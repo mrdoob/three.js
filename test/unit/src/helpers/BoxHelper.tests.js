@@ -1,36 +1,67 @@
-(function () {
+/* global QUnit */
 
-	'use strict';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
+import { BoxHelper } from '../../../../src/helpers/BoxHelper';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
+import { Mesh } from '../../../../src/objects/Mesh';
 
-	var parameters = {
-		diameter: 10
-	};
+export default QUnit.module( 'Helpers', () => {
 
-	var geometries;
+	QUnit.module( 'BoxHelper', ( hooks ) => {
 
-	QUnit.module( "Extras - Helpers - BoxHelper", {
-
-		beforeEach: function() {
-			var greenMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		var geometries = undefined;
+		hooks.beforeEach( function () {
 
 			// Test with a normal cube and a box helper
-			var boxGeometry = new THREE.BoxGeometry( parameters.diameter );
-			var box = new THREE.Mesh( boxGeometry, greenMaterial );
-			var boxHelper = new THREE.BoxHelper( box );
+			var boxGeometry = new BoxGeometry();
+			var box = new Mesh( boxGeometry );
+			var boxHelper = new BoxHelper( box );
 
 			// The same should happen with a comparable sphere
-			var sphereGeometry = new THREE.SphereGeometry( parameters.diameter / 2 );
-			var sphere = new THREE.Mesh( sphereGeometry, greenMaterial );
-			var sphereBoxHelper = new THREE.BoxHelper( sphere );
+			var sphereGeometry = new SphereGeometry();
+			var sphere = new Mesh( sphereGeometry );
+			var sphereBoxHelper = new BoxHelper( sphere );
 
 			// Note that unlike what I'd like to, these doesn't check the equivalency of the two generated geometries
 			geometries = [ boxHelper.geometry, sphereBoxHelper.geometry ];
-		}
 
-	});
+		} );
 
-	QUnit.test( "standard geometry tests", function( assert ) {
-		runStdGeometryTests( assert, geometries );
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.todo( "update", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.todo( "setFromObject", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
+
+			runStdGeometryTests( assert, geometries );
+
+		} );
+
+	} );
+
+} );

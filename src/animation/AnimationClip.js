@@ -1,69 +1,70 @@
-import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack';
-import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack';
-import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack';
-import { AnimationUtils } from './AnimationUtils';
-import { KeyframeTrack } from './KeyframeTrack';
-import { _Math } from '../math/Math';
+import { AnimationUtils } from './AnimationUtils.js';
+import { KeyframeTrack } from './KeyframeTrack.js';
+import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack.js';
+import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack.js';
+import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
+import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
+import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
+import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
+import * as MathUtils from '../math/MathUtils.js';
+import { NormalAnimationBlendMode } from '../constants.js';
 
-/**
- *
- * Reusable set of Tracks that represent an animation.
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
+class AnimationClip {
 
-function AnimationClip( name, duration, tracks ) {
+	constructor( name, duration = - 1, tracks, blendMode = NormalAnimationBlendMode ) {
 
-	this.name = name;
-	this.tracks = tracks;
-	this.duration = ( duration !== undefined ) ? duration : - 1;
+		this.name = name;
+		this.tracks = tracks;
+		this.duration = duration;
+		this.blendMode = blendMode;
 
-	this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
-	// this means it should figure out its duration by scanning the tracks
-	if ( this.duration < 0 ) {
+		// this means it should figure out its duration by scanning the tracks
+		if ( this.duration < 0 ) {
 
-		this.resetDuration();
-
-	}
-
-	this.optimize();
-
-}
-
-Object.assign( AnimationClip, {
-
-	parse: function ( json ) {
-
-		var tracks = [],
-			jsonTracks = json.tracks,
-			frameTime = 1.0 / ( json.fps || 1.0 );
-
-		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
-
-			tracks.push( KeyframeTrack.parse( jsonTracks[ i ] ).scale( frameTime ) );
+			this.resetDuration();
 
 		}
 
-		return new AnimationClip( json.name, json.duration, tracks );
+	}
 
-	},
 
-	toJSON: function ( clip ) {
+	static parse( json ) {
 
-		var tracks = [],
+		const tracks = [],
+			jsonTracks = json.tracks,
+			frameTime = 1.0 / ( json.fps || 1.0 );
+
+		for ( let i = 0, n = jsonTracks.length; i !== n; ++ i ) {
+
+			tracks.push( parseKeyframeTrack( jsonTracks[ i ] ).scale( frameTime ) );
+
+		}
+
+		const clip = new this( json.name, json.duration, tracks, json.blendMode );
+		clip.uuid = json.uuid;
+
+		return clip;
+
+	}
+
+	static toJSON( clip ) {
+
+		const tracks = [],
 			clipTracks = clip.tracks;
 
-		var json = {
+		const json = {
 
 			'name': clip.name,
 			'duration': clip.duration,
-			'tracks': tracks
+			'tracks': tracks,
+			'uuid': clip.uuid,
+			'blendMode': clip.blendMode
 
 		};
 
-		for ( var i = 0, n = clipTracks.length; i !== n; ++ i ) {
+		for ( let i = 0, n = clipTracks.length; i !== n; ++ i ) {
 
 			tracks.push( KeyframeTrack.toJSON( clipTracks[ i ] ) );
 
@@ -71,26 +72,26 @@ Object.assign( AnimationClip, {
 
 		return json;
 
-	},
+	}
 
-	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
+	static CreateFromMorphTargetSequence( name, morphTargetSequence, fps, noLoop ) {
 
-		var numMorphTargets = morphTargetSequence.length;
-		var tracks = [];
+		const numMorphTargets = morphTargetSequence.length;
+		const tracks = [];
 
-		for ( var i = 0; i < numMorphTargets; i ++ ) {
+		for ( let i = 0; i < numMorphTargets; i ++ ) {
 
-			var times = [];
-			var values = [];
+			let times = [];
+			let values = [];
 
 			times.push(
-					( i + numMorphTargets - 1 ) % numMorphTargets,
-					i,
-					( i + 1 ) % numMorphTargets );
+				( i + numMorphTargets - 1 ) % numMorphTargets,
+				i,
+				( i + 1 ) % numMorphTargets );
 
 			values.push( 0, 1, 0 );
 
-			var order = AnimationUtils.getKeyframeOrder( times );
+			const order = AnimationUtils.getKeyframeOrder( times );
 			times = AnimationUtils.sortedArray( times, 1, order );
 			values = AnimationUtils.sortedArray( values, 1, order );
 
@@ -104,29 +105,29 @@ Object.assign( AnimationClip, {
 			}
 
 			tracks.push(
-					new NumberKeyframeTrack(
-						'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
-						times, values
-					).scale( 1.0 / fps ) );
+				new NumberKeyframeTrack(
+					'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
+					times, values
+				).scale( 1.0 / fps ) );
 
 		}
 
-		return new AnimationClip( name, - 1, tracks );
+		return new this( name, - 1, tracks );
 
-	},
+	}
 
-	findByName: function ( objectOrClipArray, name ) {
+	static findByName( objectOrClipArray, name ) {
 
-		var clipArray = objectOrClipArray;
+		let clipArray = objectOrClipArray;
 
 		if ( ! Array.isArray( objectOrClipArray ) ) {
 
-			var o = objectOrClipArray;
+			const o = objectOrClipArray;
 			clipArray = o.geometry && o.geometry.animations || o.animations;
 
 		}
 
-		for ( var i = 0; i < clipArray.length; i ++ ) {
+		for ( let i = 0; i < clipArray.length; i ++ ) {
 
 			if ( clipArray[ i ].name === name ) {
 
@@ -138,28 +139,29 @@ Object.assign( AnimationClip, {
 
 		return null;
 
-	},
+	}
 
-	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
+	static CreateClipsFromMorphTargetSequences( morphTargets, fps, noLoop ) {
 
-		var animationToMorphTargets = {};
+		const animationToMorphTargets = {};
 
 		// tested with https://regex101.com/ on trick sequences
 		// such flamingo_flyA_003, flamingo_run1_003, crdeath0059
-		var pattern = /^([\w-]*?)([\d]+)$/;
+		const pattern = /^([\w-]*?)([\d]+)$/;
 
 		// sort morph target names into animation groups based
 		// patterns like Walk_001, Walk_002, Run_001, Run_002
-		for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
+		for ( let i = 0, il = morphTargets.length; i < il; i ++ ) {
 
-			var morphTarget = morphTargets[ i ];
-			var parts = morphTarget.name.match( pattern );
+			const morphTarget = morphTargets[ i ];
+			const parts = morphTarget.name.match( pattern );
 
 			if ( parts && parts.length > 1 ) {
 
-				var name = parts[ 1 ];
+				const name = parts[ 1 ];
 
-				var animationMorphTargets = animationToMorphTargets[ name ];
+				let animationMorphTargets = animationToMorphTargets[ name ];
+
 				if ( ! animationMorphTargets ) {
 
 					animationToMorphTargets[ name ] = animationMorphTargets = [];
@@ -172,20 +174,20 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var clips = [];
+		const clips = [];
 
-		for ( var name in animationToMorphTargets ) {
+		for ( const name in animationToMorphTargets ) {
 
-			clips.push( AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps, noLoop ) );
+			clips.push( this.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps, noLoop ) );
 
 		}
 
 		return clips;
 
-	},
+	}
 
 	// parse the animation.hierarchy format
-	parseAnimation: function ( animation, bones ) {
+	static parseAnimation( animation, bones ) {
 
 		if ( ! animation ) {
 
@@ -194,13 +196,13 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
+		const addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
 
 			// only return track if there are actually keys.
 			if ( animationKeys.length !== 0 ) {
 
-				var times = [];
-				var values = [];
+				const times = [];
+				const values = [];
 
 				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
 
@@ -215,18 +217,20 @@ Object.assign( AnimationClip, {
 
 		};
 
-		var tracks = [];
+		const tracks = [];
 
-		var clipName = animation.name || 'default';
+		const clipName = animation.name || 'default';
+		const fps = animation.fps || 30;
+		const blendMode = animation.blendMode;
+
 		// automatic length determination in AnimationClip.
-		var duration = animation.length || - 1;
-		var fps = animation.fps || 30;
+		let duration = animation.length || - 1;
 
-		var hierarchyTracks = animation.hierarchy || [];
+		const hierarchyTracks = animation.hierarchy || [];
 
-		for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
+		for ( let h = 0; h < hierarchyTracks.length; h ++ ) {
 
-			var animationKeys = hierarchyTracks[ h ].keys;
+			const animationKeys = hierarchyTracks[ h ].keys;
 
 			// skip empty tracks
 			if ( ! animationKeys || animationKeys.length === 0 ) continue;
@@ -235,13 +239,15 @@ Object.assign( AnimationClip, {
 			if ( animationKeys[ 0 ].morphTargets ) {
 
 				// figure out all morph targets used in this track
-				var morphTargetNames = {};
+				const morphTargetNames = {};
 
-				for ( var k = 0; k < animationKeys.length; k ++ ) {
+				let k;
+
+				for ( k = 0; k < animationKeys.length; k ++ ) {
 
 					if ( animationKeys[ k ].morphTargets ) {
 
-						for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
+						for ( let m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
 
 							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
 
@@ -254,14 +260,14 @@ Object.assign( AnimationClip, {
 				// create a track for each morph target with all zero
 				// morphTargetInfluences except for the keys in which
 				// the morphTarget is named.
-				for ( var morphTargetName in morphTargetNames ) {
+				for ( const morphTargetName in morphTargetNames ) {
 
-					var times = [];
-					var values = [];
+					const times = [];
+					const values = [];
 
-					for ( var m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
+					for ( let m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
 
-						var animationKey = animationKeys[ k ];
+						const animationKey = animationKeys[ k ];
 
 						times.push( animationKey.time );
 						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
@@ -278,19 +284,19 @@ Object.assign( AnimationClip, {
 
 				// ...assume skeletal animation
 
-				var boneName = '.bones[' + bones[ h ].name + ']';
+				const boneName = '.bones[' + bones[ h ].name + ']';
 
 				addNonemptyTrack(
-						VectorKeyframeTrack, boneName + '.position',
-						animationKeys, 'pos', tracks );
+					VectorKeyframeTrack, boneName + '.position',
+					animationKeys, 'pos', tracks );
 
 				addNonemptyTrack(
-						QuaternionKeyframeTrack, boneName + '.quaternion',
-						animationKeys, 'rot', tracks );
+					QuaternionKeyframeTrack, boneName + '.quaternion',
+					animationKeys, 'rot', tracks );
 
 				addNonemptyTrack(
-						VectorKeyframeTrack, boneName + '.scale',
-						animationKeys, 'scl', tracks );
+					VectorKeyframeTrack, boneName + '.scale',
+					animationKeys, 'scl', tracks );
 
 			}
 
@@ -302,23 +308,20 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var clip = new AnimationClip( clipName, duration, tracks );
+		const clip = new this( clipName, duration, tracks, blendMode );
 
 		return clip;
 
 	}
 
-} );
+	resetDuration() {
 
-Object.assign( AnimationClip.prototype, {
+		const tracks = this.tracks;
+		let duration = 0;
 
-	resetDuration: function () {
+		for ( let i = 0, n = tracks.length; i !== n; ++ i ) {
 
-		var tracks = this.tracks, duration = 0;
-
-		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
-
-			var track = this.tracks[ i ];
+			const track = this.tracks[ i ];
 
 			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
 
@@ -326,11 +329,13 @@ Object.assign( AnimationClip.prototype, {
 
 		this.duration = duration;
 
-	},
+		return this;
 
-	trim: function () {
+	}
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+	trim() {
+
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].trim( 0, this.duration );
 
@@ -338,11 +343,25 @@ Object.assign( AnimationClip.prototype, {
 
 		return this;
 
-	},
+	}
 
-	optimize: function () {
+	validate() {
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+		let valid = true;
+
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
+
+			valid = valid && this.tracks[ i ].validate();
+
+		}
+
+		return valid;
+
+	}
+
+	optimize() {
+
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].optimize();
 
@@ -352,7 +371,103 @@ Object.assign( AnimationClip.prototype, {
 
 	}
 
-} );
+	clone() {
 
+		const tracks = [];
+
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
+
+			tracks.push( this.tracks[ i ].clone() );
+
+		}
+
+		return new this.constructor( this.name, this.duration, tracks, this.blendMode );
+
+	}
+
+	toJSON() {
+
+		return this.constructor.toJSON( this );
+
+	}
+
+}
+
+function getTrackTypeForValueTypeName( typeName ) {
+
+	switch ( typeName.toLowerCase() ) {
+
+		case 'scalar':
+		case 'double':
+		case 'float':
+		case 'number':
+		case 'integer':
+
+			return NumberKeyframeTrack;
+
+		case 'vector':
+		case 'vector2':
+		case 'vector3':
+		case 'vector4':
+
+			return VectorKeyframeTrack;
+
+		case 'color':
+
+			return ColorKeyframeTrack;
+
+		case 'quaternion':
+
+			return QuaternionKeyframeTrack;
+
+		case 'bool':
+		case 'boolean':
+
+			return BooleanKeyframeTrack;
+
+		case 'string':
+
+			return StringKeyframeTrack;
+
+	}
+
+	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+
+}
+
+function parseKeyframeTrack( json ) {
+
+	if ( json.type === undefined ) {
+
+		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+
+	}
+
+	const trackType = getTrackTypeForValueTypeName( json.type );
+
+	if ( json.times === undefined ) {
+
+		const times = [], values = [];
+
+		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+
+		json.times = times;
+		json.values = values;
+
+	}
+
+	// derived classes can define a static parse method
+	if ( trackType.parse !== undefined ) {
+
+		return trackType.parse( json );
+
+	} else {
+
+		// by default, we assume a constructor compatible with the base
+		return new trackType( json.name, json.times, json.values, json.interpolation );
+
+	}
+
+}
 
 export { AnimationClip };

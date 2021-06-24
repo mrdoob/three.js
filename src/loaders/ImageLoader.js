@@ -1,28 +1,23 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { Cache } from './Cache.js';
+import { Loader } from './Loader.js';
 
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
+class ImageLoader extends Loader {
 
+	constructor( manager ) {
 
-function ImageLoader( manager ) {
+		super( manager );
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	}
 
-}
-
-Object.assign( ImageLoader.prototype, {
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		if ( url === undefined ) url = '';
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.path !== undefined ) url = this.path + url;
 
-		var scope = this;
+		url = this.manager.resolveURL( url );
 
-		var cached = Cache.get( url );
+		const scope = this;
+
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -40,9 +35,12 @@ Object.assign( ImageLoader.prototype, {
 
 		}
 
-		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+		const image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
-		image.addEventListener( 'load', function () {
+		function onImageLoad() {
+
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 			Cache.add( url, this );
 
@@ -50,24 +48,22 @@ Object.assign( ImageLoader.prototype, {
 
 			scope.manager.itemEnd( url );
 
-		}, false );
+		}
 
-		/*
-		image.addEventListener( 'progress', function ( event ) {
+		function onImageError( event ) {
 
-			if ( onProgress ) onProgress( event );
-
-		}, false );
-		*/
-
-		image.addEventListener( 'error', function ( event ) {
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 			if ( onError ) onError( event );
 
-			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
 
-		}, false );
+		}
+
+		image.addEventListener( 'load', onImageLoad, false );
+		image.addEventListener( 'error', onImageError, false );
 
 		if ( url.substr( 0, 5 ) !== 'data:' ) {
 
@@ -81,23 +77,9 @@ Object.assign( ImageLoader.prototype, {
 
 		return image;
 
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
 	}
 
-} );
+}
 
 
 export { ImageLoader };

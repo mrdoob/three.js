@@ -4,142 +4,110 @@
 		<title>three.js webgl - FBX loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader test
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader<br />
+			Character and animation from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/curves/NURBSCurve.js"></script>
-		<script src="js/curves/NURBSUtils.js"></script>
-		<script src="js/loaders/FBXLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
-		<script>
+			let camera, scene, renderer, stats;
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			const clock = new THREE.Clock();
 
-			var container, stats, controls;
-			var camera, scene, renderer, light;
-
-			var clock = new THREE.Clock();
-
-			var mixers = [];
+			let mixer;
 
 			init();
+			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 100, 200, 300 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
-				// grid
-				var gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
-				gridHelper.position.set( 0, - 0.04, 0 );
-				scene.add( gridHelper );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				hemiLight.position.set( 0, 200, 0 );
+				scene.add( hemiLight );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 0, 200, 100 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.top = 180;
+				dirLight.shadow.camera.bottom = - 100;
+				dirLight.shadow.camera.left = - 120;
+				dirLight.shadow.camera.right = 120;
+				scene.add( dirLight );
+
+				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+
+				// ground
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				// model
+				const loader = new FBXLoader();
+				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
+
+					mixer = new THREE.AnimationMixer( object );
+
+					const action = mixer.clipAction( object.animations[ 0 ] );
+					action.play();
+
+					object.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+							child.castShadow = true;
+							child.receiveShadow = true;
+
+						}
+
+					} );
+
+					scene.add( object );
+
+				} );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 100, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
 
 				// stats
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
-				// model
-				var manager = new THREE.LoadingManager();
-				manager.onProgress = function( item, loaded, total ) {
-
-					console.log( item, loaded, total );
-
-				};
-
-				var onProgress = function( xhr ) {
-
-					if ( xhr.lengthComputable ) {
-
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
-
-					}
-
-				};
-
-				var onError = function( xhr ) {
-
-					console.error( xhr );
-
-				};
-
-				var loader = new THREE.FBXLoader( manager );
-				loader.load( 'models/fbx/xsi_man_skinning.fbx', function( object ) {
-
-					object.mixer = new THREE.AnimationMixer( object );
-					mixers.push( object.mixer );
-
-					var action = object.mixer.clipAction( object.animations[ 0 ] );
-					action.play();
-
-					scene.add( object );
-
-
-				}, onProgress, onError );
-
-				loader.load( 'models/fbx/nurbs.fbx', function( object ) {
-
-					scene.add( object );
-
-				}, onProgress, onError );
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );
-				container.appendChild( renderer.domElement );
-
-				// controls, camera
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 12, 0 );
-				camera.position.set( 2, 18, 28 );
-				controls.update();
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-				light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
-				light.position.set(0, 1, 0);
-				scene.add(light);
-
-				light = new THREE.DirectionalLight(0xffffff, 1.0);
-				light.position.set(0, 1, 0);
-				scene.add(light);
-
-				animate();
 
 			}
 
@@ -158,25 +126,13 @@
 
 				requestAnimationFrame( animate );
 
-				if ( mixers.length > 0 ) {
+				const delta = clock.getDelta();
 
-					for ( var i = 0; i < mixers.length; i ++ ) {
-
-						mixers[ i ].update( clock.getDelta() );
-
-					}
-
-				}
-
-				stats.update();
-
-				render();
-
-			}
-
-			function render() {
+				if ( mixer ) mixer.update( delta );
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

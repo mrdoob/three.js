@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		This class stores data for an attribute (such as vertex positions, face indices, normals,
+		colors, UVs, and any custom attributes ) associated with a [page:BufferGeometry], which allows
+		for more efficient passing of data to the GPU. See that page for details and a usage example.<br /><br />
+
+		Data is stored as vectors of any length (defined by [page:BufferAttribute.itemSize itemSize]),
+		and in general in the methods outlined below if passing in an index, this is automatically
+		multiplied by the vector length.
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:TypedArray array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
+		<p>
+		[page:TypedArray array] -- Must be a [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/TypedArray TypedArray].
+		Used to instantiate the buffer. <br />
+		This array should have
+	 	<code>itemSize * numVertices</code>
+		elements, where numVertices is the number of vertices in the associated [page:BufferGeometry BufferGeometry].<br /><br />
+
+
+		[page:Integer itemSize] --  the number of values of the array that should be associated with
+		a particular vertex. For instance, if this
+		attribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3.
+		<br /><br />
+
+		[page:Boolean normalized] -- (optional) Applies to integer data only. Indicates how the underlying data
+		in the buffer maps to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance
+		of UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
+		 data will be mapped to 0.0f - +1.0f in the GLSL attribute. An Int16Array (signed) would map
+		 from -32767 - +32767  to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values
+		 will be converted to floats unmodified, i.e. 32767 becomes 32767.0f.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:TypedArray array]</h3>
+		<p>
+		The [page:TypedArray array] holding data stored in the buffer.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+		Stores the [page:BufferAttribute.array array]'s length divided by the [page:BufferAttribute.itemSize itemSize].<br /><br />
+
+		If the buffer is storing a 3-component vector (such as a position, normal, or color),
+		then this will count the number of such vectors stored.
+		</p>
+
+		<h3>[property:Integer itemSize]</h3>
+		<p>The length of vectors that are being stored in the [page:BufferAttribute.array array].</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		Optional name for this attribute instance. Default is an empty string.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+		Flag to indicate that this attribute has changed and should be re-sent to the GPU.
+		Set this to true when you modify the value of the array.<br /><br />
+
+		Setting this to true also increments the [page:BufferAttribute.version version].
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+		Indicates how the underlying data in the buffer maps to the values in the GLSL shader code.
+		See the constructor above for details.
+		</p>
+
+		<h3>[property:Function onUploadCallback]</h3>
+		<p>
+		A callback function that is executed after the Renderer has transferred the attribute array data to the GPU.
+		</p>
+
+		<h3>[property:Object updateRange]</h3>
+		<p>Object containing:<br />
+			[page:Integer offset]: Default is *0*. Position at which to start update.<br />
+			[page:Integer count]: Default is *-1*, which means don't use update ranges. <br /><br />
+
+			This can be used to only update some components of stored vectors (for example, just the component
+			related to color).
+		</p>
+
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+			Default is *THREE.StaticDrawUsage*.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>A version number, incremented every time the [page:BufferAttribute.needsUpdate needsUpdate] property is set to true.</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Applies matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Applies normal matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute, interpreting the elements as a direction vectors.</p>
+
+		<h3>[method:BufferAttribute clone]() </h3>
+		<p>Return a copy of this bufferAttribute.</p>
+
+		<h3>[method:BufferAttribute copy]( [param:BufferAttribute bufferAttribute] )</h3>
+		<p>Copies another BufferAttribute to this BufferAttribute.</p>
+
+		<h3>[method:BufferAttribute copyArray]( array ) </h3>
+		<p>Copy the array given here (which can be a normal array or TypedArray) into
+			[page:BufferAttribute.array array].<br /><br />
+
+			See [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]
+			for notes on requirements if copying a TypedArray.
+		</p>
+
+		<h3>[method:null copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
+		<p>Copy a vector from bufferAttribute[index2] to [page:BufferAttribute.array array][index1].</p>
+
+		<h3>[method:BufferAttribute copyColorsArray]( [param:Array colors] ) </h3>
+		<p>Copy an array representing RGB color values into [page:BufferAttribute.array array].</p>
+
+		<h3>[method:BufferAttribute copyVector2sArray]( [param:Array vectors] ) </h3>
+		<p>Copy an array representing [page:Vector2]s into [page:BufferAttribute.array array].</p>
+
+		<h3>[method:BufferAttribute copyVector3sArray]( [param:Array vectors] ) </h3>
+		<p>Copy an array representing [page:Vector3]s into [page:BufferAttribute.array array].</p>
+
+		<h3>[method:BufferAttribute copyVector4sArray]( [param:Array vectors] ) </h3>
+		<p>Copy an array representing [page:Vector4]s into [page:BufferAttribute.array array].</p>
+
+		<h3>[method:Number getX]( [param:Integer index] ) </h3>
+		<p>Returns the x component of the vector at the given index.</p>
+
+		<h3>[method:Number getY]( [param:Integer index] ) </h3>
+		<p>Returns the y component of the vector at the given index.</p>
+
+		<h3>[method:Number getZ]( [param:Integer index] ) </h3>
+		<p>Returns the z component of the vector at the given index.</p>
+
+		<h3>[method:Number getW]( [param:Integer index] ) </h3>
+		<p>Returns the w component of the vector at the given index.</p>
+
+		<h3>[method:this onUpload]( [param:Function callback] ) </h3>
+		<p>
+		Sets the value of the onUploadCallback property.<br /><br />
+
+		In the [example:webgl_buffergeometry WebGL / Buffergeometry] this is used to free memory
+		after the buffer has been	transferred to the GPU.
+		</p>
+
+		<h3>[method:BufferAttribute set] ( [param:Array value], [param:Integer offset] ) </h3>
+		<p>
+		value -- an [page:Array] or [page:TypedArray] from which to copy values. <br />
+		offset -- (optional) index of the [page:BufferAttribute.array array] at which to start copying.<br /><br />
+
+		Calls	[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]( [page:Array value], [page:Integer offset] )
+		on the [page:BufferAttribute.array array].<br /><br />
+
+		In particular, see that page for requirements on [page:Array value]
+		being a [page:TypedArray].
+		</p>
+
+		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:BufferAttribute.usage usage] to value.</p>
+
+		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
+		<p>Sets the x component of the vector at the given index.</p>
+
+		<h3>[method:BufferAttribute setY]( [param:Integer index], [param:Float y] ) </h3>
+		<p>Sets the y component of the vector at the given index.</p>
+
+		<h3>[method:BufferAttribute setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<p>Sets the z component of the vector at the given index.</p>
+
+		<h3>[method:BufferAttribute setW]( [param:Integer index], [param:Float w] ) </h3>
+		<p>Sets the w component of the vector at the given index.</p>
+
+		<h3>[method:BufferAttribute setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<p>Sets the x and y components of the vector at the given index.</p>
+
+		<h3>[method:BufferAttribute setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<p>Sets the x, y and z components of the vector at the given index.</p>
+
+		<h3>[method:BufferAttribute setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<p>Sets the x, y, z and w components of the vector at the given index.</p>
+
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

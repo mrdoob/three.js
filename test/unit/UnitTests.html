@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ThreeJS Unit Tests - Using Files in /src</title>
+        <link rel="stylesheet" href="../node_modules/qunit/qunit/qunit.css">
+    </head>
+    <body>
+
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+
+        <script src="../node_modules/qunit/qunit/qunit.js"></script>
+
+        <!-- We need three.js because qunit-utils cannot be es6 module and use THREE stuff... -->
+        <script src="../../build/three.js"></script>
+
+        <!-- add sources to test below -->
+        <script src="build/three.source.unit.js"></script>
+        <script src="build/three.example.unit.js"></script>
+
+    </body>
+</html>

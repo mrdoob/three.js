@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A continuous line that connects back to the start.<br /><br />
+
+			This is nearly the same	as [page:Line]; the only difference is that it is rendered using
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_LOOP]
+			instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP],
+			which draws a straight line to the next vertex, and connects the last vertex back to the first.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
+
+		<p>
+		[page:BufferGeometry geometry] — List of vertices representing points on the line loop.<br />
+		[page:Material material] — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Line] class for common properties.</p>
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Line] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

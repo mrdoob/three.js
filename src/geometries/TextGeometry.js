@@ -1,7 +1,4 @@
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author alteredq / http://alteredqualia.com/
- *
  * Text = 3D Text
  *
  * parameters = {
@@ -13,69 +10,46 @@
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float> // how far from text outline is bevel
+ *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
+ *  bevelOffset: <float> // how far from text outline does bevel start
  * }
  */
 
-import { Geometry } from '../core/Geometry';
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { ExtrudeGeometry } from './ExtrudeGeometry.js';
 
-// TextGeometry
+class TextGeometry extends ExtrudeGeometry {
 
-function TextGeometry(  text, parameters ) {
+	constructor( text, parameters = {} ) {
 
-	Geometry.call( this );
+		const font = parameters.font;
 
-	this.type = 'TextGeometry';
+		if ( ! ( font && font.isFont ) ) {
 
-	this.parameters = {
-		text: text,
-		parameters: parameters
-	};
+			console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
+			return new BufferGeometry();
 
-	this.fromBufferGeometry( new TextBufferGeometry( text, parameters ) );
-	this.mergeVertices();
+		}
 
-}
+		const shapes = font.generateShapes( text, parameters.size );
 
-TextGeometry.prototype = Object.create( Geometry.prototype );
-TextGeometry.prototype.constructor = TextGeometry;
+		// translate parameters to ExtrudeGeometry API
 
-// TextBufferGeometry
+		parameters.depth = parameters.height !== undefined ? parameters.height : 50;
 
-function TextBufferGeometry( text, parameters ) {
+		// defaults
 
-	parameters = parameters || {};
+		if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+		if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+		if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
 
-	var font = parameters.font;
+		super( shapes, parameters );
 
-	if ( ( font && font.isFont ) === false ) {
-
-		console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
-		return new Geometry();
+		this.type = 'TextGeometry';
 
 	}
 
-	var shapes = font.generateShapes( text, parameters.size, parameters.curveSegments );
-
-	// translate parameters to ExtrudeGeometry API
-
-	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
-
-	// defaults
-
-	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
-	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
-	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
-
-	ExtrudeBufferGeometry.call( this, shapes, parameters );
-
-	this.type = 'TextBufferGeometry';
-
 }
 
-TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
-TextBufferGeometry.prototype.constructor = TextBufferGeometry;
 
-
-export { TextGeometry, TextBufferGeometry };
+export { TextGeometry, TextGeometry as TextBufferGeometry };

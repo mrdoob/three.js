@@ -1,26 +1,28 @@
-import { BufferAttribute } from './BufferAttribute';
+import { BufferAttribute } from './BufferAttribute.js';
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
+class InstancedBufferAttribute extends BufferAttribute {
 
-function InstancedBufferAttribute( array, itemSize, meshPerAttribute ) {
+	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
 
-	BufferAttribute.call( this, array, itemSize );
+		if ( typeof normalized === 'number' ) {
 
-	this.meshPerAttribute = meshPerAttribute || 1;
+			meshPerAttribute = normalized;
 
-}
+			normalized = false;
 
-InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribute.prototype ), {
+			console.error( 'THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.' );
 
-	constructor: InstancedBufferAttribute,
+		}
 
-	isInstancedBufferAttribute: true,
+		super( array, itemSize, normalized );
 
-	copy: function ( source ) {
+		this.meshPerAttribute = meshPerAttribute;
 
-		BufferAttribute.prototype.copy.call( this, source );
+	}
+
+	copy( source ) {
+
+		super.copy( source );
 
 		this.meshPerAttribute = source.meshPerAttribute;
 
@@ -28,8 +30,20 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 	}
 
-} );
+	toJSON() {
 
+		const data = super.toJSON();
 
+		data.meshPerAttribute = this.meshPerAttribute;
+
+		data.isInstancedBufferAttribute = true;
+
+		return data;
+
+	}
+
+}
+
+InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
 
 export { InstancedBufferAttribute };

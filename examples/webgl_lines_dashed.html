@@ -4,50 +4,25 @@
 		<title>three.js webgl - dashed lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/geometries/hilbert3D.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			let renderer, scene, camera, stats;
+			const objects = [];
 
-			var renderer, scene, camera, stats;
-			var objects = [];
-
-
-			var WIDTH = window.innerWidth,
-				HEIGHT = window.innerHeight;
+			const WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 
 			init();
 			animate();
@@ -58,49 +33,37 @@
 				camera.position.z = 150;
 
 				scene = new THREE.Scene();
-
+				scene.background = new THREE.Color( 0x111111 );
 				scene.fog = new THREE.Fog( 0x111111, 150, 200 );
 
-				root = new THREE.Object3D();
+				const subdivisions = 6;
+				const recursion = 1;
 
-				var subdivisions = 6;
-				var recursion = 1;
+				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+				const spline = new THREE.CatmullRomCurve3( points );
 
-				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+				const samples = spline.getPoints( points.length * subdivisions );
+				const geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
 
-				var spline = new THREE.CatmullRomCurve3( points );
-				var geometrySpline = new THREE.Geometry();
+				const line = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
+				line.computeLineDistances();
 
-				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
+				objects.push( line );
+				scene.add( line );
 
-					var index = i / ( points.length * subdivisions );
-					var position = spline.getPoint( index );
+				const geometryBox = box( 50, 50, 50 );
 
-					geometrySpline.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
+				const lineSegments = new THREE.LineSegments( geometryBox, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
+				lineSegments.computeLineDistances();
 
-				}
-
-				var geometryCube = cube( 50 );
-
-				geometryCube.computeLineDistances();
-				geometrySpline.computeLineDistances();
-
-				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
-
-				objects.push( object );
-				scene.add( object );
-
-				var object = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ) );
-
-				objects.push( object );
-				scene.add( object );
+				objects.push( lineSegments );
+				scene.add( lineSegments );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x111111 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -108,54 +71,58 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function cube( size ) {
+			function box( width, height, depth ) {
 
-				var h = size * 0.5;
+				width = width * 0.5,
+				height = height * 0.5,
+				depth = depth * 0.5;
 
-				var geometry = new THREE.Geometry();
+				const geometry = new THREE.BufferGeometry();
+				const position = [];
 
-				geometry.vertices.push(
-					new THREE.Vector3( -h, -h, -h ),
-					new THREE.Vector3( -h, h, -h ),
+				position.push(
+					- width, - height, - depth,
+					- width, height, - depth,
 
-					new THREE.Vector3( -h, h, -h ),
-					new THREE.Vector3( h, h, -h ),
+					- width, height, - depth,
+					width, height, - depth,
 
-					new THREE.Vector3( h, h, -h ),
-					new THREE.Vector3( h, -h, -h ),
+					width, height, - depth,
+					width, - height, - depth,
 
-					new THREE.Vector3( h, -h, -h ),
-					new THREE.Vector3( -h, -h, -h ),
+					width, - height, - depth,
+					- width, - height, - depth,
 
+					- width, - height, depth,
+					- width, height, depth,
 
-					new THREE.Vector3( -h, -h, h ),
-					new THREE.Vector3( -h, h, h ),
+					- width, height, depth,
+					width, height, depth,
 
-					new THREE.Vector3( -h, h, h ),
-					new THREE.Vector3( h, h, h ),
+					width, height, depth,
+					width, - height, depth,
 
-					new THREE.Vector3( h, h, h ),
-					new THREE.Vector3( h, -h, h ),
+					width, - height, depth,
+					- width, - height, depth,
 
-					new THREE.Vector3( h, -h, h ),
-					new THREE.Vector3( -h, -h, h ),
+					- width, - height, - depth,
+					- width, - height, depth,
 
-					new THREE.Vector3( -h, -h, -h ),
-					new THREE.Vector3( -h, -h, h ),
+					- width, height, - depth,
+					- width, height, depth,
 
-					new THREE.Vector3( -h, h, -h ),
-					new THREE.Vector3( -h, h, h ),
+					width, height, - depth,
+					width, height, depth,
 
-					new THREE.Vector3( h, h, -h ),
-					new THREE.Vector3( h, h, h ),
-
-					new THREE.Vector3( h, -h, -h ),
-					new THREE.Vector3( h, -h, h )
+					width, - height, - depth,
+					width, - height, depth
 				 );
+
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
 
 				return geometry;
 
@@ -181,17 +148,18 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
-				for ( var i = 0; i < objects.length; i ++ ) {
+				scene.traverse( function ( object ) {
 
-					var object = objects[ i ];
+					if ( object.isLine ) {
 
-					//object.rotation.x = 0.25 * time * ( i%2 == 1 ? 1 : -1);
-					object.rotation.x = 0.25 * time;
-					object.rotation.y = 0.25 * time;
+						object.rotation.x = 0.25 * time;
+						object.rotation.y = 0.25 * time;
 
-				}
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

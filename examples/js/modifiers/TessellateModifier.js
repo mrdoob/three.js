@@ -1,236 +1,290 @@
-/**
+( function () {
+
+	/**
  * Break faces with edges longer than maxEdgeLength
- * - not recursive
- *
- * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.TessellateModifier = function ( maxEdgeLength ) {
+	class TessellateModifier {
 
-	this.maxEdgeLength = maxEdgeLength;
+		constructor( maxEdgeLength = 0.1, maxIterations = 6 ) {
 
-};
+			this.maxEdgeLength = maxEdgeLength;
+			this.maxIterations = maxIterations;
 
-THREE.TessellateModifier.prototype.modify = function ( geometry ) {
+		}
 
-	var edge;
+		modify( geometry ) {
 
-	var faces = [];
-	var faceVertexUvs = [];
-	var maxEdgeLengthSquared = this.maxEdgeLength * this.maxEdgeLength;
+			if ( geometry.isGeometry === true ) {
 
-	for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+				console.error( 'THREE.TessellateModifier no longer supports Geometry. Use THREE.BufferGeometry instead.' );
+				return geometry;
 
-		faceVertexUvs[ i ] = [];
+			}
 
-	}
+			if ( geometry.index !== null ) {
 
-	for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
+				geometry = geometry.toNonIndexed();
 
-		var face = geometry.faces[ i ];
+			} //
 
-		if ( face instanceof THREE.Face3 ) {
 
-			var a = face.a;
-			var b = face.b;
-			var c = face.c;
+			const maxIterations = this.maxIterations;
+			const maxEdgeLengthSquared = this.maxEdgeLength * this.maxEdgeLength;
+			const va = new THREE.Vector3();
+			const vb = new THREE.Vector3();
+			const vc = new THREE.Vector3();
+			const vm = new THREE.Vector3();
+			const vs = [ va, vb, vc, vm ];
+			const na = new THREE.Vector3();
+			const nb = new THREE.Vector3();
+			const nc = new THREE.Vector3();
+			const nm = new THREE.Vector3();
+			const ns = [ na, nb, nc, nm ];
+			const ca = new THREE.Color();
+			const cb = new THREE.Color();
+			const cc = new THREE.Color();
+			const cm = new THREE.Color();
+			const cs = [ ca, cb, cc, cm ];
+			const ua = new THREE.Vector2();
+			const ub = new THREE.Vector2();
+			const uc = new THREE.Vector2();
+			const um = new THREE.Vector2();
+			const us = [ ua, ub, uc, um ];
+			const u2a = new THREE.Vector2();
+			const u2b = new THREE.Vector2();
+			const u2c = new THREE.Vector2();
+			const u2m = new THREE.Vector2();
+			const u2s = [ u2a, u2b, u2c, u2m ];
+			const attributes = geometry.attributes;
+			const hasNormals = attributes.normal !== undefined;
+			const hasColors = attributes.color !== undefined;
+			const hasUVs = attributes.uv !== undefined;
+			const hasUV2s = attributes.uv2 !== undefined;
+			let positions = attributes.position.array;
+			let normals = hasNormals ? attributes.normal.array : null;
+			let colors = hasColors ? attributes.color.array : null;
+			let uvs = hasUVs ? attributes.uv.array : null;
+			let uv2s = hasUV2s ? attributes.uv2.array : null;
+			let positions2 = positions;
+			let normals2 = normals;
+			let colors2 = colors;
+			let uvs2 = uvs;
+			let uv2s2 = uv2s;
+			let iteration = 0;
+			let tessellating = true;
 
-			var va = geometry.vertices[ a ];
-			var vb = geometry.vertices[ b ];
-			var vc = geometry.vertices[ c ];
+			function addTriangle( a, b, c ) {
 
-			var dab = va.distanceToSquared( vb );
-			var dbc = vb.distanceToSquared( vc );
-			var dac = va.distanceToSquared( vc );
+				const v1 = vs[ a ];
+				const v2 = vs[ b ];
+				const v3 = vs[ c ];
+				positions2.push( v1.x, v1.y, v1.z );
+				positions2.push( v2.x, v2.y, v2.z );
+				positions2.push( v3.x, v3.y, v3.z );
 
-			if ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) {
+				if ( hasNormals ) {
 
-				var m = geometry.vertices.length;
-
-				var triA = face.clone();
-				var triB = face.clone();
-
-				if ( dab >= dbc && dab >= dac ) {
-
-					var vm = va.clone();
-					vm.lerp( vb, 0.5 );
-
-					triA.a = a;
-					triA.b = m;
-					triA.c = c;
-
-					triB.a = m;
-					triB.b = b;
-					triB.c = c;
-
-					if ( face.vertexNormals.length === 3 ) {
-
-						var vnm = face.vertexNormals[ 0 ].clone();
-						vnm.lerp( face.vertexNormals[ 1 ], 0.5 );
-
-						triA.vertexNormals[ 1 ].copy( vnm );
-						triB.vertexNormals[ 0 ].copy( vnm );
-
-					}
-
-					if ( face.vertexColors.length === 3 ) {
-
-						var vcm = face.vertexColors[ 0 ].clone();
-						vcm.lerp( face.vertexColors[ 1 ], 0.5 );
-
-						triA.vertexColors[ 1 ].copy( vcm );
-						triB.vertexColors[ 0 ].copy( vcm );
-
-					}
-
-					edge = 0;
-
-				} else if ( dbc >= dab && dbc >= dac ) {
-
-					var vm = vb.clone();
-					vm.lerp( vc, 0.5 );
-
-					triA.a = a;
-					triA.b = b;
-					triA.c = m;
-
-					triB.a = m;
-					triB.b = c;
-					triB.c = a;
-
-					if ( face.vertexNormals.length === 3 ) {
-
-						var vnm = face.vertexNormals[ 1 ].clone();
-						vnm.lerp( face.vertexNormals[ 2 ], 0.5 );
-
-						triA.vertexNormals[ 2 ].copy( vnm );
-
-						triB.vertexNormals[ 0 ].copy( vnm );
-						triB.vertexNormals[ 1 ].copy( face.vertexNormals[ 2 ] );
-						triB.vertexNormals[ 2 ].copy( face.vertexNormals[ 0 ] );
-
-					}
-
-					if ( face.vertexColors.length === 3 ) {
-
-						var vcm = face.vertexColors[ 1 ].clone();
-						vcm.lerp( face.vertexColors[ 2 ], 0.5 );
-
-						triA.vertexColors[ 2 ].copy( vcm );
-
-						triB.vertexColors[ 0 ].copy( vcm );
-						triB.vertexColors[ 1 ].copy( face.vertexColors[ 2 ] );
-						triB.vertexColors[ 2 ].copy( face.vertexColors[ 0 ] );
-
-					}
-
-					edge = 1;
-
-				} else {
-
-					var vm = va.clone();
-					vm.lerp( vc, 0.5 );
-
-					triA.a = a;
-					triA.b = b;
-					triA.c = m;
-
-					triB.a = m;
-					triB.b = b;
-					triB.c = c;
-
-					if ( face.vertexNormals.length === 3 ) {
-
-						var vnm = face.vertexNormals[ 0 ].clone();
-						vnm.lerp( face.vertexNormals[ 2 ], 0.5 );
-
-						triA.vertexNormals[ 2 ].copy( vnm );
-						triB.vertexNormals[ 0 ].copy( vnm );
-
-					}
-
-					if ( face.vertexColors.length === 3 ) {
-
-						var vcm = face.vertexColors[ 0 ].clone();
-						vcm.lerp( face.vertexColors[ 2 ], 0.5 );
-
-						triA.vertexColors[ 2 ].copy( vcm );
-						triB.vertexColors[ 0 ].copy( vcm );
-
-					}
-
-					edge = 2;
+					const n1 = ns[ a ];
+					const n2 = ns[ b ];
+					const n3 = ns[ c ];
+					normals2.push( n1.x, n1.y, n1.z );
+					normals2.push( n2.x, n2.y, n2.z );
+					normals2.push( n3.x, n3.y, n3.z );
 
 				}
 
-				faces.push( triA, triB );
-				geometry.vertices.push( vm );
+				if ( hasColors ) {
 
-				for ( var j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-					if ( geometry.faceVertexUvs[ j ].length ) {
-
-						var uvs = geometry.faceVertexUvs[ j ][ i ];
-
-						var uvA = uvs[ 0 ];
-						var uvB = uvs[ 1 ];
-						var uvC = uvs[ 2 ];
-
-						// AB
-
-						if ( edge === 0 ) {
-
-							var uvM = uvA.clone();
-							uvM.lerp( uvB, 0.5 );
-
-							var uvsTriA = [ uvA.clone(), uvM.clone(), uvC.clone() ];
-							var uvsTriB = [ uvM.clone(), uvB.clone(), uvC.clone() ];
-
-						// BC
-
-						} else if ( edge === 1 ) {
-
-							var uvM = uvB.clone();
-							uvM.lerp( uvC, 0.5 );
-
-							var uvsTriA = [ uvA.clone(), uvB.clone(), uvM.clone() ];
-							var uvsTriB = [ uvM.clone(), uvC.clone(), uvA.clone() ];
-
-						// AC
-
-						} else {
-
-							var uvM = uvA.clone();
-							uvM.lerp( uvC, 0.5 );
-
-							var uvsTriA = [ uvA.clone(), uvB.clone(), uvM.clone() ];
-							var uvsTriB = [ uvM.clone(), uvB.clone(), uvC.clone() ];
-
-						}
-
-						faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
-
-					}
+					const c1 = cs[ a ];
+					const c2 = cs[ b ];
+					const c3 = cs[ c ];
+					colors2.push( c1.x, c1.y, c1.z );
+					colors2.push( c2.x, c2.y, c2.z );
+					colors2.push( c3.x, c3.y, c3.z );
 
 				}
 
-			} else {
+				if ( hasUVs ) {
 
-				faces.push( face );
+					const u1 = us[ a ];
+					const u2 = us[ b ];
+					const u3 = us[ c ];
+					uvs2.push( u1.x, u1.y );
+					uvs2.push( u2.x, u2.y );
+					uvs2.push( u3.x, u3.y );
 
-				for ( var j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
+				}
 
-					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
+				if ( hasUV2s ) {
+
+					const u21 = u2s[ a ];
+					const u22 = u2s[ b ];
+					const u23 = u2s[ c ];
+					uv2s2.push( u21.x, u21.y );
+					uv2s2.push( u22.x, u22.y );
+					uv2s2.push( u23.x, u23.y );
 
 				}
 
 			}
 
+			while ( tessellating && iteration < maxIterations ) {
+
+				iteration ++;
+				tessellating = false;
+				positions = positions2;
+				positions2 = [];
+
+				if ( hasNormals ) {
+
+					normals = normals2;
+					normals2 = [];
+
+				}
+
+				if ( hasColors ) {
+
+					colors = colors2;
+					colors2 = [];
+
+				}
+
+				if ( hasUVs ) {
+
+					uvs = uvs2;
+					uvs2 = [];
+
+				}
+
+				if ( hasUV2s ) {
+
+					uv2s = uv2s2;
+					uv2s2 = [];
+
+				}
+
+				for ( let i = 0, i2 = 0, il = positions.length; i < il; i += 9, i2 += 6 ) {
+
+					va.fromArray( positions, i + 0 );
+					vb.fromArray( positions, i + 3 );
+					vc.fromArray( positions, i + 6 );
+
+					if ( hasNormals ) {
+
+						na.fromArray( normals, i + 0 );
+						nb.fromArray( normals, i + 3 );
+						nc.fromArray( normals, i + 6 );
+
+					}
+
+					if ( hasColors ) {
+
+						ca.fromArray( colors, i + 0 );
+						cb.fromArray( colors, i + 3 );
+						cc.fromArray( colors, i + 6 );
+
+					}
+
+					if ( hasUVs ) {
+
+						ua.fromArray( uvs, i2 + 0 );
+						ub.fromArray( uvs, i2 + 2 );
+						uc.fromArray( uvs, i2 + 4 );
+
+					}
+
+					if ( hasUV2s ) {
+
+						u2a.fromArray( uv2s, i2 + 0 );
+						u2b.fromArray( uv2s, i2 + 2 );
+						u2c.fromArray( uv2s, i2 + 4 );
+
+					}
+
+					const dab = va.distanceToSquared( vb );
+					const dbc = vb.distanceToSquared( vc );
+					const dac = va.distanceToSquared( vc );
+
+					if ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) {
+
+						tessellating = true;
+
+						if ( dab >= dbc && dab >= dac ) {
+
+							vm.lerpVectors( va, vb, 0.5 );
+							if ( hasNormals ) nm.lerpVectors( na, nb, 0.5 );
+							if ( hasColors ) cm.lerpColors( ca, cb, 0.5 );
+							if ( hasUVs ) um.lerpVectors( ua, ub, 0.5 );
+							if ( hasUV2s ) u2m.lerpVectors( u2a, u2b, 0.5 );
+							addTriangle( 0, 3, 2 );
+							addTriangle( 3, 1, 2 );
+
+						} else if ( dbc >= dab && dbc >= dac ) {
+
+							vm.lerpVectors( vb, vc, 0.5 );
+							if ( hasNormals ) nm.lerpVectors( nb, nc, 0.5 );
+							if ( hasColors ) cm.lerpColors( cb, cc, 0.5 );
+							if ( hasUVs ) um.lerpVectors( ub, uc, 0.5 );
+							if ( hasUV2s ) u2m.lerpVectors( u2b, u2c, 0.5 );
+							addTriangle( 0, 1, 3 );
+							addTriangle( 3, 2, 0 );
+
+						} else {
+
+							vm.lerpVectors( va, vc, 0.5 );
+							if ( hasNormals ) nm.lerpVectors( na, nc, 0.5 );
+							if ( hasColors ) cm.lerpColors( ca, cc, 0.5 );
+							if ( hasUVs ) um.lerpVectors( ua, uc, 0.5 );
+							if ( hasUV2s ) u2m.lerpVectors( u2a, u2c, 0.5 );
+							addTriangle( 0, 1, 3 );
+							addTriangle( 3, 1, 2 );
+
+						}
+
+					} else {
+
+						addTriangle( 0, 1, 2 );
+
+					}
+
+				}
+
+			}
+
+			const geometry2 = new THREE.BufferGeometry();
+			geometry2.setAttribute( 'position', new THREE.Float32BufferAttribute( positions2, 3 ) );
+
+			if ( hasNormals ) {
+
+				geometry2.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals2, 3 ) );
+
+			}
+
+			if ( hasColors ) {
+
+				geometry2.setAttribute( 'color', new THREE.Float32BufferAttribute( colors2, 3 ) );
+
+			}
+
+			if ( hasUVs ) {
+
+				geometry2.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs2, 2 ) );
+
+			}
+
+			if ( hasUV2s ) {
+
+				geometry2.setAttribute( 'uv2', new THREE.Float32BufferAttribute( uv2s2, 2 ) );
+
+			}
+
+			return geometry2;
+
 		}
 
 	}
 
-	geometry.faces = faces;
-	geometry.faceVertexUvs = faceVertexUvs;
+	THREE.TessellateModifier = TessellateModifier;
 
-};
+} )();

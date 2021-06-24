@@ -4,72 +4,61 @@
 		<title>three.js webgl - loaders - MMD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #fff;
-				color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #000;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
+			a {
+				color: #08f;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
 		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
 		Copyright
-		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="https://sites.google.com/view/evpvp/" target="_blank" rel="noopener">Model Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="js/libs/ammo.wasm.js"></script>
 
-		<script src="js/libs/mmdparser.min.js"></script>
-		<script src="js/libs/ammo.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/TGALoader.js"></script>
-		<script src="js/loaders/MMDLoader.js"></script>
-		<script src="js/effects/OutlineEffect.js"></script>
-		<script src="js/animation/CCDIKSolver.js"></script>
-		<script src="js/animation/MMDPhysics.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
 
-		<script>
+			let stats;
 
-			var container, stats;
+			let mesh, camera, scene, renderer, effect;
+			let helper, ikHelper, physicsHelper;
 
-			var mesh, camera, scene, renderer, effect;
-			var helper, ikHelper, physicsHelper;
+			const clock = new THREE.Clock();
 
-			var mouseX = 0, mouseY = 0;
+			Ammo().then( function ( AmmoLib ) {
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+				Ammo = AmmoLib;
 
-			var clock = new THREE.Clock();
+				init();
+				animate();
 
-			init();
-			animate();
+			} );
+
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -78,16 +67,17 @@
 				// scene
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				var gridHelper = new THREE.PolarGridHelper( 30, 10 );
-				gridHelper.position.y = -10;
+				const gridHelper = new THREE.PolarGridHelper( 30, 10 );
+				gridHelper.position.y = - 10;
 				scene.add( gridHelper );
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				const directionalLight = new THREE.DirectionalLight( 0x887766 );
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
@@ -95,10 +85,9 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				// STATS
 
@@ -107,85 +96,60 @@
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				function onProgress( xhr ) {
+
 					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
 
-				var onError = function ( xhr ) {
-				};
-
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
-
-				helper = new THREE.MMDHelper();
-
-				var loader = new THREE.MMDLoader();
-
-				loader.load( modelFile, vmdFiles, function ( object ) {
-
-					mesh = object;
-					mesh.position.y = -10;
-					scene.add( mesh );
-
-					helper.add( mesh );
-					helper.setAnimation( mesh );
-
-					/*
-					 * Note: create CCDIKHelper after calling helper.setAnimation()
-					 */
-					ikHelper = new THREE.CCDIKHelper( mesh );
-					ikHelper.visible = false;
-					scene.add( ikHelper );
-
-					/*
-					 * Note: You're recommended to call helper.setPhysics()
-					 *       after calling helper.setAnimation().
-			 		 */
-					helper.setPhysics( mesh );
-					physicsHelper = new THREE.MMDPhysicsHelper( mesh );
-					physicsHelper.visible = false;
-					scene.add( physicsHelper );
-
-					helper.unifyAnimationDuration( { afterglow: 2.0 } );
-
-					initGui();
-
-				}, onProgress, onError );
-
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.update();
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-				var phongMaterials;
-				var originalMaterials;
-
-				function makePhongMaterials ( materials ) {
-
-					var array = [];
-
-					for ( var i = 0, il = materials.length; i < il; i ++ ) {
-
-						var m = new THREE.MeshPhongMaterial();
-						m.copy( materials[ i ] );
-						m.needsUpdate = true;
-
-						array.push( m );
+						const percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
-
-					phongMaterials = array;
 
 				}
 
-				function initGui () {
 
-					var api = {
+				const modelFile = 'models/mmd/miku/miku_v2.pmd';
+				const vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+
+				helper = new MMDAnimationHelper( {
+					afterglow: 2.0
+				} );
+
+				const loader = new MMDLoader();
+
+				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
+
+					mesh = mmd.mesh;
+					mesh.position.y = - 10;
+					scene.add( mesh );
+
+					helper.add( mesh, {
+						animation: mmd.animation,
+						physics: true
+					} );
+
+					ikHelper = helper.objects.get( mesh ).ikSolver.createHelper();
+					ikHelper.visible = false;
+					scene.add( ikHelper );
+
+					physicsHelper = helper.objects.get( mesh ).physics.createHelper();
+					physicsHelper.visible = false;
+					scene.add( physicsHelper );
+
+					initGui();
+
+				}, onProgress, null );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 10;
+				controls.maxDistance = 100;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function initGui() {
+
+					const api = {
 						'animation': true,
-						'gradient mapping': true,
 						'ik': true,
 						'outline': true,
 						'physics': true,
@@ -193,47 +157,42 @@
 						'show rigid bodies': false
 					};
 
-					var gui = new dat.GUI();
+					const gui = new GUI();
 
 					gui.add( api, 'animation' ).onChange( function () {
-						helper.doAnimation = api[ 'animation' ];
-					} );
 
-					gui.add( api, 'gradient mapping' ).onChange( function () {
-
-						if ( originalMaterials === undefined ) originalMaterials = mesh.material;
-						if ( phongMaterials === undefined ) makePhongMaterials( mesh.material );
-
-						if ( api[ 'gradient mapping' ] ) {
-
-							mesh.material = originalMaterials;
-
-						} else {
-
-							mesh.material = phongMaterials;
-
-						}
+						helper.enable( 'animation', api[ 'animation' ] );
 
 					} );
 
 					gui.add( api, 'ik' ).onChange( function () {
-						helper.doIk = api[ 'ik' ];
+
+						helper.enable( 'ik', api[ 'ik' ] );
+
 					} );
 
 					gui.add( api, 'outline' ).onChange( function () {
+
 						effect.enabled = api[ 'outline' ];
+
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
-						helper.enablePhysics( api[ 'physics' ] );
+
+						helper.enable( 'physics', api[ 'physics' ] );
+
 					} );
 
 					gui.add( api, 'show IK bones' ).onChange( function () {
+
 						ikHelper.visible = api[ 'show IK bones' ];
+
 					} );
 
 					gui.add( api, 'show rigid bodies' ).onChange( function () {
+
 						if ( physicsHelper !== undefined ) physicsHelper.visible = api[ 'show rigid bodies' ];
+
 					} );
 
 				}
@@ -241,9 +200,6 @@
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -266,9 +222,7 @@
 
 			function render() {
 
-				helper.animate( clock.getDelta() );
-				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
-				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
+				helper.update( clock.getDelta() );
 				effect.render( scene, camera );
 
 			}

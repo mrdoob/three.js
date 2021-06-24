@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			加载[page:Texture texture]的一个类。
+			内部使用[page:ImageLoader]来加载文件。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+
+		// 立即使用纹理进行材质创建
+		const material = new THREE.MeshBasicMaterial( { map: texture } );
+		</code>
+
+		<h2>Code Example with Callbacks</h2>
+
+		<code>
+		// 初始化一个加载器
+		const loader = new THREE.TextureLoader();
+
+		// 加载一个资源
+		loader.load(
+			// 资源URL
+			'textures/land_ocean_ice_cloud_2048.jpg',
+
+			// onLoad回调
+			function ( texture ) {
+				// in this example we create the material when the texture is loaded
+				const material = new THREE.MeshBasicMaterial( {
+					map: texture
+				 } );
+			},
+
+			// 目前暂不支持onProgress的回调
+			undefined,
+
+			// onError回调
+			function ( err ) {
+				console.error( 'An error happened.' );
+			}
+		);
+		</code>
+		<p>
+			请注意three.js r84遗弃了TextureLoader进度事件。对于支持进度事件的TextureLoader ，
+			请参考[link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread]。
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_geometry_cube geometry / cube]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]，默认值为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:Texture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 文件的URL或者路径，也可以为
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — 加载完成时将调用。回调参数为将要加载的[page:Texture texture].<br />
+		[page:Function onProgress] — 将在加载过程中进行调用。参数为XMLHttpRequest实例，实例包含[page:Integer total]和[page:Integer loaded]字节。<br />
+		[page:Function onError] — 在加载错误时被调用。<br /><br />
+
+			从给定的URL开始加载并将完全加载的[page:Texture texture]传递给onLoad。该方法还返回一个新的纹理对象，该纹理对象可以直接用于材质创建。
+			如果采用此方法，一旦相应的加载过程完成，纹理可能会在场景中出现。
+		</p>
+
+		<h2>源</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

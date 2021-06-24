@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Creates a texture for use with a video texture.<br /><br />
+
+		This is almost the same as the base [page:Texture Texture] class, except that it continuously sets [page:Texture.needsUpdate needsUpdate] to *true* so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// assuming you have created a HTML video element with id="video"
+		const video = document.getElementById( 'video' );
+		const texture = new THREE.VideoTexture( video );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:webgl_materials_video materials / video ]</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
+		<p>
+		[page:Video video] -- The video element to use as the texture. <br />
+
+		[page:Constant mapping] --	How the image is applied to the object. An object type of [page:Textures THREE.UVMapping].
+		See [page:Textures mapping constants] for other choices.<br />
+
+		[page:Constant wrapS] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
+		See [page:Textures wrap mode constants] for other choices.<br />
+
+		[page:Constant wrapT] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
+		See [page:Textures wrap mode constants] for other choices.<br />
+
+		[page:Constant magFilter] -- How the texture is sampled when a texel covers more than one pixel.
+		The default is [page:Textures THREE.LinearFilter]. See [page:Textures magnification filter constants] for other choices.<br />
+
+		[page:Constant minFilter] -- How the texture is sampled when a texel covers less than one pixel.
+		The default is [page:Textures THREE.LinearMipmapLinearFilter]. See [page:Textures minification filter constants] for other choices.<br />
+
+		[page:Constant format] -- The default is [page:Textures THREE.RGBFormat].
+		See [page:Textures format constants] for other choices.
+		Note that a bug has been reported with Firefox's WebGL implementation where use of [page:Textures THREE.RGBFormat] on a VideoTexture can result in a significant performance penalty, if you encounter this issue it is recommended to pass in [page:Textures THREE.RGBAFormat] instead.<br />
+
+		[page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
+		See [page:Textures type constants] for other choices.<br />
+
+		[page:Number anisotropy] -- The number of samples taken along the axis through the pixel that has the highest density of texels.
+		By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used.
+		Use [page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.<br /><br />
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<p>
+		See the base [page:Texture Texture] class for common properties.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+		You will not need to set this manually here as it is handled by the [page:VideoTexture.update update] method.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>
+		See the base [page:Texture Texture] class for common methods.
+		</p>
+
+		<h3>[method:null update]()</h3>
+		<p>
+		This is called automatically and sets [property:Boolean needsUpdate] to *true* every time
+		a new frame is available.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

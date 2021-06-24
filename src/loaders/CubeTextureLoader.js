@@ -1,28 +1,24 @@
-import { ImageLoader } from './ImageLoader';
-import { CubeTexture } from '../textures/CubeTexture';
-import { DefaultLoadingManager } from './LoadingManager';
+import { ImageLoader } from './ImageLoader.js';
+import { CubeTexture } from '../textures/CubeTexture.js';
+import { Loader } from './Loader.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+class CubeTextureLoader extends Loader {
 
-function CubeTextureLoader( manager ) {
+	constructor( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		super( manager );
 
-}
+	}
 
-Object.assign( CubeTextureLoader.prototype, {
+	load( urls, onLoad, onProgress, onError ) {
 
-	load: function ( urls, onLoad, onProgress, onError ) {
+		const texture = new CubeTexture();
 
-		var texture = new CubeTexture();
-
-		var loader = new ImageLoader( this.manager );
+		const loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 
-		var loaded = 0;
+		let loaded = 0;
 
 		function loadTexture( i ) {
 
@@ -44,7 +40,7 @@ Object.assign( CubeTextureLoader.prototype, {
 
 		}
 
-		for ( var i = 0; i < urls.length; ++ i ) {
+		for ( let i = 0; i < urls.length; ++ i ) {
 
 			loadTexture( i );
 
@@ -52,23 +48,9 @@ Object.assign( CubeTextureLoader.prototype, {
 
 		return texture;
 
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
 	}
 
-} );
+}
 
 
 export { CubeTextureLoader };

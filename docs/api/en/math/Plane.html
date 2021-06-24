@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A two dimensional surface that extends infinitely in 3d space, represented in [link:http://mathworld.wolfram.com/HessianNormalForm.html Hessian normal form]
+			by a unit length normal vector and a constant.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<p>
+		[page:Vector3 normal] - (optional) a unit length [page:Vector3] defining the normal of the plane. Default is *(1, 0, 0)*.<br />
+		[page:Float constant] - (optional) the signed distance from the origin to the plane. Default is *0*.
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Vector3 normal]</h3>
+
+		<h3>[property:Float constant]</h3>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Plane applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )</h3>
+		<p>
+		[page:Matrix4 matrix] - the [Page:Matrix4] to apply.<br />
+		[page:Matrix3 optionalNormalMatrix] - (optional) pre-computed normal [Page:Matrix3] of the Matrix4 being applied.<br /><br />
+
+		Apply a Matrix4 to the plane. The matrix must be an affine, homogeneous transform.<br />
+		If supplying an [page:Matrix3 optionalNormalMatrix], it can be created like so:
+		<code>
+		const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+		</code>
+		</p>
+
+		<h3>[method:Plane clone]()</h3>
+		<p>Returns a new plane with the same [page:.normal normal] and [page:.constant constant] as this one.</p>
+
+		<h3>[method:Vector3 coplanarPoint]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+		Returns a [page:Vector3] coplanar to the plane, by calculating the projection of the
+		normal vector at the origin onto the plane.
+		</p>
+
+		<h3>[method:Plane copy]( [param:Plane plane] )</h3>
+		<p>
+		Copies the values of the passed plane's [page:.normal normal] and [page:.constant constant]
+		properties to this plane.
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>Returns the signed distance from the [page:Vector3 point] to the plane.</p>
+
+		<h3>[method:Float distanceToSphere]( [param:Sphere sphere] )</h3>
+		<p>Returns the signed distance from the [page:Sphere sphere] to the plane.</p>
+
+		<h3>[method:Boolean equals]( [param:Plane plane] )</h3>
+		<p>
+			Checks to see if two planes are equal (their [page:.normal normal] and
+			[page:.constant constant] properties match).
+		</p>
+
+		<h3>[method:Vector3 intersectLine]( [param:Line3 line], [param:Vector3 target] )</h3>
+		<p>
+		[page:Line3 line] - the [page:Line3] to check for intersection.<br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+		Returns the intersection point of the passed line and the plane. Returns null
+		 if the line does not intersect. Returns the line's starting point if the line is
+		 coplanar with the plane.
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - the [page:Box3] to check for intersection.<br /><br />
+
+		Determines whether or not this plane intersects [page:Box3 box].
+		</p>
+
+		<h3>[method:Boolean intersectsLine]( [param:Line3 line] )</h3>
+		<p>
+		[page:Line3 line] - the [page:Line3] to check for intersection.<br /><br />
+
+		Tests whether a line segment intersects with (passes through) the plane.
+		</p>
+
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere]  - the [page:Sphere] to check for intersection.<br /><br />
+
+		Determines whether or not this plane intersects [page:Sphere sphere].
+		</p>
+
+		<h3>[method:Plane negate]()</h3>
+		<p>
+		Negates both the normal vector and the constant.
+		</p>
+
+		<h3>[method:Plane normalize]()</h3>
+		<p>
+			Normalizes the [page:.normal normal] vector, and adjusts the [page:.constant constant]
+			value accordingly.
+		</p>
+
+		<h3>[method:Vector3 projectPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - the [page:Vector3] to project onto the plane.<br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+
+		Projects a [page:Vector3 point] onto the plane.
+		</p>
+
+		<h3>[method:Plane set]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<p>
+			[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
+			[page:Float constant] - the signed distance from the origin to the plane. Default is *0*.<br /><br />
+
+			Sets this plane's [page:.normal normal] and [page:.constant constant] properties by copying the values from the given normal.
+		</p>
+
+		<h3>[method:Plane setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<p>
+		[page:Float x] - x value of the unit length normal vector.<br />
+		[page:Float y] - y value of the unit length normal vector.<br />
+		[page:Float z] - z value of the unit length normal vector.<br />
+		[page:Float w] - the value of the plane's [page:.constant constant] property.<br /><br />
+
+		Set the individual components that define the plane.
+		</p>
+
+		<h3>[method:Plane setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
+		<p>
+		 [page:Vector3 a] - first point on the plane.<br />
+		 [page:Vector3 b] - second point on the plane.<br />
+		 [page:Vector3 c] - third point on the plane.<br /><br />
+
+		Defines the plane based on the 3 provided points. The winding order is assumed to be counter-clockwise,
+		and determines the direction of the [page:.normal normal].
+		</p>
+
+		<h3>[method:Plane setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] ) [param:Vector3 this]</h3>
+		<p>
+		[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
+		[page:Vector3 point] - [page:Vector3]<br /><br />
+
+		Sets the plane's properties as defined by a [page:Vector3 normal] and an arbitrary coplanar [page:Vector3 point].
+		</p>
+
+		<h3>[method:Plane translate]( [param:Vector3 offset] )</h3>
+		<p>
+		[page:Vector3 offset] - the amount to move the plane by.<br /><br />
+
+		Translates the plane by the distance defined by the [page:Vector3 offset] vector.
+		Note that this only affects the plane constant and will not affect the normal vector.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

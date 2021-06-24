@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A class representing a 3x3 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].
+		</p>
+
+		<h2>Code Example</h2>
+		<code>
+const m = new Matrix3();
+		</code>
+
+		<h2>A Note on Row-Major and Column-Major Ordering</h2>
+		<p>
+			The [page:set]() method takes arguments in [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]
+			order, while internally they are stored in the [page:.elements elements] array in column-major order.<br /><br />
+
+			This means that calling
+		<code>
+m.set( 11, 12, 13,
+       21, 22, 23,
+       31, 32, 33 );
+		</code>
+		will result in the [page:.elements elements] array containing:
+		<code>
+m.elements = [ 11, 21, 31,
+              12, 22, 32,
+              13, 23, 33 ];
+		</code>
+		and internally all calculations are performed using column-major ordering. However, as the actual ordering
+		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
+		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
+		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		Creates and initializes the [name] to the 3x3
+		[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+		</p>
+
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array elements]</h3>
+		<p>
+		A [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]
+		 list of matrix values.
+		</p>
+
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Matrix3 clone]()</h3>
+		<p>Creates a new Matrix3 and with identical elements to this one.</p>
+
+		<h3>[method:this copy]( [param:Matrix3 m] )</h3>
+		<p>Copies the elements of matrix [page:Matrix3 m] into this matrix.</p>
+
+		<h3>[method:Float determinant]()</h3>
+		<p>
+		Computes and returns the
+		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
+		<p>Return true if this matrix and [page:Matrix3 m] are equal.</p>
+
+		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<p>
+		Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] of this
+		matrix into the three axis vectors provided. If this matrix is:
+		<code>
+a, b, c,
+d, e, f,
+g, h, i
+		</code>
+		then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] will be set to:
+		<code>
+xAxis = (a, d, g)
+yAxis = (b, e, h)
+zAxis = (c, f, i)
+		</code>
+		</p>
+
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - the array to read the elements from.<br />
+		[page:Integer offset] - (optional) index of first element in the array. Default is 0.<br /><br />
+
+		Sets the elements of this matrix based on an array in
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
+		</p>
+
+		<h3>[method:this invert]()</h3>
+		<p>
+		Inverts this matrix, using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
+
+		You can not invert with a determinant of zero. If you attempt this, the method produces a zero matrix instead.
+		</p>
+
+		<h3>[method:this getNormalMatrix]( [param:Matrix4 m] )</h3>
+		<p>
+		[page:Matrix4 m] - [page:Matrix4]<br /><br />
+
+		Sets this matrix as the upper left 3x3 of the [link:https://en.wikipedia.org/wiki/Normal_matrix normal matrix]
+		of the passed [page:Matrix4 matrix4]. The normal matrix is the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] [link:https://en.wikipedia.org/wiki/Transpose transpose]
+	  of the matrix [page:Matrix4 m].
+		</p>
+
+		<h3>[method:this identity]()</h3>
+		<p>
+		Resets this matrix to the 3x3 identity matrix:
+		<code>
+1, 0, 0
+0, 1, 0
+0, 0, 1
+		</code>
+
+		</p>
+
+		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
+		<p>Post-multiplies this matrix by [page:Matrix3 m].</p>
+
+		<h3>[method:this multiplyMatrices]( [param:Matrix3 a], [param:Matrix3 b] )</h3>
+		<p>Sets this matrix to [page:Matrix3 a] x [page:Matrix3 b].</p>
+
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
+		<p>Multiplies every component of the matrix by the scalar value *s*.</p>
+
+		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )</h3>
+		<p>
+		[page:Float n11] - value to put in row 1, col 1.<br />
+		[page:Float n12] - value to put in row 1, col 2.<br />
+		...<br />
+		...<br />
+		[page:Float n32] - value to put in row 3, col 2.<br />
+		[page:Float n33] - value to put in row 3, col 3.<br /><br />
+
+		Sets the 3x3 matrix values to the given
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
+		sequence of values.
+		</p>
+
+		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
+		<p>Pre-multiplies this matrix by [page:Matrix3 m].</p>
+
+		<h3>[method:this setFromMatrix4]( [param:Matrix4 m] )</h3>
+		<p>Set this matrix to the upper 3x3 matrix of the Matrix4 [page:Matrix4 m].</p>
+
+		<h3>[method:this setUvTransform]( [param:Float tx], [param:Float ty], [param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], [param:Float cy] )</h3>
+		<p>
+		[page:Float tx] - offset x<br />
+		[page:Float ty] - offset y<br />
+		[page:Float sx] - repeat x<br />
+		[page:Float sy] - repeat y<br />
+		[page:Float rotation] - rotation (in radians)<br />
+		[page:Float cx] - center x of rotation<br />
+		[page:Float cy] - center y of rotation<br /><br />
+
+		Sets the UV transform matrix from offset, repeat, rotation, and center.
+		</p>
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - (optional) array to store the resulting vector in. If not given a new array will be created.<br />
+		[page:Integer offset] - (optional) offset in the array at which to put the result.<br /><br />
+
+		Writes the elements of this matrix to an array in
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
+		</p>
+
+		<h3>[method:this transpose]()</h3>
+		<p>[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix in place.</p>
+
+		<h3>[method:this transposeIntoArray]( [param:Array array] )</h3>
+		<p>
+		[page:Array array] -  array to store the resulting vector in.<br /><br />
+
+		[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix into the supplied array,
+		and returns itself unchanged.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

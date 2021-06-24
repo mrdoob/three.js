@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.</p>
+
+		<h2>Code Example</h2>
+
+		<code>const size = 10;
+		const divisions = 10;
+
+		const gridHelper = new THREE.GridHelper( size, divisions );
+		scene.add( gridHelper );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_helpers WebGL / helpers]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:number size], [param:Number divisions], [param:Color colorCenterLine], [param:Color colorGrid] )</h3>
+		<p>
+		size -- The size of the grid. Default is 10. <br />
+		divisions -- The number of divisions across the grid. Default is 10. <br />
+		colorCenterLine -- The color of the centerline. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x444444 <br />
+		colorGrid -- The color of the lines of the grid. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0x888888
+		</p>
+		<p>
+		Creates a new [name] of size 'size' and divided into 'divisions' segments per side. Colors are optional.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,7 +1,0 @@
-examples/*
-!examples/js/
-src/
-test/
-utils/
-docs/
-editor/

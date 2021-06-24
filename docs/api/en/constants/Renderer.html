@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>WebGLRenderer Constants</h1>
+
+		<h2>Cull Face Modes</h2>
+		<code>
+		THREE.CullFaceNone
+		THREE.CullFaceBack
+		THREE.CullFaceFront
+		THREE.CullFaceFrontBack
+		</code>
+		<p>
+		[page:constant CullFaceNone] disables face culling.<br />
+		[page:constant CullFaceBack] culls back faces (default).<br />
+		[page:constant CullFaceFront] culls front faces.<br />
+		[page:constant CullFaceFrontBack] culls both front and back faces.
+		</p>
+
+		<h2>Shadow Types</h2>
+		<code>
+		THREE.BasicShadowMap
+		THREE.PCFShadowMap
+		THREE.PCFSoftShadowMap
+		THREE.VSMShadowMap
+		</code>
+		<p>
+		These define the WebGLRenderer's [page:WebGLRenderer.shadowMap.type shadowMap.type] property.<br /><br />
+
+		[page:constant BasicShadowMap] gives unfiltered shadow maps - fastest, but lowest quality.<br />
+		[page:constant PCFShadowMap] filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm (default).<br />
+		[page:constant PCFSoftShadowMap] filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm with better soft shadows especially when using low-resolution shadow maps.<br />
+		[page:constant VSMShadowMap] filters shadow maps using the Variance Shadow Map (VSM) algorithm. When using VSMShadowMap all shadow receivers will also cast shadows.
+		</p>
+
+		<h2>Tone Mapping</h2>
+		<code>
+		THREE.NoToneMapping
+		THREE.LinearToneMapping
+		THREE.ReinhardToneMapping
+		THREE.CineonToneMapping
+		THREE.ACESFilmicToneMapping
+		</code>
+		<p>
+		These define the WebGLRenderer's [page:WebGLRenderer.toneMapping toneMapping] property.
+		This is used to approximate the appearance of high dynamic range (HDR) on the
+		low dynamic range medium of a standard computer monitor or mobile device's screen.<br /><br />
+
+		See the [example:webgl_tonemapping WebGL / tonemapping] example.
+
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

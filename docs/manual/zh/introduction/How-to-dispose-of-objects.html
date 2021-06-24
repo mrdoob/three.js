@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>如何废置对象（[name]）</h1>
+
+	<p>
+		为了提高性能，并避免应用程序中的内存泄露，一个重要的方面是废置未使用的类库实体。
+		每当你创建一个*three.js*中的实例时，都会分配一定数量的内存。然而，*three.js*会创建在渲染中所必需的特定对象，
+		例如几何体或材质，以及与WebGL相关的实体，例如buffers或着色器程序。
+		非常值得注意的是，这些对象并不会被自动释放；相反，应用程序必须使用特殊的API来释放这些资源。
+		本指南简要概述了这一API是如何使用的，以及哪些对象是和这一环境相关的。
+	</p>
+
+	<h2>几何体</h2>
+
+	<p>
+		几何体常用来表示定义为属性集合的顶点信息，*three.js*在内部为每一个属性创建一个[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]类型的对象。
+		这些实体仅有在调用[page:BufferGeometry.dispose]()的时候才会被删除。
+		如果应用程序中的几何体已废弃，请执行该方法以释放所有相关资源。
+	</p>
+
+	<h2>材质</h2>
+
+	<p>
+		材质定义了物体将如何被渲染。*three.js*使用材质所定义的信息来构造一个着色器程序，以用于渲染。
+		着色器程序只有在相应材质被废置后才能被删除。由于性能的原因，*three.js*尽可能尝试复用已存在的着色器程序。
+		因此，着色器程序只有在所有相关材质被废置后才被删除。
+		你可以通过执行[page:Material.dispose]()方法来废置材质。
+	</p>
+
+	<h2>纹理</h2>
+
+	<p>
+		对材质的废置不会对纹理造成影响。它们是分离的，因此一个纹理可以同时被多个材质所使用。
+		每当你创建一个[page:Texture]实例的时候，three.js在内部会创建一个[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]实例。
+		和buffer相似，该对象只能通过调用[page:Texture.dispose]()来删除。
+	</p>
+
+	<h2>渲染目标</h2>
+
+	<p>
+		[page:WebGLRenderTarget]类型的对象不仅分配了[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]的实例，
+		还分配了[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer WebGLFramebuffer]和[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderbuffer WebGLRenderbuffer]来实现自定义渲染目标。
+		这些对象仅能通过执行[page:WebGLRenderTarget.dispose]()来解除分配。
+	</p>
+
+	<h2>杂项</h2>
+
+	<p>
+		有一些来自examples目录的类，例如控制器或者后期处理过程，提供了*dispose()*方法以用于移除内部事件监听器或渲染目标。
+		通常来讲，非常建议查阅类的API或者文档，并注意*dispose()*函数。如果该函数存在的话，你应当在清理时使用它。
+	</p>
+
+	<h2>常见问题</h2>
+
+	<h3>为何*three.js*不能够自动废置对象？</h3>
+
+	<p>
+		这一问题在社区中多次被问到，因此澄清这件事情是十分有必要的。事实是，*three.js*并不知道用户所创建的实体（例如几何体或者材质）的生命周期或作用范围，这些是应用程序的责任。
+		比如说，即使一个材质当前没有被用于渲染，但它也可能是下一帧所必需的。
+		因此，如果应用程序决定某个对象可以被删除，则它必须通过调用对应的*dispose()*方法来通知引擎。
+	</p>
+
+	<h3>将一个mesh（网格）从场景中移除，是否也会废置它的geometry（几何体）和material（材质）？</h3>
+
+	<p>
+		并不会，你必须通过*dispose()*来明确地废置geometry（几何体）或material（材质）。
+		请记住，geometry（几何体）或material（材质）可以在3D物体之间（例如mesh（网格））被共享。
+	</p>
+
+	<h3>*three.js*是否会提供被缓存对象数量的相关信息？</h3>
+
+	<p>
+		是的，可以评估[page:WebGLRenderer.info] —— 渲染器中的一个特殊属性，具有一系列关于显存和渲染过程的统计信息。
+		除此之外，它还告诉你有多少纹理、几何体和着色器程序在内部存储。
+		如果你在你的应用程序中注意到了性能问题，一个较好的方法便是调试该属性，以便轻松识别内存泄漏。
+	</p>
+
+	<h3>当你在纹理还没有被加载时，在纹理上调用*dispose()*，会发生什么？</h3>
+
+	<p>
+		对于纹理的内部资源仅在图像完全被加载后才会分配。如果你在图像被加载之前废置纹理，什么都不会发生。
+		没有资源被分配，因此也没有必要进行清理。
+	</p>
+
+	<h3>当我在调用*dispose()*之后，使用相应的对象会发生什么？</h3>
+
+	<p>
+		被删除掉的内部资源会被引擎重新创建，因此不会有运行时错误发生，但你可能会注意到这会对当前帧的性能有一些影响，特别是当着色器程序被编译的时候。
+	</p>
+
+	<h3>我如何在我的应用程序中管理*three.js*中的对象？我如何知道什么时候该废置事物？</h3>
+
+	<p>
+		一般来说，对此并没有明确的建议。调用*dispose()*什么时候合适，很大程度上取决于具体的用例。
+		必须指出的是，没有必要总是废置对象。一个较好的例子便是一个由多个关卡所组成的游戏。使用到对象废置的地方就是当切换关卡的时候。
+		应用程序可以通过较老的场景，并废置所有过时的材质、几何体和纹理贴图。
+		正如在前面的章节中所提到，如果你废置一个仍然在使用的对象，并不会导致运行时错误。可能发生的最糟糕的事情便是单帧的性能会下降。
+	</p>
+
+	<h2>演示dispose()使用方法的示例</h2>
+
+	<p>
+		[example:webgl_test_memory WebGL / test / memory]<br />
+		[example:webgl_test_memory2 WebGL / test / memory2]<br />
+	</p>
+
+</body>
+
+</html>

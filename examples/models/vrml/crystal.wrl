@@ -1,0 +1,120 @@
+#VRML V2.0 utf8
+WorldInfo { title "created By KrystalShaper"}
+NavigationInfo { type "EXAMINE"}
+DEF BKG Background { skyColor [ 1.0 1.0 1.0 ] }
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 0.0 1.0 1.0  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+-0.6423 1.0 0.3744 ,
+0.5456 1.0 0.1594 ,
+0.5864 1.0 0.0723 ,
+0.6423 1.0 -0.3744 ,
+-0.5456 1.0 -0.1594 ,
+-0.5864 1.0 -0.0723 ,
+]} coordIndex[ 0,1,2,3,4,5, -1] }}]}
+
+Transform { children [ Shape{ 
+appearance Appearance{material Material{diffuseColor 0.0 1.0 1.0  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+-0.5864 -1.0 -0.0723 ,
+-0.5456 -1.0 -0.1594 ,
+0.6423 -1.0 -0.3744 ,
+0.5864 -1.0 0.0723 ,
+0.5456 -1.0 0.1594 ,
+-0.6423 -1.0 0.3744 ,
+]} coordIndex[ 0,1,2,3,4,5, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 0.0 0.0 1.0  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+-1.2103 0.0 0.4772 ,
+-0.6423 -1.0 0.3744 ,
+0.5456 -1.0 0.1594 ,
+1.1135 0.0 0.0566 ,
+0.5456 1.0 0.1594 ,
+-0.6423 1.0 0.3744 ,
+]} coordIndex[ 0,1,2,3,4,5, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 0.0 0.0 1.0  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+1.2103 0.0 -0.4772 ,
+0.6423 -1.0 -0.3744 ,
+-0.5456 -1.0 -0.1594 ,
+-1.1135 0.0 -0.0566 ,
+-0.5456 1.0 -0.1594 ,
+0.6423 1.0 -0.3744 ,
+]} coordIndex[ 0,1,2,3,4,5, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 0.275 1.0 0.333  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+0.6423 1.0 -0.3744 ,
+0.5864 1.0 0.0723 ,
+1.1544 0.0 -0.0305 ,
+1.2103 0.0 -0.4772 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 0.275 1.0 0.333  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+-0.6423 1.0 0.3744 ,
+-0.5864 1.0 -0.0723 ,
+-1.1544 0.0 0.0305 ,
+-1.2103 0.0 0.4772 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 0.275 1.0 0.333  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+-1.2103 0.0 0.4772 ,
+-1.1544 0.0 0.0305 ,
+-0.5864 -1.0 -0.0723 ,
+-0.6423 -1.0 0.3744 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 0.275 1.0 0.333  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+1.2103 0.0 -0.4772 ,
+1.1544 0.0 -0.0305 ,
+0.5864 -1.0 0.0723 ,
+0.6423 -1.0 -0.3744 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 1.0 0.275 0.373  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+1.1135 0.0 0.0566 ,
+1.1544 0.0 -0.0305 ,
+0.5864 1.0 0.0723 ,
+0.5456 1.0 0.1594 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 1.0 0.275 0.373  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+-1.1135 0.0 -0.0566 ,
+-1.1544 0.0 0.0305 ,
+-0.5864 1.0 -0.0723 ,
+-0.5456 1.0 -0.1594 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 1.0 0.275 0.373  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+-0.5456 -1.0 -0.1594 ,
+-0.5864 -1.0 -0.0723 ,
+-1.1544 0.0 0.0305 ,
+-1.1135 0.0 -0.0566 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}
+
+Transform { children [ Shape{
+appearance Appearance{material Material{diffuseColor 1.0 0.275 0.373  }}
+geometry IndexedFaceSet{ coord Coordinate{ point[
+0.5456 -1.0 0.1594 ,
+0.5864 -1.0 0.0723 ,
+1.1544 0.0 -0.0305 ,
+1.1135 0.0 0.0566 ,
+]} coordIndex[ 0,1,2,3, -1] }}]}

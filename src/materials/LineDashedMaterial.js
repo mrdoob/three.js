@@ -1,9 +1,6 @@
-import { Material } from './Material';
-import { Color } from '../math/Color';
+import { LineBasicMaterial } from './LineBasicMaterial.js';
 
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
@@ -16,46 +13,36 @@ import { Color } from '../math/Color';
  * }
  */
 
-function LineDashedMaterial( parameters ) {
+class LineDashedMaterial extends LineBasicMaterial {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'LineDashedMaterial';
+		super();
 
-	this.color = new Color( 0xffffff );
+		this.type = 'LineDashedMaterial';
 
-	this.linewidth = 1;
+		this.scale = 1;
+		this.dashSize = 3;
+		this.gapSize = 1;
 
-	this.scale = 1;
-	this.dashSize = 3;
-	this.gapSize = 1;
+		this.setValues( parameters );
 
-	this.lights = false;
+	}
 
-	this.setValues( parameters );
+	copy( source ) {
+
+		super.copy( source );
+
+		this.scale = source.scale;
+		this.dashSize = source.dashSize;
+		this.gapSize = source.gapSize;
+
+		return this;
+
+	}
 
 }
 
-LineDashedMaterial.prototype = Object.create( Material.prototype );
-LineDashedMaterial.prototype.constructor = LineDashedMaterial;
-
 LineDashedMaterial.prototype.isLineDashedMaterial = true;
-
-LineDashedMaterial.prototype.copy = function ( source ) {
-
-	Material.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.linewidth = source.linewidth;
-
-	this.scale = source.scale;
-	this.dashSize = source.dashSize;
-	this.gapSize = source.gapSize;
-
-	return this;
-
-};
-
 
 export { LineDashedMaterial };

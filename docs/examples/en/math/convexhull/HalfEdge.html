@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			The basis for a half-edge data structure, also known as doubly connected edge list (DCEL).<br />
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:VertexNode vertex], [param:Face face] )</h3>
+		<p>
+		[page:VertexNode vertex] - [page:VertexNode] A reference to its destination vertex.<br />
+		[page:Face face] - [page:Face] A reference to its face.<br /><br />
+
+		Creates a new instance of [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:VertexNode vertex]</h3>
+		<p>
+			Reference to the destination vertex. The origin vertex can be obtained by querying the destination of its twin, or of the previous half-edge. Default is undefined.
+		</p>
+
+		<h3>[property:HalfEdge prev]</h3>
+		<p>
+			Reference to the previous half-edge of the same face. Default is null.
+		</p>
+
+		<h3>[property:HalfEdge next]</h3>
+		<p>
+			Reference to the next half-edge of the same face. Default is null.
+		</p>
+
+		<h3>[property:HalfEdge twin]</h3>
+		<p>
+			Reference to the twin half-edge to reach the opposite face. Default is null.
+		</p>
+
+		<h3>[property:Face face]</h3>
+		<p>
+			 Each half-edge bounds a single face and thus has a reference to that face. Default is undefined.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:VertexNode head]()</h3>
+		<p>Returns the destination vertex.</p>
+
+		<h3>[method:VertexNode tail]()</h3>
+		<p>Returns the origin vertex.</p>
+
+		<h3>[method:Float length]()</h3>
+		<p>Returns the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
+		(straight-line length) of the edge.</p>
+
+		<h3>[method:Float lengthSquared]()</h3>
+		<p>Returns the square of the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
+		(straight-line length) of the edge.</p>
+
+		<h3>[method:HalfEdge setTwin]( [param:HalfEdge edge] )</h3>
+		<p>
+			[page:HalfEdge edge] - Any half-edge.<br /><br />
+
+			Sets the twin edge of this half-edge. It also ensures that the twin reference of the given half-edge is correctly set.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js examples/jsm/math/ConvexHull.js]
+		</p>
+	</body>
+</html>

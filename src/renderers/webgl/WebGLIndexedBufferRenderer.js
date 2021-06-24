@@ -1,10 +1,8 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
-function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
+	const isWebGL2 = capabilities.isWebGL2;
 
-	var mode;
+	let mode;
 
 	function setMode( value ) {
 
@@ -12,7 +10,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	}
 
-	var type, bytesPerElement;
+	let type, bytesPerElement;
 
 	function setIndex( value ) {
 
@@ -25,30 +23,38 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 		gl.drawElements( mode, count, type, start * bytesPerElement );
 
-		infoRender.calls ++;
-		infoRender.vertices += count;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
+		info.update( count, mode, 1 );
 
 	}
 
-	function renderInstances( geometry, start, count ) {
+	function renderInstances( start, count, primcount ) {
 
-		var extension = extensions.get( 'ANGLE_instanced_arrays' );
+		if ( primcount === 0 ) return;
 
-		if ( extension === null ) {
+		let extension, methodName;
 
-			console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-			return;
+		if ( isWebGL2 ) {
+
+			extension = gl;
+			methodName = 'drawElementsInstanced';
+
+		} else {
+
+			extension = extensions.get( 'ANGLE_instanced_arrays' );
+			methodName = 'drawElementsInstancedANGLE';
+
+			if ( extension === null ) {
+
+				console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				return;
+
+			}
 
 		}
 
-		extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+		extension[ methodName ]( mode, count, type, start * bytesPerElement, primcount );
 
-		infoRender.calls ++;
-		infoRender.vertices += count * geometry.maxInstancedCount;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+		info.update( count, mode, primcount );
 
 	}
 

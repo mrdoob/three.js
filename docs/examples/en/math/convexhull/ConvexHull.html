@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A convex hull class. Implements the Quickhull algorithm by: Dirk Gregorius. March 2014, Game Developers Conference: [link:http://media.steampowered.com/apps/valve/2014/DirkGregorius_ImplementingQuickHull.pdf Implementing QuickHull].
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+			Creates a new instance of [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:VertexList assigned]</h3>
+		<p>
+			This [page:VertexList vertex list] holds all vertices that are assigned to a face. Default is an empty vertex list.
+		</p>
+
+		<h3>[property:Array faces]</h3>
+		<p>
+			The generated faces of the convex hull. Default is an empty array.
+		</p>
+
+		<h3>[property:Array newFaces]</h3>
+		<p>
+			This array holds the faces that are generated within a single iteration. Default is an empty array.
+		</p>
+
+		<h3>[property:Float tolerance]</h3>
+		<p>
+			The epsilon value that is used for internal comparative operations. The calculation of this value depends on the size of the geometry. Default is -1.
+		</p>
+
+		<h3>[property:VertexList unassigned]</h3>
+		<p>
+			This [page:VertexList vertex list] holds all vertices that are not assigned to a face. Default is an empty vertex list.
+		</p>
+
+		<h3>[property:Array vertices]</h3>
+		<p>
+			The internal representation of the given geometry data (an array of [page:VertexNode vertices]).
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:HalfEdge addAdjoiningFace]( [param:VertexNode eyeVertex], [param:HalfEdge horizonEdge] )</h3>
+		<p>
+			[page:VertexNode eyeVertex] - The vertex that is added to the hull.<br />
+			[page:HalfEdge horizonEdge] - A single edge of the horizon.<br /><br />
+
+			Creates a face with the vertices 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in CCW order.
+			All the half edges are created in CCW order thus the face is always pointing outside the hull
+		</p>
+
+		<h3>[method:ConvexHull addNewFaces]( [param:VertexNode eyeVertex], [param:HalfEdge horizonEdge] )</h3>
+		<p>
+			[page:VertexNode eyeVertex] - The vertex that is added to the hull.<br />
+			[page:HalfEdge horizon] - An array of half-edges that form the horizon.<br /><br />
+
+			Adds 'horizon.length' faces to the hull, each face will be linked with the horizon opposite face and the face on the left/right.
+		</p>
+
+		<h3>[method:ConvexHull addVertexToFace]( [param:VertexNode vertex], [param:Face face]	)</h3>
+		<p>
+			[page:VertexNodeNode vertex] - The vertex to add.<br />
+			[page:Face face] - The target face.<br /><br />
+
+			Adds a vertex to the 'assigned' list of vertices and assigns it to the given face.
+		</p>
+
+		<h3>[method:ConvexHull addVertexToHull]( [param:VertexNode eyeVertex] )</h3>
+		<p>
+			[page:VertexNode eyeVertex] - The vertex that is added to the hull.<br /><br />
+
+			Adds a vertex to the hull with the following algorithm
+			<ul>
+				<li>Compute the 'horizon' which is a chain of half edges. For an edge to belong to this group it must be the edge connecting a face that can see 'eyeVertex' and a face which cannot see 'eyeVertex'.</li>
+				<li>All the faces that can see 'eyeVertex' have its visible vertices removed from the assigned vertex list.</li>
+				<li>A new set of faces is created with each edge of the 'horizon' and 'eyeVertex'. Each face is connected with the opposite horizon face and the face on the left/right.</li>
+				<li>The vertices removed from all the visible faces are assigned to the new faces if possible.</li>
+			</ul>
+		</p>
+
+		<h3>[method:ConvexHull cleanup]()</h3>
+
+		<p>Cleans up internal properties after computing the convex hull.</p>
+
+		<h3>[method:ConvexHull compute]()</h3>
+
+		<p>Starts the execution of the quick hull algorithm.</p>
+
+		<h3>[method:Object computeExtremes]()</h3>
+
+		<p>Computes the extremes values (min/max vectors) which will be used to compute the initial hull.</p>
+
+		<h3>[method:ConvexHull computeHorizon]( [param:Vector3 eyePoint], [param:HalfEdge crossEdge], [param:Face face], [param:Array horizon]	)</h3>
+		<p>
+			[page:Vector3 eyePoint] - The 3D-coordinates of a point.<br />
+			[page:HalfEdge crossEdge] - The edge used to jump to the current face.<br />
+			[page:Face face] - The current face being tested.<br />
+			[page:Array horizon] - The edges that form part of the horizon in CCW order.<br /><br />
+
+			Computes a chain of half edges in CCW order called the 'horizon'. For an edge to be part of the horizon it must join a face that can see 'eyePoint' and a face that cannot see 'eyePoint'.
+		</p>
+
+		<h3>[method:ConvexHull computeInitialHull]()</h3>
+
+		<p>Computes the initial simplex assigning to its faces all the points that are candidates to form part of the hull.</p>
+
+		<h3>[method:ConvexHull containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+			[page:Vector3 point] - A point in 3D space.<br /><br />
+
+			Returns *true* if the given point is inside this convex hull.
+		</p>
+
+		<h3>[method:ConvexHull deleteFaceVertices]( [param:Face face], [param:Face absorbingFace]	)</h3>
+		<p>
+			[page:Face face] - The given face.<br />
+			[page:Face absorbingFace] - An optional face that tries to absorb the vertices of the first face.<br /><br />
+
+			Removes all the visible vertices that 'face' is able to see.
+			<ul>
+				<li>If 'absorbingFace' doesn't exist, then all the removed vertices will be added to the 'unassigned' vertex list.</li>
+				<li>If 'absorbingFace' exists, then this method will assign all the vertices of 'face' that can see 'absorbingFace'.</li>
+				<li>If a vertex cannot see 'absorbingFace', it's added to the 'unassigned' vertex list.</li>
+			</ul>
+		</p>
+
+		<h3>[method:Vector3 intersectRay]( [param:Ray ray], [param:Vector3 target] )</h3>
+		<p>
+			[page:Ray ray] - The given ray.<br />
+			[page:Vector3 target] - The target vector representing the intersection point.<br /><br />
+
+			Performs a ray intersection test with this convext hull. If no intersection is found, *null* is returned.
+		</p>
+
+		<h3>[method:Boolean intersectsRay]( [param:Ray ray] )</h3>
+		<p>
+			[page:Ray ray] - The given ray.<br /><br />
+
+			Returns *true* if the given ray intersects with this convex hull.
+		</p>
+
+		<h3>[method:ConvexHull makeEmpty]()</h3>
+
+		<p>Makes this convex hull empty.</p>
+
+		<h3>[method:VertexNode nextVertexToAdd]()</h3>
+
+		<p>Finds the next vertex to create faces with the current hull.
+			<ul>
+				<li>Let the initial face be the first face existing in the 'assigned' vertex list.</li>
+				<li>If a face doesn't exist then return since there're no vertices left.</li>
+				<li>Otherwise for each vertex that face sees find the one furthest away from it.</li>
+			</ul>
+		</p>
+
+		<h3>[method:ConvexHull reindexFaces]()</h3>
+
+		<p>Removes inactive (e.g. deleted) faces from the internal face list.</p>
+
+		<h3>[method:VertexNode removeAllVerticesFromFace]( [param:Face face]	)</h3>
+		<p>
+			[page:Face face] - The given face.<br /><br />
+
+			Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertext list.
+		</p>
+
+		<h3>[method:ConvexHull removeVertexFromFace]( [param:VertexNode vertex], [param:Face face]	)</h3>
+		<p>
+			[page:VertexNode vertex] - The vertex to remove.<br />
+			[page:Face face] - The target face.<br /><br />
+
+			Removes a vertex from the 'assigned' list of vertices and from the given face. It also makes sure that the link from 'face' to the first vertex it sees in 'assigned' is linked correctly after the removal.
+		</p>
+
+		<h3>[method:ConvexHull resolveUnassignedPoints]( [param:Array newFaces]	)</h3>
+		<p>
+			[page:Face newFaces] - An array of new faces.<br /><br />
+
+			Reassigns as many vertices as possible from the unassigned list to the new faces.
+		</p>
+
+		<h3>[method:ConvexHull setFromObject]( [param:Object3D object] )</h3>
+		<p>
+			[page:Object3D object] - [page:Object3D] to compute the convex hull of.<br /><br />
+
+			Computes the convex hull of an [page:Object3D] (including its children),accounting for the world transforms of both the object and its childrens.
+		</p>
+
+		<h3>[method:ConvexHull setFromPoints]( [param:Array points] )</h3>
+		<p>
+			[page:Array points] - Array of [page:Vector3 Vector3s] that the resulting convex hull will contain.<br /><br />
+
+			Computes to convex hull for the given array of points.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js examples/jsm/math/ConvexHull.js]
+		</p>
+	</body>
+</html>

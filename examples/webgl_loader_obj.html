@@ -4,46 +4,30 @@
 		<title>three.js webgl - loaders - OBJ loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			var container;
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-			var camera, scene, renderer;
+			let container;
 
-			var mouseX = 0, mouseY = 0;
+			let camera, scene, renderer;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let mouseX = 0, mouseY = 0;
 
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
+
+			let object;
 
 			init();
 			animate();
@@ -61,60 +45,60 @@
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.AmbientLight( 0x101030 );
-				scene.add( ambient );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				scene.add( directionalLight );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
 
-				// texture
+				// manager
 
-				var manager = new THREE.LoadingManager();
+				function loadModel() {
+
+					object.traverse( function ( child ) {
+
+						if ( child.isMesh ) child.material.map = texture;
+
+					} );
+
+					object.position.y = - 95;
+					scene.add( object );
+
+				}
+
+				const manager = new THREE.LoadingManager( loadModel );
+
 				manager.onProgress = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
 
 				};
 
-				var texture = new THREE.Texture();
+				// texture
 
-				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
-
-				var onError = function ( xhr ) {
-				};
-
-
-				var loader = new THREE.ImageLoader( manager );
-				loader.load( 'textures/UV_Grid_Sm.jpg', function ( image ) {
-
-					texture.image = image;
-					texture.needsUpdate = true;
-
-				} );
+				const textureLoader = new THREE.TextureLoader( manager );
+				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
 
 				// model
 
-				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'obj/male02/male02.obj', function ( object ) {
+				function onProgress( xhr ) {
 
-					object.traverse( function ( child ) {
+					if ( xhr.lengthComputable ) {
 
-						if ( child instanceof THREE.Mesh ) {
+						const percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
 
-							child.material.map = texture;
+					}
 
-						}
+				}
 
-					} );
+				function onError() {}
 
-					object.position.y = - 95;
-					scene.add( object );
+				const loader = new OBJLoader( manager );
+				loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
+
+					object = obj;
 
 				}, onProgress, onError );
 
@@ -125,11 +109,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

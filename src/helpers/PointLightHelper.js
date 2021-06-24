@@ -1,34 +1,38 @@
-import { Mesh } from '../objects/Mesh';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { SphereBufferGeometry } from '../geometries/SphereGeometry';
+import { Mesh } from '../objects/Mesh.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { SphereGeometry } from '../geometries/SphereGeometry.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- */
+class PointLightHelper extends Mesh {
 
-function PointLightHelper( light, sphereSize ) {
+	constructor( light, sphereSize, color ) {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+		const geometry = new SphereGeometry( sphereSize, 4, 2 );
+		const material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
 
-	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
-	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-	material.color.copy( this.light.color );
+		super( geometry, material );
 
-	Mesh.call( this, geometry, material );
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	this.matrix = this.light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		this.color = color;
 
-	/*
-	var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
-	var distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
+		this.type = 'PointLightHelper';
+
+		this.matrix = this.light.matrixWorld;
+		this.matrixAutoUpdate = false;
+
+		this.update();
+
+
+		/*
+	// TODO: delete this comment?
+	const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+	const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
 	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 	this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
 
-	var d = light.distance;
+	const d = light.distance;
 
 	if ( d === 0.0 ) {
 
@@ -43,38 +47,45 @@ function PointLightHelper( light, sphereSize ) {
 	this.add( this.lightDistance );
 	*/
 
-}
+	}
 
-PointLightHelper.prototype = Object.create( Mesh.prototype );
-PointLightHelper.prototype.constructor = PointLightHelper;
+	dispose() {
 
-PointLightHelper.prototype.dispose = function () {
-
-	this.geometry.dispose();
-	this.material.dispose();
-
-};
-
-PointLightHelper.prototype.update = function () {
-
-	this.material.color.copy( this.light.color );
-
-	/*
-	var d = this.light.distance;
-
-	if ( d === 0.0 ) {
-
-		this.lightDistance.visible = false;
-
-	} else {
-
-		this.lightDistance.visible = true;
-		this.lightDistance.scale.set( d, d, d );
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
-	*/
 
-};
+	update() {
+
+		if ( this.color !== undefined ) {
+
+			this.material.color.set( this.color );
+
+		} else {
+
+			this.material.color.copy( this.light.color );
+
+		}
+
+		/*
+		const d = this.light.distance;
+
+		if ( d === 0.0 ) {
+
+			this.lightDistance.visible = false;
+
+		} else {
+
+			this.lightDistance.visible = true;
+			this.lightDistance.scale.set( d, d, d );
+
+		}
+		*/
+
+	}
+
+}
 
 
 export { PointLightHelper };

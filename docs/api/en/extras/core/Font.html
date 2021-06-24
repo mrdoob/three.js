@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Create a set of [page:Shape Shapes] representing a font loaded in JSON format.<br /><br />
+
+		This is used internally by the [page:FontLoader].
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+		[example:webgl_geometry_text_shapes geometry / text / shapes ]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( data )</h3>
+		<p>
+		data -- JSON data representing the font.<br /><br />
+
+		This constructor creates a new [name], which is an array of [page:Shape Shapes].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array data]</h3>
+		<p>The JSON data passed in the constructor.</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null generateShapes]( [param:String text], [param:Float size] )</h3>
+		<p>
+			[page:String text] -- string of text.<br />
+			[page:Float size] -- (optional) scale for the [page:Shape Shapes]. Default is *100*.<br />
+
+			Creates an array of [page:Shape Shapes] representing the text in the font.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

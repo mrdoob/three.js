@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>半球光（[name]）</h1>
+
+		<p class="desc">
+			光源直接放置于场景之上，光照颜色从天空光线颜色渐变到地面光线颜色。
+			<br /><br />
+
+			半球光不能投射阴影。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		scene.add( light );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_lights_hemisphere lights / hemisphere ]<br />
+			[example:misc_controls_pointerlock controls / pointerlock ]<br />
+			[example:webgl_decals decals ]<br />
+			[example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
+			[example:webgl_materials_lightmap materials / lightmap ]<br />
+			[example:webgl_shaders_ocean shaders / ocean ]
+		</p>
+
+		<h2>构造器（Constructor）</h2>
+		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
+	<p>
+		[page:Integer skyColor] - (可选参数) 天空中发出光线的颜色。 缺省值 0xffffff。<br />
+		[page:Integer groundColor] - (可选参数) 地面发出光线的颜色。 缺省值 0xffffff。<br />
+		[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
+
+		创建一个半球光。
+		</p>
+
+		<h2>属性（Properties）</h2>
+		<p>
+			公共属性请查看基类[page:Light Light]。
+		</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			该参数在构造时被设置为 *undefined* 因为半球光不能投射阴影。
+		</p>
+
+
+		<h3>[property:Float color]</h3>
+		<p>
+			在构造时传递的天空发出光线的颜色。
+			默认会创建 [page:Color] 并设置为白色（0xffffff）。
+		</p>
+
+		<h3>[property:Float groundColor]</h3>
+		<p>
+			在构造时传递的地面发出光线的颜色。
+			默认会创建 [page:Color] 并设置为白色（0xffffff）。
+		</p>
+
+		<h3>[property:Vector3 position]</h3>
+		<p>
+			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
+		</p>
+
+
+
+		<h2>方法（Methods）</h2>
+
+		<p>公共方法请查看基类 [page:Light Light]。</p>
+
+		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
+		<p>
+			从[page:Light source]复制 [page:.color color], [page:.intensity intensity] 和
+			[page:.groundColor groundColor] 的值到当前半球光对象中。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

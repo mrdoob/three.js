@@ -1,20 +1,15 @@
-/**
- * @author fordacious / fordacious.github.io
- */
-
 function WebGLProperties() {
 
-	var properties = {};
+	let properties = new WeakMap();
 
 	function get( object ) {
 
-		var uuid = object.uuid;
-		var map = properties[ uuid ];
+		let map = properties.get( object );
 
 		if ( map === undefined ) {
 
 			map = {};
-			properties[ uuid ] = map;
+			properties.set( object, map );
 
 		}
 
@@ -24,20 +19,27 @@ function WebGLProperties() {
 
 	function remove( object ) {
 
-		delete properties[ object.uuid ];
+		properties.delete( object );
 
 	}
 
-	function clear() {
+	function update( object, key, value ) {
 
-		properties = {};
+		properties.get( object )[ key ] = value;
+
+	}
+
+	function dispose() {
+
+		properties = new WeakMap();
 
 	}
 
 	return {
 		get: get,
 		remove: remove,
-		clear: clear
+		update: update,
+		dispose: dispose
 	};
 
 }

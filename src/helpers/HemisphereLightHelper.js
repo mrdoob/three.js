@@ -1,85 +1,84 @@
-import { Vector3 } from '../math/Vector3';
-import { Color } from '../math/Color';
-import { Object3D } from '../core/Object3D';
-import { Mesh } from '../objects/Mesh';
-import { VertexColors } from '../constants';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
+import { Object3D } from '../core/Object3D.js';
+import { Mesh } from '../objects/Mesh.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { OctahedronGeometry } from '../geometries/OctahedronGeometry.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
+const _vector = /*@__PURE__*/ new Vector3();
+const _color1 = /*@__PURE__*/ new Color();
+const _color2 = /*@__PURE__*/ new Color();
 
-function HemisphereLightHelper( light, size ) {
+class HemisphereLightHelper extends Object3D {
 
-	Object3D.call( this );
+	constructor( light, size, color ) {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+		super();
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		this.matrix = light.matrixWorld;
+		this.matrixAutoUpdate = false;
 
-	var geometry = new OctahedronBufferGeometry( size );
-	geometry.rotateY( Math.PI * 0.5 );
+		this.color = color;
 
-	var material = new MeshBasicMaterial( { vertexColors: VertexColors, wireframe: true } );
+		const geometry = new OctahedronGeometry( size );
+		geometry.rotateY( Math.PI * 0.5 );
 
-	var position = geometry.getAttribute( 'position' );
-	var colors = new Float32Array( position.count * 3 );
+		this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
+		if ( this.color === undefined ) this.material.vertexColors = true;
 
-	geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+		const position = geometry.getAttribute( 'position' );
+		const colors = new Float32Array( position.count * 3 );
 
-	this.add( new Mesh( geometry, material ) );
+		geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
-	this.update();
+		this.add( new Mesh( geometry, this.material ) );
 
-}
+		this.update();
 
-HemisphereLightHelper.prototype = Object.create( Object3D.prototype );
-HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;
+	}
 
-HemisphereLightHelper.prototype.dispose = function () {
+	dispose() {
 
-	this.children[ 0 ].geometry.dispose();
-	this.children[ 0 ].material.dispose();
+		this.children[ 0 ].geometry.dispose();
+		this.children[ 0 ].material.dispose();
 
-};
+	}
 
-HemisphereLightHelper.prototype.update = function () {
+	update() {
 
-	var vector = new Vector3();
+		const mesh = this.children[ 0 ];
 
-	var color1 = new Color();
-	var color2 = new Color();
+		if ( this.color !== undefined ) {
 
-	return function update() {
+			this.material.color.set( this.color );
 
-		var mesh = this.children[ 0 ];
+		} else {
 
-		var colors = mesh.geometry.getAttribute( 'color' );
+			const colors = mesh.geometry.getAttribute( 'color' );
 
-		color1.copy( this.light.color );
-		color2.copy( this.light.groundColor );
+			_color1.copy( this.light.color );
+			_color2.copy( this.light.groundColor );
 
-		for ( var i = 0, l = colors.count; i < l; i ++ ) {
+			for ( let i = 0, l = colors.count; i < l; i ++ ) {
 
-			var color = ( i < ( l / 2 ) ) ? color1 : color2;
+				const color = ( i < ( l / 2 ) ) ? _color1 : _color2;
 
-			colors.setXYZ( i, color.r, color.g, color.b );
+				colors.setXYZ( i, color.r, color.g, color.b );
+
+			}
+
+			colors.needsUpdate = true;
 
 		}
 
-		mesh.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+		mesh.lookAt( _vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
-		colors.needsUpdate = true;
+	}
 
-	};
-
-}();
+}
 
 
 export { HemisphereLightHelper };

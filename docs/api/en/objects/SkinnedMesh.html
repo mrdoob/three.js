@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.
+		</p>
+
+		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+
+		// create the skin indices and skin weights
+
+		const position = geometry.attributes.position;
+
+		const vertex = new THREE.Vector3();
+
+		const skinIndices = [];
+		const skinWeights = [];
+
+		for ( let i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+
+			// compute skinIndex and skinWeight based on some configuration data
+
+			const y = ( vertex.y + sizing.halfHeight );
+
+			const skinIndex = Math.floor( y / sizing.segmentHeight );
+			const skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+
+			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
+			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
+
+		}
+
+		geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+		// create skinned mesh and skeleton
+
+		const mesh = new THREE.SkinnedMesh( geometry, material );
+		const skeleton = new THREE.Skeleton( bones );
+
+		// see example from THREE.Skeleton
+
+		const rootBone = skeleton.bones[ 0 ];
+		mesh.add( rootBone );
+
+		// bind the skeleton to the mesh
+
+		mesh.bind( skeleton );
+
+		// move the bones and manipulate the model
+
+		skeleton.bones[ 0 ].rotation.x = -0.1;
+		skeleton.bones[ 1 ].rotation.x = 0.2;
+		</code>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
+		<p>
+		[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
+		[page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:String bindMode]</h3>
+		<p>
+		Either "attached" or "detached". "attached" uses the [page:SkinnedMesh.matrixWorld]
+		property for the base transform	matrix of the bones. "detached" uses the
+		[page:SkinnedMesh.bindMatrix]. Default is "attached".
+		</p>
+
+		<h3>[property:Matrix4 bindMatrix]</h3>
+		<p>
+		The base matrix that is used for the bound bone transforms.
+		</p>
+
+		<h3>[property:Matrix4 bindMatrixInverse]</h3>
+		<p>
+		The base matrix that is used for resetting the bound bone transforms.
+		</p>
+
+		<h3>[property:Skeleton skeleton]</h3>
+		<p>
+		[page:Skeleton] representing the bone hierarchy of the skinned mesh.
+		</p>
+
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<p>
+		[page:Skeleton skeleton] - [page:Skeleton] created from a [page:Bone Bones] tree.<br/>
+		[page:Matrix4 bindMatrix] - [page:Matrix4] that represents the base transform of the skeleton.<br /><br />
+
+		Bind a skeleton to the skinned mesh. The bindMatrix gets saved to .bindMatrix property
+		and the .bindMatrixInverse gets calculated.
+		</p>
+
+		<h3>[method:SkinnedMesh clone]()</h3>
+		<p>
+		Returns a clone of this SkinnedMesh object and any descendants.
+		</p>
+
+		<h3>[method:null normalizeSkinWeights]()</h3>
+		<p>
+		Normalizes the skin weights.
+		</p>
+
+		<h3>[method:null pose]()</h3>
+		<p>
+		This method sets the skinned mesh in the rest pose (resets the pose).
+		</p>
+
+		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+		<p>
+		Updates the [page:Matrix4 MatrixWorld].
+		</p>
+
+		<h3>[method:Vector3 boneTransform]( [index:Integer], [target:Vector3] )</h3>
+		<p>
+		Calculates the position of the vertex at the given index relative to the current bone transformations.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

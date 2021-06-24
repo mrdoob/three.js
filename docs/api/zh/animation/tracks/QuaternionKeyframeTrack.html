@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		[page:KeyframeTrack] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			四元数类型的关键帧轨道。
+		</p>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<p>
+			[page:String name] - (必须) 关键帧轨道(KeyframeTrack)的标识符.<br />
+			[page:Array times] - (必须) 关键帧的时间数组.<br />
+			[page:Array values] - 与时间数组中的时间点对应的值数组.<br />
+			[page:Constant interpolation] - 使用的插值类型。 取值参考
+			[page:Animation Animation Constants] 默认值为
+			[page:Animation InterpolateLinear].
+		</p>
+
+
+		<h2>属性</h2>
+
+
+		<p class="desc">
+			参见 [page:KeyframeTrack] 查看继承的属性.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			默认的插值类型。 参见 [page:Animation InterpolateDiscrete].
+		</p>
+
+		<h3>[property:String ValueTypeName]</h3>
+		<p>
+			String 'quaternion'.
+		</p>
+
+
+		<h2>方法</h2>
+
+
+		<p class="desc">
+			参见 [page:KeyframeTrack] 查看继承的方法.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear]()</h3>
+		<p>
+			根据值数组 ([page:KeyframeTrack.values values])，
+			时间 ([page:KeyframeTrack.times times])
+			和值大小 [page:KeyframeTrack.valueSize valueSize]
+			创建一个新的线性插值 ([page:QuaternionLinearInterpolant QuaternionLinearInterpolant])。
+		</p>
+
+
+		<h2>源码</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

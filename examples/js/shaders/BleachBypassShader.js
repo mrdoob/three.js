@@ -1,64 +1,65 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
+( function () {
+
+	/**
  * Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass]
  * - based on Nvidia example
  * http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass
  */
+	const BleachBypassShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'opacity': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-THREE.BleachBypassShader = {
+		varying vec2 vUv;
 
-	uniforms: {
+		void main() {
 
-		"tDiffuse": { value: null },
-		"opacity":  { value: 1.0 }
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	},
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-	vertexShader: [
+		uniform float opacity;
 
-		"varying vec2 vUv;",
+		uniform sampler2D tDiffuse;
 
-		"void main() {",
+		varying vec2 vUv;
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		void main() {
 
-		"}"
+			vec4 base = texture2D( tDiffuse, vUv );
 
-	].join( "\n" ),
+			vec3 lumCoeff = vec3( 0.25, 0.65, 0.1 );
+			float lum = dot( lumCoeff, base.rgb );
+			vec3 blend = vec3( lum );
 
-	fragmentShader: [
+			float L = min( 1.0, max( 0.0, 10.0 * ( lum - 0.45 ) ) );
 
-		"uniform float opacity;",
+			vec3 result1 = 2.0 * base.rgb * blend;
+			vec3 result2 = 1.0 - 2.0 * ( 1.0 - blend ) * ( 1.0 - base.rgb );
 
-		"uniform sampler2D tDiffuse;",
+			vec3 newColor = mix( result1, result2, L );
 
-		"varying vec2 vUv;",
+			float A2 = opacity * base.a;
+			vec3 mixRGB = A2 * newColor.rgb;
+			mixRGB += ( ( 1.0 - A2 ) * base.rgb );
 
-		"void main() {",
+			gl_FragColor = vec4( mixRGB, base.a );
 
-			"vec4 base = texture2D( tDiffuse, vUv );",
+		}`
+	};
 
-			"vec3 lumCoeff = vec3( 0.25, 0.65, 0.1 );",
-			"float lum = dot( lumCoeff, base.rgb );",
-			"vec3 blend = vec3( lum );",
+	THREE.BleachBypassShader = BleachBypassShader;
 
-			"float L = min( 1.0, max( 0.0, 10.0 * ( lum - 0.45 ) ) );",
-
-			"vec3 result1 = 2.0 * base.rgb * blend;",
-			"vec3 result2 = 1.0 - 2.0 * ( 1.0 - blend ) * ( 1.0 - base.rgb );",
-
-			"vec3 newColor = mix( result1, result2, L );",
-
-			"float A2 = opacity * base.a;",
-			"vec3 mixRGB = A2 * newColor.rgb;",
-			"mixRGB += ( ( 1.0 - A2 ) * base.rgb );",
-
-			"gl_FragColor = vec4( mixRGB, base.a );",
-
-		"}"
-
-	].join( "\n" )
-
-};
+} )();

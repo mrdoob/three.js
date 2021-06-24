@@ -1,36 +1,74 @@
-import { Vector3 } from '../../math/Vector3';
-import { Curve } from '../core/Curve';
+import { Vector3 } from '../../math/Vector3.js';
+import { Curve } from '../core/Curve.js';
 
+class LineCurve3 extends Curve {
 
-function LineCurve3( v1, v2 ) {
+	constructor( v1 = new Vector3(), v2 = new Vector3() ) {
 
-	Curve.call( this );
+		super();
 
-	this.v1 = v1;
-	this.v2 = v2;
+		this.type = 'LineCurve3';
+		this.isLineCurve3 = true;
 
-}
+		this.v1 = v1;
+		this.v2 = v2;
 
-LineCurve3.prototype = Object.create( Curve.prototype );
-LineCurve3.prototype.constructor = LineCurve3;
+	}
+	getPoint( t, optionalTarget = new Vector3() ) {
 
-LineCurve3.prototype.getPoint = function ( t ) {
+		const point = optionalTarget;
 
-	if ( t === 1 ) {
+		if ( t === 1 ) {
 
-		return this.v2.clone();
+			point.copy( this.v2 );
+
+		} else {
+
+			point.copy( this.v2 ).sub( this.v1 );
+			point.multiplyScalar( t ).add( this.v1 );
+
+		}
+
+		return point;
+
+	}
+	// Line curve is linear, so we can overwrite default getPointAt
+	getPointAt( u, optionalTarget ) {
+
+		return this.getPoint( u, optionalTarget );
+
+	}
+	copy( source ) {
+
+		super.copy( source );
+
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
+
+	}
+	toJSON() {
+
+		const data = super.toJSON();
+
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	}
+	fromJSON( json ) {
+
+		super.fromJSON( json );
+
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
 
 	}
 
-	var vector = new Vector3();
-
-	vector.subVectors( this.v2, this.v1 ); // diff
-	vector.multiplyScalar( t );
-	vector.add( this.v1 );
-
-	return vector;
-
-};
-
+}
 
 export { LineCurve3 };

@@ -1,51 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - buffergeometry [particles]</title>
+		<title>three.js webgl - buffergeometry - particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #050505;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - particles</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - particles</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			let container, stats;
 
-			var container, stats;
+			let camera, scene, renderer;
 
-			var camera, scene, renderer;
-
-			var points;
+			let points;
 
 			init();
 			animate();
@@ -58,68 +34,75 @@
 				camera.position.z = 2750;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
 
 				//
 
-				var particles = 500000;
+				const particles = 500000;
 
-				var geometry = new THREE.BufferGeometry();
+				const geometry = new THREE.BufferGeometry();
 
-				var interleaved_buffer_float32 = new Float32Array( particles * 4 );
-				var interleaved_buffer_uint8 = new Uint8Array( interleaved_buffer_float32.buffer );
+				// create a generic buffer of binary data (a single particle has 16 bytes of data)
 
-				var color = new THREE.Color();
+				const arrayBuffer = new ArrayBuffer( particles * 16 );
 
-				var n = 1000, n2 = n / 2; // particles spread in the cube
+				// the following typed arrays share the same buffer
 
-				for ( var i = 0; i < interleaved_buffer_float32.length; i += 4 ) {
-
-					// positions
-
-					var x = Math.random() * n - n2;
-					var y = Math.random() * n - n2;
-					var z = Math.random() * n - n2;
-
-					interleaved_buffer_float32[ i + 0 ] = x;
-					interleaved_buffer_float32[ i + 1 ] = y;
-					interleaved_buffer_float32[ i + 2 ] = z;
-
-					// colors
-
-					var vx = ( x / n ) + 0.5;
-					var vy = ( y / n ) + 0.5;
-					var vz = ( z / n ) + 0.5;
-
-					color.setRGB( vx, vy, vz );
-
-					var j = ( i + 3 ) * 4;
-
-					interleaved_buffer_uint8[ j + 0 ] = color.r * 255;
-					interleaved_buffer_uint8[ j + 1 ] = color.g * 255;
-					interleaved_buffer_uint8[ j + 2 ] = color.b * 255;
-					interleaved_buffer_uint8[ j + 3 ] = 0;
-
-				}
-
-				var ibp = new THREE.InterleavedBuffer( interleaved_buffer_float32, 4 );
-				var ibc = new THREE.InterleavedBuffer( interleaved_buffer_uint8, 16 );
-
-				geometry.addAttribute( 'position', new THREE.InterleavedBufferAttribute( ibp, 3, 0, false ) );
-				geometry.addAttribute( 'color', new THREE.InterleavedBufferAttribute( ibc, 3, 12, true ) );
-				// geometry.computeBoundingSphere();
+				const interleavedFloat32Buffer = new Float32Array( arrayBuffer );
+				const interleavedUint8Buffer = new Uint8Array( arrayBuffer );
 
 				//
 
-				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
+				const color = new THREE.Color();
+
+				const n = 1000, n2 = n / 2; // particles spread in the cube
+
+				for ( let i = 0; i < interleavedFloat32Buffer.length; i += 4 ) {
+
+					// position (first 12 bytes)
+
+					const x = Math.random() * n - n2;
+					const y = Math.random() * n - n2;
+					const z = Math.random() * n - n2;
+
+					interleavedFloat32Buffer[ i + 0 ] = x;
+					interleavedFloat32Buffer[ i + 1 ] = y;
+					interleavedFloat32Buffer[ i + 2 ] = z;
+
+					// color (last 4 bytes)
+
+					const vx = ( x / n ) + 0.5;
+					const vy = ( y / n ) + 0.5;
+					const vz = ( z / n ) + 0.5;
+
+					color.setRGB( vx, vy, vz );
+
+					const j = ( i + 3 ) * 4;
+
+					interleavedUint8Buffer[ j + 0 ] = color.r * 255;
+					interleavedUint8Buffer[ j + 1 ] = color.g * 255;
+					interleavedUint8Buffer[ j + 2 ] = color.b * 255;
+					interleavedUint8Buffer[ j + 3 ] = 0; // not needed
+
+				}
+
+				const interleavedBuffer32 = new THREE.InterleavedBuffer( interleavedFloat32Buffer, 4 );
+				const interleavedBuffer8 = new THREE.InterleavedBuffer( interleavedUint8Buffer, 16 );
+
+				geometry.setAttribute( 'position', new THREE.InterleavedBufferAttribute( interleavedBuffer32, 3, 0, false ) );
+				geometry.setAttribute( 'color', new THREE.InterleavedBufferAttribute( interleavedBuffer8, 3, 12, true ) );
+
+				//
+
+				const material = new THREE.PointsMaterial( { size: 15, vertexColors: true } );
 
 				points = new THREE.Points( geometry, material );
 				scene.add( points );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -132,7 +115,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -158,7 +141,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
 				points.rotation.x = time * 0.25;
 				points.rotation.y = time * 0.5;

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>平行光（[name]）</h1>
+
+		<p class="desc">
+			平行光是沿着特定方向发射的光。这种光的表现像是无限远,从它发出的光线都是平行的。常常用平行光来模拟太阳光
+			的效果; 太阳足够远，因此我们可以认为太阳的位置是无限远，所以我们认为从太阳发出的光线也都是平行的。<br /><br />
+
+			平行光可以投射阴影 - 跳转至 [page:DirectionalLightShadow] 查看更多细节。
+		</p>
+
+		<h2>关于位置、目标和旋转说明</h2>
+		<p>
+			Three.js 的平行光常见的困惑是设置旋转没有效果。这是因为 three.js 的平行光类似与其他引擎的"目标平行光"。
+			<br /><br />
+
+			这意味着它的方向是从一个平行光的位置 [page:Object3D.position position] 到 [page:.target target]的位置。
+			(而不是一个只有旋转分量的'自由平行光')。<br /><br />
+
+			这样做的原因是为了让光线投射阴影。 - the [page:.shadow shadow]
+			摄像机需要一个位置来计算阴影。<br /><br />
+
+			有关更新目标的详细信息，请参阅 [page:.target target] 下面的目标属性。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// White directional light at half intensity shining from the top.
+		const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:misc_controls_fly controls / fly ]<br />
+			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_geometry_extrude_splines geometry / extrude / splines ]<br />
+			[example:webgl_materials_bumpmap materials / bumpmap ]
+		</p>
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<p>
+			[page:Integer color] - (可选参数) 16进制表示光的颜色。 缺省值为 0xffffff (白色)。<br />
+			[page:Float intensity] - (可选参数) 光照的强度。缺省值为1。<br /><br />
+
+			创建一个新的 [name]。
+		</p>
+
+		<h2>属性</h2>
+
+		<p>公共属性请查看基类 [page:Light Light]。</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			如果设置为 *true* 该平行光会产生动态阴影。 警告: 这样做的代价比较高而且需要一直调整到阴影看起来正确.
+			查看 [page:DirectionalLightShadow] 了解详细信息。该属性默认为 *false*。
+		</p>
+
+
+		<h3>[property:Vector3 position]</h3>
+		<p>
+			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
+		</p>
+
+		<h3>[property:DirectionalLightShadow shadow]</h3>
+		<p>
+			这个 [page:DirectionalLightShadow] 对象用来计算该平行光产生的阴影。
+		</p>
+
+		<h3>[property:Object3D target]</h3>
+		<p>
+			平行光的方向是从它的位置到目标位置。默认的目标位置为原点 *(0,0,0)*。<br />
+
+			注意: 对于目标的位置，要将其更改为除缺省值之外的任何位置,它必须被添加到 [page:Scene scene]
+			场景中去。
+		</p>
+		<code>
+		scene.add( light.target );
+		</code>
+		<p>
+			这使得属性target中的 [page:Object3D.matrixWorld matrixWorld] 会每帧自动更新。
+			<br /><br />
+			它也可以设置target为场景中的其他对象(任意拥有 [page:Object3D.position position] 属性的对象), 示例如下:
+		</p>
+		<code>
+		const targetObject = new THREE.Object3D();
+		scene.add(targetObject);
+
+		light.target = targetObject;
+		</code>
+		<p>
+			完成上述操作后，平行光现在就可以追踪到目标对像了。
+		</p>
+
+
+		<h2>方法</h2>
+
+		<p>公共方法请查看基类 [page:Light Light]。</p>
+
+		<h3>[method:DirectionalLight copy]( [param:DirectionalLight source] )</h3>
+		<p>
+			复制 source 的值到这个平行光源对象。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

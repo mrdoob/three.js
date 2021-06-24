@@ -4,94 +4,68 @@
 		<title>three.js webgl - fly controls - earth</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
 				background:#000;
 				color: #eee;
-				padding:0;
-				margin:0;
-				font-weight:bold;
-				overflow:hidden;
-
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
-			b { color:orange }
+			b {
+				color: orange
+			}
 		</style>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/FlyControls.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 	</head>
 
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [fly controls]<br/><br/>
-		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw<br/>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [fly controls]<br/>
+		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
-			var radius = 6371;
-			var tilt = 0.41;
-			var rotationSpeed = 0.02;
+			import Stats from './jsm/libs/stats.module.js';
 
-			var cloudsScale = 1.005;
-			var moonScale = 0.23;
+			import { FlyControls } from './jsm/controls/FlyControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
 
-			var MARGIN = 0;
-			var SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
-			var SCREEN_WIDTH  = window.innerWidth;
+			const radius = 6371;
+			const tilt = 0.41;
+			const rotationSpeed = 0.02;
 
-			var container, stats;
-			var camera, controls, scene, renderer;
-			var geometry, meshPlanet, meshClouds, meshMoon;
-			var dirLight, pointLight, ambientLight;
+			const cloudsScale = 1.005;
+			const moonScale = 0.23;
 
-			var composer;
+			const MARGIN = 0;
+			let SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
+			let SCREEN_WIDTH = window.innerWidth;
 
-			var textureLoader = new THREE.TextureLoader();
+			let camera, controls, scene, renderer, stats;
+			let geometry, meshPlanet, meshClouds, meshMoon;
+			let dirLight;
 
-			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
+			let composer;
 
-			var clock = new THREE.Clock();
+			const textureLoader = new THREE.TextureLoader();
+
+			let d, dPlanet, dMoon;
+			const dMoonVec = new THREE.Vector3();
+
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7 );
 				camera.position.z = radius * 5;
@@ -99,26 +73,20 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.00000025 );
 
-				controls = new THREE.FlyControls( camera );
-
-				controls.movementSpeed = 1000;
-				controls.domElement = container;
-				controls.rollSpeed = Math.PI / 24;
-				controls.autoForward = false;
-				controls.dragToLook = false;
-
 				dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( -1, 0, 1 ).normalize();
+				dirLight.position.set( - 1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var materialNormalMap = new THREE.MeshPhongMaterial( {
+				const materialNormalMap = new THREE.MeshPhongMaterial( {
 
 					specular: 0x333333,
 					shininess: 15,
 					map: textureLoader.load( "textures/planets/earth_atmos_2048.jpg" ),
 					specularMap: textureLoader.load( "textures/planets/earth_specular_2048.jpg" ),
 					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
-					normalScale: new THREE.Vector2( 0.85, 0.85 )
+
+					// y scale is negated to compensate for normal map handedness.
+					normalScale: new THREE.Vector2( 0.85, - 0.85 )
 
 				} );
 
@@ -133,7 +101,7 @@
 
 				// clouds
 
-				var materialClouds = new THREE.MeshLambertMaterial( {
+				const materialClouds = new THREE.MeshLambertMaterial( {
 
 					map: textureLoader.load( "textures/planets/earth_clouds_1024.png" ),
 					transparent: true
@@ -147,7 +115,7 @@
 
 				// moon
 
-				var materialMoon = new THREE.MeshPhongMaterial( {
+				const materialMoon = new THREE.MeshPhongMaterial( {
 
 					map: textureLoader.load( "textures/planets/moon_1024.jpg" )
 
@@ -160,34 +128,39 @@
 
 				// stars
 
-				var i, r = radius, starsGeometry = [ new THREE.Geometry(), new THREE.Geometry() ];
+				const r = radius, starsGeometry = [ new THREE.BufferGeometry(), new THREE.BufferGeometry() ];
 
-				for ( i = 0; i < 250; i ++ ) {
+				const vertices1 = [];
+				const vertices2 = [];
 
-					var vertex = new THREE.Vector3();
+				const vertex = new THREE.Vector3();
+
+				for ( let i = 0; i < 250; i ++ ) {
+
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
 					vertex.z = Math.random() * 2 - 1;
 					vertex.multiplyScalar( r );
 
-					starsGeometry[ 0 ].vertices.push( vertex );
+					vertices1.push( vertex.x, vertex.y, vertex.z );
 
 				}
 
-				for ( i = 0; i < 1500; i ++ ) {
+				for ( let i = 0; i < 1500; i ++ ) {
 
-					var vertex = new THREE.Vector3();
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
 					vertex.z = Math.random() * 2 - 1;
 					vertex.multiplyScalar( r );
 
-					starsGeometry[ 1 ].vertices.push( vertex );
+					vertices2.push( vertex.x, vertex.y, vertex.z );
 
 				}
 
-				var stars;
-				var starsMaterials = [
+				starsGeometry[ 0 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices1, 3 ) );
+				starsGeometry[ 1 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
+
+				const starsMaterials = [
 					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
 					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
 					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
@@ -196,9 +169,9 @@
 					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 				];
 
-				for ( i = 10; i < 30; i ++ ) {
+				for ( let i = 10; i < 30; i ++ ) {
 
-					stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+					const stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
 
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
@@ -212,43 +185,50 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.sortObjects = false;
+				document.body.appendChild( renderer.domElement );
 
-				container.appendChild( renderer.domElement );
+				//
+
+				controls = new FlyControls( camera, renderer.domElement );
+
+				controls.movementSpeed = 1000;
+				controls.domElement = renderer.domElement;
+				controls.rollSpeed = Math.PI / 24;
+				controls.autoForward = false;
+				controls.dragToLook = false;
+
+				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectFilm = new THREE.FilmPass( 0.35, 0.75, 2048, false );
+				const renderModel = new RenderPass( scene, camera );
+				const effectFilm = new FilmPass( 0.35, 0.75, 2048, false );
 
-				effectFilm.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFilm );
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_HEIGHT = window.innerHeight;
-				SCREEN_WIDTH  = window.innerWidth;
-
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				SCREEN_WIDTH = window.innerWidth;
 
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				composer.reset();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
 
@@ -265,7 +245,7 @@
 
 				// rotate the planet and clouds
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				meshPlanet.rotation.y += rotationSpeed * delta;
 				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;

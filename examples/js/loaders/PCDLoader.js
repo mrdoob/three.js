@@ -1,257 +1,354 @@
-/**
- * @author Filipe Caixeta / http://filipecaixeta.com.br
- *
- * Description: A THREE loader for PCD ascii and binary files.
- *
- * Limitations: Compressed binary files are not supported.
- *
- */
+( function () {
 
-THREE.PCDLoader = function ( manager ) {
+	class PCDLoader extends THREE.Loader {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	this.littleEndian = true;
+		constructor( manager ) {
 
-};
-
-
-THREE.PCDLoader.prototype = {
-
-	constructor: THREE.PCDLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new THREE.FileLoader( scope.manager );
-		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function ( data ) {
-
-			onLoad( scope.parse( data, url ) );
-
-		}, onProgress, onError );
-
-	},
-
-	binarryToStr: function ( data ) {
-
-		var charArray = new Uint8Array( data );
-
-		if ( window.TextDecoder !== undefined ) {
-
-			return new TextDecoder().decode( charArray );
+			super( manager );
+			this.littleEndian = true;
 
 		}
 
-		var text = "";
-		for ( var i = 0, il = data.byteLength; i < il; i ++ ) {
+		load( url, onLoad, onProgress, onError ) {
 
-			text += String.fromCharCode( charArray[ i ] );
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
+			loader.setPath( scope.path );
+			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
+			loader.load( url, function ( data ) {
+
+				try {
+
+					onLoad( scope.parse( data, url ) );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
+
+			}, onProgress, onError );
 
 		}
-		return text;
 
-	},
+		parse( data, url ) {
 
-	parseHeader: function ( data ) {
+			// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
+			function decompressLZF( inData, outLength ) {
 
-		var PCDheader = {};
-		var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
-		var result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
-		PCDheader.data = result2[ 1 ];
-		PCDheader.headerLen = result2[ 0 ].length + result1;
-		PCDheader.str = data.substr( 0, PCDheader.headerLen );
-		// Remove comments
-		PCDheader.str = PCDheader.str.replace( /\#.*/gi, "" );
-		PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.version != null )
-			PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
-		PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.fields != null )
-			PCDheader.fields = PCDheader.fields[ 1 ].split( " " );
-		PCDheader.size = /SIZE (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.size != null )
-			PCDheader.size = PCDheader.size[ 1 ].split( " " ).map( function ( x ) {
+				const inLength = inData.length;
+				const outData = new Uint8Array( outLength );
+				let inPtr = 0;
+				let outPtr = 0;
+				let ctrl;
+				let len;
+				let ref;
 
-				return parseInt( x, 10 );
+				do {
 
+					ctrl = inData[ inPtr ++ ];
+
+					if ( ctrl < 1 << 5 ) {
+
+						ctrl ++;
+						if ( outPtr + ctrl > outLength ) throw new Error( 'Output buffer is not large enough' );
+						if ( inPtr + ctrl > inLength ) throw new Error( 'Invalid compressed data' );
+
+						do {
+
+							outData[ outPtr ++ ] = inData[ inPtr ++ ];
+
+						} while ( -- ctrl );
+
+					} else {
+
+						len = ctrl >> 5;
+						ref = outPtr - ( ( ctrl & 0x1f ) << 8 ) - 1;
+						if ( inPtr >= inLength ) throw new Error( 'Invalid compressed data' );
+
+						if ( len === 7 ) {
+
+							len += inData[ inPtr ++ ];
+							if ( inPtr >= inLength ) throw new Error( 'Invalid compressed data' );
+
+						}
+
+						ref -= inData[ inPtr ++ ];
+						if ( outPtr + len + 2 > outLength ) throw new Error( 'Output buffer is not large enough' );
+						if ( ref < 0 ) throw new Error( 'Invalid compressed data' );
+						if ( ref >= outPtr ) throw new Error( 'Invalid compressed data' );
+
+						do {
+
+							outData[ outPtr ++ ] = outData[ ref ++ ];
+
+						} while ( -- len + 2 );
+
+					}
+
+				} while ( inPtr < inLength );
+
+				return outData;
+
+			}
+
+			function parseHeader( data ) {
+
+				const PCDheader = {};
+				const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
+				const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
+				PCDheader.data = result2[ 1 ];
+				PCDheader.headerLen = result2[ 0 ].length + result1;
+				PCDheader.str = data.substr( 0, PCDheader.headerLen ); // remove comments
+
+				PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' ); // parse
+
+				PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
+				PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
+				PCDheader.size = /SIZE (.*)/i.exec( PCDheader.str );
+				PCDheader.type = /TYPE (.*)/i.exec( PCDheader.str );
+				PCDheader.count = /COUNT (.*)/i.exec( PCDheader.str );
+				PCDheader.width = /WIDTH (.*)/i.exec( PCDheader.str );
+				PCDheader.height = /HEIGHT (.*)/i.exec( PCDheader.str );
+				PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
+				PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str ); // evaluate
+
+				if ( PCDheader.version !== null ) PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
+				if ( PCDheader.fields !== null ) PCDheader.fields = PCDheader.fields[ 1 ].split( ' ' );
+				if ( PCDheader.type !== null ) PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
+				if ( PCDheader.width !== null ) PCDheader.width = parseInt( PCDheader.width[ 1 ] );
+				if ( PCDheader.height !== null ) PCDheader.height = parseInt( PCDheader.height[ 1 ] );
+				if ( PCDheader.viewpoint !== null ) PCDheader.viewpoint = PCDheader.viewpoint[ 1 ];
+				if ( PCDheader.points !== null ) PCDheader.points = parseInt( PCDheader.points[ 1 ], 10 );
+				if ( PCDheader.points === null ) PCDheader.points = PCDheader.width * PCDheader.height;
+
+				if ( PCDheader.size !== null ) {
+
+					PCDheader.size = PCDheader.size[ 1 ].split( ' ' ).map( function ( x ) {
+
+						return parseInt( x, 10 );
+
+					} );
+
+				}
+
+				if ( PCDheader.count !== null ) {
+
+					PCDheader.count = PCDheader.count[ 1 ].split( ' ' ).map( function ( x ) {
+
+						return parseInt( x, 10 );
+
+					} );
+
+				} else {
+
+					PCDheader.count = [];
+
+					for ( let i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+
+						PCDheader.count.push( 1 );
+
+					}
+
+				}
+
+				PCDheader.offset = {};
+				let sizeSum = 0;
+
+				for ( let i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+
+					if ( PCDheader.data === 'ascii' ) {
+
+						PCDheader.offset[ PCDheader.fields[ i ] ] = i;
+
+					} else {
+
+						PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
+						sizeSum += PCDheader.size[ i ] * PCDheader.count[ i ];
+
+					}
+
+				} // for binary only
+
+
+				PCDheader.rowSize = sizeSum;
+				return PCDheader;
+
+			}
+
+			const textData = THREE.LoaderUtils.decodeText( new Uint8Array( data ) ); // parse header (always ascii format)
+
+			const PCDheader = parseHeader( textData ); // parse data
+
+			const position = [];
+			const normal = [];
+			const color = []; // ascii
+
+			if ( PCDheader.data === 'ascii' ) {
+
+				const offset = PCDheader.offset;
+				const pcdData = textData.substr( PCDheader.headerLen );
+				const lines = pcdData.split( '\n' );
+
+				for ( let i = 0, l = lines.length; i < l; i ++ ) {
+
+					if ( lines[ i ] === '' ) continue;
+					const line = lines[ i ].split( ' ' );
+
+					if ( offset.x !== undefined ) {
+
+						position.push( parseFloat( line[ offset.x ] ) );
+						position.push( parseFloat( line[ offset.y ] ) );
+						position.push( parseFloat( line[ offset.z ] ) );
+
+					}
+
+					if ( offset.rgb !== undefined ) {
+
+						const rgb = parseFloat( line[ offset.rgb ] );
+						const r = rgb >> 16 & 0x0000ff;
+						const g = rgb >> 8 & 0x0000ff;
+						const b = rgb >> 0 & 0x0000ff;
+						color.push( r / 255, g / 255, b / 255 );
+
+					}
+
+					if ( offset.normal_x !== undefined ) {
+
+						normal.push( parseFloat( line[ offset.normal_x ] ) );
+						normal.push( parseFloat( line[ offset.normal_y ] ) );
+						normal.push( parseFloat( line[ offset.normal_z ] ) );
+
+					}
+
+				}
+
+			} // binary-compressed
+			// normally data in PCD files are organized as array of structures: XYZRGBXYZRGB
+			// binary compressed PCD files organize their data as structure of arrays: XXYYZZRGBRGB
+			// that requires a totally different parsing approach compared to non-compressed data
+
+
+			if ( PCDheader.data === 'binary_compressed' ) {
+
+				const sizes = new Uint32Array( data.slice( PCDheader.headerLen, PCDheader.headerLen + 8 ) );
+				const compressedSize = sizes[ 0 ];
+				const decompressedSize = sizes[ 1 ];
+				const decompressed = decompressLZF( new Uint8Array( data, PCDheader.headerLen + 8, compressedSize ), decompressedSize );
+				const dataview = new DataView( decompressed.buffer );
+				const offset = PCDheader.offset;
+
+				for ( let i = 0; i < PCDheader.points; i ++ ) {
+
+					if ( offset.x !== undefined ) {
+
+						position.push( dataview.getFloat32( PCDheader.points * offset.x + PCDheader.size[ 0 ] * i, this.littleEndian ) );
+						position.push( dataview.getFloat32( PCDheader.points * offset.y + PCDheader.size[ 1 ] * i, this.littleEndian ) );
+						position.push( dataview.getFloat32( PCDheader.points * offset.z + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+
+					}
+
+					if ( offset.rgb !== undefined ) {
+
+						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
+						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
+						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
+
+					}
+
+					if ( offset.normal_x !== undefined ) {
+
+						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_x + PCDheader.size[ 4 ] * i, this.littleEndian ) );
+						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_y + PCDheader.size[ 5 ] * i, this.littleEndian ) );
+						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_z + PCDheader.size[ 6 ] * i, this.littleEndian ) );
+
+					}
+
+				}
+
+			} // binary
+
+
+			if ( PCDheader.data === 'binary' ) {
+
+				const dataview = new DataView( data, PCDheader.headerLen );
+				const offset = PCDheader.offset;
+
+				for ( let i = 0, row = 0; i < PCDheader.points; i ++, row += PCDheader.rowSize ) {
+
+					if ( offset.x !== undefined ) {
+
+						position.push( dataview.getFloat32( row + offset.x, this.littleEndian ) );
+						position.push( dataview.getFloat32( row + offset.y, this.littleEndian ) );
+						position.push( dataview.getFloat32( row + offset.z, this.littleEndian ) );
+
+					}
+
+					if ( offset.rgb !== undefined ) {
+
+						color.push( dataview.getUint8( row + offset.rgb + 2 ) / 255.0 );
+						color.push( dataview.getUint8( row + offset.rgb + 1 ) / 255.0 );
+						color.push( dataview.getUint8( row + offset.rgb + 0 ) / 255.0 );
+
+					}
+
+					if ( offset.normal_x !== undefined ) {
+
+						normal.push( dataview.getFloat32( row + offset.normal_x, this.littleEndian ) );
+						normal.push( dataview.getFloat32( row + offset.normal_y, this.littleEndian ) );
+						normal.push( dataview.getFloat32( row + offset.normal_z, this.littleEndian ) );
+
+					}
+
+				}
+
+			} // build geometry
+
+
+			const geometry = new THREE.BufferGeometry();
+			if ( position.length > 0 ) geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+			if ( normal.length > 0 ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normal, 3 ) );
+			if ( color.length > 0 ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
+			geometry.computeBoundingSphere(); // build material
+
+			const material = new THREE.PointsMaterial( {
+				size: 0.005
 			} );
-		PCDheader.type = /TYPE (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.type != null )
-			PCDheader.type = PCDheader.type[ 1 ].split( " " );
-		PCDheader.count = /COUNT (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.count != null )
-			PCDheader.count = PCDheader.count[ 1 ].split( " " ).map( function ( x ) {
 
-				return parseInt( x, 10 );
+			if ( color.length > 0 ) {
 
-			} );
-		PCDheader.width = /WIDTH (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.width != null )
-			PCDheader.width = parseInt( PCDheader.width[ 1 ] );
-		PCDheader.height = /HEIGHT (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.height != null )
-			PCDheader.height = parseInt( PCDheader.height[ 1 ] );
-		PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.viewpoint != null )
-			PCDheader.viewpoint = PCDheader.viewpoint[ 1 ];
-		PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str );
-		if ( PCDheader.points != null )
-			PCDheader.points = parseInt( PCDheader.points[ 1 ], 10 );
-		if ( PCDheader.points == null )
-			PCDheader.points = PCDheader.width * PCDheader.height;
-
-		if ( PCDheader.count == null ) {
-
-			PCDheader.count = [];
-			for ( var i = 0; i < PCDheader.fields; i ++ )
-				PCDheader.count.push( 1 );
-
-		}
-
-		PCDheader.offset = {};
-		var sizeSum = 0;
-		for ( var i = 0; i < PCDheader.fields.length; i ++ ) {
-
-			if ( PCDheader.data == "ascii" ) {
-
-				PCDheader.offset[ PCDheader.fields[ i ] ] = i;
+				material.vertexColors = true;
 
 			} else {
 
-				PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
-				sizeSum += PCDheader.size[ i ];
+				material.color.setHex( Math.random() * 0xffffff );
 
-			}
+			} // build point cloud
 
-		}
-		// For binary only
-		PCDheader.rowSize = sizeSum;
 
-		return PCDheader;
-
-	},
-
-	parse: function ( data, url ) {
-
-		var textData = this.binarryToStr( data );
-
-		// Parse the header
-		// Header is always ascii format
-		var PCDheader = this.parseHeader( textData );
-
-		// Parse the data
-		var position = false;
-		if ( PCDheader.offset.x != undefined )
-			position = new Float32Array( PCDheader.points * 3 );
-		var color = false;
-		if ( PCDheader.offset.rgb != undefined )
-			color = new Float32Array( PCDheader.points * 3 );
-		var normal = false;
-		if ( PCDheader.offset.normal_x != undefined )
-			normal = new Float32Array( PCDheader.points * 3 );
-
-		if ( PCDheader.data == "ascii" ) {
-
-			var offset = PCDheader.offset;
-			var pcdData = textData.substr( PCDheader.headerLen );
-			var lines = pcdData.split( '\n' );
-			var i3 = 0;
-			for ( var i = 0; i < lines.length; i ++, i3 += 3 ) {
-
-				var line = lines[ i ].split( " " );
-				if ( offset.x != undefined ) {
-
-					position[ i3 + 0 ] = parseFloat( line[ offset.x ] );
-					position[ i3 + 1 ] = parseFloat( line[ offset.y ] );
-					position[ i3 + 2 ] = parseFloat( line[ offset.z ] );
-
-				}
-				if ( offset.rgb != undefined ) {
-
-					var c = new Float32Array( [ parseFloat( line[ offset.rgb ] ) ] );
-					var dataview = new DataView( c.buffer, 0 );
-					color[ i3 + 0 ] = dataview.getUint8( 0 ) / 255.0;
-					color[ i3 + 1 ] = dataview.getUint8( 1 ) / 255.0;
-					color[ i3 + 2 ] = dataview.getUint8( 2 ) / 255.0;
-
-				}
-				if ( offset.normal_x != undefined ) {
-
-					normal[ i3 + 0 ] = parseFloat( line[ offset.normal_x ] );
-					normal[ i3 + 1 ] = parseFloat( line[ offset.normal_y ] );
-					normal[ i3 + 2 ] = parseFloat( line[ offset.normal_z ] );
-
-				}
-
-			}
+			const mesh = new THREE.Points( geometry, material );
+			let name = url.split( '' ).reverse().join( '' );
+			name = /([^\/]*)/.exec( name );
+			name = name[ 1 ].split( '' ).reverse().join( '' );
+			mesh.name = name;
+			return mesh;
 
 		}
-
-		if ( PCDheader.data == "binary_compressed" ) {
-
-			console.error( 'THREE.PCDLoader: binary_compressed files are not supported' );
-			return;
-
-		}
-
-		if ( PCDheader.data == "binary" ) {
-
-			var row = 0;
-			var dataview = new DataView( data, PCDheader.headerLen );
-			var i = 0;
-			var offset = PCDheader.offset;
-			for ( var i3 = 0; i < PCDheader.points; i3 += 3, row += PCDheader.rowSize, i ++ ) {
-
-				if ( offset.x != undefined ) {
-
-					position[ i3 + 0 ] = dataview.getFloat32( row + offset.x, this.littleEndian );
-					position[ i3 + 1 ] = dataview.getFloat32( row + offset.y, this.littleEndian );
-					position[ i3 + 2 ] = dataview.getFloat32( row + offset.z, this.littleEndian );
-
-				}
-				if ( offset.rgb != undefined ) {
-
-					color[ i3 + 0 ] = dataview.getUint8( row + offset.rgb + 0 ) / 255.0;
-					color[ i3 + 1 ] = dataview.getUint8( row + offset.rgb + 1 ) / 255.0;
-					color[ i3 + 2 ] = dataview.getUint8( row + offset.rgb + 2 ) / 255.0;
-
-				}
-				if ( offset.normal_x != undefined ) {
-
-					normal[ i3 + 0 ] = dataview.getFloat32( row + offset.normal_x, this.littleEndian );
-					normal[ i3 + 1 ] = dataview.getFloat32( row + offset.normal_y, this.littleEndian );
-					normal[ i3 + 2 ] = dataview.getFloat32( row + offset.normal_z, this.littleEndian );
-
-				}
-
-			}
-
-		}
-
-		var geometry = new THREE.BufferGeometry();
-		if ( position != false )
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( position, 3 ) );
-		if ( color != false )
-			geometry.addAttribute( 'color', new THREE.BufferAttribute( color, 3 ) );
-		if ( normal != false )
-			geometry.addAttribute( 'normal', new THREE.BufferAttribute( normal, 3 ) );
-
-		geometry.computeBoundingSphere();
-
-		var material = new THREE.PointsMaterial( { size: 0.005, vertexColors: ! ( color == false ) } );
-		if ( color == false )
-			material.color.setHex( Math.random() * 0xffffff );
-
-		var mesh = new THREE.Points( geometry, material );
-		var name = url.split( '' ).reverse().join( '' );
-		name = /([^\/]*)/.exec( name );
-		name = name[ 1 ].split( '' ).reverse().join( '' );
-		mesh.name = name;
-		mesh.PCDheader = PCDheader;
-
-		return mesh;
 
 	}
 
-};
+	THREE.PCDLoader = PCDLoader;
+
+} )();

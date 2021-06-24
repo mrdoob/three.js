@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			用于图形化地展示对象世界轴心对齐的包围盒的辅助对象。The actual bounding box is handled with [page:Box3], this is just a visual helper for debugging.
+			It can be automatically resized with the [page:BoxHelper.update] method when the object it's created from is transformed.
+
+			注意:要想能正常运行,目标对象必须包含 [page:BufferGeometry] ,
+			所以当目标对象是精灵 [page:Sprite Sprites] 时将不能正常运行.
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const sphere = new THREE.SphereGeometry();
+		const object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
+		const box = new THREE.BoxHelper( object, 0xffff00 );
+		scene.add( box );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_helpers WebGL / helpers]<br/>
+			[example:webgl_loader_nrrd WebGL / loader / nrrd]<br/>
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]
+		</p>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:Object3D object], [param:Color color] )</h3>
+		<p>
+		[page:Object3D object]  -- (可选的) 被展示世界轴心对齐的包围盒的对象.<br />
+		[page:Color color] --  (可选的) 线框盒子的16进制颜色值. 默认为 0xffff00.<br /><br />
+
+		创建一个新的线框盒子包围指定的对象. 内部使用 [page:Box3.setFromObject]
+		方法来计算尺寸. 注意:此线框盒子将包围对象的所有子对象.
+		</p>
+
+		<h2>属性</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共属性.</p>
+
+
+		<h2>方法</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
+
+		<h3>[method:null update]()</h3>
+		<p>
+			更新辅助对象的几何体，与目标对象尺寸
+			保持一致, 包围目标对象所有子对象. 请查看 [page:Box3.setFromObject].
+		</p>
+
+		<h3>[method:BoxHelper setFromObject]( [param:Object3D object] )</h3>
+		<p>
+			[page:Object3D object] - 用于创建辅助对象的目标 [page:Object3D] 对象.<br /><br />
+
+			更新指定对象的线框盒子.
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

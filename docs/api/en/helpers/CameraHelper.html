@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		This helps with visualizing what a camera contains in its frustum.<br />
+		It visualizes the frustum of a camera using a [page:LineSegments].
+		</p>
+
+		<h2>Code Example</h2>
+		<code>
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const helper = new THREE.CameraHelper( camera );
+scene.add( helper );
+		</code>
+
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_camera WebGL / camera]<br/>
+			[example:webgl_geometry_extrude_splines WebGL / extrude / splines]
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Camera camera] )</h3>
+		<p>
+		[page:Camera camera] -- The camera to visualize.<br /><br />
+
+		This create a new [Name] for the specified camera.
+		</p>
+
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:LineSegments] class for common properties.</p>
+
+
+
+		<h3>[property:Camera camera]</h3>
+		<p>The camera being visualized.</p>
+
+		<h3>[property:Object pointMap]</h3>
+		<p>This contains the points used to visualize the camera.</p>
+
+		<h3>[property:Object matrix]</h3>
+		<p>Reference to the [page:Object3D.matrixWorld camera.matrixWorld].</p>
+
+		<h3>[property:Object matrixAutoUpdate]</h3>
+		<p>
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			camera's [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+
+
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:LineSegments] class for common methods.</p>
+
+		<h3>[method:CameraHelper dispose]()</h3>
+		<p>
+		Disposes of the internally-created [page:Line.material material] and [page:Line.geometry geometry] used by this helper.
+		</p>
+
+		<h3>[method:null update]()</h3>
+		<p>Updates the helper based on the projectionMatrix of the camera.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

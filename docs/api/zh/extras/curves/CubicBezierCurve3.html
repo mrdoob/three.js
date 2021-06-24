@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>三维三次贝塞尔曲线（[name]）</h1>
+
+		<p class="desc">
+			创建一条平滑的三维
+			<a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:Bezier_curve.svg" target="_blank">三次贝塞尔曲线</a>，
+			由起点、终点和两个控制点所定义。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const curve = new THREE.CubicBezierCurve3(
+			new THREE.Vector3( -10, 0, 0 ),
+			new THREE.Vector3( -5, 15, 0 ),
+			new THREE.Vector3( 20, 15, 0 ),
+			new THREE.Vector3( 10, 0, 0 )
+		);
+
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+		const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+		// Create the final object to add to the scene
+		const curveObject = new THREE.Line( geometry, material );
+
+		</code>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:Vector3 v0], [param:Vector3 v1], [param:Vector3 v2], [param:Vector3 v3] )</h3>
+		<p>
+			[page:Vector3 v0] – 起点<br/>
+			[page:Vector3 v1] – 第一个控制点<br/>
+			[page:Vector3 v2] – 第二个控制点<br/>
+			[page:Vector3 v3] – 终点
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Curve]。</p>
+
+		<h3>[property:Vector3 v0]</h3>
+		<p>起点</p>
+
+		<h3>[property:Vector3 v1]</h3>
+		<p>第一个控制点</p>
+
+		<h3>[property:Vector3 v2]</h3>
+		<p>第二个控制点</p>
+
+		<h3>[property:Vector3 v3]</h3>
+		<p>终点</p>
+
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Curve]。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

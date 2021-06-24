@@ -1,91 +1,125 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+( function () {
 
-THREE.KMZLoader = function ( manager ) {
+	class KMZLoader extends THREE.Loader {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		constructor( manager ) {
 
-};
-
-THREE.KMZLoader.prototype = {
-
-	constructor: THREE.KMZLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new THREE.FileLoader( scope.manager );
-		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function ( text ) {
-
-			onLoad( scope.parse( text ) );
-
-		}, onProgress, onError );
-
-	},
-
-	parse: function ( data ) {
-
-		var zip = new JSZip( data );
-
-		// console.log( zip );
-
-		// var xml = new DOMParser().parseFromString( zip.file( 'doc.kml' ).asText(), 'application/xml' );
-
-		function loadImage( image ) {
-
-			var path = decodeURI( image.init_from );
-
-			// Hack to support relative paths
-			path = path.replace( '../', '' );
-
-			var regex = new RegExp( path + '$' );
-			var files = zip.file( regex );
-
-			// console.log( image, files );
-
-			if ( files.length ) {
-
-				var file = files[ 0 ];
-				var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-binary' } );
-				image.build.src = URL.createObjectURL( blob );
-
-			}
+			super( manager );
 
 		}
 
-		// load collada
+		load( url, onLoad, onProgress, onError ) {
 
-		var files = zip.file( /dae$/i );
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
+			loader.setPath( scope.path );
+			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
+			loader.load( url, function ( text ) {
 
-		if ( files.length ) {
+				try {
 
-			var file = files[ 0 ];
+					onLoad( scope.parse( text ) );
 
-			var collada = new THREE.ColladaLoader().parse( file.asText() );
+				} catch ( e ) {
 
-			// fix images
+					if ( onError ) {
 
-			var images = collada.library.images;
+						onError( e );
 
-			for ( var name in images ) {
+					} else {
 
-				loadImage( images[ name ] );
+						console.error( e );
 
-			}
+					}
 
-			return collada;
+					scope.manager.itemError( url );
+
+				}
+
+			}, onProgress, onError );
 
 		}
 
-		console.error( 'KMZLoader: Couldn\'t find .dae file.' );
+		parse( data ) {
 
-		return {
-			scene: new THREE.Group()
-		};
+			function findFile( url ) {
+
+				for ( const path in zip ) {
+
+					if ( path.substr( - url.length ) === url ) {
+
+						return zip[ path ];
+
+					}
+
+				}
+
+			}
+
+			const manager = new THREE.LoadingManager();
+			manager.setURLModifier( function ( url ) {
+
+				const image = findFile( url );
+
+				if ( image ) {
+
+					console.log( 'Loading', url );
+					const blob = new Blob( [ image.buffer ], {
+						type: 'application/octet-stream'
+					} );
+					return URL.createObjectURL( blob );
+
+				}
+
+				return url;
+
+			} ); //
+
+			const zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+
+			if ( zip[ 'doc.kml' ] ) {
+
+				const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' ); // eslint-disable-line no-undef
+
+				const model = xml.querySelector( 'Placemark Model Link href' );
+
+				if ( model ) {
+
+					const loader = new THREE.ColladaLoader( manager );
+					return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) ); // eslint-disable-line no-undef
+
+				}
+
+			} else {
+
+				console.warn( 'KMZLoader: Missing doc.kml file.' );
+
+				for ( const path in zip ) {
+
+					const extension = path.split( '.' ).pop().toLowerCase();
+
+					if ( extension === 'dae' ) {
+
+						const loader = new THREE.ColladaLoader( manager );
+						return loader.parse( fflate.strFromU8( zip[ path ] ) ); // eslint-disable-line no-undef
+
+					}
+
+				}
+
+			}
+
+			console.error( 'KMZLoader: Couldn\'t find .dae file.' );
+			return {
+				scene: new THREE.Group()
+			};
+
+		}
 
 	}
 
-};
+	THREE.KMZLoader = KMZLoader;
+
+} )();

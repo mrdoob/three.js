@@ -1,68 +1,76 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
+( function () {
+
+	/**
  * Dot screen shader
  * based on glfx.js sepia shader
  * https://github.com/evanw/glfx.js
  */
 
-THREE.DotScreenShader = {
+	const DotScreenShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'tSize': {
+				value: new THREE.Vector2( 256, 256 )
+			},
+			'center': {
+				value: new THREE.Vector2( 0.5, 0.5 )
+			},
+			'angle': {
+				value: 1.57
+			},
+			'scale': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-	uniforms: {
+		varying vec2 vUv;
 
-		"tDiffuse": { value: null },
-		"tSize":    { value: new THREE.Vector2( 256, 256 ) },
-		"center":   { value: new THREE.Vector2( 0.5, 0.5 ) },
-		"angle":    { value: 1.57 },
-		"scale":    { value: 1.0 }
+		void main() {
 
-	},
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	vertexShader: [
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-		"varying vec2 vUv;",
+		uniform vec2 center;
+		uniform float angle;
+		uniform float scale;
+		uniform vec2 tSize;
 
-		"void main() {",
+		uniform sampler2D tDiffuse;
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		varying vec2 vUv;
 
-		"}"
+		float pattern() {
 
-	].join( "\n" ),
+			float s = sin( angle ), c = cos( angle );
 
-	fragmentShader: [
+			vec2 tex = vUv * tSize - center;
+			vec2 point = vec2( c * tex.x - s * tex.y, s * tex.x + c * tex.y ) * scale;
 
-		"uniform vec2 center;",
-		"uniform float angle;",
-		"uniform float scale;",
-		"uniform vec2 tSize;",
+			return ( sin( point.x ) * sin( point.y ) ) * 4.0;
 
-		"uniform sampler2D tDiffuse;",
+		}
 
-		"varying vec2 vUv;",
+		void main() {
 
-		"float pattern() {",
+			vec4 color = texture2D( tDiffuse, vUv );
 
-			"float s = sin( angle ), c = cos( angle );",
+			float average = ( color.r + color.g + color.b ) / 3.0;
 
-			"vec2 tex = vUv * tSize - center;",
-			"vec2 point = vec2( c * tex.x - s * tex.y, s * tex.x + c * tex.y ) * scale;",
+			gl_FragColor = vec4( vec3( average * 10.0 - 5.0 + pattern() ), color.a );
 
-			"return ( sin( point.x ) * sin( point.y ) ) * 4.0;",
+		}`
+	};
 
-		"}",
+	THREE.DotScreenShader = DotScreenShader;
 
-		"void main() {",
-
-			"vec4 color = texture2D( tDiffuse, vUv );",
-
-			"float average = ( color.r + color.g + color.b ) / 3.0;",
-
-			"gl_FragColor = vec4( vec3( average * 10.0 - 5.0 + pattern() ), color.a );",
-
-		"}"
-
-	].join( "\n" )
-
-};
+} )();

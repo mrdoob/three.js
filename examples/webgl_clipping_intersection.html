@@ -4,122 +4,135 @@
 		<title>three.js webgl - clipIntersection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var group, mode;
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var stats;
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			let camera, scene, renderer;
+
+			const params = {
+				clipIntersection: true,
+				planeConstant: 0,
+				showHelpers: false
+			};
+
+			const clipPlanes = [
+				new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 ),
+				new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
+				new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
+			];
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 800 );
-
-				camera.position.set( -20, 10, 50 );
-				camera.lookAt( new THREE.Vector3( 0, 0, 0) );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.localClippingEnabled = true;
+				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 
-				// Lights
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 
-				var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+				camera.position.set( - 1.5, 2.5, 3.0 );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use only if there is no animation loop
+				controls.minDistance = 1;
+				controls.maxDistance = 10;
+				controls.enablePan = false;
+
+				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
+				light.position.set( - 1.25, 1, 1.25 );
 				scene.add( light );
 
-				var clipPlanes = [
-					new THREE.Plane( new THREE.Vector3( 1,  0,  0 ), 0 ),
-					new THREE.Plane( new THREE.Vector3( 0, -1,  0 ), 0 ),
-					new THREE.Plane( new THREE.Vector3( 0,  0, -1 ), 0 )
-				];
+				// const helper = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper );
 
-				scene.add( new THREE.AmbientLight( 0x505050 ) );
+				//
 
-				group = new THREE.Object3D();
+				const group = new THREE.Group();
 
-				for ( var i = 1; i < 25; i ++ ) {
+				for ( let i = 1; i <= 30; i += 2 ) {
 
-					var geometry = new THREE.SphereBufferGeometry( i / 2, 48, 48 );
-					var material = new THREE.MeshStandardMaterial( {
-						color: new THREE.Color( Math.sin( i * 0.5 ) * 0.5 + 0.5, Math.cos( i * 1.5 ) * 0.5 + 0.5, Math.sin( i * 4.5 + 0 ) * 0.5 + 0.5 ),
-						roughness: 0.95,
-						metalness: 0.0,
+					const geometry = new THREE.SphereGeometry( i / 30, 48, 24 );
+
+					const material = new THREE.MeshLambertMaterial( {
+
+						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5 ),
 						side: THREE.DoubleSide,
 						clippingPlanes: clipPlanes,
-						clipIntersection: true
+						clipIntersection: params.clipIntersection
+
 					} );
+
 					group.add( new THREE.Mesh( geometry, material ) );
 
 				}
 
 				scene.add( group );
 
-				// Renderer
+				// helpers
 
-				var container = document.body;
+				const helpers = new THREE.Group();
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 0 ], 2, 0xff0000 ) );
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 1 ], 2, 0x00ff00 ) );
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 2 ], 2, 0x0000ff ) );
+				helpers.visible = false;
+				scene.add( helpers );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.antialias = true;
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x222222 );
-				renderer.localClippingEnabled = true;
+				// gui
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				container.appendChild( renderer.domElement );
+				const gui = new GUI();
 
-				// Stats
+				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+					const children = group.children;
 
-				// GUI
+					for ( let i = 0; i < children.length; i ++ ) {
 
-				mode = {};
-				mode.clipIntersection = true;
-				mode.clipPosition = 0;
-
-				var gui = new dat.GUI();
-				gui.add( mode, 'clipIntersection' ).onChange( function () {
-
-					var children = group.children;
-
-					for ( var i = 0; i < children.length; i ++ ) {
-
-						var child = children[ i ];
-						child.material.clipIntersection = ! child.material.clipIntersection;
+						children[ i ].material.clipIntersection = value;
 
 					}
 
+					render();
+
 				} );
-				gui.add( mode, 'clipPosition', -16, 16 );
 
-				// Controls
+				gui.add( params, 'planeConstant', - 1, 1 ).step( 0.01 ).name( 'plane constant' ).onChange( function ( value ) {
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 1, 0 );
-				controls.update();
+					for ( let j = 0; j < clipPlanes.length; j ++ ) {
 
-				// Start
+						clipPlanes[ j ].constant = value;
 
-				startTime = Date.now();
-				time = 0;
+					}
+
+					render();
+
+				} );
+
+				gui.add( params, 'showHelpers' ).name( 'show helpers' ).onChange( function ( value ) {
+
+					helpers.visible = value;
+
+					render();
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -130,30 +143,13 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				var children = group.children;
-
-				for ( var i = 0; i < children.length; i ++ ) {
-
-					var current = children[ i ].material;
-
-					for ( var j = 0; j < current.clippingPlanes.length; j ++ ) {
-
-						var plane = current.clippingPlanes[ j ];
-						plane.constant = ( 49 * plane.constant + mode.clipPosition ) / 50;
-
-					}
-
-				}
-
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
 
 			}
 

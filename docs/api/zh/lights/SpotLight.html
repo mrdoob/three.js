@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>聚光灯（[name]）</h1>
+
+		<p class="desc">
+			光线从一个点沿一个方向射出，随着光线照射的变远，光线圆锥体的尺寸也逐渐增大。<br /><br />
+
+			该光源可以投射阴影 - 跳转至 [page:SpotLightShadow] 查看更多细节。
+		</p>
+
+		<h2>代码示例</h2>
+		<code>
+		// white spotlight shining from the side, casting a shadow
+
+		const spotLight = new THREE.SpotLight( 0xffffff );
+		spotLight.position.set( 100, 1000, 100 );
+
+		spotLight.castShadow = true;
+
+		spotLight.shadow.mapSize.width = 1024;
+		spotLight.shadow.mapSize.height = 1024;
+
+		spotLight.shadow.camera.near = 500;
+		spotLight.shadow.camera.far = 4000;
+		spotLight.shadow.camera.fov = 30;
+
+		scene.add( spotLight );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_lights_spotlight lights / spotlight ]<br />
+			[example:webgl_lights_spotlights lights / spotlights ]
+		</p>
+
+		<h2>构造器（Constructor）</h2>
+
+
+		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )</h3>
+		<p>
+			[page:Integer color] - (可选参数) 十六进制光照颜色。 缺省值 0xffffff (白色)。<br />
+			[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
+			[page:Float distance] - 从光源发出光的最大距离，其强度根据光源的距离线性衰减。 <br />
+			[page:Radians angle] - 光线散射角度，最大为Math.PI/2。<br />
+			[page:Float penumbra] - 聚光锥的半影衰减百分比。在0和1之间的值。默认为0。<br />
+			[page:Float decay] - 沿着光照距离的衰减量。<br /><br />
+
+			创建一个新的聚光灯。
+		</p>
+
+		<h2>属性（Properties）</h2>
+
+		<p>公共属性请查看基类[page:Light Light]。</p>
+
+		<h3>[property:Float angle]</h3>
+		<p>
+			从聚光灯的位置以弧度表示聚光灯的最大范围。应该不超过 *Math.PI/2*。默认值为 *Math.PI/3*。
+		</p>
+
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			此属性设置为 *true* 聚光灯将投射阴影。警告: 这样做的代价比较高而且需要一直调整到阴影看起来正确。
+			查看 [page:SpotLightShadow] 了解详细信息。
+			默认值为 *false*
+		</p>
+
+		<h3>[property:Float decay]</h3>
+		<p>
+			沿着光照距离的衰减量<br />
+			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式下，decay 设置为等于2将实现现实世界的光衰减。<br/>
+			缺省值为 *1*。
+		</p>
+
+		<h3>[property:Float distance]</h3>
+		<p>
+			如果非零，那么光强度将会从最大值当前灯光位置处按照距离线性衰减到0。
+			缺省值为 *0.0*。
+		</p>
+
+		<h3>[property:Float penumbra]</h3>
+		<p>
+				聚光锥的半影衰减百分比。在0和1之间的值。
+				默认值 — 0.0。
+		</p>
+
+		<h3>[property:Vector3 position]</h3>
+		<p>
+			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0)，那么光线将会从上往下照射。
+		</p>
+
+		<h3>[property:Float power]</h3>
+		<p>
+			光功率<br />
+			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式中，
+			表示以"流明（光通量单位）"为单位的光功率。 缺省值 - *4Math.PI*。 <br /><br />
+
+			该值与 [page:.intensity intensity] 直接关联
+				<code>
+				power = intensity * 4&pi;
+			</code>
+			修改该值也会导致光强度的改变。
+		</p>
+
+		<h3>[property:SpotLightShadow shadow]</h3>
+		<p>
+			[page:SpotLightShadow]用与计算此光照的阴影。
+		</p>
+
+
+		<h3>[property:Object3D target]</h3>
+		<p>
+				平行光的方向是从它的位置到目标位置.默认的目标位置为原点 *(0,0,0)*。<br />
+				注意: 对于目标的位置，要将其更改为除缺省值之外的任何位置，它必须被添加到 [page:Scene scene]
+				场景中去。
+			<code>
+				scene.add( light.target );
+			</code>
+
+			这使得属性target中的 [page:Object3D.matrixWorld matrixWorld] 会每帧自动更新。<br /><br />
+
+			它也可以设置target为场景中的其他对象(任意拥有 [page:Object3D.position position] 属性的对象), 示例如下:
+			<code>
+const targetObject = new THREE.Object3D();
+scene.add(targetObject);
+
+light.target = targetObject;
+			</code>
+			完成上述操作后，聚光灯现在就可以追踪到目标对像了。
+		</p>
+
+
+		<h2>方法（Methods）</h2>
+
+		<p>公共方法请查看基类 [page:Light Light]。</p>
+
+		<h3>[method:SpotLight copy]( [param:SpotLight source] )</h3>
+		<p>
+			将所有属性的值从源 [page:SpotLight source] 复制到此聚光灯光源对象。
+		</p>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

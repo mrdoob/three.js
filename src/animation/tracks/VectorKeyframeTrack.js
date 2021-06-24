@@ -1,34 +1,12 @@
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { KeyframeTrack } from '../KeyframeTrack.js';
 
 /**
- *
  * A Track of vectored keyframe values.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
  */
+class VectorKeyframeTrack extends KeyframeTrack {}
 
-function VectorKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
-
-}
-
-VectorKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
-
-	constructor: VectorKeyframeTrack,
-
-	ValueTypeName: 'vector'
-
-	// ValueBufferType is inherited
-
-	// DefaultInterpolation is inherited
-
-} );
-
+VectorKeyframeTrack.prototype.ValueTypeName = 'vector';
+// ValueBufferType is inherited
+// DefaultInterpolation is inherited
 
 export { VectorKeyframeTrack };

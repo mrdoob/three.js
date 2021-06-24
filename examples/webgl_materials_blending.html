@@ -14,17 +14,14 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			let camera, scene, renderer;
+			let mapBg;
 
-			var camera, scene, renderer;
-			var mesh, mapBg;
-
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
 			init();
 			animate();
@@ -42,75 +39,80 @@
 
 				// BACKGROUND
 
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext( "2d" );
-				x.width = x.height = 128;
-				xc.fillStyle = "#ddd";
-				xc.fillRect( 0, 0, 128, 128 );
-				xc.fillStyle = "#555";
-				xc.fillRect( 0, 0, 64, 64 );
-				xc.fillStyle = "#999";
-				xc.fillRect( 32, 32, 32, 32 );
-				xc.fillStyle = "#555";
-				xc.fillRect( 64, 64, 64, 64 );
-				xc.fillStyle = "#777";
-				xc.fillRect( 96, 96, 32, 32 );
+				const canvas = document.createElement( 'canvas' );
+				const ctx = canvas.getContext( '2d' );
+				canvas.width = canvas.height = 128;
+				ctx.fillStyle = '#ddd';
+				ctx.fillRect( 0, 0, 128, 128 );
+				ctx.fillStyle = '#555';
+				ctx.fillRect( 0, 0, 64, 64 );
+				ctx.fillStyle = '#999';
+				ctx.fillRect( 32, 32, 32, 32 );
+				ctx.fillStyle = '#555';
+				ctx.fillRect( 64, 64, 64, 64 );
+				ctx.fillStyle = '#777';
+				ctx.fillRect( 96, 96, 32, 32 );
 
-				mapBg = new THREE.Texture( x );
+				mapBg = new THREE.CanvasTexture( canvas );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 128, 64 );
-				mapBg.needsUpdate = true;
 
 				/*
-				var mapBg = textureLoader.load( "textures/disturb.jpg" );
+				let mapBg = textureLoader.load( 'textures/disturb.jpg' );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 8, 4 );
 				*/
 
-				var materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
+				const materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
 
-				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
-				meshBg.position.set( 0, 0, -1 );
+				const meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
+				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
 				// OBJECTS
 
-				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending" ];
+				const blendings = [
+					{ name: 'No', constant: THREE.NoBlending },
+					{ name: 'Normal', constant: THREE.NormalBlending },
+					{ name: 'Additive', constant: THREE.AdditiveBlending },
+					{ name: 'Subtractive', constant: THREE.SubtractiveBlending },
+					{ name: 'Multiply', constant: THREE.MultiplyBlending }
+				];
 
-				var map0 = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
-				var map1 = textureLoader.load( 'textures/sprite0.jpg' );
-				var map2 = textureLoader.load( 'textures/sprite0.png' );
-				var map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
-				var map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png' );
+				const map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
+				const map1 = textureLoader.load( 'textures/sprite0.jpg' );
+				const map2 = textureLoader.load( 'textures/sprite0.png' );
+				const map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
+				const map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png' );
 
-				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
-				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
+				const geo1 = new THREE.PlaneGeometry( 100, 100 );
+				const geo2 = new THREE.PlaneGeometry( 100, 25 );
 
 				addImageRow( map0, 300 );
 				addImageRow( map1, 150 );
 				addImageRow( map2, 0 );
-				addImageRow( map3, -150 );
-				addImageRow( map4, -300 );
+				addImageRow( map3, - 150 );
+				addImageRow( map4, - 300 );
 
 				function addImageRow( map, y ) {
 
-					for ( var i = 0; i < blendings.length; i ++ ) {
+					for ( let i = 0; i < blendings.length; i ++ ) {
 
-						var blending = blendings[ i ];
+						const blending = blendings[ i ];
 
-						var material = new THREE.MeshBasicMaterial( { map: map } );
+						const material = new THREE.MeshBasicMaterial( { map: map } );
 						material.transparent = true;
-						material.blending = THREE[ blending ];
+						material.blending = blending.constant;
 
-						var x = ( i - blendings.length / 2 ) * 110;
-						var z = 0;
+						const x = ( i - blendings.length / 2 ) * 110;
+						const z = 0;
 
-						var mesh = new THREE.Mesh( geo1, material );
+						let mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, y, z );
 						scene.add( mesh );
 
 
-						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.replace( "Blending", "" ) ) );
+						mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.name ) );
 						mesh.position.set( x, y - 75, z );
 						scene.add( mesh );
 
@@ -127,16 +129,16 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
-				var SCREEN_WIDTH = window.innerWidth;
-				var SCREEN_HEIGHT = window.innerHeight;
+				const SCREEN_WIDTH = window.innerWidth;
+				const SCREEN_HEIGHT = window.innerHeight;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -148,22 +150,22 @@
 
 			function generateLabelMaterial( text ) {
 
-				var x = document.createElement( "canvas" );
-				var xc = x.getContext( "2d" );
-				x.width = 128;
-				x.height = 32;
+				const canvas = document.createElement( 'canvas' );
+				const ctx = canvas.getContext( '2d' );
+				canvas.width = 128;
+				canvas.height = 32;
 
-				xc.fillStyle = "rgba( 0, 0, 0, 0.95 )";
-				xc.fillRect( 0, 0, 128, 32 );
+				ctx.fillStyle = 'rgba( 0, 0, 0, 0.95 )';
+				ctx.fillRect( 0, 0, 128, 32 );
 
-				xc.fillStyle = "white";
-				xc.font = "12pt arial bold";
-				xc.fillText( text, 10, 22 );
+				ctx.fillStyle = 'white';
+				ctx.font = '12pt arial bold';
+				ctx.fillText( text, 10, 22 );
 
-				var map = new THREE.Texture( x );
-				map.needsUpdate = true;
+				const map = new THREE.CanvasTexture( canvas );
 
-				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
+				const material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
+
 				return material;
 
 			}
@@ -172,9 +174,9 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.00025;
-				var ox = ( time * -0.01 * mapBg.repeat.x ) % 1;
-				var oy = ( time * -0.01 * mapBg.repeat.y ) % 1;
+				const time = Date.now() * 0.00025;
+				const ox = ( time * - 0.01 * mapBg.repeat.x ) % 1;
+				const oy = ( time * - 0.01 * mapBg.repeat.y ) % 1;
 
 				mapBg.offset.set( ox, oy );
 

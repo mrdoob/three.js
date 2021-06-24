@@ -1,32 +1,28 @@
-import { Texture } from './Texture';
+import { Texture } from './Texture.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+class CompressedTexture extends Texture {
 
-function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
-	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-	this.image = { width: width, height: height };
-	this.mipmaps = mipmaps;
+		this.image = { width: width, height: height };
+		this.mipmaps = mipmaps;
 
-	// no flipping for cube textures
-	// (also flipping doesn't work for compressed textures )
+		// no flipping for cube textures
+		// (also flipping doesn't work for compressed textures )
 
-	this.flipY = false;
+		this.flipY = false;
 
-	// can't generate mipmaps for compressed textures
-	// mips must be embedded in DDS files
+		// can't generate mipmaps for compressed textures
+		// mips must be embedded in DDS files
 
-	this.generateMipmaps = false;
+		this.generateMipmaps = false;
+
+	}
 
 }
 
-CompressedTexture.prototype = Object.create( Texture.prototype );
-CompressedTexture.prototype.constructor = CompressedTexture;
-
 CompressedTexture.prototype.isCompressedTexture = true;
-
 
 export { CompressedTexture };

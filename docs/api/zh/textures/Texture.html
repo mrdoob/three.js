@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>纹理（[name]）</h1>
+
+		<p class="desc">创建一个纹理贴图，将其应用到一个表面，或者作为反射/折射贴图。</p>
+
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// load a texture, set wrap mode to repeat
+		const texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set( 4, 4 );
+		</code>
+
+		<h2>属性</h2>
+
+		<h3>[property:Integer id]</h3>
+		<p>
+		只读 - 表示该纹理实例的唯一数字。
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		该对象实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
+		这个值是自动分配的，因此不应当对其进行编辑。
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		该对象的名称，可选，且无需唯一。默认值是一个空字符串。
+		</p>
+
+		<h3>[property:Image image]</h3>
+		<p>
+		一个图片对象，通常由[page:TextureLoader.load]方法创建。
+		该对象可以是被three.js所支持的任意图片（例如PNG、JPG、GIF、DDS）或视频（例如MP4、OGG/OGV）格式。<br /><br />
+
+		要使用视频来作为纹理贴图，你需要有一个正在播放的HTML5 Video元素来作为你纹理贴图的源图像，
+		并在视频播放时不断地更新这个纹理贴图。——[page:VideoTexture VideoTexture] 类会对此自动进行处理。
+		</p>
+
+		<h3>[property:Array mipmaps]</h3>
+		<p>
+		用户所给定的mipmap数组（可选）。
+		</p>
+
+		<h3>[property:number mapping]</h3>
+		<p>
+		图像将如何应用到物体（对象）上。默认值是[page:Textures THREE.UVMapping]对象类型，
+		即UV坐标将被用于纹理映射。<br />
+
+		请参阅[page:Textures texture constants]（映射模式常量）来了解其他映射类型。
+		</p>
+
+		<h3>[property:number wrapS]</h3>
+		<p>
+		这个值定义了纹理贴图在水平方向上将如何包裹，在UV映射中对应于*U*。<br />
+		默认值是[page:Textures THREE.ClampToEdgeWrapping]，即纹理边缘将被推到外部边缘的纹素。
+
+		其它的两个选项分别是[page:Textures THREE.RepeatWrapping]和[page:Textures THREE.MirroredRepeatWrapping]。
+		请参阅[page:Textures texture constants]来了解详细信息。
+		</p>
+
+		<h3>[property:number wrapT]</h3>
+		<p>
+		这个值定义了纹理贴图在垂直方向上将如何包裹，在UV映射中对应于*V*。<br />
+		可以使用与[property:number wrapS]相同的选项。<br /><br />
+
+		请注意：纹理中图像的平铺，仅有当图像大小（以像素为单位）为2的幂（2、4、8、16、32、64、128、256、512、1024、2048、……）时才起作用。
+		宽度、高度无需相等，但每个维度的长度必须都是2的幂。
+		这是WebGL中的限制，不是由three.js所限制的。
+		</p>
+
+		<h3>[property:number magFilter]</h3>
+		<p>
+		当一个纹素覆盖大于一个像素时，贴图将如何采样。默认值为[page:Textures THREE.LinearFilter]，
+		它将获取四个最接近的纹素，并在他们之间进行双线性插值。
+		另一个选项是[page:Textures THREE.NearestFilter]，它将使用最接近的纹素的值。<br />
+		请参阅[page:Textures texture constants]页面来了解详细信息。
+		</p>
+
+		<h3>[property:number minFilter]</h3>
+		<p>
+		当一个纹素覆盖小于一个像素时，贴图将如何采样。默认值为[page:Textures THREE.LinearMipmapLinearFilter]，
+		它将使用mipmapping以及三次线性滤镜。<br /><br />
+
+		请参阅[page:Textures texture constants]页面来了解所有可能的选项。
+		</p>
+
+		<h3>[property:number anisotropy]</h3>
+		<p>
+		沿着轴，通过具有最高纹素密度的像素的样本数。
+		默认情况下，这个值为1。设置一个较高的值将会产生比基本的mipmap更清晰的效果，代价是需要使用更多纹理样本。
+		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。
+		</p>
+
+		<h3>[property:number format]</h3>
+		<p>
+		默认值为[page:Textures THREE.RGBAFormat]，
+		但[page:TextureLoader TextureLoader]将会在载入JPG图片时自动将这个值设置为[page:Textures THREE.RGBFormat]。<br /><br />
+
+		请参阅[page:Textures texture constants]页面来了解其它格式。
+		</p>
+
+		<h3>[property:String internalFormat]</h3>
+		<p>
+		The default value is obtained using a combination of [page:Texture.format .format] and
+		[page:Texture.type .type].<br />
+
+		The GPU format allows the developer to specify how the data is going to be
+		stored on the GPU.<br /><br />
+
+		See the [page:Textures texture constants] page for details regarding all supported internal formats.
+		</p>
+
+		<h3>[property:number type]</h3>
+		<p>
+			这个值必须与[page:Texture.format .format]相对应。默认值为[page:Textures THREE.UnsignedByteType]，
+			它将会被用于绝大多数纹理格式。<br /><br />
+
+		请参阅[page:Textures texture constants]来了解其它格式。
+		</p>
+
+		<h3>[property:Vector2 offset]</h3>
+		<p>
+		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
+		Typical range is *0.0* to *1.0*.
+		</p>
+		<p>
+			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>color map</li>
+				<li>specular map</li>
+				<li>displacement map</li>
+				<li>normal map</li>
+				<li>bump map</li>
+				<li>roughness map</li>
+				<li>metalness map</li>
+				<li>alpha map</li>
+				<li>emissive map</li>
+				<li>clearcoat map</li>
+				<li>clearcoat normal map</li>
+				<li>clearcoat roughnessMap map</li>
+			</ol>
+		</p>
+		<p>
+			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>ao map</li>
+				<li>light map</li>
+			</ol>
+		</p>
+
+		<h3>[property:Vector2 repeat]</h3>
+		<p>
+		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
+		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
+		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
+		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
+		</p>
+
+		<h3>[property:number rotation]</h3>
+		<p>
+		纹理将围绕中心点旋转多少度，单位为弧度（rad）。正值为逆时针方向旋转，默认值为*0*。
+		</p>
+
+		<h3>[property:Vector2 center]</h3>
+		<p>
+		旋转中心点。(0.5, 0.5)对应纹理的正中心。默认值为(0,0)，即左下角。
+		</p>
+
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
+		<p>
+		是否从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、[page:Texture.rotation .rotation]和[page:Texture.center .center]属性更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
+		默认值为true。
+		如果你要直接指定纹理的变换矩阵，请将其设为false。
+		</p>
+
+		<h3>[property:Matrix3 matrix]</h3>
+		<p>
+			纹理的UV变换矩阵。
+			当纹理的[page:Texture.matrixAutoUpdate .matrixAutoUpdate]属性为true时，
+			由渲染器从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、[page:Texture.rotation .rotation]和[page:Texture.center .center]属性中进行更新。
+			当[page:Texture.matrixAutoUpdate .matrixAutoUpdate]属性为false时，该矩阵可以被手动设置。
+			默认值为单位矩阵。
+		</p>
+
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+			是否为纹理生成mipmap（如果可用）。默认为true。
+			如果你手动生成mipmap，请将其设为false。
+		</p>
+
+		<h3>[property:Boolean premultiplyAlpha]</h3>
+		<p>
+		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
+
+		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
+		</p>
+
+		<h3>[property:Boolean flipY]</h3>
+		<p>
+		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
+
+		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
+		</p>
+
+		<h3>[property:number unpackAlignment]</h3>
+		<p>
+			默认为4。指定内存中每个像素行起点的对齐要求。
+			允许的值为1（字节对齐）、2（行对齐到偶数字节）、4（字对齐）和8（行从双字边界开始）。
+			请参阅[link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]来了解详细信息。
+		</p>
+
+		<h3>[property:number encoding]</h3>
+		<p>
+		默认值为[page:Textures THREE.LinearEncoding]。
+		请参阅[page:Textures texture constants]来了解其他格式的详细信息。<br /><br />
+
+		请注意，如果在材质被使用之后，纹理贴图中这个值发生了改变，
+		需要触发Material.needsUpdate，来使得这个值在着色器中实现。
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+		这个值起始值为*0*，计算[property:Boolean needsUpdate]被设置为*true*的次数。
+		</p>
+
+		<h3>[property:Function onUpdate]</h3>
+		<p>
+		一个回调函数，在纹理被更新后调用。
+		（例如，当needsUpdate被设为true且纹理被使用。）
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			将其设置为*true*，以便在下次使用纹理时触发一次更新。
+			这对于设置包裹模式尤其重要。
+		</p>
+
+
+		<h2>方法</h2>
+
+		<h3>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</h3>
+
+		<h3>[method:null updateMatrix]()</h3>
+		<p>
+			从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
+			[page:Texture.rotation .rotation]和[page:Texture.center .center]属性来更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
+		</p>
+
+		<h3>[method:Texture clone]()</h3>
+		<p>
+			拷贝纹理。请注意。这不是“深拷贝”，图像是共用的。
+		</p>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- 可选，包含有元数据的对象。<br />
+		将Texture对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
+		</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+			使用“废置”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
+		</p>
+
+		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>
+		<p>
+			基于纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
+			[page:Texture.wrapS .wrapS]、[page:Texture.wrapT .wrapT]和[page:Texture.flipY .flipY]属性值来变换uv。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,87 @@
+#VRML V2.0 utf8
+Group { children [
+  Transform {
+    translation -2.5 0 0.5
+    rotation 0 1 0 0.5
+    children Shape {
+      appearance Appearance {
+        texture PixelTexture {   # One component (gray scale)
+          image 4 4 1 0x00 0xDD 0xAA 0xFF
+                                     0xDD 0x00 0xDD 0x00
+                                     0xAA 0xDD 0x00 0x00
+                                     0xFF 0x00 0x00 0x00
+        }
+               # Notice how the diffuseColor darkens the texture
+        material DEF M Material { diffuseColor .7 .7 .7 }
+      }
+      geometry DEF IFS IndexedFaceSet {
+               coord Coordinate {
+               point [ -1.1 -1 0, 1 -1 0, 1 1 0, -1.1 1 0 ] }
+                       coordIndex [ 0 1 2 3 ]
+                       texCoord TextureCoordinate { point [ 0 0, 3 0, 3 3, 0 3 ] }
+      }
+    }
+  }
+  Transform {
+    translation 0 0 0
+    children Shape {
+      appearance Appearance {
+                       # For faster rendering, do not specify a Material
+                       # and avoid lighting calculations on the texture.
+               texture PixelTexture {
+          image 2 2 3 0xFFFFFF 0xAAAAAA 0xDDDDDD  0x000000
+               }
+      }
+      geometry USE IFS
+    }
+  }
+
+  Transform {
+    translation 2.5 0 0
+    children Shape {
+      appearance Appearance {
+        texture PixelTexture {
+          image 2 2 4 0xFFFFFF00 0xAAAAAAA0 0xDDDDDDA0  0x000000AA
+               }
+               material DEF M Material {
+          diffuseColor 0 0 0  # diffuseColor and transp have no
+          transparency 1.0    # effect - replaced by image values.
+          shininess  0.5      # All other fields work fine.
+          ambientIntensity 0.0
+        }
+      }
+      geometry USE IFS
+    }
+  }
+  Transform {
+    translation 5 0 0
+    children Shape {
+      appearance Appearance {
+        texture PixelTexture {    # repeat fields
+          image 4 4 1 0x00 0xDD 0xAA 0xFF
+                      0xDD 0x00 0xDD 0x00
+                      0xAA 0xDD 0x00 0x00
+                      0xFF 0x00 0x00 0x00
+          repeatS FALSE
+          repeatT FALSE
+               }
+               material DEF M Material { diffuseColor 1 1 1 }
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate { point [ -1 -1 0, 1 -1 0, 1 1 0, -1 1 0 ] }
+               coordIndex [ 0 1 2 3 ]
+               texCoord TextureCoordinate {
+                 point [ -0.25 -0.5, 1.25 -0.5, 1.25 1.5, -0.25 1.5 ]
+               }
+      }
+    }
+  }
+  Background {
+    skyColor [ 1 1 1, 1 1 1, .5 .5 .5, 1 1 1, .2 .2 .2, 1 1 1 ]
+    skyAngle [ 1.35, 1.4, 1.45, 1.5, 1.55 ]
+    groundColor [ 1 1 1, 1 1 1, 0.4 0.4 0.4 ]
+    groundAngle [ 1.3, 1.57 ]
+  }
+  NavigationInfo { type "EXAMINE" }
+  Viewpoint { position  0 1 6 orientation -.707 0 -.707 0 }
+]}

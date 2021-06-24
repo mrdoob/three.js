@@ -1,27 +1,27 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { Cache } from './Cache.js';
+import { Loader } from './Loader.js';
 
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
+const loading = {};
 
-function FileLoader( manager ) {
+class FileLoader extends Loader {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	constructor( manager ) {
 
-}
+		super( manager );
 
-Object.assign( FileLoader.prototype, {
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
 		if ( this.path !== undefined ) url = this.path + url;
 
-		var scope = this;
+		url = this.manager.resolveURL( url );
 
-		var cached = Cache.get( url );
+		const scope = this;
+
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -39,36 +39,51 @@ Object.assign( FileLoader.prototype, {
 
 		}
 
+		// Check if request is duplicate
+
+		if ( loading[ url ] !== undefined ) {
+
+			loading[ url ].push( {
+
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
+
+			} );
+
+			return;
+
+		}
+
 		// Check for data: URI
-		var dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
-		var dataUriRegexResult = url.match( dataUriRegex );
+		const dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
+		const dataUriRegexResult = url.match( dataUriRegex );
+		let request;
 
 		// Safari can not handle Data URIs through XMLHttpRequest so process manually
 		if ( dataUriRegexResult ) {
 
-			var mimeType = dataUriRegexResult[ 1 ];
-			var isBase64 = !! dataUriRegexResult[ 2 ];
-			var data = dataUriRegexResult[ 3 ];
+			const mimeType = dataUriRegexResult[ 1 ];
+			const isBase64 = !! dataUriRegexResult[ 2 ];
 
-			data = window.decodeURIComponent( data );
+			let data = dataUriRegexResult[ 3 ];
+			data = decodeURIComponent( data );
 
-			if ( isBase64 ) data = window.atob( data );
+			if ( isBase64 ) data = atob( data );
 
 			try {
 
-				var response;
-				var responseType = ( this.responseType || '' ).toLowerCase();
+				let response;
+				const responseType = ( this.responseType || '' ).toLowerCase();
 
 				switch ( responseType ) {
 
 					case 'arraybuffer':
 					case 'blob':
 
-					 	response = new ArrayBuffer( data.length );
+						const view = new Uint8Array( data.length );
 
-						var view = new Uint8Array( response );
-
-						for ( var i = 0; i < data.length; i ++ ) {
+						for ( let i = 0; i < data.length; i ++ ) {
 
 							view[ i ] = data.charCodeAt( i );
 
@@ -76,7 +91,11 @@ Object.assign( FileLoader.prototype, {
 
 						if ( responseType === 'blob' ) {
 
-							response = new Blob( [ response ], { type: mimeType } );
+							response = new Blob( [ view.buffer ], { type: mimeType } );
+
+						} else {
+
+							response = view.buffer;
 
 						}
 
@@ -84,7 +103,7 @@ Object.assign( FileLoader.prototype, {
 
 					case 'document':
 
-						var parser = new DOMParser();
+						const parser = new DOMParser();
 						response = parser.parseFromString( data, mimeType );
 
 						break;
@@ -103,8 +122,8 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				// Wait for next browser tick
-				window.setTimeout( function () {
+				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
+				setTimeout( function () {
 
 					if ( onLoad ) onLoad( response );
 
@@ -114,13 +133,13 @@ Object.assign( FileLoader.prototype, {
 
 			} catch ( error ) {
 
-				// Wait for next browser tick
-				window.setTimeout( function () {
+				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
+				setTimeout( function () {
 
 					if ( onError ) onError( error );
 
-					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
+					scope.manager.itemEnd( url );
 
 				}, 0 );
 
@@ -128,59 +147,112 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
-			var request = new XMLHttpRequest();
+			// Initialise array for duplicate requests
+
+			loading[ url ] = [];
+
+			loading[ url ].push( {
+
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
+
+			} );
+
+			request = new XMLHttpRequest();
+
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
 
-				var response = event.target.response;
+				const response = this.response;
 
-				Cache.add( url, response );
+				const callbacks = loading[ url ];
 
-				if ( this.status === 200 ) {
+				delete loading[ url ];
 
-					if ( onLoad ) onLoad( response );
-
-					scope.manager.itemEnd( url );
-
-				} else if ( this.status === 0 ) {
+				if ( this.status === 200 || this.status === 0 ) {
 
 					// Some browsers return HTTP Status 0 when using non-http protocol
 					// e.g. 'file://' or 'data://'. Handle as success.
 
-					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+					if ( this.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-					if ( onLoad ) onLoad( response );
+					// Add to cache only on HTTP success, so that we do not cache
+					// error response bodies as proper responses to requests.
+					Cache.add( url, response );
+
+					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						const callback = callbacks[ i ];
+						if ( callback.onLoad ) callback.onLoad( response );
+
+					}
 
 					scope.manager.itemEnd( url );
 
 				} else {
 
-					if ( onError ) onError( event );
+					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					scope.manager.itemEnd( url );
+						const callback = callbacks[ i ];
+						if ( callback.onError ) callback.onError( event );
+
+					}
+
 					scope.manager.itemError( url );
+					scope.manager.itemEnd( url );
 
 				}
 
 			}, false );
 
-			if ( onProgress !== undefined ) {
+			request.addEventListener( 'progress', function ( event ) {
 
-				request.addEventListener( 'progress', function ( event ) {
+				const callbacks = loading[ url ];
 
-					onProgress( event );
+				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-				}, false );
+					const callback = callbacks[ i ];
+					if ( callback.onProgress ) callback.onProgress( event );
 
-			}
+				}
+
+			}, false );
 
 			request.addEventListener( 'error', function ( event ) {
 
-				if ( onError ) onError( event );
+				const callbacks = loading[ url ];
 
-				scope.manager.itemEnd( url );
+				delete loading[ url ];
+
+				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					const callback = callbacks[ i ];
+					if ( callback.onError ) callback.onError( event );
+
+				}
+
 				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
+
+			}, false );
+
+			request.addEventListener( 'abort', function ( event ) {
+
+				const callbacks = loading[ url ];
+
+				delete loading[ url ];
+
+				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					const callback = callbacks[ i ];
+					if ( callback.onError ) callback.onError( event );
+
+				}
+
+				scope.manager.itemError( url );
+				scope.manager.itemEnd( url );
 
 			}, false );
 
@@ -189,7 +261,7 @@ Object.assign( FileLoader.prototype, {
 
 			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
-			for ( var header in this.requestHeader ) {
+			for ( const header in this.requestHeader ) {
 
 				request.setRequestHeader( header, this.requestHeader[ header ] );
 
@@ -203,44 +275,23 @@ Object.assign( FileLoader.prototype, {
 
 		return request;
 
-	},
+	}
 
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResponseType: function ( value ) {
+	setResponseType( value ) {
 
 		this.responseType = value;
 		return this;
 
-	},
+	}
 
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
-		return this;
-
-	},
-
-	setMimeType: function ( value ) {
+	setMimeType( value ) {
 
 		this.mimeType = value;
 		return this;
 
-	},
-
-	setRequestHeader: function ( value ) {
-
-		this.requestHeader = value;
-		return this;
-
 	}
 
-} );
+}
 
 
 export { FileLoader };

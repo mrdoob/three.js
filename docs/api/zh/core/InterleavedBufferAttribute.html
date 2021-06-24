@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+
+		</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( [param:InterleavedBuffer interleavedBuffer], [param:Integer itemSize], [param:Integer offset], [param:Boolean normalized] )</h3>
+		<p>
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:InterleavedBuffer data]</h3>
+		<p>
+			传入构造函数的 [page:InterleavedBuffer InterleavedBuffer] 实例。
+		</p>
+
+		<h3>[property:TypedArray array]</h3>
+		<p>
+			[page:InterleavedBufferAttribute.data data].array 的值。
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			[page:InterleavedBufferAttribute.data data].count 的值。
+
+			所缓存的矢量的个数。如果缓存的矢量是一个三元组（例如，位置、法向量或颜色），则该值计算上述三元组的个数。
+		</p>
+
+		<h3>[property:Integer itemSize]</h3>
+		<p>
+			队列中每个矢量有多少个元素构成。
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		Optional name for this attribute instance. Default is an empty string.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			Default is *false*. Setting this to *true* will send the entire interleaved buffer (not just the specific attribute data) to the GPU again.
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+			默认值为 *false*。
+		</p>
+
+		<h3>[property:Integer offset]</h3>
+		<p>
+			缓存队列中每个元素的起始位置的偏移量。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this InterleavedBufferAttribute.</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Applies normal matrix [page:Matrix3 m] to every Vector3 element of this InterleavedBufferAttribute.</p>
+
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this InterleavedBufferAttribute, interpreting the elements as a direction vectors.</p>
+
+		<h3>[method:Number getX]( [param:Integer index] ) </h3>
+		<p>返回给定索引矢量的第一个元素 （X 值）。</p>
+
+		<h3>[method:Number getY]( [param:Integer index] ) </h3>
+		<p>返回给定索引矢量的第二个元素 （Y 值）。</p>
+
+		<h3>[method:Number getZ]( [param:Integer index] ) </h3>
+		<p>返回给定索引矢量的第三个元素 （Z 值）。</p>
+
+		<h3>[method:Number getW]( [param:Integer index] ) </h3>
+		<p>返回给定索引矢量的第四个元素 （W 值）。</p>
+
+		<h3>[method:null setX]( [param:Integer index], [param:Float x] ) </h3>
+		<p>通过给定参数，设置指定索引矢量的第一个元素 （X 值）。</p>
+
+		<h3>[method:null setY]( [param:Integer index], [param:Float y] ) </h3>
+		<p>通过给定参数，设置指定索引矢量的第二个元素 （Y 值）。</p>
+
+		<h3>[method:null setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<p>通过给定参数，设置指定索引矢量的第三个元素 （Z 值）。</p>
+
+		<h3>[method:null setW]( [param:Integer index], [param:Float w] ) </h3>
+		<p>通过给定参数，设置指定索引矢量的第四个元素 （W 值）。</p>
+
+		<h3>[method:null setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<p>通过给定参数，设置指定索引矢量的第一、二个元素 （X 和 Y 值）。</p>
+
+		<h3>[method:null setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<p>通过给定参数，设置指定索引矢量的第一、二、三个元素 （X Y 和 Z 值）。</p>
+
+		<h3>[method:null setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<p>通过给定参数，设置指定索引矢量的第一、二、三、四个元素 （X Y Z 和 W 值）。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

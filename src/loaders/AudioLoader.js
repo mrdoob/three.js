@@ -1,38 +1,60 @@
-import { AudioContext } from '../audio/AudioContext';
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
+import { AudioContext } from '../audio/AudioContext.js';
+import { FileLoader } from './FileLoader.js';
+import { Loader } from './Loader.js';
 
-/**
- * @author Reece Aaron Lecrivain / http://reecenotes.com/
- */
+class AudioLoader extends Loader {
 
-function AudioLoader( manager ) {
+	constructor( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		super( manager );
 
-}
+	}
 
-Object.assign( AudioLoader.prototype, {
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			var context = AudioContext.getContext();
+			try {
 
-			context.decodeAudioData( buffer, function ( audioBuffer ) {
+				// Create a copy of the buffer. The `decodeAudioData` method
+				// detaches the buffer when complete, preventing reuse.
+				const bufferCopy = buffer.slice( 0 );
 
-				onLoad( audioBuffer );
+				const context = AudioContext.getContext();
+				context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
 
-			} );
+					onLoad( audioBuffer );
+
+				} );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
 	}
 
-} );
+}
 
 
 export { AudioLoader };

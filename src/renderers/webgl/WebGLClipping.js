@@ -1,20 +1,16 @@
-/**
- * @author tschw
- */
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Plane } from '../../math/Plane.js';
 
-import { Matrix3 } from '../../math/Matrix3';
-import { Plane } from '../../math/Plane';
+function WebGLClipping( properties ) {
 
-function WebGLClipping() {
+	const scope = this;
 
-	var scope = this,
-
-		globalState = null,
+	let globalState = null,
 		numGlobalPlanes = 0,
 		localClippingEnabled = false,
-		renderingShadows = false,
+		renderingShadows = false;
 
-		plane = new Plane(),
+	const plane = new Plane(),
 		viewNormalMatrix = new Matrix3(),
 
 		uniform = { value: null, needsUpdate: false };
@@ -23,9 +19,9 @@ function WebGLClipping() {
 	this.numPlanes = 0;
 	this.numIntersection = 0;
 
-	this.init = function( planes, enableLocalClipping, camera ) {
+	this.init = function ( planes, enableLocalClipping, camera ) {
 
-		var enabled =
+		const enabled =
 			planes.length !== 0 ||
 			enableLocalClipping ||
 			// enable state of previous frame - the clipping code has to
@@ -42,28 +38,34 @@ function WebGLClipping() {
 
 	};
 
-	this.beginShadows = function() {
+	this.beginShadows = function () {
 
 		renderingShadows = true;
 		projectPlanes( null );
 
 	};
 
-	this.endShadows = function() {
+	this.endShadows = function () {
 
 		renderingShadows = false;
 		resetGlobalState();
 
 	};
 
-	this.setState = function( planes, clipIntersection, clipShadows, camera, cache, fromCache ) {
+	this.setState = function ( material, camera, useCache ) {
 
-		if ( ! localClippingEnabled ||
-				planes === null || planes.length === 0 ||
-				renderingShadows && ! clipShadows ) {
+		const planes = material.clippingPlanes,
+			clipIntersection = material.clipIntersection,
+			clipShadows = material.clipShadows;
+
+		const materialProperties = properties.get( material );
+
+		if ( ! localClippingEnabled || planes === null || planes.length === 0 || renderingShadows && ! clipShadows ) {
+
 			// there's no local clipping
 
 			if ( renderingShadows ) {
+
 				// there's no global clipping
 
 				projectPlanes( null );
@@ -71,26 +73,27 @@ function WebGLClipping() {
 			} else {
 
 				resetGlobalState();
+
 			}
 
 		} else {
 
-			var nGlobal = renderingShadows ? 0 : numGlobalPlanes,
-				lGlobal = nGlobal * 4,
+			const nGlobal = renderingShadows ? 0 : numGlobalPlanes,
+				lGlobal = nGlobal * 4;
 
-				dstArray = cache.clippingState || null;
+			let dstArray = materialProperties.clippingState || null;
 
 			uniform.value = dstArray; // ensure unique state
 
-			dstArray = projectPlanes( planes, camera, lGlobal, fromCache );
+			dstArray = projectPlanes( planes, camera, lGlobal, useCache );
 
-			for ( var i = 0; i !== lGlobal; ++ i ) {
+			for ( let i = 0; i !== lGlobal; ++ i ) {
 
 				dstArray[ i ] = globalState[ i ];
 
 			}
 
-			cache.clippingState = dstArray;
+			materialProperties.clippingState = dstArray;
 			this.numIntersection = clipIntersection ? this.numPlanes : 0;
 			this.numPlanes += nGlobal;
 
@@ -115,8 +118,8 @@ function WebGLClipping() {
 
 	function projectPlanes( planes, camera, dstOffset, skipTransform ) {
 
-		var nPlanes = planes !== null ? planes.length : 0,
-			dstArray = null;
+		const nPlanes = planes !== null ? planes.length : 0;
+		let dstArray = null;
 
 		if ( nPlanes !== 0 ) {
 
@@ -124,7 +127,7 @@ function WebGLClipping() {
 
 			if ( skipTransform !== true || dstArray === null ) {
 
-				var flatSize = dstOffset + nPlanes * 4,
+				const flatSize = dstOffset + nPlanes * 4,
 					viewMatrix = camera.matrixWorldInverse;
 
 				viewNormalMatrix.getNormalMatrix( viewMatrix );
@@ -135,11 +138,9 @@ function WebGLClipping() {
 
 				}
 
-				for ( var i = 0, i4 = dstOffset;
-									i !== nPlanes; ++ i, i4 += 4 ) {
+				for ( let i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
 
-					plane.copy( planes[ i ] ).
-							applyMatrix4( viewMatrix, viewNormalMatrix );
+					plane.copy( planes[ i ] ).applyMatrix4( viewMatrix, viewNormalMatrix );
 
 					plane.normal.toArray( dstArray, i4 );
 					dstArray[ i4 + 3 ] = plane.constant;
@@ -154,7 +155,8 @@ function WebGLClipping() {
 		}
 
 		scope.numPlanes = nPlanes;
-		
+		scope.numIntersection = 0;
+
 		return dstArray;
 
 	}

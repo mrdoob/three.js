@@ -1,72 +1,68 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author mikael emtinger / http://gomo.se/
- * @author WestLangley / http://github.com/WestLangley
-*/
+import { Matrix4 } from '../math/Matrix4.js';
+import { Object3D } from '../core/Object3D.js';
 
-import { Matrix4 } from '../math/Matrix4';
-import { Quaternion } from '../math/Quaternion';
-import { Object3D } from '../core/Object3D';
-import { Vector3 } from '../math/Vector3';
+class Camera extends Object3D {
 
-function Camera() {
+	constructor() {
 
-	Object3D.call( this );
+		super();
 
-	this.type = 'Camera';
+		this.type = 'Camera';
 
-	this.matrixWorldInverse = new Matrix4();
-	this.projectionMatrix = new Matrix4();
+		this.matrixWorldInverse = new Matrix4();
 
-}
+		this.projectionMatrix = new Matrix4();
+		this.projectionMatrixInverse = new Matrix4();
 
-Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: Camera,
+	copy( source, recursive ) {
 
-	isCamera: true,
-
-	copy: function ( source, recursive ) {
-
-		Object3D.prototype.copy.call( this, source, recursive );
+		super.copy( source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+
 		this.projectionMatrix.copy( source.projectionMatrix );
+		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
 		return this;
 
-	},
+	}
 
-	getWorldDirection: function () {
+	getWorldDirection( target ) {
 
-		var quaternion = new Quaternion();
+		this.updateWorldMatrix( true, false );
 
-		return function getWorldDirection( optionalTarget ) {
+		const e = this.matrixWorld.elements;
 
-			var result = optionalTarget || new Vector3();
+		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 
-			this.getWorldQuaternion( quaternion );
+	}
 
-			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+	updateMatrixWorld( force ) {
 
-		};
+		super.updateMatrixWorld( force );
 
-	}(),
+		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
 
-	updateMatrixWorld: function ( force ) {
+	}
 
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+	updateWorldMatrix( updateParents, updateChildren ) {
 
-		this.matrixWorldInverse.getInverse( this.matrixWorld );
+		super.updateWorldMatrix( updateParents, updateChildren );
 
-	},
+		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
 
-	clone: function () {
+	}
+
+	clone() {
 
 		return new this.constructor().copy( this );
 
 	}
 
-} );
+}
+
+Camera.prototype.isCamera = true;
 
 export { Camera };

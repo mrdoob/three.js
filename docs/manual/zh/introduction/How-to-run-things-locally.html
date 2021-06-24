@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>如何在本地运行Three.js（[name]）</h1>
+		<p>
+            倘若你只是使用Three.js库中所提供的几何体，且不载入任何纹理贴图，则网页是可以从本地的文件系统中打开，并且是能够直接运行的，只需在文件管理器中双击HTML文件，它就可以在浏览器中进行显示。
+            （此时你将在地址栏中看到类似这样的URL：<em>file:///yourFile.html</em>）
+			
+		</p>
+
+		<h2>从外部文件载入的内容</h2>
+		<div>
+			<p>
+                倘若你需要从外部文件里载入几何体或是纹理贴图，由于浏览器[link:http://en.wikipedia.org/wiki/Same_origin_policy same origin policy]（同源策略）的安全限制，从本地文件系统载入外部文件将会失败，同时抛出安全性异常。
+		 	</p>
+
+			<p>这里有两种方法来解决这个问题：</p>
+
+			<ol>
+				<li>
+                    在浏览器中改变本地文件的安全策略，这将使你可以通过<code>file:///yourFile.html</code>来直接运行本地文件系统中的文件。
+				</li>
+				<li>
+                    从本地的服务器运行文件，这可以让你通过<code>http://localhost/yourFile.html</code>来访问运行在本地服务器上的文件。
+				</li>
+			</ol>
+
+			<p>
+                倘若你选择第一种方法，请小心，倘若你使用同一个浏览器来进行日常网络冲浪，你将可能会触发一些漏洞。
+                你或许可以创建一个用于开发环境的独立的浏览器配置文件或者快捷方式，仅仅用于本地开发；这将使得日常使用环境与开发环境相分离，以保证日常使用环境的安全性。
+                接下来，我们来看一看除此之外的别的方法。
+			</p>
+		</div>
+
+
+		<h2>运行一个本地的服务器</h2>
+		<div>
+			<p>
+                很多的编程语言都具有一个内置的简易HTTP服务器。它们的功能并不像能够被用于生产环境的服务器，例如[link:https://www.apache.org/ Apache] 或者 [link:https://nginx.org NGINX]那样完善，
+                但对于你来测试three.js应用程序来说，它们就已经足够了。
+			</p>
+
+			<h3>流行的代码编辑器插件</h3>
+			<div>
+				<p>一些代码编辑器具有插件，可以根据需要生成简单的服务器。</p>
+				<ul>
+					<li>Visual Studio Code [link:https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer Live Server] 插件。</li>
+					<li>Atom [link:https://atom.io/packages/atom-live-server Live Server] 插件。</li>
+				</ul>
+			</div>
+
+			<h3>Servez</h3>
+			<div>
+				<p>
+					[link:https://greggman.github.io/servez Servez] 一个具有界面的简单服务器。
+				</p>
+			</div>
+
+			<h3>Node.js server</h3>
+			<div>
+				<p>Node.js 具有一个简单的HTTP服务器包，如需安装，请执行：</p>
+				<code>npm install http-server -g</code>
+
+				<p>若要从本地目录下运行，请执行：</p>
+				<code>http-server . -p 8000</code>
+			</div>
+
+			<h3>Python server</h3>
+			<div>
+				<p>
+					如果你已经安装好了[link:http://python.org/ Python]，只需要从命令行里便可以运行它（从工作目录）：
+				</p>
+				<code>
+//Python 2.x
+python -m SimpleHTTPServer
+
+//Python 3.x
+python -m http.server
+				</code>
+
+				<p>这将会在为当前目录在8000端口创建一个服务器，也就是说你可以在地址栏里输入这个地址来访问已经创建好的服务器：</p>
+
+				<code>http://localhost:8000/</code>
+			</div>
+
+			<h3>Ruby server</h3>
+			<div>
+				<p>如果你已经安装好了Ruby，通过执行下列命也可以创建同样的服务器：</p>
+				<code>
+ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => Dir.pwd); trap('INT') { s.shutdown }; s.start"
+				</code>
+			</div>
+
+			<h3>PHP server</h3>
+			<div>
+				<p>PHP自从5.4.0版本开始，就内置了一个Web服务器：</p>
+				<code>php -S localhost:8000</code>
+			</div>
+
+			<h3>Lighttpd</h3>
+			<div>
+				<p>
+                    Lighttpd是一个轻量级的通用Web服务器，在这里，我们将介绍如何在OS X上使用HomeBrew来安装它。
+                    和我们在这里讨论的其他服务器不同，lighttpd是一个成熟的、准用于生产环境的服务器。
+				</p>
+
+				<ol>
+					<li>
+						通过HomeBrew安装lighttpd
+						<code>brew install lighttpd</code>
+					</li>
+					<li>
+                        在你希望作为服务器来运行的目录里，创建一个名为lighttpd.conf的配置文件。
+                        这是一个配置文件的样本：[link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration TutorialConfiguration]。
+					 </li>
+					<li>
+                        在配置文件里，将server.document-root更改为你将要创建的服务器中的文件的所在的目录。
+					</li>
+					<li>
+						通过这个命令来启动：
+						<code>lighttpd -f lighttpd.conf</code>
+					</li>
+					<li>
+						使用浏览器打开http://localhost:3000/，然后服务器将可以从你所选择的目录中向你提供静态文件。
+					</li>
+				</ol>
+			</div>
+			<h3>IIS</h3>
+			<div>
+				<p>如果你正在使用Microsoft IIS来作为网站服务器，在服务器载入之前，请为.fbx扩展名增加MIME类型。</p>
+				<code>File name externsion: fbx        MIME Type: text/plain</code>
+				<p>在默认情况下，IIS阻止 .fbx、 .obj 文件的下载，因此你必须对IIS进行配置，使得这些类型的文件可以被下载。</p>
+			</div>
+
+			<p>
+                其它简单的替代方案你可以在Stack Overflow上找到：[link:http://stackoverflow.com/q/12905426/24874 click here]。
+			</p>
+		</div>
+
+	</body>
+</html>

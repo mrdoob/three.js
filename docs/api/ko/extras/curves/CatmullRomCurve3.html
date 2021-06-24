@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">[link:https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline Catmull-Rom] 알고리즘을 사용하여 일련의 점으로부터 매끄러운 3D 스플라인 곡선을 생성합니다.</p>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		//Create a closed wavey loop
+		const curve = new THREE.CatmullRomCurve3( [
+			new THREE.Vector3( -10, 0, 10 ),
+			new THREE.Vector3( -5, 5, 5 ),
+			new THREE.Vector3( 0, 0, 0 ),
+			new THREE.Vector3( 5, -5, 5 ),
+			new THREE.Vector3( 10, 0, 10 )
+		] );
+
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+		const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+		// Create the final object to add to the scene
+		const curveObject = new THREE.Line( geometry, material );
+		</code>
+
+		<h2>예제</h2>
+
+		<p>
+			[example:webgl_geometry_extrude_splines WebGL / geometry / extrude / splines]
+		</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Array points], [param:Boolean closed], [param:String curveType], [param:Float tension] )</h3>
+		<p>
+			points – [page:Vector3] 점들의 배열입니다<br/>
+			closed – 곡선이 닫히는지 아닌지를 결정합니다. 기본값은 *false*입니다.<br/>
+			curveType – 곡선의 타입입니다. 기본값은 *centripetal*입니다.<br/>
+			tension – 곡선의 탄성입니다. 기본값은 *0.5*입니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:Curve] 클래스를 참고하세요.</p>
+
+		<h3>[property:Array points]</h3>
+		<p>곡선을 정의하는 [page:Vector3] 점들입니다. 적어도 두 개의 개체가 필요합니다.</p>
+
+		<h3>[property:Boolean closed]</h3>
+		<p>이 값이 true면 곡선은 스스로에게 되돌아옵니다.</p>
+
+		<h3>[property:String curveType]</h3>
+		<p>가능한 값은 *centripetal*, *chordal* 및 *catmullrom* 입니다.</p>
+
+		<h3>[property:Float tension]</h3>
+		<p>[page:.curveType]가 *catmullrom*이면, 캣멀롬 탄성을 정의합니다.</p>
+
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:Curve] 클래스를 참고하세요.</p>
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

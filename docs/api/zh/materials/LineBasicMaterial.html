@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>基础线条材质（[name]）</h1>
+
+		<p class="desc">一种用于绘制线框样式几何体的材质。</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const material = new THREE.LineBasicMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			linecap: 'round', //ignored by WebGLRenderer
+			linejoin:  'round' //ignored by WebGLRenderer
+		} );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]<br />
+			[example:webgl_buffergeometry_lines WebGL / buffergeometry / lines]<br />
+			[example:webgl_buffergeometry_lines_indexed WebGL / buffergeometry / lines / indexed]<br />
+			[example:webgl_decals WebGL / decals]<br />
+			[example:webgl_geometry_nurbs WebGL / geometry / nurbs]<br />
+			[example:webgl_geometry_shapes WebGL / geometry / shapes]<br />
+			[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor]<br />
+			[example:webgl_interactive_buffergeometry WebGL / interactive / buffergeometry]<br />
+			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter]<br />
+			[example:webgl_lines_colors WebGL / lines / colors]<br />
+			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
+			[example:webgl_lines_sphere WebGL / lines / sphere]<br />
+			[example:webgl_materials WebGL / materials]<br />
+			[example:physics_ammo_rope physics / ammo / rope]
+		</p>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+
+		<p>
+		[page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
+		属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
+		</p>
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]。</p>
+
+		<h3>[property:Color color]</h3>
+		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
+
+		<h3>[property:Float linewidth]</h3>
+		<p> 控制线宽。默认值为 *1*。<br /><br />
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
+			大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+		</p>
+
+		<h3>[property:String linecap]</h3>
+		<p> 定义线两端的样式。可选值为 'butt', 'round' 和 'square'。默认值为 'round'。<br /><br />
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
+		</p>
+
+		<h3>[property:String linejoin]</h3>
+		<p> 定义线连接节点的样式。可选值为 'round', 'bevel' 和 'miter'。默认值为 'round'。<br /><br />
+			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
+			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
+		</p>
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<p>Define whether the material uses morphTargets. Default is false.</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material]。</p>
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

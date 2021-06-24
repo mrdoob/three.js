@@ -1,76 +1,23 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UITabbedPanel } from './libs/ui.js';
 
-Sidebar.Properties = function ( editor ) {
+import { SidebarObject } from './Sidebar.Object.js';
+import { SidebarGeometry } from './Sidebar.Geometry.js';
+import { SidebarMaterial } from './Sidebar.Material.js';
 
-	var signals = editor.signals;
+function SidebarProperties( editor ) {
 
-	var container = new UI.Span();
+	var strings = editor.strings;
 
-	var objectTab = new UI.Text( 'OBJECT' ).onClick( onClick );
-	var geometryTab = new UI.Text( 'GEOMETRY' ).onClick( onClick );
-	var materialTab = new UI.Text( 'MATERIAL' ).onClick( onClick );
+	var container = new UITabbedPanel();
+	container.setId( 'properties' );
 
-	var tabs = new UI.Div();
-	tabs.setId( 'tabs' );
-	tabs.add( objectTab, geometryTab, materialTab );
-	container.add( tabs );
-
-	function onClick( event ) {
-
-		select( event.target.textContent );
-
-	}
-
-	//
-
-	var object = new UI.Span().add(
-		new Sidebar.Object( editor )
-	);
-	container.add( object );
-
-	var geometry = new UI.Span().add(
-		new Sidebar.Geometry( editor )
-	);
-	container.add( geometry );
-
-	var material = new UI.Span().add(
-		new Sidebar.Material( editor )
-	);
-	container.add( material );
-
-	//
-
-	function select( section ) {
-
-		objectTab.setClass( '' );
-		geometryTab.setClass( '' );
-		materialTab.setClass( '' );
-
-		object.setDisplay( 'none' );
-		geometry.setDisplay( 'none' );
-		material.setDisplay( 'none' );
-
-		switch ( section ) {
-			case 'OBJECT':
-				objectTab.setClass( 'selected' );
-				object.setDisplay( '' );
-				break;
-			case 'GEOMETRY':
-				geometryTab.setClass( 'selected' );
-				geometry.setDisplay( '' );
-				break;
-			case 'MATERIAL':
-				materialTab.setClass( 'selected' );
-				material.setDisplay( '' );
-				break;
-		}
-
-	}
-
-	select( 'OBJECT' );
+	container.addTab( 'object', strings.getKey( 'sidebar/properties/object' ), new SidebarObject( editor ) );
+	container.addTab( 'geometry', strings.getKey( 'sidebar/properties/geometry' ), new SidebarGeometry( editor ) );
+	container.addTab( 'material', strings.getKey( 'sidebar/properties/material' ), new SidebarMaterial( editor ) );
+	container.select( 'object' );
 
 	return container;
 
-};
+}
+
+export { SidebarProperties };

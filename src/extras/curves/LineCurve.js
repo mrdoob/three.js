@@ -1,50 +1,90 @@
-import { Curve } from '../core/Curve';
+import { Vector2 } from '../../math/Vector2.js';
+import { Curve } from '../core/Curve.js';
 
+class LineCurve extends Curve {
 
-function LineCurve( v1, v2 ) {
+	constructor( v1 = new Vector2(), v2 = new Vector2() ) {
 
-	Curve.call( this );
+		super();
 
-	this.v1 = v1;
-	this.v2 = v2;
+		this.type = 'LineCurve';
 
-}
-
-LineCurve.prototype = Object.create( Curve.prototype );
-LineCurve.prototype.constructor = LineCurve;
-
-LineCurve.prototype.isLineCurve = true;
-
-LineCurve.prototype.getPoint = function ( t ) {
-
-	if ( t === 1 ) {
-
-		return this.v2.clone();
+		this.v1 = v1;
+		this.v2 = v2;
 
 	}
 
-	var point = this.v2.clone().sub( this.v1 );
-	point.multiplyScalar( t ).add( this.v1 );
+	getPoint( t, optionalTarget = new Vector2() ) {
 
-	return point;
+		const point = optionalTarget;
 
-};
+		if ( t === 1 ) {
 
-// Line curve is linear, so we can overwrite default getPointAt
+			point.copy( this.v2 );
 
-LineCurve.prototype.getPointAt = function ( u ) {
+		} else {
 
-	return this.getPoint( u );
+			point.copy( this.v2 ).sub( this.v1 );
+			point.multiplyScalar( t ).add( this.v1 );
 
-};
+		}
 
-LineCurve.prototype.getTangent = function ( t ) {
+		return point;
 
-	var tangent = this.v2.clone().sub( this.v1 );
+	}
 
-	return tangent.normalize();
+	// Line curve is linear, so we can overwrite default getPointAt
+	getPointAt( u, optionalTarget ) {
 
-};
+		return this.getPoint( u, optionalTarget );
 
+	}
+
+	getTangent( t, optionalTarget ) {
+
+		const tangent = optionalTarget || new Vector2();
+
+		tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+
+		return tangent;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
+
+	}
+
+	toJSON() {
+
+		const data = super.toJSON();
+
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	}
+
+	fromJSON( json ) {
+
+		super.fromJSON( json );
+
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
+
+	}
+
+}
+
+LineCurve.prototype.isLineCurve = true;
 
 export { LineCurve };

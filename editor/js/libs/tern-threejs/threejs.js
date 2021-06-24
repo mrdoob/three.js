@@ -266,7 +266,7 @@
           "!doc": "Every normal vector in a geometry will have a magnitude of 1.\n\t\tThis will correct lighting on the geometry surfaces."
         }
       },
-      "!doc": "<p>\n\t\tThis class is an efficient alternative to [page:Geometry], because it stores all data, including\n\t\tvertex positions, face indices, normals, colors, UVs, and custom attributes within buffers; this\n\t\treduces the cost of passing all this data to the GPU. \n\t\tThis also makes BufferGeometry harder to work with than [page:Geometry]; rather than accessing \n\t\tposition data as [page:Vector3] objects, color data as [page:Color] objects, and so on, you have to \n\t\taccess the raw data from the appropriate [page:BufferAttribute attribute] buffer. This makes \n\t\tBufferGeometry best-suited for static objects where you don't need to manipulate the geometry much\n\t\tafter instantiating it.\n\t\t</p>\n\n\t\t<h3>Example</h3>\n\t\t<code>\n\t\tvar geometry = new THREE.BufferGeometry();\n\t\t// create a simple square shape. We duplicate the top left and bottom right\n\t\t// vertices because each vertex needs to appear once per triangle. \n\t\tvar vertexPositions = [ \n\t\t\t[-1.0, -1.0,  1.0],\n\t\t\t[ 1.0, -1.0,  1.0],\n\t\t\t[ 1.0,  1.0,  1.0],\n\n\t\t\t[ 1.0,  1.0,  1.0],\n\t\t\t[-1.0,  1.0,  1.0],\n\t\t\t[-1.0, -1.0,  1.0]\n\t\t];\n\t\tvar vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex\n\n\t\t// components of the position vector for each vertex are stored\n\t\t// contiguously in the buffer.\n\t\tfor ( var i = 0; i &lt; vertexPositions.length; i++ )\n\t\t{\n\t\t\tvertices[ i*3 + 0 ] = vertexPositions[i][0];\n\t\t\tvertices[ i*3 + 1 ] = vertexPositions[i][1];\n\t\t\tvertices[ i*3 + 2 ] = vertexPositions[i][2];\n\t\t}\n\n\t\t// itemSize = 3 because there are 3 values (components) per vertex\n\t\tgeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );\n\t\tvar material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );\n\t\tvar mesh = new THREE.Mesh( geometry, material );\n\t\t</code>\n\t\t<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>\n\n\t\t\n\t\t<h3>Accessing attributes</h3>\n\t\t<p>\n\t\tWebGL stores data associated with individual vertices of a geometry in <emph>attributes</emph>. \n\t\tExamples include the position of the vertex, the normal vector for the vertex, the vertex color,\n\t\tand so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping\n\t\tup this information into typed array buffers and sending this data to the shader. With \n\t\tBufferGeometry, all of this data is stored in buffers associated with an individual attributes.\n\t\tThis means that to get the position data associated with a vertex (for instance), you must call\n\t\t[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual \n\t\tx, y, and z coordinates of the position.  \n\t\t</p>\n\t\t<p>\n\t\tThe following attributes are set by various members of this class:\n\t\t</p>\n\t\t<h4>[page:BufferAttribute position] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z coordinates of each vertex in this geometry. Set by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute normal] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the face or vertex normal vector of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute color] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the red, green, and blue channels of vertex color of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute tangent] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the tangent vector of each vertex in this geometry. Set by [page:.computeTangents]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute index] (itemSize: 3)</h4>\n\t\tAllows for vertices to be re-used across multiple triangles; this is called using \"indexed triangles,\" and works much the same as it does in [page:Geometry]: each triangle is associated with the index of three vertices. This attribute therefore stores the index of each vertex for each triangular face.\n\n\t\tIf this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous positions represent a single triangle.",
+      "!doc": "<p>\n\t\tThis class is an efficient alternative to [page:Geometry], because it stores all data, including\n\t\tvertex positions, face indices, normals, colors, UVs, and custom attributes within buffers; this\n\t\treduces the cost of passing all this data to the GPU. \n\t\tThis also makes BufferGeometry harder to work with than [page:Geometry]; rather than accessing \n\t\tposition data as [page:Vector3] objects, color data as [page:Color] objects, and so on, you have to \n\t\taccess the raw data from the appropriate [page:BufferAttribute attribute] buffer. This makes \n\t\tBufferGeometry best-suited for static objects where you don't need to manipulate the geometry much\n\t\tafter instantiating it.\n\t\t</p>\n\n\t\t<h3>Example</h3>\n\t\t<code>\n\t\tvar geometry = new THREE.BufferGeometry();\n\t\t// create a simple square shape. We duplicate the top left and bottom right\n\t\t// vertices because each vertex needs to appear once per triangle. \n\t\tvar vertexPositions = [ \n\t\t\t[-1.0, -1.0,  1.0],\n\t\t\t[ 1.0, -1.0,  1.0],\n\t\t\t[ 1.0,  1.0,  1.0],\n\n\t\t\t[ 1.0,  1.0,  1.0],\n\t\t\t[-1.0,  1.0,  1.0],\n\t\t\t[-1.0, -1.0,  1.0]\n\t\t];\n\t\tvar vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex\n\n\t\t// components of the position vector for each vertex are stored\n\t\t// contiguously in the buffer.\n\t\tfor ( var i = 0; i &lt; vertexPositions.length; i++ )\n\t\t{\n\t\t\tvertices[ i*3 + 0 ] = vertexPositions[i][0];\n\t\t\tvertices[ i*3 + 1 ] = vertexPositions[i][1];\n\t\t\tvertices[ i*3 + 2 ] = vertexPositions[i][2];\n\t\t}\n\n\t\t// itemSize = 3 because there are 3 values (components) per vertex\n\t\tgeometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );\n\t\tvar material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );\n\t\tvar mesh = new THREE.Mesh( geometry, material );\n\t\t</code>\n\t\t<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>\n\n\t\t\n\t\t<h3>Accessing attributes</h3>\n\t\t<p>\n\t\tWebGL stores data associated with individual vertices of a geometry in <emph>attributes</emph>. \n\t\tExamples include the position of the vertex, the normal vector for the vertex, the vertex color,\n\t\tand so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping\n\t\tup this information into typed array buffers and sending this data to the shader. With \n\t\tBufferGeometry, all of this data is stored in buffers associated with an individual attributes.\n\t\tThis means that to get the position data associated with a vertex (for instance), you must call\n\t\t[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual \n\t\tx, y, and z coordinates of the position.  \n\t\t</p>\n\t\t<p>\n\t\tThe following attributes are set by various members of this class:\n\t\t</p>\n\t\t<h4>[page:BufferAttribute position] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z coordinates of each vertex in this geometry. Set by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute normal] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the face or vertex normal vector of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute color] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the red, green, and blue channels of vertex color of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute tangent] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the tangent vector of each vertex in this geometry. Set by [page:.computeTangents]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute index] (itemSize: 3)</h4>\n\t\tAllows for vertices to be re-used across multiple triangles; this is called using \"indexed triangles,\" and works much the same as it does in [page:Geometry]: each triangle is associated with the index of three vertices. This attribute therefore stores the index of each vertex for each triangular face.\n\n\t\tIf this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous positions represent a single triangle.",
       "!type": "fn()"
     },
     "Clock": {
@@ -500,10 +500,6 @@
         "dispose": {
           "!type": "fn()",
           "!doc": "Removes The object from memory. <br>\n\t\tDon't forget to call this method when you remove a geometry because it can cause memory leaks."
-        },
-        "computeLineDistances": {
-          "!type": "fn()",
-          "!doc": "Compute distances between vertices for Line geometries."
         }
       },
       "!doc": "Base class for geometries.<br>\n\t\tA geometry holds all data necessary to describe a 3D model.",
@@ -746,114 +742,6 @@
       "!doc": "Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.",
       "!type": "fn(colormap, numberOfColors)"
     },
-    "CombinedCamera": {
-      "!url": "http://threejs.org/docs/#Reference/examples/cameras/CombinedCamera",
-      "prototype": {
-        "!proto": "THREE.Camera.prototype",
-        "fov": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum vertical field of view in perspective view."
-        },
-        "left": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum left plane in orthographic view."
-        },
-        "right": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum right plane in orthographic view."
-        },
-        "top": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum top plane in orthographic view."
-        },
-        "bottom": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum bottom plane in orthographic view."
-        },
-        "zoom": {
-          "!type": "number",
-          "!doc": "Gets or sets the zoom factor of the camera."
-        },
-        "near": {
-          "!type": "number",
-          "!doc": "Gets camera frustum near plane."
-        },
-        "far": {
-          "!type": "number",
-          "!doc": "Gets camera frustum far plane."
-        },
-        "cameraO": {
-          "!type": "+THREE.OrthographicCamera",
-          "!doc": "Gets or sets the internal OrthographicCamera used as camera."
-        },
-        "cameraP": {
-          "!type": "+THREE.PerspectiveCamera",
-          "!doc": "Gets or sets the internal PerspectiveCamera used as camera."
-        },
-        "inOrthographicMode": {
-          "!type": "boolean",
-          "!doc": "Gets whether the combinedCamera is in Orthographic Mode."
-        },
-        "inPerspectiveMode": {
-          "!type": "boolean",
-          "!doc": "Gets whether the combinedCamera is in Perspective Mode."
-        },
-        "setFov": {
-          "!type": "fn(fov: number)",
-          "!doc": "sets the camera frustum vertical field of view in perspective view."
-        },
-        "setZoom": {
-          "!type": "fn(zoom: number)",
-          "!doc": "Sets the zoomfactor."
-        },
-        "setLens": {
-          "!type": "fn(focalLength: number, frameHeight: number)",
-          "!doc": "Sets the fov based on lens data."
-        },
-        "toFrontView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the front of the target."
-        },
-        "toBackView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the back of the target."
-        },
-        "toLeftView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the left of the target."
-        },
-        "toRightView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the right of the target."
-        },
-        "toTopView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the top."
-        },
-        "toBottomView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the bottom."
-        },
-        "setSize": {
-          "!type": "fn(width: number, height: number)",
-          "!doc": "Sets the size of the orthographic view."
-        },
-        "toOrthographic": {
-          "!type": "fn()",
-          "!doc": "Change the camera to orthographic view."
-        },
-        "toPerspective": {
-          "!type": "fn()",
-          "!doc": "Change the camera to Perspective view."
-        },
-        "updateProjectionMatrix": {
-          "!type": "fn()",
-          "!doc": "Updates the ProjectionMatrix."
-        }
-      },
-      "!doc": "A general purpose camera, for setting FOV, Lens Focal Length,\n \t\tand switching between perspective and orthographic views easily.\n \t\tUse this only if you do not wish to manage\n \t\tboth an Orthographic and Perspective Camera",
-      "!type": "fn(width: number, height: number, fov: number, near: number, far: number, orthoNear: number, orthoFar: number)"
-    },
     "FontUtils": {
       "!url": "http://threejs.org/docs/#Reference/extras/FontUtils",
       "prototype": {
@@ -912,62 +800,6 @@
       "!url": "http://threejs.org/docs/#Reference/extras/GeometryUtils",
       "prototype": {},
       "!doc": "Contains handy functions geometry manipulations."
-    },
-    "ImageUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/ImageUtils",
-      "prototype": {
-        "crossOrigin": {
-          "!type": "string",
-          "!doc": "The crossOrigin string to implement CORS for loading the image from a different domain that allows CORS."
-        },
-        "generateDataTexture": {
-          "!type": "fn(width: number, height: number, color: number) -> +THREE.DataTexture",
-          "!doc": "Generates a texture of a single color. It is a DataTexture with format, RGBFormat."
-        },
-        "parseDDS": {
-          "!type": "fn(buffer: string, loadMipmaps: boolean) -> +THREE.CompressedTexture",
-          "!doc": "Parses a DDS Image from the string into a CompressedTexture."
-        },
-        "loadCompressedTexture": {
-          "!type": "fn(url: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTexture": {
-          "!type": "fn(url: string, mapping: UVMapping, onLoad: function, onError: function) -> todo",
-          "!doc": "todo"
-        },
-        "getNormalMap": {
-          "!type": "fn(image: todo, depth: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadCompressedTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "A Helper class to ease the loading of images of different types."
-    },
-    "SceneUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/SceneUtils",
-      "prototype": {
-        "createMultiMaterialObject": {
-          "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
-        },
-        "attach": {
-          "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
-          "!doc": "Attaches the object to the parent without the moving the object in the worldspace."
-        },
-        "detach": {
-          "!type": "fn(child: +THREE.Object3D, parent: +THREE.Object3D, scene: +THREE.Object3D)",
-          "!doc": "Detaches the object from the parent and adds it back to the scene without moving in worldspace."
-        }
-      },
-      "!doc": "A class containing useful utility functions for scene manipulation."
     },
     "Curve": {
       "!url": "http://threejs.org/docs/#Reference/extras/core/Curve",
@@ -1032,32 +864,8 @@
           "!type": "boolean",
           "!doc": "todo"
         },
-        "getWrapPoints": {
-          "!type": "fn(oldPts: todo, path: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "addWrapPath": {
-          "!type": "fn(bendpath: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createGeometry": {
-          "!type": "fn(points: todo) -> todo",
-          "!doc": "todo"
-        },
         "add": {
           "!type": "fn(curve: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedSpacedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createSpacedPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
         "closePath": {
@@ -1069,14 +877,6 @@
           "!doc": "todo"
         },
         "getCurveLengths": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "checkConnection": {
           "!type": "fn() -> todo",
           "!doc": "todo"
         }
@@ -1100,7 +900,7 @@
           "!type": "array",
           "!doc": "The possible actions that define the path."
         },
-        "fromPoints": {
+        "setFromPoints": {
           "!type": "fn(vectors) -> todo",
           "!doc": "Adds to the Path from the points. The first vector defines the offset. After that the lines get defined."
         },
@@ -1152,23 +952,7 @@
           "!type": "array",
           "!doc": "todo"
         },
-        "makeGeometry": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ShapeGeometry"
-        },
-        "extractAllPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of shape and holes (keypoints based on segments parameter)"
-        },
-        "extrude": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ExtrudeGeometry"
-        },
         "extractPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "extractAllSpacedPoints": {
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
@@ -1176,10 +960,6 @@
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "Get points of holes"
         },
-        "getSpacedPointsHoles": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of holes (spaced by regular distance)"
-        }
       },
       "!doc": "Defines a 2d shape plane using paths.",
       "!type": "fn()"
@@ -1731,74 +1511,6 @@
       "!doc": "base class for immediate rendering objects.",
       "!type": "fn()"
     },
-    "MorphBlendMesh": {
-      "!url": "http://threejs.org/docs/#Reference/extras/objects/MorphBlendMesh",
-      "prototype": {
-        "!proto": "THREE.Mesh.prototype",
-        "animationsMap": {
-          "!type": "object",
-          "!doc": "todo"
-        },
-        "animationsList": {
-          "!type": "array",
-          "!doc": "todo"
-        },
-        "setAnimationWeight": {
-          "!type": "fn(name: todo, weight: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationFPS": {
-          "!type": "fn(name: todo, fps: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createAnimation": {
-          "!type": "fn(name: todo, start: todo, end: todo, fps: todo) -> todo",
-          "!doc": "todo"
-        },
-        "playAnimation": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "update": {
-          "!type": "fn(delta: todo) -> todo",
-          "!doc": "todo"
-        },
-        "autoCreateAnimations": {
-          "!type": "fn(fps: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationDuration": {
-          "!type": "fn(name: todo, duration: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationDirectionForward": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getAnimationDuration": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getAnimationTime": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationDirectionBackward": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationTime": {
-          "!type": "fn(name: todo, time: todo) -> todo",
-          "!doc": "todo"
-        },
-        "stopAnimation": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(geometry: todo, material: todo)"
-    },
     "AmbientLight": {
       "!url": "http://threejs.org/docs/#Reference/lights/AmbientLight",
       "prototype": {
@@ -2002,54 +1714,6 @@
       "!doc": "A loader for loading an [page:Image].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "JSONLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/JSONLoader",
-      "prototype": {
-        "!proto": "THREE.Loader.prototype",
-        "withCredentials": {
-          "!type": "boolean",
-          "!doc": "If true, the ajax request will use cookies."
-        },
-        "onLoadStart": {
-          "!type": "function",
-          "!doc": "The default is a function with empty body."
-        },
-        "onLoadComplete": {
-          "!type": "function",
-          "!doc": "The default is a function with empty body."
-        },
-        "load": {
-          "!type": "fn(url: string, callback: function, texturePath: string)",
-          "!doc": "[page:String url] — required<br>\n\t\t[page:Function callback] — required. Will be called when load completes. The arguments will be the loaded [page:Object3D] and the loaded [page:Array materials].<br>\n\t\t[page:String texturePath] — optional. If not specified, textures will be assumed to be in the same folder as the Javascript model file."
-        },
-        "loadAjaxJSON": {
-          "!type": "fn(context: +THREE.JSONLoader, url: string, callback: function, texturePath: string, callbackProgress: function)",
-          "!doc": "Begin loading from url and call <em>callback</em> with the parsed response content."
-        },
-        "parse": {
-          "!type": "fn(json: object, texturePath: string) -> +THREE.Object3D",
-          "!doc": "Parse a <em>JSON</em> structure and return an [page:Object] containing the parsed .[page:Geometry] and .[page:Array materials]."
-        },
-        "updateProgress": {
-          "!type": "fn(progress: object)",
-          "!doc": "Updates the DOM object with the progress made."
-        },
-        "createMaterial": {
-          "!type": "fn(m: object, texturePath: string) -> +THREE.Material",
-          "!doc": "Creates the Material based on the parameters m."
-        },
-        "initMaterials": {
-          "!type": "fn(materials: [], texturePath: string) -> []",
-          "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
-        }
-      },
-      "!doc": "A loader for loading objects in JSON format.",
-      "!type": "fn()"
-    },
     "Loader": {
       "!url": "http://threejs.org/docs/#Reference/loaders/Loader",
       "prototype": {
@@ -2080,10 +1744,6 @@
         "initMaterials": {
           "!type": "fn(materials: [], texturePath: string) -> []",
           "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
         }
       },
       "!doc": "Base class for implementing loaders.",
@@ -2128,7 +1788,7 @@
           "!doc": "Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
         }
       },
-      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].",
+      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader].",
       "!type": "fn(baseUrl: string, options: object, crossOrigin: string)"
     },
     "MaterialLoader": {
@@ -2196,7 +1856,7 @@
           "!doc": "[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS."
         }
       },
-      "!doc": "A loader for loading a JSON resource. Unlike the [page:JSONLoader], this one make use of the <em>.type</em> attributes of objects to map them to their original classes.",
+      "!doc": "A loader for loading a JSON resource.",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
     "PDBLoader": {
@@ -2319,7 +1979,7 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
+          "!type": "bool",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "fog": {
@@ -2355,7 +2015,7 @@
           "!doc": "The size of the gap. Default is 1."
         },
         "vertexColors": {
-          "!type": "boolean",
+          "!type": "bool",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "fog": {
@@ -2498,12 +2158,8 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
-        },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is false."
+          "!type": "boolean",
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "morphTargets": {
           "!type": "bool",
@@ -2637,12 +2293,8 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
-        },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is *false*."
+          "!type": "boolean",
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "morphTargets": {
           "!type": "bool",
@@ -2781,12 +2433,8 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
-        },
-        "skinning": {
           "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is *false*."
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "morphTargets": {
           "!type": "bool",
@@ -2822,7 +2470,7 @@
         },
         "vertexColors": {
           "!type": "bool",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "fog": {
           "!type": "bool",
@@ -2888,12 +2536,8 @@
           "!doc": "Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader"
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "Define how the vertices are colored, by defining how the *colors* attribute gets populated. Possible values are [page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] and [page:Materials THREE.VertexColors]. Default is THREE.NoColors."
-        },
-        "skinning": {
           "!type": "bool",
-          "!doc": "Define whether the material uses skinning; true to pass skinning attributes to the shader. Default is false."
+          "!doc": "Define how the vertices are colored, by defining how the *colors* attribute gets populated. Default is false."
         },
         "morphTargets": {
           "!type": "bool",
@@ -3994,11 +3638,11 @@
           "!type": "fn(a: +THREE.Vector3, b: +THREE.Vector3, c: +THREE.Vector3) -> +THREE.Triangle",
           "!doc": "Sets the triangle's vectors to the passed vectors."
         },
-        "normal": {
+        "getNormal": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the calculated normal of the triangle."
         },
-        "barycoordFromPoint": {
+        "getBarycoord": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return a barycentric coordinate from the given vector. <br><br>\n\t\t[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)"
         },
@@ -4006,11 +3650,11 @@
           "!type": "fn() -> +THREE.Triangle",
           "!doc": "Return a new copy of this triangle."
         },
-        "area": {
+        "getArea": {
           "!type": "fn() -> number",
           "!doc": "Return the area of the triangle."
         },
-        "midpoint": {
+        "getMidpoint": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the midpoint of the triangle. Optionally sets a target vector."
         },
@@ -4018,7 +3662,7 @@
           "!type": "fn(triangle: +THREE.Triangle) -> bool",
           "!doc": "Checks to see if two triangles are equal (share the same vectors)."
         },
-        "plane": {
+        "getPlane": {
           "!type": "fn(optionalTarget: +THREE.Plane) -> +THREE.Plane",
           "!doc": "Return a [page:Plane plane] based on the triangle. Optionally sets a target plane."
         },
@@ -4636,30 +4280,6 @@
       "!doc": "todo",
       "!type": "fn()"
     },
-    "LensFlare": {
-      "!url": "http://threejs.org/docs/#Reference/objects/LensFlare",
-      "prototype": {
-        "!proto": "THREE.Object3D.prototype",
-        "lensFlares": {
-          "!type": "array",
-          "!doc": "todo"
-        },
-        "positionScreen": {
-          "!type": "+THREE.Vector3",
-          "!doc": "todo"
-        },
-        "customUpdateCallback": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "updateLensFlares": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(texture: todo, size: todo, distance: todo, blending: todo, color: todo)"
-    },
     "Line": {
       "!url": "http://threejs.org/docs/#Reference/objects/Line",
       "prototype": {
@@ -4694,7 +4314,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised color."
         },
         "getMorphTargetIndexByName": {
           "!type": "fn(name: string) -> number",
@@ -4798,7 +4418,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised color."
         },
         "clone": {
           "!type": "fn() -> +THREE.PointCloud",
@@ -4985,11 +4605,7 @@
     "WebGLRenderTargetCube": {
       "!url": "http://threejs.org/docs/#Reference/renderers/WebGLRenderTargetCube",
       "prototype": {
-        "!proto": "THREE.WebGLRenderTarget.prototype",
-        "activeCubeFace": {
-          "!type": "integer",
-          "!doc": "The activeCubeFace property corresponds to a cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) and is\n\t\tused and set internally by the [page:CubeCamera]."
-        }
+        "!proto": "THREE.WebGLRenderTarget.prototype"
       },
       "!doc": "[page:CubeCamera] uses this as its [page:WebGLRenderTarget]",
       "!type": "fn(width: number, height: number, options: object)"
@@ -5028,14 +4644,6 @@
         "autoUpdateObjects": {
           "!type": "bool",
           "!doc": "Defines whether the renderer should auto update objects. Default is true."
-        },
-        "gammaInput": {
-          "!type": "bool",
-          "!doc": "Default is false. If set, then it expects that all textures and colors are premultiplied gamma."
-        },
-        "gammaOutput": {
-          "!type": "bool",
-          "!doc": "Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma."
         },
         "shadowMapEnabled": {
           "!type": "bool",
@@ -5133,10 +4741,6 @@
           "!type": "fn(camera, lights, fog, material, object)",
           "!doc": "Renders an immediate Object using a camera."
         },
-        "setFaceCulling": {
-          "!type": "fn(cullFace, frontFace)",
-          "!doc": "If cullFace is false, culling will be disabled."
-        },
         "setDepthTest": {
           "!type": "fn(depthTest: boolean)",
           "!doc": "This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer."
@@ -5229,23 +4833,12 @@
       "prototype": {},
       "!doc": "todo"
     },
-    "LensFlarePlugin": {
-      "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/LensFlarePlugin",
-      "prototype": {
-        "render": {
-          "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera, viewportWidth: number, viewportHeight: number)",
-          "!doc": "Renders the lensflares defined in the scene. This gets automatically called as post render function to draw the lensflares."
-        }
-      },
-      "!doc": "The Webglrenderer plugin class that allows lensflares to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
-      "!type": "fn()"
-    },
     "ShadowMapPlugin": {
       "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/ShadowMapPlugin",
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Prepares the shadowmaps to be rendered defined in the scene. This gets automatically called as pre render function to draw the lensflares."
+          "!doc": "Prepares the shadowmaps to be rendered defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5256,7 +4849,7 @@
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Renders the sprites defined in the scene. This gets automatically called as post-render function to draw the lensflares."
+          "!doc": "Renders the sprites defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5365,7 +4958,7 @@
         },
         "image": {
           "!type": "Image",
-          "!doc": "An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
+          "!doc": "An Image object, typically created using the [page:ImageLoader ImageLoader] class. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
         },
         "mapping": {
           "!type": "object",
