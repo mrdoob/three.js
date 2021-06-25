@@ -7,7 +7,6 @@ export class WorkerPool {
 	constructor ( pool = 4 ) {
 
 		this.pool = pool;
-
 		this.quene = [];
 		this.workers = [];
 		this.workersResolve = [];
