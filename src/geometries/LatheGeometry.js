@@ -144,6 +144,12 @@ class LatheGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new LatheGeometry( data.points, data.segments, data.phiStart, data.phiLength );
+
+	}
+
 }
 
 

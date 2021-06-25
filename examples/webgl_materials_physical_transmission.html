@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission with Premultiplied Alpha (right) and without (left)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission</div>
 
 		<script type="module">
 
@@ -36,7 +36,7 @@
 			let camera, scene, renderer;
 
 			let hdrCubeRenderTarget;
-			let mesh1, mesh2;
+			let mesh;
 
 			const hdrEquirect = new RGBELoader()
 				.setDataType( THREE.UnsignedByteType )
@@ -65,7 +65,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
-				scene.background = hdrEquirect;
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 0, 120 );
@@ -102,13 +101,8 @@
 					transparent: true
 				} );
 
-				mesh1 = new THREE.Mesh( geometry, material );
-				mesh1.position.x = - 30.0;
-				scene.add( mesh1 );
-
-				mesh2 = new THREE.Mesh( geometry, material );
-				mesh2.position.x = 30.0;
-				scene.add( mesh2 );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
 
 				//
 
@@ -213,8 +207,8 @@
 
 				const t = performance.now();
 
-				mesh1.rotation.x = mesh2.rotation.x = t * 0.0002;
-				mesh1.rotation.z = mesh2.rotation.z = - t * 0.0002;
+				mesh.rotation.x = t * 0.0002;
+				mesh.rotation.z = - t * 0.0002;
 
 				stats.begin();
 				renderer.render( scene, camera );

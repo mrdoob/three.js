@@ -1,4 +1,4 @@
-import { UIPanel, UIRow, UISelect, UISpan, UIText, UIInteger } from './libs/ui.js';
+import { UIPanel, UIRow, UISelect, UISpan, UIText } from './libs/ui.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
