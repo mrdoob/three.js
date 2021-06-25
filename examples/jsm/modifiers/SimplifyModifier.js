@@ -113,9 +113,15 @@ class SimplifyModifier {
 		// maintaining order by edge collapse cost will be cheaper
 		// than searching for lowest every time.
 		// Lowest cost at tail will minimize reindexing on removal.
-		vertices.sort((a,b)=>{return b.collapseCost-a.collapseCost;});
+		vertices.sort( ( a, b )=>{
+
+			return b.collapseCost - a.collapseCost;
+
+		} );
 		for ( let i = 0, il = vertices.length; i < il; i ++ ) {
+
 			vertices[ i ].id = i;
+
 		}
 
 		let nextVertex;
@@ -125,10 +131,11 @@ class SimplifyModifier {
 		// likely only a minor optimization,
 		// but why check for threshold every iteration
 		// in cases when we aren't even using it?
-		if (threshold){
+		if ( threshold ) {
+
 			while ( z -- ) {
 
-				nextVertex = vertices[vertices.length-1];
+				nextVertex = vertices[ vertices.length - 1 ];
 
 				if ( ! nextVertex ) {
 
@@ -137,16 +144,17 @@ class SimplifyModifier {
 
 				}
 
-				if (nextVertex.collapseCost > threshold) break;
+				if ( nextVertex.collapseCost > threshold ) break;
 
 				collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
 
 			}
-		}
-		else{
+
+		} else {
+
 			while ( z -- ) {
 
-				nextVertex = vertices[vertices.length-1];
+				nextVertex = vertices[ vertices.length - 1 ];
 
 				if ( ! nextVertex ) {
 
@@ -158,6 +166,7 @@ class SimplifyModifier {
 				collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
 
 			}
+
 		}
 
 		//
@@ -340,11 +349,14 @@ function removeVertex( v, vertices ) {
 	// but rather than spend the n looking from the top,
 	// spend it cleaning from target down.
 	let i = v.id;
-	vertices.splice(i,1);
-	for (let vl=vertices.length; i<vl; ++i){
-		--vertices[i].id;
+	vertices.splice( i, 1 );
+	for ( let vl = vertices.length; i < vl; ++ i ) {
+
+		-- vertices[ i ].id;
+
 	}
-	v.id = -1; // in case anything still references this
+
+	v.id = - 1; // in case anything still references this
 
 }
 
@@ -425,50 +437,36 @@ function collapse( vertices, faces, u, v ) { // u and v are pointers to vertices
 
 }
 
-function maintainEdgeCostSort( vertices, v ){
-	if (v.id<0) return; // trying to sort a disused vertex
+function maintainEdgeCostSort( vertices, v ) {
+
+	if ( v.id < 0 ) return; // trying to sort a disused vertex
 
 	// high cost towards head
-	while (v.id>0 && v.collapseCost > vertices[v.id-1].collapseCost){
+	while ( v.id > 0 && v.collapseCost > vertices[ v.id - 1 ].collapseCost ) {
+
 		// previous element goes down
-		vertices[v.id] = vertices[v.id-1];
-		++vertices[v.id].id;
+		vertices[ v.id ] = vertices[ v.id - 1 ];
+		++ vertices[ v.id ].id;
 		// v goes up
-		//vertices[v.id-1] = v;
-		--v.id;
+		//vertices[ v.id - 1 ] = v;
+		-- v.id;
+
 	}
 
-	let l = vertices.length-1;
+	let l = vertices.length - 1;
 	// low cost towards tail
-	while(v.id<l && v.collapseCost < vertices[v.id+1].collapseCost){
+	while ( v.id < l && v.collapseCost < vertices[ v.id + 1 ].collapseCost ) {
+
 		// next element goes up
-		vertices[v.id] = vertices[v.id+1];
-		--vertices[v.id].id;
+		vertices[ v.id ] = vertices[ v.id + 1 ];
+		-- vertices[ v.id ].id;
 		// v goes down
-		//vertices[v.id+1] = v;
-		++v.id;
-	}
-
-	vertices[v.id] = v; // no need to do this every iteration
-}
-
-function minimumCostEdge( vertices ) {
-
-	// O(n * n) approach. TODO optimize this
-
-	let least = vertices[ 0 ];
-
-	for ( let i = 0; i < vertices.length; i ++ ) {
-
-		if ( vertices[ i ].collapseCost < least.collapseCost ) {
-
-			least = vertices[ i ];
-
-		}
+		//vertices[ v.id + 1 ] = v;
+		++ v.id;
 
 	}
 
-	return least;
+	vertices[ v.id ] = v; // no need to do this every iteration
 
 }
 
@@ -564,8 +562,8 @@ class Vertex {
 	constructor( v ) {
 
 		this.position = v;
-			
-		this.id = -1; // external use position in vertices list (for e.g. face generation)
+
+		this.id = - 1; // external use position in vertices list (for e.g. face generation)
 
 		this.faces = []; // faces vertex is connected
 		this.neighbors = []; // neighbouring vertices aka "adjacentVertices"
