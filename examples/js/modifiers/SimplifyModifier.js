@@ -23,7 +23,7 @@
 
 		}
 
-		modify( geometry, count ) {
+		modify( geometry, count, threshold ) {
 
 			if ( geometry.isGeometry === true ) {
 
@@ -94,23 +94,56 @@
 
 			}
 
+			// sort & reindex now.
+			// maintaining order by edge collapse cost will be cheaper
+			// than searching for lowest every time.
+			// Lowest cost at tail will minimize reindexing on removal.
+			vertices.sort((a,b)=>{return b.collapseCost-a.collapseCost;});
+			for ( let i = 0, il = vertices.length; i < il; i ++ ) {
+				vertices[ i ].id = i;
+			}
+
 			let nextVertex;
 			let z = count;
 
-			while ( z -- ) {
+			// likely only a minor optimization,
+			// but why check for threshold every iteration
+			// in cases when we aren't even using it?
+			if (threshold){
+				while ( z -- ) {
 
-				nextVertex = minimumCostEdge( vertices );
+					nextVertex = vertices[vertices.length-1];
 
-				if ( ! nextVertex ) {
+					if ( ! nextVertex ) {
 
-					console.log( 'THREE.SimplifyModifier: No next vertex' );
-					break;
+						console.log( 'THREE.SimplifyModifier: No next vertex' );
+						break;
+
+					}
+
+					if (nextVertex.collapseCost > threshold) break;
+
+					collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
 
 				}
+			} 
+			else{
+				while ( z -- ) {
 
-				collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
+					nextVertex = vertices[vertices.length-1];
 
+					if ( ! nextVertex ) {
+
+						console.log( 'THREE.SimplifyModifier: No next vertex' );
+						break;
+
+					}
+
+					collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
+
+				}
 			} //
+
 
 
 			const simplifiedGeometry = new THREE.BufferGeometry();
@@ -275,7 +308,15 @@
 
 		}
 
-		removeFromArray( vertices, v );
+		// still effectively O(n)
+		// but rather than spend the n looking from the top,
+		// spend it cleaning from target down.
+		let i = v.id;
+		vertices.splice(i,1);
+		for (let vl=vertices.length; i<vl; ++i){
+			--vertices[i].id;
+		}
+		v.id = -1; // in case anything still references this
 
 	}
 
@@ -343,9 +384,37 @@
 		for ( let i = 0; i < tmpVertices.length; i ++ ) {
 
 			computeEdgeCostAtVertex( tmpVertices[ i ] );
+			maintainEdgeCostSort( vertices, tmpVertices[ i ] );
 
 		}
 
+	}
+
+	function maintainEdgeCostSort( vertices, v ){
+		if (v.id<0) return; // trying to sort a disused vertex
+
+		// high cost towards head
+		while (v.id>0 && v.collapseCost > vertices[v.id-1].collapseCost){
+			// previous element goes down
+			vertices[v.id] = vertices[v.id-1];
+			++vertices[v.id].id;
+			// v goes up
+			//vertices[v.id-1] = v;
+			--v.id;
+		}
+
+		let l = vertices.length-1;
+		// low cost towards tail
+		while(v.id<l && v.collapseCost < vertices[v.id+1].collapseCost){
+			// next element goes up
+			vertices[v.id] = vertices[v.id+1];
+			--vertices[v.id].id;
+			// v goes down
+			//vertices[v.id+1] = v;
+			++v.id;
+		}
+
+		vertices[v.id] = v; // no need to do this every iteration
 	}
 
 	function minimumCostEdge( vertices ) {
