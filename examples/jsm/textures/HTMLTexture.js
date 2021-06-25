@@ -77,7 +77,7 @@ class HTMLTexture extends CanvasTexture {
 
 			const C = ( r, t ) => {
 
-				if ( typeof r === 'string' ) return ( /:hover/gmi ).test( r ) ? `${ r.replace( /:hover/gmi, '.vr-hover' ) } { ${ t } }` : '';
+				if ( typeof r === 'string' ) return ( /[^[=\s]\s*:hover/gmi ).test( r ) ? `${ r.replace( /([^[=\s])(\s*)(:hover)/gmi, '$1[vr-hover]' ) } { ${ t } }` : '';
 
 				if ( r instanceof CSSImportRule ) return importedSheets.has( r.href ) ? '' : ( importedSheets.add( r.href ), C( r.styleSheet ) );
 
@@ -153,27 +153,6 @@ class HTMLTexture extends CanvasTexture {
 			}
 
 
-			//simulate hover
-
-			const undoAddClasses = [];
-
-			Array.from( sroot.querySelectorAll( '*' ) ).forEach(
-
-				e => {
-
-					if ( ( ! e?.classList?.contains( 'vr-hover' ) ) && e?._isVRHovering ) {
-
-						e.classList.add( 'vr-hover' );
-
-						undoAddClasses.push( e );
-
-					}
-
-				}
-
-			);
-
-
 			const canvas = scope.image;
 
 			if ( width === undefined ) width = canvas.width;
@@ -194,8 +173,6 @@ class HTMLTexture extends CanvasTexture {
 
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
-
-			for ( const e of undoAddClasses ) e.classList.remove( 'vr-hover' );
 
 
 			const image = new Image();
@@ -275,7 +252,7 @@ class HTMLTexture extends CanvasTexture {
 
 				dispatch( 'out', pointer.target, target );
 
-				pointer.target._isVRHovering = false;
+				pointer.target.removeAttribute( 'vr-hover' );
 
 				if ( ! pointer.target.contains( target ) ) dispatch( 'leave', pointer.target, target, false );
 
@@ -285,7 +262,7 @@ class HTMLTexture extends CanvasTexture {
 
 				dispatch( 'over', target, pointer.target );
 
-				target._isVRHovering = true;
+				target.setAttributeNode( document.createAttribute( 'vr-hover' ) );
 
 				if ( ! target.contains( pointer.target ) ) dispatch( 'enter', target, pointer.target, false );
 
