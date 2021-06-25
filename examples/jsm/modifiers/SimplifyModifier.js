@@ -182,6 +182,8 @@ class SimplifyModifier {
 
 			const vertex = vertices[ i ].position;
 			position.push( vertex.x, vertex.y, vertex.z );
+			// cache final index to GREATLY speed up faces reconstruction
+			vertices[ i ].id = i;
 
 		}
 
