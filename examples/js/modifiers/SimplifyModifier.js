@@ -122,7 +122,7 @@
 				const vertex = vertices[ i ].position;
 				position.push( vertex.x, vertex.y, vertex.z );
 				// cache final index to GREATLY speed up faces reconstruction
-				vertices[ i ].index = i;
+				vertices[ i ].newId = i;
 
 			} //
 
@@ -130,7 +130,7 @@
 			for ( let i = 0; i < faces.length; i ++ ) {
 
 				const face = faces[ i ];
-				index.push( face.v1.index, face.v2.index, face.v3.index );
+				index.push( face.v1.newId, face.v2.newId, face.v3.newId );
 
 			} //
 
@@ -443,6 +443,7 @@
 
 			this.position = v;
 			this.id = id; // old index id
+			this.newId = id; // resultant index (for final face generation)
 
 			this.faces = []; // faces vertex is connected
 
