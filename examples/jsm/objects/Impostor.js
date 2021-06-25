@@ -54,9 +54,6 @@ class Impostor extends Mesh {
 		//
 
 		this.renderTarget = renderTarget;
-		this.geometry = geometry;
-		this.material = material;
-
 		this.type = 'Impostor';
 		this.enabled = true;
 		this.redrawInterval = null; // in ms, skipped if null.

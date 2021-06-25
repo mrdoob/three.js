@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - camera cinematic</title>
+		<title>three.js webgl - impostors</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -33,7 +33,7 @@
 
 			import { Impostor } from './jsm/objects/Impostor.js';
 
-			let camera, scene, raycaster, renderer, controls, stats;
+			let camera, scene, renderer, controls, stats, params;
 
 			const cars = [];
 			const impostors = [];
@@ -131,10 +131,11 @@
 
 				const normalMaterial = new THREE.MeshNormalMaterial();
 
-				const params = {
+				params = {
 					enable: true,
 					show: false,
-					dist: 90
+					dist: 90,
+					stop: false
 				};
 
 				const gui = new GUI();
@@ -186,6 +187,8 @@
 
 				} );
 
+				gui.add( params, 'stop' ).name( 'stop cars' );
+
 			}
 
 			function onWindowResize() {
@@ -201,17 +204,21 @@
 
 				requestAnimationFrame( animate, renderer.domElement );
 
-				cars.forEach( (car) => {
+				if ( !params.stop ) {
 
-					car.position.x += car.direction;
+					cars.forEach( (car) => {
 
-					if ( car.position.x > sceneWidth ) {
+						car.position.x += car.direction;
 
-						car.position.x = - sceneWidth;
+						if ( car.position.x > sceneWidth ) {
 
-					}
+							car.position.x = - sceneWidth;
 
-				} );
+						}
+
+					} );
+
+				}
 
 				Impostor.updateAll();
 
