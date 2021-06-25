@@ -53,7 +53,7 @@
 			for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 				const v = new THREE.Vector3().fromBufferAttribute( positionAttribute, i );
-				const vertex = new Vertex( v, i );
+				const vertex = new Vertex( v );
 				vertices.push( vertex );
 
 			} // add faces
@@ -122,7 +122,7 @@
 				const vertex = vertices[ i ].position;
 				position.push( vertex.x, vertex.y, vertex.z );
 				// cache final index to GREATLY speed up faces reconstruction
-				vertices[ i ].newId = i;
+				vertices[ i ].id = i;
 
 			} //
 
@@ -130,7 +130,7 @@
 			for ( let i = 0; i < faces.length; i ++ ) {
 
 				const face = faces[ i ];
-				index.push( face.v1.newId, face.v2.newId, face.v3.newId );
+				index.push( face.v1.id, face.v2.id, face.v3.id );
 
 			} //
 
@@ -439,11 +439,11 @@
 
 	class Vertex {
 
-		constructor( v, id ) {
+		constructor( v ) {
 
 			this.position = v;
-			this.id = id; // old index id
-			this.newId = id; // resultant index (for final face generation)
+			
+			this.id = -1; // external use position in vertices list (for e.g. face generation)
 
 			this.faces = []; // faces vertex is connected
 
