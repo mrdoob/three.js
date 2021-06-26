@@ -1,5 +1,7 @@
 function WebGLInfo( gl ) {
 
+	let _isRenderTarget = false;
+
 	const memory = {
 		geometries: 0,
 		textures: 0
@@ -21,9 +23,22 @@ function WebGLInfo( gl ) {
 		lines: 0
 	};
 
-	function update( count, mode, instanceCount, isFrameBuffer ) {
+	function setRenderTarget( isRenderTarget ) {
 
-		const target = isFrameBuffer ? frameBuffer : render;
+		_isRenderTarget = isRenderTarget;
+
+	}
+
+	function update( count, mode, instanceCount ) {
+
+		let target = render;
+
+		if ( _isRenderTarget ) {
+
+			target = frameBuffer;
+
+		}
+
 		target.calls ++;
 
 		switch ( mode ) {
@@ -57,7 +72,7 @@ function WebGLInfo( gl ) {
 
 	}
 
-	function reset( isRenderToScreen ) {
+	function reset() {
 
 		render.frame ++;
 		render.calls = 0;
@@ -65,7 +80,7 @@ function WebGLInfo( gl ) {
 		render.points = 0;
 		render.lines = 0;
 
-		if ( ! isRenderToScreen ) {
+		if ( ! _isRenderTarget ) {
 
 			frameBuffer.frame ++;
 			frameBuffer.calls = 0;
@@ -81,6 +96,7 @@ function WebGLInfo( gl ) {
 		memory: memory,
 		render: render,
 		frameBuffer: frameBuffer,
+		setRenderTarget: setRenderTarget,
 		programs: null,
 		autoReset: true,
 		reset: reset,

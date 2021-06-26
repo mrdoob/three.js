@@ -785,7 +785,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		renderer.setIsFrameBuffer( _currentRenderTarget !== null );
+		info.setRenderTarget( _currentRenderTarget !== null );
 
 		//
 
@@ -1034,7 +1034,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		//
 
-		if ( this.info.autoReset === true ) this.info.reset( _currentRenderTarget === null );
+		if ( this.info.autoReset === true ) this.info.reset();
 
 		//
 
