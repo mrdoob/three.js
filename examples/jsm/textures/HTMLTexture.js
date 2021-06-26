@@ -33,10 +33,10 @@ class HTMLTexture extends CanvasTexture {
 
 		this._node = document.body.appendChild( new ( customElements.get( 'htmltexture-node' ) )() );
 
-		this.document = this._node.shadowRoot;
+		this.document = this._node.contentWindow.document;
 
 
-		const unstyled = this.document.appendChild( new ( customElements.get( 'htmltexture-default' ) )() );
+		const unstyled = this.document.body.appendChild( new ( customElements.get( 'htmltexture-default' ) )() );
 
 		const unstyle = getComputedStyle( unstyled );
 
@@ -44,11 +44,11 @@ class HTMLTexture extends CanvasTexture {
 
 		Array.from( unstyle ).forEach( name => _unstyle[ name ] = unstyle[ name ] );
 
-		this.document.removeChild( unstyled );
+		this.document.body.removeChild( unstyled );
 
 	}
 
-	redrawAsync( html, width, height ) {
+	async redrawAsync( html, width, height ) {
 
 		const scope = this;
 
@@ -57,27 +57,9 @@ class HTMLTexture extends CanvasTexture {
 
 		if ( html ) {
 
-			while ( sroot.firstChild ) sroot.removeChild( sroot.firstChild );
-
-			sroot.appendChild( new DOMParser().parseFromString( html, 'text/html' ).documentElement );
-
-
-			//enable javascript
-
-			const scripts = Array.from( sroot.querySelectorAll( 'script' ) );
-
-			scripts.forEach( script => {
-
-				const { parentNode } = script;
-
-				const newScript = document.createElement( 'script' );
-				newScript.textContent = script.textContent;
-
-				parentNode.insertBefore( newScript, script );
-
-				parentNode.removeChild( script );
-
-			} );
+			sroot.open();
+			sroot.write( html );
+			sroot.close();
 
 		}
 
@@ -85,7 +67,7 @@ class HTMLTexture extends CanvasTexture {
 		return new Promise( async resolve => {
 
 			//enable css, simulate hover
-
+			//TODO css url image, font
 			const importedSheets = new Set();
 
 			const C = ( r, t ) => {
@@ -111,74 +93,14 @@ class HTMLTexture extends CanvasTexture {
 			const css = C( sroot );
 
 
-
-			//enable images
-			{
-
-				const _canvas = document.createElement( 'canvas' );
-
-				const images = Array.from( sroot.querySelectorAll( 'img' ) );
-
-				await Promise.all( images.map(
-
-					image => new Promise( async load => {
-
-						if ( image.src.indexOf( 'data:' ) === 0 ) {
-
-							load();
-
-						} else if ( scope._cache[ image.src ] ) {
-
-							image.src = scope._cache[ image.src ];
-
-							load();
-
-						} else {
-
-							const urlImage = new Image();
-
-							urlImage.onload = () => {
-
-								const rect = image.getClientRects()[ 0 ];
-
-								_canvas.width = Math.max( 1, Math.min( rect.width, image.width ) );
-								_canvas.height = Math.max( 1, Math.min( rect.height, image.height ) );
-
-								_canvas.getContext( '2d' ).drawImage( urlImage, 0, 0, _canvas.width, _canvas.height );
-
-								scope._cache[ image.src ] = _canvas.toDataURL();
-
-								image.src = scope._cache[ image.src ];
-
-								load();
-
-							};
-
-							urlImage.src = image.src;
-
-						}
-
-					} )
-
-				) );
-
-			}
+			//block for image load
+			await Promise.all( Array.from( sroot.querySelectorAll( 'img' ) ).map( image => new Promise( load => image.complete ? load() : image.addEventListener( 'load', load ) ) ) );
 
 
-			const canvas = scope.image;
+			scope._node.style.width = ( width = scope.image.width = width || scope.image.width ) + 'px';
 
-			if ( width === undefined ) width = canvas.width;
+			scope._node.style.height = ( height = scope.image.height = height || scope.image.height ) + 'px';
 
-			else canvas.width = width;
-
-			if ( height === undefined ) height = canvas.height;
-
-			else canvas.height = height;
-
-
-			scope._node.style.width = width + 'px';
-
-			scope._node.style.height = width + 'px';
 
 
 			//collect CSS animations
@@ -193,10 +115,66 @@ class HTMLTexture extends CanvasTexture {
 				forEach( ( [ e, cssText ] ) => cssText ? styledElements.set( e, [ cssText, e.style.cssText ] ) : null );
 
 
+
+			//enable visuals
+			const proxies = [];
+
+			const _canvas = document.createElement( 'canvas' );
+
+			const D = async ( i ) => {
+
+				const [ style ] = styledElements.get( i ) || [ '' ];
+
+				let d;
+
+				if ( i instanceof HTMLImageElement && scope._cache[ i.src ] ) d = scope._cache[ i.src ];
+
+				if ( i instanceof SVGElement ) {
+
+					const src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent( new XMLSerializer().serializeToString( i ) );
+
+					if ( scope._cache[ src ] ) d = scope._cache[ src ];
+
+					else {
+
+						const s = new Image(); s.src = src;
+
+						await ( new Promise( load => s.onload = load ) );
+
+						i = s;
+
+					}
+
+				}
+
+				if ( ! d ) {
+
+					_canvas.width = i.width;
+					_canvas.height = i.height;
+
+					_canvas.getContext( '2d' ).drawImage( i, 0, 0, i.width, i.height );
+
+					d = new Image(); d.src = _canvas.toDataURL();
+
+				}
+
+				if ( i instanceof HTMLImageElement ) scope._cache[ i.src ] = d;
+
+				d.setAttribute( 'style', style );
+
+				return d;
+
+			};
+
+			await Promise.all( Array.from( sroot.querySelectorAll( 'img, canvas, video, svg' ) ).map( async v => proxies.push( [ v.parentNode, v, await D( v ) ] ) ) );
+
+
 			//-------------BEGIN DO NOT REFLOW!-------------------
 
 			//freeze CSS animations
 			styledElements.forEach( ( [ cssText ], e ) => e.setAttribute( 'style', cssText ) );
+			//install proxies
+			proxies.forEach( ( [ p, e, r ] ) => ( p.insertBefore( r, e ), p.removeChild( e ) ) );
 
 
 			const xml = new XMLSerializer().serializeToString( sroot );
@@ -204,6 +182,8 @@ class HTMLTexture extends CanvasTexture {
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
 
+			//remove proxies
+			proxies.forEach( ( [ p, e, r ] ) => ( p.insertBefore( e, r ), p.removeChild( r ) ) );
 			//unfreeze CSS animations
 			styledElements.forEach( ( [ , originalCssText ], e ) => e.setAttribute( 'style', originalCssText ) );
 
@@ -214,7 +194,10 @@ class HTMLTexture extends CanvasTexture {
 
 			image.onload = () => {
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0 );
+				const context = scope.image.getContext( '2d' );
+
+				context.clearRect( 0, 0, width, height );
+				context.drawImage( image, 0, 0 );
 
 				scope.needsUpdate = true;
 
@@ -365,13 +348,11 @@ function defineHTMLTextureNode() {
 
 	if ( ! customElements.get( 'htmltexture-node' ) ) {
 
-		class HTMLTextureNode extends HTMLElement {
+		class HTMLTextureNode extends HTMLIFrameElement {
 
 			constructor() {
 
 				super();
-
-				this.attachShadow( { mode: 'open' } );
 
 				this.style.cssText = 'contain:layout; pointer-events:none; display:block; position:absolute; left:0; top:0; opacity:0.0; z-index:-1000000';
 
@@ -379,7 +360,7 @@ function defineHTMLTextureNode() {
 
 		}
 
-		customElements.define( 'htmltexture-node', HTMLTextureNode, { is: 'htmltexture-node' } );
+		customElements.define( 'htmltexture-node', HTMLTextureNode, { is: 'htmltexture-node', extends: 'iframe' } );
 
 	}
 
