@@ -459,7 +459,7 @@ class TrackballControls extends EventDispatcher {
 
 			} else {
 
-				onMouseUp( event );
+				onMouseUp();
 
 			}
 
