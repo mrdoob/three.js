@@ -9,15 +9,9 @@ class HTMLTexture extends CanvasTexture {
 
 		super( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
+		defineHTMLTextureNode();
 
-		let htmlTextureNode = customElements.get( 'htmltexture-node' );
-
-		if ( ! htmlTextureNode ) htmlTextureNode = this._defineNode();
-
-
-		this._node = document.body.appendChild( new htmlTextureNode() );
-
-		this.document = this._node.shadowRoot;
+		this._createDocument();
 
 
 		this.onFinishRedraw = null;
@@ -32,6 +26,25 @@ class HTMLTexture extends CanvasTexture {
 
 
 		this.redrawAsync( html, width, height );
+
+	}
+
+	_createDocument() {
+
+		this._node = document.body.appendChild( new ( customElements.get( 'htmltexture-node' ) )() );
+
+		this.document = this._node.shadowRoot;
+
+
+		const unstyled = this.document.appendChild( new ( customElements.get( 'htmltexture-default' ) )() );
+
+		const unstyle = getComputedStyle( unstyled );
+
+		const _unstyle = this._unstyle = {};
+
+		Array.from( unstyle ).forEach( name => _unstyle[ name ] = unstyle[ name ] );
+
+		this.document.removeChild( unstyled );
 
 	}
 
@@ -53,7 +66,7 @@ class HTMLTexture extends CanvasTexture {
 
 			const scripts = Array.from( sroot.querySelectorAll( 'script' ) );
 
-			scripts.map( script => {
+			scripts.forEach( script => {
 
 				const { parentNode } = script;
 
@@ -71,7 +84,7 @@ class HTMLTexture extends CanvasTexture {
 
 		return new Promise( async resolve => {
 
-			//enable css
+			//enable css, simulate hover
 
 			const importedSheets = new Set();
 
@@ -141,7 +154,6 @@ class HTMLTexture extends CanvasTexture {
 
 							};
 
-
 							urlImage.src = image.src;
 
 						}
@@ -169,10 +181,33 @@ class HTMLTexture extends CanvasTexture {
 			scope._node.style.height = width + 'px';
 
 
+			//collect CSS animations
+			const styledElements = new Map();
+
+			Array.from( sroot.querySelectorAll( '*' ) ).
+
+				map( e => ( [ e, getComputedStyle( e ), Array.from( getComputedStyle( e ) ) ] ) ).
+
+				map( ( [ e, style, names ] ) => ( [ e, names.map( name => ( style[ name ] !== this._unstyle[ name ] ) ? `${ name }:${ style[ name ] }; ` : '' ).join( '' ) ] ) ).
+
+				forEach( ( [ e, cssText ] ) => cssText ? styledElements.set( e, [ cssText, e.style.cssText ] ) : null );
+
+
+			//-------------BEGIN DO NOT REFLOW!-------------------
+
+			//freeze CSS animations
+			styledElements.forEach( ( [ cssText ], e ) => e.setAttribute( 'style', cssText ) );
+
+
 			const xml = new XMLSerializer().serializeToString( sroot );
 
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
+
+			//unfreeze CSS animations
+			styledElements.forEach( ( [ , originalCssText ], e ) => e.setAttribute( 'style', originalCssText ) );
+
+			//----------------end do not reflow-------------------
 
 
 			const image = new Image();
@@ -307,8 +342,8 @@ class HTMLTexture extends CanvasTexture {
 
 		style.zIndex = '1000000';
 
-		if( x > innerWidth ) style.left = ( innerWidth / 2 ) - x;
-		if( y > innerHeight ) style.top = ( innerHeight / 2 ) - y;
+		if ( x > innerWidth ) style.left = ( innerWidth / 2 ) - x;
+		if ( y > innerHeight ) style.top = ( innerHeight / 2 ) - y;
 
 		const element = this.document.elementFromPoint( x, y );
 
@@ -324,7 +359,11 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
-	_defineNode() {
+}
+
+function defineHTMLTextureNode() {
+
+	if ( ! customElements.get( 'htmltexture-node' ) ) {
 
 		class HTMLTextureNode extends HTMLElement {
 
@@ -334,7 +373,7 @@ class HTMLTexture extends CanvasTexture {
 
 				this.attachShadow( { mode: 'open' } );
 
-				this.style.cssText = 'contain:layout; pointer-events:none; display:block; position:absolute; left:0; top:0; opacity:0.0; overflow:hidden; z-index:-1000000';
+				this.style.cssText = 'contain:layout; pointer-events:none; display:block; position:absolute; left:0; top:0; opacity:0.0; z-index:-1000000';
 
 			}
 
@@ -342,7 +381,23 @@ class HTMLTexture extends CanvasTexture {
 
 		customElements.define( 'htmltexture-node', HTMLTextureNode, { is: 'htmltexture-node' } );
 
-		return HTMLTextureNode;
+	}
+
+	if ( ! customElements.get( 'htmltexture-default' ) ) {
+
+		class HTMLTextureDefault extends HTMLElement {
+
+			constructor() {
+
+				super();
+
+				this.style.cssText = 'all:unset !important;';
+
+			}
+
+		}
+
+		customElements.define( 'htmltexture-default', HTMLTextureDefault, { is: 'htmltexture-default' } );
 
 	}
 
