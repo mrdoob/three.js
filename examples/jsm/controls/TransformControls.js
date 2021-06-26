@@ -1,7 +1,6 @@
 import {
 	BoxGeometry,
 	BufferGeometry,
-	Color,
 	CylinderGeometry,
 	DoubleSide,
 	Euler,
@@ -1522,23 +1521,15 @@ class TransformControlsGizmo extends Object3D {
 
 			// highlight selected axis
 
-			handle.material._opacity = handle.material._opacity || handle.material.opacity;
 			handle.material._color = handle.material._color || handle.material.color.clone();
 
 			handle.material.color.copy( handle.material._color );
-			handle.material.opacity = handle.material._opacity;
 
-			if ( ! this.enabled ) {
-
-				handle.material.opacity *= 0.5;
-				handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
-
-			} else if ( this.axis ) {
+			if ( this.enabled && this.axis ) {
 
 				if ( handle.name === this.axis ) {
 
-					handle.material.opacity = 1.0;
-					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
+					handle.material.color.setHex( 0xffff00 );
 
 				} else if ( this.axis.split( '' ).some( function ( a ) {
 
@@ -1546,13 +1537,7 @@ class TransformControlsGizmo extends Object3D {
 
 				} ) ) {
 
-					handle.material.opacity = 1.0;
-					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
-
-				} else {
-
-					handle.material.opacity *= 0.25;
-					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
+					handle.material.color.setHex( 0xffff00 );
 
 				}
 
