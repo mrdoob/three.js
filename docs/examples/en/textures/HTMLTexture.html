@@ -15,9 +15,7 @@
 
 			Note:
 			<ul>
-				<li>GPU-heavy elements like video and webgl will disappear.</li>
-				<li>Iframes will disappear.</li>
-				<li>Texture JavaScript is not isolated. It runs in the global context.</li>
+				<li>Iframes are not supported.</li>
 				<li>Depending on security settings, cross-origin content may not render.</li>
 			</ul>
 
@@ -26,7 +24,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		const html = getMyHTML();
+		const html = await ( await fetch('my-ui.html') ).text();
 
 		const width = 256;
 		const height = 256;
