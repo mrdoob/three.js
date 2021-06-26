@@ -1,7 +1,6 @@
 import {
 	BoxGeometry,
 	BufferGeometry,
-	Color,
 	CylinderGeometry,
 	DoubleSide,
 	Euler,
@@ -787,49 +786,49 @@ class TransformControlsGizmo extends Object3D {
 		matHelper.opacity = 0.33;
 
 		const matRed = gizmoMaterial.clone();
-		matRed.color.set( 0xff0000 );
+		matRed.color.setHex( 0xff0000 );
 
 		const matGreen = gizmoMaterial.clone();
-		matGreen.color.set( 0x00ff00 );
+		matGreen.color.setHex( 0x00ff00 );
 
 		const matBlue = gizmoMaterial.clone();
-		matBlue.color.set( 0x0000ff );
+		matBlue.color.setHex( 0x0000ff );
 
 		const matWhiteTransparent = gizmoMaterial.clone();
 		matWhiteTransparent.opacity = 0.25;
 
 		const matYellowTransparent = matWhiteTransparent.clone();
-		matYellowTransparent.color.set( 0xffff00 );
+		matYellowTransparent.color.setHex( 0xffff00 );
 
 		const matCyanTransparent = matWhiteTransparent.clone();
-		matCyanTransparent.color.set( 0x00ffff );
+		matCyanTransparent.color.setHex( 0x00ffff );
 
 		const matMagentaTransparent = matWhiteTransparent.clone();
-		matMagentaTransparent.color.set( 0xff00ff );
+		matMagentaTransparent.color.setHex( 0xff00ff );
 
 		const matYellow = gizmoMaterial.clone();
-		matYellow.color.set( 0xffff00 );
+		matYellow.color.setHex( 0xffff00 );
 
 		const matLineRed = gizmoLineMaterial.clone();
-		matLineRed.color.set( 0xff0000 );
+		matLineRed.color.setHex( 0xff0000 );
 
 		const matLineGreen = gizmoLineMaterial.clone();
-		matLineGreen.color.set( 0x00ff00 );
+		matLineGreen.color.setHex( 0x00ff00 );
 
 		const matLineBlue = gizmoLineMaterial.clone();
-		matLineBlue.color.set( 0x0000ff );
+		matLineBlue.color.setHex( 0x0000ff );
 
 		const matLineCyan = gizmoLineMaterial.clone();
-		matLineCyan.color.set( 0x00ffff );
+		matLineCyan.color.setHex( 0x00ffff );
 
 		const matLineMagenta = gizmoLineMaterial.clone();
-		matLineMagenta.color.set( 0xff00ff );
+		matLineMagenta.color.setHex( 0xff00ff );
 
 		const matLineYellow = gizmoLineMaterial.clone();
-		matLineYellow.color.set( 0xffff00 );
+		matLineYellow.color.setHex( 0xffff00 );
 
 		const matLineGray = gizmoLineMaterial.clone();
-		matLineGray.color.set( 0x787878 );
+		matLineGray.color.setHex( 0x787878 );
 
 		const matLineYellowTransparent = matLineYellow.clone();
 		matLineYellowTransparent.opacity = 0.25;
@@ -1522,23 +1521,18 @@ class TransformControlsGizmo extends Object3D {
 
 			// highlight selected axis
 
-			handle.material._opacity = handle.material._opacity || handle.material.opacity;
 			handle.material._color = handle.material._color || handle.material.color.clone();
+			handle.material._opacity = handle.material._opacity || handle.material.opacity;
 
 			handle.material.color.copy( handle.material._color );
 			handle.material.opacity = handle.material._opacity;
 
-			if ( ! this.enabled ) {
-
-				handle.material.opacity *= 0.5;
-				handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
-
-			} else if ( this.axis ) {
+			if ( this.enabled && this.axis ) {
 
 				if ( handle.name === this.axis ) {
 
+					handle.material.color.setHex( 0xffff00 );
 					handle.material.opacity = 1.0;
-					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
 
 				} else if ( this.axis.split( '' ).some( function ( a ) {
 
@@ -1546,13 +1540,8 @@ class TransformControlsGizmo extends Object3D {
 
 				} ) ) {
 
+					handle.material.color.setHex( 0xffff00 );
 					handle.material.opacity = 1.0;
-					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
-
-				} else {
-
-					handle.material.opacity *= 0.25;
-					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
 
 				}
 
