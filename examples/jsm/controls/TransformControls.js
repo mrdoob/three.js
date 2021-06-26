@@ -1522,14 +1522,17 @@ class TransformControlsGizmo extends Object3D {
 			// highlight selected axis
 
 			handle.material._color = handle.material._color || handle.material.color.clone();
+			handle.material._opacity = handle.material._opacity || handle.material.opacity;
 
 			handle.material.color.copy( handle.material._color );
+			handle.material.opacity = handle.material._opacity;
 
 			if ( this.enabled && this.axis ) {
 
 				if ( handle.name === this.axis ) {
 
 					handle.material.color.setHex( 0xffff00 );
+					handle.material.opacity = 1.0;
 
 				} else if ( this.axis.split( '' ).some( function ( a ) {
 
@@ -1538,6 +1541,7 @@ class TransformControlsGizmo extends Object3D {
 				} ) ) {
 
 					handle.material.color.setHex( 0xffff00 );
+					handle.material.opacity = 1.0;
 
 				}
 
