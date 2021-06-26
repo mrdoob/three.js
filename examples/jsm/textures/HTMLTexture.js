@@ -179,7 +179,7 @@ class HTMLTexture extends CanvasTexture {
 
 			const xml = new XMLSerializer().serializeToString( sroot );
 
-			const browserBugScale = navigator.userAgent.indexOf( 'AppleWebKit/' ) > -1 ? 1.5 : 1;
+			const browserBugScale = navigator.userAgent.indexOf( 'AppleWebKit/' ) > - 1 ? 1.5 : 1;
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * browserBugScale}" height="${height * browserBugScale}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
 
