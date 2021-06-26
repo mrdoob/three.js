@@ -307,9 +307,13 @@ class HTMLTexture extends CanvasTexture {
 
 		style.zIndex = '1000000';
 
+		if( x > innerWidth ) style.left = ( innerWidth / 2 ) - x;
+		if( y > innerHeight ) style.top = ( innerHeight / 2 ) - y;
 
 		const element = this.document.elementFromPoint( x, y );
 
+		style.left = 0;
+		style.top = 0;
 
 		style.pointerEvents = 'none';
 
