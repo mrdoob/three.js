@@ -435,7 +435,7 @@
 
 				} else {
 
-					onMouseUp( event );
+					onMouseUp();
 
 				} //
 
