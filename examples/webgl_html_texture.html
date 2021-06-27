@@ -35,6 +35,9 @@
 					border-radius: 1rem;
 					overflow: hidden;
 				}
+				#html-box > span:hover {
+					background-color: red;
+				}
 				#html-box > span {
 					display: block;
 					margin-top: 0.5rem;
@@ -103,7 +106,7 @@
 			let mesh;
 			let htmlTexture;
 
-			init().then( animate );
+			init().then( render );
 
 			async function init() {
 
@@ -116,8 +119,11 @@
 
 				htmlTexture = new HTMLTexture( html, 256, 256 );
 
-				await htmlTexture.redrawAsync();
-				htmlTexture.onFinishRedraw = () => htmlTexture.redrawAsync();
+				await htmlTexture.redrawing;
+
+				requestAnimationFrame( animateHTMLTexture );
+
+				window.htmlTexture = htmlTexture;
 
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshBasicMaterial( { map: htmlTexture } );
@@ -135,6 +141,24 @@
 
 			}
 
+			async function animateHTMLTexture() {
+
+				await htmlTexture.redrawing;
+
+				const t = performance.now();
+
+				const loadLoop = ( Math.sin( 6.284 * ( t % 5000 ) / 5000 ) + 1 ) / 2;
+				htmlTexture.document.getElementById( 'load-line' ).style.width = ( 100 * loadLoop ) + '%';
+
+				const textSizeLoop = 1 - ( Math.sin( 6.284 * ( t % 6000 ) / 6000 ) + 1 ) / 2;
+				htmlTexture.document.getElementById( 'flow-text' ).style.fontSize = ( 0.33 + textSizeLoop * 3 ) + 'rem';
+
+				htmlTexture.requestRedraw();
+
+				requestAnimationFrame( animateHTMLTexture );
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -144,20 +168,12 @@
 
 			}
 
-			function animate( t ) {
+			function render() {
 
-				requestAnimationFrame( animate );
+				requestAnimationFrame( render );
 
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
-
-				const loadLoop = ( Math.sin( 6.284 * ( t % 5000 ) / 5000 ) + 1 ) / 2;
-
-				htmlTexture.document.getElementById( 'load-line' ).style.width = ( 100 * loadLoop ) + '%';
-
-				const textSizeLoop = 1 - ( Math.sin( 6.284 * ( t % 6000 ) / 6000 ) + 1 ) / 2;
-
-				htmlTexture.document.getElementById( 'flow-text' ).style.fontSize = ( 0.33 + textSizeLoop * 3 ) + 'rem';
 
 				renderer.render( scene, camera );
 
