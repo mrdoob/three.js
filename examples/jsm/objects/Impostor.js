@@ -22,11 +22,11 @@ const _q = new Quaternion();
 const impostors = [];
 
 const DEFAULT_TEXTURE_SIZE = 64;
-const MAX_UPDATES_PER_FRAME = 10;
+const DEFAULT_MAX_UPDATES_PER_FRAME = 10;
 
 class Impostor extends Mesh {
 
-	constructor( object3D, camera, renderer, scene ) {
+	constructor( object3D, scene, camera, renderer ) {
 
 		const renderTarget = new WebGLRenderTarget(
 			DEFAULT_TEXTURE_SIZE,
@@ -50,28 +50,28 @@ class Impostor extends Mesh {
 		super( geometry, material );
 
 		this.scale.set( 10, 10, 1 );
+		scene.add( this );
 
 		//
 
-		this.renderTarget = renderTarget;
-		this.type = 'Impostor';
-		this.enabled = true;
-		this.redrawInterval = null; // in ms, skipped if null.
-		this.impostureDistance = 110; // world distance.
-		this.maxAngle = 0.5;
 		this.camera = camera;
+		this.enabled = true;
+		this.impostureDistance = 110;
+		this.lights = [];
+		this.maxAngle = 0.5;
+		this.redrawInterval = null;
 		this.renderer = renderer;
 		this.scene = scene;
-		this.visible = false;
-		this.lights = [];
 
-		this.scene.add( this );
+		this.type = 'Impostor';
+		this.visible = false;
 
 		// internal
 
 		object3D._impostor = this;
 		this._forged = object3D;
 
+		this._renderTarget = renderTarget;
 		this._isForging = false;
 		this._lastViewAngle = new Vector3();
 		this._boundingBox = new Box3();
@@ -84,6 +84,8 @@ class Impostor extends Mesh {
 
 	}
 
+	static maxUpdatesPerFrame = DEFAULT_MAX_UPDATES_PER_FRAME;
+
 	static updateAll() {
 
 		for ( let i = 0; i < impostors.length; i ++ ) {
@@ -95,7 +97,7 @@ class Impostor extends Mesh {
 		impostors
 			.filter( i => i._mustRedraw )
 			.sort( ( a, b ) => a._lastDistToCam - b._lastDistToCam )
-			.filter( ( i, idx ) => idx < MAX_UPDATES_PER_FRAME )
+			.filter( ( i, idx ) => idx < this.maxUpdatesPerFrame )
 			.forEach( i => i.redraw() );
 
 	}
@@ -173,9 +175,11 @@ class Impostor extends Mesh {
 
 		} else {
 
-			this.renderTarget.setSize( width, width );
+			this._renderTarget.setSize( width, width );
 
 		}
+
+		return this;
 
 	}
 
@@ -266,7 +270,7 @@ class Impostor extends Mesh {
 
 		// render the texture.
 
-		this.renderer.setRenderTarget( this.renderTarget );
+		this.renderer.setRenderTarget( this._renderTarget );
 		this.renderer.render( this._forged, this.camera );
 
 		// undo changes made for the texture render.
@@ -320,6 +324,10 @@ class Impostor extends Mesh {
 		//
 
 		this._mustRedraw = false;
+
+		//
+
+		return this;
 
 	}
 

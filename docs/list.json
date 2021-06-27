@@ -382,7 +382,8 @@
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare"
+				"Lensflare": "examples/en/objects/Lensflare",
+				"Impostor": "examples/en/objects/Impostor"
 			},
 
 			"Post-Processing": {
