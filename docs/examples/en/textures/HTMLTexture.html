@@ -24,27 +24,52 @@
 		<h2>Code Example</h2>
 
 		<code>
-		const html = await ( await fetch('my-ui.html') ).text();
+		async function setupMyHTMLTexture() {
 
-		const width = 256;
-		const height = 256;
+			const myUI = await fetch('my-ui.html');
+			const html = await myUI.text();
+	
+			const width = 256;
+			const height = 256;
+	
+			const htmlTexture = new HTMLTexture( html , width , height );
+	
+			//set up event listeners 
+			let myButton = htmlTexture.document.querySelector( 'my-button' );
+			myButton.onclick = async function() {
+	
+				console.log( "My button was clicked!" );
+	
+				//Change the button's style:
+	
+				//await redraw (avoids drawing half-styled changes)
+				await htmlTexture.redrawing;
+	
+				this.className = "clicked";
+	
+				//always request redraw after changes
+				htmlTexture.requestRedraw();
+	
+			}
+	
+			//update your element styles
+			const someElement = htmlTexture.document.getElementById( 'my-element' );
+			someElement.classList.add( "highlighted" );
+	
+			//always request redraw after changes
+			htmlTexture.requestRedraw();
 
-		const htmlTexture = new HTMLTexture( html , width , height );
+			return htmlTexture;
+		}
+		</code>
 
-
+		Example with CSS animations and transitions:
+		<code>
 		function render() {
 
-			/* Update styles, text, etc. */
-
-			const someElement = htmlTexture.document.getElementById( 'my-element' );
-
-			someElement.classList.add( "highlighted" );
-
-			/* Redraw the texture. */
-
-			htmlTexture.redrawAsync();
-
-
+			//request redraw every frame for CSS animations and transitions
+			myHTMLTexture.requestRedraw();
+			
 			renderer.render( scene, camera );
 
 		}
@@ -75,13 +100,25 @@
 
 		<h3>[property:HTMLDocument document]</h3>
 		<p>
-			The texture's current html document.<br />
-			This will be replaced if a new html string is passed to [page:HTMLTexture.redrawAsync redrawAsync].
+			The texture's current html document.<br /><br />
+
+			This will be replaced if a new html string is passed to [page:HTMLTexture.requestRedraw requestRedraw].<br />
+
 		</p>
 
-		<h3>[property:Function onFinishRedraw]</h3>
+		<h3>[property:Promise redrawing]</h3>
 		<p>
-		A callback function, called when the texture has finished redrawing.
+		A convenient promise for waiting until redraw finishes.<br /><br />
+		If not redrawing at the moment, this promise is already resolved.<br />
+		If redrawing, this promise will resolve when redraw finishes.<br /><br />
+
+		You can avoid redrawing partial changes using await:
+		<code>
+		await myHTMLTexture.redrawing;
+
+		hyHTMLTexture.document.querySelector( "..." ); 
+		//etc...
+		</code>
 		</p>
 
 		<h2>Methods</h2>
@@ -103,15 +140,19 @@
 			From the texture's HTML document, returns the element at (x,y).
 		</p>
 
-		<h3>[method:Promise redrawAsync]( [param:String html], [param:Number width], [param:Number height] )</h3>
+		<h3>[method:Promise requestRedraw]( [param:String html], [param:Number width], [param:Number height] )</h3>
 		<p>
-			Parameters are the same as [page:HTMLTexture.Constructor].<br /><br />
+			[page:String html] -- (optional) If set, will completely replace your texture's html document.<br />
+			[page:Number width] -- (optional) If set, will change your texture's width.<br />
+			[page:Number height] -- (optional) If set, will change your texture's height.<br /><br />
 
 			Redraw the texture's HTML document after changes.<br /><br />
 
 			If html is specified, the texture's document will be completely replaced by the new html.<br /><br />
 
 			If width and height are specified, the texture's dimensions will change and the HTML will reflow.<br /><br />
+
+			If already redrawing, this function does nothing.<br /><br />
 		</p>
 
 		<h2>Source</h2>
