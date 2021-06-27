@@ -454,8 +454,7 @@ class HTMLTexture extends CanvasTexture {
 
 				if ( ! start ) {
 
-					//No support for :focus
-					//if ( typeof target.focus === 'function' ) target.focus();
+					if ( typeof target.focus === 'function' ) target.focus();
 
 					if ( typeof target.click === 'function' ) target.click();
 
