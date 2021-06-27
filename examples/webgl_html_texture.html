@@ -103,10 +103,9 @@
 			let mesh;
 			let htmlTexture;
 
-			init();
-			animate();
+			init().then( animate );
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 400;
@@ -116,6 +115,9 @@
 				const html = document.getElementById( 'texture-contents' ).innerHTML;
 
 				htmlTexture = new HTMLTexture( html, 256, 256 );
+
+				await htmlTexture.redrawAsync();
+				htmlTexture.onFinishRedraw = () => htmlTexture.redrawAsync();
 
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshBasicMaterial( { map: htmlTexture } );
@@ -151,13 +153,11 @@
 
 				const loadLoop = ( Math.sin( 6.284 * ( t % 5000 ) / 5000 ) + 1 ) / 2;
 
-				htmlTexture.document.getElementById( 'load-line' ).style.width = (100*loadLoop) + '%';
+				htmlTexture.document.getElementById( 'load-line' ).style.width = ( 100 * loadLoop ) + '%';
 
 				const textSizeLoop = 1 - ( Math.sin( 6.284 * ( t % 6000 ) / 6000 ) + 1 ) / 2;
 
-				htmlTexture.document.getElementById( 'flow-text' ).style.fontSize = (0.33 + textSizeLoop*3) + 'rem';
-
-				htmlTexture.redrawAsync();
+				htmlTexture.document.getElementById( 'flow-text' ).style.fontSize = ( 0.33 + textSizeLoop * 3 ) + 'rem';
 
 				renderer.render( scene, camera );
 
