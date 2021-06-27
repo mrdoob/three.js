@@ -27,19 +27,21 @@ class HTMLTexture extends CanvasTexture {
 		this._createDocument();
 
 
-		this.onFinishRedraw = null;
-
+		this._redrawing = false;
+		this.redrawing = new Promise( ()=>{} );
 
 		this._cache = {};
 		this._urlcache = {};
 
 
 		this._pointers = new WeakMap();
-
+		this._queue = [];
 		this._pointerId = 0;
 
 
-		this.redrawAsync( html, width, height );
+		this._init( html );
+
+		this.requestRedraw();
 
 	}
 
@@ -49,7 +51,10 @@ class HTMLTexture extends CanvasTexture {
 
 		this.document = this._node.contentWindow.document;
 
+
 		this._cssNode = this.document.head.appendChild( this.document.createElement( 'style' ) );
+
+		this._proxyCanvas = document.createElement( 'canvas' );
 
 
 		//TODO abbreviate this
@@ -65,26 +70,43 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
-	async redrawAsync( html, width, height ) {
+	_init( html ) {
 
-		const scope = this;
-
-		const doc = scope.document;
-
+		if ( this._redrawing === true ) return;
 
 		if ( html ) {
 
-			doc.open();
-			doc.write( html );
-			doc.close();
+			this.document.open();
+			this.document.write( html );
+			this.document.close();
 
-			scope._cssNode.textContent = '';
-			doc.head.appendChild( scope._cssNode );
+			this._cssNode = this.document.head.appendChild( this.document.createElement( 'style' ) );
+			this._cssNode.id = 'htmltexture-style';
 
 		}
 
+	}
 
-		return new Promise( async resolve => {
+	requestRedraw( html = '', width = this.image.width, height = this.image.height ) {
+
+		if ( this._redrawing === true ) return;
+
+		if ( html ) this._init( html );
+
+		const scope = this;
+
+		const doc = this.document;
+
+		this._redrawing = true;
+
+		this.redrawing = new Promise( async resolve => {
+
+			//The document may change at any point during the async process.
+			//The draw must not fail on in-process changes, but its behavior is undefined.
+
+			//block for image load
+			await Promise.all( Array.from( doc.querySelectorAll( 'img' ) ).map( image => new Promise( load => image.complete ? load() : image.addEventListener( 'load', load ) ) ) );
+
 
 			//simulate hover
 			const importedSheets = new Set();
@@ -114,13 +136,10 @@ class HTMLTexture extends CanvasTexture {
 			if ( scope._cssNode.textContent !== css ) scope._cssNode.textContent = css;
 
 
-			//block for image load
-			await Promise.all( Array.from( doc.querySelectorAll( 'img' ) ).map( image => new Promise( load => image.complete ? load() : image.addEventListener( 'load', load ) ) ) );
 
+			scope._node.style.width = width + 'px';
 
-			scope._node.style.width = ( width = scope.image.width = width || scope.image.width ) + 'px';
-
-			scope._node.style.height = ( height = scope.image.height = height || scope.image.height ) + 'px';
+			scope._node.style.height = height + 'px';
 
 
 			//collect css urls
@@ -219,7 +238,7 @@ class HTMLTexture extends CanvasTexture {
 			//enable visuals
 			const proxies = [];
 
-			const _canvas = document.createElement( 'canvas' );
+			const _canvas = scope._proxyCanvas;
 
 			const D = async ( i ) => {
 
@@ -249,16 +268,17 @@ class HTMLTexture extends CanvasTexture {
 
 				if ( ! d ) {
 
-					_canvas.width = i.width;
-					_canvas.height = i.height;
+					_canvas.width = i.width || 0;
+					_canvas.height = i.height || 0;
 
-					_canvas.getContext( '2d' ).drawImage( i, 0, 0, i.width, i.height );
+					if ( i instanceof HTMLImageElement || i instanceof HTMLVideoElement || i instanceof HTMLCanvasElement )
+						_canvas.getContext( '2d' ).drawImage( i, 0, 0, i.width, i.height );
 
 					d = new Image(); d.src = _canvas.toDataURL();
 
 				}
 
-				if ( i instanceof HTMLImageElement ) scope._cache[ i.src ] = d;
+				if ( i instanceof HTMLImageElement && i.src ) scope._cache[ i.src ] = d;
 
 				d.setAttribute( 'style', style );
 
@@ -266,15 +286,19 @@ class HTMLTexture extends CanvasTexture {
 
 			};
 
-			await Promise.all( Array.from( doc.querySelectorAll( 'img, canvas, video, svg' ) ).map( async v => proxies.push( [ v.parentNode, v, await D( v ) ] ) ) );
+			await Promise.all( Array.from( doc.querySelectorAll( 'img, canvas, video, svg' ) ).map( async v => ( ( v, d ) => proxies.push( [ v.parentNode, v, d ] ) )( await D( v ) ) ) );
 
 
+			//-----------------BEGIN SYNC!------------------------
 			//-------------BEGIN DO NOT REFLOW!-------------------
 
+			//Proxied elements may have become disconnected or moved during proxy construction
+			proxies.forEach( p => p[ 0 ] = p[ 1 ].parentNode );
+
 			//freeze CSS animations
-			styledElements.forEach( ( [ cssText ], e ) => e.setAttribute( 'style', cssText ) );
+			styledElements.forEach( ( [ cssText ], e ) => ( e instanceof HTMLElement ) ? e.setAttribute( 'style', cssText ) : null );
 			//install proxies
-			proxies.forEach( ( [ p, e, r ] ) => ( p.insertBefore( r, e ), p.removeChild( e ) ) );
+			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement && p.contains( e ) ) ? ( p.insertBefore( r, e ), p.removeChild( e ) ) : null );
 
 
 			const xml = new XMLSerializer().serializeToString( doc );
@@ -284,33 +308,46 @@ class HTMLTexture extends CanvasTexture {
 
 
 			//remove proxies
-			proxies.forEach( ( [ p, e, r ] ) => ( p.insertBefore( e, r ), p.removeChild( r ) ) );
+			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement ) ? ( p.insertBefore( e, r ), p.removeChild( r ) ) : null );
 			//unfreeze CSS animations
-			styledElements.forEach( ( [ , originalCssText ], e ) => e.setAttribute( 'style', originalCssText ) );
+			styledElements.forEach( ( [ , originalCssText ], e ) => ( e instanceof HTMLElement ) ? e.setAttribute( 'style', originalCssText ) : null );
 
 			//----------------end do not reflow-------------------
+			//---------------------end sync-----------------------
 
 
 			const image = new Image();
 
 			image.onload = () => {
 
+				scope.image.width = width;
+				scope.image.height = height;
+
 				const context = scope.image.getContext( '2d' );
 
-				context.clearRect( 0, 0, width, height );
 				context.drawImage( image, 0, 0, width, height );
 
 				scope.needsUpdate = true;
 
-				resolve();
+				this._redrawing = false;
 
-				if ( scope.onFinishRedraw ) setTimeout( scope.onFinishRedraw, 1 );
+				for ( let i = 0; i < scope._queue.length; i ++ ) {
+
+					const [ action, ...parameters ] = scope._queue[ i ];
+
+					scope[ action ]( ...parameters );
+
+				}
+
+				resolve();
 
 			};
 
 			image.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent( svg );
 
 		} );
+
+		return this.redrawing;
 
 	}
 
@@ -321,6 +358,14 @@ class HTMLTexture extends CanvasTexture {
 
 	addPointer( vec2, down ) {
 
+		if ( this._redrawing ) this._queue.push( [ '_addPointer', vec2, { x: vec2.x, y: vec2.y }, down ] );
+
+		else this._addPointer( vec2, vec2, down );
+
+	}
+
+	_addPointer( key, vec2, down ) {
+
 		const { x, y } = vec2;
 
 		down = !! down;
@@ -328,15 +373,23 @@ class HTMLTexture extends CanvasTexture {
 
 		const target = this.elementFromPoint( x, y );
 
-		this._pointers.set( vec2, Object.freeze( { x, y, target, down, pointerId: this._pointerId ++ } ) );
+		this._pointers.set( key, Object.freeze( { x, y, target, down, pointerId: this._pointerId ++ } ) );
 
-		this.updatePointer( vec2, down, true );
+		this._updatePointer( key, vec2, down, true );
 
 	}
 
-	updatePointer( vec2, down, start = false ) {
+	updatePointer( vec2, down ) {
 
-		const pointer = this._pointers.get( vec2 );
+		if ( this._redrawing ) this._queue.push( [ '_updatePointer', vec2, { x: vec2.x, y: vec2.y }, down ] );
+
+		else this._updatePointer( vec2, vec2, down );
+
+	}
+
+	_updatePointer( key, vec2, down, start = false ) {
+
+		const pointer = this._pointers.get( key );
 
 		if ( ! pointer ) return;
 
@@ -414,7 +467,7 @@ class HTMLTexture extends CanvasTexture {
 
 		}
 
-		this._pointers.set( vec2, Object.freeze( { x, y, target, down, pointerId: pointer.pointerId } ) );
+		this._pointers.set( key, Object.freeze( { x, y, target, down, pointerId: pointer.pointerId } ) );
 
 	}
 
