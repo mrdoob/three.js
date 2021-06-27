@@ -4,8 +4,21 @@ class HTMLTexture extends CanvasTexture {
 
 	constructor( html, width, height, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-		const canvas = document.createElement( 'canvas' );
+		if ( html && typeof html !== 'string' ) {
 
+			//If we accept HTML elements, users will expect listeners to be preserved.
+			//But listeners transferred to the iframe still run document.querySelector in the listener's context.
+			//Too confusing to use imho. :-/
+
+			console.error( `Expected HTMLTexture( html: <string> ). Got html: <${ typeof html }>. Document will be blank.` );
+
+			html = '';
+
+		}
+
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = width;
+		canvas.height = height;
 
 		super( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
@@ -18,6 +31,7 @@ class HTMLTexture extends CanvasTexture {
 
 
 		this._cache = {};
+		this._urlcache = {};
 
 
 		this._pointers = new WeakMap();
@@ -36,6 +50,7 @@ class HTMLTexture extends CanvasTexture {
 		this.document = this._node.contentWindow.document;
 
 
+		//TODO abbreviate this
 		const unstyled = this.document.body.appendChild( new ( customElements.get( 'htmltexture-default' ) )() );
 
 		const unstyle = getComputedStyle( unstyled );
@@ -52,22 +67,21 @@ class HTMLTexture extends CanvasTexture {
 
 		const scope = this;
 
-		const sroot = scope.document;
+		const doc = scope.document;
 
 
 		if ( html ) {
 
-			sroot.open();
-			sroot.write( html );
-			sroot.close();
+			doc.open();
+			doc.write( html );
+			doc.close();
 
 		}
 
 
 		return new Promise( async resolve => {
 
-			//enable css, simulate hover
-			//TODO css url image, font
+			//simulate hover
 			const importedSheets = new Set();
 
 			const C = ( r, t ) => {
@@ -90,11 +104,11 @@ class HTMLTexture extends CanvasTexture {
 
 			};
 
-			const css = C( sroot );
+			const css = C( doc );
 
 
 			//block for image load
-			await Promise.all( Array.from( sroot.querySelectorAll( 'img' ) ).map( image => new Promise( load => image.complete ? load() : image.addEventListener( 'load', load ) ) ) );
+			await Promise.all( Array.from( doc.querySelectorAll( 'img' ) ).map( image => new Promise( load => image.complete ? load() : image.addEventListener( 'load', load ) ) ) );
 
 
 			scope._node.style.width = ( width = scope.image.width = width || scope.image.width ) + 'px';
@@ -102,18 +116,97 @@ class HTMLTexture extends CanvasTexture {
 			scope._node.style.height = ( height = scope.image.height = height || scope.image.height ) + 'px';
 
 
+			//collect css urls
+			const urls = [];
+
+			const urlid = ( s, e ) => {
+
+				if ( ( ! ( /^url\("/ ).test( s ) ) ) return s;
+
+				let id;
+				do id = Math.random().toString().substring( 2 );
+				while ( urls[ id ] );
+
+				urls.push( [ e, id, s ] );
+
+				return `{{url${ id }}}`;
+
+			};
+
 
 			//collect CSS animations
 			const styledElements = new Map();
 
-			Array.from( sroot.querySelectorAll( '*' ) ).
+			Array.from( doc.querySelectorAll( '*' ) ).
 
 				map( e => ( [ e, getComputedStyle( e ), Array.from( getComputedStyle( e ) ) ] ) ).
 
-				map( ( [ e, style, names ] ) => ( [ e, names.map( name => ( style[ name ] !== this._unstyle[ name ] ) ? `${ name }:${ style[ name ] }; ` : '' ).join( '' ) ] ) ).
+				map( ( [ e, style, names ] ) => ( [ e, names.map( name => ( style[ name ] !== scope._unstyle[ name ] ) ? `${ name }:${ ( urlid( style[ name ], e ) ) }; ` : '' ).join( '' ) ] ) ).
 
 				forEach( ( [ e, cssText ] ) => cssText ? styledElements.set( e, [ cssText, e.style.cssText ] ) : null );
 
+
+			//fetch css urls
+			await Promise.all( urls.map( async ( [ e, id, s ] ) => {
+
+				const [ css, ocss ] = styledElements.get( e );
+
+				let rs = s;
+				let i = 0, j = 0;
+				while ( true ) {
+
+					//getComputedStyle()'s URLs never have illegal characters. Easy parsing.
+					i = s.indexOf( 'url("', j ); j = s.indexOf( '")', i );
+
+					if ( i === - 1 || j === - 1 ) break;
+
+					const u = s.substring( i + 5, j );
+
+					if ( ( /^data:/ ).test( u ) ) continue;
+
+					if ( scope._urlcache[ u ] ) {
+
+						rs = rs.replace( u, scope._urlcache[ u ] );
+
+						continue;
+
+					}
+
+					const r = new FileReader();
+
+					const fetched = await ( new Promise( async load => {
+
+						r.addEventListener( 'load', () => load( true ) );
+
+						let f;
+
+						try {
+
+							f = await fetch( u );
+
+						} catch ( e ) {
+
+							load( false );
+
+						}
+
+						if ( ! f ) load( false );
+
+						r.readAsDataURL( await f.blob() );
+
+					} ) );
+
+					if ( ! fetched ) continue;
+
+					scope._urlcache[ u ] = `${ r.result }`;
+
+					rs = rs.replace( u, scope._urlcache[ u ] );
+
+				}
+
+				styledElements.set( e, [ css.replace( `{{url${ id }}}`, rs ), ocss ] );
+
+			} ) );
 
 
 			//enable visuals
@@ -166,7 +259,7 @@ class HTMLTexture extends CanvasTexture {
 
 			};
 
-			await Promise.all( Array.from( sroot.querySelectorAll( 'img, canvas, video, svg' ) ).map( async v => proxies.push( [ v.parentNode, v, await D( v ) ] ) ) );
+			await Promise.all( Array.from( doc.querySelectorAll( 'img, canvas, video, svg' ) ).map( async v => proxies.push( [ v.parentNode, v, await D( v ) ] ) ) );
 
 
 			//-------------BEGIN DO NOT REFLOW!-------------------
@@ -177,7 +270,7 @@ class HTMLTexture extends CanvasTexture {
 			proxies.forEach( ( [ p, e, r ] ) => ( p.insertBefore( r, e ), p.removeChild( e ) ) );
 
 
-			const xml = new XMLSerializer().serializeToString( sroot );
+			const xml = new XMLSerializer().serializeToString( doc );
 
 			const browserBugScale = navigator.userAgent.indexOf( 'AppleWebKit/' ) > - 1 ? 1.5 : 1;
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * browserBugScale}" height="${height * browserBugScale}"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
@@ -198,7 +291,7 @@ class HTMLTexture extends CanvasTexture {
 				const context = scope.image.getContext( '2d' );
 
 				context.clearRect( 0, 0, width, height );
-				context.drawImage( image, 0, 0 );
+				context.drawImage( image, 0, 0, width, height );
 
 				scope.needsUpdate = true;
 
