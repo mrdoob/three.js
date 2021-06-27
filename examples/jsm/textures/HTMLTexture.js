@@ -49,6 +49,8 @@ class HTMLTexture extends CanvasTexture {
 
 		this.document = this._node.contentWindow.document;
 
+		this._cssNode = this.document.head.appendChild( this.document.createElement( 'style' ) );
+
 
 		//TODO abbreviate this
 		const unstyled = this.document.body.appendChild( new ( customElements.get( 'htmltexture-default' ) )() );
@@ -76,6 +78,9 @@ class HTMLTexture extends CanvasTexture {
 			doc.write( html );
 			doc.close();
 
+			scope._cssNode.textContent = '';
+			doc.head.appendChild( scope._cssNode );
+
 		}
 
 
@@ -98,13 +103,15 @@ class HTMLTexture extends CanvasTexture {
 
 				if ( r instanceof CSSRuleList ) return Array.from( r ).map( C ).join( '\n' );
 
-				if ( r instanceof CSSStyleSheet ) return C( r.cssRules );
+				if ( r instanceof CSSStyleSheet ) return ( r.ownerNode === scope._cssNode ) ? '\n' : C( r.cssRules );
 
 				if ( r instanceof Document ) return Array.from( r.styleSheets ).map( C ).join( '\n' );
 
 			};
 
 			const css = C( doc );
+
+			if ( scope._cssNode.textContent !== css ) scope._cssNode.textContent = css;
 
 
 			//block for image load
