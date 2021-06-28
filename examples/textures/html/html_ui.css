@@ -1,0 +1,275 @@
+body {
+
+    --transition-speed: 0.5s;
+    --menu-color: rgb(70, 92, 147);
+    --back-color: rgb(25, 25, 25);
+    --text-color: rgb(255, 255, 255);
+
+
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: var(--back-color);
+    color: var(--text-color);
+    font-size: 1.67rem;
+    
+
+    overflow: hidden;
+
+    margin: 0;
+    margin-left: 4rem;
+
+}
+
+
+.menu {
+
+    list-style-type: none;
+
+    transition: width var(--transition-speed);
+
+    font-size: 1.67rem;
+
+
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    height: 100vh;
+    width: 100vw; /* overwritten to 5rem in .menu.collapsed */
+
+    box-shadow: 13rem 0 0 0 var(--menu-color) inset;
+
+    margin: 0;
+
+    padding-top: 6rem;
+    padding-left: 0;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+}
+
+.menu.collapsed { 
+
+    width: 5rem; /* overwrites 100vw in .menu */
+
+    box-shadow: 4rem 0 0 0 var(--menu-color) inset;
+
+}
+
+.menu > .screen-cover {
+
+    background: linear-gradient(90deg, var(--menu-color) 0%, rgba(0, 0, 0, 0.001) 100%);
+
+    opacity: 1.0; /* overwritten to 0.0 in .menu.collapsed > .screen-cover */
+
+    transition: opacity var(--transition-speed), width var(--transition-speed), left calc( var(--transition-speed) / 4 );
+
+    position: absolute;
+    left: 12rem;
+    top: 0;
+
+    width: 100vw; /* overwritten to 0 in .menu.collapsed > .screen-cover */
+    height: 100vh;
+
+}
+
+.menu.collapsed > .screen-cover {
+
+    opacity: 0.0; /* overwrites 1.0 in .menu > .screen-cover */
+
+    width: 0;  /* overwrites 100vw in .menu > .screen-cover */
+
+    left: 4rem;
+}
+
+
+.menu img {
+
+    width: 4rem;
+    height: 4rem;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    margin-right: 1rem;
+
+    border: 0;
+
+    transition: border-width var(--transition-speed);
+
+}
+
+
+.menu > img.hamburger {
+
+    position: absolute;
+    left: 0;
+    top: 0;
+
+}
+
+.menu > img.hamburger:hover {
+
+    transform: scale(1.25);
+
+}
+
+.menu > li {
+
+    white-space: nowrap;
+
+
+    position: relative;
+    z-index: 100;
+
+    height: 4rem;
+    width: 10rem; /* overwritten to 4rem in .menu.collapsed > ul */
+
+    margin-top: 1rem;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+
+    color: var(--text-color); /* overwritten to transparent in .menu.collapsed > ul */
+
+    transition: color var(--transition-speed);
+}
+
+.menu.collapsed > li {
+
+    width: 4rem;
+
+    color: transparent;
+
+}
+
+.menu > li:hover > img {
+
+    border-right: 1rem solid rgba(255, 255, 255, 0.5);
+
+}
+
+.menu > li.selected > img {
+
+    border-right: 1rem solid var(--text-color);
+
+}
+
+.panel {
+
+    box-sizing: border-box;
+    
+    position: absolute;
+    left: 8rem;
+    top: 4rem;
+
+    border: 1px solid white;
+
+    height: calc( 100vh - 10rem );
+    width: calc( 100vw - 10rem );
+
+    padding: 2rem;
+
+    overflow: hidden;
+
+}
+
+#css-cube {
+
+    --face-size: 40vw;
+
+    perspective: calc( var( --face-size ) * 2.0 );
+
+}
+
+#css-cube-container {
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    transform-style: preserve-3d;
+    transform: rotateX( 45deg ) rotateY( 45deg ) translateY( calc( -1.2 * ( var( --face-size ) / 2.0 ) ) ) translateX( calc( var( --face-size ) / 2.0 ) ) translateZ( calc( -1.0 * ( var( --face-size ) / 2.0 ) ) );
+
+}
+
+#css-cube-container > div {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 4rem;
+
+    width: var(--face-size);
+    height: var(--face-size);
+
+    position: absolute;
+    left: calc( 50% - ( var( --face-size ) / 2.0 ) );
+    top: calc( 50% - ( var( --face-size ) / 2.0 ) );
+
+    box-sizing: border-box;
+
+}
+
+#css-cube-container > .face-1 {
+
+    transform: rotateY( 0deg ) translateZ( calc( var( --face-size ) / 2.0 ) );
+    background-color: rgba( 255, 0, 0, 0.5 );
+    border:5px solid rgb(255, 0, 0);
+
+}
+
+#css-cube-container > .face-2 {
+
+    transform: rotateY( 90deg ) translateZ( calc( var( --face-size ) / 2.0 ) );
+    background-color: rgba( 0, 255, 0, 0.5 );
+    border:5px solid rgb(0, 255, 0);
+
+}
+
+#css-cube-container > .face-3 {
+
+    transform: rotateY( 180deg ) translateZ( calc( var( --face-size ) / 2.0 ) );
+    background-color: rgba( 0, 0, 255, 0.5 );
+    border:5px solid rgb(0, 0, 255);
+
+}
+
+#css-cube-container > .face-4 {
+
+    transform: rotateY( -90deg ) translateZ( calc( var( --face-size ) / 2.0 ) );
+    background-color: rgba( 255, 255, 0, 0.5 );
+    border:5px solid rgb( 255, 255, 0);
+
+}
+
+#css-cube-container > .face-5 {
+
+    transform: rotateX( 90deg ) translateZ( calc( var( --face-size ) / 2.0 ) );
+    background-color: rgba( 0, 255, 255, 0.5 );
+    border:5px solid rgb( 0, 255, 255 );
+
+}
+
+#css-cube-container > .face-6 {
+
+    transform: rotateX( -90deg ) translateZ( calc( var( --face-size ) / 2.0 ) );
+    background-color: rgba( 255, 0, 255, 0.5 );
+    border:5px solid rgb( 255, 0, 255 );
+
+}
+
+#lorem-ipsum {
+
+    font-size: 1.67rem;
+
+}
