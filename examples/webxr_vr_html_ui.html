@@ -83,24 +83,26 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				htmlTexture = new HTMLTexture( 'textures/html/html_ui.html', 512, 512 );
-
-				window.htmlTexture = htmlTexture;
-
-				await htmlTexture.redrawing;
-
 				if ( location.origin === 'https://raw.githack.com' ) {
 
-					htmlTexture._node.src = 'about:blank';
+					htmlTexture = new HTMLTexture( '', 512, 512 );
+
+					window.htmlTexture = htmlTexture;
+
+					await htmlTexture.redrawing;
 
 					htmlTexture.document.body.innerHTML = '<p style="text-align:center; color:red;">GitHack.com\'s local-cross-origin security settings prevent this example from running. Please use localhost or a secure domain.';
 
-					htmlTexture.requestRedraw();
-					
-					await htmlTexture.redrawing;
-					
-				}
+				} else {
 
+					htmlTexture = new HTMLTexture( 'textures/html/html_ui.html', 512, 512 );
+
+					window.htmlTexture = htmlTexture;
+
+					await htmlTexture.redrawing;
+
+				}
+			
 				htmlTexture.addPointer( pointer, false );
 
 				const geometry = new THREE.PlaneGeometry( 0.2, 0.2, 1, 1 );
