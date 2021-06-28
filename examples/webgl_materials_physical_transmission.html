@@ -27,6 +27,7 @@
 				opacity: 1,
 				metalness: 0,
 				roughness: 0,
+				reflectivity: 0.5,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
@@ -92,6 +93,7 @@
 					color: params.color,
 					metalness: params.metalness,
 					roughness: params.roughness,
+					reflectivity: params.reflectivity,
 					alphaMap: texture,
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
@@ -154,6 +156,13 @@
 
 					} );
 
+				gui.add( params, 'reflectivity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.reflectivity = params.reflectivity;
+
+					} );
+
 				gui.add( params, 'envMapIntensity', 0, 1, 0.01 )
 					.name( 'envMap intensity' )
 					.onChange( function () {
@@ -205,10 +214,10 @@
 
 				requestAnimationFrame( animate );
 
-				const t = performance.now();
+				//const t = performance.now();
 
-				mesh.rotation.x = t * 0.0002;
-				mesh.rotation.z = - t * 0.0002;
+				//mesh.rotation.x = t * 0.0002;
+				//mesh.rotation.z = - t * 0.0002;
 
 				stats.begin();
 				renderer.render( scene, camera );
