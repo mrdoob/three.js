@@ -115,7 +115,7 @@
 			// likely only a minor optimization,
 			// but why check for threshold every iteration
 			// in cases when we aren't even using it?
-			if ( threshold ) {
+			if ( threshold >= 0 ) {
 
 				while ( z -- ) {
 
