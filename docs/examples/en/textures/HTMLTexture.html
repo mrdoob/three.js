@@ -15,8 +15,9 @@
 
 			Note:
 			<ul>
-				<li>Iframes are not supported.</li>
-				<li>Depending on security settings, cross-origin content may not render.</li>
+				<li>Iframes are not currently supported, but may be in the future.</li>
+				<li>Large images, videos, and webgl will hurt performance. Not recommended.</li>
+				<li>Depending on security settings, cross-origin content may not render (especially cross-origin CSS @import stylesheets).</li>
 			</ul>
 
 		</p>
@@ -26,13 +27,12 @@
 		<code>
 		async function setupMyHTMLTexture() {
 
-			const myUI = await fetch('my-ui.html');
-			const html = await myUI.text();
-	
+			const myFileURL = 'res/ui/my-ui.html';
+
 			const width = 256;
 			const height = 256;
 	
-			const htmlTexture = new HTMLTexture( html , width , height );
+			const htmlTexture = new HTMLTexture( myFileURL , width , height );
 	
 			//set up event listeners 
 			let myButton = htmlTexture.document.querySelector( 'my-button' );
@@ -63,33 +63,21 @@
 		}
 		</code>
 
-		Example with CSS animations and transitions:
-		<code>
-		function render() {
-
-			//request redraw every frame for CSS animations and transitions
-			myHTMLTexture.requestRedraw();
-			
-			renderer.render( scene, camera );
-
-		}
-		</code>
-
 		<h2>Examples</h2>
 
 		<p>
-			[example:webgl_html_texture]<br />
+			[example:webxr_vr_html_ui]<br />
 		</p>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:String html], [param:Number width], [param:Number height], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
+		<h3>[name]( [param:String url], [param:Number width], [param:Number height] )</h3>
 		<p>
-			[page:String html] -- (optional) The html to draw. Defaults to a blank document.<br />
+			[page:String url] -- A URL to your HTML file. Cross-Origin content usually will not work properly.<br />
 			[page:Number width] -- (optional) Texture width. Will default to 300.<br />
 			[page:Number height] -- (optional) Texture height. Will default to 150.<br /><br />
 
-			See [page:CanvasTexture CanvasTexture] and [page:Texture Texture] for texture parameters.<br /><br />
+			See [page:CanvasTexture CanvasTexture] and [page:Texture Texture] for additional texture parameters.<br /><br />
 
 		</p>
 		<p>
@@ -100,21 +88,22 @@
 
 		<h3>[property:HTMLDocument document]</h3>
 		<p>
+
 			The texture's current html document.<br /><br />
 
-			This will be replaced if a new html string is passed to [page:HTMLTexture.requestRedraw requestRedraw].<br />
+			This will be replaced if a new URL is passed to [page:HTMLTexture.requestRedraw requestRedraw].<br />
 
 		</p>
 
 		<h3>[property:Promise redrawing]</h3>
 		<p>
-		A convenient promise for waiting until redraw finishes.<br /><br />
+		A convenient promise to wait for load and redraw to complete.<br /><br />
 		If not redrawing at the moment, this promise is already resolved.<br />
-		If redrawing, this promise will resolve when redraw finishes.<br /><br />
+		If loading or redrawing, this promise will resolve when redraw finishes.<br /><br />
 
 		You can avoid redrawing partial changes using await:
 		<code>
-		await myHTMLTexture.redrawing;
+		await myHTMLTexture.redrawing; //There is no () here.
 
 		hyHTMLTexture.document.querySelector( "..." ); 
 		//etc...
@@ -140,19 +129,24 @@
 			From the texture's HTML document, returns the element at (x,y).
 		</p>
 
-		<h3>[method:Promise requestRedraw]( [param:String html], [param:Number width], [param:Number height] )</h3>
+		<h3>[method:Promise requestRedraw]( [param:String url], [param:Number width], [param:Number height] )</h3>
 		<p>
-			[page:String html] -- (optional) If set, will completely replace your texture's html document.<br />
+			[page:String url] -- (optional) If set, will load and completely replace your texture's html document.<br />
 			[page:Number width] -- (optional) If set, will change your texture's width.<br />
 			[page:Number height] -- (optional) If set, will change your texture's height.<br /><br />
 
-			Redraw the texture's HTML document after changes.<br /><br />
+			Redraw the texture's HTML document after changes.<br />
 
-			If html is specified, the texture's document will be completely replaced by the new html.<br /><br />
+
+			If URL is specified, the new document will load and replace the current document. Redraw will happen after load finishes.<br /><br />
 
 			If width and height are specified, the texture's dimensions will change and the HTML will reflow.<br /><br />
 
-			If already redrawing, this function does nothing.<br /><br />
+			There is no performance cost associated with calling this function multiple times.<br />
+			Please call it after every change to ensure your texture stays up-to-date.<br /><br />
+
+			This function will be called automatically as long as your HTML document is playing a CSS animation or transition.<br />
+			
 		</p>
 
 		<h2>Source</h2>
