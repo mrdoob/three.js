@@ -16,7 +16,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { backupHTML, backupJS } from './textures/html/html-ui-backup.module.js';
+			import { getBackupHTML, getBackupJS } from './jsm/textures/HTMLTexture.example.js';
 
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
@@ -85,7 +85,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				if ( true || location.origin === 'https://raw.githack.com' ) {
+				if ( location.origin === 'https://raw.githack.com' ) {
 
 					htmlTexture = new HTMLTexture( '', 512, 512 );
 
@@ -93,10 +93,10 @@
 
 					await htmlTexture.redrawing;
 
-					htmlTexture.document.body.innerHTML = backupHTML;
+					htmlTexture.document.body.innerHTML = getBackupHTML();
 
 					const sc = htmlTexture.document.createElement( 'script' );
-					sc.textContent = backupJS;
+					sc.textContent = getBackupJS();
 					htmlTexture.document.body.appendChild( sc );
 
 					htmlTexture.requestRedraw();
