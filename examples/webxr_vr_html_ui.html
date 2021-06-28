@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - cubes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - HTML UI
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
+
+			import { HTMLTexture } from './jsm/textures/HTMLTexture.js';
+
+			let container;
+			let camera, scene, htmlTexture, uiPlane, raycaster, renderer;
+
+			//const cursor = { x: - 1, y: - 1, down: false, needsUpdate: true };
+			const cursor = new THREE.Vector2();
+			cursor.x = - 1; cursor.y = - 1; cursor.down = false; cursor.needsUpdate = false;
+
+			const setCursor = ( x, y ) => {
+
+				cursor.x = ( x / ( renderer.domElement.width / devicePixelRatio ) ) * 2 - 1;
+				cursor.y = - ( y / ( renderer.domElement.height / devicePixelRatio ) ) * 2 + 1;
+				cursor.needsUpdate = true;
+
+			};
+
+
+			const pointer = { x: - 1, y: - 1 };
+
+			const updateUIPointer = ( uv_x, uv_y, down ) => {
+
+				pointer.x = uv_x * htmlTexture.image.width;
+				pointer.y = ( 1.0 - uv_y ) * htmlTexture.image.height;
+				htmlTexture.updatePointer( pointer, down );
+
+			};
+
+			let room;
+
+			let controller, controllerGrip;
+			
+			const tempMatrix = new THREE.Matrix4();
+
+			//TODO: unlike CSSRenderer, our UI supports in-game occlusion (and lighting).
+			//		- map to non-plane geometry, inset in occluder geometry
+
+			init().then( animate );
+
+			async function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.set( 0, 1.6, 3 );
+				scene.add( camera );
+
+				room = new THREE.LineSegments(
+					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+					new THREE.LineBasicMaterial( { color: 0x808080 } )
+				);
+				scene.add( room );
+
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 ).normalize();
+				scene.add( light );
+
+				htmlTexture = new HTMLTexture( 'textures/html/html_ui.html', 512, 512 );
+
+				window.htmlTexture = htmlTexture;
+
+				await htmlTexture.redrawing;
+
+				htmlTexture.addPointer( pointer, false );
+
+				const geometry = new THREE.PlaneGeometry( 0.2, 0.2, 1, 1 );
+
+				uiPlane = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: htmlTexture } ) );
+
+				uiPlane.position.y = 1.6;
+				uiPlane.position.z = 2.7;
+				window.uiPlane = uiPlane;
+
+				room.add( uiPlane );
+
+				raycaster = new THREE.Raycaster();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.xr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				window.renderer = renderer;
+
+				const listener = ( ev, t = ev.type ) => ( {
+
+					'mousedown': () => ( cursor.down = true, listener( ev, 'mousemove' ) ),
+					'mousemove': ev => setCursor( ev.offsetX, ev.offsetY ),
+					'mouseup': () => ( cursor.down = false, listener( ev, 'mousemove' ) ),
+
+				}[ t ] )( ev );
+
+				renderer.domElement.addEventListener( 'mousedown', listener );
+				renderer.domElement.addEventListener( 'mousemove', listener );
+				renderer.domElement.addEventListener( 'mouseup', listener );
+
+
+				function onSelectStart() {
+
+					this.userData.isSelecting = true;
+
+				}
+
+				function onSelectEnd() {
+
+					this.userData.isSelecting = false;
+
+				}
+
+				controller = renderer.xr.getController( 0 );
+				controller.addEventListener( 'selectstart', onSelectStart );
+				controller.addEventListener( 'selectend', onSelectEnd );
+				controller.addEventListener( 'connected', function ( event ) {
+
+					controller.isConnected = true;
+					this.add( buildController( event.data ) );
+
+				} );
+				controller.addEventListener( 'disconnected', function () {
+
+					this.remove( this.children[ 0 ] );
+
+				} );
+				scene.add( controller );
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				controllerGrip = renderer.xr.getControllerGrip( 0 );
+				controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
+				scene.add( controllerGrip );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+			}
+
+			function buildController( data ) {
+
+				let geometry, material;
+
+				switch ( data.targetRayMode ) {
+
+					case 'tracked-pointer':
+
+						geometry = new THREE.BufferGeometry();
+						geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+						geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
+
+						material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
+
+						return new THREE.Line( geometry, material );
+
+					case 'gaze':
+
+						geometry = new THREE.RingGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
+						material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
+						return new THREE.Mesh( geometry, material );
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				// find intersections
+
+				tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+				let updatedCursor = false;
+
+				if ( controller.isConnected === true ) {
+
+					raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+					raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+
+					cursor.down = !! controller.userData.isSelecting;
+
+					updatedCursor = true;
+
+				} else if ( cursor.needsUpdate === true ) {
+
+					raycaster.setFromCamera( cursor, camera );
+
+					cursor.needsUpdate = false;
+
+					updatedCursor = true;
+
+				}
+			
+			
+				if ( updatedCursor === true ) {
+
+					const intersects = raycaster.intersectObjects( [ uiPlane ] );
+
+					if ( intersects.length > 0 ) {
+
+						const [ hit ] = intersects;
+						//if( hit.object === uiPlane ) //support multiple hit objects
+
+						const { x, y } = hit.uv;
+
+						updateUIPointer( x, y, cursor.down );
+						htmlTexture.requestRedraw();
+
+
+					} else {
+
+						if ( pointer.x !== - 1 || pointer.y !== - 1 ) {
+
+							updateUIPointer( - 0.1, - 0.1, false );
+							htmlTexture.requestRedraw();
+
+						}
+
+					}
+
+				}
+
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
