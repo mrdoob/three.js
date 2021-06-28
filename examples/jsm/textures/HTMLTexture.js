@@ -48,16 +48,6 @@ class HTMLTexture extends CanvasTexture {
 
 		if ( url === '' || typeof url !== 'string' ) url = 'about:blank';
 
-		//GitHacks doesn't support iframe local paths? Workaround attempt.
-
-		if ( ( ! ( /^https:\/\//i ).test( url ) ) && ( ! ( /^http:\/\//i ).test( url ) ) ) {
-
-			const localPathName = location.href.substring( 0, location.href.lastIndexOf( '/' ) );
-
-			url = localPathName + '/' + url;
-
-		}
-
 		this._node.src = url;
 
 		this._node.loaded = false;
