@@ -455,9 +455,22 @@ class HTMLTexture extends CanvasTexture {
 
 			image.onerror = () => {
 
+				scope._invalidHTMLCount = this._invalidHTMLCount || 0;
+				scope._invalidHTMLCount ++;
+
+				if ( scope._invalidHTMLCount > 100 ) {
+
+					scope._init( 'about:blank' ).then( () => {
+
+						scope.document.body.innerHTML = '<p style="color:red;">Invalid HTML. (Probably cross-origin security settings.)</p>';
+
+					} );
+
+				}
+
 				console.error( 'HTMLTexture: Invalid HTML.' );
 
-				this._redrawing = false;
+				scope._redrawing = false;
 
 				for ( let i = 0; i < scope._queue.length; i ++ ) {
 
@@ -469,7 +482,7 @@ class HTMLTexture extends CanvasTexture {
 
 				scope._queue.length = 0;
 
-				if ( animating === true || scope._urlQueue ) setTimeout( () => scope.requestRedraw(), 1 );
+				setTimeout( () => scope.requestRedraw(), 1 );
 
 				resolve();
 
