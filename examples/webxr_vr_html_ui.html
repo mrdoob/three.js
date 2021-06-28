@@ -16,6 +16,8 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { backupHTML, backupJS } from './textures/html/html-ui-backup.module.js';
+
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
@@ -83,7 +85,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				if ( location.origin === 'https://raw.githack.com' ) {
+				if ( true || location.origin === 'https://raw.githack.com' ) {
 
 					htmlTexture = new HTMLTexture( '', 512, 512 );
 
@@ -91,7 +93,15 @@
 
 					await htmlTexture.redrawing;
 
-					htmlTexture.document.body.innerHTML = '<p style="text-align:center; color:red;">GitHack.com\'s local-cross-origin security settings prevent this example from running. Please use localhost or a secure domain.';
+					htmlTexture.document.body.innerHTML = backupHTML;
+
+					const sc = htmlTexture.document.createElement( 'script' );
+					sc.textContent = backupJS;
+					htmlTexture.document.body.appendChild( sc );
+
+					htmlTexture.requestRedraw();
+
+					await htmlTexture.redrawing;
 
 				} else {
 
