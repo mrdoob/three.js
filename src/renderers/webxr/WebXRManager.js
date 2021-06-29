@@ -240,6 +240,7 @@ class WebXRManager extends EventDispatcher {
 					glFramebuffer = gl.createFramebuffer();
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
+
 				}
 
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
