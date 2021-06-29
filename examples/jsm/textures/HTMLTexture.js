@@ -672,6 +672,125 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
+	fetchCORS( url, as ) {
+
+		return new Promise( async load => {
+
+			if ( typeof as === 'string' ) as = as.toLowerCase();
+
+			if ( as !== 'blob' && as !== 'text' && as !== 'arraybuffer' && as !== 'json' && as !== 'formdata' ) {
+
+				console.error( 'HTMLTexture.fetchCORS( url, as ): [as] must one of "blob", "text", "arraybuffer", or "json", got: ', as );
+
+				load( null );
+
+				return;
+
+			}
+
+			let cors;
+
+			try {
+
+				const u = new URL( url );
+
+				if ( u.origin !== location.origin ) cors = true;
+
+			} catch ( e ) {
+
+				console.error( `HTMLTexture.fetchCORS: Invalid url "${url}"`, e );
+
+				load( null );
+
+				return;
+
+			}
+
+
+			let f;
+
+			try {
+
+				f = await fetch( url, cors ? { mode: 'cors' } : undefined );
+
+			} catch ( e ) {
+
+				console.error( `HTMLTexture.fetchCORS: Network error fetching "${url}" (Host may have refused CORS)`, e );
+
+				load( null );
+
+				return;
+
+			}
+
+			if ( ! f || ! f.ok ) {
+
+				console.error( `HTMLTexture.fetchCORS: Failed fetching "${url}"`, f );
+
+				load( null );
+
+				return;
+
+			}
+
+
+
+			if ( as === 'text' ) load( await f.text() );
+
+			if ( as === 'json' ) load( await f.json() );
+
+			if ( as === 'blob' ) load( await f.blob() );
+
+			if ( as === 'arraybuffer' ) load( await f.arrayBuffer() );
+
+			if ( as === 'formdata' ) load( await f.formData() );
+
+		} );
+
+	}
+
+	fetchCORSDataURL( url, mime ) {
+
+		const scope = this;
+
+		return new Promise( async load => {
+
+			const b = await scope.fetchCORS( url, 'blob' );
+
+			if ( ! b ) {
+
+				load( null );
+
+				return;
+
+			}
+
+			if ( mime && ( typeof mime === 'string' || ( typeof mime?.type === 'string' ) ) ) {
+
+				const bmime = b.split( ';' )[ 0 ];
+
+				if ( bmime !== mime ) {
+
+					console.error( `HTMLTexture.fetchCORSDataURL: MIME mismatch "${url}" (Required "${mime}", got "${bmime}")` );
+
+					load( null );
+
+					return;
+
+				}
+
+			}
+
+			const r = new FileReader();
+
+			r.addEventListener( 'load', () => load( r.result ) );
+
+			r.readAsDataURL( b );
+
+		} );
+
+	}
+
 	elementFromPoint( x, y ) {
 
 		const style = this._node.style;
