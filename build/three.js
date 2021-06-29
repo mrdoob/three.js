@@ -16421,6 +16421,9 @@
 			let referenceSpace = null;
 			let referenceSpaceType = 'local-floor';
 			let pose = null;
+			let glBinding = null;
+			let glFramebuffer = null;
+			let glProjLayer = null;
 			const controllers = [];
 			const inputSourcesMap = new Map(); //
 
@@ -16546,18 +16549,40 @@
 						await gl.makeXRCompatible();
 					}
 
-					const layerInit = {
-						antialias: attributes.antialias,
-						alpha: attributes.alpha,
-						depth: attributes.depth,
-						stencil: attributes.stencil,
-						framebufferScaleFactor: framebufferScaleFactor
-					}; // eslint-disable-next-line no-undef
+					if (session.renderState.layers === undefined) {
+						const layerInit = {
+							antialias: attributes.antialias,
+							alpha: attributes.alpha,
+							depth: attributes.depth,
+							stencil: attributes.stencil,
+							framebufferScaleFactor: framebufferScaleFactor
+						}; // eslint-disable-next-line no-undef
 
-					const baseLayer = new XRWebGLLayer(session, gl, layerInit);
-					session.updateRenderState({
-						baseLayer: baseLayer
-					});
+						const baseLayer = new XRWebGLLayer(session, gl, layerInit);
+						session.updateRenderState({
+							baseLayer: baseLayer
+						});
+					} else {
+						let depthFormat = 0;
+
+						if (attributes.depth) {
+							depthFormat = attributes.stencil ? gl.DEPTH_STENCIL : gl.DEPTH_COMPONENT;
+						}
+
+						const projectionlayerInit = {
+							colorFormat: attributes.alpha ? gl.RGBA : gl.RGB,
+							depthFormat: depthFormat,
+							scaleFactor: framebufferScaleFactor
+						}; // eslint-disable-next-line no-undef
+
+						glBinding = new XRWebGLBinding(session, gl);
+						glProjLayer = glBinding.createProjectionLayer(projectionlayerInit);
+						glFramebuffer = gl.createFramebuffer();
+						session.updateRenderState({
+							layers: [glProjLayer]
+						});
+					}
+
 					referenceSpace = await session.requestReferenceSpace(referenceSpaceType);
 					animation.setContext(session);
 					animation.start();
@@ -16720,7 +16745,11 @@
 				if (pose !== null) {
 					const views = pose.views;
 					const baseLayer = session.renderState.baseLayer;
-					state.bindXRFramebuffer(baseLayer.framebuffer);
+
+					if (session.renderState.layers === undefined) {
+						state.bindXRFramebuffer(baseLayer.framebuffer);
+					}
+
 					let cameraVRNeedsUpdate = false; // check if it's necessary to rebuild cameraVR's camera list
 
 					if (views.length !== cameraVR.cameras.length) {
@@ -16730,7 +16759,24 @@
 
 					for (let i = 0; i < views.length; i++) {
 						const view = views[i];
-						const viewport = baseLayer.getViewport(view);
+						let viewport = null;
+
+						if (session.renderState.layers === undefined) {
+							viewport = baseLayer.getViewport(view);
+						} else {
+							const glSubImage = glBinding.getViewSubImage(glProjLayer, view);
+							gl.bindFramebuffer(gl.FRAMEBUFFER, glFramebuffer);
+							gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
+
+							if (glSubImage.depthStencilTexture !== undefined) {
+								gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0);
+							}
+
+							gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+							state.bindXRFramebuffer(glFramebuffer);
+							viewport = glSubImage.viewport;
+						}
+
 						const camera = cameras[i];
 						camera.matrix.fromArray(view.transform.matrix);
 						camera.projectionMatrix.fromArray(view.projectionMatrix);
@@ -33542,6 +33588,22 @@
 			});
 			super(geometry, material);
 			this.type = 'AxesHelper';
+		}
+
+		setColors(xAxisColor, yAxisColor, zAxisColor) {
+			const color = new Color();
+			const array = this.geometry.attributes.color.array;
+			color.set(xAxisColor);
+			color.toArray(array, 0);
+			color.toArray(array, 3);
+			color.set(yAxisColor);
+			color.toArray(array, 6);
+			color.toArray(array, 9);
+			color.set(zAxisColor);
+			color.toArray(array, 12);
+			color.toArray(array, 15);
+			this.geometry.attributes.color.needsUpdate = true;
+			return this;
 		}
 
 		dispose() {
