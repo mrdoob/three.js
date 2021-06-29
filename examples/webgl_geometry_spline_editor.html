@@ -133,6 +133,7 @@
 				controls.addEventListener( 'change', render );
 
 				transformControl = new TransformControls( camera, renderer.domElement );
+				transformControl.setSize( window.devicePixelRatio );
 				transformControl.addEventListener( 'change', render );
 				transformControl.addEventListener( 'dragging-changed', function ( event ) {
 

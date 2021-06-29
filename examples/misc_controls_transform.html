@@ -62,6 +62,7 @@
 				orbit.addEventListener( 'change', render );
 
 				control = new TransformControls( currentCamera, renderer.domElement );
+				control.setSize( window.devicePixelRatio );
 				control.addEventListener( 'change', render );
 
 				control.addEventListener( 'dragging-changed', function ( event ) {
