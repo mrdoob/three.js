@@ -1172,7 +1172,7 @@ class TransformControlsGizmo extends Object3D {
 
 			}
 
-			handle.scale.set( 1, 1, 1 ).multiplyScalar( factor * this.size / 7 );
+			handle.scale.set( 1, 1, 1 ).multiplyScalar( factor * this.size / 4 );
 
 			// TODO: simplify helpers and consider decoupling from gizmo
 
