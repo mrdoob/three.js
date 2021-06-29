@@ -161,7 +161,6 @@
 
 				rayCaster = new THREE.Raycaster();
 				control = new TransformControls( camera, renderer.domElement );
-				control.setSize( window.devicePixelRatio );
 				control.addEventListener( 'dragging-changed', function ( event ) {
 
 					if ( ! event.value ) {

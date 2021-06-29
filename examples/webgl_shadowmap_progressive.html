@@ -61,7 +61,6 @@
 
 				// transform gizmo
 				control = new TransformControls( camera, renderer.domElement );
-				control.setSize( window.devicePixelRatio );
 				control.addEventListener( 'dragging-changed', ( event ) => {
 
 					controls.enabled = ! event.value;
@@ -128,7 +127,6 @@
 					object.scale.set( 2, 2, 2 );
 					object.position.set( 0, - 16, 0 );
 					control2 = new TransformControls( camera, renderer.domElement );
-					control2.setSize( window.devicePixelRatio );
 					control2.addEventListener( 'dragging-changed', ( event ) => {
 
 						controls.enabled = ! event.value;
