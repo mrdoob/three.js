@@ -73,6 +73,7 @@ function Viewport( editor ) {
 	var objectScaleOnDown = null;
 
 	var transformControls = new TransformControls( camera, container.dom );
+	transformControls.setSize( window.devicePixelRatio );
 	transformControls.addEventListener( 'change', function () {
 
 		var object = transformControls.object;
