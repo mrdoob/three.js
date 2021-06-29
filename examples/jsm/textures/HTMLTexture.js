@@ -228,15 +228,31 @@ class HTMLTexture extends CanvasTexture {
 
 			const urls = [];
 			const styledElements = new Map();
-			const scrolledElements = [];
+			const scrollingElements = new Map();
 
-			const collect = ( s, e, name ) => {
+			const collect = ( s, e, name, style ) => {
 
-				if ( e.scrollTop || e.scrollLeft ) scrolledElements.push( [ e, new Scroller( e.scrollTop, e.scrollLeft ) ] );
+				if ( e.scrollTop || e.scrollLeft ) scrollingElements.set( e, new Scroller( e.scrollTop, e.scrollLeft ) );
+
+
+				const p = e.parentNode;
+
+				if ( p && ( p.scrollTop || p.scrollLeft ) && ( ( name === 'left' && s !== 'auto' ) || ( name === 'right' && s !== 'auto' ) || ( name === 'top' && s !== 'auto' ) ) && ( style.position === 'absolute' ) ) {
+
+					if ( name === 'top' ) return ( ( ( 1 * s.replace( 'px', '' ) ) || 0 ) - ( p.scrollTop || 0 ) ) + 'px';
+
+					if ( name === 'left' && style.direction === 'ltr' ) return ( ( ( 1 * s.replace( 'px', '' ) ) || 0 ) - ( p.scrollLeft || 0 ) ) + 'px';
+
+					if ( name === 'right' && style.direction === 'rtl' ) return ( ( ( 1 * s.replace( 'px', '' ) ) || 0 ) + ( p.scrollLeft || 0 ) ) + 'px';
+
+				}
+
 
 				if ( ( name === 'animation-play-state' && s === 'running' ) ) animating = true;
 
+
 				if ( ( ! ( /^url\("/ ).test( s ) ) ) return s;
+
 
 				let id;
 				do id = Math.random().toString().substring( 2 );
@@ -254,7 +270,7 @@ class HTMLTexture extends CanvasTexture {
 
 				map( e => ( [ e, getComputedStyle( e ), Array.from( getComputedStyle( e ) ) ] ) ).
 
-				map( ( [ e, style, names ] ) => ( [ e, names.map( name => ( style[ name ] !== scope._unstyle[ name ] ) ? `${ name }:${ ( collect( style[ name ], e, name ) ) }; ` : '' ).join( '' ) ] ) ).
+				map( ( [ e, style, names ] ) => ( [ e, names.map( name => ( style[ name ] !== scope._unstyle[ name ] ) ? `${ name }:${ ( collect( style[ name ], e, name, style ) ) }; ` : '' ).join( '' ) ] ) ).
 
 				forEach( ( [ e, cssText ] ) => cssText ? styledElements.set( e, [ cssText, e.style.cssText ] ) : null );
 
@@ -406,7 +422,7 @@ class HTMLTexture extends CanvasTexture {
 			//install proxies
 			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement && p.contains( e ) ) ? ( p.insertBefore( r, e ), p.removeChild( e ) ) : null );
 			//scroll elements
-			scrolledElements.forEach( ( [ e, s ] ) => e.firstChild ? e.insertBefore( s, e.firstChild ) : e.appendChild( s ) );
+			scrollingElements.forEach( ( s, e ) => e.firstChild ? e.insertBefore( s, e.firstChild ) : e.appendChild( s ) );
 
 
 			const xml = new XMLSerializer().serializeToString( doc.body || doc ).replace( /<!DOCTYPE html>/gmi, '' ).replace( /&gt;/gmi, '>' );
@@ -415,7 +431,7 @@ class HTMLTexture extends CanvasTexture {
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${ width }" height="${ height }"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
 			//unscroll elements
-			scrolledElements.forEach( ( [ e, s ] ) => e.removeChild( s ) );
+			scrollingElements.forEach( ( s, e ) => e.removeChild( s ) );
 			//remove proxies
 			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement ) ? ( p.insertBefore( e, r ), p.removeChild( r ) ) : null );
 			//unfreeze CSS animations
