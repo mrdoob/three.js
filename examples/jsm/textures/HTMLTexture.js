@@ -34,15 +34,15 @@ class HTMLTexture extends CanvasTexture {
 		this._unstyle = null; //set in _node.onload
 
 
-		this.loading = null; //set synchronously in _init
+		this._loading = null; //set synchronously in _init
 
-		this._init( url ); //<< this.loading is meaningful immediately
+		this._init( url ); //<< this.redrawing is meaningful immediately
 
 	}
 
 	_init( url ) {
 
-		//Warning: _init must be synchronous. htmlTexture.loading must be meaningful on synchronous constructor end.
+		//Warning: _init must be synchronous. htmlTexture.redrawing must be meaningful on synchronous constructor end.
 
 		this.document = null;
 
@@ -59,7 +59,7 @@ class HTMLTexture extends CanvasTexture {
 
 		const scope = this;
 
-		this.loading = new Promise( async load => {
+		this._loading = new Promise( async load => {
 
 			//Note: Should not await redraw.
 
@@ -140,7 +140,7 @@ class HTMLTexture extends CanvasTexture {
 
 		this.requestRedraw(); //<< this.redrawing is meaningful immediately
 
-		return this.loading;
+		return this.redrawing;
 
 	}
 
@@ -166,7 +166,7 @@ class HTMLTexture extends CanvasTexture {
 
 			//await requestRedraw( url ) must resolve only once both load and redraw are finished
 
-			await this.loading;
+			await scope._loading;
 
 			if ( url ) await scope._init( url );
 
@@ -224,7 +224,7 @@ class HTMLTexture extends CanvasTexture {
 
 			//collect css urls and animations
 
-			let animating = this._transitions.size > 0;
+			let animating = scope._transitions.size > 0;
 
 			const urls = [];
 			const styledElements = new Map();
@@ -411,6 +411,7 @@ class HTMLTexture extends CanvasTexture {
 
 			const xml = new XMLSerializer().serializeToString( doc.body || doc ).replace( /<!DOCTYPE html>/gmi, '' ).replace( /&gt;/gmi, '>' );
 
+			//note: css @font-face rules require css inclusion (custom external font files loaded)
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${ width }" height="${ height }"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
 			//unscroll elements
@@ -439,9 +440,11 @@ class HTMLTexture extends CanvasTexture {
 
 				context.drawImage( image, 0, 0, width, height );
 
+				scope._invalidHTMLCount = 0;
+
 				scope.needsUpdate = true;
 
-				this._redrawing = false;
+				scope._redrawing = false;
 
 				for ( let i = 0; i < scope._queue.length; i ++ ) {
 
@@ -461,7 +464,7 @@ class HTMLTexture extends CanvasTexture {
 
 			image.onerror = () => {
 
-				scope._invalidHTMLCount = this._invalidHTMLCount || 0;
+				scope._invalidHTMLCount = scope._invalidHTMLCount || 0;
 				scope._invalidHTMLCount ++;
 
 				if ( scope._invalidHTMLCount > 100 ) {
