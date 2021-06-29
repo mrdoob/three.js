@@ -279,6 +279,16 @@
 						const linkElement = createLink( pageName, pageURL );
 						listElement.appendChild( linkElement );
 
+						// select current page
+
+						const selectedPage = window.location.hash.substring( 1 );
+
+						if ( pageURL === selectedPage ) {
+
+							linkElement.classList.add( 'selected' );
+
+						}
+
 						// Gather the main properties for the current subpage
 
 						pageProperties[ pageName ] = {
