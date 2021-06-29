@@ -238,6 +238,7 @@
 			}
 
 			const localList = list[ language ];
+			const selectedPage = window.location.hash.substring( 1 );
 
 			for ( const section in localList ) {
 
@@ -280,8 +281,6 @@
 						listElement.appendChild( linkElement );
 
 						// select current page
-
-						const selectedPage = window.location.hash.substring( 1 );
 
 						if ( pageURL === selectedPage ) {
 
