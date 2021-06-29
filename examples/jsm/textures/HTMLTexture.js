@@ -179,6 +179,7 @@ class HTMLTexture extends CanvasTexture {
 			//Chrome's element class definitions are isolated across iframe boundaries
 			const { CSSImportRule, CSSMediaRule, CSSSupportsRule, CSSRule, CSSRuleList, CSSStyleSheet, Document, HTMLElement, HTMLImageElement, SVGElement, HTMLVideoElement, HTMLCanvasElement } = scope._node.contentWindow;
 
+			const Scroller = customElements.get( 'htmltexture-scroller' );
 
 			//The document may change at any point during the async process.
 			//The draw must not fail on in-process changes, but its behavior is undefined.
@@ -226,8 +227,12 @@ class HTMLTexture extends CanvasTexture {
 			let animating = this._transitions.size > 0;
 
 			const urls = [];
+			const styledElements = new Map();
+			const scrolledElements = [];
 
 			const collect = ( s, e, name ) => {
+
+				if ( e.scrollTop || e.scrollLeft ) scrolledElements.push( [ e, new Scroller( e.scrollTop, e.scrollLeft ) ] );
 
 				if ( ( name === 'animation-play-state' && s === 'running' ) ) animating = true;
 
@@ -244,7 +249,6 @@ class HTMLTexture extends CanvasTexture {
 			};
 
 
-			const styledElements = new Map();
 
 			Array.from( doc.querySelectorAll( '*' ) ).
 
@@ -401,14 +405,16 @@ class HTMLTexture extends CanvasTexture {
 			styledElements.forEach( ( [ cssText ], e ) => ( e instanceof HTMLElement ) ? ( e.setAttribute( 'style', cssText ), e.style = cssText ) : null );
 			//install proxies
 			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement && p.contains( e ) ) ? ( p.insertBefore( r, e ), p.removeChild( e ) ) : null );
+			//scroll elements
+			scrolledElements.forEach( ( [ e, s ] ) => e.firstChild ? e.insertBefore( s, e.firstChild ) : e.appendChild( s ) );
 
 
 			const xml = new XMLSerializer().serializeToString( doc.body || doc ).replace( /<!DOCTYPE html>/gmi, '' ).replace( /&gt;/gmi, '>' );
 
 			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${ width }" height="${ height }"><style>${css}</style><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
-			//const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${ width }" height="${ height }"><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
 
-
+			//unscroll elements
+			scrolledElements.forEach( ( [ e, s ] ) => e.removeChild( s ) );
 			//remove proxies
 			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement ) ? ( p.insertBefore( e, r ), p.removeChild( r ) ) : null );
 			//unfreeze CSS animations
@@ -725,6 +731,24 @@ function defineHTMLTextureNode() {
 		}
 
 		customElements.define( 'htmltexture-default', HTMLTextureDefault, { is: 'htmltexture-default' } );
+
+	}
+
+	if ( ! customElements.get( 'htmltexture-scroller' ) ) {
+
+		class HTMLTextureScroller extends HTMLElement {
+
+			constructor( top, left ) {
+
+				super();
+
+				this.style.cssText = `display:block; width:0px; height:0px; margin-top:-${top}px; margin-left:-${left}px;`;
+
+			}
+
+		}
+
+		customElements.define( 'htmltexture-scroller', HTMLTextureScroller, { is: 'htmltexture-scroller' } );
 
 	}
 
