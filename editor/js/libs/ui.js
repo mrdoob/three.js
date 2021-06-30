@@ -126,6 +126,12 @@ class UIElement {
 
 	}
 
+	setInnerHTML( value ) {
+
+		this.dom.innerHTML = value;
+
+	}
+
 	getIndexOfChild( element ) {
 
 		return Array.prototype.indexOf.call( this.dom.children, element.dom );
@@ -137,7 +143,7 @@ class UIElement {
 // properties
 
 const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'verticalAlign', 'color',
 	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
@@ -225,7 +231,6 @@ class UIText extends UISpan {
 		this.dom.className = 'Text';
 		this.dom.style.cursor = 'default';
 		this.dom.style.display = 'inline-block';
-		this.dom.style.verticalAlign = 'middle';
 
 		this.setValue( text );
 
