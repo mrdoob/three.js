@@ -39,7 +39,9 @@
 	};
 	THREE.ShaderLib[ 'line' ] = {
 		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.common, THREE.UniformsLib.fog, THREE.UniformsLib.line ] ),
-		vertexShader: `
+		vertexShader:
+  /* glsl */
+  `
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -182,9 +184,10 @@
 			#include <clipping_planes_vertex>
 			#include <fog_vertex>
 
-		}
-		`,
-		fragmentShader: `
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 		uniform vec3 diffuse;
 		uniform float opacity;
 
@@ -260,8 +263,7 @@
 			#include <fog_fragment>
 			#include <premultiplied_alpha_fragment>
 
-		}
-		`
+		}`
 	};
 
 	class LineMaterial extends THREE.ShaderMaterial {

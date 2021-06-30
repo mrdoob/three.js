@@ -138,8 +138,8 @@ class WebGPURenderer {
 
 		}
 
-		this._parameters.nonGuaranteedFeatures = ( parameters.nonGuaranteedFeatures === undefined ) ? [] : parameters.nonGuaranteedFeatures;
-		this._parameters.nonGuaranteedLimits = ( parameters.nonGuaranteedLimits === undefined ) ? {} : parameters.nonGuaranteedLimits;
+		this._parameters.requiredFeatures = ( parameters.requiredFeatures === undefined ) ? [] : parameters.requiredFeatures;
+		this._parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 	}
 
@@ -154,8 +154,8 @@ class WebGPURenderer {
 		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
 		const deviceDescriptor = {
-			nonGuaranteedFeatures: parameters.nonGuaranteedFeatures,
-			nonGuaranteedLimits: parameters.nonGuaranteedLimits
+			requiredFeatures: parameters.requiredFeatures,
+			requiredLimits: parameters.requiredLimits
 		};
 
 		const device = await adapter.requestDevice( deviceDescriptor );
@@ -164,7 +164,7 @@ class WebGPURenderer {
 
 		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'gpupresent' );
 
-		const swapChain = context.configureSwapChain( {
+		const swapChain = context.configure( {
 			device: device,
 			format: GPUTextureFormat.BRGA8Unorm // this is the only valid swap chain format right now (r121)
 		} );
@@ -256,11 +256,11 @@ class WebGPURenderer {
 			if ( this._parameters.antialias === true ) {
 
 				colorAttachment.view = this._colorBuffer.createView();
-				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
+				colorAttachment.resolveTarget = this._context.getCurrentTexture().createView();
 
 			} else {
 
-				colorAttachment.view = this._swapChain.getCurrentTexture().createView();
+				colorAttachment.view = this._context.getCurrentTexture().createView();
 				colorAttachment.resolveTarget = undefined;
 
 			}

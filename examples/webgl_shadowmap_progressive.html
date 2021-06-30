@@ -22,9 +22,10 @@
 			import { ProgressiveLightMap } from './jsm/misc/ProgressiveLightMap.js';
 
 			// ShadowMap + LightMap Res and Number of Directional Lights
-			let shadowMapRes = 512, lightMapRes = 1024, lightCount = 8;
-			let camera, scene, renderer, dirLights = [], controls, control, control2,
-				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap, lightmapObjects = [];
+			const shadowMapRes = 512, lightMapRes = 1024, lightCount = 8;
+			let camera, scene, renderer, controls, control, control2,
+				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap;
+			const dirLights = [], lightmapObjects = [];
 			const params = { 'Enable': true, 'Blur Edges': true, 'Blend Window': 200,
 							 'Light Radius': 50, 'Ambient Weight': 0.5, 'Debug Lightmap': false };
 			init();
@@ -43,7 +44,7 @@
 				// camera
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 100, 200 );
-				camera.name = "Camera";
+				camera.name = 'Camera';
 
 				// scene
 				scene = new THREE.Scene();
@@ -71,7 +72,7 @@
 				// create 8 directional lights to speed up the convergence
 				for ( let l = 0; l < lightCount; l ++ ) {
 
-					let dirLight = new THREE.DirectionalLight( 0xffffff, 1.0 / lightCount );
+					const dirLight = new THREE.DirectionalLight( 0xffffff, 1.0 / lightCount );
 					dirLight.name = 'Dir. Light ' + l;
 					dirLight.position.set( 200, 200, 200 );
 					dirLight.castShadow = true;
@@ -89,11 +90,13 @@
 				}
 
 				// ground
-				let groundMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 600, 600 ),
-					new THREE.MeshPhongMaterial( { color: 0xffffff, depthWrite: true } ) );
+				const groundMesh = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 600, 600 ),
+					new THREE.MeshPhongMaterial( { color: 0xffffff, depthWrite: true } )
+				);
 				groundMesh.position.y = - 0.1;
 				groundMesh.rotation.x = - Math.PI / 2;
-				groundMesh.name = "Ground Mesh";
+				groundMesh.name = 'Ground Mesh';
 				lightmapObjects.push( groundMesh );
 				scene.add( groundMesh );
 
@@ -104,7 +107,7 @@
 
 						if ( child.isMesh ) {
 
-							child.name = "Loaded Mesh";
+							child.name = 'Loaded Mesh';
 							child.castShadow = true;
 							child.receiveShadow = true;
 							child.material = new THREE.MeshPhongMaterial();
@@ -131,7 +134,7 @@
 					} );
 					control2.attach( object );
 					scene.add( control2 );
-					let lightTarget = new THREE.Group();
+					const lightTarget = new THREE.Group();
 					lightTarget.position.set( 0, 20, 0 );
 					for ( let l = 0; l < dirLights.length; l ++ ) {
 
@@ -141,14 +144,23 @@
 
 					object.add( lightTarget );
 
-					if ( typeof TESTING !== 'undefined' ) { for ( let i = 0; i < 300; i ++ ) { render(); }; };
+					if ( typeof TESTING !== 'undefined' ) {
+
+						for ( let i = 0; i < 300; i ++ ) {
+
+							render();
+
+						}
+
+					}
+
 				}
 
 				const manager = new THREE.LoadingManager( loadModel );
 				const loader = new GLTFLoader( manager );
 				loader.load( 'models/gltf/ShadowmappableMesh.glb', function ( obj ) {
 
-					object = obj.scene.children[0];
+					object = obj.scene.children[ 0 ];
 
 				} );
 
@@ -194,7 +206,12 @@
 				if ( params[ 'Enable' ] ) {
 
 					progressiveSurfacemap.update( camera, params[ 'Blend Window' ], params[ 'Blur Edges' ] );
-					if(!progressiveSurfacemap.firstUpdate) { progressiveSurfacemap.showDebugLightmap( params[ 'Debug Lightmap' ] ); }
+
+					if ( ! progressiveSurfacemap.firstUpdate ) {
+
+						progressiveSurfacemap.showDebugLightmap( params[ 'Debug Lightmap' ] );
+
+					}
 
 				}
 
@@ -205,18 +222,21 @@
 					// Sometimes they will be uniformly sampled from the upper hemisphere
 					if ( Math.random() > params[ 'Ambient Weight' ] ) {
 
-						dirLights[ l ].position.set( lightOrigin.position.x + ( Math.random() * params[ 'Light Radius' ] ),
-													lightOrigin.position.y + ( Math.random() * params[ 'Light Radius' ] ),
-													lightOrigin.position.z + ( Math.random() * params[ 'Light Radius' ] ) );
+						dirLights[ l ].position.set(
+							lightOrigin.position.x + ( Math.random() * params[ 'Light Radius' ] ),
+							lightOrigin.position.y + ( Math.random() * params[ 'Light Radius' ] ),
+							lightOrigin.position.z + ( Math.random() * params[ 'Light Radius' ] ) );
 
 					} else {
 
 						// Uniform Hemispherical Surface Distribution for Ambient Occlusion
-						let lambda = Math.acos( 2 * Math.random() - 1 ) - ( 3.14159 / 2.0 );
-						let phi = 2 * 3.14159 * Math.random();
-						dirLights[ l ].position.set( ( ( Math.cos( lambda ) * Math.cos( phi ) ) * 300 ) + object.position.x,
-											 Math.abs( ( Math.cos( lambda ) * Math.sin( phi ) ) * 300 ) + object.position.y + 20,
-													   ( Math.sin( lambda )                     * 300 ) + object.position.z );
+						const lambda = Math.acos( 2 * Math.random() - 1 ) - ( 3.14159 / 2.0 );
+						const phi = 2 * 3.14159 * Math.random();
+						dirLights[ l ].position.set(
+							        ( ( Math.cos( lambda ) * Math.cos( phi ) ) * 300 ) + object.position.x,
+							Math.abs( ( Math.cos( lambda ) * Math.sin( phi ) ) * 300 ) + object.position.y + 20,
+							          ( Math.sin( lambda ) * 300 ) + object.position.z
+						);
 
 					}
 

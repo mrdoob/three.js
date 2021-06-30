@@ -4,7 +4,6 @@ import {
 	Box3,
 	BufferAttribute,
 	BufferGeometry,
-	CanvasTexture,
 	ClampToEdgeWrapping,
 	Color,
 	DirectionalLight,
@@ -54,6 +53,7 @@ import {
 	Sphere,
 	SpotLight,
 	TangentSpaceNormalMap,
+	Texture,
 	TextureLoader,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
@@ -2598,7 +2598,10 @@ class GLTFParser {
 
 					onLoad = function ( imageBitmap ) {
 
-						resolve( new CanvasTexture( imageBitmap ) );
+						const texture = new Texture( imageBitmap );
+						texture.needsUpdate = true;
+
+						resolve( texture );
 
 					};
 
@@ -2639,6 +2642,11 @@ class GLTFParser {
 			} );
 
 			return texture;
+
+		} ).catch( function () {
+
+			console.error( 'THREE.GLTFLoader: Couldn\'t load texture', sourceURI );
+			return null;
 
 		} );
 

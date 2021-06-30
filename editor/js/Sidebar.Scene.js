@@ -1,3 +1,5 @@
+import * as THREE from '../../build/three.module.js';
+
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture } from './libs/ui.three.js';
 
@@ -166,7 +168,6 @@ function SidebarScene( editor ) {
 		refreshBackgroundUI();
 
 	} );
-	backgroundType.setValue( 'Color' );
 
 	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundType );
@@ -376,18 +377,26 @@ function SidebarScene( editor ) {
 
 				backgroundType.setValue( 'Color' );
 				backgroundColor.setHexValue( scene.background.getHex() );
-				backgroundTexture.setValue( null );
-				backgroundEquirectangularTexture.setValue( null );
+
+			} else if ( scene.background.isTexture ) {
+
+				if ( scene.background.mapping === THREE.EquirectangularReflectionMapping ) {
+
+					backgroundType.setValue( 'Equirectangular' );
+					backgroundEquirectangularTexture.setValue( scene.background );
+
+				} else {
+
+					backgroundType.setValue( 'Texture' );
+					backgroundTexture.setValue( scene.background );
+
+				}
 
 			}
-
-			// TODO: Add Texture/EquirectangularTexture support
 
 		} else {
 
 			backgroundType.setValue( 'None' );
-			backgroundTexture.setValue( null );
-			backgroundEquirectangularTexture.setValue( null );
 
 		}
 
