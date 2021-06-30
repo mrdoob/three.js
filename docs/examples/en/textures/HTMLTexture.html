@@ -16,8 +16,9 @@
 			Note:
 			<ul>
 				<li>Iframes are not currently supported, but may be in the future.</li>
+				<li>Animating CSS Pseudo-elements (::before and ::after) requires calling [page:HTMLTexture.requestRedraw requestRedraw] every frame.</li>
 				<li>Large images, videos, and webgl will hurt performance. Not recommended.</li>
-				<li>Depending on security settings, cross-origin content may not render (especially cross-origin CSS @import stylesheets).</li>
+				<li>Avoid cross-origin content. Depending on security settings, it may not render (especially cross-origin CSS @import-rule stylesheets).</li>
 			</ul>
 
 		</p>
