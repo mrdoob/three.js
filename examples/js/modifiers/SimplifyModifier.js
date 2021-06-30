@@ -120,8 +120,8 @@
 			for ( let i = 0; i < vertices.length; i ++ ) {
 
 				const vertex = vertices[ i ].position;
-				position.push( vertex.x, vertex.y, vertex.z );
-				// cache final index to GREATLY speed up faces reconstruction
+				position.push( vertex.x, vertex.y, vertex.z ); // cache final index to GREATLY speed up faces reconstruction
+
 				vertices[ i ].id = i;
 
 			} //
@@ -442,8 +442,7 @@
 		constructor( v ) {
 
 			this.position = v;
-			
-			this.id = -1; // external use position in vertices list (for e.g. face generation)
+			this.id = - 1; // external use position in vertices list (for e.g. face generation)
 
 			this.faces = []; // faces vertex is connected
 

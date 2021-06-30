@@ -15,8 +15,6 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
-
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
@@ -27,12 +25,12 @@
 				opacity: 1,
 				metalness: 0,
 				roughness: 0,
+				reflectivity: 0.5,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
 			};
 
-			let container, stats;
 			let camera, scene, renderer;
 
 			let hdrCubeRenderTarget;
@@ -44,20 +42,17 @@
 				.load( 'royal_esplanade_1k.hdr', function () {
 
 					init();
-					animate();
+					render();
 
 				} );
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = params.exposure;
@@ -92,6 +87,7 @@
 					color: params.color,
 					metalness: params.metalness,
 					roughness: params.roughness,
+					reflectivity: params.reflectivity,
 					alphaMap: texture,
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
@@ -106,10 +102,8 @@
 
 				//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 10;
 				controls.maxDistance = 150;
 
@@ -123,6 +117,7 @@
 					.onChange( function () {
 
 						material.color.set( params.color );
+						render();
 
 					} );
 
@@ -130,6 +125,7 @@
 					.onChange( function () {
 
 						material.transmission = params.transmission;
+						render();
 
 					} );
 
@@ -137,6 +133,7 @@
 					.onChange( function () {
 
 						material.opacity = params.opacity;
+						render();
 
 					} );
 
@@ -144,6 +141,7 @@
 					.onChange( function () {
 
 						material.metalness = params.metalness;
+						render();
 
 					} );
 
@@ -151,6 +149,15 @@
 					.onChange( function () {
 
 						material.roughness = params.roughness;
+						render();
+
+					} );
+
+				gui.add( params, 'reflectivity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.reflectivity = params.reflectivity;
+						render();
 
 					} );
 
@@ -159,6 +166,7 @@
 					.onChange( function () {
 
 						material.envMapIntensity = params.envMapIntensity;
+						render();
 
 					} );
 
@@ -166,6 +174,7 @@
 					.onChange( function () {
 
 						renderer.toneMappingExposure = params.exposure;
+						render();
 
 					} );
 
@@ -182,6 +191,8 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
+
+				render();
 
 			}
 
@@ -201,18 +212,9 @@
 
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				const t = performance.now();
-
-				mesh.rotation.x = t * 0.0002;
-				mesh.rotation.z = - t * 0.0002;
-
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
 
 			}
 
