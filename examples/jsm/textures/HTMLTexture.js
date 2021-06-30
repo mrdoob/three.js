@@ -1,5 +1,8 @@
 import { CanvasTexture } from '../../../build/three.module.js';
 
+const _cache = {};
+const _urlcache = {};
+
 class HTMLTexture extends CanvasTexture {
 
 	constructor( url, width, height, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
@@ -19,8 +22,8 @@ class HTMLTexture extends CanvasTexture {
 
 
 		this._urlQueue = null;
-		this._cache = {};
-		this._urlcache = {};
+		this._cache = _cache;
+		this._urlcache = _urlcache;
 		this._proxyCanvas = document.createElement( 'canvas' );
 
 
@@ -69,12 +72,12 @@ class HTMLTexture extends CanvasTexture {
 
 				const doc = scope.document = scope._node.contentWindow.document;
 
-				/* doc.open();
-				doc.write( url );
-				doc.close(); */
-
-				scope._cssNode = doc.head.appendChild( doc.createElement( 'style' ) );
+				scope._cssNode = doc.createElement( 'style' );
 				scope._cssNode.id = 'htmltexture-style';
+
+				//Changes to document stylesheets must overwrite this stylesheet
+				//Must warn in documentation
+				doc.head.insertBefore( scope._cssNode, doc.head.firstChild );
 
 
 				//if the user created CSS animations, they are expected to work. No explicit command interface.
@@ -117,15 +120,15 @@ class HTMLTexture extends CanvasTexture {
 				doc.addEventListener( 'transitioncancel', transitionEnd );
 
 
-				const unstyled = doc.body.appendChild( new ( customElements.get( 'htmltexture-default' ) )() );
+				const unstyled = document.body.appendChild( new ( customElements.get( 'htmltexture-default' ) )() );
 
-				const unstyle = scope._node.contentWindow.getComputedStyle( unstyled );
+				const unstyle = getComputedStyle( unstyled );
 
 				const _unstyle = scope._unstyle = {};
 
 				Array.from( unstyle ).forEach( name => _unstyle[ name ] = unstyle[ name ] );
 
-				doc.body.removeChild( unstyled );
+				document.body.removeChild( unstyled );
 
 
 				load();
@@ -146,7 +149,7 @@ class HTMLTexture extends CanvasTexture {
 
 	requestRedraw( url = '', width = this.image.width, height = this.image.height ) {
 
-		//Warning: htmlTexture.redrawing must be meaningful on synchronous request end.
+		//Warning: htmlTexture.redrawing must be meaningful on synchronous requestDraw() end.
 
 		if ( this._redrawing === true ) {
 
@@ -164,7 +167,7 @@ class HTMLTexture extends CanvasTexture {
 
 		this.redrawing = new Promise( async resolve => {
 
-			//await requestRedraw( url ) must resolve only once both load and redraw are finished
+			//API: await requestRedraw( url ) must resolve only once both load and redraw are finished
 
 			await scope._loading;
 
@@ -181,12 +184,13 @@ class HTMLTexture extends CanvasTexture {
 
 			const Scroller = customElements.get( 'htmltexture-scroller' );
 
-			//The document may change at any point during the async process.
-			//The draw must not fail on in-process changes, but its behavior is undefined.
+
+			//Assert: The document may change at any point during the async process.
+			//Spec: The draw must not block or throw on in-process changes, but its behavior is undefined.
 
 
 			//block for image load
-			await Promise.all( Array.from( doc.querySelectorAll( 'img' ) ).map( image => new Promise( load => image.complete ? load() : image.addEventListener( 'load', load ) ) ) );
+			await Promise.all( Array.from( doc.querySelectorAll( 'img' ) ).map( image => new Promise( load => image.complete ? load() : ( image.addEventListener( 'load', load ), image.addEventListener( 'error', load ) ) ) ) );
 
 
 			//simulate hover
@@ -222,7 +226,7 @@ class HTMLTexture extends CanvasTexture {
 			scope._node.style.height = height + 'px';
 
 
-			//collect css urls and animations
+			//collect css urls, animations, and pseudo elements
 
 			let animating = scope._transitions.size > 0;
 
@@ -264,11 +268,42 @@ class HTMLTexture extends CanvasTexture {
 
 			};
 
+			const pseudoElements = new Map();
+
+			const collectPseudoElements = e => {
+
+				let before = null, after = null;
+
+				const beforeStyle = getComputedStyle( e, '::before' );
+
+				const afterStyle = getComputedStyle( e, '::after' );
+
+				//All painted elements have width '<number>px'
+
+				if ( beforeStyle.width !== 'auto' ) {
+
+					before = scope.document.createElement( 'div' );
+
+					before.style.cssText = Array.from( beforeStyle ).map( name => ( beforeStyle[ name ] !== scope._unstyle[ name ] ) ? `${ name }: ${ beforeStyle[ name ] }; ` : '' ).join( '' );
+
+				}
+
+				if ( afterStyle.width !== 'auto' ) {
+
+					after = scope.document.createElement( 'div' );
+
+					after.style.cssText = Array.from( afterStyle ).map( name => ( afterStyle[ name ] !== scope._unstyle[ name ] ) ? `${ name }: ${ afterStyle[ name ] }; ` : '' ).join( '' );
+
+				}
+
+				if ( before || after ) pseudoElements.set( e, [ before, after ] );
+
+			};
 
 
 			Array.from( doc.querySelectorAll( '*' ) ).
 
-				map( e => ( [ e, getComputedStyle( e ), Array.from( getComputedStyle( e ) ) ] ) ).
+				map( e => ( collectPseudoElements( e ), [ e, getComputedStyle( e ), Array.from( getComputedStyle( e ) ) ] ) ).
 
 				map( ( [ e, style, names ] ) => ( [ e, names.map( name => ( style[ name ] !== scope._unstyle[ name ] ) ? `${ name }:${ ( collect( style[ name ], e, name, style ) ) }; ` : '' ).join( '' ) ] ) ).
 
@@ -350,23 +385,29 @@ class HTMLTexture extends CanvasTexture {
 
 				let d;
 
-				if ( i instanceof HTMLImageElement && scope._cache[ i.src ] ) d = scope._cache[ i.src ];
+				if ( i instanceof HTMLImageElement && scope._cache[ i.src ] ) {
+
+					d = new Image();
+
+					var load = new Promise( load => d.onload = load );
+
+					d.src = scope._cache[ i.src ].src;
+
+					await load;
+
+				}
 
 				if ( i instanceof SVGElement ) {
 
 					const src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent( new XMLSerializer().serializeToString( i ) );
 
-					if ( scope._cache[ src ] ) d = scope._cache[ src ];
+					d = new Image();
 
-					else {
+					var load = new Promise( load => d.onload = load );
 
-						const s = new Image(); s.src = src;
+					d.src = src;
 
-						await ( new Promise( load => s.onload = load ) );
-
-						i = s;
-
-					}
+					await load;
 
 				}
 
@@ -421,6 +462,8 @@ class HTMLTexture extends CanvasTexture {
 			styledElements.forEach( ( [ cssText ], e ) => ( e instanceof HTMLElement ) ? ( e.setAttribute( 'style', cssText ), e.style = cssText ) : null );
 			//install proxies
 			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement && p.contains( e ) ) ? ( p.insertBefore( r, e ), p.removeChild( e ) ) : null );
+			//install pseudo elements
+			pseudoElements.forEach( ( [ before, after ], e ) => ( before ? ( e.firstChild ? e.insertBefore( before, e.firstChild ) : e.appendChild( before ) ) : null, after ? e.appendChild( after ) : null ) );
 			//scroll elements
 			scrollingElements.forEach( ( s, e ) => e.firstChild ? e.insertBefore( s, e.firstChild ) : e.appendChild( s ) );
 
@@ -432,6 +475,8 @@ class HTMLTexture extends CanvasTexture {
 
 			//unscroll elements
 			scrollingElements.forEach( ( s, e ) => e.removeChild( s ) );
+			//remove pseudo elements
+			pseudoElements.forEach( ( [ before, after ], e ) => ( before ? e.removeChild( before ) : null, after ? e.removeChild( after ) : null ) );
 			//remove proxies
 			proxies.forEach( ( [ p, e, r ] ) => ( p instanceof HTMLElement && e instanceof HTMLElement ) ? ( p.insertBefore( e, r ), p.removeChild( r ) ) : null );
 			//unfreeze CSS animations
@@ -454,11 +499,31 @@ class HTMLTexture extends CanvasTexture {
 				context.fillStyle = backgroundColor;
 				context.fillRect( 0, 0, width, height );
 
-				context.drawImage( image, 0, 0, width, height );
+				let drawn = false;
 
-				scope._invalidHTMLCount = 0;
+				try {
 
-				scope.needsUpdate = true;
+					context.drawImage( image, 0, 0, width, height );
+
+					drawn = true;
+
+				} catch ( err ) {
+
+					//the image is propbably tainted / cross-origin
+
+					console.error( 'HTMLTexture: Failed to render HTML. The source may be cross-origin tainted.', err );
+
+					drawn = false;
+
+				}
+
+				if ( drawn === true ) {
+
+					scope._invalidHTMLCount = 0;
+
+					scope.needsUpdate = true;
+
+				}
 
 				scope._redrawing = false;
 
@@ -583,8 +648,6 @@ class HTMLTexture extends CanvasTexture {
 
 		const target = this.elementFromPoint( x, y );
 
-		//console.log( 'update pointer (start/target/pointer.target): ', start, target, pointer.target );
-
 		if ( target !== pointer.target || start ) {
 
 			if ( pointer.target ) {
@@ -654,13 +717,11 @@ class HTMLTexture extends CanvasTexture {
 
 				if ( ! start ) {
 
-					//if ( typeof target.click === 'function' ) console.log( "Clicked target!: ", target, target.click() );
+					if ( typeof target.click === 'function' ) target.click();
 
-					//if ( typeof target.focus === 'function' ) console.log( "Focused target!: ", target.focus() );
+					if ( typeof target.focus === 'function' ) target.focus();
 
-					//else dispatch( 'click', target );
-
-					dispatch( 'click', target );
+					else dispatch( 'click', target );
 
 				}
 
@@ -680,7 +741,7 @@ class HTMLTexture extends CanvasTexture {
 
 			if ( as !== 'blob' && as !== 'text' && as !== 'arraybuffer' && as !== 'json' && as !== 'formdata' ) {
 
-				console.error( 'HTMLTexture.fetchCORS( url, as ): [as] must one of "blob", "text", "arraybuffer", or "json", got: ', as );
+				console.error( 'HTMLTexture.fetchCORS( url, as ): as must one of "blob", "text", "arraybuffer", or "json", got: ', as );
 
 				load( null );
 
@@ -800,8 +861,8 @@ class HTMLTexture extends CanvasTexture {
 		style.zIndex = '1000000';
 
 		//can also support via scale, maybe preferable
-		//if ( x > innerWidth ) style.left = ( innerWidth / 2 ) - x;
-		//if ( y > innerHeight ) style.top = ( innerHeight / 2 ) - y;
+		if ( x > innerWidth ) style.left = ( innerWidth / 2 ) - x;
+		if ( y > innerHeight ) style.top = ( innerHeight / 2 ) - y;
 
 
 		//elements in paint order, https://drafts.csswg.org/cssom-view/#dom-document-elementsfrompoint
@@ -819,8 +880,8 @@ class HTMLTexture extends CanvasTexture {
 		}
 
 
-		//style.left = 0;
-		//style.top = 0;
+		style.left = 0;
+		style.top = 0;
 
 		style.pointerEvents = 'none';
 
