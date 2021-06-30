@@ -348,6 +348,7 @@
 		"webxr_vr_handinput_pointerdrag",
 		"webxr_vr_handinput_pressbutton",
 		"webxr_vr_haptics",
+		"webxr_vr_layers",
 		"webxr_vr_lorenzattractor",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
@@ -355,8 +356,7 @@
 		"webxr_vr_rollercoaster",
 		"webxr_vr_sandbox",
 		"webxr_vr_sculpt",
-		"webxr_vr_video",
-		"webxr_vr_layers"
+		"webxr_vr_video"
 	],
 	"games": [
 		"games_fps"
