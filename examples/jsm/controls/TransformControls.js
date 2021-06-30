@@ -763,7 +763,8 @@ class TransformControlsGizmo extends Object3D {
 			depthTest: false,
 			depthWrite: false,
 			fog: false,
-			toneMapped: false
+			toneMapped: false,
+			transparent: true
 		} );
 
 		const gizmoLineMaterial = new LineBasicMaterial( {
@@ -791,25 +792,22 @@ class TransformControlsGizmo extends Object3D {
 		const matBlue = gizmoMaterial.clone();
 		matBlue.color.setHex( 0x0000ff );
 
-		const matTransparent = gizmoMaterial.clone();
-		matTransparent.transparent = true;
-
-		const matRedTransparent = matTransparent.clone();
+		const matRedTransparent = gizmoMaterial.clone();
 		matRedTransparent.color.setHex( 0xff0000 );
 		matRedTransparent.opacity = 0.5;
 
-		const matGreenTransparent = matTransparent.clone();
+		const matGreenTransparent = gizmoMaterial.clone();
 		matGreenTransparent.color.setHex( 0x00ff00 );
 		matGreenTransparent.opacity = 0.5;
 
-		const matBlueTransparent = matTransparent.clone();
+		const matBlueTransparent = gizmoMaterial.clone();
 		matBlueTransparent.color.setHex( 0x0000ff );
 		matBlueTransparent.opacity = 0.5;
 
-		const matWhiteTransparent = matTransparent.clone();
+		const matWhiteTransparent = gizmoMaterial.clone();
 		matWhiteTransparent.opacity = 0.25;
 
-		const matYellowTransparent = matTransparent.clone();
+		const matYellowTransparent = gizmoMaterial.clone();
 		matYellowTransparent.color.setHex( 0xffff00 );
 		matYellowTransparent.opacity = 0.25;
 
