@@ -11652,7 +11652,7 @@
 			const length = objectInfluences === undefined ? 0 : objectInfluences.length;
 			let influences = influencesList[geometry.id];
 
-			if (influences === undefined) {
+			if (influences === undefined || influences.length !== length) {
 				// initialise list
 				influences = [];
 
@@ -18009,10 +18009,10 @@
 			if (transparentObjects.length > 0) renderObjects(transparentObjects, scene, camera); //
 
 			if (_currentRenderTarget !== null) {
-				// Generate mipmap if we're using any kind of mipmap filtering
-				textures.updateRenderTargetMipmap(_currentRenderTarget); // resolve multisample renderbuffers to a single-sample texture if necessary
+				// resolve multisample renderbuffers to a single-sample texture if necessary
+				textures.updateMultisampleRenderTarget(_currentRenderTarget); // Generate mipmap if we're using any kind of mipmap filtering
 
-				textures.updateMultisampleRenderTarget(_currentRenderTarget);
+				textures.updateRenderTargetMipmap(_currentRenderTarget);
 			} //
 
 
