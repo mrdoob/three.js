@@ -244,35 +244,28 @@ self.addEventListener( 'fetch', async function ( event ) {
 
 async function networkFirst( request ) {
 
-	return fetch( request ).catch( async function () {
+	return fetch( request )
+		.then( async function ( response ) {
 
-		const cachedResponse = await caches.match( request );
+			const cache = await caches.open( cacheName );
 
-		if ( cachedResponse === undefined ) {
+			cache.put( request, response.clone() );
 
-			console.warn( '[SW] Not cached:', request.url );
+			return response;
 
-		}
+		} )
+		.catch( async function () {
 
-		return cachedResponse;
+			const cachedResponse = await caches.match( request );
 
-	} );
+			if ( cachedResponse === undefined ) {
 
-}
+				console.warn( '[SW] Not cached:', request.url );
 
-/*
-async function cacheFirst( request ) {
+			}
 
-	const cachedResponse = await caches.match( request );
+			return cachedResponse;
 
-	if ( cachedResponse === undefined ) {
-
-		console.warn( '[SW] Not cached:', request.url );
-		return fetch( request );
-
-	}
-
-	return cachedResponse;
+		} );
 
 }
-*/
