@@ -411,7 +411,7 @@ gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange
 
 The inner cone is defined by setting the [`penumbra`](SpotLight.penumbra) property
 as a percentage from the outer cone. In other words when `penumbra` is 0 then the
-inner code is the same size (0 = no difference) from the outer cone. When the
+inner cone is the same size (0 = no difference) from the outer cone. When the
 `penumbra` is 1 then the light fades starting in the center of the cone to the
 outer cone. When `penumbra` is .5 then the light fades starting from 50% between
 the center of the outer cone.
