@@ -551,6 +551,12 @@
 			this.axis = null;
 			return this;
 
+		}
+
+		getSharedRaycaster() {
+
+			return _raycaster;
+
 		} // TODO: deprecate
 
 

@@ -586,6 +586,12 @@ class TransformControls extends Object3D {
 
 	}
 
+	getSharedRaycaster() {
+
+		return _raycaster;
+
+	}
+
 	// TODO: deprecate
 
 	getMode() {
