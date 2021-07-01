@@ -586,7 +586,7 @@ class TransformControls extends Object3D {
 
 	}
 
-	getSharedRaycaster() {
+	getRaycaster() {
 
 		return _raycaster;
 

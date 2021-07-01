@@ -553,7 +553,7 @@
 
 		}
 
-		getSharedRaycaster() {
+		getRaycaster() {
 
 			return _raycaster;
 
