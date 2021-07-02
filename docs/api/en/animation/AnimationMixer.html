@@ -94,17 +94,17 @@
 		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
 
 		<p>
-			Deallocates all memory resources for a clip.
+			Deallocates all memory resources for a clip. Before using this method make sure to call [page:AnimationAction.stop]() for all related actions.
 		</p>
 
 		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
 		<p>
-			Deallocates all memory resources for a root object.
+			Deallocates all memory resources for a root object. Before using this method make sure to call [page:AnimationAction.stop]() for all related actions.
 		</p>
 
 		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
-			Deallocates all memory resources for an action.
+			Deallocates all memory resources for an action. Before using this method make sure to call [page:AnimationAction.stop]() to deactivate the action.
 		</p>
 
 
