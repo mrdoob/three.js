@@ -141,6 +141,13 @@
 
 		const name = 'Object_' + object.id;
 		const transform = buildMatrix( object.matrixWorld );
+
+		if ( object.matrixWorld.determinant() < 0 ) {
+
+			console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', object );
+
+		}
+
 		return `def Xform "${name}" (
     prepend references = @./geometries/Geometry_${geometry.id}.usd@</Geometry>
 )
