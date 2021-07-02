@@ -100,7 +100,7 @@
 
 				// environment
 
-				const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+				const envMap = pmremGenerator.fromEquirectangular( texture ).textures[0];
 
 				scene.background = envMap;
 				scene.environment = envMap;

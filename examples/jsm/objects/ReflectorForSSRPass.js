@@ -114,7 +114,7 @@ class ReflectorForSSRPass extends Mesh {
 
 		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
-			renderTarget.texture.generateMipmaps = false;
+			renderTarget.textures[0].generateMipmaps = false;
 
 		}
 
@@ -128,7 +128,7 @@ class ReflectorForSSRPass extends Mesh {
 			vertexShader: shader.vertexShader
 		} );
 
-		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+		material.uniforms[ 'tDiffuse' ].value = renderTarget.textures[0];
 		material.uniforms[ 'color' ].value = scope.color;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 		if ( useDepthTexture ) {
@@ -210,7 +210,7 @@ class ReflectorForSSRPass extends Mesh {
 
 			// Render
 
-			renderTarget.texture.encoding = renderer.outputEncoding;
+			renderTarget.textures[0].encoding = renderer.outputEncoding;
 
 			// scope.visible = false;
 

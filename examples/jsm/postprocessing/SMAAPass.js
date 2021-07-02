@@ -27,7 +27,7 @@ class SMAAPass extends Pass {
 			minFilter: LinearFilter,
 			format: RGBFormat
 		} );
-		this.edgesRT.texture.name = 'SMAAPass.edges';
+		this.edgesRT.textures[0].name = 'SMAAPass.edges';
 
 		this.weightsRT = new WebGLRenderTarget( width, height, {
 			depthBuffer: false,
@@ -35,7 +35,7 @@ class SMAAPass extends Pass {
 			minFilter: LinearFilter,
 			format: RGBAFormat
 		} );
-		this.weightsRT.texture.name = 'SMAAPass.weights';
+		this.weightsRT.textures[0].name = 'SMAAPass.weights';
 
 		// textures
 		const scope = this;
@@ -98,7 +98,7 @@ class SMAAPass extends Pass {
 		this.uniformsWeights = UniformsUtils.clone( SMAAWeightsShader.uniforms );
 
 		this.uniformsWeights[ 'resolution' ].value.set( 1 / width, 1 / height );
-		this.uniformsWeights[ 'tDiffuse' ].value = this.edgesRT.texture;
+		this.uniformsWeights[ 'tDiffuse' ].value = this.edgesRT.textures[0];
 		this.uniformsWeights[ 'tArea' ].value = this.areaTexture;
 		this.uniformsWeights[ 'tSearch' ].value = this.searchTexture;
 
@@ -114,7 +114,7 @@ class SMAAPass extends Pass {
 		this.uniformsBlend = UniformsUtils.clone( SMAABlendShader.uniforms );
 
 		this.uniformsBlend[ 'resolution' ].value.set( 1 / width, 1 / height );
-		this.uniformsBlend[ 'tDiffuse' ].value = this.weightsRT.texture;
+		this.uniformsBlend[ 'tDiffuse' ].value = this.weightsRT.textures[0];
 
 		this.materialBlend = new ShaderMaterial( {
 			uniforms: this.uniformsBlend,
@@ -132,7 +132,7 @@ class SMAAPass extends Pass {
 
 		// pass 1
 
-		this.uniformsEdges[ 'tDiffuse' ].value = readBuffer.texture;
+		this.uniformsEdges[ 'tDiffuse' ].value = readBuffer.textures[0];
 
 		this.fsQuad.material = this.materialEdges;
 
@@ -150,7 +150,7 @@ class SMAAPass extends Pass {
 
 		// pass 3
 
-		this.uniformsBlend[ 'tColor' ].value = readBuffer.texture;
+		this.uniformsBlend[ 'tColor' ].value = readBuffer.textures[0];
 
 		this.fsQuad.material = this.materialBlend;
 

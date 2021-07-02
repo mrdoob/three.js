@@ -57,7 +57,7 @@ class NodePostProcessing {
 
 			if ( this.material.uniforms.renderTexture ) {
 
-				this.material.uniforms.renderTexture.value = this.renderTarget.texture;
+				this.material.uniforms.renderTexture.value = this.renderTarget.textures[0];
 
 			}
 
@@ -66,7 +66,7 @@ class NodePostProcessing {
 		}
 
 		frame.setRenderer( this.renderer )
-			.setRenderTexture( this.renderTarget.texture );
+			.setRenderTexture( this.renderTarget.textures[0] );
 
 		this.renderer.setRenderTarget( this.renderTarget );
 		this.renderer.render( scene, camera );

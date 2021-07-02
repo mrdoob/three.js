@@ -77,7 +77,7 @@
 				//
 
 				material = new THREE.MeshBasicMaterial( {
-					envMap: cubeRenderTarget2.texture,
+					envMap: cubeRenderTarget2.textures[0],
 					combine: THREE.MultiplyOperation,
 					reflectivity: 1
 				} );
@@ -190,12 +190,12 @@
 				if ( count % 2 === 0 ) {
 
 					cubeCamera1.update( renderer, scene );
-					material.envMap = cubeRenderTarget1.texture;
+					material.envMap = cubeRenderTarget1.textures[0];
 
 				} else {
 
 					cubeCamera2.update( renderer, scene );
-					material.envMap = cubeRenderTarget2.texture;
+					material.envMap = cubeRenderTarget2.textures[0];
 
 				}
 

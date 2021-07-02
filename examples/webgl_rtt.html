@@ -113,7 +113,7 @@
 
 				const materialScreen = new THREE.ShaderMaterial( {
 
-					uniforms: { tDiffuse: { value: rtTexture.texture } },
+					uniforms: { tDiffuse: { value: rtTexture.textures[0] } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
@@ -148,7 +148,7 @@
 
 				const n = 5,
 					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
-					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture.texture } );
+					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture.textures[0] } );
 
 				for ( let j = 0; j < n; j ++ ) {
 

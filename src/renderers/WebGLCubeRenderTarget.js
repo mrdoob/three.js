@@ -19,28 +19,33 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		}
 
-		super( size, size, options );
-
 		options = options || {};
+		if ( options.texture === undefined ) {
 
-		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+			options.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter,
+				options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
-		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
-		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+		}
 
-		this.texture._needsFlipEnvMap = false;
+		if ( options.texture._needsFlipEnvMap === undefined ) {
+
+			options.texture._needsFlipEnvMap = false;
+
+		}
+
+		super( size, size, options );
 
 	}
 
 	fromEquirectangularTexture( renderer, texture ) {
 
-		this.texture.type = texture.type;
-		this.texture.format = RGBAFormat; // see #18859
-		this.texture.encoding = texture.encoding;
+		this.textures[ 0 ].type = texture.type;
+		this.textures[ 0 ].format = RGBAFormat; // see #18859
+		this.textures[ 0 ].encoding = texture.encoding;
 
-		this.texture.generateMipmaps = texture.generateMipmaps;
-		this.texture.minFilter = texture.minFilter;
-		this.texture.magFilter = texture.magFilter;
+		this.textures[ 0 ].generateMipmaps = texture.generateMipmaps;
+		this.textures[ 0 ].minFilter = texture.minFilter;
+		this.textures[ 0 ].magFilter = texture.magFilter;
 
 		const shader = {
 
@@ -127,9 +132,9 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
-		for ( let i = 0; i < 6; i ++ ) {
+		for ( let f = 0; f < 6; f ++ ) {
 
-			renderer.setRenderTarget( this, i );
+			renderer.setRenderTarget( this, f );
 
 			renderer.clear( color, depth, stencil );
 

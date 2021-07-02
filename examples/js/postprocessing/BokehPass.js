@@ -22,7 +22,7 @@
 				minFilter: THREE.NearestFilter,
 				magFilter: THREE.NearestFilter
 			} );
-			this.renderTargetDepth.texture.name = 'BokehPass.depth'; // depth material
+			this.renderTargetDepth.textures[0].name = 'BokehPass.depth'; // depth material
 
 			this.materialDepth = new THREE.MeshDepthMaterial();
 			this.materialDepth.depthPacking = THREE.RGBADepthPacking;
@@ -36,7 +36,7 @@
 
 			const bokehShader = THREE.BokehShader;
 			const bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
-			bokehUniforms[ 'tDepth' ].value = this.renderTargetDepth.texture;
+			bokehUniforms[ 'tDepth' ].value = this.renderTargetDepth.textures[0];
 			bokehUniforms[ 'focus' ].value = focus;
 			bokehUniforms[ 'aspect' ].value = aspect;
 			bokehUniforms[ 'aperture' ].value = aperture;
@@ -72,7 +72,7 @@
 			renderer.clear();
 			renderer.render( this.scene, this.camera ); // Render bokeh composite
 
-			this.uniforms[ 'tColor' ].value = readBuffer.texture;
+			this.uniforms[ 'tColor' ].value = readBuffer.textures[0];
 			this.uniforms[ 'nearClip' ].value = this.camera.near;
 			this.uniforms[ 'farClip' ].value = this.camera.far;
 

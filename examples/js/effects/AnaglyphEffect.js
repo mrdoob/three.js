@@ -27,10 +27,10 @@
 			const _material = new THREE.ShaderMaterial( {
 				uniforms: {
 					'mapLeft': {
-						value: _renderTargetL.texture
+						value: _renderTargetL.textures[0]
 					},
 					'mapRight': {
-						value: _renderTargetR.texture
+						value: _renderTargetR.textures[0]
 					},
 					'colorMatrixLeft': {
 						value: this.colorMatrixLeft

@@ -266,14 +266,14 @@
 
 				const defaultMat = new THREE.MeshPhysicalMaterial( {
 					roughness: 1,
-					envMap: cubeRenderTarget.texture,
+					envMap: cubeRenderTarget.textures[0],
 					roughnessMap: rMap
 				} );
 
 				const boxProjectedMat = new THREE.MeshPhysicalMaterial( {
 					color: new THREE.Color( '#ffffff' ),
 					roughness: 1,
-					envMap: cubeRenderTarget.texture,
+					envMap: cubeRenderTarget.textures[0],
 					roughnessMap: rMap
 				} );
 

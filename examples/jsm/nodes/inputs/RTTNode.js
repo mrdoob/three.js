@@ -16,7 +16,7 @@ class RTTNode extends TextureNode {
 
 		const renderTarget = new WebGLRenderTarget( width, height, options );
 
-		super( renderTarget.texture );
+		super( renderTarget.textures[0] );
 
 		this.input = input;
 

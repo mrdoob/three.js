@@ -30,8 +30,8 @@ class ParallaxBarrierEffect {
 
 			uniforms: {
 
-				'mapLeft': { value: _renderTargetL.texture },
-				'mapRight': { value: _renderTargetR.texture }
+				'mapLeft': { value: _renderTargetL.textures[0] },
+				'mapRight': { value: _renderTargetR.textures[0] }
 
 			},
 

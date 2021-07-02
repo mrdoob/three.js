@@ -24,7 +24,7 @@ class SessionLightProbe {
 
 			// This is the simplest way I know of to initialize a WebGL cubemap in Three.
 			const cubeRenderTarget = new WebGLCubeRenderTarget( 16 );
-			xrLight.environment = cubeRenderTarget.texture;
+			xrLight.environment = cubeRenderTarget.textures[0];
 
 			const gl = renderer.getContext();
 

@@ -121,7 +121,7 @@
 						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 						pmremGenerator.dispose();
 
-						gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
+						gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.textures[0];
 						gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 
 						hdrEquirect.dispose();

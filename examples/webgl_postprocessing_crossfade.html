@@ -325,8 +325,8 @@
 				this.sceneA = sceneA;
 				this.sceneB = sceneB;
 
-				this.quadmaterial.uniforms.tDiffuse1.value = sceneA.fbo.texture;
-				this.quadmaterial.uniforms.tDiffuse2.value = sceneB.fbo.texture;
+				this.quadmaterial.uniforms.tDiffuse1.value = sceneA.fbo.textures[0];
+				this.quadmaterial.uniforms.tDiffuse2.value = sceneB.fbo.textures[0];
 
 				this.needChange = false;
 

@@ -205,7 +205,7 @@
 
 					case 'Generated':
 						renderTarget = generatedCubeRenderTarget;
-						cubeMap = generatedCubeRenderTarget.texture;
+						cubeMap = generatedCubeRenderTarget.textures[0];
 						break;
 					case 'LDR':
 						renderTarget = ldrCubeRenderTarget;
@@ -222,7 +222,7 @@
 
 				}
 
-				const newEnvMap = renderTarget ? renderTarget.texture : null;
+				const newEnvMap = renderTarget ? renderTarget.textures[0] : null;
 
 				if ( newEnvMap && newEnvMap !== torusMesh.material.envMap ) {
 

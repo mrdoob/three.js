@@ -67,7 +67,7 @@
 					magFilter: THREE.LinearFilter,
 					format: THREE.RGBAFormat
 				} );
-				this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
+				this.sampleRenderTarget.textures[0].name = 'SSAARenderPass.sample';
 
 			}
 
@@ -79,7 +79,7 @@
 			const oldClearAlpha = renderer.getClearAlpha();
 			const baseSampleWeight = 1.0 / jitterOffsets.length;
 			const roundingRange = 1 / 32;
-			this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
+			this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.textures[0];
 			const viewOffset = {
 				fullWidth: readBuffer.width,
 				fullHeight: readBuffer.height,

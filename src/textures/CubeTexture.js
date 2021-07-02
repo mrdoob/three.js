@@ -19,7 +19,7 @@ class CubeTexture extends Texture {
 
 		// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
 		// and the flag _needsFlipEnvMap controls this conversion. The flip is not required (and thus _needsFlipEnvMap is set to false)
-		// when using WebGLCubeRenderTarget.texture as a cube texture.
+		// when using a cube texture in WebGLCubeRenderTarget.textures.
 
 		this._needsFlipEnvMap = true;
 

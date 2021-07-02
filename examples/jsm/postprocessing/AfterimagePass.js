@@ -57,13 +57,13 @@ class AfterimagePass extends Pass {
 
 	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
-		this.uniforms[ 'tOld' ].value = this.textureOld.texture;
-		this.uniforms[ 'tNew' ].value = readBuffer.texture;
+		this.uniforms[ 'tOld' ].value = this.textureOld.textures[0];
+		this.uniforms[ 'tNew' ].value = readBuffer.textures[0];
 
 		renderer.setRenderTarget( this.textureComp );
 		this.compFsQuad.render( renderer );
 
-		this.copyFsQuad.material.map = this.textureComp.texture;
+		this.copyFsQuad.material.map = this.textureComp.textures[0];
 
 		if ( this.renderToScreen ) {
 

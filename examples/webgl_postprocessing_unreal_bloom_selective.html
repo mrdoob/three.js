@@ -105,7 +105,7 @@
 				new THREE.ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
-						bloomTexture: { value: bloomComposer.renderTarget2.texture }
+						bloomTexture: { value: bloomComposer.renderTarget2.textures[0] }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

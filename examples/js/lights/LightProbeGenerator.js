@@ -130,7 +130,7 @@
 					// pixel color
 					color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 ); // convert to linear color space
 
-					convertColorToLinear( color, cubeRenderTarget.texture.encoding ); // pixel coordinate on unit cube
+					convertColorToLinear( color, cubeRenderTarget.textures[0].encoding ); // pixel coordinate on unit cube
 
 					const pixelIndex = i / 4;
 					const col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;

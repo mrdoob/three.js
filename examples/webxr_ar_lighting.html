@@ -91,7 +91,7 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						defaultEnvironment = pmremGenerator.fromEquirectangular( texture ).texture;
+						defaultEnvironment = pmremGenerator.fromEquirectangular( texture ).textures[0];
 
 						scene.environment = defaultEnvironment;
 

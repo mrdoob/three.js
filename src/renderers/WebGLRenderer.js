@@ -10,7 +10,8 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter,
 	NearestFilter,
-	ClampToEdgeWrapping
+	ClampToEdgeWrapping,
+	DepthFormat
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -1492,7 +1493,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
-		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
+		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.textures[ 0 ].encoding;
 		const envMap = cubemaps.get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && object.geometry && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
 
@@ -1826,25 +1827,13 @@ function WebGLRenderer( parameters = {} ) {
 		}
 
 		let framebuffer = null;
-		let isCube = false;
-		let isRenderTarget3D = false;
-
 		if ( renderTarget ) {
-
-			const texture = renderTarget.texture;
-
-			if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
-
-				isRenderTarget3D = true;
-
-			}
 
 			const __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
 			if ( renderTarget.isWebGLCubeRenderTarget ) {
 
 				framebuffer = __webglFramebuffer[ activeCubeFace ];
-				isCube = true;
 
 			} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
 
@@ -1876,31 +1865,20 @@ function WebGLRenderer( parameters = {} ) {
 
 			if ( renderTarget ) {
 
-				if ( renderTarget.isWebGLMultipleRenderTargets ) {
+				const textures = renderTarget.textures;
 
-					const textures = renderTarget.texture;
+				if ( _currentDrawBuffers.length !== textures.length ) {
 
-					if ( _currentDrawBuffers.length !== textures.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
+					_currentDrawBuffers.length = textures.length;
+					needsUpdate = true;
 
-						for ( let i = 0, il = textures.length; i < il; i ++ ) {
+				}
 
-							_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
+				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-						}
+					if ( _currentDrawBuffers[ i ] !== _gl.COLOR_ATTACHMENT0 + i ) {
 
-						_currentDrawBuffers.length = textures.length;
-
-						needsUpdate = true;
-
-					}
-
-				} else {
-
-					if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
-
-						_currentDrawBuffers[ 0 ] = _gl.COLOR_ATTACHMENT0;
-						_currentDrawBuffers.length = 1;
-
+						_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
 						needsUpdate = true;
 
 					}
@@ -1940,17 +1918,72 @@ function WebGLRenderer( parameters = {} ) {
 		state.scissor( _currentScissor );
 		state.setScissorTest( _currentScissorTest );
 
-		if ( isCube ) {
+		if ( renderTarget ) {
 
-			const textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + activeCubeFace, textureProperties.__webglTexture, activeMipmapLevel );
+			const textures = renderTarget.textures;
+			for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-		} else if ( isRenderTarget3D ) {
+				const texture = textures[ i ];
+				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
 
-			const textureProperties = properties.get( renderTarget.texture );
-			const layer = activeCubeFace || 0;
-			_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel || 0, layer );
+					const attachment = _gl.COLOR_ATTACHMENT0 + i;
+					const __webglTexture = properties.get( texture ).__webglTexture;
+					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, __webglTexture, activeMipmapLevel, activeCubeFace );
 
+				}
+
+			}
+<<<<<<< HEAD
+
+			if ( renderTarget.depthTexture ) {
+
+				const texture = renderTarget.depthTexture;
+				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
+
+					const attachment = texture.format === DepthFormat ? _gl.DEPTH_ATTACHMENT : _gl.DEPTH_STENCIL_ATTACHMENT;
+					const __webglTexture = properties.get( texture ).__webglTexture;
+					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, __webglTexture, activeMipmapLevel, activeCubeFace );
+
+				}
+
+			}
+
+		}
+=======
+
+			if ( renderTarget.depthTexture ) {
+
+				const texture = renderTarget.depthTexture;
+				const __webglTexture = properties.get( texture ).__webglTexture;
+
+				let attachment = undefined;
+				if ( texture.format === DepthFormat ) {
+
+					attachment = _gl.DEPTH_ATTACHMENT;
+
+				} else if ( texture.format === DepthStencilFormat ) {
+
+					attachment = _gl.DEPTH_STENCIL_ATTACHMENT;
+
+				} else {
+
+					throw new Error( 'Unknown depthTexture format' );
+
+				}
+>>>>>>> 16d6755e20... fix
+
+		const framebufferStatus = _gl.checkFramebufferStatus( _gl.FRAMEBUFFER );
+		if ( framebufferStatus !== _gl.FRAMEBUFFER_COMPLETE ) {
+
+			console.error( 'incomplete fbo', framebufferStatus );
+
+<<<<<<< HEAD
+=======
+				}
+
+			}
+
+>>>>>>> 16d6755e20... fix
 		}
 
 	};
@@ -1978,7 +2011,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			try {
 
-				const texture = renderTarget.texture;
+				const texture = renderTarget.textures[ 0 ];
 				const textureFormat = texture.format;
 				const textureType = texture.type;
 

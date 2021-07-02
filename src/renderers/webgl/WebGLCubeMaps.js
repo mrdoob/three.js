@@ -31,7 +31,7 @@ function WebGLCubeMaps( renderer ) {
 
 				if ( cubemaps.has( texture ) ) {
 
-					const cubemap = cubemaps.get( texture ).texture;
+					const cubemap = cubemaps.get( texture ).textures[ 0 ];
 					return mapTextureMapping( cubemap, texture.mapping );
 
 				} else {
@@ -50,7 +50,7 @@ function WebGLCubeMaps( renderer ) {
 
 						texture.addEventListener( 'dispose', onTextureDispose );
 
-						return mapTextureMapping( renderTarget.texture, texture.mapping );
+						return mapTextureMapping( renderTarget.textures[ 0 ], texture.mapping );
 
 					} else {
 

@@ -133,8 +133,8 @@ class CinematicCamera extends PerspectiveCamera {
 
 			this.postprocessing.bokeh_uniforms = UniformsUtils.clone( bokeh_shader.uniforms );
 
-			this.postprocessing.bokeh_uniforms[ 'tColor' ].value = this.postprocessing.rtTextureColor.texture;
-			this.postprocessing.bokeh_uniforms[ 'tDepth' ].value = this.postprocessing.rtTextureDepth.texture;
+			this.postprocessing.bokeh_uniforms[ 'tColor' ].value = this.postprocessing.rtTextureColor.textures[0];
+			this.postprocessing.bokeh_uniforms[ 'tDepth' ].value = this.postprocessing.rtTextureDepth.textures[0];
 
 			this.postprocessing.bokeh_uniforms[ 'manualdof' ].value = 0;
 			this.postprocessing.bokeh_uniforms[ 'shaderFocus' ].value = 0;

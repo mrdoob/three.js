@@ -48,7 +48,7 @@
 
 			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
-				renderTarget.texture.generateMipmaps = false;
+				renderTarget.textures[0].generateMipmaps = false;
 
 			}
 
@@ -198,7 +198,7 @@
 				side: side,
 				fog: fog
 			} );
-			material.uniforms[ 'mirrorSampler' ].value = renderTarget.texture;
+			material.uniforms[ 'mirrorSampler' ].value = renderTarget.textures[0];
 			material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 			material.uniforms[ 'alpha' ].value = alpha;
 			material.uniforms[ 'time' ].value = time;

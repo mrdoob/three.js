@@ -12,14 +12,14 @@
 				minFilter: THREE.LinearFilter,
 				format: THREE.RGBFormat
 			} );
-			this.edgesRT.texture.name = 'SMAAPass.edges';
+			this.edgesRT.textures[0].name = 'SMAAPass.edges';
 			this.weightsRT = new THREE.WebGLRenderTarget( width, height, {
 				depthBuffer: false,
 				generateMipmaps: false,
 				minFilter: THREE.LinearFilter,
 				format: THREE.RGBAFormat
 			} );
-			this.weightsRT.texture.name = 'SMAAPass.weights'; // textures
+			this.weightsRT.textures[0].name = 'SMAAPass.weights'; // textures
 
 			const scope = this;
 			const areaTextureImage = new Image();
@@ -74,7 +74,7 @@
 
 			this.uniformsWeights = THREE.UniformsUtils.clone( THREE.SMAAWeightsShader.uniforms );
 			this.uniformsWeights[ 'resolution' ].value.set( 1 / width, 1 / height );
-			this.uniformsWeights[ 'tDiffuse' ].value = this.edgesRT.texture;
+			this.uniformsWeights[ 'tDiffuse' ].value = this.edgesRT.textures[0];
 			this.uniformsWeights[ 'tArea' ].value = this.areaTexture;
 			this.uniformsWeights[ 'tSearch' ].value = this.searchTexture;
 			this.materialWeights = new THREE.ShaderMaterial( {
@@ -86,7 +86,7 @@
 
 			this.uniformsBlend = THREE.UniformsUtils.clone( THREE.SMAABlendShader.uniforms );
 			this.uniformsBlend[ 'resolution' ].value.set( 1 / width, 1 / height );
-			this.uniformsBlend[ 'tDiffuse' ].value = this.weightsRT.texture;
+			this.uniformsBlend[ 'tDiffuse' ].value = this.weightsRT.textures[0];
 			this.materialBlend = new THREE.ShaderMaterial( {
 				uniforms: this.uniformsBlend,
 				vertexShader: THREE.SMAABlendShader.vertexShader,
@@ -102,7 +102,7 @@
 		) {
 
 			// pass 1
-			this.uniformsEdges[ 'tDiffuse' ].value = readBuffer.texture;
+			this.uniformsEdges[ 'tDiffuse' ].value = readBuffer.textures[0];
 			this.fsQuad.material = this.materialEdges;
 			renderer.setRenderTarget( this.edgesRT );
 			if ( this.clear ) renderer.clear();
@@ -113,7 +113,7 @@
 			if ( this.clear ) renderer.clear();
 			this.fsQuad.render( renderer ); // pass 3
 
-			this.uniformsBlend[ 'tColor' ].value = readBuffer.texture;
+			this.uniformsBlend[ 'tColor' ].value = readBuffer.textures[0];
 			this.fsQuad.material = this.materialBlend;
 
 			if ( this.renderToScreen ) {

@@ -945,7 +945,7 @@ class NodeBuilder {
 		} else if ( map.isWebGLRenderTarget ) {
 
 			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
-			encoding = map.texture.encoding;
+			encoding = map.textures[0].encoding;
 
 		}
 

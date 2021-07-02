@@ -198,7 +198,7 @@
 
 				//
 
-				renderScene = new TexturePass( composerScene.renderTarget2.texture );
+				renderScene = new TexturePass( composerScene.renderTarget2.textures[0] );
 
 				//
 
@@ -245,7 +245,7 @@
 				composer4.addPass( effectBleach );
 				composer4.addPass( effectVignette );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
+				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.textures[0];
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -275,7 +275,7 @@
 				composer3.setSize( halfWidth, halfHeight );
 				composer4.setSize( halfWidth, halfHeight );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
+				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.textures[0];
 
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );

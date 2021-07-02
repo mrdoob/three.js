@@ -83,7 +83,7 @@
 										clearcoat: 1.0 - alpha,
 										clearcoatRoughness: 1.0 - beta,
 										reflectivity: 1.0 - gamma,
-										envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
+										envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.textures[0] : null
 									} );
 
 									index ++;
@@ -106,7 +106,7 @@
 
 						}
 
-						scene.background = hdrCubeRenderTarget.texture;
+						scene.background = hdrCubeRenderTarget.textures[0];
 
 					} );
 

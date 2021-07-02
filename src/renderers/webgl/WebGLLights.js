@@ -225,7 +225,7 @@ function WebGLLights( extensions, capabilities ) {
 			const intensity = light.intensity;
 			const distance = light.distance;
 
-			const shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
+			const shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.textures[ 0 ] : null;
 
 			if ( light.isAmbientLight ) {
 

@@ -27,15 +27,16 @@
 		<script id="post-frag" type="x-shader/x-fragment">
 			#include <packing>
 
+			precision highp sampler2DArray;
 			varying vec2 vUv;
 			uniform sampler2D tDiffuse;
-			uniform sampler2D tDepth;
+			uniform sampler2DArray tDepth;
 			uniform float cameraNear;
 			uniform float cameraFar;
 
 
-			float readDepth( sampler2D depthSampler, vec2 coord ) {
-				float fragCoordZ = texture2D( depthSampler, coord ).x;
+			float readDepth( sampler2DArray depthSampler, vec2 coord ) {
+				float fragCoordZ = texture( depthSampler, vec3(coord, 0.5) ).x;
 				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
 				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 			}
@@ -143,13 +144,13 @@
 				const type = parseFloat( params.type );
 
 				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				target.texture.format = THREE.RGBFormat;
-				target.texture.minFilter = THREE.NearestFilter;
-				target.texture.magFilter = THREE.NearestFilter;
-				target.texture.generateMipmaps = false;
+				target.textures[0].format = THREE.RGBFormat;
+				target.textures[0].minFilter = THREE.NearestFilter;
+				target.textures[0].magFilter = THREE.NearestFilter;
+				target.textures[0].generateMipmaps = false;
 				target.stencilBuffer = ( format === THREE.DepthStencilFormat ) ? true : false;
 				target.depthBuffer = true;
-				target.depthTexture = new THREE.DepthTexture();
+				target.depthTexture = new THREE.DataTexture2DArray();
 				target.depthTexture.format = format;
 				target.depthTexture.type = type;
 
@@ -212,7 +213,7 @@
 				camera.updateProjectionMatrix();
 
 				const dpr = renderer.getPixelRatio();
-				target.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				target.setSize( Math.floor( window.innerWidth * dpr ), Math.floor( window.innerHeight * dpr ) );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
@@ -228,7 +229,7 @@
 				renderer.render( scene, camera );
 
 				// render post FX
-				postMaterial.uniforms.tDiffuse.value = target.texture;
+				postMaterial.uniforms.tDiffuse.value = target.textures[0];
 				postMaterial.uniforms.tDepth.value = target.depthTexture;
 
 				renderer.setRenderTarget( null );

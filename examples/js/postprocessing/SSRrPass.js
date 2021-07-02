@@ -141,11 +141,11 @@
 				fragmentShader: THREE.SSRrShader.fragmentShader,
 				blending: THREE.NoBlending
 			} );
-			this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-			this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
-			this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.texture;
+			this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
+			this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.textures[0];
+			this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.textures[0];
 			this.ssrrMaterial.needsUpdate = true;
-			this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
+			this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.textures[0];
 			this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 			this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalSelectsRenderTarget.depthTexture;
 			this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
@@ -228,7 +228,7 @@
 		) {
 
 			// render beauty and depth
-			if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
+			if ( this.encoding ) this.beautyRenderTarget.textures[0].encoding = this.encoding;
 			renderer.setRenderTarget( this.beautyRenderTarget );
 			renderer.clear();
 			this.scene.children.forEach( child => {
@@ -292,28 +292,28 @@
 			this.ssrrMaterial.uniforms[ 'ior' ].value = this.ior;
 			this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 			this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-			this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
+			this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.textures[0];
 			this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget ); // output result to screen
 
 			switch ( this.output ) {
 
 				case SSRrPass.OUTPUT.Default:
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
 					this.copyMaterial.blending = THREE.NoBlending;
 					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.textures[0];
 					this.copyMaterial.blending = THREE.NormalBlending;
 					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 					break;
 
 				case SSRrPass.OUTPUT.SSRr:
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.textures[0];
 					this.copyMaterial.blending = THREE.NoBlending;
 					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 					break;
 
 				case SSRrPass.OUTPUT.Beauty:
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
 					this.copyMaterial.blending = THREE.NoBlending;
 					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 					break;
@@ -329,19 +329,19 @@
 					break;
 
 				case SSRrPass.OUTPUT.NormalSelects:
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalSelectsRenderTarget.texture;
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalSelectsRenderTarget.textures[0];
 					this.copyMaterial.blending = THREE.NoBlending;
 					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 					break;
 
 				case SSRrPass.OUTPUT.Refractive:
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.refractiveRenderTarget.texture;
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.refractiveRenderTarget.textures[0];
 					this.copyMaterial.blending = THREE.NoBlending;
 					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 					break;
 
 				case SSRrPass.OUTPUT.Specular:
-					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.specularRenderTarget.texture;
+					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.specularRenderTarget.textures[0];
 					this.copyMaterial.blending = THREE.NoBlending;
 					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 					break;

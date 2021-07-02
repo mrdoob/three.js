@@ -162,7 +162,7 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						envMap = pmremGenerator.fromEquirectangular( texture ).textures[0];
 						pmremGenerator.dispose();
 
 						background = envMap;

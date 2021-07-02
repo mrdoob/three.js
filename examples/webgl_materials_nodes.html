@@ -81,7 +81,7 @@
 				const generateMipmaps = pmremCube.generateMipmaps;
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
+				premTexture = pmremGenerator.fromCubemap( pmremCube ).textures[0];
 				pmremGenerator.dispose();
 
 				pmremCube.minFilter = minFilter;
@@ -281,7 +281,7 @@
 
 				if ( rtTexture ) {
 
-					delete library[ rtTexture.texture.uuid ];
+					delete library[ rtTexture.textures[0].uuid ];
 
 					rtTexture.dispose();
 					rtTexture = null;
@@ -3136,7 +3136,7 @@
 
 						rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 
-						library[ rtTexture.texture.uuid ] = rtTexture.texture;
+						library[ rtTexture.textures[0].uuid ] = rtTexture.textures[0];
 
 						var distanceMtl = new Nodes.PhongNodeMaterial();
 						distanceMtl.environment = objectDepth;

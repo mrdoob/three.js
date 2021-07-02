@@ -74,7 +74,7 @@ class Water extends Mesh {
 
 		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
-			renderTarget.texture.generateMipmaps = false;
+			renderTarget.textures[0].generateMipmaps = false;
 
 		}
 
@@ -208,7 +208,7 @@ class Water extends Mesh {
 			fog: fog
 		} );
 
-		material.uniforms[ 'mirrorSampler' ].value = renderTarget.texture;
+		material.uniforms[ 'mirrorSampler' ].value = renderTarget.textures[0];
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 		material.uniforms[ 'alpha' ].value = alpha;
 		material.uniforms[ 'time' ].value = time;

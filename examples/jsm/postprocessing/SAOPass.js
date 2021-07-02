@@ -112,8 +112,8 @@ class SAOPass extends Pass {
 		this.saoMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 		this.saoMaterial.defines[ 'NORMAL_TEXTURE' ] = this.supportsNormalTexture ? 1 : 0;
 		this.saoMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
-		this.saoMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
-		this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
+		this.saoMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.textures[0];
+		this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.textures[0];
 		this.saoMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
@@ -133,8 +133,8 @@ class SAOPass extends Pass {
 		} );
 		this.vBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 		this.vBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
-		this.vBlurMaterial.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.texture;
-		this.vBlurMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
+		this.vBlurMaterial.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.textures[0];
+		this.vBlurMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.textures[0];
 		this.vBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 		this.vBlurMaterial.blending = NoBlending;
 
@@ -146,8 +146,8 @@ class SAOPass extends Pass {
 		} );
 		this.hBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 		this.hBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
-		this.hBlurMaterial.uniforms[ 'tDiffuse' ].value = this.blurIntermediateRenderTarget.texture;
-		this.hBlurMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
+		this.hBlurMaterial.uniforms[ 'tDiffuse' ].value = this.blurIntermediateRenderTarget.textures[0];
+		this.hBlurMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.textures[0];
 		this.hBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 		this.hBlurMaterial.blending = NoBlending;
 
@@ -197,7 +197,7 @@ class SAOPass extends Pass {
 		if ( this.renderToScreen ) {
 
 			this.materialCopy.blending = NoBlending;
-			this.materialCopy.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+			this.materialCopy.uniforms[ 'tDiffuse' ].value = readBuffer.textures[0];
 			this.materialCopy.needsUpdate = true;
 			this.renderPass( renderer, this.materialCopy, null );
 
@@ -288,7 +288,7 @@ class SAOPass extends Pass {
 
 			} else {
 
-				this.depthCopy.uniforms[ 'tDiffuse' ].value = this.depthRenderTarget.texture;
+				this.depthCopy.uniforms[ 'tDiffuse' ].value = this.depthRenderTarget.textures[0];
 				this.depthCopy.needsUpdate = true;
 				outputMaterial = this.depthCopy;
 
@@ -296,12 +296,12 @@ class SAOPass extends Pass {
 
 		} else if ( this.params.output === 4 ) {
 
-			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.textures[0];
 			this.materialCopy.needsUpdate = true;
 
 		} else {
 
-			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.texture;
+			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.textures[0];
 			this.materialCopy.needsUpdate = true;
 
 		}

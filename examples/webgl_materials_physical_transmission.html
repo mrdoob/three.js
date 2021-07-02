@@ -71,7 +71,7 @@
 				hdrEquirect.dispose();
 				pmremGenerator.dispose();
 
-				scene.background = hdrCubeRenderTarget.texture;
+				scene.background = hdrCubeRenderTarget.textures[0];
 
 				//
 
@@ -89,7 +89,7 @@
 					roughness: params.roughness,
 					reflectivity: params.reflectivity,
 					alphaMap: texture,
-					envMap: hdrCubeRenderTarget.texture,
+					envMap: hdrCubeRenderTarget.textures[0],
 					envMapIntensity: params.envMapIntensity,
 					transmission: params.transmission, // use material.transmission for glass materials
 					opacity: params.opacity,

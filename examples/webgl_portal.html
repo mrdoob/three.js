@@ -93,7 +93,7 @@
 					magFilter: THREE.LinearFilter,
 					format: THREE.RGBFormat
 				} );
-				leftPortal = new THREE.Mesh( planeGeo, new THREE.MeshBasicMaterial( { map: leftPortalTexture.texture } ) );
+				leftPortal = new THREE.Mesh( planeGeo, new THREE.MeshBasicMaterial( { map: leftPortalTexture.textures[0] } ) );
 				leftPortal.position.x = - 30;
 				leftPortal.position.y = 20;
 				leftPortal.scale.set( 0.35, 0.35, 0.35 );
@@ -104,7 +104,7 @@
 					magFilter: THREE.LinearFilter,
 					format: THREE.RGBFormat
 				} );
-				rightPortal = new THREE.Mesh( planeGeo, new THREE.MeshBasicMaterial( { map: rightPortalTexture.texture } ) );
+				rightPortal = new THREE.Mesh( planeGeo, new THREE.MeshBasicMaterial( { map: rightPortalTexture.textures[0] } ) );
 				rightPortal.position.x = 30;
 				rightPortal.position.y = 20;
 				rightPortal.scale.set( 0.35, 0.35, 0.35 );
@@ -191,7 +191,7 @@
 				CameraUtils.frameCorners( portalCamera, bottomLeftCorner, bottomRightCorner, topLeftCorner, false );
 
 				// render the portal
-				thisPortalTexture.texture.encoding = renderer.outputEncoding;
+				thisPortalTexture.textures[0].encoding = renderer.outputEncoding;
 				renderer.setRenderTarget( thisPortalTexture );
 				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 				if ( renderer.autoClear === false ) renderer.clear();

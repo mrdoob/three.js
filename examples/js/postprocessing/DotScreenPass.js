@@ -24,7 +24,7 @@
 			/*, deltaTime, maskActive */
 		) {
 
-			this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+			this.uniforms[ 'tDiffuse' ].value = readBuffer.textures[0];
 			this.uniforms[ 'tSize' ].value.set( readBuffer.width, readBuffer.height );
 
 			if ( this.renderToScreen ) {

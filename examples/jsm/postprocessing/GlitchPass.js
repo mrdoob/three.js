@@ -39,7 +39,7 @@ class GlitchPass extends Pass {
 
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+		this.uniforms[ 'tDiffuse' ].value = readBuffer.textures[0];
 		this.uniforms[ 'seed' ].value = Math.random();//default seeding
 		this.uniforms[ 'byp' ].value = 0;
 

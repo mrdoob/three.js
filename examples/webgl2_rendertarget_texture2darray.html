@@ -201,7 +201,7 @@
 
 						var material = new THREE.ShaderMaterial( {
 							uniforms: {
-								diffuse: { value: renderTarget.texture },
+								diffuse: { value: renderTarget.textures[0] },
 								depth: { value: 55 },
 								size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
 							},

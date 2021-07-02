@@ -10,33 +10,63 @@ import { Vector4 } from '../math/Vector4.js';
 */
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor( width, height, options = {} ) {
+	constructor( width, height, depth, options = {} ) {
+
+		if ( ! Number.isInteger( depth ) ) {
+
+			options = depth || options;
+			depth = 1;
+
+		}
 
 		super();
 
 		this.width = width;
 		this.height = height;
-		this.depth = 1;
+		this.depth = depth;
 
 		this.scissor = new Vector4( 0, 0, width, height );
 		this.scissorTest = false;
 
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
-
-		this.texture.image = { width: width, height: height, depth: 1 };
-
-		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
-		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
-
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
+		const count = options.count !== undefined ? options.count : 1;
+		const texture = options.texture !== undefined ? options.texture :
+			new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter,
+				options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+
+		texture.image = { width: width, height: height, depth: depth };
+		texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+		texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+
+		this.textures = [];
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.textures[ i ] = texture.clone();
+
+		}
+
 	}
 
-	setTexture( texture ) {
+	get texture() {
+
+		console.log( 'get WebGLRenderTarget.texture' );
+		return this.textures[ 0 ];
+
+	}
+
+	set texture( value ) {
+
+		console.log( 'set WebGLRenderTarget.texture' );
+		this.textures[ 0 ] = value;
+
+	}
+
+	setTexture( texture, attachment = 0 ) {
 
 		texture.image = {
 			width: this.width,
@@ -44,11 +74,25 @@ class WebGLRenderTarget extends EventDispatcher {
 			depth: this.depth
 		};
 
-		this.texture = texture;
+		this.textures[ attachment ] = texture;
 
 	}
 
-	setSize( width, height, depth = 1 ) {
+	setDepthTexture( texture ) {
+
+		texture.image = {
+			width: this.width,
+			height: this.height,
+			depth: this.depth
+		};
+
+		this.depthTexture = texture;
+
+	}
+
+	setSize( width, height, depth ) {
+
+		if ( depth === undefined ) depth = this.depth;
 
 		if ( this.width !== width || this.height !== height || this.depth !== depth ) {
 
@@ -56,9 +100,13 @@ class WebGLRenderTarget extends EventDispatcher {
 			this.height = height;
 			this.depth = depth;
 
-			this.texture.image.width = width;
-			this.texture.image.height = height;
-			this.texture.image.depth = depth;
+			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
+
+				this.textures[ i ].image.width = width;
+				this.textures[ i ].image.height = height;
+				this.textures[ i ].image.depth = depth;
+
+			}
 
 			this.dispose();
 
@@ -66,6 +114,8 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.viewport.set( 0, 0, width, height );
 		this.scissor.set( 0, 0, width, height );
+
+		return this;
 
 	}
 
@@ -77,14 +127,22 @@ class WebGLRenderTarget extends EventDispatcher {
 
 	copy( source ) {
 
+		this.dispose();
+
 		this.width = source.width;
 		this.height = source.height;
 		this.depth = source.depth;
 
 		this.viewport.copy( source.viewport );
+		this.scissor.copy( source.scissor );
 
-		this.texture = source.texture.clone();
-		this.texture.image = { ...this.texture.image }; // See #20328.
+		this.textures.length = 0;
+		for ( let i = 0, il = source.textures.length; i < il; i ++ ) {
+
+			this.textures[ i ] = source.textures[ i ].clone();
+			this.textures[ i ].image = { ...this.textures[ i ].image }; // See #20328.
+
+		}
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
