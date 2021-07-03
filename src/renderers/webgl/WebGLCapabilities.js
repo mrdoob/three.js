@@ -70,6 +70,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	const drawBuffers = isWebGL2 || extensions.has( 'WEBGL_draw_buffers' );
 
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
+	const logarithmicDepthBufferFragment = parameters.logarithmicDepthBufferFragment === true;
 
 	const maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 	const maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
@@ -98,6 +99,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 		precision: precision,
 		logarithmicDepthBuffer: logarithmicDepthBuffer,
+		logarithmicDepthBufferFragment: logarithmicDepthBufferFragment,
 
 		maxTextures: maxTextures,
 		maxVertexTextures: maxVertexTextures,
