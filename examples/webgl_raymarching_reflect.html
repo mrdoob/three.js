@@ -289,7 +289,7 @@
 					uniforms: {
 						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
 						cameraWorldMatrix: { value: camera.matrixWorld },
-						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().copy( camera.projectionMatrixInverse ) }
+						cameraProjectionMatrixInverse: { value: camera.projectionMatrixInverse.clone() }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
