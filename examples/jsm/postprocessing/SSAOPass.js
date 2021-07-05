@@ -104,8 +104,8 @@ class SSAOPass extends Pass {
 			blending: NoBlending
 		} );
 
-		this.ssaoMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
-		this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.textures[0];
+		this.ssaoMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+		this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 		this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 		this.ssaoMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
 		this.ssaoMaterial.uniforms[ 'kernel' ].value = this.kernel;
@@ -128,7 +128,7 @@ class SSAOPass extends Pass {
 			vertexShader: SSAOBlurShader.vertexShader,
 			fragmentShader: SSAOBlurShader.fragmentShader
 		} );
-		this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.textures[0];
+		this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
 		this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 
 		// material for rendering the depth
@@ -220,7 +220,7 @@ class SSAOPass extends Pass {
 
 			case SSAOPass.OUTPUT.SSAO:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -228,7 +228,7 @@ class SSAOPass extends Pass {
 
 			case SSAOPass.OUTPUT.Blur:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -236,7 +236,7 @@ class SSAOPass extends Pass {
 
 			case SSAOPass.OUTPUT.Beauty:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -250,7 +250,7 @@ class SSAOPass extends Pass {
 
 			case SSAOPass.OUTPUT.Normal:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -258,11 +258,11 @@ class SSAOPass extends Pass {
 
 			case SSAOPass.OUTPUT.Default:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = CustomBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 

@@ -321,7 +321,7 @@
 
 					//
 
-					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.textures[0];
+					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysDepthMask;
 					renderer.setRenderTarget( postprocessing.rtTextureDepthMask );
@@ -343,18 +343,18 @@
 					// appear as a glimmer along the length of the beams
 
 					// pass 1 - render into first ping-pong target
-					filterGodRays( postprocessing.rtTextureDepthMask.textures[0], postprocessing.rtTextureGodRays2, getStepSize( filterLen, TAPS_PER_PASS, 1.0 ) );
+					filterGodRays( postprocessing.rtTextureDepthMask.texture, postprocessing.rtTextureGodRays2, getStepSize( filterLen, TAPS_PER_PASS, 1.0 ) );
 
 					// pass 2 - render into second ping-pong target
-					filterGodRays( postprocessing.rtTextureGodRays2.textures[0], postprocessing.rtTextureGodRays1, getStepSize( filterLen, TAPS_PER_PASS, 2.0 ) );
+					filterGodRays( postprocessing.rtTextureGodRays2.texture, postprocessing.rtTextureGodRays1, getStepSize( filterLen, TAPS_PER_PASS, 2.0 ) );
 
 					// pass 3 - 1st RT
-					filterGodRays( postprocessing.rtTextureGodRays1.textures[0], postprocessing.rtTextureGodRays2, getStepSize( filterLen, TAPS_PER_PASS, 3.0 ) );
+					filterGodRays( postprocessing.rtTextureGodRays1.texture, postprocessing.rtTextureGodRays2, getStepSize( filterLen, TAPS_PER_PASS, 3.0 ) );
 
 					// final pass - composite god-rays onto colors
 
-					postprocessing.godrayCombineUniforms[ "tColors" ].value = postprocessing.rtTextureColors.textures[0];
-					postprocessing.godrayCombineUniforms[ "tGodRays" ].value = postprocessing.rtTextureGodRays2.textures[0];
+					postprocessing.godrayCombineUniforms[ "tColors" ].value = postprocessing.rtTextureColors.texture;
+					postprocessing.godrayCombineUniforms[ "tGodRays" ].value = postprocessing.rtTextureGodRays2.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
 

@@ -916,7 +916,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		} else {
 
 			// Use the first texture for MRT so far
-			const texture = renderTarget.textures[ 0 ];
+			const texture = renderTarget.texture;
 
 			const glFormat = utils.convert( texture.format );
 			const glType = utils.convert( texture.type );
@@ -1292,7 +1292,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			texture = texture.textures[ 0 ];
+			texture = texture.texture;
 
 		}
 
@@ -1311,7 +1311,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			texture = texture.textures[ 0 ];
+			texture = texture.texture;
 
 		}
 

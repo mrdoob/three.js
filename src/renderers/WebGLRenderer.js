@@ -11,7 +11,8 @@ import {
 	LinearMipmapLinearFilter,
 	NearestFilter,
 	ClampToEdgeWrapping,
-	DepthFormat
+	DepthFormat,
+	DepthStencilFormat
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -1493,7 +1494,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
-		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.textures[ 0 ].encoding;
+		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 		const envMap = cubemaps.get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && object.geometry && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
 
@@ -1882,7 +1883,6 @@ function WebGLRenderer( parameters = {} ) {
 						needsUpdate = true;
 
 					}
-
 				}
 
 			} else {
@@ -1922,36 +1922,15 @@ function WebGLRenderer( parameters = {} ) {
 
 			const textures = renderTarget.textures;
 			for ( let i = 0, il = textures.length; i < il; i ++ ) {
-
 				const texture = textures[ i ];
+				const __webglTexture = properties.get( texture ).__webglTexture;
+				const attachment = _gl.COLOR_ATTACHMENT0 + i;
 				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
 
-					const attachment = _gl.COLOR_ATTACHMENT0 + i;
-					const __webglTexture = properties.get( texture ).__webglTexture;
 					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, __webglTexture, activeMipmapLevel, activeCubeFace );
 
 				}
-
 			}
-<<<<<<< HEAD
-
-			if ( renderTarget.depthTexture ) {
-
-				const texture = renderTarget.depthTexture;
-				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
-
-					const attachment = texture.format === DepthFormat ? _gl.DEPTH_ATTACHMENT : _gl.DEPTH_STENCIL_ATTACHMENT;
-					const __webglTexture = properties.get( texture ).__webglTexture;
-					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, __webglTexture, activeMipmapLevel, activeCubeFace );
-
-				}
-
-			}
-
-		}
-=======
-
-			if ( renderTarget.depthTexture ) {
 
 				const texture = renderTarget.depthTexture;
 				const __webglTexture = properties.get( texture ).__webglTexture;
@@ -1967,25 +1946,33 @@ function WebGLRenderer( parameters = {} ) {
 
 				} else {
 
-					throw new Error( 'Unknown depthTexture format' );
+
+			if ( renderTarget.depthTexture ) {
+
+				const texture = renderTarget.depthTexture;
+				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
+
+					let attachment = undefined;
+					if ( texture.format === DepthFormat ) {
+
+						attachment = _gl.DEPTH_ATTACHMENT;
+
+					} else if ( texture.format === DepthStencilFormat ) {
+
+						attachment = _gl.DEPTH_STENCIL_ATTACHMENT;
+
+					} else {
+
+						throw new Error( 'Unknown depthTexture format' );
+
+					}
+
+					const __webglTexture = properties.get( texture ).__webglTexture;
+					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, __webglTexture, activeMipmapLevel, activeCubeFace );
 
 				}
->>>>>>> 16d6755e20... fix
-
-		const framebufferStatus = _gl.checkFramebufferStatus( _gl.FRAMEBUFFER );
-		if ( framebufferStatus !== _gl.FRAMEBUFFER_COMPLETE ) {
-
-			console.error( 'incomplete fbo', framebufferStatus );
-
-<<<<<<< HEAD
-=======
-				}
-
 			}
-
->>>>>>> 16d6755e20... fix
 		}
-
 	};
 
 	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
@@ -2011,7 +1998,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			try {
 
-				const texture = renderTarget.textures[ 0 ];
+				const texture = renderTarget.texture;
 				const textureFormat = texture.format;
 				const textureType = texture.type;
 

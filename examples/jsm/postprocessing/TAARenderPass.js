@@ -42,14 +42,14 @@ class TAARenderPass extends SSAARenderPass {
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
-			this.sampleRenderTarget.textures[0].name = 'TAARenderPass.sample';
+			this.sampleRenderTarget.texture.name = 'TAARenderPass.sample';
 
 		}
 
 		if ( ! this.holdRenderTarget ) {
 
 			this.holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
-			this.holdRenderTarget.textures[0].name = 'TAARenderPass.hold';
+			this.holdRenderTarget.texture.name = 'TAARenderPass.hold';
 
 		}
 
@@ -69,7 +69,7 @@ class TAARenderPass extends SSAARenderPass {
 		if ( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 
 			this.copyUniforms[ 'opacity' ].value = sampleWeight;
-			this.copyUniforms[ 'tDiffuse' ].value = writeBuffer.textures[0];
+			this.copyUniforms[ 'tDiffuse' ].value = writeBuffer.texture;
 
 			// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 			const numSamplesPerFrame = Math.pow( 2, this.sampleLevel );
@@ -109,7 +109,7 @@ class TAARenderPass extends SSAARenderPass {
 		if ( accumulationWeight > 0 ) {
 
 			this.copyUniforms[ 'opacity' ].value = 1.0;
-			this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.textures[0];
+			this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 			renderer.setRenderTarget( writeBuffer );
 			renderer.clear();
 			this.fsQuad.render( renderer );
@@ -119,7 +119,7 @@ class TAARenderPass extends SSAARenderPass {
 		if ( accumulationWeight < 1.0 ) {
 
 			this.copyUniforms[ 'opacity' ].value = 1.0 - accumulationWeight;
-			this.copyUniforms[ 'tDiffuse' ].value = this.holdRenderTarget.textures[0];
+			this.copyUniforms[ 'tDiffuse' ].value = this.holdRenderTarget.texture;
 			renderer.setRenderTarget( writeBuffer );
 			if ( accumulationWeight === 0 ) renderer.clear();
 			this.fsQuad.render( renderer );

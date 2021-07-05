@@ -245,7 +245,7 @@ function WebGLMaterials( properties ) {
 			// backwards compatibility
 			if ( uvScaleMap.isWebGLRenderTarget ) {
 
-				uvScaleMap = uvScaleMap.textures[ 0 ];
+				uvScaleMap = uvScaleMap.texture;
 
 			}
 
@@ -280,7 +280,7 @@ function WebGLMaterials( properties ) {
 			// backwards compatibility
 			if ( uv2ScaleMap.isWebGLRenderTarget ) {
 
-				uv2ScaleMap = uv2ScaleMap.textures[ 0 ];
+				uv2ScaleMap = uv2ScaleMap.texture;
 
 			}
 
@@ -599,7 +599,7 @@ function WebGLMaterials( properties ) {
 
 		if ( material.transmission > 0.0 ) {
 
-			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.textures[ 0 ];
+			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;
 			uniforms.transmissionSamplerSize.value.set( transmissionRenderTarget.width, transmissionRenderTarget.height );
 
 		}

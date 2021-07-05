@@ -43,7 +43,7 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
-						const envMap = pmremGenerator.fromEquirectangular( texture ).textures[0];
+						const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
 						scene.background = envMap;
 						scene.environment = envMap;

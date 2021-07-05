@@ -549,10 +549,10 @@
 
 				for ( let i = 0; i < 10; i ++ ) {
 
-					smoothShader.uniforms[ "smoothTexture" ].value = currentRenderTarget.textures[0];
+					smoothShader.uniforms[ "smoothTexture" ].value = currentRenderTarget.texture;
 					gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
 
-					smoothShader.uniforms[ "smoothTexture" ].value = alternateRenderTarget.textures[0];
+					smoothShader.uniforms[ "smoothTexture" ].value = alternateRenderTarget.texture;
 					gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
 
 				}
@@ -589,7 +589,7 @@
 
 				const currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 
-				readWaterLevelShader.uniforms[ "levelTexture" ].value = currentRenderTarget.textures[0];
+				readWaterLevelShader.uniforms[ "levelTexture" ].value = currentRenderTarget.texture;
 
 				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
 
@@ -722,7 +722,7 @@
 				}
 
 				// Get compute output in custom uniform
-				waterUniforms[ "heightmap" ].value = gpuCompute.getCurrentRenderTarget( heightmapVariable ).textures[0];
+				waterUniforms[ "heightmap" ].value = gpuCompute.getCurrentRenderTarget( heightmapVariable ).texture;
 
 				// Render
 				renderer.render( scene, camera );

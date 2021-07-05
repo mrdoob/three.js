@@ -122,8 +122,8 @@ class Water extends Mesh {
 		normalMap0.wrapS = normalMap0.wrapT = RepeatWrapping;
 		normalMap1.wrapS = normalMap1.wrapT = RepeatWrapping;
 
-		this.material.uniforms[ 'tReflectionMap' ].value = reflector.getRenderTarget().textures[0];
-		this.material.uniforms[ 'tRefractionMap' ].value = refractor.getRenderTarget().textures[0];
+		this.material.uniforms[ 'tReflectionMap' ].value = reflector.getRenderTarget().texture;
+		this.material.uniforms[ 'tRefractionMap' ].value = refractor.getRenderTarget().texture;
 		this.material.uniforms[ 'tNormalMap0' ].value = normalMap0;
 		this.material.uniforms[ 'tNormalMap1' ].value = normalMap1;
 

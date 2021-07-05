@@ -103,7 +103,7 @@
 					envScene.background = new THREE.Color( 0xcccccc );
 
 					const pmremGenerator = new THREE.PMREMGenerator( renderer );
-					radianceMap = pmremGenerator.fromScene( envScene ).textures[0];
+					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 
 					scene.background = radianceMap;

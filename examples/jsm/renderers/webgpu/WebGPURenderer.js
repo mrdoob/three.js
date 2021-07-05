@@ -468,7 +468,7 @@ class WebGPURenderer {
 	getCurrentEncoding() {
 
 		const renderTarget = this.getRenderTarget();
-		return ( renderTarget !== null ) ? renderTarget.textures[0].encoding : this.outputEncoding;
+		return ( renderTarget !== null ) ? renderTarget.texture.encoding : this.outputEncoding;
 
 	}
 

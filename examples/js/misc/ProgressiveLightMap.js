@@ -54,7 +54,7 @@
 			}`; // Set the Previous Frame's Texture Buffer and Averaging Window
 
 				shader.uniforms.previousShadowMap = {
-					value: this.progressiveLightMap1.textures[0]
+					value: this.progressiveLightMap1.texture
 				};
 				shader.uniforms.averagingWindow = {
 					value: 100
@@ -104,7 +104,7 @@
 				} // Apply the lightmap to the object
 
 
-				object.material.lightMap = this.progressiveLightMap2.textures[0];
+				object.material.lightMap = this.progressiveLightMap2.texture;
 				object.material.dithering = true;
 				object.castShadow = true;
 				object.receiveShadow = true;
@@ -199,10 +199,10 @@
 
 			this.renderer.setRenderTarget( activeMap );
 			this.uvMat.uniforms.previousShadowMap = {
-				value: inactiveMap.textures[0]
+				value: inactiveMap.texture
 			};
 			this.blurringPlane.material.uniforms.previousShadowMap = {
-				value: inactiveMap.textures[0]
+				value: inactiveMap.texture
 			};
 			this.buffer1Active = ! this.buffer1Active;
 			this.renderer.render( this.scene, camera ); // Restore the object's Real-time Material and add it back to the original world
@@ -244,7 +244,7 @@
 			if ( this.labelMesh == null ) {
 
 				this.labelMaterial = new THREE.MeshBasicMaterial( {
-					map: this.progressiveLightMap1.textures[0],
+					map: this.progressiveLightMap1.texture,
 					side: THREE.DoubleSide
 				} );
 				this.labelPlane = new THREE.PlaneGeometry( 100, 100 );
@@ -303,7 +303,7 @@
 				}`; // Set the LightMap Accumulation Buffer
 
 				shader.uniforms.previousShadowMap = {
-					value: lightMap.textures[0]
+					value: lightMap.texture
 				};
 				shader.uniforms.pixelOffset = {
 					value: 0.5 / res

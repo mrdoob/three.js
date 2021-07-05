@@ -14,7 +14,7 @@ class WebGPUTextureRenderer {
 
 	getTexture() {
 
-		return this.renderTarget.textures[0];
+		return this.renderTarget.texture;
 
 	}
 

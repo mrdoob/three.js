@@ -65,11 +65,11 @@
 					depthBuffer: false
 				};
 				const newRoughnessTarget = new THREE.WebGLRenderTarget( width, height, params );
-				newRoughnessTarget.textures[0].generateMipmaps = true; // Setting the render target causes the memory to be allocated.
+				newRoughnessTarget.texture.generateMipmaps = true; // Setting the render target causes the memory to be allocated.
 
 				_renderer.setRenderTarget( newRoughnessTarget );
 
-				material.roughnessMap = newRoughnessTarget.textures[0];
+				material.roughnessMap = newRoughnessTarget.texture;
 				if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
 				if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap; // Copy UV transform parameters
 

@@ -71,7 +71,7 @@ import {
  * gpuCompute.compute();
  *
  * // Update texture uniforms in your visualization materials with the gpu renderer output
- * myMaterial.uniforms.myTexture.value = gpuCompute.getCurrentRenderTarget( posVar ).textures[0];
+ * myMaterial.uniforms.myTexture.value = gpuCompute.getCurrentRenderTarget( posVar ).texture;
  *
  * // Do your rendering
  * renderer.render( myScene, myCamera );
@@ -91,12 +91,12 @@ import {
  * myFilter1.uniforms.theTexture.value = inputTexture;
  *
  * const myRenderTarget = gpuCompute.createRenderTarget();
- * myFilter2.uniforms.theTexture.value = myRenderTarget.textures[0];
+ * myFilter2.uniforms.theTexture.value = myRenderTarget.texture;
  *
  * const outputRenderTarget = gpuCompute.createRenderTarget();
  *
  * // Now use the output texture where you want:
- * myMaterial.uniforms.map.value = outputRenderTarget.textures[0];
+ * myMaterial.uniforms.map.value = outputRenderTarget.texture;
  *
  * // And compute each frame, before rendering to screen:
  * gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
@@ -261,7 +261,7 @@ class GPUComputationRenderer {
 
 						const depVar = variable.dependencies[ d ];
 
-						uniforms[ depVar.name ].value = depVar.renderTargets[ currentTextureIndex ].textures[0];
+						uniforms[ depVar.name ].value = depVar.renderTargets[ currentTextureIndex ].texture;
 
 					}
 

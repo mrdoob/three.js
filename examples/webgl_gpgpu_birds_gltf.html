@@ -661,8 +661,8 @@
 
 				gpuCompute.compute();
 
-				if ( materialShader ) materialShader.uniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).textures[0];
-				if ( materialShader ) materialShader.uniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).textures[0];
+				if ( materialShader ) materialShader.uniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				if ( materialShader ) materialShader.uniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

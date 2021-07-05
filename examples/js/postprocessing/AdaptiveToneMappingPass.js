@@ -116,9 +116,9 @@
 			if ( this.needsInit ) {
 
 				this.reset( renderer );
-				this.luminanceRT.textures[0].type = readBuffer.textures[0].type;
-				this.previousLuminanceRT.textures[0].type = readBuffer.textures[0].type;
-				this.currentLuminanceRT.textures[0].type = readBuffer.textures[0].type;
+				this.luminanceRT.texture.type = readBuffer.texture.type;
+				this.previousLuminanceRT.texture.type = readBuffer.texture.type;
+				this.currentLuminanceRT.texture.type = readBuffer.texture.type;
 				this.needsInit = false;
 
 			}
@@ -127,27 +127,27 @@
 
 				//Render the luminance of the current scene into a render target with mipmapping enabled
 				this.fsQuad.material = this.materialLuminance;
-				this.materialLuminance.uniforms.tDiffuse.value = readBuffer.textures[0];
+				this.materialLuminance.uniforms.tDiffuse.value = readBuffer.texture;
 				renderer.setRenderTarget( this.currentLuminanceRT );
 				this.fsQuad.render( renderer ); //Use the new luminance values, the previous luminance and the frame delta to
 				//adapt the luminance over time.
 
 				this.fsQuad.material = this.materialAdaptiveLum;
 				this.materialAdaptiveLum.uniforms.delta.value = deltaTime;
-				this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.textures[0];
-				this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.textures[0];
+				this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.texture;
+				this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.texture;
 				renderer.setRenderTarget( this.luminanceRT );
 				this.fsQuad.render( renderer ); //Copy the new adapted luminance value so that it can be used by the next frame.
 
 				this.fsQuad.material = this.materialCopy;
-				this.copyUniforms.tDiffuse.value = this.luminanceRT.textures[0];
+				this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
 				renderer.setRenderTarget( this.previousLuminanceRT );
 				this.fsQuad.render( renderer );
 
 			}
 
 			this.fsQuad.material = this.materialToneMap;
-			this.materialToneMap.uniforms.tDiffuse.value = readBuffer.textures[0];
+			this.materialToneMap.uniforms.tDiffuse.value = readBuffer.texture;
 
 			if ( this.renderToScreen ) {
 
@@ -192,21 +192,21 @@
 			}; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
 			this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-			this.luminanceRT.textures[0].name = 'AdaptiveToneMappingPass.l';
-			this.luminanceRT.textures[0].generateMipmaps = false;
+			this.luminanceRT.texture.name = 'AdaptiveToneMappingPass.l';
+			this.luminanceRT.texture.generateMipmaps = false;
 			this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-			this.previousLuminanceRT.textures[0].name = 'AdaptiveToneMappingPass.pl';
-			this.previousLuminanceRT.textures[0].generateMipmaps = false; // We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
+			this.previousLuminanceRT.texture.name = 'AdaptiveToneMappingPass.pl';
+			this.previousLuminanceRT.texture.generateMipmaps = false; // We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 
 			pars.minFilter = THREE.LinearMipmapLinearFilter;
 			pars.generateMipmaps = true;
 			this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-			this.currentLuminanceRT.textures[0].name = 'AdaptiveToneMappingPass.cl';
+			this.currentLuminanceRT.texture.name = 'AdaptiveToneMappingPass.cl';
 
 			if ( this.adaptive ) {
 
 				this.materialToneMap.defines[ 'ADAPTED_LUMINANCE' ] = '';
-				this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.textures[0];
+				this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 			} //Put something in the adaptive luminance texture so that the scene can render initially
 
@@ -228,7 +228,7 @@
 
 				this.adaptive = true;
 				this.materialToneMap.defines[ 'ADAPTED_LUMINANCE' ] = '';
-				this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.textures[0];
+				this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 			} else {
 

@@ -34,7 +34,7 @@
 
 			if ( this.uniforms[ this.textureID ] ) {
 
-				this.uniforms[ this.textureID ].value = readBuffer.textures[0];
+				this.uniforms[ this.textureID ].value = readBuffer.texture;
 
 			}
 

@@ -197,7 +197,7 @@ class WebGPUTextures {
 
 			const width = renderTarget.width;
 			const height = renderTarget.height;
-			const colorTextureFormat = this._getFormat( renderTarget.textures[0] );
+			const colorTextureFormat = this._getFormat( renderTarget.texture );
 
 			const colorTextureGPU = device.createTexture( {
 				size: {
@@ -219,7 +219,7 @@ class WebGPUTextures {
 			// Since it's not possible to see just from a texture object whether it belongs to a render
 			// target or not, we need the initializedRTT flag.
 
-			const textureProperties = properties.get( renderTarget.textures[0] );
+			const textureProperties = properties.get( renderTarget.texture );
 			textureProperties.textureGPU = colorTextureGPU;
 			textureProperties.initializedRTT = false;
 
@@ -729,7 +729,7 @@ function onRenderTargetDispose( event ) {
 	renderTarget.removeEventListener( 'dispose', renderTargetProperties.disposeCallback );
 
 	renderTargetProperties.colorTextureGPU.destroy();
-	properties.remove( renderTarget.textures[0] );
+	properties.remove( renderTarget.texture );
 
 	this.info.memory.textures --;
 

@@ -60,7 +60,7 @@ class ProgressiveLightMap {
 			}`;
 
 			// Set the Previous Frame's Texture Buffer and Averaging Window
-			shader.uniforms.previousShadowMap = { value: this.progressiveLightMap1.textures[0] };
+			shader.uniforms.previousShadowMap = { value: this.progressiveLightMap1.texture };
 			shader.uniforms.averagingWindow = { value: 100 };
 
 			this.uvMat.uniforms = shader.uniforms;
@@ -107,7 +107,7 @@ class ProgressiveLightMap {
 			}
 
 			// Apply the lightmap to the object
-			object.material.lightMap = this.progressiveLightMap2.textures[0];
+			object.material.lightMap = this.progressiveLightMap2.texture;
 			object.material.dithering = true;
 			object.castShadow = true;
 			object.receiveShadow = true;
@@ -198,8 +198,8 @@ class ProgressiveLightMap {
 
 		// Render the object's surface maps
 		this.renderer.setRenderTarget( activeMap );
-		this.uvMat.uniforms.previousShadowMap = { value: inactiveMap.textures[0] };
-		this.blurringPlane.material.uniforms.previousShadowMap = { value: inactiveMap.textures[0] };
+		this.uvMat.uniforms.previousShadowMap = { value: inactiveMap.texture };
+		this.blurringPlane.material.uniforms.previousShadowMap = { value: inactiveMap.texture };
 		this.buffer1Active = ! this.buffer1Active;
 		this.renderer.render( this.scene, camera );
 
@@ -240,7 +240,7 @@ class ProgressiveLightMap {
 		if ( this.labelMesh == null ) {
 
 			this.labelMaterial = new THREE.MeshBasicMaterial(
-				{ map: this.progressiveLightMap1.textures[0], side: THREE.DoubleSide } );
+				{ map: this.progressiveLightMap1.texture, side: THREE.DoubleSide } );
 			this.labelPlane = new THREE.PlaneGeometry( 100, 100 );
 			this.labelMesh = new THREE.Mesh( this.labelPlane, this.labelMaterial );
 			this.labelMesh.position.y = 250;
@@ -296,7 +296,7 @@ class ProgressiveLightMap {
 				}`;
 
 			// Set the LightMap Accumulation Buffer
-			shader.uniforms.previousShadowMap = { value: lightMap.textures[0] };
+			shader.uniforms.previousShadowMap = { value: lightMap.texture };
 			shader.uniforms.pixelOffset = { value: 0.5 / res };
 			blurMaterial.uniforms = shader.uniforms;
 

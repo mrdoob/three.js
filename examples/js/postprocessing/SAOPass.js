@@ -76,8 +76,8 @@
 			this.saoMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 			this.saoMaterial.defines[ 'NORMAL_TEXTURE' ] = this.supportsNormalTexture ? 1 : 0;
 			this.saoMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
-			this.saoMaterial.uniforms[ 'tDepth' ].value = this.supportsDepthTextureExtension ? depthTexture : this.depthRenderTarget.textures[0];
-			this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.textures[0];
+			this.saoMaterial.uniforms[ 'tDepth' ].value = this.supportsDepthTextureExtension ? depthTexture : this.depthRenderTarget.texture;
+			this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 			this.saoMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 			this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 			this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
@@ -97,8 +97,8 @@
 			} );
 			this.vBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 			this.vBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
-			this.vBlurMaterial.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.textures[0];
-			this.vBlurMaterial.uniforms[ 'tDepth' ].value = this.supportsDepthTextureExtension ? depthTexture : this.depthRenderTarget.textures[0];
+			this.vBlurMaterial.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.texture;
+			this.vBlurMaterial.uniforms[ 'tDepth' ].value = this.supportsDepthTextureExtension ? depthTexture : this.depthRenderTarget.texture;
 			this.vBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 			this.vBlurMaterial.blending = THREE.NoBlending;
 			this.hBlurMaterial = new THREE.ShaderMaterial( {
@@ -109,8 +109,8 @@
 			} );
 			this.hBlurMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 			this.hBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
-			this.hBlurMaterial.uniforms[ 'tDiffuse' ].value = this.blurIntermediateRenderTarget.textures[0];
-			this.hBlurMaterial.uniforms[ 'tDepth' ].value = this.supportsDepthTextureExtension ? depthTexture : this.depthRenderTarget.textures[0];
+			this.hBlurMaterial.uniforms[ 'tDiffuse' ].value = this.blurIntermediateRenderTarget.texture;
+			this.hBlurMaterial.uniforms[ 'tDepth' ].value = this.supportsDepthTextureExtension ? depthTexture : this.depthRenderTarget.texture;
 			this.hBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 			this.hBlurMaterial.blending = THREE.NoBlending;
 
@@ -161,7 +161,7 @@
 			if ( this.renderToScreen ) {
 
 				this.materialCopy.blending = THREE.NoBlending;
-				this.materialCopy.uniforms[ 'tDiffuse' ].value = readBuffer.textures[0];
+				this.materialCopy.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 				this.materialCopy.needsUpdate = true;
 				this.renderPass( renderer, this.materialCopy, null );
 
@@ -246,7 +246,7 @@
 
 				} else {
 
-					this.depthCopy.uniforms[ 'tDiffuse' ].value = this.depthRenderTarget.textures[0];
+					this.depthCopy.uniforms[ 'tDiffuse' ].value = this.depthRenderTarget.texture;
 					this.depthCopy.needsUpdate = true;
 					outputMaterial = this.depthCopy;
 
@@ -254,12 +254,12 @@
 
 			} else if ( this.params.output === 4 ) {
 
-				this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.textures[0];
+				this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.materialCopy.needsUpdate = true;
 
 			} else {
 
-				this.materialCopy.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.textures[0];
+				this.materialCopy.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.texture;
 				this.materialCopy.needsUpdate = true;
 
 			} // Blending depends on output, only want a THREE.CustomBlending when showing SAO

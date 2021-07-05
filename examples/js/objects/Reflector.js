@@ -34,7 +34,7 @@
 
 			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
-				renderTarget.textures[0].generateMipmaps = false;
+				renderTarget.texture.generateMipmaps = false;
 
 			}
 
@@ -43,7 +43,7 @@
 				fragmentShader: shader.fragmentShader,
 				vertexShader: shader.vertexShader
 			} );
-			material.uniforms[ 'tDiffuse' ].value = renderTarget.textures[0];
+			material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 			material.uniforms[ 'color' ].value = color;
 			material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 			this.material = material;
@@ -99,7 +99,7 @@
 				projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 				projectionMatrix.elements[ 14 ] = clipPlane.w; // Render
 
-				renderTarget.textures[0].encoding = renderer.outputEncoding;
+				renderTarget.texture.encoding = renderer.outputEncoding;
 				scope.visible = false;
 				const currentRenderTarget = renderer.getRenderTarget();
 				const currentXrEnabled = renderer.xr.enabled;

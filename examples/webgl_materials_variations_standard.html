@@ -88,7 +88,7 @@
 										color: diffuseColor,
 										metalness: beta,
 										roughness: 1.0 - alpha,
-										envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.textures[0]
+										envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture
 									} );
 
 									index ++;
@@ -109,7 +109,7 @@
 
 						}
 
-						scene.background = hdrCubeRenderTarget.textures[0];
+						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
 

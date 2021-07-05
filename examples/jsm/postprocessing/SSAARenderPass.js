@@ -79,7 +79,7 @@ class SSAARenderPass extends Pass {
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat } );
-			this.sampleRenderTarget.textures[0].name = 'SSAARenderPass.sample';
+			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}
 
@@ -93,7 +93,7 @@ class SSAARenderPass extends Pass {
 
 		const baseSampleWeight = 1.0 / jitterOffsets.length;
 		const roundingRange = 1 / 32;
-		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.textures[0];
+		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
 		const viewOffset = {
 

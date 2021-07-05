@@ -81,7 +81,7 @@
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
 						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-						exrBackground = exrCubeRenderTarget.textures[0];
+						exrBackground = exrCubeRenderTarget.texture;
 
 						texture.dispose();
 
@@ -93,7 +93,7 @@
 
 					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
 
-					pngBackground = pngCubeRenderTarget.textures[0];
+					pngBackground = pngCubeRenderTarget.texture;
 
 					texture.dispose();
 
@@ -163,11 +163,11 @@
 				switch ( params.envMap ) {
 
 					case 'EXR':
-						newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.textures[0] : null;
+						newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null;
 						background = exrBackground;
 						break;
 					case 'PNG':
-						newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.textures[0] : null;
+						newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null;
 						background = pngBackground;
 						break;
 

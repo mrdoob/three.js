@@ -54,7 +54,7 @@ class Refractor extends Mesh {
 
 		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
-			renderTarget.textures[0].generateMipmaps = false;
+			renderTarget.texture.generateMipmaps = false;
 
 		}
 
@@ -68,7 +68,7 @@ class Refractor extends Mesh {
 		} );
 
 		this.material.uniforms[ 'color' ].value = color;
-		this.material.uniforms[ 'tDiffuse' ].value = renderTarget.textures[0];
+		this.material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 		this.material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
 		// functions
@@ -234,7 +234,7 @@ class Refractor extends Mesh {
 
 			// Render
 
-			renderTarget.textures[0].encoding = renderer.outputEncoding;
+			renderTarget.texture.encoding = renderer.outputEncoding;
 
 			// ensure refractors are rendered only once per frame
 

@@ -45,8 +45,8 @@ class AnaglyphEffect {
 
 			uniforms: {
 
-				'mapLeft': { value: _renderTargetL.textures[0] },
-				'mapRight': { value: _renderTargetR.textures[0] },
+				'mapLeft': { value: _renderTargetL.texture },
+				'mapRight': { value: _renderTargetR.texture },
 
 				'colorMatrixLeft': { value: this.colorMatrixLeft },
 				'colorMatrixRight': { value: this.colorMatrixRight }

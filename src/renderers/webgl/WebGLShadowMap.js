@@ -141,7 +141,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 				const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.textures[ 0 ].name = light.name + '.shadowMap';
+				shadow.map.texture.name = light.name + '.shadowMap';
 
 				shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
@@ -154,7 +154,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 				const pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.textures[ 0 ].name = light.name + '.shadowMap';
+				shadow.map.texture.name = light.name + '.shadowMap';
 
 				shadow.camera.updateProjectionMatrix();
 
@@ -210,7 +210,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		// vertical pass
 
-		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.textures[ 0 ];
+		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.texture;
 		shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
 		shadowMaterialVertical.uniforms.radius.value = shadow.radius;
 		_renderer.setRenderTarget( shadow.mapPass );
@@ -219,7 +219,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		// horizontal pass
 
-		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.textures[ 0 ];
+		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
 		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
 		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
 		_renderer.setRenderTarget( shadow.map );

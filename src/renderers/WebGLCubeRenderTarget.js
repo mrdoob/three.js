@@ -39,13 +39,13 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	fromEquirectangularTexture( renderer, texture ) {
 
-		this.textures[ 0 ].type = texture.type;
-		this.textures[ 0 ].format = RGBAFormat; // see #18859
-		this.textures[ 0 ].encoding = texture.encoding;
+		this.texture.type = texture.type;
+		this.texture.format = RGBAFormat; // see #18859
+		this.texture.encoding = texture.encoding;
 
-		this.textures[ 0 ].generateMipmaps = texture.generateMipmaps;
-		this.textures[ 0 ].minFilter = texture.minFilter;
-		this.textures[ 0 ].magFilter = texture.magFilter;
+		this.texture.generateMipmaps = texture.generateMipmaps;
+		this.texture.minFilter = texture.minFilter;
+		this.texture.magFilter = texture.magFilter;
 
 		const shader = {
 

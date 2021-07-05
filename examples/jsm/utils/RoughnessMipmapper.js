@@ -80,13 +80,13 @@ class RoughnessMipmapper {
 
 			const newRoughnessTarget = new WebGLRenderTarget( width, height, params );
 
-			newRoughnessTarget.textures[0].generateMipmaps = true;
+			newRoughnessTarget.texture.generateMipmaps = true;
 
 			// Setting the render target causes the memory to be allocated.
 
 			_renderer.setRenderTarget( newRoughnessTarget );
 
-			material.roughnessMap = newRoughnessTarget.textures[0];
+			material.roughnessMap = newRoughnessTarget.texture;
 
 			if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
 

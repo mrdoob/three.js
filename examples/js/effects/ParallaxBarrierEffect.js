@@ -23,10 +23,10 @@
 			const _material = new THREE.ShaderMaterial( {
 				uniforms: {
 					'mapLeft': {
-						value: _renderTargetL.textures[0]
+						value: _renderTargetL.texture
 					},
 					'mapRight': {
-						value: _renderTargetR.textures[0]
+						value: _renderTargetR.texture
 					}
 				},
 				vertexShader: [ 'varying vec2 vUv;', 'void main() {', '	vUv = vec2( uv.x, uv.y );', '	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}' ].join( '\n' ),

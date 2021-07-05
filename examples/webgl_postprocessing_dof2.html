@@ -325,8 +325,8 @@
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-				postprocessing.bokeh_uniforms[ 'tColor' ].value = postprocessing.rtTextureColor.textures[0];
-				postprocessing.bokeh_uniforms[ 'tDepth' ].value = postprocessing.rtTextureDepth.textures[0];
+				postprocessing.bokeh_uniforms[ 'tColor' ].value = postprocessing.rtTextureColor.texture;
+				postprocessing.bokeh_uniforms[ 'tDepth' ].value = postprocessing.rtTextureDepth.texture;
 				postprocessing.bokeh_uniforms[ 'textureWidth' ].value = window.innerWidth;
 				postprocessing.bokeh_uniforms[ 'textureHeight' ].value = window.innerHeight;
 

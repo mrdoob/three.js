@@ -29,7 +29,7 @@
 
 			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
-				renderTarget.textures[0].generateMipmaps = false;
+				renderTarget.texture.generateMipmaps = false;
 
 			} // material
 
@@ -42,7 +42,7 @@
 
 			} );
 			this.material.uniforms[ 'color' ].value = color;
-			this.material.uniforms[ 'tDiffuse' ].value = renderTarget.textures[0];
+			this.material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 			this.material.uniforms[ 'textureMatrix' ].value = textureMatrix; // functions
 
 			const visible = function () {
@@ -170,7 +170,7 @@
 			this.onBeforeRender = function ( renderer, scene, camera ) {
 
 				// Render
-				renderTarget.textures[0].encoding = renderer.outputEncoding; // ensure refractors are rendered only once per frame
+				renderTarget.texture.encoding = renderer.outputEncoding; // ensure refractors are rendered only once per frame
 
 				if ( camera.userData.refractor === true ) return; // avoid rendering when the refractor is viewed from behind
 

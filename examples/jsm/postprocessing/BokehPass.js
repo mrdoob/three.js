@@ -39,7 +39,7 @@ class BokehPass extends Pass {
 			magFilter: NearestFilter
 		} );
 
-		this.renderTargetDepth.textures[0].name = 'BokehPass.depth';
+		this.renderTargetDepth.texture.name = 'BokehPass.depth';
 
 		// depth material
 
@@ -58,7 +58,7 @@ class BokehPass extends Pass {
 		const bokehShader = BokehShader;
 		const bokehUniforms = UniformsUtils.clone( bokehShader.uniforms );
 
-		bokehUniforms[ 'tDepth' ].value = this.renderTargetDepth.textures[0];
+		bokehUniforms[ 'tDepth' ].value = this.renderTargetDepth.texture;
 
 		bokehUniforms[ 'focus' ].value = focus;
 		bokehUniforms[ 'aspect' ].value = aspect;
@@ -102,7 +102,7 @@ class BokehPass extends Pass {
 
 		// Render bokeh composite
 
-		this.uniforms[ 'tColor' ].value = readBuffer.textures[0];
+		this.uniforms[ 'tColor' ].value = readBuffer.texture;
 		this.uniforms[ 'nearClip' ].value = this.camera.near;
 		this.uniforms[ 'farClip' ].value = this.camera.far;
 

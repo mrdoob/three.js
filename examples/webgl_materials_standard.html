@@ -128,9 +128,9 @@
 						const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 						hdrEquirect.dispose();
 
-						scene.background = hdrCubeRenderTarget.textures[0];
-						scene.environment = hdrCubeRenderTarget.textures[0];
-						environments[ name ].texture = hdrCubeRenderTarget.textures[0];
+						scene.background = hdrCubeRenderTarget.texture;
+						scene.environment = hdrCubeRenderTarget.texture;
+						environments[ name ].texture = hdrCubeRenderTarget.texture;
 
 					} );
 

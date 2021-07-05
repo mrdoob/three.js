@@ -25,7 +25,7 @@
 			/*, deltaTime, maskActive */
 		) {
 
-			this.uniforms[ 'tDiffuse' ].value = readBuffer.textures[0];
+			this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 			this.uniforms[ 'seed' ].value = Math.random(); //default seeding
 
 			this.uniforms[ 'byp' ].value = 0;

@@ -57,7 +57,7 @@ class Reflector extends Mesh {
 
 		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
-			renderTarget.textures[0].generateMipmaps = false;
+			renderTarget.texture.generateMipmaps = false;
 
 		}
 
@@ -67,7 +67,7 @@ class Reflector extends Mesh {
 			vertexShader: shader.vertexShader
 		} );
 
-		material.uniforms[ 'tDiffuse' ].value = renderTarget.textures[0];
+		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 		material.uniforms[ 'color' ].value = color;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
@@ -149,7 +149,7 @@ class Reflector extends Mesh {
 
 			// Render
 
-			renderTarget.textures[0].encoding = renderer.outputEncoding;
+			renderTarget.texture.encoding = renderer.outputEncoding;
 
 			scope.visible = false;
 

@@ -172,11 +172,11 @@ class SSRrPass extends Pass {
 			blending: NoBlending
 		} );
 
-		this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
-		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.textures[0];
-		this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.textures[0];
+		this.ssrrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
+		this.ssrrMaterial.uniforms[ 'tNormalSelects' ].value = this.normalSelectsRenderTarget.texture;
 		this.ssrrMaterial.needsUpdate = true;
-		this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.textures[0];
+		this.ssrrMaterial.uniforms[ 'tRefractive' ].value = this.refractiveRenderTarget.texture;
 		this.ssrrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 		this.ssrrMaterial.uniforms[ 'tDepthSelects' ].value = this.normalSelectsRenderTarget.depthTexture;
 		this.ssrrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
@@ -274,7 +274,7 @@ class SSRrPass extends Pass {
 
 		// render beauty and depth
 
-		if ( this.encoding ) this.beautyRenderTarget.textures[0].encoding = this.encoding;
+		if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 		this.scene.children.forEach( child => {
@@ -346,7 +346,7 @@ class SSRrPass extends Pass {
 		this.ssrrMaterial.uniforms[ 'ior' ].value = this.ior;
 		this.ssrrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.textures[0];
+		this.ssrrMaterial.uniforms[ 'tSpecular' ].value = this.specularRenderTarget.texture;
 		this.renderPass( renderer, this.ssrrMaterial, this.ssrrRenderTarget );
 
 		// output result to screen
@@ -356,18 +356,18 @@ class SSRrPass extends Pass {
 			case SSRrPass.OUTPUT.Default:
 
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
 				this.copyMaterial.blending = NormalBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 			case SSRrPass.OUTPUT.SSRr:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrrRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -375,7 +375,7 @@ class SSRrPass extends Pass {
 
 			case SSRrPass.OUTPUT.Beauty:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -397,7 +397,7 @@ class SSRrPass extends Pass {
 
 			case SSRrPass.OUTPUT.NormalSelects:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalSelectsRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalSelectsRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -405,7 +405,7 @@ class SSRrPass extends Pass {
 
 			case SSRrPass.OUTPUT.Refractive:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.refractiveRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.refractiveRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -413,7 +413,7 @@ class SSRrPass extends Pass {
 
 			case SSRrPass.OUTPUT.Specular:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.specularRenderTarget.textures[0];
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.specularRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 

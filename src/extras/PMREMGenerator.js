@@ -392,7 +392,7 @@ class PMREMGenerator {
 		}
 
 		uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
-		uniforms[ 'outputEncoding' ].value = ENCODINGS[ cubeUVRenderTarget.textures[ 0 ].encoding ];
+		uniforms[ 'outputEncoding' ].value = ENCODINGS[ cubeUVRenderTarget.texture.encoding ];
 
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 
@@ -510,7 +510,7 @@ class PMREMGenerator {
 
 		}
 
-		blurUniforms[ 'envMap' ].value = targetIn.textures[ 0 ];
+		blurUniforms[ 'envMap' ].value = targetIn.texture;
 		blurUniforms[ 'samples' ].value = samples;
 		blurUniforms[ 'weights' ].value = weights;
 		blurUniforms[ 'latitudinal' ].value = direction === 'latitudinal';
@@ -523,8 +523,8 @@ class PMREMGenerator {
 
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
-		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.textures[ 0 ].encoding ];
-		blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.textures[ 0 ].encoding ];
+		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
+		blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
 
 		const outputSize = _sizeLods[ lodOut ];
 		const x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
@@ -627,8 +627,8 @@ function _createPlanes() {
 function _createRenderTarget( params ) {
 
 	const cubeUVRenderTarget = new WebGLRenderTarget( 3 * SIZE_MAX, 3 * SIZE_MAX, params );
-	cubeUVRenderTarget.textures[ 0 ].mapping = CubeUVReflectionMapping;
-	cubeUVRenderTarget.textures[ 0 ].name = 'PMREM.cubeUv';
+	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
+	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
 	cubeUVRenderTarget.scissorTest = true;
 	return cubeUVRenderTarget;
 

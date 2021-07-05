@@ -112,12 +112,12 @@
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
 						pmremGenerator.dispose();
 
-						nodeTexture.value = hdrCubeRenderTarget.textures[0];
+						nodeTexture.value = hdrCubeRenderTarget.texture;
 
 						hdrCubeMap.magFilter = THREE.LinearFilter;
 						hdrCubeMap.needsUpdate = true;
 
-						planeMesh.material.map = hdrCubeRenderTarget.textures[0];
+						planeMesh.material.map = hdrCubeRenderTarget.texture;
 						planeMesh.material.needsUpdate = true;
 
 						nodeMaterial.visible = true;

@@ -22,9 +22,9 @@ class BloomPass extends Pass {
 		const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
 
 		this.renderTargetX = new WebGLRenderTarget( resolution, resolution, pars );
-		this.renderTargetX.textures[0].name = 'BloomPass.x';
+		this.renderTargetX.texture.name = 'BloomPass.x';
 		this.renderTargetY = new WebGLRenderTarget( resolution, resolution, pars );
-		this.renderTargetY.textures[0].name = 'BloomPass.y';
+		this.renderTargetY.texture.name = 'BloomPass.y';
 
 		// copy material
 
@@ -83,7 +83,7 @@ class BloomPass extends Pass {
 
 		this.fsQuad.material = this.materialConvolution;
 
-		this.convolutionUniforms[ 'tDiffuse' ].value = readBuffer.textures[0];
+		this.convolutionUniforms[ 'tDiffuse' ].value = readBuffer.texture;
 		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurX;
 
 		renderer.setRenderTarget( this.renderTargetX );
@@ -93,7 +93,7 @@ class BloomPass extends Pass {
 
 		// Render quad with blured scene into texture (convolution pass 2)
 
-		this.convolutionUniforms[ 'tDiffuse' ].value = this.renderTargetX.textures[0];
+		this.convolutionUniforms[ 'tDiffuse' ].value = this.renderTargetX.texture;
 		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurY;
 
 		renderer.setRenderTarget( this.renderTargetY );
@@ -104,7 +104,7 @@ class BloomPass extends Pass {
 
 		this.fsQuad.material = this.materialCopy;
 
-		this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetY.textures[0];
+		this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
 
 		if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
 

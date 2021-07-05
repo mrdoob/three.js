@@ -153,7 +153,7 @@ class LightProbeGenerator {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				convertColorToLinear( color, cubeRenderTarget.textures[0].encoding );
+				convertColorToLinear( color, cubeRenderTarget.texture.encoding );
 
 				// pixel coordinate on unit cube
 
