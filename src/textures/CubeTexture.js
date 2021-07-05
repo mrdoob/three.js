@@ -39,6 +39,14 @@ class CubeTexture extends Texture {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+		this._needsFlipEnvMap = source._needsFlipEnvMap;
+		return this;
+
+	}
+
 }
 
 CubeTexture.prototype.isCubeTexture = true;

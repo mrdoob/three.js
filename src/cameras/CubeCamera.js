@@ -80,6 +80,14 @@ class CubeCamera extends Object3D {
 
 		}
 
+		let generateDepthMipmaps = false;
+		if ( renderTarget.depthTexture ) {
+
+			generateDepthMipmaps = renderTarget.depthTexture.generateMipmaps;
+			renderTarget.depthTexture.generateMipmaps = false;
+
+		}
+
 		renderer.setRenderTarget( renderTarget, 0 );
 		renderer.render( scene, cameraPX );
 
@@ -99,6 +107,12 @@ class CubeCamera extends Object3D {
 		for ( let i = 0, il = renderTarget.textures.length; i < il; i ++ ) {
 
 			renderTarget.textures[ i ].generateMipmaps = generateMipmaps[ i ];
+
+		}
+
+		if ( renderTarget.depthTexture ) {
+
+			renderTarget.depthTexture.generateMipmaps = generateDepthMipmaps;
 
 		}
 

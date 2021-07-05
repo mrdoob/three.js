@@ -177,6 +177,20 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
+		if ( glFormat === _gl.DEPTH_COMPONENT ) {
+
+			if ( glType === _gl.UNSIGNED_SHORT ) internalFormat = _gl.DEPTH_COMPONENT16;
+			if ( glType === _gl.UNSIGNED_INT ) internalFormat = _gl.DEPTH_COMPONENT24;
+			if ( glType === _gl.FLOAT ) internalFormat = _gl.DEPTH_COMPONENT32F;
+
+		}
+
+		if ( glFormat === _gl.DEPTH_STENCIL ) {
+
+			if ( glType === _gl.UNSIGNED_INT_24_8 ) internalFormat = _gl.DEPTH24_STENCIL8;
+
+		}
+
 		return internalFormat;
 
 	}
@@ -413,30 +427,30 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		[ LinearMipmapLinearFilter ]: _gl.LINEAR_MIPMAP_LINEAR
 	};
 
-	function setTextureParameters( textureType, texture, supportsMips ) {
+	function setTextureParameters( target, texture, supportsMips ) {
 
 		if ( supportsMips ) {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
+			_gl.texParameteri( target, _gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
+			_gl.texParameteri( target, _gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
 
-			if ( textureType === _gl.TEXTURE_3D || textureType === _gl.TEXTURE_2D_ARRAY ) {
+			if ( target === _gl.TEXTURE_3D || target === _gl.TEXTURE_2D_ARRAY ) {
 
-				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, wrappingToGL[ texture.wrapR ] );
+				_gl.texParameteri( target, _gl.TEXTURE_WRAP_R, wrappingToGL[ texture.wrapR ] );
 
 			}
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterToGL[ texture.magFilter ] );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterToGL[ texture.minFilter ] );
+			_gl.texParameteri( target, _gl.TEXTURE_MAG_FILTER, filterToGL[ texture.magFilter ] );
+			_gl.texParameteri( target, _gl.TEXTURE_MIN_FILTER, filterToGL[ texture.minFilter ] );
 
 		} else {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+			_gl.texParameteri( target, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+			_gl.texParameteri( target, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 
-			if ( textureType === _gl.TEXTURE_3D || textureType === _gl.TEXTURE_2D_ARRAY ) {
+			if ( target === _gl.TEXTURE_3D || target === _gl.TEXTURE_2D_ARRAY ) {
 
-				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, _gl.CLAMP_TO_EDGE );
+				_gl.texParameteri( target, _gl.TEXTURE_WRAP_R, _gl.CLAMP_TO_EDGE );
 
 			}
 
@@ -446,8 +460,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
+			_gl.texParameteri( target, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
+			_gl.texParameteri( target, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
 
 			if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) {
 
@@ -466,7 +480,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
-				_gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, capabilities.getMaxAnisotropy() ) );
+				_gl.texParameterf( target, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, capabilities.getMaxAnisotropy() ) );
 				properties.get( texture ).__currentAnisotropy = texture.anisotropy;
 
 			}
@@ -493,15 +507,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function uploadTexture( textureProperties, texture, slot ) {
 
-		let textureType = _gl.TEXTURE_2D;
-
-		if ( texture.isDataTexture2DArray ) textureType = _gl.TEXTURE_2D_ARRAY;
-		if ( texture.isDataTexture3D ) textureType = _gl.TEXTURE_3D;
+		const target =
+			texture.isDataTexture3D ? _gl.TEXTURE_3D :
+				texture.isDataTexture2DArray ? _gl.TEXTURE_2D_ARRAY :
+					_gl.TEXTURE_2D;
 
 		initTexture( textureProperties, texture );
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( textureType, textureProperties.__webglTexture );
+		state.bindTexture( target, textureProperties.__webglTexture );
 
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -514,85 +528,37 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const supportsMips = isPowerOfTwo( image ) || isWebGL2,
 			glFormat = utils.convert( texture.format );
 
-		let glType = utils.convert( texture.type ),
-			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
+		let glType = utils.convert( texture.type );
+		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
-		setTextureParameters( textureType, texture, supportsMips );
+		setTextureParameters( target, texture, supportsMips );
 
 		let mipmap;
 		const mipmaps = texture.mipmaps;
 
-		if ( texture.format === DepthFormat || texture.format === DepthStencilFormat ) {
+		// https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/
+		if ( ! isWebGL2 ) {
 
-			// populate depth texture with dummy data
+			if ( ( texture.format === DepthFormat || texture.format === DepthStencilFormat )
+				&& texture.type === FloatType ) {
 
-			glInternalFormat = _gl.DEPTH_COMPONENT;
-
-			if ( isWebGL2 ) {
-
-				if ( texture.type === FloatType ) {
-
-					glInternalFormat = _gl.DEPTH_COMPONENT32F;
-
-				} else if ( texture.type === UnsignedIntType ) {
-
-					glInternalFormat = _gl.DEPTH_COMPONENT24;
-
-				} else if ( texture.type === UnsignedInt248Type ) {
-
-					glInternalFormat = _gl.DEPTH24_STENCIL8;
-
-				} else {
-
-					glInternalFormat = _gl.DEPTH_COMPONENT16; // WebGL2 requires sized internalformat for glTexImage2D
-
-				}
-
-			} else {
-
-				if ( texture.type === FloatType ) {
-
-					console.error( 'WebGLRenderer: Floating point depth texture requires WebGL2.' );
-
-				}
+				console.error( 'WebGLRenderer: Floating point depth texture requires WebGL2.' );
 
 			}
 
-			// validation checks for WebGL 1
+			if ( texture.format === DepthFormat && texture.type !== UnsignedShortType && texture.type !== UnsignedIntType ) {
 
-			if ( texture.format === DepthFormat && glInternalFormat === _gl.DEPTH_COMPONENT ) {
-
-				// The error INVALID_OPERATION is generated by texImage2D if format and internalformat are
-				// DEPTH_COMPONENT and type is not UNSIGNED_SHORT or UNSIGNED_INT
-				// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
-				if ( texture.type !== UnsignedShortType && texture.type !== UnsignedIntType ) {
-
-					console.warn( 'THREE.WebGLRenderer: Use UnsignedShortType or UnsignedIntType for DepthFormat DepthTexture.' );
-
-					texture.type = UnsignedShortType;
-					glType = utils.convert( texture.type );
-
-				}
+				console.warn( 'THREE.WebGLRenderer: Use UnsignedShortType or UnsignedIntType for DepthFormat DepthTexture.' );
+				texture.type = UnsignedShortType;
+				glType = utils.convert( texture.type );
 
 			}
 
-			if ( texture.format === DepthStencilFormat && glInternalFormat === _gl.DEPTH_COMPONENT ) {
+			if ( texture.format === DepthStencilFormat && texture.type !== UnsignedInt248Type ) {
 
-				// Depth stencil textures need the DEPTH_STENCIL internal format
-				// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
-				glInternalFormat = _gl.DEPTH_STENCIL;
-
-				// The error INVALID_OPERATION is generated by texImage2D if format and internalformat are
-				// DEPTH_STENCIL and type is not UNSIGNED_INT_24_8_WEBGL.
-				// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
-				if ( texture.type !== UnsignedInt248Type ) {
-
-					console.warn( 'THREE.WebGLRenderer: Use UnsignedInt248Type for DepthStencilFormat DepthTexture.' );
-
-					texture.type = UnsignedInt248Type;
-					glType = utils.convert( texture.type );
-
-				}
+				console.warn( 'THREE.WebGLRenderer: Use UnsignedInt248Type for DepthStencilFormat DepthTexture.' );
+				texture.type = UnsignedInt248Type;
+				glType = utils.convert( texture.type );
 
 			}
 
@@ -692,7 +658,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-			generateMipmap( textureType, texture, image.width, image.height );
+			generateMipmap( target, texture, image.width, image.height );
 
 		}
 
@@ -787,7 +753,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			for ( let f = 0; f < 6; f ++ ) {
 
 				const target = _gl.TEXTURE_CUBE_MAP_POSITIVE_X + f;
-				if ( isDataTexture ) {
+				if ( cubeImage[ f ].data !== undefined ) {
 
 					state.texImage2D( target, 0, glInternalFormat, cubeImage[ f ].width, cubeImage[ f ].height, 0, glFormat, glType, cubeImage[ f ].data );
 
@@ -970,17 +936,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		// upload an empty depth texture with framebuffer size
-		if ( texture.image.width !== renderTarget.width ||
-				texture.image.height !== renderTarget.height ) {
-
-			texture.image.width = renderTarget.width;
-			texture.image.height = renderTarget.height;
-			texture.needsUpdate = true;
-
-		}
-
 		if ( texture.isCubeTexture ) {
+
+			// upload an empty depth texture with framebuffer size
+			for ( let f = 0; f < 6; f ++ ) {
+
+				texture.image[ f ] = texture.image[ f ] || { data: null };
+				if ( texture.image[ f ].width !== renderTarget.width ||
+						texture.image[ f ].height !== renderTarget.height ) {
+
+					texture.image[ f ].width = renderTarget.width;
+					texture.image[ f ].height = renderTarget.height;
+					texture.needsUpdate = true;
+
+				}
+
+			}
 
 			setTextureCube( texture, 0 );
 			for ( let f = 0; f < 6; f ++ ) {
@@ -991,21 +962,34 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-		} else if ( texture.isDataTexture3D ) {
-
-			throw new Error( 'renderTarget.depthTexture may not be a 3D texture.' );
-
-		} else if ( texture.isDataTexture2DArray ) {
-
-			setTexture2DArray( texture, 0 );
-			state.bindFramebuffer( _gl.FRAMEBUFFER, __webglFramebuffer );
-			_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, textureProperties.__webglTexture, 0, 0 );
-
 		} else {
 
-			setTexture2D( texture, 0 );
+			// upload an empty depth texture with framebuffer size
+			if ( texture.image.width !== renderTarget.width ||
+					texture.image.height !== renderTarget.height ) {
+
+				texture.image.width = renderTarget.width;
+				texture.image.height = renderTarget.height;
+				texture.needsUpdate = true;
+
+			}
+
 			state.bindFramebuffer( _gl.FRAMEBUFFER, __webglFramebuffer );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, _gl.TEXTURE_2D, textureProperties.__webglTexture, 0 );
+			if ( texture.isDataTexture3D ) {
+
+				throw new Error( 'renderTarget.depthTexture may not be a 3D texture.' );
+
+			} else if ( texture.isDataTexture2DArray ) {
+
+				setTexture2DArray( texture, 0 );
+				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, textureProperties.__webglTexture, 0, 0 );
+
+			} else {
+
+				setTexture2D( texture, 0 );
+				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, _gl.TEXTURE_2D, textureProperties.__webglTexture, 0 );
+
+			}
 
 		}
 

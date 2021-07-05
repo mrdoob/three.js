@@ -62,8 +62,17 @@
 					minFilter: THREE.LinearMipmapLinearFilter,
 					encoding: THREE.sRGBEncoding // temporary -- to prevent the material's shader from recompiling every frame
 				} );
+				cubeRenderTarget1.stencilBuffer = false;
+				cubeRenderTarget1.depthBuffer = true;
+				cubeRenderTarget1.depthTexture = new THREE.CubeTexture();
+				cubeRenderTarget1.depthTexture.format = THREE.DepthFormat;
+				cubeRenderTarget1.depthTexture.type = THREE.UnsignedShortType;
+				cubeRenderTarget1.depthTexture.minFilter = THREE.NearestFilter;
+				cubeRenderTarget1.depthTexture.magFilter = THREE.NearestFilter;
+				cubeRenderTarget1.depthTexture.generateMipmaps = false;
+				cubeRenderTarget1.depthTexture._needsFlipEnvMap = false;
 
-				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
+				cubeCamera1 = new THREE.CubeCamera( 10, 100, cubeRenderTarget1 );
 
 				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, {
 					format: THREE.RGBFormat,
@@ -71,10 +80,17 @@
 					minFilter: THREE.LinearMipmapLinearFilter,
 					encoding: THREE.sRGBEncoding
 				} );
+				cubeRenderTarget2.stencilBuffer = false;
+				cubeRenderTarget2.depthBuffer = true;
+				cubeRenderTarget2.depthTexture = new THREE.CubeTexture();
+				cubeRenderTarget2.depthTexture.format = THREE.DepthFormat;
+				cubeRenderTarget2.depthTexture.type = THREE.FloatType;
+				cubeRenderTarget2.depthTexture.minFilter = THREE.NearestFilter;
+				cubeRenderTarget2.depthTexture.magFilter = THREE.NearestFilter;
+				cubeRenderTarget2.depthTexture.generateMipmaps = false;
+				cubeRenderTarget2.depthTexture._needsFlipEnvMap = false;
 
-				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
-
-				//
+				cubeCamera2 = new THREE.CubeCamera( 10, 100, cubeRenderTarget2 );
 
 				material = new THREE.MeshBasicMaterial( {
 					envMap: cubeRenderTarget2.texture,
@@ -190,12 +206,12 @@
 				if ( count % 2 === 0 ) {
 
 					cubeCamera1.update( renderer, scene );
-					material.envMap = cubeRenderTarget1.texture;
+					material.envMap = cubeRenderTarget1.depthTexture;
 
 				} else {
 
 					cubeCamera2.update( renderer, scene );
-					material.envMap = cubeRenderTarget2.texture;
+					material.envMap = cubeRenderTarget2.depthTexture;
 
 				}
 

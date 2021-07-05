@@ -25,10 +25,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 			options.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter,
 				options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
-		}
-
-		if ( options.texture._needsFlipEnvMap === undefined ) {
-
 			options.texture._needsFlipEnvMap = false;
 
 		}

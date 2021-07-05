@@ -1883,6 +1883,7 @@ function WebGLRenderer( parameters = {} ) {
 						needsUpdate = true;
 
 					}
+
 				}
 
 			} else {
@@ -1918,22 +1919,30 @@ function WebGLRenderer( parameters = {} ) {
 		state.scissor( _currentScissor );
 		state.setScissorTest( _currentScissorTest );
 
+		// select active layer and level for 2D array textures and 3D textures
+		// 2D and textures need no update
+		// * framebufferTexture2D's level is fixed to 0
+		// * the active cube face is already selected by the active face framebuffer
 		if ( renderTarget ) {
 
+			const level = activeMipmapLevel || 0;
+			const layer = activeCubeFace || 0;
 			const textures = renderTarget.textures;
 			for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
 				const texture = textures[ i ];
-				const __webglTexture = properties.get( texture ).__webglTexture;
-				const attachment = _gl.COLOR_ATTACHMENT0 + i;
 				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
 
-					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, __webglTexture, activeMipmapLevel, activeCubeFace );
+					const attachment = _gl.COLOR_ATTACHMENT0 + i;
+					const webglTexture = properties.get( texture ).__webglTexture;
+					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, webglTexture, level, layer );
 
 				}
+
 			}
 
-				const texture = renderTarget.depthTexture;
-				const __webglTexture = properties.get( texture ).__webglTexture;
+			const texture = renderTarget.depthTexture;
+			if ( texture && ( texture.isDataTexture3D || texture.isDataTexture2DArray ) ) {
 
 				let attachment = undefined;
 				if ( texture.format === DepthFormat ) {
@@ -1946,33 +1955,25 @@ function WebGLRenderer( parameters = {} ) {
 
 				} else {
 
-
-			if ( renderTarget.depthTexture ) {
-
-				const texture = renderTarget.depthTexture;
-				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
-
-					let attachment = undefined;
-					if ( texture.format === DepthFormat ) {
-
-						attachment = _gl.DEPTH_ATTACHMENT;
-
-					} else if ( texture.format === DepthStencilFormat ) {
-
-						attachment = _gl.DEPTH_STENCIL_ATTACHMENT;
-
-					} else {
-
-						throw new Error( 'Unknown depthTexture format' );
-
-					}
-
-					const __webglTexture = properties.get( texture ).__webglTexture;
-					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, __webglTexture, activeMipmapLevel, activeCubeFace );
+					throw new Error( 'Unsupported depthTexture format' );
 
 				}
+
+				const webglTexture = properties.get( texture ).__webglTexture;
+				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, webglTexture, level, layer );
+
 			}
+
 		}
+
+
+		const framebufferStatus = _gl.checkFramebufferStatus( _gl.FRAMEBUFFER );
+		if ( framebufferStatus !== _gl.FRAMEBUFFER_COMPLETE ) {
+
+			console.log( 'incomplete framebuffer', framebufferStatus, framebuffer );
+
+		}
+
 	};
 
 	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
