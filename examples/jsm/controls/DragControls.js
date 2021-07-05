@@ -136,7 +136,7 @@ class DragControls extends EventDispatcher {
 
 		}
 
-		function onPointerDown() {
+		function onPointerDown( event ) {
 
 			if ( scope.enabled === false ) return;
 
