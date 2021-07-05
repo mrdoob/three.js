@@ -15171,11 +15171,11 @@
 			return texture.generateMipmaps && supportsMips && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
 		}
 
-		function generateMipmap(target, texture, width, height) {
+		function generateMipmap(target, texture, width, height, depth = 1) {
 			_gl.generateMipmap(target);
 
 			const textureProperties = properties.get(texture);
-			textureProperties.__maxMipLevel = Math.log2(Math.max(width, height));
+			textureProperties.__maxMipLevel = Math.log2(Math.max(width, height, depth));
 		}
 
 		function getInternalFormat(internalFormatName, glFormat, glType) {
@@ -15936,10 +15936,10 @@
 				setupFrameBufferTexture(renderTargetProperties.__webglFramebuffer, renderTarget, texture, _gl.COLOR_ATTACHMENT0, glTextureType);
 
 				if (textureNeedsGenerateMipmaps(texture, supportsMips)) {
-					generateMipmap(_gl.TEXTURE_2D, texture, renderTarget.width, renderTarget.height);
+					generateMipmap(glTextureType, texture, renderTarget.width, renderTarget.height, renderTarget.depth);
 				}
 
-				state.bindTexture(_gl.TEXTURE_2D, null);
+				state.bindTexture(glTextureType, null);
 			} // Setup depth and stencil buffers
 
 
@@ -16765,15 +16765,13 @@
 							viewport = baseLayer.getViewport(view);
 						} else {
 							const glSubImage = glBinding.getViewSubImage(glProjLayer, view);
-							gl.bindFramebuffer(gl.FRAMEBUFFER, glFramebuffer);
+							state.bindXRFramebuffer(glFramebuffer);
 							gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
 
 							if (glSubImage.depthStencilTexture !== undefined) {
 								gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0);
 							}
 
-							gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-							state.bindXRFramebuffer(glFramebuffer);
 							viewport = glSubImage.viewport;
 						}
 
