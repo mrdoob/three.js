@@ -144,7 +144,7 @@
 
 			}
 
-			function onPointerDown() {
+			function onPointerDown( event ) {
 
 				if ( scope.enabled === false ) return;
 				updatePointer( event );

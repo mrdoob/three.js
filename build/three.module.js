@@ -3,7 +3,7 @@
  * Copyright 2010-2021 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '130dev';
+const REVISION = '130';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -15235,7 +15235,7 @@ function WebGLMorphtargets( gl ) {
 
 		let influences = influencesList[ geometry.id ];
 
-		if ( influences === undefined ) {
+		if ( influences === undefined || influences.length !== length ) {
 
 			// initialise list
 
@@ -20394,13 +20394,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function generateMipmap( target, texture, width, height ) {
+	function generateMipmap( target, texture, width, height, depth = 1 ) {
 
 		_gl.generateMipmap( target );
 
 		const textureProperties = properties.get( texture );
 
-		textureProperties.__maxMipLevel = Math.log2( Math.max( width, height ) );
+		textureProperties.__maxMipLevel = Math.log2( Math.max( width, height, depth ) );
 
 	}
 
@@ -21502,11 +21502,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-				generateMipmap( 3553, texture, renderTarget.width, renderTarget.height );
+				generateMipmap( glTextureType, texture, renderTarget.width, renderTarget.height, renderTarget.depth );
 
 			}
 
-			state.bindTexture( 3553, null );
+			state.bindTexture( glTextureType, null );
 
 		}
 
@@ -22187,13 +22187,15 @@ class WebXRManager extends EventDispatcher {
 		const state = renderer.state;
 
 		let session = null;
-
 		let framebufferScaleFactor = 1.0;
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
 
 		let pose = null;
+		let glBinding = null;
+		let glFramebuffer = null;
+		let glProjLayer = null;
 
 		const controllers = [];
 		const inputSourcesMap = new Map();
@@ -22370,18 +22372,47 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
-				const layerInit = {
-					antialias: attributes.antialias,
-					alpha: attributes.alpha,
-					depth: attributes.depth,
-					stencil: attributes.stencil,
-					framebufferScaleFactor: framebufferScaleFactor
-				};
+				if ( session.renderState.layers === undefined ) {
 
-				// eslint-disable-next-line no-undef
-				const baseLayer = new XRWebGLLayer( session, gl, layerInit );
+					const layerInit = {
+						antialias: attributes.antialias,
+						alpha: attributes.alpha,
+						depth: attributes.depth,
+						stencil: attributes.stencil,
+						framebufferScaleFactor: framebufferScaleFactor
+					};
 
-				session.updateRenderState( { baseLayer: baseLayer } );
+					// eslint-disable-next-line no-undef
+					const baseLayer = new XRWebGLLayer( session, gl, layerInit );
+
+					session.updateRenderState( { baseLayer: baseLayer } );
+
+				} else {
+
+					let depthFormat = 0;
+
+					if ( attributes.depth ) {
+
+						depthFormat = attributes.stencil ? 34041 : 6402;
+
+					}
+
+					const projectionlayerInit = {
+						colorFormat: attributes.alpha ? 6408 : 6407,
+						depthFormat: depthFormat,
+						scaleFactor: framebufferScaleFactor
+					};
+
+					// eslint-disable-next-line no-undef
+					glBinding = new XRWebGLBinding( session, gl );
+
+					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+					glFramebuffer = gl.createFramebuffer();
+
+					session.updateRenderState( { layers: [ glProjLayer ] } );
+
+				}
 
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
@@ -22600,9 +22631,14 @@ class WebXRManager extends EventDispatcher {
 			if ( pose !== null ) {
 
 				const views = pose.views;
+
 				const baseLayer = session.renderState.baseLayer;
 
-				state.bindXRFramebuffer( baseLayer.framebuffer );
+				if ( session.renderState.layers === undefined ) {
+
+					state.bindXRFramebuffer( baseLayer.framebuffer );
+
+				}
 
 				let cameraVRNeedsUpdate = false;
 
@@ -22611,18 +22647,46 @@ class WebXRManager extends EventDispatcher {
 				if ( views.length !== cameraVR.cameras.length ) {
 
 					cameraVR.cameras.length = 0;
+
 					cameraVRNeedsUpdate = true;
+
 
 				}
 
 				for ( let i = 0; i < views.length; i ++ ) {
 
 					const view = views[ i ];
-					const viewport = baseLayer.getViewport( view );
+
+					let viewport = null;
+
+					if ( session.renderState.layers === undefined ) {
+
+						viewport = baseLayer.getViewport( view );
+
+					} else {
+
+						const glSubImage = glBinding.getViewSubImage( glProjLayer, view );
+
+						state.bindXRFramebuffer( glFramebuffer );
+
+						gl.framebufferTexture2D( 36160, 36064, 3553, glSubImage.colorTexture, 0 );
+
+						if ( glSubImage.depthStencilTexture !== undefined ) {
+
+							gl.framebufferTexture2D( 36160, 36096, 3553, glSubImage.depthStencilTexture, 0 );
+
+						}
+
+						viewport = glSubImage.viewport;
+
+					}
 
 					const camera = cameras[ i ];
+
 					camera.matrix.fromArray( view.transform.matrix );
+
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
+
 					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
 					if ( i === 0 ) {
@@ -24395,13 +24459,13 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( _currentRenderTarget !== null ) {
 
-			// Generate mipmap if we're using any kind of mipmap filtering
-
-			textures.updateRenderTargetMipmap( _currentRenderTarget );
-
 			// resolve multisample renderbuffers to a single-sample texture if necessary
 
 			textures.updateMultisampleRenderTarget( _currentRenderTarget );
+
+			// Generate mipmap if we're using any kind of mipmap filtering
+
+			textures.updateRenderTargetMipmap( _currentRenderTarget );
 
 		}
 
@@ -46488,6 +46552,29 @@ class AxesHelper extends LineSegments {
 		super( geometry, material );
 
 		this.type = 'AxesHelper';
+
+	}
+
+	setColors( xAxisColor, yAxisColor, zAxisColor ) {
+
+		const color = new Color();
+		const array = this.geometry.attributes.color.array;
+
+		color.set( xAxisColor );
+		color.toArray( array, 0 );
+		color.toArray( array, 3 );
+
+		color.set( yAxisColor );
+		color.toArray( array, 6 );
+		color.toArray( array, 9 );
+
+		color.set( zAxisColor );
+		color.toArray( array, 12 );
+		color.toArray( array, 15 );
+
+		this.geometry.attributes.color.needsUpdate = true;
+
+		return this;
 
 	}
 
