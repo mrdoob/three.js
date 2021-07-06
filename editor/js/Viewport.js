@@ -32,7 +32,6 @@ function Viewport( editor ) {
 
 	var renderer = null;
 	var pmremGenerator = null;
-	var pmremTexture = null;
 
 	var camera = editor.camera;
 	var scene = editor.scene;
@@ -354,7 +353,6 @@ function Viewport( editor ) {
 			renderer.setAnimationLoop( null );
 			renderer.dispose();
 			pmremGenerator.dispose();
-			pmremTexture = null;
 
 			container.dom.removeChild( renderer.domElement );
 
@@ -537,9 +535,7 @@ function Viewport( editor ) {
 
 	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, environmentType ) {
-
-		pmremTexture = null;
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture ) {
 
 		switch ( backgroundType ) {
 
@@ -569,23 +565,12 @@ function Viewport( editor ) {
 
 				if ( backgroundEquirectangularTexture ) {
 
-					pmremTexture = pmremGenerator.fromEquirectangular( backgroundEquirectangularTexture ).texture;
-
-					var renderTarget = new THREE.WebGLCubeRenderTarget( 512 );
-					renderTarget.fromEquirectangularTexture( renderer, backgroundEquirectangularTexture );
-					renderTarget.toJSON = function () { return null }; // TODO Remove hack
-
-					scene.background = renderTarget.texture;
+					backgroundEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
+					scene.background = backgroundEquirectangularTexture;
 
 				}
 
 				break;
-
-		}
-
-		if ( environmentType === 'Background' ) {
-
-			scene.environment = pmremTexture;
 
 		}
 
@@ -595,18 +580,32 @@ function Viewport( editor ) {
 
 	// environment
 
-	signals.sceneEnvironmentChanged.add( function ( environmentType ) {
+	signals.sceneEnvironmentChanged.add( function ( environmentType, environmentEquirectangularTexture ) {
 
 		switch ( environmentType ) {
 
 			case 'None':
+
 				scene.environment = null;
+
 				break;
-			case 'Background':
-				scene.environment = pmremTexture;
+
+			case 'Equirectangular':
+
+				scene.environment = null;
+
+				if ( environmentEquirectangularTexture ) {
+
+					scene.environment = pmremGenerator.fromEquirectangular( environmentEquirectangularTexture ).texture;
+
+				}
+
 				break;
+
 			case 'ModelViewer':
+
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
 				break;
 
 		}

@@ -2643,6 +2643,11 @@ class GLTFParser {
 
 			return texture;
 
+		} ).catch( function () {
+
+			console.error( 'THREE.GLTFLoader: Couldn\'t load texture', sourceURI );
+			return null;
+
 		} );
 
 		this.textureCache[ cacheKey ] = promise;

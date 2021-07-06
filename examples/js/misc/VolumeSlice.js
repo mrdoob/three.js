@@ -9,7 +9,7 @@
  * @see Volume
  */
 
-	var VolumeSlice = function ( volume, index, axis ) {
+	function VolumeSlice( volume, index, axis ) {
 
 		var slice = this;
 		/**
@@ -96,7 +96,7 @@
    * @returns {Number} the index corresponding to the voxel in volume.data of the given position in the slice
    */
 
-	};
+	}
 
 	VolumeSlice.prototype = {
 		constructor: VolumeSlice,

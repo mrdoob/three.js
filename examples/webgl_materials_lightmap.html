@@ -56,10 +56,10 @@
 			let container, stats;
 			let camera, scene, renderer;
 
-			init();
+			await init();
 			animate();
 
-			function init() {
+			async function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -126,11 +126,8 @@
 				// MODEL
 
 				const loader = new THREE.ObjectLoader();
-				loader.load( "models/json/lightmap/lightmap.json", function ( object ) {
-
-					scene.add( object );
-
-				} );
+				const object = await loader.loadAsync( "models/json/lightmap/lightmap.json" );
+				scene.add( object );
 
 				//
 

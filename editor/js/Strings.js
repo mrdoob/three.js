@@ -311,7 +311,6 @@ function Strings( config ) {
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
-			'sidebar/settings/exportPrecision': 'Export Precision',
 
 			'sidebar/settings/shortcuts': 'Shortcuts',
 			'sidebar/settings/shortcuts/translate': 'Translate',
@@ -646,7 +645,6 @@ function Strings( config ) {
 
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
-			'sidebar/settings/exportPrecision': 'Précision à l\'exportation',
 
 			'sidebar/settings/shortcuts': 'Shortcuts',
 			'sidebar/settings/shortcuts/translate': 'Position',
@@ -981,7 +979,6 @@ function Strings( config ) {
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
-			'sidebar/settings/exportPrecision': '输出精度',
 
 			'sidebar/settings/shortcuts': '快捷键',
 			'sidebar/settings/shortcuts/translate': '移动',

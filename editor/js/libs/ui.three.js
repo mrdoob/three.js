@@ -36,7 +36,7 @@ class UITexture extends UISpan {
 			input.click();
 
 		}, false );
-		canvas.addEventListener( 'drop', function () {
+		canvas.addEventListener( 'drop', function ( event ) {
 
 			event.preventDefault();
 			event.stopPropagation();
