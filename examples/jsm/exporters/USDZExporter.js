@@ -2,17 +2,27 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-  async parse(scene, options = { ar: { anchoring: { type: "plane"}, planeAnchoring: {alignment: "vertical"} } ) {
+  options = {
+  	ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'vertical' } }
+  };
 
-		const files = {};
-		const modelFileName = 'model.usda';
+  setOptions( options ) {
 
-		// model file should be first in USDZ archive so we init it here
-		files[ modelFileName ] = null;
+  	this.options = options;
 
-		let output = buildHeader();
+  }
 
-    output += `
+  async parse( scene ) {
+
+  	const files = {};
+  	const modelFileName = 'model.usda';
+
+  	// model file should be first in USDZ archive so we init it here
+  	files[ modelFileName ] = null;
+
+  	let output = buildHeader();
+
+  	output += `
     def Xform "Root"
     {
       def Scope "Scenes" (
@@ -27,95 +37,93 @@ class USDZExporter {
             sceneName = "Scene"
           )
           {
-              token preliminary:anchoring:type = "${options.ar.anchoring.type}"
-              token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+              token preliminary:anchoring:type = "${this.options.ar.anchoring.type}"
+              token preliminary:planeAnchoring:alignment = "${this.options.ar.planeAnchoring.alignment}"
 
-`
+`;
 
-		const materials = {};
-		const textures = {};
+  	const materials = {};
+  	const textures = {};
 
-		scene.traverseVisible( ( object ) => {
+  	scene.traverseVisible( ( object ) => {
 
-			if ( object.isMesh && object.material.isMeshStandardMaterial ) {
+  		if ( object.isMesh && object.material.isMeshStandardMaterial ) {
 
-				const geometry = object.geometry;
-				const material = object.material;
+  			const geometry = object.geometry;
+  			const material = object.material;
 
-				const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+  			const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 
-				if ( ! ( geometryFileName in files ) ) {
+  			if ( ! ( geometryFileName in files ) ) {
 
-					const meshObject = buildMeshObject( geometry );
-					files[ geometryFileName ] = buildUSDFileAsString( meshObject );
+  				const meshObject = buildMeshObject( geometry );
+  				files[ geometryFileName ] = buildUSDFileAsString( meshObject );
 
-				}
+  			}
 
-				if ( ! ( material.uuid in materials ) ) {
+  			if ( ! ( material.uuid in materials ) ) {
 
-					materials[ material.uuid ] = material;
+  				materials[ material.uuid ] = material;
 
-				}
+  			}
 
-				output += buildXform( object, geometry, material );
+  			output += buildXform( object, geometry, material );
 
-			}
+  		}
 
-		} );
+  	} );
 
 
-    output += `
+  	output += `
           }
         }
     }
-    `
+    `;
 
-    output += buildMaterials(materials, textures);
-    console.log('output', output)
-    
+  	output += buildMaterials( materials, textures );
 
-		files[ modelFileName ] = fflate.strToU8( output );
-		output = null;
+  	files[ modelFileName ] = fflate.strToU8( output );
+  	output = null;
 
-		for ( const id in textures ) {
+  	for ( const id in textures ) {
 
-			const texture = textures[ id ];
-			const color = id.split( '_' )[ 1 ];
+  		const texture = textures[ id ];
+  		const color = id.split( '_' )[ 1 ];
 
-			files[ 'textures/Texture_' + id + '.jpg' ] = await imgToU8( texture.image, color );
+  		files[ 'textures/Texture_' + id + '.jpg' ] = await imgToU8( texture.image, color );
 
-		}
+  	}
 
-		// 64 byte alignment
-		// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
+  	// 64 byte alignment
+  	// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
 
-		let offset = 0;
+  	let offset = 0;
 
-		for ( const filename in files ) {
+  	for ( const filename in files ) {
 
-			const file = files[ filename ];
-			const headerSize = 34 + filename.length;
+  		const file = files[ filename ];
+  		const headerSize = 34 + filename.length;
 
-			offset += headerSize;
+  		offset += headerSize;
 
-			const offsetMod64 = offset & 63;
+  		const offsetMod64 = offset & 63;
 
-			if ( offsetMod64 !== 4 ) {
+  		if ( offsetMod64 !== 4 ) {
 
-				const padLength = 64 - offsetMod64;
-				const padding = new Uint8Array( padLength );
+  			const padLength = 64 - offsetMod64;
+  			const padding = new Uint8Array( padLength );
 
-				files[ filename ] = [ file, { extra: { 12345: padding } } ];
+  			files[ filename ] = [ file, { extra: { 12345: padding } } ];
 
-			}
+  		}
 
-			offset = file.length;
+  		offset = file.length;
 
-		}
-    console.log('files', files)
-		return fflate.zipSync( files, { level: 0 } );
+  	}
 
-	}
+  	return fflate.zipSync( files, { level: 0 } );
+
+  }
 
 }
 
