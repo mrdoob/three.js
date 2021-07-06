@@ -115,6 +115,9 @@
 			// likely only a minor optimization,
 			// but why check for threshold every iteration
 			// in cases when we aren't even using it?
+			// implicit typeof( threshold ) !== 'undefined'.
+			// if the argument is not provided, we safely
+			// false out and use the old implementation.
 			if ( threshold >= 0 ) {
 
 				while ( z -- ) {
