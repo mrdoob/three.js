@@ -57,6 +57,8 @@
 	} //
 
 
+	const canvases = new WeakMap();
+
 	function html2canvas( element ) {
 
 		var range = document.createRange();
@@ -233,14 +235,25 @@
 
 		}
 
-		var offset = element.getBoundingClientRect();
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = offset.width;
-		canvas.height = offset.height;
-		var context = canvas.getContext( '2d'
+		const offset = element.getBoundingClientRect();
+		let canvas;
+
+		if ( canvases.has( element ) ) {
+
+			canvas = canvases.get( element );
+
+		} else {
+
+			canvas = document.createElement( 'canvas' );
+			canvas.width = offset.width;
+			canvas.height = offset.height;
+
+		}
+
+		const context = canvas.getContext( '2d'
 			/*, { alpha: false }*/
 		);
-		var clipper = new Clipper( context ); // console.time( 'drawElement' );
+		const clipper = new Clipper( context ); // console.time( 'drawElement' );
 
 		drawElement( element ); // console.timeEnd( 'drawElement' );
 
