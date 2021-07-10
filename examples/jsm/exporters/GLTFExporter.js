@@ -2,6 +2,7 @@ import {
 	BufferAttribute,
 	ClampToEdgeWrapping,
 	DoubleSide,
+	Group,
 	InterpolateDiscrete,
 	InterpolateLinear,
 	LinearFilter,
@@ -74,7 +75,7 @@ class GLTFExporter {
 
 	/**
 	 * Parse scenes and generate GLTF output
-	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
+	 * @param  {Object3D or [THREE.Object3D]} input   Object3D or Array of THREE.Object3D
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
@@ -365,7 +366,7 @@ class GLTFWriter {
 
 	/**
 	 * Parse scenes and generate GLTF output
-	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
+	 * @param  {Object3D or [THREE.Object3D]} input   Object3D or Array of THREE.Object3D
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
@@ -1989,7 +1990,7 @@ class GLTFWriter {
 
 		for ( let i = 0; i < input.length; i ++ ) {
 
-			if ( input[ i ] instanceof Scene ) {
+			if ( input[ i ] instanceof Scene || input[ i ] instanceof Group ) {
 
 				this.processScene( input[ i ] );
 
