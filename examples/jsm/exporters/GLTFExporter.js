@@ -2,7 +2,6 @@ import {
 	BufferAttribute,
 	ClampToEdgeWrapping,
 	DoubleSide,
-	Group,
 	InterpolateDiscrete,
 	InterpolateLinear,
 	LinearFilter,
@@ -75,7 +74,7 @@ class GLTFExporter {
 
 	/**
 	 * Parse scenes and generate GLTF output
-	 * @param  {Object3D or [THREE.Object3D]} input   Object3D or Array of THREE.Object3D
+	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
@@ -366,7 +365,7 @@ class GLTFWriter {
 
 	/**
 	 * Parse scenes and generate GLTF output
-	 * @param  {Object3D or [THREE.Object3D]} input   Object3D or Array of THREE.Object3D
+	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
@@ -1961,9 +1960,20 @@ class GLTFWriter {
 
 		for ( let i = 0; i < objects.length; i ++ ) {
 
+			const object = objects[ i ];
+
 			// We push directly to children instead of calling `add` to prevent
 			// modify the .parent and break its original scene and hierarchy
-			scene.children.push( objects[ i ] );
+
+			if ( object.isGroup ) {
+
+				scene.children.push( ...object.children );
+
+			} else {
+
+				scene.children.push( object );
+
+			}
 
 		}
 
@@ -1990,7 +2000,7 @@ class GLTFWriter {
 
 		for ( let i = 0; i < input.length; i ++ ) {
 
-			if ( input[ i ] instanceof Scene || input[ i ] instanceof Group ) {
+			if ( input[ i ] instanceof Scene ) {
 
 				this.processScene( input[ i ] );
 
