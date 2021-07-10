@@ -36,6 +36,7 @@
 
 			uniform vec3 color;
 			uniform sampler2D pointTexture;
+			uniform float alphaTest;
 
 			varying vec3 vColor;
 
@@ -45,7 +46,7 @@
 
 				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
 
-				if ( gl_FragColor.a < ALPHATEST ) discard;
+				if ( gl_FragColor.a < alphaTest ) discard;
 
 			}
 
@@ -120,12 +121,11 @@
 
 					uniforms: {
 						color: { value: new THREE.Color( 0xffffff ) },
-						pointTexture: { value: new THREE.TextureLoader().load( 'textures/sprites/disc.png' ) }
+						pointTexture: { value: new THREE.TextureLoader().load( 'textures/sprites/disc.png' ) },
+						alphaTest: { value: 0.9 }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-
-					alphaTest: 0.9
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
 				} );
 
