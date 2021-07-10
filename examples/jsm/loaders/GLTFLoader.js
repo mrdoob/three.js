@@ -3186,7 +3186,7 @@ class GLTFParser {
 
 				}
 
-				mesh.name = parser.createUniqueName( meshDef.name || (material && material.name) || ( 'mesh_' + meshIndex ) );
+				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
 				assignExtrasToUserData( mesh, meshDef );
 
