@@ -113,6 +113,8 @@ class Box3 {
 
 		this.makeEmpty();
 
+		object.updateWorldMatrix( true, false );
+
 		return this.expandByObject( object );
 
 	}
