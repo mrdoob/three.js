@@ -107,7 +107,6 @@ function WebGLMaterials( properties ) {
 
 	function refreshUniformsCommon( uniforms, material ) {
 
-		uniforms.alphaTest.value = material.alphaTest;
 		uniforms.opacity.value = material.opacity;
 
 		if ( material.color ) {
@@ -131,6 +130,12 @@ function WebGLMaterials( properties ) {
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		if ( material.alphaTest !== null ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
 
 		}
 

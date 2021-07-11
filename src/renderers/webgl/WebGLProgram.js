@@ -607,6 +607,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
+			parameters.alphaTest ? '#define USE_ALPHATEST' : '',
 
 			parameters.sheen ? '#define USE_SHEEN' : '',
 			parameters.transmission ? '#define USE_TRANSMISSION' : '',

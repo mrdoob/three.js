@@ -38,7 +38,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
 		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap', 'objectSpaceNormalMap', 'tangentSpaceNormalMap', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'displacementMap', 'specularMap',
 		'roughnessMap', 'metalnessMap', 'gradientMap',
-		'alphaMap', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
+		'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
 		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
 		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'premultipliedAlpha',
 		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
@@ -197,6 +197,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
+			aphaTest: material.alphaTest !== null,
 
 			gradientMap: !! material.gradientMap,
 

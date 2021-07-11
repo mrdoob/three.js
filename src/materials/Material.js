@@ -62,7 +62,7 @@ class Material extends EventDispatcher {
 
 		this.dithering = false;
 
-		this.alphaTest = 0;
+		this.alphaTest = null;
 		this.alphaToCoverage = false;
 		this.premultipliedAlpha = false;
 
@@ -308,7 +308,7 @@ class Material extends EventDispatcher {
 
 		if ( this.dithering === true ) data.dithering = true;
 
-		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.alphaTest !== null ) data.alphaTest = this.alphaTest;
 		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 
