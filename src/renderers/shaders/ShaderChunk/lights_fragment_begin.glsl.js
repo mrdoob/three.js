@@ -38,7 +38,16 @@ IncidentLight directLight;
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		pointLight = pointLights[ i ];
+		pointLight.position = pointLights[ i ].position;
+		pointLight.color = pointLights[ i ].color;
+		pointLight.distance = pointLights[ i ].distance;
+		pointLight.decay = pointLights[ i ].decay;
+		pointLight.shadow = pointLights[ i ].shadow;
+		pointLight.shadowBias = pointLights[ i ].shadowBias;
+		pointLight.shadowRadius = pointLights[ i ].shadowRadius;
+		pointLight.shadowMapSize = pointLights[ i ].shadowMapSize;
+		pointLight.shadowCameraNear = pointLights[ i ].shadowCameraNear;
+		pointLight.shadowCameraFar = pointLights[ i ].shadowCameraFar;
 
 		getPointDirectLightIrradiance( pointLight, geometry, directLight );
 
@@ -64,7 +73,17 @@ IncidentLight directLight;
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		spotLight = spotLights[ i ];
+		spotLight.position = spotLights[ i ].position;
+		spotLight.direction = spotLights[ i ].direction;
+		spotLight.color = spotLights[ i ].color;
+		spotLight.distance = spotLights[ i ].distance;
+		spotLight.decay = spotLights[ i ].decay;
+		spotLight.coneCos = spotLights[ i ].coneCos;
+		spotLight.penumbraCos = spotLights[ i ].penumbraCos;
+		spotLight.shadow = spotLights[ i ].shadow;
+		spotLight.shadowBias = spotLights[ i ].shadowBias;
+		spotLight.shadowRadius = spotLights[ i ].shadowRadius;
+		spotLight.shadowMapSize = spotLights[ i ].shadowMapSize;
 
 		getSpotDirectLightIrradiance( spotLight, geometry, directLight );
 
@@ -90,7 +109,12 @@ IncidentLight directLight;
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		directionalLight = directionalLights[ i ];
+		directionalLight.direction = directionalLights[ i ].direction;
+		directionalLight.color = directionalLights[ i ].color;
+		directionalLight.shadow = directionalLights[ i ].shadow;
+		directionalLight.shadowBias = directionalLights[ i ].shadowBias;
+		directionalLight.shadowRadius = directionalLights[ i ].shadowRadius;
+		directionalLight.shadowMapSize = directionalLights[ i ].shadowMapSize;
 
 		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
 
@@ -113,7 +137,11 @@ IncidentLight directLight;
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
 
-		rectAreaLight = rectAreaLights[ i ];
+		rectAreaLight.color = rectAreaLight[ i ].color;
+		rectAreaLight.position = rectAreaLight[ i ].position;
+		rectAreaLight.halfWidth = rectAreaLight[ i ].halfWidth;
+		rectAreaLight.halfHeight = rectAreaLight[ i ].halfHeight;
+
 		RE_Direct_RectArea( rectAreaLight, geometry, material, reflectedLight );
 
 	}
@@ -131,10 +159,16 @@ IncidentLight directLight;
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
+		HemisphereLight hemisphereLight;
+
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+			hemisphereLight.direction = hemisphereLights[ i ].direction;
+			hemisphereLight.skyColor = hemisphereLights[ i ].skyColor;
+			hemisphereLight.groundColor = hemisphereLights[ i ].groundColor;
+
+			irradiance += getHemisphereLightIrradiance( hemisphereLight, geometry );
 
 		}
 		#pragma unroll_loop_end
