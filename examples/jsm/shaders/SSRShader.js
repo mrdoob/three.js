@@ -15,14 +15,13 @@ var SSRShader = {
 		DISTANCE_ATTENUATION: true,
 		FRESNEL: true,
 		INFINITE_THICK: false,
-		SELECTIVE: false,
 	},
 
 	uniforms: {
 
 		'tDiffuse': { value: null },
 		'tNormal': { value: null },
-		'tMetalness': { value: null },
+		'tIntensity': { value: null },
 		'tDepth': { value: null },
 		'cameraNear': { value: null },
 		'cameraFar': { value: null },
@@ -56,7 +55,7 @@ var SSRShader = {
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
-		uniform sampler2D tMetalness;
+		uniform sampler2D tIntensity;
 		uniform sampler2D tDiffuse;
 		uniform float cameraRange;
 		uniform vec2 resolution;
@@ -89,7 +88,12 @@ var SSRShader = {
 		}
 		float getViewZ( const in float depth ) {
 			#ifdef PERSPECTIVE_CAMERA
-				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
+				// return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
+
+				// clipZ=cameraProjectionMatrix[2][2]*viewZ+cameraProjectionMatrix[3][2]
+				// clipZ=-2*depth*viewZ+viewZ
+				// viewZ=cameraProjectionMatrix[3][2]/(1.-2.*depth-cameraProjectionMatrix[2][2])
+				return cameraProjectionMatrix[3][2]/(1.-2.*depth-cameraProjectionMatrix[2][2]);
 			#else
 				return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
 			#endif
@@ -113,10 +117,8 @@ var SSRShader = {
 			return xy;
 		}
 		void main(){
-			#ifdef SELECTIVE
-				float metalness=texture2D(tMetalness,vUv).r;
-				if(metalness==0.) return;
-			#endif
+			float intensity=texture2D(tIntensity,vUv).r;
+			if(intensity==0.) return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
@@ -219,6 +221,7 @@ var SSRShader = {
 							float fresnelCoe=(dot(viewIncidentDir,viewReflectDir)+1.)/2.;
 							op*=fresnelCoe;
 						#endif
+						op*=intensity;
 						vec4 reflectColor=texture2D(tDiffuse,uv);
 						gl_FragColor.xyz=reflectColor.xyz;
 						gl_FragColor.a=op;

@@ -961,7 +961,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera ) {
+	this.render = function ( scene, camera, recursive = true ) {
 
 		if ( camera !== undefined && camera.isCamera !== true ) {
 
@@ -1007,7 +1007,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		renderListStack.push( currentRenderList );
 
-		projectObject( scene, camera, 0, _this.sortObjects );
+		projectObject( scene, camera, 0, _this.sortObjects, recursive );
 
 		currentRenderList.finish();
 
@@ -1106,7 +1106,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	function projectObject( object, camera, groupOrder, sortObjects ) {
+	function projectObject( object, camera, groupOrder, sortObjects, recursive = true ) {
 
 		if ( object.visible === false ) return;
 
@@ -1221,11 +1221,15 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		const children = object.children;
+		if ( recursive ) {
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+			const children = object.children;
 
-			projectObject( children[ i ], camera, groupOrder, sortObjects );
+			for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+				projectObject( children[ i ], camera, groupOrder, sortObjects, true );
+
+			}
 
 		}
 
