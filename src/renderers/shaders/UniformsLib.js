@@ -18,7 +18,7 @@ const UniformsLib = {
 		uv2Transform: { value: new Matrix3() },
 
 		alphaMap: { value: null },
-		alphaTest: { value: null }
+		alphaTest: { value: 0 }
 
 	},
 

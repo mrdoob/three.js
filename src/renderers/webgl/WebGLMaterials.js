@@ -133,7 +133,7 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( material.alphaTest !== null ) {
+		if ( material.alphaTest > 0 ) {
 
 			uniforms.alphaTest.value = material.alphaTest;
 

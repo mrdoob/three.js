@@ -197,7 +197,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
-			aphaTest: material.alphaTest !== null,
+			alphaTest: material.alphaTest > 0,
 
 			gradientMap: !! material.gradientMap,
 
