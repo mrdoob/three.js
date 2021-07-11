@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<head>
+		<title>three.js webgl - postprocessing - Screen Space Refraction</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+<body>
+	<div id="container"></div>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		SSShadowPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.
+	</div>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { TransformControls } from './jsm/controls/TransformControls.js';
+
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+		import { SSShadowPass } from './jsm/postprocessing/SSShadowPass.js';
+
+		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+
+		const params = {
+			enableSSShadow: true,
+			autoRotate: false,
+		};
+		let composer;
+		let ssshadowPass;
+		let ssshadowLightHelper;
+		let gui;
+		let stats;
+		let controls;
+		let camera, scene, renderer;
+		const objects = [];
+		const raycaster = new THREE.Raycaster();
+		const mouseDown = new THREE.Vector2();
+		const mouse = new THREE.Vector2();
+
+		const container = document.querySelector( '#container' );
+
+		// Configure and create Draco decoder.
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath( 'js/libs/draco/' );
+		dracoLoader.setDecoderConfig( { type: 'js' } );
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
+			camera.position.set( 0.13271600513224902, 0.3489546826045913, 0.43921296427927076 );
+			// camera.position.set(-0.3880278695483652, 0.19765997421081033, 0.3495264135888409);
+			window.camera=camera
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x443333 );
+			// scene.fog = new THREE.Fog( 0x443333, 1, 4 );
+
+			// Ground
+			const map = new THREE.TextureLoader().load( './textures/uv_grid_opengl.jpg' );
+			map.wrapS = THREE.RepeatWrapping;
+			map.wrapT = THREE.RepeatWrapping;
+			map.repeat.set( 20, 20 );
+			const plane = new THREE.Mesh(
+				new THREE.PlaneGeometry( 8, 8 ),
+				// new THREE.MeshPhongMaterial( {
+				new THREE.MeshBasicMaterial( {
+					color: 0x999999,
+					map,
+				} )
+			);
+			plane.rotation.x = - Math.PI / 2;
+			plane.position.y = - 0.0001;
+			// plane.receiveShadow = true;
+			scene.add( plane );
+			plane.name = 'plane';
+
+			// Lights
+			const hemiLight = new THREE.HemisphereLight( 0x443333, 0x111122 );
+			hemiLight.name = 'hemiLight';
+			scene.add( hemiLight );
+
+			// const spotLight = new THREE.SpotLight();
+			// spotLight.name = 'spotLight';
+			// spotLight.angle = Math.PI / 16;
+			// spotLight.penumbra = 0.5;
+			// // spotLight.castShadow = true;
+			// spotLight.position.set( - 1, 1, 1 );
+			// scene.add( spotLight );
+
+			const light = new THREE.PointLight( 'white', 1, 100 );
+			light.position.set( - 1, 1, 1 );
+			// light.castShadow=true
+			scene.add( light );
+
+			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
+
+				geometry.computeVertexNormals();
+
+				// const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const material = new THREE.MeshBasicMaterial( { color: 0x606060 } );
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = - 0.0365;
+				mesh.name = 'bunny';
+				scene.add( mesh );
+				objects.push( mesh );
+
+				// Release decoder resources.
+				dracoLoader.dispose();
+
+			} );
+
+			let geometry, material, mesh;
+
+			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
+			// material = new THREE.MeshStandardMaterial( { color: 'green' } );
+			material = new THREE.MeshBasicMaterial( { color: 'green' } );
+			mesh = new THREE.Mesh( geometry, material );
+			mesh.position.set( - .12, .025, .015 );
+			mesh.name = 'box';
+			scene.add( mesh );
+			objects.push( mesh );
+
+			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
+			// material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
+			material = new THREE.MeshBasicMaterial( { color: 'cyan' } );
+			mesh = new THREE.Mesh( geometry, material );
+			mesh.position.set( - .05, .025, .08 );
+			mesh.name = 'sphere';
+			scene.add( mesh );
+			objects.push( mesh );
+
+			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
+			// material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
+			material = new THREE.MeshBasicMaterial( { color: 'yellow' } );
+			mesh = new THREE.Mesh( geometry, material );
+			mesh.position.set( - .05, .025, - .055 );
+			mesh.name = 'cone';
+			scene.add( mesh );
+			objects.push( mesh );
+
+			// renderer
+			renderer = new THREE.WebGLRenderer( { antialias: false } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.autoClear = false;
+			container.appendChild( renderer.domElement );
+
+			// STATS
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			window.addEventListener( 'resize', onWindowResize );
+			window.addEventListener( 'pointerdown', onPointerDown );
+
+			// composer
+
+			composer = new EffectComposer( renderer );
+			ssshadowPass = new SSShadowPass( {
+				renderer,
+				scene,
+				camera,
+				width: innerWidth,
+				height: innerHeight,
+				encoding: THREE.sRGBEncoding,
+			} );
+
+			composer.addPass( ssshadowPass );
+
+			// SSShadow light helper
+
+			// ssshadowLightHelper = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(0,0),new THREE.MeshBasicMaterial({color:'white',}))
+			ssshadowLightHelper = new THREE.Mesh(new THREE.IcosahedronBufferGeometry(.001,3),new THREE.MeshBasicMaterial({color:'white',}))
+			// ssshadowLightHelper = new THREE.Sprite(new THREE.SpriteMaterial({color:'white',}))
+			ssshadowLightHelper.position.copy(ssshadowPass.lightPosition)
+			scene.add(ssshadowLightHelper)
+			ssshadowLightHelper.visible=false
+			window.ssshadowLightHelper=ssshadowLightHelper
+			ssshadowLightHelper.position.copy(ssshadowPass.lightPosition)
+
+			//
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.target.set( 0, 0.0635, 0 );
+			controls.update();
+			controls.enabled = ! params.autoRotate;
+
+			let transformControls = new TransformControls( camera, renderer.domElement );
+			transformControls.attach( ssshadowLightHelper );
+			scene.add( transformControls );
+			transformControls.addEventListener( 'dragging-changed', function ( event ) {
+
+				controls.enabled = ! event.value;
+
+			} );
+			transformControls.addEventListener( 'objectChange', function ( event ) {
+
+				ssshadowPass.lightPosition.copy(ssshadowLightHelper.position)
+
+			} );
+
+			// GUI
+
+			gui = new GUI();
+			gui.add( params, 'enableSSShadow' ).name( 'Enable SSShadow' );
+			gui.add( ssshadowPass, 'doubleSideCheckStartFrom' ).min( 0 ).max( .1 ).step( .0001 );
+			gui.add( params, 'autoRotate' ).onChange( () => {
+
+				controls.enabled = ! params.autoRotate;
+
+			} );
+
+			const folder = gui.addFolder( 'more settings' );
+			folder.add( ssshadowPass, 'output', {
+				'Default': SSShadowPass.OUTPUT.Default,
+				'SSShadow Only': SSShadowPass.OUTPUT.SSShadow,
+				'Beauty': SSShadowPass.OUTPUT.Beauty,
+				'Depth': SSShadowPass.OUTPUT.Depth,
+				'Normal': SSShadowPass.OUTPUT.Normal,
+			} ).onChange( function ( value ) {
+
+				ssshadowPass.output = parseInt( value );
+
+			} );
+			ssshadowPass.surfDist = 0.0015;
+			folder.add( ssshadowPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
+			folder.add( ssshadowPass, 'maxDistance' ).min( 0 ).max( 50 ).step( .001 );
+			folder.add( ssshadowPass, 'infiniteThick' );
+			folder.open()
+			// gui.close()
+
+		}
+
+		function onPointerDown( event ) {
+
+			mouseDown.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouseDown.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			composer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			stats.begin();
+			render();
+			stats.end();
+
+		}
+
+		function render() {
+
+			if ( params.autoRotate ) {
+
+				const timer = Date.now() * 0.0003;
+
+				camera.position.x = Math.sin( timer ) * 0.5;
+				camera.position.y = 0.2135;
+				camera.position.z = Math.cos( timer ) * 0.5;
+				camera.lookAt( 0, 0.0635, 0 );
+
+			} else {
+
+				controls.update();
+
+			}
+
+			if ( params.enableSSShadow ) {
+
+				composer.render();
+
+			} else {
+
+				renderer.render( scene, camera );
+
+			}
+
+		}
+	</script>
+</body>
+
+</html>
