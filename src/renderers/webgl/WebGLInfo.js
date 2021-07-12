@@ -1,5 +1,7 @@
 function WebGLInfo( gl ) {
 
+	let _isRenderTarget = false;
+
 	const memory = {
 		geometries: 0,
 		textures: 0
@@ -13,30 +15,52 @@ function WebGLInfo( gl ) {
 		lines: 0
 	};
 
+	const frameBuffer = {
+		frame: 0,
+		calls: 0,
+		triangles: 0,
+		points: 0,
+		lines: 0
+	};
+
+	function setRenderTarget( isRenderTarget ) {
+
+		_isRenderTarget = isRenderTarget;
+
+	}
+
 	function update( count, mode, instanceCount ) {
 
-		render.calls ++;
+		let target = render;
+
+		if ( _isRenderTarget ) {
+
+			target = frameBuffer;
+
+		}
+
+		target.calls ++;
 
 		switch ( mode ) {
 
 			case gl.TRIANGLES:
-				render.triangles += instanceCount * ( count / 3 );
+				target.triangles += instanceCount * ( count / 3 );
 				break;
 
 			case gl.LINES:
-				render.lines += instanceCount * ( count / 2 );
+				target.lines += instanceCount * ( count / 2 );
 				break;
 
 			case gl.LINE_STRIP:
-				render.lines += instanceCount * ( count - 1 );
+				target.lines += instanceCount * ( count - 1 );
 				break;
 
 			case gl.LINE_LOOP:
-				render.lines += instanceCount * count;
+				target.lines += instanceCount * count;
 				break;
 
 			case gl.POINTS:
-				render.points += instanceCount * count;
+				target.points += instanceCount * count;
 				break;
 
 			default:
@@ -44,6 +68,7 @@ function WebGLInfo( gl ) {
 				break;
 
 		}
+
 
 	}
 
@@ -55,11 +80,23 @@ function WebGLInfo( gl ) {
 		render.points = 0;
 		render.lines = 0;
 
+		if ( ! _isRenderTarget ) {
+
+			frameBuffer.frame ++;
+			frameBuffer.calls = 0;
+			frameBuffer.triangles = 0;
+			frameBuffer.points = 0;
+			frameBuffer.lines = 0;
+
+		}
+
 	}
 
 	return {
 		memory: memory,
 		render: render,
+		frameBuffer: frameBuffer,
+		setRenderTarget: setRenderTarget,
 		programs: null,
 		autoReset: true,
 		reset: reset,

@@ -785,6 +785,8 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
+		info.setRenderTarget( _currentRenderTarget !== null );
+
 		//
 
 		const dataCount = ( index !== null ) ? index.count : position.count;
