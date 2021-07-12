@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A texture that renders an HTML document.<br /><br />
+
+			Note:
+			<ul>
+				<li>Iframes are not currently supported, but may be in the future.</li>
+				<li>Animating CSS Pseudo-elements (::before and ::after) requires calling [page:HTMLTexture.requestRedraw requestRedraw] every frame.</li>
+				<li>Large images, videos, and webgl will hurt performance. Not recommended.</li>
+				<li>Avoid cross-origin content. Depending on security settings, it may not render (especially cross-origin CSS @import-rule stylesheets).</li>
+			</ul>
+
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		async function setupMyHTMLTexture() {
+
+			const myFileURL = 'res/ui/my-ui.html';
+
+			const width = 256;
+			const height = 256;
+	
+			const htmlTexture = new HTMLTexture( myFileURL , width , height );
+	
+			//set up event listeners 
+			let myButton = htmlTexture.document.querySelector( 'my-button' );
+			myButton.onclick = async function() {
+	
+				console.log( "My button was clicked!" );
+	
+				//Change the button's style:
+	
+				//await redraw (avoids drawing half-styled changes)
+				await htmlTexture.redrawing;
+	
+				this.className = "clicked";
+	
+				//always request redraw after changes
+				htmlTexture.requestRedraw();
+	
+			}
+	
+			//update your element styles
+			const someElement = htmlTexture.document.getElementById( 'my-element' );
+			someElement.classList.add( "highlighted" );
+	
+			//always request redraw after changes
+			htmlTexture.requestRedraw();
+
+			return htmlTexture;
+		}
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webxr_vr_html_ui]<br />
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:String url], [param:Number width], [param:Number height] )</h3>
+		<p>
+			[page:String url] -- A URL to your HTML file. Cross-Origin content usually will not work properly.<br />
+			[page:Number width] -- (optional) Texture width. Will default to 300.<br />
+			[page:Number height] -- (optional) Texture height. Will default to 150.<br /><br />
+
+			See [page:CanvasTexture CanvasTexture] and [page:Texture Texture] for additional texture parameters.<br /><br />
+
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:HTMLDocument document]</h3>
+		<p>
+
+			The texture's current html document.<br /><br />
+
+			This will be replaced if a new URL is passed to [page:HTMLTexture.requestRedraw requestRedraw].<br />
+
+		</p>
+
+		<h3>[property:Promise redrawing]</h3>
+		<p>
+		A convenient promise to wait for load and redraw to complete.<br /><br />
+		If not redrawing at the moment, this promise is already resolved.<br />
+		If loading or redrawing, this promise will resolve when redraw finishes.<br /><br />
+
+		You can avoid redrawing partial changes using await:
+		<code>
+		await myHTMLTexture.redrawing; //There is no () here.
+
+		hyHTMLTexture.document.querySelector( "..." ); 
+		//etc...
+		</code>
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:void addPointer]( [param:Vector2 pointer], [param:Bool down] )</h3>
+		<p>
+			Start tracking a new mouse pointer with 1 button (either down or not down).
+		</p>
+
+		<h3>[method:void updatePointer]( [param:Vector2 pointer], [param:Bool down] )</h3>
+		<p>
+			Update a mouse pointer's position and button state.<br /><br />
+
+			Pass the Vector2 pointer to addPointer() first, or this method will do nothing.
+		</p>
+
+		<h3>[method:HTMLElement elementFromPoint]( [param:Number x], [param:Number y] )</h3>
+		<p>
+			From the texture's HTML document, returns the element at (x,y).
+		</p>
+
+		<h3>[method:Promise requestRedraw]( [param:String url], [param:Number width], [param:Number height] )</h3>
+		<p>
+			[page:String url] -- (optional) If set, will load and completely replace your texture's html document.<br />
+			[page:Number width] -- (optional) If set, will change your texture's width.<br />
+			[page:Number height] -- (optional) If set, will change your texture's height.<br /><br />
+
+			Redraw the texture's HTML document after changes.<br />
+
+
+			If URL is specified, the new document will load and replace the current document. Redraw will happen after load finishes.<br /><br />
+
+			If width and height are specified, the texture's dimensions will change and the HTML will reflow.<br /><br />
+
+			There is no performance cost associated with calling this function multiple times.<br />
+			Please call it after every change to ensure your texture stays up-to-date.<br /><br />
+
+			This function will be called automatically as long as your HTML document is playing a CSS animation or transition.<br />
+			
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/textures/HTMLTexture.js examples/jsm/textures/HTMLTexture.js]
+		</p>
+	
+	</body>
+</html>

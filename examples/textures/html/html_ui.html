@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>HTML UI</title>
+        <link rel="stylesheet" type="text/css" href="html_ui.css">
+        <!-- <link rel="stylesheet" type="text/css" href="textures/html/html_ui.css"> -->
+        <script type="text/javascript" src="html_ui.js"></script>
+        <!-- <script type="text/javascript" src="textures/html/html_ui.js"></script> -->
+    </head>
+    <body>
+
+        <div class="panel" id="lorem-ipsum" style="display:block;">
+
+            TODO: scroll events<br /><br />
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec cursus, ex in bibendum tincidunt, dui elit tincidunt ante, sit amet imperdiet tortor arcu eu arcu. Fusce posuere justo ut velit pharetra volutpat. Curabitur dapibus felis a mi molestie semper. Fusce porttitor urna nec lorem sagittis, quis placerat massa posuere. Duis ut odio sed nulla eleifend pellentesque. Vivamus aliquam nulla quis sapien consequat finibus. Fusce tincidunt sem metus, ut dictum augue hendrerit sit amet. Duis urna arcu, egestas a nisi ac, blandit aliquet ipsum. In sit amet quam lectus. Mauris tempus nisi sem. Sed feugiat sapien elementum facilisis commodo. Suspendisse potenti. Aenean mollis sem eu augue semper, id tincidunt risus malesuada. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+
+        </div>
+
+        <div class="panel" id="css-cube" style="display:none;">
+
+            <div id="css-cube-container">
+                <div class="face-1">1</div>
+                <div class="face-2">2</div>
+                <div class="face-3">3</div>
+                <div class="face-4">4</div>
+                <div class="face-5">5</div>
+                <div class="face-6">6</div>
+            </div>
+
+        </div>
+
+        <div class="panel" id="inventory" style="display:none;">
+
+            This tab has not been created yet.<br />
+            (This example is a work in progress.)
+
+            <!-- <div class="item-description"></div>
+
+            <div class="item-preview"></div>
+
+            <div class="inventory-grid">
+
+                <div class="item-cell empty"></div>
+
+            </div> -->
+
+        </div>
+
+        <ul class="menu collapsed">
+
+            <div class="screen-cover" onclick="toggleMenu()"></div>
+
+            <!-- TODO: swap the menu icon out for an inline SVG -->
+            <img class="hamburger"  onclick="toggleMenu()" src="html_ui_menu_icon.png">
+
+            <li class='selected' onclick="showPanel( 'lorem-ipsum' , this )"><img src="html_ui_lorem_icon.png">Lorem Ipsum</li>
+            <li onclick="showPanel( 'css-cube' , this )"><img src="html_ui_cube_icon.png">CSS 3D Cube</li>
+            <li onclick="showPanel( 'inventory' , this )"><img src="html_ui_inventory_icon.png">Inventory</li>
+
+        </ul>
+
+        <script>
+
+            populateInventoryGrid();
+
+        </script>
+
+    </body>
+</html>

@@ -416,6 +416,10 @@
 
 			},
 
+			"Textures": {
+				"HTMLTexture": "examples/en/textures/HTMLTexture"
+			},
+
 			"Utils": {
 				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
 				"CameraUtils": "examples/en/utils/CameraUtils",
