@@ -862,7 +862,6 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.bumpmap_pars_fragment,
 			ShaderChunk.normalmap_pars_fragment,
 			ShaderChunk.specularmap_pars_fragment,
-			ShaderChunk.logdepthbuf_pars_fragment,
 			ShaderChunk.clipping_planes_pars_fragment,
 
 			'void main() {',
@@ -873,7 +872,6 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			'ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
 			'vec3 totalEmissiveRadiance = emissive;',
 
-			ShaderChunk.logdepthbuf_fragment,
 			ShaderChunk.map_fragment,
 			ShaderChunk.color_fragment,
 			ShaderChunk.alphamap_fragment,

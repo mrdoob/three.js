@@ -10,7 +10,6 @@ export default /* glsl */`
 #include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
-#include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 varying vec2 vHighPrecisionZW;
@@ -30,8 +29,6 @@ void main() {
 	#include <map_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
-
-	#include <logdepthbuf_fragment>
 
 	// Higher precision equivalent of gl_FragCoord.z. This assumes depthRange has been left to its default values.
 	float fragCoordZ = 0.5 * vHighPrecisionZW[0] / vHighPrecisionZW[1] + 0.5;

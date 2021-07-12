@@ -23,7 +23,6 @@ varying vec3 vViewPosition;
 #include <fog_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
-#include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 void main() {
@@ -32,7 +31,6 @@ void main() {
 
 	vec4 diffuseColor = vec4( diffuse, opacity );
 
-	#include <logdepthbuf_fragment>
 	#include <map_fragment>
 	#include <color_fragment>
 	#include <alphamap_fragment>

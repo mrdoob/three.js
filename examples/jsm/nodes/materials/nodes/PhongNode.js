@@ -151,8 +151,7 @@ class PhongNode extends Node {
 				#include <bsdfs>
 				#include <lights_pars_begin>
 				#include <lights_phong_pars_fragment>
-				#include <shadowmap_pars_fragment>
-				#include <logdepthbuf_pars_fragment>`
+				#include <shadowmap_pars_fragment>`
 			);
 
 			const output = [
@@ -176,8 +175,6 @@ class PhongNode extends Node {
 				color.code,
 				'	vec3 diffuseColor = ' + color.result + ';',
 				'	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
-
-				'#include <logdepthbuf_fragment>',
 
 				specular.code,
 				'	vec3 specular = ' + specular.result + ';',

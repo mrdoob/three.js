@@ -162,14 +162,12 @@ class Water extends Mesh {
 				#include <packing>
 				#include <bsdfs>
 				#include <fog_pars_fragment>
-				#include <logdepthbuf_pars_fragment>
 				#include <lights_pars_begin>
 				#include <shadowmap_pars_fragment>
 				#include <shadowmask_pars_fragment>
 
 				void main() {
 
-					#include <logdepthbuf_fragment>
 					vec4 noise = getNoise( worldPosition.xz * size );
 					vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );
 
