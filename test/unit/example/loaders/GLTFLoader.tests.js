@@ -6,10 +6,12 @@ import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader';
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial';
 import { Object3D } from '../../../../src/core/Object3D';
 import { Scene } from '../../../../src/scenes/Scene';
+import { DataTexture } from '../../../../src/textures/DataTexture';
 import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
 
 export default QUnit.module( 'Loaders', () => {
@@ -110,6 +112,60 @@ export default QUnit.module( 'Loaders', () => {
 				} );
 
 			}, { binary: true, animations: [ clip ] } );
+
+		} );
+
+		QUnit.test( 'parser - associations', ( assert ) => {
+
+			var done = assert.async();
+
+			var scene = new Scene();
+			scene.add( new Mesh(
+				new BoxBufferGeometry(),
+				new MeshStandardMaterial( { map: new DataTexture( new Uint8ClampedArray( [ 0, 0, 0, 0 ] ), 1, 1 ) } )
+			) );
+
+			var exporter = new GLTFExporter();
+			var loader = new GLTFLoader();
+
+			exporter.parse( scene, function ( binary ) {
+
+				loader.parse( binary, './', function ( gltf ) {
+
+					var parser = gltf.parser;
+					var associations = parser.associations;
+
+					gltf.scene.traverse( function ( object ) {
+
+						if ( object.isMesh ) {
+
+							assert.smartEqual( associations.get( object ), {
+								meshes: 0,
+								nodes: 0,
+								primitives: 0
+							}, 'Mesh has a proper association' );
+
+							assert.smartEqual( associations.get( object.material ), {
+								materials: 0
+							}, 'Material has a proper association' );
+
+							assert.smartEqual( associations.get( object.material.map ), {
+								textures: 0
+							}, 'Texture has a proper association' );
+
+						}
+
+					} );
+
+					done();
+
+				}, undefined, function ( e ) {
+
+					console.error( e );
+
+				} );
+
+			}, { binary: true } );
 
 		} );
 
