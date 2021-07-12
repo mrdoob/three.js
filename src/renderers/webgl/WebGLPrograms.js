@@ -38,13 +38,13 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
 		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap', 'objectSpaceNormalMap', 'tangentSpaceNormalMap', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'displacementMap', 'specularMap',
 		'roughnessMap', 'metalnessMap', 'gradientMap',
-		'alphaMap', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
+		'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
 		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
 		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'premultipliedAlpha',
 		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
 		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
 		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
-		'alphaTest', 'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering',
+		'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering',
 		'sheen', 'transmission', 'transmissionMap', 'thicknessMap'
 	];
 
@@ -197,6 +197,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
+			alphaTest: material.alphaTest > 0,
 
 			gradientMap: !! material.gradientMap,
 
@@ -253,7 +254,6 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 			premultipliedAlpha: material.premultipliedAlpha,
 
-			alphaTest: material.alphaTest,
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 

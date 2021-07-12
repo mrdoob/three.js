@@ -133,6 +133,12 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
 		if ( material.specularMap ) {
 
 			uniforms.specularMap.value = material.specularMap;
@@ -330,6 +336,12 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
 		// uv repeat and offset setting priorities
 		// 1. color map
 		// 2. alpha map
@@ -375,6 +387,12 @@ function WebGLMaterials( properties ) {
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
 
 		}
 

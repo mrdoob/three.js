@@ -848,6 +848,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.uv2_pars_fragment,
 			ShaderChunk.map_pars_fragment,
 			ShaderChunk.alphamap_pars_fragment,
+			ShaderChunk.alphatest_pars_fragment,
 			ShaderChunk.aomap_pars_fragment,
 			ShaderChunk.lightmap_pars_fragment,
 			ShaderChunk.emissivemap_pars_fragment,
