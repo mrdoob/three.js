@@ -7,6 +7,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 import * as Materials from '../materials/Materials.js';
+import { Plane } from '../math/Plane';
 
 class MaterialLoader extends Loader {
 
@@ -141,7 +142,7 @@ class MaterialLoader extends Loader {
 
 			if ( typeof json.vertexColors === 'number' ) {
 
-				material.vertexColors = ( json.vertexColors > 0 ) ? true : false;
+				material.vertexColors = json.vertexColors > 0;
 
 			} else {
 
@@ -151,8 +152,55 @@ class MaterialLoader extends Loader {
 
 		}
 
+		if ( json.blendSrc !== undefined ) material.blendSrc = json.blendSrc;
+		if ( json.blendDst !== undefined ) material.blendDst = json.blendDst;
+		if ( json.blendEquation !== undefined ) material.blendEquation = json.blendEquation;
+		if ( json.blendSrcAlpha !== undefined ) material.blendSrcAlpha = json.blendSrcAlpha;
+		if ( json.blendDstAlpha !== undefined ) material.blendDstAlpha = json.blendDstAlpha;
+		if ( json.blendEquationAlpha !== undefined ) material.blendEquationAlpha = json.blendEquationAlpha;
+		if ( json.depthFunc !== undefined ) material.depthFunc = json.depthFunc;
+
+		if ( json.clippingPlanes !== undefined ) {
+
+			const len = json.clippingPlanes.length;
+			material.clippingPlanes = new Array( len );
+
+			for ( let i = 0; i < len; i ++ ) {
+
+				material.clippingPlanes[ i ] = new Plane().setComponents( ...json.clippingPlanes[ i ] );
+
+			}
+
+		}
+
+		if ( json.clipIntersection !== undefined ) material.clipIntersection = json.clipIntersection;
+		if ( json.clipShadows !== undefined ) material.clipShadows = json.clipShadows;
+
+		if ( json.precision !== undefined ) material.precision = json.precision;
+
+		// Line Basic Material
+
+		if ( json.linecap !== undefined ) material.linecap = json.linecap;
+		if ( json.linejoin !== undefined ) material.linejoin = json.linejoin;
+
+		// Mesh Depth Material
+
+		if ( json.depthPacking !== undefined ) material.depthPacking = json.depthPacking;
+
+		// Mesh Distance Material
+
+		if ( json.referencePosition !== undefined ) {
+
+			material.referencePosition = new Vector3().fromArray( json.referencePosition );
+
+		}
+
+		if ( json.nearDistance !== undefined ) material.nearDistance = json.nearDistance;
+		if ( json.farDistance !== undefined ) material.farDistance = json.farDistance;
+
 		// Shader Material
 
+		if ( json.glslVersion !== undefined ) material.glslVersion = json.glslVersion;
 		if ( json.uniforms !== undefined ) {
 
 			for ( const name in json.uniforms ) {
@@ -204,6 +252,9 @@ class MaterialLoader extends Loader {
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 
+		if ( json.lights !== undefined ) material.lights = json.lights;
+		if ( json.clipping !== undefined ) material.clipping = json.clipping;
+
 		if ( json.extensions !== undefined ) {
 
 			for ( const key in json.extensions ) {
@@ -213,6 +264,10 @@ class MaterialLoader extends Loader {
 			}
 
 		}
+
+		if ( json.defaultAttributeValues !== undefined ) material.defaultAttributeValues = json.defaultAttributeValues;
+		if ( json.index0AttributeName !== undefined ) material.index0AttributeName = json.index0AttributeName;
+		if ( json.uniformsNeedUpdate !== undefined ) material.uniformsNeedUpdate = json.uniformsNeedUpdate;
 
 		// Deprecated
 
