@@ -706,6 +706,12 @@ class TrackballControls extends EventDispatcher {
 					_movePrev.copy( _moveCurr );
 					break;
 
+				case 2:
+					_state = STATE.TOUCH_ZOOM_PAN;
+					_moveCurr.copy( getMouseOnCircle( event.pageX - _movePrev.pageX, event.pageY - _movePrev.pageY ) );
+					_movePrev.copy( _moveCurr );
+					break;
+
 			}
 
 			scope.dispatchEvent( _endEvent );
