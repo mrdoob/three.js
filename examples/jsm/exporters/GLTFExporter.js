@@ -1960,9 +1960,20 @@ class GLTFWriter {
 
 		for ( let i = 0; i < objects.length; i ++ ) {
 
+			const object = objects[ i ];
+
 			// We push directly to children instead of calling `add` to prevent
 			// modify the .parent and break its original scene and hierarchy
-			scene.children.push( objects[ i ] );
+
+			if ( object.isGroup ) {
+
+				scene.children.push( ...object.children );
+
+			} else {
+
+				scene.children.push( object );
+
+			}
 
 		}
 
