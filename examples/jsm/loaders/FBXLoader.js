@@ -620,7 +620,9 @@ class FBXTreeParser {
 				case 'DiffuseColor':
 				case 'Maya|TEX_color_map':
 					parameters.map = scope.getTexture( textureMap, child.ID );
-					parameters.map.encoding = sRGBEncoding;
+					if (parameters.map != null) {
+						parameters.map.encoding = sRGBEncoding;
+					}
 					break;
 
 				case 'DisplacementColor':
@@ -629,7 +631,9 @@ class FBXTreeParser {
 
 				case 'EmissiveColor':
 					parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
-					parameters.emissiveMap.encoding = sRGBEncoding;
+					if (parameters.emissiveMap != null) {
+						parameters.emissiveMap.encoding = sRGBEncoding;
+					}
 					break;
 
 				case 'NormalMap':
@@ -639,13 +643,18 @@ class FBXTreeParser {
 
 				case 'ReflectionColor':
 					parameters.envMap = scope.getTexture( textureMap, child.ID );
-					parameters.envMap.mapping = EquirectangularReflectionMapping;
-					parameters.envMap.encoding = sRGBEncoding;
+					if (parameters.envMap != null) {
+						parameters.envMap.mapping = EquirectangularReflectionMapping;
+						parameters.envMap.encoding = sRGBEncoding;
+					}
 					break;
 
 				case 'SpecularColor':
 					parameters.specularMap = scope.getTexture( textureMap, child.ID );
-					parameters.specularMap.encoding = sRGBEncoding;
+					if (parameters.specularMap != null)
+					{
+						parameters.specularMap.encoding = sRGBEncoding;
+					}
 					break;
 
 				case 'TransparentColor':
