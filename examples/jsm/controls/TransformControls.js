@@ -172,7 +172,7 @@ class TransformControls extends Object3D {
 
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
-		this.domElement.ownerDocument.addEventListener( 'pointerup', this._onPointerUp );
+		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 
 	}
 
@@ -553,8 +553,8 @@ class TransformControls extends Object3D {
 
 		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.removeEventListener( 'pointermove', this._onPointerHover );
-		this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
-		this.domElement.ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
+		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
+		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 
 		this.traverse( function ( child ) {
 
@@ -691,7 +691,9 @@ function onPointerDown( event ) {
 
 	if ( ! this.enabled ) return;
 
-	this.domElement.ownerDocument.addEventListener( 'pointermove', this._onPointerMove );
+	this.domElement.setPointerCapture( event.pointerId );
+
+	this.domElement.addEventListener( 'pointermove', this._onPointerMove );
 
 	this.pointerHover( this._getPointer( event ) );
 	this.pointerDown( this._getPointer( event ) );
@@ -710,7 +712,9 @@ function onPointerUp( event ) {
 
 	if ( ! this.enabled ) return;
 
-	this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+	this.domElement.releasePointerCapture( event.pointerId );
+
+	this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 
 	this.pointerUp( this._getPointer( event ) );
 
