@@ -10,7 +10,7 @@ export default /* glsl */`
 
 	#endif
 
-	#ifdef USE_THICKNESSNMAP
+	#ifdef USE_THICKNESSMAP
 
 		thicknessFactor *= texture2D( thicknessMap, vUv ).g;
 
