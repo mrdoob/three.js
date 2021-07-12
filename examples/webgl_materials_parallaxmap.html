@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org">Three.js</a> parallax mapping <br />
-			Oryginal shaders authors:
+			Original shaders authors:
 			<a href="http://sunandblackcat.com/tipFullView.php?topicid=28">Igor Dyhta</a>,
 			<a href="http://mmikkelsen3d.blogspot.sk/2012/02/parallaxpoc-mapping-and-no-tangent.html">Morten S. Mikkelsen</a><br />
 			Texture by <a href="http://agf81.deviantart.com/">AGF81</a>
@@ -120,7 +120,7 @@
 				const gui = new GUI();
 
 				gui.add( effectController, 'mode', Object.keys( ParallaxShader.modes ) ).onChange( guiChanged );
-				gui.add( effectController, 'scale', 0.0, 0.01, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, 'scale', 0.0, 0.015, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, 'minLayers', 1.0, 30, 1 ).onChange( guiChanged );
 				gui.add( effectController, 'maxLayers', 1.0, 30, 1 ).onChange( guiChanged );
 
