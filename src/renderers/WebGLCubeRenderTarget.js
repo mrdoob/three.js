@@ -19,16 +19,17 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		}
 
-		super( size, size, options );
-
 		options = options || {};
+		if ( options.texture === undefined ) {
 
-		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+			options.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter,
+				options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
-		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
-		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+			options.texture._needsFlipEnvMap = false;
 
-		this.texture._needsFlipEnvMap = false;
+		}
+
+		super( size, size, options );
 
 	}
 
@@ -127,9 +128,9 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
-		for ( let i = 0; i < 6; i ++ ) {
+		for ( let f = 0; f < 6; f ++ ) {
 
-			renderer.setRenderTarget( this, i );
+			renderer.setRenderTarget( this, f );
 
 			renderer.clear( color, depth, stencil );
 

@@ -10,7 +10,9 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter,
 	NearestFilter,
-	ClampToEdgeWrapping
+	ClampToEdgeWrapping,
+	DepthFormat,
+	DepthStencilFormat
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -1826,25 +1828,13 @@ function WebGLRenderer( parameters = {} ) {
 		}
 
 		let framebuffer = null;
-		let isCube = false;
-		let isRenderTarget3D = false;
-
 		if ( renderTarget ) {
-
-			const texture = renderTarget.texture;
-
-			if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
-
-				isRenderTarget3D = true;
-
-			}
 
 			const __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
 			if ( renderTarget.isWebGLCubeRenderTarget ) {
 
 				framebuffer = __webglFramebuffer[ activeCubeFace ];
-				isCube = true;
 
 			} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
 
@@ -1876,31 +1866,20 @@ function WebGLRenderer( parameters = {} ) {
 
 			if ( renderTarget ) {
 
-				if ( renderTarget.isWebGLMultipleRenderTargets ) {
+				const textures = renderTarget.textures;
 
-					const textures = renderTarget.texture;
+				if ( _currentDrawBuffers.length !== textures.length ) {
 
-					if ( _currentDrawBuffers.length !== textures.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
+					_currentDrawBuffers.length = textures.length;
+					needsUpdate = true;
 
-						for ( let i = 0, il = textures.length; i < il; i ++ ) {
+				}
 
-							_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
+				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-						}
+					if ( _currentDrawBuffers[ i ] !== _gl.COLOR_ATTACHMENT0 + i ) {
 
-						_currentDrawBuffers.length = textures.length;
-
-						needsUpdate = true;
-
-					}
-
-				} else {
-
-					if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
-
-						_currentDrawBuffers[ 0 ] = _gl.COLOR_ATTACHMENT0;
-						_currentDrawBuffers.length = 1;
-
+						_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
 						needsUpdate = true;
 
 					}
@@ -1940,16 +1919,58 @@ function WebGLRenderer( parameters = {} ) {
 		state.scissor( _currentScissor );
 		state.setScissorTest( _currentScissorTest );
 
-		if ( isCube ) {
+		// select active layer and level for 2D array textures and 3D textures
+		// 2D and textures need no update
+		// * framebufferTexture2D's level is fixed to 0
+		// * the active cube face is already selected by the active face framebuffer
+		if ( renderTarget ) {
 
-			const textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + activeCubeFace, textureProperties.__webglTexture, activeMipmapLevel );
-
-		} else if ( isRenderTarget3D ) {
-
-			const textureProperties = properties.get( renderTarget.texture );
+			const level = activeMipmapLevel || 0;
 			const layer = activeCubeFace || 0;
-			_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel || 0, layer );
+			const textures = renderTarget.textures;
+			for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
+				const texture = textures[ i ];
+				if ( texture.isDataTexture3D || texture.isDataTexture2DArray ) {
+
+					const attachment = _gl.COLOR_ATTACHMENT0 + i;
+					const webglTexture = properties.get( texture ).__webglTexture;
+					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, webglTexture, level, layer );
+
+				}
+
+			}
+
+			const texture = renderTarget.depthTexture;
+			if ( texture && ( texture.isDataTexture3D || texture.isDataTexture2DArray ) ) {
+
+				let attachment = undefined;
+				if ( texture.format === DepthFormat ) {
+
+					attachment = _gl.DEPTH_ATTACHMENT;
+
+				} else if ( texture.format === DepthStencilFormat ) {
+
+					attachment = _gl.DEPTH_STENCIL_ATTACHMENT;
+
+				} else {
+
+					throw new Error( 'Unsupported depthTexture format' );
+
+				}
+
+				const webglTexture = properties.get( texture ).__webglTexture;
+				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, attachment, webglTexture, level, layer );
+
+			}
+
+		}
+
+
+		const framebufferStatus = _gl.checkFramebufferStatus( _gl.FRAMEBUFFER );
+		if ( framebufferStatus !== _gl.FRAMEBUFFER_COMPLETE ) {
+
+			console.log( 'incomplete framebuffer', framebufferStatus, framebuffer );
 
 		}
 
