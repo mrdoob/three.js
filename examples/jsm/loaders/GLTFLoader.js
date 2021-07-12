@@ -2600,6 +2600,7 @@ class GLTFParser {
 
 						const texture = new Texture( imageBitmap );
 						texture.needsUpdate = true;
+						texture.name = source.name;
 
 						resolve( texture );
 
