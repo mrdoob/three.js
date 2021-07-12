@@ -25,7 +25,35 @@ function SidebarScript( editor ) {
 	var newScript = new UIButton( strings.getKey( 'sidebar/script/new' ) );
 	newScript.onClick( function () {
 
-		var script = { name: '', source: 'function update( event ) {}' };
+		var script = { 
+			name: '', 
+			source: 
+				'/*\n'+
+				'========================================\n'+
+				'Lifecycle Events:\n'+
+				'init - Runs once after app.json is loaded.\n'+
+				'start - Runs when APP.Play() is called.\n'+
+				'update - Runs every frame before update.\n'+
+				'stop - Runs when APP.Stop() is called.\n'+
+				'\n'+
+				'Anything outside of an event will be run immediately when the script is loaded.\n'+
+				'\n'+
+				'Local Variables:\n'+
+				'player\n'+
+				'renderer\n'+
+				'scene\n'+
+				'camera\n'+
+				'\n'+
+				'Input Events:\n'+
+				'keydown\n'+
+				'keyup\n'+
+				'pointerdown\n'+
+				'pointerup\n'+
+				'pointermove\n'+
+				'========================================\n'+
+				'*/\n'+
+				'function update( event ) {}'
+			};
 		editor.execute( new AddScriptCommand( editor, editor.selected, script ) );
 
 	} );
