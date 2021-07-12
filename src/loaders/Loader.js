@@ -63,6 +63,30 @@ class Loader {
 		this.requestHeader = requestHeader;
 		return this;
 
+	},
+
+	setFromFetchOptions: function ( fetchOptions ) {
+
+		const defaultedOptions = Object.assign( {
+			credentials: 'same-origin',
+			mode: 'cors',
+			headers: {},
+
+		}, fetchOptions );
+
+		this.setWithCredentials( defaultedOptions.credentials === 'include' );
+		this.setRequestHeader( defaultedOptions.headers );
+
+		if ( defaultedOptions.credentials === 'include' && defaultedOptions.mode === 'cors' ) {
+
+			this.setCrossOrigin( 'use-credentials' );
+
+		} else {
+
+			this.setCrossOrigin( 'anonymous' );
+
+		}
+
 	}
 
 }
