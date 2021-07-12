@@ -12,7 +12,6 @@ class PointLightHelper extends Mesh {
 		super( geometry, material );
 
 		this.light = light;
-		this.light.updateMatrixWorld();
 
 		this.color = color;
 
@@ -57,6 +56,8 @@ class PointLightHelper extends Mesh {
 	}
 
 	update() {
+
+		this.light.updateWorldMatrix( true, false );
 
 		if ( this.color !== undefined ) {
 
