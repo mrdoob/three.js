@@ -417,6 +417,8 @@ class Int8BufferAttribute extends BufferAttribute {
 
 	}
 
+	this.integer = false;
+
 }
 
 class Uint8BufferAttribute extends BufferAttribute {
@@ -426,6 +428,8 @@ class Uint8BufferAttribute extends BufferAttribute {
 		super( new Uint8Array( array ), itemSize, normalized );
 
 	}
+
+	this.integer = false;
 
 }
 
@@ -447,6 +451,8 @@ class Int16BufferAttribute extends BufferAttribute {
 
 	}
 
+	this.integer = false;
+
 }
 
 class Uint16BufferAttribute extends BufferAttribute {
@@ -456,6 +462,8 @@ class Uint16BufferAttribute extends BufferAttribute {
 		super( new Uint16Array( array ), itemSize, normalized );
 
 	}
+
+	this.integer = false;
 
 }
 
