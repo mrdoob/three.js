@@ -160,6 +160,29 @@ class WebXRController {
 					}
 
 					this.dispatchEvent( _moveEvent );
+					if ( inputPose.linearVelocity !== null ) {
+
+						targetRay.hasLinearVelocity = true;
+						targetRay.linearVelocity.copy( inputPose.linearVelocity );
+
+					} else {
+
+						targetRay.hasLinearVelocity = false;
+
+					}
+
+					if ( inputPose.angularVelocity !== null ) {
+
+						targetRay.hasAngularVelocity = true;
+						targetRay.angularVelocity.copy( inputPose.angularVelocity );
+
+					} else {
+
+						targetRay.hasAngularVelocity = false;
+
+					}
+
+          this.dispatchEvent( _moveEvent );
 
 				}
 
@@ -253,6 +276,28 @@ class WebXRController {
 						}
 
 						if ( gripPose.angularVelocity ) {
+
+							grip.hasAngularVelocity = true;
+							grip.angularVelocity.copy( gripPose.angularVelocity );
+
+						} else {
+
+							grip.hasAngularVelocity = false;
+
+						}
+
+						if ( gripPose.linearVelocity !== null ) {
+
+							grip.hasLinearVelocity = true;
+							grip.linearVelocity.copy( gripPose.linearVelocity );
+
+						} else {
+
+							grip.hasLinearVelocity = false;
+
+						}
+
+						if ( gripPose.angularVelocity !== null ) {
 
 							grip.hasAngularVelocity = true;
 							grip.angularVelocity.copy( gripPose.angularVelocity );
