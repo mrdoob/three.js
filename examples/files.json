@@ -1,4 +1,4 @@
- {
+﻿ {
 	"webgl": [
 		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
@@ -124,6 +124,7 @@
 		"webgl_loader_vrm",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
+		"webgl_loader_workertaskmanager",
 		"webgl_loader_xyz",
 		"webgl_lod",
 		"webgl_marchingcubes",
