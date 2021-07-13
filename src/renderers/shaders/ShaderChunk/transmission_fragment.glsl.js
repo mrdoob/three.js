@@ -21,7 +21,7 @@ export default /* glsl */`
 	float ior = ( 1.0 + 0.4 * reflectivity ) / ( 1.0 - 0.4 * reflectivity );
 
 	vec3 transmission = transmissionFactor * getIBLVolumeRefraction(
-		normal, v, roughnessFactor, material.diffuseColor, totalSpecular,
+		normal, v, roughnessFactor, material.diffuseColor, material.specularColor,
 		pos, modelMatrix, viewMatrix, projectionMatrix, ior, thicknessFactor,
 		attenuationColor, attenuationDistance );
 
