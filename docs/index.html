@@ -367,21 +367,9 @@
 				const categoryClassList = linkElement.parentElement.classList;
 				const filterResults = pageName.match( regExp );
 
-				if ( filterResults && filterResults.length > 0 ) {
+				if ( filterResults !== null && filterResults.length > 0 ) {
 
-					// Accentuate matching characters
-
-					for ( let i = 0; i < filterResults.length; i ++ ) {
-
-						const result = filterResults[ i ];
-
-						if ( result !== '' ) {
-
-							pageName = pageName.replace( result, '<b>' + result + '</b>' );
-
-						}
-
-					}
+					pageName = pageName.replaceAll( regExp, '<b>$&</b>' );
 
 					categoryClassList.remove( 'hidden' );
 					linkElement.innerHTML = pageName;

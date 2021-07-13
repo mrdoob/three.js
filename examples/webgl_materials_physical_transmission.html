@@ -26,6 +26,7 @@
 				metalness: 0,
 				roughness: 0,
 				reflectivity: 0.5,
+				thickness: 0.01,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
@@ -157,6 +158,14 @@
 					.onChange( function () {
 
 						material.reflectivity = params.reflectivity;
+						render();
+
+					} );
+
+				gui.add( params, 'thickness', 0, 5, 0.01 )
+					.onChange( function () {
+
+						material.thickness = params.thickness;
 						render();
 
 					} );

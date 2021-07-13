@@ -258,8 +258,8 @@
 				scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
 				scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
 				scope.domElement.removeEventListener( 'wheel', onMouseWheel );
-				scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-				scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+				scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+				scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
 				if ( scope._domElementKeyEvents !== null ) {
 
@@ -704,8 +704,9 @@
 
 				if ( pointers.length === 0 ) {
 
-					scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
-					scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
+					scope.domElement.setPointerCapture( event.pointerId );
+					scope.domElement.addEventListener( 'pointermove', onPointerMove );
+					scope.domElement.addEventListener( 'pointerup', onPointerUp );
 
 				} //
 
@@ -758,8 +759,9 @@
 
 				if ( pointers.length === 0 ) {
 
-					scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-					scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+					scope.domElement.releasePointerCapture( event.pointerId );
+					scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+					scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
 				}
 

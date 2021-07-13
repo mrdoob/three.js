@@ -161,6 +161,14 @@
 			Should be called if the controls is no longer required.
 		</p>
 
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the [page:Raycaster] object that is used for user interaction. This object is shared between all instances of
+			TransformControls. If you set the [page:Object3D.layers .layers] property of the [name], you will also want to
+			set the [page:Raycaster.layers .layers] property on the [page:Raycaster] with a matching value, or else the [name]
+			won't work as expected.
+		</p>
+
 		<h3>[method:String getMode] ()</h3>
 		<p>
 			Returns the transformation mode.

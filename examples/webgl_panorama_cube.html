@@ -73,28 +73,25 @@
 
 				}
 
-				const imageObj = new Image();
+				new THREE.ImageLoader()
+					.load( atlasImgUrl, ( image ) => {
 
-				imageObj.onload = function () {
+						let canvas, context;
+						const tileWidth = image.height;
 
-					let canvas, context;
-					const tileWidth = imageObj.height;
+						for ( let i = 0; i < textures.length; i ++ ) {
 
-					for ( let i = 0; i < textures.length; i ++ ) {
+							canvas = document.createElement( 'canvas' );
+							context = canvas.getContext( '2d' );
+							canvas.height = tileWidth;
+							canvas.width = tileWidth;
+							context.drawImage( image, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+							textures[ i ].image = canvas;
+							textures[ i ].needsUpdate = true;
 
-						canvas = document.createElement( 'canvas' );
-						context = canvas.getContext( '2d' );
-						canvas.height = tileWidth;
-						canvas.width = tileWidth;
-						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-						textures[ i ].image = canvas;
-						textures[ i ].needsUpdate = true;
+						}
 
-					}
-
-				};
-
-				imageObj.src = atlasImgUrl;
+					} );
 
 				return textures;
 

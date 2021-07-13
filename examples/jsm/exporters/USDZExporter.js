@@ -52,8 +52,12 @@ class USDZExporter {
 
 			const texture = textures[ id ];
 			const color = id.split( '_' )[ 1 ];
+			const isRGBA = texture.format === 1023;
 
-			files[ 'textures/Texture_' + id + '.jpg' ] = await imgToU8( texture.image, color );
+			const canvas = imageToCanvas( texture.image, color );
+			const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
+
+			files[ `textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }` ] = new Uint8Array( await blob.arrayBuffer() );
 
 		}
 
@@ -90,7 +94,7 @@ class USDZExporter {
 
 }
 
-async function imgToU8( image, color ) {
+function imageToCanvas( image, color ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
@@ -108,14 +112,28 @@ async function imgToU8( image, color ) {
 
 		if ( color !== undefined ) {
 
-			context.globalCompositeOperation = 'multiply';
-			context.fillStyle = `#${ color }`;
-			context.fillRect( 0, 0, canvas.width, canvas.height );
+			const hex = parseInt( color, 16 );
+
+			const r = ( hex >> 16 & 255 ) / 255;
+			const g = ( hex >> 8 & 255 ) / 255;
+			const b = ( hex & 255 ) / 255;
+
+			const imagedata = context.getImageData( 0, 0, canvas.width, canvas.height );
+			const data = imagedata.data;
+
+			for ( let i = 0; i < data.length; i += 4 ) {
+
+				data[ i + 0 ] = data[ i + 0 ] * r;
+				data[ i + 1 ] = data[ i + 1 ] * g;
+				data[ i + 2 ] = data[ i + 2 ] * b;
+
+			}
+
+			context.putImageData( imagedata, 0, 0 );
 
 		}
 
-		const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/jpeg', 1 ) );
-		return new Uint8Array( await blob.arrayBuffer() );
+		return canvas;
 
 	}
 
@@ -154,6 +172,12 @@ function buildXform( object, geometry, material ) {
 
 	const name = 'Object_' + object.id;
 	const transform = buildMatrix( object.matrixWorld );
+
+	if ( object.matrixWorld.determinant() < 0 ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', object );
+
+	}
 
 	return `def Xform "${ name }" (
     prepend references = @./geometries/Geometry_${ geometry.id }.usd@</Geometry>
@@ -328,6 +352,7 @@ function buildMaterial( material, textures ) {
 	function buildTexture( texture, mapType, color ) {
 
 		const id = texture.id + ( color ? '_' + color.getHexString() : '' );
+		const isRGBA = texture.format === 1023;
 
 		textures[ id ] = texture;
 
@@ -348,7 +373,7 @@ function buildMaterial( material, textures ) {
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ id }.jpg@
+            asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
             float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
             token inputs:wrapS = "repeat"
             token inputs:wrapT = "repeat"

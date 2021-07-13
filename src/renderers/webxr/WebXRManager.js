@@ -26,7 +26,6 @@ class WebXRManager extends EventDispatcher {
 		let glFramebuffer = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
-		let glRenderbuffer = null;
 
 		const controllers = [];
 		const inputSourcesMap = new Map();
@@ -238,7 +237,7 @@ class WebXRManager extends EventDispatcher {
 
 					} else {
 
-						if ( attributes.depth) {
+						if ( attributes.depth ) {
 
 							depthFormat = attributes.stencil ? gl.DEPTH_STENCIL : gl.DEPTH_COMPONENT;
 

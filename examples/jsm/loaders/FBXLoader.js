@@ -4049,7 +4049,7 @@ function generateTransform( transformData ) {
 
 	}
 
-	const lLRM = new Matrix4().copy( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM );
+	const lLRM = lPreRotationM.clone().multiply( lRotationM ).multiply( lPostRotationM );
 	// Global Rotation
 	const lParentGRM = new Matrix4();
 	lParentGRM.extractRotation( lParentGX );
@@ -4058,9 +4058,8 @@ function generateTransform( transformData ) {
 	const lParentTM = new Matrix4();
 	lParentTM.copyPosition( lParentGX );
 
-	const lParentGSM = new Matrix4();
-	const lParentGRSM = new Matrix4().copy( lParentTM ).invert().multiply( lParentGX );
-	lParentGSM.copy( lParentGRM ).invert().multiply( lParentGRSM );
+	const lParentGRSM = lParentTM.clone().invert().multiply( lParentGX );
+	const lParentGSM = lParentGRM.clone().invert().multiply( lParentGRSM );
 	const lLSM = lScalingM;
 
 	const lGlobalRS = new Matrix4();
@@ -4076,27 +4075,24 @@ function generateTransform( transformData ) {
 	} else {
 
 		const lParentLSM = new Matrix4().scale( new Vector3().setFromMatrixScale( lParentLX ) );
-		const lParentLSM_inv = new Matrix4().copy( lParentLSM ).invert();
-		const lParentGSM_noLocal = new Matrix4().copy( lParentGSM ).multiply( lParentLSM_inv );
+		const lParentLSM_inv = lParentLSM.clone().invert();
+		const lParentGSM_noLocal = lParentGSM.clone().multiply( lParentLSM_inv );
 
 		lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
 
 	}
 
-	const lRotationPivotM_inv = new Matrix4();
-	lRotationPivotM_inv.copy( lRotationPivotM ).invert();
-	const lScalingPivotM_inv = new Matrix4();
-	lScalingPivotM_inv.copy( lScalingPivotM ).invert();
+	const lRotationPivotM_inv = lRotationPivotM.clone().invert();
+	const lScalingPivotM_inv = lScalingPivotM.clone().invert();
 	// Calculate the local transform matrix
-	let lTransform = new Matrix4();
-	lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
+	let lTransform = lTranslationM.clone().multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 
 	const lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition( lTransform );
 
-	const lGlobalTranslation = new Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
+	const lGlobalTranslation = lParentGX.clone().multiply( lLocalTWithAllPivotAndOffsetInfo );
 	lGlobalT.copyPosition( lGlobalTranslation );
 
-	lTransform = new Matrix4().copy( lGlobalT ).multiply( lGlobalRS );
+	lTransform = lGlobalT.clone().multiply( lGlobalRS );
 
 	// from global to local
 	lTransform.premultiply( lParentGX.invert() );
