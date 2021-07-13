@@ -412,8 +412,10 @@ class TrackballControls extends EventDispatcher {
 
 			if ( _pointers.length === 0 ) {
 
-				scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
-				scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
+				scope.domElement.setPointerCapture( event.pointerId );
+
+				scope.domElement.addEventListener( 'pointermove', onPointerMove );
+				scope.domElement.addEventListener( 'pointerup', onPointerUp );
 
 			}
 
@@ -469,8 +471,10 @@ class TrackballControls extends EventDispatcher {
 
 			if ( _pointers.length === 0 ) {
 
-				scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-				scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+				scope.domElement.releasePointerCapture( event.pointerId );
+
+				scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+				scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 
@@ -563,9 +567,6 @@ class TrackballControls extends EventDispatcher {
 
 			}
 
-			scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
-			scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
-
 			scope.dispatchEvent( _startEvent );
 
 		}
@@ -594,9 +595,6 @@ class TrackballControls extends EventDispatcher {
 		function onMouseUp() {
 
 			_state = STATE.NONE;
-
-			scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-			scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
 			scope.dispatchEvent( _endEvent );
 
@@ -779,6 +777,9 @@ class TrackballControls extends EventDispatcher {
 			scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
 			scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
 			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
+
+			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
 			window.removeEventListener( 'keydown', keydown );
 			window.removeEventListener( 'keyup', keyup );
