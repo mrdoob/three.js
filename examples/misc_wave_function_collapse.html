@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+	<title>three.js - Misc - Wave Function Collapse</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head><body>
+
+<div id="info">
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> misc - wave function collapse -
+	<a href="https://www.kenney.nl/assets/3d-road-tiles" target="_blank" rel="noopener">Kenney's 3D Road Tiles</a>
+</div>
+
+<script type="module">
+/**
+ * @author Pedro S. <sketchpunk@gmail.com>
+ * {@link https://twitter.com/SketchpunkLabs }
+ */
+
+// #region IMPORTS & MAIN
+import * as THREE			from "../build/three.module.js";
+import { OrbitControls }	from "./jsm/controls/OrbitControls.js";
+import { GUI }				from './jsm/libs/dat.gui.module.js';
+
+let $App, $Wfc;
+
+window.addEventListener( "load", _=>{
+	$App = new App();
+	$App.set_camera( 0, 50, 15 ).render();
+
+	init();
+	init_gui();
+});
+
+async function init(){
+	let glb = await fetch( "./models/gltf/kenney_road_tiles.glb" ).then( r=>r.arrayBuffer() );
+	let [ json, bin ] = parse_glb( glb );
+
+	/* TEST SINGLE TILES
+	let prim	= Gltf.get_mesh( "roadTile_026", json, bin, false );
+	let geo		= Gltf.prim_to_geo( prim[0] );
+	let mat 	= new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors });
+	let mesh 	= new THREE.Mesh( geo, mat );
+	$App.add( mesh );
+	return;
+	*/
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Load up our tiles
+	let ts = new TileSet( json, bin );
+	for( let t of tile_set ) ts.add( t.name, t.mesh, t.weight, t.sockets, t.build, t.neighbor_limits ); 
+
+	/* TESTING TILES FOR ERRORS
+	for( let t of ts.items ){
+		switch( t.index ){ case 4: case 3 :
+		console.log( "---", t.index, t.name, t.sockets, t.limits );
+		}
+	}
+	ts.view_by_name( "tee_4" );
+	ts.view_by_name( "tee_2", -3 );
+	//ts.view_by_name( "park_open_4", 6 );
+	//ts.view_by_name( "park_corner_2", 9 );
+	
+	//$App.add( ts.mesh_from( 1 ) );
+	//return;
+	//console.log( ts );
+	//return;
+	
+	ts.view_by_name( "park_side" );
+	return;
+	*/
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Generate which tiles can connect to which based on the
+	// defined socket types for each site of the tile.
+	let ns = create_neightor_set( ts );
+
+	//console.log( ns[4] )
+	//return;
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	let grid_rend = new GridRender( ts.get_by_name("grass").geo )
+	$Wfc = new Wfc( ts, ns, 3, 3, grid_rend );
+	$Wfc.draw();
+	$Wfc.run();
+}
+// #endregion ////////////////////////////////////////////////////////////////////////////////////////
+
+// #region GUI
+let $Gui;
+let $gui_params = {
+	rng_seed		: 83,
+	grid_x			: 3,
+	grid_y			: 3,
+	render_speed	: 200,
+	final_pass 		: true, 
+	run				: function(){ $Wfc.run( $gui_params.grid_x, $gui_params.grid_y ); },
+};
+
+function init_gui() {
+	$Gui = new GUI( { width: 300 } );
+
+	$Gui.add( $gui_params, "rng_seed", 0, 999999, 1 )
+		.name( "RNG Seed" )
+		.onFinishChange( function(){ $Wfc.set_seed( this.getValue() ); });
+
+	$Gui.add( $gui_params, "grid_x", 3, 10, 1 ).name( "Grid X" );
+	$Gui.add( $gui_params, "grid_y", 3, 10, 1 ).name( "Grid Y" );
+	$Gui.add( $gui_params, "render_speed", 0, 1000, 100 ).name( "Render Speed" );
+	$Gui.add( $gui_params, "final_pass" ).name( "Use Final Pass" );
+	$Gui.add( $gui_params, "run" ).name( "Generate" );
+}
+// #endregion ////////////////////////////////////////////////////////////////////////////////////////
+
+
+// ###################################################################################################################
+// #region WAVE FUNCTION COLLAPSE - MAIN
+
+class Wfc{
+	#is_running 	= false;
+
+	#tile_set		= null;	// The collection of tiles
+	#neighor_set	= null;	// Map of compatible socketed tiles
+	#grid			= null;	// Main Grid
+	#renderer		= null; // How To Render the Grid.
+
+	#bit_set		= null;	//
+
+	#rng_seed		= 83; //205815;  56751
+	#rng 			= new RandomLCG( this.#rng_seed ); //55
+
+	propagate_limit = 40;	// Limit Propagate While Loop
+	pass_limit		= 50;	// Limit Passes over all the data
+
+	speed 			= 0;
+
+	constructor( ts, ns, x, y, renderer ){
+		this.#tile_set		= ts;
+		this.#neighor_set	= ns;
+		this.#grid 			= new FlatGridXY( x, y );
+		this.#bit_set 		= new Bitset( ts.len ).on_range( 0, ts.len-1 );
+		this.#renderer 		= renderer;
+
+		this.pass_limit		= x * y + 10; // Give enough passes to cover the whole grid.
+		//console.log( this.#tile_set );
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Fill the Grid with Tile Info.
+		let ts_entropy	= ts.entropy(),
+			ts_weight	= ts.weight(),
+			ts_len 		= ts.len;
+		this.#grid.fill((i,x,y)=>{
+			return new GridCell( this.#bit_set.clone(), ts_len, ts_entropy, ts_weight );
+		});
+	}
+
+	resize_grid( x, y ){
+		if( this.#grid.can_resize( x, y ) ){
+			// Clean put old grid.
+			this.#grid.for_each( (i,x,y,cell)=>{ cell.dispose(); });
+		}else return false;
+
+		this.#grid.resize( x, y );
+		//console.log( "RESIZE GRID");
+		this.pass_limit = x * y + 10; 
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Fill the Grid with Tile Info.
+		let ts_entropy	= this.#tile_set.entropy(),
+			ts_weight	= this.#tile_set.weight(),
+			ts_len 		= this.#tile_set.len;
+		this.#grid.fill((i,x,y)=>{
+			return new GridCell( this.#bit_set.clone(), ts_len, ts_entropy, ts_weight );
+		});
+
+		return true;
+	}
+
+	set_seed( v ){ this.#rng_seed = v; return this; }
+	reset_grid(){
+		this.#grid.for_each( (i,x,y,cell)=>{
+			this.#rng.reseed( this.#rng_seed );
+
+			cell.tiles.copy( this.#bit_set );
+			cell.count			= this.#tile_set.len;
+			cell.entropy		= this.#tile_set.entropy();
+			cell.weight 		= this.#tile_set.weight();
+			cell.tile_index		= null;		
+			cell.is_collapsed	= false;
+		});
+		return this;
+	}
+
+	async run( x=null, y=null ){
+		if( this.#is_running ) return;
+		this.#is_running = true;
+
+		let passes = 0;
+		let idx;
+
+		// This is me being lazy, not sure how to handle resizing grids while wfc is running.
+		if( x == null || y== null || !this.resize_grid( x, y ) ) this.reset_grid();
+
+		this.speed = $gui_params.render_speed;
+		//console.log( this.#grid );
+
+		do{
+			idx = this.find_entropy_cell();
+
+			this.#grid.cells[ idx ].collapse( this.#tile_set, this.#rng );
+			
+			//console.log( "###########################################################" );
+			//console.log( "Find and Collapse", idx );
+			//console.log( this.#grid.cells[ idx ] );
+			//console.log( "###########################################################" );
+
+			this.propagate( idx );
+			
+			/*
+			console.log( "------------------- ", idx, this.#neighor_set[ idx ] );
+			console.log( "pass", passes, this.#grid.get( 1,0 ) );
+			console.log( "pass", passes, this.#grid.get( 0,0 ),  this.#grid.get( 0,0 ).tiles.get_bit_array()  ); //
+			*/
+
+			passes++;
+
+			if( this.speed != 0 ){
+				this.draw();
+				await async_timeout( this.speed );
+			}
+		}while( !this.is_all_collapsed() && passes <= this.pass_limit );
+
+		console.log( "Done-ish", passes, this.is_all_collapsed() );
+		//console.log( this.#grid );
+
+		if( $gui_params.final_pass ) this.final_pass();
+		this.draw();
+		this.#is_running = false;
+	}
+
+	draw(){ this.#renderer.draw( this.#tile_set, this.#grid ); }
+
+	// Check if all the cells are done
+	is_all_collapsed(){
+		let c;
+		for( c of this.#grid.cells ){
+			if( !c.is_collapsed ) return false;
+		}
+		return true;
+	}
+
+	// Find Which cell has the easiest chance to collapse.
+	find_entropy_cell( cells, tiles ){
+		let i, g, entropy_rnd, 
+			min = Infinity,
+			idx = null;
+
+		for( i=0; i < this.#grid.len; i++ ){
+			g = this.#grid.cells[ i ];		// Get Grid Item
+			//console.log( "CHECK", g );
+
+			if( g.is_collapsed ) continue;	// Skip any cells that have been collapsed.
+
+			// With many cells having the same low entropy value, use a bit
+			// of randomness to help pick which one to use.
+			entropy_rnd = g.entropy - ( this.#rng.next() * 0.001 );
+
+			// Found Cell with the least probability, meaning
+			// the cell that will most likely collapse the easiest.
+			if( entropy_rnd < min ){
+				min = entropy_rnd;
+				idx = i;
+			}
+		}
+		return idx;
+	}
+
+	propagate( start_idx ){
+		let cell_idx_a, cell_idx_b, cell_a, cell_b, dir_i, bit_mask, modified, tile_idx,
+			passes	= 0,
+			stack	= [ start_idx ];
+		let bit, mask = new Bitset();
+
+		while( ((cell_idx_a = stack.pop()) != undefined) && passes < this.propagate_limit ){
+			//console.log("-------------------------------------------");
+			//console.log( "index", cell_idx_a, "coord", this.#grid.pos_of( cell_idx_a ),  );
+			passes++;
+
+			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			cell_a = this.#grid.cells[ cell_idx_a ];
+			
+			if( cell_a.count == 0 ){ console.log("ERROR - MAIN TILES EMPTY"); return; }
+
+			let tile_ary = cell_a.tiles.get_bit_array();
+
+			/*
+			console.log( "Available Tiles", tile_ary );
+			console.log( "Is Collapsed", cell_a.is_collapsed );
+			if( cell_a.tile_index != null ){
+				let tile = this.#tile_set.items[ cell_a.tile_index ];
+				console.log( "Final Tile", tile.name, cell_a.tile_index );
+			}
+			*/
+			
+			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// Look at the cell's neighbors : Top, Right, Bottom, Left
+			for( dir_i=0; dir_i < 4; dir_i++ ){
+
+				//console.log( "-- dir ", dir_i );
+
+				//-----------------------------------------------------------
+				// Check if there is a cell in this direction
+				cell_idx_b = this.#grid.get_neightbor_idx( cell_idx_a, dir_i );
+				if( cell_idx_b == null ){ 
+					//console.log("---- No Neighbor");
+					continue; 
+				} 
+				
+				//console.log( "---- Idx", cell_idx_b, "dir", dir_i,  "coord", this.#grid.pos_of( cell_idx_b ) );
+
+				//-----------------------------------------------------------
+				// Get the Neighbor Cell
+				cell_b = this.#grid.cells[ cell_idx_b ];
+				if( cell_b.count == 0 ){ console.log("---- ERROR - DIRECTION TILE EMPTY"); return; }
+
+				/*
+				console.log( "---- Is Collapsed", cell_b.is_collapsed );
+				if( cell_b.tile_index != null ){
+					let tile = this.#tile_set.items[ cell_b.tile_index ];
+					console.log( "---- Final Tile", tile.name, cell_b.tile_index );
+				}
+				*/
+				
+
+				//-----------------------------------------------------------
+				// Create a Bit mask of all the tiles possible neighbor's in this direction
+				mask.reset();
+				for( tile_idx of tile_ary ){
+					mask.or( this.#neighor_set[ tile_idx ][ dir_i ].bit_mask );
+				}
+
+				//console.log( "---- Dir Mask ", dir_i, mask.get_bit_array() );
+
+				//-----------------------------------------------------------
+				//console.log( "---- start ", cell_b.tiles.get_bit_array() );
+
+				modified	= cell_b.apply_bitmask( mask, this.#tile_set );
+
+				//if( modified ) console.log( "---- modified ", cell_b.tiles.get_bit_array() );
+
+				// If tiles where removed, then we need to filter out
+				// its neighbor's available tiles.
+				if( modified ){
+					stack.push( cell_idx_b );
+					//console.log( "---- Add to stack", cell_idx_b, "passes", passes,  );
+				}
+
+				//bit_mask	= this.#neighor_set[ i ][ dir_i ].bit_mask;
+
+			}
+
+			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//console.log( "-- Pass ", passes );
+			
+			//for( let tile of tile_ary ){
+			//	console.log("--", tile);
+			//}
+		}
+	}
+
+	// Typically when a conflict is found (cell tile.len = 0), You would try again
+	// from scratch with a new random starting tile. Other solutions is to undo a step or two, and
+	// pick a different tile to start a pass with.
+	// BUT, in this version I let the conflicts happen and just treat those cells are improperly
+	// collapsed cells. THEN do one final pass and try to find tiles that might fit in those
+	// spots. This solution actually works most of the time, there is still times when conflicts
+	// can not be resolved BUT can show you a tile that you may want to create that can fill in 
+	// those edge cases.
+	final_pass(){
+		// Find Any Cell that was not collapsed correctly.
+		let tile, gc, ngc, n_idx, dir_i, dir_ii, s;
+		let filter			= [ null, null, null, null ];
+		let filter_cnt 		= 0;
+		let find_cnt 		= 0;
+
+		for( gc of this.#grid ){
+			// Skip any cells that are properly Collapsed
+			if( gc.cell.count == 1 ) continue;
+			
+			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// Build a a Direction Socket Filter based on existing neighbors and what
+			// is their current socket of the opposite direction.
+			filter_cnt = 0;
+			for( dir_i = 0; dir_i < 4; dir_i++ ){
+				dir_ii	= (dir_i + 2) & 3;	// Opposite Direction
+				n_idx	= this.#grid.get_neightbor_idx( gc.i, dir_i ); 
+
+				// If neighbor found, get its opposite socket type
+				if( n_idx != null ){
+					// get Neighbor Cell
+					ngc				= this.#grid.cells[ n_idx ];	
+					// Get the cell's tile
+					tile 			= this.#tile_set.items[ ngc.tile_index ];
+					// Save the opposite side socket
+					filter[ dir_i ]	= tile.sockets[ dir_ii ];
+					filter_cnt++;
+
+				// Else ignore this direction when filtering.
+				}else filter[ dir_i ] = null;
+			}
+
+			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// Search the tile set that will find one that would fit into position
+			// based on the direction socket filter.
+			for( tile of this.#tile_set.items ){
+				s			= tile.sockets;
+				find_cnt	= 0;
+
+				if( filter[0] != null && filter[0] == s[0] ) find_cnt++;
+				if( filter[1] != null && filter[1] == s[1] ) find_cnt++;
+				if( filter[2] != null && filter[2] == s[2] ) find_cnt++;
+				if( filter[3] != null && filter[3] == s[3] ) find_cnt++;
+
+				// If socket found eq how many filter checks, then 
+				// we found our tile. Update cell as properly collapsed.
+				if( find_cnt == filter_cnt ){
+					gc.cell.tile_index	= tile.index;
+					gc.cell.count		= 1;
+					break;
+				}
+			}
+		}
+	}
+}
+
+class GridCell{
+	constructor( bit_tiles, count, entropy, weight ){
+		this.tiles			= bit_tiles;
+		this.count			= count;
+		this.entropy		= entropy;	// Total Entropy of Existing Tiles
+		this.weight 		= weight;	// Total Weight of Existing Tiles.
+		this.tile_index		= null;		
+		this.is_collapsed	= false;
+
+		this.mesh			= new THREE.Mesh();
+		$App.add( this.mesh );
+	}
+
+	dispose(){
+		this.mesh.material = null;
+		this.mesh.geometry = null;
+		$App.remove( this.mesh );
+		this.mesh = null;
+	}
+
+	collapse( ts, rng ){
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Create a list of available Tile Weights.
+		let tile_idx,
+			weight_ary	= new Array( this.tiles.count ),
+			i			= 0;
+
+		// Use the Bitset Iterator to get all the Bit Indexes that are ON.
+		for( tile_idx of this.tiles ){
+			weight_ary[ i ] = {
+				idx		: tile_idx,
+				weight	: ts.items[ tile_idx ].weight
+			};
+			i++;
+		}
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Since Random Weight is less then Total, this makes sure
+		// that at some point it'll be in the negative as it keeps subtracting
+		// weight before we run out of weights for the process.
+		// Since the random number gives an unpredicted reduction and tiles
+		// are not in order by their weight, its a nice way to randomly
+		// pick something, Larger weighted tiles will have a greater chance of
+		// winning out which is what we'd like to happen.
+		let w, weight_rnd = this.weight * rng.next();
+
+		for( w of weight_ary ){
+			if( ( weight_rnd -= w.weight ) < 0 ){
+				//console.log("Save tile", w.idx );
+				this.tiles.reset().on( w.idx ); // Leave only 1 bit open, which would allow
+				this.update();					// Update to set this cell as collapsed.
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// Update cell information based on the tile's bitset value
+	update( ts ){
+		this.count = this.tiles.count;
+
+		if( this.count == 0 ){
+			this.weight			= 0;
+			this.entropy		= 0;
+			this.is_collapsed	= true;
+			console.error( "------- Bad Collapse" );
+
+		}else if( this.count == 1 ){
+			this.tile_index 	= this.tiles.get_iter()();
+			this.is_collapsed 	= true;
+			this.weight			= 0;
+			this.entropy		= 0;
+
+		}else{
+			if( !ts ){ console.error("TileSet was not passed to GridCell.update"); return; }
+
+			let t, i,
+				sum_w		= 0,	// Total Weight
+				sum_w_log	= 0;	// Total (weight * log(weight))
+
+			// Compute the Weight
+			for( i of this.tiles ){
+				t 			= ts.items[ i ];
+				sum_w		+= t.weight;
+				sum_w_log	+= t.weight_log;
+			}
+
+			// Compute the Weight
+			this.weight		= sum_w;
+			this.entropy	= Math.log( sum_w ) - ( sum_w_log / sum_w );
+		}
+	}
+
+	apply_bitmask( mask, ts ){
+		let modified = this.tiles.and( mask );
+		if( modified ) this.update( ts );
+		return modified;
+	}
+}
+
+class GridRender{
+	#tile_mat			= new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors });
+	#placeholder_mat	= new THREE.MeshPhongMaterial( { color:0xffff00, opacity: 0.5, transparent: true } );
+	#placeholder_geo	= null;
+
+	constructor( placeholder_geo ){
+		this.#placeholder_geo = placeholder_geo;
+	}
+
+	draw( ts, grid ){
+		let c, m, x, y, t;
+		let center_x = grid.get_x() * 3 * -0.5;
+		let center_y = grid.get_y() * 3 * -0.5 + 3;
+
+		for( c of grid ){			
+			x = c.x * 3 + center_x;
+			y = c.y * 3 + center_y;
+			m = c.cell.mesh;
+
+			// Place holder Tile
+			if( c.cell.count != 1 ){
+				m.material = this.#placeholder_mat;
+				m.geometry = this.#placeholder_geo;
+				m.position.x = x;
+				m.position.z = y;
+				m.quaternion.set( 0,0,0,1 );
+			
+			// Main Tile
+			}else{
+				t = ts.items[ c.cell.tile_index ];
+
+				m.material = this.#tile_mat
+				m.geometry = t.geo;
+
+				if( t.rotate )	m.quaternion.copy( t.rotate );
+				else 			m.quaternion.set( 0,0,0,1 );
+
+				if( t.offset ){
+					m.position.copy( t.offset );
+					m.position.x += x;
+					m.position.z += y;
+				}else{
+					m.position.x = x;
+					m.position.z = y;
+				}				
+			}
+		}
+	}
+}
+
+function create_neightor_set( ts ){
+	let i, ii, j, jj, a, b, ary, lmt,
+		len			= ts.len,
+		stack 		= Array.from( {length:len}, (v,i)=>i ),
+		neighbors	= Array.from( {length:len}, (v,i)=>{
+			// Top, Right, Bottom, Left
+			return [ 
+				{ idx: new Array(), bit_mask: new Bitset( len ) },
+				{ idx: new Array(), bit_mask: new Bitset( len ) },
+				{ idx: new Array(), bit_mask: new Bitset( len ) },
+				{ idx: new Array(), bit_mask: new Bitset( len ) },
+			];
+		});
+	
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	while( ( i = stack.pop() ) != undefined ){
+		a = ts.items[ i ];		// Tile we're looking neighbors for
+
+		for( ii of stack ){
+			b = ts.items[ ii ];	// Tile for neightbor testing.
+
+			// Check which sockets match between the 
+			for( j=0; j < 4; j++ ){
+				// Shift by two to match opposite sockets. Up->Down, Right->Left, etc
+				jj = ( j+2 ) & 3;
+
+				// If socket IDs are the same, then its a possible neighbors.
+				if( a.sockets[ j ] == b.sockets[ jj ] ){
+										
+					// Additional Conditions for A to Match B
+					if( a.limits && a.limits[ j ] ){
+						lmt = a.limits[ j ];
+						//console.log( "a", lmt, b.sockets[ lmt.dir ], lmt.allow.indexOf( b.sockets[ lmt.dir ] ) );
+						if( lmt.allow.indexOf( b.sockets[ lmt.dir ] ) == -1 ) continue;
+					}
+					
+					// Additional Conditions for B to Match A
+					if( b.limits && b.limits[ jj ] ){
+						lmt = b.limits[ jj ];
+
+						/*
+						if( b.index == 1 && ( a.index == 18 || a.index == 16 ) ){
+							console.log( "----------------------------" )
+							console.log( "Testing :", b.index, b.name,  "ON: ", a.index, a.name );
+							console.log( "--- limit ", lmt );
+							console.log( "--- A Socket ", a.sockets[ lmt.dir ] );
+							console.log( "--- Test ", lmt.allow.indexOf( a.sockets[ lmt.dir ] ) );
+
+						}
+						*/
+							
+						//console.log( "a", lmt, a.sockets[ lmt.dir ], lmt.allow.indexOf( a.sockets[ lmt.dir ] ) );
+						if( lmt.allow.indexOf( a.sockets[ lmt.dir ] ) == -1 ) continue;
+					}
+					/**/
+					
+					// Save To A that B is a Neighbor
+					ary = neighbors[ i ][ j ].idx;
+					if( ary.indexOf( ii ) == -1 ) ary.push( ii );
+
+					// Save To B that A is a Neighbor
+					ary = neighbors[ ii ][ jj ].idx;
+					if( ary.indexOf( i ) == -1 ) ary.push( i );
+				}
+			}
+		}
+	}
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Create a Bitmask based on the Index Array.
+	for( i of neighbors ){
+		for( ii of i ){
+			ii.bit_mask.on_ary( ii.idx );
+		}
+	}
+
+	return neighbors;
+}
+
+// #endregion
+
+// ###################################################################################################################
+// #region WAVE FUNCTION COLLAPSE - SUPPORT
+
+const VEC3_UP = new THREE.Vector3( 0, 1, 0 );
+
+class Directions{
+	static Up		= 0;
+	static Right	= 1;
+	static Down 	= 2;
+	static Left		= 3;
+	static [Symbol.iterator](){
+		let i=0;
+		return { next:()=>{
+			if( i < 4 ) return	{ value:i++, done:false };
+			else		return	{ value:null, done:true };
+		}};
+	}
+}
+
+// Define how Tiles connect to each other. Each Side of a tile gets assigned a Socket Type.
+class Sockets{
+	static Road			= 0;
+	static Grass		= 1;
+	static Asphalt		= 2;
+	static AsphaltSide	= 3;
+}
+
+// BIT Options, When adding a tile to a TileSet, can include options to duplicate the tile
+// as rotation variants.
+class BuildMode{
+	static None 		= 0;	
+	static Rotate90		= 1;
+	static Rotate180	= 2;
+	static Rotate270	= 4;
+	static RotateAll 	= 7;
+}
+
+// Define a Tile
+class Tile{
+	name 		= "";
+	index		= null;	// Index in Tileset
+	
+	geo 		= null;	// Geometry of the Tile
+	sockets 	= null; // Top, Right, Bottom, Left
+	rotate		= null;	// Rotation to Apply to Tile
+	offset		= null;	// Tiles's origin is corner, need to re position after rot.
+
+	limits		= null;
+
+	weight 		= 1;	// How more often should a tile be used compared to others.
+	weight_log 	= 0;	// Cache the Log of the weight for entropy calculations
+
+	constructor( idx, name, geo, weight, sockets=null, limits=null ){
+		this.index		= idx;
+		this.name		= name;
+		this.geo		= geo;
+		this.weight		= weight;
+		this.weight_log	= weight * Math.log( weight );
+		this.sockets	= ( sockets )? sockets : [0,0,0,0];
+		this.limits		= limits;
+	}
+
+	clone(){
+		let limits = null; 
+		if( this.limits ){
+			//limits = new Array( 4 );
+			limits = [ null, null, null, null ];
+			/*
+			for( let i=0; i < 4; i++ ){
+				if( !this.limits[ i ] ) limits[ i ] = null;
+				else{
+					limits[ i ] = {
+						dir:	this.limits[ i ].dir,
+						allow:	this.limits[ i ].allow.slice( 0 ),
+					};
+				}
+			}
+			*/
+		}
+		
+		return new Tile( 0, this.name, this.geo, this.weight, this.sockets.slice(0), limits );
+	}
+}
+
+// Collection of Tiles that WFC will use for generation.
+class TileSet{
+	//=============================================================
+	static #build_steps = [
+		{ mode: BuildMode.Rotate90,		pos: new THREE.Vector3( 0, 0, -3 ),		rot: new THREE.Quaternion().setFromAxisAngle( VEC3_UP, -90 * Math.PI / 180 ), shift_idx:3, },
+		{ mode: BuildMode.Rotate180,	pos: new THREE.Vector3( 3, 0, -3 ),		rot: new THREE.Quaternion().setFromAxisAngle( VEC3_UP, -180 * Math.PI / 180 ), shift_idx:2, },
+		{ mode: BuildMode.Rotate270,	pos: new THREE.Vector3( 3, 0, 0 ),		rot: new THREE.Quaternion().setFromAxisAngle( VEC3_UP, -270 * Math.PI / 180 ), shift_idx:1, },
+	];
+
+	//=============================================================
+	items		= new Array();
+	#json		= null;
+	#bin		= null;
+	#mat 		= null;		
+	#entropy	= null;		// Total Entropy of all the tiles
+	#weight 	= null;		// Total Weight of all the Tiles
+
+	//=============================================================
+	constructor( json, bin ){
+		this.#json	= json;
+		this.#bin	= bin;
+		this.#mat 	= new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors });
+	}
+
+	get len(){ return this.items.length; }
+
+	get_by_name( n ){
+		let t;
+		for( t of this.items ){
+			if( t.name == n ) return t;
+		}
+		return null;
+	}
+
+	// Add a new  Tile to the collection
+	add( name, mesh_name, weight, sockets, build, limits ){
+		// Parse out the mesh, create geometry object and save that to a tile
+		let prim	= Gltf.get_mesh( mesh_name, this.#json, this.#bin, false );
+		let geo		= Gltf.prim_to_geo( prim[0] );
+		let tile	= new Tile( this.items.length, name, geo, weight, sockets, limits );
+
+		this.items.push( tile );
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// BUILD VARIATIONS OF THE TILE
+		if( build ){
+			let bs, t, i, ii, tmp;
+			for( bs of TileSet.#build_steps ){
+				if( !(build & bs.mode) ) continue;
+
+				// Clone Tile and set Rotation and Offset
+				t = tile.clone();
+				t.rotate = bs.rot;
+				t.offset = bs.pos;
+				t.index	= this.items.length;
+				t.name	= tile.name + "_" + bs.mode;
+
+				// Shift Sockets because of rotation
+				if( bs.rot ){
+					ii = bs.shift_idx;
+					for( i=0; i < 4; i++ ){
+						t.sockets[ i ] = tile.sockets[ (ii & 3) ];
+
+						// Very Hacky, Just recreate the object by coping
+						// From the shift index of the original tile.
+						if( t.limits && tile.limits[ (ii & 3) ] ){
+							tmp = tile.limits[ (ii & 3) ];
+							//console.log( t.name, "idx", i, "dir", tmp.dir, "current shift",ii, "starting shift", bs.shift_idx, "SHIFT", (4-bs.shift_idx), ((4-bs.shift_idx) + tmp.dir) & 3 );
+							t.limits[ i ] ={
+								dir		: ((4-bs.shift_idx) + tmp.dir) & 3,
+								allow	: tmp.allow.slice( 0 ),
+							};
+						}
+
+						ii++;
+					}
+				}
+
+				// Save Modifed Tile to the list
+				this.items.push( t );
+			}
+		}
+
+		/*
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// TEST RESULTS
+		for( let itm of this.items ){
+			let e = this.entity_from( itm.index );
+			e.Node.add_pos( 0, 0, itm.index * 3.1 );
+			console.log( itm.sockets );
+		}
+		*/
+		return this;
+	}
+
+	// Turn a Tile into a mesh object that can be rendered.
+	mesh_from( idx ){
+		let tile	= this.items[ idx ];
+		let mesh 	= new THREE.Mesh( tile.geo, this.#mat );
+		if( tile.rotate ) mesh.quaternion.copy( tile.rotate );
+		if( tile.offset ) mesh.position.copy( tile.offset );
+		return mesh;
+	}
+
+	//Just for testing, not being used.
+	view_by_name( name, x=null, z=null ){
+		let t = this.get_by_name( name );
+		if( t != null ){
+			let mesh = new THREE.Mesh( t.geo, this.#mat );
+			if( t.rotate ) mesh.quaternion.copy( t.rotate );
+			if( t.offset ) mesh.position.copy( t.offset );
+			$App.add( mesh );
+
+			if( x != null ) mesh.position.x += x;
+			if( z != null ) mesh.position.z += z;
+		}
+	}
+
+	// https://en.wiktionary.org/wiki/Shannon_entropy
+	// Calculate some kind of probability based on a curve, I guess by what I've read.
+	entropy( refresh=false ){
+		if( this.#entropy != null && !refresh ) return this.#entropy;
+
+		let t,
+			sum_w		= 0,	// Total Weight
+			sum_w_log	= 0;	// Total (weight * log(weight))
+
+		for( t of this.items ){
+			sum_w		+= t.weight;
+			sum_w_log	+= t.weight_log;
+		}
+
+		this.#entropy	= Math.log( sum_w ) - ( sum_w_log / sum_w );
+		this.#weight 	= sum_w;
+		return this.#entropy;
+	}
+
+	// Get the total Weight of all the tiles
+	weight( refresh=false ){
+		if( this.#weight != null && !refresh ) return this.#weight;
+		this.entropy( refresh );
+		return this.#weight;
+	}
+}
+
+// #endregion
+
+// ###################################################################################################################
+// #region MISC
+let async_timeout = ( ms )=>new Promise( r=>setTimeout( r, ms ) );
+
+let tile_set = [ /**/
+	{ mesh:"roadTile_026", name:"road_end", weight:10,
+		build 	: BuildMode.All,
+		sockets	: [ Sockets.Grass, Sockets.Road, Sockets.Grass, Sockets.Grass ] },
+
+	{ mesh:"roadTile_153", name:"road_turn", weight:20,
+		build 	: BuildMode.All,
+		sockets	: [ Sockets.Road, Sockets.Road, Sockets.Grass, Sockets.Grass ] },
+
+	{ mesh:"roadTile_141", name:"cross", weight:5,
+		build 	: BuildMode.None,
+		sockets	: [ Sockets.Road, Sockets.Road, Sockets.Road, Sockets.Road ] },
+	
+	{ mesh:"roadTile_150", name:"tee", weight:5,
+		build 	: BuildMode.RotateAll,
+		sockets	: [ Sockets.Road, Sockets.Road, Sockets.Road, Sockets.Grass ] },
+
+	{ mesh:"roadTile_162", name:"road", weight:5,
+		build 	: BuildMode.Rotate90,
+		sockets	: [ Sockets.Grass, Sockets.Road, Sockets.Grass, Sockets.Road ] },
+	
+	{ mesh:"roadTile_035", name:"park_corner", weight:1,
+		build 	: BuildMode.RotateAll,
+		sockets	: [ Sockets.AsphaltSide, Sockets.AsphaltSide, Sockets.Grass, Sockets.Grass ],
+		neighbor_limits : [
+			{ dir:Directions.Left,	allow:[ Sockets.Grass, Sockets.Road ] },
+			{ dir:Directions.Down,	allow:[ Sockets.Grass, Sockets.Road ] },
+			null,
+			null,
+		] },
+
+	{ mesh:"roadTile_030", name:"park_open", weight:1,
+		build 	: BuildMode.RotateAll,
+		sockets	: [ Sockets.AsphaltSide, Sockets.Road, Sockets.AsphaltSide, Sockets.Asphalt ],
+		neighbor_limits : [
+			{ dir:Directions.Left, allow:[ Sockets.Asphalt ] },
+			null, 
+			{ dir:Directions.Left, allow:[ Sockets.Asphalt ] },
+			null,
+		]},
+
+	{ mesh:"roadTile_027", name:"park_side", weight:1,
+		build 	: BuildMode.RotateAll,
+		sockets	: [ Sockets.AsphaltSide, Sockets.Asphalt, Sockets.AsphaltSide, Sockets.Grass ], 
+		neighbor_limits : [
+			{ dir:Directions.Left, allow:[ Sockets.Grass, Sockets.Road ] },
+			null, 
+			{ dir:Directions.Left, allow:[ Sockets.Grass, Sockets.Road ] },
+			null,
+		]},
+	
+	{ mesh:"roadTile_034", name:"asphalt", weight:1,
+		build 	: BuildMode.None,
+		sockets	: [ Sockets.Asphalt, Sockets.Asphalt, Sockets.Asphalt, Sockets.Asphalt ] },
+	
+	{ mesh:"roadTile_163", name:"grass", weight:3,
+		build 	: BuildMode.None,
+		sockets	: [ Sockets.Grass, Sockets.Grass, Sockets.Grass, Sockets.Grass ] },
+];
+
+
+// Boiler Plate Starter for ThreeJS
+class App{
+	// #region MAIN
+	scene			= null;
+	camera			= null;
+	renderer		= null;
+	orbit			= null;
+	render_bind		= this.render.bind( this );
+
+	constructor(){
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// MAIN
+		this.scene				= new THREE.Scene();
+		this.camera				= new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+		this.camera.position.set( 0, 10, 20 );
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// LIGHTING
+		let light = new THREE.DirectionalLight( 0xffffff, 0.8 );
+		light.position.set( 4, 10, 1 );
+
+		this.scene.add( light );
+		this.scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// RENDERER
+		this.renderer = new THREE.WebGLRenderer( { antialias:true } );
+		this.renderer.setPixelRatio( window.devicePixelRatio );
+		this.renderer.setClearColor( 0x3a3a3a, 1 );
+		this.renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( this.renderer.domElement );
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// MISC
+		this.orbit = new OrbitControls( this.camera, this.renderer.domElement );
+		this.scene.add( new THREE.GridHelper( 20, 20, 0x0c610c, 0x444444 ) );
+	}
+
+	render(){
+		requestAnimationFrame( this.render_bind );
+		this.renderer.render( this.scene, this.camera );
+	}
+	// #endregion ////////////////////////////////////////////////////////////////////////////////////////
+
+	// #region METHODS
+	add( o ){ this.scene.add( o ); return this; }
+	remove( o ){ this.scene.remove( o ); return this; }
+
+	set_camera( lon, lat, radius ){
+		let phi 	= ( 90 - lat ) * Math.PI / 180,
+			theta 	= ( lon + 180 ) * Math.PI / 180;
+
+		this.camera.position.set(
+			-(radius * Math.sin( phi ) * Math.sin(theta)),
+			radius * Math.cos( phi ),
+			-(radius * Math.sin( phi ) * Math.cos(theta))
+		);
+
+		this.orbit.update();
+		return this;
+	}
+	// #endregion ////////////////////////////////////////////////////////////////////////////////////////
+}
+
+// Handle Specific GLTF Parsing
+class Gltf{
+	static TYPE_BYTE			= 5120;
+	static TYPE_UNSIGNED_BYTE	= 5121;
+	static TYPE_SHORT			= 5122;
+	static TYPE_UNSIGNED_SHORT	= 5123;
+	static TYPE_UNSIGNED_INT	= 5125;
+	static TYPE_FLOAT			= 5126;
+
+	static MODE_POINTS 			= 0;	// Mode Constants for GLTF and WebGL are identical
+	static MODE_LINES			= 1;	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
+	static MODE_LINE_LOOP		= 2;
+	static MODE_LINE_STRIP		= 3;
+	static MODE_TRIANGLES		= 4;
+	static MODE_TRIANGLE_STRIP	= 5;
+	static MODE_TRIANGLE_FAN	= 6;
+	
+	static COMP_SCALAR			= 1;	// Component Length based on Type
+	static COMP_VEC2			= 2;
+	static COMP_VEC3			= 3;
+	static COMP_VEC4			= 4;
+	static COMP_MAT2			= 4;
+	static COMP_MAT3			= 9;
+	static COMP_MAT4			= 16;
+
+	static TARGET_ARY_BUF		= 34962;	// bufferview.target
+	static TARGET_ELM_ARY_BUF	= 34963;
+
+	static parse_accessor( idx, json, bin, spec_only = false ){
+		let acc			= json.accessors[ idx ],				// Reference to Accessor JSON Element
+			bView 		= json.bufferViews[ acc.bufferView ],	// Buffer Information
+			compLen		= Gltf[ "COMP_" + acc.type ],			// Component Length for Data Element
+			ary			= null,									// Final Type array that will be filled with data
+			byteStart	= 0,
+			byteLen		= 0,
+			TAry, 												// Reference to Type Array to create
+			DFunc; 												// Reference to GET function in Type Array
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Figure out which Type Array we need to save the data in
+		switch( acc.componentType ){
+			case Gltf.TYPE_FLOAT:			TAry = Float32Array;	DFunc = "getFloat32"; break;
+			case Gltf.TYPE_SHORT:			TAry = Int16Array;		DFunc = "getInt16"; break;
+			case Gltf.TYPE_UNSIGNED_SHORT:	TAry = Uint16Array;		DFunc = "getUint16"; break;
+			case Gltf.TYPE_UNSIGNED_INT:	TAry = Uint32Array;		DFunc = "getUint32"; break;
+			case Gltf.TYPE_UNSIGNED_BYTE: 	TAry = Uint8Array; 		DFunc = "getUint8"; break;
+
+			default: console.log("ERROR processAccessor","componentType unknown",a.componentType); return null; break;
+		}
+		
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		let out = { 
+			min 		: acc.min,
+			max 		: acc.max,
+			elm_cnt		: acc.count,
+			comp_len 	: compLen
+		};
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Data is Interleaved
+		if( bView.byteStride ){
+			if( spec_only ) console.error( "GLTF STRIDE SPEC ONLY OPTION NEEDS TO BE IMPLEMENTED ");
+			/*
+				The RiggedSimple sample seems to be using stride the wrong way. The data all works out
+				but Weight and Joint indicate stride length BUT the data is not Interleaved in the buffer.
+				They both exists in their own individual block of data just like non-Interleaved data.
+				In the sample, Vertices and Normals ARE actually Interleaved. This make it a bit
+				difficult to parse when dealing with interlanced data with WebGL Buffers.
+
+				TODO: Can prob check if not interlanced by seeing if the Stride Length equals the length 
+				of the data in question.
+				For example related to the RiggedSimple sample.
+				Stride Length == FloatByteLength(4) * Accessor.type's ComponentLength(Vec3||Vec4)
+				-- So if Stride is 16 Bytes
+				-- The data is grouped as Vec4 ( 4 Floats )
+				-- And Each Float = 4 bytes.
+				-- Then Stride 16 Bytes == Vec4 ( 4f loats * 4 Bytes )
+				-- So the stride length equals the data we're looking for, So the BufferView in question
+					IS NOT Interleaved.
+
+				By the looks of things. If the Accessor.bufferView number is shared between BufferViews
+				then there is a good chance its really Interleaved. Its ashame that things can be designed
+				to be more straight forward when it comes to Interleaved and Non-Interleaved data.
+				*/
+
+			// console.log("BView", bView );
+			// console.log("Accessor", acc );
+
+			let stride	= bView.byteStride,					// Stride Length in bytes
+				elmCnt	= acc.count, 						// How many stride elements exist.
+				bOffset	= (bView.byteOffset || 0), 			// Buffer Offset
+				sOffset	= (acc.byteOffset || 0),			// Stride Offset
+				bPer	= TAry.BYTES_PER_ELEMENT,			// How many bytes to make one value of the data type
+				aryLen	= elmCnt * compLen,					// How many "floats/ints" need for this array
+				dView 	= new DataView( bin ),				// Access to Binary Array Buffer
+				p 		= 0, 								// Position Index of Byte Array
+				j 		= 0, 								// Loop Component Length ( Like a Vec3 at a time )
+				k 		= 0;								// Position Index of new Type Array
+
+			ary	= new TAry( aryLen );						//Final Array
+
+			//Loop for each element of by stride
+			for(var i=0; i < elmCnt; i++){
+				// Buffer Offset + (Total Stride * Element Index) + Sub Offset within Stride Component
+				p = bOffset + ( stride * i ) + sOffset;	//Calc Starting position for the stride of data
+
+				//Then loop by compLen to grab stuff out of the DataView and into the Typed Array
+				for(j=0; j < compLen; j++) ary[ k++ ] = dView[ DFunc ]( p + (j * bPer) , true );
+			}
+
+			out.data = ary;
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Data is NOT Interleaved
+		// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
+		// TArray example from documentation works pretty well for data that is not interleaved.
+		}else{
+			if( spec_only ){
+				out.array_type 	= TAry.name.substring( 0, TAry.name.length - 5 );
+				out.byte_start 	= ( acc.byteOffset || 0 ) + ( bView.byteOffset || 0 );
+				out.byte_cnt	= acc.count * compLen * TAry.BYTES_PER_ELEMENT;
+				//console.log( bin );
+			}else{
+				let bOffset	= ( acc.byteOffset || 0 ) + ( bView.byteOffset || 0 );
+				out.data = new TAry( bin, bOffset, acc.count * compLen ); // ElementCount * ComponentLength
+			}
+		}
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		return out;
+	}
+
+	static get_mesh( name, json, bin, spec_only = false ){
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Find Mesh to parse out.
+		let i, n = null, mesh_idx = null;
+		for( i of json.nodes ){
+			if( i.name === name && i.mesh != undefined ){ n = i; mesh_idx = n.mesh; break; }
+		}
+
+		//No node Found, Try looking in mesh array for the name.
+		if( !n ){
+			for( i=0; i < json.meshes.length; i++ ) if( json.meshes[i].name == name ){ mesh_idx = i; break; }
+		}
+
+		if( mesh_idx == null ){
+			console.error( "Node or Mesh by the name", name, "not found in GLTF" );
+			return null;
+		}
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Loop through all the primatives that make up a single mesh
+		let m 		= json.meshes[ mesh_idx ],
+			pLen 	= m.primitives.length,
+			ary		= new Array( pLen ),
+			itm,
+			prim,
+			attr;
+
+		for( let i=0; i < pLen; i++ ){
+			//.......................................
+			// Setup some vars
+			prim	= m.primitives[ i ];
+			attr	= prim.attributes; // console.log( attr );
+			itm		= { 
+				name	: name + (( pLen != 1 )? "_p" + i : ""),
+				mode 	: ( prim.mode != undefined )? prim.mode : Gltf.MODE_TRIANGLES
+			};
+
+			//.......................................
+			// Save Position, Rotation and Scale if Available.
+			if( n ){
+				if( n.translation ) itm.position	= n.translation.slice( 0 );
+				if( n.rotation )	itm.rotation	= n.rotation.slice( 0 );
+				if( n.scale )		itm.scale		= n.scale.slice( 0 );
+			}
+
+			//.......................................
+			// Parse out all the raw Geometry Data from the Bin file
+			itm.vertices = Gltf.parse_accessor( attr.POSITION, json, bin, spec_only );
+			if( prim.indices != undefined ) 		itm.indices	= Gltf.parse_accessor( prim.indices,	json, bin, spec_only );
+			if( attr.NORMAL != undefined )			itm.normal	= Gltf.parse_accessor( attr.NORMAL,		json, bin, spec_only );
+			if( attr.TEXCOORD_0 != undefined )		itm.uv		= Gltf.parse_accessor( attr.TEXCOORD_0,	json, bin, spec_only );
+			if( attr.WEIGHTS_0 != undefined )		itm.weights	= Gltf.parse_accessor( attr.WEIGHTS_0,	json, bin, spec_only ); 
+			if( attr.JOINTS_0 != undefined )		itm.joints	= Gltf.parse_accessor( attr.JOINTS_0,	json, bin, spec_only );
+			if( attr.COLOR_0 != undefined )			itm.color	= Gltf.parse_accessor( attr.COLOR_0,	json, bin, spec_only );
+
+			//.......................................
+			// Save to return array
+			ary[ i ] = itm;
+		}
+
+		return ary;
+	}
+
+	static prim_to_geo( g ){
+		let geo = new THREE.BufferGeometry();
+		geo.setAttribute( "position", new THREE.BufferAttribute( g.vertices.data, g.vertices.comp_len ) );
+
+		if( g.indices ) geo.setIndex( new THREE.BufferAttribute( g.indices.data, 1 ) );
+		if( g.normal )	geo.setAttribute( "normal", new THREE.BufferAttribute( g.normal.data, g.normal.comp_len ) );
+		if( g.uv )		geo.setAttribute( "uv", new THREE.BufferAttribute( g.uv.data, g.uv.comp_len ) );
+		if( g.color )	geo.setAttribute( "color", new THREE.BufferAttribute( g.color.data, g.color.comp_len ) );
+
+		return geo;
+	}
+}
+
+//https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#glb-file-format-specification
+const GLB_MAGIC	= 0x46546C67;
+const GLB_JSON	= 0x4E4F534A;
+const GLB_BIN	= 0x004E4942;
+function parse_glb( arybuf ){
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	let dv		= new DataView( arybuf );
+	let magic	= dv.getUint32( 0, true );
+	if( magic != GLB_MAGIC ){
+		console.error("GLB's Magic Number does not match.");
+		return null;
+	}
+
+	let version	= dv.getUint32( 4, true );
+	if( version != 2 ){
+		console.error("GLB is number version 2.");
+		return null;
+	}
+
+	let main_blen	= dv.getUint32( 8, true );
+	//console.log( "Version :", version );
+	//console.log( "Binary Length :", main_blen );
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// LOAD CHUNK 0 & 1 TESTING
+
+	let chk0_len	= dv.getUint32( 12, true );
+	let chk0_type	= dv.getUint32( 16, true );
+
+	if( chk0_type != GLB_JSON ){
+		console.error("GLB Chunk 0 is not the type: JSON ");
+		return null;
+	}
+
+	let chk0_offset	= 20;						// Start of JSON
+	let chk1_offset	= chk0_offset + chk0_len;	// Start of BIN's 8 byte header
+
+	let chk1_len	= dv.getUint32( chk1_offset, true );
+	let chk1_type	= dv.getUint32( chk1_offset+4, true );
+
+	if( chk1_type != GLB_BIN ){ //TODO, this does not have to exist, just means no bin data.
+		console.error("GLB Chunk 1 is not the type: BIN ");
+		return null;
+	}
+
+	chk1_offset += 8; // Skip the Header
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// PARSE JSON
+	let txt_decoder	= new TextDecoder( "utf8" );
+	let json_bytes	= new Uint8Array( arybuf, chk0_offset, chk0_len );
+	let json_text	= txt_decoder.decode( json_bytes );
+	let json		= JSON.parse( json_text );
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// PARSE BIN - TODO, Not efficent to slice the array buffer
+	// but need to fix GLTF parser to have a root offset to use 
+	// original buffer.
+	let bin = arybuf.slice( chk1_offset );
+
+	if( bin.byteLength != chk1_len ){
+		console.error( "GLB Bin length does not match value in header.");
+		return null;
+	}
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	return [ json, bin ];
+}
+
+// Seeded Random Number Generator
+class RandomLCG{
+	#init = 0;
+	#seed = 0;
+	constructor( seed ){ this.reseed( seed ); }
+	reseed( seed ){ this.#init = this.#seed = seed * 48271 % 2147483647; }
+	reset(){ this.#seed = this.#init; }
+	next(){
+		this.#seed = this.#seed * 48271 % 2147483647;
+		return this.#seed / 2147483648;
+	}
+}
+
+// Create a Grid out of a Flat Array.
+class FlatGridXY{
+	cells		= null;	// Array of Cells
+	#x_cnt		= 0;	// Width of Grid
+	#y_cnt		= 0;	// Height of Grid
+	#x_max		= 0;	// Max Index for X Direction
+	#y_max		= 0;	// Max Index for Y Direction
+	#x_cnt_inv	= 0;	// Invert of X Count, Used to replace division with mul.
+
+	constructor( x, y ){
+		this.resize( x, y );
+	}
+
+	// Just a hack... meh
+	can_resize( x, y ){ return ( this.#x_cnt == x && this.#y_cnt == y )? false : true; }
+
+	resize( x, y ){
+		//console.log( "GRID RESIZE" );
+
+		if( this.#x_cnt == x && this.#y_cnt == y ) return false;
+
+		this.#x_cnt 	= x;
+		this.#y_cnt 	= y;
+		this.#x_max 	= x-1;
+		this.#y_max		= y-1;
+		this.#x_cnt_inv	= 1 / this.#x_cnt;
+
+		if( this.cells == null )	this.cells			= new Array( x*y );
+		else						this.cells.length	= x*y;
+
+		return true;
+	}
+
+	get_x(){ return this.#x_cnt; }
+	get_y(){ return this.#y_cnt; }
+	get len(){ return this.cells.length; }
+
+	// Get cell value by XY Coord
+	get( x, y ){ return this.cells[ y * this.#x_cnt + x ]; }
+
+	// Set cell value by XY Coord
+	set( x, y, v ){ return this.cells[ y * this.#x_cnt + x ] = v; return this; }
+
+	// Is the cell an Edge Cell?
+	is_edge( x, y ){ return ( x == 0 || x == this.#x_max || y == 0 || y == this.#y_max ); }
+
+	// Compute Index from XY Coord
+	index_of( x, y ){ return y * this.#x_cnt + x; }
+
+	// Compute XY Coord from Index
+	pos_of( idx ){ 
+		let y = Math.floor( idx * this.#x_cnt_inv ),
+			x = idx - y * this.#x_cnt;
+		return [x,y];
+	}
+
+	// Get a Cell that is on either side or above/below it.
+	get_neightbor_idx( idx, dir=0 ){
+		let y = Math.floor( idx * this.#x_cnt_inv ),
+			x = idx - y * this.#x_cnt;
+
+		//console.log("---- Idxxx ", idx, "Pos", x, y );
+
+		// Which Side to shift from
+		switch( dir ){
+			case 0 : y--; break; // UP
+			case 1 : x++; break; // Right
+			case 2 : y++; break; // Bottom;
+			case 3 : x--; break; // Left;
+		}
+
+		//console.log("------ Idx ", idx, "Pos", x, y );
+		// Out of Bounds Check, return nulml
+		if( x < 0 || x > this.#x_max || y < 0 || y > this.#y_max ) return null;
+
+		// Return the cell next to the requested index.
+		return y * this.#x_cnt + x;
+	}
+
+	// Pass in a function to fill in the value of each cell
+	// fn( index, x, y )
+	fill( fn ){
+		//console.log( "FILL", this.cells.length );
+
+		let i, x, y;
+		for( i=0; i < this.cells.length; i++ ){
+			y = Math.floor( i * this.#x_cnt_inv );
+			x = i - y * this.#x_cnt; // i % this.#x_cnt;
+			this.cells[ i ] = fn( i, x, y );
+		}
+		return this;
+	}
+
+	for_each( fn ){
+		let i, x, y;
+		for( i=0; i < this.cells.length; i++ ){
+			y = Math.floor( i * this.#x_cnt_inv );
+			x = i - y * this.#x_cnt; // i % this.#x_cnt;
+			fn( i, x, y, this.cells[ i ] );
+		}
+		return this;
+	}
+
+	// Iterator to loop all the cells in the grid.
+	// Returns [ index, x, y, cell_value ]
+	[Symbol.iterator](){
+		let i=0, len = this.cells.length;
+		return {
+			next : ()=>{
+				let rtn = { value:null, done:true };
+
+				if( i < len ){
+					let y = Math.floor( i * this.#x_cnt_inv ),
+						x = i - y * this.#x_cnt;
+
+					rtn.value	= { i, x, y, cell:this.cells[ i ] };
+					rtn.done	= false;
+					i++;
+				}
+
+				return rtn;
+			},
+		};
+	}
+}
+
+const IDX_BIT	= 5; // 5 bit shift, value of 32.
+const UINT_MAX	= 4294967295;
+class Bitset{
+	bits = null;
+
+	constructor( bit_cnt=1 ){
+		if( bit_cnt != null ){
+			this.bits = new Uint32Array( ( bit_cnt >>> IDX_BIT ) + 1 );
+		}
+	}
+
+	// #region MISC METHODS
+
+	//get bit_count(){ return this.bits.length * 32; }
+	get count(){
+		let i, cnt = 0;
+		
+		for( i of this.bits ){
+			i = i - ((i >> 1) & 0x55555555);
+			i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
+			cnt += (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+		}
+		return cnt;
+	}
+
+
+	reset(){
+		for( let i=0; i < this.bits.length; i++ ) this.bits[ i ] = 0;
+		return this;
+	}
+
+	copy( bs ){
+		let a_len = this.bits.length,
+			b_len = this.bits.length,
+			max_len = Math.max( a_len, b_len );
+
+		for( let i=0; i < max_len; i++ ){
+			if( i < a_len && i < b_len )	this.bits[ i ] = bs.bits[ i ];
+			else if( i < a_len )			this.bits[ i ] = 0;
+		}
+
+		return this;
+	}
+
+	clone(){
+		let bs	= new Bitset( null );
+		bs.bits	= this.bits.slice( 0 );
+		return bs;
+	}
+
+	hash(){
+		// Simple String hash algorithm rewritten to break down
+		// each int as 4 bytes to treat each byte as a char.
+		//    let hash = 5381, i = str.length;
+		//    while(i) hash = (hash * 33) ^ str.charCodeAt(--i)
+		//    return hash >>> 0; 
+
+		let b, hash = 5381;
+		for( b of this.bits ){
+			hash = (hash * 33) ^ ( b & 255 );
+			hash = (hash * 33) ^ ( (b >>> 8) & 255 );
+			hash = (hash * 33) ^ ( (b >>> 16) & 255 );
+			hash = (hash * 33) ^ ( (b >>> 24) & 255 );
+		}
+		return hash >>> 0; // Force Negative bit to Positive;
+	}
+
+	/*
+	let x, iter = bs.get_iter();
+	while( (x = iter()) != null ) console.log( x );
+	*/
+	get_iter(){
+		let i=0, len = this.bits.length * 32;
+		return ()=>{
+			let rtn = null;
+			while( i < len && rtn == null ){
+				if( (this.bits[ i >>> IDX_BIT ] & (1 << i) ) != 0 ) rtn = i;
+				i++;
+			}
+			return rtn;
+		};
+	}
+
+	get_bit_array(){
+		let i, ii, 
+			len = this.bits.length * 32,
+			ary = new Array();
+
+		for( i=0; i < len; i++ ){
+			ii = i >>> IDX_BIT;
+			if( (this.bits[ ii ] & ( 1 << i )) != 0 ) ary.push( i );
+		}
+		return ary;
+	}
+
+	// for( let i of this.#bit_set ) console.log( i );
+	[Symbol.iterator](){
+		let i=0, len = this.bits.length * 32;
+		return {
+			//return 	: ()=>{ console.log("cleanup"); return { value:undefined, done:true }; },
+			next	: ()=>{
+				let rtn = { value:null, done:true };
+				while( i < len && rtn.value == null ){
+					if( (this.bits[ i >>> IDX_BIT ] & (1 << i) ) != 0 ){
+						rtn.value	= i;
+						rtn.done	= false;
+					}
+					i++;
+				}
+				return rtn;
+			},
+		};
+	}
+	// #endregion ////////////////////////////////////////////////////////////////////////////////////////
+
+	// #region BIT OPERATIONS
+	has( bi ){
+		let i = bi >>> IDX_BIT;
+		if( i >= this.bits.length ) return false;
+		return ( this.bits[i] & (1 << bi) ) != 0;
+	}
+
+	on( bi ){
+		let i = this._resize_idx( bi );
+		this.bits[ i ] |= 1 << bi;
+		return this;
+	}
+
+	off( bi ){
+		let i = this._resize_idx( bi );
+		this.bits[ i ] &= ~(1 << bi); //Bit Shift 1, Flip all bits to create a mask, then bitAnd to set only 1s as 1.
+		return this;
+	}
+
+	flip( bi ){
+		let i = this._resize_idx( bi );
+		this.bits[ i ] ^= 1 << bi;
+		return this;
+	}
+
+	is_mask( mask ){
+		if( this.bits.length < mask.bits.length ) return false;	
+		for( let i=0; i < mask.bits.length; i++ ){
+			if( (this.bits[i] & mask.bits[i]) != mask.bits[i] ) return false;
+		}
+		return true;
+	}
+
+	and( bs ){
+		let min		= Math.min( this.bits.length, bs.bits.length ),
+			is_mod	= false,
+			test;
+
+		for( let i=0; i < min; i++ ){
+			test = this.bits[i] & bs.bits[i];
+			if( test != this.bits[i] ){
+				is_mod = true;
+				this.bits[i] = test;
+			}
+		}
+		return is_mod;
+	}
+
+	or( bs ){
+		let a_len	= this.bits.length,
+			b_len	= bs.bits.length,
+			len 	= Math.max( a_len, b_len );
+
+		// if bs is larger, resize this bitset
+		if( b_len > a_len ) this._resize_idx( b_len * 32 - 1 );
+
+		for( let i=0; i < len; i++ ) this.bits[i] |= bs.bits[i];
+		return this;
+	}
+
+	on_range( ai, bi ){
+		// TODO, This only works for a single UINT Range Set, Fix to handle more then 320
+		let zi, uint = new Uint32Array( 3 );		// Uint shifting only works if using array.
+
+		//ai = 0; bi = 19;
+		//console.log( "range", ai, bi );
+		
+		zi			= 32 - bi - 1; 					// Get Second Shifting
+		uint[ 0 ]	= ( UINT_MAX >>> ai) << ai;		// Clear out all bits before a
+		uint[ 1 ]	= ( UINT_MAX << zi) >>> zi;		// clear out all bits before b
+		uint[ 2 ]	= uint[ 0 ] & uint[ 1 ];		// Get only when both bits are 1
+		//console.log( UINT_MAX, "a", uint[ 0 ], "b", uint[ 1 ], "c", uint[ 2 ] );
+
+		this.bits[ 0 ] = uint[ 2 ];
+		return this;
+	}
+
+	on_ary( ary ){
+		let i, bi;
+		for( bi of ary ){
+			i = this._resize_idx( bi );
+			this.bits[ i ] |= 1 << bi;
+		}			
+		return this;
+	}
+	// #endregion ////////////////////////////////////////////////////////////////////////////////////////
+
+	// #region PRIVATE
+	// Calc Index by shifting away an integer value of 32
+	// then resize the bit array if index is over the current capacity.
+	_resize_idx( bi ){
+		let i = bi >>> IDX_BIT;
+		if( i >= this.bits.length ){
+			let j, ary = new Uint32Array( i+1 );
+			for( j=0; j < i; j++ ) ary[ j ] = this.bits[ j ];
+			this.bits = ary;
+		}
+		return i;
+	}
+	// #endregion ////////////////////////////////////////////////////////////////////////////////////////
+}
+
+// #endregion
+</script></body></html>
