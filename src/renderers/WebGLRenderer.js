@@ -1275,28 +1275,28 @@ function WebGLRenderer( parameters = {} ) {
 
 		const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
 
-		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
+		if ( camera.isArrayCamera ) {
 
-			const renderItem = renderList[ i ];
+			const cameras = camera.cameras;
 
-			const object = renderItem.object;
-			const geometry = renderItem.geometry;
-			const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
-			const group = renderItem.group;
+			for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
-			if ( camera.isArrayCamera ) {
+				const camera2 = cameras[ i ];
 
-				const cameras = camera.cameras;
+				state.viewport( _currentViewport.copy( camera2.viewport ) );
 
-				for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
+				currentRenderState.setupLightsView( camera2 );
 
-					const camera2 = cameras[ j ];
+				for ( let j = 0, jl = renderList.length; j < jl; j ++ ) {
+
+					const renderItem = renderList[ j ];
+
+					const object = renderItem.object;
+					const geometry = renderItem.geometry;
+					const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
+					const group = renderItem.group;
 
 					if ( object.layers.test( camera2.layers ) ) {
-
-						state.viewport( _currentViewport.copy( camera2.viewport ) );
-
-						currentRenderState.setupLightsView( camera2 );
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
@@ -1304,7 +1304,18 @@ function WebGLRenderer( parameters = {} ) {
 
 				}
 
-			} else {
+			}
+
+		} else {
+
+			for ( let j = 0, jl = renderList.length; j < jl; j ++ ) {
+
+				const renderItem = renderList[ j ];
+
+				const object = renderItem.object;
+				const geometry = renderItem.geometry;
+				const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
+				const group = renderItem.group;
 
 				renderObject( object, scene, camera, geometry, material, group );
 
