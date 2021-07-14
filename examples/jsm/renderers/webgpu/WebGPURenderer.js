@@ -360,6 +360,7 @@ class WebGPURenderer {
 		this.domElement.width = Math.floor( width * pixelRatio );
 		this.domElement.height = Math.floor( height * pixelRatio );
 
+		this._configureContext();
 		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
@@ -380,6 +381,7 @@ class WebGPURenderer {
 
 		}
 
+		this._configureContext();
 		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
@@ -901,8 +903,8 @@ class WebGPURenderer {
 
 			this._colorBuffer = this._device.createTexture( {
 				size: {
-					width: this._width * this._pixelRatio,
-					height: this._height * this._pixelRatio,
+					width: Math.floor( this._width * this._pixelRatio ),
+					height: Math.floor( this._height * this._pixelRatio ),
 					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
@@ -924,13 +926,34 @@ class WebGPURenderer {
 
 			this._depthBuffer = this._device.createTexture( {
 				size: {
-					width: this._width * this._pixelRatio,
-					height: this._height * this._pixelRatio,
+					width: Math.floor( this._width * this._pixelRatio ),
+					height: Math.floor( this._height * this._pixelRatio ),
 					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.Depth24PlusStencil8,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT
+			} );
+
+		}
+
+	}
+
+	_configureContext() {
+
+		const device = this._device;
+
+		if ( device ) {
+
+			this._context.configure( {
+				device: device,
+				format: GPUTextureFormat.BRGA8Unorm,
+				usage: GPUTextureUsage.RENDER_ATTACHMENT,
+				size: {
+					width: Math.floor( this._width * this._pixelRatio ),
+					height: Math.floor( this._height * this._pixelRatio ),
+					depthOrArrayLayers: 1
+				},
 			} );
 
 		}
