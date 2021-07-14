@@ -610,55 +610,63 @@ class FBXTreeParser {
 			switch ( type ) {
 
 				case 'Bump':
-					parameters.bumpMap = scope.getTexture(textureMap, child.ID);
+					parameters.bumpMap = scope.getTexture( textureMap, child.ID );
 					break;
 
 				case 'Maya|TEX_ao_map':
-					parameters.aoMap = scope.getTexture(textureMap, child.ID);
+					parameters.aoMap = scope.getTexture( textureMap, child.ID );
 					break;
 
 				case 'DiffuseColor':
 				case 'Maya|TEX_color_map':
-					parameters.map = scope.getTexture(textureMap, child.ID);
-					if (parameters.map !== undefined) {
+					parameters.map = scope.getTexture( textureMap, child.ID );
+					if ( parameters.map !== undefined ) {
+
 						parameters.map.encoding = sRGBEncoding;
+
 					}
 					break;
 
 				case 'DisplacementColor':
-					parameters.displacementMap = scope.getTexture(textureMap, child.ID);
+					parameters.displacementMap = scope.getTexture( textureMap, child.ID );
 					break;
 
 				case 'EmissiveColor':
-					parameters.emissiveMap = scope.getTexture(textureMap, child.ID);
-					if (parameters.emissiveMap !== undefined) {
+					parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
+					if ( parameters.emissiveMap !== undefined ) {
+
 						parameters.emissiveMap.encoding = sRGBEncoding;
+
 					}
 					break;
 					
 				case 'NormalMap':
 				case 'Maya|TEX_normal_map':
-					parameters.normalMap = scope.getTexture(textureMap, child.ID);
+					parameters.normalMap = scope.getTexture( textureMap, child.ID );
 					break;
 
 				case 'ReflectionColor':
-					parameters.envMap = scope.getTexture(textureMap, child.ID);
-					if (parameters.envMap !== undefined) {
+					parameters.envMap = scope.getTexture( textureMap, child.ID );
+					if ( parameters.envMap !== undefined ) {
+
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
 						parameters.envMap.encoding = sRGBEncoding;
+
 					}
 					break;
 
 				case 'SpecularColor':
-					parameters.specularMap = scope.getTexture(textureMap, child.ID);
-					if (parameters.specularMap !== undefined) {
+					parameters.specularMap = scope.getTexture( textureMap, child.ID );
+					if ( parameters.specularMap !== undefined ) {
+
 						parameters.specularMap.encoding = sRGBEncoding;
+
 					}
 					break;
 
 				case 'TransparentColor':
 				case 'TransparencyFactor':
-					parameters.alphaMap = scope.getTexture(textureMap, child.ID);
+					parameters.alphaMap = scope.getTexture( textureMap, child.ID );
 					parameters.transparent = true;
 					break;
 
@@ -691,11 +699,16 @@ class FBXTreeParser {
 
 		const texture = textureMap.get( id );
 
-		if (texture.image !== undefined) {
+		if ( texture.image !== undefined ) {
+
 			return texture;
+
 		} else {
+
 			return undefined;
+
 		}
+
 	}
 
 	// Parse nodes in FBXTree.Objects.Deformer
