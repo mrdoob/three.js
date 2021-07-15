@@ -192,8 +192,7 @@ function Loader( editor ) {
 						} else {
 
 							var material = new THREE.PointsMaterial( { size: 0.01 } );
-
-							if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+							material.vertexColors = geometry.hasAttribute( 'color' );
 
 							object = new THREE.Points( geometry, material );
 							object.name = filename;
@@ -450,8 +449,7 @@ function Loader( editor ) {
 					} else {
 
 						var material = new THREE.PointsMaterial( { size: 0.01 } );
-
-						if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+						material.vertexColors = geometry.hasAttribute( 'color' );
 
 						object = new THREE.Points( geometry, material );
 						object.name = filename;
