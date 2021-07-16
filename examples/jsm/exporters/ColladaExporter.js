@@ -25,7 +25,35 @@ class ColladaExporter {
 			version: '1.4.1',
 			author: null,
 			textureDirectory: '',
+			upAxis: 'Y_UP',
+			unitName: null,
+			unitMeter: null,
 		}, options );
+
+		if (options.upAxis.match(/^[XYZ]_UP$/) === null) {
+
+			console.error('ColladaExporter: Invalid upAxis: valid values are X_UP, Y_UP or Z_UP.');
+			return null;
+
+		}
+
+		if ( (options.unitName === null) !== (options.unitMeter === null) ) {
+
+			if ( options.unitMeter === null ) {
+
+				console.error('ColladaExporter: unitMeter needs to be specified if unitName is specified.');
+
+			}
+
+			if ( options.unitName === null ) {
+
+				console.error('ColladaExporter: unitName needs to be specified if unitMeter is specified.');
+
+			}
+
+			return null;
+
+		}
 
 		if ( options.textureDirectory !== '' ) {
 
@@ -633,7 +661,8 @@ class ColladaExporter {
 				'</contributor>' +
 				`<created>${ ( new Date() ).toISOString() }</created>` +
 				`<modified>${ ( new Date() ).toISOString() }</modified>` +
-				'<up_axis>Y_UP</up_axis>'
+				( options.unitName !== null ? `<unit name="${ options.unitName }" meter="${ options.unitMeter }" />` : "" ) +
+				`<up_axis>${ options.upAxis }</up_axis>`
 			) +
 			'</asset>';
 
