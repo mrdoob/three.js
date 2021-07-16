@@ -353,13 +353,12 @@ function Loader( editor ) {
 					var { IFCLoader } = await import( '../../examples/jsm/loaders/IFCLoader.js' );
 
 					var loader = new IFCLoader();
-					loader.setWasmPath( '../../examples/jsm/loaders/ifc/' );
+					loader.ifcManager.setWasmPath( '../../examples/jsm/loaders/ifc/' );
 
-					var scene = await loader.parse( event.target.result );
+					var model = await loader.parse( event.target.result );
+					model.mesh.name = filename;
 
-					scene.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, scene ) );
+					editor.execute( new AddObjectCommand( editor, model.mesh ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
