@@ -16424,6 +16424,7 @@
 			let glBinding = null;
 			let glFramebuffer = null;
 			let glProjLayer = null;
+			let glBaseLayer = null;
 			const controllers = [];
 			const inputSourcesMap = new Map(); //
 
@@ -16556,31 +16557,43 @@
 							depth: attributes.depth,
 							stencil: attributes.stencil,
 							framebufferScaleFactor: framebufferScaleFactor
-						}; // eslint-disable-next-line no-undef
-
-						const baseLayer = new XRWebGLLayer(session, gl, layerInit);
+						};
+						glBaseLayer = new XRWebGLLayer(session, gl, layerInit);
 						session.updateRenderState({
-							baseLayer: baseLayer
+							baseLayer: glBaseLayer
 						});
 					} else {
-						let depthFormat = 0;
+						let depthFormat = 0; // for anti-aliased output, use classic webgllayer for now
 
-						if (attributes.depth) {
-							depthFormat = attributes.stencil ? gl.DEPTH_STENCIL : gl.DEPTH_COMPONENT;
+						if (attributes.antialias) {
+							const layerInit = {
+								antialias: true,
+								alpha: attributes.alpha,
+								depth: attributes.depth,
+								stencil: attributes.stencil,
+								framebufferScaleFactor: framebufferScaleFactor
+							};
+							glBaseLayer = new XRWebGLLayer(session, gl, layerInit);
+							session.updateRenderState({
+								layers: [glBaseLayer]
+							});
+						} else {
+							if (attributes.depth) {
+								depthFormat = attributes.stencil ? gl.DEPTH_STENCIL : gl.DEPTH_COMPONENT;
+							}
+
+							const projectionlayerInit = {
+								colorFormat: attributes.alpha ? gl.RGBA : gl.RGB,
+								depthFormat: depthFormat,
+								scaleFactor: framebufferScaleFactor
+							};
+							glBinding = new XRWebGLBinding(session, gl);
+							glProjLayer = glBinding.createProjectionLayer(projectionlayerInit);
+							glFramebuffer = gl.createFramebuffer();
+							session.updateRenderState({
+								layers: [glProjLayer]
+							});
 						}
-
-						const projectionlayerInit = {
-							colorFormat: attributes.alpha ? gl.RGBA : gl.RGB,
-							depthFormat: depthFormat,
-							scaleFactor: framebufferScaleFactor
-						}; // eslint-disable-next-line no-undef
-
-						glBinding = new XRWebGLBinding(session, gl);
-						glProjLayer = glBinding.createProjectionLayer(projectionlayerInit);
-						glFramebuffer = gl.createFramebuffer();
-						session.updateRenderState({
-							layers: [glProjLayer]
-						});
 					}
 
 					referenceSpace = await session.requestReferenceSpace(referenceSpaceType);
@@ -16744,10 +16757,9 @@
 
 				if (pose !== null) {
 					const views = pose.views;
-					const baseLayer = session.renderState.baseLayer;
 
-					if (session.renderState.layers === undefined) {
-						state.bindXRFramebuffer(baseLayer.framebuffer);
+					if (glBaseLayer !== null) {
+						state.bindXRFramebuffer(glBaseLayer.framebuffer);
 					}
 
 					let cameraVRNeedsUpdate = false; // check if it's necessary to rebuild cameraVR's camera list
@@ -16761,17 +16773,17 @@
 						const view = views[i];
 						let viewport = null;
 
-						if (session.renderState.layers === undefined) {
-							viewport = baseLayer.getViewport(view);
+						if (glBaseLayer !== null) {
+							viewport = glBaseLayer.getViewport(view);
 						} else {
 							const glSubImage = glBinding.getViewSubImage(glProjLayer, view);
 							state.bindXRFramebuffer(glFramebuffer);
-							gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
 
 							if (glSubImage.depthStencilTexture !== undefined) {
 								gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0);
 							}
 
+							gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
 							viewport = glSubImage.viewport;
 						}
 

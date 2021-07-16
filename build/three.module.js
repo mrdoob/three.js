@@ -22196,6 +22196,7 @@ class WebXRManager extends EventDispatcher {
 		let glBinding = null;
 		let glFramebuffer = null;
 		let glProjLayer = null;
+		let glBaseLayer = null;
 
 		const controllers = [];
 		const inputSourcesMap = new Map();
@@ -22382,35 +22383,52 @@ class WebXRManager extends EventDispatcher {
 						framebufferScaleFactor: framebufferScaleFactor
 					};
 
-					// eslint-disable-next-line no-undef
-					const baseLayer = new XRWebGLLayer( session, gl, layerInit );
+					glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
 
-					session.updateRenderState( { baseLayer: baseLayer } );
+					session.updateRenderState( { baseLayer: glBaseLayer } );
 
 				} else {
 
 					let depthFormat = 0;
 
-					if ( attributes.depth ) {
+					// for anti-aliased output, use classic webgllayer for now
+					if ( attributes.antialias ) {
 
-						depthFormat = attributes.stencil ? 34041 : 6402;
+						const layerInit = {
+							antialias: true,
+							alpha: attributes.alpha,
+							depth: attributes.depth,
+							stencil: attributes.stencil,
+							framebufferScaleFactor: framebufferScaleFactor
+						};
+
+						glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
+
+						session.updateRenderState( { layers: [ glBaseLayer ] } );
+
+					} else {
+
+						if ( attributes.depth ) {
+
+							depthFormat = attributes.stencil ? 34041 : 6402;
+
+						}
+
+						const projectionlayerInit = {
+							colorFormat: attributes.alpha ? 6408 : 6407,
+							depthFormat: depthFormat,
+							scaleFactor: framebufferScaleFactor
+						};
+
+						glBinding = new XRWebGLBinding( session, gl );
+
+						glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+						glFramebuffer = gl.createFramebuffer();
+
+						session.updateRenderState( { layers: [ glProjLayer ] } );
 
 					}
-
-					const projectionlayerInit = {
-						colorFormat: attributes.alpha ? 6408 : 6407,
-						depthFormat: depthFormat,
-						scaleFactor: framebufferScaleFactor
-					};
-
-					// eslint-disable-next-line no-undef
-					glBinding = new XRWebGLBinding( session, gl );
-
-					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
-
-					glFramebuffer = gl.createFramebuffer();
-
-					session.updateRenderState( { layers: [ glProjLayer ] } );
 
 				}
 
@@ -22632,11 +22650,9 @@ class WebXRManager extends EventDispatcher {
 
 				const views = pose.views;
 
-				const baseLayer = session.renderState.baseLayer;
+				if ( glBaseLayer !== null ) {
 
-				if ( session.renderState.layers === undefined ) {
-
-					state.bindXRFramebuffer( baseLayer.framebuffer );
+					state.bindXRFramebuffer( glBaseLayer.framebuffer );
 
 				}
 
@@ -22659,9 +22675,9 @@ class WebXRManager extends EventDispatcher {
 
 					let viewport = null;
 
-					if ( session.renderState.layers === undefined ) {
+					if ( glBaseLayer !== null ) {
 
-						viewport = baseLayer.getViewport( view );
+						viewport = glBaseLayer.getViewport( view );
 
 					} else {
 
@@ -22669,13 +22685,13 @@ class WebXRManager extends EventDispatcher {
 
 						state.bindXRFramebuffer( glFramebuffer );
 
-						gl.framebufferTexture2D( 36160, 36064, 3553, glSubImage.colorTexture, 0 );
-
 						if ( glSubImage.depthStencilTexture !== undefined ) {
 
 							gl.framebufferTexture2D( 36160, 36096, 3553, glSubImage.depthStencilTexture, 0 );
 
 						}
+
+						gl.framebufferTexture2D( 36160, 36064, 3553, glSubImage.colorTexture, 0 );
 
 						viewport = glSubImage.viewport;
 
@@ -22723,6 +22739,7 @@ class WebXRManager extends EventDispatcher {
 		}
 
 		const animation = new WebGLAnimation();
+
 		animation.setAnimationLoop( onAnimationFrame );
 
 		this.setAnimationLoop = function ( callback ) {
