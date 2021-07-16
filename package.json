@@ -44,7 +44,9 @@
       "ZSTDDecoder": true,
       "bodymovin": true,
       "OIMO": true,
-      "Stats": true
+      "Stats": true,
+      "XRWebGLBinding": true,
+      "XRWebGLLayer": true
     },
     "rules": {
       "quotes": [

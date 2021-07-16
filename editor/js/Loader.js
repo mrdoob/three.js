@@ -192,8 +192,7 @@ function Loader( editor ) {
 						} else {
 
 							var material = new THREE.PointsMaterial( { size: 0.01 } );
-
-							if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+							material.vertexColors = geometry.hasAttribute( 'color' );
 
 							object = new THREE.Points( geometry, material );
 							object.name = filename;
@@ -354,13 +353,12 @@ function Loader( editor ) {
 					var { IFCLoader } = await import( '../../examples/jsm/loaders/IFCLoader.js' );
 
 					var loader = new IFCLoader();
-					loader.setWasmPath( '../../examples/jsm/loaders/ifc/' );
+					loader.ifcManager.setWasmPath( '../../examples/jsm/loaders/ifc/' );
 
-					var scene = await loader.parse( event.target.result );
+					var model = await loader.parse( event.target.result );
+					model.mesh.name = filename;
 
-					scene.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, scene ) );
+					editor.execute( new AddObjectCommand( editor, model.mesh ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -382,6 +380,31 @@ function Loader( editor ) {
 
 				}, false );
 				reader.readAsArrayBuffer( file );
+
+				break;
+
+			case 'ldr':
+			case 'mpd':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					var { LDrawLoader } = await import( '../../examples/jsm/loaders/LDrawLoader.js' );
+
+					var loader = new LDrawLoader();
+					loader.fileMap = {}; // TODO Uh...
+					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
+					loader.parse( event.target.result, undefined, function ( group ) {
+
+						group.name = filename;
+						// Convert from LDraw coordinates: rotate 180 degrees around OX
+						group.rotation.x = Math.PI;
+
+						editor.execute( new AddObjectCommand( editor, group ) );
+
+					} );
+
+				}, false );
+				reader.readAsText( file );
 
 				break;
 
@@ -438,12 +461,26 @@ function Loader( editor ) {
 					var { PLYLoader } = await import( '../../examples/jsm/loaders/PLYLoader.js' );
 
 					var geometry = new PLYLoader().parse( contents );
-					var material = new THREE.MeshStandardMaterial();
+					var object;
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
+					if ( geometry.index !== null ) {
 
-					editor.execute( new AddObjectCommand( editor, mesh ) );
+						var material = new THREE.MeshStandardMaterial();
+
+						object = new THREE.Mesh( geometry, material );
+						object.name = filename;
+
+					} else {
+
+						var material = new THREE.PointsMaterial( { size: 0.01 } );
+						material.vertexColors = geometry.hasAttribute( 'color' );
+
+						object = new THREE.Points( geometry, material );
+						object.name = filename;
+
+					}
+
+					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
