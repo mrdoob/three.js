@@ -27,6 +27,8 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+
 			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
 
 			let container, progressBarDiv;
@@ -34,8 +36,6 @@
 			let camera, scene, renderer, controls, gui, guiData;
 
 			let model, textureCube;
-
-			let envMapActivated = false;
 
 			const ldrawPath = 'models/ldraw/officialLibrary/';
 
@@ -70,24 +70,21 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 150, 200, 250 );
 
-				// scene
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xdeebed );
-
-				const ambientLight = new THREE.AmbientLight( 0xdeebed, 0.4 );
-				scene.add( ambientLight );
-
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( - 1000, 1200, 1500 );
-				scene.add( directionalLight );
-
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
+
+				// scene
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xdeebed );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 
@@ -95,7 +92,6 @@
 
 				guiData = {
 					modelFileName: modelFileList[ 'Car' ],
-					envMapActivated: false,
 					separateObjects: false,
 					displayLines: true,
 					conditionalLines: true,
@@ -183,38 +179,6 @@
 
 						scene.add( model );
 
-						// Adjust materials
-
-						const materials = lDrawLoader.materials;
-
-						if ( envMapActivated ) {
-
-							if ( ! textureCube ) {
-
-								// Envmap texture
-								const r = "textures/cube/Bridge2/";
-								const urls = [ r + "posx.jpg", r + "negx.jpg",
-									r + "posy.jpg", r + "negy.jpg",
-									r + "posz.jpg", r + "negz.jpg" ];
-								textureCube = new THREE.CubeTextureLoader().load( urls );
-								textureCube.mapping = THREE.CubeReflectionMapping;
-
-							}
-
-							for ( let i = 0, n = materials.length; i < n; i ++ ) {
-
-								const material = materials[ i ];
-
-								if ( material.userData.canHaveEnvMap ) {
-
-									material.envMap = textureCube;
-
-								}
-
-							}
-
-						}
-
 						guiData.constructionStep = model.userData.numConstructionSteps - 1;
 
 						updateObjectsVisibility();
@@ -285,13 +249,6 @@
 					}
 
 				}
-
-				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function changeEnvMap( value ) {
-
-					envMapActivated = value;
-					reloadObject( false );
-
-				} );
 
 				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals() {
 
