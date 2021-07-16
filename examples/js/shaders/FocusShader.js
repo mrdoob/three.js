@@ -23,7 +23,11 @@
 				value: 0.00125
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+  /* glsl */
+  `
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -31,7 +35,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform float screenWidth;
+		fragmentShader:
+  /* glsl */
+  `
+
+		uniform float screenWidth;
 		uniform float screenHeight;
 		uniform float sampleDistance;
 		uniform float waveFactor;
@@ -54,7 +62,7 @@
 
 			f = ( waveFactor * 100.0 + sample_dist ) * sampleDistance * 4.0;
 
-			vec2 sampleSize = vec2(	1.0 / screenWidth, 1.0 / screenHeight ) * vec2( f );
+			vec2 sampleSize = vec2(  1.0 / screenWidth, 1.0 / screenHeight ) * vec2( f );
 
 			add += tmp = texture2D( tDiffuse, uv + vec2( 0.111964, 0.993712 ) * sampleSize );
 			if( tmp.b < color.b ) color = tmp;

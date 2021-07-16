@@ -2,9 +2,9 @@
 
 	/**
  * Dependencies
- *	- mmd-parser https://github.com/takahirox/mmd-parser
- *	- THREE.TGALoader
- *	- OutlineEffect
+ *  - mmd-parser https://github.com/takahirox/mmd-parser
+ *  - THREE.TGALoader
+ *  - OutlineEffect
  *
  * MMDLoader creates Three.js Objects from MMD resources as
  * PMD, PMX, VMD, and VPD files.
@@ -13,20 +13,20 @@
  * VPD is a posing data format used in MMD(Miku Miku Dance).
  *
  * MMD official site
- *	- https://sites.google.com/view/evpvp/
+ *  - https://sites.google.com/view/evpvp/
  *
  * PMD, VMD format (in Japanese)
- *	- http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
+ *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
  *
  * PMX format
- *	- https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
+ *  - https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
  *
  * TODO
- *	- light motion in vmd support.
- *	- SDEF support.
- *	- uv/material/bone morphing support.
- *	- more precise grant skinning support.
- *	- shadow support.
+ *  - light motion in vmd support.
+ *  - SDEF support.
+ *  - uv/material/bone morphing support.
+ *  - more precise grant skinning support.
+ *  - shadow support.
  */
 
 	/**
@@ -46,9 +46,9 @@
 
 		}
 		/**
-	 * @param {string} animationPath
-	 * @return {MMDLoader}
-	 */
+   * @param {string} animationPath
+   * @return {MMDLoader}
+   */
 
 
 		setAnimationPath( animationPath ) {
@@ -59,13 +59,13 @@
 		} // Load MMD assets as Three.js Object
 
 		/**
-	 * Loads Model file (.pmd or .pmx) as a THREE.SkinnedMesh.
-	 *
-	 * @param {string} url - url to Model(.pmd or .pmx) file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads Model file (.pmd or .pmx) as a THREE.SkinnedMesh.
+   *
+   * @param {string} url - url to Model(.pmd or .pmx) file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		load( url, onLoad, onProgress, onError ) {
@@ -106,15 +106,15 @@
 
 		}
 		/**
-	 * Loads Motion file(s) (.vmd) as a THREE.AnimationClip.
-	 * If two or more files are specified, they'll be merged.
-	 *
-	 * @param {string|Array<string>} url - url(s) to animation(.vmd) file(s)
-	 * @param {SkinnedMesh|THREE.Camera} object - tracks will be fitting to this object
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads Motion file(s) (.vmd) as a THREE.AnimationClip.
+   * If two or more files are specified, they'll be merged.
+   *
+   * @param {string|Array<string>} url - url(s) to animation(.vmd) file(s)
+   * @param {SkinnedMesh|THREE.Camera} object - tracks will be fitting to this object
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadAnimation( url, object, onLoad, onProgress, onError ) {
@@ -128,16 +128,16 @@
 
 		}
 		/**
-	 * Loads mode file and motion file(s) as an object containing
-	 * a THREE.SkinnedMesh and a THREE.AnimationClip.
-	 * Tracks of THREE.AnimationClip are fitting to the model.
-	 *
-	 * @param {string} modelUrl - url to Model(.pmd or .pmx) file
-	 * @param {string|Array{string}} vmdUrl - url(s) to animation(.vmd) file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads mode file and motion file(s) as an object containing
+   * a THREE.SkinnedMesh and a THREE.AnimationClip.
+   * Tracks of THREE.AnimationClip are fitting to the model.
+   *
+   * @param {string} modelUrl - url to Model(.pmd or .pmx) file
+   * @param {string|Array{string}} vmdUrl - url(s) to animation(.vmd) file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadWithAnimation( modelUrl, vmdUrl, onLoad, onProgress, onError ) {
@@ -159,13 +159,13 @@
 		} // Load MMD assets as Object data parsed by MMDParser
 
 		/**
-	 * Loads .pmd file as an Object.
-	 *
-	 * @param {string} url - url to .pmd file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .pmd file as an Object.
+   *
+   * @param {string} url - url to .pmd file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadPMD( url, onLoad, onProgress, onError ) {
@@ -180,13 +180,13 @@
 
 		}
 		/**
-	 * Loads .pmx file as an Object.
-	 *
-	 * @param {string} url - url to .pmx file
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .pmx file as an Object.
+   *
+   * @param {string} url - url to .pmx file
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadPMX( url, onLoad, onProgress, onError ) {
@@ -201,14 +201,14 @@
 
 		}
 		/**
-	 * Loads .vmd file as an Object. If two or more files are specified
-	 * they'll be merged.
-	 *
-	 * @param {string|Array<string>} url - url(s) to .vmd file(s)
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .vmd file as an Object. If two or more files are specified
+   * they'll be merged.
+   *
+   * @param {string|Array<string>} url - url(s) to .vmd file(s)
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadVMD( url, onLoad, onProgress, onError ) {
@@ -234,14 +234,14 @@
 
 		}
 		/**
-	 * Loads .vpd file as an Object.
-	 *
-	 * @param {string} url - url to .vpd file
-	 * @param {boolean} isUnicode
-	 * @param {function} onLoad
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 */
+   * Loads .vpd file as an Object.
+   *
+   * @param {string} url - url to .vpd file
+   * @param {boolean} isUnicode
+   * @param {function} onLoad
+   * @param {function} onProgress
+   * @param {function} onError
+   */
 
 
 		loadVPD( url, isUnicode, onLoad, onProgress, onError ) {
@@ -291,7 +291,8 @@
 	 */
 
 
-	const DEFAULT_TOON_TEXTURES = [ 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/bWiiMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh8aBHZBl14e8wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOUlEQVRYR+3WMREAMAwDsYY/yoDI7MLwIiP40+RJklfcCCBAgAABAgTqArfb/QMCCBAgQIAAgbbAB3z/e0F3js2cAAAAAElFTkSuQmCC', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/B5ilMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh81dWyx0gFwKAAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOklEQVRYR+3WoREAMAwDsWb/UQtCy9wxTOQJ/oQ8SXKKGwEECBAgQIBAXeDt7f4BAQQIECBAgEBb4AOz8Hzx7WLY4wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABPUlEQVRYR+1XwW7CMAy1+f9fZOMysSEOEweEOPRNdm3HbdOyIhAcklPrOs/PLy9RygBALxzcCDQFmgJNgaZAU6Ap0BR4PwX8gsRMVLssMRH5HcpzJEaWL7EVg9F1IHRlyqQohgVr4FGUlUcMJSjcUlDw0zvjeun70cLWmneoyf7NgBTQSniBTQQSuJAZsOnnaczjIMb5hCiuHKxokCrJfVnrctyZL0PkJAJe1HMil4nxeyi3Ypfn1kX51jpPvo/JeCNC4PhVdHdJw2XjBR8brF8PEIhNVn12AgP7uHsTBguBn53MUZCqv7Lp07Pn5k1Ro+uWmUNn7D+M57rtk7aG0Vo73xyF/fbFf0bPJjDXngnGocDTdFhygZjwUQrMNrDcmZlQT50VJ/g/UwNyHpu778+yW+/ksOz/BFo54P4AsUXMfRq7XWsAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMElEQVRYR+2Xv4pTQRTGf2dubhLdICiii2KnYKHVolhauKWPoGAnNr6BD6CvIVaihYuI2i1ia0BY0MZGRHQXjZj/mSPnnskfNWiWZUlzJ5k7M2cm833nO5Mziej2DWWJRUoCpQKlAntSQCqgw39/iUWAGmh37jrRnVsKlgpiqmkoGVABA7E57fvY+pJDdgKqF6HzFCSADkDq+F6AHABtQ+UMVE5D7zXod7fFNhTEckTbj5XQgHzNN+5tQvc5NG7C6BNkp6D3EmpXHDR+dQAjFLchW3VS9rlw3JBh+B7ys5Cf9z0GW1C/7P32AyBAOAz1q4jGliIH3YPuBnSfQX4OGreTIgEYQb/pBDtPnEQ4CivXYPAWBk13oHrB54yA9QuSn2H4AcKRpEILDt0BUzj+RLR1V5EqjD66NPRBVpLcQwjHoHYJOhsQv6U4mnzmrIXJCFr4LDwm/xBUoboG9XX4cc9VKdYoSA2yk5NQLJaKDUjTBoveG3Z2TElTxwjNK4M3LEZgUdDdruvcXzKBpStgp2NPiWi3ks9ZXxIoFVi+AvHLdc9TqtjL3/aYjpPlrzOcEnK62Szhimdd7xX232zFDTgtxezOu3WNMRLjiKgjtOhHVMd1loynVHvOgjuIIJMaELEqhJAV/RCSLbWTcfPFakFgFlALTRRvx+ok6Hlp/Q+v3fmx90bMyUzaEAhmM3KvHlXTL5DxnbGf/1M8RNNACLL5MNtPxP/mypJAqcDSFfgFhpYqWUzhTEAAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=' ]; // Builders. They build Three.js object from Object data parsed by MMDParser.
+	const DEFAULT_TOON_TEXTURES = [ 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/bWiiMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh8aBHZBl14e8wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOUlEQVRYR+3WMREAMAwDsYY/yoDI7MLwIiP40+RJklfcCCBAgAABAgTqArfb/QMCCBAgQIAAgbbAB3z/e0F3js2cAAAAAElFTkSuQmCC', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/B5ilMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh81dWyx0gFwKAAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOklEQVRYR+3WoREAMAwDsWb/UQtCy9wxTOQJ/oQ8SXKKGwEECBAgQIBAXeDt7f4BAQQIECBAgEBb4AOz8Hzx7WLY4wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABPUlEQVRYR+1XwW7CMAy1+f9fZOMysSEOEweEOPRNdm3HbdOyIhAcklPrOs/PLy9RygBALxzcCDQFmgJNgaZAU6Ap0BR4PwX8gsRMVLssMRH5HcpzJEaWL7EVg9F1IHRlyqQohgVr4FGUlUcMJSjcUlDw0zvjeun70cLWmneoyf7NgBTQSniBTQQSuJAZsOnnaczjIMb5hCiuHKxokCrJfVnrctyZL0PkJAJe1HMil4nxeyi3Ypfn1kX51jpPvo/JeCNC4PhVdHdJw2XjBR8brF8PEIhNVn12AgP7uHsTBguBn53MUZCqv7Lp07Pn5k1Ro+uWmUNn7D+M57rtk7aG0Vo73xyF/fbFf0bPJjDXngnGocDTdFhygZjwUQrMNrDcmZlQT50VJ/g/UwNyHpu778+yW+/ksOz/BFo54P4AsUXMfRq7XWsAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMElEQVRYR+2Xv4pTQRTGf2dubhLdICiii2KnYKHVolhauKWPoGAnNr6BD6CvIVaihYuI2i1ia0BY0MZGRHQXjZj/mSPnnskfNWiWZUlzJ5k7M2cm833nO5Mziej2DWWJRUoCpQKlAntSQCqgw39/iUWAGmh37jrRnVsKlgpiqmkoGVABA7E57fvY+pJDdgKqF6HzFCSADkDq+F6AHABtQ+UMVE5D7zXod7fFNhTEckTbj5XQgHzNN+5tQvc5NG7C6BNkp6D3EmpXHDR+dQAjFLchW3VS9rlw3JBh+B7ys5Cf9z0GW1C/7P32AyBAOAz1q4jGliIH3YPuBnSfQX4OGreTIgEYQb/pBDtPnEQ4CivXYPAWBk13oHrB54yA9QuSn2H4AcKRpEILDt0BUzj+RLR1V5EqjD66NPRBVpLcQwjHoHYJOhsQv6U4mnzmrIXJCFr4LDwm/xBUoboG9XX4cc9VKdYoSA2yk5NQLJaKDUjTBoveG3Z2TElTxwjNK4M3LEZgUdDdruvcXzKBpStgp2NPiWi3ks9ZXxIoFVi+AvHLdc9TqtjL3/aYjpPlrzOcEnK62Szhimdd7xX232zFDTgtxezOu3WNMRLjiKgjtOhHVMd1loynVHvOgjuIIJMaELEqhJAV/RCSLbWTcfPFakFgFlALTRRvx+ok6Hlp/Q+v3fmx90bMyUzaEAhmM3KvHlXTL5DxnbGf/1M8RNNACLL5MNtPxP/mypJAqcDSFfgFhpYqWUzhTEAAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=' ];
+	const NON_ALPHA_CHANNEL_FORMATS = [ THREE.RGB_S3TC_DXT1_Format, THREE.RGB_PVRTC_4BPPV1_Format, THREE.RGB_PVRTC_2BPPV1_Format, THREE.RGB_ETC1_Format, THREE.RGB_ETC2_Format ]; // Builders. They build Three.js object from Object data parsed by MMDParser.
 
 	/**
  * @param {THREE.LoadingManager} manager
@@ -307,9 +308,9 @@
 
 		}
 		/**
-	 * @param {string} crossOrigin
-	 * @return {MeshBuilder}
-	 */
+   * @param {string} crossOrigin
+   * @return {MeshBuilder}
+   */
 
 
 		setCrossOrigin( crossOrigin ) {
@@ -319,12 +320,12 @@
 
 		}
 		/**
-	 * @param {Object} data - parsed PMD/PMX data
-	 * @param {string} resourcePath
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 * @return {SkinnedMesh}
-	 */
+   * @param {Object} data - parsed PMD/PMX data
+   * @param {string} resourcePath
+   * @param {function} onProgress
+   * @param {function} onError
+   * @return {SkinnedMesh}
+   */
 
 
 		build( data, resourcePath, onProgress, onError ) {
@@ -396,9 +397,9 @@
 	class GeometryBuilder {
 
 		/**
-	 * @param {Object} data - parsed PMD/PMX data
-	 * @return {BufferGeometry}
-	 */
+   * @param {Object} data - parsed PMD/PMX data
+   * @return {BufferGeometry}
+   */
 		build( data ) {
 
 			// for geometry
@@ -754,19 +755,19 @@
 						updateAttributes( attribute, morph, 1.0 );
 
 					} else if ( morph.type === 2 ) { // bone
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 3 ) { // uv
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 4 ) { // additional uv1
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 5 ) { // additional uv2
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 6 ) { // additional uv3
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 7 ) { // additional uv4
-					// TODO: implement
+						// TODO: implement
 					} else if ( morph.type === 8 ) { // material
-					// TODO: implement
+						// TODO: implement
 					}
 
 				}
@@ -788,10 +789,10 @@
 
 				}
 				/*
-				 * RigidBody position parameter in PMX seems global position
-				 * while the one in PMD seems offset from corresponding bone.
-				 * So unify being offset.
-				 */
+      	 * RigidBody position parameter in PMX seems global position
+      	 * while the one in PMD seems offset from corresponding bone.
+      	 * So unify being offset.
+      	 */
 
 
 				if ( data.metadata.format === 'pmx' ) {
@@ -892,9 +893,9 @@
 
 		}
 		/**
-	 * @param {string} crossOrigin
-	 * @return {MaterialBuilder}
-	 */
+   * @param {string} crossOrigin
+   * @return {MaterialBuilder}
+   */
 
 
 		setCrossOrigin( crossOrigin ) {
@@ -904,9 +905,9 @@
 
 		}
 		/**
-	 * @param {string} resourcePath
-	 * @return {MaterialBuilder}
-	 */
+   * @param {string} resourcePath
+   * @return {MaterialBuilder}
+   */
 
 
 		setResourcePath( resourcePath ) {
@@ -916,12 +917,12 @@
 
 		}
 		/**
-	 * @param {Object} data - parsed PMD/PMX data
-	 * @param {BufferGeometry} geometry - some properties are dependend on geometry
-	 * @param {function} onProgress
-	 * @param {function} onError
-	 * @return {Array<MeshToonMaterial>}
-	 */
+   * @param {Object} data - parsed PMD/PMX data
+   * @param {BufferGeometry} geometry - some properties are dependend on geometry
+   * @param {function} onProgress
+   * @param {function} onError
+   * @return {Array<MMDToonMaterial>}
+   */
 
 
 		build( data, geometry
@@ -936,27 +937,29 @@
 
 				const material = data.materials[ i ];
 				const params = {
-					userData: {}
+					userData: {
+						MMD: {}
+					}
 				};
 				if ( material.name !== undefined ) params.name = material.name;
 				/*
-				 * THREE.Color
-				 *
-				 * MMD				 THREE.MeshToonMaterial
-				 * diffuse	-	color
-				 * ambient	-	emissive * a
-				 *							 (a = 1.0 without map texture or 0.2 with map texture)
-				 *
-				 * THREE.MeshToonMaterial doesn't have ambient. Set it to emissive instead.
-				 * It'll be too bright if material has map texture so using coef 0.2.
-				 */
+      	 * THREE.Color
+      	 *
+      	 * MMD         MMDToonMaterial
+      	 * ambient  -  emissive * a
+      	 *               (a = 1.0 without map texture or 0.2 with map texture)
+      	 *
+      	 * MMDToonMaterial doesn't have ambient. Set it to emissive instead.
+      	 * It'll be too bright if material has map texture so using coef 0.2.
+      	 */
 
-				params.color = new THREE.Color().fromArray( material.diffuse );
+				params.diffuse = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
+				params.specular = new THREE.Color().fromArray( material.specular );
+				params.shininess = material.shininess;
 				params.emissive = new THREE.Color().fromArray( material.ambient );
 				params.transparent = params.opacity !== 1.0; //
 
-				params.skinning = geometry.bones.length > 0 ? true : false;
 				params.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 				params.fog = true; // blend
 
@@ -1016,15 +1019,21 @@
 					// map
 					if ( material.textureIndex !== - 1 ) {
 
-						params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
+						params.map = this._loadTexture( data.textures[ material.textureIndex ], textures ); // Since PMX spec don't have standard to list map files except color map and env map,
+						// we need to save file name for further mapping, like matching normal map file names after model loaded.
+						// ref: https://gist.github.com/felixjones/f8a06bd48f9da9a4539f#texture
+
+						params.userData.MMD.mapFileName = data.textures[ material.textureIndex ];
 
 					} // envMap TODO: support m.envFlag === 3
 
 
 					if ( material.envTextureIndex !== - 1 && ( material.envFlag === 1 || material.envFlag == 2 ) ) {
 
-						params.envMap = this._loadTexture( data.textures[ material.envTextureIndex ], textures );
-						params.combine = material.envFlag === 1 ? THREE.MultiplyOperation : THREE.AddOperation;
+						params.matcap = this._loadTexture( data.textures[ material.envTextureIndex ], textures ); // Same as color map above, keep file name in userData for further usage.
+
+						params.userData.MMD.matcapFileName = data.textures[ material.envTextureIndex ];
+						params.matcapCombine = material.envFlag === 1 ? THREE.MultiplyOperation : THREE.AddOperation;
 
 					} // gradientMap
 
@@ -1070,7 +1079,7 @@
 
 				}
 
-				materials.push( new THREE.MeshToonMaterial( params ) );
+				materials.push( new MMDToonMaterial( params ) );
 
 			}
 
@@ -1293,12 +1302,12 @@
 
 				}
 				/*
-				 * This method expects
-				 *	 texture.flipY = false
-				 *	 texture.wrapS = THREE.RepeatWrapping
-				 *	 texture.wrapT = THREE.RepeatWrapping
-				 * TODO: more precise
-				 */
+      	 * This method expects
+      	 *   texture.flipY = false
+      	 *   texture.wrapS = THREE.RepeatWrapping
+      	 *   texture.wrapT = THREE.RepeatWrapping
+      	 * TODO: more precise
+      	 */
 
 
 				function getAlphaByUv( image, uv ) {
@@ -1311,6 +1320,23 @@
 					if ( y < 0 ) y += height;
 					const index = y * width + x;
 					return image.data[ index * 4 + 3 ];
+
+				}
+
+				if ( texture.isCompressedTexture === true ) {
+
+					if ( NON_ALPHA_CHANNEL_FORMATS.includes( texture.format ) ) {
+
+						map.transparent = false;
+
+					} else {
+
+						// any other way to check transparency of CompressedTexture?
+						map.transparent = true;
+
+					}
+
+					return;
 
 				}
 
@@ -1333,10 +1359,10 @@
 	class AnimationBuilder {
 
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
+   * @return {AnimationClip}
+   */
 		build( vmd, mesh ) {
 
 			// combine skeletal and morph animations
@@ -1353,10 +1379,10 @@
 
 		}
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
+   * @return {AnimationClip}
+   */
 
 
 		buildSkeletalAnimation( vmd, mesh ) {
@@ -1437,10 +1463,10 @@
 
 		}
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
+   * @return {AnimationClip}
+   */
 
 
 		buildMorphAnimation( vmd, mesh ) {
@@ -1485,9 +1511,9 @@
 
 		}
 		/**
-	 * @param {Object} vmd - parsed VMD data
-	 * @return {AnimationClip}
-	 */
+   * @param {Object} vmd - parsed VMD data
+   * @return {AnimationClip}
+   */
 
 
 		buildCameraAnimation( vmd ) {
@@ -1594,10 +1620,10 @@
 		_createTrack( node, typedKeyframeTrack, times, values, interpolations ) {
 
 			/*
-			 * optimizes here not to let KeyframeTrackPrototype optimize
-			 * because KeyframeTrackPrototype optimizes times and values but
-			 * doesn't optimize interpolations.
-			 */
+    	 * optimizes here not to let KeyframeTrackPrototype optimize
+    	 * because KeyframeTrackPrototype optimizes times and values but
+    	 * doesn't optimize interpolations.
+    	 */
 			if ( times.length > 2 ) {
 
 				times = times.slice();
@@ -1732,41 +1758,41 @@
 		_calculate( x1, x2, y1, y2, x ) {
 
 			/*
-			 * Cubic Bezier curves
-			 *	 https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B.C3.A9zier_curves
-			 *
-			 * B(t) = ( 1 - t ) ^ 3 * P0
-			 *			+ 3 * ( 1 - t ) ^ 2 * t * P1
-			 *			+ 3 * ( 1 - t ) * t^2 * P2
-			 *			+ t ^ 3 * P3
-			 *			( 0 <= t <= 1 )
-			 *
-			 * MMD uses Cubic Bezier curves for bone and camera animation interpolation.
-			 *	 http://d.hatena.ne.jp/edvakf/20111016/1318716097
-			 *
-			 *		x = ( 1 - t ) ^ 3 * x0
-			 *			+ 3 * ( 1 - t ) ^ 2 * t * x1
-			 *			+ 3 * ( 1 - t ) * t^2 * x2
-			 *			+ t ^ 3 * x3
-			 *		y = ( 1 - t ) ^ 3 * y0
-			 *			+ 3 * ( 1 - t ) ^ 2 * t * y1
-			 *			+ 3 * ( 1 - t ) * t^2 * y2
-			 *			+ t ^ 3 * y3
-			 *			( x0 = 0, y0 = 0 )
-			 *			( x3 = 1, y3 = 1 )
-			 *			( 0 <= t, x1, x2, y1, y2 <= 1 )
-			 *
-			 * Here solves this equation with Bisection method,
-			 *	 https://en.wikipedia.org/wiki/Bisection_method
-			 * gets t, and then calculate y.
-			 *
-			 * f(t) = 3 * ( 1 - t ) ^ 2 * t * x1
-			 *			+ 3 * ( 1 - t ) * t^2 * x2
-			 *			+ t ^ 3 - x = 0
-			 *
-			 * (Another option: Newton's method
-			 *		https://en.wikipedia.org/wiki/Newton%27s_method)
-			 */
+    	 * Cubic Bezier curves
+    	 *   https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B.C3.A9zier_curves
+    	 *
+    	 * B(t) = ( 1 - t ) ^ 3 * P0
+    	 *      + 3 * ( 1 - t ) ^ 2 * t * P1
+    	 *      + 3 * ( 1 - t ) * t^2 * P2
+    	 *      + t ^ 3 * P3
+    	 *      ( 0 <= t <= 1 )
+    	 *
+    	 * MMD uses Cubic Bezier curves for bone and camera animation interpolation.
+    	 *   http://d.hatena.ne.jp/edvakf/20111016/1318716097
+    	 *
+    	 *    x = ( 1 - t ) ^ 3 * x0
+    	 *      + 3 * ( 1 - t ) ^ 2 * t * x1
+    	 *      + 3 * ( 1 - t ) * t^2 * x2
+    	 *      + t ^ 3 * x3
+    	 *    y = ( 1 - t ) ^ 3 * y0
+    	 *      + 3 * ( 1 - t ) ^ 2 * t * y1
+    	 *      + 3 * ( 1 - t ) * t^2 * y2
+    	 *      + t ^ 3 * y3
+    	 *      ( x0 = 0, y0 = 0 )
+    	 *      ( x3 = 1, y3 = 1 )
+    	 *      ( 0 <= t, x1, x2, y1, y2 <= 1 )
+    	 *
+    	 * Here solves this equation with Bisection method,
+    	 *   https://en.wikipedia.org/wiki/Bisection_method
+    	 * gets t, and then calculate y.
+    	 *
+    	 * f(t) = 3 * ( 1 - t ) ^ 2 * t * x1
+    	 *      + 3 * ( 1 - t ) * t^2 * x2
+    	 *      + t ^ 3 - x = 0
+    	 *
+    	 * (Another option: Newton's method
+    	 *    https://en.wikipedia.org/wiki/Newton%27s_method)
+    	 */
 			let c = 0.5;
 			let t = c;
 			let s = 1.0 - t;
@@ -1793,6 +1819,93 @@
 		}
 
 	}
+
+	class MMDToonMaterial extends THREE.ShaderMaterial {
+
+		constructor( parameters ) {
+
+			super();
+			this._matcapCombine = THREE.AddOperation;
+			this.emissiveIntensity = 1.0;
+			this.normalMapType = THREE.TangentSpaceNormalMap;
+			this.combine = THREE.MultiplyOperation;
+			this.wireframeLinecap = 'round';
+			this.wireframeLinejoin = 'round';
+			this.flatShading = false;
+			this.lights = true;
+			this.vertexShader = THREE.MMDToonShader.vertexShader;
+			this.fragmentShader = THREE.MMDToonShader.fragmentShader;
+			this.defines = Object.assign( {}, THREE.MMDToonShader.defines );
+			Object.defineProperty( this, 'matcapCombine', {
+				get: function () {
+
+					return this._matcapCombine;
+
+				},
+				set: function ( value ) {
+
+					this._matcapCombine = value;
+
+					switch ( value ) {
+
+						case THREE.MultiplyOperation:
+							this.defines.MATCAP_BLENDING_MULTIPLY = true;
+							delete this.defines.MATCAP_BLENDING_ADD;
+							break;
+
+						default:
+						case THREE.AddOperation:
+							this.defines.MATCAP_BLENDING_ADD = true;
+							delete this.defines.MATCAP_BLENDING_MULTIPLY;
+							break;
+
+					}
+
+				}
+			} );
+			this.uniforms = THREE.UniformsUtils.clone( THREE.MMDToonShader.uniforms ); // merged from MeshToon/Phong/MatcapMaterial
+
+			const exposePropertyNames = [ 'specular', 'shininess', 'opacity', 'diffuse', 'map', 'matcap', 'gradientMap', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveMap', 'bumpMap', 'bumpScale', 'normalMap', 'normalScale', 'displacemantBias', 'displacemantMap', 'displacemantScale', 'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ];
+
+			for ( const propertyName of exposePropertyNames ) {
+
+				Object.defineProperty( this, propertyName, {
+					get: function () {
+
+						return this.uniforms[ propertyName ].value;
+
+					},
+					set: function ( value ) {
+
+						this.uniforms[ propertyName ].value = value;
+
+					}
+				} );
+
+			}
+
+			Object.defineProperty( this, 'color', Object.getOwnPropertyDescriptor( this, 'diffuse' ) );
+			this.setValues( parameters );
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+			this.matcapCombine = source.matcapCombine;
+			this.emissiveIntensity = source.emissiveIntensity;
+			this.normalMapType = source.normalMapType;
+			this.combine = source.combine;
+			this.wireframeLinecap = source.wireframeLinecap;
+			this.wireframeLinejoin = source.wireframeLinejoin;
+			this.flatShading = source.flatShading;
+			return this;
+
+		}
+
+	}
+
+	MMDToonMaterial.prototype.isMMDToonMaterial = true;
 
 	THREE.MMDLoader = MMDLoader;
 

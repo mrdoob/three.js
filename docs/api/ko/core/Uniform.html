@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">유니폼은 전역 [link:https://www.opengl.org/documentation/glsl/ GLSL] 변수입니다. 셰이더 프로그램으로 전달됩니다.
+		</p>
+
+		<h2>코드 예제</h2>
+		<p>
+		[page:ShaderMaterial]의 유니폼이 선언될 때는, 값 혹은 객체로부터 선언됩니다.
+		</p>
+		<code>
+		uniforms: {
+			time: { value: 1.0 },
+			resolution: new Uniform( new Vector2() )
+		};
+		</code>
+
+		<h2>유니폼 타입</h2>
+
+		<p>
+			각 유니폼에는 *value* 프로퍼티가 있어야 합니다. 값의 타입은 아래 표에 있는 기본 GLSL 유형에 대해 지정된 GLSL 코드의 유니폼 변수 타입과 일치해야 합니다. 
+			유니폼 구조 및 배열도 지원됩니다. 기본 유형의 GLSL 배열은 THREE 객체의 배열로 지정되거나 모든 객체의 데이터를 포함하는 플랫 배열로 지정되어야 합니다. 
+			즉, 배열 안의 GLSL 기본 요소는 배열로 표현해서는 안 됩니다. 이 규칙은 반대로는 적용되지 않습니다.
+			*vec2* 배열은 다섯 벡터의 길이를 각각 가지고 있기 때문에 배열 안에 배열을 가지고 있거나, 다섯개의 [page:Vector2] 객체, 10개의 *number*를 가지고 있어야 합니다.
+		</p>
+		<table>
+			<caption><a id="uniform-types">유니폼 타입</a></caption>
+			<thead>
+				<tr>
+					<th>GLSL 타입</th>
+					<th>JavaScript 타입</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<tr>
+					<td>int</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>uint (WebGL 2)</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>float</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>bool</td>
+					<td>[page:Boolean]</td>
+				</tr>
+				<tr>
+					<td>bool</td>
+					<td>[page:Number]</td>
+				</tr>
+
+				<tr>
+					<td>vec2</td>
+					<td>[page:Vector2 THREE.Vector2]</td>
+				</tr>
+				<tr>
+					<td>vec2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Vector3 THREE.Vector3]</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Color THREE.Color]</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Vector4 THREE.Vector4]</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Quaternion THREE.Quaternion]</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
+					<td>mat2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat3</td>
+					<td>[page:Matrix3 THREE.Matrix3]</td>
+				</tr>
+				<tr>
+					<td>mat3</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Matrix4 THREE.Matrix4]</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
+					<td>ivec2, bvec2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec2, bvec2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec3, bvec3</td>
+					<td>[page:Int32Array Int32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec3, bvec3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec4, bvec4</td>
+					<td>[page:Int32Array Int32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec4, bvec4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
+					<td>sampler2D</td>
+					<td>[page:Texture THREE.Texture]</td>
+				</tr>
+				<tr>
+					<td>samplerCube</td>
+					<td>[page:CubeTexture THREE.CubeTexture]</td>
+				</tr>
+
+			</tbody>
+		</table>
+
+		<p>
+			(*)	동일한 GLSL 타입의 (가장 안쪽) 배열(차원)도 동일하며, 배열 내 모든 벡터 또는 배열의 재질을 포함합니다.
+		</p>
+
+		<h2>구조화된 유니폼</h2>
+
+		<p>
+			때때로 셰이더 코드에서 유니폼을 *구조*로 구성하고자 할 수 있습니다. *three.js*가 구조화된 유니폼 데이터를 처리할 수 있도록 다음 스타일을 사용해야 합니다.
+		</p>
+		<code>
+		uniforms = {
+			data: {
+				value: {
+					position: new Vector3(),
+					direction: new Vector3( 0, 0, 1 )
+				 }
+			}
+		};
+		</code>
+		이 정의는 다음 GLSL 코드로 매핑될 수 있습니다.
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data;
+		</code>
+
+		<h2>배열이 있는 구조화된 유니폼</h2>
+
+		<p>
+			배열 *구조*를 관리하는 것도 가능합니다. 이 기능의 사용 구문은 다음과 같습니다:
+		</p>
+		<code>
+		const entry1 = {
+			position: new Vector3(),
+			direction: new Vector3( 0, 0, 1 )
+		};
+		const entry2 = {
+			position: new Vector3( 1, 1, 1 ),
+			direction: new Vector3( 0, 1, 0 )
+		};
+
+		uniforms = {
+			data: {
+				value: [ entry1, entry2 ]
+			}
+		};
+		</code>
+		이 정의는 다음 GLSL 코드로 매핑될 수 있습니다.
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data[ 2 ];
+		</code>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Object value] )</h3>
+		<p>
+		value -- 유니폼을 설정할 값을 가지고 있는 객체입니다. 위에 있는 유니폼 타입 중 하나여야 합니다.
+		</p>
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:Object value]</h3>
+		<p>
+		유니폼의 현재 값입니다.
+		</p>
+
+		<h2>메서드</h2>
+
+		<h3>[method:Uniform clone]()</h3>
+		<p>
+		현재 유니폼의 사본을 리턴합니다.<br />
+		유니폼의 값 프로퍼티가 clone() 메서드를 가진 [page:Object]라면 이 메서드가 사용됩니다. 아니라면 값은 할당된 값으로 복사됩니다.
+		배열 값은 복제된 [page:Uniform]들이 공유합니다.
+		</p>
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

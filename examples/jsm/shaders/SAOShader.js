@@ -36,16 +36,18 @@ const SAOShader = {
 		'kernelRadius': { value: 100.0 },
 		'randomSeed': { value: 0.0 }
 	},
-	vertexShader:
-		`varying vec2 vUv;
+	vertexShader: /* glsl */`
+
+		varying vec2 vUv;
 
 		void main() {
 			vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
 
-	fragmentShader:
-		`#include <common>
+	fragmentShader: /* glsl */`
+
+		#include <common>
 
 		varying vec2 vUv;
 

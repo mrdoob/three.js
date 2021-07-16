@@ -342,7 +342,6 @@
 
 			}
 
-
 			const renderList = new RenderList();
 
 			function projectObject( object ) {
@@ -893,7 +892,7 @@
 
 						// The line segment spans two boundaries, but is outside both of them.
 						// (This can't happen when we're only clipping against just near/far but good
-						//	to leave the check here for future usage if other clip planes are added.)
+						//  to leave the check here for future usage if other clip planes are added.)
 						return false;
 
 					} else {

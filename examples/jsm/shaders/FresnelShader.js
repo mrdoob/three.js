@@ -14,9 +14,9 @@ const FresnelShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`uniform float mRefractionRatio;
+		uniform float mRefractionRatio;
 		uniform float mFresnelBias;
 		uniform float mFresnelScale;
 		uniform float mFresnelPower;
@@ -44,9 +44,9 @@ const FresnelShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform samplerCube tCube;
+		uniform samplerCube tCube;
 
 		varying vec3 vReflect;
 		varying vec3 vRefract[3];

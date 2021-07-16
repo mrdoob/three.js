@@ -3,7 +3,7 @@
 	/**
  * Two pass Gaussian blur filter (horizontal and vertical blur shaders)
  * - described in http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
- *	 and used in http://www.cake23.de/traveling-wavefronts-lit-up.html
+ *   and used in http://www.cake23.de/traveling-wavefronts-lit-up.html
  *
  * - 9 samples per pass
  * - standard deviation 2.7
@@ -18,7 +18,11 @@
 				value: 1.0 / 512.0
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+  /* glsl */
+  `
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -26,7 +30,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `uniform sampler2D tDiffuse;
+		fragmentShader:
+  /* glsl */
+  `
+
+		uniform sampler2D tDiffuse;
 		uniform float h;
 
 		varying vec2 vUv;

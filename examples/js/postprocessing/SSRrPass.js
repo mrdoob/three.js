@@ -95,7 +95,7 @@
 				depthBuffer: true
 			} );
 			this.specularRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
-			// TODO: Can merge with refractiveRenderTarget?
+				// TODO: Can merge with refractiveRenderTarget?
 				minFilter: THREE.NearestFilter,
 				magFilter: THREE.NearestFilter,
 				format: THREE.RGBAFormat

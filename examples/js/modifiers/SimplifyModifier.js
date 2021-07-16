@@ -2,10 +2,10 @@
 
 	/**
  *	Simplification Geometry Modifier
- *		- based on code and technique
- *		- by Stan Melax in 1998
- *		- Progressive Mesh type Polygon Reduction Algorithm
- *		- http://www.melax.com/polychop/
+ *    - based on code and technique
+ *	  - by Stan Melax in 1998
+ *	  - Progressive Mesh type Polygon Reduction Algorithm
+ *    - http://www.melax.com/polychop/
  */
 
 	const _cb = new THREE.Vector3(),
@@ -53,7 +53,7 @@
 			for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 				const v = new THREE.Vector3().fromBufferAttribute( positionAttribute, i );
-				const vertex = new Vertex( v, i );
+				const vertex = new Vertex( v );
 				vertices.push( vertex );
 
 			} // add faces
@@ -120,7 +120,9 @@
 			for ( let i = 0; i < vertices.length; i ++ ) {
 
 				const vertex = vertices[ i ].position;
-				position.push( vertex.x, vertex.y, vertex.z );
+				position.push( vertex.x, vertex.y, vertex.z ); // cache final index to GREATLY speed up faces reconstruction
+
+				vertices[ i ].id = i;
 
 			} //
 
@@ -128,10 +130,7 @@
 			for ( let i = 0; i < faces.length; i ++ ) {
 
 				const face = faces[ i ];
-				const a = vertices.indexOf( face.v1 );
-				const b = vertices.indexOf( face.v2 );
-				const c = vertices.indexOf( face.v3 );
-				index.push( a, b, c );
+				index.push( face.v1.id, face.v2.id, face.v3.id );
 
 			} //
 
@@ -217,7 +216,7 @@
 	function computeEdgeCostAtVertex( v ) {
 
 		// compute the edge collapse cost for all edges that start
-		// from vertex v.	Since we are only interested in reducing
+		// from vertex v.  Since we are only interested in reducing
 		// the object by selecting the min cost edge at each step, we
 		// only cache the cost of the least cost edge at this vertex
 		// (in member variable collapse) as well as the value of the
@@ -440,10 +439,10 @@
 
 	class Vertex {
 
-		constructor( v, id ) {
+		constructor( v ) {
 
 			this.position = v;
-			this.id = id; // old index id
+			this.id = - 1; // external use position in vertices list (for e.g. face generation)
 
 			this.faces = []; // faces vertex is connected
 

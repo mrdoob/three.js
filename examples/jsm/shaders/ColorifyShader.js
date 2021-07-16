@@ -15,9 +15,9 @@ const ColorifyShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -26,9 +26,9 @@ const ColorifyShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform vec3 color;
+		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 
 		varying vec2 vUv;

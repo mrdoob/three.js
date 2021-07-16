@@ -22,8 +22,9 @@ const DepthLimitedBlurShader = {
 		'cameraFar': { value: 1000 },
 		'depthCutoff': { value: 10 },
 	},
-	vertexShader:
-		`#include <common>
+	vertexShader: /* glsl */`
+
+		#include <common>
 
 		uniform vec2 size;
 
@@ -37,9 +38,9 @@ const DepthLimitedBlurShader = {
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
 
+	fragmentShader: /* glsl */`
 
-	fragmentShader:
-		`#include <common>
+		#include <common>
 		#include <packing>
 
 		uniform sampler2D tDiffuse;

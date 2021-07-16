@@ -78,7 +78,7 @@
 			const originalMaterials = {}; // object.uuid -> originalOnBeforeRender
 			// save before render and release after render.
 
-			const originalOnBeforeRenders = {}; //this.cache = cache;	// for debug
+			const originalOnBeforeRenders = {}; //this.cache = cache;  // for debug
 
 			const uniformsOutline = {
 				outlineThickness: {
@@ -243,7 +243,6 @@
 
 				if ( material.name === 'invisible' ) return;
 				const outlineParameters = originalMaterial.userData.outlineParameters;
-				material.skinning = originalMaterial.skinning;
 				material.morphTargets = originalMaterial.morphTargets;
 				material.morphNormals = originalMaterial.morphNormals;
 				material.fog = originalMaterial.fog;
@@ -395,19 +394,19 @@
 
 			};
 			/*
-		 * See #9918
-		 *
-		 * The following property copies and wrapper methods enable
-		 * OutlineEffect to be called from other *Effect, like
-		 *
-		 * effect = new StereoEffect( new OutlineEffect( renderer ) );
-		 *
-		 * function render () {
-		 *
-			 * 	effect.render( scene, camera );
-		 *
-		 * }
-		 */
+     * See #9918
+     *
+     * The following property copies and wrapper methods enable
+     * OutlineEffect to be called from other *Effect, like
+     *
+     * effect = new StereoEffect( new OutlineEffect( renderer ) );
+     *
+     * function render () {
+     *
+    	 * 	effect.render( scene, camera );
+     *
+     * }
+     */
 
 
 			this.autoClear = renderer.autoClear;

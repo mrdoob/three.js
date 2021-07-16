@@ -14,9 +14,9 @@ const AfterimageShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -25,9 +25,9 @@ const AfterimageShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float damp;
+		uniform float damp;
 
 		uniform sampler2D tOld;
 		uniform sampler2D tNew;

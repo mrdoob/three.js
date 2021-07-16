@@ -6,17 +6,17 @@ const BasicShader = {
 
 	uniforms: {},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`void main() {
+		void main() {
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`void main() {
+		void main() {
 
 			gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );
 

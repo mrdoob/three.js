@@ -4,81 +4,83 @@ import { TextureCubeUVNode } from './TextureCubeUVNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 
-function TextureCubeNode( value, uv, bias ) {
+class TextureCubeNode extends TempNode {
 
-	TempNode.call( this, 'v4' );
+	constructor( value, uv, bias ) {
 
-	this.value = value;
+		super( 'v4' );
 
-	this.radianceNode = new TextureCubeUVNode(
-		this.value,
-		uv || new ReflectNode( ReflectNode.VECTOR ),
-		// bias should be replaced in builder.context in build process
-		bias
-	);
+		this.value = value;
 
-	this.irradianceNode = new TextureCubeUVNode(
-		this.value,
-		new NormalNode( NormalNode.WORLD ),
-		new FloatNode( 1 ).setReadonly( true )
-	);
+		this.radianceNode = new TextureCubeUVNode(
+			this.value,
+			uv || new ReflectNode( ReflectNode.VECTOR ),
+			// bias should be replaced in builder.context in build process
+			bias
+		);
 
-}
+		this.irradianceNode = new TextureCubeUVNode(
+			this.value,
+			new NormalNode( NormalNode.WORLD ),
+			new FloatNode( 1 ).setReadonly( true )
+		);
 
-TextureCubeNode.prototype = Object.create( TempNode.prototype );
-TextureCubeNode.prototype.constructor = TextureCubeNode;
-TextureCubeNode.prototype.nodeType = 'TextureCube';
+	}
 
-TextureCubeNode.prototype.generate = function ( builder, output ) {
+	generate( builder, output ) {
 
-	if ( builder.isShader( 'fragment' ) ) {
+		if ( builder.isShader( 'fragment' ) ) {
 
-		builder.require( 'irradiance' );
+			builder.require( 'irradiance' );
 
-		if ( builder.context.bias ) {
+			if ( builder.context.bias ) {
 
-			builder.context.bias.setTexture( this.value );
+				builder.context.bias.setTexture( this.value );
+
+			}
+
+			const scopeNode = builder.slot === 'irradiance' ? this.irradianceNode : this.radianceNode;
+
+			return scopeNode.build( builder, output );
+
+		} else {
+
+			console.warn( 'THREE.TextureCubeNode is not compatible with ' + builder.shader + ' shader.' );
+
+			return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 
 		}
 
-		var scopeNode = builder.slot === 'irradiance' ? this.irradianceNode : this.radianceNode;
+	}
 
-		return scopeNode.build( builder, output );
+	copy( source ) {
 
-	} else {
+		super.copy( source );
 
-		console.warn( 'THREE.TextureCubeNode is not compatible with ' + builder.shader + ' shader.' );
+		this.value = source.value;
 
-		return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
+		return this;
 
 	}
 
-};
+	toJSON( meta ) {
 
-TextureCubeNode.prototype.copy = function ( source ) {
+		let data = this.getJSONNode( meta );
 
-	TempNode.prototype.copy.call( this, source );
+		if ( ! data ) {
 
-	this.value = source.value;
+			data = this.createJSONNode( meta );
 
-	return this;
+			data.value = this.value.toJSON( meta ).uuid;
 
-};
+		}
 
-TextureCubeNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.value = this.value.toJSON( meta ).uuid;
+		return data;
 
 	}
 
-	return data;
+}
 
-};
+TextureCubeNode.prototype.nodeType = 'TextureCube';
 
 export { TextureCubeNode };

@@ -5,7 +5,7 @@ import {
 	LoadingManager
 } from '../../../build/three.module.js';
 import { ColladaLoader } from '../loaders/ColladaLoader.js';
-import * as fflate from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.js';
 
 class KMZLoader extends Loader {
 

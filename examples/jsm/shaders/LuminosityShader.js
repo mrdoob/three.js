@@ -11,9 +11,9 @@ const LuminosityShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -23,9 +23,9 @@ const LuminosityShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#include <common>
+		#include <common>
 
 		uniform sampler2D tDiffuse;
 

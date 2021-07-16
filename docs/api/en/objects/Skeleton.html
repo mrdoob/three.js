@@ -91,14 +91,14 @@
 		Returns a clone of this Skeleton object.
 		</p>
 
-
 		<h3>[method:null calculateInverses]()</h3>
 		<p>Generates the [page:.boneInverses boneInverses] array if not provided in the constructor.</p>
 
+		<h3>[method:null computeBoneTexture]()</h3>
+		<p>Computes an instance of [page:DataTexture] in order to pass the bone data more efficiently to the shader. The texture is assigned to [page:.boneTexture boneTexture].</p>
 
 		<h3>[method:null pose]()</h3>
 		<p>Returns the skeleton to the base pose.</p>
-
 
 		<h3>[method:null update]()</h3>
 		<p>

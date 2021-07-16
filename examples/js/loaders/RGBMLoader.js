@@ -485,7 +485,7 @@
 
 				break;
 
-			} //else {	log("unknown chunk type", type, len);	}
+			} //else {  log("unknown chunk type", type, len);  }
 
 
 			offset += len;

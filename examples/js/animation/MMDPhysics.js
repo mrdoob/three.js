@@ -2,13 +2,13 @@
 
 	/**
  * Dependencies
- *	- Ammo.js https://github.com/kripken/ammo.js
+ *  - Ammo.js https://github.com/kripken/ammo.js
  *
  * MMDPhysics calculates physics with Ammo(Bullet based JavaScript Physics engine)
  * for MMD model loaded by MMDLoader.
  *
  * TODO
- *	- Physics in Worker
+ *  - Physics in Worker
  */
 
 	/* global Ammo */
@@ -16,14 +16,14 @@
 	class MMDPhysics {
 
 		/**
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Array<Object>} rigidBodyParams
-	 * @param {Array<Object>} (optional) constraintParams
-	 * @param {Object} params - (optional)
-	 * @param {Number} params.unitStep - Default is 1 / 65.
-	 * @param {Integer} params.maxStepNum - Default is 3.
-	 * @param {Vector3} params.gravity - Default is ( 0, - 9.8 * 10, 0 )
-	 */
+   * @param {THREE.SkinnedMesh} mesh
+   * @param {Array<Object>} rigidBodyParams
+   * @param {Array<Object>} (optional) constraintParams
+   * @param {Object} params - (optional)
+   * @param {Number} params.unitStep - Default is 1 / 65.
+   * @param {Integer} params.maxStepNum - Default is 3.
+   * @param {Vector3} params.gravity - Default is ( 0, - 9.8 * 10, 0 )
+   */
 		constructor( mesh, rigidBodyParams, constraintParams = [], params = {} ) {
 
 			if ( typeof Ammo === 'undefined' ) {
@@ -35,11 +35,11 @@
 			this.manager = new ResourceManager();
 			this.mesh = mesh;
 			/*
-		 * I don't know why but 1/60 unitStep easily breaks models
-		 * so I set it 1/65 so far.
-		 * Don't set too small unitStep because
-		 * the smaller unitStep can make the performance worse.
-		 */
+     * I don't know why but 1/60 unitStep easily breaks models
+     * so I set it 1/65 so far.
+     * Don't set too small unitStep because
+     * the smaller unitStep can make the performance worse.
+     */
 
 			this.unitStep = params.unitStep !== undefined ? params.unitStep : 1 / 65;
 			this.maxStepNum = params.maxStepNum !== undefined ? params.maxStepNum : 3;
@@ -54,11 +54,11 @@
 
 		}
 		/**
-	 * Advances Physics calculation and updates bones.
-	 *
-	 * @param {Number} delta - time in second
-	 * @return {MMDPhysics}
-	 */
+   * Advances Physics calculation and updates bones.
+   *
+   * @param {Number} delta - time in second
+   * @return {MMDPhysics}
+   */
 
 
 		update( delta ) {
@@ -114,10 +114,10 @@
 
 		}
 		/**
-	 * Resets rigid bodies transorm to current bone's.
-	 *
-	 * @return {MMDPhysics}
-	 */
+   * Resets rigid bodies transorm to current bone's.
+   *
+   * @return {MMDPhysics}
+   */
 
 
 		reset() {
@@ -132,11 +132,11 @@
 
 		}
 		/**
-	 * Warm ups Rigid bodies. Calculates cycles steps.
-	 *
-	 * @param {Integer} cycles
-	 * @return {MMDPhysics}
-	 */
+   * Warm ups Rigid bodies. Calculates cycles steps.
+   *
+   * @param {Integer} cycles
+   * @return {MMDPhysics}
+   */
 
 
 		warmup( cycles ) {
@@ -151,11 +151,11 @@
 
 		}
 		/**
-	 * Sets gravity.
-	 *
-	 * @param {Vector3} gravity
-	 * @return {MMDPhysicsHelper}
-	 */
+   * Sets gravity.
+   *
+   * @param {Vector3} gravity
+   * @return {MMDPhysicsHelper}
+   */
 
 
 		setGravity( gravity ) {
@@ -166,10 +166,10 @@
 
 		}
 		/**
-	 * Creates MMDPhysicsHelper
-	 *
-	 * @return {MMDPhysicsHelper}
-	 */
+   * Creates MMDPhysicsHelper
+   *
+   * @return {MMDPhysicsHelper}
+   */
 
 
 		createHelper() {
@@ -303,8 +303,8 @@
  * This manager's responsibilies are
  *
  * 1. manage Ammo.js and Three.js object resources and
- *		improve the performance and the memory consumption by
- *		reusing objects.
+ *    improve the performance and the memory consumption by
+ *    reusing objects.
  *
  * 2. provide simple Ammo object operations.
  */
@@ -738,10 +738,10 @@
 
 		}
 		/**
-	 * Resets rigid body transform to the current bone's.
-	 *
-	 * @return {RigidBody}
-	 */
+   * Resets rigid body transform to the current bone's.
+   *
+   * @return {RigidBody}
+   */
 
 
 		reset() {
@@ -752,10 +752,10 @@
 
 		}
 		/**
-	 * Updates rigid body's transform from the current bone.
-	 *
-	 * @return {RidigBody}
-	 */
+   * Updates rigid body's transform from the current bone.
+   *
+   * @return {RidigBody}
+   */
 
 
 		updateFromBone() {
@@ -770,10 +770,10 @@
 
 		}
 		/**
-	 * Updates bone from the current ridid body's transform.
-	 *
-	 * @return {RidigBody}
-	 */
+   * Updates bone from the current ridid body's transform.
+   *
+   * @return {RidigBody}
+   */
 
 
 		updateBone() {
@@ -861,10 +861,10 @@
 
 				body.setCollisionFlags( body.getCollisionFlags() | 2 );
 				/*
-			 * It'd be better to comment out this line though in general I should call this method
-			 * because I'm not sure why but physics will be more like MMD's
-			 * if I comment out.
-			 */
+       * It'd be better to comment out this line though in general I should call this method
+       * because I'm not sure why but physics will be more like MMD's
+       * if I comment out.
+       */
 
 				body.setActivationState( 4 );
 
@@ -999,13 +999,13 @@
 	class Constraint {
 
 		/**
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Ammo.btDiscreteDynamicsWorld} world
-	 * @param {RigidBody} bodyA
-	 * @param {RigidBody} bodyB
-	 * @param {Object} params
-	 * @param {ResourceManager} manager
-	 */
+   * @param {THREE.SkinnedMesh} mesh
+   * @param {Ammo.btDiscreteDynamicsWorld} world
+   * @param {RigidBody} bodyA
+   * @param {RigidBody} bodyB
+   * @param {Object} params
+   * @param {ResourceManager} manager
+   */
 		constructor( mesh, world, bodyA, bodyB, params, manager ) {
 
 			this.mesh = mesh;
@@ -1075,11 +1075,11 @@
 
 			}
 			/*
-		 * Currently(10/31/2016) official ammo.js doesn't support
-		 * btGeneric6DofSpringConstraint.setParam method.
-		 * You need custom ammo.js (add the method into idl) if you wanna use.
-		 * By setting this parameter, physics will be more like MMD's
-		 */
+     * Currently(10/31/2016) official ammo.js doesn't support
+     * btGeneric6DofSpringConstraint.setParam method.
+     * You need custom ammo.js (add the method into idl) if you wanna use.
+     * By setting this parameter, physics will be more like MMD's
+     */
 
 
 			if ( constraint.setParam !== undefined ) {
@@ -1123,11 +1123,11 @@
 	class MMDPhysicsHelper extends THREE.Object3D {
 
 		/**
-	 * Visualize Rigid bodies
-	 *
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Physics} physics
-	 */
+   * Visualize Rigid bodies
+   *
+   * @param {THREE.SkinnedMesh} mesh
+   * @param {Physics} physics
+   */
 		constructor( mesh, physics ) {
 
 			super();
@@ -1165,8 +1165,8 @@
 
 		}
 		/**
-	 * Updates Rigid Bodies visualization.
-	 */
+   * Updates Rigid Bodies visualization.
+   */
 
 
 		updateMatrixWorld( force ) {

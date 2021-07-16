@@ -1,3 +1,5 @@
+// r130.1
+
 const cacheName = 'threejs-editor';
 
 const assets = [
@@ -13,7 +15,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/fflate.module.min.js',
+	'../examples/jsm/libs/fflate.module.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -56,6 +58,9 @@ const assets = [
 
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
+
+	'../examples/jsm/interactive/HTMLMesh.js',
+	'../examples/jsm/interactive/InteractiveGroup.js',
 
 	'../examples/jsm/environments/RoomEnvironment.js',
 
@@ -108,7 +113,6 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
-	'./js/libs/three.html.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
@@ -240,35 +244,28 @@ self.addEventListener( 'fetch', async function ( event ) {
 
 async function networkFirst( request ) {
 
-	return fetch( request ).catch( async function () {
+	return fetch( request )
+		.then( async function ( response ) {
 
-		const cachedResponse = await caches.match( request );
+			const cache = await caches.open( cacheName );
 
-		if ( cachedResponse === undefined ) {
+			cache.put( request, response.clone() );
 
-			console.warn( '[SW] Not cached:', request.url );
+			return response;
 
-		}
+		} )
+		.catch( async function () {
 
-		return cachedResponse;
+			const cachedResponse = await caches.match( request );
 
-	} );
+			if ( cachedResponse === undefined ) {
 
-}
+				console.warn( '[SW] Not cached:', request.url );
 
-/*
-async function cacheFirst( request ) {
+			}
 
-	const cachedResponse = await caches.match( request );
+			return cachedResponse;
 
-	if ( cachedResponse === undefined ) {
-
-		console.warn( '[SW] Not cached:', request.url );
-		return fetch( request );
-
-	}
-
-	return cachedResponse;
+		} );
 
 }
-*/

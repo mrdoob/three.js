@@ -16,9 +16,9 @@ const FocusShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -27,9 +27,9 @@ const FocusShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float screenWidth;
+		uniform float screenWidth;
 		uniform float screenHeight;
 		uniform float sampleDistance;
 		uniform float waveFactor;

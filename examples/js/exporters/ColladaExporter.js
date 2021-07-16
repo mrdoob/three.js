@@ -4,12 +4,12 @@
  * https://github.com/gkjohnson/collada-exporter-js
  *
  * Usage:
- *	const exporter = new ColladaExporter();
+ *  const exporter = new ColladaExporter();
  *
- *	const data = exporter.parse(mesh);
+ *  const data = exporter.parse(mesh);
  *
  * Format Definition:
- *	https://www.khronos.org/collada/
+ *  https://www.khronos.org/collada/
  */
 
 	class ColladaExporter {
@@ -55,7 +55,7 @@
 
 					}
 
-					const res = `${pad( '	', tagnum )}${tag}`;
+					const res = `${pad( '  ', tagnum )}${tag}`;
 
 					if ( ! HAS_TEXT.test( tag ) && ! IS_SELF_CLOSING.test( tag ) && ! IS_END_TAG.test( tag ) ) {
 

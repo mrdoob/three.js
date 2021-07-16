@@ -3,19 +3,19 @@
 	class GeometryUtils {
 
 		/**
-	 * Generates 2D-Coordinates in a very fast way.
-	 *
-	 * Based on work by:
-	 * @link http://www.openprocessing.org/sketch/15493
-	 *
-	 * @param center		 Center of Hilbert curve.
-	 * @param size			 Total width of Hilbert curve.
-	 * @param iterations Number of subdivisions.
-	 * @param v0				 Corner index -X, -Z.
-	 * @param v1				 Corner index -X, +Z.
-	 * @param v2				 Corner index +X, +Z.
-	 * @param v3				 Corner index +X, -Z.
-	 */
+   * Generates 2D-Coordinates in a very fast way.
+   *
+   * Based on work by:
+   * @link http://www.openprocessing.org/sketch/15493
+   *
+   * @param center     Center of Hilbert curve.
+   * @param size       Total width of Hilbert curve.
+   * @param iterations Number of subdivisions.
+   * @param v0         Corner index -X, -Z.
+   * @param v1         Corner index -X, +Z.
+   * @param v2         Corner index +X, +Z.
+   * @param v3         Corner index +X, -Z.
+   */
 		static hilbert2D( center = new THREE.Vector3( 0, 0, 0 ), size = 10, iterations = 1, v0 = 0, v1 = 1, v2 = 2, v3 = 3 ) {
 
 			const half = size / 2;
@@ -39,23 +39,23 @@
 
 		}
 		/**
-	 * Generates 3D-Coordinates in a very fast way.
-	 *
-	 * Based on work by:
-	 * @link http://www.openprocessing.org/visuals/?visualID=15599
-	 *
-	 * @param center		 Center of Hilbert curve.
-	 * @param size			 Total width of Hilbert curve.
-	 * @param iterations Number of subdivisions.
-	 * @param v0				 Corner index -X, +Y, -Z.
-	 * @param v1				 Corner index -X, +Y, +Z.
-	 * @param v2				 Corner index -X, -Y, +Z.
-	 * @param v3				 Corner index -X, -Y, -Z.
-	 * @param v4				 Corner index +X, -Y, -Z.
-	 * @param v5				 Corner index +X, -Y, +Z.
-	 * @param v6				 Corner index +X, +Y, +Z.
-	 * @param v7				 Corner index +X, +Y, -Z.
-	 */
+   * Generates 3D-Coordinates in a very fast way.
+   *
+   * Based on work by:
+   * @link http://www.openprocessing.org/visuals/?visualID=15599
+   *
+   * @param center     Center of Hilbert curve.
+   * @param size       Total width of Hilbert curve.
+   * @param iterations Number of subdivisions.
+   * @param v0         Corner index -X, +Y, -Z.
+   * @param v1         Corner index -X, +Y, +Z.
+   * @param v2         Corner index -X, -Y, +Z.
+   * @param v3         Corner index -X, -Y, -Z.
+   * @param v4         Corner index +X, -Y, -Z.
+   * @param v5         Corner index +X, -Y, +Z.
+   * @param v6         Corner index +X, +Y, +Z.
+   * @param v7         Corner index +X, +Y, -Z.
+   */
 
 
 		static hilbert3D( center = new THREE.Vector3( 0, 0, 0 ), size = 10, iterations = 1, v0 = 0, v1 = 1, v2 = 2, v3 = 3, v4 = 4, v5 = 5, v6 = 6, v7 = 7 ) {
@@ -86,12 +86,12 @@
 
 		}
 		/**
-	 * Generates a Gosper curve (lying in the XY plane)
-	 *
-	 * https://gist.github.com/nitaku/6521802
-	 *
-	 * @param size The size of a single gosper island.
-	 */
+   * Generates a Gosper curve (lying in the XY plane)
+   *
+   * https://gist.github.com/nitaku/6521802
+   *
+   * @param size The size of a single gosper island.
+   */
 
 
 		static gosper( size = 1 ) {

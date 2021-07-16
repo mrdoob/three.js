@@ -20,7 +20,7 @@ import {
 	TextureLoader,
 	sRGBEncoding
 } from '../../../build/three.module.js';
-import * as fflate from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.js';
 
 /**
  *

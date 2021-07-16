@@ -24,9 +24,9 @@ const BokehShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -35,8 +35,9 @@ const BokehShader = {
 
 		}`,
 
-	fragmentShader:
-		`#include <common>
+	fragmentShader: /* glsl */`
+
+		#include <common>
 
 		varying vec2 vUv;
 

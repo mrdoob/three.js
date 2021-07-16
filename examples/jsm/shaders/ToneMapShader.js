@@ -14,9 +14,9 @@ var ToneMapShader = {
 		'middleGrey': { value: 0.6 }
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -25,9 +25,9 @@ var ToneMapShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`#include <common>
+		#include <common>
 
 		uniform sampler2D tDiffuse;
 

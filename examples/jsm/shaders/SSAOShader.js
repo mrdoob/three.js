@@ -35,9 +35,9 @@ const SSAOShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -47,9 +47,9 @@ const SSAOShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform sampler2D tNormal;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNoise;

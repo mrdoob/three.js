@@ -12,9 +12,9 @@ const PixelShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying highp vec2 vUv;
+		varying highp vec2 vUv;
 
 			void main() {
 
@@ -23,9 +23,9 @@ const PixelShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		uniform float pixelSize;
 		uniform vec2 resolution;
 

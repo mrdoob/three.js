@@ -20,9 +20,9 @@ const DotScreenShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -31,9 +31,9 @@ const DotScreenShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform vec2 center;
+		uniform vec2 center;
 		uniform float angle;
 		uniform float scale;
 		uniform vec2 tSize;

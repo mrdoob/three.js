@@ -17,9 +17,9 @@ var FreiChenShader = {
 		'aspect': { value: new Vector2( 512, 512 ) }
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -28,9 +28,9 @@ var FreiChenShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 		varying vec2 vUv;
 
 		uniform vec2 aspect;

@@ -80,7 +80,11 @@
 				value: new THREE.Vector2()
 			}
 		},
-		vertexShader: `varying vec2 vUv;
+		vertexShader:
+  /* glsl */
+  `
+
+		varying vec2 vUv;
 
 		void main() {
 
@@ -88,7 +92,11 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: `#include <common>
+		fragmentShader:
+  /* glsl */
+  `
+
+		#include <common>
 
 		varying vec2 vUv;
 
@@ -97,7 +105,7 @@
 		uniform float textureWidth;
 		uniform float textureHeight;
 
-		uniform float focalDepth;	//focal distance value in meters, but you may use autofocus option below
+		uniform float focalDepth;  //focal distance value in meters, but you may use autofocus option below
 		uniform float focalLength; //focal length in mm
 		uniform float fstop; //f-stop value
 		uniform bool showFocus; //show debug focus point and focal range (red = focal point, green = focal range)
@@ -168,14 +176,14 @@
 		float penta(vec2 coords) {
 			//pentagonal shape
 			float scale = float(rings) - 1.3;
-			vec4	HS0 = vec4( 1.0,				 0.0,				 0.0,	1.0);
-			vec4	HS1 = vec4( 0.309016994, 0.951056516, 0.0,	1.0);
-			vec4	HS2 = vec4(-0.809016994, 0.587785252, 0.0,	1.0);
-			vec4	HS3 = vec4(-0.809016994,-0.587785252, 0.0,	1.0);
-			vec4	HS4 = vec4( 0.309016994,-0.951056516, 0.0,	1.0);
-			vec4	HS5 = vec4( 0.0				,0.0				 , 1.0,	1.0);
+			vec4  HS0 = vec4( 1.0,         0.0,         0.0,  1.0);
+			vec4  HS1 = vec4( 0.309016994, 0.951056516, 0.0,  1.0);
+			vec4  HS2 = vec4(-0.809016994, 0.587785252, 0.0,  1.0);
+			vec4  HS3 = vec4(-0.809016994,-0.587785252, 0.0,  1.0);
+			vec4  HS4 = vec4( 0.309016994,-0.951056516, 0.0,  1.0);
+			vec4  HS5 = vec4( 0.0        ,0.0         , 1.0,  1.0);
 
-			vec4	one = vec4( 1.0 );
+			vec4  one = vec4( 1.0 );
 
 			vec4 P = vec4((coords),vec2(scale, scale));
 
@@ -212,17 +220,17 @@
 			offset[1] = vec2( 0.0, -wh.y);
 			offset[2] = vec2( wh.x -wh.y);
 
-			offset[3] = vec2(-wh.x,	0.0);
-			offset[4] = vec2( 0.0,	 0.0);
-			offset[5] = vec2( wh.x,	0.0);
+			offset[3] = vec2(-wh.x,  0.0);
+			offset[4] = vec2( 0.0,   0.0);
+			offset[5] = vec2( wh.x,  0.0);
 
 			offset[6] = vec2(-wh.x, wh.y);
-			offset[7] = vec2( 0.0,	wh.y);
+			offset[7] = vec2( 0.0,  wh.y);
 			offset[8] = vec2( wh.x, wh.y);
 
-			kernel[0] = 1.0/16.0;	 kernel[1] = 2.0/16.0;	 kernel[2] = 1.0/16.0;
-			kernel[3] = 2.0/16.0;	 kernel[4] = 4.0/16.0;	 kernel[5] = 2.0/16.0;
-			kernel[6] = 1.0/16.0;	 kernel[7] = 2.0/16.0;	 kernel[8] = 1.0/16.0;
+			kernel[0] = 1.0/16.0;   kernel[1] = 2.0/16.0;   kernel[2] = 1.0/16.0;
+			kernel[3] = 2.0/16.0;   kernel[4] = 4.0/16.0;   kernel[5] = 2.0/16.0;
+			kernel[6] = 1.0/16.0;   kernel[7] = 2.0/16.0;   kernel[8] = 1.0/16.0;
 
 
 			for( int i=0; i<9; i++ ) {
@@ -383,7 +391,11 @@
 				value: 1000.0
 			}
 		},
-		vertexShader: `varying float vViewZDepth;
+		vertexShader:
+  /* glsl */
+  `
+
+		varying float vViewZDepth;
 
 		void main() {
 
@@ -393,7 +405,11 @@
 			vViewZDepth = - mvPosition.z;
 
 		}`,
-		fragmentShader: `uniform float mNear;
+		fragmentShader:
+  /* glsl */
+  `
+
+		uniform float mNear;
 		uniform float mFar;
 
 		varying float vViewZDepth;

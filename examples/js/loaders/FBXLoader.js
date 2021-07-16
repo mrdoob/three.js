@@ -6,7 +6,7 @@
  * Versions lower than this may load but will probably have errors
  *
  * Needs Support:
- *	Morph normals / blend shape normals
+ *  Morph normals / blend shape normals
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
@@ -364,6 +364,7 @@
 
 				} else {
 
+					loader.setPath( this.textureLoader.path );
 					texture = loader.load( fileName );
 
 				}
@@ -956,13 +957,13 @@
 				switch ( type ) {
 
 					case 0:
-					// Perspective
+						// Perspective
 						model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
 						if ( focalLength !== null ) model.setFocalLength( focalLength );
 						break;
 
 					case 1:
-					// Orthographic
+						// Orthographic
 						model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
 						break;
 
@@ -1052,17 +1053,17 @@
 				switch ( type ) {
 
 					case 0:
-					// Point
+						// Point
 						model = new THREE.PointLight( color, intensity, distance, decay );
 						break;
 
 					case 1:
-					// Directional
+						// Directional
 						model = new THREE.DirectionalLight( color, intensity );
 						break;
 
 					case 2:
-					// Spot
+						// Spot
 						let angle = Math.PI / 3;
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
@@ -1157,11 +1158,6 @@
 
 			if ( geometry.FBX_Deformer ) {
 
-				materials.forEach( function ( material ) {
-
-					material.skinning = true;
-
-				} );
 				model = new THREE.SkinnedMesh( geometry, material );
 				model.normalizeSkinWeights();
 
@@ -1683,8 +1679,8 @@
 				let endOfFace = false; // Face index and vertex index arrays are combined in a single array
 				// A cube with quad faces looks like this:
 				// PolygonVertexIndex: *24 {
-				//	a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
-				//	}
+				//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
+				//  }
 				// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
 				// to find index of last vertex bit shift the index: ^ - 1
 
@@ -1949,7 +1945,7 @@
 
 			} );
 
-		} // a morph geometry node is similar to a standard	node, and the node is also contained
+		} // a morph geometry node is similar to a standard  node, and the node is also contained
 		// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
 		// and a special attribute Index defining which vertices of the original geometry are affected
 		// Normal and position attributes only have data for the vertices that are affected by the morph
@@ -2667,7 +2663,7 @@
 			} );
 			return values;
 
-		} // Rotations are defined as THREE.Euler angles which can have values	of any size
+		} // Rotations are defined as THREE.Euler angles which can have values  of any size
 		// These will be converted to quaternions which don't support values greater than
 		// PI, so we'll interpolate large rotations
 
@@ -3594,7 +3590,7 @@
 
 	function isFbxFormatBinary( buffer ) {
 
-		const CORRECT = 'Kaydara FBX Binary	\0';
+		const CORRECT = 'Kaydara\u0020FBX\u0020Binary\u0020\u0020\0';
 		return buffer.byteLength >= CORRECT.length && CORRECT === convertArrayBufferToString( buffer, 0, CORRECT.length );
 
 	}
@@ -3749,16 +3745,15 @@
 
 		}
 
-		const lLRM = new THREE.Matrix4().copy( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ); // Global Rotation
+		const lLRM = lPreRotationM.clone().multiply( lRotationM ).multiply( lPostRotationM ); // Global Rotation
 
 		const lParentGRM = new THREE.Matrix4();
 		lParentGRM.extractRotation( lParentGX ); // Global Shear*Scaling
 
 		const lParentTM = new THREE.Matrix4();
 		lParentTM.copyPosition( lParentGX );
-		const lParentGSM = new THREE.Matrix4();
-		const lParentGRSM = new THREE.Matrix4().copy( lParentTM ).invert().multiply( lParentGX );
-		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGRSM );
+		const lParentGRSM = lParentTM.clone().invert().multiply( lParentGX );
+		const lParentGSM = lParentGRM.clone().invert().multiply( lParentGRSM );
 		const lLSM = lScalingM;
 		const lGlobalRS = new THREE.Matrix4();
 
@@ -3773,23 +3768,20 @@
 		} else {
 
 			const lParentLSM = new THREE.Matrix4().scale( new THREE.Vector3().setFromMatrixScale( lParentLX ) );
-			const lParentLSM_inv = new THREE.Matrix4().copy( lParentLSM ).invert();
-			const lParentGSM_noLocal = new THREE.Matrix4().copy( lParentGSM ).multiply( lParentLSM_inv );
+			const lParentLSM_inv = lParentLSM.clone().invert();
+			const lParentGSM_noLocal = lParentGSM.clone().multiply( lParentLSM_inv );
 			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
 
 		}
 
-		const lRotationPivotM_inv = new THREE.Matrix4();
-		lRotationPivotM_inv.copy( lRotationPivotM ).invert();
-		const lScalingPivotM_inv = new THREE.Matrix4();
-		lScalingPivotM_inv.copy( lScalingPivotM ).invert(); // Calculate the local transform matrix
+		const lRotationPivotM_inv = lRotationPivotM.clone().invert();
+		const lScalingPivotM_inv = lScalingPivotM.clone().invert(); // Calculate the local transform matrix
 
-		let lTransform = new THREE.Matrix4();
-		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
+		let lTransform = lTranslationM.clone().multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 		const lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
-		const lGlobalTranslation = new THREE.Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
+		const lGlobalTranslation = lParentGX.clone().multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
-		lTransform = new THREE.Matrix4().copy( lGlobalT ).multiply( lGlobalRS ); // from global to local
+		lTransform = lGlobalT.clone().multiply( lGlobalRS ); // from global to local
 
 		lTransform.premultiply( lParentGX.invert() );
 		return lTransform;

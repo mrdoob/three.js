@@ -372,7 +372,7 @@ class Projector {
 				pushTriangle: pushTriangle
 			};
 
-		};
+		}
 
 		const renderList = new RenderList();
 

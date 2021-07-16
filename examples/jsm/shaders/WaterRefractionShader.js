@@ -24,9 +24,9 @@ const WaterRefractionShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`uniform mat4 textureMatrix;
+		uniform mat4 textureMatrix;
 
 		varying vec2 vUv;
 		varying vec4 vUvRefraction;
@@ -41,9 +41,9 @@ const WaterRefractionShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform vec3 color;
+		uniform vec3 color;
 		uniform float time;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tDudv;
@@ -65,7 +65,7 @@ const WaterRefractionShader = {
 
 		void main() {
 
-		 float waveStrength = 0.1;
+		 float waveStrength = 0.5;
 		 float waveSpeed = 0.03;
 
 			// simple distortion (ripple) via dudv map (see https://www.youtube.com/watch?v=6B7IF6GOu7s)

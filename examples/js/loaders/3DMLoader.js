@@ -18,6 +18,7 @@
 			this.workerSourceURL = '';
 			this.workerConfig = {};
 			this.materials = [];
+			this.warnings = [];
 
 		}
 
@@ -54,7 +55,12 @@
 
 				}
 
-				this.decodeObjects( buffer, url ).then( onLoad ).catch( onError );
+				this.decodeObjects( buffer, url ).then( result => {
+
+					result.userData.warnings = this.warnings;
+					onLoad( result );
+
+				} ).catch( e => onError( e ) );
 
 			}, onProgress, onError );
 
@@ -68,15 +74,14 @@
 
 		decodeObjects( buffer, url ) {
 
-			var worker;
-			var taskID;
-			var taskCost = buffer.byteLength;
+			let worker;
+			let taskID;
+			const taskCost = buffer.byteLength;
 
-			var objectPending = this._getWorker( taskCost ).then( _worker => {
+			const objectPending = this._getWorker( taskCost ).then( _worker => {
 
 				worker = _worker;
-				taskID = this.workerNextTaskID ++; //hmmm
-
+				taskID = this.workerNextTaskID ++;
 				return new Promise( ( resolve, reject ) => {
 
 					worker._callbacks[ taskID ] = {
@@ -87,11 +92,15 @@
 						type: 'decode',
 						id: taskID,
 						buffer
-					}, [ buffer ] ); //this.debug();
+					}, [ buffer ] ); // this.debug();
 
 				} );
 
-			} ).then( message => this._createGeometry( message.data ) ); // Remove task from the task list.
+			} ).then( message => this._createGeometry( message.data ) ).catch( e => {
+
+				throw e;
+
+			} ); // Remove task from the task list.
 			// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 
 
@@ -116,13 +125,18 @@
 
 		parse( data, onLoad, onError ) {
 
-			this.decodeObjects( data, '' ).then( onLoad ).catch( onError );
+			this.decodeObjects( data, '' ).then( result => {
+
+				result.userData.warnings = this.warnings;
+				onLoad( result );
+
+			} ).catch( e => onError( e ) );
 
 		}
 
 		_compareMaterials( material ) {
 
-			var mat = {};
+			const mat = {};
 			mat.name = material.name;
 			mat.color = {};
 			mat.color.r = material.color.r;
@@ -130,10 +144,10 @@
 			mat.color.b = material.color.b;
 			mat.type = material.type;
 
-			for ( var i = 0; i < this.materials.length; i ++ ) {
+			for ( let i = 0; i < this.materials.length; i ++ ) {
 
-				var m = this.materials[ i ];
-				var _mat = {};
+				const m = this.materials[ i ];
+				const _mat = {};
 				_mat.name = m.name;
 				_mat.color = {};
 				_mat.color.r = m.color.r;
@@ -167,8 +181,8 @@
 
 			}
 
-			var _diffuseColor = material.diffuseColor;
-			var diffusecolor = new THREE.Color( _diffuseColor.r / 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
+			const _diffuseColor = material.diffuseColor;
+			const diffusecolor = new THREE.Color( _diffuseColor.r / 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
 
 			if ( _diffuseColor.r === 0 && _diffuseColor.g === 0 && _diffuseColor.b === 0 ) {
 
@@ -179,22 +193,22 @@
 			} // console.log( material );
 
 
-			var mat = new THREE.MeshStandardMaterial( {
+			const mat = new THREE.MeshStandardMaterial( {
 				color: diffusecolor,
 				name: material.name,
 				side: 2,
 				transparent: material.transparency > 0 ? true : false,
 				opacity: 1.0 - material.transparency
 			} );
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
-			for ( var i = 0; i < material.textures.length; i ++ ) {
+			for ( let i = 0; i < material.textures.length; i ++ ) {
 
-				var texture = material.textures[ i ];
+				const texture = material.textures[ i ];
 
 				if ( texture.image !== null ) {
 
-					var map = textureLoader.load( texture.image );
+					const map = textureLoader.load( texture.image );
 
 					switch ( texture.type ) {
 
@@ -228,23 +242,23 @@
 		_createGeometry( data ) {
 
 			// console.log(data);
-			var object = new THREE.Object3D();
-			var instanceDefinitionObjects = [];
-			var instanceDefinitions = [];
-			var instanceReferences = [];
+			const object = new THREE.Object3D();
+			const instanceDefinitionObjects = [];
+			const instanceDefinitions = [];
+			const instanceReferences = [];
 			object.userData[ 'layers' ] = data.layers;
 			object.userData[ 'groups' ] = data.groups;
 			object.userData[ 'settings' ] = data.settings;
 			object.userData[ 'objectType' ] = 'File3dm';
 			object.userData[ 'materials' ] = null;
 			object.name = this.url;
-			var objects = data.objects;
-			var materials = data.materials;
+			let objects = data.objects;
+			const materials = data.materials;
 
-			for ( var i = 0; i < objects.length; i ++ ) {
+			for ( let i = 0; i < objects.length; i ++ ) {
 
-				var obj = objects[ i ];
-				var attributes = obj.attributes;
+				const obj = objects[ i ];
+				const attributes = obj.attributes;
 
 				switch ( obj.objectType ) {
 
@@ -257,21 +271,22 @@
 						break;
 
 					default:
+						let _object;
+
 						if ( attributes.materialIndex >= 0 ) {
 
-							var rMaterial = materials[ attributes.materialIndex ];
+							const rMaterial = materials[ attributes.materialIndex ];
 
-							var material = this._createMaterial( rMaterial );
+							let material = this._createMaterial( rMaterial );
 
 							material = this._compareMaterials( material );
-
-							var _object = this._createObject( obj, material );
+							_object = this._createObject( obj, material );
 
 						} else {
 
-							var material = this._createMaterial();
+							const material = this._createMaterial();
 
-							var _object = this._createObject( obj, material );
+							_object = this._createObject( obj, material );
 
 						}
 
@@ -281,7 +296,7 @@
 
 						}
 
-						var layer = data.layers[ attributes.layerIndex ];
+						const layer = data.layers[ attributes.layerIndex ];
 						_object.visible = layer ? data.layers[ attributes.layerIndex ].visible : true;
 
 						if ( attributes.isInstanceDefinitionObject ) {
@@ -300,18 +315,18 @@
 
 			}
 
-			for ( var i = 0; i < instanceDefinitions.length; i ++ ) {
+			for ( let i = 0; i < instanceDefinitions.length; i ++ ) {
 
-				var iDef = instanceDefinitions[ i ];
-				var objects = [];
+				const iDef = instanceDefinitions[ i ];
+				objects = [];
 
-				for ( var j = 0; j < iDef.attributes.objectIds.length; j ++ ) {
+				for ( let j = 0; j < iDef.attributes.objectIds.length; j ++ ) {
 
-					var objId = iDef.attributes.objectIds[ j ];
+					const objId = iDef.attributes.objectIds[ j ];
 
-					for ( var p = 0; p < instanceDefinitionObjects.length; p ++ ) {
+					for ( let p = 0; p < instanceDefinitionObjects.length; p ++ ) {
 
-						var idoId = instanceDefinitionObjects[ p ].userData.attributes.id;
+						const idoId = instanceDefinitionObjects[ p ].userData.attributes.id;
 
 						if ( objId === idoId ) {
 
@@ -324,19 +339,19 @@
 				} // Currently clones geometry and does not take advantage of instancing
 
 
-				for ( var j = 0; j < instanceReferences.length; j ++ ) {
+				for ( let j = 0; j < instanceReferences.length; j ++ ) {
 
-					var iRef = instanceReferences[ j ];
+					const iRef = instanceReferences[ j ];
 
 					if ( iRef.geometry.parentIdefId === iDef.attributes.id ) {
 
-						var iRefObject = new THREE.Object3D();
-						var xf = iRef.geometry.xform.array;
-						var matrix = new THREE.Matrix4();
+						const iRefObject = new THREE.Object3D();
+						const xf = iRef.geometry.xform.array;
+						const matrix = new THREE.Matrix4();
 						matrix.set( xf[ 0 ], xf[ 1 ], xf[ 2 ], xf[ 3 ], xf[ 4 ], xf[ 5 ], xf[ 6 ], xf[ 7 ], xf[ 8 ], xf[ 9 ], xf[ 10 ], xf[ 11 ], xf[ 12 ], xf[ 13 ], xf[ 14 ], xf[ 15 ] );
 						iRefObject.applyMatrix4( matrix );
 
-						for ( var p = 0; p < objects.length; p ++ ) {
+						for ( let p = 0; p < objects.length; p ++ ) {
 
 							iRefObject.add( objects[ p ].clone( true ) );
 
@@ -357,15 +372,16 @@
 
 		_createObject( obj, mat ) {
 
-			var loader = new THREE.BufferGeometryLoader();
-			var attributes = obj.attributes;
+			const loader = new THREE.BufferGeometryLoader();
+			const attributes = obj.attributes;
+
+			let geometry, material, _color, color;
 
 			switch ( obj.objectType ) {
 
 				case 'Point':
 				case 'PointSet':
-					var geometry = loader.parse( obj.geometry );
-					var material = null;
+					geometry = loader.parse( obj.geometry );
 
 					if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
@@ -377,8 +393,8 @@
 
 					} else {
 
-						var _color = attributes.drawColor;
-						var color = new THREE.Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+						_color = attributes.drawColor;
+						color = new THREE.Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 						material = new THREE.PointsMaterial( {
 							color: color,
 							sizeAttenuation: false,
@@ -388,7 +404,7 @@
 					}
 
 					material = this._compareMaterials( material );
-					var points = new THREE.Points( geometry, material );
+					const points = new THREE.Points( geometry, material );
 					points.userData[ 'attributes' ] = attributes;
 					points.userData[ 'objectType' ] = obj.objectType;
 
@@ -405,7 +421,7 @@
 				case 'SubD':
 				case 'Brep':
 					if ( obj.geometry === null ) return;
-					var geometry = loader.parse( obj.geometry );
+					geometry = loader.parse( obj.geometry );
 
 					if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
@@ -420,7 +436,7 @@
 
 					}
 
-					var mesh = new THREE.Mesh( geometry, mat );
+					const mesh = new THREE.Mesh( geometry, mat );
 					mesh.castShadow = attributes.castsShadows;
 					mesh.receiveShadow = attributes.receivesShadows;
 					mesh.userData[ 'attributes' ] = attributes;
@@ -436,13 +452,13 @@
 
 				case 'Curve':
 					geometry = loader.parse( obj.geometry );
-					var _color = attributes.drawColor;
-					var color = new THREE.Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
-					var material = new THREE.LineBasicMaterial( {
+					_color = attributes.drawColor;
+					color = new THREE.Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					material = new THREE.LineBasicMaterial( {
 						color: color
 					} );
 					material = this._compareMaterials( material );
-					var lines = new THREE.Line( geometry, material );
+					const lines = new THREE.Line( geometry, material );
 					lines.userData[ 'attributes' ] = attributes;
 					lines.userData[ 'objectType' ] = obj.objectType;
 
@@ -456,12 +472,12 @@
 
 				case 'TextDot':
 					geometry = obj.geometry;
-					var ctx = document.createElement( 'canvas' ).getContext( '2d' );
-					var font = `${geometry.fontHeight}px ${geometry.fontFace}`;
+					const ctx = document.createElement( 'canvas' ).getContext( '2d' );
+					const font = `${geometry.fontHeight}px ${geometry.fontFace}`;
 					ctx.font = font;
-					var width = ctx.measureText( geometry.text ).width + 10;
-					var height = geometry.fontHeight + 10;
-					var r = window.devicePixelRatio;
+					const width = ctx.measureText( geometry.text ).width + 10;
+					const height = geometry.fontHeight + 10;
+					const r = window.devicePixelRatio;
 					ctx.canvas.width = width * r;
 					ctx.canvas.height = height * r;
 					ctx.canvas.style.width = width + 'px';
@@ -470,20 +486,20 @@
 					ctx.font = font;
 					ctx.textBaseline = 'middle';
 					ctx.textAlign = 'center';
-					var color = attributes.drawColor;
+					color = attributes.drawColor;
 					ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
 					ctx.fillRect( 0, 0, width, height );
 					ctx.fillStyle = 'white';
 					ctx.fillText( geometry.text, width / 2, height / 2 );
-					var texture = new THREE.CanvasTexture( ctx.canvas );
+					const texture = new THREE.CanvasTexture( ctx.canvas );
 					texture.minFilter = THREE.LinearFilter;
 					texture.wrapS = THREE.ClampToEdgeWrapping;
 					texture.wrapT = THREE.ClampToEdgeWrapping;
-					var material = new THREE.SpriteMaterial( {
+					material = new THREE.SpriteMaterial( {
 						map: texture,
 						depthTest: false
 					} );
-					var sprite = new THREE.Sprite( material );
+					const sprite = new THREE.Sprite( material );
 					sprite.position.set( geometry.point[ 0 ], geometry.point[ 1 ], geometry.point[ 2 ] );
 					sprite.scale.set( width / 10, height / 10, 1.0 );
 					sprite.userData[ 'attributes' ] = attributes;
@@ -499,54 +515,58 @@
 
 				case 'Light':
 					geometry = obj.geometry;
-					var light;
+					let light;
 
-					if ( geometry.isDirectionalLight ) {
+					switch ( geometry.lightStyle.name ) {
 
-						light = new THREE.DirectionalLight();
-						light.castShadow = attributes.castsShadows;
-						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-						light.shadow.normalBias = 0.1;
+						case 'LightStyle_WorldPoint':
+							light = new THREE.PointLight();
+							light.castShadow = attributes.castsShadows;
+							light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+							light.shadow.normalBias = 0.1;
+							break;
 
-					} else if ( geometry.isPointLight ) {
+						case 'LightStyle_WorldSpot':
+							light = new THREE.SpotLight();
+							light.castShadow = attributes.castsShadows;
+							light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+							light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+							light.angle = geometry.spotAngleRadians;
+							light.shadow.normalBias = 0.1;
+							break;
 
-						light = new THREE.PointLight();
-						light.castShadow = attributes.castsShadows;
-						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-						light.shadow.normalBias = 0.1;
+						case 'LightStyle_WorldRectangular':
+							light = new THREE.RectAreaLight();
+							const width = Math.abs( geometry.width[ 2 ] );
+							const height = Math.abs( geometry.length[ 0 ] );
+							light.position.set( geometry.location[ 0 ] - height / 2, geometry.location[ 1 ], geometry.location[ 2 ] - width / 2 );
+							light.height = height;
+							light.width = width;
+							light.lookAt( new THREE.Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+							break;
 
-					} else if ( geometry.isRectangularLight ) {
+						case 'LightStyle_WorldDirectional':
+							light = new THREE.DirectionalLight();
+							light.castShadow = attributes.castsShadows;
+							light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+							light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+							light.shadow.normalBias = 0.1;
+							break;
 
-						light = new THREE.RectAreaLight();
-						var width = Math.abs( geometry.width[ 2 ] );
-						var height = Math.abs( geometry.length[ 0 ] );
-						light.position.set( geometry.location[ 0 ] - height / 2, geometry.location[ 1 ], geometry.location[ 2 ] - width / 2 );
-						light.height = height;
-						light.width = width;
-						light.lookAt( new THREE.Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+						case 'LightStyle_WorldLinear':
+							// not conversion exists, warning has already been printed to the console
+							break;
 
-					} else if ( geometry.isSpotLight ) {
-
-						light = new THREE.SpotLight();
-						light.castShadow = attributes.castsShadows;
-						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-						light.angle = geometry.spotAngleRadians;
-						light.shadow.normalBias = 0.1;
-
-					} else if ( geometry.isLinearLight ) {
-
-						console.warn( 'THREE.3DMLoader:	No conversion exists for linear lights.' );
-						return;
+						default:
+							break;
 
 					}
 
 					if ( light ) {
 
 						light.intensity = geometry.intensity;
-						var _color = geometry.diffuse;
-						var color = new THREE.Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+						_color = geometry.diffuse;
+						color = new THREE.Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 						light.color = color;
 						light.userData[ 'attributes' ] = attributes;
 						light.userData[ 'objectType' ] = obj.objectType;
@@ -564,18 +584,18 @@
 			if ( ! this.libraryPending ) {
 
 				// Load rhino3dm wrapper.
-				var jsLoader = new THREE.FileLoader( this.manager );
+				const jsLoader = new THREE.FileLoader( this.manager );
 				jsLoader.setPath( this.libraryPath );
-				var jsContent = new Promise( ( resolve, reject ) => {
+				const jsContent = new Promise( ( resolve, reject ) => {
 
 					jsLoader.load( 'rhino3dm.js', resolve, undefined, reject );
 
 				} ); // Load rhino3dm WASM binary.
 
-				var binaryLoader = new THREE.FileLoader( this.manager );
+				const binaryLoader = new THREE.FileLoader( this.manager );
 				binaryLoader.setPath( this.libraryPath );
 				binaryLoader.setResponseType( 'arraybuffer' );
-				var binaryContent = new Promise( ( resolve, reject ) => {
+				const binaryContent = new Promise( ( resolve, reject ) => {
 
 					binaryLoader.load( 'rhino3dm.wasm', resolve, undefined, reject );
 
@@ -584,8 +604,8 @@
 
 					//this.libraryBinary = binaryContent;
 					this.libraryConfig.wasmBinary = binaryContent;
-					var fn = Rhino3dmWorker.toString();
-					var body = [ '/* rhino3dm.js */', jsContent, '/* worker */', fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) ) ].join( '\n' );
+					const fn = Rhino3dmWorker.toString();
+					const body = [ '/* rhino3dm.js */', jsContent, '/* worker */', fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) ) ].join( '\n' );
 					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
 
 				} );
@@ -602,7 +622,7 @@
 
 				if ( this.workerPool.length < this.workerLimit ) {
 
-					var worker = new Worker( this.workerSourceURL );
+					const worker = new Worker( this.workerSourceURL );
 					worker._callbacks = {};
 					worker._taskCosts = {};
 					worker._taskLoad = 0;
@@ -611,11 +631,16 @@
 						libraryConfig: this.libraryConfig
 					} );
 
-					worker.onmessage = function ( e ) {
+					worker.onmessage = e => {
 
-						var message = e.data;
+						const message = e.data;
 
 						switch ( message.type ) {
+
+							case 'warning':
+								this.warnings.push( message.data );
+								console.warn( message.data );
+								break;
 
 							case 'decode':
 								worker._callbacks[ message.id ].resolve( message );
@@ -646,7 +671,7 @@
 
 				}
 
-				var worker = this.workerPool[ this.workerPool.length - 1 ];
+				const worker = this.workerPool[ this.workerPool.length - 1 ];
 				worker._taskLoad += taskCost;
 				return worker;
 
@@ -664,7 +689,7 @@
 
 		dispose() {
 
-			for ( var i = 0; i < this.workerPool.length; ++ i ) {
+			for ( let i = 0; i < this.workerPool.length; ++ i ) {
 
 				this.workerPool[ i ].terminate();
 
@@ -681,20 +706,22 @@
 
 	function Rhino3dmWorker() {
 
-		var libraryPending;
-		var libraryConfig;
-		var rhino;
+		let libraryPending;
+		let libraryConfig;
+		let rhino;
+		let taskID;
 
 		onmessage = function ( e ) {
 
-			var message = e.data;
+			const message = e.data;
 
 			switch ( message.type ) {
 
 				case 'init':
+					// console.log(message)
 					libraryConfig = message.libraryConfig;
-					var wasmBinary = libraryConfig.wasmBinary;
-					var RhinoModule;
+					const wasmBinary = libraryConfig.wasmBinary;
+					let RhinoModule;
 					libraryPending = new Promise( function ( resolve ) {
 
 						/* Like Basis THREE.Loader */
@@ -712,15 +739,28 @@
 					break;
 
 				case 'decode':
-					var buffer = message.buffer;
+					taskID = message.id;
+					const buffer = message.buffer;
 					libraryPending.then( () => {
 
-						var data = decodeObjects( rhino, buffer );
-						self.postMessage( {
-							type: 'decode',
-							id: message.id,
-							data
-						} );
+						try {
+
+							const data = decodeObjects( rhino, buffer );
+							self.postMessage( {
+								type: 'decode',
+								id: message.id,
+								data
+							} );
+
+						} catch ( error ) {
+
+							self.postMessage( {
+								type: 'error',
+								id: message.id,
+								error
+							} );
+
+						}
 
 					} );
 					break;
@@ -731,23 +771,23 @@
 
 		function decodeObjects( rhino, buffer ) {
 
-			var arr = new Uint8Array( buffer );
-			var doc = rhino.File3dm.fromByteArray( arr );
-			var objects = [];
-			var materials = [];
-			var layers = [];
-			var views = [];
-			var namedViews = [];
-			var groups = []; //Handle objects
+			const arr = new Uint8Array( buffer );
+			const doc = rhino.File3dm.fromByteArray( arr );
+			const objects = [];
+			const materials = [];
+			const layers = [];
+			const views = [];
+			const namedViews = [];
+			const groups = []; //Handle objects
 
-			var objs = doc.objects();
-			var cnt = objs.count;
+			const objs = doc.objects();
+			const cnt = objs.count;
 
-			for ( var i = 0; i < cnt; i ++ ) {
+			for ( let i = 0; i < cnt; i ++ ) {
 
-				var _object = objs.get( i );
+				const _object = objs.get( i );
 
-				var object = extractObjectData( _object, doc );
+				const object = extractObjectData( _object, doc );
 
 				_object.delete();
 
@@ -761,10 +801,10 @@
 			// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
 
-			for ( var i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
+			for ( let i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
 
-				var idef = doc.instanceDefinitions().get( i );
-				var idefAttributes = extractProperties( idef );
+				const idef = doc.instanceDefinitions().get( i );
+				const idefAttributes = extractProperties( idef );
 				idefAttributes.objectIds = idef.getObjectIds();
 				objects.push( {
 					geometry: null,
@@ -775,31 +815,31 @@
 			} // Handle materials
 
 
-			var textureTypes = [// rhino.TextureType.Bitmap,
+			const textureTypes = [// rhino.TextureType.Bitmap,
 				rhino.TextureType.Diffuse, rhino.TextureType.Bump, rhino.TextureType.Transparency, rhino.TextureType.Opacity, rhino.TextureType.Emap ];
-			var pbrTextureTypes = [ rhino.TextureType.PBR_BaseColor, rhino.TextureType.PBR_Subsurface, rhino.TextureType.PBR_SubsurfaceScattering, rhino.TextureType.PBR_SubsurfaceScatteringRadius, rhino.TextureType.PBR_Metallic, rhino.TextureType.PBR_Specular, rhino.TextureType.PBR_SpecularTint, rhino.TextureType.PBR_Roughness, rhino.TextureType.PBR_Anisotropic, rhino.TextureType.PBR_Anisotropic_Rotation, rhino.TextureType.PBR_Sheen, rhino.TextureType.PBR_SheenTint, rhino.TextureType.PBR_Clearcoat, rhino.TextureType.PBR_ClearcoatBump, rhino.TextureType.PBR_ClearcoatRoughness, rhino.TextureType.PBR_OpacityIor, rhino.TextureType.PBR_OpacityRoughness, rhino.TextureType.PBR_Emission, rhino.TextureType.PBR_AmbientOcclusion, rhino.TextureType.PBR_Displacement ];
+			const pbrTextureTypes = [ rhino.TextureType.PBR_BaseColor, rhino.TextureType.PBR_Subsurface, rhino.TextureType.PBR_SubsurfaceScattering, rhino.TextureType.PBR_SubsurfaceScatteringRadius, rhino.TextureType.PBR_Metallic, rhino.TextureType.PBR_Specular, rhino.TextureType.PBR_SpecularTint, rhino.TextureType.PBR_Roughness, rhino.TextureType.PBR_Anisotropic, rhino.TextureType.PBR_Anisotropic_Rotation, rhino.TextureType.PBR_Sheen, rhino.TextureType.PBR_SheenTint, rhino.TextureType.PBR_Clearcoat, rhino.TextureType.PBR_ClearcoatBump, rhino.TextureType.PBR_ClearcoatRoughness, rhino.TextureType.PBR_OpacityIor, rhino.TextureType.PBR_OpacityRoughness, rhino.TextureType.PBR_Emission, rhino.TextureType.PBR_AmbientOcclusion, rhino.TextureType.PBR_Displacement ];
 
-			for ( var i = 0; i < doc.materials().count(); i ++ ) {
+			for ( let i = 0; i < doc.materials().count(); i ++ ) {
 
-				var _material = doc.materials().get( i );
+				const _material = doc.materials().get( i );
 
-				var _pbrMaterial = _material.physicallyBased();
+				const _pbrMaterial = _material.physicallyBased();
 
-				var material = extractProperties( _material );
-				var textures = [];
+				let material = extractProperties( _material );
+				const textures = [];
 
-				for ( var j = 0; j < textureTypes.length; j ++ ) {
+				for ( let j = 0; j < textureTypes.length; j ++ ) {
 
-					var _texture = _material.getTexture( textureTypes[ j ] );
+					const _texture = _material.getTexture( textureTypes[ j ] );
 
 					if ( _texture ) {
 
-						var textureType = textureTypes[ j ].constructor.name;
+						let textureType = textureTypes[ j ].constructor.name;
 						textureType = textureType.substring( 12, textureType.length );
-						var texture = {
+						const texture = {
 							type: textureType
 						};
-						var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
 
 						if ( image ) {
 
@@ -807,7 +847,14 @@
 
 						} else {
 
-							console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+							self.postMessage( {
+								type: 'warning',
+								id: taskID,
+								data: {
+									message: `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.`,
+									type: 'missing resource'
+								}
+							} );
 							texture.image = null;
 
 						}
@@ -824,18 +871,16 @@
 
 				if ( _pbrMaterial.supported ) {
 
-					console.log( 'pbr true' );
+					for ( let j = 0; j < pbrTextureTypes.length; j ++ ) {
 
-					for ( var j = 0; j < pbrTextureTypes.length; j ++ ) {
-
-						var _texture = _material.getTexture( textureTypes[ j ] );
+						const _texture = _material.getTexture( pbrTextureTypes[ j ] );
 
 						if ( _texture ) {
 
-							var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-							var textureType = textureTypes[ j ].constructor.name;
+							const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+							let textureType = pbrTextureTypes[ j ].constructor.name;
 							textureType = textureType.substring( 12, textureType.length );
-							var texture = {
+							const texture = {
 								type: textureType,
 								image: 'data:image/png;base64,' + image
 							};
@@ -847,7 +892,7 @@
 
 					}
 
-					var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+					const pbMaterialProperties = extractProperties( _material.physicallyBased() );
 					material = Object.assign( pbMaterialProperties, material );
 
 				}
@@ -861,11 +906,11 @@
 			} // Handle layers
 
 
-			for ( var i = 0; i < doc.layers().count(); i ++ ) {
+			for ( let i = 0; i < doc.layers().count(); i ++ ) {
 
-				var _layer = doc.layers().get( i );
+				const _layer = doc.layers().get( i );
 
-				var layer = extractProperties( _layer );
+				const layer = extractProperties( _layer );
 				layers.push( layer );
 
 				_layer.delete();
@@ -873,11 +918,11 @@
 			} // Handle views
 
 
-			for ( var i = 0; i < doc.views().count(); i ++ ) {
+			for ( let i = 0; i < doc.views().count(); i ++ ) {
 
-				var _view = doc.views().get( i );
+				const _view = doc.views().get( i );
 
-				var view = extractProperties( _view );
+				const view = extractProperties( _view );
 				views.push( view );
 
 				_view.delete();
@@ -885,11 +930,11 @@
 			} // Handle named views
 
 
-			for ( var i = 0; i < doc.namedViews().count(); i ++ ) {
+			for ( let i = 0; i < doc.namedViews().count(); i ++ ) {
 
-				var _namedView = doc.namedViews().get( i );
+				const _namedView = doc.namedViews().get( i );
 
-				var namedView = extractProperties( _namedView );
+				const namedView = extractProperties( _namedView );
 				namedViews.push( namedView );
 
 				_namedView.delete();
@@ -897,11 +942,11 @@
 			} // Handle groups
 
 
-			for ( var i = 0; i < doc.groups().count(); i ++ ) {
+			for ( let i = 0; i < doc.groups().count(); i ++ ) {
 
-				var _group = doc.groups().get( i );
+				const _group = doc.groups().get( i );
 
-				var group = extractProperties( _group );
+				const group = extractProperties( _group );
 				groups.push( group );
 
 				_group.delete();
@@ -909,7 +954,7 @@
 			} // Handle settings
 
 
-			var settings = extractProperties( doc.settings() ); //TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
+			const settings = extractProperties( doc.settings() ); //TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 			// Handle dimstyles
 			// console.log( `Dimstyle Count: ${doc.dimstyles().count()}` );
 			// Handle bitmaps
@@ -918,14 +963,14 @@
 			// console.log( `Document Strings Count: ${doc.strings().count()}` );
 
 			/*
-		for( var i = 0; i < doc.strings().count(); i++ ){
-				var _string= doc.strings().get( i );
-				console.log(_string);
-			var string = extractProperties( _group );
-				strings.push( string );
-				_string.delete();
-			}
-		*/
+    for( var i = 0; i < doc.strings().count(); i++ ){
+    		var _string= doc.strings().get( i );
+    		console.log(_string);
+    	var string = extractProperties( _group );
+    		strings.push( string );
+    		_string.delete();
+    	}
+    */
 
 			doc.delete();
 			return {
@@ -942,28 +987,27 @@
 
 		function extractObjectData( object, doc ) {
 
-			var _geometry = object.geometry();
+			const _geometry = object.geometry();
 
-			var _attributes = object.attributes();
+			const _attributes = object.attributes();
 
-			var objectType = _geometry.objectType;
-			var geometry = null;
-			var attributes = null; // skip instance definition objects
+			let objectType = _geometry.objectType;
+			let geometry, attributes, position, data, mesh; // skip instance definition objects
 			//if( _attributes.isInstanceDefinitionObject ) { continue; }
 			// TODO: handle other geometry types
 
 			switch ( objectType ) {
 
 				case rhino.ObjectType.Curve:
-					var pts = curveToPoints( _geometry, 100 );
-					var position = {};
-					var attributes = {};
-					var data = {};
+					const pts = curveToPoints( _geometry, 100 );
+					position = {};
+					attributes = {};
+					data = {};
 					position.itemSize = 3;
 					position.type = 'Float32Array';
 					position.array = [];
 
-					for ( var j = 0; j < pts.length; j ++ ) {
+					for ( let j = 0; j < pts.length; j ++ ) {
 
 						position.array.push( pts[ j ][ 0 ] );
 						position.array.push( pts[ j ][ 1 ] );
@@ -979,16 +1023,16 @@
 					break;
 
 				case rhino.ObjectType.Point:
-					var pt = _geometry.location;
-					var position = {};
-					var color = {};
-					var attributes = {};
-					var data = {};
+					const pt = _geometry.location;
+					position = {};
+					const color = {};
+					attributes = {};
+					data = {};
 					position.itemSize = 3;
 					position.type = 'Float32Array';
 					position.array = [ pt[ 0 ], pt[ 1 ], pt[ 2 ] ];
 
-					var _color = _attributes.drawColor( doc );
+					const _color = _attributes.drawColor( doc );
 
 					color.itemSize = 3;
 					color.type = 'Float32Array';
@@ -1007,15 +1051,15 @@
 					break;
 
 				case rhino.ObjectType.Brep:
-					var faces = _geometry.faces();
+					const faces = _geometry.faces();
 
-					var mesh = new rhino.Mesh();
+					mesh = new rhino.Mesh();
 
-					for ( var faceIndex = 0; faceIndex < faces.count; faceIndex ++ ) {
+					for ( let faceIndex = 0; faceIndex < faces.count; faceIndex ++ ) {
 
-						var face = faces.get( faceIndex );
+						const face = faces.get( faceIndex );
 
-						var _mesh = face.getMesh( rhino.MeshType.Any );
+						const _mesh = face.getMesh( rhino.MeshType.Any );
 
 						if ( _mesh ) {
 
@@ -1041,7 +1085,7 @@
 					break;
 
 				case rhino.ObjectType.Extrusion:
-					var mesh = _geometry.getMesh( rhino.MeshType.Any );
+					mesh = _geometry.getMesh( rhino.MeshType.Any );
 
 					if ( mesh ) {
 
@@ -1058,6 +1102,21 @@
 
 				case rhino.ObjectType.Light:
 					geometry = extractProperties( _geometry );
+
+					if ( geometry.lightStyle.name === 'LightStyle_WorldLinear' ) {
+
+						self.postMessage( {
+							type: 'warning',
+							id: taskID,
+							data: {
+								message: `THREE.3DMLoader: No conversion exists for ${objectType.constructor.name} ${geometry.lightStyle.name}`,
+								type: 'no conversion',
+								guid: _attributes.id
+							}
+						} );
+
+					}
+
 					break;
 
 				case rhino.ObjectType.InstanceReference:
@@ -1067,10 +1126,10 @@
 					break;
 
 				case rhino.ObjectType.SubD:
-				// TODO: precalculate resulting vertices and faces and warn on excessive results
+					// TODO: precalculate resulting vertices and faces and warn on excessive results
 					_geometry.subdivide( 3 );
 
-					var mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
+					mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
 
 					if ( mesh ) {
 
@@ -1082,20 +1141,28 @@
 					break;
 
 					/*
-			case rhino.ObjectType.Annotation:
-			case rhino.ObjectType.Hatch:
-			case rhino.ObjectType.ClipPlane:
-			*/
+      case rhino.ObjectType.Annotation:
+      case rhino.ObjectType.Hatch:
+      case rhino.ObjectType.ClipPlane:
+      */
 
 				default:
-					console.warn( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
+					self.postMessage( {
+						type: 'warning',
+						id: taskID,
+						data: {
+							message: `THREE.3DMLoader: Conversion not implemented for ${objectType.constructor.name}`,
+							type: 'not implemented',
+							guid: _attributes.id
+						}
+					} );
 					break;
 
 			}
 
 			if ( geometry ) {
 
-				var attributes = extractProperties( _attributes );
+				attributes = extractProperties( _attributes );
 				attributes.geometry = extractProperties( _geometry );
 
 				if ( _attributes.groupCount > 0 ) {
@@ -1127,7 +1194,15 @@
 
 			} else {
 
-				console.warn( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
+				self.postMessage( {
+					type: 'warning',
+					id: taskID,
+					data: {
+						message: `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`,
+						type: 'missing mesh',
+						guid: _attributes.id
+					}
+				} );
 
 			}
 
@@ -1135,11 +1210,11 @@
 
 		function extractProperties( object ) {
 
-			var result = {};
+			const result = {};
 
-			for ( var property in object ) {
+			for ( const property in object ) {
 
-				var value = object[ property ];
+				const value = object[ property ];
 
 				if ( typeof value !== 'function' ) {
 
@@ -1157,7 +1232,7 @@
 					}
 
 				} else { // these are functions that could be called to extract more data.
-				//console.log( `${property}: ${object[ property ].constructor.name}` );
+					//console.log( `${property}: ${object[ property ].constructor.name}` );
 				}
 
 			}
@@ -1168,9 +1243,9 @@
 
 		function curveToPoints( curve, pointLimit ) {
 
-			var pointCount = pointLimit;
-			var rc = [];
-			var ts = [];
+			let pointCount = pointLimit;
+			let rc = [];
+			const ts = [];
 
 			if ( curve instanceof rhino.LineCurve ) {
 
@@ -1182,7 +1257,7 @@
 
 				pointCount = curve.pointCount;
 
-				for ( var i = 0; i < pointCount; i ++ ) {
+				for ( let i = 0; i < pointCount; i ++ ) {
 
 					rc.push( curve.point( i ) );
 
@@ -1194,12 +1269,12 @@
 
 			if ( curve instanceof rhino.PolyCurve ) {
 
-				var segmentCount = curve.segmentCount;
+				const segmentCount = curve.segmentCount;
 
-				for ( var i = 0; i < segmentCount; i ++ ) {
+				for ( let i = 0; i < segmentCount; i ++ ) {
 
-					var segment = curve.segmentCurve( i );
-					var segmentArray = curveToPoints( segment, pointCount );
+					const segment = curve.segmentCurve( i );
+					const segmentArray = curveToPoints( segment, pointCount );
 					rc = rc.concat( segmentArray );
 					segment.delete();
 
@@ -1220,7 +1295,7 @@
 
 				const pLine = curve.tryGetPolyline();
 
-				for ( var i = 0; i < pLine.count; i ++ ) {
+				for ( let i = 0; i < pLine.count; i ++ ) {
 
 					rc.push( pLine.get( i ) );
 
@@ -1231,12 +1306,12 @@
 
 			}
 
-			var domain = curve.domain;
-			var divisions = pointCount - 1.0;
+			const domain = curve.domain;
+			const divisions = pointCount - 1.0;
 
-			for ( var j = 0; j < pointCount; j ++ ) {
+			for ( let j = 0; j < pointCount; j ++ ) {
 
-				var t = domain[ 0 ] + j / divisions * ( domain[ 1 ] - domain[ 0 ] );
+				const t = domain[ 0 ] + j / divisions * ( domain[ 1 ] - domain[ 0 ] );
 
 				if ( t === domain[ 0 ] || t === domain[ 1 ] ) {
 
@@ -1245,14 +1320,14 @@
 
 				}
 
-				var tan = curve.tangentAt( t );
-				var prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] ); // Duplicated from THREE.Vector3
+				const tan = curve.tangentAt( t );
+				const prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] ); // Duplicated from THREE.Vector3
 				// How to pass imports to worker?
 
-				var tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
-				var ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
-				var denominator = Math.sqrt( tS * ptS );
-				var angle;
+				const tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
+				const ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
+				const denominator = Math.sqrt( tS * ptS );
+				let angle;
 
 				if ( denominator === 0 ) {
 
@@ -1260,7 +1335,7 @@
 
 				} else {
 
-					var theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
+					const theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
 					angle = Math.acos( Math.max( - 1, Math.min( 1, theta ) ) );
 
 				}

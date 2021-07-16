@@ -39,8 +39,7 @@ ShaderLib[ 'line' ] = {
 		UniformsLib.line
 	] ),
 
-	vertexShader:
-		`
+	vertexShader: /* glsl */`
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -183,11 +182,9 @@ ShaderLib[ 'line' ] = {
 			#include <clipping_planes_vertex>
 			#include <fog_vertex>
 
-		}
-		`,
+		}`,
 
-	fragmentShader:
-		`
+	fragmentShader: /* glsl */`
 		uniform vec3 diffuse;
 		uniform float opacity;
 
@@ -221,7 +218,7 @@ ShaderLib[ 'line' ] = {
 
 			#endif
 
-			float alpha = opacity;
+			float alpha = 1.0;
 
 			#ifdef ALPHA_TO_COVERAGE
 
@@ -251,20 +248,20 @@ ShaderLib[ 'line' ] = {
 
 			#endif
 
-			vec4 diffuseColor = vec4( diffuse, alpha );
+			vec4 diffuseColor = vec4( diffuse, opacity * alpha );
 
 			#include <logdepthbuf_fragment>
 			#include <color_fragment>
 
-			gl_FragColor = vec4( diffuseColor.rgb, alpha );
+			gl_FragColor = diffuseColor;
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
 			#include <fog_fragment>
 			#include <premultiplied_alpha_fragment>
 
-		}
-		`
+		}`
+
 };
 
 class LineMaterial extends ShaderMaterial {
@@ -283,8 +280,6 @@ class LineMaterial extends ShaderMaterial {
 			clipping: true // required for clipping support
 
 		} );
-
-		this.dashed = false;
 
 		Object.defineProperties( this, {
 
@@ -319,6 +314,38 @@ class LineMaterial extends ShaderMaterial {
 				set: function ( value ) {
 
 					this.uniforms.linewidth.value = value;
+
+				}
+
+			},
+
+			dashed: {
+
+				enumerable: true,
+
+				get: function () {
+
+					return Boolean( 'USE_DASH' in this.defines );
+
+				},
+
+				set( value ) {
+
+					if ( Boolean( value ) !== Boolean( 'USE_DASH' in this.defines ) ) {
+
+						this.needsUpdate = true;
+
+					}
+
+					if ( value === true ) {
+
+						this.defines.USE_DASH = '';
+
+					} else {
+
+						delete this.defines.USE_DASH;
+
+					}
 
 				}
 
@@ -450,7 +477,7 @@ class LineMaterial extends ShaderMaterial {
 
 					}
 
-					if ( value ) {
+					if ( value === true ) {
 
 						this.defines.ALPHA_TO_COVERAGE = '';
 						this.extensions.derivatives = true;

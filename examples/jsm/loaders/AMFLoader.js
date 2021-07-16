@@ -9,7 +9,7 @@ import {
 	Mesh,
 	MeshPhongMaterial
 } from '../../../build/three.module.js';
-import * as fflate from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.js';
 
 /**
  * Description: Early release of an AMF Loader following the pattern of the

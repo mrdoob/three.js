@@ -288,20 +288,19 @@ ReflectorForSSRPass.ReflectorShader = {
 
 	},
 
-	vertexShader: [
-		'uniform mat4 textureMatrix;',
-		'varying vec4 vUv;',
+	vertexShader: /* glsl */`
+		uniform mat4 textureMatrix;
+		varying vec4 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = textureMatrix * vec4( position, 1.0 );',
+			vUv = textureMatrix * vec4( position, 1.0 );
 
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
-	].join( '\n' ),
+		}`,
 
-	fragmentShader: `
+	fragmentShader: /* glsl */`
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tDepth;

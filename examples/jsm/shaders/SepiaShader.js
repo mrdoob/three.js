@@ -13,9 +13,9 @@ const SepiaShader = {
 
 	},
 
-	vertexShader:
+	vertexShader: /* glsl */`
 
-		`varying vec2 vUv;
+		varying vec2 vUv;
 
 		void main() {
 
@@ -24,9 +24,9 @@ const SepiaShader = {
 
 		}`,
 
-	fragmentShader:
+	fragmentShader: /* glsl */`
 
-		`uniform float amount;
+		uniform float amount;
 
 		uniform sampler2D tDiffuse;
 

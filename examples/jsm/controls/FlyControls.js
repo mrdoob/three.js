@@ -57,8 +57,6 @@ class FlyControls extends EventDispatcher {
 
 			}
 
-			//event.preventDefault();
-
 			switch ( event.code ) {
 
 				case 'ShiftLeft':
@@ -123,14 +121,6 @@ class FlyControls extends EventDispatcher {
 
 		this.mousedown = function ( event ) {
 
-			if ( this.domElement !== document ) {
-
-				this.domElement.focus();
-
-			}
-
-			event.preventDefault();
-
 			if ( this.dragToLook ) {
 
 				this.mouseStatus ++;
@@ -168,8 +158,6 @@ class FlyControls extends EventDispatcher {
 		};
 
 		this.mouseup = function ( event ) {
-
-			event.preventDefault();
 
 			if ( this.dragToLook ) {
 

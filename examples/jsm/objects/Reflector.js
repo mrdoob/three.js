@@ -217,43 +217,50 @@ Reflector.ReflectorShader = {
 
 	},
 
-	vertexShader: [
-		'uniform mat4 textureMatrix;',
-		'varying vec4 vUv;',
+	vertexShader: /* glsl */`
+		uniform mat4 textureMatrix;
+		varying vec4 vUv;
 
-		'void main() {',
+		#include <common>
+		#include <logdepthbuf_pars_vertex>
 
-		'	vUv = textureMatrix * vec4( position, 1.0 );',
+		void main() {
 
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			vUv = textureMatrix * vec4( position, 1.0 );
 
-		'}'
-	].join( '\n' ),
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	fragmentShader: [
-		'uniform vec3 color;',
-		'uniform sampler2D tDiffuse;',
-		'varying vec4 vUv;',
+			#include <logdepthbuf_vertex>
 
-		'float blendOverlay( float base, float blend ) {',
+		}`,
 
-		'	return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );',
+	fragmentShader: /* glsl */`
+		uniform vec3 color;
+		uniform sampler2D tDiffuse;
+		varying vec4 vUv;
 
-		'}',
+		#include <logdepthbuf_pars_fragment>
 
-		'vec3 blendOverlay( vec3 base, vec3 blend ) {',
+		float blendOverlay( float base, float blend ) {
 
-		'	return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );',
+			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
 
-		'}',
+		}
 
-		'void main() {',
+		vec3 blendOverlay( vec3 base, vec3 blend ) {
 
-		'	vec4 base = texture2DProj( tDiffuse, vUv );',
-		'	gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );',
+			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
 
-		'}'
-	].join( '\n' )
+		}
+
+		void main() {
+
+			#include <logdepthbuf_fragment>
+
+			vec4 base = texture2DProj( tDiffuse, vUv );
+			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+		}`
 };
 
 export { Reflector };
