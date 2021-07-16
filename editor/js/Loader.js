@@ -192,8 +192,7 @@ function Loader( editor ) {
 						} else {
 
 							var material = new THREE.PointsMaterial( { size: 0.01 } );
-
-							if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+							material.vertexColors = geometry.hasAttribute( 'color' );
 
 							object = new THREE.Points( geometry, material );
 							object.name = filename;
@@ -438,12 +437,26 @@ function Loader( editor ) {
 					var { PLYLoader } = await import( '../../examples/jsm/loaders/PLYLoader.js' );
 
 					var geometry = new PLYLoader().parse( contents );
-					var material = new THREE.MeshStandardMaterial();
+					var object;
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
+					if ( geometry.index !== null ) {
 
-					editor.execute( new AddObjectCommand( editor, mesh ) );
+						var material = new THREE.MeshStandardMaterial();
+
+						object = new THREE.Mesh( geometry, material );
+						object.name = filename;
+
+					} else {
+
+						var material = new THREE.PointsMaterial( { size: 0.01 } );
+						material.vertexColors = geometry.hasAttribute( 'color' );
+
+						object = new THREE.Points( geometry, material );
+						object.name = filename;
+
+					}
+
+					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
