@@ -383,6 +383,31 @@ function Loader( editor ) {
 
 				break;
 
+			case 'ldr':
+			case 'mpd':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					var { LDrawLoader } = await import( '../../examples/jsm/loaders/LDrawLoader.js' );
+
+					var loader = new LDrawLoader();
+					loader.fileMap = {}; // TODO Uh...
+					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
+					loader.parse( event.target.result, undefined, function ( group ) {
+
+						group.name = filename;
+						// Convert from LDraw coordinates: rotate 180 degrees around OX
+						group.rotation.x = Math.PI;
+
+						editor.execute( new AddObjectCommand( editor, group ) );
+
+					} );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
 			case 'md2':
 
 				reader.addEventListener( 'load', async function ( event ) {
