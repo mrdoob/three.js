@@ -1922,7 +1922,7 @@ function WebGLRenderer( parameters = {} ) {
 
 				if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== _gl.BACK ) {
 
-					if ( !xr || !xr.getSession() || !xr.getSession().renderState || !xr.getSession().renderState.layers ) {
+					if ( ! xr || ! xr.getSession() || ! xr.getSession().renderState || ! xr.getSession().renderState.layers ) {
 
 						_currentDrawBuffers[ 0 ] = _gl.BACK;
 						_currentDrawBuffers.length = 1;
