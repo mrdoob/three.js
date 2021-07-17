@@ -1922,10 +1922,14 @@ function WebGLRenderer( parameters = {} ) {
 
 				if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== _gl.BACK ) {
 
-					_currentDrawBuffers[ 0 ] = _gl.BACK;
-					_currentDrawBuffers.length = 1;
+					if ( !xr || !xr.getSession() || !xr.getSession().renderState || !xr.getSession().renderState.layers ) {
 
-					needsUpdate = true;
+						_currentDrawBuffers[ 0 ] = _gl.BACK;
+						_currentDrawBuffers.length = 1;
+
+						needsUpdate = true;
+
+					} // else avoid https://github.com/mrdoob/three.js/issues/22079 when using XR layers.
 
 				}
 
