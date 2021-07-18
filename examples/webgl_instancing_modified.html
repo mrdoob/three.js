@@ -46,17 +46,15 @@
 
 				new THREE.BufferGeometryLoader().load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
-					const instanceColors = [];
+					const instanceVisibilities = [];
 
 					for ( let i = 0; i < count; i ++ ) {
 
-						instanceColors.push( Math.random() );
-						instanceColors.push( Math.random() );
-						instanceColors.push( Math.random() );
+						instanceVisibilities.push( Math.random() );
 
 					}
 
-					geometry.setAttribute( 'instanceColor', new THREE.InstancedBufferAttribute( new Float32Array( instanceColors ), 3 ) );
+					geometry.setAttribute( 'instanceVisibility', new THREE.InstancedBufferAttribute( new Float32Array( instanceVisibilities ), 1 ) );
 
 					geometry.computeVertexNormals();
 
@@ -70,37 +68,38 @@
 
 						texture.encoding = THREE.sRGBEncoding;
 
-						const material = new THREE.MeshMatcapMaterial( { color: 0xaaaaff, matcap: texture } );
+						const material = new THREE.MeshMatcapMaterial( { color: 0xff4040, matcap: texture } );
 
-						const colorParsChunk = [
-							'attribute vec3 instanceColor;',
-							'varying vec3 vInstanceColor;',
+						const vertexCommonChunk = [
+							'attribute float instanceVisibility;',
+							'varying float vInstanceVisibility;',
 							'#include <common>'
 						].join( '\n' );
 
-						const instanceColorChunk = [
+						const vertexBeginChunk = [
 							'#include <begin_vertex>',
-							'\tvInstanceColor = instanceColor;'
+							'\tvInstanceVisibility = instanceVisibility;'
 						].join( '\n' );
 
-						const fragmentParsChunk = [
-							'varying vec3 vInstanceColor;',
+						const fragmentCommonChunk = [
+							'varying float vInstanceVisibility;',
 							'#include <common>'
 						].join( '\n' );
 
-						const colorChunk = [
-							'vec4 diffuseColor = vec4( diffuse * vInstanceColor, opacity );'
+						const fragmentDiffuseColorChunk = [
+							'if ( vInstanceVisibility < 0. ) discard;',
+							'vec4 diffuseColor = vec4( diffuse, opacity );'
 						].join( '\n' );
 
 						material.onBeforeCompile = function ( shader ) {
 
 							shader.vertexShader = shader.vertexShader
-								.replace( '#include <common>', colorParsChunk )
-								.replace( '#include <begin_vertex>', instanceColorChunk );
+								.replace( '#include <common>', vertexCommonChunk )
+								.replace( '#include <begin_vertex>', vertexBeginChunk );
 
 							shader.fragmentShader = shader.fragmentShader
-								.replace( '#include <common>', fragmentParsChunk )
-								.replace( 'vec4 diffuseColor = vec4( diffuse, opacity );', colorChunk );
+								.replace( '#include <common>', fragmentCommonChunk )
+								.replace( 'vec4 diffuseColor = vec4( diffuse, opacity );', fragmentDiffuseColorChunk );
 
 							//console.log( shader.uniforms );
 							//console.log( shader.vertexShader );
@@ -111,6 +110,8 @@
 						mesh = new THREE.InstancedMesh( geometry, material, count );
 
 						mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
+
+						mesh.geometry.attributes.instanceVisibility.setUsage( THREE.DynamicDrawUsage ); // ditto
 
 						scene.add( mesh );
 
@@ -174,7 +175,9 @@
 
 								dummy.updateMatrix();
 
-								mesh.setMatrixAt( i ++, dummy.matrix );
+								mesh.setMatrixAt( i, dummy.matrix );
+
+								mesh.geometry.attributes.instanceVisibility.array[ i ++ ] -= 0.001;
 
 							}
 
@@ -183,6 +186,7 @@
 					}
 
 					mesh.instanceMatrix.needsUpdate = true;
+					mesh.geometry.attributes.instanceVisibility.needsUpdate = true;
 
 				}
 
