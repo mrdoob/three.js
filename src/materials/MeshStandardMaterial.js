@@ -112,8 +112,6 @@ class MeshStandardMaterial extends Material {
 
 		this.flatShading = false;
 
-		this.vertexTangents = false;
-
 		this.setValues( parameters );
 
 	}
@@ -171,8 +169,6 @@ class MeshStandardMaterial extends Material {
 		this.morphNormals = source.morphNormals;
 
 		this.flatShading = source.flatShading;
-
-		this.vertexTangents = source.vertexTangents;
 
 		return this;
 

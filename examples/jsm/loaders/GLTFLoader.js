@@ -684,8 +684,7 @@ class GLTFMaterialsClearcoatExtension {
 
 				const scale = extension.clearcoatNormalTexture.scale;
 
-				// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-				materialParams.clearcoatNormalScale = new Vector2( scale, - scale );
+				materialParams.clearcoatNormalScale = new Vector2( scale, scale );
 
 			}
 
@@ -2898,16 +2897,6 @@ class GLTFParser {
 				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
-				if ( useVertexTangents ) {
-
-					cachedMaterial.vertexTangents = true;
-
-					// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-					if ( cachedMaterial.normalScale ) cachedMaterial.normalScale.y *= - 1;
-					if ( cachedMaterial.clearcoatNormalScale ) cachedMaterial.clearcoatNormalScale.y *= - 1;
-
-				}
-
 				this.cache.add( cacheKey, cachedMaterial );
 
 				this.associations.set( cachedMaterial, this.associations.get( material ) );
@@ -3046,12 +3035,9 @@ class GLTFParser {
 
 			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
 
-			// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-			materialParams.normalScale = new Vector2( 1, - 1 );
-
 			if ( materialDef.normalTexture.scale !== undefined ) {
 
-				materialParams.normalScale.set( materialDef.normalTexture.scale, - materialDef.normalTexture.scale );
+				materialParams.normalScale = new Vector2( materialDef.normalTexture.scale, materialDef.normalTexture.scale );
 
 			}
 

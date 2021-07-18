@@ -1255,7 +1255,6 @@ function SidebarMaterial( editor ) {
 			'clearcoatRoughness': materialClearcoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
-			'vertexTangents': materialVertexTangentsRow,
 			'depthPacking': materialDepthPackingRow,
 			'map': materialMapRow,
 			'matcap': materialMatcapMapRow,
