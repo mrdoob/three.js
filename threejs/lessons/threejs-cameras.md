@@ -25,7 +25,7 @@ and a frustum are all names of different kinds of solids.
   <div><div data-diagram="shapeFrustum"></div><div>frustum</div></div>
 </div>
 
-I only point that out because I didn't know if for years. Some book or page would mention
+I only point that out because I didn't know it for years. Some book or page would mention
 *frustum* and my eyes would glaze over. Understanding it's the name of a type of solid
 shape made those descriptions suddenly make more sense &#128517;
 
