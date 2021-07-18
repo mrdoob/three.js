@@ -27,6 +27,8 @@
 				roughness: 0,
 				reflectivity: 0.5,
 				thickness: 0.01,
+				specularStrength: 1,
+				specular: 0xffffff,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
@@ -93,6 +95,8 @@
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
 					transmission: params.transmission, // use material.transmission for glass materials
+					specularStrength: params.specularStrength,
+					specular: params.specular,
 					opacity: params.opacity,
 					side: THREE.DoubleSide,
 					transparent: true
@@ -166,6 +170,22 @@
 					.onChange( function () {
 
 						material.thickness = params.thickness;
+						render();
+
+					} );
+
+				gui.add( params, 'specularStrength', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.specularStrength = params.specularStrength;
+						render();
+
+					} );
+
+				gui.addColor( params, 'specular' )
+					.onChange( function () {
+
+						material.specular.set( params.specular );
 						render();
 
 					} );
