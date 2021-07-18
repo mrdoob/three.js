@@ -615,6 +615,16 @@ function WebGLMaterials( properties ) {
 		uniforms.attenuationDistance.value = material.attenuationDistance;
 		uniforms.attenuationColor.value.copy( material.attenuationColor );
 
+		uniforms.specularStrength.value = material.specularStrength;
+
+		if ( material.specularStrengthMap ) {
+
+			uniforms.specularStrengthMap.value = material.specularStrengthMap;
+
+		}
+
+		uniforms.specular.value.copy( material.specular );
+
 	}
 
 	function refreshUniformsMatcap( uniforms, material ) {

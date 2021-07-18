@@ -4,6 +4,7 @@ export default /* glsl */`
 #ifdef PHYSICAL
 	#define REFLECTIVITY
 	#define CLEARCOAT
+	#define SPECULAR
 #endif
 
 uniform vec3 diffuse;
@@ -21,6 +22,19 @@ uniform float opacity;
 
 #ifdef REFLECTIVITY
 	uniform float reflectivity;
+#endif
+
+#ifdef SPECULAR
+	uniform float specularStrength;
+	uniform vec3 specular;
+
+	#ifdef USE_SPECULARSTRENGTHMAP
+		uniform sampler2D specularStrengthMap;
+	#endif
+
+	#ifdef USE_SPECULARMAP
+		uniform sampler2D specularMap;
+	#endif
 #endif
 
 #ifdef CLEARCOAT
