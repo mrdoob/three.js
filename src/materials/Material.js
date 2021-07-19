@@ -306,7 +306,7 @@ class Material extends EventDispatcher {
 		if ( this.clippingPlanes !== null && Array.isArray( this.clippingPlanes ) ) {
 
 			const len = this.clippingPlanes.length;
-			data.clippingPlanes = new Array( len );
+			data.clippingPlanes = [];
 
 			for ( let i = 0; i < len; i ++ ) {
 

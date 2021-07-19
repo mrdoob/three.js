@@ -163,7 +163,7 @@ class MaterialLoader extends Loader {
 		if ( json.clippingPlanes !== undefined ) {
 
 			const len = json.clippingPlanes.length;
-			material.clippingPlanes = new Array( len );
+			material.clippingPlanes = [];
 
 			for ( let i = 0; i < len; i ++ ) {
 
