@@ -303,7 +303,7 @@ class Material extends EventDispatcher {
 		data.stencilZFail = this.stencilZFail;
 		data.stencilZPass = this.stencilZPass;
 
-		if ( this.clippingPlanes !== null && Array.isArray( this.clippingPlanes ) ) {
+		if ( Array.isArray( this.clippingPlanes ) === true ) {
 
 			const len = this.clippingPlanes.length;
 			data.clippingPlanes = [];
