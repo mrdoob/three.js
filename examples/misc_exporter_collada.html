@@ -30,7 +30,7 @@
 			let camera, scene, renderer;
 			let cameraControls;
 			let effectController;
-			const teapotSize = 400;
+			const teapotSize = 100; // vertical height of the teapot is about 2x this, we scale it to millimeters.
 			let ambientLight, light;
 
 			let tess = - 1;	// force initialization
@@ -60,8 +60,8 @@
 				const canvasHeight = window.innerHeight;
 
 				// CAMERA
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
-				camera.position.set( - 600, 550, 1300 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( - 150, 137.5, 325 );
 
 				// LIGHTS
 				ambientLight = new THREE.AmbientLight( 0x333333 );	// 0.2
@@ -352,7 +352,7 @@
 
 			function exportCollada() {
 
-				const result = exporter.parse( teapot );
+				const result = exporter.parse( teapot, undefined, { upAxis: 'Y_UP', unitName: 'millimeter', unitMeter: 0.001 } );
 				let materialType = "Phong";
 
 				if ( shading === "wireframe" ) {
