@@ -30,27 +30,23 @@ class ColladaExporter {
 			unitMeter: null,
 		}, options );
 
-		if (options.upAxis.match(/^[XYZ]_UP$/) === null) {
+		if ( options.upAxis.match( /^[XYZ]_UP$/ ) === null ) {
 
-			console.error('ColladaExporter: Invalid upAxis: valid values are X_UP, Y_UP or Z_UP.');
+			console.error( 'ColladaExporter: Invalid upAxis: valid values are X_UP, Y_UP or Z_UP.' );
 			return null;
 
 		}
 
-		if ( (options.unitName === null) !== (options.unitMeter === null) ) {
+		if ( options.unitName !== null && options.unitMeter === null ) {
 
-			if ( options.unitMeter === null ) {
+			console.error( 'ColladaExporter: unitMeter needs to be specified if unitName is specified.' );
+			return null;
 
-				console.error('ColladaExporter: unitMeter needs to be specified if unitName is specified.');
+		}
 
-			}
+		if ( options.unitMeter !== null && options.unitName === null ) {
 
-			if ( options.unitName === null ) {
-
-				console.error('ColladaExporter: unitName needs to be specified if unitMeter is specified.');
-
-			}
-
+			console.error( 'ColladaExporter: unitName needs to be specified if unitMeter is specified.' );
 			return null;
 
 		}
@@ -661,7 +657,7 @@ class ColladaExporter {
 				'</contributor>' +
 				`<created>${ ( new Date() ).toISOString() }</created>` +
 				`<modified>${ ( new Date() ).toISOString() }</modified>` +
-				( options.unitName !== null ? `<unit name="${ options.unitName }" meter="${ options.unitMeter }" />` : "" ) +
+				( options.unitName !== null ? `<unit name="${ options.unitName }" meter="${ options.unitMeter }" />` : '' ) +
 				`<up_axis>${ options.upAxis }</up_axis>`
 			) +
 			'</asset>';
