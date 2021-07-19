@@ -16,6 +16,7 @@ import {
 	MathUtils
 } from '../../../build/three.module.js';
 import {} from 'https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js'
+//import {} from '../libs/hammerjs.module.js';
 
 
 //trackball state
@@ -2479,7 +2480,9 @@ class ArcballControls extends Object3D {
 			this._gizmos.updateMatrix();
 
 			this._tbRadius = this.calculateTbRadius( this.camera );
-			this.makeGizmos(this._gizmos.position, this._tbRadius);
+			let gizmoTmp = new Matrix4().copy( this._gizmoMatrixState0 );
+			this.makeGizmos( this._gizmos.position, this._tbRadius );
+			this._gizmoMatrixState0.copy(gizmoTmp);
 
 			this.camera.lookAt( this._gizmos.position );
 			this.updateTbState( STATE.IDLE, false );
