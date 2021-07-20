@@ -68,7 +68,7 @@
 
 			// *BufferGeometry to *Geometry
 
-			if ( /^(?!.*(Instanced)).*BufferGeometry/.exec( window.location.hash ) ) {
+			if ( window.location.hash.includes( 'Instanced' ) === false && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
 
 				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
 
