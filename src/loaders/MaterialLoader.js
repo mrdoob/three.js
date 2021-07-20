@@ -4,10 +4,10 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Plane } from '../math/Plane.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 import * as Materials from '../materials/Materials.js';
-import { Plane } from '../math/Plane';
 
 class MaterialLoader extends Loader {
 
