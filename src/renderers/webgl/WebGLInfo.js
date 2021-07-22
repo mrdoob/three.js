@@ -1,6 +1,6 @@
 function WebGLInfo( gl ) {
 
-	let _isRenderTarget = false;
+	let _isRTT = false;
 
 	const memory = {
 		geometries: 0,
@@ -15,7 +15,7 @@ function WebGLInfo( gl ) {
 		lines: 0
 	};
 
-	const frameBuffer = {
+	const rtt = {
 		frame: 0,
 		calls: 0,
 		triangles: 0,
@@ -23,9 +23,15 @@ function WebGLInfo( gl ) {
 		lines: 0
 	};
 
-	function setRenderTarget( isRenderTarget ) {
+	function enableRTT() {
 
-		_isRenderTarget = isRenderTarget;
+		_isRTT = true;
+
+	}
+
+	function disableRTT() {
+
+		_isRTT = false;
 
 	}
 
@@ -33,9 +39,9 @@ function WebGLInfo( gl ) {
 
 		let target = render;
 
-		if ( _isRenderTarget ) {
+		if ( _isRTT ) {
 
-			target = frameBuffer;
+			target = rtt;
 
 		}
 
@@ -80,13 +86,13 @@ function WebGLInfo( gl ) {
 		render.points = 0;
 		render.lines = 0;
 
-		if ( ! _isRenderTarget ) {
+		if ( ! _isRTT ) {
 
-			frameBuffer.frame ++;
-			frameBuffer.calls = 0;
-			frameBuffer.triangles = 0;
-			frameBuffer.points = 0;
-			frameBuffer.lines = 0;
+			rtt.frame ++;
+			rtt.calls = 0;
+			rtt.triangles = 0;
+			rtt.points = 0;
+			rtt.lines = 0;
 
 		}
 
@@ -95,8 +101,9 @@ function WebGLInfo( gl ) {
 	return {
 		memory: memory,
 		render: render,
-		frameBuffer: frameBuffer,
-		setRenderTarget: setRenderTarget,
+		rtt: rtt,
+		enableRTT: enableRTT,
+		disableRTT: disableRTT,
 		programs: null,
 		autoReset: true,
 		reset: reset,

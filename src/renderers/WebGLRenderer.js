@@ -785,9 +785,16 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		info.setRenderTarget( _currentRenderTarget !== null );
 
-		//
+		if ( _currentRenderTarget !== null ) {
+
+			info.enableRTT();
+
+		} else {
+
+			info.disableRTT();
+
+		}
 
 		const dataCount = ( index !== null ) ? index.count : position.count;
 
