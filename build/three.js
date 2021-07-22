@@ -6092,8 +6092,6 @@
 			if (this.wireframeLinewidth > 1) data.wireframeLinewidth = this.wireframeLinewidth;
 			if (this.wireframeLinecap !== 'round') data.wireframeLinecap = this.wireframeLinecap;
 			if (this.wireframeLinejoin !== 'round') data.wireframeLinejoin = this.wireframeLinejoin;
-			if (this.morphTargets === true) data.morphTargets = true;
-			if (this.morphNormals === true) data.morphNormals = true;
 			if (this.flatShading === true) data.flatShading = this.flatShading;
 			if (this.visible === false) data.visible = false;
 			if (this.toneMapped === false) data.toneMapped = false;
@@ -6789,8 +6787,6 @@
 	 *
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
-	 *
-	 *	morphTargets: <bool>
 	 * }
 	 */
 
@@ -6815,7 +6811,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.morphTargets = false;
 			this.setValues(parameters);
 		}
 
@@ -6837,7 +6832,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.morphTargets = source.morphTargets;
 			return this;
 		}
 
@@ -8291,7 +8285,7 @@
 
 		const morphInfluences = object.morphTargetInfluences;
 
-		if (material.morphTargets && morphPosition && morphInfluences) {
+		if (morphPosition && morphInfluences) {
 			_morphA.set(0, 0, 0);
 
 			_morphB.set(0, 0, 0);
@@ -8546,10 +8540,7 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	lights: <bool>,
-	 *
-	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>
+	 *	lights: <bool>
 	 * }
 	 */
 
@@ -8569,10 +8560,6 @@
 			this.lights = false; // set to use scene lights
 
 			this.clipping = false; // set to use user-defined clipping planes
-
-			this.morphTargets = false; // set to use morph targets
-
-			this.morphNormals = false; // set to use morph normals
 
 			this.extensions = {
 				derivatives: false,
@@ -8614,8 +8601,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.lights = source.lights;
 			this.clipping = source.clipping;
-			this.morphTargets = source.morphTargets;
-			this.morphNormals = source.morphNormals;
 			this.extensions = Object.assign({}, source.extensions);
 			this.glslVersion = source.glslVersion;
 			return this;
@@ -11683,8 +11668,8 @@
 			}
 
 			workInfluences.sort(numericalSort);
-			const morphTargets = material.morphTargets && geometry.morphAttributes.position;
-			const morphNormals = material.morphNormals && geometry.morphAttributes.normal;
+			const morphTargets = geometry.morphAttributes.position;
+			const morphNormals = geometry.morphAttributes.normal;
 			let morphInfluencesSum = 0;
 
 			for (let i = 0; i < 8; i++) {
@@ -13174,8 +13159,8 @@
 				skinning: object.isSkinnedMesh === true && maxBones > 0,
 				maxBones: maxBones,
 				useVertexTexture: floatVertexTextures,
-				morphTargets: material.morphTargets,
-				morphNormals: material.morphNormals,
+				morphTargets: object.geometry && object.geometry.morphAttributes.position !== undefined,
+				morphNormals: object.geometry && object.geometry.morphAttributes.normal !== undefined,
 				numDirLights: lights.directional.length,
 				numPointLights: lights.point.length,
 				numSpotLights: lights.spot.length,
@@ -13979,7 +13964,6 @@
 			super();
 			this.type = 'MeshDepthMaterial';
 			this.depthPacking = BasicDepthPacking;
-			this.morphTargets = false;
 			this.map = null;
 			this.alphaMap = null;
 			this.displacementMap = null;
@@ -13994,7 +13978,6 @@
 		copy(source) {
 			super.copy(source);
 			this.depthPacking = source.depthPacking;
-			this.morphTargets = source.morphTargets;
 			this.map = source.map;
 			this.alphaMap = source.alphaMap;
 			this.displacementMap = source.displacementMap;
@@ -14016,8 +13999,6 @@
 	 *	nearDistance: <float>,
 	 *	farDistance: <float>,
 	 *
-	 *	morphTargets: <bool>,
-	 *
 	 *	map: new THREE.Texture( <Image> ),
 	 *
 	 *	alphaMap: new THREE.Texture( <Image> ),
@@ -14036,7 +14017,6 @@
 			this.referencePosition = new Vector3();
 			this.nearDistance = 1;
 			this.farDistance = 1000;
-			this.morphTargets = false;
 			this.map = null;
 			this.alphaMap = null;
 			this.displacementMap = null;
@@ -14051,7 +14031,6 @@
 			this.referencePosition.copy(source.referencePosition);
 			this.nearDistance = source.nearDistance;
 			this.farDistance = source.farDistance;
-			this.morphTargets = source.morphTargets;
 			this.map = source.map;
 			this.alphaMap = source.alphaMap;
 			this.displacementMap = source.displacementMap;
@@ -14074,8 +14053,10 @@
 		const _shadowMapSize = new Vector2(),
 					_viewportSize = new Vector2(),
 					_viewport = new Vector4(),
-					_depthMaterials = [],
-					_distanceMaterials = [],
+					_depthMaterial = new MeshDepthMaterial({
+			depthPacking: RGBADepthPacking
+		}),
+					_distanceMaterial = new MeshDistanceMaterial(),
 					_materialCache = {},
 					_maxTextureSize = _capabilities.maxTextureSize;
 
@@ -14249,55 +14230,14 @@
 			_renderer.renderBufferDirect(camera, null, geometry, shadowMaterialHorizontal, fullScreenMesh, null);
 		}
 
-		function getDepthMaterialVariant(useMorphing) {
-			const index = useMorphing << 0;
-			let material = _depthMaterials[index];
-
-			if (material === undefined) {
-				material = new MeshDepthMaterial({
-					depthPacking: RGBADepthPacking,
-					morphTargets: useMorphing
-				});
-				_depthMaterials[index] = material;
-			}
-
-			return material;
-		}
-
-		function getDistanceMaterialVariant(useMorphing) {
-			const index = useMorphing << 0;
-			let material = _distanceMaterials[index];
-
-			if (material === undefined) {
-				material = new MeshDistanceMaterial({
-					morphTargets: useMorphing
-				});
-				_distanceMaterials[index] = material;
-			}
-
-			return material;
-		}
-
 		function getDepthMaterial(object, geometry, material, light, shadowCameraNear, shadowCameraFar, type) {
 			let result = null;
-			let getMaterialVariant = getDepthMaterialVariant;
-			let customMaterial = object.customDepthMaterial;
+			const customMaterial = light.isPointLight === true ? object.customDistanceMaterial : object.customDepthMaterial;
 
-			if (light.isPointLight === true) {
-				getMaterialVariant = getDistanceMaterialVariant;
-				customMaterial = object.customDistanceMaterial;
-			}
-
-			if (customMaterial === undefined) {
-				let useMorphing = false;
-
-				if (material.morphTargets === true) {
-					useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
-				}
-
-				result = getMaterialVariant(useMorphing);
-			} else {
+			if (customMaterial !== undefined) {
 				result = customMaterial;
+			} else {
+				result = light.isPointLight === true ? _distanceMaterial : _depthMaterial;
 			}
 
 			if (_renderer.localClippingEnabled && material.clipShadows === true && material.clippingPlanes.length !== 0) {
@@ -17841,7 +17781,7 @@
 				rangeFactor = 2;
 			}
 
-			if (material.morphTargets || material.morphNormals) {
+			if (geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined) {
 				morphtargets.update(object, geometry, material, program);
 			}
 
@@ -18313,6 +18253,8 @@
 			materialProperties.outputEncoding = parameters.outputEncoding;
 			materialProperties.instancing = parameters.instancing;
 			materialProperties.skinning = parameters.skinning;
+			materialProperties.morphTargets = parameters.morphTargets;
+			materialProperties.morphNormals = parameters.morphNormals;
 			materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 			materialProperties.numIntersection = parameters.numClipIntersection;
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
@@ -18327,6 +18269,8 @@
 			const encoding = _currentRenderTarget === null ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 			const envMap = cubemaps.get(material.envMap || environment);
 			const vertexAlphas = material.vertexColors === true && object.geometry && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
+			const morphTargets = object.geometry && object.geometry.morphAttributes.position;
+			const morphNormals = object.geometry && object.geometry.morphAttributes.normal;
 			const materialProperties = properties.get(material);
 			const lights = currentRenderState.state.lights;
 
@@ -18363,6 +18307,10 @@
 				} else if (materialProperties.numClippingPlanes !== undefined && (materialProperties.numClippingPlanes !== clipping.numPlanes || materialProperties.numIntersection !== clipping.numIntersection)) {
 					needsProgramChange = true;
 				} else if (materialProperties.vertexAlphas !== vertexAlphas) {
+					needsProgramChange = true;
+				} else if (materialProperties.morphTargets !== morphTargets) {
+					needsProgramChange = true;
+				} else if (materialProperties.morphNormals !== morphNormals) {
 					needsProgramChange = true;
 				}
 			} else {
@@ -19959,7 +19907,6 @@
 			this.linewidth = 1;
 			this.linecap = 'round';
 			this.linejoin = 'round';
-			this.morphTargets = false;
 			this.setValues(parameters);
 		}
 
@@ -19969,7 +19916,6 @@
 			this.linewidth = source.linewidth;
 			this.linecap = source.linecap;
 			this.linejoin = source.linejoin;
-			this.morphTargets = source.morphTargets;
 			return this;
 		}
 
@@ -20221,7 +20167,6 @@
 	 *	size: <float>,
 	 *	sizeAttenuation: <bool>
 	 *
-	 *	morphTargets: <bool>
 	 * }
 	 */
 
@@ -20234,7 +20179,6 @@
 			this.alphaMap = null;
 			this.size = 1;
 			this.sizeAttenuation = true;
-			this.morphTargets = false;
 			this.setValues(parameters);
 		}
 
@@ -20245,7 +20189,6 @@
 			this.alphaMap = source.alphaMap;
 			this.size = source.size;
 			this.sizeAttenuation = source.sizeAttenuation;
-			this.morphTargets = source.morphTargets;
 			return this;
 		}
 
@@ -24298,9 +24241,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>,
-	 *
 	 *	flatShading: <bool>
 	 * }
 	 */
@@ -24342,8 +24282,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.morphTargets = false;
-			this.morphNormals = false;
 			this.flatShading = false;
 			this.vertexTangents = false;
 			this.setValues(parameters);
@@ -24383,8 +24321,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.morphTargets = source.morphTargets;
-			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
 			this.vertexTangents = source.vertexTangents;
 			return this;
@@ -24528,9 +24464,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>,
-	 *
 	 *	flatShading: <bool>
 	 * }
 	 */
@@ -24569,8 +24502,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.morphTargets = false;
-			this.morphNormals = false;
 			this.flatShading = false;
 			this.setValues(parameters);
 		}
@@ -24606,8 +24537,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.morphTargets = source.morphTargets;
-			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
 			return this;
 		}
@@ -24649,8 +24578,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>
 	 * }
 	 */
 
@@ -24684,8 +24611,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.morphTargets = false;
-			this.morphNormals = false;
 			this.setValues(parameters);
 		}
 
@@ -24714,8 +24639,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.morphTargets = source.morphTargets;
-			this.morphNormals = source.morphNormals;
 			return this;
 		}
 
@@ -24741,9 +24664,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>
 	 *
-	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>,
-	 *
 	 *	flatShading: <bool>
 	 * }
 	 */
@@ -24763,8 +24683,6 @@
 			this.wireframe = false;
 			this.wireframeLinewidth = 1;
 			this.fog = false;
-			this.morphTargets = false;
-			this.morphNormals = false;
 			this.flatShading = false;
 			this.setValues(parameters);
 		}
@@ -24781,8 +24699,6 @@
 			this.displacementBias = source.displacementBias;
 			this.wireframe = source.wireframe;
 			this.wireframeLinewidth = source.wireframeLinewidth;
-			this.morphTargets = source.morphTargets;
-			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
 			return this;
 		}
@@ -24820,8 +24736,6 @@
 	 *	wireframe: <boolean>,
 	 *	wireframeLinewidth: <float>,
 	 *
-	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>
 	 * }
 	 */
 
@@ -24849,8 +24763,6 @@
 			this.wireframeLinewidth = 1;
 			this.wireframeLinecap = 'round';
 			this.wireframeLinejoin = 'round';
-			this.morphTargets = false;
-			this.morphNormals = false;
 			this.setValues(parameters);
 		}
 
@@ -24875,8 +24787,6 @@
 			this.wireframeLinewidth = source.wireframeLinewidth;
 			this.wireframeLinecap = source.wireframeLinecap;
 			this.wireframeLinejoin = source.wireframeLinejoin;
-			this.morphTargets = source.morphTargets;
-			this.morphNormals = source.morphNormals;
 			return this;
 		}
 
@@ -24906,9 +24816,6 @@
 	 *
 	 *	alphaMap: new THREE.Texture( <Image> ),
 	 *
-	 *	morphTargets: <bool>,
-	 *	morphNormals: <bool>
-	 *
 	 *	flatShading: <bool>
 	 * }
 	 */
@@ -24933,8 +24840,6 @@
 			this.displacementScale = 1;
 			this.displacementBias = 0;
 			this.alphaMap = null;
-			this.morphTargets = false;
-			this.morphNormals = false;
 			this.flatShading = false;
 			this.setValues(parameters);
 		}
@@ -24956,8 +24861,6 @@
 			this.displacementScale = source.displacementScale;
 			this.displacementBias = source.displacementBias;
 			this.alphaMap = source.alphaMap;
-			this.morphTargets = source.morphTargets;
-			this.morphNormals = source.morphNormals;
 			this.flatShading = source.flatShading;
 			return this;
 		}
@@ -28123,8 +28026,6 @@
 			if (json.polygonOffset !== undefined) material.polygonOffset = json.polygonOffset;
 			if (json.polygonOffsetFactor !== undefined) material.polygonOffsetFactor = json.polygonOffsetFactor;
 			if (json.polygonOffsetUnits !== undefined) material.polygonOffsetUnits = json.polygonOffsetUnits;
-			if (json.morphTargets !== undefined) material.morphTargets = json.morphTargets;
-			if (json.morphNormals !== undefined) material.morphNormals = json.morphNormals;
 			if (json.dithering !== undefined) material.dithering = json.dithering;
 			if (json.alphaToCoverage !== undefined) material.alphaToCoverage = json.alphaToCoverage;
 			if (json.premultipliedAlpha !== undefined) material.premultipliedAlpha = json.premultipliedAlpha;
