@@ -7,17 +7,19 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>Geometry Usage Constants</h1>
+		<h1>Buffer Attribute Usage Constants</h1>
 
 		<p>
-			The usage constants can be used to provide a hint to the API regarding how the geometry will be used in order to optimize performance.
+			The usage constants can be used to provide a hint to the API regarding how the geometry buffer attribute will be used in order to optimize performance.
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
 		const geometry = new THREE.SphereBufferGeometry();
-		geometry.setUsage( THREE.DynamicDrawUsage );
+		const positionAttribute = new THREE.BufferAttribute( array, 3 , false );
+		positionAttribute.setUsage( THREE.DynamicDrawUsage );
+		geometry.setAttribute( 'position', positionAttribute );
 		</code>
 
 		<h2>Examples</h2>
