@@ -1117,7 +1117,6 @@ class MaterialBuilder {
 
 			//
 
-			params.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 			params.fog = true;
 
 			// blend

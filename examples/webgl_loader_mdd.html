@@ -44,7 +44,7 @@
 					const geometry = new THREE.BoxGeometry();
 					geometry.morphAttributes.position = morphTargets; // apply morph targets
 
-					const material = new THREE.MeshNormalMaterial( { morphTargets: true } );
+					const material = new THREE.MeshNormalMaterial();
 
 					const mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );

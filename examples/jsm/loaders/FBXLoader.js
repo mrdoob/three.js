@@ -858,8 +858,6 @@ class FBXTreeParser {
 
 		this.createAmbientLight();
 
-		this.setupMorphMaterials();
-
 		sceneGraph.traverse( function ( node ) {
 
 			if ( node.userData.transformData ) {
@@ -1450,75 +1448,6 @@ class FBXTreeParser {
 			}
 
 		}
-
-	}
-
-	setupMorphMaterials() {
-
-		const scope = this;
-		sceneGraph.traverse( function ( child ) {
-
-			if ( child.isMesh ) {
-
-				if ( child.geometry.morphAttributes.position && child.geometry.morphAttributes.position.length ) {
-
-					if ( Array.isArray( child.material ) ) {
-
-						child.material.forEach( function ( material, i ) {
-
-							scope.setupMorphMaterial( child, material, i );
-
-						} );
-
-					} else {
-
-						scope.setupMorphMaterial( child, child.material );
-
-					}
-
-				}
-
-			}
-
-		} );
-
-	}
-
-	setupMorphMaterial( child, material, index ) {
-
-		const uuid = child.uuid;
-		const matUuid = material.uuid;
-
-		// if a geometry has morph targets, it cannot share the material with other geometries
-		let sharedMat = false;
-
-		sceneGraph.traverse( function ( node ) {
-
-			if ( node.isMesh ) {
-
-				if ( Array.isArray( node.material ) ) {
-
-					node.material.forEach( function ( mat ) {
-
-						if ( mat.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
-
-					} );
-
-				} else if ( node.material.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
-
-			}
-
-		} );
-
-		if ( sharedMat === true ) {
-
-			const clonedMat = material.clone();
-			clonedMat.morphTargets = true;
-
-			if ( index === undefined ) child.material = clonedMat;
-			else child.material[ index ] = clonedMat;
-
-		} else material.morphTargets = true;
 
 	}
 

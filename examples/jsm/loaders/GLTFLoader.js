@@ -2832,8 +2832,6 @@ class GLTFParser {
 		const useVertexTangents = geometry.attributes.tangent !== undefined;
 		const useVertexColors = geometry.attributes.color !== undefined;
 		const useFlatShading = geometry.attributes.normal === undefined;
-		const useMorphTargets = Object.keys( geometry.morphAttributes ).length > 0;
-		const useMorphNormals = useMorphTargets && geometry.morphAttributes.normal !== undefined;
 
 		if ( mesh.isPoints ) {
 
@@ -2876,7 +2874,7 @@ class GLTFParser {
 		}
 
 		// Clone the material if it will be modified
-		if ( useVertexTangents || useVertexColors || useFlatShading || useMorphTargets ) {
+		if ( useVertexTangents || useVertexColors || useFlatShading ) {
 
 			let cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
@@ -2884,8 +2882,6 @@ class GLTFParser {
 			if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 			if ( useVertexColors ) cacheKey += 'vertex-colors:';
 			if ( useFlatShading ) cacheKey += 'flat-shading:';
-			if ( useMorphTargets ) cacheKey += 'morph-targets:';
-			if ( useMorphNormals ) cacheKey += 'morph-normals:';
 
 			let cachedMaterial = this.cache.get( cacheKey );
 
@@ -2895,8 +2891,6 @@ class GLTFParser {
 
 				if ( useVertexColors ) cachedMaterial.vertexColors = true;
 				if ( useFlatShading ) cachedMaterial.flatShading = true;
-				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
-				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
 				if ( useVertexTangents ) {
 

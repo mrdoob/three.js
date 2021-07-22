@@ -417,10 +417,7 @@ function Loader( editor ) {
 					var { MD2Loader } = await import( '../../examples/jsm/loaders/MD2Loader.js' );
 
 					var geometry = new MD2Loader().parse( contents );
-					var material = new THREE.MeshStandardMaterial( {
-						morphTargets: true,
-						morphNormals: true
-					} );
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.mixer = new THREE.AnimationMixer( mesh );
