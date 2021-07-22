@@ -116,6 +116,13 @@ class OrbitControls extends EventDispatcher {
 
 		this.getDistance = function () {
 
+			// compute the distance manually if the camera is orthographic
+			if ( this.object.isOrthographicCamera ) {
+
+				return this.object.position.distanceTo( this.target );
+
+			}
+
 			return spherical.radius;
 
 		};
