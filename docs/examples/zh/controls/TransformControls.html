@@ -160,6 +160,13 @@
 			若不再需要该控制器，则应当调用此函数。
 		</p>
 
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			返回用于用户交互的 [page:Raycaster] 对象。 此对象在所有实例之间共享 变换控件。 如果您设置 [name] 的
+			[page:Object3D.layers .layers] 属性，您还需要 使用匹配值设置 [page:Raycaster] 上的
+			[page:Raycaster.layers .layers] 属性，否则设置 [name] 不会按预期工作。
+		</p>
+
 		<h3>[method:String getMode] ()</h3>
 		<p>
 			返回变换模式。

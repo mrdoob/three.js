@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - layers</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> media and projection layers<br/>
+			(Oculus Browser 16.1+)
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
+			import { XRHandModelFactory } from './jsm/webxr/XRHandModelFactory.js';
+
+			let container;
+			let camera, scene, renderer;
+			let hand1, hand2;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
+
+			let controls;
+			let video;
+			let snellenTexture;
+			let quadLayer;
+
+			// Data shared between the THREE.Mesh on the left side and WebXR Layer on the right side for
+			// the eye chart. See https://en.wikipedia.org/wiki/Snellen_chart for details about the math.
+			//
+			// The image was designed so that each 2x2px block on the 20/20 line subtends 1 minute of
+			// arc. That is
+			//    tan(1/60 deg) * 6.1m * 160px/142mm = 2px
+			// per block on line 8.
+			//
+			// This fidelity is beyond any modern consumer headset since it would require ~60px/deg of
+			// resolution. The Quest has ~16ppd and the Quest 2 has ~20ppd so only lines 3 or 4 will be
+			// legible when using layers. Without layers, you lose ~sqrt(2) in resolution due to the
+			// extra resampling.
+			const snellenConfig = {
+				// The height & width of the WebXR layer needs to match the given image size.
+				widthPx: 320,
+				heightPx: 450,
+
+				x: 0, // +/- widthMeters/2
+				y: 1.5,
+
+				z: - 6.1, // 20/20 vision @ 20ft = 6.1m
+
+				widthMeters: .268, // 320px image * (142mm/160px scale factor)
+				heightMeters: .382 // 450px image * (142mm/160px scale factor)
+			};
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.set( 0, 1.6, 3 );
+
+				controls = new OrbitControls( camera, container );
+				controls.target.set( 0, 1.6, 0 );
+				controls.update();
+
+				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 6, 0 );
+				light.castShadow = true;
+				light.shadow.camera.top = 2;
+				light.shadow.camera.bottom = - 2;
+				light.shadow.camera.right = 2;
+				light.shadow.camera.left = - 2;
+				light.shadow.mapSize.set( 4096, 4096 );
+				scene.add( light );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setClearAlpha(1);
+				renderer.setClearColor(new THREE.Color(0), 0);
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.shadowMap.enabled = true;
+				renderer.xr.enabled = true;
+
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				// controllers
+
+				controller1 = renderer.xr.getController( 0 );
+				scene.add( controller1 );
+
+				controller2 = renderer.xr.getController( 1 );
+				scene.add( controller2 );
+
+				const controllerModelFactory = new XRControllerModelFactory();
+				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+
+				// Hand 1
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				hand1 = renderer.xr.getHand( 0 );
+				hand1.add( handModelFactory.createHandModel( hand1 ) );
+
+				scene.add( hand1 );
+
+				// Hand 2
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+				hand2 = renderer.xr.getHand( 1 );
+				hand2.add( handModelFactory.createHandModel( hand2 ) );
+				scene.add( hand2 );
+
+				//
+
+				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+
+				const line = new THREE.Line( geometry );
+				line.name = 'line';
+				line.scale.z = 5;
+
+				controller1.add( line.clone() );
+				controller2.add( line.clone() );
+
+				// Eye chart
+				snellenTexture = new THREE.TextureLoader().load( "textures/snellen.png" );
+				const snellenMesh = new THREE.Mesh(
+					new THREE.PlaneGeometry( snellenConfig.widthMeters, snellenConfig.heightMeters ),
+					new THREE.MeshBasicMaterial( { map: snellenTexture } ) );
+				snellenMesh.position.x = snellenConfig.x - snellenConfig.widthMeters / 2;
+				snellenMesh.position.y = snellenConfig.y;
+				snellenMesh.position.z = snellenConfig.z;
+				scene.add( snellenMesh );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				video = document.createElement('video');
+				video.loop = true;
+				video.src = 'textures/MaryOculus.webm';
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+			//
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render( t, frame ) {
+
+				const xr = renderer.xr;
+				const session = xr.getSession();
+				const gl = renderer.getContext();
+
+				// Init layers once in immersive mode and video is ready.
+				if ( session && session.renderState.layers !== undefined && session.hasMediaLayer === undefined && video.readyState >= 2 ) {
+
+					session.hasMediaLayer = true;
+					session.requestReferenceSpace( 'local' ).then( ( refSpace ) => {
+
+						// Create Quad layer for Snellen chart.
+						const glBinding = new XRWebGLBinding( session, gl );
+						quadLayer = glBinding.createQuadLayer( {
+							width: snellenConfig.widthMeters / 2,
+							height: snellenConfig.heightMeters / 2,
+							viewPixelWidth: snellenConfig.widthPx,
+							viewPixelHeight: snellenConfig.heightPx,
+							space: refSpace, layout: "mono",
+							transform: new XRRigidTransform( { x: snellenConfig.x + snellenConfig.widthMeters / 2, y: snellenConfig.y, z: snellenConfig.z } )
+						} );
+
+						// Create background EQR video layer.
+						const mediaBinding = new XRMediaBinding( session );
+						const equirectLayer = mediaBinding.createEquirectLayer( video, { space: refSpace, layout: "stereo-left-right" } );
+
+						session.updateRenderState( { layers: [ equirectLayer, quadLayer, session.renderState.layers[ 0 ] ] } );
+						video.play();
+
+					} );
+
+				}
+
+				// Copy image to canvas as required.
+				// needsRedraw is set on creation or if the underlying GL resources of a layer are lost.
+				if ( quadLayer && quadLayer.needsRedraw ) {
+
+					const glBinding = new XRWebGLBinding( session, gl );
+					const glayer = glBinding.getSubImage( quadLayer, frame );
+					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
+					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+					gl.texSubImage2D( gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, snellenTexture.image );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

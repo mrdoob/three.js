@@ -175,7 +175,8 @@ function Viewport( editor ) {
 
 		raycaster.setFromCamera( mouse, camera );
 
-		return raycaster.intersectObjects( objects );
+		return raycaster.intersectObjects( objects )
+			.filter( intersect => intersect.object.visible === true );
 
 	}
 

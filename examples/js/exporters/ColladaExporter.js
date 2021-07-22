@@ -19,8 +19,32 @@
 			options = Object.assign( {
 				version: '1.4.1',
 				author: null,
-				textureDirectory: ''
+				textureDirectory: '',
+				upAxis: 'Y_UP',
+				unitName: null,
+				unitMeter: null
 			}, options );
+
+			if ( options.upAxis.match( /^[XYZ]_UP$/ ) === null ) {
+
+				console.error( 'ColladaExporter: Invalid upAxis: valid values are X_UP, Y_UP or Z_UP.' );
+				return null;
+
+			}
+
+			if ( options.unitName !== null && options.unitMeter === null ) {
+
+				console.error( 'ColladaExporter: unitMeter needs to be specified if unitName is specified.' );
+				return null;
+
+			}
+
+			if ( options.unitMeter !== null && options.unitName === null ) {
+
+				console.error( 'ColladaExporter: unitName needs to be specified if unitMeter is specified.' );
+				return null;
+
+			}
 
 			if ( options.textureDirectory !== '' ) {
 
@@ -437,7 +461,7 @@
 			const libraryMaterials = [];
 			const libraryVisualScenes = processObject( object );
 			const specLink = version === '1.4.1' ? 'http://www.collada.org/2005/11/COLLADASchema' : 'https://www.khronos.org/collada/';
-			let dae = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' + `<COLLADA xmlns="${specLink}" version="${version}">` + '<asset>' + ( '<contributor>' + '<authoring_tool>three.js Collada Exporter</authoring_tool>' + ( options.author !== null ? `<author>${options.author}</author>` : '' ) + '</contributor>' + `<created>${new Date().toISOString()}</created>` + `<modified>${new Date().toISOString()}</modified>` + '<up_axis>Y_UP</up_axis>' ) + '</asset>';
+			let dae = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' + `<COLLADA xmlns="${specLink}" version="${version}">` + '<asset>' + ( '<contributor>' + '<authoring_tool>three.js Collada Exporter</authoring_tool>' + ( options.author !== null ? `<author>${options.author}</author>` : '' ) + '</contributor>' + `<created>${new Date().toISOString()}</created>` + `<modified>${new Date().toISOString()}</modified>` + ( options.unitName !== null ? `<unit name="${options.unitName}" meter="${options.unitMeter}" />` : '' ) + `<up_axis>${options.upAxis}</up_axis>` ) + '</asset>';
 			dae += `<library_images>${libraryImages.join( '' )}</library_images>`;
 			dae += `<library_effects>${libraryEffects.join( '' )}</library_effects>`;
 			dae += `<library_materials>${libraryMaterials.join( '' )}</library_materials>`;
