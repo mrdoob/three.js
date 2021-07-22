@@ -227,8 +227,8 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			maxBones: maxBones,
 			useVertexTexture: floatVertexTextures,
 
-			morphTargets: material.morphTargets,
-			morphNormals: material.morphNormals,
+			morphTargets: object.geometry && object.geometry.morphAttributes.position !== undefined,
+			morphNormals: object.geometry && object.geometry.morphAttributes.normal !== undefined,
 
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
