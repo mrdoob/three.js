@@ -35,7 +35,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 	const parameterNames = [
 		'precision', 'isWebGL2', 'supportsVertexTextures', 'outputEncoding', 'instancing', 'instancingColor',
-		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
+		'alphaToCoverage', 'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
 		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap', 'objectSpaceNormalMap', 'tangentSpaceNormalMap', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'displacementMap', 'specularMap',
 		'roughnessMap', 'metalnessMap', 'gradientMap',
 		'alphaMap', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
@@ -172,6 +172,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 			supportsVertexTextures: vertexTextures,
 			outputEncoding: ( currentRenderTarget !== null ) ? getTextureEncodingFromMap( currentRenderTarget.texture ) : renderer.outputEncoding,
+			alphaToCoverage: !! material.alphaToCoverage,
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map ),
 			matcap: !! material.matcap,
