@@ -18,6 +18,7 @@ class InstancedMesh extends Mesh {
 		this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
 		this.instanceColor = null;
 
+		this._maxCount = count;
 		this.count = count;
 
 		this.frustumCulled = false;
@@ -95,7 +96,7 @@ class InstancedMesh extends Mesh {
 
 		if ( this.instanceColor === null ) {
 
-			this.instanceColor = new BufferAttribute( new Float32Array( this.count * 3 ), 3 );
+			this.instanceColor = new BufferAttribute( new Float32Array( this._maxCount * 3 ), 3 );
 
 		}
 
