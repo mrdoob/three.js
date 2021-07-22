@@ -16,6 +16,8 @@ export default /* glsl */`
 			distanceGradient = fwidth( distanceToPlane ) / 2.0;
 			clipOpacity *= smoothstep( - distanceGradient, distanceGradient, distanceToPlane );
 
+			if ( clipOpacity == 0.0 ) discard;
+
 		}
 		#pragma unroll_loop_end
 
@@ -39,6 +41,8 @@ export default /* glsl */`
 		#endif
 
 		diffuseColor.a *= clipOpacity;
+
+		if ( diffuseColor.a == 0.0 ) discard;
 
 	#else
 
