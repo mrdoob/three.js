@@ -620,7 +620,11 @@ class FBXTreeParser {
 				case 'DiffuseColor':
 				case 'Maya|TEX_color_map':
 					parameters.map = scope.getTexture( textureMap, child.ID );
-					parameters.map.encoding = sRGBEncoding;
+					if ( parameters.map !== undefined ) {
+
+						parameters.map.encoding = sRGBEncoding;
+
+					}
 					break;
 
 				case 'DisplacementColor':
@@ -629,9 +633,13 @@ class FBXTreeParser {
 
 				case 'EmissiveColor':
 					parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
-					parameters.emissiveMap.encoding = sRGBEncoding;
-					break;
+					if ( parameters.emissiveMap !== undefined ) {
 
+						parameters.emissiveMap.encoding = sRGBEncoding;
+
+					}
+					break;
+					
 				case 'NormalMap':
 				case 'Maya|TEX_normal_map':
 					parameters.normalMap = scope.getTexture( textureMap, child.ID );
@@ -639,13 +647,21 @@ class FBXTreeParser {
 
 				case 'ReflectionColor':
 					parameters.envMap = scope.getTexture( textureMap, child.ID );
-					parameters.envMap.mapping = EquirectangularReflectionMapping;
-					parameters.envMap.encoding = sRGBEncoding;
+					if ( parameters.envMap !== undefined ) {
+
+						parameters.envMap.mapping = EquirectangularReflectionMapping;
+						parameters.envMap.encoding = sRGBEncoding;
+
+					}
 					break;
 
 				case 'SpecularColor':
 					parameters.specularMap = scope.getTexture( textureMap, child.ID );
-					parameters.specularMap.encoding = sRGBEncoding;
+					if ( parameters.specularMap !== undefined ) {
+
+						parameters.specularMap.encoding = sRGBEncoding;
+
+					}
 					break;
 
 				case 'TransparentColor':
@@ -681,7 +697,17 @@ class FBXTreeParser {
 
 		}
 
-		return textureMap.get( id );
+		const texture = textureMap.get( id );
+
+		if ( texture.image !== undefined ) {
+
+			return texture;
+
+		} else {
+
+			return undefined;
+
+		}
 
 	}
 
