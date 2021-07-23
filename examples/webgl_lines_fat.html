@@ -18,6 +18,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
+			import { GPUStatsPanel } from './jsm/utils/GPUStatsPanel.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -29,7 +30,7 @@
 			let line, renderer, scene, camera, camera2, controls;
 			let line1;
 			let matLine, matLineBasic, matLineDashed;
-			let stats;
+			let stats, gpuPanel;
 			let gui;
 
 			// viewport
@@ -130,6 +131,10 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
+				gpuPanel = new GPUStatsPanel( renderer.getContext() );
+				stats.addPanel( gpuPanel );
+				stats.showPanel( 0 );
+
 				initGui();
 
 			}
@@ -164,7 +169,9 @@
 				// renderer will set this eventually
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
 
+				gpuPanel.startQuery();
 				renderer.render( scene, camera );
+				gpuPanel.endQuery();
 
 				// inset scene
 
@@ -242,13 +249,6 @@
 				gui.add( param, 'dashed' ).onChange( function ( val ) {
 
 					matLine.dashed = val;
-
-					// dashed is implemented as a defines -- not as a uniform. this could be changed.
-					// ... or THREE.LineDashedMaterial could be implemented as a separate material
-					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
-					matLine.needsUpdate = true;
-
 					line1.material = val ? matLineDashed : matLineBasic;
 
 				} );

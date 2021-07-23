@@ -6,11 +6,19 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			.label {
-				background-color: black;
+			#labels {
 				position: absolute;
-				z-index: 100;
-				padding: 5px
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				justify-items: center;
+				align-items: end;
+				height: 100%;
+				width: 100%;
+			}
+			#labels > div {
+				background-color: black;
+				padding: 6px;
+				margin-bottom: 20%;
 			}
 		</style>
 	</head>
@@ -19,20 +27,21 @@
 		<div id="d">
 			<div id="info">
 				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
-				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
-
+				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a>
 			</div>
-			<div class="label" style="position: absolute;left: 10%;bottom: 10%;">
-				Low Dynamic Range<br/>
-				Static Tone Mapping
-			</div>
-			<div class="label" style="position: absolute;left: 40%;bottom: 10%;">
-				High Dynamic Range<br/>
-				Static Tone Mapping
-			</div>
-			<div class="label" style="position: absolute;left: 73%;bottom: 10%;">
-				High Dynamic Range<br/>
-				Adaptive Tone Mapping
+			<div id="labels">
+				<div>
+					Low Dynamic Range<br/>
+					Static Tone Mapping
+				</div>
+				<div>
+					High Dynamic Range<br/>
+					Static Tone Mapping
+				</div>
+				<div>
+					High Dynamic Range<br/>
+					Adaptive Tone Mapping
+				</div>
 			</div>
 		</div>
 

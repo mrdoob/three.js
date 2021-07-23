@@ -29,9 +29,9 @@
 			const params = {
 				projection: 'normal',
 				autoRotate: true,
-				reflectivity: 1.0,
+				reflectivity: 1,
 				background: false,
-				exposure: 1.0,
+				exposure: 1,
 				gemColor: 'Green'
 			};
 			let camera, scene, renderer;
@@ -155,6 +155,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
@@ -171,7 +172,7 @@
 				const gui = new GUI();
 
 				gui.add( params, 'reflectivity', 0, 1 );
-				gui.add( params, 'exposure', 0.1, 2 );
+				gui.add( params, 'exposure', 0, 2 );
 				gui.add( params, 'autoRotate' );
 				gui.add( params, 'gemColor', [ 'Blue', 'Green', 'Red', 'White', 'Black' ] );
 				gui.open();

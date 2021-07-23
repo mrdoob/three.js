@@ -37,8 +37,7 @@
 				color: new THREE.Color( 255, 0, 127 ),
 				sheenBRDF: true,
 				sheen: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
-				roughness: .9,
-				exposure: 2,
+				roughness: 0.9
 			};
 
 			// model
@@ -57,7 +56,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				mesh.scale.multiplyScalar( .5 );
+				mesh.scale.multiplyScalar( 0.5 );
 				scene.add( mesh );
 
 				//
@@ -95,12 +94,12 @@
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, .5 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 0, 10, 0 );
 				directionalLight.castShadow = true;
 				directionalLight.add(
 					new THREE.Mesh(
-						new THREE.SphereGeometry( .5 ),
+						new THREE.SphereGeometry( 0.5 ),
 						new THREE.MeshBasicMaterial( { color: 0xffffff } )
 					)
 				);
@@ -141,7 +140,6 @@
 				gui.add( params, 'sheenBRDF' ).onChange( onUpdate );
 				gui.addColor( params, 'sheen' );
 				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'exposure', 0, 3 );
 				gui.open();
 
 				onUpdate();
@@ -190,7 +188,6 @@
 
 				//
 
-				renderer.toneMappingExposure = params.exposure;
 				renderer.render( scene, camera );
 
 			}

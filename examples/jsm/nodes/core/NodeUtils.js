@@ -1,4 +1,4 @@
-var NodeUtils = {
+const NodeUtils = {
 
 	elements: [ 'x', 'y', 'z', 'w' ],
 
@@ -48,11 +48,11 @@ var NodeUtils = {
 
 		return function addShortcuts( proto, proxy, list ) {
 
-			var shortcuts = {};
+			const shortcuts = {};
 
-			for ( var i = 0; i < list.length; ++ i ) {
+			for ( let i = 0; i < list.length; ++ i ) {
 
-				var data = list[ i ].split( '.' ),
+				const data = list[ i ].split( '.' ),
 					property = data[ 0 ],
 					subProperty = data[ 1 ];
 

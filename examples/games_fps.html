@@ -77,6 +77,8 @@
 			const NUM_SPHERES = 20;
 			const SPHERE_RADIUS = 0.2;
 
+			const STEPS_PER_FRAME = 5;
+
 			const sphereGeometry = new THREE.SphereGeometry( SPHERE_RADIUS, 32, 32 );
 			const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0x888855, roughness: 0.8, metalness: 0.5 } );
 
@@ -360,13 +362,20 @@
 
 			function animate() {
 
-				const deltaTime = Math.min( 0.1, clock.getDelta() );
+				const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
 
-				controls( deltaTime );
+				// we look for collisions in substeps to mitigate the risk of
+				// an object traversing another too quickly for detection.
 
-				updatePlayer( deltaTime );
+				for ( let i = 0 ; i < STEPS_PER_FRAME ; i ++ ) {
 
-				updateSpheres( deltaTime );
+					controls( deltaTime );
+
+					updatePlayer( deltaTime );
+
+					updateSpheres( deltaTime );
+
+				}
 
 				renderer.render( scene, camera );
 

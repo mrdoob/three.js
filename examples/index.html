@@ -105,6 +105,7 @@
 
 					selectFile( file );
 					viewer.src = validRedirects.get( file );
+					viewer.style.display = 'unset';
 
 				}
 
@@ -221,6 +222,7 @@
 
 			window.location.hash = file;
 			viewer.focus();
+			viewer.style.display = 'unset';
 
 			panel.classList.remove( 'open' );
 

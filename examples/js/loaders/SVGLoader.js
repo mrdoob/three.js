@@ -651,29 +651,49 @@
 
 				const x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
 				const y = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
-				const rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || 0 );
-				const ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || 0 );
+				const rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || node.getAttribute( 'ry' ) || 0 );
+				const ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || node.getAttribute( 'rx' ) || 0 );
 				const w = parseFloatWithUnits( node.getAttribute( 'width' ) );
-				const h = parseFloatWithUnits( node.getAttribute( 'height' ) );
-				const path = new THREE.ShapePath();
-				path.moveTo( x + 2 * rx, y );
-				path.lineTo( x + w - 2 * rx, y );
-				if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
-				path.lineTo( x + w, y + h - 2 * ry );
-				if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y + h, x + w, y + h, x + w - 2 * rx, y + h );
-				path.lineTo( x + 2 * rx, y + h );
+				const h = parseFloatWithUnits( node.getAttribute( 'height' ) ); // Ellipse arc to Bezier approximation Coefficient (Inversed). See:
+				// https://spencermortensen.com/articles/bezier-circle/
+
+				const bci = 1 - 0.551915024494;
+				const path = new THREE.ShapePath(); // top left
+
+				path.moveTo( x + rx, y ); // top right
+
+				path.lineTo( x + w - rx, y );
 
 				if ( rx !== 0 || ry !== 0 ) {
 
-					path.bezierCurveTo( x, y + h, x, y + h, x, y + h - 2 * ry );
+					path.bezierCurveTo( x + w - rx * bci, y, x + w, y + ry * bci, x + w, y + ry );
 
-				}
+				} // bottom right
 
-				path.lineTo( x, y + 2 * ry );
+
+				path.lineTo( x + w, y + h - ry );
 
 				if ( rx !== 0 || ry !== 0 ) {
 
-					path.bezierCurveTo( x, y, x, y, x + 2 * rx, y );
+					path.bezierCurveTo( x + w, y + h - ry * bci, x + w - rx * bci, y + h, x + w - rx, y + h );
+
+				} // bottom left
+
+
+				path.lineTo( x + rx, y + h );
+
+				if ( rx !== 0 || ry !== 0 ) {
+
+					path.bezierCurveTo( x + rx * bci, y + h, x, y + h - ry * bci, x, y + h - ry );
+
+				} // back to top left
+
+
+				path.lineTo( x, y + ry );
+
+				if ( rx !== 0 || ry !== 0 ) {
+
+					path.bezierCurveTo( x, y + ry * bci, x + rx * bci, y, x + rx, y );
 
 				}
 
@@ -1873,7 +1893,7 @@
 				};
 
 			} );
-			simplePaths = simplePaths.filter( sp => sp.points.length > 0 ); // check if path is solid or a hole
+			simplePaths = simplePaths.filter( sp => sp.points.length > 1 ); // check if path is solid or a hole
 
 			const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
 			const shapesToReturn = [];

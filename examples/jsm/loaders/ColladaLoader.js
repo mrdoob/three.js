@@ -3684,16 +3684,6 @@ class ColladaLoader extends Loader {
 
 				const skinning = ( geometry.data.attributes.skinIndex !== undefined );
 
-				if ( skinning ) {
-
-					for ( let i = 0, l = materials.length; i < l; i ++ ) {
-
-						materials[ i ].skinning = true;
-
-					}
-
-				}
-
 				// choose between a single or multi materials (material array)
 
 				const material = ( materials.length === 1 ) ? materials[ 0 ] : materials;

@@ -9,13 +9,11 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission with Premultiplied Alpha (right) and without (left)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
-			import Stats from './jsm/libs/stats.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -23,17 +21,21 @@
 
 			const params = {
 				color: 0xffffff,
-				transmission: 0.90,
+				transmission: 1,
+				opacity: 1,
+				metalness: 0,
+				roughness: 0,
+				reflectivity: 0.5,
+				thickness: 0.01,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
 			};
 
-			let container, stats;
 			let camera, scene, renderer;
 
 			let hdrCubeRenderTarget;
-			let mesh1, mesh2;
+			let mesh;
 
 			const hdrEquirect = new RGBELoader()
 				.setDataType( THREE.UnsignedByteType )
@@ -41,20 +43,17 @@
 				.load( 'royal_esplanade_1k.hdr', function () {
 
 					init();
-					animate();
+					render();
 
 				} );
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = params.exposure;
@@ -62,7 +61,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
-				scene.background = hdrEquirect;
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 0, 120 );
@@ -88,64 +86,25 @@
 
 				const material = new THREE.MeshPhysicalMaterial( {
 					color: params.color,
-					metalness: 0,
-					roughness: 0,
+					metalness: params.metalness,
+					roughness: params.roughness,
+					reflectivity: params.reflectivity,
 					alphaMap: texture,
-					alphaTest: 0.5,
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
-					depthWrite: false,
 					transmission: params.transmission, // use material.transmission for glass materials
-					opacity: 1, // set material.opacity to 1 when material.transmission is non-zero
+					opacity: params.opacity,
+					side: THREE.DoubleSide,
 					transparent: true
 				} );
 
-				const material1 = new THREE.MeshPhysicalMaterial().copy( material );
-
-				const material1b = new THREE.MeshPhysicalMaterial().copy( material );
-				material1b.side = THREE.BackSide;
-
-				const material2 = new THREE.MeshPhysicalMaterial().copy( material );
-				material2.premultipliedAlpha = true;
-
-				const material2b = new THREE.MeshPhysicalMaterial().copy( material );
-				material2b.premultipliedAlpha = true;
-				material2b.side = THREE.BackSide;
-
-				mesh1 = new THREE.Mesh( geometry, material1 );
-				mesh1.position.x = - 30.0;
-				scene.add( mesh1 );
-
-				let mesh = new THREE.Mesh( geometry, material1b );
-				mesh.renderOrder = - 1;
-				mesh1.add( mesh );
-
-				mesh2 = new THREE.Mesh( geometry, material2 );
-				mesh2.position.x = 30.0;
-				scene.add( mesh2 );
-
-				mesh = new THREE.Mesh( geometry, material2b );
-				mesh.renderOrder = - 1;
-				mesh2.add( mesh );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
 
 				//
-
-				const spotLight1 = new THREE.SpotLight( 0xffffff, params.lightIntensity );
-				spotLight1.position.set( 100, 200, 100 );
-				spotLight1.angle = Math.PI / 6;
-				scene.add( spotLight1 );
-
-				const spotLight2 = new THREE.SpotLight( 0xffffff, params.lightIntensity );
-				spotLight2.position.set( - 100, - 200, - 100 );
-				spotLight2.angle = Math.PI / 6;
-				scene.add( spotLight2 );
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 10;
 				controls.maxDistance = 150;
 
@@ -158,42 +117,73 @@
 				gui.addColor( params, 'color' )
 					.onChange( function () {
 
-						material1.color.set( params.color );
-						material2.color.set( params.color );
-						material1b.color.set( params.color );
-						material2b.color.set( params.color );
+						material.color.set( params.color );
+						render();
 
 					} );
 
-				gui.add( params, 'transmission', 0, 1 )
+				gui.add( params, 'transmission', 0, 1, 0.01 )
 					.onChange( function () {
 
-						material1.transmission = material2.transmission = params.transmission;
-						material1b.transmission = material2b.transmission = params.transmission;
+						material.transmission = params.transmission;
+						render();
 
 					} );
 
-				gui.add( params, 'envMapIntensity', 0, 1 )
+				gui.add( params, 'opacity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.opacity = params.opacity;
+						render();
+
+					} );
+
+				gui.add( params, 'metalness', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.metalness = params.metalness;
+						render();
+
+					} );
+
+				gui.add( params, 'roughness', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.roughness = params.roughness;
+						render();
+
+					} );
+
+				gui.add( params, 'reflectivity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.reflectivity = params.reflectivity;
+						render();
+
+					} );
+
+				gui.add( params, 'thickness', 0, 5, 0.01 )
+					.onChange( function () {
+
+						material.thickness = params.thickness;
+						render();
+
+					} );
+
+				gui.add( params, 'envMapIntensity', 0, 1, 0.01 )
 					.name( 'envMap intensity' )
 					.onChange( function () {
 
-						material1.envMapIntensity = material2.envMapIntensity = params.envMapIntensity;
-						material1b.envMapIntensity = material2b.envMapIntensity = params.envMapIntensity;
+						material.envMapIntensity = params.envMapIntensity;
+						render();
 
 					} );
 
-				gui.add( params, 'lightIntensity', 0, 1 )
-					.name( 'light intensity' )
-					.onChange( function () {
-
-						spotLight1.intensity = spotLight2.intensity = params.lightIntensity;
-
-					} );
-
-				gui.add( params, 'exposure', 0, 1 )
+				gui.add( params, 'exposure', 0, 1, 0.01 )
 					.onChange( function () {
 
 						renderer.toneMappingExposure = params.exposure;
+						render();
 
 					} );
 
@@ -210,6 +200,8 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
+
+				render();
 
 			}
 
@@ -229,18 +221,9 @@
 
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				const t = performance.now();
-
-				mesh1.rotation.x = mesh2.rotation.x = t * 0.0002;
-				mesh1.rotation.z = mesh2.rotation.z = - t * 0.0002;
-
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
 
 			}
 

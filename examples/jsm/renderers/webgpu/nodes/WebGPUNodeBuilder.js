@@ -65,6 +65,16 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			this.addSlot( 'vertex', new NodeSlot( mvpNode, 'MVP', 'vec4' ) );
 
+			if ( material.alphaTestNode !== undefined ) {
+
+				this.addSlot( 'fragment', new NodeSlot( material.alphaTestNode, 'ALPHA_TEST', 'float' ) );
+
+			} else {
+
+				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.ALPHA_TEST ), 'ALPHA_TEST', 'float' ) );
+
+			}
+
 			if ( material.colorNode !== undefined ) {
 
 				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec4' ) );

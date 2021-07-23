@@ -291,7 +291,8 @@
 	 */
 
 
-	const DEFAULT_TOON_TEXTURES = [ 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/bWiiMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh8aBHZBl14e8wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOUlEQVRYR+3WMREAMAwDsYY/yoDI7MLwIiP40+RJklfcCCBAgAABAgTqArfb/QMCCBAgQIAAgbbAB3z/e0F3js2cAAAAAElFTkSuQmCC', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/B5ilMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh81dWyx0gFwKAAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOklEQVRYR+3WoREAMAwDsWb/UQtCy9wxTOQJ/oQ8SXKKGwEECBAgQIBAXeDt7f4BAQQIECBAgEBb4AOz8Hzx7WLY4wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABPUlEQVRYR+1XwW7CMAy1+f9fZOMysSEOEweEOPRNdm3HbdOyIhAcklPrOs/PLy9RygBALxzcCDQFmgJNgaZAU6Ap0BR4PwX8gsRMVLssMRH5HcpzJEaWL7EVg9F1IHRlyqQohgVr4FGUlUcMJSjcUlDw0zvjeun70cLWmneoyf7NgBTQSniBTQQSuJAZsOnnaczjIMb5hCiuHKxokCrJfVnrctyZL0PkJAJe1HMil4nxeyi3Ypfn1kX51jpPvo/JeCNC4PhVdHdJw2XjBR8brF8PEIhNVn12AgP7uHsTBguBn53MUZCqv7Lp07Pn5k1Ro+uWmUNn7D+M57rtk7aG0Vo73xyF/fbFf0bPJjDXngnGocDTdFhygZjwUQrMNrDcmZlQT50VJ/g/UwNyHpu778+yW+/ksOz/BFo54P4AsUXMfRq7XWsAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMElEQVRYR+2Xv4pTQRTGf2dubhLdICiii2KnYKHVolhauKWPoGAnNr6BD6CvIVaihYuI2i1ia0BY0MZGRHQXjZj/mSPnnskfNWiWZUlzJ5k7M2cm833nO5Mziej2DWWJRUoCpQKlAntSQCqgw39/iUWAGmh37jrRnVsKlgpiqmkoGVABA7E57fvY+pJDdgKqF6HzFCSADkDq+F6AHABtQ+UMVE5D7zXod7fFNhTEckTbj5XQgHzNN+5tQvc5NG7C6BNkp6D3EmpXHDR+dQAjFLchW3VS9rlw3JBh+B7ys5Cf9z0GW1C/7P32AyBAOAz1q4jGliIH3YPuBnSfQX4OGreTIgEYQb/pBDtPnEQ4CivXYPAWBk13oHrB54yA9QuSn2H4AcKRpEILDt0BUzj+RLR1V5EqjD66NPRBVpLcQwjHoHYJOhsQv6U4mnzmrIXJCFr4LDwm/xBUoboG9XX4cc9VKdYoSA2yk5NQLJaKDUjTBoveG3Z2TElTxwjNK4M3LEZgUdDdruvcXzKBpStgp2NPiWi3ks9ZXxIoFVi+AvHLdc9TqtjL3/aYjpPlrzOcEnK62Szhimdd7xX232zFDTgtxezOu3WNMRLjiKgjtOhHVMd1loynVHvOgjuIIJMaELEqhJAV/RCSLbWTcfPFakFgFlALTRRvx+ok6Hlp/Q+v3fmx90bMyUzaEAhmM3KvHlXTL5DxnbGf/1M8RNNACLL5MNtPxP/mypJAqcDSFfgFhpYqWUzhTEAAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=' ]; // Builders. They build Three.js object from Object data parsed by MMDParser.
+	const DEFAULT_TOON_TEXTURES = [ 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/bWiiMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh8aBHZBl14e8wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOUlEQVRYR+3WMREAMAwDsYY/yoDI7MLwIiP40+RJklfcCCBAgAABAgTqArfb/QMCCBAgQIAAgbbAB3z/e0F3js2cAAAAAElFTkSuQmCC', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/B5ilMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh81dWyx0gFwKAAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOklEQVRYR+3WoREAMAwDsWb/UQtCy9wxTOQJ/oQ8SXKKGwEECBAgQIBAXeDt7f4BAQQIECBAgEBb4AOz8Hzx7WLY4wAAAABJRU5ErkJggg==', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABPUlEQVRYR+1XwW7CMAy1+f9fZOMysSEOEweEOPRNdm3HbdOyIhAcklPrOs/PLy9RygBALxzcCDQFmgJNgaZAU6Ap0BR4PwX8gsRMVLssMRH5HcpzJEaWL7EVg9F1IHRlyqQohgVr4FGUlUcMJSjcUlDw0zvjeun70cLWmneoyf7NgBTQSniBTQQSuJAZsOnnaczjIMb5hCiuHKxokCrJfVnrctyZL0PkJAJe1HMil4nxeyi3Ypfn1kX51jpPvo/JeCNC4PhVdHdJw2XjBR8brF8PEIhNVn12AgP7uHsTBguBn53MUZCqv7Lp07Pn5k1Ro+uWmUNn7D+M57rtk7aG0Vo73xyF/fbFf0bPJjDXngnGocDTdFhygZjwUQrMNrDcmZlQT50VJ/g/UwNyHpu778+yW+/ksOz/BFo54P4AsUXMfRq7XWsAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMElEQVRYR+2Xv4pTQRTGf2dubhLdICiii2KnYKHVolhauKWPoGAnNr6BD6CvIVaihYuI2i1ia0BY0MZGRHQXjZj/mSPnnskfNWiWZUlzJ5k7M2cm833nO5Mziej2DWWJRUoCpQKlAntSQCqgw39/iUWAGmh37jrRnVsKlgpiqmkoGVABA7E57fvY+pJDdgKqF6HzFCSADkDq+F6AHABtQ+UMVE5D7zXod7fFNhTEckTbj5XQgHzNN+5tQvc5NG7C6BNkp6D3EmpXHDR+dQAjFLchW3VS9rlw3JBh+B7ys5Cf9z0GW1C/7P32AyBAOAz1q4jGliIH3YPuBnSfQX4OGreTIgEYQb/pBDtPnEQ4CivXYPAWBk13oHrB54yA9QuSn2H4AcKRpEILDt0BUzj+RLR1V5EqjD66NPRBVpLcQwjHoHYJOhsQv6U4mnzmrIXJCFr4LDwm/xBUoboG9XX4cc9VKdYoSA2yk5NQLJaKDUjTBoveG3Z2TElTxwjNK4M3LEZgUdDdruvcXzKBpStgp2NPiWi3ks9ZXxIoFVi+AvHLdc9TqtjL3/aYjpPlrzOcEnK62Szhimdd7xX232zFDTgtxezOu3WNMRLjiKgjtOhHVMd1loynVHvOgjuIIJMaELEqhJAV/RCSLbWTcfPFakFgFlALTRRvx+ok6Hlp/Q+v3fmx90bMyUzaEAhmM3KvHlXTL5DxnbGf/1M8RNNACLL5MNtPxP/mypJAqcDSFfgFhpYqWUzhTEAAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=' ];
+	const NON_ALPHA_CHANNEL_FORMATS = [ THREE.RGB_S3TC_DXT1_Format, THREE.RGB_PVRTC_4BPPV1_Format, THREE.RGB_PVRTC_2BPPV1_Format, THREE.RGB_ETC1_Format, THREE.RGB_ETC2_Format ]; // Builders. They build Three.js object from Object data parsed by MMDParser.
 
 	/**
  * @param {THREE.LoadingManager} manager
@@ -920,7 +921,7 @@
    * @param {BufferGeometry} geometry - some properties are dependend on geometry
    * @param {function} onProgress
    * @param {function} onError
-   * @return {Array<MeshToonMaterial>}
+   * @return {Array<MMDToonMaterial>}
    */
 
 
@@ -936,28 +937,29 @@
 
 				const material = data.materials[ i ];
 				const params = {
-					userData: {}
+					userData: {
+						MMD: {}
+					}
 				};
 				if ( material.name !== undefined ) params.name = material.name;
 				/*
       	 * THREE.Color
       	 *
-      	 * MMD         THREE.MeshToonMaterial
-      	 * diffuse  -  color
+      	 * MMD         MMDToonMaterial
       	 * ambient  -  emissive * a
       	 *               (a = 1.0 without map texture or 0.2 with map texture)
       	 *
-      	 * THREE.MeshToonMaterial doesn't have ambient. Set it to emissive instead.
+      	 * MMDToonMaterial doesn't have ambient. Set it to emissive instead.
       	 * It'll be too bright if material has map texture so using coef 0.2.
       	 */
 
-				params.color = new THREE.Color().fromArray( material.diffuse );
+				params.diffuse = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
+				params.specular = new THREE.Color().fromArray( material.specular );
+				params.shininess = material.shininess;
 				params.emissive = new THREE.Color().fromArray( material.ambient );
 				params.transparent = params.opacity !== 1.0; //
 
-				params.skinning = geometry.bones.length > 0 ? true : false;
-				params.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 				params.fog = true; // blend
 
 				params.blending = THREE.CustomBlending;
@@ -1016,15 +1018,21 @@
 					// map
 					if ( material.textureIndex !== - 1 ) {
 
-						params.map = this._loadTexture( data.textures[ material.textureIndex ], textures );
+						params.map = this._loadTexture( data.textures[ material.textureIndex ], textures ); // Since PMX spec don't have standard to list map files except color map and env map,
+						// we need to save file name for further mapping, like matching normal map file names after model loaded.
+						// ref: https://gist.github.com/felixjones/f8a06bd48f9da9a4539f#texture
+
+						params.userData.MMD.mapFileName = data.textures[ material.textureIndex ];
 
 					} // envMap TODO: support m.envFlag === 3
 
 
 					if ( material.envTextureIndex !== - 1 && ( material.envFlag === 1 || material.envFlag == 2 ) ) {
 
-						params.envMap = this._loadTexture( data.textures[ material.envTextureIndex ], textures );
-						params.combine = material.envFlag === 1 ? THREE.MultiplyOperation : THREE.AddOperation;
+						params.matcap = this._loadTexture( data.textures[ material.envTextureIndex ], textures ); // Same as color map above, keep file name in userData for further usage.
+
+						params.userData.MMD.matcapFileName = data.textures[ material.envTextureIndex ];
+						params.matcapCombine = material.envFlag === 1 ? THREE.MultiplyOperation : THREE.AddOperation;
 
 					} // gradientMap
 
@@ -1070,7 +1078,7 @@
 
 				}
 
-				materials.push( new THREE.MeshToonMaterial( params ) );
+				materials.push( new MMDToonMaterial( params ) );
 
 			}
 
@@ -1311,6 +1319,23 @@
 					if ( y < 0 ) y += height;
 					const index = y * width + x;
 					return image.data[ index * 4 + 3 ];
+
+				}
+
+				if ( texture.isCompressedTexture === true ) {
+
+					if ( NON_ALPHA_CHANNEL_FORMATS.includes( texture.format ) ) {
+
+						map.transparent = false;
+
+					} else {
+
+						// any other way to check transparency of CompressedTexture?
+						map.transparent = true;
+
+					}
+
+					return;
 
 				}
 
@@ -1793,6 +1818,93 @@
 		}
 
 	}
+
+	class MMDToonMaterial extends THREE.ShaderMaterial {
+
+		constructor( parameters ) {
+
+			super();
+			this._matcapCombine = THREE.AddOperation;
+			this.emissiveIntensity = 1.0;
+			this.normalMapType = THREE.TangentSpaceNormalMap;
+			this.combine = THREE.MultiplyOperation;
+			this.wireframeLinecap = 'round';
+			this.wireframeLinejoin = 'round';
+			this.flatShading = false;
+			this.lights = true;
+			this.vertexShader = THREE.MMDToonShader.vertexShader;
+			this.fragmentShader = THREE.MMDToonShader.fragmentShader;
+			this.defines = Object.assign( {}, THREE.MMDToonShader.defines );
+			Object.defineProperty( this, 'matcapCombine', {
+				get: function () {
+
+					return this._matcapCombine;
+
+				},
+				set: function ( value ) {
+
+					this._matcapCombine = value;
+
+					switch ( value ) {
+
+						case THREE.MultiplyOperation:
+							this.defines.MATCAP_BLENDING_MULTIPLY = true;
+							delete this.defines.MATCAP_BLENDING_ADD;
+							break;
+
+						default:
+						case THREE.AddOperation:
+							this.defines.MATCAP_BLENDING_ADD = true;
+							delete this.defines.MATCAP_BLENDING_MULTIPLY;
+							break;
+
+					}
+
+				}
+			} );
+			this.uniforms = THREE.UniformsUtils.clone( THREE.MMDToonShader.uniforms ); // merged from MeshToon/Phong/MatcapMaterial
+
+			const exposePropertyNames = [ 'specular', 'shininess', 'opacity', 'diffuse', 'map', 'matcap', 'gradientMap', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveMap', 'bumpMap', 'bumpScale', 'normalMap', 'normalScale', 'displacemantBias', 'displacemantMap', 'displacemantScale', 'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ];
+
+			for ( const propertyName of exposePropertyNames ) {
+
+				Object.defineProperty( this, propertyName, {
+					get: function () {
+
+						return this.uniforms[ propertyName ].value;
+
+					},
+					set: function ( value ) {
+
+						this.uniforms[ propertyName ].value = value;
+
+					}
+				} );
+
+			}
+
+			Object.defineProperty( this, 'color', Object.getOwnPropertyDescriptor( this, 'diffuse' ) );
+			this.setValues( parameters );
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+			this.matcapCombine = source.matcapCombine;
+			this.emissiveIntensity = source.emissiveIntensity;
+			this.normalMapType = source.normalMapType;
+			this.combine = source.combine;
+			this.wireframeLinecap = source.wireframeLinecap;
+			this.wireframeLinejoin = source.wireframeLinejoin;
+			this.flatShading = source.flatShading;
+			return this;
+
+		}
+
+	}
+
+	MMDToonMaterial.prototype.isMMDToonMaterial = true;
 
 	THREE.MMDLoader = MMDLoader;
 

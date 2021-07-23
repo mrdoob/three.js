@@ -35,7 +35,7 @@
 
 		[page:constant BasicShadowMap] 能够给出没有经过过滤的阴影映射 —— 速度最快，但质量最差。<br />
 		[page:constant PCFShadowMap] 为默认值，使用Percentage-Closer Filtering (PCF)算法来过滤阴影映射。<br />
-		[page:constant PCFSoftShadowMap] filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm with better soft shadows especially when using low-resolution shadow maps.<br />
+		[page:constant PCFSoftShadowMap] 和PCFShadowMap一样使用 Percentage-Closer Filtering (PCF) 算法过滤阴影映射，但在使用低分辨率阴影图时具有更好的软阴影。<br />
 		[page:constant VSMShadowMap] 使用Variance Shadow Map (VSM)算法来过滤阴影映射。当使用VSMShadowMap时，所有阴影接收者也将会投射阴影。
 		</p>
 
