@@ -1,9 +1,9 @@
 Title: Primitives de Three.js
-Description: Un tour des primitives de  three.js
+Description: Un tour des primitives de  Three.js
 TOC: Primitives
 
-Cet article fait partie d'une série consacrée à three.js.
-Le premier article est [Principes de base](threejs-fundamentals.html).
+Cet article fait partie d'une série consacrée à Three.js.
+Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
 Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là.
 
 Three.js a un grand nombre de primitives. Les primitives
@@ -18,12 +18,12 @@ applications 3D, il est courant de demander à un artiste de faire des modèles 
 dans un programme de modélisation 3D comme [Blender](https://blender.org),
 [Maya](https://www.autodesk.com/products/maya/) ou [Cinema 4D](https://www.maxon.net/en-us/products/cinema-4d/).
 Plus tard dans cette série,
-nous aborderons la conception et le chargement de données de
+nous aborderons la conception et le chargement de données provenant de
 plusieurs programme de modélisation 3D. Pour l'instant, passons
 en revue certaines primitives disponibles.
 
 La plupart des primitives ci-dessous ont des valeurs par défaut
-pour certains ou tous leurs paramètres. Vous pouvez donc les
+pour certain ou tous leurs paramètres. Vous pouvez donc les
 utiliser en fonction de vos besoins.
 
 <div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">Une Boîte</div>
@@ -33,7 +33,7 @@ utiliser en fonction de vos besoins.
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">Un Dodécaèdre (12 côtés)</div>
 <div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">Une forme 2D extrudée avec un biseautage optionnel. Ici, nous extrudons une forme de cœur. Notez qu'il s'agit du principe de fonctionnement pour les <code>TextGeometry</code> et les <code>TextGeometry</code>.</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">Un Icosaèdre (20 côtés)</div>
-<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">Une forme généré par la rotation d'une ligne pour, par exemple, dessiner une lampe, une quille, bougies, bougeoirs, verres à vin, verres à boire, etc. Vous fournissez une silhouette en deux dimensions comme une série de points et vous indiquez ensuite à three.js combien de subdivisions sont nécessaires en faisant tourner la silhouette autour d'un axe.</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">Une forme généré par la rotation d'une ligne pour, par exemple, dessiner une lampe, une quille, une bougie, un bougeoir, un verre à vin, etc. Vous fournissez une silhouette en deux dimensions comme une série de points et vous indiquez ensuite à Three.js combien de subdivisions sont nécessaires en faisant tourner la silhouette autour d'un axe.</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">Un Octaèdre (8 côtés)</div>
 <div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">Une surface générée en fournissant à la fonction un point 2D d'une grille et retourne le point 3D correspondant.</div>
 <div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">Un plan 2D</div>
