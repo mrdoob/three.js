@@ -103,10 +103,30 @@
 
 			};
 
+			this.setPolarAngle = function ( angle ) {
+	
+				let counterClockwise = angle - spherical.phi;
+				
+				let clockwise = angle - Math.PI - spherical.phi;
+	
+				sphericalDelta.phi = Math.abs( counterClockwise ) > Math.abs( clockwise ) ? clockwise : counterClockwise;
+	
+			};
+
 			this.getAzimuthalAngle = function () {
 
 				return spherical.theta;
 
+			};
+			
+			this.setAzimuthalAngle = function ( angle ) {
+	
+				let counterClockwise = angle - spherical.theta;
+				
+				let clockwise = angle - 2 * Math.PI - spherical.theta;
+	
+				sphericalDelta.theta = Math.abs( counterClockwise ) > Math.abs( clockwise ) ? clockwise : counterClockwise;
+	
 			};
 
 			this.listenToKeyEvents = function ( domElement ) {
@@ -703,7 +723,7 @@
 					case 'pen':
 						onMouseDown( event );
 						break;
-        // TODO touch
+				// TODO touch
 
 				}
 
@@ -719,7 +739,7 @@
 					case 'pen':
 						onMouseMove( event );
 						break;
-        // TODO touch
+				// TODO touch
 
 				}
 
@@ -733,7 +753,7 @@
 					case 'pen':
 						onMouseUp( event );
 						break;
-        // TODO touch
+				// TODO touch
 
 				}
 
