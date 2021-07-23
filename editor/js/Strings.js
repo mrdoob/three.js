@@ -78,6 +78,7 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
+			'menubar/help/manual': 'Manual',
 
 			'sidebar/animations': 'Animations',
 			'sidebar/animations/play': 'Play',
@@ -412,6 +413,7 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Code Source',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
+			'menubar/help/manual': 'Manual',
 
 			'sidebar/animations': 'Animations',
 			'sidebar/animations/play': 'Play',
@@ -746,6 +748,7 @@ function Strings( config ) {
 			'menubar/help/source_code': '源码',
 			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
+			'menubar/help/manual': 'Manual',
 
 			'sidebar/animations': '动画',
 			'sidebar/animations/play': '播放',
