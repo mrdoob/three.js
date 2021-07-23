@@ -17,7 +17,7 @@
 
 			#container {
 				position: absolute;
-				top: 80px;
+				top: 70px;
 				width: 100%;
 				bottom: 0px;
 			}
@@ -28,7 +28,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - postprocessing - FXAA<br />
-			Left scene processed with FXAA, right scene is rendered without anti-aliasing.
+			Left: No FXAA, Right: FXAA
 		</div>
 		<div id="container">
 		</div>
@@ -54,7 +54,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -115,23 +115,22 @@
 				//
 
 				fxaaPass = new ShaderPass( FXAAShader );
+				const copyPass = new ShaderPass( CopyShader );
+
+				composer1 = new EffectComposer( renderer );
+				composer1.addPass( renderPass );
+				composer1.addPass( copyPass );
+
+				//
 
 				const pixelRatio = renderer.getPixelRatio();
 
 				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
 				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
-				composer1 = new EffectComposer( renderer );
-				composer1.addPass( renderPass );
-				composer1.addPass( fxaaPass );
-
-				//
-
-				const copyPass = new ShaderPass( CopyShader );
-
 				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
-				composer2.addPass( copyPass );
+				composer2.addPass( fxaaPass );
 
 				//
 
@@ -141,7 +140,7 @@
 
 			function onWindowResize() {
 
-				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
+				camera.aspect = container.offsetWidth / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
@@ -163,13 +162,15 @@
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
-				renderer.setViewport( 0, 0, halfWidth, container.offsetHeight );
+				renderer.setScissorTest( true );
 
+				renderer.setScissor( 0, 0, halfWidth - 1, container.offsetHeight );
 				composer1.render();
 
-				renderer.setViewport( halfWidth, 0, halfWidth, container.offsetHeight );
-
+				renderer.setScissor( halfWidth, 0, halfWidth, container.offsetHeight );
 				composer2.render();
+
+				renderer.setScissorTest( false );
 
 			}
 

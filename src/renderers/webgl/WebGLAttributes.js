@@ -66,6 +66,10 @@ function WebGLAttributes( gl, capabilities ) {
 
 			type = gl.UNSIGNED_BYTE;
 
+		} else if ( array instanceof Uint8ClampedArray ) {
+
+			type = gl.UNSIGNED_BYTE;
+
 		}
 
 		return {

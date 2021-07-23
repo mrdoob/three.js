@@ -138,7 +138,7 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
-		Decomposes this matrix into it's [page:Vector3 position], [page:Quaternion quaternion] and [page:Vector3 scale] components.<br/><br/>
+		Decomposes this matrix into its [page:Vector3 position], [page:Quaternion quaternion] and [page:Vector3 scale] components.<br/><br/>
 		Note: Not all matrices are decomposable in this way. For example, if an object has a non-uniformly scaled parent, then the object's world matrix may not be decomposable, and this method may not be appropriate.
 		</p>
 
@@ -317,18 +317,21 @@ x, 0, 0, 0,
 			</code>
 		</p>
 
-		<h3>[method:this makeShear]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this makeShear]( [param:Float xy], [param:Float xz], [param:Float yx], [param:Float yz], [param:Float zx], [param:Float zy] )</h3>
 		<p>
-		[page:Float x] - the amount to shear in the X axis.<br />
-		[page:Float y] - the amount to shear in the Y axis.<br />
-		[page:Float z] - the amount to shear in the Z axis.<br /><br />
+			[page:Float xy] - the amount to shear X by Y.<br />
+			[page:Float xz] - the amount to shear X by Z.<br />
+			[page:Float yx] - the amount to shear Y by X.<br />
+			[page:Float yz] - the amount to shear Y by Z.<br />
+			[page:Float zx] - the amount to shear Z by X.<br />
+			[page:Float zy] - the amount to shear Z by Y.<br /><br />
 
 		Sets this matrix as a shear transform:
 <code>
-1, y, z, 0,
-x, 1, z, 0,
-x, y, 1, 0,
-0, 0, 0, 1
+1,   yx,  zx,  0,
+xy,   1,  zy,  0,
+xz,  yz,   1,  0,
+0,    0,   0,  1
 </code>
 		</p>
 

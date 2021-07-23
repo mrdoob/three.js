@@ -2,16 +2,20 @@
 
 	class Lut {
 
-		constructor( colormap, numberofcolors ) {
+		constructor( colormap, count = 32 ) {
 
 			this.lut = [];
-			this.setColorMap( colormap, numberofcolors );
+			this.map = [];
+			this.n = 0;
+			this.minV = 0;
+			this.maxV = 1;
+			this.setColorMap( colormap, count );
 
 		}
 
 		set( value ) {
 
-			if ( value instanceof Lut ) {
+			if ( value.isLut === true ) {
 
 				this.copy( value );
 
@@ -35,10 +39,10 @@
 
 		}
 
-		setColorMap( colormap, numberofcolors = 32 ) {
+		setColorMap( colormap, count = 32 ) {
 
 			this.map = ColorMapKeywords[ colormap ] || ColorMapKeywords.rainbow;
-			this.n = numberofcolors;
+			this.n = count;
 			const step = 1.0 / this.n;
 			this.lut.length = 0;
 
@@ -95,9 +99,10 @@
 
 		}
 
-		addColorMap( colormapName, arrayOfColors ) {
+		addColorMap( name, arrayOfColors ) {
 
-			ColorMapKeywords[ colormapName ] = arrayOfColors;
+			ColorMapKeywords[ name ] = arrayOfColors;
+			return this;
 
 		}
 
@@ -151,11 +156,7 @@
 
 	}
 
-	Lut.prototype.lut = [];
-	Lut.prototype.map = [];
-	Lut.prototype.n = 256;
-	Lut.prototype.minV = 0;
-	Lut.prototype.maxV = 1;
+	Lut.prototype.isLut = true;
 	const ColorMapKeywords = {
 		'rainbow': [[ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFF0000 ]],
 		'cooltowarm': [[ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ], [ 1.0, 0xB40426 ]],

@@ -1,3 +1,5 @@
+import * as THREE from '../../build/three.module.js';
+
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture } from './libs/ui.three.js';
 
@@ -150,18 +152,6 @@ function SidebarScene( editor ) {
 
 	// background
 
-	function onBackgroundChanged() {
-
-		signals.sceneBackgroundChanged.dispatch(
-			backgroundType.getValue(),
-			backgroundColor.getHexValue(),
-			backgroundTexture.getValue(),
-			backgroundEquirectangularTexture.getValue(),
-			environmentType.getValue()
-		);
-
-	}
-
 	var backgroundRow = new UIRow();
 
 	var backgroundType = new UISelect().setOptions( {
@@ -178,7 +168,6 @@ function SidebarScene( editor ) {
 		refreshBackgroundUI();
 
 	} );
-	backgroundType.setValue( 'Color' );
 
 	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundType );
@@ -196,7 +185,16 @@ function SidebarScene( editor ) {
 
 	container.add( backgroundRow );
 
-	//
+	function onBackgroundChanged() {
+
+		signals.sceneBackgroundChanged.dispatch(
+			backgroundType.getValue(),
+			backgroundColor.getHexValue(),
+			backgroundTexture.getValue(),
+			backgroundEquirectangularTexture.getValue()
+		);
+
+	}
 
 	function refreshBackgroundUI() {
 
@@ -216,21 +214,44 @@ function SidebarScene( editor ) {
 	var environmentType = new UISelect().setOptions( {
 
 		'None': '',
-		'Background': 'Background',
+		'Equirectangular': 'Equirect',
 		'ModelViewer': 'ModelViewer'
 
 	} ).setWidth( '150px' );
 	environmentType.setValue( 'None' );
 	environmentType.onChange( function () {
 
-		signals.sceneEnvironmentChanged.dispatch( environmentType.getValue() );
+		onEnvironmentChanged();
+		refreshEnvironmentUI();
 
 	} );
 
 	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setWidth( '90px' ) );
 	environmentRow.add( environmentType );
 
+	var environmentEquirectangularTexture = new UITexture().setMarginLeft( '8px' ).onChange( onEnvironmentChanged );
+	environmentEquirectangularTexture.setDisplay( 'none' );
+	environmentRow.add( environmentEquirectangularTexture );
+
 	container.add( environmentRow );
+
+	function onEnvironmentChanged() {
+
+		signals.sceneEnvironmentChanged.dispatch(
+			environmentType.getValue(),
+			environmentEquirectangularTexture.getValue()
+		);
+
+	}
+
+	function refreshEnvironmentUI() {
+
+		var type = environmentType.getValue();
+
+		environmentType.setWidth( type !== 'Equirectangular' ? '150px' : '110px' );
+		environmentEquirectangularTexture.setDisplay( type === 'Equirectangular' ? '' : 'none' );
+
+	}
 
 	// fog
 
@@ -356,18 +377,26 @@ function SidebarScene( editor ) {
 
 				backgroundType.setValue( 'Color' );
 				backgroundColor.setHexValue( scene.background.getHex() );
-				backgroundTexture.setValue( null );
-				backgroundEquirectangularTexture.setValue( null );
+
+			} else if ( scene.background.isTexture ) {
+
+				if ( scene.background.mapping === THREE.EquirectangularReflectionMapping ) {
+
+					backgroundType.setValue( 'Equirectangular' );
+					backgroundEquirectangularTexture.setValue( scene.background );
+
+				} else {
+
+					backgroundType.setValue( 'Texture' );
+					backgroundTexture.setValue( scene.background );
+
+				}
 
 			}
-
-			// TODO: Add Texture/EquirectangularTexture support
 
 		} else {
 
 			backgroundType.setValue( 'None' );
-			backgroundTexture.setValue( null );
-			backgroundEquirectangularTexture.setValue( null );
 
 		}
 

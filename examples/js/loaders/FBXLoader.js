@@ -364,6 +364,7 @@
 
 				} else {
 
+					loader.setPath( this.textureLoader.path );
 					texture = loader.load( fileName );
 
 				}
@@ -756,7 +757,6 @@
 			} );
 			this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
 			this.createAmbientLight();
-			this.setupMorphMaterials();
 			sceneGraph.traverse( function ( node ) {
 
 				if ( node.userData.transformData ) {
@@ -1157,11 +1157,6 @@
 
 			if ( geometry.FBX_Deformer ) {
 
-				materials.forEach( function ( material ) {
-
-					material.skinning = true;
-
-				} );
 				model = new THREE.SkinnedMesh( geometry, material );
 				model.normalizeSkinWeights();
 
@@ -1337,71 +1332,6 @@
 				}
 
 			}
-
-		}
-
-		setupMorphMaterials() {
-
-			const scope = this;
-			sceneGraph.traverse( function ( child ) {
-
-				if ( child.isMesh ) {
-
-					if ( child.geometry.morphAttributes.position && child.geometry.morphAttributes.position.length ) {
-
-						if ( Array.isArray( child.material ) ) {
-
-							child.material.forEach( function ( material, i ) {
-
-								scope.setupMorphMaterial( child, material, i );
-
-							} );
-
-						} else {
-
-							scope.setupMorphMaterial( child, child.material );
-
-						}
-
-					}
-
-				}
-
-			} );
-
-		}
-
-		setupMorphMaterial( child, material, index ) {
-
-			const uuid = child.uuid;
-			const matUuid = material.uuid; // if a geometry has morph targets, it cannot share the material with other geometries
-
-			let sharedMat = false;
-			sceneGraph.traverse( function ( node ) {
-
-				if ( node.isMesh ) {
-
-					if ( Array.isArray( node.material ) ) {
-
-						node.material.forEach( function ( mat ) {
-
-							if ( mat.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
-
-						} );
-
-					} else if ( node.material.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
-
-				}
-
-			} );
-
-			if ( sharedMat === true ) {
-
-				const clonedMat = material.clone();
-				clonedMat.morphTargets = true;
-				if ( index === undefined ) child.material = clonedMat; else child.material[ index ] = clonedMat;
-
-			} else material.morphTargets = true;
 
 		}
 
@@ -3749,16 +3679,15 @@
 
 		}
 
-		const lLRM = new THREE.Matrix4().copy( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ); // Global Rotation
+		const lLRM = lPreRotationM.clone().multiply( lRotationM ).multiply( lPostRotationM ); // Global Rotation
 
 		const lParentGRM = new THREE.Matrix4();
 		lParentGRM.extractRotation( lParentGX ); // Global Shear*Scaling
 
 		const lParentTM = new THREE.Matrix4();
 		lParentTM.copyPosition( lParentGX );
-		const lParentGSM = new THREE.Matrix4();
-		const lParentGRSM = new THREE.Matrix4().copy( lParentTM ).invert().multiply( lParentGX );
-		lParentGSM.copy( lParentGRM ).invert().multiply( lParentGRSM );
+		const lParentGRSM = lParentTM.clone().invert().multiply( lParentGX );
+		const lParentGSM = lParentGRM.clone().invert().multiply( lParentGRSM );
 		const lLSM = lScalingM;
 		const lGlobalRS = new THREE.Matrix4();
 
@@ -3773,23 +3702,20 @@
 		} else {
 
 			const lParentLSM = new THREE.Matrix4().scale( new THREE.Vector3().setFromMatrixScale( lParentLX ) );
-			const lParentLSM_inv = new THREE.Matrix4().copy( lParentLSM ).invert();
-			const lParentGSM_noLocal = new THREE.Matrix4().copy( lParentGSM ).multiply( lParentLSM_inv );
+			const lParentLSM_inv = lParentLSM.clone().invert();
+			const lParentGSM_noLocal = lParentGSM.clone().multiply( lParentLSM_inv );
 			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
 
 		}
 
-		const lRotationPivotM_inv = new THREE.Matrix4();
-		lRotationPivotM_inv.copy( lRotationPivotM ).invert();
-		const lScalingPivotM_inv = new THREE.Matrix4();
-		lScalingPivotM_inv.copy( lScalingPivotM ).invert(); // Calculate the local transform matrix
+		const lRotationPivotM_inv = lRotationPivotM.clone().invert();
+		const lScalingPivotM_inv = lScalingPivotM.clone().invert(); // Calculate the local transform matrix
 
-		let lTransform = new THREE.Matrix4();
-		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
+		let lTransform = lTranslationM.clone().multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 		const lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
-		const lGlobalTranslation = new THREE.Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
+		const lGlobalTranslation = lParentGX.clone().multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
-		lTransform = new THREE.Matrix4().copy( lGlobalT ).multiply( lGlobalRS ); // from global to local
+		lTransform = lGlobalT.clone().multiply( lGlobalRS ); // from global to local
 
 		lTransform.premultiply( lParentGX.invert() );
 		return lTransform;

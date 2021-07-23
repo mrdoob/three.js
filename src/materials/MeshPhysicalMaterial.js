@@ -18,7 +18,12 @@ import * as MathUtils from '../math/MathUtils.js';
  *  sheen: <Color>,
  *
  *  transmission: <float>,
- *  transmissionMap: new THREE.Texture( <Image> )
+ *  transmissionMap: new THREE.Texture( <Image> ),
+ *
+ *  thickness: <float>,
+ *  thicknessMap: new THREE.Texture( <Image> ),
+ *  attenuationDistance: <float>,
+ *  attenuationColor: <Color>
  * }
  */
 
@@ -64,6 +69,11 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.transmission = 0.0;
 		this.transmissionMap = null;
 
+		this.thickness = 0.01;
+		this.thicknessMap = null;
+		this.attenuationDistance = 0.0;
+		this.attenuationColor = new Color( 1, 1, 1 );
+
 		this.setValues( parameters );
 
 	}
@@ -100,6 +110,11 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.transmission = source.transmission;
 		this.transmissionMap = source.transmissionMap;
+
+		this.thickness = source.thickness;
+		this.thicknessMap = source.thicknessMap;
+		this.attenuationDistance = source.attenuationDistance;
+		this.attenuationColor.copy( source.attenuationColor );
 
 		return this;
 

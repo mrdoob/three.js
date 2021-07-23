@@ -20,10 +20,6 @@ import { Vector2 } from '../math/Vector2.js';
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  *
- *  skinning: <bool>,
- *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
  *  flatShading: <bool>
  * }
  */
@@ -52,10 +48,6 @@ class MeshNormalMaterial extends Material {
 
 		this.fog = false;
 
-		this.skinning = false;
-		this.morphTargets = false;
-		this.morphNormals = false;
-
 		this.flatShading = false;
 
 		this.setValues( parameters );
@@ -79,10 +71,6 @@ class MeshNormalMaterial extends Material {
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
-
-		this.skinning = source.skinning;
-		this.morphTargets = source.morphTargets;
-		this.morphNormals = source.morphNormals;
 
 		this.flatShading = source.flatShading;
 

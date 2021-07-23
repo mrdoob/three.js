@@ -19,60 +19,44 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
-
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { PCDLoader } from './jsm/loaders/PCDLoader.js';
 
-			let container, stats;
-			let camera, controls, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
-			animate();
+			render();
+
 			function init() {
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
-
-				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
-				camera.position.x = 0.4;
-				camera.position.z = - 2;
-				camera.up.set( 0, 0, 1 );
-
-				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.01, 40 );
+				camera.position.set( 0, 0, 1 );
+				scene.add( camera );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 0.5;
+				controls.maxDistance = 10;
+
+				//scene.add( new THREE.AxesHelper( 1 ) );
+
 				const loader = new PCDLoader();
 				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
 
+					points.geometry.center();
+					points.geometry.rotateX( Math.PI );
 					scene.add( points );
-					const center = points.geometry.boundingSphere.center;
-					controls.target.set( center.x, center.y, center.z );
-					controls.update();
+
+					render();
 
 				} );
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
-
-				controls = new TrackballControls( camera, renderer.domElement );
-
-				controls.rotateSpeed = 2.0;
-				controls.zoomSpeed = 0.3;
-				controls.panSpeed = 0.2;
-
-				controls.staticMoving = true;
-
-				controls.minDistance = 0.3;
-				controls.maxDistance = 0.3 * 100;
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -84,8 +68,8 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				controls.handleResize();
 
 			}
 
@@ -97,29 +81,25 @@
 
 					case '+':
 						points.material.size *= 1.2;
-						points.material.needsUpdate = true;
 						break;
 
 					case '-':
 						points.material.size /= 1.2;
-						points.material.needsUpdate = true;
 						break;
 
 					case 'c':
 						points.material.color.setHex( Math.random() * 0xffffff );
-						points.material.needsUpdate = true;
 						break;
 
 				}
 
+				render();
+
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-				controls.update();
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

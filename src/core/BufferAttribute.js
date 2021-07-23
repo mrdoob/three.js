@@ -29,9 +29,9 @@ class BufferAttribute {
 
 		this.version = 0;
 
-		this.onUploadCallback = function () {};
-
 	}
+
+	onUploadCallback() {}
 
 	set needsUpdate( value ) {
 

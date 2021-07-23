@@ -239,7 +239,6 @@ class LWOTreeParser {
 
 					spec.size = 0.1;
 					spec.map = mat.map;
-					spec.morphTargets = mat.morphTargets;
 					materials[ i ] = new PointsMaterial( spec );
 
 				} else if ( type === 'lines' ) {
