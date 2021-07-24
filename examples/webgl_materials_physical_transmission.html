@@ -34,13 +34,14 @@
 
 			let camera, scene, renderer;
 
-			let hdrCubeRenderTarget;
 			let mesh;
 
 			const hdrEquirect = new RGBELoader()
-				.setDataType( THREE.UnsignedByteType )
+				.setDataType( THREE.FloatType )
 				.setPath( 'textures/equirectangular/' )
 				.load( 'royal_esplanade_1k.hdr', function () {
+
+					hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
 
 					init();
 					render();
@@ -67,12 +68,7 @@
 
 				//
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-				hdrEquirect.dispose();
-				pmremGenerator.dispose();
-
-				scene.background = hdrCubeRenderTarget.texture;
+				scene.background = hdrEquirect;
 
 				//
 
@@ -90,7 +86,7 @@
 					roughness: params.roughness,
 					reflectivity: params.reflectivity,
 					alphaMap: texture,
-					envMap: hdrCubeRenderTarget.texture,
+					envMap: hdrEquirect,
 					envMapIntensity: params.envMapIntensity,
 					transmission: params.transmission, // use material.transmission for glass materials
 					opacity: params.opacity,

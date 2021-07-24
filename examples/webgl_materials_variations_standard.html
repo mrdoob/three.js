@@ -44,23 +44,19 @@
 
 				scene = new THREE.Scene();
 
-				let hdrCubeRenderTarget = null;
-
 				// Materials
 
-				let imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
+				let imgTexture = new THREE.TextureLoader().load( 'textures/planets/moon_1024.jpg' );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
+					.setDataType( THREE.FloatType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						hdrEquirect.dispose();
-						pmremGenerator.dispose();
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						const bumpScale = 1;
 						const cubeWidth = 400;
@@ -88,7 +84,7 @@
 										color: diffuseColor,
 										metalness: beta,
 										roughness: 1.0 - alpha,
-										envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture
+										envMap: index % 2 === 0 ? null : texture
 									} );
 
 									index ++;
@@ -109,7 +105,7 @@
 
 						}
 
-						scene.background = hdrCubeRenderTarget.texture;
+						scene.background = texture;
 
 					} );
 
@@ -132,14 +128,14 @@
 
 				}
 
-				addLabel( "+roughness", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "-roughness", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( '+roughness', new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( '-roughness', new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-metalness", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "+metalness", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( '-metalness', new THREE.Vector3( 0, - 300, 0 ) );
+				addLabel( '+metalness', new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
-				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( '-diffuse', new THREE.Vector3( 0, 0, - 300 ) );
+				addLabel( '+diffuse', new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -165,11 +161,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.75;
-
-				//
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				//
 
