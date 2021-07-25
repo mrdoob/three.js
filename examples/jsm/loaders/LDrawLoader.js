@@ -262,7 +262,8 @@ function smoothNormals( triangles, lineSegments ) {
 								const norm = tri[ `n${ next }` ];
 								otherTri[ `n${ otherIndex }` ] = norm;
 
-								norm.addScaledVector( otherTri.faceNormal, otherTri.fromQuad && otherIndex !== 2 ? 0.5 : 1.0 );
+								const isDoubledVert = otherTri.fromQuad && otherIndex !== 2;
+								norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
 
 							}
 
@@ -270,7 +271,9 @@ function smoothNormals( triangles, lineSegments ) {
 
 								const norm = tri[ `n${ index }` ];
 								otherTri[ `n${ otherNext }` ] = norm;
-								norm.addScaledVector( otherTri.faceNormal, otherTri.fromQuad && otherNext !== 2 ? 0.5 : 1.0 );
+
+								const isDoubledVert = otherTri.fromQuad && otherNext !== 2;
+								norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
 
 							}
 
