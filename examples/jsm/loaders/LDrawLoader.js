@@ -173,13 +173,6 @@ function smoothNormals( triangles, lineSegments ) {
 
 	}
 
-	// NOTE: Some of the normals wind up being skewed in an unexpected way because
-	// quads provide more "influence" to some vertex normals than a triangle due to
-	// the fact that a quad is made up of two triangles and all triangles are weighted
-	// equally. To fix this quads could be tracked separately so their vertex normals
-	// are weighted appropriately or we could try only adding a normal direction
-	// once per normal.
-
 	// Iterate until we've tried to connect all triangles to share normals
 	while ( true ) {
 
@@ -199,14 +192,14 @@ function smoothNormals( triangles, lineSegments ) {
 			const faceNormal = tri.faceNormal;
 			if ( tri.n0 === null ) {
 
-				tri.n0 = faceNormal.clone();
+				tri.n0 = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
 				normals.push( tri.n0 );
 
 			}
 
 			if ( tri.n1 === null ) {
 
-				tri.n1 = faceNormal.clone();
+				tri.n1 = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
 				normals.push( tri.n1 );
 
 			}
@@ -268,7 +261,8 @@ function smoothNormals( triangles, lineSegments ) {
 
 								const norm = tri[ `n${ next }` ];
 								otherTri[ `n${ otherIndex }` ] = norm;
-								norm.add( otherTri.faceNormal );
+
+								norm.addScaledVector( otherTri.faceNormal, otherTri.fromQuad && otherIndex !== 2 ? 0.5 : 1.0 );
 
 							}
 
@@ -276,7 +270,7 @@ function smoothNormals( triangles, lineSegments ) {
 
 								const norm = tri[ `n${ index }` ];
 								otherTri[ `n${ otherNext }` ] = norm;
-								norm.add( otherTri.faceNormal );
+								norm.addScaledVector( otherTri.faceNormal, otherTri.fromQuad && otherNext !== 2 ? 0.5 : 1.0 );
 
 							}
 
@@ -1482,7 +1476,8 @@ class LDrawLoader extends Loader {
 						faceNormal: faceNormal,
 						n0: null,
 						n1: null,
-						n2: null
+						n2: null,
+						fromQuad: false,
 					} );
 
 					if ( doubleSided === true ) {
@@ -1496,7 +1491,8 @@ class LDrawLoader extends Loader {
 							faceNormal: faceNormal,
 							n0: null,
 							n1: null,
-							n2: null
+							n2: null,
+							fromQuad: false,
 						} );
 
 					}
@@ -1534,16 +1530,19 @@ class LDrawLoader extends Loader {
 						.crossVectors( _tempVec0, _tempVec1 )
 						.normalize();
 
+					// specifically place the triangle diagonal in the v0 and v1 slots so we can
+					// account for the doubling of vertices later when smoothing normals.
 					triangles.push( {
 						material: material,
 						colourCode: material.userData.code,
-						v0: v0,
-						v1: v1,
-						v2: v2,
+						v0: v2,
+						v1: v0,
+						v2: v1,
 						faceNormal: faceNormal,
 						n0: null,
 						n1: null,
-						n2: null
+						n2: null,
+						fromQuad: true,
 					} );
 
 					triangles.push( {
@@ -1555,7 +1554,8 @@ class LDrawLoader extends Loader {
 						faceNormal: faceNormal,
 						n0: null,
 						n1: null,
-						n2: null
+						n2: null,
+						fromQuad: true,
 					} );
 
 					if ( doubleSided === true ) {
@@ -1569,19 +1569,21 @@ class LDrawLoader extends Loader {
 							faceNormal: faceNormal,
 							n0: null,
 							n1: null,
-							n2: null
+							n2: null,
+							fromQuad: true,
 						} );
 
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
-							v0: v0,
-							v1: v3,
-							v2: v2,
+							v0: v2,
+							v1: v0,
+							v2: v3,
 							faceNormal: faceNormal,
 							n0: null,
 							n1: null,
-							n2: null
+							n2: null,
+							fromQuad: true,
 						} );
 
 					}
