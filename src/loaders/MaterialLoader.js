@@ -127,8 +127,6 @@ class MaterialLoader extends Loader {
 		if ( json.alphaToCoverage !== undefined ) material.alphaToCoverage = json.alphaToCoverage;
 		if ( json.premultipliedAlpha !== undefined ) material.premultipliedAlpha = json.premultipliedAlpha;
 
-		if ( json.vertexTangents !== undefined ) material.vertexTangents = json.vertexTangents;
-
 		if ( json.visible !== undefined ) material.visible = json.visible;
 
 		if ( json.toneMapped !== undefined ) material.toneMapped = json.toneMapped;
