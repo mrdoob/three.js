@@ -843,7 +843,6 @@ class LDrawLoader extends Loader {
 		let luminance = 0;
 
 		let finishType = FINISH_TYPE_DEFAULT;
-		let canHaveEnvMap = true;
 
 		let edgeMaterial = null;
 
@@ -1010,7 +1009,6 @@ class LDrawLoader extends Loader {
 
 				// Rubber finish
 				material = new MeshStandardMaterial( { color: colour, roughness: 0.9, metalness: 0 } );
-				canHaveEnvMap = false;
 				break;
 
 			case FINISH_TYPE_MATTE_METALLIC:
@@ -1039,8 +1037,6 @@ class LDrawLoader extends Loader {
 		material.polygonOffset = true;
 		material.polygonOffsetFactor = 1;
 
-		material.userData.canHaveEnvMap = canHaveEnvMap;
-
 		if ( luminance !== 0 ) {
 
 			material.emissive.set( material.color ).multiplyScalar( luminance );
@@ -1058,7 +1054,6 @@ class LDrawLoader extends Loader {
 			} );
 			edgeMaterial.userData.code = code;
 			edgeMaterial.name = name + ' - Edge';
-			edgeMaterial.userData.canHaveEnvMap = false;
 
 			// This is the material used for conditional edges
 			edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
@@ -1070,7 +1065,6 @@ class LDrawLoader extends Loader {
 				opacity: alpha,
 
 			} );
-			edgeMaterial.userData.conditionalEdgeMaterial.userData.canHaveEnvMap = false;
 
 		}
 
