@@ -254,8 +254,6 @@ class Object3D extends EventDispatcher {
 
 	lookAt( x, y, z ) {
 
-		// This method does not support objects having non-uniformly-scaled parent(s)
-
 		if ( x.isVector3 ) {
 
 			_target.copy( x );
@@ -288,7 +286,7 @@ class Object3D extends EventDispatcher {
 
 			_m1.extractRotation( parent.matrixWorld );
 			_q1.setFromRotationMatrix( _m1 );
-			this.quaternion.premultiply( _q1.invert() );
+			this.quaternion.premultiply( _q1.normalize().invert() );
 
 		}
 
