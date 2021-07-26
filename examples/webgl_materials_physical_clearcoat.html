@@ -46,31 +46,27 @@
 				scene.add( group );
 
 				new HDRCubeTextureLoader()
-					.setDataType( THREE.UnsignedByteType )
+					.setDataType( THREE.FloatType )
 					.setPath( 'textures/cube/pisaHDR/' )
 					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
-						function ( hdrCubeMap ) {
-
-							const hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-							hdrCubeMap.dispose();
-							pmremGenerator.dispose();
+						function ( texture ) {
 
 							const geometry = new THREE.SphereGeometry( 80, 64, 32 );
 
 							const textureLoader = new THREE.TextureLoader();
 
-							const diffuse = textureLoader.load( "textures/carbon/Carbon.png" );
+							const diffuse = textureLoader.load( 'textures/carbon/Carbon.png' );
 							diffuse.encoding = THREE.sRGBEncoding;
 							diffuse.wrapS = THREE.RepeatWrapping;
 							diffuse.wrapT = THREE.RepeatWrapping;
 							diffuse.repeat.x = 10;
 							diffuse.repeat.y = 10;
 
-							const normalMap = textureLoader.load( "textures/carbon/Carbon_Normal.png" );
+							const normalMap = textureLoader.load( 'textures/carbon/Carbon_Normal.png' );
 							normalMap.wrapS = THREE.RepeatWrapping;
 							normalMap.wrapT = THREE.RepeatWrapping;
 
-							const normalMap2 = textureLoader.load( "textures/water/Water_1_M_Normal.jpg" );
+							const normalMap2 = textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
 
 							const normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
 							normalMap3.wrapS = THREE.RepeatWrapping;
@@ -79,9 +75,9 @@
 							normalMap3.repeat.y = 6;
 							normalMap3.anisotropy = 16;
 
-							const normalMap4 = textureLoader.load( "textures/golfball.jpg" );
+							const normalMap4 = textureLoader.load( 'textures/golfball.jpg' );
 
-							const clearcoatNormaMap = textureLoader.load( "textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png" );
+							const clearcoatNormaMap = textureLoader.load( 'textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png' );
 
 							// car paint
 
@@ -151,8 +147,8 @@
 
 							//
 
-							scene.background = hdrCubeRenderTarget.texture;
-							scene.environment = hdrCubeRenderTarget.texture;
+							scene.background = texture;
+							scene.environment = texture;
 
 						}
 
@@ -181,11 +177,6 @@
 				//
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
-
-				//
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				//
 

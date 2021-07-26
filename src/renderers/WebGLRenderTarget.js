@@ -24,6 +24,7 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.viewport = new Vector4( 0, 0, width, height );
 
 		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+		this.texture.isRenderTargetTexture = true;
 
 		this.texture.image = { width: width, height: height, depth: 1 };
 

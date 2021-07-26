@@ -109,7 +109,7 @@
 
 				};
 
-				function loadEnvironment(name) {
+				function loadEnvironment( name ) {
 
 					if ( environments[ name ].texture !== undefined ) {
 
@@ -121,18 +121,17 @@
 
 					const filename = environments[ name ].filename;
 					new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'textures/equirectangular/' )
-					.load( filename, function ( hdrEquirect ) {
+						.setDataType( THREE.FloatType )
+						.setPath( 'textures/equirectangular/' )
+						.load( filename, function ( hdrEquirect ) {
 
-						const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						hdrEquirect.dispose();
+							hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
 
-						scene.background = hdrCubeRenderTarget.texture;
-						scene.environment = hdrCubeRenderTarget.texture;
-						environments[ name ].texture = hdrCubeRenderTarget.texture;
+							scene.background = hdrEquirect;
+							scene.environment = hdrEquirect;
+							environments[ name ].texture = hdrEquirect;
 
-					} );
+						} );
 
 				}
 
@@ -144,15 +143,12 @@
 				loadEnvironment( params.environment );
 
 				const gui = new GUI();
-				gui.add( params, 'environment', Object.keys( environments ) ).onChange( function( value ) {
+				gui.add( params, 'environment', Object.keys( environments ) ).onChange( function ( value ) {
 
-					loadEnvironment(value);
+					loadEnvironment( value );
 
 				} );
 				gui.open();
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				//
 
