@@ -1,6 +1,6 @@
-Title: Les Matériaux dans Three.js
-Description: Les Matériaux dans Three.js
-TOC: Matériaux
+Title: Les Materials de Three.js
+Description: Les Materials dans Three.js
+TOC: Materials
 
 Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
