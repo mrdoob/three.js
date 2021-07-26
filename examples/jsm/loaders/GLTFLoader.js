@@ -691,8 +691,7 @@ class GLTFMaterialsClearcoatExtension {
 
 				const scale = extension.clearcoatNormalTexture.scale;
 
-				// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-				materialParams.clearcoatNormalScale = new Vector2( scale, - scale );
+				materialParams.clearcoatNormalScale = new Vector2( scale, scale );
 
 			}
 
@@ -2908,8 +2907,6 @@ class GLTFParser {
 		const useVertexTangents = geometry.attributes.tangent !== undefined;
 		const useVertexColors = geometry.attributes.color !== undefined;
 		const useFlatShading = geometry.attributes.normal === undefined;
-		const useMorphTargets = Object.keys( geometry.morphAttributes ).length > 0;
-		const useMorphNormals = useMorphTargets && geometry.morphAttributes.normal !== undefined;
 
 		if ( mesh.isPoints ) {
 
@@ -2952,7 +2949,7 @@ class GLTFParser {
 		}
 
 		// Clone the material if it will be modified
-		if ( useVertexTangents || useVertexColors || useFlatShading || useMorphTargets ) {
+		if ( useVertexTangents || useVertexColors || useFlatShading ) {
 
 			let cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
@@ -2960,8 +2957,6 @@ class GLTFParser {
 			if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 			if ( useVertexColors ) cacheKey += 'vertex-colors:';
 			if ( useFlatShading ) cacheKey += 'flat-shading:';
-			if ( useMorphTargets ) cacheKey += 'morph-targets:';
-			if ( useMorphNormals ) cacheKey += 'morph-normals:';
 
 			let cachedMaterial = this.cache.get( cacheKey );
 
@@ -2971,18 +2966,6 @@ class GLTFParser {
 
 				if ( useVertexColors ) cachedMaterial.vertexColors = true;
 				if ( useFlatShading ) cachedMaterial.flatShading = true;
-				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
-				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
-
-				if ( useVertexTangents ) {
-
-					cachedMaterial.vertexTangents = true;
-
-					// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-					if ( cachedMaterial.normalScale ) cachedMaterial.normalScale.y *= - 1;
-					if ( cachedMaterial.clearcoatNormalScale ) cachedMaterial.clearcoatNormalScale.y *= - 1;
-
-				}
 
 				this.cache.add( cacheKey, cachedMaterial );
 
@@ -3122,12 +3105,9 @@ class GLTFParser {
 
 			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
 
-			// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-			materialParams.normalScale = new Vector2( 1, - 1 );
-
 			if ( materialDef.normalTexture.scale !== undefined ) {
 
-				materialParams.normalScale.set( materialDef.normalTexture.scale, - materialDef.normalTexture.scale );
+				materialParams.normalScale = new Vector2( materialDef.normalTexture.scale, materialDef.normalTexture.scale );
 
 			}
 

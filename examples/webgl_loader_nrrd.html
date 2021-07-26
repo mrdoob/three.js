@@ -136,7 +136,7 @@
 
 				} );
 
-				const vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, morphTargets: false, side: THREE.DoubleSide, color: 0xff0000 } );
+				const vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, side: THREE.DoubleSide, color: 0xff0000 } );
 
 				const vtkloader = new VTKLoader();
 				vtkloader.load( "models/vtk/liver.vtk", function ( geometry ) {

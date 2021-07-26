@@ -248,16 +248,6 @@ function SidebarMaterial( editor ) {
 
 	container.add( materialVertexColorsRow );
 
-	// vertex tangents
-
-	var materialVertexTangentsRow = new UIRow();
-	var materialVertexTangents = new UICheckbox( false ).onChange( update );
-
-	materialVertexTangentsRow.add( new UIText( strings.getKey( 'sidebar/material/vertextangents' ) ).setWidth( '90px' ) );
-	materialVertexTangentsRow.add( materialVertexTangents );
-
-	container.add( materialVertexTangentsRow );
-
 	// depth packing
 
 	var materialDepthPackingRow = new UIRow();
@@ -1255,7 +1245,6 @@ function SidebarMaterial( editor ) {
 			'clearcoatRoughness': materialClearcoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
-			'vertexTangents': materialVertexTangentsRow,
 			'depthPacking': materialDepthPackingRow,
 			'map': materialMapRow,
 			'matcap': materialMatcapMapRow,

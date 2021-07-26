@@ -39,7 +39,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap',
 		'objectSpaceNormalMap', 'tangentSpaceNormalMap', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'displacementMap',
 		'specularMap', 'specularMapEncoding', 'specularStrengthMap', 'roughnessMap', 'metalnessMap', 'gradientMap',
-		'alphaMap', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
+		'alphaMap', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'flipNormalScaleY', 'fog', 'useFog', 'fogExp2',
 		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
 		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'premultipliedAlpha',
 		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
@@ -211,11 +211,12 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 			combine: material.combine,
 
-			vertexTangents: ( material.normalMap && material.vertexTangents ),
+			vertexTangents: ( material.normalMap && object.geometry && object.geometry.attributes.tangent ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && object.geometry && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4,
 			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularStrengthMap,
 			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || !! material.transmission || !! material.transmissionMap || !! material.thicknessMap || !! material.specularStrengthMap ) && !! material.displacementMap,
+			flipNormalScaleY: ( ( material.normalMap && material.normalMap.flipY === false || material.clearcoatNormalMap && material.clearcoatNormalMap.flipY === false ) && ! ( object.geometry && object.geometry.attributes.tangent ) ),
 
 			fog: !! fog,
 			useFog: material.fog,
@@ -230,8 +231,8 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			maxBones: maxBones,
 			useVertexTexture: floatVertexTextures,
 
-			morphTargets: material.morphTargets,
-			morphNormals: material.morphNormals,
+			morphTargets: object.geometry && object.geometry.morphAttributes.position !== undefined,
+			morphNormals: object.geometry && object.geometry.morphAttributes.normal !== undefined,
 
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,

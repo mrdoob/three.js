@@ -78,6 +78,7 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Source Code',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
+			'menubar/help/manual': 'Manual',
 
 			'sidebar/animations': 'Animations',
 			'sidebar/animations/play': 'Play',
@@ -250,7 +251,6 @@ function Strings( config ) {
 			'sidebar/material/clearcoat': 'Clearcoat',
 			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
-			'sidebar/material/vertextangents': 'Vertex Tangents',
 			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Map',
 			'sidebar/material/alphamap': 'Alpha Map',
@@ -412,6 +412,7 @@ function Strings( config ) {
 			'menubar/help/source_code': 'Code Source',
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
+			'menubar/help/manual': 'Manual',
 
 			'sidebar/animations': 'Animations',
 			'sidebar/animations/play': 'Play',
@@ -584,7 +585,6 @@ function Strings( config ) {
 			'sidebar/material/clearcoat': 'Vernis',
 			'sidebar/material/clearcoatroughness': 'Rugosité du vernis',
 			'sidebar/material/vertexcolors': 'Couleurs aux Sommets',
-			'sidebar/material/vertextangents': 'Tangentes aux sommets',
 			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Texture',
 			'sidebar/material/alphamap': 'Texture de transparence',
@@ -746,6 +746,7 @@ function Strings( config ) {
 			'menubar/help/source_code': '源码',
 			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
+			'menubar/help/manual': 'Manual',
 
 			'sidebar/animations': '动画',
 			'sidebar/animations/play': '播放',
@@ -918,7 +919,6 @@ function Strings( config ) {
 			'sidebar/material/clearcoat': '清漆',
 			'sidebar/material/clearcoatroughness': '清漆粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
-			'sidebar/material/vertextangents': '顶点切线',
 			'sidebar/material/matcap': '材质捕获',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
