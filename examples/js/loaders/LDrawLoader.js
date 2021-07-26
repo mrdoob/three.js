@@ -17,88 +17,129 @@
 	const FILE_LOCATION_TRY_RELATIVE = 4;
 	const FILE_LOCATION_TRY_ABSOLUTE = 5;
 	const FILE_LOCATION_NOT_FOUND = 6;
-	const conditionalLineVertShader =
-/* glsl */
-`
-	attribute vec3 control0;
-	attribute vec3 control1;
-	attribute vec3 direction;
-	varying float discardFlag;
-
-	#include <common>
-	#include <color_pars_vertex>
-	#include <fog_pars_vertex>
-	#include <logdepthbuf_pars_vertex>
-	#include <clipping_planes_pars_vertex>
-	void main() {
-		#include <color_vertex>
-
-		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-		gl_Position = projectionMatrix * mvPosition;
-
-		// Transform the line segment ends and control points into camera clip space
-		vec4 c0 = projectionMatrix * modelViewMatrix * vec4( control0, 1.0 );
-		vec4 c1 = projectionMatrix * modelViewMatrix * vec4( control1, 1.0 );
-		vec4 p0 = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-		vec4 p1 = projectionMatrix * modelViewMatrix * vec4( position + direction, 1.0 );
-
-		c0.xy /= c0.w;
-		c1.xy /= c1.w;
-		p0.xy /= p0.w;
-		p1.xy /= p1.w;
-
-		// Get the direction of the segment and an orthogonal vector
-		vec2 dir = p1.xy - p0.xy;
-		vec2 norm = vec2( -dir.y, dir.x );
-
-		// Get control point directions from the line
-		vec2 c0dir = c0.xy - p1.xy;
-		vec2 c1dir = c1.xy - p1.xy;
-
-		// If the vectors to the controls points are pointed in different directions away
-		// from the line segment then the line should not be drawn.
-		float d0 = dot( normalize( norm ), normalize( c0dir ) );
-		float d1 = dot( normalize( norm ), normalize( c1dir ) );
-		discardFlag = float( sign( d0 ) != sign( d1 ) );
-
-		#include <logdepthbuf_vertex>
-		#include <clipping_planes_vertex>
-		#include <fog_vertex>
-	}
-	`;
-	const conditionalLineFragShader =
-/* glsl */
-`
-	uniform vec3 diffuse;
-	uniform float opacity;
-	varying float discardFlag;
-
-	#include <common>
-	#include <color_pars_fragment>
-	#include <fog_pars_fragment>
-	#include <logdepthbuf_pars_fragment>
-	#include <clipping_planes_pars_fragment>
-	void main() {
-
-		if ( discardFlag > 0.5 ) discard;
-
-		#include <clipping_planes_fragment>
-		vec3 outgoingLight = vec3( 0.0 );
-		vec4 diffuseColor = vec4( diffuse, opacity );
-		#include <logdepthbuf_fragment>
-		#include <color_fragment>
-		outgoingLight = diffuseColor.rgb; // simple shader
-		gl_FragColor = vec4( outgoingLight, diffuseColor.a );
-		#include <tonemapping_fragment>
-		#include <encodings_fragment>
-		#include <fog_fragment>
-		#include <premultiplied_alpha_fragment>
-	}
-	`;
 
 	const _tempVec0 = new THREE.Vector3();
 
 	const _tempVec1 = new THREE.Vector3();
+
+	class LDrawConditionalLineMaterial extends THREE.ShaderMaterial {
+
+		constructor( parameters ) {
+
+			super( {
+				uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.fog, {
+					diffuse: {
+						value: new THREE.Color()
+					},
+					opacity: {
+						value: 1.0
+					}
+				} ] ),
+				vertexShader:
+      /* glsl */
+      `
+				attribute vec3 control0;
+				attribute vec3 control1;
+				attribute vec3 direction;
+				varying float discardFlag;
+
+				#include <common>
+				#include <color_pars_vertex>
+				#include <fog_pars_vertex>
+				#include <logdepthbuf_pars_vertex>
+				#include <clipping_planes_pars_vertex>
+				void main() {
+					#include <color_vertex>
+
+					vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+					gl_Position = projectionMatrix * mvPosition;
+
+					// Transform the line segment ends and control points into camera clip space
+					vec4 c0 = projectionMatrix * modelViewMatrix * vec4( control0, 1.0 );
+					vec4 c1 = projectionMatrix * modelViewMatrix * vec4( control1, 1.0 );
+					vec4 p0 = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+					vec4 p1 = projectionMatrix * modelViewMatrix * vec4( position + direction, 1.0 );
+
+					c0.xy /= c0.w;
+					c1.xy /= c1.w;
+					p0.xy /= p0.w;
+					p1.xy /= p1.w;
+
+					// Get the direction of the segment and an orthogonal vector
+					vec2 dir = p1.xy - p0.xy;
+					vec2 norm = vec2( -dir.y, dir.x );
+
+					// Get control point directions from the line
+					vec2 c0dir = c0.xy - p1.xy;
+					vec2 c1dir = c1.xy - p1.xy;
+
+					// If the vectors to the controls points are pointed in different directions away
+					// from the line segment then the line should not be drawn.
+					float d0 = dot( normalize( norm ), normalize( c0dir ) );
+					float d1 = dot( normalize( norm ), normalize( c1dir ) );
+					discardFlag = float( sign( d0 ) != sign( d1 ) );
+
+					#include <logdepthbuf_vertex>
+					#include <clipping_planes_vertex>
+					#include <fog_vertex>
+				}
+			`,
+				fragmentShader:
+      /* glsl */
+      `
+			uniform vec3 diffuse;
+			uniform float opacity;
+			varying float discardFlag;
+
+			#include <common>
+			#include <color_pars_fragment>
+			#include <fog_pars_fragment>
+			#include <logdepthbuf_pars_fragment>
+			#include <clipping_planes_pars_fragment>
+			void main() {
+
+				if ( discardFlag > 0.5 ) discard;
+
+				#include <clipping_planes_fragment>
+				vec3 outgoingLight = vec3( 0.0 );
+				vec4 diffuseColor = vec4( diffuse, opacity );
+				#include <logdepthbuf_fragment>
+				#include <color_fragment>
+				outgoingLight = diffuseColor.rgb; // simple shader
+				gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+				#include <tonemapping_fragment>
+				#include <encodings_fragment>
+				#include <fog_fragment>
+				#include <premultiplied_alpha_fragment>
+			}
+			`
+			} );
+			Object.defineProperties( this, {
+				opacity: {
+					get: function () {
+
+						return this.uniforms.opacity.value;
+
+					},
+					set: function ( value ) {
+
+						this.uniforms.opacity.value = value;
+
+					}
+				},
+				color: {
+					get: function () {
+
+						return this.uniforms.diffuse.value;
+
+					}
+				}
+			} );
+			this.setValues( parameters );
+
+		}
+
+	}
 
 	function smoothNormals( triangles, lineSegments ) {
 
@@ -154,13 +195,7 @@
 
 			}
 
-		} // NOTE: Some of the normals wind up being skewed in an unexpected way because
-		// quads provide more "influence" to some vertex normals than a triangle due to
-		// the fact that a quad is made up of two triangles and all triangles are weighted
-		// equally. To fix this quads could be tracked separately so their vertex normals
-		// are weighted appropriately or we could try only adding a normal direction
-		// once per normal.
-		// Iterate until we've tried to connect all triangles to share normals
+		} // Iterate until we've tried to connect all triangles to share normals
 
 
 		while ( true ) {
@@ -181,14 +216,14 @@
 
 				if ( tri.n0 === null ) {
 
-					tri.n0 = faceNormal.clone();
+					tri.n0 = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
 					normals.push( tri.n0 );
 
 				}
 
 				if ( tri.n1 === null ) {
 
-					tri.n1 = faceNormal.clone();
+					tri.n1 = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
 					normals.push( tri.n1 );
 
 				}
@@ -249,7 +284,8 @@
 
 									const norm = tri[ `n${next}` ];
 									otherTri[ `n${otherIndex}` ] = norm;
-									norm.add( otherTri.faceNormal );
+									const isDoubledVert = otherTri.fromQuad && otherIndex !== 2;
+									norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
 
 								}
 
@@ -257,7 +293,8 @@
 
 									const norm = tri[ `n${index}` ];
 									otherTri[ `n${otherNext}` ] = norm;
-									norm.add( otherTri.faceNormal );
+									const isDoubledVert = otherTri.fromQuad && otherNext !== 2;
+									norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
 
 								}
 
@@ -723,7 +760,6 @@
 
 			let luminance = 0;
 			let finishType = FINISH_TYPE_DEFAULT;
-			let canHaveEnvMap = true;
 			let edgeMaterial = null;
 			const name = lineParser.getToken();
 
@@ -904,7 +940,6 @@
 						roughness: 0.9,
 						metalness: 0
 					} );
-					canHaveEnvMap = false;
 					break;
 
 				case FINISH_TYPE_MATTE_METALLIC:
@@ -937,7 +972,6 @@
 			material.depthWrite = ! isTransparent;
 			material.polygonOffset = true;
 			material.polygonOffsetFactor = 1;
-			material.userData.canHaveEnvMap = canHaveEnvMap;
 
 			if ( luminance !== 0 ) {
 
@@ -955,25 +989,15 @@
 					depthWrite: ! isTransparent
 				} );
 				edgeMaterial.userData.code = code;
-				edgeMaterial.name = name + ' - Edge';
-				edgeMaterial.userData.canHaveEnvMap = false; // This is the material used for conditional edges
+				edgeMaterial.name = name + ' - Edge'; // This is the material used for conditional edges
 
-				edgeMaterial.userData.conditionalEdgeMaterial = new THREE.ShaderMaterial( {
-					vertexShader: conditionalLineVertShader,
-					fragmentShader: conditionalLineFragShader,
-					uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.fog, {
-						diffuse: {
-							value: new THREE.Color( edgeColour )
-						},
-						opacity: {
-							value: alpha
-						}
-					} ] ),
+				edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
 					fog: true,
 					transparent: isTransparent,
-					depthWrite: ! isTransparent
+					depthWrite: ! isTransparent,
+					color: edgeColour,
+					opacity: alpha
 				} );
-				edgeMaterial.userData.conditionalEdgeMaterial.userData.canHaveEnvMap = false;
 
 			}
 
@@ -1367,7 +1391,8 @@
 							faceNormal: faceNormal,
 							n0: null,
 							n1: null,
-							n2: null
+							n2: null,
+							fromQuad: false
 						} );
 
 						if ( doubleSided === true ) {
@@ -1381,7 +1406,8 @@
 								faceNormal: faceNormal,
 								n0: null,
 								n1: null,
-								n2: null
+								n2: null,
+								fromQuad: false
 							} );
 
 						}
@@ -1415,17 +1441,20 @@
 
 						_tempVec1.subVectors( v2, v1 );
 
-						faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
+						faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize(); // specifically place the triangle diagonal in the v0 and v1 slots so we can
+						// account for the doubling of vertices later when smoothing normals.
+
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
-							v0: v0,
-							v1: v1,
-							v2: v2,
+							v0: v2,
+							v1: v0,
+							v2: v1,
 							faceNormal: faceNormal,
 							n0: null,
 							n1: null,
-							n2: null
+							n2: null,
+							fromQuad: true
 						} );
 						triangles.push( {
 							material: material,
@@ -1436,7 +1465,8 @@
 							faceNormal: faceNormal,
 							n0: null,
 							n1: null,
-							n2: null
+							n2: null,
+							fromQuad: true
 						} );
 
 						if ( doubleSided === true ) {
@@ -1450,18 +1480,20 @@
 								faceNormal: faceNormal,
 								n0: null,
 								n1: null,
-								n2: null
+								n2: null,
+								fromQuad: true
 							} );
 							triangles.push( {
 								material: material,
 								colourCode: material.userData.code,
-								v0: v0,
-								v1: v3,
-								v2: v2,
+								v0: v2,
+								v1: v0,
+								v2: v3,
 								faceNormal: faceNormal,
 								n0: null,
 								n1: null,
-								n2: null
+								n2: null,
+								fromQuad: true
 							} );
 
 						}

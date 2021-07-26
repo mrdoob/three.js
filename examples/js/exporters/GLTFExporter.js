@@ -1126,14 +1126,10 @@
 					index: this.processTexture( material.normalMap )
 				};
 
-				if ( material.normalScale && material.normalScale.x !== - 1 ) {
+				if ( material.normalScale && material.normalScale.x !== 1 ) {
 
-					if ( material.normalScale.x !== material.normalScale.y ) {
-
-						console.warn( 'THREE.GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
-
-					}
-
+					// glTF normal scale is univariate. Ignore `y`, which may be flipped.
+					// Context: https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 					normalMapDef.scale = material.normalScale.x;
 
 				}
