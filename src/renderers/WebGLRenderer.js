@@ -1497,6 +1497,7 @@ function WebGLRenderer( parameters = {} ) {
 		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 		materialProperties.numIntersection = parameters.numClipIntersection;
 		materialProperties.vertexAlphas = parameters.vertexAlphas;
+		materialProperties.vertexTangents = parameters.vertexTangents;
 
 	}
 
@@ -1511,6 +1512,7 @@ function WebGLRenderer( parameters = {} ) {
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && object.geometry && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
+		const vertexTangents = object.geometry && object.geometry.attributes.tangent;
 		const morphTargets = object.geometry && object.geometry.morphAttributes.position;
 		const morphNormals = object.geometry && object.geometry.morphAttributes.normal;
 
@@ -1579,6 +1581,10 @@ function WebGLRenderer( parameters = {} ) {
 				needsProgramChange = true;
 
 			} else if ( materialProperties.vertexAlphas !== vertexAlphas ) {
+
+				needsProgramChange = true;
+
+			} else if ( materialProperties.vertexTangents !== vertexTangents ) {
 
 				needsProgramChange = true;
 
