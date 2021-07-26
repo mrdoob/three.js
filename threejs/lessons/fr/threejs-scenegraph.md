@@ -1,12 +1,12 @@
-Title: Graphe de scène Three.js
-Description: What's a scene graph?
+Title: Graphique de scène de Three.js
+Description: Qu'est-ce qu'un graphique de scène ?
 TOC: Scenegraph
 
 Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
 Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là.
 
-Le coeurs de Three.js est sans aucun doute son graphique de scène. Une scène est une représentation arborescente des objets que l’on souhaite afficher, où chaque nœud représente un espace local.
+Le coeurs de Three.js est sans aucun doute son graphique de scène. Un graphique de scène est une représentation arborescente des objets que l’on souhaite afficher, où chaque nœud représente un espace local.
 
 <img src="resources/images/scenegraph-generic.svg" align="center">
 
