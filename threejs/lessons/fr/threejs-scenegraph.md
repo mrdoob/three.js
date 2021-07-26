@@ -6,7 +6,7 @@ Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
 Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là.
 
-Le coeurs de Three.js est sans aucun doute son objet scène. Une scène est une représentation arborescente des objets que l’on souhaite afficher, où chaque nœud représente un espace local.
+Le coeurs de Three.js est sans aucun doute son graphique de scène. Une scène est une représentation arborescente des objets que l’on souhaite afficher, où chaque nœud représente un espace local.
 
 <img src="resources/images/scenegraph-generic.svg" align="center">
 
@@ -176,31 +176,26 @@ objects.push(earthMesh);
 +moonOrbit.add(moonMesh);
 +objects.push(moonMesh);
 ```
-XXXXXXXXXXXXXXXX
 
-
-Again we added more invisible scene graph nodes. The first, an `Object3D` called `earthOrbit`
-and added both the `earthMesh` and the `moonOrbit` to it, also new. We then added the `moonMesh`
-to the `moonOrbit`. The new scene graph looks like this.
+Ajoutons à nouveau d'autres noeuds à notre scène. D'abord, un `Object3D` appelé `earthOrbit`
+ensuite ajoutons-lui un `earthMesh` et un `moonOrbit`. Finalement, ajoutons un `moonMesh`
+au `moonOrbit`. Notre scène devrait ressembler à ceci :
 
 <img src="resources/images/scenegraph-sun-earth-moon.svg" align="center">
 
-and here's that
+et à ça :
 
 {{{example url="../threejs-scenegraph-sun-earth-moon.html" }}}
 
-You can see the moon follows the spirograph pattern shown at the top
-of this article but we didn't have to manually compute it. We just
-setup our scene graph to do it for us.
+Vous pouvez voir que la lune suit le modèle de spirographe indiqué en haut de cet article, mais nous n'avons pas eu à le calculer manuellement. Nous venons de configurer notre graphe de scène pour le faire pour nous.
 
-It is often useful to draw something to visualize the nodes in the scene graph.
-Three.js has some helpful ummmm, helpers to ummm, ... help with this.
+Il est souvent utile de dessiner quelque chose pour visualiser les nœuds dans le graphe de scène.
+Three.js dispose pour cela de Helpers.
 
-One is called an `AxesHelper`. It draws 3 lines representing the local
+L'un d'entre eux s'appelle `AxesHelper`. Il dessine trois lignes représentant les axes 
 <span style="color:red">X</span>,
-<span style="color:green">Y</span>, and
-<span style="color:blue">Z</span> axes. Let's add one to every node we
-created.
+<span style="color:green">Y</span>, et
+<span style="color:blue">Z</span>. Ajoutons-en un à chacun de nos noeuds. 
 
 ```js
 // add an AxesHelper to each node
@@ -212,35 +207,20 @@ objects.forEach((node) => {
 });
 ```
 
-On our case we want the axes to appear even though they are inside the spheres.
-To do this we set their material's `depthTest` to false which means they will
-not check to see if they are drawing behind something else. We also
-set their `renderOrder` to 1 (the default is 0) so that they get drawn after
-all the spheres. Otherwise a sphere might draw over them and cover them up.
+Dans notre cas, nous voulons que les axes apparaissent même s'ils sont à l'intérieur des sphères.
+Pour cela, nous définissons le `depthTest` de material à false, pour ne pas vérifier s'ils dessinent derrière quelque chose. Nous définissons également leur `renderOrder` sur 1 (la valeur par défaut est 0) afin qu'ils soient dessinés après toutes les sphères. Sinon, une sphère pourrait les recouvrir et les recouvrir.
 
 {{{example url="../threejs-scenegraph-sun-earth-moon-axes.html" }}}
 
-We can see the
-<span style="color:red">x (red)</span> and
-<span style="color:blue">z (blue)</span> axes. Since we are looking
-straight down and each of our objects is only rotating around its
-y axis we don't see much of the <span style="color:green">y (green)</span> axes.
+Vous pouvez voir les axes
+<span style="color:red">x (rouge)</span> et
+<span style="color:blue">z (bleu)</span>. Comme nous regardons vers le bas et que chacun de nos objets tourne autour de son axe y, nous ne voyons pas bien l'axe <span style="color:green">y (verte)</span>.
 
-It might be hard to see some of them as there are 2 pairs of overlapping axes. Both the `sunMesh`
-and the `solarSystem` are at the same position. Similarly the `earthMesh` and
-`earthOrbit` are at the same position. Let's add some simple controls to allow us
-to turn them on/off for each node.
-While we're at it let's also add another helper called the `GridHelper`. It
-makes a 2D grid on the X,Z plane. By default the grid is 10x10 units.
+Il peut être difficile de voir certains d'entre eux car il y a 2 paires d'axes qui se chevauchent. Le `sunMesh` et le `solarSystem` sont tous les deux à la même position. De même, `earthMesh` et `earthOrbit` sont à la même position. Ajoutons quelques contrôles simples pour nous permettre de les activer/désactiver pour chaque nœud. Pendant que nous y sommes, ajoutons également un autre assistant appelé `GridHelper`. Il crée une grille 2D sur le plan X,Z. Par défaut, la grille est de 10x10 unités.
 
-We're also going to use [dat.GUI](https://github.com/dataarts/dat.gui) which is
-a UI library that is very popular with three.js projects. dat.GUI takes an
-object and a property name on that object and based on the type of the property
-automatically makes a UI to manipulate that property.
+Nous allons également utiliser [dat.GUI](https://github.com/dataarts/dat.gui), une librairie d'interface utilisateur très populaire pour les projets Three.js. dat.GUI prend un objet et un nom de propriété sur cet objet et, en fonction du type de la propriété, crée automatiquement une interface utilisateur pour manipuler cette propriété.
 
-We want to make both a `GridHelper` and an `AxesHelper` for each node. We need
-a label for each node so we'll get rid of the old loop and switch to calling
-some function to add the helpers for each node
+Nous voulons créer à la fois un `GridHelper` et un `AxesHelper` pour chaque nœud. Nous avons besoin d'un label pour chaque nœud, nous allons donc nous débarrasser de l'ancienne boucle et faire appel à une fonction pour ajouter les helpers pour chaque nœud.
 
 ```js
 -// add an AxesHelper to each node
@@ -263,24 +243,14 @@ some function to add the helpers for each node
 +makeAxisGrid(moonOrbit, 'moonOrbit');
 +makeAxisGrid(moonMesh, 'moonMesh');
 ```
-
-`makeAxisGrid` makes an `AxisGridHelper` which is a class we'll create
-to make dat.GUI happy. Like it says above dat.GUI
-will automagically make a UI that manipulates the named property
-of some object. It will create a different UI depending on the type
-of property. We want it to create a checkbox so we need to specify
-a `bool` property. But, we want both the axes and the grid
-to appear/disappear based on a single property so we'll make a class
-that has a getter and setter for a property. That way we can let dat.GUI
-think it's manipulating a single property but internally we can set
-the visible property of both the `AxesHelper` and `GridHelper` for a node.
+`makeAxisGrid` crée un `AxisGridHelper` qui est une classe que nous allons créer pour rendre dat.GUI heureux. Comme il est dit ci-dessus, dat.GUI créera automatiquement une interface utilisateur qui manipule la propriété nommée d'un objet. Cela créera une interface utilisateur différente selon le type de propriété. Nous voulons qu'il crée une case à cocher, nous devons donc spécifier une propriété bool. Mais, nous voulons que les axes et la grille apparaissent/disparaissent en fonction d'une seule propriété, nous allons donc créer une classe qui a un getter et un setter pour une propriété. De cette façon, nous pouvons laisser dat.GUI penser qu'il manipule une seule propriété, mais en interne, nous pouvons définir la propriété visible de `AxesHelper` et `GridHelper` pour un nœud.
 
 ```js
-// Turns both axes and grid visible on/off
-// dat.GUI requires a property that returns a bool
-// to decide to make a checkbox so we make a setter
-// and getter for `visible` which we can tell dat.GUI
-// to look at.
+// Activer/désactiver les axes et la grille dat.GUI 
+// nécessite une propriété qui renvoie un bool 
+// pour décider de faire une case à cocher 
+// afin que nous créions un setter et un getter pour `visible` 
+// que nous pouvons dire à dat.GUI de regarder.
 class AxisGridHelper {
   constructor(node, units = 10) {
     const axes = new THREE.AxesHelper();
@@ -308,57 +278,40 @@ class AxisGridHelper {
 }
 ```
 
-One thing to notice is we set the `renderOrder` of the `AxesHelper`
-to 2 and for the `GridHelper` to 1 so that the axes get drawn after the grid.
-Otherwise the grid might overwrite the axes.
+Une chose à noter est que nous définissons le `renderOrder` de l'`AxesHelper` sur 2 et pour le `GridHelper` sur 1 afin que les axes soient dessinés après la grille. Sinon, la grille pourrait écraser les axes.
 
 {{{example url="../threejs-scenegraph-sun-earth-moon-axes-grids.html" }}}
 
-Turn on the `solarSystem` and you'll see how the earth is exactly 10
-units out from the center just like we set above. You can see how the
-earth is in the *local space* of the `solarSystem`. Similarly if you
-turn on the `earthOrbit` you'll see how the moon is exactly 2 units
-from the center of the *local space* of the `earthOrbit`.
+Cliquez sur `solarSystem` et vous verrez que la terre est exactement à 10 unités du centre, comme nous l'avons défini ci-dessus. Vous pouvez voir que la terre est dans l'espace local du `solarSystem`. De même, si vous cliquez sur `earthOrbit`, vous verrez que la lune est exactement à 2 unités du centre de *l'espace local* de `earthOrbit`.
 
-A few more examples of scene graphs. An automobile in a simple game world might have a scene graph like this
+Un autre exemple de scène. Une automobile dans un jeu simple pourrait avoir un graphique de scène comme celui-ci
 
 <img src="resources/images/scenegraph-car.svg" align="center">
 
-If you move the car's body all the wheels will move with it. If you wanted the body
-to bounce separate from the wheels you might parent the body and the wheels to a "frame" node
-that represents the car's frame.
+Si vous déplacez la carrosserie de la voiture, toutes les roues bougeront avec elle. Si vous vouliez que le corps rebondisse séparément des roues, vous pouvez lier le corps et les roues à un nœud "cadre" qui représente le cadre de la voiture.
 
-Another example is a human in a game world.
+Un autre exemple avec un humain dans un jeu vidéo.
 
 <img src="resources/images/scenegraph-human.svg" align="center">
 
-You can see the scene graph gets pretty complex for a human. In fact
-that scene graph above is simplified. For example you might extend it
-to cover every finger (at least another 28 nodes) and every toe
-(yet another 28 nodes) plus ones for the face and jaw, the eyes and maybe more.
+Vous pouvez voir que le graphique de la scène devient assez complexe pour un humain. En fait, le graphe ci-dessus est simplifié. Par exemple, vous pouvez l'étendre pour couvrir chaque doigt (au moins 28 autres nœuds) et chaque orteil (encore 28 nœuds) plus ceux pour le visage et la mâchoire, les yeux et peut-être plus.
+
+Faisons un graphe semi-complexe. On va faire un char. Il aura 6 roues et une tourelle. Il pourra suivre un chemin. Il y aura une sphère qui se déplacera et le char ciblera la sphère.
 
 Let's make one semi-complex scene graph. We'll make a tank. The tank will have
 6 wheels and a turret. The tank will follow a path. There will be a sphere that
 moves around and the tank will target the sphere.
 
-Here's the scene graph. The meshes are colored in green, the `Object3D`s in blue,
-the lights in gold, and the cameras in purple. One camera has not been added
-to the scene graph.
+Voici le graphique de la scène. Les maillages sont colorés en vert, les `Object3D` en bleu, les lumières en or et les caméras en violet. Une caméra n'a pas été ajoutée au graphique de la scène.
 
 <div class="threejs_center"><img src="resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
-Look in the code to see the setup of all of these nodes.
+Regardez dans le code pour voir la configuration de tous ces nœuds.
 
-For the target, the thing the tank is aiming at, there is a `targetOrbit`
-(`Object3D`) which just rotates similar to the `earthOrbit` above. A
-`targetElevation` (`Object3D`) which is a child of the `targetOrbit` provides an
-offset from the `targetOrbit` and a base elevation. Childed to that is another
-`Object3D` called `targetBob` which just bobs up and down relative to the
-`targetElevation`. Finally there's the `targetMesh` which is just a cube we
-rotate and change its colors
+Pour la cible, la chose que le char vise, il y a une `targetOrbit` (Object3D) qui tourne juste de la même manière que la `earthOrbit` ci-dessus. Une `targetElevation` (Object3D) qui est un enfant de `targetOrbit` fournit un décalage par rapport à `targetOrbit` et une élévation de base. Un autre `Object3D` appelé `targetBob` qui monte et descend par rapport à la `targetElevation`. Enfin, il y a le `targetMesh` qui est juste un cube que nous faisons pivoter et changeons ses couleurs.
 
 ```js
-// move target
+// mettre en mouvement la cible
 targetOrbit.rotation.y = time * .27;
 targetBob.position.y = Math.sin(time * 2) * 4;
 targetMesh.rotation.x = time * 7;
@@ -367,12 +320,7 @@ targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 ```
 
-For the tank there's an `Object3D` called `tank` which is used to move everything
-below it around. The code uses a `SplineCurve` which it can ask for positions
-along that curve. 0.0 is the start of the curve. 1.0 is the end of the curve. It
-asks for the current position where it puts the tank. It then asks for a
-position slightly further down the curve and uses that to point the tank in that
-direction using `Object3D.lookAt`.
+Pour le char, il y a un `Object3D` appelé `tank` qui est utilisé pour déplacer tout ce qui se trouve en dessous. Le code utilise une `SplineCurve` à laquelle il peut demander des positions le long de cette courbe. 0.0 est le début de la courbe. 1,0 est la fin de la courbe. Il demande la position actuelle où il met le réservoir. Il demande ensuite une position légèrement plus bas dans la courbe et l'utilise pour pointer le réservoir dans cette direction à l'aide de `Object3D.lookAt`.
 
 ```js
 const tankPosition = new THREE.Vector2();
@@ -380,7 +328,7 @@ const tankTarget = new THREE.Vector2();
 
 ...
 
-// move tank
+// mettre en mouvement le char
 const tankTime = time * .05;
 curve.getPointAt(tankTime % 1, tankPosition);
 curve.getPointAt((tankTime + 0.01) % 1, tankTarget);
@@ -388,42 +336,35 @@ tank.position.set(tankPosition.x, 0, tankPosition.y);
 tank.lookAt(tankTarget.x, 0, tankTarget.y);
 ```
 
-The turret on top of the tank is moved automatically by being a child
-of the tank. To point it at the target we just ask for the target's world position
-and then again use `Object3D.lookAt`
+La tourelle sur le dessus du char est déplacée automatiquement en tant qu'enfant du char. Pour le pointer sur la cible, nous demandons simplement la position de la cible, puis utilisons à nouveau `Object3D.lookAt`.
 
 ```js
 const targetPosition = new THREE.Vector3();
 
 ...
 
-// face turret at target
+// tourelle face à la cible
 targetMesh.getWorldPosition(targetPosition);
 turretPivot.lookAt(targetPosition);
 ```
-
-There's a `turretCamera` which is a child of the `turretMesh` so
-it will move up and down and rotate with the turret. We make that
-aim at the target.
+Il y a une `tourretCamera` qui est un enfant de `turretMesh` donc il se déplacera de haut en bas et tournera avec la tourelle. On la fait viser la cible.
 
 ```js
-// make the turretCamera look at target
+// la turretCamera regarde la cible
 turretCamera.lookAt(targetPosition);
 ```
-
-There is also a `targetCameraPivot` which is a child of `targetBob` so it floats
-around with the target. We aim that back at the tank. Its purpose is to allow the
-`targetCamera` to be offset from the target itself. If we instead made the camera
-a child of `targetBob` and just aimed the camera itself it would be inside the
-target.
+Il y a aussi un `targetCameraPivot` qui est un enfant de `targetBob` donc il flotte
+autour de la cible. Nous le pointons vers le char. Son but est de permettre à la
+`targetCamera` d'être décalé par rapport à la cible elle-même. Si nous faisions de la caméra
+un enfant de `targetBob`, elle serait à l'intérieur de la cible.
 
 ```js
-// make the targetCameraPivot look at the tank
+// faire en sorte que la cibleCameraPivot regarde le char
 tank.getWorldPosition(targetPosition);
 targetCameraPivot.lookAt(targetPosition);
 ```
 
-Finally we rotate all the wheels
+Enfin on fait tourner toutes les roues
 
 ```js
 wheelMeshes.forEach((obj) => {
@@ -431,7 +372,7 @@ wheelMeshes.forEach((obj) => {
 });
 ```
 
-For the cameras we setup an array of all 4 cameras at init time with descriptions.
+Pour les caméras, nous avons configuré un ensemble de 4 caméras au moment de l'initialisation avec des descriptions.
 
 ```js
 const cameras = [
@@ -444,7 +385,7 @@ const cameras = [
 const infoElem = document.querySelector('#info');
 ```
 
-and cycle through our cameras at render time.
+et nous parcourons chaque camera au moment du rendu
 
 ```js
 const camera = cameras[time * .25 % cameras.length | 0];
@@ -453,11 +394,11 @@ infoElem.textContent = camera.desc;
 
 {{{example url="../threejs-scenegraph-tank.html"}}}
 
-I hope this gives some idea of how scene graphs work and how you might use them.
-Making `Object3D` nodes and parenting things to them is an important step to using
-a 3D engine like three.js well. Often it might seem like some complex math is necessary
-to make something move and rotate the way you want. For example without a scene graph
-computing the motion of the moon or where to put the wheels of the car relative to its
-body would be very complicated but using a scene graph it becomes much easier.
+J'espère que cela donne une idée du fonctionnement des graphiques de scène et de la façon dont vous pouvez les utiliser.
+Faire des nœuds « Object3D » et leur attacher des choses est une étape importante pour utiliser
+un moteur 3D comme Three.js bien. Souvent, on pourrait penser que des mathématiques complexes soient nécessaires
+pour faire bouger quelque chose et faire pivoter comme vous le souhaitez. Par exemple sans graphique de scène
+calculer le mouvement de la lune, savoir où placer les roues de la voiture par rapport à son
+corps serait très compliqué, mais en utilisant un graphique de scène, cela devient beaucoup plus facile.
 
-[Next up we'll go over materials](threejs-materials.html).
+[Passons maintenant en revue les materials](threejs-materials.html).
