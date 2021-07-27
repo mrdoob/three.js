@@ -1,6 +1,6 @@
-Title: Installation de Three.js
+Title: Configuration de Three.js
 Description: Comment configurer votre environnement de développement pour Three.js
-TOC: Setup
+TOC: Configuration
 
 Cette article fait parti d'une série consacrée à Three.js. Le premier article traité des [fondements de Three.js](threejs-fundamentals.html).
 Si vous ne l'avez pas encore lu, vous devriez peut-être commencer par là.
