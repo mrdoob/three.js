@@ -1,8 +1,8 @@
 Title: Design réactif et Three.js
-Description: Comment rendre three.js adaptable à des affichages de taille différente.
+Description: Comment rendre Three.js adaptable à des affichages de taille différente.
 TOC: Design réactif
 
-Ceci est le second article dans une série traitant de three.js.
+Ceci est le second article dans une série traitant de Three.js.
 Le premier traitait [des principes de base](threejs-fundamentals.html).
 Si vous ne l'avez pas encore lu, vous deviriez peut-être commencer par là.
 
@@ -17,18 +17,18 @@ Par exemple, un éditeur 3D avec des contrôles à gauche, droite, en haut ou
 en bas est quelque chose que nous voudrions gérer. Un schéma interactif
 au milieu d'un document en est un autre exemple.
 
-Le dernier exemple que nous avions utilisé est un canevas sans CSS et
+Le dernier exemple que nous avions utilisé est un canvas sans CSS et
 sans taille :
 
 ```html
 <canvas id="c"></canvas>
 ```
 
-Ce canevas a, par défaut, une taille de 300x150 pixels.
+Ce canvas a, par défaut, une taille de 300x150 pixels.
 Dans le navigateur, la manière recommandée de fixer la taille
 de quelque chose est d'utiliser CSS.
 
-Paramétrons le canevas pour occuper complètement la page en ajoutant
+Paramétrons le canvas pour occuper complètement la page en ajoutant
 du CSS :
 
 ```html
@@ -54,15 +54,15 @@ Ensuite, nous faisons en sorte que l'élément `id=c` fasse
 100% de la taille de son conteneur qui est, dans ce cas, la balise body.
 
 Finalement, nous passons le mode `display` à `block`.
-Le mode d'affichage par défaut d'un canevas est `inline`, ce qui implique
+Le mode d'affichage par défaut d'un canvas est `inline`, ce qui implique
 que des espaces peuvent être ajoutés à l'affichage.
-En passant le canevas à `block`, ce problème est supprimé.
+En passant le canvas à `block`, ce problème est supprimé.
 
 Voici le résultat :
 
 {{{example url="../threejs-responsive-no-resize.html" }}}
 
-Le canevas, comme nous le voyons, remplit maintenant la page mais il y a deux
+Le canvas, comme nous le voyons, remplit maintenant la page mais il y a deux
 problèmes. Tout d'abord, nos cubes sont étirés et ressemblent à des boîtes trop
 hautes et trop larges. Ouvrez l'exemple dans sa propre fenêtre et
 redimensionnez la, vous verrez comment les cubes s'en trouvent déformés
@@ -78,8 +78,8 @@ pleinement le problème.
 
 Tout d'abord, nous allons résoudre le problème d'étirement.
 Pour cela, nous devons calquer l'aspect de la caméra sur celui
-de la taille d'affichage du canevas. Nous pouvons le faire
-en utilisant les propriétés `clientWidth` et `clientHeight` du canevas.
+de la taille d'affichage du canvas. Nous pouvons le faire
+en utilisant les propriétés `clientWidth` et `clientHeight` du canvas.
 
 Nous mettons alors notre boucle de rendu comme cela :
 
@@ -108,8 +108,8 @@ Ils restent corrects quelque soit l'aspect de la taille de la fenêtre.
 Maintenant résolvons le problème de la pixellisation.
 
 Les éléments de type *canvas* ont deux tailles. La première
-est celle du canevas affiché dans la page. C'est ce que nous paramétrons avec le CSS.
-L'autre taille est le nombre de pixels dont est constitué le canevas lui-même.
+est celle du canvas affiché dans la page. C'est ce que nous paramétrons avec le CSS.
+L'autre taille est le nombre de pixels dont est constitué le canvas lui-même.
 Ceci n'est pas différent d'une image.
 Par exemple, nous pouvons avoir une image de taille 128x64 et, en utilisant le CSS,
 nous pouvons l'afficher avec une taille de 400x200.
@@ -118,14 +118,14 @@ nous pouvons l'afficher avec une taille de 400x200.
 <img src="some128x64image.jpg" style="width:400px; height:200px">
 ```
 
-La taille interne d'un canevas, sa résolution, est souvent appelée sa taille de tampon
+La taille interne d'un canvas, sa résolution, est souvent appelée sa taille de tampon
 de dessin (*drawingbuffer*). Dans Three.js, nous pouvons ajuster la taille
-du canevas en appelant `renderer.setSize`.
+du canvas en appelant `renderer.setSize`.
 Quelle taille devons nous choisir ? La réponse la plus évidente est "la même taille que
-celle du canevas". A nouveau, pour le faire, nous pouvons recourir
+celle du canvas". A nouveau, pour le faire, nous pouvons recourir
 aux propriétés `clientWidth` et `clientHeight`.
 
-Ecrivons une fonction qui vérifie si le rendu du canevas a la bonne taille et l'ajuste en conséquence.
+Ecrivons une fonction qui vérifie si le rendu du canvas a la bonne taille et l'ajuste en conséquence.
 
 ```js
 function resizeRendererToDisplaySize(renderer) {
@@ -140,21 +140,21 @@ function resizeRendererToDisplaySize(renderer) {
 }
 ```
 
-Remarquez que nous vérifions si le canevas a réellement besoin d'être redimensionné.
-Le redimensionnement est une partie intéressante de la spécification du canevas
+Remarquez que nous vérifions si le canvas a réellement besoin d'être redimensionné.
+Le redimensionnement est une partie intéressante de la spécification du canvas
 et il est mieux de ne pas lui donner à nouveau la même taille s'il est déjà
 à la dimension que nous voulons.
 
 Une fois que nous savons si le redimensionnement est nécessaire ou non, nous
 appelons `renderer.setSize` et lui passons les nouvelles largeur et hauteur.
 Il est important de passer `false` en troisième.
-`render.setSize` modifie par défaut la taille du canevas dans le CSS, mais ce n'est
+`render.setSize` modifie par défaut la taille du canvas dans le CSS, mais ce n'est
 pas ce que nous voulons. Nous souhaitons que le navigateur continue à fonctionner
 comme pour les autres éléments, en utilisant le CSS pour déterminer la
-taille d'affichage d'un élément. Nous ne voulons pas que les canevas utilisés
-par Three aient un comportement différent des autres éléments.
+taille d'affichage d'un élément. Nous ne voulons pas que les canvas utilisés
+par Three.js aient un comportement différent des autres éléments.
 
-Remarquez que notre fonction renvoie *true* si le canevas a été redimensionné.
+Remarquez que notre fonction renvoie *true* si le canvas a été redimensionné.
 Nous pouvons l'utiliser pour vérifier si d'autre choses doivent être mises à jour.
 Modifions à présent notre boucle de rendu pour utiliser la nouvelle fonction :
 
@@ -171,14 +171,14 @@ function render(time) {
   ...
 ```
 
-Puisque l'aspect ne change que si la taille d'affichage du canevas change,
+Puisque l'aspect ne change que si la taille d'affichage du canvas change,
 nous ne modifions l'aspect de la caméra que si `resizeRendererToDisplaySize`
 retourne `true`.
 
 {{{example url="../threejs-responsive.html" }}}
 
 Le rendu devrait à présent avoir une résolution correspondant à
-la taille d'affichage du canevas.
+la taille d'affichage du canvas.
 
 Afin de comprendre pourquoi il faut laisser le CSS gérer le redimensionnement,
 prenons notre code et mettons le dans un [fichier `.js` séparé](../threejs-responsive.js). Voici donc quelques autres exemples où nous avons laissé le CSS choisir la taille et remarquez que nous n'avons
@@ -242,7 +242,7 @@ utiliser la taille que vous avez demandé, multiplié par le
 ratio que vous avez demandé.
 **Ceci est fortement DÉCONSEILLÉ**. Voir ci-dessous.
 
-L'autre façon est de le faire par soi-même quand on redimensionne le canevas.
+L'autre façon est de le faire par soi-même quand on redimensionne le canvas.
 
 ```js
     function resizeRendererToDisplaySize(renderer) {
@@ -261,10 +261,10 @@ L'autre façon est de le faire par soi-même quand on redimensionne le canevas.
 Cette seconde façon est objectivement meilleure. Pourquoi ? Parce que cela signifie
 que nous avons ce que nous avons demandé. Il y a plusieurs cas où,
 quand on utilise Three.js, nous avons besoin de connaître la taille effective
-du tampon d'affichage du canevas. Par exemple, quand on réalise un filtre de
+du tampon d'affichage du canvas. Par exemple, quand on réalise un filtre de
 post-processing, ou si nous faisons un *shader* qui accède à `gl_FragCoord`,
 si nous sommes en train de faire une capture d'écran, ou en train de lire les pixels
-pour une sélection par GPU, pour dessiner dans un canevas 2D, etc...
+pour une sélection par GPU, pour dessiner dans un canvas 2D, etc...
 Il y a plusieurs cas où, si nous utilisons `setPixelRatio` alors notre
 taille effective est différente de la taille que nous avons demandé et nous
 aurons alors à deviner quand utiliser la taille demandée ou la taille utilisée
