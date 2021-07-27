@@ -128,33 +128,26 @@ On peut l'ajouter comme ceci.
 }
 ```
 
-The `near` and `far` parameters set the minimum and maximum values
-for adjusting the fog. They are set when we setup the camera.
+Les paramètres `near` et `far` définissent les valeurs minimales et maximales pour ajuster le brouillard. Ils sont définis lors de la configuration de la caméra.
 
-The `.listen()` at the end of the last 2 lines tells dat.GUI to *listen*
-for changes. That way when we change `near` because of an edit to `far`
-or we change `far` in response to an edit to `near` dat.GUI will update
-the other property's UI for us.
+Le `.listen()` à la fin des 2 lignes, dit à dat.GUI *d'écouter*
+les changements. Ainsi, que nous changions `near` ou `far`, dat.GUI mettra automatiquement à jour les deux propriétés pour nous.
 
-It might also be nice to be able to change the fog color but like was
-mentioned above we need to keep both the fog color and the background
-color in sync. So, let's add another *virtual* property to our helper
-that will set both colors when dat.GUI manipulates it.
+Il peut également être agréable de pouvoir changer la couleur du brouillard, mais comme mentionné ci-dessus, nous devons synchroniser la couleur du brouillard et la couleur de l'arrière-plan. Ajoutons donc une autre propriété *virtuelle* à notre helper qui définira les deux couleurs lorsque dat.GUI la manipule.
 
-dat.GUI can manipulate colors in 4 ways, as a CSS 6 digit hex string (eg: `#112233`). As an hue, saturation, value, object (eg: `{h: 60, s: 1, v: }`).
-As an RGB array (eg: `[255, 128, 64]`). Or, as an RGBA array (eg: `[127, 200, 75, 0.3]`).
+dat.GUI peut manipuler les couleurs de 4 façons différentes. Sous la forme d'une chaîne hexadécimale à 6 chiffres (ex : `#112233`). Sous la forme HSL (ex : `{h: 60, s: 1, v: }`).
+En tant que tableau RGB (ex : `[255, 128, 64]`). Ou, comme un tableau RGBA (ex : `[127, 200, 75, 0.3]`).
 
-It's easiest for our purpose to use the hex string version since that way
-dat.GUI is only manipulating a single value. Fortunately `THREE.Color`
-as a [`getHexString`](Color.getHexString) method
-we get use to easily get such a string, we just have to prepend a '#' to the front.
+Il est plus simple d'utiliser la première solution, la version chaîne hexadécimale, ainsi 
+dat.GUI nemanipule qu'une seule valeur. Heureusement, `THREE.Color`
+a une méthode pour cela : [`getHexString`](Color.getHexString) qui permet d'obtenir une telle chaîne, il suffit juste d'ajouter un '#' au début.
 
 ```js
-// We use this class to pass to dat.gui
-// so when it manipulates near or far
-// near is never > far and far is never < near
-+// Also when dat.gui manipulates color we'll
-+// update both the fog and background colors.
+/// On utilise cette classe pour passer à dat.gui
+// donc quand il manipule near ou far
+// near n'est jamais > far et far n'est jamais < near
++// Aussi, lorsque dat.gui manipule la couleur, nous allons
++// mettre à jour les couleurs du brouillard et de l'arrière-plan.
 class FogGUIHelper {
 *  constructor(fog, backgroundColor) {
     this.fog = fog;
@@ -184,7 +177,7 @@ class FogGUIHelper {
 }
 ```
 
-We then call `gui.addColor` to add a color UI for our helper's virtual property.
+Ensuite, nous appelons `gui.addColor` pour ajouter une couleur à notre propriété virtuelle.
 
 ```js
 {
@@ -203,28 +196,11 @@ We then call `gui.addColor` to add a color UI for our helper's virtual property.
 
 {{{example url="../threejs-fog-gui.html" }}}
 
-You can see setting `near` to like 1.9 and `far` to 2.0 gives
-a very sharp transition between un-fogged and completely fogged.
-where as `near` = 1.1 and `far` = 2.9 should just about be
-the smoothest given our cubes are spinning 2 units away from the camera.
+Vous pouvez voir qu'un réglage `near` à 1.9 et `far` à 2,0 donne une transition très nette entre non embué et complètement dans le brouillard. `near` = 1,1 et `far` = 2,9 devrait être la meilleure configuration étant donné que nos cubes tournent à 2 unités de la caméra.
 
-One last thing, there is a boolean [`fog`](Material.fog)
-property on a material for whether or not objects rendered
-with that material are affected by fog. It defaults to `true`
-for most materials. As an example of why you might want
-to turn the fog off, imagine you're making a 3D vehicle
-simulator with a view from the driver's seat or cockpit.
-You probably want the fog off for everything inside the vehicle when
-viewing from inside the vehicle.
+Une dernière chose, il existe une propriété [les matériaux](Material.fog) pour savoir si les objets rendus avec ce matériau sont affectés ou non par le brouillard. La valeur par défaut est `true` pour la plupart des matériaux. Pour illustrer pourquoi vous pourriez vouloir désactiver le brouillard, imaginez que vous créez un simulateur de véhicule 3D avec une vue depuis le siège du conducteur ou le cockpit. Vous voulez probablement que le brouillard se dissipe pour tout ce qui se trouve à l'intérieur du véhicule lorsque vous regardez de l'intérieur du véhicule.
 
-A better example might be a house
-and thick fog outside house. Let's say the fog is set to start
-2 meters away (near = 2) and completely fogged out at 4 meters (far = 4).
-Rooms are longer than 2 meters and the house is probably longer
-than 4 meters so you need to set the materials for the inside
-of the house to not apply fog otherwise when standing inside the
-house looking outside the wall at the far end of the room will look
-like it's in the fog.
+Prenons un autre exemple. Une maison avec un épais brouillard à l'extérieur. Disons que pour commencer, le brouillard est réglé pour commencer à 2 mètres (near = 2) et être complet à 4 mètres (far = 4). Les pièces et la maison faisant probablement plus de 4 mètres, il faudra donc définir les matériaux utilisés à l'intérieur de la maison pour qu'il n'y est pas de brouillard. Sinon, ça donnerait ceci.
 
 <div class="spread">
   <div>
@@ -233,8 +209,7 @@ like it's in the fog.
   </div>
 </div>
 
-Notice the walls and ceiling at the far end of the room are getting fog applied.
-By turning fog off on the materials for the house we can fix that issue.
+Remarquez que les murs et le plafond au fond de la pièce sont dans le brouillard. En désactivant le brouillard sur les matériaux de la maison, on résoud le problème.
 
 <div class="spread">
   <div>
