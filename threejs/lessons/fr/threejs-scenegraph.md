@@ -1,6 +1,6 @@
 Title: Graphique de scène de Three.js
 Description: Qu'est-ce qu'un graphique de scène ?
-TOC: Scenegraph
+TOC: Graphique de scène
 
 Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
