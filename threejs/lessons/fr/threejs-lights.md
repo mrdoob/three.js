@@ -1,6 +1,6 @@
 Title: Lumières en Three.js
-Description: Configuration des mulières
-TOC: Lights
+Description: Configuration des lumières
+TOC: Lumières
 
 Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule [Principes de base](threejs-fundamentals.html). Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là ou aussi voir l'article sur [la configuartion de votre environnement](threejs-setup.html). L'
