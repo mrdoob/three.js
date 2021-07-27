@@ -20,11 +20,13 @@ export default /* glsl */`
 	vec3 v = normalize( cameraPosition - pos );
 	float ior = ( 1.0 + 0.4 * reflectivity ) / ( 1.0 - 0.4 * reflectivity );
 
-	vec3 transmission = transmissionFactor * getIBLVolumeRefraction(
+	vec4 transmission = getIBLVolumeRefraction(
 		normal, v, roughnessFactor, material.diffuseColor, material.specularColor,
 		pos, modelMatrix, viewMatrix, projectionMatrix, ior, thicknessFactor,
 		attenuationColor, attenuationDistance );
 
-	totalDiffuse = mix( totalDiffuse, transmission, transmissionFactor );
+	totalDiffuse = mix( totalDiffuse, transmissionFactor * transmission.rgb, transmissionFactor );
+	diffuseColor.a *= transmission.a;
+
 #endif
 `;
