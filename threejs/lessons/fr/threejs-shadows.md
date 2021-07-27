@@ -1,6 +1,6 @@
 Title: Les ombres dans Three.js
 Description: Les ombres dans Three.js
-TOC: Shadows
+TOC: Ombres
 
 Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
