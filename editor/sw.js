@@ -176,6 +176,7 @@ const assets = [
 	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
 	'./js/Sidebar.Material.ColorProperty.js',
+	'./js/Sidebar.Material.NumberProperty.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',
 	'./js/Strings.js',
