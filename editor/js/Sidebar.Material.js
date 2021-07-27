@@ -1,14 +1,14 @@
 import * as THREE from '../../build/three.module.js';
 
-import { UIButton, UICheckbox, UIColor, UIInput, UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
+import { UIButton, UICheckbox, UIInput, UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
-import { SetMaterialColorCommand } from './commands/SetMaterialColorCommand.js';
 import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
 
+import { SidebarMaterialBooleanProperty } from './Sidebar.Material.BooleanProperty.js';
 import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.js';
 import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty.js';
 
@@ -180,13 +180,8 @@ function SidebarMaterial( editor ) {
 
 	// vertex colors
 
-	var materialVertexColorsRow = new UIRow();
-	var materialVertexColors = new UICheckbox( false ).onChange( update );
-
-	materialVertexColorsRow.add( new UIText( strings.getKey( 'sidebar/material/vertexcolors' ) ).setWidth( '90px' ) );
-	materialVertexColorsRow.add( materialVertexColors );
-
-	container.add( materialVertexColorsRow );
+	const materialVertexColors = new SidebarMaterialBooleanProperty( editor, 'vertexColors', strings.getKey( 'sidebar/material/vertexcolors' ) );
+	container.add( materialVertexColors );
 
 	// depth packing
 
@@ -426,23 +421,13 @@ function SidebarMaterial( editor ) {
 
 	// sizeAttenuation
 
-	var materialSizeAttenuationRow = new UIRow();
-	var materialSizeAttenuation = new UICheckbox( true ).onChange( update );
+	const materialSizeAttenuation = new SidebarMaterialBooleanProperty( editor, 'sizeAttenuation', strings.getKey( 'sidebar/material/sizeAttenuation' ) );
+	container.add( materialSizeAttenuation );
 
-	materialSizeAttenuationRow.add( new UIText( strings.getKey( 'sidebar/material/sizeAttenuation' ) ).setWidth( '90px' ) );
-	materialSizeAttenuationRow.add( materialSizeAttenuation );
+	// flatShading
 
-	container.add( materialSizeAttenuationRow );
-
-	// shading
-
-	var materialShadingRow = new UIRow();
-	var materialShading = new UICheckbox( false ).setLeft( '100px' ).onChange( update );
-
-	materialShadingRow.add( new UIText( strings.getKey( 'sidebar/material/flatshaded' ) ).setWidth( '90px' ) );
-	materialShadingRow.add( materialShading );
-
-	container.add( materialShadingRow );
+	const materialFlatShading = new SidebarMaterialBooleanProperty( editor, 'flatShading', strings.getKey( 'sidebar/material/flatShading' ) );
+	container.add( materialFlatShading );
 
 	// blending
 
@@ -470,13 +455,8 @@ function SidebarMaterial( editor ) {
 
 	// transparent
 
-	var materialTransparentRow = new UIRow();
-	var materialTransparent = new UICheckbox().setLeft( '100px' ).onChange( update );
-
-	materialTransparentRow.add( new UIText( strings.getKey( 'sidebar/material/transparent' ) ).setWidth( '90px' ) );
-	materialTransparentRow.add( materialTransparent );
-
-	container.add( materialTransparentRow );
+	const materialTransparent = new SidebarMaterialBooleanProperty( editor, 'transparent', strings.getKey( 'sidebar/material/transparent' ) );
+	container.add( materialTransparent );
 
 	// alpha test
 
@@ -485,33 +465,18 @@ function SidebarMaterial( editor ) {
 
 	// depth test
 
-	var materialDepthTestRow = new UIRow();
-	var materialDepthTest = new UICheckbox().onChange( update );
-
-	materialDepthTestRow.add( new UIText( strings.getKey( 'sidebar/material/depthtest' ) ).setWidth( '90px' ) );
-	materialDepthTestRow.add( materialDepthTest );
-
-	container.add( materialDepthTestRow );
+	const materialDepthTest = new SidebarMaterialBooleanProperty( editor, 'depthTest', strings.getKey( 'sidebar/material/depthtest' ) );
+	container.add( materialDepthTest );
 
 	// depth write
 
-	var materialDepthWriteRow = new UIRow();
-	var materialDepthWrite = new UICheckbox().onChange( update );
-
-	materialDepthWriteRow.add( new UIText( strings.getKey( 'sidebar/material/depthwrite' ) ).setWidth( '90px' ) );
-	materialDepthWriteRow.add( materialDepthWrite );
-
-	container.add( materialDepthWriteRow );
+	const materialDepthWrite = new SidebarMaterialBooleanProperty( editor, 'depthWrite', strings.getKey( 'sidebar/material/depthwrite' ) );
+	container.add( materialDepthWrite );
 
 	// wireframe
 
-	var materialWireframeRow = new UIRow();
-	var materialWireframe = new UICheckbox( false ).onChange( update );
-
-	materialWireframeRow.add( new UIText( strings.getKey( 'sidebar/material/wireframe' ) ).setWidth( '90px' ) );
-	materialWireframeRow.add( materialWireframe );
-
-	container.add( materialWireframeRow );
+	const materialWireframe = new SidebarMaterialBooleanProperty( editor, 'wireframe', strings.getKey( 'sidebar/material/wireframe' ) );
+	container.add( materialWireframe );
 
 	//
 
@@ -576,21 +541,10 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.vertexColors !== undefined ) {
-
-				var vertexColors = materialVertexColors.getValue();
-
-				if ( material.vertexColors !== vertexColors ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'vertexColors', vertexColors, currentMaterialSlot ) );
-
-				}
-
-			}
-
 			if ( material.depthPacking !== undefined ) {
 
 				var depthPacking = parseInt( materialDepthPacking.getValue() );
+
 				if ( material.depthPacking !== depthPacking ) {
 
 					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
@@ -976,28 +930,6 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.sizeAttenuation !== undefined ) {
-
-				var sizeAttenuation = materialSizeAttenuation.getValue();
-				if ( material.sizeAttenuation !== sizeAttenuation ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'sizeAttenuation', sizeAttenuation, currentMaterialSlot ) );
-
-				}
-
-			}
-
-			if ( material.flatShading !== undefined ) {
-
-				var flatShading = materialShading.getValue();
-				if ( material.flatShading != flatShading ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'flatShading', flatShading, currentMaterialSlot ) );
-
-				}
-
-			}
-
 			if ( material.blending !== undefined ) {
 
 				var blending = parseInt( materialBlending.getValue() );
@@ -1006,30 +938,6 @@ function SidebarMaterial( editor ) {
 					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'blending', blending, currentMaterialSlot ) );
 
 				}
-
-			}
-
-			if ( material.transparent !== undefined && material.transparent !== materialTransparent.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'transparent', materialTransparent.getValue(), currentMaterialSlot ) );
-
-			}
-
-			if ( material.depthTest !== undefined && material.depthTest !== materialDepthTest.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthTest', materialDepthTest.getValue(), currentMaterialSlot ) );
-
-			}
-
-			if ( material.depthWrite !== undefined && material.depthWrite !== materialDepthWrite.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthWrite', materialDepthWrite.getValue(), currentMaterialSlot ) );
-
-			}
-
-			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -1074,7 +982,6 @@ function SidebarMaterial( editor ) {
 		var properties = {
 			'name': materialNameRow,
 			'vertexShader': materialProgramRow,
-			'vertexColors': materialVertexColorsRow,
 			'depthPacking': materialDepthPackingRow,
 			'map': materialMapRow,
 			'matcap': materialMatcapMapRow,
@@ -1093,13 +1000,7 @@ function SidebarMaterial( editor ) {
 			'gradientMap': materialGradientMapRow,
 			'side': materialSideRow,
 			'size': materialSizeRow,
-			'sizeAttenuation': materialSizeAttenuationRow,
-			'flatShading': materialShadingRow,
-			'blending': materialBlendingRow,
-			'transparent': materialTransparentRow,
-			'depthTest': materialDepthTestRow,
-			'depthWrite': materialDepthWriteRow,
-			'wireframe': materialWireframeRow
+			'blending': materialBlendingRow
 		};
 
 		var material = currentObject.material;
@@ -1183,12 +1084,6 @@ function SidebarMaterial( editor ) {
 
 		materialClass.setValue( material.type );
 
-
-		if ( material.vertexColors !== undefined ) {
-
-			materialVertexColors.setValue( material.vertexColors );
-
-		}
 		if ( material.depthPacking !== undefined ) {
 
 			materialDepthPacking.setValue( material.depthPacking );
@@ -1405,45 +1300,9 @@ function SidebarMaterial( editor ) {
 
 		}
 
-		if ( material.sizeAttenuation !== undefined ) {
-
-			materialSizeAttenuation.setValue( material.sizeAttenuation );
-
-		}
-
-		if ( material.flatShading !== undefined ) {
-
-			materialShading.setValue( material.flatShading );
-
-		}
-
 		if ( material.blending !== undefined ) {
 
 			materialBlending.setValue( material.blending );
-
-		}
-
-		if ( material.transparent !== undefined ) {
-
-			materialTransparent.setValue( material.transparent );
-
-		}
-
-		if ( material.depthTest !== undefined ) {
-
-			materialDepthTest.setValue( material.depthTest );
-
-		}
-
-		if ( material.depthWrite !== undefined ) {
-
-			materialDepthWrite.setValue( material.depthWrite );
-
-		}
-
-		if ( material.wireframe !== undefined ) {
-
-			materialWireframe.setValue( material.wireframe );
 
 		}
 
