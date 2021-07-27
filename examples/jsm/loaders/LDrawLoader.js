@@ -162,11 +162,10 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 		} );
 
-
 		this.setValues( parameters );
+		this.isLDrawConditionalLineMaterial = true;
 
 	}
-
 
 }
 
@@ -981,7 +980,7 @@ class LDrawLoader extends Loader {
 
 			case FINISH_TYPE_DEFAULT:
 
-				material = new MeshStandardMaterial( { color: colour, roughness: 0.3, envMapIntensity: 0.3, metalness: 0 } );
+				material = new MeshStandardMaterial( { color: colour, roughness: 0.3, metalness: 0 } );
 				break;
 
 			case FINISH_TYPE_PEARLESCENT:
