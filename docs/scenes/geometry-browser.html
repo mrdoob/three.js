@@ -458,8 +458,8 @@
 
 					const data = {
 						radius: 15,
-						widthSegments: 8,
-						heightSegments: 6,
+						widthSegments: 32,
+						heightSegments: 16,
 						phiStart: 0,
 						phiLength: twoPi,
 						thetaStart: 0,
@@ -479,7 +479,7 @@
 					const folder = gui.addFolder( 'THREE.SphereGeometry' );
 
 					folder.add( data, 'radius', 1, 30 ).onChange( generateGeometry );
-					folder.add( data, 'widthSegments', 3, 32 ).step( 1 ).onChange( generateGeometry );
+					folder.add( data, 'widthSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'heightSegments', 2, 32 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'phiStart', 0, twoPi ).onChange( generateGeometry );
 					folder.add( data, 'phiLength', 0, twoPi ).onChange( generateGeometry );
