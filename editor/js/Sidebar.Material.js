@@ -9,6 +9,7 @@ import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
 
+import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.js';
 var materialClasses = {
 	'LineBasicMaterial': THREE.LineBasicMaterial,
 	'LineDashedMaterial': THREE.LineDashedMaterial,
@@ -134,13 +135,8 @@ function SidebarMaterial( editor ) {
 
 	// color
 
-	var materialColorRow = new UIRow();
-	var materialColor = new UIColor().onInput( update );
-
-	materialColorRow.add( new UIText( strings.getKey( 'sidebar/material/color' ) ).setWidth( '90px' ) );
-	materialColorRow.add( materialColor );
-
-	container.add( materialColorRow );
+	const materialColor = new SidebarMaterialColorProperty( editor, 'color', strings.getKey( 'sidebar/material/color' ) );
+	container.add( materialColor );
 
 	// roughness
 
@@ -188,25 +184,13 @@ function SidebarMaterial( editor ) {
 
 	// emissive
 
-	var materialEmissiveRow = new UIRow();
-	var materialEmissive = new UIColor().setHexValue( 0x000000 ).onInput( update );
-	var materialEmissiveIntensity = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-
-	materialEmissiveRow.add( new UIText( strings.getKey( 'sidebar/material/emissive' ) ).setWidth( '90px' ) );
-	materialEmissiveRow.add( materialEmissive );
-	materialEmissiveRow.add( materialEmissiveIntensity );
-
-	container.add( materialEmissiveRow );
+	const materialEmissive = new SidebarMaterialColorProperty( editor, 'emissive', strings.getKey( 'sidebar/material/emissive' ) );
+	container.add( materialEmissive );
 
 	// specular
 
-	var materialSpecularRow = new UIRow();
-	var materialSpecular = new UIColor().setHexValue( 0x111111 ).onInput( update );
-
-	materialSpecularRow.add( new UIText( strings.getKey( 'sidebar/material/specular' ) ).setWidth( '90px' ) );
-	materialSpecularRow.add( materialSpecular );
-
-	container.add( materialSpecularRow );
+	const materialSpecular = new SidebarMaterialColorProperty( editor, 'specular', strings.getKey( 'sidebar/material/specular' ) );
+	container.add( materialSpecular );
 
 	// shininess
 
@@ -646,12 +630,6 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.color !== undefined && material.color.getHex() !== materialColor.getHexValue() ) {
-
-				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'color', materialColor.getHexValue(), currentMaterialSlot ) );
-
-			}
-
 			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'roughness', materialRoughness.getValue(), currentMaterialSlot ) );
@@ -685,24 +663,6 @@ function SidebarMaterial( editor ) {
 			if ( material.transmission !== undefined && Math.abs( material.transmission - materialTransmission.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'transmission', materialTransmission.getValue(), currentMaterialSlot ) );
-
-			}
-
-			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
-
-				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'emissive', materialEmissive.getHexValue(), currentMaterialSlot ) );
-
-			}
-
-			if ( material.emissiveIntensity !== undefined && material.emissiveIntensity !== materialEmissiveIntensity.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'emissiveIntensity', materialEmissiveIntensity.getValue(), currentMaterialSlot ) );
-
-			}
-
-			if ( material.specular !== undefined && material.specular.getHex() !== materialSpecular.getHexValue() ) {
-
-				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'specular', materialSpecular.getHexValue(), currentMaterialSlot ) );
 
 			}
 
@@ -1233,13 +1193,10 @@ function SidebarMaterial( editor ) {
 
 		var properties = {
 			'name': materialNameRow,
-			'color': materialColorRow,
 			'roughness': materialRoughnessRow,
 			'metalness': materialMetalnessRow,
-			'emissive': materialEmissiveRow,
 			// 'sheen': materialSheenRow,
 			'transmission': materialTransmissionRow,
-			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
 			'clearcoat': materialClearcoatRow,
 			'clearcoatRoughness': materialClearcoatRoughnessRow,
@@ -1356,12 +1313,6 @@ function SidebarMaterial( editor ) {
 		materialClass.setValue( material.type );
 
 
-		if ( material.color !== undefined ) {
-
-			materialColor.setHexValue( material.color.getHexString() );
-
-		}
-
 		if ( material.roughness !== undefined ) {
 
 			materialRoughness.setValue( material.roughness );
@@ -1386,20 +1337,6 @@ function SidebarMaterial( editor ) {
 		if ( material.transmission !== undefined ) {
 
 			materialTransmission.setValue( material.transmission );
-
-		}
-
-		if ( material.emissive !== undefined ) {
-
-			materialEmissive.setHexValue( material.emissive.getHexString() );
-
-			materialEmissiveIntensity.setValue( material.emissiveIntensity );
-
-		}
-
-		if ( material.specular !== undefined ) {
-
-			materialSpecular.setHexValue( material.specular.getHexString() );
 
 		}
 

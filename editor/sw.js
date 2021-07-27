@@ -175,6 +175,7 @@ const assets = [
 	'./js/Sidebar.Geometry.TubeGeometry.js',
 	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
+	'./js/Sidebar.Material.ColorProperty.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',
 	'./js/Strings.js',
