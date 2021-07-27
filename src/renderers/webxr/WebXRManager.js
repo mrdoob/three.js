@@ -487,6 +487,9 @@ class WebXRManager extends EventDispatcher {
 
 		this.setFoveation = function ( foveation ) {
 
+			// 0 = no foveation = full resolution
+			// 1 = maximum foveation = the edges render at lower resolution
+
 			if ( glProjLayer !== null ) {
 
 				glProjLayer.fixedFoveation = foveation;
