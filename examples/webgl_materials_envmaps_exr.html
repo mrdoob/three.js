@@ -32,7 +32,6 @@
 			let container, stats;
 			let camera, scene, renderer, controls;
 			let torusMesh, planeMesh;
-			let pngCubeRenderTarget, exrCubeRenderTarget;
 			let pngBackground, exrBackground;
 
 			init();
@@ -70,37 +69,21 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				THREE.DefaultLoadingManager.onLoad = function ( ) {
+				new EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
 
-					pmremGenerator.dispose();
-
-				};
-
-				new EXRLoader()
-					.setDataType( THREE.UnsignedByteType )
-					.load( 'textures/piz_compressed.exr', function ( texture ) {
-
-						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-						exrBackground = exrCubeRenderTarget.texture;
-
-						texture.dispose();
-
-					} );
-
-				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
-
-					texture.encoding = THREE.sRGBEncoding;
-
-					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-
-					pngBackground = pngCubeRenderTarget.texture;
-
-					texture.dispose();
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					exrBackground = texture;
 
 				} );
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
+				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
+
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					texture.encoding = THREE.sRGBEncoding;
+
+					pngBackground = texture;
+
+				} );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -163,11 +146,11 @@
 				switch ( params.envMap ) {
 
 					case 'EXR':
-						newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null;
+						newEnvMap = exrBackground;
 						background = exrBackground;
 						break;
 					case 'PNG':
-						newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null;
+						newEnvMap = pngBackground;
 						background = pngBackground;
 						break;
 

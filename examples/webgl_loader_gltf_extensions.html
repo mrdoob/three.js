@@ -158,14 +158,14 @@
 				// Load background and generate envMap
 
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
+					.setDataType( THREE.FloatType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-						pmremGenerator.dispose();
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						background = envMap;
+						envMap = texture;
+						background = texture;
 
 						//
 
@@ -174,9 +174,6 @@
 						animate();
 
 					} );
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 			}
 

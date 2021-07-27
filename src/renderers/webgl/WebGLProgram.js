@@ -478,7 +478,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
-			parameters.flipNormalScaleY ? '#define FLIP_NORMAL_SCALE_Y' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -623,7 +622,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
-			parameters.flipNormalScaleY ? '#define FLIP_NORMAL_SCALE_Y' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 

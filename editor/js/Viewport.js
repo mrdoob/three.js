@@ -597,7 +597,8 @@ function Viewport( editor ) {
 
 				if ( environmentEquirectangularTexture ) {
 
-					scene.environment = pmremGenerator.fromEquirectangular( environmentEquirectangularTexture ).texture;
+					environmentEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
+					scene.environment = environmentEquirectangularTexture;
 
 				}
 

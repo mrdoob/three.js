@@ -402,7 +402,12 @@ function SidebarScene( editor ) {
 
 		if ( scene.environment ) {
 
-			// TODO
+			if ( scene.environment.mapping === THREE.EquirectangularReflectionMapping ) {
+
+				environmentType.setValue( 'Equirectangular' );
+				environmentEquirectangularTexture.setValue( scene.environment );
+
+			}
 
 		} else {
 
@@ -434,6 +439,7 @@ function SidebarScene( editor ) {
 		}
 
 		refreshBackgroundUI();
+		refreshEnvironmentUI();
 		refreshFogUI();
 
 	}

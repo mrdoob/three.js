@@ -549,7 +549,13 @@
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = scope.getTexture( textureMap, child.ID );
-						parameters.map.encoding = THREE.sRGBEncoding;
+
+						if ( parameters.map !== undefined ) {
+
+							parameters.map.encoding = THREE.sRGBEncoding;
+
+						}
+
 						break;
 
 					case 'DisplacementColor':
@@ -558,7 +564,13 @@
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
-						parameters.emissiveMap.encoding = THREE.sRGBEncoding;
+
+						if ( parameters.emissiveMap !== undefined ) {
+
+							parameters.emissiveMap.encoding = THREE.sRGBEncoding;
+
+						}
+
 						break;
 
 					case 'NormalMap':
@@ -568,13 +580,25 @@
 
 					case 'ReflectionColor':
 						parameters.envMap = scope.getTexture( textureMap, child.ID );
-						parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
-						parameters.envMap.encoding = THREE.sRGBEncoding;
+
+						if ( parameters.envMap !== undefined ) {
+
+							parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
+							parameters.envMap.encoding = THREE.sRGBEncoding;
+
+						}
+
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = scope.getTexture( textureMap, child.ID );
-						parameters.specularMap.encoding = THREE.sRGBEncoding;
+
+						if ( parameters.specularMap !== undefined ) {
+
+							parameters.specularMap.encoding = THREE.sRGBEncoding;
+
+						}
+
 						break;
 
 					case 'TransparentColor':
@@ -612,7 +636,17 @@
 
 			}
 
-			return textureMap.get( id );
+			const texture = textureMap.get( id );
+
+			if ( texture.image !== undefined ) {
+
+				return texture;
+
+			} else {
+
+				return undefined;
+
+			}
 
 		} // Parse nodes in FBXTree.Objects.Deformer
 		// Deformer node can contain skinning or Vertex Cache animation data, however only skinning is supported here

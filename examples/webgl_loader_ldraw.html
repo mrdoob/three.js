@@ -27,7 +27,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+			import { LDrawEnvironment } from './jsm/environments/LDrawEnvironment.js';
 
 			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
 
@@ -76,6 +76,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				// scene
@@ -84,7 +85,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xdeebed );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
+				scene.environment = pmremGenerator.fromScene( new LDrawEnvironment() ).texture;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 

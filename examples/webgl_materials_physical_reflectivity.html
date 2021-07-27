@@ -36,7 +36,6 @@
 			};
 			let camera, scene, renderer;
 			let gemBackMaterial, gemFrontMaterial;
-			let hdrCubeRenderTarget;
 
 			const objects = [];
 
@@ -114,22 +113,16 @@
 				} );
 
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
+					.setDataType( THREE.FloatType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( hdrEquirect ) {
+					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						pmremGenerator.dispose();
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
+						gemFrontMaterial.envMap = gemBackMaterial.envMap = texture;
 						gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 
-						hdrEquirect.dispose();
-
 					} );
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				// Lights
 
