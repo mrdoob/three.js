@@ -1,5 +1,5 @@
 Title: Primitives de Three.js
-Description: Un tour des primitives de  Three.js
+Description: Tour d'horizon des primitives de Three.js
 TOC: Primitives
 
 Cet article fait partie d'une série consacrée à Three.js.
