@@ -1,6 +1,6 @@
 Title: Caméras dans Three.js
 Description: Comment utiliser les Cameras dans Three.js
-TOC: Cameras
+TOC: Caméras
 
 Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
