@@ -32,6 +32,7 @@
 			let container, stats;
 			let camera, scene, renderer, controls;
 			let torusMesh, planeMesh;
+			let pngCubeRenderTarget, exrCubeRenderTarget;
 			let pngBackground, exrBackground;
 
 			init();
@@ -69,21 +70,37 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				new EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
-					texture.mapping = THREE.EquirectangularReflectionMapping;
-					exrBackground = texture;
+					pmremGenerator.dispose();
 
-				} );
+				};
+
+				new EXRLoader()
+					.setDataType( THREE.UnsignedByteType )
+					.load( 'textures/piz_compressed.exr', function ( texture ) {
+
+						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
+						exrBackground = exrCubeRenderTarget.texture;
+
+						texture.dispose();
+
+					} );
 
 				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
-					texture.mapping = THREE.EquirectangularReflectionMapping;
 					texture.encoding = THREE.sRGBEncoding;
 
-					pngBackground = texture;
+					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
+
+					pngBackground = pngCubeRenderTarget.texture;
+
+					texture.dispose();
 
 				} );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -146,11 +163,11 @@
 				switch ( params.envMap ) {
 
 					case 'EXR':
-						newEnvMap = exrBackground;
+						newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null;
 						background = exrBackground;
 						break;
 					case 'PNG':
-						newEnvMap = pngBackground;
+						newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null;
 						background = pngBackground;
 						break;
 
