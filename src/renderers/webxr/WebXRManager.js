@@ -467,6 +467,40 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getFoveation = function () {
+
+			if ( glProjLayer !== null ) {
+
+				return glProjLayer.fixedFoveation;
+
+			}
+
+			if ( glBaseLayer !== null ) {
+
+				return glBaseLayer.fixedFoveation;
+
+			}
+
+			return undefined;
+
+		};
+
+		this.setFoveation = function ( foveation ) {
+
+			if ( glProjLayer !== null ) {
+
+				glProjLayer.fixedFoveation = foveation;
+
+			}
+
+			if ( glBaseLayer !== null && glBaseLayer.fixedFoveation !== undefined ) {
+
+				glBaseLayer.fixedFoveation = foveation;
+
+			}
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
