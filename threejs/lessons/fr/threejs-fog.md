@@ -2,25 +2,18 @@ Title: Brouillard dans Three.js
 Description: Brouillard dans Three.js
 TOC: Brouillard
 
-This article is part of a series of articles about three.js. The
-first article is [three.js fundamentals](threejs-fundamentals.html). If
-you haven't read that yet and you're new to three.js you might want to
-consider starting there. If you haven't read about cameras you might
-want to start with [this article](threejs-cameras.html).
+Cet article fait partie d'une série consacrée à Three.js.
+Le premier article s'intitule [Principes de base](threejs-fundamentals.html).
+Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là. Si vous n'avez pas lu l'artcile concernant [les caméras](threejs-cameras.html) lisez-le avant celui-ci.
 
-Fog in a 3D engine is generally a way of fading to a specific color
-based on the distance from the camera. In three.js you add fog by
-creating `Fog` or `FogExp2` object and setting it on the scene's
-[`fog`](Scene.fog) property.
+Le brouillard dans un moteur 3D est généralement un moyen de passer à une couleur spécifique en fonction de la distance par rapport à la caméra. Dans Three.js, vous ajoutez du brouillard en créant un objet [`Fog`](https://threejs.org/docs/#api/en/scenes/Fog) ou [`FogExp2`](https://threejs.org/docs/#api/en/scenes/FogExp2) et en le définissant sur la propriété `fog de la scène.
 
-`Fog` lets you choose `near` and `far` settings which are distances
-from the camera. Anything closer than `near` is unaffected by fog.
-Anything further than `far` is completely the fog color. Parts between
-`near` and `far` fade from their material color to the fog color.
+`Fog` permet de définir les paramètres `near` et `far` en tant que distance par rapport à la caméra. Ce qui se trouve entre la caméra et `near` n'est pas affecté par le brouillard.
+Ce qui est au-delà de `far` est complètement dans le brouillard. Ce qui se trouve entre les deux, est altéré par le brouillard.
 
-There's also `FogExp2` which grows exponentially with distance from the camera.
+Il y a aussi `FogExp2` qui croît de façon exponentielle avec la distance par rapport à la caméra.
 
-To use either type of fog you create one and and assign it to the scene as in
+Pour utiliser `Fog`, suivez cet exemple. 
 
 ```js
 const scene = new THREE.Scene();
@@ -32,7 +25,7 @@ const scene = new THREE.Scene();
 }
 ```
 
-or for `FogExp2` it would be
+ou pour `FogExp2`, celui-ci.
 
 ```js
 const scene = new THREE.Scene();
@@ -43,11 +36,7 @@ const scene = new THREE.Scene();
 }
 ```
 
-`FogExp2` is closer to reality but `Fog` is used
-more commonly since it lets you choose a place to apply
-the fog so you can decide to show a clear scene
-up to a certain distance and then fade out to some color
-past that distance.
+`FogExp2` est plus proche de la réalité mais `Fog` est plus souvent utilisé car il permet de choisir un endroit où appliquer le brouillard, ce faisant on peut choisir de montrer une scène bien clair et du brouillard qu'au-delà.
 
 <div class="spread">
   <div>
@@ -60,13 +49,7 @@ past that distance.
   </div>
 </div>
 
-It's important to note that the fog is applied to *things that are rendered*.
-It is part of the calculation of each pixel of the color of the object.
-What that means is if you want your scene to fade to a certain color you
-need to set the fog **and** the background color to the same color.
-The background color is set using the
-[`scene.background`](Scene.background)
-property. To pick a background color you attach a `THREE.Color` to it. For example
+Il est important de noter que le brouillard est appliqué aux choses qui sont rendues. Il fait partie du calcul de chaque pixel de la couleur de l'objet. Cela signifie que si vous voulez que votre scène s'estompe avec une certaine couleur, vous devez définir le brouillard et la couleur d'arrière-plan sur la même couleur. La couleur d'arrière-plan est définie à l'aide de la propriété [`scene.background`](Scene.background). Pour choisir une couleur d'arrière-plan, vous lui attachez une `THREE.Color`. Comme ceci :
 
 ```js
 scene.background = new THREE.Color('#F00');  // red
@@ -83,9 +66,7 @@ scene.background = new THREE.Color('#F00');  // red
   </div>
 </div>
 
-Here is one of our previous examples with fog added. The only addition
-is right after setting up the scene we add the fog and set the scene's
-background color
+Voici l'un de nos exemples précédents avec du brouillard. Juste après la configuration de la scène, nous ajoutons le brouillard et définissons la couleur d'arrière-plan de la scène.
 
 ```js
 const scene = new THREE.Scene();
@@ -99,26 +80,17 @@ const scene = new THREE.Scene();
 +}
 ```
 
-In the example below the camera's `near` is 0.1 and its `far` is 5.
-The camera is at `z = 2`. The cubes are 1 unit large and at Z = 0.
-This means with a fog setting of `near = 1` and `far = 2` the cubes
-will fade out right around their center.
+Dans l'exemple ci-dessous, le 'near' de la caméra est à 0,1 et le `far` à 5. La position z de la caméra est à 2. Les cubes mesurent 1 unité de large et à Z = 0. Les réglages du brouillard, `near` = 1 et `far` = 2. Ainsi, les cubes s'estompent juste autour de leur centre.
 
 {{{example url="../threejs-fog.html" }}}
 
-Let's add an interface so we can adjust the fog. Again we'll use
-[dat.GUI](https://github.com/dataarts/dat.gui). dat.GUI takes
-an object and a property and automagically makes an interface
-for that type of property. We could just simply let it manipulate
-the fog's `near` and `far` properties but it's invalid to have
-`near` be greater than `far` so let's make a helper so dat.GUI
-can manipulate a `near` and `far` property but we'll make sure `near`
-is less than or equal to `far` and `far` is greater than or equal `near`.
+Mettons à jour notre dat.GUI pour jouer avec le brouillard.
+[dat.GUI](https://github.com/dataarts/dat.gui) prend un objet et une propriété et crée automatiquement une interface de contrôle pour cette propriété. Nous pourrions simplement le laisser manipuler les propriétés `near` et `far` du brouillard, mais il est impossible que `near` soit supérieur à `far`. Assurons-nous de cela.
 
 ```js
-// We use this class to pass to dat.gui
-// so when it manipulates near or far
-// near is never > far and far is never < near
+// On utilise cette classe pour passer à dat.gui
+// donc quand il manipule near ou far
+// near n'est jamais > far et far n'est jamais < near
 class FogGUIHelper {
   constructor(fog) {
     this.fog = fog;
@@ -140,7 +112,7 @@ class FogGUIHelper {
 }
 ```
 
-We can then add it like this
+On peut l'ajouter comme ceci.
 
 ```js
 {
