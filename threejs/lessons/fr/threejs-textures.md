@@ -1,5 +1,5 @@
-Title: Three.js Textures
-Description: Using textures in three.js
+Title: Les textures dans Three.js
+Description: Comment utiliser les textures dans Three.js
 TOC: Textures
 
 Cet article fait partie d'une série consacrée à Three.js.
