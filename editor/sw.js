@@ -177,6 +177,7 @@ const assets = [
 	'./js/Sidebar.Material.js',
 	'./js/Sidebar.Material.BooleanProperty.js',
 	'./js/Sidebar.Material.ColorProperty.js',
+	'./js/Sidebar.Material.ConstantProperty.js',
 	'./js/Sidebar.Material.MapProperty.js',
 	'./js/Sidebar.Material.NumberProperty.js',
 	'./js/Sidebar.Animation.js',

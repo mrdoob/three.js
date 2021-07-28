@@ -7,6 +7,7 @@ import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
 import { SidebarMaterialBooleanProperty } from './Sidebar.Material.BooleanProperty.js';
 import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.js';
+import { SidebarMaterialConstantProperty } from './Sidebar.Material.ConstantProperty.js';
 import { SidebarMaterialMapProperty } from './Sidebar.Material.MapProperty.js';
 import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty.js';
 
@@ -183,22 +184,19 @@ function SidebarMaterial( editor ) {
 
 	// vertex colors
 
+
 	const materialVertexColors = new SidebarMaterialBooleanProperty( editor, 'vertexColors', strings.getKey( 'sidebar/material/vertexcolors' ) );
 	container.add( materialVertexColors );
 
 	// depth packing
 
-	var materialDepthPackingRow = new UIRow();
-	var materialDepthPacking = new UISelect().setOptions( {
+	const materialDepthPackingOptions = {
 		[ THREE.BasicDepthPacking ]: 'BasicDepthPacking',
 		[ THREE.RGBADepthPacking ]: 'RGBADepthPacking'
-	} );
-	materialDepthPacking.onChange( update );
+	};
 
-	materialDepthPackingRow.add( new UIText( strings.getKey( 'sidebar/material/depthPacking' ) ).setWidth( '90px' ) );
-	materialDepthPackingRow.add( materialDepthPacking );
-
-	container.add( materialDepthPackingRow );
+	const materialDepthPacking = new SidebarMaterialConstantProperty( editor, 'depthPacking', strings.getKey( 'sidebar/material/depthPacking' ), materialDepthPackingOptions );
+	container.add( materialDepthPacking );
 
 	// map
 
@@ -277,19 +275,16 @@ function SidebarMaterial( editor ) {
 
 	// side
 
-	var materialSideRow = new UIRow();
-	var materialSide = new UISelect().setOptions( {
+	const materialSideOptions = {
 
 		0: strings.getKey( 'sidebar/material/side/front' ),
 		1: strings.getKey( 'sidebar/material/side/back' ),
 		2: strings.getKey( 'sidebar/material/side/double' )
 
-	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
+	};
 
-	materialSideRow.add( new UIText( strings.getKey( 'sidebar/material/side' ) ).setWidth( '90px' ) );
-	materialSideRow.add( materialSide );
-
-	container.add( materialSideRow );
+	const materialSide = new SidebarMaterialConstantProperty( editor, 'side', strings.getKey( 'sidebar/material/side' ), materialSideOptions );
+	container.add( materialSide );
 
 	// size
 
@@ -308,8 +303,7 @@ function SidebarMaterial( editor ) {
 
 	// blending
 
-	var materialBlendingRow = new UIRow();
-	var materialBlending = new UISelect().setOptions( {
+	const materialBlendingOptions = {
 
 		0: strings.getKey( 'sidebar/material/blending/no' ),
 		1: strings.getKey( 'sidebar/material/blending/normal' ),
@@ -318,12 +312,10 @@ function SidebarMaterial( editor ) {
 		4: strings.getKey( 'sidebar/material/blending/multiply' ),
 		5: strings.getKey( 'sidebar/material/blending/custom' )
 
-	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
+	};
 
-	materialBlendingRow.add( new UIText( strings.getKey( 'sidebar/material/blending' ) ).setWidth( '90px' ) );
-	materialBlendingRow.add( materialBlending );
-
-	container.add( materialBlendingRow );
+	const materialBlending = new SidebarMaterialConstantProperty( editor, 'blending', strings.getKey( 'sidebar/material/blending' ), materialBlendingOptions );
+	container.add( materialBlending );
 
 	// opacity
 
@@ -407,41 +399,6 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.depthPacking !== undefined ) {
-
-				var depthPacking = parseInt( materialDepthPacking.getValue() );
-
-				if ( material.depthPacking !== depthPacking ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
-
-				}
-
-			}
-
-			if ( material.side !== undefined ) {
-
-				var side = parseInt( materialSide.getValue() );
-				if ( material.side !== side ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'side', side, currentMaterialSlot ) );
-
-				}
-
-
-			}
-
-			if ( material.blending !== undefined ) {
-
-				var blending = parseInt( materialBlending.getValue() );
-				if ( material.blending !== blending ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'blending', blending, currentMaterialSlot ) );
-
-				}
-
-			}
-
 			refreshUI();
 
 		}
@@ -453,10 +410,7 @@ function SidebarMaterial( editor ) {
 	function setRowVisibility() {
 
 		var properties = {
-			'vertexShader': materialProgramRow,
-			'depthPacking': materialDepthPackingRow,
-			'side': materialSideRow,
-			'blending': materialBlendingRow
+			'vertexShader': materialProgramRow
 		};
 
 		var material = currentObject.material;
@@ -539,24 +493,6 @@ function SidebarMaterial( editor ) {
 		}
 
 		materialClass.setValue( material.type );
-
-		if ( material.depthPacking !== undefined ) {
-
-			materialDepthPacking.setValue( material.depthPacking );
-
-		}
-
-		if ( material.side !== undefined ) {
-
-			materialSide.setValue( material.side );
-
-		}
-
-		if ( material.blending !== undefined ) {
-
-			materialBlending.setValue( material.blending );
-
-		}
 
 		setRowVisibility();
 
