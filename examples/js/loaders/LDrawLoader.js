@@ -136,6 +136,7 @@
 				}
 			} );
 			this.setValues( parameters );
+			this.isLDrawConditionalLineMaterial = true;
 
 		}
 
@@ -900,7 +901,6 @@
 					material = new THREE.MeshStandardMaterial( {
 						color: colour,
 						roughness: 0.3,
-						envMapIntensity: 0.3,
 						metalness: 0
 					} );
 					break;
