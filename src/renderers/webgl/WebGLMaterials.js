@@ -622,8 +622,8 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		uniforms.attenuation.value.copy( material.attenuation );
 		uniforms.attenuationDistance.value = material.attenuationDistance;
-		uniforms.attenuationColor.value.copy( material.attenuationColor );
 
 		uniforms.specularIntensity.value = material.specularIntensity;
 		uniforms.specularTint.value.copy( material.specularTint );
