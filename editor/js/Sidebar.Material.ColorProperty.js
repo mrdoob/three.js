@@ -12,12 +12,12 @@ function SidebarMaterialColorProperty( editor, property, name ) {
 	const color = new UIColor().onInput( onChange );
 	container.add( color );
 
-	let emissiveIntensity;
+	let intensity;
 
 	if ( property === 'emissive' ) {
 
-		emissiveIntensity = new UINumber( 1 ).setWidth( '30px' ).onChange( onChange );
-		container.add( emissiveIntensity );
+		intensity = new UINumber().setWidth( '30px' ).onChange( onChange );
+		container.add( intensity );
 
 	}
 
@@ -32,11 +32,11 @@ function SidebarMaterialColorProperty( editor, property, name ) {
 
 		}
 
-		if ( emissiveIntensity !== undefined ) {
+		if ( intensity !== undefined ) {
 
-			if ( material.emissiveIntensity !== emissiveIntensity.getValue() ) {
+			if ( material[ `${ property }Intensity` ] !== intensity.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( editor, object, 'emissiveIntensity', emissiveIntensity.getValue(), /* TODO: currentMaterialSlot*/ 0 ) );
+				editor.execute( new SetMaterialValueCommand( editor, object, `${ property }Intensity`, intensity.getValue(), /* TODO: currentMaterialSlot*/ 0 ) );
 
 			}
 
@@ -55,9 +55,9 @@ function SidebarMaterialColorProperty( editor, property, name ) {
 
 			color.setHexValue( material[ property ].getHexString() );
 
-			if ( emissiveIntensity !== undefined ) {
+			if ( intensity !== undefined ) {
 
-				emissiveIntensity.setValue( material.emissiveIntensity );
+				intensity.setValue( material[ `${ property }Intensity` ] );
 
 			}
 
