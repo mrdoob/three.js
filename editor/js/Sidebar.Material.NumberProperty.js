@@ -11,14 +11,12 @@ function SidebarMaterialNumberProperty( editor, property, name, range = [ - Infi
 	const number = new UINumber().setWidth( '60px' ).setRange( range[ 0 ], range[ 1 ] ).onChange( onChange );
 	container.add( number );
 
-	const epsilon = 0.01 - Number.EPSILON;
-
 	let object = null;
 	let material = null;
 
 	function onChange() {
 
-		if ( Math.abs( material[ property ] - number.getValue() ) >= epsilon ) {
+		if ( material[ property ] !== number.getValue() ) {
 
 			editor.execute( new SetMaterialValueCommand( editor, object, property, number.getValue(), 0 /* TODO: currentMaterialSlot */ ) );
 
