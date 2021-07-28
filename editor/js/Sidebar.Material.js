@@ -1,10 +1,8 @@
 import * as THREE from '../../build/three.module.js';
 
-import { UIButton, UICheckbox, UIInput, UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
-import { UITexture } from './libs/ui.three.js';
+import { UIButton, UIInput, UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
-import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
 import { SidebarMaterialBooleanProperty } from './Sidebar.Material.BooleanProperty.js';
@@ -366,24 +364,13 @@ function SidebarMaterial( editor ) {
 
 	function update() {
 
-		var object = currentObject;
-
-		var geometry = object.geometry;
-
 		var previousSelectedSlot = currentMaterialSlot;
 
 		currentMaterialSlot = parseInt( materialSlotSelect.getValue() );
 
-		if ( currentMaterialSlot !== previousSelectedSlot ) refreshUI( true );
+		if ( currentMaterialSlot !== previousSelectedSlot ) refreshUI();
 
 		var material = editor.getObjectMaterial( currentObject, currentMaterialSlot );
-
-		var textureWarning = false;
-		var objectHasUvs = false;
-
-		if ( object.isSprite ) objectHasUvs = true;
-		if ( geometry.isGeometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
-		if ( geometry.isBufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
 		if ( material ) {
 
@@ -475,34 +462,6 @@ function SidebarMaterial( editor ) {
 
 		}
 
-		if ( textureWarning ) {
-
-			console.warn( 'Can\'t set texture, model doesn\'t have texture coordinates' );
-
-		}
-
-	}
-
-	function updateMaterial( texture ) {
-
-		if ( texture !== null ) {
-
-			if ( texture.isDataTexture !== true && texture.encoding !== THREE.sRGBEncoding ) {
-
-				texture.encoding = THREE.sRGBEncoding;
-				var object = currentObject;
-				if ( object !== null ) {
-
-					object.material.needsUpdate = true;
-
-				}
-
-			}
-
-		}
-
-		update();
-
 	}
 
 	//
@@ -543,7 +502,7 @@ function SidebarMaterial( editor ) {
 	}
 
 
-	function refreshUI( resetTextureSelectors ) {
+	function refreshUI() {
 
 		if ( ! currentObject ) return;
 
@@ -647,10 +606,8 @@ function SidebarMaterial( editor ) {
 
 		if ( hasMaterial ) {
 
-			var objectChanged = object !== currentObject;
-
 			currentObject = object;
-			refreshUI( objectChanged );
+			refreshUI();
 			container.setDisplay( '' );
 
 		} else {
@@ -662,11 +619,7 @@ function SidebarMaterial( editor ) {
 
 	} );
 
-	signals.materialChanged.add( function () {
-
-		refreshUI();
-
-	} );
+	signals.materialChanged.add( refreshUI );
 
 	var vertexShaderVariables = [
 		'uniform mat4 projectionMatrix;',
