@@ -100,11 +100,6 @@ function SidebarMaterial( editor ) {
 	const materialMetalness = new SidebarMaterialNumberProperty( editor, 'metalness', strings.getKey( 'sidebar/material/metalness' ), [ 0, 1 ] );
 	container.add( materialMetalness );
 
-	// reflectivity
-
-	const materialReflectivity = new SidebarMaterialNumberProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
-	container.add( materialReflectivity );
-
 	// transmission
 
 	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
@@ -124,6 +119,11 @@ function SidebarMaterial( editor ) {
 
 	const materialShininess = new SidebarMaterialNumberProperty( editor, 'shininess', strings.getKey( 'sidebar/material/shininess' ) );
 	container.add( materialShininess );
+
+	// reflectivity
+
+	const materialReflectivity = new SidebarMaterialNumberProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
+	container.add( materialReflectivity );
 
 	// clearcoat
 
