@@ -453,7 +453,6 @@ function SidebarMaterial( editor ) {
 	function setRowVisibility() {
 
 		var properties = {
-			'name': materialNameRow,
 			'vertexShader': materialProgramRow,
 			'depthPacking': materialDepthPackingRow,
 			'side': materialSideRow,
