@@ -41,6 +41,11 @@
 			} );
 			this.register( function ( parser ) {
 
+				return new GLTFMaterialsSpecularExtension( parser );
+
+			} );
+			this.register( function ( parser ) {
+
 				return new GLTFLightsExtension( parser );
 
 			} );
@@ -331,6 +336,7 @@
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_IOR: 'KHR_materials_ior',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
+		KHR_MATERIALS_SPECULAR: 'KHR_materials_specular',
 		KHR_MATERIALS_TRANSMISSION: 'KHR_materials_transmission',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		KHR_MATERIALS_VOLUME: 'KHR_materials_volume',
@@ -738,6 +744,70 @@
 			const extension = materialDef.extensions[ this.name ];
 			materialParams.ior = extension.ior !== undefined ? extension.ior : 1.5;
 			return Promise.resolve();
+
+		}
+
+	}
+	/**
+ * Materials specular Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_specular
+ */
+
+
+	class GLTFMaterialsSpecularExtension {
+
+		constructor( parser ) {
+
+			this.parser = parser;
+			this.name = EXTENSIONS.KHR_MATERIALS_SPECULAR;
+
+		}
+
+		getMaterialType( materialIndex ) {
+
+			const parser = this.parser;
+			const materialDef = parser.json.materials[ materialIndex ];
+			if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
+			return THREE.MeshPhysicalMaterial;
+
+		}
+
+		extendMaterialParams( materialIndex, materialParams ) {
+
+			const parser = this.parser;
+			const materialDef = parser.json.materials[ materialIndex ];
+
+			if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+				return Promise.resolve();
+
+			}
+
+			const pending = [];
+			const extension = materialDef.extensions[ this.name ];
+			materialParams.specularIntensity = extension.specularFactor !== undefined ? extension.specularFactor : 1.0;
+
+			if ( extension.specularTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'specularIntensityMap', extension.specularTexture ) );
+
+			}
+
+			const colorArray = extension.specularColorFactor || [ 1, 1, 1 ];
+			materialParams.specularTint = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+
+			if ( extension.specularColorTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'specularTintMap', extension.specularColorTexture ).then( function ( texture ) {
+
+					texture.encoding = THREE.sRGBEncoding;
+
+				} ) );
+
+			}
+
+			return Promise.all( pending );
 
 		}
 
@@ -2501,7 +2571,7 @@
    * @param {Object} materialParams
    * @param {string} mapName
    * @param {Object} mapDef
-   * @return {Promise}
+   * @return {Promise<Texture>}
    */
 
 
@@ -2533,6 +2603,7 @@
 				}
 
 				materialParams[ mapName ] = texture;
+				return texture;
 
 			} );
 

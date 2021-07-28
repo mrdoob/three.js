@@ -2119,16 +2119,8 @@
 			}
 
 			const curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
-			const vertices = curve.getPoints( controlPoints.length * 7 );
-			const positions = new Float32Array( vertices.length * 3 );
-			vertices.forEach( function ( vertex, i ) {
-
-				vertex.toArray( positions, i * 3 );
-
-			} );
-			const geometry = new THREE.BufferGeometry();
-			geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-			return geometry;
+			const points = curve.getPoints( controlPoints.length * 12 );
+			return new THREE.BufferGeometry().setFromPoints( points );
 
 		}
 
