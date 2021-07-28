@@ -121,7 +121,7 @@ function SidebarMaterial( editor ) {
 
 	// reflectivity
 
-	const materialReflectivity = new SidebarMaterialMapProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
+	const materialReflectivity = new SidebarMaterialNumberProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
 	container.add( materialReflectivity );
 
 	// transmission
