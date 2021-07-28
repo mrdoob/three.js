@@ -28,7 +28,7 @@ function SidebarMaterialColorProperty( editor, property, name ) {
 
 		if ( material[ property ].getHex() !== color.getHexValue() ) {
 
-			editor.execute( new SetMaterialColorCommand( editor, object, property, color.getHexValue(), /* TODO: currentMaterialSlot*/ 0 ) );
+			editor.execute( new SetMaterialColorCommand( editor, object, property, color.getHexValue(), 0 /* TODO: currentMaterialSlot */ ) );
 
 		}
 

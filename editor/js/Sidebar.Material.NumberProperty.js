@@ -20,7 +20,7 @@ function SidebarMaterialNumberProperty( editor, property, name, range = [ - Infi
 
 		if ( Math.abs( material[ property ] - number.getValue() ) >= epsilon ) {
 
-			editor.execute( new SetMaterialValueCommand( editor, object, property, number.getValue(), /* TODO: currentMaterialSlot*/ 0 ) );
+			editor.execute( new SetMaterialValueCommand( editor, object, property, number.getValue(), 0 /* TODO: currentMaterialSlot */ ) );
 
 		}
 
