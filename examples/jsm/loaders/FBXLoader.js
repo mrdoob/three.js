@@ -639,7 +639,7 @@ class FBXTreeParser {
 
 					}
 					break;
-					
+
 				case 'NormalMap':
 				case 'Maya|TEX_normal_map':
 					parameters.normalMap = scope.getTexture( textureMap, child.ID );
@@ -2295,20 +2295,9 @@ class GeometryParser {
 		}
 
 		const curve = new NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
-		const vertices = curve.getPoints( controlPoints.length * 7 );
+		const points = curve.getPoints( controlPoints.length * 12 );
 
-		const positions = new Float32Array( vertices.length * 3 );
-
-		vertices.forEach( function ( vertex, i ) {
-
-			vertex.toArray( positions, i * 3 );
-
-		} );
-
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
-
-		return geometry;
+		return new BufferGeometry().setFromPoints( points );
 
 	}
 
