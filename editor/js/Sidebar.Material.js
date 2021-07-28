@@ -260,7 +260,7 @@ function SidebarMaterial( editor ) {
 
 	// size
 
-	const materialSize = new SidebarMaterialNumberProperty( editor, 'opacity', strings.getKey( 'sidebar/material/size' ), [ 0, Infinity ] );
+	const materialSize = new SidebarMaterialNumberProperty( editor, 'size', strings.getKey( 'sidebar/material/size' ), [ 0, Infinity ] );
 	container.add( materialSize );
 
 	// sizeAttenuation
