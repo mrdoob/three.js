@@ -381,8 +381,6 @@ function SidebarMaterial( editor ) {
 
 	function setRowVisibility() {
 
-		var properties = {};
-
 		var material = currentObject.material;
 
 		if ( Array.isArray( material ) ) {
@@ -399,14 +397,7 @@ function SidebarMaterial( editor ) {
 
 		}
 
-		for ( var property in properties ) {
-
-			properties[ property ].setDisplay( material[ property ] !== undefined ? '' : 'none' );
-
-		}
-
 	}
-
 
 	function refreshUI() {
 
