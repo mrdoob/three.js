@@ -264,17 +264,8 @@ function SidebarMaterial( editor ) {
 
 	// ambient occlusion map
 
-	var materialAOMapRow = new UIRow();
-	var materialAOMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialAOMap = new UITexture().onChange( update );
-	var materialAOScale = new UINumber( 1 ).setRange( 0, 1 ).setWidth( '30px' ).onChange( update );
-
-	materialAOMapRow.add( new UIText( strings.getKey( 'sidebar/material/aomap' ) ).setWidth( '90px' ) );
-	materialAOMapRow.add( materialAOMapEnabled );
-	materialAOMapRow.add( materialAOMap );
-	materialAOMapRow.add( materialAOScale );
-
-	container.add( materialAOMapRow );
+	const materialAOMap = new SidebarMaterialMapProperty( editor, 'aoMap', strings.getKey( 'sidebar/material/aomap' ) );
+	container.add( materialAOMap );
 
 	// emissive map
 
@@ -446,33 +437,6 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.aoMap !== undefined ) {
-
-				var aoMapEnabled = materialAOMapEnabled.getValue() === true;
-
-				if ( objectHasUvs ) {
-
-					var aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
-					if ( material.aoMap !== aoMap ) {
-
-						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'aoMap', aoMap, currentMaterialSlot ) );
-
-					}
-
-					if ( material.aoMapIntensity !== materialAOScale.getValue() ) {
-
-						editor.execute( new SetMaterialValueCommand( editor, currentObject, 'aoMapIntensity', materialAOScale.getValue(), currentMaterialSlot ) );
-
-					}
-
-				} else {
-
-					if ( aoMapEnabled ) textureWarning = true;
-
-				}
-
-			}
-
 			if ( material.side !== undefined ) {
 
 				var side = parseInt( materialSide.getValue() );
@@ -549,7 +513,6 @@ function SidebarMaterial( editor ) {
 			'name': materialNameRow,
 			'vertexShader': materialProgramRow,
 			'depthPacking': materialDepthPackingRow,
-			'aoMap': materialAOMapRow,
 			'side': materialSideRow,
 			'size': materialSizeRow,
 			'blending': materialBlendingRow
@@ -639,20 +602,6 @@ function SidebarMaterial( editor ) {
 		if ( material.depthPacking !== undefined ) {
 
 			materialDepthPacking.setValue( material.depthPacking );
-
-		}
-
-		if ( material.aoMap !== undefined ) {
-
-			materialAOMapEnabled.setValue( material.aoMap !== null );
-
-			if ( material.aoMap !== null || resetTextureSelectors ) {
-
-				materialAOMap.setValue( material.aoMap );
-
-			}
-
-			materialAOScale.setValue( material.aoMapIntensity );
 
 		}
 

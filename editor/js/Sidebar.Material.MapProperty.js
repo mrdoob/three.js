@@ -21,6 +21,15 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	const mapType = property.replace( 'Map', '' );
 
+	let intensity;
+
+	if ( property === 'aoMap' ) {
+
+		intensity = new UINumber().setWidth( '30px' ).onChange( onIntensityChange );
+		container.add( intensity );
+
+	}
+
 	let scale;
 
 	if ( property === 'bumpMap' || property === 'displacementMap' ) {
@@ -82,6 +91,16 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
+	function onIntensityChange() {
+
+		if ( material[ `${ property }Intensity` ] !== intensity.getValue() ) {
+
+			editor.execute( new SetMaterialValueCommand( editor, object, `${ property }Intensity`, intensity.getValue(), 0 /* TODO: currentMaterialSlot */ ) );
+
+		}
+
+	}
+
 	function onScaleChange() {
 
 		if ( material[ `${ mapType }Scale` ] !== scale.getValue() ) {
@@ -118,6 +137,12 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 			if ( enabled.getValue() ) {
 
 				map.setValue( material[ property ] );
+
+			}
+
+			if ( intensity !== undefined ) {
+
+				intensity.setValue( material[ `${ property }Intensity` ] );
 
 			}
 
