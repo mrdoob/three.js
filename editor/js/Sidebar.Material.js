@@ -12,47 +12,27 @@ import { SidebarMaterialMapProperty } from './Sidebar.Material.MapProperty.js';
 import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty.js';
 import { SidebarMaterialProgram } from './Sidebar.Material.Program.js';
 
-var materialClasses = {
-	'LineBasicMaterial': THREE.LineBasicMaterial,
-	'LineDashedMaterial': THREE.LineDashedMaterial,
-	'MeshBasicMaterial': THREE.MeshBasicMaterial,
-	'MeshDepthMaterial': THREE.MeshDepthMaterial,
-	'MeshNormalMaterial': THREE.MeshNormalMaterial,
-	'MeshLambertMaterial': THREE.MeshLambertMaterial,
-	'MeshMatcapMaterial': THREE.MeshMatcapMaterial,
-	'MeshPhongMaterial': THREE.MeshPhongMaterial,
-	'MeshToonMaterial': THREE.MeshToonMaterial,
-	'MeshStandardMaterial': THREE.MeshStandardMaterial,
-	'MeshPhysicalMaterial': THREE.MeshPhysicalMaterial,
-	'RawShaderMaterial': THREE.RawShaderMaterial,
-	'ShaderMaterial': THREE.ShaderMaterial,
-	'ShadowMaterial': THREE.ShadowMaterial,
-	'SpriteMaterial': THREE.SpriteMaterial,
-	'PointsMaterial': THREE.PointsMaterial
-};
-
 function SidebarMaterial( editor ) {
 
-	var strings = editor.strings;
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	var signals = editor.signals;
+	let currentObject;
 
-	var currentObject;
+	let currentMaterialSlot = 0;
 
-	var currentMaterialSlot = 0;
-
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
 	// Current material slot
 
-	var materialSlotRow = new UIRow();
+	const materialSlotRow = new UIRow();
 
 	materialSlotRow.add( new UIText( strings.getKey( 'sidebar/material/slot' ) ).setWidth( '90px' ) );
 
-	var materialSlotSelect = new UISelect().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
+	const materialSlotSelect = new UISelect().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
 	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );
 	materialSlotRow.add( materialSlotSelect );
 
@@ -60,8 +40,8 @@ function SidebarMaterial( editor ) {
 
 	// type
 
-	var materialClassRow = new UIRow();
-	var materialClass = new UISelect().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
+	const materialClassRow = new UIRow();
+	const materialClass = new UISelect().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
 	materialClassRow.add( new UIText( strings.getKey( 'sidebar/material/type' ) ).setWidth( '90px' ) );
 	materialClassRow.add( materialClass );
@@ -70,9 +50,10 @@ function SidebarMaterial( editor ) {
 
 	// uuid
 
-	var materialUUIDRow = new UIRow();
-	var materialUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
-	var materialUUIDRenew = new UIButton( strings.getKey( 'sidebar/material/new' ) ).setMarginLeft( '7px' ).onClick( function () {
+	const materialUUIDRow = new UIRow();
+	const materialUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	const materialUUIDRenew = new UIButton( strings.getKey( 'sidebar/material/new' ) ).setMarginLeft( '7px' );
+	materialUUIDRenew.onClick( function () {
 
 		materialUUID.setValue( THREE.MathUtils.generateUUID() );
 		update();
@@ -87,8 +68,8 @@ function SidebarMaterial( editor ) {
 
 	// name
 
-	var materialNameRow = new UIRow();
-	var materialName = new UIInput().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
+	const materialNameRow = new UIRow();
+	const materialName = new UIInput().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 		editor.execute( new SetMaterialValueCommand( editor, editor.selected, 'name', materialName.getValue(), currentMaterialSlot ) );
 
@@ -155,7 +136,6 @@ function SidebarMaterial( editor ) {
 	container.add( materialClearcoatRoughness );
 
 	// vertex colors
-
 
 	const materialVertexColors = new SidebarMaterialBooleanProperty( editor, 'vertexColors', strings.getKey( 'sidebar/material/vertexcolors' ) );
 	container.add( materialVertexColors );
@@ -248,11 +228,9 @@ function SidebarMaterial( editor ) {
 	// side
 
 	const materialSideOptions = {
-
 		0: 'Front',
 		1: 'Back',
 		2: 'Double'
-
 	};
 
 	const materialSide = new SidebarMaterialConstantProperty( editor, 'side', strings.getKey( 'sidebar/material/side' ), materialSideOptions );
@@ -276,14 +254,12 @@ function SidebarMaterial( editor ) {
 	// blending
 
 	const materialBlendingOptions = {
-
 		0: 'No',
 		1: 'Normal',
 		2: 'Additive',
 		3: 'Subtractive',
 		4: 'Multiply',
 		5: 'Custom'
-
 	};
 
 	const materialBlending = new SidebarMaterialConstantProperty( editor, 'blending', strings.getKey( 'sidebar/material/blending' ), materialBlendingOptions );
@@ -323,13 +299,13 @@ function SidebarMaterial( editor ) {
 
 	function update() {
 
-		var previousSelectedSlot = currentMaterialSlot;
+		const previousSelectedSlot = currentMaterialSlot;
 
 		currentMaterialSlot = parseInt( materialSlotSelect.getValue() );
 
 		if ( currentMaterialSlot !== previousSelectedSlot ) refreshUI();
 
-		var material = editor.getObjectMaterial( currentObject, currentMaterialSlot );
+		let material = editor.getObjectMaterial( currentObject, currentMaterialSlot );
 
 		if ( material ) {
 
@@ -381,7 +357,7 @@ function SidebarMaterial( editor ) {
 
 	function setRowVisibility() {
 
-		var material = currentObject.material;
+		const material = currentObject.material;
 
 		if ( Array.isArray( material ) ) {
 
@@ -403,15 +379,15 @@ function SidebarMaterial( editor ) {
 
 		if ( ! currentObject ) return;
 
-		var material = currentObject.material;
+		let material = currentObject.material;
 
 		if ( Array.isArray( material ) ) {
 
-			var slotOptions = {};
+			const slotOptions = {};
 
 			currentMaterialSlot = Math.max( 0, Math.min( material.length, currentMaterialSlot ) );
 
-			for ( var i = 0; i < material.length; i ++ ) {
+			for ( let i = 0; i < material.length; i ++ ) {
 
 				slotOptions[ i ] = String( i + 1 ) + ': ' + material[ i ].name;
 
@@ -463,7 +439,7 @@ function SidebarMaterial( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		var hasMaterial = false;
+		let hasMaterial = false;
 
 		if ( object && object.material ) {
 
@@ -494,48 +470,67 @@ function SidebarMaterial( editor ) {
 
 	signals.materialChanged.add( refreshUI );
 
-	var vertexShaderVariables = [
-		'uniform mat4 projectionMatrix;',
-		'uniform mat4 modelViewMatrix;\n',
-		'attribute vec3 position;\n\n',
-	].join( '\n' );
-
-	var meshMaterialOptions = {
-		'MeshBasicMaterial': 'MeshBasicMaterial',
-		'MeshDepthMaterial': 'MeshDepthMaterial',
-		'MeshNormalMaterial': 'MeshNormalMaterial',
-		'MeshLambertMaterial': 'MeshLambertMaterial',
-		'MeshMatcapMaterial': 'MeshMatcapMaterial',
-		'MeshPhongMaterial': 'MeshPhongMaterial',
-		'MeshToonMaterial': 'MeshToonMaterial',
-		'MeshStandardMaterial': 'MeshStandardMaterial',
-		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
-		'RawShaderMaterial': 'RawShaderMaterial',
-		'ShaderMaterial': 'ShaderMaterial',
-		'ShadowMaterial': 'ShadowMaterial'
-	};
-
-	var lineMaterialOptions = {
-		'LineBasicMaterial': 'LineBasicMaterial',
-		'LineDashedMaterial': 'LineDashedMaterial',
-		'RawShaderMaterial': 'RawShaderMaterial',
-		'ShaderMaterial': 'ShaderMaterial'
-	};
-
-	var spriteMaterialOptions = {
-		'SpriteMaterial': 'SpriteMaterial',
-		'RawShaderMaterial': 'RawShaderMaterial',
-		'ShaderMaterial': 'ShaderMaterial'
-	};
-
-	var pointsMaterialOptions = {
-		'PointsMaterial': 'PointsMaterial',
-		'RawShaderMaterial': 'RawShaderMaterial',
-		'ShaderMaterial': 'ShaderMaterial'
-	};
-
 	return container;
 
 }
+
+const materialClasses = {
+	'LineBasicMaterial': THREE.LineBasicMaterial,
+	'LineDashedMaterial': THREE.LineDashedMaterial,
+	'MeshBasicMaterial': THREE.MeshBasicMaterial,
+	'MeshDepthMaterial': THREE.MeshDepthMaterial,
+	'MeshNormalMaterial': THREE.MeshNormalMaterial,
+	'MeshLambertMaterial': THREE.MeshLambertMaterial,
+	'MeshMatcapMaterial': THREE.MeshMatcapMaterial,
+	'MeshPhongMaterial': THREE.MeshPhongMaterial,
+	'MeshToonMaterial': THREE.MeshToonMaterial,
+	'MeshStandardMaterial': THREE.MeshStandardMaterial,
+	'MeshPhysicalMaterial': THREE.MeshPhysicalMaterial,
+	'RawShaderMaterial': THREE.RawShaderMaterial,
+	'ShaderMaterial': THREE.ShaderMaterial,
+	'ShadowMaterial': THREE.ShadowMaterial,
+	'SpriteMaterial': THREE.SpriteMaterial,
+	'PointsMaterial': THREE.PointsMaterial
+};
+
+const vertexShaderVariables = [
+	'uniform mat4 projectionMatrix;',
+	'uniform mat4 modelViewMatrix;\n',
+	'attribute vec3 position;\n\n',
+].join( '\n' );
+
+const meshMaterialOptions = {
+	'MeshBasicMaterial': 'MeshBasicMaterial',
+	'MeshDepthMaterial': 'MeshDepthMaterial',
+	'MeshNormalMaterial': 'MeshNormalMaterial',
+	'MeshLambertMaterial': 'MeshLambertMaterial',
+	'MeshMatcapMaterial': 'MeshMatcapMaterial',
+	'MeshPhongMaterial': 'MeshPhongMaterial',
+	'MeshToonMaterial': 'MeshToonMaterial',
+	'MeshStandardMaterial': 'MeshStandardMaterial',
+	'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
+	'RawShaderMaterial': 'RawShaderMaterial',
+	'ShaderMaterial': 'ShaderMaterial',
+	'ShadowMaterial': 'ShadowMaterial'
+};
+
+const lineMaterialOptions = {
+	'LineBasicMaterial': 'LineBasicMaterial',
+	'LineDashedMaterial': 'LineDashedMaterial',
+	'RawShaderMaterial': 'RawShaderMaterial',
+	'ShaderMaterial': 'ShaderMaterial'
+};
+
+const spriteMaterialOptions = {
+	'SpriteMaterial': 'SpriteMaterial',
+	'RawShaderMaterial': 'RawShaderMaterial',
+	'ShaderMaterial': 'ShaderMaterial'
+};
+
+const pointsMaterialOptions = {
+	'PointsMaterial': 'PointsMaterial',
+	'RawShaderMaterial': 'RawShaderMaterial',
+	'ShaderMaterial': 'ShaderMaterial'
+};
 
 export { SidebarMaterial };
