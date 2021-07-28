@@ -6,7 +6,6 @@ import { UITexture } from './libs/ui.three.js';
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
 import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
-import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
 
 import { SidebarMaterialBooleanProperty } from './Sidebar.Material.BooleanProperty.js';
 import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.js';
@@ -215,63 +214,23 @@ function SidebarMaterial( editor ) {
 
 	// bump map
 
-	var materialBumpMapRow = new UIRow();
-	var materialBumpMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialBumpMap = new UITexture().onChange( update );
-	var materialBumpScale = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-
-	materialBumpMapRow.add( new UIText( strings.getKey( 'sidebar/material/bumpmap' ) ).setWidth( '90px' ) );
-	materialBumpMapRow.add( materialBumpMapEnabled );
-	materialBumpMapRow.add( materialBumpMap );
-	materialBumpMapRow.add( materialBumpScale );
-
-	container.add( materialBumpMapRow );
+	const materialBumpMap = new SidebarMaterialMapProperty( editor, 'bumpMap', strings.getKey( 'sidebar/material/bumpmap' ) );
+	container.add( materialBumpMap );
 
 	// normal map
 
-	var materialNormalMapRow = new UIRow();
-	var materialNormalMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialNormalMap = new UITexture().onChange( update );
-	var materialNormalScaleX = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-	var materialNormalScaleY = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-
-	materialNormalMapRow.add( new UIText( strings.getKey( 'sidebar/material/normalmap' ) ).setWidth( '90px' ) );
-	materialNormalMapRow.add( materialNormalMapEnabled );
-	materialNormalMapRow.add( materialNormalMap );
-	materialNormalMapRow.add( materialNormalScaleX );
-	materialNormalMapRow.add( materialNormalScaleY );
-
-	container.add( materialNormalMapRow );
+	const materialNormalMap = new SidebarMaterialMapProperty( editor, 'normalMap', strings.getKey( 'sidebar/material/normalmap' ) );
+	container.add( materialNormalMap );
 
 	// clearcoat normal map
 
-	var materialClearcoatNormalMapRow = new UIRow();
-	var materialClearcoatNormalMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialClearcoatNormalMap = new UITexture().onChange( update );
-	var materialClearcoatNormalScaleX = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-	var materialClearcoatNormalScaleY = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-
-	materialClearcoatNormalMapRow.add( new UIText( strings.getKey( 'sidebar/material/clearcoatnormalmap' ) ).setWidth( '90px' ) );
-	materialClearcoatNormalMapRow.add( materialClearcoatNormalMapEnabled );
-	materialClearcoatNormalMapRow.add( materialClearcoatNormalMap );
-	materialClearcoatNormalMapRow.add( materialClearcoatNormalScaleX );
-	materialClearcoatNormalMapRow.add( materialClearcoatNormalScaleY );
-
-	container.add( materialClearcoatNormalMapRow );
+	const materialClearcoatNormalMap = new SidebarMaterialMapProperty( editor, 'clearcoatNormalMap', strings.getKey( 'sidebar/material/clearcoatnormalmap' ) );
+	container.add( materialClearcoatNormalMap );
 
 	// displacement map
 
-	var materialDisplacementMapRow = new UIRow();
-	var materialDisplacementMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialDisplacementMap = new UITexture().onChange( update );
-	var materialDisplacementScale = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-
-	materialDisplacementMapRow.add( new UIText( strings.getKey( 'sidebar/material/displacemap' ) ).setWidth( '90px' ) );
-	materialDisplacementMapRow.add( materialDisplacementMapEnabled );
-	materialDisplacementMapRow.add( materialDisplacementMap );
-	materialDisplacementMapRow.add( materialDisplacementScale );
-
-	container.add( materialDisplacementMapRow );
+	const materialDisplacementMap = new SidebarMaterialMapProperty( editor, 'displacementMap', strings.getKey( 'sidebar/material/displacemap' ) );
+	container.add( materialDisplacementMap );
 
 	// roughness map
 
@@ -491,125 +450,6 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.bumpMap !== undefined ) {
-
-				var bumpMapEnabled = materialBumpMapEnabled.getValue() === true;
-
-				if ( objectHasUvs ) {
-
-					var bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
-					if ( material.bumpMap !== bumpMap ) {
-
-						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'bumpMap', bumpMap, currentMaterialSlot ) );
-
-					}
-
-					if ( material.bumpScale !== materialBumpScale.getValue() ) {
-
-						editor.execute( new SetMaterialValueCommand( editor, currentObject, 'bumpScale', materialBumpScale.getValue(), currentMaterialSlot ) );
-
-					}
-
-				} else {
-
-					if ( bumpMapEnabled ) textureWarning = true;
-
-				}
-
-			}
-
-			if ( material.normalMap !== undefined ) {
-
-				var normalMapEnabled = materialNormalMapEnabled.getValue() === true;
-
-				if ( objectHasUvs ) {
-
-					var normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
-					if ( material.normalMap !== normalMap ) {
-
-						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'normalMap', normalMap, currentMaterialSlot ) );
-
-					}
-
-					if ( material.normalScale.x !== materialNormalScaleX.getValue() ||
-						material.normalScale.y !== materialNormalScaleY.getValue() ) {
-
-						var value = [
-							materialNormalScaleX.getValue(),
-							materialNormalScaleY.getValue()
-						];
-						editor.execute( new SetMaterialVectorCommand( editor, currentObject, 'normalScale', value, currentMaterialSlot ) );
-
-					}
-
-				} else {
-
-					if ( normalMapEnabled ) textureWarning = true;
-
-				}
-
-			}
-
-			if ( material.clearcoatNormalMap !== undefined ) {
-
-				var clearcoatNormalMapEnabled = materialClearcoatNormalMapEnabled.getValue() === true;
-
-				if ( objectHasUvs ) {
-
-					var clearcoatNormalMap = clearcoatNormalMapEnabled ? materialClearcoatNormalMap.getValue() : null;
-
-					if ( material.clearcoatNormalMap !== clearcoatNormalMap ) {
-
-						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'clearcoatNormalMap', clearcoatNormalMap, currentMaterialSlot ) );
-
-					}
-
-					if ( material.clearcoatNormalScale.x !== materialClearcoatNormalScaleX.getValue() ||
-						material.clearcoatNormalScale.y !== materialClearcoatNormalScaleY.getValue() ) {
-
-						var value = [
-							materialClearcoatNormalScaleX.getValue(),
-							materialClearcoatNormalScaleY.getValue()
-						];
-						editor.execute( new SetMaterialVectorCommand( editor, currentObject, 'clearcoatNormalScale', value, currentMaterialSlot ) );
-
-					}
-
-				} else {
-
-					if ( clearcoatNormalMapEnabled ) textureWarning = true;
-
-				}
-
-			}
-
-			if ( material.displacementMap !== undefined ) {
-
-				var displacementMapEnabled = materialDisplacementMapEnabled.getValue() === true;
-
-				if ( objectHasUvs ) {
-
-					var displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
-					if ( material.displacementMap !== displacementMap ) {
-
-						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'displacementMap', displacementMap, currentMaterialSlot ) );
-
-					}
-
-					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
-
-						editor.execute( new SetMaterialValueCommand( editor, currentObject, 'displacementScale', materialDisplacementScale.getValue(), currentMaterialSlot ) );
-
-					}
-
-				} else {
-
-					if ( displacementMapEnabled ) textureWarning = true;
-
-				}
-
-			}
-
 			if ( material.envMap !== undefined ) {
 
 				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
@@ -739,10 +579,6 @@ function SidebarMaterial( editor ) {
 			'name': materialNameRow,
 			'vertexShader': materialProgramRow,
 			'depthPacking': materialDepthPackingRow,
-			'bumpMap': materialBumpMapRow,
-			'normalMap': materialNormalMapRow,
-			'clearcoatNormalMap': materialClearcoatNormalMapRow,
-			'displacementMap': materialDisplacementMapRow,
 			'envMap': materialEnvMapRow,
 			'aoMap': materialAOMapRow,
 			'side': materialSideRow,
@@ -834,64 +670,6 @@ function SidebarMaterial( editor ) {
 		if ( material.depthPacking !== undefined ) {
 
 			materialDepthPacking.setValue( material.depthPacking );
-
-		}
-
-		if ( material.bumpMap !== undefined ) {
-
-			materialBumpMapEnabled.setValue( material.bumpMap !== null );
-
-			if ( material.bumpMap !== null || resetTextureSelectors ) {
-
-				materialBumpMap.setValue( material.bumpMap );
-
-			}
-
-			materialBumpScale.setValue( material.bumpScale );
-
-		}
-
-		if ( material.normalMap !== undefined ) {
-
-			materialNormalMapEnabled.setValue( material.normalMap !== null );
-
-			if ( material.normalMap !== null || resetTextureSelectors ) {
-
-				materialNormalMap.setValue( material.normalMap );
-
-			}
-
-			materialNormalScaleX.setValue( material.normalScale.x );
-			materialNormalScaleY.setValue( material.normalScale.y );
-
-		}
-
-		if ( material.clearcoatNormalMap !== undefined ) {
-
-			materialClearcoatNormalMapEnabled.setValue( material.clearcoatNormalMap !== null );
-
-			if ( material.clearcoatNormalMap !== null || resetTextureSelectors ) {
-
-				materialClearcoatNormalMap.setValue( material.clearcoatNormalMap );
-
-			}
-
-			materialClearcoatNormalScaleX.setValue( material.clearcoatNormalScale.x );
-			materialClearcoatNormalScaleY.setValue( material.clearcoatNormalScale.y );
-
-		}
-
-		if ( material.displacementMap !== undefined ) {
-
-			materialDisplacementMapEnabled.setValue( material.displacementMap !== null );
-
-			if ( material.displacementMap !== null || resetTextureSelectors ) {
-
-				materialDisplacementMap.setValue( material.displacementMap );
-
-			}
-
-			materialDisplacementScale.setValue( material.displacementScale );
 
 		}
 

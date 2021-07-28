@@ -1,8 +1,10 @@
 import * as THREE from '../../build/three.module.js';
 
-import { UICheckbox, UIRow, UIText } from './libs/ui.js';
+import { UICheckbox, UINumber, UIRow, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
+import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
+import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
 
 function SidebarMaterialMapProperty( editor, property, name ) {
 
@@ -16,6 +18,29 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	const map = new UITexture().onChange( onMapChange );
 	container.add( map );
+
+	const mapType = property.replace( 'Map', '' );
+
+	let scale;
+
+	if ( property === 'bumpMap' || property === 'displacementMap' ) {
+
+		scale = new UINumber().setWidth( '30px' ).onChange( onScaleChange );
+		container.add( scale );
+
+	}
+
+	let scaleX, scaleY;
+
+	if ( property === 'normalMap' || property === 'clearcoatNormalMap' ) {
+
+		scaleX = new UINumber().setWidth( '30px' ).onChange( onScaleXYChange );
+		container.add( scaleX );
+
+		scaleY = new UINumber().setWidth( '30px' ).onChange( onScaleXYChange );
+		container.add( scaleY );
+
+	}
 
 	let object = null;
 	let material = null;
@@ -57,6 +82,28 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
+	function onScaleChange() {
+
+		if ( material[ `${ mapType }Scale` ] !== scale.getValue() ) {
+
+			editor.execute( new SetMaterialValueCommand( editor, object, `${ mapType }Scale`, scale.getValue(), 0 /* TODO: currentMaterialSlot */ ) );
+
+		}
+
+	}
+
+	function onScaleXYChange() {
+
+		const value = [ scaleX.getValue(), scaleY.getValue() ];
+
+		if ( material[ `${ mapType }Scale` ].x !== value[ 0 ] || material[ `${ mapType }Scale` ].y !== value[ 1 ] ) {
+
+			editor.execute( new SetMaterialVectorCommand( editor, object, `${ mapType }Scale`, value, 0 /* TODOL currentMaterialSlot */ ) );
+
+		}
+
+	}
+
 	function update() {
 
 		if ( object === null ) return;
@@ -67,7 +114,26 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 		if ( property in material ) {
 
 			enabled.setValue( material[ property ] !== null );
-			if ( enabled.getValue() ) map.setValue( material[ property ] );
+
+			if ( enabled.getValue() ) {
+
+				map.setValue( material[ property ] );
+
+			}
+
+			if ( scale !== undefined ) {
+
+				scale.setValue( material[ `${ mapType }Scale` ] );
+
+			}
+
+			if ( scaleX !== undefined ) {
+
+				scaleX.setValue( material[ `${ mapType }Scale` ].x );
+				scaleY.setValue( material[ `${ mapType }Scale` ].y );
+
+			}
+
 			container.setDisplay( '' );
 
 		} else {
