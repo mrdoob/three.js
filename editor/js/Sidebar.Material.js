@@ -148,6 +148,11 @@ function SidebarMaterial( editor ) {
 	const materialMetalness = new SidebarMaterialNumberProperty( editor, 'metalness', strings.getKey( 'sidebar/material/metalness' ), [ 0, 1 ] );
 	container.add( materialMetalness );
 
+	// reflectivity
+
+	const materialReflectivity = new SidebarMaterialMapProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
+	container.add( materialReflectivity );
+
 	// transmission
 
 	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
@@ -249,17 +254,8 @@ function SidebarMaterial( editor ) {
 
 	// env map
 
-	var materialEnvMapRow = new UIRow();
-	var materialEnvMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialEnvMap = new UITexture( THREE.EquirectangularReflectionMapping ).onChange( updateMaterial );
-	var materialReflectivity = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
-
-	materialEnvMapRow.add( new UIText( strings.getKey( 'sidebar/material/envmap' ) ).setWidth( '90px' ) );
-	materialEnvMapRow.add( materialEnvMapEnabled );
-	materialEnvMapRow.add( materialEnvMap );
-	materialEnvMapRow.add( materialReflectivity );
-
-	container.add( materialEnvMapRow );
+	const materialEnvMap = new SidebarMaterialMapProperty( editor, 'envMap', strings.getKey( 'sidebar/material/envmap' ) );
+	container.add( materialEnvMap );
 
 	// light map
 
@@ -450,32 +446,6 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.envMap !== undefined ) {
-
-				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
-
-				var envMap = envMapEnabled ? materialEnvMap.getValue() : null;
-
-				if ( material.envMap !== envMap ) {
-
-					editor.execute( new SetMaterialMapCommand( editor, currentObject, 'envMap', envMap, currentMaterialSlot ) );
-
-				}
-
-			}
-
-			if ( material.reflectivity !== undefined ) {
-
-				var reflectivity = materialReflectivity.getValue();
-
-				if ( material.reflectivity !== reflectivity ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'reflectivity', reflectivity, currentMaterialSlot ) );
-
-				}
-
-			}
-
 			if ( material.aoMap !== undefined ) {
 
 				var aoMapEnabled = materialAOMapEnabled.getValue() === true;
@@ -579,7 +549,6 @@ function SidebarMaterial( editor ) {
 			'name': materialNameRow,
 			'vertexShader': materialProgramRow,
 			'depthPacking': materialDepthPackingRow,
-			'envMap': materialEnvMapRow,
 			'aoMap': materialAOMapRow,
 			'side': materialSideRow,
 			'size': materialSizeRow,
@@ -670,24 +639,6 @@ function SidebarMaterial( editor ) {
 		if ( material.depthPacking !== undefined ) {
 
 			materialDepthPacking.setValue( material.depthPacking );
-
-		}
-
-		if ( material.envMap !== undefined ) {
-
-			materialEnvMapEnabled.setValue( material.envMap !== null );
-
-			if ( material.envMap !== null || resetTextureSelectors ) {
-
-				materialEnvMap.setValue( material.envMap );
-
-			}
-
-		}
-
-		if ( material.reflectivity !== undefined ) {
-
-			materialReflectivity.setValue( material.reflectivity );
 
 		}
 
