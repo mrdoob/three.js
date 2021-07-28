@@ -13,7 +13,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	const container = new UIRow();
 	container.add( new UIText( name ).setWidth( '90px' ) );
 
-	const enabled = new UICheckbox( false ).onChange( onChange );
+	const enabled = new UICheckbox( false ).setMarginRight( '8px' ).onChange( onChange );
 	container.add( enabled );
 
 	const map = new UITexture().onChange( onMapChange );
@@ -87,6 +87,8 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		}
 
+		enabled.setDisabled( false );
+
 		onChange();
 
 	}
@@ -132,13 +134,14 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		if ( property in material ) {
 
-			enabled.setValue( material[ property ] !== null );
-
-			if ( enabled.getValue() ) {
+			if ( material[ property ] !== null ) {
 
 				map.setValue( material[ property ] );
 
 			}
+
+			enabled.setValue( material[ property ] !== null );
+			enabled.setDisabled( map.getValue() === null );
 
 			if ( intensity !== undefined ) {
 
@@ -174,6 +177,8 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	signals.objectSelected.add( function ( selected ) {
 
 		object = selected;
+
+		map.setValue( null );
 
 		update();
 

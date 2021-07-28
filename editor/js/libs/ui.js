@@ -424,6 +424,12 @@ class UICheckbox extends UIElement {
 
 	}
 
+	setDisabled( boolean ) {
+
+		this.dom.disabled = boolean;
+
+	}
+
 	getValue() {
 
 		return this.dom.checked;
