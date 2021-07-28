@@ -180,6 +180,7 @@ const assets = [
 	'./js/Sidebar.Material.ConstantProperty.js',
 	'./js/Sidebar.Material.MapProperty.js',
 	'./js/Sidebar.Material.NumberProperty.js',
+	'./js/Sidebar.Material.Program.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',
 	'./js/Strings.js',

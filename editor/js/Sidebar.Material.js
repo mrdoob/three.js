@@ -10,6 +10,7 @@ import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.j
 import { SidebarMaterialConstantProperty } from './Sidebar.Material.ConstantProperty.js';
 import { SidebarMaterialMapProperty } from './Sidebar.Material.MapProperty.js';
 import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty.js';
+import { SidebarMaterialProgram } from './Sidebar.Material.Program.js';
 
 var materialClasses = {
 	'LineBasicMaterial': THREE.LineBasicMaterial,
@@ -100,37 +101,8 @@ function SidebarMaterial( editor ) {
 
 	// program
 
-	var materialProgramRow = new UIRow();
-	materialProgramRow.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setWidth( '90px' ) );
-
-	var materialProgramInfo = new UIButton( strings.getKey( 'sidebar/material/info' ) );
-	materialProgramInfo.setMarginRight( '4px' );
-	materialProgramInfo.onClick( function () {
-
-		signals.editScript.dispatch( currentObject, 'programInfo' );
-
-	} );
-	materialProgramRow.add( materialProgramInfo );
-
-	var materialProgramVertex = new UIButton( strings.getKey( 'sidebar/material/vertex' ) );
-	materialProgramVertex.setMarginRight( '4px' );
-	materialProgramVertex.onClick( function () {
-
-		signals.editScript.dispatch( currentObject, 'vertexShader' );
-
-	} );
-	materialProgramRow.add( materialProgramVertex );
-
-	var materialProgramFragment = new UIButton( strings.getKey( 'sidebar/material/fragment' ) );
-	materialProgramFragment.setMarginRight( '4px' );
-	materialProgramFragment.onClick( function () {
-
-		signals.editScript.dispatch( currentObject, 'fragmentShader' );
-
-	} );
-	materialProgramRow.add( materialProgramFragment );
-
-	container.add( materialProgramRow );
+	const materialProgram = new SidebarMaterialProgram( editor, 'vertexShader' );
+	container.add( materialProgram );
 
 	// color
 
@@ -409,9 +381,7 @@ function SidebarMaterial( editor ) {
 
 	function setRowVisibility() {
 
-		var properties = {
-			'vertexShader': materialProgramRow
-		};
+		var properties = {};
 
 		var material = currentObject.material;
 
