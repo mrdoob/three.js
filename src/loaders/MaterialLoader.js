@@ -76,8 +76,9 @@ class MaterialLoader extends Loader {
 		if ( json.metalness !== undefined ) material.metalness = json.metalness;
 		if ( json.sheen !== undefined ) material.sheen = new Color().setHex( json.sheen );
 		if ( json.emissive !== undefined && material.emissive !== undefined ) material.emissive.setHex( json.emissive );
-		if ( json.specularStrength !== undefined ) material.specularStrength = json.specularStrength;
 		if ( json.specular !== undefined && material.specular !== undefined ) material.specular.setHex( json.specular );
+		if ( json.specularIntensity !== undefined ) material.specularIntensity = json.specularIntensity;
+		if ( json.specularTint !== undefined && material.specularTint !== undefined ) material.specularTint.setHex( json.specularTint );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.clearcoat !== undefined ) material.clearcoat = json.clearcoat;
 		if ( json.clearcoatRoughness !== undefined ) material.clearcoatRoughness = json.clearcoatRoughness;
@@ -258,8 +259,9 @@ class MaterialLoader extends Loader {
 		if ( json.emissiveMap !== undefined ) material.emissiveMap = getTexture( json.emissiveMap );
 		if ( json.emissiveIntensity !== undefined ) material.emissiveIntensity = json.emissiveIntensity;
 
-		if ( json.specularStrengthMap !== undefined ) material.specularStrengthMap = getTexture( json.specularStrengthMap );
 		if ( json.specularMap !== undefined ) material.specularMap = getTexture( json.specularMap );
+		if ( json.specularIntensityMap !== undefined ) material.specularIntensityMap = getTexture( json.specularIntensityMap );
+		if ( json.specularTintMap !== undefined ) material.specularTintMap = getTexture( json.specularTintMap );
 
 		if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
 		if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;

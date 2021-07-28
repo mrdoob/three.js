@@ -25,15 +25,15 @@ uniform float opacity;
 #endif
 
 #ifdef SPECULAR
-	uniform float specularStrength;
-	uniform vec3 specular;
+	uniform float specularIntensity;
+	uniform vec3 specularTint;
 
-	#ifdef USE_SPECULARSTRENGTHMAP
-		uniform sampler2D specularStrengthMap;
+	#ifdef USE_SPECULARINTENSITYMAP
+		uniform sampler2D specularIntensityMap;
 	#endif
 
-	#ifdef USE_SPECULARMAP
-		uniform sampler2D specularMap;
+	#ifdef USE_SPECULARTINTMAP
+		uniform sampler2D specularTintMap;
 	#endif
 #endif
 

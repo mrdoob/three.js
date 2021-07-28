@@ -25,10 +25,10 @@ import * as MathUtils from '../math/MathUtils.js';
  *  attenuationDistance: <float>,
  *  attenuationColor: <Color>,
  *
- *  specularStrength: <float>,
- *  specularStrengthMap: new THREE.Texture( <Image> ),
- *  specular: <Color>,
- *  specularMap: new THREE.Texture( <Image> )
+ *  specularIntensity: <float>,
+ *  specularIntensityhMap: new THREE.Texture( <Image> ),
+ *  specularTint: <Color>,
+ *  specularTintMap: new THREE.Texture( <Image> )
  * }
  */
 
@@ -79,10 +79,10 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.attenuationDistance = 0.0;
 		this.attenuationColor = new Color( 1, 1, 1 );
 
-		this.specularStrength = 1.0;
-		this.specularStrengthMap = null;
-		this.specular = new Color( 1, 1, 1 );
-		this.specularMap = null;
+		this.specularIntensity = 1.0;
+		this.specularIntensityMap = null;
+		this.specularTint = new Color( 1, 1, 1 );
+		this.specularTintMap = null;
 
 		this.setValues( parameters );
 
@@ -126,10 +126,10 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.attenuationDistance = source.attenuationDistance;
 		this.attenuationColor.copy( source.attenuationColor );
 
-		this.specularStrength = source.specularStrength;
-		this.specularStrengthMap = source.specularStrengthMap;
-		this.specular.copy( source.specular );
-		this.specularMap = source.specularMap;
+		this.specularIntensity = source.specularIntensity;
+		this.specularIntensityMap = source.specularIntensityMap;
+		this.specularTint.copy( source.specularTint );
+		this.specularTintMap = source.specularTintMap;
 
 		return this;
 

@@ -289,7 +289,6 @@ ShaderLib.physical = {
 
 	uniforms: mergeUniforms( [
 		ShaderLib.standard.uniforms,
-		UniformsLib.specularmap,
 		{
 			clearcoat: { value: 0 },
 			clearcoatMap: { value: null },
@@ -306,9 +305,10 @@ ShaderLib.physical = {
 			thicknessMap: { value: null },
 			attenuationDistance: { value: 0 },
 			attenuationColor: { value: new Color( 0x000000 ) },
-			specularStrength: { value: 0 },
-			specularStrengthMap: { value: null },
-			specular: { value: new Color( 1, 1, 1 ) }
+			specularIntensity: { value: 0 },
+			specularIntensityMap: { value: null },
+			specularTint: { value: new Color( 1, 1, 1 ) },
+			specularTintMap: { value: null },
 		}
 	] ),
 

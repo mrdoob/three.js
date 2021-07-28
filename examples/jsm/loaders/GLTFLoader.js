@@ -908,20 +908,20 @@ class GLTFMaterialsSpecularExtension {
 
 		const extension = materialDef.extensions[ this.name ];
 
-		materialParams.specularStrength = extension.specularFactor !== undefined ? extension.specularFactor : 1.0;
+		materialParams.specularIntensity = extension.specularFactor !== undefined ? extension.specularFactor : 1.0;
 
 		if ( extension.specularTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'specularStrengthMap', extension.specularTexture ) );
+			pending.push( parser.assignTexture( materialParams, 'specularIntensityMap', extension.specularTexture ) );
 
 		}
 
 		const colorArray = extension.specularColorFactor || [ 1, 1, 1 ];
-		materialParams.specular = new Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+		materialParams.specularTint = new Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
 
 		if ( extension.specularColorTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'specularMap', extension.specularColorTexture ).then( function ( texture ) {
+			pending.push( parser.assignTexture( materialParams, 'specularTintMap', extension.specularColorTexture ).then( function ( texture ) {
 
 				texture.encoding = sRGBEncoding;
 
