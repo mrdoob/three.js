@@ -1,6 +1,6 @@
 import * as THREE from '../../build/three.module.js';
 
-import { UIButton, UIInput, UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
+import { UIButton, UIInput, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
@@ -293,13 +293,8 @@ function SidebarMaterial( editor ) {
 
 	// size
 
-	var materialSizeRow = new UIRow();
-	var materialSize = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( update );
-
-	materialSizeRow.add( new UIText( strings.getKey( 'sidebar/material/size' ) ).setWidth( '90px' ) );
-	materialSizeRow.add( materialSize );
-
-	container.add( materialSizeRow );
+	const materialSize = new SidebarMaterialNumberProperty( editor, 'opacity', strings.getKey( 'sidebar/material/size' ), [ 0, Infinity ] );
+	container.add( materialSize );
 
 	// sizeAttenuation
 
@@ -436,17 +431,6 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.size !== undefined ) {
-
-				var size = materialSize.getValue();
-				if ( material.size !== size ) {
-
-					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'size', size, currentMaterialSlot ) );
-
-				}
-
-			}
-
 			if ( material.blending !== undefined ) {
 
 				var blending = parseInt( materialBlending.getValue() );
@@ -473,7 +457,6 @@ function SidebarMaterial( editor ) {
 			'vertexShader': materialProgramRow,
 			'depthPacking': materialDepthPackingRow,
 			'side': materialSideRow,
-			'size': materialSizeRow,
 			'blending': materialBlendingRow
 		};
 
@@ -567,12 +550,6 @@ function SidebarMaterial( editor ) {
 		if ( material.side !== undefined ) {
 
 			materialSide.setValue( material.side );
-
-		}
-
-		if ( material.size !== undefined ) {
-
-			materialSize.setValue( material.size );
 
 		}
 
