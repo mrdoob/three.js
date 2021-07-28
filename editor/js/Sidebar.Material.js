@@ -120,11 +120,6 @@ function SidebarMaterial( editor ) {
 	const materialMetalness = new SidebarMaterialNumberProperty( editor, 'metalness', strings.getKey( 'sidebar/material/metalness' ), [ 0, 1 ] );
 	container.add( materialMetalness );
 
-	// transmission
-
-	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
-	container.add( materialTransmission );
-
 	// clearcoat
 
 	const materialClearcoat = new SidebarMaterialNumberProperty( editor, 'clearcoat', strings.getKey( 'sidebar/material/clearcoat' ), [ 0, 1 ] );
@@ -134,6 +129,26 @@ function SidebarMaterial( editor ) {
 
 	const materialClearcoatRoughness = new SidebarMaterialNumberProperty( editor, 'clearcoatRoughness', strings.getKey( 'sidebar/material/clearcoatroughness' ), [ 0, 1 ] );
 	container.add( materialClearcoatRoughness );
+
+	// transmission
+
+	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
+	container.add( materialTransmission );
+
+	// attenuation
+
+	const materialAttenuation = new SidebarMaterialColorProperty( editor, 'attenuation', strings.getKey( 'sidebar/material/attenuation' ) );
+	container.add( materialAttenuation );
+
+	// attenuation distance
+
+	const materialAttenuationDistance = new SidebarMaterialNumberProperty( editor, 'attenuationDistance', strings.getKey( 'sidebar/material/attenuationDistance' ) );
+	container.add( materialAttenuationDistance );
+
+	// thickness
+
+	const materialThickness = new SidebarMaterialNumberProperty( editor, 'thickness', strings.getKey( 'sidebar/material/thickness' ) );
+	container.add( materialThickness );
 
 	// vertex colors
 
