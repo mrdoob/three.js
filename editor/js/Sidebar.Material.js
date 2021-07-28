@@ -191,8 +191,8 @@ function SidebarMaterial( editor ) {
 	// depth packing
 
 	const materialDepthPackingOptions = {
-		[ THREE.BasicDepthPacking ]: 'BasicDepthPacking',
-		[ THREE.RGBADepthPacking ]: 'RGBADepthPacking'
+		[ THREE.BasicDepthPacking ]: 'Basic',
+		[ THREE.RGBADepthPacking ]: 'RGBA'
 	};
 
 	const materialDepthPacking = new SidebarMaterialConstantProperty( editor, 'depthPacking', strings.getKey( 'sidebar/material/depthPacking' ), materialDepthPackingOptions );
@@ -277,9 +277,9 @@ function SidebarMaterial( editor ) {
 
 	const materialSideOptions = {
 
-		0: strings.getKey( 'sidebar/material/side/front' ),
-		1: strings.getKey( 'sidebar/material/side/back' ),
-		2: strings.getKey( 'sidebar/material/side/double' )
+		0: 'Front',
+		1: 'Back',
+		2: 'Double'
 
 	};
 
@@ -305,12 +305,12 @@ function SidebarMaterial( editor ) {
 
 	const materialBlendingOptions = {
 
-		0: strings.getKey( 'sidebar/material/blending/no' ),
-		1: strings.getKey( 'sidebar/material/blending/normal' ),
-		2: strings.getKey( 'sidebar/material/blending/additive' ),
-		3: strings.getKey( 'sidebar/material/blending/subtractive' ),
-		4: strings.getKey( 'sidebar/material/blending/multiply' ),
-		5: strings.getKey( 'sidebar/material/blending/custom' )
+		0: 'No',
+		1: 'Normal',
+		2: 'Additive',
+		3: 'Subtractive',
+		4: 'Multiply',
+		5: 'Custom'
 
 	};
 
