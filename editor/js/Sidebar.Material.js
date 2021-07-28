@@ -90,6 +90,26 @@ function SidebarMaterial( editor ) {
 	const materialColor = new SidebarMaterialColorProperty( editor, 'color', strings.getKey( 'sidebar/material/color' ) );
 	container.add( materialColor );
 
+	// specular
+
+	const materialSpecular = new SidebarMaterialColorProperty( editor, 'specular', strings.getKey( 'sidebar/material/specular' ) );
+	container.add( materialSpecular );
+
+	// shininess
+
+	const materialShininess = new SidebarMaterialNumberProperty( editor, 'shininess', strings.getKey( 'sidebar/material/shininess' ) );
+	container.add( materialShininess );
+
+	// emissive
+
+	const materialEmissive = new SidebarMaterialColorProperty( editor, 'emissive', strings.getKey( 'sidebar/material/emissive' ) );
+	container.add( materialEmissive );
+
+	// reflectivity
+
+	const materialReflectivity = new SidebarMaterialNumberProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
+	container.add( materialReflectivity );
+
 	// roughness
 
 	const materialRoughness = new SidebarMaterialNumberProperty( editor, 'roughness', strings.getKey( 'sidebar/material/roughness' ), [ 0, 1 ] );
@@ -104,26 +124,6 @@ function SidebarMaterial( editor ) {
 
 	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
 	container.add( materialTransmission );
-
-	// emissive
-
-	const materialEmissive = new SidebarMaterialColorProperty( editor, 'emissive', strings.getKey( 'sidebar/material/emissive' ) );
-	container.add( materialEmissive );
-
-	// specular
-
-	const materialSpecular = new SidebarMaterialColorProperty( editor, 'specular', strings.getKey( 'sidebar/material/specular' ) );
-	container.add( materialSpecular );
-
-	// shininess
-
-	const materialShininess = new SidebarMaterialNumberProperty( editor, 'shininess', strings.getKey( 'sidebar/material/shininess' ) );
-	container.add( materialShininess );
-
-	// reflectivity
-
-	const materialReflectivity = new SidebarMaterialNumberProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
-	container.add( materialReflectivity );
 
 	// clearcoat
 
@@ -154,6 +154,16 @@ function SidebarMaterial( editor ) {
 
 	const materialMap = new SidebarMaterialMapProperty( editor, 'map', strings.getKey( 'sidebar/material/map' ) );
 	container.add( materialMap );
+
+	// specular map
+
+	const materialSpecularMap = new SidebarMaterialMapProperty( editor, 'specularMap', strings.getKey( 'sidebar/material/specularmap' ) );
+	container.add( materialSpecularMap );
+
+	// emissive map
+
+	const materialEmissiveMap = new SidebarMaterialMapProperty( editor, 'emissiveMap', strings.getKey( 'sidebar/material/emissivemap' ) );
+	container.add( materialEmissiveMap );
 
 	// matcap map
 
@@ -195,11 +205,6 @@ function SidebarMaterial( editor ) {
 	const materialMetalnessMap = new SidebarMaterialMapProperty( editor, 'metalnessMap', strings.getKey( 'sidebar/material/metalnessmap' ) );
 	container.add( materialMetalnessMap );
 
-	// specular map
-
-	const materialSpecularMap = new SidebarMaterialMapProperty( editor, 'specularMap', strings.getKey( 'sidebar/material/specularmap' ) );
-	container.add( materialSpecularMap );
-
 	// env map
 
 	const materialEnvMap = new SidebarMaterialMapProperty( editor, 'envMap', strings.getKey( 'sidebar/material/envmap' ) );
@@ -214,11 +219,6 @@ function SidebarMaterial( editor ) {
 
 	const materialAOMap = new SidebarMaterialMapProperty( editor, 'aoMap', strings.getKey( 'sidebar/material/aomap' ) );
 	container.add( materialAOMap );
-
-	// emissive map
-
-	const materialEmissiveMap = new SidebarMaterialMapProperty( editor, 'emissiveMap', strings.getKey( 'sidebar/material/emissivemap' ) );
-	container.add( materialEmissiveMap );
 
 	// gradient map
 
