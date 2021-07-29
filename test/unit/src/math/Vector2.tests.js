@@ -361,6 +361,24 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
+		
+		QUnit.test( "angleTo", ( assert ) => {
+
+			var a = new Vector2( - 0.18851655680720186, 0.9820700116639124 );
+			var b = new Vector2( 0.18851655680720186, - 0.9820700116639124 );
+
+			assert.equal( a.angleTo( a ), 0 );
+			assert.equal( a.angleTo( b ), Math.PI );
+
+ 			var x = new Vector2( 1, 0 );
+			var y = new Vector2( 0, 1 );
+
+			assert.equal( x.angleTo( y ), Math.PI / 2 );
+			assert.equal( y.angleTo( x ), Math.PI / 2 );
+
+			assert.ok( Math.abs( x.angleTo( new Vector2( 1, 1 ) ) - ( Math.PI / 4 ) ) < 0.0000001 );
+
+		} );
 
 		QUnit.todo( "distanceTo", ( assert ) => {
 
