@@ -152,7 +152,6 @@
 		"webgl_materials_physical_reflectivity",
 		"webgl_materials_physical_sheen",
 		"webgl_materials_physical_transmission",
-		"webgl_materials_shaders_fresnel",
 		"webgl_materials_standard",
 		"webgl_materials_subsurface_scattering",
 		"webgl_materials_texture_anisotropy",
