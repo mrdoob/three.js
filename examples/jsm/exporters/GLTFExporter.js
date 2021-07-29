@@ -2291,6 +2291,7 @@ class GLTFMaterialsVolumeExtension {
 		const extensionsUsed = writer.extensionsUsed;
 
 		const extensionDef = {};
+
 		extensionDef.thicknessFactor = material.thickness;
 
 		if ( material.thicknessMap ) {
