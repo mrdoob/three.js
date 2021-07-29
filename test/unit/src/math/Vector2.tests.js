@@ -374,7 +374,7 @@ export default QUnit.module( 'Maths', () => {
 			var y = new Vector2( 0, 1 );
 
 			assert.equal( x.angleTo( y ), Math.PI / 2 );
-			assert.equal( y.angleTo( x ), Math.PI / 2 );
+			assert.equal( y.angleTo( x ), - Math.PI / 2 );
 
 			assert.ok( Math.abs( x.angleTo( new Vector2( 1, 1 ) ) - ( Math.PI / 4 ) ) < 0.0000001 );
 
