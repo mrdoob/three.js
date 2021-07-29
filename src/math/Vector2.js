@@ -371,9 +371,9 @@ class Vector2 {
 
 		const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() )
 
-		if (denominator === 0) return Math.PI / 2;
+		if ( denominator === 0 ) return Math.PI / 2;
 
-		const theta = this.dot(v) / denominator;
+		const theta = this.dot( v ) / denominator;
 		
 		// clamp, to handle numerical problems
 
