@@ -366,7 +366,7 @@ class Vector2 {
 		return angle;
 
 	}
-	
+
 	angleTo( v ) {
 
 		const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() )
