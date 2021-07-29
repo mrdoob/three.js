@@ -367,10 +367,7 @@ class Vector2 {
 
 	angleTo( v ) {
 
-		const dot = this.x * v.x + this.y * v.y;
-		const det = this.x * v.y - this.y * v.x;
-
-		return Math.atan2( det, dot );
+		return Math.atan2( this.cross( v ), this.dot( v ) );
 
 	}
 
