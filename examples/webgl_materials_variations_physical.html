@@ -46,16 +46,12 @@
 
 				scene = new THREE.Scene();
 
-				let hdrCubeRenderTarget = null;
-
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
+					.setDataType( THREE.FloatType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						hdrEquirect.dispose();
-						pmremGenerator.dispose();
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						// Materials
 
@@ -83,7 +79,7 @@
 										clearcoat: 1.0 - alpha,
 										clearcoatRoughness: 1.0 - beta,
 										reflectivity: 1.0 - gamma,
-										envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
+										envMap: ( index % 2 ) == 1 ? texture : null
 									} );
 
 									index ++;
@@ -106,7 +102,7 @@
 
 						}
 
-						scene.background = hdrCubeRenderTarget.texture;
+						scene.background = texture;
 
 					} );
 
@@ -129,14 +125,14 @@
 
 				}
 
-				addLabel( "+clearcoat", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "-clearcoat", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( '+clearcoat', new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( '-clearcoat', new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "+clearcoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "-clearcoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( '+clearcoatRoughness', new THREE.Vector3( 0, - 300, 0 ) );
+				addLabel( '-clearcoatRoughness', new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, - 300 ) );
-				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( '+reflectivity', new THREE.Vector3( 0, 0, - 300 ) );
+				addLabel( '-reflectivity', new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -162,11 +158,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.75;
-
-				//
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				//
 

@@ -7,7 +7,7 @@
 		constructor( manager ) {
 
 			super( manager );
-			this.type = THREE.UnsignedByteType;
+			this.type = THREE.FloatType;
 
 		} // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 

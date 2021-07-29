@@ -84,11 +84,8 @@
 				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
-
 				const rgbeLoader = new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
+					.setDataType( THREE.FloatType )
 					.setPath( 'textures/equirectangular/' );
 
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
@@ -100,13 +97,10 @@
 
 				// environment
 
-				const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+				texture.mapping = THREE.EquirectangularReflectionMapping;
 
-				scene.background = envMap;
-				scene.environment = envMap;
-
-				texture.dispose();
-				pmremGenerator.dispose();
+				scene.background = texture;
+				scene.environment = texture;
 
 				// model
 

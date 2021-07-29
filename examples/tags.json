@@ -30,6 +30,7 @@
 	"webgl_lines_fat": [ "gpu", "stats", "panel" ],
 	"webgl_loader_ttf": [ "text", "font" ],
 	"webgl_loader_pdb": [ "molecules", "css2d" ],
+	"webgl_loader_ldraw": [ "lego" ],
 	"webgl_lod": [ "level", "details" ],
 	"webgl_materials_blending": [ "alpha" ],
 	"webgl_materials_blending_custom": [ "alpha" ],

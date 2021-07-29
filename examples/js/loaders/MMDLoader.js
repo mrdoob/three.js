@@ -960,7 +960,6 @@
 				params.emissive = new THREE.Color().fromArray( material.ambient );
 				params.transparent = params.opacity !== 1.0; //
 
-				params.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 				params.fog = true; // blend
 
 				params.blending = THREE.CustomBlending;

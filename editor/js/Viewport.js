@@ -175,7 +175,8 @@ function Viewport( editor ) {
 
 		raycaster.setFromCamera( mouse, camera );
 
-		return raycaster.intersectObjects( objects );
+		return raycaster.intersectObjects( objects )
+			.filter( intersect => intersect.object.visible === true );
 
 	}
 
@@ -596,7 +597,8 @@ function Viewport( editor ) {
 
 				if ( environmentEquirectangularTexture ) {
 
-					scene.environment = pmremGenerator.fromEquirectangular( environmentEquirectangularTexture ).texture;
+					environmentEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
+					scene.environment = environmentEquirectangularTexture;
 
 				}
 
