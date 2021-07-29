@@ -135,15 +135,15 @@ function SidebarMaterial( editor ) {
 	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
 	container.add( materialTransmission );
 
-	// attenuation
-
-	const materialAttenuation = new SidebarMaterialColorProperty( editor, 'attenuation', strings.getKey( 'sidebar/material/attenuation' ) );
-	container.add( materialAttenuation );
-
 	// attenuation distance
 
 	const materialAttenuationDistance = new SidebarMaterialNumberProperty( editor, 'attenuationDistance', strings.getKey( 'sidebar/material/attenuationDistance' ) );
 	container.add( materialAttenuationDistance );
+
+	// attenuation tint
+
+	const materialAttenuationTint = new SidebarMaterialColorProperty( editor, 'attenuationTint', strings.getKey( 'sidebar/material/attenuationTint' ) );
+	container.add( materialAttenuationTint );
 
 	// thickness
 

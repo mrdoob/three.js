@@ -16,8 +16,8 @@ uniform float opacity;
 #ifdef USE_TRANSMISSION
 	uniform float transmission;
 	uniform float thickness;
-	uniform vec3 attenuation;
 	uniform float attenuationDistance;
+	uniform vec3 attenuationTint;
 #endif
 
 #ifdef REFLECTIVITY

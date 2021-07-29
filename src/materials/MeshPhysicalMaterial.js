@@ -22,8 +22,8 @@ import * as MathUtils from '../math/MathUtils.js';
  *
  *  thickness: <float>,
  *  thicknessMap: new THREE.Texture( <Image> ),
- *  attenuation: <Color>,
  *  attenuationDistance: <float>,
+ *  attenuationTint: <Color>,
  *
  *  specularIntensity: <float>,
  *  specularIntensityhMap: new THREE.Texture( <Image> ),
@@ -76,8 +76,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.thickness = 0.01;
 		this.thicknessMap = null;
-		this.attenuation = new Color( 1, 1, 1 );
 		this.attenuationDistance = 0.0;
+		this.attenuationTint = new Color( 1, 1, 1 );
 
 		this.specularIntensity = 1.0;
 		this.specularIntensityMap = null;
@@ -123,8 +123,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.thickness = source.thickness;
 		this.thicknessMap = source.thicknessMap;
-		this.attenuation.copy( source.attenuation );
 		this.attenuationDistance = source.attenuationDistance;
+		this.attenuationTint.copy( source.attenuationTint );
 
 		this.specularIntensity = source.specularIntensity;
 		this.specularIntensityMap = source.specularIntensityMap;
