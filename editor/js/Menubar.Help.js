@@ -54,6 +54,18 @@ function MenubarHelp( editor ) {
 	} );
 	options.add( option );
 
+	// Manual
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/help/manual' ) );
+	option.onClick( function () {
+
+		window.open( 'https://github.com/mrdoob/three.js/wiki/Editor-Manual', '_blank' );
+
+	} );
+	options.add( option );
+
 	return container;
 
 }

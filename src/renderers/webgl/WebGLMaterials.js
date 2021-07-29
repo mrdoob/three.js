@@ -145,7 +145,7 @@ function WebGLMaterials( properties ) {
 
 			uniforms.envMap.value = envMap;
 
-			uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap._needsFlipEnvMap ) ? - 1 : 1;
+			uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
 
 			uniforms.reflectivity.value = material.reflectivity;
 			uniforms.refractionRatio.value = material.refractionRatio;
@@ -187,6 +187,8 @@ function WebGLMaterials( properties ) {
 		// 10. clearcoat map
 		// 11. clearcoat normal map
 		// 12. clearcoat roughnessMap map
+		// 13. specular intensity map
+		// 14. specular tint map
 
 		let uvScaleMap;
 
@@ -237,6 +239,14 @@ function WebGLMaterials( properties ) {
 		} else if ( material.clearcoatRoughnessMap ) {
 
 			uvScaleMap = material.clearcoatRoughnessMap;
+
+		} else if ( material.specularIntensityMap ) {
+
+			uvScaleMap = material.specularIntensityMap;
+
+		} else if ( material.specularTintMap ) {
+
+			uvScaleMap = material.specularTintMap;
 
 		}
 
@@ -613,7 +623,22 @@ function WebGLMaterials( properties ) {
 		}
 
 		uniforms.attenuationDistance.value = material.attenuationDistance;
-		uniforms.attenuationColor.value.copy( material.attenuationColor );
+		uniforms.attenuationTint.value.copy( material.attenuationTint );
+
+		uniforms.specularIntensity.value = material.specularIntensity;
+		uniforms.specularTint.value.copy( material.specularTint );
+
+		if ( material.specularIntensityMap ) {
+
+			uniforms.specularIntensityMap.value = material.specularIntensityMap;
+
+		}
+
+		if ( material.specularTintMap ) {
+
+			uniforms.specularTintMap.value = material.specularTintMap;
+
+		}
 
 	}
 

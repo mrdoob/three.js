@@ -4,6 +4,7 @@ export default /* glsl */`
 #ifdef PHYSICAL
 	#define REFLECTIVITY
 	#define CLEARCOAT
+	#define SPECULAR
 #endif
 
 uniform vec3 diffuse;
@@ -15,12 +16,25 @@ uniform float opacity;
 #ifdef USE_TRANSMISSION
 	uniform float transmission;
 	uniform float thickness;
-	uniform vec3 attenuationColor;
 	uniform float attenuationDistance;
+	uniform vec3 attenuationTint;
 #endif
 
 #ifdef REFLECTIVITY
 	uniform float reflectivity;
+#endif
+
+#ifdef SPECULAR
+	uniform float specularIntensity;
+	uniform vec3 specularTint;
+
+	#ifdef USE_SPECULARINTENSITYMAP
+		uniform sampler2D specularIntensityMap;
+	#endif
+
+	#ifdef USE_SPECULARTINTMAP
+		uniform sampler2D specularTintMap;
+	#endif
 #endif
 
 #ifdef CLEARCOAT
@@ -83,11 +97,6 @@ void main() {
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
 
-	#ifdef USE_TRANSMISSION
-		float totalTransmission = transmission;
-		float thicknessFactor = thickness;
-	#endif
-
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
 	#include <color_fragment>
@@ -101,10 +110,6 @@ void main() {
 	#include <clearcoat_normal_fragment_maps>
 	#include <emissivemap_fragment>
 
-	vec3 rawDiffuseColor = diffuseColor.rgb;
-
-	#include <transmission_fragment>
-
 	// accumulation
 	#include <lights_physical_fragment>
 	#include <lights_fragment_begin>
@@ -114,7 +119,12 @@ void main() {
 	// modulation
 	#include <aomap_fragment>
 
-	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+	vec3 totalDiffuse = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse;
+	vec3 totalSpecular = reflectedLight.directSpecular + reflectedLight.indirectSpecular;
+
+	#include <transmission_fragment>
+
+	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 

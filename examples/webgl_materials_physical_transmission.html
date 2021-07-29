@@ -9,13 +9,11 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission with Premultiplied Alpha (right) and without (left)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
-			import Stats from './jsm/libs/stats.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -27,37 +25,38 @@
 				opacity: 1,
 				metalness: 0,
 				roughness: 0,
+				reflectivity: 0.5,
+				thickness: 0.01,
+				specularIntensity: 1,
+				specularTint: 0xffffff,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
 			};
 
-			let container, stats;
 			let camera, scene, renderer;
 
-			let hdrCubeRenderTarget;
-			let mesh1, mesh2;
+			let mesh;
 
 			const hdrEquirect = new RGBELoader()
-				.setDataType( THREE.UnsignedByteType )
+				.setDataType( THREE.FloatType )
 				.setPath( 'textures/equirectangular/' )
 				.load( 'royal_esplanade_1k.hdr', function () {
 
+					hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
+
 					init();
-					animate();
+					render();
 
 				} );
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = params.exposure;
@@ -65,19 +64,13 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
-				scene.background = hdrEquirect;
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 0, 120 );
 
 				//
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-				hdrEquirect.dispose();
-				pmremGenerator.dispose();
-
-				scene.background = hdrCubeRenderTarget.texture;
+				scene.background = hdrEquirect;
 
 				//
 
@@ -93,29 +86,25 @@
 					color: params.color,
 					metalness: params.metalness,
 					roughness: params.roughness,
+					reflectivity: params.reflectivity,
 					alphaMap: texture,
-					envMap: hdrCubeRenderTarget.texture,
+					envMap: hdrEquirect,
 					envMapIntensity: params.envMapIntensity,
 					transmission: params.transmission, // use material.transmission for glass materials
+					specularIntensity: params.specularIntensity,
+					specularTint: params.specularTint,
 					opacity: params.opacity,
 					side: THREE.DoubleSide,
 					transparent: true
 				} );
 
-				mesh1 = new THREE.Mesh( geometry, material );
-				mesh1.position.x = - 30.0;
-				scene.add( mesh1 );
-
-				mesh2 = new THREE.Mesh( geometry, material );
-				mesh2.position.x = 30.0;
-				scene.add( mesh2 );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
 
 				//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 10;
 				controls.maxDistance = 150;
 
@@ -129,6 +118,7 @@
 					.onChange( function () {
 
 						material.color.set( params.color );
+						render();
 
 					} );
 
@@ -136,6 +126,7 @@
 					.onChange( function () {
 
 						material.transmission = params.transmission;
+						render();
 
 					} );
 
@@ -143,6 +134,7 @@
 					.onChange( function () {
 
 						material.opacity = params.opacity;
+						render();
 
 					} );
 
@@ -150,6 +142,7 @@
 					.onChange( function () {
 
 						material.metalness = params.metalness;
+						render();
 
 					} );
 
@@ -157,6 +150,39 @@
 					.onChange( function () {
 
 						material.roughness = params.roughness;
+						render();
+
+					} );
+
+				gui.add( params, 'reflectivity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.reflectivity = params.reflectivity;
+						render();
+
+					} );
+
+				gui.add( params, 'thickness', 0, 5, 0.01 )
+					.onChange( function () {
+
+						material.thickness = params.thickness;
+						render();
+
+					} );
+
+				gui.add( params, 'specularIntensity', 0, 1, 0.01 )
+					.onChange( function () {
+
+						material.specularIntensity = params.specularIntensity;
+						render();
+
+					} );
+
+				gui.addColor( params, 'specularTint' )
+					.onChange( function () {
+
+						material.specularTint.set( params.specularTint );
+						render();
 
 					} );
 
@@ -165,6 +191,7 @@
 					.onChange( function () {
 
 						material.envMapIntensity = params.envMapIntensity;
+						render();
 
 					} );
 
@@ -172,6 +199,7 @@
 					.onChange( function () {
 
 						renderer.toneMappingExposure = params.exposure;
+						render();
 
 					} );
 
@@ -188,6 +216,8 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
+
+				render();
 
 			}
 
@@ -207,18 +237,9 @@
 
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				const t = performance.now();
-
-				mesh1.rotation.x = mesh2.rotation.x = t * 0.0002;
-				mesh1.rotation.z = mesh2.rotation.z = - t * 0.0002;
-
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
 
 			}
 

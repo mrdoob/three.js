@@ -14,10 +14,8 @@ import {
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
-import { Color } from '../math/Color.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
@@ -26,6 +24,7 @@ import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
 import { WebGLCubeMaps } from './webgl/WebGLCubeMaps.js';
+import { WebGLCubeUVMaps } from './webgl/WebGLCubeUVMaps.js';
 import { WebGLExtensions } from './webgl/WebGLExtensions.js';
 import { WebGLGeometries } from './webgl/WebGLGeometries.js';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
@@ -268,7 +267,7 @@ function WebGLRenderer( parameters = {} ) {
 	}
 
 	let extensions, capabilities, state, info;
-	let properties, textures, cubemaps, attributes, geometries, objects;
+	let properties, textures, cubemaps, cubeuvmaps, attributes, geometries, objects;
 	let programCache, materials, renderLists, renderStates, clipping, shadowMap;
 
 	let background, morphtargets, bufferRenderer, indexedBufferRenderer;
@@ -293,13 +292,14 @@ function WebGLRenderer( parameters = {} ) {
 		properties = new WebGLProperties();
 		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 		cubemaps = new WebGLCubeMaps( _this );
+		cubeuvmaps = new WebGLCubeUVMaps( _this );
 		attributes = new WebGLAttributes( _gl, capabilities );
 		bindingStates = new WebGLBindingStates( _gl, extensions, attributes, capabilities );
 		geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
 		objects = new WebGLObjects( _gl, geometries, attributes, info );
 		morphtargets = new WebGLMorphtargets( _gl );
 		clipping = new WebGLClipping( properties );
-		programCache = new WebGLPrograms( _this, cubemaps, extensions, capabilities, bindingStates, clipping );
+		programCache = new WebGLPrograms( _this, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping );
 		materials = new WebGLMaterials( properties );
 		renderLists = new WebGLRenderLists( properties );
 		renderStates = new WebGLRenderStates( extensions, capabilities );
@@ -375,14 +375,6 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.getSize = function ( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'WebGLRenderer: .getsize() now requires a Vector2 as an argument' );
-
-			target = new Vector2();
-
-		}
-
 		return target.set( _width, _height );
 
 	};
@@ -415,14 +407,6 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.getDrawingBufferSize = function ( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'WebGLRenderer: .getdrawingBufferSize() now requires a Vector2 as an argument' );
-
-			target = new Vector2();
-
-		}
-
 		return target.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
 
 	};
@@ -442,14 +426,6 @@ function WebGLRenderer( parameters = {} ) {
 	};
 
 	this.getCurrentViewport = function ( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'WebGLRenderer: .getCurrentViewport() now requires a Vector4 as an argument' );
-
-			target = new Vector4();
-
-		}
 
 		return target.copy( _currentViewport );
 
@@ -527,14 +503,6 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.getClearColor = function ( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'WebGLRenderer: .getClearColor() now requires a Color as an argument' );
-
-			target = new Color();
-
-		}
-
 		return target.copy( background.getClearColor() );
 
 	};
@@ -598,6 +566,7 @@ function WebGLRenderer( parameters = {} ) {
 		renderStates.dispose();
 		properties.dispose();
 		cubemaps.dispose();
+		cubeuvmaps.dispose();
 		objects.dispose();
 		bindingStates.dispose();
 
@@ -799,7 +768,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		if ( material.morphTargets || material.morphNormals ) {
+		if ( geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined ) {
 
 			morphtargets.update( object, geometry, material, program );
 
@@ -908,6 +877,8 @@ function WebGLRenderer( parameters = {} ) {
 		currentRenderState = renderStates.get( scene );
 		currentRenderState.init();
 
+		renderStateStack.push( currentRenderState );
+
 		scene.traverseVisible( function ( object ) {
 
 			if ( object.isLight && object.layers.test( camera.layers ) ) {
@@ -951,6 +922,9 @@ function WebGLRenderer( parameters = {} ) {
 			}
 
 		} );
+
+		renderStateStack.pop();
+		currentRenderState = null;
 
 	};
 
@@ -1086,13 +1060,13 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( _currentRenderTarget !== null ) {
 
-			// Generate mipmap if we're using any kind of mipmap filtering
-
-			textures.updateRenderTargetMipmap( _currentRenderTarget );
-
 			// resolve multisample renderbuffers to a single-sample texture if necessary
 
 			textures.updateMultisampleRenderTarget( _currentRenderTarget );
+
+			// Generate mipmap if we're using any kind of mipmap filtering
+
+			textures.updateRenderTargetMipmap( _currentRenderTarget );
 
 		}
 
@@ -1274,6 +1248,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
 				generateMipmaps: true,
+				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
 				minFilter: LinearMipmapLinearFilter,
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
@@ -1286,7 +1261,14 @@ function WebGLRenderer( parameters = {} ) {
 		_this.setRenderTarget( _transmissionRenderTarget );
 		_this.clear();
 
+		// Turn off the features which can affect the frag color for opaque objects pass.
+		// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
+		const currentToneMapping = _this.toneMapping;
+		_this.toneMapping = NoToneMapping;
+
 		renderObjects( opaqueObjects, scene, camera );
+
+		_this.toneMapping = currentToneMapping;
 
 		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
@@ -1301,28 +1283,28 @@ function WebGLRenderer( parameters = {} ) {
 
 		const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
 
-		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
+		if ( camera.isArrayCamera ) {
 
-			const renderItem = renderList[ i ];
+			const cameras = camera.cameras;
 
-			const object = renderItem.object;
-			const geometry = renderItem.geometry;
-			const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
-			const group = renderItem.group;
+			for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
-			if ( camera.isArrayCamera ) {
+				const camera2 = cameras[ i ];
 
-				const cameras = camera.cameras;
+				state.viewport( _currentViewport.copy( camera2.viewport ) );
 
-				for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
+				currentRenderState.setupLightsView( camera2 );
 
-					const camera2 = cameras[ j ];
+				for ( let j = 0, jl = renderList.length; j < jl; j ++ ) {
+
+					const renderItem = renderList[ j ];
+
+					const object = renderItem.object;
+					const geometry = renderItem.geometry;
+					const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
+					const group = renderItem.group;
 
 					if ( object.layers.test( camera2.layers ) ) {
-
-						state.viewport( _currentViewport.copy( camera2.viewport ) );
-
-						currentRenderState.setupLightsView( camera2 );
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
@@ -1330,7 +1312,18 @@ function WebGLRenderer( parameters = {} ) {
 
 				}
 
-			} else {
+			}
+
+		} else {
+
+			for ( let j = 0, jl = renderList.length; j < jl; j ++ ) {
+
+				const renderItem = renderList[ j ];
+
+				const object = renderItem.object;
+				const geometry = renderItem.geometry;
+				const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
+				const group = renderItem.group;
 
 				renderObject( object, scene, camera, geometry, material, group );
 
@@ -1403,7 +1396,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 		materialProperties.fog = scene.fog;
-		materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment );
+		materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
 
 		if ( programs === undefined ) {
 
@@ -1504,9 +1497,12 @@ function WebGLRenderer( parameters = {} ) {
 		materialProperties.outputEncoding = parameters.outputEncoding;
 		materialProperties.instancing = parameters.instancing;
 		materialProperties.skinning = parameters.skinning;
+		materialProperties.morphTargets = parameters.morphTargets;
+		materialProperties.morphNormals = parameters.morphNormals;
 		materialProperties.numClippingPlanes = parameters.numClippingPlanes;
 		materialProperties.numIntersection = parameters.numClipIntersection;
 		materialProperties.vertexAlphas = parameters.vertexAlphas;
+		materialProperties.vertexTangents = parameters.vertexTangents;
 
 	}
 
@@ -1519,8 +1515,11 @@ function WebGLRenderer( parameters = {} ) {
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
-		const envMap = cubemaps.get( material.envMap || environment );
+		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && object.geometry && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
+		const vertexTangents = object.geometry && object.geometry.attributes.tangent;
+		const morphTargets = object.geometry && object.geometry.morphAttributes.position;
+		const morphNormals = object.geometry && object.geometry.morphAttributes.normal;
 
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;
@@ -1587,6 +1586,18 @@ function WebGLRenderer( parameters = {} ) {
 				needsProgramChange = true;
 
 			} else if ( materialProperties.vertexAlphas !== vertexAlphas ) {
+
+				needsProgramChange = true;
+
+			} else if ( materialProperties.vertexTangents !== vertexTangents ) {
+
+				needsProgramChange = true;
+
+			} else if ( materialProperties.morphTargets !== morphTargets ) {
+
+				needsProgramChange = true;
+
+			} else if ( materialProperties.morphNormals !== morphNormals ) {
 
 				needsProgramChange = true;
 
@@ -2066,6 +2077,7 @@ function WebGLRenderer( parameters = {} ) {
 		if ( capabilities.isWebGL2 ) {
 
 			// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
+			// Not needed in Chrome 93+
 
 			if ( glFormat === _gl.RGB ) glFormat = _gl.RGB8;
 			if ( glFormat === _gl.RGBA ) glFormat = _gl.RGBA8;

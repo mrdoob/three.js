@@ -56,7 +56,7 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 } // validated
 
-vec3 F_Schlick( const in vec3 specularColor, const in float dotVH ) {
+vec3 F_Schlick( const in vec3 f0, const in vec3 f90, const in float dotVH ) {
 
 	// Original approximation by Christophe Schlick '94
 	// float fresnel = pow( 1.0 - dotVH, 5.0 );
@@ -65,7 +65,7 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotVH ) {
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
 	float fresnel = exp2( ( -5.55473 * dotVH - 6.98316 ) * dotVH );
 
-	return ( 1.0 - specularColor ) * fresnel + specularColor;
+	return ( f90 - f0 ) * fresnel + f0;
 
 } // validated
 
@@ -125,7 +125,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 }
 
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
-vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
+vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in vec3 f90, const in float roughness ) {
 
 	float alpha = pow2( roughness ); // UE4's roughness
 
@@ -136,7 +136,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 view
 	float dotNH = saturate( dot( normal, halfDir ) );
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, dotLH );
+	vec3 F = F_Schlick( f0, f90, dotLH );
 
 	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
@@ -318,7 +318,7 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, dotLH );
+	vec3 F = F_Schlick( specularColor, vec3( 1.0 ), dotLH );
 
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 

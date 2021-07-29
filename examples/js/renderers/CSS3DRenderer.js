@@ -12,6 +12,8 @@
 			this.element = element || document.createElement( 'div' );
 			this.element.style.position = 'absolute';
 			this.element.style.pointerEvents = 'auto';
+			this.element.style.userSelect = 'none';
+			this.element.setAttribute( 'draggable', false );
 			this.addEventListener( 'removed', function () {
 
 				this.traverse( function ( object ) {

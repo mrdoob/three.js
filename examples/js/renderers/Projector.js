@@ -447,10 +447,10 @@
 								let x = positions[ i ];
 								let y = positions[ i + 1 ];
 								let z = positions[ i + 2 ];
+								const morphTargets = geometry.morphAttributes.position;
 
-								if ( material.morphTargets === true ) {
+								if ( morphTargets !== undefined ) {
 
-									const morphTargets = geometry.morphAttributes.position;
 									const morphTargetsRelative = geometry.morphTargetsRelative;
 									const morphInfluences = object.morphTargetInfluences;
 

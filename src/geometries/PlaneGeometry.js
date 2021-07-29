@@ -76,6 +76,12 @@ class PlaneGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new PlaneGeometry( data.width, data.height, data.widthSegments, data.heightSegments );
+
+	}
+
 }
 
 export { PlaneGeometry, PlaneGeometry as PlaneBufferGeometry };

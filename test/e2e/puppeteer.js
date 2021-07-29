@@ -1,15 +1,3 @@
-
-try {
-
-	require( 'puppeteer' );
-
-} catch {
-
-	console.log( 'Error: Can\'t find Puppeteer. Run `npm install --prefix test`.' );
-	process.exit( 0 );
-
-}
-
 const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );

@@ -68,6 +68,8 @@ class Texture extends EventDispatcher {
 		this.version = 0;
 		this.onUpdate = null;
 
+		this.isRenderTargetTexture = false;
+
 	}
 
 	updateMatrix() {
