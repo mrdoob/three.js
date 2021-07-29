@@ -1,5 +1,3 @@
-import * as MathUtils from './MathUtils.js';
-
 class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
@@ -369,15 +367,10 @@ class Vector2 {
 
 	angleTo( v ) {
 
-		const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
+		const dot = this.x * v.x + this.y * v.y;
+		const det = this.x * v.y - this.y * v.x;
 
-		if ( denominator === 0 ) return Math.PI / 2;
-
-		const theta = this.dot( v ) / denominator;
-
-		// clamp, to handle numerical problems
-
-		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
+		return Math.atan2( det, dot );
 
 	}
 
