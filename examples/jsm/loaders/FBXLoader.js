@@ -2,7 +2,6 @@ import {
 	AmbientLight,
 	AnimationClip,
 	Bone,
-	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
