@@ -162,7 +162,7 @@ class WebGPURenderer {
 
 		const compiler = await glslang();
 
-		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'gpupresent' );
+		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
 
 		const swapChain = context.configure( {
 			device: device,
