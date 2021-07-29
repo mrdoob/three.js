@@ -23,7 +23,7 @@ export default /* glsl */`
 	vec3 transmission = transmissionFactor * getIBLVolumeRefraction(
 		normal, v, roughnessFactor, material.diffuseColor, material.specularColor,
 		pos, modelMatrix, viewMatrix, projectionMatrix, ior, thicknessFactor,
-		attenuation, attenuationDistance );
+		attenuationTint, attenuationDistance );
 
 	totalDiffuse = mix( totalDiffuse, transmission, transmissionFactor );
 #endif
