@@ -190,7 +190,6 @@ function smoothNormals( faces, lineSegments ) {
 
 	const hardEdges = new Set();
 	const halfEdgeList = {};
-	const fullHalfEdgeList = {};
 	const normals = [];
 
 	// Save the list of hard edges by hash
@@ -227,7 +226,6 @@ function smoothNormals( faces, lineSegments ) {
 				tri: tri
 			};
 			halfEdgeList[ hash ] = info;
-			fullHalfEdgeList[ hash ] = info;
 
 		}
 
@@ -252,16 +250,14 @@ function smoothNormals( faces, lineSegments ) {
 		}
 
 		// Exhaustively find all connected faces
-		let i = 0;
 		const queue = [ halfEdge ];
-		while ( i < queue.length ) {
+		while ( queue.length > 0 ) {
 
 			// initialize all vertex normals in this triangle
-			const tri = queue[ i ].tri;
+			const tri = queue.pop().tri;
 			const vertices = tri.vertices;
 			const vertNormals = tri.normals;
 			const faceNormal = tri.faceNormal;
-			i ++;
 
 			// Check if any edge is connected to another triangle edge
 			const vertCount = vertices.length;
@@ -277,7 +273,7 @@ function smoothNormals( faces, lineSegments ) {
 				delete halfEdgeList[ hash ];
 
 				const reverseHash = hashEdge( v1, v0 );
-				const otherInfo = fullHalfEdgeList[ reverseHash ];
+				const otherInfo = halfEdgeList[ reverseHash ];
 				if ( otherInfo ) {
 
 					const otherTri = otherInfo.tri;
