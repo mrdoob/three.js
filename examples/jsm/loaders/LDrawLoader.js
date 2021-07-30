@@ -168,7 +168,7 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 }
 
-function smoothNormals( triangles, lineSegments ) {
+function smoothNormals( faces, lineSegments ) {
 
 	function hashVertex( v ) {
 
@@ -206,9 +206,9 @@ function smoothNormals( triangles, lineSegments ) {
 	}
 
 	// track the half edges associated with each triangle
-	for ( let i = 0, l = triangles.length; i < l; i ++ ) {
+	for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-		const tri = triangles[ i ];
+		const tri = faces[ i ];
 		const vertices = tri.vertices;
 		const vertCount = vertices.length;
 		for ( let i2 = 0; i2 < vertCount; i2 ++ ) {
@@ -233,10 +233,10 @@ function smoothNormals( triangles, lineSegments ) {
 
 	}
 
-	// Iterate until we've tried to connect all triangles to share normals
+	// Iterate until we've tried to connect all faces to share normals
 	while ( true ) {
 
-		// Stop if there are no more triangles left
+		// Stop if there are no more faces left
 		let halfEdge = null;
 		for ( const key in halfEdgeList ) {
 
@@ -251,7 +251,7 @@ function smoothNormals( triangles, lineSegments ) {
 
 		}
 
-		// Exhaustively find all connected triangles
+		// Exhaustively find all connected faces
 		let i = 0;
 		const queue = [ halfEdge ];
 		while ( i < queue.length ) {
@@ -286,7 +286,7 @@ function smoothNormals( triangles, lineSegments ) {
 					const otherVertCount = otherNormals.length;
 					const otherFaceNormal = otherTri.faceNormal;
 
-					// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
+					// NOTE: If the angle between faces is > 67.5 degrees then assume it's
 					// hard edge. There are some cases where the line segments do not line up exactly
 					// with or span multiple triangle edges (see Lunar Vehicle wheels).
 					if ( Math.abs( otherTri.faceNormal.dot( tri.faceNormal ) ) < 0.25 ) {
@@ -481,7 +481,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 	// Creates a LineSegments (elementSize = 2) or a Mesh (elementSize = 3 )
 	// With per face / segment material, implemented with mesh groups and materials array
 
-	// Sort the triangles or line segments by colour code to make later the mesh groups
+	// Sort the faces or line segments by colour code to make later the mesh groups
 	elements.sort( sortByMaterial );
 
 	if ( totalElements === null ) {
@@ -788,7 +788,7 @@ class LDrawLoader extends Loader {
 			// If false, it is a root material scope previous to parse
 			isFromParse: true,
 
-			triangles: null,
+			faces: null,
 			lineSegments: null,
 			conditionalSegments: null,
 			totalFaces: 0,
@@ -1149,7 +1149,7 @@ class LDrawLoader extends Loader {
 		const currentParseScope = this.getCurrentParseScope();
 
 		// Parse result variables
-		let triangles;
+		let faces;
 		let lineSegments;
 		let conditionalSegments;
 
@@ -1290,7 +1290,7 @@ class LDrawLoader extends Loader {
 
 								type = lp.getToken();
 
-								currentParseScope.triangles = [];
+								currentParseScope.faces = [];
 								currentParseScope.lineSegments = [];
 								currentParseScope.conditionalSegments = [];
 								currentParseScope.type = type;
@@ -1316,7 +1316,7 @@ class LDrawLoader extends Loader {
 
 								}
 
-								triangles = currentParseScope.triangles;
+								faces = currentParseScope.faces;
 								lineSegments = currentParseScope.lineSegments;
 								conditionalSegments = currentParseScope.conditionalSegments;
 
@@ -1576,7 +1576,7 @@ class LDrawLoader extends Loader {
 						.crossVectors( _tempVec0, _tempVec1 )
 						.normalize();
 
-					triangles.push( {
+					faces.push( {
 						material: material,
 						colourCode: material.userData.code,
 						faceNormal: faceNormal,
@@ -1587,7 +1587,7 @@ class LDrawLoader extends Loader {
 
 					if ( doubleSided === true ) {
 
-						triangles.push( {
+						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
 							faceNormal: faceNormal,
@@ -1633,7 +1633,7 @@ class LDrawLoader extends Loader {
 
 					// specifically place the triangle diagonal in the v0 and v1 slots so we can
 					// account for the doubling of vertices later when smoothing normals.
-					triangles.push( {
+					faces.push( {
 						material: material,
 						colourCode: material.userData.code,
 						faceNormal: faceNormal,
@@ -1644,7 +1644,7 @@ class LDrawLoader extends Loader {
 
 					if ( doubleSided === true ) {
 
-						triangles.push( {
+						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
 							faceNormal: faceNormal,
@@ -1776,7 +1776,7 @@ class LDrawLoader extends Loader {
 
 			if ( scope.smoothNormals && parseScope.type === 'Part' ) {
 
-				smoothNormals( parseScope.triangles, parseScope.lineSegments );
+				smoothNormals( parseScope.faces, parseScope.lineSegments );
 
 			}
 
@@ -1785,9 +1785,9 @@ class LDrawLoader extends Loader {
 
 				const objGroup = parseScope.groupObject;
 
-				if ( parseScope.triangles.length > 0 ) {
+				if ( parseScope.faces.length > 0 ) {
 
-					objGroup.add( createObject( parseScope.triangles, 3, false, parseScope.totalFaces ) );
+					objGroup.add( createObject( parseScope.faces, 3, false, parseScope.totalFaces ) );
 
 				}
 
@@ -1819,11 +1819,11 @@ class LDrawLoader extends Loader {
 				const separateObjects = scope.separateObjects;
 				const parentLineSegments = parentParseScope.lineSegments;
 				const parentConditionalSegments = parentParseScope.conditionalSegments;
-				const parentTriangles = parentParseScope.triangles;
+				const parentFaces = parentParseScope.faces;
 
 				const lineSegments = parseScope.lineSegments;
 				const conditionalSegments = parseScope.conditionalSegments;
-				const triangles = parseScope.triangles;
+				const faces = parseScope.faces;
 
 				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
@@ -1860,9 +1860,9 @@ class LDrawLoader extends Loader {
 
 				}
 
-				for ( let i = 0, l = triangles.length; i < l; i ++ ) {
+				for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-					const tri = triangles[ i ];
+					const tri = faces[ i ];
 
 					if ( separateObjects ) {
 
@@ -1879,7 +1879,7 @@ class LDrawLoader extends Loader {
 
 					}
 
-					parentTriangles.push( tri );
+					parentFaces.push( tri );
 
 				}
 
