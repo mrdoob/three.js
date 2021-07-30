@@ -259,20 +259,9 @@ function smoothNormals( triangles, lineSegments ) {
 			// initialize all vertex normals in this triangle
 			const tri = queue[ i ].tri;
 			const vertices = tri.vertices;
-			const triNormals = tri.normals;
-			i ++;
-
+			const vertNormals = tri.normals;
 			const faceNormal = tri.faceNormal;
-			for ( let j = 0, lj = triNormals.length; j < lj; j ++ ) {
-
-				if ( triNormals[ j ] === null ) {
-
-					triNormals[ j ] = faceNormal.clone();
-					normals.push( triNormals[ j ] );
-
-				}
-
-			}
+			i ++;
 
 			// Check if any edge is connected to another triangle edge
 			const vertCount = vertices.length;
@@ -295,6 +284,7 @@ function smoothNormals( triangles, lineSegments ) {
 					const otherIndex = otherInfo.index;
 					const otherNormals = otherTri.normals;
 					const otherVertCount = otherNormals.length;
+					const otherFaceNormal = otherTri.faceNormal;
 
 					// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
 					// hard edge. There are some cases where the line segments do not line up exactly
@@ -315,21 +305,50 @@ function smoothNormals( triangles, lineSegments ) {
 
 					}
 
-					// TODO: there are cases where the other tri already has a different normal??
+					// share the first normal
 					const otherNext = ( otherIndex + 1 ) % otherVertCount;
-					if ( otherNormals[ otherIndex ] === null ) {
+					let sharedNormal1 = vertNormals[ index ] || otherNormals[ otherNext ];
+					if ( sharedNormal1 === null ) {
 
-						const norm = triNormals[ next ];
-						otherNormals[ otherIndex ] = norm;
-						norm.add( otherTri.faceNormal );
+						sharedNormal1 = new Vector3();
+						normals.push( sharedNormal1 );
+
+					}
+
+					if ( vertNormals[ index ] === null ) {
+
+						vertNormals[ index ] = sharedNormal1;
+						sharedNormal1.add( faceNormal );
 
 					}
 
 					if ( otherNormals[ otherNext ] === null ) {
 
-						const norm = triNormals[ index ];
-						otherNormals[ otherNext ] = norm;
-						norm.add( otherTri.faceNormal );
+						otherNormals[ otherNext ] = sharedNormal1;
+						sharedNormal1.add( otherFaceNormal );
+
+					}
+
+					// share the second normal
+					let sharedNormal2 = vertNormals[ next ] || otherNormals[ otherIndex ];
+					if ( sharedNormal2 === null ) {
+
+						sharedNormal2 = new Vector3();
+						normals.push( sharedNormal2 );
+
+					}
+
+					if ( vertNormals[ next ] === null ) {
+
+						vertNormals[ next ] = sharedNormal2;
+						sharedNormal2.add( faceNormal );
+
+					}
+
+					if ( otherNormals[ otherIndex ] === null ) {
+
+						otherNormals[ otherIndex ] = sharedNormal2;
+						sharedNormal2.add( otherFaceNormal );
 
 					}
 
