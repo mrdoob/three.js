@@ -263,24 +263,10 @@ function smoothNormals( triangles, lineSegments ) {
 			i ++;
 
 			const faceNormal = tri.faceNormal;
-			if ( triNormals[ 0 ] === null ) {
+			for ( let j = 0, lj = triNormals.length; j < lj; j ++ ) {
 
-				triNormals[ 0 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
-				normals.push( triNormals[ 0 ] );
-
-			}
-
-			if ( triNormals[ 1 ] === null ) {
-
-				triNormals[ 1 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
-				normals.push( triNormals[ 1 ] );
-
-			}
-
-			if ( triNormals[ 2 ] === null ) {
-
-				triNormals[ 2 ] = faceNormal.clone();
-				normals.push( triNormals[ 2 ] );
+				triNormals[ j ] = faceNormal.clone();
+				normals.push( triNormals[ j ] );
 
 			}
 
@@ -330,9 +316,7 @@ function smoothNormals( triangles, lineSegments ) {
 
 						const norm = triNormals[ next ];
 						otherNormals[ otherIndex ] = norm;
-
-						const isDoubledVert = otherTri.fromQuad && otherIndex !== 2;
-						norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
+						norm.add( otherTri.faceNormal );
 
 					}
 
@@ -340,9 +324,7 @@ function smoothNormals( triangles, lineSegments ) {
 
 						const norm = triNormals[ index ];
 						otherNormals[ otherNext ] = norm;
-
-						const isDoubledVert = otherTri.fromQuad && otherNext !== 2;
-						norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
+						norm.add( otherTri.faceNormal );
 
 					}
 
@@ -470,7 +452,7 @@ function sortByMaterial( a, b ) {
 
 }
 
-function createObject( elements, elementSize, isConditionalSegments ) {
+function createObject( elements, elementSize, isConditionalSegments = false, totalElements = null ) {
 
 	// Creates a LineSegments (elementSize = 2) or a Mesh (elementSize = 3 )
 	// With per face / segment material, implemented with mesh groups and materials array
@@ -478,10 +460,17 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 	// Sort the triangles or line segments by colour code to make later the mesh groups
 	elements.sort( sortByMaterial );
 
-	const positions = new Float32Array( elementSize * elements.length * 3 );
-	const normals = elementSize === 3 ? new Float32Array( elementSize * elements.length * 3 ) : null;
+	if ( totalElements === null ) {
+
+		totalElements = elements.length;
+
+	}
+
+	const positions = new Float32Array( elementSize * totalElements * 3 );
+	const normals = elementSize === 3 ? new Float32Array( elementSize * totalElements * 3 ) : null;
 	const materials = [];
 
+	const quadArray = new Array( 6 );
 	const bufferGeometry = new BufferGeometry();
 	let prevMaterial = null;
 	let index0 = 0;
@@ -491,7 +480,18 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 	for ( let iElem = 0, nElem = elements.length; iElem < nElem; iElem ++ ) {
 
 		const elem = elements[ iElem ];
-		const vertices = elem.vertices;
+		let vertices = elem.vertices;
+		if ( vertices.length === 4 ) {
+
+			quadArray[ 0 ] = vertices[ 0 ];
+			quadArray[ 1 ] = vertices[ 1 ];
+			quadArray[ 2 ] = vertices[ 2 ];
+			quadArray[ 3 ] = vertices[ 0 ];
+			quadArray[ 4 ] = vertices[ 2 ];
+			quadArray[ 5 ] = vertices[ 3 ];
+			vertices = quadArray;
+
+		}
 
 		for ( let j = 0, l = vertices.length; j < l; j ++ ) {
 
@@ -505,7 +505,19 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 
 		if ( elementSize === 3 ) {
 
-			const elemNormals = elem.normals;
+			let elemNormals = elem.normals;
+			if ( vertices.length === 4 ) {
+
+				quadArray[ 0 ] = elemNormals[ 0 ];
+				quadArray[ 1 ] = elemNormals[ 1 ];
+				quadArray[ 2 ] = elemNormals[ 2 ];
+				quadArray[ 3 ] = elemNormals[ 0 ];
+				quadArray[ 4 ] = elemNormals[ 2 ];
+				quadArray[ 5 ] = elemNormals[ 3 ];
+				elemNormals = quadArray;
+
+			}
+
 			for ( let j = 0, l = vertices.length; j < l; j ++ ) {
 
 				const n = elemNormals[ j ] || elem.faceNormal;
@@ -518,8 +530,6 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 
 		}
 
-		offset += 3 * vertices.length;
-
 		if ( prevMaterial !== elem.material ) {
 
 			if ( prevMaterial !== null ) {
@@ -531,14 +541,16 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 			materials.push( elem.material );
 
 			prevMaterial = elem.material;
-			index0 = iElem * elementSize;
-			numGroupVerts = elementSize;
+			index0 = offset / 3;
+			numGroupVerts = vertices.length;
 
 		} else {
 
-			numGroupVerts += elementSize;
+			numGroupVerts += vertices.length;
 
 		}
+
+		offset += 3 * vertices.length;
 
 	}
 
@@ -755,6 +767,7 @@ class LDrawLoader extends Loader {
 			triangles: null,
 			lineSegments: null,
 			conditionalSegments: null,
+			totalFaces: 0,
 
 			// If true, this object is the start of a construction step
 			startingConstructionStep: false
@@ -1543,11 +1556,10 @@ class LDrawLoader extends Loader {
 						material: material,
 						colourCode: material.userData.code,
 						faceNormal: faceNormal,
-						fromQuad: false,
-
 						vertices: [ v0, v1, v2 ],
 						normals: [ null, null, null ],
 					} );
+					currentParseScope.totalFaces ++;
 
 					if ( doubleSided === true ) {
 
@@ -1555,11 +1567,10 @@ class LDrawLoader extends Loader {
 							material: material,
 							colourCode: material.userData.code,
 							faceNormal: faceNormal,
-							fromQuad: false,
-
-							vertices: [ v0, v2, v1 ],
+							vertices: [ v2, v1, v0 ],
 							normals: [ null, null, null ],
 						} );
+						currentParseScope.totalFaces ++;
 
 					}
 
@@ -1602,21 +1613,10 @@ class LDrawLoader extends Loader {
 						material: material,
 						colourCode: material.userData.code,
 						faceNormal: faceNormal,
-						fromQuad: true,
-
-						vertices: [ v2, v0, v1 ],
-						normals: [ null, null, null ],
+						vertices: [ v0, v1, v2, v3 ],
+						normals: [ null, null, null, null ],
 					} );
-
-					triangles.push( {
-						material: material,
-						colourCode: material.userData.code,
-						faceNormal: faceNormal,
-						fromQuad: true,
-
-						vertices: [ v0, v2, v3 ],
-						normals: [ null, null, null ],
-					} );
+					currentParseScope.totalFaces += 2;
 
 					if ( doubleSided === true ) {
 
@@ -1624,21 +1624,10 @@ class LDrawLoader extends Loader {
 							material: material,
 							colourCode: material.userData.code,
 							faceNormal: faceNormal,
-							fromQuad: true,
-
-							vertices: [ v0, v2, v1 ],
-							normals: [ null, null, null ],
+							vertices: [ v3, v2, v1, v0 ],
+							normals: [ null, null, null, null ],
 						} );
-
-						triangles.push( {
-							material: material,
-							colourCode: material.userData.code,
-							faceNormal: faceNormal,
-							fromQuad: true,
-
-							vertices: [ v2, v0, v3 ],
-							normals: [ null, null, null ],
-						} );
+						currentParseScope.totalFaces += 2;
 
 					}
 
@@ -1774,7 +1763,7 @@ class LDrawLoader extends Loader {
 
 				if ( parseScope.triangles.length > 0 ) {
 
-					objGroup.add( createObject( parseScope.triangles, 3 ) );
+					objGroup.add( createObject( parseScope.triangles, 3, false, parseScope.totalFaces ) );
 
 				}
 
@@ -1869,6 +1858,8 @@ class LDrawLoader extends Loader {
 					parentTriangles.push( tri );
 
 				}
+
+				parentParseScope.totalFaces += parseScope.totalFaces;
 
 			}
 
