@@ -12,6 +12,8 @@
 			<div id="info">
 				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a>
+				<br>Rougnness increases left to right
+				<br>Metalness increases top to bottom
 			</div>
 		</div>
 
@@ -20,6 +22,10 @@
 			import * as THREE from '../build/three.module.js';
 
 			let scene, camera, renderer, radianceMap;
+
+			const frustumSize = 14;
+
+			const COLOR = 0xcccccc;
 
 			function init() {
 
@@ -34,13 +40,16 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
 
+				//renderer.outputEncoding = THREE.sRGBEncoding; // optional
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				document.body.addEventListener( 'mouseover', function () {
 
 					scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) child.material.color.setHex( 0xaaaaff );
+						if ( child.isMesh ) child.material.color.setHex( 0xccccff ); // tinted for visibility
+						render();
 
 					} );
 
@@ -51,6 +60,7 @@
 					scene.traverse( function ( child ) {
 
 						if ( child.isMesh ) child.material.color.setHex( 0xffffff );
+						render();
 
 					} );
 
@@ -62,14 +72,14 @@
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
-				camera.position.set( 0, 0, 18 );
+				camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 30 ); 
+				camera.position.set( 0, 0, 10 );
 
 			}
 
 			function createObjects() {
 
-				const geometry = new THREE.SphereGeometry( 0.4, 32, 32 );
+				const geometry = new THREE.SphereGeometry( 0.4, 32, 16 );
 
 				for ( let x = 0; x <= 10; x ++ ) {
 
@@ -81,7 +91,7 @@
 							color: 0xffffff,
 							envMap: radianceMap,
 							envMapIntensity: 1,
-							reflectivity: 1
+							reflectivity: 0.5
 						} );
 
 						const mesh = new THREE.Mesh( geometry, material );
@@ -100,13 +110,14 @@
 				return new Promise( function ( resolve ) {
 
 					const envScene = new THREE.Scene();
-					envScene.background = new THREE.Color( 0xcccccc );
+					envScene.background = new THREE.Color( COLOR ); // sRGB colorspace assumed, apparently
 
 					const pmremGenerator = new THREE.PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 
-					scene.background = radianceMap;
+					scene.background = new THREE.Color( COLOR );
+					if ( renderer.outputEncoding !== THREE.sRGBEncoding ) scene.background.convertSRGBToLinear();
 
 					resolve();
 
@@ -116,19 +127,18 @@
 
 			function onWindowResize() {
 
-				const width = window.innerWidth;
-				const height = window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
-				camera.aspect = width / height;
+				camera.left = - frustumSize * aspect / 2;
+				camera.right = frustumSize * aspect / 2;
+				camera.top = frustumSize / 2;
+				camera.bottom = - frustumSize / 2;
+
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( width, height );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}
-
-			function animate() {
-
-				renderer.setAnimationLoop( render );
+				render();
 
 			}
 
@@ -142,7 +152,7 @@
 				.then( init )
 				.then( createEnvironment )
 				.then( createObjects )
-				.then( animate );
+				.then( render );
 
 		</script>
 	</body>
