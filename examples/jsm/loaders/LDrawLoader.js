@@ -258,28 +258,28 @@ function smoothNormals( triangles, lineSegments ) {
 			// initialize all vertex normals in this triangle
 			const tri = queue[ i ].tri;
 			const vertices = tri.vertices;
-			const normals = tri.normals;
+			const triNormals = tri.normals;
 			i ++;
 
 			const faceNormal = tri.faceNormal;
-			if ( normals[ 0 ] === null ) {
+			if ( triNormals[ 0 ] === null ) {
 
-				normals[ 0 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
-				normals.push( normals[ 0 ] );
-
-			}
-
-			if ( normals[ 1 ] === null ) {
-
-				normals[ 1 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
-				normals.push( normals[ 1 ] );
+				triNormals[ 0 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
+				normals.push( triNormals[ 0 ] );
 
 			}
 
-			if ( normals[ 2 ] === null ) {
+			if ( triNormals[ 1 ] === null ) {
 
-				normals[ 2 ] = faceNormal.clone();
-				normals.push( normals[ 2 ] );
+				triNormals[ 1 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
+				normals.push( triNormals[ 1 ] );
+
+			}
+
+			if ( triNormals[ 2 ] === null ) {
+
+				triNormals[ 2 ] = faceNormal.clone();
+				normals.push( triNormals[ 2 ] );
 
 			}
 
@@ -325,7 +325,7 @@ function smoothNormals( triangles, lineSegments ) {
 					const otherNext = ( otherIndex + 1 ) % 3;
 					if ( otherNormals[ otherIndex ] === null ) {
 
-						const norm = normals[ next ];
+						const norm = triNormals[ next ];
 						otherNormals[ otherIndex ] = norm;
 
 						const isDoubledVert = otherTri.fromQuad && otherIndex !== 2;
@@ -335,7 +335,7 @@ function smoothNormals( triangles, lineSegments ) {
 
 					if ( otherNormals[ otherNext ] === null ) {
 
-						const norm = normals[ index ];
+						const norm = triNormals[ index ];
 						otherNormals[ otherNext ] = norm;
 
 						const isDoubledVert = otherTri.fromQuad && otherNext !== 2;
