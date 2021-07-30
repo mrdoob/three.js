@@ -3,7 +3,6 @@ import {
 	BufferGeometry,
 	Color,
 	FileLoader,
-	Float32BufferAttribute,
 	Group,
 	LineBasicMaterial,
 	LineSegments,
