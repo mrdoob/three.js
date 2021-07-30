@@ -15,9 +15,6 @@ import {
 	Matrix4,
 	MathUtils
 } from '../../../build/three.module.js';
-import {} from 'https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js'
-//import {} from '../libs/hammerjs.module.js';
-
 
 //trackball state
 const STATE = {
@@ -31,6 +28,24 @@ const STATE = {
 	TOUCH_MULTI: Symbol(),
 	ANIMATION_FOCUS: Symbol(),
 	ANIMATION_ROTATE: Symbol()
+
+};
+
+const INPUT = {
+
+	NONE: Symbol(),
+	ONE_FINGER: Symbol(),
+	TWO_FINGER: Symbol(),
+	MULT_FINGER: Symbol(),
+	CURSOR: Symbol()
+
+};
+
+//cursor center coordinates
+const _center = {
+
+	x: 0,
+	y: 0
 
 };
 
@@ -104,11 +119,25 @@ class ArcballControls extends Object3D {
 		this._cameraMatrixState0 = new Matrix4();
 		this._gizmoMatrixState0 = new Matrix4();
 
+		//pointers array
+		this._button = 0;
+		this._touchStart = [];
+		this._touchCurrent = [];
+		this._input = INPUT.NONE;
+
 		//two fingers touch interaction
 		this._startFingerDistance = 0; //distance between two fingers
 		this._currentFingerDistance = 0;
 		this._startFingerRotation = 0; //amount of rotation performed with two fingers
 		this._currentFingerRotation = 0;
+
+		//double tap
+		this._nTaps = 0;
+		this._downStart = 0;
+		this._maxDownTime = 250;
+		this._maxInterval = 300;
+		this._posThreshold = 16;
+		this._movementThreshold = 16;
 
 		//cursor positions
 		this._currentCursorPosition = new Vector3();
@@ -171,43 +200,6 @@ class ArcballControls extends Object3D {
 		this._state = STATE.IDLE;
 		this._prevState = this._state;
 
-		//Hammerjs gestures
-		this._manager = new Hammer.Manager( this.domElement );
-
-		this._press = new Hammer.Press( { event: 'press', pointers: 1, time: 0, enable: false } );
-		this._singlePan = new Hammer.Pan( { event: 'singlepan', pointers: 1, threshold: 0, direction: Hammer.DIRECTION_ALL } );
-		this._doublePan = new Hammer.Pan( { event: 'doublepan', pointers: 2, threshold: 0, direction: Hammer.DIRECTION_ALL } );
-		this._triplePan = new Hammer.Pan( { event: 'triplepan', pointers: 0, threshold: 0, direction: Hammer.DIRECTION_ALL } );
-		this._pinch = new Hammer.Pinch();
-		this._rotate = new Hammer.Rotate();
-		this._doubleTap = new Hammer.Tap( ( { event: 'doubletap', taps: 2, threshold: 6, posThreshold: 20 } ) );
-
-		this._manager.add( [ this._press, this._singlePan, this._doubleTap, this._doublePan, this._triplePan, this._pinch, this._rotate ] );
-
-		this._manager.get( 'singlepan' ).recognizeWith( 'doublepan' );
-		this._manager.get( 'singlepan' ).recognizeWith( 'pinch' );
-		this._manager.get( 'singlepan' ).recognizeWith( 'rotate' );
-		this._manager.get( 'singlepan' ).recognizeWith( 'triplepan' );
-
-		this._manager.get( 'doublepan' ).recognizeWith( 'pinch' );
-		this._manager.get( 'doublepan' ).recognizeWith( 'rotate' );
-		this._manager.get( 'doublepan' ).recognizeWith( 'triplepan' );
-
-		this._manager.get( 'pinch' ).recognizeWith( 'rotate' );
-
-		this._manager.get( 'triplepan' ).recognizeWith( 'rotate' );
-		this._manager.get( 'triplepan' ).recognizeWith( 'pinch' );
-
-		this._manager.get( 'doubletap' ).recognizeWith( 'press' );
-
-
-		this._manager.get( 'triplepan' ).requireFailure( 'singlepan' );
-		this._manager.get( 'triplepan' ).requireFailure( 'pinch' );
-		this._manager.get( 'triplepan' ).requireFailure( 'rotate' );
-		this._manager.get( 'triplepan' ).requireFailure( 'doublepan' );
-
-		this._manager.get( 'rotate' ).recognizeWith( 'pinch' );
-
 		this.setCamera(camera);
 
 		if ( this.scene != null ) {
@@ -216,33 +208,14 @@ class ArcballControls extends Object3D {
 		
 		}
 
-		this._manager.on( 'press', this.onPress );
-		this._manager.on( 'doubletap', this.onDoubleTap );
+		this.domElement.style.touchAction = 'none';
 
-		this._manager.on( 'singlepanstart', this.onSinglePanStart );
-		this._manager.on( 'singlepanmove', this.onSinglePanMove );
-		this._manager.on( 'singlepanend', this.onSinglePanEnd );
-
-		this._manager.on( 'doublepanstart', this.onDoublePanStart );
-		this._manager.on( 'doublepanmove', this.onDoublePanMove );
-		this._manager.on( 'doublepanend', this.onDoublePanEnd );
-
-		this._manager.on( 'pinchstart', this.onPinchStart );
-		this._manager.on( 'pinchmove', this.onPinchMove );
-		this._manager.on( 'pinchend', this.onPinchEnd );
-
-		this._manager.on( 'rotatestart', this.onRotateStart );
-		this._manager.on( 'rotatemove', this.onRotateMove );
-		this._manager.on( 'rotateend', this.onRotateEnd );
-
-		this._manager.on( 'triplepanstart', this.onTriplePanStart );
-		this._manager.on( 'triplepanmove', this.onTriplePanMove );
-		this._manager.on( 'triplepanend', this.onTriplePanEnd );
-
-		this.domElement.addEventListener( 'mousedown', this.onMouseDown );
 		this.domElement.addEventListener( 'wheel', this.onWheel );
+		this.domElement.addEventListener( 'dblclick', this.onDoubleTap );
 
-		document.addEventListener( 'keydown', this.onKeyDown );
+		this.domElement.addEventListener('pointerdown', this.onPointerDown);
+
+		window.addEventListener( 'keydown', this.onKeyDown );
 		window.addEventListener( 'resize', this.onWindowResize );
 
 	};
@@ -270,74 +243,171 @@ class ArcballControls extends Object3D {
 
 	};
 
-	onMouseDown = ( event ) => {
+	onPointerDown = ( event ) => {
 
-		if ( event.button == 1 && this.enabled && this.enablePan ) {
-	
-			event.preventDefault();
-			this.dispatchEvent( _startEvent );
+		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
-			document.addEventListener( 'mousemove', this.onMouseMove );
-			document.addEventListener( 'mouseup', this.onMouseUp );
-	
-			//pan operation
-			this.updateTbState( STATE.PAN, true );
-			this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ) );
-	
-			if ( this.enableGrid ) {
-	
-				this.drawGrid();
-				this.dispatchEvent( _changeEvent );
-	
+			window.addEventListener( 'pointermove', this.onPointerMove );
+			window.addEventListener( 'pointerup', this.onPointerUp );
+
+			this._touchStart.push( event );
+			this._touchCurrent.push( event );
+
+			switch ( this._input ) {
+
+				case INPUT.NONE:
+
+					//singleStart
+					this._input = INPUT.ONE_FINGER;
+					this.onSinglePanStart( event );
+					break;
+
+				case INPUT.ONE_FINGER:
+
+					//doubleStart
+					this._input = INPUT.TWO_FINGER;
+
+					this.onRotateStart();
+					this.onPinchStart();
+					this.onDoublePanStart();
+
+					break;
+
+				case INPUT.TWO_FINGER:
+					
+					//multipleStart
+					this._input = INPUT.MULT_FINGER;
+					this.onTriplePanStart( event );
+					break;
 			}
-	
+
+		} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ){
+
+			window.addEventListener( 'pointermove', this.onPointerMove );
+			window.addEventListener( 'pointerup', this.onPointerUp );
+
+			//singleStart
+			this._input = INPUT.CURSOR;
+			this._button = event.button;
+			this.onSinglePanStart( event );
+
 		}
-	
+
 	};
 
-	onMouseMove = ( event ) => {
+	onPointerMove = ( event ) => {
 
-		if ( this.enabled && this.enablePan ) {
+		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
-			if ( this._state == STATE.PAN ) {
+			for ( let i = 0; i < this._touchCurrent.length; i++ ) {
 
-				//continue with panning routine
-				this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ) );
-				this.applyTransformMatrix( this.pan( this._startCursorPosition, this._currentCursorPosition ) );
-				this.dispatchEvent( _changeEvent );
+				if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
 
-			} else if ( this._state == STATE.IDLE ) {
+					this._touchCurrent.splice( i, 1, event );
+					break;
 
-				//panning was interrupted
-				//update state and restart pan operation
-				this._state = STATE.PAN;
-				this.updateTbState( STATE.PAN, true );
-				this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ) );
-				
+				}
+
 			}
+
+			switch ( this._input ) {
+
+				case INPUT.ONE_FINGER:
+					
+					//singleMove
+					this.onSinglePanMove( event );
+					break;
+
+				case INPUT.TWO_FINGER:
+
+					//rotate/pan/pinchMove
+					this.onRotateMove();
+					this.onPinchMove();
+					this.onDoublePanMove();
+
+					break;
+
+				case INPUT.MULT_FINGER:
+
+					//multMove
+					this.onTriplePanMove( event );
+					break;
+			
+			}
+
+		} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ){
+
+			this.onSinglePanMove( event );
 
 		}
 
 	};
 
 
-	onMouseUp = ( event ) => {
+	onPointerUp = ( event ) => {
 
-		if ( event.button == 1 ) {
+		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
-			this.updateTbState( STATE.IDLE, false );
+			for( let i = 0; i < this._touchCurrent.length; i++ ) {
 
-			document.removeEventListener( 'mousemove', this.onMouseMove );
-			document.removeEventListener( 'mouseup', this.onMouseUp );
+				if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
 
-			if ( this.enableGrid ) {
+					this._touchCurrent.splice( i, 1 );
+					this._touchStart.splice( i, 1 );
+					break;
 
-				this.disposeGrid();
-				this.dispatchEvent( _changeEvent );
+				}
 
 			}
 
-			this.dispatchEvent( _endEvent );
+			switch ( this._input ) {
+
+				case INPUT.ONE_FINGER:
+					
+					//singleEnd
+					this._input = INPUT.NONE;
+					this.onSinglePanEnd();
+
+					break;
+
+				case INPUT.TWO_FINGER:
+
+					//doubleEnd
+					this.onDoublePanEnd( event );
+					this.onPinchEnd( event );
+					this.onRotateEnd( event );
+
+					//singleStart
+					this._input = INPUT.ONE_FINGER;
+					this.onSinglePanStart( this._touchCurrent[ 0 ] );
+
+					break;					
+					
+				case INPUT.MULT_FINGER:
+					
+					if ( this._touchCurrent.length == 0 ) {
+
+						//multCancel
+						this._input = INPUT.NONE;
+						this.onTriplePanEnd();
+
+					}
+
+					break;
+
+			}
+
+			document.removeEventListener( 'pointermove', this.onPointerMove );
+			document.removeEventListener( 'pointerup', this.onPointerUp );
+
+		} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
+
+			this._input = INPUT.NONE;
+			this.onSinglePanEnd();
+			this._button = 0;
+
+			document.removeEventListener( 'pointermove', this.onPointerMove );
+			document.removeEventListener( 'pointerup', this.onPointerUp );
 
 		}
 
@@ -526,11 +596,10 @@ class ArcballControls extends Object3D {
 		if ( this.enabled ) {
 
 			this.dispatchEvent( _startEvent );
-
-			this.domElement.removeEventListener( 'mousedown', this.onMouseDown );
 			
-			const center = event.center;
-			if ( event.srcEvent.ctrlKey || event.srcEvent.metaKey ) {
+			this.setCenter( event.clientX, event.clientY );
+
+			if ( event.ctrlKey || event.metaKey || this._button == 1 ) {
 
 				//pan operation
 
@@ -541,7 +610,7 @@ class ArcballControls extends Object3D {
 				}
 
 				this.updateTbState( STATE.PAN, true );
-				this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement ) );
+				this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ) );
 				if ( this.enableGrid ) {
 
 					this.drawGrid();
@@ -560,7 +629,7 @@ class ArcballControls extends Object3D {
 				}
 
 				this.updateTbState( STATE.ROTATE, true );
-				this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, center.x, center.y, this.domElement, this._tbRadius ) );
+				this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, _center.x, _center.y, this.domElement, this._tbRadius ) );
 				this.activateGizmos( true );
 				if ( this.enableAnimations ) {
 
@@ -585,10 +654,11 @@ class ArcballControls extends Object3D {
 
 		if ( this.enabled ) {
 
-			const center = event.center;
+			this.setCenter( event.clientX, event.clientY );
+
 			if ( this._state == STATE.ROTATE ) {
 
-				if ( event.srcEvent.ctrlKey || event.srcEvent.metaKey ) {
+				if ( event.ctrlKey || event.metaKey || this._button == 1 ) {
 
 					//switch to pan operation
 					this.dispatchEvent( _endEvent );
@@ -602,7 +672,7 @@ class ArcballControls extends Object3D {
 					}
 	
 					this.updateTbState( STATE.PAN, true );
-					this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement ) );
+					this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ) );
 					if ( this.enableGrid ) {
 
 						this.drawGrid();
@@ -621,7 +691,7 @@ class ArcballControls extends Object3D {
 
 					}
 	
-					this._currentCursorPosition.copy( this.unprojectOnTbSurface( this.camera, center.x, center.y, this.domElement, this._tbRadius ) );
+					this._currentCursorPosition.copy( this.unprojectOnTbSurface( this.camera, _center.x, _center.y, this.domElement, this._tbRadius ) );
 
 					const distance = this._startCursorPosition.distanceTo( this._currentCursorPosition );
 					const angle = this._startCursorPosition.angleTo( this._currentCursorPosition );
@@ -648,7 +718,7 @@ class ArcballControls extends Object3D {
 
 			} else if ( this._state == STATE.PAN ) {
 
-				if ( !event.srcEvent.ctrlKey && !event.srcEvent.metaKey ) {
+				if ( !event.ctrlKey && !event.metaKey && this._button != 1 ) {
 
 					//switch to rotate operation
 					this.dispatchEvent( _endEvent );
@@ -661,7 +731,7 @@ class ArcballControls extends Object3D {
 					}
 	
 					this.updateTbState( STATE.ROTATE, true );
-					this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, center.x, center.y, this.domElement, this._tbRadius ) );
+					this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, _center.x, _center.y, this.domElement, this._tbRadius ) );
 
 					if ( this.enableGrid ) {
 
@@ -681,7 +751,7 @@ class ArcballControls extends Object3D {
 
 					}
 	
-					this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement ) );
+					this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ) );
 					this.applyTransformMatrix( this.pan( this._startCursorPosition, this._currentCursorPosition ) );
 
 				}
@@ -704,7 +774,7 @@ class ArcballControls extends Object3D {
 					}
 	
 					this.updateTbState( STATE.PAN, true );
-					this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement ) );
+					this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ) );
 
 				} else if ( this._state == STATE.ROTATE ) {
 	
@@ -715,7 +785,7 @@ class ArcballControls extends Object3D {
 					}
 	
 					this.updateTbState( STATE.ROTATE, true );
-					this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, center.x, center.y, this.domElement, this._tbRadius ) );
+					this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, _center.x, _center.y, this.domElement, this._tbRadius ) );
 					
 					if ( this.enableAnimations ) {
 
@@ -736,8 +806,6 @@ class ArcballControls extends Object3D {
 	};
 
 	onSinglePanEnd = ( event ) => {
-
-		this.domElement.addEventListener( 'mousedown', this.onMouseDown );
 
 		if ( this._state == STATE.ROTATE ) {
 
@@ -810,8 +878,9 @@ class ArcballControls extends Object3D {
 
 			this.dispatchEvent( _startEvent );
 
-			const center = event.center;
-			const hitP = this.unprojectOnObj( this.getCursorNDC( center.x, center.y, this.domElement ), this.camera );
+			//const center = event.center;
+			this.setCenter( event.clientX, event.clientY );
+			const hitP = this.unprojectOnObj( this.getCursorNDC( _center.x, _center.y, this.domElement ), this.camera );
 
 			if ( hitP != null && this.enableAnimations ) {
 
@@ -853,8 +922,8 @@ class ArcballControls extends Object3D {
 
 			this.updateTbState( STATE.PAN, true );
 	
-			const center = event.center;
-			this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement, true ) );
+			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
+			this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement, true ) );
 			this._currentCursorPosition.copy( this._startCursorPosition );
 
 			this.activateGizmos( false );
@@ -867,7 +936,7 @@ class ArcballControls extends Object3D {
 
 		if( this.enabled && this.enablePan ) {
 
-			const center = event.center;
+			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
 
 			if ( this._state != STATE.PAN ) {
 
@@ -876,7 +945,7 @@ class ArcballControls extends Object3D {
 
 			}
 	
-			this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement, true ) );
+			this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement, true ) );
 			this.applyTransformMatrix( this.pan( this._startCursorPosition, this._currentCursorPosition, true ) );
 			this.dispatchEvent( _changeEvent );
 		}
@@ -899,7 +968,9 @@ class ArcballControls extends Object3D {
 
 			this.updateTbState( STATE.ZROTATE, true );
 
-			this._startFingerRotation = event.rotation;
+			//this._startFingerRotation = event.rotation;
+
+			this._startFingerRotation = this.getAngle( this._touchCurrent[ 1 ], this._touchCurrent[ 0 ] ) + this.getAngle( this._touchStart[ 1 ], this._touchStart[ 0 ] );
 			this._currentFingerRotation = this._startFingerRotation;
 
 			this.camera.getWorldDirection( this._rotationAxis );  //rotation axis
@@ -918,7 +989,7 @@ class ArcballControls extends Object3D {
 
 		if ( this.enabled && this.enableRotate ) {
 
-			const center = event.center;
+			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
 			let rotationPoint;
 	
 			if ( this._state != STATE.ZROTATE ) {
@@ -928,7 +999,8 @@ class ArcballControls extends Object3D {
 
 			}
 	
-			this._currentFingerRotation = event.rotation;
+			//this._currentFingerRotation = event.rotation;
+			this._currentFingerRotation = this.getAngle( this._touchCurrent[ 1 ], this._touchCurrent[ 0 ] ) + this.getAngle( this._touchStart[ 1 ], this._touchStart[ 0 ] );
 
 			if ( !this.enablePan ) {
 
@@ -937,7 +1009,7 @@ class ArcballControls extends Object3D {
 			} else {
 
 				this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
-				rotationPoint = this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement ).applyQuaternion( this.camera.quaternion ).multiplyScalar( 1 / this.camera.zoom ).add( this._v3_2 );
+				rotationPoint = this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ).applyQuaternion( this.camera.quaternion ).multiplyScalar( 1 / this.camera.zoom ).add( this._v3_2 );
 
 			}
 
@@ -965,7 +1037,7 @@ class ArcballControls extends Object3D {
 			this.dispatchEvent( _startEvent );
 			this.updateTbState( STATE.SCALE, true );
 	
-			this._startFingerDistance = this.calculatePointersDistance( event.pointers[ 0 ], event.pointers[ 1 ] );
+			this._startFingerDistance = this.calculatePointersDistance( this._touchCurrent[ 0 ], this._touchCurrent[ 1 ] );
 			this._currentFingerDistance =  this._startFingerDistance;
 
 			this.activateGizmos( false );
@@ -978,8 +1050,8 @@ class ArcballControls extends Object3D {
 
 		if ( this.enabled && this.enableZoom ) {
 
-			const center = event.center; 
-			const minDistance = 10; //minimum distance between fingers
+			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
+			const minDistance = 10; //minimum distance between fingers (in pixels)
 	
 			if ( this._state != STATE.SCALE ) {
 
@@ -988,7 +1060,7 @@ class ArcballControls extends Object3D {
 
 			}
 	
-			this._currentFingerDistance = Math.max( this.calculatePointersDistance( event.pointers[ 0 ], event.pointers[ 1 ] ), minDistance );
+			this._currentFingerDistance = Math.max( this.calculatePointersDistance( this._touchCurrent[ 0 ], this._touchCurrent[ 1 ] ), minDistance );
 			const amount = this._currentFingerDistance / this._startFingerDistance;
 	
 			let scalePoint;
@@ -1001,7 +1073,7 @@ class ArcballControls extends Object3D {
 
 				if ( this.camera.type == 'OrthographicCamera' ) {
 
-					scalePoint = this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement )
+					scalePoint = this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement )
 						.applyQuaternion( this.camera.quaternion )
 						.multiplyScalar( 1 / this.camera.zoom )
 						.add( this._gizmos.position );
@@ -1009,7 +1081,7 @@ class ArcballControls extends Object3D {
 				}
 				else if ( this.camera.type == 'PerspectiveCamera' ) {
 
-					scalePoint = this.unprojectOnTbPlane( this.camera, center.x, center.y, this.domElement )
+					scalePoint = this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement )
 						.applyQuaternion( this.camera.quaternion )
 						.add( this._gizmos.position );
 					
@@ -1037,8 +1109,21 @@ class ArcballControls extends Object3D {
 
 			this.updateTbState( STATE.SCALE, true );
 	
-			const center = event.center;
-			this._startCursorPosition.setY( this.getCursorNDC( center.x, center.y, this.domElement ).y * 0.5 );
+			//const center = event.center;
+			let clientX = 0;
+			let clientY = 0;
+			const nFingers = this._touchCurrent.length;
+
+			for ( let i = 0; i < nFingers; i++ ) {
+
+				clientX += this._touchCurrent[ i ].clientX;
+				clientY += this._touchCurrent[ i ].clientY;
+
+			}
+
+			this.setCenter( clientX / nFingers, clientY / nFingers );
+
+			this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
 			this._currentCursorPosition.copy( this._startCursorPosition );
 
 		}
@@ -1059,9 +1144,22 @@ class ArcballControls extends Object3D {
 				//		| _ _ _\
 				//			y
 
-			const center = event.center;
+			//const center = event.center;
+			let clientX = 0;
+			let clientY = 0;
+			const nFingers = this._touchCurrent.length;
+
+			for ( let i = 0; i < nFingers; i++ ) {
+
+				clientX += this._touchCurrent[ i ].clientX;
+				clientY += this._touchCurrent[ i ].clientY;
+
+			}
+			
+			this.setCenter( clientX / nFingers, clientY / nFingers );
+
 			const screenNotches = 8;	//how many wheel notches corresponds to a full screen pan
-			this._currentCursorPosition.setY( this.getCursorNDC( center.x, center.y, this.domElement ).y * 0.5 );
+			this._currentCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
 
 			let movement = this._currentCursorPosition.y - this._startCursorPosition.y;
 
@@ -1116,6 +1214,19 @@ class ArcballControls extends Object3D {
 		this.updateTbState( STATE.IDLE, false );
 		this.dispatchEvent( _endEvent );
 		//this.dispatchEvent( _changeEvent );
+
+	};
+
+	setCenter = ( clientX, clientY ) => {
+
+		_center.x = clientX;
+		_center.y = clientY;
+
+	};
+
+	getAngle = ( p1, p2  ) => {
+
+		return Math.atan2( p2.clientY - p1.clientY, p2.clientX - p1.clientX ) * 180 / Math.PI;
 
 	};
 
@@ -1376,16 +1487,16 @@ class ArcballControls extends Object3D {
 
 		}
 
-		this.domElement.removeEventListener( 'mousedown', this.onMouseDown );
+		this.domElement.removeEventListener( 'pointerup', this.onMouseDown );
 		this.domElement.removeEventListener( 'wheel', this.onWheel );
 
-		document.removeEventListener( 'mousemove', this.onMouseMove );
-		document.removeEventListener( 'mouseup', this.onMouseUp );
+		document.removeEventListener( 'pointermove', this.onMouseMove );
+		document.removeEventListener( 'pointerup', this.onMouseUp );
 
 		window.removeEventListener( 'resize', this.onWindowResize );
 		window.addEventListener( 'keydown', this.onKeyDown );
 
-		this._manager.destroy();
+		//this._manager.destroy();
 
 		this.scene.remove( this._gizmos );
 		this.disposeGrid();
@@ -1596,7 +1707,7 @@ class ArcballControls extends Object3D {
 
 			//animation start
 			this._timeStart = time;
-			this._manager.get( 'press' ).options.enable = true ;
+			//this._manager.get( 'press' ).options.enable = true ;
 
 		}
 
@@ -1620,7 +1731,7 @@ class ArcballControls extends Object3D {
 
 				window.cancelAnimationFrame( this._animationId );
 
-				this._manager.get( 'press' ).options.enable = false ;
+				//this._manager.get( 'press' ).options.enable = false ;
 
 				this.dispatchEvent( _changeEvent ); 
 
@@ -1650,7 +1761,7 @@ class ArcballControls extends Object3D {
 			window.cancelAnimationFrame( this._animationId );
 			this._animationId = -1;
 
-			this._manager.get( 'press' ).options.enable = false ;
+			//this._manager.get( 'press' ).options.enable = false ;
 
 			this.dispatchEvent( _changeEvent );
 
@@ -1672,7 +1783,7 @@ class ArcballControls extends Object3D {
 			this._anglePrev = 0
 			this._angleCurrent = 0;
 			this._timeStart = time;
-			this._manager.get( 'press' ).options.enable = true ;
+			//this._manager.get( 'press' ).options.enable = true ;
 
 		}
 
@@ -1704,7 +1815,7 @@ class ArcballControls extends Object3D {
 				window.cancelAnimationFrame( this._animationId );
 				this._animationId = -1;
 
-				this._manager.get( 'press' ).options.enable = false ;
+				//this._manager.get( 'press' ).options.enable = false ;
 
 				this.dispatchEvent( _changeEvent );
 
@@ -1723,7 +1834,7 @@ class ArcballControls extends Object3D {
 			window.cancelAnimationFrame( this._animationId );
 			this._animationId = -1;
 
-			this._manager.get( 'press' ).options.enable = false ;
+			//this._manager.get( 'press' ).options.enable = false ;
 
 			this.dispatchEvent ( _changeEvent );
 
@@ -2496,3 +2607,5 @@ class ArcballControls extends Object3D {
 };
 
 export { ArcballControls };
+
+//todo: ontriplepan: fare punto medio per ogni dito presente nell'array (da 1 a max)
