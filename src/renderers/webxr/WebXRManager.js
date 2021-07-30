@@ -26,6 +26,11 @@ class WebXRManager extends EventDispatcher {
 		let glFramebuffer = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
+		let isMultisample = false;
+		let glMultisampledFramebuffer = null;
+		let glColorRenderbuffer = null;
+		let glDepthRenderbuffer = null;
+		let depthStyle = null;
 
 		const controllers = [];
 		const inputSourcesMap = new Map();
@@ -133,6 +138,15 @@ class WebXRManager extends EventDispatcher {
 			state.bindXRFramebuffer( null );
 			renderer.setRenderTarget( renderer.getRenderTarget() );
 
+			if ( glFramebuffer ) gl.deleteFramebuffer( glFramebuffer );
+			if ( glMultisampledFramebuffer ) gl.deleteFramebuffer( glMultisampledFramebuffer );
+			if ( glColorRenderbuffer ) gl.deleteRenderbuffer( glColorRenderbuffer );
+			if ( glDepthRenderbuffer ) gl.deleteRenderbuffer( glDepthRenderbuffer );
+			glFramebuffer = null;
+			glMultisampledFramebuffer = null;
+			glColorRenderbuffer = null;
+			glDepthRenderbuffer = null;
+
 			//
 
 			animation.stop();
@@ -216,46 +230,76 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { baseLayer: glBaseLayer } );
 
+				} else if ( gl instanceof WebGLRenderingContext ) {
+
+					// Use old style webgl layer because we can't use MSAA
+					// WebGL2 support.
+
+					const layerInit = {
+						antialias: true,
+						alpha: attributes.alpha,
+						depth: attributes.depth,
+						stencil: attributes.stencil,
+						framebufferScaleFactor: framebufferScaleFactor
+					};
+
+					glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
+
+					session.updateRenderState( { layers: [ glBaseLayer ] } );
+
 				} else {
 
-					let depthFormat = 0;
+					isMultisample = attributes.antialias;
+					let depthFormat = null;
 
-					// for anti-aliased output, use classic webgllayer for now
-					if ( attributes.antialias ) {
 
-						const layerInit = {
-							antialias: true,
-							alpha: attributes.alpha,
-							depth: attributes.depth,
-							stencil: attributes.stencil,
-							framebufferScaleFactor: framebufferScaleFactor
-						};
+					if ( attributes.depth ) {
 
-						glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
+						depthStyle = attributes.stencil ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+						depthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 
-						session.updateRenderState( { layers: [ glBaseLayer ] } );
+					}
 
-					} else {
+					const projectionlayerInit = {
+						colorFormat: attributes.alpha ? gl.RGBA8 : gl.RGB8,
+						depthFormat: depthFormat,
+						scaleFactor: framebufferScaleFactor
+					};
 
-						if ( attributes.depth ) {
+					glBinding = new XRWebGLBinding( session, gl );
 
-							depthFormat = attributes.stencil ? gl.DEPTH_STENCIL : gl.DEPTH_COMPONENT;
+					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+					glFramebuffer = gl.createFramebuffer();
+
+					session.updateRenderState( { layers: [ glProjLayer ] } );
+
+					if ( isMultisample ) {
+
+						glMultisampledFramebuffer = gl.createFramebuffer();
+						glColorRenderbuffer = gl.createRenderbuffer();
+						gl.bindRenderbuffer( gl.RENDERBUFFER, glColorRenderbuffer );
+						gl.renderbufferStorageMultisample(
+							gl.RENDERBUFFER,
+							4,
+							gl.RGBA8,
+							glProjLayer.textureWidth,
+							glProjLayer.textureHeight );
+						state.bindFramebuffer( gl.FRAMEBUFFER, glMultisampledFramebuffer );
+						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, glColorRenderbuffer );
+						gl.bindRenderbuffer( gl.RENDERBUFFER, null );
+
+						if ( depthFormat !== null ) {
+
+							glDepthRenderbuffer = gl.createRenderbuffer();
+							gl.bindRenderbuffer( gl.RENDERBUFFER, glDepthRenderbuffer );
+							gl.renderbufferStorageMultisample( gl.RENDERBUFFER, 4, depthFormat, glProjLayer.textureWidth, glProjLayer.textureHeight );
+							gl.framebufferRenderbuffer( gl.FRAMEBUFFER, depthStyle, gl.RENDERBUFFER, glDepthRenderbuffer );
+							gl.bindRenderbuffer( gl.RENDERBUFFER, null );
 
 						}
 
-						const projectionlayerInit = {
-							colorFormat: attributes.alpha ? gl.RGBA : gl.RGB,
-							depthFormat: depthFormat,
-							scaleFactor: framebufferScaleFactor
-						};
-
-						glBinding = new XRWebGLBinding( session, gl );
-
-						glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
-
-						glFramebuffer = gl.createFramebuffer();
-
-						session.updateRenderState( { layers: [ glProjLayer ] } );
+						state.bindFramebuffer( gl.FRAMEBUFFER, null );
 
 					}
 
@@ -553,7 +597,7 @@ class WebXRManager extends EventDispatcher {
 
 						if ( glSubImage.depthStencilTexture !== undefined ) {
 
-							gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0 );
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0 );
 
 						}
 
@@ -585,6 +629,12 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
+				if ( isMultisample ) {
+
+					state.bindXRFramebuffer( glMultisampledFramebuffer );
+
+				}
+
 			}
 
 			//
@@ -601,6 +651,25 @@ class WebXRManager extends EventDispatcher {
 			}
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
+
+			if ( isMultisample ) {
+
+				const width = glProjLayer.textureWidth;
+				const height = glProjLayer.textureHeight;
+
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, glMultisampledFramebuffer );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, glFramebuffer );
+				// Invalidate the depth here to avoid flush of the depth data to main memory.
+				gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, [ depthStyle ] );
+				gl.invalidateFramebuffer( gl.DRAW_FRAMEBUFFER, [ depthStyle ] );
+				gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+				// Invalidate the MSAA buffer because it's not needed anymore.
+				gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, [ gl.COLOR_ATTACHMENT0 ] );
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
+
+				state.bindFramebuffer( gl.FRAMEBUFFER, glMultisampledFramebuffer );
+			}
 
 		}
 

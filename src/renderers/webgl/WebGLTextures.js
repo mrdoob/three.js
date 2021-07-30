@@ -1293,6 +1293,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 
+				_gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [_gl.COLOR_ATTACHMENT0, _gl.DEPTH_ATTACHMENT]);
+
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
 
