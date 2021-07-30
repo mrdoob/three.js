@@ -146,7 +146,7 @@ class DRACOExporter {
 			dracoObject = new dracoEncoder.PointCloud();
 
 			const vertices = geometry.getAttribute( 'position' );
-			builder.AddFloatAttribute(
+			attributeIDs[ 'POSITION' ] = builder.AddFloatAttribute(
 				dracoObject,
 				dracoEncoder.POSITION,
 				vertices.count,
@@ -160,7 +160,7 @@ class DRACOExporter {
 
 				if ( colors !== undefined ) {
 
-					builder.AddFloatAttribute(
+					attributeIDs[ 'COLOR_0' ] = builder.AddFloatAttribute(
 						dracoObject,
 						dracoEncoder.COLOR,
 						colors.count,
