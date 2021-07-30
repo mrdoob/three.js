@@ -1595,7 +1595,6 @@ class LDrawLoader extends Loader {
 
 						vertices: [ v2, v0, v1 ],
 						normals: [ null, null, null ],
-
 					} );
 
 					triangles.push( {
