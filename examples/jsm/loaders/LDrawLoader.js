@@ -209,11 +209,12 @@ function smoothNormals( triangles, lineSegments ) {
 	for ( let i = 0, l = triangles.length; i < l; i ++ ) {
 
 		const tri = triangles[ i ];
-		for ( let i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+		const vertices = tri.vertices;
+		const vertCount = vertices.length;
+		for ( let i2 = 0; i2 < vertCount; i2 ++ ) {
 
 			const index = i2;
-			const next = ( i2 + 1 ) % 3;
-			const vertices = tri.vertices;
+			const next = ( i2 + 1 ) % vertCount;
 			const v0 = vertices[ index ];
 			const v1 = vertices[ next ];
 			const hash = hashEdge( v0, v1 );
@@ -284,10 +285,11 @@ function smoothNormals( triangles, lineSegments ) {
 			}
 
 			// Check if any edge is connected to another triangle edge
-			for ( let i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+			const vertCount = vertices.length;
+			for ( let i2 = 0; i2 < vertCount; i2 ++ ) {
 
 				const index = i2;
-				const next = ( i2 + 1 ) % 3;
+				const next = ( i2 + 1 ) % vertCount;
 				const v0 = vertices[ index ];
 				const v1 = vertices[ next ];
 
@@ -302,6 +304,7 @@ function smoothNormals( triangles, lineSegments ) {
 					const otherTri = otherInfo.tri;
 					const otherIndex = otherInfo.index;
 					const otherNormals = otherTri.normals;
+					const otherVertCount = otherNormals.length;
 
 					// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
 					// hard edge. There are some cases where the line segments do not line up exactly
@@ -322,7 +325,7 @@ function smoothNormals( triangles, lineSegments ) {
 
 					}
 
-					const otherNext = ( otherIndex + 1 ) % 3;
+					const otherNext = ( otherIndex + 1 ) % otherVertCount;
 					if ( otherNormals[ otherIndex ] === null ) {
 
 						const norm = normals[ next ];
@@ -505,7 +508,7 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 			const elemNormals = elem.normals;
 			for ( let j = 0, l = vertices.length; j < l; j ++ ) {
 
-				const n = elemNormals[ j ];
+				const n = elemNormals[ j ] || elem.faceNormal;
 				const index = offset + j * 3;
 				normals[ index + 0 ] = n.x;
 				normals[ index + 1 ] = n.y;
