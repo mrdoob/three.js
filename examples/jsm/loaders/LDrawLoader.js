@@ -265,8 +265,12 @@ function smoothNormals( triangles, lineSegments ) {
 			const faceNormal = tri.faceNormal;
 			for ( let j = 0, lj = triNormals.length; j < lj; j ++ ) {
 
-				triNormals[ j ] = faceNormal.clone();
-				normals.push( triNormals[ j ] );
+				if ( triNormals[ j ] === null ) {
+
+					triNormals[ j ] = faceNormal.clone();
+					normals.push( triNormals[ j ] );
+
+				}
 
 			}
 
@@ -311,6 +315,7 @@ function smoothNormals( triangles, lineSegments ) {
 
 					}
 
+					// TODO: there are cases where the other tri already has a different normal??
 					const otherNext = ( otherIndex + 1 ) % otherVertCount;
 					if ( otherNormals[ otherIndex ] === null ) {
 
@@ -506,7 +511,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 		if ( elementSize === 3 ) {
 
 			let elemNormals = elem.normals;
-			if ( vertices.length === 4 ) {
+			if ( elemNormals.length === 4 ) {
 
 				quadArray[ 0 ] = elemNormals[ 0 ];
 				quadArray[ 1 ] = elemNormals[ 1 ];
@@ -518,7 +523,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 			}
 
-			for ( let j = 0, l = vertices.length; j < l; j ++ ) {
+			for ( let j = 0, l = elemNormals.length; j < l; j ++ ) {
 
 				const n = elemNormals[ j ] || elem.faceNormal;
 				const index = offset + j * 3;
