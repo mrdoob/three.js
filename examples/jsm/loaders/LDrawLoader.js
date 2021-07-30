@@ -476,52 +476,46 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 	elements.sort( sortByMaterial );
 
 	const positions = new Float32Array( elementSize * elements.length * 3 );
-	const normals = new Float32Array( elementSize * elements.length * 3 );
+	const normals = elementSize === 3 ? new Float32Array( elementSize * elements.length * 3 ) : null;
 	const materials = [];
 
 	const bufferGeometry = new BufferGeometry();
 	let prevMaterial = null;
 	let index0 = 0;
 	let numGroupVerts = 0;
+	let offset = 0;
 
 	for ( let iElem = 0, nElem = elements.length; iElem < nElem; iElem ++ ) {
 
 		const elem = elements[ iElem ];
 		const vertices = elem.vertices;
-		const elemNormals = elem.normals;
-		const v0 = vertices[ 0 ];
-		const v1 = vertices[ 1 ];
 
-		// Note that LDraw coordinate system is rotated 180 deg. in the X axis w.r.t. Three.js's one
-		const index = iElem * elementSize * 3;
-		positions[ index + 0 ] = v0.x;
-		positions[ index + 1 ] = v0.y;
-		positions[ index + 2 ] = v0.z;
-		positions[ index + 3 ] = v1.x;
-		positions[ index + 4 ] = v1.y;
-		positions[ index + 5 ] = v1.z;
+		for ( let j = 0, l = vertices.length; j < l; j ++ ) {
+
+			const v = vertices[ j ];
+			const index = offset + j * 3;
+			positions[ index + 0 ] = v.x;
+			positions[ index + 1 ] = v.y;
+			positions[ index + 2 ] = v.z;
+
+		}
 
 		if ( elementSize === 3 ) {
 
-			const v2 = vertices[ 2 ];
-			positions[ index + 6 ] = v2.x;
-			positions[ index + 7 ] = v2.y;
-			positions[ index + 8 ] = v2.z;
+			const elemNormals = elem.normals;
+			for ( let j = 0, l = vertices.length; j < l; j ++ ) {
 
-			const n0 = elemNormals[ 0 ] || elem.faceNormal;
-			const n1 = elemNormals[ 1 ] || elem.faceNormal;
-			const n2 = elemNormals[ 2 ] || elem.faceNormal;
-			normals[ index + 0 ] = n0.x;
-			normals[ index + 1 ] = n0.y;
-			normals[ index + 2 ] = n0.z;
-			normals[ index + 3 ] = n1.x;
-			normals[ index + 4 ] = n1.y;
-			normals[ index + 5 ] = n1.z;
-			normals[ index + 6 ] = n2.x;
-			normals[ index + 7 ] = n2.y;
-			normals[ index + 8 ] = n2.z;
+				const n = elemNormals[ j ];
+				const index = offset + j * 3;
+				normals[ index + 0 ] = n.x;
+				normals[ index + 1 ] = n.y;
+				normals[ index + 2 ] = n.z;
+
+			}
 
 		}
+
+		offset += 3 * vertices.length;
 
 		if ( prevMaterial !== elem.material ) {
 
@@ -553,7 +547,7 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 
 	bufferGeometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
-	if ( elementSize === 3 ) {
+	if ( normals !== null ) {
 
 		bufferGeometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
