@@ -1851,9 +1851,11 @@ class LDrawLoader extends Loader {
 					if ( separateObjects ) {
 
 						const vertices = tri.vertices;
-						vertices[ 0 ] = vertices[ 0 ].clone().applyMatrix4( parseScope.matrix );
-						vertices[ 1 ] = vertices[ 1 ].clone().applyMatrix4( parseScope.matrix );
-						vertices[ 2 ] = vertices[ 2 ].clone().applyMatrix4( parseScope.matrix );
+						for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+
+							vertices[ i ] = vertices[ i ].clone().applyMatrix4( parseScope.matrix );
+
+						}
 
 						_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
 						_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
