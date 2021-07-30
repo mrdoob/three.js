@@ -476,8 +476,8 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 	// Sort the triangles or line segments by colour code to make later the mesh groups
 	elements.sort( sortByMaterial );
 
-	const positions = [];
-	const normals = [];
+	const positions = new Float32Array( elementSize * elements.length * 3 );
+	const normals = new Float32Array( elementSize * elements.length * 3 );
 	const materials = [];
 
 	const bufferGeometry = new BufferGeometry();
@@ -494,18 +494,33 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 		const v1 = vertices[ 1 ];
 
 		// Note that LDraw coordinate system is rotated 180 deg. in the X axis w.r.t. Three.js's one
-		positions.push( v0.x, v0.y, v0.z, v1.x, v1.y, v1.z );
+		const index = iElem * elementSize * 3;
+		positions[ index + 0 ] = v0.x;
+		positions[ index + 1 ] = v0.y;
+		positions[ index + 2 ] = v0.z;
+		positions[ index + 3 ] = v1.x;
+		positions[ index + 4 ] = v1.y;
+		positions[ index + 5 ] = v1.z;
+
 		if ( elementSize === 3 ) {
 
 			const v2 = vertices[ 2 ];
-			positions.push( v2.x, v2.y, v2.z );
+			positions[ index + 6 ] = v2.x;
+			positions[ index + 7 ] = v2.y;
+			positions[ index + 8 ] = v2.z;
 
 			const n0 = elemNormals[ 0 ] || elem.faceNormal;
 			const n1 = elemNormals[ 1 ] || elem.faceNormal;
 			const n2 = elemNormals[ 2 ] || elem.faceNormal;
-			normals.push( n0.x, n0.y, n0.z );
-			normals.push( n1.x, n1.y, n1.z );
-			normals.push( n2.x, n2.y, n2.z );
+			normals[ index + 0 ] = n0.x;
+			normals[ index + 1 ] = n0.y;
+			normals[ index + 2 ] = n0.z;
+			normals[ index + 3 ] = n1.x;
+			normals[ index + 4 ] = n1.y;
+			normals[ index + 5 ] = n1.z;
+			normals[ index + 6 ] = n2.x;
+			normals[ index + 7 ] = n2.y;
+			normals[ index + 8 ] = n2.z;
 
 		}
 
@@ -537,11 +552,11 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 
 	}
 
-	bufferGeometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	bufferGeometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
 	if ( elementSize === 3 ) {
 
-		bufferGeometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		bufferGeometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 	}
 
