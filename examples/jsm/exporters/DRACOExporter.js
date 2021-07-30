@@ -44,7 +44,7 @@ class DRACOExporter {
 		const encoder = new dracoEncoder.Encoder();
 		let builder;
 		let dracoObject;
-
+		const attributeIDs = {};
 
 		if ( geometry.isBufferGeometry !== true ) {
 
@@ -58,7 +58,13 @@ class DRACOExporter {
 			dracoObject = new dracoEncoder.Mesh();
 
 			const vertices = geometry.getAttribute( 'position' );
-			builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
+			attributeIDs[ 'POSITION' ] = builder.AddFloatAttributeToMesh(
+				dracoObject,
+				dracoEncoder.POSITION,
+				vertices.count,
+				vertices.itemSize,
+				vertices.array
+			);
 
 			const faces = geometry.getIndex();
 
@@ -86,7 +92,13 @@ class DRACOExporter {
 
 				if ( normals !== undefined ) {
 
-					builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.NORMAL, normals.count, normals.itemSize, normals.array );
+					attributeIDs[ 'NORMAL' ] = builder.AddFloatAttributeToMesh(
+						dracoObject,
+						dracoEncoder.NORMAL,
+						normals.count,
+						normals.itemSize,
+						normals.array
+					);
 
 				}
 
@@ -98,7 +110,13 @@ class DRACOExporter {
 
 				if ( uvs !== undefined ) {
 
-					builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, uvs.array );
+					attributeIDs[ 'TEXCOORD_0' ] = builder.AddFloatAttributeToMesh(
+						dracoObject,
+						dracoEncoder.TEX_COORD,
+						uvs.count,
+						uvs.itemSize,
+						uvs.array
+					);
 
 				}
 
@@ -110,7 +128,13 @@ class DRACOExporter {
 
 				if ( colors !== undefined ) {
 
-					builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array );
+					attributeIDs[ 'COLOR_0' ] = builder.AddFloatAttributeToMesh(
+						dracoObject,
+						dracoEncoder.COLOR,
+						colors.count,
+						colors.itemSize,
+						colors.array
+					);
 
 				}
 
@@ -122,7 +146,13 @@ class DRACOExporter {
 			dracoObject = new dracoEncoder.PointCloud();
 
 			const vertices = geometry.getAttribute( 'position' );
-			builder.AddFloatAttribute( dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
+			builder.AddFloatAttribute(
+				dracoObject,
+				dracoEncoder.POSITION,
+				vertices.count,
+				vertices.itemSize,
+				vertices.array
+			);
 
 			if ( options.exportColor === true ) {
 
@@ -130,7 +160,13 @@ class DRACOExporter {
 
 				if ( colors !== undefined ) {
 
-					builder.AddFloatAttribute( dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array );
+					builder.AddFloatAttribute(
+						dracoObject,
+						dracoEncoder.COLOR,
+						colors.count,
+						colors.itemSize,
+						colors.array
+					);
 
 				}
 
@@ -138,15 +174,15 @@ class DRACOExporter {
 
 		} else {
 
-			throw new Error( 'DRACOExporter: Unsupported object type.' );
+			throw new Error( 'DRACOExporter: Unsupported object type: ' + object.type );
 
 		}
 
-		//Compress using draco encoder
+		// Compress using draco encoder
 
 		const encodedData = new dracoEncoder.DracoInt8Array();
 
-		//Sets the desired encoding and decoding speed for the given options from 0 (slowest speed, but the best compression) to 10 (fastest, but the worst compression).
+		// Sets the desired encoding and decoding speed for the given options from 0 (slowest speed, but the best compression) to 10 (fastest, but the worst compression).
 
 		const encodeSpeed = ( options.encodeSpeed !== undefined ) ? options.encodeSpeed : 5;
 		const decodeSpeed = ( options.decodeSpeed !== undefined ) ? options.decodeSpeed : 5;
@@ -197,7 +233,7 @@ class DRACOExporter {
 
 		}
 
-		//Copy encoded data to buffer.
+		// Copy encoded data to buffer.
 		const outputData = new Int8Array( new ArrayBuffer( length ) );
 
 		for ( let i = 0; i < length; i ++ ) {
@@ -210,7 +246,10 @@ class DRACOExporter {
 		dracoEncoder.destroy( encoder );
 		dracoEncoder.destroy( builder );
 
-		return outputData;
+		return {
+			buffer: outputData,
+			attributeIDs,
+		};
 
 	}
 

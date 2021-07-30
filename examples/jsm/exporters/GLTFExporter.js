@@ -26,6 +26,8 @@ class GLTFExporter {
 
 	constructor() {
 
+		this.dracoExporter = null;
+
 		this.pluginCallbacks = [];
 
 		this.register( function ( writer ) {
@@ -84,6 +86,13 @@ class GLTFExporter {
 
 	}
 
+	setDRACOExporter( dracoExporter ) {
+
+		this.dracoExporter = dracoExporter;
+		return this;
+
+	}
+
 	/**
 	 * Parse scenes and generate GLTF output
 	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
@@ -98,6 +107,13 @@ class GLTFExporter {
 		for ( let i = 0, il = this.pluginCallbacks.length; i < il; i ++ ) {
 
 			plugins.push( this.pluginCallbacks[ i ]( writer ) );
+
+		}
+
+
+		if ( options && options.draco ) {
+
+			writer.dracoExporter = this.dracoExporter;
 
 		}
 
@@ -386,6 +402,7 @@ class GLTFWriter {
 		this.options = Object.assign( {}, {
 			// default options
 			binary: false,
+			draco: false,
 			trs: false,
 			onlyVisible: true,
 			truncateDrawRange: true,
@@ -903,29 +920,42 @@ class GLTFWriter {
 		if ( count === 0 ) return null;
 
 		const minMax = getMinMax( attribute, start, count );
-		let bufferViewTarget;
-
-		// If geometry isn't provided, don't infer the target usage of the bufferView. For
-		// animation samplers, target must not be set.
-		if ( geometry !== undefined ) {
-
-			bufferViewTarget = attribute === geometry.index ? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER : WEBGL_CONSTANTS.ARRAY_BUFFER;
-
-		}
-
-		const bufferView = this.processBufferView( attribute, componentType, start, count, bufferViewTarget );
 
 		const accessorDef = {
-
-			bufferView: bufferView.id,
-			byteOffset: bufferView.byteOffset,
 			componentType: componentType,
 			count: count,
 			max: minMax.max,
 			min: minMax.min,
-			type: types[ attribute.itemSize ]
-
+			type: types[ attribute.itemSize ],
 		};
+
+		if ( ! this.options.draco ) {
+
+			let bufferViewTarget;
+
+			// If geometry isn't provided, don't infer the target usage of the bufferView. For
+			// animation samplers, target must not be set.
+			if ( geometry !== undefined ) {
+
+				bufferViewTarget =
+					attribute === geometry.index
+						? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER
+						: WEBGL_CONSTANTS.ARRAY_BUFFER;
+
+			}
+
+			const bufferView = this.processBufferView(
+				attribute,
+				componentType,
+				start,
+				count,
+				bufferViewTarget
+			);
+
+			accessorDef.bufferView = bufferView.id;
+			accessorDef.byteOffset = bufferView.byteOffset;
+
+		}
 
 		if ( attribute.normalized === true ) accessorDef.normalized = true;
 		if ( ! json.accessors ) json.accessors = [];
@@ -1589,6 +1619,51 @@ class GLTFWriter {
 		}
 
 		meshDef.primitives = primitives;
+
+
+		if ( this.options.draco ) {
+
+			const dracoOutput = this.dracoExporter.parse( mesh );
+
+			// Add buffer
+			this.processBuffer( dracoOutput.buffer );
+
+			// Add single bufferView
+			const bufferView = {
+				buffer: 0,
+				byteOffset: this.byteOffset,
+				byteLength: dracoOutput.buffer.length,
+			};
+			this.byteOffset += bufferView.byteLength;
+
+			if ( ! json.bufferViews ) json.bufferViews = [];
+
+			json.bufferViews.push( bufferView );
+
+			primitives.forEach( ( primitive ) => {
+
+				// Add draco extension to the primitive
+				if ( ! primitive.extensions ) primitive.extensions = {};
+				primitive.extensions[ 'KHR_draco_mesh_compression' ] = {
+					bufferView: json.bufferViews.length - 1,
+					attributes: dracoOutput.attributeIDs,
+				};
+
+			} );
+
+			// add draco to extensionsRequired
+			if ( ! json.extensionsRequired ) json.extensionsRequired = [];
+			if ( ! json.extensionsRequired.includes( 'KHR_draco_mesh_compression' ) ) {
+
+				json.extensionsRequired.push( 'KHR_draco_mesh_compression' );
+
+			}
+
+			// add draco to extensionsUsed
+			this.extensionsUsed[ 'KHR_draco_mesh_compression' ] = true;
+
+		}
+
 
 		if ( ! json.meshes ) json.meshes = [];
 

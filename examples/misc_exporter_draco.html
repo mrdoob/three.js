@@ -120,7 +120,7 @@
 			function exportFile() {
 
 				const result = exporter.parse( mesh );
-				saveArrayBuffer( result, 'file.drc' );
+				saveArrayBuffer( result.buffer, 'file.drc' );
 
 			}
 
