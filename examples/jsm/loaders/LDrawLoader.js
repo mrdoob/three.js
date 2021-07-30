@@ -219,8 +219,13 @@ function smoothNormals( triangles, lineSegments ) {
 
 			// don't add the triangle if the edge is supposed to be hard
 			if ( hardEdges.has( hash ) ) continue;
-			halfEdgeList[ hash ] = tri;
-			fullHalfEdgeList[ hash ] = tri;
+
+			const info = {
+				index: index,
+				tri: tri
+			};
+			halfEdgeList[ hash ] = info;
+			fullHalfEdgeList[ hash ] = info;
 
 		}
 
@@ -230,16 +235,27 @@ function smoothNormals( triangles, lineSegments ) {
 	while ( true ) {
 
 		// Stop if there are no more triangles left
-		const halfEdges = Object.keys( halfEdgeList );
-		if ( halfEdges.length === 0 ) break;
+		let halfEdge = null;
+		for ( const key in halfEdgeList ) {
+
+			halfEdge = halfEdgeList[ key ];
+			break;
+
+		}
+
+		if ( halfEdge === null ) {
+
+			break;
+
+		}
 
 		// Exhaustively find all connected triangles
 		let i = 0;
-		const queue = [ fullHalfEdgeList[ halfEdges[ 0 ] ] ];
+		const queue = [ halfEdge];
 		while ( i < queue.length ) {
 
 			// initialize all vertex normals in this triangle
-			const tri = queue[ i ];
+			const tri = queue[ i ].tri;
 			i ++;
 
 			const faceNormal = tri.faceNormal;
@@ -277,9 +293,11 @@ function smoothNormals( triangles, lineSegments ) {
 				delete halfEdgeList[ hash ];
 
 				const reverseHash = hashEdge( v1, v0 );
-				const otherTri = fullHalfEdgeList[ reverseHash ];
-				if ( otherTri ) {
+				const otherInfo = fullHalfEdgeList[ reverseHash ];
+				if ( otherInfo ) {
 
+					const otherTri = otherInfo.tri;
+					const otherIndex = otherInfo.index;
 					// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
 					// hard edge. There are some cases where the line segments do not line up exactly
 					// with or span multiple triangle edges (see Lunar Vehicle wheels).
@@ -294,45 +312,29 @@ function smoothNormals( triangles, lineSegments ) {
 					// it so it won't be found again.
 					if ( reverseHash in halfEdgeList ) {
 
-						queue.push( otherTri );
+						queue.push( otherInfo );
 						delete halfEdgeList[ reverseHash ];
 
 					}
 
-					// Find the matching edge in this triangle and copy the normal vector over
-					for ( let i3 = 0, l3 = 3; i3 < l3; i3 ++ ) {
+					const otherNext = ( otherIndex + 1 ) % 3;
+					if ( otherTri[ `n${ otherIndex }` ] === null ) {
 
-						const otherIndex = i3;
-						const otherNext = ( i3 + 1 ) % 3;
-						const otherV0 = otherTri[ `v${ otherIndex }` ];
-						const otherV1 = otherTri[ `v${ otherNext }` ];
+						const norm = tri[ `n${ next }` ];
+						otherTri[ `n${ otherIndex }` ] = norm;
 
-						const otherHash = hashEdge( otherV0, otherV1 );
-						if ( otherHash === reverseHash ) {
+						const isDoubledVert = otherTri.fromQuad && otherIndex !== 2;
+						norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
 
-							if ( otherTri[ `n${ otherIndex }` ] === null ) {
+					}
 
-								const norm = tri[ `n${ next }` ];
-								otherTri[ `n${ otherIndex }` ] = norm;
+					if ( otherTri[ `n${ otherNext }` ] === null ) {
 
-								const isDoubledVert = otherTri.fromQuad && otherIndex !== 2;
-								norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
+						const norm = tri[ `n${ index }` ];
+						otherTri[ `n${ otherNext }` ] = norm;
 
-							}
-
-							if ( otherTri[ `n${ otherNext }` ] === null ) {
-
-								const norm = tri[ `n${ index }` ];
-								otherTri[ `n${ otherNext }` ] = norm;
-
-								const isDoubledVert = otherTri.fromQuad && otherNext !== 2;
-								norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
-
-							}
-
-							break;
-
-						}
+						const isDoubledVert = otherTri.fromQuad && otherNext !== 2;
+						norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
 
 					}
 
