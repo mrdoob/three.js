@@ -1,6 +1,7 @@
 import {
 	Matrix4,
-	Object3D
+	Object3D,
+	Vector3
 } from '../../../build/three.module.js';
 
 /**
@@ -246,7 +247,9 @@ class CSS3DRenderer {
 					if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
 
 					_matrix.copyPosition( object.matrixWorld );
-					_matrix.scale( object.getWorldScale() );
+					const objectWorldScale = new Vector3();
+					object.getWorldScale( objectWorldScale )
+					matrix.scale( objectWorldScale )
 
 					_matrix.elements[ 3 ] = 0;
 					_matrix.elements[ 7 ] = 0;
