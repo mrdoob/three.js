@@ -1,12 +1,17 @@
 import {
 	Matrix4,
 	Object3D,
+	Quaternion,
 	Vector3
 } from '../../../build/three.module.js';
 
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  */
+
+const _vector = new Vector3();
+const _quaternion = new Quaternion();
+const _scale = new Vector3();
 
 class CSS3DObject extends Object3D {
 
@@ -246,10 +251,10 @@ class CSS3DRenderer {
 
 					if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
 
-					_matrix.copyPosition( object.matrixWorld );
-					const objectWorldScale = new Vector3();
-					object.getWorldScale( objectWorldScale )
-					matrix.scale( objectWorldScale )
+					_matrix.copyPosition( object.matrixWorld);
+					
+					object.matrixWorld.decompose( _vector, _quaternion, _scale );
+					_matrix.scale( _scale )
 
 					_matrix.elements[ 3 ] = 0;
 					_matrix.elements[ 7 ] = 0;
