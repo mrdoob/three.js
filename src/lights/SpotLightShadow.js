@@ -2,11 +2,14 @@ import { LightShadow } from './LightShadow.js';
 import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
+/** Define default shadow distance. */
+const DEF_DISTANCE = 500;
+
 class SpotLightShadow extends LightShadow {
 
 	constructor() {
 
-		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
+		super( new PerspectiveCamera( 50, 1, 0.5, DEF_DISTANCE ) );
 
 		this.focus = 1;
 
@@ -18,7 +21,7 @@ class SpotLightShadow extends LightShadow {
 
 		const fov = MathUtils.RAD2DEG * 2 * light.angle * this.focus;
 		const aspect = this.mapSize.width / this.mapSize.height;
-		const far = light.distance || camera.far;
+		const far = light.distance != null ? light.distance : DEF_DISTANCE;
 
 		if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {
 
