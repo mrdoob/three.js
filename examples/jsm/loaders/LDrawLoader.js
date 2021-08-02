@@ -699,6 +699,34 @@ class LDrawLoader extends Loader {
 
 	}
 
+	async preloadMaterials( url ) {
+
+		const fileLoader = new FileLoader( this.manager );
+		fileLoader.setPath( this.path );
+		fileLoader.setRequestHeader( this.requestHeader );
+		fileLoader.setWithCredentials( this.withCredentials );
+
+		const text = await fileLoader.loadAsync( url );
+		const colorLineRegex = /^0 !COLOUR/;
+		const lines = text.split( /[\n\r]/g );
+		const materials = [];
+		for ( let i = 0, l = lines.length; i < l; i ++ ) {
+
+			const line = lines[ i ];
+			if ( colorLineRegex.test( line ) ) {
+
+				const directive = line.replace( colorLineRegex, '' );
+				const material = this.parseColourMetaDirective( new LineParser( directive ) );
+				materials.push( material );
+
+			}
+
+		}
+
+		this.setMaterials( materials );
+
+	}
+
 	load( url, onLoad, onProgress, onError ) {
 
 		if ( ! this.fileMap ) {
