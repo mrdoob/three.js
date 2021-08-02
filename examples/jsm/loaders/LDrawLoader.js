@@ -592,11 +592,11 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 	if ( elementSize === 2 ) {
 
-		object3d = new LineSegments( bufferGeometry, materials );
+		object3d = new LineSegments( bufferGeometry, materials.length === 1 ? materials[ 0 ] : materials );
 
 	} else if ( elementSize === 3 ) {
 
-		object3d = new Mesh( bufferGeometry, materials );
+		object3d = new Mesh( bufferGeometry, materials.length === 1 ? materials[ 0 ] : materials );
 
 	}
 
