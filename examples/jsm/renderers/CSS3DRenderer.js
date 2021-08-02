@@ -246,12 +246,7 @@ class CSS3DRenderer {
 					if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
 
 					_matrix.copyPosition( object.matrixWorld );
-					
-					let curr = object;
-					while(curr) {
-						_matrix.scale( curr.scale )
-						curr = curr.parent;
-					}
+					_matrix.scale( object.getWorldScale() );
 
 					_matrix.elements[ 3 ] = 0;
 					_matrix.elements[ 7 ] = 0;
