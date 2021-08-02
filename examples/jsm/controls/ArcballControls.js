@@ -133,7 +133,7 @@ class ArcballControls extends Object3D {
 
 		//double tap
 		this._devPxRatio = 0;
-		this._detectDouble = true;
+		this._downValid = true;
 		this._nclicks = 0;
 		this._downEvents = [];
 		this._downStart = 0;	//pointerDown time
@@ -250,10 +250,15 @@ class ArcballControls extends Object3D {
 
 		if ( event.isPrimary ) {
 
+			this._downValid = true;
 			this._downEvents.push( event );
 			this._downStart = performance.now();
 
-		} 
+		} else {
+
+			this._downValid = false;
+
+		}
 
 		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
@@ -346,21 +351,20 @@ class ArcballControls extends Object3D {
 			
 			}
 
-		} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ){
+		} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
 
 			this.onSinglePanMove( event );
 
 		}
 
 		//checkDistance
-		if( this._detectDouble ) {
+		if( this._downValid ) {
 
 			const movement = this.calculatePointersDistance( this._downEvents[ this._downEvents.length -1 ], event ) * this._devPxRatio;
 			if ( movement > this._movementThreshold ) {
 	
-				this._detectDouble = false;
-				this._downEvents.splice( 0, this._downEvents.length );
-	
+				this._downValid = false;
+
 			}
 
 		}
@@ -437,38 +441,49 @@ class ArcballControls extends Object3D {
 
 		}
 
-		if ( this._detectDouble ) {
+		if ( event.isPrimary ) {
 
-			const downTime = event.timeStamp - this._downEvents[ this._downEvents.length -1 ].timeStamp;
+			if ( this._downValid ) {
 
-			if ( downTime <= this._maxDownTime ) {
+				const downTime = event.timeStamp - this._downEvents[ this._downEvents.length -1 ].timeStamp;
 
-				if ( this._nclicks == 1 ) {
+				if ( downTime <= this._maxDownTime ) {
 
-					//second click performed
-					const clickInterval = event.timeStamp - this._clickStart;
-					const movement = this.calculatePointersDistance( this._downEvents[ 1 ], this._downEvents[ 0 ] ) * this._devPxRatio;
+					if ( this._nclicks == 0 ) {
 
-					if ( clickInterval <= this._maxInterval && movement <= this._posThreshold) {
-
-						//fire double tap
-						this._nclicks = 0;
-						this._downEvents.splice( 0, this._downEvents.length );
-						this.onDoubleTap( event );
+						//first valid click detected
+						this._nclicks = 1;
+						this._clickStart = performance.now();
 
 					} else {
 
-						//new first click
-						this._clickStart = event.timeStamp;
-						this._downEvents.shift();
+						const clickInterval = event.timeStamp - this._clickStart;
+						const movement = this.calculatePointersDistance( this._downEvents[ 1 ], this._downEvents[ 0 ] ) * this._devPxRatio;
+
+						if ( clickInterval <= this._maxInterval && movement <= this._posThreshold ) {
+
+							//second valid click detected
+							//fire double tap and reset values
+							this._nclicks = 0;
+							this._downEvents.splice( 0, this._downEvents.length );
+							this.onDoubleTap( event );
+
+						} else {
+
+							//new 'first click'
+							this._nclicks = 1;
+							this._downEvents.shift();
+							this._clickStart = performance.now();
+
+						}
 
 					}
 
 				} else {
 
-					//first click performed
-					this._nclicks++;
-					this._clickStart = performance.now();
+					this._downValid = false;
+					this._nclicks = 0;
+					this._downEvents.splice( 0, this._downEvents.length );
 
 				}
 
@@ -478,13 +493,6 @@ class ArcballControls extends Object3D {
 				this._downEvents.splice( 0, this._downEvents.length );
 
 			}
-
-		} else {
-
-			this._nclicks = 0;
-			this._downEvents.splice( 0, this._downEvents.length );
-			this._detectDouble = true;
-
 		}
 
 	};
@@ -1116,7 +1124,7 @@ class ArcballControls extends Object3D {
 		if ( this.enabled && this.enableZoom ) {
 
 			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
-			const minDistance = 10; //minimum distance between fingers (in pixels)
+			const minDistance = 12; //minimum distance between fingers (in css pixels)
 	
 			if ( this._state != STATE.SCALE ) {
 
@@ -1125,7 +1133,7 @@ class ArcballControls extends Object3D {
 
 			}
 	
-			this._currentFingerDistance = Math.max( this.calculatePointersDistance( this._touchCurrent[ 0 ], this._touchCurrent[ 1 ] ), minDistance );
+			this._currentFingerDistance = Math.max( this.calculatePointersDistance( this._touchCurrent[ 0 ], this._touchCurrent[ 1 ] ), minDistance * this._devPxRatio );
 			const amount = this._currentFingerDistance / this._startFingerDistance;
 	
 			let scalePoint;
