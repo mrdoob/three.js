@@ -168,7 +168,7 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 }
 
-function smoothNormals( triangles, lineSegments ) {
+function smoothNormals( faces, lineSegments ) {
 
 	function hashVertex( v ) {
 
@@ -190,7 +190,6 @@ function smoothNormals( triangles, lineSegments ) {
 
 	const hardEdges = new Set();
 	const halfEdgeList = {};
-	const fullHalfEdgeList = {};
 	const normals = [];
 
 	// Save the list of hard edges by hash
@@ -206,14 +205,15 @@ function smoothNormals( triangles, lineSegments ) {
 	}
 
 	// track the half edges associated with each triangle
-	for ( let i = 0, l = triangles.length; i < l; i ++ ) {
+	for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-		const tri = triangles[ i ];
-		for ( let i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+		const tri = faces[ i ];
+		const vertices = tri.vertices;
+		const vertCount = vertices.length;
+		for ( let i2 = 0; i2 < vertCount; i2 ++ ) {
 
 			const index = i2;
-			const next = ( i2 + 1 ) % 3;
-			const vertices = tri.vertices;
+			const next = ( i2 + 1 ) % vertCount;
 			const v0 = vertices[ index ];
 			const v1 = vertices[ next ];
 			const hash = hashEdge( v0, v1 );
@@ -226,16 +226,15 @@ function smoothNormals( triangles, lineSegments ) {
 				tri: tri
 			};
 			halfEdgeList[ hash ] = info;
-			fullHalfEdgeList[ hash ] = info;
 
 		}
 
 	}
 
-	// Iterate until we've tried to connect all triangles to share normals
+	// Iterate until we've tried to connect all faces to share normals
 	while ( true ) {
 
-		// Stop if there are no more triangles left
+		// Stop if there are no more faces left
 		let halfEdge = null;
 		for ( const key in halfEdgeList ) {
 
@@ -250,44 +249,22 @@ function smoothNormals( triangles, lineSegments ) {
 
 		}
 
-		// Exhaustively find all connected triangles
-		let i = 0;
+		// Exhaustively find all connected faces
 		const queue = [ halfEdge ];
-		while ( i < queue.length ) {
+		while ( queue.length > 0 ) {
 
 			// initialize all vertex normals in this triangle
-			const tri = queue[ i ].tri;
+			const tri = queue.pop().tri;
 			const vertices = tri.vertices;
-			const triNormals = tri.normals;
-			i ++;
-
+			const vertNormals = tri.normals;
 			const faceNormal = tri.faceNormal;
-			if ( triNormals[ 0 ] === null ) {
-
-				triNormals[ 0 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
-				normals.push( triNormals[ 0 ] );
-
-			}
-
-			if ( triNormals[ 1 ] === null ) {
-
-				triNormals[ 1 ] = faceNormal.clone().multiplyScalar( tri.fromQuad ? 0.5 : 1.0 );
-				normals.push( triNormals[ 1 ] );
-
-			}
-
-			if ( triNormals[ 2 ] === null ) {
-
-				triNormals[ 2 ] = faceNormal.clone();
-				normals.push( triNormals[ 2 ] );
-
-			}
 
 			// Check if any edge is connected to another triangle edge
-			for ( let i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+			const vertCount = vertices.length;
+			for ( let i2 = 0; i2 < vertCount; i2 ++ ) {
 
 				const index = i2;
-				const next = ( i2 + 1 ) % 3;
+				const next = ( i2 + 1 ) % vertCount;
 				const v0 = vertices[ index ];
 				const v1 = vertices[ next ];
 
@@ -296,14 +273,16 @@ function smoothNormals( triangles, lineSegments ) {
 				delete halfEdgeList[ hash ];
 
 				const reverseHash = hashEdge( v1, v0 );
-				const otherInfo = fullHalfEdgeList[ reverseHash ];
+				const otherInfo = halfEdgeList[ reverseHash ];
 				if ( otherInfo ) {
 
 					const otherTri = otherInfo.tri;
 					const otherIndex = otherInfo.index;
 					const otherNormals = otherTri.normals;
+					const otherVertCount = otherNormals.length;
+					const otherFaceNormal = otherTri.faceNormal;
 
-					// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
+					// NOTE: If the angle between faces is > 67.5 degrees then assume it's
 					// hard edge. There are some cases where the line segments do not line up exactly
 					// with or span multiple triangle edges (see Lunar Vehicle wheels).
 					if ( Math.abs( otherTri.faceNormal.dot( tri.faceNormal ) ) < 0.25 ) {
@@ -322,24 +301,50 @@ function smoothNormals( triangles, lineSegments ) {
 
 					}
 
-					const otherNext = ( otherIndex + 1 ) % 3;
-					if ( otherNormals[ otherIndex ] === null ) {
+					// share the first normal
+					const otherNext = ( otherIndex + 1 ) % otherVertCount;
+					let sharedNormal1 = vertNormals[ index ] || otherNormals[ otherNext ];
+					if ( sharedNormal1 === null ) {
 
-						const norm = triNormals[ next ];
-						otherNormals[ otherIndex ] = norm;
+						sharedNormal1 = new Vector3();
+						normals.push( sharedNormal1 );
 
-						const isDoubledVert = otherTri.fromQuad && otherIndex !== 2;
-						norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
+					}
+
+					if ( vertNormals[ index ] === null ) {
+
+						vertNormals[ index ] = sharedNormal1;
+						sharedNormal1.add( faceNormal );
 
 					}
 
 					if ( otherNormals[ otherNext ] === null ) {
 
-						const norm = triNormals[ index ];
-						otherNormals[ otherNext ] = norm;
+						otherNormals[ otherNext ] = sharedNormal1;
+						sharedNormal1.add( otherFaceNormal );
 
-						const isDoubledVert = otherTri.fromQuad && otherNext !== 2;
-						norm.addScaledVector( otherTri.faceNormal, isDoubledVert ? 0.5 : 1.0 );
+					}
+
+					// share the second normal
+					let sharedNormal2 = vertNormals[ next ] || otherNormals[ otherIndex ];
+					if ( sharedNormal2 === null ) {
+
+						sharedNormal2 = new Vector3();
+						normals.push( sharedNormal2 );
+
+					}
+
+					if ( vertNormals[ next ] === null ) {
+
+						vertNormals[ next ] = sharedNormal2;
+						sharedNormal2.add( faceNormal );
+
+					}
+
+					if ( otherNormals[ otherIndex ] === null ) {
+
+						otherNormals[ otherIndex ] = sharedNormal2;
+						sharedNormal2.add( otherFaceNormal );
 
 					}
 
@@ -467,59 +472,81 @@ function sortByMaterial( a, b ) {
 
 }
 
-function createObject( elements, elementSize, isConditionalSegments ) {
+function createObject( elements, elementSize, isConditionalSegments = false, totalElements = null ) {
 
 	// Creates a LineSegments (elementSize = 2) or a Mesh (elementSize = 3 )
 	// With per face / segment material, implemented with mesh groups and materials array
 
-	// Sort the triangles or line segments by colour code to make later the mesh groups
+	// Sort the faces or line segments by colour code to make later the mesh groups
 	elements.sort( sortByMaterial );
 
-	const positions = new Float32Array( elementSize * elements.length * 3 );
-	const normals = new Float32Array( elementSize * elements.length * 3 );
+	if ( totalElements === null ) {
+
+		totalElements = elements.length;
+
+	}
+
+	const positions = new Float32Array( elementSize * totalElements * 3 );
+	const normals = elementSize === 3 ? new Float32Array( elementSize * totalElements * 3 ) : null;
 	const materials = [];
 
+	const quadArray = new Array( 6 );
 	const bufferGeometry = new BufferGeometry();
 	let prevMaterial = null;
 	let index0 = 0;
 	let numGroupVerts = 0;
+	let offset = 0;
 
 	for ( let iElem = 0, nElem = elements.length; iElem < nElem; iElem ++ ) {
 
 		const elem = elements[ iElem ];
-		const vertices = elem.vertices;
-		const elemNormals = elem.normals;
-		const v0 = vertices[ 0 ];
-		const v1 = vertices[ 1 ];
+		let vertices = elem.vertices;
+		if ( vertices.length === 4 ) {
 
-		// Note that LDraw coordinate system is rotated 180 deg. in the X axis w.r.t. Three.js's one
-		const index = iElem * elementSize * 3;
-		positions[ index + 0 ] = v0.x;
-		positions[ index + 1 ] = v0.y;
-		positions[ index + 2 ] = v0.z;
-		positions[ index + 3 ] = v1.x;
-		positions[ index + 4 ] = v1.y;
-		positions[ index + 5 ] = v1.z;
+			quadArray[ 0 ] = vertices[ 0 ];
+			quadArray[ 1 ] = vertices[ 1 ];
+			quadArray[ 2 ] = vertices[ 2 ];
+			quadArray[ 3 ] = vertices[ 0 ];
+			quadArray[ 4 ] = vertices[ 2 ];
+			quadArray[ 5 ] = vertices[ 3 ];
+			vertices = quadArray;
+
+		}
+
+		for ( let j = 0, l = vertices.length; j < l; j ++ ) {
+
+			const v = vertices[ j ];
+			const index = offset + j * 3;
+			positions[ index + 0 ] = v.x;
+			positions[ index + 1 ] = v.y;
+			positions[ index + 2 ] = v.z;
+
+		}
 
 		if ( elementSize === 3 ) {
 
-			const v2 = vertices[ 2 ];
-			positions[ index + 6 ] = v2.x;
-			positions[ index + 7 ] = v2.y;
-			positions[ index + 8 ] = v2.z;
+			let elemNormals = elem.normals;
+			if ( elemNormals.length === 4 ) {
 
-			const n0 = elemNormals[ 0 ] || elem.faceNormal;
-			const n1 = elemNormals[ 1 ] || elem.faceNormal;
-			const n2 = elemNormals[ 2 ] || elem.faceNormal;
-			normals[ index + 0 ] = n0.x;
-			normals[ index + 1 ] = n0.y;
-			normals[ index + 2 ] = n0.z;
-			normals[ index + 3 ] = n1.x;
-			normals[ index + 4 ] = n1.y;
-			normals[ index + 5 ] = n1.z;
-			normals[ index + 6 ] = n2.x;
-			normals[ index + 7 ] = n2.y;
-			normals[ index + 8 ] = n2.z;
+				quadArray[ 0 ] = elemNormals[ 0 ];
+				quadArray[ 1 ] = elemNormals[ 1 ];
+				quadArray[ 2 ] = elemNormals[ 2 ];
+				quadArray[ 3 ] = elemNormals[ 0 ];
+				quadArray[ 4 ] = elemNormals[ 2 ];
+				quadArray[ 5 ] = elemNormals[ 3 ];
+				elemNormals = quadArray;
+
+			}
+
+			for ( let j = 0, l = elemNormals.length; j < l; j ++ ) {
+
+				const n = elemNormals[ j ] || elem.faceNormal;
+				const index = offset + j * 3;
+				normals[ index + 0 ] = n.x;
+				normals[ index + 1 ] = n.y;
+				normals[ index + 2 ] = n.z;
+
+			}
 
 		}
 
@@ -534,14 +561,16 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 			materials.push( elem.material );
 
 			prevMaterial = elem.material;
-			index0 = iElem * elementSize;
-			numGroupVerts = elementSize;
+			index0 = offset / 3;
+			numGroupVerts = vertices.length;
 
 		} else {
 
-			numGroupVerts += elementSize;
+			numGroupVerts += vertices.length;
 
 		}
+
+		offset += 3 * vertices.length;
 
 	}
 
@@ -553,7 +582,7 @@ function createObject( elements, elementSize, isConditionalSegments ) {
 
 	bufferGeometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
-	if ( elementSize === 3 ) {
+	if ( normals !== null ) {
 
 		bufferGeometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
@@ -755,9 +784,10 @@ class LDrawLoader extends Loader {
 			// If false, it is a root material scope previous to parse
 			isFromParse: true,
 
-			triangles: null,
+			faces: null,
 			lineSegments: null,
 			conditionalSegments: null,
+			totalFaces: 0,
 
 			// If true, this object is the start of a construction step
 			startingConstructionStep: false
@@ -1115,7 +1145,7 @@ class LDrawLoader extends Loader {
 		const currentParseScope = this.getCurrentParseScope();
 
 		// Parse result variables
-		let triangles;
+		let faces;
 		let lineSegments;
 		let conditionalSegments;
 
@@ -1256,7 +1286,7 @@ class LDrawLoader extends Loader {
 
 								type = lp.getToken();
 
-								currentParseScope.triangles = [];
+								currentParseScope.faces = [];
 								currentParseScope.lineSegments = [];
 								currentParseScope.conditionalSegments = [];
 								currentParseScope.type = type;
@@ -1282,7 +1312,7 @@ class LDrawLoader extends Loader {
 
 								}
 
-								triangles = currentParseScope.triangles;
+								faces = currentParseScope.faces;
 								lineSegments = currentParseScope.lineSegments;
 								conditionalSegments = currentParseScope.conditionalSegments;
 
@@ -1542,27 +1572,25 @@ class LDrawLoader extends Loader {
 						.crossVectors( _tempVec0, _tempVec1 )
 						.normalize();
 
-					triangles.push( {
+					faces.push( {
 						material: material,
 						colourCode: material.userData.code,
 						faceNormal: faceNormal,
-						fromQuad: false,
-
 						vertices: [ v0, v1, v2 ],
 						normals: [ null, null, null ],
 					} );
+					currentParseScope.totalFaces ++;
 
 					if ( doubleSided === true ) {
 
-						triangles.push( {
+						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
 							faceNormal: faceNormal,
-							fromQuad: false,
-
-							vertices: [ v0, v2, v1 ],
+							vertices: [ v2, v1, v0 ],
 							normals: [ null, null, null ],
 						} );
+						currentParseScope.totalFaces ++;
 
 					}
 
@@ -1601,47 +1629,25 @@ class LDrawLoader extends Loader {
 
 					// specifically place the triangle diagonal in the v0 and v1 slots so we can
 					// account for the doubling of vertices later when smoothing normals.
-					triangles.push( {
+					faces.push( {
 						material: material,
 						colourCode: material.userData.code,
 						faceNormal: faceNormal,
-						fromQuad: true,
-
-						vertices: [ v2, v0, v1 ],
-						normals: [ null, null, null ],
+						vertices: [ v0, v1, v2, v3 ],
+						normals: [ null, null, null, null ],
 					} );
-
-					triangles.push( {
-						material: material,
-						colourCode: material.userData.code,
-						faceNormal: faceNormal,
-						fromQuad: true,
-
-						vertices: [ v0, v2, v3 ],
-						normals: [ null, null, null ],
-					} );
+					currentParseScope.totalFaces += 2;
 
 					if ( doubleSided === true ) {
 
-						triangles.push( {
+						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
 							faceNormal: faceNormal,
-							fromQuad: true,
-
-							vertices: [ v0, v2, v1 ],
-							normals: [ null, null, null ],
+							vertices: [ v3, v2, v1, v0 ],
+							normals: [ null, null, null, null ],
 						} );
-
-						triangles.push( {
-							material: material,
-							colourCode: material.userData.code,
-							faceNormal: faceNormal,
-							fromQuad: true,
-
-							vertices: [ v2, v0, v3 ],
-							normals: [ null, null, null ],
-						} );
+						currentParseScope.totalFaces += 2;
 
 					}
 
@@ -1766,7 +1772,7 @@ class LDrawLoader extends Loader {
 
 			if ( scope.smoothNormals && parseScope.type === 'Part' ) {
 
-				smoothNormals( parseScope.triangles, parseScope.lineSegments );
+				smoothNormals( parseScope.faces, parseScope.lineSegments );
 
 			}
 
@@ -1775,9 +1781,9 @@ class LDrawLoader extends Loader {
 
 				const objGroup = parseScope.groupObject;
 
-				if ( parseScope.triangles.length > 0 ) {
+				if ( parseScope.faces.length > 0 ) {
 
-					objGroup.add( createObject( parseScope.triangles, 3 ) );
+					objGroup.add( createObject( parseScope.faces, 3, false, parseScope.totalFaces ) );
 
 				}
 
@@ -1809,11 +1815,11 @@ class LDrawLoader extends Loader {
 				const separateObjects = scope.separateObjects;
 				const parentLineSegments = parentParseScope.lineSegments;
 				const parentConditionalSegments = parentParseScope.conditionalSegments;
-				const parentTriangles = parentParseScope.triangles;
+				const parentFaces = parentParseScope.faces;
 
 				const lineSegments = parseScope.lineSegments;
 				const conditionalSegments = parseScope.conditionalSegments;
-				const triangles = parseScope.triangles;
+				const faces = parseScope.faces;
 
 				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
@@ -1850,16 +1856,18 @@ class LDrawLoader extends Loader {
 
 				}
 
-				for ( let i = 0, l = triangles.length; i < l; i ++ ) {
+				for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-					const tri = triangles[ i ];
+					const tri = faces[ i ];
 
 					if ( separateObjects ) {
 
 						const vertices = tri.vertices;
-						vertices[ 0 ] = vertices[ 0 ].clone().applyMatrix4( parseScope.matrix );
-						vertices[ 1 ] = vertices[ 1 ].clone().applyMatrix4( parseScope.matrix );
-						vertices[ 2 ] = vertices[ 2 ].clone().applyMatrix4( parseScope.matrix );
+						for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+
+							vertices[ i ] = vertices[ i ].clone().applyMatrix4( parseScope.matrix );
+
+						}
 
 						_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
 						_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
@@ -1867,9 +1875,11 @@ class LDrawLoader extends Loader {
 
 					}
 
-					parentTriangles.push( tri );
+					parentFaces.push( tri );
 
 				}
+
+				parentParseScope.totalFaces += parseScope.totalFaces;
 
 			}
 
