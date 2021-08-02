@@ -12,8 +12,8 @@ import * as MathUtils from '../math/MathUtils.js';
  *  clearcoatNormalScale: <Vector2>,
  *  clearcoatNormalMap: new THREE.Texture( <Image> ),
  *
- *  reflectivity: <float>,
  *  ior: <float>,
+ *  reflectivity: <float>,
  *
  *  sheen: <Color>,
  *
@@ -54,17 +54,17 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalScale = new Vector2( 1, 1 );
 		this.clearcoatNormalMap = null;
 
-		this.reflectivity = 0.5; // maps to F0 = 0.04
+		this.ior = 1.5;
 
-		Object.defineProperty( this, 'ior', {
+		Object.defineProperty( this, 'reflectivity', {
 			get: function () {
 
-				return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
+				return ( MathUtils.clamp( 2.5 * ( this.ior - 1 ) / ( this.ior + 1 ), 0, 1 ) );
 
 			},
-			set: function ( ior ) {
+			set: function ( reflectivity ) {
 
-				this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
+				this.ior = ( 1 + 0.4 * reflectivity ) / ( 1 - 0.4 * reflectivity );
 
 			}
 		} );
@@ -106,7 +106,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalMap = source.clearcoatNormalMap;
 		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
 
-		this.reflectivity = source.reflectivity;
+		this.ior = source.ior;
 
 		if ( source.sheen ) {
 
