@@ -687,6 +687,16 @@ class LDrawLoader extends Loader {
 		// If this flag is set to true the vertex normals will be smoothed.
 		this.smoothNormals = true;
 
+		// The path to load parts from the LDraw parts library from.
+		this.partsLibraryPath = '';
+
+	}
+
+	setPartsLibraryPath( path ) {
+
+		this.partsLibraryPath = path;
+		return this;
+
 	}
 
 	load( url, onLoad, onProgress, onError ) {
@@ -1988,7 +1998,7 @@ class LDrawLoader extends Loader {
 			// Use another file loader here so we can keep track of the subobject information
 			// and use it when processing the next model.
 			const fileLoader = new FileLoader( scope.manager );
-			fileLoader.setPath( scope.path );
+			fileLoader.setPath( scope.partsLibraryPath );
 			fileLoader.setRequestHeader( scope.requestHeader );
 			fileLoader.setWithCredentials( scope.withCredentials );
 			fileLoader.load( subobjectURL, function ( text ) {
