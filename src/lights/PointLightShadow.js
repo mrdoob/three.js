@@ -9,11 +9,14 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
+/** Define default shadow distance. */
+const DEF_DISTANCE = 500;
+
 class PointLightShadow extends LightShadow {
 
 	constructor() {
 
-		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
+		super( new PerspectiveCamera( 90, 1, 0.5, DEF_DISTANCE ) );
 
 		this._frameExtents = new Vector2( 4, 2 );
 
@@ -64,7 +67,7 @@ class PointLightShadow extends LightShadow {
 		const camera = this.camera;
 		const shadowMatrix = this.matrix;
 
-		const far = light.distance || camera.far;
+		const far = light.distance != null ? light.distance : DEF_DISTANCE;
 
 		if ( far !== camera.far ) {
 
