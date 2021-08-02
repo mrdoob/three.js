@@ -303,48 +303,71 @@ function smoothNormals( faces, lineSegments ) {
 
 					// share the first normal
 					const otherNext = ( otherIndex + 1 ) % otherVertCount;
+					if (
+						vertNormals[ index ] && otherNormals[ otherNext ] &&
+						vertNormals[ index ] !== otherNormals[ otherNext ]
+					) {
+
+						otherNormals[ otherNext ].norm.add( vertNormals[ index ].norm );
+						vertNormals[ index ].norm = otherNormals[ otherNext ].norm;
+
+					}
+
 					let sharedNormal1 = vertNormals[ index ] || otherNormals[ otherNext ];
 					if ( sharedNormal1 === null ) {
 
-						sharedNormal1 = new Vector3();
-						normals.push( sharedNormal1 );
+						// it's possible to encounter an edge of a triangle that has already been traversed meaning
+						// both edges already have different normals defined and shared. To work around this we create
+						// a wrapper object so when those edges are merged the normals can be updated everywhere.
+						sharedNormal1 = { norm: new Vector3() };
+						normals.push( sharedNormal1.norm );
 
 					}
 
 					if ( vertNormals[ index ] === null ) {
 
 						vertNormals[ index ] = sharedNormal1;
-						sharedNormal1.add( faceNormal );
+						sharedNormal1.norm.add( faceNormal );
 
 					}
 
 					if ( otherNormals[ otherNext ] === null ) {
 
 						otherNormals[ otherNext ] = sharedNormal1;
-						sharedNormal1.add( otherFaceNormal );
+						sharedNormal1.norm.add( otherFaceNormal );
 
 					}
 
 					// share the second normal
+					if (
+						vertNormals[ next ] && otherNormals[ otherIndex ] &&
+						vertNormals[ next ] !== otherNormals[ otherIndex ]
+					) {
+
+						otherNormals[ otherIndex ].norm.add( vertNormals[ next ].norm );
+						vertNormals[ next ].norm = otherNormals[ otherIndex ].norm;
+
+					}
+
 					let sharedNormal2 = vertNormals[ next ] || otherNormals[ otherIndex ];
 					if ( sharedNormal2 === null ) {
 
-						sharedNormal2 = new Vector3();
-						normals.push( sharedNormal2 );
+						sharedNormal2 = { norm: new Vector3() };
+						normals.push( sharedNormal2.norm );
 
 					}
 
 					if ( vertNormals[ next ] === null ) {
 
 						vertNormals[ next ] = sharedNormal2;
-						sharedNormal2.add( faceNormal );
+						sharedNormal2.norm.add( faceNormal );
 
 					}
 
 					if ( otherNormals[ otherIndex ] === null ) {
 
 						otherNormals[ otherIndex ] = sharedNormal2;
-						sharedNormal2.add( otherFaceNormal );
+						sharedNormal2.norm.add( otherFaceNormal );
 
 					}
 
@@ -540,7 +563,13 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 			for ( let j = 0, l = elemNormals.length; j < l; j ++ ) {
 
-				const n = elemNormals[ j ] || elem.faceNormal;
+				let n = elem.faceNormal;
+				if ( elemNormals[ j ] ) {
+
+					n = elemNormals[ j ].norm;
+
+				}
+
 				const index = offset + j * 3;
 				normals[ index + 0 ] = n.x;
 				normals[ index + 1 ] = n.y;
