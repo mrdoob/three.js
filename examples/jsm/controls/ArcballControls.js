@@ -132,12 +132,16 @@ class ArcballControls extends Object3D {
 		this._currentFingerRotation = 0;
 
 		//double tap
-		this._nTaps = 0;
-		this._downStart = 0;
+		this._devPxRatio = 0;
+		this._detectDouble = true;
+		this._nclicks = 0;
+		this._downEvents = [];
+		this._downStart = 0;	//pointerDown time
+		this._clickStart = 0;	//first click time
 		this._maxDownTime = 250;
 		this._maxInterval = 300;
-		this._posThreshold = 16;
-		this._movementThreshold = 16;
+		this._posThreshold = 20;
+		this._movementThreshold = 20;
 
 		//cursor positions
 		this._currentCursorPosition = new Vector3();
@@ -209,10 +213,9 @@ class ArcballControls extends Object3D {
 		}
 
 		this.domElement.style.touchAction = 'none';
+		this._devPxRatio = window.devicePixelRatio;
 
 		this.domElement.addEventListener( 'wheel', this.onWheel );
-		this.domElement.addEventListener( 'dblclick', this.onDoubleTap );
-
 		this.domElement.addEventListener('pointerdown', this.onPointerDown);
 
 		window.addEventListener( 'keydown', this.onKeyDown );
@@ -245,10 +248,14 @@ class ArcballControls extends Object3D {
 
 	onPointerDown = ( event ) => {
 
-		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
+		if ( event.isPrimary ) {
 
-			window.addEventListener( 'pointermove', this.onPointerMove );
-			window.addEventListener( 'pointerup', this.onPointerUp );
+			this._downEvents.push( event );
+			this._downStart = performance.now();
+
+		} 
+
+		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
 			this._touchStart.push( event );
 			this._touchCurrent.push( event );
@@ -260,6 +267,10 @@ class ArcballControls extends Object3D {
 					//singleStart
 					this._input = INPUT.ONE_FINGER;
 					this.onSinglePanStart( event );
+
+					window.addEventListener( 'pointermove', this.onPointerMove );
+					window.addEventListener( 'pointerup', this.onPointerUp );
+
 					break;
 
 				case INPUT.ONE_FINGER:
@@ -281,7 +292,7 @@ class ArcballControls extends Object3D {
 					break;
 			}
 
-		} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ){
+		} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ) {
 
 			window.addEventListener( 'pointermove', this.onPointerMove );
 			window.addEventListener( 'pointerup', this.onPointerUp );
@@ -341,6 +352,19 @@ class ArcballControls extends Object3D {
 
 		}
 
+		//checkDistance
+		if( this._detectDouble ) {
+
+			const movement = this.calculatePointersDistance( this._downEvents[ this._downEvents.length -1 ], event ) * this._devPxRatio;
+			if ( movement > this._movementThreshold ) {
+	
+				this._detectDouble = false;
+				this._downEvents.splice( 0, this._downEvents.length );
+	
+			}
+
+		}
+
 	};
 
 
@@ -348,7 +372,9 @@ class ArcballControls extends Object3D {
 
 		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
-			for( let i = 0; i < this._touchCurrent.length; i++ ) {
+			let nTouch = this._touchCurrent.length;
+
+			for( let i = 0; i < nTouch; i++ ) {
 
 				if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
 
@@ -365,6 +391,9 @@ class ArcballControls extends Object3D {
 				case INPUT.ONE_FINGER:
 					
 					//singleEnd
+					window.removeEventListener( 'pointermove', this.onPointerMove );
+					window.removeEventListener( 'pointerup', this.onPointerUp );
+
 					this._input = INPUT.NONE;
 					this.onSinglePanEnd();
 
@@ -397,17 +426,64 @@ class ArcballControls extends Object3D {
 
 			}
 
-			document.removeEventListener( 'pointermove', this.onPointerMove );
-			document.removeEventListener( 'pointerup', this.onPointerUp );
-
 		} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
+
+			window.removeEventListener( 'pointermove', this.onPointerMove );
+			window.removeEventListener( 'pointerup', this.onPointerUp );
 
 			this._input = INPUT.NONE;
 			this.onSinglePanEnd();
 			this._button = 0;
 
-			document.removeEventListener( 'pointermove', this.onPointerMove );
-			document.removeEventListener( 'pointerup', this.onPointerUp );
+		}
+
+		if ( this._detectDouble ) {
+
+			const downTime = event.timeStamp - this._downEvents[ this._downEvents.length -1 ].timeStamp;
+
+			if ( downTime <= this._maxDownTime ) {
+
+				if ( this._nclicks == 1 ) {
+
+					//second click performed
+					const clickInterval = event.timeStamp - this._clickStart;
+					const movement = this.calculatePointersDistance( this._downEvents[ 1 ], this._downEvents[ 0 ] ) * this._devPxRatio;
+
+					if ( clickInterval <= this._maxInterval && movement <= this._posThreshold) {
+
+						//fire double tap
+						this._nclicks = 0;
+						this._downEvents.splice( 0, this._downEvents.length );
+						this.onDoubleTap( event );
+
+					} else {
+
+						//new first click
+						this._clickStart = event.timeStamp;
+						this._downEvents.shift();
+
+					}
+
+				} else {
+
+					//first click performed
+					this._nclicks++;
+					this._clickStart = performance.now();
+
+				}
+
+			} else {
+
+				this._nclicks = 0;
+				this._downEvents.splice( 0, this._downEvents.length );
+
+			}
+
+		} else {
+
+			this._nclicks = 0;
+			this._downEvents.splice( 0, this._downEvents.length );
+			this._detectDouble = true;
 
 		}
 
@@ -444,7 +520,7 @@ class ArcballControls extends Object3D {
 
 			}
 
-			if ( event.shiftKey && this.camera.type == 'PerspectiveCamera' ) {
+			if ( event.shiftKey && this.camera.isPerspectiveCamera ) {
 
 				//Vertigo effect
 
@@ -522,11 +598,11 @@ class ArcballControls extends Object3D {
 	
 					let scalePoint;
 
-					if ( this.camera.type == 'OrthographicCamera' ) {
+					if ( this.camera.isOrthographicCamera ) {
 	
 						scalePoint = this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.camera.quaternion ).multiplyScalar (1 / this.camera.zoom ).add( this._gizmos.position );
 	
-					} else if ( this.camera.type == 'PerspectiveCamera' ) {
+					} else if ( this.camera.isPerspectiveCamera ) {
 	
 						scalePoint = this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.camera.quaternion ).add( this._gizmos.position );
 	
@@ -575,17 +651,6 @@ class ArcballControls extends Object3D {
 				this.pasteState();
 
 			}
-
-		}
-
-	};
-
-
-	onPress = () => {
-
-		if ( this._state == STATE.ANIMATION_ROTATE || this._state == STATE.ANIMATION_FOCUS ) {
-
-			this.updateTbState( STATE.IDLE, false );
 
 		}
 
@@ -1071,7 +1136,7 @@ class ArcballControls extends Object3D {
 
 			} else {
 
-				if ( this.camera.type == 'OrthographicCamera' ) {
+				if ( this.camera.isOrthographicCamera ) {
 
 					scalePoint = this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement )
 						.applyQuaternion( this.camera.quaternion )
@@ -1079,7 +1144,7 @@ class ArcballControls extends Object3D {
 						.add( this._gizmos.position );
 
 				}
-				else if ( this.camera.type == 'PerspectiveCamera' ) {
+				else if ( this.camera.isPerspectiveCamera ) {
 
 					scalePoint = this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement )
 						.applyQuaternion( this.camera.quaternion )
@@ -1435,7 +1500,7 @@ class ArcballControls extends Object3D {
 			const multiplier = 3;
 			let size, divisions, maxLength, tick;
 
-			if ( this.camera.type == 'OrthographicCamera' ) {
+			if ( this.camera.isOrthographicCamera ) {
 
 				const width = this.camera.right - this.camera.left;
 				const height = this.camera.bottom - this.camera.top;
@@ -1446,7 +1511,7 @@ class ArcballControls extends Object3D {
 				size = maxLength / this.camera.zoom * multiplier;
 				divisions = size / tick * this.camera.zoom;
 
-			} else if ( this.camera.type == 'PerspectiveCamera' ) {
+			} else if ( this.camera.isPerspectiveCamera ) {
 
 				const distance = this.camera.position.distanceTo( this._gizmos.position );
 				const halfFovV = MathUtils.DEG2RAD * this.camera.fov * 0.5;
@@ -1487,16 +1552,14 @@ class ArcballControls extends Object3D {
 
 		}
 
-		this.domElement.removeEventListener( 'pointerup', this.onMouseDown );
+		this.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
 		this.domElement.removeEventListener( 'wheel', this.onWheel );
 
-		document.removeEventListener( 'pointermove', this.onMouseMove );
-		document.removeEventListener( 'pointerup', this.onMouseUp );
+		window.removeEventListener( 'pointermove', this.onPointerMove );
+		window.removeEventListener( 'pointerup', this.onPointerUp );
 
 		window.removeEventListener( 'resize', this.onWindowResize );
 		window.addEventListener( 'keydown', this.onKeyDown );
-
-		//this._manager.destroy();
 
 		this.scene.remove( this._gizmos );
 		this.disposeGrid();
@@ -1707,7 +1770,6 @@ class ArcballControls extends Object3D {
 
 			//animation start
 			this._timeStart = time;
-			//this._manager.get( 'press' ).options.enable = true ;
 
 		}
 
@@ -1730,8 +1792,6 @@ class ArcballControls extends Object3D {
 				this.activateGizmos( false );
 
 				window.cancelAnimationFrame( this._animationId );
-
-				//this._manager.get( 'press' ).options.enable = false ;
 
 				this.dispatchEvent( _changeEvent ); 
 
@@ -1761,8 +1821,6 @@ class ArcballControls extends Object3D {
 			window.cancelAnimationFrame( this._animationId );
 			this._animationId = -1;
 
-			//this._manager.get( 'press' ).options.enable = false ;
-
 			this.dispatchEvent( _changeEvent );
 
 		}
@@ -1783,7 +1841,6 @@ class ArcballControls extends Object3D {
 			this._anglePrev = 0
 			this._angleCurrent = 0;
 			this._timeStart = time;
-			//this._manager.get( 'press' ).options.enable = true ;
 
 		}
 
@@ -1815,8 +1872,6 @@ class ArcballControls extends Object3D {
 				window.cancelAnimationFrame( this._animationId );
 				this._animationId = -1;
 
-				//this._manager.get( 'press' ).options.enable = false ;
-
 				this.dispatchEvent( _changeEvent );
 
 			}
@@ -1833,8 +1888,6 @@ class ArcballControls extends Object3D {
 
 			window.cancelAnimationFrame( this._animationId );
 			this._animationId = -1;
-
-			//this._manager.get( 'press' ).options.enable = false ;
 
 			this.dispatchEvent ( _changeEvent );
 
@@ -1853,12 +1906,12 @@ class ArcballControls extends Object3D {
 
 		const movement = p0.clone().sub( p1 );
 
-		if ( this.camera.type == 'OrthographicCamera' ) {
+		if ( this.camera.isOrthographicCamera ) {
 
 			//adjust movement amount
 			movement.multiplyScalar( 1 / this.camera.zoom );
 
-		} else if ( this.camera.type == 'PerspectiveCamera' && adjust ) {
+		} else if ( this.camera.isPerspectiveCamera && adjust ) {
 
 			//adjust movement amount
 			this._v3_1.setFromMatrixPosition( this._cameraMatrixState0 );	//camera's initial position
@@ -1884,7 +1937,7 @@ class ArcballControls extends Object3D {
 
 		this.camera.zoom = this._zoom0;
 	
-		if( this.camera.type == 'PerspectiveCamera' ) {
+		if( this.camera.isPerspectiveCamera ) {
 
 			this.camera.fov = this._fov0;
 
@@ -1940,7 +1993,7 @@ class ArcballControls extends Object3D {
 	copyState = () => {
 
 		let state;
-		if ( this.camera.type == 'OrthographicCamera' ) {
+		if ( this.camera.isOrthographicCamera ) {
 
 			state = JSON.stringify( { arcballState: { 
 				
@@ -1953,7 +2006,7 @@ class ArcballControls extends Object3D {
 
 			} } );
 
-		} else if ( this.camera.type == 'PerspectiveCamera' ) {
+		} else if ( this.camera.isPerspectiveCamera ) {
 
 			state = JSON.stringify( { arcballState: { 
 				cameraFar: this.camera.far,
@@ -1995,7 +2048,7 @@ class ArcballControls extends Object3D {
 		this._zoom0 = this.camera.zoom;
 		this._up0.copy( this.camera.up );
 
-		if ( this.camera.type == 'PerspectiveCamera' ) {
+		if ( this.camera.isPerspectiveCamera ) {
 
 			this._fov0 = this.camera.fov;
 
@@ -2015,7 +2068,7 @@ class ArcballControls extends Object3D {
 		const scalePoint = point.clone();
 		let sizeInverse = 1 / size;
 		
-		if( this.camera.type == 'OrthographicCamera' ) {
+		if( this.camera.isOrthographicCamera ) {
 
 			//camera zoom
 			this.camera.zoom = this._zoomState;
@@ -2059,7 +2112,7 @@ class ArcballControls extends Object3D {
 			this.setTransformationMatrices( this._m4_1, this._m4_2 );
 			return _transformation;
 
-		} else if ( this.camera.type == 'PerspectiveCamera' ) {
+		} else if ( this.camera.isPerspectiveCamera ) {
 		   
 			this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
 			this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
@@ -2126,7 +2179,7 @@ class ArcballControls extends Object3D {
 	 */
 	setFov = ( value ) => {
 
-		if ( this.camera.type == 'PerspectiveCamera' ) {
+		if ( this.camera.isPerspectiveCamera ) {
 
 			this.camera.fov = MathUtils.clamp( value, this.minFov, this.maxFov );
 			this.camera.updateProjectionMatrix();
@@ -2470,13 +2523,13 @@ class ArcballControls extends Object3D {
 		this._cameraMatrixState.copy( this.camera.matrix );
 		this._gizmoMatrixState.copy( this._gizmos.matrix );
 
-		if ( this.camera.type == 'OrthographicCamera' ) {
+		if ( this.camera.isOrthographicCamera ) {
 
 			this._cameraProjectionState.copy( this.camera.projectionMatrix );
 			this.camera.updateProjectionMatrix();
 			this._zoomState = this.camera.zoom;
 
-		} else if ( this.camera.type == 'PerspectiveCamera') {
+		} else if ( this.camera.isPerspectiveCamera) {
 
 			this._fovState =  this.camera.fov;
 
@@ -2505,7 +2558,7 @@ class ArcballControls extends Object3D {
 		const EPS = 0.000001;
 
 		//check min/max parameters
-		if ( this.camera.type == 'OrthographicCamera' ) {
+		if ( this.camera.isOrthographicCamera ) {
 
 			//check zoom
 			if ( this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom ) {
@@ -2515,7 +2568,7 @@ class ArcballControls extends Object3D {
 						
 			}
 
-		} else if ( this.camera.type == 'PerspectiveCamera' ) {
+		} else if ( this.camera.isPerspectiveCamera ) {
  
 			//check distance
 			const distance = this.camera.position.distanceTo( this._gizmos.position );
@@ -2576,7 +2629,7 @@ class ArcballControls extends Object3D {
 
 			this.camera.zoom = state.arcballState.cameraZoom;
 
-			if ( this.camera.type == 'PerspectiveCamera' ) {
+			if ( this.camera.isPerspectiveCamera ) {
 
 				this.camera.fov = state.arcballState.cameraFov;
 
@@ -2608,4 +2661,4 @@ class ArcballControls extends Object3D {
 
 export { ArcballControls };
 
-//todo: ontriplepan: fare punto medio per ogni dito presente nell'array (da 1 a max)
+//todo: fixare type persp/ortho come piace a loro
