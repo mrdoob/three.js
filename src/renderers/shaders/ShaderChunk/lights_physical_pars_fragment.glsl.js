@@ -16,7 +16,6 @@ struct PhysicalMaterial {
 
 };
 
-#define MAXIMUM_SPECULAR_COEFFICIENT 0.16
 #define DEFAULT_SPECULAR_COEFFICIENT 0.04
 
 // Clear coat directional hemishperical reflectance (this approximation should be improved)
