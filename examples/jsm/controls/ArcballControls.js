@@ -35,6 +35,7 @@ const INPUT = {
 
 	NONE: Symbol(),
 	ONE_FINGER: Symbol(),
+	ONE_FINGER_SWITCHED: Symbol(),
 	TWO_FINGER: Symbol(),
 	MULT_FINGER: Symbol(),
 	CURSOR: Symbol()
@@ -126,6 +127,7 @@ class ArcballControls extends Object3D {
 		this._input = INPUT.NONE;
 
 		//two fingers touch interaction
+		this._switchSensibility = 32;	//minimum movement to be performed to fire single pan start after the second finger has been released
 		this._startFingerDistance = 0; //distance between two fingers
 		this._currentFingerDistance = 0;
 		this._startFingerRotation = 0; //amount of rotation performed with two fingers
@@ -140,8 +142,8 @@ class ArcballControls extends Object3D {
 		this._clickStart = 0;	//first click time
 		this._maxDownTime = 250;
 		this._maxInterval = 300;
-		this._posThreshold = 20;
-		this._movementThreshold = 20;
+		this._posThreshold = 22;
+		this._movementThreshold = 22;
 
 		//cursor positions
 		this._currentCursorPosition = new Vector3();
@@ -279,6 +281,7 @@ class ArcballControls extends Object3D {
 					break;
 
 				case INPUT.ONE_FINGER:
+				case INPUT.ONE_FINGER_SWITCHED:
 
 					//doubleStart
 					this._input = INPUT.TWO_FINGER;
@@ -315,28 +318,38 @@ class ArcballControls extends Object3D {
 
 		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
-			for ( let i = 0; i < this._touchCurrent.length; i++ ) {
-
-				if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
-
-					this._touchCurrent.splice( i, 1, event );
-					break;
-
-				}
-
-			}
-
 			switch ( this._input ) {
 
 				case INPUT.ONE_FINGER:
 					
 					//singleMove
+					this.updateTouchEvent( event );
+
 					this.onSinglePanMove( event );
+					break;
+
+				case INPUT.ONE_FINGER_SWITCHED:
+
+					const movement = this.calculatePointersDistance( this._touchCurrent[ 0 ], event ) * this._devPxRatio;
+				
+					if ( movement >= this._switchSensibility ) {
+
+						//singleMove
+						this._input = INPUT.ONE_FINGER;
+						this.updateTouchEvent( event );
+
+						this.onSinglePanStart( event );
+						break;
+
+					}
+
 					break;
 
 				case INPUT.TWO_FINGER:
 
 					//rotate/pan/pinchMove
+					this.updateTouchEvent( event );
+
 					this.onRotateMove();
 					this.onPinchMove();
 					this.onDoublePanMove();
@@ -346,6 +359,8 @@ class ArcballControls extends Object3D {
 				case INPUT.MULT_FINGER:
 
 					//multMove
+					this.updateTouchEvent( event );
+
 					this.onTriplePanMove( event );
 					break;
 			
@@ -393,6 +408,7 @@ class ArcballControls extends Object3D {
 			switch ( this._input ) {
 
 				case INPUT.ONE_FINGER:
+				case INPUT.ONE_FINGER_SWITCHED:
 					
 					//singleEnd
 					window.removeEventListener( 'pointermove', this.onPointerMove );
@@ -410,9 +426,8 @@ class ArcballControls extends Object3D {
 					this.onPinchEnd( event );
 					this.onRotateEnd( event );
 
-					//singleStart
-					this._input = INPUT.ONE_FINGER;
-					this.onSinglePanStart( this._touchCurrent[ 0 ] );
+					//switching to singleStart
+					this._input = INPUT.ONE_FINGER_SWITCHED;
 
 					break;					
 					
@@ -501,7 +516,7 @@ class ArcballControls extends Object3D {
 
 		if ( this.enabled && this.enableZoom ) {
 
-			event.preventDefault();
+			//event.preventDefault();
 			this.dispatchEvent( _startEvent );
 
 			//wheel has been moved while another operation has being performed
@@ -1278,8 +1293,6 @@ class ArcballControls extends Object3D {
 
 		}
 
-		//this.dispatchEvent( _changeEvent );
-
 	};
 
 	onTriplePanEnd = ( event ) => {
@@ -1290,6 +1303,11 @@ class ArcballControls extends Object3D {
 
 	};
 
+	/**
+	 * Set _center's x/y coordinates
+	 * @param {Number} clientX 
+	 * @param {Number} clientY 
+	 */
 	setCenter = ( clientX, clientY ) => {
 
 		_center.x = clientX;
@@ -1297,9 +1315,34 @@ class ArcballControls extends Object3D {
 
 	};
 
+	/**
+	 * Calculate the angle between two pointers
+	 * @param {PointerEvent} p1 
+	 * @param {PointerEvent} p2
+	 * @returns {Number} The angle between two pointers in degrees
+	 */
 	getAngle = ( p1, p2  ) => {
 
 		return Math.atan2( p2.clientY - p1.clientY, p2.clientX - p1.clientX ) * 180 / Math.PI;
+
+	};
+
+	/**
+	 * Update a PointerEvent inside current pointerevents array
+	 * @param {PointerEvent} event
+	 */
+	updateTouchEvent = ( event ) => {
+
+		for ( let i = 0; i < this._touchCurrent.length; i++ ) {
+
+			if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
+
+				this._touchCurrent.splice( i, 1, event )
+				break;
+
+			}
+
+		}
 
 	};
 
@@ -2654,12 +2697,12 @@ class ArcballControls extends Object3D {
 			this._tbRadius = this.calculateTbRadius( this.camera );
 			let gizmoTmp = new Matrix4().copy( this._gizmoMatrixState0 );
 			this.makeGizmos( this._gizmos.position, this._tbRadius );
-			this._gizmoMatrixState0.copy(gizmoTmp);
+			this._gizmoMatrixState0.copy( gizmoTmp );
 
 			this.camera.lookAt( this._gizmos.position );
 			this.updateTbState( STATE.IDLE, false );
 
-			this.dispatchEvent(_changeEvent);
+			this.dispatchEvent( _changeEvent );
 
 		}
 
@@ -2668,5 +2711,3 @@ class ArcballControls extends Object3D {
 };
 
 export { ArcballControls };
-
-//todo: fixare type persp/ortho come piace a loro

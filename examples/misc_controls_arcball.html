@@ -10,9 +10,9 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - interactive controls comparison<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - arcball controls<br/>
 			<a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
-		</div>
+		</div> 
 
 		<script type="module">
 			import * as THREE from '../build/three.module.js';
@@ -20,21 +20,16 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { ArcballControls } from './jsm/controls/ArcballControls.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-
-			const types = [ 'Arcball', 'Orbit', 'Trackball' ];
-			const controlsType = { type: 'Arcball' };
 
 			const cameras = [ 'Orthographic', 'Perspective' ];
 			const cameraType = { type: 'Perspective' };
 
 			const perspectiveDistance = 2.5;
 			const orthographicDistance = 120;
-			let camera, controls, scene, renderer, gui, animationId;
+			let camera, controls, scene, renderer, gui;
 			let folderOptions, folderAnimations;
 
 			const arcballGui = {
@@ -45,13 +40,6 @@
 					
 					controls = new ArcballControls( camera, renderer.domElement, scene );
 					controls.addEventListener( 'change', render );
-
-					if (animationId != -1) {
-
-						cancelAnimationFrame( animationId );
-						animationId = -1;
-
-					}
 
 					this.gizmoVisible = true;
 
@@ -81,7 +69,7 @@
 					folderOptions.add( controls, 'copyState' ).name( 'Copy state(ctrl+c)' );
 					folderOptions.add( controls, 'pasteState' ).name( 'Paste state(ctrl+v)' );
 					folderOptions.add( controls, 'reset' ).name( 'Reset' );
-					folderAnimations.add( controls, 'enableAnimations' ).name( 'Enable anim' );
+					folderAnimations.add( controls, 'enableAnimations' ).name( 'Enable anim.' );
 					folderAnimations.add( controls, 'dampingFactor', 0, 100, 1 ).name( 'Damping' );
 					folderAnimations.add( controls, 'wMax', 0, 100, 1 ).name( 'Angular spd' );
 
@@ -89,101 +77,8 @@
 
 			};
 
-			const orbitGui = {
-
-				setOrbitControls: function() {
-					
-					controls = new OrbitControls( camera, renderer.domElement );				
-					controls.addEventListener( 'change', render );
-
-					if (animationId != -1) {
-
-						cancelAnimationFrame( animationId );
-						animationId = -1;
-
-					}
-
-					this.populateGui();
-
-				},
-
-				populateGui: function() {
-
-					folderOptions.add( controls, 'enabled' ).name( 'Enable controls' );
-					folderOptions.add( controls, 'enableRotate' ).name( 'Enable rotate' );
-					folderOptions.add( controls, 'enablePan' ).name( 'Enable pan' );
-					folderOptions.add( controls, 'enableZoom' ).name( 'Enable zoom' );
-					folderOptions.add( controls, 'minDistance', 0, 50, 0.5 ).name( 'Min distance' );
-					folderOptions.add( controls, 'maxDistance', 0, 50, 0.5 ).name( 'Max distance' );
-					folderOptions.add( controls, 'minZoom', 0, 50, 1 ).name( 'Min zoom' );
-					folderOptions.add( controls, 'maxZoom', 0, 50, 1 ).name( 'Max zoom' );
-					folderOptions.add( controls, 'rotateSpeed', 0, 10, 0.1 ).name( 'Rotate spd' );
-					folderOptions.add( controls, 'panSpeed', 0, 10, 0.1 ).name( 'Pan spd' );
-					folderOptions.add( controls, 'zoomSpeed', 1, 10, 0.1 ).name( 'Zoom spd' );
-					folderOptions.add( controls, 'saveState' ).name( 'Save state' );
-					folderOptions.add( controls, 'reset' ).name( 'Reset' );
-					folderAnimations.add( controls, 'enableDamping' ).name( 'Enable damping' ).onChange( function () {
-
-						if ( controls.enableDamping ) {
-
-							animate();
-
-						} else {
-
-							if (animationId != -1) {
-							
-								cancelAnimationFrame( animationId );
-								animationId = -1;
-							
-							}
-						}
-
-					} );
-					
-					folderAnimations.add( controls, 'dampingFactor', 0.05, 1, 0.05 ).name( 'Damping' );
-
-				},
-
-				params: {
-
-					enableDamping: null
-
-				}
-
-			};
-
-			const trackballGui = {
-
-				setTrackballControls: function() {
-
-					animate();
-					controls = new TrackballControls( camera, renderer.domElement );
-					this.populateGui();
-
-				},
-
-				populateGui() {
-
-					folderOptions.add( controls, 'enabled' ).name( 'Enable controls' );
-					folderOptions.add( controls, 'noRotate' ).name( 'Disable rotate' );
-					folderOptions.add( controls, 'noPan' ).name( 'Disable pan' );
-					folderOptions.add( controls, 'noZoom' ).name( 'Disable zoom' );
-					folderOptions.add( controls, 'minDistance', 0, 50, 0.5 ).name( 'Min distance' );
-					folderOptions.add( controls, 'maxDistance', 0, 50, 0.5 ).name( 'Max distance' );
-					folderOptions.add( controls, 'rotateSpeed', 0, 10, 0.1 ).name( 'Rotate spd' );
-					folderOptions.add( controls, 'panSpeed', 0, 10, 0.1 ).name( 'Pan spd' );
-					folderOptions.add( controls, 'zoomSpeed', 1, 10, 0.1 ).name( 'Zoom spd' );
-					folderOptions.add( controls, 'reset' ).name( 'Reset' );
-					folderAnimations.add( controls, 'staticMoving' ).name( 'Static moving' );
-					folderAnimations.add( controls, 'dynamicDampingFactor', 0, 1, 0.1 ).name( 'Damping' );
-					
-				}
-
-			};
-
 
 			init();
-			//animate();
 
 			function init() {
 
@@ -271,12 +166,6 @@
 						//
 
 						gui = new GUI();
-						gui.add( controlsType, 'type', types ).name( 'Choose Controller' ).onChange( function () {
-							
-							setControls( controlsType.type );
-
-						} );
-
 						gui.add( cameraType, 'type', cameras ).name( 'Choose Camera' ).onChange( function () {
 							
 							setCamera( cameraType.type )
@@ -291,14 +180,6 @@
 						render();
 
 				} );
-
-			};
-
-			function animate( now ) {
-
-				animationId = requestAnimationFrame( animate );
-				controls.update()
-				render();
 
 			};
 
@@ -377,58 +258,7 @@
 
 				}
 
-				if ( controlsType.type == 'Arcball' ) {
-
-					controls.setCamera( camera );
-
-				} else {
-
-					controls.object = camera;
-
-				}
-
-				render();
-
-			};
-
-			function setControls( type ) {
-				
-				if ( controls != null ) {
-
-					controls.dispose();
-
-				}
-
-				if ( camera.type == 'OrthographicCamera' ) {
-
-					camera = makeOrthographicCamera();
-					camera.position.set( 0, 0, orthographicDistance );
-
-				} else if ( camera.type == 'PerspectiveCamera' ) {
-
-					camera = makePerspectiveCamera();
-					camera.position.set( 0, 0, perspectiveDistance );   
-
-				}
-				
-				gui.removeFolder( folderOptions );
-				folderOptions = gui.addFolder( type+' parameters' );
-				folderAnimations = folderOptions.addFolder( 'Animations' );
-
-				switch( type ) {
-
-					case 'Arcball': 
-						arcballGui.setArcballControls();
-						break;
-
-					case 'Orbit': 
-						orbitGui.setOrbitControls();
-						break;
-
-					case 'Trackball': 
-						trackballGui.setTrackballControls();
-						break;
-				}
+				controls.setCamera( camera );
 
 				render();
 
