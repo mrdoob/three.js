@@ -808,7 +808,7 @@ class LDrawLoader extends Loader {
 
 		this.rootParseScope = this.newParseScopeLevel();
 
-		// Add default main triangle and line edge materials (used in piecess that can be coloured with a main color)
+		// Add default main triangle and line edge materials (used in pieces that can be coloured with a main color)
 		this.setMaterials( [
 			this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ),
 			this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
@@ -1029,7 +1029,7 @@ class LDrawLoader extends Loader {
 
 	parseColourMetaDirective( lineParser ) {
 
-		// Parses a colour definition and returns a THREE.Material or null if error
+		// Parses a colour definition and returns a THREE.Material
 
 		let code = null;
 
@@ -1984,7 +1984,7 @@ class LDrawLoader extends Loader {
 
 		}
 
-		// Parse the object (returns a Group)
+		// Parse the object
 		this.objectParse( text, parseScope );
 
 		const subobjects = parseScope.subobjects;
@@ -1997,10 +1997,10 @@ class LDrawLoader extends Loader {
 
 		// Kick off of the downloads in parallel but process all the subobjects
 		// in order so all the assembly instructions are correct
-		const scopes = await Promise.all( promises );
-		for ( let i = 0, l = scopes.length; i < l; i ++ ) {
+		const subobjectScopes = await Promise.all( promises );
+		for ( let i = 0, l = subobjectScopes.length; i < l; i ++ ) {
 
-			this.finalizeObject( scopes[ i ] );
+			this.finalizeObject( subobjectScopes[ i ] );
 
 		}
 
