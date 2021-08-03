@@ -2,7 +2,7 @@ export default /* glsl */`
 #define STANDARD
 
 #ifdef PHYSICAL
-	#define REFLECTIVITY
+	#define IOR
 	#define CLEARCOAT
 	#define SPECULAR
 #endif
@@ -20,8 +20,8 @@ uniform float opacity;
 	uniform vec3 attenuationTint;
 #endif
 
-#ifdef REFLECTIVITY
-	uniform float reflectivity;
+#ifdef IOR
+	uniform float ior;
 #endif
 
 #ifdef SPECULAR

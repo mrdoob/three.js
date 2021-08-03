@@ -237,6 +237,9 @@ class StandardNode extends Node {
 			builder.addParsCode( /* glsl */`
 				varying vec3 vViewPosition;
 
+				#define NODE_MAXIMUM_SPECULAR_COEFFICIENT 0.16
+				#define NODE_DEFAULT_SPECULAR_COEFFICIENT 0.04
+
 				#ifndef FLAT_SHADED
 
 					varying vec3 vNormal;
@@ -375,13 +378,13 @@ class StandardNode extends Node {
 
 				output.push(
 					reflectivity.code,
-					'material.specularColor = mix( vec3( MAXIMUM_SPECULAR_COEFFICIENT * pow2( ' + reflectivity.result + ' ) ), diffuseColor, metalnessFactor );'
+					'material.specularColor = mix( vec3( NODE_MAXIMUM_SPECULAR_COEFFICIENT * pow2( ' + reflectivity.result + ' ) ), diffuseColor, metalnessFactor );'
 				);
 
 			} else {
 
 				output.push(
-					'material.specularColor = mix( vec3( DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor, metalnessFactor );'
+					'material.specularColor = mix( vec3( NODE_DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor, metalnessFactor );'
 				);
 
 			}

@@ -24,7 +24,7 @@
 
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-			let camera, scene, renderer, clock, mixer;
+			let camera, scene, renderer, controls, clock, mixer;
 
 			init();
 			animate();
@@ -53,17 +53,16 @@
 
 						// model
 
-						const loader = new GLTFLoader()
+						new GLTFLoader()
 							.setPath( 'models/gltf/' )
-							.setDRACOLoader( new DRACOLoader().setDecoderPath( 'js/libs/draco/gltf/' ) );
+							.setDRACOLoader( new DRACOLoader().setDecoderPath( 'js/libs/draco/gltf/' ) )
+							.load( 'IridescentDishWithOlives.glb', function ( gltf ) {
 
-						loader.load( 'IridescentDishWithOlives.glb', function ( gltf ) {
+								mixer = new THREE.AnimationMixer( gltf.scene );
+								mixer.clipAction( gltf.animations[ 0 ] ).play();
+								scene.add( gltf.scene );
 
-							mixer = new THREE.AnimationMixer( gltf.scene );
-							mixer.clipAction( gltf.animations[ 0 ] ).play();
-							scene.add( gltf.scene );
-
-						} );
+							} );
 
 					} );
 
@@ -75,10 +74,11 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
 				controls.minDistance = 0.5;
-				controls.maxDistance = 10;
-				controls.target.y = 0.1;
+				controls.maxDistance = 1;
+				controls.target.set( 0, 0.1, 0 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -101,6 +101,8 @@
 				requestAnimationFrame( animate );
 
 				if ( mixer ) mixer.update( clock.getDelta() );
+
+				controls.update(); // required if damping enabled
 
 				render();
 
