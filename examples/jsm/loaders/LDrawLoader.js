@@ -1868,8 +1868,6 @@ class LDrawLoader extends Loader {
 		// Parse the object (returns a Group)
 		this.objectParse( text, parseScope );
 
-		// TODO: we need to wait for all subobjects to load and then finalize them in order to
-		// make sure everything is applied in the correct order.
 		const subobjects = parseScope.subobjects;
 		const promises = [];
 		for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
@@ -1878,17 +1876,29 @@ class LDrawLoader extends Loader {
 
 		}
 
-		await Promise.all( promises );
+		// Kick off of the downloads in parallel but process all the subobjects
+		// in order so all the assembly instructions are correct
+		const scopes = await Promise.all( promises );
+		scopes.forEach( s => {
 
-		finalizeObject();
+			finalizeObject( s );
+
+		} );
+
+		// TODO: should this go after any call to processObject?
+		if ( ! parentParseScope.isFromParse ) {
+
+			finalizeObject( parseScope );
+
+		}
 
 		return parseScope;
 
 
+		// TODO: move this out of this scope
+		function finalizeObject( parseScope ) {
 
-
-
-		function finalizeObject() {
+			const parentParseScope = parseScope.parentScope;
 
 			if ( scope.smoothNormals && parseScope.type === 'Part' ) {
 
