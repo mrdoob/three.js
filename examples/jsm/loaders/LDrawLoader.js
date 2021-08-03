@@ -796,12 +796,6 @@ class LDrawLoader extends Loader {
 
 		super( manager );
 
-		// This is a stack of 'parse scopes' with one level per subobject loaded file.
-		// Each level contains a material lib and also other runtime variables passed between parent and child subobjects
-		// When searching for a material code, the stack is read from top of the stack to bottom
-		// Each material library is an object map keyed by colour codes.
-		this.parseScopesStack = null;
-
 		// Array of THREE.Material
 		this.materials = [];
 
@@ -811,6 +805,8 @@ class LDrawLoader extends Loader {
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = null;
+
+		this.rootParseScope = this.newParseScopeLevel();
 
 		// Add default main triangle and line edge materials (used in piecess that can be coloured with a main color)
 		this.setMaterials( [
@@ -881,7 +877,7 @@ class LDrawLoader extends Loader {
 		fileLoader.setWithCredentials( this.withCredentials );
 		fileLoader.load( url, function ( text ) {
 
-			scope.processObject( text, onLoad, null, url );
+			scope.processObject( text, onLoad, null, url, scope.rootParseScope );
 
 		}, onProgress, onError );
 
@@ -891,19 +887,15 @@ class LDrawLoader extends Loader {
 
 		// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 
-		this.processObject( text, onLoad, null, path );
+		this.processObject( text, onLoad, null, path, this.rootParseScope );
 
 	}
 
 	setMaterials( materials ) {
 
 		// Clears parse scopes stack, adds new scope with material library
-
-		this.parseScopesStack = [];
-
-		this.newParseScopeLevel( materials );
-
-		this.getCurrentParseScope().isFromParse = false;
+		this.rootParseScope = this.newParseScopeLevel( materials );
+		this.rootParseScope.isFromParse = false;
 
 		this.materials = materials;
 
@@ -919,7 +911,7 @@ class LDrawLoader extends Loader {
 
 	}
 
-	newParseScopeLevel( materials ) {
+	newParseScopeLevel( materials = null, parentScope = null ) {
 
 		// Adds a new scope level, assign materials to it and returns it
 
@@ -936,9 +928,9 @@ class LDrawLoader extends Loader {
 
 		}
 
-		const topParseScope = this.getCurrentParseScope();
 		const newParseScope = {
 
+			parentScope: parentScope,
 			lib: matLib,
 			url: null,
 
@@ -952,8 +944,8 @@ class LDrawLoader extends Loader {
 
 			// Current subobject
 			currentFileName: null,
-			mainColourCode: topParseScope ? topParseScope.mainColourCode : '16',
-			mainEdgeColourCode: topParseScope ? topParseScope.mainEdgeColourCode : '24',
+			mainColourCode: parentScope ? parentScope.mainColourCode : '16',
+			mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
 			currentMatrix: new Matrix4(),
 			matrix: new Matrix4(),
 
@@ -969,25 +961,15 @@ class LDrawLoader extends Loader {
 			startingConstructionStep: false
 		};
 
-		this.parseScopesStack.push( newParseScope );
-
 		return newParseScope;
 
 	}
 
-	removeScopeLevel() {
-
-		this.parseScopesStack.pop();
-
-		return this;
-
-	}
-
-	addMaterial( material ) {
+	addMaterial( material, parseScope ) {
 
 		// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
 
-		const matLib = this.getCurrentParseScope().lib;
+		const matLib = parseScope.lib;
 
 		if ( ! matLib[ material.userData.code ] ) {
 
@@ -1001,7 +983,7 @@ class LDrawLoader extends Loader {
 
 	}
 
-	getMaterial( colourCode ) {
+	getMaterial( colourCode, parseScope = this.rootParseScope ) {
 
 		// Given a colour code search its material in the parse scopes stack
 
@@ -1015,43 +997,23 @@ class LDrawLoader extends Loader {
 
 		}
 
-		for ( let i = this.parseScopesStack.length - 1; i >= 0; i -- ) {
+		while ( parseScope ) {
 
-			const material = this.parseScopesStack[ i ].lib[ colourCode ];
+			const material = parseScope.lib[ colourCode ];
 
 			if ( material ) {
 
 				return material;
+
+			} else {
+
+				parseScope = parseScope.parentScope;
 
 			}
 
 		}
 
 		// Material was not found
-		return null;
-
-	}
-
-	getParentParseScope() {
-
-		if ( this.parseScopesStack.length > 1 ) {
-
-			return this.parseScopesStack[ this.parseScopesStack.length - 2 ];
-
-		}
-
-		return null;
-
-	}
-
-	getCurrentParseScope() {
-
-		if ( this.parseScopesStack.length > 0 ) {
-
-			return this.parseScopesStack[ this.parseScopesStack.length - 1 ];
-
-		}
-
 		return null;
 
 	}
@@ -1309,16 +1271,16 @@ class LDrawLoader extends Loader {
 
 	//
 
-	objectParse( text ) {
+	objectParse( text, parseScope ) {
 
 		// Retrieve data from the parent parse scope
-		const parentParseScope = this.getParentParseScope();
+		const currentParseScope = parseScope;
+		const parentParseScope = currentParseScope.parentScope;
 
 		// Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
-		const mainColourCode = parentParseScope.mainColourCode;
-		const mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
+		const mainColourCode = currentParseScope.mainColourCode;
+		const mainEdgeColourCode = currentParseScope.mainEdgeColourCode;
 
-		const currentParseScope = this.getCurrentParseScope();
 
 		// Parse result variables
 		let faces;
@@ -1371,7 +1333,7 @@ class LDrawLoader extends Loader {
 
 			}
 
-			const material = scope.getMaterial( colourCode );
+			const material = scope.getMaterial( colourCode, currentParseScope );
 
 			if ( ! material ) {
 
@@ -1499,7 +1461,7 @@ class LDrawLoader extends Loader {
 								material = this.parseColourMetaDirective( lp );
 								if ( material ) {
 
-									this.addMaterial( material );
+									this.addMaterial( material, parseScope );
 
 								}	else {
 
@@ -1667,10 +1629,6 @@ class LDrawLoader extends Loader {
 						material: material,
 						matrix: matrix,
 						fileName: fileName,
-						originalFileName: fileName,
-						locationState: FILE_LOCATION_AS_IS,
-						url: null,
-						triedLowerCase: false,
 						inverted: bfcInverted !== currentParseScope.inverted,
 						startingConstructionStep: startingConstructionStep
 					} );
@@ -1877,14 +1835,14 @@ class LDrawLoader extends Loader {
 
 	}
 
-	processObject( text, onProcessed, subobject, url ) {
+	processObject( text, onProcessed, subobject, url, parentScope ) {
 
 		const scope = this;
 
-		const parseScope = scope.newParseScopeLevel();
+		const parseScope = scope.newParseScopeLevel( null, parentScope );
 		parseScope.url = url;
 
-		const parentParseScope = scope.getParentParseScope();
+		const parentParseScope = parseScope.parentScope;
 
 		// Set current matrix
 		if ( subobject ) {
@@ -1893,41 +1851,33 @@ class LDrawLoader extends Loader {
 			parseScope.matrix.copy( subobject.matrix );
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
+			parseScope.mainColourCode = subobject.material.userData.code;
+			parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
 
 		}
 
 		// Parse the object (returns a Group)
-		scope.objectParse( text );
-		let finishedCount = 0;
-		onSubobjectFinish();
+		this.objectParse( text, parseScope );
 
-		function onSubobjectFinish() {
+		( async () => {
 
-			finishedCount ++;
+			// TODO: we need to wait for all subobjects to load and then finalize them in order to
+			// make sure everything is applied in the correct order.
+			const subobjects = parseScope.subobjects;
+			const promises = [];
+			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
-			if ( finishedCount === parseScope.subobjects.length + 1 ) {
-
-				finalizeObject();
-
-			} else {
-
-				// Once the previous subobject has finished we can start processing the next one in the list.
-				// The subobject processing shares scope in processing so it's important that they be loaded serially
-				// to avoid race conditions.
-				// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
-				// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
-				// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
-				const subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
-				Promise.resolve().then( function () {
-
-					loadSubobject( subobject );
-
-				} );
-				parseScope.subobjectIndex ++;
+				const pr = loadSubobject( parseScope.subobjects[ i ] );
+				promises.push( pr );
+				// await pr;
 
 			}
 
-		}
+			await Promise.all( promises );
+
+			finalizeObject();
+
+		} )();
 
 		function finalizeObject() {
 
@@ -2044,8 +1994,6 @@ class LDrawLoader extends Loader {
 
 			}
 
-			scope.removeScopeLevel();
-
 			// If it is root object, compute construction steps
 			if ( ! parentParseScope.isFromParse ) {
 
@@ -2063,130 +2011,23 @@ class LDrawLoader extends Loader {
 
 		function loadSubobject( subobject ) {
 
-			parseScope.mainColourCode = subobject.material.userData.code;
-			parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
-			parseScope.currentFileName = subobject.originalFileName;
+			return scope.cache.loadData( subobject.fileName ).then( text => {
 
+				return new Promise( resolve => {
 
-			// If subobject was cached previously, use the cached one
-			const cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
-			if ( cached ) {
+					scope.processObject( text, function () {
 
-				scope.processObject( cached, function ( subobjectGroup ) {
+						resolve();
 
-					onSubobjectLoaded( subobjectGroup, subobject );
-					onSubobjectFinish();
+					}, subobject, url, parseScope );
 
-				}, subobject, url );
+				} );
 
-				return;
+			} ).catch( () => {
 
-			}
+				console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be found.' );
 
-			// Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
-			// Update also subobject.locationState for the next try if this load fails.
-			let subobjectURL = subobject.fileName;
-			let newLocationState = FILE_LOCATION_NOT_FOUND;
-
-			switch ( subobject.locationState ) {
-
-				case FILE_LOCATION_AS_IS:
-					newLocationState = subobject.locationState + 1;
-					break;
-
-				case FILE_LOCATION_TRY_PARTS:
-					subobjectURL = 'parts/' + subobjectURL;
-					newLocationState = subobject.locationState + 1;
-					break;
-
-				case FILE_LOCATION_TRY_P:
-					subobjectURL = 'p/' + subobjectURL;
-					newLocationState = subobject.locationState + 1;
-					break;
-
-				case FILE_LOCATION_TRY_MODELS:
-					subobjectURL = 'models/' + subobjectURL;
-					newLocationState = subobject.locationState + 1;
-					break;
-
-				case FILE_LOCATION_TRY_RELATIVE:
-					subobjectURL = url.substring( 0, url.lastIndexOf( '/' ) + 1 ) + subobjectURL;
-					newLocationState = subobject.locationState + 1;
-					break;
-
-				case FILE_LOCATION_TRY_ABSOLUTE:
-
-					if ( subobject.triedLowerCase ) {
-
-						// Try absolute path
-						newLocationState = FILE_LOCATION_NOT_FOUND;
-
-					} else {
-
-						// Next attempt is lower case
-						subobject.fileName = subobject.fileName.toLowerCase();
-						subobjectURL = subobject.fileName;
-						subobject.triedLowerCase = true;
-						newLocationState = FILE_LOCATION_AS_IS;
-
-					}
-
-					break;
-
-				case FILE_LOCATION_NOT_FOUND:
-
-					// All location possibilities have been tried, give up loading this object
-					console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
-
-					return;
-
-			}
-
-			subobject.locationState = newLocationState;
-			subobject.url = subobjectURL;
-
-			// Load the subobject
-			// Use another file loader here so we can keep track of the subobject information
-			// and use it when processing the next model.
-			const fileLoader = new FileLoader( scope.manager );
-			fileLoader.setPath( scope.partsLibraryPath );
-			fileLoader.setRequestHeader( scope.requestHeader );
-			fileLoader.setWithCredentials( scope.withCredentials );
-			fileLoader.load( subobjectURL, function ( text ) {
-
-				scope.processObject( text, function ( subobjectGroup ) {
-
-					onSubobjectLoaded( subobjectGroup, subobject );
-					onSubobjectFinish();
-
-				}, subobject, url );
-
-			}, undefined, function ( err ) {
-
-				onSubobjectError( err, subobject );
-
-			}, subobject );
-
-		}
-
-		function onSubobjectLoaded( subobjectGroup, subobject ) {
-
-			if ( subobjectGroup === null ) {
-
-				// Try to reload
-				loadSubobject( subobject );
-				return;
-
-			}
-
-			scope.fileMap[ subobject.originalFileName ] = subobject.url;
-
-		}
-
-		function onSubobjectError( err, subobject ) {
-
-			// Retry download from a different default possible location
-			loadSubobject( subobject );
+			} );
 
 		}
 
