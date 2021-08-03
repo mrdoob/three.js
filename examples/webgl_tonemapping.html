@@ -84,8 +84,10 @@
 				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
+				const dataType = renderer.extensions.has( 'OES_texture_float_linear' ) ? THREE.FloatType : THREE.HalfFloatType;
+
 				const rgbeLoader = new RGBELoader()
-					.setDataType( THREE.FloatType )
+					.setDataType( dataType )
 					.setPath( 'textures/equirectangular/' );
 
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );

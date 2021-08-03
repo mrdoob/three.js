@@ -46,8 +46,20 @@
 
 				scene = new THREE.Scene();
 
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.75;
+				container.appendChild( renderer.domElement );
+
+				const dataType = renderer.extensions.has( 'OES_texture_float_linear' ) ? THREE.FloatType : THREE.HalfFloatType;
+
 				new RGBELoader()
-					.setDataType( THREE.FloatType )
+					.setDataType( dataType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
@@ -147,17 +159,6 @@
 
 				const pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );
-
-				//
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.75;
 
 				//
 

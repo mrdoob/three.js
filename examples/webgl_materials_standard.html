@@ -120,8 +120,10 @@
 					}
 
 					const filename = environments[ name ].filename;
+					const dataType = renderer.extensions.has( 'OES_texture_float_linear' ) ? THREE.FloatType : THREE.HalfFloatType;
+
 					new RGBELoader()
-						.setDataType( THREE.FloatType )
+						.setDataType( dataType )
 						.setPath( 'textures/equirectangular/' )
 						.load( filename, function ( hdrEquirect ) {
 

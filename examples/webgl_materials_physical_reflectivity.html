@@ -54,6 +54,12 @@
 				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				container.appendChild( renderer.domElement );
 
 				gemBackMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
@@ -112,8 +118,10 @@
 
 				} );
 
+				const dataType = renderer.extensions.has( 'OES_texture_float_linear' ) ? THREE.FloatType : THREE.HalfFloatType;
+
 				new RGBELoader()
-					.setDataType( THREE.FloatType )
+					.setDataType( dataType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
@@ -144,14 +152,6 @@
 				const pointLight4 = new THREE.PointLight( 0xffffff );
 				pointLight4.position.set( 0, 0, 150 );
 				scene.add( pointLight4 );
-
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				container.appendChild( renderer.domElement );
-
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

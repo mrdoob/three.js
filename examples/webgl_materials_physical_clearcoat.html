@@ -45,8 +45,18 @@
 				group = new THREE.Group();
 				scene.add( group );
 
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.25;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
+				const dataType = renderer.extensions.has( 'OES_texture_float_linear' ) ? THREE.FloatType : THREE.HalfFloatType;
+
 				new HDRCubeTextureLoader()
-					.setDataType( THREE.FloatType )
+					.setDataType( dataType )
 					.setPath( 'textures/cube/pisaHDR/' )
 					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
 						function ( texture ) {
@@ -163,20 +173,6 @@
 				scene.add( particleLight );
 
 				particleLight.add( new THREE.PointLight( 0xffffff, 1 ) );
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				//
-
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1.25;
-
-				//
-
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

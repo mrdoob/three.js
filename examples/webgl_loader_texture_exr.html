@@ -47,8 +47,10 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
+				const dataType = renderer.extensions.has( 'OES_texture_float_linear' ) ? THREE.FloatType : THREE.HalfFloatType;
+
 				new EXRLoader()
-					.setDataType( THREE.FloatType )
+					.setDataType( dataType )
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
 						// memorial.exr is NPOT
