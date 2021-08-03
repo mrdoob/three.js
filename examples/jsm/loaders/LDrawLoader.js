@@ -388,6 +388,18 @@ function smoothNormals( faces, lineSegments ) {
 
 }
 
+function isPartType( type ) {
+
+	return type === 'Part';
+
+}
+
+function isModelType( type ) {
+
+	return type === 'Model' || type === 'Unofficial_Model';
+
+}
+
 function isPrimitiveType( type ) {
 
 	return /primitive/i.test( type ) || type === 'Subpart';
@@ -1845,8 +1857,15 @@ class LDrawLoader extends Loader {
 	finalizeObject( subobjectParseScope ) {
 
 		const parentParseScope = subobjectParseScope.parentScope;
+		const doSmooth =
+			isPartType( subobjectParseScope.type ) ||
+			(
+				! isPartType( subobjectParseScope.type ) &&
+				! isModelType( subobjectParseScope.type ) &&
+				isModelType( subobjectParseScope.parentScope.type )
+			);
 
-		if ( this.smoothNormals && subobjectParseScope.type === 'Part' ) {
+		if ( this.smoothNormals && doSmooth ) {
 
 			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
 
