@@ -878,7 +878,7 @@ class LDrawLoader extends Loader {
 		fileLoader.load( url, function ( text ) {
 
 			scope.processObject( text, null, url, scope.rootParseScope )
-				.then( result => {
+				.then( function ( result ) {
 
 					onLoad( result.groupObject );
 
@@ -892,7 +892,7 @@ class LDrawLoader extends Loader {
 
 		// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 		this.processObject( text, null, path, this.rootParseScope )
-			.then( result => {
+			.then( function ( result ) {
 
 				onLoad( result.groupObject );
 
@@ -2016,11 +2016,11 @@ class LDrawLoader extends Loader {
 
 		function loadSubobject( subobject ) {
 
-			return scope.cache.loadData( subobject.fileName ).then( text => {
+			return scope.cache.loadData( subobject.fileName ).then( function ( text ) {
 
 				return scope.processObject( text, subobject, url, parseScope );
 
-			} ).catch( () => {
+			} ).catch( function () {
 
 				console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be found.' );
 
