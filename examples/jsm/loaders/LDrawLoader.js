@@ -477,6 +477,115 @@ class LineParser {
 
 }
 
+class LDrawFileCache {
+
+	constructor( loader ) {
+
+		this.cache = {};
+		this.loader = loader;
+
+	}
+
+	setData( key, contents ) {
+
+		this.cache[ key.toLowerCase() ] = contents;
+
+	}
+
+	async loadData( fileName ) {
+
+		const key = fileName.toLowerCase();
+		if ( key in this.cache ) {
+
+			return this.cache[ key ];
+
+		}
+
+		this.cache[ fileName ] = new Promise( async ( resolve, reject ) => {
+
+			let triedLowerCase = false;
+			let locationState = FILE_LOCATION_AS_IS;
+			while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
+
+				let subobjectURL = fileName;
+				switch ( locationState ) {
+
+					case FILE_LOCATION_AS_IS:
+						locationState = locationState + 1;
+						break;
+
+					case FILE_LOCATION_TRY_PARTS:
+						subobjectURL = 'parts/' + subobjectURL;
+						locationState = locationState + 1;
+						break;
+
+					case FILE_LOCATION_TRY_P:
+						subobjectURL = 'p/' + subobjectURL;
+						locationState = locationState + 1;
+						break;
+
+					case FILE_LOCATION_TRY_MODELS:
+						subobjectURL = 'models/' + subobjectURL;
+						locationState = locationState + 1;
+						break;
+
+					case FILE_LOCATION_TRY_RELATIVE:
+						subobjectURL = fileName.substring( 0, fileName.lastIndexOf( '/' ) + 1 ) + subobjectURL;
+						locationState = locationState + 1;
+						break;
+
+					case FILE_LOCATION_TRY_ABSOLUTE:
+
+						if ( triedLowerCase ) {
+
+							// Try absolute path
+							locationState = FILE_LOCATION_NOT_FOUND;
+
+						} else {
+
+							// Next attempt is lower case
+							fileName = fileName.toLowerCase();
+							subobjectURL = fileName;
+							triedLowerCase = true;
+							locationState = FILE_LOCATION_AS_IS;
+
+						}
+
+						break;
+
+				}
+
+				const loader = this.loader;
+				const fileLoader = new FileLoader( loader.manager );
+				fileLoader.setPath( loader.partsLibraryPath );
+				fileLoader.setRequestHeader( loader.requestHeader );
+				fileLoader.setWithCredentials( loader.withCredentials );
+
+				try {
+
+					const text = await fileLoader.loadAsync( subobjectURL );
+					this.setData( fileName, text );
+					resolve( text );
+					return;
+
+				} catch {
+
+					continue;
+
+				}
+
+			}
+
+			reject();
+
+		} );
+
+		return this.cache[ fileName ];
+
+	}
+
+}
+
 function sortByMaterial( a, b ) {
 
 	if ( a.colourCode === b.colourCode ) {
@@ -698,7 +807,7 @@ class LDrawLoader extends Loader {
 
 		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
-		this.subobjectCache = {};
+		this.cache = new LDrawFileCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = null;
@@ -1300,7 +1409,7 @@ class LDrawLoader extends Loader {
 				if ( line.startsWith( '0 FILE ' ) ) {
 
 					// Save previous embedded file in the cache
-					this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
+					this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
 
 					// New embedded text file
 					currentEmbeddedFileName = line.substring( 7 );
@@ -1539,7 +1648,7 @@ class LDrawLoader extends Loader {
 						// Found the subobject path in the preloaded file path map
 						fileName = scope.fileMap[ fileName ];
 
-					}	else {
+					} else {
 
 						// Standardized subfolders
 						if ( fileName.startsWith( 's/' ) ) {
@@ -1730,7 +1839,7 @@ class LDrawLoader extends Loader {
 
 		if ( parsingEmbeddedFiles ) {
 
-			this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
+			this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
 
 		}
 
@@ -1786,21 +1895,6 @@ class LDrawLoader extends Loader {
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
 
 		}
-
-		// Add to cache
-		let currentFileName = parentParseScope.currentFileName;
-		if ( currentFileName !== null ) {
-
-			currentFileName = parentParseScope.currentFileName.toLowerCase();
-
-		}
-
-		if ( scope.subobjectCache[ currentFileName ] === undefined ) {
-
-			scope.subobjectCache[ currentFileName ] = text;
-
-		}
-
 
 		// Parse the object (returns a Group)
 		scope.objectParse( text );
