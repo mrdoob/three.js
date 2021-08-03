@@ -388,6 +388,18 @@ function smoothNormals( faces, lineSegments ) {
 
 }
 
+function isPartType( type ) {
+
+	return type === 'Part';
+
+}
+
+function isModelType( type ) {
+
+	return type === 'Model' || type === 'Unofficial_Model';
+
+}
+
 function isPrimitiveType( type ) {
 
 	return /primitive/i.test( type ) || type === 'Subpart';
@@ -869,15 +881,13 @@ class LDrawLoader extends Loader {
 
 		}
 
-		const scope = this;
-
 		const fileLoader = new FileLoader( this.manager );
 		fileLoader.setPath( this.path );
 		fileLoader.setRequestHeader( this.requestHeader );
 		fileLoader.setWithCredentials( this.withCredentials );
-		fileLoader.load( url, function ( text ) {
+		fileLoader.load( url, text => {
 
-			scope.processObject( text, null, url, scope.rootParseScope )
+			this.processObject( text, null, url, this.rootParseScope )
 				.then( function ( result ) {
 
 					onLoad( result.groupObject );
@@ -1848,7 +1858,18 @@ class LDrawLoader extends Loader {
 
 		const parentParseScope = subobjectParseScope.parentScope;
 
-		if ( this.smoothNormals && subobjectParseScope.type === 'Part' ) {
+		// Smooth the normals if this is a part or if this is a case where the subpart
+		// is added directly into the parent model (meaning it will never get smoothed by
+		// being added to a part)
+		const doSmooth =
+			isPartType( subobjectParseScope.type ) ||
+			(
+				! isPartType( subobjectParseScope.type ) &&
+				! isModelType( subobjectParseScope.type ) &&
+				isModelType( subobjectParseScope.parentScope.type )
+			);
+
+		if ( this.smoothNormals && doSmooth ) {
 
 			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
 
@@ -1967,7 +1988,7 @@ class LDrawLoader extends Loader {
 
 		const scope = this;
 
-		const parseScope = scope.newParseScopeLevel( null, parentScope );
+		const parseScope = this.newParseScopeLevel( null, parentScope );
 		parseScope.url = url;
 
 		const parentParseScope = parseScope.parentScope;
@@ -1981,6 +2002,7 @@ class LDrawLoader extends Loader {
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
 			parseScope.mainColourCode = subobject.material.userData.code;
 			parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
+			parseScope.fileName = subobject.fileName;
 
 		}
 
