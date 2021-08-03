@@ -1979,6 +1979,7 @@ class LDrawLoader extends Loader {
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
 			parseScope.mainColourCode = subobject.material.userData.code;
 			parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
+			parseScope.fileName = subobject.fileName;
 
 		}
 
