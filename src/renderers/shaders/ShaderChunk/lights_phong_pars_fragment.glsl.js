@@ -5,8 +5,14 @@ varying vec3 vViewPosition;
 
 	varying vec3 vNormal;
 
-#endif
+	#ifdef USE_TANGENT
 
+		varying vec3 vTangent;
+		varying vec3 vBitangent;
+
+	#endif
+
+#endif
 
 struct BlinnPhongMaterial {
 

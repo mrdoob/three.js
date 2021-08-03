@@ -7,6 +7,13 @@ varying vec3 vViewPosition;
 
 	varying vec3 vNormal;
 
+	#ifdef USE_TANGENT
+
+		varying vec3 vTangent;
+		varying vec3 vBitangent;
+
+	#endif
+
 #endif
 
 #include <common>
@@ -34,11 +41,18 @@ void main() {
 	#include <skinnormal_vertex>
 	#include <defaultnormal_vertex>
 
-#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
+	#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
 
-	vNormal = normalize( transformedNormal );
+		vNormal = normalize( transformedNormal );
 
-#endif
+		#ifdef USE_TANGENT
+
+			vTangent = normalize( transformedTangent );
+			vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
+
+		#endif
+
+	#endif
 
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
