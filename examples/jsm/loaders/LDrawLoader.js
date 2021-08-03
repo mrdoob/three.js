@@ -1844,6 +1844,125 @@ class LDrawLoader extends Loader {
 
 	}
 
+	finalizeObject( subobjectParseScope ) {
+
+		const parentParseScope = subobjectParseScope.parentScope;
+
+		if ( this.smoothNormals && subobjectParseScope.type === 'Part' ) {
+
+			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
+
+		}
+
+		const isRoot = ! parentParseScope.isFromParse;
+		if ( this.separateObjects && ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
+
+			const objGroup = subobjectParseScope.groupObject;
+
+			if ( subobjectParseScope.faces.length > 0 ) {
+
+				objGroup.add( createObject( subobjectParseScope.faces, 3, false, subobjectParseScope.totalFaces ) );
+
+			}
+
+			if ( subobjectParseScope.lineSegments.length > 0 ) {
+
+				objGroup.add( createObject( subobjectParseScope.lineSegments, 2 ) );
+
+			}
+
+			if ( subobjectParseScope.conditionalSegments.length > 0 ) {
+
+				objGroup.add( createObject( subobjectParseScope.conditionalSegments, 2, true ) );
+
+			}
+
+			if ( parentParseScope.groupObject ) {
+
+				objGroup.name = subobjectParseScope.fileName;
+				objGroup.userData.category = subobjectParseScope.category;
+				objGroup.userData.keywords = subobjectParseScope.keywords;
+				subobjectParseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
+
+				parentParseScope.groupObject.add( objGroup );
+
+			}
+
+		} else {
+
+			const separateObjects = this.separateObjects;
+			const parentLineSegments = parentParseScope.lineSegments;
+			const parentConditionalSegments = parentParseScope.conditionalSegments;
+			const parentFaces = parentParseScope.faces;
+
+			const lineSegments = subobjectParseScope.lineSegments;
+			const conditionalSegments = subobjectParseScope.conditionalSegments;
+			const faces = subobjectParseScope.faces;
+
+			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
+
+				const ls = lineSegments[ i ];
+
+				if ( separateObjects ) {
+
+					const vertices = ls.vertices;
+					vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+					vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+
+				}
+
+				parentLineSegments.push( ls );
+
+			}
+
+			for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+
+				const os = conditionalSegments[ i ];
+
+				if ( separateObjects ) {
+
+					const vertices = os.vertices;
+					const controlPoints = os.controlPoints;
+					vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+					vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+					controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+					controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+
+				}
+
+				parentConditionalSegments.push( os );
+
+			}
+
+			for ( let i = 0, l = faces.length; i < l; i ++ ) {
+
+				const tri = faces[ i ];
+
+				if ( separateObjects ) {
+
+					const vertices = tri.vertices;
+					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+
+						vertices[ i ] = vertices[ i ].clone().applyMatrix4( subobjectParseScope.matrix );
+
+					}
+
+					_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
+					_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
+					tri.faceNormal.crossVectors( _tempVec0, _tempVec1 ).normalize();
+
+				}
+
+				parentFaces.push( tri );
+
+			}
+
+			parentParseScope.totalFaces += subobjectParseScope.totalFaces;
+
+		}
+
+	}
+
 	async processObject( text, subobject, url, parentScope ) {
 
 		const scope = this;
@@ -1879,148 +1998,21 @@ class LDrawLoader extends Loader {
 		// Kick off of the downloads in parallel but process all the subobjects
 		// in order so all the assembly instructions are correct
 		const scopes = await Promise.all( promises );
-		scopes.forEach( s => {
+		for ( let i = 0, l = scopes.length; i < l; i ++ ) {
 
-			finalizeObject( s );
+			this.finalizeObject( scopes[ i ] );
 
-		} );
+		}
 
-		// TODO: should this go after any call to processObject?
+		// If it is root object then finalize this object and compute construction steps
 		if ( ! parentParseScope.isFromParse ) {
 
-			finalizeObject( parseScope );
+			this.finalizeObject( parseScope );
+			this.computeConstructionSteps( parseScope.groupObject );
 
 		}
 
 		return parseScope;
-
-
-		// TODO: move this out of this scope
-		function finalizeObject( parseScope ) {
-
-			const parentParseScope = parseScope.parentScope;
-
-			if ( scope.smoothNormals && parseScope.type === 'Part' ) {
-
-				smoothNormals( parseScope.faces, parseScope.lineSegments );
-
-			}
-
-			const isRoot = ! parentParseScope.isFromParse;
-			if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
-
-				const objGroup = parseScope.groupObject;
-
-				if ( parseScope.faces.length > 0 ) {
-
-					objGroup.add( createObject( parseScope.faces, 3, false, parseScope.totalFaces ) );
-
-				}
-
-				if ( parseScope.lineSegments.length > 0 ) {
-
-					objGroup.add( createObject( parseScope.lineSegments, 2 ) );
-
-				}
-
-				if ( parseScope.conditionalSegments.length > 0 ) {
-
-					objGroup.add( createObject( parseScope.conditionalSegments, 2, true ) );
-
-				}
-
-				if ( parentParseScope.groupObject ) {
-
-					objGroup.name = parseScope.fileName;
-					objGroup.userData.category = parseScope.category;
-					objGroup.userData.keywords = parseScope.keywords;
-					parseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
-
-					parentParseScope.groupObject.add( objGroup );
-
-				}
-
-			} else {
-
-				const separateObjects = scope.separateObjects;
-				const parentLineSegments = parentParseScope.lineSegments;
-				const parentConditionalSegments = parentParseScope.conditionalSegments;
-				const parentFaces = parentParseScope.faces;
-
-				const lineSegments = parseScope.lineSegments;
-				const conditionalSegments = parseScope.conditionalSegments;
-				const faces = parseScope.faces;
-
-				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
-
-					const ls = lineSegments[ i ];
-
-					if ( separateObjects ) {
-
-						const vertices = ls.vertices;
-						vertices[ 0 ].applyMatrix4( parseScope.matrix );
-						vertices[ 1 ].applyMatrix4( parseScope.matrix );
-
-					}
-
-					parentLineSegments.push( ls );
-
-				}
-
-				for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
-
-					const os = conditionalSegments[ i ];
-
-					if ( separateObjects ) {
-
-						const vertices = os.vertices;
-						const controlPoints = os.controlPoints;
-						vertices[ 0 ].applyMatrix4( parseScope.matrix );
-						vertices[ 1 ].applyMatrix4( parseScope.matrix );
-						controlPoints[ 0 ].applyMatrix4( parseScope.matrix );
-						controlPoints[ 1 ].applyMatrix4( parseScope.matrix );
-
-					}
-
-					parentConditionalSegments.push( os );
-
-				}
-
-				for ( let i = 0, l = faces.length; i < l; i ++ ) {
-
-					const tri = faces[ i ];
-
-					if ( separateObjects ) {
-
-						const vertices = tri.vertices;
-						for ( let i = 0, l = vertices.length; i < l; i ++ ) {
-
-							vertices[ i ] = vertices[ i ].clone().applyMatrix4( parseScope.matrix );
-
-						}
-
-						_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
-						_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
-						tri.faceNormal.crossVectors( _tempVec0, _tempVec1 ).normalize();
-
-					}
-
-					parentFaces.push( tri );
-
-				}
-
-				parentParseScope.totalFaces += parseScope.totalFaces;
-
-			}
-
-			// If it is root object, compute construction steps
-			if ( ! parentParseScope.isFromParse ) {
-
-				scope.computeConstructionSteps( parseScope.groupObject );
-
-			}
-
-		}
 
 		function loadSubobject( subobject ) {
 
