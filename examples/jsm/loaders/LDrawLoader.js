@@ -1857,6 +1857,10 @@ class LDrawLoader extends Loader {
 	finalizeObject( subobjectParseScope ) {
 
 		const parentParseScope = subobjectParseScope.parentScope;
+
+		// Smooth the normals if this is a part or if this is a case where the subpart
+		// is added directly into the parent model (meaning it will never get smoothed by
+		// being added to a part)
 		const doSmooth =
 			isPartType( subobjectParseScope.type ) ||
 			(
