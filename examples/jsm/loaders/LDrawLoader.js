@@ -869,15 +869,13 @@ class LDrawLoader extends Loader {
 
 		}
 
-		const scope = this;
-
 		const fileLoader = new FileLoader( this.manager );
 		fileLoader.setPath( this.path );
 		fileLoader.setRequestHeader( this.requestHeader );
 		fileLoader.setWithCredentials( this.withCredentials );
-		fileLoader.load( url, function ( text ) {
+		fileLoader.load( url, text => {
 
-			scope.processObject( text, null, url, scope.rootParseScope )
+			this.processObject( text, null, url, this.rootParseScope )
 				.then( function ( result ) {
 
 					onLoad( result.groupObject );
@@ -1967,7 +1965,7 @@ class LDrawLoader extends Loader {
 
 		const scope = this;
 
-		const parseScope = scope.newParseScopeLevel( null, parentScope );
+		const parseScope = this.newParseScopeLevel( null, parentScope );
 		parseScope.url = url;
 
 		const parentParseScope = parseScope.parentScope;
