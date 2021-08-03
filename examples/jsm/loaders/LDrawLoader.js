@@ -877,7 +877,12 @@ class LDrawLoader extends Loader {
 		fileLoader.setWithCredentials( this.withCredentials );
 		fileLoader.load( url, function ( text ) {
 
-			scope.processObject( text, onLoad, null, url, scope.rootParseScope );
+			scope.processObject( text, null, url, scope.rootParseScope )
+				.then( result => {
+
+					onLoad( result.groupObject );
+
+				} );
 
 		}, onProgress, onError );
 
@@ -886,8 +891,12 @@ class LDrawLoader extends Loader {
 	parse( text, path, onLoad ) {
 
 		// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
+		this.processObject( text, null, path, this.rootParseScope )
+			.then( result => {
 
-		this.processObject( text, onLoad, null, path, this.rootParseScope );
+				onLoad( result.groupObject );
+
+			} );
 
 	}
 
@@ -1835,7 +1844,7 @@ class LDrawLoader extends Loader {
 
 	}
 
-	processObject( text, onProcessed, subobject, url, parentScope ) {
+	async processObject( text, subobject, url, parentScope ) {
 
 		const scope = this;
 
@@ -1859,25 +1868,25 @@ class LDrawLoader extends Loader {
 		// Parse the object (returns a Group)
 		this.objectParse( text, parseScope );
 
-		( async () => {
+		// TODO: we need to wait for all subobjects to load and then finalize them in order to
+		// make sure everything is applied in the correct order.
+		const subobjects = parseScope.subobjects;
+		const promises = [];
+		for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
-			// TODO: we need to wait for all subobjects to load and then finalize them in order to
-			// make sure everything is applied in the correct order.
-			const subobjects = parseScope.subobjects;
-			const promises = [];
-			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
+			promises.push( loadSubobject( parseScope.subobjects[ i ] ) );
 
-				const pr = loadSubobject( parseScope.subobjects[ i ] );
-				promises.push( pr );
-				// await pr;
+		}
 
-			}
+		await Promise.all( promises );
 
-			await Promise.all( promises );
+		finalizeObject();
 
-			finalizeObject();
+		return parseScope;
 
-		} )();
+
+
+
 
 		function finalizeObject() {
 
@@ -2001,27 +2010,13 @@ class LDrawLoader extends Loader {
 
 			}
 
-			if ( onProcessed ) {
-
-				onProcessed( parseScope.groupObject );
-
-			}
-
 		}
 
 		function loadSubobject( subobject ) {
 
 			return scope.cache.loadData( subobject.fileName ).then( text => {
 
-				return new Promise( resolve => {
-
-					scope.processObject( text, function () {
-
-						resolve();
-
-					}, subobject, url, parseScope );
-
-				} );
+				return scope.processObject( text, subobject, url, parseScope );
 
 			} ).catch( () => {
 
