@@ -63,6 +63,9 @@ import morphtarget_pars_vertex from './ShaderChunk/morphtarget_pars_vertex.glsl.
 import morphtarget_vertex from './ShaderChunk/morphtarget_vertex.glsl.js';
 import normal_fragment_begin from './ShaderChunk/normal_fragment_begin.glsl.js';
 import normal_fragment_maps from './ShaderChunk/normal_fragment_maps.glsl.js';
+import normal_pars_fragment from './ShaderChunk/normal_pars_fragment.glsl.js';
+import normal_pars_vertex from './ShaderChunk/normal_pars_vertex.glsl.js';
+import normal_vertex from './ShaderChunk/normal_vertex.glsl.js';
 import normalmap_pars_fragment from './ShaderChunk/normalmap_pars_fragment.glsl.js';
 import clearcoat_normal_fragment_begin from './ShaderChunk/clearcoat_normal_fragment_begin.glsl.js';
 import clearcoat_normal_fragment_maps from './ShaderChunk/clearcoat_normal_fragment_maps.glsl.js';
@@ -195,6 +198,9 @@ export const ShaderChunk = {
 	morphtarget_vertex: morphtarget_vertex,
 	normal_fragment_begin: normal_fragment_begin,
 	normal_fragment_maps: normal_fragment_maps,
+	normal_pars_fragment: normal_pars_fragment,
+	normal_pars_vertex: normal_pars_vertex,
+	normal_vertex: normal_vertex,
 	normalmap_pars_fragment: normalmap_pars_fragment,
 	clearcoat_normal_fragment_begin: clearcoat_normal_fragment_begin,
 	clearcoat_normal_fragment_maps: clearcoat_normal_fragment_maps,
