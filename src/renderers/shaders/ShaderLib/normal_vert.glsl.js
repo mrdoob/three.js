@@ -7,22 +7,10 @@ export default /* glsl */`
 
 #endif
 
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-	#ifdef USE_TANGENT
-
-		varying vec3 vTangent;
-		varying vec3 vBitangent;
-
-	#endif
-
-#endif
-
 #include <common>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
+#include <normal_pars_vertex>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
 #include <logdepthbuf_pars_vertex>
@@ -37,19 +25,7 @@ void main() {
 	#include <skinbase_vertex>
 	#include <skinnormal_vertex>
 	#include <defaultnormal_vertex>
-
-#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
-
-	vNormal = normalize( transformedNormal );
-
-	#ifdef USE_TANGENT
-
-		vTangent = normalize( transformedTangent );
-		vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
-
-	#endif
-
-#endif
+	#include <normal_vertex>
 
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
