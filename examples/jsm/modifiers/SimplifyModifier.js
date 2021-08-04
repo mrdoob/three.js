@@ -501,7 +501,7 @@ class Vertex {
 
 		this.position = v;
 
-		this.id = -1; // external use position in vertices list (for e.g. face generation)
+		this.id = - 1; // external use position in vertices list (for e.g. face generation)
 
 		this.faces = []; // faces vertex is connected
 		this.neighbors = []; // neighbouring vertices aka "adjacentVertices"
