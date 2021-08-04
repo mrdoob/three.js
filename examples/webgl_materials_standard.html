@@ -121,7 +121,6 @@
 
 					const filename = environments[ name ].filename;
 					new RGBELoader()
-						.setDataType( THREE.FloatType )
 						.setPath( 'textures/equirectangular/' )
 						.load( filename, function ( hdrEquirect ) {
 

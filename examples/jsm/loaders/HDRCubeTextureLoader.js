@@ -22,7 +22,7 @@ class HDRCubeTextureLoader extends Loader {
 		super( manager );
 
 		this.hdrLoader = new RGBELoader();
-		this.type = FloatType;
+		this.type = HalfFloatType;
 
 	}
 
