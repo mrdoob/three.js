@@ -46,7 +46,6 @@
 				scene.add( group );
 
 				new HDRCubeTextureLoader()
-					.setDataType( THREE.FloatType )
 					.setPath( 'textures/cube/pisaHDR/' )
 					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
 						function ( texture ) {
