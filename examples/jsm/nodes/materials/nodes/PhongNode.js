@@ -41,14 +41,9 @@ class PhongNode extends Node {
 			builder.addParsCode( /* glsl */`
 				varying vec3 vViewPosition;
 
-				#ifndef FLAT_SHADED
-
-					varying vec3 vNormal;
-
-				#endif
-
 				//"#include <encodings_pars_fragment> // encoding functions
 				#include <fog_pars_vertex>
+				#include <normal_pars_vertex>
 				#include <morphtarget_pars_vertex>
 				#include <skinning_pars_vertex>
 				#include <shadowmap_pars_vertex>
@@ -62,12 +57,7 @@ class PhongNode extends Node {
 				'#include <skinbase_vertex>',
 				'#include <skinnormal_vertex>',
 				'#include <defaultnormal_vertex>',
-
-				'#ifndef FLAT_SHADED', // normal computed with derivatives when FLAT_SHADED
-
-				'	vNormal = normalize( transformedNormal );',
-
-				'#endif',
+				'#include <normal_vertex>',
 
 				'#include <begin_vertex>'
 			];
@@ -150,6 +140,7 @@ class PhongNode extends Node {
 				#include <fog_pars_fragment>
 				#include <bsdfs>
 				#include <lights_pars_begin>
+				#include <normal_pars_fragment>
 				#include <lights_phong_pars_fragment>
 				#include <shadowmap_pars_fragment>
 				#include <logdepthbuf_pars_fragment>`
