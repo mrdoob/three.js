@@ -335,7 +335,7 @@
 					session.requestReferenceSpace( 'local-floor' ).then( ( refSpace ) => {
 
 						// Create Quad layers for Snellen chart.
-						const glBinding = new XRWebGLBinding( session, gl );
+						const glBinding = xr.getBinding();
 						const quadLayerConfig = {
 							width: snellenConfig.quadWidth,
 							height: snellenConfig.quadHeight,
@@ -397,8 +397,7 @@
 				// needsRedraw is set on creation or if the underlying GL resources of a layer are lost.
 				if ( quadLayerPlain && quadLayerPlain.needsRedraw ) {
 
-					const glBinding = new XRWebGLBinding( session, gl );
-					const glayer = glBinding.getSubImage( quadLayerPlain, frame );
+					const glayer = xr.getBinding().getSubImage( quadLayerPlain, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
 					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
@@ -412,8 +411,7 @@
 				// Same as above but also gl.generateMipmap.
 				if ( quadLayerMips && quadLayerMips.needsRedraw ) {
 
-					const glBinding = new XRWebGLBinding( session, gl );
-					const glayer = glBinding.getSubImage( quadLayerMips, frame );
+					const glayer = xr.getBinding().getSubImage( quadLayerMips, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
 					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
@@ -428,8 +426,7 @@
 				// Same as above, but guiLayer.needsUpdate is set when the user interacts with the GUI.
 				if ( guiLayer && ( guiLayer.needsRedraw || guiLayer.needsUpdate ) ) {
 
-					const glBinding = new XRWebGLBinding( session, gl );
-					const glayer = glBinding.getSubImage( guiLayer, frame );
+					const glayer = xr.getBinding().getSubImage( guiLayer, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
 					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					const canvas = guiMesh.material.map.image;

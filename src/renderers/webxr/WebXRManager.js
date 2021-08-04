@@ -30,6 +30,7 @@ class WebXRManager extends EventDispatcher {
 		let glMultisampledFramebuffer = null;
 		let glColorRenderbuffer = null;
 		let glDepthRenderbuffer = null;
+		let xrFrame = null;
 		let depthStyle = null;
 		let clearStyle = null;
 
@@ -147,6 +148,10 @@ class WebXRManager extends EventDispatcher {
 			glMultisampledFramebuffer = null;
 			glColorRenderbuffer = null;
 			glDepthRenderbuffer = null;
+			glBaseLayer = null;
+			glProjLayer = null;
+			glBinding = null;
+			session = null;
 
 			//
 
@@ -185,6 +190,24 @@ class WebXRManager extends EventDispatcher {
 		this.getReferenceSpace = function () {
 
 			return referenceSpace;
+
+		};
+
+		this.getBaseLayer = function () {
+
+			return glProjLayer !== null ? glProjLayer : glBaseLayer;
+
+		};
+
+		this.getBinding = function () {
+
+			return glBinding;
+
+		};
+
+		this.getFrame = function () {
+
+			return xrFrame;
 
 		};
 
@@ -560,6 +583,7 @@ class WebXRManager extends EventDispatcher {
 		function onAnimationFrame( time, frame ) {
 
 			pose = frame.getViewerPose( referenceSpace );
+			xrFrame = frame;
 
 			if ( pose !== null ) {
 
@@ -675,6 +699,8 @@ class WebXRManager extends EventDispatcher {
 				state.bindFramebuffer( gl.FRAMEBUFFER, glMultisampledFramebuffer );
 
 			}
+
+			xrFrame = null;
 
 		}
 
