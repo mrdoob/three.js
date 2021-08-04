@@ -3,7 +3,7 @@ import {
 	Float32BufferAttribute,
 	Vector3
 } from '../../../build/three.module.js';
-import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js';
+import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
 /**
  *	Simplification Geometry Modifier
@@ -500,7 +500,7 @@ class Vertex {
 	constructor( v ) {
 
 		this.position = v;
-			
+
 		this.id = -1; // external use position in vertices list (for e.g. face generation)
 
 		this.faces = []; // faces vertex is connected
