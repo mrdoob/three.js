@@ -37,18 +37,32 @@
 
 				const config = {
 					'Spotlight Radius': 4,
-					'Directional light Radius': 4,
+					'Spotlight Samples': 8,
+					'Dirlight Radius': 4,
+					'Dirlight Samples': 8
 				};
 
-				gui.add( config, 'Spotlight Radius' ).min( 2 ).max( 8 ).onChange( function ( value ) {
+				gui.add( config, 'Spotlight Radius' ).min( 0 ).max( 58 ).onChange( function ( value ) {
 
 					spotLight.shadow.radius = value;
 
 				} );
+				
+				gui.add( config, 'Spotlight Samples', 1, 50, 1 ).onChange( function ( value ) {
 
-				gui.add( config, 'Directional light Radius' ).min( 2 ).max( 8 ).onChange( function ( value ) {
+					spotLight.shadow.blurSamples = value;
+
+				} );
+
+				gui.add( config, 'Dirlight Radius' ).min( 0 ).max( 58 ).onChange( function ( value ) {
 
 					dirLight.shadow.radius = value;
+
+				} );
+
+				gui.add( config, 'Dirlight Samples', 1, 50, 1 ).onChange( function ( value ) {
+
+					dirLight.shadow.blurSamples = value;
 
 				} );
 
