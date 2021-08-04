@@ -7,7 +7,7 @@
 		constructor( manager ) {
 
 			super( manager );
-			this.type = THREE.FloatType;
+			this.type = THREE.HalfFloatType;
 
 		} // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 
