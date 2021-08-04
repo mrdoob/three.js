@@ -36,35 +36,39 @@
 				const gui = new GUI();
 
 				const config = {
-					'Spotlight Radius': 4,
-					'Spotlight Samples': 8,
-					'Dirlight Radius': 4,
-					'Dirlight Samples': 8
+					spotlightRadius: 4,
+					spotlightSamples: 8,
+					dirlightRadius: 4,
+					dirlightSamples: 8
 				};
 
-				gui.add( config, 'Spotlight Radius' ).min( 0 ).max( 58 ).onChange( function ( value ) {
+				const spotlightFolder = gui.addFolder( 'Spotlight' );
+				spotlightFolder.add( config, 'spotlightRadius' ).name( 'radius' ).min( 0 ).max( 58 ).onChange( function ( value ) {
 
 					spotLight.shadow.radius = value;
 
 				} );
-				
-				gui.add( config, 'Spotlight Samples', 1, 50, 1 ).onChange( function ( value ) {
+
+				spotlightFolder.add( config, 'spotlightSamples', 1, 50, 1 ).name( 'samples' ).onChange( function ( value ) {
 
 					spotLight.shadow.blurSamples = value;
 
 				} );
+				spotlightFolder.open();
 
-				gui.add( config, 'Dirlight Radius' ).min( 0 ).max( 58 ).onChange( function ( value ) {
+				const dirlightFolder = gui.addFolder( 'Directional Light' );
+				dirlightFolder.add( config, 'dirlightRadius' ).name( 'radius' ).min( 0 ).max( 58 ).onChange( function ( value ) {
 
 					dirLight.shadow.radius = value;
 
 				} );
 
-				gui.add( config, 'Dirlight Samples', 1, 50, 1 ).onChange( function ( value ) {
+				dirlightFolder.add( config, 'dirlightSamples', 1, 50, 1 ).name( 'samples' ).onChange( function ( value ) {
 
 					dirLight.shadow.blurSamples = value;
 
 				} );
+				dirlightFolder.open();
 
 				document.body.appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize );
