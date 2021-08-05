@@ -42,6 +42,8 @@ class MeshDepthMaterial extends Material {
 
 		this.fog = false;
 
+		this.ditherTransparency = false;
+
 		this.setValues( parameters );
 
 	}
