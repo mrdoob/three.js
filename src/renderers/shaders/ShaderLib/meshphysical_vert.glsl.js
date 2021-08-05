@@ -5,7 +5,7 @@ varying vec3 vViewPosition;
 
 #ifdef USE_TRANSMISSION
 
-	varying vec4 vWorldPosition;
+	varying vec3 vWorldPosition;
 
 #endif
 
@@ -51,7 +51,7 @@ void main() {
 
 #ifdef USE_TRANSMISSION
 
-	vWorldPosition = worldPosition;
+	vWorldPosition = worldPosition.xyz;
 
 #endif
 }
