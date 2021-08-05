@@ -36,21 +36,39 @@
 				const gui = new GUI();
 
 				const config = {
-					'Spotlight Radius': 4,
-					'Directional light Radius': 4,
+					spotlightRadius: 4,
+					spotlightSamples: 8,
+					dirlightRadius: 4,
+					dirlightSamples: 8
 				};
 
-				gui.add( config, 'Spotlight Radius' ).min( 2 ).max( 8 ).onChange( function ( value ) {
+				const spotlightFolder = gui.addFolder( 'Spotlight' );
+				spotlightFolder.add( config, 'spotlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
 
 					spotLight.shadow.radius = value;
 
 				} );
 
-				gui.add( config, 'Directional light Radius' ).min( 2 ).max( 8 ).onChange( function ( value ) {
+				spotlightFolder.add( config, 'spotlightSamples', 1, 25, 1 ).name( 'samples' ).onChange( function ( value ) {
+
+					spotLight.shadow.blurSamples = value;
+
+				} );
+				spotlightFolder.open();
+
+				const dirlightFolder = gui.addFolder( 'Directional Light' );
+				dirlightFolder.add( config, 'dirlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
 
 					dirLight.shadow.radius = value;
 
 				} );
+
+				dirlightFolder.add( config, 'dirlightSamples', 1, 25, 1 ).name( 'samples' ).onChange( function ( value ) {
+
+					dirLight.shadow.blurSamples = value;
+
+				} );
+				dirlightFolder.open();
 
 				document.body.appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize );
@@ -98,7 +116,6 @@
 				dirLight.shadow.mapSize.height = 512;
 				dirLight.shadow.radius = 4;
 				dirLight.shadow.bias = - 0.0005;
-				scene.add( dirLight );
 
 				dirGroup = new THREE.Group();
 				dirGroup.add( dirLight );
