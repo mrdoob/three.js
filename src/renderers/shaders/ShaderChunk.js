@@ -117,14 +117,14 @@ import meshlambert_frag from './ShaderLib/meshlambert_frag.glsl.js';
 import meshlambert_vert from './ShaderLib/meshlambert_vert.glsl.js';
 import meshmatcap_frag from './ShaderLib/meshmatcap_frag.glsl.js';
 import meshmatcap_vert from './ShaderLib/meshmatcap_vert.glsl.js';
-import meshtoon_frag from './ShaderLib/meshtoon_frag.glsl.js';
-import meshtoon_vert from './ShaderLib/meshtoon_vert.glsl.js';
+import meshnormal_frag from './ShaderLib/meshnormal_frag.glsl.js';
+import meshnormal_vert from './ShaderLib/meshnormal_vert.glsl.js';
 import meshphong_frag from './ShaderLib/meshphong_frag.glsl.js';
 import meshphong_vert from './ShaderLib/meshphong_vert.glsl.js';
 import meshphysical_frag from './ShaderLib/meshphysical_frag.glsl.js';
 import meshphysical_vert from './ShaderLib/meshphysical_vert.glsl.js';
-import normal_frag from './ShaderLib/normal_frag.glsl.js';
-import normal_vert from './ShaderLib/normal_vert.glsl.js';
+import meshtoon_frag from './ShaderLib/meshtoon_frag.glsl.js';
+import meshtoon_vert from './ShaderLib/meshtoon_vert.glsl.js';
 import points_frag from './ShaderLib/points_frag.glsl.js';
 import points_vert from './ShaderLib/points_vert.glsl.js';
 import shadow_frag from './ShaderLib/shadow_frag.glsl.js';
@@ -252,14 +252,14 @@ export const ShaderChunk = {
 	meshlambert_vert: meshlambert_vert,
 	meshmatcap_frag: meshmatcap_frag,
 	meshmatcap_vert: meshmatcap_vert,
-	meshtoon_frag: meshtoon_frag,
-	meshtoon_vert: meshtoon_vert,
+	meshnormal_frag: meshnormal_frag,
+	meshnormal_vert: meshnormal_vert,
 	meshphong_frag: meshphong_frag,
 	meshphong_vert: meshphong_vert,
 	meshphysical_frag: meshphysical_frag,
 	meshphysical_vert: meshphysical_vert,
-	normal_frag: normal_frag,
-	normal_vert: normal_vert,
+	meshtoon_frag: meshtoon_frag,
+	meshtoon_vert: meshtoon_vert,
 	points_frag: points_frag,
 	points_vert: points_vert,
 	shadow_frag: shadow_frag,
