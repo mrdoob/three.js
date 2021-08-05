@@ -56,10 +56,10 @@
 			let container, stats;
 			let camera, scene, renderer;
 
-			init();
+			await init();
 			animate();
 
-			function init() {
+			async function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -93,7 +93,7 @@
 				};
 				uniforms.topColor.value.copy( light.color );
 
-				const skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
+				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
 				const skyMat = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: vertexShader,
@@ -126,15 +126,12 @@
 				// MODEL
 
 				const loader = new THREE.ObjectLoader();
-				loader.load( "models/json/lightmap/lightmap.json", function ( object ) {
-
-					scene.add( object );
-
-				} );
+				const object = await loader.loadAsync( "models/json/lightmap/lightmap.json" );
+				scene.add( object );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

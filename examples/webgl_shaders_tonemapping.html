@@ -6,11 +6,19 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			.label {
-				background-color: black;
+			#labels {
 				position: absolute;
-				z-index: 100;
-				padding: 5px
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				justify-items: center;
+				align-items: end;
+				height: 100%;
+				width: 100%;
+			}
+			#labels > div {
+				background-color: black;
+				padding: 6px;
+				margin-bottom: 20%;
 			}
 		</style>
 	</head>
@@ -19,20 +27,21 @@
 		<div id="d">
 			<div id="info">
 				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
-				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
-
+				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a>
 			</div>
-			<div class="label" style="position: absolute;left: 10%;bottom: 10%;">
-				Low Dynamic Range<br/>
-				Static Tone Mapping
-			</div>
-			<div class="label" style="position: absolute;left: 40%;bottom: 10%;">
-				High Dynamic Range<br/>
-				Static Tone Mapping
-			</div>
-			<div class="label" style="position: absolute;left: 73%;bottom: 10%;">
-				High Dynamic Range<br/>
-				Adaptive Tone Mapping
+			<div id="labels">
+				<div>
+					Low Dynamic Range<br/>
+					Static Tone Mapping
+				</div>
+				<div>
+					High Dynamic Range<br/>
+					Static Tone Mapping
+				</div>
+				<div>
+					High Dynamic Range<br/>
+					Adaptive Tone Mapping
+				</div>
 			</div>
 		</div>
 
@@ -147,6 +156,7 @@
 						THREE.ShaderChunk[ "common" ],
 						THREE.ShaderChunk[ "bsdfs" ],
 						THREE.ShaderChunk[ "lights_pars_begin" ],
+						THREE.ShaderChunk[ "normal_pars_fragment" ],
 						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 
 						"void main() {",
@@ -232,7 +242,7 @@
 				} );
 
 
-				const earthGeo = new THREE.SphereBufferGeometry( 600, 24, 24 );
+				const earthGeo = new THREE.SphereGeometry( 600, 24, 24 );
 				const sphereMesh = new THREE.Mesh( earthGeo, earthMat );
 				scene.add( sphereMesh );
 
@@ -295,13 +305,13 @@
 					// blending: THREE.NoBlending
 				} );
 
-				let quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), currentLuminanceMat );
+				let quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 0.1, 0.1 ), currentLuminanceMat );
 				quadBG.position.z = - 500;
 				quadBG.position.x = - window.innerWidth * 0.5 + window.innerWidth * 0.05;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				debugScene.add( quadBG );
 
-				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.1, 0.1 ), adaptiveLuminanceMat );
+				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 0.1, 0.1 ), adaptiveLuminanceMat );
 				quadBG.position.z = - 500;
 				quadBG.position.x = - window.innerWidth * 0.5 + window.innerWidth * 0.15;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
@@ -394,7 +404,7 @@
 
 				gui.open();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

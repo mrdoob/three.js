@@ -41,7 +41,7 @@
 
 				//
 
-				const geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
+				const geometry = new THREE.BoxGeometry( 5, 5, 5 );
 				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true } );
 				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -101,7 +101,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

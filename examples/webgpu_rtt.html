@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>WebGPU RTT</title>
+		<title>three.js - WebGPU - RTT</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -10,15 +10,27 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
 		</div>
 
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+		</script>
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
+
 			let camera, scene, renderer;
+			const mouse = new THREE.Vector2();
 
 			let cameraFX, sceneFX, textureRenderer;
 
@@ -49,8 +61,11 @@
 				const loader = new THREE.TextureLoader();
 				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
 
-				const geometryBox = new THREE.BoxBufferGeometry();
-				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
+				const geometryBox = new THREE.BoxGeometry();
+				const materialBox = new THREE.MeshBasicMaterial();
+				materialBox.colorNode = new TextureNode( texture );
+
+				//
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				scene.add( box );
@@ -65,18 +80,22 @@
 				textureRenderer = new WebGPUTextureRenderer( renderer );
 				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'mousemove', onWindowMouseMove );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// FX
 
 				cameraFX = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				sceneFX = new THREE.Scene();
 
-				const geometryFX = new THREE.PlaneBufferGeometry( 2, 2 );
+				const geometryFX = new THREE.PlaneGeometry( 2, 2 );
 
-				// @TODO Until NodeMaterial is available just copy the beauty pass to screen
+				// modulate the final color based on the mouse position
 
-				const materialFX = new THREE.MeshBasicMaterial( { map: textureRenderer.getTexture() } );
+				const screenFXNode = new OperatorNode( '+', new Vector2Node( mouse ), new Vector2Node( new THREE.Vector2( 0.5, 0.5 ) ).setConst( true ) );
+
+				const materialFX = new THREE.MeshBasicMaterial();
+				materialFX.colorNode = new OperatorNode( '*', new TextureNode( textureRenderer.getTexture() ), screenFXNode );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
@@ -84,6 +103,13 @@
 				//
 
 				return renderer.init();
+
+			}
+
+			function onWindowMouseMove( e ) {
+
+				mouse.x = e.offsetX / screen.width;
+				mouse.y = e.offsetY / screen.height;
 
 			}
 

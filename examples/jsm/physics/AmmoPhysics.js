@@ -28,7 +28,7 @@ async function AmmoPhysics() {
 
 		// TODO change type to is*
 
-		if ( geometry.type === 'BoxBufferGeometry' ) {
+		if ( geometry.type === 'BoxGeometry' ) {
 
 			const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
 			const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
@@ -39,7 +39,7 @@ async function AmmoPhysics() {
 
 			return shape;
 
-		} else if ( geometry.type === 'SphereBufferGeometry' || geometry.type === 'IcosahedronBufferGeometry' ) {
+		} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
 
 			const radius = parameters.radius !== undefined ? parameters.radius : 1;
 
@@ -137,7 +137,6 @@ async function AmmoPhysics() {
 
 		if ( mass > 0 ) {
 
-			mesh.instanceMatrix.setUsage( 35048 ); // THREE.DynamicDrawUsage = 35048
 			meshes.push( mesh );
 
 			meshMap.set( mesh, bodies );

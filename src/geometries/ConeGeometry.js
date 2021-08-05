@@ -2,9 +2,10 @@ import { CylinderGeometry } from './CylinderGeometry.js';
 
 class ConeGeometry extends CylinderGeometry {
 
-	constructor( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+	constructor( radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super( 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
+
 		this.type = 'ConeGeometry';
 
 		this.parameters = {
@@ -19,6 +20,12 @@ class ConeGeometry extends CylinderGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new ConeGeometry( data.radius, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
+
+	}
+
 }
 
-export { ConeGeometry };
+export { ConeGeometry, ConeGeometry as ConeBufferGeometry };

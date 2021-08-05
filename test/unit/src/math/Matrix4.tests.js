@@ -1,10 +1,11 @@
 /* global QUnit */
 
+import { Matrix3 } from '../../../../src/math/Matrix3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
 import { Quaternion } from '../../../../src/math/Quaternion';
-import { MathUtils } from '../../../../src/math/MathUtils';
+import * as MathUtils from '../../../../src/math/MathUtils';
 import { eps } from './Constants.tests';
 
 
@@ -160,6 +161,25 @@ export default QUnit.module( 'Maths', () => {
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
 			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromMatrix4", ( assert ) => {
+
+			var a = new Matrix3().set(
+				0, 1, 2,
+				3, 4, 5,
+				6, 7, 8
+			);
+			var b = new Matrix4();
+			var c = new Matrix4().set(
+				0, 1, 2, 0,
+				3, 4, 5, 0,
+				6, 7, 8, 0,
+				0, 0, 0, 1
+			);
+			b.setFromMatrix3( a );
+			assert.ok( b.equals( c ) );
 
 		} );
 
@@ -601,9 +621,9 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "makeShear", ( assert ) => {
 
 			var a = new Matrix4();
-			var c = new Matrix4().set( 1, 3, 4, 0, 2, 1, 4, 0, 2, 3, 1, 0, 0, 0, 0, 1 );
+			var c = new Matrix4().set( 1, 3, 5, 0, 1, 1, 6, 0, 2, 4, 1, 0, 0, 0, 0, 1 );
 
-			a.makeShear( 2, 3, 4 );
+			a.makeShear( 1, 2, 3, 4, 5, 6 );
 			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );

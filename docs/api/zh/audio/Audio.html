@@ -65,7 +65,8 @@
 		<p>修改音高，以音分为单位。 +/- 100为一个半音， +/- 1200为一个八度。默认值为0。</p>
 
 		<h3>[property:Array filters]</h3>
-		<p>表示[link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]的数组. 可以使用多种不同的低阶filters去创建复杂的音效. filters可以通过 [page:Audio.setFilter] 或者 [page:Audio.setFilters]设置.</p>
+		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioNode AudioNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects.
+			In most cases, the array contains instances of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>
 
 		<h3>[property:GainNode gain]</h3>
 		<p>使用[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]()创建的[link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode].</p>
@@ -74,10 +75,10 @@
 		<p>是否可以使用 [page:Audio.play play](),
 			[page:Audio.pause pause]()等方法控制播放. 默认为 *true*.</p>
 
-		<h3>[property:Boolean isPlaying]</h3>	
-		<p>是否正在播放</p>	
+		<h3>[property:Boolean isPlaying]</h3>
+		<p>是否正在播放</p>
 
-		<h3>[property:AudioListener listener]</h3>	
+		<h3>[property:AudioListener listener]</h3>
 		<p>A reference to the listener object of this audio.</p>
 
 		<h3>[property:Number playbackRate]</h3>
@@ -165,13 +166,13 @@
 
 		<h3>[method:Audio setFilter]( filter )</h3>
 		<p>
-		设置一个[link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNode]给Audio.
+		Applies a single filter node to the audio.
 		</p>
 
 		<h3>[method:Audio setFilters]( [param:Array value] )</h3>
 		<p>
-		value--filters数组.<br />
-		应用[link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]数组给Audio.
+		value - arrays of filters.<br />
+		Applies an array of filter nodes to the audio.
 		</p>
 
 		<h3>[method:Audio setLoop]( [param:Boolean value] )</h3>

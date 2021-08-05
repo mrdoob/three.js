@@ -62,9 +62,6 @@
 									THREE.Material.prototype.copy.call( material, object.material[ i ] );
 									material.color.copy( object.material[ i ].color );
 									material.map = object.material[ i ].map;
-									material.skinning = object.material[ i ].skinning;
-									material.morphTargets = object.material[ i ].morphTargets;
-									material.morphNormals = object.material[ i ].morphNormals;
 									object.material[ i ] = material;
 
 								}
@@ -75,9 +72,6 @@
 								THREE.Material.prototype.copy.call( material, object.material );
 								material.color.copy( object.material.color );
 								material.map = object.material.map;
-								material.skinning = object.material.skinning;
-								material.morphTargets = object.material.morphTargets;
-								material.morphNormals = object.material.morphNormals;
 								object.material = material;
 
 							}
@@ -103,7 +97,7 @@
 				controls.target.set( 0, 0.9, 0 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// stats
 				stats = new Stats();

@@ -40,6 +40,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -55,7 +56,7 @@
 
 				// Water
 
-				const waterGeometry = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
 
 				water = new Water(
 					waterGeometry,
@@ -67,7 +68,6 @@
 							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 						} ),
-						alpha: 1.0,
 						sunDirection: new THREE.Vector3(),
 						sunColor: 0xffffff,
 						waterColor: 0x001e0f,
@@ -94,20 +94,18 @@
 				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
 
 				const parameters = {
-					inclination: 0.49,
-					azimuth: 0.205
+					elevation: 2,
+					azimuth: 180
 				};
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				function updateSun() {
 
-					const theta = Math.PI * ( parameters.inclination - 0.5 );
-					const phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+					const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+					const theta = THREE.MathUtils.degToRad( parameters.azimuth );
 
-					sun.x = Math.cos( phi );
-					sun.y = Math.sin( phi ) * Math.sin( theta );
-					sun.z = Math.sin( phi ) * Math.cos( theta );
+					sun.setFromSphericalCoords( 1, phi, theta );
 
 					sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
 					water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
@@ -120,7 +118,7 @@
 
 				//
 
-				const geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
+				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
 				const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -145,8 +143,8 @@
 				const gui = new GUI();
 
 				const folderSky = gui.addFolder( 'Sky' );
-				folderSky.add( parameters, 'inclination', 0, 0.5, 0.0001 ).onChange( updateSun );
-				folderSky.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );
+				folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+				folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
 				folderSky.open();
 
 				const waterUniforms = water.material.uniforms;
@@ -154,12 +152,11 @@
 				const folderWater = gui.addFolder( 'Water' );
 				folderWater.add( waterUniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
 				folderWater.add( waterUniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
-				folderWater.add( waterUniforms.alpha, 'value', 0.9, 1, .001 ).name( 'alpha' );
 				folderWater.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

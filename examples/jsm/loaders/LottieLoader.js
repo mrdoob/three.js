@@ -1,30 +1,24 @@
 import {
 	FileLoader,
 	Loader,
-	CanvasTexture
-} from "../../../build/three.module.js";
+	CanvasTexture,
+	NearestFilter
+} from '../../../build/three.module.js';
 
-var LottieLoader = function ( manager ) {
+class LottieLoader extends Loader {
 
-	Loader.call( this, manager );
-
-};
-
-LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: LottieLoader,
-
-	setQuality: function ( value ) {
+	setQuality( value ) {
 
 		this._quality = value;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const quality = this._quality || 1;
 
 		const texture = new CanvasTexture();
+		texture.minFilter = NearestFilter;
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
@@ -74,6 +68,6 @@ LottieLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { LottieLoader };

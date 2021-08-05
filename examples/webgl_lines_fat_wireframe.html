@@ -61,7 +61,7 @@
 
 				// Wireframe ( WireframeGeometry2, LineMaterial )
 
-				let geo = new THREE.IcosahedronBufferGeometry( 20, 1 );
+				let geo = new THREE.IcosahedronGeometry( 20, 1 );
 
 				const geometry = new WireframeGeometry2( geo );
 
@@ -94,7 +94,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
 				stats = new Stats();

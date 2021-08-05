@@ -4,7 +4,7 @@ import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-function SidebarGeometryRingGeometry( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -77,7 +77,7 @@ function SidebarGeometryRingGeometry( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.RingBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.RingGeometry(
 			innerRadius.getValue(),
 			outerRadius.getValue(),
 			thetaSegments.getValue(),
@@ -92,4 +92,4 @@ function SidebarGeometryRingGeometry( editor, object ) {
 
 }
 
-export { SidebarGeometryRingGeometry };
+export { GeometryParametersPanel };

@@ -1,4 +1,4 @@
-import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from '../../../../build/three.module.js';
+import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
 class WebGPUUniform {
 
@@ -20,6 +20,12 @@ class WebGPUUniform {
 
 	}
 
+	getValue() {
+
+		return this.value;
+
+	}
+
 }
 
 class FloatUniform extends WebGPUUniform {
@@ -31,11 +37,11 @@ class FloatUniform extends WebGPUUniform {
 		this.boundary = 4;
 		this.itemSize = 1;
 
-		Object.defineProperty( this, 'isFloatUniform', { value: true } );
-
 	}
 
 }
+
+FloatUniform.prototype.isFloatUniform = true;
 
 class Vector2Uniform extends WebGPUUniform {
 
@@ -46,11 +52,11 @@ class Vector2Uniform extends WebGPUUniform {
 		this.boundary = 8;
 		this.itemSize = 2;
 
-		Object.defineProperty( this, 'isVector2Uniform', { value: true } );
-
 	}
 
 }
+
+Vector2Uniform.prototype.isVector2Uniform = true;
 
 class Vector3Uniform extends WebGPUUniform {
 
@@ -61,11 +67,11 @@ class Vector3Uniform extends WebGPUUniform {
 		this.boundary = 16;
 		this.itemSize = 3;
 
-		Object.defineProperty( this, 'isVector3Uniform', { value: true } );
-
 	}
 
 }
+
+Vector3Uniform.prototype.isVector3Uniform = true;
 
 class Vector4Uniform extends WebGPUUniform {
 
@@ -76,11 +82,11 @@ class Vector4Uniform extends WebGPUUniform {
 		this.boundary = 16;
 		this.itemSize = 4;
 
-		Object.defineProperty( this, 'isVector4Uniform', { value: true } );
-
 	}
 
 }
+
+Vector4Uniform.prototype.isVector4Uniform = true;
 
 class ColorUniform extends WebGPUUniform {
 
@@ -91,11 +97,11 @@ class ColorUniform extends WebGPUUniform {
 		this.boundary = 16;
 		this.itemSize = 3;
 
-		Object.defineProperty( this, 'isColorUniform', { value: true } );
-
 	}
 
 }
+
+ColorUniform.prototype.isColorUniform = true;
 
 class Matrix3Uniform extends WebGPUUniform {
 
@@ -106,11 +112,11 @@ class Matrix3Uniform extends WebGPUUniform {
 		this.boundary = 48;
 		this.itemSize = 12;
 
-		Object.defineProperty( this, 'isMatrix3Uniform', { value: true } );
-
 	}
 
 }
+
+Matrix3Uniform.prototype.isMatrix3Uniform = true;
 
 class Matrix4Uniform extends WebGPUUniform {
 
@@ -121,10 +127,10 @@ class Matrix4Uniform extends WebGPUUniform {
 		this.boundary = 64;
 		this.itemSize = 16;
 
-		Object.defineProperty( this, 'isMatrix4Uniform', { value: true } );
-
 	}
 
 }
+
+Matrix4Uniform.prototype.isMatrix4Uniform = true;
 
 export { FloatUniform, Vector2Uniform, Vector3Uniform, Vector4Uniform, ColorUniform, Matrix3Uniform, Matrix4Uniform };

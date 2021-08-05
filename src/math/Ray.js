@@ -11,10 +11,10 @@ const _normal = /*@__PURE__*/ new Vector3();
 
 class Ray {
 
-	constructor( origin, direction ) {
+	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, - 1 ) ) {
 
-		this.origin = ( origin !== undefined ) ? origin : new Vector3();
-		this.direction = ( direction !== undefined ) ? direction : new Vector3( 0, 0, - 1 );
+		this.origin = origin;
+		this.direction = direction;
 
 	}
 
@@ -24,12 +24,6 @@ class Ray {
 		this.direction.copy( direction );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -43,13 +37,6 @@ class Ray {
 	}
 
 	at( t, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Ray: .at() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
@@ -72,13 +59,6 @@ class Ray {
 	}
 
 	closestPointToPoint( point, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Ray: .closestPointToPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		target.subVectors( point, this.origin );
 
@@ -505,7 +485,12 @@ class Ray {
 
 	}
 
-}
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Ray };

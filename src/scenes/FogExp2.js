@@ -2,14 +2,12 @@ import { Color } from '../math/Color.js';
 
 class FogExp2 {
 
-	constructor( color, density ) {
-
-		Object.defineProperty( this, 'isFogExp2', { value: true } );
+	constructor( color, density = 0.00025 ) {
 
 		this.name = '';
 
 		this.color = new Color( color );
-		this.density = ( density !== undefined ) ? density : 0.00025;
+		this.density = density;
 
 	}
 
@@ -31,5 +29,6 @@ class FogExp2 {
 
 }
 
+FogExp2.prototype.isFogExp2 = true;
 
 export { FogExp2 };

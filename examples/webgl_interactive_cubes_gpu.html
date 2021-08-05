@@ -30,7 +30,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
 
 			let container, stats;
 			let camera, controls, scene, renderer;
@@ -39,7 +39,7 @@
 
 			const pickingData = [];
 
-			const mouse = new THREE.Vector2();
+			const pointer = new THREE.Vector2();
 			const offset = new THREE.Vector3( 10, 10, 10 );
 
 			init();
@@ -47,7 +47,7 @@
 
 			function init() {
 
-				container = document.getElementById( "container" );
+				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
@@ -91,7 +91,7 @@
 
 				for ( let i = 0; i < 5000; i ++ ) {
 
-					let geometry = new THREE.BoxBufferGeometry();
+					let geometry = new THREE.BoxGeometry();
 
 					const position = new THREE.Vector3();
 					position.x = Math.random() * 10000 - 5000;
@@ -143,7 +143,7 @@
 				pickingScene.add( new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
 
 				highlightBox = new THREE.Mesh(
-					new THREE.BoxBufferGeometry(),
+					new THREE.BoxGeometry(),
 					new THREE.MeshLambertMaterial( { color: 0xffff00 }
 					) );
 				scene.add( highlightBox );
@@ -165,16 +165,16 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+				renderer.domElement.addEventListener( 'pointermove', onPointerMove );
 
 			}
 
 			//
 
-			function onMouseMove( e ) {
+			function onPointerMove( e ) {
 
-				mouse.x = e.clientX;
-				mouse.y = e.clientY;
+				pointer.x = e.clientX;
+				pointer.y = e.clientY;
 
 			}
 
@@ -193,7 +193,7 @@
 
 				// set the view offset to represent just a single pixel under the mouse
 
-				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, mouse.x * window.devicePixelRatio | 0, mouse.y * window.devicePixelRatio | 0, 1, 1 );
+				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, pointer.x * window.devicePixelRatio | 0, pointer.y * window.devicePixelRatio | 0, 1, 1 );
 
 				// render the scene
 

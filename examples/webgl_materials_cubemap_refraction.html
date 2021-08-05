@@ -70,7 +70,7 @@
 
 				// light representation
 
-				const sphere = new THREE.SphereBufferGeometry( 100, 16, 8 );
+				const sphere = new THREE.SphereGeometry( 100, 16, 8 );
 
 				const mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
@@ -99,11 +99,11 @@
 
 				} );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

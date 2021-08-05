@@ -36,6 +36,12 @@
 		Default is *0*.
 		</p>
 
+		<h3>[property:Float alphaToCoverage]</h3>
+		<p>
+		Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with *antialias* parameter set to *true*).
+		Default is *false*.
+		</p>
+
 		<h3>[property:Integer blendDst]</h3>
 		<p>
 		Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor].
@@ -160,11 +166,6 @@
 		<h3>[property:Integer stencilZPass]</h3>
 		<p>
 		Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
-		</p>
-
-		<h3>[property:Boolean flatShading]</h3>
-		<p>
-		Define whether the material is rendered with flat shading. Default is false.
 		</p>
 
 		<h3>[property:Boolean fog]</h3>

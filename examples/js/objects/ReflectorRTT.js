@@ -1,9 +1,16 @@
-THREE.ReflectorRTT = function ( geometry, options ) {
+( function () {
 
-	THREE.Reflector.call( this, geometry, options );
+	class ReflectorRTT extends THREE.Reflector {
 
-	this.geometry.setDrawRange( 0, 0 ); // avoid rendering geometry
+		constructor( geometry, options ) {
 
-};
+			super( geometry, options );
+			this.geometry.setDrawRange( 0, 0 ); // avoid rendering geometry
 
-THREE.ReflectorRTT.prototype = Object.create( THREE.Reflector.prototype );
+		}
+
+	}
+
+	THREE.ReflectorRTT = ReflectorRTT;
+
+} )();

@@ -1,30 +1,35 @@
+import {
+	RGBAFormat,
+	FloatType
+} from '../constants.js';
 import { Bone } from './Bone.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { MathUtils } from '../math/MathUtils.js';
+import { DataTexture } from '../textures/DataTexture.js';
+import * as MathUtils from '../math/MathUtils.js';
 
-const _offsetMatrix = new Matrix4();
-const _identityMatrix = new Matrix4();
+const _offsetMatrix = /*@__PURE__*/ new Matrix4();
+const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
-function Skeleton( bones = [], boneInverses = [] ) {
+class Skeleton {
 
-	this.uuid = MathUtils.generateUUID();
+	constructor( bones = [], boneInverses = [] ) {
 
-	this.bones = bones.slice( 0 );
-	this.boneInverses = boneInverses;
-	this.boneMatrices = null;
+		this.uuid = MathUtils.generateUUID();
 
-	this.boneTexture = null;
-	this.boneTextureSize = 0;
+		this.bones = bones.slice( 0 );
+		this.boneInverses = boneInverses;
+		this.boneMatrices = null;
 
-	this.frame = - 1;
+		this.boneTexture = null;
+		this.boneTextureSize = 0;
 
-	this.init();
+		this.frame = - 1;
 
-}
+		this.init();
 
-Object.assign( Skeleton.prototype, {
+	}
 
-	init: function () {
+	init() {
 
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
@@ -57,9 +62,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	calculateInverses: function () {
+	calculateInverses() {
 
 		this.boneInverses.length = 0;
 
@@ -77,9 +82,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	pose: function () {
+	pose() {
 
 		// recover the bind-time world matrices
 
@@ -120,9 +125,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	update: function () {
+	update() {
 
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
@@ -148,15 +153,41 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new Skeleton( this.bones, this.boneInverses );
 
-	},
+	}
 
-	getBoneByName: function ( name ) {
+	computeBoneTexture() {
+
+		// layout (1 matrix = 4 pixels)
+		//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+		//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
+		//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
+		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
+		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
+
+		let size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
+		size = MathUtils.ceilPowerOfTwo( size );
+		size = Math.max( size, 4 );
+
+		const boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+		boneMatrices.set( this.boneMatrices ); // copy current values
+
+		const boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
+
+		this.boneMatrices = boneMatrices;
+		this.boneTexture = boneTexture;
+		this.boneTextureSize = size;
+
+		return this;
+
+	}
+
+	getBoneByName( name ) {
 
 		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
@@ -172,9 +203,9 @@ Object.assign( Skeleton.prototype, {
 
 		return undefined;
 
-	},
+	}
 
-	dispose: function ( ) {
+	dispose( ) {
 
 		if ( this.boneTexture !== null ) {
 
@@ -184,9 +215,9 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-	},
+	}
 
-	fromJSON: function ( json, bones ) {
+	fromJSON( json, bones ) {
 
 		this.uuid = json.uuid;
 
@@ -211,9 +242,9 @@ Object.assign( Skeleton.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		const data = {
 			metadata: {
@@ -244,7 +275,6 @@ Object.assign( Skeleton.prototype, {
 
 	}
 
-} );
-
+}
 
 export { Skeleton };

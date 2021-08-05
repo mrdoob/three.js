@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - handinput<br/>
-			(Oculus Browser with #webxr-hands flag enabled)
+			(Oculus Browser 15.1+)
 		</div>
 
 		<script type="module">
@@ -47,7 +47,7 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				const floorGeometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
 				const floorMaterial = new THREE.MeshStandardMaterial( { color: 0x222222 } );
 				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
@@ -88,7 +88,7 @@
 				scene.add( controller2 );
 
 				const controllerModelFactory = new XRControllerModelFactory();
-				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+				const handModelFactory = new XRHandModelFactory();
 
 				// Hand 1
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
@@ -122,7 +122,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

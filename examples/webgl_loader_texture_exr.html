@@ -48,7 +48,6 @@
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
 				new EXRLoader()
-					.setDataType( THREE.FloatType )
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
 						// memorial.exr is NPOT
@@ -63,7 +62,7 @@
 
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-						const quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+						const quad = new THREE.PlaneGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
 
 						const mesh = new THREE.Mesh( quad, material );
 
@@ -82,7 +81,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

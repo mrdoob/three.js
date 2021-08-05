@@ -34,7 +34,7 @@
 				enabled: true,
 				lut: 'Bourbon 64.CUBE',
 				intensity: 1,
-				use2dLut: false,
+				use2DLut: false,
 			};
 
 			const lutMap = {
@@ -63,17 +63,13 @@
 				scene = new THREE.Scene();
 
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						scene.background = envMap;
-						scene.environment = envMap;
-
-						texture.dispose();
-						pmremGenerator.dispose();
+						scene.background = texture;
+						scene.environment = texture;
 
 						// model
 
@@ -103,7 +99,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 				container.appendChild( renderer.domElement );
-				
+
 				const target = new THREE.WebGLRenderTarget( {
 					minFilter: THREE.LinearFilter,
 					magFilter: THREE.LinearFilter,
@@ -120,9 +116,6 @@
 				lutPass = new LUTPass();
 				composer.addPass( lutPass );
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
-
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
@@ -137,7 +130,7 @@
 
 				if ( renderer.capabilities.isWebGL2 ) {
 
-					gui.add( params, 'use2dLut' );
+					gui.add( params, 'use2DLut' );
 
 				} else {
 
@@ -145,7 +138,7 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -2,6 +2,7 @@
 
 import { Color } from '../../../../src/math/Color';
 import { eps } from './Constants.tests';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -124,7 +125,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( hsl.l == 0.75, "lightness: " + hsl.l );
 
 			hsl = { h: 0, s: 0, l: 0 };
-			a.setStyle( "hsl(270,50%,75%,0.5)" );
+			a.setStyle( "hsl(270,50%,75%)" );
 			a.getHSL( hsl );
 			assert.ok( hsl.h == 0.75, "hue: " + hsl.h );
 			assert.ok( hsl.s == 0.5, "saturation: " + hsl.s );
@@ -483,7 +484,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleRGBARed", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'rgba(255,0,0,0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g === 0, "Green: " + c.g );
 			assert.ok( c.b === 0, "Blue: " + c.b );
@@ -523,7 +528,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleRGBAPercent", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'rgba(100%,50%,10%, 0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g == 0.5, "Green: " + c.g );
 			assert.ok( c.b == 0.1, "Blue: " + c.b );
@@ -543,7 +552,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleRGBAPercentWithSpaces", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'rgba( 100% ,50%  ,  10%, 0.5 )' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g == 0.5, "Green: " + c.g );
 			assert.ok( c.b == 0.1, "Blue: " + c.b );
@@ -563,7 +576,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleHSLARed", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'hsla(360,100%,50%,0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g === 0, "Green: " + c.g );
 			assert.ok( c.b === 0, "Blue: " + c.b );
@@ -583,7 +600,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleHSLARedWithSpaces", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'hsla( 360,  100% , 50%,  0.5 )' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g === 0, "Green: " + c.g );
 			assert.ok( c.b === 0, "Blue: " + c.b );

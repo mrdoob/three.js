@@ -45,7 +45,7 @@
 				// Ground
 
 				const plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
+					new THREE.PlaneGeometry( 40, 40 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
@@ -158,7 +158,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

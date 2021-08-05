@@ -1,4 +1,4 @@
-import { UIDiv, UIBreak, UIText, UIRow, UIInput } from './libs/ui.js';
+import { UIPanel, UIText, UIRow, UIInput } from './libs/ui.js';
 
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 
@@ -17,8 +17,11 @@ function SidebarSettingsShortcuts( editor ) {
 	var config = editor.config;
 	var signals = editor.signals;
 
-	var container = new UIDiv();
-	container.add( new UIBreak() );
+	var container = new UIPanel();
+
+	var headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts' ).toUpperCase() ) );
+	container.add( headerRow );
 
 	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
 
@@ -27,7 +30,8 @@ function SidebarSettingsShortcuts( editor ) {
 		var configName = 'settings/shortcuts/' + name;
 		var shortcutRow = new UIRow();
 
-		var shortcutInput = new UIInput().setWidth( '150px' ).setFontSize( '12px' );
+		var shortcutInput = new UIInput().setWidth( '15px' ).setFontSize( '12px' );
+		shortcutInput.setTextAlign( 'center' );
 		shortcutInput.setTextTransform( 'lowercase' );
 		shortcutInput.onChange( function () {
 

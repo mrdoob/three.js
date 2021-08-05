@@ -2,9 +2,9 @@ export default /* glsl */`
 #define STANDARD
 
 #ifdef PHYSICAL
-	#define REFLECTIVITY
+	#define IOR
 	#define CLEARCOAT
-	#define TRANSMISSION
+	#define SPECULAR
 #endif
 
 uniform vec3 diffuse;
@@ -13,12 +13,21 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
-#ifdef TRANSMISSION
-	uniform float transmission;
+#ifdef IOR
+	uniform float ior;
 #endif
 
-#ifdef REFLECTIVITY
-	uniform float reflectivity;
+#ifdef SPECULAR
+	uniform float specularIntensity;
+	uniform vec3 specularTint;
+
+	#ifdef USE_SPECULARINTENSITYMAP
+		uniform sampler2D specularIntensityMap;
+	#endif
+
+	#ifdef USE_SPECULARTINTMAP
+		uniform sampler2D specularTintMap;
+	#endif
 #endif
 
 #ifdef CLEARCOAT
@@ -32,19 +41,6 @@ uniform float opacity;
 
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-	#ifdef USE_TANGENT
-
-		varying vec3 vTangent;
-		varying vec3 vBitangent;
-
-	#endif
-
-#endif
-
 #include <common>
 #include <packing>
 #include <dithering_pars_fragment>
@@ -56,13 +52,14 @@ varying vec3 vViewPosition;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
-#include <transmissionmap_pars_fragment>
 #include <bsdfs>
+#include <transmission_pars_fragment>
 #include <cube_uv_reflection_fragment>
 #include <envmap_common_pars_fragment>
 #include <envmap_physical_pars_fragment>
 #include <fog_pars_fragment>
 #include <lights_pars_begin>
+#include <normal_pars_fragment>
 #include <lights_physical_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
@@ -81,10 +78,6 @@ void main() {
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
 
-	#ifdef TRANSMISSION
-		float totalTransmission = transmission;
-	#endif
-
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
 	#include <color_fragment>
@@ -97,7 +90,6 @@ void main() {
 	#include <clearcoat_normal_fragment_begin>
 	#include <clearcoat_normal_fragment_maps>
 	#include <emissivemap_fragment>
-	#include <transmissionmap_fragment>
 
 	// accumulation
 	#include <lights_physical_fragment>
@@ -108,12 +100,12 @@ void main() {
 	// modulation
 	#include <aomap_fragment>
 
-	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+	vec3 totalDiffuse = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse;
+	vec3 totalSpecular = reflectedLight.directSpecular + reflectedLight.indirectSpecular;
 
-	// this is a stub for the transmission model
-	#ifdef TRANSMISSION
-		diffuseColor.a *= mix( saturate( 1. - totalTransmission + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) ), 1.0, metalness );
-	#endif
+	#include <transmission_fragment>
+
+	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 

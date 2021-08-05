@@ -1,44 +1,38 @@
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
 import { Light } from './Light.js';
 
-function LightProbe( sh, intensity ) {
+class LightProbe extends Light {
 
-	Light.call( this, undefined, intensity );
+	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
-	this.type = 'LightProbe';
+		super( undefined, intensity );
 
-	this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
+		this.sh = sh;
 
-}
+	}
 
-LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
+	copy( source ) {
 
-	constructor: LightProbe,
-
-	isLightProbe: true,
-
-	copy: function ( source ) {
-
-		Light.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.sh.copy( source.sh );
 
 		return this;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
 		this.intensity = json.intensity; // TODO: Move this bit to Light.fromJSON();
 		this.sh.fromArray( json.sh );
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		const data = Light.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		data.object.sh = this.sh.toArray();
 
@@ -46,6 +40,8 @@ LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	}
 
-} );
+}
+
+LightProbe.prototype.isLightProbe = true;
 
 export { LightProbe };

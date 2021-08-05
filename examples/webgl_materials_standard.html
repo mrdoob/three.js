@@ -19,6 +19,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
@@ -101,22 +102,52 @@
 
 					} );
 
-				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
+				const environments = {
 
-						const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						hdrEquirect.dispose();
-						pmremGenerator.dispose();
+					'Venice Sunset': { filename: 'venice_sunset_1k.hdr' },
+					'Overpass': { filename: 'pedestrian_overpass_1k.hdr' }
 
-						scene.background = hdrCubeRenderTarget.texture;
-						scene.environment = hdrCubeRenderTarget.texture;
+				};
 
-					} );
+				function loadEnvironment( name ) {
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
+					if ( environments[ name ].texture !== undefined ) {
+
+						scene.background = environments[ name ].texture;
+						scene.environment = environments[ name ].texture;
+						return;
+
+					}
+
+					const filename = environments[ name ].filename;
+					new RGBELoader()
+						.setPath( 'textures/equirectangular/' )
+						.load( filename, function ( hdrEquirect ) {
+
+							hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
+
+							scene.background = hdrEquirect;
+							scene.environment = hdrEquirect;
+							environments[ name ].texture = hdrEquirect;
+
+						} );
+
+				}
+
+				const params = {
+
+					environment: Object.keys( environments )[ 0 ]
+
+				};
+				loadEnvironment( params.environment );
+
+				const gui = new GUI();
+				gui.add( params, 'environment', Object.keys( environments ) ).onChange( function ( value ) {
+
+					loadEnvironment( value );
+
+				} );
+				gui.open();
 
 				//
 
@@ -127,7 +158,7 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

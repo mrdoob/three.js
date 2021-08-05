@@ -105,7 +105,7 @@
 				const	materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
 				const materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
-				const geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const geometry = new THREE.PlaneGeometry( 100, 100 );
 
 				const meshCanvas = new THREE.Mesh( geometry, materialCanvas );
 				meshCanvas.rotation.x = - Math.PI / 2;
@@ -128,7 +128,7 @@
 					scene.add( meshCanvas );
 					scene2.add( meshCanvas2 );
 
-					const geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+					const geometry = new THREE.PlaneGeometry( 100, 100 );
 					const mesh = new THREE.Mesh( geometry, materialPainting );
 					const mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 
@@ -182,7 +182,7 @@
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 

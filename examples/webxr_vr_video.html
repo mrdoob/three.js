@@ -46,24 +46,14 @@
 				const video = document.getElementById( 'video' );
 				video.play();
 
-				const texture = new THREE.Texture( video );
-
-				setInterval( function () {
-
-					if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
-
-						texture.needsUpdate = true;
-
-					}
-
-				}, 1000 / 24 );
+				const texture = new THREE.VideoTexture( video );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 
 				// left
 
-				const geometry1 = new THREE.SphereBufferGeometry( 500, 60, 40 );
+				const geometry1 = new THREE.SphereGeometry( 500, 60, 40 );
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry1.scale( - 1, 1, 1 );
 
@@ -84,7 +74,7 @@
 
 				// right
 
-				const geometry2 = new THREE.SphereBufferGeometry( 500, 60, 40 );
+				const geometry2 = new THREE.SphereGeometry( 500, 60, 40 );
 				geometry2.scale( - 1, 1, 1 );
 
 				const uvs2 = geometry2.attributes.uv.array;
@@ -116,7 +106,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

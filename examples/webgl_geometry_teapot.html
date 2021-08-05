@@ -19,7 +19,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
 			let camera, scene, renderer;
 			let cameraControls;
@@ -71,7 +71,7 @@
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// CONTROLS
 				cameraControls = new OrbitControls( camera, renderer.domElement );
@@ -306,7 +306,7 @@
 
 				}
 
-				const teapotGeometry = new TeapotBufferGeometry( teapotSize,
+				const teapotGeometry = new TeapotGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,

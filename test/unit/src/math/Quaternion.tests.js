@@ -657,6 +657,22 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "slerpQuaternions", ( assert ) => {
+
+			var e = new Quaternion( 1, 0, 0, 0 );
+			var f = new Quaternion( 0, 0, 1, 0 );
+			var expected = new Quaternion( Math.SQRT1_2, 0, Math.SQRT1_2, 0 );
+
+			var a = new Quaternion();
+			a.slerpQuaternions( e, f, 0.5 );
+
+			assert.ok( Math.abs( a.x - expected.x ) <= eps, "Check x" );
+			assert.ok( Math.abs( a.y - expected.y ) <= eps, "Check y" );
+			assert.ok( Math.abs( a.z - expected.z ) <= eps, "Check z" );
+			assert.ok( Math.abs( a.w - expected.w ) <= eps, "Check w" );
+
+		} );
+
 		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );

@@ -87,7 +87,7 @@
 		<p>
 			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
-			Default is *THREE.StaticDrawUsage*.
+			Default is [page:BufferAttributeUsage StaticDrawUsage]. See usage [page:BufferAttributeUsage constants] for all possible values.
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -116,7 +116,7 @@
 			拷贝 TypedArray 相关注意事项详见 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]。
 		</p>
 
-		<h3>[method:null copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
+		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>将一个矢量从 bufferAttribute[index2] 拷贝到 [page:BufferAttribute.array array][index1] 中。</p>
 
 		<h3>[method:BufferAttribute copyColorsArray]( [param:Array colors] ) </h3>
@@ -143,7 +143,7 @@
 		<h3>[method:Number getW]( [param:Integer index] ) </h3>
 		<p>获取给定索引的矢量的第四维元素 （即 W 值）。</p>
 
-		<h3>[method:null onUpload]( [param:Function callback] ) </h3>
+		<h3>[method:this onUpload]( [param:Function callback] ) </h3>
 		<p>见 onUploadCallback 属性。<br /><br />
 			在 [example:webgl_buffergeometry WebGL / Buffergeometry] 中，该方在缓存数据传递给 GPU 后，用于释放内存。
 		</p>
@@ -160,7 +160,7 @@
 		</p>
 
 		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:BufferAttribute.usage usage] to value.</p>
+		<p>Set [page:BufferAttribute.usage usage] to value. See usage [page:BufferAttributeUsage constants] for all possible input values.</p>
 
 		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>设置给定索引的矢量的第一维数据（设置 X 值）。</p>

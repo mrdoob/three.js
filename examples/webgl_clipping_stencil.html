@@ -127,13 +127,13 @@
 
 				} );
 
-				const geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 220, 60 );
+				const geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 220, 60 );
 				object = new THREE.Group();
 				scene.add( object );
 
 				// Set up clip plane rendering
 				planeObjects = [];
-				const planeGeom = new THREE.PlaneBufferGeometry( 4, 4 );
+				const planeGeom = new THREE.PlaneGeometry( 4, 4 );
 
 				for ( let i = 0; i < 3; i ++ ) {
 
@@ -193,7 +193,7 @@
 
 
 				const ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
+					new THREE.PlaneGeometry( 9, 9, 1, 1 ),
 					new THREE.ShadowMaterial( { color: 0, opacity: 0.25, side: THREE.DoubleSide } )
 				);
 
@@ -212,7 +212,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x263238 );
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.localClippingEnabled = true;

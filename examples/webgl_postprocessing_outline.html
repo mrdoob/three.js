@@ -197,7 +197,7 @@
 
 				//
 
-				const geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+				const geometry = new THREE.SphereGeometry( 3, 48, 24 );
 
 				for ( let i = 0; i < 20; i ++ ) {
 
@@ -217,14 +217,14 @@
 
 				const floorMaterial = new THREE.MeshLambertMaterial( { side: THREE.DoubleSide } );
 
-				const floorGeometry = new THREE.PlaneBufferGeometry( 12, 12 );
+				const floorGeometry = new THREE.PlaneGeometry( 12, 12 );
 				const floorMesh = new THREE.Mesh( floorGeometry, floorMaterial );
 				floorMesh.rotation.x -= Math.PI * 0.5;
 				floorMesh.position.y -= 1.5;
 				group.add( floorMesh );
 				floorMesh.receiveShadow = true;
 
-				const torusGeometry = new THREE.TorusBufferGeometry( 1, 0.3, 16, 100 );
+				const torusGeometry = new THREE.TorusGeometry( 1, 0.3, 16, 100 );
 				const torusMaterial = new THREE.MeshPhongMaterial( { color: 0xffaaff } );
 				const torus = new THREE.Mesh( torusGeometry, torusMaterial );
 				torus.position.z = - 4;
@@ -260,10 +260,10 @@
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 				composer.addPass( effectFXAA );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				renderer.domElement.style.touchAction = 'none';
-				renderer.domElement.addEventListener( 'pointermove', onPointerMove, false );
+				renderer.domElement.addEventListener( 'pointermove', onPointerMove );
 
 				function onPointerMove( event ) {
 

@@ -33,6 +33,14 @@
 			<li>KHR_texture_transform</li>
 		</ul>
 
+		<p>
+			The following glTF 2.0 extension is supported by an external user plugin
+		</p>
+
+		<ul>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions KHR_materials_variants]</li>
+		</ul>
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -100,7 +108,6 @@
 			<li>maxTextureSize - int. Restricts the image maximum size (both width and height) to the given value. This option works only if embedImages is true. Default is Infinity.</li>
 			<li>animations - Array<[page:AnimationClip AnimationClip]>. List of animations to be included in the export.</li>
 			<li>forceIndices - bool. Generate indices for non-index geometry and export with them. Default is false.</li>
-			<li>forcePowerOfTwoTextures - bool. Export with images resized to POT size. This option works only if embedImages is true. Default is false.</li>
 			<li>includeCustomExtensions - bool. Export custom glTF extensions defined on an object's <em>userData.gltfExtensions</em> property. Default is false.</li>
 		</ul>
 		</p>

@@ -20,7 +20,6 @@
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label><br/>
 			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
-			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 			<label><input id="option_maxsize" name="maxSize" type="number" value="4096" min="2" max="8192" step="1"> Max texture size</label>
 		</div>
 
@@ -40,7 +39,6 @@
 					onlyVisible: document.getElementById( 'option_visible' ).checked,
 					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
 					binary: document.getElementById( 'option_binary' ).checked,
-					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked,
 					maxTextureSize: Number( document.getElementById( 'option_maxsize' ).value ) || Infinity // To prevent NaN value
 				};
 				gltfExporter.parse( input, function ( result ) {
@@ -138,6 +136,23 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// Make linear gradient texture
+				const data = new Uint8ClampedArray( 100 * 100 * 3 );
+				for ( let y = 0; y < 100; y ++ ) {
+
+					for ( let x = 0; x < 100; x ++ ) {
+
+						data[ 3 * ( 100 * y + x ) ] = Math.round( 255 * y / 99 );
+						data[ 3 * ( 100 * y + x ) + 1 ] = Math.round( 255 - 255 * y / 99 );
+
+					}
+
+				}
+
+				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBFormat );
+				gradientTexture.minFilter = THREE.LinearFilter;
+				gradientTexture.magFilter = THREE.LinearFilter;
+
 				scene1 = new THREE.Scene();
 				scene1.name = 'Scene1';
 
@@ -193,7 +208,7 @@
 					map: mapGrid
 				} );
 
-				object = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 0 ), material );
 				object.position.set( - 200, 0, 200 );
 				object.name = 'Icosahedron';
 				scene1.add( object );
@@ -203,7 +218,7 @@
 					color: 0x0000ff,
 					wireframe: true
 				} );
-				object = new THREE.Mesh( new THREE.OctahedronBufferGeometry( 75, 1 ), material );
+				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 1 ), material );
 				object.position.set( 0, 0, 200 );
 				object.name = 'Octahedron';
 				scene1.add( object );
@@ -215,7 +230,7 @@
 					opacity: 0.5
 				} );
 
-				object = new THREE.Mesh( new THREE.TetrahedronBufferGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
 				object.name = 'Tetrahedron';
 				scene1.add( object );
@@ -230,7 +245,8 @@
 					roughness: 1.0,
 					flatShading: true
 				} );
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 70, 10, 10 ), material );
+				material.map = gradientTexture;
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 70, 10, 10 ), material );
 				sphere.position.set( 0, 0, 0 );
 				sphere.name = "Sphere";
 				scene1.add( sphere );
@@ -240,7 +256,7 @@
 					color: 0xff00ff,
 					flatShading: true
 				} );
-				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 10, 80, 100 ), material );
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 10, 80, 100 ), material );
 				object.position.set( 200, 0, 0 );
 				object.name = "Cylinder";
 				scene1.add( object );
@@ -250,7 +266,7 @@
 					color: 0xff0000,
 					roughness: 1
 				} );
-				object = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 50, 15, 40, 10 ), material );
+				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 15, 40, 10 ), material );
 				object.position.set( - 200, 0, 0 );
 				object.name = "Cylinder";
 				scene1.add( object );
@@ -262,12 +278,12 @@
 				const mapWood = new THREE.TextureLoader().load( 'textures/hardwood2_diffuse.jpg' );
 				material = new THREE.MeshStandardMaterial( { map: mapWood, side: THREE.DoubleSide } );
 
-				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 100, 100 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 40, 100, 100 ), material );
 				object.position.set( - 200, 0, 400 );
 				object.name = "Cube";
 				scene1.add( object );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
+				object2 = new THREE.Mesh( new THREE.BoxGeometry( 40, 40, 40, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
@@ -286,7 +302,7 @@
 				group2.position.set( 0, 50, 0 );
 				group1.add( group2 );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
+				object2 = new THREE.Mesh( new THREE.BoxGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
@@ -406,15 +422,15 @@
 					side: THREE.DoubleSide
 				} );
 
-				object = new THREE.Mesh( new THREE.CircleBufferGeometry( 50, 20, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
 				object.position.set( 200, 0, - 400 );
 				scene1.add( object );
 
-				object = new THREE.Mesh( new THREE.RingBufferGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
 				object.position.set( 0, 0, - 400 );
 				scene1.add( object );
 
-				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 25, 75, 100, 40, 5 ), material );
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.set( - 200, 0, - 400 );
 				scene1.add( object );
 
@@ -427,7 +443,7 @@
 
 				}
 
-				object = new THREE.Mesh( new THREE.LatheBufferGeometry( points, 20 ), material );
+				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
 				object.position.set( 200, 0, 400 );
 				scene1.add( object );
 
@@ -437,7 +453,7 @@
 				material = new THREE.MeshBasicMaterial( {
 					color: 0xff0000
 				} );
-				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "CubeHidden";
 				object.visible = false;
@@ -461,7 +477,7 @@
 				// 2nd THREE.Scene
 				// ---------------------------------------------------------------------
 				scene2 = new THREE.Scene();
-				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "Cube2ndScene";
 				scene2.name = 'Scene2';
@@ -477,7 +493,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

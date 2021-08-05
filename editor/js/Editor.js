@@ -26,6 +26,11 @@ function Editor() {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
+		// vr
+
+		toggleVR: new Signal(),
+		exitedVR: new Signal(),
+
 		// notifications
 
 		editorCleared: new Signal(),
@@ -36,7 +41,7 @@ function Editor() {
 		transformModeChanged: new Signal(),
 		snapChanged: new Signal(),
 		spaceChanged: new Signal(),
-		rendererChanged: new Signal(),
+		rendererCreated: new Signal(),
 		rendererUpdated: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
@@ -79,7 +84,9 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal()
+		viewportCameraChanged: new Signal(),
+
+		animationStopped: new Signal()
 
 	};
 
@@ -105,7 +112,6 @@ function Editor() {
 
 	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
 
-	this.animations = {};
 	this.mixer = new THREE.AnimationMixer( this.scene );
 
 	this.selected = null;
@@ -125,9 +131,9 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
-		this.scene.background = ( scene.background !== null ) ? scene.background.clone() : null;
-
-		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+		this.scene.background = scene.background;
+		this.scene.environment = scene.environment;
+		this.scene.fog = scene.fog;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -357,16 +363,6 @@ Editor.prototype = {
 
 	},
 
-	addAnimations: function ( object, animations ) {
-
-		if ( animations.length > 0 ) {
-
-			this.animations[ object.uuid ] = animations;
-
-		}
-
-	},
-
 	//
 
 	addCamera: function ( camera ) {
@@ -397,7 +393,7 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
+		var geometry = new THREE.SphereGeometry( 2, 4, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object, helper ) {
@@ -418,7 +414,7 @@ Editor.prototype = {
 
 				} else if ( object.isSpotLight ) {
 
-					helper = new THREE.SpotLightHelper( object, 1 );
+					helper = new THREE.SpotLightHelper( object );
 
 				} else if ( object.isHemisphereLight ) {
 
@@ -563,7 +559,7 @@ Editor.prototype = {
 
 		}
 
-		this.select( this.scene.getObjectById( id, true ) );
+		this.select( this.scene.getObjectById( id ) );
 
 	},
 
@@ -601,7 +597,7 @@ Editor.prototype = {
 
 	focusById: function ( id ) {
 
-		this.focus( this.scene.getObjectById( id, true ) );
+		this.focus( this.scene.getObjectById( id ) );
 
 	},
 
@@ -613,7 +609,7 @@ Editor.prototype = {
 		this.camera.copy( _DEFAULT_CAMERA );
 		this.signals.cameraResetted.dispatch();
 
-		this.scene.name = "Scene";
+		this.scene.name = 'Scene';
 		this.scene.userData = {};
 		this.scene.background = null;
 		this.scene.environment = null;
@@ -645,12 +641,10 @@ Editor.prototype = {
 
 	//
 
-	fromJSON: function ( json ) {
-
-		var scope = this;
+	fromJSON: async function ( json ) {
 
 		var loader = new THREE.ObjectLoader();
-		var camera = loader.parse( json.camera );
+		var camera = await loader.parseAsync( json.camera );
 
 		this.camera.copy( camera );
 		this.signals.cameraResetted.dispatch();
@@ -658,55 +652,11 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		loader.parse( json.scene, function ( scene ) {
-
-			scope.setScene( scene );
-
-		} );
-
-		// animations
-
-		var animationsJSON = json.animations;
-
-		for ( var i = 0; i < animationsJSON.length; i ++ ) {
-
-			var objectJSON = animationsJSON[ i ];
-			var animations = [];
-
-			for ( var j = 0; j < objectJSON.animations.length; j ++ ) {
-
-				animations.push( THREE.AnimationClip.parse( objectJSON.animations[ j ] ) );
-
-			}
-
-			this.animations[ objectJSON.uuid ] = animations;
-
-		}
+		this.setScene( await loader.parseAsync( json.scene ) );
 
 	},
 
 	toJSON: function () {
-
-		// animations
-
-		var animations = this.animations;
-		var animationsJSON = [];
-
-		for ( var entry in animations ) {
-
-			var objectAnimations = animations[ entry ];
-			var objectJSON = { uuid: entry, animations: [] };
-
-			for ( var i = 0; i < objectAnimations.length; i ++ ) {
-
-				var objectAnimation = objectAnimations[ i ];
-				objectJSON.animations.push( THREE.AnimationClip.toJSON( objectAnimation ) );
-
-			}
-
-			animationsJSON.push( objectJSON );
-
-		}
 
 		// scripts clean up
 
@@ -741,8 +691,7 @@ Editor.prototype = {
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
-			history: this.history.toJSON(),
-			animations: animationsJSON
+			history: this.history.toJSON()
 
 		};
 

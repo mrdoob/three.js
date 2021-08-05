@@ -1,15 +1,15 @@
 import { Vector3 } from './Vector3.js';
-import { MathUtils } from './MathUtils.js';
+import * as MathUtils from './MathUtils.js';
 
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
 
 class Line3 {
 
-	constructor( start, end ) {
+	constructor( start = new Vector3(), end = new Vector3() ) {
 
-		this.start = ( start !== undefined ) ? start : new Vector3();
-		this.end = ( end !== undefined ) ? end : new Vector3();
+		this.start = start;
+		this.end = end;
 
 	}
 
@@ -19,12 +19,6 @@ class Line3 {
 		this.end.copy( end );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -39,25 +33,11 @@ class Line3 {
 
 	getCenter( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .getCenter() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return target.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
 
 	}
 
 	delta( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .delta() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.subVectors( this.end, this.start );
 
@@ -76,13 +56,6 @@ class Line3 {
 	}
 
 	at( t, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .at() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return this.delta( target ).multiplyScalar( t ).add( this.start );
 
@@ -112,13 +85,6 @@ class Line3 {
 
 		const t = this.closestPointToPointParameter( point, clampToLine );
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .closestPointToPoint() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return this.delta( target ).multiplyScalar( t ).add( this.start );
 
 	}
@@ -138,7 +104,12 @@ class Line3 {
 
 	}
 
-}
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Line3 };

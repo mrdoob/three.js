@@ -55,7 +55,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				const geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 
 				for ( let i = 0; i < 100; i ++ ) {
 
@@ -107,7 +107,7 @@
 				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
 				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

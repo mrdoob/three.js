@@ -13,23 +13,13 @@ export default QUnit.module( 'Helpers', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {
-				radius: 10,
-				widthSegments: 20,
-				heightSegments: 30,
-				phiStart: 0.5,
-				phiLength: 1.0,
-				thetaStart: 0.4,
-				thetaLength: 2.0,
-			};
-
 			// Test with a normal cube and a box helper
-			var boxGeometry = new BoxGeometry( parameters.diameter );
+			var boxGeometry = new BoxGeometry();
 			var box = new Mesh( boxGeometry );
 			var boxHelper = new BoxHelper( box );
 
 			// The same should happen with a comparable sphere
-			var sphereGeometry = new SphereGeometry( parameters.diameter / 2 );
+			var sphereGeometry = new SphereGeometry();
 			var sphere = new Mesh( sphereGeometry );
 			var sphereBoxHelper = new BoxHelper( sphere );
 
