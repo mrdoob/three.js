@@ -81,14 +81,14 @@
 				camera.position.set( 0, 10, 30 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xCCCCCC, 50, 100 );
+				scene.background = new THREE.Color( 0x222244 );
+				scene.fog = new THREE.Fog( 0x222244, 50, 100 );
 
 				// Lights
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				spotLight = new THREE.SpotLight( 0x888888 );
-				spotLight.name = 'Spot Light';
+				spotLight = new THREE.SpotLight( 0xff8888 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
 				spotLight.position.set( 8, 10, 5 );
@@ -102,8 +102,7 @@
 				scene.add( spotLight );
 
 
-				dirLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
-				dirLight.name = 'Dir. Light';
+				dirLight = new THREE.DirectionalLight( 0x8888ff );
 				dirLight.position.set( 3, 12, 17 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 0.1;
@@ -140,16 +139,16 @@
 				const cylinderGeometry = new THREE.CylinderGeometry( 0.75, 0.75, 7, 32 );
 
 				const pillar1 = new THREE.Mesh( cylinderGeometry, material );
-				pillar1.position.set( 10, 3.5, 10 );
+				pillar1.position.set( 8, 3.5, 8 );
 				pillar1.castShadow = true;
 				pillar1.receiveShadow = true;
 
 				const pillar2 = pillar1.clone();
-				pillar2.position.set( 10, 3.5, - 10 );
+				pillar2.position.set( 8, 3.5, - 8 );
 				const pillar3 = pillar1.clone();
-				pillar3.position.set( - 10, 3.5, 10 );
+				pillar3.position.set( - 8, 3.5, 8 );
 				const pillar4 = pillar1.clone();
-				pillar4.position.set( - 10, 3.5, - 10 );
+				pillar4.position.set( - 8, 3.5, - 8 );
 
 				scene.add( pillar1 );
 				scene.add( pillar2 );
@@ -180,8 +179,6 @@
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.VSMShadowMap;
 
-				renderer.setClearColor( 0xCCCCCC, 1 );
-
 				// Mouse control
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
@@ -203,34 +200,22 @@
 
 			}
 
-			function animate() {
+			function animate( time ) {
 
 				requestAnimationFrame( animate );
-				render();
-
-				stats.update();
-
-			}
-
-			function renderScene() {
-
-				renderer.render( scene, camera );
-
-			}
-
-			function render() {
 
 				const delta = clock.getDelta();
-				const time = clock.elapsedTime;
-
-				renderScene();
 
 				torusKnot.rotation.x += 0.25 * delta;
-				torusKnot.rotation.y += 2 * delta;
+				torusKnot.rotation.y += 0.5 * delta;
 				torusKnot.rotation.z += 1 * delta;
 
 				dirGroup.rotation.y += 0.7 * delta;
 				dirLight.position.z = 17 + Math.sin( time * 0.001 ) * 5;
+
+				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
