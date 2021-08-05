@@ -214,12 +214,6 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		_renderer.clear();
 		_renderer.renderBufferDirect( camera, null, geometry, shadowMaterialVertical, fullScreenMesh, null );
 
-		if ( shadow.blurSamples <= 1.0 ) {
-
-			return;
-
-		}
-
 		// horizontal pass
 
 		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
