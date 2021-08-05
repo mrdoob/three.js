@@ -4,6 +4,11 @@ export default /* glsl */`
 	// Transmission code is based on glTF-Sampler-Viewer
 	// https://github.com/KhronosGroup/glTF-Sample-Viewer
 
+	uniform float transmission;
+	uniform float thickness;
+	uniform float attenuationDistance;
+	uniform vec3 attenuationTint;
+
 	#ifdef USE_TRANSMISSIONMAP
 
 		uniform sampler2D transmissionMap;

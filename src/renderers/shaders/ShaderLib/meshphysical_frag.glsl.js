@@ -13,13 +13,6 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
-#ifdef USE_TRANSMISSION
-	uniform float transmission;
-	uniform float thickness;
-	uniform float attenuationDistance;
-	uniform vec3 attenuationTint;
-#endif
-
 #ifdef IOR
 	uniform float ior;
 #endif
