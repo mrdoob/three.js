@@ -16,7 +16,7 @@ export default /* glsl */`
 
 	#endif
 
-	vec3 pos = vWorldPosition.xyz / vWorldPosition.w;
+	vec3 pos = vWorldPosition;
 	vec3 v = normalize( cameraPosition - pos );
 	vec3 n = inverseTransformDirection( normal, viewMatrix );
 

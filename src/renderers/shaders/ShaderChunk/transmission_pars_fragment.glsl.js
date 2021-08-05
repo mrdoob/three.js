@@ -27,7 +27,7 @@ export default /* glsl */`
 	uniform mat4 modelMatrix;
 	uniform mat4 projectionMatrix;
 
-	varying vec4 vWorldPosition;
+	varying vec3 vWorldPosition;
 
 	vec3 getVolumeTransmissionRay(vec3 n, vec3 v, float thickness, float ior, mat4 modelMatrix) {
 		// Direction of refracted light.
