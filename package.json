@@ -109,7 +109,7 @@
     "@babel/preset-env": "^7.14.8",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-node-resolve": "^13.0.4",
-    "chalk": "^4.1.1",
+    "chalk": "^4.1.2",
     "concurrently": "^6.2.0",
     "eslint": "^7.31.0",
     "eslint-config-mdcs": "^5.0.0",
