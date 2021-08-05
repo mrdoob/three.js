@@ -290,7 +290,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		info = new WebGLInfo( _gl );
 		properties = new WebGLProperties();
-		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
+		textures = new WebGLTextures( _this, _gl, extensions, state, properties, capabilities, utils, info );
 		cubemaps = new WebGLCubeMaps( _this );
 		cubeuvmaps = new WebGLCubeUVMaps( _this );
 		attributes = new WebGLAttributes( _gl, capabilities );
@@ -569,6 +569,7 @@ function WebGLRenderer( parameters = {} ) {
 		cubeuvmaps.dispose();
 		objects.dispose();
 		bindingStates.dispose();
+		textures.dispose();
 
 		xr.dispose();
 
@@ -1509,6 +1510,8 @@ function WebGLRenderer( parameters = {} ) {
 	function setProgram( camera, scene, material, object ) {
 
 		if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
+
+		if ( material.isMeshStandardMaterial === true ) textures.updateRoughnessMap( material );
 
 		textures.resetTextureUnits();
 

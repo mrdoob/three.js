@@ -1,7 +1,8 @@
 import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
 import * as MathUtils from '../../math/MathUtils.js';
+import { RoughnessMipmapper } from '../../extras/RoughnessMipmapper.js';
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
+function WebGLTextures( renderer, _gl, extensions, state, properties, capabilities, utils, info ) {
 
 	const isWebGL2 = capabilities.isWebGL2;
 	const maxTextures = capabilities.maxTextures;
@@ -9,8 +10,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	const maxTextureSize = capabilities.maxTextureSize;
 	const maxSamples = capabilities.maxSamples;
 
-	const _videoTextures = new WeakMap();
+	let _roughnessMaps = new WeakMap();
+	let _videoTextures = new WeakMap();
 	let _canvas;
+	let _roughnessMipmapper;
 
 	// cordova iOS (as of 5.0) still uses UIWebView, which provides OffscreenCanvas,
 	// also OffscreenCanvas.getContext("webgl"), but not OffscreenCanvas.getContext("2d")!
@@ -1372,9 +1375,42 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function updateRoughnessMap( material ) {
+
+		const { roughnessMap, normalMap } = material;
+
+		// ignore PBR materials without roughness and normals maps
+
+		if ( roughnessMap === null || normalMap === null || roughnessMap.generateMipmaps === false ) return;
+
+		// PBR materials are processed once right now (meaning they are not processed again if their roughness/normal
+		// map combination is changed or the maps itself are manually updated)
+
+		if ( _roughnessMaps.has( material ) === false ) {
+
+			if ( _roughnessMipmapper === undefined ) _roughnessMipmapper = new RoughnessMipmapper( renderer ); // lazily create roughness mipmapper
+
+			_roughnessMipmapper.generateMipmaps( material );
+
+			_roughnessMaps.set( material, true );
+
+		}
+
+	}
+
+	function dispose() {
+
+		if ( _roughnessMipmapper ) _roughnessMipmapper.dispose();
+
+		_roughnessMaps = new WeakMap();
+		_videoTextures = new WeakMap();
+
+	}
+
 	//
 
 	this.allocateTextureUnit = allocateTextureUnit;
+	this.dispose = dispose;
 	this.resetTextureUnits = resetTextureUnits;
 
 	this.setTexture2D = setTexture2D;
@@ -1384,6 +1420,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
 	this.updateMultisampleRenderTarget = updateMultisampleRenderTarget;
+	this.updateRoughnessMap = updateRoughnessMap;
 
 	this.safeSetTexture2D = safeSetTexture2D;
 	this.safeSetTextureCube = safeSetTextureCube;

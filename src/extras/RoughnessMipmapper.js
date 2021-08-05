@@ -6,16 +6,15 @@
  * enlarged to match the dimensions of the normal map.
  */
 
-import {
-	MathUtils,
-	Mesh,
-	NoBlending,
-	OrthographicCamera,
-	PlaneGeometry,
-	RawShaderMaterial,
-	Vector2,
-	WebGLRenderTarget
-} from '../../../build/three.module.js';
+import { NoBlending } from '../constants.js';
+
+import * as MathUtils from '../math/MathUtils.js';
+import { Mesh } from '../objects/Mesh.js';
+import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
+import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
+import { Vector2 } from '../math/Vector2.js';
+import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
+import { PlaneGeometry } from '../geometries/PlaneGeometry.js';
 
 const _mipmapMaterial = _getMipmapMaterial();
 
@@ -33,19 +32,11 @@ class RoughnessMipmapper {
 
 		_renderer = renderer;
 
-		_renderer.compile( _mesh, _flatCamera );
-
 	}
 
 	generateMipmaps( material ) {
 
-		if ( 'roughnessMap' in material === false ) return;
-
 		const { roughnessMap, normalMap } = material;
-
-		if ( roughnessMap === null || normalMap === null || ! roughnessMap.generateMipmaps || material.userData.roughnessUpdated ) return;
-
-		material.userData.roughnessUpdated = true;
 
 		let width = Math.max( roughnessMap.image.width, normalMap.image.width );
 		let height = Math.max( roughnessMap.image.height, normalMap.image.height );
