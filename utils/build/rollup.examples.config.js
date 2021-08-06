@@ -43,13 +43,9 @@ function unmodularize() {
 
 		renderChunk( code, { fileName } ) {
 
-			// the modules that need to be namespaced
-			const namespaces = [ 'BufferGeometryUtils' ];
-
-
+			// Namespace the modules that end with Utils
 			const fileNameNoExtension = fileName.slice( 0, fileName.indexOf( '.' ) );
-			const namespace = namespaces.includes( fileNameNoExtension ) ? fileNameNoExtension : '';
-
+			const namespace = fileNameNoExtension.endsWith( 'Utils' ) ? fileNameNoExtension : undefined;
 
 			// export { Example };
 			// ↓
