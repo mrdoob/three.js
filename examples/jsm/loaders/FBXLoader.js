@@ -701,16 +701,7 @@ class FBXTreeParser {
 		}
 
 		const texture = textureMap.get( id );
-
-		if ( texture !== undefined && texture.image !== undefined ) {
-
-			return texture;
-
-		} else {
-
-			return undefined;
-
-		}
+		return texture;
 
 	}
 
