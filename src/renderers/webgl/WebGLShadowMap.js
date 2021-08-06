@@ -295,6 +295,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		result.displacementMap = material.displacementMap;
 		result.displacementScale = material.displacementScale;
+		result.displacementBias = material.displacementBias;
 
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
