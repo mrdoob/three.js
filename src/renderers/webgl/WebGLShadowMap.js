@@ -69,6 +69,20 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 	this.type = PCFShadowMap;
 
+	function onDisposeCustomMaterial( e ) {
+
+		const uuid = e.target.uuid;
+		const materialsForVariant = _materialCache[ uuid ];
+		for ( const key in materialsForVariant ) {
+
+			materialsForVariant[ key ].dispose();
+
+		}
+
+		delete _materialCache[ uuid ];
+
+	}
+
 	this.render = function ( lights, scene, camera ) {
 
 		if ( scope.enabled === false ) return;
@@ -257,6 +271,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 				materialsForVariant = {};
 				_materialCache[ keyA ] = materialsForVariant;
+				result.addEventListener( 'dispose', onDisposeCustomMaterial );
 
 			}
 
