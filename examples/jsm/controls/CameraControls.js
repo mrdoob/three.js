@@ -20,7 +20,7 @@ class CameraControls extends EventDispatcher {
         super();
         this.angleX = 0;
         this.angleY = 0;
-        this.look = new Vector3(0, 0, -1);
+        this.look = new Vector3();
         this.stop = false;
 
         this.o = new Vector3(0, 0, 0)
