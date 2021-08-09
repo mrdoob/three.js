@@ -9,7 +9,7 @@ import {
 // This set of controls models a movie camera.
 // Pan up / down / left / right  - right mouse, or WASD keys / touch: three finger swipe
 // Dolly forward / backward  - mousewheel or WASD keys / touch: two finger spread or squish
-// Rotate  - middle mouse, or arrow keys / touch: one finger move
+// Rotate  - left mouse, or arrow keys / touch: one finger move
 
 // Compared to OrbitControls:
 // 1. It can dolly forward/backward and pan left/right/up/down.
@@ -81,7 +81,7 @@ class CameraControls extends EventDispatcher {
         this.keys = { TURNLEFT: 37, TURNUP: 38, TURNRIGHT: 39, TURNBOTTOM: 40, FORWARD: 87, BACKWARD: 83, LEFT: 65, RIGHT: 68 };
 
         // Mouse buttons
-        this.mouseButtons = { PAN: MOUSE.RIGHT, ZOOM: false, ROTATE: MOUSE.MIDDLE };
+        this.mouseButtons = { PAN: MOUSE.RIGHT, ZOOM: false, ROTATE: MOUSE.LEFT };
 
         // for reset
         this.position0 = this.object.position.clone();
@@ -167,6 +167,11 @@ class CameraControls extends EventDispatcher {
 
                     scope.angleX += angleXDelta * scope.dampingFactor * 1.5;
                     scope.angleY = Math.max(-Math.PI / 2.001, Math.min(scope.angleY + angleYDelta * scope.dampingFactor * 1.5, Math.PI / 2.001))
+
+                } else {
+
+                    scope.angleX += angleXDelta * 1.5;
+                    scope.angleY = Math.max(-Math.PI / 2.001, Math.min(scope.angleY + angleYDelta * 1.5, Math.PI / 2.001))
 
                 }
 
@@ -337,7 +342,6 @@ class CameraControls extends EventDispatcher {
 
                 if (scope.object.isPerspectiveCamera) {
 
-                    // we actually don't use screenWidth, since perspective camera is fixed to screen height
                     panLeft(deltaX / element.clientHeight, scope.object.matrix);
                     panUp(deltaY / element.clientHeight, scope.object.matrix);
 
@@ -528,7 +532,9 @@ class CameraControls extends EventDispatcher {
                         break;
 
                 }
+
             }
+
             if (scope.enablePan === true) {
 
                 switch (event.keyCode) {
@@ -544,17 +550,19 @@ class CameraControls extends EventDispatcher {
                         break;
 
                     case scope.keys.LEFT:
-                        pan(20 * scope.keyPanSpeed, 0);
+                        pan(20 * scope.keyPanSpeed * scope.sensibility, 0);
                         scope.update();
                         break;
 
                     case scope.keys.RIGHT:
-                        pan(- 20 * scope.keyPanSpeed, 0);
+                        pan(- 20 * scope.keyPanSpeed * scope.sensibility, 0);
                         scope.update();
                         break;
 
                 }
+
             }
+
         }
 
         function handleTouchStartRotate(event) {
@@ -696,8 +704,10 @@ class CameraControls extends EventDispatcher {
         function onMouseMove(event) {
 
             if (scope.stop) {
+
                 onMouseUp(event);
                 scope.stop = false;
+
             }
 
             if (scope.enabled === false) return;
