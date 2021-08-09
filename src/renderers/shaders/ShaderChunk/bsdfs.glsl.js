@@ -134,9 +134,9 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 view
 	float dotNL = saturate( dot( normal, incidentLight.direction ) );
 	float dotNV = saturate( dot( normal, viewDir ) );
 	float dotNH = saturate( dot( normal, halfDir ) );
-	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
+	float dotVH = saturate( dot( viewDir, halfDir ) );
 
-	vec3 F = F_Schlick( f0, f90, dotLH );
+	vec3 F = F_Schlick( f0, f90, dotVH );
 
 	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
@@ -313,12 +313,10 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
-	//float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );
-	//float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
-	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
+	float dotVH = saturate( dot( geometry.viewDir, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, vec3( 1.0 ), dotLH );
+	vec3 F = F_Schlick( specularColor, vec3( 1.0 ), dotVH );
 
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 
