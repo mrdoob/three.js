@@ -36,6 +36,11 @@ class CameraControls extends EventDispatcher {
         // Set to false to disable this control
         this.enabled = true;
 
+        // Set to true to enable damping (inertia)
+        // If damping is enabled, you must call controls.update() in your animation loop
+        this.enableDamping = false;
+        this.dampingFactor = 0.1;
+
         // "target" sets the location of focus, where the object orbits around
         this.target = new Vector3();
 
@@ -149,7 +154,15 @@ class CameraControls extends EventDispatcher {
                 }
 
                 // move target to panned location
-                scope.target.add(panOffset);
+                if (scope.enableDamping === true) {
+
+                    scope.target.addScaledVector(panOffset, scope.dampingFactor);
+
+                } else {
+
+                    scope.target.add(panOffset);
+
+                }
                 let distance = scope.target.distanceTo(scope.o)
                 if (distance > scope.maxDistance) {
                     scope.target.multiplyScalar(scope.maxDistance / distance)
@@ -161,11 +174,35 @@ class CameraControls extends EventDispatcher {
                 position.copy(scope.target).add(offset);
 
 
+                if (scope.enableDamping) {
+                    scope.angleX += angleXDelta * scope.dampingFactor * 1.5;
+                    scope.angleY = Math.max(-Math.PI / 2.001, Math.min(scope.angleY + angleYDelta * scope.dampingFactor * 1.5, Math.PI / 2.001))
+                }
+                scope.look.x = Math.sin(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
+                scope.look.z = -Math.cos(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
+                scope.look.y = Math.sin(scope.angleY)
+                scope.look.normalize()
+
+
                 let look = position.clone();
                 look.add(scope.look);
                 scope.object.lookAt(look);
 
-                panOffset.set(0, 0, 0);
+                if (scope.enableDamping === true) {
+
+                    angleXDelta *= (1 - scope.dampingFactor * 1.5);
+                    angleYDelta *= (1 - scope.dampingFactor * 1.5);
+
+                    panOffset.multiplyScalar(1 - scope.dampingFactor);
+
+                } else {
+
+                    angleXDelta = 0;
+                    angleYDelta = 0;
+
+                    panOffset.set(0, 0, 0);
+
+                }
 
                 // update condition is:
                 // min(camera displacement, camera rotation in radians)^2 > EPS
@@ -223,7 +260,8 @@ class CameraControls extends EventDispatcher {
         var state = STATE.NONE;
 
         var EPS = 0.000001;
-
+        var angleXDelta = 0;
+        var angleYDelta = 0;
 
         var panOffset = new Vector3();
         var zoomChanged = false;
@@ -253,12 +291,8 @@ class CameraControls extends EventDispatcher {
         }
 
         function rotate(angleX, angleY) {
-            scope.angleX += angleX * 50 * scope.rotateSpeed
-            scope.angleY = Math.max(-Math.PI / 2.001, Math.min(scope.angleY - angleY * 50 * scope.rotateSpeed, Math.PI / 2.001))
-            scope.look.x = Math.sin(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
-            scope.look.z = -Math.cos(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
-            scope.look.y = Math.sin(scope.angleY)
-            //scope.look.normalize()
+            angleXDelta += angleX * 50 * scope.rotateSpeed;
+            angleYDelta -= angleY * 50 * scope.rotateSpeed;
         }
 
         var panLeft = function () {
