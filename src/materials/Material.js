@@ -80,6 +80,8 @@ class Material extends EventDispatcher {
 
 	onBeforeCompile( /* shaderobject, renderer */ ) {}
 
+	onProgramChange( /* uniformParams */ ) {}
+
 	customProgramCacheKey() {
 
 		return this.onBeforeCompile.toString();

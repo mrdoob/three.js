@@ -1404,6 +1404,8 @@ function WebGLRenderer( parameters = {} ) {
 
 			}
 
+			material.onProgramChange( { uniforms: materialProperties.uniforms } );
+
 		} else {
 
 			parameters.uniforms = programCache.getUniforms( material );
@@ -1414,6 +1416,8 @@ function WebGLRenderer( parameters = {} ) {
 
 			program = programCache.acquireProgram( parameters, programCacheKey );
 			programs.set( programCacheKey, program );
+
+			material.onProgramChange( { uniforms: parameters.uniforms } );
 
 			materialProperties.uniforms = parameters.uniforms;
 
