@@ -6,12 +6,12 @@ import {
     Vector3
 } from '../../../build/three.module.js';
 
-// This set of controls performs turning, dollying (zooming), and panning. It is an update of OrbitControls
+// This set of controls models a movie camera.
 // Pan up / down / left / right  - right mouse, or WASD keys / touch: three finger swipe
 // Dolly forward / backward  - mousewheel or WASD keys / touch: two finger spread or squish
 // Rotate  - middle mouse, or arrow keys / touch: one finger move
 
-// Updates compared to OrbitControls:
+// Compared to OrbitControls:
 // 1. It can dolly forward/backward and pan left/right/up/down.
 // 2. Rotation is centered on the camera itself.
 
