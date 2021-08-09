@@ -73,6 +73,7 @@ vec3 F_Schlick_RoughnessDependent( const in vec3 F0, const in float dotNV, const
 
 	// See F_Schlick
 	float fresnel = exp2( ( -5.55473 * dotNV - 6.98316 ) * dotNV );
+
 	vec3 Fr = max( vec3( 1.0 - roughness ), F0 ) - F0;
 
 	return Fr * fresnel + F0;
@@ -326,30 +327,26 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 
 } // validated
 
-// source: http://simonstechblog.blogspot.ca/2011/12/microfacet-brdf.html
-float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {
-	return ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );
-}
-
-float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
-	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );
-}
-
 #if defined( USE_SHEEN )
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L94
-float D_Charlie(float roughness, float NoH) {
+float D_Charlie( float roughness, float NoH ) {
+
 	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
 	float invAlpha = 1.0 / roughness;
 	float cos2h = NoH * NoH;
-	float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
-	return (2.0 + invAlpha) * pow(sin2h, invAlpha * 0.5) / (2.0 * PI);
+	float sin2h = max( 1.0 - cos2h, 0.0078125 ); // 2^(-14/2), so sin2h^2 > 0 in fp16
+
+	return ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );
+
 }
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L136
-float V_Neubelt(float NoV, float NoL) {
+float V_Neubelt( float NoV, float NoL ) {
+
 	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
-	return saturate(1.0 / (4.0 * (NoL + NoV - NoL * NoV)));
+	return saturate( 1.0 / ( 4.0 * ( NoL + NoV - NoL * NoV ) ) );
+
 }
 
 vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {
