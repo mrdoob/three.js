@@ -1,6 +1,6 @@
 class VRButton {
 
-	static createButton( renderer, options ) {
+	static createButton( rendererOrCallback, options ) {
 
 		if ( options ) {
 
@@ -18,7 +18,11 @@ class VRButton {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				await renderer.xr.setSession( session );
+				if (typeof rendererOrCallback === 'function') {
+					await rendererOrCallback( session );
+				} else {
+					await renderer.xr.setSession( session );
+				}
 				button.textContent = 'EXIT VR';
 
 				currentSession = session;
