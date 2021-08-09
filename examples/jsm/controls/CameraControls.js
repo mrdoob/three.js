@@ -16,10 +16,14 @@ import {
 // 2. The turning will be conducted using the PerspectiveCamera as the center.
 
 class CameraControls extends EventDispatcher {
+
     constructor(object, domElement) {
+
         super();
+
         this.angleX = 0;
         this.angleY = 0;
+
         this.stop = false;
 
         this.o = new Vector3(0, 0, 0)
@@ -40,9 +44,6 @@ class CameraControls extends EventDispatcher {
         // If damping is enabled, you must call controls.update() in your animation loop
         this.enableDamping = false;
         this.dampingFactor = 0.1;
-
-        // "target" sets the location of focus, where the object orbits around
-        this.target = new Vector3();
 
         // "look" sets the direction of the focus
         this.look = new Vector3();
@@ -68,7 +69,7 @@ class CameraControls extends EventDispatcher {
         this.keyPanSpeed = 1.0;// pixels moved per arrow key push
         this.keyRotateSpeed = 1.0;
 
-        // Set to true to automatically rotate around the target
+        // Set to true to automatically rotate
         // If auto-rotate is enabled, you must call controls.update() in your animation loop
         this.autoRotate = false;
         this.autoRotateSpeed = 0.2;
@@ -83,7 +84,6 @@ class CameraControls extends EventDispatcher {
         this.mouseButtons = { ORBIT: MOUSE.RIGHT, ZOOM: false, PAN: MOUSE.MIDDLE };
 
         // for reset
-        this.target0 = this.target.clone();
         this.position0 = this.object.position.clone();
         this.zoom0 = this.object.zoom;
         this.look0 = this.look.clone();
@@ -96,7 +96,6 @@ class CameraControls extends EventDispatcher {
 
         this.saveState = function () {
 
-            scope.target0.copy(scope.target);
             scope.position0.copy(scope.object.position);
             scope.zoom0 = scope.object.zoom;
             scope.look0.copy(scope.look);
@@ -107,7 +106,6 @@ class CameraControls extends EventDispatcher {
 
         this.reset = function () {
 
-            scope.target.copy(scope.target0);
             scope.object.position.copy(scope.position0);
             scope.object.zoom = scope.zoom0;
             scope.look.copy(scope.look0);
@@ -126,12 +124,6 @@ class CameraControls extends EventDispatcher {
         // this method is exposed, but perhaps it would be better if we can make it private...
         this.update = function () {
 
-            var offset = new Vector3();
-
-            // so camera.up is the orbit axis
-            var quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
-            var quatInverse = quat.clone().invert();
-
             var lastPosition = new Vector3();
             var lastQuaternion = new Quaternion();
 
@@ -140,13 +132,10 @@ class CameraControls extends EventDispatcher {
                 var position = scope.object.position;
 
                 if (scope.dynamicSensibility) {
-                    scope.sensibility = Math.max(1, scope.object.position.distanceTo(scope.o))
+
+                    scope.sensibility = Math.max(1, scope.object.position.distanceTo(scope.o));
+
                 }
-
-                offset.copy(position).sub(scope.target);
-
-                // rotate offset to "y-axis-is-up" space
-                offset.applyQuaternion(quat);
 
                 if (scope.autoRotate && state === STATE.NONE) {
 
@@ -154,31 +143,33 @@ class CameraControls extends EventDispatcher {
 
                 }
 
-                // move target to panned location
+                // move position to panned location
                 if (scope.enableDamping === true) {
 
-                    scope.target.addScaledVector(panOffset, scope.dampingFactor);
+                    position.addScaledVector(panOffset, scope.dampingFactor);
 
                 } else {
 
-                    scope.target.add(panOffset);
+                    position.add(panOffset);
 
                 }
-                let distance = scope.target.distanceTo(scope.o)
+
+                let distance = position.distanceTo(scope.o);
+
                 if (distance > scope.maxDistance) {
-                    scope.target.multiplyScalar(scope.maxDistance / distance)
+
+                    position.multiplyScalar(scope.maxDistance / distance);
+
                 }
-
-                // rotate offset back to "camera-up-vector-is-up" space
-                offset.applyQuaternion(quatInverse);
-
-                position.copy(scope.target).add(offset);
 
 
                 if (scope.enableDamping) {
+
                     scope.angleX += angleXDelta * scope.dampingFactor * 1.5;
                     scope.angleY = Math.max(-Math.PI / 2.001, Math.min(scope.angleY + angleYDelta * scope.dampingFactor * 1.5, Math.PI / 2.001))
+
                 }
+
                 scope.look.x = Math.sin(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
                 scope.look.z = -Math.cos(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
                 scope.look.y = Math.sin(scope.angleY)
@@ -193,14 +184,12 @@ class CameraControls extends EventDispatcher {
 
                     angleXDelta *= (1 - scope.dampingFactor * 1.5);
                     angleYDelta *= (1 - scope.dampingFactor * 1.5);
-
                     panOffset.multiplyScalar(1 - scope.dampingFactor);
 
                 } else {
 
                     angleXDelta = 0;
                     angleYDelta = 0;
-
                     panOffset.set(0, 0, 0);
 
                 }
@@ -208,17 +197,12 @@ class CameraControls extends EventDispatcher {
                 // update condition is:
                 // min(camera displacement, camera rotation in radians)^2 > EPS
                 // using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-                if (zoomChanged ||
-                    lastPosition.distanceToSquared(scope.object.position) > EPS ||
-                    8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS) {
+                if (zoomChanged || lastPosition.distanceToSquared(scope.object.position) > EPS || 8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS) {
 
                     scope.dispatchEvent(changeEvent);
-
                     lastPosition.copy(scope.object.position);
                     lastQuaternion.copy(scope.object.quaternion);
                     zoomChanged = false;
-
                     return true;
 
                 }
@@ -292,8 +276,10 @@ class CameraControls extends EventDispatcher {
         }
 
         function rotate(angleX, angleY) {
+
             angleXDelta += angleX * 50 * scope.rotateSpeed;
             angleYDelta -= angleY * 50 * scope.rotateSpeed;
+
         }
 
         var panLeft = function () {
@@ -350,6 +336,7 @@ class CameraControls extends EventDispatcher {
                 var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
                 if (scope.object.isPerspectiveCamera) {
+
                     // we actually don't use screenWidth, since perspective camera is fixed to screen height
                     panLeft(deltaX / element.clientHeight, scope.object.matrix);
                     panUp(deltaY / element.clientHeight, scope.object.matrix);
@@ -373,6 +360,7 @@ class CameraControls extends EventDispatcher {
         }();
 
         function dollyIn(dollyScale) {
+
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
             if (scope.object.isPerspectiveCamera) {
@@ -395,6 +383,7 @@ class CameraControls extends EventDispatcher {
         }
 
         function dollyOut(dollyScale) {
+
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
             if (scope.object.isPerspectiveCamera) {
@@ -511,8 +500,11 @@ class CameraControls extends EventDispatcher {
         }
 
         function handleKeyDown(event) {
+
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+
             if (scope.enableRotate === true) {
+
                 switch (event.keyCode) {
 
                     case scope.keys.TURNUP:
@@ -538,6 +530,7 @@ class CameraControls extends EventDispatcher {
                 }
             }
             if (scope.enablePan === true) {
+
                 switch (event.keyCode) {
 
                     case scope.keys.FORWARD:
@@ -696,12 +689,12 @@ class CameraControls extends EventDispatcher {
                 document.addEventListener('mousemove', onMouseMove, false);
                 document.addEventListener('mouseup', onMouseUp, false);
 
-
             }
 
         }
 
         function onMouseMove(event) {
+
             if (scope.stop) {
                 onMouseUp(event);
                 scope.stop = false;
@@ -767,6 +760,7 @@ class CameraControls extends EventDispatcher {
 
             scope.dispatchEvent(startEvent); // not sure why these are here...
             scope.dispatchEvent(endEvent);
+
         }
 
         function onKeyDown(event) {
@@ -891,8 +885,6 @@ class CameraControls extends EventDispatcher {
 
         }
 
-        //
-
         scope.domElement.addEventListener('contextmenu', onContextMenu, false);
 
         scope.domElement.addEventListener('mousedown', onMouseDown, false);
@@ -905,11 +897,9 @@ class CameraControls extends EventDispatcher {
         window.addEventListener('keydown', onKeyDown, false);
 
         // force an update at start
-
         this.update();
 
     };
 }
-
 
 export { CameraControls };
