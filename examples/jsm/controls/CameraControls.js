@@ -7,9 +7,9 @@ import {
 } from '../../../build/three.module.js';
 
 // This set of controls performs turning, dollying (zooming), and panning. It is an update of OrbitControls
-// Pan up / down / left / right  - middle mouse or WASD keys / touch: one finger move
+// Pan up / down / left / right  - right mouse, or WASD keys / touch: one finger move
 // Move forward / backward  - mousewheel or WASD keys / touch: two finger spread or squish
-// Turn  - right mouse, or arrow keys / touch: three finger swipe
+// Turn  - middle mouse, or arrow keys / touch: three finger swipe
 
 // Updates compared to OrbitControls:
 // 1. The dollying of PerspectiveCamera is replaced with panning forward and backward.Therefore, this component can be used to move the PerspectiveCamera to six directions including forward, backward, up, down, left and right from current perspective.
@@ -81,7 +81,7 @@ class CameraControls extends EventDispatcher {
         this.keys = { TURNLEFT: 37, TURNUP: 38, TURNRIGHT: 39, TURNBOTTOM: 40, FORWARD: 87, BACKWARD: 83, LEFT: 65, RIGHT: 68 };
 
         // Mouse buttons
-        this.mouseButtons = { ORBIT: MOUSE.RIGHT, ZOOM: false, PAN: MOUSE.MIDDLE };
+        this.mouseButtons = { PAN: MOUSE.RIGHT, ZOOM: false, ROTATE: MOUSE.MIDDLE };
 
         // for reset
         this.position0 = this.object.position.clone();
@@ -652,7 +652,7 @@ class CameraControls extends EventDispatcher {
 
             switch (event.button) {
 
-                case scope.mouseButtons.ORBIT:
+                case scope.mouseButtons.ROTATE:
 
                     if (scope.enableRotate === false) return;
 
