@@ -26,6 +26,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		_distanceMaterial = new MeshDistanceMaterial(),
 
 		_materialCache = {},
+		_reverseMaterialCache = {},
 
 		_maxTextureSize = _capabilities.maxTextureSize;
 
@@ -69,17 +70,36 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 	this.type = PCFShadowMap;
 
+	// clean up all variants of a shadow material when the shadow material is disposed.
 	function onDisposeCustomMaterial( e ) {
 
 		const uuid = e.target.uuid;
 		const materialsForVariant = _materialCache[ uuid ];
 		for ( const key in materialsForVariant ) {
 
+			_reverseMaterialCache[ key ].delete( uuid );
 			materialsForVariant[ key ].dispose();
 
 		}
 
 		delete _materialCache[ uuid ];
+
+	}
+
+	// clean up material subvariants when the original material is disposed.
+	function onDisposeMaterial( e ) {
+
+		const uuid = e.target.uuid;
+		const uuidSet = _reverseMaterialCache[ uuid ];
+		uuidSet.forEach( shadowUuid => {
+
+			const cache = _materialCache[ shadowUuid ];
+			cache[ uuid ].dispose();
+			delete cache[ uuid ];
+
+		} );
+
+		delete _reverseMaterialCache[ uuid ];
 
 	}
 
@@ -281,6 +301,16 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 				cachedMaterial = result.clone();
 				materialsForVariant[ keyB ] = cachedMaterial;
+
+				// store all the shadow materials that have had a subvariant made for this material
+				// so they can be easily cleaned up later.
+				if ( ! ( keyB in _reverseMaterialCache ) ) {
+
+					_reverseMaterialCache[ keyB ] = new Set();
+					material.addEventListener( 'dispose', onDisposeMaterial );
+
+				}
+				_reverseMaterialCache[ keyB ].add( keyA );
 
 			}
 
