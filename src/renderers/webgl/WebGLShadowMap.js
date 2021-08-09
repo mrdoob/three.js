@@ -310,6 +310,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 					material.addEventListener( 'dispose', onDisposeMaterial );
 
 				}
+
 				_reverseMaterialCache[ keyB ].add( keyA );
 
 			}
