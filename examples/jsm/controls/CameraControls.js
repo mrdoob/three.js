@@ -20,7 +20,6 @@ class CameraControls extends EventDispatcher {
         super();
         this.angleX = 0;
         this.angleY = 0;
-        this.look = new Vector3();
         this.stop = false;
 
         this.o = new Vector3(0, 0, 0)
@@ -39,6 +38,9 @@ class CameraControls extends EventDispatcher {
 
         // "target" sets the location of focus, where the object orbits around
         this.target = new Vector3();
+
+        // "look" sets the direction of the focus
+        this.look = new Vector3();
 
         // How far you can dolly and pan ( PerspectiveCamera only )
         this.maxDistance = Infinity;
@@ -78,6 +80,9 @@ class CameraControls extends EventDispatcher {
         this.target0 = this.target.clone();
         this.position0 = this.object.position.clone();
         this.zoom0 = this.object.zoom;
+        this.look0 = this.look.clone();
+        this.angleX0 = this.angleX;
+        this.angleY0 = this.angleY;
 
         //
         // public methods
@@ -88,6 +93,9 @@ class CameraControls extends EventDispatcher {
             scope.target0.copy(scope.target);
             scope.position0.copy(scope.object.position);
             scope.zoom0 = scope.object.zoom;
+            scope.look0.copy(scope.look);
+            scope.angleX0 = scope.angleX;
+            scope.angleY0 = scope.angleY;
 
         };
 
@@ -96,6 +104,9 @@ class CameraControls extends EventDispatcher {
             scope.target.copy(scope.target0);
             scope.object.position.copy(scope.position0);
             scope.object.zoom = scope.zoom0;
+            scope.look.copy(scope.look0);
+            scope.angleX = scope.angleX0;
+            scope.angleY = scope.angleY0;
 
             scope.object.updateProjectionMatrix();
             scope.dispatchEvent(changeEvent);
@@ -150,8 +161,8 @@ class CameraControls extends EventDispatcher {
                 position.copy(scope.target).add(offset);
 
 
-                let look = position.clone()
-                look.add(scope.look)
+                let look = position.clone();
+                look.add(scope.look);
                 scope.object.lookAt(look);
 
                 panOffset.set(0, 0, 0);
@@ -247,7 +258,7 @@ class CameraControls extends EventDispatcher {
             scope.look.x = Math.sin(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
             scope.look.z = -Math.cos(scope.angleX) * (Math.PI / 2 - Math.abs(scope.angleY))
             scope.look.y = Math.sin(scope.angleY)
-            scope.look.setLength(1)
+            //scope.look.normalize()
         }
 
         var panLeft = function () {
@@ -284,12 +295,11 @@ class CameraControls extends EventDispatcher {
 
             var v = new Vector3();
 
-            return function moveForward(distance) {
+            return function moveForward(distance, objectMatrix) {
 
-                v.copy(scope.look)
+                v.setFromMatrixColumn(objectMatrix, 2); // get Z column of objectMatrix
 
-
-                v.multiplyScalar(distance);
+                v.multiplyScalar(-distance);
 
                 panOffset.add(v);
 
@@ -332,7 +342,7 @@ class CameraControls extends EventDispatcher {
 
             if (scope.object.isPerspectiveCamera) {
 
-                moveForward(-50 * scope.sensibility * dollyScale / element.clientHeight);
+                moveForward(-50 * scope.sensibility * dollyScale / element.clientHeight, scope.object.matrix);
 
             } else if (scope.object.isOrthographicCamera) {
 
@@ -350,12 +360,11 @@ class CameraControls extends EventDispatcher {
         }
 
         function dollyOut(dollyScale) {
-            if (scope.object.position.z < scope.minZ) return
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
             if (scope.object.isPerspectiveCamera) {
 
-                moveForward(50 * scope.sensibility * dollyScale / element.clientHeight);
+                moveForward(50 * scope.sensibility * dollyScale / element.clientHeight, scope.object.matrix);
 
             } else if (scope.object.isOrthographicCamera) {
 
@@ -840,5 +849,6 @@ class CameraControls extends EventDispatcher {
 
     };
 }
+
 
 export { CameraControls };
