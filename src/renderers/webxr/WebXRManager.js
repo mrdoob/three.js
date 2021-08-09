@@ -270,6 +270,8 @@ class WebXRManager extends EventDispatcher {
 
 				scope.dispatchEvent( { type: 'sessionstart' } );
 
+				return glProjLayer || glBaseLayer;
+
 			}
 
 		};
