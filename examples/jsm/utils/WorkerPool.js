@@ -7,7 +7,7 @@ export class WorkerPool {
 	constructor ( pool = 4 ) {
 
 		this.pool = pool;
-		this.quene = [];
+		this.queue = [];
 		this.workers = [];
 		this.workersResolve = [];
 		this.workerStatus = 0;
@@ -40,9 +40,9 @@ export class WorkerPool {
 		const resolve = this.workersResolve[ workerId ];
 		resolve && resolve( msg );
 
-		if ( this.quene.length ) {
+		if ( this.queue.length ) {
 
-			const { resolve, msg, transfer } = this.quene.shift();
+			const { resolve, msg, transfer } = this.queue.shift();
 			this.workersResolve[ workerId ] = resolve;
 			this.workers[ workerId ].postMessage( msg, transfer );
 
@@ -81,7 +81,7 @@ export class WorkerPool {
 
 			} else {
 
-				this.quene.push( { resolve, msg, transfer } );
+				this.queue.push( { resolve, msg, transfer } );
 
 			}
 
@@ -94,7 +94,7 @@ export class WorkerPool {
 		this.workers.forEach( ( worker ) => worker.terminate() );
 		this.workersResolve.length = 0;
 		this.workers.length = 0;
-		this.quene.length = 0;
+		this.queue.length = 0;
 		this.workerStatus = 0;
 
 	}
