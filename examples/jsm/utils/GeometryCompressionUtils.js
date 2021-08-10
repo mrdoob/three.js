@@ -346,32 +346,6 @@ function defaultEncode( x, y, z, bytes ) {
 
 }
 
-function defaultDecode( array, bytes ) {
-
-	if ( bytes == 1 ) {
-
-		return [
-			( ( array[ 0 ] / 255 ) * 2.0 ) - 1.0,
-			( ( array[ 1 ] / 255 ) * 2.0 ) - 1.0,
-			( ( array[ 2 ] / 255 ) * 2.0 ) - 1.0,
-		];
-
-	} else if ( bytes == 2 ) {
-
-		return [
-			( ( array[ 0 ] / 65535 ) * 2.0 ) - 1.0,
-			( ( array[ 1 ] / 65535 ) * 2.0 ) - 1.0,
-			( ( array[ 2 ] / 65535 ) * 2.0 ) - 1.0,
-		];
-
-	} else {
-
-		console.error( 'number of bytes must be 1 or 2' );
-
-	}
-
-}
-
 // for `Angles` encoding
 function anglesEncode( x, y, z ) {
 
