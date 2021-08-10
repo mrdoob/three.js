@@ -24,7 +24,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSRrPass extends Pass {
 
-	constructor( { renderer, scene, camera, width, height, selects, encoding, morphTargets = false } ) {
+	constructor( { renderer, scene, camera, width, height, selects, encoding } ) {
 
 		super();
 
@@ -187,7 +187,7 @@ class SSRrPass extends Pass {
 
 		// normal material
 
-		this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
+		this.normalMaterial = new MeshNormalMaterial();
 		this.normalMaterial.blending = NoBlending;
 
 		// refractiveOn material

@@ -7,12 +7,6 @@ uniform sampler2D matcap;
 
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-#endif
-
 #include <common>
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
@@ -21,6 +15,7 @@ varying vec3 vViewPosition;
 #include <alphamap_pars_fragment>
 
 #include <fog_pars_fragment>
+#include <normal_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>

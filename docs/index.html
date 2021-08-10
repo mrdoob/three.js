@@ -68,7 +68,7 @@
 
 			// *BufferGeometry to *Geometry
 
-			if ( /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+			if ( /Instanced/.exec( window.location.hash ) !== null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
 
 				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
 
@@ -238,6 +238,7 @@
 			}
 
 			const localList = list[ language ];
+			const selectedPage = window.location.hash.substring( 1 );
 
 			for ( const section in localList ) {
 
@@ -297,10 +298,10 @@
 							const linkElement = createLink( `.${name}`, `${pageURL}/.${name}` );
 							linkElement.classList.add( 'hidden' );
 							listElement.appendChild( linkElement );
-		
+
 
 							searchable.push( { name, linkElement } );
-		
+
 						} );
 
 						page.methods?.forEach( name => {
@@ -310,7 +311,7 @@
 							listElement.appendChild( linkElement );
 
 							searchable.push( { name, linkElement } );
-		
+
 						} );
 
 						// Gather the main properties for the current subpage
@@ -389,7 +390,7 @@
 					if ( result !== '' ) {
 
 						text = text.replace( result, '<b>' + result + '</b>' );
-		
+
 					}
 
 				}
@@ -428,9 +429,9 @@
 
 						removeBold( linkElement );
 						linkElement.classList.add( 'hidden' );
-		
+
 					} );
-		
+
 				}
 
 				return displayFilteredPanel();
@@ -451,7 +452,7 @@
 				if ( parentMatches ) {
 
 					categoryClassList.remove( 'hidden' );
-		
+
 				}
 
 				// Show and highlight matching children
@@ -463,24 +464,24 @@
 					if ( matches ) {
 
 						linkElement.classList.remove( 'hidden' );
-		
+
 					} else {
 
 						linkElement.classList.add( 'hidden' );
-		
+
 					}
 
 					return matches;
-		
+
 				} );
 
 				// Hide category if no matches in children and base class
 				if ( ! parentMatches && ! childMatches?.length ) {
 
 					categoryClassList.add( 'hidden' );
-		
+
 				}
-		
+
 			}
 
 			displayFilteredPanel();
@@ -574,11 +575,13 @@
 
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
+				iframe.style.display = 'unset';
 
 			} else {
 
 				iframe.src = '';
 				subtitle = '';
+				iframe.style.display = 'none';
 
 			}
 

@@ -20,6 +20,12 @@ class ConeGeometry extends CylinderGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new ConeGeometry( data.radius, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
+
+	}
+
 }
 
 export { ConeGeometry, ConeGeometry as ConeBufferGeometry };

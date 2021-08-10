@@ -297,7 +297,7 @@
 
 						const offset = entity.getComponent( OffsetFromCamera );
 						const object = entity.getComponent( Object3D ).object;
-						const xrCamera = renderer.xr.getCamera( this.camera );
+						const xrCamera = this.renderer.xr.getCamera();
 						object.position.x = xrCamera.position.x + offset.x;
 						object.position.y = xrCamera.position.y + offset.y;
 						object.position.z = xrCamera.position.z + offset.z;
@@ -411,6 +411,7 @@
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.shadowMap.enabled = true;
 			renderer.xr.enabled = true;
+			renderer.xr.cameraAutoUpdate = false;
 
 			container.appendChild( renderer.domElement );
 
@@ -581,6 +582,7 @@
 
 			const delta = clock.getDelta();
 			const elapsedTime = clock.elapsedTime;
+			renderer.xr.updateCamera( camera );
 			world.execute( delta, elapsedTime );
 			renderer.render( scene, camera );
 

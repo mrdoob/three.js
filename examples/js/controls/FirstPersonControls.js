@@ -72,8 +72,6 @@
 
 				}
 
-				event.preventDefault();
-
 				if ( this.activeLook ) {
 
 					switch ( event.button ) {
@@ -95,8 +93,6 @@
 			};
 
 			this.onMouseUp = function ( event ) {
-
-				event.preventDefault();
 
 				if ( this.activeLook ) {
 
@@ -136,7 +132,6 @@
 
 			this.onKeyDown = function ( event ) {
 
-				//event.preventDefault();
 				switch ( event.code ) {
 
 					case 'ArrowUp':

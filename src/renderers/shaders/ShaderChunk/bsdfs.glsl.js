@@ -56,16 +56,16 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 } // validated
 
-vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
+vec3 F_Schlick( const in vec3 f0, const in vec3 f90, const in float dotVH ) {
 
 	// Original approximation by Christophe Schlick '94
-	// float fresnel = pow( 1.0 - dotLH, 5.0 );
+	// float fresnel = pow( 1.0 - dotVH, 5.0 );
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
-	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );
+	float fresnel = exp2( ( -5.55473 * dotVH - 6.98316 ) * dotVH );
 
-	return ( 1.0 - specularColor ) * fresnel + specularColor;
+	return ( f90 - f0 ) * fresnel + f0;
 
 } // validated
 
@@ -73,6 +73,7 @@ vec3 F_Schlick_RoughnessDependent( const in vec3 F0, const in float dotNV, const
 
 	// See F_Schlick
 	float fresnel = exp2( ( -5.55473 * dotNV - 6.98316 ) * dotNV );
+
 	vec3 Fr = max( vec3( 1.0 - roughness ), F0 ) - F0;
 
 	return Fr * fresnel + F0;
@@ -125,7 +126,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 }
 
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
-vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
+vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in vec3 f90, const in float roughness ) {
 
 	float alpha = pow2( roughness ); // UE4's roughness
 
@@ -134,9 +135,9 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 view
 	float dotNL = saturate( dot( normal, incidentLight.direction ) );
 	float dotNV = saturate( dot( normal, viewDir ) );
 	float dotNH = saturate( dot( normal, halfDir ) );
-	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
+	float dotVH = saturate( dot( viewDir, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, dotLH );
+	vec3 F = F_Schlick( f0, f90, dotVH );
 
 	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
@@ -313,12 +314,10 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
-	//float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );
-	//float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 	float dotNH = saturate( dot( geometry.normal, halfDir ) );
-	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
+	float dotVH = saturate( dot( geometry.viewDir, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, dotLH );
+	vec3 F = F_Schlick( specularColor, vec3( 1.0 ), dotVH );
 
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 
@@ -328,30 +327,26 @@ vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in Ge
 
 } // validated
 
-// source: http://simonstechblog.blogspot.ca/2011/12/microfacet-brdf.html
-float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {
-	return ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );
-}
-
-float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
-	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );
-}
-
 #if defined( USE_SHEEN )
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L94
-float D_Charlie(float roughness, float NoH) {
+float D_Charlie( float roughness, float NoH ) {
+
 	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
 	float invAlpha = 1.0 / roughness;
 	float cos2h = NoH * NoH;
-	float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
-	return (2.0 + invAlpha) * pow(sin2h, invAlpha * 0.5) / (2.0 * PI);
+	float sin2h = max( 1.0 - cos2h, 0.0078125 ); // 2^(-14/2), so sin2h^2 > 0 in fp16
+
+	return ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );
+
 }
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L136
-float V_Neubelt(float NoV, float NoL) {
+float V_Neubelt( float NoV, float NoL ) {
+
 	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
-	return saturate(1.0 / (4.0 * (NoL + NoV - NoL * NoV)));
+	return saturate( 1.0 / ( 4.0 * ( NoL + NoV - NoL * NoV ) ) );
+
 }
 
 vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {

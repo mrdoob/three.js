@@ -16,7 +16,6 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			let container, stats, clock;
 
@@ -27,10 +26,6 @@
 			const segments = 10000;
 			const r = 800;
 			let t = 0;
-
-			const params = {
-				morphTargets: false
-			};
 
 			init();
 			animate();
@@ -49,7 +44,7 @@
 				clock = new THREE.Clock();
 
 				const geometry = new THREE.BufferGeometry();
-				const material = new THREE.LineBasicMaterial( { vertexColors: true, morphTargets: true } );
+				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
 
 				const positions = [];
 				const colors = [];
@@ -97,13 +92,6 @@
 
 				//
 
-				const gui = new GUI();
-				gui.add( params, 'morphTargets' );
-				gui.open();
-
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -136,12 +124,8 @@
 				line.rotation.x = time * 0.25;
 				line.rotation.y = time * 0.5;
 
-				if ( params.morphTargets ) {
-
-					t += delta * 0.5;
-					line.morphTargetInfluences[ 0 ] = Math.abs( Math.sin( t ) );
-
-				}
+				t += delta * 0.5;
+				line.morphTargetInfluences[ 0 ] = Math.abs( Math.sin( t ) );
 
 				renderer.render( scene, camera );
 

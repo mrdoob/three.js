@@ -9,13 +9,41 @@ material.specularRoughness = max( roughnessFactor, 0.0525 );// 0.0525 correspond
 material.specularRoughness += geometryRoughness;
 material.specularRoughness = min( material.specularRoughness, 1.0 );
 
-#ifdef REFLECTIVITY
+#ifdef IOR
 
-	material.specularColor = mix( vec3( MAXIMUM_SPECULAR_COEFFICIENT * pow2( reflectivity ) ), diffuseColor.rgb, metalnessFactor );
+	#ifdef SPECULAR
+
+		vec3 specularIntensityFactor = vec3( specularIntensity );
+		vec3 specularTintFactor = specularTint;
+
+		#ifdef USE_SPECULARINTENSITYMAP
+
+			specularIntensityFactor *= texture2D( specularIntensityMap, vUv ).a;
+
+		#endif
+
+		#ifdef USE_SPECULARTINTMAP
+
+			specularTintFactor *= specularTintMapTexelToLinear( texture2D( specularTintMap, vUv ) ).rgb;
+
+		#endif
+
+		material.specularColorF90 = mix( specularIntensityFactor, vec3( 1.0 ), metalnessFactor );
+
+	#else
+
+		vec3 specularIntensityFactor = vec3( 1.0 );
+		vec3 specularTintFactor = vec3( 1.0 );
+		material.specularColorF90 = vec3( 1.0 );
+
+	#endif
+
+	material.specularColor = mix( min( pow2( ( ior - 1.0 ) / ( ior + 1.0 ) ) * specularTintFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
 
 #else
 
 	material.specularColor = mix( vec3( DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor.rgb, metalnessFactor );
+	material.specularColorF90 = vec3( 1.0 );
 
 #endif
 

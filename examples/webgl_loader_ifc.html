@@ -61,13 +61,37 @@
 
 				//Setup IFC Loader
 				const ifcLoader = new IFCLoader();
-				ifcLoader.setWasmPath( 'jsm/loaders/ifc/' );
+				ifcLoader.ifcManager.setWasmPath( 'jsm/loaders/ifc/' );
 				ifcLoader.load( 'models/ifc/rac_advanced_sample_project.ifc', function ( model ) {
 
-					scene.add( model );
+					scene.add( model.mesh );
 					render();
 
 				} );
+
+				function selectObject(event) {
+					if (event.button != 0) return;
+
+					const mouse = new THREE.Vector2();
+					mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+					mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+					const raycaster = new THREE.Raycaster();
+					raycaster.setFromCamera(mouse, camera);
+
+					const intersected = raycaster.intersectObjects(scene.children);
+					if (intersected.length){
+						const faceIndex = intersected[0].faceIndex;
+						const id = ifcLoader.getExpressId(faceIndex);
+
+						ifcLoader.highlightItems([id], scene);
+						const props = ifcLoader.getItemProperties(id, true);
+						console.log(props);
+						renderer.render( scene, camera );
+					} 
+				}
+
+				window.onpointerdown = selectObject;
 
 				//Renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true	} );
