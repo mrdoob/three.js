@@ -700,8 +700,7 @@ class FBXTreeParser {
 
 		}
 
-		const texture = textureMap.get( id );
-		return texture;
+		return textureMap.get( id );
 
 	}
 
