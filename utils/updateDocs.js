@@ -5,7 +5,7 @@ const DOCS_PATH = path.join( process.cwd(), 'docs' );
 const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
 
 /**
- * Updates docs list meta in `docs/list.json`.
+ * Updates docs meta in `docs/docs.json`.
  */
 const updateDocs = ( write ) => {
 
@@ -26,19 +26,18 @@ const updateDocs = ( write ) => {
 
 				for ( const pageName in pages ) {
 
-					const pageURL = pages[ pageName ].url;
+					const pageURL = pages[ pageName ];
+					const pagePath = path.join( DOCS_PATH, `${pageURL}.html` );
 
 					// Read doc file
-					const file = fs.readFileSync(
-						path.join( DOCS_PATH, `${pageURL}.html` ),
-						'utf-8'
-					);
+					const fileExists = fs.existsSync( pagePath );
+					const file = fileExists && fs.readFileSync( pagePath, 'utf-8' );
 
 					// Base page data
 					const baseData = { url: pageURL };
 
 					// Parse methods & properties from doc file
-					const matches = file.match( DOCS_PROPS_REGEX );
+					const matches = file && file.match( DOCS_PROPS_REGEX );
 					const pageData = matches && matches.reduce(
 						( output, match ) => {
 
@@ -71,11 +70,11 @@ const updateDocs = ( write ) => {
 
 	}
 
-	// If specified, write to list.json with Mr.doob's Code Style™
+	// If specified, write to docs.json with Mr.doob's Code Style™
 	if ( write ) {
 
 		fs.writeFileSync(
-			path.join( DOCS_PATH, 'list.json' ),
+			path.join( DOCS_PATH, 'docs.json' ),
 			JSON.stringify( list, null, '\t' ).replace( /(\}\,)\n/g, '$1\n\n' )
 		);
 
