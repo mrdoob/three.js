@@ -90,7 +90,11 @@ function unmodularize() {
 			code = code.replace( /import \* as ([a-zA-Z0-9_, ]+) from '((?!libs).)*';/g, ( match, p1 ) => {
 
 				const imp = p1;
-				imports.push( imp );
+				if ( imp !== 'THREE' ) {
+
+					imports.push( imp );
+
+				}
 
 				return '';
 
