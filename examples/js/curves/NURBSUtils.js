@@ -115,8 +115,8 @@ returns point for given u
 
 	function calcBSplinePoint( p, U, P, u ) {
 
-		const span = this.findSpan( p, u, U );
-		const N = this.calcBasisFunctions( span, u, p, U );
+		const span = findSpan( p, u, U );
+		const N = calcBasisFunctions( span, u, p, U );
 		const C = new THREE.Vector4( 0, 0, 0, 0 );
 
 		for ( let j = 0; j <= p; ++ j ) {
@@ -279,8 +279,8 @@ returns array[n+1][p+1] with basis functions derivatives
 
 		const du = nd < p ? nd : p;
 		const CK = [];
-		const span = this.findSpan( p, u, U );
-		const nders = this.calcBasisFunctionDerivatives( span, u, p, du, U );
+		const span = findSpan( p, u, U );
+		const nders = calcBasisFunctionDerivatives( span, u, p, du, U );
 		const Pw = [];
 
 		for ( let i = 0; i < P.length; ++ i ) {
@@ -382,7 +382,7 @@ returns array with derivatives for rational curve.
 
 			for ( let i = 1; i <= k; ++ i ) {
 
-				v.sub( CK[ k - i ].clone().multiplyScalar( this.calcKoverI( k, i ) * wders[ i ] ) );
+				v.sub( CK[ k - i ].clone().multiplyScalar( calcKoverI( k, i ) * wders[ i ] ) );
 
 			}
 
@@ -408,8 +408,8 @@ returns array with derivatives.
 
 	function calcNURBSDerivatives( p, U, P, u, nd ) {
 
-		const Pders = this.calcBSplineDerivatives( p, U, P, u, nd );
-		return this.calcRationalCurveDerivatives( Pders );
+		const Pders = calcBSplineDerivatives( p, U, P, u, nd );
+		return calcRationalCurveDerivatives( Pders );
 
 	}
 	/*
@@ -426,10 +426,10 @@ returns point for given (u, v)
 
 	function calcSurfacePoint( p, q, U, V, P, u, v, target ) {
 
-		const uspan = this.findSpan( p, u, U );
-		const vspan = this.findSpan( q, v, V );
-		const Nu = this.calcBasisFunctions( uspan, u, p, U );
-		const Nv = this.calcBasisFunctions( vspan, v, q, V );
+		const uspan = findSpan( p, u, U );
+		const vspan = findSpan( q, v, V );
+		const Nu = calcBasisFunctions( uspan, u, p, U );
+		const Nv = calcBasisFunctions( vspan, v, q, V );
 		const temp = [];
 
 		for ( let l = 0; l <= q; ++ l ) {
