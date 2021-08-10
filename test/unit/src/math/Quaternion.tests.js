@@ -1,10 +1,6 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author tschw
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
+import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { Quaternion } from '../../../../src/math/Quaternion';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Vector4 } from '../../../../src/math/Vector4';
@@ -527,7 +523,21 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse/conjugate", ( assert ) => {
+		QUnit.test( "identity", ( assert ) => {
+
+			var a = new Quaternion();
+
+			a.set( x, y, z, w );
+			a.identity();
+
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z === 0, "Passed!" );
+			assert.ok( a.w === 1, "Passed!" );
+
+		} );
+
+		QUnit.test( "invert/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 
@@ -647,6 +657,22 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "slerpQuaternions", ( assert ) => {
+
+			var e = new Quaternion( 1, 0, 0, 0 );
+			var f = new Quaternion( 0, 0, 1, 0 );
+			var expected = new Quaternion( Math.SQRT1_2, 0, Math.SQRT1_2, 0 );
+
+			var a = new Quaternion();
+			a.slerpQuaternions( e, f, 0.5 );
+
+			assert.ok( Math.abs( a.x - expected.x ) <= eps, "Check x" );
+			assert.ok( Math.abs( a.y - expected.y ) <= eps, "Check y" );
+			assert.ok( Math.abs( a.z - expected.z ) <= eps, "Check z" );
+			assert.ok( Math.abs( a.w - expected.w ) <= eps, "Check w" );
+
+		} );
+
 		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
@@ -711,6 +737,38 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "fromBufferAttribute", ( assert ) => {
+
+			var a = new Quaternion();
+
+			var attribute = new BufferAttribute( new Float32Array( [
+
+				0, 0, 0, 1,
+				.7, 0, 0, .7,
+				0, .7, 0, .7,
+
+			] ), 4 );
+
+			a.fromBufferAttribute( attribute, 0 );
+			assert.numEqual( a.x, 0, 'index 0, component x' );
+			assert.numEqual( a.y, 0, 'index 0, component y' );
+			assert.numEqual( a.z, 0, 'index 0, component z' );
+			assert.numEqual( a.w, 1, 'index 0, component w' );
+
+			a.fromBufferAttribute( attribute, 1 );
+			assert.numEqual( a.x, .7, 'index 1, component x' );
+			assert.numEqual( a.y, 0, 'index 1, component y' );
+			assert.numEqual( a.z, 0, 'index 1, component z' );
+			assert.numEqual( a.w, .7, 'index 1, component w' );
+
+			a.fromBufferAttribute( attribute, 2 );
+			assert.numEqual( a.x, 0, 'index 2, component x' );
+			assert.numEqual( a.y, .7, 'index 2, component y' );
+			assert.numEqual( a.z, 0, 'index 2, component z' );
+			assert.numEqual( a.w, .7, 'index 2, component w' );
+
+		} );
+
 		QUnit.test( "_onChange", ( assert ) => {
 
 			var b = false;
@@ -733,13 +791,14 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "_onChangeCallback", ( assert ) => {
 
 			var b = false;
+			var a = new Quaternion( 11, 12, 13, 1 );
 			var f = function () {
 
 				b = true;
+				assert.ok( a === this, "Passed!" );
 
 			};
 
-			var a = new Quaternion( 11, 12, 13, 1 );
 			a._onChangeCallback = f;
 			assert.ok( a._onChangeCallback === f, "Passed!" );
 
@@ -777,5 +836,3 @@ export default QUnit.module( 'Maths', () => {
 	} );
 
 } );
-
-QUnit.module( "Quaternion" );

@@ -1,49 +1,43 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
+} from '../../../build/three.module.js';
+import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
 
-var ShaderPass = function ( shader, textureID ) {
+class ShaderPass extends Pass {
 
-	Pass.call( this );
+	constructor( shader, textureID ) {
 
-	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
+		super();
 
-	if ( shader instanceof ShaderMaterial ) {
+		this.textureID = ( textureID !== undefined ) ? textureID : 'tDiffuse';
 
-		this.uniforms = shader.uniforms;
+		if ( shader instanceof ShaderMaterial ) {
 
-		this.material = shader;
+			this.uniforms = shader.uniforms;
 
-	} else if ( shader ) {
+			this.material = shader;
 
-		this.uniforms = UniformsUtils.clone( shader.uniforms );
+		} else if ( shader ) {
 
-		this.material = new ShaderMaterial( {
+			this.uniforms = UniformsUtils.clone( shader.uniforms );
 
-			defines: Object.assign( {}, shader.defines ),
-			uniforms: this.uniforms,
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
+			this.material = new ShaderMaterial( {
 
-		} );
+				defines: Object.assign( {}, shader.defines ),
+				uniforms: this.uniforms,
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+
+			} );
+
+		}
+
+		this.fsQuad = new FullScreenQuad( this.material );
 
 	}
 
-	this.fsQuad = new Pass.FullScreenQuad( this.material );
-
-};
-
-ShaderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
-
-	constructor: ShaderPass,
-
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
@@ -69,6 +63,6 @@ ShaderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	}
 
-} );
+}
 
 export { ShaderPass };

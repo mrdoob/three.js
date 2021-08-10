@@ -6,7 +6,7 @@ export default /* glsl */`
 
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
 
-	#if defined( USE_ENVMAP ) && defined( PHYSICAL )
+	#if defined( USE_ENVMAP ) && defined( STANDARD )
 
 		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 

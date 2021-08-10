@@ -2,16 +2,11 @@ import { Material } from './Material.js';
 import { Vector3 } from '../math/Vector3.js';
 
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *
  *  referencePosition: <float>,
  *  nearDistance: <float>,
  *  farDistance: <float>,
- *
- *  skinning: <bool>,
- *  morphTargets: <bool>,
  *
  *  map: new THREE.Texture( <Image> ),
  *
@@ -24,61 +19,54 @@ import { Vector3 } from '../math/Vector3.js';
  * }
  */
 
-function MeshDistanceMaterial( parameters ) {
+class MeshDistanceMaterial extends Material {
 
-	Material.call( this );
+	constructor( parameters ) {
 
-	this.type = 'MeshDistanceMaterial';
+		super();
 
-	this.referencePosition = new Vector3();
-	this.nearDistance = 1;
-	this.farDistance = 1000;
+		this.type = 'MeshDistanceMaterial';
 
-	this.skinning = false;
-	this.morphTargets = false;
+		this.referencePosition = new Vector3();
+		this.nearDistance = 1;
+		this.farDistance = 1000;
 
-	this.map = null;
+		this.map = null;
 
-	this.alphaMap = null;
+		this.alphaMap = null;
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
-	this.fog = false;
-	this.lights = false;
+		this.fog = false;
 
-	this.setValues( parameters );
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.referencePosition.copy( source.referencePosition );
+		this.nearDistance = source.nearDistance;
+		this.farDistance = source.farDistance;
+
+		this.map = source.map;
+
+		this.alphaMap = source.alphaMap;
+
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+
+		return this;
+
+	}
 
 }
 
-MeshDistanceMaterial.prototype = Object.create( Material.prototype );
-MeshDistanceMaterial.prototype.constructor = MeshDistanceMaterial;
-
 MeshDistanceMaterial.prototype.isMeshDistanceMaterial = true;
-
-MeshDistanceMaterial.prototype.copy = function ( source ) {
-
-	Material.prototype.copy.call( this, source );
-
-	this.referencePosition.copy( source.referencePosition );
-	this.nearDistance = source.nearDistance;
-	this.farDistance = source.farDistance;
-
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
-
-	this.map = source.map;
-
-	this.alphaMap = source.alphaMap;
-
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
-
-	return this;
-
-};
-
 
 export { MeshDistanceMaterial };

@@ -1,8 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var Cache = {
+const Cache = {
 
 	enabled: false,
 

@@ -1,24 +1,23 @@
+import {
+	Matrix3,
+	Matrix4,
+	Vector3
+} from '../../../build/three.module.js';
+import { VolumeSlice } from '../misc/VolumeSlice.js';
+
 /**
  * This class had been written to handle the output of the NRRD loader.
  * It contains a volume of data and informations about it.
  * For now it only handles 3 dimensional data.
  * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
  * @class
- * @author Valentin Demeusy / https://github.com/stity
  * @param   {number}        xLength         Width of the volume
  * @param   {number}        yLength         Length of the volume
  * @param   {number}        zLength         Depth of the volume
  * @param   {string}        type            The type of data (uint8, uint16, ...)
  * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
  */
-
-import {
-	Matrix3,
-	Matrix4,
-	Vector3
-} from "../../../build/three.module.js";
-import { VolumeSlice } from "../misc/VolumeSlice.js";
-var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
+function Volume( xLength, yLength, zLength, type, arrayBuffer ) {
 
 	if ( arguments.length > 0 ) {
 
@@ -34,7 +33,10 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 		 * @member {number} zLength Depth of the volume in the IJK coordinate system
 		 */
 		this.zLength = Number( zLength ) || 1;
-
+		/**
+		 * @member {Array<string>} The order of the Axis dictated by the NRRD header
+		 */
+		this.axisOrder = [ 'x', 'y', 'z' ];
 		/**
 		 * @member {TypedArray} data Data of the volume
 		 */
@@ -194,7 +196,7 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 	 * @member {Array} RASDimensions This array holds the dimensions of the volume in the RAS space
 	 */
 
-};
+}
 
 Volume.prototype = {
 
@@ -302,8 +304,8 @@ Volume.prototype = {
 				axisInIJK.set( 1, 0, 0 );
 				firstDirection.set( 0, 0, - 1 );
 				secondDirection.set( 0, - 1, 0 );
-				firstSpacing = this.spacing[ 2 ];
-				secondSpacing = this.spacing[ 1 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
 				IJKIndex = new Vector3( RASIndex, 0, 0 );
 
 				planeMatrix.multiply( ( new Matrix4() ).makeRotationY( Math.PI / 2 ) );
@@ -314,8 +316,8 @@ Volume.prototype = {
 				axisInIJK.set( 0, 1, 0 );
 				firstDirection.set( 1, 0, 0 );
 				secondDirection.set( 0, 0, 1 );
-				firstSpacing = this.spacing[ 0 ];
-				secondSpacing = this.spacing[ 2 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
 				IJKIndex = new Vector3( 0, RASIndex, 0 );
 
 				planeMatrix.multiply( ( new Matrix4() ).makeRotationX( - Math.PI / 2 ) );
@@ -327,8 +329,8 @@ Volume.prototype = {
 				axisInIJK.set( 0, 0, 1 );
 				firstDirection.set( 1, 0, 0 );
 				secondDirection.set( 0, - 1, 0 );
-				firstSpacing = this.spacing[ 0 ];
-				secondSpacing = this.spacing[ 1 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
 				IJKIndex = new Vector3( 0, 0, RASIndex );
 
 				positionOffset = ( volume.RASDimensions[ 2 ] - 1 ) / 2;
@@ -364,15 +366,24 @@ Volume.prototype = {
 			return Math.abs( x.dot( base[ 2 ] ) ) > 0.9;
 
 		} );
-		var argumentsWithInversion = [ 'volume.xLength-1-', 'volume.yLength-1-', 'volume.zLength-1-' ];
-		var argArray = [ iDirection, jDirection, kDirection ].map( function ( direction, n ) {
 
-			return ( direction.dot( base[ n ] ) > 0 ? '' : argumentsWithInversion[ n ] ) + ( direction === axisInIJK ? 'IJKIndex' : direction.argVar );
+		sliceAccess = function ( i, j ) {
 
-		} );
-		var argString = argArray.join( ',' );
-		sliceAccess = eval( '(function sliceAccess (i,j) {return volume.access( ' + argString + ');})' );
+			var accessI, accessJ, accessK;
 
+			var si = ( iDirection === axisInIJK ) ? IJKIndex : ( iDirection.argVar === 'i' ? i : j );
+			var sj = ( jDirection === axisInIJK ) ? IJKIndex : ( jDirection.argVar === 'i' ? i : j );
+			var sk = ( kDirection === axisInIJK ) ? IJKIndex : ( kDirection.argVar === 'i' ? i : j );
+
+			// invert indices if necessary
+
+			var accessI = ( iDirection.dot( base[ 0 ] ) > 0 ) ? si : ( volume.xLength - 1 ) - si;
+			var accessJ = ( jDirection.dot( base[ 1 ] ) > 0 ) ? sj : ( volume.yLength - 1 ) - sj;
+			var accessK = ( kDirection.dot( base[ 2 ] ) > 0 ) ? sk : ( volume.zLength - 1 ) - sk;
+
+			return volume.access( accessI, accessJ, accessK );
+
+		};
 
 		return {
 			iLength: iLength,
@@ -433,6 +444,7 @@ Volume.prototype = {
 		var datasize = this.data.length;
 
 		var i = 0;
+
 		for ( i = 0; i < datasize; i ++ ) {
 
 			if ( ! isNaN( this.data[ i ] ) ) {
@@ -444,6 +456,7 @@ Volume.prototype = {
 			}
 
 		}
+
 		this.min = min;
 		this.max = max;
 

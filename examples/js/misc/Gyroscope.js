@@ -1,65 +1,60 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+( function () {
 
-THREE.Gyroscope = function () {
+	const _translationObject = new THREE.Vector3();
 
-	THREE.Object3D.call( this );
+	const _quaternionObject = new THREE.Quaternion();
 
-};
+	const _scaleObject = new THREE.Vector3();
 
-THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Gyroscope.prototype.constructor = THREE.Gyroscope;
+	const _translationWorld = new THREE.Vector3();
 
-THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
+	const _quaternionWorld = new THREE.Quaternion();
 
-	var translationObject = new THREE.Vector3();
-	var quaternionObject = new THREE.Quaternion();
-	var scaleObject = new THREE.Vector3();
+	const _scaleWorld = new THREE.Vector3();
 
-	var translationWorld = new THREE.Vector3();
-	var quaternionWorld = new THREE.Quaternion();
-	var scaleWorld = new THREE.Vector3();
+	class Gyroscope extends THREE.Object3D {
 
-	return function updateMatrixWorld( force ) {
+		constructor() {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+			super();
 
-		// update matrixWorld
+		}
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+		updateMatrixWorld( force ) {
 
-			if ( this.parent !== null ) {
+			this.matrixAutoUpdate && this.updateMatrix(); // update matrixWorld
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+			if ( this.matrixWorldNeedsUpdate || force ) {
 
-				this.matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
-				this.matrix.decompose( translationObject, quaternionObject, scaleObject );
+				if ( this.parent !== null ) {
 
-				this.matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+					this.matrixWorld.decompose( _translationWorld, _quaternionWorld, _scaleWorld );
+					this.matrix.decompose( _translationObject, _quaternionObject, _scaleObject );
+					this.matrixWorld.compose( _translationWorld, _quaternionObject, _scaleWorld );
+
+				} else {
+
+					this.matrixWorld.copy( this.matrix );
+
+				}
+
+				this.matrixWorldNeedsUpdate = false;
+				force = true;
+
+			} // update children
 
 
-			} else {
+			for ( let i = 0, l = this.children.length; i < l; i ++ ) {
 
-				this.matrixWorld.copy( this.matrix );
+				this.children[ i ].updateMatrixWorld( force );
 
 			}
 
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
 		}
 
-		// update children
+	}
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+	THREE.Gyroscope = Gyroscope;
 
-			this.children[ i ].updateMatrixWorld( force );
-
-		}
-
-	};
-
-}() );
+} )();

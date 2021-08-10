@@ -14,9 +14,11 @@
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
+			import { GPUStatsPanel } from './jsm/utils/GPUStatsPanel.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -25,15 +27,15 @@
 			import { LineGeometry } from './jsm/lines/LineGeometry.js';
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-			var line, renderer, scene, camera, camera2, controls;
-			var line1;
-			var matLine, matLineBasic, matLineDashed;
-			var stats;
-			var gui;
+			let line, renderer, scene, camera, camera2, controls;
+			let line1;
+			let matLine, matLineBasic, matLineDashed;
+			let stats, gpuPanel;
+			let gui;
 
 			// viewport
-			var insetWidth;
-			var insetHeight;
+			let insetWidth;
+			let insetHeight;
 
 			init();
 			animate();
@@ -61,21 +63,24 @@
 
 				// Position and THREE.Color Data
 
-				var positions = [];
-				var colors = [];
+				const positions = [];
+				const colors = [];
 
-				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var spline = new THREE.CatmullRomCurve3( points );
-				var divisions = Math.round( 12 * points.length );
-				var color = new THREE.Color();
+				const spline = new THREE.CatmullRomCurve3( points );
+				const divisions = Math.round( 12 * points.length );
+				const point = new THREE.Vector3();
+				const color = new THREE.Color();
 
-				for ( var i = 0, l = divisions; i < l; i ++ ) {
+				for ( let i = 0, l = divisions; i < l; i ++ ) {
 
-					var point = spline.getPoint( i / l );
+					const t = i / l;
+
+					spline.getPoint( t, point );
 					positions.push( point.x, point.y, point.z );
 
-					color.setHSL( i / l, 1.0, 0.5 );
+					color.setHSL( t, 1.0, 0.5 );
 					colors.push( color.r, color.g, color.b );
 
 				}
@@ -83,7 +88,7 @@
 
 				// Line2 ( LineGeometry, LineMaterial )
 
-				var geometry = new LineGeometry();
+				const geometry = new LineGeometry();
 				geometry.setPositions( positions );
 				geometry.setColors( colors );
 
@@ -91,9 +96,11 @@
 
 					color: 0xffffff,
 					linewidth: 5, // in world units with size attenuation, pixels otherwise
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
+					
 					//resolution:  // to be set by renderer, eventually
-					dashed: false
+					dashed: false,
+					alphaToCoverage: true,
 
 				} );
 
@@ -105,12 +112,12 @@
 
 				// THREE.Line ( THREE.BufferGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE_STRIP
 
-				var geo = new THREE.BufferGeometry();
-				geo.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				const geo = new THREE.BufferGeometry();
+				geo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				matLineBasic = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
-				matLineDashed = new THREE.LineDashedMaterial( { vertexColors: THREE.VertexColors, scale: 2, dashSize: 1, gapSize: 1 } );
+				matLineBasic = new THREE.LineBasicMaterial( { vertexColors: true } );
+				matLineDashed = new THREE.LineDashedMaterial( { vertexColors: true, scale: 2, dashSize: 1, gapSize: 1 } );
 
 				line1 = new THREE.Line( geo, matLineBasic );
 				line1.computeLineDistances();
@@ -119,11 +126,15 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+
+				gpuPanel = new GPUStatsPanel( renderer.getContext() );
+				stats.addPanel( gpuPanel );
+				stats.showPanel( 0 );
 
 				initGui();
 
@@ -159,7 +170,9 @@
 				// renderer will set this eventually
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
 
+				gpuPanel.startQuery();
 				renderer.render( scene, camera );
+				gpuPanel.endQuery();
 
 				// inset scene
 
@@ -191,15 +204,15 @@
 
 				gui = new GUI();
 
-				var param = {
+				const param = {
 					'line type': 0,
 					'world units': false,
 					'width': 5,
+					'alphaToCoverage': true,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
 				};
-
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1 } ).onChange( function ( val ) {
 
@@ -236,16 +249,15 @@
 
 				} );
 
+				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) { 
+
+					matLine.alphaToCoverage = val;
+
+				} );
+
 				gui.add( param, 'dashed' ).onChange( function ( val ) {
 
 					matLine.dashed = val;
-
-					// dashed is implemented as a defines -- not as a uniform. this could be changed.
-					// ... or THREE.LineDashedMaterial could be implemented as a separate material
-					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
-					matLine.needsUpdate = true;
-
 					line1.material = val ? matLineDashed : matLineBasic;
 
 				} );

@@ -1,19 +1,41 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	Group,
 	Mesh
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
-var SceneUtils = {
+class SceneUtils {
 
-	createMultiMaterialObject: function ( geometry, materials ) {
+	static createMeshesFromInstancedMesh( instancedMesh ) {
 
-		var group = new Group();
+		const group = new Group();
 
-		for ( var i = 0, l = materials.length; i < l; i ++ ) {
+		const count = instancedMesh.count;
+		const geometry = instancedMesh.geometry;
+		const material = instancedMesh.material;
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			const mesh = new Mesh( geometry, material );
+
+			instancedMesh.getMatrixAt( i, mesh.matrix );
+			mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
+
+			group.add( mesh );
+
+		}
+
+		group.copy( instancedMesh );
+		group.updateMatrixWorld(); // ensure correct world matrices of meshes
+
+		return group;
+
+	}
+
+	static createMultiMaterialObject( geometry, materials ) {
+
+		const group = new Group();
+
+		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 			group.add( new Mesh( geometry, materials[ i ] ) );
 
@@ -21,17 +43,17 @@ var SceneUtils = {
 
 		return group;
 
-	},
+	}
 
-	detach: function ( child, parent, scene ) {
+	static detach( child, parent, scene ) {
 
 		console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
 
 		scene.attach( child );
 
-	},
+	}
 
-	attach: function ( child, scene, parent ) {
+	static attach( child, scene, parent ) {
 
 		console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
 
@@ -39,6 +61,6 @@ var SceneUtils = {
 
 	}
 
-};
+}
 
 export { SceneUtils };

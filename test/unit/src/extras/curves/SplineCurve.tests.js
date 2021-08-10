@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { SplineCurve } from '../../../../../src/extras/curves/SplineCurve';
@@ -111,13 +108,15 @@ export default QUnit.module( 'Extras', () => {
 			QUnit.test( "getPointAt", ( assert ) => {
 
 				var curve = _curve;
+				var point = new Vector2();
 
-				assert.ok( curve.getPointAt( 0 ).equals( curve.points[ 0 ] ), "PointAt 0.0 correct" );
-				assert.ok( curve.getPointAt( 1 ).equals( curve.points[ 4 ] ), "PointAt 1.0 correct" );
+				assert.ok( curve.getPointAt( 0, point ).equals( curve.points[ 0 ] ), "PointAt 0.0 correct" );
+				assert.ok( curve.getPointAt( 1, point ).equals( curve.points[ 4 ] ), "PointAt 1.0 correct" );
 
-				var pointAt = curve.getPointAt( 0.5 );
-				assert.numEqual( pointAt.x, 0.0, "PointAt 0.5 x correct" );
-				assert.numEqual( pointAt.y, 0.0, "PointAt 0.5 y correct" );
+				curve.getPointAt( 0.5, point );
+
+				assert.numEqual( point.x, 0.0, "PointAt 0.5 x correct" );
+				assert.numEqual( point.y, 0.0, "PointAt 0.5 y correct" );
 
 			} );
 
@@ -132,9 +131,9 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var tangents = [
-					curve.getTangent( 0 ),
-					curve.getTangent( 0.5 ),
-					curve.getTangent( 1 )
+					curve.getTangent( 0, new Vector2() ),
+					curve.getTangent( 0.5, new Vector2() ),
+					curve.getTangent( 1, new Vector2() )
 				];
 
 				tangents.forEach( function ( tangent, i ) {

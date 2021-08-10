@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			KeyframeTrack은 시간 리스트와 관련 값으로 구성되어 있고 오브젝트의 특정 프로퍼티를 동작시키는 데에 사용되는
+			[link:https://en.wikipedia.org/wiki/Key_frame keyframes]의 시간별 시퀀스입니다.
+		</p>
+
+		<p>
+			three.js 애니메이션 시스템의 다양한 엘레먼트에 관해서는 매뉴얼의 "심화과정" 중 "애니메이션 시스템" 문서를 참고하세요.
+		</p>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format]의 애니메이션 계층 구조와는 다르게
+			*KeyframeTrack*은 "keys" 배열에 자신의 단일 키프레임을 오브젝트로 저장하지 않습니다. (각 프레임의 시간과 값을 한 장소에 보관합니다).
+		</p>
+
+		<p>
+			그 대신에, *KeyframeTrack*에는 언제나 두 배열이 존재합니다: [page:.times times] 배열은
+			트랙의 모든 키프레임의 값을 시퀀스 순으로 저장하고,
+			[page:.values values] 배열은 애니메이션 프로퍼티의 변동값을 저장합니다.
+		</p>
+
+		<p>
+			한 특정 시점에 속한 단일 값은 간단한 숫자 뿐만이 아니라 (예를 들면) 벡터값 (위치가 변화하는 애니메이션의 경우) 혹은 쿼터니언 (회전이 있는 애니메이션의 경우)
+			도 가능합니다. 이러한 이유로 values 배열은(플랫 배열도 마찬가지) 보통 times 배열보다 3~4배 정도 깁니다.
+		</p>
+
+		<p>
+			다양한 애니메이션 관련 값들의 타입 대응을 위해,	*KeyframeTrack*에는 하위 클래스가 있고 대부분의 프로퍼티와 메서드등을 상속받습니다.
+		</p>
+
+		<ul>
+			<li>[page:BooleanKeyframeTrack]</li>
+			<li>[page:ColorKeyframeTrack]</li>
+			<li>[page:NumberKeyframeTrack]</li>
+			<li>[page:QuaternionKeyframeTrack]</li>
+			<li>[page:StringKeyframeTrack]</li>
+			<li>[page:VectorKeyframeTrack]</li>
+		</ul>
+
+		<p>
+			다른 종류의 KeyframeTracks으로 [page:AnimationClip AnimationClips]를 직접 만드는 예제는
+			[link:https://threejs.org/examples/jsm/animation/AnimationClipCreator.js AnimationClipCreator]를 참고하세요.
+		</p>
+
+		<p>
+			명시적 값은 시간 배열에 저장된 시간 이산 지점에 특정되기 때문에, 모든 중간 값들은 보간이 되어야 합니다.
+		</p>
+
+		<p>
+			트랙의 이름은 트랙과 애니메이션 노드([page:PropertyBinding]에 의한)의 특정 프로퍼티와의 연결에 중요합니다.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
+		<p>
+			[page:String name] - *KeyframeTrack*의 식별자.<br />
+			[page:Array times] - 키프레임 시간 배열, 내부적으로
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]로 변환됩니다.<br />
+			[page:Array values] - 시간 배열과 관련된 값을 가진 배열, 내부적으로
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]로 변환됩니다.<br />
+			[page:Constant interpolation] - 보간법 사용 타입. 가능한 값들은
+			[page:Animation Animation Constants] 를 참고하세요. 기본값은 [page:Animation InterpolateLinear]입니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+
+		<h3>[property:String name]</h3>
+		<p>
+			트랙의 이름은 morph targets 혹은 [page:SkinnedMesh bones] 및 
+			다른 애니메이션 오브젝트에 들어있는 값들을 참조할 수 있습니다. See
+			프로퍼티로 파싱될 수 있는 문자열 폼에 대해서는 [page:PropertyBinding.parseTrackName] 를 참고하세요.
+		</p>
+
+		<p>
+			트랙의 이름은 노드의 이름을 사용하거나 노드의 uuid(믹서에 전달된 씬 그래프 노드의 서브트리 안에 있어야 하지만)를 사용해서 노드를 특정할 수 있습니다.
+			혹은 만약 트랙 이름이 .으로 시작한다면, 트랙은  믹서에 전달된 루트 노드를 적용할 것입니다.
+		</p>
+
+		<p>
+			보통 노드 다음에는 프로퍼티가 직접 특정됩니다. 하지만 float 트랙을 통해 회전의 X 컴포넌트를 조절하려면
+			.rotation[x]같은 서브프로퍼티를 특정할 수도 있습니다.
+		</p>
+
+		<p>
+			오브젝트 이름으로 골자나 다중 재질을 특정할 수도 있습니다. 예시:
+			.bones[R_hand].scale;
+			추가적으로, 재질 배열의 네 번째 재질의 확상광 중 레드 채널은 .materials[3].diffuse[r]로 접근할 수 있습니다.
+		</p>
+
+		<p>
+			PropertyBinding은 모프 타겟 이름도 해석할 수 있습니다. 예시: .morphTargetInfluences[run].
+		</p>
+
+		<p>
+			참고: 트랙의 이름은 반드시 고유할 필요는 없습니다. 다중 트랙은 같은 프로퍼티를 사용할 수 있습니다.
+			결과는 다중 트랙의 각각의 동작들의 가중치에 따른 혼합 가중치에 기반해야 합니다.
+		</p>
+
+		<h3>[property:Float32Array times]</h3>
+		<p>
+			생성자를 통해 전달된 시간 배열을 변환한 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]입니다.
+		</p>
+
+		<h3>[property:Float32Array values]</h3>
+		<p>
+			생성자를 통해 전달된 값 배열을 변환한 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]입니다.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			기본 보간법 타입: [page:Animation InterpolateLinear].
+		</p>
+
+		<h3>[property:Constant TimeBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			내부적으로 시간에 사용되는 버퍼 타입.
+		</p>
+
+		<h3>[property:Constant ValueBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			내부적으로 값에 사용되는 버퍼 타입.
+		</p>
+
+
+		<h2>메서드</h2>
+
+
+		<h3>[method:KeyframeTrack clone]()</h3>
+		<p>
+			트랙의 복사본을 리턴합니다.
+		</p>
+
+		<h3>[method:null createInterpolant]()</h3>
+		<p>
+			생성자에서 넘어온 보간법 파라미터 값에 기반한 [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
+			혹은 [page:DiscreteInterpolant DiscreteInterpolant]를 생성합니다.
+		</p>
+
+		<h3>[method:null getInterpolation]()</h3>
+		<p>
+			보간법 타입을 리턴합니다.
+		</p>
+
+		<h3>[method:Number getValueSize]()</h3>
+		<p>
+			각 값의 길이를 리턴합니다 ([page:.times times] 배열로 나눈 [page:.values values] 배열의 길이).
+		</p>
+
+		<h3>[method:DiscreteInterpolant InterpolantFactoryMethodDiscrete]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			[page:KeyframeTrack.times times] 와 [page:KeyframeTrack.times values]를 통해
+			새 [page:DiscreteInterpolant DiscreteInterpolant]를 만듭니다.
+			Float32Array는 결과를 받을 수 있으면 넘겨줄 수 있습니다.
+			그렇지 않다면 적당한 크기가 자동으로 생성될 것입니다.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			[page:KeyframeTrack.times times] 와 [page:KeyframeTrack.times values]를 통해
+			새 [page:LinearInterpolant LinearInterpolant]를 만듭니다.
+			Float32Array는 결과를 받을 수 있으면 넘겨줄 수 있습니다.
+			그렇지 않다면 적당한 크기가 자동으로 생성될 것입니다.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			[page:KeyframeTrack.times times] 와 [page:KeyframeTrack.times values]를 통해
+			새 [page:CubicInterpolant CubicInterpolant]를 만듭니다.
+			Float32Array는 결과를 받을 수 있으면 넘겨줄 수 있습니다.
+			그렇지 않다면 적당한 크기가 자동으로 생성될 것입니다.
+		</p>
+
+		<h3>[method:this optimize]()</h3>
+		<p>
+			모프 타겟 시퀀스에서는 흔한 동일 시퀀스 키를 제거합니다.
+		</p>
+
+		<h3>[method:this scale]()</h3>
+		<p>
+			인자 값으로 모든 키프레임 배속을 설정합니다.<br /><br />
+
+			참고: 아주 유용한 기능인데, 예를 들면, 초당 프레임의 특정 비율 변환에 있어서 용이합니다
+			(내부적으로 [page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]를 통해).
+		</p>
+
+		<h3>[method:this setInterpolation]( [param:Constant interpolationType] )</h3>
+		<p>
+			보간법 타입을 설정합니다. 타입은 [page:Animation Animation Constants] 를 참고하세요.
+		</p>
+
+		<h3>[method:this shift]( [param:Number timeOffsetInSeconds] )</h3>
+		<p>
+			모든 키프레임을 앞으로 혹은 뒤로 이동시킵니다.
+		</p>
+
+
+		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
+		<p>
+			*startTime* 앞과 *endTime* 뒤의 키프레임을 제거하며 [*startTime*, *endTime*] 범위 안의 수치는 변경시키지 않습니다.
+		</p>
+
+		<h3>[method:Boolean validate]()</h3>
+		<p>
+			트랙의 최소 유효성 검사를 실행합니다. 유효한 트랙이면 true를 리턴합니다.
+		</p>
+
+		<p>
+			이 메서드는 트랙이 비었거나, [page:.valueSize value size] 값이 부적절하거나,
+			[page:.times times] 혹은 [page:.values values] 배열의 값이 부적절하거나, *times* 배열의 순서가 어긋나면 에러 로그를 콘솔에 출력합니다.
+		</p>
+
+		<h2>정적 메서드</h2>
+
+		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
+		<p>
+		트랙을 JSON으로 변환합니다.
+		</p>
+
+
+		<h2>소스코드</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

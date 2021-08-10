@@ -1,18 +1,17 @@
 import { EllipseCurve } from './EllipseCurve.js';
 
+class ArcCurve extends EllipseCurve {
 
-function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+	constructor( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
-	EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+		super( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
-	this.type = 'ArcCurve';
+		this.type = 'ArcCurve';
+
+	}
 
 }
 
-ArcCurve.prototype = Object.create( EllipseCurve.prototype );
-ArcCurve.prototype.constructor = ArcCurve;
-
 ArcCurve.prototype.isArcCurve = true;
-
 
 export { ArcCurve };

@@ -1,22 +1,24 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author szimek / https://github.com/szimek/
- */
+let _canvas;
 
-var _canvas;
+class ImageUtils {
 
-var ImageUtils = {
+	static getDataURL( image ) {
 
-	getDataURL: function ( image ) {
+		if ( /^data:/i.test( image.src ) ) {
 
-		var canvas;
+			return image.src;
+
+		}
 
 		if ( typeof HTMLCanvasElement == 'undefined' ) {
 
 			return image.src;
 
-		} else if ( image instanceof HTMLCanvasElement ) {
+		}
+
+		let canvas;
+
+		if ( image instanceof HTMLCanvasElement ) {
 
 			canvas = image;
 
@@ -27,7 +29,7 @@ var ImageUtils = {
 			_canvas.width = image.width;
 			_canvas.height = image.height;
 
-			var context = _canvas.getContext( '2d' );
+			const context = _canvas.getContext( '2d' );
 
 			if ( image instanceof ImageData ) {
 
@@ -45,6 +47,8 @@ var ImageUtils = {
 
 		if ( canvas.width > 2048 || canvas.height > 2048 ) {
 
+			console.warn( 'THREE.ImageUtils.getDataURL: Image converted to jpg for performance reasons', image );
+
 			return canvas.toDataURL( 'image/jpeg', 0.6 );
 
 		} else {
@@ -55,6 +59,6 @@ var ImageUtils = {
 
 	}
 
-};
+}
 
 export { ImageUtils };

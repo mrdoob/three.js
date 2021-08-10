@@ -1,38 +1,25 @@
 import { Path } from './Path.js';
-import { _Math } from '../../math/Math.js';
+import * as MathUtils from '../../math/MathUtils.js';
 
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * Defines a 2d shape plane using paths.
- **/
+class Shape extends Path {
 
-// STEP 1 Create a path.
-// STEP 2 Turn path into shape.
-// STEP 3 ExtrudeGeometry takes in Shape/Shapes
-// STEP 3a - Extract points from each shape, turn to vertices
-// STEP 3b - Triangulate each shape, add faces.
+	constructor( points ) {
 
-function Shape( points ) {
+		super( points );
 
-	Path.call( this, points );
+		this.uuid = MathUtils.generateUUID();
 
-	this.uuid = _Math.generateUUID();
+		this.type = 'Shape';
 
-	this.type = 'Shape';
+		this.holes = [];
 
-	this.holes = [];
+	}
 
-}
+	getPointsHoles( divisions ) {
 
-Shape.prototype = Object.assign( Object.create( Path.prototype ), {
+		const holesPts = [];
 
-	constructor: Shape,
-
-	getPointsHoles: function ( divisions ) {
-
-		var holesPts = [];
-
-		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = this.holes.length; i < l; i ++ ) {
 
 			holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
@@ -40,11 +27,11 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		return holesPts;
 
-	},
+	}
 
 	// get points of shape and holes (keypoints based on segments parameter)
 
-	extractPoints: function ( divisions ) {
+	extractPoints( divisions ) {
 
 		return {
 
@@ -53,17 +40,17 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		};
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
-		Path.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.holes = [];
 
-		for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = source.holes.length; i < l; i ++ ) {
 
-			var hole = source.holes[ i ];
+			const hole = source.holes[ i ];
 
 			this.holes.push( hole.clone() );
 
@@ -71,36 +58,36 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var data = Path.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		data.uuid = this.uuid;
 		data.holes = [];
 
-		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = this.holes.length; i < l; i ++ ) {
 
-			var hole = this.holes[ i ];
+			const hole = this.holes[ i ];
 			data.holes.push( hole.toJSON() );
 
 		}
 
 		return data;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Path.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.uuid = json.uuid;
 		this.holes = [];
 
-		for ( var i = 0, l = json.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = json.holes.length; i < l; i ++ ) {
 
-			var hole = json.holes[ i ];
+			const hole = json.holes[ i ];
 			this.holes.push( new Path().fromJSON( hole ) );
 
 		}
@@ -109,7 +96,7 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { Shape };

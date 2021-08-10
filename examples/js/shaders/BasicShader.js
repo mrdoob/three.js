@@ -1,31 +1,30 @@
-/**
- * @author mrdoob / http://www.mrdoob.com
- *
+( function () {
+
+	/**
  * Simple test shader
  */
+	const BasicShader = {
+		uniforms: {},
+		vertexShader:
+  /* glsl */
+  `
 
-THREE.BasicShader = {
+		void main() {
 
-	uniforms: {},
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	vertexShader: [
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-		"void main() {",
+		void main() {
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );
 
-		"}"
+		}`
+	};
 
-	].join( "\n" ),
+	THREE.BasicShader = BasicShader;
 
-	fragmentShader: [
-
-		"void main() {",
-
-			"gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );",
-
-		"}"
-
-	].join( "\n" )
-
-};
+} )();

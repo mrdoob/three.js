@@ -22,76 +22,62 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - keyframes<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - keyframes<br/>
 			Model: <a href="https://www.artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by
 			<a href="https://www.artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-			var scene, camera, pointLight, stats;
-			var renderer, mixer, controls;
+			let mixer;
 
-			var clock = new THREE.Clock();
-			var container = document.getElementById( 'container' );
+			const clock = new THREE.Clock();
+			const container = document.getElementById( 'container' );
 
-			stats = new Stats();
+			const stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.gammaOutput = true;
-			renderer.gammaFactor = 2.2;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			container.appendChild( renderer.domElement );
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xbfe3dd );
+			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xbfe3dd );
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
 
-			controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
+			controls.update();
 			controls.enablePan = false;
+			controls.enableDamping = true;
 
-			scene.add( new THREE.AmbientLight( 0x404040 ) );
+			const dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
-			pointLight = new THREE.PointLight( 0xffffff, 1 );
-			pointLight.position.copy( camera.position );
-			scene.add( pointLight );
-
-			// envmap
-			var path = 'textures/cube/Park2/';
-			var format = '.jpg';
-			var envMap = new THREE.CubeTextureLoader().load( [
-				path + 'posx' + format, path + 'negx' + format,
-				path + 'posy' + format, path + 'negy' + format,
-				path + 'posz' + format, path + 'negz' + format
-			] );
-
-			DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
-
-			var loader = new GLTFLoader();
-			loader.setDRACOLoader( new DRACOLoader() );
+			const loader = new GLTFLoader();
+			loader.setDRACOLoader( dracoLoader );
 			loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
 
-				var model = gltf.scene;
+				const model = gltf.scene;
 				model.position.set( 1, 1, 0 );
 				model.scale.set( 0.01, 0.01, 0.01 );
-				model.traverse( function ( child ) {
-
-					if ( child.isMesh ) child.material.envMap = envMap;
-
-				} );
-
 				scene.add( model );
 
 				mixer = new THREE.AnimationMixer( model );
@@ -120,9 +106,11 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
+
 				mixer.update( delta );
-				controls.update( delta );
+
+				controls.update();
 
 				stats.update();
 

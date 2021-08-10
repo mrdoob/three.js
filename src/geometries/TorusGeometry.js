@@ -1,142 +1,109 @@
-/**
- * @author oosmoxiecode
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// TorusGeometry
+class TorusGeometry extends BufferGeometry {
 
-function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
-	Geometry.call( this );
+		super();
+		this.type = 'TorusGeometry';
 
-	this.type = 'TorusGeometry';
+		this.parameters = {
+			radius: radius,
+			tube: tube,
+			radialSegments: radialSegments,
+			tubularSegments: tubularSegments,
+			arc: arc
+		};
 
-	this.parameters = {
-		radius: radius,
-		tube: tube,
-		radialSegments: radialSegments,
-		tubularSegments: tubularSegments,
-		arc: arc
-	};
+		radialSegments = Math.floor( radialSegments );
+		tubularSegments = Math.floor( tubularSegments );
 
-	this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
-	this.mergeVertices();
+		// buffers
 
-}
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
-TorusGeometry.prototype = Object.create( Geometry.prototype );
-TorusGeometry.prototype.constructor = TorusGeometry;
+		// helper variables
 
-// TorusBufferGeometry
+		const center = new Vector3();
+		const vertex = new Vector3();
+		const normal = new Vector3();
 
-function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
+		// generate vertices, normals and uvs
 
-	BufferGeometry.call( this );
+		for ( let j = 0; j <= radialSegments; j ++ ) {
 
-	this.type = 'TorusBufferGeometry';
+			for ( let i = 0; i <= tubularSegments; i ++ ) {
 
-	this.parameters = {
-		radius: radius,
-		tube: tube,
-		radialSegments: radialSegments,
-		tubularSegments: tubularSegments,
-		arc: arc
-	};
+				const u = i / tubularSegments * arc;
+				const v = j / radialSegments * Math.PI * 2;
 
-	radius = radius || 1;
-	tube = tube || 0.4;
-	radialSegments = Math.floor( radialSegments ) || 8;
-	tubularSegments = Math.floor( tubularSegments ) || 6;
-	arc = arc || Math.PI * 2;
+				// vertex
 
-	// buffers
+				vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
+				vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
+				vertex.z = tube * Math.sin( v );
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-	// helper variables
+				// normal
 
-	var center = new Vector3();
-	var vertex = new Vector3();
-	var normal = new Vector3();
+				center.x = radius * Math.cos( u );
+				center.y = radius * Math.sin( u );
+				normal.subVectors( vertex, center ).normalize();
 
-	var j, i;
+				normals.push( normal.x, normal.y, normal.z );
 
-	// generate vertices, normals and uvs
+				// uv
 
-	for ( j = 0; j <= radialSegments; j ++ ) {
+				uvs.push( i / tubularSegments );
+				uvs.push( j / radialSegments );
 
-		for ( i = 0; i <= tubularSegments; i ++ ) {
-
-			var u = i / tubularSegments * arc;
-			var v = j / radialSegments * Math.PI * 2;
-
-			// vertex
-
-			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
-			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
-			vertex.z = tube * Math.sin( v );
-
-			vertices.push( vertex.x, vertex.y, vertex.z );
-
-			// normal
-
-			center.x = radius * Math.cos( u );
-			center.y = radius * Math.sin( u );
-			normal.subVectors( vertex, center ).normalize();
-
-			normals.push( normal.x, normal.y, normal.z );
-
-			// uv
-
-			uvs.push( i / tubularSegments );
-			uvs.push( j / radialSegments );
+			}
 
 		}
 
-	}
+		// generate indices
 
-	// generate indices
+		for ( let j = 1; j <= radialSegments; j ++ ) {
 
-	for ( j = 1; j <= radialSegments; j ++ ) {
+			for ( let i = 1; i <= tubularSegments; i ++ ) {
 
-		for ( i = 1; i <= tubularSegments; i ++ ) {
+				// indices
 
-			// indices
+				const a = ( tubularSegments + 1 ) * j + i - 1;
+				const b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+				const c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+				const d = ( tubularSegments + 1 ) * j + i;
 
-			var a = ( tubularSegments + 1 ) * j + i - 1;
-			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
-			var d = ( tubularSegments + 1 ) * j + i;
+				// faces
 
-			// faces
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
-			indices.push( a, b, d );
-			indices.push( b, c, d );
+			}
 
 		}
 
+		// build geometry
+
+		this.setIndex( indices );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
 	}
 
-	// build geometry
+	static fromJSON( data ) {
 
-	this.setIndex( indices );
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
+
+	}
 
 }
 
-TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
-
-
-export { TorusGeometry, TorusBufferGeometry };
+export { TorusGeometry, TorusGeometry as TorusBufferGeometry };

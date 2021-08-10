@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLightHelper';

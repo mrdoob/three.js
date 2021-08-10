@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { ShaderChunk } from '../../../../../src/renderers/shaders/ShaderChunk';
