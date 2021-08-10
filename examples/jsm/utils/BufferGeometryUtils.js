@@ -166,7 +166,7 @@ function mergeBufferGeometries( geometries, useGroups = false ) {
 
 	for ( const name in attributes ) {
 
-		const mergedAttribute = this.mergeBufferAttributes( attributes[ name ] );
+		const mergedAttribute = mergeBufferAttributes( attributes[ name ] );
 
 		if ( ! mergedAttribute ) {
 
@@ -200,7 +200,7 @@ function mergeBufferGeometries( geometries, useGroups = false ) {
 
 			}
 
-			const mergedMorphAttribute = this.mergeBufferAttributes( morphAttributesToMerge );
+			const mergedMorphAttribute = mergeBufferAttributes( morphAttributesToMerge );
 
 			if ( ! mergedMorphAttribute ) {
 
