@@ -327,6 +327,15 @@ h1 a {
 			color: var(--color-blue);
 		}
 
+		#panel #content li a {
+			display: block;
+			padding-left: 1em;
+		}
+
+		#panel #content li a:first-of-type {
+			padding: 0;
+		}
+
 		#panel #content .selected {
 			text-decoration: underline;
 		}

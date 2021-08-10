@@ -64,7 +64,7 @@
 
 		async function init() {
 
-			const list = await ( await fetch( 'list.json' ) ).json();
+			const list = await ( await fetch( 'docs.json' ) ).json();
 
 			// *BufferGeometry to *Geometry
 
@@ -269,7 +269,8 @@
 
 						// Create page links
 
-						const pageURL = pages[ pageName ].url;
+						const page = pages[ pageName ];
+						const pageURL = page.url;
 
 						// Localisation
 
@@ -279,13 +280,39 @@
 						const linkElement = createLink( pageName, pageURL );
 						listElement.appendChild( linkElement );
 
+						// Searchable properties and methods
+
+						const searchable = [];
+
+						page.properties?.forEach( name => {
+
+							const linkElement = createLink( `.${name}`, `${pageURL}/.${name}` );
+							linkElement.classList.add( 'hidden' );
+							listElement.appendChild( linkElement );
+		
+
+							searchable.push( { name, linkElement } );
+		
+						} );
+
+						page.methods?.forEach( name => {
+
+							const linkElement = createLink( `.${name}()`, `${pageURL}/.${name}` );
+							linkElement.classList.add( 'hidden' );
+							listElement.appendChild( linkElement );
+
+							searchable.push( { name, linkElement } );
+		
+						} );
+
 						// Gather the main properties for the current subpage
 
 						pageProperties[ pageName ] = {
 							section: section,
 							category: category,
+							linkElement: linkElement,
 							pageURL: pageURL,
-							linkElement: linkElement
+							searchable: searchable,
 						};
 
 						// Gather the document titles (used for easy access on browser navigation)
@@ -333,6 +360,40 @@
 
 		}
 
+		function removeBold( element ) {
+
+			element.innerHTML = element.innerHTML.replace( /\<\/?b\>/g, '' );
+
+		}
+
+		function boldMatching( regExp, text, element ) {
+
+			const filterResults = text.match( regExp );
+
+			if ( filterResults?.length ) {
+
+				// Accentuate matching characters
+
+				for ( let i = 0; i < filterResults.length; i ++ ) {
+
+					const result = filterResults[ i ];
+
+					if ( result !== '' ) {
+
+						text = text.replace( result, '<b>' + result + '</b>' );
+		
+					}
+
+				}
+
+				element.innerHTML = text;
+
+			}
+
+			return filterResults?.filter( result => result !== '' ).length;
+
+		}
+
 		function updateFilter() {
 
 			let v = filterInput.value.trim();
@@ -346,45 +407,72 @@
 
 				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
 
+				for ( const pageName in pageProperties ) {
+
+					const linkElement = pageProperties[ pageName ].linkElement;
+					removeBold( linkElement );
+
+					const categoryClassList = linkElement.parentElement.classList;
+					categoryClassList.remove( 'hidden' );
+
+					const children = pageProperties[ pageName ].children;
+					children?.forEach( ( { linkElement } ) => {
+
+						removeBold( linkElement );
+						linkElement.classList.add( 'hidden' );
+		
+					} );
+		
+				}
+
+				return displayFilteredPanel();
+
 			}
 
 			//
 
 			const regExp = new RegExp( filterInput.value, 'gi' );
 
-			for ( let pageName in pageProperties ) {
+			for ( const pageName in pageProperties ) {
 
 				const linkElement = pageProperties[ pageName ].linkElement;
 				const categoryClassList = linkElement.parentElement.classList;
-				const filterResults = pageName.match( regExp );
 
-				if ( filterResults && filterResults.length > 0 ) {
-
-					// Accentuate matching characters
-
-					for ( let i = 0; i < filterResults.length; i ++ ) {
-
-						const result = filterResults[ i ];
-
-						if ( result !== '' ) {
-
-							pageName = pageName.replace( result, '<b>' + result + '</b>' );
-
-						}
-
-					}
+				// Highlight matches in base class
+				const parentMatches = boldMatching( regExp, pageName, linkElement );
+				if ( parentMatches ) {
 
 					categoryClassList.remove( 'hidden' );
-					linkElement.innerHTML = pageName;
-
-				} else {
-
-					// Hide all non-matching page names
-
-					categoryClassList.add( 'hidden' );
-
+		
 				}
 
+				// Show and highlight matching children
+				const children = pageProperties[ pageName ].searchable;
+				const childMatches = children.filter( ( { name, linkElement } ) => {
+
+					const matches = boldMatching( regExp, name, linkElement );
+
+					if ( matches ) {
+
+						linkElement.classList.remove( 'hidden' );
+		
+					} else {
+
+						linkElement.classList.add( 'hidden' );
+		
+					}
+
+					return matches;
+		
+				} );
+
+				// Hide category if no matches in children and base class
+				if ( ! parentMatches && ! childMatches?.length ) {
+
+					categoryClassList.add( 'hidden' );
+		
+				}
+		
 			}
 
 			displayFilteredPanel();
