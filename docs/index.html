@@ -369,40 +369,6 @@
 
 		}
 
-		function removeBold( element ) {
-
-			element.innerHTML = element.innerHTML.replace( /\<\/?b\>/g, '' );
-
-		}
-
-		function boldMatching( regExp, text, element ) {
-
-			const filterResults = text.match( regExp );
-
-			if ( filterResults?.length ) {
-
-				// Accentuate matching characters
-
-				for ( let i = 0; i < filterResults.length; i ++ ) {
-
-					const result = filterResults[ i ];
-
-					if ( result !== '' ) {
-
-						text = text.replace( result, '<b>' + result + '</b>' );
-
-					}
-
-				}
-
-				element.innerHTML = text;
-
-			}
-
-			return filterResults?.filter( result => result !== '' ).length;
-
-		}
-
 		function updateFilter() {
 
 			let v = filterInput.value.trim();
@@ -416,26 +382,6 @@
 
 				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
 
-				for ( const pageName in pageProperties ) {
-
-					const linkElement = pageProperties[ pageName ].linkElement;
-					removeBold( linkElement );
-
-					const categoryClassList = linkElement.parentElement.classList;
-					categoryClassList.remove( 'hidden' );
-
-					const children = pageProperties[ pageName ].children;
-					children?.forEach( ( { linkElement } ) => {
-
-						removeBold( linkElement );
-						linkElement.classList.add( 'hidden' );
-
-					} );
-
-				}
-
-				return displayFilteredPanel();
-
 			}
 
 			//
@@ -448,22 +394,24 @@
 				const categoryClassList = linkElement.parentElement.classList;
 
 				// Highlight matches in base class
-				const parentMatches = boldMatching( regExp, pageName, linkElement );
-				if ( parentMatches ) {
+				const parentMatches = pageName.match( regExp );
+				if ( parentMatches?.length ) {
 
 					categoryClassList.remove( 'hidden' );
+					linkElement.innerHTML = pageName.replaceAll( regExp, '<b>$&</b>' );
 
 				}
 
 				// Show and highlight matching children
 				const children = pageProperties[ pageName ].searchable;
-				const childMatches = children.filter( ( { name, linkElement } ) => {
+				const childMatches = children?.filter( ( { name, linkElement } ) => {
 
-					const matches = boldMatching( regExp, name, linkElement );
+					const matches = name.match( regExp );
 
-					if ( matches ) {
+					if ( matches?.length ) {
 
 						linkElement.classList.remove( 'hidden' );
+						linkElement.innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
 
 					} else {
 
@@ -476,7 +424,7 @@
 				} );
 
 				// Hide category if no matches in children and base class
-				if ( ! parentMatches && ! childMatches?.length ) {
+				if ( ! parentMatches?.length && ! childMatches?.length ) {
 
 					categoryClassList.add( 'hidden' );
 
