@@ -179,6 +179,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getWebGLLayer = function() {
+
+			return glProjLayer || glBaseLayer;
+
+		};
+
 		this.setSession = async function ( value ) {
 
 			session = value;
@@ -269,8 +275,6 @@ class WebXRManager extends EventDispatcher {
 				scope.isPresenting = true;
 
 				scope.dispatchEvent( { type: 'sessionstart' } );
-
-				return glProjLayer || glBaseLayer;
 
 			}
 
