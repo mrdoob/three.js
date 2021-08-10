@@ -2707,7 +2707,7 @@
 
 		}
 
-		getMaterialType( ) {
+		getMaterialType() {
 
 			return THREE.MeshStandardMaterial;
 

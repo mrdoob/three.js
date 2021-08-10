@@ -220,8 +220,7 @@
 					const scanline_width = w;
 
 					if ( // run length encoding is not allowed so read flat
-						scanline_width < 8 || scanline_width > 0x7fff || // this file is not run length encoded
-      2 !== buffer[ 0 ] || 2 !== buffer[ 1 ] || buffer[ 2 ] & 0x80 ) {
+						scanline_width < 8 || scanline_width > 0x7fff || 2 !== buffer[ 0 ] || 2 !== buffer[ 1 ] || buffer[ 2 ] & 0x80 ) {
 
 						// return the flat buffer
 						return new Uint8Array( buffer );

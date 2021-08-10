@@ -361,6 +361,18 @@
 
 	}
 
+	function isPartType( type ) {
+
+		return type === 'Part';
+
+	}
+
+	function isModelType( type ) {
+
+		return type === 'Model' || type === 'Unofficial_Model';
+
+	}
+
 	function isPrimitiveType( type ) {
 
 		return /primitive/i.test( type ) || type === 'Subpart';
@@ -442,6 +454,116 @@
 		getLineNumberString() {
 
 			return this.lineNumber >= 0 ? ' at line ' + this.lineNumber : '';
+
+		}
+
+	}
+
+	class LDrawFileCache {
+
+		constructor( loader ) {
+
+			this.cache = {};
+			this.loader = loader;
+
+		}
+
+		setData( key, contents ) {
+
+			this.cache[ key.toLowerCase() ] = contents;
+
+		}
+
+		async loadData( fileName ) {
+
+			const key = fileName.toLowerCase();
+
+			if ( key in this.cache ) {
+
+				return this.cache[ key ];
+
+			}
+
+			this.cache[ fileName ] = new Promise( async ( resolve, reject ) => {
+
+				let triedLowerCase = false;
+				let locationState = FILE_LOCATION_AS_IS;
+
+				while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
+
+					let subobjectURL = fileName;
+
+					switch ( locationState ) {
+
+						case FILE_LOCATION_AS_IS:
+							locationState = locationState + 1;
+							break;
+
+						case FILE_LOCATION_TRY_PARTS:
+							subobjectURL = 'parts/' + subobjectURL;
+							locationState = locationState + 1;
+							break;
+
+						case FILE_LOCATION_TRY_P:
+							subobjectURL = 'p/' + subobjectURL;
+							locationState = locationState + 1;
+							break;
+
+						case FILE_LOCATION_TRY_MODELS:
+							subobjectURL = 'models/' + subobjectURL;
+							locationState = locationState + 1;
+							break;
+
+						case FILE_LOCATION_TRY_RELATIVE:
+							subobjectURL = fileName.substring( 0, fileName.lastIndexOf( '/' ) + 1 ) + subobjectURL;
+							locationState = locationState + 1;
+							break;
+
+						case FILE_LOCATION_TRY_ABSOLUTE:
+							if ( triedLowerCase ) {
+
+								// Try absolute path
+								locationState = FILE_LOCATION_NOT_FOUND;
+
+							} else {
+
+								// Next attempt is lower case
+								fileName = fileName.toLowerCase();
+								subobjectURL = fileName;
+								triedLowerCase = true;
+								locationState = FILE_LOCATION_AS_IS;
+
+							}
+
+							break;
+
+					}
+
+					const loader = this.loader;
+					const fileLoader = new THREE.FileLoader( loader.manager );
+					fileLoader.setPath( loader.partsLibraryPath );
+					fileLoader.setRequestHeader( loader.requestHeader );
+					fileLoader.setWithCredentials( loader.withCredentials );
+
+					try {
+
+						const text = await fileLoader.loadAsync( subobjectURL );
+						this.setData( fileName, text );
+						resolve( text );
+						return;
+
+					} catch {
+
+						continue;
+
+					}
+
+				}
+
+				reject();
+
+			} );
+			return this.cache[ fileName ];
 
 		}
 
@@ -652,19 +774,15 @@
 
 		constructor( manager ) {
 
-			super( manager ); // This is a stack of 'parse scopes' with one level per subobject loaded file.
-			// Each level contains a material lib and also other runtime variables passed between parent and child subobjects
-			// When searching for a material code, the stack is read from top of the stack to bottom
-			// Each material library is an object map keyed by colour codes.
-
-			this.parseScopesStack = null; // Array of THREE.Material
+			super( manager ); // Array of THREE.Material
 
 			this.materials = []; // Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 			// This also allows to handle the embedded text files ("0 FILE" lines)
 
-			this.subobjectCache = {}; // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
+			this.cache = new LDrawFileCache( this ); // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 
-			this.fileMap = null; // Add default main triangle and line edge materials (used in piecess that can be coloured with a main color)
+			this.fileMap = null;
+			this.rootParseScope = this.newParseScopeLevel(); // Add default main triangle and line edge materials (used in pieces that can be coloured with a main color)
 
 			this.setMaterials( [ this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true, each subobject will be a Object.
 			// If not (the default), only one object which contains all the merged primitives will be created.
@@ -721,14 +839,17 @@
 
 			}
 
-			const scope = this;
 			const fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path );
 			fileLoader.setRequestHeader( this.requestHeader );
 			fileLoader.setWithCredentials( this.withCredentials );
-			fileLoader.load( url, function ( text ) {
+			fileLoader.load( url, text => {
 
-				scope.processObject( text, onLoad, null, url );
+				this.processObject( text, null, url, this.rootParseScope ).then( function ( result ) {
+
+					onLoad( result.groupObject );
+
+				} );
 
 			}, onProgress, onError );
 
@@ -737,16 +858,19 @@
 		parse( text, path, onLoad ) {
 
 			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
-			this.processObject( text, onLoad, null, path );
+			this.processObject( text, null, path, this.rootParseScope ).then( function ( result ) {
+
+				onLoad( result.groupObject );
+
+			} );
 
 		}
 
 		setMaterials( materials ) {
 
 			// Clears parse scopes stack, adds new scope with material library
-			this.parseScopesStack = [];
-			this.newParseScopeLevel( materials );
-			this.getCurrentParseScope().isFromParse = false;
+			this.rootParseScope = this.newParseScopeLevel( materials );
+			this.rootParseScope.isFromParse = false;
 			this.materials = materials;
 			return this;
 
@@ -759,7 +883,7 @@
 
 		}
 
-		newParseScopeLevel( materials ) {
+		newParseScopeLevel( materials = null, parentScope = null ) {
 
 			// Adds a new scope level, assign materials to it and returns it
 			const matLib = {};
@@ -775,8 +899,8 @@
 
 			}
 
-			const topParseScope = this.getCurrentParseScope();
 			const newParseScope = {
+				parentScope: parentScope,
 				lib: matLib,
 				url: null,
 				// Subobjects
@@ -788,8 +912,8 @@
 				keywords: null,
 				// Current subobject
 				currentFileName: null,
-				mainColourCode: topParseScope ? topParseScope.mainColourCode : '16',
-				mainEdgeColourCode: topParseScope ? topParseScope.mainEdgeColourCode : '24',
+				mainColourCode: parentScope ? parentScope.mainColourCode : '16',
+				mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
 				currentMatrix: new THREE.Matrix4(),
 				matrix: new THREE.Matrix4(),
 				// If false, it is a root material scope previous to parse
@@ -801,22 +925,14 @@
 				// If true, this object is the start of a construction step
 				startingConstructionStep: false
 			};
-			this.parseScopesStack.push( newParseScope );
 			return newParseScope;
 
 		}
 
-		removeScopeLevel() {
-
-			this.parseScopesStack.pop();
-			return this;
-
-		}
-
-		addMaterial( material ) {
+		addMaterial( material, parseScope ) {
 
 			// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
-			const matLib = this.getCurrentParseScope().lib;
+			const matLib = parseScope.lib;
 
 			if ( ! matLib[ material.userData.code ] ) {
 
@@ -829,7 +945,7 @@
 
 		}
 
-		getMaterial( colourCode ) {
+		getMaterial( colourCode, parseScope = this.rootParseScope ) {
 
 			// Given a colour code search its material in the parse scopes stack
 			if ( colourCode.startsWith( '0x2' ) ) {
@@ -840,13 +956,17 @@
 
 			}
 
-			for ( let i = this.parseScopesStack.length - 1; i >= 0; i -- ) {
+			while ( parseScope ) {
 
-				const material = this.parseScopesStack[ i ].lib[ colourCode ];
+				const material = parseScope.lib[ colourCode ];
 
 				if ( material ) {
 
 					return material;
+
+				} else {
+
+					parseScope = parseScope.parentScope;
 
 				}
 
@@ -857,33 +977,9 @@
 
 		}
 
-		getParentParseScope() {
-
-			if ( this.parseScopesStack.length > 1 ) {
-
-				return this.parseScopesStack[ this.parseScopesStack.length - 2 ];
-
-			}
-
-			return null;
-
-		}
-
-		getCurrentParseScope() {
-
-			if ( this.parseScopesStack.length > 0 ) {
-
-				return this.parseScopesStack[ this.parseScopesStack.length - 1 ];
-
-			}
-
-			return null;
-
-		}
-
 		parseColourMetaDirective( lineParser ) {
 
-			// Parses a colour definition and returns a THREE.Material or null if error
+			// Parses a colour definition and returns a THREE.Material
 			let code = null; // Triangle and line colours
 
 			let colour = 0xFF00FF;
@@ -1142,14 +1238,14 @@
 		} //
 
 
-		objectParse( text ) {
+		objectParse( text, parseScope ) {
 
 			// Retrieve data from the parent parse scope
-			const parentParseScope = this.getParentParseScope(); // Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
+			const currentParseScope = parseScope;
+			const parentParseScope = currentParseScope.parentScope; // Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
 
-			const mainColourCode = parentParseScope.mainColourCode;
-			const mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
-			const currentParseScope = this.getCurrentParseScope(); // Parse result variables
+			const mainColourCode = currentParseScope.mainColourCode;
+			const mainEdgeColourCode = currentParseScope.mainEdgeColourCode; // Parse result variables
 
 			let faces;
 			let lineSegments;
@@ -1195,7 +1291,7 @@
 
 				}
 
-				const material = scope.getMaterial( colourCode );
+				const material = scope.getMaterial( colourCode, currentParseScope );
 
 				if ( ! material ) {
 
@@ -1232,7 +1328,7 @@
 					if ( line.startsWith( '0 FILE ' ) ) {
 
 						// Save previous embedded file in the cache
-						this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText; // New embedded text file
+						this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText ); // New embedded text file
 
 						currentEmbeddedFileName = line.substring( 7 );
 						currentEmbeddedText = '';
@@ -1310,7 +1406,7 @@
 
 									if ( material ) {
 
-										this.addMaterial( material );
+										this.addMaterial( material, parseScope );
 
 									} else {
 
@@ -1453,10 +1549,6 @@
 							material: material,
 							matrix: matrix,
 							fileName: fileName,
-							originalFileName: fileName,
-							locationState: FILE_LOCATION_AS_IS,
-							url: null,
-							triedLowerCase: false,
 							inverted: bfcInverted !== currentParseScope.inverted,
 							startingConstructionStep: startingConstructionStep
 						} );
@@ -1608,7 +1700,7 @@
 
 			if ( parsingEmbeddedFiles ) {
 
-				this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
+				this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
 
 			}
 
@@ -1643,12 +1735,137 @@
 
 		}
 
-		processObject( text, onProcessed, subobject, url ) {
+		finalizeObject( subobjectParseScope ) {
+
+			const parentParseScope = subobjectParseScope.parentScope; // Smooth the normals if this is a part or if this is a case where the subpart
+			// is added directly into the parent model (meaning it will never get smoothed by
+			// being added to a part)
+
+			const doSmooth = isPartType( subobjectParseScope.type ) || ! isPartType( subobjectParseScope.type ) && ! isModelType( subobjectParseScope.type ) && isModelType( subobjectParseScope.parentScope.type );
+
+			if ( this.smoothNormals && doSmooth ) {
+
+				smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
+
+			}
+
+			const isRoot = ! parentParseScope.isFromParse;
+
+			if ( this.separateObjects && ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
+
+				const objGroup = subobjectParseScope.groupObject;
+
+				if ( subobjectParseScope.faces.length > 0 ) {
+
+					objGroup.add( createObject( subobjectParseScope.faces, 3, false, subobjectParseScope.totalFaces ) );
+
+				}
+
+				if ( subobjectParseScope.lineSegments.length > 0 ) {
+
+					objGroup.add( createObject( subobjectParseScope.lineSegments, 2 ) );
+
+				}
+
+				if ( subobjectParseScope.conditionalSegments.length > 0 ) {
+
+					objGroup.add( createObject( subobjectParseScope.conditionalSegments, 2, true ) );
+
+				}
+
+				if ( parentParseScope.groupObject ) {
+
+					objGroup.name = subobjectParseScope.fileName;
+					objGroup.userData.category = subobjectParseScope.category;
+					objGroup.userData.keywords = subobjectParseScope.keywords;
+					subobjectParseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
+					parentParseScope.groupObject.add( objGroup );
+
+				}
+
+			} else {
+
+				const separateObjects = this.separateObjects;
+				const parentLineSegments = parentParseScope.lineSegments;
+				const parentConditionalSegments = parentParseScope.conditionalSegments;
+				const parentFaces = parentParseScope.faces;
+				const lineSegments = subobjectParseScope.lineSegments;
+				const conditionalSegments = subobjectParseScope.conditionalSegments;
+				const faces = subobjectParseScope.faces;
+
+				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
+
+					const ls = lineSegments[ i ];
+
+					if ( separateObjects ) {
+
+						const vertices = ls.vertices;
+						vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+						vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+
+					}
+
+					parentLineSegments.push( ls );
+
+				}
+
+				for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+
+					const os = conditionalSegments[ i ];
+
+					if ( separateObjects ) {
+
+						const vertices = os.vertices;
+						const controlPoints = os.controlPoints;
+						vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+						vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+						controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+						controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+
+					}
+
+					parentConditionalSegments.push( os );
+
+				}
+
+				for ( let i = 0, l = faces.length; i < l; i ++ ) {
+
+					const tri = faces[ i ];
+
+					if ( separateObjects ) {
+
+						const vertices = tri.vertices;
+
+						for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+
+							vertices[ i ] = vertices[ i ].clone().applyMatrix4( subobjectParseScope.matrix );
+
+						}
+
+						_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
+
+						_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
+
+						tri.faceNormal.crossVectors( _tempVec0, _tempVec1 ).normalize();
+
+					}
+
+					parentFaces.push( tri );
+
+				}
+
+				parentParseScope.totalFaces += subobjectParseScope.totalFaces;
+
+			}
+
+		}
+
+		async processObject( text, subobject, url, parentScope ) {
 
 			const scope = this;
-			const parseScope = scope.newParseScopeLevel();
+			const parseScope = this.newParseScopeLevel( null, parentScope );
 			parseScope.url = url;
-			const parentParseScope = scope.getParentParseScope(); // Set current matrix
+			const parentParseScope = parseScope.parentScope; // Set current matrix
 
 			if ( subobject ) {
 
@@ -1656,310 +1873,54 @@
 				parseScope.matrix.copy( subobject.matrix );
 				parseScope.inverted = subobject.inverted;
 				parseScope.startingConstructionStep = subobject.startingConstructionStep;
+				parseScope.mainColourCode = subobject.material.userData.code;
+				parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
+				parseScope.fileName = subobject.fileName;
 
-			} // Add to cache
-
-
-			let currentFileName = parentParseScope.currentFileName;
-
-			if ( currentFileName !== null ) {
-
-				currentFileName = parentParseScope.currentFileName.toLowerCase();
-
-			}
-
-			if ( scope.subobjectCache[ currentFileName ] === undefined ) {
-
-				scope.subobjectCache[ currentFileName ] = text;
-
-			} // Parse the object (returns a THREE.Group)
+			} // Parse the object
 
 
-			scope.objectParse( text );
-			let finishedCount = 0;
-			onSubobjectFinish();
+			this.objectParse( text, parseScope );
+			const subobjects = parseScope.subobjects;
+			const promises = [];
 
-			function onSubobjectFinish() {
+			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
-				finishedCount ++;
+				promises.push( loadSubobject( parseScope.subobjects[ i ] ) );
 
-				if ( finishedCount === parseScope.subobjects.length + 1 ) {
+			} // Kick off of the downloads in parallel but process all the subobjects
+			// in order so all the assembly instructions are correct
 
-					finalizeObject();
 
-				} else {
+			const subobjectScopes = await Promise.all( promises );
 
-					// Once the previous subobject has finished we can start processing the next one in the list.
-					// The subobject processing shares scope in processing so it's important that they be loaded serially
-					// to avoid race conditions.
-					// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
-					// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
-					// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
-					const subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
-					Promise.resolve().then( function () {
+			for ( let i = 0, l = subobjectScopes.length; i < l; i ++ ) {
 
-						loadSubobject( subobject );
+				this.finalizeObject( subobjectScopes[ i ] );
 
-					} );
-					parseScope.subobjectIndex ++;
+			} // If it is root object then finalize this object and compute construction steps
 
-				}
+
+			if ( ! parentParseScope.isFromParse ) {
+
+				this.finalizeObject( parseScope );
+				this.computeConstructionSteps( parseScope.groupObject );
 
 			}
 
-			function finalizeObject() {
-
-				if ( scope.smoothNormals && parseScope.type === 'Part' ) {
-
-					smoothNormals( parseScope.faces, parseScope.lineSegments );
-
-				}
-
-				const isRoot = ! parentParseScope.isFromParse;
-
-				if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
-
-					const objGroup = parseScope.groupObject;
-
-					if ( parseScope.faces.length > 0 ) {
-
-						objGroup.add( createObject( parseScope.faces, 3, false, parseScope.totalFaces ) );
-
-					}
-
-					if ( parseScope.lineSegments.length > 0 ) {
-
-						objGroup.add( createObject( parseScope.lineSegments, 2 ) );
-
-					}
-
-					if ( parseScope.conditionalSegments.length > 0 ) {
-
-						objGroup.add( createObject( parseScope.conditionalSegments, 2, true ) );
-
-					}
-
-					if ( parentParseScope.groupObject ) {
-
-						objGroup.name = parseScope.fileName;
-						objGroup.userData.category = parseScope.category;
-						objGroup.userData.keywords = parseScope.keywords;
-						parseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
-						parentParseScope.groupObject.add( objGroup );
-
-					}
-
-				} else {
-
-					const separateObjects = scope.separateObjects;
-					const parentLineSegments = parentParseScope.lineSegments;
-					const parentConditionalSegments = parentParseScope.conditionalSegments;
-					const parentFaces = parentParseScope.faces;
-					const lineSegments = parseScope.lineSegments;
-					const conditionalSegments = parseScope.conditionalSegments;
-					const faces = parseScope.faces;
-
-					for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
-
-						const ls = lineSegments[ i ];
-
-						if ( separateObjects ) {
-
-							const vertices = ls.vertices;
-							vertices[ 0 ].applyMatrix4( parseScope.matrix );
-							vertices[ 1 ].applyMatrix4( parseScope.matrix );
-
-						}
-
-						parentLineSegments.push( ls );
-
-					}
-
-					for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
-
-						const os = conditionalSegments[ i ];
-
-						if ( separateObjects ) {
-
-							const vertices = os.vertices;
-							const controlPoints = os.controlPoints;
-							vertices[ 0 ].applyMatrix4( parseScope.matrix );
-							vertices[ 1 ].applyMatrix4( parseScope.matrix );
-							controlPoints[ 0 ].applyMatrix4( parseScope.matrix );
-							controlPoints[ 1 ].applyMatrix4( parseScope.matrix );
-
-						}
-
-						parentConditionalSegments.push( os );
-
-					}
-
-					for ( let i = 0, l = faces.length; i < l; i ++ ) {
-
-						const tri = faces[ i ];
-
-						if ( separateObjects ) {
-
-							const vertices = tri.vertices;
-
-							for ( let i = 0, l = vertices.length; i < l; i ++ ) {
-
-								vertices[ i ] = vertices[ i ].clone().applyMatrix4( parseScope.matrix );
-
-							}
-
-							_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
-
-							_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
-
-							tri.faceNormal.crossVectors( _tempVec0, _tempVec1 ).normalize();
-
-						}
-
-						parentFaces.push( tri );
-
-					}
-
-					parentParseScope.totalFaces += parseScope.totalFaces;
-
-				}
-
-				scope.removeScopeLevel(); // If it is root object, compute construction steps
-
-				if ( ! parentParseScope.isFromParse ) {
-
-					scope.computeConstructionSteps( parseScope.groupObject );
-
-				}
-
-				if ( onProcessed ) {
-
-					onProcessed( parseScope.groupObject );
-
-				}
-
-			}
+			return parseScope;
 
 			function loadSubobject( subobject ) {
 
-				parseScope.mainColourCode = subobject.material.userData.code;
-				parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
-				parseScope.currentFileName = subobject.originalFileName; // If subobject was cached previously, use the cached one
+				return scope.cache.loadData( subobject.fileName ).then( function ( text ) {
 
-				const cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
+					return scope.processObject( text, subobject, url, parseScope );
 
-				if ( cached ) {
+				} ).catch( function () {
 
-					scope.processObject( cached, function ( subobjectGroup ) {
+					console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be found.' );
 
-						onSubobjectLoaded( subobjectGroup, subobject );
-						onSubobjectFinish();
-
-					}, subobject, url );
-					return;
-
-				} // Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
-				// Update also subobject.locationState for the next try if this load fails.
-
-
-				let subobjectURL = subobject.fileName;
-				let newLocationState = FILE_LOCATION_NOT_FOUND;
-
-				switch ( subobject.locationState ) {
-
-					case FILE_LOCATION_AS_IS:
-						newLocationState = subobject.locationState + 1;
-						break;
-
-					case FILE_LOCATION_TRY_PARTS:
-						subobjectURL = 'parts/' + subobjectURL;
-						newLocationState = subobject.locationState + 1;
-						break;
-
-					case FILE_LOCATION_TRY_P:
-						subobjectURL = 'p/' + subobjectURL;
-						newLocationState = subobject.locationState + 1;
-						break;
-
-					case FILE_LOCATION_TRY_MODELS:
-						subobjectURL = 'models/' + subobjectURL;
-						newLocationState = subobject.locationState + 1;
-						break;
-
-					case FILE_LOCATION_TRY_RELATIVE:
-						subobjectURL = url.substring( 0, url.lastIndexOf( '/' ) + 1 ) + subobjectURL;
-						newLocationState = subobject.locationState + 1;
-						break;
-
-					case FILE_LOCATION_TRY_ABSOLUTE:
-						if ( subobject.triedLowerCase ) {
-
-							// Try absolute path
-							newLocationState = FILE_LOCATION_NOT_FOUND;
-
-						} else {
-
-							// Next attempt is lower case
-							subobject.fileName = subobject.fileName.toLowerCase();
-							subobjectURL = subobject.fileName;
-							subobject.triedLowerCase = true;
-							newLocationState = FILE_LOCATION_AS_IS;
-
-						}
-
-						break;
-
-					case FILE_LOCATION_NOT_FOUND:
-						// All location possibilities have been tried, give up loading this object
-						console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
-						return;
-
-				}
-
-				subobject.locationState = newLocationState;
-				subobject.url = subobjectURL; // Load the subobject
-				// Use another file loader here so we can keep track of the subobject information
-				// and use it when processing the next model.
-
-				const fileLoader = new THREE.FileLoader( scope.manager );
-				fileLoader.setPath( scope.partsLibraryPath );
-				fileLoader.setRequestHeader( scope.requestHeader );
-				fileLoader.setWithCredentials( scope.withCredentials );
-				fileLoader.load( subobjectURL, function ( text ) {
-
-					scope.processObject( text, function ( subobjectGroup ) {
-
-						onSubobjectLoaded( subobjectGroup, subobject );
-						onSubobjectFinish();
-
-					}, subobject, url );
-
-				}, undefined, function ( err ) {
-
-					onSubobjectError( err, subobject );
-
-				}, subobject );
-
-			}
-
-			function onSubobjectLoaded( subobjectGroup, subobject ) {
-
-				if ( subobjectGroup === null ) {
-
-					// Try to reload
-					loadSubobject( subobject );
-					return;
-
-				}
-
-				scope.fileMap[ subobject.originalFileName ] = subobject.url;
-
-			}
-
-			function onSubobjectError( err, subobject ) {
-
-				// Retry download from a different default possible location
-				loadSubobject( subobject );
+				} );
 
 			}
 
