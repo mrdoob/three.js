@@ -285,12 +285,12 @@ class CameraControls extends EventDispatcher {
 
             if (scope.invertRotate) {
 
-                angleXDelta += angleX * 50 * scope.rotateSpeed;
+                angleXDelta += angleX * 100 * scope.rotateSpeed;
                 angleYDelta -= angleY * 50 * scope.rotateSpeed;
 
             } else {
 
-                angleXDelta -= angleX * 50 * scope.rotateSpeed;
+                angleXDelta -= angleX * 100 * scope.rotateSpeed;
                 angleYDelta += angleY * 50 * scope.rotateSpeed;
 
             }
@@ -450,7 +450,7 @@ class CameraControls extends EventDispatcher {
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
             // rotating across whole screen goes 360 degrees around
-            rotate(1.2 * (element.clientWidth / element.clientHeight) * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed, 1.2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed);
+            rotate(1.2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed, 1.2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed);
 
             rotateStart.copy(rotateEnd);
 
@@ -533,12 +533,12 @@ class CameraControls extends EventDispatcher {
                         break;
 
                     case scope.keys.TURNLEFT:
-                        rotate(-(element.clientWidth / element.clientHeight) * Math.PI / element.clientWidth * scope.keyRotateSpeed, 0);
+                        rotate(-Math.PI / element.clientWidth * scope.keyRotateSpeed, 0);
                         scope.update();
                         break;
 
                     case scope.keys.TURNRIGHT:
-                        rotate((element.clientWidth / element.clientHeight) * Math.PI / element.clientWidth * scope.keyRotateSpeed, 0);
+                        rotate(Math.PI / element.clientWidth * scope.keyRotateSpeed, 0);
                         scope.update();
                         break;
 
@@ -606,7 +606,7 @@ class CameraControls extends EventDispatcher {
 
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-            rotate(1.2 * (element.clientWidth / element.clientHeight) * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed, 1.2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed);
+            rotate(1.2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed, 1.2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed);
 
             rotateStart.copy(rotateEnd);
 
