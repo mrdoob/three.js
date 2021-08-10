@@ -25,22 +25,22 @@
 			this.res = res;
 			this.lightMapContainers = [];
 			this.compiled = false;
-			this.scene = new THREE.THREE.THREE.Scene();
+			this.scene = new THREE.Scene();
 			this.scene.background = null;
-			this.tinyTarget = new THREE.THREE.THREE.WebGLRenderTarget( 1, 1 );
+			this.tinyTarget = new THREE.WebGLRenderTarget( 1, 1 );
 			this.buffer1Active = false;
 			this.firstUpdate = true;
 			this.warned = false; // Create the Progressive LightMap Texture
 
-			const format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.THREE.THREE.HalfFloatType : THREE.THREE.THREE.FloatType;
-			this.progressiveLightMap1 = new THREE.THREE.THREE.WebGLRenderTarget( this.res, this.res, {
+			const format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
+			this.progressiveLightMap1 = new THREE.WebGLRenderTarget( this.res, this.res, {
 				type: format
 			} );
-			this.progressiveLightMap2 = new THREE.THREE.THREE.WebGLRenderTarget( this.res, this.res, {
+			this.progressiveLightMap2 = new THREE.WebGLRenderTarget( this.res, this.res, {
 				type: format
 			} ); // Inject some spicy new logic into a standard phong material
 
-			this.uvMat = new THREE.THREE.THREE.MeshPhongMaterial();
+			this.uvMat = new THREE.MeshPhongMaterial();
 			this.uvMat.uniforms = {};
 
 			this.uvMat.onBeforeCompile = shader => {
@@ -243,12 +243,12 @@
 
 			if ( this.labelMesh == null ) {
 
-				this.labelMaterial = new THREE.THREE.THREE.MeshBasicMaterial( {
+				this.labelMaterial = new THREE.MeshBasicMaterial( {
 					map: this.progressiveLightMap1.texture,
-					side: THREE.THREE.THREE.DoubleSide
+					side: THREE.DoubleSide
 				} );
-				this.labelPlane = new THREE.THREE.THREE.PlaneGeometry( 100, 100 );
-				this.labelMesh = new THREE.THREE.THREE.Mesh( this.labelPlane, this.labelMaterial );
+				this.labelPlane = new THREE.PlaneGeometry( 100, 100 );
+				this.labelMesh = new THREE.Mesh( this.labelPlane, this.labelMaterial );
 				this.labelMesh.position.y = 250;
 				this.lightMapContainers[ 0 ].object.parent.add( this.labelMesh );
 
@@ -272,7 +272,7 @@
 
 		_initializeBlurPlane( res, lightMap = null ) {
 
-			const blurMaterial = new THREE.THREE.THREE.MeshBasicMaterial();
+			const blurMaterial = new THREE.MeshBasicMaterial();
 			blurMaterial.uniforms = {
 				previousShadowMap: {
 					value: null
@@ -315,7 +315,7 @@
 
 			};
 
-			this.blurringPlane = new THREE.THREE.THREE.Mesh( new THREE.THREE.THREE.PlaneBufferGeometry( 1, 1 ), blurMaterial );
+			this.blurringPlane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), blurMaterial );
 			this.blurringPlane.name = 'Blurring Plane';
 			this.blurringPlane.frustumCulled = false;
 			this.blurringPlane.renderOrder = 0;
@@ -326,6 +326,6 @@
 
 	}
 
-	THREE.THREE.THREE.ProgressiveLightMap = ProgressiveLightMap;
+	THREE.ProgressiveLightMap = ProgressiveLightMap;
 
 } )();
