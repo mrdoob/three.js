@@ -280,6 +280,14 @@
 						const linkElement = createLink( pageName, pageURL );
 						listElement.appendChild( linkElement );
 
+						// select current page
+
+						if ( pageURL === selectedPage ) {
+
+							linkElement.classList.add( 'selected' );
+
+						}
+
 						// Searchable properties and methods
 
 						const searchable = [];
