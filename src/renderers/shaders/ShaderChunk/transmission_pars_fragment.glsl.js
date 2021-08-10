@@ -57,7 +57,15 @@ export default /* glsl */`
 
 		float framebufferLod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );
 
-		return texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod ).rgb;
+		#ifdef TEXTURE_LOD_EXT
+
+			return texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod ).rgb;
+
+		#else
+
+			return texture2D( transmissionSamplerMap, fragCoord.xy, framebufferLod ).rgb;
+
+		#endif
 
 	}
 
