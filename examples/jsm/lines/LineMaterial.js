@@ -18,7 +18,6 @@ import {
 	Vector2
 } from "../../../build/three.module.js";
 
-// TODO: fix clipping when
 
 UniformsLib.line = {
 
@@ -176,6 +175,7 @@ ShaderLib[ 'line' ] = {
 
 					// shift the position of the quad so it hugs the forward edge of the line
 					offset.xy -= dir * forwardOffset;
+					offset.z += 0.5;
 
 				#endif
 
