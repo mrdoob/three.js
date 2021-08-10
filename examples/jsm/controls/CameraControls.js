@@ -6,13 +6,13 @@ import {
     Vector3
 } from '../../../build/three.module.js';
 
-// This set of controls models a movie camera.
+// This set of controls performs Rotating, dollying (zooming for OrthographicCamera), and panning.
 // Pan up / down / left / right  - right mouse, or WASD keys / touch: three finger swipe
 // Dolly forward / backward  - mousewheel or WASD keys / touch: two finger spread or squish
 // Rotate  - left mouse, or arrow keys / touch: one finger move
 
 // Compared to OrbitControls:
-// 1. It can dolly forward/backward and pan left/right/up/down.
+// 1. It can dolly forward/backward (instead of dolly in/out) and pan left/right/up/down.
 // 2. Rotation is centered on the camera itself.
 
 class CameraControls extends EventDispatcher {
@@ -62,7 +62,8 @@ class CameraControls extends EventDispatcher {
 
         // Set to false to disable rotating
         this.enableRotate = true;
-        this.rotateSpeed = 0.1;
+        this.invertRotate = false;
+        this.rotateSpeed = 0.08;
 
         // Set to false to disable panning
         this.enablePan = true;
@@ -282,8 +283,18 @@ class CameraControls extends EventDispatcher {
 
         function rotate(angleX, angleY) {
 
-            angleXDelta += angleX * 50 * scope.rotateSpeed;
-            angleYDelta -= angleY * 50 * scope.rotateSpeed;
+            if (scope.invertRotate) {
+
+                angleXDelta += angleX * 50 * scope.rotateSpeed;
+                angleYDelta -= angleY * 50 * scope.rotateSpeed;
+
+            } else {
+
+                angleXDelta -= angleX * 50 * scope.rotateSpeed;
+                angleYDelta += angleY * 50 * scope.rotateSpeed;
+
+            }
+
 
         }
 
@@ -363,7 +374,7 @@ class CameraControls extends EventDispatcher {
 
         }();
 
-        function dollyIn(dollyScale) {
+        function dollyForward(dollyScale) {
 
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
@@ -386,7 +397,7 @@ class CameraControls extends EventDispatcher {
 
         }
 
-        function dollyOut(dollyScale) {
+        function dollyBackward(dollyScale) {
 
             var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
@@ -455,11 +466,11 @@ class CameraControls extends EventDispatcher {
 
             if (dollyDelta.y > 0) {
 
-                dollyIn(getZoomScale());
+                dollyForward(getZoomScale());
 
             } else if (dollyDelta.y < 0) {
 
-                dollyOut(getZoomScale());
+                dollyBackward(getZoomScale());
 
             }
 
@@ -491,11 +502,11 @@ class CameraControls extends EventDispatcher {
 
             if (event.deltaY < 0) {
 
-                dollyOut(getZoomScale());
+                dollyBackward(getZoomScale());
 
             } else if (event.deltaY > 0) {
 
-                dollyIn(getZoomScale());
+                dollyForward(getZoomScale());
 
             }
 
@@ -540,12 +551,12 @@ class CameraControls extends EventDispatcher {
                 switch (event.keyCode) {
 
                     case scope.keys.FORWARD:
-                        dollyOut(getZoomScale() * scope.keyPanSpeed);;
+                        dollyBackward(getZoomScale() * scope.keyPanSpeed);;
                         scope.update();
                         break;
 
                     case scope.keys.BACKWARD:
-                        dollyIn(getZoomScale() * scope.keyPanSpeed);;
+                        dollyForward(getZoomScale() * scope.keyPanSpeed);;
                         scope.update();
                         break;
 
@@ -616,11 +627,11 @@ class CameraControls extends EventDispatcher {
 
             if (dollyDelta.y > 0) {
 
-                dollyOut(getZoomScale());
+                dollyBackward(getZoomScale());
 
             } else if (dollyDelta.y < 0) {
 
-                dollyIn(getZoomScale());
+                dollyForward(getZoomScale());
 
             }
 
