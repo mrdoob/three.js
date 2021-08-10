@@ -28,8 +28,8 @@ function retarget( target, source, options = {} ) {
 	options.hip = options.hip !== undefined ? options.hip : 'hip';
 	options.names = options.names || {};
 
-	const sourceBones = source.isObject3D ? source.skeleton.bones : this.getBones( source ),
-		bones = target.isObject3D ? target.skeleton.bones : this.getBones( target );
+	const sourceBones = source.isObject3D ? source.skeleton.bones : getBones( source ),
+		bones = target.isObject3D ? target.skeleton.bones : getBones( target );
 
 	let bindBones,
 		bone, name, boneTo,
@@ -108,7 +108,7 @@ function retarget( target, source, options = {} ) {
 		bone = bones[ i ];
 		name = options.names[ bone.name ] || bone.name;
 
-		boneTo = this.getBoneByName( name, sourceBones );
+		boneTo = getBoneByName( name, sourceBones );
 
 		globalMatrix.copy( bone.matrixWorld );
 
@@ -207,7 +207,7 @@ function retargetClip( target, source, clip, options = {} ) {
 
 	if ( ! source.isObject3D ) {
 
-		source = this.getHelperFromSkeleton( source );
+		source = getHelperFromSkeleton( source );
 
 	}
 
@@ -215,7 +215,7 @@ function retargetClip( target, source, clip, options = {} ) {
 		delta = 1 / options.fps,
 		convertedTracks = [],
 		mixer = new AnimationMixer( source ),
-		bones = this.getBones( target.skeleton ),
+		bones = getBones( target.skeleton ),
 		boneDatas = [];
 	let positionOffset,
 		bone, boneTo, boneData,
@@ -230,13 +230,13 @@ function retargetClip( target, source, clip, options = {} ) {
 
 		const time = i * delta;
 
-		this.retarget( target, source, options );
+		retarget( target, source, options );
 
 		for ( let j = 0; j < bones.length; ++ j ) {
 
 			name = options.names[ bones[ j ].name ] || bones[ j ].name;
 
-			boneTo = this.getBoneByName( name, source.skeleton );
+			boneTo = getBoneByName( name, source.skeleton );
 
 			if ( boneTo ) {
 
@@ -350,14 +350,14 @@ function getSkeletonOffsets( target, source, options = {} ) {
 
 	if ( ! source.isObject3D ) {
 
-		source = this.getHelperFromSkeleton( source );
+		source = getHelperFromSkeleton( source );
 
 	}
 
 	const nameKeys = Object.keys( options.names ),
 		nameValues = Object.values( options.names ),
-		sourceBones = source.isObject3D ? source.skeleton.bones : this.getBones( source ),
-		bones = target.isObject3D ? target.skeleton.bones : this.getBones( target ),
+		sourceBones = source.isObject3D ? source.skeleton.bones : getBones( source ),
+		bones = target.isObject3D ? target.skeleton.bones : getBones( target ),
 		offsets = [];
 
 	let bone, boneTo,
@@ -370,12 +370,12 @@ function getSkeletonOffsets( target, source, options = {} ) {
 		bone = bones[ i ];
 		name = options.names[ bone.name ] || bone.name;
 
-		boneTo = this.getBoneByName( name, sourceBones );
+		boneTo = getBoneByName( name, sourceBones );
 
 		if ( boneTo && name !== options.hip ) {
 
-			const boneParent = this.getNearestBone( bone.parent, nameKeys ),
-				boneToParent = this.getNearestBone( boneTo.parent, nameValues );
+			const boneParent = getNearestBone( bone.parent, nameKeys ),
+				boneToParent = getNearestBone( boneTo.parent, nameValues );
 
 			boneParent.updateMatrixWorld();
 			boneToParent.updateMatrixWorld();
@@ -424,7 +424,7 @@ function getSkeletonOffsets( target, source, options = {} ) {
 
 function renameBones( skeleton, names ) {
 
-	const bones = this.getBones( skeleton );
+	const bones = getBones( skeleton );
 
 	for ( let i = 0; i < bones.length; ++ i ) {
 
@@ -450,7 +450,7 @@ function getBones( skeleton ) {
 
 function getBoneByName( name, skeleton ) {
 
-	for ( let i = 0, bones = this.getBones( skeleton ); i < bones.length; i ++ ) {
+	for ( let i = 0, bones = getBones( skeleton ); i < bones.length; i ++ ) {
 
 		if ( name === bones[ i ].name )
 
@@ -501,8 +501,8 @@ function findBoneTrackData( name, tracks ) {
 
 function getEqualsBonesNames( skeleton, targetSkeleton ) {
 
-	const sourceBones = this.getBones( skeleton ),
-		targetBones = this.getBones( targetSkeleton ),
+	const sourceBones = getBones( skeleton ),
+		targetBones = getBones( targetSkeleton ),
 		bones = [];
 
 	search : for ( let i = 0; i < sourceBones.length; i ++ ) {
