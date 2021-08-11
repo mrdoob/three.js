@@ -69,18 +69,6 @@ vec3 F_Schlick( const in vec3 f0, const in vec3 f90, const in float dotVH ) {
 
 } // validated
 
-vec3 F_Schlick_RoughnessDependent( const in vec3 F0, const in float dotNV, const in float roughness ) {
-
-	// See F_Schlick
-	float fresnel = exp2( ( -5.55473 * dotNV - 6.98316 ) * dotNV );
-
-	vec3 Fr = max( vec3( 1.0 - roughness ), F0 ) - F0;
-
-	return Fr * fresnel + F0;
-
-}
-
-
 // Microfacet Models for Refraction through Rough Surfaces - equation (34)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
@@ -282,9 +270,9 @@ void BRDF_Specular_Multiscattering_Environment( const in GeometricContext geomet
 
 	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 
-	vec3 F = F_Schlick_RoughnessDependent( specularColor, dotNV, roughness );
 	vec2 brdf = integrateSpecularBRDF( dotNV, roughness );
-	vec3 FssEss = F * brdf.x + brdf.y;
+
+	vec3 FssEss = specularColor * brdf.x + brdf.y;
 
 	float Ess = brdf.x + brdf.y;
 	float Ems = 1.0 - Ess;
