@@ -70,21 +70,21 @@ m.elements = [ 11, 21, 31, 41,
 		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
 		</p>
 
-		<h2>Extracting position, rotation and scale</h2>
+		<h2>提取位置、旋转和缩放</h2>
 		<p>
-			There are several options available for extracting position, rotation and scale from a Matrix4.
+			有多种选项可用于从 Matrix4 中提取位置、旋转和缩放。
 			<ul>
 				<li>
-					[page:Vector3.setFromMatrixPosition]: can be used to extract the translation component.
+					[page:Vector3.setFromMatrixPosition]：可用于提取位置相关的分量。
 				</li>
 				<li>
-					[page:Vector3.setFromMatrixScale]: can be used to extract the scale component.
+					[page:Vector3.setFromMatrixScale]：可用于提取缩放相关的分量。
 				</li>
 				<li>
-					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] or [page:.extractRotation extractRotation] can be used to extract the rotation component.
+					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] 或 [page:.extractRotation extractRotation]：可用于从纯(未缩放)矩阵中提取旋转相关分量。
 				</li>
 				<li>
-					[page:.decompose decompose] can be used to extract position, rotation and scale all at once.
+					[page:.decompose decompose]：可用于一次性提取位置、旋转和缩放
 				</li>
 			</ul>
 		</p>
