@@ -202,8 +202,10 @@
 
 		function createLink( pageName, pageURL ) {
 
+			const [ href, hash = '' ] = pageURL.split( /(?=\#)/ );
+
 			const link = document.createElement( 'a' );
-			link.href = pageURL + '.html';
+			link.href = `${href}.html${hash}`;
 			link.textContent = pageName;
 			link.setAttribute( 'target', 'viewer' );
 			link.addEventListener( 'click', function ( event ) {
