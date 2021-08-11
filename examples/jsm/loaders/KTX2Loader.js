@@ -355,6 +355,12 @@ KTX2Loader.BasisWorker = function () {
 
 			BasisModule.initializeBasis();
 
+			if ( BasisModule.KTX2File === undefined ) {
+
+				console.warn( 'THREE.KTX2Loader: Please update Basis Universal transcoder.' );
+
+			}
+
 		} );
 
 	}
