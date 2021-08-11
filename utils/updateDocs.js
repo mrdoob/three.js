@@ -5,7 +5,7 @@ const DOCS_PATH = path.join( process.cwd(), 'docs' );
 const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
 
 /**
- * Updates docs meta in `docs/docs.json`.
+ * Updates docs meta in `docs/files.json`.
  */
 const updateDocs = ( write ) => {
 
@@ -70,11 +70,11 @@ const updateDocs = ( write ) => {
 
 	}
 
-	// If specified, write to docs.json with Mr.doob's Code Style™
+	// If specified, write to files.json with Mr.doob's Code Style™
 	if ( write ) {
 
 		fs.writeFileSync(
-			path.join( DOCS_PATH, 'docs.json' ),
+			path.join( DOCS_PATH, 'files.json' ),
 			JSON.stringify( list, null, '\t' ).replace( /(\}\,)\n/g, '$1\n\n' )
 		);
 

@@ -184,6 +184,7 @@
 						"flattenJSON",
 						"getKeyframeOrder",
 						"isTypedArray",
+						"makeClipAdditive",
 						"sortedArray",
 						"subclip"
 					],
@@ -708,7 +709,9 @@
 
 				"InstancedBufferGeometry": {
 					"url": "api/en/core/InstancedBufferGeometry",
-					"methods": [],
+					"methods": [
+						"copy"
+					],
 					"properties": [
 						"instanceCount"
 					]
@@ -1378,6 +1381,7 @@
 				"AxesHelper": {
 					"url": "api/en/helpers/AxesHelper",
 					"methods": [
+						"setColors",
 						"dispose"
 					],
 					"properties": []
@@ -1572,6 +1576,7 @@
 					"properties": [
 						"decay",
 						"distance",
+						"intensity",
 						"power",
 						"shadow"
 					]
@@ -1582,7 +1587,10 @@
 					"methods": [
 						"copy"
 					],
-					"properties": []
+					"properties": [
+						"intensity",
+						"power"
+					]
 				},
 
 				"SpotLight": {
@@ -1596,6 +1604,7 @@
 						"castShadow",
 						"decay",
 						"distance",
+						"intensity",
 						"penumbra",
 						"position",
 						"power",
@@ -1622,6 +1631,7 @@
 						"autoUpdate",
 						"camera",
 						"bias",
+						"blurSamples",
 						"map",
 						"mapPass",
 						"mapSize",
@@ -1865,8 +1875,7 @@
 						"color",
 						"linewidth",
 						"linecap",
-						"linejoin",
-						"morphTargets"
+						"linejoin"
 					]
 				},
 
@@ -1955,7 +1964,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphTargets",
 						"reflectivity",
 						"refractionRatio",
 						"specularMap",
@@ -1977,7 +1985,6 @@
 						"displacementBias",
 						"fog",
 						"map",
-						"morphTargets",
 						"wireframe",
 						"wireframeLinewidth"
 					]
@@ -1994,7 +2001,6 @@
 						"farDistance",
 						"fog",
 						"map",
-						"morphTargets",
 						"nearDistance",
 						"referencePosition"
 					]
@@ -2016,8 +2022,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphNormals",
-						"morphTargets",
 						"reflectivity",
 						"refractionRatio",
 						"specularMap",
@@ -2042,8 +2046,6 @@
 						"flatShading",
 						"map",
 						"matcap",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale"
@@ -2061,8 +2063,6 @@
 						"displacementBias",
 						"flatShading",
 						"fog",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
@@ -2093,8 +2093,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
@@ -2154,15 +2152,12 @@
 						"map",
 						"metalness",
 						"metalnessMap",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
 						"refractionRatio",
 						"roughness",
 						"roughnessMap",
-						"vertexTangents",
 						"wireframe",
 						"wireframeLinecap",
 						"wireframeLinejoin",
@@ -2190,8 +2185,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
@@ -2209,7 +2202,6 @@
 						"alphaMap",
 						"color",
 						"map",
-						"morphTargets",
 						"size",
 						"sizeAttenuation"
 					]
@@ -2235,8 +2227,6 @@
 						"index0AttributeName",
 						"lights",
 						"linewidth",
-						"morphTargets",
-						"morphNormals",
 						"flatShading",
 						"uniforms",
 						"uniformsNeedUpdate",
@@ -3341,12 +3331,18 @@
 				"WebXRManager": {
 					"url": "api/en/renderers/webxr/WebXRManager",
 					"methods": [
+						"getCamera",
 						"getController",
 						"getControllerGrip",
+						"getHand",
+						"getReferenceSpace",
+						"getSession",
 						"setFramebufferScaleFactor",
-						"setReferenceSpaceType"
+						"setReferenceSpaceType",
+						"updateCamera"
 					],
 					"properties": [
+						"cameraAutoUpdate",
 						"enabled",
 						"isPresenting"
 					]
@@ -3633,6 +3629,7 @@
 						"dispose",
 						"getAzimuthalAngle",
 						"getPolarAngle",
+						"getDistance",
 						"listenToKeyEvents",
 						"reset",
 						"saveState",
@@ -3729,6 +3726,7 @@
 						"attach",
 						"detach",
 						"dispose",
+						"getRaycaster",
 						"getMode",
 						"setMode",
 						"setRotationSnap",
@@ -4036,16 +4034,20 @@
 					"url": "examples/en/math/Lut",
 					"methods": [
 						"copy",
+						"addColorMap",
+						"createCanvas",
+						"getColor",
+						"setColorMap",
 						"setMin",
 						"setMax",
-						"changeNumberOfColors",
-						"changeColorMap",
-						"addColorMap",
-						"getColor"
+						"updateCanvas"
 					],
 					"properties": [
+						"lut",
+						"map",
 						"minV",
-						"maxV"
+						"maxV",
+						"n"
 					]
 				},
 
@@ -4244,7 +4246,11 @@
 				},
 
 				"CameraUtils": {
-					"url": "examples/en/utils/CameraUtils"
+					"url": "examples/en/utils/CameraUtils",
+					"methods": [
+						"frameCorners"
+					],
+					"properties": []
 				},
 
 				"SceneUtils": {
@@ -4502,6 +4508,7 @@
 						"flattenJSON",
 						"getKeyframeOrder",
 						"isTypedArray",
+						"makeClipAdditive",
 						"sortedArray",
 						"subclip"
 					],
@@ -4966,9 +4973,8 @@
 						"convertArray",
 						"flattenJSON",
 						"getKeyframeOrder",
-						"insertKeyframe",
 						"isTypedArray",
-						"mergeMorphTargetTracks",
+						"makeClipAdditive",
 						"sortedArray",
 						"subclip"
 					],
@@ -5487,7 +5493,9 @@
 
 				"InstancedBufferGeometry": {
 					"url": "api/zh/core/InstancedBufferGeometry",
-					"methods": [],
+					"methods": [
+						"copy"
+					],
 					"properties": [
 						"instanceCount"
 					]
@@ -6370,6 +6378,7 @@
 						"autoUpdate",
 						"camera",
 						"bias",
+						"blurSamples",
 						"map",
 						"mapPass",
 						"mapSize",
@@ -6614,8 +6623,7 @@
 						"color",
 						"linewidth",
 						"linecap",
-						"linejoin",
-						"morphTargets"
+						"linejoin"
 					]
 				},
 
@@ -6704,7 +6712,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphTargets",
 						"reflectivity",
 						"refractionRatio",
 						"specularMap",
@@ -6726,7 +6733,6 @@
 						"displacementBias",
 						"fog",
 						"map",
-						"morphTargets",
 						"wireframe",
 						"wireframeLinewidth"
 					]
@@ -6743,7 +6749,6 @@
 						"farDistance",
 						"fog",
 						"map",
-						"morphTargets",
 						"nearDistance",
 						"referencePosition"
 					]
@@ -6765,8 +6770,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphNormals",
-						"morphTargets",
 						"reflectivity",
 						"refractionRatio",
 						"specularMap",
@@ -6791,8 +6794,6 @@
 						"flatShading",
 						"map",
 						"matcap",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale"
@@ -6810,8 +6811,6 @@
 						"displacementBias",
 						"flatShading",
 						"fog",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
@@ -6842,8 +6841,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
@@ -6903,15 +6900,12 @@
 						"map",
 						"metalness",
 						"metalnessMap",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
 						"refractionRatio",
 						"roughness",
 						"roughnessMap",
-						"vertexTangents",
 						"wireframe",
 						"wireframeLinecap",
 						"wireframeLinejoin",
@@ -6939,8 +6933,6 @@
 						"lightMap",
 						"lightMapIntensity",
 						"map",
-						"morphNormals",
-						"morphTargets",
 						"normalMap",
 						"normalMapType",
 						"normalScale",
@@ -6958,7 +6950,6 @@
 						"alphaMap",
 						"color",
 						"map",
-						"morphTargets",
 						"size",
 						"sizeAttenuation"
 					]
@@ -6984,8 +6975,6 @@
 						"index0AttributeName",
 						"lights",
 						"linewidth",
-						"morphTargets",
-						"morphNormals",
 						"flatShading",
 						"uniforms",
 						"uniformsNeedUpdate",
@@ -8082,12 +8071,18 @@
 				"WebXRManager": {
 					"url": "api/zh/renderers/webxr/WebXRManager",
 					"methods": [
+						"getCamera",
 						"getController",
 						"getControllerGrip",
+						"getHand",
+						"getReferenceSpace",
+						"getSession",
 						"setFramebufferScaleFactor",
-						"setReferenceSpaceType"
+						"setReferenceSpaceType",
+						"updateCamera"
 					],
 					"properties": [
+						"cameraAutoUpdate",
 						"enabled",
 						"isPresenting"
 					]
@@ -8374,6 +8369,7 @@
 						"dispose",
 						"getAzimuthalAngle",
 						"getPolarAngle",
+						"getDistance",
 						"listenToKeyEvents",
 						"reset",
 						"saveState",
@@ -8470,6 +8466,7 @@
 						"attach",
 						"detach",
 						"dispose",
+						"getRaycaster",
 						"getMode",
 						"setMode",
 						"setRotationSnap",
@@ -8752,16 +8749,20 @@
 					"url": "examples/zh/math/Lut",
 					"methods": [
 						"copy",
+						"addColorMap",
+						"createCanvas",
+						"getColor",
+						"setColorMap",
 						"setMin",
 						"setMax",
-						"changeNumberOfColors",
-						"changeColorMap",
-						"addColorMap",
-						"getColor"
+						"updateCanvas"
 					],
 					"properties": [
+						"lut",
+						"map",
 						"minV",
-						"maxV"
+						"maxV",
+						"n"
 					]
 				},
 
@@ -9209,6 +9210,7 @@
 						"flattenJSON",
 						"getKeyframeOrder",
 						"isTypedArray",
+						"makeClipAdditive",
 						"sortedArray",
 						"subclip"
 					],
@@ -9659,6 +9661,7 @@
 						"dispose",
 						"getAzimuthalAngle",
 						"getPolarAngle",
+						"getDistance",
 						"listenToKeyEvents",
 						"reset",
 						"saveState",
@@ -9755,6 +9758,7 @@
 						"attach",
 						"detach",
 						"dispose",
+						"getRaycaster",
 						"getMode",
 						"setMode",
 						"setRotationSnap",
