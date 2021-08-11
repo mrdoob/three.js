@@ -31,13 +31,16 @@
 				</li>
 			</ul>
 
-			摄像机[page:Camera Cameras] 有两个额外的四维矩阵:
+			摄像机[page:Camera Cameras] 有三个额外的四维矩阵:
 			<ul>
 				<li>
 					[page:Camera.matrixWorldInverse]: 视矩阵 - 摄像机世界坐标变换的逆矩阵。
 				</li>
 				<li>
 					[page:Camera.projectionMatrix]: 投影变换矩阵，表示将场景中的信息投影到裁剪空间。
+				</li>
+				<li>
+					[page:Camera.projectionMatrixInverse]: 投影变换矩阵的逆矩阵。
 				</li>
 			</ul>
 			注意：物体的正规矩阵 [page:Object3D.normalMatrix] 并不是一个4维矩阵，而是一个三维矩阵[page:Matrix3]。
