@@ -305,7 +305,7 @@
 
 						page.properties?.forEach( name => {
 
-							const linkElement = createLink( name, `${pageURL}/.${name}` );
+							const linkElement = createLink( name, `${pageURL}#${name}` );
 							linkElement.classList.add( 'property', 'hidden' );
 							listElement.appendChild( linkElement );
 
@@ -315,7 +315,7 @@
 
 						page.methods?.forEach( name => {
 
-							const linkElement = createLink( name, `${pageURL}/.${name}` );
+							const linkElement = createLink( name, `${pageURL}#${name}` );
 							linkElement.classList.add( 'method', 'hidden' );
 							listElement.appendChild( linkElement );
 
@@ -328,8 +328,8 @@
 						pageProperties[ pageName ] = {
 							section: section,
 							category: category,
-							linkElement: linkElement,
 							pageURL: pageURL,
+							linkElement: linkElement,
 							searchable: searchable,
 						};
 
