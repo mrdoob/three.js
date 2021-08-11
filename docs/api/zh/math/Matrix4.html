@@ -20,13 +20,13 @@
 			任何3D物体[page:Object3D]都有三个关联的矩阵：
 			<ul>
 				<li>
-					[page:Object3D.matrix]: 存储物体的本地变换。 这是对象相对于其父对象的变换。
+					[page:Object3D.matrix]: 存储物体的本地变换矩阵。 这是对象相对于其父对象的变换矩阵。
 				</li>
 				<li>
-					[page:Object3D.matrixWorld]: 对象的全局或世界变换。如果对象没有父对象，那么这与存储在矩阵[page:Object3D.matrix matrix]中的本地变换相同。
+					[page:Object3D.matrixWorld]: 对象的全局或世界变换矩阵。如果对象没有父对象，那么这与存储在矩阵[page:Object3D.matrix matrix]中的本地变换矩阵相同。
 				</li>
 				<li>
-					[page:Object3D.modelViewMatrix]: 表示对象相坐标相对于摄像机空间坐标转换，
+					[page:Object3D.modelViewMatrix]: 表示对象相对于摄像机坐标系的变换矩阵，
 					一个对象的 modelViewMatrix 是物体世界变换矩阵乘以摄像机相对于世界空间变换矩阵的逆矩阵。
 				</li>
 			</ul>
