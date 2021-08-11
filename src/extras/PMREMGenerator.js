@@ -353,6 +353,7 @@ class PMREMGenerator {
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
 		renderer.autoClear = originalAutoClear;
+		scene.background = background;
 
 	}
 
