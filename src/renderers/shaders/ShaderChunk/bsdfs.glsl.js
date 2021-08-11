@@ -69,30 +69,12 @@ vec3 F_Schlick( const in vec3 f0, const in vec3 f90, const in float dotVH ) {
 
 } // validated
 
-// Microfacet Models for Refraction through Rough Surfaces - equation (34)
-// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-// alpha is "roughness squared" in Disney’s reparameterization
-float G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {
-
-	// geometry term (normalized) = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
-	// also see #12151
-
-	float a2 = pow2( alpha );
-
-	float gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
-	float gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
-
-	return 1.0 / ( gl * gv );
-
-} // validated
-
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
+float V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
 
 	float a2 = pow2( alpha );
 
-	// dotNL and dotNV are explicitly swapped. This is not a mistake.
 	float gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
 	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
@@ -127,11 +109,11 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 view
 
 	vec3 F = F_Schlick( f0, f90, dotVH );
 
-	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+	float V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
 	float D = D_GGX( alpha, dotNH );
 
-	return F * ( G * D );
+	return F * ( V * D );
 
 } // validated
 
