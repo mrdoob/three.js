@@ -153,7 +153,17 @@
 
 			filterInput.oninput = function () {
 
-				updateFilter();
+				let timeout;
+
+				const handleFilter = () => {
+
+					timeout = null;
+					updateFilter();
+
+				};
+
+				clearTimeout( timeout );
+				timeout = setTimeout( handleFilter, 250 );
 
 			};
 
@@ -295,10 +305,9 @@
 
 						page.properties?.forEach( name => {
 
-							const linkElement = createLink( `.${name}`, `${pageURL}/.${name}` );
-							linkElement.classList.add( 'hidden' );
+							const linkElement = createLink( name, `${pageURL}/.${name}` );
+							linkElement.classList.add( 'property', 'hidden' );
 							listElement.appendChild( linkElement );
-
 
 							searchable.push( { name, linkElement } );
 
@@ -306,8 +315,8 @@
 
 						page.methods?.forEach( name => {
 
-							const linkElement = createLink( `.${name}()`, `${pageURL}/.${name}` );
-							linkElement.classList.add( 'hidden' );
+							const linkElement = createLink( name, `${pageURL}/.${name}` );
+							linkElement.classList.add( 'method', 'hidden' );
 							listElement.appendChild( linkElement );
 
 							searchable.push( { name, linkElement } );
@@ -384,9 +393,9 @@
 
 			}
 
-			//
-
-			const regExp = new RegExp( filterInput.value, 'gi' );
+			// Escape input to be safe to search
+			const sanitized = filterInput.value.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' );
+			const regExp = new RegExp( sanitized, 'gi' );
 
 			for ( const pageName in pageProperties ) {
 
@@ -423,7 +432,14 @@
 
 				} );
 
-				// Hide category if no matches in children and base class
+				// Show category if children match
+				if ( childMatches?.length ) {
+
+					categoryClassList.remove( 'hidden' );
+
+				}
+
+				// Hide category if no matches in children and parent class
 				if ( ! parentMatches?.length && ! childMatches?.length ) {
 
 					categoryClassList.add( 'hidden' );
@@ -479,7 +495,7 @@
 
 		// Routing
 
-		function setUrlFragment( pageName ) { // eslint-disable-line no-undef
+		function setUrlFragment( pageName ) { // eslint-disable-line no-unused-vars
 
 			// Handle navigation from the subpages (iframes):
 			// First separate the memeber (if existing) from the page name,
