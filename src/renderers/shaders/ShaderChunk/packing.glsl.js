@@ -26,9 +26,10 @@ float unpackRGBAToDepth( const in vec4 v ) {
 }
 
 vec4 pack2HalfToRGBA( vec2 v ) {
-	vec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ));
-	return vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w);
+	vec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ) );
+	return vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w );
 }
+
 vec2 unpackRGBATo2Half( vec4 v ) {
 	return vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );
 }
@@ -45,7 +46,7 @@ float orthographicDepthToViewZ( const in float linearClipZ, const in float near,
 // NOTE: https://twitter.com/gonnavis/status/1377183786949959682
 
 float viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {
-	return (( near + viewZ ) * far ) / (( far - near ) * viewZ );
+	return ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );
 }
 float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
 	return ( near * far ) / ( ( far - near ) * invClipZ - far );

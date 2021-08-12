@@ -636,17 +636,7 @@
 
 			}
 
-			const texture = textureMap.get( id );
-
-			if ( texture.image !== undefined ) {
-
-				return texture;
-
-			} else {
-
-				return undefined;
-
-			}
+			return textureMap.get( id );
 
 		} // Parse nodes in FBXTree.Objects.Deformer
 		// Deformer node can contain skinning or Vertex Cache animation data, however only skinning is supported here

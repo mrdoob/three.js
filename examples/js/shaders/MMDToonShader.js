@@ -17,13 +17,6 @@
 	const lights_mmd_toon_pars_fragment = `
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-#endif
-
-
 struct BlinnPhongMaterial {
 
 	vec3 diffuseColor;

@@ -36,13 +36,16 @@
 				</li>
 			</ul>
 
-			[page:Camera Cameras] have two additional Matrix4s:
+			[page:Camera Cameras] have three additional Matrix4s:
 			<ul>
 				<li>
 					[page:Camera.matrixWorldInverse]: The view matrix - the inverse of the Camera's [page:Object3D.matrixWorld matrixWorld].
 				</li>
 				<li>
 					[page:Camera.projectionMatrix]: Represents the information how to project the scene to clip space.
+				</li>
+				<li>
+					[page:Camera.projectionMatrixInverse]: The inverse of projectionMatrix.
 				</li>
 			</ul>
 			Note: [page:Object3D.normalMatrix] is not a Matrix4, but a [page:Matrix3].
