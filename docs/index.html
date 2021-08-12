@@ -438,11 +438,13 @@
 
 				// Show and highlight matching children
 				const children = pageProperties[ pageName ].searchable;
+				const specifiedChild = children.find( ( { name } ) => name === targetChild );
 				const childMatches = children?.filter( ( { name, linkElement, type } ) => {
 
-					// Hide children when search is cleared or of wrong type
+					// Hide children when search is cleared, of wrong type, or if another child was specified
 					const incorrectType = onlyMethods && type !== 'method';
-					if ( sanitized === '' || incorrectType ) {
+					const incorrectChild = specifiedChild && name !== targetChild;
+					if ( sanitized === '' || incorrectType || incorrectChild ) {
 
 						return void linkElement.classList.add( 'hidden' );
 
