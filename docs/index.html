@@ -311,7 +311,7 @@
 							linkElement.classList.add( 'property', 'hidden' );
 							listElement.appendChild( linkElement );
 
-							searchable.push( { name, linkElement } );
+							searchable.push( { name, linkElement, type: 'property' } );
 
 						} );
 
@@ -321,7 +321,7 @@
 							linkElement.classList.add( 'method', 'hidden' );
 							listElement.appendChild( linkElement );
 
-							searchable.push( { name, linkElement } );
+							searchable.push( { name, linkElement, type: 'method' } );
 
 						} );
 
@@ -396,39 +396,65 @@
 			}
 
 			// Escape input to be safe to search
-			const sanitized = filterInput.value.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' );
+			const sanitized = filterInput.value.replace( /[-/\\^$*+?.()|[\]{}]/g, '\\$&' );
 			const regExp = new RegExp( sanitized, 'gi' );
+
+			// Allow filtering to parents PascalCase and children with accessors
+			const searchParents = /^[A-Z]\w*/.test( sanitized );
+			const searchChildren = /([.#])\w*/.test( sanitized );
+
+			// Check for exact matches
+			const targetParent = sanitized.match( /^([A-Z][^\\.#]*)/ )?.[ 1 ];
+			const targetChild = sanitized.match( /(?:\.|#)(\w+)$/ )?.[ 1 ];
+
+			// Create matchers if strict searching
+			const parentRegExp = searchParents ? new RegExp( targetParent, 'gi' ) : regExp;
+			const childRegExp = searchChildren ? new RegExp( targetChild, 'gi' ) : regExp;
+
+			// Create filter modes
+			const onlyParents = searchParents && ! searchChildren;
+			const onlyChildren = ! searchParents && searchChildren;
+			const onlyMethods = sanitized.includes( '#' );
+
+			// Check if a parent was specifically searched for
+			const matchedParent = pageProperties[ targetParent ];
 
 			for ( const pageName in pageProperties ) {
 
 				const linkElement = pageProperties[ pageName ].linkElement;
 				const categoryClassList = linkElement.parentElement.classList;
 
-				// Highlight matches in base class
-				const parentMatches = pageName.match( regExp );
-				if ( parentMatches?.length ) {
+				// If a parent is specifically searched for, filter to it
+				const notSpecified = matchedParent && pageName !== targetParent;
+
+				// Highlight matches in parent class
+				const parentMatches = pageName.match( parentRegExp );
+				if ( ! onlyChildren && parentMatches?.length && ! notSpecified ) {
 
 					categoryClassList.remove( 'hidden' );
-					linkElement.innerHTML = pageName.replaceAll( regExp, '<b>$&</b>' );
+					linkElement.innerHTML = pageName.replaceAll( parentRegExp, '<b>$&</b>' );
 
 				}
 
 				// Show and highlight matching children
 				const children = pageProperties[ pageName ].searchable;
-				const childMatches = children?.filter( ( { name, linkElement } ) => {
+				const childMatches = children?.filter( ( { name, linkElement, type } ) => {
 
-					if ( sanitized === '' ) {
+					// Hide children when search is cleared or of wrong type
+					const incorrectType = onlyMethods && type !== 'method';
+					if ( sanitized === '' || incorrectType ) {
 
 						return void linkElement.classList.add( 'hidden' );
 
 					}
 
-					const matches = name.match( regExp );
+					// Hide if not of target parent or matching query
+					const matches = name.match( childRegExp );
 
-					if ( matches?.length ) {
+					if ( ! onlyParents && matches?.length && ! notSpecified ) {
 
 						linkElement.classList.remove( 'hidden' );
-						linkElement.innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
+						linkElement.innerHTML = name.replaceAll( childRegExp, '<b>$&</b>' );
 
 					} else {
 
@@ -448,7 +474,7 @@
 				}
 
 				// Hide category if no matches in children and parent class
-				if ( ! parentMatches?.length && ! childMatches?.length ) {
+				if ( notSpecified || ( ! parentMatches?.length && ! childMatches?.length ) ) {
 
 					categoryClassList.add( 'hidden' );
 
