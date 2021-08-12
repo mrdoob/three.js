@@ -286,6 +286,12 @@
 	
 			} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ) {
 	
+				if (event.button == 1) {
+
+					event.preventDefault();
+	
+				}
+				
 				window.addEventListener( 'pointermove', this.onPointerMove );
 				window.addEventListener( 'pointerup', this.onPointerUp );
 	
@@ -500,7 +506,7 @@
 	
 			if ( this.enabled && this.enableZoom ) {
 	
-				//event.preventDefault();
+				event.preventDefault();
 				this.dispatchEvent( _startEvent );
 	
 				//wheel has been moved while another operation has being performed
