@@ -186,7 +186,7 @@
 		[page:Box3 box] - 与包围盒的交集<br /><br />
 
 		计算此包围盒和 [page:Box3 box] 的交集，将此框的上界设置为两个框的max的较小部分，
-		将此包围盒的下界设置为两个包围盒的min的较大部分。If there's no overlap, makes this box empty.
+		将此包围盒的下界设置为两个包围盒的min的较大部分。如果两个包围盒不相交，则清空此包围盒。
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
@@ -232,24 +232,24 @@
 		[page:Vector3 max] - [page:Vector3] 表示上边界每个纬度（x,y,z）的值。<br /><br />
 
 		设置包围盒上下边界每个纬度（x,y,z)的值。<br>
-		Please note that this method only copies the values from the given objects.
+		请注意，此方法仅复制给定对象的值。
 		</p>
 
-		<h3>[method:this setFromArray]( [param:Array array] ) [param:Box3 this]</h3>
+		<h3>[method:this setFromArray]( [param:Array array] )</h3>
 		<p>
-		array -- 数组当中的所有的点都将被包围盒包裹。<br /><br />
+		array -- 位置数据的数组，包含在返回的包围盒内。<br /><br />
 
-		设置包围盒的上下边界使得数组 *array* 中的所有点的点都被包含在内。
+		设置包围盒的上下边界使得数组 *array* 中的所有位置数据都被包含在内。
 		</p>
 
-		<h3>[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] ) [param:Box3 this]</h3>
+		<h3>[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] )</h3>
 		<p>
 		[page:BufferAttribute attribute] - 位置的缓冲数据，包含在返回的包围盒内。<br /><br />
 
 		设置此包围盒的上边界和下边界，以包含 [page:BufferAttribute attribute] 中的所有位置数据。
 		</p>
 
-		<h3>[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] ) [param:Box3 this]</h3>
+		<h3>[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )</h3>
 		<p>
 		[page:Vector3 center], - 包围盒所要设置的中心位置。 <br>
 		[page:Vector3 size] - 包围盒所要设置的x、y和z尺寸（宽/高/长）。<br /><br />
