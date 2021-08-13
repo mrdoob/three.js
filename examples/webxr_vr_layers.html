@@ -235,6 +235,7 @@
 				function onChange() {
 
 					eyeCharts.position.z = - parameters.eyeChartDistanceFt * 0.3048;
+					snellenConfig.z = eyeCharts.position.z;
 
 					if ( quadLayerPlain ) {
 
@@ -431,6 +432,7 @@
 					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					const canvas = guiMesh.material.map.image;
 					gl.texSubImage2D( gl.TEXTURE_2D, 0, 0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, canvas );
+					guiLayer.needsUpdate = false;
 
 				}
 
