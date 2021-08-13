@@ -296,7 +296,7 @@ class PMREMGenerator {
 
 			if ( background.isColor ) {
 
-				backgroundMaterial.color.copy( background ).convertSRGBToLinear();
+				backgroundMaterial.color.copy( background );
 				scene.background = null;
 
 				const alpha = convertLinearToRGBE( backgroundMaterial.color );
@@ -307,7 +307,7 @@ class PMREMGenerator {
 
 		} else {
 
-			backgroundMaterial.color.copy( _clearColor ).convertSRGBToLinear();
+			backgroundMaterial.color.copy( _clearColor );
 
 			const alpha = convertLinearToRGBE( backgroundMaterial.color );
 			backgroundMaterial.opacity = alpha;
