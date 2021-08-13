@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - pixel pass with outlines</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Pixel shader pass with outlines by
+		<a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a><br /><br />
+	</div>
+
+	<div id="container"></div>
+
+	<script type="module">
+
+		import * as THREE from '../build/three.module.js';
+		import { Vector2 } from '../build/three.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+		import { RenderPixelatedPass } from './jsm/postprocessing/RenderPixelatedPass.js';
+
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+
+		let screenResolution, camera, scene, renderer, composer, renderPixelatedPass, controls, crystalMesh;
+		let gui, params;
+
+		init();
+		animate();
+
+		function onWindowResize() {
+
+			screenResolution.set( window.innerWidth, window.innerHeight );
+			const aspectRatio = screenResolution.x / screenResolution.y;
+			camera.left = -aspectRatio;
+			camera.right = aspectRatio;
+			camera.updateProjectionMatrix();
+			renderer.setSize( screenResolution.x, screenResolution.y );
+			renderPixelatedPass.setSize( screenResolution.x, screenResolution.y );
+
+		}
+
+		function init() {
+
+			screenResolution = new Vector2( window.innerWidth, window.innerHeight );
+			const aspectRatio = screenResolution.x / screenResolution.y;
+
+			camera = new THREE.OrthographicCamera( -aspectRatio, aspectRatio, 1, -1, 0.1, 10 );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x151729 );
+
+			renderer = new THREE.WebGLRenderer( { antialias: false } );
+			renderer.shadowMap.enabled = true;
+			renderer.setSize( screenResolution.x, screenResolution.y );
+			document.body.appendChild( renderer.domElement );
+
+			composer = new EffectComposer( renderer );
+			renderPixelatedPass = new RenderPixelatedPass( screenResolution, 6, scene, camera );
+			composer.addPass( renderPixelatedPass );
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0, 0 );
+			camera.position.z = 2;
+			camera.position.y = 2 * Math.tan( Math.PI / 6 );
+			controls.update();
+			// controls.minPolarAngle = controls.maxPolarAngle = controls.getPolarAngle();
+
+			gui = new GUI();
+			params = { pixelSize: 6, normalEdgeStrenth: .3, depthEdgeStrenth: .4 };
+			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
+				.onChange( () => {
+					renderPixelatedPass.setPixelSize( params.pixelSize )
+				} );
+			gui.add( renderPixelatedPass, 'normalEdgeStrenth' ).min( 0 ).max( 2 ).step( .05 );
+			gui.add( renderPixelatedPass, 'depthEdgeStrenth' ).min( 0 ).max( 1 ).step( .05 );
+
+			const texLoader = new THREE.TextureLoader();
+			const tex_checker = pixelTexture( texLoader.load( 'textures/checker.png' ) );
+			const tex_checker2 = pixelTexture( texLoader.load( 'textures/checker.png' ) );
+			tex_checker.repeat.set( 3, 3 );
+			tex_checker2.repeat.set( 1.5, 1.5 );
+
+			// Setup geometry
+			const boxMaterial = new THREE.MeshPhongMaterial( { map: tex_checker2 } );
+			function addBox( boxSideLength, x, z, rotation ) {
+				let mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				mesh.rotation.y = rotation;
+				mesh.position.y = boxSideLength / 2;
+				mesh.position.set( x, boxSideLength / 2 + .0001, z );
+				scene.add( mesh );
+				return mesh;
+			}
+			addBox( .4, 0, 0, Math.PI / 4 );
+			addBox( .5, -.5, -.5, Math.PI / 4 );
+
+			const planeSideLength = 2;
+			const planeMesh = new THREE.Mesh(
+				new THREE.PlaneGeometry( planeSideLength, planeSideLength ),
+				new THREE.MeshPhongMaterial( { map: tex_checker } )
+			);
+			planeMesh.receiveShadow = true;
+			planeMesh.rotation.x = -Math.PI / 2;
+			scene.add( planeMesh );
+
+			const radius = .2;
+			const geometry = new THREE.IcosahedronGeometry( radius );
+			crystalMesh = new THREE.Mesh(
+				geometry,
+				new THREE.MeshPhongMaterial( {
+					color: 0x2379cf,
+					emissive: 0x143542,
+					shininess: 10,
+					specular: 0xffffff
+				} )
+			);
+			crystalMesh.receiveShadow = true;
+			crystalMesh.castShadow = true;
+			scene.add( crystalMesh );
+
+			// Setup lights
+			scene.add( new THREE.AmbientLight( 0x2d3645, 1.5 ) );
+
+			const directionalLight = new THREE.DirectionalLight( 0xfffc9c, .5 );
+			directionalLight.position.set( 100, 100, 100 );
+			directionalLight.castShadow = true;
+			directionalLight.shadow.mapSize.set( 2048, 2048 );
+			scene.add( directionalLight );
+
+			const spotLight = new THREE.SpotLight( 0xff8800, 1, 10, Math.PI / 16, .02, 2 );
+			spotLight.position.set( 2, 2, 0 );
+			const target = spotLight.target;
+			scene.add( target );
+			target.position.set( 0, 0, 0 );
+			spotLight.castShadow = true;
+			scene.add( spotLight );
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+			const t = performance.now() / 1000;
+			crystalMesh.material.emissiveIntensity = Math.sin( t * 3 ) * .5 + .5;
+			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
+			crystalMesh.rotation.y = stopGoEased( t, 2, 4 ) * 2 * Math.PI;
+			composer.render();
+
+		}
+
+		// Helper functions
+
+		function pixelTexture( texture ) {
+
+			texture.minFilter = THREE.NearestFilter;
+			texture.magFilter = THREE.NearestFilter;
+			texture.generateMipmaps = false;
+			texture.wrapS = THREE.RepeatWrapping;
+			texture.wrapT = THREE.RepeatWrapping;
+			return texture;
+
+		}
+
+		function easeInOutCubic( x ) {
+
+			return x ** 2 * 3 - x ** 3 * 2;
+
+		}
+
+		function clamp( x, min, max ) {
+
+			return Math.min( max, Math.max( min, x ) );
+
+		}
+
+		function linearStep( x, edge0, edge1 ) {
+
+			const w = edge1 - edge0;
+			const m = 1 / w;
+			const y0 = -m * edge0;
+			return clamp( y0 + m * x, 0, 1 );
+
+		}
+
+		function stopGoEased( x, downtime, period ) {
+
+			const cycle = ( x / period ) | 0;
+			const tween = x - cycle * period;
+			const linStep = easeInOutCubic( linearStep( tween, downtime, period ) );
+			return cycle + linStep;
+
+		}
+		
+	</script>
+</body>
+
+</html>
