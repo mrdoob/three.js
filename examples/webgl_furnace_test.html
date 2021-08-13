@@ -72,7 +72,7 @@
 
 				// camera
 
-				camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 30 ); 
+				camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 30 );
 				camera.position.set( 0, 0, 10 );
 
 			}
@@ -110,14 +110,13 @@
 				return new Promise( function ( resolve ) {
 
 					const envScene = new THREE.Scene();
-					envScene.background = new THREE.Color( COLOR ); // sRGB colorspace assumed, apparently
+					envScene.background = new THREE.Color( COLOR );
 
 					const pmremGenerator = new THREE.PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 
 					scene.background = new THREE.Color( COLOR );
-					if ( renderer.outputEncoding !== THREE.sRGBEncoding ) scene.background.convertSRGBToLinear();
 
 					resolve();
 
