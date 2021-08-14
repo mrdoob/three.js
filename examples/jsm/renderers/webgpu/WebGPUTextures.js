@@ -206,7 +206,7 @@ class WebGPUTextures {
 					depthOrArrayLayers: 1
 				},
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.SAMPLED
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
 			} );
 
 			this.info.memory.textures ++;
@@ -316,7 +316,7 @@ class WebGPUTextures {
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = this._getFormat( texture );
 
-		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
+		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
 
 		if ( needsMipmaps === true ) {
 
