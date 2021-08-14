@@ -94,6 +94,9 @@
 	</p>
 
 	<code>
+		// Setting a background color can make debugging of models easier
+		scene.background = new Color( 0x444444 );
+
 		const loader = new GLTFLoader();
 
 		loader.load( 'path/to/model.glb', function ( gltf ) {
