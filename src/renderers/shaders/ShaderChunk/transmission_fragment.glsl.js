@@ -20,7 +20,7 @@ export default /* glsl */`
 	vec3 v = normalize( cameraPosition - pos );
 	vec3 n = inverseTransformDirection( normal, viewMatrix );
 
-	vec3 transmission = transmissionFactor * getIBLVolumeRefraction(
+	vec3 transmission = getIBLVolumeRefraction(
 		n, v, roughnessFactor, material.diffuseColor, material.specularColor,
 		pos, modelMatrix, viewMatrix, projectionMatrix, ior, thicknessFactor,
 		attenuationTint, attenuationDistance );
