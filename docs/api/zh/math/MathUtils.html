@@ -66,7 +66,7 @@
 		[page:Float lambda] - 较高的参数 lambda 值会使运动更加突然，而较低的值会使运动更加平缓。<br />
 		[page:Float dt] - 以秒为单位的增量时间<br><br />
 
-		返回使用 [page:Float dt] 以类似弹簧保持帧速率独立的移动的方式从 [page:Float x] 向 [page:Float y] 平滑插值的一个数值结果。有关详细信息，请参阅 [link:http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/ Frame rate independent damping using lerp].
+		返回使用 [page:Float dt] 以类似弹簧保持帧速率独立的移动方式从 [page:Float x] 向 [page:Float y] 平滑插值的一个数值结果。有关详细信息，请参阅 [link:http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/ Frame rate independent damping using lerp].
 		</p>
 
 		<h3>[method:Float mapLinear]( [param:Float x], [param:Float a1], [param:Float a2], [param:Float b1], [param:Float b2] )</h3>
@@ -83,7 +83,7 @@
 		<h3>[method:Float pingpong]( [param:Float x], [param:Float length] )</h3>
 		<p>
 		[page:Float x] — pingpong 的值<br />
-		[page:Float length] — 函数将 pingpong 到达的正值。默认值为 1。<br /><br />
+		[page:Float length] — 函数将 pingpong 传递到的正值。默认值为 1。<br /><br />
 
 		返回一个介于 0 和 [param:Float length] 之间的值。</p>
 
@@ -134,7 +134,7 @@
 		[page:Float a] - 应用于第一个轴的旋转，以弧度为单位。<br />
 		[page:Float b] - 应用于第二个轴的旋转，以弧度为单位。<br />
 		[page:Float c] - 应用于第三个轴的旋转，以弧度为单位。<br />
-		[page:String order] - 指定轴顺序的字符串：'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', 或 'ZYZ'<br /><br />
+		[page:String order] - 指定轴旋转顺序的字符串：'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', 或 'ZYZ'<br /><br />
 
 		根据 [page:Float a]、[page:Float b]、[page:Float c]、[page:String order] 组成的欧拉角 [link:http://en.wikipedia.org/wiki/Euler_angles intrinsic Proper Euler Angles] 来设置四元数 [page:Quaternion q]。<br />
 		按照 [page:String order] 指定的轴旋转顺序：先旋转角度 [page:Float a]，再旋转角度 [page:Float b]，最后旋转角度 [page:Float c]。角度以弧度为单位。
