@@ -322,7 +322,7 @@
 
 			const programAttribute = programAttributes[ name ];
 
-			if ( programAttribute >= 0 ) {
+			if ( programAttribute.location >= 0 ) {
 
 				const geometryAttribute = geometryAttributes[ name ];
 
@@ -349,7 +349,11 @@
 
 						if ( data && data.isInstancedInterleavedBuffer ) {
 
-							enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+								enableAttributeAndDivisor( programAttribute.location + i, data.meshPerAttribute );
+
+							}
 
 							if ( geometry._maxInstanceCount === undefined ) {
 
@@ -359,18 +363,38 @@
 
 						} else {
 
-							enableAttribute( programAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+								enableAttribute( programAttribute.location + i );
+
+							}
 
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+
+						for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+							vertexAttribPointer(
+								programAttribute.location + i,
+								size / programAttribute.locationSize,
+								type,
+								normalized,
+								stride * bytesPerElement,
+								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement
+							);
+
+						}
 
 					} else {
 
 						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
-							enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+								enableAttributeAndDivisor( programAttribute.location + i, geometryAttribute.meshPerAttribute );
+
+							}
 
 							if ( geometry._maxInstanceCount === undefined ) {
 
@@ -380,12 +404,16 @@
 
 						} else {
 
-							enableAttribute( programAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+								enableAttribute( programAttribute.location + i );
+
+							}
 
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+						vertexAttribPointer( programAttribute.location, size, type, normalized, 0, 0 );
 
 					}
 
@@ -400,17 +428,19 @@
 					const buffer = attribute.buffer;
 					const type = attribute.type;
 
-					enableAttributeAndDivisor( programAttribute + 0, 1 );
-					enableAttributeAndDivisor( programAttribute + 1, 1 );
-					enableAttributeAndDivisor( programAttribute + 2, 1 );
-					enableAttributeAndDivisor( programAttribute + 3, 1 );
+					for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+						enableAttributeAndDivisor( programAttribute.location + i, 1 );
+
+					}
 
 					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
 
-					gl.vertexAttribPointer( programAttribute + 0, 4, type, false, 64, 0 );
-					gl.vertexAttribPointer( programAttribute + 1, 4, type, false, 64, 16 );
-					gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
-					gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
+					for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+						gl.vertexAttribPointer( programAttribute.location + i, 4, type, false, 64, 16 * i );
+
+					}
 
 				} else if ( name === 'instanceColor' ) {
 
@@ -423,11 +453,11 @@
 					const buffer = attribute.buffer;
 					const type = attribute.type;
 
-					enableAttributeAndDivisor( programAttribute, 1 );
+					enableAttributeAndDivisor( programAttribute.location, 1 );
 
 					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
 
-					gl.vertexAttribPointer( programAttribute, 3, type, false, 12, 0 );
+					gl.vertexAttribPointer( programAttribute.location, 3, type, false, 12, 0 );
 
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
@@ -438,19 +468,19 @@
 						switch ( value.length ) {
 
 							case 2:
-								gl.vertexAttrib2fv( programAttribute, value );
+								gl.vertexAttrib2fv( programAttribute.location, value );
 								break;
 
 							case 3:
-								gl.vertexAttrib3fv( programAttribute, value );
+								gl.vertexAttrib3fv( programAttribute.location, value );
 								break;
 
 							case 4:
-								gl.vertexAttrib4fv( programAttribute, value );
+								gl.vertexAttrib4fv( programAttribute.location, value );
 								break;
 
 							default:
-								gl.vertexAttrib1fv( programAttribute, value );
+								gl.vertexAttrib1fv( programAttribute.location, value );
 
 						}
 
