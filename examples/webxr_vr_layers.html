@@ -30,20 +30,16 @@
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 			import { XRHandModelFactory } from './jsm/webxr/XRHandModelFactory.js';
 
-			let container;
 			let camera, scene, renderer;
-			let hand1, hand2;
-			let controller1, controller2;
-			let controllerGrip1, controllerGrip2;
 			let video;
 
-			// Four eye charts are rendered to demonstrate the differences in text quality. The two
-			// charts on the bottom are rendered to the eye buffer while the two charts on the top are
-			// rendered into XRQuadLayers, and the latter pair are substantially more legible.
+			// Four eye charts are rendered to demonstrate the differences in text quality.
+			// The two charts on the top are rendered into XRQuadLayers ( substantially more legible ).
+			// The two charts on the bottom are rendered to the eye buffer.
 			//
-			// The two charts on the left are rendered without mipmaps and have aliasing artifacts while
-			// the two charts on the right are with mipmaps an don't twinkle but are blurrier. To
-			// maximize text legibility, it's important to choose a texture size optimized for the
+			// The two charts on the left are rendered without mipmaps and have aliasing artifacts.
+			// The two charts on the right are with mipmaps an don't twinkle but are blurrier.
+			// To maximize text legibility, it's important to choose a texture size optimized for the
 			// distance of the text. (This example intentionally uses incorrectly large textures to
 			// demonstrate this issue.) If the optimal text size can't be determined beforehand, then
 			// mipmaps are required to avoid aliasing.
@@ -105,26 +101,14 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 3 );
 
-
-				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
-
+				const hemLight = new THREE.HemisphereLight( 0x808080, 0x606060 );
 				const light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 6, 0 );
-				light.castShadow = true;
-				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = - 2;
-				light.shadow.camera.right = 2;
-				light.shadow.camera.left = - 2;
-				light.shadow.mapSize.set( 4096, 4096 );
-				scene.add( light );
+				scene.add( hemLight, light );
 
 				//
 
@@ -134,55 +118,45 @@
 				renderer.setClearColor( new THREE.Color( 0 ), 0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 
-				container.appendChild( renderer.domElement );
-
+				document.body.appendChild( renderer.domElement );
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				// controllers
 
-				controller1 = renderer.xr.getController( 0 );
-				scene.add( controller1 );
-
-				controller2 = renderer.xr.getController( 1 );
-				scene.add( controller2 );
+				const lineGeometry = new THREE.BufferGeometry().setFromPoints( [
+					new THREE.Vector3( 0, 0, 0 ),
+					new THREE.Vector3( 0, 0, - 10 )
+				] );
+				const line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: 0x5555ff } ) );
 
 				const controllerModelFactory = new XRControllerModelFactory();
 				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
 
-				// Hand 1
-				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-				scene.add( controllerGrip1 );
-
-				hand1 = renderer.xr.getHand( 0 );
-				hand1.add( handModelFactory.createHandModel( hand1 ) );
-
-				scene.add( hand1 );
-
-				// Hand 2
-				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
-				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
-				scene.add( controllerGrip2 );
-
-				hand2 = renderer.xr.getHand( 1 );
-				hand2.add( handModelFactory.createHandModel( hand2 ) );
-				scene.add( hand2 );
-
 				//
 
-				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+				const controllers = [
+					renderer.xr.getController( 0 ),
+					renderer.xr.getController( 1 )
+				];
 
-				const line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x5555ff } ) );
-				line.name = 'line';
-				line.scale.z = 10;
+				controllers.forEach( ( controller, i ) => {
 
-				controller1.add( line.clone() );
-				controller2.add( line.clone() );
+					const controllerGrip = renderer.xr.getControllerGrip( i );
+					controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
+					scene.add( controllerGrip );
+
+					const hand = renderer.xr.getHand( i );
+					hand.add( handModelFactory.createHandModel( hand ) );
+
+					controller.add( line.clone() );
+					scene.add( controller, controllerGrip, hand );
+
+				} );
 
 				// Eye charts
+
 				const eyeCharts = new THREE.Group();
 				eyeCharts.position.z = snellenConfig.z;
 				scene.add( eyeCharts );
@@ -235,6 +209,7 @@
 				function onChange() {
 
 					eyeCharts.position.z = - parameters.eyeChartDistanceFt * 0.3048;
+					snellenConfig.z = eyeCharts.position.z;
 
 					if ( quadLayerPlain ) {
 
@@ -264,9 +239,7 @@
 				scene.add( group );
 
 				guiMesh = new HTMLMesh( gui.domElement );
-				guiMesh.position.x = 1.0;
-				guiMesh.position.y = 1.5;
-				guiMesh.position.z = - 1.0;
+				guiMesh.position.set( 1.0, 1.5, - 1.0 );
 				guiMesh.rotation.y = - Math.PI / 4;
 				guiMesh.scale.setScalar( 2 );
 				guiMesh.material.opacity = 0;
@@ -329,7 +302,12 @@
 
 				}
 
-				if ( session && session.renderState.layers !== undefined && session.hasMediaLayer === undefined && video.readyState >= 2 ) {
+				if (
+					session &&
+					session.renderState.layers !== undefined &&
+					session.hasMediaLayer === undefined &&
+					video.readyState >= 2
+				) {
 
 					session.hasMediaLayer = true;
 					session.requestReferenceSpace( 'local-floor' ).then( ( refSpace ) => {
@@ -342,19 +320,19 @@
 							viewPixelWidth: snellenConfig.textureSizePx,
 							viewPixelHeight: snellenConfig.textureSizePx,
 							isStatic: true,
-							space: refSpace, layout: "mono",
+							space: refSpace,
+							layout: "mono",
 							transform: new XRRigidTransform( {
 								x: snellenConfig.x - snellenConfig.widthMeters,
 								y: snellenConfig.y + snellenConfig.heightMeters,
 								z: snellenConfig.z
 							} )
-
 						};
 
 						quadLayerPlain = glBinding.createQuadLayer( quadLayerConfig );
 
 						quadLayerConfig.mipLevels = 3;
-						quadLayerConfig.transform = new XRRigidTransform(	{
+						quadLayerConfig.transform = new XRRigidTransform( {
 							x: snellenConfig.x + snellenConfig.widthMeters,
 							y: snellenConfig.y + snellenConfig.heightMeters,
 							z: snellenConfig.z
@@ -381,12 +359,23 @@
 								// Rotate by 45 deg to avoid stereo conflict with the 3D geometry.
 								transform: new XRRigidTransform(
 									{},
-									{ x: 0, y: .28, z: 0, w: .96 } )
+									{ x: 0, y: .28, z: 0, w: .96 }
+								)
 							}
 						);
 
 						errorMesh.visible = false;
-						session.updateRenderState( { layers: [ equirectLayer, quadLayerPlain, quadLayerMips, guiLayer, session.renderState.layers[ 0 ] ] } );
+
+						session.updateRenderState( {
+							layers: [
+								equirectLayer,
+								quadLayerPlain,
+								quadLayerMips,
+								guiLayer,
+								session.renderState.layers[ 0 ]
+							]
+						} );
+						
 						video.play();
 
 					} );
@@ -395,7 +384,7 @@
 
 				// Copy image to layers as required.
 				// needsRedraw is set on creation or if the underlying GL resources of a layer are lost.
-				if ( quadLayerPlain && quadLayerPlain.needsRedraw ) {
+				if ( session && quadLayerPlain && quadLayerPlain.needsRedraw ) {
 
 					const glayer = xr.getBinding().getSubImage( quadLayerPlain, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
@@ -409,7 +398,7 @@
 				}
 
 				// Same as above but also gl.generateMipmap.
-				if ( quadLayerMips && quadLayerMips.needsRedraw ) {
+				if ( session && quadLayerMips && quadLayerMips.needsRedraw ) {
 
 					const glayer = xr.getBinding().getSubImage( quadLayerMips, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
@@ -424,13 +413,14 @@
 				}
 
 				// Same as above, but guiLayer.needsUpdate is set when the user interacts with the GUI.
-				if ( guiLayer && ( guiLayer.needsRedraw || guiLayer.needsUpdate ) ) {
+				if ( session && guiLayer && ( guiLayer.needsRedraw || guiLayer.needsUpdate ) ) {
 
 					const glayer = xr.getBinding().getSubImage( guiLayer, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
 					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					const canvas = guiMesh.material.map.image;
 					gl.texSubImage2D( gl.TEXTURE_2D, 0, 0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, canvas );
+					guiLayer.needsUpdate = false;
 
 				}
 
