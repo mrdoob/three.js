@@ -324,7 +324,14 @@
 
 			if ( programAttribute.location >= 0 ) {
 
-				const geometryAttribute = geometryAttributes[ name ];
+				let geometryAttribute = geometryAttributes[ name ];
+
+				if ( geometryAttribute === undefined ) {
+
+					if ( name === 'instanceMatrix' && object.instanceMatrix ) geometryAttribute = object.instanceMatrix;
+					if ( name === 'instanceColor' && object.instanceColor ) geometryAttribute = object.instanceColor;
+
+				}
 
 				if ( geometryAttribute !== undefined ) {
 
@@ -355,7 +362,7 @@
 
 							}
 
-							if ( geometry._maxInstanceCount === undefined ) {
+							if ( object.isInstancedMesh !== true && geometry._maxInstanceCount === undefined ) {
 
 								geometry._maxInstanceCount = data.meshPerAttribute * data.count;
 
@@ -396,7 +403,7 @@
 
 							}
 
-							if ( geometry._maxInstanceCount === undefined ) {
+							if ( object.isInstancedMesh !== true && geometry._maxInstanceCount === undefined ) {
 
 								geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
@@ -413,51 +420,21 @@
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute.location, size, type, normalized, 0, 0 );
+
+						for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+							vertexAttribPointer(
+								programAttribute.location + i,
+								size / programAttribute.locationSize,
+								type,
+								normalized,
+								size * bytesPerElement,
+								( size / programAttribute.locationSize ) * i * bytesPerElement
+							);
+
+						}
 
 					}
-
-				} else if ( name === 'instanceMatrix' ) {
-
-					const attribute = attributes.get( object.instanceMatrix );
-
-					// TODO Attribute may not be available on context restore
-
-					if ( attribute === undefined ) continue;
-
-					const buffer = attribute.buffer;
-					const type = attribute.type;
-
-					for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
-
-						enableAttributeAndDivisor( programAttribute.location + i, 1 );
-
-					}
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-
-					for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
-
-						gl.vertexAttribPointer( programAttribute.location + i, 4, type, false, 64, 16 * i );
-
-					}
-
-				} else if ( name === 'instanceColor' ) {
-
-					const attribute = attributes.get( object.instanceColor );
-
-					// TODO Attribute may not be available on context restore
-
-					if ( attribute === undefined ) continue;
-
-					const buffer = attribute.buffer;
-					const type = attribute.type;
-
-					enableAttributeAndDivisor( programAttribute.location, 1 );
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-
-					gl.vertexAttribPointer( programAttribute.location, 3, type, false, 12, 0 );
 
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
