@@ -6,8 +6,6 @@ const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
 const port = 1234;
-const pixelThreshold = 0.1; // threshold error in one pixel
-const maxFailedPixels = 0.05; // total failed pixels
 
 const networkTimeout = 600;
 const networkTax = 2000; // additional timeout for resources size
@@ -27,6 +25,7 @@ const exceptionList = [
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
+	'webgl_animation_cloth', // we lost delay somehow?
 	'webgl_loader_imagebitmap', // takes too long to load?
 	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
@@ -264,12 +263,7 @@ const pup = puppeteer.launch( {
 
 				try {
 
-					numFailedPixels = pixelmatch( expected.data, actual.data, diff.data, actual.width, actual.height, {
-						threshold: pixelThreshold,
-						alpha: 0.2,
-						diffMask: process.env.FORCE_COLOR === '0',
-						diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
-					} );
+					numFailedPixels = pixelmatch( expected.data, actual.data, diff.data, actual.width, actual.height );
 
 				} catch {
 
@@ -280,20 +274,18 @@ const pup = puppeteer.launch( {
 
 				}
 
-				numFailedPixels /= actual.width * actual.height;
-
 				/* Print results */
 
-				if ( numFailedPixels < maxFailedPixels ) {
+				if ( numFailedPixels === 0 ) {
 
 					attemptId = maxAttemptId;
-					console.green( `diff: ${ numFailedPixels.toFixed( 3 ) }, file: ${ file }` );
+					console.green( `SUCCESS! All pixel match: ${ file }` );
 
 				} else {
 
 					if ( ++ attemptId === maxAttemptId ) {
 
-						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
+						console.red( `ERROR! ${ numFailedPixels } pixels do not match: ${ file }` );
 						failedScreenshots.push( file );
 						continue;
 
