@@ -125,6 +125,7 @@ export { Vector3 } from './math/Vector3.js';
 export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
+export { ColorManagement } from './math/ColorManagement.js';
 export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
 export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';

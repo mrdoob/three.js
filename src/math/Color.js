@@ -1,4 +1,5 @@
 import * as MathUtils from './MathUtils.js';
+import { ColorManagement } from './ColorManagement.js';
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -51,6 +52,30 @@ function LinearToSRGB( c ) {
 
 }
 
+function internalToSRGB( c ) {
+
+	if ( ColorManagement.enabled ) {
+
+		return LinearToSRGB( c );
+
+	}
+
+	return c;
+
+}
+
+function SRGBToInternal( c ) {
+
+	if ( ColorManagement.enabled ) {
+
+		return SRGBToLinear( c );
+
+	}
+
+	return c;
+
+}
+
 class Color {
 
 	constructor( r, g, b ) {
@@ -100,9 +125,9 @@ class Color {
 
 		hex = Math.floor( hex );
 
-		this.r = ( hex >> 16 & 255 ) / 255;
-		this.g = ( hex >> 8 & 255 ) / 255;
-		this.b = ( hex & 255 ) / 255;
+		this.r = SRGBToInternal( ( hex >> 16 & 255 ) / 255 );
+		this.g = SRGBToInternal( ( hex >> 8 & 255 ) / 255 );
+		this.b = SRGBToInternal( ( hex & 255 ) / 255 );
 
 		return this;
 
@@ -127,16 +152,16 @@ class Color {
 
 		if ( s === 0 ) {
 
-			this.r = this.g = this.b = l;
+			this.r = this.g = this.b = SRGBToInternal( l );
 
 		} else {
 
 			const p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
 			const q = ( 2 * l ) - p;
 
-			this.r = hue2rgb( q, p, h + 1 / 3 );
-			this.g = hue2rgb( q, p, h );
-			this.b = hue2rgb( q, p, h - 1 / 3 );
+			this.r = SRGBToInternal( hue2rgb( q, p, h + 1 / 3 ) );
+			this.g = SRGBToInternal( hue2rgb( q, p, h ) );
+			this.b = SRGBToInternal( hue2rgb( q, p, h - 1 / 3 ) );
 
 		}
 
@@ -177,9 +202,9 @@ class Color {
 					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(255,0,0) rgba(255,0,0,0.5)
-						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+						this.r = SRGBToInternal( Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255 );
+						this.g = SRGBToInternal( Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255 );
+						this.b = SRGBToInternal( Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255 );
 
 						handleAlpha( color[ 4 ] );
 
@@ -190,9 +215,9 @@ class Color {
 					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
-						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+						this.r = SRGBToInternal( Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100 );
+						this.g = SRGBToInternal( Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100 );
+						this.b = SRGBToInternal( Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100 );
 
 						handleAlpha( color[ 4 ] );
 
@@ -232,18 +257,18 @@ class Color {
 			if ( size === 3 ) {
 
 				// #ff0
-				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
-				this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
-				this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
+				this.r = SRGBToInternal( parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255 );
+				this.g = SRGBToInternal( parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255 );
+				this.b = SRGBToInternal( parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255 );
 
 				return this;
 
 			} else if ( size === 6 ) {
 
 				// #ff0000
-				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
-				this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
-				this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
+				this.r = SRGBToInternal( parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255 );
+				this.g = SRGBToInternal( parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255 );
+				this.b = SRGBToInternal( parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255 );
 
 				return this;
 
@@ -374,7 +399,9 @@ class Color {
 
 	getHex() {
 
-		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
+		const r = internalToSRGB( this.r ), g = internalToSRGB( this.g ), b = internalToSRGB( this.b );
+
+		return ( r * 255 ) << 16 ^ ( g * 255 ) << 8 ^ ( b * 255 ) << 0;
 
 	}
 
@@ -388,7 +415,7 @@ class Color {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		const r = this.r, g = this.g, b = this.b;
+		const r = internalToSRGB( this.r ), g = internalToSRGB( this.g ), b = internalToSRGB( this.b );
 
 		const max = Math.max( r, g, b );
 		const min = Math.min( r, g, b );
@@ -429,7 +456,9 @@ class Color {
 
 	getStyle() {
 
-		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+		const r = internalToSRGB( this.r ), g = internalToSRGB( this.g ), b = internalToSRGB( this.b );
+
+		return 'rgb(' + ( ( r * 255 ) | 0 ) + ',' + ( ( g * 255 ) | 0 ) + ',' + ( ( b * 255 ) | 0 ) + ')';
 
 	}
 
