@@ -537,11 +537,16 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( color === undefined || color ) {
 
-			const targetFormat = _currentRenderTarget.texture.format;
-			const isIntegerFormat = targetFormat === RGBAIntegerFormat ||
-				targetFormat === RGBIntegerFormat ||
-				targetFormat === RGIntegerFormat ||
-				targetFormat === RedIntegerFormat;
+			let isIntegerFormat = false;
+			if ( _currentRenderTarget !== null ) {
+
+				const targetFormat = _currentRenderTarget.texture.format;
+				isIntegerFormat = targetFormat === RGBAIntegerFormat ||
+					targetFormat === RGBIntegerFormat ||
+					targetFormat === RGIntegerFormat ||
+					targetFormat === RedIntegerFormat;
+
+			}
 
 			if ( isIntegerFormat ) {
 
