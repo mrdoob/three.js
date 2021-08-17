@@ -30,6 +30,8 @@ class EdgesGeometry extends BufferGeometry {
 
 		}
 
+		const precisionPoints = 4;
+		const precision = Math.pow( 10, precisionPoints );
 		const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
 
 		const indexAttr = geometry.getIndex();
@@ -65,9 +67,9 @@ class EdgesGeometry extends BufferGeometry {
 			_triangle.getNormal( _normal );
 
 			// create hashes for the edge from the vertices
-			hashes[ 0 ] = `${ a.x },${ a.y },${ a.z }`;
-			hashes[ 1 ] = `${ b.x },${ b.y },${ b.z }`;
-			hashes[ 2 ] = `${ c.x },${ c.y },${ c.z }`;
+			hashes[ 0 ] = `${ Math.round( a.x * precision ) },${ Math.round( a.y * precision ) },${ Math.round( a.z * precision ) }`;
+			hashes[ 1 ] = `${ Math.round( b.x * precision ) },${ Math.round( b.y * precision ) },${ Math.round( b.z * precision ) }`;
+			hashes[ 2 ] = `${ Math.round( c.x * precision ) },${ Math.round( c.y * precision ) },${ Math.round( c.z * precision ) }`;
 
 			// skip degenerate triangles
 			if ( hashes[ 0 ] === hashes[ 1 ] || hashes[ 1 ] === hashes[ 2 ] || hashes[ 2 ] === hashes[ 0 ] ) {
