@@ -25,6 +25,11 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 		this.texture.isRenderTargetTexture = true;
+		if ( 'internalFormat' in options ) {
+
+			this.texture.internalFormat = options.internalFormat;
+
+		}
 
 		this.texture.image = { width: width, height: height, depth: 1 };
 
