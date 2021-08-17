@@ -14,7 +14,9 @@ import {
 	RGBAIntegerFormat,
 	RGBIntegerFormat,
 	RGIntegerFormat,
-	RedIntegerFormat
+	RedIntegerFormat,
+	UnsignedIntType,
+	UnsignedShortType
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -550,16 +552,20 @@ function WebGLRenderer( parameters = {} ) {
 
 			if ( isIntegerFormat ) {
 
+				const targetType = _currentRenderTarget.texture.type;
+				const isUnsignedType = targetType === UnsignedByteType ||
+					targetType === UnsignedIntType ||
+					targetType === UnsignedShortType;
+
 				const clearColor = background.getClearColor();
 				const a = background.getClearAlpha();
 				const r = clearColor.r;
 				const g = clearColor.g;
 				const b = clearColor.b;
 
-				const needsUint = r < 0 || g < 0 || b < 0 || a < 0;
 				const __webglFramebuffer = properties.get( _currentRenderTarget ).__webglFramebuffer;
 
-				if ( needsUint ) {
+				if ( isUnsignedType ) {
 
 					uintClearColor[ 0 ] = r;
 					uintClearColor[ 1 ] = g;
