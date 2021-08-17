@@ -21,7 +21,6 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 	function render( renderList, scene ) {
 
-		let forceClear = false;
 		let background = scene.isScene === true ? scene.background : null;
 
 		if ( background && background.isTexture ) {
@@ -42,24 +41,19 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		}
 
-		if ( background === null ) {
-
-			setClear( clearColor, clearAlpha );
-
-		} else if ( background && background.isColor ) {
-
-			setClear( background, 1 );
-			forceClear = true;
-
-		}
-
-		if ( renderer.autoClear || forceClear ) {
+		if ( renderer.autoClear ) {
 
 			renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && background.isColor ) {
+
+			setClear( background, 1 );
+			renderer.clear( true, false, false );
+			setClear( clearColor, clearAlpha ); // restore clear color/alpha
+
+		} else if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
