@@ -16,7 +16,7 @@ jobs:
 
   lint:
     name: "Linting"
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -32,7 +32,7 @@ jobs:
 
   unit:
     name: "Unit testing"
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -50,7 +50,7 @@ jobs:
 
   e2e:
     name: "E2E testing"
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         CI: [ 0, 1, 2, 3 ]
@@ -74,7 +74,7 @@ jobs:
 
   e2e-cov:
     name: "Ready for release"
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
