@@ -10,7 +10,11 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter,
 	NearestFilter,
-	ClampToEdgeWrapping
+	ClampToEdgeWrapping,
+	RGBAIntegerFormat,
+	RGBIntegerFormat,
+	RGIntegerFormat,
+	RedIntegerFormat
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -67,6 +71,8 @@ function WebGLRenderer( parameters = {} ) {
 		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
 		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
 
+	const uintClearColor = new Uint32Array( 4 );
+	const intClearColor = new Int32Array( 4 );
 	let currentRenderList = null;
 	let currentRenderState = null;
 
@@ -529,7 +535,51 @@ function WebGLRenderer( parameters = {} ) {
 
 		let bits = 0;
 
-		if ( color === undefined || color ) bits |= _gl.COLOR_BUFFER_BIT;
+		if ( color === undefined || color ) {
+
+			const targetFormat = _currentRenderTarget.texture.format;
+			const isIntegerFormat = targetFormat === RGBAIntegerFormat ||
+				targetFormat === RGBIntegerFormat ||
+				targetFormat === RGIntegerFormat ||
+				targetFormat === RedIntegerFormat;
+
+			if ( isIntegerFormat ) {
+
+				const clearColor = background.getClearColor();
+				const a = background.getClearAlpha();
+				const r = clearColor.r;
+				const g = clearColor.g;
+				const b = clearColor.b;
+
+				const needsUint = r < 0 || g < 0 || b < 0 || a < 0;
+				const __webglFramebuffer = properties.get( _currentRenderTarget ).__webglFramebuffer;
+
+				if ( needsUint ) {
+
+					uintClearColor[ 0 ] = r;
+					uintClearColor[ 1 ] = g;
+					uintClearColor[ 2 ] = b;
+					uintClearColor[ 3 ] = a;
+					_gl.clearBufferuiv( _gl.COLOR, __webglFramebuffer, uintClearColor );
+
+				} else {
+
+					intClearColor[ 0 ] = r;
+					intClearColor[ 1 ] = g;
+					intClearColor[ 2 ] = b;
+					intClearColor[ 3 ] = a;
+					_gl.clearBufferiv( _gl.COLOR, __webglFramebuffer, intClearColor );
+
+				}
+
+			} else {
+
+				bits |= _gl.COLOR_BUFFER_BIT;
+
+			}
+
+		}
+
 		if ( depth === undefined || depth ) bits |= _gl.DEPTH_BUFFER_BIT;
 		if ( stencil === undefined || stencil ) bits |= _gl.STENCIL_BUFFER_BIT;
 
