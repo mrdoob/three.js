@@ -129,16 +129,13 @@
 
 			function onWindowResize() {
 
-				const aspect = window.innerWidth / window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
-				camera.left = - frustumSize * aspect / 2;
-				camera.right = frustumSize * aspect / 2;
-				camera.top = frustumSize / 2;
-				camera.bottom = - frustumSize / 2;
-
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 
 				render();
 
