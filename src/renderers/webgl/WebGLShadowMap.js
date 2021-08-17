@@ -6,6 +6,7 @@ import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { BufferAttribute } from '../../core/BufferAttribute.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
+import { Color } from '../../math/Color.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Frustum } from '../../math/Frustum.js';
@@ -21,6 +22,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		_viewportSize = new Vector2(),
 
 		_viewport = new Vector4(),
+		_clearColor = new Color(),
 
 		_depthMaterial = new MeshDepthMaterial( { depthPacking: RGBADepthPacking } ),
 		_distanceMaterial = new MeshDistanceMaterial(),
@@ -79,12 +81,15 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		const currentRenderTarget = _renderer.getRenderTarget();
 		const activeCubeFace = _renderer.getActiveCubeFace();
 		const activeMipmapLevel = _renderer.getActiveMipmapLevel();
+		_renderer.getClearColor( _clearColor );
+		const alpha = _renderer.getClearAlpha();
 
 		const _state = _renderer.state;
 
 		// Set GL state for depth map.
+		_renderer.setClearColor( 0xffffff, 1 );
+
 		_state.setBlending( NoBlending );
-		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.buffers.depth.setTest( true );
 		_state.setScissorTest( false );
 
@@ -197,6 +202,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		scope.needsUpdate = false;
 
 		_renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );
+		_renderer.setClearColor( _clearColor, alpha );
 
 	};
 
