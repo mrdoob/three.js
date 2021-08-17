@@ -145,6 +145,11 @@ export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
 
+// Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
+export const NonColorData = '';
+export const SRGBColorSpace = 'srgb';
+export const LinearSRGBColorSpace = 'srgb-linear';
+
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;
 export const ReplaceStencilOp = 7681;
