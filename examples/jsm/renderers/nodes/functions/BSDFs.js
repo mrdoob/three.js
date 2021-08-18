@@ -1,16 +1,16 @@
 import FunctionNode from '../core/FunctionNode.js';
 
 export const F_Schlick = new FunctionNode( `
-vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
+vec3 F_Schlick( const in vec3 f0, const in vec3 f90, const in float dotVH ) {
 
 	// Original approximation by Christophe Schlick '94
-	// float fresnel = pow( 1.0 - dotLH, 5.0 );
+	// float fresnel = pow( 1.0 - dotVH, 5.0 );
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
-	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );
+	float fresnel = exp2( ( -5.55473 * dotVH - 6.98316 ) * dotVH );
 
-	return ( 1.0 - specularColor ) * fresnel + specularColor;
+	return ( f90 - f0 ) * fresnel + f0;
 
 }` ); // validated
 
@@ -43,12 +43,10 @@ vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 specularColor, float sh
 
 	vec3 halfDir = normalize( lightDirection + PositionViewDirection );
 
-	//float dotNL = saturate( dot( NormalView, lightDirection ) );
-	//float dotNV = saturate( dot( NormalView, PositionViewDirection ) );
 	float dotNH = saturate( dot( NormalView, halfDir ) );
-	float dotLH = saturate( dot( lightDirection, halfDir ) );
+	float dotVH = saturate( dot( PositionViewDirection, halfDir ) );
 
-	vec3 F = F_Schlick( specularColor, dotLH );
+	vec3 F = F_Schlick( specularColor, vec3( 1.0 ), dotVH );
 
 	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
 

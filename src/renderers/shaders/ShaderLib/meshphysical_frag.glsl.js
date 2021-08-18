@@ -2,8 +2,9 @@ export default /* glsl */`
 #define STANDARD
 
 #ifdef PHYSICAL
-	#define REFLECTIVITY
+	#define IOR
 	#define CLEARCOAT
+	#define SPECULAR
 #endif
 
 uniform vec3 diffuse;
@@ -12,15 +13,21 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
-#ifdef USE_TRANSMISSION
-	uniform float transmission;
-	uniform float thickness;
-	uniform vec3 attenuationColor;
-	uniform float attenuationDistance;
+#ifdef IOR
+	uniform float ior;
 #endif
 
-#ifdef REFLECTIVITY
-	uniform float reflectivity;
+#ifdef SPECULAR
+	uniform float specularIntensity;
+	uniform vec3 specularTint;
+
+	#ifdef USE_SPECULARINTENSITYMAP
+		uniform sampler2D specularIntensityMap;
+	#endif
+
+	#ifdef USE_SPECULARTINTMAP
+		uniform sampler2D specularTintMap;
+	#endif
 #endif
 
 #ifdef CLEARCOAT
@@ -33,19 +40,6 @@ uniform float opacity;
 #endif
 
 varying vec3 vViewPosition;
-
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-	#ifdef USE_TANGENT
-
-		varying vec3 vTangent;
-		varying vec3 vBitangent;
-
-	#endif
-
-#endif
 
 #include <common>
 #include <packing>
@@ -65,6 +59,7 @@ varying vec3 vViewPosition;
 #include <envmap_physical_pars_fragment>
 #include <fog_pars_fragment>
 #include <lights_pars_begin>
+#include <normal_pars_fragment>
 #include <lights_physical_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>

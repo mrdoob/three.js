@@ -1,13 +1,6 @@
 export default /* glsl */`
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-#endif
-
-
 struct ToonMaterial {
 
 	vec3 diffuseColor;

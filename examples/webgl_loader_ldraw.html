@@ -35,7 +35,7 @@
 
 			let camera, scene, renderer, controls, gui, guiData;
 
-			let model, textureCube;
+			let model;
 
 			const ldrawPath = 'models/ldraw/officialLibrary/';
 
@@ -75,7 +75,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				// scene
@@ -97,20 +97,20 @@
 					conditionalLines: true,
 					smoothNormals: true,
 					constructionStep: 0,
-					noConstructionSteps: "No steps."
+					noConstructionSteps: 'No steps.'
 				};
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				progressBarDiv = document.createElement( 'div' );
-				progressBarDiv.innerText = "Loading...";
-				progressBarDiv.style.fontSize = "3em";
-				progressBarDiv.style.color = "#888";
-				progressBarDiv.style.display = "block";
-				progressBarDiv.style.position = "absolute";
-				progressBarDiv.style.top = "50%";
-				progressBarDiv.style.width = "100%";
-				progressBarDiv.style.textAlign = "center";
+				progressBarDiv.innerText = 'Loading...';
+				progressBarDiv.style.fontSize = '3em';
+				progressBarDiv.style.color = '#888';
+				progressBarDiv.style.display = 'block';
+				progressBarDiv.style.position = 'absolute';
+				progressBarDiv.style.top = '50%';
+				progressBarDiv.style.width = '100%';
+				progressBarDiv.style.textAlign = 'center';
 
 
 				// load materials and then the model
@@ -290,7 +290,7 @@
 
 			function onError() {
 
-				const message = "Error loading model";
+				const message = 'Error loading model';
 				progressBarDiv.innerText = message;
 				console.log( message );
 

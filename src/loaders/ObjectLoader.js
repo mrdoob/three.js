@@ -792,7 +792,11 @@ class ObjectLoader extends Loader {
 
 				}
 
-				if ( data.environment !== undefined ) object.environment = getTexture( data.environment );
+				if ( data.environment !== undefined ) {
+
+					object.environment = getTexture( data.environment );
+
+				}
 
 				if ( data.fog !== undefined ) {
 

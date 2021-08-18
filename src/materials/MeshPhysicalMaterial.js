@@ -12,8 +12,8 @@ import * as MathUtils from '../math/MathUtils.js';
  *  clearcoatNormalScale: <Vector2>,
  *  clearcoatNormalMap: new THREE.Texture( <Image> ),
  *
- *  reflectivity: <float>,
  *  ior: <float>,
+ *  reflectivity: <float>,
  *
  *  sheen: <Color>,
  *
@@ -23,7 +23,12 @@ import * as MathUtils from '../math/MathUtils.js';
  *  thickness: <float>,
  *  thicknessMap: new THREE.Texture( <Image> ),
  *  attenuationDistance: <float>,
- *  attenuationColor: <Color>
+ *  attenuationTint: <Color>,
+ *
+ *  specularIntensity: <float>,
+ *  specularIntensityhMap: new THREE.Texture( <Image> ),
+ *  specularTint: <Color>,
+ *  specularTintMap: new THREE.Texture( <Image> )
  * }
  */
 
@@ -49,17 +54,17 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalScale = new Vector2( 1, 1 );
 		this.clearcoatNormalMap = null;
 
-		this.reflectivity = 0.5; // maps to F0 = 0.04
+		this.ior = 1.5;
 
-		Object.defineProperty( this, 'ior', {
+		Object.defineProperty( this, 'reflectivity', {
 			get: function () {
 
-				return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
+				return ( MathUtils.clamp( 2.5 * ( this.ior - 1 ) / ( this.ior + 1 ), 0, 1 ) );
 
 			},
-			set: function ( ior ) {
+			set: function ( reflectivity ) {
 
-				this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
+				this.ior = ( 1 + 0.4 * reflectivity ) / ( 1 - 0.4 * reflectivity );
 
 			}
 		} );
@@ -72,7 +77,12 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.thickness = 0.01;
 		this.thicknessMap = null;
 		this.attenuationDistance = 0.0;
-		this.attenuationColor = new Color( 1, 1, 1 );
+		this.attenuationTint = new Color( 1, 1, 1 );
+
+		this.specularIntensity = 1.0;
+		this.specularIntensityMap = null;
+		this.specularTint = new Color( 1, 1, 1 );
+		this.specularTintMap = null;
 
 		this.setValues( parameters );
 
@@ -96,7 +106,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalMap = source.clearcoatNormalMap;
 		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
 
-		this.reflectivity = source.reflectivity;
+		this.ior = source.ior;
 
 		if ( source.sheen ) {
 
@@ -114,7 +124,12 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.thickness = source.thickness;
 		this.thicknessMap = source.thicknessMap;
 		this.attenuationDistance = source.attenuationDistance;
-		this.attenuationColor.copy( source.attenuationColor );
+		this.attenuationTint.copy( source.attenuationTint );
+
+		this.specularIntensity = source.specularIntensity;
+		this.specularIntensityMap = source.specularIntensityMap;
+		this.specularTint.copy( source.specularTint );
+		this.specularTintMap = source.specularTintMap;
 
 		return this;
 

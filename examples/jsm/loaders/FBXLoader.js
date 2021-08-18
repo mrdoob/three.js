@@ -2,7 +2,6 @@ import {
 	AmbientLight,
 	AnimationClip,
 	Bone,
-	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
@@ -620,7 +619,12 @@ class FBXTreeParser {
 				case 'DiffuseColor':
 				case 'Maya|TEX_color_map':
 					parameters.map = scope.getTexture( textureMap, child.ID );
-					parameters.map.encoding = sRGBEncoding;
+					if ( parameters.map !== undefined ) {
+
+						parameters.map.encoding = sRGBEncoding;
+
+					}
+
 					break;
 
 				case 'DisplacementColor':
@@ -629,7 +633,12 @@ class FBXTreeParser {
 
 				case 'EmissiveColor':
 					parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
-					parameters.emissiveMap.encoding = sRGBEncoding;
+					if ( parameters.emissiveMap !== undefined ) {
+
+						parameters.emissiveMap.encoding = sRGBEncoding;
+
+					}
+
 					break;
 
 				case 'NormalMap':
@@ -639,13 +648,23 @@ class FBXTreeParser {
 
 				case 'ReflectionColor':
 					parameters.envMap = scope.getTexture( textureMap, child.ID );
-					parameters.envMap.mapping = EquirectangularReflectionMapping;
-					parameters.envMap.encoding = sRGBEncoding;
+					if ( parameters.envMap !== undefined ) {
+
+						parameters.envMap.mapping = EquirectangularReflectionMapping;
+						parameters.envMap.encoding = sRGBEncoding;
+
+					}
+
 					break;
 
 				case 'SpecularColor':
 					parameters.specularMap = scope.getTexture( textureMap, child.ID );
-					parameters.specularMap.encoding = sRGBEncoding;
+					if ( parameters.specularMap !== undefined ) {
+
+						parameters.specularMap.encoding = sRGBEncoding;
+
+					}
+
 					break;
 
 				case 'TransparentColor':
@@ -857,8 +876,6 @@ class FBXTreeParser {
 		this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
 
 		this.createAmbientLight();
-
-		this.setupMorphMaterials();
 
 		sceneGraph.traverse( function ( node ) {
 
@@ -1450,75 +1467,6 @@ class FBXTreeParser {
 			}
 
 		}
-
-	}
-
-	setupMorphMaterials() {
-
-		const scope = this;
-		sceneGraph.traverse( function ( child ) {
-
-			if ( child.isMesh ) {
-
-				if ( child.geometry.morphAttributes.position && child.geometry.morphAttributes.position.length ) {
-
-					if ( Array.isArray( child.material ) ) {
-
-						child.material.forEach( function ( material, i ) {
-
-							scope.setupMorphMaterial( child, material, i );
-
-						} );
-
-					} else {
-
-						scope.setupMorphMaterial( child, child.material );
-
-					}
-
-				}
-
-			}
-
-		} );
-
-	}
-
-	setupMorphMaterial( child, material, index ) {
-
-		const uuid = child.uuid;
-		const matUuid = material.uuid;
-
-		// if a geometry has morph targets, it cannot share the material with other geometries
-		let sharedMat = false;
-
-		sceneGraph.traverse( function ( node ) {
-
-			if ( node.isMesh ) {
-
-				if ( Array.isArray( node.material ) ) {
-
-					node.material.forEach( function ( mat ) {
-
-						if ( mat.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
-
-					} );
-
-				} else if ( node.material.uuid === matUuid && node.uuid !== uuid ) sharedMat = true;
-
-			}
-
-		} );
-
-		if ( sharedMat === true ) {
-
-			const clonedMat = material.clone();
-			clonedMat.morphTargets = true;
-
-			if ( index === undefined ) child.material = clonedMat;
-			else child.material[ index ] = clonedMat;
-
-		} else material.morphTargets = true;
 
 	}
 
@@ -2340,20 +2288,9 @@ class GeometryParser {
 		}
 
 		const curve = new NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
-		const vertices = curve.getPoints( controlPoints.length * 7 );
+		const points = curve.getPoints( controlPoints.length * 12 );
 
-		const positions = new Float32Array( vertices.length * 3 );
-
-		vertices.forEach( function ( vertex, i ) {
-
-			vertex.toArray( positions, i * 3 );
-
-		} );
-
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
-
-		return geometry;
+		return new BufferGeometry().setFromPoints( points );
 
 	}
 

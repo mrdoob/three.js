@@ -9,8 +9,7 @@
 			width,
 			height,
 			selects,
-			encoding,
-			morphTargets = false
+			encoding
 		} ) {
 
 			super();
@@ -154,9 +153,7 @@
 			this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 			this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse ); // normal material
 
-			this.normalMaterial = new THREE.MeshNormalMaterial( {
-				morphTargets
-			} );
+			this.normalMaterial = new THREE.MeshNormalMaterial();
 			this.normalMaterial.blending = THREE.NoBlending; // refractiveOn material
 
 			this.refractiveOnMaterial = new THREE.MeshBasicMaterial( {

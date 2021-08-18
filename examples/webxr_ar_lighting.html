@@ -83,20 +83,16 @@
 
 				//
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
-
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						defaultEnvironment = pmremGenerator.fromEquirectangular( texture ).texture;
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						defaultEnvironment = texture;
 
 						scene.environment = defaultEnvironment;
-
-						texture.dispose();
-						pmremGenerator.dispose();
 
 					} );
 

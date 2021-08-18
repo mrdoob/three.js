@@ -41,6 +41,11 @@
 			} );
 			this.register( function ( parser ) {
 
+				return new GLTFMaterialsSpecularExtension( parser );
+
+			} );
+			this.register( function ( parser ) {
+
 				return new GLTFLightsExtension( parser );
 
 			} );
@@ -331,6 +336,7 @@
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_IOR: 'KHR_materials_ior',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
+		KHR_MATERIALS_SPECULAR: 'KHR_materials_specular',
 		KHR_MATERIALS_TRANSMISSION: 'KHR_materials_transmission',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		KHR_MATERIALS_VOLUME: 'KHR_materials_volume',
@@ -693,7 +699,7 @@
 
 			materialParams.attenuationDistance = extension.attenuationDistance || 0;
 			const colorArray = extension.attenuationColor || [ 1, 1, 1 ];
-			materialParams.attenuationColor = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+			materialParams.attenuationTint = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
 			return Promise.all( pending );
 
 		}
@@ -738,6 +744,70 @@
 			const extension = materialDef.extensions[ this.name ];
 			materialParams.ior = extension.ior !== undefined ? extension.ior : 1.5;
 			return Promise.resolve();
+
+		}
+
+	}
+	/**
+ * Materials specular Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_specular
+ */
+
+
+	class GLTFMaterialsSpecularExtension {
+
+		constructor( parser ) {
+
+			this.parser = parser;
+			this.name = EXTENSIONS.KHR_MATERIALS_SPECULAR;
+
+		}
+
+		getMaterialType( materialIndex ) {
+
+			const parser = this.parser;
+			const materialDef = parser.json.materials[ materialIndex ];
+			if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
+			return THREE.MeshPhysicalMaterial;
+
+		}
+
+		extendMaterialParams( materialIndex, materialParams ) {
+
+			const parser = this.parser;
+			const materialDef = parser.json.materials[ materialIndex ];
+
+			if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+				return Promise.resolve();
+
+			}
+
+			const pending = [];
+			const extension = materialDef.extensions[ this.name ];
+			materialParams.specularIntensity = extension.specularFactor !== undefined ? extension.specularFactor : 1.0;
+
+			if ( extension.specularTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'specularIntensityMap', extension.specularTexture ) );
+
+			}
+
+			const colorArray = extension.specularColorFactor || [ 1, 1, 1 ];
+			materialParams.specularTint = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+
+			if ( extension.specularColorTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'specularTintMap', extension.specularColorTexture ).then( function ( texture ) {
+
+					texture.encoding = THREE.sRGBEncoding;
+
+				} ) );
+
+			}
+
+			return Promise.all( pending );
 
 		}
 
@@ -2501,7 +2571,7 @@
    * @param {Object} materialParams
    * @param {string} mapName
    * @param {Object} mapDef
-   * @return {Promise}
+   * @return {Promise<Texture>}
    */
 
 
@@ -2533,6 +2603,7 @@
 				}
 
 				materialParams[ mapName ] = texture;
+				return texture;
 
 			} );
 
@@ -2554,8 +2625,6 @@
 			const useVertexTangents = geometry.attributes.tangent !== undefined;
 			const useVertexColors = geometry.attributes.color !== undefined;
 			const useFlatShading = geometry.attributes.normal === undefined;
-			const useMorphTargets = Object.keys( geometry.morphAttributes ).length > 0;
-			const useMorphNormals = useMorphTargets && geometry.morphAttributes.normal !== undefined;
 
 			if ( mesh.isPoints ) {
 
@@ -2595,15 +2664,13 @@
 			} // Clone the material if it will be modified
 
 
-			if ( useVertexTangents || useVertexColors || useFlatShading || useMorphTargets ) {
+			if ( useVertexTangents || useVertexColors || useFlatShading ) {
 
 				let cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 				if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
 				if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 				if ( useVertexColors ) cacheKey += 'vertex-colors:';
 				if ( useFlatShading ) cacheKey += 'flat-shading:';
-				if ( useMorphTargets ) cacheKey += 'morph-targets:';
-				if ( useMorphNormals ) cacheKey += 'morph-normals:';
 				let cachedMaterial = this.cache.get( cacheKey );
 
 				if ( ! cachedMaterial ) {
@@ -2611,13 +2678,10 @@
 					cachedMaterial = material.clone();
 					if ( useVertexColors ) cachedMaterial.vertexColors = true;
 					if ( useFlatShading ) cachedMaterial.flatShading = true;
-					if ( useMorphTargets ) cachedMaterial.morphTargets = true;
-					if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
 					if ( useVertexTangents ) {
 
-						cachedMaterial.vertexTangents = true; // https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-
+						// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 						if ( cachedMaterial.normalScale ) cachedMaterial.normalScale.y *= - 1;
 						if ( cachedMaterial.clearcoatNormalScale ) cachedMaterial.clearcoatNormalScale.y *= - 1;
 
@@ -2643,7 +2707,7 @@
 
 		}
 
-		getMaterialType( ) {
+		getMaterialType() {
 
 			return THREE.MeshStandardMaterial;
 

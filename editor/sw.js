@@ -1,4 +1,4 @@
-// r130.1
+// r131
 
 const cacheName = 'threejs-editor';
 
@@ -175,6 +175,12 @@ const assets = [
 	'./js/Sidebar.Geometry.TubeGeometry.js',
 	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
+	'./js/Sidebar.Material.BooleanProperty.js',
+	'./js/Sidebar.Material.ColorProperty.js',
+	'./js/Sidebar.Material.ConstantProperty.js',
+	'./js/Sidebar.Material.MapProperty.js',
+	'./js/Sidebar.Material.NumberProperty.js',
+	'./js/Sidebar.Material.Program.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',
 	'./js/Strings.js',
