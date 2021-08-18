@@ -256,7 +256,6 @@
 		"webgl_postprocessing_ssaa",
 		"webgl_postprocessing_outline",
 		"webgl_postprocessing_pixel",
-		"webgl_postprocessing_pixel_outlines",
 		"webgl_postprocessing_procedural",
 		"webgl_postprocessing_sao",
 		"webgl_postprocessing_smaa",

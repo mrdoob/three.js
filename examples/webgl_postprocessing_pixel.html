@@ -1,167 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webgl - postprocessing - pixel shader</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
-	<body>
 
-		<div id="container"></div>
+<head>
+	<title>three.js webgl - pixelation pass</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
 
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader by <a href="http://wongbryan.github.io">wongbryan</a>
-		</div>
+<body>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Pixelation pass with optional single pixel outlines by
+		<a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a><br /><br />
+	</div>
 
-		<script type="module">
+	<div id="container"></div>
 
-			import * as THREE from '../build/three.module.js';
+	<script type="module">
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+		import * as THREE from '../build/three.module.js';
+		import { Vector2 } from '../build/three.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+		import { RenderPixelatedPass } from './jsm/postprocessing/RenderPixelatedPass.js';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { PixelShader } from './jsm/shaders/PixelShader.js';
+		import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			let camera, scene, renderer, gui, composer, controls;
-			let pixelPass, params;
+		let screenResolution, camera, scene, renderer, composer, renderPixelatedPass, controls, crystalMesh;
+		let gui, params;
 
-			let group;
+		init();
+		animate();
 
-			init();
-			animate();
+		function onWindowResize() {
 
-			function updateGUI() {
+			screenResolution.set( window.innerWidth, window.innerHeight );
+			const aspectRatio = screenResolution.x / screenResolution.y;
+			camera.left = -aspectRatio;
+			camera.right = aspectRatio;
+			camera.updateProjectionMatrix();
+			renderer.setSize( screenResolution.x, screenResolution.y );
+			renderPixelatedPass.setSize( screenResolution.x, screenResolution.y );
 
-				pixelPass.uniforms[ "pixelSize" ].value = params.pixelSize;
+		}
 
+		function init() {
+
+			screenResolution = new Vector2( window.innerWidth, window.innerHeight );
+			const aspectRatio = screenResolution.x / screenResolution.y;
+
+			camera = new THREE.OrthographicCamera( -aspectRatio, aspectRatio, 1, -1, 0.1, 10 );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x151729 );
+
+			renderer = new THREE.WebGLRenderer( { antialias: false } );
+			renderer.shadowMap.enabled = true;
+			renderer.setSize( screenResolution.x, screenResolution.y );
+			document.body.appendChild( renderer.domElement );
+
+			composer = new EffectComposer( renderer );
+			renderPixelatedPass = new RenderPixelatedPass( screenResolution, 6, scene, camera );
+			composer.addPass( renderPixelatedPass );
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0, 0 );
+			camera.position.z = 2;
+			camera.position.y = 2 * Math.tan( Math.PI / 6 );
+			controls.update();
+			// controls.minPolarAngle = controls.maxPolarAngle = controls.getPolarAngle();
+
+			gui = new GUI();
+			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4 };
+			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
+				.onChange( () => {
+					renderPixelatedPass.setPixelSize( params.pixelSize )
+				} );
+			gui.add( renderPixelatedPass, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
+			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
+
+			const texLoader = new THREE.TextureLoader();
+			const tex_checker = pixelTexture( texLoader.load( 'textures/checker.png' ) );
+			const tex_checker2 = pixelTexture( texLoader.load( 'textures/checker.png' ) );
+			tex_checker.repeat.set( 3, 3 );
+			tex_checker2.repeat.set( 1.5, 1.5 );
+
+			// Setup geometry
+			const boxMaterial = new THREE.MeshPhongMaterial( { map: tex_checker2 } );
+			function addBox( boxSideLength, x, z, rotation ) {
+				let mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				mesh.rotation.y = rotation;
+				mesh.position.y = boxSideLength / 2;
+				mesh.position.set( x, boxSideLength / 2 + .0001, z );
+				scene.add( mesh );
+				return mesh;
 			}
+			addBox( .4, 0, 0, Math.PI / 4 );
+			addBox( .5, -.5, -.5, Math.PI / 4 );
 
-			function init() {
+			const planeSideLength = 2;
+			const planeMesh = new THREE.Mesh(
+				new THREE.PlaneGeometry( planeSideLength, planeSideLength ),
+				new THREE.MeshPhongMaterial( { map: tex_checker } )
+			);
+			planeMesh.receiveShadow = true;
+			planeMesh.rotation.x = -Math.PI / 2;
+			scene.add( planeMesh );
 
-				const container = document.getElementById( 'container' );
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+			const radius = .2;
+			const geometry = new THREE.IcosahedronGeometry( radius );
+			crystalMesh = new THREE.Mesh(
+				geometry,
+				new THREE.MeshPhongMaterial( {
+					color: 0x2379cf,
+					emissive: 0x143542,
+					shininess: 10,
+					specular: 0xffffff
+				} )
+			);
+			crystalMesh.receiveShadow = true;
+			crystalMesh.castShadow = true;
+			scene.add( crystalMesh );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 0, 30 );
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 2.0;
-				controls.panSpeed = 0.8;
-				controls.zoomSpeed = 1.5;
+			// Setup lights
+			scene.add( new THREE.AmbientLight( 0x2d3645, 1.5 ) );
 
-				scene = new THREE.Scene();
+			const directionalLight = new THREE.DirectionalLight( 0xfffc9c, .5 );
+			directionalLight.position.set( 100, 100, 100 );
+			directionalLight.castShadow = true;
+			directionalLight.shadow.mapSize.set( 2048, 2048 );
+			scene.add( directionalLight );
 
-				const hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
-				scene.add( hemisphereLight );
+			const spotLight = new THREE.SpotLight( 0xff8800, 1, 10, Math.PI / 16, .02, 2 );
+			spotLight.position.set( 2, 2, 0 );
+			const target = spotLight.target;
+			scene.add( target );
+			target.position.set( 0, 0, 0 );
+			spotLight.castShadow = true;
+			scene.add( spotLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
-				dirLight.position.set( 150, 75, 150 );
-				scene.add( dirLight );
+		}
 
-				const dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
-				dirLight2.position.set( - 150, 75, - 150 );
-				scene.add( dirLight2 );
+		function animate() {
 
-				const dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
-				dirLight3.position.set( 0, 125, 0 );
-				scene.add( dirLight3 );
+			requestAnimationFrame( animate );
+			const t = performance.now() / 1000;
+			crystalMesh.material.emissiveIntensity = Math.sin( t * 3 ) * .5 + .5;
+			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
+			crystalMesh.rotation.y = stopGoEased( t, 2, 4 ) * 2 * Math.PI;
+			composer.render();
 
-				const geometries = [
-					new THREE.SphereGeometry( 1, 64, 64 ),
-					new THREE.BoxGeometry( 1, 1, 1 ),
-					new THREE.ConeGeometry( 1, 1, 32 ),
-					new THREE.TetrahedronGeometry( 1 ),
-					new THREE.TorusKnotGeometry( 1, .4 )
-				];
+		}
 
-				group = new THREE.Group();
+		// Helper functions
 
-				for ( let i = 0; i < 25; i ++ ) {
+		function pixelTexture( texture ) {
 
-					const geom = geometries[ Math.floor( Math.random() * geometries.length ) ];
+			texture.minFilter = THREE.NearestFilter;
+			texture.magFilter = THREE.NearestFilter;
+			texture.generateMipmaps = false;
+			texture.wrapS = THREE.RepeatWrapping;
+			texture.wrapT = THREE.RepeatWrapping;
+			return texture;
 
-					const color = new THREE.Color();
-					color.setHSL( Math.random(), .7 + .2 * Math.random(), .5 + .1 * Math.random() );
+		}
 
-					const mat = new THREE.MeshPhongMaterial( { color: color, shininess: 200 } );
+		function easeInOutCubic( x ) {
 
-					const mesh = new THREE.Mesh( geom, mat );
+			return x ** 2 * 3 - x ** 3 * 2;
 
-					const s = 4 + Math.random() * 10;
-					mesh.scale.set( s, s, s );
-					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
-					mesh.position.multiplyScalar( Math.random() * 200 );
-					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
-					group.add( mesh );
+		}
 
-				}
+		function clamp( x, min, max ) {
 
-				scene.add( group );
+			return Math.min( max, Math.max( min, x ) );
 
-				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
+		}
 
-				pixelPass = new ShaderPass( PixelShader );
-				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
-				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
-				composer.addPass( pixelPass );
+		function linearStep( x, edge0, edge1 ) {
 
-				window.addEventListener( 'resize', onWindowResize );
+			const w = edge1 - edge0;
+			const m = 1 / w;
+			const y0 = -m * edge0;
+			return clamp( y0 + m * x, 0, 1 );
 
-				params = {
-					pixelSize: 16,
-					postprocessing: true
-				};
-				gui = new GUI();
-				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
-				gui.add( params, 'postprocessing' );
+		}
 
-			}
+		function stopGoEased( x, downtime, period ) {
 
-			function onWindowResize() {
+			const cycle = ( x / period ) | 0;
+			const tween = x - cycle * period;
+			const linStep = easeInOutCubic( linearStep( tween, downtime, period ) );
+			return cycle + linStep;
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+		}
+		
+	</script>
+</body>
 
-				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
-
-			}
-
-			function update() {
-
-				controls.update();
-				updateGUI();
-
-				group.rotation.y += .0015;
-				group.rotation.z += .001;
-
-			}
-
-			function animate() {
-
-				update();
-
-				if ( params.postprocessing ) {
-
-					composer.render();
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
-
-				window.requestAnimationFrame( animate );
-
-			}
-
-		</script>
-	</body>
 </html>
