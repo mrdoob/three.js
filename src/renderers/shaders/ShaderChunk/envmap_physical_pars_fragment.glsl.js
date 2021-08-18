@@ -7,7 +7,7 @@ export default /* glsl */`
 
 	#endif
 
-	vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {
+	vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry ) {
 
 		#if defined( ENVMAP_TYPE_CUBE_UV )
 
@@ -25,7 +25,7 @@ export default /* glsl */`
 
 	}
 
-	vec3 getLightProbeIndirectRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in int maxMIPLevel ) {
+	vec3 getLightProbeIndirectRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
 
 		#if defined( ENVMAP_TYPE_CUBE_UV )
 
