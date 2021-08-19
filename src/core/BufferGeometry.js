@@ -467,12 +467,6 @@ class BufferGeometry extends EventDispatcher {
 
 	}
 
-	computeFaceNormals() {
-
-		// backwards compatibility
-
-	}
-
 	computeTangents() {
 
 		const index = this.index;
