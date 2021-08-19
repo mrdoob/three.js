@@ -39,7 +39,7 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		getPointDirectLightIrradiance( pointLights[ i ], geometry, directLight );
+		getPointLightInfo( pointLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
 		directLightColor_Diffuse = PI * directLight.color;
@@ -62,7 +62,7 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		getSpotDirectLightIrradiance( spotLights[ i ], geometry, directLight );
+		getSpotLightInfo( spotLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
 		directLightColor_Diffuse = PI * directLight.color;
@@ -79,24 +79,12 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
 
 #endif
 
-/*
-#if NUM_RECT_AREA_LIGHTS > 0
-
-	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
-
-		// TODO (abelnation): implement
-
-	}
-
-#endif
-*/
-
 #if NUM_DIR_LIGHTS > 0
 
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		getDirectionalDirectLightIrradiance( directionalLights[ i ], geometry, directLight );
+		getDirectionalLightInfo( directionalLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
 		directLightColor_Diffuse = PI * directLight.color;
