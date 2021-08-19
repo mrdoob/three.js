@@ -2,7 +2,7 @@ export default /* glsl */`
 struct PhysicalMaterial {
 
 	vec3 diffuseColor;
-	float specularRoughness;
+	float roughness;
 	vec3 specularColor;
 	float specularF90;
 
@@ -86,7 +86,7 @@ void BRDF_Specular_Multiscattering_Environment( const in vec3 normal, const in v
 		vec3 halfWidth = rectAreaLight.halfWidth;
 		vec3 halfHeight = rectAreaLight.halfHeight;
 		vec3 lightColor = rectAreaLight.color;
-		float roughness = material.specularRoughness;
+		float roughness = material.roughness;
 
 		vec3 rectCoords[ 4 ];
 		rectCoords[ 0 ] = lightPos + halfWidth - halfHeight; // counterclockwise; light shines in local neg z direction
@@ -154,7 +154,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 	#ifdef USE_SHEEN
 
 		reflectedLight.directSpecular += ( 1.0 - clearcoatDHR ) * irradiance * BRDF_Specular_Sheen(
-			material.specularRoughness,
+			material.roughness,
 			directLight.direction,
 			geometry,
 			material.sheenColor
@@ -162,7 +162,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#else
 
-		reflectedLight.directSpecular += ( 1.0 - clearcoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.specularRoughness );
+		reflectedLight.directSpecular += ( 1.0 - clearcoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.roughness );
 
 	#endif
 
@@ -200,7 +200,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	vec3 multiScattering = vec3( 0.0 );
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
-	BRDF_Specular_Multiscattering_Environment( geometry.normal, geometry.viewDir, material.specularColor, material.specularF90, material.specularRoughness, singleScattering, multiScattering );
+	BRDF_Specular_Multiscattering_Environment( geometry.normal, geometry.viewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
 
 	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
 
