@@ -45,6 +45,7 @@ import {
 	Points,
 	PointsMaterial,
 	PropertyBinding,
+	Quaternion,
 	QuaternionKeyframeTrack,
 	RGBFormat,
 	RepeatWrapping,
@@ -1776,6 +1777,23 @@ GLTFCubicSplineInterpolant.prototype.interpolate_ = function ( i1, t0, t, t1 ) {
 	return result;
 
 };
+
+const _q = new Quaternion();
+
+class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
+
+	interpolate_( i1, t0, t, t1 ) {
+
+		const result = super.interpolate_( i1, t0, t, t1 );
+
+		_q.fromArray( result ).normalize().toArray( result );
+
+		return result;
+
+	}
+
+}
+
 
 /*********************************/
 /********** INTERNALS ************/
@@ -3615,7 +3633,9 @@ class GLTFParser {
 							// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
 							// must be divided by three to get the interpolant's sampleSize argument.
 
-							return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
+							const interpolantType = ( this instanceof QuaternionKeyframeTrack ) ? GLTFCubicSplineQuaternionInterpolant : GLTFCubicSplineInterpolant;
+
+							return new interpolantType( this.times, this.values, this.getValueSize() / 3, result );
 
 						};
 
