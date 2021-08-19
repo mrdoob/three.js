@@ -279,6 +279,21 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
+			glconstants(),
+			glsl(),
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
 			glsl(),
 			babel( {
 				babelHelpers: 'bundled',
@@ -318,21 +333,6 @@ export default [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.min.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glconstants(),
-			glsl(),
-			header()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.module.js'
 			}
 		]
 	}
