@@ -37,7 +37,6 @@
 	"webgl_materials_channels": [ "normal", "depth", "rgba packing" ],
 	"webgl_materials_cubemap_mipmaps": [ "envmap" ],
 	"webgl_materials_envmaps_hdr": [ "rgbm" ],
-	"webgl_materials_envmaps_parallax": [ "onBeforeCompile" ],
 	"webgl_materials_lightmap": [ "shadow" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],
 	"webgl_materials_physical_transmission": [ "alpha" ],
