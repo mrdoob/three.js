@@ -190,6 +190,8 @@ function WebGLMaterials( properties ) {
 		// 12. clearcoat roughnessMap map
 		// 13. specular intensity map
 		// 14. specular tint map
+		// 15. transmission map
+		// 16. thickness map
 
 		let uvScaleMap;
 
@@ -248,6 +250,14 @@ function WebGLMaterials( properties ) {
 		} else if ( material.specularTintMap ) {
 
 			uvScaleMap = material.specularTintMap;
+
+		} else if ( material.transmissionMap ) {
+
+			uvScaleMap = material.transmissionMap;
+
+		} else if ( material.thicknessMap ) {
+
+			uvScaleMap = material.thicknessMap;
 
 		}
 
