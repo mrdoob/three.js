@@ -33,7 +33,7 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 
 }
 
-vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
+vec3 BRDF_Lambert( const in vec3 diffuseColor ) {
 
 	return RECIPROCAL_PI * diffuseColor;
 
@@ -79,7 +79,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 }
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in float f90, const in float roughness ) {
+vec3 BRDF_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in float f90, const in float roughness ) {
 
 	float alpha = pow2( roughness ); // UE4's roughness
 
@@ -231,7 +231,7 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }
 
-vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {
+vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
@@ -270,7 +270,7 @@ float V_Neubelt( float NoV, float NoL ) {
 
 }
 
-vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {
+vec3 BRDF_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {
 
 	vec3 N = geometry.normal;
 	vec3 V = geometry.viewDir;

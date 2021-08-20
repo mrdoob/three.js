@@ -65,7 +65,7 @@ void main() {
 
 	#include <lightmap_fragment>
 
-	reflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );
+	reflectedLight.indirectDiffuse *= BRDF_Lambert( diffuseColor.rgb );
 
 	#ifdef DOUBLE_SIDED
 
@@ -77,7 +77,7 @@ void main() {
 
 	#endif
 
-	reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();
+	reflectedLight.directDiffuse *= BRDF_Lambert( diffuseColor.rgb ) * getShadowMask();
 
 	// modulation
 
