@@ -206,7 +206,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			sheen: !! material.sheen,
 
-			transmission: !! material.transmission,
+			transmission: material.transmission > 0,
 			transmissionMap: !! material.transmissionMap,
 			thicknessMap: !! material.thicknessMap,
 
