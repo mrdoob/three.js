@@ -106,7 +106,7 @@ export default /* glsl */`
 		vec3 attenuatedColor = applyVolumeAttenuation( transmittedLight, length( transmissionRay ), attenuationColor, attenuationDistance );
 
 		// Get the specular component.
-		vec3 F = BRDF_Specular_GGX_Environment( n, v, specularColor, specularF90, roughness );
+		vec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );
 
 		return ( 1.0 - F ) * attenuatedColor * diffuseColor;
 
