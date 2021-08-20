@@ -19,8 +19,9 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 	let currentBackgroundVersion = 0;
 	let currentTonemapping = null;
 
-	function render( renderList, scene, camera, forceClear ) {
+	function render( renderList, scene ) {
 
+		let forceClear = false;
 		let background = scene.isScene === true ? scene.background : null;
 
 		if ( background && background.isTexture ) {
@@ -58,7 +59,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
@@ -100,16 +101,8 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 			}
 
-			if ( background.isWebGLCubeRenderTarget ) {
-
-				// TODO Deprecate
-
-				background = background.texture;
-
-			}
-
 			boxMesh.material.uniforms.envMap.value = background;
-			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background._needsFlipEnvMap ) ? - 1 : 1;
+			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background.isRenderTargetTexture === false ) ? - 1 : 1;
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||

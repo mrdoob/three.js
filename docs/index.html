@@ -34,6 +34,7 @@
 						<option value="ar">ar</option>
 						<option value="ko">한국어</option>
 						<option value="zh">中文</option>
+						<option value="ja">日本語</option>
 					</select>
 				</div>
 				<div id="content"></div>
@@ -67,7 +68,7 @@
 
 			// *BufferGeometry to *Geometry
 
-			if ( /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+			if ( /Instanced/.exec( window.location.hash ) !== null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
 
 				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
 
@@ -81,7 +82,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
@@ -133,6 +134,7 @@
 
 
 			// Functionality for search/filter input field
+
 			filterInput.onfocus = function () {
 
 				panel.classList.add( 'searchFocused' );
@@ -149,17 +151,17 @@
 
 			};
 
+			filterInput.oninput = function () {
+
+				updateFilter();
+
+			};
+
 			exitSearchButton.onclick = function () {
 
 				filterInput.value = '';
 				updateFilter();
 				panel.classList.remove( 'searchFocused' );
-
-			};
-
-			filterInput.oninput = function () {
-
-				updateFilter();
 
 			};
 
@@ -171,6 +173,18 @@
 
 			createNavigation( list, language );
 			createNewIframe();
+
+			// Handle search query
+
+			filterInput.value = extractQuery();
+
+			if ( filterInput.value !== '' ) {
+
+				panel.classList.add( 'searchFocused' );
+
+				updateFilter();
+
+			}
 
 		}
 
@@ -224,6 +238,7 @@
 			}
 
 			const localList = list[ language ];
+			const selectedPage = window.location.hash.substring( 1 );
 
 			for ( const section in localList ) {
 
@@ -265,6 +280,14 @@
 						const linkElement = createLink( pageName, pageURL );
 						listElement.appendChild( linkElement );
 
+						// select current page
+
+						if ( pageURL === selectedPage ) {
+
+							linkElement.classList.add( 'selected' );
+
+						}
+
 						// Gather the main properties for the current subpage
 
 						pageProperties[ pageName ] = {
@@ -305,10 +328,36 @@
 
 		// Filtering
 
+		function extractQuery() {
+
+			const search = window.location.search;
+
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
+
+				return decodeURI( search.substr( 3 ) );
+
+			}
+
+			return '';
+
+		}
+
 		function updateFilter() {
 
-			// (uncomment the following line and the "Query strings" section, if you want query strings):
-			// updateQueryString();
+			let v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+
+			if ( v !== '' ) {
+
+				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
+			} else {
+
+				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
+			}
+
+			//
 
 			const regExp = new RegExp( filterInput.value, 'gi' );
 
@@ -318,21 +367,9 @@
 				const categoryClassList = linkElement.parentElement.classList;
 				const filterResults = pageName.match( regExp );
 
-				if ( filterResults && filterResults.length > 0 ) {
+				if ( filterResults !== null && filterResults.length > 0 ) {
 
-					// Accentuate matching characters
-
-					for ( let i = 0; i < filterResults.length; i ++ ) {
-
-						const result = filterResults[ i ];
-
-						if ( result !== '' ) {
-
-							pageName = pageName.replace( result, '<b>' + result + '</b>' );
-
-						}
-
-					}
+					pageName = pageName.replaceAll( regExp, '<b>$&</b>' );
 
 					categoryClassList.remove( 'hidden' );
 					linkElement.innerHTML = pageName;
@@ -438,11 +475,13 @@
 
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
+				iframe.style.display = 'unset';
 
 			} else {
 
 				iframe.src = '';
 				subtitle = '';
+				iframe.style.display = 'none';
 
 			}
 

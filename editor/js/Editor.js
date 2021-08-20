@@ -26,6 +26,11 @@ function Editor() {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
+		// vr
+
+		toggleVR: new Signal(),
+		exitedVR: new Signal(),
+
 		// notifications
 
 		editorCleared: new Signal(),
@@ -36,7 +41,7 @@ function Editor() {
 		transformModeChanged: new Signal(),
 		snapChanged: new Signal(),
 		spaceChanged: new Signal(),
-		rendererChanged: new Signal(),
+		rendererCreated: new Signal(),
 		rendererUpdated: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
@@ -126,9 +131,9 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
-		this.scene.background = ( scene.background !== null ) ? scene.background.clone() : null;
-
-		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+		this.scene.background = scene.background;
+		this.scene.environment = scene.environment;
+		this.scene.fog = scene.fog;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -409,7 +414,7 @@ Editor.prototype = {
 
 				} else if ( object.isSpotLight ) {
 
-					helper = new THREE.SpotLightHelper( object, 1 );
+					helper = new THREE.SpotLightHelper( object );
 
 				} else if ( object.isHemisphereLight ) {
 
@@ -636,12 +641,10 @@ Editor.prototype = {
 
 	//
 
-	fromJSON: function ( json ) {
-
-		var scope = this;
+	fromJSON: async function ( json ) {
 
 		var loader = new THREE.ObjectLoader();
-		var camera = loader.parse( json.camera );
+		var camera = await loader.parseAsync( json.camera );
 
 		this.camera.copy( camera );
 		this.signals.cameraResetted.dispatch();
@@ -649,11 +652,7 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		loader.parse( json.scene, function ( scene ) {
-
-			scope.setScene( scene );
-
-		} );
+		this.setScene( await loader.parseAsync( json.scene ) );
 
 	},
 

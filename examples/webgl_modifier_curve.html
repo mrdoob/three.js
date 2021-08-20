@@ -15,13 +15,12 @@
 		</div>
 
 		<script type="module">
-			import * as THREE from "../build/three.module.js";
-			import { TransformControls } from "./jsm/controls/TransformControls.js";
-			import Stats from "./jsm/libs/stats.module.js";
-			import { Flow } from "./jsm/modifiers/CurveModifier.js";
+			import * as THREE from '../build/three.module.js';
+			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import Stats from './jsm/libs/stats.module.js';
+			import { Flow } from './jsm/modifiers/CurveModifier.js';
 
-			const ACTION_SELECT = 1,
-				ACTION_NONE = 0;
+			const ACTION_SELECT = 1, ACTION_NONE = 0;
 			const curveHandles = [];
 			const mouse = new THREE.Vector2();
 
@@ -72,7 +71,7 @@
 				const curve = new THREE.CatmullRomCurve3(
 					curveHandles.map( ( handle ) => handle.position )
 				);
-				curve.curveType = "centripetal";
+				curve.curveType = 'centripetal';
 				curve.closed = true;
 
 				const points = curve.getPoints( 50 );
@@ -97,12 +96,9 @@
 				//
 
 				const loader = new THREE.FontLoader();
+				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-				loader.load( "fonts/helvetiker_regular.typeface.json", function (
-					font
-				) {
-
-					const geometry = new THREE.TextGeometry( "Hello three.js!", {
+					const geometry = new THREE.TextGeometry( 'Hello three.js!', {
 						font: font,
 						size: 0.2,
 						height: 0.05,
@@ -139,7 +135,7 @@
 
 				rayCaster = new THREE.Raycaster();
 				control = new TransformControls( camera, renderer.domElement );
-				control.addEventListener( "dragging-changed", function ( event ) {
+				control.addEventListener( 'dragging-changed', function ( event ) {
 
 					if ( ! event.value ) {
 
@@ -154,7 +150,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				window.addEventListener( "resize", onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

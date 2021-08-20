@@ -15,9 +15,23 @@
 			import { Reflector } from './jsm/objects/Reflector.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			let camera, scene, renderer;
+			import { HTMLMesh } from './jsm/interactive/HTMLMesh.js';
+			import { InteractiveGroup } from './jsm/interactive/InteractiveGroup.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			let camera, scene, renderer;
 			let reflector;
+
+			const parameters = {
+				radius: 0.5,
+				tube: 0.2,
+				tubularSegments: 150,
+				radialSegments: 20,
+				p: 2,
+				q: 3
+			};
 
 			init();
 			animate();
@@ -32,25 +46,27 @@
 				scene.background = background;
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.set( 0, 1.6, 2 );
+				camera.position.set( 0, 1.6, 1.5 );
 
-				const torusGeometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
+				//
+
+				const torusGeometry = new THREE.TorusKnotGeometry( ...Object.values( parameters ) );
 				const torusMaterial = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
 				const torus = new THREE.Mesh( torusGeometry, torusMaterial );
-				torus.position.y = 0.75;
+				torus.name = 'torus';
+				torus.position.y = 1.25;
 				torus.position.z = - 2;
 				torus.castShadow = true;
 				torus.receiveShadow = true;
 				scene.add( torus );
 
-				const boxGeometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
-				const boxMaterial = new THREE.MeshPhongMaterial();
-				const box = new THREE.Mesh( boxGeometry, boxMaterial );
-				box.position.y = - 0.2;
-				box.position.z = - 2;
-				box.castShadow = true;
-				box.receiveShadow = true;
-				scene.add( box );
+				const cylinderGeometry = new THREE.CylinderGeometry( 1, 1, 0.1, 50 );
+				const cylinderMaterial = new THREE.MeshPhongMaterial();
+				const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+				cylinder.position.z = - 2;
+				cylinder.castShadow = true;
+				cylinder.receiveShadow = true;
+				scene.add( cylinder );
 
 				const light1 = new THREE.DirectionalLight( 0x8800ff );
 				light1.position.set( - 1, 1.5, - 1.5 );
@@ -90,17 +106,17 @@
 
 				//
 
-				reflector = new Reflector( new THREE.PlaneGeometry( 1.4, 1.4 ), {
+				reflector = new Reflector( new THREE.PlaneGeometry( 2, 2 ), {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );
 				reflector.position.x = 1;
-				reflector.position.y = 0.5;
+				reflector.position.y = 1.25;
 				reflector.position.z = - 3;
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 
-				const frameGeometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
+				const frameGeometry = new THREE.BoxGeometry( 2.1, 2.1, 0.1 );
 				const frameMaterial = new THREE.MeshPhongMaterial();
 				const frame = new THREE.Mesh( frameGeometry, frameMaterial );
 				frame.position.z = - 0.07;
@@ -120,9 +136,61 @@
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
+				window.addEventListener( 'resize', onWindowResize );
+
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+
+				const controller1 = renderer.xr.getController( 0 );
+				controller1.add( new THREE.Line( geometry ) );
+				scene.add( controller1 );
+
+				const controller2 = renderer.xr.getController( 1 );
+				controller2.add( new THREE.Line( geometry ) );
+				scene.add( controller2 );
+
+				//
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				const controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				const controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+				// GUI
+
+				function onChange() {
+
+					torus.geometry.dispose();
+					torus.geometry = new THREE.TorusKnotGeometry( ...Object.values( parameters ) );
+
+				}
+
+				const gui = new GUI( { width: 300 } );
+				gui.add( parameters, 'radius', 0.0, 1.0 ).onChange( onChange );
+				gui.add( parameters, 'tube', 0.0, 1.0 ).onChange( onChange );
+				gui.add( parameters, 'tubularSegments', 10, 150, 1 ).onChange( onChange );
+				gui.add( parameters, 'radialSegments', 2, 20, 1 ).onChange( onChange );
+				gui.add( parameters, 'p', 1, 10, 1 ).onChange( onChange );
+				gui.add( parameters, 'q', 0, 10, 1 ).onChange( onChange );
+				gui.domElement.style.visibility = 'hidden';
+
+				const group = new InteractiveGroup( renderer, camera );
+				scene.add( group );
+
+				const mesh = new HTMLMesh( gui.domElement );
+				mesh.position.x = - 0.75;
+				mesh.position.y = 1.5;
+				mesh.position.z = - 0.5;
+				mesh.rotation.y = Math.PI / 4;
+				mesh.scale.setScalar( 2 );
+				group.add( mesh );
 
 			}
 
@@ -144,7 +212,7 @@
 			function render() {
 
 				const time = performance.now() * 0.0002;
-				const torus = scene.children[ 0 ];
+				const torus = scene.getObjectByName( 'torus' );
 				torus.rotation.x = time * 2;
 				torus.rotation.y = time * 5;
 

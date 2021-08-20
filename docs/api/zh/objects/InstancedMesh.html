@@ -49,13 +49,13 @@
 			如果你需要比原先的数量更多的实例数量，你需要创建一个新的[name]。
 		</p>
 
-		<h3>[property:BufferAttribute instanceColor]</h3>
+		<h3>[property:InstancedBufferAttribute instanceColor]</h3>
 		<p>
 			Represents the colors of all instances. *null* by default.
 			You have to set its [page:BufferAttribute.needsUpdate needsUpdate] flag to true if you modify instanced data via [page:.setColorAt]().
 		</p>
 
-		<h3>[property:BufferAttribute instanceMatrix]</h3>
+		<h3>[property:InstancedBufferAttribute instanceMatrix]</h3>
 		<p>
 			表示所有实例的本地变换。
 			如果你要通过 [page:.setMatrixAt]() 来修改实例数据，你必须将它的 [page:BufferAttribute.needsUpdate needsUpdate] 标识为 true 。

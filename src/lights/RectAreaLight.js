@@ -13,6 +13,20 @@ class RectAreaLight extends Light {
 
 	}
 
+	get power() {
+
+		// compute the light's luminous power (in lumens) from its intensity (in nits)
+		return this.intensity * this.width * this.height * Math.PI;
+
+	}
+
+	set power( power ) {
+
+		// set the light's intensity (in nits) from the desired luminous power (in lumens)
+		this.intensity = power / ( this.width * this.height * Math.PI );
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );

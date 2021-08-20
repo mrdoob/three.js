@@ -10,145 +10,148 @@ import { NodeBuilder } from '../core/NodeBuilder.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { TextureNode } from './TextureNode.js';
 
-function RTTNode( width, height, input, options ) {
+class RTTNode extends TextureNode {
 
-	options = options || {};
+	constructor( width, height, input, options = {} ) {
 
-	this.input = input;
+		const renderTarget = new WebGLRenderTarget( width, height, options );
 
-	this.clear = options.clear !== undefined ? options.clear : true;
+		super( renderTarget.texture );
 
-	this.renderTarget = new WebGLRenderTarget( width, height, options );
+		this.input = input;
 
-	this.material = new NodeMaterial();
+		this.clear = options.clear !== undefined ? options.clear : true;
 
-	this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new Scene();
+		this.renderTarget = renderTarget;
 
-	this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+		this.material = new NodeMaterial();
 
-	this.render = true;
+		this.camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+		this.scene = new Scene();
 
-	TextureNode.call( this, this.renderTarget.texture );
+		this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
+		this.quad.frustumCulled = false; // Avoid getting clipped
+		this.scene.add( this.quad );
 
-}
+		this.render = true;
 
-RTTNode.prototype = Object.create( TextureNode.prototype );
-RTTNode.prototype.constructor = RTTNode;
-RTTNode.prototype.nodeType = 'RTT';
-
-RTTNode.prototype.build = function ( builder, output, uuid ) {
-
-	var rttBuilder = new NodeBuilder();
-	rttBuilder.nodes = builder.nodes;
-	rttBuilder.updaters = builder.updaters;
-
-	this.material.fragment.value = this.input;
-	this.material.build( { builder: rttBuilder } );
-
-	return TextureNode.prototype.build.call( this, builder, output, uuid );
-
-};
-
-RTTNode.prototype.updateFramesaveTo = function ( frame ) {
-
-	this.saveTo.render = false;
-
-	if ( this.saveTo !== this.saveToCurrent ) {
-
-		if ( this.saveToMaterial ) this.saveToMaterial.dispose();
-
-		var material = new NodeMaterial();
-		material.fragment.value = this;
-		material.build();
-
-		var scene = new Scene();
-
-		var quad = new Mesh( new PlaneGeometry( 2, 2 ), material );
-		quad.frustumCulled = false; // Avoid getting clipped
-		scene.add( quad );
-
-		this.saveToScene = scene;
-		this.saveToMaterial = material;
 
 	}
 
-	this.saveToCurrent = this.saveTo;
+	build( builder, output, uuid ) {
 
-	frame.renderer.setRenderTarget( this.saveTo.renderTarget );
-	if ( this.saveTo.clear ) frame.renderer.clear();
-	frame.renderer.render( this.saveToScene, this.camera );
+		const rttBuilder = new NodeBuilder();
+		rttBuilder.nodes = builder.nodes;
+		rttBuilder.updaters = builder.updaters;
 
-};
+		this.material.fragment.value = this.input;
+		this.material.build( { builder: rttBuilder } );
 
-RTTNode.prototype.updateFrame = function ( frame ) {
+		return super.build( builder, output, uuid );
 
-	if ( frame.renderer ) {
+	}
 
-		// from the second frame
+	updateFramesaveTo( frame ) {
 
-		if ( this.saveTo && this.saveTo.render === false ) {
+		this.saveTo.render = false;
 
-			this.updateFramesaveTo( frame );
+		if ( this.saveTo !== this.saveToCurrent ) {
+
+			if ( this.saveToMaterial ) this.saveToMaterial.dispose();
+
+			const material = new NodeMaterial();
+			material.fragment.value = this;
+			material.build();
+
+			const scene = new Scene();
+
+			const quad = new Mesh( new PlaneGeometry( 2, 2 ), material );
+			quad.frustumCulled = false; // Avoid getting clipped
+			scene.add( quad );
+
+			this.saveToScene = scene;
+			this.saveToMaterial = material;
 
 		}
 
-		if ( this.render ) {
+		this.saveToCurrent = this.saveTo;
 
-			if ( this.material.uniforms.renderTexture ) {
+		frame.renderer.setRenderTarget( this.saveTo.renderTarget );
+		if ( this.saveTo.clear ) frame.renderer.clear();
+		frame.renderer.render( this.saveToScene, this.camera );
 
-				this.material.uniforms.renderTexture.value = frame.renderTexture;
+	}
+
+	updateFrame( frame ) {
+
+		if ( frame.renderer ) {
+
+			// from the second frame
+
+			if ( this.saveTo && this.saveTo.render === false ) {
+
+				this.updateFramesaveTo( frame );
 
 			}
 
-			frame.renderer.setRenderTarget( this.renderTarget );
-			if ( this.clear ) frame.renderer.clear();
-			frame.renderer.render( this.scene, this.camera );
+			if ( this.render ) {
+
+				if ( this.material.uniforms.renderTexture ) {
+
+					this.material.uniforms.renderTexture.value = frame.renderTexture;
+
+				}
+
+				frame.renderer.setRenderTarget( this.renderTarget );
+				if ( this.clear ) frame.renderer.clear();
+				frame.renderer.render( this.scene, this.camera );
+
+			}
+
+			// first frame
+
+			if ( this.saveTo && this.saveTo.render === true ) {
+
+				this.updateFramesaveTo( frame );
+
+			}
+
+		} else {
+
+			console.warn( 'RTTNode need a renderer in NodeFrame' );
 
 		}
 
-		// first frame
+	}
 
-		if ( this.saveTo && this.saveTo.render === true ) {
+	copy( source ) {
 
-			this.updateFramesaveTo( frame );
+		super.copy( source );
+
+		this.saveTo = source.saveTo;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = super.toJSON( meta );
+
+			if ( this.saveTo ) data.saveTo = this.saveTo.toJSON( meta ).uuid;
 
 		}
 
-	} else {
-
-		console.warn( 'RTTNode need a renderer in NodeFrame' );
+		return data;
 
 	}
 
-};
+}
 
-RTTNode.prototype.copy = function ( source ) {
-
-	TextureNode.prototype.copy.call( this, source );
-
-	this.saveTo = source.saveTo;
-
-	return this;
-
-};
-
-RTTNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = TextureNode.prototype.toJSON.call( this, meta );
-
-		if ( this.saveTo ) data.saveTo = this.saveTo.toJSON( meta ).uuid;
-
-	}
-
-	return data;
-
-};
+RTTNode.prototype.nodeType = 'RTT';
 
 export { RTTNode };

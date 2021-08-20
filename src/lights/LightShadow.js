@@ -17,6 +17,7 @@ class LightShadow {
 		this.bias = 0;
 		this.normalBias = 0;
 		this.radius = 1;
+		this.blurSamples = 8;
 
 		this.mapSize = new Vector2( 512, 512 );
 
@@ -88,6 +89,22 @@ class LightShadow {
 	getFrameExtents() {
 
 		return this._frameExtents;
+
+	}
+
+	dispose() {
+
+		if ( this.map ) {
+
+			this.map.dispose();
+
+		}
+
+		if ( this.mapPass ) {
+
+			this.mapPass.dispose();
+
+		}
 
 	}
 

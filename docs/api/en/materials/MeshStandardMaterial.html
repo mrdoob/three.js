@@ -49,7 +49,7 @@
 		</p>
 		<p>
 			Technical details of the approach used in three.js (and most other PBR systems) can be found is this
-			[link:https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf paper from Disney] (pdf),
+			[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf paper from Disney] (pdf),
 			by Brent Burley.
 		</p>
 
@@ -196,15 +196,6 @@
 		<h3>[property:Texture metalnessMap]</h3>
 		<p>The blue channel of this texture is used to alter the metalness of the material.</p>
 
-		<h3>[property:Boolean morphNormals]</h3>
-		<p>
-			Defines whether the material uses morphNormals. Set as true to pass morphNormal
-			attributes from the geometry to the shader. Default is *false*.
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>Define whether the material uses morphTargets. Default is false.</p>
-
 		<h3>[property:Texture normalMap]</h3>
 		<p>
 			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
@@ -241,16 +232,6 @@
 
 		<h3>[property:Texture roughnessMap]</h3>
 		<p>The green channel of this texture is used to alter the roughness of the material.</p>
-
-		<h3>[property:Boolean skinning]</h3>
-		<p>Define whether the material uses skinning. Default is false.</p>
-
-		<h3>[property:Boolean vertexTangents]</h3>
-		<p>
-		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
-		</p>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>Render geometry as wireframe. Default is *false* (i.e. render as flat polygons).</p>

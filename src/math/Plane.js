@@ -99,25 +99,11 @@ class Plane {
 
 	projectPoint( point, target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .projectPoint() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
 
 	}
 
 	intersectLine( line, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .intersectLine() target is now required' );
-			target = new Vector3();
-
-		}
 
 		const direction = line.delta( _vector1 );
 
@@ -133,7 +119,7 @@ class Plane {
 			}
 
 			// Unsure if this is the correct method to handle this case.
-			return undefined;
+			return null;
 
 		}
 
@@ -141,7 +127,7 @@ class Plane {
 
 		if ( t < 0 || t > 1 ) {
 
-			return undefined;
+			return null;
 
 		}
 
@@ -173,13 +159,6 @@ class Plane {
 	}
 
 	coplanarPoint( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .coplanarPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.copy( this.normal ).multiplyScalar( - this.constant );
 

@@ -7,7 +7,7 @@ import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
-import { unzipSync, strFromU8 } from '../../examples/jsm/libs/fflate.module.min.js';
+import { unzipSync, strFromU8 } from '../../examples/jsm/libs/fflate.module.js';
 
 function Loader( editor ) {
 
@@ -192,8 +192,7 @@ function Loader( editor ) {
 						} else {
 
 							var material = new THREE.PointsMaterial( { size: 0.01 } );
-
-							if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+							material.vertexColors = geometry.hasAttribute( 'color' );
 
 							object = new THREE.Points( geometry, material );
 							object.name = filename;
@@ -299,11 +298,6 @@ function Loader( editor ) {
 			case 'js':
 			case 'json':
 
-			case '3geo':
-			case '3mat':
-			case '3obj':
-			case '3scn':
-
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
@@ -352,6 +346,24 @@ function Loader( editor ) {
 
 				break;
 
+			case 'ifc':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					var { IFCLoader } = await import( '../../examples/jsm/loaders/IFCLoader.js' );
+
+					var loader = new IFCLoader();
+					loader.ifcManager.setWasmPath( '../../examples/jsm/loaders/ifc/' );
+
+					var model = await loader.parse( event.target.result );
+					model.mesh.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, model.mesh ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case 'kmz':
 
@@ -371,6 +383,31 @@ function Loader( editor ) {
 
 				break;
 
+			case 'ldr':
+			case 'mpd':
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					var { LDrawLoader } = await import( '../../examples/jsm/loaders/LDrawLoader.js' );
+
+					var loader = new LDrawLoader();
+					loader.fileMap = {}; // TODO Uh...
+					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
+					loader.parse( event.target.result, undefined, function ( group ) {
+
+						group.name = filename;
+						// Convert from LDraw coordinates: rotate 180 degrees around OX
+						group.rotation.x = Math.PI;
+
+						editor.execute( new AddObjectCommand( editor, group ) );
+
+					} );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
 			case 'md2':
 
 				reader.addEventListener( 'load', async function ( event ) {
@@ -380,10 +417,7 @@ function Loader( editor ) {
 					var { MD2Loader } = await import( '../../examples/jsm/loaders/MD2Loader.js' );
 
 					var geometry = new MD2Loader().parse( contents );
-					var material = new THREE.MeshStandardMaterial( {
-						morphTargets: true,
-						morphNormals: true
-					} );
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.mixer = new THREE.AnimationMixer( mesh );
@@ -424,12 +458,26 @@ function Loader( editor ) {
 					var { PLYLoader } = await import( '../../examples/jsm/loaders/PLYLoader.js' );
 
 					var geometry = new PLYLoader().parse( contents );
-					var material = new THREE.MeshStandardMaterial();
+					var object;
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
+					if ( geometry.index !== null ) {
 
-					editor.execute( new AddObjectCommand( editor, mesh ) );
+						var material = new THREE.MeshStandardMaterial();
+
+						object = new THREE.Mesh( geometry, material );
+						object.name = filename;
+
+					} else {
+
+						var material = new THREE.PointsMaterial( { size: 0.01 } );
+						material.vertexColors = geometry.hasAttribute( 'color' );
+
+						object = new THREE.Points( geometry, material );
+						object.name = filename;
+
+					}
+
+					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -492,7 +540,7 @@ function Loader( editor ) {
 							depthWrite: false
 						} );
 
-						var shapes = path.toShapes( true );
+						var shapes = SVGLoader.createShapes( path );
 
 						for ( var j = 0; j < shapes.length; j ++ ) {
 

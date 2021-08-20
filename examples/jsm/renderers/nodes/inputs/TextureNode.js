@@ -3,14 +3,12 @@ import UVNode from '../accessors/UVNode.js';
 
 class TextureNode extends InputNode {
 
-	constructor( value, uv = new UVNode() ) {
+	constructor( value = null, uv = new UVNode() ) {
 
 		super( 'texture' );
 
 		this.value = value;
 		this.uv = uv;
-
-		Object.defineProperty( this, 'isTextureNode', { value: true } );
 
 	}
 
@@ -28,5 +26,7 @@ class TextureNode extends InputNode {
 	}
 
 }
+
+TextureNode.prototype.isTextureNode = true;
 
 export default TextureNode;

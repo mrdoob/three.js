@@ -298,6 +298,12 @@ class PolyhedronGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );
+
+	}
+
 }
 
 export { PolyhedronGeometry, PolyhedronGeometry as PolyhedronBufferGeometry };

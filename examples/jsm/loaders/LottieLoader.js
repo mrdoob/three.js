@@ -36,7 +36,6 @@ class LottieLoader extends Loader {
 			container.style.height = data.h + 'px';
 			document.body.appendChild( container );
 
-			// eslint-disable-next-line no-undef
 			const animation = bodymovin.loadAnimation( {
 				container: container,
 				animType: 'canvas',

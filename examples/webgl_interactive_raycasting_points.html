@@ -25,7 +25,7 @@
 			let clock;
 			let toggle = 0;
 
-			const mouse = new THREE.Vector2();
+			const pointer = new THREE.Vector2();
 			const spheres = [];
 
 			const threshold = 0.1;
@@ -209,16 +209,14 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				document.addEventListener( 'pointermove', onPointerMove );
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -245,7 +243,7 @@
 				camera.applyMatrix4( rotateY );
 				camera.updateMatrixWorld();
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( pointer, camera );
 
 				const intersections = raycaster.intersectObjects( pointclouds );
 				intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;

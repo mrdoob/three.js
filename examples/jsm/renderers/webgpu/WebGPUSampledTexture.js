@@ -16,12 +16,17 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 		this.textureGPU = null; // set by the renderer
 
-		Object.defineProperty( this, 'isSampledTexture', { value: true } );
+	}
+
+	getTexture() {
+
+		return this.texture;
 
 	}
 
-
 }
+
+WebGPUSampledTexture.prototype.isSampledTexture = true;
 
 class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
 
@@ -31,11 +36,11 @@ class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
 
 		this.dimension = GPUTextureViewDimension.TwoDArray;
 
-		Object.defineProperty( this, 'isSampledArrayTexture', { value: true } );
-
 	}
 
 }
+
+WebGPUSampledArrayTexture.prototype.isSampledArrayTexture = true;
 
 class WebGPUSampled3DTexture extends WebGPUSampledTexture {
 
@@ -45,11 +50,11 @@ class WebGPUSampled3DTexture extends WebGPUSampledTexture {
 
 		this.dimension = GPUTextureViewDimension.ThreeD;
 
-		Object.defineProperty( this, 'isSampled3DTexture', { value: true } );
-
 	}
 
 }
+
+WebGPUSampled3DTexture.prototype.isSampled3DTexture = true;
 
 class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
@@ -59,10 +64,10 @@ class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
 		this.dimension = GPUTextureViewDimension.Cube;
 
-		Object.defineProperty( this, 'isSampledCubeTexture', { value: true } );
-
 	}
 
 }
+
+WebGPUSampledCubeTexture.prototype.isSampledCubeTexture = true;
 
 export { WebGPUSampledTexture, WebGPUSampledArrayTexture, WebGPUSampled3DTexture, WebGPUSampledCubeTexture };

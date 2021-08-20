@@ -37,7 +37,7 @@
 			</ul>
 		</p>
 		<p>在 three.js（以及其他大多数PBR系统）中使用方法的技术细节，
-			可以在Brent Burley撰写的[link:https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf paper from Disney] (pdf)
+			可以在Brent Burley撰写的[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf paper from Disney] (pdf)
 			中查看。
 		</p>
 
@@ -161,13 +161,6 @@
 		<h3>[property:Texture metalnessMap]</h3>
 		<p> 该纹理的蓝色通道用于改变材质的金属度。</p>
 
-		<h3>[property:Boolean morphNormals]</h3>
-		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从geometry传递到shader。默认值为*false*。
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>定义材质是否使用morphTargets。默认值为false。</p>
-
 		<h3>[property:Texture normalMap]</h3>
 		<p>用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
 			In case the material has a normal map authored using the left handed convention, the y component of normalScale
@@ -197,17 +190,6 @@
 
 		<h3>[property:Texture roughnessMap]</h3>
 		<p>该纹理的绿色通道用于改变材质的粗糙度。</p>
-
-		<h3>[property:Boolean skinning]</h3>
-		<p>材质是否使用蒙皮。默认值为false。</p>
-
-		<h3>[property:Boolean vertexTangents]</h3>
-		<p>
-		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
-		</p>
-
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>将几何体渲染为线框。默认值为*false*（即渲染为平面多边形）。</p>

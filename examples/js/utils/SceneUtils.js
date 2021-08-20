@@ -1,20 +1,17 @@
-THREE.SceneUtils = {
+( function () {
 
-	createMeshesFromInstancedMesh: function ( instancedMesh ) {
+	function createMeshesFromInstancedMesh( instancedMesh ) {
 
-		var group = new THREE.Group();
+		const group = new THREE.Group();
+		const count = instancedMesh.count;
+		const geometry = instancedMesh.geometry;
+		const material = instancedMesh.material;
 
-		var count = instancedMesh.count;
-		var geometry = instancedMesh.geometry;
-		var material = instancedMesh.material;
+		for ( let i = 0; i < count; i ++ ) {
 
-		for ( var i = 0; i < count; i ++ ) {
-
-			var mesh = new THREE.Mesh( geometry, material );
-
+			const mesh = new THREE.Mesh( geometry, material );
 			instancedMesh.getMatrixAt( i, mesh.matrix );
 			mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
-
 			group.add( mesh );
 
 		}
@@ -24,13 +21,13 @@ THREE.SceneUtils = {
 
 		return group;
 
-	},
+	}
 
-	createMultiMaterialObject: function ( geometry, materials ) {
+	function createMultiMaterialObject( geometry, materials ) {
 
-		var group = new THREE.Group();
+		const group = new THREE.Group();
 
-		for ( var i = 0, l = materials.length; i < l; i ++ ) {
+		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 			group.add( new THREE.Mesh( geometry, materials[ i ] ) );
 
@@ -38,22 +35,26 @@ THREE.SceneUtils = {
 
 		return group;
 
-	},
+	}
 
-	detach: function ( child, parent, scene ) {
+	function detach( child, parent, scene ) {
 
 		console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
-
 		scene.attach( child );
 
-	},
+	}
 
-	attach: function ( child, scene, parent ) {
+	function attach( child, scene, parent ) {
 
 		console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
-
 		parent.attach( child );
 
 	}
 
-};
+	THREE.SceneUtils = {};
+	THREE.SceneUtils.attach = attach;
+	THREE.SceneUtils.createMeshesFromInstancedMesh = createMeshesFromInstancedMesh;
+	THREE.SceneUtils.createMultiMaterialObject = createMultiMaterialObject;
+	THREE.SceneUtils.detach = detach;
+
+} )();

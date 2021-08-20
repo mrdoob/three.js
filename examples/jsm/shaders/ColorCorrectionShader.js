@@ -6,7 +6,7 @@ import {
  * Color correction
  */
 
-var ColorCorrectionShader = {
+const ColorCorrectionShader = {
 
 	uniforms: {
 
@@ -17,37 +17,33 @@ var ColorCorrectionShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = uv;',
+			vUv = uv;
 
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+		}`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		uniform sampler2D tDiffuse;
+		uniform vec3 powRGB;
+		uniform vec3 mulRGB;
+		uniform vec3 addRGB;
 
-		'uniform sampler2D tDiffuse;',
-		'uniform vec3 powRGB;',
-		'uniform vec3 mulRGB;',
-		'uniform vec3 addRGB;',
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		void main() {
 
-		'void main() {',
+			gl_FragColor = texture2D( tDiffuse, vUv );
+			gl_FragColor.rgb = mulRGB * pow( ( gl_FragColor.rgb + addRGB ), powRGB );
 
-		'	gl_FragColor = texture2D( tDiffuse, vUv );',
-		'	gl_FragColor.rgb = mulRGB * pow( ( gl_FragColor.rgb + addRGB ), powRGB );',
-
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 

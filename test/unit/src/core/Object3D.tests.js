@@ -440,6 +440,12 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( child1.parent, null, "First child has no parent" );
 			assert.strictEqual( child2.parent, null, "Second child has no parent" );
 
+			a.add( child1 );
+			assert.strictEqual( a.children.length, 1, "The child was added to the parent" );
+			child1.removeFromParent();
+			assert.strictEqual( a.children.length, 0, "The child was removed" );
+			assert.strictEqual( child1.parent, null, "Child has no parent" );
+
 		} );
 
 		QUnit.test( "attach", ( assert ) => {

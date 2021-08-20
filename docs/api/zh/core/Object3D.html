@@ -247,7 +247,7 @@
 		请注意，大多数的对象中name默认是一个空字符串，要使用这个方法，你将需要手动地设置name属性。
 	</p>
 
-	<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Float value] )</h3>
+	<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Any value] )</h3>
 	<p>
 		name —— 将要用于查找的属性的名称。<br />
 		value —— 给定的属性的值。 <br /><br />
@@ -303,6 +303,11 @@
 	<h3>[method:null remove]( [param:Object3D object], ... )</h3>
 	<p>
 		从当前对象的子级中移除<b>对象</b>。可以移除任意数量的对象。
+	</p>
+
+	<h3>[method:this removeFromParent]()</h3>
+	<p>
+	Removes this object from its current parent.
 	</p>
 
 	<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>

@@ -1,44 +1,47 @@
-/**
+( function () {
+
+	/**
  * Full-screen textured quad shader
  */
+	var CopyShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'opacity': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-THREE.CopyShader = {
+		varying vec2 vUv;
 
-	uniforms: {
+		void main() {
 
-		'tDiffuse': { value: null },
-		'opacity': { value: 1.0 }
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	},
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-	vertexShader: [
+		uniform float opacity;
 
-		'varying vec2 vUv;',
+		uniform sampler2D tDiffuse;
 
-		'void main() {',
+		varying vec2 vUv;
 
-		'	vUv = uv;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		void main() {
 
-		'}'
+			vec4 texel = texture2D( tDiffuse, vUv );
+			gl_FragColor = opacity * texel;
 
-	].join( '\n' ),
+		}`
+	};
 
-	fragmentShader: [
+	THREE.CopyShader = CopyShader;
 
-		'uniform float opacity;',
-
-		'uniform sampler2D tDiffuse;',
-
-		'varying vec2 vUv;',
-
-		'void main() {',
-
-		'	vec4 texel = texture2D( tDiffuse, vUv );',
-		'	gl_FragColor = opacity * texel;',
-
-		'}'
-
-	].join( '\n' )
-
-};
+} )();

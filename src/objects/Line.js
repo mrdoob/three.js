@@ -7,43 +7,39 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-const _start = new Vector3();
-const _end = new Vector3();
-const _inverseMatrix = new Matrix4();
-const _ray = new Ray();
-const _sphere = new Sphere();
+const _start = /*@__PURE__*/ new Vector3();
+const _end = /*@__PURE__*/ new Vector3();
+const _inverseMatrix = /*@__PURE__*/ new Matrix4();
+const _ray = /*@__PURE__*/ new Ray();
+const _sphere = /*@__PURE__*/ new Sphere();
 
-function Line( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
+class Line extends Object3D {
 
-	Object3D.call( this );
+	constructor( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
-	this.type = 'Line';
+		super();
 
-	this.geometry = geometry;
-	this.material = material;
+		this.type = 'Line';
 
-	this.updateMorphTargets();
+		this.geometry = geometry;
+		this.material = material;
 
-}
+		this.updateMorphTargets();
 
-Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: Line,
+	copy( source ) {
 
-	isLine: true,
-
-	copy: function ( source ) {
-
-		Object3D.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.material = source.material;
 		this.geometry = source.geometry;
 
 		return this;
 
-	},
+	}
 
-	computeLineDistances: function () {
+	computeLineDistances() {
 
 		const geometry = this.geometry;
 
@@ -82,13 +78,14 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	raycast: function ( raycaster, intersects ) {
+	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
 		const matrixWorld = this.matrixWorld;
 		const threshold = raycaster.params.Line.threshold;
+		const drawRange = geometry.drawRange;
 
 		// Checking boundingSphere distance to ray
 
@@ -122,12 +119,13 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( index !== null ) {
 
-				const indices = index.array;
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
 
-				for ( let i = 0, l = indices.length - 1; i < l; i += step ) {
+				for ( let i = start, l = end - 1; i < l; i += step ) {
 
-					const a = indices[ i ];
-					const b = indices[ i + 1 ];
+					const a = index.getX( i );
+					const b = index.getX( i + 1 );
 
 					vStart.fromBufferAttribute( positionAttribute, a );
 					vEnd.fromBufferAttribute( positionAttribute, b );
@@ -159,7 +157,10 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positionAttribute.count - 1; i < l; i += step ) {
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( positionAttribute.count, ( drawRange.start + drawRange.count ) );
+
+				for ( let i = start, l = end - 1; i < l; i += step ) {
 
 					vStart.fromBufferAttribute( positionAttribute, i );
 					vEnd.fromBufferAttribute( positionAttribute, i + 1 );
@@ -197,9 +198,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
+	}
 
-	updateMorphTargets: function () {
+	updateMorphTargets() {
 
 		const geometry = this.geometry;
 
@@ -244,7 +245,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
+
+Line.prototype.isLine = true;
 
 
 export { Line };

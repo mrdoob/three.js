@@ -7,7 +7,6 @@
 			"Getting Started": {
 				"Creating a scene": "manual/en/introduction/Creating-a-scene",
 				"Installation": "manual/en/introduction/Installation",
-				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
@@ -76,6 +75,7 @@
 				"Animation": "api/en/constants/Animation",
 				"Core": "api/en/constants/Core",
 				"CustomBlendingEquation": "api/en/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/en/constants/BufferAttributeUsage",
 				"Materials": "api/en/constants/Materials",
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"
@@ -290,6 +290,7 @@
 			},
 
 			"Renderers": {
+				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
@@ -417,6 +418,7 @@
 
 			"Utils": {
 				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
+				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			}
@@ -446,7 +448,6 @@
 			"البدء": {
 				"إنشاء مشهد": "manual/ar/introduction/Creating-a-scene",
 				"التثبيت": "manual/ar/introduction/Installation",
-				"دعم المتصفح": "manual/ar/introduction/Browser-support",
 				"فحص توافق WebGL": "manual/ar/introduction/WebGL-compatibility-check",
 				"كيف تدير الأشياء محليًا": "manual/ar/introduction/How-to-run-things-locally",
 				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
@@ -518,7 +519,6 @@
 			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
 				"安装": "manual/zh/introduction/Installation",
-				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
 				"画线": "manual/zh/introduction/Drawing-lines",
@@ -799,6 +799,7 @@
 			},
 
 			"渲染器": {
+				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
 				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
@@ -952,7 +953,6 @@
 			"시작하기": {
 				"장면 만들기": "manual/ko/introduction/Creating-a-scene",
 				"설치": "manual/ko/introduction/Installation",
-				"브라우저 지원": "manual/ko/introduction/Browser-support",
 				"WebGL 호환성 검사": "manual/ko/introduction/WebGL-compatibility-check",
 				"로컬 환경에서 구동 방법": "manual/ko/introduction/How-to-run-things-locally",
 				"선 그리기": "manual/ko/introduction/Drawing-lines",
@@ -1043,6 +1043,34 @@
 
 		}
 
-	}
+	},
+
+    "ja": {
+        "マニュアル": {
+            "はじめてみましょう": {
+                "シーンの作成": "manual/ja/introduction/Creating-a-scene",
+                "インストールの方法": "manual/ja/introduction/Installation",
+                "WebGLの互換性の確認": "manual/ja/introduction/WebGL-compatibility-check",
+                "localで実行する方法": "manual/ja/introduction/How-to-run-things-locally",
+                "線を引く": "manual/ja/introduction/Drawing-lines",
+                "テキストを作成する": "manual/ja/introduction/Creating-text",
+                "3Dモデルをロードする": "manual/ja/introduction/Loading-3D-models",
+                "ライブラリとプラグイン": "manual/ja/introduction/Libraries-and-Plugins",
+                "FAQ": "manual/ja/introduction/FAQ",
+                "役にたつリンク集": "manual/ja/introduction/Useful-links"
+            },
+            "次の段階": {
+                "更新の仕方": "manual/ja/introduction/How-to-update-things",
+                "オブジェクトを廃棄する方法": "manual/ja/introduction/How-to-dispose-of-objects",
+                "VRコンテンツの作り方": "manual/ja/introduction/How-to-create-VR-content",
+                "post-processingの使い方": "manual/ja/introduction/How-to-use-post-processing",
+                "行列の変換": "manual/ja/introduction/Matrix-transformations",
+                "アニメーションシステム": "manual/ja/introduction/Animation-system"
+            },
+            "ビルドツール": {
+                "NPMでテストを実行する": "manual/ja/buildTools/Testing-with-NPM"
+            }
+        }
+    }
 
 }

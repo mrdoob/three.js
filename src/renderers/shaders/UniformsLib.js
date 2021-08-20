@@ -10,7 +10,7 @@ const UniformsLib = {
 
 	common: {
 
-		diffuse: { value: new Color( 0xeeeeee ) },
+		diffuse: { value: new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 
 		map: { value: null },
@@ -31,7 +31,8 @@ const UniformsLib = {
 
 		envMap: { value: null },
 		flipEnvMap: { value: - 1 },
-		reflectivity: { value: 1.0 },
+		reflectivity: { value: 1.0 }, // basic, lambert, phong
+		ior: { value: 1.5 }, // standard, physical
 		refractionRatio: { value: 0.98 },
 		maxMipLevel: { value: 0 }
 
@@ -187,7 +188,7 @@ const UniformsLib = {
 
 	points: {
 
-		diffuse: { value: new Color( 0xeeeeee ) },
+		diffuse: { value: new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
@@ -199,7 +200,7 @@ const UniformsLib = {
 
 	sprite: {
 
-		diffuse: { value: new Color( 0xeeeeee ) },
+		diffuse: { value: new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 		center: { value: new Vector2( 0.5, 0.5 ) },
 		rotation: { value: 0.0 },

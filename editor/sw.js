@@ -1,4 +1,6 @@
-// r125
+// r131
+
+const cacheName = 'threejs-editor';
 
 const assets = [
 	'./',
@@ -13,7 +15,7 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/fflate.module.min.js',
+	'../examples/jsm/libs/fflate.module.js',
 
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
@@ -23,6 +25,8 @@ const assets = [
 	'../examples/js/libs/draco/gltf/draco_decoder.js',
 	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
 	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
+
+	'../examples/jsm/libs/motion-controllers.module.js',
 
 	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
 	'../examples/jsm/libs/rhino3dm/rhino3dm.js',
@@ -35,6 +39,9 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/IFCLoader.js',
+	'../examples/jsm/loaders/ifc/web-ifc-api.js',
+	'../examples/jsm/loaders/ifc/web-ifc.wasm',
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
@@ -52,6 +59,11 @@ const assets = [
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
 
+	'../examples/jsm/interactive/HTMLMesh.js',
+	'../examples/jsm/interactive/InteractiveGroup.js',
+
+	'../examples/jsm/environments/RoomEnvironment.js',
+
 	'../examples/jsm/exporters/ColladaExporter.js',
 	'../examples/jsm/exporters/DRACOExporter.js',
 	'../examples/jsm/exporters/GLTFExporter.js',
@@ -65,6 +77,7 @@ const assets = [
 	'../examples/jsm/geometries/TeapotGeometry.js',
 
 	'../examples/jsm/webxr/VRButton.js',
+	'../examples/jsm/webxr/XRControllerModelFactory.js',
 
 	'./images/rotate.svg',
 	'./images/scale.svg',
@@ -126,6 +139,7 @@ const assets = [
 	'./js/Menubar.Play.js',
 	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
+	'./js/Menubar.View.js',
 	'./js/Menubar.Status.js',
 	'./js/Resizer.js',
 	'./js/Sidebar.js',
@@ -161,6 +175,12 @@ const assets = [
 	'./js/Sidebar.Geometry.TubeGeometry.js',
 	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
+	'./js/Sidebar.Material.BooleanProperty.js',
+	'./js/Sidebar.Material.ColorProperty.js',
+	'./js/Sidebar.Material.ConstantProperty.js',
+	'./js/Sidebar.Material.MapProperty.js',
+	'./js/Sidebar.Material.NumberProperty.js',
+	'./js/Sidebar.Material.Program.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',
 	'./js/Strings.js',
@@ -169,6 +189,7 @@ const assets = [
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
 	'./js/Viewport.ViewHelper.js',
+	'./js/Viewport.VR.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',
@@ -206,13 +227,13 @@ const assets = [
 
 self.addEventListener( 'install', async function () {
 
-	const cache = await caches.open( 'threejs-editor' );
+	const cache = await caches.open( cacheName );
 
 	assets.forEach( function ( asset ) {
 
 		cache.add( asset ).catch( function () {
 
-			console.error( '[SW] Cound\'t cache:', asset );
+			console.warn( '[SW] Cound\'t cache:', asset );
 
 		} );
 
@@ -223,21 +244,34 @@ self.addEventListener( 'install', async function () {
 self.addEventListener( 'fetch', async function ( event ) {
 
 	const request = event.request;
-	event.respondWith( cacheFirst( request ) );
+	event.respondWith( networkFirst( request ) );
 
 } );
 
-async function cacheFirst( request ) {
+async function networkFirst( request ) {
 
-	const cachedResponse = await caches.match( request );
+	return fetch( request )
+		.then( async function ( response ) {
 
-	if ( cachedResponse === undefined ) {
+			const cache = await caches.open( cacheName );
 
-		console.error( '[SW] Not cached:', request.url );
-		return fetch( request );
+			cache.put( request, response.clone() );
 
-	}
+			return response;
 
-	return cachedResponse;
+		} )
+		.catch( async function () {
+
+			const cachedResponse = await caches.match( request );
+
+			if ( cachedResponse === undefined ) {
+
+				console.warn( '[SW] Not cached:', request.url );
+
+			}
+
+			return cachedResponse;
+
+		} );
 
 }

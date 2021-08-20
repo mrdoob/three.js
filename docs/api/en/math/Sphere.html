@@ -29,7 +29,7 @@
 		<p>A [page:Vector3] defining the center of the sphere. Default is (0, 0, 0).</p>
 
 		<h3>[property:Float radius]</h3>
-		<p>The radius of the sphere. Default is 0.</p>
+		<p>The radius of the sphere. Default is -1.</p>
 
 		<h2>Methods</h2>
 
@@ -70,6 +70,13 @@
 		<p>
 		Returns the closest distance from the boundary of the sphere to the [page:Vector3 point]. If the sphere contains the point,
 		the distance will be negative.
+		</p>
+
+		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] that should be included in the sphere.<br /><br />
+
+		Expands the boundaries of this sphere to include [page:Vector3 point].
 		</p>
 
 		<h3>[method:Boolean isEmpty]()</h3>
@@ -136,6 +143,13 @@
 		<h3>[method:Sphere translate]( [param:Vector3 offset] )</h3>
 		<p>
 		Translate the sphere's center by the provided offset [page:Vector3].
+		</p>
+
+		<h3>[method:this union]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - Bounding sphere that will be unioned with this sphere.<br /><br />
+
+		Expands this sphere to enclose both the original sphere and the given sphere.
 		</p>
 
 		<h2>Source</h2>

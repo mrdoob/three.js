@@ -143,13 +143,12 @@
 			This object contains references to the keycodes for controlling camera panning. Default is the 4 arrow keys.
 			<code>
 controls.keys = {
-	LEFT: 37, //left arrow
-	UP: 38, // up arrow
-	RIGHT: 39, // right arrow
-	BOTTOM: 40 // down arrow
+	LEFT: 'ArrowLeft', //left arrow
+	UP: 'ArrowUp', // up arrow
+	RIGHT: 'ArrowRight', // right arrow
+	BOTTOM: 'ArrowDown' // down arrow
 }
-			 </code> See [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode this page] for a full
-			list of keycodes.
+			 </code> See [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code KeyboardEvent.code] for a full list of keycodes.
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
@@ -217,7 +216,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 position0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Float rotateSpeed]</h3>
@@ -234,7 +233,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 target0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Vector3 target]</h3>
@@ -256,7 +255,7 @@ controls.touches = {
 
 		<h3>[property:Float zoom0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Float zoomSpeed]</h3>
@@ -281,6 +280,11 @@ controls.touches = {
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
 			Get the current vertical rotation, in radians.
+		</p>
+
+		<h3>[method:Float getDistance] ()</h3>
+		<p>
+			Returns the distance from the camera to the target.
 		</p>
 
 		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>

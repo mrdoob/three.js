@@ -8,7 +8,7 @@ three.js
 
 #### JavaScript 3D library ####
 
-The aim of the project is to create an easy to use, lightweight, 3D library with a default WebGL renderer. The library also provides Canvas 2D, SVG and CSS3D renderers in the examples.
+The aim of the project is to create an easy to use, lightweight, cross-browser, general purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available in the examples.
 
 [Examples](https://threejs.org/examples/) &mdash;
 [Documentation](https://threejs.org/docs/) &mdash;
@@ -16,7 +16,7 @@ The aim of the project is to create an easy to use, lightweight, 3D library with
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/enQtMzYxMzczODM2OTgxLTQ1YmY4YTQxOTFjNDAzYmQ4NjU2YzRhNzliY2RiNDEyYjU2MjhhODgyYWQ5Y2MyZTU3MWNkOGVmOGRhOTQzYTk) &mdash;
+[Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw) &mdash;
 [Discord](https://discordapp.com/invite/HF4UdyF)
 
 ### Usage ###
@@ -61,7 +61,7 @@ function animation( time ) {
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/zdjankqw/).
+If everything went well, you should see [this](https://jsfiddle.net/vy29n6aj/).
 
 ### Cloning this repository ###
 

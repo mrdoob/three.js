@@ -52,6 +52,7 @@
 			<div>
 				<p>Some code editors have plugins which will spawn a simple server on demand.</p>
 				<ul>
+					<li>[link:https://marketplace.visualstudio.com/items?itemName=yandeu.five-server Five Server] for Visual Studio Code.</li>
 					<li>[link:https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer Live Server] for Visual Studio Code.</li>
 					<li>[link:https://atom.io/packages/atom-live-server Live Server] for Atom.</li>
 				</ul>
@@ -62,6 +63,24 @@
 				<p>
 					[link:https://greggman.github.io/servez Servez] is a simple server with a GUI.
 				</p>
+			</div>
+
+			<h3>Node.js five-server</h3>
+			<div>
+				<p>Development server with live reload capability. To install:</p>
+				<code>
+# Remove live-server (if you have it)
+npm -g rm live-server
+
+# Install five-server
+npm -g i five-server
+
+# Update five-server (from time to time)
+npm -g i five-server@latest
+				</code>
+
+				<p>To run (from your local directory):</p>
+				<code>five-server . -p 8000</code>
 			</div>
 
 			<h3>Node.js http-server</h3>

@@ -1,4 +1,4 @@
-import { MathUtils } from './MathUtils.js';
+import * as MathUtils from './MathUtils.js';
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -264,7 +264,7 @@ class Color {
 	setColorName( style ) {
 
 		// color keywords
-		const hex = _colorKeywords[ style ];
+		const hex = _colorKeywords[ style.toLowerCase() ];
 
 		if ( hex !== undefined ) {
 
@@ -387,13 +387,6 @@ class Color {
 	getHSL( target ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Color: .getHSL() target is now required' );
-			target = { h: 0, s: 0, l: 0 };
-
-		}
 
 		const r = this.r, g = this.g, b = this.b;
 

@@ -258,7 +258,7 @@
 		have to set it manually to make use of this method.
 		</p>
 
-		<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Float value] )</h3>
+		<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Any value] )</h3>
 		<p>
 		name -- the property name to search for. <br />
 		value -- value of the given property. <br /><br />
@@ -323,6 +323,11 @@
 		<h3>[method:this remove]( [param:Object3D object], ... )</h3>
 		<p>
 		Removes *object* as child of this object. An arbitrary number of objects may be removed.
+		</p>
+
+		<h3>[method:this removeFromParent]()</h3>
+		<p>
+		Removes this object from its current parent.
 		</p>
 
 		<h3>[method:this clear]()</h3>

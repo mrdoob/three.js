@@ -5,123 +5,118 @@ import { EventDispatcher } from './EventDispatcher.js';
 import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 
 let _object3DId = 0;
 
-const _v1 = new Vector3();
-const _q1 = new Quaternion();
-const _m1 = new Matrix4();
-const _target = new Vector3();
+const _v1 = /*@__PURE__*/ new Vector3();
+const _q1 = /*@__PURE__*/ new Quaternion();
+const _m1 = /*@__PURE__*/ new Matrix4();
+const _target = /*@__PURE__*/ new Vector3();
 
-const _position = new Vector3();
-const _scale = new Vector3();
-const _quaternion = new Quaternion();
+const _position = /*@__PURE__*/ new Vector3();
+const _scale = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
 
-const _xAxis = new Vector3( 1, 0, 0 );
-const _yAxis = new Vector3( 0, 1, 0 );
-const _zAxis = new Vector3( 0, 0, 1 );
+const _xAxis = /*@__PURE__*/ new Vector3( 1, 0, 0 );
+const _yAxis = /*@__PURE__*/ new Vector3( 0, 1, 0 );
+const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
-function Object3D() {
+class Object3D extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: _object3DId ++ } );
+	constructor() {
 
-	this.uuid = MathUtils.generateUUID();
+		super();
 
-	this.name = '';
-	this.type = 'Object3D';
+		Object.defineProperty( this, 'id', { value: _object3DId ++ } );
 
-	this.parent = null;
-	this.children = [];
+		this.uuid = MathUtils.generateUUID();
 
-	this.up = Object3D.DefaultUp.clone();
+		this.name = '';
+		this.type = 'Object3D';
 
-	const position = new Vector3();
-	const rotation = new Euler();
-	const quaternion = new Quaternion();
-	const scale = new Vector3( 1, 1, 1 );
+		this.parent = null;
+		this.children = [];
 
-	function onRotationChange() {
+		this.up = Object3D.DefaultUp.clone();
 
-		quaternion.setFromEuler( rotation, false );
+		const position = new Vector3();
+		const rotation = new Euler();
+		const quaternion = new Quaternion();
+		const scale = new Vector3( 1, 1, 1 );
 
-	}
+		function onRotationChange() {
 
-	function onQuaternionChange() {
+			quaternion.setFromEuler( rotation, false );
 
-		rotation.setFromQuaternion( quaternion, undefined, false );
-
-	}
-
-	rotation._onChange( onRotationChange );
-	quaternion._onChange( onQuaternionChange );
-
-	Object.defineProperties( this, {
-		position: {
-			configurable: true,
-			enumerable: true,
-			value: position
-		},
-		rotation: {
-			configurable: true,
-			enumerable: true,
-			value: rotation
-		},
-		quaternion: {
-			configurable: true,
-			enumerable: true,
-			value: quaternion
-		},
-		scale: {
-			configurable: true,
-			enumerable: true,
-			value: scale
-		},
-		modelViewMatrix: {
-			value: new Matrix4()
-		},
-		normalMatrix: {
-			value: new Matrix3()
 		}
-	} );
 
-	this.matrix = new Matrix4();
-	this.matrixWorld = new Matrix4();
+		function onQuaternionChange() {
 
-	this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
-	this.matrixWorldNeedsUpdate = false;
+			rotation.setFromQuaternion( quaternion, undefined, false );
 
-	this.layers = new Layers();
-	this.visible = true;
+		}
 
-	this.castShadow = false;
-	this.receiveShadow = false;
+		rotation._onChange( onRotationChange );
+		quaternion._onChange( onQuaternionChange );
 
-	this.frustumCulled = true;
-	this.renderOrder = 0;
+		Object.defineProperties( this, {
+			position: {
+				configurable: true,
+				enumerable: true,
+				value: position
+			},
+			rotation: {
+				configurable: true,
+				enumerable: true,
+				value: rotation
+			},
+			quaternion: {
+				configurable: true,
+				enumerable: true,
+				value: quaternion
+			},
+			scale: {
+				configurable: true,
+				enumerable: true,
+				value: scale
+			},
+			modelViewMatrix: {
+				value: new Matrix4()
+			},
+			normalMatrix: {
+				value: new Matrix3()
+			}
+		} );
 
-	this.animations = [];
+		this.matrix = new Matrix4();
+		this.matrixWorld = new Matrix4();
 
-	this.userData = {};
+		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+		this.matrixWorldNeedsUpdate = false;
 
-}
+		this.layers = new Layers();
+		this.visible = true;
 
-Object3D.DefaultUp = new Vector3( 0, 1, 0 );
-Object3D.DefaultMatrixAutoUpdate = true;
+		this.castShadow = false;
+		this.receiveShadow = false;
 
-Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		this.frustumCulled = true;
+		this.renderOrder = 0;
 
-	constructor: Object3D,
+		this.animations = [];
 
-	isObject3D: true,
+		this.userData = {};
 
-	onBeforeRender: function () {},
-	onAfterRender: function () {},
+	}
 
-	applyMatrix4: function ( matrix ) {
+	onBeforeRender() {}
+	onAfterRender() {}
+
+	applyMatrix4( matrix ) {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
@@ -129,47 +124,47 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
 
-	},
+	}
 
-	applyQuaternion: function ( q ) {
+	applyQuaternion( q ) {
 
 		this.quaternion.premultiply( q );
 
 		return this;
 
-	},
+	}
 
-	setRotationFromAxisAngle: function ( axis, angle ) {
+	setRotationFromAxisAngle( axis, angle ) {
 
 		// assumes axis is normalized
 
 		this.quaternion.setFromAxisAngle( axis, angle );
 
-	},
+	}
 
-	setRotationFromEuler: function ( euler ) {
+	setRotationFromEuler( euler ) {
 
 		this.quaternion.setFromEuler( euler, true );
 
-	},
+	}
 
-	setRotationFromMatrix: function ( m ) {
+	setRotationFromMatrix( m ) {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		this.quaternion.setFromRotationMatrix( m );
 
-	},
+	}
 
-	setRotationFromQuaternion: function ( q ) {
+	setRotationFromQuaternion( q ) {
 
 		// assumes q is normalized
 
 		this.quaternion.copy( q );
 
-	},
+	}
 
-	rotateOnAxis: function ( axis, angle ) {
+	rotateOnAxis( axis, angle ) {
 
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
@@ -180,9 +175,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	rotateOnWorldAxis: function ( axis, angle ) {
+	rotateOnWorldAxis( axis, angle ) {
 
 		// rotate object on axis in world space
 		// axis is assumed to be normalized
@@ -194,27 +189,27 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	rotateX: function ( angle ) {
+	rotateX( angle ) {
 
 		return this.rotateOnAxis( _xAxis, angle );
 
-	},
+	}
 
-	rotateY: function ( angle ) {
+	rotateY( angle ) {
 
 		return this.rotateOnAxis( _yAxis, angle );
 
-	},
+	}
 
-	rotateZ: function ( angle ) {
+	rotateZ( angle ) {
 
 		return this.rotateOnAxis( _zAxis, angle );
 
-	},
+	}
 
-	translateOnAxis: function ( axis, distance ) {
+	translateOnAxis( axis, distance ) {
 
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
@@ -225,39 +220,39 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	translateX: function ( distance ) {
+	translateX( distance ) {
 
 		return this.translateOnAxis( _xAxis, distance );
 
-	},
+	}
 
-	translateY: function ( distance ) {
+	translateY( distance ) {
 
 		return this.translateOnAxis( _yAxis, distance );
 
-	},
+	}
 
-	translateZ: function ( distance ) {
+	translateZ( distance ) {
 
 		return this.translateOnAxis( _zAxis, distance );
 
-	},
+	}
 
-	localToWorld: function ( vector ) {
+	localToWorld( vector ) {
 
 		return vector.applyMatrix4( this.matrixWorld );
 
-	},
+	}
 
-	worldToLocal: function ( vector ) {
+	worldToLocal( vector ) {
 
 		return vector.applyMatrix4( _m1.copy( this.matrixWorld ).invert() );
 
-	},
+	}
 
-	lookAt: function ( x, y, z ) {
+	lookAt( x, y, z ) {
 
 		// This method does not support objects having non-uniformly-scaled parent(s)
 
@@ -297,9 +292,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	add: function ( object ) {
+	add( object ) {
 
 		if ( arguments.length > 1 ) {
 
@@ -341,9 +336,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	remove: function ( object ) {
+	remove( object ) {
 
 		if ( arguments.length > 1 ) {
 
@@ -370,9 +365,23 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	clear: function () {
+	removeFromParent() {
+
+		const parent = this.parent;
+
+		if ( parent !== null ) {
+
+			parent.remove( this );
+
+		}
+
+		return this;
+
+	}
+
+	clear() {
 
 		for ( let i = 0; i < this.children.length; i ++ ) {
 
@@ -389,9 +398,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		return this;
 
 
-	},
+	}
 
-	attach: function ( object ) {
+	attach( object ) {
 
 		// adds object as a child of this, while maintaining the object's world transform
 
@@ -415,21 +424,21 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return this;
 
-	},
+	}
 
-	getObjectById: function ( id ) {
+	getObjectById( id ) {
 
 		return this.getObjectByProperty( 'id', id );
 
-	},
+	}
 
-	getObjectByName: function ( name ) {
+	getObjectByName( name ) {
 
 		return this.getObjectByProperty( 'name', name );
 
-	},
+	}
 
-	getObjectByProperty: function ( name, value ) {
+	getObjectByProperty( name, value ) {
 
 		if ( this[ name ] === value ) return this;
 
@@ -448,31 +457,17 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return undefined;
 
-	},
+	}
 
-	getWorldPosition: function ( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldPosition() target is now required' );
-			target = new Vector3();
-
-		}
+	getWorldPosition( target ) {
 
 		this.updateWorldMatrix( true, false );
 
 		return target.setFromMatrixPosition( this.matrixWorld );
 
-	},
+	}
 
-	getWorldQuaternion: function ( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldQuaternion() target is now required' );
-			target = new Quaternion();
-
-		}
+	getWorldQuaternion( target ) {
 
 		this.updateWorldMatrix( true, false );
 
@@ -480,16 +475,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return target;
 
-	},
+	}
 
-	getWorldScale: function ( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldScale() target is now required' );
-			target = new Vector3();
-
-		}
+	getWorldScale( target ) {
 
 		this.updateWorldMatrix( true, false );
 
@@ -497,16 +485,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return target;
 
-	},
+	}
 
-	getWorldDirection: function ( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
-			target = new Vector3();
-
-		}
+	getWorldDirection( target ) {
 
 		this.updateWorldMatrix( true, false );
 
@@ -514,11 +495,11 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
 
-	},
+	}
 
-	raycast: function () {},
+	raycast() {}
 
-	traverse: function ( callback ) {
+	traverse( callback ) {
 
 		callback( this );
 
@@ -530,9 +511,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	traverseVisible: function ( callback ) {
+	traverseVisible( callback ) {
 
 		if ( this.visible === false ) return;
 
@@ -546,9 +527,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	traverseAncestors: function ( callback ) {
+	traverseAncestors( callback ) {
 
 		const parent = this.parent;
 
@@ -560,17 +541,17 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	updateMatrix: function () {
+	updateMatrix() {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
 
 		this.matrixWorldNeedsUpdate = true;
 
-	},
+	}
 
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld( force ) {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
@@ -602,9 +583,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	updateWorldMatrix: function ( updateParents, updateChildren ) {
+	updateWorldMatrix( updateParents, updateChildren ) {
 
 		const parent = this.parent;
 
@@ -640,9 +621,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		// meta is a string when called from JSON.stringify
 		const isRootObject = ( meta === undefined || typeof meta === 'string' );
@@ -700,6 +681,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			object.type = 'InstancedMesh';
 			object.count = this.count;
 			object.instanceMatrix = this.instanceMatrix.toJSON();
+			if ( this.instanceColor !== null ) object.instanceColor = this.instanceColor.toJSON();
 
 		}
 
@@ -717,7 +699,29 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		if ( this.isMesh || this.isLine || this.isPoints ) {
+		if ( this.isScene ) {
+
+			if ( this.background ) {
+
+				if ( this.background.isColor ) {
+
+					object.background = this.background.toJSON();
+
+				} else if ( this.background.isTexture ) {
+
+					object.background = this.background.toJSON( meta ).uuid;
+
+				}
+
+			}
+
+			if ( this.environment && this.environment.isTexture ) {
+
+				object.environment = this.environment.toJSON( meta ).uuid;
+
+			}
+
+		} else if ( this.isMesh || this.isLine || this.isPoints ) {
 
 			object.geometry = serialize( meta.geometries, this.geometry );
 
@@ -856,15 +860,15 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-	},
+	}
 
-	clone: function ( recursive ) {
+	clone( recursive ) {
 
 		return new this.constructor().copy( this, recursive );
 
-	},
+	}
 
-	copy: function ( source, recursive = true ) {
+	copy( source, recursive = true ) {
 
 		this.name = source.name;
 
@@ -907,7 +911,11 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	}
 
-} );
+}
 
+Object3D.DefaultUp = new Vector3( 0, 1, 0 );
+Object3D.DefaultMatrixAutoUpdate = true;
+
+Object3D.prototype.isObject3D = true;
 
 export { Object3D };

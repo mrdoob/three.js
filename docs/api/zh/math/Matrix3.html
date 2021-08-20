@@ -77,14 +77,13 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
-		Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] of this
-		matrix into the three axis vectors provided. If this matrix is:
+		将该矩阵的基向量 [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 提取到提供的三个轴向中。如果该矩阵如下：
 		<code>
 a, b, c,
 d, e, f,
 g, h, i
 		</code>
-		then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] will be set to:
+		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：
 		<code>
 xAxis = (a, d, g)
 yAxis = (b, e, h)
@@ -102,9 +101,7 @@ zAxis = (c, f, i)
 
 		<h3>[method:this invert]()</h3>
 		<p>
-		Inverts this matrix, using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
-
-		You can not invert with a determinant of zero. If you attempt this, the method produces a zero matrix instead.
+		将当前矩阵翻转为它的逆矩阵，使用 [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method] 解析方式。你不能对行或列为 0 的矩阵进行翻转，如果你尝试这样做，该方法将生成一个零矩阵。
 		</p>
 
 		<h3>[method:this getNormalMatrix]( [param:Matrix4 m] )</h3>
@@ -144,16 +141,14 @@ zAxis = (c, f, i)
 		[page:Float n32] - 设置第三行第二列的值。<br />
 		[page:Float n33] - 设置第三行第三列的值。<br /><br />
 
-		Sets the 3x3 matrix values to the given
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
-		sequence of values.
+		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵。
 		</p>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
 		<p>将矩阵[page:Matrix3 m]乘以当前矩阵。</p>
 
 		<h3>[method:this setFromMatrix4]( [param:Matrix4 m] )</h3>
-		<p>将当前矩阵设置为4X4矩阵[page:Matrix4 m]左上3X3</p>
+		<p>根据参数 [page:Matrix4 m] 左上 3x3 的矩阵值，设置当前矩阵的值。</p>
 
 		<h3>[method:this setUvTransform]( [param:Float tx], [param:Float ty], [param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], [param:Float cy] )</h3>
 		<p>
@@ -183,7 +178,7 @@ zAxis = (c, f, i)
 		<p>
 		[page:Array array] -  用于存储当前矩阵转置结果的数组。<br /><br />
 
-		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组[param:Array array]但不改变当前矩阵，
+		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组 array 中，但不改变当前矩阵，
 		并返回当前矩阵。
 		</p>
 

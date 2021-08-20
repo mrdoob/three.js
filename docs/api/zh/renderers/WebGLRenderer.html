@@ -184,18 +184,6 @@
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<p>定义渲染器是否考虑对象级剪切平面。 默认为*false*.</p>
 
-		<h3>[property:Integer maxMorphTargets]</h3>
-		<p>
-		默认是8。 一个着色器中允许的最大MorphTargets数。
-		切记标准材质只允许8个MorphTargets。
-		</p>
-
-		<h3>[property:Integer maxMorphNormals]</h3>
-		<p>
-		默认是4。 色器中允许的最大MorphNormal数。
-		切记标准材质只允许4个MorphNormal。
-		</p>
-
 		<h3>[property:Boolean physicallyCorrectLights]</h3>
 		<p>
 		是否使用物理上正确的光照模式。 默认是*false*。
@@ -312,11 +300,16 @@
 		- *WEBGL_compressed_texture_etc1*
 		</p>
 
-		<h3>[method:null forceContextLoss]( )</h3>
+		<h3>[method:void forceContextLoss]()</h3>
 		<p>
 		模拟WebGL环境的丢失。需要支持
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context]扩展才能用。
-		根据[link:https://webglstats.com/ WebGLStats], as of February 2016 90% of WebGL enabled devices support this.
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] 扩展才能用。
+		</p>
+
+		<h3>[method:void forceContextRestore]( )</h3>
+		<p>
+		模拟WebGL环境的恢复。需要支持
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] 扩展才能用。
 		</p>
 
 		<h3>[method:Float getClearAlpha]()</h3>
@@ -375,7 +368,7 @@
 			即便forceClear设为true, 也可以通过将[page:WebGLRenderer.autoClearColor autoClearColor]、[page:WebGLRenderer.autoClearStencil autoClearStencil]或[page:WebGLRenderer.autoClearDepth autoClearDepth]属性的值设为false来阻止对应缓存被清除。
 		</p>
 
-		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:BufferGeometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Scene scene], [param:BufferGeometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>使用相机和指定材质渲染缓冲几何组。</p>
 
 		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
@@ -397,9 +390,6 @@
 
 		<h3>[method:null setClearColor]( [param:Color color], [param:Float alpha] )</h3>
 		<p>设置颜色及其透明度</p>
-
-		<h3>[method:null setFramebuffer]( [param:WebGLFramebuffer value] )</h3>
-		<p>Sets the given WebGLFramebuffer. This method can only be used if no render target is set via [page:WebGLRenderer.setRenderTarget .setRenderTarget]().</p>
 
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>设置设备像素比。通常用于避免HiDPI设备上绘图模糊</p>

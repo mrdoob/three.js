@@ -151,25 +151,11 @@ class Box3 {
 
 	getCenter( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getCenter() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	}
 
 	getSize( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getSize() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
 
@@ -258,13 +244,6 @@ class Box3 {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getParameter() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -395,13 +374,6 @@ class Box3 {
 
 	clampPoint( point, target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .clampPoint() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return target.copy( point ).clamp( this.min, this.max );
 
 	}
@@ -415,13 +387,6 @@ class Box3 {
 	}
 
 	getBoundingSphere( target ) {
-
-		if ( target === undefined ) {
-
-			console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
-			//target = new Sphere(); // removed to avoid cyclic dependency
-
-		}
 
 		this.getCenter( target.center );
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { BufferGeometryUtils } from '../../../../examples/jsm/utils/BufferGeometryUtils';
+import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils';
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';

@@ -4,12 +4,14 @@ import { APP } from './libs/app.js';
 
 function SidebarProjectVideo( editor ) {
 
+	var strings = editor.strings;
+
 	var container = new UIPanel();
 	container.setId( 'render' );
 
 	// Video
 
-	container.add( new UIText( 'Video' ).setTextTransform( 'uppercase' ) );
+	container.add( new UIText( strings.getKey( 'sidebar/project/video' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UIBreak(), new UIBreak() );
 
 	// Resolution
@@ -17,7 +19,7 @@ function SidebarProjectVideo( editor ) {
 	var resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
-	resolutionRow.add( new UIText( 'Resolution' ).setWidth( '90px' ) );
+	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setWidth( '90px' ) );
 
 	var videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( videoWidth );
@@ -35,7 +37,7 @@ function SidebarProjectVideo( editor ) {
 	// Duration
 
 	var videoDurationRow = new UIRow();
-	videoDurationRow.add( new UIText( 'Duration' ).setWidth( '90px' ) );
+	videoDurationRow.add( new UIText( strings.getKey( 'sidebar/project/duration' ) ).setWidth( '90px' ) );
 
 	var videoDuration = new UIInteger( 10 );
 	videoDurationRow.add( videoDuration );
@@ -51,7 +53,7 @@ function SidebarProjectVideo( editor ) {
 	progress.setWidth( '170px' );
 	container.add( progress );
 
-	const renderButton = new UIButton( 'RENDER' );
+	const renderButton = new UIButton( strings.getKey( 'sidebar/project/render' ) ).setTextTransform( 'uppercase' );
 	renderButton.setWidth( '170px' );
 	renderButton.onClick( async () => {
 
@@ -75,7 +77,7 @@ function SidebarProjectVideo( editor ) {
 
 		ffmpeg.setProgress( ( { ratio } ) => {
 
-			progress.setValue( ratio );
+			progress.setValue( ( ratio * 0.5 ) + 0.5 );
 
 		} );
 
@@ -93,11 +95,11 @@ function SidebarProjectVideo( editor ) {
 			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
 			currentTime += 1 / fps;
 
-			progress.setValue( i / frames );
+			progress.setValue( ( i / frames ) * 0.5 );
 
 		}
 
-		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 6 ), 'out.mp4' );
+		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
 
 		const data = ffmpeg.FS( 'readFile', 'out.mp4' );
 

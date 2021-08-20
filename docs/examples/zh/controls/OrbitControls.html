@@ -141,12 +141,12 @@
 			这一对象包含了用于控制相机平移的按键代码的引用。默认值为4个箭头（方向）键。
 			<code>
 controls.keys = {
-	LEFT: 37, //left arrow
-	UP: 38, // up arrow
-	RIGHT: 39, // right arrow
-	BOTTOM: 40 // down arrow
+	LEFT: 'ArrowLeft', //left arrow
+	UP: 'ArrowUp', // up arrow
+	RIGHT: 'ArrowRight', // right arrow
+	BOTTOM: 'ArrowDown' // down arrow
 }
-			 </code>请参阅[link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode this page]来查看所有按键的代码列表。
+			 </code> 请参阅[link:https://developer.mozilla.org/zh-CN/docs/Web/API/KeyboardEvent/code KeyboardEvent.code]来查看所有按键的代码列表。
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
@@ -214,7 +214,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 position0]</h3>
 		<p>
-			由[method:saveState]和[method:reset]方法在内部使用。
+			由[page:.saveState]和[page:.reset]方法在内部使用。
 		</p>
 
 		<h3>[property:Float rotateSpeed]</h3>
@@ -231,7 +231,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 target0]</h3>
 		<p>
-			由[method:saveState]和[method:reset]方法在内部使用。
+			由[page:.saveState]和[page:.reset]方法在内部使用。
 		</p>
 
 		<h3>[property:Vector3 target]</h3>
@@ -253,7 +253,7 @@ controls.touches = {
 
 		<h3>[property:Float zoom0]</h3>
 		<p>
-			由[method:saveState]和[method:reset]方法在内部使用。
+			由[page:.saveState]和[page:.reset]方法在内部使用。
 		</p>
 
 		<h3>[property:Float zoomSpeed]</h3>
@@ -278,6 +278,11 @@ controls.touches = {
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
 			获得当前的垂直旋转，单位为弧度。
+		</p>
+
+		<h3>[method:Float getDistance] ()</h3>
+		<p>
+			Returns the distance from the camera to the target.
 		</p>
 
 		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>

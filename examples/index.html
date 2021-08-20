@@ -38,7 +38,7 @@
 
 		</div>
 
-		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allow="fullscreen; xr-spatial-tracking;"></iframe>
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
@@ -105,6 +105,7 @@
 
 					selectFile( file );
 					viewer.src = validRedirects.get( file );
+					viewer.style.display = 'unset';
 
 				}
 
@@ -116,9 +117,9 @@
 
 				panel.classList.add( 'searchFocused' );
 
-			}
+				updateFilter( files, tags );
 
-			updateFilter( files, tags );
+			}
 
 			// Events
 
@@ -221,6 +222,7 @@
 
 			window.location.hash = file;
 			viewer.focus();
+			viewer.style.display = 'unset';
 
 			panel.classList.remove( 'open' );
 
@@ -342,18 +344,17 @@
 
 		function extractQuery() {
 
-			const p = window.location.search.indexOf( '?q=' );
+			const search = window.location.search;
 
-			if ( p !== - 1 ) {
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( window.location.search.substr( 3 ) );
+				return decodeURI( search.substr( 3 ) );
 
 			}
 
 			return '';
 
 		}
-
 
 		function createElementFromHTML( htmlString ) {
 
