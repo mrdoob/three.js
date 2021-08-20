@@ -26,7 +26,7 @@ export default /* glsl */`
 
 #if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
-	radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.specularRoughness );
+	radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
 
 	#ifdef CLEARCOAT
 
