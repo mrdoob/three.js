@@ -204,7 +204,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			gradientMap: !! material.gradientMap,
 
-			sheenTint: ( !! material.sheenTint && ! material.sheenTint.isBlack() ),
+			sheenTint: ( !! material.sheenTint && ( material.sheenTint.r > 0 || material.sheenTint.g > 0 || material.sheenTint.b > 0 ) ),
 
 			transmission: material.transmission > 0,
 			transmissionMap: !! material.transmissionMap,
