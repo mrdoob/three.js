@@ -208,6 +208,11 @@
 	<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 	<p>对当前物体应用这个变换矩阵，并更新物体的位置、旋转和缩放。</p>
 
+	<h3>[method:null applyMatrix4OnWorldOrigin]( [param:Matrix4 matrix], [param:Vector3 origin] )</h3>
+	<p>对当前物体设置变换原点，应用变换矩阵，并更新物体的位置、旋转和缩放。</p>
+	<p>旋转时，origin当作向量，作为旋转轴</p>
+	<p>缩放时，origin的(x,y,z) 作为缩放原点</p>
+
 	<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
 	<p>对当前物体应用由四元数所表示的变换。</p>
 

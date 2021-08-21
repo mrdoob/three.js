@@ -219,6 +219,11 @@
 		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>Applies the matrix transform to the object and updates the object's position, rotation and scale.</p>
 
+		<h3>[method:null applyMatrix4OnWorldOrigin]( [param:Matrix4 matrix], [param:Vector3 origin] )</h3>
+		<p>Applies the matrix transform to the object and updates the object's position, rotation and scale with a origin.</p>
+		<p>The origin as a vector3 as an axis of rotation when rotating.</p>
+		<p>The (origin.x,origin.y,origin.z) as a point when scaling.</p>
+
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 

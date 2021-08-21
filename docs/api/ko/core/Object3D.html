@@ -209,6 +209,11 @@
 		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>매트릭스 변환을 객체에 적용하고 객체의 위치, 회전 및 스케일을 업데이트합니다.</p>
 
+		<h3>[method:null applyMatrix4OnWorldOrigin]( [param:Matrix4 matrix], [param:Vector3 origin] )</h3>
+		<p>Applies the matrix transform to the object and updates the object's position, rotation and scale with a origin.</p>
+		<p>The origin as a vector3 as an axis of rotation when rotating.</p>
+		<p>The (origin.x,origin.y,origin.z) as a point when scaling.</p>
+
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>쿼터니언으로 표시된 회전을 객체에 적용합니다</p>
 
