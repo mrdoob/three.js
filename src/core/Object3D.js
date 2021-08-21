@@ -126,7 +126,7 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	applyMatrix4OnWorldOrigin( matrix, origin ) {      
+	applyMatrix4OnOrigin( matrix, origin ) {      
 
 		// Origin as a vector3 as an axis of rotation when rotating
 
