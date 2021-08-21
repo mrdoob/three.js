@@ -380,8 +380,8 @@
 							break;
 
 						case THREE.FloatType:
-							numElements = image_rgba_data.length / 4 * 3;
-							const floatArray = new Float32Array( numElements );
+							numElements = image_rgba_data.length / 4;
+							const floatArray = new Float32Array( numElements * 3 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 
@@ -395,8 +395,8 @@
 							break;
 
 						case THREE.HalfFloatType:
-							numElements = image_rgba_data.length / 4 * 3;
-							const halfArray = new Uint16Array( numElements );
+							numElements = image_rgba_data.length / 4;
+							const halfArray = new Uint16Array( numElements * 3 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 
