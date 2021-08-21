@@ -643,6 +643,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
 
 			parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
+			parameters.ditherTransparency ? '#define DITHER_TRANSPARENCY' : '',
 
 			parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
 

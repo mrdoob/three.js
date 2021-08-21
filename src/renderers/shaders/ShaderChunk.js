@@ -20,6 +20,8 @@ import cube_uv_reflection_fragment from './ShaderChunk/cube_uv_reflection_fragme
 import defaultnormal_vertex from './ShaderChunk/defaultnormal_vertex.glsl.js';
 import displacementmap_pars_vertex from './ShaderChunk/displacementmap_pars_vertex.glsl.js';
 import displacementmap_vertex from './ShaderChunk/displacementmap_vertex.glsl.js';
+import dither_transparency_pars_fragment from './ShaderChunk/dither_transparency_pars_fragment.glsl.js';
+import dither_transparency_fragment from './ShaderChunk/dither_transparency_fragment.glsl.js';
 import emissivemap_fragment from './ShaderChunk/emissivemap_fragment.glsl.js';
 import emissivemap_pars_fragment from './ShaderChunk/emissivemap_pars_fragment.glsl.js';
 import encodings_fragment from './ShaderChunk/encodings_fragment.glsl.js';
@@ -155,6 +157,8 @@ export const ShaderChunk = {
 	defaultnormal_vertex: defaultnormal_vertex,
 	displacementmap_pars_vertex: displacementmap_pars_vertex,
 	displacementmap_vertex: displacementmap_vertex,
+	dither_transparency_pars_fragment: dither_transparency_pars_fragment,
+	dither_transparency_fragment: dither_transparency_fragment,
 	emissivemap_fragment: emissivemap_fragment,
 	emissivemap_pars_fragment: emissivemap_pars_fragment,
 	encodings_fragment: encodings_fragment,

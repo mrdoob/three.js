@@ -24,6 +24,11 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		_depthMaterial = new MeshDepthMaterial( { depthPacking: RGBADepthPacking } ),
 		_distanceMaterial = new MeshDistanceMaterial(),
+		_ditheredDepthMaterial = new MeshDepthMaterial( {
+			depthPacking: RGBADepthPacking,
+			ditherTransparency: true
+		} ),
+		_ditheredDistanceMaterial = new MeshDepthMaterial( { ditherTransparency: true } ),
 
 		_materialCache = {},
 
@@ -68,6 +73,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 	this.needsUpdate = false;
 
 	this.type = PCFShadowMap;
+	this.dithering = false;
 
 	this.render = function ( lights, scene, camera ) {
 
@@ -238,7 +244,16 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		} else {
 
-			result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
+			const requiresDithering = scope.dithering && material.opacity < 1.0 && material.transparent;
+			if ( light.isPointLight ) {
+
+				result = requiresDithering ? _ditheredDistanceMaterial : _distanceMaterial;
+
+			} else {
+
+				result = requiresDithering ? _ditheredDepthMaterial : _depthMaterial;
+
+			}
 
 		}
 
@@ -299,6 +314,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
+		result.opacity = material.opacity;
 
 		if ( light.isPointLight === true && result.isMeshDistanceMaterial === true ) {
 
