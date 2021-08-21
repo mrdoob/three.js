@@ -87,7 +87,7 @@ function WebGLCubeUVMaps( renderer ) {
 
 		if ( cubemapUV !== undefined ) {
 
-			cubemapUV.delete( texture );
+			cubeUVmaps.delete( texture );
 			cubemapUV.dispose();
 
 		}
