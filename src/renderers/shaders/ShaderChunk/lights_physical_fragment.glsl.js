@@ -73,7 +73,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 #ifdef USE_SHEEN
 
-	material.sheenColor = sheen;
+	material.sheenTint = sheenTint;
 
 #endif
 `;
