@@ -126,6 +126,24 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	applyMatrix4OnWorldOrigin( matrix, origin ) {      
+
+		// Origin as a vector3 as an axis of rotation when rotating
+
+		// Origin as a point when scaling
+
+    const translation = new THREE.Matrix4()
+    translation.set(
+      1, 0, 0, origin.x,
+      0, 1, 0, origin.y,
+      0, 0, 1, origin.z,
+      0, 0, 0, 1
+    )
+    // M' = T⁻¹ M T
+    matrix.premultiply(translation).multiply(translation.invert());
+    this.applyMatrix4(matrix);
+	};
+
 	applyQuaternion( q ) {
 
 		this.quaternion.premultiply( q );
