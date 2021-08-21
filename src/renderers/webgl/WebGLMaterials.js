@@ -583,7 +583,7 @@ function WebGLMaterials( properties ) {
 		uniforms.clearcoat.value = material.clearcoat;
 		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
 
-		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
+		if ( material.sheenTint ) uniforms.sheenTint.value.copy( material.sheenTint );
 
 		if ( material.clearcoatMap ) {
 

@@ -15,7 +15,7 @@ import * as MathUtils from '../math/MathUtils.js';
  *  ior: <float>,
  *  reflectivity: <float>,
  *
- *  sheen: <Color>,
+ *  sheenTint: <Color>,
  *
  *  transmission: <float>,
  *  transmissionMap: new THREE.Texture( <Image> ),
@@ -69,7 +69,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			}
 		} );
 
-		this.sheen = null; // null will disable sheen bsdf
+		this.sheenTint = new Color( 0x000000 );
 
 		this.transmission = 0.0;
 		this.transmissionMap = null;
@@ -108,15 +108,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.ior = source.ior;
 
-		if ( source.sheen ) {
-
-			this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
-
-		} else {
-
-			this.sheen = null;
-
-		}
+		this.sheenTint.copy( source.sheenTint );
 
 		this.transmission = source.transmission;
 		this.transmissionMap = source.transmissionMap;
