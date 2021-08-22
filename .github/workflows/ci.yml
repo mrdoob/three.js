@@ -41,7 +41,9 @@ jobs:
         with:
           node-version: 12
       - name: Install packages
-        run: npm ci && npm ci --prefix test
+        run: |
+          npm ci
+          npm ci --prefix test
       - name: Build
         run: npm run build
 
@@ -65,7 +67,10 @@ jobs:
         with:
           node-version: 12
       - name: Install packages
-        run: npm ci && npm ci --prefix test && sudo apt-get install xvfb
+        run: |
+          npm ci
+          npm ci --prefix test
+          sudo apt-get install xvfb
       - name: Build
         run: npm run build
 
