@@ -6,20 +6,21 @@ struct PhysicalMaterial {
 	vec3 specularColor;
 	float specularF90;
 
-#ifdef CLEARCOAT
-	float clearcoat;
-	float clearcoatRoughness;
-#endif
-#ifdef USE_SHEEN
-	vec3 sheenTint;
-#endif
+	#ifdef CLEARCOAT
+		float clearcoat;
+		float clearcoatRoughness;
+		vec3 clearcoatF0;
+		float clearcoatF90;
+	#endif
+
+	#ifdef USE_SHEEN
+		vec3 sheenTint;
+	#endif
 
 };
 
 // temporary
 vec3 clearcoatSpecular = vec3( 0.0 );
-
-#define DEFAULT_SPECULAR_COEFFICIENT 0.04
 
 // Analytical approximation of the DFG LUT, one half of the
 // split-sum approximation used in indirect specular lighting.
@@ -137,7 +138,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 		#endif
 
-		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight, geometry.viewDir, geometry.clearcoatNormal, vec3( DEFAULT_SPECULAR_COEFFICIENT ), 1.0, material.clearcoatRoughness );
+		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight, geometry.viewDir, geometry.clearcoatNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 
 	#endif
 
@@ -164,7 +165,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifdef CLEARCOAT
 
-		clearcoatSpecular += clearcoatRadiance * EnvironmentBRDF( geometry.clearcoatNormal, geometry.viewDir, vec3( DEFAULT_SPECULAR_COEFFICIENT ), 1.0, material.clearcoatRoughness );
+		clearcoatSpecular += clearcoatRadiance * EnvironmentBRDF( geometry.clearcoatNormal, geometry.viewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 
 	#endif
 
