@@ -111,7 +111,7 @@ void main() {
 
 		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
 
-		vec3 Fcc = F_Schlick( vec3( DEFAULT_SPECULAR_COEFFICIENT ), 1.0, dotNVcc );
+		vec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );
 
 		outgoingLight = outgoingLight * ( 1.0 - clearcoat * Fcc ) + clearcoatSpecular * clearcoat;
 

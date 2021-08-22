@@ -42,7 +42,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 #else
 
-	material.specularColor = mix( vec3( DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor.rgb, metalnessFactor );
+	material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );
 	material.specularF90 = 1.0;
 
 #endif
@@ -51,6 +51,8 @@ material.roughness = min( material.roughness, 1.0 );
 
 	material.clearcoat = clearcoat;
 	material.clearcoatRoughness = clearcoatRoughness;
+	material.clearcoatF0 = vec3( 0.04 );
+	material.clearcoatF90 = 1.0;
 
 	#ifdef USE_CLEARCOATMAP
 
