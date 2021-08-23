@@ -120,23 +120,11 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	vec3 irradiance = dotNL * directLight.color;
 
-	#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-		irradiance *= PI; // punctual light
-
-	#endif
-
 	#ifdef CLEARCOAT
 
 		float dotNLcc = saturate( dot( geometry.clearcoatNormal, directLight.direction ) );
 
 		vec3 ccIrradiance = dotNLcc * directLight.color;
-
-		#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-			ccIrradiance *= PI; // punctual light
-
-		#endif
 
 		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight, geometry.viewDir, geometry.clearcoatNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 

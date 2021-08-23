@@ -895,7 +895,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		} );
 
-		currentRenderState.setupLights();
+		currentRenderState.setupLights( _this.physicallyCorrectLights );
 
 		scene.traverse( function ( object ) {
 
@@ -1033,7 +1033,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		shadowMap.render( shadowsArray, scene, camera );
 
-		currentRenderState.setupLights();
+		currentRenderState.setupLights( _this.physicallyCorrectLights );
 		currentRenderState.setupLightsView( camera );
 
 		if ( _clippingEnabled === true ) clipping.endShadows();

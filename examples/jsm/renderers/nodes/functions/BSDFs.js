@@ -96,12 +96,6 @@ void RE_Direct_BlinnPhong( vec3 lightDirection, vec3 lightColor ) {
 	float dotNL = saturate( dot( NormalView, lightDirection ) );
 	vec3 irradiance = dotNL * lightColor;
 
-#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-		irradiance *= PI; // punctual light
-
-#endif
-
 	ReflectedLightDirectDiffuse += irradiance * BRDF_Lambert( MaterialDiffuseColor.rgb );
 
 	ReflectedLightDirectSpecular += irradiance * BRDF_BlinnPhong( lightDirection, MaterialSpecularColor, MaterialSpecularShininess );
