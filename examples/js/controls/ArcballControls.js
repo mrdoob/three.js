@@ -675,13 +675,6 @@
 		onSinglePanStart = ( event ) => {
 	
 			if ( this.enabled ) {
-
-				if (this._animationId != -1) {
-
-					cancelAnimationFrame( this._animationId );
-					this._animationId = -1;
-	
-				}
 	
 				this.dispatchEvent( _startEvent );
 				
@@ -695,6 +688,18 @@
 	
 						return;
 	
+					}
+
+					
+					if (this._animationId != -1) {
+
+						cancelAnimationFrame( this._animationId );
+						this._animationId = -1;
+						this._timeStart = -1;
+
+						this.activateGizmos( false );
+						this.dispatchEvent( _changeEvent );
+					
 					}
 	
 					this.updateTbState( STATE.PAN, true );
@@ -714,6 +719,14 @@
 	
 						return;
 	
+					}
+
+					if (this._animationId != -1) {
+
+						cancelAnimationFrame( this._animationId );
+						this._animationId = -1;
+						this._timeStart = -1;
+		
 					}
 	
 					this.updateTbState( STATE.ROTATE, true );

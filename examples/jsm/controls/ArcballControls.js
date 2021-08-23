@@ -692,13 +692,6 @@ class ArcballControls extends Object3D {
 
 		if ( this.enabled ) {
 
-			if (this._animationId != -1) {
-
-				cancelAnimationFrame( this._animationId );
-				this._animationId = -1;
-
-			}
-
 			this.dispatchEvent( _startEvent );
 			
 			this.setCenter( event.clientX, event.clientY );
@@ -711,6 +704,17 @@ class ArcballControls extends Object3D {
 
 					return;
 
+				}
+
+				if (this._animationId != -1) {
+
+					cancelAnimationFrame( this._animationId );
+					this._animationId = -1;
+					this._timeStart = -1;
+
+					this.activateGizmos( false );
+					this.dispatchEvent( _changeEvent );
+	
 				}
 
 				this.updateTbState( STATE.PAN, true );
@@ -730,6 +734,14 @@ class ArcballControls extends Object3D {
 
 					return;
 
+				}
+
+				if (this._animationId != -1) {
+
+					cancelAnimationFrame( this._animationId );
+					this._animationId = -1;
+					this._timeStart = -1;
+	
 				}
 
 				this.updateTbState( STATE.ROTATE, true );

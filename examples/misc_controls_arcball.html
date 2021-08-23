@@ -147,14 +147,9 @@
 							.setPath( 'textures/equirectangular/' )
 							.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-								const pmremGenerator = new THREE.PMREMGenerator( renderer );
-								pmremGenerator.compileEquirectangularShader();
+								hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
 
-								const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-								hdrEquirect.dispose();
-
-								//scene.background = hdrCubeRenderTarget.texture;
-								scene.environment = hdrCubeRenderTarget.texture;
+								scene.environment = hdrEquirect;
 
 								render();
 
