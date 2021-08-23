@@ -160,7 +160,7 @@ class ArcballControls extends Object3D {
 
 		//animations
 		this._timeStart = -1; //initial time
-		this._animationId = 0;
+		this._animationId = -1;
 
 		//focus animation
 		this.focusAnimationTime = 500; //duration of focus animation in ms
@@ -441,6 +441,9 @@ class ArcballControls extends Object3D {
 					
 					if ( this._touchCurrent.length == 0 ) {
 
+						window.removeEventListener( 'pointermove', this.onPointerMove );
+						window.removeEventListener( 'pointerup', this.onPointerUp );
+
 						//multCancel
 						this._input = INPUT.NONE;
 						this.onTriplePanEnd();
@@ -688,6 +691,13 @@ class ArcballControls extends Object3D {
 	onSinglePanStart = ( event ) => {
 
 		if ( this.enabled ) {
+
+			if (this._animationId != -1) {
+
+				cancelAnimationFrame( this._animationId );
+				this._animationId = -1;
+
+			}
 
 			this.dispatchEvent( _startEvent );
 			
@@ -972,7 +982,6 @@ class ArcballControls extends Object3D {
 
 			this.dispatchEvent( _startEvent );
 
-			//const center = event.center;
 			this.setCenter( event.clientX, event.clientY );
 			const hitP = this.unprojectOnObj( this.getCursorNDC( _center.x, _center.y, this.domElement ), this.camera );
 
@@ -1840,6 +1849,7 @@ class ArcballControls extends Object3D {
 			if ( animTime >= 1)  {
 
 				//animation end
+
 				this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
 				this.focus( point, this.scaleFactor );
@@ -1847,8 +1857,6 @@ class ArcballControls extends Object3D {
 				this._timeStart = -1;
 				this.updateTbState( STATE.IDLE, false );
 				this.activateGizmos( false );
-
-				window.cancelAnimationFrame( this._animationId );
 
 				this.dispatchEvent( _changeEvent ); 
 
@@ -1873,12 +1881,9 @@ class ArcballControls extends Object3D {
 		} else {
 
 			//interrupt animation
-			this._timeStart = -1;
 
-			window.cancelAnimationFrame( this._animationId );
 			this._animationId = -1;
-
-			this.dispatchEvent( _changeEvent );
+			this._timeStart = -1;
 
 		}
 
@@ -1922,12 +1927,11 @@ class ArcballControls extends Object3D {
 
 			} else {
 
+				this._animationId = -1;
 				this._timeStart = -1;
+
 				this.updateTbState( STATE.IDLE, false );
 				this.activateGizmos( false );
-
-				window.cancelAnimationFrame( this._animationId );
-				this._animationId = -1;
 
 				this.dispatchEvent( _changeEvent );
 
@@ -1936,17 +1940,16 @@ class ArcballControls extends Object3D {
 		} else {
 
 			//interrupt animation
+
+			this._animationId = -1;
 			this._timeStart = -1;
+
 			if ( this._state != STATE.ROTATE ) {
 
 				this.activateGizmos( false );
+				this.dispatchEvent ( _changeEvent );
 
 			}
-
-			window.cancelAnimationFrame( this._animationId );
-			this._animationId = -1;
-
-			this.dispatchEvent ( _changeEvent );
 
 		}
 
