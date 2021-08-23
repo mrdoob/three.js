@@ -34,6 +34,8 @@ import * as MathUtils from '../math/MathUtils.js';
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
+	#transmission = 0;
+
 	constructor( parameters ) {
 
 		super();
@@ -87,6 +89,25 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.setValues( parameters );
 
 	}
+
+	get transmission() {
+
+		return this.#transmission;
+
+	}
+
+	set transmission( value ) {
+
+		if ( this.#transmission > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this.#transmission = value;
+
+	}
+
 
 	copy( source ) {
 
