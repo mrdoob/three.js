@@ -1990,6 +1990,8 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
+		_currentMaterialId = - 1; // reset current material to ensure correct uniform bindings
+
 	};
 
 	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
