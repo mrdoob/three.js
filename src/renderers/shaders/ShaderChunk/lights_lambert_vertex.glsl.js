@@ -42,13 +42,13 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
 		getPointLightInfo( pointLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
-		directLightColor_Diffuse = PI * directLight.color;
+		directLightColor_Diffuse = directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;
+			vLightBack += saturate( - dotNL ) * directLightColor_Diffuse;
 
 		#endif
 
@@ -65,13 +65,13 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
 		getSpotLightInfo( spotLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
-		directLightColor_Diffuse = PI * directLight.color;
+		directLightColor_Diffuse = directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;
+			vLightBack += saturate( - dotNL ) * directLightColor_Diffuse;
 
 		#endif
 	}
@@ -87,13 +87,13 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
 		getDirectionalLightInfo( directionalLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
-		directLightColor_Diffuse = PI * directLight.color;
+		directLightColor_Diffuse = directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;
+			vLightBack += saturate( - dotNL ) * directLightColor_Diffuse;
 
 		#endif
 
