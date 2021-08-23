@@ -11,19 +11,13 @@ void RE_Direct_Toon( const in IncidentLight directLight, const in GeometricConte
 
 	vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
 
-	#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-		irradiance *= PI; // punctual light
-
-	#endif
-
-	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
 }
 
 void RE_IndirectDiffuse_Toon( const in vec3 irradiance, const in GeometricContext geometry, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
 }
 

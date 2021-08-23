@@ -122,12 +122,12 @@ class StandardNode extends Node {
 
 		} else {
 
-			const specularRoughnessNode = new ExpressionNode( 'material.specularRoughness', 'f' );
+			const roughnessNode = new ExpressionNode( 'material.roughness', 'f' );
 			const clearcoatRoughnessNode = new ExpressionNode( 'material.clearcoatRoughness', 'f' );
 
 			const contextEnvironment = {
-				roughness: specularRoughnessNode,
-				bias: new SpecularMIPLevelNode( specularRoughnessNode ),
+				roughness: roughnessNode,
+				bias: new SpecularMIPLevelNode( roughnessNode ),
 				viewNormal: new ExpressionNode( 'normal', 'v3' ),
 				worldNormal: new ExpressionNode( 'inverseTransformDirection( geometry.normal, viewMatrix )', 'v3' ),
 				gamma: true
@@ -185,7 +185,7 @@ class StandardNode extends Node {
 
 			}
 
-			if ( this.sheen ) this.sheen.analyze( builder );
+			if ( this.sheenTint ) this.sheenTint.analyze( builder );
 
 			// build code
 
@@ -230,7 +230,7 @@ class StandardNode extends Node {
 
 			const clearcoatEnv = useClearcoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearcoat', context: contextClearcoatEnvironment, slot: 'environment' } ) : undefined;
 
-			const sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
+			const sheenTint = this.sheenTint ? this.sheenTint.flow( builder, 'c' ) : undefined;
 
 			builder.requires.transparent = alpha !== undefined;
 
@@ -333,11 +333,11 @@ class StandardNode extends Node {
 			output.push(
 				'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * ( 1.0 - metalnessFactor )' ) + ';',
 
-				'material.specularRoughness = max( roughnessFactor, 0.0525 );',
-				'material.specularRoughness += geometryRoughness;',
-				'material.specularRoughness = min( material.specularRoughness, 1.0 );',
+				'material.roughness = max( roughnessFactor, 0.0525 );',
+				'material.roughness += geometryRoughness;',
+				'material.roughness = min( material.roughness, 1.0 );',
 
-				'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );'
+				'material.roughness = clamp( roughnessFactor, 0.04, 1.0 );'
 			);
 
 			if ( clearcoat ) {
@@ -368,9 +368,9 @@ class StandardNode extends Node {
 
 			}
 
-			if ( sheen ) {
+			if ( sheenTint ) {
 
-				output.push( 'material.sheenColor = ' + sheen.result + ';' );
+				output.push( 'material.sheenTint = ' + sheenTint.result + ';' );
 
 			}
 
@@ -417,7 +417,7 @@ class StandardNode extends Node {
 					ao.code,
 					'reflectedLight.indirectDiffuse *= ' + ao.result + ';',
 					'float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );',
-					'reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ' + ao.result + ', material.specularRoughness );'
+					'reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ' + ao.result + ', material.roughness );'
 				);
 
 			}
@@ -547,7 +547,7 @@ class StandardNode extends Node {
 
 		if ( source.environment ) this.environment = source.environment;
 
-		if ( source.sheen ) this.sheen = source.sheen;
+		if ( source.sheenTint ) this.sheenTint = source.sheenTint;
 
 		return this;
 
@@ -593,7 +593,7 @@ class StandardNode extends Node {
 
 			if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
 
-			if ( this.sheen ) data.sheen = this.sheen.toJSON( meta ).uuid;
+			if ( this.sheenTint ) data.sheenTint = this.sheenTint.toJSON( meta ).uuid;
 
 		}
 

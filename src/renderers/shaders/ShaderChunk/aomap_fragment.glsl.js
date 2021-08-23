@@ -10,7 +10,7 @@ export default /* glsl */`
 
 		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 
-		reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ambientOcclusion, material.specularRoughness );
+		reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ambientOcclusion, material.roughness );
 
 	#endif
 

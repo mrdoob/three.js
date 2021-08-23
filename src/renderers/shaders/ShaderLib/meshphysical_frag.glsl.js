@@ -36,7 +36,7 @@ uniform float opacity;
 #endif
 
 #ifdef USE_SHEEN
-	uniform vec3 sheen;
+	uniform vec3 sheenTint;
 #endif
 
 varying vec3 vViewPosition;
@@ -53,7 +53,6 @@ varying vec3 vViewPosition;
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
 #include <bsdfs>
-#include <transmission_pars_fragment>
 #include <cube_uv_reflection_fragment>
 #include <envmap_common_pars_fragment>
 #include <envmap_physical_pars_fragment>
@@ -61,6 +60,7 @@ varying vec3 vViewPosition;
 #include <lights_pars_begin>
 #include <normal_pars_fragment>
 #include <lights_physical_pars_fragment>
+#include <transmission_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
@@ -106,6 +106,16 @@ void main() {
 	#include <transmission_fragment>
 
 	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
+
+	#ifdef CLEARCOAT
+
+		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
+
+		vec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );
+
+		outgoingLight = outgoingLight * ( 1.0 - clearcoat * Fcc ) + clearcoatSpecular * clearcoat;
+
+	#endif
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 

@@ -99,17 +99,6 @@ const _axisDirections = [
  * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
 */
 
-function convertLinearToRGBE( color ) {
-
-	const maxComponent = Math.max( color.r, color.g, color.b );
-	const fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
-	color.multiplyScalar( Math.pow( 2.0, - fExp ) );
-
-	const alpha = ( fExp + 128.0 ) / 255.0;
-	return alpha;
-
-}
-
 class PMREMGenerator {
 
 	constructor( renderer ) {
@@ -296,21 +285,15 @@ class PMREMGenerator {
 
 			if ( background.isColor ) {
 
-				backgroundMaterial.color.copy( background ).convertSRGBToLinear();
+				backgroundMaterial.color.copy( background );
 				scene.background = null;
-
-				const alpha = convertLinearToRGBE( backgroundMaterial.color );
-				backgroundMaterial.opacity = alpha;
 				useSolidColor = true;
 
 			}
 
 		} else {
 
-			backgroundMaterial.color.copy( _clearColor ).convertSRGBToLinear();
-
-			const alpha = convertLinearToRGBE( backgroundMaterial.color );
-			backgroundMaterial.opacity = alpha;
+			backgroundMaterial.color.copy( _clearColor );
 			useSolidColor = true;
 
 		}

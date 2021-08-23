@@ -125,6 +125,9 @@ export function glconstants() {
 		FRAGMENT_SHADER: 35632,
 		MAX_VERTEX_TEXTURE_IMAGE_UNITS: 35660,
 		MAX_COMBINED_TEXTURE_IMAGE_UNITS: 35661,
+		FLOAT_MAT2: 35674,
+		FLOAT_MAT3: 35675,
+		FLOAT_MAT4: 35676,
 		COMPILE_STATUS: 35713,
 		LINK_STATUS: 35714,
 		VALIDATE_STATUS: 35715,
@@ -279,6 +282,21 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
+			glconstants(),
+			glsl(),
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
 			glsl(),
 			babel( {
 				babelHelpers: 'bundled',
@@ -318,21 +336,6 @@ export default [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.min.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glconstants(),
-			glsl(),
-			header()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.module.js'
 			}
 		]
 	}

@@ -12,7 +12,7 @@
 			<div id="info">
 				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a>
-				<br>Rougnness increases left to right
+				<br>Roughness increases left to right
 				<br>Metalness increases top to bottom
 			</div>
 		</div>
@@ -48,10 +48,11 @@
 
 					scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) child.material.color.setHex( 0xccccff ); // tinted for visibility
-						render();
+						if ( child.isMesh ) child.material.color.setHex( 0xffffff );
 
 					} );
+
+					render();
 
 				} );
 
@@ -59,10 +60,11 @@
 
 					scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) child.material.color.setHex( 0xffffff );
-						render();
+						if ( child.isMesh ) child.material.color.setHex( 0xccccff ); // tinted for visibility
 
 					} );
+
+					render();
 
 				} );
 
@@ -71,9 +73,8 @@
 				scene = new THREE.Scene();
 
 				// camera
-
-				camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 30 ); 
-				camera.position.set( 0, 0, 10 );
+				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
+				camera.position.set( 0, 0, 18 );
 
 			}
 
@@ -91,6 +92,7 @@
 							color: 0xffffff,
 							envMap: radianceMap,
 							envMapIntensity: 1,
+							transmission: 0,
 							ior: 1.5
 						} );
 
@@ -110,14 +112,14 @@
 				return new Promise( function ( resolve ) {
 
 					const envScene = new THREE.Scene();
-					envScene.background = new THREE.Color( COLOR ); // sRGB colorspace assumed, apparently
+					envScene.background = new THREE.Color( COLOR );
+					if ( renderer.outputEncoding === THREE.sRGBEncoding ) envScene.background.convertSRGBToLinear();
 
 					const pmremGenerator = new THREE.PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 
-					scene.background = new THREE.Color( COLOR );
-					if ( renderer.outputEncoding !== THREE.sRGBEncoding ) scene.background.convertSRGBToLinear();
+					scene.background = radianceMap;
 
 					resolve();
 
@@ -127,16 +129,13 @@
 
 			function onWindowResize() {
 
-				const aspect = window.innerWidth / window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
-				camera.left = - frustumSize * aspect / 2;
-				camera.right = frustumSize * aspect / 2;
-				camera.top = frustumSize / 2;
-				camera.bottom = - frustumSize / 2;
-
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 
 				render();
 

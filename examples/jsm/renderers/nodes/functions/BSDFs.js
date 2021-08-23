@@ -31,15 +31,15 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }` ); // validated
 
-export const BRDF_Diffuse_Lambert = new FunctionNode( `
-vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
+export const BRDF_Lambert = new FunctionNode( `
+vec3 BRDF_Lambert( const in vec3 diffuseColor ) {
 
 	return RECIPROCAL_PI * diffuseColor;
 
 }` ); // validated
 
-export const BRDF_Specular_BlinnPhong = new FunctionNode( `
-vec3 BRDF_Specular_BlinnPhong( vec3 lightDirection, vec3 specularColor, float shininess ) {
+export const BRDF_BlinnPhong = new FunctionNode( `
+vec3 BRDF_BlinnPhong( vec3 lightDirection, vec3 specularColor, float shininess ) {
 
 	vec3 halfDir = normalize( lightDirection + PositionViewDirection );
 
@@ -96,21 +96,15 @@ void RE_Direct_BlinnPhong( vec3 lightDirection, vec3 lightColor ) {
 	float dotNL = saturate( dot( NormalView, lightDirection ) );
 	vec3 irradiance = dotNL * lightColor;
 
-#ifndef PHYSICALLY_CORRECT_LIGHTS
+	ReflectedLightDirectDiffuse += irradiance * BRDF_Lambert( MaterialDiffuseColor.rgb );
 
-		irradiance *= PI; // punctual light
+	ReflectedLightDirectSpecular += irradiance * BRDF_BlinnPhong( lightDirection, MaterialSpecularColor, MaterialSpecularShininess );
 
-#endif
-
-	ReflectedLightDirectDiffuse += irradiance * BRDF_Diffuse_Lambert( MaterialDiffuseColor.rgb );
-
-	ReflectedLightDirectSpecular += irradiance * BRDF_Specular_BlinnPhong( lightDirection, MaterialSpecularColor, MaterialSpecularShininess );
-
-}` ).setIncludes( [ BRDF_Diffuse_Lambert, BRDF_Specular_BlinnPhong ] );
+}` ).setIncludes( [ BRDF_Lambert, BRDF_BlinnPhong ] );
 
 export const RE_IndirectDiffuse_BlinnPhong = new FunctionNode( `
 void RE_IndirectDiffuse_BlinnPhong( ) {
 
-	ReflectedLightIndirectDiffuse += Irradiance * BRDF_Diffuse_Lambert( MaterialDiffuseColor.rgb );
+	ReflectedLightIndirectDiffuse += Irradiance * BRDF_Lambert( MaterialDiffuseColor.rgb );
 
-}` ).setIncludes( [ BRDF_Diffuse_Lambert ] );
+}` ).setIncludes( [ BRDF_Lambert ] );

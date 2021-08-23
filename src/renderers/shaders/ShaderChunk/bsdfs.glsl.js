@@ -1,23 +1,5 @@
 export default /* glsl */`
 
-// Analytical approximation of the DFG LUT, one half of the
-// split-sum approximation used in indirect specular lighting.
-// via 'environmentBRDF' from "Physically Based Shading on Mobile"
-// https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-vec2 integrateSpecularBRDF( const in float dotNV, const in float roughness ) {
-
-	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
-
-	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
-
-	vec4 r = roughness * c0 + c1;
-
-	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
-
-	return vec2( - 1.04, 1.04 ) * a004 + r.zw;
-
-}
-
 float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 #if defined ( PHYSICALLY_CORRECT_LIGHTS )
@@ -51,7 +33,7 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 
 }
 
-vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
+vec3 BRDF_Lambert( const in vec3 diffuseColor ) {
 
 	return RECIPROCAL_PI * diffuseColor;
 
@@ -97,7 +79,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 }
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in float f90, const in float roughness ) {
+vec3 BRDF_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in float f90, const in float roughness ) {
 
 	float alpha = pow2( roughness ); // UE4's roughness
 
@@ -116,7 +98,7 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 view
 
 	return F * ( V * D );
 
-} // validated
+}
 
 // Rect Area Light
 
@@ -235,38 +217,6 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 
 // End Rect Area Light
 
-// ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
-vec3 BRDF_Specular_GGX_Environment( const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
-
-	float dotNV = saturate( dot( normal, viewDir ) );
-
-	vec2 brdf = integrateSpecularBRDF( dotNV, roughness );
-
-	return specularColor * brdf.x + brdf.y;
-
-} // validated
-
-// Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
-// Approximates multiscattering in order to preserve energy.
-// http://www.jcgt.org/published/0008/01/03/
-void BRDF_Specular_Multiscattering_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
-
-	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
-
-	vec2 brdf = integrateSpecularBRDF( dotNV, roughness );
-
-	vec3 FssEss = specularColor * brdf.x + brdf.y;
-
-	float Ess = brdf.x + brdf.y;
-	float Ems = 1.0 - Ess;
-
-	vec3 Favg = specularColor + ( 1.0 - specularColor ) * 0.047619; // 1/21
-	vec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );
-
-	singleScatter += FssEss;
-	multiScatter += Fms * Ems;
-
-}
 
 float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {
 
@@ -281,7 +231,7 @@ float D_BlinnPhong( const in float shininess, const in float dotNH ) {
 
 }
 
-vec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {
+vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
@@ -320,7 +270,7 @@ float V_Neubelt( float NoV, float NoL ) {
 
 }
 
-vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {
+vec3 BRDF_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {
 
 	vec3 N = geometry.normal;
 	vec3 V = geometry.viewDir;

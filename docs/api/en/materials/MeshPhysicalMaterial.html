@@ -133,10 +133,9 @@
 			This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is *1.0*
 		</p>
 
-		<h3>[property:Color sheen]</h3>
+		<h3>[property:Color sheenTint]</h3>
 		<p>
-			If a color is assigned to this property, the material will use a special sheen BRDF intended for rendering cloth materials such as velvet.
-			The sheen color provides the ability to create two-tone specular materials. *null* by default.
+			Used for rendering materials such as velvet. It has no effect when set to black (0x000000). Default is black.
 		</p>
 
 		<h3>[property:Float transmission]</h3>

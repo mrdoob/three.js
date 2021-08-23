@@ -5,9 +5,9 @@ material.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );
 vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );
 float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
 
-material.specularRoughness = max( roughnessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.
-material.specularRoughness += geometryRoughness;
-material.specularRoughness = min( material.specularRoughness, 1.0 );
+material.roughness = max( roughnessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.
+material.roughness += geometryRoughness;
+material.roughness = min( material.roughness, 1.0 );
 
 #ifdef IOR
 
@@ -42,7 +42,7 @@ material.specularRoughness = min( material.specularRoughness, 1.0 );
 
 #else
 
-	material.specularColor = mix( vec3( DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor.rgb, metalnessFactor );
+	material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );
 	material.specularF90 = 1.0;
 
 #endif
@@ -51,6 +51,8 @@ material.specularRoughness = min( material.specularRoughness, 1.0 );
 
 	material.clearcoat = clearcoat;
 	material.clearcoatRoughness = clearcoatRoughness;
+	material.clearcoatF0 = vec3( 0.04 );
+	material.clearcoatF90 = 1.0;
 
 	#ifdef USE_CLEARCOATMAP
 
@@ -73,7 +75,7 @@ material.specularRoughness = min( material.specularRoughness, 1.0 );
 
 #ifdef USE_SHEEN
 
-	material.sheenColor = sheen;
+	material.sheenTint = sheenTint;
 
 #endif
 `;

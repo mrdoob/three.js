@@ -44,12 +44,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	vec3 irradiance = ambientLightColor;
 
-	#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-		irradiance *= PI;
-
-	#endif
-
 	return irradiance;
 
 }
@@ -63,7 +57,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	void getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight ) {
+	void getDirectionalLightInfo( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 
 		directLight.color = directionalLight.color;
 		directLight.direction = directionalLight.direction;
@@ -86,7 +80,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
 	// directLight is an out parameter as having it as a return value caused compiler errors on some devices
-	void getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight ) {
+	void getPointLightInfo( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 
 		vec3 lVector = pointLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
@@ -117,7 +111,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
 	// directLight is an out parameter as having it as a return value caused compiler errors on some devices
-	void getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight ) {
+	void getSpotLightInfo( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 
 		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );
@@ -179,12 +173,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
 
 		vec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );
-
-		#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-			irradiance *= PI;
-
-		#endif
 
 		return irradiance;
 
