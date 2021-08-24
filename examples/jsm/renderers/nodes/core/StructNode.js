@@ -39,8 +39,6 @@ class StructNode extends CodeNode {
 		const type = this.getType( builder );
 		const inputs = this.inputs;
 
-		const shaderStage = builder.getShaderStage();
-
 		let code = `struct ${type} {\n`;
 
 		for ( const inputName in inputs ) {
