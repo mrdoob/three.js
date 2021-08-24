@@ -54,13 +54,6 @@ const ENCODINGS = {
 	[ GammaEncoding ]: 6
 };
 
-const backgroundMaterial = new MeshBasicMaterial( {
-	side: BackSide,
-	depthWrite: false,
-	depthTest: false,
-} );
-const backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
-
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
 const _clearColor = /*@__PURE__*/ new Color();
@@ -279,8 +272,18 @@ class PMREMGenerator {
 		renderer.outputEncoding = LinearEncoding;
 		renderer.autoClear = false;
 
+		const backgroundMaterial = new MeshBasicMaterial( {
+			name: 'PMREM.Background',
+			side: BackSide,
+			depthWrite: false,
+			depthTest: false,
+		} );
+
+		const backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
+
 		let useSolidColor = false;
 		const background = scene.background;
+
 		if ( background ) {
 
 			if ( background.isColor ) {
@@ -297,7 +300,6 @@ class PMREMGenerator {
 			useSolidColor = true;
 
 		}
-
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -332,6 +334,9 @@ class PMREMGenerator {
 			renderer.render( scene, cubeCamera );
 
 		}
+
+		backgroundBox.geometry.dispose();
+		backgroundBox.material.dispose();
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
