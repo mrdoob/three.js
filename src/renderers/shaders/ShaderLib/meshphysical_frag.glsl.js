@@ -3,7 +3,6 @@ export default /* glsl */`
 
 #ifdef PHYSICAL
 	#define IOR
-	#define CLEARCOAT
 	#define SPECULAR
 #endif
 
@@ -30,7 +29,7 @@ uniform float opacity;
 	#endif
 #endif
 
-#ifdef CLEARCOAT
+#ifdef USE_CLEARCOAT
 	uniform float clearcoat;
 	uniform float clearcoatRoughness;
 #endif
@@ -107,7 +106,7 @@ void main() {
 
 	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 
-	#ifdef CLEARCOAT
+	#ifdef USE_CLEARCOAT
 
 		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
 
