@@ -43,8 +43,8 @@ class SelectionBox {
 		this.startPoint = new Vector3();
 		this.endPoint = new Vector3();
 		this.collection = [];
+		this.instances = {};
 		this.deep = deep;
-		this.instanceDetection = {};
 
 	}
 
@@ -175,38 +175,38 @@ class SelectionBox {
 
 		if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				if ( object instanceof InstancedMesh ) {
+			if ( object.isInstancedMesh ) {
 
-					this.instanceDetection[ object.uuid ] = [];
+				this.instances[ object.uuid ] = [];
 
-					for ( let instanceId = 0; instanceId < object.count; instanceId ++ ) {
+				for ( let instanceId = 0; instanceId < object.count; instanceId ++ ) {
 
-						object.getMatrixAt( instanceId, _matrix );
-						_matrix.decompose( _center, _quaternion, _scale );
-
-						if ( frustum.containsPoint( _center ) ) {
-
-							this.instanceDetection[ object.uuid ].push( instanceId );
-
-						}
-
-					}
-
-				} else {
-
-					if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
-
-					_center.copy( object.geometry.boundingSphere.center );
-
-					_center.applyMatrix4( object.matrixWorld );
+					object.getMatrixAt( instanceId, _matrix );
+					_matrix.decompose( _center, _quaternion, _scale );
 
 					if ( frustum.containsPoint( _center ) ) {
 
-						this.collection.push( object );
+						this.instances[ object.uuid ].push( instanceId );
 
 					}
 
 				}
+
+			} else {
+
+				if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
+
+				_center.copy( object.geometry.boundingSphere.center );
+
+				_center.applyMatrix4( object.matrixWorld );
+
+				if ( frustum.containsPoint( _center ) ) {
+
+					this.collection.push( object );
+
+				}
+
+			}
 
 		}
 
