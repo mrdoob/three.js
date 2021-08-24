@@ -192,19 +192,17 @@ class SelectionBox {
 
 					}
 
-				} else {
+				} 
 
-					if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
+				if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
 
-					_center.copy( object.geometry.boundingSphere.center );
+				_center.copy( object.geometry.boundingSphere.center );
 
-					_center.applyMatrix4( object.matrixWorld );
+				_center.applyMatrix4( object.matrixWorld );
 
-					if ( frustum.containsPoint( _center ) ) {
+				if ( frustum.containsPoint( _center ) ) {
 
-						this.collection.push( object );
-
-					}
+					this.collection.push( object );
 
 				}
 
