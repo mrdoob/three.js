@@ -242,12 +242,8 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		}
 
-		if ( _renderer.localClippingEnabled &&
-				material.clipShadows === true &&
-				material.clippingPlanes.length !== 0 ||
-				material.displacementMap &&
-				material.displacementScale !== 0
-		) {
+		if ( ( _renderer.localClippingEnabled && material.clipShadows === true && material.clippingPlanes.length !== 0 ) ||
+			( material.displacementMap && material.displacementScale !== 0 ) || material.alphaMap ) {
 
 			// in this case we need a unique material instance reflecting the
 			// appropriate state
@@ -288,6 +284,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 			result.side = ( material.shadowSide !== null ) ? material.shadowSide : shadowSide[ material.side ];
 
 		}
+
+		result.alphaMap = material.alphaMap;
+		result.alphaTest = material.alphaTest;
 
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
