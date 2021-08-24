@@ -194,9 +194,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
 
 			clearcoat: material.clearcoat > 0,
-			clearcoatMap: material.clearcoat > 0 && !! material.clearcoatMap,
-			clearcoatRoughnessMap: material.clearcoat > 0 && !! material.clearcoatRoughnessMap,
-			clearcoatNormalMap: material.clearcoat > 0 && !! material.clearcoatNormalMap,
+			clearcoatMap: !! material.clearcoatMap,
+			clearcoatRoughnessMap: !! material.clearcoatRoughnessMap,
+			clearcoatNormalMap: !! material.clearcoatNormalMap,
 
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
