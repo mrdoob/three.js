@@ -22,12 +22,13 @@ class VaryNode extends Node {
 	generate( builder, output ) {
 
 		const type = this.getType( builder );
+		const value = this.value;
 
 		const nodeVary = builder.getVaryFromNode( this, type );
 		const propertyName = builder.getPropertyName( nodeVary );
 
 		// force nodeVary.snippet work in vertex stage
-		const flowData = builder.flowNodeFromShaderStage( NodeShaderStage.Vertex, this.value, type, propertyName );
+		builder.flowNodeFromShaderStage( NodeShaderStage.Vertex, value, type, propertyName );
 
 		return builder.format( propertyName, type, output );
 
