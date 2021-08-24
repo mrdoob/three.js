@@ -28,7 +28,7 @@ export default /* glsl */`
 
 	radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
 
-	#ifdef CLEARCOAT
+	#ifdef USE_CLEARCOAT
 
 		clearcoatRadiance += getIBLRadiance( geometry.viewDir, geometry.clearcoatNormal, material.clearcoatRoughness );
 
