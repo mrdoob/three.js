@@ -1,6 +1,6 @@
-import Node from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
 
-class OperatorNode extends Node {
+class OperatorNode extends TempNode {
 
 	constructor( op, a, b ) {
 
@@ -42,12 +42,6 @@ class OperatorNode extends Node {
 
 	}
 
-	getVectorFromMatrix( type ) {
-
-		return 'vec' + type.substr( 3 );
-
-	}
-
 	generate( builder, output ) {
 
 		let typeA = this.a.getType( builder );
@@ -59,13 +53,13 @@ class OperatorNode extends Node {
 
 			// matrix x vector
 
-			type = typeB = this.getVectorFromMatrix( typeA );
+			type = typeB = builder.getVectorFromMatrix( typeA );
 
 		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
 
 			// vector x matrix
 
-			type = typeB = this.getVectorFromMatrix( typeB );
+			type = typeB = builder.getVectorFromMatrix( typeB );
 
 		} else {
 

@@ -1,6 +1,6 @@
-import Node from './Node.js';
+import TempNode from './TempNode.js';
 
-class FunctionCallNode extends Node {
+class FunctionCallNode extends TempNode {
 
 	constructor( functionNode = null, parameters = {} ) {
 

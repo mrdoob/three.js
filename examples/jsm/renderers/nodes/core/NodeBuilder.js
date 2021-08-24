@@ -21,11 +21,11 @@ class NodeBuilder {
 
 		this.slots = { vertex: [], fragment: [] };
 		this.defines = { vertex: {}, fragment: {} };
-		this.uniforms = { vertex: [], fragment: [] };
-		this.nodeCodes = { vertex: [], fragment: [] };
-		this.vars = { vertex: [], fragment: [] };
+		this.uniforms = { vertex: [], fragment: [], index: 0 };
+		this.codes = { vertex: [], fragment: [] };
 		this.attributes = [];
 		this.varys = [];
+		this.vars = { vertex: [], fragment: [] };
 		this.flow = { code: '' };
 
 		this.context = {
@@ -36,6 +36,7 @@ class NodeBuilder {
 		this.nodesData = new WeakMap();
 
 		this.shaderStage = null;
+		this.slot = null;
 
 	}
 
@@ -81,13 +82,25 @@ class NodeBuilder {
 
 	}
 
-	getContextParameter( name ) {
+	getContextValue( name ) {
 
 		return this.context[ name ];
 
 	}
 
-	getTexture( /* textureProperty, uvSnippet */ ) {
+	getTexture( /* textureProperty, uvSnippet, biasSnippet = null */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getCubeTexture( /* textureProperty, uvSnippet, biasSnippet = null */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getPMREM( texture ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -155,6 +168,28 @@ class NodeBuilder {
 
 	}
 
+	getTextureEncodingFromMap( map ) {
+
+		let encoding;
+
+		if ( map && map.isTexture ) {
+
+			encoding = map.encoding;
+
+		} else if ( map && map.isWebGLRenderTarget ) {
+
+			encoding = map.texture.encoding;
+
+		} else {
+
+			encoding = LinearEncoding;
+
+		}
+
+		return encoding;
+
+	}
+
 	getVectorType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
@@ -177,18 +212,24 @@ class NodeBuilder {
 
 	getTypeLength( type ) {
 
-		type = this.getVectorType( type );
+		const vecType = this.getVectorType( type );
 
-		if ( type === 'float' ) return 1;
-		if ( type === 'vec2' ) return 2;
-		if ( type === 'vec3' ) return 3;
-		if ( type === 'vec4' ) return 4;
+		if ( vecType === 'float' ) return 1;
+		if ( vecType === 'vec2' ) return 2;
+		if ( vecType === 'vec3' ) return 3;
+		if ( vecType === 'vec4' ) return 4;
 
 		return 0;
 
 	}
 
-	getDataFromNode( node, shaderStage = null ) {
+	getVectorFromMatrix( type ) {
+
+		return 'vec' + type.substr( 3 );
+
+	}
+
+	getDataFromNode( node, shaderStage = this.shaderStage ) {
 
 		let nodeData = this.nodesData.get( node );
 
@@ -200,7 +241,7 @@ class NodeBuilder {
 
 		}
 
-		return shaderStage ? nodeData[ shaderStage ] : nodeData;
+		return shaderStage !== null ? nodeData[ shaderStage ] : nodeData;
 
 	}
 
@@ -212,12 +253,11 @@ class NodeBuilder {
 
 		if ( nodeUniform === undefined ) {
 
-			const uniforms = this.uniforms[ shaderStage ];
-			const index = uniforms.length;
+			const index = this.uniforms.index ++;
 
 			nodeUniform = new NodeUniform( 'nodeUniform' + index, type, node );
 
-			uniforms.push( nodeUniform );
+			this.uniforms[ shaderStage ].push( nodeUniform );
 
 			nodeData.uniform = nodeUniform;
 
@@ -252,7 +292,7 @@ class NodeBuilder {
 
 	getVaryFromNode( node, type ) {
 
-		const nodeData = this.getDataFromNode( node );
+		const nodeData = this.getDataFromNode( node, null );
 
 		let nodeVary = nodeData.vary;
 
@@ -281,12 +321,12 @@ class NodeBuilder {
 
 		if ( nodeCode === undefined ) {
 
-			const nodeCodes = this.nodeCodes[ shaderStage ];
-			const index = nodeCodes.length;
+			const codes = this.codes[ shaderStage ];
+			const index = codes.length;
 
 			nodeCode = new NodeCode( 'nodeCode' + index, type );
 
-			nodeCodes.push( nodeCode );
+			codes.push( nodeCode );
 
 			nodeData.code = nodeCode;
 
@@ -296,31 +336,37 @@ class NodeBuilder {
 
 	}
 
-	/*
-	analyzeNode( node ) {
-
-
-	}
-	*/
-
 	addFlowCode( code ) {
 
 		if ( ! /;\s*$/.test( code ) ) {
 
-			code += '; ';
+			code += ';';
 
 		}
 
-		this.flow.code += code;
+		this.flow.code += code + ' ';
 
 	}
 
-	flowNode( node, output ) {
+	flowSlot( slot, shaderStage = this.shaderStage ) {
+
+		this.slot = slot;
+
+		const flowData = this.flowNode( slot.node, slot.output );
+
+		this.define( shaderStage, `NODE_CODE_${slot.name}`, flowData.code );
+		this.define( shaderStage, `NODE_${slot.name}`, flowData.result );
+
+		this.slot = null;
+
+	}
+
+	flowNode( node, output = null ) {
 
 		const previousFlow = this.flow;
 
 		const flow = {
-			code: previousFlow.code,
+			code: '',
 		};
 
 		this.flow = flow;
@@ -333,9 +379,33 @@ class NodeBuilder {
 
 	}
 
-	_buildDefines( shader ) {
+	flowNodeFromShaderStage( shaderStage, node, output = null, propertyName = null ) {
 
-		const defines = this.defines[ shader ];
+		const previousShaderStage = this.shaderStage;
+
+		this.setShaderStage( shaderStage );
+
+		const flowData = this.flowNode( node, output );
+
+		if ( propertyName !== null ) {
+
+			flowData.code += `${propertyName} = ${flowData.result}; `;
+
+		}
+
+		const shaderStageCode = this.defines[ shaderStage ][ 'NODE_CODE' ] + flowData.code;
+
+		this.define( shaderStage, 'NODE_CODE', shaderStageCode );
+
+		this.setShaderStage( previousShaderStage );
+
+		return flowData;
+
+	}
+
+	getDefines( shaderStage ) {
+
+		const defines = this.defines[ shaderStage ];
 
 		let code = '';
 
@@ -349,55 +419,65 @@ class NodeBuilder {
 
 	}
 
-	getAttributesBodySnippet( /*shaderStage*/ ) {
+	getAttributes( shaderStage ) {
+
+		let snippet = '';
+
+		if ( shaderStage === 'vertex' ) {
+
+			const attributes = this.attributes;
+
+			for ( let index = 0; index < attributes.length; index ++ ) {
+
+				const attribute = attributes[ index ];
+
+				snippet += `layout(location = ${index}) in ${attribute.type} ${attribute.name}; `;
+
+			}
+
+		}
+
+		return snippet;
+
+	}
+
+	getVarys( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	getAttributesHeaderSnippet( /*shaderStage*/ ) {
+	getVars( shaderStage ) {
+
+		let snippet = '';
+
+		const vars = this.vars[ shaderStage ];
+
+		for ( let index = 0; index < vars.length; index ++ ) {
+
+			const variable = vars[ index ];
+
+			snippet += `${variable.type} ${variable.name}; `;
+
+		}
+
+		return snippet;
+
+	}
+
+	getUniforms( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	getVarysHeaderSnippet( /*shaderStage*/ ) {
+	getCodes( shaderStage ) {
 
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getVarysBodySnippet( /*shaderStage*/ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getVarsHeaderSnippet( /*shaderStage*/ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getVarsBodySnippet( /*shaderStage*/ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getUniformsHeaderSnippet( /*shaderStage*/ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getUniformsHeaderCodes( shaderStage ) {
-
-		const nodeCodes = this.nodeCodes[ shaderStage ];
+		const codes = this.codes[ shaderStage ];
 
 		let code = '';
 
-		for ( const nodeCode of nodeCodes ) {
+		for ( const nodeCode of codes ) {
 
 			code += nodeCode.code + '\n';
 
@@ -413,6 +493,18 @@ class NodeBuilder {
 
 	}
 
+	getShaderStage() {
+
+		return this.shaderStage;
+
+	}
+
+	setShaderStage( shaderStage ) {
+
+		this.shaderStage = shaderStage;
+
+	}
+
 	build() {
 
 		const shaderStages = [ 'vertex', 'fragment' ];
@@ -420,38 +512,56 @@ class NodeBuilder {
 
 		for ( const shaderStage of shaderStages ) {
 
-			this.shaderStage = shaderStage;
+			this.setShaderStage( shaderStage );
+
+			this.define( shaderStage, 'NODE_CODE', '' );
 
 			const slots = this.slots[ shaderStage ];
 
 			for ( const slot of slots ) {
 
-				const flowData = this.flowNode( slot.node, slot.output );
-
-				this.define( shaderStage, `NODE_CODE_${slot.name}`, flowData.code );
-				this.define( shaderStage, `NODE_${slot.name}`, flowData.result );
+				this.flowSlot( slot, shaderStage );
 
 			}
 
 		}
 
-		this.shaderStage = null;
+		this.setShaderStage( null );
 
 		for ( const shaderStage of shaderStages ) {
 
-			this.define( shaderStage, 'NODE_HEADER_UNIFORMS', this.getUniformsHeaderSnippet( shaderStage ) );
-			this.define( shaderStage, 'NODE_HEADER_ATTRIBUTES', this.getAttributesHeaderSnippet( shaderStage ) );
-			this.define( shaderStage, 'NODE_HEADER_VARYS', this.getVarysHeaderSnippet( shaderStage ) );
+			const defines = this.getDefines( shaderStage );
+			const uniforms = this.getUniforms( shaderStage );
+			const attributes = this.getAttributes( shaderStage );
+			const varys = this.getVarys( shaderStage );
+			const vars = this.getVars( shaderStage );
+			const codes = this.getCodes( shaderStage );
 
-			this.define( shaderStage, 'NODE_BODY_VARYS', this.getVarysBodySnippet( shaderStage ) );
-			this.define( shaderStage, 'NODE_BODY_VARS', this.getVarsBodySnippet( shaderStage ) );
+			shaderData[ shaderStage ] = `
+				// <node_builder>
 
-			let headerCode = '';
+				#define NODE_MATERIAL
 
-			headerCode += this.getVarsHeaderSnippet( shaderStage ) + '\n';
-			headerCode += this.getUniformsHeaderCodes( shaderStage );
+				// defines
+				${defines}
 
-			shaderData[ shaderStage ] = this._buildDefines( shaderStage ) + '\n' + headerCode;
+				// uniforms
+				${uniforms}
+
+				// attributes
+				${attributes}
+
+				// varys
+				${varys}
+
+				// vars
+				${vars}
+
+				// codes
+				${codes}
+
+				// </node_builder>
+				`;
 
 		}
 
