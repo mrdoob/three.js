@@ -158,8 +158,8 @@
 
 			const waves = {
 				A: { direction: 0, steepness: 0.4, wavelength: 60 },
-				B: { direction: 15, steepness: 0.4, wavelength: 31 },
-				C: { direction: 30, steepness: 0.4, wavelength: 18 },
+				B: { direction: 30, steepness: 0.4, wavelength: 30 },
+				C: { direction: 60, steepness: 0.4, wavelength: 15 },
 			};
 
 			function getWaveInfo(x, z, time) {
@@ -172,7 +172,7 @@
 					const c = Math.sqrt(9.8 / k);
 					const d = new THREE.Vector2(
 						Math.sin((w.direction * Math.PI) / 180),
-						Math.cos((w.direction * Math.PI) / 180)
+						-Math.cos((w.direction * Math.PI) / 180)
 					);
 					const f = k * (d.dot(new THREE.Vector2(x, z)) - c * time);
 					const a = w.steepness / k;
