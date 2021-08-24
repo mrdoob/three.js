@@ -39,10 +39,8 @@
 	<p>含有对象的子级的数组。请参阅[page:Group]来了解将手动对象进行分组的相关信息。</p>
 
 	<h3>[property:Material customDepthMaterial]</h3>
-	<p>渲染到深度贴图时此材质要使用的自定义深度材质。
-		当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
-		（b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
-		您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
+	<p>Custom depth material to be used when rendering to the depth map. Can only be used in context of meshes.
+	When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are modifying vertex positions in the vertex shader you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
 	</p>
 
 	<h3>[property:Material customDistanceMaterial]</h3>
