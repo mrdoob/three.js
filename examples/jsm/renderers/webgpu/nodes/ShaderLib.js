@@ -5,15 +5,11 @@ const ShaderLib = {
 		vertexShader:
 			`#version 450
 
-			NODE_HEADER_ATTRIBUTES
-			NODE_HEADER_UNIFORMS
-			NODE_HEADER_VARYS
-
 			void main(){
 
-				NODE_BODY_VARYS
-				NODE_BODY_VARS
+				NODE_CODE
 
+				NODE_CODE_MVP
 				gl_Position = NODE_MVP;
 
 			}`,
@@ -21,15 +17,11 @@ const ShaderLib = {
 		fragmentShader:
 			`#version 450
 
-			NODE_HEADER_ATTRIBUTES
-			NODE_HEADER_UNIFORMS
-			NODE_HEADER_VARYS
-
 			layout(location = 0) out vec4 outColor;
 
 			void main() {
 
-				NODE_BODY_VARS
+				NODE_CODE
 
 				MaterialDiffuseColor = vec4( 1.0 );
 
@@ -51,6 +43,7 @@ const ShaderLib = {
 
 				#ifdef NODE_ALPHA_TEST
 
+					NODE_CODE_ALPHA_TEST
 					if ( MaterialDiffuseColor.a < NODE_ALPHA_TEST ) discard;
 
 				#endif
@@ -77,15 +70,11 @@ const ShaderLib = {
 		vertexShader:
 			`#version 450
 
-			NODE_HEADER_ATTRIBUTES
-			NODE_HEADER_UNIFORMS
-			NODE_HEADER_VARYS
-
 			void main(){
 
-				NODE_BODY_VARYS
-				NODE_BODY_VARS
+				NODE_CODE
 
+				NODE_CODE_MVP
 				gl_Position = NODE_MVP;
 
 			}`,
@@ -93,15 +82,11 @@ const ShaderLib = {
 		fragmentShader:
 			`#version 450
 
-			NODE_HEADER_ATTRIBUTES
-			NODE_HEADER_UNIFORMS
-			NODE_HEADER_VARYS
-
 			layout(location = 0) out vec4 outColor;
 
 			void main() {
 
-				NODE_BODY_VARS
+				NODE_CODE
 
 				MaterialDiffuseColor = vec4( 1.0 );
 				MaterialSpecularColor = vec3( 1.0 );
@@ -115,6 +100,7 @@ const ShaderLib = {
 
 				#ifdef NODE_ALPHA_TEST
 
+					NODE_CODE_ALPHA_TEST
 					if ( MaterialDiffuseColor.a < NODE_ALPHA_TEST ) discard;
 
 				#endif
@@ -140,7 +126,89 @@ const ShaderLib = {
 
 			}`
 
-	}
+	},
+
+	standard: {
+
+		vertexShader:
+			`#version 450
+
+			void main(){
+
+				NODE_CODE
+
+				NODE_CODE_MVP
+				gl_Position = NODE_MVP;
+
+			}`,
+
+		fragmentShader:
+			`#version 450
+
+			layout(location = 0) out vec4 outColor;
+
+			void main() {
+
+				NODE_CODE
+
+				MaterialDiffuseColor = vec4( 1.0 );
+				MaterialMetalness = 1.0;
+				MaterialRoughness = 1.0;
+
+				#ifdef NODE_COLOR
+
+					NODE_CODE_COLOR
+
+					MaterialDiffuseColor = NODE_COLOR;
+
+				#endif
+
+				#ifdef NODE_OPACITY
+
+					NODE_CODE_OPACITY
+
+					MaterialDiffuseColor.a *= NODE_OPACITY;
+
+				#endif
+
+				#ifdef NODE_ALPHA_TEST
+
+					NODE_CODE_ALPHA_TEST
+					if ( MaterialDiffuseColor.a < NODE_ALPHA_TEST ) discard;
+
+				#endif
+
+				NODE_CODE_METALNESS
+				MaterialMetalness = NODE_METALNESS;
+
+				NODE_CODE_ROUGHNESS
+				MaterialRoughness = NODE_ROUGHNESS;
+
+				#ifdef NODE_NORMAL
+
+					NODE_CODE_NORMAL
+					TransformedNormalView = NODE_NORMAL;
+
+				#endif
+
+				MaterialDiffuseColor.rgb = MaterialDiffuseColor.rgb * ( 1.0 - MaterialMetalness );
+
+				#ifdef NODE_LIGHT
+
+					NODE_CODE_LIGHT
+
+					outColor.rgb = NODE_LIGHT;
+					outColor.a = MaterialDiffuseColor.a;
+
+				#else
+
+					outColor = MaterialDiffuseColor;
+
+				#endif
+
+			}`
+
+	},
 
 };
 

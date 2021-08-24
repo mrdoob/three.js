@@ -1,17 +1,17 @@
 import ContextNode from '../core/ContextNode.js';
-import { RE_Direct_BlinnPhong, RE_IndirectDiffuse_BlinnPhong } from '../functions/BSDFs.js';
+import StructNode from '../core/StructNode.js';
+import { PhysicalLightingModel, BlinnPhongLightingModel } from '../functions/BSDFs.js';
+
+const reflectedLightStruct = new StructNode( {
+	directDiffuse: 'vec3',
+	directSpecular: 'vec3'
+}, 'ReflectedLight' );
 
 class LightContextNode extends ContextNode {
 
 	constructor( node ) {
 
-		super( node );
-
-	}
-
-	getType( /*builder*/ ) {
-
-		return 'vec3';
+		super( node, 'vec3' );
 
 	}
 
@@ -21,37 +21,36 @@ class LightContextNode extends ContextNode {
 
 		const material = builder.material;
 
-		let RE_Direct = null;
-		let RE_IndirectDiffuse = null;
+		let lightingModel = null;
 
-		if ( material.isMeshPhongMaterial === true ) {
+		if ( material.isMeshStandardMaterial === true ) {
 
-			RE_Direct = RE_Direct_BlinnPhong;
-			RE_IndirectDiffuse = RE_IndirectDiffuse_BlinnPhong;
+			lightingModel = PhysicalLightingModel;
 
-		}
+		} else if ( material.isMeshPhongMaterial === true ) {
 
-		if ( RE_Direct !== null ) {
-
-			this.setParameter( 'RE_Direct', RE_Direct );
-			this.setParameter( 'RE_IndirectDiffuse', RE_IndirectDiffuse );
+			lightingModel = BlinnPhongLightingModel;
 
 		}
 
-		const resetTotalLight = 'Irradiance = vec3( 0.0 ); ReflectedLightDirectDiffuse = vec3( 0.0 ); ReflectedLightDirectSpecular = vec3( 0.0 );';
-		const resultTotalLight = 'ReflectedLightDirectDiffuse + ReflectedLightDirectSpecular';
+		const reflectedLightNode = reflectedLightStruct.create();
+		const reflectedLight = reflectedLightNode.build( builder, 'var' );
 
-		// include keywords
+		this.setContextValue( 'reflectedLight', reflectedLightNode );
 
-		builder.getContextParameter( 'keywords' ).include( builder, resetTotalLight );
+		if ( lightingModel !== null ) {
+
+			this.setContextValue( 'lightingModel', lightingModel );
+
+		}
+
+		const totalLightSnippet = `( ${reflectedLight}.directDiffuse + ${reflectedLight}.directSpecular )`;
 
 		// add code
 
-		builder.addFlowCode( resetTotalLight );
-
 		super.generate( builder, output );
 
-		return builder.format( resultTotalLight, type, output );
+		return builder.format( totalLightSnippet, type, output );
 
 	}
 

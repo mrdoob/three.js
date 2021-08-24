@@ -56,22 +56,21 @@ class LightNode extends Node {
 
 		this.lightPositionView.object3d = this.light;
 
-		const directFunctionNode = builder.getContextParameter( 'RE_Direct' );
-		const indirectDiffuseFunctionNode = builder.getContextParameter( 'RE_IndirectDiffuse' );
+		const lightingModelFunctionNode = builder.getContextValue( 'lightingModel' );
 
-		const directFunctionCallNode = directFunctionNode.call( {
-			lightDirection: this.lightDirection,
-			lightColor: this.lightColor
-		} );
+		if ( lightingModelFunctionNode !== undefined ) {
 
-		const indirectDiffuseFunctionCallNode = indirectDiffuseFunctionNode.call( {
-			lightDirection: this.lightDirection,
-			lightColor: this.lightColor
-		} );
+			const reflectedLightStructNode = builder.getContextValue( 'reflectedLight' );
 
-		builder.addFlowCode( directFunctionCallNode.build( builder ) );
+			const lightingModelCallNode = lightingModelFunctionNode.call( {
+				lightDirection: this.lightDirection,
+				lightColor: this.lightColor,
+				reflectedLight:	reflectedLightStructNode
+			} );
 
-		builder.addFlowCode( indirectDiffuseFunctionCallNode.build( builder ) );
+			builder.addFlowCode( lightingModelCallNode.build( builder ) );
+
+		}
 
 		return this.color.build( builder, output );
 

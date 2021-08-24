@@ -3,13 +3,14 @@ import PropertyNode from './PropertyNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 
-import { PI, RECIPROCAL_PI } from '../consts/MathConsts.js';
+import { PI, RECIPROCAL_PI, EPSILON } from '../consts/MathConsts.js';
 import { saturateMacro, whiteComplementMacro } from '../functions/MathFunctions.js';
 
 class NodeKeywords {
 
 	static PI = 'PI';
 	static RECIPROCAL_PI = 'RECIPROCAL_PI';
+	static EPSILON = 'EPSILON';
 
 	static Saturate = 'saturate';
 	static WhiteComplement = 'whiteComplement';
@@ -31,6 +32,11 @@ class NodeKeywords {
 
 	static MaterialDiffuseColor = 'MaterialDiffuseColor';
 
+	// STANDARD
+	static MaterialRoughness = 'MaterialRoughness';
+	static MaterialMetalness = 'MaterialMetalness';
+
+	// PHONG
 	static MaterialSpecularShininess = 'MaterialSpecularShininess';
 	static MaterialSpecularColor = 'MaterialSpecularColor';
 
@@ -40,6 +46,7 @@ class NodeKeywords {
 			// consts
 			NodeKeywords.PI,
 			NodeKeywords.RECIPROCAL_PI,
+			NodeKeywords.EPSILON,
 			// variadic macros
 			NodeKeywords.Saturate,
 			NodeKeywords.WhiteComplement,
@@ -53,6 +60,8 @@ class NodeKeywords {
 			NodeKeywords.NormalView,
 			// vars -> float
 			NodeKeywords.MaterialSpecularShininess,
+			NodeKeywords.MaterialRoughness,
+			NodeKeywords.MaterialMetalness,
 			// vars -> vec3
 			NodeKeywords.Irradiance,
 			NodeKeywords.ReflectedLightIndirectDiffuse,
@@ -85,6 +94,12 @@ class NodeKeywords {
 				case NodeKeywords.RECIPROCAL_PI:
 
 					node = RECIPROCAL_PI;
+
+					break;
+
+				case NodeKeywords.EPSILON:
+
+					node = EPSILON;
 
 					break;
 
@@ -144,6 +159,8 @@ class NodeKeywords {
 
 				// floats properties
 				case NodeKeywords.MaterialSpecularShininess:
+				case NodeKeywords.MaterialRoughness:
+				case NodeKeywords.MaterialMetalness:
 
 					node = new PropertyNode( name, 'float' );
 

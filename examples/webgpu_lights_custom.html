@@ -89,26 +89,17 @@
 
 				// custom lighting model
 
-				const RE_Direct = new FunctionNode( `
-					void ( vec3 lightColor ) {
+				const customLightingModel = new FunctionNode( `
+					void ( inout ReflectedLight reflectedLight, vec3 lightColor ) {
 
 						// lightColor returns the light color with the intensity calculated
 
-						ReflectedLightDirectDiffuse += lightColor;
-
-					}` );
-
-
-				const RE_IndirectDiffuse = new FunctionNode( `
-					void ( ) {
-
-						//ReflectedLightIndirectDiffuse += vec3( 0.0 );
+						reflectedLight.directDiffuse += lightColor;
 
 					}` );
 
 				const lightingModelContext = new ContextNode( allLightsNode );
-				lightingModelContext.setParameter( 'RE_Direct', RE_Direct );
-				lightingModelContext.setParameter( 'RE_IndirectDiffuse', RE_IndirectDiffuse );
+				lightingModelContext.setContextValue( 'lightingModel', customLightingModel );
 
 				materialPoints.lightNode = lightingModelContext;
 

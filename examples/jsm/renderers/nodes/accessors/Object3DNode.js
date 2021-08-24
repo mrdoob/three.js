@@ -92,7 +92,7 @@ class Object3DNode extends Node {
 
 				if ( inputNode === null || inputNode.isMatrix4Node !== true ) {
 
-					inputNode = new Matrix4Node( null );
+					inputNode = new Matrix4Node( /*null*/ );
 
 				}
 
@@ -100,7 +100,7 @@ class Object3DNode extends Node {
 
 				if ( inputNode === null || inputNode.isMatrix3Node !== true ) {
 
-					inputNode = new Matrix3Node( null );
+					inputNode = new Matrix3Node( /*null*/ );
 
 				}
 
