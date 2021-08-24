@@ -1,6 +1,9 @@
 import {
 	Frustum,
-	Vector3
+	Vector3,
+	InstancedMesh,
+	Matrix4,
+	Quaternion,
 } from '../../../build/three.module.js';
 
 /**
@@ -27,6 +30,10 @@ const _vectemp1 = new Vector3();
 const _vectemp2 = new Vector3();
 const _vectemp3 = new Vector3();
 
+const _matrix = new Matrix4();
+const _quaternion = new Quaternion();
+const _scale = new Vector3();
+
 class SelectionBox {
 
 	constructor( camera, scene, deep = Number.MAX_VALUE ) {
@@ -37,6 +44,7 @@ class SelectionBox {
 		this.endPoint = new Vector3();
 		this.collection = [];
 		this.deep = deep;
+		this.instanceDetection = {};
 
 	}
 
@@ -167,21 +175,38 @@ class SelectionBox {
 
 		if ( object.isMesh || object.isLine || object.isPoints ) {
 
-			if ( object.material !== undefined ) {
+				if ( object instanceof InstancedMesh ) {
 
-				if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
+					this.instanceDetection[ object.uuid ] = [];
 
-				_center.copy( object.geometry.boundingSphere.center );
+					for ( let instanceId = 0; instanceId < object.count; instanceId ++ ) {
 
-				_center.applyMatrix4( object.matrixWorld );
+						object.getMatrixAt( instanceId, _matrix );
+						_matrix.decompose( _center, _quaternion, _scale );
 
-				if ( frustum.containsPoint( _center ) ) {
+						if ( frustum.containsPoint( _center ) ) {
 
-					this.collection.push( object );
+							this.instanceDetection[ object.uuid ].push( instanceId );
+
+						}
+
+					}
+
+				} else {
+
+					if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
+
+					_center.copy( object.geometry.boundingSphere.center );
+
+					_center.applyMatrix4( object.matrixWorld );
+
+					if ( frustum.containsPoint( _center ) ) {
+
+						this.collection.push( object );
+
+					}
 
 				}
-
-			}
 
 		}
 
