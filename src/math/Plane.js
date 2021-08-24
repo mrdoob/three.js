@@ -103,7 +103,7 @@ class Plane {
 
 	}
 
-	intersectLine( line, target ) {
+	intersectLine( line, target = new Vector3() ) {
 
 		const direction = line.delta( _vector1 );
 
