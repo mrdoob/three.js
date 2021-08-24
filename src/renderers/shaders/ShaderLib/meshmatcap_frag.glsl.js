@@ -13,7 +13,7 @@ varying vec3 vViewPosition;
 #include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
-
+#include <alphatest_pars_fragment>
 #include <fog_pars_fragment>
 #include <normal_pars_fragment>
 #include <bumpmap_pars_fragment>

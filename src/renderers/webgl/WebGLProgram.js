@@ -598,8 +598,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			customDefines,
 
-			parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest + ( parameters.alphaTest % 1 ? '' : '.0' ) : '', // add '.0' if integer
-
 			'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
@@ -629,7 +627,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.specularTintMap ? '#define USE_SPECULARTINTMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
+
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
+			parameters.alphaTest ? '#define USE_ALPHATEST' : '',
 
 			parameters.sheenTint ? '#define USE_SHEEN' : '',
 			parameters.transmission ? '#define USE_TRANSMISSION' : '',

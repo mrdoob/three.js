@@ -18,6 +18,7 @@ const UniformsLib = {
 		uv2Transform: { value: new Matrix3() },
 
 		alphaMap: { value: null },
+		alphaTest: { value: 0 }
 
 	},
 
@@ -194,6 +195,7 @@ const UniformsLib = {
 		scale: { value: 1.0 },
 		map: { value: null },
 		alphaMap: { value: null },
+		alphaTest: { value: 0 },
 		uvTransform: { value: new Matrix3() }
 
 	},
@@ -206,6 +208,7 @@ const UniformsLib = {
 		rotation: { value: 0.0 },
 		map: { value: null },
 		alphaMap: { value: null },
+		alphaTest: { value: 0 },
 		uvTransform: { value: new Matrix3() }
 
 	}
