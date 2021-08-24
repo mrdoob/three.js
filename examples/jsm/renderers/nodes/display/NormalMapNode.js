@@ -16,25 +16,25 @@ import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 export const perturbNormal2Arb = new FunctionNode( `
 vec3 ( vec3 eye_pos, vec3 surf_norm, vec3 mapN, float faceDirection, const in vec2 uv ) {
 
-		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
+	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
-		vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
-		vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
-		vec2 st0 = dFdx( uv.st );
-		vec2 st1 = dFdy( uv.st );
+	vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
+	vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
+	vec2 st0 = dFdx( uv.st );
+	vec2 st1 = dFdy( uv.st );
 
-		vec3 N = surf_norm; // normalized
+	vec3 N = surf_norm; // normalized
 
-		vec3 q1perp = cross( q1, N );
-		vec3 q0perp = cross( N, q0 );
+	vec3 q1perp = cross( q1, N );
+	vec3 q0perp = cross( N, q0 );
 
-		vec3 T = q1perp * st0.x + q0perp * st1.x;
-		vec3 B = q1perp * st0.y + q0perp * st1.y;
+	vec3 T = q1perp * st0.x + q0perp * st1.x;
+	vec3 B = q1perp * st0.y + q0perp * st1.y;
 
-		float det = max( dot( T, T ), dot( B, B ) );
-		float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
+	float det = max( dot( T, T ), dot( B, B ) );
+	float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
 
-		return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
+	return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
 
 }` );
 
@@ -76,7 +76,7 @@ class NormalMapNode extends TempNode {
 
 				perturbNormal2ArbCall = perturbNormal2Arb.call( {
 					eye_pos: new PositionNode( PositionNode.VIEW ),
-					surf_norm: new NormalNode( NormalNode.WORLD ),
+					surf_norm: new NormalNode( NormalNode.VIEW ),
 					mapN: normalMap,
 					faceDirection: new FloatNode( 1.0 ).setConst( true ),
 					uv: new UVNode()
