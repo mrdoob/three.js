@@ -1,6 +1,6 @@
 import ContextNode from '../core/ContextNode.js';
 import StructNode from '../core/StructNode.js';
-import { PhysicalLightingModel, BlinnPhongLightingModel } from '../functions/BSDFs.js';
+import { PhysicalLightingModel } from '../functions/BSDFs.js';
 
 const reflectedLightStruct = new StructNode( {
 	directDiffuse: 'vec3',
@@ -26,10 +26,6 @@ class LightContextNode extends ContextNode {
 		if ( material.isMeshStandardMaterial === true ) {
 
 			lightingModel = PhysicalLightingModel;
-
-		} else if ( material.isMeshPhongMaterial === true ) {
-
-			lightingModel = BlinnPhongLightingModel;
 
 		}
 

@@ -65,69 +65,6 @@ const ShaderLib = {
 
 	},
 
-	phong: {
-
-		vertexShader:
-			`#version 450
-
-			void main(){
-
-				NODE_CODE
-
-				NODE_CODE_MVP
-				gl_Position = NODE_MVP;
-
-			}`,
-
-		fragmentShader:
-			`#version 450
-
-			layout(location = 0) out vec4 outColor;
-
-			void main() {
-
-				NODE_CODE
-
-				MaterialDiffuseColor = vec4( 1.0 );
-				MaterialSpecularColor = vec3( 1.0 );
-				MaterialSpecularShininess = 30.0;
-
-				NODE_CODE_COLOR
-				MaterialDiffuseColor = NODE_COLOR;
-
-				NODE_CODE_OPACITY
-				MaterialDiffuseColor.a *= NODE_OPACITY;
-
-				#ifdef NODE_ALPHA_TEST
-
-					NODE_CODE_ALPHA_TEST
-					if ( MaterialDiffuseColor.a < NODE_ALPHA_TEST ) discard;
-
-				#endif
-
-				NODE_CODE_SPECULAR
-				MaterialSpecularColor = NODE_SPECULAR;
-
-				NODE_CODE_SHININESS
-				MaterialSpecularShininess = NODE_SHININESS;
-
-				#ifdef NODE_LIGHT
-
-					NODE_CODE_LIGHT
-
-					outColor.rgb = NODE_LIGHT;
-					outColor.a = MaterialDiffuseColor.a;
-
-				#else
-
-					outColor = MaterialDiffuseColor;
-
-				#endif
-
-			}`
-
-	},
-
 	standard: {
 
 		vertexShader:

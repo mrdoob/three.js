@@ -67,60 +67,6 @@ float punctualLightIntensityToIrradianceFactor( float lightDistance, float cutof
 }` ).setIncludes( [ pow2 ] );
 
 //
-//	BLINN PHONG
-//
-
-export const D_BlinnPhong = new FunctionNode( `
-float D_BlinnPhong( const in float shininess, const in float dotNH ) {
-
-	return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );
-
-}` ); // validated
-
-export const BRDF_BlinnPhong = new FunctionNode( `
-vec3 BRDF_BlinnPhong( vec3 lightDirection, vec3 specularColor, float shininess ) {
-
-	vec3 halfDir = normalize( lightDirection + PositionViewDirection );
-
-	float dotNH = saturate( dot( NormalView, halfDir ) );
-	float dotVH = saturate( dot( PositionViewDirection, halfDir ) );
-
-	vec3 F = F_Schlick( specularColor, 1.0, dotVH );
-
-	float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );
-
-	float D = D_BlinnPhong( shininess, dotNH );
-
-	return F * ( G * D );
-
-}` ).setIncludes( [ F_Schlick, G_BlinnPhong_Implicit, D_BlinnPhong ] ); // validated
-
-export const RE_Direct_BlinnPhong = new FunctionNode( `
-void RE_Direct_BlinnPhong( inout ReflectedLight reflectedLight, vec3 lightDirection, vec3 lightColor ) {
-
-	float dotNL = saturate( dot( NormalView, lightDirection ) );
-	vec3 irradiance = dotNL * lightColor;
-
-#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-		irradiance *= PI; // punctual light
-
-#endif
-
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( MaterialDiffuseColor.rgb );
-
-	reflectedLight.directSpecular += irradiance * BRDF_BlinnPhong( lightDirection, MaterialSpecularColor, MaterialSpecularShininess );
-
-}` ).setIncludes( [ BRDF_Lambert, BRDF_BlinnPhong ] );
-
-export const BlinnPhongLightingModel = new FunctionNode( `
-void ( inout ReflectedLight reflectedLight, vec3 lightDirection, vec3 lightColor ) {
-
-	RE_Direct_BlinnPhong( reflectedLight, lightDirection, lightColor );
-
-}` ).setIncludes( [ RE_Direct_BlinnPhong ] );
-
-//
 // STANDARD
 //
 
@@ -189,7 +135,7 @@ void RE_Direct_Physical( inout ReflectedLight reflectedLight, vec3 lightDirectio
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( MaterialDiffuseColor.rgb );
 
-	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( lightDirection, MaterialSpecularColor, 1.0, MaterialRoughness );
+	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( lightDirection, MaterialSpecularTint, 1.0, MaterialRoughness );
 
 }` ).setIncludes( [ BRDF_Lambert, BRDF_Specular_GGX ] );
 

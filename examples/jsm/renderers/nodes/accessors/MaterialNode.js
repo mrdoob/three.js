@@ -8,7 +8,6 @@ class MaterialNode extends Node {
 	static COLOR = 'color';
 	static OPACITY = 'opacity';
 	static SPECULAR = 'specular';
-	static SHININESS = 'shininess';
 	static ROUGHNESS = 'roughness';
 	static METALNESS = 'metalness';
 
@@ -37,7 +36,7 @@ class MaterialNode extends Node {
 
 			return 'vec3';
 
-		} else if ( scope === MaterialNode.SHININESS || scope === MaterialNode.ROUGHNESS || scope === MaterialNode.METALNESS ) {
+		} else if ( scope === MaterialNode.ROUGHNESS || scope === MaterialNode.METALNESS ) {
 
 			return 'float';
 
@@ -86,15 +85,15 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR ) {
 
-			const specularColorNode = new MaterialReferenceNode( 'specular', 'color' );
+			const specularTintNode = new MaterialReferenceNode( 'specularTint', 'color' );
 
-			if ( material.specularMap !== null && material.specularMap !== undefined && material.specularMap.isTexture === true ) {
+			if ( material.specularTintMap !== null && material.specularTintMap !== undefined && material.specularTintMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', specularColorNode, new MaterialReferenceNode( 'specularMap', 'texture' ) );
+				node = new OperatorNode( '*', specularTintNode, new MaterialReferenceNode( 'specularTintMap', 'texture' ) );
 
 			} else {
 
-				node = specularColorNode;
+				node = specularTintNode;
 
 			}
 
