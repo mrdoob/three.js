@@ -14,14 +14,15 @@ import NodeBuilder from '../../nodes/core/NodeBuilder.js';
 import MaterialNode from '../../nodes/accessors/MaterialNode.js';
 import NormalNode from '../../nodes/accessors/NormalNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
+import SkinningPositionNode from '../../nodes/accessors/SkinningPositionNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import ShaderLib from './ShaderLib.js';
 
 class WebGPUNodeBuilder extends NodeBuilder {
 
-	constructor( material, renderer, lightNode = null ) {
+	constructor( object, renderer, lightNode = null ) {
 
-		super( material, renderer );
+		super( object, renderer );
 
 		this.lightNode = lightNode;
 
@@ -32,12 +33,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.nativeShader = null;
 
-		this._parseMaterial();
+		this._parseObject();
 
 	}
 
-	_parseMaterial() {
+	_parseObject() {
 
+		const object = this.object;
 		const material = this.material;
 
 		// get shader
@@ -70,7 +72,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			if ( material.positionNode && material.positionNode.isNode ) {
+			if ( object.isSkinnedMesh === true ) {
+
+				mvpNode.position = new SkinningPositionNode( object );
+
+			}
+
+			if ( material.positionNode !== undefined ) {
 
 				mvpNode.position = material.positionNode;
 
@@ -401,7 +409,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			this.shaderStage = shaderStage;
 
-			keywords.include( this, this.nativeShader.fragmentShader );
+			keywords.include( this, this.nativeShader[ shaderStage + 'Shader' ] );
 
 		}
 

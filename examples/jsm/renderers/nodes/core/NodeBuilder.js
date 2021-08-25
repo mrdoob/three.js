@@ -10,9 +10,10 @@ import { LinearEncoding } from 'three';
 
 class NodeBuilder {
 
-	constructor( material, renderer ) {
+	constructor( object, renderer ) {
 
-		this.material = material;
+		this.object = object;
+		this.material = object.material;
 		this.renderer = renderer;
 
 		this.nodes = [];
@@ -32,7 +33,7 @@ class NodeBuilder {
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: material
+			material: object.material
 		};
 
 		this.nodesData = new WeakMap();
