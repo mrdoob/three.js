@@ -1,5 +1,5 @@
 export default /* glsl */`
-#ifndef TRANSPARENT
+#ifdef OPAQUE
 diffuseColor.a = 1.0;
 #endif
 
