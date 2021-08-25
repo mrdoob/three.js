@@ -97,6 +97,8 @@ class Material extends EventDispatcher {
 
 	onBuild( /* shaderobject, renderer */ ) {}
 
+	onUpdate( /* renderer, scene, camera, geometry, object, group */ ) {}
+
 	onBeforeCompile( /* shaderobject, renderer */ ) {}
 
 	customProgramCacheKey() {
