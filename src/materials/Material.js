@@ -25,8 +25,8 @@ class Material extends EventDispatcher {
 		this.side = FrontSide;
 		this.vertexColors = false;
 
-		this.format = RGBAFormat;
 		this.opacity = 1;
+		this.format = RGBAFormat;
 		this.transparent = false;
 
 		this.blendSrc = SrcAlphaFactor;
@@ -301,8 +301,8 @@ class Material extends EventDispatcher {
 		if ( this.side !== FrontSide ) data.side = this.side;
 		if ( this.vertexColors ) data.vertexColors = true;
 
-		if ( this.format !== RGBAFormat ) data.format = this.format;
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
+		if ( this.format !== RGBAFormat ) data.format = this.format;
 		if ( this.transparent === true ) data.transparent = this.transparent;
 
 		data.depthFunc = this.depthFunc;
@@ -398,8 +398,8 @@ class Material extends EventDispatcher {
 		this.side = source.side;
 		this.vertexColors = source.vertexColors;
 
-		this.format = source.format;
 		this.opacity = source.opacity;
+		this.format = source.format;
 		this.transparent = source.transparent;
 
 		this.blendSrc = source.blendSrc;
