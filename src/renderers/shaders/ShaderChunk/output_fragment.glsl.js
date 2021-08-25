@@ -1,11 +1,11 @@
 export default /* glsl */`
 #ifdef OPAQUE
+diffuseColor.a = 1.0;
+#endif
 
-gl_FragColor = vec4( outgoingLight, 1.0 );
-
-#else
+#ifdef USE_TRANSMISSION
+diffuseColor.a *= transmissionAlpha;
+#endif
 
 gl_FragColor = vec4( outgoingLight, diffuseColor.a );
-
-#endif
 `;
