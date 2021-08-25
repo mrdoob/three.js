@@ -632,31 +632,30 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		uniforms.transmission.value = material.transmission;
+		if ( material.transmission > 0 ) {
 
-		if ( material.transmissionMap ) {
-
-			uniforms.transmissionMap.value = material.transmissionMap;
-
-		}
-
-		if ( material.transmission > 0.0 ) {
-
+			uniforms.transmission.value = material.transmission;
 			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;
 			uniforms.transmissionSamplerSize.value.set( transmissionRenderTarget.width, transmissionRenderTarget.height );
 
+			if ( material.transmissionMap ) {
+
+				uniforms.transmissionMap.value = material.transmissionMap;
+
+			}
+
+			uniforms.thickness.value = material.thickness;
+
+			if ( material.thicknessMap ) {
+
+				uniforms.thicknessMap.value = material.thicknessMap;
+
+			}
+
+			uniforms.attenuationDistance.value = material.attenuationDistance;
+			uniforms.attenuationTint.value.copy( material.attenuationTint );
+
 		}
-
-		uniforms.thickness.value = material.thickness;
-
-		if ( material.thicknessMap ) {
-
-			uniforms.thicknessMap.value = material.thicknessMap;
-
-		}
-
-		uniforms.attenuationDistance.value = material.attenuationDistance;
-		uniforms.attenuationTint.value.copy( material.attenuationTint );
 
 		uniforms.specularIntensity.value = material.specularIntensity;
 		uniforms.specularTint.value.copy( material.specularTint );
