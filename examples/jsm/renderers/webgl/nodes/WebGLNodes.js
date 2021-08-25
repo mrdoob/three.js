@@ -1,44 +1,35 @@
 import { WebGLNodeBuilder } from './WebGLNodeBuilder.js';
+import NodeFrame from '../../nodes/core/NodeFrame.js';
 
-import { Material } from '../../../../../build/three.module.js';
+import { Material } from 'three';
 
-function addCodeAfterSnippet( source, snippet, code ) {
-
-	const index = source.indexOf( snippet );
-
-	if ( index !== - 1 ) {
-
-		const start = source.substring( 0, index + snippet.length );
-		const end = source.substring( index + snippet.length );
-
-		return `${start}\n${code}\n${end}`;
-
-	}
-
-	return source;
-
-}
+const builders = new WeakMap();
+export const nodeFrame = new NodeFrame();
 
 Material.prototype.onBuild = function ( parameters, renderer ) {
 
-	new WebGLNodeBuilder( this, renderer, parameters ).build();
+	builders.set( this, new WebGLNodeBuilder( this, renderer, parameters ).build() );
 
-	let fragmentShader = parameters.fragmentShader;
+};
 
-	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_pars_fragment>',
-		`#ifdef NODE_HEADER_UNIFORMS
+Material.prototype.onUpdate = function ( renderer, scene, camera, geometry, object ) {
 
-			NODE_HEADER_UNIFORMS
+	const nodeBuilder = builders.get( this );
 
-		#endif` );
+	if ( nodeBuilder !== undefined ) {
 
-	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_fragment>',
-		`#ifdef NODE_COLOR
+		nodeFrame.update();
 
-			diffuseColor = NODE_COLOR;
+		nodeFrame.material = this;
+		nodeFrame.camera = camera;
+		nodeFrame.object = object;
 
-		#endif` );
+		for ( const node of nodeBuilder.updateNodes ) {
 
-	parameters.fragmentShader = fragmentShader;
+			nodeFrame.updateNode( node );
+
+		}
+
+	}
 
 };
