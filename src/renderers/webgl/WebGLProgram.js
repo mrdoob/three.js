@@ -1,7 +1,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoBlending, NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding, GLSL3 } from '../../constants.js';
+import { RGBFormat, NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding, GLSL3 } from '../../constants.js';
 
 let programIdCount = 0;
 
@@ -670,7 +670,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
-			parameters.blending === NoBlending ? '#define OPAQUE' : '',
+			parameters.format === RGBFormat ? '#define OPAQUE' : '',
 
 			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			parameters.map ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
