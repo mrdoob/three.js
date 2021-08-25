@@ -37,6 +37,7 @@ import {
 	NearestFilter,
 	NearestMipmapLinearFilter,
 	NearestMipmapNearestFilter,
+	NoBlending,
 	NumberKeyframeTrack,
 	Object3D,
 	OrthographicCamera,
@@ -3118,6 +3119,7 @@ class GLTFParser {
 
 		} else {
 
+			materialParams.blending = NoBlending;
 			materialParams.transparent = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {

@@ -24,8 +24,7 @@ void main() {
 
 	outgoingLight = diffuseColor.rgb;
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
-
+	#include <output_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
