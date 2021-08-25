@@ -1033,9 +1033,6 @@ function WebGLRenderer( parameters = {} ) {
 
 		shadowMap.render( shadowsArray, scene, camera );
 
-		currentRenderState.setupLights( _this.physicallyCorrectLights );
-		currentRenderState.setupLightsView( camera );
-
 		if ( _clippingEnabled === true ) clipping.endShadows();
 
 		//
@@ -1048,13 +1045,25 @@ function WebGLRenderer( parameters = {} ) {
 
 		// render scene
 
-		const opaqueObjects = currentRenderList.opaque;
-		const transmissiveObjects = currentRenderList.transmissive;
-		const transparentObjects = currentRenderList.transparent;
+		currentRenderState.setupLights( _this.physicallyCorrectLights );
 
-		if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
-		if ( transmissiveObjects.length > 0 ) renderTransmissiveObjects( opaqueObjects, transmissiveObjects, scene, camera );
-		if ( transparentObjects.length > 0 ) renderObjects( transparentObjects, scene, camera );
+		if ( camera.isArrayCamera ) {
+
+			const cameras = camera.cameras;
+
+			for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+
+				const camera2 = cameras[ i ];
+
+				renderScene( currentRenderList, scene, camera2, camera2.viewport );
+
+			}
+
+		} else {
+
+			renderScene( currentRenderList, scene, camera );
+
+		}
 
 		//
 
@@ -1239,7 +1248,25 @@ function WebGLRenderer( parameters = {} ) {
 
 	}
 
-	function renderTransmissiveObjects( opaqueObjects, transmissiveObjects, scene, camera ) {
+	function renderScene( currentRenderList, scene, camera, viewport ) {
+
+		const opaqueObjects = currentRenderList.opaque;
+		const transmissiveObjects = currentRenderList.transmissive;
+		const transparentObjects = currentRenderList.transparent;
+
+		currentRenderState.setupLightsView( camera );
+
+		if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, scene, camera );
+
+		if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
+
+		if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
+		if ( transmissiveObjects.length > 0 ) renderObjects( transmissiveObjects, scene, camera );
+		if ( transparentObjects.length > 0 ) renderObjects( transparentObjects, scene, camera );
+
+	}
+
+	function renderTransmissionPass( opaqueObjects, scene, camera ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
@@ -1275,55 +1302,22 @@ function WebGLRenderer( parameters = {} ) {
 
 		_this.setRenderTarget( currentRenderTarget );
 
-		renderObjects( transmissiveObjects, scene, camera );
-
 	}
 
 	function renderObjects( renderList, scene, camera ) {
 
 		const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
 
-		if ( camera.isArrayCamera ) {
+		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
 
-			const cameras = camera.cameras;
+			const renderItem = renderList[ i ];
 
-			for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+			const object = renderItem.object;
+			const geometry = renderItem.geometry;
+			const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
+			const group = renderItem.group;
 
-				const camera2 = cameras[ i ];
-
-				state.viewport( _currentViewport.copy( camera2.viewport ) );
-
-				currentRenderState.setupLightsView( camera2 );
-
-				for ( let j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-					const renderItem = renderList[ j ];
-
-					const object = renderItem.object;
-					const geometry = renderItem.geometry;
-					const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
-					const group = renderItem.group;
-
-					if ( object.layers.test( camera2.layers ) ) {
-
-						renderObject( object, scene, camera2, geometry, material, group );
-
-					}
-
-				}
-
-			}
-
-		} else {
-
-			for ( let j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-				const renderItem = renderList[ j ];
-
-				const object = renderItem.object;
-				const geometry = renderItem.geometry;
-				const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
-				const group = renderItem.group;
+			if ( object.layers.test( camera.layers ) ) {
 
 				renderObject( object, scene, camera, geometry, material, group );
 
