@@ -349,19 +349,19 @@ class TransformControls extends Object3D {
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
-						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
+						object.position.setX(Math.round( object.position.x / this.translationSnap ) * this.translationSnap);
 
 					}
 
 					if ( axis.search( 'Y' ) !== - 1 ) {
 
-						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
+						object.position.setY(Math.round( object.position.y / this.translationSnap ) * this.translationSnap);
 
 					}
 
 					if ( axis.search( 'Z' ) !== - 1 ) {
 
-						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
+						object.position.setZ(Math.round( object.position.z / this.translationSnap ) * this.translationSnap);
 
 					}
 
@@ -379,19 +379,19 @@ class TransformControls extends Object3D {
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
-						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
+						object.position.setX(Math.round( object.position.x / this.translationSnap ) * this.translationSnap);
 
 					}
 
 					if ( axis.search( 'Y' ) !== - 1 ) {
 
-						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
+						object.position.setY(Math.round( object.position.y / this.translationSnap ) * this.translationSnap);
 
 					}
 
 					if ( axis.search( 'Z' ) !== - 1 ) {
 
-						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
+						object.position.setZ(Math.round( object.position.z / this.translationSnap ) * this.translationSnap);
 
 					}
 
@@ -453,19 +453,19 @@ class TransformControls extends Object3D {
 
 				if ( axis.search( 'X' ) !== - 1 ) {
 
-					object.scale.x = Math.round( object.scale.x / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+					object.scale.setX(Math.round( object.scale.x / this.scaleSnap ) * this.scaleSnap || this.scaleSnap);
 
 				}
 
 				if ( axis.search( 'Y' ) !== - 1 ) {
 
-					object.scale.y = Math.round( object.scale.y / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+					object.scale.setY(Math.round( object.scale.y / this.scaleSnap ) * this.scaleSnap || this.scaleSnap);
 
 				}
 
 				if ( axis.search( 'Z' ) !== - 1 ) {
 
-					object.scale.z = Math.round( object.scale.z / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+					object.scale.setZ(Math.round( object.scale.z / this.scaleSnap ) * this.scaleSnap || this.scaleSnap);
 
 				}
 
