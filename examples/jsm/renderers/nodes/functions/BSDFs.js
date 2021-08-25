@@ -32,16 +32,14 @@ vec3 BRDF_Lambert( const in vec3 diffuseColor ) {
 
 }` ); // validated
 
-export const punctualLightIntensityToIrradianceFactor = new FunctionNode( `
-float punctualLightIntensityToIrradianceFactor( float lightDistance, float cutoffDistance, float decayExponent ) {
+export const getDistanceAttenuation = new FunctionNode( `
+float getDistanceAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
 
 #if defined ( PHYSICALLY_CORRECT_LIGHTS )
 
 	// based upon Frostbite 3 Moving to Physically-based Rendering
 	// page 32, equation 26: E[window1]
 	// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-	// this is intended to be used on spot and point lights who are represented as luminous intensity
-	// but who must be converted to luminous irradiance for surface lighting calculation
 	float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
 
 	if( cutoffDistance > 0.0 ) {

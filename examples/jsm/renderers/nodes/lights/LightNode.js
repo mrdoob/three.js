@@ -6,7 +6,7 @@ import FloatNode from '../inputs/FloatNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import MathNode from '../math/MathNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { punctualLightIntensityToIrradianceFactor } from '../functions/BSDFs.js';
+import { getDistanceAttenuation } from '../functions/BSDFs.js';
 
 import { Color } from 'three';
 
@@ -34,13 +34,13 @@ class LightNode extends Node {
 
 		this.lightDistance = new MathNode( MathNode.LENGTH, this.lVector );
 
-		this.lightIntensity = punctualLightIntensityToIrradianceFactor.call( {
+		this.lightAttenuation = getDistanceAttenuation.call( {
 			lightDistance: this.lightDistance,
 			cutoffDistance: this.lightCutoffDistance,
 			decayExponent: this.lightDecayExponent
 		} );
 
-		this.lightColor = new OperatorNode( '*', this.color, this.lightIntensity );
+		this.lightColor = new OperatorNode( '*', this.color, this.lightAttenuation );
 
 	}
 
