@@ -11,7 +11,6 @@ import {
 	FileLoader,
 	FrontSide,
 	Group,
-	GLTFOpaqueBlending,
 	ImageBitmapLoader,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
@@ -3119,7 +3118,7 @@ class GLTFParser {
 
 		} else {
 
-			materialParams.blending = GLTFOpaqueBlending;
+			materialParams.format = RGBFormat;
 			materialParams.transparent = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {

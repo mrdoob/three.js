@@ -20,7 +20,6 @@ export const AdditiveBlending = 2;
 export const SubtractiveBlending = 3;
 export const MultiplyBlending = 4;
 export const CustomBlending = 5;
-export const GLTFOpaqueBlending = 6;
 export const AddEquation = 100;
 export const SubtractEquation = 101;
 export const ReverseSubtractEquation = 102;
