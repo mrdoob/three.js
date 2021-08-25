@@ -31,7 +31,8 @@
 				tubularSegments: 150,
 				radialSegments: 20,
 				p: 2,
-				q: 3
+				q: 3,
+				thickness: 0.5
 			};
 
 			init();
@@ -153,6 +154,12 @@
 
 				}
 
+				function onThicknessChange() {
+
+					torus.material.thickness = parameters.thickness;
+
+				}
+
 				const gui = new GUI( { width: 300 } );
 				gui.add( parameters, 'radius', 0.0, 1.0 ).onChange( onChange );
 				gui.add( parameters, 'tube', 0.0, 1.0 ).onChange( onChange );
@@ -160,6 +167,7 @@
 				gui.add( parameters, 'radialSegments', 2, 20, 1 ).onChange( onChange );
 				gui.add( parameters, 'p', 1, 10, 1 ).onChange( onChange );
 				gui.add( parameters, 'q', 0, 10, 1 ).onChange( onChange );
+				gui.add( parameters, 'thickness', 0, 1 ).onChange( onThicknessChange );
 				gui.domElement.style.visibility = 'hidden';
 
 				const group = new InteractiveGroup( renderer, camera );
