@@ -46,10 +46,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			shader = ShaderLib.standard;
 
-		} else if ( material.isMeshPhongMaterial ) {
-
-			shader = ShaderLib.phong;
-
 		} else {
 
 			shader = ShaderLib.common;
