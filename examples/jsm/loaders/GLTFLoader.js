@@ -11,6 +11,7 @@ import {
 	FileLoader,
 	FrontSide,
 	Group,
+	GLTFOpaqueBlending,
 	ImageBitmapLoader,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
@@ -37,7 +38,6 @@ import {
 	NearestFilter,
 	NearestMipmapLinearFilter,
 	NearestMipmapNearestFilter,
-	NoBlending,
 	NumberKeyframeTrack,
 	Object3D,
 	OrthographicCamera,
@@ -3119,7 +3119,7 @@ class GLTFParser {
 
 		} else {
 
-			materialParams.blending = NoBlending;
+			materialParams.blending = GLTFOpaqueBlending;
 			materialParams.transparent = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {
