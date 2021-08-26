@@ -73,10 +73,10 @@ composer.addPass(filmPass);
 为了使用这些类,我们需要导入一些js模块
 
 ```js
-import {EffectComposer} from './resources/threejs/r131/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from './resources/threejs/r131/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from './resources/threejs/r131/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from './resources/threejs/r131/examples/jsm/postprocessing/FilmPass.js';
+import {EffectComposer} from './resources/threejs/r132/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r132/examples/jsm/postprocessing/RenderPass.js';
+import {BloomPass} from './resources/threejs/r132/examples/jsm/postprocessing/BloomPass.js';
+import {FilmPass} from './resources/threejs/r132/examples/jsm/postprocessing/FilmPass.js';
 ```
 
 对于几乎所有的后期处理EffectComposer.js，RenderPass.js 都是必需的。

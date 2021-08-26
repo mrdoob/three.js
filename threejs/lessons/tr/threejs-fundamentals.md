@@ -86,7 +86,7 @@ First let's load three.js
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r131/build/three.module.js';
+import * as THREE from './resources/threejs/r132/build/three.module.js';
 </script>
 ```
 
@@ -109,7 +109,7 @@ We will ask three.js to draw into that canvas so we need to look it up.
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r131/build/three.module.js';
+import * as THREE from './resources/threejs/r132/build/three.module.js';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -407,7 +407,7 @@ both
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r131/build/three.module.js';
+import * as THREE from './resources/threejs/r132/build/three.module.js';
 
 ...
 

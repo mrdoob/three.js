@@ -429,7 +429,7 @@ them into a single mesh.
 We also need to include the `BufferGeometryUtils`
 
 ```js
-import * as BufferGeometryUtils from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
+import * as BufferGeometryUtils from './resources/threejs/r132/examples/jsm/utils/BufferGeometryUtils.js';
 ```
 
 And now, at least on my machine, I get 60 frames per second

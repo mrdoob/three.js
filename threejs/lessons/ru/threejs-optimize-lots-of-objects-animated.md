@@ -365,10 +365,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 Нам нужно включить библиотеку 
 
 ```js
-import * as THREE from './resources/three/r131/build/three.module.js';
-import * as BufferGeometryUtils from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from './resources/threejs/r131/examples/jsm/libs/tween.min.js';
+import * as THREE from './resources/three/r132/build/three.module.js';
+import * as BufferGeometryUtils from './resources/threejs/r132/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
++import {TWEEN} from './resources/threejs/r132/examples/jsm/libs/tween.min.js';
 ```
 
 А затем создайте `Tween` чтобы оживить влияние.

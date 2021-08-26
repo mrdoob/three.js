@@ -30,8 +30,8 @@ requestAnimationFrame(render);
 먼저 뭔가 변화를 일으킬 수 있는 요소가 필요하니 `OrbitControls`를 추가합니다.
 
 ```js
-import * as THREE from './resources/three/r131/build/three.module.js';
-+import { OrbitControls } from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r132/build/three.module.js';
++import { OrbitControls } from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
 
 ...
 
@@ -176,8 +176,8 @@ render();
 간단한 dat.GUI를 추가해 반복 렌더링 여부를 제어할 수 있도록 하겠습니다.
 
 ```js
-import * as THREE from './resources/three/r131/build/three.module.js';
-import { OrbitControls } from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r132/build/three.module.js';
+import { OrbitControls } from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
 +import { GUI } from '../3rdparty/dat.gui.module.js';
 ```
 

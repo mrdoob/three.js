@@ -313,10 +313,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 我们这里首先引入它
 
 ```js
-import * as THREE from './resources/three/r131/build/three.module.js';
-import {BufferGeometryUtils} from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from './resources/threejs/r131/examples/jsm/libs/tween.min.js';
+import * as THREE from './resources/three/r132/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r132/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
++import {TWEEN} from './resources/threejs/r132/examples/jsm/libs/tween.min.js';
 ```
 
 然后创建一个`Tween`来使influence变化

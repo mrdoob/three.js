@@ -1,5 +1,9 @@
-import * as THREE from '../../resources/threejs/r131/build/three.module.js';
+console.log('here!');
+
+import * as THREE from '../../resources/threejs/r132/build/three.module.js';
+console.log('here!2');
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
+console.log('here!3');
 
 {
   const darkColors = {

@@ -369,7 +369,7 @@ function addBoxes(file) {
 别忘了引入`BufferGeometryUtils`
 
 ```js
-import * as BufferGeometryUtils from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
+import * as BufferGeometryUtils from './resources/threejs/r132/examples/jsm/utils/BufferGeometryUtils.js';
 ```
 
 现在, 至少在我的机器上, 可以跑到60帧每秒了

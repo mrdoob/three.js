@@ -52,8 +52,8 @@ The first thing we need to do is include the VR support after
 including three.js
 
 ```js
-import * as THREE from './resources/three/r131/build/three.module.js';
-+import {VRButton} from './resources/threejs/r131/examples/jsm/webxr/VRButton.js';
+import * as THREE from './resources/three/r132/build/three.module.js';
++import {VRButton} from './resources/threejs/r132/examples/jsm/webxr/VRButton.js';
 ```
 
 Then we need to enable three.js's WebXR support and add its

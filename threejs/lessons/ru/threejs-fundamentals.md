@@ -44,7 +44,7 @@ Three.js будет рисовать на этом холсте, так что �
 
 ```
 <script type="module">
-import * as THREE from './resources/threejs/r131/build/three.module.js';
+import * as THREE from './resources/threejs/r132/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
