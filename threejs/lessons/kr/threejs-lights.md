@@ -26,8 +26,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 별도 모듈이므로, 먼저 페이지에 로드해야 합니다.
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-+import { OrbitControls } from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
++import { OrbitControls } from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 ```
 
 이제 `OrbitControls`에 카메라와, DOM 이벤트를 감지할 수 있도록
@@ -447,9 +447,9 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 `RectAreaLightHelper`도 같이 불러와 조명을 시각화하겠습니다.
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-+import { RectAreaLightUniformsLib } from './resources/threejs/r127/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import { RectAreaLightHelper } from './resources/threejs/r127/examples/jsm/helpers/RectAreaLightHelper.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
++import { RectAreaLightUniformsLib } from './resources/threejs/r131/examples/jsm/lights/RectAreaLightUniformsLib.js';
++import { RectAreaLightHelper } from './resources/threejs/r131/examples/jsm/helpers/RectAreaLightHelper.js';
 ```
 
 모듈을 불러온 후 `RectAreaLightUniformsLib.init` 메서드를 호출합니다.

@@ -99,10 +99,10 @@ composer.addPass(filmPass);
 これらのクラスを使用するには、以下をインポートする必要があります。
 
 ```js
-import {EffectComposer} from './resources/threejs/r127/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from './resources/threejs/r127/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from './resources/threejs/r127/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from './resources/threejs/r127/examples/jsm/postprocessing/FilmPass.js';
+import {EffectComposer} from './resources/threejs/r131/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r131/examples/jsm/postprocessing/RenderPass.js';
+import {BloomPass} from './resources/threejs/r131/examples/jsm/postprocessing/BloomPass.js';
+import {FilmPass} from './resources/threejs/r131/examples/jsm/postprocessing/FilmPass.js';
 ```
 
 ほとんどのポストプロセスには `EffectComposer.js` と `RenderPass.js` が必須です。

@@ -53,7 +53,7 @@ ES6的语法。[点击这里查看你需要提前掌握的东西](threejs-prereq
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r127/build/three.module.js';
+import * as THREE from './resources/threejs/r131/build/three.module.js';
 </script>
 ```
 
@@ -71,7 +71,7 @@ Three.js需要使用这个canvas标签来绘制，所以我们要先获取它然
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r127/build/three.module.js';
+import * as THREE from './resources/threejs/r131/build/three.module.js';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -302,7 +302,7 @@ function render(time) {
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r127/build/three.module.js';
+import * as THREE from './resources/threejs/r131/build/three.module.js';
 
 ...
 

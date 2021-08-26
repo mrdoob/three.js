@@ -22,8 +22,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 Ajoutons ensuite `OrbitControls`. `OrbitControls` permet à l'utilisateur de tourner ou de mettre la caméra en *orbite* autour d'un certain point. Il s'agit d'une fonctionnalité facultative de Three.js, nous devons donc d'abord l'importer
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 ```
 
 Ensuite, nous pouvons l'utiliser. Nous passons à `OrbitControls` une caméra à contrôler et l'élément DOM à utiliser.
@@ -402,9 +402,9 @@ Le [`RectAreaLight`](https://threejs.org/docs/#api/en/lights/RectAreaLight) ne f
 Pour utiliser [`RectAreaLight`](https://threejs.org/docs/#api/en/lights/RectAreaLight) nous devons importer [`RectAreaLightHelper`](https://threejs.org/docs/#api/en/helpers/RectAreaLightHelper) pour nous aider à voir la lumière.
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-+import {RectAreaLightUniformsLib} from './resources/threejs/r127/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import {RectAreaLightHelper} from './resources/threejs/r127/examples/jsm/helpers/RectAreaLightHelper.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r131/examples/jsm/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from './resources/threejs/r131/examples/jsm/helpers/RectAreaLightHelper.js';
 ```
 
 et nous devons appeler `RectAreaLightUniformsLib.init`

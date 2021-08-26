@@ -26,8 +26,8 @@ requestAnimationFrame(render);
 Сначала мы добавим в OrbitControls, чтобы можно было что-то изменить, что мы можем сделать в ответ. 
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 ```
 
 и настроить их
@@ -172,8 +172,8 @@ render();
 Давайте также добавим простой графический интерфейс dat.GUI и внесем его изменения по запросу. 
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r127/build/three.module.js';
-import {OrbitControls} from '../../resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '../../resources/threejs/r131/build/three.module.js';
+import {OrbitControls} from '../../resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 
 export const threejsLessonUtils = {
   _afterPrettifyFuncs: [],

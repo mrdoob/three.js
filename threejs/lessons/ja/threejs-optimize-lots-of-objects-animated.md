@@ -343,10 +343,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 アニメーションライブラリをimportする必要があります。
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-import {BufferGeometryUtils} from './resources/threejs/r127/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from './resources/threejs/r127/examples/jsm/libs/tween.min.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
++import {TWEEN} from './resources/threejs/r131/examples/jsm/libs/tween.min.js';
 ```
 
 そして、影響を与えるアニメーションの `Tween` を作成します。

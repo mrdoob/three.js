@@ -24,8 +24,8 @@ requestAnimationFrame(render);
 最初に `OrbitControls` を追加します。これで何かの変更を反映してレンダリングする事ができます。
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 ```
 
 次に以下のように設定します。
@@ -167,8 +167,8 @@ render();
 シンプルなdat.GUIを追加し、GUIで値の変更時にレンダリングを要求してみましょう。
 
 ```js
-import * as THREE from './resources/three/r127/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r131/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

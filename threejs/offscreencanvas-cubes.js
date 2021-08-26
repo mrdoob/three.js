@@ -1,4 +1,4 @@
-import * as THREE from './resources/threejs/r127/build/three.module.js';
+import * as THREE from './resources/threejs/r131/build/three.module.js';
 
 const state = {
   width: 300,   // canvas default
