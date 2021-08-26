@@ -94,9 +94,44 @@
 				const type = taskConfig.attributeTypes[ attribute ];
 
 				if ( type.BYTES_PER_ELEMENT !== undefined ) {
+					
+					// In certain versions of Safari (including mobile) <= 13, when aggressively minfied,
+					// the `name` property of a function can be stripped away.
+					// This leads to some `TypedArray`'s `name` property being an empty string.
+					switch ( type ) {
 
-					taskConfig.attributeTypes[ attribute ] = type.name;
+						case Float32Array:
+							taskConfig.attributeTypes[ attribute ] = "Float32Array";
+							break;
 
+						case Int8Array:
+							taskConfig.attributeTypes[ attribute ] =  "Int8Array";
+							break;
+
+						case Int16Array:
+							taskConfig.attributeTypes[ attribute ] =  "Int16Array";
+							break;
+
+						case Int32Array:
+							taskConfig.attributeTypes[ attribute ] =  "Int32Array";
+							break;
+
+						case Uint8Array:
+							taskConfig.attributeTypes[ attribute ] =  "Uint8Array";
+							break;
+
+						case Uint16Array:
+							taskConfig.attributeTypes[ attribute ] =  "Uint16Array";
+							break;
+
+						case Uint32Array:
+							taskConfig.attributeTypes[ attribute ] =  "Uint32Array";
+							break;
+
+						default:
+							throw new Error( 'THREE.DRACOLoader: Unexpected attribute type.' );
+
+					}
 				}
 
 			} //
