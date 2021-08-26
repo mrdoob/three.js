@@ -3,7 +3,7 @@ import {OrbitControls} from '../../resources/threejs/r127/examples/jsm/controls/
 
 export const threejsLessonUtils = {
   _afterPrettifyFuncs: [],
-  init() {
+  init(options = {threejsOptions:{}}) {
     if (this.renderer) {
       return;
     }
@@ -15,6 +15,7 @@ export const threejsLessonUtils = {
       canvas,
       alpha: true,
       powerPreference: 'low-power',
+      ...options.threejsOptions,
     });
     this.pixelRatio = Math.max(2, window.devicePixelRatio);
 

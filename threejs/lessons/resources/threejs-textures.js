@@ -108,6 +108,9 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     return ctx.canvas;
   }
 
+  threejsLessonUtils.init({
+    threejsOptions: {antialias: false},
+  });
   threejsLessonUtils.addDiagrams({
     filterCube: {
       create() {
