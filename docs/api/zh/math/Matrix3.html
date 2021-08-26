@@ -77,14 +77,13 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
-		Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] of this
-		matrix into the three axis vectors provided. If this matrix is:
+		将该矩阵的基向量 [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 提取到提供的三个轴向中。如果该矩阵如下：
 		<code>
 a, b, c,
 d, e, f,
 g, h, i
 		</code>
-		then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] will be set to:
+		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：
 		<code>
 xAxis = (a, d, g)
 yAxis = (b, e, h)
@@ -142,9 +141,7 @@ zAxis = (c, f, i)
 		[page:Float n32] - 设置第三行第二列的值。<br />
 		[page:Float n33] - 设置第三行第三列的值。<br /><br />
 
-		Sets the 3x3 matrix values to the given
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
-		sequence of values.
+		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵。
 		</p>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
@@ -181,7 +178,7 @@ zAxis = (c, f, i)
 		<p>
 		[page:Array array] -  用于存储当前矩阵转置结果的数组。<br /><br />
 
-		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组[param:Array array]但不改变当前矩阵，
+		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组 array 中，但不改变当前矩阵，
 		并返回当前矩阵。
 		</p>
 

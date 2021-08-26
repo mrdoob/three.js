@@ -19,10 +19,10 @@
 		<p>
 		[page:Float radius] - 半径值，或者说从该点到原点的
 		[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]（欧几里得距离，即直线距离）。默认值为*1.0*。<br />
-		[page:Float phi] - 与 y (up) 轴的极坐标角（以弧度为单位）。 默认值为 *0*。<br />
-		[page:Float theta] - 绕 y (up) 轴的赤道角（以弧度为单位）。 默认值为 *0*。<br /><br />
+		[page:Float phi] - 与 y (up) 轴的极角（以弧度为单位）。 默认值为 *0*。<br />
+		[page:Float theta] - 绕 y (up) 轴的赤道角(方位角)（以弧度为单位）。 默认值为 *0*。<br /><br />
 
-		极点（φ phi）位于正 y 轴和负 y 轴上。赤道（θ theta）从正 z 开始。
+		极角（phi）位于正 y 轴和负 y 轴上。赤道角(方位角)（theta）从正 z 开始。
 		</p>
 
 
@@ -51,7 +51,7 @@
 
 		<h3>[method:Spherical makeSafe]()</h3>
 		<p>
-		将极角 [page:.phi phi] 的值限制在0.000001 和 pi - 0.000001 之间。
+		将极角 [page:.phi phi] 的值限制在0.000001 和 π - 0.000001 之间。
 		</p>
 
 		<h3>[method:Spherical set]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>

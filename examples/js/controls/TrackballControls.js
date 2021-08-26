@@ -117,8 +117,7 @@
 				const vector = new THREE.Vector2();
 				return function getMouseOnCircle( pageX, pageY ) {
 
-					vector.set( ( pageX - scope.screen.width * 0.5 - scope.screen.left ) / ( scope.screen.width * 0.5 ), ( scope.screen.height + 2 * ( scope.screen.top - pageY ) ) / scope.screen.width // screen.width intentional
-					);
+					vector.set( ( pageX - scope.screen.width * 0.5 - scope.screen.left ) / ( scope.screen.width * 0.5 ), ( scope.screen.height + 2 * ( scope.screen.top - pageY ) ) / scope.screen.width );
 					return vector;
 
 				};

@@ -27,6 +27,8 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
@@ -34,6 +36,8 @@
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
 			import LightsNode from './jsm/renderers/nodes/lights/LightsNode.js';
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import NormalMapNode from './jsm/renderers/nodes/display/NormalMapNode.js';
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
@@ -57,6 +61,18 @@
 				scene = new THREE.Scene();
 
 				const sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
+
+				//textures
+
+				const textureLoader = new THREE.TextureLoader();
+
+				const normalMapTexture = textureLoader.load( './textures/water/Water_1_M_Normal.jpg' );
+				normalMapTexture.wrapS = THREE.RepeatWrapping;
+				normalMapTexture.wrapT = THREE.RepeatWrapping;
+
+				const alphaTexture = textureLoader.load( './textures/roughness_map.jpg' );
+				alphaTexture.wrapS = THREE.RepeatWrapping;
+				alphaTexture.wrapT = THREE.RepeatWrapping;
 
 				//lights
 
@@ -86,21 +102,24 @@
 
 				const geometryTeapot = new TeapotGeometry( 8, 18 );
 
-				const leftObject = new THREE.Mesh( geometryTeapot, new THREE.MeshPhongMaterial( { color: 0x555555 } ) );
+				const leftObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardMaterial( { color: 0x555555 } ) );
 				leftObject.material.lightNode = redLightNode;
+				leftObject.material.roughnessNode = new TextureNode( alphaTexture );
+				leftObject.material.metalness = 0;
 				leftObject.position.x = - 30;
 				scene.add( leftObject );
 
-				const centerObject = new THREE.Mesh( geometryTeapot, new THREE.MeshPhongMaterial( { color: 0x555555 } ) );
+				const centerObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardMaterial( { color: 0x555555 } ) );
 				centerObject.material.lightNode = allLightsNode;
+				centerObject.material.normalNode = new NormalMapNode( new TextureNode( normalMapTexture ) );
+				centerObject.material.roughness = .5;
 				scene.add( centerObject );
 
-				const rightObject = new THREE.Mesh( geometryTeapot, new THREE.MeshPhongMaterial( { color: 0x555555 } ) );
+				const rightObject = new THREE.Mesh( geometryTeapot, new THREE.MeshStandardMaterial( { color: 0x555555 } ) );
 				rightObject.material.lightNode = blueLightNode;
+				rightObject.material.metalnessNode = new TextureNode( alphaTexture );
 				rightObject.position.x = 30;
 				scene.add( rightObject );
-
-				leftObject.material.shininess = centerObject.material.shininess = rightObject.material.shininess = 70;
 
 				leftObject.rotation.y = centerObject.rotation.y = rightObject.rotation.y = Math.PI * - 0.5;
 				leftObject.position.y = centerObject.position.y = rightObject.position.y = - 10;
@@ -124,6 +143,13 @@
 				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				//gui
+
+				const gui = new GUI();
+
+				gui.add( centerObject.material, 'roughness', 0, 1, 0.01 );
+				gui.add( centerObject.material, 'metalness', 0, 1, 0.01 );
 
 				return renderer.init();
 

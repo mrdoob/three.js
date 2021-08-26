@@ -220,8 +220,7 @@
 					const scanline_width = w;
 
 					if ( // run length encoding is not allowed so read flat
-						scanline_width < 8 || scanline_width > 0x7fff || // this file is not run length encoded
-      2 !== buffer[ 0 ] || 2 !== buffer[ 1 ] || buffer[ 2 ] & 0x80 ) {
+						scanline_width < 8 || scanline_width > 0x7fff || 2 !== buffer[ 0 ] || 2 !== buffer[ 1 ] || buffer[ 2 ] & 0x80 ) {
 
 						// return the flat buffer
 						return new Uint8Array( buffer );
@@ -381,8 +380,8 @@
 							break;
 
 						case THREE.FloatType:
-							numElements = image_rgba_data.length / 4 * 3;
-							const floatArray = new Float32Array( numElements );
+							numElements = image_rgba_data.length / 4;
+							const floatArray = new Float32Array( numElements * 3 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 
@@ -396,8 +395,8 @@
 							break;
 
 						case THREE.HalfFloatType:
-							numElements = image_rgba_data.length / 4 * 3;
-							const halfArray = new Uint16Array( numElements );
+							numElements = image_rgba_data.length / 4;
+							const halfArray = new Uint16Array( numElements * 3 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 

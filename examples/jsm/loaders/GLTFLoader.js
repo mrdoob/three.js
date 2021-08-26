@@ -45,6 +45,7 @@ import {
 	Points,
 	PointsMaterial,
 	PropertyBinding,
+	Quaternion,
 	QuaternionKeyframeTrack,
 	RGBFormat,
 	RepeatWrapping,
@@ -1405,9 +1406,9 @@ class GLTFMeshStandardSGMaterial extends MeshStandardMaterial {
 			'material.diffuseColor = diffuseColor.rgb * ( 1. - max( specularFactor.r, max( specularFactor.g, specularFactor.b ) ) );',
 			'vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );',
 			'float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );',
-			'material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.',
-			'material.specularRoughness += geometryRoughness;',
-			'material.specularRoughness = min( material.specularRoughness, 1.0 );',
+			'material.roughness = max( 1.0 - glossinessFactor, 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.',
+			'material.roughness += geometryRoughness;',
+			'material.roughness = min( material.roughness, 1.0 );',
 			'material.specularColor = specularFactor;',
 		].join( '\n' );
 
@@ -1776,6 +1777,23 @@ GLTFCubicSplineInterpolant.prototype.interpolate_ = function ( i1, t0, t, t1 ) {
 	return result;
 
 };
+
+const _q = new Quaternion();
+
+class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
+
+	interpolate_( i1, t0, t, t1 ) {
+
+		const result = super.interpolate_( i1, t0, t, t1 );
+
+		_q.fromArray( result ).normalize().toArray( result );
+
+		return result;
+
+	}
+
+}
+
 
 /*********************************/
 /********** INTERNALS ************/
@@ -3100,6 +3118,7 @@ class GLTFParser {
 
 		} else {
 
+			materialParams.format = RGBFormat;
 			materialParams.transparent = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {
@@ -3615,7 +3634,9 @@ class GLTFParser {
 							// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
 							// must be divided by three to get the interpolant's sampleSize argument.
 
-							return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
+							const interpolantType = ( this instanceof QuaternionKeyframeTrack ) ? GLTFCubicSplineQuaternionInterpolant : GLTFCubicSplineInterpolant;
+
+							return new interpolantType( this.times, this.values, this.getValueSize() / 3, result );
 
 						};
 

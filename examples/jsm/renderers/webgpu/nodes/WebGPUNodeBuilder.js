@@ -7,17 +7,21 @@ import WebGPUNodeSampler from './WebGPUNodeSampler.js';
 import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
+import VarNode from '../../nodes/core/VarNode.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
 import MaterialNode from '../../nodes/accessors/MaterialNode.js';
+import NormalNode from '../../nodes/accessors/NormalNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import ShaderLib from './ShaderLib.js';
 
 class WebGPUNodeBuilder extends NodeBuilder {
 
-	constructor( material, renderer ) {
+	constructor( material, renderer, lightNode = null ) {
 
 		super( material, renderer );
+
+		this.lightNode = lightNode;
 
 		this.bindings = { vertex: [], fragment: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0 };
@@ -38,9 +42,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		let shader = null;
 
-		if ( material.isMeshPhongMaterial ) {
+		if ( material.isMeshStandardMaterial ) {
 
-			shader = ShaderLib.phong;
+			shader = ShaderLib.standard;
 
 		} else {
 
@@ -52,10 +56,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		// parse inputs
 
-		if ( material.isMeshPhongMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
+		if ( material.isMeshStandardMaterial || material.isMeshPhongMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
 			const mvpNode = new ModelViewProjectionNode();
-			const lightNode = material.lightNode;
+
+			let lightNode = material.lightNode;
+
+			if ( lightNode === undefined && this.lightNode && this.lightNode.hasLights === true ) {
+
+				lightNode = this.lightNode;
+
+			}
 
 			if ( material.positionNode !== undefined ) {
 
@@ -95,7 +106,43 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			if ( material.isMeshPhongMaterial ) {
+			if ( material.isMeshStandardMaterial ) {
+
+				if ( material.metalnessNode !== undefined ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.metalnessNode, 'METALNESS', 'float' ) );
+
+				} else {
+
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.METALNESS ), 'METALNESS', 'float' ) );
+
+				}
+
+				if ( material.roughnessNode !== undefined ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.roughnessNode, 'ROUGHNESS', 'float' ) );
+
+				} else {
+
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.ROUGHNESS ), 'ROUGHNESS', 'float' ) );
+
+				}
+
+				let normalNode = null;
+
+				if ( material.normalNode !== undefined ) {
+
+					normalNode = material.normalNode;
+
+				} else {
+
+					normalNode = new NormalNode( NormalNode.VIEW );
+
+				}
+
+				this.addSlot( 'fragment', new NodeSlot( new VarNode( normalNode, 'TransformedNormalView', 'vec3' ), 'NORMAL', 'vec3' ) );
+
+			} else if ( material.isMeshPhongMaterial ) {
 
 				if ( material.specularNode !== undefined ) {
 
@@ -119,7 +166,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			if ( lightNode !== undefined ) {
+			if ( lightNode && lightNode.isNode ) {
 
 				const lightContextNode = new LightContextNode( lightNode );
 
@@ -131,9 +178,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet ) {
+	getTexture( textureProperty, uvSnippet, biasSnippet = null ) {
 
-		return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet} )`;
+		if ( biasSnippet !== null ) {
+
+			return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet}, ${biasSnippet} )`;
+
+		} else {
+
+			return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet} )`;
+
+		}
 
 	}
 
@@ -258,7 +313,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getAttributesHeaderSnippet( shaderStage ) {
+	getAttributes( shaderStage ) {
 
 		let snippet = '';
 
@@ -280,7 +335,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarysHeaderSnippet( shaderStage ) {
+	getVarys( shaderStage ) {
 
 		let snippet = '';
 
@@ -300,63 +355,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarysBodySnippet( shaderStage ) {
-
-		let snippet = '';
-
-		if ( shaderStage === 'vertex' ) {
-
-			for ( const vary of this.varys ) {
-
-				snippet += `${vary.name} = ${vary.snippet}; `;
-
-			}
-
-		}
-
-		return snippet;
-
-	}
-
-	getVarsHeaderSnippet( shaderStage ) {
-
-		let snippet = '';
-
-		const vars = this.vars[ shaderStage ];
-
-		for ( let index = 0; index < vars.length; index ++ ) {
-
-			const variable = vars[ index ];
-
-			snippet += `${variable.type} ${variable.name}; `;
-
-		}
-
-		return snippet;
-
-	}
-
-	getVarsBodySnippet( shaderStage ) {
-
-		let snippet = '';
-
-		const vars = this.vars[ shaderStage ];
-
-		for ( const variable of vars ) {
-
-			if ( variable.snippet !== '' ) {
-
-				snippet += `${variable.name} = ${variable.snippet}; `;
-
-			}
-
-		}
-
-		return snippet;
-
-	}
-
-	getUniformsHeaderSnippet( shaderStage ) {
+	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
@@ -409,7 +408,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	build() {
 
-		const keywords = this.getContextParameter( 'keywords' );
+		const keywords = this.getContextValue( 'keywords' );
 
 		for ( const shaderStage of [ 'vertex', 'fragment' ] ) {
 

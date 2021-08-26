@@ -8,7 +8,8 @@ class MaterialNode extends Node {
 	static COLOR = 'color';
 	static OPACITY = 'opacity';
 	static SPECULAR = 'specular';
-	static SHININESS = 'shininess';
+	static ROUGHNESS = 'roughness';
+	static METALNESS = 'metalness';
 
 	constructor( scope = MaterialNode.COLOR ) {
 
@@ -21,7 +22,7 @@ class MaterialNode extends Node {
 	getType( builder ) {
 
 		const scope = this.scope;
-		const material = builder.getContextParameter( 'material' );
+		const material = builder.getContextValue( 'material' );
 
 		if ( scope === MaterialNode.COLOR ) {
 
@@ -35,7 +36,7 @@ class MaterialNode extends Node {
 
 			return 'vec3';
 
-		} else if ( scope === MaterialNode.SHININESS ) {
+		} else if ( scope === MaterialNode.ROUGHNESS || scope === MaterialNode.METALNESS ) {
 
 			return 'float';
 
@@ -45,7 +46,7 @@ class MaterialNode extends Node {
 
 	generate( builder, output ) {
 
-		const material = builder.getContextParameter( 'material' );
+		const material = builder.getContextValue( 'material' );
 		const scope = this.scope;
 
 		let node = null;
@@ -84,21 +85,23 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR ) {
 
-			const specularColorNode = new MaterialReferenceNode( 'specular', 'color' );
+			const specularTintNode = new MaterialReferenceNode( 'specularTint', 'color' );
 
-			if ( material.specularMap !== null && material.specularMap !== undefined && material.specularMap.isTexture === true ) {
+			if ( material.specularTintMap !== null && material.specularTintMap !== undefined && material.specularTintMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', specularColorNode, new MaterialReferenceNode( 'specularMap', 'texture' ) );
+				node = new OperatorNode( '*', specularTintNode, new MaterialReferenceNode( 'specularTintMap', 'texture' ) );
 
 			} else {
 
-				node = specularColorNode;
+				node = specularTintNode;
 
 			}
 
-		} else if ( scope === MaterialNode.SHININESS ) {
+		} else {
 
-			node = new MaterialReferenceNode( 'shininess', 'float' );
+			const type = this.getType( builder );
+
+			node = new MaterialReferenceNode( scope, type );
 
 		}
 
