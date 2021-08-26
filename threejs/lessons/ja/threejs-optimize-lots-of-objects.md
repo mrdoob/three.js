@@ -387,7 +387,7 @@ function addBoxes(file) {
 また `BufferGeometryUtils` も含める必要があります。
 
 ```js
-import {BufferGeometryUtils} from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
+import * as BufferGeometryUtils from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
 ```
 
 少なくとも私のマシンでは毎秒60フレームになりました。

@@ -326,7 +326,6 @@ showFileInfo(fileInfos, fileInfos[0]);
 +});
 +const material = new THREE.MeshBasicMaterial({
 +  vertexColors: true,
-+  morphTargets: true,
 +});
 +const mesh = new THREE.Mesh(baseGeometry, material);
 +scene.add(mesh);
@@ -367,7 +366,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
 ```js
 import * as THREE from './resources/three/r131/build/three.module.js';
-import {BufferGeometryUtils} from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
+import * as BufferGeometryUtils from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
 import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 +import {TWEEN} from './resources/threejs/r131/examples/jsm/libs/tween.min.js';
 ```

@@ -43,7 +43,7 @@
   </body>
 <script type="module">
 import * as THREE from './resources/threejs/r131/build/three.module.js';
-import {BufferGeometryUtils} from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
+import * as BufferGeometryUtils from './resources/threejs/r131/examples/jsm/utils/BufferGeometryUtils.js';
 import {OrbitControls} from './resources/threejs/r131/examples/jsm/controls/OrbitControls.js';
 import {TWEEN} from './resources/threejs/r131/examples/jsm/libs/tween.module.min.js';
 
@@ -311,7 +311,6 @@ function main() {
     });
     const material = new THREE.MeshBasicMaterial({
       vertexColors: true,
-      morphTargets: true,
     });
     const mesh = new THREE.Mesh(baseGeometry, material);
     scene.add(mesh);

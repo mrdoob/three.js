@@ -281,8 +281,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 +});
 +const material = new THREE.MeshBasicMaterial({
 +  vertexColors: true,
-+  morphTargets: true,
-+});
+++});
 +const mesh = new THREE.Mesh(baseGeometry, material);
 +scene.add(mesh);
 
@@ -462,7 +461,6 @@ baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
 +});
 const material = new THREE.MeshBasicMaterial({
   vertexColors: true,
-  morphTargets: true,
 });
 ```
 
@@ -515,7 +513,6 @@ void main() {
 ```js
 const material = new THREE.MeshBasicMaterial({
   vertexColors: true,
-  morphTargets: true,
 });
 +const vertexShaderReplacements = [
 +  {
