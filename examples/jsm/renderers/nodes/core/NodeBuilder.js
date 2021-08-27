@@ -6,6 +6,8 @@ import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
+import { LinearEncoding } from 'three';
+
 class NodeBuilder {
 
 	constructor( material, renderer ) {
