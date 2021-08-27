@@ -278,7 +278,6 @@ ${ code }`;
 }
 
 // Transform #properties to _properties until they're supported in bundlers
-// https://github.com/mrdoob/three.js/issues/22437
 function privateProperties() {
 
 	return {
@@ -329,7 +328,6 @@ let builds = [
 		plugins: [
 			addons(),
 			glsl(),
-			privateProperties(),
 			babel( {
 				babelHelpers: 'bundled',
 				compact: false,
@@ -354,7 +352,6 @@ let builds = [
 			addons(),
 			glconstants(),
 			glsl(),
-			privateProperties(),
 			babel( {
 				babelHelpers: 'bundled',
 				babelrc: false,
