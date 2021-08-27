@@ -7687,7 +7687,7 @@ let materialId = 0;
 
 class Material extends EventDispatcher {
 
-	#alphaTest = 0;
+	_alphaTest = 0;
 
 	constructor() {
 
@@ -7761,19 +7761,19 @@ class Material extends EventDispatcher {
 
 	get alphaTest() {
 
-		return this.#alphaTest;
+		return this._alphaTest;
 
 	}
 
 	set alphaTest( value ) {
 
-		if ( this.#alphaTest > 0 !== value > 0 ) {
+		if ( this._alphaTest > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this.#alphaTest = value;
+		this._alphaTest = value;
 
 	}
 
@@ -35090,8 +35090,8 @@ MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
-	#clearcoat = 0;
-	#transmission = 0;
+	_clearcoat = 0;
+	_transmission = 0;
 
 	constructor( parameters ) {
 
@@ -35148,37 +35148,37 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	get clearcoat() {
 
-		return this.#clearcoat;
+		return this._clearcoat;
 
 	}
 
 	set clearcoat( value ) {
 
-		if ( this.#clearcoat > 0 !== value > 0 ) {
+		if ( this._clearcoat > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this.#clearcoat = value;
+		this._clearcoat = value;
 
 	}
 
 	get transmission() {
 
-		return this.#transmission;
+		return this._transmission;
 
 	}
 
 	set transmission( value ) {
 
-		if ( this.#transmission > 0 !== value > 0 ) {
+		if ( this._transmission > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this.#transmission = value;
+		this._transmission = value;
 
 	}
 

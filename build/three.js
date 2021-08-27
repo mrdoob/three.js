@@ -5857,31 +5857,12 @@
 
 	}
 
-	var id = 0;
-
-	function _classPrivateFieldLooseKey(name) {
-		return "__private_" + id++ + "_" + name;
-	}
-
-	function _classPrivateFieldLooseBase(receiver, privateKey) {
-		if (!Object.prototype.hasOwnProperty.call(receiver, privateKey)) {
-			throw new TypeError("attempted to use private field on non-instance");
-		}
-
-		return receiver;
-	}
-
 	let materialId = 0;
-
-	var _alphaTest = /*#__PURE__*/_classPrivateFieldLooseKey("alphaTest");
 
 	class Material extends EventDispatcher {
 		constructor() {
 			super();
-			Object.defineProperty(this, _alphaTest, {
-				writable: true,
-				value: 0
-			});
+			this._alphaTest = 0;
 			Object.defineProperty(this, 'id', {
 				value: materialId++
 			});
@@ -5932,15 +5913,15 @@
 		}
 
 		get alphaTest() {
-			return _classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest];
+			return this._alphaTest;
 		}
 
 		set alphaTest(value) {
-			if (_classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest] > 0 !== value > 0) {
+			if (this._alphaTest > 0 !== value > 0) {
 				this.version++;
 			}
 
-			_classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest] = value;
+			this._alphaTest = value;
 		}
 
 		onBuild() {}
@@ -25642,21 +25623,11 @@
 	 * }
 	 */
 
-	var _clearcoat = /*#__PURE__*/_classPrivateFieldLooseKey("clearcoat");
-
-	var _transmission = /*#__PURE__*/_classPrivateFieldLooseKey("transmission");
-
 	class MeshPhysicalMaterial extends MeshStandardMaterial {
 		constructor(parameters) {
 			super();
-			Object.defineProperty(this, _clearcoat, {
-				writable: true,
-				value: 0
-			});
-			Object.defineProperty(this, _transmission, {
-				writable: true,
-				value: 0
-			});
+			this._clearcoat = 0;
+			this._transmission = 0;
 			this.defines = {
 				'STANDARD': '',
 				'PHYSICAL': ''
@@ -25691,27 +25662,27 @@
 		}
 
 		get clearcoat() {
-			return _classPrivateFieldLooseBase(this, _clearcoat)[_clearcoat];
+			return this._clearcoat;
 		}
 
 		set clearcoat(value) {
-			if (_classPrivateFieldLooseBase(this, _clearcoat)[_clearcoat] > 0 !== value > 0) {
+			if (this._clearcoat > 0 !== value > 0) {
 				this.version++;
 			}
 
-			_classPrivateFieldLooseBase(this, _clearcoat)[_clearcoat] = value;
+			this._clearcoat = value;
 		}
 
 		get transmission() {
-			return _classPrivateFieldLooseBase(this, _transmission)[_transmission];
+			return this._transmission;
 		}
 
 		set transmission(value) {
-			if (_classPrivateFieldLooseBase(this, _transmission)[_transmission] > 0 !== value > 0) {
+			if (this._transmission > 0 !== value > 0) {
 				this.version++;
 			}
 
-			_classPrivateFieldLooseBase(this, _transmission)[_transmission] = value;
+			this._transmission = value;
 		}
 
 		copy(source) {
