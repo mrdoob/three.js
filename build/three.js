@@ -5862,7 +5862,6 @@
 	class Material extends EventDispatcher {
 		constructor() {
 			super();
-			this._alphaTest = 0;
 			Object.defineProperty(this, 'id', {
 				value: materialId++
 			});
@@ -5910,6 +5909,7 @@
 			this.toneMapped = true;
 			this.userData = {};
 			this.version = 0;
+			this._alphaTest = 0;
 		}
 
 		get alphaTest() {
@@ -25626,8 +25626,6 @@
 	class MeshPhysicalMaterial extends MeshStandardMaterial {
 		constructor(parameters) {
 			super();
-			this._clearcoat = 0;
-			this._transmission = 0;
 			this.defines = {
 				'STANDARD': '',
 				'PHYSICAL': ''
@@ -25658,6 +25656,8 @@
 			this.specularIntensityMap = null;
 			this.specularTint = new Color(1, 1, 1);
 			this.specularTintMap = null;
+			this._clearcoat = 0;
+			this._transmission = 0;
 			this.setValues(parameters);
 		}
 
