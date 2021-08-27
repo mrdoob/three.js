@@ -306,7 +306,7 @@ function privateProperties() {
 
 }
 
-export default [
+let builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
@@ -323,55 +323,59 @@ export default [
 			}
 		]
 	},
-	...( process.env.ONLY_MODULE === 'true'
-		? []
-		: [
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
+			glsl(),
+			babel( {
+				babelHelpers: 'bundled',
+				compact: false,
+				babelrc: false,
+				...babelrc
+			} ),
+			babelCleanup(),
+			header()
+		],
+		output: [
 			{
-				input: 'src/Three.js',
-				plugins: [
-					addons(),
-					glsl(),
-					babel( {
-						babelHelpers: 'bundled',
-						compact: false,
-						babelrc: false,
-						...babelrc
-					} ),
-					babelCleanup(),
-					header()
-				],
-				output: [
-					{
-						format: 'umd',
-						name: 'THREE',
-						file: 'build/three.js',
-						indent: '\t'
-					}
-				]
-			},
-			{
-				input: 'src/Three.js',
-				plugins: [
-					addons(),
-					glconstants(),
-					glsl(),
-					babel( {
-						babelHelpers: 'bundled',
-						babelrc: false,
-						...babelrc
-					} ),
-					babelCleanup(),
-					terser(),
-					header()
-				],
-				output: [
-					{
-						format: 'umd',
-						name: 'THREE',
-						file: 'build/three.min.js'
-					}
-				]
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.js',
+				indent: '\t'
 			}
 		]
-	)
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
+			glconstants(),
+			glsl(),
+			babel( {
+				babelHelpers: 'bundled',
+				babelrc: false,
+				...babelrc
+			} ),
+			babelCleanup(),
+			terser(),
+			header()
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.min.js'
+			}
+		]
+	}
 ];
+
+
+if ( process.env.ONLY_MODULE === 'true' ) {
+
+	builds = builds[ 0 ];
+
+}
+
+export default builds;
