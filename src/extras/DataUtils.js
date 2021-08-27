@@ -7,6 +7,8 @@ class DataUtils {
 
 	static toHalfFloat( val ) {
 
+		val = Math.min( val, 65504 ); // 65504 = maximum representable value in float16
+
 		// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
 
 		/* This method is faster than the OpenEXR implementation (very often
