@@ -307,7 +307,7 @@ function privateProperties() {
 
 }
 
-export default [
+let builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
@@ -373,3 +373,12 @@ export default [
 		]
 	}
 ];
+
+
+if ( process.env.ONLY_MODULE === 'true' ) {
+
+	builds = builds[ 0 ];
+
+}
+
+export default builds;
