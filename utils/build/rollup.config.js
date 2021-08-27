@@ -289,6 +289,9 @@ function privateProperties() {
 			// replace `#property =` with `_property =`
 			code = code.replace( /#(\w+) =/g, ( match, p1 ) => `_${p1} =` );
 
+			// replace `#property;` with `_property;`
+			code = code.replace( /#(\w+);/g, ( match, p1 ) => `_${p1};` );
+
 			// replace `this.#property` with `this._property`
 			code = code.replace( /this\.#(\w+)/g, ( match, p1 ) => `this._${p1}` );
 
