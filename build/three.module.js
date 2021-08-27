@@ -7687,8 +7687,6 @@ let materialId = 0;
 
 class Material extends EventDispatcher {
 
-	_alphaTest = 0;
-
 	constructor() {
 
 		super();
@@ -7756,6 +7754,8 @@ class Material extends EventDispatcher {
 		this.userData = {};
 
 		this.version = 0;
+
+		this._alphaTest = 0;
 
 	}
 
@@ -35090,9 +35090,6 @@ MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
-	_clearcoat = 0;
-	_transmission = 0;
-
 	constructor( parameters ) {
 
 		super();
@@ -35141,6 +35138,10 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularIntensityMap = null;
 		this.specularTint = new Color( 1, 1, 1 );
 		this.specularTintMap = null;
+
+		this._clearcoat = 0;
+		this._transmission = 0;
+
 
 		this.setValues( parameters );
 
