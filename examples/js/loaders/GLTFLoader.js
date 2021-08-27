@@ -2819,6 +2819,7 @@
 
 			} else {
 
+				materialParams.format = THREE.RGBFormat;
 				materialParams.transparent = false;
 
 				if ( alphaMode === ALPHA_MODES.MASK ) {
