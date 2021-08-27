@@ -66,6 +66,7 @@
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
+    "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
     "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint": "eslint src --ext js",
