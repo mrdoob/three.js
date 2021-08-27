@@ -277,36 +277,6 @@ ${ code }`;
 
 }
 
-// Transform #properties to _properties until they're supported in bundlers
-// https://github.com/mrdoob/three.js/issues/22437
-function privateProperties() {
-
-	return {
-
-		transform( code, id ) {
-
-			if ( /\.glsl.js$/.test( id ) === true ) return;
-
-			// replace `#property =` with `_property =`
-			code = code.replace( /#(\w+) =/g, ( match, p1 ) => `_${p1} =` );
-
-			// replace `#property;` with `_property;`
-			code = code.replace( /#(\w+);/g, ( match, p1 ) => `_${p1};` );
-
-			// replace `this.#property` with `this._property`
-			code = code.replace( /this\.#(\w+)/g, ( match, p1 ) => `this._${p1}` );
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
 let builds = [
 	{
 		input: 'src/Three.js',
@@ -314,7 +284,6 @@ let builds = [
 			addons(),
 			glconstants(),
 			glsl(),
-			privateProperties(),
 			header()
 		],
 		output: [
@@ -329,7 +298,6 @@ let builds = [
 		plugins: [
 			addons(),
 			glsl(),
-			privateProperties(),
 			babel( {
 				babelHelpers: 'bundled',
 				compact: false,
@@ -354,7 +322,6 @@ let builds = [
 			addons(),
 			glconstants(),
 			glsl(),
-			privateProperties(),
 			babel( {
 				babelHelpers: 'bundled',
 				babelrc: false,

@@ -34,9 +34,6 @@ import * as MathUtils from '../math/MathUtils.js';
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
-	#clearcoat = 0;
-	#transmission = 0;
-
 	constructor( parameters ) {
 
 		super();
@@ -86,43 +83,47 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularTint = new Color( 1, 1, 1 );
 		this.specularTintMap = null;
 
+		this._clearcoat = 0;
+		this._transmission = 0;
+
+
 		this.setValues( parameters );
 
 	}
 
 	get clearcoat() {
 
-		return this.#clearcoat;
+		return this._clearcoat;
 
 	}
 
 	set clearcoat( value ) {
 
-		if ( this.#clearcoat > 0 !== value > 0 ) {
+		if ( this._clearcoat > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this.#clearcoat = value;
+		this._clearcoat = value;
 
 	}
 
 	get transmission() {
 
-		return this.#transmission;
+		return this._transmission;
 
 	}
 
 	set transmission( value ) {
 
-		if ( this.#transmission > 0 !== value > 0 ) {
+		if ( this._transmission > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this.#transmission = value;
+		this._transmission = value;
 
 	}
 
