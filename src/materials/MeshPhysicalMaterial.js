@@ -72,7 +72,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.sheenTint = new Color( 0x000000 );
 		this.sheenRoughness = 1.0;
 
-		this.transmission = 0.0;
 		this.transmissionMap = null;
 
 		this.thickness = 0.01;
@@ -87,7 +86,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this._clearcoat = 0;
 		this._transmission = 0;
-
 
 		this.setValues( parameters );
 
@@ -128,7 +126,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this._transmission = value;
 
 	}
-
 
 	copy( source ) {
 
