@@ -598,7 +598,13 @@ function WebGLMaterials( properties ) {
 
 		uniforms.ior.value = material.ior; // also part of uniforms common
 
-		if ( material.sheenTint ) uniforms.sheenTint.value.copy( material.sheenTint );
+		if ( material.sheenTint && ( material.sheenTint.r > 0 || material.sheenTint.g > 0 || material.sheenTint.b > 0 ) ) {
+
+			uniforms.sheenTint.value.copy( material.sheenTint );
+
+			uniforms.sheenRoughness.value = material.sheenRoughness;
+
+		}
 
 		if ( material.clearcoat > 0 ) {
 
