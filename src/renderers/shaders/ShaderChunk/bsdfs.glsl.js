@@ -220,8 +220,10 @@ vec3 BRDF_BlinnPhong( const in IncidentLight incidentLight, const in GeometricCo
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs
 float D_Charlie( float roughness, float dotNH ) {
 
+	float alpha = pow2( roughness );
+
 	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
-	float invAlpha = 1.0 / roughness;
+	float invAlpha = 1.0 / alpha;
 	float cos2h = dotNH * dotNH;
 	float sin2h = max( 1.0 - cos2h, 0.0078125 ); // 2^(-14/2), so sin2h^2 > 0 in fp16
 
