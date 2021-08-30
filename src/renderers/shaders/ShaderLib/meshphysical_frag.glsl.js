@@ -36,6 +36,7 @@ uniform float opacity;
 
 #ifdef USE_SHEEN
 	uniform vec3 sheenTint;
+	uniform float sheenRoughness;
 #endif
 
 varying vec3 vViewPosition;

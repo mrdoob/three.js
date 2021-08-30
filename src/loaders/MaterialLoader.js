@@ -75,6 +75,7 @@ class MaterialLoader extends Loader {
 		if ( json.roughness !== undefined ) material.roughness = json.roughness;
 		if ( json.metalness !== undefined ) material.metalness = json.metalness;
 		if ( json.sheenTint !== undefined ) material.sheenTint = new Color().setHex( json.sheenTint );
+		if ( json.sheenRoughness !== undefined ) material.sheenRoughness = json.sheenRoughness;
 		if ( json.emissive !== undefined && material.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined && material.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.specularIntensity !== undefined ) material.specularIntensity = json.specularIntensity;
