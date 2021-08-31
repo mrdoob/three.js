@@ -15,6 +15,7 @@ import * as MathUtils from '../math/MathUtils.js';
  *  ior: <float>,
  *  reflectivity: <float>,
  *
+ *  sheen: <float>,
  *  sheenTint: <Color>,
  *  sheenRoughness: <float>,
  *
@@ -84,10 +85,29 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularTint = new Color( 1, 1, 1 );
 		this.specularTintMap = null;
 
+		this._sheen = 0.0;
 		this._clearcoat = 0;
 		this._transmission = 0;
 
 		this.setValues( parameters );
+
+	}
+
+	get sheen() {
+
+		return this._sheen;
+
+	}
+
+	set sheen( value ) {
+
+		if ( this._sheen > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._sheen = value;
 
 	}
 
@@ -147,6 +167,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.ior = source.ior;
 
+		this.sheen = source.sheen;
 		this.sheenTint.copy( source.sheenTint );
 		this.sheenRoughness = source.sheenRoughness;
 
