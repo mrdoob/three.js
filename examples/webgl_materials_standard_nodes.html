@@ -37,7 +37,6 @@
 			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 			import SwitchNode from './jsm/renderers/nodes/utils/SwitchNode.js';
-			import NormalMapNode from './jsm/renderers/nodes/display/NormalMapNode.js';
 
 			let container, stats;
 
@@ -102,7 +101,7 @@
 						material.roughnessNode = new SwitchNode( mpMapNode, 'g' );
 						material.metalnessNode = new SwitchNode( mpMapNode, 'b' );
 
-						material.normalNode = new NormalMapNode( new TextureNode( normalMap ) );
+						material.normalMap = normalMap;
 
 						group.traverse( function ( child ) {
 
