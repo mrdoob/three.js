@@ -27,6 +27,6 @@ export default /* glsl */`
 		attenuationTint, attenuationDistance );
 
 	totalDiffuse = mix( totalDiffuse, transmission.rgb, transmissionFactor );
-	transmissionAlpha = transmission.a;
+	transmissionAlpha = mix( transmissionAlpha, transmission.a, transmissionFactor );
 #endif
 `;
