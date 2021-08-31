@@ -24,13 +24,13 @@ vec3 directLightColor_Diffuse;
 
 vIndirectFront += getAmbientLightIrradiance( ambientLightColor );
 
-vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
+vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
 
 #ifdef DOUBLE_SIDED
 
 	vIndirectBack += getAmbientLightIrradiance( ambientLightColor );
 
-	vIndirectBack += getLightProbeIrradiance( lightProbe, backGeometry );
+	vIndirectBack += getLightProbeIrradiance( lightProbe, backGeometry.normal );
 
 #endif
 
@@ -107,11 +107,11 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-		vIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+		vIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry.normal );
 
 		#ifdef DOUBLE_SIDED
 
-			vIndirectBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
+			vIndirectBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry.normal );
 
 		#endif
 
