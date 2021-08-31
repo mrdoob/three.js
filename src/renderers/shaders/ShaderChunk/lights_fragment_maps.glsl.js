@@ -18,7 +18,7 @@ export default /* glsl */`
 
 	#if defined( USE_ENVMAP ) && defined( STANDARD ) && defined( ENVMAP_TYPE_CUBE_UV )
 
-		iblIrradiance += getIBLIrradiance( geometry );
+		iblIrradiance += getIBLIrradiance( geometry.normal );
 
 	#endif
 
