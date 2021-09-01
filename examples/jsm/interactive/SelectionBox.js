@@ -1,7 +1,6 @@
 import {
 	Frustum,
 	Vector3,
-	InstancedMesh,
 	Matrix4,
 	Quaternion,
 } from '../../../build/three.module.js';

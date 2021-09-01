@@ -18,6 +18,8 @@ Material.prototype.onUpdate = function ( renderer, scene, camera, geometry, obje
 
 	if ( nodeBuilder !== undefined ) {
 
+		nodeFrame.update();
+
 		nodeFrame.material = this;
 		nodeFrame.camera = camera;
 		nodeFrame.object = object;

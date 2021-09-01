@@ -36,6 +36,7 @@ uniform float opacity;
 
 #ifdef USE_SHEEN
 	uniform vec3 sheenTint;
+	uniform float sheenRoughness;
 #endif
 
 varying vec3 vViewPosition;
@@ -117,8 +118,7 @@ void main() {
 
 	#endif
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
-
+	#include <output_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
