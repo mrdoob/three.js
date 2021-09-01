@@ -21,7 +21,7 @@ class ViewHelper extends THREE.Object3D {
 
 		const scope = this;
 
-		panel.dom.addEventListener( 'mouseup', function ( event ) {
+		panel.dom.addEventListener( 'pointerup', function ( event ) {
 
 			event.stopPropagation();
 
@@ -29,7 +29,7 @@ class ViewHelper extends THREE.Object3D {
 
 		} );
 
-		panel.dom.addEventListener( 'mousedown', function ( event ) {
+		panel.dom.addEventListener( 'pointerdown', function ( event ) {
 
 			event.stopPropagation();
 
