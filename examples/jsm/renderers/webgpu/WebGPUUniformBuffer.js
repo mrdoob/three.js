@@ -20,9 +20,10 @@ class WebGPUUniformBuffer extends WebGPUBinding {
 
 	getByteLength() {
 
-		const buffer = 	this.buffer;
+		const chunkSize = 16; // size of a chunk in bytes (STD140 layout)
+		const byteLength = this.buffer.byteLength;
 
-		return buffer.byteLength + ( ( 4 - ( buffer.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+		return byteLength + ( ( chunkSize - ( byteLength % chunkSize ) ) % chunkSize ); // ensure chunkSize byte alignment
 
 	}
 
