@@ -7,8 +7,6 @@ class WebGPUUniformBuffer extends WebGPUBinding {
 
 		super( name );
 
-		this.onBeforeUpdate = function () {};
-
 		this.bytesPerElement = Float32Array.BYTES_PER_ELEMENT;
 		this.type = GPUBindingType.UniformBuffer;
 		this.visibility = GPUShaderStage.VERTEX;
@@ -17,14 +15,6 @@ class WebGPUUniformBuffer extends WebGPUBinding {
 
 		this.buffer = buffer;
 		this.bufferGPU = null; // set by the renderer
-
-	}
-
-	setOnBeforeUpdate( callback ) {
-
-		this.onBeforeUpdate = callback;
-
-		return this;
 
 	}
 

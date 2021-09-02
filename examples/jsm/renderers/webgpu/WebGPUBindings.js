@@ -104,8 +104,6 @@ class WebGPUBindings {
 				const buffer = binding.getBuffer();
 				const bufferGPU = binding.bufferGPU;
 
-				binding.onBeforeUpdate( object, camera );
-
 				const needsBufferWrite = binding.update();
 
 				if ( needsBufferWrite === true ) {
