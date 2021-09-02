@@ -1,5 +1,4 @@
 import WebGPUUniformBuffer from './WebGPUUniformBuffer.js';
-import { GPUBindingType } from './constants.js';
 
 class WebGPUUniformsGroup extends WebGPUUniformBuffer {
 
