@@ -48,4 +48,10 @@ function getTypedArray( type, buffer ) {
 
 }
 
-export { arrayMin, arrayMax, getTypedArray };
+function createElementNS( name ) {
+
+	return document.createElementNS( 'http://www.w3.org/1999/xhtml', name );
+
+}
+
+export { arrayMin, arrayMax, getTypedArray, createElementNS };
