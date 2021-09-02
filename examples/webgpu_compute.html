@@ -80,7 +80,9 @@
 				const particleBuffer = new WebGPUStorageBuffer( 'particle', new THREE.BufferAttribute( particleArray, 3 ) );
 				const velocityBuffer = new WebGPUStorageBuffer( 'velocity', new THREE.BufferAttribute( velocityArray, 3 ) );
 
-				scaleUniformBuffer = new WebGPUUniformBuffer( 'scaleUniform', new Float32Array( 3 ) ); // single vector3
+				const scaleUniformLength = WebGPUUniformBuffer.getByteLength( 3 ); // single vector3
+
+				scaleUniformBuffer = new WebGPUUniformBuffer( 'scaleUniform', new Float32Array( scaleUniformLength ) ); 
 
 				pointer = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
 

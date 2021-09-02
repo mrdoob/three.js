@@ -1,4 +1,5 @@
 import WebGPUUniformBuffer from './WebGPUUniformBuffer.js';
+import { GPUChunkSize } from './constants.js';
 
 class WebGPUUniformsGroup extends WebGPUUniformBuffer {
 
@@ -55,7 +56,6 @@ class WebGPUUniformsGroup extends WebGPUUniformBuffer {
 	getByteLength() {
 
 		let offset = 0; // global buffer offset in bytes
-		const chunkSize = 16; // size of a chunk in bytes (STD140 layout)
 
 		for ( let i = 0, l = this.uniforms.length; i < l; i ++ ) {
 
@@ -63,8 +63,8 @@ class WebGPUUniformsGroup extends WebGPUUniformBuffer {
 
 			// offset within a single chunk in bytes
 
-			const chunkOffset = offset % chunkSize;
-			const remainingSizeInChunk = chunkSize - chunkOffset;
+			const chunkOffset = offset % GPUChunkSize;
+			const remainingSizeInChunk = GPUChunkSize - chunkOffset;
 
 			// conformance tests
 
@@ -72,7 +72,7 @@ class WebGPUUniformsGroup extends WebGPUUniformBuffer {
 
 				// check for chunk overflow
 
-				offset += ( chunkSize - chunkOffset );
+				offset += ( GPUChunkSize - chunkOffset );
 
 			} else if ( chunkOffset % uniform.boundary !== 0 ) {
 

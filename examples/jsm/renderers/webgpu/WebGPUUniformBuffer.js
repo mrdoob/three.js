@@ -1,5 +1,5 @@
 import WebGPUBinding from './WebGPUBinding.js';
-import { GPUBindingType } from './constants.js';
+import { GPUBindingType, GPUChunkSize } from './constants.js';
 
 class WebGPUUniformBuffer extends WebGPUBinding {
 
@@ -20,10 +20,7 @@ class WebGPUUniformBuffer extends WebGPUBinding {
 
 	getByteLength() {
 
-		const chunkSize = 16; // size of a chunk in bytes (STD140 layout)
-		const byteLength = this.buffer.byteLength;
-
-		return byteLength + ( ( chunkSize - ( byteLength % chunkSize ) ) % chunkSize ); // ensure chunkSize byte alignment
+		return WebGPUUniformBuffer.getByteLength(  this.buffer.byteLength );
 
 	}
 
@@ -36,6 +33,12 @@ class WebGPUUniformBuffer extends WebGPUBinding {
 	update() {
 
 		return true;
+
+	}
+
+	static getByteLength( byteLength ) {
+
+		return byteLength + ( ( GPUChunkSize - ( byteLength % GPUChunkSize ) ) % GPUChunkSize ); // ensure chunk size byte alignment (STD140 layout)
 
 	}
 
