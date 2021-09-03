@@ -10,8 +10,7 @@ import { Vector4 } from '../../math/Vector4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Frustum } from '../../math/Frustum.js';
 
-import vsm_frag from '../shaders/ShaderLib/vsm_frag.glsl.js';
-import vsm_vert from '../shaders/ShaderLib/vsm_vert.glsl.js';
+import * as vsm from '../shaders/ShaderLib/vsm.glsl.js';
 
 function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
@@ -40,9 +39,8 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 			samples: { value: 8.0 }
 		},
 
-		vertexShader: vsm_vert,
-
-		fragmentShader: vsm_frag
+		vertexShader: vsm.vertex,
+		fragmentShader: vsm.fragment
 
 	} );
 
