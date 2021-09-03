@@ -1072,6 +1072,37 @@
 
 	Matrix3.prototype.isMatrix3 = true;
 
+	function arrayMax(array) {
+		if (array.length === 0) return -Infinity;
+		let max = array[0];
+
+		for (let i = 1, l = array.length; i < l; ++i) {
+			if (array[i] > max) max = array[i];
+		}
+
+		return max;
+	}
+
+	const TYPED_ARRAYS = {
+		Int8Array: Int8Array,
+		Uint8Array: Uint8Array,
+		Uint8ClampedArray: Uint8ClampedArray,
+		Int16Array: Int16Array,
+		Uint16Array: Uint16Array,
+		Int32Array: Int32Array,
+		Uint32Array: Uint32Array,
+		Float32Array: Float32Array,
+		Float64Array: Float64Array
+	};
+
+	function getTypedArray(type, buffer) {
+		return new TYPED_ARRAYS[type](buffer);
+	}
+
+	function createElementNS(name) {
+		return document.createElementNS('http://www.w3.org/1999/xhtml', name);
+	}
+
 	let _canvas;
 
 	class ImageUtils {
@@ -1089,7 +1120,7 @@
 			if (image instanceof HTMLCanvasElement) {
 				canvas = image;
 			} else {
-				if (_canvas === undefined) _canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+				if (_canvas === undefined) _canvas = createElementNS('canvas');
 				_canvas.width = image.width;
 				_canvas.height = image.height;
 
@@ -5719,6 +5750,13 @@
 			return this;
 		}
 
+		setFromAttributeAndIndices(attribute, i0, i1, i2) {
+			this.a.fromBufferAttribute(attribute, i0);
+			this.b.fromBufferAttribute(attribute, i1);
+			this.c.fromBufferAttribute(attribute, i2);
+			return this;
+		}
+
 		clone() {
 			return new this.constructor().copy(this);
 		}
@@ -7225,33 +7263,6 @@
 		}
 
 	} //
-
-	function arrayMax(array) {
-		if (array.length === 0) return -Infinity;
-		let max = array[0];
-
-		for (let i = 1, l = array.length; i < l; ++i) {
-			if (array[i] > max) max = array[i];
-		}
-
-		return max;
-	}
-
-	const TYPED_ARRAYS = {
-		Int8Array: Int8Array,
-		Uint8Array: Uint8Array,
-		Uint8ClampedArray: Uint8ClampedArray,
-		Int16Array: Int16Array,
-		Uint16Array: Uint16Array,
-		Int32Array: Int32Array,
-		Uint32Array: Uint32Array,
-		Float32Array: Float32Array,
-		Float64Array: Float64Array
-	};
-
-	function getTypedArray(type, buffer) {
-		return new TYPED_ARRAYS[type](buffer);
-	}
 
 	let _id = 0;
 
@@ -16175,7 +16186,7 @@
 
 		function createCanvas(width, height) {
 			// Use OffscreenCanvas when available. Specially needed in web workers
-			return useOffscreenCanvas ? new OffscreenCanvas(width, height) : document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+			return useOffscreenCanvas ? new OffscreenCanvas(width, height) : createElementNS('canvas');
 		}
 
 		function resizeImage(image, needsPowerOfTwo, needsNewCanvas, maxSize) {
@@ -18512,7 +18523,7 @@
 	}
 
 	function createCanvasElement() {
-		const canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+		const canvas = createElementNS('canvas');
 		canvas.style.display = 'block';
 		return canvas;
 	}
@@ -28025,7 +28036,7 @@
 				return cached;
 			}
 
-			const image = document.createElementNS('http://www.w3.org/1999/xhtml', 'img');
+			const image = createElementNS('img');
 
 			function onImageLoad() {
 				image.removeEventListener('load', onImageLoad, false);
