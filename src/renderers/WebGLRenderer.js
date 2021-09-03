@@ -1334,7 +1334,7 @@ function WebGLRenderer( parameters = {} ) {
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-		material.onUpdate( _this, scene, camera, geometry, object, group );
+		material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
 		if ( object.isImmediateRenderObject ) {
 
