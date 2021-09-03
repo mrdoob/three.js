@@ -4,3 +4,4 @@ import './example/utils/BufferGeometryUtils.tests';
 import './example/exporters/GLTFExporter.tests';
 import './example/loaders/GLTFLoader.tests';
 import './example/objects/Lensflare.tests';
+import './example/math/Random.tests';
