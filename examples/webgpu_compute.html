@@ -81,7 +81,7 @@
 				const particleBuffer = new WebGPUStorageBuffer( 'particle', new THREE.BufferAttribute( particleArray, 3 ) );
 				const velocityBuffer = new WebGPUStorageBuffer( 'velocity', new THREE.BufferAttribute( velocityArray, 3 ) );
 
-				const scaleUniformLength = WebGPUBufferUtils.getFloatLength( 3 ); // single vector3
+				const scaleUniformLength = WebGPUBufferUtils.getVectorLength( 2, 3 ); // two vector3 for array
 
 				scaleUniformBuffer = new WebGPUUniformBuffer( 'scaleUniform', new Float32Array( scaleUniformLength ) ); 
 
@@ -117,7 +117,7 @@
 					} velocity;
 
 					layout(set = 0, binding = 2) uniform Scale {
-						vec3 value;
+						vec3 value[2];
 					} scaleUniform;
 
 					layout(set = 0, binding = 3) uniform MouseUniforms {
@@ -164,9 +164,9 @@
 
 						}
 
-						particle.particle[ index * 3 + 0 ] = position.x * scaleUniform.value.x;
-						particle.particle[ index * 3 + 1 ] = position.y * scaleUniform.value.y;
-						particle.particle[ index * 3 + 2 ] = position.z * scaleUniform.value.z;
+						particle.particle[ index * 3 + 0 ] = position.x * scaleUniform.value[0].x;
+						particle.particle[ index * 3 + 1 ] = position.y * scaleUniform.value[0].y;
+						particle.particle[ index * 3 + 2 ] = position.z * scaleUniform.value[0].z;
 
 					}
 				`;
