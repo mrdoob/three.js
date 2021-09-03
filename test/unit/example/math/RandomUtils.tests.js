@@ -1,18 +1,18 @@
 /* global QUnit */
 
-import * as Random from '../../../../examples/jsm/math/Random';
+import * as RandomUtils from '../../../../examples/jsm/math/RandomUtils';
 
 import { Vector3 } from '../../../../src/math/Vector3';
 
 export default QUnit.module( 'Math', () => {
 
-	QUnit.module( 'Random', () => {
+	QUnit.module( 'RandomUtils', () => {
 
 		QUnit.test( 'onUnitSphere - basic', ( assert ) => {
 
 			var vec = new Vector3();
 
-			Random.onUnitSphere( vec );
+			RandomUtils.onUnitSphere( vec );
 
 			var zero = new Vector3();
 			assert.notDeepEqual(
