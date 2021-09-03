@@ -1,4 +1,6 @@
 import WebGPUBinding from './WebGPUBinding.js';
+import { getFloatLength } from './WebGPUBufferUtils.js';
+
 import { GPUBindingType } from './constants.js';
 
 class WebGPUUniformBuffer extends WebGPUBinding {
@@ -20,9 +22,7 @@ class WebGPUUniformBuffer extends WebGPUBinding {
 
 	getByteLength() {
 
-		const buffer = 	this.buffer;
-
-		return buffer.byteLength + ( ( 4 - ( buffer.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+		return getFloatLength( this.buffer.byteLength );
 
 	}
 
