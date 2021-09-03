@@ -1,15 +1,13 @@
 import { GPUChunkSize } from './constants.js';
 
-class WebGPUBufferUtils {
+function getFloatLength( floatLength ) {
 
-	static getFloatLength( floatLength ) {
+    // ensure chunk size alignment (STD140 layout)
 
-		// ensure chunk size alignment (STD140 layout)
-
-		return floatLength + ( ( GPUChunkSize - ( floatLength % GPUChunkSize ) ) % GPUChunkSize );
-
-	}
+    return floatLength + ( ( GPUChunkSize - ( floatLength % GPUChunkSize ) ) % GPUChunkSize );
 
 }
 
-export default WebGPUBufferUtils;
+export {
+    getFloatLength
+};
