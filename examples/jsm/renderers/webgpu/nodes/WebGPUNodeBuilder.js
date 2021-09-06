@@ -6,6 +6,8 @@ import {
 import WebGPUNodeSampler from './WebGPUNodeSampler.js';
 import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
 
+import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
+
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import VarNode from '../../nodes/core/VarNode.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
@@ -245,7 +247,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				bindings.splice( index, 0, sampler, texture );
 
-				uniformGPU = { sampler, texture };
+				uniformGPU = [ sampler, texture ];
 
 			} else {
 
@@ -261,41 +263,33 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( type === 'float' ) {
+				if ( node.isArrayInputNode === true ) {
 
-					uniformGPU = new FloatNodeUniform( uniformNode );
+					uniformGPU = [];
 
-				} else if ( type === 'vec2' ) {
+					console.log( );
 
-					uniformGPU = new Vector2NodeUniform( uniformNode );
+					for ( const inputNode of node.value ) {
 
-				} else if ( type === 'vec3' ) {
+						const uniformNodeGPU = this._getNodeUniform( inputNode, type );
 
-					uniformGPU = new Vector3NodeUniform( uniformNode );
+						// fit bounds to buffer
+						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );
+						uniformNodeGPU.itemSize = getStrideLength( uniformNodeGPU.itemSize );
 
-				} else if ( type === 'vec4' ) {
+						uniformsGroup.addUniform( uniformNodeGPU );
 
-					uniformGPU = new Vector4NodeUniform( uniformNode );
+						uniformGPU.push( uniformNodeGPU );
 
-				} else if ( type === 'color' ) {
-
-					uniformGPU = new ColorNodeUniform( uniformNode );
-
-				} else if ( type === 'mat3' ) {
-
-					uniformGPU = new Matrix3NodeUniform( uniformNode );
-
-				} else if ( type === 'mat4' ) {
-
-					uniformGPU = new Matrix4NodeUniform( uniformNode );
+					}
 
 				} else {
 
-					throw new Error( `Uniform "${type}" not declared.` );
+					uniformGPU = this._getNodeUniform( uniformNode, type );
+
+					uniformsGroup.addUniform( uniformGPU );
 
 				}
-
-				uniformsGroup.addUniform( uniformGPU );
 
 			}
 
@@ -375,7 +369,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				groupSnippet += `uniform ${vectorType} ${uniform.name}; `;
+				if ( Array.isArray( uniform.value ) === true ) {
+
+					const length = uniform.value.length;
+
+					groupSnippet += `uniform ${vectorType}[ ${length} ] ${uniform.name}; `;
+
+				} else {
+
+					groupSnippet += `uniform ${vectorType} ${uniform.name}; `;
+
+				}
 
 			}
 
@@ -424,6 +428,20 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
 
 		return this;
+
+	}
+
+	_getNodeUniform( uniformNode, type ) {
+
+		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
+		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
+		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
+		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
+		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
+		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
+		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
+
+		throw new Error( `Uniform "${type}" not declared.` );
 
 	}
 
