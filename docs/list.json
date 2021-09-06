@@ -398,8 +398,7 @@
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
 				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
-				"OBB": "examples/en/math/OBB",
-				"RandomUtils": "examples/en/math/RandomUtils"
+				"OBB": "examples/en/math/OBB"
 			},
 
 			"ConvexHull": {
