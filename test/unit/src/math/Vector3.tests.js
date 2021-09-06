@@ -989,6 +989,23 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'randomDirection', ( assert ) => {
+
+			var vec = new Vector3();
+
+			vec.randomDirection();
+
+			var zero = new Vector3();
+			assert.notDeepEqual(
+				vec,
+				zero,
+				'randomizes at least one component of the vector'
+			);
+
+			assert.ok( ( 1 - vec.length() ) <= Number.EPSILON, 'produces a unit vector' );
+
+		} );
+
 	} );
 
 } );
