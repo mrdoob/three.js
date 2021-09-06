@@ -8,19 +8,26 @@ function getFloatLength( floatLength ) {
 
 }
 
-function getVectorLength( count, vectorLength ) {
+function getVectorLength( count, vectorLength = 4 ) {
 
-	const strideLength = 4;
+	const strideLength = getStrideLength( vectorLength );
 
-	vectorLength = vectorLength + ( ( strideLength - ( vectorLength % strideLength ) ) % strideLength );
-
-	const floatLength = vectorLength * count;
+	const floatLength = strideLength * count;
 
 	return getFloatLength( floatLength );
 
 }
 
+function getStrideLength( vectorLength ) {
+
+	const strideLength = 4;
+
+	return vectorLength + ( ( strideLength - ( vectorLength % strideLength ) ) % strideLength );
+
+}
+
 export {
 	getFloatLength,
-	getVectorLength
+	getVectorLength,
+	getStrideLength
 };
