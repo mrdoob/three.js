@@ -232,9 +232,24 @@
 			Set the visible property of gizmos.
 		</p>
 
+		<h3>[method:Boolean setMouseAction] ( [param:String operation], mouse, key )</h3>
+		<p>
+			Set a new mouse action by specifying the operation to be performed and a mouse/key combination. In case of conflict, replaces the existing one.<br><br>
+			Operations can be specified as 'ROTATE', 'PAN', 'FOV' or 'ZOOM'.<br>
+			Mouse inputs can be specified as mouse buttons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
+			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
+		</p>
+
 		<h3>[method:null setTarget] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 			Set the trackball center point.
+		</p>
+
+		<h3>[method:Boolean unsetMouseAction] ( mouse, key )</h3>
+		<p>
+			Removes a mouse action by specifying its mouse/key combination.<br><br>
+			Mouse inputs can be specified as mouse buttons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
+			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
 		</p>
 		
 		<h3>[method:null update] ()</h3>
