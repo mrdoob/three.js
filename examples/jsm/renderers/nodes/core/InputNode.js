@@ -40,7 +40,7 @@ class InputNode extends Node {
 
 		} else {
 
-			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, this.getType( builder ) );
+			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, type );
 			const propertyName = builder.getPropertyName( nodeUniform );
 
 			return builder.format( propertyName, type, output );
