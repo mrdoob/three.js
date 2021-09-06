@@ -12,13 +12,11 @@ Material.prototype.onBuild = function ( parameters, renderer ) {
 
 };
 
-Material.prototype.onUpdate = function ( renderer, scene, camera, geometry, object ) {
+Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry, object ) {
 
 	const nodeBuilder = builders.get( this );
 
 	if ( nodeBuilder !== undefined ) {
-
-		nodeFrame.update();
 
 		nodeFrame.material = this;
 		nodeFrame.camera = camera;
