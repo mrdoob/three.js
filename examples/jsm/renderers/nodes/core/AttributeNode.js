@@ -1,4 +1,5 @@
 import Node from './Node.js';
+import VaryNode from './VaryNode.js';
 
 class AttributeNode extends Node {
 
@@ -43,16 +44,13 @@ class AttributeNode extends Node {
 
 			if ( nodeVary === undefined ) {
 
-				nodeVary = builder.getVaryFromNode( this, attribute.type );
-				nodeVary.snippet = attributeName;
+				nodeVary = new VaryNode( this );
 
 				nodeData.nodeVary = nodeVary;
 
 			}
 
-			const varyName = builder.getPropertyName( nodeVary );
-
-			return builder.format( varyName, attribute.type, output );
+			return nodeVary.build( builder, output );
 
 		}
 

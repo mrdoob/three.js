@@ -1,3 +1,5 @@
+import { createElementNS } from '../utils.js';
+
 let _canvas;
 
 class ImageUtils {
@@ -24,7 +26,7 @@ class ImageUtils {
 
 		} else {
 
-			if ( _canvas === undefined ) _canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+			if ( _canvas === undefined ) _canvas = createElementNS( 'canvas' );
 
 			_canvas.width = image.width;
 			_canvas.height = image.height;

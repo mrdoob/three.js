@@ -3118,6 +3118,7 @@ class GLTFParser {
 
 		} else {
 
+			materialParams.format = RGBFormat;
 			materialParams.transparent = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {

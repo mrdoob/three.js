@@ -7,11 +7,11 @@ export default /* glsl */`
 
 	#endif
 
-	vec3 getIBLIrradiance( const in GeometricContext geometry ) {
+	vec3 getIBLIrradiance( const in vec3 normal ) {
 
 		#if defined( ENVMAP_TYPE_CUBE_UV )
 
-			vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+			vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
 
 			vec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );
 

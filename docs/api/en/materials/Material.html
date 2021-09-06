@@ -32,7 +32,7 @@
 		<h3>[property:Float alphaTest]</h3>
 		<p>
 		Sets the alpha value to be used when running an alpha test.
-		The material will not be renderered if the opacity is lower than this value.
+		The material will not be rendered if the opacity is lower than this value.
 		Default is *0*.
 		</p>
 
@@ -126,6 +126,11 @@
 		Whether rendering this material has any effect on the depth buffer. Default is *true*.<br /><br />
 
 		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
+		</p>
+
+		<h3>[property:Number format]</h3>
+		<p>
+		When this property is set to [page:Textures THREE.RGBFormat], the material is considered to be opaque and alpha values are ignored. Default is [page:Textures THREE.RGBAFormat].
 		</p>
 
 		<h3>[property:Boolean stencilWrite]</h3>

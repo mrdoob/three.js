@@ -47,7 +47,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 #endif
 
-#ifdef CLEARCOAT
+#ifdef USE_CLEARCOAT
 
 	material.clearcoat = clearcoat;
 	material.clearcoatRoughness = clearcoatRoughness;
@@ -76,6 +76,7 @@ material.roughness = min( material.roughness, 1.0 );
 #ifdef USE_SHEEN
 
 	material.sheenTint = sheenTint;
+	material.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );
 
 #endif
 `;

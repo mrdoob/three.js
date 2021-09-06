@@ -139,6 +139,12 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
 		const envMap = properties.get( material ).envMap;
 
 		if ( envMap ) {
@@ -351,6 +357,12 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
 		// uv repeat and offset setting priorities
 		// 1. color map
 		// 2. alpha map
@@ -396,6 +408,12 @@ function WebGLMaterials( properties ) {
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
 
 		}
 
@@ -580,61 +598,70 @@ function WebGLMaterials( properties ) {
 
 		uniforms.ior.value = material.ior; // also part of uniforms common
 
-		uniforms.clearcoat.value = material.clearcoat;
-		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
+		if ( material.sheen > 0 ) {
 
-		if ( material.sheenTint ) uniforms.sheenTint.value.copy( material.sheenTint );
+			uniforms.sheenTint.value.copy( material.sheenTint ).multiplyScalar( material.sheen );
 
-		if ( material.clearcoatMap ) {
-
-			uniforms.clearcoatMap.value = material.clearcoatMap;
+			uniforms.sheenRoughness.value = material.sheenRoughness;
 
 		}
 
-		if ( material.clearcoatRoughnessMap ) {
+		if ( material.clearcoat > 0 ) {
 
-			uniforms.clearcoatRoughnessMap.value = material.clearcoatRoughnessMap;
+			uniforms.clearcoat.value = material.clearcoat;
+			uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
 
-		}
+			if ( material.clearcoatMap ) {
 
-		if ( material.clearcoatNormalMap ) {
+				uniforms.clearcoatMap.value = material.clearcoatMap;
 
-			uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
-			uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
+			}
 
-			if ( material.side === BackSide ) {
+			if ( material.clearcoatRoughnessMap ) {
 
-				uniforms.clearcoatNormalScale.value.negate();
+				uniforms.clearcoatRoughnessMap.value = material.clearcoatRoughnessMap;
+
+			}
+
+			if ( material.clearcoatNormalMap ) {
+
+				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
+				uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
+
+				if ( material.side === BackSide ) {
+
+					uniforms.clearcoatNormalScale.value.negate();
+
+				}
 
 			}
 
 		}
 
-		uniforms.transmission.value = material.transmission;
+		if ( material.transmission > 0 ) {
 
-		if ( material.transmissionMap ) {
-
-			uniforms.transmissionMap.value = material.transmissionMap;
-
-		}
-
-		if ( material.transmission > 0.0 ) {
-
+			uniforms.transmission.value = material.transmission;
 			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;
 			uniforms.transmissionSamplerSize.value.set( transmissionRenderTarget.width, transmissionRenderTarget.height );
 
+			if ( material.transmissionMap ) {
+
+				uniforms.transmissionMap.value = material.transmissionMap;
+
+			}
+
+			uniforms.thickness.value = material.thickness;
+
+			if ( material.thicknessMap ) {
+
+				uniforms.thicknessMap.value = material.thicknessMap;
+
+			}
+
+			uniforms.attenuationDistance.value = material.attenuationDistance;
+			uniforms.attenuationTint.value.copy( material.attenuationTint );
+
 		}
-
-		uniforms.thickness.value = material.thickness;
-
-		if ( material.thicknessMap ) {
-
-			uniforms.thicknessMap.value = material.thicknessMap;
-
-		}
-
-		uniforms.attenuationDistance.value = material.attenuationDistance;
-		uniforms.attenuationTint.value.copy( material.attenuationTint );
 
 		uniforms.specularIntensity.value = material.specularIntensity;
 		uniforms.specularTint.value.copy( material.specularTint );

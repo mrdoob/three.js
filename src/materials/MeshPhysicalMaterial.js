@@ -15,7 +15,9 @@ import * as MathUtils from '../math/MathUtils.js';
  *  ior: <float>,
  *  reflectivity: <float>,
  *
+ *  sheen: <float>,
  *  sheenTint: <Color>,
+ *  sheenRoughness: <float>,
  *
  *  transmission: <float>,
  *  transmissionMap: new THREE.Texture( <Image> ),
@@ -34,8 +36,6 @@ import * as MathUtils from '../math/MathUtils.js';
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
-	#transmission = 0;
-
 	constructor( parameters ) {
 
 		super();
@@ -49,7 +49,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.type = 'MeshPhysicalMaterial';
 
-		this.clearcoat = 0.0;
 		this.clearcoatMap = null;
 		this.clearcoatRoughness = 0.0;
 		this.clearcoatRoughnessMap = null;
@@ -72,8 +71,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		} );
 
 		this.sheenTint = new Color( 0x000000 );
+		this.sheenRoughness = 1.0;
 
-		this.transmission = 0.0;
 		this.transmissionMap = null;
 
 		this.thickness = 0.01;
@@ -86,28 +85,67 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularTint = new Color( 1, 1, 1 );
 		this.specularTintMap = null;
 
+		this._sheen = 0.0;
+		this._clearcoat = 0;
+		this._transmission = 0;
+
 		this.setValues( parameters );
 
 	}
 
-	get transmission() {
+	get sheen() {
 
-		return this.#transmission;
+		return this._sheen;
 
 	}
 
-	set transmission( value ) {
+	set sheen( value ) {
 
-		if ( this.#transmission > 0 !== value > 0 ) {
+		if ( this._sheen > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this.#transmission = value;
+		this._sheen = value;
 
 	}
 
+	get clearcoat() {
+
+		return this._clearcoat;
+
+	}
+
+	set clearcoat( value ) {
+
+		if ( this._clearcoat > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._clearcoat = value;
+
+	}
+
+	get transmission() {
+
+		return this._transmission;
+
+	}
+
+	set transmission( value ) {
+
+		if ( this._transmission > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._transmission = value;
+
+	}
 
 	copy( source ) {
 
@@ -129,7 +167,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.ior = source.ior;
 
+		this.sheen = source.sheen;
 		this.sheenTint.copy( source.sheenTint );
+		this.sheenRoughness = source.sheenRoughness;
 
 		this.transmission = source.transmission;
 		this.transmissionMap = source.transmissionMap;

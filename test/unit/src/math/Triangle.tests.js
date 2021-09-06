@@ -1,5 +1,6 @@
 /* global QUnit */
 
+import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { Triangle } from '../../../../src/math/Triangle';
 import { Box3 } from '../../../../src/math/Box3';
 import { Plane } from '../../../../src/math/Plane';
@@ -66,6 +67,18 @@ export default QUnit.module( 'Maths', () => {
 
 			var points = [ one3, one3.clone().negate(), two3 ];
 			a.setFromPointsAndIndices( points, 1, 0, 2 );
+			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
+			assert.ok( a.b.equals( one3 ), "Passed!" );
+			assert.ok( a.c.equals( two3 ), "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromAttributeAndIndices", ( assert ) => {
+
+			var a = new Triangle();
+			var attribute = new BufferAttribute( new Float32Array( [ 1, 1, 1, - 1, - 1, - 1, 2, 2, 2 ] ), 3 );
+
+			a.setFromAttributeAndIndices( attribute, 1, 0, 2 );
 			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
 			assert.ok( a.b.equals( one3 ), "Passed!" );
 			assert.ok( a.c.equals( two3 ), "Passed!" );

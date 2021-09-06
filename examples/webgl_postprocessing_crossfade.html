@@ -21,6 +21,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
 
 			let container, stats;
 			let renderer;
@@ -29,11 +30,10 @@
 			const transitionParams = {
 				'useTexture': true,
 				'transition': 0,
-				'transitionSpeed': 2.0,
 				'texture': 5,
-				'loopTexture': true,
-				'animateTransition': true,
-				'textureThreshold': 0.3
+				'cycle': true,
+				'animate': true,
+				'threshold': 0.3
 			};
 
 			const clock = new THREE.Clock();
@@ -55,10 +55,10 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				const geometryA = new THREE.BoxGeometry( 1, 1, 1 );
+				const geometryA = new THREE.BoxGeometry( 2, 2, 2 );
 				const geometryB = new THREE.IcosahedronGeometry( 1, 1 );
-				const sceneA = new FXScene( geometryA, 5000, 1200, 120, new THREE.Vector3( 0, - 0.4, 0 ), 0xffffff );
-				const sceneB = new FXScene( geometryB, 500, 2000, 50, new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
+				const sceneA = new FXScene( geometryA, new THREE.Vector3( 0, - 0.4, 0 ), 0xffffff );
+				const sceneB = new FXScene( geometryB, new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
 
 				transition = new Transition( sceneA, sceneB );
 
@@ -77,13 +77,14 @@
 
 				const gui = new GUI();
 
+				gui.add( transitionParams, 'animate' );
+				gui.add( transitionParams, 'transition', 0, 1, 0.01 ).listen();
+
 				gui.add( transitionParams, 'useTexture' ).onChange( function ( value ) {
 
 					transition.useTexture( value );
 
 				} );
-
-				gui.add( transitionParams, 'loopTexture' );
 
 				gui.add( transitionParams, 'texture', { Perlin: 0, Squares: 1, Cells: 2, Distort: 3, Gradient: 4, Radial: 5 } ).onChange( function ( value ) {
 
@@ -91,15 +92,13 @@
 
 				} ).listen();
 
-				gui.add( transitionParams, 'textureThreshold', 0, 1, 0.01 ).onChange( function ( value ) {
+				gui.add( transitionParams, 'cycle' );
+
+				gui.add( transitionParams, 'threshold', 0, 1, 0.01 ).onChange( function ( value ) {
 
 					transition.setTextureThreshold( value );
 
 				} );
-
-				gui.add( transitionParams, 'animateTransition' );
-				gui.add( transitionParams, 'transition', 0, 1, 0.01 ).listen();
-				gui.add( transitionParams, 'transitionSpeed', 0.5, 5, 0.01 );
 
 			}
 
@@ -152,12 +151,12 @@
 
 			}
 
-			function FXScene( geometry, numObjects, cameraZ, fov, rotationSpeed, clearColor ) {
+			function FXScene( geometry, rotationSpeed, clearColor ) {
 
 				this.clearColor = clearColor;
 
-				const camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = cameraZ;
+				const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 2000;
 
 				// Setup scene
 				const scene = new THREE.Scene();
@@ -171,7 +170,7 @@
 
 				const color = geometry.type === 'BoxGeometry' ? 0x0000ff : 0xff0000;
 				const material = new THREE.MeshPhongMaterial( { color: color, flatShading: true } );
-				const mesh = generateInstancedMesh( geometry, material, numObjects );
+				const mesh = generateInstancedMesh( geometry, material, 500 );
 				scene.add( mesh );
 
 				const renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -301,7 +300,14 @@
 				material.uniforms.tDiffuse1.value = sceneA.fbo.texture;
 				material.uniforms.tDiffuse2.value = sceneB.fbo.texture;
 
-				this.needChange = false;
+				new TWEEN.Tween( transitionParams )
+					.to( { transition: 1 }, 1500 )
+					.repeat( Infinity )
+					.delay( 2000 )
+					.yoyo( true )
+					.start();
+
+				this.needsTextureChange = false;
 
 				this.setTextureThreshold = function ( value ) {
 
@@ -324,24 +330,34 @@
 				this.render = function ( delta ) {
 
 					// Transition animation
-					if ( transitionParams.animateTransition ) {
+					if ( transitionParams.animate ) {
 
-						const t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
-						transitionParams.transition = THREE.MathUtils.smoothstep( t, 0.3, 0.7 );
+						TWEEN.update();
 
 						// Change the current alpha texture after each transition
-						if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) ) {
+						if ( transitionParams.cycle ) {
 
-							if ( this.needChange ) {
+							if ( transitionParams.transition == 0 || transitionParams.transition == 1 ) {
 
-								transitionParams.texture = ( transitionParams.texture + 1 ) % textures.length;
-								material.uniforms.tMixTexture.value = textures[ transitionParams.texture ];
-								this.needChange = false;
+								if ( this.needsTextureChange ) {
+
+									transitionParams.texture = ( transitionParams.texture + 1 ) % textures.length;
+									material.uniforms.tMixTexture.value = textures[ transitionParams.texture ];
+									this.needsTextureChange = false;
+
+								}
+
+							} else {
+
+								this.needsTextureChange = true;
 
 							}
 
-						} else
-							this.needChange = true;
+						} else {
+
+							this.needsTextureChange = true;
+
+						}
 
 					}
 

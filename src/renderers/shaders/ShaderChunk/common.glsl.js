@@ -55,7 +55,7 @@ struct GeometricContext {
 	vec3 position;
 	vec3 normal;
 	vec3 viewDir;
-#ifdef CLEARCOAT
+#ifdef USE_CLEARCOAT
 	vec3 clearcoatNormal;
 #endif
 };

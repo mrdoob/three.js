@@ -105,9 +105,15 @@ class FunctionNode extends CodeNode {
 				}
 
 				const type = propsMatches[ i ++ ][ 0 ];
+
+				let count = Number.parseInt( propsMatches[ i ][ 0 ] );
+
+				if ( Number.isNaN( count ) === false ) i ++;
+				else count = 0;
+
 				const name = propsMatches[ i ++ ][ 0 ];
 
-				inputs.push( new NodeFunctionInput( type, name, qualifier, isConst ) );
+				inputs.push( new NodeFunctionInput( type, name, qualifier, isConst, count ) );
 
 			}
 
@@ -135,7 +141,7 @@ class FunctionNode extends CodeNode {
 
 	}
 
-	call( parameters = null ) {
+	call( parameters = {} ) {
 
 		return new FunctionCallNode( this, parameters );
 

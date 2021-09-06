@@ -200,14 +200,14 @@ IncidentLight directLight;
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-	irradiance += getLightProbeIrradiance( lightProbe, geometry );
+	irradiance += getLightProbeIrradiance( lightProbe, geometry.normal );
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry.normal );
 
 		}
 		#pragma unroll_loop_end

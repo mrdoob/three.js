@@ -6,7 +6,7 @@ struct PhysicalMaterial {
 	vec3 specularColor;
 	float specularF90;
 
-	#ifdef CLEARCOAT
+	#ifdef USE_CLEARCOAT
 		float clearcoat;
 		float clearcoatRoughness;
 		vec3 clearcoatF0;
@@ -15,6 +15,7 @@ struct PhysicalMaterial {
 
 	#ifdef USE_SHEEN
 		vec3 sheenTint;
+		float sheenRoughness;
 	#endif
 
 };
@@ -120,25 +121,24 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	vec3 irradiance = dotNL * directLight.color;
 
-	#ifdef CLEARCOAT
+	#ifdef USE_CLEARCOAT
 
 		float dotNLcc = saturate( dot( geometry.clearcoatNormal, directLight.direction ) );
 
 		vec3 ccIrradiance = dotNLcc * directLight.color;
 
-		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight, geometry.viewDir, geometry.clearcoatNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.clearcoatNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 
 	#endif
 
 	#ifdef USE_SHEEN
 
-		reflectedLight.directSpecular += irradiance * BRDF_Sheen( material.roughness, directLight.direction, geometry, material.sheenTint );
-
-	#else
-
-		reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.roughness );
+		reflectedLight.directSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenTint, material.sheenRoughness );
 
 	#endif
+
+	reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.roughness );
+
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 }
@@ -151,7 +151,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricCo
 
 void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
-	#ifdef CLEARCOAT
+	#ifdef USE_CLEARCOAT
 
 		clearcoatSpecular += clearcoatRadiance * EnvironmentBRDF( geometry.clearcoatNormal, geometry.viewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 

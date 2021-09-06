@@ -53,17 +53,17 @@ export default /* glsl */`
 
 	}
 
-	vec3 getTransmissionSample( vec2 fragCoord, float roughness, float ior ) {
+	vec4 getTransmissionSample( vec2 fragCoord, float roughness, float ior ) {
 
 		float framebufferLod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );
 
 		#ifdef TEXTURE_LOD_EXT
 
-			return texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod ).rgb;
+			return texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod );
 
 		#else
 
-			return texture2D( transmissionSamplerMap, fragCoord.xy, framebufferLod ).rgb;
+			return texture2D( transmissionSamplerMap, fragCoord.xy, framebufferLod );
 
 		#endif
 
@@ -87,7 +87,7 @@ export default /* glsl */`
 
 	}
 
-	vec3 getIBLVolumeRefraction( vec3 n, vec3 v, float roughness, vec3 diffuseColor, vec3 specularColor, float specularF90,
+	vec4 getIBLVolumeRefraction( vec3 n, vec3 v, float roughness, vec3 diffuseColor, vec3 specularColor, float specularF90,
 		vec3 position, mat4 modelMatrix, mat4 viewMatrix, mat4 projMatrix, float ior, float thickness,
 		vec3 attenuationColor, float attenuationDistance ) {
 
@@ -101,14 +101,14 @@ export default /* glsl */`
 		refractionCoords /= 2.0;
 
 		// Sample framebuffer to get pixel the refracted ray hits.
-		vec3 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
+		vec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
 
-		vec3 attenuatedColor = applyVolumeAttenuation( transmittedLight, length( transmissionRay ), attenuationColor, attenuationDistance );
+		vec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );
 
 		// Get the specular component.
 		vec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );
 
-		return ( 1.0 - F ) * attenuatedColor * diffuseColor;
+		return vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );
 
 	}
 #endif

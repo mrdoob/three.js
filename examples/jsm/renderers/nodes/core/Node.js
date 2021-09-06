@@ -22,6 +22,12 @@ class Node {
 
 	}
 
+	getTypeLength( builder ) {
+
+		return builder.getTypeLength( this.getType( builder ) );
+
+	}
+
 	update( /*frame*/ ) {
 
 		console.warn( 'Abstract function.' );
@@ -31,20 +37,6 @@ class Node {
 	generate( /*builder, output*/ ) {
 
 		console.warn( 'Abstract function.' );
-
-	}
-
-	buildStage( builder, shaderStage, output = null ) {
-
-		const oldShaderStage = builder.shaderStage;
-
-		builder.shaderStage = shaderStage;
-
-		const snippet = this.build( builder, output );
-
-		builder.shaderStage = oldShaderStage;
-
-		return snippet;
 
 	}
 

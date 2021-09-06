@@ -99,12 +99,10 @@ class WebGPUBindings {
 
 			if ( isShared && isUpdated ) continue;
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
-				const array = binding.array;
+				const buffer = binding.getBuffer();
 				const bufferGPU = binding.bufferGPU;
-
-				binding.onBeforeUpdate( object, camera );
 
 				const needsBufferWrite = binding.update();
 
@@ -113,7 +111,7 @@ class WebGPUBindings {
 					this.device.queue.writeBuffer(
 						bufferGPU,
 						0,
-						array,
+						buffer,
 						0
 					);
 
@@ -181,13 +179,11 @@ class WebGPUBindings {
 
 		for ( const binding of bindings ) {
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
 				if ( binding.bufferGPU === null ) {
 
 					const byteLength = binding.getByteLength();
-
-					binding.array = new Float32Array( new ArrayBuffer( byteLength ) );
 
 					binding.bufferGPU = this.device.createBuffer( {
 						size: byteLength,
