@@ -17,9 +17,17 @@ class TextureNode extends InputNode {
 
 	generate( builder, output ) {
 
-		if ( output === 'sampler2D' ) {
+		const type = this.getType( builder );
 
-			return super.generate( builder, output );
+		const textureProperty = super.generate( builder, type );
+
+		if ( output === 'sampler2D' || output === 'texture2D' ) {
+
+			return textureProperty;
+
+		} else if ( output === 'sampler' ) {
+
+			return textureProperty + '_sampler';
 
 		} else {
 
@@ -28,10 +36,6 @@ class TextureNode extends InputNode {
 			let colorSpace = nodeData.colorSpace;
 
 			if ( colorSpace === undefined ) {
-
-				const type = this.getType( builder );
-
-				const textureProperty = super.generate( builder, type );
 
 				const uvSnippet = this.uv.build( builder, 'vec2' );
 				const bias = this.bias;
