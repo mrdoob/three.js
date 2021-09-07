@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        CI: [ 0, 1, 2, 3 ]
+        CI: [ 0, 1, 2, 3, 4, 5, 6, 7 ]
     env:
       CI: ${{ matrix.CI }}
       FORCE_COLOR: 1
