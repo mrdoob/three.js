@@ -179,7 +179,7 @@
 
 					rayCaster.setFromCamera( mouse, camera );
 					action = ACTION_NONE;
-					const intersects = rayCaster.intersectObjects( curveHandles );
+					const intersects = rayCaster.intersectObjects( curveHandles, false );
 					if ( intersects.length ) {
 
 						const target = intersects[ 0 ].object;
