@@ -673,6 +673,23 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "random", ( assert ) => {
+
+			var a = new Quaternion();
+
+			a.random();
+
+			var identity = new Quaternion();
+			assert.notDeepEqual(
+				a,
+				identity,
+				'randomizes at least one component of the quaternion'
+			);
+
+			assert.ok( ( 1 - a.length() ) <= Number.EPSILON, 'produces a normalized quaternion' );
+
+		} );
+
 		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
