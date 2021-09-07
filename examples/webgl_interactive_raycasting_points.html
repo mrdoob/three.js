@@ -245,7 +245,7 @@
 
 				raycaster.setFromCamera( pointer, camera );
 
-				const intersections = raycaster.intersectObjects( pointclouds );
+				const intersections = raycaster.intersectObjects( pointclouds, false );
 				intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
 
 				if ( toggle > 0.02 && intersection !== null ) {
