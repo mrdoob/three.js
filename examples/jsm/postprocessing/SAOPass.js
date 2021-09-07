@@ -81,7 +81,7 @@ class SAOPass extends Pass {
 
 		if ( this.supportsDepthTextureExtension ) {
 
-			const depthTexture = new DepthTexture();
+			depthTexture = new DepthTexture();
 			depthTexture.type = UnsignedShortType;
 
 			this.beautyRenderTarget.depthTexture = depthTexture;
