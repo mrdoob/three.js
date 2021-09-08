@@ -109,9 +109,9 @@
 
 			const keyStates = {};
 
-			const t_vector = new THREE.Vector3();
-			const t_vector2 = new THREE.Vector3();
-			const t_vector3 = new THREE.Vector3();
+			const vector1 = new THREE.Vector3();
+			const vector2 = new THREE.Vector3();
+			const vector3 = new THREE.Vector3();
 
 			document.addEventListener( 'keydown', ( event ) => {
 
@@ -171,7 +171,7 @@
 
 				// throw the ball with more force if we hold the button longer, and if we move forward
 
-				let impulse = 15 + 30 * ( 1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ));
+				const impulse = 15 + 30 * ( 1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ) );
 
 				sphere.velocity.copy( playerDirection ).multiplyScalar( impulse );
 				sphere.velocity.addScaledVector( playerVelocity, 2 );
@@ -228,7 +228,7 @@
 
 			function playerSphereCollision( sphere ) {
 
-				const center = t_vector.addVectors( playerCollider.start, playerCollider.end ).multiplyScalar( 0.5 );
+				const center = vector1.addVectors( playerCollider.start, playerCollider.end ).multiplyScalar( 0.5 );
 
 				const sphere_center = sphere.collider.center;
 
@@ -237,15 +237,15 @@
 
 				// approximation: player = 3 spheres
 
-				for ( let point of [ playerCollider.start, playerCollider.end, center ] ) {
+				for ( const point of [ playerCollider.start, playerCollider.end, center ] ) {
 
 					const d2 = point.distanceToSquared( sphere_center );
 
 					if ( d2 < r2 ) {
 
-						const normal = t_vector.subVectors( point, sphere_center ).normalize();
-						const v1 = t_vector2.copy( normal ).multiplyScalar( normal.dot( playerVelocity ) );
-						const v2 = t_vector3.copy( normal ).multiplyScalar( normal.dot( sphere.velocity ) );
+						const normal = vector1.subVectors( point, sphere_center ).normalize();
+						const v1 = vector2.copy( normal ).multiplyScalar( normal.dot( playerVelocity ) );
+						const v2 = vector3.copy( normal ).multiplyScalar( normal.dot( sphere.velocity ) );
 
 						playerVelocity.add( v2 ).sub( v1 );
 						sphere.velocity.add( v1 ).sub( v2 );
@@ -256,6 +256,7 @@
 					}
 
 				}
+
 			}
 
 			function spheresCollisions() {
@@ -274,9 +275,9 @@
 
 						if ( d2 < r2 ) {
 
-							const normal = t_vector.subVectors( s1.collider.center, s2.collider.center ).normalize();
-							const v1 = t_vector2.copy( normal ).multiplyScalar( normal.dot( s1.velocity ) );
-							const v2 = t_vector3.copy( normal ).multiplyScalar( normal.dot( s2.velocity ) );
+							const normal = vector1.subVectors( s1.collider.center, s2.collider.center ).normalize();
+							const v1 = vector2.copy( normal ).multiplyScalar( normal.dot( s1.velocity ) );
+							const v2 = vector3.copy( normal ).multiplyScalar( normal.dot( s2.velocity ) );
 
 							s1.velocity.add( v2 ).sub( v1 );
 							s2.velocity.add( v1 ).sub( v2 );
@@ -322,7 +323,7 @@
 
 				spheresCollisions();
 
-				for ( let sphere of spheres ) {
+				for ( const sphere of spheres ) {
 
 					sphere.mesh.position.copy( sphere.collider.center );
 
@@ -354,7 +355,7 @@
 			function controls( deltaTime ) {
 
 				// gives a bit of air control
-				let speedDelta = deltaTime * ( playerOnFloor ? 25 : 8 );
+				const speedDelta = deltaTime * ( playerOnFloor ? 25 : 8 );
 
 				if ( keyStates[ 'KeyW' ] ) {
 
@@ -428,7 +429,7 @@
 				// we look for collisions in substeps to mitigate the risk of
 				// an object traversing another too quickly for detection.
 
-				for ( let i = 0 ; i < STEPS_PER_FRAME ; i ++ ) {
+				for ( let i = 0; i < STEPS_PER_FRAME; i ++ ) {
 
 					controls( deltaTime );
 
@@ -445,7 +446,6 @@
 				requestAnimationFrame( animate );
 
 			}
-
 
 		</script>
 	</body>
