@@ -143,8 +143,8 @@ const pup = puppeteer.launch( {
 	let pageSize, file, attemptProgress;
 	const failedScreenshots = [];
 	const isParallel = 'CI' in process.env;
-	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
-	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 4 ) : files.length;
+	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 8 ) : 0;
+	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 8 ) : files.length;
 
 	for ( let id = beginId; id < endId; ++ id ) {
 
