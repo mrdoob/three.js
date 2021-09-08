@@ -53,7 +53,6 @@
 		const exitSearchButton = document.getElementById( 'exitSearchButton' );
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const filterInput = document.getElementById( 'filterInput' );
-		const sectionLink = document.querySelector('#sections > a');
 		let iframe = document.querySelector( 'iframe' );
 
 		const pageProperties = {};
@@ -185,10 +184,6 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter();
-
-			} else {
-
-				updateLink('');
 
 			}
 
@@ -391,31 +386,6 @@
 			}
 
 			displayFilteredPanel();
-
-			updateLink(v);
-
-		}
-
-		function updateLink(search) {
-
-			// update examples link
-
-			if ( ! sectionLink.href2 ) {
-
-				sectionLink.href2 = sectionLink.href;
-
-			}
-
-			if (search) {
-
-				let link = sectionLink.href.split(/[?#]/)[0];
-				sectionLink.href = `${link}?q=${search}`;
-
-			} else {
-
-				sectionLink.href = sectionLink.href2;
-
-			}
 
 		}
 
