@@ -105,6 +105,7 @@
 			const playerDirection = new THREE.Vector3();
 
 			let playerOnFloor = false;
+			let mouseTime = 0;
 
 			const keyStates = {};
 
@@ -127,6 +128,14 @@
 			document.addEventListener( 'mousedown', () => {
 
 				document.body.requestPointerLock();
+
+				mouseTime = performance.now();
+
+			} );
+
+			document.addEventListener( 'mouseup', () => {
+
+				throwBall();
 
 			} );
 
@@ -152,18 +161,30 @@
 
 			}
 
-			document.addEventListener( 'click', () => {
+			function throwBall() {
 
 				const sphere = spheres[ sphereIdx ];
 
 				camera.getWorldDirection( playerDirection );
 
 				sphere.collider.center.copy( playerCollider.end );
-				sphere.velocity.copy( playerDirection ).multiplyScalar( 30 );
+
+				// throw the ball with more force if we hold the button longer, and if we move forward
+
+				let impulse = 15;
+
+				if (mouseTime) {
+
+					impulse += 30 * (1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ));
+
+				}
+
+				sphere.velocity.copy( playerDirection ).multiplyScalar( impulse );
+				sphere.velocity.addScaledVector( playerVelocity, 2 );
 
 				sphereIdx = ( sphereIdx + 1 ) % spheres.length;
 
-			} );
+			}
 
 			function playerCollisions() {
 
@@ -189,16 +210,18 @@
 
 			function updatePlayer( deltaTime ) {
 
-				if ( playerOnFloor ) {
+				let damping = Math.exp( - 4 * deltaTime ) - 1;
 
-					const damping = Math.exp( - 3 * deltaTime ) - 1;
-					playerVelocity.addScaledVector( playerVelocity, damping );
-
-				} else {
+				if ( ! playerOnFloor ) {
 
 					playerVelocity.y -= GRAVITY * deltaTime;
 
+					// small air resistance
+					damping *= 0.1;
+
 				}
+
+				playerVelocity.addScaledVector( playerVelocity, damping );
 
 				const deltaPosition = playerVelocity.clone().multiplyScalar( deltaTime );
 				playerCollider.translate( deltaPosition );
@@ -302,33 +325,34 @@
 
 			function controls( deltaTime ) {
 
-				const speed = 25;
+				// gives a bit of air control
+				let speedDelta = deltaTime * ( playerOnFloor ? 25 : 8 );
+
+				if ( keyStates[ 'KeyW' ] ) {
+
+					playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
+
+				}
+
+				if ( keyStates[ 'KeyS' ] ) {
+
+					playerVelocity.add( getForwardVector().multiplyScalar( - speedDelta ) );
+
+				}
+
+				if ( keyStates[ 'KeyA' ] ) {
+
+					playerVelocity.add( getSideVector().multiplyScalar( - speedDelta ) );
+
+				}
+
+				if ( keyStates[ 'KeyD' ] ) {
+
+					playerVelocity.add( getSideVector().multiplyScalar( speedDelta ) );
+
+				}
 
 				if ( playerOnFloor ) {
-
-					if ( keyStates[ 'KeyW' ] ) {
-
-						playerVelocity.add( getForwardVector().multiplyScalar( speed * deltaTime ) );
-
-					}
-
-					if ( keyStates[ 'KeyS' ] ) {
-
-						playerVelocity.add( getForwardVector().multiplyScalar( - speed * deltaTime ) );
-
-					}
-
-					if ( keyStates[ 'KeyA' ] ) {
-
-						playerVelocity.add( getSideVector().multiplyScalar( - speed * deltaTime ) );
-
-					}
-
-					if ( keyStates[ 'KeyD' ] ) {
-
-						playerVelocity.add( getSideVector().multiplyScalar( speed * deltaTime ) );
-
-					}
 
 					if ( keyStates[ 'Space' ] ) {
 
