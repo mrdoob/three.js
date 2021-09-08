@@ -74,7 +74,7 @@
 
 			const GRAVITY = 30;
 
-			const NUM_SPHERES = 20;
+			const NUM_SPHERES = 100;
 			const SPHERE_RADIUS = 0.2;
 
 			const STEPS_PER_FRAME = 5;
@@ -107,6 +107,10 @@
 			let playerOnFloor = false;
 
 			const keyStates = {};
+
+			const t_vector = new THREE.Vector3();
+			const t_vector2 = new THREE.Vector3();
+			const t_vector3 = new THREE.Vector3();
 
 			document.addEventListener( 'keydown', ( event ) => {
 
@@ -161,7 +165,7 @@
 
 			} );
 
-			function playerCollitions() {
+			function playerCollisions() {
 
 				const result = worldOctree.capsuleIntersect( playerCollider );
 
@@ -199,7 +203,7 @@
 				const deltaPosition = playerVelocity.clone().multiplyScalar( deltaTime );
 				playerCollider.translate( deltaPosition );
 
-				playerCollitions();
+				playerCollisions();
 
 				camera.position.copy( playerCollider.end );
 
@@ -221,9 +225,10 @@
 
 						if ( d2 < r2 ) {
 
-							const normal = s1.collider.clone().center.sub( s2.collider.center ).normalize();
-							const v1 = normal.clone().multiplyScalar( normal.dot( s1.velocity ) );
-							const v2 = normal.clone().multiplyScalar( normal.dot( s2.velocity ) );
+							const normal = t_vector.subVectors(s1.collider.center, s2.collider.center).normalize();
+							const v1 = t_vector2.copy(normal).multiplyScalar( normal.dot( s1.velocity ) );
+							const v2 = t_vector3.copy(normal).multiplyScalar( normal.dot( s2.velocity ) );
+
 							s1.velocity.add( v2 ).sub( v1 );
 							s2.velocity.add( v1 ).sub( v2 );
 
@@ -242,7 +247,7 @@
 
 			function updateSpheres( deltaTime ) {
 
-				spheres.forEach( sphere =>{
+				spheres.forEach( sphere => {
 
 					sphere.collider.center.addScaledVector( sphere.velocity, deltaTime );
 
@@ -262,11 +267,15 @@
 					const damping = Math.exp( - 1.5 * deltaTime ) - 1;
 					sphere.velocity.addScaledVector( sphere.velocity, damping );
 
-					spheresCollisions();
+				} );
+
+				spheresCollisions();
+
+				for (let sphere of spheres) {
 
 					sphere.mesh.position.copy( sphere.collider.center );
 
-				} );
+				}
 
 			}
 
