@@ -167,15 +167,15 @@
 
 				camera.getWorldDirection( playerDirection );
 
-				sphere.collider.center.copy( playerCollider.end );
+				sphere.collider.center.copy( playerCollider.end ).addScaledVector( playerDirection , playerCollider.radius * 1.5);
 
 				// throw the ball with more force if we hold the button longer, and if we move forward
 
 				let impulse = 15;
 
-				if (mouseTime) {
+				if ( mouseTime ) {
 
-					impulse += 30 * (1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ));
+					impulse += 30 * ( 1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ));
 
 				}
 
@@ -232,13 +232,45 @@
 
 			}
 
+			function playerSphereCollision( sphere ) {
+
+				const center = t_vector.addVectors( playerCollider.start, playerCollider.end ).multiplyScalar( 0.5 );
+
+				const sphere_center = sphere.collider.center;
+
+				const r = playerCollider.radius + sphere.collider.radius;
+				const r2 = r * r;
+
+				// approximation: player = 3 spheres
+
+				for ( let point of [ playerCollider.start, playerCollider.end, center ] ) {
+
+					const d2 = point.distanceToSquared( sphere_center );
+
+					if ( d2 < r2 ) {
+
+						const normal = t_vector.subVectors( point, sphere_center ).normalize();
+						const v1 = t_vector2.copy( normal ).multiplyScalar( normal.dot( playerVelocity ) );
+						const v2 = t_vector3.copy( normal ).multiplyScalar( normal.dot( sphere.velocity ) );
+
+						playerVelocity.add( v2 ).sub( v1 );
+						sphere.velocity.add( v1 ).sub( v2 );
+
+						const d = ( r - Math.sqrt( d2 ) ) / 2;
+						sphere_center.addScaledVector( normal, - d );
+
+					}
+
+				}
+			}
+
 			function spheresCollisions() {
 
-				for ( let i = 0; i < spheres.length; i ++ ) {
+				for ( let i = 0, length = spheres.length; i < length; i ++ ) {
 
 					const s1 = spheres[ i ];
 
-					for ( let j = i + 1; j < spheres.length; j ++ ) {
+					for ( let j = i + 1; j < length; j ++ ) {
 
 						const s2 = spheres[ j ];
 
@@ -248,9 +280,9 @@
 
 						if ( d2 < r2 ) {
 
-							const normal = t_vector.subVectors(s1.collider.center, s2.collider.center).normalize();
-							const v1 = t_vector2.copy(normal).multiplyScalar( normal.dot( s1.velocity ) );
-							const v2 = t_vector3.copy(normal).multiplyScalar( normal.dot( s2.velocity ) );
+							const normal = t_vector.subVectors( s1.collider.center, s2.collider.center ).normalize();
+							const v1 = t_vector2.copy( normal ).multiplyScalar( normal.dot( s1.velocity ) );
+							const v2 = t_vector3.copy( normal ).multiplyScalar( normal.dot( s2.velocity ) );
 
 							s1.velocity.add( v2 ).sub( v1 );
 							s2.velocity.add( v1 ).sub( v2 );
@@ -290,11 +322,13 @@
 					const damping = Math.exp( - 1.5 * deltaTime ) - 1;
 					sphere.velocity.addScaledVector( sphere.velocity, damping );
 
+					playerSphereCollision( sphere );
+
 				} );
 
 				spheresCollisions();
 
-				for (let sphere of spheres) {
+				for ( let sphere of spheres ) {
 
 					sphere.mesh.position.copy( sphere.collider.center );
 
