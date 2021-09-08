@@ -142,7 +142,6 @@ const pup = puppeteer.launch( {
 
 	let pageSize, file, attemptProgress;
 	const failedScreenshots = [];
-	const parallel
 
 	let beginId = 0;
 	let endId = files.length;
