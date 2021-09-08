@@ -229,6 +229,7 @@
 		"webgl_materials_compile",
 		"webgl_materials_envmaps_hdr_nodes",
 		"webgl_materials_envmaps_pmrem_nodes",
+		"webgl_materials_instance_uniform_nodes",
 		"webgl_materials_nodes",
 		"webgl_materials_standard_nodes",
 		"webgl_mirror_nodes",
