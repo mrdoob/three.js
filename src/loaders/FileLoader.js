@@ -55,148 +55,179 @@ class FileLoader extends Loader {
 
 		}
 
-		// Check for data: URI
-		const dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
-		const dataUriRegexResult = url.match( dataUriRegex );
-		let request;
+		// Initialise array for duplicate requests
+		loading[ url ] = [];
 
-		// Safari can not handle Data URIs through XMLHttpRequest so process manually
-		if ( dataUriRegexResult ) {
+		loading[ url ].push( {
+			onLoad: onLoad,
+			onProgress: onProgress,
+			onError: onError,
+		} );
 
-			const mimeType = dataUriRegexResult[ 1 ];
-			const isBase64 = !! dataUriRegexResult[ 2 ];
+		// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType
+		// if (this.responseType !== undefined) {
+		//   request.responseType = this.responseType;
+		// }
 
-			let data = dataUriRegexResult[ 3 ];
-			data = decodeURIComponent( data );
+		// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+		// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#sending_a_request_with_credentials_included
+		// if (this.withCredentials !== undefined) {
+		//   request.withCredentials = this.withCredentials;
+		// }
 
-			if ( isBase64 ) data = atob( data );
+		// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/overrideMimeType
+		// if (request.overrideMimeType) {
+		//   request.overrideMimeType(
+		//     this.mimeType !== undefined ? this.mimeType : "text/plain",
+		//   );
+		// }
 
-			try {
+		// TODO-DefinitelyMaybe: Confirm if Safari can handle Data URIs through fetch
 
-				let response;
-				const responseType = ( this.responseType || '' ).toLowerCase();
+		// create request
+		const req = new Request( url, {
+			method: 'GET',
+			headers: new Headers( this.requestHeader ),
+			// signal: this.signal ? this.signal : undefined, // An abort signal for those that use it
+		} );
 
-				switch ( responseType ) {
+		// start the fetch
+		fetch( req )
+			.then( ( res ) => {
 
-					case 'arraybuffer':
-					case 'blob':
+				// https://xhr.spec.whatwg.org/#the-response-attribute
 
-						const view = new Uint8Array( data.length );
-
-						for ( let i = 0; i < data.length; i ++ ) {
-
-							view[ i ] = data.charCodeAt( i );
-
-						}
-
-						if ( responseType === 'blob' ) {
-
-							response = new Blob( [ view.buffer ], { type: mimeType } );
-
-						} else {
-
-							response = view.buffer;
-
-						}
-
-						break;
-
-					case 'document':
-
-						const parser = new DOMParser();
-						response = parser.parseFromString( data, mimeType );
-
-						break;
-
-					case 'json':
-
-						response = JSON.parse( data );
-
-						break;
-
-					default: // 'text' or other
-
-						response = data;
-
-						break;
-
-				}
-
-				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
-				setTimeout( function () {
-
-					if ( onLoad ) onLoad( response );
-
-					scope.manager.itemEnd( url );
-
-				}, 0 );
-
-			} catch ( error ) {
-
-				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
-				setTimeout( function () {
-
-					if ( onError ) onError( error );
-
-					scope.manager.itemError( url );
-					scope.manager.itemEnd( url );
-
-				}, 0 );
-
-			}
-
-		} else {
-
-			// Initialise array for duplicate requests
-
-			loading[ url ] = [];
-
-			loading[ url ].push( {
-
-				onLoad: onLoad,
-				onProgress: onProgress,
-				onError: onError
-
-			} );
-
-			request = new XMLHttpRequest();
-
-			request.open( 'GET', url, true );
-
-			request.addEventListener( 'load', function ( event ) {
-
-				const response = this.response;
-
-				const callbacks = loading[ url ];
-
-				delete loading[ url ];
-
-				if ( this.status === 200 || this.status === 0 ) {
+				if ( res.status === 200 || res.status === 0 ) {
 
 					// Some browsers return HTTP Status 0 when using non-http protocol
 					// e.g. 'file://' or 'data://'. Handle as success.
 
-					if ( this.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+					if ( res.status === 0 ) {
 
-					// Add to cache only on HTTP success, so that we do not cache
-					// error response bodies as proper responses to requests.
-					Cache.add( url, response );
-
-					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-						const callback = callbacks[ i ];
-						if ( callback.onLoad ) callback.onLoad( response );
+						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
 					}
 
-					scope.manager.itemEnd( url );
+					switch ( this.responseType ) {
+
+						case 'arraybuffer':
+							// Add to cache only on HTTP success, so that we do not cache
+							// error response bodies as proper responses to requests.
+							res.arrayBuffer()
+								.then( ab => {
+
+									Cache.add( url, ab );
+
+									const callbacks = loading[ url ];
+									delete loading[ url ];
+
+									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+										const callback = callbacks[ i ];
+										if ( callback.onLoad ) callback.onLoad( ab );
+
+									}
+
+									scope.manager.itemEnd( url );
+
+								} );
+							break;
+						case 'blob':
+							res.blob()
+								.then( blob => {
+
+									Cache.add( url, blob );
+
+									const callbacks = loading[ url ];
+									delete loading[ url ];
+
+									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+										const callback = callbacks[ i ];
+										if ( callback.onLoad ) callback.onLoad( blob );
+
+									}
+
+									scope.manager.itemEnd( url );
+
+								} );
+							break;
+						case 'document':
+							res.text()
+								.then( text => {
+
+									const parser = new DOMParser();
+									const dom = parser.parseFromString( text, this.mimeType );
+
+									Cache.add( url, dom );
+
+									const callbacks = loading[ url ];
+									delete loading[ url ];
+
+									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+										const callback = callbacks[ i ];
+										if ( callback.onLoad ) callback.onLoad( dom );
+
+									}
+
+									scope.manager.itemEnd( url );
+
+								} );
+							break;
+						case 'json':
+							res.json()
+								.then( json => {
+
+									Cache.add( url, json );
+
+									const callbacks = loading[ url ];
+									delete loading[ url ];
+
+									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+										const callback = callbacks[ i ];
+										if ( callback.onLoad ) callback.onLoad( json );
+
+									}
+
+									scope.manager.itemEnd( url );
+
+								} );
+							break;
+						default: // 'text' or other
+							// TODO-DefinitelyMaybe: assuming text. Could've gone for `new File([Blob])`?
+							res.text()
+								.then( text => {
+
+									Cache.add( url, text );
+
+									const callbacks = loading[ url ];
+									delete loading[ url ];
+
+									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+										const callback = callbacks[ i ];
+										if ( callback.onLoad ) callback.onLoad( text );
+
+									}
+
+									scope.manager.itemEnd( url );
+
+								} );
+							break;
+
+					}
 
 				} else {
+
+					const callbacks = loading[ url ];
+					delete loading[ url ];
 
 					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
 						const callback = callbacks[ i ];
-						if ( callback.onError ) callback.onError( event );
+						if ( callback.onError ) callback.onError( res.statusText );
 
 					}
 
@@ -205,75 +236,38 @@ class FileLoader extends Loader {
 
 				}
 
-			}, false );
+			} )
+			.catch( ( err ) => {
 
-			request.addEventListener( 'progress', function ( event ) {
-
-				const callbacks = loading[ url ];
-
-				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-					const callback = callbacks[ i ];
-					if ( callback.onProgress ) callback.onProgress( event );
-
-				}
-
-			}, false );
-
-			request.addEventListener( 'error', function ( event ) {
+				// Abort errors and other errors are handled the same
 
 				const callbacks = loading[ url ];
-
 				delete loading[ url ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
 					const callback = callbacks[ i ];
-					if ( callback.onError ) callback.onError( event );
+					if ( callback.onError ) callback.onError( err );
 
 				}
 
 				scope.manager.itemError( url );
 				scope.manager.itemEnd( url );
 
-			}, false );
+			} );
+		// Straight after the fetch is initiated we can call the "progress" events
+		const callbacks = loading[ url ];
 
-			request.addEventListener( 'abort', function ( event ) {
+		for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-				const callbacks = loading[ url ];
-
-				delete loading[ url ];
-
-				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-					const callback = callbacks[ i ];
-					if ( callback.onError ) callback.onError( event );
-
-				}
-
-				scope.manager.itemError( url );
-				scope.manager.itemEnd( url );
-
-			}, false );
-
-			if ( this.responseType !== undefined ) request.responseType = this.responseType;
-			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
-
-			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
-
-			for ( const header in this.requestHeader ) {
-
-				request.setRequestHeader( header, this.requestHeader[ header ] );
-
-			}
-
-			request.send( null );
+			const callback = callbacks[ i ];
+			if ( callback.onProgress ) callback.onProgress();
 
 		}
 
 		scope.manager.itemStart( url );
 
-		return request;
+		return;
 
 	}
 
