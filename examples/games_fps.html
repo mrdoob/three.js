@@ -171,13 +171,7 @@
 
 				// throw the ball with more force if we hold the button longer, and if we move forward
 
-				let impulse = 15;
-
-				if ( mouseTime ) {
-
-					impulse += 30 * ( 1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ));
-
-				}
+				let impulse = 15 + 30 * ( 1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ));
 
 				sphere.velocity.copy( playerDirection ).multiplyScalar( impulse );
 				sphere.velocity.addScaledVector( playerVelocity, 2 );
