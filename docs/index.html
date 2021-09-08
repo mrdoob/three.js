@@ -53,7 +53,7 @@
 		const exitSearchButton = document.getElementById( 'exitSearchButton' );
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const filterInput = document.getElementById( 'filterInput' );
-		const sectionLink = document.querySelector('#sections > a');
+		const sectionLink = document.querySelector( '#sections > a' );
 		let iframe = document.querySelector( 'iframe' );
 
 		const pageProperties = {};
@@ -188,7 +188,7 @@
 
 			} else {
 
-				updateLink('');
+				updateLink( '' );
 
 			}
 
@@ -396,7 +396,7 @@
 
 		}
 
-		function updateLink(search) {
+		function updateLink( search ) {
 
 			// update examples link
 
@@ -406,9 +406,9 @@
 
 			}
 
-			if (search) {
+			if ( search ) {
 
-				let link = sectionLink.href.split(/[?#]/)[0];
+				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
 				sectionLink.href = `${link}?q=${search}`;
 
 			} else {

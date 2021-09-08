@@ -53,7 +53,7 @@
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
-		const sectionLink = document.querySelector('#sections > a');
+		const sectionLink = document.querySelector( '#sections > a' );
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 
 		const links = {};
@@ -122,7 +122,7 @@
 
 			} else {
 
-				updateLink('');
+				updateLink( '' );
 
 			}
 
@@ -275,7 +275,7 @@
 
 		}
 
-		function updateLink(search) {
+		function updateLink( search ) {
 
 			// update examples link
 
@@ -285,9 +285,9 @@
 
 			}
 
-			if (search) {
+			if ( search ) {
 
-				let link = sectionLink.href.split(/[?#]/)[0];
+				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
 				sectionLink.href = `${link}?q=${search}`;
 
 			} else {
