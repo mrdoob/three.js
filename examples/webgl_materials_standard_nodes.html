@@ -36,7 +36,7 @@
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
 			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
-			import SwitchNode from './jsm/renderers/nodes/utils/SwitchNode.js';
+			import SplitNode from './jsm/renderers/nodes/utils/SplitNode.js';
 			import NormalMapNode from './jsm/renderers/nodes/display/NormalMapNode.js';
 
 			let container, stats;
@@ -99,8 +99,8 @@
 						material.colorNode = new OperatorNode( '*', new TextureNode( diffuseMap ), new Vector3Node( material.color ) );
 
 						// roughness is in G channel, metalness is in B channel
-						material.roughnessNode = new SwitchNode( mpMapNode, 'g' );
-						material.metalnessNode = new SwitchNode( mpMapNode, 'b' );
+						material.roughnessNode = new SplitNode( mpMapNode, 'g' );
+						material.metalnessNode = new SplitNode( mpMapNode, 'b' );
 
 						material.normalNode = new NormalMapNode( new TextureNode( normalMap ) );
 

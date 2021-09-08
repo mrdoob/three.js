@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 
-class SwitchNode extends Node {
+class SplitNode extends Node {
 
 	constructor( node, components = 'x' ) {
 
@@ -30,4 +30,4 @@ class SwitchNode extends Node {
 
 }
 
-export default SwitchNode;
+export default SplitNode;
