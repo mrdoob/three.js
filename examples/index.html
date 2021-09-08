@@ -53,7 +53,7 @@
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
-
+		const sectionLink = document.querySelector('#sections > a');
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 
 		const links = {};
@@ -119,6 +119,10 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter( files, tags );
+
+			} else {
+
+				updateLink('');
 
 			}
 
@@ -266,6 +270,31 @@
 			}
 
 			layoutList( files );
+
+			updateLink( v );
+
+		}
+
+		function updateLink(search) {
+
+			// update examples link
+
+			if ( ! sectionLink.href2 ) {
+
+				sectionLink.href2 = sectionLink.href;
+
+			}
+
+			if (search) {
+
+				let link = sectionLink.href.split(/[?#]/)[0];
+				sectionLink.href = `${link}?q=${search}`;
+
+			} else {
+
+				sectionLink.href = sectionLink.href2;
+
+			}
 
 		}
 
