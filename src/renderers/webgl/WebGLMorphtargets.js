@@ -24,9 +24,7 @@ function denormalize( morph, attribute ) {
 	if ( array instanceof Int16Array ) denominator = 32767;
 	if ( array instanceof Int32Array ) denominator = 2147483647;
 
-	morph.x /= denominator;
-	morph.y /= denominator;
-	morph.z /= denominator;
+	morph.divideScalar( denominator );
 
 }
 
