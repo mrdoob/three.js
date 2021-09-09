@@ -17,12 +17,13 @@ function absNumericalSort( a, b ) {
 
 function denormalize( morph, attribute ) {
 
-	let denominator = 0;
+	let denominator = 1;
 	const array = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
 
 	if ( array instanceof Int8Array ) denominator = 127;
-	if ( array instanceof Int16Array ) denominator = 32767;
-	if ( array instanceof Int32Array ) denominator = 2147483647;
+	else if ( array instanceof Int16Array ) denominator = 32767;
+	else if ( array instanceof Int32Array ) denominator = 2147483647;
+	else console.error( 'THREE.WebGLMorphtargets: Unsupported morph attribute data type: ', array );
 
 	morph.divideScalar( denominator );
 
