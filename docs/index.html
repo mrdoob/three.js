@@ -53,8 +53,10 @@
 		const exitSearchButton = document.getElementById( 'exitSearchButton' );
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const filterInput = document.getElementById( 'filterInput' );
-		const sectionLink = document.querySelector( '#sections > a' );
 		let iframe = document.querySelector( 'iframe' );
+
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
 
 		const pageProperties = {};
 		const titles = {};
@@ -400,12 +402,6 @@
 
 			// update examples link
 
-			if ( ! sectionLink.href2 ) {
-
-				sectionLink.href2 = sectionLink.href;
-
-			}
-
 			if ( search ) {
 
 				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
@@ -413,7 +409,7 @@
 
 			} else {
 
-				sectionLink.href = sectionLink.href2;
+				sectionLink.href = sectionDefaultHref;
 
 			}
 

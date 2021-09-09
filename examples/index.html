@@ -53,8 +53,10 @@
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
-		const sectionLink = document.querySelector( '#sections > a' );
 		const previewsToggler = document.getElementById( 'previewsToggler' );
+
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
 
 		const links = {};
 		const validRedirects = new Map();
@@ -277,13 +279,7 @@
 
 		function updateLink( search ) {
 
-			// update examples link
-
-			if ( ! sectionLink.href2 ) {
-
-				sectionLink.href2 = sectionLink.href;
-
-			}
+			// update docs link
 
 			if ( search ) {
 
@@ -292,7 +288,7 @@
 
 			} else {
 
-				sectionLink.href = sectionLink.href2;
+				sectionLink.href = sectionDefaultHref;
 
 			}
 
