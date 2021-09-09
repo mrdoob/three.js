@@ -337,12 +337,6 @@
 	
 				this._mouseOp = this.getOpFromAction( event.button, modifier );
 				if ( this._mouseOp != null ) {
-	
-					if ( event.button == 1 ) {
-	
-						event.preventDefault();
-		
-					}
 		
 					window.addEventListener( 'pointermove', this.onPointerMove );
 					window.addEventListener( 'pointerup', this.onPointerUp );
@@ -1559,13 +1553,15 @@
 		initializeMouseActions = () => {
 
 			this.setMouseAction( 'PAN', 0, 'CTRL' );
-			this.setMouseAction( 'PAN', 1 );
-
+			this.setMouseAction( 'PAN', 2 );
+	
 			this.setMouseAction( 'ROTATE', 0 );
-
+	
 			this.setMouseAction( 'ZOOM', 'WHEEL' );
-
+			this.setMouseAction( 'ZOOM', 1 );
+	
 			this.setMouseAction( 'FOV', 'WHEEL', 'SHIFT' );
+			this.setMouseAction( 'FOV', 1, 'SHIFT' );
 
 		};
 
