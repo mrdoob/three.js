@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - morph targets - face</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			a {
+				color: #f00;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - face<br/>
+			model by <a href="https://www.bannaflak.com/face-cap" target="_blank" rel="noopener">Face Cap</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
+			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
+
+			init();
+
+			function init() {
+
+				let mixer;
+
+				const clock = new THREE.Clock();
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
+				camera.position.set( - 1.8, 0.8, 3 );
+
+				const scene = new THREE.Scene();
+
+				new RGBELoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_1k.hdr', ( texture ) => {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						scene.background = texture;
+						scene.environment = texture;
+
+						const roughnessMipmapper = new RoughnessMipmapper( renderer );
+
+						new GLTFLoader().load( "models/gltf/facecap.glb", ( gltf ) => {
+
+							const mesh = gltf.scene.children[ 2 ];
+
+							scene.add( gltf.scene );
+
+							mixer = new THREE.AnimationMixer( mesh );
+
+							mixer.clipAction( gltf.animations[ 1 ] ).play();
+
+						} );
+
+					} );
+
+				const renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
+				container.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2.5;
+				controls.maxDistance = 5;
+				controls.minAzimuthAngle = - Math.PI / 2;
+				controls.maxAzimuthAngle = Math.PI / 2;
+				controls.maxPolarAngle = Math.PI / 1.8;
+				controls.target.set( 0, 0, - 0.2 );
+				controls.enableDamping = true;
+
+				const stats = new Stats();
+				container.appendChild( stats.dom );
+
+				renderer.setAnimationLoop( () => {
+
+					const delta = clock.getDelta();
+
+					if ( mixer ) {
+
+						mixer.update( delta );
+
+					}
+
+					renderer.render( scene, camera );
+
+					controls.update();
+
+					stats.update();
+
+				} );
+
+				window.addEventListener( 'resize', () => {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				} );
+
+			}
+
+		</script>
+	</body>
+</html>
