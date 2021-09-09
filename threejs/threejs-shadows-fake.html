@@ -26,7 +26,6 @@ import * as THREE from './resources/threejs/r132/build/three.module.js';
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
-  renderer.physicallyCorrectLights = true;
 
   const fov = 45;
   const aspect = 2;  // the canvas default
@@ -112,14 +111,14 @@ function main() {
   {
     const skyColor = 0xB1E1FF;  // light blue
     const groundColor = 0xB97A20;  // brownish orange
-    const intensity = 2;
+    const intensity = 0.25;
     const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
     scene.add(light);
   }
 
   {
     const color = 0xFFFFFF;
-    const intensity = 1;
+    const intensity = 0.75;
     const light = new THREE.DirectionalLight(color, intensity);
     light.position.set(0, 10, 5);
     light.target.position.set(-5, 0, 0);
