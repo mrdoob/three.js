@@ -117,6 +117,12 @@
 
 		load( url, onLoad, onProgress, onError ) {
 
+			if ( this.workerConfig === null ) {
+
+				throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
+
+			}
+
 			const loader = new THREE.FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setWithCredentials( this.withCredentials );
@@ -146,7 +152,7 @@
 
 		}
 
-		createTextureFrom( transcodeResult ) {
+		_createTextureFrom( transcodeResult ) {
 
 			const {
 				mipmaps,
@@ -187,7 +193,7 @@
 					taskConfig: taskConfig
 				}, buffers );
 
-			} ).then( e => this.createTextureFrom( e.data ) ); // Cache the task result.
+			} ).then( e => this._createTextureFrom( e.data ) ); // Cache the task result.
 
 			_taskCache.set( buffers[ 0 ], {
 				promise: texturePending

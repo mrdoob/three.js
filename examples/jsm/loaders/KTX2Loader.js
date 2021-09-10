@@ -162,6 +162,12 @@ class KTX2Loader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
+		if ( this.workerConfig === null ) {
+
+			throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
+
+		}
+
 		const loader = new FileLoader( this.manager );
 
 		loader.setResponseType( 'arraybuffer' );
@@ -198,7 +204,7 @@ class KTX2Loader extends Loader {
 
 	}
 
-	createTextureFrom( transcodeResult ) {
+	_createTextureFrom( transcodeResult ) {
 		const { mipmaps, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
 
 		if ( type === 'error' ) return Promise.reject( error );
@@ -227,7 +233,7 @@ class KTX2Loader extends Loader {
 
 			return this.workerPool.postMessage( { type: 'transcode', buffers, taskConfig: taskConfig }, buffers );
 
-		} ).then( ( e ) => this.createTextureFrom( e.data ) );
+		} ).then( ( e ) => this._createTextureFrom( e.data ) );
 
 		// Cache the task result.
 		_taskCache.set( buffers[ 0 ], { promise: texturePending } );
