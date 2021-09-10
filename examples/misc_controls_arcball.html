@@ -12,7 +12,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - arcball controls<br/>
 			<a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
-		</div> 
+		</div>
 
 		<script type="module">
 			import * as THREE from '../build/three.module.js';
@@ -33,11 +33,11 @@
 			let folderOptions, folderAnimations;
 
 			const arcballGui = {
-				
+
 				gizmoVisible: true,
 
-				setArcballControls: function() {
-					
+				setArcballControls: function () {
+
 					controls = new ArcballControls( camera, renderer.domElement, scene );
 					controls.addEventListener( 'change', render );
 
@@ -47,7 +47,7 @@
 
 				},
 
-				populateGui: function() {
+				populateGui: function () {
 
 					folderOptions.add( controls, 'enabled' ).name( 'Enable controls' );
 					folderOptions.add( controls, 'enableGrid' ).name( 'Enable Grid' );
@@ -60,9 +60,9 @@
 					folderOptions.add( controls, 'minDistance', 0, 50, 0.5 ).name( 'Min distance' );
 					folderOptions.add( controls, 'maxDistance', 0, 50, 0.5 ).name( 'Max distance' );
 					folderOptions.add( controls, 'minZoom', 0, 50, 0.5 ).name( 'Min zoom' );
-					folderOptions.add( controls, 'maxZoom', 0, 50, 0.5 ).name( 'Max zoom' );   
-					folderOptions.add( arcballGui, 'gizmoVisible' ).name( 'Show gizmos' ).onChange( function() {
-							
+					folderOptions.add( controls, 'maxZoom', 0, 50, 0.5 ).name( 'Max zoom' );
+					folderOptions.add( arcballGui, 'gizmoVisible' ).name( 'Show gizmos' ).onChange( function () {
+
 						controls.setGizmosVisible( arcballGui.gizmoVisible );
 
 					} );
@@ -88,11 +88,11 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				
+
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
-				renderer.domElement.style.background = "linear-gradient( 180deg, rgba( 0,0,0,1 ) 0%, rgba( 128,128,255,1 ) 100% )";
+				renderer.domElement.style.background = 'linear-gradient( 180deg, rgba( 0,0,0,1 ) 0%, rgba( 128,128,255,1 ) 100% )';
 				container.appendChild( renderer.domElement );
 
 				//
@@ -110,7 +110,7 @@
 					.load( 'Cerberus.obj', function ( group ) {
 
 						const textureLoader = new THREE.TextureLoader().setPath( 'models/obj/cerberus/' );
-						
+
 						material.roughness = 1;
 						material.metalness = 1;
 
@@ -118,7 +118,7 @@
 						diffuseMap.encoding = THREE.sRGBEncoding;
 						material.map = diffuseMap;
 
-						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg', render);
+						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg', render );
 						material.normalMap = textureLoader.load( 'Cerberus_N.jpg', render );
 
 						material.map.wrapS = THREE.RepeatWrapping;
@@ -130,9 +130,9 @@
 						group.traverse( function ( child ) {
 
 							if ( child.isMesh ) {
-							
+
 								child.material = material;
-							
+
 							}
 
 						} );
@@ -162,8 +162,8 @@
 
 						gui = new GUI();
 						gui.add( cameraType, 'type', cameras ).name( 'Choose Camera' ).onChange( function () {
-							
-							setCamera( cameraType.type )
+
+							setCamera( cameraType.type );
 
 						} );
 
@@ -174,11 +174,11 @@
 
 						render();
 
-				} );
+					} );
 
-			};
+			}
 
-			function makeOrthographicCamera( domElement ) {
+			function makeOrthographicCamera() {
 
 				const halfFovV = THREE.MathUtils.DEG2RAD * 45 * 0.5;
 				const halfFovH = Math.atan( ( window.innerWidth / window.innerHeight ) * Math.tan( halfFovV ) );
@@ -187,10 +187,10 @@
 				const halfH = perspectiveDistance * Math.tan( halfFovV );
 				const near = 0.01;
 				const far = 2000;
-				const newCamera = new THREE.OrthographicCamera( -halfW, halfW, halfH, -halfH, near, far );
-				return newCamera
+				const newCamera = new THREE.OrthographicCamera( - halfW, halfW, halfH, - halfH, near, far );
+				return newCamera;
 
-			};
+			}
 
 			function makePerspectiveCamera() {
 
@@ -201,22 +201,22 @@
 				const newCamera = new THREE.PerspectiveCamera( fov, aspect, near, far );
 				return newCamera;
 
-			};
+			}
 
-		
+
 			function onWindowResize() {
 
-				if ( camera.type == 'OrthographicCamera') {
+				if ( camera.type == 'OrthographicCamera' ) {
 
 					const halfFovV = THREE.MathUtils.DEG2RAD * 45 * 0.5;
 					const halfFovH = Math.atan( ( window.innerWidth / window.innerHeight ) * Math.tan( halfFovV ) );
 
 					const halfW = perspectiveDistance * Math.tan( halfFovH );
 					const halfH = perspectiveDistance * Math.tan( halfFovV );
-					camera.left = -halfW;
-					camera.right = halfW
+					camera.left = - halfW;
+					camera.right = halfW;
 					camera.top = halfH;
-					camera.bottom = -halfH;
+					camera.bottom = - halfH;
 
 				} else if ( camera.type == 'PerspectiveCamera' ) {
 
@@ -230,13 +230,13 @@
 
 				render();
 
-			};
-			
+			}
+
 			function render() {
 
 				renderer.render( scene, camera );
 
-			};
+			}
 
 			function setCamera( type ) {
 
@@ -257,7 +257,7 @@
 
 				render();
 
-			};
+			}
 
 		</script>
 	</body>
