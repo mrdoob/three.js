@@ -32,7 +32,7 @@ import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
 
 class SAOPass extends Pass {
 
-	constructor( scene, camera, depthTexture, useNormals, resolution ) {
+	constructor( scene, camera, useDepthTexture, useNormals, resolution ) {
 
 		super();
 
@@ -42,7 +42,7 @@ class SAOPass extends Pass {
 		this.clear = true;
 		this.needsSwap = false;
 
-		this.supportsDepthTextureExtension = ( depthTexture !== undefined ) ? depthTexture : false;
+		this.supportsDepthTextureExtension = ( useDepthTexture !== undefined ) ? useDepthTexture : false;
 		this.supportsNormalTexture = ( useNormals !== undefined ) ? useNormals : false;
 
 		this.originalClearColor = new Color();
@@ -78,10 +78,12 @@ class SAOPass extends Pass {
 			format: RGBAFormat
 		} );
 		this.depthRenderTarget = this.normalRenderTarget.clone();
+		
+		let depthTexture;
 
 		if ( this.supportsDepthTextureExtension ) {
 
-			const depthTexture = new DepthTexture();
+			depthTexture = new DepthTexture();
 			depthTexture.type = UnsignedShortType;
 
 			this.beautyRenderTarget.depthTexture = depthTexture;
