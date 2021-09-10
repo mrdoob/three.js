@@ -6,6 +6,9 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
+			body {
+				color: black;
+			}
 			a {
 				color: #f00;
 			}
@@ -70,7 +73,7 @@
 				const environment = new RoomEnvironment();
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
-				scene.background = new THREE.Color( 0xeeeeee );
+				scene.background = new THREE.Color( 0xD5F7F7 );
 				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				const controls = new OrbitControls( camera, renderer.domElement );
