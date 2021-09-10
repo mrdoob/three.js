@@ -31,6 +31,8 @@
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
 
+			import MeshBasicNodeMaterial from './jsm/renderers/nodes/materials/MeshBasicNodeMaterial.js';
+
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
 
@@ -64,7 +66,7 @@
 				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
 
 				const geometryBox = new THREE.BoxGeometry();
-				const materialBox = new THREE.MeshBasicMaterial();
+				const materialBox = new MeshBasicNodeMaterial();
 				materialBox.colorNode = new TextureNode( texture );
 
 				//
@@ -96,7 +98,7 @@
 
 				const screenFXNode = new OperatorNode( '+', new Vector2Node( mouse ), new Vector2Node( new THREE.Vector2( 0.5, 0.5 ) ).setConst( true ) );
 
-				const materialFX = new THREE.MeshBasicMaterial();
+				const materialFX = new MeshBasicNodeMaterial();
 				materialFX.colorNode = new OperatorNode( '*', new TextureNode( textureRenderer.getTexture() ), screenFXNode );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
