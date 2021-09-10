@@ -26,10 +26,9 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
 
 			init();
 
@@ -47,30 +46,17 @@
 
 				const scene = new THREE.Scene();
 
-				new RGBELoader()
-					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', ( texture ) => {
+				new GLTFLoader().load( "models/gltf/facecap.glb", ( gltf ) => {
 
-						texture.mapping = THREE.EquirectangularReflectionMapping;
+					const mesh = gltf.scene.children[ 2 ];
 
-						scene.background = texture;
-						scene.environment = texture;
+					scene.add( gltf.scene );
 
-						const roughnessMipmapper = new RoughnessMipmapper( renderer );
+					mixer = new THREE.AnimationMixer( mesh );
 
-						new GLTFLoader().load( "models/gltf/facecap.glb", ( gltf ) => {
+					mixer.clipAction( gltf.animations[ 1 ] ).play();
 
-							const mesh = gltf.scene.children[ 2 ];
-
-							scene.add( gltf.scene );
-
-							mixer = new THREE.AnimationMixer( mesh );
-
-							mixer.clipAction( gltf.animations[ 1 ] ).play();
-
-						} );
-
-					} );
+				} );
 
 				const renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -80,6 +66,12 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.background = new THREE.Color( 0xeeeeee );
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2.5;
