@@ -32,7 +32,7 @@ import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
 
 class SAOPass extends Pass {
 
-	constructor( scene, camera, useDepthTexture, useNormals, resolution ) {
+	constructor( scene, camera, useDepthTexture = false, useNormals = false, resolution = new Vector2( 256, 256 ) ) {
 
 		super();
 
@@ -42,8 +42,8 @@ class SAOPass extends Pass {
 		this.clear = true;
 		this.needsSwap = false;
 
-		this.supportsDepthTextureExtension = ( useDepthTexture !== undefined ) ? useDepthTexture : false;
-		this.supportsNormalTexture = ( useNormals !== undefined ) ? useNormals : false;
+		this.supportsDepthTextureExtension = useDepthTexture;
+		this.supportsNormalTexture = useNormals;
 
 		this.originalClearColor = new Color();
 		this._oldClearColor = new Color();
@@ -62,7 +62,7 @@ class SAOPass extends Pass {
 			saoBlurDepthCutoff: 0.01
 		};
 
-		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
+		this.resolution = new Vector2( resolution.x, resolution.y );
 
 		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
 			minFilter: LinearFilter,
