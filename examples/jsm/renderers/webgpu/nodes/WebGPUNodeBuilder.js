@@ -58,7 +58,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		// parse inputs
 
-		if ( material.isMeshStandardMaterial || material.isMeshPhongMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
+		if ( material.isMeshStandardMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
 			const mvpNode = new ModelViewProjectionNode();
 
@@ -266,8 +266,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				if ( node.isArrayInputNode === true ) {
 
 					uniformGPU = [];
-
-					console.log( );
 
 					for ( const inputNode of node.value ) {
 
