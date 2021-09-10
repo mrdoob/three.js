@@ -58,19 +58,19 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		// parse inputs
 
-		if ( material.isMeshStandardMaterial || material.isMeshPhongMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
+		if ( material.isMeshStandardMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
 			const mvpNode = new ModelViewProjectionNode();
 
 			let lightNode = material.lightNode;
 
-			if ( lightNode === undefined && this.lightNode && this.lightNode.hasLights === true ) {
+			if ( lightNode === null && this.lightNode && this.lightNode.hasLights === true ) {
 
 				lightNode = this.lightNode;
 
 			}
 
-			if ( material.positionNode !== undefined ) {
+			if ( material.positionNode && material.positionNode.isNode ) {
 
 				mvpNode.position = material.positionNode;
 
@@ -78,7 +78,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			this.addSlot( 'vertex', new NodeSlot( mvpNode, 'MVP', 'vec4' ) );
 
-			if ( material.alphaTestNode !== undefined ) {
+			if ( material.alphaTestNode && material.alphaTestNode.isNode ) {
 
 				this.addSlot( 'fragment', new NodeSlot( material.alphaTestNode, 'ALPHA_TEST', 'float' ) );
 
@@ -88,7 +88,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			if ( material.colorNode !== undefined ) {
+			if ( material.colorNode && material.colorNode.isNode ) {
 
 				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec4' ) );
 
@@ -98,7 +98,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			if ( material.opacityNode !== undefined ) {
+			if ( material.opacityNode && material.opacityNode.isNode ) {
 
 				this.addSlot( 'fragment', new NodeSlot( material.opacityNode, 'OPACITY', 'float' ) );
 
@@ -110,7 +110,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( material.isMeshStandardMaterial ) {
 
-				if ( material.metalnessNode !== undefined ) {
+				if ( material.metalnessNode && material.metalnessNode.isNode ) {
 
 					this.addSlot( 'fragment', new NodeSlot( material.metalnessNode, 'METALNESS', 'float' ) );
 
@@ -120,7 +120,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( material.roughnessNode !== undefined ) {
+				if ( material.roughnessNode && material.roughnessNode.isNode ) {
 
 					this.addSlot( 'fragment', new NodeSlot( material.roughnessNode, 'ROUGHNESS', 'float' ) );
 
@@ -132,7 +132,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				let normalNode = null;
 
-				if ( material.normalNode !== undefined ) {
+				if ( material.normalNode && material.normalNode.isNode ) {
 
 					normalNode = material.normalNode;
 
@@ -146,7 +146,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			} else if ( material.isMeshPhongMaterial ) {
 
-				if ( material.specularNode !== undefined ) {
+				if ( material.specularNode && material.specularNode.isNode ) {
 
 					this.addSlot( 'fragment', new NodeSlot( material.specularNode, 'SPECULAR', 'vec3' ) );
 
@@ -156,7 +156,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( material.shininessNode !== undefined ) {
+				if ( material.shininessNode && material.shininessNode.isNode ) {
 
 					this.addSlot( 'fragment', new NodeSlot( material.shininessNode, 'SHININESS', 'float' ) );
 
@@ -266,8 +266,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				if ( node.isArrayInputNode === true ) {
 
 					uniformGPU = [];
-
-					console.log( );
 
 					for ( const inputNode of node.value ) {
 

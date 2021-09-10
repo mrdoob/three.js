@@ -34,6 +34,8 @@
 			import { NodeUpdateType } from './jsm/renderers/nodes/core/constants.js';
 			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 
+			import MeshBasicNodeMaterial from './jsm/renderers/nodes/materials/MeshBasicNodeMaterial.js';
+
 			import Stats from './jsm/libs/stats.module.js';
 
 			class InstanceUniformNode extends Node {
@@ -101,7 +103,7 @@
 
 				const instanceUniform = new InstanceUniformNode();
 
-				const material = new THREE.MeshBasicMaterial();
+				const material = new MeshBasicNodeMaterial();
 				material.colorNode = instanceUniform;
 
 				// Geometry

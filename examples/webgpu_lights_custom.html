@@ -33,6 +33,8 @@
 
 			import LightsNode from './jsm/renderers/nodes/lights/LightsNode.js';
 
+			import PointsNodeMaterial from './jsm/renderers/nodes/materials/PointsNodeMaterial.js';
+
 			let camera, scene, renderer;
 
 			let light1, light2, light3;
@@ -87,7 +89,7 @@
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new THREE.PointsMaterial();
+				const materialPoints = new PointsNodeMaterial();
 
 				// custom lighting model
 
