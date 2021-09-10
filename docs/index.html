@@ -55,6 +55,9 @@
 		const filterInput = document.getElementById( 'filterInput' );
 		let iframe = document.querySelector( 'iframe' );
 
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
+
 		const pageProperties = {};
 		const titles = {};
 		const categoryElements = [];
@@ -184,6 +187,10 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter();
+
+			} else {
+
+				updateLink( '' );
 
 			}
 
@@ -386,6 +393,25 @@
 			}
 
 			displayFilteredPanel();
+
+			updateLink( v );
+
+		}
+
+		function updateLink( search ) {
+
+			// update examples link
+
+			if ( search ) {
+
+				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				sectionLink.href = `${link}?q=${search}`;
+
+			} else {
+
+				sectionLink.href = sectionDefaultHref;
+
+			}
 
 		}
 
