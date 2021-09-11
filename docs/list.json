@@ -338,6 +338,7 @@
 			},
 
 			"Controls": {
+				"ArcballControls": "examples/en/controls/ArcballControls",
 				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
 				"FirstPersonControls": "examples/en/controls/FirstPersonControls",

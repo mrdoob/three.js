@@ -35,6 +35,8 @@
 			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
 
+			import MeshBasicNodeMaterial from './jsm/renderers/nodes/materials/MeshBasicNodeMaterial.js';
+
 			import Stats from './jsm/libs/stats.module.js';
 
 			let stats;
@@ -85,38 +87,38 @@
 				let material;
 
 				// PositionNode.LOCAL
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = new PositionNode( PositionNode.LOCAL );
 				materials.push( material );
 
 				// NormalNode.LOCAL
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = new NormalNode( NormalNode.LOCAL );
 				materials.push( material );
 
 				// NormalNode.WORLD
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = new NormalNode( NormalNode.WORLD );
 				materials.push( material );
 
 				// NormalNode.VIEW
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = new NormalNode( NormalNode.VIEW );
 				materials.push( material );
 
 				// TextureNode
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = new TextureNode( texture );
 				materials.push( material );
 
 				// Opacity
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.opacityNode = new TextureNode( texture );
 				material.transparent = true;
 				materials.push( material );
 
 				// AlphaTest
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = new TextureNode( texture );
 				material.opacityNode = new TextureNode( opacityTexture );
 				material.alphaTestNode = new FloatNode( 0.5 );
