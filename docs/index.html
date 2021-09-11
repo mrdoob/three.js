@@ -131,8 +131,6 @@
 
 			setGlobalEvents( updateFilter );
 
-			searchQuery();
-
 		}
 
 		// Navigation Panel
@@ -244,7 +242,7 @@
 
 							// for quick matching
 
-							lower: pageName.toLowerCase(),
+							text: pageName.toLowerCase(),
 							parentList: listElement.classList,
 						};
 
@@ -252,7 +250,7 @@
 
 						titles[ pageURL ] = pageName;
 
-					});
+					} );
 
 					// Gather the category elements for easy access on filtering
 
@@ -261,9 +259,9 @@
 						Array.from( categoryContent.children ).map( child => child.classList )
 					] );
 
-				});
+				} );
 
-			});
+			} );
 
 		}
 
@@ -284,69 +282,20 @@
 
 		function updateFilter() {
 
-			let now = performance.now();
+			// see documentation @ search.js
+			// time to remove "pro" from the search (average of 5 times)
+			// - original: 37.68 ms
+			// - new: 6.05 ms
 
-			// create a clean search query
-			let search = filterInput.value.trim().replace( /\s+/g, ' ' );
+			searchContent( pageProperties, ( pageName, page, regExp, index, end ) => {
 
-			window.history.replaceState( {}, '', `${search? '?q=': ''}${search}${window.location.hash}` );
+				if ( regExp ) {
 
-			if ( search.length >= 2 && search[ 0 ] == '/' && search.slice( - 1 ) == '/' ) {
-
-				// /regexp/ format
-				// ex:
-				// - /./ => finds everything
-				// - /^pro/ => finds PropertyBinding + PropertyMixer, but NOT: LightProbe
-				// - /mesh.*material/
-				// - /audio|video/ => finds all audio and video stuff
-
-				const regExp = new RegExp( search.slice( 1, - 1 ), 'gi' );
-
-				Object.keys( pageProperties ).forEach( pageName => {
-
-					const page = pageProperties[ pageName ];
-					const filterResults = pageName.match( regExp );
-
-					if ( filterResults !== null && filterResults.length > 0 ) {
-
-						page.linkElement.innerHTML = pageName.replaceAll( regExp, '<b>$&</b>' );
-
-						page.parentList.remove( 'hidden' );
-
-					} else {
-
-						page.parentList.add( 'hidden' );
-
-					}
-
-				});
-
-			} else {
-
-				// full text search
-				// ex:
-				// - . => finds nothing
-				// - pro => finds post-processing, PropertyBinding, PropertyMixer, ... LightProbe etc, same as /pro/
-
-				search = search.toLowerCase();
-
-				Object.keys( pageProperties ).forEach( pageName => {
-
-					const page = pageProperties[ pageName ];
-					const index = page.lower.indexOf( search );
+					// /regexp/ was used
 
 					if ( index >= 0 ) {
 
-						const end = index + search.length;
-
-						page.linkElement.innerHTML = [
-							pageName.slice( 0, index ),
-							'<b>',
-							pageName.slice( index, end ),
-							'</b>',
-							pageName.slice( end ),
-						].join( '' );
-
+						page.linkElement.innerHTML = pageName.replaceAll( regExp, '<b>$&</b>' );
 						page.parentList.remove( 'hidden' );
 
 					} else {
@@ -355,14 +304,43 @@
 
 					}
 
-				});
+				} else if ( index == -2 ) {
 
-			}
+					// empty search => restore original names if needed (note: the check is not useless)
+
+					if ( page.linkElement.innerHTML != pageName ) {
+
+						page.linkElement.innerHTML = pageName;
+
+					}
+
+					page.parentList.remove( 'hidden' );
+
+				} else if ( index >= 0 ) {
+
+					// full text match => show the matching text
+
+					page.linkElement.innerHTML = [
+						pageName.slice( 0, index ),
+						'<b>',
+						pageName.slice( index, end ),
+						'</b>',
+						pageName.slice( end ),
+					].join( '' );
+
+					page.parentList.remove( 'hidden' );
+
+				} else {
+
+					// full text fail
+
+					page.parentList.add( 'hidden' );
+
+				}
+
+			} );
 
 			displayFilteredPanel();
-			console.log(performance.now() - now);
-
-			updateLink( search );
 
 		}
 

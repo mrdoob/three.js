@@ -17,7 +17,7 @@ const panelScrim = document.getElementById( 'panelScrim' );
 const filterInput = document.getElementById( 'filterInput' );
 
 const sectionLink = document.querySelector( '#sections > a' );
-const sectionDefaultHref = sectionLink.href;
+const sectionDefaultHref = sectionLink.getAttribute( 'href' );
 
 
 function extractQuery() {
@@ -34,23 +34,87 @@ function extractQuery() {
 
 }
 
-function searchQuery() {
+function searchContent( data, callback ) {
 
-    // Handle search query
+    // Search content:
+    // - data must be an object of objects
+    // - those objects must contain a `text` string used for matching
 
-    filterInput.value = extractQuery();
+    // create a clean search query
+    let search = filterInput.value.trim().replace( /\s+/g, ' ' );
 
-    if ( filterInput.value !== '' ) {
+    window.history.replaceState( {}, '', `${search? '?q=': ''}${search}${window.location.hash}` );
 
-        panel.classList.add( 'searchFocused' );
+    if ( search.length >= 2 && search[ 0 ] == '/' && search.slice( - 1 ) == '/' ) {
 
-        updateFilter();
+        // /regexp/ format
+        // ex:
+        // - /./ => finds everything
+        // - /^pro/ => finds PropertyBinding + PropertyMixer, but NOT: LightProbe
+        // - /mesh.*material/
+        // - /audio|video/ => finds all audio and video stuff
+        // - /3$/ => finds everything that ends with a 3: CatmullRomCurve3, ..., Box3, Line3, ...
+
+        let regExp;
+
+        try {
+
+            regExp = new RegExp( search.slice( 1, - 1 ), 'gi' );
+
+        } catch (e) {
+
+            // invalid regexp => don't search anything
+            return;
+
+        }
+
+        Object.keys( data ).forEach( key => {
+
+            const item = data[ key ];
+            const filterResults = key.match( regExp );
+
+            if ( filterResults !== null && filterResults.length > 0 ) {
+
+                callback( key, item, regExp, 0 );
+
+            } else {
+
+                callback( key, item, regExp, -1 );
+
+            }
+
+        });
 
     } else {
 
-        updateLink( '' );
+        // full text search
+        // ex:
+        // - . => finds nothing
+        // - pro => finds post-processing, PropertyBinding, PropertyMixer, ... LightProbe etc, same as /pro/
+
+        search = search.toLowerCase();
+
+        Object.keys( data ).forEach( key => {
+
+            const item = data[ key ];
+
+            if ( ! search ) {
+
+                callback( key, item, null, -2 );
+
+            } else {
+
+                const index = item.text.indexOf( search );
+
+                callback( key, item, null, index, index + search.length );
+
+            }
+
+        });
 
     }
+
+    updateLink( search );
 
 }
 
@@ -104,10 +168,22 @@ function setGlobalEvents(updateFilter) {
 
     };
 
-}
+    // Handle search query
 
-function updateFilter() {
-    
+    filterInput.value = extractQuery();
+
+    if ( filterInput.value !== '' ) {
+
+        panel.classList.add( 'searchFocused' );
+
+        updateFilter();
+
+    } else {
+
+        updateLink( '' );
+
+    }
+
 }
 
 function updateLink( search ) {

@@ -513,6 +513,7 @@ iframe#viewer {
 
 .card .cover {
 	padding-bottom: 56.25%; /* 16:9 aspect ratio */
+	pointer-events: none;
 	position: relative;
 	overflow: hidden;
 }
@@ -527,6 +528,7 @@ iframe#viewer {
 
 .card .title {
 	padding: 8px 12px 4px;
+	pointer-events: none;
 	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
 	line-height: calc(var(--line-height) - 6px);

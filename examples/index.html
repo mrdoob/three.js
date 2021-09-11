@@ -51,12 +51,15 @@
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 		const container = document.getElementById( 'container' );
 
-		const links = {};
 		const validRedirects = new Map();
 
 		let selected = null;
-		let files = [];
-		let tags = [];
+
+		const headerClassLists = {};
+		const linkClassLists = {};
+		const linkTitles = {};
+		let sectionFiles = {};
+		const fileObjects = {};
 
 		init();
 
@@ -64,31 +67,10 @@
 
 			viewSrcButton.style.display = 'none';
 
-			files = await ( await fetch( 'files.json' ) ).json();
-			tags = await ( await fetch( 'tags.json' ) ).json();
+			sectionFiles = await ( await fetch( 'files.json' ) ).json();
+			const fileTags = await ( await fetch( 'tags.json' ) ).json();
 
-			for ( const key in files ) {
-
-				const section = files[ key ];
-
-				const header = document.createElement( 'h2' );
-				header.textContent = key;
-				header.setAttribute( 'data-category', key );
-				container.appendChild( header );
-
-				for ( let i = 0; i < section.length; i ++ ) {
-
-					const file = section[ i ];
-
-					const link = createLink( file );
-					container.appendChild( link );
-
-					links[ file ] = link;
-					validRedirects.set( file, file + '.html' );
-
-				}
-
-			}
+			createExamplesList( fileTags );
 
 			if ( window.location.hash !== '' ) {
 
@@ -127,42 +109,84 @@
 
 			setGlobalEvents(updateFilter);
 
-			searchQuery();
-
 		}
 
-		function createLink( file ) {
+		function createExamplesList( fileTags ) {
 
-			const template = `
-				<div class="card">
-					<a href="${file}.html" target="viewer">
-						<div class="cover">
-							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
-						</div>
-						<div class="title">${getName( file )}</div>
-					</a>
-				</div>
-			`;
+			// create the list of examples
+			// + fill the sectionFiles object
 
-			const link = createElementFromHTML( template );
+			const lines = [];
 
-			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
+			Object.keys( sectionFiles ).forEach( section => {
 
-				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+				lines.push( `<h2 data-category="${section}">${section}</h2>` );
 
-				selectFile( file );
+				for ( let name of sectionFiles[ section ] ) {
+
+					fileObjects[ name ] = {};
+					const file = fileObjects[ name ];
+					const clean = cleanName( name );
+
+					lines.push( [
+						'<div class="card">',
+							`<a href="${name}.html" target="viewer">`,
+								'<div class="cover">',
+									`<img src="screenshots/${name}.jpg" loading="lazy" width="400">`,
+								'</div>',
+								`<div class="title">${clean}</div>`,
+							'</a>',
+						'</div>',
+					].join( '' ) );
+
+					file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join(' ');
+
+					validRedirects.set( name, name + '.html' );
+
+				}
+
+			});
+
+			container.innerHTML = lines.join( '' );
+
+			// cache headers + links
+
+			container.querySelectorAll( 'h2' ).forEach( node => {
+
+				headerClassLists[ node.dataset.category ] = node.classList;
 
 			} );
 
-			return link;
+			container.querySelectorAll( 'a' ).forEach( node => {
+
+				let name = node.getAttribute( 'href' ).slice( 0, -5 );
+				linkClassLists[ name ] = node.parentNode.classList;
+				linkTitles[ name ] = node.querySelector( '.title' );
+
+			} );
+
+			// events
+
+			container.addEventListener( 'click', event => {
+
+				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+				if ( event.target.tagName != 'A' ) return;
+
+				selectFile( event.target.getAttribute( 'href' ).slice( 0, -5 ) );
+
+			} );
 
 		}
 
 		function selectFile( file ) {
 
-			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
+			if ( selected !== null ) {
 
-			links[ file ].classList.add( 'selected' );
+				linkClassLists[ selected ].remove( 'selected' );
+
+			}
+
+			linkClassLists[ file ].add( 'selected' );
 
 			window.location.hash = file;
 			viewer.focus();
@@ -175,119 +199,91 @@
 			// Reveal "View source" button and set attributes to this example
 			viewSrcButton.style.display = '';
 			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
-			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
+			viewSrcButton.title = 'View source code for ' + cleanName( selected ) + ' on GitHub';
 
 		}
 
 		function updateFilter() {
 
-			let now = performance.now();
+			// see documentation @ search.js
+			// time to remove "buffer" from the search (average of 5 times)
+			// - original: 72.04 ms
+			// - new: 2.82 ms
 
-			let v = filterInput.value.trim();
-			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+			searchContent( fileObjects, ( name, page, regExp, index, end ) => {
 
-			if ( v !== '' ) {
+				if ( regExp ) {
 
-				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+					// /regexp/ was used
 
-			} else {
+					if ( index >= 0 ) {
 
-				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+						linkTitles[ name ].innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
+						linkClassLists[ name ].remove( 'hidden' );
 
-			}
+					} else {
 
-			const exp = new RegExp( v, 'gi' );
-
-			for ( const key in files ) {
-
-				const section = files[ key ];
-
-				for ( let i = 0; i < section.length; i ++ ) {
-
-					filterExample( section[ i ], exp, tags );
-
-				}
-
-			}
-
-			layoutList( files );
-			console.log(performance.now() - now);
-
-			updateLink( v );
-
-		}
-
-		function filterExample( file, exp, tags ) {
-
-			const link = links[ file ];
-			const name = getName( file );
-			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
-			const res = file.match( exp );
-			let text;
-
-			if ( res && res.length > 0 ) {
-
-				link.classList.remove( 'hidden' );
-
-				for ( let i = 0; i < res.length; i ++ ) {
-
-					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
-
-				}
-
-				link.querySelector( '.title' ).innerHTML = text;
-
-			} else {
-
-				link.classList.add( 'hidden' );
-				link.querySelector( '.title' ).innerHTML = name;
-
-			}
-
-		}
-
-		function getName( file ) {
-
-			const name = file.split( '_' );
-			name.shift();
-			return name.join( ' / ' );
-
-		}
-
-		function layoutList( files ) {
-
-			for ( const key in files ) {
-
-				let collapsed = true;
-
-				const section = files[ key ];
-
-				for ( let i = 0; i < section.length; i ++ ) {
-
-					const file = section[ i ];
-
-					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
-
-						collapsed = false;
-						break;
+						linkClassLists[ name ].add( 'hidden' );
 
 					}
 
-				}
+				} else if ( index == -2 ) {
 
-				const element = document.querySelector( 'h2[data-category="' + key + '"]' );
+					// empty search => restore original names if needed (note: the check is not useless)
 
-				if ( collapsed ) {
+					const title = linkTitles[ name ];
 
-					element.classList.add( 'hidden' );
+					if ( title.innerHTML != name ) {
+
+						title.innerHTML = name;
+
+					}
+
+					linkClassLists[ name ].remove( 'hidden' );
+
+				} else if ( index >= 0 ) {
+
+					// full text match => show the matching text
+
+					linkClassLists[ name ].remove( 'hidden' );
 
 				} else {
 
-					element.classList.remove( 'hidden' );
+					// full text fail
+
+					linkClassLists[ name ].add( 'hidden' );
 
 				}
 
-			}
+			} );
+
+			layoutList();
+
+		}
+
+		function cleanName( name ) {
+
+			return name.split('_').slice(1).join(' / ');
+
+		}
+
+		function layoutList() {
+
+			Object.keys( sectionFiles ).forEach( section => {
+
+				const collapsed = sectionFiles[ section ].every( name => linkClassLists[ name ].contains( 'hidden' ) );
+
+				if ( collapsed ) {
+
+					headerClassLists[ section ].add( 'hidden' );
+
+				} else {
+
+					headerClassLists[ section ].remove( 'hidden' );
+
+				}
+
+			});
 
 		}
 
