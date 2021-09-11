@@ -38,6 +38,7 @@
 						<option value="ja">日本語</option>
 					</select>
 				</div>
+
 				<div id="content"></div>
 			</div>
 
@@ -45,18 +46,11 @@
 
 		<iframe name="viewer"></iframe>
 
+		<script src="../files/search.js"></script>
+
 		<script>
 
-		const panel = document.getElementById( 'panel' );
-		const content = document.getElementById( 'content' );
-		const expandButton = document.getElementById( 'expandButton' );
-		const exitSearchButton = document.getElementById( 'exitSearchButton' );
-		const panelScrim = document.getElementById( 'panelScrim' );
-		const filterInput = document.getElementById( 'filterInput' );
 		let iframe = document.querySelector( 'iframe' );
-
-		const sectionLink = document.querySelector( '#sections > a' );
-		const sectionDefaultHref = sectionLink.href;
 
 		const pageProperties = {};
 		const titles = {};
@@ -72,13 +66,17 @@
 
 			// *BufferGeometry to *Geometry
 
-			if ( /Instanced/.exec( window.location.hash ) !== null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+			let hash = window.location.hash;
+			const index = hash.indexOf( 'BufferGeometry' );
 
-				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
+			if ( index > 1 && ! hash.includes( 'Instanced' ) && hash[ index - 1 ] != '/' ) {
+
+				hash = hash.replace( 'BufferGeometry', 'Geometry' );
+				window.location.hash = hash;
 
 			}
 
-			const hash = window.location.hash.substring( 1 );
+			hash = hash.slice( 1 );
 
 			// Localisation
 
@@ -120,55 +118,6 @@
 
 			}
 
-			// Functionality for hamburger button (on small devices)
-
-			expandButton.onclick = function ( event ) {
-
-				event.preventDefault();
-				panel.classList.toggle( 'open' );
-
-			};
-
-			panelScrim.onclick = function ( event ) {
-
-				event.preventDefault();
-				panel.classList.toggle( 'open' );
-
-			};
-
-
-			// Functionality for search/filter input field
-
-			filterInput.onfocus = function () {
-
-				panel.classList.add( 'searchFocused' );
-
-			};
-
-			filterInput.onblur = function () {
-
-				if ( filterInput.value === '' ) {
-
-					panel.classList.remove( 'searchFocused' );
-
-				}
-
-			};
-
-			filterInput.oninput = function () {
-
-				updateFilter();
-
-			};
-
-			exitSearchButton.onclick = function () {
-
-				filterInput.value = '';
-				updateFilter();
-				panel.classList.remove( 'searchFocused' );
-
-			};
-
 			// Activate content and title change on browser navigation
 
 			window.onpopstate = createNewIframe;
@@ -178,21 +127,11 @@
 			createNavigation( list, language );
 			createNewIframe();
 
-			// Handle search query
+			// Global events + check the ?q= query
 
-			filterInput.value = extractQuery();
+			setGlobalEvents( updateFilter );
 
-			if ( filterInput.value !== '' ) {
-
-				panel.classList.add( 'searchFocused' );
-
-				updateFilter();
-
-			} else {
-
-				updateLink( '' );
-
-			}
+			searchQuery();
 
 		}
 
@@ -211,8 +150,7 @@
 				window.location.hash = pageURL;
 				panel.classList.remove( 'open' );
 
-
-				content.querySelectorAll( 'a' ).forEach( function ( item ) {
+				content.querySelectorAll( 'a' ).forEach( item => {
 
 					item.classList.remove( 'selected' );
 
@@ -248,7 +186,7 @@
 			const localList = list[ language ];
 			const selectedPage = window.location.hash.substring( 1 );
 
-			for ( const section in localList ) {
+			Object.keys( localList ).forEach( section => {
 
 				// Create sections
 
@@ -258,7 +196,7 @@
 				sectionHead.textContent = section;
 				navigation.appendChild( sectionHead );
 
-				for ( const category in categories ) {
+				Object.keys( categories ).forEach( category => {
 
 					// Create categories
 
@@ -274,7 +212,7 @@
 					const categoryContent = document.createElement( 'ul' );
 					categoryContainer.appendChild( categoryContent );
 
-					for ( const pageName in pages ) {
+					Object.keys( pages ).forEach( pageName => {
 
 						// Create page links
 
@@ -302,22 +240,30 @@
 							section: section,
 							category: category,
 							pageURL: pageURL,
-							linkElement: linkElement
+							linkElement: linkElement,
+
+							// for quick matching
+
+							lower: pageName.toLowerCase(),
+							parentList: listElement.classList,
 						};
 
 						// Gather the document titles (used for easy access on browser navigation)
 
 						titles[ pageURL ] = pageName;
 
-					}
+					});
 
 					// Gather the category elements for easy access on filtering
 
-					categoryElements.push( categoryContent );
+					categoryElements.push( [
+						categoryContainer.classList,
+						Array.from( categoryContent.children ).map( child => child.classList )
+					] );
 
-				}
+				});
 
-			}
+			});
 
 		}
 
@@ -336,119 +282,107 @@
 
 		// Filtering
 
-		function extractQuery() {
-
-			const search = window.location.search;
-
-			if ( search.indexOf( '?q=' ) !== - 1 ) {
-
-				return decodeURI( search.substr( 3 ) );
-
-			}
-
-			return '';
-
-		}
-
 		function updateFilter() {
 
-			let v = filterInput.value.trim();
-			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
+			let now = performance.now();
 
-			if ( v !== '' ) {
+			// create a clean search query
+			let search = filterInput.value.trim().replace( /\s+/g, ' ' );
 
-				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+			window.history.replaceState( {}, '', `${search? '?q=': ''}${search}${window.location.hash}` );
+
+			if ( search.length >= 2 && search[ 0 ] == '/' && search.slice( - 1 ) == '/' ) {
+
+				// /regexp/ format
+				// ex:
+				// - /./ => finds everything
+				// - /^pro/ => finds PropertyBinding + PropertyMixer, but NOT: LightProbe
+				// - /mesh.*material/
+				// - /audio|video/ => finds all audio and video stuff
+
+				const regExp = new RegExp( search.slice( 1, - 1 ), 'gi' );
+
+				Object.keys( pageProperties ).forEach( pageName => {
+
+					const page = pageProperties[ pageName ];
+					const filterResults = pageName.match( regExp );
+
+					if ( filterResults !== null && filterResults.length > 0 ) {
+
+						page.linkElement.innerHTML = pageName.replaceAll( regExp, '<b>$&</b>' );
+
+						page.parentList.remove( 'hidden' );
+
+					} else {
+
+						page.parentList.add( 'hidden' );
+
+					}
+
+				});
 
 			} else {
 
-				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+				// full text search
+				// ex:
+				// - . => finds nothing
+				// - pro => finds post-processing, PropertyBinding, PropertyMixer, ... LightProbe etc, same as /pro/
 
-			}
+				search = search.toLowerCase();
 
-			//
+				Object.keys( pageProperties ).forEach( pageName => {
 
-			const regExp = new RegExp( filterInput.value, 'gi' );
+					const page = pageProperties[ pageName ];
+					const index = page.lower.indexOf( search );
 
-			for ( let pageName in pageProperties ) {
+					if ( index >= 0 ) {
 
-				const linkElement = pageProperties[ pageName ].linkElement;
-				const categoryClassList = linkElement.parentElement.classList;
-				const filterResults = pageName.match( regExp );
+						const end = index + search.length;
 
-				if ( filterResults !== null && filterResults.length > 0 ) {
+						page.linkElement.innerHTML = [
+							pageName.slice( 0, index ),
+							'<b>',
+							pageName.slice( index, end ),
+							'</b>',
+							pageName.slice( end ),
+						].join( '' );
 
-					pageName = pageName.replaceAll( regExp, '<b>$&</b>' );
+						page.parentList.remove( 'hidden' );
 
-					categoryClassList.remove( 'hidden' );
-					linkElement.innerHTML = pageName;
+					} else {
 
-				} else {
+						page.parentList.add( 'hidden' );
 
-					// Hide all non-matching page names
+					}
 
-					categoryClassList.add( 'hidden' );
-
-				}
+				});
 
 			}
 
 			displayFilteredPanel();
+			console.log(performance.now() - now);
 
-			updateLink( v );
-
-		}
-
-		function updateLink( search ) {
-
-			// update examples link
-
-			if ( search ) {
-
-				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
-				sectionLink.href = `${link}?q=${search}`;
-
-			} else {
-
-				sectionLink.href = sectionDefaultHref;
-
-			}
+			updateLink( search );
 
 		}
 
 		function displayFilteredPanel() {
 
 			// Show/hide categories depending on their content
-			// First check if at least one page in this category is not hidden
 
-			categoryElements.forEach( function ( category ) {
-
-				const pages = category.children;
-				const pagesLength = pages.length;
-				const sectionClassList = category.parentElement.classList;
-
-				let hideCategory = true;
-
-				for ( let i = 0; i < pagesLength; i ++ ) {
-
-					const pageClassList = pages[ i ].classList;
-
-					if ( ! pageClassList.contains( 'hidden' ) ) {
-
-						hideCategory = false;
-
-					}
-
-				}
+			categoryElements.forEach( ( [ parentClassList, childrenLists ] ) => {
 
 				// If and only if all page names are hidden, hide the whole category
 
+				let hideCategory = childrenLists.every( list => list.contains( 'hidden' ) );
+
 				if ( hideCategory ) {
 
-					sectionClassList.add( 'hidden' );
+					parentClassList.add( 'hidden' );
 
 				} else {
 
-					sectionClassList.remove( 'hidden' );
+					parentClassList.remove( 'hidden' );
 
 				}
 
@@ -544,21 +478,9 @@
 
 		}
 
-		//
-
-		console.log( [
-			'    __     __',
-			' __/ __\\  / __\\__   ____   _____   _____',
-			'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
-			'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
-			'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
-			'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
-			'                                         / __/  /  \\__  \\',
-			'                                         \\/____/\\/_____/'
-		].join( '\n' ) );
+		welcomeThree();
 
 		</script>
 
 	</body>
-
 </html>
