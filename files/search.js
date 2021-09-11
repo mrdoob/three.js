@@ -34,6 +34,18 @@ function extractQuery() {
 
 }
 
+function highlightText(name, start, end) {
+
+    return [
+        name.slice( 0, start ),
+        '<b>',
+        name.slice( start, end ),
+        '</b>',
+        name.slice( end ),
+    ].join( '' );
+
+}
+
 function searchContent( data, callback ) {
 
     // Search content:

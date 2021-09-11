@@ -139,6 +139,7 @@
 						'</div>',
 					].join( '' ) );
 
+					file.clean = clean;
 					file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join(' ');
 
 					validRedirects.set( name, name + '.html' );
@@ -218,7 +219,7 @@
 
 					if ( index >= 0 ) {
 
-						linkTitles[ name ].innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
+						linkTitles[ name ].innerHTML = page.clean.replaceAll( regExp, '<b>$&</b>' );
 						linkClassLists[ name ].remove( 'hidden' );
 
 					} else {
@@ -233,9 +234,9 @@
 
 					const title = linkTitles[ name ];
 
-					if ( title.innerHTML != name ) {
+					if ( title.innerHTML != page.clean ) {
 
-						title.innerHTML = name;
+						title.innerHTML = page.clean;
 
 					}
 
@@ -245,6 +246,7 @@
 
 					// full text match => show the matching text
 
+					linkTitles[ name ].innerHTML = highlightText( page.clean, index, end );
 					linkClassLists[ name ].remove( 'hidden' );
 
 				} else {

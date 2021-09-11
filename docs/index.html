@@ -287,7 +287,7 @@
 			// - original: 37.68 ms
 			// - new: 6.05 ms
 
-			searchContent( pageProperties, ( pageName, page, regExp, index, end ) => {
+			searchContent( pageProperties, ( name, page, regExp, index, end ) => {
 
 				if ( regExp ) {
 
@@ -295,7 +295,7 @@
 
 					if ( index >= 0 ) {
 
-						page.linkElement.innerHTML = pageName.replaceAll( regExp, '<b>$&</b>' );
+						page.linkElement.innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
 						page.parentList.remove( 'hidden' );
 
 					} else {
@@ -308,9 +308,9 @@
 
 					// empty search => restore original names if needed (note: the check is not useless)
 
-					if ( page.linkElement.innerHTML != pageName ) {
+					if ( page.linkElement.innerHTML != name ) {
 
-						page.linkElement.innerHTML = pageName;
+						page.linkElement.innerHTML = name;
 
 					}
 
@@ -320,14 +320,7 @@
 
 					// full text match => show the matching text
 
-					page.linkElement.innerHTML = [
-						pageName.slice( 0, index ),
-						'<b>',
-						pageName.slice( index, end ),
-						'</b>',
-						pageName.slice( end ),
-					].join( '' );
-
+					page.linkElement.innerHTML = highlightText( name, index, end );
 					page.parentList.remove( 'hidden' );
 
 				} else {
