@@ -34,7 +34,7 @@ function extractQuery() {
 
 }
 
-function highlightText(name, start, end) {
+function highlightText( name, start, end ) {
 
     return [
         name.slice( 0, start ),
@@ -73,7 +73,7 @@ function searchContent( data, callback ) {
 
             regExp = new RegExp( search.slice( 1, - 1 ), 'gi' );
 
-        } catch (e) {
+        } catch ( e ) {
 
             // invalid regexp => don't search anything
             return;
@@ -130,7 +130,7 @@ function searchContent( data, callback ) {
 
 }
 
-function setGlobalEvents(updateFilter) {
+function setGlobalEvents( updateFilter ) {
 
     // Functionality for hamburger button (on small devices)
 
