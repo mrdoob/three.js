@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Instance Uniform</title>
+		<title>three.js webgl - material instance uniform</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-97), expires 10/11/2021 -->
-		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Instance Uniform<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl material instance uniform
 		</div>
 
 		<script type="importmap">
@@ -24,19 +22,12 @@
 
 			import * as THREE from 'three';
 
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
-
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
-
-			import Node from './jsm/renderers/nodes/core/Node.js';
-			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
-			import { NodeUpdateType } from './jsm/renderers/nodes/core/constants.js';
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
-
-			import MeshBasicNodeMaterial from './jsm/renderers/nodes/materials/MeshBasicNodeMaterial.js';
-
 			import Stats from './jsm/libs/stats.module.js';
+
+			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+			import { NodeUpdateType } from './jsm/renderers/nodes/core/constants.js';
+			import Node from './jsm/renderers/nodes/core/Node.js';
+			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 
 			class InstanceUniformNode extends Node {
 
@@ -52,9 +43,15 @@
 
 				update( frame ) {
 
+					const rendererState = frame.renderer.state;
 					const mesh = frame.object;
 
-					this.inputNode.value.copy( mesh.color );
+					const meshColor = mesh.color;
+
+					this.inputNode.value.copy( meshColor );
+
+					// force refresh material uniforms
+					rendererState.useProgram( null );
 
 				}
 
@@ -69,20 +66,14 @@
 			let stats;
 
 			let camera, scene, renderer;
+			let pointLight;
 
 			const objects = [];
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
-
-				if ( WebGPU.isAvailable() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw 'No WebGPU support';
-
-				}
+			function init() {
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -95,20 +86,19 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = new AttributeNode( 'color', 'vec3' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
-				// Materials
+				// Material
 
 				const instanceUniform = new InstanceUniformNode();
 
-				const material = new MeshBasicNodeMaterial();
+				const material = new THREE.MeshStandardMaterial();
 				material.colorNode = instanceUniform;
 
-				// Geometry
+				// Spheres geometry
 
-				const geometry = new TeapotGeometry( 50, 18 );
+				const geometry = new THREE.SphereGeometry( 70, 32, 16 );
 
 				for ( let i = 0, l = 12; i < l; i ++ ) {
 
@@ -116,9 +106,27 @@
 
 				}
 
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x111111 ) );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+
+				scene.add( directionalLight );
+
+				pointLight = new THREE.PointLight( 0xffffff, 1 );
+				scene.add( pointLight );
+
+				pointLight.add( new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
+
 				//
 
-				renderer = new WebGPURenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -131,8 +139,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -170,6 +176,8 @@
 
 				requestAnimationFrame( animate );
 
+				nodeFrame.update();
+
 				render();
 				stats.update();
 
@@ -193,13 +201,11 @@
 
 				}
 
+				pointLight.position.x = Math.sin( timer * 7 ) * 300;
+				pointLight.position.y = Math.cos( timer * 5 ) * 400;
+				pointLight.position.z = Math.cos( timer * 3 ) * 300;
+
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

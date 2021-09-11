@@ -38,6 +38,8 @@
 			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 
+			import PointsNodeMaterial from './jsm/renderers/nodes/materials/PointsNodeMaterial.js';
+
 			let camera, scene, renderer;
 			let pointer;
 			let scaleUniformBuffer;
@@ -183,7 +185,7 @@
 					'position', particleBuffer.attribute
 				);
 
-				const pointsMaterial = new THREE.PointsMaterial();
+				const pointsMaterial = new PointsNodeMaterial();
 				pointsMaterial.colorNode = new OperatorNode( '+', new PositionNode(), new ColorNode( new THREE.Color( 0x0000FF ) ) );
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
