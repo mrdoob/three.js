@@ -17,7 +17,7 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
 		</div>
 
 		<script type="module">
@@ -27,19 +27,19 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+
 			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
 
-			var container, progressBarDiv;
+			let container, progressBarDiv;
 
-			var camera, scene, renderer, controls, gui, guiData;
+			let camera, scene, renderer, controls, gui, guiData;
 
-			var modelFileList, model, textureCube;
+			let model;
 
-			var envMapActivated = false;
+			const ldrawPath = 'models/ldraw/officialLibrary/';
 
-			var ldrawPath = 'models/ldraw/officialLibrary/';
-
-			var modelFileList = {
+			const modelFileList = {
 				'Car': 'models/car.ldr_Packed.mpd',
 				'Lunar Vehicle': 'models/1621-1-LunarMPVVehicle.mpd_Packed.mpd',
 				'Radar Truck': 'models/889-1-RadarTruck.mpd_Packed.mpd',
@@ -70,24 +70,21 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 150, 200, 250 );
 
-				// scene
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xdeebed );
-
-				var ambientLight = new THREE.AmbientLight( 0xdeebed, 0.4 );
-				scene.add( ambientLight );
-
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( - 1000, 1200, 1500 );
-				scene.add( directionalLight );
-
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
+
+				// scene
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xdeebed );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 
@@ -95,26 +92,25 @@
 
 				guiData = {
 					modelFileName: modelFileList[ 'Car' ],
-					envMapActivated: false,
 					separateObjects: false,
 					displayLines: true,
 					conditionalLines: true,
 					smoothNormals: true,
 					constructionStep: 0,
-					noConstructionSteps: "No steps."
+					noConstructionSteps: 'No steps.'
 				};
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				progressBarDiv = document.createElement( 'div' );
-				progressBarDiv.innerText = "Loading...";
-				progressBarDiv.style.fontSize = "3em";
-				progressBarDiv.style.color = "#888";
-				progressBarDiv.style.display = "block";
-				progressBarDiv.style.position = "absolute";
-				progressBarDiv.style.top = "50%";
-				progressBarDiv.style.width = "100%";
-				progressBarDiv.style.textAlign = "center";
+				progressBarDiv.innerText = 'Loading...';
+				progressBarDiv.style.fontSize = '3em';
+				progressBarDiv.style.color = '#888';
+				progressBarDiv.style.display = 'block';
+				progressBarDiv.style.position = 'absolute';
+				progressBarDiv.style.top = '50%';
+				progressBarDiv.style.width = '100%';
+				progressBarDiv.style.textAlign = 'center';
 
 
 				// load materials and then the model
@@ -139,8 +135,7 @@
 
 						}
 
-					}
-					else if ( c.isGroup ) {
+					} else if ( c.isGroup ) {
 
 						// Hide objects with construction step > gui setting
 						c.visible = c.userData.constructionStep <= guiData.constructionStep;
@@ -164,7 +159,7 @@
 				updateProgressBar( 0 );
 				showProgressBar();
 
-				var lDrawLoader = new LDrawLoader();
+				const lDrawLoader = new LDrawLoader();
 				lDrawLoader.separateObjects = guiData.separateObjects;
 				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
@@ -184,53 +179,20 @@
 
 						scene.add( model );
 
-						// Adjust materials
-
-						var materials = lDrawLoader.materials;
-
-						if ( envMapActivated ) {
-
-							if ( ! textureCube ) {
-
-								// Envmap texture
-								var r = "textures/cube/Bridge2/";
-								var urls = [ r + "posx.jpg", r + "negx.jpg",
-									r + "posy.jpg", r + "negy.jpg",
-									r + "posz.jpg", r + "negz.jpg" ];
-								textureCube = new THREE.CubeTextureLoader().load( urls );
-								textureCube.format = THREE.RGBFormat;
-								textureCube.mapping = THREE.CubeReflectionMapping;
-
-							}
-
-							for ( var i = 0, n = materials.length; i < n; i ++ ) {
-
-								var material = materials[ i ];
-
-								if ( material.userData.canHaveEnvMap ) {
-
-									material.envMap = textureCube;
-
-								}
-
-							}
-
-						}
-
 						guiData.constructionStep = model.userData.numConstructionSteps - 1;
 
 						updateObjectsVisibility();
 
 						// Adjust camera and light
 
-						var bbox = new THREE.Box3().setFromObject( model );
-						var size = bbox.getSize( new THREE.Vector3() );
-						var radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.5;
+						const bbox = new THREE.Box3().setFromObject( model );
+						const size = bbox.getSize( new THREE.Vector3() );
+						const radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.5;
 
 						if ( resetCamera ) {
 
 							controls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
-							controls.position0.set( - 2.3, 2, 2 ).multiplyScalar( radius ).add( controls.target0 );
+							controls.position0.set( - 2.3, 1, 2 ).multiplyScalar( radius ).add( controls.target0 );
 							controls.reset();
 
 						}
@@ -257,6 +219,7 @@
 				if ( gui ) {
 
 					gui.destroy();
+
 				}
 
 				gui = new GUI();
@@ -267,7 +230,7 @@
 
 				} );
 
-				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function () {
 
 					reloadObject( false );
 
@@ -275,26 +238,19 @@
 
 				if ( guiData.separateObjects ) {
 
-					if ( model.userData.numConstructionSteps > 1  ) {
+					if ( model.userData.numConstructionSteps > 1 ) {
 
 						gui.add( guiData, 'constructionStep', 0, model.userData.numConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( updateObjectsVisibility );
 
-					}
-					else {
+					} else {
 
 						gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( updateObjectsVisibility );
 
 					}
+
 				}
 
-				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function changeEnvMap ( value ) {
-
-					envMapActivated = value;
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals ( value ) {
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals() {
 
 					reloadObject( false );
 
@@ -334,7 +290,7 @@
 
 			function onError() {
 
-				var message = "Error loading model";
+				const message = 'Error loading model';
 				progressBarDiv.innerText = message;
 				console.log( message );
 

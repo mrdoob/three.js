@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'build/**'
+      - 'docs/**'
+      - 'files/**'
+  push:
+    paths-ignore:
+      - 'build/**'
+      - 'docs/**'
+      - 'files/**'
+
+jobs:
+
+  lint:
+    name: "Linting"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install packages
+        run: npm ci
+
+      - name: === Linting ===
+        run: npm run lint
+
+  unit:
+    name: "Unit testing"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install packages
+        run: |
+          npm ci
+          npm ci --prefix test
+      - name: Build
+        run: npm run build
+
+      - name: === Unit testing ===
+        run: npm run test-unit
+
+  e2e:
+    name: "E2E testing"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        CI: [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+    env:
+      CI: ${{ matrix.CI }}
+      FORCE_COLOR: 1
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install packages
+        run: |
+          npm ci
+          npm ci --prefix test
+          sudo apt-get install xvfb
+      - name: Build
+        run: npm run build
+
+      - name: === E2E testing ===
+        run: xvfb-run --auto-servernum npm run test-e2e
+
+  e2e-cov:
+    name: "Ready for release"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install packages
+        run: npm ci
+
+      - name: === Ready for release ===
+        run: npm run test-e2e-cov

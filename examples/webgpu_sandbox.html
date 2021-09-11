@@ -1,0 +1,254 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Sandbox</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-97), expires 10/11/2021 -->
+		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sandbox<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+		</div>
+
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+
+			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
+
+			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
+			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
+			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
+			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
+			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
+			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+			import SplitNode from './jsm/renderers/nodes/utils/SplitNode.js';
+			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
+
+			import MeshBasicNodeMaterial from './jsm/renderers/nodes/materials/MeshBasicNodeMaterial.js';
+			import LineBasicNodeMaterial from './jsm/renderers/nodes/materials/LineBasicNodeMaterial.js';
+			import PointsNodeMaterial from './jsm/renderers/nodes/materials/PointsNodeMaterial.js';
+
+			let camera, scene, renderer;
+
+			let box;
+
+			init().then( animate ).catch( error );
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw 'No WebGPU support';
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.z = 4;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// textures
+
+				const textureLoader = new THREE.TextureLoader();
+				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.name = 'uv_grid';
+
+				const textureDisplace = textureLoader.load( './textures/transition/transition1.png' );
+				textureDisplace.wrapS = THREE.RepeatWrapping;
+				textureDisplace.wrapT = THREE.RepeatWrapping;
+
+				// compressed texture
+
+				const ddsLoader = new DDSLoader();
+				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
+
+				// box mesh
+
+				const geometryBox = new THREE.BoxGeometry();
+				const materialBox = new MeshBasicNodeMaterial();
+
+				const timerNode = new TimerNode();
+
+				// birection speed
+				const timerScaleNode = new OperatorNode( '*', timerNode, new Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
+				const animateUV = new OperatorNode( '+', new UVNode(), timerScaleNode );
+
+				materialBox.colorNode = new TextureNode( texture, animateUV );
+
+				// test uv 2
+				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
+				//materialBox.colorNode = new TextureNode( texture, new UVNode( 1 ) );
+
+				box = new THREE.Mesh( geometryBox, materialBox );
+				box.position.set( 0, 1, 0 );
+				scene.add( box );
+
+				// displace example
+
+				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
+				const materialSphere = new MeshBasicNodeMaterial();
+
+				const displaceAnimated = new SplitNode( new TextureNode( textureDisplace ), 'x' );
+				const displaceY = new OperatorNode( '*', displaceAnimated, new FloatNode( .25 ).setConst( true ) );
+
+				const displace = new OperatorNode( '*', new NormalNode( NormalNode.LOCAL ), displaceY );
+
+				materialSphere.colorNode = displaceY;
+				materialSphere.positionNode = new OperatorNode( '+', new PositionNode( PositionNode.LOCAL ), displace );
+
+				const sphere = new THREE.Mesh( geometrySphere, materialSphere );
+				sphere.position.set( - 2, - 1, 0 );
+				scene.add( sphere );
+
+				// data texture
+
+				const geometryPlane = new THREE.PlaneGeometry();
+				const materialPlane = new MeshBasicNodeMaterial();
+				materialPlane.colorNode = new OperatorNode( '+', new TextureNode( createDataTexture() ), new ColorNode( new THREE.Color( 0x0000FF ) ) );
+				materialPlane.opacityNode = new SplitNode( new TextureNode( dxt5Texture ), 'a' );
+				materialPlane.transparent = true;
+
+				const plane = new THREE.Mesh( geometryPlane, materialPlane );
+				plane.position.set( 0, - 1, 0 );
+				scene.add( plane );
+
+				// compressed texture
+
+				const materialCompressed = new MeshBasicNodeMaterial();
+				materialCompressed.colorNode = new TextureNode( dxt5Texture );
+				materialCompressed.transparent = true;
+
+				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
+				boxCompressed.position.set( - 2, 1, 0 );
+				scene.add( boxCompressed );
+
+				// points
+
+				const points = [];
+
+				for ( let i = 0; i < 1000; i ++ ) {
+
+					const point = new THREE.Vector3().random().subScalar( 0.5 );
+					points.push( point );
+
+				}
+
+				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
+				const materialPoints = new PointsNodeMaterial();
+
+				materialPoints.colorNode = new OperatorNode( '*', new PositionNode(), new FloatNode( 3 ).setConst( true ) );
+
+				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
+				pointCloud.position.set( 2, - 1, 0 );
+				scene.add( pointCloud );
+
+				// lines
+
+				const geometryLine = new THREE.BufferGeometry().setFromPoints( [
+					new THREE.Vector3( - 0.5, - 0.5, 0 ),
+					new THREE.Vector3( 0.5, - 0.5, 0 ),
+					new THREE.Vector3( 0.5, 0.5, 0 ),
+					new THREE.Vector3( - 0.5, 0.5, 0 )
+				] );
+
+				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
+
+				const materialLine = new LineBasicNodeMaterial();
+				materialLine.colorNode = new AttributeNode( 'color', 'vec3' );
+
+				const line = new THREE.Line( geometryLine, materialLine );
+				line.position.set( 2, 1, 0 );
+				scene.add( line );
+
+				//
+
+				renderer = new WebGPURenderer( { requiredFeatures: [ 'texture-compression-bc' ] } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				return renderer.init();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				box.rotation.x += 0.01;
+				box.rotation.y += 0.02;
+
+				renderer.render( scene, camera );
+
+			}
+
+			function createDataTexture() {
+
+				const color = new THREE.Color( 0xff0000 );
+
+				const width = 512;
+				const height = 512;
+
+				const size = width * height;
+				const data = new Uint8Array( 4 * size );
+
+				const r = Math.floor( color.r * 255 );
+				const g = Math.floor( color.g * 255 );
+				const b = Math.floor( color.b * 255 );
+
+				for ( let i = 0; i < size; i ++ ) {
+
+					const stride = i * 4;
+
+					data[ stride ] = r;
+					data[ stride + 1 ] = g;
+					data[ stride + 2 ] = b;
+					data[ stride + 3 ] = 255;
+
+				}
+
+				return new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
+
+			}
+
+			function error( error ) {
+
+				console.error( error );
+
+			}
+
+		</script>
+	</body>
+</html>

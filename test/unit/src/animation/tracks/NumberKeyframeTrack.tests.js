@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { NumberKeyframeTrack } from '../../../../../src/animation/tracks/NumberKeyframeTrack';

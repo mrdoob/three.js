@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,10 +19,10 @@
 		<p>
 		[page:Float radius] - 半径值，或者说从该点到原点的
 		[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]（欧几里得距离，即直线距离）。默认值为*1.0*。<br />
-		[page:Float phi] - polar angle from the y (up) axis. Default is *0*.<br />
-		[page:Float theta] - equator angle around the y (up) axis. Default is *0*.<br /><br />
+		[page:Float phi] - 与 y (up) 轴的极角（以弧度为单位）。 默认值为 *0*。<br />
+		[page:Float theta] - 绕 y (up) 轴的赤道角(方位角)（以弧度为单位）。 默认值为 *0*。<br /><br />
 
-		The poles (phi) are at the positive and negative y axis. The equator (theta) starts at positive z.
+		极角（phi）位于正 y 轴和负 y 轴上。赤道角(方位角)（theta）从正 z 开始。
 		</p>
 
 
@@ -52,7 +51,7 @@
 
 		<h3>[method:Spherical makeSafe]()</h3>
 		<p>
-		将极角 [page:.phi phi] 的值限制在0.000001 和 pi - 0.000001 之间。
+		将极角 [page:.phi phi] 的值限制在0.000001 和 π - 0.000001 之间。
 		</p>
 
 		<h3>[method:Spherical set]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
@@ -70,6 +69,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

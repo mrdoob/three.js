@@ -1,6 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry';
@@ -52,8 +49,8 @@ export default QUnit.module( 'Core', () => {
 			instance.addGroup( 0, 10, instanceMock1 );
 			instance.addGroup( 10, 5, instanceMock2 );
 			instance.setIndex( indexMock );
-			instance.addAttribute( 'defaultAttribute1', defaultAttribute1 );
-			instance.addAttribute( 'defaultAttribute2', defaultAttribute2 );
+			instance.setAttribute( 'defaultAttribute1', defaultAttribute1 );
+			instance.setAttribute( 'defaultAttribute2', defaultAttribute2 );
 
 			var copiedInstance = new InstancedBufferGeometry().copy( instance );
 

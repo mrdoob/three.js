@@ -1,7 +1,4 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
 
 /**
  * @param editor Editor
@@ -10,44 +7,43 @@
  * @param newValue number, string, boolean or object
  * @constructor
  */
+class SetGeometryValueCommand extends Command {
 
-var SetGeometryValueCommand = function ( editor, object, attributeName, newValue ) {
+	constructor( editor, object, attributeName, newValue ) {
 
-	Command.call( this, editor );
+		super( editor );
 
-	this.type = 'SetGeometryValueCommand';
-	this.name = 'Set Geometry.' + attributeName;
+		this.type = 'SetGeometryValueCommand';
+		this.name = `Set Geometry.${attributeName}`;
 
-	this.object = object;
-	this.attributeName = attributeName;
-	this.oldValue = ( object !== undefined ) ? object.geometry[ attributeName ] : undefined;
-	this.newValue = newValue;
+		this.object = object;
+		this.attributeName = attributeName;
+		this.oldValue = ( object !== undefined ) ? object.geometry[ attributeName ] : undefined;
+		this.newValue = newValue;
 
-};
+	}
 
-SetGeometryValueCommand.prototype = {
-
-	execute: function () {
+	execute() {
 
 		this.object.geometry[ this.attributeName ] = this.newValue;
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.geometryChanged.dispatch();
 		this.editor.signals.sceneGraphChanged.dispatch();
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.object.geometry[ this.attributeName ] = this.oldValue;
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.geometryChanged.dispatch();
 		this.editor.signals.sceneGraphChanged.dispatch();
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
@@ -56,11 +52,11 @@ SetGeometryValueCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.attributeName = json.attributeName;
@@ -69,4 +65,6 @@ SetGeometryValueCommand.prototype = {
 
 	}
 
-};
+}
+
+export { SetGeometryValueCommand };

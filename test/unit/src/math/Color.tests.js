@@ -1,11 +1,8 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Color } from '../../../../src/math/Color';
 import { eps } from './Constants.tests';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -25,6 +22,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.r == 1, "Passed" );
 			assert.ok( c.g == 1, "Passed" );
 			assert.ok( c.b == 1, "Passed" );
+
+		} );
+
+		// EXPOSED CONSTANTS
+		QUnit.test( "Color.NAMES", ( assert ) => {
+
+			assert.ok( Color.NAMES.aliceblue == 0xF0F8FF, "Exposed Color.NAMES" );
 
 		} );
 
@@ -121,7 +125,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( hsl.l == 0.75, "lightness: " + hsl.l );
 
 			hsl = { h: 0, s: 0, l: 0 };
-			a.setStyle( "hsl(270,50%,75%,0.5)" );
+			a.setStyle( "hsl(270,50%,75%)" );
 			a.getHSL( hsl );
 			assert.ok( hsl.h == 0.75, "hue: " + hsl.h );
 			assert.ok( hsl.s == 0.5, "saturation: " + hsl.s );
@@ -136,6 +140,21 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.r == 0xF8 / 255, "Red: " + a.r );
 			assert.ok( a.g == 0xAB / 255, "Green: " + a.g );
 			assert.ok( a.b == 0xC1 / 255, "Blue: " + a.b );
+
+			a.setStyle( "aliceblue" );
+			assert.ok( a.r == 0xF0 / 255, "Red: " + a.r );
+			assert.ok( a.g == 0xF8 / 255, "Green: " + a.g );
+			assert.ok( a.b == 0xFF / 255, "Blue: " + a.b );
+
+		} );
+
+		QUnit.test( "setColorName", ( assert ) => {
+
+			var c = new Color();
+			var res = c.setColorName( "aliceblue" );
+
+			assert.ok( c.getHex() == 0xF0F8FF, "Hex: " + c.getHex() );
+			assert.ok( c == res, "Returns Self" );
 
 		} );
 
@@ -343,16 +362,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setRGB", ( assert ) => {
-
-			var c = new Color();
-			c.setRGB( 1, 0.2, 0.1 );
-			assert.ok( c.r == 1, "Red: " + c.r );
-			assert.ok( c.g == 0.2, "Green: " + c.g );
-			assert.ok( c.b == 0.1, "Blue: " + c.b );
-
-		} );
-
 		QUnit.test( "lerp", ( assert ) => {
 
 			var c = new Color();
@@ -475,7 +484,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleRGBARed", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'rgba(255,0,0,0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g === 0, "Green: " + c.g );
 			assert.ok( c.b === 0, "Blue: " + c.b );
@@ -515,7 +528,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleRGBAPercent", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'rgba(100%,50%,10%, 0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g == 0.5, "Green: " + c.g );
 			assert.ok( c.b == 0.1, "Blue: " + c.b );
@@ -535,7 +552,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleRGBAPercentWithSpaces", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'rgba( 100% ,50%  ,  10%, 0.5 )' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g == 0.5, "Green: " + c.g );
 			assert.ok( c.b == 0.1, "Blue: " + c.b );
@@ -555,7 +576,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleHSLARed", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'hsla(360,100%,50%,0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g === 0, "Green: " + c.g );
 			assert.ok( c.b === 0, "Blue: " + c.b );
@@ -575,7 +600,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setStyleHSLARedWithSpaces", ( assert ) => {
 
 			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
 			c.setStyle( 'hsla( 360,  100% , 50%,  0.5 )' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok( c.r == 1, "Red: " + c.r );
 			assert.ok( c.g === 0, "Green: " + c.g );
 			assert.ok( c.b === 0, "Blue: " + c.b );

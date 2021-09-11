@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,11 +12,11 @@
 		<p class="desc">A global instance of the [page:LoadingManager LoadingManager], used by most loaders
 			when no custom manager has been specified.<br /><br />
 
-		  This will be sufficient for most purposes, however there may be times when you desire seperate loading managers
+		  This will be sufficient for most purposes, however there may be times when you desire separate loading managers
 			for say, textures and models.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<p>
 			You can optionally set the [page:LoadingManager.onStart onStart], [page:LoadingManager.onLoad onLoad],
@@ -66,6 +65,8 @@ THREE.DefaultLoadingManager.onError = function ( url ) {
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
+		</p>
 	</body>
 </html>

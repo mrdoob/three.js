@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">مجموعة من الكائنات التي تتلقى حالة حركة مشتركة.<br /><br />
+
+			للحصول على نظرة عامة حول العناصر المختلفة لنظام الرسوم المتحركة three.js ، راجع مقالة "نظام الحركات" في قسم "الخطوات التالية" من الدليل.
+		</p>
+
+		<h2>الإستعمال:</h2>
+
+		<p class="desc">
+			تظيف كائنات يمكن تمريرها عبر المنشئ كـ'جذر' أو عبر وظيفة [page:AnimationMixer.clipAction clipAction] الخاصة بـ [page:AnimationMixer AnimationMixer] أو بدلا من دلك عبر تمرير هدا الكائن الأخير كـ'جذر'.<br /><br />
+
+
+			لاحظ أن كائنات هذه الفئة تظهر ككائن واحد للخالط ، لذا يجب التحكم في ذاكرة التخزين المؤقت للكائنات الفردية على المجموعة.
+		</p>
+
+
+		<h2>التقييدات (Limitations)</h2>
+		<p class="desc">
+			يجب أن تكون الخصائص المتحركة متوافقة مع جميع الكائنات في المجموعة.<br /><br />
+
+			يمكن التحكم في خاصية واحدة إما من خلال مجموعة مستهدفة أو بشكل مباشر ، ولكن ليس كلاهما.
+		</p>
+
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			[page:Object obj] - عدد عشوائي من الشبكات التي تشترك في نفس حالة الحركة.
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+
+
+		<h3>[property:Object stats]</h3>
+		<p>
+			كائن يحتوي على بعض المعلومات حول *AnimationObjectGroup* (العدد الإجمالي ، العدد المستخدم ، عدد الروابط لكل كائن)
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] الخاص بهذا *AnimationObjectGroup*. يتم تعيينه تلقائيًا ولا يجب تحريره.
+		</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<h3>[method:null add]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			يضيف عددًا عشوائيًا من الكائنات إلى *AnimationObjectGroup*.
+		</p>
+
+		<h3>[method:null remove]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			يزيل عددًا عشوائيًا من الكائنات من *AnimationObjectGroup*.
+		</p>
+
+		<h3>[method:null uncache]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<p>
+			إلغاء تخصيص كافة موارد الذاكرة للكائنات التي تم تمريرها من *AnimationObjectGroup*.
+		</p>
+
+
+		<h2>المصدر (Source)</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

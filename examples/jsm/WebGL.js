@@ -1,17 +1,10 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
- */
+class WEBGL {
 
-
-
-var WEBGL = {
-
-	isWebGLAvailable: function () {
+	static isWebGLAvailable() {
 
 		try {
 
-			var canvas = document.createElement( 'canvas' );
+			const canvas = document.createElement( 'canvas' );
 			return !! ( window.WebGLRenderingContext && ( canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' ) ) );
 
 		} catch ( e ) {
@@ -20,13 +13,13 @@ var WEBGL = {
 
 		}
 
-	},
+	}
 
-	isWebGL2Available: function () {
+	static isWebGL2Available() {
 
 		try {
 
-			var canvas = document.createElement( 'canvas' );
+			const canvas = document.createElement( 'canvas' );
 			return !! ( window.WebGL2RenderingContext && canvas.getContext( 'webgl2' ) );
 
 		} catch ( e ) {
@@ -35,35 +28,35 @@ var WEBGL = {
 
 		}
 
-	},
+	}
 
-	getWebGLErrorMessage: function () {
+	static getWebGLErrorMessage() {
 
 		return this.getErrorMessage( 1 );
 
-	},
+	}
 
-	getWebGL2ErrorMessage: function () {
+	static getWebGL2ErrorMessage() {
 
 		return this.getErrorMessage( 2 );
 
-	},
+	}
 
-	getErrorMessage: function ( version ) {
+	static getErrorMessage( version ) {
 
-		var names = {
+		const names = {
 			1: 'WebGL',
 			2: 'WebGL 2'
 		};
 
-		var contexts = {
+		const contexts = {
 			1: window.WebGLRenderingContext,
 			2: window.WebGL2RenderingContext
 		};
 
-		var message = 'Your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">$1</a>';
+		let message = 'Your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">$1</a>';
 
-		var element = document.createElement( 'div' );
+		const element = document.createElement( 'div' );
 		element.id = 'webglmessage';
 		element.style.fontFamily = 'monospace';
 		element.style.fontSize = '13px';
@@ -93,6 +86,6 @@ var WEBGL = {
 
 	}
 
-};
+}
 
 export { WEBGL };

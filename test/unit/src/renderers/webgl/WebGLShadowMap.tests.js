@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { WebGLShadowMap } from '../../../../../src/renderers/webgl/WebGLShadowMap';

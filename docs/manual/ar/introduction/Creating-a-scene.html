@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>إنشاء مشهد（[name]）</h1>
+
+		<p>الهدف من هذا القسم هو تقديم لمحة وجيزة عن كيفية عمل المكتبة. سنبدأ بتحضير مشهد يتمثل في مكعب ثلاثي الأبعاد .الصفحة مرفوقة بمثال أسفلها في حالة واجهتك بعض المشاكل وإحتجت إلى المساعدة.</p>
+
+		<h2>قبل أن نبدأ</h2>
+
+		<p>
+			قبل أن يمكنك إستعمال المكتبة, يجب أن توفر مكان لإظهار المشهد. قم بإنشاء ملف HTML يحتوي الشفرة البرمجية التالية
+        	بصحبة نسخة من المكتبة [link:https://threejs.org/build/three.js three.js] في مجلد سمه js و من ثم فم بفتح الصفحة في المتصفح.
+		</p>
+
+		<code>
+		&lt;!DOCTYPE html&gt;
+		&lt;html&gt;
+			&lt;head&gt;
+				&lt;meta charset="utf-8"&gt;
+				&lt;title&gt;My first three.js app&lt;/title&gt;
+				&lt;style&gt;
+					body { margin: 0; }
+				&lt;/style&gt;
+			&lt;/head&gt;
+			&lt;body&gt;
+				&lt;script src="js/three.js"&gt;&lt;/script&gt;
+				&lt;script&gt;
+					// Our Javascript will go here.
+				&lt;/script&gt;
+			&lt;/body&gt;
+		&lt;/html&gt;
+		</code>
+
+		<p>
+			هذا كل شيء. بقية الأوامر البرمجية ستكون محتوات في وسم &lt;script&gt; الفارغ حاليا.
+		</p>
+
+		<h2>إنشاء مشهد</h2>
+
+		<p>
+			لنتمكن من إظهار أي شيء بإستهمال three.js، نحتاج ثلاثة عناصر أساسية: المسرح (Scene)، الكاميرا (Camera)، و العارض
+			(Renderer).
+		</p>
+
+		<code>
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+		</code>
+
+		<p>
+			لنتمهل لحظة من أجل توضيح ما يحصل هنا. لقد قمنا بتحضير كل من المسرح، الكاميرا، و العارض.
+		</p>
+
+		<p>
+			توفر مكتبة three.js العديد من الخيارات بخصوص نوع الكاميرا. للوقت الراهن، سنستعمل
+			<strong>PerspectiveCamera</strong>.
+		</p>
+
+		<p>
+			أول ميزة هي <strong>مجال الرؤية - Field of view</strong>. يمكن التعبير عنها بإستعمال إختصارها كالأتي FOV. هذه
+			القيمة تمثل مجال
+			المشاهدة المتاح في أي وقت
+			من العرض. وحده قيسها هي الدرجة (degrees)
+		</p>
+
+		<p>
+			القيمة الثانية هي <strong>نسبة العرض إلى الارتفاع - aspect ratio</strong>. من المستحسن إستعمال نتيجة قسمة عرض و
+			طول العنصر الحاوي، و إلا ستحصل على تجربة مماثلة
+			لمشاهدة فيلم قديم على تلفاز عريض حيث ستكون الصورة متغيرة.
+		</p>
+
+		<p>
+			القيمتين المتبقيتين هما <strong>أقرب</strong> و <strong>أبعد</strong> سطح فاصل. نقصد بدلك أن أي عنصر في المشهد
+			أبعد من السطح الفاصل البعيد بالنسبة
+			للكاميرا أو أقرب من السطح الفاصل القريب لن يتم عرضه.
+			أنت لست مطالب بالقلق حيال هذا، و لكن من الممكن أن تريد إستعمال قيم أخرى من أجل الحصول على أداء أفضل.
+		</p>
+
+		<p>
+			نصل الأن إلى العارض. هنا أين يكمن السحر. بالإضافة لإستعمال WebGLRenderer، المكتبة تتكفل بتمكين بعض المتصفحات
+			القديمة التي لا
+			تدعم WebGL لسبب ما من الخصائص المفقودة.
+		</p>
+
+		<p>
+			إلي جانب إنشاء نموذج من مكون عارض، نحن مطالبون بتوفير قياس المشهد المراد عرضه. إنها لا فكرة جيدة أن نستعمل عرض و
+			طول المنطقة التي نريد ملأها في الصفحة. في هذه الحالة إستعملنا عرض و طول نافدة المتصفح. بالنسبة لتطبيقات عالية
+			الأداء، يمكنك توفير قيم أقل مثل <strong>window.innerWidth/2</strong> و <strong>window.innerHeight/2</strong>،
+			التي
+			ستجعل المشهد يعرض أسرع بنصف المدة السابقة.
+		</p>
+
+		<p>
+			على سبيل المثال إلغاء قيمة <strong>updateStyle</strong> كالأتي:
+			<br />
+			<strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong>
+			<br />
+			ستجعل المشهد يعرض بدقة أقل بنصف
+			الدرجة القديمة، مع العلم أن < canvas>
+				الخاصة بك تم إمدادها ب100% في كلا الطول و العرض.
+		</p>
+
+		<p>
+			أخيرا و ليس أخرا، سنقوم بإضافة <strong>العارض</strong> إلى ملف الـHTML.
+			<br />
+			< canvas> هو وسم يستعمله العارض لإظهار المشهد من خلاله.
+		</p>
+
+		<p>
+			<em>"كل شيء جيد، و لكن أي المكعب الذي وعدتنا به؟"</em> لنقم بإضافته الأن.
+		</p>
+
+		<code>
+		const geometry = new THREE.BoxGeometry();
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+
+		camera.position.z = 5;
+		</code>
+
+		<p>
+			لكي نقوم بإنشاء مكعب، نحتاج مكون <strong>BoxGeometry</strong>. هذا الأخير مسؤول عن حفض أماكن كل النقاط
+			(<strong>vertices</strong>) و تعبئة كل الأوجه
+			(<strong>faces</strong>) المكونة للمكعب. سنقوم بالتعمق في هذا الموضوع مستقبلا.
+		</p>
+
+		<p>
+			بالإضافة إلى الهندسة الخاصة بالمكعب، نحتاج المادة المكونة له لتعطيه لون. Three.js تأتي مع العديد من المواد،
+			و
+			لكن سنكتفي بإستعمال <strong>MeshBasicMaterial</strong> للوقت الراهن. كل المواد تأخذ مجموعة من القيم ستطبق
+			عليها
+			من أجل الوصول إلى النتيجة المرادة. لإبقاء الأشياء بسيطة، قمنا بإرفاق قيمة اللون التي تحمل
+			<strong>0x00ff00</strong>، و الذي يمثل اللون الأخضر. كيفية إحتساب القيمة هي نفسها كإستعمال CSS أو Photoshop
+			(<strong>hex colors</strong>).
+		</p>
+
+		<p>
+			الخطوة التالية هي إنشاء جسم <strong>Mesh</strong>. نقصد به الشيء الذي سيتكفل بالتعامل مع هندسة الشكل و
+			تطبيقها
+			على المادة المرفوقة، و من ثم يمكننا إدخال الشكل الجسم النهائي إلى المشهد، و التحرك بحرية حوله.
+		</p>
+
+		<p>
+			عند إستعمال أمر <strong>()scene.add</strong>، الشيء المراد إضافته للمشهد سيضاف في الإحداثيات التالية
+			(<strong>0,0,0</strong>). هذا يمكن له أن يشكل بعض المشاكل كون الكاميرا في هذه الحالة وسط المكعب. لتجنب هذا
+			نقوم
+			ببساطة بإبعاد الكاميرا قليلا.
+		</p>
+
+		<h2>عرض المشهد</h2>
+
+		<p>
+			إن قمت بنسخ الأوامر البرمجية الموجودة أعله وسط ملف HTML الذي قمنا بإنشائه مسبقا، لم تتمكن من رؤية أي شيء حتى
+			الأن. هذا بسبب أننا لم نقم بعرض أي شيء حتى اللحظة. لذلك، ما نحتاجه يدعى العرض (<strong>render</strong>) أو
+			حلقة
+			الحركات (<strong>animation loop</strong>).
+		</p>
+
+		<code>
+		function animate() {
+			requestAnimationFrame( animate );
+			renderer.render( scene, camera );
+		}
+		animate();
+		</code>
+
+		<p>
+			هذه الشفرة البرمجية تقوم بإنشاء حلقة تجعل العارض يعيد تحديث المشهد كل مرة يحدث فيها تغيير في الصفحة (أو نظريا
+			هذا يعني 60
+			مرة
+			خلال كل ثانية). إن كنت لا تملك تجربة مسبقة في صناعة ألعاب المتصفح، ستتسائل <em>"لماذا لا نستعمل
+				setInterval؟"</em> الحقيقة أننا بإمكاننا ذلك و لكن <strong>requestAnimationFrame</strong> تقدم لنا
+			العديد من
+			المزايا. من أهما أنها تقوم بإيقاف العمل عندما يقوم المستعمل بتغيير الصفحة، بالإضافة لعدم إستهلاك قدرة
+			الحاسب الخاص بالجهاز و عمر البطارية.
+		</p>
+
+		<h2>تحريك المكعب</h2>
+
+		<p>
+			إن قمت بإضافة الأوامر البرمجية السابقة للملف الخاص بك، من الأرجح أنك ترى الأن مكعبا أخضر اللون. لنقم بجعله
+			أكثر
+			جذابية من خلال تدويره.
+		</p>
+
+		<p>
+			قم بإضافة الشفرة التالية فوق السطر الذي يحتوي أمر <strong>renderer.render</strong> في الوظيفة
+			(<strong>animate</strong>):
+		</p>
+
+		<code>
+		cube.rotation.x += 0.01;
+		cube.rotation.y += 0.01;
+		</code>
+
+		<p>
+			هذه الأوامر سيتم تشغيلها في كل إطار (frame). ما يعني 60 مرة في الثانية تقريبا، و بذلك ستمكن المكعب من الدوران.
+			في
+			الأساس، أي شيء تريد تحريكه أو تغيره خلال فترة عمل التطبيق يستوجب أن تكون الأوامر الخاصة بذلك قد تم تشغيلها
+			داخل
+			حلقة الحركات. يمكنك بالتأكيد مناداة وظائف أخرى، لكي لا ينتهي بك المطاف بوظيفة واحدة تحتوي على مئات السطور.
+		</p>
+
+		<h2>النتيجة</h2>
+		<p>
+			تهانينا! لقد قمت بإكمال أول تطبيق three.js لك. الأمر ليس معقدا، يجب عليك فقد البدأ بشيء ما.
+		</p>
+
+		<p>
+			الشفرة البرمجية الكاملة في الأسفل إلى جانب محرر مباشر [link:https://jsfiddle.net/fxurzeb4/ live example].
+			أنت
+			مدعو للعب بالأوامر البرمجية لكي تصبح صورة كيفية عملها أوضح من قبل.
+		</p>
+
+		<code>
+		&lt;html&gt;
+			&lt;head&gt;
+				&lt;meta charset="utf-8"&gt;
+				&lt;title&gt;My first three.js app&lt;/title&gt;
+				&lt;style&gt;
+					body { margin: 0; }
+				&lt;/style&gt;
+			&lt;/head&gt;
+			&lt;body&gt;
+				&lt;script src="js/three.js"&gt;&lt;/script&gt;
+				&lt;script&gt;
+					const scene = new THREE.Scene();
+					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+					const renderer = new THREE.WebGLRenderer();
+					renderer.setSize( window.innerWidth, window.innerHeight );
+					document.body.appendChild( renderer.domElement );
+
+					const geometry = new THREE.BoxGeometry();
+					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+					const cube = new THREE.Mesh( geometry, material );
+					scene.add( cube );
+
+					camera.position.z = 5;
+
+					const animate = function () {
+						requestAnimationFrame( animate );
+
+						cube.rotation.x += 0.01;
+						cube.rotation.y += 0.01;
+
+						renderer.render( scene, camera );
+					};
+
+					animate();
+				&lt;/script&gt;
+			&lt;/body&gt;
+		&lt;/html&gt;
+		</code>
+	</body>
+</html>

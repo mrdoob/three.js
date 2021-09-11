@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -52,23 +51,6 @@
 			若缓存存储三元组（例如顶点位置、法向量、颜色值），则该值应等于队列中三元组的个数。
 		</p>
 
-		<h3>[property:Boolean dynamic]</h3>
-		<p>
-			不论缓存是否是动态的，默认值都将是 *false*<br />
-
-			如果该值为 false，即告知 GPU 缓存中的数据会经常使用但不经常变化。
-			该值与 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.STATIC_DRAW] 标志位相一致。<br />
-			如果该值为 true，即告知 GPU 缓存中的数据会经常使用且经常变化。
-			该值与 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] 标志位相一致。
-		</p>
-
-		<h3>[property:Boolean isBufferAttribute]</h3>
-		<p>
-			指示当前类或派生类是 BufferAttributes. 默认值为 *true*.<br /><br />
-
-			开发者不应当改变该值，该值用于内部实现优化。
-		</p>
-
 		<h3>[property:Integer itemSize]</h3>
 		<p>保存在 [page:BufferAttribute.array array] 中矢量的长度。</p>
 
@@ -101,11 +83,30 @@
 			该值只可以被用于更新某些矢量数据（例如，颜色相关数据）。
 		</p>
 
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+			Default is [page:BufferAttributeUsage StaticDrawUsage]. See usage [page:BufferAttributeUsage constants] for all possible values.
+		</p>
+
 		<h3>[property:Integer version]</h3>
 		<p>版本号，当 [page:BufferAttribute.needsUpdate needsUpdate] 被设置为 true 时，该值会自增。</p>
 
 
 		<h2>方法</h2>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Applies matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Applies normal matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute, interpreting the elements as a direction vectors.</p>
 
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>返回该 BufferAttribute 的拷贝。</p>
@@ -115,7 +116,7 @@
 			拷贝 TypedArray 相关注意事项详见 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]。
 		</p>
 
-		<h3>[method:null copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
+		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>将一个矢量从 bufferAttribute[index2] 拷贝到 [page:BufferAttribute.array array][index1] 中。</p>
 
 		<h3>[method:BufferAttribute copyColorsArray]( [param:Array colors] ) </h3>
@@ -142,7 +143,7 @@
 		<h3>[method:Number getW]( [param:Integer index] ) </h3>
 		<p>获取给定索引的矢量的第四维元素 （即 W 值）。</p>
 
-		<h3>[method:null onUpload]( [param:Function callback] ) </h3>
+		<h3>[method:this onUpload]( [param:Function callback] ) </h3>
 		<p>见 onUploadCallback 属性。<br /><br />
 			在 [example:webgl_buffergeometry WebGL / Buffergeometry] 中，该方在缓存数据传递给 GPU 后，用于释放内存。
 		</p>
@@ -158,15 +159,8 @@
 		特别的, 对将 [page:Array value] 转为  [page:TypedArray] 的要求详见上述链接。
 		</p>
 
-		<h3>[method:BufferAttribute setArray] ( [param:TypedArray array] ) </h3>
-		<p>
-		[page:BufferAttribute.array array] 被赋值的 TypedArray 队列。<br /><br />
-
-		队列被复制后，[page:BufferAttribute.needsUpdate needsUpdate] 应当被设置为 true。
-		</p>
-
-		<h3>[method:BufferAttribute setDynamic] ( [param:Boolean value] ) </h3>
-		<p>将 [page:BufferAttribute.dynamic dynamic] 设置为 value.</p>
+		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:BufferAttribute.usage usage] to value. See usage [page:BufferAttributeUsage constants] for all possible input values.</p>
 
 		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>设置给定索引的矢量的第一维数据（设置 X 值）。</p>
@@ -193,6 +187,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

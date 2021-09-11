@@ -1,14 +1,14 @@
-import { _Math } from '../../math/Math.js';
+import * as MathUtils from '../../math/MathUtils.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * Extensible curve object
+ * Extensible curve object.
  *
  * Some common of curve methods:
- * .getPoint( t, optionalTarget ), .getTangent( t )
- * .getPointAt( u, optionalTarget ), .getTangentAt( u )
+ * .getPoint( t, optionalTarget ), .getTangent( t, optionalTarget )
+ * .getPointAt( u, optionalTarget ), .getTangentAt( u, optionalTarget )
  * .getPoints(), .getSpacedPoints()
  * .getLength()
  * .updateArcLengths()
@@ -33,49 +33,43 @@ import { Matrix4 } from '../../math/Matrix4.js';
  *
  **/
 
-/**************************************************************
- *	Abstract Curve base class
- **************************************************************/
+class Curve {
 
-function Curve() {
+	constructor() {
 
-	this.type = 'Curve';
+		this.type = 'Curve';
 
-	this.arcLengthDivisions = 200;
+		this.arcLengthDivisions = 200;
 
-}
-
-Object.assign( Curve.prototype, {
+	}
 
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
 
-	getPoint: function ( /* t, optionalTarget */ ) {
+	getPoint( /* t, optionalTarget */ ) {
 
 		console.warn( 'THREE.Curve: .getPoint() not implemented.' );
 		return null;
 
-	},
+	}
 
 	// Get point at relative position in curve according to arc length
 	// - u [0 .. 1]
 
-	getPointAt: function ( u, optionalTarget ) {
+	getPointAt( u, optionalTarget ) {
 
-		var t = this.getUtoTmapping( u );
+		const t = this.getUtoTmapping( u );
 		return this.getPoint( t, optionalTarget );
 
-	},
+	}
 
 	// Get sequence of points using getPoint( t )
 
-	getPoints: function ( divisions ) {
+	getPoints( divisions = 5 ) {
 
-		if ( divisions === undefined ) divisions = 5;
+		const points = [];
 
-		var points = [];
-
-		for ( var d = 0; d <= divisions; d ++ ) {
+		for ( let d = 0; d <= divisions; d ++ ) {
 
 			points.push( this.getPoint( d / divisions ) );
 
@@ -83,17 +77,15 @@ Object.assign( Curve.prototype, {
 
 		return points;
 
-	},
+	}
 
 	// Get sequence of points using getPointAt( u )
 
-	getSpacedPoints: function ( divisions ) {
+	getSpacedPoints( divisions = 5 ) {
 
-		if ( divisions === undefined ) divisions = 5;
+		const points = [];
 
-		var points = [];
-
-		for ( var d = 0; d <= divisions; d ++ ) {
+		for ( let d = 0; d <= divisions; d ++ ) {
 
 			points.push( this.getPointAt( d / divisions ) );
 
@@ -101,22 +93,20 @@ Object.assign( Curve.prototype, {
 
 		return points;
 
-	},
+	}
 
 	// Get total curve arc length
 
-	getLength: function () {
+	getLength() {
 
-		var lengths = this.getLengths();
+		const lengths = this.getLengths();
 		return lengths[ lengths.length - 1 ];
 
-	},
+	}
 
 	// Get list of cumulative segment lengths
 
-	getLengths: function ( divisions ) {
-
-		if ( divisions === undefined ) divisions = this.arcLengthDivisions;
+	getLengths( divisions = this.arcLengthDivisions ) {
 
 		if ( this.cacheArcLengths &&
 			( this.cacheArcLengths.length === divisions + 1 ) &&
@@ -128,13 +118,13 @@ Object.assign( Curve.prototype, {
 
 		this.needsUpdate = false;
 
-		var cache = [];
-		var current, last = this.getPoint( 0 );
-		var p, sum = 0;
+		const cache = [];
+		let current, last = this.getPoint( 0 );
+		let sum = 0;
 
 		cache.push( 0 );
 
-		for ( p = 1; p <= divisions; p ++ ) {
+		for ( let p = 1; p <= divisions; p ++ ) {
 
 			current = this.getPoint( p / divisions );
 			sum += current.distanceTo( last );
@@ -147,24 +137,25 @@ Object.assign( Curve.prototype, {
 
 		return cache; // { sums: cache, sum: sum }; Sum is in the last element.
 
-	},
+	}
 
-	updateArcLengths: function () {
+	updateArcLengths() {
 
 		this.needsUpdate = true;
 		this.getLengths();
 
-	},
+	}
 
 	// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
 
-	getUtoTmapping: function ( u, distance ) {
+	getUtoTmapping( u, distance ) {
 
-		var arcLengths = this.getLengths();
+		const arcLengths = this.getLengths();
 
-		var i = 0, il = arcLengths.length;
+		let i = 0;
+		const il = arcLengths.length;
 
-		var targetArcLength; // The targeted u distance value to get
+		let targetArcLength; // The targeted u distance value to get
 
 		if ( distance ) {
 
@@ -178,7 +169,7 @@ Object.assign( Curve.prototype, {
 
 		// binary search for the index with largest value smaller than target u distance
 
-		var low = 0, high = il - 1, comparison;
+		let low = 0, high = il - 1, comparison;
 
 		while ( low <= high ) {
 
@@ -215,77 +206,77 @@ Object.assign( Curve.prototype, {
 
 		// we could get finer grain at lengths, or use simple interpolation between two points
 
-		var lengthBefore = arcLengths[ i ];
-		var lengthAfter = arcLengths[ i + 1 ];
+		const lengthBefore = arcLengths[ i ];
+		const lengthAfter = arcLengths[ i + 1 ];
 
-		var segmentLength = lengthAfter - lengthBefore;
+		const segmentLength = lengthAfter - lengthBefore;
 
 		// determine where we are between the 'before' and 'after' points
 
-		var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
+		const segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
 
 		// add that fractional amount to t
 
-		var t = ( i + segmentFraction ) / ( il - 1 );
+		const t = ( i + segmentFraction ) / ( il - 1 );
 
 		return t;
 
-	},
+	}
 
 	// Returns a unit vector tangent at t
 	// In case any sub curve does not implement its tangent derivation,
 	// 2 points a small delta apart will be used to find its gradient
 	// which seems to give a reasonable approximation
 
-	getTangent: function ( t ) {
+	getTangent( t, optionalTarget ) {
 
-		var delta = 0.0001;
-		var t1 = t - delta;
-		var t2 = t + delta;
+		const delta = 0.0001;
+		let t1 = t - delta;
+		let t2 = t + delta;
 
 		// Capping in case of danger
 
 		if ( t1 < 0 ) t1 = 0;
 		if ( t2 > 1 ) t2 = 1;
 
-		var pt1 = this.getPoint( t1 );
-		var pt2 = this.getPoint( t2 );
+		const pt1 = this.getPoint( t1 );
+		const pt2 = this.getPoint( t2 );
 
-		var vec = pt2.clone().sub( pt1 );
-		return vec.normalize();
+		const tangent = optionalTarget || ( ( pt1.isVector2 ) ? new Vector2() : new Vector3() );
 
-	},
+		tangent.copy( pt2 ).sub( pt1 ).normalize();
 
-	getTangentAt: function ( u ) {
+		return tangent;
 
-		var t = this.getUtoTmapping( u );
-		return this.getTangent( t );
+	}
 
-	},
+	getTangentAt( u, optionalTarget ) {
 
-	computeFrenetFrames: function ( segments, closed ) {
+		const t = this.getUtoTmapping( u );
+		return this.getTangent( t, optionalTarget );
+
+	}
+
+	computeFrenetFrames( segments, closed ) {
 
 		// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
 
-		var normal = new Vector3();
+		const normal = new Vector3();
 
-		var tangents = [];
-		var normals = [];
-		var binormals = [];
+		const tangents = [];
+		const normals = [];
+		const binormals = [];
 
-		var vec = new Vector3();
-		var mat = new Matrix4();
-
-		var i, u, theta;
+		const vec = new Vector3();
+		const mat = new Matrix4();
 
 		// compute the tangent vectors for each segment on the curve
 
-		for ( i = 0; i <= segments; i ++ ) {
+		for ( let i = 0; i <= segments; i ++ ) {
 
-			u = i / segments;
+			const u = i / segments;
 
-			tangents[ i ] = this.getTangentAt( u );
-			tangents[ i ].normalize();
+			tangents[ i ] = this.getTangentAt( u, new Vector3() );
 
 		}
 
@@ -294,10 +285,10 @@ Object.assign( Curve.prototype, {
 
 		normals[ 0 ] = new Vector3();
 		binormals[ 0 ] = new Vector3();
-		var min = Number.MAX_VALUE;
-		var tx = Math.abs( tangents[ 0 ].x );
-		var ty = Math.abs( tangents[ 0 ].y );
-		var tz = Math.abs( tangents[ 0 ].z );
+		let min = Number.MAX_VALUE;
+		const tx = Math.abs( tangents[ 0 ].x );
+		const ty = Math.abs( tangents[ 0 ].y );
+		const tz = Math.abs( tangents[ 0 ].z );
 
 		if ( tx <= min ) {
 
@@ -327,7 +318,7 @@ Object.assign( Curve.prototype, {
 
 		// compute the slowly-varying normal and binormal vectors for each segment on the curve
 
-		for ( i = 1; i <= segments; i ++ ) {
+		for ( let i = 1; i <= segments; i ++ ) {
 
 			normals[ i ] = normals[ i - 1 ].clone();
 
@@ -339,7 +330,7 @@ Object.assign( Curve.prototype, {
 
 				vec.normalize();
 
-				theta = Math.acos( _Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+				const theta = Math.acos( MathUtils.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 				normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -353,7 +344,7 @@ Object.assign( Curve.prototype, {
 
 		if ( closed === true ) {
 
-			theta = Math.acos( _Math.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+			let theta = Math.acos( MathUtils.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
 			theta /= segments;
 
 			if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
@@ -362,7 +353,7 @@ Object.assign( Curve.prototype, {
 
 			}
 
-			for ( i = 1; i <= segments; i ++ ) {
+			for ( let i = 1; i <= segments; i ++ ) {
 
 				// twist a little...
 				normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
@@ -378,25 +369,25 @@ Object.assign( Curve.prototype, {
 			binormals: binormals
 		};
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.arcLengthDivisions = source.arcLengthDivisions;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var data = {
+		const data = {
 			metadata: {
 				version: 4.5,
 				type: 'Curve',
@@ -409,9 +400,9 @@ Object.assign( Curve.prototype, {
 
 		return data;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
 		this.arcLengthDivisions = json.arcLengthDivisions;
 
@@ -419,7 +410,7 @@ Object.assign( Curve.prototype, {
 
 	}
 
-} );
+}
 
 
 export { Curve };

@@ -1,9 +1,7 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
-History = function ( editor ) {
+import * as Commands from './commands/Commands.js';
+
+function History( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -30,7 +28,7 @@ History = function ( editor ) {
 
 	} );
 
-};
+}
 
 History.prototype = {
 
@@ -47,7 +45,7 @@ History.prototype = {
 			lastCmd.script === cmd.script &&
 			lastCmd.attributeName === cmd.attributeName;
 
-		if ( isUpdatableCmd && cmd.type === "SetScriptValueCommand" ) {
+		if ( isUpdatableCmd && cmd.type === 'SetScriptValueCommand' ) {
 
 			// When the cmd.type is "SetScriptValueCommand" the timeDifference is ignored
 
@@ -67,6 +65,7 @@ History.prototype = {
 			cmd.id = ++ this.idCounter;
 
 		}
+
 		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
 		cmd.execute();
 		cmd.inMemory = true;
@@ -76,6 +75,7 @@ History.prototype = {
 			cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
 
 		}
+
 		this.lastCmdTime = new Date();
 
 		// clearing all the redo-commands
@@ -89,7 +89,7 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert( "Undo/Redo disabled while scene is playing." );
+			alert( 'Undo/Redo disabled while scene is playing.' );
 			return;
 
 		}
@@ -124,7 +124,7 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert( "Undo/Redo disabled while scene is playing." );
+			alert( 'Undo/Redo disabled while scene is playing.' );
 			return;
 
 		}
@@ -171,7 +171,7 @@ History.prototype = {
 
 		for ( var i = 0; i < this.undos.length; i ++ ) {
 
-			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
+			if ( this.undos[ i ].hasOwnProperty( 'json' ) ) {
 
 				history.undos.push( this.undos[ i ].json );
 
@@ -183,7 +183,7 @@ History.prototype = {
 
 		for ( var i = 0; i < this.redos.length; i ++ ) {
 
-			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
+			if ( this.redos[ i ].hasOwnProperty( 'json' ) ) {
 
 				history.redos.push( this.redos[ i ].json );
 
@@ -202,7 +202,7 @@ History.prototype = {
 		for ( var i = 0; i < json.undos.length; i ++ ) {
 
 			var cmdJSON = json.undos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -214,7 +214,7 @@ History.prototype = {
 		for ( var i = 0; i < json.redos.length; i ++ ) {
 
 			var cmdJSON = json.redos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -242,7 +242,7 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert( "Undo/Redo disabled while scene is playing." );
+			alert( 'Undo/Redo disabled while scene is playing.' );
 			return;
 
 		}
@@ -300,11 +300,12 @@ History.prototype = {
 		var cmd = this.redo();
 		while ( cmd !== undefined ) {
 
-			if ( ! cmd.hasOwnProperty( "json" ) ) {
+			if ( ! cmd.hasOwnProperty( 'json' ) ) {
 
 				cmd.json = cmd.toJSON();
 
 			}
+
 			cmd = this.redo();
 
 		}
@@ -317,3 +318,5 @@ History.prototype = {
 	}
 
 };
+
+export { History };

@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Vector3 } from '../../../../src/math/Vector3';
@@ -990,6 +986,23 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.clone().lerp( b, 0.5 ).z == z * 0.5, "Passed!" );
 
 			assert.ok( a.clone().lerp( b, 1 ).equals( b ), "Passed!" );
+
+		} );
+
+		QUnit.test( 'randomDirection', ( assert ) => {
+
+			var vec = new Vector3();
+
+			vec.randomDirection();
+
+			var zero = new Vector3();
+			assert.notDeepEqual(
+				vec,
+				zero,
+				'randomizes at least one component of the vector'
+			);
+
+			assert.ok( ( 1 - vec.length() ) <= Number.EPSILON, 'produces a unit vector' );
 
 		} );
 

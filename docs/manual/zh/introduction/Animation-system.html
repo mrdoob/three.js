@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,7 +13,7 @@
 
 		<p class="desc">
 			在three.js动画系统中，您可以为模型的各种属性设置动画：
-			[page:SkinnedMesh]（蒙皮和装配模型）的骨骼，[page:Geometry.morphTargets]（变形目标），
+			[page:SkinnedMesh]（蒙皮和装配模型）的骨骼，morph targets（变形目标），
 			不同的材料属性（颜色，不透明度，布尔运算），可见性和变换。动画属性可以淡入、淡出、交叉淡化和扭曲。
 			在相同或不同物体上同时发生的动画的权重和时间比例的变化可以独立地进行。
 			相同或不同物体的动画也可以同步发生。
@@ -28,7 +27,7 @@
 
 		<p class="desc">
 			如果您已成功导入3D动画对象（无论它是否有骨骼或变形目标或两者皆有都不要紧）——
-			例如使用<a href="https://github.com/KhronosGroup/glTF-Blender-Exporter">glTF Blender导出器</a>
+			例如使用[link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter]（glTF Blender导出器）</a>
 			从Blender导出它并使用[page:GLTFLoader]将其加载到three.js场景中
 			—— 其中一个响应字段应该是一个名为“animations”的数组，
 			其中包含此模型的[page:AnimationClip AnimationClips]（请参阅下面可用的加载器列表）。
@@ -47,7 +46,7 @@
 			另一个轨道追踪同一块骨骼的旋转变化，第三个追踪另外一块骨骼的位置、转角和尺寸，等等。
 			应该很清楚，AnimationClip可以由许多这样的轨道组成。
 			<br /><br />
-			假设模型具有[page:Geometry.morphTargets]（变形目标）——
+			假设模型具有morph Targets（变形目标）——
 			例如一个变形目标显示一个笑脸，另一个显示愤怒的脸 ——
 			每个轨道都持有某个变形目标在AnimationClip运行期间产生的[page:Mesh.morphTargetInfluences]（变形目标影响）如何变化的信息。
 		</p>
@@ -90,7 +89,6 @@
 				<li>THREE.FBXLoader</li>
 				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
 				<li>THREE.MMDLoader</li>
-				<li>THREE.SEA3DLoader</li>
 			</ul>
 
 		<p class="desc">
@@ -100,11 +98,11 @@
 		<h2>范例</h2>
 
 		<code>
-		var mesh;
+		let mesh;
 
 		// 新建一个AnimationMixer, 并取得AnimationClip实例列表
-		var mixer = new THREE.AnimationMixer( mesh );
-		var clips = mesh.animations;
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
 
 		// 在每一帧中更新mixer
 		function update () {
@@ -112,8 +110,8 @@
 		}
 
 		// 播放一个特定的动画
-		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-		var action = mixer.clipAction( clip );
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
 		action.play();
 
 		// 播放所有动画

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const lut = new Lut( 'rainbow', 512 );
+		const color = lut.getColor( 0.5 );
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:String colormap], [param:Number count] )</h3>
+		<p>
+		colormap - Sets a colormap from predefined colormaps. Available colormaps are : *rainbow*, *cooltowarm*, *blackbody*, *grayscale*. Default is *rainbow*.<br />
+		count - Sets the number of colors used to represent the data array. Default is *32*.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array lut]</h3>
+		<p>
+		The lookup table for the selected color map represented as an array of [page:Color]s.
+		</p>
+
+		<h3>[property:Array map]</h3>
+		<p>
+		The currently selected color map. Default is the *rainbow* color map.
+		</p>
+
+		<h3>[property:Number minV]</h3>
+		<p>
+		The minimum value to be represented with the lookup table. Default is *0*.
+		</p>
+
+		<h3>[property:Number maxV]</h3>
+		<p>
+		The maximum value to be represented with the lookup table. Default is *1*.
+		</p>
+
+		<h3>[property:Number n]</h3>
+		<p>
+		The number of colors of the current selected color map. Default is *32*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null copy]( [param:Lut lut] ) [param:Lut this]</h3>
+		<p>
+		color — Lut to copy.
+		</p>
+		<p>
+		Copies the given lut.
+		</p>
+
+		<h3>[method:Lut addColorMap]( [param:String name], [param:Array arrayOfColors] )</h3>
+		<p>
+		name — The name of the color map.<br />
+		arrayOfColors — An array of color values. Each value is an array holding a threshold and the actual color value as a hexadecimal number.
+		</p>
+		<p>
+		Adds a color map to this [name] instance.
+		</p>
+
+		<h3>[method:HTMLCanvasElement createCanvas]()</h3>
+		<p>
+		Creates a canvas in order to visualize the lookup table as a texture.
+		</p>
+
+		<h3>[method:Color getColor]( [param:Number alpha] )</h3>
+		<p>
+		value -- the data value to be displayed as a color.
+		</p>
+		<p>
+		Returns an instance of [page:Color] for the given data value.
+		</p>
+
+		<h3>[method:Lut setColorMap]( [param:String colormap], [param:Number count] )</h3>
+		<p>
+		colormap — The name of the color map.<br />
+		count — The number of colors. Default is *32*.
+		</p>
+		<p>
+		Configure the lookup table for the given color map and number of colors.
+		</p>
+
+		<h3>[method:Lut setMin]( [param:Number minV] )</h3>
+		<p>
+		minV — The minimum value to be represented with the lookup table
+		</p>
+		<p>
+		Sets this Lut with the minimum value to be represented.
+		</p>
+
+		<h3>[method:Lut setMax]( [param:Number maxV] )</h3>
+		<p>
+		maxV — The maximum value to be represented with the lookup table.
+		</p>
+		<p>
+		Sets this Lut with the maximum value to be represented.
+		</p>
+
+		<h3>[method:HTMLCanvasElement updateCanvas]( [param:HTMLCanvasElement canvas] )</h3>
+		<p>
+		Updates the canvas with the [name]'s data.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/Lut.js examples/jsm/math/Lut.js]
+		</p>
+	</body>
+</html>

@@ -1,23 +1,22 @@
-/**
- * This class has been made to hold a slice of a volume data
- * @class
- * @author Valentin Demeusy / https://github.com/stity
- * @param   {Volume} volume    The associated volume
- * @param   {number}       [index=0] The index of the slice
- * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
- * @see Volume
- */
-
 import {
 	ClampToEdgeWrapping,
 	DoubleSide,
 	LinearFilter,
 	Mesh,
 	MeshBasicMaterial,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	Texture
-} from "../../../build/three.module.js";
-var VolumeSlice = function ( volume, index, axis ) {
+} from '../../../build/three.module.js';
+
+/**
+ * This class has been made to hold a slice of a volume data
+ * @class
+ * @param   {Volume} volume    The associated volume
+ * @param   {number}       [index=0] The index of the slice
+ * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
+ * @see Volume
+ */
+function VolumeSlice( volume, index, axis ) {
 
 	var slice = this;
 	/**
@@ -96,7 +95,7 @@ var VolumeSlice = function ( volume, index, axis ) {
 	 */
 
 
-};
+}
 
 VolumeSlice.prototype = {
 
@@ -179,6 +178,7 @@ VolumeSlice.prototype = {
 			}
 
 		}
+
 		ctx.putImageData( imgData, 0, 0 );
 		this.ctx.drawImage( canvas, 0, 0, iLength, jLength, 0, 0, this.canvas.width, this.canvas.height );
 
@@ -209,14 +209,14 @@ VolumeSlice.prototype = {
 
 		if ( this.geometry ) this.geometry.dispose(); // dispose existing geometry
 
-		this.geometry = new PlaneBufferGeometry( extracted.planeWidth, extracted.planeHeight );
+		this.geometry = new PlaneGeometry( extracted.planeWidth, extracted.planeHeight );
 
 		if ( this.mesh ) {
 
 			this.mesh.geometry = this.geometry;
 			//reset mesh matrix
 			this.mesh.matrix.identity();
-			this.mesh.applyMatrix( this.matrix );
+			this.mesh.applyMatrix4( this.matrix );
 
 		}
 

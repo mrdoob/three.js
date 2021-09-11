@@ -1,8 +1,4 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
-var NodeLib = {
+const NodeLib = {
 
 	nodes: {},
 	keywords: {},

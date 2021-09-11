@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,15 +17,15 @@
 		This exporter only supports exporting geometry, materials, textures, and scene hierarchy.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		// Instantiate an exporter
-		var exporter = new THREE.ColladaExporter();
+		const exporter = new ColladaExporter();
 
 		// Parse the input and generate the ply output
-		var data = exporter.parse( scene, null, options );
-		downloadFile(data);
+		const data = exporter.parse( scene, null, options );
+		downloadFile( data );
 		</code>
 
 		<h2>Constructor</h2>
@@ -49,6 +48,9 @@
 			<li>version - string. Which version of Collada to export. The options are "1.4.1" or "1.5.0". Defaults to "1.4.1".</li>
 			<li>author - string. The name to include in the author field. Author field is excluded by default.</li>
 			<li>textureDirectory - string. The directory relative to the Collada file to save the textures to.</li>
+			<li>upAxis - string. Either Y_UP (default), Z_UP or X_UP.</li>
+			<li>unitName - string. Name of the unit. Can be any string, but could be for example "meter", "inch", or "parsec".</li>
+			<li>unitMeter - number. Length of the unit in meters.</li>
 		</ul>
 		</p>
 		<p>
@@ -58,7 +60,7 @@
 			// Collada file content
 			data: "",
 
-			// List of referenced texures
+			// List of referenced textures
 			textures: [{
 
 				// File directory, name, and extension of the texture data
@@ -76,6 +78,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/ColladaExporter.js examples/js/exporters/ColladaExporter.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/ColladaExporter.js examples/jsm/exporters/ColladaExporter.js]
+		</p>
 	</body>
 </html>

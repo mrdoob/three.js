@@ -19,7 +19,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - map controls
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - map controls
 		</div>
 
 		<script type="module">
@@ -28,7 +28,7 @@
 
 			import { MapControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, controls, scene, renderer;
+			let camera, controls, scene, renderer;
 
 			init();
 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -36,16 +36,16 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xcccccc );
-				scene.fog = new THREE.FogExp2( 0xcccccc, 0.0012 );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xcccccc );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.0012 );
 
 				//var h = 100, aspect = window.innerWidth / window.innerHeight;
 				//camera = new THREE.OrthographicCamera( - h * aspect, h * aspect, h, - h, 10, 10000 );
@@ -88,7 +88,7 @@
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

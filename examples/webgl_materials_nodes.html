@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material<br />
 			<a id="serialize" href="javascript:void(0);">Serialize and apply</a>
 		</div>
 
@@ -20,23 +20,26 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
-			var container = document.getElementById( 'container' );
+			const container = document.getElementById( 'container' );
 
-			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new Nodes.NodeFrame();
-			var teapot, mesh;
-			var controls;
-			var move = false;
-			var rtTexture, rtMaterial;
-			var gui;
-			var library = {};
-			var serialized = false;
-			var textures = {
+			let renderer, scene, lightGroup, camera;
+			const clock = new THREE.Clock(), fov = 50;
+			const frame = new Nodes.NodeFrame();
+			let teapot, mesh;
+			let controls;
+			let move = false;
+			let rtTexture, rtMaterial;
+			let gui;
+			const library = {};
+			let serialized = false;
+			const textures = {
 				brick: { url: 'textures/brick_diffuse.jpg' },
 				grass: { url: 'textures/terrain/grasslight-big.jpg' },
 				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg' },
@@ -46,11 +49,11 @@
 				spherical: { url: 'textures/envmap.png' }
 			};
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
+			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
 
 			function getTexture( name ) {
 
-				var texture = textures[ name ].texture;
+				let texture = textures[ name ].texture;
 
 				if ( ! texture ) {
 
@@ -65,18 +68,42 @@
 
 			}
 
-			var cubemap = function () {
+			let premTexture, pmremCube;
 
-				var path = "textures/cube/Park2/";
-				var format = '.jpg';
-				var urls = [
+			function updatePREM( textureCube ) {
+
+				pmremCube = pmremCube || textureCube;
+
+				if ( ! pmremCube || ! renderer ) return;
+
+				const minFilter = pmremCube.minFilter;
+				const magFilter = pmremCube.magFilter;
+				const generateMipmaps = pmremCube.generateMipmaps;
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
+				pmremGenerator.dispose();
+
+				pmremCube.minFilter = minFilter;
+				pmremCube.magFilter = magFilter;
+				pmremCube.generateMipmaps = generateMipmaps;
+				pmremCube.needsUpdate = true;
+
+				library[ premTexture.uuid ] = premTexture;
+
+			}
+
+			const cubemap = function () {
+
+				const path = "textures/cube/Park2/";
+				const format = '.jpg';
+				const urls = [
 					path + 'posx' + format, path + 'negx' + format,
 					path + 'posy' + format, path + 'negy' + format,
 					path + 'posz' + format, path + 'negz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
+				const textureCube = new THREE.CubeTextureLoader().load( urls, updatePREM );
 
 				library[ textureCube.uuid ] = textureCube;
 
@@ -91,7 +118,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.uuid = THREE.Math.generateUUID(); // generate to library
+				renderer.uuid = THREE.MathUtils.generateUUID(); // generate to library
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -100,24 +128,27 @@
 				camera.position.x = 50;
 				camera.position.z = - 50;
 				camera.position.y = 30;
-				camera.target = new THREE.Vector3();
-
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
-				scene.add( new THREE.AmbientLight( 0x464646 ) );
+				lightGroup = new THREE.Group();
+				scene.add( lightGroup );
 
-				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+				let light;
+
+				lightGroup.add( new THREE.AmbientLight( 0x464646 ) );
+
+				light = new THREE.DirectionalLight( 0xffddcc, 1 );
 				light.position.set( 1, 0.75, 0.5 );
-				scene.add( light );
+				lightGroup.add( light );
 
-				var light = new THREE.DirectionalLight( 0xccccff, 1 );
+				light = new THREE.DirectionalLight( 0xccccff, 1 );
 				light.position.set( - 1, 0.75, - 0.5 );
-				scene.add( light );
+				lightGroup.add( light );
 
-				teapot = new TeapotBufferGeometry( 15, 18 );
+				teapot = new TeapotGeometry( 15, 18 );
 
 				mesh = new THREE.Mesh( teapot );
 				scene.add( mesh );
@@ -126,7 +157,9 @@
 				library[ camera.uuid ] = camera;
 				library[ mesh.uuid ] = mesh;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				updatePREM();
+
+				window.addEventListener( 'resize', onWindowResize );
 
 				updateMaterial();
 
@@ -145,6 +178,7 @@
 					'basic / mesh-standard': 'mesh-standard',
 					'basic / standard': 'standard',
 					'basic / physical': 'physical',
+					'basic / prem': 'prem',
 					'basic / phong': 'phong',
 					'basic / layers': 'layers',
 					'basic / rim': 'rim',
@@ -175,14 +209,17 @@
 					'adv / expression': 'expression',
 					'adv / sss': 'sss',
 					'adv / translucent': 'translucent',
+					'adv / bias': 'bias',
 					'node / position': 'node-position',
 					'node / normal': 'node-normal',
 					'node / reflect': 'node-reflect',
+					'misc / sub-slot': 'sub-slot',
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
 					'misc / reserved-keywords': 'reserved-keywords',
 					'misc / varying': 'varying',
 					'misc / void-function': 'void-function',
+					'misc / basic-material': 'basic-material',
 					'misc / readonly': 'readonly',
 					'misc / label': 'label',
 					'misc / custom-attribute': 'custom-attribute'
@@ -198,7 +235,7 @@
 
 			function addGui( name, value, callback, isColor, min, max ) {
 
-				var node;
+				let node;
 
 				param[ name ] = value;
 
@@ -237,6 +274,8 @@
 			function updateMaterial() {
 
 				move = false;
+
+				lightGroup.visible = true;
 
 				if ( mesh.material ) mesh.material.dispose();
 
@@ -393,6 +432,180 @@
 
 						break;
 
+					case 'prem':
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						//mtl.color = // albedo (vec3)
+						//mtl.alpha = // opacity (float)
+						//mtl.roughness = // roughness (float)
+						//mtl.metalness = // metalness (float)
+						//mtl.normal = // normal (vec3)
+						//mtl.emissive = // emissive color (vec3)
+						//mtl.ambient = // ambient color (vec3)
+						//mtl.shadow = // shadowmap (vec3)
+						//mtl.light = // custom-light (vec3)
+						//mtl.ao = // ambient occlusion (float)
+						//mtl.environment = // reflection/refraction (vec3)
+						//mtl.position = // vertex local position (vec3)
+
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+
+						var intensity = new Nodes.FloatNode( 1 );
+
+						var normalScale = new Nodes.FloatNode( .3 );
+
+						var roughnessA = new Nodes.FloatNode( .5 );
+						var metalnessA = new Nodes.FloatNode( .5 );
+
+						var roughnessB = new Nodes.FloatNode( 0 );
+						var metalnessB = new Nodes.FloatNode( 1 );
+
+						var roughness = new Nodes.MathNode(
+							roughnessA,
+							roughnessB,
+							mask,
+							Nodes.MathNode.MIX
+						);
+
+						var metalness = new Nodes.MathNode(
+							metalnessA,
+							metalnessB,
+							mask,
+							Nodes.MathNode.MIX
+						);
+
+						var normalMask = new Nodes.OperatorNode(
+							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
+							normalScale,
+							Nodes.OperatorNode.MUL
+						);
+
+						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
+						mtl.roughness = roughness;
+						mtl.metalness = metalness;
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal.scale = normalMask;
+
+						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
+						mtl.environment = new Nodes.OperatorNode( envNode, intensity, Nodes.OperatorNode.MUL );
+
+						// GUI
+
+						addGui( 'color', mtl.color.value.getHex(), function ( val ) {
+
+							mtl.color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'intensity', intensity.value, function ( val ) {
+
+							intensity.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'roughnessA', roughnessA.value, function ( val ) {
+
+							roughnessA.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessA', metalnessA.value, function ( val ) {
+
+							metalnessA.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughnessB', roughnessB.value, function ( val ) {
+
+							roughnessB.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessB', metalnessB.value, function ( val ) {
+
+							metalnessB.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'normalScale', normalScale.value, function ( val ) {
+
+							normalScale.value = val;
+
+						}, false, 0, 1 );
+
+						break;
+
+					case 'sub-slot':
+
+						// disable dynamic light
+
+						lightGroup.visible = false;
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						// NODES
+
+						var normalScale = new Nodes.FloatNode( .3 );
+
+						var radiance = new Nodes.FloatNode( 1 );
+						var irradiance = new Nodes.FloatNode( 1 );
+
+						var roughness = new Nodes.FloatNode( .5 );
+						var metalness = new Nodes.FloatNode( .5 );
+
+						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
+						mtl.roughness = roughness;
+						mtl.metalness = metalness;
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal.scale = normalScale;
+
+						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
+
+						var subSlotNode = new Nodes.SubSlotNode();
+						subSlotNode.slots[ 'radiance' ] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
+						subSlotNode.slots[ 'irradiance' ] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
+
+						mtl.environment = subSlotNode;
+
+						// GUI
+
+						addGui( 'radiance', radiance.value, function ( val ) {
+
+							radiance.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'irradiance', irradiance.value, function ( val ) {
+
+							irradiance.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'roughness', roughness.value, function ( val ) {
+
+							roughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalness', metalness.value, function ( val ) {
+
+							metalness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'normalScale', normalScale.value, function ( val ) {
+
+							normalScale.value = val;
+
+						}, false, 0, 1 );
+
+						break;
+
 					case 'mesh-standard':
 
 						// MATERIAL
@@ -501,6 +714,18 @@
 
 						}, false );
 
+						addGui( 'side', {
+							DoubleSided: THREE.DoubleSide,
+							FrontSided: THREE.FrontSide,
+							BackSided: THREE.BackSide
+						}, function ( val ) {
+
+							defaultSide = Number( val );
+
+							updateMaterial();
+
+						} );
+
 						break;
 
 					case 'physical':
@@ -514,8 +739,9 @@
 						//mtl.roughness = // roughness (float)
 						//mtl.metalness = // metalness (float)
 						//mtl.reflectivity = // reflectivity (float)
-						//mtl.clearCoat = // clearCoat (float)
-						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
+						//mtl.clearcoat = // clearcoat (float)
+						//mtl.clearcoatRoughness = // clearcoatRoughness (float)
+						//mtl.clearcoatNormal = // clearcoatNormal (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)
@@ -528,6 +754,7 @@
 						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
+						var clearcoatNormalScale = new Nodes.FloatNode( .1 );
 
 						var roughnessA = new Nodes.FloatNode( .5 );
 						var metalnessA = new Nodes.FloatNode( .5 );
@@ -536,8 +763,8 @@
 						var metalnessB = new Nodes.FloatNode( 1 );
 
 						var reflectivity = new Nodes.FloatNode( 0 );
-						var clearCoat = new Nodes.FloatNode( 1 );
-						var clearCoatRoughness = new Nodes.FloatNode( 1 );
+						var clearcoat = new Nodes.FloatNode( 1 );
+						var clearcoatRoughness = new Nodes.FloatNode( 1 );
 
 						var roughness = new Nodes.MathNode(
 							roughnessA,
@@ -559,12 +786,20 @@
 							Nodes.OperatorNode.MUL
 						);
 
+						var clearcoatNormalMask = new Nodes.OperatorNode(
+							mask,
+							clearcoatNormalScale,
+							Nodes.OperatorNode.MUL
+						);
+
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.reflectivity = reflectivity;
-						mtl.clearCoat = clearCoat;
-						mtl.clearCoatRoughness = clearCoatRoughness;
+						mtl.clearcoat = clearcoat;
+						mtl.clearcoatRoughness = clearcoatRoughness;
+						mtl.clearcoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.clearcoatNormal.scale = clearcoatNormalMask;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
@@ -583,15 +818,21 @@
 
 						}, false, 0, 1 );
 
-						addGui( 'clearCoat', clearCoat.value, function ( val ) {
+						addGui( 'clearcoat', clearcoat.value, function ( val ) {
 
-							clearCoat.value = val;
+							clearcoat.value = val;
 
 						}, false, 0, 1 );
 
-						addGui( 'clearCoatRoughness', clearCoatRoughness.value, function ( val ) {
+						addGui( 'clearcoatRoughness', clearcoatRoughness.value, function ( val ) {
 
-							clearCoatRoughness.value = val;
+							clearcoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearcoatNormalScale', clearcoatNormalScale.value, function ( val ) {
+
+							clearcoatNormalScale.value = val;
 
 						}, false, 0, 1 );
 
@@ -904,7 +1145,7 @@
 
 						function updateUVTransform() {
 
-							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
+							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.MathUtils.degToRad( rotate ) );
 
 						}
 
@@ -1994,8 +2235,8 @@
 							mtl.metalness = new Nodes.FloatNode( 0 );
 							mtl.roughness = new Nodes.FloatNode( 1 );
 							mtl.reflectivity = new Nodes.FloatNode( 0 );
-							mtl.clearCoat = new Nodes.FloatNode( .2 );
-							mtl.clearCoatRoughness = new Nodes.FloatNode( .3 );
+							mtl.clearcoat = new Nodes.FloatNode( .2 );
+							mtl.clearcoatRoughness = new Nodes.FloatNode( .3 );
 							mtl.environment = new Nodes.CubeTextureNode( cubemap );
 
 						} else {
@@ -2233,12 +2474,73 @@
 
 						// reserved keywords
 
-						console.log( Nodes.NodeLib.keywords );
+						// console.log( Nodes.NodeLib.keywords );
 
 						// keywords conflit? use this to disable:
 						//blurtexture.useKeywords = false; // ( true is default )
 
 						mtl.color = new Nodes.FunctionCallNode( keywordsexample, [ new Nodes.TextureNode( getTexture( "brick" ) ) ] );
+
+						break;
+
+					case 'bias':
+
+						// MATERIAL
+
+						var bias = new Nodes.FloatNode( .5 );
+						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureNode( cubemap ) );
+						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
+
+						mtl = new Nodes.PhongNodeMaterial();
+						mtl.color.value.setHex( 0xFFFFFF );
+
+						function biasMode( val ) {
+
+							switch ( val ) {
+
+								case 'prem':
+
+									mtl.color = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ), undefined, bias );
+
+									break;
+
+								case 'lod':
+
+									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCubeLodEXT( samplerCube texture, vec3 uv, float bias );', undefined, { shaderTextureLOD: true } 								);
+
+									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
+
+									break;
+
+								case 'basic':
+
+									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCube( samplerCube texture, vec3 uv, float bias );' );
+
+									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
+
+									break;
+
+							}
+
+							mtl.needsUpdate = true;
+
+						}
+
+						biasMode( 'prem' );
+
+						// GUI
+
+						addGui( 'scope', {
+							PREM: 'prem',
+							LOD: 'lod',
+							BASIC: 'basic'
+						}, biasMode );
+
+						addGui( 'bias', bias.value, function ( val ) {
+
+							bias.value = val;
+
+						}, false, 0, 1 );
 
 						break;
 
@@ -2279,6 +2581,7 @@
 						// GUI
 
 						addGui( 'scope', {
+							view: Nodes.NormalNode.VIEW,
 							local: Nodes.NormalNode.LOCAL,
 							world: Nodes.NormalNode.WORLD
 						}, function ( val ) {
@@ -2297,22 +2600,36 @@
 
 						var node = new Nodes.ReflectNode();
 
-						mtl = new Nodes.PhongNodeMaterial();
-						mtl.environment = new Nodes.CubeTextureNode( cubemap, node );
+						var nodeMaterial = new Nodes.StandardNodeMaterial();
+						nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
+						nodeMaterial.roughness.value = .5;
+						nodeMaterial.metalness.value = 1;
+
+						var standardMaterial = new THREE.MeshStandardMaterial( {
+							color: nodeMaterial.color.value,
+							side: defaultSide,
+							envMap: cubemap,
+							roughness: nodeMaterial.roughness.value,
+							metalness: 1
+						} );
+
+						mtl = nodeMaterial;
 
 						// GUI
 
-						addGui( 'scope', {
-							vector: Nodes.ReflectNode.VECTOR,
-							cube: Nodes.ReflectNode.CUBE,
-							sphere: Nodes.ReflectNode.SPHERE
-						}, function ( val ) {
+						addGui( 'node', true, function ( val ) {
 
-							node.scope = val;
-
-							mtl.needsUpdate = true;
+							mtl = val ? nodeMaterial : standardMaterial;
+							mesh.material = mtl;
 
 						} );
+
+						addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
+
+							nodeMaterial.roughness.value = val;
+							standardMaterial.roughness = val;
+
+						}, false, 0, 1 );
 
 						break;
 
@@ -2383,6 +2700,37 @@
 						} );
 
 						mtl.color = new Nodes.BypassNode( clipFromPosCall, varying );
+
+						break;
+
+					case 'basic-material':
+
+						// MATERIAL
+
+						mtl = new Nodes.BasicNodeMaterial();
+
+						var positionNode = new Nodes.PositionNode();
+
+						var a = new Nodes.OperatorNode(
+							new Nodes.SwitchNode( positionNode, 'x' ),
+							new Nodes.SwitchNode( positionNode, 'y' ),
+							Nodes.OperatorNode.ADD
+						);
+						var b = new Nodes.FloatNode( 0. );
+						var ifNode = new Nodes.FloatNode( 1. );
+						var elseNode = new Nodes.FloatNode( 0. );
+
+						mtl.mask = new Nodes.CondNode( a, b, Nodes.CondNode.GREATER, ifNode, elseNode );
+
+						var sin = new Nodes.MathNode( new Nodes.TimerNode(), Nodes.MathNode.SIN );
+
+						mtl.position = new Nodes.OperatorNode(
+							positionNode,
+							sin,
+							Nodes.OperatorNode.ADD
+						);
+
+						mtl.color = new Nodes.ColorNode( 'green' );
 
 						break;
 
@@ -2584,7 +2932,7 @@
 						// show names glsl fragment shader
 						// open console e find using CTRL+F "colorMix" for example
 
-						console.log( mtl.fragmentShader );
+						// console.log( mtl.fragmentShader );
 
 						break;
 
@@ -2599,7 +2947,7 @@
 
 						var blurtexture = new Nodes.FunctionNode( [
 							// Reference: TriangleBlurShader.js
-							"vec4 blurtexture(sampler2D texture, vec2 uv, vec2 delta) {",
+							"vec4 blurtexture(sampler2D map, vec2 uv, vec2 delta) {",
 							"	vec4 color = vec4( 0.0 );",
 							"	float total = 0.0;",
 							// randomize the lookup values to hide the fixed number of samples
@@ -2607,7 +2955,7 @@
 							"	for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {",
 							"		float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;",
 							"		float weight = 1.0 - abs( percent );",
-							"		color += texture2D( texture, uv + delta * percent ) * weight;",
+							"		color += texture2D( map, uv + delta * percent ) * weight;",
 							"		total += weight;",
 							"	}",
 							"	return color / total;",
@@ -2615,7 +2963,7 @@
 						].join( "\n" ), [ new Nodes.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
 
 						var blurredTexture = new Nodes.FunctionCallNode( blurtexture, {
-							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
+							map: new Nodes.TextureNode( getTexture( "brick" ) ),
 							delta: delta,
 							uv: new Nodes.UVNode()
 						} );
@@ -2661,7 +3009,7 @@
 
 						var triplanarMapping = new Nodes.FunctionNode( [
 							// Reference: https://github.com/keijiro/StandardTriplanar
-							"vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {",
+							"vec4 triplanar_mapping( sampler2D map, vec3 normal, vec3 position, float scale ) {",
 
 							// Blending factor of triplanar mapping
 							"	vec3 bf = normalize( abs( normal ) );",
@@ -2673,9 +3021,9 @@
 							"	vec2 tz = position.xy * scale;",
 
 							// Base color
-							"	vec4 cx = texture2D(texture, tx) * bf.x;",
-							"	vec4 cy = texture2D(texture, ty) * bf.y;",
-							"	vec4 cz = texture2D(texture, tz) * bf.z;",
+							"	vec4 cx = texture2D(map, tx) * bf.x;",
+							"	vec4 cy = texture2D(map, ty) * bf.y;",
+							"	vec4 cz = texture2D(map, tz) * bf.z;",
 
 							"	return cx + cy + cz;",
 
@@ -2683,7 +3031,7 @@
 						].join( "\n" ) );
 
 						var triplanarMappingTexture = new Nodes.FunctionCallNode( triplanarMapping, {
-							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
+							map: new Nodes.TextureNode( getTexture( "brick" ) ),
 							normal: new Nodes.NormalNode( Nodes.NormalNode.WORLD ),
 							position: new Nodes.PositionNode( Nodes.PositionNode.WORLD ),
 							scale: scale,
@@ -2911,7 +3259,7 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth, height = window.innerHeight;
+				const width = window.innerWidth, height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -2937,18 +3285,18 @@
 
 				// gui
 
-				var div = document.getElementById( 'serialize' );
+				const div = document.getElementById( 'serialize' );
 				div.textContent = "Serialize and apply";
 
 			}
 
 			function serialize() {
 
-				var json = mesh.material.toJSON();
+				const json = mesh.material.toJSON();
 
 				// replace uuid to url (facilitates the load of textures using url otherside uuid) e.g:
 
-				var cloud = getTexture( "cloud" );
+				const cloud = getTexture( "cloud" );
 
 				NodeMaterialLoaderUtils.replaceUUID( json, cloud, "cloud" );
 
@@ -2956,9 +3304,9 @@
 
 				// --
 
-				var jsonStr = JSON.stringify( json );
+				const jsonStr = JSON.stringify( json );
 
-				console.log( jsonStr );
+				// console.log( jsonStr );
 
 				var loader = new NodeMaterialLoader( null, library ),
 					material = loader.parse( json );
@@ -2969,7 +3317,7 @@
 
 				// gui
 
-				var div = document.getElementById( 'serialize' );
+				const div = document.getElementById( 'serialize' );
 				div.textContent = "Click to reset - JSON Generate: " + ( jsonStr.length / 1024 ).toFixed( 3 ) + "kB";
 
 				if ( gui ) gui.destroy();
@@ -2980,7 +3328,7 @@
 
 			function animate() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( move ) {
 

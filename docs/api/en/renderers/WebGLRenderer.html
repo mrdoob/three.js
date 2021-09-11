@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -55,17 +54,19 @@
 
 		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
 		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.
-		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for details.<br />
 
-		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
-		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low performance is detected. Default is *false*.
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for details.<br />
 
 		[page:Boolean depth] - whether the drawing buffer has a
 		[link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] of at least 16 bits.
 		Default is *true*.<br />
 
 		[page:Boolean logarithmicDepthBuffer] -  whether to use a logarithmic depth buffer. It may
-		be neccesary to use this if dealing with huge differences in scale in a single scene.
+		be necessary to use this if dealing with huge differences in scale in a single scene. Note that this setting
+		uses gl_FragDepth if available which disables the [link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test]
+		optimization and can cause a decrease in performance.
 		Default is *false*. See the [example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer] example.
 		</p>
 
@@ -162,13 +163,10 @@
 		<h3>[property:Float gammaFactor]</h3>
 		<p>Default is *2*. </p>
 
-
-		<h3>[property:Boolean gammaInput]</h3>
-		<p>If set, then it expects that all textures and colors are premultiplied gamma. Default is *false*.</p>
-
-
-		<h3>[property:Boolean gammaOutput]</h3>
-		<p>If set, then it expects that all textures and colors need to be outputted in premultiplied gamma. Default is *false*.</p>
+		<h3>[property:number outputEncoding]</h3>
+		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
+		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 
 		<h3>[property:Object info]</h3>
 		<p>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</p>
@@ -186,33 +184,26 @@
 					<li>triangles</li>
 					<li>points</li>
 					<li>lines</li>
+					<li>frame</li>
 				</ul>
 			</li>
 			<li>programs
 			</li>
 		</ul>
 		</p>
-		<p>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<p>By default these data are reset at each render call but when having multiple render passes per frame (e.g. when using post processing) it can be preferred to reset with a custom pattern.
+			First, set *autoReset* to *false*.
 		<code>
 		renderer.info.autoReset = false;
+		</code>
+		Call *reset()* whenever you have finished to render a single frame.
+		<code>
 		renderer.info.reset();
 		</code>
 		</p>
 
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<p>Defines whether the renderer respects object-level clipping planes. Default is *false*.</p>
-
-		<h3>[property:Integer maxMorphTargets]</h3>
-		<p>
-		Default is 8. The maximum number of MorphTargets allowed in a shader.
-			Keep in mind that the standard materials only allow 8 MorphTargets.
-		</p>
-
-		<h3>[property:Integer maxMorphNormals]</h3>
-		<p>
-		Default is 4. The maximum number of MorphNormals allowed in a shader.
-			Keep in mind that the standard materials only allow 4 MorphNormals.
-		</p>
 
 		<h3>[property:Boolean physicallyCorrectLights]</h3>
 		<p>
@@ -248,7 +239,7 @@
 
 		<h3>[property:Integer shadowMap.type]</h3>
 		<p>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</p>
-		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default) and THREE.PCFSoftShadowMap. See [page:Renderer Renderer constants] for details.</p>
+		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap and THREE.VSMShadowMap. See [page:Renderer Renderer constants] for details.</p>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<p>
@@ -267,7 +258,7 @@
 
 		<h3>[property:Constant toneMapping]</h3>
 		<p>
-		Default is [page:Renderer LinearToneMapping]. See the [page:Renderer Renderer constants] for other choices.
+		Default is [page:Renderer NoToneMapping]. See the [page:Renderer Renderer constants] for other choices.
 		</p>
 
 		<h3>[property:Number toneMappingExposure]</h3>
@@ -275,9 +266,9 @@
 		Exposure level of tone mapping. Default is *1*.
 		</p>
 
-		<h3>[property:Number toneMappingWhitePoint]</h3>
+		<h3>[property:WebXRManager xr]</h3>
 		<p>
-		Tone mapping white point. Default is *1*.
+		Provides access to the WebXR related [page:WebXRManager interface] of the renderer.
 		</p>
 
 		<h2>Methods</h2>
@@ -298,7 +289,7 @@
 		<h3>[method:null clearStencil]( )</h3>
 		<p>Clear the stencil buffers. Equivalent to calling [page:WebGLRenderer.clear .clear]( false, false, true ).</p>
 
-		<h3>[method:null compile]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:null compile]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</p>
 
 		<h3>[method:null copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
@@ -306,6 +297,9 @@
 
 		<h3>[method:null copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
 		<p>Copies all pixels of a texture to an existing texture starting from the given position. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].</p>
+
+		<h3>[method:null copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
+		<p>Copies the pixels of a texture in the bounds '[page:Box3 sourceBox]' in the destination texture starting from the given position. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].</p>
 
 		<h3>[method:null dispose]( )</h3>
 		<p>Dispose of the current rendering context.</p>
@@ -322,17 +316,22 @@
 		- *WEBGL_compressed_texture_etc1*
 		</p>
 
-		<h3>[method:null forceContextLoss]( )</h3>
+		<h3>[method:void forceContextLoss]()</h3>
 		<p>
 		Simulate loss of the WebGL context. This requires support for the
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] extensions.
-		According to [link:https://webglstats.com/ WebGLStats], as of February 2016 90% of WebGL enabled devices support this.
+		</p>
+
+		<h3>[method:void forceContextRestore]( )</h3>
+		<p>
+		Simulate restore of the WebGL context. This requires support for the
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] extensions.
 		</p>
 
 		<h3>[method:Float getClearAlpha]()</h3>
 		<p>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</p>
 
-		<h3>[method:Color getClearColor]()</h3>
+		<h3>[method:Color getClearColor]( [param:Color target] )</h3>
 		<p>Returns a [page:Color THREE.Color] instance with the current clear color.</p>
 
 		<h3>[method:WebGLRenderingContext getContext]()</h3>
@@ -391,6 +390,9 @@
 		Returns the viewport.
 		</p>
 
+		<h3>[method:null initTexture]( [param:Texture texture] )</h3>
+		<p> Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
+
 		<h3>[method:null resetGLState]( )</h3>
 		<p>Reset the GL state to default. Called internally if the WebGL context is lost.</p>
 
@@ -398,12 +400,12 @@
 		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
 		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
 		<p>See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.</p>
-		<p>For reading out a [page:WebGLRenderTargetCube WebGLRenderTargetCube] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
+		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
 
-		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>
-			Render a [page:Scene scene] using a [page:Camera camera].<br />
+			Render a [page:Scene scene] or another type of [page:Object3D object] using a [page:Camera camera].<br />
 
 			The render is done to a previously specified [page:WebGLRenderTarget renderTarget] set by calling [page:WebGLRenderer.setRenderTarget .setRenderTarget] or to the canvas as usual.<br />
 
@@ -412,20 +414,22 @@
 			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one ore more buffers call [page:WebGLRenderer.clear .clear].
 		</p>
 
-		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Scene scene], [param:BufferGeometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>Render a buffer geometry group using the camera and with the specified material.</p>
 
-		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:shaderprogram program], [param:Material shading] )</h3>
+		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
 		<p>object - an instance of [page:Object3D]<br />
-		program - an instance of shaderProgram<br />
-		shading - an instance of Material<br /><br />
+		program - an instance of [page:WebGLProgram]<br />
 
-		Render an immediate buffer. Gets called by renderImmediateObject.
+		Renders an instance of [page:ImmediateRenderObject]. Gets called by renderObjectImmediate().
 		</p>
+
+		<h3>[method:null resetState]()</h3>
+		<p>Can be used to reset the internal WebGL state. This method is mostly relevant for applications which share a single WebGL context across multiple WebGL libraries.</p>
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
-		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
+		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebXR projects this function must be used.</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>
@@ -439,7 +443,7 @@
 		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
 		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
-		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
+		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLCubeRenderTarget] (optional).<br />
 		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
 		This method sets the active rendertarget.
 		</p>
@@ -459,6 +463,16 @@
 		<p>
 		Enable or disable the scissor test. When this is enabled, only the pixels within the defined
 			scissor area will be affected by further renderer actions.
+		</p>
+
+		<h3>[method:null setOpaqueSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
+		</p>
+
+		<h3>[method:null setTransparentSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
 		</p>
 
 		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>
@@ -481,6 +495,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

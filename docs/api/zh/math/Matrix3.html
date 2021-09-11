@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,9 +13,9 @@
 			一个表示3X3矩阵[link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].的类。
 		</p>
 
-		<h2>示例（Example）</h2>
+		<h2>代码示例</h2>
 		<code>
-var m = new Matrix3();
+const m = new Matrix3();
 		</code>
 
 		<h2>注意行优先列优先的顺序。</h2>
@@ -58,24 +57,9 @@ m.elements = [ 11, 21, 31,
 			矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
 
-		<h3>[property:Boolean isMatrix3]</h3>
-		<p>
-				用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
-
-				不应该改变该值，因为它在内部用于优化。
-		</p>
-
 
 
 		<h2>方法（Methods）</h2>
-
-		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
-		<p>
-		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
-
-		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
-		</p>
-
 
 		<h3>[method:Matrix3 clone]()</h3>
 		<p>创建一个新的矩阵，元素 [page:.elements elements] 与该矩阵相同。</p>
@@ -91,6 +75,22 @@ m.elements = [ 11, 21, 31,
 		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
 		<p>如果矩阵[page:Matrix3 m] 与当前矩阵所有对应元素相同则返回true。</p>
 
+		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<p>
+		将该矩阵的基向量 [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 提取到提供的三个轴向中。如果该矩阵如下：
+		<code>
+a, b, c,
+d, e, f,
+g, h, i
+		</code>
+		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：
+		<code>
+xAxis = (a, d, g)
+yAxis = (b, e, h)
+zAxis = (c, f, i)
+		</code>
+		</p>
+
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
 		[page:Array array] - 用来存储设置元素数据的数组<br />
@@ -99,14 +99,9 @@ m.elements = [ 11, 21, 31,
 		使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
 		</p>
 
-		<h3>[method:this getInverse]( [param:Matrix3 m], [param:Boolean throwOnDegenerate] )</h3>
+		<h3>[method:this invert]()</h3>
 		<p>
-		[page:Matrix3 m] - 取逆的矩阵。<br />
-		[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
-
-		使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
-		将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
-		参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
+		将当前矩阵翻转为它的逆矩阵，使用 [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method] 解析方式。你不能对行或列为 0 的矩阵进行翻转，如果你尝试这样做，该方法将生成一个零矩阵。
 		</p>
 
 		<h3>[method:this getNormalMatrix]( [param:Matrix4 m] )</h3>
@@ -146,16 +141,14 @@ m.elements = [ 11, 21, 31,
 		[page:Float n32] - 设置第三行第二列的值。<br />
 		[page:Float n33] - 设置第三行第三列的值。<br /><br />
 
-		Sets the 3x3 matrix values to the given
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
-		sequence of values.
+		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵。
 		</p>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
 		<p>将矩阵[page:Matrix3 m]乘以当前矩阵。</p>
 
 		<h3>[method:this setFromMatrix4]( [param:Matrix4 m] )</h3>
-		<p>将当前矩阵设置为4X4矩阵[page:Matrix4 m]左上3X3</p>
+		<p>根据参数 [page:Matrix4 m] 左上 3x3 的矩阵值，设置当前矩阵的值。</p>
 
 		<h3>[method:this setUvTransform]( [param:Float tx], [param:Float ty], [param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], [param:Float cy] )</h3>
 		<p>
@@ -185,12 +178,14 @@ m.elements = [ 11, 21, 31,
 		<p>
 		[page:Array array] -  用于存储当前矩阵转置结果的数组。<br /><br />
 
-		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组[param:Array array]但不改变当前矩阵，
+		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组 array 中，但不改变当前矩阵，
 		并返回当前矩阵。
 		</p>
 
 		<h2>源码（Source）</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

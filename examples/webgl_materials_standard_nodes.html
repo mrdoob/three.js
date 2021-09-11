@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - standard (nodes)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based material<br/>
+			<a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
+		</div>
+
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
+			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+
+			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
+			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+			import SplitNode from './jsm/renderers/nodes/utils/SplitNode.js';
+			import NormalMapNode from './jsm/renderers/nodes/display/NormalMapNode.js';
+
+			import MeshStandardNodeMaterial from './jsm/renderers/nodes/materials/MeshStandardNodeMaterial.js';
+
+			let container, stats;
+
+			let camera, scene, renderer, controls;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 3;
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 1000 );
+				camera.position.z = 2;
+
+				controls = new TrackballControls( camera, renderer.domElement );
+
+				//
+
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
+
+				//
+
+				const material = new MeshStandardNodeMaterial();
+
+				new OBJLoader()
+					.setPath( 'models/obj/cerberus/' )
+					.load( 'Cerberus.obj', function ( group ) {
+
+						const loader = new THREE.TextureLoader()
+							.setPath( 'models/obj/cerberus/' );
+
+						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
+						diffuseMap.wrapS = THREE.RepeatWrapping;
+						diffuseMap.encoding = THREE.sRGBEncoding;
+
+						const rmMap = loader.load( 'Cerberus_RM.jpg' );
+						rmMap.wrapS = THREE.RepeatWrapping;
+
+						const normalMap = loader.load( 'Cerberus_N.jpg' );
+						normalMap.wrapS = THREE.RepeatWrapping;
+
+						const mpMapNode = new TextureNode( rmMap );
+
+						material.colorNode = new OperatorNode( '*', new TextureNode( diffuseMap ), new Vector3Node( material.color ) );
+
+						// roughness is in G channel, metalness is in B channel
+						material.roughnessNode = new SplitNode( mpMapNode, 'g' );
+						material.metalnessNode = new SplitNode( mpMapNode, 'b' );
+
+						material.normalNode = new NormalMapNode( new TextureNode( normalMap ) );
+
+						group.traverse( function ( child ) {
+
+							if ( child.isMesh ) {
+
+								child.material = material;
+
+							}
+
+						} );
+
+						group.position.x = - 0.45;
+						group.rotation.y = - Math.PI / 2;
+						scene.add( group );
+
+					} );
+
+				const environments = {
+
+					'Venice Sunset': { filename: 'venice_sunset_1k.hdr' },
+					'Overpass': { filename: 'pedestrian_overpass_1k.hdr' }
+
+				};
+
+				function loadEnvironment( name ) {
+
+					if ( environments[ name ].texture !== undefined ) {
+
+						scene.background = environments[ name ].texture;
+						scene.environment = environments[ name ].texture;
+						return;
+
+					}
+
+					const filename = environments[ name ].filename;
+					new RGBELoader()
+						.setDataType( THREE.UnsignedByteType )
+						.setPath( 'textures/equirectangular/' )
+						.load( filename, function ( hdrEquirect ) {
+
+							const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+							hdrEquirect.dispose();
+
+							scene.background = hdrCubeRenderTarget.texture;
+							scene.environment = hdrCubeRenderTarget.texture;
+							environments[ name ].texture = hdrCubeRenderTarget.texture;
+
+						} );
+
+				}
+
+				const params = {
+
+					environment: Object.keys( environments )[ 0 ]
+
+				};
+				loadEnvironment( params.environment );
+
+				const gui = new GUI();
+				gui.add( params, 'environment', Object.keys( environments ) ).onChange( function ( value ) {
+
+					loadEnvironment( value );
+
+				} );
+				gui.open();
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			//
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				nodeFrame.update();
+
+				controls.update();
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>

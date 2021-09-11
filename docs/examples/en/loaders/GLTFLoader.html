@@ -3,12 +3,12 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc"> A loader for <em>glTF 2.0</em> resources. <br /><br />
@@ -29,11 +29,28 @@
 
 		<ul>
 			<li>KHR_draco_mesh_compression</li>
+			<li>KHR_materials_clearcoat</li>
+			<li>KHR_materials_ior</li>
 			<li>KHR_materials_pbrSpecularGlossiness</li>
+			<li>KHR_materials_specular</li>
+			<li>KHR_materials_transmission</li>
 			<li>KHR_materials_unlit</li>
+			<li>KHR_materials_volume</li>
+			<li>KHR_mesh_quantization</li>
 			<li>KHR_lights_punctual<sup>1</sup></li>
+			<li>KHR_texture_basisu</li>
 			<li>KHR_texture_transform<sup>2</sup></li>
-			<li>MSFT_texture_dds</li>
+			<li>EXT_texture_webp</li>
+			<li>EXT_meshopt_compression</li>
+		</ul>
+
+		<p>
+			The following glTF 2.0 extension is supported by an external user plugin
+		</p>
+
+		<ul>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions KHR_materials_variants]<sup>3</sup></li>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions MSFT_texture_dds]</li>
 		</ul>
 
 		<p><i>
@@ -42,25 +59,27 @@
 		<p><i>
 			<sup>2</sup>UV transforms are supported, with several key limitations. Transforms applied to
 			a texture using the first UV slot (all textures except aoMap and lightMap) must share the same
-			transform, or no transfor at all. The aoMap and lightMap textures cannot be transformed. No
+			transform, or no transform at all. The aoMap and lightMap textures cannot be transformed. No
 			more than one transform may be used per material. Each use of a texture with a unique
 			transform will result in an additional GPU texture upload. See
 			#[link:https://github.com/mrdoob/three.js/pull/13831 13831] and
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788].
 		</i></p>
 
-		<h2>Example</h2>
+		<p><i>
+			<sup>3</sup>You can also manually process the extension after loading in your application. See [link:https://threejs.org/examples/#webgl_loader_gltf_variants Three.js glTF materials variants example].
+		</i></p>
+
+		<h2>Code Example</h2>
 
 		<code>
 		// Instantiate a loader
-		var loader = new THREE.GLTFLoader();
+		const loader = new GLTFLoader();
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
-		THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
-		loader.setDRACOLoader( new THREE.DRACOLoader() );
-
-		// Optional: Pre-fetch Draco WASM/JS module, to save time while parsing.
-		THREE.DRACOLoader.getDecoderModule();
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
+		loader.setDRACOLoader( dracoLoader );
 
 		// Load a glTF resource
 		loader.load(
@@ -72,8 +91,8 @@
 				scene.add( gltf.scene );
 
 				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
-				gltf.scene; // THREE.Scene
-				gltf.scenes; // Array&lt;THREE.Scene&gt;
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array&lt;THREE.Group&gt;
 				gltf.cameras; // Array&lt;THREE.Camera&gt;
 				gltf.asset; // Object
 
@@ -93,7 +112,11 @@
 		);
 		</code>
 
-		[example:webgl_loader_gltf]
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_gltf]
+		</p>
 
 		<h2>Browser compatibility</h2>
 
@@ -111,8 +134,7 @@
 		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
 
 		<code>
-		renderer.gammaOutput = true;
-		renderer.gammaFactor = 2.2;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		</code>
 
 		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
@@ -137,11 +159,11 @@
 		<code>
 		loader.load('foo.gltf', function ( gltf ) {
 
-			var scene = gltf.scene;
+			const scene = gltf.scene;
 
-			var mesh = scene.children[ 3 ];
+			const mesh = scene.children[ 3 ];
 
-			var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+			const fooExtension = mesh.userData.gltfExtensions.EXT_foo;
 
 			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
 				.then( function ( fooBuffer ) { ... } );
@@ -163,9 +185,10 @@
 		</p>
 
 		<h2>Properties</h2>
-
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -178,27 +201,6 @@
 		Begin loading from url and call the callback function with the parsed response content.
 		</p>
 
-		<h3>[method:GLTFLoader setPath]( [param:String path] )</h3>
-		<p>
-		[page:String path] — Base path.
-		</p>
-		<p>
-		Set the base path for the .gltf/.glb file.
-		</p>
-
-		<h3>[method:GLTFLoader setResourcePath]( [param:String path] )</h3>
-		<p>
-		[page:String path] — Base path for loading additional resources e.g. textures and .bin data.
-		</p>
-		<p>
-		Set the base path for additional resources.
-		</p>
-
-		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
-		<p>
-		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-		</p>
-
 		<h3>[method:null setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
 		<p>
 		[page:DRACOLoader dracoLoader] — Instance of THREE.DRACOLoader, to be used for decoding assets compressed with the KHR_draco_mesh_compression extension.
@@ -207,9 +209,9 @@
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
 		</p>
 
-		<h3>[method:null setDDSLoader]( [param:DDSLoader ddsLoader] )</h3>
+		<h3>[method:null setKTX2Loader]( [param:KTX2Loader ktx2Loader] )</h3>
 		<p>
-		[page:DDSLoader ddsLoader] — Instance of THREE.DDSLoader, to be used for loading compressed textures with the MSFT_TEXTURE_DDS extension.
+		[page:KTX2Loader ktx2Loader] — Instance of THREE.KTX2Loader, to be used for loading KTX2 compressed textures.
 		</p>
 
 		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
@@ -220,11 +222,13 @@
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</p>
 		<p>
-		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:Object] that contains loaded parts: .[page:Group scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</p>
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/GLTFLoader.js examples/js/loaders/GLTFLoader.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js examples/jsm/loaders/GLTFLoader.js]
+		</p>
 	</body>
 </html>
