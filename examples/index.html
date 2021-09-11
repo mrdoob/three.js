@@ -140,7 +140,7 @@
 					].join( '' ) );
 
 					file.clean = clean;
-					file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join(' ');
+					file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join(' ').toLowerCase();
 
 					validRedirects.set( name, name + '.html' );
 
