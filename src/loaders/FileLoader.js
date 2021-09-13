@@ -93,16 +93,14 @@ class FileLoader extends Loader {
 
 		// start the fetch
 		fetch( req )
-			.then( ( res ) => {
+			.then( response => {
 
-				// https://xhr.spec.whatwg.org/#the-response-attribute
-
-				if ( res.status === 200 || res.status === 0 ) {
+				if ( response.status === 200 || response.status === 0 ) {
 
 					// Some browsers return HTTP Status 0 when using non-http protocol
 					// e.g. 'file://' or 'data://'. Handle as success.
 
-					if ( res.status === 0 ) {
+					if ( response.status === 0 ) {
 
 						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
@@ -111,111 +109,21 @@ class FileLoader extends Loader {
 					switch ( this.responseType ) {
 
 						case 'arraybuffer':
-							// Add to cache only on HTTP success, so that we do not cache
-							// error response bodies as proper responses to requests.
-							res.arrayBuffer()
-								.then( ab => {
-
-									Cache.add( url, ab );
-
-									const callbacks = loading[ url ];
-									delete loading[ url ];
-
-									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-										const callback = callbacks[ i ];
-										if ( callback.onLoad ) callback.onLoad( ab );
-
-									}
-
-									scope.manager.itemEnd( url );
-
-								} );
-							break;
+							return response.arrayBuffer();
 						case 'blob':
-							res.blob()
-								.then( blob => {
-
-									Cache.add( url, blob );
-
-									const callbacks = loading[ url ];
-									delete loading[ url ];
-
-									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-										const callback = callbacks[ i ];
-										if ( callback.onLoad ) callback.onLoad( blob );
-
-									}
-
-									scope.manager.itemEnd( url );
-
-								} );
-							break;
+							return response.blob();
 						case 'document':
-							res.text()
+							return response.text()
 								.then( text => {
 
 									const parser = new DOMParser();
-									const dom = parser.parseFromString( text, this.mimeType );
-
-									Cache.add( url, dom );
-
-									const callbacks = loading[ url ];
-									delete loading[ url ];
-
-									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-										const callback = callbacks[ i ];
-										if ( callback.onLoad ) callback.onLoad( dom );
-
-									}
-
-									scope.manager.itemEnd( url );
+									return parser.parseFromString( text, this.mimeType );
 
 								} );
-							break;
 						case 'json':
-							res.json()
-								.then( json => {
-
-									Cache.add( url, json );
-
-									const callbacks = loading[ url ];
-									delete loading[ url ];
-
-									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-										const callback = callbacks[ i ];
-										if ( callback.onLoad ) callback.onLoad( json );
-
-									}
-
-									scope.manager.itemEnd( url );
-
-								} );
-							break;
-						default: // 'text' or other
-							// TODO-DefinitelyMaybe: assuming text. Could've gone for `new File([Blob])`?
-							res.text()
-								.then( text => {
-
-									Cache.add( url, text );
-
-									const callbacks = loading[ url ];
-									delete loading[ url ];
-
-									for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-										const callback = callbacks[ i ];
-										if ( callback.onLoad ) callback.onLoad( text );
-
-									}
-
-									scope.manager.itemEnd( url );
-
-								} );
-							break;
+							return response.json();
+						default:
+							return response.text();
 
 					}
 
@@ -227,7 +135,7 @@ class FileLoader extends Loader {
 					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
 						const callback = callbacks[ i ];
-						if ( callback.onError ) callback.onError( res.statusText );
+						if ( callback.onError ) callback.onError( response.statusText );
 
 					}
 
@@ -235,6 +143,25 @@ class FileLoader extends Loader {
 					scope.manager.itemEnd( url );
 
 				}
+
+			} )
+			.then( data => {
+
+				// Add to cache only on HTTP success, so that we do not cache
+				// error response bodies as proper responses to requests.
+				Cache.add( url, data );
+
+				const callbacks = loading[ url ];
+				delete loading[ url ];
+
+				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					const callback = callbacks[ i ];
+					if ( callback.onLoad ) callback.onLoad( data );
+
+				}
+
+				scope.manager.itemEnd( url );
 
 			} )
 			.catch( ( err ) => {
@@ -255,15 +182,6 @@ class FileLoader extends Loader {
 				scope.manager.itemEnd( url );
 
 			} );
-		// Straight after the fetch is initiated we can call the "progress" events
-		const callbacks = loading[ url ];
-
-		for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-			const callback = callbacks[ i ];
-			if ( callback.onProgress ) callback.onProgress();
-
-		}
 
 		scope.manager.itemStart( url );
 
