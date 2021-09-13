@@ -1,4 +1,4 @@
- {
+{
 	"webgl": [
 		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
@@ -175,6 +175,7 @@
 		"webgl_modifier_simplifier",
 		"webgl_modifier_tessellation",
 		"webgl_morphtargets",
+		"webgl_morphtargets_face",
 		"webgl_morphtargets_horse",
 		"webgl_morphtargets_sphere",
 		"webgl_multiple_canvases_circle",
