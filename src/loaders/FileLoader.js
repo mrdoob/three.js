@@ -69,12 +69,6 @@ class FileLoader extends Loader {
 		//   request.responseType = this.responseType;
 		// }
 
-		// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
-		// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#sending_a_request_with_credentials_included
-		// if (this.withCredentials !== undefined) {
-		//   request.withCredentials = this.withCredentials;
-		// }
-
 		// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/overrideMimeType
 		// if (request.overrideMimeType) {
 		//   request.overrideMimeType(
@@ -83,12 +77,12 @@ class FileLoader extends Loader {
 		// }
 
 		// TODO-DefinitelyMaybe: Confirm if Safari can handle Data URIs through fetch
-
 		// create request
 		const req = new Request( url, {
-			method: 'GET',
 			headers: new Headers( this.requestHeader ),
-			// signal: this.signal ? this.signal : undefined, // An abort signal for those that use it
+			credentials: this.withCredentials ? 'include' : 'same-origin',
+			// TODO-DefinitelyMaybe: Could add an abort controller?
+			// signal: this.attachSignal ? this.signal : undefined;
 		} );
 
 		// start the fetch
@@ -106,26 +100,50 @@ class FileLoader extends Loader {
 
 					}
 
-					switch ( this.responseType ) {
+					const callbacks = loading[ url ];
+					const reader = response.body.getReader();
+					let loaded = 0;
+					const total = parseInt( response.headers.get( 'Content-Length' ) );
 
-						case 'arraybuffer':
-							return response.arrayBuffer();
-						case 'blob':
-							return response.blob();
-						case 'document':
-							return response.text()
-								.then( text => {
 
-									const parser = new DOMParser();
-									return parser.parseFromString( text, this.mimeType );
+					// periodically read data into the new stream tracking while download progress
+					return new ReadableStream( {
+						start( controller ) {
 
-								} );
-						case 'json':
-							return response.json();
-						default:
-							return response.text();
+							readData();
 
-					}
+							function readData() {
+
+								reader.read()
+									.then( ( { done, value } ) => {
+
+										if ( done ) {
+
+											controller.close();
+
+										} else {
+
+											loaded += value.byteLength;
+
+											const event = new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } );
+											for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+												const callback = callbacks[ i ];
+												if ( callback.onProgress ) callback.onProgress( event );
+
+											}
+
+											controller.enqueue( value );
+											readData();
+
+										}
+
+									} );
+
+							}
+
+						}
+        	} );
 
 				} else {
 
@@ -141,6 +159,41 @@ class FileLoader extends Loader {
 
 					scope.manager.itemError( url );
 					scope.manager.itemEnd( url );
+
+				}
+
+			} )
+			.then( async stream => {
+
+				const response = new Response( stream );
+
+				switch ( this.responseType ) {
+
+					case 'arraybuffer':
+
+						return response.arrayBuffer();
+
+					case 'blob':
+
+						return response.blob();
+
+					case 'document':
+
+						return response.text()
+							.then( text => {
+
+								const parser = new DOMParser();
+								return parser.parseFromString( text, this.mimeType );
+
+							} );
+
+					case 'json':
+
+						return response.json();
+
+					default:
+
+						return response.text();
 
 				}
 
