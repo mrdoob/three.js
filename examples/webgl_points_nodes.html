@@ -147,7 +147,7 @@
 				// gui
 
 				const gui = new GUI();
-				const guiNode = { mix: 0 };
+				const guiNode = { lerpPosition: 0 };
 
 				gui.add( material, 'sizeAttenuation' ).onChange( function () {
 
@@ -155,9 +155,9 @@
 
 				} );
 
-				gui.add( guiNode, 'mix', 0, 1 ).onChange( function () {
+				gui.add( guiNode, 'lerpPosition', 0, 1 ).onChange( function () {
 
-					lerpPosition.value = guiNode.mix;
+					lerpPosition.value = guiNode.lerpPosition;
 
 				} );
 
