@@ -108,7 +108,9 @@
 
 				const time = new TimerNode();
 
-				const fireUV = new SpriteSheetUVNode( new Vector2Node( new THREE.Vector2( 6, 6 ) ).setConst( true ), new PointUVNode() );
+				const spriteSheetCount = new Vector2Node( new THREE.Vector2( 6, 6 ) ).setConst( true );
+
+				const fireUV = new SpriteSheetUVNode( spriteSheetCount, new PointUVNode() );
 				fireUV.frame = new OperatorNode( '*', time, particleSpeed );
 
 				const fireSprite = new TextureNode( fireMap, fireUV );
