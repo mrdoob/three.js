@@ -9,7 +9,7 @@ import { Vector3 } from '../math/Vector3.js';
 
 class ParametricGeometry extends BufferGeometry {
 
-	constructor( func, slices, stacks ) {
+	constructor( func = ( u, v, target ) => target.set( u, v, Math.cos( u ) * Math.sin( v ) ), slices = 8, stacks = 8 ) {
 
 		super();
 
