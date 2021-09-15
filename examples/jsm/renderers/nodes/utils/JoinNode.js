@@ -1,7 +1,5 @@
 import Node from '../core/Node.js';
 
-const inputKeys = [ 'x', 'y', 'z', 'w' ];
-
 class JoinNode extends Node {
 
 	constructor( values = [] ) {
@@ -27,7 +25,6 @@ class JoinNode extends Node {
 
 		for ( let i = 0; i < values.length; i ++ ) {
 
-			const property = inputKeys[ i ];
 			const input = values[ i ];
 
 			const inputSnippet = input.build( builder, 'float' );
