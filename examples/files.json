@@ -235,6 +235,7 @@
 		"webgl_materials_standard_nodes",
 		"webgl_mirror_nodes",
 		"webgl_performance_nodes",
+		"webgl_points_nodes",
 		"webgl_postprocessing_nodes",
 		"webgl_postprocessing_nodes_pass",
 		"webgl_sprites_nodes"
