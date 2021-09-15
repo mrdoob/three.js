@@ -23417,6 +23417,358 @@
 		SplineCurve: SplineCurve
 	});
 
+	/**************************************************************
+	 *	Curved Path - a curve path is simply a array of connected
+	 *	curves, but retains the api of a curve
+	 **************************************************************/
+
+	class CurvePath extends Curve {
+		constructor() {
+			super();
+			this.type = 'CurvePath';
+			this.curves = [];
+			this.autoClose = false; // Automatically closes the path
+		}
+
+		add(curve) {
+			this.curves.push(curve);
+		}
+
+		closePath() {
+			// Add a line curve if start and end of lines are not connected
+			const startPoint = this.curves[0].getPoint(0);
+			const endPoint = this.curves[this.curves.length - 1].getPoint(1);
+
+			if (!startPoint.equals(endPoint)) {
+				this.curves.push(new LineCurve(endPoint, startPoint));
+			}
+		} // To get accurate point with reference to
+		// entire path distance at time t,
+		// following has to be done:
+		// 1. Length of each sub path have to be known
+		// 2. Locate and identify type of curve
+		// 3. Get t for the curve
+		// 4. Return curve.getPointAt(t')
+
+
+		getPoint(t, optionalTarget) {
+			const d = t * this.getLength();
+			const curveLengths = this.getCurveLengths();
+			let i = 0; // To think about boundaries points.
+
+			while (i < curveLengths.length) {
+				if (curveLengths[i] >= d) {
+					const diff = curveLengths[i] - d;
+					const curve = this.curves[i];
+					const segmentLength = curve.getLength();
+					const u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
+					return curve.getPointAt(u, optionalTarget);
+				}
+
+				i++;
+			}
+
+			return null; // loop where sum != 0, sum > d , sum+1 <d
+		} // We cannot use the default THREE.Curve getPoint() with getLength() because in
+		// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
+		// getPoint() depends on getLength
+
+
+		getLength() {
+			const lens = this.getCurveLengths();
+			return lens[lens.length - 1];
+		} // cacheLengths must be recalculated.
+
+
+		updateArcLengths() {
+			this.needsUpdate = true;
+			this.cacheLengths = null;
+			this.getCurveLengths();
+		} // Compute lengths and cache them
+		// We cannot overwrite getLengths() because UtoT mapping uses it.
+
+
+		getCurveLengths() {
+			// We use cache values if curves and cache array are same length
+			if (this.cacheLengths && this.cacheLengths.length === this.curves.length) {
+				return this.cacheLengths;
+			} // Get length of sub-curve
+			// Push sums into cached array
+
+
+			const lengths = [];
+			let sums = 0;
+
+			for (let i = 0, l = this.curves.length; i < l; i++) {
+				sums += this.curves[i].getLength();
+				lengths.push(sums);
+			}
+
+			this.cacheLengths = lengths;
+			return lengths;
+		}
+
+		getSpacedPoints(divisions = 40) {
+			const points = [];
+
+			for (let i = 0; i <= divisions; i++) {
+				points.push(this.getPoint(i / divisions));
+			}
+
+			if (this.autoClose) {
+				points.push(points[0]);
+			}
+
+			return points;
+		}
+
+		getPoints(divisions = 12) {
+			const points = [];
+			let last;
+
+			for (let i = 0, curves = this.curves; i < curves.length; i++) {
+				const curve = curves[i];
+				const resolution = curve && curve.isEllipseCurve ? divisions * 2 : curve && (curve.isLineCurve || curve.isLineCurve3) ? 1 : curve && curve.isSplineCurve ? divisions * curve.points.length : divisions;
+				const pts = curve.getPoints(resolution);
+
+				for (let j = 0; j < pts.length; j++) {
+					const point = pts[j];
+					if (last && last.equals(point)) continue; // ensures no consecutive points are duplicates
+
+					points.push(point);
+					last = point;
+				}
+			}
+
+			if (this.autoClose && points.length > 1 && !points[points.length - 1].equals(points[0])) {
+				points.push(points[0]);
+			}
+
+			return points;
+		}
+
+		copy(source) {
+			super.copy(source);
+			this.curves = [];
+
+			for (let i = 0, l = source.curves.length; i < l; i++) {
+				const curve = source.curves[i];
+				this.curves.push(curve.clone());
+			}
+
+			this.autoClose = source.autoClose;
+			return this;
+		}
+
+		toJSON() {
+			const data = super.toJSON();
+			data.autoClose = this.autoClose;
+			data.curves = [];
+
+			for (let i = 0, l = this.curves.length; i < l; i++) {
+				const curve = this.curves[i];
+				data.curves.push(curve.toJSON());
+			}
+
+			return data;
+		}
+
+		fromJSON(json) {
+			super.fromJSON(json);
+			this.autoClose = json.autoClose;
+			this.curves = [];
+
+			for (let i = 0, l = json.curves.length; i < l; i++) {
+				const curve = json.curves[i];
+				this.curves.push(new Curves[curve.type]().fromJSON(curve));
+			}
+
+			return this;
+		}
+
+	}
+
+	class Path extends CurvePath {
+		constructor(points) {
+			super();
+			this.type = 'Path';
+			this.currentPoint = new Vector2();
+
+			if (points) {
+				this.setFromPoints(points);
+			}
+		}
+
+		setFromPoints(points) {
+			this.moveTo(points[0].x, points[0].y);
+
+			for (let i = 1, l = points.length; i < l; i++) {
+				this.lineTo(points[i].x, points[i].y);
+			}
+
+			return this;
+		}
+
+		moveTo(x, y) {
+			this.currentPoint.set(x, y); // TODO consider referencing vectors instead of copying?
+
+			return this;
+		}
+
+		lineTo(x, y) {
+			const curve = new LineCurve(this.currentPoint.clone(), new Vector2(x, y));
+			this.curves.push(curve);
+			this.currentPoint.set(x, y);
+			return this;
+		}
+
+		quadraticCurveTo(aCPx, aCPy, aX, aY) {
+			const curve = new QuadraticBezierCurve(this.currentPoint.clone(), new Vector2(aCPx, aCPy), new Vector2(aX, aY));
+			this.curves.push(curve);
+			this.currentPoint.set(aX, aY);
+			return this;
+		}
+
+		bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
+			const curve = new CubicBezierCurve(this.currentPoint.clone(), new Vector2(aCP1x, aCP1y), new Vector2(aCP2x, aCP2y), new Vector2(aX, aY));
+			this.curves.push(curve);
+			this.currentPoint.set(aX, aY);
+			return this;
+		}
+
+		splineThru(pts
+		/*Array of Vector*/
+		) {
+			const npts = [this.currentPoint.clone()].concat(pts);
+			const curve = new SplineCurve(npts);
+			this.curves.push(curve);
+			this.currentPoint.copy(pts[pts.length - 1]);
+			return this;
+		}
+
+		arc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
+			const x0 = this.currentPoint.x;
+			const y0 = this.currentPoint.y;
+			this.absarc(aX + x0, aY + y0, aRadius, aStartAngle, aEndAngle, aClockwise);
+			return this;
+		}
+
+		absarc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
+			this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
+			return this;
+		}
+
+		ellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
+			const x0 = this.currentPoint.x;
+			const y0 = this.currentPoint.y;
+			this.absellipse(aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
+			return this;
+		}
+
+		absellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
+			const curve = new EllipseCurve(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
+
+			if (this.curves.length > 0) {
+				// if a previous curve is present, attempt to join
+				const firstPoint = curve.getPoint(0);
+
+				if (!firstPoint.equals(this.currentPoint)) {
+					this.lineTo(firstPoint.x, firstPoint.y);
+				}
+			}
+
+			this.curves.push(curve);
+			const lastPoint = curve.getPoint(1);
+			this.currentPoint.copy(lastPoint);
+			return this;
+		}
+
+		copy(source) {
+			super.copy(source);
+			this.currentPoint.copy(source.currentPoint);
+			return this;
+		}
+
+		toJSON() {
+			const data = super.toJSON();
+			data.currentPoint = this.currentPoint.toArray();
+			return data;
+		}
+
+		fromJSON(json) {
+			super.fromJSON(json);
+			this.currentPoint.fromArray(json.currentPoint);
+			return this;
+		}
+
+	}
+
+	class Shape extends Path {
+		constructor(points) {
+			super(points);
+			this.uuid = generateUUID();
+			this.type = 'Shape';
+			this.holes = [];
+		}
+
+		getPointsHoles(divisions) {
+			const holesPts = [];
+
+			for (let i = 0, l = this.holes.length; i < l; i++) {
+				holesPts[i] = this.holes[i].getPoints(divisions);
+			}
+
+			return holesPts;
+		} // get points of shape and holes (keypoints based on segments parameter)
+
+
+		extractPoints(divisions) {
+			return {
+				shape: this.getPoints(divisions),
+				holes: this.getPointsHoles(divisions)
+			};
+		}
+
+		copy(source) {
+			super.copy(source);
+			this.holes = [];
+
+			for (let i = 0, l = source.holes.length; i < l; i++) {
+				const hole = source.holes[i];
+				this.holes.push(hole.clone());
+			}
+
+			return this;
+		}
+
+		toJSON() {
+			const data = super.toJSON();
+			data.uuid = this.uuid;
+			data.holes = [];
+
+			for (let i = 0, l = this.holes.length; i < l; i++) {
+				const hole = this.holes[i];
+				data.holes.push(hole.toJSON());
+			}
+
+			return data;
+		}
+
+		fromJSON(json) {
+			super.fromJSON(json);
+			this.uuid = json.uuid;
+			this.holes = [];
+
+			for (let i = 0, l = json.holes.length; i < l; i++) {
+				const hole = json.holes[i];
+				this.holes.push(new Path().fromJSON(hole));
+			}
+
+			return this;
+		}
+
+	}
+
 	/**
 	 * Port from https://github.com/mapbox/earcut (v2.2.2)
 	 */
@@ -24087,7 +24439,7 @@
 	 */
 
 	class ExtrudeGeometry extends BufferGeometry {
-		constructor(shapes, options) {
+		constructor(shapes = new Shape([new Vector2(0.5, 0.5), new Vector2(-0.5, 0.5), new Vector2(-0.5, -0.5), new Vector2(0.5, -0.5)]), options = {}) {
 			super();
 			this.type = 'ExtrudeGeometry';
 			this.parameters = {
@@ -24114,10 +24466,10 @@
 
 				const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 				const steps = options.steps !== undefined ? options.steps : 1;
-				let depth = options.depth !== undefined ? options.depth : 100;
+				let depth = options.depth !== undefined ? options.depth : 1;
 				let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
-				let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
-				let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
+				let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
+				let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
 				let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 				let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 				const extrudePath = options.extrudePath;
@@ -24726,7 +25078,7 @@
 	 */
 
 	class ParametricGeometry extends BufferGeometry {
-		constructor(func, slices, stacks) {
+		constructor(func = (u, v, target) => target.set(u, v, Math.cos(u) * Math.sin(v)), slices = 8, stacks = 8) {
 			super();
 			this.type = 'ParametricGeometry';
 			this.parameters = {
@@ -24879,358 +25231,6 @@
 
 		static fromJSON(data) {
 			return new RingGeometry(data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength);
-		}
-
-	}
-
-	/**************************************************************
-	 *	Curved Path - a curve path is simply a array of connected
-	 *	curves, but retains the api of a curve
-	 **************************************************************/
-
-	class CurvePath extends Curve {
-		constructor() {
-			super();
-			this.type = 'CurvePath';
-			this.curves = [];
-			this.autoClose = false; // Automatically closes the path
-		}
-
-		add(curve) {
-			this.curves.push(curve);
-		}
-
-		closePath() {
-			// Add a line curve if start and end of lines are not connected
-			const startPoint = this.curves[0].getPoint(0);
-			const endPoint = this.curves[this.curves.length - 1].getPoint(1);
-
-			if (!startPoint.equals(endPoint)) {
-				this.curves.push(new LineCurve(endPoint, startPoint));
-			}
-		} // To get accurate point with reference to
-		// entire path distance at time t,
-		// following has to be done:
-		// 1. Length of each sub path have to be known
-		// 2. Locate and identify type of curve
-		// 3. Get t for the curve
-		// 4. Return curve.getPointAt(t')
-
-
-		getPoint(t, optionalTarget) {
-			const d = t * this.getLength();
-			const curveLengths = this.getCurveLengths();
-			let i = 0; // To think about boundaries points.
-
-			while (i < curveLengths.length) {
-				if (curveLengths[i] >= d) {
-					const diff = curveLengths[i] - d;
-					const curve = this.curves[i];
-					const segmentLength = curve.getLength();
-					const u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
-					return curve.getPointAt(u, optionalTarget);
-				}
-
-				i++;
-			}
-
-			return null; // loop where sum != 0, sum > d , sum+1 <d
-		} // We cannot use the default THREE.Curve getPoint() with getLength() because in
-		// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
-		// getPoint() depends on getLength
-
-
-		getLength() {
-			const lens = this.getCurveLengths();
-			return lens[lens.length - 1];
-		} // cacheLengths must be recalculated.
-
-
-		updateArcLengths() {
-			this.needsUpdate = true;
-			this.cacheLengths = null;
-			this.getCurveLengths();
-		} // Compute lengths and cache them
-		// We cannot overwrite getLengths() because UtoT mapping uses it.
-
-
-		getCurveLengths() {
-			// We use cache values if curves and cache array are same length
-			if (this.cacheLengths && this.cacheLengths.length === this.curves.length) {
-				return this.cacheLengths;
-			} // Get length of sub-curve
-			// Push sums into cached array
-
-
-			const lengths = [];
-			let sums = 0;
-
-			for (let i = 0, l = this.curves.length; i < l; i++) {
-				sums += this.curves[i].getLength();
-				lengths.push(sums);
-			}
-
-			this.cacheLengths = lengths;
-			return lengths;
-		}
-
-		getSpacedPoints(divisions = 40) {
-			const points = [];
-
-			for (let i = 0; i <= divisions; i++) {
-				points.push(this.getPoint(i / divisions));
-			}
-
-			if (this.autoClose) {
-				points.push(points[0]);
-			}
-
-			return points;
-		}
-
-		getPoints(divisions = 12) {
-			const points = [];
-			let last;
-
-			for (let i = 0, curves = this.curves; i < curves.length; i++) {
-				const curve = curves[i];
-				const resolution = curve && curve.isEllipseCurve ? divisions * 2 : curve && (curve.isLineCurve || curve.isLineCurve3) ? 1 : curve && curve.isSplineCurve ? divisions * curve.points.length : divisions;
-				const pts = curve.getPoints(resolution);
-
-				for (let j = 0; j < pts.length; j++) {
-					const point = pts[j];
-					if (last && last.equals(point)) continue; // ensures no consecutive points are duplicates
-
-					points.push(point);
-					last = point;
-				}
-			}
-
-			if (this.autoClose && points.length > 1 && !points[points.length - 1].equals(points[0])) {
-				points.push(points[0]);
-			}
-
-			return points;
-		}
-
-		copy(source) {
-			super.copy(source);
-			this.curves = [];
-
-			for (let i = 0, l = source.curves.length; i < l; i++) {
-				const curve = source.curves[i];
-				this.curves.push(curve.clone());
-			}
-
-			this.autoClose = source.autoClose;
-			return this;
-		}
-
-		toJSON() {
-			const data = super.toJSON();
-			data.autoClose = this.autoClose;
-			data.curves = [];
-
-			for (let i = 0, l = this.curves.length; i < l; i++) {
-				const curve = this.curves[i];
-				data.curves.push(curve.toJSON());
-			}
-
-			return data;
-		}
-
-		fromJSON(json) {
-			super.fromJSON(json);
-			this.autoClose = json.autoClose;
-			this.curves = [];
-
-			for (let i = 0, l = json.curves.length; i < l; i++) {
-				const curve = json.curves[i];
-				this.curves.push(new Curves[curve.type]().fromJSON(curve));
-			}
-
-			return this;
-		}
-
-	}
-
-	class Path extends CurvePath {
-		constructor(points) {
-			super();
-			this.type = 'Path';
-			this.currentPoint = new Vector2();
-
-			if (points) {
-				this.setFromPoints(points);
-			}
-		}
-
-		setFromPoints(points) {
-			this.moveTo(points[0].x, points[0].y);
-
-			for (let i = 1, l = points.length; i < l; i++) {
-				this.lineTo(points[i].x, points[i].y);
-			}
-
-			return this;
-		}
-
-		moveTo(x, y) {
-			this.currentPoint.set(x, y); // TODO consider referencing vectors instead of copying?
-
-			return this;
-		}
-
-		lineTo(x, y) {
-			const curve = new LineCurve(this.currentPoint.clone(), new Vector2(x, y));
-			this.curves.push(curve);
-			this.currentPoint.set(x, y);
-			return this;
-		}
-
-		quadraticCurveTo(aCPx, aCPy, aX, aY) {
-			const curve = new QuadraticBezierCurve(this.currentPoint.clone(), new Vector2(aCPx, aCPy), new Vector2(aX, aY));
-			this.curves.push(curve);
-			this.currentPoint.set(aX, aY);
-			return this;
-		}
-
-		bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
-			const curve = new CubicBezierCurve(this.currentPoint.clone(), new Vector2(aCP1x, aCP1y), new Vector2(aCP2x, aCP2y), new Vector2(aX, aY));
-			this.curves.push(curve);
-			this.currentPoint.set(aX, aY);
-			return this;
-		}
-
-		splineThru(pts
-		/*Array of Vector*/
-		) {
-			const npts = [this.currentPoint.clone()].concat(pts);
-			const curve = new SplineCurve(npts);
-			this.curves.push(curve);
-			this.currentPoint.copy(pts[pts.length - 1]);
-			return this;
-		}
-
-		arc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
-			const x0 = this.currentPoint.x;
-			const y0 = this.currentPoint.y;
-			this.absarc(aX + x0, aY + y0, aRadius, aStartAngle, aEndAngle, aClockwise);
-			return this;
-		}
-
-		absarc(aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise) {
-			this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
-			return this;
-		}
-
-		ellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
-			const x0 = this.currentPoint.x;
-			const y0 = this.currentPoint.y;
-			this.absellipse(aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
-			return this;
-		}
-
-		absellipse(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation) {
-			const curve = new EllipseCurve(aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation);
-
-			if (this.curves.length > 0) {
-				// if a previous curve is present, attempt to join
-				const firstPoint = curve.getPoint(0);
-
-				if (!firstPoint.equals(this.currentPoint)) {
-					this.lineTo(firstPoint.x, firstPoint.y);
-				}
-			}
-
-			this.curves.push(curve);
-			const lastPoint = curve.getPoint(1);
-			this.currentPoint.copy(lastPoint);
-			return this;
-		}
-
-		copy(source) {
-			super.copy(source);
-			this.currentPoint.copy(source.currentPoint);
-			return this;
-		}
-
-		toJSON() {
-			const data = super.toJSON();
-			data.currentPoint = this.currentPoint.toArray();
-			return data;
-		}
-
-		fromJSON(json) {
-			super.fromJSON(json);
-			this.currentPoint.fromArray(json.currentPoint);
-			return this;
-		}
-
-	}
-
-	class Shape extends Path {
-		constructor(points) {
-			super(points);
-			this.uuid = generateUUID();
-			this.type = 'Shape';
-			this.holes = [];
-		}
-
-		getPointsHoles(divisions) {
-			const holesPts = [];
-
-			for (let i = 0, l = this.holes.length; i < l; i++) {
-				holesPts[i] = this.holes[i].getPoints(divisions);
-			}
-
-			return holesPts;
-		} // get points of shape and holes (keypoints based on segments parameter)
-
-
-		extractPoints(divisions) {
-			return {
-				shape: this.getPoints(divisions),
-				holes: this.getPointsHoles(divisions)
-			};
-		}
-
-		copy(source) {
-			super.copy(source);
-			this.holes = [];
-
-			for (let i = 0, l = source.holes.length; i < l; i++) {
-				const hole = source.holes[i];
-				this.holes.push(hole.clone());
-			}
-
-			return this;
-		}
-
-		toJSON() {
-			const data = super.toJSON();
-			data.uuid = this.uuid;
-			data.holes = [];
-
-			for (let i = 0, l = this.holes.length; i < l; i++) {
-				const hole = this.holes[i];
-				data.holes.push(hole.toJSON());
-			}
-
-			return data;
-		}
-
-		fromJSON(json) {
-			super.fromJSON(json);
-			this.uuid = json.uuid;
-			this.holes = [];
-
-			for (let i = 0, l = json.holes.length; i < l; i++) {
-				const hole = json.holes[i];
-				this.holes.push(new Path().fromJSON(hole));
-			}
-
-			return this;
 		}
 
 	}
@@ -25660,7 +25660,7 @@
 	}
 
 	class TubeGeometry extends BufferGeometry {
-		constructor(path, tubularSegments = 64, radius = 1, radialSegments = 8, closed = false) {
+		constructor(path = new QuadraticBezierCurve3(new Vector3(-1, -1, 0), new Vector3(-1, 1, 0), new Vector3(1, 1, 0)), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false) {
 			super();
 			this.type = 'TubeGeometry';
 			this.parameters = {
