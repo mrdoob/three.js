@@ -5,9 +5,9 @@ const DOCS_PATH = path.join( process.cwd(), 'docs' );
 const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
 
 /**
- * Updates list meta in `docs/list.json`.
+ * Updates docs list meta in `docs/list.json`.
  */
-const updateList = ( write ) => {
+const updateDocs = ( write ) => {
 
 	// Get list data
 	const list = JSON.parse( fs.readFileSync( path.join( DOCS_PATH, 'list.json' ), 'utf-8' ) );
@@ -57,7 +57,7 @@ const updateList = ( write ) => {
 						}
 					);
 
-					list[ locale ][ section ][ category ][ pageName ] = pageData;
+					pages[ pageName ] = pageData;
 
 				}
 
@@ -84,6 +84,6 @@ const updateList = ( write ) => {
 const args = process.argv.slice( 2 );
 const write = args.includes( '--write' );
 
-updateList( write );
+updateDocs( write );
 
 process.exit( 0 );
