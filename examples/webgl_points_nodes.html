@@ -46,7 +46,7 @@
 			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
 			import SpriteSheetUVNode from './jsm/renderers/nodes/utils/SpriteSheetUVNode.js';
 
-			let camera, scene, renderer, stats, material;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -122,7 +122,7 @@
 
 				// material
 
-				material = new PointsNodeMaterial( {
+				const material = new PointsNodeMaterial( {
 					depthWrite: false,
 					transparent: true,
 					sizeAttenuation: true,
