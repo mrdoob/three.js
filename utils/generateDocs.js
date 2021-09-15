@@ -5,9 +5,9 @@ const DOCS_PATH = path.join( process.cwd(), 'docs' );
 const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
 
 /**
- * Generates a list from a target docs directory.
+ * Updates list meta in `docs/list.json`.
  */
-const createList = ( write ) => {
+const updateList = ( write ) => {
 
 	// Get list data
 	const list = JSON.parse( fs.readFileSync( path.join( DOCS_PATH, 'list.json' ), 'utf-8' ) );
@@ -16,7 +16,7 @@ const createList = ( write ) => {
 
 		const localList = list[ locale ];
 
-		for ( const section in list[ locale ] ) {
+		for ( const section in localList ) {
 
 			const categories = localList[ section ];
 
@@ -71,7 +71,7 @@ const createList = ( write ) => {
 
 		fs.writeFileSync(
 			path.join( DOCS_PATH, 'list.json' ),
-			JSON.stringify( createList(), null, '\t' )
+			JSON.stringify( list, null, '\t' )
 		);
 
 	}
@@ -84,6 +84,6 @@ const createList = ( write ) => {
 const args = process.argv.slice( 2 );
 const write = args.includes( '--write' );
 
-createList( write );
+updateList( write );
 
 process.exit( 0 );
