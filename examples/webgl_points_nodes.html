@@ -118,6 +118,8 @@
 
 				const lerpPosition = new FloatNode( 0 );
 
+				const positionNode = new MathNode( MathNode.MIX, new PositionNode( PositionNode.LOCAL ), targetPosition, lerpPosition );
+
 				// material
 
 				material = new PointsNodeMaterial( {
@@ -129,7 +131,7 @@
 
 				material.colorNode = fire;
 				material.sizeNode = particleSize;
-				material.positionNode = new MathNode( MathNode.MIX, new PositionNode( PositionNode.LOCAL ), targetPosition, lerpPosition );
+				material.positionNode = positionNode;
 
 				const particles = new THREE.Points( geometry, material );
 				scene.add( particles );
