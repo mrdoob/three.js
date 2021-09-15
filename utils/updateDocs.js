@@ -34,9 +34,12 @@ const updateDocs = ( write ) => {
 						'utf-8'
 					);
 
+					// Base page data
+					const baseData = { url: pageURL };
+
 					// Parse methods & properties from doc file
-					const matches = file.match( DOCS_PROPS_REGEX ) || [];
-					const pageData = matches.reduce(
+					const matches = file.match( DOCS_PROPS_REGEX );
+					const pageData = matches && matches.reduce(
 						( output, match ) => {
 
 							if ( ! match ) return output;
@@ -51,13 +54,14 @@ const updateDocs = ( write ) => {
 
 						},
 						{
-							url: pageURL,
+							...baseData,
 							methods: [],
 							properties: [],
 						}
 					);
 
-					pages[ pageName ] = pageData;
+					// Use base data if no matching methods or props
+					pages[ pageName ] = pageData || baseData;
 
 				}
 
@@ -67,11 +71,12 @@ const updateDocs = ( write ) => {
 
 	}
 
+	// If specified, write to list.json with Mr.doob's Code Style™
 	if ( write ) {
 
 		fs.writeFileSync(
 			path.join( DOCS_PATH, 'list.json' ),
-			JSON.stringify( list, null, '\t' )
+			JSON.stringify( list, null, '\t' ).replace( /(\}\,)\n/g, '$1\n\n' )
 		);
 
 	}
@@ -80,7 +85,7 @@ const updateDocs = ( write ) => {
 
 };
 
-// Write to list.json if specified via flag
+// Check whether to write via CLI flag
 const args = process.argv.slice( 2 );
 const write = args.includes( '--write' );
 
