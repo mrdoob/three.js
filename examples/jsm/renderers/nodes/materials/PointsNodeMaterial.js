@@ -28,7 +28,7 @@ class PointsNodeMaterial extends PointsMaterial {
 
 		this.lightNode = source.lightNode;
 
-		this.sizeNode = source.positionNode;
+		this.sizeNode = source.sizeNode;
 
 		this.positionNode = source.positionNode;
 
