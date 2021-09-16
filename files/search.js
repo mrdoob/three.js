@@ -54,12 +54,12 @@ function initNodes() {
 
 }
 
-function cleanSearch() {
+function cleanSearch(hash) {
 
     // create a clean search query
 
     const search = filterInput.value.trim().replace( /\s+/g, ' ' );
-    window.history.replaceState( {}, '', `?${search? 'q=': ''}${search}${location.hash}` );
+    window.history.replaceState( {}, '', `?${search? 'q=': ''}${search}${hash || location.hash}` );
     return search;
 
 }
@@ -346,6 +346,8 @@ async function setSection( section ) {
     showHide( viewerDoc, isDoc );
     showHide( viewerEx, ! isDoc );
 
+    // starting page
+
     if ( ! location.hash ) {
 
         location.hash = ( isDoc ? nodeSectionDoc : nodeSectionEx ).getAttribute( 'href' );
@@ -354,12 +356,24 @@ async function setSection( section ) {
 
     if ( isDoc ) {
 
+        if ( lastHashDoc ) {
+
+            location.hash = lastHashDoc;
+
+        }
+
         nodeSectionDoc.classList.add( 'selected' );
         nodeSectionEx.classList.remove( 'selected' );
 
         await initDoc();
 
     } else {
+
+        if ( lastHashEx ) {
+
+            location.hash = lastHashEx;
+
+        }
 
         nodeSectionDoc.classList.remove( 'selected' );
         nodeSectionEx.classList.add( 'selected' );
@@ -394,7 +408,7 @@ function updateFilter() {
 
 function updateIFrame( iframe, src ) {
 
-    if ( iframe.src == src ) {
+    if ( iframe.getAttribute( 'src' ) == src ) {
 
         return;
 
@@ -405,6 +419,18 @@ function updateIFrame( iframe, src ) {
     iframes.removeChild( iframe );
     iframe.src = src;
     iframes.appendChild( iframe );
+
+    if ( currentSection == 'docs' ) {
+
+        lastHashDoc = location.hash;
+        nodeSectionDoc.setAttribute( 'href', lastHashDoc );
+
+    } else {
+
+        lastHashEx = location.hash;
+        nodeSectionEx.setAttribute( 'href', lastHashEx );
+
+    }
 
 }
 
@@ -429,6 +455,7 @@ function welcomeThree() {
 ///////
 
 const categoriesDoc = [];
+let lastHashDoc;
 let lastSearchDoc;
 const pagesDoc = {};
 const sectionsDoc = [];
@@ -1024,6 +1051,7 @@ function updateFilterDoc() {
 
 const fileObjects = {};
 const headerClassLists = {};
+let lastHashEx;
 let lastSearchEx;
 const linkClassLists = {};
 const linkTitles = {};
@@ -1185,6 +1213,7 @@ function selectEx( name ) {
 
     linkClassLists[ name ].add( 'selected' );
 
+    cleanSearch( `#${name}` );
     updateIFrame( viewerEx, `../examples/${name}.html` );
 
     viewerEx.focus();
