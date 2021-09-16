@@ -545,6 +545,7 @@ iframe {
 }
 .method > a::after {
 	content: "()";
+	color: var(--secondary-text-color);
 }
 
 .mainSearch .method,

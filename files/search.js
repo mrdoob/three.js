@@ -30,6 +30,7 @@ let viewerDoc;
 let viewerEx;
 
 let currentSection = '';
+let language = 'en';
 let prevHash = '';
 
 function initNodes() {
@@ -58,7 +59,7 @@ function cleanSearch() {
     // create a clean search query
 
     const search = filterInput.value.trim().replace( /\s+/g, ' ' );
-    window.history.replaceState( {}, '', `${search? '?q=': ''}${search}${location.hash}` );
+    window.history.replaceState( {}, '', `?${search? 'q=': ''}${search}${location.hash}` );
     return search;
 
 }
@@ -115,7 +116,7 @@ function highlightText( name, start, end ) {
 
 }
 
-function highlightTokens( name, lower, searchLow, mainUrl ) {
+function highlightTokens( name, lower, regExp, searchLow, mainUrl ) {
 
     const names = name.split( ' ' );
     const lowers = lower.split( ' ' );
@@ -124,16 +125,31 @@ function highlightTokens( name, lower, searchLow, mainUrl ) {
 
     for ( let i = 0, length = names.length; i < length; i ++ ) {
 
-        const index = lowers[ i ].indexOf( searchLow );
-        if ( index < 0 ) {
+        let text;
 
-            continue;
+        if ( regExp ) {
+
+            text = names[ i ].replaceAll( regExp, '<b>$&</b>' );
+            if ( text == names[ i ]) {
+
+                continue;
+
+            }
+
+        } else {
+
+            const index = lowers[ i ].indexOf( searchLow );
+            if ( index < 0 ) {
+
+                continue;
+
+            }
+
+            text = highlightText( names[ i ], index, index + searchLength );
 
         }
 
-        const text = highlightText(names[ i ], index, index + searchLength);
         const url = `${mainUrl}.${names[ i ]}`;
-
         lines.push( `<a href="#${url}" data-url="${url}">${text}</a>` );
     }
 
@@ -176,15 +192,25 @@ function searchContent( search, data, mode, callback ) {
         Object.keys( data ).forEach( key => {
 
             const item = data[ key ];
-            const filterResults = key.match( regExp );
 
-            if ( filterResults !== null && filterResults.length > 0 ) {
+            if ( mode & 1 ) {
 
-                callback( key, item, regExp, 0 );
+                const filterResults = item.text.match( regExp );
+                callback( key, item, regExp, ( filterResults !== null && filterResults.length > 0 ) ? 0 : -1, 0, 1 );
 
-            } else {
+            }
 
-                callback( key, item, regExp, -1 );
+            if ( ( mode & 2 ) && item.property ) {
+
+                const filterResults = item.property.match( regExp );
+                callback( key, item, regExp, ( filterResults !== null && filterResults.length > 0 ) ? 0 : -1, 0, 2 );
+
+            }
+
+            if ( ( mode & 4 ) && item.method ) {
+
+                const filterResults = item.method.match( regExp );
+                callback( key, item, regExp, ( filterResults !== null && filterResults.length > 0 ) ? 0 : -1, 0, 4 );
 
             }
 
@@ -428,8 +454,6 @@ async function initDoc() {
 
     // Localisation
 
-    let language = 'en';
-
     if ( /^(api|manual|examples)/.test( hash ) ) {
 
         const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja)\//.exec( hash );
@@ -449,7 +473,7 @@ async function initDoc() {
     }
 
     nodeLanguage.value = language;
-    nodeLanguage.onChange = function () {
+    nodeLanguage.onchange = function () {
 
         setLanguage( this.value );
 
@@ -596,7 +620,7 @@ function createNavigationDoc( list, language ) {
         for ( const node of lists.childNodes ) {
 
             const children = node.childNodes;
-            const name = children[0].dataset.name;
+            const name = children[ 0 ].dataset.name;
 
             const cvector = [ 1, node.classList, name ];
             categoriesDoc.push( cvector );
@@ -783,7 +807,7 @@ function selectDoc( url, node ) {
 
     if ( ! node ) {
 
-        node = contentDoc.querySelector( `[data-url="${splits[0]}"]` );
+        node = contentDoc.querySelector( `[data-url="${splits[ 0 ]}"]` );
         if ( ! node ) {
 
             return;
@@ -914,7 +938,7 @@ function updateFilterDoc() {
 
     }
 
-    for ( const vector of categoriesDoc) {
+    for ( const vector of categoriesDoc ) {
 
         vector[ 0 ] = 0;
 
@@ -922,25 +946,13 @@ function updateFilterDoc() {
 
     searchContent( search, pagesDoc, mode, ( name, page, regExp, index, end, type ) => {
 
-        if ( regExp ) {
-
-            // /regexp/ was used
-
-            if ( index >= 0 ) {
-
-                page.nodes[0].innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
-                page.cvector[ 0 ] |= 1;
-                page.svector[ 0 ] ++;
-
-            }
-
-        } else if ( index == -2 ) {
+        if ( index == -2 ) {
 
             // empty search => restore original names if needed (note: the check is not useless)
 
-            if ( page.nodes[0].innerHTML != name ) {
+            if ( page.nodes[ 0 ].innerHTML != name ) {
 
-                page.nodes[0].innerHTML = name;
+                page.nodes[ 0 ].innerHTML = name;
 
             }
 
@@ -949,21 +961,24 @@ function updateFilterDoc() {
 
         } else if ( index >= 0 ) {
 
-            // full text match => show the matching text
+            // match => show the matching text
 
             if ( type == 1 ) {
 
-                page.nodes[0].innerHTML = highlightText( name, index, end );
+                page.nodes[ 0 ].innerHTML =
+                    regExp ? name.replaceAll( regExp, '<b>$&</b>' ) : highlightText( name, index, end );
                 page.cvector[ 0 ] |= 1;
 
             } else if ( type == 2 ) {
 
-                page.nodes[ 1 ].innerHTML = highlightTokens( page.property, page.propertyLow, searchLow, page.url );
+                page.nodes[ 1 ].innerHTML =
+                    highlightTokens( page.property, page.propertyLow, regExp, searchLow, page.url );
                 page.cvector[ 0 ] |= 2;
 
             } else if ( type == 4 ) {
 
-                page.nodes[ 2 ].innerHTML = highlightTokens( page.method, page.methodLow, searchLow, page.url );
+                page.nodes[ 2 ].innerHTML =
+                    highlightTokens( page.method, page.methodLow, regExp, searchLow, page.url );
                 page.cvector[ 0 ] |= 4;
 
             }
@@ -976,15 +991,15 @@ function updateFilterDoc() {
 
             if ( type == 1 ) {
 
-                page.nodes[0].innerHTML = name;
+                page.nodes[ 0 ].innerHTML = name;
 
             } else if ( type == 2 ) {
 
-                page.nodes[1].innerHTML = '';
+                page.nodes[ 1 ].innerHTML = '';
 
             } else if ( type == 4 ) {
 
-                page.nodes[2].innerHTML = '';
+                page.nodes[ 2 ].innerHTML = '';
 
             }
 
