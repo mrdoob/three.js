@@ -71,10 +71,26 @@ function extractQuery() {
 
 }
 
+function guessSection() {
+
+    return location.hash.includes( '/' ) ? 'docs' : 'examples';
+
+}
+
 async function hashChanged( defaultSection ) {
 
-    const hash = location.hash.slice( 1 );
-    const section = ( hash || ! defaultSection ) ? ( hash.includes( '/' ) ? 'docs': 'examples' ) : defaultSection;
+    let hash = location.hash;
+    const section = ( hash || ! defaultSection ) ? guessSection() : defaultSection;
+
+    if ( section == 'docs' ) {
+
+        nodeSectionDoc.setAttribute( 'href', hash );
+
+    } else {
+
+        nodeSectionEx.setAttribute( 'href', hash );
+
+    }
 
     // section change docs <=> examples
 
@@ -85,6 +101,8 @@ async function hashChanged( defaultSection ) {
     }
 
     // selection change
+
+    hash = hash.slice( 1 );
 
     if ( hash != prevHash ) {
 
@@ -356,24 +374,12 @@ async function setSection( section ) {
 
     if ( isDoc ) {
 
-        if ( lastHashDoc ) {
-
-            location.hash = lastHashDoc;
-
-        }
-
         nodeSectionDoc.classList.add( 'selected' );
         nodeSectionEx.classList.remove( 'selected' );
 
         await initDoc();
 
     } else {
-
-        if ( lastHashEx ) {
-
-            location.hash = lastHashEx;
-
-        }
 
         nodeSectionDoc.classList.remove( 'selected' );
         nodeSectionEx.classList.add( 'selected' );
@@ -420,17 +426,8 @@ function updateIFrame( iframe, src ) {
     iframe.src = src;
     iframes.appendChild( iframe );
 
-    if ( currentSection == 'docs' ) {
-
-        lastHashDoc = location.hash;
-        nodeSectionDoc.setAttribute( 'href', lastHashDoc );
-
-    } else {
-
-        lastHashEx = location.hash;
-        nodeSectionEx.setAttribute( 'href', lastHashEx );
-
-    }
+    let node = ( guessSection() == 'docs' ) ? nodeSectionDoc : nodeSectionEx;
+    node.setAttribute( 'href', location.hash );
 
 }
 
@@ -455,7 +452,6 @@ function welcomeThree() {
 ///////
 
 const categoriesDoc = [];
-let lastHashDoc;
 let lastSearchDoc;
 const pagesDoc = {};
 const sectionsDoc = [];
