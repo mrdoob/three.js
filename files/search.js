@@ -365,8 +365,8 @@ async function setSection( section ) {
     showHide( nodeLanguage, isDoc );
     showHide( contentDoc, isDoc );
     showHide( contentEx, ! isDoc );
-    showHide( viewerDoc, isDoc );
-    showHide( viewerEx, ! isDoc );
+    showHide( viewerDoc, isDoc, 'hidden' );
+    showHide( viewerEx, ! isDoc, 'hidden' );
 
     // starting page
 
@@ -395,10 +395,28 @@ async function setSection( section ) {
     updateFilter();
 }
 
-function showHide( node, show ) {
+function showHide( node, show, class_='hide' ) {
 
-    node.classList.remove( 'hidden' );
-    node.style.display = show ? '' : 'none';
+    // Show / hide a node
+    // class:
+    // - using 'hide' => sets the 'display' to 'none'
+    // - using 'hidden' => sets the 'visibility' to 'hidden'
+
+    let classList = node.classList;
+
+    if ( classList.contains( class_ ) ) {
+
+        if ( show ) {
+
+            classList.remove( class_ );
+
+        }
+
+    } else if ( ! show ) {
+
+        classList.add( class_ );
+
+    }
 
 }
 
@@ -902,11 +920,11 @@ function showCategoriesDoc() {
 
         if ( count ) {
 
-            classList.remove( 'hidden' );
+            classList.remove( 'hide' );
 
         } else {
 
-            classList.add( 'hidden' );
+            classList.add( 'hide' );
 
         }
 
@@ -916,11 +934,11 @@ function showCategoriesDoc() {
 
         if ( count ) {
 
-            classList.remove( 'hidden' );
+            classList.remove( 'hide' );
 
         } else {
 
-            classList.add( 'hidden' );
+            classList.add( 'hide' );
 
         }
 
@@ -1180,15 +1198,16 @@ function showCategoriesEx() {
 
     Object.keys( sectionFiles ).forEach( section => {
 
-        const collapsed = sectionFiles[ section ].every( name => linkClassLists[ name ].contains( 'hidden' ) );
+        // note: this could be improved using similar code to showCategoriesDoc
+        const collapsed = sectionFiles[ section ].every( name => linkClassLists[ name ].contains( 'hide' ) );
 
         if ( collapsed ) {
 
-            headerClassLists[ section ].add( 'hidden' );
+            headerClassLists[ section ].add( 'hide' );
 
         } else {
 
-            headerClassLists[ section ].remove( 'hidden' );
+            headerClassLists[ section ].remove( 'hide' );
 
         }
 
@@ -1217,7 +1236,6 @@ function selectEx( name ) {
     updateIFrame( viewerEx, `../examples/${name}.html` );
 
     viewerEx.focus();
-    showHide( viewerEx, true );
 
     panel.classList.remove( 'open' );
 
@@ -1260,11 +1278,11 @@ function updateFilterEx() {
             if ( index >= 0 ) {
 
                 linkTitles[ name ].innerHTML = page.clean.replaceAll( regExp, '<b>$&</b>' );
-                linkClassLists[ name ].remove( 'hidden' );
+                linkClassLists[ name ].remove( 'hide' );
 
             } else {
 
-                linkClassLists[ name ].add( 'hidden' );
+                linkClassLists[ name ].add( 'hide' );
 
             }
 
@@ -1280,20 +1298,20 @@ function updateFilterEx() {
 
             }
 
-            linkClassLists[ name ].remove( 'hidden' );
+            linkClassLists[ name ].remove( 'hide' );
 
         } else if ( index >= 0 ) {
 
             // full text match => show the matching text
 
             linkTitles[ name ].innerHTML = highlightText( page.clean, index, end );
-            linkClassLists[ name ].remove( 'hidden' );
+            linkClassLists[ name ].remove( 'hide' );
 
         } else {
 
             // full text fail
 
-            linkClassLists[ name ].add( 'hidden' );
+            linkClassLists[ name ].add( 'hide' );
 
         }
 

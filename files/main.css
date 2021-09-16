@@ -303,13 +303,13 @@ h1 a {
 	margin: 1px 0;
 }
 
-.content h2:not(.hidden) {
+.content h2:not(.hide) {
 	margin-top: 16px;
 	border-top: none;
 	padding-top: 0;
 }
 
-.content h2:not(.hidden) ~ h2 {
+.content h2:not(.hide) ~ h2 {
 	margin-top: 32px;
 	border-top: var(--border-style);
 	padding-top: 12px;
@@ -523,8 +523,11 @@ iframe {
 	line-height: calc(var(--line-height) - 6px);
 }
 
-.hidden {
+.hide {
 	display: none !important;
+}
+.hidden {
+	visibility: hidden;
 }
 
 /* extra search */
