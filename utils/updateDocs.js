@@ -1,81 +1,149 @@
+/*
+globals
+console, process, require
+*/
+'use strict';
+
 const fs = require( 'fs' );
 const path = require( 'path' );
+const { parseDocumentation } = require( '../files/search.js' );
 
 const DOCS_PATH = path.join( process.cwd(), 'docs' );
 const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
+const FILES_PATH = path.join( process.cwd(), 'files' );
 
 /**
- * Updates docs list meta in `docs/list.json`.
+ * Parse methods & properties from doc file
  */
-const updateDocs = ( write ) => {
+function parseSource( pagePath ) {
 
-	// Get list data
-	const list = JSON.parse( fs.readFileSync( path.join( DOCS_PATH, 'list.json' ), 'utf-8' ) );
+	// Read doc file
+	const fileExists = fs.existsSync( pagePath );
+	if ( ! fileExists ) {
 
-	for ( const locale in list ) {
+		return null;
 
-		const localList = list[ locale ];
+	}
 
-		for ( const section in localList ) {
+	const file = fs.readFileSync( pagePath, 'utf-8' );
+	if ( ! file ) {
 
-			const categories = localList[ section ];
+		return null;
 
-			for ( const category in categories ) {
+	}
 
-				const pages = categories[ category ];
+	// Parse methods & properties
+	const matches = file.match( DOCS_PROPS_REGEX );
+	if ( ! matches ) {
 
-				for ( const pageName in pages ) {
+		return null;
 
-					const pageURL = pages[ pageName ].url;
+	}
 
-					// Read doc file
-					const file = fs.readFileSync(
-						path.join( DOCS_PATH, `${pageURL}.html` ),
-						'utf-8'
-					);
+	const data = {
+		method: new Set(),
+		property: new Set(),
+	};
 
-					// Base page data
-					const baseData = { url: pageURL };
+	for ( const match of matches ) {
 
-					// Parse methods & properties from doc file
-					const matches = file.match( DOCS_PROPS_REGEX );
-					const pageData = matches && matches.reduce(
-						( output, match ) => {
+		let [ left, right ] = match.slice( 1, -1 ).split( ' ' );
+		let type = ( left.split( ':' )[ 0 ] == 'method' ) ? 'method' : 'property';
+		data[ type ].add( right );
 
-							if ( ! match ) return output;
+	}
 
-							const type = match.replace( DOCS_PROPS_REGEX, '$1' );
-							const target = type === 'method' ? 'methods' : 'properties';
+	for ( let type of [ 'method', 'property' ] ) {
 
-							const value = match.replace( DOCS_PROPS_REGEX, '$2' );
-							if ( value ) output[ target ].push( value );
+		if ( data[ type ].size ) {
 
-							return output;
+			data[ type ] = [ ...data[ type ] ].sort();
 
-						},
-						{
-							...baseData,
-							methods: [],
-							properties: [],
-						}
-					);
+		} else {
 
-					// Use base data if no matching methods or props
-					pages[ pageName ] = pageData || baseData;
-
-				}
-
-			}
+			delete data[ type ];
 
 		}
 
 	}
 
-	// If specified, write to list.json with Mr.doob's Code Style™
+	return ( data.method || data.property ) ? data : null;
+
+}
+
+/**
+ * Updates docs meta in `docs/files.json`.
+ */
+function updateDocs( write ) {
+
+	// Get list data
+	const list = JSON.parse( fs.readFileSync( path.join( DOCS_PATH, 'list.json' ), 'utf-8' ) );
+
+	const listEng = list.en;
+	let categoryDico = {};
+	let changes = 0;
+
+    parseDocumentation( list, 'en', {
+
+		categoryBefore: () => {
+
+			categoryDico = {};
+			changes = 0;
+
+		},
+
+        pageAfter: ( _section, _category, pageName, pageURL, page ) => {
+
+			let data = parseSource( path.join( DOCS_PATH, `${pageURL}.html` ) );
+
+			categoryDico[ pageName ] = {};
+			let pageDico = categoryDico[ pageName ];
+
+			if ( page ) {
+
+				pageDico.url = page;
+
+			}
+
+			if ( ! data ) {
+
+				return;
+
+			}
+
+			changes ++;
+
+			if ( data.method ) {
+
+				pageDico.method = data.method;
+
+			}
+
+			if ( data.property ) {
+
+				pageDico.property = data.property;
+
+			}
+
+        },
+
+		categoryAfter: ( section, category ) => {
+
+			if (changes) {
+
+				listEng[ section ][ category ] = categoryDico;
+
+			}
+
+		},
+
+    } );
+
+	// If specified, write to files.json with Mr.doob's Code Style™
 	if ( write ) {
 
 		fs.writeFileSync(
-			path.join( DOCS_PATH, 'list.json' ),
+			path.join( FILES_PATH, 'docs.json' ),
 			JSON.stringify( list, null, '\t' ).replace( /(\}\,)\n/g, '$1\n\n' )
 		);
 
@@ -83,7 +151,7 @@ const updateDocs = ( write ) => {
 
 	return list;
 
-};
+}
 
 // Check whether to write via CLI flag
 const args = process.argv.slice( 2 );

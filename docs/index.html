@@ -2,13 +2,13 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>three.js docs</title>
+		<title>three.js docs/examples</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
 		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 		<!-- console sandbox -->
-		<script src="../build/three.min.js" async defer></script>
+		<!-- <script src="../build/three.min.js" async defer></script> -->
 	</head>
 	<body>
 		<div id="panel">
@@ -17,8 +17,8 @@
 				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
-					<span class="selected">docs</span>
-					<a href="../examples/#webgl_animation_cloth">examples</a>
+					<a id="sectionDoc" href="#manual/introduction/Creating-a-scene">docs</a>
+					<a id="sectionEx" href="#webgl_animation_cloth">examples</a>
 				</div>
 
 				<div id="expandButton"></div>
@@ -39,417 +39,30 @@
 					</select>
 				</div>
 
-				<div id="content"></div>
+				<div id="contentDoc" class="content"></div>
+				<div id="contentEx" class="content hidden">
+					<img id="previewsToggler" src="../files/thumbnails.svg" width="20" height="20" />
+					<div id="container"></div>
+				</div>
 			</div>
 
 		</div>
 
-		<iframe name="viewer"></iframe>
+		<iframe id="viewerDoc" name="viewerDoc"></iframe>
+		<iframe id="viewerEx" name="viewerEx" class="hidden" allow="fullscreen; xr-spatial-tracking;"></iframe>
+
+		<a id="button" target="_blank" class="hidden">
+			<img src="../files/ic_code_black_24dp.svg">
+		</a>
 
 		<script src="../files/search.js"></script>
 
 		<script>
 
-		let iframe = document.querySelector( 'iframe' );
-
-		const pageProperties = {};
-		const titles = {};
-		const categoryElements = [];
-
-		let navigation;
-
-		init();
-
-		async function init() {
-
-			const list = await ( await fetch( 'list.json' ) ).json();
-
-			// *BufferGeometry to *Geometry
-
-			let hash = window.location.hash;
-			const index = hash.indexOf( 'BufferGeometry' );
-
-			if ( index > 1 && ! hash.includes( 'Instanced' ) && hash[ index - 1 ] != '/' ) {
-
-				hash = hash.replace( 'BufferGeometry', 'Geometry' );
-				window.location.hash = hash;
-
-			}
-
-			hash = hash.slice( 1 );
-
-			// Localisation
-
-			let language = 'en';
-
-			if ( /^(api|manual|examples)/.test( hash ) ) {
-
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja)\//.exec( hash );
-
-				if ( hashLanguage === null ) {
-
-					// Route old non-localised api links
-
-					window.location.hash = hash.replace( /^(api|manual|examples)/, '$1/en' );
-
-				} else {
-
-					language = hashLanguage[ 2 ];
-
-				}
-
-			}
-
-			const languageSelect = document.getElementById( 'language' );
-			languageSelect.value = language;
-			languageSelect.addEventListener( 'change', function () {
-
-				setLanguage( this.value );
-
-			} );
-
-			function setLanguage( value ) {
-
-				language = value;
-
-				createNavigation( list, language );
-				updateFilter();
-				autoChangeUrlLanguage( language );
-
-			}
-
-			// Activate content and title change on browser navigation
-
-			window.onpopstate = createNewIframe;
-
-			// Create the navigation panel and configure the iframe
-
-			createNavigation( list, language );
-			createNewIframe();
-
-			// Global events + check the ?q= query
-
-			setGlobalEvents( updateFilter );
-
-		}
-
-		// Navigation Panel
-
-		function createLink( pageName, pageURL ) {
-
-			const link = document.createElement( 'a' );
-			link.href = pageURL + '.html';
-			link.textContent = pageName;
-			link.setAttribute( 'target', 'viewer' );
-			link.addEventListener( 'click', function ( event ) {
-
-				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
-
-				window.location.hash = pageURL;
-				panel.classList.remove( 'open' );
-
-				content.querySelectorAll( 'a' ).forEach( item => {
-
-					item.classList.remove( 'selected' );
-
-				} );
-
-				link.classList.add( 'selected' );
-
-			} );
-
-			return link;
-
-		}
-
-		function createNavigation( list, language ) {
-
-			if ( navigation !== undefined ) {
-
-				content.removeChild( navigation );
-
-			}
-
-			// Create the navigation panel using data from list.js
-
-			navigation = document.createElement( 'div' );
-			content.appendChild( navigation );
-
-			if ( language === 'ar' ) {
-
-				navigation.style.direction = 'rtl';
-
-			}
-
-			const localList = list[ language ];
-			const selectedPage = window.location.hash.substring( 1 );
-
-			Object.keys( localList ).forEach( section => {
-
-				// Create sections
-
-				const categories = localList[ section ];
-
-				const sectionHead = document.createElement( 'h2' );
-				sectionHead.textContent = section;
-				navigation.appendChild( sectionHead );
-
-				Object.keys( categories ).forEach( category => {
-
-					// Create categories
-
-					const pages = categories[ category ];
-
-					const categoryContainer = document.createElement( 'div' );
-					navigation.appendChild( categoryContainer );
-
-					const categoryHead = document.createElement( 'h3' );
-					categoryHead.textContent = category;
-					categoryContainer.appendChild( categoryHead );
-
-					const categoryContent = document.createElement( 'ul' );
-					categoryContainer.appendChild( categoryContent );
-
-					Object.keys( pages ).forEach( pageName => {
-
-						// Create page links
-
-						const pageURL = pages[ pageName ].url;
-
-						// Localisation
-
-						const listElement = document.createElement( 'li' );
-						categoryContent.appendChild( listElement );
-
-						const linkElement = createLink( pageName, pageURL );
-						listElement.appendChild( linkElement );
-
-						// select current page
-
-						if ( pageURL === selectedPage ) {
-
-							linkElement.classList.add( 'selected' );
-
-						}
-
-						// Gather the main properties for the current subpage
-
-						pageProperties[ pageName ] = {
-							section: section,
-							category: category,
-							pageURL: pageURL,
-							linkElement: linkElement,
-
-							// for quick matching
-
-							text: pageName.toLowerCase(),
-							parentList: listElement.classList,
-						};
-
-						// Gather the document titles (used for easy access on browser navigation)
-
-						titles[ pageURL ] = pageName;
-
-					} );
-
-					// Gather the category elements for easy access on filtering
-
-					categoryElements.push( [
-						categoryContainer.classList,
-						Array.from( categoryContent.children ).map( child => child.classList )
-					] );
-
-				} );
-
-			} );
-
-		}
-
-		// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
-
-		function autoChangeUrlLanguage( language ) {
-
-			const hash = location.hash;
-			if ( hash === '' ) return;
-			const docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
-			let docLink = hash.substr( hash.indexOf( '/' ) + 1 );
-			docLink = docLink.substr( docLink.indexOf( '/' ) );
-			location.href = docType + language + docLink;
-
-		}
-
-		// Filtering
-
-		function updateFilter() {
-
-			// see documentation @ search.js
-			// time to remove "pro" from the search (average of 5 times)
-			// - original: 37.68 ms
-			// - new: 6.05 ms
-
-			searchContent( pageProperties, ( name, page, regExp, index, end ) => {
-
-				if ( regExp ) {
-
-					// /regexp/ was used
-
-					if ( index >= 0 ) {
-
-						page.linkElement.innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
-						page.parentList.remove( 'hidden' );
-
-					} else {
-
-						page.parentList.add( 'hidden' );
-
-					}
-
-				} else if ( index == -2 ) {
-
-					// empty search => restore original names if needed (note: the check is not useless)
-
-					if ( page.linkElement.innerHTML != name ) {
-
-						page.linkElement.innerHTML = name;
-
-					}
-
-					page.parentList.remove( 'hidden' );
-
-				} else if ( index >= 0 ) {
-
-					// full text match => show the matching text
-
-					page.linkElement.innerHTML = highlightText( name, index, end );
-					page.parentList.remove( 'hidden' );
-
-				} else {
-
-					// full text fail
-
-					page.parentList.add( 'hidden' );
-
-				}
-
-			} );
-
-			displayFilteredPanel();
-
-		}
-
-		function displayFilteredPanel() {
-
-			// Show/hide categories depending on their content
-
-			categoryElements.forEach( ( [ parentClassList, childrenLists ] ) => {
-
-				// If and only if all page names are hidden, hide the whole category
-
-				let hideCategory = childrenLists.every( list => list.contains( 'hidden' ) );
-
-				if ( hideCategory ) {
-
-					parentClassList.add( 'hidden' );
-
-				} else {
-
-					parentClassList.remove( 'hidden' );
-
-				}
-
-			} );
-
-		}
-
-		// Routing
-
-		function setUrlFragment( pageName ) { // eslint-disable-line no-undef
-
-			// Handle navigation from the subpages (iframes):
-			// First separate the member (if existing) from the page name,
-			// then identify the subpage's URL and set it as URL fragment (re-adding the member)
-
-			const splitPageName = decomposePageName( pageName, '.', '.' );
-
-			const currentProperties = pageProperties[ splitPageName[ 0 ] ];
-
-			if ( currentProperties ) {
-
-				window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
-
-				createNewIframe();
-
-			}
-
-		}
-
-		function createNewIframe() {
-
-			// Change the content displayed in the iframe
-			// First separate the member part of the fragment (if existing)
-
-			const hash = window.location.hash.substring( 1 );
-			const splitHash = decomposePageName( hash, '.', '#' );
-
-			// Creating a new Iframe instead of assigning a new src is
-			// a cross-browser solution to allow normal browser navigation;
-			// - only assigning a new src would result in two history states each time.
-
-			// Note: iframe.contentWindow.location.replace(hash) should work, too,
-			// but it doesn't work in Edge with links from the subpages!
-
-			let subtitle;
-
-			const oldIframe = iframe;
-			iframe = oldIframe.cloneNode();
-
-			if ( hash ) {
-
-				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
-				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
-				iframe.style.display = 'unset';
-
-			} else {
-
-				iframe.src = '';
-				subtitle = '';
-				iframe.style.display = 'none';
-
-			}
-
-			document.body.replaceChild( iframe, oldIframe );
-			document.title = subtitle + 'three.js docs';
-
-		}
-
-		function decomposePageName( pageName, oldDelimiter, newDelimiter ) {
-
-			// Helper function for separating the member (if existing) from the pageName
-			// For example: 'Geometry.morphTarget' can be converted to
-			// ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
-			// Note: According RFC 3986 no '#' allowed inside of an URL fragment!
-
-			let parts = [];
-
-			const dotIndex = pageName.indexOf( oldDelimiter );
-
-			if ( dotIndex !== - 1 ) {
-
-				parts = pageName.split( oldDelimiter );
-				parts[ 1 ] = newDelimiter + parts[ 1 ];
-
-			} else {
-
-				parts[ 0 ] = pageName;
-				parts[ 1 ] = '';
-
-			}
-
-			return parts;
-
-		}
-
-		welcomeThree();
+			initNodes();
+			hashChanged('docs');
+		    setGlobalEvents();
+			welcomeThree();
 
 		</script>
 

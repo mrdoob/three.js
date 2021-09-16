@@ -2,11 +2,13 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>three.js examples</title>
+		<title>three.js docs/examples</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
 		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
+		<!-- -->
+		<!-- -->
 	</head>
 	<body>
 		<div id="panel">
@@ -15,8 +17,8 @@
 				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
-					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
-					<span class="selected">examples</span>
+					<a href="#manual/introduction/Creating-a-scene">docs</a>
+					<a href="#webgl_animation_cloth">examples</a>
 				</div>
 
 				<div id="expandButton"></div>
@@ -28,276 +30,39 @@
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
 					<div id="exitSearchButton"></div>
+					<select id="language" class="hidden">
+						<option value="en">en</option>
+						<option value="ar">ar</option>
+						<option value="ko">한국어</option>
+						<option value="zh">中文</option>
+						<option value="ja">日本語</option>
+					</select>
 				</div>
 
-				<div id="content">
-					<img id="previewsToggler" src="./files/thumbnails.svg" width="20" height="20" />
+				<div id="contentDoc" class="content hidden"></div>
+				<div id="contentEx" class="content">
+					<img id="previewsToggler" src="../files/thumbnails.svg" width="20" height="20" />
 					<div id="container"></div>
 				</div>
 			</div>
 
 		</div>
 
-		<iframe id="viewer" name="viewer" allow="fullscreen; xr-spatial-tracking;"></iframe>
+		<iframe id="viewerDoc" name="viewerDoc" class="hidden"></iframe>
+		<iframe id="viewerEx" name="viewerEx" allow="fullscreen; xr-spatial-tracking;"></iframe>
 
-		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
+		<a id="button" target="_blank">
+			<img src="../files/ic_code_black_24dp.svg">
+		</a>
 
 		<script src="../files/search.js"></script>
 
 		<script>
 
-		const viewer = document.getElementById( 'viewer' );
-		const viewSrcButton = document.getElementById( 'button' );
-		const previewsToggler = document.getElementById( 'previewsToggler' );
-		const container = document.getElementById( 'container' );
-
-		const validRedirects = new Map();
-
-		let selected = null;
-
-		const headerClassLists = {};
-		const linkClassLists = {};
-		const linkTitles = {};
-		let sectionFiles = {};
-		const fileObjects = {};
-
-		init();
-
-		async function init() {
-
-			viewSrcButton.style.display = 'none';
-
-			sectionFiles = await ( await fetch( 'files.json' ) ).json();
-			const fileTags = await ( await fetch( 'tags.json' ) ).json();
-
-			createExamplesList( fileTags );
-
-			if ( window.location.hash !== '' ) {
-
-				const file = window.location.hash.substring( 1 );
-
-				// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
-
-				if ( validRedirects.has( file ) === true ) {
-
-					selectFile( file );
-					viewer.src = validRedirects.get( file );
-					viewer.style.display = 'unset';
-
-				}
-
-			}
-
-			// iOS iframe auto-resize workaround
-
-			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-				viewer.style.width = getComputedStyle( viewer ).width;
-				viewer.style.height = getComputedStyle( viewer ).height;
-				viewer.setAttribute( 'scrolling', 'no' );
-
-			}
-
-			previewsToggler.onclick = function ( event ) {
-
-				event.preventDefault();
-				content.classList.toggle( 'minimal' );
-
-			};
-
-			// Global events + check the ?q= query
-
-			setGlobalEvents( updateFilter );
-
-		}
-
-		function createExamplesList( fileTags ) {
-
-			// create the list of examples
-			// + fill the sectionFiles object
-
-			const lines = [];
-
-			Object.keys( sectionFiles ).forEach( section => {
-
-				lines.push( `<h2 data-category="${section}">${section}</h2>` );
-
-				for ( let name of sectionFiles[ section ] ) {
-
-					fileObjects[ name ] = {};
-					const file = fileObjects[ name ];
-					const clean = cleanName( name );
-
-					lines.push( [
-						'<div class="card">',
-							`<a href="${name}.html" target="viewer">`,
-								'<div class="cover">',
-									`<img src="screenshots/${name}.jpg" loading="lazy" width="400">`,
-								'</div>',
-								`<div class="title">${clean}</div>`,
-							'</a>',
-						'</div>',
-					].join( '' ) );
-
-					file.clean = clean;
-					file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join(' ').toLowerCase();
-
-					validRedirects.set( name, name + '.html' );
-
-				}
-
-			});
-
-			container.innerHTML = lines.join( '' );
-
-			// cache headers + links
-
-			container.querySelectorAll( 'h2' ).forEach( node => {
-
-				headerClassLists[ node.dataset.category ] = node.classList;
-
-			} );
-
-			container.querySelectorAll( 'a' ).forEach( node => {
-
-				let name = node.getAttribute( 'href' ).slice( 0, -5 );
-				linkClassLists[ name ] = node.parentNode.classList;
-				linkTitles[ name ] = node.querySelector( '.title' );
-
-			} );
-
-			// events
-
-			container.addEventListener( 'click', event => {
-
-				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
-				if ( event.target.tagName != 'A' ) return;
-
-				selectFile( event.target.getAttribute( 'href' ).slice( 0, -5 ) );
-
-			} );
-
-		}
-
-		function selectFile( file ) {
-
-			if ( selected !== null ) {
-
-				linkClassLists[ selected ].remove( 'selected' );
-
-			}
-
-			linkClassLists[ file ].add( 'selected' );
-
-			window.location.hash = file;
-			viewer.focus();
-			viewer.style.display = 'unset';
-
-			panel.classList.remove( 'open' );
-
-			selected = file;
-
-			// Reveal "View source" button and set attributes to this example
-			viewSrcButton.style.display = '';
-			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
-			viewSrcButton.title = 'View source code for ' + cleanName( selected ) + ' on GitHub';
-
-		}
-
-		function updateFilter() {
-
-			// see documentation @ search.js
-			// time to remove "buffer" from the search (average of 5 times)
-			// - original: 72.04 ms
-			// - new: 2.82 ms
-
-			searchContent( fileObjects, ( name, page, regExp, index, end ) => {
-
-				if ( regExp ) {
-
-					// /regexp/ was used
-
-					if ( index >= 0 ) {
-
-						linkTitles[ name ].innerHTML = page.clean.replaceAll( regExp, '<b>$&</b>' );
-						linkClassLists[ name ].remove( 'hidden' );
-
-					} else {
-
-						linkClassLists[ name ].add( 'hidden' );
-
-					}
-
-				} else if ( index == -2 ) {
-
-					// empty search => restore original names if needed (note: the check is not useless)
-
-					const title = linkTitles[ name ];
-
-					if ( title.innerHTML != page.clean ) {
-
-						title.innerHTML = page.clean;
-
-					}
-
-					linkClassLists[ name ].remove( 'hidden' );
-
-				} else if ( index >= 0 ) {
-
-					// full text match => show the matching text
-
-					linkTitles[ name ].innerHTML = highlightText( page.clean, index, end );
-					linkClassLists[ name ].remove( 'hidden' );
-
-				} else {
-
-					// full text fail
-
-					linkClassLists[ name ].add( 'hidden' );
-
-				}
-
-			} );
-
-			layoutList();
-
-		}
-
-		function cleanName( name ) {
-
-			return name.split( '_' ).slice( 1 ).join( ' / ' );
-
-		}
-
-		function layoutList() {
-
-			Object.keys( sectionFiles ).forEach( section => {
-
-				const collapsed = sectionFiles[ section ].every( name => linkClassLists[ name ].contains( 'hidden' ) );
-
-				if ( collapsed ) {
-
-					headerClassLists[ section ].add( 'hidden' );
-
-				} else {
-
-					headerClassLists[ section ].remove( 'hidden' );
-
-				}
-
-			});
-
-		}
-
-		function createElementFromHTML( htmlString ) {
-
-			const div = document.createElement( 'div' );
-			div.innerHTML = htmlString.trim();
-			return div.firstChild;
-
-		}
-
-		welcomeThree();
+			initNodes();
+			hashChanged('examples');
+		    setGlobalEvents();
+			welcomeThree();
 
 		</script>
 

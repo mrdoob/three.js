@@ -1,3 +1,9 @@
+/*
+globals
+document, prettyPrint, window
+*/
+'use strict';
+
 if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
@@ -82,11 +88,7 @@ function onDocumentLoad() {
 
 	// handle code snippets formatting
 
-	const elements = document.getElementsByTagName( 'code' );
-
-	for ( let i = 0; i < elements.length; i ++ ) {
-
-		const element = elements[ i ];
+	for ( const element of document.getElementsByTagName( 'code' ) ) {
 
 		text = element.textContent.trim();
 		text = text.replace( /^\t\t/gm, '' );
@@ -124,15 +126,12 @@ function onDocumentLoad() {
 	const prettify = document.createElement( 'script' );
 	prettify.src = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.js';
 
-	prettify.onload = function () {
+	prettify.onload = () => {
 
-		const elements = document.getElementsByTagName( 'code' );
+		for ( const element of document.getElementsByTagName( 'code' ) ) {
 
-		for ( let i = 0; i < elements.length; i ++ ) {
-
-			const e = elements[ i ];
-			e.className += ' prettyprint';
-			e.setAttribute( 'translate', 'no' );
+			element.classList.add('prettyprint');
+			element.setAttribute( 'translate', 'no' );
 
 		}
 
