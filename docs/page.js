@@ -141,6 +141,10 @@ function onDocumentLoad() {
 
 	document.head.appendChild( prettify );
 
+	// inform the parent that we're done
+
+	window.parent.iFrameIsReady( window.location.href );
+
 }
 
 document.addEventListener( 'DOMContentLoaded', onDocumentLoad, false );

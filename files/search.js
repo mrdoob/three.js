@@ -18,6 +18,8 @@ let contentEx;
 let exitSearchButton;
 let expandButton;
 let filterInput;
+let frameDoc;
+let frameDoc2;
 let iframes;
 let nodeButton;
 let nodeLanguage;
@@ -27,6 +29,7 @@ let panel;
 let panelScrim;
 let previewsToggler;
 let viewerDoc;
+let viewerDoc2;
 let viewerEx;
 
 let currentSection = '';
@@ -50,11 +53,17 @@ function initNodes() {
     panelScrim = document.getElementById( 'panelScrim' );
     previewsToggler = document.getElementById( 'previewsToggler' );
     viewerDoc = document.getElementById( 'viewerDoc' );
+    viewerDoc2 = document.getElementById( 'viewerDoc2' );
     viewerEx = document.getElementById( 'viewerEx' );
+
+    // used for double buffering
+
+    frameDoc = viewerDoc;
+    frameDoc2 = viewerDoc2;
 
 }
 
-function cleanSearch(hash) {
+function cleanSearch( hash ) {
 
     // create a clean search query
 
@@ -68,6 +77,14 @@ function extractQuery() {
 
     const search = location.search;
     return ( search.indexOf( '?q=' ) >= 0 ) ? decodeURI( search.substr( 3 ) ) : '';
+
+}
+
+function getTrailingPath( path ) {
+
+    // Get the last 4 elements of a path, useful for iFrame src/href matching
+
+    return ( path || '' ).split( '/' ).slice( -4 ).join( '/' );
 
 }
 
@@ -365,7 +382,7 @@ async function setSection( section ) {
     showHide( nodeLanguage, isDoc );
     showHide( contentDoc, isDoc );
     showHide( contentEx, ! isDoc );
-    showHide( viewerDoc, isDoc, 'hidden' );
+    showHide( frameDoc, isDoc, 'hidden' );
     showHide( viewerEx, ! isDoc, 'hidden' );
 
     // starting page
@@ -436,19 +453,36 @@ function updateFilter() {
 
 function updateIFrame( iframe, src ) {
 
-    if ( iframe.getAttribute( 'src' ) == src ) {
+    const isDoc = ( guessSection() == 'docs' );
 
-        return;
+    // Check if an iFrame already has the correct content
+
+    const nodes = isDoc ? [ viewerDoc, viewerDoc2 ] : [ iframe ];
+
+    for ( const node of nodes ) {
+
+        if ( node.getAttribute( 'src' ) == src ) {
+
+            if ( isDoc && node.dataset.ready == '1' ) {
+
+                iFrameIsReady( src );
+
+            }
+
+            return;
+
+        }
 
     }
 
     // Update the source outside the DOM to prevent history from being changed
 
     iframes.removeChild( iframe );
+    iframe.dataset.ready = '0';
     iframe.src = src;
     iframes.appendChild( iframe );
 
-    let node = ( guessSection() == 'docs' ) ? nodeSectionDoc : nodeSectionEx;
+    let node = isDoc ? nodeSectionDoc : nodeSectionEx;
     node.setAttribute( 'href', location.hash );
 
 }
@@ -706,6 +740,42 @@ function createNavigationDoc( list, language ) {
 
 }
 
+function iFrameIsReady( href ) {
+
+    // double buffering
+
+    if ( guessSection() != 'docs' ) {
+
+        return;
+
+    }
+
+    const childPath = getTrailingPath( href );
+    const src1 = getTrailingPath( viewerDoc.getAttribute( 'src' ) );
+    const src2 = getTrailingPath( viewerDoc2.getAttribute( 'src' ) );
+
+    if ( childPath == src1 ) {
+
+        frameDoc = viewerDoc;
+        frameDoc2 = viewerDoc2;
+
+    } else if ( childPath == src2 ) {
+
+        frameDoc = viewerDoc2;
+        frameDoc2 = viewerDoc;
+
+    } else {
+
+        console.log( 'ERROR', childPath, src1, src2 );
+
+    }
+
+    showHide( frameDoc, true, 'hidden' );
+    showHide( frameDoc2, false, 'hidden' );
+    frameDoc.dataset.ready = '1';
+
+}
+
 function parseDoc( list, language, {
         categoryAfter, categoryBefore, pageAfter, sectionAfter, sectionBefore, skipUnderscore=true,
     } = {} ) {
@@ -883,7 +953,7 @@ function selectDoc( url, node ) {
 
     }
 
-    updateIFrame( viewerDoc, localURL );
+    updateIFrame( frameDoc2, localURL );
 
 }
 
