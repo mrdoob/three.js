@@ -82,13 +82,17 @@ async function hashChanged( defaultSection ) {
     let hash = location.hash;
     const section = ( hash || ! defaultSection ) ? guessSection() : defaultSection;
 
-    if ( section == 'docs' ) {
+    if ( hash ) {
 
-        nodeSectionDoc.setAttribute( 'href', hash );
+        if ( section == 'docs' ) {
 
-    } else {
+            nodeSectionDoc.setAttribute( 'href', hash );
 
-        nodeSectionEx.setAttribute( 'href', hash );
+        } else {
+
+            nodeSectionEx.setAttribute( 'href', hash );
+
+        }
 
     }
 
