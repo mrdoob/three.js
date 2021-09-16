@@ -2171,7 +2171,10 @@ class GLTFParser {
 		// loader object cache
 		this.cache = new GLTFRegistry();
 
-		// associations between Three.js objects and glTF elements
+		 /**
+		 * Associations between Three.js objects and glTF elements
+		 * @type {Map<Object3D|Material|Texture, Map.<string, number>>}
+		 */
 		this.associations = new Map();
 
 		// BufferGeometry caching
@@ -2408,6 +2411,29 @@ class GLTFParser {
 		}
 
 		return pending;
+
+	}
+
+	/**
+	 * Adds a glTF association by mapping the object to a glTF type and index.
+	 * Note that a single Three.js object can represent several glTF objects and
+	 * thus several mappings may be added for one object.
+	 * @param {Object3D} object the Three.js object to be mapped
+	 * @param {string} type the glTF type (nodes, meshes, materials, textures)
+	 *  includes inferred type 'primitives'
+	 * @param {number} index the glTF index, indicates the exact object in a glTF
+	 *  type list
+	 */
+	_addAssociation( object, type, index ) {
+
+		const mappings = this.associations.get( object ) || new Map();
+		mappings.set( type, index );
+		this.associations.set( object, mappings );
+
+		// Gives the object the ability to find itself in the glTF data structure
+		// of the given type, in other words this indicates which glTF object
+		// the Three object was generated from and/or represents.
+		object.userData[ `${type}Index` ] = index;
 
 	}
 
@@ -2847,10 +2873,7 @@ class GLTFParser {
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
-			parser.associations.set( texture, {
-				type: 'textures',
-				index: textureIndex
-			} );
+			parser._addAssociation( texture, 'textures', textureIndex );
 
 			return texture;
 
@@ -3190,7 +3213,7 @@ class GLTFParser {
 
 			assignExtrasToUserData( material, materialDef );
 
-			parser.associations.set( material, { type: 'materials', index: materialIndex } );
+			parser._addAssociation( material, 'materials', materialIndex );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3345,6 +3368,9 @@ class GLTFParser {
 						? new SkinnedMesh( geometry, material )
 						: new Mesh( geometry, material );
 
+					parser._addAssociation( mesh, 'primitives', i );
+					parser._addAssociation( mesh, 'meshes', meshIndex );
+
 					if ( mesh.isSkinnedMesh === true && ! mesh.geometry.attributes.skinWeight.normalized ) {
 
 						// we normalize floating point skin weight array to fix malformed assets (see #15319)
@@ -3403,21 +3429,32 @@ class GLTFParser {
 
 			}
 
+			let meshContainer = null;
+
 			if ( meshes.length === 1 ) {
+
+				// Combines the primitive, mesh, and node into one object.
+				meshContainer = meshes[ 0 ];
 
 				return meshes[ 0 ];
 
+			} else {
+
+				// Represents the mesh as a group node.
+				meshContainer = new Group();
+
+				for ( let i = 0, il = meshes.length; i < il; i ++ ) {
+
+					// Represents the mesh primitives as children of a group node.
+					meshContainer.add( meshes[ i ] );
+
+				}
+
 			}
 
-			const group = new Group();
+			parser._addAssociation( meshContainer, 'meshes', meshIndex );
 
-			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
-
-				group.add( meshes[ i ] );
-
-			}
-
-			return group;
+			return meshContainer;
 
 		} );
 
@@ -3820,7 +3857,7 @@ class GLTFParser {
 
 			}
 
-			parser.associations.set( node, { type: 'nodes', index: nodeIndex } );
+			parser._addAssociation( node, 'nodes', nodeIndex );
 
 			return node;
 
