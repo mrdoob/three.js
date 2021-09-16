@@ -4,7 +4,7 @@
 
 /*
 globals
-console, document, exports, fetch, getComputedStyle, location, navigator, window
+console, document, exports, fetch, getComputedStyle, location, navigator, performance, THREE, window
 */
 
 'use strict';
@@ -193,6 +193,100 @@ function highlightTokens( name, lower, regExp, searchLow, mainUrl ) {
     }
 
     return lines.join( '' );
+}
+
+function parseThree() {
+
+    // parse THREE classes at run time
+    // - automatically fill method + property
+    // - called when THREE is loaded and also when Doc is ready
+
+    const T = window.THREE;
+    const now = performance.now();
+
+    if ( readyThree || ! readyDoc || ! T) {
+
+        return;
+
+    }
+
+    const errors = new Set();
+
+    Object.keys( pagesDoc ).forEach( name => {
+
+        const class_ = T[name];
+
+        if ( typeof class_ != 'function' ) {
+
+            return;
+
+        }
+
+        try {
+
+            const object = new class_();
+            const page = pagesDoc[ name ];
+            const method = [];
+            const methodLow = [];
+            const property = [];
+            const propertyLow = [];
+
+            for ( let member in object ) {
+
+                if ( member[0] == '_' ) {
+
+                    continue;
+
+                }
+
+                if ( typeof member == 'function' ) {
+
+                    method.push( member );
+                    methodLow.push( member.toLowerCase() );
+
+                } else {
+
+                    property.push( member );
+                    propertyLow.push( member.toLowerCase() );
+
+                }
+
+            }
+
+            if ( method.length ) {
+
+                page.method = method.join( ' ' );
+                page.methodLow = methodLow.join( ' ' );
+
+            }
+
+            if ( property.length ) {
+
+                page.property = property.join( ' ' );
+                page.propertyLow = propertyLow.join( ' ' );
+
+            }
+
+            // console.log(name, page, methods, properties);
+
+        } catch (e) {
+
+            errors.add( name );
+
+        }
+
+    } );
+
+    // those classes have required arguments ...
+
+    if ( errors.size ) {
+
+        console.log( 'ERRORS:', [ ...errors ].sort() );
+
+    }
+
+    readyThree = true;
+    console.log(performance.now() - now);
 }
 
 /**
@@ -395,12 +489,16 @@ async function setSection( section ) {
 
     if ( isDoc ) {
 
+        document.title = titleDoc;
+
         nodeSectionDoc.classList.add( 'selected' );
         nodeSectionEx.classList.remove( 'selected' );
 
         await initDoc();
 
     } else {
+
+        document.title = 'three.js examples';
 
         nodeSectionDoc.classList.remove( 'selected' );
         nodeSectionEx.classList.add( 'selected' );
@@ -509,9 +607,12 @@ function welcomeThree() {
 
 const categoriesDoc = [];
 let lastSearchDoc;
+let listDoc;
 const pagesDoc = {};
 const sectionsDoc = [];
 let readyDoc;
+let readyThree;
+let titleDoc = 'three.js docs';
 
 async function initDoc() {
 
@@ -521,7 +622,8 @@ async function initDoc() {
 
     }
 
-    const list = await ( await fetch( '../files/docs.json' ) ).json();
+    // listDoc = await ( await fetch( '../docs/list.json' ) ).json();
+    listDoc = await ( await fetch( '../files/docs.json' ) ).json();
 
     // *BufferGeometry to *Geometry
 
@@ -568,7 +670,7 @@ async function initDoc() {
 
         language = value;
 
-        createNavigationDoc( list, language );
+        createNavigationDoc();
         updateFilterDoc();
 
 		// Auto change language url. If a reader open a document in English, when he click "zh",
@@ -588,20 +690,21 @@ async function initDoc() {
 
     }
 
-    createNavigationDoc( list, language );
+    createNavigationDoc();
 
     readyDoc = true;
+    parseThree();
     return true;
 }
 
-function createNavigationDoc( list, language ) {
+function createNavigationDoc() {
 
     // Create the navigation panel
 
     const selectedPage = location.hash.substring( 1 );
     const lines = [];
 
-    parseDoc( list, language, {
+    parseDoc( listDoc, language, {
 
         sectionBefore: section => {
 
@@ -653,6 +756,13 @@ function createNavigationDoc( list, language ) {
             }
 
             const selected = ( url === selectedPage ) ? ' selected' : '';
+
+            if ( selected ) {
+
+                titleDoc = `${pageName} - three.js docs`;
+                document.title = titleDoc;
+
+            }
 
             lines.push(
                         '<li>',
