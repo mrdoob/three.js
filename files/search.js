@@ -346,6 +346,12 @@ async function setSection( section ) {
     showHide( viewerDoc, isDoc );
     showHide( viewerEx, ! isDoc );
 
+    if ( ! location.hash ) {
+
+        location.hash = ( isDoc ? nodeSectionDoc : nodeSectionEx ).getAttribute( 'href' );
+
+    }
+
     if ( isDoc ) {
 
         nodeSectionDoc.classList.add( 'selected' );
