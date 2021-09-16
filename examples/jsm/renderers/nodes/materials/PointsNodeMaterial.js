@@ -13,6 +13,8 @@ class PointsNodeMaterial extends PointsMaterial {
 
 		this.lightNode = null;
 
+		this.sizeNode = null;
+
 		this.positionNode = null;
 
 	}
@@ -25,6 +27,8 @@ class PointsNodeMaterial extends PointsMaterial {
 		this.alphaTestNode = source.alphaTestNode;
 
 		this.lightNode = source.lightNode;
+
+		this.sizeNode = source.sizeNode;
 
 		this.positionNode = source.positionNode;
 

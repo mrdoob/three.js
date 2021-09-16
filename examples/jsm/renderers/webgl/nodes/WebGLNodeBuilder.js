@@ -94,6 +94,18 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
+		if ( material.sizeNode && material.sizeNode.isNode ) {
+
+			this.addSlot( 'vertex', new NodeSlot( material.sizeNode, 'SIZE', 'float' ) );
+
+		}
+
+		if ( material.positionNode && material.positionNode.isNode ) {
+
+			this.addSlot( 'vertex', new NodeSlot( material.positionNode, 'POSITION', 'vec3' ) );
+
+		}
+
 	}
 
 	getTexture( textureProperty, uvSnippet, biasSnippet = null ) {
@@ -250,13 +262,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	/*prependCode( code ) {
-
-		this.shader.vertexShader = code + this.shader.vertexShader;
-		this.shader.fragmentShader = code + this.shader.fragmentShader;
-
-	}*/
-
 	build() {
 
 		super.build();
@@ -343,6 +348,22 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 				NODE_CODE_IRRADIANCE
 				iblIrradiance += PI * NODE_IRRADIANCE;
+
+			#endif` );
+
+		this.addCodeAfterInclude( 'vertex', 'begin_vertex',
+			`#ifdef NODE_POSITION
+
+				NODE_CODE_POSITION
+				transformed = NODE_POSITION;
+
+			#endif` );
+
+		this.addCodeAfterSnippet( 'vertex', 'gl_PointSize = size;',
+			`#ifdef NODE_SIZE
+
+				NODE_CODE_SIZE
+				gl_PointSize = NODE_SIZE;
 
 			#endif` );
 
