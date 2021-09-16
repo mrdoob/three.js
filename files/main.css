@@ -381,10 +381,6 @@ iframe {
 }
 
 #viewerEx {
-	display: none; /* Workaround: The iframe has white background in Chrome for some reason */
-}
-
-#viewerEx {
 	padding-left: var(--panel-width);
 }
 
@@ -529,6 +525,12 @@ iframe {
 
 .hidden {
 	display: none !important;
+}
+
+.method,
+.property {
+	display: block;
+	padding-left: 1em;
 }
 
 /* mobile */

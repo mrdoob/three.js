@@ -18,6 +18,7 @@ let contentEx;
 let exitSearchButton;
 let expandButton;
 let filterInput;
+let iframes;
 let nodeButton;
 let nodeLanguage;
 let panel;
@@ -29,6 +30,7 @@ let viewerDoc;
 let viewerEx;
 
 let currentSection = '';
+let prevHash = '';
 let sectionData = {
     docs: {},
     examples: {},
@@ -42,6 +44,7 @@ function initNodes() {
     exitSearchButton = document.getElementById( 'exitSearchButton' );
     expandButton = document.getElementById( 'expandButton' );
     filterInput = document.getElementById( 'filterInput' );
+    iframes = document.getElementById( 'iframes' );
     nodeButton = document.getElementById( 'button' );
     nodeLanguage = document.getElementById( 'language' );
     panel = document.getElementById( 'panel' );
@@ -51,6 +54,16 @@ function initNodes() {
     sectionEx = document.getElementById( 'sectionEx' );
     viewerDoc = document.getElementById( 'viewerDoc' );
     viewerEx = document.getElementById( 'viewerEx' );
+
+}
+
+function cleanSearch() {
+
+    // create a clean search query
+
+    const search = filterInput.value.trim().replace( /\s+/g, ' ' );
+    window.history.replaceState( {}, '', `${search? '?q=': ''}${search}${location.hash}` );
+    return search;
 
 }
 
@@ -66,9 +79,29 @@ async function hashChanged(defaultSection) {
     const hash = location.hash.slice(1);
     const section = ( hash || ! defaultSection ) ? ( hash.includes( '/' ) ? 'docs': 'examples' ) : defaultSection;
 
+    // section change docs <=> examples
+
     if ( section != currentSection ) {
 
         await setSection( section );
+
+    }
+
+    // selection change
+
+    if ( hash != prevHash ) {
+
+        if ( section == 'docs' ) {
+
+            selectDoc( hash );
+
+        } else {
+
+            selectEx( hash );
+
+        }
+
+        prevHash = hash;
 
     }
 
@@ -86,16 +119,15 @@ function highlightText( name, start, end ) {
 
 }
 
-function searchContent( data, callback ) {
+/**
+ * Search content
+ * @param {number} mode &1: text (class name), &2: method, &4: property
+ */
+function searchContent( search, data, mode, callback ) {
 
     // Search content:
     // - data must be an object of objects
     // - those objects must contain a `text` string used for matching
-
-    // create a clean search query
-    let search = filterInput.value.trim().replace( /\s+/g, ' ' );
-
-    window.history.replaceState( {}, '', `${search? '?q=': ''}${search}${window.location.hash}` );
 
     if ( search.length >= 2 && search[ 0 ] == '/' && search.slice( - 1 ) == '/' ) {
 
@@ -156,9 +188,49 @@ function searchContent( data, callback ) {
 
             } else {
 
-                const index = item.text.indexOf( search );
+                let matches = 0;
 
-                callback( key, item, null, index, index + search.length );
+                if ( mode & 1 ) {
+
+                    const index = item.text.indexOf( search );
+                    if ( index >= 0 ) {
+
+                        callback( key, item, null, index, index + search.length, 1 );
+                        matches ++;
+
+                    }
+
+                }
+
+                if ( ( mode & 2 ) && item.methodLow ) {
+
+                    const index = item.methodLow.indexOf( search );
+                    if ( index >= 0 ) {
+
+                        callback( key, item, null, index, index + search.length, 2 );
+                        matches ++;
+
+                    }
+
+                }
+
+                if ( ( mode & 4 ) && item.propertyLow ) {
+
+                    const index = item.propertyLow.indexOf( search );
+                    if ( index >= 0 ) {
+
+                        callback( key, item, null, index, index + search.length, 4 );
+                        matches ++;
+
+                    }
+
+                }
+
+                if ( ! matches ) {
+
+                    callback( key, item, null, -1 );
+
+                }
 
             }
 
@@ -226,20 +298,12 @@ function setGlobalEvents() {
 
         panel.classList.add( 'searchFocused' );
 
-        updateFilter();
-
     }
 
     window.onhashchange = async event => {
 
-        console.log('HASH_CHANGED', event);
-
         await hashChanged();
 
-    };
-
-    window.onpopstate = event => {
-        console.log('POP_STATE', event);
     };
 
 }
@@ -258,7 +322,7 @@ async function setSection( section ) {
     showHide( viewerDoc, isDoc );
     showHide( viewerEx, ! isDoc );
 
-    if ( section == 'docs' ) {
+    if ( isDoc ) {
 
         sectionDoc.classList.add( 'selected' );
         sectionEx.classList.remove( 'selected' );
@@ -296,6 +360,22 @@ function updateFilter() {
 
 }
 
+function updateIFrame( iframe, src ) {
+
+    if ( iframe.src == src ) {
+
+        return;
+
+    }
+
+    // Update the source outside the DOM to prevent history from being changed
+
+    iframes.removeChild(iframe);
+    iframe.src = src;
+    iframes.appendChild(iframe);
+
+}
+
 function welcomeThree() {
 
     console.log( [
@@ -317,7 +397,7 @@ function welcomeThree() {
 ///////
 
 const categoryElements = [];
-const pageProperties = {};
+const pagesDoc = {};
 let readyDoc;
 
 async function initDoc() {
@@ -328,17 +408,17 @@ async function initDoc() {
 
     }
 
-    const list = await ( await fetch( '../docs/list.json' ) ).json();
+    const list = await ( await fetch( '../files/docs.json' ) ).json();
 
     // *BufferGeometry to *Geometry
 
-    let hash = window.location.hash;
+    let hash = location.hash;
     const index = hash.indexOf( 'BufferGeometry' );
 
     if ( index > 1 && ! hash.includes( 'Instanced' ) && hash[ index - 1 ] != '/' ) {
 
         hash = hash.replace( 'BufferGeometry', 'Geometry' );
-        window.location.hash = hash;
+        location.hash = hash;
 
     }
 
@@ -356,7 +436,7 @@ async function initDoc() {
 
             // Route old non-localised api links
 
-            window.location.hash = hash.replace( /^(api|manual|examples)/, '$1/en' );
+            location.hash = hash.replace( /^(api|manual|examples)/, '$1/en' );
 
         } else {
 
@@ -400,7 +480,7 @@ async function initDoc() {
     createNavigationDoc( list, language );
 
     readyDoc = true;
-
+    updateFilter();
 }
 
 function createNavigationDoc( list, language ) {
@@ -410,7 +490,7 @@ function createNavigationDoc( list, language ) {
     const selectedPage = location.hash.substring( 1 );
     const lines = [];
 
-    parseDocumentation( list, language, {
+    parseDoc( list, language, {
 
         sectionBefore: section => {
 
@@ -430,24 +510,50 @@ function createNavigationDoc( list, language ) {
 
         },
 
-        pageAfter: ( section, category, pageName, pageURL ) => {
+        pageAfter: ( section, category, pageName, url, page ) => {
 
-            const selected = ( pageURL === selectedPage ) ? ' selected' : '';
+            // Gather data for the current subpage
+
+            pagesDoc[ pageName ] = {
+                section: section,
+                category: category,
+                url: url,
+
+                // search
+                text: pageName.toLowerCase(),
+            };
+
+            if ( typeof page == 'object' ) {
+
+                const dico = pagesDoc[ pageName ];
+
+                if ( page.method ) {
+
+                    const text = page.method.join(' ');
+                    dico.method = text;
+                    dico.methodLow = text.toLowerCase();
+
+                }
+
+                if ( page.property ) {
+
+                    const text = page.property.join(' ');
+                    dico.property = text;
+                    dico.propertyLow = text.toLowerCase();
+
+                }
+
+            }
+
+            const selected = ( url === selectedPage ) ? ' selected' : '';
 
             lines.push(
                         '<li>',
-                            `<a href="#${pageURL}"${selected}>${pageName}</a>`,
+                            `<a href="#${url}"${selected} data-name="${pageName}" data-url="${url}">${pageName}</a>`,
+                            '<a class="method"></a>',
+                            '<a class="property"></a>',
                         '</li>',
             );
-
-            // Gather the main properties for the current subpage
-
-            pageProperties[ pageName ] = {
-                section: section,
-                category: category,
-                pageURL: pageURL,
-                text: pageName.toLowerCase(),
-            };
 
         },
 
@@ -474,10 +580,45 @@ function createNavigationDoc( list, language ) {
 
     }
 
+    // cache headers + links
+
+    contentDoc.querySelectorAll( 'h2' ).forEach( node => {
+
+        // headerClassLists[ node.dataset.category ] = node.classList;
+
+    } );
+
+    contentDoc.querySelectorAll( 'li' ).forEach( node => {
+
+        const child = node.firstElementChild;
+        let name = child.dataset.name;
+        let page = pagesDoc[ name ];
+        page.linkNode = child;
+        page.nodes = node.children;
+        page.parentList = node.classList;
+
+    } );
+
+    // events
+
+    contentDoc.onclick = event => {
+
+        let target = event.target;
+
+        if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey || target.tagName != 'A') {
+
+            return;
+
+        }
+
+        selectDoc( target.dataset.url, target );
+
+    };
+
 }
 
-function parseDocumentation( list, language, {
-        categoryAfter, categoryBefore, pageAfter, sectionAfter, sectionBefore,
+function parseDoc( list, language, {
+        categoryAfter, categoryBefore, pageAfter, sectionAfter, sectionBefore, skipUnderscore=true,
     } = {} ) {
 
     const engList = list.en;
@@ -564,7 +705,13 @@ function parseDocumentation( list, language, {
 
                 if ( pageName[ 0 ] == '_' ) {
 
-                    return;
+                    if ( ! skipUnderscore) {
+
+                        pageAfter( section, category, pageName, '', pages[ pageName ] );
+
+                    }
+
+                    continue;
 
                 }
 
@@ -572,28 +719,25 @@ function parseDocumentation( list, language, {
 
                 const page = pages[ pageName ];
                 const type = typeof( page );
-                let pageURL;
 
-                if ( type == 'object' ) {
+                let url = ( type == 'object' ) ? page.url : ( ( type == 'string' ) ? page : null );
 
-                    pageURL = page.url;
+                if ( ! url || typeof url != 'string' ) {
 
-                } else {
-
-                    pageURL = ( page && type == 'string' ) ? page : pageName.replace( /\s+/g, '-' );
+                    url = pageName.replace( /\s+/g, '-' );
 
                 }
 
                 // if URL contains '/' => treat it as the final answer
-                if ( ! pageURL.includes( '/' ) ) {
+                if ( ! url.includes( '/' ) ) {
 
-                    pageURL = `${subPath}/${pageURL}`;
+                    url = `${subPath}/${url}`;
 
                 }
 
                 if ( pageAfter ) {
 
-                    pageAfter( section, category, pageName, pageURL, page );
+                    pageAfter( section, category, pageName, url, page );
 
                 }
 
@@ -616,6 +760,34 @@ function parseDocumentation( list, language, {
         }
 
     } );
+
+}
+
+function selectDoc( url, node ) {
+
+    if ( ! node ) {
+
+        node = contentDoc.querySelector( `[data-url="${url}"]` );
+        if ( ! node) {
+
+            return;
+
+        }
+
+    }
+
+    const selected = contentDoc.querySelector( '.selected' );
+    if ( selected ) {
+
+        selected.classList.remove( 'selected' );
+
+    }
+
+    node.classList.add( 'selected' );
+
+    // const url = pagesDoc[ node.dataset.name ].url;
+
+    updateIFrame( viewerDoc, `../docs/${url}.html` );
 
 }
 
@@ -645,12 +817,21 @@ function showCategoriesDoc() {
 
 function updateFilterDoc() {
 
-    // see documentation @ search.js
     // time to remove "pro" from the search (average of 5 times)
     // - original: 37.68 ms
     // - new: 6.05 ms
 
-    searchContent( pageProperties, ( name, page, regExp, index, end ) => {
+    let search = cleanSearch();
+    let mode = 1;
+
+    if ( search[ 0 ] == '.' ) {
+
+        mode = 6;
+        search = search.slice( 1 );
+
+    }
+
+    searchContent( search, pagesDoc, mode, ( name, page, regExp, index, end, type ) => {
 
         if ( regExp ) {
 
@@ -658,7 +839,7 @@ function updateFilterDoc() {
 
             if ( index >= 0 ) {
 
-                page.linkElement.innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
+                page.linkNode.innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
                 page.parentList.remove( 'hidden' );
 
             } else {
@@ -671,9 +852,9 @@ function updateFilterDoc() {
 
             // empty search => restore original names if needed (note: the check is not useless)
 
-            if ( page.linkElement.innerHTML != name ) {
+            if ( page.linkNode.innerHTML != name ) {
 
-                page.linkElement.innerHTML = name;
+                page.linkNode.innerHTML = name;
 
             }
 
@@ -683,7 +864,20 @@ function updateFilterDoc() {
 
             // full text match => show the matching text
 
-            page.linkElement.innerHTML = highlightText( name, index, end );
+            if ( type == 1 ) {
+
+                page.linkNode.innerHTML = highlightText( name, index, end );
+
+            } else if ( type == 2 ) {
+
+                page.nodes[1].innerHTML = highlightText( page.method, index, end );
+
+            } else {
+
+                page.nodes[2].innerHTML = highlightText( page.property, index, end );
+
+            }
+
             page.parentList.remove( 'hidden' );
 
         } else {
@@ -712,7 +906,6 @@ const linkTitles = {};
 let readyEx;
 let sectionFiles = {};
 let selectedEx = null;
-const validRedirects = new Map();
 
 async function initEx() {
 
@@ -730,16 +923,7 @@ async function initEx() {
     if ( location.hash !== '' ) {
 
         const file = location.hash.substring( 1 );
-
-        // use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
-
-        if ( validRedirects.has( file ) === true ) {
-
-            selectFile( file );
-            viewerEx.src = validRedirects.get( file );
-            showHide( viewerEx, true );
-
-        }
+        selectEx( file );
 
     }
 
@@ -761,7 +945,7 @@ async function initEx() {
     };
 
     readyEx = true;
-
+    updateFilter();
 }
 
 function cleanName( name ) {
@@ -801,8 +985,6 @@ function createNavigationEx( fileTags ) {
             file.clean = clean;
             file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join(' ').toLowerCase();
 
-            validRedirects.set( name, name + '.html' );
-
         }
 
     } );
@@ -835,34 +1017,9 @@ function createNavigationEx( fileTags ) {
 
         }
 
-        selectFile( event.target.dataset.name );
+        selectEx( event.target.dataset.name );
 
     };
-
-}
-
-function selectFile( file ) {
-
-    if ( selectedEx !== null ) {
-
-        linkClassLists[ selectedEx ].remove( 'selected' );
-
-    }
-
-    linkClassLists[ file ].add( 'selected' );
-
-    location.hash = file;
-    viewerEx.focus();
-    showHide( viewerEx, true );
-
-    panel.classList.remove( 'open' );
-
-    selectedEx = file;
-
-    // Reveal "View source" button and set attributes to this example
-    showHide( nodeButton, true );
-    nodeButton.href = `https://github.com/mrdoob/three.js/blob/master/examples/${selectedEx}.html`;
-    nodeButton.title = `View source code for ${cleanName( selectedEx )} on GitHub`;
 
 }
 
@@ -886,14 +1043,50 @@ function showCategoriesEx() {
 
 }
 
+function selectEx( name ) {
+
+    const fileObj = fileObjects[ name ];
+    console.log(fileObj);
+
+    if ( ! fileObj ) {
+
+        return;
+
+    }
+
+    if ( selectedEx !== null ) {
+
+        linkClassLists[ selectedEx ].remove( 'selected' );
+
+    }
+
+    linkClassLists[ name ].add( 'selected' );
+
+    updateIFrame( viewerEx, `../examples/${name}.html` );
+
+    viewerEx.focus();
+    showHide( viewerEx, true );
+
+    panel.classList.remove( 'open' );
+
+    selectedEx = name;
+
+    // Reveal "View source" button and set attributes to this example
+    showHide( nodeButton, true );
+    nodeButton.href = `https://github.com/mrdoob/three.js/blob/master/examples/${selectedEx}.html`;
+    nodeButton.title = `View source code for ${cleanName( selectedEx )} on GitHub`;
+
+}
+
 function updateFilterEx() {
 
-    // see documentation @ search.js
     // time to remove "buffer" from the search (average of 5 times)
     // - original: 72.04 ms
     // - new: 2.82 ms
 
-    searchContent( fileObjects, ( name, page, regExp, index, end ) => {
+    const search = cleanSearch();
+
+    searchContent( search, fileObjects, 1, ( name, page, regExp, index, end ) => {
 
         if ( regExp ) {
 
@@ -950,6 +1143,6 @@ function updateFilterEx() {
 
 if (typeof exports != 'undefined') {
 
-    exports.parseDocumentation = parseDocumentation;
+    exports.parseDoc = parseDoc;
 
 }

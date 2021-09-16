@@ -6,7 +6,7 @@ console, process, require
 
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { parseDocumentation } = require( '../files/search.js' );
+const { parseDoc } = require( '../files/search.js' );
 
 const DOCS_PATH = path.join( process.cwd(), 'docs' );
 const DOCS_PROPS_REGEX = /\[\s*(method|property):\w*\s(\w*\s*)\]/gi;
@@ -15,13 +15,19 @@ const FILES_PATH = path.join( process.cwd(), 'files' );
 /**
  * Parse methods & properties from doc file
  */
-function parseSource( pagePath ) {
+function parseSource( pagePath, pageName, onlyCheck ) {
 
 	// Read doc file
 	const fileExists = fs.existsSync( pagePath );
 	if ( ! fileExists ) {
 
+		console.warn( 'File not found:', pagePath, ':', pageName);
 		return null;
+
+	}
+	if ( onlyCheck ) {
+
+		return fileExists;
 
 	}
 
@@ -47,13 +53,13 @@ function parseSource( pagePath ) {
 
 	for ( const match of matches ) {
 
-		let [ left, right ] = match.slice( 1, -1 ).split( ' ' );
-		let type = ( left.split( ':' )[ 0 ] == 'method' ) ? 'method' : 'property';
+		const [ left, right ] = match.slice( 1, -1 ).split( ' ' );
+		const type = ( left.split( ':' )[ 0 ] == 'method' ) ? 'method' : 'property';
 		data[ type ].add( right );
 
 	}
 
-	for ( let type of [ 'method', 'property' ] ) {
+	for ( const type of [ 'method', 'property' ] ) {
 
 		if ( data[ type ].size ) {
 
@@ -83,7 +89,9 @@ function updateDocs( write ) {
 	let categoryDico = {};
 	let changes = 0;
 
-    parseDocumentation( list, 'en', {
+    parseDoc( list, 'en', {
+
+		skipUnderscore: false,
 
 		categoryBefore: () => {
 
@@ -92,12 +100,17 @@ function updateDocs( write ) {
 
 		},
 
-        pageAfter: ( _section, _category, pageName, pageURL, page ) => {
+        pageAfter: ( _section, _category, pageName, url, page ) => {
 
-			let data = parseSource( path.join( DOCS_PATH, `${pageURL}.html` ) );
+			if ( pageName[ 0 ] == '_' ) {
+
+				categoryDico[ pageName ] = page;
+				return;
+
+			}
 
 			categoryDico[ pageName ] = {};
-			let pageDico = categoryDico[ pageName ];
+			const pageDico = categoryDico[ pageName ];
 
 			if ( page ) {
 
@@ -105,6 +118,7 @@ function updateDocs( write ) {
 
 			}
 
+			const data = parseSource( path.join( DOCS_PATH, `${url}.html` ), pageName );
 			if ( ! data ) {
 
 				return;
@@ -138,6 +152,22 @@ function updateDocs( write ) {
 		},
 
     } );
+
+	// Check other languages
+
+	Object.keys( list ).filter( language => language != 'en' ).forEach( language => {
+
+		parseDoc( list, language, {
+
+			pageAfter: ( _section, _category, pageName, url ) => {
+
+				parseSource( path.join( DOCS_PATH, `${url}.html` ), pageName, true );
+
+			}
+
+		} );
+
+	} );
 
 	// If specified, write to files.json with Mr.doob's Code Style™
 	if ( write ) {

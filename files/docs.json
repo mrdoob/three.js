@@ -449,7 +449,7 @@
 				"Animation",
 				"BufferAttributeUsage",
 				"Core",
-				"CustomBlendingEquation",
+				"CustomBlendingEquations",
 				"Materials",
 				"Renderer",
 				"Textures"
@@ -782,9 +782,10 @@
 				}
 			},
 
-			"Core / BufferAttributes": [
-				"BufferAttribute Types"
-			],
+			"Core / BufferAttributes": {
+				"BufferAttribute Types": "BufferAttributeTypes"
+			},
+
 			"Extras": {
 				"DataUtils": {
 					"method": [
@@ -853,7 +854,6 @@
 						"add",
 						"closePath",
 						"getCurveLengths",
-						"getPoint",
 						"getPoints",
 						"getSpacedPoints"
 					],
@@ -3576,9 +3576,31 @@
 			"Objects": [
 				"Lensflare"
 			],
-			"Post-Processing": [
-				"EffectComposer"
-			],
+			"Post-Processing": {
+				"_sub": "postprocessing",
+				"EffectComposer": {
+					"url": 1,
+					"method": [
+						"addPass",
+						"insertPass",
+						"isLastEnabledPass",
+						"removePass",
+						"render",
+						"reset",
+						"setPixelRatio",
+						"setSize",
+						"swapBuffers"
+					],
+					"property": [
+						"passes",
+						"readBuffer",
+						"renderToScreen",
+						"renderer",
+						"writeBuffer"
+					]
+				}
+			},
+
 			"Exporters": {
 				"GLTFExporter": {
 					"method": [
@@ -3600,9 +3622,29 @@
 			},
 
 			"Math": {
-				"LookupTable": {},
+				"LookupTable": {
+					"url": "Lut",
+					"method": [
+						"addColorMap",
+						"copy",
+						"createCanvas",
+						"getColor",
+						"setColorMap",
+						"setMax",
+						"setMin",
+						"updateCanvas"
+					],
+					"property": [
+						"lut",
+						"map",
+						"maxV",
+						"minV",
+						"n"
+					]
+				},
 
 				"MeshSurfaceSampler": {
+					"url": 1,
 					"method": [
 						"build",
 						"sample",
@@ -3611,6 +3653,7 @@
 				},
 
 				"OBB": {
+					"url": 1,
 					"method": [
 						"applyMatrix4",
 						"clampPoint",
@@ -3635,13 +3678,111 @@
 				}
 			},
 
-			"ConvexHull": [
-				"Face",
-				"HalfEdge",
-				"ConvexHull",
-				"VertexNode",
-				"VertexList"
-			],
+			"ConvexHull": {
+				"_sub": "math/convexhull",
+				"Face": {
+					"url": 1,
+					"method": [
+						"compute",
+						"create",
+						"distanceToPoint",
+						"getEdge"
+					],
+					"property": [
+						"area",
+						"constant",
+						"edge",
+						"mark",
+						"midpoint",
+						"normal",
+						"outside"
+					]
+				},
+
+				"HalfEdge": {
+					"url": 1,
+					"method": [
+						"head",
+						"length",
+						"lengthSquared",
+						"setTwin",
+						"tail"
+					],
+					"property": [
+						"face",
+						"next",
+						"prev",
+						"twin",
+						"vertex"
+					]
+				},
+
+				"ConvexHull": {
+					"url": 1,
+					"method": [
+						"addAdjoiningFace",
+						"addNewFaces",
+						"addVertexToFace",
+						"addVertexToHull",
+						"cleanup",
+						"compute",
+						"computeExtremes",
+						"computeHorizon",
+						"computeInitialHull",
+						"containsPoint",
+						"deleteFaceVertices",
+						"intersectRay",
+						"intersectsRay",
+						"makeEmpty",
+						"nextVertexToAdd",
+						"reindexFaces",
+						"removeAllVerticesFromFace",
+						"removeVertexFromFace",
+						"resolveUnassignedPoints",
+						"setFromObject",
+						"setFromPoints"
+					],
+					"property": [
+						"assigned",
+						"faces",
+						"newFaces",
+						"tolerance",
+						"unassigned",
+						"vertices"
+					]
+				},
+
+				"VertexNode": {
+					"url": 1,
+					"property": [
+						"face",
+						"next",
+						"point",
+						"prev"
+					]
+				},
+
+				"VertexList": {
+					"url": 1,
+					"method": [
+						"append",
+						"appendChain",
+						"clear",
+						"first",
+						"insertAfter",
+						"insertBefore",
+						"isEmpty",
+						"last",
+						"remove",
+						"removeSubList"
+					],
+					"property": [
+						"head",
+						"tail"
+					]
+				}
+			},
+
 			"Renderers": {
 				"CSS2DRenderer": {
 					"method": [
@@ -3726,9 +3867,38 @@
 
 			"WebGLRenderer": {
 				"_sub": "api/en/renderers/webgl",
-				"WebGLProgram": "WebGLProgram",
-				"WebGLShader": "WebGLShader",
-				"WebGLState": "WebGLState"
+				"WebGLProgram": {
+					"url": "WebGLProgram",
+					"method": [
+						"destroy",
+						"getAttributes",
+						"getUniforms"
+					],
+					"property": [
+						"cacheKey",
+						"fragmentShader",
+						"id",
+						"name",
+						"program",
+						"usedTimes",
+						"vertexShader"
+					]
+				},
+
+				"WebGLShader": {
+					"url": "WebGLShader"
+				},
+
+				"WebGLState": {
+					"url": "WebGLState",
+					"method": [
+						"disable",
+						"enable",
+						"setBlending",
+						"setDepthTest",
+						"setDepthWrite"
+					]
+				}
 			}
 		}
 	},
@@ -3930,11 +4100,14 @@
 				"_sub": "constants",
 				"Animation": 1,
 				"Core": 1,
-				"CustomBlendingEquation": 1,
+				"CustomBlendingEquations": 1,
 				"Materials": 1,
 				"Renderer": 1,
 				"Textures": 1
-			}
+			},
+
+			"Core": "Core",
+			"Extra": "Extras"
 		},
 
 		"예제": {

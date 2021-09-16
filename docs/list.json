@@ -77,7 +77,7 @@
 				"Animation",
 				"BufferAttributeUsage",
 				"Core",
-				"CustomBlendingEquation",
+				"CustomBlendingEquations",
 				"Materials",
 				"Renderer",
 				"Textures"
@@ -100,9 +100,9 @@
 				"Uniform"
 			],
 
-			"Core / BufferAttributes": [
-				"BufferAttribute Types"
-			],
+			"Core / BufferAttributes": {
+				"BufferAttribute Types": "BufferAttributeTypes"
+			},
 
 			"Extras": [
 				"DataUtils",
@@ -389,9 +389,10 @@
 				"Lensflare"
 			],
 
-			"Post-Processing": [
-				"EffectComposer"
-			],
+			"Post-Processing": {
+				"_sub": "postprocessing",
+				"EffectComposer": 1
+			},
 
 			"Exporters": [
 				"GLTFExporter",
@@ -399,19 +400,21 @@
 				"ColladaExporter"
 			],
 
-			"Math": [
-				"LookupTable",
-				"MeshSurfaceSampler",
-				"OBB"
-			],
+			"Math": {
+				"LookupTable": "Lut",
+				"MeshSurfaceSampler": 1,
+				"OBB": 1
+			},
 
-			"ConvexHull": [
-				"Face",
-				"HalfEdge",
-				"ConvexHull",
-				"VertexNode",
-				"VertexList"
-			],
+			"ConvexHull": {
+				"_sub": "math/convexhull",
+
+				"Face": 1,
+				"HalfEdge": 1,
+				"ConvexHull": 1,
+				"VertexNode": 1,
+				"VertexList": 1
+			},
 
 			"Renderers": [
 				"CSS2DRenderer",
@@ -667,11 +670,14 @@
 
 				"Animation": 1,
 				"Core": 1,
-				"CustomBlendingEquation": 1,
+				"CustomBlendingEquations": 1,
 				"Materials": 1,
 				"Renderer": 1,
 				"Textures": 1
-			}
+			},
+
+			"Core": "Core",
+			"Extra": "Extras"
 		},
 
 		"예제": {
