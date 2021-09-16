@@ -21,7 +21,7 @@ function parseSource( pagePath, pageName, onlyCheck ) {
 	const fileExists = fs.existsSync( pagePath );
 	if ( ! fileExists ) {
 
-		console.warn( 'File not found:', pagePath, ':', pageName);
+		console.warn( 'File not found:', pagePath, ':', pageName );
 		return null;
 
 	}
@@ -47,25 +47,21 @@ function parseSource( pagePath, pageName, onlyCheck ) {
 	}
 
 	const data = {
-		method: new Set(),
-		property: new Set(),
+		method: [],
+		property: [],
 	};
 
 	for ( const match of matches ) {
 
 		const [ left, right ] = match.slice( 1, -1 ).split( ' ' );
 		const type = ( left.split( ':' )[ 0 ] == 'method' ) ? 'method' : 'property';
-		data[ type ].add( right );
+		data[ type ].push( right );
 
 	}
 
 	for ( const type of [ 'method', 'property' ] ) {
 
-		if ( data[ type ].size ) {
-
-			data[ type ] = [ ...data[ type ] ].sort();
-
-		} else {
+		if ( ! data[ type ].length ) {
 
 			delete data[ type ];
 
@@ -143,7 +139,7 @@ function updateDocs( write ) {
 
 		categoryAfter: ( section, category ) => {
 
-			if (changes) {
+			if ( changes ) {
 
 				listEng[ section ][ category ] = categoryDico;
 

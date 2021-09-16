@@ -21,20 +21,16 @@ let filterInput;
 let iframes;
 let nodeButton;
 let nodeLanguage;
+let nodeSectionDoc;
+let nodeSectionEx;
 let panel;
 let panelScrim;
 let previewsToggler;
-let sectionDoc;
-let sectionEx;
 let viewerDoc;
 let viewerEx;
 
 let currentSection = '';
 let prevHash = '';
-let sectionData = {
-    docs: {},
-    examples: {},
-};
 
 function initNodes() {
 
@@ -47,11 +43,11 @@ function initNodes() {
     iframes = document.getElementById( 'iframes' );
     nodeButton = document.getElementById( 'button' );
     nodeLanguage = document.getElementById( 'language' );
+    nodeSectionDoc = document.getElementById( 'sectionDoc' );
+    nodeSectionEx = document.getElementById( 'sectionEx' );
     panel = document.getElementById( 'panel' );
     panelScrim = document.getElementById( 'panelScrim' );
     previewsToggler = document.getElementById( 'previewsToggler' );
-    sectionDoc = document.getElementById( 'sectionDoc' );
-    sectionEx = document.getElementById( 'sectionEx' );
     viewerDoc = document.getElementById( 'viewerDoc' );
     viewerEx = document.getElementById( 'viewerEx' );
 
@@ -74,9 +70,9 @@ function extractQuery() {
 
 }
 
-async function hashChanged(defaultSection) {
+async function hashChanged( defaultSection ) {
 
-    const hash = location.hash.slice(1);
+    const hash = location.hash.slice( 1 );
     const section = ( hash || ! defaultSection ) ? ( hash.includes( '/' ) ? 'docs': 'examples' ) : defaultSection;
 
     // section change docs <=> examples
@@ -119,9 +115,34 @@ function highlightText( name, start, end ) {
 
 }
 
+function highlightTokens( name, lower, searchLow, mainUrl ) {
+
+    const names = name.split( ' ' );
+    const lowers = lower.split( ' ' );
+    const searchLength = searchLow.length;
+    const lines = [];
+
+    for ( let i = 0, length = names.length; i < length; i ++ ) {
+
+        const index = lowers[ i ].indexOf( searchLow );
+        if ( index < 0 ) {
+
+            continue;
+
+        }
+
+        const text = highlightText(names[ i ], index, index + searchLength);
+        const url = `${mainUrl}.${names[ i ]}`;
+
+        lines.push( `<a href="#${url}" data-url="${url}">${text}</a>` );
+    }
+
+    return lines.join( '' );
+}
+
 /**
  * Search content
- * @param {number} mode &1: text (class name), &2: method, &4: property
+ * @param {number} mode &1: text (class name), &2: property, &4: method
  */
 function searchContent( search, data, mode, callback ) {
 
@@ -188,47 +209,24 @@ function searchContent( search, data, mode, callback ) {
 
             } else {
 
-                let matches = 0;
-
                 if ( mode & 1 ) {
 
                     const index = item.text.indexOf( search );
-                    if ( index >= 0 ) {
-
-                        callback( key, item, null, index, index + search.length, 1 );
-                        matches ++;
-
-                    }
+                    callback( key, item, null, index, index + search.length, 1 );
 
                 }
 
-                if ( ( mode & 2 ) && item.methodLow ) {
-
-                    const index = item.methodLow.indexOf( search );
-                    if ( index >= 0 ) {
-
-                        callback( key, item, null, index, index + search.length, 2 );
-                        matches ++;
-
-                    }
-
-                }
-
-                if ( ( mode & 4 ) && item.propertyLow ) {
+                if ( ( mode & 2 ) && item.propertyLow ) {
 
                     const index = item.propertyLow.indexOf( search );
-                    if ( index >= 0 ) {
-
-                        callback( key, item, null, index, index + search.length, 4 );
-                        matches ++;
-
-                    }
+                    callback( key, item, null, index, index + search.length, 2 );
 
                 }
 
-                if ( ! matches ) {
+                if ( ( mode & 4 ) && item.methodLow ) {
 
-                    callback( key, item, null, -1 );
+                    const index = item.methodLow.indexOf( search );
+                    callback( key, item, null, index, index + search.length, 4 );
 
                 }
 
@@ -300,7 +298,7 @@ function setGlobalEvents() {
 
     }
 
-    window.onhashchange = async event => {
+    window.onhashchange = async () => {
 
         await hashChanged();
 
@@ -324,19 +322,21 @@ async function setSection( section ) {
 
     if ( isDoc ) {
 
-        sectionDoc.classList.add( 'selected' );
-        sectionEx.classList.remove( 'selected' );
+        nodeSectionDoc.classList.add( 'selected' );
+        nodeSectionEx.classList.remove( 'selected' );
 
         await initDoc();
 
     } else {
 
-        sectionDoc.classList.remove( 'selected' );
-        sectionEx.classList.add( 'selected' );
+        nodeSectionDoc.classList.remove( 'selected' );
+        nodeSectionEx.classList.add( 'selected' );
 
         await initEx();
 
     }
+
+    updateFilter();
 }
 
 function showHide( node, show ) {
@@ -370,9 +370,9 @@ function updateIFrame( iframe, src ) {
 
     // Update the source outside the DOM to prevent history from being changed
 
-    iframes.removeChild(iframe);
+    iframes.removeChild( iframe );
     iframe.src = src;
-    iframes.appendChild(iframe);
+    iframes.appendChild( iframe );
 
 }
 
@@ -396,15 +396,17 @@ function welcomeThree() {
 // DOCS
 ///////
 
-const categoryElements = [];
+const categoriesDoc = [];
+let lastSearchDoc;
 const pagesDoc = {};
+const sectionsDoc = [];
 let readyDoc;
 
 async function initDoc() {
 
     if ( readyDoc ) {
 
-        return;
+        return false;
 
     }
 
@@ -480,7 +482,7 @@ async function initDoc() {
     createNavigationDoc( list, language );
 
     readyDoc = true;
-    updateFilter();
+    return true;
 }
 
 function createNavigationDoc( list, language ) {
@@ -510,16 +512,12 @@ function createNavigationDoc( list, language ) {
 
         },
 
-        pageAfter: ( section, category, pageName, url, page ) => {
+        pageAfter: ( _section, _category, pageName, url, page ) => {
 
             // Gather data for the current subpage
 
             pagesDoc[ pageName ] = {
-                section: section,
-                category: category,
                 url: url,
-
-                // search
                 text: pageName.toLowerCase(),
             };
 
@@ -527,19 +525,19 @@ function createNavigationDoc( list, language ) {
 
                 const dico = pagesDoc[ pageName ];
 
-                if ( page.method ) {
+                if ( page.property ) {
 
-                    const text = page.method.join(' ');
-                    dico.method = text;
-                    dico.methodLow = text.toLowerCase();
+                    const text = page.property.join( ' ' );
+                    dico.property = text;
+                    dico.propertyLow = text.toLowerCase();
 
                 }
 
-                if ( page.property ) {
+                if ( page.method ) {
 
-                    const text = page.property.join(' ');
-                    dico.property = text;
-                    dico.propertyLow = text.toLowerCase();
+                    const text = page.method.join( ' ' );
+                    dico.method = text;
+                    dico.methodLow = text.toLowerCase();
 
                 }
 
@@ -550,8 +548,8 @@ function createNavigationDoc( list, language ) {
             lines.push(
                         '<li>',
                             `<a href="#${url}"${selected} data-name="${pageName}" data-url="${url}">${pageName}</a>`,
-                            '<a class="method"></a>',
-                            '<a class="property"></a>',
+                            '<div class="property"></div>',
+                            '<div class="method"></div>',
                         '</li>',
             );
 
@@ -582,22 +580,38 @@ function createNavigationDoc( list, language ) {
 
     // cache headers + links
 
-    contentDoc.querySelectorAll( 'h2' ).forEach( node => {
+    for ( const section of contentDoc.childNodes ) {
 
-        // headerClassLists[ node.dataset.category ] = node.classList;
+        if ( section.tagName != 'DIV' ) {
 
-    } );
+            continue;
 
-    contentDoc.querySelectorAll( 'li' ).forEach( node => {
+        }
 
-        const child = node.firstElementChild;
-        let name = child.dataset.name;
-        let page = pagesDoc[ name ];
-        page.linkNode = child;
-        page.nodes = node.children;
-        page.parentList = node.classList;
+        const children = section.childNodes;
+        const header = children[ 0 ];
+        const lists = children[ 1 ];
+        const svector = [ 1, header.classList ];
 
-    } );
+        for ( const node of lists.childNodes ) {
+
+            const children = node.childNodes;
+            const name = children[0].dataset.name;
+
+            const cvector = [ 1, node.classList, name ];
+            categoriesDoc.push( cvector );
+
+            const page = pagesDoc[ name ];
+            page.cvector = cvector;
+            page.nodes = children;
+            page.parentList = node.classList;
+            page.svector = svector;
+
+        }
+
+        sectionsDoc.push( svector );
+
+    }
 
     // events
 
@@ -605,7 +619,7 @@ function createNavigationDoc( list, language ) {
 
         let target = event.target;
 
-        if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey || target.tagName != 'A') {
+        if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey || target.tagName != 'A' ) {
 
             return;
 
@@ -636,7 +650,7 @@ function parseDoc( list, language, {
         const categories = localList[ section ];
 
         let mainPath = categories._main;
-        let refPath = ( mainPath && mainPath.slice(0, 2) == 'ex' ) ? 'Examples': 'Reference';
+        let refPath = ( mainPath && mainPath.slice( 0, 2 ) == 'ex' ) ? 'Examples' : 'Reference';
 
         Object.keys( categories ).forEach( category => {
 
@@ -705,7 +719,7 @@ function parseDoc( list, language, {
 
                 if ( pageName[ 0 ] == '_' ) {
 
-                    if ( ! skipUnderscore) {
+                    if ( ! skipUnderscore ) {
 
                         pageAfter( section, category, pageName, '', pages[ pageName ] );
 
@@ -765,10 +779,12 @@ function parseDoc( list, language, {
 
 function selectDoc( url, node ) {
 
+    const splits = url.split( '.' );
+
     if ( ! node ) {
 
-        node = contentDoc.querySelector( `[data-url="${url}"]` );
-        if ( ! node) {
+        node = contentDoc.querySelector( `[data-url="${splits[0]}"]` );
+        if ( ! node ) {
 
             return;
 
@@ -785,33 +801,73 @@ function selectDoc( url, node ) {
 
     node.classList.add( 'selected' );
 
-    // const url = pagesDoc[ node.dataset.name ].url;
+    let localURL = `../docs/${splits[ 0 ]}.html`;
+    if ( splits[ 1 ] ) {
 
-    updateIFrame( viewerDoc, `../docs/${url}.html` );
+        localURL = `${localURL}#${splits[ 1 ]}`;
+
+    }
+
+    updateIFrame( viewerDoc, localURL );
+
+}
+
+function setUrlFragment( pageName ) {
+
+    // Handle navigation from the subpages (iframes):
+    // First separate the member (if existing) from the page name,
+    // then identify the subpage's URL and set it as URL fragment (re-adding the member)
+
+    const splits = pageName.split( '.' );
+    const page = pagesDoc[ splits[ 0 ] ];
+
+    if ( page ) {
+
+        let url = page.url;
+
+        if ( splits[ 1 ]) {
+
+            url = `${url}.${splits[ 1 ]}`;
+
+        }
+
+        location.hash = url;
+
+    }
 
 }
 
 function showCategoriesDoc() {
 
-    // Show/hide categories depending on their content
+    // Show/hide sections + categories depending on their content
 
-    categoryElements.forEach( ( [ parentClassList, childrenLists ] ) => {
+    for ( const [ count, classList ] of sectionsDoc ) {
 
-        // If and only if all page names are hidden, hide the whole category
+        if ( count ) {
 
-        let hideCategory = childrenLists.every( list => list.contains( 'hidden' ) );
-
-        if ( hideCategory ) {
-
-            parentClassList.add( 'hidden' );
+            classList.remove( 'hidden' );
 
         } else {
 
-            parentClassList.remove( 'hidden' );
+            classList.add( 'hidden' );
 
         }
 
-    } );
+    }
+
+    for ( const [ count, classList ] of categoriesDoc ) {
+
+        if ( count ) {
+
+            classList.remove( 'hidden' );
+
+        } else {
+
+            classList.add( 'hidden' );
+
+        }
+
+    }
 
 }
 
@@ -822,12 +878,45 @@ function updateFilterDoc() {
     // - new: 6.05 ms
 
     let search = cleanSearch();
-    let mode = 1;
+    if ( search == lastSearchDoc ) {
 
-    if ( search[ 0 ] == '.' ) {
+        return;
 
-        mode = 6;
-        search = search.slice( 1 );
+    }
+
+    lastSearchDoc = search;
+
+    let mode = 7;
+
+    if ( search && search[ 0 ] == search[ 0 ].toUpperCase() && search[ 0 ] != search[ 0 ].toLowerCase() ) {
+
+        mode = 1;
+        contentDoc.classList.add( 'mainSearch' );
+
+    } else {
+
+        if ( search[ 0 ] == '.' ) {
+
+            mode = 6;
+            search = search.slice( 1 );
+
+        }
+
+        contentDoc.classList.remove( 'mainSearch' );
+
+    }
+
+    let searchLow = search.toLowerCase();
+
+    for ( const vector of sectionsDoc ) {
+
+        vector[ 0 ] = 0;
+
+    }
+
+    for ( const vector of categoriesDoc) {
+
+        vector[ 0 ] = 0;
 
     }
 
@@ -839,12 +928,9 @@ function updateFilterDoc() {
 
             if ( index >= 0 ) {
 
-                page.linkNode.innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
-                page.parentList.remove( 'hidden' );
-
-            } else {
-
-                page.parentList.add( 'hidden' );
+                page.nodes[0].innerHTML = name.replaceAll( regExp, '<b>$&</b>' );
+                page.cvector[ 0 ] |= 1;
+                page.svector[ 0 ] ++;
 
             }
 
@@ -852,13 +938,14 @@ function updateFilterDoc() {
 
             // empty search => restore original names if needed (note: the check is not useless)
 
-            if ( page.linkNode.innerHTML != name ) {
+            if ( page.nodes[0].innerHTML != name ) {
 
-                page.linkNode.innerHTML = name;
+                page.nodes[0].innerHTML = name;
 
             }
 
-            page.parentList.remove( 'hidden' );
+            page.cvector[ 0 ] |= 1;
+            page.svector[ 0 ] ++;
 
         } else if ( index >= 0 ) {
 
@@ -866,25 +953,40 @@ function updateFilterDoc() {
 
             if ( type == 1 ) {
 
-                page.linkNode.innerHTML = highlightText( name, index, end );
+                page.nodes[0].innerHTML = highlightText( name, index, end );
+                page.cvector[ 0 ] |= 1;
 
             } else if ( type == 2 ) {
 
-                page.nodes[1].innerHTML = highlightText( page.method, index, end );
+                page.nodes[ 1 ].innerHTML = highlightTokens( page.property, page.propertyLow, searchLow, page.url );
+                page.cvector[ 0 ] |= 2;
 
-            } else {
+            } else if ( type == 4 ) {
 
-                page.nodes[2].innerHTML = highlightText( page.property, index, end );
+                page.nodes[ 2 ].innerHTML = highlightTokens( page.method, page.methodLow, searchLow, page.url );
+                page.cvector[ 0 ] |= 4;
 
             }
 
-            page.parentList.remove( 'hidden' );
+            page.svector[ 0 ] ++;
 
         } else {
 
             // full text fail
 
-            page.parentList.add( 'hidden' );
+            if ( type == 1 ) {
+
+                page.nodes[0].innerHTML = name;
+
+            } else if ( type == 2 ) {
+
+                page.nodes[1].innerHTML = '';
+
+            } else if ( type == 4 ) {
+
+                page.nodes[2].innerHTML = '';
+
+            }
 
         }
 
@@ -901,17 +1003,19 @@ function updateFilterDoc() {
 
 const fileObjects = {};
 const headerClassLists = {};
+let lastSearchEx;
 const linkClassLists = {};
 const linkTitles = {};
 let readyEx;
 let sectionFiles = {};
+// let sectionsEx = [];
 let selectedEx = null;
 
 async function initEx() {
 
     if ( readyEx ) {
 
-        return;
+        return false;
 
     }
 
@@ -945,7 +1049,7 @@ async function initEx() {
     };
 
     readyEx = true;
-    updateFilter();
+    return true;
 }
 
 function cleanName( name ) {
@@ -983,7 +1087,7 @@ function createNavigationEx( fileTags ) {
             );
 
             file.clean = clean;
-            file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join(' ').toLowerCase();
+            file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join( ' ' ).toLowerCase();
 
         }
 
@@ -1011,7 +1115,7 @@ function createNavigationEx( fileTags ) {
 
     container.onclick = event => {
 
-        if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey || event.target.tagName != 'A') {
+        if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey || event.target.tagName != 'A' ) {
 
             return;
 
@@ -1046,8 +1150,6 @@ function showCategoriesEx() {
 function selectEx( name ) {
 
     const fileObj = fileObjects[ name ];
-    console.log(fileObj);
-
     if ( ! fileObj ) {
 
         return;
@@ -1084,7 +1186,20 @@ function updateFilterEx() {
     // - original: 72.04 ms
     // - new: 2.82 ms
 
-    const search = cleanSearch();
+    let search = cleanSearch();
+    if ( search == lastSearchEx ) {
+
+        return;
+
+    }
+
+    lastSearchEx = search;
+
+    if ( search[ 0 ] == '.' ) {
+
+        search = search.slice( 1 );
+
+    }
 
     searchContent( search, fileObjects, 1, ( name, page, regExp, index, end ) => {
 
@@ -1141,7 +1256,7 @@ function updateFilterEx() {
 // EXPORTS
 //////////
 
-if (typeof exports != 'undefined') {
+if ( typeof exports != 'undefined' ) {
 
     exports.parseDoc = parseDoc;
 

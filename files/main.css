@@ -527,10 +527,29 @@ iframe {
 	display: none !important;
 }
 
+/* extra search */
 .method,
 .property {
 	display: block;
 	padding-left: 1em;
+}
+
+.method > a,
+.property > a {
+	display: block;
+}
+
+.method > a::before,
+.property > a::before {
+	content: ".";
+}
+.method > a::after {
+	content: "()";
+}
+
+.mainSearch .method,
+.mainSearch .property {
+	display: none;
 }
 
 /* mobile */

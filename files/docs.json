@@ -36,9 +36,9 @@
 						"crossFadeTo",
 						"fadeIn",
 						"fadeOut",
-						"getClip",
 						"getEffectiveTimeScale",
 						"getEffectiveWeight",
+						"getClip",
 						"getMixer",
 						"getRoot",
 						"halt",
@@ -73,17 +73,18 @@
 
 				"AnimationClip": {
 					"method": [
-						"CreateClipsFromMorphTargetSequences",
-						"CreateFromMorphTargetSequence",
 						"clone",
-						"findByName",
 						"optimize",
-						"parse",
-						"parseAnimation",
 						"resetDuration",
 						"toJSON",
 						"trim",
-						"validate"
+						"validate",
+						"CreateClipsFromMorphTargetSequences",
+						"CreateFromMorphTargetSequence",
+						"findByName",
+						"parse",
+						"parseAnimation",
+						"toJSON"
 					],
 					"property": [
 						"duration",
@@ -98,12 +99,12 @@
 						"clipAction",
 						"existingAction",
 						"getRoot",
-						"setTime",
 						"stopAllAction",
-						"uncacheAction",
+						"update",
+						"setTime",
 						"uncacheClip",
 						"uncacheRoot",
-						"update"
+						"uncacheAction"
 					],
 					"property": [
 						"time",
@@ -138,51 +139,51 @@
 
 				"KeyframeTrack": {
 					"method": [
-						"InterpolantFactoryMethodDiscrete",
-						"InterpolantFactoryMethodLinear",
-						"InterpolantFactoryMethodSmooth",
 						"clone",
 						"createInterpolant",
 						"getInterpolation",
 						"getValueSize",
+						"InterpolantFactoryMethodDiscrete",
+						"InterpolantFactoryMethodLinear",
+						"InterpolantFactoryMethodSmooth",
 						"optimize",
 						"scale",
 						"setInterpolation",
 						"shift",
-						"toJSON",
 						"trim",
-						"validate"
+						"validate",
+						"toJSON"
 					],
 					"property": [
-						"DefaultInterpolation",
-						"TimeBufferType",
-						"ValueBufferType",
 						"name",
 						"times",
-						"values"
+						"values",
+						"DefaultInterpolation",
+						"TimeBufferType",
+						"ValueBufferType"
 					]
 				},
 
 				"PropertyBinding": {
 					"method": [
-						"Composite",
-						"bind",
-						"create",
-						"findNode",
 						"getValue",
-						"parseTrackName",
 						"setValue",
-						"unbind"
+						"bind",
+						"unbind",
+						"Composite",
+						"create",
+						"parseTrackName",
+						"findNode"
 					],
 					"property": [
-						"BindingType",
-						"GetterByBindingType",
-						"SetterByBindingTypeAndVersioning",
-						"Versioning",
-						"node",
-						"parsedPath",
 						"path",
-						"rootNode"
+						"parsedPath",
+						"node",
+						"rootNode",
+						"BindingType",
+						"Versioning",
+						"GetterByBindingType",
+						"SetterByBindingTypeAndVersioning"
 					]
 				},
 
@@ -190,16 +191,16 @@
 					"method": [
 						"accumulate",
 						"apply",
-						"restoreOriginalState",
-						"saveOriginalState"
+						"saveOriginalState",
+						"restoreOriginalState"
 					],
 					"property": [
 						"binding",
 						"buffer",
 						"cumulativeWeight",
+						"valueSize",
 						"referenceCount",
-						"useCount",
-						"valueSize"
+						"useCount"
 					]
 				}
 			},
@@ -269,15 +270,15 @@
 						"getOutput",
 						"getPlaybackRate",
 						"getVolume",
-						"onEnded",
-						"pause",
 						"play",
+						"pause",
+						"onEnded",
 						"setBuffer",
 						"setFilter",
 						"setFilters",
 						"setLoop",
-						"setLoopEnd",
 						"setLoopStart",
+						"setLoopEnd",
 						"setMediaElementSource",
 						"setMediaStreamSource",
 						"setNodeSource",
@@ -289,14 +290,14 @@
 						"autoplay",
 						"context",
 						"detune",
-						"duration",
 						"filters",
 						"gain",
 						"hasPlaybackControl",
 						"isPlaying",
 						"listener",
-						"offset",
 						"playbackRate",
+						"offset",
+						"duration",
 						"source",
 						"sourceType",
 						"type"
@@ -305,13 +306,13 @@
 
 				"AudioAnalyser": {
 					"method": [
-						"getAverageFrequency",
-						"getFrequencyData"
+						"getFrequencyData",
+						"getAverageFrequency"
 					],
 					"property": [
 						"analyser",
-						"data",
-						"fftSize"
+						"fftSize",
+						"data"
 					]
 				},
 
@@ -324,33 +325,33 @@
 
 				"AudioListener": {
 					"method": [
-						"getFilter",
 						"getInput",
-						"getMasterVolume",
 						"removeFilter",
+						"getFilter",
 						"setFilter",
+						"getMasterVolume",
 						"setMasterVolume"
 					],
 					"property": [
 						"context",
-						"filter",
 						"gain",
+						"filter",
 						"timeDelta"
 					]
 				},
 
 				"PositionalAudio": {
 					"method": [
-						"getDistanceModel",
-						"getMaxDistance",
 						"getOutput",
 						"getRefDistance",
-						"getRolloffFactor",
-						"setDirectionalCone",
-						"setDistanceModel",
-						"setMaxDistance",
 						"setRefDistance",
-						"setRolloffFactor"
+						"getRolloffFactor",
+						"setRolloffFactor",
+						"getDistanceModel",
+						"setDistanceModel",
+						"getMaxDistance",
+						"setMaxDistance",
+						"setDirectionalCone"
 					],
 					"property": [
 						"panner"
@@ -390,10 +391,10 @@
 
 				"OrthographicCamera": {
 					"method": [
-						"clearViewOffset",
 						"setViewOffset",
-						"toJSON",
-						"updateProjectionMatrix"
+						"clearViewOffset",
+						"updateProjectionMatrix",
+						"toJSON"
 					],
 					"property": [
 						"bottom",
@@ -416,8 +417,8 @@
 						"getFocalLength",
 						"setFocalLength",
 						"setViewOffset",
-						"toJSON",
-						"updateProjectionMatrix"
+						"updateProjectionMatrix",
+						"toJSON"
 					],
 					"property": [
 						"aspect",
@@ -438,9 +439,9 @@
 					],
 					"property": [
 						"aspect",
+						"eyeSep",
 						"cameraL",
-						"cameraR",
-						"eyeSep"
+						"cameraR"
 					]
 				}
 			},
@@ -460,6 +461,7 @@
 						"applyMatrix3",
 						"applyMatrix4",
 						"applyNormalMatrix",
+						"transformDirection",
 						"clone",
 						"copy",
 						"copyArray",
@@ -468,21 +470,20 @@
 						"copyVector2sArray",
 						"copyVector3sArray",
 						"copyVector4sArray",
-						"getW",
 						"getX",
 						"getY",
 						"getZ",
+						"getW",
 						"onUpload",
 						"set",
 						"setUsage",
-						"setW",
 						"setX",
-						"setXY",
-						"setXYZ",
-						"setXYZW",
 						"setY",
 						"setZ",
-						"transformDirection"
+						"setW",
+						"setXY",
+						"setXYZ",
+						"setXYZW"
 					],
 					"property": [
 						"array",
@@ -500,18 +501,18 @@
 
 				"BufferGeometry": {
 					"method": [
+						"setAttribute",
 						"addGroup",
 						"applyMatrix4",
 						"applyQuaternion",
 						"center",
-						"clearGroups",
 						"clone",
+						"copy",
+						"clearGroups",
 						"computeBoundingBox",
 						"computeBoundingSphere",
 						"computeTangents",
 						"computeVertexNormals",
-						"copy",
-						"deleteAttribute",
 						"dispose",
 						"getAttribute",
 						"getIndex",
@@ -519,14 +520,14 @@
 						"lookAt",
 						"merge",
 						"normalizeNormals",
+						"deleteAttribute",
 						"rotateX",
 						"rotateY",
 						"rotateZ",
 						"scale",
-						"setAttribute",
+						"setIndex",
 						"setDrawRange",
 						"setFromPoints",
-						"setIndex",
 						"toJSON",
 						"toNonIndexed",
 						"translate"
@@ -536,8 +537,8 @@
 						"boundingBox",
 						"boundingSphere",
 						"drawRange",
-						"drawcalls",
 						"groups",
+						"drawcalls",
 						"id",
 						"index",
 						"morphAttributes",
@@ -550,45 +551,45 @@
 
 				"Clock": {
 					"method": [
-						"getDelta",
-						"getElapsedTime",
 						"start",
-						"stop"
+						"stop",
+						"getElapsedTime",
+						"getDelta"
 					],
 					"property": [
 						"autoStart",
-						"elapsedTime",
+						"startTime",
 						"oldTime",
-						"running",
-						"startTime"
+						"elapsedTime",
+						"running"
 					]
 				},
 
 				"EventDispatcher": {
 					"method": [
 						"addEventListener",
-						"dispatchEvent",
 						"hasEventListener",
-						"removeEventListener"
+						"removeEventListener",
+						"dispatchEvent"
 					]
 				},
 
 				"GLBufferAttribute": {
 					"method": [
 						"setBuffer",
-						"setCount",
+						"setType",
 						"setItemSize",
-						"setType"
+						"setCount"
 					],
 					"property": [
 						"buffer",
 						"count",
-						"elementSize",
-						"isGLBufferAttribute",
 						"itemSize",
-						"needsUpdate",
+						"elementSize",
 						"type",
-						"version"
+						"isGLBufferAttribute",
+						"version",
+						"needsUpdate"
 					]
 				},
 
@@ -615,22 +616,22 @@
 
 				"InterleavedBuffer": {
 					"method": [
-						"clone",
 						"copy",
 						"copyAt",
 						"set",
+						"clone",
 						"setUsage",
 						"toJSON"
 					],
 					"property": [
 						"array",
-						"count",
-						"needsUpdate",
 						"stride",
+						"count",
 						"updateRange",
-						"usage",
 						"uuid",
-						"version"
+						"version",
+						"needsUpdate",
+						"usage"
 					]
 				},
 
@@ -638,23 +639,23 @@
 					"method": [
 						"applyMatrix4",
 						"applyNormalMatrix",
-						"getW",
+						"transformDirection",
 						"getX",
 						"getY",
 						"getZ",
-						"setW",
+						"getW",
 						"setX",
-						"setXY",
-						"setXYZ",
-						"setXYZW",
 						"setY",
 						"setZ",
-						"transformDirection"
+						"setW",
+						"setXY",
+						"setXYZ",
+						"setXYZW"
 					],
 					"property": [
+						"data",
 						"array",
 						"count",
-						"data",
 						"itemSize",
 						"name",
 						"needsUpdate",
@@ -666,12 +667,12 @@
 				"Layers": {
 					"method": [
 						"disable",
-						"disableAll",
 						"enable",
-						"enableAll",
 						"set",
 						"test",
-						"toggle"
+						"toggle",
+						"enableAll",
+						"disableAll"
 					],
 					"property": [
 						"mask"
@@ -684,21 +685,22 @@
 						"applyMatrix4",
 						"applyQuaternion",
 						"attach",
-						"clear",
 						"clone",
 						"copy",
 						"getObjectById",
 						"getObjectByName",
 						"getObjectByProperty",
-						"getWorldDirection",
 						"getWorldPosition",
 						"getWorldQuaternion",
 						"getWorldScale",
+						"getWorldDirection",
 						"localToWorld",
+						"lookAt",
 						"lookAt",
 						"raycast",
 						"remove",
 						"removeFromParent",
+						"clear",
 						"rotateOnAxis",
 						"rotateOnWorldAxis",
 						"rotateX",
@@ -714,16 +716,14 @@
 						"translateY",
 						"translateZ",
 						"traverse",
-						"traverseAncestors",
 						"traverseVisible",
+						"traverseAncestors",
 						"updateMatrix",
 						"updateMatrixWorld",
 						"updateWorldMatrix",
 						"worldToLocal"
 					],
 					"property": [
-						"DefaultMatrixAutoUpdate",
-						"DefaultUp",
 						"animations",
 						"castShadow",
 						"children",
@@ -751,22 +751,24 @@
 						"up",
 						"userData",
 						"uuid",
-						"visible"
+						"visible",
+						"DefaultUp",
+						"DefaultMatrixAutoUpdate"
 					]
 				},
 
 				"Raycaster": {
 					"method": [
-						"intersectObject",
-						"intersectObjects",
 						"set",
-						"setFromCamera"
+						"setFromCamera",
+						"intersectObject",
+						"intersectObjects"
 					],
 					"property": [
-						"camera",
 						"far",
-						"layers",
 						"near",
+						"camera",
+						"layers",
 						"params",
 						"ray"
 					]
@@ -807,12 +809,12 @@
 
 				"PMREMGenerator": {
 					"method": [
+						"fromScene",
+						"fromEquirectangular",
+						"fromCubemap",
 						"compileCubemapShader",
 						"compileEquirectangularShader",
-						"dispose",
-						"fromCubemap",
-						"fromEquirectangular",
-						"fromScene"
+						"dispose"
 					]
 				},
 
@@ -828,21 +830,21 @@
 			"Extras / Core": {
 				"Curve": {
 					"method": [
-						"clone",
-						"computeFrenetFrames",
-						"copy",
-						"fromJSON",
-						"getLength",
-						"getLengths",
 						"getPoint",
 						"getPointAt",
 						"getPoints",
 						"getSpacedPoints",
+						"getLength",
+						"getLengths",
+						"updateArcLengths",
+						"getUtoTmapping",
 						"getTangent",
 						"getTangentAt",
-						"getUtoTmapping",
+						"computeFrenetFrames",
+						"clone",
+						"copy",
 						"toJSON",
-						"updateArcLengths"
+						"fromJSON"
 					],
 					"property": [
 						"arcLengthDivisions"
@@ -858,8 +860,8 @@
 						"getSpacedPoints"
 					],
 					"property": [
-						"autoClose",
-						"curves"
+						"curves",
+						"autoClose"
 					]
 				},
 
@@ -875,8 +877,8 @@
 				"Interpolations": {
 					"method": [
 						"CatmullRom",
-						"CubicBezier",
-						"QuadraticBezier"
+						"QuadraticBezier",
+						"CubicBezier"
 					]
 				},
 
@@ -904,24 +906,24 @@
 						"getPointsHoles"
 					],
 					"property": [
-						"holes",
-						"uuid"
+						"uuid",
+						"holes"
 					]
 				},
 
 				"ShapePath": {
 					"method": [
-						"bezierCurveTo",
-						"lineTo",
 						"moveTo",
+						"lineTo",
 						"quadraticCurveTo",
+						"bezierCurveTo",
 						"splineThru",
 						"toShapes"
 					],
 					"property": [
-						"color",
+						"subPaths",
 						"currentPath",
-						"subPaths"
+						"color"
 					]
 				}
 			},
@@ -931,9 +933,9 @@
 
 				"CatmullRomCurve3": {
 					"property": [
+						"points",
 						"closed",
 						"curveType",
-						"points",
 						"tension"
 					]
 				},
@@ -958,14 +960,14 @@
 
 				"EllipseCurve": {
 					"property": [
-						"aClockwise",
-						"aEndAngle",
-						"aRotation",
-						"aStartAngle",
 						"aX",
 						"aY",
 						"xRadius",
-						"yRadius"
+						"yRadius",
+						"aStartAngle",
+						"aEndAngle",
+						"aClockwise",
+						"aRotation"
 					]
 				},
 
@@ -1012,16 +1014,16 @@
 						"render"
 					],
 					"property": [
-						"colorArray",
-						"count",
-						"hasColors",
-						"hasNormals",
-						"hasPositions",
-						"hasUvs",
 						"material",
-						"normalArray",
+						"hasPositions",
+						"hasNormals",
+						"hasColors",
+						"hasUvs",
 						"positionArray",
-						"uvArray"
+						"normalArray",
+						"colorArray",
+						"uvArray",
+						"count"
 					]
 				}
 			},
@@ -1149,10 +1151,10 @@
 
 				"TubeGeometry": {
 					"property": [
-						"binormals",
-						"normals",
 						"parameters",
-						"tangents"
+						"tangents",
+						"normals",
+						"binormals"
 					]
 				},
 
@@ -1163,26 +1165,26 @@
 				"ArrowHelper": {
 					"method": [
 						"setColor",
-						"setDirection",
-						"setLength"
+						"setLength",
+						"setDirection"
 					],
 					"property": [
-						"cone",
-						"line"
+						"line",
+						"cone"
 					]
 				},
 
 				"AxesHelper": {
 					"method": [
-						"dispose",
-						"setColors"
+						"setColors",
+						"dispose"
 					]
 				},
 
 				"BoxHelper": {
 					"method": [
-						"setFromObject",
-						"update"
+						"update",
+						"setFromObject"
 					]
 				},
 
@@ -1202,9 +1204,9 @@
 					],
 					"property": [
 						"camera",
+						"pointMap",
 						"matrix",
-						"matrixAutoUpdate",
-						"pointMap"
+						"matrixAutoUpdate"
 					]
 				},
 
@@ -1214,11 +1216,11 @@
 						"update"
 					],
 					"property": [
-						"color",
-						"light",
 						"lightPlane",
+						"light",
 						"matrix",
-						"matrixAutoUpdate"
+						"matrixAutoUpdate",
+						"color"
 					]
 				},
 
@@ -1232,10 +1234,10 @@
 						"update"
 					],
 					"property": [
-						"color",
 						"light",
 						"matrix",
-						"matrixAutoUpdate"
+						"matrixAutoUpdate",
+						"color"
 					]
 				},
 
@@ -1255,10 +1257,10 @@
 						"update"
 					],
 					"property": [
-						"color",
 						"light",
 						"matrix",
-						"matrixAutoUpdate"
+						"matrixAutoUpdate",
+						"color"
 					]
 				},
 
@@ -1275,11 +1277,11 @@
 						"update"
 					],
 					"property": [
-						"color",
 						"cone",
 						"light",
 						"matrix",
-						"matrixAutoUpdate"
+						"matrixAutoUpdate",
+						"color"
 					]
 				}
 			},
@@ -1291,8 +1293,8 @@
 
 				"DirectionalLight": {
 					"method": [
-						"copy",
-						"dispose"
+						"dispose",
+						"copy"
 					],
 					"property": [
 						"castShadow",
@@ -1317,8 +1319,8 @@
 
 				"Light": {
 					"method": [
-						"copy",
 						"dispose",
+						"copy",
 						"toJSON"
 					],
 					"property": [
@@ -1335,8 +1337,8 @@
 
 				"PointLight": {
 					"method": [
-						"copy",
-						"dispose"
+						"dispose",
+						"copy"
 					],
 					"property": [
 						"decay",
@@ -1359,8 +1361,8 @@
 
 				"SpotLight": {
 					"method": [
-						"copy",
-						"dispose"
+						"dispose",
+						"copy"
 					],
 					"property": [
 						"angle",
@@ -1380,20 +1382,20 @@
 			"Lights / Shadows": {
 				"LightShadow": {
 					"method": [
-						"clone",
-						"copy",
-						"dispose",
 						"getFrameExtents",
+						"updateMatrices",
 						"getFrustum",
 						"getViewportCount",
-						"toJSON",
-						"updateMatrices"
+						"dispose",
+						"copy",
+						"clone",
+						"toJSON"
 					],
 					"property": [
 						"autoUpdate",
+						"camera",
 						"bias",
 						"blurSamples",
-						"camera",
 						"map",
 						"mapPass",
 						"mapSize",
@@ -1448,9 +1450,9 @@
 				"Cache": {
 					"method": [
 						"add",
-						"clear",
 						"get",
-						"remove"
+						"remove",
+						"clear"
 					],
 					"property": [
 						"enabled",
@@ -1517,18 +1519,18 @@
 						"loadAsync",
 						"parse",
 						"setCrossOrigin",
+						"setWithCredentials",
 						"setPath",
-						"setRequestHeader",
 						"setResourcePath",
-						"setWithCredentials"
+						"setRequestHeader"
 					],
 					"property": [
 						"crossOrigin",
+						"withCredentials",
 						"manager",
 						"path",
-						"requestHeader",
 						"resourcePath",
-						"withCredentials"
+						"requestHeader"
 					]
 				},
 
@@ -1554,12 +1556,12 @@
 					"method": [
 						"load",
 						"parse",
-						"parseAnimations",
 						"parseGeometries",
-						"parseImages",
 						"parseMaterials",
-						"parseObject",
-						"parseTextures"
+						"parseAnimations",
+						"parseImages",
+						"parseTextures",
+						"parseObject"
 					]
 				},
 
@@ -1577,18 +1579,18 @@
 					"method": [
 						"addHandler",
 						"getHandler",
-						"itemEnd",
-						"itemError",
-						"itemStart",
 						"removeHandler",
 						"resolveURL",
-						"setURLModifier"
+						"setURLModifier",
+						"itemStart",
+						"itemEnd",
+						"itemError"
 					],
 					"property": [
-						"onError",
+						"onStart",
 						"onLoad",
 						"onProgress",
-						"onStart"
+						"onError"
 					]
 				}
 			},
@@ -1597,9 +1599,9 @@
 				"LineBasicMaterial": {
 					"property": [
 						"color",
+						"linewidth",
 						"linecap",
-						"linejoin",
-						"linewidth"
+						"linejoin"
 					]
 				},
 
@@ -1615,9 +1617,9 @@
 					"method": [
 						"clone",
 						"copy",
-						"customProgramCacheKey",
 						"dispose",
 						"onBeforeCompile",
+						"customProgramCacheKey",
 						"setValues",
 						"toJSON"
 					],
@@ -1628,20 +1630,27 @@
 						"blendDstAlpha",
 						"blendEquation",
 						"blendEquationAlpha",
+						"blending",
 						"blendSrc",
 						"blendSrcAlpha",
-						"blending",
 						"clipIntersection",
-						"clipShadows",
 						"clippingPlanes",
+						"clipShadows",
 						"colorWrite",
 						"defines",
 						"depthFunc",
 						"depthTest",
 						"depthWrite",
-						"dithering",
-						"fog",
 						"format",
+						"stencilWrite",
+						"stencilWriteMask",
+						"stencilFunc",
+						"stencilRef",
+						"stencilFuncMask",
+						"stencilFail",
+						"stencilZFail",
+						"stencilZPass",
+						"fog",
 						"id",
 						"name",
 						"needsUpdate",
@@ -1651,24 +1660,18 @@
 						"polygonOffsetUnits",
 						"precision",
 						"premultipliedAlpha",
+						"dithering",
 						"shadowSide",
 						"side",
-						"stencilFail",
-						"stencilFunc",
-						"stencilFuncMask",
-						"stencilRef",
-						"stencilWrite",
-						"stencilWriteMask",
-						"stencilZFail",
-						"stencilZPass",
 						"toneMapped",
 						"transparent",
 						"type",
-						"userData",
 						"uuid",
 						"version",
+						"needsUpdate",
 						"vertexColors",
-						"visible"
+						"visible",
+						"userData"
 					]
 				},
 
@@ -1697,9 +1700,9 @@
 					"property": [
 						"alphaMap",
 						"depthPacking",
-						"displacementBias",
 						"displacementMap",
 						"displacementScale",
+						"displacementBias",
 						"fog",
 						"map",
 						"wireframe",
@@ -1710,9 +1713,9 @@
 				"MeshDistanceMaterial": {
 					"property": [
 						"alphaMap",
-						"displacementBias",
 						"displacementMap",
 						"displacementScale",
+						"displacementBias",
 						"farDistance",
 						"fog",
 						"map",
@@ -1729,8 +1732,8 @@
 						"color",
 						"combine",
 						"emissive",
-						"emissiveIntensity",
 						"emissiveMap",
+						"emissiveIntensity",
 						"envMap",
 						"lightMap",
 						"lightMapIntensity",
@@ -1751,9 +1754,9 @@
 						"bumpMap",
 						"bumpScale",
 						"color",
-						"displacementBias",
 						"displacementMap",
 						"displacementScale",
+						"displacementBias",
 						"flatShading",
 						"map",
 						"matcap",
@@ -1767,9 +1770,9 @@
 					"property": [
 						"bumpMap",
 						"bumpScale",
-						"displacementBias",
 						"displacementMap",
 						"displacementScale",
+						"displacementBias",
 						"flatShading",
 						"fog",
 						"normalMap",
@@ -1789,12 +1792,12 @@
 						"bumpScale",
 						"color",
 						"combine",
-						"displacementBias",
 						"displacementMap",
 						"displacementScale",
+						"displacementBias",
 						"emissive",
-						"emissiveIntensity",
 						"emissiveMap",
+						"emissiveIntensity",
 						"envMap",
 						"flatShading",
 						"lightMap",
@@ -1843,12 +1846,12 @@
 						"bumpScale",
 						"color",
 						"defines",
-						"displacementBias",
 						"displacementMap",
 						"displacementScale",
+						"displacementBias",
 						"emissive",
-						"emissiveIntensity",
 						"emissiveMap",
+						"emissiveIntensity",
 						"envMap",
 						"envMapIntensity",
 						"flatShading",
@@ -1878,12 +1881,12 @@
 						"bumpMap",
 						"bumpScale",
 						"color",
-						"displacementBias",
 						"displacementMap",
 						"displacementScale",
+						"displacementBias",
 						"emissive",
-						"emissiveIntensity",
 						"emissiveMap",
+						"emissiveIntensity",
 						"gradientMap",
 						"lightMap",
 						"lightMapIntensity",
@@ -1919,13 +1922,13 @@
 						"defaultAttributeValues",
 						"defines",
 						"extensions",
-						"flatShading",
 						"fog",
 						"fragmentShader",
 						"glslVersion",
 						"index0AttributeName",
 						"lights",
 						"linewidth",
+						"flatShading",
 						"uniforms",
 						"uniformsNeedUpdate",
 						"vertexColors",
@@ -1979,8 +1982,8 @@
 						"union"
 					],
 					"property": [
-						"max",
-						"min"
+						"min",
+						"max"
 					]
 				},
 
@@ -2019,8 +2022,8 @@
 						"union"
 					],
 					"property": [
-						"max",
-						"min"
+						"min",
+						"max"
 					]
 				},
 
@@ -2030,11 +2033,11 @@
 						"addColors",
 						"addScalar",
 						"clone",
+						"copy",
 						"convertGammaToLinear",
 						"convertLinearToGamma",
 						"convertLinearToSRGB",
 						"convertSRGBToLinear",
-						"copy",
 						"copyGammaToLinear",
 						"copyLinearToGamma",
 						"copyLinearToSRGB",
@@ -2042,9 +2045,9 @@
 						"equals",
 						"fromArray",
 						"fromBufferAttribute",
-						"getHSL",
 						"getHex",
 						"getHexString",
+						"getHSL",
 						"getStyle",
 						"lerp",
 						"lerpColors",
@@ -2053,19 +2056,19 @@
 						"multiplyScalar",
 						"offsetHSL",
 						"set",
-						"setColorName",
-						"setHSL",
 						"setHex",
+						"setHSL",
 						"setRGB",
 						"setScalar",
 						"setStyle",
+						"setColorName",
 						"sub",
 						"toArray"
 					],
 					"property": [
-						"b",
+						"r",
 						"g",
-						"r"
+						"b"
 					]
 				},
 
@@ -2074,8 +2077,8 @@
 						"clone",
 						"copy",
 						"set",
-						"setFromCartesianCoords",
-						"setFromVector3"
+						"setFromVector3",
+						"setFromCartesianCoords"
 					],
 					"property": [
 						"radius",
@@ -2086,14 +2089,14 @@
 
 				"Euler": {
 					"method": [
-						"clone",
 						"copy",
+						"clone",
 						"equals",
 						"fromArray",
 						"reorder",
 						"set",
-						"setFromQuaternion",
 						"setFromRotationMatrix",
+						"setFromQuaternion",
 						"setFromVector3",
 						"toArray",
 						"toVector3"
@@ -2152,33 +2155,33 @@
 						"set"
 					],
 					"property": [
-						"end",
-						"start"
+						"start",
+						"end"
 					]
 				},
 
 				"MathUtils": {
 					"method": [
-						"ceilPowerOfTwo",
 						"clamp",
-						"damp",
 						"degToRad",
 						"euclideanModulo",
-						"floorPowerOfTwo",
 						"generateUUID",
-						"inverseLerp",
 						"isPowerOfTwo",
+						"inverseLerp",
 						"lerp",
+						"damp",
 						"mapLinear",
 						"pingpong",
+						"ceilPowerOfTwo",
+						"floorPowerOfTwo",
 						"radToDeg",
 						"randFloat",
 						"randFloatSpread",
 						"randInt",
 						"seededRandom",
-						"setQuaternionFromProperEuler",
+						"smoothstep",
 						"smootherstep",
-						"smoothstep"
+						"setQuaternionFromProperEuler"
 					]
 				},
 
@@ -2190,14 +2193,14 @@
 						"equals",
 						"extractBasis",
 						"fromArray",
+						"invert",
 						"getNormalMatrix",
 						"identity",
-						"invert",
 						"multiply",
 						"multiplyMatrices",
 						"multiplyScalar",
-						"premultiply",
 						"set",
+						"premultiply",
 						"setFromMatrix4",
 						"setUvTransform",
 						"toArray",
@@ -2221,14 +2224,14 @@
 						"extractBasis",
 						"extractRotation",
 						"fromArray",
+						"invert",
 						"getMaxScaleOnAxis",
 						"identity",
-						"invert",
 						"lookAt",
-						"makeBasis",
-						"makeOrthographic",
-						"makePerspective",
 						"makeRotationAxis",
+						"makeBasis",
+						"makePerspective",
+						"makeOrthographic",
 						"makeRotationFromEuler",
 						"makeRotationFromQuaternion",
 						"makeRotationX",
@@ -2244,6 +2247,7 @@
 						"scale",
 						"set",
 						"setFromMatrix3",
+						"setPosition",
 						"setPosition",
 						"toArray",
 						"transpose"
@@ -2276,8 +2280,8 @@
 						"translate"
 					],
 					"property": [
-						"constant",
-						"normal"
+						"normal",
+						"constant"
 					]
 				},
 
@@ -2287,35 +2291,35 @@
 						"clone",
 						"conjugate",
 						"copy",
-						"dot",
 						"equals",
+						"dot",
 						"fromArray",
-						"fromBufferAttribute",
 						"identity",
 						"invert",
 						"length",
 						"lengthSq",
+						"normalize",
 						"multiply",
 						"multiplyQuaternions",
-						"normalize",
 						"premultiply",
 						"random",
 						"rotateTowards",
+						"slerp",
+						"slerpQuaternions",
 						"set",
 						"setFromAxisAngle",
 						"setFromEuler",
 						"setFromRotationMatrix",
 						"setFromUnitVectors",
-						"slerp",
-						"slerpFlat",
-						"slerpQuaternions",
-						"toArray"
+						"toArray",
+						"fromBufferAttribute",
+						"slerpFlat"
 					],
 					"property": [
-						"w",
 						"x",
 						"y",
-						"z"
+						"z",
+						"w"
 					]
 				},
 
@@ -2343,8 +2347,8 @@
 						"set"
 					],
 					"property": [
-						"direction",
-						"origin"
+						"origin",
+						"direction"
 					]
 				},
 
@@ -2356,14 +2360,14 @@
 						"containsPoint",
 						"copy",
 						"distanceToPoint",
-						"equals",
 						"expandByPoint",
+						"isEmpty",
+						"makeEmpty",
+						"equals",
 						"getBoundingBox",
 						"intersectsBox",
 						"intersectsPlane",
 						"intersectsSphere",
-						"isEmpty",
-						"makeEmpty",
 						"set",
 						"setFromPoints",
 						"translate",
@@ -2381,12 +2385,12 @@
 						"copy",
 						"makeSafe",
 						"set",
-						"setFromCartesianCoords",
-						"setFromVector3"
+						"setFromVector3",
+						"setFromCartesianCoords"
 					],
 					"property": [
-						"phi",
 						"radius",
+						"phi",
 						"theta"
 					]
 				},
@@ -2400,13 +2404,13 @@
 						"equals",
 						"fromArray",
 						"getAt",
-						"getBasisAt",
 						"getIrradianceAt",
 						"lerp",
 						"scale",
 						"set",
 						"toArray",
-						"zero"
+						"zero",
+						"getBasisAt"
 					],
 					"property": [
 						"coefficients"
@@ -2451,30 +2455,29 @@
 						"clampScalar",
 						"clone",
 						"copy",
-						"cross",
 						"distanceTo",
+						"manhattanDistanceTo",
 						"distanceToSquared",
 						"divide",
 						"divideScalar",
 						"dot",
+						"cross",
 						"equals",
 						"floor",
 						"fromArray",
 						"fromBufferAttribute",
 						"getComponent",
 						"length",
+						"manhattanLength",
 						"lengthSq",
 						"lerp",
 						"lerpVectors",
-						"manhattanDistanceTo",
-						"manhattanLength",
+						"negate",
+						"normalize",
 						"max",
 						"min",
 						"multiply",
 						"multiplyScalar",
-						"negate",
-						"normalize",
-						"random",
 						"rotateAround",
 						"round",
 						"roundToZero",
@@ -2487,7 +2490,8 @@
 						"sub",
 						"subScalar",
 						"subVectors",
-						"toArray"
+						"toArray",
+						"random"
 					],
 					"property": [
 						"height",
@@ -2503,13 +2507,13 @@
 						"addScalar",
 						"addScaledVector",
 						"addVectors",
-						"angleTo",
 						"applyAxisAngle",
 						"applyEuler",
 						"applyMatrix3",
 						"applyMatrix4",
 						"applyNormalMatrix",
 						"applyQuaternion",
+						"angleTo",
 						"ceil",
 						"clamp",
 						"clampLength",
@@ -2519,6 +2523,7 @@
 						"cross",
 						"crossVectors",
 						"distanceTo",
+						"manhattanDistanceTo",
 						"distanceToSquared",
 						"divide",
 						"divideScalar",
@@ -2529,11 +2534,10 @@
 						"fromBufferAttribute",
 						"getComponent",
 						"length",
+						"manhattanLength",
 						"lengthSq",
 						"lerp",
 						"lerpVectors",
-						"manhattanDistanceTo",
-						"manhattanLength",
 						"max",
 						"min",
 						"multiply",
@@ -2544,8 +2548,6 @@
 						"project",
 						"projectOnPlane",
 						"projectOnVector",
-						"random",
-						"randomDirection",
 						"reflect",
 						"round",
 						"roundToZero",
@@ -2553,8 +2555,8 @@
 						"setComponent",
 						"setFromCylindrical",
 						"setFromCylindricalCoords",
-						"setFromMatrix3Column",
 						"setFromMatrixColumn",
+						"setFromMatrix3Column",
 						"setFromMatrixPosition",
 						"setFromMatrixScale",
 						"setFromSpherical",
@@ -2569,7 +2571,9 @@
 						"subVectors",
 						"toArray",
 						"transformDirection",
-						"unproject"
+						"unproject",
+						"random",
+						"randomDirection"
 					],
 					"property": [
 						"x",
@@ -2599,17 +2603,16 @@
 						"fromBufferAttribute",
 						"getComponent",
 						"length",
+						"manhattanLength",
 						"lengthSq",
 						"lerp",
 						"lerpVectors",
-						"manhattanLength",
+						"negate",
+						"normalize",
 						"max",
 						"min",
 						"multiply",
 						"multiplyScalar",
-						"negate",
-						"normalize",
-						"random",
 						"round",
 						"roundToZero",
 						"set",
@@ -2618,22 +2621,23 @@
 						"setComponent",
 						"setLength",
 						"setScalar",
-						"setW",
 						"setX",
 						"setY",
 						"setZ",
+						"setW",
 						"sub",
 						"subScalar",
 						"subVectors",
-						"toArray"
+						"toArray",
+						"random"
 					],
 					"property": [
-						"height",
-						"w",
-						"width",
 						"x",
 						"y",
-						"z"
+						"z",
+						"w",
+						"width",
+						"height"
 					]
 				}
 			},
@@ -2722,16 +2726,16 @@
 
 				"Line": {
 					"method": [
-						"clone",
 						"computeLineDistances",
 						"raycast",
+						"clone",
 						"updateMorphTargets"
 					],
 					"property": [
 						"geometry",
 						"material",
-						"morphTargetDictionary",
-						"morphTargetInfluences"
+						"morphTargetInfluences",
+						"morphTargetDictionary"
 					]
 				},
 
@@ -2764,57 +2768,57 @@
 					"property": [
 						"geometry",
 						"material",
-						"morphTargetDictionary",
-						"morphTargetInfluences"
+						"morphTargetInfluences",
+						"morphTargetDictionary"
 					]
 				},
 
 				"Points": {
 					"method": [
-						"clone",
 						"raycast",
+						"clone",
 						"updateMorphTargets"
 					],
 					"property": [
 						"geometry",
 						"material",
-						"morphTargetDictionary",
-						"morphTargetInfluences"
+						"morphTargetInfluences",
+						"morphTargetDictionary"
 					]
 				},
 
 				"Skeleton": {
 					"method": [
-						"calculateInverses",
 						"clone",
+						"calculateInverses",
 						"computeBoneTexture",
-						"dispose",
-						"getBoneByName",
 						"pose",
-						"update"
+						"update",
+						"getBoneByName",
+						"dispose"
 					],
 					"property": [
+						"bones",
 						"boneInverses",
 						"boneMatrices",
 						"boneTexture",
-						"boneTextureSize",
-						"bones"
+						"boneTextureSize"
 					]
 				},
 
 				"SkinnedMesh": {
 					"method": [
 						"bind",
-						"boneTransform",
 						"clone",
 						"normalizeSkinWeights",
 						"pose",
-						"updateMatrixWorld"
+						"updateMatrixWorld",
+						"boneTransform"
 					],
 					"property": [
+						"bindMode",
 						"bindMatrix",
 						"bindMatrixInverse",
-						"bindMode",
 						"skeleton"
 					]
 				},
@@ -2826,8 +2830,8 @@
 						"raycast"
 					],
 					"property": [
-						"center",
-						"material"
+						"material",
+						"center"
 					]
 				}
 			},
@@ -2858,37 +2862,39 @@
 						"dispose",
 						"forceContextLoss",
 						"forceContextRestore",
-						"getActiveCubeFace",
-						"getActiveMipmapLevel",
 						"getClearAlpha",
 						"getClearColor",
 						"getContext",
 						"getContextAttributes",
+						"getActiveCubeFace",
+						"getActiveMipmapLevel",
+						"getRenderTarget",
 						"getCurrentViewport",
 						"getDrawingBufferSize",
 						"getPixelRatio",
-						"getRenderTarget",
 						"getScissor",
 						"getScissorTest",
 						"getSize",
 						"getViewport",
 						"initTexture",
+						"resetGLState",
 						"readRenderTargetPixels",
 						"render",
 						"renderBufferDirect",
 						"renderBufferImmediate",
-						"resetGLState",
 						"resetState",
 						"setAnimationLoop",
 						"setClearAlpha",
 						"setClearColor",
-						"setOpaqueSort",
 						"setPixelRatio",
 						"setRenderTarget",
 						"setScissor",
+						"setScissor",
 						"setScissorTest",
-						"setSize",
+						"setOpaqueSort",
 						"setTransparentSort",
+						"setSize",
+						"setViewport",
 						"setViewport"
 					],
 					"property": [
@@ -2897,14 +2903,14 @@
 						"autoClearDepth",
 						"autoClearStencil",
 						"capabilities",
+						"maxVertexTextures",
 						"clippingPlanes",
 						"domElement",
 						"extensions",
 						"gammaFactor",
+						"outputEncoding",
 						"info",
 						"localClippingEnabled",
-						"maxVertexTextures",
-						"outputEncoding",
 						"physicallyCorrectLights",
 						"properties",
 						"renderLists",
@@ -2921,28 +2927,28 @@
 
 				"WebGLRenderTarget": {
 					"method": [
+						"setSize",
 						"clone",
 						"copy",
-						"dispose",
-						"setSize"
+						"dispose"
 					],
 					"property": [
-						"depthBuffer",
-						"depthTexture",
+						"width",
 						"height",
 						"scissor",
 						"scissorTest",
-						"stencilBuffer",
-						"texture",
 						"viewport",
-						"width"
+						"texture",
+						"depthBuffer",
+						"stencilBuffer",
+						"depthTexture"
 					]
 				},
 
 				"WebGLCubeRenderTarget": {
 					"method": [
-						"clear",
-						"fromEquirectangularTexture"
+						"fromEquirectangularTexture",
+						"clear"
 					]
 				}
 			},
@@ -2990,10 +2996,10 @@
 						"toJSON"
 					],
 					"property": [
-						"color",
-						"far",
 						"name",
-						"near"
+						"color",
+						"near",
+						"far"
 					]
 				},
 
@@ -3003,9 +3009,9 @@
 						"toJSON"
 					],
 					"property": [
+						"name",
 						"color",
-						"density",
-						"name"
+						"density"
 					]
 				},
 
@@ -3061,41 +3067,43 @@
 
 				"Texture": {
 					"method": [
+						"updateMatrix",
 						"clone",
-						"dispose",
 						"toJSON",
-						"transformUv",
-						"updateMatrix"
+						"dispose",
+						"transformUv"
 					],
 					"property": [
-						"anisotropy",
-						"center",
-						"encoding",
-						"flipY",
-						"format",
-						"generateMipmaps",
 						"id",
-						"image",
-						"internalFormat",
-						"magFilter",
-						"mapping",
-						"matrix",
-						"matrixAutoUpdate",
-						"minFilter",
-						"mipmaps",
+						"uuid",
 						"name",
-						"needsUpdate",
+						"image",
+						"mipmaps",
+						"mapping",
+						"wrapS",
+						"wrapT",
+						"wrapS",
+						"magFilter",
+						"minFilter",
+						"anisotropy",
+						"format",
+						"internalFormat",
+						"type",
 						"offset",
-						"onUpdate",
-						"premultiplyAlpha",
 						"repeat",
 						"rotation",
-						"type",
+						"center",
+						"matrixAutoUpdate",
+						"matrix",
+						"generateMipmaps",
+						"premultiplyAlpha",
+						"flipY",
 						"unpackAlignment",
-						"uuid",
+						"encoding",
 						"version",
-						"wrapS",
-						"wrapT"
+						"needsUpdate",
+						"onUpdate",
+						"needsUpdate"
 					]
 				},
 
@@ -3104,6 +3112,7 @@
 						"update"
 					],
 					"property": [
+						"needsUpdate",
 						"needsUpdate"
 					]
 				}
@@ -3178,12 +3187,12 @@
 						"cursorZoom",
 						"dampingFactor",
 						"domElement",
+						"enabled",
 						"enableAnimations",
 						"enableGrid",
 						"enablePan",
 						"enableRotate",
 						"enableZoom",
-						"enabled",
 						"focusAnimationTime",
 						"maxDistance",
 						"maxZoom",
@@ -3229,6 +3238,7 @@
 						"dispose",
 						"handleResize",
 						"lookAt",
+						"lookAt",
 						"update"
 					],
 					"property": [
@@ -3241,8 +3251,8 @@
 						"heightMax",
 						"heightMin",
 						"heightSpeed",
-						"lookSpeed",
 						"lookVertical",
+						"lookSpeed",
 						"mouseDragOn",
 						"movementSpeed",
 						"object",
@@ -3270,8 +3280,8 @@
 					"method": [
 						"dispose",
 						"getAzimuthalAngle",
-						"getDistance",
 						"getPolarAngle",
+						"getDistance",
 						"listenToKeyEvents",
 						"reset",
 						"saveState",
@@ -3282,11 +3292,11 @@
 						"autoRotateSpeed",
 						"dampingFactor",
 						"domElement",
+						"enabled",
 						"enableDamping",
 						"enablePan",
 						"enableRotate",
 						"enableZoom",
-						"enabled",
 						"keyPanSpeed",
 						"keys",
 						"maxAzimuthAngle",
@@ -3303,8 +3313,8 @@
 						"position0",
 						"rotateSpeed",
 						"screenSpacePanning",
-						"target",
 						"target0",
+						"target",
 						"touches",
 						"zoom0",
 						"zoomSpeed"
@@ -3365,8 +3375,8 @@
 						"attach",
 						"detach",
 						"dispose",
-						"getMode",
 						"getRaycaster",
+						"getMode",
 						"setMode",
 						"setRotationSnap",
 						"setSize",
@@ -3414,9 +3424,9 @@
 					],
 					"property": [
 						"audio",
+						"range",
 						"divisionsInnerAngle",
-						"divisionsOuterAngle",
-						"range"
+						"divisionsOuterAngle"
 					]
 				},
 
@@ -3425,8 +3435,8 @@
 						"dispose"
 					],
 					"property": [
-						"color",
-						"light"
+						"light",
+						"color"
 					]
 				},
 
@@ -3456,8 +3466,8 @@
 			"Lights": {
 				"LightProbeGenerator": {
 					"method": [
-						"fromCubeRenderTarget",
-						"fromCubeTexture"
+						"fromCubeTexture",
+						"fromCubeRenderTarget"
 					]
 				}
 			},
@@ -3465,51 +3475,51 @@
 			"Loaders": {
 				"3DMLoader": {
 					"method": [
-						"dispose",
 						"load",
 						"parse",
 						"setLibraryPath",
-						"setWorkerLimit"
+						"setWorkerLimit",
+						"dispose"
 					]
 				},
 
 				"BasisTextureLoader": {
 					"method": [
-						"detectSupport",
-						"dispose",
 						"load",
+						"detectSupport",
 						"setTranscoderPath",
-						"setWorkerLimit"
+						"setWorkerLimit",
+						"dispose"
 					]
 				},
 
 				"DRACOLoader": {
 					"method": [
-						"dispose",
 						"load",
-						"preload",
-						"setDecoderConfig",
 						"setDecoderPath",
-						"setWorkerLimit"
+						"setDecoderConfig",
+						"setWorkerLimit",
+						"preload",
+						"dispose"
 					]
 				},
 
 				"GLTFLoader": {
 					"method": [
 						"load",
-						"parse",
 						"setDRACOLoader",
-						"setKTX2Loader"
+						"setKTX2Loader",
+						"parse"
 					]
 				},
 
 				"KTX2Loader": {
 					"method": [
-						"detectSupport",
-						"dispose",
 						"load",
+						"detectSupport",
 						"setTranscoderPath",
-						"setWorkerLimit"
+						"setWorkerLimit",
+						"dispose"
 					]
 				},
 
@@ -3525,8 +3535,8 @@
 				"MTLLoader": {
 					"method": [
 						"load",
-						"parse",
-						"setMaterialOptions"
+						"setMaterialOptions",
+						"parse"
 					]
 				},
 
@@ -3561,8 +3571,8 @@
 
 				"SVGLoader": {
 					"method": [
-						"createShapes",
-						"load"
+						"load",
+						"createShapes"
 					]
 				},
 
@@ -3594,8 +3604,8 @@
 					"property": [
 						"passes",
 						"readBuffer",
-						"renderToScreen",
 						"renderer",
+						"renderToScreen",
 						"writeBuffer"
 					]
 				}
@@ -3625,20 +3635,20 @@
 				"LookupTable": {
 					"url": "Lut",
 					"method": [
-						"addColorMap",
 						"copy",
+						"addColorMap",
 						"createCanvas",
 						"getColor",
 						"setColorMap",
-						"setMax",
 						"setMin",
+						"setMax",
 						"updateCanvas"
 					],
 					"property": [
 						"lut",
 						"map",
-						"maxV",
 						"minV",
+						"maxV",
 						"n"
 					]
 				},
@@ -3646,9 +3656,9 @@
 				"MeshSurfaceSampler": {
 					"url": 1,
 					"method": [
+						"setWeightAttribute",
 						"build",
-						"sample",
-						"setWeightAttribute"
+						"sample"
 					]
 				},
 
@@ -3663,11 +3673,11 @@
 						"equals",
 						"fromBox3",
 						"getSize",
-						"intersectRay",
 						"intersectsBox3",
+						"intersectsSphere",
 						"intersectsOBB",
 						"intersectsRay",
-						"intersectsSphere",
+						"intersectRay",
 						"set"
 					],
 					"property": [
@@ -3683,19 +3693,19 @@
 				"Face": {
 					"url": 1,
 					"method": [
-						"compute",
 						"create",
-						"distanceToPoint",
-						"getEdge"
+						"getEdge",
+						"compute",
+						"distanceToPoint"
 					],
 					"property": [
+						"normal",
+						"midpoint",
 						"area",
 						"constant",
-						"edge",
+						"outside",
 						"mark",
-						"midpoint",
-						"normal",
-						"outside"
+						"edge"
 					]
 				},
 
@@ -3703,17 +3713,17 @@
 					"url": 1,
 					"method": [
 						"head",
+						"tail",
 						"length",
 						"lengthSquared",
-						"setTwin",
-						"tail"
+						"setTwin"
 					],
 					"property": [
-						"face",
-						"next",
+						"vertex",
 						"prev",
+						"next",
 						"twin",
-						"vertex"
+						"face"
 					]
 				},
 
@@ -3755,26 +3765,26 @@
 				"VertexNode": {
 					"url": 1,
 					"property": [
-						"face",
-						"next",
 						"point",
-						"prev"
+						"prev",
+						"next",
+						"face"
 					]
 				},
 
 				"VertexList": {
 					"url": 1,
 					"method": [
+						"first",
+						"last",
+						"clear",
+						"insertBefore",
+						"insertAfter",
 						"append",
 						"appendChain",
-						"clear",
-						"first",
-						"insertAfter",
-						"insertBefore",
-						"isEmpty",
-						"last",
 						"remove",
-						"removeSubList"
+						"removeSubList",
+						"isEmpty"
 					],
 					"property": [
 						"head",
@@ -3819,13 +3829,13 @@
 			"Utils": {
 				"BufferGeometryUtils": {
 					"method": [
-						"computeMorphedAttributes",
-						"estimateBytesUsed",
-						"interleaveAttributes",
-						"mergeBufferAttributes",
 						"mergeBufferGeometries",
+						"mergeBufferAttributes",
+						"interleaveAttributes",
+						"estimateBytesUsed",
 						"mergeVertices",
-						"toTrianglesDrawMode"
+						"toTrianglesDrawMode",
+						"computeMorphedAttributes"
 					]
 				},
 
@@ -3870,18 +3880,18 @@
 				"WebGLProgram": {
 					"url": "WebGLProgram",
 					"method": [
-						"destroy",
+						"getUniforms",
 						"getAttributes",
-						"getUniforms"
+						"destroy"
 					],
 					"property": [
-						"cacheKey",
-						"fragmentShader",
-						"id",
 						"name",
-						"program",
+						"id",
+						"cacheKey",
 						"usedTimes",
-						"vertexShader"
+						"program",
+						"vertexShader",
+						"fragmentShader"
 					]
 				},
 
@@ -3892,11 +3902,11 @@
 				"WebGLState": {
 					"url": "WebGLState",
 					"method": [
-						"disable",
 						"enable",
-						"setBlending",
+						"disable",
 						"setDepthTest",
-						"setDepthWrite"
+						"setDepthWrite",
+						"setBlending"
 					]
 				}
 			}
