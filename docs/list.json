@@ -485,7 +485,7 @@
 			"_main": "api/ar",
 
 			"الحركات": {
-				"_sub": "animation",
+				"_eng": "Animation",
 
 				"AnimationAction": 1,
 				"AnimationClip": 1,
@@ -498,7 +498,7 @@
 			},
 
 			"الحركات / Tracks": {
-				"_sub": "animation/tracks",
+				"_eng": "Animation / Tracks",
 
 				"BooleanKeyframeTrack": 1,
 				"ColorKeyframeTrack": 1,
@@ -666,7 +666,7 @@
 			"카메라": "Cameras",
 
 			"상수": {
-				"_sub": "constants",
+				"_eng": "Constants",
 
 				"Animation": 1,
 				"Core": 1,
@@ -684,7 +684,7 @@
 			"_main": "examples/ko",
 
 			"컨트롤": {
-				"_sub": "controls",
+				"_eng": "Controls",
 
 				"DeviceOrientationControls": 1,
 				"DragControls": 1,

@@ -39,6 +39,7 @@ const autoParse = true;
 let currentSection = '';
 let language = 'en';
 let prevHash = '';
+const threeCaches = {};
 
 function initNodes() {
 
@@ -80,6 +81,7 @@ function cleanSearch( hash ) {
 function createArguments( args ) {
 
     // Create arguments required for THREE constructors
+    // + keep a cache for each object for speed-up
 
     if ( ! args ) {
 
@@ -98,12 +100,28 @@ function createArguments( args ) {
         // THREE objects + others
 
         const name = value.slice( 1 );
+        const cache = threeCaches[ name ];
+
+        if ( cache ) {
+
+            return cache;
+
+        }
 
         switch ( name ) {
 
         case 'Audio':
 
-            value = new THREE.Audio( new THREE.AudioListener() );
+            let listener = threeCaches.AudioListener;
+
+            if ( ! listener ) {
+
+                listener = new THREE.AudioListener();
+                threeCaches.AudioListener = listener;
+
+            }
+
+            value = new THREE.Audio( listener );
             break;
 
         case 'Geometry':
@@ -124,6 +142,7 @@ function createArguments( args ) {
 
         }
 
+        threeCaches[ name ] = value;
         return value;
 
     } );
@@ -633,6 +652,7 @@ async function initDoc() {
         language = value;
 
         createNavigationDoc();
+        parseTHREE();
         updateFilterDoc();
 
 		// Auto change language url. If a reader open a document in English, when he click "zh",
@@ -727,8 +747,7 @@ function createNavigationDoc() {
 
             if ( selected ) {
 
-                titleDoc = `${pageName} - three.js docs`;
-                document.title = titleDoc;
+                setTitleDoc( pageName );
 
             }
 
@@ -859,6 +878,7 @@ function parseDoc( list, language, {
     } = {} ) {
 
     const engList = list.en;
+    const isForeign = ( language != 'en' );
     const localList = list[ language ];
 
     Object.keys( localList ).forEach( section => {
@@ -886,11 +906,13 @@ function parseDoc( list, language, {
             }
 
             let pages = categories[ category ];
+            let parent;
 
             if ( typeof pages == 'string' ) {
 
                 category = pages;
                 pages = engList[ refPath ][ category ];
+                parent = pages;
 
             }
 
@@ -909,7 +931,20 @@ function parseDoc( list, language, {
 
             //
 
+            let engPath = pages._eng;
             let subPath = pages._sub || categories._sub;
+
+            if ( isForeign && ! subPath ) {
+
+                parent = parent || engList[ refPath ][ engPath || category ];
+
+                if ( parent && parent._sub ) {
+
+                    subPath = parent._sub;
+
+                }
+
+            }
 
             if ( subPath ) {
 
@@ -925,7 +960,7 @@ function parseDoc( list, language, {
 
             } else {
 
-                subPath = `${mainPath}/${category.toLowerCase().replace( / /g, '' )}`;
+                subPath = `${mainPath}/${( engPath || category ).toLowerCase().replace( / /g, '' )}`;
 
             }
 
@@ -958,6 +993,14 @@ function parseDoc( list, language, {
                 const type = typeof( page );
                 let args;
                 let url;
+
+                // use English data for foreign languages
+
+                if ( isForeign && parent ) {
+
+                    page = parent[ pageName ];
+
+                }
 
                 // arguments for the constructor
                 if ( Array.isArray( page ) ) {
@@ -1025,7 +1068,7 @@ function parseTHREE() {
 
     const T = window.THREE;
 
-    if ( ! autoParse || readyThree || ! readyDoc || ! T ) {
+    if ( ! autoParse || readyThree == language || ! readyDoc || ! T ) {
 
         return;
 
@@ -1044,13 +1087,26 @@ function parseTHREE() {
         }
 
         const page = pagesDoc[ name ];
-        const args = createArguments( page.args );
         const method = new Set();
         const property = new Set();
 
         try {
 
-            const instance = args? new class_( ...args ) : new class_();
+            // cache is useful when changing languages => processing will be very fast
+
+            let instance = threeCaches[ name ];
+
+            if ( ! instance ) {
+
+                const args = createArguments( page.args );
+                instance = args ? new class_( ...args ) : new class_();
+
+                threeCaches[ name ] = instance;
+
+            }
+
+            // check every method + from the prototype too
+
             const instance2 = Object.getPrototypeOf( instance );
 
             for ( const object of [ instance, instance2 ] ) {
@@ -1079,7 +1135,7 @@ function parseTHREE() {
 
             if ( method.size ) {
 
-                let sorts = [ ...method ].sort();
+                const sorts = [ ...method ].sort();
                 page.method = sorts.join( ' ' );
                 page.methodLow = sorts.map( item => item.toLowerCase() ).join( ' ' );
 
@@ -1087,7 +1143,7 @@ function parseTHREE() {
 
             if ( property.size ) {
 
-                let sorts = [ ...property ].sort();
+                const sorts = [ ...property ].sort();
                 page.property = sorts.join( ' ' );
                 page.propertyLow = sorts.map( item => item.toLowerCase() ).join( ' ' );
 
@@ -1101,8 +1157,8 @@ function parseTHREE() {
 
     } );
 
-    readyThree = true;
-    console.log( `parsed THREE in ${performance.now() - now} ms` );
+    readyThree = language;
+    // console.log( `parsed THREE in ${performance.now() - now} ms` );
 
     updateFilter( true );
 }
@@ -1130,6 +1186,7 @@ function selectDoc( url, node ) {
     }
 
     node.classList.add( 'selected' );
+    setTitleDoc( node.dataset.name );
 
     let localURL = `../docs/${splits[ 0 ]}.html`;
     if ( splits[ 1 ] ) {
@@ -1139,6 +1196,13 @@ function selectDoc( url, node ) {
     }
 
     updateIFrame( frameDoc2, localURL );
+
+}
+
+function setTitleDoc( name ) {
+
+    titleDoc = `${name} - three.js docs`;
+    document.title = titleDoc;
 
 }
 

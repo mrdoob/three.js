@@ -533,6 +533,7 @@ iframe {
 /* extra search */
 .method,
 .property {
+	direction: ltr;
 	display: block;
 	padding-left: 1em;
 }
