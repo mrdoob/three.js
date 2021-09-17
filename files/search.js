@@ -1074,6 +1074,7 @@ function parseTHREE() {
 
     }
 
+    const PROTO_METHODS = new Set( [ 'fromJSON', 'length', 'name', 'prototype' ] );
     const now = performance.now();
 
     Object.keys( pagesDoc ).forEach( name => {
@@ -1109,7 +1110,7 @@ function parseTHREE() {
 
             const instance2 = Object.getPrototypeOf( instance );
 
-            for ( const object of [ instance, instance2 ] ) {
+            [ instance, instance2, class_ ].forEach( ( object, id ) => {
 
                 Object.getOwnPropertyNames( object ).forEach( key => {
 
@@ -1119,7 +1120,17 @@ function parseTHREE() {
 
                     }
 
-                    if ( typeof instance[ key ] == 'function' ) {
+                    // id=2 => keep static functions only
+
+                    if ( id == 2 ) {
+
+                        if ( ! PROTO_METHODS.has( key ) ) {
+
+                            method.add( key );
+
+                        }
+
+                    } else if ( typeof instance[ key ] == 'function' ) {
 
                         method.add( key );
 
@@ -1129,9 +1140,9 @@ function parseTHREE() {
 
                     }
 
-                });
+                } );
 
-            }
+            } );
 
             if ( method.size ) {
 
