@@ -233,8 +233,8 @@ function highlightText( name, start, end ) {
 
 function highlightTokens( name, lower, regExp, searchLow, mainUrl ) {
 
-    const names = name.split( ' ' );
-    const lowers = lower.split( ' ' );
+    const names = name.split( '\n' );
+    const lowers = lower.split( '\n' );
     const searchLength = searchLow.length;
     const lines = [];
 
@@ -290,12 +290,13 @@ function searchContent( search, data, mode, callback ) {
         // - /mesh.*material/
         // - /audio|video/ => finds all audio and video stuff
         // - /3$/ => finds everything that ends with a 3: CatmullRomCurve3, ..., Box3, Line3, ...
+        // - ./^obj/ => finds BoxHelper.object property
 
         let regExp;
 
         try {
 
-            regExp = new RegExp( search.slice( 1, - 1 ), 'gi' );
+            regExp = new RegExp( search.slice( 1, - 1 ), 'gim' );
 
         } catch ( e ) {
 
@@ -727,7 +728,7 @@ function createNavigationDoc() {
 
                 if ( page.property ) {
 
-                    const text = page.property.join( ' ' );
+                    const text = page.property.join( '\n' );
                     dico.property = text;
                     dico.propertyLow = text.toLowerCase();
 
@@ -735,7 +736,7 @@ function createNavigationDoc() {
 
                 if ( page.method ) {
 
-                    const text = page.method.join( ' ' );
+                    const text = page.method.join( '\n' );
                     dico.method = text;
                     dico.methodLow = text.toLowerCase();
 
@@ -1147,16 +1148,16 @@ function parseTHREE() {
             if ( method.size ) {
 
                 const sorts = [ ...method ].sort();
-                page.method = sorts.join( ' ' );
-                page.methodLow = sorts.map( item => item.toLowerCase() ).join( ' ' );
+                page.method = sorts.join( '\n' );
+                page.methodLow = sorts.map( item => item.toLowerCase() ).join( '\n' );
 
             }
 
             if ( property.size ) {
 
                 const sorts = [ ...property ].sort();
-                page.property = sorts.join( ' ' );
-                page.propertyLow = sorts.map( item => item.toLowerCase() ).join( ' ' );
+                page.property = sorts.join( '\n' );
+                page.propertyLow = sorts.map( item => item.toLowerCase() ).join( '\n' );
 
             }
 
@@ -1169,7 +1170,7 @@ function parseTHREE() {
     } );
 
     readyThree = language;
-    // console.log( `parsed THREE in ${performance.now() - now} ms` );
+    console.log( `parsed THREE in ${performance.now() - now} ms` );
 
     updateFilter( true );
 }
@@ -1289,6 +1290,7 @@ function updateFilterDoc( force ) {
     // - new: 6.05 ms
 
     let search = cleanSearch();
+
     if ( ! force && search == lastSearchDoc ) {
 
         return;
@@ -1297,21 +1299,53 @@ function updateFilterDoc( force ) {
 
     lastSearchDoc = search;
 
+    // limit searches to: all, or main only, or property/method only
+
     let mode = 7;
 
-    if ( search && search[ 0 ] == search[ 0 ].toUpperCase() && search[ 0 ] != search[ 0 ].toLowerCase() ) {
+    if ( ! search ) {
 
         mode = 1;
-        contentDoc.classList.add( 'mainSearch' );
+
+    } else if ( search[ 0 ] == '.' ) {
+
+        // . => property/method only, it works with RegExp too: ./^ob/
+
+        mode = 6;
+        search = search.slice( 1 );
 
     } else {
 
-        if ( search[ 0 ] == '.' ) {
+        // first letter is capital (A-Z) => only check main
 
-            mode = 6;
-            search = search.slice( 1 );
+        for ( let i = 0, length = search.length; i < length; i ++ ) {
+
+            const code = search.charCodeAt( i );
+
+            if ( code >= 97 && code <= 122 ) {
+
+                // a-z
+                break;
+
+            } else if ( code >= 65 && code <= 90 ) {
+
+                // A-Z
+                mode = 1;
+                break;
+
+            }
 
         }
+
+    }
+
+    // hide properties/methods if not wanted
+
+    if ( mode == 1 ) {
+
+        contentDoc.classList.add( 'mainSearch' );
+
+    } else {
 
         contentDoc.classList.remove( 'mainSearch' );
 
@@ -1490,7 +1524,7 @@ function createNavigationEx( fileTags ) {
             );
 
             file.clean = clean;
-            file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join( ' ' ).toLowerCase();
+            file.text = [ clean, ... ( fileTags[ name ] || [] ) ].join( '\n' ).toLowerCase();
 
         }
 
