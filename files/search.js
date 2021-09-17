@@ -1212,8 +1212,14 @@ function setUrlFragment( pageName ) {
     // First separate the member (if existing) from the page name,
     // then identify the subpage's URL and set it as URL fragment (re-adding the member)
 
-    const splits = pageName.split( '.' );
+    const splits = pageName.trim().split( '.' );
     const page = pagesDoc[ splits[ 0 ] ];
+
+    if ( splits.length < 2 ) {
+
+        splits[ 1 ] = location.hash.split( '/' ).slice( -1 )[ 0 ].split( '.' )[ 1 ];
+
+    }
 
     if ( page ) {
 
