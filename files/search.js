@@ -25,7 +25,7 @@ let nodeButton;
 let nodeLanguage;
 let nodeSectionDoc;
 let nodeSectionEx;
-let panel;
+let panelClassList;
 let panelScrim;
 let previewsToggler;
 let viewerDoc;
@@ -54,7 +54,7 @@ function initNodes() {
     nodeLanguage = document.getElementById( 'language' );
     nodeSectionDoc = document.getElementById( 'sectionDoc' );
     nodeSectionEx = document.getElementById( 'sectionEx' );
-    panel = document.getElementById( 'panel' );
+    panelClassList = document.getElementById( 'panel' ).classList;
     panelScrim = document.getElementById( 'panelScrim' );
     previewsToggler = document.getElementById( 'previewsToggler' );
     viewerDoc = document.getElementById( 'viewerDoc' );
@@ -387,14 +387,14 @@ function setGlobalEvents() {
     expandButton.onclick = event => {
 
         event.preventDefault();
-        panel.classList.toggle( 'open' );
+        panelClassList.toggle( 'open' );
 
     };
 
     panelScrim.onclick = event => {
 
         event.preventDefault();
-        panel.classList.toggle( 'open' );
+        panelClassList.toggle( 'open' );
 
     };
 
@@ -402,7 +402,7 @@ function setGlobalEvents() {
 
     filterInput.onfocus = () => {
 
-        panel.classList.add( 'searchFocused' );
+        panelClassList.add( 'searchFocused' );
 
     };
 
@@ -410,7 +410,7 @@ function setGlobalEvents() {
 
         if ( filterInput.value === '' ) {
 
-            panel.classList.remove( 'searchFocused' );
+            panelClassList.remove( 'searchFocused' );
 
         }
 
@@ -426,7 +426,7 @@ function setGlobalEvents() {
 
         filterInput.value = '';
         updateFilter();
-        panel.classList.remove( 'searchFocused' );
+        panelClassList.remove( 'searchFocused' );
 
     };
 
@@ -436,7 +436,7 @@ function setGlobalEvents() {
 
     if ( filterInput.value !== '' ) {
 
-        panel.classList.add( 'searchFocused' );
+        panelClassList.add( 'searchFocused' );
 
     }
 
@@ -534,10 +534,11 @@ function updateFilter( force ) {
 
 function updateIFrame( iframe, src ) {
 
-    const isDoc = ( guessSection() == 'docs' );
+    panelClassList.remove( 'open' );
 
     // Check if an iFrame already has the correct content
 
+    const isDoc = ( guessSection() == 'docs' );
     const nodes = isDoc ? [ viewerDoc, viewerDoc2 ] : [ iframe ];
 
     for ( const node of nodes ) {
@@ -1606,8 +1607,6 @@ function selectEx( name ) {
     updateIFrame( viewerEx, `../examples/${name}.html` );
 
     viewerEx.focus();
-
-    panel.classList.remove( 'open' );
 
     selectedEx = name;
 
