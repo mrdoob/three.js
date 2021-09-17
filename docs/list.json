@@ -36,42 +36,42 @@
 		"Reference": {
 			"_main": "api/en",
 
-			"Animation": [
-				"AnimationAction",
-				"AnimationClip",
-				"AnimationMixer",
-				"AnimationObjectGroup",
-				"AnimationUtils",
-				"KeyframeTrack",
-				"PropertyBinding",
-				"PropertyMixer"
-			],
+			"Animation": {
+				"AnimationAction": 1,
+				"AnimationClip": ["", 0, []],
+				"AnimationMixer": 1,
+				"AnimationObjectGroup": 1,
+				"AnimationUtils": 1,
+				"KeyframeTrack": ["", [0]],
+				"PropertyBinding": [".Object3D", "a.x"],
+				"PropertyMixer": 1
+			},
 
-			"Animation / Tracks": [
-				"BooleanKeyframeTrack",
-				"ColorKeyframeTrack",
-				"NumberKeyframeTrack",
-				"QuaternionKeyframeTrack",
-				"StringKeyframeTrack",
-				"VectorKeyframeTrack"
-			],
+			"Animation / Tracks": {
+				"BooleanKeyframeTrack": ["", [0]],
+				"ColorKeyframeTrack": ["", [0]],
+				"NumberKeyframeTrack": ["", [0]],
+				"QuaternionKeyframeTrack": ["", [0]],
+				"StringKeyframeTrack": ["", [0]],
+				"VectorKeyframeTrack": ["", [0]]
+			},
 
-			"Audio": [
-				"Audio",
-				"AudioAnalyser",
-				"AudioContext",
-				"AudioListener",
-				"PositionalAudio"
-			],
+			"Audio": {
+				"Audio": [".AudioListener"],
+				"AudioAnalyser": [".Audio"],
+				"AudioContext": 1,
+				"AudioListener": 1,
+				"PositionalAudio": [".AudioListener"]
+			},
 
-			"Cameras": [
-				"ArrayCamera",
-				"Camera",
-				"CubeCamera",
-				"OrthographicCamera",
-				"PerspectiveCamera",
-				"StereoCamera"
-			],
+			"Cameras": {
+				"ArrayCamera": 1,
+				"Camera": 1,
+				"CubeCamera": [1, 1, {}],
+				"OrthographicCamera": 1,
+				"PerspectiveCamera": 1,
+				"StereoCamera": 1
+			},
 
 			"Constants": [
 				"Animation",
@@ -83,34 +83,34 @@
 				"Textures"
 			],
 
-			"Core": [
-				"BufferAttribute",
-				"BufferGeometry",
-				"Clock",
-				"EventDispatcher",
-				"GLBufferAttribute",
-				"InstancedBufferAttribute",
-				"InstancedBufferGeometry",
-				"InstancedInterleavedBuffer",
-				"InterleavedBuffer",
-				"InterleavedBufferAttribute",
-				"Layers",
-				"Object3D",
-				"Raycaster",
-				"Uniform"
-			],
+			"Core": {
+				"BufferAttribute": [".Uint32Array"],
+				"BufferGeometry": 1,
+				"Clock": 1,
+				"EventDispatcher": 1,
+				"GLBufferAttribute": 1,
+				"InstancedBufferAttribute": 1,
+				"InstancedBufferGeometry": 1,
+				"InstancedInterleavedBuffer": 1,
+				"InterleavedBuffer": 1,
+				"InterleavedBufferAttribute": [{}],
+				"Layers": 1,
+				"Object3D": 1,
+				"Raycaster": 1,
+				"Uniform": 1
+			},
 
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "BufferAttributeTypes"
 			},
 
-			"Extras": [
-				"DataUtils",
-				"Earcut",
-				"ImageUtils",
-				"PMREMGenerator",
-				"ShapeUtils"
-			],
+			"Extras": {
+				"DataUtils": 1,
+				"Earcut": 1,
+				"ImageUtils": 1,
+				"PMREMGenerator": [".WebGLRenderer"],
+				"ShapeUtils": 1
+			},
 
 			"Extras / Core": [
 				"Curve",
@@ -139,46 +139,46 @@
 				"ImmediateRenderObject"
 			],
 
-			"Geometries": [
-				"BoxGeometry",
-				"CircleGeometry",
-				"ConeGeometry",
-				"CylinderGeometry",
-				"DodecahedronGeometry",
-				"EdgesGeometry",
-				"ExtrudeGeometry",
-				"IcosahedronGeometry",
-				"LatheGeometry",
-				"OctahedronGeometry",
-				"ParametricGeometry",
-				"PlaneGeometry",
-				"PolyhedronGeometry",
-				"RingGeometry",
-				"ShapeGeometry",
-				"SphereGeometry",
-				"TetrahedronGeometry",
-				"TextGeometry",
-				"TorusGeometry",
-				"TorusKnotGeometry",
-				"TubeGeometry",
-				"WireframeGeometry"
-			],
+			"Geometries": {
+				"BoxGeometry": 1,
+				"CircleGeometry": 1,
+				"ConeGeometry": 1,
+				"CylinderGeometry": 1,
+				"DodecahedronGeometry": 1,
+				"EdgesGeometry": [".Geometry"],
+				"ExtrudeGeometry": 1,
+				"IcosahedronGeometry": 1,
+				"LatheGeometry": 1,
+				"OctahedronGeometry": 1,
+				"ParametricGeometry": 1,
+				"PlaneGeometry": 1,
+				"PolyhedronGeometry": [[], []],
+				"RingGeometry": 1,
+				"ShapeGeometry": 1,
+				"SphereGeometry": 1,
+				"TetrahedronGeometry": 1,
+				"TextGeometry": 1,
+				"TorusGeometry": 1,
+				"TorusKnotGeometry": 1,
+				"TubeGeometry": 1,
+				"WireframeGeometry": [".Geometry"]
+			},
 
-			"Helpers": [
-				"ArrowHelper",
-				"AxesHelper",
-				"BoxHelper",
-				"Box3Helper",
-				"CameraHelper",
-				"DirectionalLightHelper",
-				"GridHelper",
-				"PolarGridHelper",
-				"HemisphereLightHelper",
-				"PlaneHelper",
-				"PointLightHelper",
-				"SkeletonHelper",
-				"SpotLightHelper"
-			],
+			"Helpers": {
+				"ArrowHelper": 1,
+				"AxesHelper": 1,
+				"BoxHelper": 1,
+				"Box3Helper": 1,
+				"CameraHelper": [".Camera"],
+				"DirectionalLightHelper": [".DirectionalLight"],
+				"GridHelper": 1,
+				"PolarGridHelper": 1,
+				"HemisphereLightHelper": [".HemisphereLight"],
+				"PlaneHelper": 1,
+				"PointLightHelper": [".PointLight"],
+				"SkeletonHelper": [".Object3D"],
+				"SpotLightHelper": [".SpotLight"]
+			},
 
 			"Lights": [
 				"AmbientLight",
@@ -245,36 +245,36 @@
 				"SpriteMaterial"
 			],
 
-			"Math": [
-				"Box2",
-				"Box3",
-				"Color",
-				"Cylindrical",
-				"Euler",
-				"Frustum",
-				"Interpolant",
-				"Line3",
-				"MathUtils",
-				"Matrix3",
-				"Matrix4",
-				"Plane",
-				"Quaternion",
-				"Ray",
-				"Sphere",
-				"Spherical",
-				"SphericalHarmonics3",
-				"Triangle",
-				"Vector2",
-				"Vector3",
-				"Vector4"
-			],
+			"Math": {
+				"Box2": 1,
+				"Box3": 1,
+				"Color": 1,
+				"Cylindrical": 1,
+				"Euler": 1,
+				"Frustum": 1,
+				"Interpolant": [[], []],
+				"Line3": 1,
+				"MathUtils": 1,
+				"Matrix3": 1,
+				"Matrix4": 1,
+				"Plane": 1,
+				"Quaternion": 1,
+				"Ray": 1,
+				"Sphere": 1,
+				"Spherical": 1,
+				"SphericalHarmonics3": 1,
+				"Triangle": 1,
+				"Vector2": 1,
+				"Vector3": 1,
+				"Vector4": 1
+			},
 
-			"Math / Interpolants": [
-				"CubicInterpolant",
-				"DiscreteInterpolant",
-				"LinearInterpolant",
-				"QuaternionLinearInterpolant"
-			],
+			"Math / Interpolants": {
+				"CubicInterpolant": [[], [], 0, []],
+				"DiscreteInterpolant": [[], [], 0, []],
+				"LinearInterpolant": [[], [], 0, []],
+				"QuaternionLinearInterpolant": [[], [], 0, []]
+			},
 
 			"Objects": [
 				"Bone",
@@ -317,17 +317,17 @@
 				"Scene"
 			],
 
-			"Textures": [
-				"CanvasTexture",
-				"CompressedTexture",
-				"CubeTexture",
-				"DataTexture",
-				"DataTexture2DArray",
-				"DataTexture3D",
-				"DepthTexture",
-				"Texture",
-				"VideoTexture"
-			]
+			"Textures": {
+				"CanvasTexture": 1,
+				"CompressedTexture": 1,
+				"CubeTexture": 1,
+				"DataTexture": 1,
+				"DataTexture2DArray": 1,
+				"DataTexture3D": 1,
+				"DepthTexture": 1,
+				"Texture": 1,
+				"VideoTexture": [{}]
+			}
 
 		},
 

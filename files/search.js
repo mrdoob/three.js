@@ -32,6 +32,10 @@ let viewerDoc;
 let viewerDoc2;
 let viewerEx;
 
+// enable this to use docs/list.json and automatically parse THREE functions/properties,
+// otherwise it's using files/docs.json
+const autoParse = true;
+
 let currentSection = '';
 let language = 'en';
 let prevHash = '';
@@ -70,6 +74,59 @@ function cleanSearch( hash ) {
     const search = filterInput.value.trim().replace( /\s+/g, ' ' );
     window.history.replaceState( {}, '', `?${search? 'q=': ''}${search}${hash || location.hash}` );
     return search;
+
+}
+
+function createArguments( args ) {
+
+    // Create arguments required for THREE constructors
+
+    if ( ! args ) {
+
+        return;
+
+    }
+
+    return args.map( value => {
+
+        if ( typeof value != 'string' || value[ 0 ] != '.' ) {
+
+            return value;
+
+        }
+
+        // THREE objects + others
+
+        const name = value.slice( 1 );
+
+        switch ( name ) {
+
+        case 'Audio':
+
+            value = new THREE.Audio( new THREE.AudioListener() );
+            break;
+
+        case 'Geometry':
+
+            value = new THREE.BufferGeometry();
+            let vertices = new Float32Array( [ 0, 0, 0, 1, 0, 0, 1, 1, 0 ] );
+            value.setAttribute( 'position', new THREE.BufferAttribute( vertices , 3 ) );
+            break;
+
+        case 'Uint32Array':
+
+            value = new Uint32Array();
+            break;
+
+        default:
+
+            value = new THREE[ name ]();
+
+        }
+
+        return value;
+
+    } );
 
 }
 
@@ -193,100 +250,6 @@ function highlightTokens( name, lower, regExp, searchLow, mainUrl ) {
     }
 
     return lines.join( '' );
-}
-
-function parseThree() {
-
-    // parse THREE classes at run time
-    // - automatically fill method + property
-    // - called when THREE is loaded and also when Doc is ready
-
-    const T = window.THREE;
-    const now = performance.now();
-
-    if ( readyThree || ! readyDoc || ! T) {
-
-        return;
-
-    }
-
-    const errors = new Set();
-
-    Object.keys( pagesDoc ).forEach( name => {
-
-        const class_ = T[name];
-
-        if ( typeof class_ != 'function' ) {
-
-            return;
-
-        }
-
-        try {
-
-            const object = new class_();
-            const page = pagesDoc[ name ];
-            const method = [];
-            const methodLow = [];
-            const property = [];
-            const propertyLow = [];
-
-            for ( let member in object ) {
-
-                if ( member[0] == '_' ) {
-
-                    continue;
-
-                }
-
-                if ( typeof member == 'function' ) {
-
-                    method.push( member );
-                    methodLow.push( member.toLowerCase() );
-
-                } else {
-
-                    property.push( member );
-                    propertyLow.push( member.toLowerCase() );
-
-                }
-
-            }
-
-            if ( method.length ) {
-
-                page.method = method.join( ' ' );
-                page.methodLow = methodLow.join( ' ' );
-
-            }
-
-            if ( property.length ) {
-
-                page.property = property.join( ' ' );
-                page.propertyLow = propertyLow.join( ' ' );
-
-            }
-
-            // console.log(name, page, methods, properties);
-
-        } catch (e) {
-
-            errors.add( name );
-
-        }
-
-    } );
-
-    // those classes have required arguments ...
-
-    if ( errors.size ) {
-
-        console.log( 'ERRORS:', [ ...errors ].sort() );
-
-    }
-
-    readyThree = true;
-    console.log(performance.now() - now);
 }
 
 /**
@@ -535,15 +498,15 @@ function showHide( node, show, class_='hide' ) {
 
 }
 
-function updateFilter() {
+function updateFilter( force ) {
 
     if ( currentSection == 'docs' ) {
 
-        updateFilterDoc();
+        updateFilterDoc( force );
 
     } else {
 
-        updateFilterEx();
+        updateFilterEx( force );
 
     }
 
@@ -622,8 +585,7 @@ async function initDoc() {
 
     }
 
-    // listDoc = await ( await fetch( '../docs/list.json' ) ).json();
-    listDoc = await ( await fetch( '../files/docs.json' ) ).json();
+    listDoc = await ( await fetch( autoParse ? '../docs/list.json' :  '../files/docs.json' ) ).json();
 
     // *BufferGeometry to *Geometry
 
@@ -693,7 +655,7 @@ async function initDoc() {
     createNavigationDoc();
 
     readyDoc = true;
-    parseThree();
+    parseTHREE();
     return true;
 }
 
@@ -724,7 +686,7 @@ function createNavigationDoc() {
 
         },
 
-        pageAfter: ( _section, _category, pageName, url, page ) => {
+        pageAfter: ( _section, _category, pageName, url, page, args ) => {
 
             // Gather data for the current subpage
 
@@ -733,9 +695,15 @@ function createNavigationDoc() {
                 text: pageName.toLowerCase(),
             };
 
-            if ( typeof page == 'object' ) {
+            const dico = pagesDoc[ pageName ];
 
-                const dico = pagesDoc[ pageName ];
+            if ( args ) {
+
+                dico.args = args;
+
+            }
+
+            if ( typeof page == 'object' ) {
 
                 if ( page.property ) {
 
@@ -986,10 +954,27 @@ function parseDoc( list, language, {
 
                 // Construct the URL
 
-                const page = pages[ pageName ];
+                let page = pages[ pageName ];
                 const type = typeof( page );
+                let args;
+                let url;
 
-                let url = ( type == 'object' ) ? page.url : ( ( type == 'string' ) ? page : null );
+                // arguments for the constructor
+                if ( Array.isArray( page ) ) {
+
+                    args = page;
+                    page = 1;
+
+                } else if ( type == 'object' ) {
+
+                    url = page.url;
+                    args = page.args;
+
+                } else if ( type == 'string' ) {
+
+                    url = page;
+
+                }
 
                 if ( ! url || typeof url != 'string' ) {
 
@@ -1006,7 +991,7 @@ function parseDoc( list, language, {
 
                 if ( pageAfter ) {
 
-                    pageAfter( section, category, pageName, url, page );
+                    pageAfter( section, category, pageName, url, page, args );
 
                 }
 
@@ -1030,6 +1015,96 @@ function parseDoc( list, language, {
 
     } );
 
+}
+
+function parseTHREE() {
+
+    // parse THREE classes at run time
+    // - automatically fill method + property
+    // - called when THREE is loaded and also when Doc is ready
+
+    const T = window.THREE;
+
+    if ( ! autoParse || readyThree || ! readyDoc || ! T ) {
+
+        return;
+
+    }
+
+    const now = performance.now();
+
+    Object.keys( pagesDoc ).forEach( name => {
+
+        const class_ = T[ name ];
+
+        if ( typeof class_ != 'function' ) {
+
+            return;
+
+        }
+
+        const page = pagesDoc[ name ];
+        const args = createArguments( page.args );
+        const method = new Set();
+        const property = new Set();
+
+        try {
+
+            const instance = args? new class_( ...args ) : new class_();
+            const instance2 = Object.getPrototypeOf( instance );
+
+            for ( const object of [ instance, instance2 ] ) {
+
+                Object.getOwnPropertyNames( object ).forEach( key => {
+
+                    if ( key[ 0 ] == '_' ) {
+
+                        return;
+
+                    }
+
+                    if ( typeof instance[ key ] == 'function' ) {
+
+                        method.add( key );
+
+                    } else {
+
+                        property.add( key );
+
+                    }
+
+                });
+
+            }
+
+            if ( method.size ) {
+
+                let sorts = [ ...method ].sort();
+                page.method = sorts.join( ' ' );
+                page.methodLow = sorts.map( item => item.toLowerCase() ).join( ' ' );
+
+            }
+
+            if ( property.size ) {
+
+                let sorts = [ ...property ].sort();
+                page.property = sorts.join( ' ' );
+                page.propertyLow = sorts.map( item => item.toLowerCase() ).join( ' ' );
+
+            }
+
+        } catch ( e ) {
+
+            console.log( name, e );
+
+        }
+
+    } );
+
+    readyThree = true;
+    console.log( `parsed THREE in ${performance.now() - now} ms` );
+
+    updateFilter( true );
 }
 
 function selectDoc( url, node ) {
@@ -1126,14 +1201,14 @@ function showCategoriesDoc() {
 
 }
 
-function updateFilterDoc() {
+function updateFilterDoc( force ) {
 
     // time to remove "pro" from the search (average of 5 times)
     // - original: 37.68 ms
     // - new: 6.05 ms
 
     let search = cleanSearch();
-    if ( search == lastSearchDoc ) {
+    if ( ! force && search == lastSearchDoc ) {
 
         return;
 
@@ -1428,14 +1503,14 @@ function selectEx( name ) {
 
 }
 
-function updateFilterEx() {
+function updateFilterEx( force ) {
 
     // time to remove "buffer" from the search (average of 5 times)
     // - original: 72.04 ms
     // - new: 2.82 ms
 
     let search = cleanSearch();
-    if ( search == lastSearchEx ) {
+    if ( ! force && search == lastSearchEx ) {
 
         return;
 
