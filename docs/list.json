@@ -327,11 +327,7 @@
 				"DepthTexture": 1,
 				"Texture": 1,
 				"VideoTexture": [{}]
-			},
-
-			"Misc": [
-				"Legacy"
-			]
+			}
 
 		},
 
@@ -447,6 +443,10 @@
 				"WebGLProgram": "WebGLProgram",
 				"WebGLShader": "WebGLShader",
 				"WebGLState": "WebGLState"
+			},
+
+			"Misc": {
+				"Legacy": "api/en/misc/Legacy"
 			}
 
 		}
