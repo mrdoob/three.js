@@ -195,15 +195,18 @@ function onDocumentLoad() {
 	);
 
 	// 4) [param:type text?]
-	html = html.replace( /\[param:([\w\.]+)\s?([\w\.\s]+)?\]/gi, ( _match, type, text ) => {
+	// use text=? to just show the type alone, ex: [param:Array ?] => <span class="param">Array</span>
+	html = html.replace( /\[param:([\w\.]+)\s?([\w\.\s\?]+)?\]/gi, ( _match, type, text ) => {
 
 		if ( PRIMITIVES.has( type ) ) {
 
-			return ( text || type ) + ' : ' + '<span class="param">' + type + '</span>';
+			return ( ( text == '?' ) ? '' : ( text || type ) + ' : ' )
+				+ '<span class="param">' + type + '</span>';
 
 		}
 
-		return ( text || type ) + ' : ' + '<a class="param" ' + onclick + '(\'' + type + '\')">' + type + '</a>';
+		return ( ( text == '?' ) ? '' : ( text || type ) + ' : ' )
+			+ '<a class="param" ' + onclick + '(\'' + type + '\')">' + type + '</a>';
 
 	} );
 

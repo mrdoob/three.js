@@ -22,6 +22,8 @@ const DOCS_PATH = path.join( CWD, 'docs' );
 const FILES_PATH = path.join( CWD, 'files' );
 const SRC_PATH = path.join( CWD, 'src' );
 
+const GITHUB = 'https://github.com/mrdoob/three.js/blob/master';
+
 // LEGACY
 /////////
 
@@ -211,11 +213,12 @@ function parseLegacy() {
  */
 function tagFreeText( objectName, text ) {
 
+	// 1)
 	// - Use matrixInv.copy( matrix ).invert(); instead.
 	// - Set Material.shadowSide instead.
 	// - Use new THREE.Float32BufferAttribute() instead.
 
-	return text.replace( /\s(\w+)?(\.\w+(?:\([^)]*\))?)(\.(?:\w+(?:\([^)]*\))?))?/g, ( _match, _1, _2, _3 ) => {
+	text = text.replace( /\s(\w+)?(\.\w+(?:\([^)]*\))?)(\.(?:\w+(?:\([^)]*\))?))?/g, ( _match, _1, _2, _3 ) => {
 
 		let object;
 		let objectArgs = '';
@@ -271,6 +274,19 @@ function tagFreeText( objectName, text ) {
 		return ` [page:${object || objectName}${method} ${object}${method}]${methodArgs}${third}`;
 
 	} );
+
+	// 2) tag simple types like Array, Integer
+
+	text = text.replace(
+		/\b(ArrayBuffer|TypedArray|Array|Boolean|Float|Integer|null|Number|Object|String|this)\b/g,
+		'[param:$1 ?]'
+	);
+
+	// 3) resolve /docs/...js and /examples/...js links
+
+	text = text.replace( /\/(docs|examples)\/[\w/]+\.js/g, match  => `[link:${GITHUB}${match} ${match}]` );
+
+	return text;
 
 }
 
@@ -367,7 +383,7 @@ function updateLegacy( verbose ) {
 				<h2>Source</h2>
 
 				<p>
-					[link:https://github.com/mrdoob/three.js/blob/master/src/Three.Legacy.js src/Three.Legacy.js]
+					[link:${GITHUB}/src/Three.Legacy.js src/Three.Legacy.js]
 				</p>
 			</body>
 		</html>

@@ -506,6 +506,7 @@ async function setSection( section ) {
     showHide( contentEx, ! isDoc );
     showHide( frameDoc, isDoc, 'hidden' );
     showHide( viewerEx, ! isDoc, 'hidden' );
+    showHide( nodeButton, ! isDoc );
 
     // starting page
 
