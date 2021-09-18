@@ -1,4 +1,4 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, sRGBEncoding } from '../../constants.js';
 import * as MathUtils from '../../math/MathUtils.js';
 import { createElementNS } from '../../utils.js';
 
@@ -132,7 +132,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( internalFormatName, glFormat, glType ) {
+	function getInternalFormat( internalFormatName, glFormat, glType, encoding ) {
 
 		if ( isWebGL2 === false ) return glFormat;
 
@@ -166,7 +166,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGBA32F;
 			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGBA16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGBA8;
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 
 		}
 
@@ -532,7 +532,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			glFormat = utils.convert( texture.format );
 
 		let glType = utils.convert( texture.type ),
-			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
+			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 		setTextureParameters( textureType, texture, supportsMips );
 
@@ -758,7 +758,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			supportsMips = isPowerOfTwo( image ) || isWebGL2,
 			glFormat = utils.convert( texture.format ),
 			glType = utils.convert( texture.type ),
-			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
+			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 		setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
 
@@ -857,7 +857,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const glFormat = utils.convert( texture.format );
 		const glType = utils.convert( texture.type );
-		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
+		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 		if ( textureTarget === _gl.TEXTURE_3D || textureTarget === _gl.TEXTURE_2D_ARRAY ) {
 
@@ -938,7 +938,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const glFormat = utils.convert( texture.format );
 			const glType = utils.convert( texture.type );
-			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
+			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 			if ( isMultisample ) {
 
@@ -1131,7 +1131,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					const glFormat = utils.convert( texture.format );
 					const glType = utils.convert( texture.type );
-					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
+					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 					const samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 

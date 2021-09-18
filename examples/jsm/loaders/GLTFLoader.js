@@ -2761,30 +2761,12 @@ class GLTFParser {
 
 		let sourceURI = source.uri || '';
 		let isObjectURL = false;
-		let hasAlpha = true;
-
-		const isJPEG = sourceURI.search( /\.jpe?g($|\?)/i ) > 0 || sourceURI.search( /^data\:image\/jpeg/ ) === 0;
-
-		if ( source.mimeType === 'image/jpeg' || isJPEG ) hasAlpha = false;
 
 		if ( source.bufferView !== undefined ) {
 
 			// Load binary image data from bufferView, if provided.
 
 			sourceURI = parser.getDependency( 'bufferView', source.bufferView ).then( function ( bufferView ) {
-
-				if ( source.mimeType === 'image/png' ) {
-
-					// Inspect the PNG 'IHDR' chunk to determine whether the image could have an
-					// alpha channel. This check is conservative — the image could have an alpha
-					// channel with all values == 1, and the indexed type (colorType == 3) only
-					// sometimes contains alpha.
-					//
-					// https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
-					const colorType = new DataView( bufferView, 25, 1 ).getUint8( 0, false );
-					hasAlpha = colorType === 6 || colorType === 4 || colorType === 3;
-
-				}
 
 				isObjectURL = true;
 				const blob = new Blob( [ bufferView ], { type: source.mimeType } );
@@ -2835,9 +2817,6 @@ class GLTFParser {
 			texture.flipY = false;
 
 			if ( textureDef.name ) texture.name = textureDef.name;
-
-			// When there is definitely no alpha channel in the texture, set RGBFormat to save space.
-			if ( ! hasAlpha ) texture.format = RGBFormat;
 
 			const samplers = json.samplers || {};
 			const sampler = samplers[ textureDef.sampler ] || {};
