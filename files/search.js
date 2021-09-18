@@ -758,6 +758,7 @@ function createNavigationDoc() {
             }
 
             const selected = ( url === selectedPage ) ? ' selected' : '';
+            const legacyClass = ( pageName == 'Legacy' ) ? ' legacy': '';
 
             if ( selected ) {
 
@@ -768,8 +769,8 @@ function createNavigationDoc() {
             lines.push(
                         '<li>',
                             `<a href="#${url}"${selected} data-name="${pageName}" data-url="${url}">${pageName}</a>`,
-                            '<div class="property"></div>',
-                            `<div class="method${( pageName == 'Legacy' ) ? ' legacy': ''}"></div>`,
+                            `<div class="property${legacyClass}"></div>`,
+                            `<div class="method${legacyClass}"></div>`,
                         '</li>',
             );
 
@@ -1212,9 +1213,11 @@ function selectDoc( url, node ) {
     setTitleDoc( node.dataset.name );
 
     let localURL = `../docs/${splits[ 0 ]}.html`;
-    if ( splits[ 1 ] ) {
 
-        localURL = `${localURL}#${splits[ 1 ]}`;
+    const splitsRight = splits.slice( 1 ).join( '.' );
+    if ( splitsRight ) {
+
+        localURL = `${localURL}#${splitsRight}`;
 
     }
 
@@ -1710,8 +1713,8 @@ if ( typeof window == 'object' ) {
 
         initNodes();
 
-        const section = location.href.split( '/').includes( 'examples' ) ? 'examples' : 'docs';
-        hashChanged(section);
+        const section = location.href.split( '/' ).includes( 'examples' ) ? 'examples' : 'docs';
+        hashChanged( section );
 
         setGlobalEvents();
         welcomeThree();

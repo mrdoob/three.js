@@ -108,7 +108,7 @@ function parseLegacy() {
 	for ( let match of data.matchAll(
 			/export function (\w+)|(\w+)\.prototype\b|\n(\w+)\.\w+ = function|export const (\w+)/g ) ) {
 
-		objects.push( [ match.index, match[ 1 ] || match[ 2 ] || match[ 3 ] || match[4] ] );
+		objects.push( [ match.index, match[ 1 ] || match[ 2 ] || match[ 3 ] || match[ 4 ] ] );
 		objCount ++;
 
 	}
@@ -140,7 +140,7 @@ function parseLegacy() {
 
 		// assemble the string from multiple parts
 
-		const result = assembleString(text, objectName);
+		const result = assembleString( text, objectName );
 
 		// guess main object + main method/property
 		// - THREE.Curve.create() has been deprecated
@@ -255,7 +255,6 @@ function updateLegacy( verbose ) {
 		let [ object, method, args, text ] = result;
 
 		const hash = ( object + method + text ).replace( / /g, '' );
-
 		if ( hashes.has( hash ) ) {
 
 			continue;
@@ -304,7 +303,7 @@ function updateLegacy( verbose ) {
 		</html>
 	`.split( '\n' ).map( item => item.slice( 2 ) ).join( '\n' );
 
-	lines.push(footer);
+	lines.push( footer );
 
 	fs.writeFileSync( path.join( DOCS_PATH, 'api/en/extras/Legacy.html' ), lines.join( '\n' ) );
 
