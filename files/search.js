@@ -4,7 +4,8 @@
 
 /*
 globals
-console, document, exports, fetch, getComputedStyle, location, navigator, performance, THREE, window
+clearTimeout, console, document, exports, fetch, getComputedStyle, location, navigator, performance,
+setTimeout, THREE, window
 */
 
 'use strict';
@@ -463,6 +464,13 @@ function setGlobalEvents() {
 
     filterInput.oninput = () => {
 
+        if ( currentSection == 'docs' ) {
+
+            // type something in docs => close the 3d frame
+            closeIFrameEx();
+
+        }
+
         updateFilter();
 
     };
@@ -516,6 +524,8 @@ async function setSection( section ) {
 
     }
 
+    clearTimeoutEx();
+
     if ( isDoc ) {
 
         document.title = titleDoc;
@@ -523,8 +533,8 @@ async function setSection( section ) {
         nodeSectionDoc.classList.add( 'selected' );
         nodeSectionEx.classList.remove( 'selected' );
 
-        // completely stop the 3d frame to save CPU/GPU
-        updateIFrame( viewerEx, '' );
+        // close the 3d frame within 30 sec
+        timerHideEx = setTimeout( closeIFrameEx, 30000 );
 
         await initDoc();
 
@@ -599,7 +609,6 @@ function updateIFrame( iframe, src ) {
                 iFrameIsReady( src );
 
             }
-
             return;
 
         }
@@ -925,6 +934,9 @@ function iFrameIsReady( href ) {
     showHide( frameDoc, true, 'hidden' );
     showHide( frameDoc2, false, 'hidden' );
     frameDoc.dataset.ready = '1';
+
+    // scroll => close the 3d frame directly
+    frameDoc.contentWindow.onscroll = closeIFrameEx;
 
 }
 
@@ -1490,6 +1502,7 @@ let readyEx;
 let sectionFiles = {};
 // let sectionsEx = [];
 let selectedEx = null;
+let timerHideEx = null;
 
 async function initEx() {
 
@@ -1535,6 +1548,34 @@ async function initEx() {
 function cleanName( name ) {
 
     return name.split( '_' ).slice( 1 ).join( ' / ' );
+
+}
+
+function clearTimeoutEx() {
+
+    if ( timerHideEx != null ) {
+
+        clearTimeout( timerHideEx );
+        timerHideEx = null;
+
+    }
+
+}
+
+function closeIFrameEx() {
+
+    // Close the 3d frame to save CPU/GPU resources
+
+    clearTimeoutEx();
+
+    if ( viewerEx.getAttribute( 'src' ) ) {
+
+        iframes.removeChild( viewerEx );
+        viewerEx.dataset.ready = '0';
+        viewerEx.src = '';
+        iframes.appendChild( viewerEx );
+
+    }
 
 }
 
