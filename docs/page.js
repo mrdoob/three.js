@@ -1,20 +1,24 @@
 /*
 globals
-document, prettyPrint, window
+document, location, prettyPrint, window
 */
 'use strict';
 
-if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
+let documentReady;
+let prettyDone;
+let prettyLoaded;
+
+if ( ! window.frameElement && location.protocol !== 'file:' ) {
 
 	// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
 	// redirect to the index page (using the current URL without extension as the new fragment).
 	// If this URL itself has a fragment, append it with a dot (since '#' in an URL fragment is not allowed).
 
-	let href = window.location.href;
+	let href = location.href;
 	const splitIndex = href.lastIndexOf( '/docs/' ) + 6;
 	const docsBaseURL = href.substr( 0, splitIndex );
 
-	let hash = window.location.hash;
+	let hash = location.hash;
 
 	if ( hash !== '' ) {
 
@@ -27,73 +31,209 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 	const end = ( extension === 'html' ) ? - 5 : href.length;
 	const pathSnippet = href.slice( splitIndex, end );
 
-	window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
+	location.replace( docsBaseURL + '#' + pathSnippet + hash );
 
 }
 
+function loadPrettify() {
+
+	// Load syntax highlighter directly
+	// This saves a few ms
+
+	const pathname = location.pathname;
+	const prettifyBase = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify';
+
+	const styleBase = document.createElement( 'link' );
+	styleBase.href = prettifyBase + '/prettify.css';
+	styleBase.rel = 'stylesheet';
+
+	const styleCustom = document.createElement( 'link' );
+	styleCustom.href = prettifyBase + '/threejs.css';
+	styleCustom.rel = 'stylesheet';
+
+	const prettify = document.createElement( 'script' );
+	prettify.src = prettifyBase + '/prettify.js';
+
+	prettify.onload = () => {
+
+		// try to prettify the document (might have to wait for the document to be ready)
+
+		prettyLoaded = true;
+		prettifyDocument();
+
+	};
+
+	document.head.appendChild( styleBase );
+	document.head.appendChild( styleCustom );
+	document.head.appendChild( prettify );
+
+}
+
+function prettifyDocument() {
+
+	if ( prettyDone || ! documentReady || ! prettyLoaded ) {
+
+		return;
+
+	}
+
+	for ( const element of document.getElementsByTagName( 'code' ) ) {
+
+		element.classList.add( 'prettyprint' );
+		element.setAttribute( 'translate', 'no' );
+
+	}
+
+	prettyPrint();
+	prettyDone = true;
+
+}
 
 function onDocumentLoad() {
 
+	loadPrettify();
+
 	let path, localizedPath;
-	const pathname = window.location.pathname;
-	const section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
-	let name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
+	const pathname = location.pathname;
+	const section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].split( '.html' )[ 0 ];
+	let pageName = pathname.split( '/' ).pop().split( '.' )[ 0 ];
 
 	switch ( section ) {
 
 		case 'api':
-			localizedPath = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			localizedPath = /\/api\/([\w\/]+)/.exec( '/api/en/extras/Legacy.html' )[ 1 ];
 
 			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
-			path = localizedPath.replace( /^[A-z0-9-]+\//, '' );
-
+			path = localizedPath.replace( /^[\w-]+\//, '' );
 			break;
 
 		case 'examples':
-			path = localizedPath = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+			path = localizedPath = /\/examples\/([\w\/]+)/.exec( pathname )[ 1 ];
 			break;
 
 		case 'manual':
-			name = name.replace( /\-/g, ' ' );
-
+			pageName = pageName.replace( /\-/g, ' ' );
 			path = pathname.replace( /\ /g, '-' );
-			path = localizedPath = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
+			path = localizedPath = /\/manual\/([-\w\/]+)/.exec( path )[ 1 ];
 			break;
 
 	}
 
-	let text = document.body.innerHTML;
+	// Replace entities with RegExp
+	//
+	// benchmark of 1 iteration (averaged of 50k) on Vector3.html
+	// - old code: 21682.9 / 50k = 0.4337 sec
+	// - new code: 14844.2 / 50k = 0.2969 sec
+	// => 1.46x faster + saves 0.137 sec on loading time ... why not? :)
 
-	text = text.replace( /\[name\]/gi, name );
-	text = text.replace( /\[path\]/gi, path );
-	text = text.replace( /\[page:([\w\.]+)\]/gi, '[page:$1 $1]' ); // [page:name] to [page:name title]
-	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, '[page:' + name + '.$1 $2]' ); // [page:.member title] to [page:name.member title]
-	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, '<a onclick="window.parent.setUrlFragment(\'$1\')" title="$1">$2</a>' ); // [page:name title]
-	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
+	const PRIMITIVES = new Set( [
+		'Array',
+		'ArrayBuffer',
+		'Boolean',
+		'Float',
+		'Integer',
+		'null',
+		'Number',
+		'Object',
+		'String',
+		'this',
+		'TypedArray',
+	] );
 
-	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, '[$1:$2 $2]' ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, '<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" target="_parent" title="' + name + '.$2" class="permalink">#</a> .<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" id="$2">$2</a> $3 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' );
-	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' ); // [param:name title]
+	const onclick = 'onclick="window.parent.setUrlFragment';
+	let html = document.body.innerHTML;
 
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+)\]/gi, '<a href="$1"  target="_blank">$1</a>' ); // [link:url]
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+) ([\w|\:|\/|\.|\-|\_|\'|\s]+)\]/gi, '<a href="$1"  target="_blank">$2</a>' ); // [link:url title]
-	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, '<strong>$1</strong>' ); // *
+	// 1) replace single entities
+	// - quicker to do one complex replace than multiple simple replaces
 
-	text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
-	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../examples/#$1"  target="_blank">$2</a>' ); // [example:name title]
+	const replaces = {
+		name: pageName,
+		path: path,
+	};
 
-	text = text.replace( /<a class="param" onclick="window.parent.setUrlFragment\('\w+'\)">(null|this|Boolean|Object|Array|Number|String|Integer|Float|TypedArray|ArrayBuffer)<\/a>/gi, '<span class="param">$1</span>' ); // remove links to primitive types
+	html = html.replace( /\[(name|path)\]/gi, ( _match, _1 ) => replaces[ _1 ] );
 
-	document.body.innerHTML = text;
+	// 2) [page:value text?]
+	// - value: Class or .member or Class.member
+
+	html = html.replace( /\[page:([\w\.]+)\s?([\w\.\s]+)?\]/gi, ( _match, value, text ) => {
+
+		const classType = ( value[ 0 ] == '.' ) ? pageName + value : value;
+		return '<a ' + onclick + '(\'' + classType + '\')" title="' + classType + '">' + ( text || value ) + '</a>';
+
+	} );
+
+	// 3) [member|property|method:type name?]
+	// - type: type or Class
+	// - name: name or .member or Class.member (new feature needed for Legacy)
+
+	html = html.replace( /\[(?:member|property|method):([\w]+)\s?([A-Z]\w+\.)?([\w\.\s]+)?\]\s*(\(.*\))?/gi,
+
+		( _match, rtype, class_, method, param ) => {
+
+			method = method || rtype;
+			const full = ( class_ || '' ) + method;
+			const link = '<a ' + onclick + '(\'' + pageName + '.' + full + '\')"';
+
+			let text = link + ' target="_parent" title="' + pageName + '.' + full + '" class="permalink">#</a>'
+				+ '.' + link + ' id="' + full + '">' + method + '</a> ' + ( param || '' ) + ' : ';
+
+			if ( PRIMITIVES.has( rtype ) ) {
+
+				text += '<span class="param">' + rtype + '</span>';
+
+			} else {
+
+				text += '<a class="param" ' + onclick + '(\''+ rtype + '\')">' + rtype + '</a>';
+
+			}
+
+			return text;
+		}
+
+	);
+
+	// 4) [param:type text?]
+	html = html.replace( /\[param:([\w\.]+)\s?([\w\.\s]+)?\]/gi, ( _match, type, text ) => {
+
+		if ( PRIMITIVES.has( type ) ) {
+
+			return ( text || type ) + ' : ' + '<span class="param">' + type + '</span>';
+
+		}
+
+		return ( text || type ) + ' : ' + '<a class="param" ' + onclick + '(\'' + type + '\')">' + type + '</a>';
+
+	} );
+
+	// 5) [link:url text?]
+	html = html.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+)\s?([\w|\:|\/|\.|\-|\_|\'|\s]+)?\]/gi,
+
+		( _match, url, text ) => {
+
+			return '<a href="' + url + '" target="_blank">' + ( text || url ) + '</a>';
+
+		}
+	);
+
+	// 6) *
+	html = html.replace(
+		/\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, '<strong>$1</strong>' );
+
+	// 7) [example:link text?]
+	html = html.replace( /\[example:([\w\_]+)\s?([\w\:\/\.\-\_ \s]+)?\]/gi, ( _match, link, text ) => {
+
+		return '<a href="../examples/#' + link + '" target="_blank">' + ( text || link ) + '</a>';
+
+	} );
+
+	document.body.innerHTML = html;
 
 	// handle code snippets formatting
 
 	for ( const element of document.getElementsByTagName( 'code' ) ) {
 
-		text = element.textContent.trim();
-		text = text.replace( /^\t\t/gm, '' );
-
-		element.textContent = text;
+		element.textContent = element.textContent.trim().replace( /^\t\t/gm, '' );
 
 	}
 
@@ -110,40 +250,18 @@ function onDocumentLoad() {
 
 	document.body.appendChild( button );
 
-	// Syntax highlighting
+	// try to prettify the document (might have to wait for prettify.js to be loaded)
 
-	const styleBase = document.createElement( 'link' );
-	styleBase.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.css';
-	styleBase.rel = 'stylesheet';
-
-	const styleCustom = document.createElement( 'link' );
-	styleCustom.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/threejs.css';
-	styleCustom.rel = 'stylesheet';
-
-	document.head.appendChild( styleBase );
-	document.head.appendChild( styleCustom );
-
-	const prettify = document.createElement( 'script' );
-	prettify.src = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.js';
-
-	prettify.onload = () => {
-
-		for ( const element of document.getElementsByTagName( 'code' ) ) {
-
-			element.classList.add('prettyprint');
-			element.setAttribute( 'translate', 'no' );
-
-		}
-
-		prettyPrint();
-
-	};
-
-	document.head.appendChild( prettify );
+	documentReady = true;
+	prettifyDocument();
 
 	// inform the parent that we're done
 
-	window.parent.iFrameIsReady( window.location.href );
+	if ( window.parent.iFrameIsReady ) {
+
+		window.parent.iFrameIsReady( location.href );
+
+	}
 
 }
 
