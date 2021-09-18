@@ -505,7 +505,7 @@ async function setSection( section ) {
     showHide( contentDoc, isDoc );
     showHide( contentEx, ! isDoc );
     showHide( frameDoc, isDoc, 'hidden' );
-    showHide( viewerEx, ! isDoc, 'hidden' );
+    showHide( viewerEx, ! isDoc );
     showHide( nodeButton, ! isDoc );
 
     // starting page
@@ -522,6 +522,9 @@ async function setSection( section ) {
 
         nodeSectionDoc.classList.add( 'selected' );
         nodeSectionEx.classList.remove( 'selected' );
+
+        // completely stop the 3d frame to save CPU/GPU
+        updateIFrame( viewerEx, '' );
 
         await initDoc();
 
