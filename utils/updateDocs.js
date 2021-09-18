@@ -63,7 +63,7 @@ function assembleString( text, type ) {
 
 				if ( segment.includes( 'this.type' ) ) {
 
-					result += '*' + type;
+					result += type;
 
 				}
 
@@ -137,10 +137,11 @@ function parseLegacy() {
 		let error = '';
 		let method = '';
 		let args = '';
+		let type = '';
 
 		// assemble the string from multiple parts
 
-		const result = assembleString( text, objectName );
+		let result = assembleString( text, objectName );
 
 		// guess main object + main method/property
 		// - THREE.Curve.create() has been deprecated
@@ -153,7 +154,7 @@ function parseLegacy() {
 		// - THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.
 
 		const match = result.match(
-				/THREE\.(?<class>\w+)(?<method>\.\w+(?:\(.*?\))?)?(?:: (?<method2>\.\w+(?:\(.*?\))?))?/ );
+				/THREE\.(\w+)(\.\w+(?:\([^)]*\))?)?(?:: ([.A-Z]\w+(?:\([^)]*\))?)(\.\w+(?:\([^)]*\))?)?)?/ );
 
 		if ( ! match ) {
 
@@ -161,28 +162,25 @@ function parseLegacy() {
 
 		} else {
 
-			const groups = match.groups;
-			const className = groups.class;
-			method = groups.method || groups.method2 || '';
-
-			if ( className != objectName ) {
-
-				error = className;
-				objectName = className;
-
-			}
+			// const groups = match.groups;
+			const className = match[ 1 ];
+			method = match[ 2 ] || ( ( match[ 3 ] || '' ) + ( match[ 4 ] || '' ) );
 
 			const pos = method.indexOf( '(' );
 			if ( pos >= 0 ) {
 
-				args = '()';
+				const pos2 = method.indexOf( ')' );
+				args = method.slice( pos, pos2 + 1 );
 				method = method.slice( 0, pos );
 
 			}
 
+			type = method ? ( args ? 'method' : 'property' ) : 'class';
+			result = 'The ' + type + tagFreeText( objectName, result.slice( match[ 0 ].length ) );
+
 		}
 
-		results.push( [ objectName, method, args, result ] );
+		results.push( [ objectName, method, args, type, result ] );
 
 		if ( verbose || error ) {
 
@@ -208,9 +206,71 @@ function parseLegacy() {
 
 }
 
-function tagText( text ) {
+/**
+ * Add [tagging] to the free text
+ */
+function tagFreeText( objectName, text ) {
 
-	return text;
+	// - Use matrixInv.copy( matrix ).invert(); instead.
+	// - Set Material.shadowSide instead.
+	// - Use new THREE.Float32BufferAttribute() instead.
+
+	return text.replace( /\s(\w+)?(\.\w+(?:\([^)]*\))?)(\.(?:\w+(?:\([^)]*\))?))?/g, ( _match, _1, _2, _3 ) => {
+
+		let object;
+		let objectArgs = '';
+		let method;
+		let methodArgs = '';
+		let third;
+
+		if ( _1 == 'THREE' ) {
+
+			object = _2.slice( 1 );
+			method = _3 || '';
+			third = '';
+
+		} else {
+
+			object = _1 || '';
+			method = _2 || '';
+			third = _3 || '';
+
+		}
+
+		let pos = object.indexOf( '(' );
+		if ( pos >= 0 ) {
+
+			const pos2 = object.indexOf( ')' );
+			objectArgs = object.slice( pos, pos2 + 1 );
+			object = object.slice( 0, pos );
+
+		}
+
+		pos = method.indexOf( '(' );
+		if ( pos >= 0 ) {
+
+			const pos2 = method.indexOf( ')' );
+			methodArgs = method.slice( pos, pos2 + 1 );
+			method = method.slice( 0, pos );
+
+		}
+
+		// - Use new THREE.BufferAttribute().setUsage( THREE.DynamicDrawUsage ) instead.
+		// => [page:BufferAttribute BufferAttribute()]
+		//	 	.[page:BufferAttribute.setUsage .setUsage]( THREE.DynamicDrawUsage )
+		//
+		// - Use new THREE.CameraHelper( light.shadow.camera ) instead.
+
+		if ( objectArgs ) {
+
+			return ` [page:${object || objectName} ${object}]${objectArgs}`
+				+ ( method ? `[page:${object || objectName}${method} ${method}]${methodArgs}${third}` : third );
+
+		}
+
+		return ` [page:${object || objectName}${method} ${object}${method}]${methodArgs}${third}`;
+
+	} );
 
 }
 
@@ -234,7 +294,7 @@ function updateLegacy( verbose ) {
 				<h1>[name]</h1>
 
 				<p class="desc">
-				Legacy methods.
+				Legacy classes, properties and methods.
 				</p>
 	`.split( '\n' ).slice( 1, -1 ).map( item => item.slice( 2 ) ).join( '\n' );
 
@@ -245,14 +305,13 @@ function updateLegacy( verbose ) {
 	const results = parseLegacy( verbose );
 
 	const hashes = new Set();
-	let count = 0;
 	let prevClass;
 
 	for ( let result of results ) {
 
 		// keep unique items
 
-		let [ object, method, args, text ] = result;
+		let [ object, method, args, type, text ] = result;
 
 		const hash = ( object + method + text ).replace( / /g, '' );
 		if ( hashes.has( hash ) ) {
@@ -266,28 +325,39 @@ function updateLegacy( verbose ) {
 		// add data
 		// <h3>[method:String Loader.extractUrlBase]( [param:String url] )</h3>
 
-		const type = args ? 'method' : 'property';
-		const methodData = `[${type}:Any ${object}${method || ''}]${args}`;
-
 		if ( object != prevClass ) {
 
-			lines.push( `\n\t\t<h2>${object}</h2>\n` );
+			if ( type != 'class' ) {
+
+				lines.push(
+					`\n\t\t<h2>${object}</h2>\n`,
+					`\t\t<p>See the [page:${object} class].</p>\n`,
+				);
+
+			} else {
+
+				lines.push( `\n\t\t<h2 id="${object}">${object}</h2>\n` );
+
+			}
+
 			prevClass = object;
 
 		}
 
-		const data = [
-			'<h3>' + methodData + '</h3>',
-			'<p>',
-		];
+		const data = [];
 
+		if ( type != 'class' ) {
+
+			const methodData = `[${type}:Any ${object}${method || ''}]${args}`;
+			data.push( '<h3>' + methodData + '</h3>' );
+
+		}
+
+		data.push( '<p>\n' );
 		data.push( ...text.replace( /\. /g, '.<br>\n' ).split( '\n' ) );
 		data.push( '</p>\n' );
 
 		lines.push( data.map( item => '\t\t' + item ).join( '\n' ) );
-
-		// console.log( count, result );
-		count ++;
 
 	}
 
@@ -305,7 +375,7 @@ function updateLegacy( verbose ) {
 
 	lines.push( footer );
 
-	fs.writeFileSync( path.join( DOCS_PATH, 'api/en/extras/Legacy.html' ), lines.join( '\n' ) );
+	fs.writeFileSync( path.join( DOCS_PATH, 'api/en/misc/Legacy.html' ), lines.join( '\n' ) );
 
 }
 
@@ -345,9 +415,17 @@ function parseSource( pagePath, pageName, onlyCheck ) {
 		property: [],
 	};
 
-	for ( let prop of data.matchAll( /\[\s*(method|property):\w*\s([\w.]*\s*)\]/gi ) ) {
+	for ( let prop of data.matchAll( /\[\s*(method|property):\w*\s([\w.]*\s*)\]|<h2 id="(\w+)"/gi ) ) {
 
-		dico[ prop[ 1 ] ].push( prop[ 2 ] );
+		if ( prop[ 3 ] ) {
+
+			dico.property.push( prop[ 3 ] );
+
+		} else {
+
+			dico[ prop[ 1 ] ].push( prop[ 2 ] );
+
+		}
 
 	}
 

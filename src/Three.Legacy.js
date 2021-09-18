@@ -437,7 +437,7 @@ Matrix3.prototype.flattenToArrayOffset = function ( array, offset ) {
 
 Matrix3.prototype.multiplyVector3 = function ( vector ) {
 
-	console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
+	console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use Vector3.applyMatrix3( matrix ) instead.' );
 	return vector.applyMatrix3( this );
 
 };
@@ -506,14 +506,14 @@ Matrix4.prototype.multiplyToArray = function () {
 
 Matrix4.prototype.multiplyVector3 = function ( vector ) {
 
-	console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+	console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use Vector3.applyMatrix4( matrix ) instead.' );
 	return vector.applyMatrix4( this );
 
 };
 
 Matrix4.prototype.multiplyVector4 = function ( vector ) {
 
-	console.warn( 'THREE.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+	console.warn( 'THREE.Matrix4: .multiplyVector4() has been removed. Use Vector4.applyMatrix4( matrix ) instead.' );
 	return vector.applyMatrix4( this );
 
 };
@@ -533,7 +533,7 @@ Matrix4.prototype.rotateAxis = function ( v ) {
 
 Matrix4.prototype.crossVector = function ( vector ) {
 
-	console.warn( 'THREE.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+	console.warn( 'THREE.Matrix4: .crossVector() has been removed. Use Vector3.applyMatrix4( matrix ) instead.' );
 	return vector.applyMatrix4( this );
 
 };
@@ -608,7 +608,7 @@ Plane.prototype.isIntersectionLine = function ( line ) {
 
 Quaternion.prototype.multiplyVector3 = function ( vector ) {
 
-	console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+	console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now Vector3.applyQuaternion( quaternion ) instead.' );
 	return vector.applyQuaternion( this );
 
 };

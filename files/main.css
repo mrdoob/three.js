@@ -7,6 +7,7 @@
 	--color-blue: #049EF4;
 	--text-color: #444;
 	--secondary-text-color: #9e9e9e;
+	--legacy-color: #777;
 
 	--font-size: 16px;
 	--line-height: 26px;
@@ -25,6 +26,7 @@
 
 		--text-color: #bbb;
 		--secondary-text-color: #666;
+		--legacy-color: #888;
 
 		--border-style: 1px solid #444;
 	}
@@ -560,8 +562,8 @@ iframe {
 	display: none;
 }
 
-a.legacy {
-	color: var(--secondary-text-color);
+.legacy a {
+	color: var(--legacy-color);
 }
 
 /* mobile */

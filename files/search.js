@@ -265,7 +265,7 @@ function highlightTokens( name, lower, regExp, searchLow, mainUrl, checkLegacy )
 
             if ( legacyMethods.has( classMethod ) ) {
 
-                const url = 'api/en/extras/Legacy.' + classMethod;
+                const url = 'api/en/misc/Legacy.' + classMethod;
                 lines.push( `<a class="legacy" href="#${url}" data-url="${url}">${text}</a>` );
                 continue;
 
@@ -600,9 +600,9 @@ function welcomeThree() {
 
 const categoriesDoc = [];
 let lastSearchDoc;
-let legacyMethods = new Set([
+let legacyMethods = new Set( [
     'Loader.extractUrlBase',
-]);
+] );
 let listDoc;
 const pagesDoc = {};
 const sectionsDoc = [];
@@ -1250,10 +1250,11 @@ function setUrlFragment( pageName ) {
     if ( page ) {
 
         let url = page.url;
+        const splitsRight = splits.slice( 1 ).join( '.' );
 
-        if ( splits[ 1 ]) {
+        if ( splitsRight ) {
 
-            url += '.' + splits[ 1 ];
+            url += '.' + splitsRight;
 
         }
 

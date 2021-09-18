@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../">
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css">
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Legacy classes, properties and methods.
+		</p>
+
+		<h2>Audio</h2>
+
+		<p>See the [page:Audio class].</p>
+
+		<h3>[property:Any Audio.load]</h3>
+		<p>
+
+		The property has been deprecated.<br>
+		Use [page:AudioLoader AudioLoader] instead.
+		</p>
+
+
+		<h2>AudioAnalyser</h2>
+
+		<p>See the [page:AudioAnalyser class].</p>
+
+		<h3>[method:Any AudioAnalyser.getData]()</h3>
+		<p>
+
+		The method is now [page:AudioAnalyser.getFrequencyData .getFrequencyData]().
+		</p>
+
+
+		<h2 id="AxisHelper">AxisHelper</h2>
+
+		<p>
+
+		The class has been renamed to [page:AxesHelper AxesHelper].
+		</p>
+
+
+		<h2 id="BinaryTextureLoader">BinaryTextureLoader</h2>
+
+		<p>
+
+		The class has been renamed to [page:DataTextureLoader DataTextureLoader].
+		</p>
+
+
+		<h2 id="BoundingBoxHelper">BoundingBoxHelper</h2>
+
+		<p>
+
+		The class has been deprecated.<br>
+		Creating a [page:BoxHelper BoxHelper] instead.
+		</p>
+
+
+		<h2>Box2</h2>
+
+		<p>See the [page:Box2 class].</p>
+
+		<h3>[method:Any Box2.center]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box2.getCenter .getCenter]().
+		</p>
+
+		<h3>[method:Any Box2.empty]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box2.isEmpty .isEmpty]().
+		</p>
+
+		<h3>[method:Any Box2.isIntersectionBox]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box2.intersectsBox .intersectsBox]().
+		</p>
+
+		<h3>[method:Any Box2.size]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box2.getSize .getSize]().
+		</p>
+
+
+		<h2>Box3</h2>
+
+		<p>See the [page:Box3 class].</p>
+
+		<h3>[method:Any Box3.center]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box3.getCenter .getCenter]().
+		</p>
+
+		<h3>[method:Any Box3.empty]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box3.isEmpty .isEmpty]().
+		</p>
+
+		<h3>[method:Any Box3.isIntersectionBox]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box3.intersectsBox .intersectsBox]().
+		</p>
+
+		<h3>[method:Any Box3.isIntersectionSphere]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box3.intersectsSphere .intersectsSphere]().
+		</p>
+
+		<h3>[method:Any Box3.size]()</h3>
+		<p>
+
+		The method has been renamed to [page:Box3.getSize .getSize]().
+		</p>
+
+
+		<h2>BufferAttribute</h2>
+
+		<p>See the [page:BufferAttribute class].</p>
+
+		<h3>[method:Any BufferAttribute.copyIndicesArray]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[property:Any BufferAttribute.dynamic]</h3>
+		<p>
+
+		The property has been deprecated.<br>
+		Use [page:BufferAttribute.usage .usage] instead.
+		</p>
+
+		<h3>[property:Any BufferAttribute.length]</h3>
+		<p>
+
+		The property has been deprecated.<br>
+		Use [page:BufferAttribute.count .count] instead.
+		</p>
+
+		<h3>[property:Any BufferAttribute.setArray]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use BufferGeometry [page:BufferAttribute.setAttribute .setAttribute] to replace/resize attribute buffers
+		</p>
+
+		<h3>[method:Any BufferAttribute.setDynamic]()</h3>
+		<p>
+
+		The method has been deprecated.<br>
+		Use [page:BufferAttribute.setUsage .setUsage]() instead.
+		</p>
+
+
+		<h2>BufferGeometry</h2>
+
+		<p>See the [page:BufferGeometry class].</p>
+
+		<h3>[method:Any BufferGeometry.addAttribute]()</h3>
+		<p>
+
+		The method has been renamed to [page:BufferGeometry.setAttribute .setAttribute]().
+		</p>
+
+		<h3>[method:Any BufferGeometry.addAttribute]()</h3>
+		<p>
+
+		The method now expects ( name, attribute ).
+		</p>
+
+		<h3>[property:Any BufferGeometry.addAttribute]</h3>
+		<p>
+
+		The property [page:BufferGeometry.setIndex .setIndex]() for index attribute.
+		</p>
+
+		<h3>[method:Any BufferGeometry.addDrawCall]()</h3>
+		<p>
+
+		The method no longer supports indexOffset.
+		</p>
+
+		<h3>[method:Any BufferGeometry.addDrawCall]()</h3>
+		<p>
+
+		The method is now [page:BufferGeometry.addGroup .addGroup]().
+		</p>
+
+		<h3>[method:Any BufferGeometry.addIndex]()</h3>
+		<p>
+
+		The method has been renamed to [page:BufferGeometry.setIndex .setIndex]().
+		</p>
+
+		<h3>[method:Any BufferGeometry.applyMatrix]()</h3>
+		<p>
+
+		The method has been renamed to [page:BufferGeometry.applyMatrix4 .applyMatrix4]().
+		</p>
+
+		<h3>[method:Any BufferGeometry.clearDrawCalls]()</h3>
+		<p>
+
+		The method is now [page:BufferGeometry.clearGroups .clearGroups]().
+		</p>
+
+		<h3>[method:Any BufferGeometry.computeOffsets]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[property:Any BufferGeometry.drawcalls]</h3>
+		<p>
+
+		The property has been renamed to [page:BufferGeometry.groups .groups].
+		</p>
+
+		<h3>[property:Any BufferGeometry.offsets]</h3>
+		<p>
+
+		The property has been renamed to [page:BufferGeometry.groups .groups].
+		</p>
+
+		<h3>[method:Any BufferGeometry.removeAttribute]()</h3>
+		<p>
+
+		The method has been renamed to [page:BufferGeometry.deleteAttribute .deleteAttribute]().
+		</p>
+
+
+		<h2 id="CanvasRenderer">CanvasRenderer</h2>
+
+		<p>
+
+		The class has been removed
+		</p>
+
+
+		<h2>CubeCamera</h2>
+
+		<p>See the [page:CubeCamera class].</p>
+
+		<h3>[method:Any CubeCamera.clear]()</h3>
+		<p>
+
+		The method is now [page:CubeCamera.renderTarget .renderTarget].clear().
+		</p>
+
+		<h3>[method:Any CubeCamera.updateCubeMap]()</h3>
+		<p>
+
+		The method is now [page:CubeCamera.update .update]().
+		</p>
+
+
+		<h2>Curve</h2>
+
+		<p>See the [page:Curve class].</p>
+
+		<h3>[method:Any Curve.create]()</h3>
+		<p>
+
+		The method has been deprecated
+		</p>
+
+
+		<h2 id="DynamicBufferAttribute">DynamicBufferAttribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:BufferAttribute BufferAttribute]()[page:BufferAttribute.setUsage .setUsage]( THREE.DynamicDrawUsage ) instead.
+		</p>
+
+
+		<h2 id="EdgesHelper">EdgesHelper</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use [page:EdgesGeometry EdgesGeometry] instead.
+		</p>
+
+
+		<h2>ExtrudeGeometry</h2>
+
+		<p>See the [page:ExtrudeGeometry class].</p>
+
+		<h3>[method:Any ExtrudeGeometry.addShape]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any ExtrudeGeometry.addShapeList]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any ExtrudeGeometry.getArrays]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+
+		<h2 id="Float32Attribute">Float32Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Float32BufferAttribute Float32BufferAttribute]() instead.
+		</p>
+
+
+		<h2 id="Float64Attribute">Float64Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Float64BufferAttribute Float64BufferAttribute]() instead.
+		</p>
+
+
+		<h2>Frustum</h2>
+
+		<p>See the [page:Frustum class].</p>
+
+		<h3>[method:Any Frustum.setFromMatrix]()</h3>
+		<p>
+
+		The method has been renamed to [page:Frustum.setFromProjectionMatrix .setFromProjectionMatrix]().
+		</p>
+
+
+		<h2 id="GridHelper">GridHelper</h2>
+
+		<p>
+
+		The class: setColors() has been deprecated, pass them in the constructor instead.
+		</p>
+
+
+		<h2>ImageUtils</h2>
+
+		<p>See the [page:ImageUtils class].</p>
+
+		<h3>[property:Any ImageUtils.loadCompressedTexture]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use [page:DDSLoader DDSLoader] instead.
+		</p>
+
+		<h3>[property:Any ImageUtils.loadCompressedTextureCube]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use [page:DDSLoader DDSLoader] instead.
+		</p>
+
+		<h3>[property:Any ImageUtils.loadTexture]</h3>
+		<p>
+
+		The property has been deprecated.<br>
+		Use [page:TextureLoader TextureLoader]() instead.
+		</p>
+
+		<h3>[property:Any ImageUtils.loadTextureCube]</h3>
+		<p>
+
+		The property has been deprecated.<br>
+		Use [page:CubeTextureLoader CubeTextureLoader]() instead.
+		</p>
+
+
+		<h2 id="Int16Attribute">Int16Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Int16BufferAttribute Int16BufferAttribute]() instead.
+		</p>
+
+
+		<h2 id="Int32Attribute">Int32Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Int32BufferAttribute Int32BufferAttribute]() instead.
+		</p>
+
+
+		<h2 id="Int8Attribute">Int8Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Int8BufferAttribute Int8BufferAttribute]() instead.
+		</p>
+
+
+		<h2>InterleavedBuffer</h2>
+
+		<p>See the [page:InterleavedBuffer class].</p>
+
+		<h3>[property:Any InterleavedBuffer.setArray]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use BufferGeometry [page:InterleavedBuffer.setAttribute .setAttribute] to replace/resize attribute buffers
+		</p>
+
+		<h3>[method:Any InterleavedBuffer.setDynamic]()</h3>
+		<p>
+
+		The method has been deprecated.<br>
+		Use [page:InterleavedBuffer.setUsage .setUsage]() instead.
+		</p>
+
+
+		<h2 id="JSONLoader">JSONLoader</h2>
+
+		<p>
+
+		The class has been removed.
+		</p>
+
+
+		<h2 id="LensFlare">LensFlare</h2>
+
+		<p>
+
+		The class has been moved to /examples/jsm/objects/Lensflare.js
+		</p>
+
+
+		<h2>Light</h2>
+
+		<p>See the [page:Light class].</p>
+
+		<h3>[property:Any Light.onlyShadow]</h3>
+		<p>
+
+		The property has been removed.
+		</p>
+
+		<h3>[property:Any Light.shadowBias]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].bias.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraBottom]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].camera.bottom.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraFar]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].camera.far.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraFov]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].camera.fov.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraLeft]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].camera.left.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraNear]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].camera.near.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraRight]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].camera.right.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraTop]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].camera.top.
+		</p>
+
+		<h3>[property:Any Light.shadowCameraVisible]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use new [page:CameraHelper CameraHelper]( light.shadow.camera ) instead.
+		</p>
+
+		<h3>[property:Any Light.shadowDarkness]</h3>
+		<p>
+
+		The property has been removed.
+		</p>
+
+		<h3>[property:Any Light.shadowMapHeight]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].mapSize.height.
+		</p>
+
+		<h3>[property:Any Light.shadowMapWidth]</h3>
+		<p>
+
+		The property is now [page:Light.shadow .shadow].mapSize.width.
+		</p>
+
+
+		<h2>Line3</h2>
+
+		<p>See the [page:Line3 class].</p>
+
+		<h3>[method:Any Line3.center]()</h3>
+		<p>
+
+		The method has been renamed to [page:Line3.getCenter .getCenter]().
+		</p>
+
+
+		<h2>Loader</h2>
+
+		<p>See the [page:Loader class].</p>
+
+		<h3>[method:Any Loader.extractUrlBase]()</h3>
+		<p>
+
+		The method has been deprecated.<br>
+		Use [page:LoaderUtils.extractUrlBase LoaderUtils.extractUrlBase]() instead.
+		</p>
+
+		<h3>[method:Any LoaderHandlers.add]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:LoadingManager.addHandler LoadingManager.addHandler]() instead.
+		</p>
+
+		<h3>[method:Any LoaderHandlers.get]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:LoadingManager.getHandler LoadingManager.getHandler]() instead.
+		</p>
+
+
+		<h2>Material</h2>
+
+		<p>See the [page:Material class].</p>
+
+		<h3>[property:Any Material.overdraw]</h3>
+		<p>
+
+		The property has been removed.
+		</p>
+
+		<h3>[property:Any Material.shading]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use the boolean [page:Material.flatShading .flatShading] instead.
+		</p>
+
+		<h3>[property:Any Material.stencilMask]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use [page:Material.stencilFuncMask .stencilFuncMask] instead.
+		</p>
+
+		<h3>[property:Any Material.vertexTangents]</h3>
+		<p>
+
+		The property has been removed.
+		</p>
+
+		<h3>[property:Any Material.wrapAround]</h3>
+		<p>
+
+		The property has been removed.
+		</p>
+
+		<h3>[property:Any Material.wrapRGB]</h3>
+		<p>
+
+		The property has been removed.
+		</p>
+
+
+		<h2>Matrix3</h2>
+
+		<p>See the [page:Matrix3 class].</p>
+
+		<h3>[method:Any Matrix3.applyToBufferAttribute]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:attribute.applyMatrix3 attribute.applyMatrix3]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix3.applyToVector3Array]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix3.flattenToArrayOffset]()</h3>
+		<p>
+
+		The method has been deprecated.<br>
+		Use [page:Matrix3.toArray .toArray]() instead.
+		</p>
+
+		<h3>[method:Any Matrix3.getInverse]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:matrixInv.copy matrixInv.copy]( matrix ).invert(); instead.
+		</p>
+
+		<h3>[method:Any Matrix3.multiplyVector3]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Vector3.applyMatrix3 Vector3.applyMatrix3]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix3.multiplyVector3Array]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+
+		<h2>Matrix4</h2>
+
+		<p>See the [page:Matrix4 class].</p>
+
+		<h3>[method:Any Matrix4.applyToBufferAttribute]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:attribute.applyMatrix4 attribute.applyMatrix4]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix4.applyToVector3Array]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix4.crossVector]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Vector3.applyMatrix4 Vector3.applyMatrix4]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix4.extractPosition]()</h3>
+		<p>
+
+		The method has been renamed to [page:Matrix4.copyPosition .copyPosition]().
+		</p>
+
+		<h3>[method:Any Matrix4.flattenToArrayOffset]()</h3>
+		<p>
+
+		The method has been deprecated.<br>
+		Use [page:Matrix4.toArray .toArray]() instead.
+		</p>
+
+		<h3>[method:Any Matrix4.getInverse]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:matrixInv.copy matrixInv.copy]( matrix ).invert(); instead.
+		</p>
+
+		<h3>[method:Any Matrix4.getPosition]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Vector3.setFromMatrixPosition Vector3.setFromMatrixPosition]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix4.makeFrustum]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Matrix4.makePerspective .makePerspective]( left, right, top, bottom, near, far ) instead.
+		</p>
+
+		<h3>[method:Any Matrix4.multiplyToArray]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix4.multiplyVector3]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Vector3.applyMatrix4 Vector3.applyMatrix4]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix4.multiplyVector3Array]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix4.multiplyVector4]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Vector4.applyMatrix4 Vector4.applyMatrix4]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix4.rotateAxis]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Vector3.transformDirection Vector3.transformDirection]( matrix ) instead.
+		</p>
+
+		<h3>[method:Any Matrix4.rotateByAxis]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix4.rotateX]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix4.rotateY]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix4.rotateZ]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any Matrix4.setRotationFromQuaternion]()</h3>
+		<p>
+
+		The method has been renamed to [page:Matrix4.makeRotationFromQuaternion .makeRotationFromQuaternion]().
+		</p>
+
+		<h3>[method:Any Matrix4.translate]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+
+		<h2>Mesh</h2>
+
+		<p>See the [page:Mesh class].</p>
+
+		<h3>[property:Any Mesh.drawMode]</h3>
+		<p>
+
+		The property has been removed.<br>
+		The renderer now always assumes [page:TrianglesDrawMode TrianglesDrawMode].
+		</p>
+
+		<h3>[property:Any Mesh.drawMode]</h3>
+		<p>
+
+		The property has been removed.<br>
+		The renderer now always assumes [page:TrianglesDrawMode TrianglesDrawMode].<br>
+		Transform your geometry via [page:BufferGeometryUtils.toTrianglesDrawMode BufferGeometryUtils.toTrianglesDrawMode]() if necessary.
+		</p>
+
+		<h3>[method:Any Mesh.setDrawMode]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		The renderer now always assumes [page:TrianglesDrawMode TrianglesDrawMode].<br>
+		Transform your geometry via [page:BufferGeometryUtils.toTrianglesDrawMode BufferGeometryUtils.toTrianglesDrawMode]() if necessary.
+		</p>
+
+
+		<h2 id="MeshFaceMaterial">MeshFaceMaterial</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use an Array instead.
+		</p>
+
+
+		<h2 id="MultiMaterial">MultiMaterial</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use an Array instead.
+		</p>
+
+
+		<h2>Object3D</h2>
+
+		<p>See the [page:Object3D class].</p>
+
+		<h3>[method:Any Object3D.applyMatrix]()</h3>
+		<p>
+
+		The method has been renamed to [page:Object3D.applyMatrix4 .applyMatrix4]().
+		</p>
+
+		<h3>[property:Any Object3D.eulerOrder]</h3>
+		<p>
+
+		The property is now [page:Object3D.rotation .rotation].order.
+		</p>
+
+		<h3>[method:Any Object3D.getChildByName]()</h3>
+		<p>
+
+		The method has been renamed to [page:Object3D.getObjectByName .getObjectByName]().
+		</p>
+
+		<h3>[method:Any Object3D.getWorldRotation]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Object3D.getWorldQuaternion Object3D.getWorldQuaternion]( target ) instead.
+		</p>
+
+		<h3>[property:Any Object3D.renderDepth]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use [page:Object3D.renderOrder .renderOrder], instead.
+		</p>
+
+		<h3>[method:Any Object3D.translate]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Object3D.translateOnAxis .translateOnAxis]( axis, distance ) instead.
+		</p>
+
+		<h3>[property:Any Object3D.useQuaternion]</h3>
+		<p>
+
+		The property has been removed.<br>
+		The library now uses quaternions by default.
+		</p>
+
+
+		<h2 id="Particle">Particle</h2>
+
+		<p>
+
+		The class has been renamed to [page:Sprite Sprite].
+		</p>
+
+
+		<h2 id="ParticleBasicMaterial">ParticleBasicMaterial</h2>
+
+		<p>
+
+		The class has been renamed to [page:PointsMaterial PointsMaterial].
+		</p>
+
+
+		<h2 id="ParticleSystem">ParticleSystem</h2>
+
+		<p>
+
+		The class has been renamed to [page:Points Points].
+		</p>
+
+
+		<h2 id="ParticleSystemMaterial">ParticleSystemMaterial</h2>
+
+		<p>
+
+		The class has been renamed to [page:PointsMaterial PointsMaterial].
+		</p>
+
+
+		<h2>Path</h2>
+
+		<p>See the [page:Path class].</p>
+
+		<h3>[method:Any Path.fromPoints]()</h3>
+		<p>
+
+		The method has been renamed to [page:Path.setFromPoints .setFromPoints]().
+		</p>
+
+
+		<h2>PerspectiveCamera</h2>
+
+		<p>See the [page:PerspectiveCamera class].</p>
+
+		<h3>[property:Any PerspectiveCamera.setLens]</h3>
+		<p>
+
+		The property is deprecated.<br>
+		Use [page:PerspectiveCamera.setFocalLength .setFocalLength] and [page:PerspectiveCamera.filmGauge .filmGauge] for a photographic setup.
+		</p>
+
+
+		<h2>Plane</h2>
+
+		<p>See the [page:Plane class].</p>
+
+		<h3>[method:Any Plane.isIntersectionLine]()</h3>
+		<p>
+
+		The method has been renamed to [page:Plane.intersectsLine .intersectsLine]().
+		</p>
+
+
+		<h2 id="PointCloud">PointCloud</h2>
+
+		<p>
+
+		The class has been renamed to [page:Points Points].
+		</p>
+
+
+		<h2 id="PointCloudMaterial">PointCloudMaterial</h2>
+
+		<p>
+
+		The class has been renamed to [page:PointsMaterial PointsMaterial].
+		</p>
+
+
+		<h2>Quaternion</h2>
+
+		<p>See the [page:Quaternion class].</p>
+
+		<h3>[method:Any Quaternion.inverse]()</h3>
+		<p>
+
+		The method has been renamed to invert().
+		</p>
+
+		<h3>[method:Any Quaternion.multiplyVector3]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use is now [page:Vector3.applyQuaternion Vector3.applyQuaternion]( quaternion ) instead.
+		</p>
+
+
+		<h2>Ray</h2>
+
+		<p>See the [page:Ray class].</p>
+
+		<h3>[method:Any Ray.isIntersectionBox]()</h3>
+		<p>
+
+		The method has been renamed to [page:Ray.intersectsBox .intersectsBox]().
+		</p>
+
+		<h3>[method:Any Ray.isIntersectionPlane]()</h3>
+		<p>
+
+		The method has been renamed to [page:Ray.intersectsPlane .intersectsPlane]().
+		</p>
+
+		<h3>[method:Any Ray.isIntersectionSphere]()</h3>
+		<p>
+
+		The method has been renamed to [page:Ray.intersectsSphere .intersectsSphere]().
+		</p>
+
+
+		<h2>Scene</h2>
+
+		<p>See the [page:Scene class].</p>
+
+		<h3>[method:Any Scene.dispose]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+
+		<h2 id="SceneUtils">SceneUtils</h2>
+
+		<p>
+
+		The class has been moved to /examples/jsm/utils/SceneUtils.js
+		</p>
+
+
+		<h2>ShaderMaterial</h2>
+
+		<p>See the [page:ShaderMaterial class].</p>
+
+		<h3>[property:Any ShaderMaterial.derivatives]</h3>
+		<p>
+
+		The property has been moved to [page:ShaderMaterial.extensions .extensions].derivatives.
+		</p>
+
+
+		<h2>Shape</h2>
+
+		<p>See the [page:Shape class].</p>
+
+		<h3>[method:Any Shape.extractAllPoints]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Shape.extractPoints .extractPoints]() instead.
+		</p>
+
+		<h3>[method:Any Shape.extrude]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use ExtrudeGeometry() instead.
+		</p>
+
+		<h3>[method:Any Shape.makeGeometry]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use ShapeGeometry() instead.
+		</p>
+
+
+		<h2 id="SkeletonHelper">SkeletonHelper</h2>
+
+		<p>
+
+		The class: update() no longer needs to be called.
+		</p>
+
+
+		<h2 id="SkinnedMesh">SkinnedMesh</h2>
+
+		<p>
+
+		The class: initBones() has been removed.
+		</p>
+
+
+		<h2>Sphere</h2>
+
+		<p>See the [page:Sphere class].</p>
+
+		<h3>[method:Any Sphere.empty]()</h3>
+		<p>
+
+		The method has been renamed to [page:Sphere.isEmpty .isEmpty]().
+		</p>
+
+
+		<h2>Triangle</h2>
+
+		<p>See the [page:Triangle class].</p>
+
+		<h3>[method:Any Triangle.area]()</h3>
+		<p>
+
+		The method has been renamed to [page:Triangle.getArea .getArea]().
+		</p>
+
+		<h3>[method:Any Triangle.barycoordFromPoint]()</h3>
+		<p>
+
+		The method has been renamed to [page:Triangle.getBarycoord .getBarycoord]().
+		</p>
+
+		<h3>[method:Any Triangle.midpoint]()</h3>
+		<p>
+
+		The method has been renamed to [page:Triangle.getMidpoint .getMidpoint]().
+		</p>
+
+		<h3>[method:Any Triangle.normal]()</h3>
+		<p>
+
+		The method has been renamed to [page:Triangle.getNormal .getNormal]().
+		</p>
+
+		<h3>[method:Any Triangle.plane]()</h3>
+		<p>
+
+		The method has been renamed to [page:Triangle.getPlane .getPlane]().
+		</p>
+
+
+		<h2 id="Uint16Attribute">Uint16Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Uint16BufferAttribute Uint16BufferAttribute]() instead.
+		</p>
+
+
+		<h2 id="Uint32Attribute">Uint32Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Uint32BufferAttribute Uint32BufferAttribute]() instead.
+		</p>
+
+
+		<h2 id="Uint8Attribute">Uint8Attribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Uint8BufferAttribute Uint8BufferAttribute]() instead.
+		</p>
+
+
+		<h2 id="Uint8ClampedAttribute">Uint8ClampedAttribute</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use new [page:Uint8ClampedBufferAttribute Uint8ClampedBufferAttribute]() instead.
+		</p>
+
+
+		<h2>Uniform</h2>
+
+		<p>See the [page:Uniform class].</p>
+
+		<h3>[method:Any Uniform.onUpdate]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:object.onBeforeRender object.onBeforeRender]() instead.
+		</p>
+
+
+		<h2>Vector2</h2>
+
+		<p>See the [page:Vector2 class].</p>
+
+		<h3>[method:Any Vector2.distanceToManhattan]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector2.manhattanDistanceTo .manhattanDistanceTo]().
+		</p>
+
+		<h3>[method:Any Vector2.fromAttribute]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector2.fromBufferAttribute .fromBufferAttribute]().
+		</p>
+
+		<h3>[method:Any Vector2.lengthManhattan]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector2.manhattanLength .manhattanLength]().
+		</p>
+
+
+		<h2>Vector3</h2>
+
+		<p>See the [page:Vector3 class].</p>
+
+		<h3>[method:Any Vector3.applyProjection]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Vector3.applyMatrix4 .applyMatrix4]( m ) instead.
+		</p>
+
+		<h3>[method:Any Vector3.distanceToManhattan]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector3.manhattanDistanceTo .manhattanDistanceTo]().
+		</p>
+
+		<h3>[method:Any Vector3.fromAttribute]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector3.fromBufferAttribute .fromBufferAttribute]().
+		</p>
+
+		<h3>[method:Any Vector3.getColumnFromMatrix]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector3.setFromMatrixColumn .setFromMatrixColumn]().
+		</p>
+
+		<h3>[method:Any Vector3.getPositionFromMatrix]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector3.setFromMatrixPosition .setFromMatrixPosition]().
+		</p>
+
+		<h3>[method:Any Vector3.getScaleFromMatrix]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector3.setFromMatrixScale .setFromMatrixScale]().
+		</p>
+
+		<h3>[method:Any Vector3.lengthManhattan]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector3.manhattanLength .manhattanLength]().
+		</p>
+
+		<h3>[method:Any Vector3.setEulerFromQuaternion]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Euler.setFromQuaternion Euler.setFromQuaternion]() instead.
+		</p>
+
+		<h3>[method:Any Vector3.setEulerFromRotationMatrix]()</h3>
+		<p>
+
+		The method has been removed.<br>
+		Use [page:Euler.setFromRotationMatrix Euler.setFromRotationMatrix]() instead.
+		</p>
+
+
+		<h2>Vector4</h2>
+
+		<p>See the [page:Vector4 class].</p>
+
+		<h3>[method:Any Vector4.fromAttribute]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector4.fromBufferAttribute .fromBufferAttribute]().
+		</p>
+
+		<h3>[method:Any Vector4.lengthManhattan]()</h3>
+		<p>
+
+		The method has been renamed to [page:Vector4.manhattanLength .manhattanLength]().
+		</p>
+
+
+		<h2 id="Vertex">Vertex</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use [page:Vector3 Vector3] instead.
+		</p>
+
+
+		<h2>WebGLRenderer</h2>
+
+		<p>See the [page:WebGLRenderer class].</p>
+
+		<h3>[method:Any WebGLRenderer.addPostPlugin]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.addPrePlugin]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.allocTextureUnit]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.animate]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.setAnimationLoop .setAnimationLoop]().
+		</p>
+
+		<h3>[method:Any WebGLRenderer.clearTarget]()</h3>
+		<p>
+
+		The method has been deprecated.<br>
+		Use [page:WebGLRenderer.setRenderTarget .setRenderTarget]() and [page:WebGLRenderer.clear .clear]() instead.
+		</p>
+
+		<h3>[property:Any WebGLRenderer.context]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Use [page:WebGLRenderer.getContext .getContext]() instead.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.enableScissorTest]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.setScissorTest .setScissorTest]().
+		</p>
+
+		<h3>[property:Any WebGLRenderer.gammaInput]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Set the encoding for textures via [page:Texture.encoding Texture.encoding] instead.
+		</p>
+
+		<h3>[property:Any WebGLRenderer.gammaOutput]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Set [page:WebGLRenderer.outputEncoding WebGLRenderer.outputEncoding] instead.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.getActiveMipMapLevel]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.getActiveMipmapLevel .getActiveMipmapLevel]().
+		</p>
+
+		<h3>[method:Any WebGLRenderer.getCurrentRenderTarget]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.getRenderTarget .getRenderTarget]().
+		</p>
+
+		<h3>[method:Any WebGLRenderer.getMaxAnisotropy]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.capabilities .capabilities].getMaxAnisotropy().
+		</p>
+
+		<h3>[method:Any WebGLRenderer.getPrecision]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.capabilities .capabilities].precision.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.initMaterial]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.resetGLState]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.state .state].reset().
+		</p>
+
+		<h3>[method:Any WebGLRenderer.setFaceCulling]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.setTexture]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.setTexture2D]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.setTextureCube]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[property:Any WebGLRenderer.shadowMapCullFace]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Set [page:Material.shadowSide Material.shadowSide] instead.
+		</p>
+
+		<h3>[property:Any WebGLRenderer.shadowMapEnabled]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderer.shadowMap .shadowMap].enabled.
+		</p>
+
+		<h3>[property:Any WebGLRenderer.shadowMapType]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderer.shadowMap .shadowMap].type.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsBlendMinMax]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.extensions .extensions].get( EXT_blend_minmax ).
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsCompressedTexturePVRTC]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.extensions .extensions].get( WEBGL_compressed_texture_pvrtc ).
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsCompressedTextureS3TC]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.extensions .extensions].get( WEBGL_compressed_texture_s3tc ).
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsFloatTextures]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.extensions .extensions].get( OES_texture_float ).
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsHalfFloatTextures]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.extensions .extensions].get( OES_texture_half_float ).
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsInstancedArrays]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.extensions .extensions].get( ANGLE_instanced_arrays ).
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsStandardDerivatives]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.extensions .extensions].get( OES_standard_derivatives ).
+		</p>
+
+		<h3>[method:Any WebGLRenderer.supportsVertexTextures]()</h3>
+		<p>
+
+		The method is now [page:WebGLRenderer.capabilities .capabilities].vertexTextures.
+		</p>
+
+		<h3>[property:Any WebGLRenderer.toneMappingWhitePoint]</h3>
+		<p>
+
+		The property has been removed.
+		</p>
+
+		<h3>[method:Any WebGLRenderer.updateShadowMap]()</h3>
+		<p>
+
+		The method has been removed.
+		</p>
+
+		<h3>[property:Any WebGLRenderer.vr]</h3>
+		<p>
+
+		The property has been renamed to [page:WebGLRenderer.xr .xr]
+		</p>
+
+
+		<h2>WebGLRenderTarget</h2>
+
+		<p>See the [page:WebGLRenderTarget class].</p>
+
+		<h3>[property:Any WebGLRenderTarget.anisotropy]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].anisotropy.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.format]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].format.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.generateMipmaps]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].generateMipmaps.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.magFilter]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].magFilter.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.minFilter]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].minFilter.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.offset]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].offset.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.repeat]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].repeat.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.type]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].type.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.wrapS]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].wrapS.
+		</p>
+
+		<h3>[property:Any WebGLRenderTarget.wrapT]</h3>
+		<p>
+
+		The property is now [page:WebGLRenderTarget.texture .texture].wrapT.
+		</p>
+
+
+		<h2 id="WebGLRenderTargetCube">WebGLRenderTargetCube</h2>
+
+		<p>
+
+		The class( width, height, options ) is now WebGLCubeRenderTarget( size, options ).
+		</p>
+
+
+		<h2>WebGLShadowMap</h2>
+
+		<p>See the [page:WebGLShadowMap class].</p>
+
+		<h3>[property:Any WebGLShadowMap.shadowMap.cullFace]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Set [page:Material.shadowSide Material.shadowSide] instead.
+		</p>
+
+		<h3>[property:Any WebGLShadowMap.shadowMap.renderReverseSided]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Set [page:Material.shadowSide Material.shadowSide] instead.
+		</p>
+
+		<h3>[property:Any WebGLShadowMap.shadowMap.renderSingleSided]</h3>
+		<p>
+
+		The property has been removed.<br>
+		Set [page:Material.shadowSide Material.shadowSide] instead.
+		</p>
+
+
+		<h2 id="WireframeHelper">WireframeHelper</h2>
+
+		<p>
+
+		The class has been removed.<br>
+		Use [page:WireframeGeometry WireframeGeometry] instead.
+		</p>
+
+
+		<h2 id="XHRLoader">XHRLoader</h2>
+
+		<p>
+
+		The class has been renamed to [page:FileLoader FileLoader].
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/Three.Legacy.js src/Three.Legacy.js]
+		</p>
+	</body>
+</html>
