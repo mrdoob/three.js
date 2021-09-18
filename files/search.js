@@ -36,6 +36,12 @@ let viewerEx;
 // otherwise it's using files/docs.json
 const autoParse = false;
 
+const allMatches = new Set( [
+    '/./',
+    '/../',
+    '/.+/',
+    '/.*/',
+] );
 let currentSection = '';
 let language = 'en';
 let prevHash = '';
@@ -237,10 +243,18 @@ function highlightTokens( name, lower, regExp, searchLow, mainUrl, checkLegacy )
 
         if ( regExp ) {
 
-            text = split.replaceAll( regExp, '<b>$&</b>' );
-            if ( text == split ) {
+            if ( allMatches.has( searchLow ) ) {
 
-                continue;
+                text = split;
+
+            } else {
+
+                text = split.replaceAll( regExp, '<b>$&</b>' );
+                if ( text == split ) {
+
+                    continue;
+
+                }
 
             }
 
@@ -290,7 +304,29 @@ function searchContent( search, data, mode, callback ) {
     // - data must be an object of objects
     // - those objects must contain a `text` string used for matching
 
-    if ( search.length >= 2 && search[ 0 ] == '/' && search.slice( -1 ) == '/' ) {
+    const searchLength = search.length;
+    const isRegExp = ( searchLength >= 2 && search[ 0 ] == '/' && search.slice( -1 ) == '/' );
+    const realLength = isRegExp ? searchLength - 2 : searchLength;
+
+    if ( realLength < 2 ) {
+
+        mode = 1;
+
+    }
+
+    // hide properties/methods if not wanted
+
+    if ( mode == 1 ) {
+
+        contentDoc.classList.add( 'mainSearch' );
+
+    } else {
+
+        contentDoc.classList.remove( 'mainSearch' );
+
+    }
+
+    if ( isRegExp ) {
 
         // /regexp/ format
         // ex:
@@ -1354,19 +1390,8 @@ function updateFilterDoc( force ) {
 
     }
 
-    // hide properties/methods if not wanted
-
-    if ( mode == 1 ) {
-
-        contentDoc.classList.add( 'mainSearch' );
-
-    } else {
-
-        contentDoc.classList.remove( 'mainSearch' );
-
-    }
-
     let searchLow = search.toLowerCase();
+    let isAllMatches = allMatches.has( search );
 
     for ( const vector of sectionsDoc ) {
 
@@ -1401,19 +1426,17 @@ function updateFilterDoc( force ) {
 
             if ( type == 1 ) {
 
-                page.nodes[ 0 ].innerHTML =
-                    regExp ? name.replaceAll( regExp, '<b>$&</b>' ) : highlightText( name, index, end );
+                page.nodes[ 0 ].innerHTML = isAllMatches ? name :
+                    ( regExp ? name.replaceAll( regExp, '<b>$&</b>' ) : highlightText( name, index, end ) );
                 page.cvector[ 0 ] |= 1;
 
             } else if ( type == 2 ) {
 
                 page.nodes[ 1 ].innerHTML =
-                    highlightTokens( page.property, page.propertyLow, regExp, searchLow, page.url, false );
+                    highlightTokens( page.property, page.propertyLow, regExp, searchLow, page.url, autoParse );
                 page.cvector[ 0 ] |= 2;
 
             } else if ( type == 4 ) {
-
-                // check legacy only with run-time THREE parsing (autoParse)
 
                 page.nodes[ 2 ].innerHTML =
                     highlightTokens( page.method, page.methodLow, regExp, searchLow, page.url, autoParse );
@@ -1653,6 +1676,8 @@ function updateFilterEx( force ) {
 
     }
 
+    let isAllMatches = allMatches.has( search );
+
     searchContent( search, fileObjects, 1, ( name, page, regExp, index, end ) => {
 
         if ( regExp ) {
@@ -1661,7 +1686,7 @@ function updateFilterEx( force ) {
 
             if ( index >= 0 ) {
 
-                linkTitles[ name ].innerHTML = page.clean.replaceAll( regExp, '<b>$&</b>' );
+                linkTitles[ name ].innerHTML = isAllMatches ? page.clean : page.clean.replaceAll( regExp, '<b>$&</b>' );
                 linkClassLists[ name ].remove( 'hide' );
 
             } else {
