@@ -464,12 +464,8 @@ function setGlobalEvents() {
 
     filterInput.oninput = () => {
 
-        if ( currentSection == 'docs' ) {
-
-            // type something in docs => close the 3d frame
-            closeIFrameEx();
-
-        }
+        // type something in docs => close the 3d frame
+        closeIFrameEx();
 
         updateFilter();
 
@@ -482,6 +478,9 @@ function setGlobalEvents() {
         panelClassList.remove( 'searchFocused' );
 
     };
+
+    // close the 3d frame when scrolling in the search
+    contentDoc.onscroll = closeIFrameEx;
 
     // Handle search query
 
@@ -1568,14 +1567,16 @@ function closeIFrameEx() {
 
     clearTimeoutEx();
 
-    if ( viewerEx.getAttribute( 'src' ) ) {
+    if ( guessSection() != 'docs' || ! viewerEx.getAttribute( 'src' ) ) {
 
-        iframes.removeChild( viewerEx );
-        viewerEx.dataset.ready = '0';
-        viewerEx.src = '';
-        iframes.appendChild( viewerEx );
+        return;
 
     }
+
+    iframes.removeChild( viewerEx );
+    viewerEx.dataset.ready = '0';
+    viewerEx.src = '';
+    iframes.appendChild( viewerEx );
 
 }
 
