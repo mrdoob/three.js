@@ -33,6 +33,8 @@ class WebXRManager extends EventDispatcher {
 		let xrFrame = null;
 		let depthStyle = null;
 		let clearStyle = null;
+		const msaartcSupported = renderer.extensions.has( 'EXT_multisampled_render_to_texture' );
+		let msaaExt = null;
 
 		const controllers = [];
 		const inputSourcesMap = new Map();
@@ -302,7 +304,11 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
 
-					if ( isMultisample ) {
+					if ( isMultisample && msaartcSupported ) {
+
+						msaaExt = renderer.extensions.get( 'EXT_multisampled_render_to_texture' );
+
+					} else if ( isMultisample ) {
 
 						glMultisampledFramebuffer = gl.createFramebuffer();
 						glColorRenderbuffer = gl.createRenderbuffer();
@@ -623,13 +629,27 @@ class WebXRManager extends EventDispatcher {
 
 						state.bindXRFramebuffer( glFramebuffer );
 
-						if ( glSubImage.depthStencilTexture !== undefined ) {
+						if ( isMultisample && msaartcSupported ) {
 
-							gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0 );
+							if ( glSubImage.depthStencilTexture !== undefined ) {
+
+								msaaExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0, 4 );
+
+							}
+
+							msaaExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0, 4 );
+
+						} else {
+
+							if ( glSubImage.depthStencilTexture !== undefined ) {
+
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0 );
+
+							}
+
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0 );
 
 						}
-
-						gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0 );
 
 						viewport = glSubImage.viewport;
 
@@ -655,7 +675,7 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
-				if ( isMultisample ) {
+				if ( isMultisample && ! msaartcSupported ) {
 
 					state.bindXRFramebuffer( glMultisampledFramebuffer );
 
@@ -680,7 +700,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
-			if ( isMultisample ) {
+			if ( isMultisample && ! msaartcSupported ) {
 
 				const width = glProjLayer.textureWidth;
 				const height = glProjLayer.textureHeight;
