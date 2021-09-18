@@ -301,6 +301,8 @@ function updateLegacy( verbose ) {
 		<!DOCTYPE html>
 		<html lang="en">
 			<head>
+				<!-- THIS FILE WAS AUTO GENERATED, DO NOT EDIT -->
+
 				<meta charset="utf-8">
 				<base href="../../../">
 				<script src="page.js"></script>
