@@ -34,7 +34,7 @@ let viewerEx;
 
 // enable this to use docs/list.json and automatically parse THREE functions/properties,
 // otherwise it's using files/docs.json
-const autoParse = true;
+const autoParse = false;
 
 let currentSection = '';
 let language = 'en';
@@ -111,7 +111,6 @@ function createArguments( args ) {
         switch ( name ) {
 
         case 'Audio':
-
             let listener = threeCaches.AudioListener;
 
             if ( ! listener ) {
@@ -125,19 +124,16 @@ function createArguments( args ) {
             break;
 
         case 'Geometry':
-
             value = new THREE.BufferGeometry();
             let vertices = new Float32Array( [ 0, 0, 0, 1, 0, 0, 1, 1, 0 ] );
             value.setAttribute( 'position', new THREE.BufferAttribute( vertices , 3 ) );
             break;
 
         case 'Uint32Array':
-
             value = new Uint32Array();
             break;
 
         default:
-
             value = new THREE[ name ]();
 
         }
@@ -221,31 +217,28 @@ async function hashChanged( defaultSection ) {
 
 function highlightText( name, start, end ) {
 
-    return [
-        name.slice( 0, start ),
-        '<b>',
-        name.slice( start, end ),
-        '</b>',
-        name.slice( end ),
-    ].join( '' );
+    return name.slice( 0, start ) + '<b>' + name.slice( start, end ) + '</b>' + name.slice( end );
 
 }
 
-function highlightTokens( name, lower, regExp, searchLow, mainUrl ) {
+function highlightTokens( name, lower, regExp, searchLow, mainUrl, checkLegacy ) {
 
-    const names = name.split( '\n' );
+    const className = checkLegacy ? mainUrl.split( '/' ).pop() : '';
+
+    const splits = name.split( '\n' );
     const lowers = lower.split( '\n' );
     const searchLength = searchLow.length;
     const lines = [];
 
-    for ( let i = 0, length = names.length; i < length; i ++ ) {
+    for ( let i = 0, length = splits.length; i < length; i ++ ) {
 
+        const split = splits[ i ];
         let text;
 
         if ( regExp ) {
 
-            text = names[ i ].replaceAll( regExp, '<b>$&</b>' );
-            if ( text == names[ i ]) {
+            text = split.replaceAll( regExp, '<b>$&</b>' );
+            if ( text == split ) {
 
                 continue;
 
@@ -260,11 +253,27 @@ function highlightTokens( name, lower, regExp, searchLow, mainUrl ) {
 
             }
 
-            text = highlightText( names[ i ], index, index + searchLength );
+            text = highlightText( split, index, index + searchLength );
 
         }
 
-        const url = `${mainUrl}.${names[ i ]}`;
+        // Legacy method?
+
+        if ( checkLegacy ) {
+
+            const classMethod = className + '.' + split;
+
+            if ( legacyMethods.has( classMethod ) ) {
+
+                const url = 'api/en/extras/Legacy.' + classMethod;
+                lines.push( `<a class="legacy" href="#${url}" data-url="${url}">${text}</a>` );
+                continue;
+
+            }
+
+        }
+
+        const url = mainUrl + '.' + split;
         lines.push( `<a href="#${url}" data-url="${url}">${text}</a>` );
     }
 
@@ -281,7 +290,7 @@ function searchContent( search, data, mode, callback ) {
     // - data must be an object of objects
     // - those objects must contain a `text` string used for matching
 
-    if ( search.length >= 2 && search[ 0 ] == '/' && search.slice( - 1 ) == '/' ) {
+    if ( search.length >= 2 && search[ 0 ] == '/' && search.slice( -1 ) == '/' ) {
 
         // /regexp/ format
         // ex:
@@ -591,6 +600,9 @@ function welcomeThree() {
 
 const categoriesDoc = [];
 let lastSearchDoc;
+let legacyMethods = new Set([
+    'Loader.extractUrlBase',
+]);
 let listDoc;
 const pagesDoc = {};
 const sectionsDoc = [];
@@ -757,7 +769,7 @@ function createNavigationDoc() {
                         '<li>',
                             `<a href="#${url}"${selected} data-name="${pageName}" data-url="${url}">${pageName}</a>`,
                             '<div class="property"></div>',
-                            '<div class="method"></div>',
+                            `<div class="method${( pageName == 'Legacy' ) ? ' legacy': ''}"></div>`,
                         '</li>',
             );
 
@@ -956,13 +968,13 @@ function parseDoc( list, language, {
 
                 } else if ( mainPath ) {
 
-                    subPath = `${mainPath}/${subPath}`;
+                    subPath = mainPath + '/' + subPath;
 
                 }
 
             } else {
 
-                subPath = `${mainPath}/${( engPath || category ).toLowerCase().replace( / /g, '' )}`;
+                subPath = mainPath + '/' + ( engPath || category ).toLowerCase().replace( / /g, '' );
 
             }
 
@@ -1030,7 +1042,7 @@ function parseDoc( list, language, {
                 // if URL contains '/' => treat it as the final answer
                 if ( ! url.includes( '/' ) ) {
 
-                    url = `${subPath}/${url}`;
+                    url = subPath + '/' + url;
 
                 }
 
@@ -1068,9 +1080,7 @@ function parseTHREE() {
     // - automatically fill method + property
     // - called when THREE is loaded and also when Doc is ready
 
-    const T = window.THREE;
-
-    if ( ! autoParse || readyThree == language || ! readyDoc || ! T ) {
+    if ( ! autoParse || readyThree == language || ! readyDoc || ! window.THREE ) {
 
         return;
 
@@ -1081,7 +1091,7 @@ function parseTHREE() {
 
     Object.keys( pagesDoc ).forEach( name => {
 
-        const class_ = T[ name ];
+        const class_ = THREE[ name ];
 
         if ( typeof class_ != 'function' ) {
 
@@ -1214,7 +1224,7 @@ function selectDoc( url, node ) {
 
 function setTitleDoc( name ) {
 
-    titleDoc = `${name} - three.js docs`;
+    titleDoc = name + ' - three.js docs';
     document.title = titleDoc;
 
 }
@@ -1230,7 +1240,7 @@ function setUrlFragment( pageName ) {
 
     if ( splits.length < 2 ) {
 
-        splits[ 1 ] = location.hash.split( '/' ).slice( -1 )[ 0 ].split( '.' )[ 1 ];
+        splits[ 1 ] = location.hash.split( '/' ).pop().split( '.' )[ 1 ];
 
     }
 
@@ -1240,7 +1250,7 @@ function setUrlFragment( pageName ) {
 
         if ( splits[ 1 ]) {
 
-            url = `${url}.${splits[ 1 ]}`;
+            url += '.' + splits[ 1 ];
 
         }
 
@@ -1394,13 +1404,15 @@ function updateFilterDoc( force ) {
             } else if ( type == 2 ) {
 
                 page.nodes[ 1 ].innerHTML =
-                    highlightTokens( page.property, page.propertyLow, regExp, searchLow, page.url );
+                    highlightTokens( page.property, page.propertyLow, regExp, searchLow, page.url, false );
                 page.cvector[ 0 ] |= 2;
 
             } else if ( type == 4 ) {
 
+                // check legacy only with run-time THREE parsing (autoParse)
+
                 page.nodes[ 2 ].innerHTML =
-                    highlightTokens( page.method, page.methodLow, regExp, searchLow, page.url );
+                    highlightTokens( page.method, page.methodLow, regExp, searchLow, page.url, autoParse );
                 page.cvector[ 0 ] |= 4;
 
             }
@@ -1440,7 +1452,6 @@ function updateFilterDoc( force ) {
 
 const fileObjects = {};
 const headerClassLists = {};
-let lastHashEx;
 let lastSearchEx;
 const linkClassLists = {};
 const linkTitles = {};
@@ -1687,6 +1698,25 @@ function updateFilterEx( force ) {
     } );
 
     showCategoriesEx();
+
+}
+
+// STARTUP
+//////////
+
+if ( typeof window == 'object' ) {
+
+    window.onload = () => {
+
+        initNodes();
+
+        const section = location.href.split( '/').includes( 'examples' ) ? 'examples' : 'docs';
+        hashChanged(section);
+
+        setGlobalEvents();
+        welcomeThree();
+
+    };
 
 }
 

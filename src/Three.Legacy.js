@@ -666,7 +666,7 @@ Triangle.prototype.midpoint = function ( target ) {
 
 };
 
-Triangle.prototypenormal = function ( target ) {
+Triangle.prototype.normal = function ( target ) {
 
 	console.warn( 'THREE.Triangle: .normal() has been renamed to .getNormal().' );
 	return this.getNormal( target );
@@ -1323,7 +1323,7 @@ Object.defineProperties( ShaderMaterial.prototype, {
 		},
 		set: function ( value ) {
 
-			console.warn( 'THREE. ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
+			console.warn( 'THREE.ShaderMaterial: .derivatives has been moved to .extensions.derivatives.' );
 			this.extensions.derivatives = value;
 
 		}

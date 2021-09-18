@@ -547,6 +547,9 @@ iframe {
 .property > a::before {
 	content: ".";
 }
+.legacy > a::before {
+	content: "";
+}
 .method > a::after {
 	content: "()";
 	color: var(--secondary-text-color);
@@ -555,6 +558,10 @@ iframe {
 .mainSearch .method,
 .mainSearch .property {
 	display: none;
+}
+
+a.legacy {
+	color: var(--secondary-text-color);
 }
 
 /* mobile */

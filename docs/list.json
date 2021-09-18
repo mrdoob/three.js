@@ -108,6 +108,7 @@
 				"DataUtils": 1,
 				"Earcut": 1,
 				"ImageUtils": 1,
+				"Legacy": 1,
 				"PMREMGenerator": [".WebGLRenderer"],
 				"ShapeUtils": 1
 			},

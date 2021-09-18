@@ -72,6 +72,11 @@
 				},
 
 				"AnimationClip": {
+					"url": [
+						"",
+						0,
+						[]
+					],
 					"method": [
 						"clone",
 						"optimize",
@@ -138,6 +143,12 @@
 				},
 
 				"KeyframeTrack": {
+					"url": [
+						"",
+						[
+							0
+						]
+					],
 					"method": [
 						"clone",
 						"createInterpolant",
@@ -159,12 +170,16 @@
 						"times",
 						"values",
 						"DefaultInterpolation",
-						"TimeBufferType",
-						"ValueBufferType"
+						"TimeBufferType ",
+						"ValueBufferType "
 					]
 				},
 
 				"PropertyBinding": {
+					"url": [
+						".Object3D",
+						"a.x"
+					],
 					"method": [
 						"getValue",
 						"setValue",
@@ -207,9 +222,15 @@
 
 			"Animation / Tracks": {
 				"BooleanKeyframeTrack": {
+					"url": [
+						"",
+						[
+							0
+						]
+					],
 					"method": [
-						"InterpolantFactoryMethodLinear",
-						"InterpolantFactoryMethodSmooth"
+						"InterpolantFactoryMethodLinear ",
+						"InterpolantFactoryMethodSmooth "
 					],
 					"property": [
 						"DefaultInterpolation",
@@ -219,18 +240,36 @@
 				},
 
 				"ColorKeyframeTrack": {
+					"url": [
+						"",
+						[
+							0
+						]
+					],
 					"property": [
 						"ValueTypeName"
 					]
 				},
 
 				"NumberKeyframeTrack": {
+					"url": [
+						"",
+						[
+							0
+						]
+					],
 					"property": [
 						"ValueTypeName"
 					]
 				},
 
 				"QuaternionKeyframeTrack": {
+					"url": [
+						"",
+						[
+							0
+						]
+					],
 					"method": [
 						"InterpolantFactoryMethodLinear"
 					],
@@ -241,6 +280,12 @@
 				},
 
 				"StringKeyframeTrack": {
+					"url": [
+						"",
+						[
+							0
+						]
+					],
 					"method": [
 						"InterpolantFactoryMethodLinear",
 						"InterpolantFactoryMethodSmooth"
@@ -253,6 +298,12 @@
 				},
 
 				"VectorKeyframeTrack": {
+					"url": [
+						"",
+						[
+							0
+						]
+					],
 					"property": [
 						"ValueTypeName"
 					]
@@ -261,6 +312,9 @@
 
 			"Audio": {
 				"Audio": {
+					"url": [
+						".AudioListener"
+					],
 					"method": [
 						"connect",
 						"disconnect",
@@ -305,6 +359,9 @@
 				},
 
 				"AudioAnalyser": {
+					"url": [
+						".Audio"
+					],
 					"method": [
 						"getFrequencyData",
 						"getAverageFrequency"
@@ -341,6 +398,9 @@
 				},
 
 				"PositionalAudio": {
+					"url": [
+						".AudioListener"
+					],
 					"method": [
 						"getOutput",
 						"getRefDistance",
@@ -381,6 +441,11 @@
 				},
 
 				"CubeCamera": {
+					"url": [
+						1,
+						1,
+						{}
+					],
 					"method": [
 						"update"
 					],
@@ -457,6 +522,9 @@
 			],
 			"Core": {
 				"BufferAttribute": {
+					"url": [
+						".Uint32Array"
+					],
 					"method": [
 						"applyMatrix3",
 						"applyMatrix4",
@@ -628,6 +696,8 @@
 						"stride",
 						"count",
 						"updateRange",
+						"updateRange.offset",
+						"updateRange.count",
 						"uuid",
 						"version",
 						"needsUpdate",
@@ -636,6 +706,9 @@
 				},
 
 				"InterleavedBufferAttribute": {
+					"url": [
+						{}
+					],
 					"method": [
 						"applyMatrix4",
 						"applyNormalMatrix",
@@ -807,7 +880,229 @@
 					]
 				},
 
+				"Legacy": {
+					"method": [
+						"AudioAnalyser.getData",
+						"Box2.center",
+						"Box2.empty",
+						"Box2.isIntersectionBox",
+						"Box2.size",
+						"Box3.center",
+						"Box3.empty",
+						"Box3.isIntersectionBox",
+						"Box3.isIntersectionSphere",
+						"Box3.size",
+						"BufferAttribute.copyIndicesArray",
+						"BufferAttribute.setDynamic",
+						"BufferGeometry.addAttribute",
+						"BufferGeometry.addAttribute",
+						"BufferGeometry.addDrawCall",
+						"BufferGeometry.addDrawCall",
+						"BufferGeometry.addIndex",
+						"BufferGeometry.applyMatrix",
+						"BufferGeometry.clearDrawCalls",
+						"BufferGeometry.computeOffsets",
+						"BufferGeometry.removeAttribute",
+						"CubeCamera.clear",
+						"CubeCamera.updateCubeMap",
+						"Curve.create",
+						"ExtrudeGeometry.addShape",
+						"ExtrudeGeometry.addShapeList",
+						"ExtrudeGeometry.getArrays",
+						"Frustum.setFromMatrix",
+						"InterleavedBuffer.setDynamic",
+						"Line3.center",
+						"Loader.extractUrlBase",
+						"Matrix3.applyToBufferAttribute",
+						"Matrix3.applyToVector3Array",
+						"Matrix3.flattenToArrayOffset",
+						"Matrix3.getInverse",
+						"Matrix3.multiplyVector3",
+						"Matrix3.multiplyVector3Array",
+						"Matrix4.applyToBufferAttribute",
+						"Matrix4.applyToVector3Array",
+						"Matrix4.crossVector",
+						"Matrix4.extractPosition",
+						"Matrix4.flattenToArrayOffset",
+						"Matrix4.getInverse",
+						"Matrix4.getPosition",
+						"Matrix4.makeFrustum",
+						"Matrix4.multiplyToArray",
+						"Matrix4.multiplyVector3",
+						"Matrix4.multiplyVector3Array",
+						"Matrix4.multiplyVector4",
+						"Matrix4.rotateAxis",
+						"Matrix4.rotateByAxis",
+						"Matrix4.rotateX",
+						"Matrix4.rotateY",
+						"Matrix4.rotateZ",
+						"Matrix4.setRotationFromQuaternion",
+						"Matrix4.translate",
+						"Mesh.setDrawMode",
+						"Object3D.applyMatrix",
+						"Object3D.getChildByName",
+						"Object3D.getWorldRotation",
+						"Object3D.translate",
+						"Path.fromPoints",
+						"Plane.isIntersectionLine",
+						"Quaternion.inverse",
+						"Quaternion.multiplyVector3",
+						"Ray.isIntersectionBox",
+						"Ray.isIntersectionPlane",
+						"Ray.isIntersectionSphere",
+						"Scene.dispose",
+						"Shape.extractAllPoints",
+						"Shape.extrude",
+						"Shape.makeGeometry",
+						"Sphere.empty",
+						"Triangle.area",
+						"Triangle.barycoordFromPoint",
+						"Triangle.midpoint",
+						"Triangle.normal",
+						"Triangle.plane",
+						"Uniform.onUpdate",
+						"Vector2.distanceToManhattan",
+						"Vector2.fromAttribute",
+						"Vector2.lengthManhattan",
+						"Vector3.applyProjection",
+						"Vector3.distanceToManhattan",
+						"Vector3.fromAttribute",
+						"Vector3.getColumnFromMatrix",
+						"Vector3.getPositionFromMatrix",
+						"Vector3.getScaleFromMatrix",
+						"Vector3.lengthManhattan",
+						"Vector3.setEulerFromQuaternion",
+						"Vector3.setEulerFromRotationMatrix",
+						"Vector4.fromAttribute",
+						"Vector4.lengthManhattan",
+						"WebGLRenderer.addPostPlugin",
+						"WebGLRenderer.addPrePlugin",
+						"WebGLRenderer.allocTextureUnit",
+						"WebGLRenderer.animate",
+						"WebGLRenderer.clearTarget",
+						"WebGLRenderer.enableScissorTest",
+						"WebGLRenderer.getActiveMipMapLevel",
+						"WebGLRenderer.getCurrentRenderTarget",
+						"WebGLRenderer.getMaxAnisotropy",
+						"WebGLRenderer.getPrecision",
+						"WebGLRenderer.initMaterial",
+						"WebGLRenderer.resetGLState",
+						"WebGLRenderer.setFaceCulling",
+						"WebGLRenderer.setTexture",
+						"WebGLRenderer.setTexture2D",
+						"WebGLRenderer.setTextureCube",
+						"WebGLRenderer.supportsBlendMinMax",
+						"WebGLRenderer.supportsCompressedTexturePVRTC",
+						"WebGLRenderer.supportsCompressedTextureS3TC",
+						"WebGLRenderer.supportsFloatTextures",
+						"WebGLRenderer.supportsHalfFloatTextures",
+						"WebGLRenderer.supportsInstancedArrays",
+						"WebGLRenderer.supportsStandardDerivatives",
+						"WebGLRenderer.supportsVertexTextures",
+						"WebGLRenderer.updateShadowMap"
+					],
+					"property": [
+						"Audio.load",
+						"AxisHelper",
+						"BinaryTextureLoader",
+						"BoundingBoxHelper",
+						"BufferAttribute.dynamic",
+						"BufferAttribute.length",
+						"BufferAttribute.setArray",
+						"BufferGeometry.addAttribute",
+						"BufferGeometry.drawcalls",
+						"BufferGeometry.offsets",
+						"CanvasRenderer",
+						"DynamicBufferAttribute",
+						"EdgesHelper",
+						"Float32Attribute",
+						"Float64Attribute",
+						"GridHelper",
+						"ImageUtils.loadCompressedTexture",
+						"ImageUtils.loadCompressedTextureCube",
+						"ImageUtils.loadTexture",
+						"ImageUtils.loadTextureCube",
+						"Int16Attribute",
+						"Int32Attribute",
+						"Int8Attribute",
+						"InterleavedBuffer.setArray",
+						"JSONLoader",
+						"LensFlare",
+						"Light.onlyShadow",
+						"Light.shadowBias",
+						"Light.shadowCameraBottom",
+						"Light.shadowCameraFar",
+						"Light.shadowCameraFov",
+						"Light.shadowCameraLeft",
+						"Light.shadowCameraNear",
+						"Light.shadowCameraRight",
+						"Light.shadowCameraTop",
+						"Light.shadowCameraVisible",
+						"Light.shadowDarkness",
+						"Light.shadowMapHeight",
+						"Light.shadowMapWidth",
+						"Loader",
+						"Loader",
+						"Material",
+						"Material",
+						"Material",
+						"Material.overdraw",
+						"Material.wrapAround",
+						"Material.wrapRGB",
+						"Mesh.drawMode",
+						"Mesh.drawMode",
+						"MeshFaceMaterial",
+						"MultiMaterial",
+						"Object3D.eulerOrder",
+						"Object3D.renderDepth",
+						"Object3D.useQuaternion",
+						"Particle",
+						"ParticleBasicMaterial",
+						"ParticleSystem",
+						"ParticleSystemMaterial",
+						"PerspectiveCamera.setLens",
+						"PointCloud",
+						"PointCloudMaterial",
+						"SceneUtils",
+						"ShaderMaterial.derivatives",
+						"SkeletonHelper",
+						"SkinnedMesh",
+						"Uint16Attribute",
+						"Uint32Attribute",
+						"Uint8Attribute",
+						"Uint8ClampedAttribute",
+						"Vertex",
+						"WebGLRenderer.context",
+						"WebGLRenderer.gammaInput",
+						"WebGLRenderer.gammaOutput",
+						"WebGLRenderer.shadowMap",
+						"WebGLRenderer.shadowMap",
+						"WebGLRenderer.shadowMap",
+						"WebGLRenderer.shadowMapCullFace",
+						"WebGLRenderer.shadowMapEnabled",
+						"WebGLRenderer.shadowMapType",
+						"WebGLRenderer.toneMappingWhitePoint",
+						"WebGLRenderer.vr",
+						"WebGLRenderTarget.anisotropy",
+						"WebGLRenderTarget.format",
+						"WebGLRenderTarget.generateMipmaps",
+						"WebGLRenderTarget.magFilter",
+						"WebGLRenderTarget.minFilter",
+						"WebGLRenderTarget.offset",
+						"WebGLRenderTarget.repeat",
+						"WebGLRenderTarget.type",
+						"WebGLRenderTarget.wrapS",
+						"WebGLRenderTarget.wrapT",
+						"WebGLRenderTargetCube",
+						"WireframeHelper",
+						"XHRLoader"
+					]
+				},
+
 				"PMREMGenerator": {
+					"url": [
+						".WebGLRenderer"
+					],
 					"method": [
 						"fromScene",
 						"fromEquirectangular",
@@ -1060,6 +1355,9 @@
 				},
 
 				"EdgesGeometry": {
+					"url": [
+						".Geometry"
+					],
 					"property": [
 						"parameters"
 					]
@@ -1102,6 +1400,10 @@
 				},
 
 				"PolyhedronGeometry": {
+					"url": [
+						[],
+						[]
+					],
 					"property": [
 						"parameters"
 					]
@@ -1158,7 +1460,11 @@
 					]
 				},
 
-				"WireframeGeometry": {}
+				"WireframeGeometry": {
+					"url": [
+						".Geometry"
+					]
+				}
 			},
 
 			"Helpers": {
@@ -1198,6 +1504,9 @@
 				},
 
 				"CameraHelper": {
+					"url": [
+						".Camera"
+					],
 					"method": [
 						"dispose",
 						"update"
@@ -1211,6 +1520,9 @@
 				},
 
 				"DirectionalLightHelper": {
+					"url": [
+						".DirectionalLight"
+					],
 					"method": [
 						"dispose",
 						"update"
@@ -1229,6 +1541,9 @@
 				"PolarGridHelper": {},
 
 				"HemisphereLightHelper": {
+					"url": [
+						".HemisphereLight"
+					],
 					"method": [
 						"dispose",
 						"update"
@@ -1252,6 +1567,9 @@
 				},
 
 				"PointLightHelper": {
+					"url": [
+						".PointLight"
+					],
 					"method": [
 						"dispose",
 						"update"
@@ -1265,6 +1583,9 @@
 				},
 
 				"SkeletonHelper": {
+					"url": [
+						".Object3D"
+					],
 					"property": [
 						"bones",
 						"root"
@@ -1272,6 +1593,9 @@
 				},
 
 				"SpotLightHelper": {
+					"url": [
+						".SpotLight"
+					],
 					"method": [
 						"dispose",
 						"update"
@@ -2127,6 +2451,10 @@
 				},
 
 				"Interpolant": {
+					"url": [
+						[],
+						[]
+					],
 					"method": [
 						"evaluate"
 					],
@@ -2644,6 +2972,12 @@
 
 			"Math / Interpolants": {
 				"CubicInterpolant": {
+					"url": [
+						[],
+						[],
+						0,
+						[]
+					],
 					"method": [
 						"evaluate"
 					],
@@ -2657,6 +2991,12 @@
 				},
 
 				"DiscreteInterpolant": {
+					"url": [
+						[],
+						[],
+						0,
+						[]
+					],
 					"method": [
 						"evaluate"
 					],
@@ -2670,6 +3010,12 @@
 				},
 
 				"LinearInterpolant": {
+					"url": [
+						[],
+						[],
+						0,
+						[]
+					],
 					"method": [
 						"evaluate"
 					],
@@ -2683,6 +3029,12 @@
 				},
 
 				"QuaternionLinearInterpolant": {
+					"url": [
+						[],
+						[],
+						0,
+						[]
+					],
 					"method": [
 						"evaluate"
 					],
@@ -2860,6 +3212,7 @@
 						"copyTextureToTexture",
 						"copyTextureToTexture3D",
 						"dispose",
+						"extensions.get",
 						"forceContextLoss",
 						"forceContextRestore",
 						"getClearAlpha",
@@ -2902,6 +3255,7 @@
 						"autoClearColor",
 						"autoClearDepth",
 						"autoClearStencil",
+						"debug.checkShaderErrors",
 						"capabilities",
 						"maxVertexTextures",
 						"clippingPlanes",
@@ -2915,6 +3269,10 @@
 						"properties",
 						"renderLists",
 						"shadowMap",
+						"shadowMap.enabled",
+						"shadowMap.autoUpdate",
+						"shadowMap.needsUpdate",
+						"shadowMap.type",
 						"sortObjects",
 						"state",
 						"toneMapping",
@@ -3108,6 +3466,9 @@
 				},
 
 				"VideoTexture": {
+					"url": [
+						{}
+					],
 					"method": [
 						"update"
 					],
@@ -3589,7 +3950,6 @@
 			"Post-Processing": {
 				"_sub": "postprocessing",
 				"EffectComposer": {
-					"url": 1,
 					"method": [
 						"addPass",
 						"insertPass",
@@ -3654,7 +4014,6 @@
 				},
 
 				"MeshSurfaceSampler": {
-					"url": 1,
 					"method": [
 						"setWeightAttribute",
 						"build",
@@ -3663,7 +4022,6 @@
 				},
 
 				"OBB": {
-					"url": 1,
 					"method": [
 						"applyMatrix4",
 						"clampPoint",
@@ -3691,7 +4049,6 @@
 			"ConvexHull": {
 				"_sub": "math/convexhull",
 				"Face": {
-					"url": 1,
 					"method": [
 						"create",
 						"getEdge",
@@ -3710,7 +4067,6 @@
 				},
 
 				"HalfEdge": {
-					"url": 1,
 					"method": [
 						"head",
 						"tail",
@@ -3728,7 +4084,6 @@
 				},
 
 				"ConvexHull": {
-					"url": 1,
 					"method": [
 						"addAdjoiningFace",
 						"addNewFaces",
@@ -3763,7 +4118,6 @@
 				},
 
 				"VertexNode": {
-					"url": 1,
 					"property": [
 						"point",
 						"prev",
@@ -3773,7 +4127,6 @@
 				},
 
 				"VertexList": {
-					"url": 1,
 					"method": [
 						"first",
 						"last",
@@ -3945,7 +4298,7 @@
 		"المرجع": {
 			"_main": "api/ar",
 			"الحركات": {
-				"_sub": "animation",
+				"_eng": "Animation",
 				"AnimationAction": 1,
 				"AnimationClip": 1,
 				"AnimationMixer": 1,
@@ -3957,7 +4310,7 @@
 			},
 
 			"الحركات / Tracks": {
-				"_sub": "animation/tracks",
+				"_eng": "Animation / Tracks",
 				"BooleanKeyframeTrack": 1,
 				"ColorKeyframeTrack": 1,
 				"NumberKeyframeTrack": 1,
@@ -4107,7 +4460,7 @@
 			"오디오": "Audio",
 			"카메라": "Cameras",
 			"상수": {
-				"_sub": "constants",
+				"_eng": "Constants",
 				"Animation": 1,
 				"Core": 1,
 				"CustomBlendingEquations": 1,
@@ -4123,7 +4476,7 @@
 		"예제": {
 			"_main": "examples/ko",
 			"컨트롤": {
-				"_sub": "controls",
+				"_eng": "Controls",
 				"DeviceOrientationControls": 1,
 				"DragControls": 1,
 				"FirstPersonControls": 1,

@@ -127,6 +127,7 @@ function onDocumentLoad() {
 	// => 1.46x faster + saves 0.137 sec on loading time ... why not? :)
 
 	const PRIMITIVES = new Set( [
+		'Any',
 		'Array',
 		'ArrayBuffer',
 		'Boolean',
