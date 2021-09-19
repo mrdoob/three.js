@@ -15,7 +15,6 @@ import NodeCode from './core/NodeCode.js';
 import NodeFrame from './core/NodeFrame.js';
 import NodeFunctionInput from './core/NodeFunctionInput.js';
 import NodeKeywords from './core/NodeKeywords.js';
-import NodeSerializer from './core/NodeSerializer.js';
 import NodeSlot from './core/NodeSlot.js';
 import NodeUniform from './core/NodeUniform.js';
 import NodeVar from './core/NodeVar.js';
@@ -101,7 +100,6 @@ export {
 	NodeFrame,
 	NodeFunctionInput,
 	NodeKeywords,
-	NodeSerializer,
 	NodeSlot,
 	NodeUniform,
 	NodeVar,
