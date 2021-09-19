@@ -1280,7 +1280,8 @@ function WebGLRenderer( parameters = {} ) {
 				minFilter: LinearMipmapLinearFilter,
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
-				wrapT: ClampToEdgeWrapping
+				wrapT: ClampToEdgeWrapping,
+				useMultisampleRenderToTexture: extensions.has( 'EXT_multisampled_render_to_texture' )
 			} );
 
 		}
@@ -1853,15 +1854,61 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
+	this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0, options = {} ) {
 
 		_currentRenderTarget = renderTarget;
 		_currentActiveCubeFace = activeCubeFace;
 		_currentActiveMipmapLevel = activeMipmapLevel;
+		const useDefaultFramebuffer = options.framebuffer === undefined;
 
-		if ( renderTarget && properties.get( renderTarget ).__webglFramebuffer === undefined ) {
+		if ( renderTarget ) {
 
-			textures.setupRenderTarget( renderTarget );
+			const renderTargetProperties = properties.get( renderTarget );
+			let hasNewExternalTextures = false;
+
+			if ( options.colorTexture !== undefined ) {
+
+				hasNewExternalTextures = true;
+				properties.get( renderTarget.texture ).__webglTexture = options.colorTexture;
+
+				renderTarget.autoAllocateDepthBuffer = options.depthTexture === undefined;
+
+				if ( ! renderTarget.autoAllocateDepthBuffer ) {
+
+					properties.get( renderTarget.depthTexture ).__webglTexture = options.depthTexture;
+
+					// The multisample_render_to_texture extension doesn't work properly if there
+					// are midframe flushes and an external depth buffer. Disable use of the extension.
+					if ( renderTarget.useMultisampleRenderToTexture ) {
+
+						console.warn( 'render-to-texture extension was disabled because an external texture was provided' );
+						renderTarget.useMultisampleRenderToTexture = false;
+						renderTarget.useMultisampleRenderbuffer = true;
+
+					}
+
+				}
+
+				renderTarget.hasExternalTextures = true;
+
+			}
+
+			if ( ! useDefaultFramebuffer ) {
+
+				// We need to make sure to rebind the framebuffer.
+				state.bindFramebuffer( _gl.FRAMEBUFFER, null );
+				renderTargetProperties.__webglFramebuffer = options.framebuffer;
+
+			} else if ( renderTargetProperties.__webglFramebuffer === undefined ) {
+
+				textures.setupRenderTarget( renderTarget );
+
+			} else if ( hasNewExternalTextures ) {
+
+				// Color and depth texture must be rebound in order for the swapchain to update.
+				textures.rebindTextures( renderTarget, options.colorTexture, options.depthTexture );
+
+			}
 
 		}
 
@@ -1886,7 +1933,7 @@ function WebGLRenderer( parameters = {} ) {
 				framebuffer = __webglFramebuffer[ activeCubeFace ];
 				isCube = true;
 
-			} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
+			} else if ( renderTarget.useMultisampleRenderbuffer ) {
 
 				framebuffer = properties.get( renderTarget ).__webglMultisampledFramebuffer;
 
@@ -1910,7 +1957,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		const framebufferBound = state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-		if ( framebufferBound && capabilities.drawBuffers ) {
+		if ( framebufferBound && capabilities.drawBuffers && useDefaultFramebuffer ) {
 
 			let needsUpdate = false;
 
