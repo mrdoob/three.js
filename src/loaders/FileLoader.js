@@ -102,9 +102,10 @@ class FileLoader extends Loader {
 
 					const callbacks = loading[ url ];
 					const reader = response.body.getReader();
+					const contentLength = response.headers.get( 'Content-Length' );
+					const total = contentLength ? parseInt( contentLength ) : 0;
+					const lengthComputable = total != 0;
 					let loaded = 0;
-					const total = parseInt( response.headers.get( 'Content-Length' ) );
-
 
 					// periodically read data into the new stream tracking while download progress
 					return new ReadableStream( {
@@ -125,7 +126,7 @@ class FileLoader extends Loader {
 
 											loaded += value.byteLength;
 
-											const event = new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } );
+											const event = new ProgressEvent( 'progress', { lengthComputable, loaded, total } );
 											for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
 												const callback = callbacks[ i ];
@@ -163,7 +164,7 @@ class FileLoader extends Loader {
 				}
 
 			} )
-			.then( async stream => {
+			.then( stream => {
 
 				const response = new Response( stream );
 
