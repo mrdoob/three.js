@@ -5,7 +5,7 @@ const RAD2DEG = 180 / Math.PI;
 
 let generateUUID;
 
-if ( 'randomUUID' in crypto ) {
+if ( typeof crypto !== 'undefined' && 'randomUUID' in crypto ) {
 
 	generateUUID = function generateUUID() {
 
