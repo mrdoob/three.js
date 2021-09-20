@@ -2,6 +2,7 @@ import {
 	DynamicDrawUsage,
 	SphereGeometry,
 	BoxGeometry,
+	CylinderGeometry,
 	MeshStandardMaterial,
 	InstancedMesh,
 	Matrix4,
@@ -29,6 +30,15 @@ class XRHandPrimitiveModel {
 
 			geometry = new BoxGeometry( 1, 1, 1 );
 
+		} else if ( options.primitive === 'bones' ) {
+
+            geometry = new CylinderGeometry( 0.5, 0.75, 2.25, 10, 1 );
+
+            const cylinderReset = new Matrix4()
+                .makeRotationX(-Math.PI / 2);
+
+            geometry.applyMatrix4(cylinderReset);
+            
 		}
 
 		const material = new MeshStandardMaterial();
