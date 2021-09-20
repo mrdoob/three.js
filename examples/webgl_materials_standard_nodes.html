@@ -33,13 +33,7 @@
 
 			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
 
-			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
-			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
-			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
-			import SplitNode from './jsm/renderers/nodes/utils/SplitNode.js';
-			import NormalMapNode from './jsm/renderers/nodes/display/NormalMapNode.js';
-
-			import MeshStandardNodeMaterial from './jsm/renderers/nodes/materials/MeshStandardNodeMaterial.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let container, stats;
 
@@ -77,7 +71,7 @@
 
 				//
 
-				const material = new MeshStandardNodeMaterial();
+				const material = new Nodes.MeshStandardNodeMaterial();
 
 				new OBJLoader()
 					.setPath( 'models/obj/cerberus/' )
@@ -96,15 +90,15 @@
 						const normalMap = loader.load( 'Cerberus_N.jpg' );
 						normalMap.wrapS = THREE.RepeatWrapping;
 
-						const mpMapNode = new TextureNode( rmMap );
+						const mpMapNode = new Nodes.TextureNode( rmMap );
 
-						material.colorNode = new OperatorNode( '*', new TextureNode( diffuseMap ), new Vector3Node( material.color ) );
+						material.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( diffuseMap ), new Nodes.Vector3Node( material.color ) );
 
 						// roughness is in G channel, metalness is in B channel
-						material.roughnessNode = new SplitNode( mpMapNode, 'g' );
-						material.metalnessNode = new SplitNode( mpMapNode, 'b' );
+						material.roughnessNode = new Nodes.SplitNode( mpMapNode, 'g' );
+						material.metalnessNode = new Nodes.SplitNode( mpMapNode, 'b' );
 
-						material.normalNode = new NormalMapNode( new TextureNode( normalMap ) );
+						material.normalNode = new Nodes.NormalMapNode( new Nodes.TextureNode( normalMap ) );
 
 						group.traverse( function ( child ) {
 

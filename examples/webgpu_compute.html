@@ -34,11 +34,7 @@
 			import WebGPUUniformsGroup from './jsm/renderers/webgpu/WebGPUUniformsGroup.js';
 			import { Vector2Uniform } from './jsm/renderers/webgpu/WebGPUUniform.js';
 
-			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
-			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
-
-			import PointsNodeMaterial from './jsm/renderers/nodes/materials/PointsNodeMaterial.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 			let pointer;
@@ -185,8 +181,8 @@
 					'position', particleBuffer.attribute
 				);
 
-				const pointsMaterial = new PointsNodeMaterial();
-				pointsMaterial.colorNode = new OperatorNode( '+', new PositionNode(), new ColorNode( new THREE.Color( 0x0000FF ) ) );
+				const pointsMaterial = new Nodes.PointsNodeMaterial();
+				pointsMaterial.colorNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode(), new Nodes.ColorNode( new THREE.Color( 0x0000FF ) ) );
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
 				scene.add( mesh );
