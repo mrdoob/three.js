@@ -3,9 +3,11 @@ let _seed = 1234567;
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
+let generateUUID;
+
 if ( 'randomUUID' in crypto ) {
 	
-	function generateUUID() {
+	generateUUID = function generateUUID() {
 
 		return crypto.randomUUID().toUpperCase();
 
@@ -22,7 +24,7 @@ if ( 'randomUUID' in crypto ) {
 	}
 	
 	// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
-	function generateUUID() {
+	generateUUID = function generateUUID() {
 
 		const d0 = Math.random() * 0xffffffff | 0;
 		const d1 = Math.random() * 0xffffffff | 0;
