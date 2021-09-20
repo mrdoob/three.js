@@ -6,13 +6,13 @@ const RAD2DEG = 180 / Math.PI;
 let generateUUID;
 
 if ( 'randomUUID' in crypto ) {
-	
+
 	generateUUID = function generateUUID() {
 
 		return crypto.randomUUID().toUpperCase();
 
-	}
-	
+	};
+
 } else {
 
 	const _lut = [];
@@ -22,7 +22,7 @@ if ( 'randomUUID' in crypto ) {
 		_lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
 
 	}
-	
+
 	// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 	generateUUID = function generateUUID() {
 
@@ -38,8 +38,8 @@ if ( 'randomUUID' in crypto ) {
 		// .toUpperCase() here flattens concatenated strings to save heap memory space.
 		return uuid.toUpperCase();
 
-	}
-	
+	};
+
 }
 
 function clamp( value, min, max ) {
