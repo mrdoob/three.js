@@ -2433,6 +2433,7 @@ class GLTFParser {
 		// Gives the object the ability to find itself in the glTF data structure
 		// of the given type, in other words this indicates which glTF object
 		// the Three object was generated from and/or represents.
+		object.userData = object.userData || {};
 		object.userData[ `${type}Index` ] = index;
 
 	}
