@@ -14,7 +14,7 @@ if ( typeof crypto !== 'undefined' && 'randomUUID' in crypto ) {
 	};
 
 } else {
-	
+
 	// TODO Remove this code when crypto.randomUUID() is available everywhere
 
 	const _lut = [];
