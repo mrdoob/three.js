@@ -2171,7 +2171,10 @@ class GLTFParser {
 		// loader object cache
 		this.cache = new GLTFRegistry();
 
-		// associations between Three.js objects and glTF elements
+		 /**
+		 * Associations between Three.js objects and glTF elements
+		 * @type {Map<Object3D|Material|Texture, {nodes:number, meshes:number, primitives:number}>}
+		 */
 		this.associations = new Map();
 
 		// BufferGeometry caching
@@ -2369,6 +2372,12 @@ class GLTFParser {
 
 		const ref = object.clone();
 
+		// Propagates mappings to the cloned object.
+		const mappings = this.associations.get( object );
+		if( mappings !== undefined ) {
+			this.associations.set(ref, mappings);
+		}
+
 		ref.name += '_instance_' + ( cache.uses[ index ] ++ );
 
 		return ref;
@@ -2408,6 +2417,31 @@ class GLTFParser {
 		}
 
 		return pending;
+
+	}
+
+	/**
+	 * Adds a glTF association by mapping the object to a glTF type and index.
+	 * Note that a single Three.js object can represent several glTF objects and
+	 * thus several mappings may be added for one object.
+	 * @param {Object3D} object the Three.js object to be mapped
+	 * @param {string} type the glTF type (nodes, meshes, materials, textures)
+	 *  includes inferred type 'primitives'
+	 * @param {number} index the glTF index, indicates the exact object in a glTF
+	 *  type list
+	 */
+	_addAssociation( object, type, index ) {
+
+		const mappings = this.associations.get( object ) || {}
+		mappings[type] = index;
+		this.associations.set( object, mappings );
+
+		// Gives the object the ability to find itself in the glTF data structure
+		// of the given type, in other words this indicates which glTF object
+		// the Three object was generated from and/or represents.
+		object.userData = object.userData || {};
+		object.userData.associations = object.userData.associations || {};
+		object.userData.associations[type] = index;
 
 	}
 
@@ -2826,7 +2860,7 @@ class GLTFParser {
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
-			parser.associations.set( texture, { textures: textureIndex } );
+			parser._addAssociation( texture, 'textures', textureIndex );
 
 			return texture;
 
@@ -3166,7 +3200,7 @@ class GLTFParser {
 
 			assignExtrasToUserData( material, materialDef );
 
-			parser.associations.set( material, { materials: materialIndex } );
+			parser._addAssociation( material, 'materials', materialIndex );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3298,7 +3332,7 @@ class GLTFParser {
 			const materials = results.slice( 0, results.length - 1 );
 			const geometries = results[ results.length - 1 ];
 
-			const meshes = [];
+			const outPrimitives = [];
 
 			for ( let i = 0, il = geometries.length; i < il; i ++ ) {
 
@@ -3375,36 +3409,37 @@ class GLTFParser {
 
 				parser.assignFinalMaterial( mesh );
 
-				meshes.push( mesh );
+				outPrimitives.push( mesh );
 
 			}
 
-			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
+			for ( let i = 0, il = outPrimitives.length; i < il; i ++ ) {
 
-				parser.associations.set( meshes[ i ], {
-					meshes: meshIndex,
-					primitives: i
-				} );
+				parser._addAssociation( outPrimitives[ i ], 'meshes', meshIndex );
+				parser._addAssociation( outPrimitives[ i ], 'primitives', i );
 
 			}
 
-			if ( meshes.length === 1 ) {
+			if ( outPrimitives.length === 1 ) {
 
-				return meshes[ 0 ];
-
-			}
-
-			const group = new Group();
-
-			parser.associations.set( group, { meshes: meshIndex } );
-
-			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
-
-				group.add( meshes[ i ] );
+				return outPrimitives[ 0 ];
 
 			}
 
-			return group;
+			// Represents the mesh as a group node.
+			const mesh = new Group();
+
+			parser._addAssociation( mesh, 'meshes', meshIndex );
+
+			for ( let i = 0, il = outPrimitives.length; i < il; i ++ ) {
+
+				// Primitives are added to the mesh.
+				mesh.add( outPrimitives[ i ] );
+
+			}
+
+
+			return mesh;
 
 		} );
 
@@ -3807,13 +3842,7 @@ class GLTFParser {
 
 			}
 
-			if ( ! parser.associations.has( node ) ) {
-
-				parser.associations.set( node, {} );
-
-			}
-
-			parser.associations.get( node ).nodes = nodeIndex;
+			parser._addAssociation( node, 'nodes', nodeIndex );
 
 			return node;
 
