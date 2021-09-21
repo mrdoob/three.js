@@ -2374,8 +2374,10 @@ class GLTFParser {
 
 		// Propagates mappings to the cloned object.
 		const mappings = this.associations.get( object );
-		if( mappings !== undefined ) {
-			this.associations.set(ref, mappings);
+		if ( mappings !== undefined ) {
+
+			this.associations.set( ref, mappings );
+
 		}
 
 		ref.name += '_instance_' + ( cache.uses[ index ] ++ );
@@ -2432,8 +2434,8 @@ class GLTFParser {
 	 */
 	_addAssociation( object, type, index ) {
 
-		const mappings = this.associations.get( object ) || {}
-		mappings[type] = index;
+		const mappings = this.associations.get( object ) || {};
+		mappings[ type ] = index;
 		this.associations.set( object, mappings );
 
 		// Gives the object the ability to find itself in the glTF data structure
@@ -2441,7 +2443,7 @@ class GLTFParser {
 		// the Three object was generated from and/or represents.
 		object.userData = object.userData || {};
 		object.userData.associations = object.userData.associations || {};
-		object.userData.associations[type] = index;
+		object.userData.associations[ type ] = index;
 
 	}
 
