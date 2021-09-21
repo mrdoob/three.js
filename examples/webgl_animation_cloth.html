@@ -29,6 +29,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ParametricGeometry } from './jsm/geometries/ParametricGeometry.js';
 
 			/*
 			 * Cloth Simulation using a relaxed constraints solver
@@ -466,7 +467,7 @@
 
 				// cloth geometry
 
-				clothGeometry = new THREE.ParametricBufferGeometry( clothFunction, cloth.w, cloth.h );
+				clothGeometry = new ParametricGeometry( clothFunction, cloth.w, cloth.h );
 
 				// cloth mesh
 
