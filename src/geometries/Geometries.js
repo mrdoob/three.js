@@ -8,7 +8,6 @@ export * from './ExtrudeGeometry.js';
 export * from './IcosahedronGeometry.js';
 export * from './LatheGeometry.js';
 export * from './OctahedronGeometry.js';
-export * from './ParametricGeometry.js';
 export * from './PlaneGeometry.js';
 export * from './PolyhedronGeometry.js';
 export * from './RingGeometry.js';

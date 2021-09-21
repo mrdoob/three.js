@@ -47,7 +47,6 @@
 				Mesh,
 				MeshPhongMaterial,
 				OctahedronGeometry,
-				ParametricGeometry,
 				PerspectiveCamera,
 				PlaneGeometry,
 				PointLight,
@@ -650,30 +649,6 @@
 					folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
-
-					generateGeometry();
-
-				},
-
-				ParametricGeometry: function ( mesh ) {
-
-					const data = {
-						slices: 25,
-						stacks: 25
-					};
-
-					function generateGeometry() {
-
-						updateGroupGeometry( mesh,
-							new ParametricGeometry( ParametricGeometries.klein, data.slices, data.stacks )
-						);
-
-					}
-
-					const folder = gui.addFolder( 'THREE.ParametricGeometry' );
-
-					folder.add( data, 'slices', 1, 100 ).step( 1 ).onChange( generateGeometry );
-					folder.add( data, 'stacks', 1, 100 ).step( 1 ).onChange( generateGeometry );
 
 					generateGeometry();
 

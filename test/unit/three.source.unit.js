@@ -97,7 +97,6 @@ import './src/geometries/ExtrudeGeometry.tests';
 import './src/geometries/IcosahedronGeometry.tests';
 import './src/geometries/LatheGeometry.tests';
 import './src/geometries/OctahedronGeometry.tests';
-import './src/geometries/ParametricGeometry.tests';
 import './src/geometries/PlaneGeometry.tests';
 import './src/geometries/PolyhedronGeometry.tests';
 import './src/geometries/RingGeometry.tests';
