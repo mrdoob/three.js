@@ -403,7 +403,7 @@ function updateLegacy( verbose ) {
 /**
  * Parse methods & properties from doc file
  */
-function parseSource( pagePath, pageName, onlyCheck ) {
+function parseSource( pagePath, pageName, onlyCheck, addTitle ) {
 
 	// Read doc file
 	const fileExists = fs.existsSync( pagePath );
@@ -457,6 +457,47 @@ function parseSource( pagePath, pageName, onlyCheck ) {
 
 	}
 
+	// add the title?
+
+	if ( addTitle ) {
+
+		let newData;
+		const title = pageName + ' - three.js docs';
+		const result = data.match( /<title>(.*)<\/title>/s );
+
+		if ( result ) {
+
+			// update title if it's incorrect
+
+			if ( result[ 1 ] != title ) {
+
+				newData = data.slice( 0, result.index )
+					+ '<title>' + title + '</title>'
+					+ data.slice( result.index + result[ 0 ].length );
+
+			}
+
+		} else {
+
+			// no title => add one
+
+			const pos = data.indexOf( '<base href=' );
+			if ( pos >= 0 ) {
+
+				newData = data.slice( 0, pos ) + '<title>' + title + '</title>\n\t\t' + data.slice( pos );
+
+			}
+
+		}
+
+		if ( newData ) {
+
+			fs.writeFileSync( pagePath, newData );
+
+		}
+
+	}
+
 	return ( dico.method || dico.property ) ? dico : null;
 
 }
@@ -464,7 +505,7 @@ function parseSource( pagePath, pageName, onlyCheck ) {
 /**
  * Updates docs meta in `docs/files.json`.
  */
-function updateDocs() {
+function updateDocs( addTitle ) {
 
 	// Get list data
 	const list = JSON.parse( fs.readFileSync( path.join( DOCS_PATH, 'list.json' ), 'utf-8' ) );
@@ -506,7 +547,7 @@ function updateDocs() {
 
 			}
 
-			const data = parseSource( path.join( DOCS_PATH, `${url}.html` ), pageName );
+			const data = parseSource( path.join( DOCS_PATH, `${url}.html` ), pageName, false, addTitle );
 			if ( ! data ) {
 
 				return;
@@ -570,17 +611,20 @@ function updateDocs() {
 
 // Check whether to write via CLI flag
 const args = new Set( process.argv.slice( 2 ) );
+const legacy = args.has( '--legacy' );
+const docs = args.has( '--docs' );
+const title = args.has( '--title' );
 const verbose = args.has( '--verbose' );
 
-if ( args.has( '--legacy' ) ) {
+if ( legacy ) {
 
 	updateLegacy( verbose );
 
 }
 
-if ( args.has( '--docs' ) ) {
+if ( docs ) {
 
-	updateDocs();
+	updateDocs( title );
 
 }
 
