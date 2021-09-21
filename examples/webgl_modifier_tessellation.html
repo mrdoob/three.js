@@ -61,6 +61,8 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { TessellateModifier } from './jsm/modifiers/TessellateModifier.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 
 			let renderer, scene, camera, stats;
 
@@ -71,7 +73,7 @@
 			const WIDTH = window.innerWidth;
 			const HEIGHT = window.innerHeight;
 
-			const loader = new THREE.FontLoader();
+			const loader = new FontLoader();
 			loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 				init( font );
@@ -89,7 +91,7 @@
 
 				//
 
-				let geometry = new THREE.TextGeometry( 'THREE.JS', {
+				let geometry = new TextGeometry( 'THREE.JS', {
 
 					font: font,
 

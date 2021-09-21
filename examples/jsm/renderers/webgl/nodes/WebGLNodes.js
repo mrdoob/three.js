@@ -21,6 +21,7 @@ Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry
 		nodeFrame.material = this;
 		nodeFrame.camera = camera;
 		nodeFrame.object = object;
+		nodeFrame.renderer = renderer;
 
 		for ( const node of nodeBuilder.updateNodes ) {
 

@@ -3,13 +3,15 @@
  * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
  */
 
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
+import {
+	BufferGeometry,
+	Float32BufferAttribute,
+	Vector3
+} from '../../../build/three.module.js';
 
 class ParametricGeometry extends BufferGeometry {
 
-	constructor( func, slices, stacks ) {
+	constructor( func = ( u, v, target ) => target.set( u, v, Math.cos( u ) * Math.sin( v ) ), slices = 8, stacks = 8 ) {
 
 		super();
 

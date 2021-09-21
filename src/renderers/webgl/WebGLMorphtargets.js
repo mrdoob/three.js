@@ -15,6 +15,20 @@ function absNumericalSort( a, b ) {
 
 }
 
+function denormalize( morph, attribute ) {
+
+	let denominator = 1;
+	const array = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
+
+	if ( array instanceof Int8Array ) denominator = 127;
+	else if ( array instanceof Int16Array ) denominator = 32767;
+	else if ( array instanceof Int32Array ) denominator = 2147483647;
+	else console.error( 'THREE.WebGLMorphtargets: Unsupported morph attribute data type: ', array );
+
+	morph.divideScalar( denominator );
+
+}
+
 function WebGLMorphtargets( gl, capabilities, textures ) {
 
 	const influencesList = {};
@@ -86,6 +100,8 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 						morph.fromBufferAttribute( morphTarget, j );
 
+						if ( morphTarget.normalized === true ) denormalize( morph, morphTarget );
+
 						const stride = j * vertexDataStride;
 
 						buffer[ offset + stride + 0 ] = morph.x;
@@ -95,6 +111,8 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 						if ( hasMorphNormals === true ) {
 
 							morph.fromBufferAttribute( morphNormal, j );
+
+							if ( morphNormal.normalized === true ) denormalize( morph, morphNormal );
 
 							buffer[ offset + stride + 3 ] = morph.x;
 							buffer[ offset + stride + 4 ] = morph.y;

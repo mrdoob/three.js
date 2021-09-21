@@ -27,6 +27,8 @@
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
+		import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+		import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 		import { ReflectorForSSRPass } from './jsm/objects/ReflectorForSSRPass.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
@@ -144,7 +146,6 @@
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputEncoding = THREE.sRGBEncoding;
 			container.appendChild( renderer.domElement );
 
 			//
@@ -171,12 +172,12 @@
 				camera,
 				width: innerWidth,
 				height: innerHeight,
-				encoding: THREE.sRGBEncoding,
 				groundReflector: params.groundReflector ? groundReflector : null,
 				selects: params.groundReflector ? selects : null
 			} );
 
 			composer.addPass( ssrPass );
+			composer.addPass( new ShaderPass( GammaCorrectionShader ) );
 
 			// GUI
 

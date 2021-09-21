@@ -26,6 +26,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
 
 			let camera, scene, renderer;
 
@@ -40,7 +41,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					const color = new THREE.Color( 0x006699 );

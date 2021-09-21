@@ -24,7 +24,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSRrPass extends Pass {
 
-	constructor( { renderer, scene, camera, width, height, selects, encoding } ) {
+	constructor( { renderer, scene, camera, width, height, selects } ) {
 
 		super();
 
@@ -43,8 +43,6 @@ class SSRrPass extends Pass {
 		this.ior = SSRrShader.uniforms.ior.value;
 		this.maxDistance = SSRrShader.uniforms.maxDistance.value;
 		this.surfDist = SSRrShader.uniforms.surfDist.value;
-
-		this.encoding = encoding;
 
 		this.tempColor = new Color();
 
@@ -274,7 +272,6 @@ class SSRrPass extends Pass {
 
 		// render beauty and depth
 
-		if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 		this.scene.children.forEach( child => {

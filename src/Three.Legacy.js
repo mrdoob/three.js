@@ -1929,3 +1929,31 @@ export function LensFlare() {
 	console.error( 'THREE.LensFlare has been moved to /examples/jsm/objects/Lensflare.js' );
 
 }
+
+//
+
+export function ParametricGeometry() {
+
+	console.error( 'THREE.ParametricGeometry has been moved to /examples/jsm/geometries/ParametricGeometry.js' );
+	return new BufferGeometry();
+
+}
+
+export function TextGeometry() {
+
+	console.error( 'THREE.TextGeometry has been moved to /examples/jsm/geometries/TextGeometry.js' );
+	return new BufferGeometry();
+
+}
+
+export function FontLoader() {
+
+	console.error( 'THREE.FontLoader has been moved to /examples/jsm/loaders/FontLoader.js' );
+
+}
+
+export function Font() {
+
+	console.error( 'THREE.Font has been moved to /examples/jsm/loaders/FontLoader.js' );
+
+}
