@@ -148,7 +148,6 @@
 				"IcosahedronGeometry": "api/en/geometries/IcosahedronGeometry",
 				"LatheGeometry": "api/en/geometries/LatheGeometry",
 				"OctahedronGeometry": "api/en/geometries/OctahedronGeometry",
-				"ParametricGeometry": "api/en/geometries/ParametricGeometry",
 				"PlaneGeometry": "api/en/geometries/PlaneGeometry",
 				"PolyhedronGeometry": "api/en/geometries/PolyhedronGeometry",
 				"RingGeometry": "api/en/geometries/RingGeometry",
@@ -351,7 +350,8 @@
 
 			"Geometries": {
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/en/geometries/DecalGeometry"
+				"DecalGeometry": "examples/en/geometries/DecalGeometry",
+				"ParametricGeometry": "examples/en/geometries/ParametricGeometry"
 			},
 
 			"Helpers": {
@@ -658,7 +658,6 @@
 				"IcosahedronGeometry": "api/zh/geometries/IcosahedronGeometry",
 				"LatheGeometry": "api/zh/geometries/LatheGeometry",
 				"OctahedronGeometry": "api/zh/geometries/OctahedronGeometry",
-				"ParametricGeometry": "api/zh/geometries/ParametricGeometry",
 				"PlaneGeometry": "api/zh/geometries/PlaneGeometry",
 				"PolyhedronGeometry": "api/zh/geometries/PolyhedronGeometry",
 				"RingGeometry": "api/zh/geometries/RingGeometry",
@@ -860,7 +859,8 @@
 
 			"几何体": {
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
+				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
+				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry"
 			},
 
 			"辅助对象": {
