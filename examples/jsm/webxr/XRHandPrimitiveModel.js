@@ -30,7 +30,7 @@ class XRHandPrimitiveModel {
 
 			geometry = new BoxGeometry( 1, 1, 1 );
 
-		} else if ( options.primitive === 'bones' ) {
+		} else if ( options.primitive === 'bone' ) {
 
 			geometry = new CylinderGeometry( 0.5, 0.75, 2.25, 10, 1 ).rotateX( - Math.PI / 2 );
 
