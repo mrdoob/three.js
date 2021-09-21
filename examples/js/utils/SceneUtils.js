@@ -37,6 +37,52 @@
 
 	}
 
+	//Convert multi-material mesh into group of mesh with single material
+	function createMeshesFromMultiMaterialMesh( mesh ) {
+
+		const group = new THREE.Group();
+
+		//split groups by material index
+		const materials = mesh.material;
+
+		if ( ! ( materials instanceof Array ) ) {
+
+			console.error( 'Not a multimaterial mesh.' );
+			return;
+
+		}
+
+		materials.forEach( ( mat, index ) => {
+
+			const singleIndexGroups = mesh.geometry.groups.filter( g => g.materialIndex == index );
+			const singleIndices = mesh.geometry.index.array.filter( ( val, i ) => {
+
+				let belong = false;
+				singleIndexGroups.forEach( g => {
+
+					belong |= ( g.start <= i && g.count + g.start > i );
+
+				} );
+
+				return belong;
+
+			} );
+			const singleGeo = mesh.geometry.clone();
+			singleGeo.setIndex( new THREE.BufferAttribute( new Uint16Array( singleIndices ), 1 ) );
+			const singleMesh = new THREE.Mesh( singleGeo, mat );
+			group.add( singleMesh );
+
+		} );
+		group.position.copy( mesh.position );
+		group.rotation.copy( mesh.rotation );
+		group.scale.copy( mesh.scale );
+		group.name = mesh.name;
+		group.visible = mesh.visible;
+
+		return group;
+
+	}
+
 	function detach( child, parent, scene ) {
 
 		console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
@@ -55,6 +101,7 @@
 	THREE.SceneUtils.attach = attach;
 	THREE.SceneUtils.createMeshesFromInstancedMesh = createMeshesFromInstancedMesh;
 	THREE.SceneUtils.createMultiMaterialObject = createMultiMaterialObject;
+	THREE.SceneUtils.createMeshesFromMultiMaterialMesh = createMeshesFromMultiMaterialMesh;
 	THREE.SceneUtils.detach = detach;
 
 } )();
