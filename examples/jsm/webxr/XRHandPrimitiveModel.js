@@ -32,13 +32,8 @@ class XRHandPrimitiveModel {
 
 		} else if ( options.primitive === 'bones' ) {
 
-            geometry = new CylinderGeometry( 0.5, 0.75, 2.25, 10, 1 );
+			geometry = new CylinderGeometry( 0.5, 0.75, 2.25, 10, 1 ).rotateX( - Math.PI / 2 );
 
-            const cylinderReset = new Matrix4()
-                .makeRotationX(-Math.PI / 2);
-
-            geometry.applyMatrix4(cylinderReset);
-            
 		}
 
 		const material = new MeshStandardMaterial();
