@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		使用JSON格式中加载字体的一个类。返回[page:Font Font], 返回值是表示字体的[page:Shape Shape]类型的数组。
+		使用JSON格式中加载字体的一个类。返回font, 返回值是表示字体的[page:Shape Shape]类型的数组。
 		其内部使用[page:FileLoader]来加载文件。 <br /><br />
 
 		你可以使用[link:https://gero3.github.io/facetype.js/ facetype.js]在线转换字体。
@@ -21,7 +21,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		const loader = new THREE.FontLoader();
+		const loader = new FontLoader();
 		const font = loader.load(
 			// 资源URL
 			'fonts/helvetiker_bold.typeface.json',
@@ -29,7 +29,7 @@
 			// onLoad回调
 			function ( font ) {
 				// do something with the font
-				scene.add( font );
+				console.log( font );
 			},
 
 			// onProgress回调
@@ -79,13 +79,13 @@
 		<h3>[method:Font parse]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
-		以<em>JSON</em>格式进行解析，并返回一个[page:Font].
+		以<em>JSON</em>格式进行解析，并返回一个font.
 		</p>
 
 		<h2>源</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/FontLoader.js examples/jsm/loaders/FontLoader.js]
 		</p>
 	</body>
 </html>

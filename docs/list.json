@@ -113,7 +113,6 @@
 			"Extras / Core": {
 				"Curve": "api/en/extras/core/Curve",
 				"CurvePath": "api/en/extras/core/CurvePath",
-				"Font": "api/en/extras/core/Font",
 				"Interpolations": "api/en/extras/core/Interpolations",
 				"Path": "api/en/extras/core/Path",
 				"Shape": "api/en/extras/core/Shape",
@@ -154,7 +153,6 @@
 				"ShapeGeometry": "api/en/geometries/ShapeGeometry",
 				"SphereGeometry": "api/en/geometries/SphereGeometry",
 				"TetrahedronGeometry": "api/en/geometries/TetrahedronGeometry",
-				"TextGeometry": "api/en/geometries/TextGeometry",
 				"TorusGeometry": "api/en/geometries/TorusGeometry",
 				"TorusKnotGeometry": "api/en/geometries/TorusKnotGeometry",
 				"TubeGeometry": "api/en/geometries/TubeGeometry",
@@ -206,7 +204,6 @@
 				"CubeTextureLoader": "api/en/loaders/CubeTextureLoader",
 				"DataTextureLoader": "api/en/loaders/DataTextureLoader",
 				"FileLoader": "api/en/loaders/FileLoader",
-				"FontLoader": "api/en/loaders/FontLoader",
 				"ImageBitmapLoader": "api/en/loaders/ImageBitmapLoader",
 				"ImageLoader": "api/en/loaders/ImageLoader",
 				"Loader": "api/en/loaders/Loader",
@@ -351,7 +348,8 @@
 			"Geometries": {
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
-				"ParametricGeometry": "examples/en/geometries/ParametricGeometry"
+				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
+				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
 
 			"Helpers": {
@@ -370,6 +368,7 @@
 				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
+				"FontLoader": "examples/en/loaders/FontLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
@@ -623,7 +622,6 @@
 			"附件 / 核心": {
 				"Curve": "api/zh/extras/core/Curve",
 				"CurvePath": "api/zh/extras/core/CurvePath",
-				"Font": "api/zh/extras/core/Font",
 				"Interpolations": "api/zh/extras/core/Interpolations",
 				"Path": "api/zh/extras/core/Path",
 				"Shape": "api/zh/extras/core/Shape",
@@ -664,7 +662,6 @@
 				"ShapeGeometry": "api/zh/geometries/ShapeGeometry",
 				"SphereGeometry": "api/zh/geometries/SphereGeometry",
 				"TetrahedronGeometry": "api/zh/geometries/TetrahedronGeometry",
-				"TextGeometry": "api/zh/geometries/TextGeometry",
 				"TorusGeometry": "api/zh/geometries/TorusGeometry",
 				"TorusKnotGeometry": "api/zh/geometries/TorusKnotGeometry",
 				"TubeGeometry": "api/zh/geometries/TubeGeometry",
@@ -716,7 +713,6 @@
 				"CubeTextureLoader": "api/zh/loaders/CubeTextureLoader",
 				"DataTextureLoader": "api/zh/loaders/DataTextureLoader",
 				"FileLoader": "api/zh/loaders/FileLoader",
-				"FontLoader": "api/zh/loaders/FontLoader",
 				"ImageBitmapLoader": "api/zh/loaders/ImageBitmapLoader",
 				"ImageLoader": "api/zh/loaders/ImageLoader",
 				"Loader": "api/zh/loaders/Loader",
@@ -860,7 +856,8 @@
 			"几何体": {
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
-				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry"
+				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
+				"TextGeometry": "examples/zh/geometries/TextGeometry"
 			},
 
 			"辅助对象": {
@@ -878,6 +875,7 @@
 			"加载器": {
 				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
+				"FontLoader": "examples/zh/loaders/FontLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",

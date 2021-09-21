@@ -14,7 +14,6 @@ export * from './RingGeometry.js';
 export * from './ShapeGeometry.js';
 export * from './SphereGeometry.js';
 export * from './TetrahedronGeometry.js';
-export * from './TextGeometry.js';
 export * from './TorusGeometry.js';
 export * from './TorusKnotGeometry.js';
 export * from './TubeGeometry.js';
