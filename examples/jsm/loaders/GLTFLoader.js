@@ -3345,7 +3345,7 @@ class GLTFParser {
 			const materials = results.slice( 0, results.length - 1 );
 			const geometries = results[ results.length - 1 ];
 
-			const outPrimitives = [];
+			const meshes = [];
 
 			for ( let i = 0, il = geometries.length; i < il; i ++ ) {
 
@@ -3425,30 +3425,36 @@ class GLTFParser {
 
 				parser.assignFinalMaterial( mesh );
 
-				outPrimitives.push( mesh );
+				meshes.push( mesh );
 
 			}
 
-			if ( outPrimitives.length === 1 ) {
+			let meshContainer = null;
+
+			if ( meshes.length === 1 ) {
 
 				// Combines the primitive, mesh, and node into one object.
-				return outPrimitives[ 0 ];
+				meshContainer = meshes[ 0 ];
+
+				return meshes[ 0 ];
+
+			} else {
+
+				// Represents the mesh as a group node.
+				meshContainer = new Group();
+
+				for ( let i = 0, il = meshes.length; i < il; i ++ ) {
+
+					// Represents the mesh primitives as children of a group node.
+					meshContainer.add( meshes[ i ] );
+
+				}
 
 			}
 
-			// Represents the mesh as a group node.
-			const mesh = new Group();
+			parser._addAssociation( meshContainer, 'meshes', meshIndex );
 
-			for ( let i = 0, il = outPrimitives.length; i < il; i ++ ) {
-
-				// Primitives are added to the mesh.
-				mesh.add( outPrimitives[ i ] );
-
-			}
-
-			parser._addAssociation( mesh, 'meshes', meshIndex );
-
-			return mesh;
+			return meshContainer;
 
 		} );
 
