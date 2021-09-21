@@ -33,18 +33,7 @@
 
 			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
 
-			import PointsNodeMaterial from './jsm/renderers/nodes/materials/PointsNodeMaterial.js';
-
-			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
-			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
-			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
-			import PointUVNode from './jsm/renderers/nodes/accessors/PointUVNode.js';
-			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
-			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
-			import MathNode from './jsm/renderers/nodes/math/MathNode.js';
-			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
-			import SpriteSheetUVNode from './jsm/renderers/nodes/utils/SpriteSheetUVNode.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer, stats;
 
@@ -101,28 +90,28 @@
 
 				// nodes
 
-				const targetPosition = new AttributeNode( 'targetPosition', 'vec3' );
-				const particleSpeed = new AttributeNode( 'particleSpeed', 'float' );
-				const particleIntensity = new AttributeNode( 'particleIntensity', 'float' );
-				const particleSize = new AttributeNode( 'particleSize', 'float' );
+				const targetPosition = new Nodes.AttributeNode( 'targetPosition', 'vec3' );
+				const particleSpeed = new Nodes.AttributeNode( 'particleSpeed', 'float' );
+				const particleIntensity = new Nodes.AttributeNode( 'particleIntensity', 'float' );
+				const particleSize = new Nodes.AttributeNode( 'particleSize', 'float' );
 
-				const time = new TimerNode();
+				const time = new Nodes.TimerNode();
 
-				const spriteSheetCount = new Vector2Node( new THREE.Vector2( 6, 6 ) ).setConst( true );
+				const spriteSheetCount = new Nodes.Vector2Node( new THREE.Vector2( 6, 6 ) ).setConst( true );
 
-				const fireUV = new SpriteSheetUVNode( spriteSheetCount, new PointUVNode() );
-				fireUV.frame = new OperatorNode( '*', time, particleSpeed );
+				const fireUV = new Nodes.SpriteSheetUVNode( spriteSheetCount, new Nodes.PointUVNode() );
+				fireUV.frame = new Nodes.OperatorNode( '*', time, particleSpeed );
 
-				const fireSprite = new TextureNode( fireMap, fireUV );
-				const fire = new OperatorNode( '*', fireSprite, particleIntensity );
+				const fireSprite = new Nodes.TextureNode( fireMap, fireUV );
+				const fire = new Nodes.OperatorNode( '*', fireSprite, particleIntensity );
 
-				const lerpPosition = new FloatNode( 0 );
+				const lerpPosition = new Nodes.FloatNode( 0 );
 
-				const positionNode = new MathNode( MathNode.MIX, new PositionNode( PositionNode.LOCAL ), targetPosition, lerpPosition );
+				const positionNode = new Nodes.MathNode( Nodes.MathNode.MIX, new Nodes.PositionNode( Nodes.PositionNode.LOCAL ), targetPosition, lerpPosition );
 
 				// material
 
-				const material = new PointsNodeMaterial( {
+				const material = new Nodes.PointsNodeMaterial( {
 					depthWrite: false,
 					transparent: true,
 					sizeAttenuation: true,

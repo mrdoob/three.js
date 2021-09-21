@@ -22,6 +22,9 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
+
 			import Stats from './jsm/libs/stats.module.js';
 
 			THREE.Cache.enabled = true;
@@ -326,7 +329,7 @@
 
 			function loadFont() {
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
 
 					font = response;
@@ -339,7 +342,7 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextGeometry( text, {
+				textGeo = new TextGeometry( text, {
 
 					font: font,
 

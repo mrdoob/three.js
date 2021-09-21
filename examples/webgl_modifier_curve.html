@@ -19,6 +19,8 @@
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 			import Stats from './jsm/libs/stats.module.js';
 			import { Flow } from './jsm/modifiers/CurveModifier.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 
 			const ACTION_SELECT = 1, ACTION_NONE = 0;
 			const curveHandles = [];
@@ -95,10 +97,10 @@
 
 				//
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-					const geometry = new THREE.TextGeometry( 'Hello three.js!', {
+					const geometry = new TextGeometry( 'Hello three.js!', {
 						font: font,
 						size: 0.2,
 						height: 0.05,

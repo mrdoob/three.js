@@ -28,12 +28,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			import ContextNode from './jsm/renderers/nodes/core/ContextNode.js';
-			import FunctionNode from './jsm/renderers/nodes/core/FunctionNode.js';
-
-			import LightsNode from './jsm/renderers/nodes/lights/LightsNode.js';
-
-			import PointsNodeMaterial from './jsm/renderers/nodes/materials/PointsNodeMaterial.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 
@@ -75,7 +70,7 @@
 
 				//light nodes ( selective lights )
 
-				const allLightsNode = LightsNode.fromLights( [ light1, light2, light3 ] );
+				const allLightsNode = Nodes.LightsNode.fromLights( [ light1, light2, light3 ] );
 
 				// points
 
@@ -89,11 +84,11 @@
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new PointsNodeMaterial();
+				const materialPoints = new Nodes.PointsNodeMaterial();
 
 				// custom lighting model
 
-				const customLightingModel = new FunctionNode( `
+				const customLightingModel = new Nodes.FunctionNode( `
 					void ( inout ReflectedLight reflectedLight, vec3 lightColor ) {
 
 						// lightColor returns the light color with the intensity calculated
@@ -102,7 +97,7 @@
 
 					}` );
 
-				const lightingModelContext = new ContextNode( allLightsNode );
+				const lightingModelContext = new Nodes.ContextNode( allLightsNode );
 				lightingModelContext.setContextValue( 'lightingModel', customLightingModel );
 
 				materialPoints.lightNode = lightingModelContext;

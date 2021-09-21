@@ -28,21 +28,7 @@
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
-			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
-			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
-			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
-			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
-			import UVNode from './jsm/renderers/nodes/accessors/UVNode.js';
-			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
-			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
-			import SplitNode from './jsm/renderers/nodes/utils/SplitNode.js';
-			import TimerNode from './jsm/renderers/nodes/utils/TimerNode.js';
-
-			import MeshBasicNodeMaterial from './jsm/renderers/nodes/materials/MeshBasicNodeMaterial.js';
-			import LineBasicNodeMaterial from './jsm/renderers/nodes/materials/LineBasicNodeMaterial.js';
-			import PointsNodeMaterial from './jsm/renderers/nodes/materials/PointsNodeMaterial.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 
@@ -86,15 +72,15 @@
 				// box mesh
 
 				const geometryBox = new THREE.BoxGeometry();
-				const materialBox = new MeshBasicNodeMaterial();
+				const materialBox = new Nodes.MeshBasicNodeMaterial();
 
-				const timerNode = new TimerNode();
+				const timerNode = new Nodes.TimerNode();
 
 				// birection speed
-				const timerScaleNode = new OperatorNode( '*', timerNode, new Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
-				const animateUV = new OperatorNode( '+', new UVNode(), timerScaleNode );
+				const timerScaleNode = new Nodes.OperatorNode( '*', timerNode, new Nodes.Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
+				const animateUV = new Nodes.OperatorNode( '+', new Nodes.UVNode(), timerScaleNode );
 
-				materialBox.colorNode = new TextureNode( texture, animateUV );
+				materialBox.colorNode = new Nodes.TextureNode( texture, animateUV );
 
 				// test uv 2
 				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
@@ -107,15 +93,15 @@
 				// displace example
 
 				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
-				const materialSphere = new MeshBasicNodeMaterial();
+				const materialSphere = new Nodes.MeshBasicNodeMaterial();
 
-				const displaceAnimated = new SplitNode( new TextureNode( textureDisplace ), 'x' );
-				const displaceY = new OperatorNode( '*', displaceAnimated, new FloatNode( .25 ).setConst( true ) );
+				const displaceAnimated = new Nodes.SplitNode( new Nodes.TextureNode( textureDisplace ), 'x' );
+				const displaceY = new Nodes.OperatorNode( '*', displaceAnimated, new Nodes.FloatNode( .25 ).setConst( true ) );
 
-				const displace = new OperatorNode( '*', new NormalNode( NormalNode.LOCAL ), displaceY );
+				const displace = new Nodes.OperatorNode( '*', new Nodes.NormalNode( Nodes.NormalNode.LOCAL ), displaceY );
 
 				materialSphere.colorNode = displaceY;
-				materialSphere.positionNode = new OperatorNode( '+', new PositionNode( PositionNode.LOCAL ), displace );
+				materialSphere.positionNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode( Nodes.PositionNode.LOCAL ), displace );
 
 				const sphere = new THREE.Mesh( geometrySphere, materialSphere );
 				sphere.position.set( - 2, - 1, 0 );
@@ -124,9 +110,9 @@
 				// data texture
 
 				const geometryPlane = new THREE.PlaneGeometry();
-				const materialPlane = new MeshBasicNodeMaterial();
-				materialPlane.colorNode = new OperatorNode( '+', new TextureNode( createDataTexture() ), new ColorNode( new THREE.Color( 0x0000FF ) ) );
-				materialPlane.opacityNode = new SplitNode( new TextureNode( dxt5Texture ), 'a' );
+				const materialPlane = new Nodes.MeshBasicNodeMaterial();
+				materialPlane.colorNode = new Nodes.OperatorNode( '+', new Nodes.TextureNode( createDataTexture() ), new Nodes.ColorNode( new THREE.Color( 0x0000FF ) ) );
+				materialPlane.opacityNode = new Nodes.SplitNode( new Nodes.TextureNode( dxt5Texture ), 'a' );
 				materialPlane.transparent = true;
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
@@ -135,8 +121,8 @@
 
 				// compressed texture
 
-				const materialCompressed = new MeshBasicNodeMaterial();
-				materialCompressed.colorNode = new TextureNode( dxt5Texture );
+				const materialCompressed = new Nodes.MeshBasicNodeMaterial();
+				materialCompressed.colorNode = new Nodes.TextureNode( dxt5Texture );
 				materialCompressed.transparent = true;
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
@@ -155,9 +141,9 @@
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new PointsNodeMaterial();
+				const materialPoints = new Nodes.PointsNodeMaterial();
 
-				materialPoints.colorNode = new OperatorNode( '*', new PositionNode(), new FloatNode( 3 ).setConst( true ) );
+				materialPoints.colorNode = new Nodes.OperatorNode( '*', new Nodes.PositionNode(), new Nodes.FloatNode( 3 ).setConst( true ) );
 
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
@@ -174,8 +160,8 @@
 
 				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
 
-				const materialLine = new LineBasicNodeMaterial();
-				materialLine.colorNode = new AttributeNode( 'color', 'vec3' );
+				const materialLine = new Nodes.LineBasicNodeMaterial();
+				materialLine.colorNode = new Nodes.AttributeNode( 'color', 'vec3' );
 
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );
