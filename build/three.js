@@ -799,6 +799,11 @@
 			return this;
 		}
 
+		*[Symbol.iterator]() {
+			yield this.x;
+			yield this.y;
+		}
+
 	}
 
 	Vector2.prototype.isVector2 = true;
@@ -1876,6 +1881,13 @@
 			this.z = Math.random();
 			this.w = Math.random();
 			return this;
+		}
+
+		*[Symbol.iterator]() {
+			yield this.x;
+			yield this.y;
+			yield this.z;
+			yield this.w;
 		}
 
 	}
@@ -3094,6 +3106,12 @@
 			this.y = f * Math.sin(t);
 			this.z = u;
 			return this;
+		}
+
+		*[Symbol.iterator]() {
+			yield this.x;
+			yield this.y;
+			yield this.z;
 		}
 
 	}
@@ -8000,21 +8018,7 @@
 		}
 
 		clone() {
-			/*
-			 // Handle primitives
-				 const parameters = this.parameters;
-				 if ( parameters !== undefined ) {
-				 const values = [];
-				 for ( const key in parameters ) {
-				 values.push( parameters[ key ] );
-				 }
-				 const geometry = Object.create( this.constructor.prototype );
-			 this.constructor.apply( geometry, values );
-			 return geometry;
-				 }
-				 return new this.constructor().copy( this );
-			 */
-			return new BufferGeometry().copy(this);
+			return new this.constructor().copy(this);
 		}
 
 		copy(source) {
@@ -8085,7 +8089,9 @@
 			this.drawRange.start = source.drawRange.start;
 			this.drawRange.count = source.drawRange.count; // user data
 
-			this.userData = source.userData;
+			this.userData = source.userData; // geometry generator parameters
+
+			if (source.parameters !== undefined) this.parameters = Object.assign({}, source.parameters);
 			return this;
 		}
 
@@ -19672,7 +19678,7 @@
 			const encoding = _currentRenderTarget === null ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 			const envMap = (material.isMeshStandardMaterial ? cubeuvmaps : cubemaps).get(material.envMap || environment);
 			const vertexAlphas = material.vertexColors === true && !!object.geometry && !!object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
-			const vertexTangents = !!object.geometry && !!object.geometry.attributes.tangent;
+			const vertexTangents = !!material.normalMap && !!object.geometry && !!object.geometry.attributes.tangent;
 			const morphTargets = !!object.geometry && !!object.geometry.morphAttributes.position;
 			const morphNormals = !!object.geometry && !!object.geometry.morphAttributes.normal;
 			const morphTargetsCount = !!object.geometry && !!object.geometry.morphAttributes.position ? object.geometry.morphAttributes.position.length : 0;
@@ -22107,7 +22113,7 @@
 	}
 
 	class PolyhedronGeometry extends BufferGeometry {
-		constructor(vertices, indices, radius = 1, detail = 0) {
+		constructor(vertices = [], indices = [], radius = 1, detail = 0) {
 			super();
 			this.type = 'PolyhedronGeometry';
 			this.parameters = {
