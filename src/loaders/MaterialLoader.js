@@ -51,12 +51,6 @@ class MaterialLoader extends Loader {
 
 	}
 
-	createMaterial( type ) {
-
-		return new Materials[ type ]();
-
-	}
-
 	parse( json ) {
 
 		const textures = this.textures;
@@ -73,7 +67,7 @@ class MaterialLoader extends Loader {
 
 		}
 
-		const material = this.createMaterial( json.type );
+		const material = new Materials[ json.type ]();
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
