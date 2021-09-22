@@ -149,6 +149,7 @@ export { CurvePath } from './extras/core/CurvePath.js';
 export { Curve } from './extras/core/Curve.js';
 export { DataUtils } from './extras/DataUtils.js';
 export { ImageUtils } from './extras/ImageUtils.js';
+export * as MaterialUtils from './extras/MaterialUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
