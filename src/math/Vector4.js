@@ -648,6 +648,15 @@ class Vector4 {
 
 	}
 
+	*[ Symbol.iterator ]() {
+
+		yield this.x;
+		yield this.y;
+		yield this.z;
+		yield this.w;
+
+	}
+
 }
 
 Vector4.prototype.isVector4 = true;
