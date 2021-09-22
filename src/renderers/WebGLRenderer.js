@@ -1515,7 +1515,7 @@ function WebGLRenderer( parameters = {} ) {
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && !! object.geometry && !! object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
-		const vertexTangents = !! object.geometry && !! object.geometry.attributes.tangent;
+		const vertexTangents = !! material.normalMap && !! object.geometry && !! object.geometry.attributes.tangent;
 		const morphTargets = !! object.geometry && !! object.geometry.morphAttributes.position;
 		const morphNormals = !! object.geometry && !! object.geometry.morphAttributes.normal;
 		const morphTargetsCount = ( !! object.geometry && !! object.geometry.morphAttributes.position ) ? object.geometry.morphAttributes.position.length : 0;
