@@ -23,7 +23,7 @@ class NormalNode extends Node {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const nodeData = builder.getDataFromNode( this, builder.shaderStage );
 		const scope = this.scope;
 

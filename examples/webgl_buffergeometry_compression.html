@@ -237,14 +237,6 @@
 
 			function updateGroupGeometry( mesh, lineSegments, geometry, data ) {
 
-				if ( geometry.isGeometry ) {
-
-					geometry = new THREE.BufferGeometry().fromGeometry( geometry );
-
-					console.log( 'THREE.GeometryCompression: Converted Geometry to BufferGeometry.' );
-
-				}
-
 				// dispose first
 				lineSegments.geometry.dispose();
 				mesh.geometry.dispose();

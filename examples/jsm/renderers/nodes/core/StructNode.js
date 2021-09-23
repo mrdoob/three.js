@@ -12,7 +12,7 @@ class StructNode extends CodeNode {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		if ( this.name !== '' ) {
 
@@ -36,7 +36,7 @@ class StructNode extends CodeNode {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const inputs = this.inputs;
 
 		let code = `struct ${type} {\n`;

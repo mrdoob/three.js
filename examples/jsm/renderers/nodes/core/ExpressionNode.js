@@ -2,9 +2,9 @@ import Node from './Node.js';
 
 class ExpressionNode extends Node {
 
-	constructor( snipped = '', type = null ) {
+	constructor( snipped = '', nodeType = null ) {
 
-		super( type );
+		super( nodeType );
 
 		this.snipped = snipped;
 
@@ -12,7 +12,7 @@ class ExpressionNode extends Node {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const snipped = this.snipped;
 
 		return builder.format( `( ${ snipped } )`, type, output );

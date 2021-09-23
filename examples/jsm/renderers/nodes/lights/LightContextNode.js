@@ -17,7 +17,7 @@ class LightContextNode extends ContextNode {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 
 		const material = builder.material;
 

@@ -273,17 +273,25 @@
 
 	}
 
+	let _seed = 1234567;
+	const DEG2RAD = Math.PI / 180;
+	const RAD2DEG = 180 / Math.PI; //
+
 	const _lut = [];
 
 	for (let i = 0; i < 256; i++) {
 		_lut[i] = (i < 16 ? '0' : '') + i.toString(16);
 	}
 
-	let _seed = 1234567;
-	const DEG2RAD = Math.PI / 180;
-	const RAD2DEG = 180 / Math.PI; // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
+	const hasRandomUUID = typeof crypto !== 'undefined' && 'randomUUID' in crypto;
 
 	function generateUUID() {
+		if (hasRandomUUID) {
+			return crypto.randomUUID().toUpperCase();
+		} // TODO Remove this code when crypto.randomUUID() is available everywhere
+		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
+
+
 		const d0 = Math.random() * 0xffffffff | 0;
 		const d1 = Math.random() * 0xffffffff | 0;
 		const d2 = Math.random() * 0xffffffff | 0;
@@ -789,6 +797,11 @@
 			this.x = Math.random();
 			this.y = Math.random();
 			return this;
+		}
+
+		*[Symbol.iterator]() {
+			yield this.x;
+			yield this.y;
 		}
 
 	}
@@ -1868,6 +1881,13 @@
 			this.z = Math.random();
 			this.w = Math.random();
 			return this;
+		}
+
+		*[Symbol.iterator]() {
+			yield this.x;
+			yield this.y;
+			yield this.z;
+			yield this.w;
 		}
 
 	}
@@ -3086,6 +3106,12 @@
 			this.y = f * Math.sin(t);
 			this.z = u;
 			return this;
+		}
+
+		*[Symbol.iterator]() {
+			yield this.x;
+			yield this.y;
+			yield this.z;
 		}
 
 	}
@@ -7992,21 +8018,7 @@
 		}
 
 		clone() {
-			/*
-			 // Handle primitives
-				 const parameters = this.parameters;
-				 if ( parameters !== undefined ) {
-				 const values = [];
-				 for ( const key in parameters ) {
-				 values.push( parameters[ key ] );
-				 }
-				 const geometry = Object.create( this.constructor.prototype );
-			 this.constructor.apply( geometry, values );
-			 return geometry;
-				 }
-				 return new this.constructor().copy( this );
-			 */
-			return new BufferGeometry().copy(this);
+			return new this.constructor().copy(this);
 		}
 
 		copy(source) {
@@ -8077,7 +8089,9 @@
 			this.drawRange.start = source.drawRange.start;
 			this.drawRange.count = source.drawRange.count; // user data
 
-			this.userData = source.userData;
+			this.userData = source.userData; // geometry generator parameters
+
+			if (source.parameters !== undefined) this.parameters = Object.assign({}, source.parameters);
 			return this;
 		}
 
@@ -9027,7 +9041,6 @@
 		constructor(images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding) {
 			images = images !== undefined ? images : [];
 			mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
-			format = format !== undefined ? format : RGBFormat;
 			super(images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding);
 			this.flipY = false;
 		}
@@ -11769,6 +11782,14 @@
 			scene.background = background;
 		}
 
+		_setEncoding(uniform, texture) {
+			if (this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding) {
+				uniform.value = ENCODINGS[LinearEncoding];
+			} else {
+				uniform.value = ENCODINGS[texture.encoding];
+			}
+		}
+
 		_textureToCubeUV(texture, cubeUVRenderTarget) {
 			const renderer = this._renderer;
 
@@ -11791,8 +11812,9 @@
 				uniforms['texelSize'].value.set(1.0 / texture.image.width, 1.0 / texture.image.height);
 			}
 
-			uniforms['inputEncoding'].value = ENCODINGS[texture.encoding];
-			uniforms['outputEncoding'].value = ENCODINGS[cubeUVRenderTarget.texture.encoding];
+			this._setEncoding(uniforms['inputEncoding'], texture);
+
+			this._setEncoding(uniforms['outputEncoding'], cubeUVRenderTarget.texture);
 
 			_setViewport(cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX);
 
@@ -11882,8 +11904,11 @@
 
 			blurUniforms['dTheta'].value = radiansPerPixel;
 			blurUniforms['mipInt'].value = LOD_MAX - lodIn;
-			blurUniforms['inputEncoding'].value = ENCODINGS[targetIn.texture.encoding];
-			blurUniforms['outputEncoding'].value = ENCODINGS[targetIn.texture.encoding];
+
+			this._setEncoding(blurUniforms['inputEncoding'], targetIn.texture);
+
+			this._setEncoding(blurUniforms['outputEncoding'], targetIn.texture);
+
 			const outputSize = _sizeLods[lodOut];
 			const x = 3 * Math.max(0, SIZE_MAX - 2 * outputSize);
 			const y = (lodOut === 0 ? 0 : 2 * SIZE_MAX) + 2 * outputSize * (lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0);
@@ -12478,6 +12503,7 @@
 
 				getExtension('OES_texture_float_linear');
 				getExtension('EXT_color_buffer_half_float');
+				getExtension('EXT_multisampled_render_to_texture');
 			},
 			get: function (name) {
 				const extension = getExtension(name);
@@ -14271,6 +14297,10 @@
 				encoding = map.texture.encoding;
 			} else {
 				encoding = LinearEncoding;
+			}
+
+			if (isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding) {
+				encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
 			}
 
 			return encoding;
@@ -16338,7 +16368,7 @@
 			textureProperties.__maxMipLevel = Math.log2(Math.max(width, height, depth));
 		}
 
-		function getInternalFormat(internalFormatName, glFormat, glType) {
+		function getInternalFormat(internalFormatName, glFormat, glType, encoding) {
 			if (isWebGL2 === false) return glFormat;
 
 			if (internalFormatName !== null) {
@@ -16363,7 +16393,7 @@
 			if (glFormat === _gl.RGBA) {
 				if (glType === _gl.FLOAT) internalFormat = _gl.RGBA32F;
 				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F;
-				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.RGBA8;
+				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 			}
 
 			if (internalFormat === _gl.R16F || internalFormat === _gl.R32F || internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F) {
@@ -16629,7 +16659,7 @@
 			const supportsMips = isPowerOfTwo$1(image) || isWebGL2,
 						glFormat = utils.convert(texture.format);
 			let glType = utils.convert(texture.type),
-					glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
+					glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
 			setTextureParameters(textureType, texture, supportsMips);
 			let mipmap;
 			const mipmaps = texture.mipmaps;
@@ -16777,7 +16807,7 @@
 						supportsMips = isPowerOfTwo$1(image) || isWebGL2,
 						glFormat = utils.convert(texture.format),
 						glType = utils.convert(texture.type),
-						glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
+						glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
 			setTextureParameters(_gl.TEXTURE_CUBE_MAP, texture, supportsMips);
 			let mipmaps;
 
@@ -16840,7 +16870,7 @@
 		function setupFrameBufferTexture(framebuffer, renderTarget, texture, attachment, textureTarget) {
 			const glFormat = utils.convert(texture.format);
 			const glType = utils.convert(texture.type);
-			const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
+			const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
 
 			if (textureTarget === _gl.TEXTURE_3D || textureTarget === _gl.TEXTURE_2D_ARRAY) {
 				state.texImage3D(textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, renderTarget.depth, 0, glFormat, glType, null);
@@ -16896,7 +16926,7 @@
 				const texture = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture[0] : renderTarget.texture;
 				const glFormat = utils.convert(texture.format);
 				const glType = utils.convert(texture.type);
-				const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
+				const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
 
 				if (isMultisample) {
 					const samples = getRenderTargetSamples(renderTarget);
@@ -17025,7 +17055,7 @@
 
 						const glFormat = utils.convert(texture.format);
 						const glType = utils.convert(texture.type);
-						const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType);
+						const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
 						const samples = getRenderTargetSamples(renderTarget);
 
 						_gl.renderbufferStorageMultisample(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
@@ -17592,6 +17622,8 @@
 			let xrFrame = null;
 			let depthStyle = null;
 			let clearStyle = null;
+			const msaartcSupported = renderer.extensions.has('EXT_multisampled_render_to_texture');
+			let msaaExt = null;
 			const controllers = [];
 			const inputSourcesMap = new Map(); //
 
@@ -17790,7 +17822,9 @@
 							layers: [glProjLayer]
 						});
 
-						if (isMultisample) {
+						if (isMultisample && msaartcSupported) {
+							msaaExt = renderer.extensions.get('EXT_multisampled_render_to_texture');
+						} else if (isMultisample) {
 							glMultisampledFramebuffer = gl.createFramebuffer();
 							glColorRenderbuffer = gl.createRenderbuffer();
 							gl.bindRenderbuffer(gl.RENDERBUFFER, glColorRenderbuffer);
@@ -18019,11 +18053,20 @@
 							const glSubImage = glBinding.getViewSubImage(glProjLayer, view);
 							state.bindXRFramebuffer(glFramebuffer);
 
-							if (glSubImage.depthStencilTexture !== undefined) {
-								gl.framebufferTexture2D(gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0);
+							if (isMultisample && msaartcSupported) {
+								if (glSubImage.depthStencilTexture !== undefined) {
+									msaaExt.framebufferTexture2DMultisampleEXT(gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0, 4);
+								}
+
+								msaaExt.framebufferTexture2DMultisampleEXT(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0, 4);
+							} else {
+								if (glSubImage.depthStencilTexture !== undefined) {
+									gl.framebufferTexture2D(gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0);
+								}
+
+								gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
 							}
 
-							gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
 							viewport = glSubImage.viewport;
 						}
 
@@ -18041,7 +18084,7 @@
 						}
 					}
 
-					if (isMultisample) {
+					if (isMultisample && !msaartcSupported) {
 						state.bindXRFramebuffer(glMultisampledFramebuffer);
 						if (clearStyle !== null) gl.clear(clearStyle);
 					}
@@ -18058,7 +18101,7 @@
 
 				if (onAnimationFrameCallback) onAnimationFrameCallback(time, frame);
 
-				if (isMultisample) {
+				if (isMultisample && !msaartcSupported) {
 					const width = glProjLayer.textureWidth;
 					const height = glProjLayer.textureHeight;
 					state.bindFramebuffer(gl.READ_FRAMEBUFFER, glMultisampledFramebuffer);
@@ -19635,7 +19678,7 @@
 			const encoding = _currentRenderTarget === null ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 			const envMap = (material.isMeshStandardMaterial ? cubeuvmaps : cubemaps).get(material.envMap || environment);
 			const vertexAlphas = material.vertexColors === true && !!object.geometry && !!object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
-			const vertexTangents = !!object.geometry && !!object.geometry.attributes.tangent;
+			const vertexTangents = !!material.normalMap && !!object.geometry && !!object.geometry.attributes.tangent;
 			const morphTargets = !!object.geometry && !!object.geometry.morphAttributes.position;
 			const morphNormals = !!object.geometry && !!object.geometry.morphAttributes.normal;
 			const morphTargetsCount = !!object.geometry && !!object.geometry.morphAttributes.position ? object.geometry.morphAttributes.position.length : 0;
@@ -22070,7 +22113,7 @@
 	}
 
 	class PolyhedronGeometry extends BufferGeometry {
-		constructor(vertices, indices, radius = 1, detail = 0) {
+		constructor(vertices = [], indices = [], radius = 1, detail = 0) {
 			super();
 			this.type = 'PolyhedronGeometry';
 			this.parameters = {
@@ -22296,111 +22339,108 @@
 	const _triangle = new Triangle();
 
 	class EdgesGeometry extends BufferGeometry {
-		constructor(geometry, thresholdAngle) {
+		constructor(geometry = null, thresholdAngle = 1) {
 			super();
 			this.type = 'EdgesGeometry';
 			this.parameters = {
+				geometry: geometry,
 				thresholdAngle: thresholdAngle
 			};
-			thresholdAngle = thresholdAngle !== undefined ? thresholdAngle : 1;
 
-			if (geometry.isGeometry === true) {
-				console.error('THREE.EdgesGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
-				return;
-			}
+			if (geometry !== null) {
+				const precisionPoints = 4;
+				const precision = Math.pow(10, precisionPoints);
+				const thresholdDot = Math.cos(DEG2RAD * thresholdAngle);
+				const indexAttr = geometry.getIndex();
+				const positionAttr = geometry.getAttribute('position');
+				const indexCount = indexAttr ? indexAttr.count : positionAttr.count;
+				const indexArr = [0, 0, 0];
+				const vertKeys = ['a', 'b', 'c'];
+				const hashes = new Array(3);
+				const edgeData = {};
+				const vertices = [];
 
-			const precisionPoints = 4;
-			const precision = Math.pow(10, precisionPoints);
-			const thresholdDot = Math.cos(DEG2RAD * thresholdAngle);
-			const indexAttr = geometry.getIndex();
-			const positionAttr = geometry.getAttribute('position');
-			const indexCount = indexAttr ? indexAttr.count : positionAttr.count;
-			const indexArr = [0, 0, 0];
-			const vertKeys = ['a', 'b', 'c'];
-			const hashes = new Array(3);
-			const edgeData = {};
-			const vertices = [];
+				for (let i = 0; i < indexCount; i += 3) {
+					if (indexAttr) {
+						indexArr[0] = indexAttr.getX(i);
+						indexArr[1] = indexAttr.getX(i + 1);
+						indexArr[2] = indexAttr.getX(i + 2);
+					} else {
+						indexArr[0] = i;
+						indexArr[1] = i + 1;
+						indexArr[2] = i + 2;
+					}
 
-			for (let i = 0; i < indexCount; i += 3) {
-				if (indexAttr) {
-					indexArr[0] = indexAttr.getX(i);
-					indexArr[1] = indexAttr.getX(i + 1);
-					indexArr[2] = indexAttr.getX(i + 2);
-				} else {
-					indexArr[0] = i;
-					indexArr[1] = i + 1;
-					indexArr[2] = i + 2;
-				}
+					const {
+						a,
+						b,
+						c
+					} = _triangle;
+					a.fromBufferAttribute(positionAttr, indexArr[0]);
+					b.fromBufferAttribute(positionAttr, indexArr[1]);
+					c.fromBufferAttribute(positionAttr, indexArr[2]);
 
-				const {
-					a,
-					b,
-					c
-				} = _triangle;
-				a.fromBufferAttribute(positionAttr, indexArr[0]);
-				b.fromBufferAttribute(positionAttr, indexArr[1]);
-				c.fromBufferAttribute(positionAttr, indexArr[2]);
-
-				_triangle.getNormal(_normal); // create hashes for the edge from the vertices
+					_triangle.getNormal(_normal); // create hashes for the edge from the vertices
 
 
-				hashes[0] = `${Math.round(a.x * precision)},${Math.round(a.y * precision)},${Math.round(a.z * precision)}`;
-				hashes[1] = `${Math.round(b.x * precision)},${Math.round(b.y * precision)},${Math.round(b.z * precision)}`;
-				hashes[2] = `${Math.round(c.x * precision)},${Math.round(c.y * precision)},${Math.round(c.z * precision)}`; // skip degenerate triangles
+					hashes[0] = `${Math.round(a.x * precision)},${Math.round(a.y * precision)},${Math.round(a.z * precision)}`;
+					hashes[1] = `${Math.round(b.x * precision)},${Math.round(b.y * precision)},${Math.round(b.z * precision)}`;
+					hashes[2] = `${Math.round(c.x * precision)},${Math.round(c.y * precision)},${Math.round(c.z * precision)}`; // skip degenerate triangles
 
-				if (hashes[0] === hashes[1] || hashes[1] === hashes[2] || hashes[2] === hashes[0]) {
-					continue;
-				} // iterate over every edge
+					if (hashes[0] === hashes[1] || hashes[1] === hashes[2] || hashes[2] === hashes[0]) {
+						continue;
+					} // iterate over every edge
 
 
-				for (let j = 0; j < 3; j++) {
-					// get the first and next vertex making up the edge
-					const jNext = (j + 1) % 3;
-					const vecHash0 = hashes[j];
-					const vecHash1 = hashes[jNext];
-					const v0 = _triangle[vertKeys[j]];
-					const v1 = _triangle[vertKeys[jNext]];
-					const hash = `${vecHash0}_${vecHash1}`;
-					const reverseHash = `${vecHash1}_${vecHash0}`;
+					for (let j = 0; j < 3; j++) {
+						// get the first and next vertex making up the edge
+						const jNext = (j + 1) % 3;
+						const vecHash0 = hashes[j];
+						const vecHash1 = hashes[jNext];
+						const v0 = _triangle[vertKeys[j]];
+						const v1 = _triangle[vertKeys[jNext]];
+						const hash = `${vecHash0}_${vecHash1}`;
+						const reverseHash = `${vecHash1}_${vecHash0}`;
 
-					if (reverseHash in edgeData && edgeData[reverseHash]) {
-						// if we found a sibling edge add it into the vertex array if
-						// it meets the angle threshold and delete the edge from the map.
-						if (_normal.dot(edgeData[reverseHash].normal) <= thresholdDot) {
-							vertices.push(v0.x, v0.y, v0.z);
-							vertices.push(v1.x, v1.y, v1.z);
+						if (reverseHash in edgeData && edgeData[reverseHash]) {
+							// if we found a sibling edge add it into the vertex array if
+							// it meets the angle threshold and delete the edge from the map.
+							if (_normal.dot(edgeData[reverseHash].normal) <= thresholdDot) {
+								vertices.push(v0.x, v0.y, v0.z);
+								vertices.push(v1.x, v1.y, v1.z);
+							}
+
+							edgeData[reverseHash] = null;
+						} else if (!(hash in edgeData)) {
+							// if we've already got an edge here then skip adding a new one
+							edgeData[hash] = {
+								index0: indexArr[j],
+								index1: indexArr[jNext],
+								normal: _normal.clone()
+							};
 						}
+					}
+				} // iterate over all remaining, unmatched edges and add them to the vertex array
 
-						edgeData[reverseHash] = null;
-					} else if (!(hash in edgeData)) {
-						// if we've already got an edge here then skip adding a new one
-						edgeData[hash] = {
-							index0: indexArr[j],
-							index1: indexArr[jNext],
-							normal: _normal.clone()
-						};
+
+				for (const key in edgeData) {
+					if (edgeData[key]) {
+						const {
+							index0,
+							index1
+						} = edgeData[key];
+
+						_v0.fromBufferAttribute(positionAttr, index0);
+
+						_v1$1.fromBufferAttribute(positionAttr, index1);
+
+						vertices.push(_v0.x, _v0.y, _v0.z);
+						vertices.push(_v1$1.x, _v1$1.y, _v1$1.z);
 					}
 				}
-			} // iterate over all remaining, unmatched edges and add them to the vertex array
 
-
-			for (const key in edgeData) {
-				if (edgeData[key]) {
-					const {
-						index0,
-						index1
-					} = edgeData[key];
-
-					_v0.fromBufferAttribute(positionAttr, index0);
-
-					_v1$1.fromBufferAttribute(positionAttr, index1);
-
-					vertices.push(_v0.x, _v0.y, _v0.z);
-					vertices.push(_v1$1.x, _v1$1.y, _v1$1.z);
-				}
+				this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
 			}
-
-			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
 		}
 
 	}
@@ -25072,95 +25112,6 @@
 
 	}
 
-	/**
-	 * Parametric Surfaces Geometry
-	 * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
-	 */
-
-	class ParametricGeometry extends BufferGeometry {
-		constructor(func = (u, v, target) => target.set(u, v, Math.cos(u) * Math.sin(v)), slices = 8, stacks = 8) {
-			super();
-			this.type = 'ParametricGeometry';
-			this.parameters = {
-				func: func,
-				slices: slices,
-				stacks: stacks
-			}; // buffers
-
-			const indices = [];
-			const vertices = [];
-			const normals = [];
-			const uvs = [];
-			const EPS = 0.00001;
-			const normal = new Vector3();
-			const p0 = new Vector3(),
-						p1 = new Vector3();
-			const pu = new Vector3(),
-						pv = new Vector3();
-
-			if (func.length < 3) {
-				console.error('THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.');
-			} // generate vertices, normals and uvs
-
-
-			const sliceCount = slices + 1;
-
-			for (let i = 0; i <= stacks; i++) {
-				const v = i / stacks;
-
-				for (let j = 0; j <= slices; j++) {
-					const u = j / slices; // vertex
-
-					func(u, v, p0);
-					vertices.push(p0.x, p0.y, p0.z); // normal
-					// approximate tangent vectors via finite differences
-
-					if (u - EPS >= 0) {
-						func(u - EPS, v, p1);
-						pu.subVectors(p0, p1);
-					} else {
-						func(u + EPS, v, p1);
-						pu.subVectors(p1, p0);
-					}
-
-					if (v - EPS >= 0) {
-						func(u, v - EPS, p1);
-						pv.subVectors(p0, p1);
-					} else {
-						func(u, v + EPS, p1);
-						pv.subVectors(p1, p0);
-					} // cross product of tangent vectors returns surface normal
-
-
-					normal.crossVectors(pu, pv).normalize();
-					normals.push(normal.x, normal.y, normal.z); // uv
-
-					uvs.push(u, v);
-				}
-			} // generate indices
-
-
-			for (let i = 0; i < stacks; i++) {
-				for (let j = 0; j < slices; j++) {
-					const a = i * sliceCount + j;
-					const b = i * sliceCount + j + 1;
-					const c = (i + 1) * sliceCount + j + 1;
-					const d = (i + 1) * sliceCount + j; // faces one and two
-
-					indices.push(a, b, d);
-					indices.push(b, c, d);
-				}
-			} // build geometry
-
-
-			this.setIndex(indices);
-			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-		}
-
-	}
-
 	class RingGeometry extends BufferGeometry {
 		constructor(innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2) {
 			super();
@@ -25444,45 +25395,6 @@
 
 		static fromJSON(data) {
 			return new TetrahedronGeometry(data.radius, data.detail);
-		}
-
-	}
-
-	/**
-	 * Text = 3D Text
-	 *
-	 * parameters = {
-	 *	font: <THREE.Font>, // font
-	 *
-	 *	size: <float>, // size of the text
-	 *	height: <float>, // thickness to extrude text
-	 *	curveSegments: <int>, // number of points on the curves
-	 *
-	 *	bevelEnabled: <bool>, // turn on bevel
-	 *	bevelThickness: <float>, // how deep into text bevel goes
-	 *	bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
-	 *	bevelOffset: <float> // how far from text outline does bevel start
-	 * }
-	 */
-
-	class TextGeometry extends ExtrudeGeometry {
-		constructor(text, parameters = {}) {
-			const font = parameters.font;
-
-			if (!(font && font.isFont)) {
-				console.error('THREE.TextGeometry: font parameter is not an instance of THREE.Font.');
-				return new BufferGeometry();
-			}
-
-			const shapes = font.generateShapes(text, parameters.size); // translate parameters to ExtrudeGeometry API
-
-			parameters.depth = parameters.height !== undefined ? parameters.height : 50; // defaults
-
-			if (parameters.bevelThickness === undefined) parameters.bevelThickness = 10;
-			if (parameters.bevelSize === undefined) parameters.bevelSize = 8;
-			if (parameters.bevelEnabled === undefined) parameters.bevelEnabled = false;
-			super(shapes, parameters);
-			this.type = 'TextGeometry';
 		}
 
 	}
@@ -25775,46 +25687,65 @@
 	}
 
 	class WireframeGeometry extends BufferGeometry {
-		constructor(geometry) {
+		constructor(geometry = null) {
 			super();
 			this.type = 'WireframeGeometry';
+			this.parameters = {
+				geometry: geometry
+			};
 
-			if (geometry.isGeometry === true) {
-				console.error('THREE.WireframeGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
-				return;
-			} // buffer
+			if (geometry !== null) {
+				// buffer
+				const vertices = [];
+				const edges = new Set(); // helper variables
+
+				const start = new Vector3();
+				const end = new Vector3();
+
+				if (geometry.index !== null) {
+					// indexed BufferGeometry
+					const position = geometry.attributes.position;
+					const indices = geometry.index;
+					let groups = geometry.groups;
+
+					if (groups.length === 0) {
+						groups = [{
+							start: 0,
+							count: indices.count,
+							materialIndex: 0
+						}];
+					} // create a data structure that contains all eges without duplicates
 
 
-			const vertices = [];
-			const edges = new Set(); // helper variables
+					for (let o = 0, ol = groups.length; o < ol; ++o) {
+						const group = groups[o];
+						const groupStart = group.start;
+						const groupCount = group.count;
 
-			const start = new Vector3();
-			const end = new Vector3();
+						for (let i = groupStart, l = groupStart + groupCount; i < l; i += 3) {
+							for (let j = 0; j < 3; j++) {
+								const index1 = indices.getX(i + j);
+								const index2 = indices.getX(i + (j + 1) % 3);
+								start.fromBufferAttribute(position, index1);
+								end.fromBufferAttribute(position, index2);
 
-			if (geometry.index !== null) {
-				// indexed BufferGeometry
-				const position = geometry.attributes.position;
-				const indices = geometry.index;
-				let groups = geometry.groups;
+								if (isUniqueEdge(start, end, edges) === true) {
+									vertices.push(start.x, start.y, start.z);
+									vertices.push(end.x, end.y, end.z);
+								}
+							}
+						}
+					}
+				} else {
+					// non-indexed BufferGeometry
+					const position = geometry.attributes.position;
 
-				if (groups.length === 0) {
-					groups = [{
-						start: 0,
-						count: indices.count,
-						materialIndex: 0
-					}];
-				} // create a data structure that contains all eges without duplicates
-
-
-				for (let o = 0, ol = groups.length; o < ol; ++o) {
-					const group = groups[o];
-					const groupStart = group.start;
-					const groupCount = group.count;
-
-					for (let i = groupStart, l = groupStart + groupCount; i < l; i += 3) {
+					for (let i = 0, l = position.count / 3; i < l; i++) {
 						for (let j = 0; j < 3; j++) {
-							const index1 = indices.getX(i + j);
-							const index2 = indices.getX(i + (j + 1) % 3);
+							// three edges per triangle, an edge is represented as (index1, index2)
+							// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
+							const index1 = 3 * i + j;
+							const index2 = 3 * i + (j + 1) % 3;
 							start.fromBufferAttribute(position, index1);
 							end.fromBufferAttribute(position, index2);
 
@@ -25824,30 +25755,11 @@
 							}
 						}
 					}
-				}
-			} else {
-				// non-indexed BufferGeometry
-				const position = geometry.attributes.position;
-
-				for (let i = 0, l = position.count / 3; i < l; i++) {
-					for (let j = 0; j < 3; j++) {
-						// three edges per triangle, an edge is represented as (index1, index2)
-						// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
-						const index1 = 3 * i + j;
-						const index2 = 3 * i + (j + 1) % 3;
-						start.fromBufferAttribute(position, index1);
-						end.fromBufferAttribute(position, index2);
-
-						if (isUniqueEdge(start, end, edges) === true) {
-							vertices.push(start.x, start.y, start.z);
-							vertices.push(end.x, end.y, end.z);
-						}
-					}
-				}
-			} // build geometry
+				} // build geometry
 
 
-			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+				this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+			}
 		}
 
 	}
@@ -25885,8 +25797,6 @@
 		LatheBufferGeometry: LatheGeometry,
 		OctahedronGeometry: OctahedronGeometry,
 		OctahedronBufferGeometry: OctahedronGeometry,
-		ParametricGeometry: ParametricGeometry,
-		ParametricBufferGeometry: ParametricGeometry,
 		PlaneGeometry: PlaneGeometry,
 		PlaneBufferGeometry: PlaneGeometry,
 		PolyhedronGeometry: PolyhedronGeometry,
@@ -25899,8 +25809,6 @@
 		SphereBufferGeometry: SphereGeometry,
 		TetrahedronGeometry: TetrahedronGeometry,
 		TetrahedronBufferGeometry: TetrahedronGeometry,
-		TextGeometry: TextGeometry,
-		TextBufferGeometry: TextGeometry,
 		TorusGeometry: TorusGeometry,
 		TorusBufferGeometry: TorusGeometry,
 		TorusKnotGeometry: TorusKnotGeometry,
@@ -28636,10 +28544,7 @@
 			loader.setCrossOrigin(this.crossOrigin);
 			loader.setPath(this.path);
 			loader.load(url, function (image) {
-				texture.image = image; // JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
-
-				const isJPEG = url.search(/\.jpe?g($|\?)/i) > 0 || url.search(/^data\:image\/jpeg/) === 0;
-				texture.format = isJPEG ? RGBFormat : RGBAFormat;
+				texture.image = image;
 				texture.needsUpdate = true;
 
 				if (onLoad !== undefined) {
@@ -30471,356 +30376,6 @@
 	}
 
 	ImageBitmapLoader.prototype.isImageBitmapLoader = true;
-
-	class ShapePath {
-		constructor() {
-			this.type = 'ShapePath';
-			this.color = new Color();
-			this.subPaths = [];
-			this.currentPath = null;
-		}
-
-		moveTo(x, y) {
-			this.currentPath = new Path();
-			this.subPaths.push(this.currentPath);
-			this.currentPath.moveTo(x, y);
-			return this;
-		}
-
-		lineTo(x, y) {
-			this.currentPath.lineTo(x, y);
-			return this;
-		}
-
-		quadraticCurveTo(aCPx, aCPy, aX, aY) {
-			this.currentPath.quadraticCurveTo(aCPx, aCPy, aX, aY);
-			return this;
-		}
-
-		bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
-			this.currentPath.bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY);
-			return this;
-		}
-
-		splineThru(pts) {
-			this.currentPath.splineThru(pts);
-			return this;
-		}
-
-		toShapes(isCCW, noHoles) {
-			function toShapesNoHoles(inSubpaths) {
-				const shapes = [];
-
-				for (let i = 0, l = inSubpaths.length; i < l; i++) {
-					const tmpPath = inSubpaths[i];
-					const tmpShape = new Shape();
-					tmpShape.curves = tmpPath.curves;
-					shapes.push(tmpShape);
-				}
-
-				return shapes;
-			}
-
-			function isPointInsidePolygon(inPt, inPolygon) {
-				const polyLen = inPolygon.length; // inPt on polygon contour => immediate success		or
-				// toggling of inside/outside at every single! intersection point of an edge
-				//	with the horizontal line through inPt, left of inPt
-				//	not counting lowerY endpoints of edges and whole edges on that line
-
-				let inside = false;
-
-				for (let p = polyLen - 1, q = 0; q < polyLen; p = q++) {
-					let edgeLowPt = inPolygon[p];
-					let edgeHighPt = inPolygon[q];
-					let edgeDx = edgeHighPt.x - edgeLowPt.x;
-					let edgeDy = edgeHighPt.y - edgeLowPt.y;
-
-					if (Math.abs(edgeDy) > Number.EPSILON) {
-						// not parallel
-						if (edgeDy < 0) {
-							edgeLowPt = inPolygon[q];
-							edgeDx = -edgeDx;
-							edgeHighPt = inPolygon[p];
-							edgeDy = -edgeDy;
-						}
-
-						if (inPt.y < edgeLowPt.y || inPt.y > edgeHighPt.y) continue;
-
-						if (inPt.y === edgeLowPt.y) {
-							if (inPt.x === edgeLowPt.x) return true; // inPt is on contour ?
-							// continue;				// no intersection or edgeLowPt => doesn't count !!!
-						} else {
-							const perpEdge = edgeDy * (inPt.x - edgeLowPt.x) - edgeDx * (inPt.y - edgeLowPt.y);
-							if (perpEdge === 0) return true; // inPt is on contour ?
-
-							if (perpEdge < 0) continue;
-							inside = !inside; // true intersection left of inPt
-						}
-					} else {
-						// parallel or collinear
-						if (inPt.y !== edgeLowPt.y) continue; // parallel
-						// edge lies on the same horizontal line as inPt
-
-						if (edgeHighPt.x <= inPt.x && inPt.x <= edgeLowPt.x || edgeLowPt.x <= inPt.x && inPt.x <= edgeHighPt.x) return true; // inPt: Point on contour !
-						// continue;
-					}
-				}
-
-				return inside;
-			}
-
-			const isClockWise = ShapeUtils.isClockWise;
-			const subPaths = this.subPaths;
-			if (subPaths.length === 0) return [];
-			if (noHoles === true) return toShapesNoHoles(subPaths);
-			let solid, tmpPath, tmpShape;
-			const shapes = [];
-
-			if (subPaths.length === 1) {
-				tmpPath = subPaths[0];
-				tmpShape = new Shape();
-				tmpShape.curves = tmpPath.curves;
-				shapes.push(tmpShape);
-				return shapes;
-			}
-
-			let holesFirst = !isClockWise(subPaths[0].getPoints());
-			holesFirst = isCCW ? !holesFirst : holesFirst; // console.log("Holes first", holesFirst);
-
-			const betterShapeHoles = [];
-			const newShapes = [];
-			let newShapeHoles = [];
-			let mainIdx = 0;
-			let tmpPoints;
-			newShapes[mainIdx] = undefined;
-			newShapeHoles[mainIdx] = [];
-
-			for (let i = 0, l = subPaths.length; i < l; i++) {
-				tmpPath = subPaths[i];
-				tmpPoints = tmpPath.getPoints();
-				solid = isClockWise(tmpPoints);
-				solid = isCCW ? !solid : solid;
-
-				if (solid) {
-					if (!holesFirst && newShapes[mainIdx]) mainIdx++;
-					newShapes[mainIdx] = {
-						s: new Shape(),
-						p: tmpPoints
-					};
-					newShapes[mainIdx].s.curves = tmpPath.curves;
-					if (holesFirst) mainIdx++;
-					newShapeHoles[mainIdx] = []; //console.log('cw', i);
-				} else {
-					newShapeHoles[mainIdx].push({
-						h: tmpPath,
-						p: tmpPoints[0]
-					}); //console.log('ccw', i);
-				}
-			} // only Holes? -> probably all Shapes with wrong orientation
-
-
-			if (!newShapes[0]) return toShapesNoHoles(subPaths);
-
-			if (newShapes.length > 1) {
-				let ambiguous = false;
-				const toChange = [];
-
-				for (let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++) {
-					betterShapeHoles[sIdx] = [];
-				}
-
-				for (let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++) {
-					const sho = newShapeHoles[sIdx];
-
-					for (let hIdx = 0; hIdx < sho.length; hIdx++) {
-						const ho = sho[hIdx];
-						let hole_unassigned = true;
-
-						for (let s2Idx = 0; s2Idx < newShapes.length; s2Idx++) {
-							if (isPointInsidePolygon(ho.p, newShapes[s2Idx].p)) {
-								if (sIdx !== s2Idx) toChange.push({
-									froms: sIdx,
-									tos: s2Idx,
-									hole: hIdx
-								});
-
-								if (hole_unassigned) {
-									hole_unassigned = false;
-									betterShapeHoles[s2Idx].push(ho);
-								} else {
-									ambiguous = true;
-								}
-							}
-						}
-
-						if (hole_unassigned) {
-							betterShapeHoles[sIdx].push(ho);
-						}
-					}
-				} // console.log("ambiguous: ", ambiguous);
-
-
-				if (toChange.length > 0) {
-					// console.log("to change: ", toChange);
-					if (!ambiguous) newShapeHoles = betterShapeHoles;
-				}
-			}
-
-			let tmpHoles;
-
-			for (let i = 0, il = newShapes.length; i < il; i++) {
-				tmpShape = newShapes[i].s;
-				shapes.push(tmpShape);
-				tmpHoles = newShapeHoles[i];
-
-				for (let j = 0, jl = tmpHoles.length; j < jl; j++) {
-					tmpShape.holes.push(tmpHoles[j].h);
-				}
-			} //console.log("shape", shapes);
-
-
-			return shapes;
-		}
-
-	}
-
-	class Font {
-		constructor(data) {
-			this.type = 'Font';
-			this.data = data;
-		}
-
-		generateShapes(text, size = 100) {
-			const shapes = [];
-			const paths = createPaths(text, size, this.data);
-
-			for (let p = 0, pl = paths.length; p < pl; p++) {
-				Array.prototype.push.apply(shapes, paths[p].toShapes());
-			}
-
-			return shapes;
-		}
-
-	}
-
-	function createPaths(text, size, data) {
-		const chars = Array.from(text);
-		const scale = size / data.resolution;
-		const line_height = (data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness) * scale;
-		const paths = [];
-		let offsetX = 0,
-				offsetY = 0;
-
-		for (let i = 0; i < chars.length; i++) {
-			const char = chars[i];
-
-			if (char === '\n') {
-				offsetX = 0;
-				offsetY -= line_height;
-			} else {
-				const ret = createPath(char, scale, offsetX, offsetY, data);
-				offsetX += ret.offsetX;
-				paths.push(ret.path);
-			}
-		}
-
-		return paths;
-	}
-
-	function createPath(char, scale, offsetX, offsetY, data) {
-		const glyph = data.glyphs[char] || data.glyphs['?'];
-
-		if (!glyph) {
-			console.error('THREE.Font: character "' + char + '" does not exists in font family ' + data.familyName + '.');
-			return;
-		}
-
-		const path = new ShapePath();
-		let x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
-
-		if (glyph.o) {
-			const outline = glyph._cachedOutline || (glyph._cachedOutline = glyph.o.split(' '));
-
-			for (let i = 0, l = outline.length; i < l;) {
-				const action = outline[i++];
-
-				switch (action) {
-					case 'm':
-						// moveTo
-						x = outline[i++] * scale + offsetX;
-						y = outline[i++] * scale + offsetY;
-						path.moveTo(x, y);
-						break;
-
-					case 'l':
-						// lineTo
-						x = outline[i++] * scale + offsetX;
-						y = outline[i++] * scale + offsetY;
-						path.lineTo(x, y);
-						break;
-
-					case 'q':
-						// quadraticCurveTo
-						cpx = outline[i++] * scale + offsetX;
-						cpy = outline[i++] * scale + offsetY;
-						cpx1 = outline[i++] * scale + offsetX;
-						cpy1 = outline[i++] * scale + offsetY;
-						path.quadraticCurveTo(cpx1, cpy1, cpx, cpy);
-						break;
-
-					case 'b':
-						// bezierCurveTo
-						cpx = outline[i++] * scale + offsetX;
-						cpy = outline[i++] * scale + offsetY;
-						cpx1 = outline[i++] * scale + offsetX;
-						cpy1 = outline[i++] * scale + offsetY;
-						cpx2 = outline[i++] * scale + offsetX;
-						cpy2 = outline[i++] * scale + offsetY;
-						path.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, cpx, cpy);
-						break;
-				}
-			}
-		}
-
-		return {
-			offsetX: glyph.ha * scale,
-			path: path
-		};
-	}
-
-	Font.prototype.isFont = true;
-
-	class FontLoader extends Loader {
-		constructor(manager) {
-			super(manager);
-		}
-
-		load(url, onLoad, onProgress, onError) {
-			const scope = this;
-			const loader = new FileLoader(this.manager);
-			loader.setPath(this.path);
-			loader.setRequestHeader(this.requestHeader);
-			loader.setWithCredentials(scope.withCredentials);
-			loader.load(url, function (text) {
-				let json;
-
-				try {
-					json = JSON.parse(text);
-				} catch (e) {
-					console.warn('THREE.FontLoader: typeface.js support is being deprecated. Use typeface.json instead.');
-					json = JSON.parse(text.substring(65, text.length - 2));
-				}
-
-				const font = scope.parse(json);
-				if (onLoad) onLoad(font);
-			}, onProgress, onError);
-		}
-
-		parse(json) {
-			return new Font(json);
-		}
-
-	}
 
 	let _context;
 
@@ -34841,6 +34396,218 @@
 
 	}
 
+	class ShapePath {
+		constructor() {
+			this.type = 'ShapePath';
+			this.color = new Color();
+			this.subPaths = [];
+			this.currentPath = null;
+		}
+
+		moveTo(x, y) {
+			this.currentPath = new Path();
+			this.subPaths.push(this.currentPath);
+			this.currentPath.moveTo(x, y);
+			return this;
+		}
+
+		lineTo(x, y) {
+			this.currentPath.lineTo(x, y);
+			return this;
+		}
+
+		quadraticCurveTo(aCPx, aCPy, aX, aY) {
+			this.currentPath.quadraticCurveTo(aCPx, aCPy, aX, aY);
+			return this;
+		}
+
+		bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
+			this.currentPath.bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY);
+			return this;
+		}
+
+		splineThru(pts) {
+			this.currentPath.splineThru(pts);
+			return this;
+		}
+
+		toShapes(isCCW, noHoles) {
+			function toShapesNoHoles(inSubpaths) {
+				const shapes = [];
+
+				for (let i = 0, l = inSubpaths.length; i < l; i++) {
+					const tmpPath = inSubpaths[i];
+					const tmpShape = new Shape();
+					tmpShape.curves = tmpPath.curves;
+					shapes.push(tmpShape);
+				}
+
+				return shapes;
+			}
+
+			function isPointInsidePolygon(inPt, inPolygon) {
+				const polyLen = inPolygon.length; // inPt on polygon contour => immediate success		or
+				// toggling of inside/outside at every single! intersection point of an edge
+				//	with the horizontal line through inPt, left of inPt
+				//	not counting lowerY endpoints of edges and whole edges on that line
+
+				let inside = false;
+
+				for (let p = polyLen - 1, q = 0; q < polyLen; p = q++) {
+					let edgeLowPt = inPolygon[p];
+					let edgeHighPt = inPolygon[q];
+					let edgeDx = edgeHighPt.x - edgeLowPt.x;
+					let edgeDy = edgeHighPt.y - edgeLowPt.y;
+
+					if (Math.abs(edgeDy) > Number.EPSILON) {
+						// not parallel
+						if (edgeDy < 0) {
+							edgeLowPt = inPolygon[q];
+							edgeDx = -edgeDx;
+							edgeHighPt = inPolygon[p];
+							edgeDy = -edgeDy;
+						}
+
+						if (inPt.y < edgeLowPt.y || inPt.y > edgeHighPt.y) continue;
+
+						if (inPt.y === edgeLowPt.y) {
+							if (inPt.x === edgeLowPt.x) return true; // inPt is on contour ?
+							// continue;				// no intersection or edgeLowPt => doesn't count !!!
+						} else {
+							const perpEdge = edgeDy * (inPt.x - edgeLowPt.x) - edgeDx * (inPt.y - edgeLowPt.y);
+							if (perpEdge === 0) return true; // inPt is on contour ?
+
+							if (perpEdge < 0) continue;
+							inside = !inside; // true intersection left of inPt
+						}
+					} else {
+						// parallel or collinear
+						if (inPt.y !== edgeLowPt.y) continue; // parallel
+						// edge lies on the same horizontal line as inPt
+
+						if (edgeHighPt.x <= inPt.x && inPt.x <= edgeLowPt.x || edgeLowPt.x <= inPt.x && inPt.x <= edgeHighPt.x) return true; // inPt: Point on contour !
+						// continue;
+					}
+				}
+
+				return inside;
+			}
+
+			const isClockWise = ShapeUtils.isClockWise;
+			const subPaths = this.subPaths;
+			if (subPaths.length === 0) return [];
+			if (noHoles === true) return toShapesNoHoles(subPaths);
+			let solid, tmpPath, tmpShape;
+			const shapes = [];
+
+			if (subPaths.length === 1) {
+				tmpPath = subPaths[0];
+				tmpShape = new Shape();
+				tmpShape.curves = tmpPath.curves;
+				shapes.push(tmpShape);
+				return shapes;
+			}
+
+			let holesFirst = !isClockWise(subPaths[0].getPoints());
+			holesFirst = isCCW ? !holesFirst : holesFirst; // console.log("Holes first", holesFirst);
+
+			const betterShapeHoles = [];
+			const newShapes = [];
+			let newShapeHoles = [];
+			let mainIdx = 0;
+			let tmpPoints;
+			newShapes[mainIdx] = undefined;
+			newShapeHoles[mainIdx] = [];
+
+			for (let i = 0, l = subPaths.length; i < l; i++) {
+				tmpPath = subPaths[i];
+				tmpPoints = tmpPath.getPoints();
+				solid = isClockWise(tmpPoints);
+				solid = isCCW ? !solid : solid;
+
+				if (solid) {
+					if (!holesFirst && newShapes[mainIdx]) mainIdx++;
+					newShapes[mainIdx] = {
+						s: new Shape(),
+						p: tmpPoints
+					};
+					newShapes[mainIdx].s.curves = tmpPath.curves;
+					if (holesFirst) mainIdx++;
+					newShapeHoles[mainIdx] = []; //console.log('cw', i);
+				} else {
+					newShapeHoles[mainIdx].push({
+						h: tmpPath,
+						p: tmpPoints[0]
+					}); //console.log('ccw', i);
+				}
+			} // only Holes? -> probably all Shapes with wrong orientation
+
+
+			if (!newShapes[0]) return toShapesNoHoles(subPaths);
+
+			if (newShapes.length > 1) {
+				let ambiguous = false;
+				const toChange = [];
+
+				for (let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++) {
+					betterShapeHoles[sIdx] = [];
+				}
+
+				for (let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++) {
+					const sho = newShapeHoles[sIdx];
+
+					for (let hIdx = 0; hIdx < sho.length; hIdx++) {
+						const ho = sho[hIdx];
+						let hole_unassigned = true;
+
+						for (let s2Idx = 0; s2Idx < newShapes.length; s2Idx++) {
+							if (isPointInsidePolygon(ho.p, newShapes[s2Idx].p)) {
+								if (sIdx !== s2Idx) toChange.push({
+									froms: sIdx,
+									tos: s2Idx,
+									hole: hIdx
+								});
+
+								if (hole_unassigned) {
+									hole_unassigned = false;
+									betterShapeHoles[s2Idx].push(ho);
+								} else {
+									ambiguous = true;
+								}
+							}
+						}
+
+						if (hole_unassigned) {
+							betterShapeHoles[sIdx].push(ho);
+						}
+					}
+				} // console.log("ambiguous: ", ambiguous);
+
+
+				if (toChange.length > 0) {
+					// console.log("to change: ", toChange);
+					if (!ambiguous) newShapeHoles = betterShapeHoles;
+				}
+			}
+
+			let tmpHoles;
+
+			for (let i = 0, il = newShapes.length; i < il; i++) {
+				tmpShape = newShapes[i].s;
+				shapes.push(tmpShape);
+				tmpHoles = newShapeHoles[i];
+
+				for (let j = 0, jl = tmpHoles.length; j < jl; j++) {
+					tmpShape.holes.push(tmpHoles[j].h);
+				}
+			} //console.log("shape", shapes);
+
+
+			return shapes;
+		}
+
+	}
+
 	const _floatView = new Float32Array(1);
 
 	const _int32View = new Int32Array(_floatView.buffer);
@@ -36145,6 +35912,21 @@
 
 	function LensFlare() {
 		console.error('THREE.LensFlare has been moved to /examples/jsm/objects/Lensflare.js');
+	} //
+
+	function ParametricGeometry() {
+		console.error('THREE.ParametricGeometry has been moved to /examples/jsm/geometries/ParametricGeometry.js');
+		return new BufferGeometry();
+	}
+	function TextGeometry() {
+		console.error('THREE.TextGeometry has been moved to /examples/jsm/geometries/TextGeometry.js');
+		return new BufferGeometry();
+	}
+	function FontLoader() {
+		console.error('THREE.FontLoader has been moved to /examples/jsm/loaders/FontLoader.js');
+	}
+	function Font() {
+		console.error('THREE.Font has been moved to /examples/jsm/loaders/FontLoader.js');
 	}
 
 	if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
@@ -36431,7 +36213,6 @@
 	exports.PCFShadowMap = PCFShadowMap;
 	exports.PCFSoftShadowMap = PCFSoftShadowMap;
 	exports.PMREMGenerator = PMREMGenerator;
-	exports.ParametricBufferGeometry = ParametricGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
 	exports.Particle = Particle;
 	exports.ParticleBasicMaterial = ParticleBasicMaterial;
@@ -36568,7 +36349,6 @@
 	exports.TangentSpaceNormalMap = TangentSpaceNormalMap;
 	exports.TetrahedronBufferGeometry = TetrahedronGeometry;
 	exports.TetrahedronGeometry = TetrahedronGeometry;
-	exports.TextBufferGeometry = TextGeometry;
 	exports.TextGeometry = TextGeometry;
 	exports.Texture = Texture;
 	exports.TextureLoader = TextureLoader;

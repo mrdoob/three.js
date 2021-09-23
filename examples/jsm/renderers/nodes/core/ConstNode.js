@@ -16,7 +16,7 @@ class ConstNode extends CodeNode {
 
 		const code = super.generate( builder );
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const nodeCode = builder.getCodeFromNode( this, type );
 
 		if ( this.name !== '' ) {

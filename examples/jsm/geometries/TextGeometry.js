@@ -15,8 +15,10 @@
  * }
  */
 
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { ExtrudeGeometry } from './ExtrudeGeometry.js';
+import {
+	BufferGeometry,
+	ExtrudeGeometry
+} from '../../../build/three.module.js';
 
 class TextGeometry extends ExtrudeGeometry {
 

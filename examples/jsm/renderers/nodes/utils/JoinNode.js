@@ -10,7 +10,7 @@ class JoinNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		return builder.getTypeFromLength( this.values.length );
 
@@ -18,7 +18,7 @@ class JoinNode extends Node {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const values = this.values;
 
 		const snippetValues = [];

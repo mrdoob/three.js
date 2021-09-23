@@ -17,7 +17,7 @@ class TextureNode extends InputNode {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 
 		const textureProperty = super.generate( builder, type );
 
