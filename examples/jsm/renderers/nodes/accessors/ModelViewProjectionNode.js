@@ -18,7 +18,7 @@ class ModelViewProjectionNode extends Node {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 
 		const mvpSnipped = this._mvpMatrix.build( builder );
 		const positionSnipped = this.position.build( builder, 'vec3' );

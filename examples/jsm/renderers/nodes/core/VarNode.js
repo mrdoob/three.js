@@ -2,24 +2,24 @@ import Node from './Node.js';
 
 class VarNode extends Node {
 
-	constructor( value, name = '', type = null ) {
+	constructor( value, name = '', nodeType = null ) {
 
-		super( type );
+		super( nodeType );
 
 		this.value = value;
 		this.name = name;
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		return this.type || this.value.getType( builder );
+		return super.getNodeType( builder ) || this.value.getNodeType( builder );
 
 	}
 
 	generate( builder, output ) {
 
-		const type = builder.getVectorType( this.type || this.getType( builder ) );
+		const type = builder.getVectorType( this.getNodeType( builder ) );
 		const name = this.name;
 		const value = this.value;
 

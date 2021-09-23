@@ -10,9 +10,9 @@ class ArrayInputNode extends InputNode {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		return this.value[ 0 ].getType( builder );
+		return this.value[ 0 ].getNodeType( builder );
 
 	}
 

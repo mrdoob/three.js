@@ -69,23 +69,23 @@ class MathNode extends TempNode {
 
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return this.a.getType( builder );
+			return this.a.getNodeType( builder );
 
 		} else if ( bLen > cLen ) {
 
-			return this.b.getType( builder );
+			return this.b.getNodeType( builder );
 
 		} else if ( cLen > aLen ) {
 
-			this.c.getType( builder )
+			this.c.getNodeType( builder )
 
 		}
 
-		return this.a.getType( builder );
+		return this.a.getNodeType( builder );
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		const method = this.method;
 
@@ -109,7 +109,7 @@ class MathNode extends TempNode {
 
 		const method = this.method;
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
 
 		if ( method === MathNode.NEGATE ) {
