@@ -31,13 +31,17 @@ function Resizer( editor ) {
 
 		if ( event.isPrimary === false ) return;
 
-		const rect = dom.getBoundingClientRect();
-		const x = ( document.body.offsetWidth - rect.right ) - event.movementX;
+		const offsetWidth = document.body.offsetWidth;
+		const clientX = event.clientX;
+
+		const cX = clientX < 0 ? 0 : clientX > offsetWidth ? offsetWidth : clientX;
+
+		const x = offsetWidth - cX;
 
 		dom.style.right = x + 'px';
 
-		document.getElementById( 'sidebar' ).style.width = ( x + rect.width ) + 'px';
-		document.getElementById( 'viewport' ).style.right = ( x + rect.width ) + 'px';
+		document.getElementById( 'sidebar' ).style.width = x + 'px';
+		document.getElementById( 'viewport' ).style.right = x + 'px';
 
 		signals.windowResize.dispatch();
 
