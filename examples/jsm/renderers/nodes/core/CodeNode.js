@@ -2,9 +2,9 @@ import Node from './Node.js';
 
 class CodeNode extends Node {
 
-	constructor( code = '', type = 'code' ) {
+	constructor( code = '', nodeType = 'code' ) {
 
-		super( type );
+		super( nodeType );
 
 		this.code = code;
 
@@ -66,7 +66,7 @@ class CodeNode extends Node {
 
 		}
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const nodeCode = builder.getCodeFromNode( this, type );
 
 		nodeCode.code = this.code;

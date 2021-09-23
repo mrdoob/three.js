@@ -2,9 +2,9 @@ import Node from './Node.js';
 
 class ContextNode extends Node {
 
-	constructor( node, type, context = {} ) {
+	constructor( node, nodeType, context = {} ) {
 
-		super( type );
+		super( nodeType );
 
 		this.node = node;
 
@@ -28,9 +28,9 @@ class ContextNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		return this.node.getType( builder );
+		return this.node.getNodeType( builder );
 
 	}
 

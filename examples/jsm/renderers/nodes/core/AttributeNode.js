@@ -3,9 +3,9 @@ import VaryNode from './VaryNode.js';
 
 class AttributeNode extends Node {
 
-	constructor( attributeName, type ) {
+	constructor( attributeName, nodeType ) {
 
-		super( type );
+		super( nodeType );
 
 		this._attributeName = attributeName;
 
@@ -28,7 +28,7 @@ class AttributeNode extends Node {
 	generate( builder, output ) {
 
 		const attributeName = this.getAttributeName( builder );
-		const attributeType = this.getType( builder );
+		const attributeType = this.getNodeType( builder );
 
 		const attribute = builder.getAttribute( attributeName, attributeType );
 

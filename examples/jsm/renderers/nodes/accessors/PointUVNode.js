@@ -12,7 +12,7 @@ class PointUVNode extends Node {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const snippet = 'vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y )';
 
 		return builder.format( snippet, type, output );

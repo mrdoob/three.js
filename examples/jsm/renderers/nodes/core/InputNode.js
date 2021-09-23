@@ -2,9 +2,9 @@ import Node from './Node.js';
 
 class InputNode extends Node {
 
-	constructor( type ) {
+	constructor( nodeType ) {
 
-		super( type );
+		super( nodeType );
 
 		this.constant = false;
 
@@ -26,13 +26,13 @@ class InputNode extends Node {
 
 	generateConst( builder ) {
 
-		return builder.getConst( this.getType( builder ), this.value );
+		return builder.getConst( this.getNodeType( builder ), this.value );
 
 	}
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 
 		if ( this.constant === true ) {
 

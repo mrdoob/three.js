@@ -29,38 +29,38 @@ class ReferenceNode extends Node {
 	setNodeType( inputType ) {
 
 		let node = null;
-		let type = inputType;
+		let nodeType = inputType;
 
-		if ( type === 'float' ) {
+		if ( nodeType === 'float' ) {
 
 			node = new FloatNode();
 
-		} else if ( type === 'vec2' ) {
+		} else if ( nodeType === 'vec2' ) {
 
 			node = new Vector2Node( null );
 
-		} else if ( type === 'vec3' ) {
+		} else if ( nodeType === 'vec3' ) {
 
 			node = new Vector3Node( null );
 
-		} else if ( type === 'vec4' ) {
+		} else if ( nodeType === 'vec4' ) {
 
 			node = new Vector4Node( null );
 
-		} else if ( type === 'color' ) {
+		} else if ( nodeType === 'color' ) {
 
 			node = new ColorNode( null );
-			type = 'vec3';
+			nodeType = 'vec3';
 
-		} else if ( type === 'texture' ) {
+		} else if ( nodeType === 'texture' ) {
 
 			node = new TextureNode();
-			type = 'vec4';
+			nodeType = 'vec4';
 
 		}
 
 		this.node = node;
-		this.type = type;
+		this.nodeType = nodeType;
 		this.inputType = inputType;
 
 	}

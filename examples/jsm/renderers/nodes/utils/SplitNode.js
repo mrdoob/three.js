@@ -11,7 +11,7 @@ class SplitNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		return builder.getTypeFromLength( this.components.length );
 
@@ -19,12 +19,12 @@ class SplitNode extends Node {
 
 	generate( builder, output ) {
 
-		const nodeType = this.node.getType( builder );
-		const nodeSnippet = this.node.build( builder, nodeType );
+		const type = this.node.getNodeType( builder );
+		const nodeSnippet = this.node.build( builder, type );
 
 		const snippet = `${nodeSnippet}.${this.components}`;
 
-		return builder.format( snippet, this.getType( builder ), output );
+		return builder.format( snippet, this.getNodeType( builder ), output );
 
 	}
 

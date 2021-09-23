@@ -13,10 +13,10 @@ class OperatorNode extends TempNode {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		const typeA = this.a.getType( builder );
-		const typeB = this.b.getType( builder );
+		const typeA = this.a.getNodeType( builder );
+		const typeB = this.b.getNodeType( builder );
 
 		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
@@ -44,10 +44,10 @@ class OperatorNode extends TempNode {
 
 	generate( builder, output ) {
 
-		let typeA = this.a.getType( builder );
-		let typeB = this.b.getType( builder );
+		let typeA = this.a.getNodeType( builder );
+		let typeB = this.b.getNodeType( builder );
 
-		let type = this.getType( builder );
+		let type = this.getNodeType( builder );
 
 		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 

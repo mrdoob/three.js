@@ -11,7 +11,7 @@ class CameraNode extends Object3DNode {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		const scope = this.scope;
 
@@ -21,7 +21,7 @@ class CameraNode extends Object3DNode {
 
 		}
 
-		return super.getType( builder );
+		return super.getNodeType( builder );
 
 	}
 
