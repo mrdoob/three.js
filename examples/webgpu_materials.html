@@ -29,13 +29,7 @@
 
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
-			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
-			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import NormalNode from './jsm/renderers/nodes/accessors/NormalNode.js';
-			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
-			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
-
-			import MeshBasicNodeMaterial from './jsm/renderers/nodes/materials/MeshBasicNodeMaterial.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -68,7 +62,7 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = new AttributeNode( 'color', 'vec3' );
+				helper.material.colorNode = new Nodes.AttributeNode( 'color', 'vec3' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
@@ -87,41 +81,41 @@
 				let material;
 
 				// PositionNode.LOCAL
-				material = new MeshBasicNodeMaterial();
-				material.colorNode = new PositionNode( PositionNode.LOCAL );
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.PositionNode( Nodes.PositionNode.LOCAL );
 				materials.push( material );
 
 				// NormalNode.LOCAL
-				material = new MeshBasicNodeMaterial();
-				material.colorNode = new NormalNode( NormalNode.LOCAL );
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.NormalNode( Nodes.NormalNode.LOCAL );
 				materials.push( material );
 
 				// NormalNode.WORLD
-				material = new MeshBasicNodeMaterial();
-				material.colorNode = new NormalNode( NormalNode.WORLD );
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.NormalNode( Nodes.NormalNode.WORLD );
 				materials.push( material );
 
 				// NormalNode.VIEW
-				material = new MeshBasicNodeMaterial();
-				material.colorNode = new NormalNode( NormalNode.VIEW );
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.NormalNode( Nodes.NormalNode.VIEW );
 				materials.push( material );
 
 				// TextureNode
-				material = new MeshBasicNodeMaterial();
-				material.colorNode = new TextureNode( texture );
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.TextureNode( texture );
 				materials.push( material );
 
 				// Opacity
-				material = new MeshBasicNodeMaterial();
-				material.opacityNode = new TextureNode( texture );
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.opacityNode = new Nodes.TextureNode( texture );
 				material.transparent = true;
 				materials.push( material );
 
 				// AlphaTest
-				material = new MeshBasicNodeMaterial();
-				material.colorNode = new TextureNode( texture );
-				material.opacityNode = new TextureNode( opacityTexture );
-				material.alphaTestNode = new FloatNode( 0.5 );
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.TextureNode( texture );
+				material.opacityNode = new Nodes.TextureNode( opacityTexture );
+				material.alphaTestNode = new Nodes.FloatNode( 0.5 );
 				materials.push( material );
 
 				// Geometry

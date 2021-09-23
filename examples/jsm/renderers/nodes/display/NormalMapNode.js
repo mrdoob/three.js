@@ -52,7 +52,7 @@ class NormalMapNode extends TempNode {
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const normalMapType = this.normalMapType;
 
 		const nodeData = builder.getDataFromNode( this );

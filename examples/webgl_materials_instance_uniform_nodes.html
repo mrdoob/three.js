@@ -25,19 +25,18 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
-			import { NodeUpdateType } from './jsm/renderers/nodes/core/constants.js';
-			import Node from './jsm/renderers/nodes/core/Node.js';
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
 
-			class InstanceUniformNode extends Node {
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+
+			class InstanceUniformNode extends Nodes.Node {
 
 				constructor() {
 
 					super( 'vec3' );
 
-					this.updateType = NodeUpdateType.Object;
+					this.updateType = Nodes.NodeUpdateType.Object;
 
-					this.inputNode = new ColorNode();
+					this.inputNode = new Nodes.ColorNode();
 
 				}
 

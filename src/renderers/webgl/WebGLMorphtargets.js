@@ -107,6 +107,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 						buffer[ offset + stride + 0 ] = morph.x;
 						buffer[ offset + stride + 1 ] = morph.y;
 						buffer[ offset + stride + 2 ] = morph.z;
+						buffer[ offset + stride + 3 ] = 0;
 
 						if ( hasMorphNormals === true ) {
 
@@ -114,9 +115,10 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 							if ( morphNormal.normalized === true ) denormalize( morph, morphNormal );
 
-							buffer[ offset + stride + 3 ] = morph.x;
-							buffer[ offset + stride + 4 ] = morph.y;
-							buffer[ offset + stride + 5 ] = morph.z;
+							buffer[ offset + stride + 4 ] = morph.x;
+							buffer[ offset + stride + 5 ] = morph.y;
+							buffer[ offset + stride + 6 ] = morph.z;
+							buffer[ offset + stride + 7 ] = 0;
 
 						}
 

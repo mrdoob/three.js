@@ -25,7 +25,7 @@ class Object3DNode extends Node {
 
 	}
 
-	getType() {
+	getNodeType() {
 
 		const scope = this.scope;
 

@@ -19,7 +19,7 @@ class MaterialNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		const scope = this.scope;
 		const material = builder.getContextValue( 'material' );
@@ -99,9 +99,9 @@ class MaterialNode extends Node {
 
 		} else {
 
-			const type = this.getType( builder );
+			const outputType = this.getNodeType( builder );
 
-			node = new MaterialReferenceNode( scope, type );
+			node = new MaterialReferenceNode( scope, outputType );
 
 		}
 

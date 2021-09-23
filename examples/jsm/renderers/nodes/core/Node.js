@@ -2,11 +2,17 @@ import { NodeUpdateType } from './constants.js';
 
 class Node {
 
-	constructor( type = null ) {
+	constructor( nodeType = null ) {
 
-		this.type = type;
+		this.nodeType = nodeType;
 
 		this.updateType = NodeUpdateType.None;
+
+	}
+
+	get type() {
+
+		return this.constructor.name;
 
 	}
 
@@ -16,15 +22,15 @@ class Node {
 
 	}
 
-	getType( /*builder*/ ) {
+	getNodeType( /*builder*/ ) {
 
-		return this.type;
+		return this.nodeType;
 
 	}
 
 	getTypeLength( builder ) {
 
-		return builder.getTypeLength( this.getType( builder ) );
+		return builder.getTypeLength( this.getNodeType( builder ) );
 
 	}
 
