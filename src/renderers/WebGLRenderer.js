@@ -1281,7 +1281,7 @@ function WebGLRenderer( parameters = {} ) {
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
 				wrapT: ClampToEdgeWrapping,
-				useMultisampleRenderToTexture: extensions.has( 'EXT_multisampled_render_to_texture' )
+				useMultisampledRenderToTexture: extensions.has( 'EXT_multisampled_render_to_texture' )
 			} );
 
 		}
@@ -1871,25 +1871,25 @@ function WebGLRenderer( parameters = {} ) {
 				hasNewExternalTextures = true;
 				properties.get( renderTarget.texture ).__webglTexture = options.colorTexture;
 
-				renderTarget.autoAllocateDepthBuffer = options.depthTexture === undefined;
+				renderTargetProperties.__autoAllocateDepthBuffer = options.depthTexture === undefined;
 
-				if ( ! renderTarget.autoAllocateDepthBuffer ) {
+				if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
 
 					properties.get( renderTarget.depthTexture ).__webglTexture = options.depthTexture;
 
 					// The multisample_render_to_texture extension doesn't work properly if there
 					// are midframe flushes and an external depth buffer. Disable use of the extension.
-					if ( renderTarget.useMultisampleRenderToTexture ) {
+					if ( renderTarget.useMultisampledRenderToTexture ) {
 
 						console.warn( 'render-to-texture extension was disabled because an external texture was provided' );
-						renderTarget.useMultisampleRenderToTexture = false;
-						renderTarget.useMultisampleRenderbuffer = true;
+						renderTarget.useMultisampledRenderToTexture = false;
+						renderTarget.useMultisampledRenderbuffer = true;
 
 					}
 
 				}
 
-				renderTarget.hasExternalTextures = true;
+				renderTargetProperties.__hasExternalTextures = true;
 
 			}
 
@@ -1933,7 +1933,7 @@ function WebGLRenderer( parameters = {} ) {
 				framebuffer = __webglFramebuffer[ activeCubeFace ];
 				isCube = true;
 
-			} else if ( renderTarget.useMultisampleRenderbuffer ) {
+			} else if ( renderTarget.useMultisampledRenderbuffer ) {
 
 				framebuffer = properties.get( renderTarget ).__webglMultisampledFramebuffer;
 
