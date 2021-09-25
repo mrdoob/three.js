@@ -19,19 +19,17 @@ class FileLoader extends Loader {
 
 		url = this.manager.resolveURL( url );
 
-		const scope = this;
-
 		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
-			scope.manager.itemStart( url );
+			this.manager.itemStart( url );
 
-			setTimeout( function () {
+			setTimeout( () => {
 
 				if ( onLoad ) onLoad( cached );
 
-				scope.manager.itemEnd( url );
+				this.manager.itemEnd( url );
 
 			}, 0 );
 
@@ -73,7 +71,7 @@ class FileLoader extends Loader {
 		} );
 
 		// start the fetch
-		const res = fetch( req )
+		fetch( req )
 			.then( response => {
 
 				if ( response.status === 200 || response.status === 0 ) {
@@ -145,8 +143,8 @@ class FileLoader extends Loader {
 
 					}
 
-					scope.manager.itemError( url );
-					scope.manager.itemEnd( url );
+					this.manager.itemError( url );
+					this.manager.itemEnd( url );
 
 				}
 
@@ -202,7 +200,7 @@ class FileLoader extends Loader {
 
 				}
 
-				scope.manager.itemEnd( url );
+				this.manager.itemEnd( url );
 
 			} )
 			.catch( err => {
@@ -219,162 +217,14 @@ class FileLoader extends Loader {
 
 				}
 
-				scope.manager.itemError( url );
-				scope.manager.itemEnd( url );
+				this.manager.itemError( url );
+				this.manager.itemEnd( url );
 
 			} );
 
-		scope.manager.itemStart( url );
+		this.manager.itemStart( url );
 
-		return res;
-
-	}
-
-	async loadAsync( url ) {
-
-		if ( url === undefined ) url = '';
-
-		if ( this.path !== undefined ) url = this.path + url;
-
-		url = this.manager.resolveURL( url );
-
-		const cached = Cache.get( url );
-
-		if ( cached !== undefined ) {
-
-			return cached;
-
-		}
-
-		// Check if request is duplicate
-		if ( loading[ url ] !== undefined ) {
-
-			return loading[ url ];
-
-		}
-
-		const req = new Request( url, {
-			headers: new Headers( this.requestHeader ),
-			credentials: this.withCredentials ? 'include' : 'same-origin',
-		} );
-
-		const res = fetch( req )
-			.then( response => {
-
-				if ( response.status === 200 || response.status === 0 ) {
-
-					// Some browsers return HTTP Status 0 when using non-http protocol
-					// e.g. 'file://' or 'data://'. Handle as success.
-
-					if ( response.status === 0 ) {
-
-						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
-
-					}
-
-					const reader = response.body.getReader();
-					const contentLength = response.headers.get( 'Content-Length' );
-					const total = contentLength ? parseInt( contentLength ) : 0;
-					const lengthComputable = total != 0;
-					let loaded = 0;
-
-					// periodically read data into the new stream tracking while download progress
-					return new ReadableStream( {
-						start( controller ) {
-
-							readData();
-
-							function readData() {
-
-								reader.read()
-									.then( ( { done, value } ) => {
-
-										if ( done ) {
-
-											controller.close();
-
-										} else {
-
-											loaded += value.byteLength;
-
-											// TODO-DefinitelyMaybe: call a progress function defined on the loader?
-
-											controller.enqueue( value );
-											readData();
-
-										}
-
-									} );
-
-							}
-
-						}
-        	} );
-
-				} else {
-
-					// TODO-DefinitelyMaybe: Or some other appropriate error
-					return Error( response );
-
-				}
-
-			} )
-			.then( stream => {
-
-				const response = new Response( stream );
-
-				switch ( this.responseType ) {
-
-					case 'arraybuffer':
-
-						return response.arrayBuffer();
-
-					case 'blob':
-
-						return response.blob();
-
-					case 'document':
-
-						return response.text()
-							.then( text => {
-
-								const parser = new DOMParser();
-								return parser.parseFromString( text, this.mimeType );
-
-							} );
-
-					case 'json':
-
-						return response.json();
-
-					default:
-
-						return response.text();
-
-				}
-
-			} )
-			.then( data => {
-
-				Cache.add( url, data );
-
-				delete loading[ url ];
-
-				return data;
-
-			} )
-			.catch( err => {
-
-				delete loading[ url ];
-
-				return err;
-
-			} );
-
-		// stop duplicate requests
-		loading[ url ] = res;
-
-		return res;
+		return;
 
 	}
 
