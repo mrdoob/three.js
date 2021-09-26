@@ -89,7 +89,7 @@ class FileLoader extends Loader {
 					const reader = response.body.getReader();
 					const contentLength = response.headers.get( 'Content-Length' );
 					const total = contentLength ? parseInt( contentLength ) : 0;
-					const lengthComputable = total != 0;
+					const lengthComputable = total !== 0;
 					let loaded = 0;
 
 					// periodically read data into the new stream tracking while download progress
@@ -100,51 +100,40 @@ class FileLoader extends Loader {
 
 							function readData() {
 
-								reader.read()
-									.then( ( { done, value } ) => {
+								reader.read().then( ( { done, value } ) => {
 
-										if ( done ) {
+									if ( done ) {
 
-											controller.close();
+										controller.close();
 
-										} else {
+									} else {
 
-											loaded += value.byteLength;
+										loaded += value.byteLength;
 
-											const event = new ProgressEvent( 'progress', { lengthComputable, loaded, total } );
-											for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+										const event = new ProgressEvent( 'progress', { lengthComputable, loaded, total } );
+										for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-												const callback = callbacks[ i ];
-												if ( callback.onProgress ) callback.onProgress( event );
-
-											}
-
-											controller.enqueue( value );
-											readData();
+											const callback = callbacks[ i ];
+											if ( callback.onProgress ) callback.onProgress( event );
 
 										}
 
-									} );
+										controller.enqueue( value );
+										readData();
+
+									}
+
+								} );
 
 							}
 
 						}
+
         	} );
 
 				} else {
 
-					const callbacks = loading[ url ];
-					delete loading[ url ];
-
-					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-						const callback = callbacks[ i ];
-						if ( callback.onError ) callback.onError( response.statusText );
-
-					}
-
-					this.manager.itemError( url );
-					this.manager.itemEnd( url );
+					throw Error( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}` );
 
 				}
 
@@ -223,8 +212,6 @@ class FileLoader extends Loader {
 			} );
 
 		this.manager.itemStart( url );
-
-		return;
 
 	}
 
