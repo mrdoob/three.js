@@ -7,6 +7,8 @@ function noop() {
 class ElementProxyReceiver extends EventDispatcher {
   constructor() {
     super();
+    // because OrbitControls try to set style.touchAction;
+    this.style = {};
   }
   get clientWidth() {
     return this.width;
@@ -14,6 +16,9 @@ class ElementProxyReceiver extends EventDispatcher {
   get clientHeight() {
     return this.height;
   }
+  // OrbitControls call these as of r132. Maybe we should implement them
+  setPointerCapture() { }
+  releasePointerCapture() { }
   getBoundingClientRect() {
     return {
       left: this.left,
