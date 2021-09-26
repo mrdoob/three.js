@@ -170,6 +170,14 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
+		if ( this.parameters !== undefined ) {
+
+			this.type = 'BufferGeometry';
+
+			delete this.parameters;
+
+		}
+
 		return this;
 
 	}
