@@ -246,7 +246,7 @@ the utils.
 import * as THREE from './resources/three/r132/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
 import {GLTFLoader} from './resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js';
-+import {SkeletonUtils} from './resources/threejs/r132/examples/jsm/utils/SkeletonUtils.js';
++import * as SkeletonUtils from './resources/threejs/r132/examples/jsm/utils/SkeletonUtils.js';
 ```
 
 Then we can clone the models we just loaded
@@ -1681,7 +1681,7 @@ we've used else where
 import * as THREE from './resources/three/r132/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
 import {GLTFLoader} from './resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js';
-import {SkeletonUtils} from './resources/threejs/r132/examples/jsm/utils/SkeletonUtils.js';
+import * as SkeletonUtils from './resources/threejs/r132/examples/jsm/utils/SkeletonUtils.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
