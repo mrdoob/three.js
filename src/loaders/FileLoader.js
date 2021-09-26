@@ -129,7 +129,7 @@ class FileLoader extends Loader {
 
 						}
 
-        	} );
+					} );
 
 				} else {
 
