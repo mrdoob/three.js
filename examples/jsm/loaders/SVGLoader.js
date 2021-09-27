@@ -1007,6 +1007,7 @@ class SVGLoader extends Loader {
 
 			addStyle( 'fill', 'fill' );
 			addStyle( 'fill-opacity', 'fillOpacity', clamp );
+			addStyle( 'fill-rule', 'fillRule' );
 			addStyle( 'opacity', 'opacity', clamp );
 			addStyle( 'stroke', 'stroke' );
 			addStyle( 'stroke-opacity', 'strokeOpacity', clamp );
