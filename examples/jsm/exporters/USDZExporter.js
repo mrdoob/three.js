@@ -381,7 +381,7 @@ function buildMaterial( material, textures ) {
             float outputs:g
             float outputs:b
             float outputs:a
-            float3 outputs:rgba
+            float3 outputs:rgb
         }`;
 
 	}
