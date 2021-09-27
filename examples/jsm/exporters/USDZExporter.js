@@ -380,8 +380,7 @@ function buildMaterial( material, textures ) {
             float outputs:r
             float outputs:g
             float outputs:b
-            float outputs:a
-            float3 outputs:rgba
+            float3 outputs:rgb
         }`;
 
 	}
@@ -456,11 +455,6 @@ function buildMaterial( material, textures ) {
 		inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
 
 		samplers.push( buildTexture( material.alphaMap, 'opacity' ) );
-
-	} else if ( material.map !== null && material.map.format === 1023 ) {
-
-		inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:a>` );
-		inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
 
 	} else {
 
