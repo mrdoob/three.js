@@ -10,16 +10,12 @@ class PropertyNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getNodeType( builder );
-
-		const nodeVary = builder.getVarFromNode( this, type );
+		const nodeVary = builder.getVarFromNode( this, this.getNodeType( builder ) );
 		nodeVary.name = this.name;
 
-		const propertyName = builder.getPropertyName( nodeVary );
-
-		return builder.format( propertyName, type, output );
+		return builder.getPropertyName( nodeVary );
 
 	}
 

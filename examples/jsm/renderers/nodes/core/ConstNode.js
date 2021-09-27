@@ -12,12 +12,11 @@ class ConstNode extends CodeNode {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const code = super.generate( builder );
 
-		const type = this.getNodeType( builder );
-		const nodeCode = builder.getCodeFromNode( this, type );
+		const nodeCode = builder.getCodeFromNode( this, this.getNodeType( builder ) );
 
 		if ( this.name !== '' ) {
 
@@ -31,7 +30,7 @@ class ConstNode extends CodeNode {
 
 		nodeCode.code = `#define ${propertyName} ${code}`;
 
-		return builder.format( propertyName, type, output );
+		return propertyName;
 
 	}
 

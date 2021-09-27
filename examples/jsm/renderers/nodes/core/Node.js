@@ -1,4 +1,4 @@
-import { NodeUpdateType } from './constants.js';
+import { NodeUpdateType, NodeGenerateType } from './constants.js';
 
 class Node {
 
@@ -49,6 +49,27 @@ class Node {
 	build( builder, output = null ) {
 
 		builder.addNode( this );
+
+		const isGenerateOnce = this.generate.length === 1;
+
+		if ( isGenerateOnce ) {
+
+			const type = this.getNodeType( builder );
+			const nodeData = builder.getDataFromNode( this );
+
+			let snippet = nodeData.snippet;
+
+			if ( snippet === undefined ) {
+
+				snippet = this.generate( builder );
+
+				nodeData.snippet = snippet;
+
+			}
+
+			return builder.format( snippet, type, output );
+
+		}
 
 		return this.generate( builder, output );
 

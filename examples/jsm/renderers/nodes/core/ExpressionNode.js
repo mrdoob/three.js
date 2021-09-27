@@ -1,6 +1,6 @@
-import Node from './Node.js';
+import TempNode from './TempNode.js';
 
-class ExpressionNode extends Node {
+class ExpressionNode extends TempNode {
 
 	constructor( snipped = '', nodeType = null ) {
 
@@ -10,12 +10,9 @@ class ExpressionNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getNodeType( builder );
-		const snipped = this.snipped;
-
-		return builder.format( `( ${ snipped } )`, type, output );
+		return `( ${ this.snipped } )`;
 
 	}
 

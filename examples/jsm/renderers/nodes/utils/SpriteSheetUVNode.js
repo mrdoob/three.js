@@ -18,49 +18,38 @@ class SpriteSheetUVNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const nodeData = builder.getDataFromNode( this );
+		const uv = this.uv;
+		const count = this.count;
+		const frame = this.frame;
 
-		let uvFrame = nodeData.uvFrame;
+		const one = new FloatNode( 1 ).setConst( true );
 
-		if ( nodeData.uvFrame === undefined ) {
+		const width = new SplitNode( count, 'x' );
+		const height = new SplitNode( count, 'y' );
 
-			const uv = this.uv;
-			const count = this.count;
-			const frame = this.frame;
+		const total = new OperatorNode( '*', width, height );
 
-			const one = new FloatNode( 1 ).setConst( true );
+		const roundFrame = new MathNode( MathNode.FLOOR, new MathNode( MathNode.MOD, frame, total ) );
 
-			const width = new SplitNode( count, 'x' );
-			const height = new SplitNode( count, 'y' );
+		const frameNum = new OperatorNode( '+', roundFrame, one );
 
-			const total = new OperatorNode( '*', width, height );
+		const cell = new MathNode( MathNode.MOD, roundFrame, width );
+		const row = new MathNode( MathNode.CEIL, new OperatorNode( '/', frameNum, width ) );
+		const rowInv = new OperatorNode( '-', height, row );
 
-			const roundFrame = new MathNode( MathNode.FLOOR, new MathNode( MathNode.MOD, frame, total ) );
+		const scale = new OperatorNode( '/', one, count );
 
-			const frameNum = new OperatorNode( '+', roundFrame, one );
+		const uvFrameOffset = new JoinNode( [
+			new OperatorNode( '*', cell, new SplitNode( scale, 'x' ) ),
+			new OperatorNode( '*', rowInv, new SplitNode( scale, 'y' ) )
+		] );
 
-			const cell = new MathNode( MathNode.MOD, roundFrame, width );
-			const row = new MathNode( MathNode.CEIL, new OperatorNode( '/', frameNum, width ) );
-			const rowInv = new OperatorNode( '-', height, row );
+		const uvScale = new OperatorNode( '*', uv, scale );
+		const uvFrame = new OperatorNode( '+', uvScale, uvFrameOffset );
 
-			const scale = new OperatorNode( '/', one, count );
-
-			const uvFrameOffset = new JoinNode( [
-				new OperatorNode( '*', cell, new SplitNode( scale, 'x' ) ),
-				new OperatorNode( '*', rowInv, new SplitNode( scale, 'y' ) )
-			] );
-
-			const uvScale = new OperatorNode( '*', uv, scale );
-
-			uvFrame = new OperatorNode( '+', uvScale, uvFrameOffset );
-
-			nodeData.uvFrame = uvFrame;
-
-		}
-
-		return uvFrame.build( builder, output );
+		return uvFrame.build( builder, this.getNodeType( builder ) );
 
 	}
 

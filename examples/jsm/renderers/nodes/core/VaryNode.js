@@ -19,7 +19,7 @@ class VaryNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const type = this.getNodeType( builder );
 		const value = this.value;
@@ -30,7 +30,7 @@ class VaryNode extends Node {
 		// force nodeVary.snippet work in vertex stage
 		builder.flowNodeFromShaderStage( NodeShaderStage.Vertex, value, type, propertyName );
 
-		return builder.format( propertyName, type, output );
+		return propertyName;
 
 	}
 

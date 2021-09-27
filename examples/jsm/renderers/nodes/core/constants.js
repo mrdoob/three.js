@@ -9,6 +9,11 @@ export const NodeUpdateType = {
 	Object: 'object'
 };
 
+export const NodeGenerateType = {
+	Once: 'once',
+	Always: 'always'
+};
+
 export const NodeType = {
 	Float: 'float',
 	Vector2: 'vec2',

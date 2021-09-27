@@ -1,10 +1,13 @@
 import Node from './Node.js';
+import { NodeGenerateType } from './constants.js';
 
 class TempNode extends Node {
 
 	constructor( type ) {
 
 		super( type );
+
+		this.generateType = NodeGenerateType.Always;
 
 	}
 
@@ -17,15 +20,25 @@ class TempNode extends Node {
 			const nodeVar = builder.getVarFromNode( this, type );
 			const propertyName = builder.getPropertyName( nodeVar );
 
-			const snippet = super.build( builder, type );
+			const nodeData = builder.getDataFromNode( this );
 
-			builder.addFlowCode( `${propertyName} = ${snippet}` );
+			let snippet = nodeData.snippet;
+
+			if ( snippet === undefined ) {
+
+				snippet = super.build( builder, type );
+
+				builder.addFlowCode( `${propertyName} = ${snippet}` );
+
+				nodeData.snippet = snippet;
+
+			}
 
 			return builder.format( propertyName, type, output );
 
 		} else {
 
-			return super.build( builder, type );
+			return super.build( builder, output );
 
 		}
 
