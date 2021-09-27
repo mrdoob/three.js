@@ -21,61 +21,29 @@ class NormalNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getNodeType( builder );
-		const nodeData = builder.getDataFromNode( this, builder.shaderStage );
 		const scope = this.scope;
 
-		let localNormalNode = nodeData.localNormalNode;
+		let outputNode = null;
 
-		if ( localNormalNode === undefined ) {
+		if ( scope === NormalNode.LOCAL ) {
 
-			localNormalNode = new AttributeNode( 'normal', 'vec3' );
+			outputNode = new AttributeNode( 'normal', 'vec3' );
 
-			nodeData.localNormalNode = localNormalNode;
+		} else if ( scope === NormalNode.VIEW ) {
 
-		}
-
-		let outputNode = localNormalNode;
-
-		if ( scope === NormalNode.VIEW ) {
-
-			let viewNormalNode = nodeData.viewNormalNode;
-
-			if ( viewNormalNode === undefined ) {
-
-				const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), localNormalNode );
-
-				viewNormalNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
-
-				nodeData.viewNormalNode = viewNormalNode;
-
-			}
-
-			outputNode = viewNormalNode;
+			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), new NormalNode( NormalNode.LOCAL ) );
+			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
 
 		} else if ( scope === NormalNode.WORLD ) {
 
-			let worldNormalNode = nodeData.worldNormalNode;
-
-			if ( worldNormalNode === undefined ) {
-
-				const vertexNormalNode = inverseTransformDirection.call( { dir: new NormalNode( NormalNode.VIEW ), matrix: new CameraNode( CameraNode.VIEW_MATRIX ) } );
-
-				worldNormalNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
-
-				nodeData.worldNormalNode = worldNormalNode;
-
-			}
-
-			outputNode = worldNormalNode;
+			const vertexNormalNode = inverseTransformDirection.call( { dir: new NormalNode( NormalNode.VIEW ), matrix: new CameraNode( CameraNode.VIEW_MATRIX ) } );
+			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
 
 		}
 
-		const normalSnipped = outputNode.build( builder, type );
-
-		return builder.format( normalSnipped, type, output );
+		return outputNode.build( builder );
 
 	}
 

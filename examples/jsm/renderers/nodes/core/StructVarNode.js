@@ -20,7 +20,7 @@ class StructVarNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const type = this.getNodeType( builder );
 
@@ -66,7 +66,7 @@ class StructVarNode extends Node {
 
 		}
 
-		return builder.format( property, type, output );
+		return property;
 
 	}
 

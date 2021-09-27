@@ -78,49 +78,25 @@ class Object3DNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const nodeData = builder.getDataFromNode( this );
+		const scope = this.scope;
 
-		let inputNode = this._inputNode;
+		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
 
-		if ( nodeData.inputNode === undefined ) {
+			this._inputNode = new Matrix4Node( /*null*/ );
 
-			const scope = this.scope;
+		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
 
-			if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
+			this._inputNode = new Matrix3Node( /*null*/ );
 
-				if ( inputNode === null || inputNode.isMatrix4Node !== true ) {
+		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
 
-					inputNode = new Matrix4Node( /*null*/ );
-
-				}
-
-			} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
-
-				if ( inputNode === null || inputNode.isMatrix3Node !== true ) {
-
-					inputNode = new Matrix3Node( /*null*/ );
-
-				}
-
-			} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
-
-				if ( inputNode === null || inputNode.isVector3Node !== true ) {
-
-					inputNode = new Vector3Node();
-
-				}
-
-			}
-
-			this._inputNode = inputNode;
-
-			nodeData.inputNode = inputNode;
+			this._inputNode = new Vector3Node();
 
 		}
 
-		return inputNode.build( builder, output );
+		return this._inputNode.build( builder );
 
 	}
 

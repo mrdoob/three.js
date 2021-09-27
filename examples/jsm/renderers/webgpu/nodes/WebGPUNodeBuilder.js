@@ -393,21 +393,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	composeShaderCode( code, snippet ) {
-
-		// use regex maybe for security?
-		const versionStrIndex = code.indexOf( '\n' );
-
-		let finalCode = code.substr( 0, versionStrIndex ) + '\n\n';
-
-		finalCode += snippet;
-
-		finalCode += code.substr( versionStrIndex );
-
-		return finalCode;
-
-	}
-
 	build() {
 
 		const keywords = this.getContextValue( 'keywords' );
@@ -422,10 +407,25 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		super.build();
 
-		this.vertexShader = this.composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
-		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
+		this.vertexShader = this._composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
+		this.fragmentShader = this._composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
 
 		return this;
+
+	}
+
+	_composeShaderCode( code, snippet ) {
+
+		// use regex maybe for security?
+		const versionStrIndex = code.indexOf( '\n' );
+
+		let finalCode = code.substr( 0, versionStrIndex ) + '\n\n';
+
+		finalCode += snippet;
+
+		finalCode += code.substr( versionStrIndex );
+
+		return finalCode;
 
 	}
 
