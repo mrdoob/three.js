@@ -68,6 +68,9 @@ import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
 import TimerNode from './utils/TimerNode.js';
 
+// procedural
+import CheckerNode from './procedural/CheckerNode.js';
+
 // core
 export * from './core/constants.js';
 
@@ -151,6 +154,9 @@ export {
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	TimerNode
+	TimerNode,
+
+	// procedural
+	CheckerNode
 };
 
