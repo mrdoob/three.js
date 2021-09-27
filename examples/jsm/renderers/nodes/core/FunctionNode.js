@@ -1,7 +1,6 @@
 import CodeNode from './CodeNode.js';
 import NodeFunctionInput from './NodeFunctionInput.js';
 import FunctionCallNode from './FunctionCallNode.js';
-import { NodeGenerateType } from './constants.js';
 
 const declarationRegexp = /^\s*(highp|mediump|lowp)?\s*([a-z_0-9]+)\s*([a-z_0-9]+)?\s*\((.*?)\)/i;
 const propertiesRegexp = /[a-z_0-9]+/ig;
@@ -22,8 +21,6 @@ class FunctionNode extends CodeNode {
 		this.useKeywords = true;
 
 		this.presicion = '';
-
-		this.generateType = NodeGenerateType.Always;
 
 		this._includeCode = '';
 		this._internalCode = '';

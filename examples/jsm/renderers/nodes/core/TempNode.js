@@ -1,13 +1,10 @@
 import Node from './Node.js';
-import { NodeGenerateType } from './constants.js';
 
 class TempNode extends Node {
 
 	constructor( type ) {
 
 		super( type );
-
-		this.generateType = NodeGenerateType.Always;
 
 	}
 
