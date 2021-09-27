@@ -380,7 +380,8 @@ function buildMaterial( material, textures ) {
             float outputs:r
             float outputs:g
             float outputs:b
-            float3 outputs:rgb
+            float outputs:a
+            float3 outputs:rgba
         }`;
 
 	}
@@ -449,7 +450,23 @@ function buildMaterial( material, textures ) {
 
 	}
 
-	inputs.push( `${ pad }float inputs:opacity = ${ material.opacity }` );
+	if ( material.alphaMap !== null ) {
+
+		inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.alphaMap.id}_opacity.outputs:r>` );
+		inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
+
+		samplers.push( buildTexture( material.alphaMap, 'opacity' ) );
+
+	} else if ( material.map !== null && material.map.format === 1023 ) {
+
+		inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:a>` );
+		inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
+
+	} else {
+
+		inputs.push( `${pad}float inputs:opacity = ${material.opacity}` );
+
+	}
 
 	if ( material.isMeshPhysicalMaterial ) {
 
