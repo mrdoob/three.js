@@ -2369,6 +2369,27 @@ class GLTFParser {
 
 		const ref = object.clone();
 
+		// Propagates mappings to the cloned object, prevents mappings on the
+		// original object from being lost.
+		const updateMappings = ( original, clone ) => {
+
+			const mappings = this.associations.get( original );
+			if ( mappings != null ) {
+
+				this.associations.set( clone, mappings );
+
+			}
+
+			for ( const [ i, child ] of original.children.entries() ) {
+
+				updateMappings( child, clone.children[ i ] );
+
+			}
+
+		};
+
+		updateMappings( object, ref );
+
 		ref.name += '_instance_' + ( cache.uses[ index ] ++ );
 
 		return ref;
@@ -3848,11 +3869,45 @@ class GLTFParser {
 
 		for ( let i = 0, il = nodeIds.length; i < il; i ++ ) {
 
-			pending.push( buildNodeHierachy( nodeIds[ i ], scene, json, parser ) );
+			pending.push( buildNodeHierarchy( nodeIds[ i ], scene, json, parser ) );
 
 		}
 
 		return Promise.all( pending ).then( function () {
+
+			// Removes dangling associations, associations that reference a node that
+			// didn't make it into the scene.
+			const reduceAssociations = ( node ) => {
+
+				const reducedAssociations = new Map();
+
+				for ( const [ key, value ] of parser.associations ) {
+
+					if ( key instanceof Material || key instanceof Texture ) {
+
+						reducedAssociations.set( key, value );
+
+					}
+
+				}
+
+				node.traverse( ( node ) => {
+
+					const mappings = parser.associations.get( node );
+
+					if ( mappings != null ) {
+
+						reducedAssociations.set( node, mappings );
+
+					}
+
+				} );
+
+				return reducedAssociations;
+
+			};
+
+			parser.associations = reduceAssociations( scene );
 
 			return scene;
 
@@ -3862,7 +3917,7 @@ class GLTFParser {
 
 }
 
-function buildNodeHierachy( nodeId, parentObject, json, parser ) {
+function buildNodeHierarchy( nodeId, parentObject, json, parser ) {
 
 	const nodeDef = json.nodes[ nodeId ];
 
@@ -3946,7 +4001,7 @@ function buildNodeHierachy( nodeId, parentObject, json, parser ) {
 			for ( let i = 0, il = children.length; i < il; i ++ ) {
 
 				const child = children[ i ];
-				pending.push( buildNodeHierachy( child, node, json, parser ) );
+				pending.push( buildNodeHierarchy( child, node, json, parser ) );
 
 			}
 
