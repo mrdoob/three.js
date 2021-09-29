@@ -80,7 +80,9 @@
 				const timerScaleNode = new Nodes.OperatorNode( '*', timerNode, new Nodes.Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
 				const animateUV = new Nodes.OperatorNode( '+', new Nodes.UVNode(), timerScaleNode );
 
-				materialBox.colorNode = new Nodes.TextureNode( texture, animateUV );
+				const textureNode = new Nodes.TextureNode( texture, animateUV );
+
+				materialBox.colorNode = new Nodes.MathNode( 'mix', textureNode, new Nodes.CheckerNode( animateUV ), new Nodes.FloatNode( .5) );
 
 				// test uv 2
 				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
