@@ -2,10 +2,10 @@ import FunctionNode from '../core/FunctionNode.js';
 import Node from '../core/Node.js';
 import UVNode from '../accessors/UVNode.js';
 
-import { tjsl, float, add, mul, floor, mod, sign, color, vec3, join } from '../TJSL.js';
+import { tjsl, float, add, mul, floor, mod, sign } from '../TJSL.js';
 
 // Three.JS Shader Language
-const ShaderChecker = tjsl( ( uv ) => {
+const checkerShaderNode = tjsl( ( uv ) => {
 
 	uv = mul( uv, 2.0 );
 
@@ -29,7 +29,7 @@ class CheckerNode extends Node {
 
 	generate( builder, output ) {
 
-		const checkerNode = ShaderChecker( this.uv );
+		const checkerNode = checkerShaderNode( this.uv );
 
 		return checkerNode.build( builder, output );
 
