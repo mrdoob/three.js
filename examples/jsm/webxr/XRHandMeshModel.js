@@ -1,6 +1,19 @@
+import { Quaternion } from '../../../build/three.module.js';
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
 const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/';
+
+const _oculusBrowserV14CorrectionRight = new Quaternion().identity();
+const _oculusBrowserV14CorrectionLeft = new Quaternion().identity();
+
+if ( /OculusBrowser\/14\./.test( navigator.userAgent ) ) {
+    _oculusBrowserV14CorrectionRight
+    	.setFromAxisAngle( { x: 0, y: 1, z: 0 }, Math.PI / 2 );
+
+    _oculusBrowserV14CorrectionLeft
+    	.setFromAxisAngle( { x: 1, y: 0, z: 0 }, Math.PI )
+        .premultiply( _oculusBrowserV14CorrectionRight );
+}
 
 class XRHandMeshModel {
 
@@ -8,6 +21,10 @@ class XRHandMeshModel {
 
 		this.controller = controller;
 		this.handModel = handModel;
+
+        this.oculusBrowserV14Correction = handedness === 'left' 
+        	? _oculusBrowserV14CorrectionLeft 
+        	: _oculusBrowserV14CorrectionRight;
 
 		this.bones = [];
 
@@ -93,7 +110,8 @@ class XRHandMeshModel {
 					if ( bone ) {
 
 						bone.position.copy( position );
-						bone.quaternion.copy( XRJoint.quaternion );
+						bone.quaternion.copy( XRJoint.quaternion )
+                            .multiply( this.oculusBrowserV14Correction );
 						// bone.scale.setScalar( XRJoint.jointRadius || defaultRadius );
 
 					}

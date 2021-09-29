@@ -11,6 +11,16 @@ import {
 const _matrix = new Matrix4();
 const _vector = new Vector3();
 
+const _oculusBrowserV14CorrectionRight = new Matrix4().identity();
+const _oculusBrowserV14CorrectionLeft = new Matrix4().identity();
+
+if ( /OculusBrowser\/14\./.test( navigator.userAgent ) ) {
+
+    _oculusBrowserV14CorrectionRight.makeRotationY( Math.PI / 2 );
+
+    _oculusBrowserV14CorrectionLeft.makeRotationY( - Math.PI / 2 );
+}
+
 class XRHandPrimitiveModel {
 
 	constructor( handModel, controller, path, handedness, options ) {
@@ -18,6 +28,10 @@ class XRHandPrimitiveModel {
 		this.controller = controller;
 		this.handModel = handModel;
 		this.envMap = null;
+
+        this.oculusBrowserV14Correction = handedness === 'left' 
+        	? _oculusBrowserV14CorrectionLeft 
+        	: _oculusBrowserV14CorrectionRight;
 
 		let geometry;
 
@@ -83,7 +97,9 @@ class XRHandPrimitiveModel {
 			if ( joint.visible ) {
 
 				_vector.setScalar( joint.jointRadius || defaultRadius );
-				_matrix.compose( joint.position, joint.quaternion, _vector );
+				_matrix.compose( joint.position, joint.quaternion, _vector )
+                    .multiply( this.oculusBrowserV14Correction );
+
 				this.handMesh.setMatrixAt( i, _matrix );
 
 				count ++;
