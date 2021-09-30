@@ -22,31 +22,31 @@ const NodeHandler = {
 
 		// Split Properties Pass
 
-		if ( typeof prop === 'string' ) {
+		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
 			const splitProps = prop.match( /^[xyzw]{1,4}$/ );
 
 			if ( splitProps !== null ) {
 
-				return tjslObject( new SplitNode( node, splitProps[ 0 ] ) );
+				return ShaderNodeObject( new SplitNode( node, splitProps[ 0 ] ) );
 
 			}
 
-			return node[ prop ];
-
 		}
+
+		return node[ prop ];
 
 	}
 
 };
 
-export const tjslObject = ( obj ) => {
+export const ShaderNodeObject = ( obj ) => {
 
 	const type = typeof obj;
 
 	if ( type === 'number' ) {
 
-		return tjslObject( new FloatNode( obj ).setConst( true ) );
+		return ShaderNodeObject( new FloatNode( obj ).setConst( true ) );
 
 	} else if ( type === 'object' ) {
 
@@ -70,13 +70,13 @@ export const tjslObject = ( obj ) => {
 
 };
 
-export const tjslArray = ( array ) => {
+export const ShaderNodeArray = ( array ) => {
 
 	const len = array.length;
 
 	for ( let i = 0; i < len; i ++ ) {
 
-		array[ i ] = tjslObject( array[ i ] );
+		array[ i ] = ShaderNodeObject( array[ i ] );
 
 	}
 
@@ -84,25 +84,29 @@ export const tjslArray = ( array ) => {
 
 };
 
-export const tjslScript = ( jsFunc ) => {
+export const ShaderNodeScript = ( jsFunc ) => {
 
 	return ( ...params ) => {
 
-		tjslArray( params );
+		ShaderNodeArray( params );
 
-		return jsFunc( ...params );
+		return ShaderNodeObject( jsFunc( ...params ) );
 
 	};
 
 };
 
-export const tjsl = ( obj ) => {
+export const ShaderNode = ( obj ) => {
 
-	return tjslScript( obj );
+	return ShaderNodeScript( obj );
 
 };
 
-export const uniform = tjslScript( ( inputNode ) => {
+//
+// Node Material Shader Syntax
+//
+
+export const uniform = ShaderNodeScript( ( inputNode ) => {
 
 	inputNode.setConst( false );
 
@@ -112,78 +116,78 @@ export const uniform = tjslScript( ( inputNode ) => {
 
 export const float = ( val ) => {
 
-	return tjslObject( new FloatNode( val ).setConst( true ) );
+	return ShaderNodeObject( new FloatNode( val ).setConst( true ) );
 
 };
 
 export const color = ( ...params ) => {
 
-	return tjslObject( new ColorNode( new Color( ...params ) ).setConst( true ) );
+	return ShaderNodeObject( new ColorNode( new Color( ...params ) ).setConst( true ) );
 
 };
 
 export const join = ( ...params ) => {
 
-	return tjslObject( new JoinNode( tjslArray( params ) ) );
+	return ShaderNodeObject( new JoinNode( ShaderNodeArray( params ) ) );
 
 };
 
 export const vec2 = ( ...params ) => {
 
-	return tjslObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
+	return ShaderNodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
 
 };
 
 export const vec3 = ( ...params ) => {
 
-	return tjslObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
+	return ShaderNodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
 
 };
 
 export const vec4 = ( ...params ) => {
 
-	return tjslObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
+	return ShaderNodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
 
 };
 
 export const add = ( ...params ) => {
 
-	return tjslObject( new OperatorNode( '+', ...tjslArray( params ) ) );
+	return ShaderNodeObject( new OperatorNode( '+', ...ShaderNodeArray( params ) ) );
 
 };
 
 export const sub = ( ...params ) => {
 
-	return tjslObject( new OperatorNode( '-', ...tjslArray( params ) ) );
+	return new OperatorNode( '-', ...ShaderNodeArray( params ) );
 
 };
 
 export const mul = ( ...params ) => {
 
-	return tjslObject( new OperatorNode( '*', ...tjslArray( params ) ) );
+	return ShaderNodeObject( new OperatorNode( '*', ...ShaderNodeArray( params ) ) );
 
 };
 
 export const div = ( ...params ) => {
 
-	return tjslObject( new OperatorNode( '/', ...tjslArray( params ) ) );
+	return ShaderNodeObject( new OperatorNode( '/', ...ShaderNodeArray( params ) ) );
 
 };
 
 export const floor = ( ...params ) => {
 
-	return tjslObject( new MathNode( 'floor', ...tjslArray( params ) ) );
+	return ShaderNodeObject( new MathNode( 'floor', ...ShaderNodeArray( params ) ) );
 
 };
 
 export const mod = ( ...params ) => {
 
-	return tjslObject( new MathNode( 'mod', ...tjslArray( params ) ) );
+	return ShaderNodeObject( new MathNode( 'mod', ...ShaderNodeArray( params ) ) );
 
 };
 
 export const sign = ( ...params ) => {
 
-	return tjslObject( new MathNode( 'sign', ...tjslArray( params ) ) );
+	return ShaderNodeObject( new MathNode( 'sign', ...ShaderNodeArray( params ) ) );
 
 };
