@@ -66,8 +66,10 @@
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
-
 		const previewsToggler = document.getElementById( 'previewsToggler' );
+
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
 
 		const links = {};
 		const validRedirects = new Map();
@@ -132,6 +134,10 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter( files, tags );
+
+			} else {
+
+				updateLink( '' );
 
 			}
 
@@ -279,6 +285,25 @@
 			}
 
 			layoutList( files );
+
+			updateLink( v );
+
+		}
+
+		function updateLink( search ) {
+
+			// update docs link
+
+			if ( search ) {
+
+				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				sectionLink.href = `${link}?q=${search}`;
+
+			} else {
+
+				sectionLink.href = sectionDefaultHref;
+
+			}
 
 		}
 

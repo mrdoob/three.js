@@ -153,6 +153,12 @@ class WebGPURenderer {
 
 		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
+		if ( adapter === null ) {
+
+			throw new Error( 'WebGPURenderer: Unable to create WebGPU adapter.' );
+
+		}
+
 		const deviceDescriptor = {
 			requiredFeatures: parameters.requiredFeatures,
 			requiredLimits: parameters.requiredLimits

@@ -241,28 +241,6 @@ class TransformControls extends Object3D {
 
 			if ( planeIntersect ) {
 
-				let space = this.space;
-
-				if ( this.mode === 'scale' ) {
-
-					space = 'local';
-
-				} else if ( this.axis === 'E' || this.axis === 'XYZE' || this.axis === 'XYZ' ) {
-
-					space = 'world';
-
-				}
-
-				if ( space === 'local' && this.mode === 'rotate' ) {
-
-					const snap = this.rotationSnap;
-
-					if ( this.axis === 'X' && snap ) this.object.rotation.x = Math.round( this.object.rotation.x / snap ) * snap;
-					if ( this.axis === 'Y' && snap ) this.object.rotation.y = Math.round( this.object.rotation.y / snap ) * snap;
-					if ( this.axis === 'Z' && snap ) this.object.rotation.z = Math.round( this.object.rotation.z / snap ) * snap;
-
-				}
-
 				this.object.updateMatrixWorld();
 				this.object.parent.updateMatrixWorld();
 

@@ -69,23 +69,23 @@ class MathNode extends TempNode {
 
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return this.a.getType( builder );
+			return this.a.getNodeType( builder );
 
 		} else if ( bLen > cLen ) {
 
-			return this.b.getType( builder );
+			return this.b.getNodeType( builder );
 
 		} else if ( cLen > aLen ) {
 
-			this.c.getType( builder )
+			this.c.getNodeType( builder )
 
 		}
 
-		return this.a.getType( builder );
+		return this.a.getNodeType( builder );
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		const method = this.method;
 
@@ -105,20 +105,20 @@ class MathNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const method = this.method;
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
 
 		if ( method === MathNode.NEGATE ) {
 
-			return builder.format( '( -' + this.a.build( builder, inputType ) + ' )', type, output );
+			return '( -' + this.a.build( builder, inputType ) + ' )';
 
 		} else if ( method === MathNode.INVERT ) {
 
-			return builder.format( '( 1.0 - ' + this.a.build( builder, inputType ) + ' )', type, output );
+			return '( 1.0 - ' + this.a.build( builder, inputType ) + ' )';
 
 		} else {
 
@@ -177,7 +177,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return builder.format( `${method}( ${params.join(', ')} )`, type, output );
+			return `${method}( ${params.join(', ')} )`;
 
 		}
 

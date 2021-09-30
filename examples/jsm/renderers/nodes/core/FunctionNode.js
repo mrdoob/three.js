@@ -27,7 +27,7 @@ class FunctionNode extends CodeNode {
 
 	}
 
-	getType( /*builder*/ ) {
+	getNodeType( builder ) {
 
 		if ( this.needsUpdate === true ) {
 
@@ -35,7 +35,7 @@ class FunctionNode extends CodeNode {
 
 		}
 
-		return this.type;
+		return super.getNodeType( builder );
 
 	}
 
@@ -105,16 +105,22 @@ class FunctionNode extends CodeNode {
 				}
 
 				const type = propsMatches[ i ++ ][ 0 ];
+
+				let count = Number.parseInt( propsMatches[ i ][ 0 ] );
+
+				if ( Number.isNaN( count ) === false ) i ++;
+				else count = 0;
+
 				const name = propsMatches[ i ++ ][ 0 ];
 
-				inputs.push( new NodeFunctionInput( type, name, qualifier, isConst ) );
+				inputs.push( new NodeFunctionInput( type, name, qualifier, isConst, count ) );
 
 			}
 
 			const blockCode = mainCode.substring( declaration[ 0 ].length );
 
 			this.name = declaration[ 3 ] !== undefined ? declaration[ 3 ] : '';
-			this.type = declaration[ 2 ];
+			this.nodeType = declaration[ 2 ];
 
 			this.presicion = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
 
@@ -135,7 +141,7 @@ class FunctionNode extends CodeNode {
 
 	}
 
-	call( parameters = null ) {
+	call( parameters = {} ) {
 
 		return new FunctionCallNode( this, parameters );
 
@@ -145,7 +151,7 @@ class FunctionNode extends CodeNode {
 
 		super.generate( builder );
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const nodeCode = builder.getCodeFromNode( this, type );
 
 		if ( this.name !== '' ) {

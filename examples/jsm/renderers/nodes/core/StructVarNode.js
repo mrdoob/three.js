@@ -14,15 +14,15 @@ class StructVarNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		return this.struct.getType( builder );
+		return this.struct.getNodeType( builder );
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 
 		const struct = this.struct;
 
@@ -66,7 +66,7 @@ class StructVarNode extends Node {
 
 		}
 
-		return builder.format( property, type, output );
+		return property;
 
 	}
 

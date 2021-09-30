@@ -2,25 +2,20 @@ import Node from './Node.js';
 
 class PropertyNode extends Node {
 
-	constructor( name, type ) {
+	constructor( name, nodeType ) {
 
-		super();
+		super( nodeType );
 
 		this.name = name;
-		this.type = type;
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getType( builder );
-
-		const nodeVary = builder.getVarFromNode( this, type );
+		const nodeVary = builder.getVarFromNode( this, this.getNodeType( builder ) );
 		nodeVary.name = this.name;
 
-		const propertyName = builder.getPropertyName( nodeVary );
-
-		return builder.format( propertyName, type, output );
+		return builder.getPropertyName( nodeVary );
 
 	}
 

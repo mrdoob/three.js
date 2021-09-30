@@ -32,7 +32,7 @@
 
 				<div id="sections">
 					<span class="selected">docs</span>
-					<a href="../examples/#webgl_animation_cloth">examples</a>
+					<a href="../examples/#webgl_animation_keyframes">examples</a>
 				</div>
 
 				<div id="expandButton"></div>
@@ -68,6 +68,9 @@
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const filterInput = document.getElementById( 'filterInput' );
 		let iframe = document.querySelector( 'iframe' );
+
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
 
 		const pageProperties = {};
 		const titles = {};
@@ -198,6 +201,10 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter();
+
+			} else {
+
+				updateLink( '' );
 
 			}
 
@@ -400,6 +407,25 @@
 			}
 
 			displayFilteredPanel();
+
+			updateLink( v );
+
+		}
+
+		function updateLink( search ) {
+
+			// update examples link
+
+			if ( search ) {
+
+				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				sectionLink.href = `${link}?q=${search}`;
+
+			} else {
+
+				sectionLink.href = sectionDefaultHref;
+
+			}
 
 		}
 

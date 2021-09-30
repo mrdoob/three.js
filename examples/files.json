@@ -1,6 +1,5 @@
- {
+{
 	"webgl": [
-		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_additive_blending",
@@ -175,6 +174,7 @@
 		"webgl_modifier_simplifier",
 		"webgl_modifier_tessellation",
 		"webgl_morphtargets",
+		"webgl_morphtargets_face",
 		"webgl_morphtargets_horse",
 		"webgl_morphtargets_sphere",
 		"webgl_multiple_canvases_circle",
@@ -205,7 +205,6 @@
 		"webgl_shaders_ocean",
 		"webgl_shaders_sky",
 		"webgl_shaders_tonemapping",
-		"webgl_shading_physical",
 		"webgl_shadow_contact",
 		"webgl_shadowmap",
 		"webgl_shadowmap_performance",
@@ -229,10 +228,12 @@
 		"webgl_materials_compile",
 		"webgl_materials_envmaps_hdr_nodes",
 		"webgl_materials_envmaps_pmrem_nodes",
+		"webgl_materials_instance_uniform_nodes",
 		"webgl_materials_nodes",
 		"webgl_materials_standard_nodes",
 		"webgl_mirror_nodes",
 		"webgl_performance_nodes",
+		"webgl_points_nodes",
 		"webgl_postprocessing_nodes",
 		"webgl_postprocessing_nodes_pass",
 		"webgl_sprites_nodes"
@@ -369,6 +370,7 @@
 		"misc_animation_groups",
 		"misc_animation_keys",
 		"misc_boxselection",
+		"misc_controls_arcball",
 		"misc_controls_deviceorientation",
 		"misc_controls_drag",
 		"misc_controls_fly",

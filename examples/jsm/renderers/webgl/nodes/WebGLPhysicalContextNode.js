@@ -1,9 +1,9 @@
-import ContextNode from '../core/ContextNode.js';
-import NormalNode from '../accessors/NormalNode.js';
-import ExpressionNode from '../core/ExpressionNode.js';
-import FloatNode from '../inputs/FloatNode.js';
+import ContextNode from '../../nodes/core/ContextNode.js';
+import NormalNode from '../../nodes/accessors/NormalNode.js';
+import ExpressionNode from '../../nodes/core/ExpressionNode.js';
+import FloatNode from '../../nodes/inputs/FloatNode.js';
 
-class PhysicalMaterialContextNode extends ContextNode {
+class WebGLPhysicalContextNode extends ContextNode {
 
 	static RADIANCE = 'radiance';
 	static IRRADIANCE = 'irradiance';
@@ -22,11 +22,11 @@ class PhysicalMaterialContextNode extends ContextNode {
 
 		let roughness = null;
 
-		if ( scope === PhysicalMaterialContextNode.RADIANCE ) {
+		if ( scope === WebGLPhysicalContextNode.RADIANCE ) {
 
 			roughness = new ExpressionNode( 'roughnessFactor', 'float' );
 
-		} else if ( scope === PhysicalMaterialContextNode.IRRADIANCE ) {
+		} else if ( scope === WebGLPhysicalContextNode.IRRADIANCE ) {
 
 			roughness = new FloatNode( 1.0 ).setConst( true );
 
@@ -42,4 +42,4 @@ class PhysicalMaterialContextNode extends ContextNode {
 
 }
 
-export default PhysicalMaterialContextNode;
+export default WebGLPhysicalContextNode;
