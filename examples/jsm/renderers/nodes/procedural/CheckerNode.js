@@ -2,18 +2,20 @@ import FunctionNode from '../core/FunctionNode.js';
 import Node from '../core/Node.js';
 import UVNode from '../accessors/UVNode.js';
 
-const checker = new FunctionNode( `
-float ( vec2 uv ) {
+import { ShaderNode, float, add, mul, floor, mod, sign } from '../ShaderNode.js';
 
-	uv *= 2.0;
+// Three.JS Shader Language
+const checkerShaderNode = ShaderNode( ( uv ) => {
 
-	float cx = floor( uv.x );
-	float cy = floor( uv.y );
-	float result = mod( cx + cy, 2.0 );
+	uv = mul( uv, 2.0 );
+
+	const cx = floor( uv.x );
+	const cy = floor( uv.y );
+	const result = mod( add( cx, cy ), 2.0 );
 
 	return sign( result );
 
-}` );
+} );
 
 class CheckerNode extends Node {
 
@@ -27,7 +29,7 @@ class CheckerNode extends Node {
 
 	generate( builder, output ) {
 
-		return checker.call( { uv: this.uv } ).build( builder, output );
+		return checkerShaderNode( this.uv ).build( builder, output );
 
 	}
 
