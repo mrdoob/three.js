@@ -7,10 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: black;
-			}
-			a {
-				color: #f00;
+				background-color: #666666;
 			}
 		</style>
 	</head>
@@ -34,6 +31,8 @@
 			import { MeshoptDecoder } from './jsm/libs/meshopt_decoder.module.js';
 
 			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			init();
 
@@ -77,22 +76,38 @@
 
 						mixer.clipAction( gltf.animations[ 0 ] ).play();
 
+						// GUI
+
+						const head = mesh.getObjectByName( 'mesh_2' );
+						const influences = head.morphTargetInfluences;
+
+						const gui = new GUI();
+						gui.close();
+
+						for ( const [ key, value ] of Object.entries( head.morphTargetDictionary ) ) {
+
+							gui.add( influences, value, 0, 1, 0.01 )
+								.name( key.replace( 'blendShape1.', '' ) )
+								.listen( influences );
+
+						}
+
 					} );
 
 				const environment = new RoomEnvironment();
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
-				scene.background = new THREE.Color( 0xD5F7F7 );
+				scene.background = new THREE.Color( 0x666666 );
 				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
 				controls.minDistance = 2.5;
 				controls.maxDistance = 5;
 				controls.minAzimuthAngle = - Math.PI / 2;
 				controls.maxAzimuthAngle = Math.PI / 2;
 				controls.maxPolarAngle = Math.PI / 1.8;
-				controls.target.set( 0, 0, - 0.2 );
-				controls.enableDamping = true;
+				controls.target.set( 0, 0.15, - 0.2 );
 
 				const stats = new Stats();
 				container.appendChild( stats.dom );
