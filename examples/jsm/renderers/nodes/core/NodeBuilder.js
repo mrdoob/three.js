@@ -46,13 +46,13 @@ class NodeBuilder {
 	}
 
 	addStack( node ) {
-
+/*
 		if ( this.stack.indexOf( node ) !== - 1 ) {
 
 			console.warn( 'Recursive node: ', node );
 
 		}
-
+*/
 		this.stack.push( node );
 
 	}
