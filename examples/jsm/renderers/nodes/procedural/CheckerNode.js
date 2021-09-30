@@ -29,9 +29,7 @@ class CheckerNode extends Node {
 
 	generate( builder, output ) {
 
-		const checkerNode = checkerShaderNode( this.uv );
-
-		return checkerNode.build( builder, output );
+		return checkerShaderNode( this.uv ).build( builder, output );
 
 	}
 
