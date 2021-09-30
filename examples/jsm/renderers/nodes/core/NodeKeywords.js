@@ -71,6 +71,8 @@ class NodeKeywords {
 
 		this.nodes = [];
 
+		this.keywordsCallback = {};
+
 	}
 
 	getNode( name ) {
@@ -78,6 +80,16 @@ class NodeKeywords {
 		let node = this.nodes[ name ];
 
 		if ( node === undefined ) {
+
+			if ( this.keywordsCallback[ name ] !== undefined ) {
+				
+				node = this.keywordsCallback[ name ]( name );
+				
+				this.nodes[ name ] = node;
+				
+				return node;
+				
+			}
 
 			switch ( name ) {
 
@@ -113,7 +125,7 @@ class NodeKeywords {
 
 				case NodeKeywords.PositionLocal:
 
-					node = new VarNode( new PositionNode( PositionNode.LOCAL ), name );
+					node = new VarNode( new PositionNode( PositionNode.GEOMETRY ), name );
 
 					break;
 
@@ -137,7 +149,7 @@ class NodeKeywords {
 
 				case NodeKeywords.NormalLocal:
 
-					node = new VarNode( new NormalNode( NormalNode.LOCAL ), name );
+					node = new VarNode( new NormalNode( NormalNode.GEOMETRY ), name );
 
 					break;
 
@@ -192,6 +204,16 @@ class NodeKeywords {
 
 		return node;
 
+	}
+
+	addKeyword( name, callback ) {
+		
+		this.keywords.push( name );
+		
+		this.keywordsCallback[ name ] = callback;
+		
+		return this;
+		
 	}
 
 	parse( code ) {
