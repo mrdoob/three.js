@@ -132,4 +132,4 @@ class ParametricGeometry extends BufferGeometry {
 
 }
 
-export { ParametricGeometry, ParametricGeometry as ParametricBufferGeometry };
+export { ParametricGeometry };
