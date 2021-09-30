@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 }(this, (function (exports) { 'use strict';
 
-	const REVISION = '133dev';
+	const REVISION = '133';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -20975,7 +20975,7 @@
 
 			_skinWeight.fromBufferAttribute(geometry.attributes.skinWeight, index);
 
-			_basePosition.fromBufferAttribute(geometry.attributes.position, index).applyMatrix4(this.bindMatrix);
+			_basePosition.copy(target).applyMatrix4(this.bindMatrix);
 
 			target.set(0, 0, 0);
 
