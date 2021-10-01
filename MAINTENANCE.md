@@ -59,4 +59,4 @@ for the things that need to be changed.
 
 * project organization changing (the npm version of changed making it no longer useful for this project)
 
-
+* Significant changes for WebGPU
