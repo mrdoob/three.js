@@ -3403,13 +3403,21 @@ class GLTFParser {
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
 				parser.associations.set( meshes[ i ], {
+
 					meshes: meshIndex,
-					primitives: i
+					primitives: i,
+
 				} );
 
 			}
 
 			if ( meshes.length === 1 ) {
+
+				// Appends temporary association data to be removed in loadNode()
+				meshes[ 0 ].userData.tempAssociations = {
+					meshes: meshIndex,
+					primitives: 0,
+				};
 
 				return meshes[ 0 ];
 
@@ -3828,13 +3836,19 @@ class GLTFParser {
 
 			}
 
-			if ( ! parser.associations.has( node ) ) {
+			let associations = { nodes: nodeIndex };
 
-				parser.associations.set( node, {} );
+			if ( node.userData.tempAssociations ) {
+
+				// Uses temp association data to update associations.
+				associations.meshes = node.userData.tempAssociations.meshes;
+				associations.primitives = node.userData.tempAssociations.primitives;
+				// Removes the temp data.
+				node.userData.tempAssociations = undefined;
 
 			}
 
-			parser.associations.get( node ).nodes = nodeIndex;
+			parser.associations.set( node, associations );
 
 			return node;
 
