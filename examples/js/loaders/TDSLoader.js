@@ -205,6 +205,12 @@
 
 			while ( next !== 0 ) {
 
+				if (next === 0x3338 ) {
+
+					var subChunk = this.readChunk( data );
+					next = this.nextChunk( data, subChunk );
+				}
+				
 				if ( next === N_TRI_OBJECT ) {
 
 					this.resetPosition( data );
