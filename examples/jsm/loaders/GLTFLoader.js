@@ -1905,7 +1905,13 @@ function resolveURL( url, path ) {
 	if ( /^(https?:)?\/\//i.test( url ) ) return url;
 
 	// Data URI
-	if ( /^data:.*,.*$/i.test( url ) ) return url;
+	if ( /^data:.*,.*$/i.test( url ) ) {
+
+		checkDataURI( url );
+
+		return url;
+
+	}
 
 	// Blob URL
 	if ( /^blob:.*$/i.test( url ) ) return url;
@@ -2151,6 +2157,25 @@ function getNormalizedComponentScale( constructor ) {
 
 		default:
 			throw new Error( 'THREE.GLTFLoader: Unsupported normalized accessor component type.' );
+
+	}
+
+}
+
+let _checkDataURI = true;
+
+function checkDataURI( url ) {
+
+	if ( _checkDataURI === true && url.length > 1e5 ) {
+
+		console.warn(
+
+			`THREE.GLTFLoader: Large Data URI (${ url.length } bytes) will increase file size and`
+			+ ' parsing time. Use ".glb", or ".gltf" with external resources, instead.'
+
+		);
+
+		_checkDataURI = false;
 
 	}
 
