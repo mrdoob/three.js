@@ -1,17 +1,22 @@
 class NodeFunctionInput {
 
-	constructor( type, name, qualifier = '', isConst = false, count = 0 ) {
+	constructor( type, name, qualifier = '', count = null ) {
 
 		this.type = type;
 		this.name = name;
 		this.qualifier = qualifier;
-		this.isConst = isConst;
 		this.count = count;
 
-		Object.defineProperty( this, 'isNodeFunction', { value: true } );
+	}
+
+	get isCount() {
+
+		return this.count > 0;
 
 	}
 
 }
+
+NodeFunctionInput.isNodeFunctionInput = true;
 
 export default NodeFunctionInput;
