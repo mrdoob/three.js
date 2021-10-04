@@ -80,9 +80,9 @@ class ReferenceNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		return this.node.build( builder, output );
+		return this.node.build( builder, this.getNodeType( builder ) );
 
 	}
 

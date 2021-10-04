@@ -16,14 +16,12 @@ class ModelViewProjectionNode extends Node {
 
 	}
 
-	generate( builder, output ) {
-
-		const type = this.getNodeType( builder );
+	generate( builder ) {
 
 		const mvpSnipped = this._mvpMatrix.build( builder );
 		const positionSnipped = this.position.build( builder, 'vec3' );
 
-		return builder.format( `( ${mvpSnipped} * vec4( ${positionSnipped}, 1.0 ) )`, type, output );
+		return `( ${mvpSnipped} * vec4( ${positionSnipped}, 1.0 ) )`;
 
 	}
 

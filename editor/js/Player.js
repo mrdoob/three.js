@@ -21,6 +21,12 @@ function Player( editor ) {
 
 	} );
 
+	signals.windowResize.add( function () {
+
+		player.setSize( container.dom.clientWidth, container.dom.clientHeight );
+
+	} );
+
 	signals.startPlayer.add( function () {
 
 		container.setDisplay( '' );

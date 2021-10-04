@@ -2,7 +2,7 @@ import NodeBuilder from '../../nodes/core/NodeBuilder.js';
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { ShaderChunk } from 'three';
+import { ShaderChunk, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
 
 const shaderStages = [ 'vertex', 'fragment' ];
 
@@ -259,6 +259,20 @@ class WebGLNodeBuilder extends NodeBuilder {
 			this.replaceCode( shaderStage, includeSnippet, code );
 
 		}
+
+	}
+
+	getTextureEncodingFromMap( map ) {
+
+		const isWebGL2 = this.renderer.capabilities.isWebGL2;
+
+		if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
+
+			return LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
+
+		}
+
+		return super.getTextureEncodingFromMap( map );
 
 	}
 

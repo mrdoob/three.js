@@ -15,7 +15,7 @@ class LightContextNode extends ContextNode {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const type = this.getNodeType( builder );
 
@@ -40,13 +40,11 @@ class LightContextNode extends ContextNode {
 
 		}
 
-		const totalLightSnippet = `( ${reflectedLight}.directDiffuse + ${reflectedLight}.directSpecular )`;
-
 		// add code
 
-		super.generate( builder, output );
+		super.generate( builder, type );
 
-		return builder.format( totalLightSnippet, type, output );
+		return `( ${reflectedLight}.directDiffuse + ${reflectedLight}.directSpecular )`;
 
 	}
 

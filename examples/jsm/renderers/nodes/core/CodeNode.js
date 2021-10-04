@@ -30,7 +30,7 @@ class CodeNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		if ( this.useKeywords === true ) {
 
@@ -66,9 +66,7 @@ class CodeNode extends Node {
 
 		}
 
-		const type = this.getNodeType( builder );
-		const nodeCode = builder.getCodeFromNode( this, type );
-
+		const nodeCode = builder.getCodeFromNode( this, this.getNodeType( builder ) );
 		nodeCode.code = this.code;
 
 		return nodeCode.code;

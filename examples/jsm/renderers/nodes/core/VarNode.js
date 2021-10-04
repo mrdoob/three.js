@@ -17,7 +17,7 @@ class VarNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const type = builder.getVectorType( this.getNodeType( builder ) );
 		const name = this.name;
@@ -37,7 +37,7 @@ class VarNode extends Node {
 
 		builder.addFlowCode( `${propertyName} = ${snippet}` );
 
-		return builder.format( propertyName, type, output );
+		return propertyName;
 
 	}
 

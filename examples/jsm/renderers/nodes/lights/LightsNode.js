@@ -11,7 +11,7 @@ class LightsNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const lightNodes = this.lightNodes;
 
@@ -21,7 +21,7 @@ class LightsNode extends Node {
 
 		}
 
-		return builder.format( 'vec3( 0.0 )', this.getNodeType( builder ), output );
+		return 'vec3( 0.0 )';
 
 	}
 

@@ -16,7 +16,7 @@ class JoinNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const type = this.getNodeType( builder );
 		const values = this.values;
@@ -33,9 +33,7 @@ class JoinNode extends Node {
 
 		}
 
-		const snippet = `${type}( ${ snippetValues.join( ', ' ) } )`;
-
-		return builder.format( snippet, type, output );
+		return `${type}( ${ snippetValues.join( ', ' ) } )`;
 
 	}
 

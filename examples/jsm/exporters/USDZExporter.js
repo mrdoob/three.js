@@ -449,7 +449,18 @@ function buildMaterial( material, textures ) {
 
 	}
 
-	inputs.push( `${ pad }float inputs:opacity = ${ material.opacity }` );
+	if ( material.alphaMap !== null ) {
+
+		inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.alphaMap.id}_opacity.outputs:r>` );
+		inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
+
+		samplers.push( buildTexture( material.alphaMap, 'opacity' ) );
+
+	} else {
+
+		inputs.push( `${pad}float inputs:opacity = ${material.opacity}` );
+
+	}
 
 	if ( material.isMeshPhysicalMaterial ) {
 

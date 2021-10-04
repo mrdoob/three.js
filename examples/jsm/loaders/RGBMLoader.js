@@ -251,7 +251,7 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 			}
 			else if ( depth == 16 ) for ( var x = 0; x < w; x ++ ) {
 
-				var gr = data[ off + ( x << 1 ) ], al = ( rs( data, off + ( x << i ) ) == tr ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+				var gr = data[ off + ( x << 1 ) ], al = ( rs( data, off + ( x << 1 ) ) == tr ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
 
 			}
 
@@ -397,7 +397,7 @@ UPNG.decode = function ( buff ) {
 
 		}
 
-		//else {  log("unknown chunk type", type, len);  }
+		//else {  console.log("unknown chunk type", type, len);  out.tabs[type]=data.slice(offset,offset+len);  }
 		offset += len;
 		bin.readUint( data, offset ); offset += 4;
 
@@ -406,7 +406,7 @@ UPNG.decode = function ( buff ) {
 	if ( foff != 0 ) {
 
 		var fr = out.frames[ out.frames.length - 1 ];
-		fr.data = UPNG.decode._decompress( out, fd.slice( 0, foff ), fr.rect.width, fr.rect.height ); foff = 0;
+		fr.data = UPNG.decode._decompress( out, fd.slice( 0, foff ), fr.rect.width, fr.rect.height );
 
 	}
 
@@ -819,7 +819,7 @@ UPNG.decode._filterZero = function ( data, out, off, w, h ) {
 	var bpp = UPNG.decode._getBPP( out ), bpl = Math.ceil( w * bpp / 8 ), paeth = UPNG.decode._paeth;
 	bpp = Math.ceil( bpp / 8 );
 
-	var i = 0, di = 1, type = data[ off ], x = 0;
+	var i, di, type = data[ off ], x = 0;
 
 	if ( type > 1 ) data[ off ] = [ 0, 0, 1 ][ type - 2 ];
 	if ( type == 3 ) for ( x = bpp; x < bpl; x ++ ) data[ x + 1 ] = ( data[ x + 1 ] + ( data[ x + 1 - bpp ] >>> 1 ) ) & 255;

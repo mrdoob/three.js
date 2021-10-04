@@ -1,6 +1,5 @@
 {
 	"webgl": [
-		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_additive_blending",
@@ -206,7 +205,6 @@
 		"webgl_shaders_ocean",
 		"webgl_shaders_sky",
 		"webgl_shaders_tonemapping",
-		"webgl_shading_physical",
 		"webgl_shadow_contact",
 		"webgl_shadowmap",
 		"webgl_shadowmap_performance",
