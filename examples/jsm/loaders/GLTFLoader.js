@@ -3840,7 +3840,6 @@ class GLTFParser {
 
 			if ( node.userData.tempAssociations ) {
 
-				// Poke.
 				// Uses temp association data to update associations.
 				associations.meshes = node.userData.tempAssociations.meshes;
 				associations.primitives = node.userData.tempAssociations.primitives;
