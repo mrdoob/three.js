@@ -581,9 +581,8 @@
 
 				if ( extension.clearcoatNormalTexture.scale !== undefined ) {
 
-					const scale = extension.clearcoatNormalTexture.scale; // https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-
-					materialParams.clearcoatNormalScale = new THREE.Vector2( scale, - scale );
+					const scale = extension.clearcoatNormalTexture.scale;
+					materialParams.clearcoatNormalScale = new THREE.Vector2( scale, scale );
 
 				}
 
@@ -2110,7 +2109,28 @@
 		_getNodeRef( cache, index, object ) {
 
 			if ( cache.refs[ index ] <= 1 ) return object;
-			const ref = object.clone();
+			const ref = object.clone(); // Propagates mappings to the cloned object, prevents mappings on the
+			// original object from being lost.
+
+			const updateMappings = ( original, clone ) => {
+
+				const mappings = this.associations.get( original );
+
+				if ( mappings != null ) {
+
+					this.associations.set( clone, mappings );
+
+				}
+
+				for ( const [ i, child ] of original.children.entries() ) {
+
+					updateMappings( child, clone.children[ i ] );
+
+				}
+
+			};
+
+			updateMappings( object, ref );
 			ref.name += '_instance_' + cache.uses[ index ] ++;
 			return ref;
 
@@ -2488,27 +2508,11 @@
 			const URL = self.URL || self.webkitURL;
 			let sourceURI = source.uri || '';
 			let isObjectURL = false;
-			let hasAlpha = true;
-			const isJPEG = sourceURI.search( /\.jpe?g($|\?)/i ) > 0 || sourceURI.search( /^data\:image\/jpeg/ ) === 0;
-			if ( source.mimeType === 'image/jpeg' || isJPEG ) hasAlpha = false;
 
 			if ( source.bufferView !== undefined ) {
 
 				// Load binary image data from bufferView, if provided.
 				sourceURI = parser.getDependency( 'bufferView', source.bufferView ).then( function ( bufferView ) {
-
-					if ( source.mimeType === 'image/png' ) {
-
-						// Inspect the PNG 'IHDR' chunk to determine whether the image could have an
-						// alpha channel. This check is conservative — the image could have an alpha
-						// channel with all values == 1, and the indexed type (colorType == 3) only
-						// sometimes contains alpha.
-						//
-						// https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
-						const colorType = new DataView( bufferView, 25, 1 ).getUint8( 0, false );
-						hasAlpha = colorType === 6 || colorType === 4 || colorType === 3;
-
-					}
 
 					isObjectURL = true;
 					const blob = new Blob( [ bufferView ], {
@@ -2557,9 +2561,7 @@
 				}
 
 				texture.flipY = false;
-				if ( textureDef.name ) texture.name = textureDef.name; // When there is definitely no alpha channel in the texture, set THREE.RGBFormat to save space.
-
-				if ( ! hasAlpha ) texture.format = THREE.RGBFormat;
+				if ( textureDef.name ) texture.name = textureDef.name;
 				const samplers = json.samplers || {};
 				const sampler = samplers[ textureDef.sampler ] || {};
 				texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
@@ -2567,8 +2569,7 @@
 				texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
 				texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 				parser.associations.set( texture, {
-					type: 'textures',
-					index: textureIndex
+					textures: textureIndex
 				} );
 				return texture;
 
@@ -2638,7 +2639,7 @@
 
 			const geometry = mesh.geometry;
 			let material = mesh.material;
-			const useVertexTangents = geometry.attributes.tangent !== undefined;
+			const useDerivativeTangents = geometry.attributes.tangent === undefined;
 			const useVertexColors = geometry.attributes.color !== undefined;
 			const useFlatShading = geometry.attributes.normal === undefined;
 
@@ -2680,11 +2681,11 @@
 			} // Clone the material if it will be modified
 
 
-			if ( useVertexTangents || useVertexColors || useFlatShading ) {
+			if ( useDerivativeTangents || useVertexColors || useFlatShading ) {
 
 				let cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 				if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
-				if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
+				if ( useDerivativeTangents ) cacheKey += 'derivative-tangents:';
 				if ( useVertexColors ) cacheKey += 'vertex-colors:';
 				if ( useFlatShading ) cacheKey += 'flat-shading:';
 				let cachedMaterial = this.cache.get( cacheKey );
@@ -2695,7 +2696,7 @@
 					if ( useVertexColors ) cachedMaterial.vertexColors = true;
 					if ( useFlatShading ) cachedMaterial.flatShading = true;
 
-					if ( useVertexTangents ) {
+					if ( useDerivativeTangents ) {
 
 						// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 						if ( cachedMaterial.normalScale ) cachedMaterial.normalScale.y *= - 1;
@@ -2832,13 +2833,13 @@
 
 			if ( materialDef.normalTexture !== undefined && materialType !== THREE.MeshBasicMaterial ) {
 
-				pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) ); // https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-
-				materialParams.normalScale = new THREE.Vector2( 1, - 1 );
+				pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
+				materialParams.normalScale = new THREE.Vector2( 1, 1 );
 
 				if ( materialDef.normalTexture.scale !== undefined ) {
 
-					materialParams.normalScale.set( materialDef.normalTexture.scale, - materialDef.normalTexture.scale );
+					const scale = materialDef.normalTexture.scale;
+					materialParams.normalScale.set( scale, scale );
 
 				}
 
@@ -2888,8 +2889,7 @@
 				if ( material.emissiveMap ) material.emissiveMap.encoding = THREE.sRGBEncoding;
 				assignExtrasToUserData( material, materialDef );
 				parser.associations.set( material, {
-					type: 'materials',
-					index: materialIndex
+					materials: materialIndex
 				} );
 				if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 				return material;
@@ -3082,6 +3082,15 @@
 
 				}
 
+				for ( let i = 0, il = meshes.length; i < il; i ++ ) {
+
+					parser.associations.set( meshes[ i ], {
+						meshes: meshIndex,
+						primitives: i
+					} );
+
+				}
+
 				if ( meshes.length === 1 ) {
 
 					return meshes[ 0 ];
@@ -3089,6 +3098,9 @@
 				}
 
 				const group = new THREE.Group();
+				parser.associations.set( group, {
+					meshes: meshIndex
+				} );
 
 				for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
@@ -3466,10 +3478,13 @@
 
 				}
 
-				parser.associations.set( node, {
-					type: 'nodes',
-					index: nodeIndex
-				} );
+				if ( ! parser.associations.has( node ) ) {
+
+					parser.associations.set( node, {} );
+
+				}
+
+				parser.associations.get( node ).nodes = nodeIndex;
 				return node;
 
 			} );
@@ -3499,12 +3514,44 @@
 
 			for ( let i = 0, il = nodeIds.length; i < il; i ++ ) {
 
-				pending.push( buildNodeHierachy( nodeIds[ i ], scene, json, parser ) );
+				pending.push( buildNodeHierarchy( nodeIds[ i ], scene, json, parser ) );
 
 			}
 
 			return Promise.all( pending ).then( function () {
 
+				// Removes dangling associations, associations that reference a node that
+				// didn't make it into the scene.
+				const reduceAssociations = node => {
+
+					const reducedAssociations = new Map();
+
+					for ( const [ key, value ] of parser.associations ) {
+
+						if ( key instanceof THREE.Material || key instanceof THREE.Texture ) {
+
+							reducedAssociations.set( key, value );
+
+						}
+
+					}
+
+					node.traverse( node => {
+
+						const mappings = parser.associations.get( node );
+
+						if ( mappings != null ) {
+
+							reducedAssociations.set( node, mappings );
+
+						}
+
+					} );
+					return reducedAssociations;
+
+				};
+
+				parser.associations = reduceAssociations( scene );
 				return scene;
 
 			} );
@@ -3513,7 +3560,7 @@
 
 	}
 
-	function buildNodeHierachy( nodeId, parentObject, json, parser ) {
+	function buildNodeHierarchy( nodeId, parentObject, json, parser ) {
 
 		const nodeDef = json.nodes[ nodeId ];
 		return parser.getDependency( 'node', nodeId ).then( function ( node ) {
@@ -3587,7 +3634,7 @@
 				for ( let i = 0, il = children.length; i < il; i ++ ) {
 
 					const child = children[ i ];
-					pending.push( buildNodeHierachy( child, node, json, parser ) );
+					pending.push( buildNodeHierarchy( child, node, json, parser ) );
 
 				}
 

@@ -310,7 +310,7 @@
 				} else if ( depth == 16 ) for ( var x = 0; x < w; x ++ ) {
 
 					var gr = data[ off + ( x << 1 ) ],
-						al = rs( data, off + ( x << i ) ) == tr ? 0 : 255;
+						al = rs( data, off + ( x << 1 ) ) == tr ? 0 : 255;
 					bf32[ to + x ] = al << 24 | gr << 16 | gr << 8 | gr;
 
 				}
@@ -485,7 +485,7 @@
 
 				break;
 
-			} //else {  log("unknown chunk type", type, len);  }
+			} //else {  console.log("unknown chunk type", type, len);  out.tabs[type]=data.slice(offset,offset+len);  }
 
 
 			offset += len;
@@ -498,7 +498,6 @@
 
 			var fr = out.frames[ out.frames.length - 1 ];
 			fr.data = UPNG.decode._decompress( out, fd.slice( 0, foff ), fr.rect.width, fr.rect.height );
-			foff = 0;
 
 		}
 
@@ -1111,8 +1110,8 @@
 			paeth = UPNG.decode._paeth;
 
 		bpp = Math.ceil( bpp / 8 );
-		var i = 0,
-			di = 1,
+		var i,
+			di,
 			type = data[ off ],
 			x = 0;
 		if ( type > 1 ) data[ off ] = [ 0, 0, 1 ][ type - 2 ];

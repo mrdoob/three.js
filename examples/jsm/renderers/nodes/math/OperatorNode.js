@@ -22,13 +22,13 @@ class OperatorNode extends TempNode {
 
 			// matrix x vector
 
-			return typeB;
+			return builder.getVectorFromMatrix( typeA );
 
 		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
 
 			// vector x matrix
 
-			return typeA;
+			return builder.getVectorFromMatrix( typeB );
 
 		} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
 
@@ -72,7 +72,7 @@ class OperatorNode extends TempNode {
 		const a = this.a.build( builder, typeA );
 		const b = this.b.build( builder, typeB );
 
-		return builder.format( `( ${a} ${this.op} ${b} )`, type, output );
+		return `( ${a} ${this.op} ${b} )`;
 
 	}
 

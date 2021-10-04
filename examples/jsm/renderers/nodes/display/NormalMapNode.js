@@ -50,12 +50,11 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const type = this.getNodeType( builder );
-		const normalMapType = this.normalMapType;
 
-		const nodeData = builder.getDataFromNode( this );
+		const normalMapType = this.normalMapType;
 
 		const normalOP = new OperatorNode( '*', this.value, new FloatNode( 2.0 ).setConst( true ) );
 		const normalMap = new OperatorNode( '-', normalOP, new FloatNode( 1.0 ).setConst( true ) );
@@ -66,29 +65,19 @@ class NormalMapNode extends TempNode {
 
 			const normal = new MathNode( MathNode.NORMALIZE, vertexNormalNode );
 
-			return normal.build( builder, output );
+			return normal.build( builder, type );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
-			let perturbNormal2ArbCall = nodeData.perturbNormal2ArbCall;
+			const perturbNormal2ArbCall = perturbNormal2Arb.call( {
+				eye_pos: new PositionNode( PositionNode.VIEW ),
+				surf_norm: new NormalNode( NormalNode.VIEW ),
+				mapN: normalMap,
+				faceDirection: new FloatNode( 1.0 ).setConst( true ),
+				uv: new UVNode()
+			} );
 
-			if (perturbNormal2ArbCall === undefined) {
-
-				perturbNormal2ArbCall = perturbNormal2Arb.call( {
-					eye_pos: new PositionNode( PositionNode.VIEW ),
-					surf_norm: new NormalNode( NormalNode.VIEW ),
-					mapN: normalMap,
-					faceDirection: new FloatNode( 1.0 ).setConst( true ),
-					uv: new UVNode()
-				} );
-
-				nodeData.perturbNormal2ArbCall = perturbNormal2ArbCall;
-
-			}
-
-			const snippet = perturbNormal2ArbCall.build( builder, output );
-			
-			return builder.format( snippet, type, output );
+			return perturbNormal2ArbCall.build( builder, type );
 			
 		}
 

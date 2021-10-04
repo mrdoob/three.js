@@ -25,32 +25,19 @@ class AttributeNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const attributeName = this.getAttributeName( builder );
-		const attributeType = this.getNodeType( builder );
-
-		const attribute = builder.getAttribute( attributeName, attributeType );
+		const attribute = builder.getAttribute( this.getAttributeName( builder ), this.getNodeType( builder ) );
 
 		if ( builder.isShaderStage( 'vertex' ) ) {
 
-			return builder.format( attribute.name, attribute.type, output );
+			return attribute.name;
 
 		} else {
 
-			const nodeData = builder.getDataFromNode( this, builder.shaderStage );
+			const nodeVary = new VaryNode( this );
 
-			let nodeVary = nodeData.varyNode;
-
-			if ( nodeVary === undefined ) {
-
-				nodeVary = new VaryNode( this );
-
-				nodeData.nodeVary = nodeVary;
-
-			}
-
-			return nodeVary.build( builder, output );
+			return nodeVary.build( builder, attribute.type );
 
 		}
 

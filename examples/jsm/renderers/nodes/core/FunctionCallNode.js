@@ -31,7 +31,7 @@ class FunctionCallNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const params = [];
 
@@ -56,12 +56,9 @@ class FunctionCallNode extends TempNode {
 
 		}
 
-		const type = this.getNodeType( builder );
 		const functionName = functionNode.build( builder, 'property' );
 
-		const callSnippet = `${functionName}( ${params.join( ', ' )} )`;
-
-		return builder.format( callSnippet, type, output );
+		return `${functionName}( ${params.join( ', ' )} )`;
 
 	}
 

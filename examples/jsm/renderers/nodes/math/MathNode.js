@@ -105,7 +105,7 @@ class MathNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const method = this.method;
 
@@ -114,11 +114,11 @@ class MathNode extends TempNode {
 
 		if ( method === MathNode.NEGATE ) {
 
-			return builder.format( '( -' + this.a.build( builder, inputType ) + ' )', type, output );
+			return '( -' + this.a.build( builder, inputType ) + ' )';
 
 		} else if ( method === MathNode.INVERT ) {
 
-			return builder.format( '( 1.0 - ' + this.a.build( builder, inputType ) + ' )', type, output );
+			return '( 1.0 - ' + this.a.build( builder, inputType ) + ' )';
 
 		} else {
 
@@ -177,7 +177,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return builder.format( `${method}( ${params.join(', ')} )`, type, output );
+			return `${method}( ${params.join(', ')} )`;
 
 		}
 
