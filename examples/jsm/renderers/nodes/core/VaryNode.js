@@ -3,11 +3,12 @@ import { NodeShaderStage } from './constants.js';
 
 class VaryNode extends Node {
 
-	constructor( value ) {
+	constructor( value, name = '' ) {
 
 		super();
 
 		this.value = value;
+		this.name = name;
 
 	}
 
@@ -23,8 +24,16 @@ class VaryNode extends Node {
 
 		const type = this.getNodeType( builder );
 		const value = this.value;
+		const name = this.name;
 
 		const nodeVary = builder.getVaryFromNode( this, type );
+
+		if ( name !== '' ) {
+
+			nodeVary.name = name;
+
+		}
+
 		const propertyName = builder.getPropertyName( nodeVary );
 
 		// force nodeVary.snippet work in vertex stage
