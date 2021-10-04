@@ -87,9 +87,7 @@ const _matrix2 = new Matrix4();
 
 class CSS3DRenderer {
 
-	constructor( parameters ) {
-
-		parameters = parameters || {};
+	constructor( parameters = {} ) {
 
 		const _this = this;
 

@@ -57,9 +57,7 @@ const _b = new Vector3();
 
 class CSS2DRenderer {
 
-	constructor( parameters ) {
-
-		parameters = parameters || {};
+	constructor( parameters = {} ) {
 
 		const _this = this;
 
