@@ -37,6 +37,8 @@ const KTX2TransferSRGB = 2;
 const KTX2_ALPHA_PREMULTIPLIED = 1;
 const _taskCache = new WeakMap();
 
+let _activeLoaders = 0;
+
 class KTX2Loader extends Loader {
 
 	constructor( manager ) {
@@ -154,6 +156,21 @@ class KTX2Loader extends Loader {
 
 				} );
 
+			if ( _activeLoaders > 0 ) {
+
+				// Each instance loads a transcoder and allocates workers, increasing network and memory cost.
+
+				console.warn(
+
+					'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.'
+					+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
+
+				);
+
+			}
+
+			_activeLoaders++;
+
 		}
 
 		return this.transcoderPending;
@@ -247,6 +264,8 @@ class KTX2Loader extends Loader {
 
 		URL.revokeObjectURL( this.workerSourceURL );
 		this.workerPool.dispose();
+
+		_activeLoaders--;
 
 		return this;
 
