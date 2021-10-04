@@ -57,7 +57,7 @@ const _b = new Vector3();
 
 class CSS2DRenderer {
 
-	constructor() {
+	constructor( element ) {
 
 		const _this = this;
 
@@ -68,7 +68,8 @@ class CSS2DRenderer {
 			objects: new WeakMap()
 		};
 
-		const domElement = document.createElement( 'div' );
+		
+		const domElement = element || document.createElement( 'div' );
 		domElement.style.overflow = 'hidden';
 
 		this.domElement = domElement;
