@@ -71,6 +71,7 @@ class CSS2DRenderer {
 		};
 
 		const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
+
 		domElement.style.overflow = 'hidden';
 
 		this.domElement = domElement;
