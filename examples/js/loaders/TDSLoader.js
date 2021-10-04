@@ -199,17 +199,11 @@
 		readNamedObject( data ) {
 
 			const chunk = this.readChunk( data );
-			const name = this.readString( data, 64 );
+			const name = this.readString( data, 256 );
 			chunk.cur = this.position;
 			let next = this.nextChunk( data, chunk );
 
 			while ( next !== 0 ) {
-
-				if (next === 0x3338 ) {
-
-					var subChunk = this.readChunk( data );
-					next = this.nextChunk( data, subChunk );
-				}
 				
 				if ( next === N_TRI_OBJECT ) {
 
