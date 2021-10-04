@@ -693,19 +693,6 @@ class WebGPURenderer {
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				if ( object.isSkinnedMesh ) {
-
-					// update skeleton only once in a frame
-
-					if ( object.skeleton.frame !== info.render.frame ) {
-
-						object.skeleton.update();
-						object.skeleton.frame = info.render.frame;
-
-					}
-
-				}
-
 				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
 					if ( this.sortObjects === true ) {

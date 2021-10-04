@@ -18,6 +18,12 @@ import { Vector2, Vector3, Vector4, Color } from 'three';
 
 const NodeHandler = {
 
+	construct( NodeClosure, params ) {
+
+		return NodeClosure( params[ 0 ] );
+
+	},
+
 	get: function ( node, prop ) {
 
 		// Split Properties Pass
@@ -40,7 +46,7 @@ const NodeHandler = {
 
 };
 
-export const ShaderNodeObject = ( obj ) => {
+const ShaderNodeObject = ( obj ) => {
 
 	const type = typeof obj;
 
@@ -70,7 +76,7 @@ export const ShaderNodeObject = ( obj ) => {
 
 };
 
-export const ShaderNodeArray = ( array ) => {
+const ShaderNodeArray = ( array ) => {
 
 	const len = array.length;
 
@@ -84,7 +90,7 @@ export const ShaderNodeArray = ( array ) => {
 
 };
 
-export const ShaderNodeScript = ( jsFunc ) => {
+const ShaderNodeScript = function ( jsFunc ) {
 
 	return ( ...params ) => {
 
@@ -96,17 +102,13 @@ export const ShaderNodeScript = ( jsFunc ) => {
 
 };
 
-export const ShaderNode = ( obj ) => {
-
-	return ShaderNodeScript( obj );
-
-};
+export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
 
 //
 // Node Material Shader Syntax
 //
 
-export const uniform = ShaderNodeScript( ( inputNode ) => {
+export const uniform = new ShaderNode( ( inputNode ) => {
 
 	inputNode.setConst( false );
 
