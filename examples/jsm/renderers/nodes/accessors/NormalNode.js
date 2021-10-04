@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
+import NodeKeywords from '../core/NodeKeywords.js';
 import VaryNode from '../core/VaryNode.js';
 import ModelNode from '../accessors/ModelNode.js';
 import CameraNode from '../accessors/CameraNode.js';
@@ -9,6 +10,7 @@ import { inverseTransformDirection } from '../functions/MathFunctions.js';
 
 class NormalNode extends Node {
 
+	static GEOMETRY = 'geometry';
 	static LOCAL = 'local';
 	static WORLD = 'world';
 	static VIEW = 'view';
@@ -21,15 +23,25 @@ class NormalNode extends Node {
 
 	}
 
+	getHash( /*builder*/ ) {
+
+		return `normal-${this.scope}`;
+
+	}
+
 	generate( builder ) {
 
 		const scope = this.scope;
 
 		let outputNode = null;
 
-		if ( scope === NormalNode.LOCAL ) {
+		if ( scope === NormalNode.GEOMETRY ) {
 
 			outputNode = new AttributeNode( 'normal', 'vec3' );
+
+		} else if ( scope === NormalNode.LOCAL ) {
+
+			outputNode = new VaryNode( new NormalNode( NormalNode.GEOMETRY ) );
 
 		} else if ( scope === NormalNode.VIEW ) {
 

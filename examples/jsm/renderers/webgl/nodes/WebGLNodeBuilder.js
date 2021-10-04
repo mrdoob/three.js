@@ -20,17 +20,17 @@ function getShaderStageProperty( shaderStage ) {
 
 class WebGLNodeBuilder extends NodeBuilder {
 
-	constructor( material, renderer, shader ) {
+	constructor( object, renderer, shader ) {
 
-		super( material, renderer );
+		super( object, renderer );
 
 		this.shader = shader;
 
-		this._parseMaterial();
+		this._parseObject();
 
 	}
 
-	_parseMaterial() {
+	_parseObject() {
 
 		const material = this.material;
 

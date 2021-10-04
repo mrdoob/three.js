@@ -6,9 +6,9 @@ import { Material } from 'three';
 const builders = new WeakMap();
 export const nodeFrame = new NodeFrame();
 
-Material.prototype.onBuild = function ( parameters, renderer ) {
+Material.prototype.onBuild = function ( object, parameters, renderer ) {
 
-	builders.set( this, new WebGLNodeBuilder( this, renderer, parameters ).build() );
+	builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
 
 };
 

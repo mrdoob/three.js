@@ -10,13 +10,15 @@ import { LinearEncoding } from 'three';
 
 class NodeBuilder {
 
-	constructor( material, renderer ) {
+	constructor( object, renderer ) {
 
-		this.material = material;
+		this.object = object;
+		this.material = object.material;
 		this.renderer = renderer;
 
 		this.nodes = [];
 		this.updateNodes = [];
+		this.hashNodes = {};
 
 		this.vertexShader = null;
 		this.fragmentShader = null;
@@ -29,16 +31,41 @@ class NodeBuilder {
 		this.varys = [];
 		this.vars = { vertex: [], fragment: [] };
 		this.flow = { code: '' };
+		this.stack = [];
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: material
+			material: object.material
 		};
 
 		this.nodesData = new WeakMap();
 
 		this.shaderStage = null;
 		this.slot = null;
+
+	}
+
+	addStack( node ) {
+/*
+		if ( this.stack.indexOf( node ) !== - 1 ) {
+
+			console.warn( 'Recursive node: ', node );
+
+		}
+*/
+		this.stack.push( node );
+
+	}
+
+	removeStack( node ) {
+
+		const lastStack = this.stack.pop();
+
+		if ( lastStack !== node ) {
+
+			throw new Error( 'NodeBuilder: Invalid node stack!' );
+
+		}
 
 	}
 
@@ -56,7 +83,15 @@ class NodeBuilder {
 
 			this.nodes.push( node );
 
+			this.hashNodes[ node.getHash( this ) ] = node;
+
 		}
+
+	}
+
+	getNodeFromHash( hash ) {
+
+		return this.hashNodes[ hash ];
 
 	}
 
@@ -503,14 +538,24 @@ class NodeBuilder {
 
 	build() {
 
-		const shaderStages = [ 'vertex', 'fragment' ];
+		const shaderStages = [ 'fragment', 'vertex' ];
 		const shaderData = {};
 
 		for ( const shaderStage of shaderStages ) {
 
-			this.setShaderStage( shaderStage );
-
 			this.define( shaderStage, 'NODE_CODE', '' );
+
+		}
+
+		if ( this.context.vertex !== undefined && this.context.vertex !== null ) {
+
+			this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
+
+		}
+
+		for ( const shaderStage of shaderStages ) {
+
+			this.setShaderStage( shaderStage );
 
 			const slots = this.slots[ shaderStage ];
 
@@ -582,26 +627,26 @@ class NodeBuilder {
 			case 'float to vec4' : return `vec4( vec3( ${snippet} ), 1.0 )`;
 
 			case 'vec2 to float' : return `${snippet}.x`;
-			case 'vec2 to vec3'  : return `vec3( ${snippet}, 0.0 )`;
-			case 'vec2 to vec4'  : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
+			case 'vec2 to vec3' : return `vec3( ${snippet}, 0.0 )`;
+			case 'vec2 to vec4' : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
 
 			case 'vec3 to float' : return `${snippet}.x`;
-			case 'vec3 to vec2'  : return `${snippet}.xy`;
-			case 'vec3 to vec4'  : return `vec4( ${snippet}, 1.0 )`;
+			case 'vec3 to vec2' : return `${snippet}.xy`;
+			case 'vec3 to vec4' : return `vec4( ${snippet}, 1.0 )`;
 
 			case 'vec4 to float' : return `${snippet}.x`;
-			case 'vec4 to vec2'  : return `${snippet}.xy`;
-			case 'vec4 to vec3'  : return `${snippet}.xyz`;
+			case 'vec4 to vec2' : return `${snippet}.xy`;
+			case 'vec4 to vec3' : return `${snippet}.xyz`;
 
 			case 'mat3 to float' : return `( ${snippet} * vec3( 1.0 ) ).x`;
-			case 'mat3 to vec2'  : return `( ${snippet} * vec3( 1.0 ) ).xy`;
-			case 'mat3 to vec3'  : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
-			case 'mat3 to vec4'  : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
+			case 'mat3 to vec2' : return `( ${snippet} * vec3( 1.0 ) ).xy`;
+			case 'mat3 to vec3' : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
+			case 'mat3 to vec4' : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
 
 			case 'mat4 to float' : return `( ${snippet} * vec4( 1.0 ) ).x`;
-			case 'mat4 to vec2'  : return `( ${snippet} * vec4( 1.0 ) ).xy`;
-			case 'mat4 to vec3'  : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
-			case 'mat4 to vec4'  : return `( ${snippet} * vec4( 1.0 ) )`;
+			case 'mat4 to vec2' : return `( ${snippet} * vec4( 1.0 ) ).xy`;
+			case 'mat4 to vec3' : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
+			case 'mat4 to vec4' : return `( ${snippet} * vec4( 1.0 ) )`;
 
 		}
 

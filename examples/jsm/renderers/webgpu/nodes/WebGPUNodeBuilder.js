@@ -6,22 +6,26 @@ import {
 import WebGPUNodeSampler from './WebGPUNodeSampler.js';
 import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
 
+import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import VarNode from '../../nodes/core/VarNode.js';
+import BypassNode from '../../nodes/core/BypassNode.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
 import MaterialNode from '../../nodes/accessors/MaterialNode.js';
+import PositionNode from '../../nodes/accessors/PositionNode.js';
 import NormalNode from '../../nodes/accessors/NormalNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
+import SkinningNode from '../../nodes/accessors/SkinningNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import ShaderLib from './ShaderLib.js';
 
 class WebGPUNodeBuilder extends NodeBuilder {
 
-	constructor( material, renderer, lightNode = null ) {
+	constructor( object, renderer, lightNode = null ) {
 
-		super( material, renderer );
+		super( object, renderer );
 
 		this.lightNode = lightNode;
 
@@ -32,12 +36,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.nativeShader = null;
 
-		this._parseMaterial();
+		this._parseObject();
 
 	}
 
-	_parseMaterial() {
+	_parseObject() {
 
+		const object = this.object;
 		const material = this.material;
 
 		// get shader
@@ -60,9 +65,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( material.isMeshStandardMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
-			const mvpNode = new ModelViewProjectionNode();
-
 			let lightNode = material.lightNode;
+
+			let vertex = new PositionNode( PositionNode.GEOMETRY );
 
 			if ( lightNode === null && this.lightNode && this.lightNode.hasLights === true ) {
 
@@ -70,13 +75,21 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			if ( material.positionNode && material.positionNode.isNode ) {
+			if ( material.positionNode !== undefined ) {
 
-				mvpNode.position = material.positionNode;
+				vertex = material.positionNode;
 
 			}
 
-			this.addSlot( 'vertex', new NodeSlot( mvpNode, 'MVP', 'vec4' ) );
+			if ( object.isSkinnedMesh === true ) {
+
+				vertex = new BypassNode( vertex, new SkinningNode( object ) );
+
+			}
+
+			this.context.vertex = vertex;
+
+			this.addSlot( 'vertex', new NodeSlot( new ModelViewProjectionNode(), 'MVP', 'vec4' ) );
 
 			if ( material.alphaTestNode && material.alphaTestNode.isNode ) {
 
@@ -205,6 +218,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				return name;
 
+			} else if ( type === 'buffer' ) {
+
+				return `${name}.value`;
+
 			} else {
 
 				return `nodeUniforms.${name}`;
@@ -248,6 +265,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				bindings.splice( index, 0, sampler, texture );
 
 				uniformGPU = [ sampler, texture ];
+
+			} else if ( type === 'buffer' ) {
+
+				const buffer = new WebGPUUniformBuffer( 'NodeBuffer', node.value );
+
+				// add first textures in sequence and group for last
+				const lastBinding = bindings[ bindings.length - 1 ];
+				const index = lastBinding && lastBinding.isUniformsGroup ? bindings.length - 1 : bindings.length;
+
+				bindings.splice( index, 0, buffer );
+
+				uniformGPU = buffer;
 
 			} else {
 
@@ -363,6 +392,14 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				snippet += `layout(set = 0, binding = ${index ++}) uniform sampler ${uniform.name}_sampler; `;
 				snippet += `layout(set = 0, binding = ${index ++}) uniform texture2D ${uniform.name}; `;
 
+			} else if ( uniform.type === 'buffer' ) {
+
+				const bufferNode = uniform.node;
+				const bufferType = bufferNode.bufferType;
+				const bufferCount = bufferNode.bufferCount;
+
+				snippet += `layout(set = 0, binding = ${index ++}) uniform NodeBuffer { uniform ${bufferType}[ ${bufferCount} ] value; } ${uniform.name}; `;
+
 			} else {
 
 				const vectorType = this.getVectorType( uniform.type );
@@ -397,11 +434,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const keywords = this.getContextValue( 'keywords' );
 
-		for ( const shaderStage of [ 'vertex', 'fragment' ] ) {
+		for ( const shaderStage of [ 'fragment', 'vertex' ] ) {
 
 			this.shaderStage = shaderStage;
 
-			keywords.include( this, this.nativeShader.fragmentShader );
+			keywords.include( this, this.nativeShader[ shaderStage + 'Shader' ] );
 
 		}
 

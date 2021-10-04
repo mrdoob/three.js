@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
+import NodeKeywords from '../core/NodeKeywords.js';
 import VaryNode from '../core/VaryNode.js';
 import ModelNode from '../accessors/ModelNode.js';
 import MathNode from '../math/MathNode.js';
@@ -8,6 +9,7 @@ import { transformDirection } from '../functions/MathFunctions.js';
 
 class PositionNode extends Node {
 
+	static GEOMETRY = 'geometry';
 	static LOCAL = 'local';
 	static WORLD = 'world';
 	static VIEW = 'view';
@@ -21,16 +23,26 @@ class PositionNode extends Node {
 
 	}
 
+	getHash( /*builder*/ ) {
+
+		return `position-${this.scope}`;
+
+	}
+
 	generate( builder ) {
 
 		const scope = this.scope;
 
 		let outputNode = null;
 
-		if ( scope === PositionNode.LOCAL ) {
-			
+		if ( scope === PositionNode.GEOMETRY ) {
+
 			outputNode = new AttributeNode( 'position', 'vec3' );
-			
+
+		} else if ( scope === PositionNode.LOCAL ) {
+
+			outputNode = new VaryNode( new PositionNode( PositionNode.GEOMETRY ) );
+
 		} else if ( scope === PositionNode.WORLD ) {
 
 			const vertexPositionNode = transformDirection.call( { dir: new PositionNode( PositionNode.LOCAL ), matrix: new ModelNode( ModelNode.WORLD_MATRIX ) } );
