@@ -87,7 +87,9 @@ const _matrix2 = new Matrix4();
 
 class CSS3DRenderer {
 
-	constructor() {
+	constructor( parameters ) {
+
+		parameters = parameters || {};
 
 		const _this = this;
 
@@ -99,7 +101,7 @@ class CSS3DRenderer {
 			objects: new WeakMap()
 		};
 
-		const domElement = document.createElement( 'div' );
+		const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
 		domElement.style.overflow = 'hidden';
 
 		this.domElement = domElement;
