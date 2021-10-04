@@ -5,7 +5,7 @@ import UVNode from '../accessors/UVNode.js';
 import { ShaderNode, float, add, mul, floor, mod, sign } from '../ShaderNode.js';
 
 // Three.JS Shader Language
-const checkerShaderNode = ShaderNode( ( uv ) => {
+const checkerShaderNode = new ShaderNode( ( uv ) => {
 
 	uv = mul( uv, 2.0 );
 
