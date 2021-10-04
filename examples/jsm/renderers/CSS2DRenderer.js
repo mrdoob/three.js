@@ -6,11 +6,11 @@ import {
 
 class CSS2DObject extends Object3D {
 
-	constructor( element ) {
+	constructor( element = document.createElement( 'div' ) ) {
 
 		super();
 
-		this.element = element || document.createElement( 'div' );
+		this.element = element;
 
 		this.element.style.position = 'absolute';
 		this.element.style.userSelect = 'none';

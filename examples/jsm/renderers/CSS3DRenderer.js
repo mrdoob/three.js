@@ -15,11 +15,11 @@ const _scale = new Vector3();
 
 class CSS3DObject extends Object3D {
 
-	constructor( element ) {
+	constructor( element = document.createElement( 'div' ) ) {
 
 		super();
 
-		this.element = element || document.createElement( 'div' );
+		this.element = element;
 		this.element.style.position = 'absolute';
 		this.element.style.pointerEvents = 'auto';
 		this.element.style.userSelect = 'none';
