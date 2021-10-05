@@ -66,7 +66,7 @@ const parse = ( source ) => {
 
 			const name = propsMatches[ i ++ ][ 0 ];
 
-			inputs.push( new NodeFunctionInput( type, name, qualifier, count ) );
+			inputs.push( new NodeFunctionInput( type, name, qualifier, isConst, count ) );
 
 		}
 

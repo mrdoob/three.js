@@ -1,17 +1,12 @@
 class NodeFunctionInput {
 
-	constructor( type, name, qualifier = '', count = null ) {
+	constructor( type, name, qualifier = '', isConst = false, count = null ) {
 
 		this.type = type;
 		this.name = name;
 		this.qualifier = qualifier;
+		this.isConst = isConst;
 		this.count = count;
-
-	}
-
-	get isCount() {
-
-		return this.count > 0;
 
 	}
 
