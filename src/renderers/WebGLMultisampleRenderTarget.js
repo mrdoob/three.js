@@ -8,8 +8,9 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 		this.samples = 4;
 
-		this.useMultisampledRenderToTexture = ( options.useMultisampledRenderToTexture !== undefined ) ? options.useMultisampledRenderToTexture : false;
-		this.useMultisampledRenderbuffer = this.useMultisampledRenderToTexture === false;
+		this.ignoreDepthForMultisampleCopy = options.ignoreDepth !== undefined ? options.ignoreDepth : true;
+		this.useRenderToTexture = ( options.useMultisampledRenderToTexture !== undefined ) ? options.useMultisampledRenderToTexture : false;
+		this.useRenderbuffer = this.useRenderToTexture === false;
 
 	}
 
@@ -18,8 +19,8 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 		super.copy.call( this, source );
 
 		this.samples = source.samples;
-		this.useMultisampledRenderToTexture = source.useMultisampledRenderToTexture;
-		this.useMultisampledRenderbuffer = source.useMultisampledRenderbuffer;
+		this.useRenderToTexture = source.useMultisampledRenderToTexture;
+		this.useRenderbuffer = source.useRenderbuffer;
 
 		return this;
 

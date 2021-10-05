@@ -1275,7 +1275,7 @@ function WebGLRenderer( parameters = {} ) {
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
 				wrapT: ClampToEdgeWrapping,
-				useMultisampledRenderToTexture: extensions.has( 'EXT_multisampled_render_to_texture' )
+				useRenderToTexture: extensions.has( 'EXT_multisampled_render_to_texture' )
 			} );
 
 		}
@@ -1880,11 +1880,11 @@ function WebGLRenderer( parameters = {} ) {
 
 					// The multisample_render_to_texture extension doesn't work properly if there
 					// are midframe flushes and an external depth buffer. Disable use of the extension.
-					if ( renderTarget.useMultisampledRenderToTexture ) {
+					if ( renderTarget.useRenderToTexture ) {
 
 						console.warn( 'render-to-texture extension was disabled because an external texture was provided' );
-						renderTarget.useMultisampledRenderToTexture = false;
-						renderTarget.useMultisampledRenderbuffer = true;
+						renderTarget.useRenderToTexture = false;
+						renderTarget.useRenderbuffer = true;
 
 					}
 
@@ -1934,7 +1934,7 @@ function WebGLRenderer( parameters = {} ) {
 				framebuffer = __webglFramebuffer[ activeCubeFace ];
 				isCube = true;
 
-			} else if ( renderTarget.useMultisampledRenderbuffer ) {
+			} else if ( renderTarget.useRenderbuffer ) {
 
 				framebuffer = properties.get( renderTarget ).__webglMultisampledFramebuffer;
 

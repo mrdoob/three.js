@@ -35,9 +35,6 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
-		this.ignoreDepthForMultisampleCopy = options.ignoreDepth !== undefined ? options.ignoreDepth : true;
-		this.useMultisampledRenderToTexture = false;
-		this.useMultisampledRenderbuffer = false;
 
 	}
 
