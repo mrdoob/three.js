@@ -62,12 +62,11 @@ class FileLoader extends Loader {
 			onError: onError,
 		} );
 
-		// TODO-DefinitelyMaybe: Confirm if Safari can handle Data URIs through fetch
 		// create request
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
-			// TODO-DefinitelyMaybe: An abort controller could be added within a future PR
+			// An abort controller could be added within a future PR
 		} );
 
 		// start the fetch
