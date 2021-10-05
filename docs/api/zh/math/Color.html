@@ -178,10 +178,10 @@
 
 		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
 		<p>
-		[page:BufferAttribute attribute] - the source attribute.<br />
-		[page:Integer index] - index in the attribute.<br /><br />
+		[page:BufferAttribute attribute] - 数据源<br />
+		[page:Integer index] - 索引值<br /><br />
 
-		Sets this color's components from the [page:BufferAttribute attribute].
+		根据参数 [page:BufferAttribute attribute] 设置该颜色。
 		</p>
 
 		<h3>[method:Integer getHex]()</h3>
@@ -234,7 +234,7 @@
 		</p>
 
 		<h3>[method:Color multiply]( [param:Color color] ) </h3>
-		<p>将此颜色的RGB值乘以给定的[page: color color]的RGB值。</p>
+		<p>将此颜色的RGB值乘以给定的 [page:Color color] 的RGB值。</p>
 
 		<h3>[method:Color multiplyScalar]( [param:Number s] ) </h3>
 		<p>将此颜色的RGB值乘以给定的[page:Number s]的值。</p>
@@ -308,11 +308,11 @@
 
 		<h3>[method:Color setColorName]( [param:String style] ) </h3>
 		<p>
-		[page:String style] — color name ( from [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 color names] ).<br /><br />
+		[page:String style] — 颜色名字的英文单词 ( 具体请查阅 [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 color names] )<br /><br />
 
-		Sets this color from a color name. Faster than [page:.setStyle] method if you don't need the other CSS-style formats.<br/><br/>
+		通过颜色名字设置该颜色。如果你不使用其他 CSS 颜色样式形式，那么这种方式会略快于 [page:.setStyle] 方法。<br/><br/>
 
-		For convenience, the list of names is exposed in Color.NAMES as a hash: <code>Color.NAMES.aliceblue // returns 0xF0F8FF</code>
+		为了方便使用，颜色名称都可以通过 Color.NAMES 访问，例如：<code>Color.NAMES.aliceblue // returns 0xF0F8FF</code>
 		</p>
 
 		<h3>[method:Color sub]( [param:Color color] ) </h3>

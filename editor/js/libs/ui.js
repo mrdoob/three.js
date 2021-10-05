@@ -126,6 +126,12 @@ class UIElement {
 
 	}
 
+	setInnerHTML( value ) {
+
+		this.dom.innerHTML = value;
+
+	}
+
 	getIndexOfChild( element ) {
 
 		return Array.prototype.indexOf.call( this.dom.children, element.dom );
@@ -137,7 +143,7 @@ class UIElement {
 // properties
 
 const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'verticalAlign', 'color',
 	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
@@ -225,7 +231,6 @@ class UIText extends UISpan {
 		this.dom.className = 'Text';
 		this.dom.style.cursor = 'default';
 		this.dom.style.display = 'inline-block';
-		this.dom.style.verticalAlign = 'middle';
 
 		this.setValue( text );
 
@@ -261,6 +266,8 @@ class UIInput extends UIElement {
 		this.dom.className = 'Input';
 		this.dom.style.padding = '2px';
 		this.dom.style.border = '1px solid transparent';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
 
 		this.dom.addEventListener( 'keydown', function ( event ) {
 
@@ -298,6 +305,8 @@ class UITextArea extends UIElement {
 		this.dom.style.padding = '2px';
 		this.dom.spellcheck = false;
 
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
 		this.dom.addEventListener( 'keydown', function ( event ) {
 
 			event.stopPropagation();
@@ -306,11 +315,11 @@ class UITextArea extends UIElement {
 
 				event.preventDefault();
 
-				const cursor = this.dom.selectionStart;
+				const cursor = this.selectionStart;
 
-				this.dom.value = this.dom.value.substring( 0, cursor ) + '\t' + this.dom.value.substring( cursor );
-				this.dom.selectionStart = cursor + 1;
-				this.dom.selectionEnd = this.dom.selectionStart;
+				this.value = this.value.substring( 0, cursor ) + '\t' + this.value.substring( cursor );
+				this.selectionStart = cursor + 1;
+				this.selectionEnd = this.selectionStart;
 
 			}
 
@@ -342,6 +351,8 @@ class UISelect extends UIElement {
 
 		this.dom.className = 'Select';
 		this.dom.style.padding = '2px';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
 
 	}
 
@@ -447,6 +458,8 @@ class UIColor extends UIElement {
 		this.dom.style.padding = '2px';
 		this.dom.style.backgroundColor = 'transparent';
 
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
 		try {
 
 			this.dom.type = 'color';
@@ -495,6 +508,8 @@ class UINumber extends UIElement {
 		this.dom.style.cursor = 'ns-resize';
 		this.dom.className = 'Number';
 		this.dom.value = '0.00';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
 
 		this.value = 0;
 
@@ -761,6 +776,8 @@ class UIInteger extends UIElement {
 		this.dom.style.cursor = 'ns-resize';
 		this.dom.className = 'Number';
 		this.dom.value = '0';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
 
 		this.value = 0;
 

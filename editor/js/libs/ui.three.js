@@ -36,7 +36,7 @@ class UITexture extends UISpan {
 			input.click();
 
 		}, false );
-		canvas.addEventListener( 'drop', function () {
+		canvas.addEventListener( 'drop', function ( event ) {
 
 			event.preventDefault();
 			event.stopPropagation();
@@ -56,7 +56,7 @@ class UITexture extends UISpan {
 
 					// assuming RGBE/Radiance HDR iamge format
 
-					const loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
+					const loader = new RGBELoader().setDataType( THREE.FloatType );
 					loader.load( event.target.result, function ( hdrTexture ) {
 
 						hdrTexture.sourceFile = file.name;

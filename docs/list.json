@@ -7,7 +7,6 @@
 			"Getting Started": {
 				"Creating a scene": "manual/en/introduction/Creating-a-scene",
 				"Installation": "manual/en/introduction/Installation",
-				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
@@ -76,6 +75,7 @@
 				"Animation": "api/en/constants/Animation",
 				"Core": "api/en/constants/Core",
 				"CustomBlendingEquation": "api/en/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/en/constants/BufferAttributeUsage",
 				"Materials": "api/en/constants/Materials",
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"
@@ -113,7 +113,6 @@
 			"Extras / Core": {
 				"Curve": "api/en/extras/core/Curve",
 				"CurvePath": "api/en/extras/core/CurvePath",
-				"Font": "api/en/extras/core/Font",
 				"Interpolations": "api/en/extras/core/Interpolations",
 				"Path": "api/en/extras/core/Path",
 				"Shape": "api/en/extras/core/Shape",
@@ -148,14 +147,12 @@
 				"IcosahedronGeometry": "api/en/geometries/IcosahedronGeometry",
 				"LatheGeometry": "api/en/geometries/LatheGeometry",
 				"OctahedronGeometry": "api/en/geometries/OctahedronGeometry",
-				"ParametricGeometry": "api/en/geometries/ParametricGeometry",
 				"PlaneGeometry": "api/en/geometries/PlaneGeometry",
 				"PolyhedronGeometry": "api/en/geometries/PolyhedronGeometry",
 				"RingGeometry": "api/en/geometries/RingGeometry",
 				"ShapeGeometry": "api/en/geometries/ShapeGeometry",
 				"SphereGeometry": "api/en/geometries/SphereGeometry",
 				"TetrahedronGeometry": "api/en/geometries/TetrahedronGeometry",
-				"TextGeometry": "api/en/geometries/TextGeometry",
 				"TorusGeometry": "api/en/geometries/TorusGeometry",
 				"TorusKnotGeometry": "api/en/geometries/TorusKnotGeometry",
 				"TubeGeometry": "api/en/geometries/TubeGeometry",
@@ -207,7 +204,6 @@
 				"CubeTextureLoader": "api/en/loaders/CubeTextureLoader",
 				"DataTextureLoader": "api/en/loaders/DataTextureLoader",
 				"FileLoader": "api/en/loaders/FileLoader",
-				"FontLoader": "api/en/loaders/FontLoader",
 				"ImageBitmapLoader": "api/en/loaders/ImageBitmapLoader",
 				"ImageLoader": "api/en/loaders/ImageLoader",
 				"Loader": "api/en/loaders/Loader",
@@ -290,6 +286,7 @@
 			},
 
 			"Renderers": {
+				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
@@ -337,6 +334,7 @@
 			},
 
 			"Controls": {
+				"ArcballControls": "examples/en/controls/ArcballControls",
 				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
 				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
@@ -349,7 +347,9 @@
 
 			"Geometries": {
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/en/geometries/DecalGeometry"
+				"DecalGeometry": "examples/en/geometries/DecalGeometry",
+				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
+				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
 
 			"Helpers": {
@@ -368,6 +368,7 @@
 				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
+				"FontLoader": "examples/en/loaders/FontLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
@@ -417,6 +418,7 @@
 
 			"Utils": {
 				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
+				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			}
@@ -446,7 +448,6 @@
 			"البدء": {
 				"إنشاء مشهد": "manual/ar/introduction/Creating-a-scene",
 				"التثبيت": "manual/ar/introduction/Installation",
-				"دعم المتصفح": "manual/ar/introduction/Browser-support",
 				"فحص توافق WebGL": "manual/ar/introduction/WebGL-compatibility-check",
 				"كيف تدير الأشياء محليًا": "manual/ar/introduction/How-to-run-things-locally",
 				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
@@ -518,7 +519,6 @@
 			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
 				"安装": "manual/zh/introduction/Installation",
-				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
 				"画线": "manual/zh/introduction/Drawing-lines",
@@ -622,7 +622,6 @@
 			"附件 / 核心": {
 				"Curve": "api/zh/extras/core/Curve",
 				"CurvePath": "api/zh/extras/core/CurvePath",
-				"Font": "api/zh/extras/core/Font",
 				"Interpolations": "api/zh/extras/core/Interpolations",
 				"Path": "api/zh/extras/core/Path",
 				"Shape": "api/zh/extras/core/Shape",
@@ -657,14 +656,12 @@
 				"IcosahedronGeometry": "api/zh/geometries/IcosahedronGeometry",
 				"LatheGeometry": "api/zh/geometries/LatheGeometry",
 				"OctahedronGeometry": "api/zh/geometries/OctahedronGeometry",
-				"ParametricGeometry": "api/zh/geometries/ParametricGeometry",
 				"PlaneGeometry": "api/zh/geometries/PlaneGeometry",
 				"PolyhedronGeometry": "api/zh/geometries/PolyhedronGeometry",
 				"RingGeometry": "api/zh/geometries/RingGeometry",
 				"ShapeGeometry": "api/zh/geometries/ShapeGeometry",
 				"SphereGeometry": "api/zh/geometries/SphereGeometry",
 				"TetrahedronGeometry": "api/zh/geometries/TetrahedronGeometry",
-				"TextGeometry": "api/zh/geometries/TextGeometry",
 				"TorusGeometry": "api/zh/geometries/TorusGeometry",
 				"TorusKnotGeometry": "api/zh/geometries/TorusKnotGeometry",
 				"TubeGeometry": "api/zh/geometries/TubeGeometry",
@@ -716,7 +713,6 @@
 				"CubeTextureLoader": "api/zh/loaders/CubeTextureLoader",
 				"DataTextureLoader": "api/zh/loaders/DataTextureLoader",
 				"FileLoader": "api/zh/loaders/FileLoader",
-				"FontLoader": "api/zh/loaders/FontLoader",
 				"ImageBitmapLoader": "api/zh/loaders/ImageBitmapLoader",
 				"ImageLoader": "api/zh/loaders/ImageLoader",
 				"Loader": "api/zh/loaders/Loader",
@@ -799,6 +795,7 @@
 			},
 
 			"渲染器": {
+				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
 				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
@@ -858,7 +855,9 @@
 
 			"几何体": {
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
+				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
+				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
+				"TextGeometry": "examples/zh/geometries/TextGeometry"
 			},
 
 			"辅助对象": {
@@ -876,6 +875,7 @@
 			"加载器": {
 				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
+				"FontLoader": "examples/zh/loaders/FontLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
@@ -952,7 +952,6 @@
 			"시작하기": {
 				"장면 만들기": "manual/ko/introduction/Creating-a-scene",
 				"설치": "manual/ko/introduction/Installation",
-				"브라우저 지원": "manual/ko/introduction/Browser-support",
 				"WebGL 호환성 검사": "manual/ko/introduction/WebGL-compatibility-check",
 				"로컬 환경에서 구동 방법": "manual/ko/introduction/How-to-run-things-locally",
 				"선 그리기": "manual/ko/introduction/Drawing-lines",
@@ -1050,7 +1049,6 @@
             "はじめてみましょう": {
                 "シーンの作成": "manual/ja/introduction/Creating-a-scene",
                 "インストールの方法": "manual/ja/introduction/Installation",
-                "サポートしているブラウザ": "manual/ja/introduction/Browser-support",
                 "WebGLの互換性の確認": "manual/ja/introduction/WebGL-compatibility-check",
                 "localで実行する方法": "manual/ja/introduction/How-to-run-things-locally",
                 "線を引く": "manual/ja/introduction/Drawing-lines",

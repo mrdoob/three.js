@@ -333,9 +333,6 @@ class OutlineEffect {
 
 			const outlineParameters = originalMaterial.userData.outlineParameters;
 
-			material.skinning = originalMaterial.skinning;
-			material.morphTargets = originalMaterial.morphTargets;
-			material.morphNormals = originalMaterial.morphNormals;
 			material.fog = originalMaterial.fog;
 			material.toneMapped = originalMaterial.toneMapped;
 			material.premultipliedAlpha = originalMaterial.premultipliedAlpha;

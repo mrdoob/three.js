@@ -11,27 +11,26 @@ class VaryNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		// VaryNode is auto type
 
-		return this.value.getType( builder );
+		return this.value.getNodeType( builder );
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getType( builder );
-
-		// force nodeVary.snippet work in vertex stage
-		const snippet = this.value.buildStage( builder, NodeShaderStage.Vertex, type );
+		const type = this.getNodeType( builder );
+		const value = this.value;
 
 		const nodeVary = builder.getVaryFromNode( this, type );
-		nodeVary.snippet = snippet;
-
 		const propertyName = builder.getPropertyName( nodeVary );
 
-		return builder.format( propertyName, type, output );
+		// force nodeVary.snippet work in vertex stage
+		builder.flowNodeFromShaderStage( NodeShaderStage.Vertex, value, type, propertyName );
+
+		return propertyName;
 
 	}
 

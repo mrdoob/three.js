@@ -15,9 +15,9 @@
 
 		}
 
-		setSize( ) {}
+		setSize() {}
 
-		render( ) {
+		render() {
 
 			console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
 

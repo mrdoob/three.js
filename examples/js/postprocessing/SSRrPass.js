@@ -8,9 +8,7 @@
 			camera,
 			width,
 			height,
-			selects,
-			encoding,
-			morphTargets = false
+			selects
 		} ) {
 
 			super();
@@ -25,7 +23,6 @@
 			this.ior = THREE.SSRrShader.uniforms.ior.value;
 			this.maxDistance = THREE.SSRrShader.uniforms.maxDistance.value;
 			this.surfDist = THREE.SSRrShader.uniforms.surfDist.value;
-			this.encoding = encoding;
 			this.tempColor = new THREE.Color();
 			this.selects = selects;
 			this._specular = THREE.SSRrShader.defines.SPECULAR;
@@ -154,9 +151,7 @@
 			this.ssrrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 			this.ssrrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse ); // normal material
 
-			this.normalMaterial = new THREE.MeshNormalMaterial( {
-				morphTargets
-			} );
+			this.normalMaterial = new THREE.MeshNormalMaterial();
 			this.normalMaterial.blending = THREE.NoBlending; // refractiveOn material
 
 			this.refractiveOnMaterial = new THREE.MeshBasicMaterial( {
@@ -228,7 +223,6 @@
 		) {
 
 			// render beauty and depth
-			if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 			renderer.setRenderTarget( this.beautyRenderTarget );
 			renderer.clear();
 			this.scene.children.forEach( child => {

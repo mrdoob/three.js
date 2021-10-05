@@ -80,14 +80,6 @@ class LineGeometry extends LineSegmentsGeometry {
 
 	}
 
-	copy( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
-
 }
 
 LineGeometry.prototype.isLineGeometry = true;

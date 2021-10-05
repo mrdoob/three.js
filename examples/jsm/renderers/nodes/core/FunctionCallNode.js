@@ -1,6 +1,6 @@
-import Node from './Node.js';
+import TempNode from './TempNode.js';
 
-class FunctionCallNode extends Node {
+class FunctionCallNode extends TempNode {
 
 	constructor( functionNode = null, parameters = {} ) {
 
@@ -25,13 +25,13 @@ class FunctionCallNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		return this.functionNode.getType( builder );
+		return this.functionNode.getNodeType( builder );
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const params = [];
 
@@ -56,12 +56,9 @@ class FunctionCallNode extends Node {
 
 		}
 
-		const type = this.getType( builder );
 		const functionName = functionNode.build( builder, 'property' );
 
-		const callSnippet = `${functionName}( ${params.join( ', ' )} )`;
-
-		return builder.format( callSnippet, type, output );
+		return `${functionName}( ${params.join( ', ' )} )`;
 
 	}
 

@@ -206,7 +206,7 @@ class WebGPUTextures {
 					depthOrArrayLayers: 1
 				},
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.SAMPLED
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
 			} );
 
 			this.info.memory.textures ++;
@@ -316,7 +316,7 @@ class WebGPUTextures {
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = this._getFormat( texture );
 
-		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
+		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
 
 		if ( needsMipmaps === true ) {
 
@@ -366,7 +366,7 @@ class WebGPUTextures {
 
 				this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-					this._copyImageBitmapToTexture( imageBitmap, textureGPU );
+					this._copyExternalImageToTexture( imageBitmap, textureGPU );
 
 					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
@@ -416,7 +416,7 @@ class WebGPUTextures {
 
 			this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-				this._copyImageBitmapToTexture( imageBitmap, textureGPU, { x: 0, y: 0, z: i } );
+				this._copyExternalImageToTexture( imageBitmap, textureGPU, { x: 0, y: 0, z: i } );
 
 			} );
 
@@ -424,11 +424,11 @@ class WebGPUTextures {
 
 	}
 
-	_copyImageBitmapToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
+	_copyExternalImageToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
 
-		this.device.queue.copyImageBitmapToTexture(
+		this.device.queue.copyExternalImageToTexture(
 			{
-				imageBitmap: image
+				source: image
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,

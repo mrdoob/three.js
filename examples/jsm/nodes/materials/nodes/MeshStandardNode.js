@@ -9,106 +9,108 @@ import { OperatorNode } from '../../math/OperatorNode.js';
 import { SwitchNode } from '../../utils/SwitchNode.js';
 import { NormalMapNode } from '../../misc/NormalMapNode.js';
 
-function MeshStandardNode() {
+class MeshStandardNode extends StandardNode {
 
-	StandardNode.call( this );
+	constructor() {
 
-	this.properties = {
-		color: new Color( 0xffffff ),
-		roughness: 0.5,
-		metalness: 0.5,
-		normalScale: new Vector2( 1, 1 )
-	};
+		super();
 
-	this.inputs = {
-		color: new PropertyNode( this.properties, 'color', 'c' ),
-		roughness: new PropertyNode( this.properties, 'roughness', 'f' ),
-		metalness: new PropertyNode( this.properties, 'metalness', 'f' ),
-		normalScale: new PropertyNode( this.properties, 'normalScale', 'v2' )
-	};
+		this.properties = {
+			color: new Color( 0xffffff ),
+			roughness: 0.5,
+			metalness: 0.5,
+			normalScale: new Vector2( 1, 1 )
+		};
 
-}
+		this.inputs = {
+			color: new PropertyNode( this.properties, 'color', 'c' ),
+			roughness: new PropertyNode( this.properties, 'roughness', 'f' ),
+			metalness: new PropertyNode( this.properties, 'metalness', 'f' ),
+			normalScale: new PropertyNode( this.properties, 'normalScale', 'v2' )
+		};
 
-MeshStandardNode.prototype = Object.create( StandardNode.prototype );
-MeshStandardNode.prototype.constructor = MeshStandardNode;
-MeshStandardNode.prototype.nodeType = 'MeshStandard';
+	}
 
-MeshStandardNode.prototype.build = function ( builder ) {
+	build( builder ) {
 
-	var props = this.properties,
-		inputs = this.inputs;
+		const props = this.properties,
+			inputs = this.inputs;
 
-	if ( builder.isShader( 'fragment' ) ) {
+		if ( builder.isShader( 'fragment' ) ) {
 
-		// slots
-		// * color
-		// * map
+			// slots
+			// * color
+			// * map
 
-		var color = builder.findNode( props.color, inputs.color ),
-			map = builder.resolve( props.map );
+			const color = builder.findNode( props.color, inputs.color ),
+				map = builder.resolve( props.map );
 
-		this.color = map ? new OperatorNode( color, map, OperatorNode.MUL ) : color;
+			this.color = map ? new OperatorNode( color, map, OperatorNode.MUL ) : color;
 
-		// slots
-		// * roughness
-		// * roughnessMap
+			// slots
+			// * roughness
+			// * roughnessMap
 
-		var roughness = builder.findNode( props.roughness, inputs.roughness ),
-			roughnessMap = builder.resolve( props.roughnessMap );
+			const roughness = builder.findNode( props.roughness, inputs.roughness ),
+				roughnessMap = builder.resolve( props.roughnessMap );
 
-		this.roughness = roughnessMap ? new OperatorNode( roughness, new SwitchNode( roughnessMap, 'g' ), OperatorNode.MUL ) : roughness;
+			this.roughness = roughnessMap ? new OperatorNode( roughness, new SwitchNode( roughnessMap, 'g' ), OperatorNode.MUL ) : roughness;
 
-		// slots
-		// * metalness
-		// * metalnessMap
+			// slots
+			// * metalness
+			// * metalnessMap
 
-		var metalness = builder.findNode( props.metalness, inputs.metalness ),
-			metalnessMap = builder.resolve( props.metalnessMap );
+			const metalness = builder.findNode( props.metalness, inputs.metalness ),
+				metalnessMap = builder.resolve( props.metalnessMap );
 
-		this.metalness = metalnessMap ? new OperatorNode( metalness, new SwitchNode( metalnessMap, 'b' ), OperatorNode.MUL ) : metalness;
+			this.metalness = metalnessMap ? new OperatorNode( metalness, new SwitchNode( metalnessMap, 'b' ), OperatorNode.MUL ) : metalness;
 
-		// slots
-		// * normalMap
-		// * normalScale
+			// slots
+			// * normalMap
+			// * normalScale
 
-		if ( props.normalMap ) {
+			if ( props.normalMap ) {
 
-			this.normal = new NormalMapNode( builder.resolve( props.normalMap ) );
-			this.normal.scale = builder.findNode( props.normalScale, inputs.normalScale );
+				this.normal = new NormalMapNode( builder.resolve( props.normalMap ) );
+				this.normal.scale = builder.findNode( props.normalScale, inputs.normalScale );
 
-		} else {
+			} else {
 
-			this.normal = undefined;
+				this.normal = undefined;
+
+			}
+
+			// slots
+			// * envMap
+
+			this.environment = builder.resolve( props.envMap );
 
 		}
 
-		// slots
-		// * envMap
+		// build code
 
-		this.environment = builder.resolve( props.envMap );
-
-	}
-
-	// build code
-
-	return StandardNode.prototype.build.call( this, builder );
-
-};
-
-MeshStandardNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		console.warn( '.toJSON not implemented in', this );
+		return super.build( builder );
 
 	}
 
-	return data;
+	toJSON( meta ) {
 
-};
+		let data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			console.warn( '.toJSON not implemented in', this );
+
+		}
+
+		return data;
+
+	}
+
+}
+
+MeshStandardNode.prototype.nodeType = 'MeshStandard';
 
 export { MeshStandardNode };

@@ -158,11 +158,16 @@
 		uniform mat4 textureMatrix;
 		varying vec4 vUv;
 
+		#include <common>
+		#include <logdepthbuf_pars_vertex>
+
 		void main() {
 
 			vUv = textureMatrix * vec4( position, 1.0 );
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			#include <logdepthbuf_vertex>
 
 		}`,
 		fragmentShader:
@@ -171,6 +176,8 @@
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 		varying vec4 vUv;
+
+		#include <logdepthbuf_pars_fragment>
 
 		float blendOverlay( float base, float blend ) {
 
@@ -185,6 +192,8 @@
 		}
 
 		void main() {
+
+			#include <logdepthbuf_fragment>
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );

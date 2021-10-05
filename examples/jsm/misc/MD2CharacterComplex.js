@@ -550,8 +550,8 @@ class MD2CharacterComplex {
 
 	_createPart( geometry, skinMap ) {
 
-		const materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true, morphTargets: true, morphNormals: true } );
-		const materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap, morphTargets: true, morphNormals: true } );
+		const materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true } );
+		const materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap } );
 
 		//
 

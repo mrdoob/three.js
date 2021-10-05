@@ -1,6 +1,6 @@
-import Node from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
 
-class OperatorNode extends Node {
+class OperatorNode extends TempNode {
 
 	constructor( op, a, b ) {
 
@@ -13,22 +13,22 @@ class OperatorNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		const typeA = this.a.getType( builder );
-		const typeB = this.b.getType( builder );
+		const typeA = this.a.getNodeType( builder );
+		const typeB = this.b.getNodeType( builder );
 
 		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
 			// matrix x vector
 
-			return typeB;
+			return builder.getVectorFromMatrix( typeA );
 
 		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
 
 			// vector x matrix
 
-			return typeA;
+			return builder.getVectorFromMatrix( typeB );
 
 		} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
 
@@ -42,30 +42,24 @@ class OperatorNode extends Node {
 
 	}
 
-	getVectorFromMatrix( type ) {
-
-		return 'vec' + type.substr( 3 );
-
-	}
-
 	generate( builder, output ) {
 
-		let typeA = this.a.getType( builder );
-		let typeB = this.b.getType( builder );
+		let typeA = this.a.getNodeType( builder );
+		let typeB = this.b.getNodeType( builder );
 
-		let type = this.getType( builder );
+		let type = this.getNodeType( builder );
 
 		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
 			// matrix x vector
 
-			type = typeB = this.getVectorFromMatrix( typeA );
+			type = typeB = builder.getVectorFromMatrix( typeA );
 
 		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
 
 			// vector x matrix
 
-			type = typeB = this.getVectorFromMatrix( typeB );
+			type = typeB = builder.getVectorFromMatrix( typeB );
 
 		} else {
 
@@ -78,7 +72,7 @@ class OperatorNode extends Node {
 		const a = this.a.build( builder, typeA );
 		const b = this.b.build( builder, typeB );
 
-		return builder.format( `( ${a} ${this.op} ${b} )`, type, output );
+		return `( ${a} ${this.op} ${b} )`;
 
 	}
 

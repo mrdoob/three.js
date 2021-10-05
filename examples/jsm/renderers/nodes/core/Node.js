@@ -2,11 +2,17 @@ import { NodeUpdateType } from './constants.js';
 
 class Node {
 
-	constructor( type = null ) {
+	constructor( nodeType = null ) {
 
-		this.type = type;
+		this.nodeType = nodeType;
 
 		this.updateType = NodeUpdateType.None;
+
+	}
+
+	get type() {
+
+		return this.constructor.name;
 
 	}
 
@@ -16,9 +22,15 @@ class Node {
 
 	}
 
-	getType( /*builder*/ ) {
+	getNodeType( /*builder*/ ) {
 
-		return this.type;
+		return this.nodeType;
+
+	}
+
+	getTypeLength( builder ) {
+
+		return builder.getTypeLength( this.getNodeType( builder ) );
 
 	}
 
@@ -34,23 +46,30 @@ class Node {
 
 	}
 
-	buildStage( builder, shaderStage, output = null ) {
-
-		const oldShaderStage = builder.shaderStage;
-
-		builder.shaderStage = shaderStage;
-
-		const snippet = this.build( builder, output );
-
-		builder.shaderStage = oldShaderStage;
-
-		return snippet;
-
-	}
-
 	build( builder, output = null ) {
 
 		builder.addNode( this );
+
+		const isGenerateOnce = this.generate.length === 1;
+
+		if ( isGenerateOnce ) {
+
+			const type = this.getNodeType( builder );
+			const nodeData = builder.getDataFromNode( this );
+
+			let snippet = nodeData.snippet;
+
+			if ( snippet === undefined ) {
+
+				snippet = this.generate( builder );
+
+				nodeData.snippet = snippet;
+
+			}
+
+			return builder.format( snippet, type, output );
+
+		}
 
 		return this.generate( builder, output );
 

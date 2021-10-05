@@ -39,10 +39,8 @@
 	<p>含有对象的子级的数组。请参阅[page:Group]来了解将手动对象进行分组的相关信息。</p>
 
 	<h3>[property:Material customDepthMaterial]</h3>
-	<p>渲染到深度贴图时此材质要使用的自定义深度材质。
-		当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
-		（b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
-		您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
+	<p>Custom depth material to be used when rendering to the depth map. Can only be used in context of meshes.
+	When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are modifying vertex positions in the vertex shader you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
 	</p>
 
 	<h3>[property:Material customDistanceMaterial]</h3>
@@ -247,7 +245,7 @@
 		请注意，大多数的对象中name默认是一个空字符串，要使用这个方法，你将需要手动地设置name属性。
 	</p>
 
-	<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Float value] )</h3>
+	<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Any value] )</h3>
 	<p>
 		name —— 将要用于查找的属性的名称。<br />
 		value —— 给定的属性的值。 <br /><br />
@@ -303,6 +301,11 @@
 	<h3>[method:null remove]( [param:Object3D object], ... )</h3>
 	<p>
 		从当前对象的子级中移除<b>对象</b>。可以移除任意数量的对象。
+	</p>
+
+	<h3>[method:this removeFromParent]()</h3>
+	<p>
+	Removes this object from its current parent.
 	</p>
 
 	<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>

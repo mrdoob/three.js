@@ -93,7 +93,7 @@ class EXRLoader extends DataTextureLoader {
 
 		super( manager );
 
-		this.type = FloatType;
+		this.type = HalfFloatType;
 
 	}
 

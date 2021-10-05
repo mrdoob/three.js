@@ -1,6 +1,8 @@
 import {
 	Frustum,
-	Vector3
+	Vector3,
+	Matrix4,
+	Quaternion,
 } from '../../../build/three.module.js';
 
 /**
@@ -27,6 +29,10 @@ const _vectemp1 = new Vector3();
 const _vectemp2 = new Vector3();
 const _vectemp3 = new Vector3();
 
+const _matrix = new Matrix4();
+const _quaternion = new Quaternion();
+const _scale = new Vector3();
+
 class SelectionBox {
 
 	constructor( camera, scene, deep = Number.MAX_VALUE ) {
@@ -36,6 +42,7 @@ class SelectionBox {
 		this.startPoint = new Vector3();
 		this.endPoint = new Vector3();
 		this.collection = [];
+		this.instances = {};
 		this.deep = deep;
 
 	}
@@ -167,7 +174,24 @@ class SelectionBox {
 
 		if ( object.isMesh || object.isLine || object.isPoints ) {
 
-			if ( object.material !== undefined ) {
+			if ( object.isInstancedMesh ) {
+
+				this.instances[ object.uuid ] = [];
+
+				for ( let instanceId = 0; instanceId < object.count; instanceId ++ ) {
+
+					object.getMatrixAt( instanceId, _matrix );
+					_matrix.decompose( _center, _quaternion, _scale );
+
+					if ( frustum.containsPoint( _center ) ) {
+
+						this.instances[ object.uuid ].push( instanceId );
+
+					}
+
+				}
+
+			} else {
 
 				if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
 

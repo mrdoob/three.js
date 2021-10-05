@@ -1,11 +1,17 @@
 import {
 	Matrix4,
-	Object3D
+	Object3D,
+	Quaternion,
+	Vector3
 } from '../../../build/three.module.js';
 
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  */
+
+const _position = new Vector3();
+const _quaternion = new Quaternion();
+const _scale = new Vector3();
 
 class CSS3DObject extends Object3D {
 
@@ -16,6 +22,9 @@ class CSS3DObject extends Object3D {
 		this.element = element || document.createElement( 'div' );
 		this.element.style.position = 'absolute';
 		this.element.style.pointerEvents = 'auto';
+		this.element.style.userSelect = 'none';
+
+		this.element.setAttribute( 'draggable', false );
 
 		this.addEventListener( 'removed', function () {
 
@@ -53,6 +62,18 @@ class CSS3DSprite extends CSS3DObject {
 
 		super( element );
 
+		this.rotation2D = 0;
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.rotation2D = source.rotation2D;
+
+		return this;
+
 	}
 
 }
@@ -62,6 +83,7 @@ CSS3DSprite.prototype.isCSS3DSprite = true;
 //
 
 const _matrix = new Matrix4();
+const _matrix2 = new Matrix4();
 
 class CSS3DRenderer {
 
@@ -226,8 +248,12 @@ class CSS3DRenderer {
 
 					_matrix.copy( camera.matrixWorldInverse );
 					_matrix.transpose();
-					_matrix.copyPosition( object.matrixWorld );
-					_matrix.scale( object.scale );
+
+					if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
+
+					object.matrixWorld.decompose( _position, _quaternion, _scale );
+					_matrix.setPosition( _position );
+					_matrix.scale( _scale );
 
 					_matrix.elements[ 3 ] = 0;
 					_matrix.elements[ 7 ] = 0;

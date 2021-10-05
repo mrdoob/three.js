@@ -50,9 +50,10 @@
 				if ( max > 1 ) c.multiplyScalar( 1 / max );
 				this.children[ 0 ].material.color.copy( this.material.color );
 
-			}
+			} // ignore world scale on light
 
-			this.matrixWorld.copy( this.light.matrixWorld ).scale( this.scale );
+
+			this.matrixWorld.extractRotation( this.light.matrixWorld ).scale( this.scale ).copyPosition( this.light.matrixWorld );
 			this.children[ 0 ].matrixWorld.copy( this.matrixWorld );
 
 		}

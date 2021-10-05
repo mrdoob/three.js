@@ -56,7 +56,7 @@
 		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.
 		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for details.<br />
 
-		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
+		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low performance is detected. Default is *false*.
 		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for details.<br />
 
 		[page:Boolean depth] - whether the drawing buffer has a
@@ -64,7 +64,7 @@
 		Default is *true*.<br />
 
 		[page:Boolean logarithmicDepthBuffer] -  whether to use a logarithmic depth buffer. It may
-		be neccesary to use this if dealing with huge differences in scale in a single scene. Note that this setting
+		be necessary to use this if dealing with huge differences in scale in a single scene. Note that this setting
 		uses gl_FragDepth if available which disables the [link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test]
 		optimization and can cause a decrease in performance.
 		Default is *false*. See the [example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer] example.
@@ -316,11 +316,16 @@
 		- *WEBGL_compressed_texture_etc1*
 		</p>
 
-		<h3>[method:null forceContextLoss]( )</h3>
+		<h3>[method:void forceContextLoss]()</h3>
 		<p>
 		Simulate loss of the WebGL context. This requires support for the
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] extensions.
-		According to [link:https://webglstats.com/ WebGLStats], as of February 2016 90% of WebGL enabled devices support this.
+		</p>
+
+		<h3>[method:void forceContextRestore]( )</h3>
+		<p>
+		Simulate restore of the WebGL context. This requires support for the
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] extensions.
 		</p>
 
 		<h3>[method:Float getClearAlpha]()</h3>
@@ -409,7 +414,7 @@
 			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one ore more buffers call [page:WebGLRenderer.clear .clear].
 		</p>
 
-		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:BufferGeometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Scene scene], [param:BufferGeometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>Render a buffer geometry group using the camera and with the specified material.</p>
 
 		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>

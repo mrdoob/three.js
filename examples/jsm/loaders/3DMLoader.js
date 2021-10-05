@@ -46,6 +46,7 @@ class Rhino3dmLoader extends Loader {
 		this.workerConfig = {};
 
 		this.materials = [];
+		this.warnings = [];
 
 	}
 
@@ -88,11 +89,15 @@ class Rhino3dmLoader extends Loader {
 			}
 
 			this.decodeObjects( buffer, url )
-				.then( onLoad )
-				.catch( onError );
+				.then( result => {
+
+					result.userData.warnings = this.warnings;
+					onLoad( result );
+
+				 } )
+				.catch( e => onError( e ) );
 
 		}, onProgress, onError );
-
 
 	}
 
@@ -113,7 +118,7 @@ class Rhino3dmLoader extends Loader {
 			.then( ( _worker ) => {
 
 				worker = _worker;
-				taskID = this.workerNextTaskID ++; //hmmm
+				taskID = this.workerNextTaskID ++;
 
 				return new Promise( ( resolve, reject ) => {
 
@@ -121,12 +126,17 @@ class Rhino3dmLoader extends Loader {
 
 					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
 
-					//this.debug();
+					// this.debug();
 
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.data ) );
+			.then( ( message ) => this._createGeometry( message.data ) )
+			.catch( e => {
+
+				throw e;
+
+			} );
 
 		// Remove task from the task list.
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
@@ -159,8 +169,13 @@ class Rhino3dmLoader extends Loader {
 	parse( data, onLoad, onError ) {
 
 		this.decodeObjects( data, '' )
-			.then( onLoad )
-			.catch( onError );
+			.then( result => {
+
+				result.userData.warnings = this.warnings;
+				onLoad( result );
+
+			} )
+			.catch( e => onError( e ) );
 
 	}
 
@@ -332,7 +347,7 @@ class Rhino3dmLoader extends Loader {
 
 					} else {
 
-						const material = this._createMaterial( );
+						const material = this._createMaterial();
 						_object = this._createObject( obj, material );
 
 					}
@@ -575,49 +590,56 @@ class Rhino3dmLoader extends Loader {
 
 				let light;
 
-				if ( geometry.isDirectionalLight ) {
+				switch ( geometry.lightStyle.name ) {
 
-					light = new DirectionalLight();
-					light.castShadow = attributes.castsShadows;
-					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-					light.shadow.normalBias = 0.1;
+					case 'LightStyle_WorldPoint':
 
-				} else if ( geometry.isPointLight ) {
+						light = new PointLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.shadow.normalBias = 0.1;
 
-					light = new PointLight();
-					light.castShadow = attributes.castsShadows;
-					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-					light.shadow.normalBias = 0.1;
+						break;
 
-				} else if ( geometry.isRectangularLight ) {
+					case 'LightStyle_WorldSpot':
 
-					light = new RectAreaLight();
+						light = new SpotLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						light.angle = geometry.spotAngleRadians;
+						light.shadow.normalBias = 0.1;
 
-					const width = Math.abs( geometry.width[ 2 ] );
-					const height = Math.abs( geometry.length[ 0 ] );
+						break;
 
-					light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+					case 'LightStyle_WorldRectangular':
 
-					light.height = height;
-					light.width = width;
+						light = new RectAreaLight();
+						const width = Math.abs( geometry.width[ 2 ] );
+						const height = Math.abs( geometry.length[ 0 ] );
+						light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+						light.height = height;
+						light.width = width;
+						light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
 
-					light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+						break;
 
-				} else if ( geometry.isSpotLight ) {
+					case 'LightStyle_WorldDirectional':
 
-					light = new SpotLight();
-					light.castShadow = attributes.castsShadows;
-					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-					light.angle = geometry.spotAngleRadians;
-					light.shadow.normalBias = 0.1;
+						light = new DirectionalLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						light.shadow.normalBias = 0.1;
 
-				} else if ( geometry.isLinearLight ) {
+						break;
 
-					console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
+					case 'LightStyle_WorldLinear':
+						// not conversion exists, warning has already been printed to the console
+						break;
 
-					return;
+					default:
+						break;
 
 				}
 
@@ -703,11 +725,16 @@ class Rhino3dmLoader extends Loader {
 					libraryConfig: this.libraryConfig
 				} );
 
-				worker.onmessage = function ( e ) {
+				worker.onmessage = e => {
 
 					const message = e.data;
 
 					switch ( message.type ) {
+
+						case 'warning':
+							this.warnings.push( message.data );
+							console.warn( message.data );
+							break;
 
 						case 'decode':
 							worker._callbacks[ message.id ].resolve( message );
@@ -777,6 +804,7 @@ function Rhino3dmWorker() {
 	let libraryPending;
 	let libraryConfig;
 	let rhino;
+	let taskID;
 
 	onmessage = function ( e ) {
 
@@ -786,6 +814,7 @@ function Rhino3dmWorker() {
 
 			case 'init':
 
+				// console.log(message)
 				libraryConfig = message.libraryConfig;
 				const wasmBinary = libraryConfig.wasmBinary;
 				let RhinoModule;
@@ -806,12 +835,20 @@ function Rhino3dmWorker() {
 
 			case 'decode':
 
+				taskID = message.id;
 				const buffer = message.buffer;
 				libraryPending.then( () => {
 
-					const data = decodeObjects( rhino, buffer );
+					try {
 
-					self.postMessage( { type: 'decode', id: message.id, data } );
+						const data = decodeObjects( rhino, buffer );
+						self.postMessage( { type: 'decode', id: message.id, data } );
+
+					} catch ( error ) {
+
+						self.postMessage( { type: 'error', id: message.id, error } );
+
+					}
 
 				} );
 
@@ -927,7 +964,13 @@ function Rhino3dmWorker() {
 
 					} else {
 
-						console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+						self.postMessage( { type: 'warning', id: taskID, data: {
+							message: `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.`,
+							type: 'missing resource'
+						}
+
+						} );
+
 						texture.image = null;
 
 					}
@@ -944,15 +987,13 @@ function Rhino3dmWorker() {
 
 			if ( _pbrMaterial.supported ) {
 
-				console.log( 'pbr true' );
-
 				for ( let j = 0; j < pbrTextureTypes.length; j ++ ) {
 
-					const _texture = _material.getTexture( textureTypes[ j ] );
+					const _texture = _material.getTexture( pbrTextureTypes[ j ] );
 					if ( _texture ) {
 
 						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-						let textureType = textureTypes[ j ].constructor.name;
+						let textureType = pbrTextureTypes[ j ].constructor.name;
 						textureType = textureType.substring( 12, textureType.length );
 						const texture = { type: textureType, image: 'data:image/png;base64,' + image };
 						textures.push( texture );
@@ -1194,6 +1235,18 @@ function Rhino3dmWorker() {
 
 				geometry = extractProperties( _geometry );
 
+				if ( geometry.lightStyle.name === 'LightStyle_WorldLinear' ) {
+
+					self.postMessage( { type: 'warning', id: taskID, data: {
+						message: `THREE.3DMLoader: No conversion exists for ${objectType.constructor.name} ${geometry.lightStyle.name}`,
+						type: 'no conversion',
+						guid: _attributes.id
+					}
+
+					} );
+
+				}
+
 				break;
 
 			case rhino.ObjectType.InstanceReference:
@@ -1225,7 +1278,15 @@ function Rhino3dmWorker() {
 				*/
 
 			default:
-				console.warn( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
+
+				self.postMessage( { type: 'warning', id: taskID, data: {
+					message: `THREE.3DMLoader: Conversion not implemented for ${objectType.constructor.name}`,
+					type: 'not implemented',
+					guid: _attributes.id
+				}
+
+				} );
+
 				break;
 
 		}
@@ -1262,7 +1323,13 @@ function Rhino3dmWorker() {
 
 		} else {
 
-			console.warn( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
+			self.postMessage( { type: 'warning', id: taskID, data: {
+				message: `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`,
+				type: 'missing mesh',
+				guid: _attributes.id
+			}
+
+			} );
 
 		}
 

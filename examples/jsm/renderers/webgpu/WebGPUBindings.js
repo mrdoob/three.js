@@ -23,17 +23,16 @@ class WebGPUBindings {
 
 		if ( data === undefined ) {
 
-			const renderPipelines = this.renderPipelines.get( object );
-
-			// each material defines an array of bindings (ubos, textures, samplers etc.)
+			// each object defines an array of bindings (ubos, textures, samplers etc.)
 
 			const nodeBuilder = this.nodes.get( object );
-
 			const bindings = nodeBuilder.getBindings();
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const bindLayout = renderPipelines.pipeline.getBindGroupLayout( 0 );
+			const renderPipeline = this.renderPipelines.get( object );
+
+			const bindLayout = renderPipeline.pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -56,9 +55,13 @@ class WebGPUBindings {
 
 		if ( data === undefined ) {
 
-			const pipeline = this.computePipelines.get( param );
+			// bindings are not yet retrieved via node material
+
 			const bindings = param.bindings !== undefined ? param.bindings.slice() : [];
-			const bindLayout = pipeline.getBindGroupLayout( 0 );
+
+			const computePipeline = this.computePipelines.get( param );
+
+			const bindLayout = computePipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -96,12 +99,10 @@ class WebGPUBindings {
 
 			if ( isShared && isUpdated ) continue;
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
-				const array = binding.array;
+				const buffer = binding.getBuffer();
 				const bufferGPU = binding.bufferGPU;
-
-				binding.onBeforeUpdate( object, camera );
 
 				const needsBufferWrite = binding.update();
 
@@ -110,7 +111,7 @@ class WebGPUBindings {
 					this.device.queue.writeBuffer(
 						bufferGPU,
 						0,
-						array,
+						buffer,
 						0
 					);
 
@@ -178,13 +179,11 @@ class WebGPUBindings {
 
 		for ( const binding of bindings ) {
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
 				if ( binding.bufferGPU === null ) {
 
 					const byteLength = binding.getByteLength();
-
-					binding.array = new Float32Array( new ArrayBuffer( byteLength ) );
 
 					binding.bufferGPU = this.device.createBuffer( {
 						size: byteLength,

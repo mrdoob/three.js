@@ -371,7 +371,7 @@
 
 				raycaster.setFromCamera( pointer, camera );
 
-				const intersects = raycaster.intersectObjects( splineHelperObjects );
+				const intersects = raycaster.intersectObjects( splineHelperObjects, false );
 
 				if ( intersects.length > 0 ) {
 

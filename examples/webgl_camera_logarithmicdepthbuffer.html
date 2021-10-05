@@ -66,6 +66,9 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
+
 			import Stats from './jsm/libs/stats.module.js';
 
 			// 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
@@ -107,7 +110,7 @@
 
 				container = document.getElementById( 'container' );
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					const scene = initScene( font );
@@ -174,7 +177,7 @@
 
 					const scale = labeldata[ i ].scale || 1;
 
-					const labelgeo = new THREE.TextGeometry( labeldata[ i ].label, {
+					const labelgeo = new TextGeometry( labeldata[ i ].label, {
 						font: font,
 						size: labeldata[ i ].size,
 						height: labeldata[ i ].size / 2
