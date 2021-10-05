@@ -132,10 +132,6 @@
 				"SplineCurve": "api/en/extras/curves/SplineCurve"
 			},
 
-			"Extras / Objects": {
-				"ImmediateRenderObject": "api/en/extras/objects/ImmediateRenderObject"
-			},
-
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
 				"CircleGeometry": "api/en/geometries/CircleGeometry",
@@ -641,10 +637,6 @@
 				"SplineCurve": "api/zh/extras/curves/SplineCurve"
 			},
 
-			"附件 / 物体": {
-				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject"
-			},
-
 			"几何体": {
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
 				"CircleGeometry": "api/zh/geometries/CircleGeometry",
@@ -980,7 +972,6 @@
 		"레퍼런스": {
 
 			"애니메이션": {
-				"AnimationAction": "api/ko/animation/AnimationAction",
 				"AnimationAction": "api/ko/animation/AnimationAction",
 				"AnimationClip": "api/ko/animation/AnimationClip",
 				"AnimationMixer": "api/ko/animation/AnimationMixer",
