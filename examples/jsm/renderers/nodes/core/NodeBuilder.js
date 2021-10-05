@@ -10,14 +10,16 @@ import { LinearEncoding } from 'three';
 
 class NodeBuilder {
 
-	constructor( material, renderer, parser ) {
+	constructor( object, renderer, parser ) {
 
-		this.material = material;
+		this.object = object;
+		this.material = object.material;
 		this.renderer = renderer;
 		this.parser = parser;
 
 		this.nodes = [];
 		this.updateNodes = [];
+		this.hashNodes = {};
 
 		this.vertexShader = null;
 		this.fragmentShader = null;
@@ -30,16 +32,41 @@ class NodeBuilder {
 		this.varys = [];
 		this.vars = { vertex: [], fragment: [] };
 		this.flow = { code: '' };
+		this.stack = [];
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: material
+			material: object.material
 		};
 
 		this.nodesData = new WeakMap();
 
 		this.shaderStage = null;
 		this.slot = null;
+
+	}
+
+	addStack( node ) {
+/*
+		if ( this.stack.indexOf( node ) !== - 1 ) {
+
+			console.warn( 'Recursive node: ', node );
+
+		}
+*/
+		this.stack.push( node );
+
+	}
+
+	removeStack( node ) {
+
+		const lastStack = this.stack.pop();
+
+		if ( lastStack !== node ) {
+
+			throw new Error( 'NodeBuilder: Invalid node stack!' );
+
+		}
 
 	}
 
@@ -57,7 +84,15 @@ class NodeBuilder {
 
 			this.nodes.push( node );
 
+			this.hashNodes[ node.getHash( this ) ] = node;
+
 		}
+
+	}
+
+	getNodeFromHash( hash ) {
+
+		return this.hashNodes[ hash ];
 
 	}
 
@@ -504,14 +539,24 @@ class NodeBuilder {
 
 	build() {
 
-		const shaderStages = [ 'vertex', 'fragment' ];
+		const shaderStages = [ 'fragment', 'vertex' ];
 		const shaderData = {};
 
 		for ( const shaderStage of shaderStages ) {
 
-			this.setShaderStage( shaderStage );
-
 			this.define( shaderStage, 'NODE_CODE', '' );
+
+		}
+
+		if ( this.context.vertex !== undefined && this.context.vertex !== null ) {
+
+			this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
+
+		}
+
+		for ( const shaderStage of shaderStages ) {
+
+			this.setShaderStage( shaderStage );
 
 			const slots = this.slots[ shaderStage ];
 

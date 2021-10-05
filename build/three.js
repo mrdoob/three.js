@@ -12503,7 +12503,6 @@
 
 				getExtension('OES_texture_float_linear');
 				getExtension('EXT_color_buffer_half_float');
-				getExtension('EXT_multisampled_render_to_texture');
 			},
 			get: function (name) {
 				const extension = getExtension(name);
@@ -17624,8 +17623,6 @@
 			let xrFrame = null;
 			let depthStyle = null;
 			let clearStyle = null;
-			const msaartcSupported = renderer.extensions.has('EXT_multisampled_render_to_texture');
-			let msaaExt = null;
 			const controllers = [];
 			const inputSourcesMap = new Map(); //
 
@@ -17824,9 +17821,7 @@
 							layers: [glProjLayer]
 						});
 
-						if (isMultisample && msaartcSupported) {
-							msaaExt = renderer.extensions.get('EXT_multisampled_render_to_texture');
-						} else if (isMultisample) {
+						if (isMultisample) {
 							glMultisampledFramebuffer = gl.createFramebuffer();
 							glColorRenderbuffer = gl.createRenderbuffer();
 							gl.bindRenderbuffer(gl.RENDERBUFFER, glColorRenderbuffer);
@@ -18055,20 +18050,11 @@
 							const glSubImage = glBinding.getViewSubImage(glProjLayer, view);
 							state.bindXRFramebuffer(glFramebuffer);
 
-							if (isMultisample && msaartcSupported) {
-								if (glSubImage.depthStencilTexture !== undefined) {
-									msaaExt.framebufferTexture2DMultisampleEXT(gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0, 4);
-								}
-
-								msaaExt.framebufferTexture2DMultisampleEXT(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0, 4);
-							} else {
-								if (glSubImage.depthStencilTexture !== undefined) {
-									gl.framebufferTexture2D(gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0);
-								}
-
-								gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
+							if (glSubImage.depthStencilTexture !== undefined) {
+								gl.framebufferTexture2D(gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0);
 							}
 
+							gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0);
 							viewport = glSubImage.viewport;
 						}
 
@@ -18086,7 +18072,7 @@
 						}
 					}
 
-					if (isMultisample && !msaartcSupported) {
+					if (isMultisample) {
 						state.bindXRFramebuffer(glMultisampledFramebuffer);
 						if (clearStyle !== null) gl.clear(clearStyle);
 					}
@@ -18103,7 +18089,7 @@
 
 				if (onAnimationFrameCallback) onAnimationFrameCallback(time, frame);
 
-				if (isMultisample && !msaartcSupported) {
+				if (isMultisample) {
 					const width = glProjLayer.textureWidth;
 					const height = glProjLayer.textureHeight;
 					state.bindFramebuffer(gl.READ_FRAMEBUFFER, glMultisampledFramebuffer);
@@ -19170,7 +19156,7 @@
 			if (scene === null) scene = _emptyScene; // renderBufferDirect second parameter used to be fog (could be null)
 
 			const frontFaceCW = object.isMesh && object.matrixWorld.determinant() < 0;
-			const program = setProgram(camera, scene, material, object);
+			const program = setProgram(camera, scene, geometry, material, object);
 			state.setMaterial(material, frontFaceCW); //
 
 			let index = geometry.index;
@@ -19188,10 +19174,6 @@
 			if (material.wireframe === true) {
 				index = geometries.getWireframeAttribute(geometry);
 				rangeFactor = 2;
-			}
-
-			if (geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined) {
-				morphtargets.update(object, geometry, material, program);
 			}
 
 			bindingStates.setup(object, material, program, geometry, index);
@@ -19553,7 +19535,7 @@
 			material.onBeforeRender(_this, scene, camera, geometry, object, group);
 
 			if (object.isImmediateRenderObject) {
-				const program = setProgram(camera, scene, material, object);
+				const program = setProgram(camera, scene, geometry, material, object);
 				state.setMaterial(material);
 				bindingStates.reset();
 				renderObjectImmediate(object, program);
@@ -19671,7 +19653,7 @@
 			materialProperties.vertexTangents = parameters.vertexTangents;
 		}
 
-		function setProgram(camera, scene, material, object) {
+		function setProgram(camera, scene, geometry, material, object) {
 			if (scene.isScene !== true) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
 
 			textures.resetTextureUnits();
@@ -19679,11 +19661,11 @@
 			const environment = material.isMeshStandardMaterial ? scene.environment : null;
 			const encoding = _currentRenderTarget === null ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 			const envMap = (material.isMeshStandardMaterial ? cubeuvmaps : cubemaps).get(material.envMap || environment);
-			const vertexAlphas = material.vertexColors === true && !!object.geometry && !!object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
-			const vertexTangents = !!material.normalMap && !!object.geometry && !!object.geometry.attributes.tangent;
-			const morphTargets = !!object.geometry && !!object.geometry.morphAttributes.position;
-			const morphNormals = !!object.geometry && !!object.geometry.morphAttributes.normal;
-			const morphTargetsCount = !!object.geometry && !!object.geometry.morphAttributes.position ? object.geometry.morphAttributes.position.length : 0;
+			const vertexAlphas = material.vertexColors === true && !!geometry && !!geometry.attributes.color && geometry.attributes.color.itemSize === 4;
+			const vertexTangents = !!material.normalMap && !!geometry && !!geometry.attributes.tangent;
+			const morphTargets = !!geometry && !!geometry.morphAttributes.position;
+			const morphNormals = !!geometry && !!geometry.morphAttributes.normal;
+			const morphTargetsCount = !!geometry && !!geometry.morphAttributes.position ? geometry.morphAttributes.position.length : 0;
 			const materialProperties = properties.get(material);
 			const lights = currentRenderState.state.lights;
 
@@ -19793,9 +19775,9 @@
 				if (material.isMeshPhongMaterial || material.isMeshToonMaterial || material.isMeshLambertMaterial || material.isMeshBasicMaterial || material.isMeshStandardMaterial || material.isShaderMaterial || material.isShadowMaterial || object.isSkinnedMesh) {
 					p_uniforms.setValue(_gl, 'viewMatrix', camera.matrixWorldInverse);
 				}
-			} // skinning uniforms must be set even if material didn't change
-			// auto-setting of texture unit for bone texture must go before other textures
-			// otherwise textures used for skinning can take over texture units reserved for other material textures
+			} // skinning and morph target uniforms must be set even if material didn't change
+			// auto-setting of texture unit for bone and morph texture must go before other textures
+			// otherwise textures used for skinning and morphing can take over texture units reserved for other material textures
 
 
 			if (object.isSkinnedMesh) {
@@ -19812,6 +19794,10 @@
 						p_uniforms.setOptional(_gl, skeleton, 'boneMatrices');
 					}
 				}
+			}
+
+			if (!!geometry && (geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined)) {
+				morphtargets.update(object, geometry, material, program);
 			}
 
 			if (refreshMaterial || materialProperties.receiveShadow !== object.receiveShadow) {
