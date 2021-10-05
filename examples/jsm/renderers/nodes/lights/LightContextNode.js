@@ -11,7 +11,7 @@ class LightContextNode extends ContextNode {
 
 	constructor( node ) {
 
-		super( node, 'vec3' );
+		super( node );
 
 	}
 

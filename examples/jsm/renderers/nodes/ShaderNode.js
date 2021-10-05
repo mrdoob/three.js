@@ -6,8 +6,9 @@ import Vector3Node from './inputs/Vector3Node.js';
 import Vector4Node from './inputs/Vector4Node.js';
 
 // math
-import MathNode from './math/MathNode.js';
 import OperatorNode from './math/OperatorNode.js';
+import CondNode from './math/CondNode.js';
+import MathNode from './math/MathNode.js';
 
 // utils
 import JoinNode from './utils/JoinNode.js';
@@ -20,7 +21,7 @@ const NodeHandler = {
 
 	construct( NodeClosure, params ) {
 
-		return NodeClosure( params[ 0 ] );
+		return NodeClosure( ShaderNodeObjects( params[ 0 ] ) );
 
 	},
 
@@ -30,7 +31,7 @@ const NodeHandler = {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			const splitProps = prop.match( /^[xyzw]{1,4}$/ );
+			const splitProps = prop.match( /^[xyzwst]{1,4}$/ );
 
 			if ( splitProps !== null ) {
 
@@ -76,6 +77,18 @@ const ShaderNodeObject = ( obj ) => {
 
 };
 
+const ShaderNodeObjects = ( objects ) => {
+
+	for ( const name in objects ) {
+
+		objects[ name ] = ShaderNodeObject( objects[ name ] );
+
+	}
+
+	return objects;
+
+};
+
 const ShaderNodeArray = ( array ) => {
 
 	const len = array.length;
@@ -90,13 +103,24 @@ const ShaderNodeArray = ( array ) => {
 
 };
 
-const ShaderNodeScript = function ( jsFunc ) {
+const ShaderNodeProxy = ( NodeClass, scope ) => {
 
 	return ( ...params ) => {
 
-		ShaderNodeArray( params );
+		return ShaderNodeObject( new NodeClass( scope, ...ShaderNodeArray( params ) ) );
 
-		return ShaderNodeObject( jsFunc( ...params ) );
+	};
+
+};
+
+
+const ShaderNodeScript = function ( jsFunc ) {
+
+	return ( inputs ) => {
+
+		ShaderNodeObjects( inputs );
+
+		return ShaderNodeObject( jsFunc( inputs ) );
 
 	};
 
@@ -134,6 +158,12 @@ export const join = ( ...params ) => {
 
 };
 
+export const cond = ( ...params ) => {
+
+	return ShaderNodeObject( new CondNode( ...ShaderNodeArray( params ) ) );
+
+};
+
 export const vec2 = ( ...params ) => {
 
 	return ShaderNodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
@@ -152,44 +182,20 @@ export const vec4 = ( ...params ) => {
 
 };
 
-export const add = ( ...params ) => {
+export const add = ShaderNodeProxy( OperatorNode, '+' );
+export const sub = ShaderNodeProxy( OperatorNode, '-' );
+export const mul = ShaderNodeProxy( OperatorNode, '*' );
+export const div = ShaderNodeProxy( OperatorNode, '/' );
+export const equals = ShaderNodeProxy( OperatorNode, '==' );
 
-	return ShaderNodeObject( new OperatorNode( '+', ...ShaderNodeArray( params ) ) );
-
-};
-
-export const sub = ( ...params ) => {
-
-	return new OperatorNode( '-', ...ShaderNodeArray( params ) );
-
-};
-
-export const mul = ( ...params ) => {
-
-	return ShaderNodeObject( new OperatorNode( '*', ...ShaderNodeArray( params ) ) );
-
-};
-
-export const div = ( ...params ) => {
-
-	return ShaderNodeObject( new OperatorNode( '/', ...ShaderNodeArray( params ) ) );
-
-};
-
-export const floor = ( ...params ) => {
-
-	return ShaderNodeObject( new MathNode( 'floor', ...ShaderNodeArray( params ) ) );
-
-};
-
-export const mod = ( ...params ) => {
-
-	return ShaderNodeObject( new MathNode( 'mod', ...ShaderNodeArray( params ) ) );
-
-};
-
-export const sign = ( ...params ) => {
-
-	return ShaderNodeObject( new MathNode( 'sign', ...ShaderNodeArray( params ) ) );
-
-};
+export const floor = ShaderNodeProxy( MathNode, 'floor' );
+export const mod = ShaderNodeProxy( MathNode, 'mod' );
+export const cross = ShaderNodeProxy( MathNode, 'cross' );
+export const max = ShaderNodeProxy( MathNode, 'max' );
+export const min = ShaderNodeProxy( MathNode, 'min' );
+export const dot = ShaderNodeProxy( MathNode, 'dot' );
+export const normalize = ShaderNodeProxy( MathNode, 'normalize' );
+export const inversesqrt = ShaderNodeProxy( MathNode, 'inversesqrt' );
+export const sign = ShaderNodeProxy( MathNode, 'sign' );
+export const dFdx = ShaderNodeProxy( MathNode, 'dFdx' );
+export const dFdy = ShaderNodeProxy( MathNode, 'dFdy' );
