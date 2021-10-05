@@ -2,11 +2,25 @@ import TempNode from '../core/TempNode.js';
 
 class OperatorNode extends TempNode {
 
-	constructor( op, a, b ) {
+	constructor( op, a, b, ...params ) {
 
 		super();
 
 		this.op = op;
+
+		if ( params.length > 0 ) {
+
+			let finalB = b;
+
+			for ( let i = 0; i < params.length; i ++ ) {
+
+				finalB = new OperatorNode( op, finalB, params[ i ] );
+
+			}
+
+			b = finalB;
+
+		}
 
 		this.a = a;
 		this.b = b;
@@ -15,30 +29,40 @@ class OperatorNode extends TempNode {
 
 	getNodeType( builder ) {
 
-		const typeA = this.a.getNodeType( builder );
-		const typeB = this.b.getNodeType( builder );
+		const op = this.op;
 
-		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+		if ( op === '==' ) {
 
-			// matrix x vector
+			return 'bool';
 
-			return builder.getVectorFromMatrix( typeA );
+		} else {
 
-		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+			const typeA = this.a.getNodeType( builder );
+			const typeB = this.b.getNodeType( builder );
 
-			// vector x matrix
+			if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
-			return builder.getVectorFromMatrix( typeB );
+				// matrix x vector
 
-		} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+				return builder.getVectorFromMatrix( typeA );
 
-			// anytype x anytype: use the greater length vector
+			} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
 
-			return typeB;
+				// vector x matrix
+
+				return builder.getVectorFromMatrix( typeB );
+
+			} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+
+				// anytype x anytype: use the greater length vector
+
+				return typeB;
+
+			}
+
+			return typeA;
 
 		}
-
-		return typeA;
 
 	}
 

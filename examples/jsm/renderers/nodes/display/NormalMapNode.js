@@ -5,38 +5,39 @@ import MathNode from '../math/MathNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import FloatNode from '../inputs/FloatNode.js';
 import TempNode from '../core/TempNode.js';
-import FunctionNode from '../core/FunctionNode.js';
 import ModelNode from '../accessors/ModelNode.js';
+import { ShaderNode, cond, add, mul, join, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equals } from '../ShaderNode.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
 
-export const perturbNormal2Arb = new FunctionNode( `
-vec3 ( vec3 eye_pos, vec3 surf_norm, vec3 mapN, float faceDirection, const in vec2 uv ) {
+const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
+
+	const { eye_pos, surf_norm, mapN, faceDirection, uv } = inputs;
 
 	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
-	vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
-	vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
-	vec2 st0 = dFdx( uv.st );
-	vec2 st1 = dFdy( uv.st );
+	const q0 = join( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
+	const q1 = join( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
+	const st0 = dFdx( uv.st );
+	const st1 = dFdy( uv.st );
 
-	vec3 N = surf_norm; // normalized
+	const N = surf_norm; // normalized
 
-	vec3 q1perp = cross( q1, N );
-	vec3 q0perp = cross( N, q0 );
+	const q1perp = cross( q1, N );
+	const q0perp = cross( N, q0 );
 
-	vec3 T = q1perp * st0.x + q0perp * st1.x;
-	vec3 B = q1perp * st0.y + q0perp * st1.y;
+	const T = add( mul( q1perp, st0.x ), mul( q0perp, st1.x ) );
+	const B = add( mul( q1perp, st0.y ), mul( q0perp, st1.y ) );
 
-	float det = max( dot( T, T ), dot( B, B ) );
-	float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
+	const det = max( dot( T, T ), dot( B, B ) );
+	const scale = cond( equals( det, 0 ), 0, mul( faceDirection, inversesqrt( det ) ) );
 
-	return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
+	return normalize( add( mul( T, mul( mapN.x, scale ) ), mul( B, mul( mapN.y, scale ) ), mul( N, mapN.z ) ) );
 
-}` );
+} );
 
 class NormalMapNode extends TempNode {
 
@@ -69,7 +70,7 @@ class NormalMapNode extends TempNode {
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
-			const perturbNormal2ArbCall = perturbNormal2Arb.call( {
+			const perturbNormal2ArbCall = perturbNormal2ArbNode( {
 				eye_pos: new PositionNode( PositionNode.VIEW ),
 				surf_norm: new NormalNode( NormalNode.VIEW ),
 				mapN: normalMap,
@@ -78,7 +79,7 @@ class NormalMapNode extends TempNode {
 			} );
 
 			return perturbNormal2ArbCall.build( builder, type );
-			
+
 		}
 
 	}

@@ -28,6 +28,8 @@ class MathNode extends TempNode {
 	static LENGTH = 'length';
 	static NEGATE = 'negate';
 	static INVERT = 'invert';
+	static DFDX = 'dFdx';
+	static DFDY = 'dFdy';
 
 	// 2 inputs
 
