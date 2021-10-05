@@ -132,10 +132,6 @@
 				"SplineCurve": "api/en/extras/curves/SplineCurve"
 			},
 
-			"Extras / Objects": {
-				"ImmediateRenderObject": "api/en/extras/objects/ImmediateRenderObject"
-			},
-
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
 				"CircleGeometry": "api/en/geometries/CircleGeometry",
@@ -639,10 +635,6 @@
 				"QuadraticBezierCurve": "api/zh/extras/curves/QuadraticBezierCurve",
 				"QuadraticBezierCurve3": "api/zh/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/zh/extras/curves/SplineCurve"
-			},
-
-			"附件 / 物体": {
-				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject"
 			},
 
 			"几何体": {
