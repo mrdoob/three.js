@@ -6,7 +6,7 @@ import OperatorNode from '../math/OperatorNode.js';
 import FloatNode from '../inputs/FloatNode.js';
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
-import { ShaderNode, cond, add, mul, join, float, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equals } from '../ShaderNode.js';
+import { ShaderNode, cond, add, mul, join, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equals } from '../ShaderNode.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
