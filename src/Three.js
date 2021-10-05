@@ -125,7 +125,6 @@ export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
 export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
-export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './helpers/SkeletonHelper.js';
 export { PointLightHelper } from './helpers/PointLightHelper.js';
