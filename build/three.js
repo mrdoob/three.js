@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 }(this, (function (exports) { 'use strict';
 
-	const REVISION = '133';
+	const REVISION = '134dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -19090,68 +19090,6 @@
 		} // Buffer rendering
 
 
-		function renderObjectImmediate(object, program) {
-			object.render(function (object) {
-				_this.renderBufferImmediate(object, program);
-			});
-		}
-
-		this.renderBufferImmediate = function (object, program) {
-			bindingStates.initAttributes();
-			const buffers = properties.get(object);
-			if (object.hasPositions && !buffers.position) buffers.position = _gl.createBuffer();
-			if (object.hasNormals && !buffers.normal) buffers.normal = _gl.createBuffer();
-			if (object.hasUvs && !buffers.uv) buffers.uv = _gl.createBuffer();
-			if (object.hasColors && !buffers.color) buffers.color = _gl.createBuffer();
-			const programAttributes = program.getAttributes();
-
-			if (object.hasPositions) {
-				_gl.bindBuffer(_gl.ARRAY_BUFFER, buffers.position);
-
-				_gl.bufferData(_gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW);
-
-				bindingStates.enableAttribute(programAttributes.position.location);
-
-				_gl.vertexAttribPointer(programAttributes.position.location, 3, _gl.FLOAT, false, 0, 0);
-			}
-
-			if (object.hasNormals) {
-				_gl.bindBuffer(_gl.ARRAY_BUFFER, buffers.normal);
-
-				_gl.bufferData(_gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW);
-
-				bindingStates.enableAttribute(programAttributes.normal.location);
-
-				_gl.vertexAttribPointer(programAttributes.normal.location, 3, _gl.FLOAT, false, 0, 0);
-			}
-
-			if (object.hasUvs) {
-				_gl.bindBuffer(_gl.ARRAY_BUFFER, buffers.uv);
-
-				_gl.bufferData(_gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW);
-
-				bindingStates.enableAttribute(programAttributes.uv.location);
-
-				_gl.vertexAttribPointer(programAttributes.uv.location, 2, _gl.FLOAT, false, 0, 0);
-			}
-
-			if (object.hasColors) {
-				_gl.bindBuffer(_gl.ARRAY_BUFFER, buffers.color);
-
-				_gl.bufferData(_gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW);
-
-				bindingStates.enableAttribute(programAttributes.color.location);
-
-				_gl.vertexAttribPointer(programAttributes.color.location, 3, _gl.FLOAT, false, 0, 0);
-			}
-
-			bindingStates.disableUnusedAttributes();
-
-			_gl.drawArrays(_gl.TRIANGLES, 0, object.count);
-
-			object.count = 0;
-		};
-
 		this.renderBufferDirect = function (camera, scene, geometry, material, object, group) {
 			if (scene === null) scene = _emptyScene; // renderBufferDirect second parameter used to be fog (could be null)
 
@@ -19420,12 +19358,6 @@
 							currentRenderList.push(object, geometry, material, groupOrder, _vector3.z, null);
 						}
 					}
-				} else if (object.isImmediateRenderObject) {
-					if (sortObjects) {
-						_vector3.setFromMatrixPosition(object.matrixWorld).applyMatrix4(_projScreenMatrix);
-					}
-
-					currentRenderList.push(object, null, object.material, groupOrder, _vector3.z, null);
 				} else if (object.isMesh || object.isLine || object.isPoints) {
 					if (object.isSkinnedMesh) {
 						// update skeleton only once in a frame
@@ -19534,27 +19466,20 @@
 			object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
 			material.onBeforeRender(_this, scene, camera, geometry, object, group);
 
-			if (object.isImmediateRenderObject) {
-				const program = setProgram(camera, scene, geometry, material, object);
-				state.setMaterial(material);
-				bindingStates.reset();
-				renderObjectImmediate(object, program);
+			if (material.transparent === true && material.side === DoubleSide) {
+				material.side = BackSide;
+				material.needsUpdate = true;
+
+				_this.renderBufferDirect(camera, scene, geometry, material, object, group);
+
+				material.side = FrontSide;
+				material.needsUpdate = true;
+
+				_this.renderBufferDirect(camera, scene, geometry, material, object, group);
+
+				material.side = DoubleSide;
 			} else {
-				if (material.transparent === true && material.side === DoubleSide) {
-					material.side = BackSide;
-					material.needsUpdate = true;
-
-					_this.renderBufferDirect(camera, scene, geometry, material, object, group);
-
-					material.side = FrontSide;
-					material.needsUpdate = true;
-
-					_this.renderBufferDirect(camera, scene, geometry, material, object, group);
-
-					material.side = DoubleSide;
-				} else {
-					_this.renderBufferDirect(camera, scene, geometry, material, object, group);
-				}
+				_this.renderBufferDirect(camera, scene, geometry, material, object, group);
 			}
 
 			object.onAfterRender(_this, scene, camera, geometry, material, group);
@@ -19592,7 +19517,7 @@
 				}
 			} else {
 				parameters.uniforms = programCache.getUniforms(material);
-				material.onBuild(parameters, _this);
+				material.onBuild(object, parameters, _this);
 				material.onBeforeCompile(parameters, _this);
 				program = programCache.acquireProgram(parameters, programCacheKey);
 				programs.set(programCacheKey, program);
@@ -19661,11 +19586,11 @@
 			const environment = material.isMeshStandardMaterial ? scene.environment : null;
 			const encoding = _currentRenderTarget === null ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 			const envMap = (material.isMeshStandardMaterial ? cubeuvmaps : cubemaps).get(material.envMap || environment);
-			const vertexAlphas = material.vertexColors === true && !!geometry && !!geometry.attributes.color && geometry.attributes.color.itemSize === 4;
-			const vertexTangents = !!material.normalMap && !!geometry && !!geometry.attributes.tangent;
-			const morphTargets = !!geometry && !!geometry.morphAttributes.position;
-			const morphNormals = !!geometry && !!geometry.morphAttributes.normal;
-			const morphTargetsCount = !!geometry && !!geometry.morphAttributes.position ? geometry.morphAttributes.position.length : 0;
+			const vertexAlphas = material.vertexColors === true && !!geometry.attributes.color && geometry.attributes.color.itemSize === 4;
+			const vertexTangents = !!material.normalMap && !!geometry.attributes.tangent;
+			const morphTargets = !!geometry.morphAttributes.position;
+			const morphNormals = !!geometry.morphAttributes.normal;
+			const morphTargetsCount = !!geometry.morphAttributes.position ? geometry.morphAttributes.position.length : 0;
 			const materialProperties = properties.get(material);
 			const lights = currentRenderState.state.lights;
 
@@ -28050,14 +27975,13 @@
 			if (url === undefined) url = '';
 			if (this.path !== undefined) url = this.path + url;
 			url = this.manager.resolveURL(url);
-			const scope = this;
 			const cached = Cache.get(url);
 
 			if (cached !== undefined) {
-				scope.manager.itemStart(url);
-				setTimeout(function () {
+				this.manager.itemStart(url);
+				setTimeout(() => {
 					if (onLoad) onLoad(cached);
-					scope.manager.itemEnd(url);
+					this.manager.itemEnd(url);
 				}, 0);
 				return cached;
 			} // Check if request is duplicate
@@ -28070,155 +27994,121 @@
 					onError: onError
 				});
 				return;
-			} // Check for data: URI
+			} // Initialise array for duplicate requests
 
 
-			const dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
-			const dataUriRegexResult = url.match(dataUriRegex);
-			let request; // Safari can not handle Data URIs through XMLHttpRequest so process manually
+			loading[url] = [];
+			loading[url].push({
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
+			}); // create request
 
-			if (dataUriRegexResult) {
-				const mimeType = dataUriRegexResult[1];
-				const isBase64 = !!dataUriRegexResult[2];
-				let data = dataUriRegexResult[3];
-				data = decodeURIComponent(data);
-				if (isBase64) data = atob(data);
+			const req = new Request(url, {
+				headers: new Headers(this.requestHeader),
+				credentials: this.withCredentials ? 'include' : 'same-origin' // An abort controller could be added within a future PR
 
-				try {
-					let response;
-					const responseType = (this.responseType || '').toLowerCase();
+			}); // start the fetch
 
-					switch (responseType) {
-						case 'arraybuffer':
-						case 'blob':
-							const view = new Uint8Array(data.length);
+			fetch(req).then(response => {
+				if (response.status === 200 || response.status === 0) {
+					// Some browsers return HTTP Status 0 when using non-http protocol
+					// e.g. 'file://' or 'data://'. Handle as success.
+					if (response.status === 0) {
+						console.warn('THREE.FileLoader: HTTP Status 0 received.');
+					}
 
-							for (let i = 0; i < data.length; i++) {
-								view[i] = data.charCodeAt(i);
-							}
+					const callbacks = loading[url];
+					const reader = response.body.getReader();
+					const contentLength = response.headers.get('Content-Length');
+					const total = contentLength ? parseInt(contentLength) : 0;
+					const lengthComputable = total !== 0;
+					let loaded = 0; // periodically read data into the new stream tracking while download progress
 
-							if (responseType === 'blob') {
-								response = new Blob([view.buffer], {
-									type: mimeType
+					return new ReadableStream({
+						start(controller) {
+							readData();
+
+							function readData() {
+								reader.read().then(({
+									done,
+									value
+								}) => {
+									if (done) {
+										controller.close();
+									} else {
+										loaded += value.byteLength;
+										const event = new ProgressEvent('progress', {
+											lengthComputable,
+											loaded,
+											total
+										});
+
+										for (let i = 0, il = callbacks.length; i < il; i++) {
+											const callback = callbacks[i];
+											if (callback.onProgress) callback.onProgress(event);
+										}
+
+										controller.enqueue(value);
+										readData();
+									}
 								});
-							} else {
-								response = view.buffer;
 							}
+						}
 
-							break;
+					});
+				} else {
+					throw Error(`fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`);
+				}
+			}).then(stream => {
+				const response = new Response(stream);
 
-						case 'document':
+				switch (this.responseType) {
+					case 'arraybuffer':
+						return response.arrayBuffer();
+
+					case 'blob':
+						return response.blob();
+
+					case 'document':
+						return response.text().then(text => {
 							const parser = new DOMParser();
-							response = parser.parseFromString(data, mimeType);
-							break;
+							return parser.parseFromString(text, this.mimeType);
+						});
 
-						case 'json':
-							response = JSON.parse(data);
-							break;
+					case 'json':
+						return response.json();
 
-						default:
-							// 'text' or other
-							response = data;
-							break;
-					} // Wait for next browser tick like standard XMLHttpRequest event dispatching does
-
-
-					setTimeout(function () {
-						if (onLoad) onLoad(response);
-						scope.manager.itemEnd(url);
-					}, 0);
-				} catch (error) {
-					// Wait for next browser tick like standard XMLHttpRequest event dispatching does
-					setTimeout(function () {
-						if (onError) onError(error);
-						scope.manager.itemError(url);
-						scope.manager.itemEnd(url);
-					}, 0);
+					default:
+						return response.text();
 				}
-			} else {
-				// Initialise array for duplicate requests
-				loading[url] = [];
-				loading[url].push({
-					onLoad: onLoad,
-					onProgress: onProgress,
-					onError: onError
-				});
-				request = new XMLHttpRequest();
-				request.open('GET', url, true);
-				request.addEventListener('load', function (event) {
-					const response = this.response;
-					const callbacks = loading[url];
-					delete loading[url];
+			}).then(data => {
+				// Add to cache only on HTTP success, so that we do not cache
+				// error response bodies as proper responses to requests.
+				Cache.add(url, data);
+				const callbacks = loading[url];
+				delete loading[url];
 
-					if (this.status === 200 || this.status === 0) {
-						// Some browsers return HTTP Status 0 when using non-http protocol
-						// e.g. 'file://' or 'data://'. Handle as success.
-						if (this.status === 0) console.warn('THREE.FileLoader: HTTP Status 0 received.'); // Add to cache only on HTTP success, so that we do not cache
-						// error response bodies as proper responses to requests.
-
-						Cache.add(url, response);
-
-						for (let i = 0, il = callbacks.length; i < il; i++) {
-							const callback = callbacks[i];
-							if (callback.onLoad) callback.onLoad(response);
-						}
-
-						scope.manager.itemEnd(url);
-					} else {
-						for (let i = 0, il = callbacks.length; i < il; i++) {
-							const callback = callbacks[i];
-							if (callback.onError) callback.onError(event);
-						}
-
-						scope.manager.itemError(url);
-						scope.manager.itemEnd(url);
-					}
-				}, false);
-				request.addEventListener('progress', function (event) {
-					const callbacks = loading[url];
-
-					for (let i = 0, il = callbacks.length; i < il; i++) {
-						const callback = callbacks[i];
-						if (callback.onProgress) callback.onProgress(event);
-					}
-				}, false);
-				request.addEventListener('error', function (event) {
-					const callbacks = loading[url];
-					delete loading[url];
-
-					for (let i = 0, il = callbacks.length; i < il; i++) {
-						const callback = callbacks[i];
-						if (callback.onError) callback.onError(event);
-					}
-
-					scope.manager.itemError(url);
-					scope.manager.itemEnd(url);
-				}, false);
-				request.addEventListener('abort', function (event) {
-					const callbacks = loading[url];
-					delete loading[url];
-
-					for (let i = 0, il = callbacks.length; i < il; i++) {
-						const callback = callbacks[i];
-						if (callback.onError) callback.onError(event);
-					}
-
-					scope.manager.itemError(url);
-					scope.manager.itemEnd(url);
-				}, false);
-				if (this.responseType !== undefined) request.responseType = this.responseType;
-				if (this.withCredentials !== undefined) request.withCredentials = this.withCredentials;
-				if (request.overrideMimeType) request.overrideMimeType(this.mimeType !== undefined ? this.mimeType : 'text/plain');
-
-				for (const header in this.requestHeader) {
-					request.setRequestHeader(header, this.requestHeader[header]);
+				for (let i = 0, il = callbacks.length; i < il; i++) {
+					const callback = callbacks[i];
+					if (callback.onLoad) callback.onLoad(data);
 				}
 
-				request.send(null);
-			}
+				this.manager.itemEnd(url);
+			}).catch(err => {
+				// Abort errors and other errors are handled the same
+				const callbacks = loading[url];
+				delete loading[url];
 
-			scope.manager.itemStart(url);
-			return request;
+				for (let i = 0, il = callbacks.length; i < il; i++) {
+					const callback = callbacks[i];
+					if (callback.onError) callback.onError(err);
+				}
+
+				this.manager.itemError(url);
+				this.manager.itemEnd(url);
+			});
+			this.manager.itemStart(url);
 		}
 
 		setResponseType(value) {
@@ -33537,28 +33427,6 @@
 
 	}
 
-	class ImmediateRenderObject extends Object3D {
-		constructor(material) {
-			super();
-			this.material = material;
-
-			this.render = function () {};
-
-			this.hasPositions = false;
-			this.hasNormals = false;
-			this.hasColors = false;
-			this.hasUvs = false;
-			this.positionArray = null;
-			this.normalArray = null;
-			this.colorArray = null;
-			this.uvArray = null;
-			this.count = 0;
-		}
-
-	}
-
-	ImmediateRenderObject.prototype.isImmediateRenderObject = true;
-
 	const _vector$3 = /*@__PURE__*/new Vector3();
 
 	class SpotLightHelper extends Object3D {
@@ -35915,6 +35783,9 @@
 	}
 	function Font() {
 		console.error('THREE.Font has been moved to /examples/jsm/loaders/FontLoader.js');
+	}
+	function ImmediateRenderObject() {
+		console.error('THREE.ImmediateRenderObject has been removed.');
 	}
 
 	if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
