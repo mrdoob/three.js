@@ -54,9 +54,9 @@ function createElementNS( name ) {
 
 }
 
- /**
+/**
   * cyrb53 hash for string from: https://stackoverflow.com/a/52171480
-  * 
+  *
   * Public Domain, @bryc - https://stackoverflow.com/users/815680/bryc
   *
   * It is roughly similar to the well-known MurmurHash/xxHash algorithms. It uses a combination
@@ -64,7 +64,7 @@ function createElementNS( name ) {
   * faster than either would be in JavaScript and significantly simpler to implement. Keep in
   * mind this is not a secure algorithm, if privacy/security is a concern, this is not for you.
   *
-  * @param {string} str 
+  * @param {string} str
   * @param {number} seed, default 0
   * @returns number
   */
@@ -72,7 +72,7 @@ function hashString( str, seed = 0 ) {
 
 	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
 
-	for ( let i = 0, ch; i < str.length; i++ ) {
+	for ( let i = 0, ch; i < str.length; i ++ ) {
 
 		ch = str.charCodeAt( i );
 
