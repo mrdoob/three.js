@@ -583,9 +583,7 @@ class WebXRManager extends EventDispatcher {
 						newRenderTarget,
 						0,
 						0,
-						{
-							framebuffer: glBaseLayer.framebuffer
-						} );
+						glBaseLayer.framebuffer );
 
 				}
 
@@ -622,6 +620,7 @@ class WebXRManager extends EventDispatcher {
 								newRenderTarget,
 								0,
 								0,
+								undefined,
 								{
 									colorTexture: glSubImage.colorTexture,
 									depthTexture: glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture

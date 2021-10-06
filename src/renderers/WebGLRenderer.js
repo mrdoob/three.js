@@ -1855,12 +1855,12 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0, options = {} ) {
+	this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0, defaultFramebuffer = undefined, options = {} ) {
 
 		_currentRenderTarget = renderTarget;
 		_currentActiveCubeFace = activeCubeFace;
 		_currentActiveMipmapLevel = activeMipmapLevel;
-		const useDefaultFramebuffer = options.framebuffer === undefined;
+		const useDefaultFramebuffer = defaultFramebuffer === undefined;
 
 		if ( renderTarget ) {
 
@@ -1898,7 +1898,7 @@ function WebGLRenderer( parameters = {} ) {
 
 				// We need to make sure to rebind the framebuffer.
 				state.bindFramebuffer( _gl.FRAMEBUFFER, null );
-				renderTargetProperties.__webglFramebuffer = options.framebuffer;
+				renderTargetProperties.__webglFramebuffer = defaultFramebuffer;
 
 			} else if ( renderTargetProperties.__webglFramebuffer === undefined ) {
 
