@@ -871,7 +871,7 @@ class Chunk {
 
 		let s = '';
 		let c = this.readByte();
-		while ( c )
+		while ( c ) {
 			s += String.fromCharCode( c );
 			c = this.readByte();
 		}
