@@ -10,10 +10,24 @@ class WebGPUProgrammableStage {
 		this.type = type;
 		this.usedTimes = 0;
 
-		const byteCode = glslang.compileGLSL( code, type );
+		let data = null;
+
+		if ( /^#version 450/.test( code ) === true ) {
+
+			// GLSL
+
+			data = glslang.compileGLSL( code, type );
+
+		} else {
+
+			// WGSL
+
+			data = code;
+
+		}
 
 		this.stage = {
-			module: device.createShaderModule( { code: byteCode } ),
+			module: device.createShaderModule( { code: data } ),
 			entryPoint: 'main'
 		};
 
