@@ -777,7 +777,7 @@ class Chunk {
 	 */
 	readByte() {
 
-		let v = this.data.getUint8( this.position, true );
+		const v = this.data.getUint8( this.position, true );
 		this.position += 1;
 		return v;
 
@@ -793,13 +793,14 @@ class Chunk {
 
 		try {
 
-			let v = this.data.getFloat32( this.position, true );
+			const v = this.data.getFloat32( this.position, true );
 			this.position += 4;
 			return v;
 
 		}	catch ( e ) {
 
 			this.debugMessage( e + ' ' + this.position + ' ' + this.data.byteLength );
+			return 0;
 
 		}
 
@@ -813,7 +814,7 @@ class Chunk {
 	 */
 	readInt() {
 
-		let v = this.data.getInt32( this.position, true );
+		const v = this.data.getInt32( this.position, true );
 		this.position += 4;
 		return v;
 
@@ -827,7 +828,7 @@ class Chunk {
 	 */
 	readShort() {
 
-		let v = this.data.getInt16( this.position, true );
+		const v = this.data.getInt16( this.position, true );
 		this.position += 2;
 		return v;
 
@@ -841,7 +842,7 @@ class Chunk {
 	 */
 	readDWord() {
 
-		let v = this.data.getUint32( this.position, true );
+		const v = this.data.getUint32( this.position, true );
 		this.position += 4;
 		return v;
 
@@ -855,7 +856,7 @@ class Chunk {
 	 */
 	readWord() {
 
-		let v = this.data.getUint16( this.position, true );
+		const v = this.data.getUint16( this.position, true );
 		this.position += 2;
 		return v;
 
