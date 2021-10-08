@@ -1332,18 +1332,22 @@
 			}
 
 			function parseEffectExtraTechniqueBump( xml ) {
+
 				var data = {};
 
 				for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					var child = xml.childNodes[ i ];
-
 					if ( child.nodeType !== 1 ) continue;
 
 					switch ( child.nodeName ) {
 
 						case 'texture':
-							data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), texcoord: child.getAttribute( 'texcoord' ), extra: parseEffectParameterTexture( child ) };
+							data[ child.nodeName ] = {
+								id: child.getAttribute( 'texture' ),
+								texcoord: child.getAttribute( 'texcoord' ),
+								extra: parseEffectParameterTexture( child )
+							};
 							break;
 
 					}
@@ -1607,16 +1611,16 @@
 
 				if ( technique.extra !== undefined && technique.extra.technique !== undefined ) {
 
-					let techniques = technique.extra.technique;
+					const techniques = technique.extra.technique;
 
-					for ( let k in techniques ) {
+					for ( const k in techniques ) {
 
-						let v = techniques[k];
+						const v = techniques[ k ];
 
-						switch (k) {
+						switch ( k ) {
 
 							case 'double_sided':
-								material.side = ( v === 1 ? THREE.DoubleSide : THREE.FrontSide );
+								material.side = v === 1 ? THREE.DoubleSide : THREE.FrontSide;
 								break;
 
 							case 'bump':
