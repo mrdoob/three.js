@@ -16,9 +16,13 @@
 
 			import * as THREE from '../build/three.module.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 
 			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x505050 );
+
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera.position.y = 1.6;
 
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -29,9 +33,14 @@
 			const geometry = new THREE.BoxGeometry();
 			const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 			const cube = new THREE.Mesh( geometry, material );
+			cube.position.set( 0, 1.2, -2 );
 			scene.add( cube );
 
-			camera.position.z = 5;
+			const room = new THREE.LineSegments(
+				new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+				new THREE.LineBasicMaterial( { color: 0x808080 } )
+			);
+			scene.add( room );
 
 			renderer.setAnimationLoop( function () {
 
