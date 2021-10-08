@@ -2,6 +2,7 @@ import {
 	Mesh,
 	PlaneGeometry,
 	MeshBasicMaterial,
+	Matrix4,
 	// testing
 	BoxGeometry,
 	MeshNormalMaterial
@@ -12,15 +13,14 @@ const MESH_MODE = 1;
 
 class XRLayerHelper extends Mesh {
 
-	constructor( renderer, texture, width, height ) {
+	constructor( renderer, params ) {
 
 		super();
 
 		this.isXRLayerHelper = true
 		this.renderer = renderer;
-		this.texture = texture;
-		this.width = width;
-		this.height = height;
+		this.params = params;
+		this.xrLayerMatrix = new Matrix4();
 
 		this.init();
 
@@ -48,27 +48,68 @@ class XRLayerHelper extends Mesh {
 
 	updateMesh() {
 
-		this.geometry = new PlaneGeometry( this.width, this.height );
-
-		this.material = new MeshBasicMaterial( { map: this.texture } );
-
-		/*
-
-		snellenTexture = new THREE.TextureLoader().load( "textures/snellen.png" );
-		snellenTexture.repeat.x = snellenConfig.cropX;
-		snellenTexture.repeat.y = snellenConfig.cropY;
-
-		const snellenMeshMipMap = new THREE.Mesh(
-			new THREE.PlaneGeometry( snellenConfig.widthMeters, snellenConfig.heightMeters ),
-			new THREE.MeshBasicMaterial( { map: snellenTexture } )
+		this.geometry = new PlaneGeometry(
+			this.params.layerWidth,
+			this.params.layerHeight
 		);
 
-		snellenMeshMipMap.position.x = snellenConfig.x + snellenConfig.widthMeters;
-		snellenMeshMipMap.position.y = snellenConfig.y - snellenConfig.heightMeters;
+		this.material = new MeshBasicMaterial( { opacity: 0 } );
 
-		eyeCharts.add( snellenMeshMipMap );
+	}
 
-		*/
+	makeXRLayer() {
+
+		this.session.requestReferenceSpace( 'local-floor' ).then( ( refSpace ) => {
+
+			this.params.cropX = this.params.widthPx / this.params.textureSizePx;
+			this.params.cropY = this.params.heightPx / this.params.textureSizePx;
+
+			const quadLayerConfig = {
+				width: .5 * this.params.layerWidth / this.params.cropX,
+				height: .5 * this.params.layerHeight / this.params.cropY,
+				viewPixelWidth: this.params.textureSizePx,
+				viewPixelHeight: this.params.textureSizePx,
+				isStatic: true,
+				space: refSpace,
+				layout: "mono"
+			};
+
+			// quadLayerConfig.mipLevels = this.params.mipLevels;
+
+			this.XRLayer = this.glBinding.createQuadLayer( quadLayerConfig );
+
+			this.updateTransform();
+
+			this.session.updateRenderState( {
+				layers: [
+					this.XRLayer,
+					// this is the projection layer, the one on which the scene is drawn.
+					this.session.renderState.layers[ 0 ]
+				]
+			} );
+
+		} );
+
+	}
+
+	updateTransform() {
+
+		if ( this.XRLayer ) {
+
+			this.updateMatrixWorld();
+
+			if ( !this.xrLayerMatrix.equals( this.matrixWorld ) ) {
+
+				this.XRLayer.transform = new XRRigidTransform(
+					this.position,
+					this.quaternion
+				);
+
+				this.xrLayerMatrix.copy( this.matrixWorld );
+
+			}
+
+		}
 
 	}
 
@@ -106,7 +147,7 @@ class XRLayerHelper extends Mesh {
 				// is falsy, it means we need to create an XRLayer and
 				// reference it in this.XRLayer.
 
-				// this.makeXRLayer();
+				this.makeXRLayer();
 
 			}
 
@@ -117,6 +158,41 @@ class XRLayerHelper extends Mesh {
 	update( frame ) {
 
 		this.updateMode();
+
+		this.updateTransform();
+
+		//
+
+		if (
+			this.mode === XRLAYER_MODE &&
+			this.XRLayer &&
+			this.XRLayer.needsRedraw
+		) {
+
+			// Copy images to layers as required.
+			// needsRedraw is set on creation or if the underlying GL resources of a layer are lost.
+
+			const gl = this.renderer.getContext();
+
+			const glayer = this.glBinding.getSubImage( this.XRLayer, frame );
+
+			this.renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
+
+			gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+
+			gl.texSubImage2D(
+				gl.TEXTURE_2D,
+				0,
+				( this.params.textureSizePx - this.params.widthPx ) / 2,
+				( this.params.textureSizePx - this.params.heightPx ) / 2,
+				this.params.widthPx,
+				this.params.heightPx,
+				gl.RGBA,
+				gl.UNSIGNED_BYTE,
+				this.params.texture.image
+			);
+
+		}
 
 	}
 

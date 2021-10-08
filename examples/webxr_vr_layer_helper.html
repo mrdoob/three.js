@@ -41,11 +41,21 @@
 
 			// XR LAYER
 
-			const texture = new THREE.TextureLoader().load( "textures/snellen.png" );
-			const layerWidth = 1.3;
-			const layerHeight = 0.5;
+			const params = {
+				texture: new THREE.TextureLoader().load( "textures/snellen.png" ),
+				textureSize: 1024,
+				textureWidth: 1024,
+				textureHeight: 512,
+				mipLevels: 3,
+				layerWidth: 0.5,
+				layerHeight: 0.7,
+				//
+				textureSizePx: 512,
+				widthPx: 320,
+				heightPx: 450
+			}
 
-			const layer = new XRLayerHelper( renderer, texture, layerWidth, layerHeight );
+			const layer = new XRLayerHelper( renderer, params );
 			scene.add( layer );
 
 			// RENDER LOOP
@@ -57,6 +67,8 @@
 					Math.cos( time * 0.001 ) * 0.5 + 1.4,
 					-2
 				);
+
+				layer.rotation.x = Math.cos( time * 0.001 ) * 0.5;
 
 				layer.update( xrFrame );
 
