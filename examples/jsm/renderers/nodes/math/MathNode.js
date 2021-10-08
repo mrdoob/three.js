@@ -1,4 +1,9 @@
 import TempNode from '../core/Node.js';
+import Vector4Node from '../inputs/Vector4Node.js';
+import SplitNode from '../utils/SplitNode.js';
+import OperatorNode from './OperatorNode.js';
+
+import { Vector4 } from 'three';
 
 class MathNode extends TempNode {
 
@@ -30,6 +35,7 @@ class MathNode extends TempNode {
 	static INVERT = 'invert';
 	static DFDX = 'dFdx';
 	static DFDY = 'dFdy';
+	static SATURATE = 'saturate'
 
 	// 2 inputs
 
@@ -42,6 +48,7 @@ class MathNode extends TempNode {
 	static DOT = 'dot';
 	static CROSS = 'cross';
 	static POW = 'pow';
+	static TRANSFORM_DIRECTION = 'transformDirection';
 
 	// 3 inputs
 
@@ -114,7 +121,20 @@ class MathNode extends TempNode {
 		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
 
-		if ( method === MathNode.NEGATE ) {
+		if ( method === MathNode.TRANSFORM_DIRECTION ) {
+
+			// dir can be either a direction vector or a normal vector
+			// upper-left 3x3 of matrix is assumed to be orthogonal
+
+			const mulNode = new SplitNode( new OperatorNode( '*', this.a, this.b ), 'xyz' );
+
+			return new MathNode( MathNode.NORMALIZE, mulNode ).build( builder );
+
+		} else if ( method === MathNode.SATURATE ) {
+
+			return `clamp( ${ this.a.build( builder, inputType ) }, 0.0, 1.0 )`;
+
+		} else if ( method === MathNode.NEGATE ) {
 
 			return '( -' + this.a.build( builder, inputType ) + ' )';
 

@@ -1,68 +1,43 @@
-import FunctionNode from '../core/FunctionNode.js';
-import { pow2 } from './MathFunctions.js';
+import { ShaderNode,
+	add, sub, mul, div, saturate, dot, pow, pow2, exp2, normalize, max, sqrt, negate,
+	cond, greaterThan, and,
+	transformedNormalView, positionViewDirection,
+	materialDiffuseColor, materialSpecularTint, materialRoughness,
+	PI, RECIPROCAL_PI, EPSILON
+} from '../ShaderNode.js';
 
-export const F_Schlick = new FunctionNode( `
-vec3 F_Schlick( const in vec3 f0, const in float f90, const in float dotVH  ) {
+export const F_Schlick = new ShaderNode( ( inputs ) => {
+
+	const { f0, f90, dotVH } = inputs;
 
 	// Original approximation by Christophe Schlick '94
 	// float fresnel = pow( 1.0 - dotVH, 5.0 );
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
-	float fresnel = exp2( ( -5.55473 * dotVH - 6.98316 ) * dotVH );
+	const fresnel = exp2( mul( sub( mul( - 5.55473, dotVH ), 6.98316 ), dotVH ) );
 
-	return ( f90 - f0 ) * fresnel + f0;
+	return mul( sub( f90, f0 ), add( fresnel, f0 ) );
 
-}` ); // validated
+} ); // validated
 
-export const G_BlinnPhong_Implicit = new FunctionNode( `
-float G_BlinnPhong_Implicit() {
+export const BRDF_Lambert = new ShaderNode( ( inputs ) => {
 
-	// ( const in float dotNL, const in float dotNV )
-	// geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)
+	return mul( RECIPROCAL_PI, inputs.diffuseColor ); // punctual light
 
-	return 0.25;
+} ); // validated
 
-}` ); // validated
+export const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 
-export const BRDF_Lambert = new FunctionNode( `
-vec3 BRDF_Lambert( const in vec3 diffuseColor ) {
+	const { lightDistance, cutoffDistance, decayExponent } = inputs;
 
-	return RECIPROCAL_PI * diffuseColor;
+	return cond(
+		and( greaterThan( cutoffDistance, 0 ), greaterThan( decayExponent, 0 ) ),
+		pow( saturate( add( div( negate( lightDistance ), cutoffDistance ), 1.0 ) ), decayExponent ),
+		1.0
+	);
 
-}` ); // validated
-
-export const getDistanceAttenuation = new FunctionNode( `
-float getDistanceAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
-
-#if defined ( PHYSICALLY_CORRECT_LIGHTS )
-
-	// based upon Frostbite 3 Moving to Physically-based Rendering
-	// page 32, equation 26: E[window1]
-	// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-	float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
-
-	if( cutoffDistance > 0.0 ) {
-
-		distanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
-
-	}
-
-	return distanceFalloff;
-
-#else
-
-	if( cutoffDistance > 0.0 && decayExponent > 0.0 ) {
-
-		return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
-
-	}
-
-	return 1.0;
-
-#endif
-
-}` ).setIncludes( [ pow2 ] );
+} ); // validated
 
 //
 // STANDARD
@@ -70,90 +45,78 @@ float getDistanceAttenuation( float lightDistance, float cutoffDistance, float d
 
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-export const V_GGX_SmithCorrelated = new FunctionNode( `
-float V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
+export const V_GGX_SmithCorrelated = new ShaderNode( ( inputs ) => {
 
-	float a2 = pow2( alpha );
+	const { alpha, dotNL, dotNV } = inputs;
 
-	float gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
-	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
+	const a2 = pow2( alpha );
 
-	return 0.5 / max( gv + gl, EPSILON );
+	const gv = mul( dotNL, sqrt( add( a2, mul( sub( 1.0, a2 ), pow2( dotNV ) ) ) ) );
+	const gl = mul( dotNV, sqrt( add( a2, mul( sub( 1.0, a2 ), pow2( dotNL ) ) ) ) );
 
-}` ).setIncludes( [ pow2 ] );
+	return div( 0.5, max( add( gv, gl ), EPSILON ) );
+
+} ); // validated
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
-export const D_GGX = new FunctionNode( `
-float D_GGX( const in float alpha, const in float dotNH ) {
+export const D_GGX = new ShaderNode( ( inputs ) => {
 
-	float a2 = pow2( alpha );
+	const { alpha, dotNH } = inputs;
 
-	float denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1
+	const a2 = pow2( alpha );
 
-	return RECIPROCAL_PI * a2 / pow2( denom );
+	const denom = add( mul( pow2( dotNH ), sub( a2, 1.0 ) ), 1.0 ); // avoid alpha = 0 with dotNH = 1
 
-}` ).setIncludes( [ pow2 ] );
+	return mul( RECIPROCAL_PI, div( a2, pow2( denom ) ) );
+
+} ); // validated
+
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-export const BRDF_Specular_GGX = new FunctionNode( `
-vec3 BRDF_Specular_GGX( vec3 lightDirection, const in vec3 f0, const in float f90, const in float roughness ) {
+export const BRDF_Specular_GGX = new ShaderNode( ( inputs ) => {
 
-	float alpha = pow2( roughness ); // UE4's roughness
+	const { lightDirection, f0, f90, roughness } = inputs;
 
-	vec3 halfDir = normalize( lightDirection + PositionViewDirection );
+	const alpha = pow2( roughness ); // UE4's roughness
 
-	float dotNL = saturate( dot( TransformedNormalView, lightDirection ) );
-	float dotNV = saturate( dot( TransformedNormalView, PositionViewDirection ) );
-	float dotNH = saturate( dot( TransformedNormalView, halfDir ) );
-	float dotVH = saturate( dot( PositionViewDirection, halfDir ) );
+	const halfDir = normalize( add( lightDirection, positionViewDirection ) );
 
-	vec3 F = F_Schlick( f0, f90, dotVH );
+	const dotNL = saturate( dot( transformedNormalView, lightDirection ) );
+	const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
+	const dotNH = saturate( dot( transformedNormalView, halfDir ) );
+	const dotVH = saturate( dot( positionViewDirection, halfDir ) );
 
-	float V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+	const F = F_Schlick( { f0, f90, dotVH } );
 
-	float D = D_GGX( alpha, dotNH );
+	const V = V_GGX_SmithCorrelated( { alpha, dotNL, dotNV } );
 
-	return F * ( V * D );
+	const D = D_GGX( { alpha, dotNH } );
 
-}` ).setIncludes( [ pow2, F_Schlick, V_GGX_SmithCorrelated, D_GGX ] ); // validated
+	return mul( F, mul( V, D ) );
 
-export const RE_Direct_Physical = new FunctionNode( `
-void RE_Direct_Physical( inout ReflectedLight reflectedLight, vec3 lightDirection, vec3 lightColor ) {
+} ); // validated
 
-	float dotNL = saturate( dot( TransformedNormalView, lightDirection ) );
-	vec3 irradiance = dotNL * lightColor;
+export const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 
-#ifndef PHYSICALLY_CORRECT_LIGHTS
+	const { lightDirection, lightColor, directDiffuse, directSpecular } = inputs;
 
-		irradiance *= PI; // punctual light
+	const dotNL = saturate( dot( transformedNormalView, lightDirection ) );
+	let irradiance = mul( dotNL, lightColor );
 
-#endif
+	irradiance = mul( irradiance, PI ); // punctual light
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( MaterialDiffuseColor.rgb );
+	directDiffuse.value = add( directDiffuse.value, mul( irradiance, BRDF_Lambert( { diffuseColor: materialDiffuseColor } ) ) );
 
-	reflectedLight.directSpecular += irradiance * BRDF_Specular_GGX( lightDirection, MaterialSpecularTint, 1.0, MaterialRoughness );
+	directSpecular.value = add( directSpecular.value, mul( irradiance, BRDF_Specular_GGX( { lightDirection, f0: materialSpecularTint, f90: 1, roughness: materialRoughness } ) ) );
 
-}` ).setIncludes( [ BRDF_Lambert, BRDF_Specular_GGX ] );
+} );
 
-export const PhysicalLightingModel = new FunctionNode( `
-void ( inout ReflectedLight reflectedLight, vec3 lightDirection, vec3 lightColor ) {
+export const PhysicalLightingModel = new ShaderNode( ( inputs/*, builder*/ ) => {
 
-	RE_Direct_Physical( reflectedLight, lightDirection, lightColor );
+	// PHYSICALLY_CORRECT_LIGHTS <-> builder.renderer.physicallyCorrectLights === true
 
-}` ).setIncludes( [ RE_Direct_Physical ] );
+	RE_Direct_Physical( inputs );
 
-// utils
-
-// Trowbridge-Reitz distribution to Mip level, following the logic of http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-export const getSpecularMIPLevel = new FunctionNode( `
-float ( const in float roughness, const in float maxMIPLevelScalar ) {
-
-	float sigma = PI * roughness * roughness / ( 1.0 + roughness );
-	float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );
-
-	// clamp to allowable LOD ranges.
-	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
-
-}` );
+} );

@@ -1,11 +1,8 @@
 import ContextNode from '../core/ContextNode.js';
-import StructNode from '../core/StructNode.js';
+import VarNode from '../core/VarNode.js';
+import Vector3Node from '../inputs/Vector3Node.js';
+import OperatorNode from '../math/OperatorNode.js';
 import { PhysicalLightingModel } from '../functions/BSDFs.js';
-
-const reflectedLightStruct = new StructNode( {
-	directDiffuse: 'vec3',
-	directSpecular: 'vec3'
-}, 'ReflectedLight' );
 
 class LightContextNode extends ContextNode {
 
@@ -15,9 +12,13 @@ class LightContextNode extends ContextNode {
 
 	}
 
-	generate( builder ) {
+	getNodeType( /*builder*/ ) {
 
-		const type = this.getNodeType( builder );
+		return 'vec3';
+
+	}
+
+	generate( builder ) {
 
 		const material = builder.material;
 
@@ -29,10 +30,11 @@ class LightContextNode extends ContextNode {
 
 		}
 
-		const reflectedLightNode = reflectedLightStruct.create();
-		const reflectedLight = reflectedLightNode.build( builder, 'var' );
+		const directDiffuse = new VarNode( new Vector3Node() );
+		const directSpecular = new VarNode( new Vector3Node() );
 
-		this.setContextValue( 'reflectedLight', reflectedLightNode );
+		this.setContextValue( 'directDiffuse', directDiffuse );
+		this.setContextValue( 'directSpecular', directSpecular );
 
 		if ( lightingModel !== null ) {
 
@@ -42,9 +44,13 @@ class LightContextNode extends ContextNode {
 
 		// add code
 
+		const type = this.getNodeType( builder );
+
 		super.generate( builder, type );
 
-		return `( ${reflectedLight}.directDiffuse + ${reflectedLight}.directSpecular )`;
+		const totalLight = new OperatorNode( '+', directDiffuse, directSpecular );
+
+		return totalLight.build( builder, type );
 
 	}
 

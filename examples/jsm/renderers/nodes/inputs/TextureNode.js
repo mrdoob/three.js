@@ -51,7 +51,7 @@ class TextureNode extends InputNode {
 				const textureCallSnippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
 
 				colorSpace = new ColorSpaceNode();
-				colorSpace.input = new ExpressionNode( textureCallSnippet, 'vec4' );
+				colorSpace.value = new ExpressionNode( textureCallSnippet, 'vec4' );
 				colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );
 
 				nodeData.colorSpace = colorSpace;

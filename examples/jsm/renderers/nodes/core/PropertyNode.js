@@ -10,6 +10,12 @@ class PropertyNode extends Node {
 
 	}
 
+	getHash( /*builder*/ ) {
+
+		return this.name;
+
+	}
+
 	generate( builder ) {
 
 		const nodeVary = builder.getVarFromNode( this, this.getNodeType( builder ) );

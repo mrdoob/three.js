@@ -76,14 +76,12 @@ export * from './core/constants.js';
 
 // functions
 export * from './functions/BSDFs.js';
-export * from './functions/EncodingFunctions.js';
-export * from './functions/MathFunctions.js';
-
-// consts
-export * from './consts/MathConsts.js';
 
 // materials
 export * from './materials/Materials.js';
+
+// shader node
+export * from './ShaderNode.js';
 
 export {
 	// core

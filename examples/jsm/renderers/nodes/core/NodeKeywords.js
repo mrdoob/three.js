@@ -3,17 +3,7 @@ import PropertyNode from './PropertyNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 
-import { PI, RECIPROCAL_PI, EPSILON } from '../consts/MathConsts.js';
-import { saturateMacro, whiteComplementMacro } from '../functions/MathFunctions.js';
-
 class NodeKeywords {
-
-	static PI = 'PI';
-	static RECIPROCAL_PI = 'RECIPROCAL_PI';
-	static EPSILON = 'EPSILON';
-
-	static Saturate = 'saturate';
-	static WhiteComplement = 'whiteComplement';
 
 	static PositionLocal = 'PositionLocal';
 	static PositionWorld = 'PositionWorld';
@@ -40,13 +30,6 @@ class NodeKeywords {
 	constructor() {
 
 		this.keywords = [
-			// consts
-			NodeKeywords.PI,
-			NodeKeywords.RECIPROCAL_PI,
-			NodeKeywords.EPSILON,
-			// variadic macros
-			NodeKeywords.Saturate,
-			NodeKeywords.WhiteComplement,
 			// nodes
 			NodeKeywords.PositionLocal,
 			NodeKeywords.PositionWorld,
@@ -92,36 +75,6 @@ class NodeKeywords {
 			}
 
 			switch ( name ) {
-
-				case NodeKeywords.PI:
-
-					node = PI;
-
-					break;
-
-				case NodeKeywords.RECIPROCAL_PI:
-
-					node = RECIPROCAL_PI;
-
-					break;
-
-				case NodeKeywords.EPSILON:
-
-					node = EPSILON;
-
-					break;
-
-				case NodeKeywords.Saturate:
-
-					node = saturateMacro;
-
-					break;
-
-				case NodeKeywords.WhiteComplement:
-
-					node = whiteComplementMacro;
-
-					break;
 
 				case NodeKeywords.PositionLocal:
 
