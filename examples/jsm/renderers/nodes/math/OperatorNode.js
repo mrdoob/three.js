@@ -31,7 +31,7 @@ class OperatorNode extends TempNode {
 
 		const op = this.op;
 
-		if ( op === '==' ) {
+		if ( op === '==' || op === '>' || op === '&&' ) {
 
 			return 'bool';
 
@@ -71,25 +71,23 @@ class OperatorNode extends TempNode {
 		let typeA = this.a.getNodeType( builder );
 		let typeB = this.b.getNodeType( builder );
 
-		let type = this.getNodeType( builder );
-
 		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
 			// matrix x vector
 
-			type = typeB = builder.getVectorFromMatrix( typeA );
+			typeB = builder.getVectorFromMatrix( typeA );
 
 		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
 
 			// vector x matrix
 
-			type = typeB = builder.getVectorFromMatrix( typeB );
+			typeA = builder.getVectorFromMatrix( typeB );
 
 		} else {
 
 			// anytype x anytype
 
-			typeA = typeB = type;
+			typeA = typeB = this.getNodeType( builder );
 
 		}
 
