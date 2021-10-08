@@ -19,6 +19,7 @@ import CondNode from './math/CondNode.js';
 import MathNode from './math/MathNode.js';
 
 // utils
+import ArrayElementNode from './utils/ArrayElementNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
@@ -37,15 +38,21 @@ const NodeHandler = {
 
 	get: function ( node, prop ) {
 
-		// Split Properties Pass
-
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
 			const splitProps = prop.match( /^[xyzwst]{1,4}$/ );
 
 			if ( splitProps !== null ) {
 
+				// accessing properties ( swizzle )
+
 				return ShaderNodeObject( new SplitNode( node, splitProps[ 0 ] ) );
+
+			} else if ( /^\d+$/.test( prop ) === true ) {
+
+				// accessing array
+
+				return ShaderNodeObject( new ArrayElementNode( node, new FloatNode( Number( prop ) ).setConst( true ) ) );
 
 			}
 
@@ -113,25 +120,35 @@ const ShaderNodeArray = ( array ) => {
 
 };
 
-const ShaderNodeProxy = ( NodeClass, scope, factor ) => {
+const ShaderNodeProxy = ( NodeClass, scope = null, factor = null ) => {
 
-	return ( ...params ) => {
+	if ( scope === null ) {
 
-		return ShaderNodeObject( new NodeClass( scope, ...ShaderNodeArray( params ) ) );
+		return ( ...params ) => {
 
-	};
+			return ShaderNodeObject( new NodeClass( ...ShaderNodeArray( params ) ) );
 
-};
+		};
 
-const ShaderNodeProxyFactor = ( NodeClass, scope, factor ) => {
+	} else if ( factor === null ) {
 
-	factor = ShaderNodeObject( factor );
+		return ( ...params ) => {
 
-	return ( ...params ) => {
+			return ShaderNodeObject( new NodeClass( scope, ...ShaderNodeArray( params ) ) );
 
-		return ShaderNodeObject( new NodeClass( scope, ...ShaderNodeArray( params ), factor ) );
+		};
 
-	};
+	} else {
+
+		factor = ShaderNodeObject( factor );
+
+		return ( ...params ) => {
+
+			return ShaderNodeObject( new NodeClass( scope, ...ShaderNodeArray( params ), factor ) );
+
+		};
+
+	}
 
 };
 
@@ -235,6 +252,8 @@ export const equal = ShaderNodeProxy( OperatorNode, '==' );
 export const greaterThan = ShaderNodeProxy( OperatorNode, '>' );
 export const and = ShaderNodeProxy( OperatorNode, '&&' );
 
+export const element = ShaderNodeProxy( ArrayElementNode );
+
 export const normalLocal = new NormalNode( NormalNode.LOCAL );
 export const normalWorld = new NormalNode( NormalNode.WORLD );
 export const normalView = new NormalNode( NormalNode.VIEW );
@@ -267,8 +286,8 @@ export const sign = ShaderNodeProxy( MathNode, 'sign' );
 export const dFdx = ShaderNodeProxy( MathNode, 'dFdx' );
 export const dFdy = ShaderNodeProxy( MathNode, 'dFdy' );
 export const pow = ShaderNodeProxy( MathNode, 'pow' );
-export const pow2 = ShaderNodeProxyFactor( MathNode, 'pow', 2 );
-export const pow3 = ShaderNodeProxyFactor( MathNode, 'pow', 3 );
-export const pow4 = ShaderNodeProxyFactor( MathNode, 'pow', 4 );
+export const pow2 = ShaderNodeProxy( MathNode, 'pow', 2 );
+export const pow3 = ShaderNodeProxy( MathNode, 'pow', 3 );
+export const pow4 = ShaderNodeProxy( MathNode, 'pow', 4 );
 export const exp2 = ShaderNodeProxy( MathNode, 'exp2' );
 export const saturate = ShaderNodeProxy( MathNode, 'saturate' );

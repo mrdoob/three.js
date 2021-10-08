@@ -66,7 +66,7 @@ class SkinningNode extends Node {
 
 	generate( builder ) {
 
-		const keywords = builder.getContextValue( 'keywords' );
+		const keywords = builder.context.keywords;
 
 		keywords.addKeyword( 'BoneMatrices', () => {
 
