@@ -16,7 +16,10 @@
 
 			import * as THREE from '../build/three.module.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRLayerHelper } from './jsm/webxr/XRLayerHelper.js';
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
+
+			// BASIC VR SCENE SETUP
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x505050 );
@@ -42,14 +45,34 @@
 			);
 			scene.add( room );
 
-			renderer.setAnimationLoop( function () {
+			// XR LAYER
+
+			const layer = new XRLayerHelper( renderer );
+
+			console.log( layer )
+
+			// RENDER LOOP
+
+			renderer.setAnimationLoop( function ( _, xrFrame ) {
 
 				cube.rotation.x += 0.01;
 				cube.rotation.y += 0.01;
 
+				layer.update( xrFrame );
+
 				renderer.render( scene, camera );
 
 			} );
+
+			// RESIZING
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
 
 		</script>
 	</body>
