@@ -1,18 +1,26 @@
 import {
-	Object3D
+	Mesh,
+	PlaneGeometry,
+	MeshBasicMaterial,
+	// testing
+	BoxGeometry,
+	MeshNormalMaterial
 } from '../../../build/three.module.js';
 
 const XRLAYER_MODE = 0;
 const MESH_MODE = 1;
 
-class XRLayerHelper extends Object3D {
+class XRLayerHelper extends Mesh {
 
-	constructor( renderer ) {
+	constructor( renderer, texture, width, height ) {
 
 		super();
 
 		this.isXRLayerHelper = true
 		this.renderer = renderer;
+		this.texture = texture;
+		this.width = width;
+		this.height = height;
 
 		this.init();
 
@@ -33,6 +41,34 @@ class XRLayerHelper extends Object3D {
 			this.glBinding = null;
 
 		} );
+
+		this.updateMesh();
+
+	}
+
+	updateMesh() {
+
+		this.geometry = new PlaneGeometry( this.width, this.height );
+
+		this.material = new MeshBasicMaterial( { map: this.texture } );
+
+		/*
+
+		snellenTexture = new THREE.TextureLoader().load( "textures/snellen.png" );
+		snellenTexture.repeat.x = snellenConfig.cropX;
+		snellenTexture.repeat.y = snellenConfig.cropY;
+
+		const snellenMeshMipMap = new THREE.Mesh(
+			new THREE.PlaneGeometry( snellenConfig.widthMeters, snellenConfig.heightMeters ),
+			new THREE.MeshBasicMaterial( { map: snellenTexture } )
+		);
+
+		snellenMeshMipMap.position.x = snellenConfig.x + snellenConfig.widthMeters;
+		snellenMeshMipMap.position.y = snellenConfig.y - snellenConfig.heightMeters;
+
+		eyeCharts.add( snellenMeshMipMap );
+
+		*/
 
 	}
 
@@ -75,8 +111,6 @@ class XRLayerHelper extends Object3D {
 			}
 
 		}
-
-		console.log( this.mode )
 
 	}
 
