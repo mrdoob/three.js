@@ -10,11 +10,12 @@ import { LinearEncoding } from 'three';
 
 class NodeBuilder {
 
-	constructor( object, renderer ) {
+	constructor( object, renderer, parser ) {
 
 		this.object = object;
 		this.material = object.material;
 		this.renderer = renderer;
+		this.parser = parser;
 
 		this.nodes = [];
 		this.updateNodes = [];

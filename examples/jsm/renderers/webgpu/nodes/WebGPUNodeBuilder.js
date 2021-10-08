@@ -11,6 +11,7 @@ import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
 import VarNode from '../../nodes/core/VarNode.js';
+import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import BypassNode from '../../nodes/core/BypassNode.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
 import MaterialNode from '../../nodes/accessors/MaterialNode.js';
@@ -25,7 +26,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, lightNode = null ) {
 
-		super( object, renderer );
+		super( object, renderer, new GLSLNodeParser() );
 
 		this.lightNode = lightNode;
 
