@@ -83,12 +83,10 @@ function checkGeometryClone( geom ) {
 	QUnit.assert.notEqual( copy.uuid, geom.uuid, "clone uuid should differ from original" );
 	QUnit.assert.notEqual( copy.id, geom.id, "clone id should differ from original" );
 
-	var excludedProperties = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
-
-	var differingProp = getDifferingProp( geom, copy, excludedProperties );
+	var differingProp = getDifferingProp( geom, copy );
 	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 
-	differingProp = getDifferingProp( copy, geom, excludedProperties );
+	differingProp = getDifferingProp( copy, geom );
 	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 
 	// json round trip with clone
@@ -96,9 +94,7 @@ function checkGeometryClone( geom ) {
 
 }
 
-function getDifferingProp( geometryA, geometryB, excludedProperties ) {
-
-	excludedProperties = excludedProperties || [];
+function getDifferingProp( geometryA, geometryB ) {
 
 	var geometryKeys = Object.keys( geometryA );
 	var cloneKeys = Object.keys( geometryB );
@@ -108,8 +104,6 @@ function getDifferingProp( geometryA, geometryB, excludedProperties ) {
 	for ( var i = 0, l = geometryKeys.length; i < l; i ++ ) {
 
 		var key = geometryKeys[ i ];
-
-		if ( excludedProperties.indexOf( key ) >= 0 ) continue;
 
 		if ( cloneKeys.indexOf( key ) < 0 ) {
 
@@ -193,31 +187,6 @@ function checkGeometryJsonRoundtrip( geom ) {
 
 }
 
-// Look for undefined and NaN values in numerical fieds.
-function checkFinite( geom ) {
-
-	var allVerticesAreFinite = true;
-
-	var vertices = geom.vertices || [];
-
-	for ( var i = 0, l = vertices.length; i < l; i ++ ) {
-
-		var v = geom.vertices[ i ];
-
-		if ( ! ( isFinite( v.x ) || isFinite( v.y ) || isFinite( v.z ) ) ) {
-
-			allVerticesAreFinite = false;
-			break;
-
-		}
-
-	}
-
-	// TODO Buffers, normal, etc.
-
-	QUnit.assert.ok( allVerticesAreFinite, "contains only finite coordinates" );
-
-}
 
 // Run common geometry tests.
 function runStdGeometryTests( assert, geometries ) {
@@ -225,8 +194,6 @@ function runStdGeometryTests( assert, geometries ) {
 	for ( var i = 0, l = geometries.length; i < l; i ++ ) {
 
 		var geom = geometries[ i ];
-
-		checkFinite( geom );
 
 		// Clone
 		checkGeometryClone( geom );

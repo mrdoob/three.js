@@ -30,7 +30,7 @@ IncidentLight directLight;
 
 		pointLight = pointLights[ i ];
 
-		getPointDirectLightIrradiance( pointLight, geometry, directLight );
+		getPointLightInfo( pointLight, geometry, directLight );
 
 		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS )
 		pointLightShadow = pointLightShadows[ i ];
@@ -56,7 +56,7 @@ IncidentLight directLight;
 
 		spotLight = spotLights[ i ];
 
-		getSpotDirectLightIrradiance( spotLight, geometry, directLight );
+		getSpotLightInfo( spotLight, geometry, directLight );
 
 		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
 		spotLightShadow = spotLightShadows[ i ];
@@ -90,7 +90,7 @@ IncidentLight directLight;
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
-		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
+		getDirectionalLightInfo( directionalLight, geometry, directLight );
 
 		// NOTE: Depth gets larger away from the camera.
 		// cascade.x is closer, cascade.y is further
@@ -136,7 +136,7 @@ IncidentLight directLight;
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
-		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
+		getDirectionalLightInfo( directionalLight, geometry, directLight );
 
 		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )
 
@@ -167,7 +167,7 @@ IncidentLight directLight;
 
 		directionalLight = directionalLights[ i ];
 
-		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
+		getDirectionalLightInfo( directionalLight, geometry, directLight );
 
 		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )
 		directionalLightShadow = directionalLightShadows[ i ];
@@ -202,14 +202,14 @@ IncidentLight directLight;
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-	irradiance += getLightProbeIrradiance( lightProbe, geometry );
+	irradiance += getLightProbeIrradiance( lightProbe, geometry.normal );
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry.normal );
 
 		}
 		#pragma unroll_loop_end

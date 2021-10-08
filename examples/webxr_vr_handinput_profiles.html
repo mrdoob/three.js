@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - handinput - profiles<br/>
-			(Oculus Browser with #webxr-hands flag enabled)
+			(Oculus Browser 15.1+)
 		</div>
 
 		<script type="module">
@@ -26,11 +26,6 @@
 			let hand1, hand2;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
-
-			const currentHandModel = {
-				left: 0,
-				right: 0
-			};
 
 			const handModels = {
 				left: null,
@@ -100,7 +95,7 @@
 				scene.add( controller2 );
 
 				const controllerModelFactory = new XRControllerModelFactory();
-				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+				const handModelFactory = new XRHandModelFactory();
 
 				// Hand 1
 
@@ -109,35 +104,28 @@
 				scene.add( controllerGrip1 );
 
 				hand1 = renderer.xr.getHand( 0 );
+				hand1.userData.currentHandModel = 0;
 				scene.add( hand1 );
 
 				handModels.left = [
 					handModelFactory.createHandModel( hand1, "boxes" ),
 					handModelFactory.createHandModel( hand1, "spheres" ),
-					handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ),
-					handModelFactory.createHandModel( hand1, "oculus" )
+					handModelFactory.createHandModel( hand1, "mesh" )
 				];
 
-				handModels.left.forEach( model => {
+				for ( let i = 0; i < 3; i ++ ) {
 
-					model.visible = false;
+					const model = handModels.left[ i ];
+					model.visible = i == 0;
 					hand1.add( model );
-
-				} );
-
-				handModels.left[ currentHandModel.left ].visible = true;
-
-				function cycleHandModel( hand ) {
-
-					handModels[ hand ][ currentHandModel[ hand ] ].visible = false;
-					currentHandModel[ hand ] = ( currentHandModel[ hand ] + 1 ) % handModels[ hand ].length;
-					handModels[ hand ][ currentHandModel[ hand ] ].visible = true;
 
 				}
 
-				hand1.addEventListener( 'pinchend', evt => {
+				hand1.addEventListener( 'pinchend', function ( event ) {
 
-					cycleHandModel( evt.handedness );
+					handModels.left[ this.userData.currentHandModel ].visible = false;
+					this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
+					handModels.left[ this.userData.currentHandModel ].visible = true;
 
 				} );
 
@@ -148,33 +136,32 @@
 				scene.add( controllerGrip2 );
 
 				hand2 = renderer.xr.getHand( 1 );
+				hand2.userData.currentHandModel = 0;
 				scene.add( hand2 );
 
 				handModels.right = [
 					handModelFactory.createHandModel( hand2, "boxes" ),
 					handModelFactory.createHandModel( hand2, "spheres" ),
-					handModelFactory.createHandModel( hand2, "oculus", { model: "lowpoly" } ),
-					handModelFactory.createHandModel( hand2, "oculus" )
+					handModelFactory.createHandModel( hand2, "mesh" )
 				];
-				handModels.right.forEach( model => {
 
-					model.visible = false;
+				for ( let i = 0; i < 3; i ++ ) {
+
+					const model = handModels.right[ i ];
+					model.visible = i == 0;
 					hand2.add( model );
 
-				} );
+				}
 
-				handModels.right[ currentHandModel.right ].visible = true;
+				hand2.addEventListener( 'pinchend', function ( evevent ) {
 
-				window.handModels = handModels;
-
-				hand2.addEventListener( 'pinchend', evt => {
-
-					cycleHandModel( evt.handedness );
+					handModels.right[ this.userData.currentHandModel ].visible = false;
+					this.userData.currentHandModel = ( this.userData.currentHandModel + 1 ) % 3;
+					handModels.right[ this.userData.currentHandModel ].visible = true;
 
 				} );
 
 				//
-				window.hands = [ hand1, hand2 ];
 
 				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 

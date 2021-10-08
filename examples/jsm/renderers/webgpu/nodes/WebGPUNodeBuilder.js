@@ -3,20 +3,32 @@ import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from './WebGPUNodeUniform.js';
-import WebGPUSampler from '../WebGPUSampler.js';
-import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js';
+import WebGPUNodeSampler from './WebGPUNodeSampler.js';
+import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
+
+import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
+import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
 import NodeSlot from '../../nodes/core/NodeSlot.js';
+import VarNode from '../../nodes/core/VarNode.js';
+import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
+import BypassNode from '../../nodes/core/BypassNode.js';
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
+import MaterialNode from '../../nodes/accessors/MaterialNode.js';
+import PositionNode from '../../nodes/accessors/PositionNode.js';
+import NormalNode from '../../nodes/accessors/NormalNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
-
+import SkinningNode from '../../nodes/accessors/SkinningNode.js';
+import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import ShaderLib from './ShaderLib.js';
 
 class WebGPUNodeBuilder extends NodeBuilder {
 
-	constructor( material, renderer ) {
+	constructor( object, renderer, lightNode = null ) {
 
-		super( material, renderer );
+		super( object, renderer, new GLSLNodeParser() );
+
+		this.lightNode = lightNode;
 
 		this.bindings = { vertex: [], fragment: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0 };
@@ -25,41 +37,156 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.nativeShader = null;
 
-		this._parseMaterial();
+		this._parseObject();
 
 	}
 
-	_parseMaterial() {
+	_parseObject() {
 
+		const object = this.object;
 		const material = this.material;
 
 		// get shader
 
-		this.nativeShader = ShaderLib.common;
+		let shader = null;
+
+		if ( material.isMeshStandardMaterial ) {
+
+			shader = ShaderLib.standard;
+
+		} else {
+
+			shader = ShaderLib.common;
+
+		}
+
+		this.nativeShader = shader;
 
 		// parse inputs
 
-		if ( material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
+		if ( material.isMeshStandardMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
 
-			const mvpNode = new ModelViewProjectionNode();
+			let lightNode = material.lightNode;
+
+			let vertex = new PositionNode( PositionNode.GEOMETRY );
+
+			if ( lightNode === null && this.lightNode && this.lightNode.hasLights === true ) {
+
+				lightNode = this.lightNode;
+
+			}
 
 			if ( material.positionNode !== undefined ) {
 
-				mvpNode.position = material.positionNode;
+				vertex = material.positionNode;
 
 			}
 
-			this.addSlot( 'vertex', new NodeSlot( mvpNode, 'MVP', 'vec4' ) );
+			if ( object.isSkinnedMesh === true ) {
 
-			if ( material.colorNode !== undefined ) {
+				vertex = new BypassNode( vertex, new SkinningNode( object ) );
+
+			}
+
+			this.context.vertex = vertex;
+
+			this.addSlot( 'vertex', new NodeSlot( new ModelViewProjectionNode(), 'MVP', 'vec4' ) );
+
+			if ( material.alphaTestNode && material.alphaTestNode.isNode ) {
+
+				this.addSlot( 'fragment', new NodeSlot( material.alphaTestNode, 'ALPHA_TEST', 'float' ) );
+
+			} else {
+
+				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.ALPHA_TEST ), 'ALPHA_TEST', 'float' ) );
+
+			}
+
+			if ( material.colorNode && material.colorNode.isNode ) {
 
 				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec4' ) );
 
+			} else {
+
+				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.COLOR ), 'COLOR', 'vec4' ) );
+
 			}
 
-			if ( material.opacityNode !== undefined ) {
+			if ( material.opacityNode && material.opacityNode.isNode ) {
 
 				this.addSlot( 'fragment', new NodeSlot( material.opacityNode, 'OPACITY', 'float' ) );
+
+			} else {
+
+				this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.OPACITY ), 'OPACITY', 'float' ) );
+
+			}
+
+			if ( material.isMeshStandardMaterial ) {
+
+				if ( material.metalnessNode && material.metalnessNode.isNode ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.metalnessNode, 'METALNESS', 'float' ) );
+
+				} else {
+
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.METALNESS ), 'METALNESS', 'float' ) );
+
+				}
+
+				if ( material.roughnessNode && material.roughnessNode.isNode ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.roughnessNode, 'ROUGHNESS', 'float' ) );
+
+				} else {
+
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.ROUGHNESS ), 'ROUGHNESS', 'float' ) );
+
+				}
+
+				let normalNode = null;
+
+				if ( material.normalNode && material.normalNode.isNode ) {
+
+					normalNode = material.normalNode;
+
+				} else {
+
+					normalNode = new NormalNode( NormalNode.VIEW );
+
+				}
+
+				this.addSlot( 'fragment', new NodeSlot( new VarNode( normalNode, 'TransformedNormalView', 'vec3' ), 'NORMAL', 'vec3' ) );
+
+			} else if ( material.isMeshPhongMaterial ) {
+
+				if ( material.specularNode && material.specularNode.isNode ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.specularNode, 'SPECULAR', 'vec3' ) );
+
+				} else {
+
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.SPECULAR ), 'SPECULAR', 'vec3' ) );
+
+				}
+
+				if ( material.shininessNode && material.shininessNode.isNode ) {
+
+					this.addSlot( 'fragment', new NodeSlot( material.shininessNode, 'SHININESS', 'float' ) );
+
+				} else {
+
+					this.addSlot( 'fragment', new NodeSlot( new MaterialNode( MaterialNode.SHININESS ), 'SHININESS', 'float' ) );
+
+				}
+
+			}
+
+			if ( lightNode && lightNode.isNode ) {
+
+				const lightContextNode = new LightContextNode( lightNode );
+
+				this.addSlot( 'fragment', new NodeSlot( lightContextNode, 'LIGHT', 'vec3' ) );
 
 			}
 
@@ -67,15 +194,23 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet ) {
+	getTexture( textureProperty, uvSnippet, biasSnippet = null ) {
 
-		return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet} )`;
+		if ( biasSnippet !== null ) {
+
+			return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet}, ${biasSnippet} )`;
+
+		} else {
+
+			return `texture( sampler2D( ${textureProperty}, ${textureProperty}_sampler ), ${uvSnippet} )`;
+
+		}
 
 	}
 
 	getPropertyName( node ) {
 
-		if ( node.isNodeUniform ) {
+		if ( node.isNodeUniform === true ) {
 
 			const name = node.name;
 			const type = node.type;
@@ -83,6 +218,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			if ( type === 'texture' ) {
 
 				return name;
+
+			} else if ( type === 'buffer' ) {
+
+				return `${name}.value`;
 
 			} else {
 
@@ -117,8 +256,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( type === 'texture' ) {
 
-				const sampler = new WebGPUSampler( `${uniformNode.name}_sampler`, uniformNode.value );
-				const texture = new WebGPUSampledTexture( uniformNode.name, uniformNode.value );
+				const sampler = new WebGPUNodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+				const texture = new WebGPUNodeSampledTexture( uniformNode.name, uniformNode.node );
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
@@ -126,7 +265,19 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				bindings.splice( index, 0, sampler, texture );
 
-				uniformGPU = { sampler, texture };
+				uniformGPU = [ sampler, texture ];
+
+			} else if ( type === 'buffer' ) {
+
+				const buffer = new WebGPUUniformBuffer( 'NodeBuffer', node.value );
+
+				// add first textures in sequence and group for last
+				const lastBinding = bindings[ bindings.length - 1 ];
+				const index = lastBinding && lastBinding.isUniformsGroup ? bindings.length - 1 : bindings.length;
+
+				bindings.splice( index, 0, buffer );
+
+				uniformGPU = buffer;
 
 			} else {
 
@@ -142,41 +293,31 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( type === 'float' ) {
+				if ( node.isArrayInputNode === true ) {
 
-					uniformGPU = new FloatNodeUniform( uniformNode );
+					uniformGPU = [];
 
-				} else if ( type === 'vec2' ) {
+					for ( const inputNode of node.value ) {
 
-					uniformGPU = new Vector2NodeUniform( uniformNode );
+						const uniformNodeGPU = this._getNodeUniform( inputNode, type );
 
-				} else if ( type === 'vec3' ) {
+						// fit bounds to buffer
+						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );
+						uniformNodeGPU.itemSize = getStrideLength( uniformNodeGPU.itemSize );
 
-					uniformGPU = new Vector3NodeUniform( uniformNode );
+						uniformsGroup.addUniform( uniformNodeGPU );
 
-				} else if ( type === 'vec4' ) {
+						uniformGPU.push( uniformNodeGPU );
 
-					uniformGPU = new Vector4NodeUniform( uniformNode );
-
-				} else if ( type === 'color' ) {
-
-					uniformGPU = new ColorNodeUniform( uniformNode );
-
-				} else if ( type === 'mat3' ) {
-
-					uniformGPU = new Matrix3NodeUniform( uniformNode );
-
-				} else if ( type === 'mat4' ) {
-
-					uniformGPU = new Matrix4NodeUniform( uniformNode );
+					}
 
 				} else {
 
-					throw new Error( `Uniform "${type}" not declared.` );
+					uniformGPU = this._getNodeUniform( uniformNode, type );
+
+					uniformsGroup.addUniform( uniformGPU );
 
 				}
-
-				uniformsGroup.addUniform( uniformGPU );
 
 			}
 
@@ -194,7 +335,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getAttributesHeaderSnippet( shaderStage ) {
+	getAttributes( shaderStage ) {
 
 		let snippet = '';
 
@@ -206,7 +347,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const attribute = attributes[ index ];
 
-				snippet += `layout(location = ${index}) in ${attribute.type} ${attribute.name};`;
+				snippet += `layout(location = ${index}) in ${attribute.type} ${attribute.name}; `;
 
 			}
 
@@ -216,7 +357,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarysHeaderSnippet( shaderStage ) {
+	getVarys( shaderStage ) {
 
 		let snippet = '';
 
@@ -228,7 +369,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const vary = varys[ index ];
 
-			snippet += `layout(location = ${index}) ${ioStage} ${vary.type} ${vary.name};`;
+			snippet += `layout(location = ${index}) ${ioStage} ${vary.type} ${vary.name}; `;
 
 		}
 
@@ -236,25 +377,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarysBodySnippet( shaderStage ) {
-
-		let snippet = '';
-
-		if ( shaderStage === 'vertex' ) {
-
-			for ( const vary of this.varys ) {
-
-				snippet += `${vary.name} = ${vary.snippet};`;
-
-			}
-
-		}
-
-		return snippet;
-
-	}
-
-	getUniformsHeaderSnippet( shaderStage ) {
+	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
@@ -267,14 +390,32 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( uniform.type === 'texture' ) {
 
-				snippet += `layout(set = 0, binding = ${index ++}) uniform sampler ${uniform.name}_sampler;`;
-				snippet += `layout(set = 0, binding = ${index ++}) uniform texture2D ${uniform.name};`;
+				snippet += `layout(set = 0, binding = ${index ++}) uniform sampler ${uniform.name}_sampler; `;
+				snippet += `layout(set = 0, binding = ${index ++}) uniform texture2D ${uniform.name}; `;
+
+			} else if ( uniform.type === 'buffer' ) {
+
+				const bufferNode = uniform.node;
+				const bufferType = bufferNode.bufferType;
+				const bufferCount = bufferNode.bufferCount;
+
+				snippet += `layout(set = 0, binding = ${index ++}) uniform NodeBuffer { uniform ${bufferType}[ ${bufferCount} ] value; } ${uniform.name}; `;
 
 			} else {
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				groupSnippet += `uniform ${vectorType} ${uniform.name};`;
+				if ( Array.isArray( uniform.value ) === true ) {
+
+					const length = uniform.value.length;
+
+					groupSnippet += `uniform ${vectorType}[ ${length} ] ${uniform.name}; `;
+
+				} else {
+
+					groupSnippet += `uniform ${vectorType} ${uniform.name}; `;
+
+				}
 
 			}
 
@@ -282,7 +423,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( groupSnippet ) {
 
-			snippet += `layout(set = 0, binding = ${index ++}) uniform NodeUniforms { ${groupSnippet} } nodeUniforms;`;
+			snippet += `layout(set = 0, binding = ${index ++}) uniform NodeUniforms { ${groupSnippet} } nodeUniforms; `;
 
 		}
 
@@ -290,7 +431,28 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	composeShaderCode( code, snippet ) {
+	build() {
+
+		const keywords = this.getContextValue( 'keywords' );
+
+		for ( const shaderStage of [ 'fragment', 'vertex' ] ) {
+
+			this.shaderStage = shaderStage;
+
+			keywords.include( this, this.nativeShader[ shaderStage + 'Shader' ] );
+
+		}
+
+		super.build();
+
+		this.vertexShader = this._composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
+		this.fragmentShader = this._composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
+
+		return this;
+
+	}
+
+	_composeShaderCode( code, snippet ) {
 
 		// use regex maybe for security?
 		const versionStrIndex = code.indexOf( '\n' );
@@ -305,14 +467,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	build() {
+	_getNodeUniform( uniformNode, type ) {
 
-		super.build();
+		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
+		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
+		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
+		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
+		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
+		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
+		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
 
-		this.vertexShader = this.composeShaderCode( this.nativeShader.vertexShader, this.vertexShader );
-		this.fragmentShader = this.composeShaderCode( this.nativeShader.fragmentShader, this.fragmentShader );
-
-		return this;
+		throw new Error( `Uniform "${type}" not declared.` );
 
 	}
 

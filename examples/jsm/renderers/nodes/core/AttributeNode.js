@@ -1,18 +1,25 @@
 import Node from './Node.js';
+import VaryNode from './VaryNode.js';
 
 class AttributeNode extends Node {
 
-	constructor( name, type ) {
+	constructor( attributeName, nodeType ) {
 
-		super( type );
+		super( nodeType );
 
-		this.name = name;
+		this._attributeName = attributeName;
 
 	}
 
-	setAttributeName( name ) {
+	getHash( builder ) {
 
-		this.name = name;
+		return this.getAttributeName( builder );
+
+	}
+
+	setAttributeName( attributeName ) {
+
+		this._attributeName = attributeName;
 
 		return this;
 
@@ -20,39 +27,23 @@ class AttributeNode extends Node {
 
 	getAttributeName( /*builder*/ ) {
 
-		return this.name;
+		return this._attributeName;
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const attributeName = this.getAttributeName( builder );
-		const attributeType = this.getType( builder );
-
-		const attribute = builder.getAttribute( attributeName, attributeType );
+		const attribute = builder.getAttribute( this.getAttributeName( builder ), this.getNodeType( builder ) );
 
 		if ( builder.isShaderStage( 'vertex' ) ) {
 
-			return builder.format( attribute.name, attribute.type, output );
+			return attribute.name;
 
 		} else {
 
-			const nodeData = builder.getDataFromNode( this, builder.shaderStage );
+			const nodeVary = new VaryNode( this );
 
-			let nodeVary = nodeData.varyNode;
-
-			if ( nodeVary === undefined ) {
-
-				nodeVary = builder.getVaryFromNode( this, attribute.type );
-				nodeVary.snippet = attributeName;
-
-				nodeData.nodeVary = nodeVary;
-
-			}
-
-			const varyName = builder.getPropertyName( nodeVary );
-
-			return builder.format( varyName, attribute.type, output );
+			return nodeVary.build( builder, attribute.type );
 
 		}
 

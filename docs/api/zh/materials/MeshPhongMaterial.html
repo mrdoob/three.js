@@ -125,13 +125,6 @@
 		<h3>[property:Texture map]</h3>
 		<p>颜色贴图。默认为null。纹理贴图颜色由漫反射颜色[page:.color]调节。</p>
 
-		<h3>[property:Boolean morphNormals]</h3>
-		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从geometry传递到shader。默认值为*false*。
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>定义材质是否使用morphTargets。默认值为false。</p>
-
 		<h3>[property:Texture normalMap]</h3>
 		<p> 用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
 			In case the material has a normal map authored using the left handed convention, the y component of normalScale
@@ -162,10 +155,6 @@
 
 		<h3>[property:Float shininess]</h3>
 		<p> [page:.specular]高亮的程度，越高的值越闪亮。默认值为 *30*。</p>
-
-
-		<h3>[property:Boolean skinning]</h3>
-		<p>材质是否使用蒙皮。默认值为false。</p>
 
 		<h3>[property:Color specular]</h3>
 		<p> 材质的高光颜色。默认值为*0x111111*（深灰色）的颜色[page:Color]。<br /><br />

@@ -14,7 +14,7 @@
 		<p class="desc">
 		Creates a texture for use with a video texture.<br /><br />
 
-		This is almost the same as the base [page:Texture Texture] class, except that it continuosly sets [page:Texture.needsUpdate needsUpdate] to *true* so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
+		This is almost the same as the base [page:Texture Texture] class, except that it continuously sets [page:Texture.needsUpdate needsUpdate] to *true* so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
 		</p>
 
 		<h2>Code Example</h2>
@@ -49,8 +49,9 @@
 		[page:Constant minFilter] -- How the texture is sampled when a texel covers less than one pixel.
 		The default is [page:Textures THREE.LinearMipmapLinearFilter]. See [page:Textures minification filter constants] for other choices.<br />
 
-		[page:Constant format] -- The format used in the texture.
-		See [page:Textures format constants] for other choices.<br />
+		[page:Constant format] -- The default is [page:Textures THREE.RGBFormat].
+		See [page:Textures format constants] for other choices.
+		Note that a bug has been reported with Firefox's WebGL implementation where use of [page:Textures THREE.RGBFormat] on a VideoTexture can result in a significant performance penalty, if you encounter this issue it is recommended to pass in [page:Textures THREE.RGBAFormat] instead.<br />
 
 		[page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
 		See [page:Textures type constants] for other choices.<br />

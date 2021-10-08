@@ -1,32 +1,26 @@
-function NodeUniform( params ) {
+class NodeUniform {
 
-	params = params || {};
+	constructor( params = {} ) {
 
-	this.name = params.name;
-	this.type = params.type;
-	this.node = params.node;
-	this.needsUpdate = params.needsUpdate;
-
-}
-
-Object.defineProperties( NodeUniform.prototype, {
-
-	value: {
-
-		get: function () {
-
-			return this.node.value;
-
-		},
-
-		set: function ( val ) {
-
-			this.node.value = val;
-
-		}
+		this.name = params.name;
+		this.type = params.type;
+		this.node = params.node;
+		this.needsUpdate = params.needsUpdate;
 
 	}
 
-} );
+	get value() {
+
+		return this.node.value;
+
+	}
+
+	set value( val ) {
+
+		this.node.value = val;
+
+	}
+
+}
 
 export { NodeUniform };

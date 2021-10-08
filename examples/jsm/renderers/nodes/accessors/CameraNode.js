@@ -1,37 +1,29 @@
-import Node from '../core/Node.js';
-import Vector3Node from '../inputs/Vector3Node.js';
+import Object3DNode from './Object3DNode.js';
 import Matrix4Node from '../inputs/Matrix4Node.js';
-import { NodeUpdateType } from '../core/constants.js';
 
-class CameraNode extends Node {
+class CameraNode extends Object3DNode {
 
-	static POSITION = 'position';
-	static PROJECTION = 'projection';
-	static VIEW = 'view';
+	static PROJECTION_MATRIX = 'projectionMatrix';
 
 	constructor( scope = CameraNode.POSITION ) {
 
-		super();
-
-		this.updateType = NodeUpdateType.Frame;
-
-		this.scope = scope;
+		super( scope );
 
 		this._inputNode = null;
 
 	}
 
-	getType() {
+	getNodeType( builder ) {
 
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION || scope === CameraNode.VIEW ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
 			return 'mat4';
 
 		}
 
-		return 'vec3';
+		return super.getNodeType( builder );
 
 	}
 
@@ -41,57 +33,33 @@ class CameraNode extends Node {
 		const inputNode = this._inputNode;
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
 			inputNode.value = camera.projectionMatrix;
 
-		} else if ( scope === CameraNode.VIEW ) {
+		} else if ( scope === CameraNode.VIEW_MATRIX ) {
 
 			inputNode.value = camera.matrixWorldInverse;
 
-		} else if ( scope === CameraNode.POSITION ) {
+		} else {
 
-			camera.getWorldPosition( inputNode.value );
+			super.update( frame );
 
 		}
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const nodeData = builder.getDataFromNode( this );
+		const scope = this.scope;
 
-		let inputNode = this._inputNode;
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-		if ( nodeData.inputNode === undefined ) {
-
-			const scope = this.scope;
-
-			if ( scope === CameraNode.PROJECTION || scope === CameraNode.VIEW ) {
-
-				if ( inputNode === null || inputNode.isMatrix4Node !== true ) {
-
-					inputNode = new Matrix4Node( null );
-
-				}
-
-			} else if ( scope === CameraNode.POSITION ) {
-
-				if ( inputNode === null || inputNode.isVector3Node !== true ) {
-
-					inputNode = new Vector3Node();
-
-				}
-
-			}
-
-			this._inputNode = inputNode;
-
-			nodeData.inputNode = inputNode;
+			this._inputNode = new Matrix4Node( null );
 
 		}
 
-		return inputNode.build( builder, output );
+		return super.generate( builder );
 
 	}
 

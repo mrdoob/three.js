@@ -138,7 +138,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
-	romLineSegments( lineSegments ) {
+	fromLineSegments( lineSegments ) {
 
 		const geometry = lineSegments.geometry;
 

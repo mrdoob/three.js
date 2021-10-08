@@ -73,13 +73,6 @@
 
 		}
 
-		copy( ) {
-
-			// todo
-			return this;
-
-		}
-
 	}
 
 	LineGeometry.prototype.isLineGeometry = true;

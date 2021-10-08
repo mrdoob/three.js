@@ -19,13 +19,15 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 
 			let container, stats;
 
 			let camera, scene, renderer, effect;
 			let particleLight;
 
-			const loader = new THREE.FontLoader();
+			const loader = new FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -98,7 +100,7 @@
 
 				function addLabel( name, location ) {
 
-					const textGeo = new THREE.TextGeometry( name, {
+					const textGeo = new TextGeometry( name, {
 
 						font: font,
 

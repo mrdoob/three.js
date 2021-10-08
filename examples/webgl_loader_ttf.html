@@ -17,6 +17,8 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { TTFLoader } from './jsm/loaders/TTFLoader.js';
+			import { Font } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 
 			let container;
 			let camera, cameraTarget, scene, renderer;
@@ -85,7 +87,7 @@
 
 				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
 
-					font = new THREE.Font( json );
+					font = new Font( json );
 					createText();
 
 				} );
@@ -177,7 +179,7 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextGeometry( text, {
+				textGeo = new TextGeometry( text, {
 
 					font: font,
 

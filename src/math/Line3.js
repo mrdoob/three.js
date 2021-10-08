@@ -33,25 +33,11 @@ class Line3 {
 
 	getCenter( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .getCenter() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return target.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
 
 	}
 
 	delta( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .delta() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.subVectors( this.end, this.start );
 
@@ -70,13 +56,6 @@ class Line3 {
 	}
 
 	at( t, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .at() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return this.delta( target ).multiplyScalar( t ).add( this.start );
 
@@ -105,13 +84,6 @@ class Line3 {
 	closestPointToPoint( point, clampToLine, target ) {
 
 		const t = this.closestPointToPointParameter( point, clampToLine );
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Line3: .closestPointToPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return this.delta( target ).multiplyScalar( t ).add( this.start );
 

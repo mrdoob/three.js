@@ -48,6 +48,7 @@
 		<code>
 		THREE.NeverDepth
 		THREE.AlwaysDepth
+		THREE.EqualDepth
 		THREE.LessDepth
 		THREE.LessEqualDepth
 		THREE.GreaterEqualDepth
@@ -58,6 +59,7 @@
 		Which depth function the material uses to compare incoming pixels Z-depth against the current Z-depth buffer value. If the result of the comparison is true, the pixel will be drawn.<br />
 		[page:Materials NeverDepth] will never return true.<br />
 		[page:Materials AlwaysDepth] will always return true.<br />
+		[page:Materials EqualDepth] will return true if the incoming pixel Z-depth is equal to the current buffer Z-depth.<br />
 		[page:Materials LessDepth] will return true if the incoming pixel Z-depth is less than the current buffer Z-depth.<br />
 		[page:Materials LessEqualDepth] is the default and will return true if the incoming pixel Z-depth is less than or equal to the current buffer Z-depth.<br />
 		[page:Materials GreaterEqualDepth] will return true if the incoming pixel Z-depth is greater than or equal to the current buffer Z-depth.<br />

@@ -1,11 +1,21 @@
 import Node from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
+import NodeKeywords from '../core/NodeKeywords.js';
+import VaryNode from '../core/VaryNode.js';
+import ModelNode from '../accessors/ModelNode.js';
+import MathNode from '../math/MathNode.js';
+import OperatorNode from '../math/OperatorNode.js';
+import { transformDirection } from '../functions/MathFunctions.js';
 
 class PositionNode extends Node {
 
+	static GEOMETRY = 'geometry';
 	static LOCAL = 'local';
+	static WORLD = 'world';
+	static VIEW = 'view';
+	static VIEW_DIRECTION = 'viewDirection';
 
-	constructor( scope = PositionNode.POSITION ) {
+	constructor( scope = PositionNode.LOCAL ) {
 
 		super( 'vec3' );
 
@@ -13,24 +23,44 @@ class PositionNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	getHash( /*builder*/ ) {
 
-		const type = this.getType( builder );
-		const nodeData = builder.getDataFromNode( this, builder.shaderStage );
+		return `position-${this.scope}`;
 
-		let positionNode = nodeData.positionNode;
+	}
 
-		if ( positionNode === undefined ) {
+	generate( builder ) {
 
-			positionNode = new AttributeNode( 'position', 'vec3' );
+		const scope = this.scope;
 
-			nodeData.positionNode = positionNode;
+		let outputNode = null;
+
+		if ( scope === PositionNode.GEOMETRY ) {
+
+			outputNode = new AttributeNode( 'position', 'vec3' );
+
+		} else if ( scope === PositionNode.LOCAL ) {
+
+			outputNode = new VaryNode( new PositionNode( PositionNode.GEOMETRY ) );
+
+		} else if ( scope === PositionNode.WORLD ) {
+
+			const vertexPositionNode = transformDirection.call( { dir: new PositionNode( PositionNode.LOCAL ), matrix: new ModelNode( ModelNode.WORLD_MATRIX ) } );
+			outputNode = new VaryNode( vertexPositionNode );
+
+		} else if ( scope === PositionNode.VIEW ) {
+
+			const vertexPositionNode = new OperatorNode( '*', new ModelNode( ModelNode.VIEW_MATRIX ), new PositionNode( PositionNode.LOCAL ) );
+			outputNode = new VaryNode( vertexPositionNode );
+
+		} else if ( scope === PositionNode.VIEW_DIRECTION ) {
+
+			const vertexPositionNode = new MathNode( MathNode.NEGATE, new PositionNode( PositionNode.VIEW ) );
+			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexPositionNode ) );
 
 		}
 
-		const positionSnipped = positionNode.build( builder, type );
-
-		return builder.format( positionSnipped, type, output );
+		return outputNode.build( builder, this.getNodeType( builder ) );
 
 	}
 

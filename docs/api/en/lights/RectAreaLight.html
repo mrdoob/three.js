@@ -62,6 +62,25 @@ rectLight.add( rectLightHelper );
 			See the base [page:Light Light] class for common properties.
 		</p>
 
+		<h3>[property:Float intensity]</h3>
+		<p>
+			The light's intensity. Default is *1*. <br />
+			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, intensity is the luminance
+			(brightness) of the light measured in nits (cd/m^2).<br /><br />
+
+			Changing the intensity will also change the light's power.
+
+		</p>
+
+		<h3>[property:Float power]</h3>
+		<p>
+			The light's power.<br />
+			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, power is the luminous
+			power of the light measured in lumens (lm). <br /><br />
+
+			Changing the power will also change the light's intensity.
+		</p>
+
 		<h2>Methods</h2>
 		<p>
 			See the base [page:Light Light] class for common methods.

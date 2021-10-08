@@ -1,11 +1,57 @@
-import Node from '../core/Node.js';
+import TempNode from '../core/Node.js';
 
-class MathNode extends Node {
+class MathNode extends TempNode {
 
+	// 1 input
+
+	static RAD = 'radians';
+	static DEG = 'degrees';
+	static EXP = 'exp';
+	static EXP2 = 'exp2';
+	static LOG = 'log';
+	static LOG2 = 'log2';
+	static SQRT = 'sqrt';
+	static INV_SQRT = 'inversesqrt';
+	static FLOOR = 'floor';
+	static CEIL = 'ceil';
 	static NORMALIZE = 'normalize';
-	static INVERSE_TRANSFORM_DIRETION = 'inverseTransformDirection';
+	static FRACT = 'fract';
+	static SATURATE = 'saturate';
+	static SIN = 'sin';
+	static COS = 'cos';
+	static TAN = 'tan';
+	static ASIN = 'asin';
+	static ACOS = 'acos';
+	static ATAN = 'atan';
+	static ABS = 'abs';
+	static SIGN = 'sign';
+	static LENGTH = 'length';
+	static NEGATE = 'negate';
+	static INVERT = 'invert';
+	static DFDX = 'dFdx';
+	static DFDY = 'dFdy';
 
-	constructor( method, a, b = null ) {
+	// 2 inputs
+
+	static MIN = 'min';
+	static MAX = 'max';
+	static MOD = 'mod';
+	static STEP = 'step';
+	static REFLECT = 'reflect';
+	static DISTANCE = 'distance';
+	static DOT = 'dot';
+	static CROSS = 'cross';
+	static POW = 'pow';
+
+	// 3 inputs
+
+	static MIX = 'mix';
+	static CLAMP = 'clamp';
+	static REFRACT = 'refract';
+	static SMOOTHSTEP = 'smoothstep';
+	static FACEFORWARD = 'faceforward';
+
+	constructor( method, a, b = null, c = null ) {
 
 		super();
 
@@ -13,73 +59,127 @@ class MathNode extends Node {
 
 		this.a = a;
 		this.b = b;
+		this.c = c;
 
 	}
 
-	getType( builder ) {
+	getInputType( builder ) {
+
+		const aLen = this.a.getTypeLength( builder );
+		const bLen = this.b ? this.b.getTypeLength( builder ) : 0;
+		const cLen = this.c ? this.c.getTypeLength( builder ) : 0;
+
+		if ( aLen > bLen && aLen > cLen ) {
+
+			return this.a.getNodeType( builder );
+
+		} else if ( bLen > cLen ) {
+
+			return this.b.getNodeType( builder );
+
+		} else if ( cLen > aLen ) {
+
+			this.c.getNodeType( builder )
+
+		}
+
+		return this.a.getNodeType( builder );
+
+	}
+
+	getNodeType( builder ) {
 
 		const method = this.method;
 
-		if ( method === MathNode.INVERSE_TRANSFORM_DIRETION ) {
+		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE || method === MathNode.DOT ) {
+
+			return 'float';
+
+		} else if (method === MathNode.CROSS) {
 
 			return 'vec3';
 
 		} else {
 
-			const typeA = this.a.getType( builder );
-
-			if ( this.b !== null ) {
-
-				if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
-
-					// anytype x anytype: use the greater length vector
-
-					return typeB;
-
-				}
-
-			}
-
-			return typeA;
+			return this.getInputType( builder );
 
 		}
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const method = this.method;
-		const type = this.getType( builder );
 
-		let a = null, b = null;
+		const type = this.getNodeType( builder );
+		const inputType = this.getInputType( builder );
 
-		if ( method === MathNode.INVERSE_TRANSFORM_DIRETION ) {
+		if ( method === MathNode.NEGATE ) {
 
-			a = this.a.build( builder, 'vec3' );
-			b = this.b.build( builder, 'mat4' );
+			return '( -' + this.a.build( builder, inputType ) + ' )';
 
-			// add in FunctionNode later
-			return `normalize( ( vec4( ${a}, 0.0 ) * ${b} ).xyz )`;
+		} else if ( method === MathNode.INVERT ) {
+
+			return '( 1.0 - ' + this.a.build( builder, inputType ) + ' )';
 
 		} else {
 
-			a = this.a.build( builder, type );
+			const params = [];
 
-			if ( this.b !== null ) {
+			if ( method === MathNode.CROSS ) {
 
-				b = this.b.build( builder, type );
+				params.push(
+					this.a.build( builder, type ),
+					this.b.build( builder, type )
+				);
+
+			} else if ( method === MathNode.STEP ) {
+
+				params.push(
+					this.b.build( builder, this.a.getTypeLength( builder ) === 1 ? 'float' : inputType ),
+					this.b.build( builder, inputType )
+				);
+
+			} else if ( method === MathNode.MIN || method === MathNode.MAX || method === MathNode.MOD ) {
+
+				params.push(
+					this.a.build( builder, inputType ),
+					this.b.build( builder, this.b.getTypeLength( builder ) === 1 ? 'float' : inputType )
+				);
+
+			} else if ( method === MathNode.REFRACT ) {
+
+				params.push(
+					this.a.build( builder, inputType ),
+					this.b.build( builder, inputType ),
+					this.c.build( builder, 'float' )
+				);
+
+			} else if ( method === MathNode.MIX ) {
+
+				params.push(
+					this.a.build( builder, inputType ),
+					this.b.build( builder, inputType ),
+					this.c.build( builder, this.c.getTypeLength( builder ) === 1 ? 'float' : inputType )
+				);
+
+			} else {
+
+				params.push( this.a.build( builder, inputType ) );
+
+				if ( this.c !== null ) {
+
+					params.push( this.b.build( builder, inputType ), this.c.build( builder, inputType ) );
+
+				} else if ( this.b !== null ) {
+
+					params.push( this.b.build( builder, inputType ) );
+
+				}
 
 			}
 
-		}
-
-		if ( b !== null ) {
-
-			return builder.format( `${method}( ${a}, ${b} )`, type, output );
-
-		} else {
-
-			return builder.format( `${method}( ${a} )`, type, output );
+			return `${method}( ${params.join(', ')} )`;
 
 		}
 

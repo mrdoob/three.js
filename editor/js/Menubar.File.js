@@ -6,16 +6,6 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 function MenubarFile( editor ) {
 
-	function parseNumber( key, value ) {
-
-		var precision = config.getKey( 'exportPrecision' );
-
-		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
-
-	}
-
-	//
-
 	var config = editor.config;
 	var strings = editor.strings;
 
@@ -111,7 +101,7 @@ function MenubarFile( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, parseNumber, '\t' );
+			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -145,7 +135,7 @@ function MenubarFile( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, parseNumber, '\t' );
+			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -170,7 +160,7 @@ function MenubarFile( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, parseNumber, '\t' );
+			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -228,8 +218,18 @@ function MenubarFile( editor ) {
 
 		var exporter = new DRACOExporter();
 
+		const options = {
+			decodeSpeed: 5,
+			encodeSpeed: 5,
+			encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
+			quantization: [ 16, 8, 8, 8, 8 ],
+			exportUvs: true,
+			exportNormals: true,
+			exportColor: object.geometry.hasAttribute( 'color' )
+		};
+
 		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
-		var result = exporter.parse( object );
+		var result = exporter.parse( object, options );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
@@ -414,7 +414,7 @@ function MenubarFile( editor ) {
 		output.metadata.type = 'App';
 		delete output.history;
 
-		output = JSON.stringify( output, parseNumber, '\t' );
+		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		toZip[ 'app.json' ] = strToU8( output );
@@ -447,19 +447,17 @@ function MenubarFile( editor ) {
 			if ( config.getKey( 'project/editable' ) ) {
 
 				editButton = [
-					'',
 					'			var button = document.createElement( \'a\' );',
 					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
 					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
 					'			button.target = \'_blank\';',
 					'			button.textContent = \'EDIT\';',
 					'			document.body.appendChild( button );',
-					''
 				].join( '\n' );
 
 			}
 
-			content = content.replace( '\n\t\t\t/* edit button */\n', editButton );
+			content = content.replace( '\t\t\t/* edit button */', editButton );
 
 			toZip[ 'index.html' ] = strToU8( content );
 

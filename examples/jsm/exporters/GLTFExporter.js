@@ -46,6 +46,18 @@ class GLTFExporter {
 
 		} );
 
+		this.register( function ( writer ) {
+
+			return new GLTFMaterialsTransmissionExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
+			return new GLTFMaterialsVolumeExtension( writer );
+
+		} );
+
 	}
 
 	register( callback ) {
@@ -986,11 +998,20 @@ class GLTFWriter {
 
 				}
 
-				let data = image.data;
+				const data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-				if ( format === RGBFormat ) {
+				if ( format === RGBAFormat ) {
 
-					data = new Uint8ClampedArray( image.height * image.width * 4 );
+					for ( let i = 0; i < data.length; i += 4 ) {
+
+						data[ i + 0 ] = image.data[ i + 0 ];
+						data[ i + 1 ] = image.data[ i + 1 ];
+						data[ i + 2 ] = image.data[ i + 2 ];
+						data[ i + 3 ] = image.data[ i + 3 ];
+
+					}
+
+				} else {
 
 					for ( let i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
 
@@ -1176,12 +1197,21 @@ class GLTFWriter {
 
 		if ( material.emissive ) {
 
-			// emissiveFactor
-			const emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
+			// note: emissive components are limited to stay within the 0 - 1 range to accommodate glTF spec. see #21849 and #22000.
+			const emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity );
+			const maxEmissiveComponent = Math.max( emissive.r, emissive.g, emissive.b );
 
-			if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
+			if ( maxEmissiveComponent > 1 ) {
 
-				materialDef.emissiveFactor = emissive;
+				emissive.multiplyScalar( 1 / maxEmissiveComponent );
+
+				console.warn( 'THREE.GLTFExporter: Some emissive components exceed 1; emissive has been limited' );
+
+			}
+
+			if ( maxEmissiveComponent > 0 ) {
+
+				materialDef.emissiveFactor = emissive.toArray();
 
 			}
 
@@ -1201,14 +1231,10 @@ class GLTFWriter {
 
 			const normalMapDef = { index: this.processTexture( material.normalMap ) };
 
-			if ( material.normalScale && material.normalScale.x !== - 1 ) {
+			if ( material.normalScale && material.normalScale.x !== 1 ) {
 
-				if ( material.normalScale.x !== material.normalScale.y ) {
-
-					console.warn( 'THREE.GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
-
-				}
-
+				// glTF normal scale is univariate. Ignore `y`, which may be flipped.
+				// Context: https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 				normalMapDef.scale = material.normalScale.x;
 
 			}
@@ -2195,6 +2221,93 @@ class GLTFMaterialsPBRSpecularGlossiness {
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+/**
+ * Transmission Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
+ */
+class GLTFMaterialsTransmissionExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_transmission';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial || material.transmission === 0 ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		extensionDef.transmissionFactor = material.transmission;
+
+		if ( material.transmissionMap ) {
+
+			const transmissionMapDef = { index: writer.processTexture( material.transmissionMap ) };
+			writer.applyTextureTransform( transmissionMapDef, material.transmissionMap );
+			extensionDef.transmissionTexture = transmissionMapDef;
+
+		}
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+/**
+ * Materials Volume Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_volume
+ */
+class GLTFMaterialsVolumeExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_volume';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial || material.thickness === 0 ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		extensionDef.thicknessFactor = material.thickness;
+
+		if ( material.thicknessMap ) {
+
+			const thicknessMapDef = { index: writer.processTexture( material.thicknessMap ) };
+			writer.applyTextureTransform( thicknessMapDef, material.thicknessMap );
+			extensionDef.thicknessTexture = thicknessMapDef;
+
+		}
+
+		extensionDef.attenuationDistance = material.attenuationDistance;
+		extensionDef.attenuationColor = material.attenuationTint.toArray();
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
 		extensionsUsed[ this.name ] = true;
 
 	}
