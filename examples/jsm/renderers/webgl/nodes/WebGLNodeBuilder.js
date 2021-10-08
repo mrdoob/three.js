@@ -1,5 +1,6 @@
 import NodeBuilder from '../../nodes/core/NodeBuilder.js';
 import NodeSlot from '../../nodes/core/NodeSlot.js';
+import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
 import { ShaderChunk, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
@@ -22,7 +23,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, shader ) {
 
-		super( object, renderer );
+		super( object, renderer, new GLSLNodeParser() );
 
 		this.shader = shader;
 
