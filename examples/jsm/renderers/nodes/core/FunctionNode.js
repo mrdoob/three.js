@@ -35,6 +35,8 @@ class FunctionNode extends CodeNode {
 
 			nodeFunction = builder.parser.parseFunction( this.code );
 
+			nodeData.nodeFunction = nodeFunction;
+
 		}
 
 		return nodeFunction;
