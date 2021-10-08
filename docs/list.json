@@ -331,7 +331,6 @@
 
 			"Controls": {
 				"ArcballControls": "examples/en/controls/ArcballControls",
-				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
 				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
 				"FlyControls": "examples/en/controls/FlyControls",
@@ -835,7 +834,6 @@
 			},
 
 			"控制": {
-				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
 				"DragControls": "examples/zh/controls/DragControls",
 				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
 				"FlyControls": "examples/zh/controls/FlyControls",
@@ -1021,7 +1019,6 @@
 		"예제": {
 
 			"컨트롤": {
-				"DeviceOrientationControls": "examples/ko/controls/DeviceOrientationControls",
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",
