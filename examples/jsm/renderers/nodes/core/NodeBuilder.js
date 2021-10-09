@@ -554,7 +554,7 @@ class NodeBuilder {
 
 		}
 
-		if ( this.context.vertex !== undefined && this.context.vertex !== null ) {
+		if ( this.context.vertex && this.context.vertex.isNode === true ) {
 
 			this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
 
