@@ -75,14 +75,6 @@ class SkinningNode extends Node {
 
 	generate( builder ) {
 
-		const keywords = builder.context.keywords;
-
-		keywords.addKeyword( 'BoneMatrices', () => {
-
-			return new ConstNode( this.boneMatricesNode.build( builder ), 'mat4', 'BoneMatrices' );
-
-		} );
-
 		// inout nodes
 		const position = new PositionNode( PositionNode.LOCAL );
 		const normal = new NormalNode( NormalNode.LOCAL );
