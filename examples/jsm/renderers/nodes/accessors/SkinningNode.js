@@ -26,8 +26,8 @@ const Skinning = new ShaderNode( ( inputs, builder ) => {
 	const skinned = add(
 		mul( mul( boneMatX, skinVertex ), weight.x ),
 		mul( mul( boneMatY, skinVertex ), weight.y ),
-		mul( mul( boneMatW, skinVertex ), weight.z ),
-		mul( mul( boneMatZ, skinVertex ), weight.w )
+		mul( mul( boneMatZ, skinVertex ), weight.z ),
+		mul( mul( boneMatW, skinVertex ), weight.w )
 	);
 
 	const skinPosition = mul( bindMatrixInverse, skinned ).xyz;
