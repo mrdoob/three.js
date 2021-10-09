@@ -15,6 +15,12 @@ class BufferNode extends InputNode {
 
 	}
 
+	getNodeType( builder ) {
+
+		return this.bufferType;
+
+	}
+
 }
 
 BufferNode.prototype.isBufferNode = true;
