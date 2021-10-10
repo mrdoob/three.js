@@ -703,15 +703,15 @@ class WebGPURenderPipeline {
 
 	_getShaderAttributes( nodeBuilder, geometry ) {
 
-		const attributes = [];
 		const nodeAttributes = nodeBuilder.attributes;
+		const attributes = [];
 
 		for ( let slot = 0; slot < nodeAttributes.length; slot++ ) {
 
-			const attribute = nodeAttributes[ slot ];
+			const nodeAttribute = nodeAttributes[ slot ];
 
-			const name = attribute.name;
-			const type = attribute.type;
+			const name = nodeAttribute.name;
+			const type = nodeAttribute.type;
 
 			const geometryAttribute = geometry.getAttribute( name );
 			const bytesPerElement = ( geometryAttribute !== undefined ) ? geometryAttribute.array.BYTES_PER_ELEMENT : 4;
