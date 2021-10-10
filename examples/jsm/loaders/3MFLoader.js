@@ -1431,7 +1431,11 @@ class ThreeMFLoader extends Loader {
 			for ( let i = 0; i < buildData.length; i ++ ) {
 
 				const buildItem = buildData[ i ];
-				const object3D = objects[ buildItem[ 'objectId' ] ];
+				const object3D = objects[ buildItem[ 'objectId' ] ].clone(true);
+
+				for(let j = 0; j < object3D.children.length; j++){
+					object3D.children[j].geometry = object3D.children[j].geometry.clone();
+				}
 
 				// apply transform
 
