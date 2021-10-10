@@ -83,7 +83,7 @@ class Node {
 
 			if ( snippet === undefined ) {
 
-				snippet = this.generate( builder );
+				snippet = this.generate( builder ) || '';
 
 				nodeData.snippet = snippet;
 
@@ -93,7 +93,7 @@ class Node {
 
 		} else {
 
-			snippet = this.generate( builder, output );
+			snippet = this.generate( builder, output ) || '';
 
 		}
 

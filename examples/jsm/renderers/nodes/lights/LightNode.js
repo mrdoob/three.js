@@ -25,23 +25,6 @@ class LightNode extends Node {
 		this.lightCutoffDistance = new FloatNode( 0 );
 		this.lightDecayExponent = new FloatNode( 0 );
 
-		this.lightPositionView = new Object3DNode( Object3DNode.VIEW_POSITION );
-		this.positionView = new PositionNode( PositionNode.VIEW );
-
-		this.lVector = new OperatorNode( '-', this.lightPositionView, this.positionView );
-
-		this.lightDirection = new MathNode( MathNode.NORMALIZE, this.lVector );
-
-		this.lightDistance = new MathNode( MathNode.LENGTH, this.lVector );
-
-		this.lightAttenuation = getDistanceAttenuation.call( {
-			lightDistance: this.lightDistance,
-			cutoffDistance: this.lightCutoffDistance,
-			decayExponent: this.lightDecayExponent
-		} );
-
-		this.lightColor = new OperatorNode( '*', this.color, this.lightAttenuation );
-
 	}
 
 	update( /* frame */ ) {
@@ -56,21 +39,38 @@ class LightNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		this.lightPositionView.object3d = this.light;
+		const lightPositionView = new Object3DNode( Object3DNode.VIEW_POSITION );
+		const positionView = new PositionNode( PositionNode.VIEW );
 
-		const lightingModelFunctionNode = builder.getContextValue( 'lightingModel' );
+		const lVector = new OperatorNode( '-', lightPositionView, positionView );
 
-		if ( lightingModelFunctionNode !== undefined ) {
+		const lightDirection = new MathNode( MathNode.NORMALIZE, lVector );
 
-			const reflectedLightStructNode = builder.getContextValue( 'reflectedLight' );
+		const lightDistance = new MathNode( MathNode.LENGTH, lVector );
 
-			const lightingModelCallNode = lightingModelFunctionNode.call( {
-				lightDirection: this.lightDirection,
-				lightColor: this.lightColor,
-				reflectedLight:	reflectedLightStructNode
-			} );
+		const lightAttenuation = getDistanceAttenuation( {
+			lightDistance,
+			cutoffDistance: this.lightCutoffDistance,
+			decayExponent: this.lightDecayExponent
+		} );
 
-			builder.addFlowCode( lightingModelCallNode.build( builder ) );
+		const lightColor = new OperatorNode( '*', this.color, lightAttenuation );
+
+		lightPositionView.object3d = this.light;
+
+		const lightingModelFunction = builder.getContextValue( 'lightingModel' );
+
+		if ( lightingModelFunction !== undefined ) {
+
+			const directDiffuse = builder.getContextValue( 'directDiffuse' );
+			const directSpecular = builder.getContextValue( 'directSpecular' );
+
+			lightingModelFunction( {
+				lightDirection,
+				lightColor,
+				directDiffuse,
+				directSpecular
+			}, builder );
 
 		}
 

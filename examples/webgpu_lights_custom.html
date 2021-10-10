@@ -29,6 +29,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import { add } from './jsm/renderers/nodes/ShaderNode.js';
 
 			let camera, scene, renderer;
 
@@ -88,14 +89,13 @@
 
 				// custom lighting model
 
-				const customLightingModel = new Nodes.FunctionNode( `
-					void ( inout ReflectedLight reflectedLight, vec3 lightColor ) {
+				const customLightingModel = new Nodes.ShaderNode( ( inputs ) => {
 
-						// lightColor returns the light color with the intensity calculated
+					const { lightColor, directDiffuse } = inputs;
 
-						reflectedLight.directDiffuse += lightColor;
+					directDiffuse.value = add( directDiffuse.value, lightColor );
 
-					}` );
+				} );
 
 				const lightingModelContext = new Nodes.ContextNode( allLightsNode );
 				lightingModelContext.setContextValue( 'lightingModel', customLightingModel );

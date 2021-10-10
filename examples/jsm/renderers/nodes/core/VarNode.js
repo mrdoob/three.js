@@ -11,6 +11,12 @@ class VarNode extends Node {
 
 	}
 
+	getHash( builder ) {
+
+		return this.name || super.getHash( builder );
+
+	}
+
 	getNodeType( builder ) {
 
 		return super.getNodeType( builder ) || this.value.getNodeType( builder );

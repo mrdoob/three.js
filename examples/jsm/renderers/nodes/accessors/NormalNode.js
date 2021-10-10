@@ -6,7 +6,6 @@ import ModelNode from '../accessors/ModelNode.js';
 import CameraNode from '../accessors/CameraNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import MathNode from '../math/MathNode.js';
-import { inverseTransformDirection } from '../functions/MathFunctions.js';
 
 class NormalNode extends Node {
 
@@ -50,7 +49,8 @@ class NormalNode extends Node {
 
 		} else if ( scope === NormalNode.WORLD ) {
 
-			const vertexNormalNode = inverseTransformDirection.call( { dir: new NormalNode( NormalNode.VIEW ), matrix: new CameraNode( CameraNode.VIEW_MATRIX ) } );
+			// To use INVERSE_TRANSFORM_DIRECTION only inverse the param order like this: MathNode( ..., Vector, Matrix );
+			const vertexNormalNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new NormalNode( NormalNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
 			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
 
 		}

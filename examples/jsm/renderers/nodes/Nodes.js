@@ -42,6 +42,7 @@ import UVNode from './accessors/UVNode.js';
 // inputs
 import ColorNode from './inputs/ColorNode.js';
 import FloatNode from './inputs/FloatNode.js';
+import IntNode from './inputs/IntNode.js';
 import Matrix3Node from './inputs/Matrix3Node.js';
 import Matrix4Node from './inputs/Matrix3Node.js';
 import TextureNode from './inputs/TextureNode.js';
@@ -63,6 +64,7 @@ import LightNode from './lights/LightNode.js';
 import LightsNode from './lights/LightsNode.js';
 
 // utils
+import ArrayElementNode from './utils/ArrayElementNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
@@ -76,14 +78,12 @@ export * from './core/constants.js';
 
 // functions
 export * from './functions/BSDFs.js';
-export * from './functions/EncodingFunctions.js';
-export * from './functions/MathFunctions.js';
-
-// consts
-export * from './consts/MathConsts.js';
 
 // materials
 export * from './materials/Materials.js';
+
+// shader node
+export * from './ShaderNode.js';
 
 export {
 	// core
@@ -130,6 +130,7 @@ export {
 	// inputs
 	ColorNode,
 	FloatNode,
+	IntNode,
 	Matrix3Node,
 	Matrix4Node,
 	TextureNode,
@@ -151,6 +152,7 @@ export {
 	LightsNode,
 
 	// utils
+	ArrayElementNode,
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,

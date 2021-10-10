@@ -141,12 +141,18 @@ class NodeBuilder {
 	getConst( type, value ) {
 
 		if ( type === 'float' ) return value + ( value % 1 ? '' : '.0' );
-		if ( type === 'vec2' ) return `vec2( ${value.x}, ${value.y} )`;
-		if ( type === 'vec3' ) return `vec3( ${value.x}, ${value.y}, ${value.z} )`;
-		if ( type === 'vec4' ) return `vec4( ${value.x}, ${value.y}, ${value.z}, ${value.w} )`;
-		if ( type === 'color' ) return `vec3( ${value.r}, ${value.g}, ${value.b} )`;
+		if ( type === 'vec2' ) return `${ this.getType( 'vec2' ) }( ${value.x}, ${value.y} )`;
+		if ( type === 'vec3' ) return `${ this.getType( 'vec3' ) }( ${value.x}, ${value.y}, ${value.z} )`;
+		if ( type === 'vec4' ) return `${ this.getType( 'vec4' ) }( ${value.x}, ${value.y}, ${value.z}, ${value.w} )`;
+		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${value.r}, ${value.g}, ${value.b} )`;
 
 		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
+
+	}
+
+	getType( type ) {
+
+		return type;
 
 	}
 
@@ -548,7 +554,7 @@ class NodeBuilder {
 
 		}
 
-		if ( this.context.vertex !== undefined && this.context.vertex !== null ) {
+		if ( this.context.vertex && this.context.vertex.isNode === true ) {
 
 			this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
 
@@ -623,31 +629,42 @@ class NodeBuilder {
 
 		switch ( typeToType ) {
 
-			case 'float to vec2' : return `vec2( ${snippet} )`;
-			case 'float to vec3' : return `vec3( ${snippet} )`;
-			case 'float to vec4' : return `vec4( vec3( ${snippet} ), 1.0 )`;
+			case 'int to float' : return `${ this.getType( 'float' ) }( ${ snippet } )`;
+			case 'int to vec2' : return `${ this.getType( 'vec2' ) }( ${ this.getType( 'float' ) }( ${ snippet } ) )`;
+			case 'int to vec3' : return `${ this.getType( 'vec3' ) }( ${ this.getType( 'float' ) }( ${ snippet } ) )`;
+			case 'int to vec4' : return `${ this.getType( 'vec4' ) }( ${ this.getType( 'vec3' ) }( ${ this.getType( 'float' ) }( ${ snippet } ) ), 1.0 )`;
 
-			case 'vec2 to float' : return `${snippet}.x`;
-			case 'vec2 to vec3' : return `vec3( ${snippet}, 0.0 )`;
-			case 'vec2 to vec4' : return `vec4( ${snippet}.xy, 0.0, 1.0 )`;
+			case 'float to int' : return `${ this.getType( 'int' ) }( ${ snippet } )`;
+			case 'float to vec2' : return `${ this.getType( 'vec2' ) }( ${ snippet } )`;
+			case 'float to vec3' : return `${ this.getType( 'vec3' ) }( ${ snippet } )`;
+			case 'float to vec4' : return `${ this.getType( 'vec4' ) }( ${ this.getType( 'vec3' ) }( ${ snippet } ), 1.0 )`;
 
-			case 'vec3 to float' : return `${snippet}.x`;
-			case 'vec3 to vec2' : return `${snippet}.xy`;
-			case 'vec3 to vec4' : return `vec4( ${snippet}, 1.0 )`;
+			case 'vec2 to int' : return `${ this.getType( 'int' ) }( ${ snippet }.x )`;
+			case 'vec2 to float' : return `${ snippet }.x`;
+			case 'vec2 to vec3'  : return `${ this.getType( 'vec3' ) }( ${ snippet }, 0.0 )`;
+			case 'vec2 to vec4'  : return `${ this.getType( 'vec4' ) }( ${ snippet }.xy, 0.0, 1.0 )`;
 
-			case 'vec4 to float' : return `${snippet}.x`;
-			case 'vec4 to vec2' : return `${snippet}.xy`;
-			case 'vec4 to vec3' : return `${snippet}.xyz`;
+			case 'vec3 to int' : return `${ this.getType( 'int' ) }( ${ snippet }.x )`;
+			case 'vec3 to float' : return `${ snippet }.x`;
+			case 'vec3 to vec2'  : return `${ snippet }.xy`;
+			case 'vec3 to vec4'  : return `${ this.getType( 'vec4' ) }( ${ snippet }, 1.0 )`;
 
-			case 'mat3 to float' : return `( ${snippet} * vec3( 1.0 ) ).x`;
-			case 'mat3 to vec2' : return `( ${snippet} * vec3( 1.0 ) ).xy`;
-			case 'mat3 to vec3' : return `( ${snippet} * vec3( 1.0 ) ).xyz`;
-			case 'mat3 to vec4' : return `vec4( ${snippet} * vec3( 1.0 ), 1.0 )`;
+			case 'vec4 to int' : return `${ this.getType( 'int' ) }( ${ snippet }.x )`;
+			case 'vec4 to float' : return `${ snippet }.x`;
+			case 'vec4 to vec2'  : return `${ snippet }.xy`;
+			case 'vec4 to vec3'  : return `${ snippet }.xyz`;
 
-			case 'mat4 to float' : return `( ${snippet} * vec4( 1.0 ) ).x`;
-			case 'mat4 to vec2' : return `( ${snippet} * vec4( 1.0 ) ).xy`;
-			case 'mat4 to vec3' : return `( ${snippet} * vec4( 1.0 ) ).xyz`;
-			case 'mat4 to vec4' : return `( ${snippet} * vec4( 1.0 ) )`;
+			case 'mat3 to int' : return `${ this.getType( 'int' ) }( ${ snippet } * ${ this.getType( 'vec3' ) }( 1.0 ) ).x`;
+			case 'mat3 to float' : return `( ${ snippet } * ${ this.getType( 'vec3' ) }( 1.0 ) ).x`;
+			case 'mat3 to vec2'  : return `( ${ snippet } * ${ this.getType( 'vec3' ) }( 1.0 ) ).xy`;
+			case 'mat3 to vec3'  : return `( ${ snippet } * ${ this.getType( 'vec3' ) }( 1.0 ) ).xyz`;
+			case 'mat3 to vec4'  : return `${ this.getType( 'vec4' ) }( ${ snippet } * ${ this.getType( 'vec3' ) }( 1.0 ), 1.0 )`;
+
+			case 'mat4 to int' : return `${ this.getType( 'int' ) }( ${ snippet } * ${ this.getType( 'vec4' ) }( 1.0 ) ).x`;
+			case 'mat4 to float' : return `( ${ snippet } * ${ this.getType( 'vec4' ) }( 1.0 ) ).x`;
+			case 'mat4 to vec2'  : return `( ${ snippet } * ${ this.getType( 'vec4' ) }( 1.0 ) ).xy`;
+			case 'mat4 to vec3'  : return `( ${ snippet } * ${ this.getType( 'vec4' ) }( 1.0 ) ).xyz`;
+			case 'mat4 to vec4'  : return `( ${ snippet } * ${ this.getType( 'vec4' ) }( 1.0 ) )`;
 
 		}
 

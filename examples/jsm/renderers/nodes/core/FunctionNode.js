@@ -8,7 +8,6 @@ class FunctionNode extends CodeNode {
 		super( code );
 
 		this.inputs = [];
-		this.nodeFunction = null;
 
 		this.useKeywords = true;
 
@@ -28,13 +27,19 @@ class FunctionNode extends CodeNode {
 
 	getNodeFunction( builder ) {
 
-		if ( this.nodeFunction === null ) {
+		const nodeData = builder.getDataFromNode( this );
 
-			this.nodeFunction = builder.parser.parseFunction( this.code );
+		let nodeFunction = nodeData.nodeFunction;
+
+		if ( nodeFunction === undefined ) {
+
+			nodeFunction = builder.parser.parseFunction( this.code );
+
+			nodeData.nodeFunction = nodeFunction;
 
 		}
 
-		return this.nodeFunction;
+		return nodeFunction;
 
 	}
 

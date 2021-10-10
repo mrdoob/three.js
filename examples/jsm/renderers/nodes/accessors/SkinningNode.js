@@ -3,45 +3,54 @@ import AttributeNode from '../core/AttributeNode.js';
 import ConstNode from '../core/ConstNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
-import FunctionNode from '../core/FunctionNode.js';
 import Matrix4Node from '../inputs/Matrix4Node.js';
 import BufferNode from '../inputs/BufferNode.js';
 
+import { ShaderNode, assign, element, add, mul, transformDirection } from '../ShaderNode.js';
+
 import { NodeUpdateType } from '../core/constants.js';
 
-const Skinning = new FunctionNode( `
-	void ( inout vec3 position, inout vec3 normal, const in vec4 index, const in vec4 weight, const in mat4 bindMatrix, const in mat4 bindMatrixInverse ) {
+const Skinning = new ShaderNode( ( inputs, builder ) => {
 
-		mat4 boneMatX = BoneMatrices[ int( index.x ) ];
-		mat4 boneMatY = BoneMatrices[ int( index.y ) ];
-		mat4 boneMatZ = BoneMatrices[ int( index.z ) ];
-		mat4 boneMatW = BoneMatrices[ int( index.w ) ];
+	const { position, normal, index, weight, bindMatrix, bindMatrixInverse, boneMatrices } = inputs;
 
-		// POSITION
+	const boneMatX = element( boneMatrices, index.x );
+	const boneMatY = element( boneMatrices, index.y );
+	const boneMatZ = element( boneMatrices, index.z );
+	const boneMatW = element( boneMatrices, index.w );
 
-		vec4 skinVertex = bindMatrix * vec4( position, 1.0 );
+	// POSITION
 
-		vec4 skinned = vec4( 0.0 );
-		skinned += boneMatX * skinVertex * weight.x;
-		skinned += boneMatY * skinVertex * weight.y;
-		skinned += boneMatZ * skinVertex * weight.z;
-		skinned += boneMatW * skinVertex * weight.w;
+	const skinVertex = mul( bindMatrix, position );
 
-		position = ( bindMatrixInverse * skinned ).xyz;
+	const skinned = add(
+		mul( mul( boneMatX, skinVertex ), weight.x ),
+		mul( mul( boneMatY, skinVertex ), weight.y ),
+		mul( mul( boneMatZ, skinVertex ), weight.z ),
+		mul( mul( boneMatW, skinVertex ), weight.w )
+	);
 
-		// NORMAL
+	const skinPosition = mul( bindMatrixInverse, skinned ).xyz;
 
-		mat4 skinMatrix = mat4( 0.0 );
-		skinMatrix += skinWeight.x * boneMatX;
-		skinMatrix += skinWeight.y * boneMatY;
-		skinMatrix += skinWeight.z * boneMatZ;
-		skinMatrix += skinWeight.w * boneMatW;
-		skinMatrix = bindMatrixInverse * skinMatrix * bindMatrix;
+	// NORMAL
 
-		normal = vec4( skinMatrix * vec4( normal, 0.0 ) ).xyz;
+	let skinMatrix = add(
+		mul( weight.x, boneMatX ),
+		mul( weight.y, boneMatY ),
+		mul( weight.z, boneMatZ ),
+		mul( weight.w, boneMatW )
+	);
 
-	}`
-);
+	skinMatrix = mul( mul( bindMatrixInverse, skinMatrix ), bindMatrix );
+
+	const skinNormal = transformDirection( skinMatrix, normal ).xyz;
+
+	// ASSIGNS
+
+	assign( position, skinPosition ).build( builder );
+	assign( normal, skinNormal ).build( builder );
+
+} );
 
 class SkinningNode extends Node {
 
@@ -66,14 +75,6 @@ class SkinningNode extends Node {
 
 	generate( builder ) {
 
-		const keywords = builder.getContextValue( 'keywords' );
-
-		keywords.addKeyword( 'BoneMatrices', () => {
-
-			return new ConstNode( this.boneMatricesNode.build( builder ), 'mat4', 'BoneMatrices' );
-
-		} );
-
 		// inout nodes
 		const position = new PositionNode( PositionNode.LOCAL );
 		const normal = new NormalNode( NormalNode.LOCAL );
@@ -82,15 +83,17 @@ class SkinningNode extends Node {
 		const weight = this.skinWeightNode;
 		const bindMatrix = this.bindMatrixNode;
 		const bindMatrixInverse = this.bindMatrixInverseNode;
+		const boneMatrices = this.boneMatricesNode;
 
-		return Skinning.call( {
+		Skinning( {
 			position,
 			normal,
 			index,
 			weight,
 			bindMatrix,
-			bindMatrixInverse
-		} ).build( builder );
+			bindMatrixInverse,
+			boneMatrices
+		}, builder );
 
 	}
 
