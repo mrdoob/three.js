@@ -43,6 +43,7 @@
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
 		"webgl_instancing_dynamic",
+		"webgl_instancing_skinning",
 		"webgl_instancing_performance",
 		"webgl_instancing_raycast",
 		"webgl_instancing_scatter",

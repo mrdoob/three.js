@@ -127,23 +127,23 @@ class Skeleton {
 
 	}
 
-	update() {
+	update( instanceBones, id ) {
 
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
-		const boneMatrices = this.boneMatrices;
+		const boneMatrices = instanceBones || this.boneMatrices;
 		const boneTexture = this.boneTexture;
+		const instanceId = id || 0;
 
 		// flatten bone matrices to array
 
 		for ( let i = 0, il = bones.length; i < il; i ++ ) {
 
 			// compute the offset between the current and the original transform
-
 			const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix;
 
 			_offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
-			_offsetMatrix.toArray( boneMatrices, i * 16 );
+			_offsetMatrix.toArray( boneMatrices, 16 * ( i + instanceId * bones.length ) );
 
 		}
 
@@ -184,6 +184,12 @@ class Skeleton {
 		this.boneTextureSize = size;
 
 		return this;
+
+	}
+
+	computeInstancedBoneTexture( boneMatrices, count ) {
+
+		this.boneTexture = new DataTexture( boneMatrices, this.bones.length * 4, count, RGBAFormat, FloatType );
 
 	}
 

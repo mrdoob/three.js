@@ -16,6 +16,7 @@ export { Scene } from './scenes/Scene.js';
 export { Sprite } from './objects/Sprite.js';
 export { LOD } from './objects/LOD.js';
 export { SkinnedMesh } from './objects/SkinnedMesh.js';
+export { InstancedSkinnedMesh } from './objects/InstancedSkinnedMesh.js';
 export { Skeleton } from './objects/Skeleton.js';
 export { Bone } from './objects/Bone.js';
 export { Mesh } from './objects/Mesh.js';

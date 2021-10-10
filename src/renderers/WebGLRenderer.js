@@ -1099,9 +1099,9 @@ function WebGLRenderer( parameters = {} ) {
 
 				if ( object.isSkinnedMesh ) {
 
-					// update skeleton only once in a frame
-
-					if ( object.skeleton.frame !== info.render.frame ) {
+					// update skeleton only once in a frame but skip for InstancedSkinnedMesh
+					// as we have done that implicitly already by calling object.setBonesAt()
+					if ( object.skeleton.frame !== info.render.frame && object.isInstancedMesh !== true ) {
 
 						object.skeleton.update();
 						object.skeleton.frame = info.render.frame;
@@ -1629,7 +1629,19 @@ function WebGLRenderer( parameters = {} ) {
 
 				if ( capabilities.floatVertexTextures ) {
 
-					if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
+					if ( skeleton.boneTexture === null ) {
+
+						if ( object.isInstancedMesh ) {
+
+							skeleton.computeInstancedBoneTexture( object.instanceBones, object.count );
+
+						} else {
+
+							skeleton.computeBoneTexture();
+
+						}
+
+					}
 
 					p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture, textures );
 					p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );

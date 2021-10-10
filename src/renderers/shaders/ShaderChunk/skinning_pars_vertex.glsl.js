@@ -11,6 +11,16 @@ export default /* glsl */`
 
 		mat4 getBoneMatrix( const in float i ) {
 
+		#ifdef USE_INSTANCING
+			
+			int j = 4 * int(i);
+			vec4 v1 = texelFetch(boneTexture, ivec2( j, gl_InstanceID ), 0);
+			vec4 v2 = texelFetch(boneTexture, ivec2( j + 1, gl_InstanceID ), 0);
+			vec4 v3 = texelFetch(boneTexture, ivec2( j + 2, gl_InstanceID ), 0);
+			vec4 v4 = texelFetch(boneTexture, ivec2( j + 3, gl_InstanceID ), 0);
+			
+		#else
+
 			float j = i * 4.0;
 			float x = mod( j, float( boneTextureSize ) );
 			float y = floor( j / float( boneTextureSize ) );
@@ -25,6 +35,8 @@ export default /* glsl */`
 			vec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );
 			vec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );
 
+		#endif
+		
 			mat4 bone = mat4( v1, v2, v3, v4 );
 
 			return bone;
