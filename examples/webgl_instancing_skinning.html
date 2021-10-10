@@ -167,11 +167,12 @@
 								
 								dummy.updateMatrix();
 								
+								mixer.setTime(t);
+
 								dummy.skeleton.bones.forEach((b) => {
 									b.updateMatrixWorld();
 								});
-								mixer.setTime(t);
-
+								
 								mesh.setMatrixAt( i, dummy.matrix );
 								
 								mesh.setBonesAt(i, dummy.skeleton);
