@@ -1275,7 +1275,7 @@ function WebGLRenderer( parameters = {} ) {
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
 				wrapT: ClampToEdgeWrapping,
-				useRenderToTexture: extensions.has( 'EXT_multisampled_render_to_texture' )
+				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
 			} );
 
 		}
