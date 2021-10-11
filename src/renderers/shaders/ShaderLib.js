@@ -311,6 +311,7 @@ ShaderLib.physical = {
 			specularIntensityMap: { value: null },
 			specularTint: { value: new Color( 1, 1, 1 ) },
 			specularTintMap: { value: null },
+			specularMap: { value: null },
 		}
 	] ),
 
