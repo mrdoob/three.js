@@ -363,25 +363,58 @@ class PLYLoader extends Loader {
 
 		function handleElement( buffer, elementName, element ) {
 
+			function findAttrName( attrNames, fallbackAttrName ) {
+
+				for ( let i = 0; i < attrNames.length; i ++ ) {
+
+					if ( attrNames[ i ] in element ) {
+
+						return attrNames[ i ];
+
+					}
+
+				}
+
+				return fallbackAttrName;
+
+			}
+
 			if ( elementName === 'vertex' ) {
 
-				buffer.vertices.push( element.x, element.y, element.z );
+				// Common PLY attribute names.
 
-				if ( 'nx' in element && 'ny' in element && 'nz' in element ) {
+				const attr_x = findAttrName( [ 'x', 'px', 'posx' ], 'x' ); // always required
+				const attr_y = findAttrName( [ 'y', 'py', 'posy' ], 'y' ); // always required
+				const attr_z = findAttrName( [ 'z', 'pz', 'posz' ], 'z' ); // always required
 
-					buffer.normals.push( element.nx, element.ny, element.nz );
+				const attr_nx = findAttrName( [ 'nx', 'normalx' ], null );
+				const attr_ny = findAttrName( [ 'ny', 'normaly' ], null );
+				const attr_nz = findAttrName( [ 'nz', 'normalz' ], null );
+
+				const attr_u = findAttrName( [ 's', 'u', 'texture_u', 'tx' ], null );
+				const attr_v = findAttrName( [ 't', 'v', 'texture_v', 'ty' ], null );
+
+				const attr_red = findAttrName( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ], null );
+				const attr_green = findAttrName( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ], null );
+				const attr_blue = findAttrName( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ], null );
+
+				buffer.vertices.push( element[ attr_x ], element[ attr_y ], element[ attr_z ] );
+
+				if ( attr_nx !== null && attr_ny !== null && attr_nz !== null ) {
+
+					buffer.normals.push( element[ attr_nx ], element[ attr_ny ], element[ attr_nz ] );
 
 				}
 
-				if ( 's' in element && 't' in element ) {
+				if ( attr_u !== null && attr_v !== null ) {
 
-					buffer.uvs.push( element.s, element.t );
+					buffer.uvs.push( element[ attr_u ], element[ attr_v ] );
 
 				}
 
-				if ( 'red' in element && 'green' in element && 'blue' in element ) {
+				if ( attr_red !== null && attr_green !== null && attr_blue !== null ) {
 
-					buffer.colors.push( element.red / 255.0, element.green / 255.0, element.blue / 255.0 );
+					buffer.colors.push( element[ attr_red ] / 255.0, element[ attr_green ] / 255.0, element[ attr_blue ] / 255.0 );
 
 				}
 
