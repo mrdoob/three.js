@@ -576,7 +576,7 @@ function WebGLRenderer( parameters = {} ) {
 		xr.removeEventListener( 'sessionstart', onXRSessionStart );
 		xr.removeEventListener( 'sessionend', onXRSessionEnd );
 
-		if ( _transmissionRenderTarget.length ) {
+		if ( _transmissionRenderTarget.length > 0 ) {
 
 			_transmissionRenderTarget.forEach( ( target ) => target.dispose() );
 			_transmissionRenderTarget = [];
