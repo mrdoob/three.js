@@ -2097,9 +2097,9 @@ class ArcballControls extends Object3D {
 		window.removeEventListener( 'pointerup', this.onPointerUp );
 
 		window.removeEventListener( 'resize', this.onWindowResize );
-		window.addEventListener( 'keydown', this.onKeyDown );
+		window.removeEventListener( 'keydown', this.onKeyDown );
 
-		this.scene.remove( this._gizmos );
+		if ( this.scene !== null ) this.scene.remove( this._gizmos );
 		this.disposeGrid();
 
 	};
