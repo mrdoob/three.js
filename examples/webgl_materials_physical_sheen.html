@@ -18,8 +18,6 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import * as Nodes from './jsm/nodes/Nodes.js';
-
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -30,13 +28,13 @@
 			// Graphics variables
 			let camera, controls, scene, renderer, stats;
 			let directionalLight;
-			let mesh, sphere, material, nodeMaterial;
+			let mesh, sphere, material;
 
 			const params = {
-				nodeMaterial: true,
 				color: new THREE.Color( 255, 0, 127 ),
-				sheenBRDF: true,
-				sheen: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
+				sheen: 1,
+				sheenTint: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
+				sheenRoughness: 1,
 				roughness: 0.9
 			};
 
@@ -52,6 +50,7 @@
 			function init( ) {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
+				camera.position.set( - 12, 7, 4 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
@@ -65,13 +64,7 @@
 				material.side = THREE.DoubleSide;
 				material.metalness = 0;
 
-				//
-
-				nodeMaterial = new Nodes.StandardNodeMaterial();
-				nodeMaterial.side = THREE.DoubleSide;
-				nodeMaterial.metalness = new Nodes.FloatNode( 0 );
-				nodeMaterial.roughness = new Nodes.FloatNode();
-				nodeMaterial.color = new Nodes.ColorNode( params.color.clone() );
+				mesh.material = material;
 
 				//
 
@@ -81,13 +74,12 @@
 				);
 				scene.add( sphere );
 
-				camera.position.set( - 12, 7, 4 );
+				//
 
 				const container = document.getElementById( 'container' );
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -96,7 +88,6 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 0, 10, 0 );
-				directionalLight.castShadow = true;
 				directionalLight.add(
 					new THREE.Mesh(
 						new THREE.SphereGeometry( 0.5 ),
@@ -107,42 +98,18 @@
 				scene.add( directionalLight );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
 				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
 
-				function onUpdate() {
-
-					mesh.material = sphere.material = params.nodeMaterial
-						? nodeMaterial
-						: material;
-
-					material.sheen = params.sheenBRDF
-						? new THREE.Color()
-						: null;
-
-					material.needsUpdate = true;
-
-					nodeMaterial.sheen = params.sheenBRDF
-						? new Nodes.ColorNode( material.sheen )
-						: undefined;
-
-					nodeMaterial.needsCompile = true;
-
-				}
-
-				gui.add( params, 'nodeMaterial' ).onChange( onUpdate );
 				gui.addColor( params, 'color' );
-				gui.add( params, 'sheenBRDF' ).onChange( onUpdate );
-				gui.addColor( params, 'sheen' );
+				gui.add( params, 'sheen', 0, 1 );
+				gui.addColor( params, 'sheenTint' );
+				gui.add( params, 'sheenRoughness', 0, 1 );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.open();
-
-				onUpdate();
 
 				animate();
 
@@ -168,23 +135,11 @@
 
 			function render() {
 
-				//
-
 				material.color.copy( params.color ).multiplyScalar( 1 / 255 );
 				material.roughness = params.roughness;
-
-				//
-
-				nodeMaterial.color.value.copy( material.color );
-				nodeMaterial.roughness.value = params.roughness;
-
-				//
-
-				if ( params.sheenBRDF ) {
-
-					material.sheen.copy( params.sheen ).multiplyScalar( 1 / 255 );
-
-				}
+				material.sheen = params.sheen;
+				material.sheenTint.copy( params.sheenTint ).multiplyScalar( 1 / 255 );
+				material.sheenRoughness = params.sheenRoughness;
 
 				//
 
