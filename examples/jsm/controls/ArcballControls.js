@@ -79,6 +79,7 @@ class ArcballControls extends Object3D {
 		this.camera = null;
 		this.domElement = domElement;
 		this.scene = scene;
+		this.target = new Vector3( 0, 0, 0 );
 
 		this.mouseActions = [];
 		this._mouseOp = null;
@@ -204,7 +205,6 @@ class ArcballControls extends Object3D {
 		this.maxZoom = Infinity;
 
 		//trackball parameters
-		this._tbCenter = new Vector3( 0, 0, 0 );
 		this._tbRadius = 1;
 
 		//FSA
@@ -2193,7 +2193,7 @@ class ArcballControls extends Object3D {
 	 */
 	setCamera = ( camera ) => {
 
-		camera.lookAt( this._tbCenter );
+		camera.lookAt( this.target );
 		camera.updateMatrix();
 
 		//setting state
@@ -2211,11 +2211,11 @@ class ArcballControls extends Object3D {
 		this._zoomState = this._zoom0;
 
 		this._initialNear = camera.near;
-		this._nearPos0 = camera.position.distanceTo( this._tbCenter ) - camera.near;
+		this._nearPos0 = camera.position.distanceTo( this.target ) - camera.near;
 		this._nearPos = this._initialNear;
 
 		this._initialFar = camera.far;
-		this._farPos0 = camera.position.distanceTo( this._tbCenter ) - camera.far;
+		this._farPos0 = camera.position.distanceTo( this.target ) - camera.far;
 		this._farPos = this._initialFar;
 
 		this._up0.copy( camera.up );
@@ -2226,7 +2226,7 @@ class ArcballControls extends Object3D {
 
 		//making gizmos
 		this._tbRadius = this.calculateTbRadius( camera );
-		this.makeGizmos( this._tbCenter, this._tbRadius );
+		this.makeGizmos( this.target, this._tbRadius );
 
 	};
 
@@ -2728,12 +2728,12 @@ class ArcballControls extends Object3D {
 	 */
 	setTarget = ( x, y, z ) => {
 
-		this._tbCenter.set( x, y, z );
+		this.target.set( x, y, z );
 		this._gizmos.position.set( x, y, z );	//for correct radius calculation
 		this._tbRadius = this.calculateTbRadius( this.camera );
 
-		this.makeGizmos( this._tbCenter, this._tbRadius );
-		this.camera.lookAt( this._tbCenter );
+		this.makeGizmos( this.target, this._tbRadius );
+		this.camera.lookAt( this.target );
 
 	};
 
