@@ -1735,6 +1735,7 @@ class ColladaLoader extends Loader {
 							material.opacity = color[ 0 ] * transparency.float;
 							break;
 						default:
+							material.opacity = 1 - transparency.float;
 							console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
 
 					}
