@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+		<p class="desc"> A texture cache interface for GLTF files.</p>
+
+    The simplest way to implement this is to just use a Javascript Map object.
+
+    <h2>Methods</h2>
+    <h3>[method:null set]( [param:string key] [param:Promise&lt;Texture&gt; texturePromise] )</h3>
+		<p>
+    [key] - unique string for texture
+		[page:Texture texture] — Instance of Promise&lt;THREE.Texture&gt;
+		</p>
+
+    <h3>[method:Promise&lt;Texture&gt; get]( [param:string key] )</h3>
+		<p>
+    [key] - unique string for texture
+		Returns instance of Promise&lt;THREE.Texture&gt;
+		</p>
+  </body>
+</html>

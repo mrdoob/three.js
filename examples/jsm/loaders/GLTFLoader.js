@@ -73,6 +73,7 @@ class GLTFLoader extends Loader {
 		this.dracoLoader = null;
 		this.ktx2Loader = null;
 		this.meshoptDecoder = null;
+		this.textureCache = null;
 
 		this.pluginCallbacks = [];
 
@@ -234,6 +235,13 @@ class GLTFLoader extends Loader {
 
 	}
 
+	setTextureCache( textureCache ) {
+
+		this.textureCache = textureCache;
+		return this;
+
+	}
+
 	register( callback ) {
 
 		if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
@@ -311,8 +319,8 @@ class GLTFLoader extends Loader {
 			requestHeader: this.requestHeader,
 			manager: this.manager,
 			ktx2Loader: this.ktx2Loader,
-			meshoptDecoder: this.meshoptDecoder
-
+			meshoptDecoder: this.meshoptDecoder,
+			textureCache: this.textureCache
 		} );
 
 		parser.fileLoader.setRequestHeader( this.requestHeader );
@@ -2181,7 +2189,7 @@ class GLTFParser {
 		this.cameraCache = { refs: {}, uses: {} };
 		this.lightCache = { refs: {}, uses: {} };
 
-		this.textureCache = {};
+		this.textureCache = options.textureCache || new Map();
 
 		// Track node names, to ensure no duplicates
 		this.nodeNamesUsed = {};
@@ -2770,10 +2778,10 @@ class GLTFParser {
 
 		const cacheKey = ( source.uri || source.bufferView ) + ':' + textureDef.sampler;
 
-		if ( this.textureCache[ cacheKey ] ) {
+		if ( this.textureCache.get( cacheKey ) ) {
 
 			// See https://github.com/mrdoob/three.js/issues/21559.
-			return this.textureCache[ cacheKey ];
+			return this.textureCache.get( cacheKey );
 
 		}
 
@@ -2857,7 +2865,7 @@ class GLTFParser {
 
 		} );
 
-		this.textureCache[ cacheKey ] = promise;
+		this.textureCache.set( cacheKey, promise );
 
 		return promise;
 
