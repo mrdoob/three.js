@@ -30,15 +30,15 @@ class LightContextNode extends ContextNode {
 
 		}
 
-		const directDiffuse = new VarNode( new Vector3Node() );
-		const directSpecular = new VarNode( new Vector3Node() );
+		const directDiffuse = new VarNode( new Vector3Node(), 'DirectDiffuse', 'vec3' );
+		const directSpecular = new VarNode( new Vector3Node(), 'DirectSpecular', 'vec3' );
 
-		this.setContextValue( 'directDiffuse', directDiffuse );
-		this.setContextValue( 'directSpecular', directSpecular );
+		this.context.directDiffuse = directDiffuse;
+		this.context.directSpecular = directSpecular;
 
 		if ( lightingModel !== null ) {
 
-			this.setContextValue( 'lightingModel', lightingModel );
+			this.context.lightingModel = lightingModel;
 
 		}
 
