@@ -2152,4 +2152,6 @@ function WebGLRenderer( parameters = {} ) {
 
 }
 
+WebGLRenderer.prototype.isWebGLRenderer = true;
+
 export { WebGLRenderer };
