@@ -76,7 +76,20 @@ material.roughness = min( material.roughness, 1.0 );
 #ifdef USE_SHEEN
 
 	material.sheenTint = sheenTint;
+
+	#ifdef USE_SHEENTINTMAP
+
+		material.sheenTint *= sheenTintMapTexelToLinear( texture2D( sheenTintMap, vUv ) ).rgb;
+
+	#endif
+
 	material.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );
+
+	#ifdef USE_SHEENROUGHNESSMAP
+
+		material.sheenRoughness *= texture2D( sheenRoughnessMap, vUv ).a;
+
+	#endif
 
 #endif
 `;
