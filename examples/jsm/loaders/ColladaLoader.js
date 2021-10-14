@@ -10,6 +10,7 @@ import {
 	Euler,
 	FileLoader,
 	Float32BufferAttribute,
+	FrontSide,
 	Group,
 	Line,
 	LineBasicMaterial,
@@ -33,6 +34,7 @@ import {
 	SkinnedMesh,
 	SpotLight,
 	TextureLoader,
+	Vector2,
 	Vector3,
 	VectorKeyframeTrack
 } from '../../../build/three.module.js';
@@ -1466,6 +1468,7 @@ class ColladaLoader extends Loader {
 		}
 
 		function parseEffectExtraTechniqueBump( xml ) {
+
 			var data = {};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
@@ -1554,7 +1557,6 @@ class ColladaLoader extends Loader {
 
 			const effect = getEffect( data.url );
 			const technique = effect.profile.technique;
-			const extra = effect.profile.extra;
 
 			let material;
 
@@ -1751,21 +1753,21 @@ class ColladaLoader extends Loader {
 
 			if ( technique.extra !== undefined && technique.extra.technique !== undefined ) {
 
-				let techniques = technique.extra.technique;
+				const techniques = technique.extra.technique;
 
-				for ( let k in techniques ) {
+				for ( const k in techniques ) {
 
-					let v = techniques[k];
+					const v = techniques[ k ];
 
-					switch (k) {
+					switch ( k ) {
 
 						case 'double_sided':
-							material.side = ( v === 1 ? THREE.DoubleSide : THREE.FrontSide );
+							material.side = ( v === 1 ? DoubleSide : FrontSide );
 							break;
 
 						case 'bump':
 							material.normalMap = getTexture( v.texture );
-							material.normalScale = new THREE.Vector2( 1, 1 );
+							material.normalScale = new Vector2( 1, 1 );
 							break;
 
 					}
