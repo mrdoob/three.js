@@ -17,7 +17,9 @@ import * as MathUtils from '../math/MathUtils.js';
  *
  *  sheen: <float>,
  *  sheenTint: <Color>,
+ *  sheenTintMap: new THREE.Texture( <Image> ),
  *  sheenRoughness: <float>,
+ *  sheenRoughnessMap: new THREE.Texture( <Image> ),
  *
  *  transmission: <float>,
  *  transmissionMap: new THREE.Texture( <Image> ),
@@ -71,7 +73,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		} );
 
 		this.sheenTint = new Color( 0x000000 );
+		this.sheenTintMap = null;
 		this.sheenRoughness = 1.0;
+		this.sheenRoughnessMap = null;
 
 		this.transmissionMap = null;
 
@@ -169,7 +173,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.sheen = source.sheen;
 		this.sheenTint.copy( source.sheenTint );
+		this.sheenTintMap = source.sheenTintMap;
 		this.sheenRoughness = source.sheenRoughness;
+		this.sheenRoughnessMap = source.sheenRoughnessMap;
 
 		this.transmission = source.transmission;
 		this.transmissionMap = source.transmissionMap;
