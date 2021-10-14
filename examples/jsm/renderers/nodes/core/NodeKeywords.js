@@ -1,59 +1,9 @@
-import VarNode from './VarNode.js';
-import PropertyNode from './PropertyNode.js';
-import PositionNode from '../accessors/PositionNode.js';
-import NormalNode from '../accessors/NormalNode.js';
-
 class NodeKeywords {
-
-	static PositionLocal = 'PositionLocal';
-	static PositionWorld = 'PositionWorld';
-	static PositionView = 'PositionView';
-	static PositionViewDirection = 'PositionViewDirection';
-
-	static NormalLocal = 'NormalLocal';
-	static NormalWorld = 'NormalWorld';
-	static NormalView = 'NormalView';
-
-	static Irradiance = 'Irradiance';
-	static ReflectedLightIndirectDiffuse = 'ReflectedLightIndirectDiffuse';
-	static ReflectedLightIndirectSpecular = 'ReflectedLightIndirectSpecular';
-	static ReflectedLightDirectDiffuse = 'ReflectedLightDirectDiffuse';
-	static ReflectedLightDirectSpecular = 'ReflectedLightDirectSpecular';
-
-	static MaterialDiffuseColor = 'MaterialDiffuseColor';
-
-	// STANDARD
-	static MaterialRoughness = 'MaterialRoughness';
-	static MaterialMetalness = 'MaterialMetalness';
-	static MaterialSpecularTint = 'MaterialSpecularTint';
 
 	constructor() {
 
-		this.keywords = [
-			// nodes
-			NodeKeywords.PositionLocal,
-			NodeKeywords.PositionWorld,
-			NodeKeywords.PositionView,
-			NodeKeywords.PositionViewDirection,
-			NodeKeywords.NormalLocal,
-			NodeKeywords.NormalWorld,
-			NodeKeywords.NormalView,
-			// vars -> float
-			NodeKeywords.MaterialRoughness,
-			NodeKeywords.MaterialMetalness,
-			// vars -> vec3
-			NodeKeywords.Irradiance,
-			NodeKeywords.ReflectedLightIndirectDiffuse,
-			NodeKeywords.ReflectedLightIndirectSpecular,
-			NodeKeywords.ReflectedLightDirectDiffuse,
-			NodeKeywords.ReflectedLightDirectSpecular,
-			NodeKeywords.MaterialSpecularTint,
-			// vars -> vec4
-			NodeKeywords.MaterialDiffuseColor
-		];
-
+		this.keywords = [];
 		this.nodes = [];
-
 		this.keywordsCallback = {};
 
 	}
@@ -62,96 +12,11 @@ class NodeKeywords {
 
 		let node = this.nodes[ name ];
 
-		if ( node === undefined ) {
+		if ( node === undefined && this.keywordsCallback[ name ] !== undefined ) {
 
-			if ( this.keywordsCallback[ name ] !== undefined ) {
-				
-				node = this.keywordsCallback[ name ]( name );
-				
-				this.nodes[ name ] = node;
-				
-				return node;
-				
-			}
+			node = this.keywordsCallback[ name ]( name );
 
-			switch ( name ) {
-
-				case NodeKeywords.PositionLocal:
-
-					node = new VarNode( new PositionNode( PositionNode.GEOMETRY ), name );
-
-					break;
-
-				case NodeKeywords.PositionWorld:
-
-					node = new VarNode( new PositionNode( PositionNode.WORLD ), name );
-
-					break;
-
-				case NodeKeywords.PositionView:
-
-					node = new VarNode( new PositionNode( PositionNode.VIEW ), name );
-
-					break;
-
-				case NodeKeywords.PositionViewDirection:
-
-					node = new VarNode( new PositionNode( PositionNode.VIEW_DIRECTION ), name );
-
-					break;
-
-				case NodeKeywords.NormalLocal:
-
-					node = new VarNode( new NormalNode( NormalNode.GEOMETRY ), name );
-
-					break;
-
-				case NodeKeywords.NormalWorld:
-
-					node = new VarNode( new NormalNode( NormalNode.WORLD ), name );
-
-					break;
-
-				case NodeKeywords.NormalView:
-
-					node = new VarNode( new NormalNode( NormalNode.VIEW ), name );
-
-					break;
-
-				// floats properties
-				case NodeKeywords.MaterialRoughness:
-				case NodeKeywords.MaterialMetalness:
-
-					node = new PropertyNode( name, 'float' );
-
-					break;
-
-				// vec3 properties
-				case NodeKeywords.Irradiance:
-				case NodeKeywords.ReflectedLightIndirectDiffuse:
-				case NodeKeywords.ReflectedLightIndirectSpecular:
-				case NodeKeywords.ReflectedLightDirectDiffuse:
-				case NodeKeywords.ReflectedLightDirectSpecular:
-				case NodeKeywords.MaterialSpecularTint:
-
-					node = new PropertyNode( name, 'vec3' );
-
-					break;
-
-				// vec4 properties
-				case NodeKeywords.MaterialDiffuseColor:
-
-					node = new PropertyNode( name, 'vec4' );
-
-					break;
-
-			}
-
-			if ( node !== undefined ) {
-
-				this.nodes[ name ] = node;
-
-			}
+			this.nodes[ name ] = node;
 
 		}
 
@@ -160,13 +25,12 @@ class NodeKeywords {
 	}
 
 	addKeyword( name, callback ) {
-		
+
 		this.keywords.push( name );
-		
 		this.keywordsCallback[ name ] = callback;
-		
+
 		return this;
-		
+
 	}
 
 	parse( code ) {
@@ -177,7 +41,7 @@ class NodeKeywords {
 
 		const codeKeywords = code.match( regExp );
 
-		const keywords = [];
+		const keywordNodes = [];
 
 		if ( codeKeywords !== null ) {
 
@@ -185,9 +49,9 @@ class NodeKeywords {
 
 				const node = this.getNode( keyword );
 
-				if ( keywords.indexOf( node ) === - 1 ) {
+				if ( node !== undefined && keywordNodes.indexOf( node ) === - 1 ) {
 
-					keywords.push( node );
+					keywordNodes.push( node );
 
 				}
 
@@ -195,15 +59,15 @@ class NodeKeywords {
 
 		}
 
-		return keywords;
+		return keywordNodes;
 
 	}
 
 	include( builder, code ) {
 
-		const keywords = this.parse( code );
+		const keywordNodes = this.parse( code );
 
-		for ( const keywordNode of keywords ) {
+		for ( const keywordNode of keywordNodes ) {
 
 			keywordNode.build( builder );
 
