@@ -40,13 +40,17 @@ const NodeHandler = {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			const splitProps = prop.match( /^[xyzwst]{1,4}$/ );
-
-			if ( splitProps !== null ) {
+			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
 
 				// accessing properties ( swizzle )
 
-				return ShaderNodeObject( new SplitNode( node, splitProps[ 0 ] ) );
+				prop = prop
+					.replace( /r|s/g, 'x' )
+					.replace( /g|t/g, 'y' )
+					.replace( /b|p/g, 'z' )
+					.replace( /a|q/g, 'w' );
+
+				return ShaderNodeObject( new SplitNode( node, prop ) );
 
 			} else if ( /^\d+$/.test( prop ) === true ) {
 
@@ -244,6 +248,14 @@ export const vec4 = ( ...params ) => {
 
 };
 
+export const addTo = ( varNode, ...params ) => {
+
+	varNode.node = add( varNode.node, ...ShaderNodeArray( params ) );
+
+	return ShaderNodeObject( varNode );
+
+};
+
 export const add = ShaderNodeProxy( OperatorNode, '+' );
 export const sub = ShaderNodeProxy( OperatorNode, '-' );
 export const mul = ShaderNodeProxy( OperatorNode, '*' );
@@ -269,9 +281,11 @@ export const PI = float( 3.141592653589793 );
 export const RECIPROCAL_PI = float( 0.3183098861837907 );
 export const EPSILON = float( 1e-6 );
 
-export const materialDiffuseColor = new PropertyNode( 'MaterialDiffuseColor', 'vec4' );
-export const materialRoughness = new PropertyNode( 'MaterialRoughness', 'float' );
-export const materialSpecularTint = new PropertyNode( 'MaterialSpecularTint', 'vec4' );
+export const diffuseColor = new PropertyNode( 'DiffuseColor', 'vec4' );
+export const roughness = new PropertyNode( 'Roughness', 'float' );
+export const metalness = new PropertyNode( 'Metalness', 'float' );
+export const alphaTest = new PropertyNode( 'AlphaTest', 'float' );
+export const specularTint = new PropertyNode( 'SpecularTint', 'color' );
 
 export const negate = ShaderNodeProxy( MathNode, 'negate' );
 export const floor = ShaderNodeProxy( MathNode, 'floor' );
@@ -290,6 +304,7 @@ export const pow = ShaderNodeProxy( MathNode, 'pow' );
 export const pow2 = ShaderNodeProxy( MathNode, 'pow', 2 );
 export const pow3 = ShaderNodeProxy( MathNode, 'pow', 3 );
 export const pow4 = ShaderNodeProxy( MathNode, 'pow', 4 );
+export const exp = ShaderNodeProxy( MathNode, 'exp' );
 export const exp2 = ShaderNodeProxy( MathNode, 'exp2' );
 export const saturate = ShaderNodeProxy( MathNode, 'saturate' );
 export const transformDirection = ShaderNodeProxy( MathNode, 'transformDirection' );

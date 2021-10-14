@@ -2,7 +2,6 @@
 import ArrayInputNode from './core/ArrayInputNode.js';
 import AttributeNode from './core/AttributeNode.js';
 import CodeNode from './core/CodeNode.js';
-import ConstNode from './core/ConstNode.js';
 import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
@@ -15,13 +14,10 @@ import NodeCode from './core/NodeCode.js';
 import NodeFrame from './core/NodeFrame.js';
 import NodeFunctionInput from './core/NodeFunctionInput.js';
 import NodeKeywords from './core/NodeKeywords.js';
-import NodeSlot from './core/NodeSlot.js';
 import NodeUniform from './core/NodeUniform.js';
 import NodeVar from './core/NodeVar.js';
 import NodeVary from './core/NodeVary.js';
 import PropertyNode from './core/PropertyNode.js';
-import StructNode from './core/StructNode.js';
-import StructVarNode from './core/StructVarNode.js';
 import TempNode from './core/TempNode.js';
 import VarNode from './core/VarNode.js';
 import VaryNode from './core/VaryNode.js';
@@ -90,7 +86,6 @@ export {
 	ArrayInputNode,
 	AttributeNode,
 	CodeNode,
-	ConstNode,
 	ContextNode,
 	ExpressionNode,
 	FunctionCallNode,
@@ -103,13 +98,10 @@ export {
 	NodeFrame,
 	NodeFunctionInput,
 	NodeKeywords,
-	NodeSlot,
 	NodeUniform,
 	NodeVar,
 	NodeVary,
 	PropertyNode,
-	StructNode,
-	StructVarNode,
 	TempNode,
 	VarNode,
 	VaryNode,

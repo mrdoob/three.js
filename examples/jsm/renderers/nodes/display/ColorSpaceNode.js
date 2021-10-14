@@ -59,13 +59,13 @@ class ColorSpaceNode extends TempNode {
 	static LINEAR_TO_LOG_LUV = 'LinearToLogLuv';
 	static LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
 */
-	constructor( method, value ) {
+	constructor( method, node ) {
 
 		super( 'vec4' );
 
 		this.method = method;
 
-		this.value = value;
+		this.node = node;
 		this.factor = null;
 
 	}
@@ -97,7 +97,7 @@ class ColorSpaceNode extends TempNode {
 		const type = this.getNodeType( builder );
 
 		const method = this.method;
-		const value = this.value;
+		const node = this.node;
 
 		if ( method !== ColorSpaceNode.LINEAR_TO_LINEAR ) {
 
@@ -106,13 +106,13 @@ class ColorSpaceNode extends TempNode {
 			const factor = this.factor;
 
 			return encodingFunctionNode( {
-				value,
+				value: node,
 				factor
 			} ).build( builder, type );
 
 		} else {
 
-			return value.build( builder, type );
+			return node.build( builder, type );
 
 		}
 

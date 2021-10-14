@@ -1,6 +1,5 @@
 import Node from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
-import ConstNode from '../core/ConstNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 import Matrix4Node from '../inputs/Matrix4Node.js';

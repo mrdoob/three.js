@@ -17,17 +17,17 @@ const checkerShaderNode = new ShaderNode( ( inputs ) => {
 
 class CheckerNode extends Node {
 
-	constructor( uv = new UVNode() ) {
+	constructor( uvNode = new UVNode() ) {
 
 		super( 'float' );
 
-		this.uv = uv;
+		this.uvNode = uvNode;
 
 	}
 
 	generate( builder ) {
 
-		return checkerShaderNode( { uv: this.uv } ).build( builder );
+		return checkerShaderNode( { uv: this.uvNode } ).build( builder );
 
 	}
 

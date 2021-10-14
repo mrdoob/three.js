@@ -7,8 +7,6 @@ class FunctionNode extends CodeNode {
 
 		super( code );
 
-		this.inputs = [];
-
 		this.useKeywords = true;
 
 	}

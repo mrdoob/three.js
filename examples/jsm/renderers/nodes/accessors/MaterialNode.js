@@ -22,7 +22,7 @@ class MaterialNode extends Node {
 	getNodeType( builder ) {
 
 		const scope = this.scope;
-		const material = builder.getContextValue( 'material' );
+		const material = builder.context.material;
 
 		if ( scope === MaterialNode.COLOR ) {
 
@@ -46,7 +46,7 @@ class MaterialNode extends Node {
 
 	generate( builder, output ) {
 
-		const material = builder.getContextValue( 'material' );
+		const material = builder.context.material;
 		const scope = this.scope;
 
 		let node = null;

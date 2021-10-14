@@ -12,8 +12,6 @@ import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
 
-import glslang from '../../libs/glslang.js';
-
 import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
@@ -166,8 +164,6 @@ class WebGPURenderer {
 
 		const device = await adapter.requestDevice( deviceDescriptor );
 
-		const compiler = await glslang();
-
 		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
 
 		const swapChain = context.configure( {
@@ -184,11 +180,11 @@ class WebGPURenderer {
 		this._properties = new WebGPUProperties();
 		this._attributes = new WebGPUAttributes( device );
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
-		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
+		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
 		this._nodes = new WebGPUNodes( this );
-		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount, this._nodes );
-		this._computePipelines = new WebGPUComputePipelines( device, compiler );
+		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, parameters.sampleCount, this._nodes );
+		this._computePipelines = new WebGPUComputePipelines( device );
 		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
 		this._background = new WebGPUBackground( this );
@@ -962,5 +958,7 @@ class WebGPURenderer {
 	}
 
 }
+
+WebGPURenderer.prototype.isWebGPURenderer = true;
 
 export default WebGPURenderer;

@@ -20,24 +20,22 @@ class LightNode extends Node {
 
 		this.light = light;
 
-		this.color = new ColorNode( new Color() );
+		this.colorNode = new ColorNode( new Color() );
 
-		this.lightCutoffDistance = new FloatNode( 0 );
-		this.lightDecayExponent = new FloatNode( 0 );
+		this.lightCutoffDistanceNode = new FloatNode( 0 );
+		this.lightDecayExponentNode = new FloatNode( 0 );
 
 	}
 
 	update( /* frame */ ) {
 
-		this.color.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
-		this.lightCutoffDistance.value = this.light.distance;
-		this.lightDecayExponent.value = this.light.decay;
+		this.colorNode.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		this.lightCutoffDistanceNode.value = this.light.distance;
+		this.lightDecayExponentNode.value = this.light.decay;
 
 	}
 
 	generate( builder ) {
-
-		const type = this.getNodeType( builder );
 
 		const lightPositionView = new Object3DNode( Object3DNode.VIEW_POSITION );
 		const positionView = new PositionNode( PositionNode.VIEW );
@@ -50,20 +48,20 @@ class LightNode extends Node {
 
 		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,
-			cutoffDistance: this.lightCutoffDistance,
-			decayExponent: this.lightDecayExponent
+			cutoffDistance: this.lightCutoffDistanceNode,
+			decayExponent: this.lightDecayExponentNode
 		} );
 
-		const lightColor = new OperatorNode( '*', this.color, lightAttenuation );
+		const lightColor = new OperatorNode( '*', this.colorNode, lightAttenuation );
 
 		lightPositionView.object3d = this.light;
 
-		const lightingModelFunction = builder.getContextValue( 'lightingModel' );
+		const lightingModelFunction = builder.context.lightingModel;
 
 		if ( lightingModelFunction !== undefined ) {
 
-			const directDiffuse = builder.getContextValue( 'directDiffuse' );
-			const directSpecular = builder.getContextValue( 'directSpecular' );
+			const directDiffuse = builder.context.directDiffuse;
+			const directSpecular = builder.context.directSpecular;
 
 			lightingModelFunction( {
 				lightDirection,
@@ -73,8 +71,6 @@ class LightNode extends Node {
 			}, builder );
 
 		}
-
-		return this.color.build( builder, type );
 
 	}
 
