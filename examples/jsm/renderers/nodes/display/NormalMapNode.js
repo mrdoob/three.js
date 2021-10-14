@@ -6,7 +6,7 @@ import OperatorNode from '../math/OperatorNode.js';
 import FloatNode from '../inputs/FloatNode.js';
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
-import { ShaderNode, cond, add, mul, join, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../ShaderNode.js';
+import { ShaderNode, cond, add, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../ShaderNode.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -17,10 +17,8 @@ const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
 
 	const { eye_pos, surf_norm, mapN, faceDirection, uv } = inputs;
 
-	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-
-	const q0 = join( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
-	const q1 = join( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
+	const q0 = dFdx( eye_pos.xyz );
+	const q1 = dFdy( eye_pos.xyz );
 	const st0 = dFdx( uv.st );
 	const st1 = dFdy( uv.st );
 
@@ -41,11 +39,11 @@ const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
 
 class NormalMapNode extends TempNode {
 
-	constructor( value ) {
+	constructor( node ) {
 
 		super( 'vec3' );
 
-		this.value = value;
+		this.node = node;
 
 		this.normalMapType = TangentSpaceNormalMap;
 
@@ -57,7 +55,7 @@ class NormalMapNode extends TempNode {
 
 		const normalMapType = this.normalMapType;
 
-		const normalOP = new OperatorNode( '*', this.value, new FloatNode( 2.0 ).setConst( true ) );
+		const normalOP = new OperatorNode( '*', this.node, new FloatNode( 2.0 ).setConst( true ) );
 		const normalMap = new OperatorNode( '-', normalOP, new FloatNode( 1.0 ).setConst( true ) );
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
