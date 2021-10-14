@@ -17,6 +17,14 @@ class TextureNode extends InputNode {
 
 	generate( builder, output ) {
 
+		const texture = this.value;
+
+		if ( ! texture || texture.isTexture !== true ) {
+
+			throw new Error( `TextureNode: Need a three.js texture.` );
+
+		}
+
 		const type = this.getNodeType( builder );
 
 		const textureProperty = super.generate( builder, type );
@@ -51,8 +59,8 @@ class TextureNode extends InputNode {
 				const textureCallSnippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
 
 				colorSpace = new ColorSpaceNode();
-				colorSpace.value = new ExpressionNode( textureCallSnippet, 'vec4' );
-				colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );
+				colorSpace.node = new ExpressionNode( textureCallSnippet, 'vec4' );
+				colorSpace.fromDecoding( builder.getTextureEncodingFromMap( texture ) );
 
 				nodeData.colorSpace = colorSpace;
 

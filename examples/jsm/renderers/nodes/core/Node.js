@@ -38,12 +38,6 @@ class Node {
 
 	}
 
-	getTypeLength( builder ) {
-
-		return builder.getTypeLength( this.getNodeType( builder ) );
-
-	}
-
 	update( /*frame*/ ) {
 
 		console.warn( 'Abstract function.' );

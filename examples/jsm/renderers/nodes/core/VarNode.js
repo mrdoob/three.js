@@ -2,11 +2,11 @@ import Node from './Node.js';
 
 class VarNode extends Node {
 
-	constructor( value, name = '', nodeType = null ) {
+	constructor( node, name = null, nodeType = null ) {
 
 		super( nodeType );
 
-		this.value = value;
+		this.node = node;
 		this.name = name;
 
 	}
@@ -19,21 +19,20 @@ class VarNode extends Node {
 
 	getNodeType( builder ) {
 
-		return super.getNodeType( builder ) || this.value.getNodeType( builder );
+		return super.getNodeType( builder ) || this.node.getNodeType( builder );
 
 	}
 
 	generate( builder ) {
 
 		const type = builder.getVectorType( this.getNodeType( builder ) );
+		const node = this.node;
 		const name = this.name;
-		const value = this.value;
 
+		const snippet = node.build( builder, type );
 		const nodeVar = builder.getVarFromNode( this, type );
 
-		const snippet = value.build( builder, type );
-
-		if ( name !== '' ) {
+		if ( name !== null ) {
 
 			nodeVar.name = name;
 

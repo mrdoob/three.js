@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 
 class OperatorNode extends TempNode {
 
-	constructor( op, a, b, ...params ) {
+	constructor( op, aNode, bNode, ...params ) {
 
 		super();
 
@@ -10,20 +10,20 @@ class OperatorNode extends TempNode {
 
 		if ( params.length > 0 ) {
 
-			let finalB = b;
+			let finalBNode = bNode;
 
 			for ( let i = 0; i < params.length; i ++ ) {
 
-				finalB = new OperatorNode( op, finalB, params[ i ] );
+				finalBNode = new OperatorNode( op, finalBNode, params[ i ] );
 
 			}
 
-			b = finalB;
+			bNode = finalBNode;
 
 		}
 
-		this.a = a;
-		this.b = b;
+		this.aNode = aNode;
+		this.bNode = bNode;
 
 	}
 
@@ -31,9 +31,12 @@ class OperatorNode extends TempNode {
 
 		const op = this.op;
 
+		const aNode = this.aNode;
+		const bNode = this.bNode;
+
 		if ( op === '=' ) {
 
-			return this.a.getNodeType( builder );
+			return aNode.getNodeType( builder );
 
 		} else if ( op === '==' || op === '>' || op === '&&' ) {
 
@@ -41,8 +44,8 @@ class OperatorNode extends TempNode {
 
 		} else {
 
-			const typeA = this.a.getNodeType( builder );
-			const typeB = this.b.getNodeType( builder );
+			const typeA = aNode.getNodeType( builder );
+			const typeB = bNode.getNodeType( builder );
 
 			if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
 
@@ -78,8 +81,11 @@ class OperatorNode extends TempNode {
 
 		const op = this.op;
 
-		let typeA = this.a.getNodeType( builder );
-		let typeB = this.b.getNodeType( builder );
+		const aNode = this.aNode;
+		const bNode = this.bNode;
+
+		let typeA = aNode.getNodeType( builder );
+		let typeB = bNode.getNodeType( builder );
 
 		if ( op === '=' ) {
 
@@ -105,10 +111,28 @@ class OperatorNode extends TempNode {
 
 		}
 
-		const a = this.a.build( builder, typeA );
-		const b = this.b.build( builder, typeB );
+		const a = aNode.build( builder, typeA );
+		const b = bNode.build( builder, typeB );
 
-		return `( ${a} ${this.op} ${b} )`;
+		if ( output !== 'void' ) {
+
+			if ( op === '=' ) {
+
+				builder.addFlowCode( `${a} ${this.op} ${b}` );
+
+				return a;
+
+			} else {
+
+				return `( ${a} ${this.op} ${b} )`;
+
+			}
+
+		} else {
+
+			return `${a} ${this.op} ${b}`;
+
+		}
 
 	}
 

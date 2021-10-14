@@ -2,7 +2,7 @@ import Node from './Node.js';
 
 class PropertyNode extends Node {
 
-	constructor( name, nodeType ) {
+	constructor( name = null, nodeType = 'vec4' ) {
 
 		super( nodeType );
 
@@ -10,16 +10,22 @@ class PropertyNode extends Node {
 
 	}
 
-	getHash( /*builder*/ ) {
+	getHash( builder ) {
 
-		return this.name;
+		return this.name || super.getHash( builder );
 
 	}
 
 	generate( builder ) {
 
 		const nodeVary = builder.getVarFromNode( this, this.getNodeType( builder ) );
-		nodeVary.name = this.name;
+		const name = this.name;
+
+		if ( name !== null ) {
+
+			nodeVary.name = name;
+
+		}
 
 		return builder.getPropertyName( nodeVary );
 

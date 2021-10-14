@@ -1,5 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import ExpressionNode from '../core/ExpressionNode.js';
+import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import OperatorNode from './OperatorNode.js';
 
@@ -56,39 +57,43 @@ class MathNode extends TempNode {
 	static SMOOTHSTEP = 'smoothstep';
 	static FACEFORWARD = 'faceforward';
 
-	constructor( method, a, b = null, c = null ) {
+	constructor( method, aNode, bNode = null, cNode = null ) {
 
 		super();
 
 		this.method = method;
 
-		this.a = a;
-		this.b = b;
-		this.c = c;
+		this.aNode = aNode;
+		this.bNode = bNode;
+		this.cNode = cNode;
 
 	}
 
 	getInputType( builder ) {
 
-		const aLen = this.a.getTypeLength( builder );
-		const bLen = this.b ? this.b.getTypeLength( builder ) : 0;
-		const cLen = this.c ? this.c.getTypeLength( builder ) : 0;
+		const aType = this.aNode.getNodeType( builder );
+		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
+		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
+
+		const aLen = builder.getTypeLength( aType );
+		const bLen = builder.getTypeLength( bType );
+		const cLen = builder.getTypeLength( cType );
 
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return this.a.getNodeType( builder );
+			return aType;
 
 		} else if ( bLen > cLen ) {
 
-			return this.b.getNodeType( builder );
+			return bType;
 
 		} else if ( cLen > aLen ) {
 
-			this.c.getNodeType( builder )
+			return cType;
 
 		}
 
-		return this.a.getNodeType( builder );
+		return aType;
 
 	}
 
@@ -100,7 +105,7 @@ class MathNode extends TempNode {
 
 			return 'float';
 
-		} else if (method === MathNode.CROSS) {
+		} else if ( method === MathNode.CROSS ) {
 
 			return 'vec3';
 
@@ -112,18 +117,28 @@ class MathNode extends TempNode {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const method = this.method;
 
 		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
 
-		const a = this.a;
-		const b = this.b;
-		const c = this.c;
+		const a = this.aNode;
+		const b = this.bNode;
+		const c = this.cNode;
 
-		if ( method === MathNode.TRANSFORM_DIRECTION ) {
+		if ( builder.renderer.isWebGLRenderer === true && ( method === MathNode.DFDX || method === MathNode.DFDY ) && output === 'vec3' ) {
+
+			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
+
+			return new JoinNode( [
+				new MathNode( method, new SplitNode( a, 'x' ) ),
+				new MathNode( method, new SplitNode( a, 'y' ) ),
+				new MathNode( method, new SplitNode( a, 'z' ) )
+			] ).build( builder );
+
+		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// dir can be either a direction vector or a normal vector
 			// upper-left 3x3 of matrix is assumed to be orthogonal
@@ -171,7 +186,7 @@ class MathNode extends TempNode {
 			} else if ( method === MathNode.STEP ) {
 
 				params.push(
-					b.build( builder, a.getTypeLength( builder ) === 1 ? 'float' : inputType ),
+					b.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
 					b.build( builder, inputType )
 				);
 
@@ -179,7 +194,7 @@ class MathNode extends TempNode {
 
 				params.push(
 					a.build( builder, inputType ),
-					b.build( builder, b.getTypeLength( builder ) === 1 ? 'float' : inputType )
+					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? 'float' : inputType )
 				);
 
 			} else if ( method === MathNode.REFRACT ) {
@@ -195,7 +210,7 @@ class MathNode extends TempNode {
 				params.push(
 					a.build( builder, inputType ),
 					b.build( builder, inputType ),
-					c.build( builder, c.getTypeLength( builder ) === 1 ? 'float' : inputType )
+					c.build( builder, builder.getTypeLength( c.getNodeType( builder ) ) === 1 ? 'float' : inputType )
 				);
 
 			} else {
@@ -206,7 +221,7 @@ class MathNode extends TempNode {
 
 					params.push( b.build( builder, inputType ), c.build( builder, inputType ) );
 
-				} else if ( this.b !== null ) {
+				} else if ( b !== null ) {
 
 					params.push( b.build( builder, inputType ) );
 
@@ -214,7 +229,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return `${method}( ${params.join(', ')} )`;
+			return `${ builder.getMethod( method ) }( ${params.join( ', ' )} )`;
 
 		}
 

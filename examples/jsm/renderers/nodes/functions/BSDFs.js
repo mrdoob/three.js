@@ -1,8 +1,8 @@
 import { ShaderNode,
-	add, sub, mul, div, saturate, dot, pow, pow2, exp2, normalize, max, sqrt, negate,
+	add, addTo, sub, mul, div, saturate, dot, pow, pow2, exp2, normalize, max, sqrt, negate,
 	cond, greaterThan, and,
 	transformedNormalView, positionViewDirection,
-	materialDiffuseColor, materialSpecularTint, materialRoughness,
+	diffuseColor, specularTint, roughness,
 	PI, RECIPROCAL_PI, EPSILON
 } from '../ShaderNode.js';
 
@@ -17,7 +17,7 @@ export const F_Schlick = new ShaderNode( ( inputs ) => {
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
 	const fresnel = exp2( mul( sub( mul( - 5.55473, dotVH ), 6.98316 ), dotVH ) );
 
-	return mul( sub( f90, f0 ), add( fresnel, f0 ) );
+	return add( mul( f0, sub( 1.0, fresnel ) ), mul( f90, fresnel ) );
 
 } ); // validated
 
@@ -107,9 +107,9 @@ export const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 
 	irradiance = mul( irradiance, PI ); // punctual light
 
-	directDiffuse.value = add( directDiffuse.value, mul( irradiance, BRDF_Lambert( { diffuseColor: materialDiffuseColor } ) ) );
+	addTo( directDiffuse, mul( irradiance, BRDF_Lambert( { diffuseColor } ) ) );
 
-	directSpecular.value = add( directSpecular.value, mul( irradiance, BRDF_Specular_GGX( { lightDirection, f0: materialSpecularTint, f90: 1, roughness: materialRoughness } ) ) );
+	addTo( directSpecular, mul( irradiance, BRDF_Specular_GGX( { lightDirection, f0: specularTint, f90: 1, roughness } ) ) );
 
 } );
 

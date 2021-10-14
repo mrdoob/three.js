@@ -1,7 +1,8 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
+import PropertyNode from '../core/PropertyNode.js';
 import ContextNode from '../core/ContextNode.js';
 
-class CondNode extends TempNode {
+class CondNode extends Node {
 
 	constructor( node, ifNode, elseNode ) {
 
@@ -33,13 +34,24 @@ class CondNode extends TempNode {
 
 		const type = this.getNodeType( builder );
 
-		const context = { cache: false };
+		const context = { temp: false };
+		const nodeProperty = new PropertyNode( null, type ).build( builder );
 
-		const nodeSnippet = this.node.build( builder, 'bool' ),
+		const nodeSnippet = new ContextNode( this.node/*, context*/ ).build( builder, 'bool' ),
 			ifSnippet = new ContextNode( this.ifNode, context ).build( builder, type ),
 			elseSnippet = new ContextNode( this.elseNode, context ).build( builder, type );
 
-		return `( ${ nodeSnippet } ? ${ ifSnippet } : ${ elseSnippet } )`;
+		builder.addFlowCode( `if ( ${nodeSnippet} ) {
+
+\t\t${nodeProperty} = ${ifSnippet};
+
+\t} else {
+
+\t\t${nodeProperty} = ${elseSnippet};
+
+\t}` );
+
+		return nodeProperty;
 
 	}
 

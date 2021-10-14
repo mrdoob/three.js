@@ -8,21 +8,21 @@ import JoinNode from '../utils/JoinNode.js';
 
 class SpriteSheetUVNode extends Node {
 
-	constructor( count, uv = new UVNode() ) {
+	constructor( countNode, uvNode = new UVNode(), frameNode = new FloatNode( 0 ).setConst( true ) ) {
 
 		super( 'vec2' );
 
-		this.count = count;
-		this.uv = uv;
-		this.frame = new FloatNode( 0 ).setConst( true );
+		this.countNode = countNode;
+		this.uvNode = uvNode;
+		this.frameNode = frameNode;
 
 	}
 
 	generate( builder ) {
 
-		const uv = this.uv;
-		const count = this.count;
-		const frame = this.frame;
+		const count = this.countNode;
+		const uv = this.uvNode;
+		const frame = this.frameNode;
 
 		const one = new FloatNode( 1 ).setConst( true );
 
