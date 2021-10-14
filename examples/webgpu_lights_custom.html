@@ -29,7 +29,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
-			import { add } from './jsm/renderers/nodes/ShaderNode.js';
+			import { addTo } from './jsm/renderers/nodes/ShaderNode.js';
 
 			let camera, scene, renderer;
 
@@ -93,12 +93,12 @@
 
 					const { lightColor, directDiffuse } = inputs;
 
-					directDiffuse.value = add( directDiffuse.value, lightColor );
+					addTo( directDiffuse, lightColor );
 
 				} );
 
 				const lightingModelContext = new Nodes.ContextNode( allLightsNode );
-				lightingModelContext.setContextValue( 'lightingModel', customLightingModel );
+				lightingModelContext.context.lightingModel = customLightingModel;
 
 				materialPoints.lightNode = lightingModelContext;
 
