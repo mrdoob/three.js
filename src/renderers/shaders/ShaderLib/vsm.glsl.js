@@ -18,14 +18,15 @@ void main() {
 
 	float mean = 0.0;
 	float squared_mean = 0.0;
+	const float MAX_ITERATIONS = 100.0;
 
 	// This seems totally useless but it's a crazy work around for a Adreno compiler bug
 	// float depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy ) / resolution ) );
 
 	float uvStride = samples <= 1.0 ? 0.0 : 2.0 / ( samples - 1.0 );
 	float uvStart = samples <= 1.0 ? 0.0 : - 1.0;
-	for ( float i = 0.0; i < samples; i ++ ) {
-
+	for ( float i = 0.0; i < MAX_ITERATIONS; i ++ ) {
+		if (i >= samples){break;}
 		float uvOffset = uvStart + i * uvStride;
 
 		#ifdef HORIZONTAL_PASS
