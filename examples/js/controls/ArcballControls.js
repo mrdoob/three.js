@@ -1707,8 +1707,8 @@
 				window.removeEventListener( 'pointermove', this.onPointerMove );
 				window.removeEventListener( 'pointerup', this.onPointerUp );
 				window.removeEventListener( 'resize', this.onWindowResize );
-				window.addEventListener( 'keydown', this.onKeyDown );
-				this.scene.remove( this._gizmos );
+				window.removeEventListener( 'keydown', this.onKeyDown );
+				if ( this.scene !== null ) this.scene.remove( this._gizmos );
 				this.disposeGrid();
 
 			};
@@ -1788,7 +1788,7 @@
 
 			this.setCamera = camera => {
 
-				camera.lookAt( this._tbCenter );
+				camera.lookAt( this.target );
 				camera.updateMatrix(); //setting state
 
 				if ( camera.type == 'PerspectiveCamera' ) {
@@ -1807,10 +1807,10 @@
 				this._zoom0 = camera.zoom;
 				this._zoomState = this._zoom0;
 				this._initialNear = camera.near;
-				this._nearPos0 = camera.position.distanceTo( this._tbCenter ) - camera.near;
+				this._nearPos0 = camera.position.distanceTo( this.target ) - camera.near;
 				this._nearPos = this._initialNear;
 				this._initialFar = camera.far;
-				this._farPos0 = camera.position.distanceTo( this._tbCenter ) - camera.far;
+				this._farPos0 = camera.position.distanceTo( this.target ) - camera.far;
 				this._farPos = this._initialFar;
 
 				this._up0.copy( camera.up );
@@ -1821,7 +1821,7 @@
 				this.camera.updateProjectionMatrix(); //making gizmos
 
 				this._tbRadius = this.calculateTbRadius( camera );
-				this.makeGizmos( this._tbCenter, this._tbRadius );
+				this.makeGizmos( this.target, this._tbRadius );
 
 			};
 
@@ -2283,14 +2283,14 @@
 
 			this.setTarget = ( x, y, z ) => {
 
-				this._tbCenter.set( x, y, z );
+				this.target.set( x, y, z );
 
 				this._gizmos.position.set( x, y, z ); //for correct radius calculation
 
 
 				this._tbRadius = this.calculateTbRadius( this.camera );
-				this.makeGizmos( this._tbCenter, this._tbRadius );
-				this.camera.lookAt( this._tbCenter );
+				this.makeGizmos( this.target, this._tbRadius );
+				this.camera.lookAt( this.target );
 
 			};
 
@@ -2680,6 +2680,7 @@
 			this.camera = null;
 			this.domElement = domElement;
 			this.scene = scene;
+			this.target = new THREE.Vector3( 0, 0, 0 );
 			this.mouseActions = [];
 			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
 
@@ -2803,7 +2804,6 @@
 			this.minZoom = 0;
 			this.maxZoom = Infinity; //trackball parameters
 
-			this._tbCenter = new THREE.Vector3( 0, 0, 0 );
 			this._tbRadius = 1; //FSA
 
 			this._state = STATE.IDLE;
