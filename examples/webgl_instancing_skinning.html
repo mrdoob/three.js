@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			Created by <a href="https://github.com/wizgrav" target="_blank" rel="noopener">wizgrav</a>. Model from <a href="https://film.livyatanim.com/" target="_blank" rel="noopener">Livyatanim Myth</a>.
+			Created by <a href="https://github.com/wizgrav" target="_blank" rel="noopener">wizgrav</a>.  Click anywhere to toggle between mesh/points rendering. Model from <a href="https://film.livyatanim.com/" target="_blank" rel="noopener">Livyatanim Myth</a>.
 		</div>
 
 		<script type="module">
@@ -29,6 +29,7 @@
 			init();
 			animate();
 
+			
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -62,6 +63,24 @@
 					mesh = new THREE.InstancedSkinnedMesh( m.geometry, m.material, count );
 					
 					mesh.copy(m);
+
+					const meshMaterial = mesh.material;
+					const pointsMaterial = new THREE.PointsMaterial({transparent: true, alpha: 0.5});
+					
+					mesh.material = pointsMaterial;
+					mesh.isPoints = true;
+					
+					window.addEventListener("click", () => {
+						if(mesh.material === pointsMaterial) {
+							mesh.material = meshMaterial;
+							mesh.isPoints = false;
+						} else {
+							mesh.material = pointsMaterial;
+							mesh.isPoints = true;
+						}
+					});
+
+					pointsMaterial.size = 0.07;
 					
 					m.visible = false;
 					
