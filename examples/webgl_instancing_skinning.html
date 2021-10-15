@@ -65,7 +65,7 @@
 					mesh.copy(m);
 
 					const meshMaterial = mesh.material;
-					const pointsMaterial = new THREE.PointsMaterial({transparent: true, alpha: 0.5});
+					const pointsMaterial = new THREE.PointsMaterial({transparent: true, opacity: 0.1});
 					
 					mesh.material = pointsMaterial;
 					mesh.isPoints = true;
