@@ -323,7 +323,8 @@
 		"webgpu_materials",
 		"webgpu_rtt",
 		"webgpu_sandbox",
-		"webgpu_skinning"
+		"webgpu_skinning",
+		"webgpu_skinning_points"
 	],
 	"webaudio": [
 		"webaudio_orientation",
