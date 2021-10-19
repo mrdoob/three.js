@@ -34,18 +34,22 @@ class OperatorNode extends TempNode {
 		const aNode = this.aNode;
 		const bNode = this.bNode;
 
-		if ( op === '=' ) {
+		const typeA = aNode.getNodeType( builder );
+		const typeB = bNode.getNodeType( builder );
 
-			return aNode.getNodeType( builder );
+		if ( typeA === 'void' || typeB === 'void' ) {
+
+			return 'void';
+
+		} else if ( op === '=' ) {
+
+			return typeA;
 
 		} else if ( op === '==' || op === '>' || op === '&&' ) {
 
 			return 'bool';
 
 		} else {
-
-			const typeA = aNode.getNodeType( builder );
-			const typeB = bNode.getNodeType( builder );
 
 			if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
 
@@ -84,30 +88,43 @@ class OperatorNode extends TempNode {
 		const aNode = this.aNode;
 		const bNode = this.bNode;
 
-		let typeA = aNode.getNodeType( builder );
-		let typeB = bNode.getNodeType( builder );
+		const type = this.getNodeType( builder );
 
-		if ( op === '=' ) {
+		let typeA = null;
+		let typeB = null;
 
-			typeB = typeA;
+		if ( type !== 'void' ) {
 
-		} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+			typeA = aNode.getNodeType( builder );
+			typeB = bNode.getNodeType( builder );
 
-			// matrix x vector
+			if ( op === '=' ) {
 
-			typeB = builder.getVectorFromMatrix( typeA );
+				typeB = typeA;
 
-		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
-			// vector x matrix
+				// matrix x vector
 
-			typeA = builder.getVectorFromMatrix( typeB );
+				typeB = builder.getVectorFromMatrix( typeA );
+
+			} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+
+				// vector x matrix
+
+				typeA = builder.getVectorFromMatrix( typeB );
+
+			} else {
+
+				// anytype x anytype
+
+				typeA = typeB = type;
+
+			}
 
 		} else {
 
-			// anytype x anytype
-
-			typeA = typeB = this.getNodeType( builder );
+			typeA = typeB = type;
 
 		}
 
@@ -128,7 +145,7 @@ class OperatorNode extends TempNode {
 
 			}
 
-		} else {
+		} else if ( typeA !== 'void' ) {
 
 			return `${a} ${this.op} ${b}`;
 

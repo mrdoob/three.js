@@ -1,6 +1,7 @@
 // core
 import ArrayInputNode from './core/ArrayInputNode.js';
 import AttributeNode from './core/AttributeNode.js';
+import BypassNode from './core/BypassNode.js';
 import CodeNode from './core/CodeNode.js';
 import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
@@ -33,6 +34,7 @@ import Object3DNode from './accessors/Object3DNode.js';
 import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
+import SkinningNode from './accessors/SkinningNode.js';
 import UVNode from './accessors/UVNode.js';
 
 // inputs
@@ -85,6 +87,7 @@ export {
 	// core
 	ArrayInputNode,
 	AttributeNode,
+	BypassNode,
 	CodeNode,
 	ContextNode,
 	ExpressionNode,
@@ -117,6 +120,7 @@ export {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
+	SkinningNode,
 	UVNode,
 
 	// inputs
