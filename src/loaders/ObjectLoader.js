@@ -696,6 +696,8 @@ class ObjectLoader extends Loader {
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 
+				if ( data.userData !== undefined ) texture.userData = data.userData;
+
 				textures[ data.uuid ] = texture;
 
 			}
