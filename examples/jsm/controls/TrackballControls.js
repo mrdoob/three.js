@@ -208,7 +208,7 @@ class TrackballControls extends EventDispatcher {
 
 				} else if ( scope.object.isOrthographicCamera ) {
 
-					scope.object.zoom *= factor;
+					scope.object.zoom /= factor;
 					scope.object.updateProjectionMatrix();
 
 				} else {
