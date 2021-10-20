@@ -1,6 +1,7 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp, RGBAFormat } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
+import { cloneDeep } from '../utils.js';
 
 let materialId = 0;
 
@@ -466,7 +467,7 @@ class Material extends EventDispatcher {
 
 		this.toneMapped = source.toneMapped;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = cloneDeep( source.userData );
 
 		return this;
 

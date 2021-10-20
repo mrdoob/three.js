@@ -14,6 +14,7 @@ import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { ImageUtils } from '../extras/ImageUtils.js';
+import { cloneDeep } from '../utils.js';
 
 let textureId = 0;
 
@@ -121,7 +122,7 @@ class Texture extends EventDispatcher {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = cloneDeep( source.userData );
 
 		return this;
 

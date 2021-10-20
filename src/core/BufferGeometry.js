@@ -8,7 +8,7 @@ import { Object3D } from './Object3D.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import * as MathUtils from '../math/MathUtils.js';
-import { arrayMax } from '../utils.js';
+import { arrayMax, cloneDeep } from '../utils.js';
 
 let _id = 0;
 
@@ -983,7 +983,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( groups.length > 0 ) {
 
-			data.data.groups = JSON.parse( JSON.stringify( groups ) );
+			data.data.groups = cloneDeep( groups );
 
 		}
 

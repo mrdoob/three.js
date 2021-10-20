@@ -90,4 +90,10 @@ function hashString( str, seed = 0 ) {
 
 }
 
-export { arrayMin, arrayMax, getTypedArray, createElementNS, hashString };
+function cloneDeep( object ) {
+
+	return JSON.parse( JSON.stringify( object ) );
+
+}
+
+export { arrayMin, arrayMax, getTypedArray, createElementNS, hashString, cloneDeep };
