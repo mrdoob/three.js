@@ -2618,7 +2618,7 @@ class GLTFParser {
 
 		return new Promise( function ( resolve, reject ) {
 
-			loader.load( parser.resolveURL( bufferDef.uri ), resolve, undefined, function () {
+			loader.load( LoaderUtils.resolveURL( bufferDef.uri, parser.options.path ), resolve, undefined, function () {
 
 				reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
@@ -2864,7 +2864,7 @@ class GLTFParser {
 
 				}
 
-				loader.load( parser.resolveURL( sourceURI ), onLoad, undefined, reject );
+				loader.load( LoaderUtils.resolveURL( sourceURI, parser.options.path ), onLoad, undefined, reject );
 
 			} );
 
@@ -3956,34 +3956,6 @@ class GLTFParser {
 			return scene;
 
 		} );
-
-	}
-
-	resolveURL( url ) {
-
-		const path = this.options.path;
-
-		// Invalid URL
-		if ( typeof url !== 'string' || url === '' ) return '';
-
-		// Host Relative URL
-		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
-
-			path = path.replace( /(^https?:\/\/[^\/]+).*/i, '$1' );
-
-		}
-
-		// Absolute URL http://,https://,//
-		if ( /^(https?:)?\/\//i.test( url ) ) return url;
-
-		// Data URI
-		if ( /^data:.*,.*$/i.test( url ) ) return url;
-
-		// Blob URL
-		if ( /^blob:.*$/i.test( url ) ) return url;
-
-		// Relative URL
-		return path + url;
 
 	}
 
