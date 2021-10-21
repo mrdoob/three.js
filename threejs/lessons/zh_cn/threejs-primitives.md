@@ -24,7 +24,7 @@ Three.js 有很多图元。图元就是一些 3D 的形状，在运行时根据�
 <div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">圆柱</div>
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">十二面体</div>
 <div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">受挤压的 2D 形状，及可选的斜切。
-这里我们挤压了一个心型。注意，这分别是 <code>TextGeometry</code> 和 <code>TextGeometry</code> 的基础。<div>
+这里我们挤压了一个心型。注意，这分别是 <code>TextGeometry</code> 和 <code>TextGeometry</code> 的基础。</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">二十面体</div>
 <div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">绕着一条线旋转形成的形状。例如：灯泡、保龄球瓶、蜡烛、蜡烛台、酒瓶、玻璃杯等。你提供一系列点作为 2D 轮廓，并告诉 Three.js 沿着某条轴旋转时需要将侧面分成多少块。</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">八面体</div>
