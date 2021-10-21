@@ -2597,7 +2597,6 @@ class GLTFParser {
 	 */
 	loadBuffer( bufferIndex ) {
 
-		const parser = this;
 		const bufferDef = this.json.buffers[ bufferIndex ];
 		const loader = this.fileLoader;
 
@@ -2618,7 +2617,7 @@ class GLTFParser {
 
 		return new Promise( function ( resolve, reject ) {
 
-			loader.load( LoaderUtils.resolveURL( bufferDef.uri, parser.options.path ), resolve, undefined, function () {
+			loader.load( LoaderUtils.resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
 
 				reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
@@ -2864,7 +2863,7 @@ class GLTFParser {
 
 				}
 
-				loader.load( LoaderUtils.resolveURL( sourceURI, parser.options.path ), onLoad, undefined, reject );
+				loader.load( LoaderUtils.resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
 
 			} );
 
