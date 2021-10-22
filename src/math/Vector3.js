@@ -478,6 +478,16 @@ class Vector3 {
 
 	}
 
+	damp( v, lambda, delta ) {
+
+		this.x = MathUtils.damp( this.x, v.x, lambda, delta );
+		this.y = MathUtils.damp( this.y, v.y, lambda, delta );
+		this.z = MathUtils.damp( this.z, v.z, lambda, delta );
+
+		return this;
+
+	}
+
 	lerp( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
@@ -493,6 +503,16 @@ class Vector3 {
 		this.x = v1.x + ( v2.x - v1.x ) * alpha;
 		this.y = v1.y + ( v2.y - v1.y ) * alpha;
 		this.z = v1.z + ( v2.z - v1.z ) * alpha;
+
+		return this;
+
+	}
+
+	dampVectors( v1, v2, lambda, delta ) {
+
+		this.x = MathUtils.damp( v1.x, v2.x, lambda, delta );
+		this.y = MathUtils.damp( v1.y, v2.y, lambda, delta );
+		this.z = MathUtils.damp( v1.z, v2.z, lambda, delta );
 
 		return this;
 

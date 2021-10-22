@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - damping, lerping comparison</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		#info {
+			background-color: rgba(0,0,0,0.75);
+		}
+
+		.dg .folder .gui-stats {
+			height: auto;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="info">
+
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - damping, lerping comparison
+
+	</div>
+
+	<div id="container"></div>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+		let container, stats, gui, guiStatsEl;
+		let camera, controls, scene, renderer, material, mesh;
+
+		const matrix = new THREE.Matrix4();
+		const dummyVec3 = new THREE.Vector3();
+		const dummyVec3B = new THREE.Vector3();
+
+		const clock = new THREE.Clock();
+
+		// gui
+
+		const api = {
+			count: 4000,
+		};
+		let arr = [];
+		//
+
+		init();
+		initMesh();
+		animate();
+
+		const randomizeMatrix = ( offsetX ) => {
+
+			const position = new THREE.Vector3();
+			const rotation = new THREE.Euler();
+			const quaternion = new THREE.Quaternion();
+			const scale = new THREE.Vector3();
+
+
+			position.x = ( Math.random() * 20 - 10 ) + offsetX;
+			position.y = Math.random() * 20 - 10;
+			position.z = Math.random() * 20 - 10;
+
+			rotation.x = Math.random() * 2 * Math.PI;
+			rotation.y = Math.random() * 2 * Math.PI;
+			rotation.z = Math.random() * 2 * Math.PI;
+
+			quaternion.setFromEuler( rotation );
+
+			scale.x = scale.y = scale.z = Math.random() * 1;
+
+			matrix.compose( position, quaternion, scale );
+
+			return matrix;
+
+};
+
+		//
+
+		function clean() {
+
+			const meshes = [];
+
+			scene.traverse( function ( object ) {
+
+				if ( object.isMesh ) meshes.push( object );
+
+			} );
+
+			for ( let i = 0; i < meshes.length; i ++ ) {
+
+				const mesh = meshes[ i ];
+				mesh.material.dispose();
+				mesh.geometry.dispose();
+
+				scene.remove( mesh );
+
+			}
+
+		}
+
+
+		function initMesh() {
+
+			clean();
+
+			// make instances
+			new THREE.BufferGeometryLoader()
+				.setPath( 'models/json/' )
+				.load( 'suzanne_buffergeometry.json', function ( geometry ) {
+
+					material = new THREE.MeshNormalMaterial();
+
+					geometry.computeVertexNormals();
+
+					console.time( api.method + ' (build)' );
+
+					makeInstanced( geometry );
+
+					console.timeEnd( api.method + ' (build)' );
+
+				} );
+
+		}
+
+		function makeInstanced( geometry ) {
+
+			// const matrix = new THREE.Matrix4();
+			mesh = new THREE.InstancedMesh( geometry, material, api.count );
+			arr = [];
+			for ( let i = 0; i < api.count; i ++ ) {
+
+				const offsetX = i < api.count / 2 ? - 12 : 12;
+				const rmatrix = randomizeMatrix( offsetX );
+				arr.push( {
+					start: new THREE.Vector3().applyMatrix4( randomizeMatrix( offsetX ) ),
+					end: new THREE.Vector3().applyMatrix4( randomizeMatrix( offsetX ) ),
+					mat4: new THREE.Matrix4(),
+					reverse: false
+				} );
+
+				mesh.setMatrixAt( i, rmatrix );
+
+			}
+
+			scene.add( mesh );
+
+			//
+
+			const geometryByteLength = getGeometryByteLength( geometry );
+
+			guiStatsEl.innerHTML = [
+
+				'<i>GPU draw calls</i>: 1',
+				'<i>GPU memory</i>: ' + formatBytes( api.count * 16 + geometryByteLength, 2 )
+
+			].join( '<br/>' );
+
+		}
+
+		function init() {
+
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+
+			// camera
+
+			camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
+			camera.position.z = 30;
+
+			// renderer
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( width, height );
+			renderer.outputEncoding = THREE.sRGBEncoding;
+
+			container = document.getElementById( 'container' );
+			container.appendChild( renderer.domElement );
+
+			// scene
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );
+
+			// controls
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.autoRotate = false;
+
+			// stats
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			// gui
+
+			gui = new GUI();
+			gui.add( api, 'count', 2, 100000 ).step( 1 ).onChange( initMesh );
+
+			const perfFolder = gui.addFolder( 'Performance' );
+
+			guiStatsEl = document.createElement( 'li' );
+			guiStatsEl.classList.add( 'gui-stats' );
+
+			perfFolder.__ul.appendChild( guiStatsEl );
+			perfFolder.open();
+
+			// listeners
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			Object.assign( window, { scene } );
+
+		}
+
+		//
+
+		function onWindowResize() {
+
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( width, height );
+
+		}
+
+		function animate() {
+
+			const delta = clock.getDelta();
+
+			requestAnimationFrame( animate );
+
+			if ( arr.length > 0 ) {
+
+				for ( let i = 0; i < api.count; i ++ ) {
+
+					const { start, end, mat4 } = arr[ i ];
+
+		
+					const pos = dummyVec3.setFromMatrixPosition( mat4 );
+		
+
+					if ( ! arr[ i ].touchedEnd && pos.distanceTo( end ) <= 0.1 ) {
+
+						arr[ i ].touchedEnd = true;
+						arr[ i ].touchedStart = false;
+						arr[ i ].reverse = true;
+		
+					}
+
+					if ( ! arr[ i ].touchedStart && pos.distanceTo( start ) <= 0.1 ) {
+
+						arr[ i ].touchedStart = true;
+						arr[ i ].touchedEnd = false;
+						arr[ i ].reverse = false;
+		
+					}
+
+
+					const dest = dummyVec3B.copy( arr[ i ].reverse ? start : end );
+					if ( i < api.count / 2 ) {
+
+						pos.damp( dest, 1.25, delta );
+
+					} else {
+
+						pos.lerp( dest, 0.0225 );
+
+					}
+
+					mat4.setPosition( pos );
+
+					mesh.setMatrixAt( i, mat4 );
+
+				}
+
+				mesh.instanceMatrix.needsUpdate = true;
+		
+	}
+
+			controls.update();
+			stats.update();
+
+			render();
+
+		}
+
+		function render() {
+
+			renderer.render( scene, camera );
+
+		}
+
+		//
+
+		function getGeometryByteLength( geometry ) {
+
+			let total = 0;
+
+			if ( geometry.index ) total += geometry.index.array.byteLength;
+
+			for ( const name in geometry.attributes ) {
+
+				total += geometry.attributes[ name ].array.byteLength;
+
+			}
+
+			return total;
+
+		}
+
+		// Source: https://stackoverflow.com/a/18650828/1314762
+		function formatBytes( bytes, decimals ) {
+
+			if ( bytes === 0 ) return '0 bytes';
+
+			const k = 1024;
+			const dm = decimals < 0 ? 0 : decimals;
+			const sizes = [ 'bytes', 'KB', 'MB' ];
+
+			const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
+
+			return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ' ' + sizes[ i ];
+
+		}
+
+	</script>
+
+</body>
+</html>
