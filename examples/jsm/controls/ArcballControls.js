@@ -80,6 +80,7 @@ class ArcballControls extends Object3D {
 		this.domElement = domElement;
 		this.scene = scene;
 		this.target = new Vector3( 0, 0, 0 );
+		this.radiusFactor = 0.67;
 
 		this.mouseActions = [];
 		this._mouseOp = null;
@@ -1974,18 +1975,17 @@ class ArcballControls extends Object3D {
 	 */
 	calculateTbRadius = ( camera ) => {
 
-		const factor = 0.67;
 		const distance = camera.position.distanceTo( this._gizmos.position );
 
 		if ( camera.type == 'PerspectiveCamera' ) {
 
 			const halfFovV = MathUtils.DEG2RAD * camera.fov * 0.5; //vertical fov/2 in radians
 			const halfFovH = Math.atan( ( camera.aspect ) * Math.tan( halfFovV ) ); //horizontal fov/2 in radians
-			return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * factor;
+			return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * this.radiusFactor;
 
 		} else if ( camera.type == 'OrthographicCamera' ) {
 
-			return Math.min( camera.top, camera.right ) * factor;
+			return Math.min( camera.top, camera.right ) * this.radiusFactor;
 
 		}
 
