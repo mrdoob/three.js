@@ -576,7 +576,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		return _transmissionRenderTarget;
 
-	}
+	};
 
 	//
 
