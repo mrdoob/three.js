@@ -125,7 +125,7 @@ ShaderLib[ 'line' ] = {
 
 			#else
 
-			vUv = uv;
+				vUv = uv;
 
 			#endif
 
