@@ -2242,6 +2242,30 @@ class ArcballControls extends Object3D {
 	}
 
 	/**
+	 * Set gizmos radius factor and redraws gizmos
+	 * @param {Float} value Value of radius factor
+	 */
+	setTbRadius( value ) {
+
+		this.radiusFactor = value;
+		this._tbRadius = this.calculateTbRadius( this.camera );
+
+		const curve = new EllipseCurve( 0, 0, this._tbRadius, this._tbRadius );
+		const points = curve.getPoints( this._curvePts );
+		const curveGeometry = new BufferGeometry().setFromPoints( points );
+
+
+		for ( const gizmo in this._gizmos.children ) {
+
+			this._gizmos.children[ gizmo ].geometry = curveGeometry;
+
+		}
+
+		this.dispatchEvent( _changeEvent );
+
+	}
+
+	/**
 	 * Creates the rotation gizmos matching trackball center and radius
 	 * @param {Vector3} tbCenter The trackball center
 	 * @param {number} tbRadius The trackball radius
