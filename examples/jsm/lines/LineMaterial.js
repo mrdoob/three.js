@@ -123,9 +123,9 @@ ShaderLib[ 'line' ] = {
 				worldStart = start.xyz;
 				worldEnd = end.xyz;
 
-		 #else
+			#else
 
-		 	vUv = uv;
+			vUv = uv;
 
 			#endif
 
