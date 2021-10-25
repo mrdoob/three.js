@@ -64,6 +64,8 @@ const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
+const _raycaster = new Raycaster();
+
 
 /**
  *
@@ -80,7 +82,6 @@ class ArcballControls extends Object3D {
 		this.domElement = domElement;
 		this.scene = scene;
 		this.target = new Vector3( 0, 0, 0 );
-		this.raycaster = new Raycaster();
 
 		this.mouseActions = [];
 		this._mouseOp = null;
@@ -2809,6 +2810,13 @@ class ArcballControls extends Object3D {
 
 	};
 
+	
+	getRaycaster() {
+
+		return _raycaster;
+
+	}
+
 
 	/**
 	 * Unproject the cursor on the 3D object surface
@@ -2818,11 +2826,12 @@ class ArcballControls extends Object3D {
 	 */
 	unprojectOnObj = ( cursor, camera ) => {
 
-		this.raycaster.near = camera.near;
-		this.raycaster.far = camera.far;
-		this.raycaster.setFromCamera( cursor, camera );
+		const raycaster = this.getRaycaster();
+		raycaster.near = camera.near;
+		raycaster.far = camera.far;
+		raycaster.setFromCamera( cursor, camera );
 
-		const intersect = this.raycaster.intersectObjects( this.scene.children, true );
+		const intersect = raycaster.intersectObjects( this.scene.children, true );
 
 		for ( let i = 0; i < intersect.length; i ++ ) {
 

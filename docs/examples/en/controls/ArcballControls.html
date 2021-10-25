@@ -189,11 +189,6 @@
 			Maximum angular velocity allowed on rotation animation start.
 		</p>
 
-		<h3>[property:Raycaster raycaster]</h3>
-		<p>
-			The raycaster used to intersect objects for focusing.
-		</p>
-
 
 		<h2>Methods</h2>
 
@@ -260,6 +255,14 @@
 		<h3>[method:null update] ()</h3>
 		<p>
 			Update the controls. Must be called after any manual changes to the camera's transform.
+		</p>
+		
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the [page:Raycaster] object that is used for user interaction. This object is shared between all instances of
+			ArcballControls. If you set the [page:Object3D.layers .layers] property of the [name], you will also want to
+			set the [page:Raycaster.layers .layers] property on the [page:Raycaster] with a matching value, or else the [name]
+			won't work as expected.
 		</p>
 
 		<h2>Source</h2>

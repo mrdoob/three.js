@@ -40,6 +40,8 @@
 	const _endEvent = {
 		type: 'end'
 	};
+	
+	const _raycaster = new THREE.Raycaster();
 	/**
  *
  * @param {Camera} camera Virtual camera used in the scene
@@ -2321,12 +2323,19 @@
 
 			};
 
+			this.getRaycaster = () => {
+
+				return _raycaster;
+	
+			};
+
 			this.unprojectOnObj = ( cursor, camera ) => {
 
-				this.raycaster.near = camera.near;
-				this.raycaster.far = camera.far;
-				this.raycaster.setFromCamera( cursor, camera );
-				const intersect = this.raycaster.intersectObjects( this.scene.children, true );
+				const raycaster = this.getRaycaster();
+				raycaster.near = camera.near;
+				raycaster.far = camera.far;
+				raycaster.setFromCamera( cursor, camera );
+				const intersect = raycaster.intersectObjects( this.scene.children, true );
 
 				for ( let i = 0; i < intersect.length; i ++ ) {
 
@@ -2680,7 +2689,6 @@
 			this.domElement = domElement;
 			this.scene = scene;
 			this.target = new THREE.Vector3( 0, 0, 0 );
-			this.raycaster = new Raycaster();
 			this.mouseActions = [];
 			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
 
