@@ -9,7 +9,7 @@ import {
 	LinearEncoding,
 	NoToneMapping,
 	LinearMipmapLinearFilter,
-	NearestFilter,
+	LinearFilter,
 	ClampToEdgeWrapping
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
@@ -555,6 +555,28 @@ function WebGLRenderer( parameters = {} ) {
 		this.clear( false, false, true );
 
 	};
+
+	this.getTransmissionRenderTarget = function () {
+
+		if ( _transmissionRenderTarget === null ) {
+
+			const needsAntialias = _antialias === true && capabilities.isWebGL2 === true;
+			const renderTargetType = needsAntialias ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+
+			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
+				generateMipmaps: true,
+				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
+				minFilter: LinearMipmapLinearFilter,
+				magFilter: LinearFilter,
+				wrapS: ClampToEdgeWrapping,
+				wrapT: ClampToEdgeWrapping
+			} );
+
+		}
+
+		return _transmissionRenderTarget;
+
+	}
 
 	//
 
@@ -1181,24 +1203,10 @@ function WebGLRenderer( parameters = {} ) {
 
 	function renderTransmissionPass( opaqueObjects, scene, camera ) {
 
-		if ( _transmissionRenderTarget === null ) {
-
-			const needsAntialias = _antialias === true && capabilities.isWebGL2 === true;
-			const renderTargetType = needsAntialias ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
-
-			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
-				generateMipmaps: true,
-				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
-				minFilter: LinearMipmapLinearFilter,
-				magFilter: NearestFilter,
-				wrapS: ClampToEdgeWrapping,
-				wrapT: ClampToEdgeWrapping
-			} );
-
-		}
+		const transmissionRenderTarget = _this.getTransmissionRenderTarget();
 
 		const currentRenderTarget = _this.getRenderTarget();
-		_this.setRenderTarget( _transmissionRenderTarget );
+		_this.setRenderTarget( transmissionRenderTarget );
 		_this.clear();
 
 		// Turn off the features which can affect the frag color for opaque objects pass.
@@ -1210,8 +1218,8 @@ function WebGLRenderer( parameters = {} ) {
 
 		_this.toneMapping = currentToneMapping;
 
-		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
-		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+		textures.updateMultisampleRenderTarget( transmissionRenderTarget );
+		textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
 		_this.setRenderTarget( currentRenderTarget );
 
@@ -1685,7 +1693,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			}
 
-			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget );
+			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _this.getTransmissionRenderTarget() );
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 
