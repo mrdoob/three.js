@@ -1692,7 +1692,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			}
 
-			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, this.getTransmissionRenderTarget() );
+			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _this.getTransmissionRenderTarget() );
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 
