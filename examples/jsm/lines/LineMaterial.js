@@ -55,10 +55,23 @@ ShaderLib[ 'line' ] = {
 		attribute vec3 instanceColorStart;
 		attribute vec3 instanceColorEnd;
 
-		varying vec2 vUv;
-		varying vec4 worldPos;
-		varying vec3 worldStart;
-		varying vec3 worldEnd;
+		#ifdef WORLD_UNITS
+
+			varying vec4 worldPos;
+			varying vec3 worldStart;
+			varying vec3 worldEnd;
+
+			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#endif
+
+		#else
+
+			varying vec2 vUv;
+
+		#endif
 
 		#ifdef USE_DASH
 
@@ -95,19 +108,26 @@ ShaderLib[ 'line' ] = {
 			#ifdef USE_DASH
 
 				vLineDistance = ( position.y < 0.5 ) ? dashScale * instanceDistanceStart : dashScale * instanceDistanceEnd;
+				vUv = uv;
 
 			#endif
 
 			float aspect = resolution.x / resolution.y;
 
-			vUv = uv;
-
 			// camera space
 			vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );
 			vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );
 
-			worldStart = start.xyz;
-			worldEnd = end.xyz;
+			#ifdef WORLD_UNITS
+
+				worldStart = start.xyz;
+				worldEnd = end.xyz;
+
+			#else
+
+				vUv = uv;
+
+			#endif
 
 			// special case for perspective projection, and segments that terminate either in, or behind, the camera plane
 			// clearly the gpu firmware has a way of addressing this issue when projecting into ndc space
@@ -263,17 +283,30 @@ ShaderLib[ 'line' ] = {
 		#endif
 
 		varying float vLineDistance;
-		varying vec4 worldPos;
-		varying vec3 worldStart;
-		varying vec3 worldEnd;
+
+		#ifdef WORLD_UNITS
+
+			varying vec4 worldPos;
+			varying vec3 worldStart;
+			varying vec3 worldEnd;
+
+			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#endif
+
+		#else
+
+			varying vec2 vUv;
+
+		#endif
 
 		#include <common>
 		#include <color_pars_fragment>
 		#include <fog_pars_fragment>
 		#include <logdepthbuf_pars_fragment>
 		#include <clipping_planes_pars_fragment>
-
-		varying vec2 vUv;
 
 		vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
 
@@ -333,7 +366,7 @@ ShaderLib[ 'line' ] = {
 
 				#ifndef USE_DASH
 
-					#ifdef ALPHA_TO_COVERAGE
+					#ifdef USE_ALPHA_TO_COVERAGE
 
 						float dnorm = fwidth( norm );
 						alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
@@ -352,7 +385,7 @@ ShaderLib[ 'line' ] = {
 
 			#else
 
-				#ifdef ALPHA_TO_COVERAGE
+				#ifdef USE_ALPHA_TO_COVERAGE
 
 					// artifacts appear on some hardware if a derivative is taken within a conditional
 					float a = vUv.x;
@@ -625,13 +658,13 @@ class LineMaterial extends ShaderMaterial {
 
 				get: function () {
 
-					return Boolean( 'ALPHA_TO_COVERAGE' in this.defines );
+					return Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines );
 
 				},
 
 				set: function ( value ) {
 
-					if ( Boolean( value ) !== Boolean( 'ALPHA_TO_COVERAGE' in this.defines ) ) {
+					if ( Boolean( value ) !== Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines ) ) {
 
 						this.needsUpdate = true;
 
@@ -639,12 +672,12 @@ class LineMaterial extends ShaderMaterial {
 
 					if ( value === true ) {
 
-						this.defines.ALPHA_TO_COVERAGE = '';
+						this.defines.USE_ALPHA_TO_COVERAGE = '';
 						this.extensions.derivatives = true;
 
 					} else {
 
-						delete this.defines.ALPHA_TO_COVERAGE;
+						delete this.defines.USE_ALPHA_TO_COVERAGE;
 						this.extensions.derivatives = false;
 
 					}
