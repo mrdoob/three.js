@@ -64,6 +64,8 @@ const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
+const _raycaster = new Raycaster();
+
 
 /**
  *
@@ -2808,6 +2810,13 @@ class ArcballControls extends Object3D {
 
 	};
 
+	
+	getRaycaster() {
+
+		return _raycaster;
+
+	}
+
 
 	/**
 	 * Unproject the cursor on the 3D object surface
@@ -2817,7 +2826,7 @@ class ArcballControls extends Object3D {
 	 */
 	unprojectOnObj = ( cursor, camera ) => {
 
-		const raycaster = new Raycaster();
+		const raycaster = this.getRaycaster();
 		raycaster.near = camera.near;
 		raycaster.far = camera.far;
 		raycaster.setFromCamera( cursor, camera );

@@ -40,6 +40,8 @@
 	const _endEvent = {
 		type: 'end'
 	};
+	
+	const _raycaster = new THREE.Raycaster();
 	/**
  *
  * @param {Camera} camera Virtual camera used in the scene
@@ -2321,9 +2323,15 @@
 
 			};
 
+			this.getRaycaster = () => {
+
+				return _raycaster;
+	
+			};
+
 			this.unprojectOnObj = ( cursor, camera ) => {
 
-				const raycaster = new THREE.Raycaster();
+				const raycaster = this.getRaycaster();
 				raycaster.near = camera.near;
 				raycaster.far = camera.far;
 				raycaster.setFromCamera( cursor, camera );
