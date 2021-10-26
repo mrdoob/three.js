@@ -40,7 +40,7 @@
 	const _endEvent = {
 		type: 'end'
 	};
-	
+
 	const _raycaster = new THREE.Raycaster();
 	/**
  *
@@ -48,6 +48,7 @@
  * @param {HTMLElement} domElement Renderer's dom element
  * @param {Scene} scene The scene to be rendered
  */
+
 
 	class ArcballControls extends THREE.Object3D {
 
@@ -463,11 +464,11 @@
 
 									}
 
-									this.applyTransformMatrix( this.scale( size, scalePoint ) );
+									this.applyTransformMatrix( this.applyScale( size, scalePoint ) );
 
 								} else {
 
-									this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+									this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
 
 								}
 
@@ -540,7 +541,7 @@
 									const newDistance = y / Math.tan( THREE.MathUtils.DEG2RAD * ( newFov / 2 ) );
 									size = x / newDistance;
 									this.setFov( newFov );
-									this.applyTransformMatrix( this.scale( size, this._gizmos.position, false ) );
+									this.applyTransformMatrix( this.applyScale( size, this._gizmos.position, false ) );
 
 								}
 
@@ -858,7 +859,7 @@
 
 									}
 
-									this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+									this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
 
 								}
 
@@ -927,7 +928,7 @@
 									this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
 									this.setFov( newFov );
-									this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
+									this.applyTransformMatrix( this.applyScale( size, this._v3_2, false ) ); //adjusting distance
 
 									const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
 
@@ -1215,7 +1216,7 @@
 
 					}
 
-					this.applyTransformMatrix( this.scale( amount, scalePoint ) );
+					this.applyTransformMatrix( this.applyScale( amount, scalePoint ) );
 					this.dispatchEvent( _changeEvent );
 
 				}
@@ -1319,7 +1320,7 @@
 					this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
 					this.setFov( newFov );
-					this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
+					this.applyTransformMatrix( this.applyScale( size, this._v3_2, false ) ); //adjusting distance
 
 					const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
 
@@ -1635,7 +1636,7 @@
 
 				if ( this.enableZoom ) {
 
-					this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+					this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
 
 				}
 
@@ -2160,7 +2161,7 @@
 
 			};
 
-			this.scale = ( size, point, scaleGizmos = true ) => {
+			this.applyScale = ( size, point, scaleGizmos = true ) => {
 
 				const scalePoint = point.clone();
 				let sizeInverse = 1 / size;
@@ -2321,12 +2322,6 @@
 				this.setTransformationMatrices( this._m4_1, this._m4_2 );
 				return _transformation;
 
-			};
-
-			this.getRaycaster = () => {
-
-				return _raycaster;
-	
 			};
 
 			this.unprojectOnObj = ( cursor, camera ) => {
@@ -2591,7 +2586,7 @@
 					if ( this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom ) {
 
 						const newZoom = THREE.MathUtils.clamp( this.camera.zoom, this.minZoom, this.maxZoom );
-						this.applyTransformMatrix( this.scale( newZoom / this.camera.zoom, this._gizmos.position, true ) );
+						this.applyTransformMatrix( this.applyScale( newZoom / this.camera.zoom, this._gizmos.position, true ) );
 
 					}
 
@@ -2603,7 +2598,7 @@
 					if ( distance > this.maxDistance + EPS || distance < this.minDistance - EPS ) {
 
 						const newDistance = THREE.MathUtils.clamp( distance, this.minDistance, this.maxDistance );
-						this.applyTransformMatrix( this.scale( newDistance / distance, this._gizmos.position ) );
+						this.applyTransformMatrix( this.applyScale( newDistance / distance, this._gizmos.position ) );
 						this.updateMatrixState();
 
 					} //check fov
@@ -2993,6 +2988,19 @@
    * @param {Vector3} point The point where the rotation axis is passing trough
    * @param {Number} angle Angle in radians
    * @returns The computed transormation matix
+   */
+
+
+		getRaycaster() {
+
+			return _raycaster;
+
+		}
+		/**
+   * Unproject the cursor on the 3D object surface
+   * @param {Vector2} cursor Cursor coordinates in NDC
+   * @param {Camera} camera Virtual camera
+   * @returns {Vector3} The point of intersection with the model, if exist, null otherwise
    */
 
 

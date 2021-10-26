@@ -1724,33 +1724,9 @@
 		MASK: 'MASK',
 		BLEND: 'BLEND'
 	};
-	/* UTILITY FUNCTIONS */
-
-	function resolveURL( url, path ) {
-
-		// Invalid URL
-		if ( typeof url !== 'string' || url === '' ) return ''; // Host Relative URL
-
-		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
-
-			path = path.replace( /(^https?:\/\/[^\/]+).*/i, '$1' );
-
-		} // Absolute URL http://,https://,//
-
-
-		if ( /^(https?:)?\/\//i.test( url ) ) return url; // Data URI
-
-		if ( /^data:.*,.*$/i.test( url ) ) return url; // Blob URL
-
-		if ( /^blob:.*$/i.test( url ) ) return url; // Relative URL
-
-		return path + url;
-
-	}
 	/**
  * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
  */
-
 
 	function createDefaultMaterial( cache ) {
 
@@ -2378,7 +2354,7 @@
 			const options = this.options;
 			return new Promise( function ( resolve, reject ) {
 
-				loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
+				loader.load( THREE.LoaderUtils.resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
 
 					reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
@@ -2613,7 +2589,7 @@
 
 					}
 
-					loader.load( resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
+					loader.load( THREE.LoaderUtils.resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
 
 				} );
 
