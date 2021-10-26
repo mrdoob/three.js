@@ -36,8 +36,7 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 
-				const defaultLight = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
-				defaultLight.position.set( 0.5, 1, 0.25 );
+				const defaultLight = new THREE.AmbientLight( 0xffffff );
 				scene.add( defaultLight );
 
 				//
@@ -64,7 +63,7 @@
 					// The estimated lighting also provides an environment cubemap, which we can apply here.
 					if ( xrLight.environment ) {
 
-						scene.environment = xrLight.environment;
+						updateEnvironment( xrLight.environment );
 
 					}
 
@@ -77,7 +76,7 @@
 					scene.remove( xrLight );
 
 					// Revert back to the default environment.
-					scene.environment = defaultEnvironment;
+					updateEnvironment( defaultEnvironment );
 
 				} );
 
@@ -92,7 +91,7 @@
 
 						defaultEnvironment = texture;
 
-						scene.environment = defaultEnvironment;
+						updateEnvironment( defaultEnvironment );
 
 					} );
 
@@ -107,17 +106,16 @@
 				const ballGroup = new THREE.Group();
 				ballGroup.position.z = - 2;
 
-				const rows = 3;
-				const cols = 3;
+				const rows = 1;
+				const cols = 4;
 
 				for ( let i = 0; i < rows; i ++ ) {
 
 					for ( let j = 0; j < cols; j ++ ) {
 
-						const ballMaterial = new THREE.MeshStandardMaterial( {
+						const ballMaterial = new THREE.MeshPhongMaterial( {
 							color: 0xdddddd,
-							roughness: i / rows,
-							metalness: j / cols
+							reflectivity: j / cols
 						} );
 						const ballMesh = new THREE.Mesh( ballGeometry, ballMaterial );
 						ballMesh.position.set( ( i + 0.5 - rows * 0.5 ) * 0.4, ( j + 0.5 - cols * 0.5 ) * 0.4, 0 );
@@ -170,6 +168,18 @@
 				renderer.render( scene, camera );
 
 			}
+
+			function updateEnvironment( envMap ) {
+
+				scene.traverse( function ( object ) {
+
+					if ( object.isMesh ) object.material.envMap = envMap;
+
+
+				} );
+
+			}
+
 
 		</script>
 	</body>
