@@ -659,11 +659,11 @@ class ArcballControls extends Object3D {
 
 							}
 
-							this.applyTransformMatrix( this.scale( size, scalePoint ) );
+							this.applyTransformMatrix( this.applyScale( size, scalePoint ) );
 
 						} else {
 
-							this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+							this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
 
 						}
 
@@ -746,7 +746,7 @@ class ArcballControls extends Object3D {
 							size = x / newDistance;
 
 							this.setFov( newFov );
-							this.applyTransformMatrix( this.scale( size, this._gizmos.position, false ) );
+							this.applyTransformMatrix( this.applyScale( size, this._gizmos.position, false ) );
 
 						}
 
@@ -1058,7 +1058,7 @@ class ArcballControls extends Object3D {
 
 							}
 
-							this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+							this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
 
 						}
 
@@ -1129,7 +1129,7 @@ class ArcballControls extends Object3D {
 							this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
 							this.setFov( newFov );
-							this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
+							this.applyTransformMatrix( this.applyScale( size, this._v3_2, false ) );
 
 							//adjusting distance
 							const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
@@ -1431,7 +1431,7 @@ class ArcballControls extends Object3D {
 
 			}
 
-			this.applyTransformMatrix( this.scale( amount, scalePoint ) );
+			this.applyTransformMatrix( this.applyScale( amount, scalePoint ) );
 			this.dispatchEvent( _changeEvent );
 
 		}
@@ -1539,7 +1539,7 @@ class ArcballControls extends Object3D {
 			this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
 			this.setFov( newFov );
-			this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
+			this.applyTransformMatrix( this.applyScale( size, this._v3_2, false ) );
 
 			//adjusting distance
 			const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
@@ -2018,7 +2018,7 @@ class ArcballControls extends Object3D {
 		//apply zoom
 		if ( this.enableZoom ) {
 
-			this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+			this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
 
 		}
 
@@ -2598,7 +2598,7 @@ class ArcballControls extends Object3D {
 	 * @param {Boolean} scaleGizmos If gizmos should be scaled (Perspective only)
 	 * @returns {Object} Object with 'camera' and 'gizmo' fields containing transformation matrices resulting from the operation to be applied to the camera and gizmos
 	 */
-	scale = ( size, point, scaleGizmos = true ) => {
+	applyScale = ( size, point, scaleGizmos = true ) => {
 
 		const scalePoint = point.clone();
 		let sizeInverse = 1 / size;
@@ -2810,7 +2810,7 @@ class ArcballControls extends Object3D {
 
 	};
 
-	
+
 	getRaycaster() {
 
 		return _raycaster;
@@ -3107,7 +3107,7 @@ class ArcballControls extends Object3D {
 			if ( this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom ) {
 
 				const newZoom = MathUtils.clamp( this.camera.zoom, this.minZoom, this.maxZoom );
-				this.applyTransformMatrix( this.scale( newZoom / this.camera.zoom, this._gizmos.position, true ) );
+				this.applyTransformMatrix( this.applyScale( newZoom / this.camera.zoom, this._gizmos.position, true ) );
 
 			}
 
@@ -3119,7 +3119,7 @@ class ArcballControls extends Object3D {
 			if ( distance > this.maxDistance + EPS || distance < this.minDistance - EPS ) {
 
 				const newDistance = MathUtils.clamp( distance, this.minDistance, this.maxDistance );
-				this.applyTransformMatrix( this.scale( newDistance / distance, this._gizmos.position ) );
+				this.applyTransformMatrix( this.applyScale( newDistance / distance, this._gizmos.position ) );
 				this.updateMatrixState();
 
 			 }
