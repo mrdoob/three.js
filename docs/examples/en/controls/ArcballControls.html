@@ -7,22 +7,24 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:EventDispatcher] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
 		Arcball controls allow the camera to be controlled by a virtual trackball with full touch support and advanced navigation functionality. <br>
 		Cursor/finger positions and movements are mapped over a virtual trackball surface
-		represented by a gizmo and mapped in intuitive and consistent camera movements. 
+		represented by a gizmo and mapped in intuitive and consistent camera movements.
 		Dragging cursor/fingers will cause camera to orbit around the center of the trackball in a conservative way (returning to the starting point
 		will make the camera to return to its starting orientation).<br><br>
-		
+
 		In addition to supporting pan, zoom and pinch gestures, Arcball controls provide <i>focus</i> functionality with a double click/tap for
-		intuitively moving the object's point of interest in the center of the virtual trackball.   
-		Focus allows a much better inspection and navigation in complex environment. 
+		intuitively moving the object's point of interest in the center of the virtual trackball.
+		Focus allows a much better inspection and navigation in complex environment.
 		Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation.
-		Saving and restoring of Camera State is supported also through clipboard 
+		Saving and restoring of Camera State is supported also through clipboard
 		(use ctrl+c and ctrl+v shortcuts for copy and paste the state).<br><br>
-		
+
 		Unlike [page:OrbitControls] and [page:TrackballControls], [name] doesn't require [page:.update] to be called externally in an animation loop when animations
 		are on.<br><br>
 
@@ -251,12 +253,12 @@
 			Mouse inputs can be specified as mouse buttons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
 			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
 		</p>
-		
+
 		<h3>[method:null update] ()</h3>
 		<p>
 			Update the controls. Must be called after any manual changes to the camera's transform.
 		</p>
-		
+
 		<h3>[method:Raycaster getRaycaster] ()</h3>
 		<p>
 			Returns the [page:Raycaster] object that is used for user interaction. This object is shared between all instances of
