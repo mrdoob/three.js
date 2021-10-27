@@ -23,7 +23,7 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import * as Flow from './jsm/libs/flow.module.js';
 
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
@@ -235,10 +235,18 @@
 
 				// gui
 
-				const gui = new GUI();
+				const nodeUI = new Flow.Node()
+					.setStyle( 'glass rounded' )
+					.setAlign( 'top-right' );
 
-				gui.add( scaleVector, 'x', 0, 1, 0.01 );
-				gui.add( scaleVector, 'y', 0, 1, 0.01 );
+				nodeUI.add( new Flow.TitleElement( 'Size Screen' ) );
+				nodeUI.add(
+					new Flow.LabelElement( 'X / Y' )
+						.add( new Flow.NumberInput( scaleVector.x, 0, 1 ).onChange( input => scaleVector.x = input.value ) )
+						.add( new Flow.NumberInput( scaleVector.y, 0, 1 ).onChange( input => scaleVector.y = input.value ) )
+				);
+
+				document.body.appendChild( nodeUI.dom );
 
 				return renderer.init();
 

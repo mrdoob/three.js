@@ -29,7 +29,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import * as Flow from './jsm/libs/flow.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
@@ -146,10 +146,15 @@
 
 				//gui
 
-				const gui = new GUI();
+				const nodeUI = new Flow.Node()
+					.setStyle( 'glass rounded' )
+					.setAlign( 'top-right' );
 
-				gui.add( centerObject.material, 'roughness', 0, 1, 0.01 );
-				gui.add( centerObject.material, 'metalness', 0, 1, 0.01 );
+				nodeUI.add( new Flow.TitleElement( 'Center Object' ) );
+				nodeUI.add( Flow.fromProperty( centerObject.material, 'roughness', 0, 1, 0.01 ) );
+				nodeUI.add( Flow.fromProperty( centerObject.material, 'metalness', 0, 1, 0.01 ) );
+
+				document.body.appendChild( nodeUI.dom );
 
 				return renderer.init();
 
