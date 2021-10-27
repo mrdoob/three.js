@@ -92,8 +92,9 @@
 		[page:Float framebufferScaleFactor] — The framebuffer scale factor to set.<br /><br />
 
 		Specifies the scaling factor to use when determining the size of the framebuffer when rendering to a XR device.
-		The value is relative to the default XR device display resolution. Default is *1*. A value of *0.5* would specify
-		a framebuffer with 50% of the display's native resolution.
+		The value is relative to the default XR device framebuffer size, which may be less than the 'native' display resolution.
+		A value of *0.5* would specify a framebuffer of half the default framebuffer size of the device. Default is *1*.
+		To set a native resolution framebuffer, use [page:constant THREE.NativeFramebufferScaleFactor].
 		</p>
 
 		<p>
