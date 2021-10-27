@@ -6,14 +6,14 @@ import {
 	LineBasicMaterial,
 	Raycaster,
 	Group,
-	Object3D,
 	Box3,
 	Sphere,
 	Quaternion,
 	Vector2,
 	Vector3,
 	Matrix4,
-	MathUtils
+	MathUtils,
+	EventDispatcher
 } from '../../../build/three.module.js';
 
 //trackball state
@@ -73,7 +73,7 @@ const _raycaster = new Raycaster();
  * @param {HTMLElement} domElement Renderer's dom element
  * @param {Scene} scene The scene to be rendered
  */
-class ArcballControls extends Object3D {
+class ArcballControls extends EventDispatcher {
 
 	constructor( camera, domElement, scene = null ) {
 
@@ -2810,7 +2810,7 @@ class ArcballControls extends Object3D {
 
 	};
 
-	
+
 	getRaycaster() {
 
 		return _raycaster;
