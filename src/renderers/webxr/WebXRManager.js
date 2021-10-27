@@ -5,6 +5,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebXRController } from './WebXRController.js';
+import { NativeFramebufferScaleFactor } from '../../constants';
 
 class WebXRManager extends EventDispatcher {
 
@@ -237,6 +238,12 @@ class WebXRManager extends EventDispatcher {
 				if ( attributes.xrCompatible !== true ) {
 
 					await gl.makeXRCompatible();
+
+				}
+
+				if ( framebufferScaleFactor === NativeFramebufferScaleFactor ) {
+
+					framebufferScaleFactor = XRWebGLLayer.getNativeFramebufferScaleFactor( session );
 
 				}
 

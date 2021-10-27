@@ -198,3 +198,5 @@ export const StreamCopyUsage = 35042;
 
 export const GLSL1 = '100';
 export const GLSL3 = '300 es';
+
+export const NativeFramebufferScaleFactor = 0;
