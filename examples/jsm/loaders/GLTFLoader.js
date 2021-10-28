@@ -1876,7 +1876,7 @@ const PATH_PROPERTIES = {
 
 const INTERPOLATION = {
 	CUBICSPLINE: undefined, // We use a custom interpolant (GLTFCubicSplineInterpolation) for CUBICSPLINE tracks. Each
-														// keyframe track will be initialized with a default interpolation type, then modified.
+	// keyframe track will be initialized with a default interpolation type, then modified.
 	LINEAR: InterpolateLinear,
 	STEP: InterpolateDiscrete
 };
@@ -1932,7 +1932,7 @@ function createDefaultMaterial( cache ) {
 			side: FrontSide
 		} );
 
-		_addAssociation(cache[ 'DefaultMaterial' ], 'materials', null);
+		_addAssociation( cache[ 'DefaultMaterial' ], 'materials', null );
 
 	}
 
@@ -2159,10 +2159,12 @@ function getNormalizedComponentScale( constructor ) {
 }
 
 
-function _addAssociation(object, type, value) {
+function _addAssociation( object, type, value ) {
+
 	object.userData = object.userData || {};
 	object.userData.tempAssociations = object.userData.tempAssociations || {};
-	object.userData.tempAssociations[type] = value;
+	object.userData.tempAssociations[ type ] = value;
+
 }
 
 
@@ -2835,7 +2837,7 @@ class GLTFParser {
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
-			_addAssociation(texture, "textures", textureIndex);
+			_addAssociation( texture, "textures", textureIndex );
 
 			return texture;
 
@@ -3172,7 +3174,7 @@ class GLTFParser {
 
 			assignExtrasToUserData( material, materialDef );
 
-			_addAssociation(material, "materials", materialIndex);
+			_addAssociation( material, "materials", materialIndex );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3810,7 +3812,7 @@ class GLTFParser {
 
 			}
 
-			_addAssociation(node, "nodes", nodeIndex);
+			_addAssociation( node, "nodes", nodeIndex );
 
 			return node;
 
@@ -3852,7 +3854,7 @@ class GLTFParser {
 		return Promise.all( pending ).then( function () {
 
 			// Creates the association data from tempAssociations.
-			const parseAssociations = ( object ) => {
+			const generateAssociations = ( object ) => {
 
 
 				if ( object.isMaterial && object.userData &&
@@ -3862,7 +3864,7 @@ class GLTFParser {
 
 						if ( object[ field ] && object[ field ].isTexture ) {
 
-							parseAssociations( object[ field ]  );
+							generateAssociations( object[ field ] );
 
 						}
 
@@ -3870,17 +3872,17 @@ class GLTFParser {
 
 				}
 
-				if( object.material ) {
+				if ( object.material ) {
 
-						parseAssociations( object.material );
+					generateAssociations( object.material );
 
 				}
 
-				if( object.children ) {
+				if ( object.children ) {
 
 					for ( const child of object.children ) {
 
-						parseAssociations( child )
+						generateAssociations( child );
 
 					}
 
@@ -3897,47 +3899,15 @@ class GLTFParser {
 						parser.associations.set( object, value );
 
 					}
+
 					// Removes the temp data.
-					object.userData.tempAssociations = undefined;
+					delete object.userData.tempAssociations;
 
 				}
-			}
-
-			parseAssociations( scene );
-
-			// Removes dangling associations, associations that reference a node that
-			// didn't make it into the scene.
-			const reduceAssociations = ( node ) => {
-
-				const reducedAssociations = new Map();
-
-				for ( const [ key, value ] of parser.associations ) {
-
-					if ( key instanceof Material || key instanceof Texture ) {
-
-						reducedAssociations.set( key, value );
-
-					}
-
-				}
-
-				node.traverse( ( node ) => {
-
-					const mappings = parser.associations.get( node );
-
-					if ( mappings != null ) {
-
-						reducedAssociations.set( node, mappings );
-
-					}
-
-				} );
-
-				return reducedAssociations;
 
 			};
 
-			parser.associations = reduceAssociations( scene );
+			generateAssociations( scene );
 
 			return scene;
 
