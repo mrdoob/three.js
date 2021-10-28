@@ -285,7 +285,7 @@ export const diffuseColor = new PropertyNode( 'DiffuseColor', 'vec4' );
 export const roughness = new PropertyNode( 'Roughness', 'float' );
 export const metalness = new PropertyNode( 'Metalness', 'float' );
 export const alphaTest = new PropertyNode( 'AlphaTest', 'float' );
-export const specularColor = new PropertyNode( 'SpecularTint', 'color' );
+export const specularColor = new PropertyNode( 'SpecularColor', 'color' );
 
 export const negate = ShaderNodeProxy( MathNode, 'negate' );
 export const floor = ShaderNodeProxy( MathNode, 'floor' );

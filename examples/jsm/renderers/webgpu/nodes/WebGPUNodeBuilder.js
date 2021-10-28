@@ -215,7 +215,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				// SPECULAR_TINT
 
-				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), DiffuseColor.rgb, Metalness )', 'vec3' ), 'SpecularTint', 'color' ) );
+				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), DiffuseColor.rgb, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
 
 				// NORMAL_VIEW
 
