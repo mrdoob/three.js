@@ -30,7 +30,7 @@ import * as MathUtils from '../math/MathUtils.js';
  *  attenuationColor: <Color>,
  *
  *  specularIntensity: <float>,
- *  specularIntensityhMap: new THREE.Texture( <Image> ),
+ *  specularIntensityMap: new THREE.Texture( <Image> ),
  *  specularColor: <Color>,
  *  specularColorMap: new THREE.Texture( <Image> )
  * }
