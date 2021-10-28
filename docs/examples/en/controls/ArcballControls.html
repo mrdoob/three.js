@@ -191,6 +191,11 @@
 			Maximum angular velocity allowed on rotation animation start.
 		</p>
 
+		<h3>[property:Float radiusFactor]</h3>
+		<p>
+			The size of the gizmo relative to the screen width and height. Default is 0.67.
+		</p>
+
 
 		<h2>Methods</h2>
 
@@ -232,6 +237,11 @@
 		<h3>[method:null setGizmosVisible] ( [param:Boolean value] )</h3>
 		<p>
 			Set the visible property of gizmos.
+		</p>
+
+		<h3>[method:null setTbRadius] ( [param:Float value] )</h3>
+		<p>
+			Update the `radiusFactor` value, redraw the gizmo and send a `changeEvent` to visualise the changes.
 		</p>
 
 		<h3>[method:Boolean setMouseAction] ( [param:String operation], mouse, key )</h3>

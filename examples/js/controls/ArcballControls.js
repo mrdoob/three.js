@@ -1594,7 +1594,6 @@
 
 			this.calculateTbRadius = camera => {
 
-				const factor = 0.67;
 				const distance = camera.position.distanceTo( this._gizmos.position );
 
 				if ( camera.type == 'PerspectiveCamera' ) {
@@ -1603,11 +1602,11 @@
 
 					const halfFovH = Math.atan( camera.aspect * Math.tan( halfFovV ) ); //horizontal fov/2 in radians
 
-					return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * factor;
+					return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * this.radiusFactor;
 
 				} else if ( camera.type == 'OrthographicCamera' ) {
 
-					return Math.min( camera.top, camera.right ) * factor;
+					return Math.min( camera.top, camera.right ) * this.radiusFactor;
 
 				}
 
@@ -2684,6 +2683,7 @@
 			this.domElement = domElement;
 			this.scene = scene;
 			this.target = new THREE.Vector3( 0, 0, 0 );
+			this.radiusFactor = 0.67;
 			this.mouseActions = [];
 			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
 
@@ -2932,6 +2932,33 @@
 			this.dispatchEvent( _changeEvent );
 
 		}
+
+		
+		/**
+   * Set gizmos radius factor and redraws gizmos
+   * @param {Float} value Value of radius factor
+   */
+		setTbRadius( value ) {
+
+			this.radiusFactor = value;
+			this._tbRadius = this.calculateTbRadius( this.camera );
+
+			const curve = new EllipseCurve( 0, 0, this._tbRadius, this._tbRadius );
+			const points = curve.getPoints( this._curvePts );
+			const curveGeometry = new BufferGeometry().setFromPoints( points );
+
+
+			for ( const gizmo in this._gizmos.children ) {
+
+				this._gizmos.children[ gizmo ].geometry = curveGeometry;
+
+			}
+
+			this.dispatchEvent( _changeEvent );
+
+		}
+
+
 		/**
    * Creates the rotation gizmos matching trackball center and radius
    * @param {Vector3} tbCenter The trackball center
