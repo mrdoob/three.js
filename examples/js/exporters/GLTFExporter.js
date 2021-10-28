@@ -2143,7 +2143,7 @@
 			}
 
 			extensionDef.attenuationDistance = material.attenuationDistance;
-			extensionDef.attenuationColor = material.attenuationTint.toArray();
+			extensionDef.attenuationColor = material.attenuationColor.toArray();
 			materialDef.extensions = materialDef.extensions || {};
 			materialDef.extensions[ this.name ] = extensionDef;
 			extensionsUsed[ this.name ] = true;

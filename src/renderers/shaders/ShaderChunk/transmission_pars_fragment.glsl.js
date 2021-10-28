@@ -7,7 +7,7 @@ export default /* glsl */`
 	uniform float transmission;
 	uniform float thickness;
 	uniform float attenuationDistance;
-	uniform vec3 attenuationTint;
+	uniform vec3 attenuationColor;
 
 	#ifdef USE_TRANSMISSIONMAP
 

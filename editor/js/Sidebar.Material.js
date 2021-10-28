@@ -142,7 +142,7 @@ function SidebarMaterial( editor ) {
 
 	// attenuation tint
 
-	const materialAttenuationTint = new SidebarMaterialColorProperty( editor, 'attenuationTint', strings.getKey( 'sidebar/material/attenuationTint' ) );
+	const materialAttenuationTint = new SidebarMaterialColorProperty( editor, 'attenuationColor', strings.getKey( 'sidebar/material/attenuationColor' ) );
 	container.add( materialAttenuationTint );
 
 	// thickness
