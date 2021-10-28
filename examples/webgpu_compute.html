@@ -235,16 +235,10 @@
 
 				// gui
 
-				const nodeUI = new Flow.Node()
-					.setStyle( 'glass rounded' )
-					.setAlign( 'top-right' );
+				const nodeUI = new Flow.PanelNode( 'Screen Scale' );
 
-				nodeUI.add( new Flow.TitleElement( 'Screen Scale' ) );
-				nodeUI.add(
-					new Flow.LabelElement( 'X / Y' )
-						.add( new Flow.NumberInput( scaleVector.x, 0, 1 ).onChange( input => scaleVector.x = input.value ) )
-						.add( new Flow.NumberInput( scaleVector.y, 0, 1 ).onChange( input => scaleVector.y = input.value ) )
-				);
+				nodeUI.addSlider( scaleVector, 'x', 0, 1 );
+				nodeUI.addSlider( scaleVector, 'y', 0, 1 );
 
 				document.body.appendChild( nodeUI.dom );
 

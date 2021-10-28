@@ -146,13 +146,10 @@
 
 				//gui
 
-				const nodeUI = new Flow.Node()
-					.setStyle( 'glass rounded' )
-					.setAlign( 'top-right' );
+				const nodeUI = new Flow.PanelNode( 'Center Object' );
 
-				nodeUI.add( new Flow.TitleElement( 'Center Object' ) );
-				nodeUI.add( Flow.fromProperty( centerObject.material, 'roughness', 0, 1, 0.01 ) );
-				nodeUI.add( Flow.fromProperty( centerObject.material, 'metalness', 0, 1, 0.01 ) );
+				nodeUI.addSlider( centerObject.material, 'roughness', 0, 1 );
+				nodeUI.addSlider( centerObject.material, 'metalness', 0, 1 );
 
 				document.body.appendChild( nodeUI.dom );
 
