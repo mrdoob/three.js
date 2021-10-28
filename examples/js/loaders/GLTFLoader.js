@@ -651,8 +651,19 @@
 
 				materialParams.sheenRoughness = extension.sheenRoughnessFactor;
 
-			} // TODO sheenColorTexture and sheenRoughnessTexture
+			}
 
+			if ( extension.sheenColorTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture ) );
+
+			}
+
+			if ( extension.sheenRoughnessTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'sheenRoughnessMap', extension.sheenRoughnessTexture ) );
+
+			}
 
 			return Promise.all( pending );
 
