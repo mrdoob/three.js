@@ -5,6 +5,7 @@
  *  dashed: <boolean>,
  *  dashScale: <float>,
  *  dashSize: <float>,
+ *  dashOffset: <float>,
  *  gapSize: <float>,
  *  resolution: <Vector2>, // to be set by renderer
  * }
@@ -16,7 +17,7 @@ import {
 	UniformsLib,
 	UniformsUtils,
 	Vector2
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 
 UniformsLib.line = {
@@ -24,6 +25,7 @@ UniformsLib.line = {
 	worldUnits: { value: 1 },
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
+	dashOffset: { value: 0 },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
 	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
@@ -39,7 +41,7 @@ ShaderLib[ 'line' ] = {
 	] ),
 
 	vertexShader:
-		/* glsl */`
+	/* glsl */`
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -270,13 +272,14 @@ ShaderLib[ 'line' ] = {
 		`,
 
 	fragmentShader:
-		/* glsl */`
+	/* glsl */`
 		uniform vec3 diffuse;
 		uniform float opacity;
 		uniform float linewidth;
 
 		#ifdef USE_DASH
 
+			uniform float dashOffset;
 			uniform float dashSize;
 			uniform float gapSize;
 
@@ -345,7 +348,7 @@ ShaderLib[ 'line' ] = {
 
 				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
 
-				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
 
