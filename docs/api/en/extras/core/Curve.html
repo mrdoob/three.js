@@ -69,7 +69,11 @@
 		<p>Get list of cumulative segment lengths.</p>
 
 		<h3>[method:null updateArcLengths]()</h3>
-		<p>Update the cumlative segment distance cache.</p>
+		<p>
+			Update the cumlative segment distance cache. The method must be called every time curve parameters are changed.
+			If an updated curve is part of a composed curve like [page:CurvePath], [page:.updateArcLengths]() must be 
+			called on the composed curve, too.
+		</p>
 
 		<h3>[method:Float getUtoTmapping]( [param:Float u], [param:Float distance] )</h3>
 		<p>
