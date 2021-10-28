@@ -6,16 +6,16 @@ class PointUVNode extends Node {
 
 		super( 'vec2' );
 
-		Object.defineProperty( this, 'isPointUVNode', { value: true } );
-
 	}
 
-	generate( builder ) {
+	generate( /*builder*/ ) {
 
 		return 'vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y )';
 
 	}
 
 }
+
+PointUVNode.prototype.isPointUVNode = true;
 
 export default PointUVNode;

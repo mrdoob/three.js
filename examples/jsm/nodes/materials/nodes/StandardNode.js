@@ -185,7 +185,7 @@ class StandardNode extends Node {
 
 			}
 
-			if ( this.sheenTint ) this.sheenTint.analyze( builder );
+			if ( this.sheenColor ) this.sheenColor.analyze( builder );
 
 			// build code
 
@@ -230,7 +230,7 @@ class StandardNode extends Node {
 
 			const clearcoatEnv = useClearcoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearcoat', context: contextClearcoatEnvironment, slot: 'environment' } ) : undefined;
 
-			const sheenTint = this.sheenTint ? this.sheenTint.flow( builder, 'c' ) : undefined;
+			const sheenColor = this.sheenColor ? this.sheenColor.flow( builder, 'c' ) : undefined;
 
 			builder.requires.transparent = alpha !== undefined;
 
@@ -368,9 +368,9 @@ class StandardNode extends Node {
 
 			}
 
-			if ( sheenTint ) {
+			if ( sheenColor ) {
 
-				output.push( 'material.sheenTint = ' + sheenTint.result + ';' );
+				output.push( 'material.sheenColor = ' + sheenColor.result + ';' );
 
 			}
 
@@ -547,7 +547,7 @@ class StandardNode extends Node {
 
 		if ( source.environment ) this.environment = source.environment;
 
-		if ( source.sheenTint ) this.sheenTint = source.sheenTint;
+		if ( source.sheenColor ) this.sheenColor = source.sheenColor;
 
 		return this;
 
@@ -593,7 +593,7 @@ class StandardNode extends Node {
 
 			if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
 
-			if ( this.sheenTint ) data.sheenTint = this.sheenTint.toJSON( meta ).uuid;
+			if ( this.sheenColor ) data.sheenColor = this.sheenColor.toJSON( meta ).uuid;
 
 		}
 

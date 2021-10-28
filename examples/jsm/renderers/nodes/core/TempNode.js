@@ -12,32 +12,29 @@ class TempNode extends Node {
 
 		const type = builder.getVectorType( this.getNodeType( builder ) );
 
-		if ( type !== 'void' ) {
-
-			const nodeVar = builder.getVarFromNode( this, type );
-			const propertyName = builder.getPropertyName( nodeVar );
+		if ( builder.context.temp !== false && type !== 'void ' && output !== 'void' ) {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			let snippet = nodeData.snippet;
+			if ( nodeData.snippet === undefined ) {
 
-			if ( snippet === undefined ) {
+				const snippet = super.build( builder, type );
 
-				snippet = super.build( builder, type );
+				const nodeVar = builder.getVarFromNode( this, type );
+				const propertyName = builder.getPropertyName( nodeVar );
 
 				builder.addFlowCode( `${propertyName} = ${snippet}` );
 
 				nodeData.snippet = snippet;
+				nodeData.propertyName = propertyName;
 
 			}
 
-			return builder.format( propertyName, type, output );
-
-		} else {
-
-			return super.build( builder, output );
+			return builder.format( nodeData.propertyName, type, output );
 
 		}
+
+		return super.build( builder, output );
 
 	}
 

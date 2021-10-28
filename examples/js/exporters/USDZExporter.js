@@ -228,25 +228,33 @@ def "Geometry"
 
 	function buildMeshVertexCount( geometry ) {
 
-		const count = geometry.index !== null ? geometry.index.array.length : geometry.attributes.position.count;
+		const count = geometry.index !== null ? geometry.index.count : geometry.attributes.position.count;
 		return Array( count / 3 ).fill( 3 ).join( ', ' );
 
 	}
 
 	function buildMeshVertexIndices( geometry ) {
 
-		if ( geometry.index !== null ) {
-
-			return geometry.index.array.join( ', ' );
-
-		}
-
+		const index = geometry.index;
 		const array = [];
-		const length = geometry.attributes.position.count;
 
-		for ( let i = 0; i < length; i ++ ) {
+		if ( index !== null ) {
 
-			array.push( i );
+			for ( let i = 0; i < index.count; i ++ ) {
+
+				array.push( index.getX( i ) );
+
+			}
+
+		} else {
+
+			const length = geometry.attributes.position.count;
+
+			for ( let i = 0; i < length; i ++ ) {
+
+				array.push( i );
+
+			}
 
 		}
 
@@ -264,11 +272,13 @@ def "Geometry"
 		}
 
 		const array = [];
-		const data = attribute.array;
 
-		for ( let i = 0; i < data.length; i += 3 ) {
+		for ( let i = 0; i < attribute.count; i ++ ) {
 
-			array.push( `(${data[ i + 0 ].toPrecision( PRECISION )}, ${data[ i + 1 ].toPrecision( PRECISION )}, ${data[ i + 2 ].toPrecision( PRECISION )})` );
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			const z = attribute.getZ( i );
+			array.push( `(${x.toPrecision( PRECISION )}, ${y.toPrecision( PRECISION )}, ${z.toPrecision( PRECISION )})` );
 
 		}
 
@@ -286,11 +296,12 @@ def "Geometry"
 		}
 
 		const array = [];
-		const data = attribute.array;
 
-		for ( let i = 0; i < data.length; i += 2 ) {
+		for ( let i = 0; i < attribute.count; i ++ ) {
 
-			array.push( `(${data[ i + 0 ].toPrecision( PRECISION )}, ${1 - data[ i + 1 ].toPrecision( PRECISION )})` );
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			array.push( `(${x.toPrecision( PRECISION )}, ${1 - y.toPrecision( PRECISION )})` );
 
 		}
 

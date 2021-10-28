@@ -5,10 +5,10 @@ class NodeVar {
 		this.name = name;
 		this.type = type;
 
-		Object.defineProperty( this, 'isNodeVar', { value: true } );
-
 	}
 
 }
+
+NodeVar.prototype.isNodeVar = true;
 
 export default NodeVar;

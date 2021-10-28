@@ -12,8 +12,6 @@ class CodeNode extends Node {
 
 		this._includes = [];
 
-		Object.defineProperty( this, 'isCodeNode', { value: true } );
-
 	}
 
 	setIncludes( includes ) {
@@ -34,7 +32,7 @@ class CodeNode extends Node {
 
 		if ( this.useKeywords === true ) {
 
-			const contextKeywords = builder.getContextValue( 'keywords' );
+			const contextKeywords = builder.context.keywords;
 
 			if ( contextKeywords !== undefined ) {
 
@@ -74,5 +72,7 @@ class CodeNode extends Node {
 	}
 
 }
+
+CodeNode.prototype.isCodeNode = true;
 
 export default CodeNode;

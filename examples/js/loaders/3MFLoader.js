@@ -1299,7 +1299,7 @@
 				for ( let i = 0; i < buildData.length; i ++ ) {
 
 					const buildItem = buildData[ i ];
-					const object3D = objects[ buildItem[ 'objectId' ] ]; // apply transform
+					const object3D = objects[ buildItem[ 'objectId' ] ].clone(); // apply transform
 
 					const transform = buildItem[ 'transform' ];
 

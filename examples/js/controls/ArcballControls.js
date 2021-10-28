@@ -40,6 +40,8 @@
 	const _endEvent = {
 		type: 'end'
 	};
+
+	const _raycaster = new THREE.Raycaster();
 	/**
  *
  * @param {Camera} camera Virtual camera used in the scene
@@ -47,7 +49,8 @@
  * @param {Scene} scene The scene to be rendered
  */
 
-	class ArcballControls extends THREE.Object3D {
+
+	class ArcballControls extends THREE.EventDispatcher {
 
 		constructor( _camera, domElement, scene = null ) {
 
@@ -1591,7 +1594,6 @@
 
 			this.calculateTbRadius = camera => {
 
-				const factor = 0.67;
 				const distance = camera.position.distanceTo( this._gizmos.position );
 
 				if ( camera.type == 'PerspectiveCamera' ) {
@@ -1600,11 +1602,11 @@
 
 					const halfFovH = Math.atan( camera.aspect * Math.tan( halfFovV ) ); //horizontal fov/2 in radians
 
-					return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * factor;
+					return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * this.radiusFactor;
 
 				} else if ( camera.type == 'OrthographicCamera' ) {
 
-					return Math.min( camera.top, camera.right ) * factor;
+					return Math.min( camera.top, camera.right ) * this.radiusFactor;
 
 				}
 
@@ -1707,8 +1709,8 @@
 				window.removeEventListener( 'pointermove', this.onPointerMove );
 				window.removeEventListener( 'pointerup', this.onPointerUp );
 				window.removeEventListener( 'resize', this.onWindowResize );
-				window.addEventListener( 'keydown', this.onKeyDown );
-				this.scene.remove( this._gizmos );
+				window.removeEventListener( 'keydown', this.onKeyDown );
+				if ( this.scene !== null ) this.scene.remove( this._gizmos );
 				this.disposeGrid();
 
 			};
@@ -1788,7 +1790,7 @@
 
 			this.setCamera = camera => {
 
-				camera.lookAt( this._tbCenter );
+				camera.lookAt( this.target );
 				camera.updateMatrix(); //setting state
 
 				if ( camera.type == 'PerspectiveCamera' ) {
@@ -1807,10 +1809,10 @@
 				this._zoom0 = camera.zoom;
 				this._zoomState = this._zoom0;
 				this._initialNear = camera.near;
-				this._nearPos0 = camera.position.distanceTo( this._tbCenter ) - camera.near;
+				this._nearPos0 = camera.position.distanceTo( this.target ) - camera.near;
 				this._nearPos = this._initialNear;
 				this._initialFar = camera.far;
-				this._farPos0 = camera.position.distanceTo( this._tbCenter ) - camera.far;
+				this._farPos0 = camera.position.distanceTo( this.target ) - camera.far;
 				this._farPos = this._initialFar;
 
 				this._up0.copy( camera.up );
@@ -1821,7 +1823,7 @@
 				this.camera.updateProjectionMatrix(); //making gizmos
 
 				this._tbRadius = this.calculateTbRadius( camera );
-				this.makeGizmos( this._tbCenter, this._tbRadius );
+				this.makeGizmos( this.target, this._tbRadius );
 
 			};
 
@@ -2283,14 +2285,14 @@
 
 			this.setTarget = ( x, y, z ) => {
 
-				this._tbCenter.set( x, y, z );
+				this.target.set( x, y, z );
 
 				this._gizmos.position.set( x, y, z ); //for correct radius calculation
 
 
 				this._tbRadius = this.calculateTbRadius( this.camera );
-				this.makeGizmos( this._tbCenter, this._tbRadius );
-				this.camera.lookAt( this._tbCenter );
+				this.makeGizmos( this.target, this._tbRadius );
+				this.camera.lookAt( this.target );
 
 			};
 
@@ -2323,7 +2325,7 @@
 
 			this.unprojectOnObj = ( cursor, camera ) => {
 
-				const raycaster = new THREE.Raycaster();
+				const raycaster = this.getRaycaster();
 				raycaster.near = camera.near;
 				raycaster.far = camera.far;
 				raycaster.setFromCamera( cursor, camera );
@@ -2680,6 +2682,8 @@
 			this.camera = null;
 			this.domElement = domElement;
 			this.scene = scene;
+			this.target = new THREE.Vector3( 0, 0, 0 );
+			this.radiusFactor = 0.67;
 			this.mouseActions = [];
 			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
 
@@ -2803,7 +2807,6 @@
 			this.minZoom = 0;
 			this.maxZoom = Infinity; //trackball parameters
 
-			this._tbCenter = new THREE.Vector3( 0, 0, 0 );
 			this._tbRadius = 1; //FSA
 
 			this._state = STATE.IDLE;
@@ -2930,6 +2933,29 @@
 
 		}
 		/**
+   * Set gizmos radius factor and redraws gizmos
+   * @param {Float} value Value of radius factor
+   */
+
+
+		setTbRadius( value ) {
+
+			this.radiusFactor = value;
+			this._tbRadius = this.calculateTbRadius( this.camera );
+			const curve = new THREE.EllipseCurve( 0, 0, this._tbRadius, this._tbRadius );
+			const points = curve.getPoints( this._curvePts );
+			const curveGeometry = new THREE.BufferGeometry().setFromPoints( points );
+
+			for ( const gizmo in this._gizmos.children ) {
+
+				this._gizmos.children[ gizmo ].geometry = curveGeometry;
+
+			}
+
+			this.dispatchEvent( _changeEvent );
+
+		}
+		/**
    * Creates the rotation gizmos matching trackball center and radius
    * @param {Vector3} tbCenter The trackball center
    * @param {number} tbRadius The trackball radius
@@ -2985,6 +3011,19 @@
    * @param {Vector3} point The point where the rotation axis is passing trough
    * @param {Number} angle Angle in radians
    * @returns The computed transormation matix
+   */
+
+
+		getRaycaster() {
+
+			return _raycaster;
+
+		}
+		/**
+   * Unproject the cursor on the 3D object surface
+   * @param {Vector2} cursor Cursor coordinates in NDC
+   * @param {Camera} camera Virtual camera
+   * @returns {Vector3} The point of intersection with the model, if exist, null otherwise
    */
 
 

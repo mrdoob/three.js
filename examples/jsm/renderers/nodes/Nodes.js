@@ -1,8 +1,8 @@
 // core
 import ArrayInputNode from './core/ArrayInputNode.js';
 import AttributeNode from './core/AttributeNode.js';
+import BypassNode from './core/BypassNode.js';
 import CodeNode from './core/CodeNode.js';
-import ConstNode from './core/ConstNode.js';
 import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
@@ -15,13 +15,10 @@ import NodeCode from './core/NodeCode.js';
 import NodeFrame from './core/NodeFrame.js';
 import NodeFunctionInput from './core/NodeFunctionInput.js';
 import NodeKeywords from './core/NodeKeywords.js';
-import NodeSlot from './core/NodeSlot.js';
 import NodeUniform from './core/NodeUniform.js';
 import NodeVar from './core/NodeVar.js';
 import NodeVary from './core/NodeVary.js';
 import PropertyNode from './core/PropertyNode.js';
-import StructNode from './core/StructNode.js';
-import StructVarNode from './core/StructVarNode.js';
 import TempNode from './core/TempNode.js';
 import VarNode from './core/VarNode.js';
 import VaryNode from './core/VaryNode.js';
@@ -37,11 +34,13 @@ import Object3DNode from './accessors/Object3DNode.js';
 import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
+import SkinningNode from './accessors/SkinningNode.js';
 import UVNode from './accessors/UVNode.js';
 
 // inputs
 import ColorNode from './inputs/ColorNode.js';
 import FloatNode from './inputs/FloatNode.js';
+import IntNode from './inputs/IntNode.js';
 import Matrix3Node from './inputs/Matrix3Node.js';
 import Matrix4Node from './inputs/Matrix3Node.js';
 import TextureNode from './inputs/TextureNode.js';
@@ -63,6 +62,7 @@ import LightNode from './lights/LightNode.js';
 import LightsNode from './lights/LightsNode.js';
 
 // utils
+import ArrayElementNode from './utils/ArrayElementNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
@@ -76,21 +76,19 @@ export * from './core/constants.js';
 
 // functions
 export * from './functions/BSDFs.js';
-export * from './functions/EncodingFunctions.js';
-export * from './functions/MathFunctions.js';
-
-// consts
-export * from './consts/MathConsts.js';
 
 // materials
 export * from './materials/Materials.js';
+
+// shader node
+export * from './ShaderNode.js';
 
 export {
 	// core
 	ArrayInputNode,
 	AttributeNode,
+	BypassNode,
 	CodeNode,
-	ConstNode,
 	ContextNode,
 	ExpressionNode,
 	FunctionCallNode,
@@ -103,13 +101,10 @@ export {
 	NodeFrame,
 	NodeFunctionInput,
 	NodeKeywords,
-	NodeSlot,
 	NodeUniform,
 	NodeVar,
 	NodeVary,
 	PropertyNode,
-	StructNode,
-	StructVarNode,
 	TempNode,
 	VarNode,
 	VaryNode,
@@ -125,11 +120,13 @@ export {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
+	SkinningNode,
 	UVNode,
 
 	// inputs
 	ColorNode,
 	FloatNode,
+	IntNode,
 	Matrix3Node,
 	Matrix4Node,
 	TextureNode,
@@ -151,6 +148,7 @@ export {
 	LightsNode,
 
 	// utils
+	ArrayElementNode,
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,

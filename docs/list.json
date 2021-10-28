@@ -132,10 +132,6 @@
 				"SplineCurve": "api/en/extras/curves/SplineCurve"
 			},
 
-			"Extras / Objects": {
-				"ImmediateRenderObject": "api/en/extras/objects/ImmediateRenderObject"
-			},
-
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
 				"CircleGeometry": "api/en/geometries/CircleGeometry",
@@ -335,7 +331,6 @@
 
 			"Controls": {
 				"ArcballControls": "examples/en/controls/ArcballControls",
-				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
 				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
 				"FlyControls": "examples/en/controls/FlyControls",
@@ -641,10 +636,6 @@
 				"SplineCurve": "api/zh/extras/curves/SplineCurve"
 			},
 
-			"附件 / 物体": {
-				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject"
-			},
-
 			"几何体": {
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
 				"CircleGeometry": "api/zh/geometries/CircleGeometry",
@@ -843,7 +834,6 @@
 			},
 
 			"控制": {
-				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
 				"DragControls": "examples/zh/controls/DragControls",
 				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
 				"FlyControls": "examples/zh/controls/FlyControls",
@@ -981,7 +971,6 @@
 
 			"애니메이션": {
 				"AnimationAction": "api/ko/animation/AnimationAction",
-				"AnimationAction": "api/ko/animation/AnimationAction",
 				"AnimationClip": "api/ko/animation/AnimationClip",
 				"AnimationMixer": "api/ko/animation/AnimationMixer",
 				"AnimationObjectGroup": "api/ko/animation/AnimationObjectGroup",
@@ -1030,7 +1019,6 @@
 		"예제": {
 
 			"컨트롤": {
-				"DeviceOrientationControls": "examples/ko/controls/DeviceOrientationControls",
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",

@@ -2,7 +2,7 @@ import TempNode from './TempNode.js';
 
 class ExpressionNode extends TempNode {
 
-	constructor( snipped = '', nodeType = null ) {
+	constructor( snipped = '', nodeType = 'void' ) {
 
 		super( nodeType );
 
@@ -12,7 +12,18 @@ class ExpressionNode extends TempNode {
 
 	generate( builder ) {
 
-		return `( ${ this.snipped } )`;
+		const type = this.getNodeType( builder );
+		const snipped = this.snipped;
+
+		if ( type === 'void' ) {
+
+			builder.addFlowCode( snipped );
+
+		} else {
+
+			return `( ${ snipped } )`;
+
+		}
 
 	}
 

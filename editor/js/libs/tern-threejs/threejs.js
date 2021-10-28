@@ -1499,18 +1499,6 @@
       "!doc": "Creates a wireframe object that shows the edges of another object's geometry. To draw a  wireframe image showing only \"hard\" edges (edges between non-coplanar faces), see [page:EdgesHelper].",
       "!type": "fn(object: +THREE.Object3D, color: +THREE.Color)"
     },
-    "ImmediateRenderObject": {
-      "!url": "http://threejs.org/docs/#Reference/extras/objects/ImmediateRenderObject",
-      "prototype": {
-        "!proto": "THREE.Object3D.prototype",
-        "render": {
-          "!type": "fn(renderCallback: function)",
-          "!doc": "This function needs to be overridden to start the creation of the object and should call renderCallback when finished."
-        }
-      },
-      "!doc": "base class for immediate rendering objects.",
-      "!type": "fn()"
-    },
     "AmbientLight": {
       "!url": "http://threejs.org/docs/#Reference/lights/AmbientLight",
       "prototype": {

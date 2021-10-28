@@ -144,7 +144,7 @@ class WebGPUBindings {
 				const forceUpdate = textures.updateTexture( texture );
 				const textureGPU = textures.getTextureGPU( texture );
 
-				if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
+				if ( textureGPU !== undefined && binding.textureGPU !== textureGPU || forceUpdate === true ) {
 
 					binding.textureGPU = textureGPU;
 					needsBindGroupRefresh = true;
