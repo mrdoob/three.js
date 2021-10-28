@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '134dev';
+	const REVISION = '134';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -25979,7 +25979,7 @@
 	 *	attenuationColor: <Color>,
 	 *
 	 *	specularIntensity: <float>,
-	 *	specularIntensityhMap: new THREE.Texture( <Image> ),
+	 *	specularIntensityMap: new THREE.Texture( <Image> ),
 	 *	specularColor: <Color>,
 	 *	specularColorMap: new THREE.Texture( <Image> )
 	 * }
