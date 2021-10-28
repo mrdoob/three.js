@@ -767,7 +767,17 @@ class GLTFMaterialsSheenExtension {
 
 		}
 
-		// TODO sheenColorTexture and sheenRoughnessTexture
+		if ( extension.sheenColorTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'sheenTintMap', extension.sheenColorTexture ) );
+
+		}
+
+		if ( extension.sheenRoughnessTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'sheenRoughnessMap', extension.sheenRoughnessTexture ) );
+
+		}
 
 		return Promise.all( pending );
 

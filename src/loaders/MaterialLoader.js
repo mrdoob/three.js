@@ -288,6 +288,9 @@ class MaterialLoader extends Loader {
 		if ( json.transmissionMap !== undefined ) material.transmissionMap = getTexture( json.transmissionMap );
 		if ( json.thicknessMap !== undefined ) material.thicknessMap = getTexture( json.thicknessMap );
 
+		if ( json.sheenTintMap !== undefined ) material.sheenTintMap = getTexture( json.sheenTintMap );
+		if ( json.sheenRoughnessMap !== undefined ) material.sheenRoughnessMap = getTexture( json.sheenRoughnessMap );
+
 		return material;
 
 	}

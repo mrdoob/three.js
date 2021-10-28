@@ -96,6 +96,14 @@ uniform float opacity;
 #ifdef USE_SHEEN
 	uniform vec3 sheenTint;
 	uniform float sheenRoughness;
+
+	#ifdef USE_SHEENTINTMAP
+		uniform sampler2D sheenTintMap;
+	#endif
+
+	#ifdef USE_SHEENROUGHNESSMAP
+		uniform sampler2D sheenRoughnessMap;
+	#endif
 #endif
 
 varying vec3 vViewPosition;

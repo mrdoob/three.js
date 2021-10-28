@@ -265,6 +265,14 @@ function WebGLMaterials( properties ) {
 
 			uvScaleMap = material.thicknessMap;
 
+		} else if ( material.sheenTintMap ) {
+
+			uvScaleMap = material.sheenTintMap;
+
+		} else if ( material.sheenRoughnessMap ) {
+
+			uvScaleMap = material.sheenRoughnessMap;
+
 		}
 
 		if ( uvScaleMap !== undefined ) {
@@ -603,6 +611,18 @@ function WebGLMaterials( properties ) {
 			uniforms.sheenTint.value.copy( material.sheenTint ).multiplyScalar( material.sheen );
 
 			uniforms.sheenRoughness.value = material.sheenRoughness;
+
+			if ( material.sheenTintMap ) {
+
+				uniforms.sheenTintMap.value = material.sheenTintMap;
+
+			}
+
+			if ( material.sheenRoughnessMap ) {
+
+				uniforms.sheenRoughnessMap.value = material.sheenRoughnessMap;
+
+			}
 
 		}
 
