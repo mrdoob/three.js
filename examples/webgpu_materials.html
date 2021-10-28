@@ -30,6 +30,7 @@
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
 			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import { ShaderNode, vec3, dot } from './jsm/renderers/nodes/ShaderNode.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -80,6 +81,10 @@
 
 				let material;
 
+				//
+				//	BASIC
+				//
+
 				// PositionNode.LOCAL
 				material = new Nodes.MeshBasicNodeMaterial();
 				material.colorNode = new Nodes.PositionNode( Nodes.PositionNode.LOCAL );
@@ -107,6 +112,7 @@
 
 				// Opacity
 				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.ColorNode( new THREE.Color( 0x0099FF ) );
 				material.opacityNode = new Nodes.TextureNode( texture );
 				material.transparent = true;
 				materials.push( material );
@@ -118,7 +124,41 @@
 				material.alphaTestNode = new Nodes.FloatNode( 0.5 );
 				materials.push( material );
 
+				//
+				//	ADVANCED
+				//
+
+				// Custom ShaderNode ( desaturate filter )
+
+				const desaturateShaderNode = new Nodes.ShaderNode( ( input ) => {
+
+					return dot( vec3( 0.299, 0.587, 0.114 ), input.color.xyz );
+
+				} );
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = desaturateShaderNode( { color: new Nodes.TextureNode( texture ) } );
+				materials.push( material );
+
+				// Custom WGSL ( desaturate filter )
+
+				const desaturateWGSLNode = new Nodes.FunctionNode( `
+					fn desaturate( color:vec3<f32> ) -> vec3<f32> {
+
+						let lum = vec3<f32>( 0.299, 0.587, 0.114 );
+
+						return vec3<f32>( dot( lum, color ) );
+
+					}
+				` );
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = desaturateWGSLNode.call( { color: new Nodes.TextureNode( texture ) } );
+				materials.push( material );
+
+				//
 				// Geometry
+				//
 
 				const geometry = new TeapotGeometry( 50, 18 );
 

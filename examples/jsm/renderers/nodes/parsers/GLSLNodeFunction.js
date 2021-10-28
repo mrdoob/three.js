@@ -8,6 +8,8 @@ const pragmaMain = '#pragma main';
 
 const parse = ( source ) => {
 
+	source = source.trim();
+
 	const pragmaMainIndex = source.indexOf( pragmaMain );
 
 	const mainCode = pragmaMainIndex !== - 1 ? source.substr( pragmaMainIndex + pragmaMain.length ) : source;
