@@ -1876,7 +1876,7 @@ const PATH_PROPERTIES = {
 
 const INTERPOLATION = {
 	CUBICSPLINE: undefined, // We use a custom interpolant (GLTFCubicSplineInterpolation) for CUBICSPLINE tracks. Each
-		                        // keyframe track will be initialized with a default interpolation type, then modified.
+														// keyframe track will be initialized with a default interpolation type, then modified.
 	LINEAR: InterpolateLinear,
 	STEP: InterpolateDiscrete
 };
@@ -1931,6 +1931,8 @@ function createDefaultMaterial( cache ) {
 			depthTest: true,
 			side: FrontSide
 		} );
+
+		_addAssociation(cache[ 'DefaultMaterial' ], 'materials', null);
 
 	}
 
@@ -2156,6 +2158,14 @@ function getNormalizedComponentScale( constructor ) {
 
 }
 
+
+function _addAssociation(object, type, value) {
+	object.userData = object.userData || {};
+	object.userData.tempAssociations = object.userData.tempAssociations || {};
+	object.userData.tempAssociations[type] = value;
+}
+
+
 /* GLTF PARSER */
 
 class GLTFParser {
@@ -2367,27 +2377,6 @@ class GLTFParser {
 		if ( cache.refs[ index ] <= 1 ) return object;
 
 		const ref = object.clone();
-
-		// Propagates mappings to the cloned object, prevents mappings on the
-		// original object from being lost.
-		const updateMappings = ( original, clone ) => {
-
-			const mappings = this.associations.get( original );
-			if ( mappings != null ) {
-
-				this.associations.set( clone, mappings );
-
-			}
-
-			for ( const [ i, child ] of original.children.entries() ) {
-
-				updateMappings( child, clone.children[ i ] );
-
-			}
-
-		};
-
-		updateMappings( object, ref );
 
 		ref.name += '_instance_' + ( cache.uses[ index ] ++ );
 
@@ -2846,7 +2835,7 @@ class GLTFParser {
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
-			parser.associations.set( texture, { textures: textureIndex } );
+			_addAssociation(texture, "textures", textureIndex);
 
 			return texture;
 
@@ -2890,9 +2879,7 @@ class GLTFParser {
 
 				if ( transform ) {
 
-					const gltfReference = parser.associations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
-					parser.associations.set( texture, gltfReference );
 
 				}
 
@@ -2991,8 +2978,6 @@ class GLTFParser {
 				}
 
 				this.cache.add( cacheKey, cachedMaterial );
-
-				this.associations.set( cachedMaterial, this.associations.get( material ) );
 
 			}
 
@@ -3187,7 +3172,7 @@ class GLTFParser {
 
 			assignExtrasToUserData( material, materialDef );
 
-			parser.associations.set( material, { materials: materialIndex } );
+			_addAssociation(material, "materials", materialIndex);
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3402,30 +3387,19 @@ class GLTFParser {
 
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
-				parser.associations.set( meshes[ i ], {
+				_addAssociation( meshes[ i ], "meshes", meshIndex );
 
-					meshes: meshIndex,
-					primitives: i,
-
-				} );
+				_addAssociation( meshes[ i ], "primitives", i );
 
 			}
 
 			if ( meshes.length === 1 ) {
-
-				// Appends temporary association data to be removed in loadNode()
-				meshes[ 0 ].userData.tempAssociations = {
-					meshes: meshIndex,
-					primitives: 0,
-				};
 
 				return meshes[ 0 ];
 
 			}
 
 			const group = new Group();
-
-			parser.associations.set( group, { meshes: meshIndex } );
 
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
@@ -3836,19 +3810,7 @@ class GLTFParser {
 
 			}
 
-			let associations = { nodes: nodeIndex };
-
-			if ( node.userData.tempAssociations ) {
-
-				// Uses temp association data to update associations.
-				associations.meshes = node.userData.tempAssociations.meshes;
-				associations.primitives = node.userData.tempAssociations.primitives;
-				// Removes the temp data.
-				node.userData.tempAssociations = undefined;
-
-			}
-
-			parser.associations.set( node, associations );
+			_addAssociation(node, "nodes", nodeIndex);
 
 			return node;
 
@@ -3888,6 +3850,60 @@ class GLTFParser {
 		}
 
 		return Promise.all( pending ).then( function () {
+
+			// Creates the association data from tempAssociations.
+			const parseAssociations = ( object ) => {
+
+
+				if ( object.isMaterial && object.userData &&
+					 object.userData.tempAssociations ) {
+
+					for ( const field in object ) {
+
+						if ( object[ field ] && object[ field ].isTexture ) {
+
+							parseAssociations( object[ field ]  );
+
+						}
+
+					}
+
+				}
+
+				if( object.material ) {
+
+						parseAssociations( object.material );
+
+				}
+
+				if( object.children ) {
+
+					for ( const child of object.children ) {
+
+						parseAssociations( child )
+
+					}
+
+				}
+
+				if ( object.userData && object.userData.tempAssociations ) {
+
+					for ( const type in object.userData.tempAssociations ) {
+
+						const value = parser.associations.get( object ) || {};
+
+						value[ type ] = object.userData.tempAssociations[ type ];
+
+						parser.associations.set( object, value );
+
+					}
+					// Removes the temp data.
+					object.userData.tempAssociations = undefined;
+
+				}
+			}
+
+			parseAssociations( scene );
 
 			// Removes dangling associations, associations that reference a node that
 			// didn't make it into the scene.
