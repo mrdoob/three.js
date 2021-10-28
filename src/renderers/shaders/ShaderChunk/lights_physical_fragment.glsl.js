@@ -14,7 +14,7 @@ material.roughness = min( material.roughness, 1.0 );
 	#ifdef SPECULAR
 
 		float specularIntensityFactor = specularIntensity;
-		vec3 specularTintFactor = specularTint;
+		vec3 specularColorFactor = specularColor;
 
 		#ifdef USE_SPECULARINTENSITYMAP
 
@@ -22,9 +22,9 @@ material.roughness = min( material.roughness, 1.0 );
 
 		#endif
 
-		#ifdef USE_SPECULARTINTMAP
+		#ifdef USE_SPECULARCOLORMAP
 
-			specularTintFactor *= specularTintMapTexelToLinear( texture2D( specularTintMap, vUv ) ).rgb;
+			specularColorFactor *= specularColorMapTexelToLinear( texture2D( specularColorMap, vUv ) ).rgb;
 
 		#endif
 
@@ -33,12 +33,12 @@ material.roughness = min( material.roughness, 1.0 );
 	#else
 
 		float specularIntensityFactor = 1.0;
-		vec3 specularTintFactor = vec3( 1.0 );
+		vec3 specularColorFactor = vec3( 1.0 );
 		material.specularF90 = 1.0;
 
 	#endif
 
-	material.specularColor = mix( min( pow2( ( ior - 1.0 ) / ( ior + 1.0 ) ) * specularTintFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
+	material.specularColor = mix( min( pow2( ( ior - 1.0 ) / ( ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
 
 #else
 
@@ -75,11 +75,11 @@ material.roughness = min( material.roughness, 1.0 );
 
 #ifdef USE_SHEEN
 
-	material.sheenTint = sheenTint;
+	material.sheenColor = sheenColor;
 
-	#ifdef USE_SHEENTINTMAP
+	#ifdef USE_SHEENCOLORMAP
 
-		material.sheenTint *= sheenTintMapTexelToLinear( texture2D( sheenTintMap, vUv ) ).rgb;
+		material.sheenColor *= sheenColorMapTexelToLinear( texture2D( sheenColorMap, vUv ) ).rgb;
 
 	#endif
 

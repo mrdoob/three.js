@@ -636,14 +636,14 @@
 			}
 
 			const pending = [];
-			materialParams.sheenTint = new THREE.Color( 0, 0, 0 );
+			materialParams.sheenColor = new THREE.Color( 0, 0, 0 );
 			materialParams.sheenRoughness = 0;
 			materialParams.sheen = 1;
 			const extension = materialDef.extensions[ this.name ];
 
 			if ( extension.sheenColorFactor !== undefined ) {
 
-				materialParams.sheenTint.fromArray( extension.sheenColorFactor );
+				materialParams.sheenColor.fromArray( extension.sheenColorFactor );
 
 			}
 
@@ -764,7 +764,7 @@
 
 			materialParams.attenuationDistance = extension.attenuationDistance || 0;
 			const colorArray = extension.attenuationColor || [ 1, 1, 1 ];
-			materialParams.attenuationTint = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+			materialParams.attenuationColor = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
 			return Promise.all( pending );
 
 		}
@@ -860,11 +860,11 @@
 			}
 
 			const colorArray = extension.specularColorFactor || [ 1, 1, 1 ];
-			materialParams.specularTint = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+			materialParams.specularColor = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
 
 			if ( extension.specularColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'specularTintMap', extension.specularColorTexture ).then( function ( texture ) {
+				pending.push( parser.assignTexture( materialParams, 'specularColorMap', extension.specularColorTexture ).then( function ( texture ) {
 
 					texture.encoding = THREE.sRGBEncoding;
 
