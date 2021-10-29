@@ -110,7 +110,7 @@ class GLTFExporter {
 
 		const scope = this;
 
-		return new Promise( function ( resolve ) {
+		return new Promise( function ( resolve, reject ) {
 
 		try {
 
