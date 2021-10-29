@@ -5,16 +5,15 @@ import {
 	GammaEncoding,
 	LinearEncoding,
 	NoToneMapping,
-	NearestFilter,
 	NoBlending,
 	RGBDEncoding,
 	RGBEEncoding,
-	RGBEFormat,
-	RGBAFormat,
+	RGBFormat,
 	RGBM16Encoding,
 	RGBM7Encoding,
 	UnsignedByteType,
-	sRGBEncoding
+	sRGBEncoding,
+	HalfFloatType
 } from '../constants.js';
 
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -234,12 +233,12 @@ class PMREMGenerator {
 	_allocateTargets( texture ) { // warning: null texture is valid
 
 		const params = {
-			magFilter: NearestFilter,
-			minFilter: NearestFilter,
+			magFilter: LinearFilter,
+			minFilter: LinearFilter,
 			generateMipmaps: false,
-			type: UnsignedByteType,
-			format: RGBEFormat,
-			encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
+			type: HalfFloatType,
+			format: RGBFormat,
+			encoding: LinearEncoding,
 			depthBuffer: false
 		};
 
@@ -544,14 +543,6 @@ class PMREMGenerator {
 		renderer.render( blurMesh, _flatCamera );
 
 	}
-
-}
-
-function _isLDR( texture ) {
-
-	if ( texture === undefined || texture.type !== UnsignedByteType ) return false;
-
-	return texture.encoding === LinearEncoding || texture.encoding === sRGBEncoding || texture.encoding === GammaEncoding;
 
 }
 
