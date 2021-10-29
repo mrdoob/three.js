@@ -112,7 +112,15 @@ class GLTFExporter {
 
 		return new Promise( function ( resolve ) {
 
+		try {
+
 			scope.parse( input, resolve, options );
+
+		} catch ( e ) {
+
+			reject( e );
+
+		}
 
 		} );
 
