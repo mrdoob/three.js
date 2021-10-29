@@ -10,7 +10,6 @@ import {
 	RGBDEncoding,
 	RGBEEncoding,
 	RGBEFormat,
-	RGBAFormat,
 	RGBM16Encoding,
 	RGBM7Encoding,
 	UnsignedByteType,
