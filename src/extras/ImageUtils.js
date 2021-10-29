@@ -47,6 +47,12 @@ class ImageUtils {
 
 		}
 
+		if ( image.src.endsWith( '.jpg' ) ) {
+
+			return canvas.toDataURL( 'image/jpeg', 0.6 );
+
+		}
+
 		if ( canvas.width > 2048 || canvas.height > 2048 ) {
 
 			console.warn( 'THREE.ImageUtils.getDataURL: Image converted to jpg for performance reasons', image );
