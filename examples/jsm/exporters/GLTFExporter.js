@@ -106,6 +106,26 @@ class GLTFExporter {
 
 	}
 
+	parseAsync( input, options ) {
+
+		const scope = this;
+
+		return new Promise( function ( resolve, reject ) {
+
+		try {
+
+			scope.parse( input, resolve, options );
+
+		} catch ( e ) {
+
+			reject( e );
+
+		}
+
+		} );
+
+	}
+
 }
 
 //------------------------------------------------------------------------------
