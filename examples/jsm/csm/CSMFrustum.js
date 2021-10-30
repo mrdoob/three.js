@@ -2,7 +2,7 @@ import { Vector3, Matrix4 } from '../../../build/three.module.js';
 
 const inverseProjectionMatrix = new Matrix4();
 
-class Frustum {
+class CSMFrustum {
 
 	constructor( data ) {
 
@@ -81,7 +81,7 @@ class Frustum {
 
 		while ( breaks.length > target.length ) {
 
-			target.push( new Frustum() );
+			target.push( new CSMFrustum() );
 
 		}
 
@@ -149,4 +149,4 @@ class Frustum {
 
 }
 
-export { Frustum };
+export { CSMFrustum };
