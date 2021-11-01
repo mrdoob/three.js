@@ -3311,7 +3311,7 @@
 						// Node may be a THREE.Group (glTF mesh with several primitives) or a THREE.Mesh.
 						node.traverse( function ( object ) {
 
-							if ( object.isMesh === true && object.morphTargetInfluences ) {
+							if ( object.morphTargetInfluences !== undefined && object.morphTargetInfluences ) {
 
 								targetNames.push( object.name ? object.name : object.uuid );
 
