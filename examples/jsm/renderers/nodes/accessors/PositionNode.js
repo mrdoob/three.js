@@ -1,6 +1,5 @@
 import Node from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
-import NodeKeywords from '../core/NodeKeywords.js';
 import VaryNode from '../core/VaryNode.js';
 import ModelNode from '../accessors/ModelNode.js';
 import MathNode from '../math/MathNode.js';
