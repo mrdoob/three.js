@@ -171,7 +171,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( alphaTest !== null ) {
 
-				alphaTest = this.addFlow( 'fragment', new VarNode( alphaTest, 'AlphaTest', 'float' ) );
+				this.addFlow( 'fragment', new VarNode( alphaTest, 'AlphaTest', 'float' ) );
 
 				this.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
 
@@ -441,7 +441,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			const attributes = this.attributes;
 			const length = attributes.length;
 
-			snippet += `\n`;
+			snippet += '\n';
 
 			for ( let index = 0; index < length; index ++ ) {
 
@@ -453,13 +453,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( index + 1 < length ) {
 
-					snippet += `,\n`;
+					snippet += ',\n';
 
 				}
 
 			}
 
-			snippet += `\n`;
+			snippet += '\n';
 
 		}
 
@@ -494,7 +494,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'vertex' ) {
 
-			snippet += `\t[[ builtin( position ) ]] Vertex: vec4<f32>;\n`;
+			snippet += '\t[[ builtin( position ) ]] Vertex: vec4<f32>;\n';
 
 			const varys = this.varys;
 
@@ -512,7 +512,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const varys = this.varys;
 
-			snippet += `\n`;
+			snippet += '\n';
 
 			for ( let index = 0; index < varys.length; index ++ ) {
 
@@ -522,13 +522,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( index + 1 < varys.length ) {
 
-					snippet += `,\n`;
+					snippet += ',\n';
 
 				}
 
 			}
 
-			snippet += `\n`;
+			snippet += '\n';
 
 		}
 
@@ -603,7 +603,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		for ( const shaderStage in shadersData ) {
 
-			let flow = `// code\n`;
+			let flow = '// code\n';
 			flow += `\t${ this.flowCode[ shaderStage ] }`;
 			flow += '\n';
 
@@ -617,7 +617,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( slotName ) {
 
-					if ( flow.length > 0 ) flow += `\n`;
+					if ( flow.length > 0 ) flow += '\n';
 
 					flow += `\t// FLOW -> ${ slotName }\n\t`;
 
@@ -627,15 +627,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( node === mainNode ) {
 
-					flow += `// FLOW RESULT\n\t`;
+					flow += '// FLOW RESULT\n\t';
 
 					if ( shaderStage === 'vertex' ) {
 
-						flow += `NodeVarys.Vertex = `;
+						flow += 'NodeVarys.Vertex = ';
 
 					} else if ( shaderStage === 'fragment' ) {
 
-						flow += `return `;
+						flow += 'return ';
 
 					}
 
@@ -661,7 +661,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getMethod( method, shaderStage = this.shaderStage ) {
+	getMethod( method ) {
 
 		if ( wgslPolyfill[ method ] !== undefined ) {
 
