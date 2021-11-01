@@ -635,7 +635,6 @@ class WebGPURenderer {
 
 	_projectObject( object, camera, groupOrder ) {
 
-		const info = this._info;
 		const currentRenderList = this._currentRenderList;
 
 		if ( object.visible === false ) return;
