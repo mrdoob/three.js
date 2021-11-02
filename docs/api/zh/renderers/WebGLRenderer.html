@@ -97,15 +97,13 @@
 		<p>
 			一个包含当前渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])的功能细节的对象。<br />
 
-		- [page:Boolean floatFragmentTextures]: 环境是否支持[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float]扩展。
-			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月，超过95％的支持WebGL的设备支持此功能<br />
+		- [page:Boolean floatFragmentTextures]: 环境是否支持[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float]扩展<br />
 		- [page:Boolean floatVertexTextures]: 如果[page:Boolean floatFragmentTextures]和[page:Boolean vertexTextures]都是true， 则此值为*true* <br />
 		- [page:Method getMaxAnisotropy](): 返回最大可用各向异性。<br />
 		- [page:Method getMaxPrecision](): 返回顶点着色器和片元着色器的最大可用精度。 <br />
 		- [page:Boolean isWebGL2]: *true* if the context in use is a WebGL2RenderingContext object.<br />
 		- [page:Boolean logarithmicDepthBuffer]: 如果[page:parameter logarithmicDepthBuffer]在构造器中被设为true且
-		环境支持[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth]扩展，则此值为*true*
-			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月， 约66%的支持WebGL的设备支持此功能<br />
+		环境支持[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth]扩展，则此值为*true*<br />
 		- [page:Integer maxAttributes]: *gl.MAX_VERTEX_ATTRIBS*的值<br />
 		- [page:Integer maxCubemapSize]: *gl.MAX_CUBE_MAP_TEXTURE_SIZE* 的值，着色器可使用的立方体贴图纹理的最大宽度*高度<br />
 		- [page:Integer maxFragmentUniforms]: *gl.MAX_FRAGMENT_UNIFORM_VECTORS*的值，片元着色器可使用的全局变量(uniforms)数量<br />
