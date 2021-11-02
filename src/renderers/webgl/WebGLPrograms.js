@@ -2,7 +2,6 @@ import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping,
 import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
-import { hashString } from '../../utils.js';
 
 function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
@@ -314,8 +313,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		} else {
 
-			array.push( hashString( parameters.fragmentShader ) );
-			array.push( hashString( parameters.vertexShader ) );
+			array.push( parameters.fragmentShader );
+			array.push( parameters.vertexShader );
 
 		}
 
