@@ -435,7 +435,7 @@ class GLTFWriter {
 		const writer = this;
 		const buffers = writer.buffers;
 		const json = writer.json;
-		const options = writer.options;
+		options = writer.options;
 		const extensionsUsed = writer.extensionsUsed;
 
 		// Merge buffers.
