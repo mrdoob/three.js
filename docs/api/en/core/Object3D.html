@@ -221,7 +221,11 @@
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 
 		<h3>[method:this attach]( [param:Object3D object] )</h3>
-		<p>Adds *object* as a child of this, while maintaining the object's world transform.</p>
+		<p>Adds *object* as a child of this, while maintaining the object's world transform. 
+		<br /><br />	
+		Note: If the old or new parent of the object is scaled non-uniformly, the exact visible transformation will not be preserved.
+		This is a limitation of [page:Matrix4.decompose Matrix4].
+		</p>
 
 		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
 		<p>
