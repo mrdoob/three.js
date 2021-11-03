@@ -99,8 +99,9 @@ class GLTFExporter {
 	 */
 	parse( input, onDone, onError, options ) {
 
-		// legacy: the third argument used to be options
 		if ( typeof onError === 'object' ) {
+
+			console.warn( 'THREE.GLTFExporter: parse() expects options as the fourth argument now.' );
 
 			options = onError;
 
