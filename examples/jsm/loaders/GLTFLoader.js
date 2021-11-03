@@ -3655,7 +3655,6 @@ class GLTFParser {
 
 				if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
 
-					// Node may be a Group (glTF mesh with several primitives) or a Mesh.
 					node.traverse( function ( object ) {
 
 						if ( object.morphTargetInfluences ) {
