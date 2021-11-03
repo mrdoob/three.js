@@ -1,255 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webgl - svg loader</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				background-color: #b0b0b0;
-			}
-		</style>
-	</head>
+<head>
+	<title>three.js webgl - svg loader</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		body {
+			background-color: #b0b0b0;
+		}
+	</style>
+</head>
 
-	<body>
+<body>
 
-		<div id="container"></div>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - SVGLoader
-		</div>
+<div id="container"></div>
+<div id="info">
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - SVGLoader
+</div>
 
-		<script type="module">
+<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+	import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
+	import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
+	import { GUI } from './jsm/libs/dat.gui.module.js';
+	import { OrbitControls } from './jsm/controls/OrbitControls.js';
+	import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
-			let renderer, stats, scene, camera, gui, guiData;
+	let renderer, stats, scene, camera, gui, guiData;
 
-			init();
-			animate();
+	const extrudeSettings = {
+		steps: 2,
+		depth: 16,
+		bevelEnabled: false,
+		bevelThickness: 1,
+		bevelSize: 1,
+		bevelOffset: 0,
+		bevelSegments: 1
+	};
 
-			//
+	const fileOptions = {
 
-			function init() {
+		"Tiger": 'models/svg/tiger.svg',
+		"Three.js": 'models/svg/threejs.svg',
+		"Joins and caps": 'models/svg/lineJoinsAndCaps.svg',
+		"Hexagon": 'models/svg/hexagon.svg',
+		"Energy": 'models/svg/energy.svg',
+		"Test 1": 'models/svg/tests/1.svg',
+		"Test 2": 'models/svg/tests/2.svg',
+		"Test 3": 'models/svg/tests/3.svg',
+		"Test 4": 'models/svg/tests/4.svg',
+		"Test 5": 'models/svg/tests/5.svg',
+		"Test 6": 'models/svg/tests/6.svg',
+		"Test 7": 'models/svg/tests/7.svg',
+		"Test 8": 'models/svg/tests/8.svg',
+		"Test 9": 'models/svg/tests/9.svg',
+		"Units": 'models/svg/tests/units.svg',
+		"Defs": 'models/svg/tests/testDefs/Svg-defs.svg',
+		"Defs2": 'models/svg/tests/testDefs/Svg-defs2.svg',
+		"Defs3": 'models/svg/tests/testDefs/Wave-defs.svg',
+		"Defs4": 'models/svg/tests/testDefs/defs4.svg',
+		"Defs5": 'models/svg/tests/testDefs/defs5.svg',
+		"Zero Radius": 'models/svg/zero-radius.svg'
 
-				const container = document.getElementById( 'container' );
+	};
 
-				//
+	init();
+	animate();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 0, 0, 200 );
+	//
 
-				//
+	function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+		const container = document.getElementById( 'container' );
 
-				//
+		//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.screenSpacePanning = true;
+		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+		camera.position.set( 0, 0, 200 );
 
-				//
+		//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		container.appendChild( renderer.domElement );
 
-				//
+		//
 
-				window.addEventListener( 'resize', onWindowResize );
+		const controls = new OrbitControls( camera, renderer.domElement );
+		controls.screenSpacePanning = true;
 
-				guiData = {
-					currentURL: 'models/svg/tiger.svg',
-					drawFillShapes: true,
-					drawStrokes: true,
-					fillShapesWireframe: false,
-					strokesWireframe: false
-				};
+		//
 
-				loadSVG( guiData.currentURL );
+		stats = new Stats();
+		container.appendChild( stats.dom );
 
-				createGUI();
+		//
 
-			}
+		window.addEventListener( 'resize', onWindowResize );
 
-			function createGUI() {
+		guiData = {
+			currentURL: 'models/svg/tiger.svg',
+			drawFillShapes: true,
+			drawStrokes: true,
+			fillShapesWireframe: false,
+			strokesWireframe: false,
+			extrudeFillShapes: false,
+			extrudeStrokes: false,
+		};
 
-				if ( gui ) gui.destroy();
+		loadSVG( guiData.currentURL );
 
-				gui = new GUI( { width: 350 } );
+		createGUI();
 
-				gui.add( guiData, 'currentURL', {
+	}
 
-					"Tiger": 'models/svg/tiger.svg',
-					"Three.js": 'models/svg/threejs.svg',
-					"Joins and caps": 'models/svg/lineJoinsAndCaps.svg',
-					"Hexagon": 'models/svg/hexagon.svg',
-					"Energy": 'models/svg/energy.svg',
-					"Test 1": 'models/svg/tests/1.svg',
-					"Test 2": 'models/svg/tests/2.svg',
-					"Test 3": 'models/svg/tests/3.svg',
-					"Test 4": 'models/svg/tests/4.svg',
-					"Test 5": 'models/svg/tests/5.svg',
-					"Test 6": 'models/svg/tests/6.svg',
-					"Test 7": 'models/svg/tests/7.svg',
-					"Test 8": 'models/svg/tests/8.svg',
-					"Test 9": 'models/svg/tests/9.svg',
-					"Units": 'models/svg/tests/units.svg',
-					"Defs": 'models/svg/tests/testDefs/Svg-defs.svg',
-					"Defs2": 'models/svg/tests/testDefs/Svg-defs2.svg',
-					"Defs3": 'models/svg/tests/testDefs/Wave-defs.svg',
-					"Defs4": 'models/svg/tests/testDefs/defs4.svg',
-					"Defs5": 'models/svg/tests/testDefs/defs5.svg',
-					"Zero Radius": 'models/svg/zero-radius.svg'
+	function createGUI() {
 
-				} ).name( 'SVG File' ).onChange( update );
+		if ( gui ) gui.destroy();
 
-				gui.add( guiData, 'drawStrokes' ).name( 'Draw strokes' ).onChange( update );
+		gui = new GUI( { width: 350 } );
 
-				gui.add( guiData, 'drawFillShapes' ).name( 'Draw fill shapes' ).onChange( update );
+		gui.add( guiData, 'currentURL', fileOptions ).name( 'SVG File' ).onChange( update );
 
-				gui.add( guiData, 'strokesWireframe' ).name( 'Wireframe strokes' ).onChange( update );
+		gui.add( guiData, 'drawStrokes' ).name( 'Draw strokes' ).onChange( update );
 
-				gui.add( guiData, 'fillShapesWireframe' ).name( 'Wireframe fill shapes' ).onChange( update );
+		gui.add( guiData, 'drawFillShapes' ).name( 'Draw fill shapes' ).onChange( update );
 
-				function update() {
+		gui.add( guiData, 'strokesWireframe' ).name( 'Wireframe strokes' ).onChange( update );
 
-					loadSVG( guiData.currentURL );
+		gui.add( guiData, 'fillShapesWireframe' ).name( 'Wireframe fill shapes' ).onChange( update );
+
+		gui.add( guiData, 'extrudeFillShapes' ).name( 'Extrude fill shapes' ).onChange( update );
+
+		gui.add( guiData, 'extrudeStrokes' ).name( 'Extrude strokes' ).onChange( update );
+
+
+		function update( value ) {
+
+			if ( value === fileOptions[ 'Custom SVG' ] )
+				promptFile( 'image/svg+xml', false ).then( loadSVG );
+
+			else if ( guiData.currentURL !== fileOptions[ 'Custom SVG' ] ) loadSVG( guiData.currentURL );
+
+		}
+
+
+	}
+
+	function loadSVG( url ) {
+
+		guiData.currentURL = url;
+
+		if( scene ) {
+
+			scene.traverse( function ( child ) {
+
+				if ( child.material ) child.material.dispose();
+				if ( child.geometry ) child.geometry.dispose();
+
+			} );
+
+		}
+
+		scene = new THREE.Scene();
+		scene.background = new THREE.Color( 0xb0b0b0 );
+
+		const light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+		light.position.set( 3, 1.75, 4 );
+		scene.add( light );
+
+		//
+
+		const helper = new THREE.GridHelper( 160, 10 );
+		helper.rotation.x = Math.PI / 2;
+		scene.add( helper );
+
+		//
+
+		const loader = new SVGLoader();
+
+		loader.load( url, function ( data ) {
+
+			const paths = data.paths;
+
+			const group = new THREE.Group();
+			group.scale.multiplyScalar( 0.25 );
+			group.position.x = - 70;
+			group.position.y = 70;
+			group.scale.y *= - 1;
+			let zOffset = 0;
+
+			for ( let i = 0; i < paths.length; i ++ ) {
+
+				const path = paths[ i ];
+
+				const fillColor = path.userData.style.fill;
+				if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
+
+					const materialClass = guiData.extrudeFillShapes ? THREE.MeshLambertMaterial : THREE.MeshBasicMaterial;
+					const material = new materialClass( {
+						color: new THREE.Color().setStyle( fillColor ),
+						opacity: path.userData.style.fillOpacity,
+						transparent: path.userData.style.fillOpacity < 1,
+						side: guiData.extrudeFillShapes ? THREE.FrontSide : THREE.DoubleSide,
+						depthWrite: guiData.extrudeFillShapes,
+						wireframe: guiData.fillShapesWireframe
+					} );
+
+					const shapes = SVGLoader.createShapes( path );
+
+					for ( let j = 0; j < shapes.length; j ++ ) {
+
+						const shape = shapes[ j ];
+
+						const geometry = guiData.extrudeFillShapes ? new THREE.ExtrudeBufferGeometry( shape, extrudeSettings ) : new THREE.ShapeGeometry( shape );
+						const mesh = new THREE.Mesh( geometry, material );
+						if ( guiData.extrudeFillShapes )
+							mesh.position.z += zOffset ++ * 0.01;
+						group.add( mesh );
+
+					}
 
 				}
 
-			}
+				const strokeColor = path.userData.style.stroke;
 
-			function loadSVG( url ) {
+				if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
 
-				//
+					const materialClass = guiData.extrudeStrokes ? THREE.MeshLambertMaterial : THREE.MeshBasicMaterial;
+					const material = new materialClass( {
+						color: new THREE.Color().setStyle( strokeColor ),
+						opacity: path.userData.style.strokeOpacity,
+						transparent: path.userData.style.strokeOpacity < 1,
+						side: guiData.extrudeStrokes ? THREE.FrontSide : THREE.DoubleSide,
+						depthWrite: guiData.extrudeStrokes,
+						wireframe: guiData.strokesWireframe
+					} );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xb0b0b0 );
+					for ( let j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
 
-				//
+						const subPath = path.subPaths[ j ];
 
-				const helper = new THREE.GridHelper( 160, 10 );
-				helper.rotation.x = Math.PI / 2;
-				scene.add( helper );
+						const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style, undefined, undefined, guiData.extrudeStrokes, extrudeSettings );
 
-				//
+						if ( geometry ) {
 
-				const loader = new SVGLoader();
+							const mesh = new THREE.Mesh( geometry, material );
+							if ( guiData.extrudeStrokes )
+								mesh.position.z += zOffset ++ * 0.01;
 
-				loader.load( url, function ( data ) {
-
-					const paths = data.paths;
-
-					const group = new THREE.Group();
-					group.scale.multiplyScalar( 0.25 );
-					group.position.x = - 70;
-					group.position.y = 70;
-					group.scale.y *= - 1;
-
-					for ( let i = 0; i < paths.length; i ++ ) {
-
-						const path = paths[ i ];
-
-						const fillColor = path.userData.style.fill;
-						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
-
-							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( fillColor ),
-								opacity: path.userData.style.fillOpacity,
-								transparent: path.userData.style.fillOpacity < 1,
-								side: THREE.DoubleSide,
-								depthWrite: false,
-								wireframe: guiData.fillShapesWireframe
-							} );
-
-							const shapes = SVGLoader.createShapes( path );
-
-							for ( let j = 0; j < shapes.length; j ++ ) {
-
-								const shape = shapes[ j ];
-
-								const geometry = new THREE.ShapeGeometry( shape );
-								const mesh = new THREE.Mesh( geometry, material );
-
-								group.add( mesh );
-
-							}
-
-						}
-
-						const strokeColor = path.userData.style.stroke;
-
-						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
-
-							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( strokeColor ),
-								opacity: path.userData.style.strokeOpacity,
-								transparent: path.userData.style.strokeOpacity < 1,
-								side: THREE.DoubleSide,
-								depthWrite: false,
-								wireframe: guiData.strokesWireframe
-							} );
-
-							for ( let j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
-
-								const subPath = path.subPaths[ j ];
-
-								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
-
-								if ( geometry ) {
-
-									const mesh = new THREE.Mesh( geometry, material );
-
-									group.add( mesh );
-
-								}
-
-							}
+							group.add( mesh );
 
 						}
 
 					}
 
-					scene.add( group );
-
-				} );
+				}
 
 			}
 
-			function onWindowResize() {
+			scene.add( group );
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+		} );
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+	}
 
-			}
+	function onWindowResize() {
 
-			function animate() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
 
-				requestAnimationFrame( animate );
+		renderer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-				stats.update();
+	}
 
-			}
+	function animate() {
 
-			function render() {
+		requestAnimationFrame( animate );
 
-				renderer.render( scene, camera );
+		render();
 
-			}
+		stats.update();
 
-		</script>
+	}
 
-	</body>
+	function render() {
+
+		renderer.render( scene, camera );
+
+	}
+
+	let fileInput = null;
+	function promptFile( contentType, multiple ) {
+
+		if ( fileInput == null ) {
+
+			fileInput = document.createElement( 'input' );
+
+		}
+
+		fileInput.type = 'file';
+		fileInput.multiple = multiple;
+		fileInput.accept = contentType;
+		return new Promise( function ( resolve ) {
+
+			fileInput.onchange = function () {
+
+				const files = Array.from( fileInput.files ).map( f => f && URL.createObjectURL( f ) );
+				if ( multiple )
+					return resolve( files );
+				if ( files.length > 0 && files[ 0 ] )
+					resolve( files[ 0 ] );
+
+			};
+
+			fileInput.click();
+
+		} );
+
+	}
+
+</script>
+
+</body>
 </html>
