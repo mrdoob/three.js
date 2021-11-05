@@ -157,14 +157,6 @@ function WebGLMaterials( properties ) {
 			uniforms.ior.value = material.ior;
 			uniforms.refractionRatio.value = material.refractionRatio;
 
-			const maxMipLevel = properties.get( envMap ).__maxMipLevel;
-
-			if ( maxMipLevel !== undefined ) {
-
-				uniforms.maxMipLevel.value = maxMipLevel;
-
-			}
-
 		}
 
 		if ( material.lightMap ) {
