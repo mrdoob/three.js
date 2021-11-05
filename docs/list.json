@@ -427,9 +427,7 @@
 			},
 
 			"WebGLRenderer": {
-				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram",
-				"WebGLShader": "api/en/renderers/webgl/WebGLShader",
-				"WebGLState": "api/en/renderers/webgl/WebGLState"
+				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
 			}
 
 		}
@@ -926,9 +924,7 @@
 			},
 
 			"WebGL渲染器": {
-				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram",
-				"WebGLShader": "api/zh/renderers/webgl/WebGLShader",
-				"WebGLState": "api/zh/renderers/webgl/WebGLState"
+				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram"
 			}
 
 		}
