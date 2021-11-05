@@ -707,10 +707,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// set 0 level mipmap and then use GL to generate other mipmap levels
 
 			const levels = getMipLevels( texture, image, supportsMips );
+			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
+			const allocateMemory = ( texture.version === 1 );
 
 			if ( mipmaps.length > 0 && supportsMips ) {
 
-				if ( isWebGL2 ) {
+				if ( useTexStorage && allocateMemory ) {
 
 					state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height );
 
@@ -720,7 +722,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					mipmap = mipmaps[ i ];
 
-					if ( isWebGL2 ) {
+					if ( useTexStorage ) {
 
 						state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, glFormat, glType, mipmap );
 
@@ -736,9 +738,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				if ( isWebGL2 ) {
+				if ( useTexStorage ) {
 
-					state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+					if ( allocateMemory ) state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+
 					state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, glFormat, glType, image );
 
 				} else {
