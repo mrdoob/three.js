@@ -29,6 +29,24 @@ const _box = new Box3();
 const _sphere = new Sphere();
 const _clipToWorldVector = new Vector4();
 
+// Returns the margin required to expand by in world space given the distance from the camera,
+// line width, resolution, and camera projection
+function getWorldSpaceHalfWidth( camera, distance, lineWidth, resolution ) {
+
+	// transform into clip space, adjust the x and y values by the pixel width offset, then
+	// transform back into world space to get world offset. Note clip space is [-1, 1] so full
+	// width does not need to be halved.
+	_clipToWorldVector.set( 0, 0, - distance, 1.0 ).applyMatrix4( camera.projectionMatrix );
+	_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
+	_clipToWorldVector.x = lineWidth / resolution.width;
+	_clipToWorldVector.y = lineWidth / resolution.height;
+	_clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
+	_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
+
+	return Math.abs( Math.max( _clipToWorldVector.x, _clipToWorldVector.y ) );
+
+}
+
 class LineSegments2 extends Mesh {
 
 	constructor( geometry = new LineSegmentsGeometry(), material = new LineMaterial( { color: Math.random() * 0xffffff } ) ) {
@@ -106,18 +124,8 @@ class LineSegments2 extends Mesh {
 		_sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
 		const distanceToSphere = Math.max( camera.near, _sphere.distanceToPoint( ray.origin ) );
 
-		// transform into clip space, adjust the x and y values by the pixel width offset, then
-		// transform back into world space to get world offset. Note clip space is [-1, 1] so full
-		// width does not need to be halved.
-		_clipToWorldVector.set( 0, 0, - distanceToSphere, 1.0 ).applyMatrix4( camera.projectionMatrix );
-		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
-		_clipToWorldVector.x = lineWidth / resolution.width;
-		_clipToWorldVector.y = lineWidth / resolution.height;
-		_clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
-		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
-
 		// increase the sphere bounds by the worst case line screen space width
-		const sphereMargin = Math.abs( Math.max( _clipToWorldVector.x, _clipToWorldVector.y ) );
+		const sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, lineWidth, resolution );
 		_sphere.radius += sphereMargin;
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) {
@@ -138,18 +146,8 @@ class LineSegments2 extends Mesh {
 		_box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
 		const distanceToBox = Math.max( camera.near, _box.distanceToPoint( ray.origin ) );
 
-		// transform into clip space, adjust the x and y values by the pixel width offset, then
-		// transform back into world space to get world offset. Note clip space is [-1, 1] so full
-		// width does not need to be halved.
-		_clipToWorldVector.set( 0, 0, - distanceToBox, 1.0 ).applyMatrix4( camera.projectionMatrix );
-		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
-		_clipToWorldVector.x = lineWidth / resolution.width;
-		_clipToWorldVector.y = lineWidth / resolution.height;
-		_clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
-		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
-
 		// increase the sphere bounds by the worst case line screen space width
-		const boxMargin = Math.abs( Math.max( _clipToWorldVector.x, _clipToWorldVector.y ) )
+		const boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, lineWidth, resolution );
 		_box.max.x += boxMargin;
 		_box.max.y += boxMargin;
 		_box.max.z += boxMargin;
