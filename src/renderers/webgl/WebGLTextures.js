@@ -177,6 +177,34 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function getMipLevels( texture, image, supportsMips ) {
+
+		let levels;
+
+		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) === true ) {
+
+			// generated mipmaps via gl.generateMipmap()
+
+			levels = Math.log2( Math.max( image.width, image.height ) ) + 1;
+
+		} else if ( texture.mipmaps.length > 0 ) {
+
+			// user-defined mipmaps
+
+			levels = texture.mipmaps.length;
+
+		} else {
+
+			// texture without mipmaps (only base level)
+
+			levels = 1;
+
+		}
+
+		return levels;
+
+	}
+
 	// Fallback filters for non-power-of-2 textures
 
 	function filterFallback( f ) {
@@ -678,12 +706,29 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// if there are no manual mipmaps
 			// set 0 level mipmap and then use GL to generate other mipmap levels
 
+			const levels = getMipLevels( texture, image, supportsMips );
+
 			if ( mipmaps.length > 0 && supportsMips ) {
+
+				if ( isWebGL2 ) {
+
+					state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height );
+
+				}
 
 				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, glFormat, glType, mipmap );
+
+					if ( isWebGL2 ) {
+
+						state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, glFormat, glType, mipmap );
+
+					} else {
+
+						state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, glFormat, glType, mipmap );
+
+					}
 
 				}
 
@@ -691,7 +736,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, glFormat, glType, image );
+				if ( isWebGL2 ) {
+
+					state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+					state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, glFormat, glType, image );
+
+				} else {
+
+					state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, glFormat, glType, image );
+
+				}
 
 			}
 
