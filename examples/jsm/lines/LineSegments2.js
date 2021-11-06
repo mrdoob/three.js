@@ -146,7 +146,7 @@ class LineSegments2 extends Mesh {
 		_box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
 		const distanceToBox = Math.max( camera.near, _box.distanceToPoint( ray.origin ) );
 
-		// increase the sphere bounds by the worst case line screen space width
+		// increase the box bounds by the worst case line screen space width
 		const boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, lineWidth, resolution );
 		_box.max.x += boxMargin;
 		_box.max.y += boxMargin;
