@@ -216,7 +216,7 @@ function WebGLRenderer( parameters = {} ) {
 			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat
 		};
 
-		_canvas.setAttribute( 'data-engine', `three-${REVISION}` );
+		_canvas.setAttribute( 'data-engine', `three.js r${REVISION}` );
 
 		// event listeners must be registered before WebGL context is created, see #12753
 
