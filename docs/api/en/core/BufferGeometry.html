@@ -169,7 +169,7 @@
 		attributes.
 		</p>
 
-		<h3>[method:null addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
+		<h3>[method:undefined addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
 		<p>
 			Adds a group to this geometry; see the [page:BufferGeometry.groups groups]
 			property for details.
@@ -191,31 +191,31 @@
 		<h3>[method:BufferGeometry copy]( [param:BufferGeometry bufferGeometry] )</h3>
 		<p>Copies another BufferGeometry to this BufferGeometry.</p>
 
-		<h3>[method:null clearGroups]( )</h3>
+		<h3>[method:undefined clearGroups]( )</h3>
 		<p>Clears all groups.</p>
 
-		<h3>[method:null computeBoundingBox]()</h3>
+		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
 		Computes bounding box of the geometry, updating [page:.boundingBox] attribute.<br />
 		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</p>
 
-		<h3>[method:null computeBoundingSphere]()</h3>
+		<h3>[method:undefined computeBoundingSphere]()</h3>
 		<p>
 		Computes bounding sphere of the geometry, updating [page:.boundingSphere] attribute.<br />
 		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</p>
 
-		<h3>[method:null computeTangents]()</h3>
+		<h3>[method:undefined computeTangents]()</h3>
 		<p>
 		Calculates and adds a tangent attribute to this geometry.<br />
 		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined.
 		</p>
 
-		<h3>[method:null computeVertexNormals]()</h3>
+		<h3>[method:undefined computeVertexNormals]()</h3>
 		<p>Computes vertex normals by averaging face normals.</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 		Disposes the object from memory. <br />
 		You need to call this when you want the BufferGeometry removed while the application is running.
@@ -238,10 +238,10 @@
 		Use [page:Object3D.lookAt] for typical real-time mesh usage.
 		</p>
 
-		<h3>[method:null merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
+		<h3>[method:this merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
 		<p>Merge in another BufferGeometry with an optional offset of where to start merging in.</p>
 
-		<h3>[method:null normalizeNormals]()</h3>
+		<h3>[method:undefined normalizeNormals]()</h3>
 		<p>
 		Every normal vector in a geometry will have a magnitude of 1.
 		This will correct lighting on the geometry surfaces.
@@ -277,7 +277,7 @@
 		<h3>[method:BufferGeometry setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>Set the [page:.index] buffer.</p>
 
-		<h3>[method:null setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
+		<h3>[method:undefined setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
 		<p>Set the [page:.drawRange] property. For non-indexed BufferGeometry, count is the number of vertices to render.
 		For indexed BufferGeometry, count is the number of indices to render.</p>
 

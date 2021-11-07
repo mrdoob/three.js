@@ -129,7 +129,7 @@ m.elements = [ 11, 21, 31, 41,
 		将给定矩阵 [param:Matrix4 m] 的平移分量拷贝到当前矩阵中。
 		</p>
 
-		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
+		<h3>[method:this decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
 			将矩阵分解到给定的平移[page:Vector3 position] ,旋转 [page:Quaternion quaternion]，缩放[page:Vector3 scale]分量中。<br/><br/>
 			注意：并非所有矩阵都可以通过这种方式分解。 例如，如果一个对象有一个非均匀缩放的父对象，那么该对象的世界矩阵可能是不可分解的，这种方法可能不合适。
