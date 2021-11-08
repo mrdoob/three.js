@@ -161,13 +161,13 @@
 			所以，你需要使用该方法来添加 attributes。
 		</p>
 
-		<h3>[method:null addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
+		<h3>[method:undefined addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
 		<p>
 			为当前几何体增加一个 group，详见 [page:BufferGeometry.groups groups] 属性。
 		</p>
 
 
-		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p> 用给定矩阵转换几何体的顶点坐标。</p>
 
 		<h3>[method:BufferGeometry center] ()</h3>
@@ -179,31 +179,31 @@
 		<h3>[method:BufferGeometry copy]( [param:BufferGeometry bufferGeometry] )</h3>
 		<p>将参数指定的 BufferGeometry 的值拷贝到当前 BufferGeometry 中。</p>
 
-		<h3>[method:null clearGroups]( )</h3>
+		<h3>[method:undefined clearGroups]( )</h3>
 		<p>清空所有的 groups。</p>
 
-		<h3>[method:null computeBoundingBox]()</h3>
+		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
 			计算当前几何体的的边界矩形，该操作会更新已有 [param:.boundingBox]。<br />
 			边界矩形不会默认计算，需要调用该接口指定计算边界矩形，否则保持默认值 *null*。
 		</p>
 
-		<h3>[method:null computeBoundingSphere]()</h3>
+		<h3>[method:undefined computeBoundingSphere]()</h3>
 		<p>
 			计算当前几何体的的边界球形，该操作会更新已有 [param:.boundingSphere]。<br />
 			边界球形不会默认计算，需要调用该接口指定计算边界球形，否则保持默认值 *null*。
 		</p>
 
-		<h3>[method:null computeTangents]()</h3>
+		<h3>[method:undefined computeTangents]()</h3>
 		<p>
 		Calculates and adds a tangent attribute to this geometry.<br />
 		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined.
 		</p>
 
-		<h3>[method:null computeVertexNormals]()</h3>
+		<h3>[method:undefined computeVertexNormals]()</h3>
 		<p>通过面片法向量的平均值计算每个顶点的法向量。</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 			从内存中销毁对象。 <br />
 			如果在运行是需要从内存中删除 BufferGeometry，则需要调用该函数。
@@ -225,10 +225,10 @@
 			旋转几何体朝向控件中的一点。该过程通常在一次处理中完成，不会循环处理。典型的用法是过通过调用 [page:Object3D.lookAt] 实时改变 mesh 朝向。
 		</p>
 
-		<h3>[method:null merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
+		<h3>[method:this merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
 		<p>同参数指定的 BufferGeometry 进行合并。可以通过可选参数指定，从哪个偏移位置开始进行 merge。</p>
 
-		<h3>[method:null normalizeNormals]()</h3>
+		<h3>[method:undefined normalizeNormals]()</h3>
 		<p>
 			几何体中的每个法向量长度将会为 1。这样操作会更正光线在表面的效果。
 		</p>
@@ -259,7 +259,7 @@
 		<h3>[method:BufferGeometry setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>设置缓存的 [page:.index]。</p>
 
-		<h3>[method:null setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
+		<h3>[method:undefined setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
 		<p>设置缓存的 [page:.drawRange]。详见相关属性说明。</p>
 
 		<h3>[method:BufferGeometry setFromPoints] ( [param:Array points] )</h3>

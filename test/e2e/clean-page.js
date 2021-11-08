@@ -13,12 +13,12 @@
 	}
 
 
-	/* Remove dat.gui and fonts */
+	/* Remove gui and fonts */
 
 	const style = document.createElement( 'style' );
 	style.type = 'text/css';
 	style.innerHTML = `body { font size: 0 !important; }
-      #info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
+      #info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; }`;
 
 	const head = document.getElementsByTagName( 'head' );
 

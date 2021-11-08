@@ -17,7 +17,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Water } from './jsm/objects/Water2.js';
 
@@ -126,7 +126,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
 
-				// dat.gui
+				// gui
 
 				const gui = new GUI();
 

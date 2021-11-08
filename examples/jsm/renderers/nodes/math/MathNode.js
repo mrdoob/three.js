@@ -20,7 +20,6 @@ class MathNode extends TempNode {
 	static CEIL = 'ceil';
 	static NORMALIZE = 'normalize';
 	static FRACT = 'fract';
-	static SATURATE = 'saturate';
 	static SIN = 'sin';
 	static COS = 'cos';
 	static TAN = 'tan';
