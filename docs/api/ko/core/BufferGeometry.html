@@ -160,7 +160,7 @@
 
 		<h3>이 클래스에서는 [page:EventDispatcher EventDispatcher] 메서드들이 활용 가능합니다.</h3>
 
-		<h3>[method:BufferGeometry setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
 		기하학에 대한 속성을 설정합니다. [page:.attributes]의 내부 해시맵은 속성들의 반복 속도 증가를 위해 유지되기 때문에,
 		속성 프로퍼티 대신 이 메서드를 사용하세요.
@@ -175,13 +175,13 @@
 		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>꼭짓점 좌표로 직접 매트릭스 변형을 합니다.</p>
 
-		<h3>[method:BufferGeometry center] ()</h3>
+		<h3>[method:this center] ()</h3>
 		<p>바운딩 박스를 기준으로 기하학을 중앙정렬합니다.</p>
 
 		<h3>[method:BufferGeometry clone]()</h3>
 		<p>BufferGeometry의 사본을 만듭니다.</p>
 
-		<h3>[method:BufferGeometry copy]( [param:BufferGeometry bufferGeometry] )</h3>
+		<h3>[method:this copy]( [param:BufferGeometry bufferGeometry] )</h3>
 		<p>다른 BufferGeometry를 이 BufferGeometry에 복사합니다.</p>
 
 		<h3>[method:undefined clearGroups]( )</h3>
@@ -223,7 +223,7 @@
 		<h3>[method:Boolean hasAttribute]( [param:String name] )</h3>
 		<p>특정 이름의 속성이 존재하면 *true*를 리턴합니다.</p>
 
-		<h3>[method:BufferGeometry lookAt] ( [param:Vector3 vector] )</h3>
+		<h3>[method:this lookAt] ( [param:Vector3 vector] )</h3>
 		<p>
 		vector - 바라보는 시점의 월드 벡터 입니다.<br /><br />
 
@@ -243,38 +243,38 @@
 		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
 		<p>특정 이름의 [page:BufferAttribute attribute]를 전부 삭제합니다.</p>
 
-		<h3>[method:BufferGeometry rotateX] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateX] ( [param:Float radians] )</h3>
 		<p>
 		X 축의 기하학을 회전합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 회전은 [page:Object3D.rotation] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry rotateY] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateY] ( [param:Float radians] )</h3>
 		<p>
 		Y 축의 기하학을 회전합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 회전은 [page:Object3D.rotation] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry rotateZ] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateZ] ( [param:Float radians] )</h3>
 		<p>
 		Z 축의 기하학을 회전합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 회전은 [page:Object3D.rotation] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		기하학 데이터를 확대/축소합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 확대/축소는 [page:Object3D.scale] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry setIndex] ( [param:BufferAttribute index] )</h3>
+		<h3>[method:this setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>[page:.index] 버퍼를 설정합니다.</p>
 
 		<h3>[method:undefined setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
 		<p>[page:.drawRange] 프로퍼티를 설정합니다. 인덱스가 없는 BufferGeometry에서, count는 렌더링할 꼭짓점의 수입니다.
 		인덱스가 있는 BufferGeometry에서 count는 렌더링할 인덱스의 수입니다.</p>
 
-		<h3>[method:BufferGeometry setFromPoints] ( [param:Array points] )</h3>
+		<h3>[method:this setFromPoints] ( [param:Array points] )</h3>
 		<p>점 배열로부터 BufferGeometry의 속성을 설정합니다. from an array of points.</p>
 
 		<h3>[method:Object toJSON]()</h3>
@@ -283,7 +283,7 @@
 		<h3>[method:BufferGeometry toNonIndexed]()</h3>
 		<p>인덱스가 있는 BufferGeometry의 인덱스가 없는 버전을 리턴합니다.</p>
 
-		<h3>[method:BufferGeometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		기하학을 이동합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 이동은 [page:Object3D.position] 를 사용하세요.

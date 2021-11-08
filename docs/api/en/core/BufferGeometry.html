@@ -162,7 +162,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:BufferGeometry setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
 		Sets an attribute to this geometry. Use this rather than the attributes property,
 		because an internal hashmap of [page:.attributes] is maintained to speed up iterating over
@@ -182,13 +182,13 @@
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the geometry.</p>
 
-		<h3>[method:BufferGeometry center] ()</h3>
+		<h3>[method:this center] ()</h3>
 		<p>Center the geometry based on the bounding box.</p>
 
 		<h3>[method:BufferGeometry clone]()</h3>
 		<p>Creates a clone of this BufferGeometry.</p>
 
-		<h3>[method:BufferGeometry copy]( [param:BufferGeometry bufferGeometry] )</h3>
+		<h3>[method:this copy]( [param:BufferGeometry bufferGeometry] )</h3>
 		<p>Copies another BufferGeometry to this BufferGeometry.</p>
 
 		<h3>[method:undefined clearGroups]( )</h3>
@@ -230,7 +230,7 @@
 		<h3>[method:Boolean hasAttribute]( [param:String name] )</h3>
 		<p>Returns *true* if the attribute with the specified name exists.</p>
 
-		<h3>[method:BufferGeometry lookAt] ( [param:Vector3 vector] )</h3>
+		<h3>[method:this lookAt] ( [param:Vector3 vector] )</h3>
 		<p>
 		vector - A world vector to look at.<br /><br />
 
@@ -250,38 +250,38 @@
 		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
 		<p>Deletes the [page:BufferAttribute attribute] with the specified name.</p>
 
-		<h3>[method:BufferGeometry rotateX] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateX] ( [param:Float radians] )</h3>
 		<p>
 		Rotate the geometry about the X axis. This is typically done as a one time operation, and not during a loop.
     Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</p>
 
-		<h3>[method:BufferGeometry rotateY] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateY] ( [param:Float radians] )</h3>
 		<p>
 		Rotate the geometry about the Y axis. This is typically done as a one time operation, and not during a loop.
     Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</p>
 
-		<h3>[method:BufferGeometry rotateZ] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateZ] ( [param:Float radians] )</h3>
 		<p>
 		Rotate the geometry about the Z axis. This is typically done as a one time operation, and not during a loop.
     Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</p>
 
-		<h3>[method:BufferGeometry scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		Scale the geometry data. This is typically done as a one time operation, and not during a loop.
 		Use [page:Object3D.scale] for typical real-time mesh scaling.
 		</p>
 
-		<h3>[method:BufferGeometry setIndex] ( [param:BufferAttribute index] )</h3>
+		<h3>[method:this setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>Set the [page:.index] buffer.</p>
 
 		<h3>[method:undefined setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
 		<p>Set the [page:.drawRange] property. For non-indexed BufferGeometry, count is the number of vertices to render.
 		For indexed BufferGeometry, count is the number of indices to render.</p>
 
-		<h3>[method:BufferGeometry setFromPoints] ( [param:Array points] )</h3>
+		<h3>[method:this setFromPoints] ( [param:Array points] )</h3>
 		<p>Sets the attributes for this BufferGeometry from an array of points.</p>
 
 		<h3>[method:Object toJSON]()</h3>
@@ -290,7 +290,7 @@
 		<h3>[method:BufferGeometry toNonIndexed]()</h3>
 		<p>Return a non-index version of an indexed BufferGeometry.</p>
 
-		<h3>[method:BufferGeometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		Translate the geometry. This is typically done as a one time operation, and not during a loop.
 		Use [page:Object3D.position] for typical real-time mesh translation.
