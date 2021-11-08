@@ -168,7 +168,7 @@ class WebGPURenderer {
 
 		const swapChain = context.configure( {
 			device: device,
-			format: GPUTextureFormat.BRGA8Unorm // this is the only valid swap chain format right now (r121)
+			format: GPUTextureFormat.BGRA8Unorm // this is the only valid swap chain format right now (r121)
 		} );
 
 		this._adapter = adapter;
@@ -489,7 +489,7 @@ class WebGPURenderer {
 
 		} else {
 
-			format = GPUTextureFormat.BRGA8Unorm; // default swap chain format
+			format = GPUTextureFormat.BGRA8Unorm; // default swap chain format
 
 		}
 
@@ -635,7 +635,6 @@ class WebGPURenderer {
 
 	_projectObject( object, camera, groupOrder ) {
 
-		const info = this._info;
 		const currentRenderList = this._currentRenderList;
 
 		if ( object.visible === false ) return;
@@ -897,7 +896,7 @@ class WebGPURenderer {
 					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
-				format: GPUTextureFormat.BRGA8Unorm,
+				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT
 			} );
 
@@ -936,7 +935,7 @@ class WebGPURenderer {
 
 			this._context.configure( {
 				device: device,
-				format: GPUTextureFormat.BRGA8Unorm,
+				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT,
 				size: {
 					width: Math.floor( this._width * this._pixelRatio ),

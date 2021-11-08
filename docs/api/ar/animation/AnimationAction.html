@@ -128,7 +128,7 @@
 		<h2>الوظائف (Methods)</h2>
 
 
-		<h3>[method:AnimationAction crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<h3>[method:this crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
 			يؤدي هذا الإجراء إلى تلاشي [page:.fadeIn fade in] ، مما يؤدي إلى تلاشي إجراء آخر في نفس الوقت ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة.<br /><br />
 
@@ -138,7 +138,7 @@
 
 		</p>
 
-		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<h3>[method:this crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
 			يؤدي هذا الإجراء إلى تلاشي [page:.fadeOut fade out] ، يتلاشى في إجراء آخر في وقت واحد ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.<br /><br />
 			إذا كانت warpBoolean صحيحة ، فسيتم تطبيق [page:.warp warping] إضافيًا (تغييرات تدريجية في المقاييس الزمنية).<br /><br />
@@ -146,12 +146,12 @@
 			ملاحظة: كما هو الحال مع *fadeIn*/*fadeOut* ، يبدأ / ينتهي التلاشي بوزن 1.
 		</p>
 
-		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this fadeIn]( [param:Number durationInSeconds] )</h3>
 		<p>
 			يزيد [page:.weight weight] هذا الإجراء تدريجياً من 0 إلى 1 ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.
 		</p>
 
-		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this fadeOut]( [param:Number durationInSeconds] )</h3>
 		<p>
 			يقلل [page:.weight weight] هذا الإجراء تدريجيًا من 1 إلى 0 ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.
 		</p>
@@ -181,7 +181,7 @@
 			تُرجع الكائن الجذر الذي تم تنفيذ هذا الإجراء عليه.
 		</p>
 
-		<h3>[method:AnimationAction halt]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this halt]( [param:Number durationInSeconds] )</h3>
 		<p>
 			تعمل على إبطاء سرعة هذه الرسوم المتحركة إلى 0 من خلال إنقاص [page:.timeScale timeScale] تدريجيًا (بدءًا من قيمتها الحالية) ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.
 		</p>
@@ -205,7 +205,7 @@
 			ملاحظة: هذا لا يعني بالضرورة أن الرسوم المتحركة تعمل بالفعل (قارن الشروط الإضافية لـ [page:.isRunning isRunning]).
 		</p>
 
-		<h3>[method:AnimationAction play]()</h3>
+		<h3>[method:this play]()</h3>
 		<p>
 			يعلم الخالط بضرورة البدء في تنشيط الحدث (action). يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
 
@@ -214,7 +214,7 @@
 			[page:.weight weight]=0, [page:.timeScale timeScale]=0) منع تشغيل الرسوم المتحركة أيضًا.
 		</p>
 
-		<h3>[method:AnimationAction reset]()</h3>
+		<h3>[method:this reset]()</h3>
 		<p>
 			يتم إعادة الحدث إلى وضع البداية. يمكن تقييد هذه الطريقة ضمن سلسلة.<br /><br />
 
@@ -224,12 +224,12 @@
 			هذا يعني: إذا كنت تريد كلاهما ، reset وstop ، لا تتصل بـ *reset* بل إتصل بـ *stop* بدلا من ذلك.
 		</p>
 
-		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this setDuration]( [param:Number durationInSeconds] )</h3>
 		<p>
 			يضبط المدة لحلقة واحدة من هذا الإجراء (بضبط [page:.timeScale timeScale] وإيقاف أي إلتفاف مجدول). يمكن تقييد هذه الطريقة ضمن سلسلة.
 		</p>
 
-		<h3>[method:AnimationAction setEffectiveTimeScale]( [param:Number timeScale] )</h3>
+		<h3>[method:this setEffectiveTimeScale]( [param:Number timeScale] )</h3>
 		<p>
 			يضبط [page:.timeScale timeScale] ويوقف أي إلتفاف مجدول. يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
 
@@ -239,7 +239,7 @@
 			ملاحظة: *paused* لن يتم تحويله إلى *true* تلقائيًا ، إذا تم ضبط *timeScale* على 0 بهذه الطريقة.
 		</p>
 
-		<h3>[method:AnimationAction setEffectiveWeight]( [param:Number weight] )</h3>
+		<h3>[method:this setEffectiveWeight]( [param:Number weight] )</h3>
 		<p>
 			تضبط [page:.weight weight] وتوقف أي تضاؤل مجدول. يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
 
@@ -249,12 +249,12 @@
 			ملاحظة: لن يتم تحويل *enabled* إلى false تلقائيًا ، إذا تم ضبط *weight* على 0 بهذه الطريقة.
 		</p>
 
-		<h3>[method:AnimationAction setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
+		<h3>[method:this setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
 		<p>
 			يعين [page:.loop loop mode] وعدد [page:.repetitions repetitions]. يمكن تقييد هذه الطريقة ضمن سلسلة
 		</p>
 
-		<h3>[method:AnimationAction startAt]( [param:Number startTimeInSeconds] )</h3>
+		<h3>[method:this startAt]( [param:Number startTimeInSeconds] )</h3>
 		<p>
 			يحدد وقت البداية المتأخرة (عادةً ما يتم تمريره كـ [page:AnimationMixer.time] + deltaTimeInSeconds). يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
 
@@ -262,7 +262,7 @@
 			أو إذا تم بالفعل تنشيط الإجراء في الخالط (عن طريق استدعاء سابق لـ. *play* ، دون إيقافه أو إعادة تعيينه في هذه الأثناء).
 		</p>
 
-		<h3>[method:AnimationAction stop]()</h3>
+		<h3>[method:this stop]()</h3>
 		<p>
 			يخبر الخالط بإلغاء تنشيط هذا الإجراء. يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
 
@@ -271,17 +271,17 @@
 			ملاحظة: يمكنك إيقاف جميع الإجراءات النشطة على نفس الخالط دفعة واحدة عبر [page:AnimationMixer.stopAllAction mixer.stopAllAction].
 		</p>
 
-		<h3>[method:AnimationAction stopFading]()</h3>
+		<h3>[method:this stopFading]()</h3>
 		<p>
 			يوقف أي [page:.fadeIn fading] مجدولًا يتم تطبيقه على هذا الحدث. يمكن تقييد هذه الطريقة ضمن سلسلة.
 		</p>
 
-		<h3>[method:AnimationAction stopWarping]()</h3>
+		<h3>[method:this stopWarping]()</h3>
 		<p>
 			يوقف أي [page:.warp warping] مجدولًا يتم تطبيقه على هذا الحدث. يمكن تقييد هذه الوظيفة ضمن سلسلة.
 		</p>
 
-		<h3>[method:AnimationAction syncWith]( [param:AnimationAction otherAction] )</h3>
+		<h3>[method:this syncWith]( [param:AnimationAction otherAction] )</h3>
 		<p>
 			يزامن هذا الإجراء مع الإجراء الآخر الذي تم تمريره. يمكن تقييد هذه الوظيفة ضمن سلسلة. <br /><br />
 
@@ -290,7 +290,7 @@
 			ملاحظة: لن يتم الكشف عن التغييرات المستقبلية في *time* و *timeScale* للإجراء الآخر.
 		</p>
 
-		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
+		<h3>[method:this warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
 		<p>
 			يغير سرعة التشغيل ، خلال الفترة الزمنية المنقضية ، عن طريق تعديل [page:.timeScale timeScale] تدريجيًا من *startTimeScale* إلى *endTimeScale*.يمكن تقييد هذه الوظيفة ضمن سلسلة.
 		</p>

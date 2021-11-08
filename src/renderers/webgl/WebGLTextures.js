@@ -122,13 +122,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function generateMipmap( target, texture, width, height, depth = 1 ) {
+	function generateMipmap( target ) {
 
 		_gl.generateMipmap( target );
-
-		const textureProperties = properties.get( texture );
-
-		textureProperties.__maxMipLevel = Math.log2( Math.max( width, height, depth ) );
 
 	}
 
@@ -633,12 +629,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				texture.generateMipmaps = false;
-				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 			} else {
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
-				textureProperties.__maxMipLevel = 0;
 
 			}
 
@@ -668,17 +662,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			textureProperties.__maxMipLevel = mipmaps.length - 1;
-
 		} else if ( texture.isDataTexture2DArray ) {
 
 			state.texImage3D( _gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
-			textureProperties.__maxMipLevel = 0;
 
 		} else if ( texture.isDataTexture3D ) {
 
 			state.texImage3D( _gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
-			textureProperties.__maxMipLevel = 0;
 
 		} else {
 
@@ -698,12 +688,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				texture.generateMipmaps = false;
-				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 			} else {
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, glFormat, glType, image );
-				textureProperties.__maxMipLevel = 0;
 
 			}
 
@@ -711,7 +699,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-			generateMipmap( textureType, texture, image.width, image.height );
+			generateMipmap( textureType );
 
 		}
 
@@ -796,8 +784,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			textureProperties.__maxMipLevel = mipmaps.length - 1;
-
 		} else {
 
 			mipmaps = texture.mipmaps;
@@ -833,14 +819,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			textureProperties.__maxMipLevel = mipmaps.length;
-
 		}
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
 			// We assume images for cube map have the same size.
-			generateMipmap( _gl.TEXTURE_CUBE_MAP, texture, image.width, image.height );
+			generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
 		}
 
@@ -1174,7 +1158,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-				generateMipmap( _gl.TEXTURE_CUBE_MAP, texture, renderTarget.width, renderTarget.height );
+				generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
 			}
 
@@ -1195,7 +1179,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( textureNeedsGenerateMipmaps( attachment, supportsMips ) ) {
 
-					generateMipmap( _gl.TEXTURE_2D, attachment, renderTarget.width, renderTarget.height );
+					generateMipmap( _gl.TEXTURE_2D );
 
 				}
 
@@ -1230,7 +1214,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-				generateMipmap( glTextureType, texture, renderTarget.width, renderTarget.height, renderTarget.depth );
+				generateMipmap( glTextureType );
 
 			}
 
@@ -1264,7 +1248,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const webglTexture = properties.get( texture ).__webglTexture;
 
 				state.bindTexture( target, webglTexture );
-				generateMipmap( target, texture, renderTarget.width, renderTarget.height );
+				generateMipmap( target );
 				state.unbindTexture();
 
 			}

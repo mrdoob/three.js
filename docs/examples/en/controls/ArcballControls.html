@@ -199,47 +199,47 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null activateGizmos] ( [param:Boolean isActive] )</h3>
+		<h3>[method:undefined activateGizmos] ( [param:Boolean isActive] )</h3>
 		<p>
 			Make gizmos more or less visible.
 		</p>
 
-		<h3>[method:null copyState] ()</h3>
+		<h3>[method:undefined copyState] ()</h3>
 		<p>
 			Copy the current state to clipboard (as a readable JSON text).
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Remove all the event listeners, cancel any pending animation and clean the scene from gizmos and grid.
 		</p>
 
-		<h3>[method:null pasteState] ()</h3>
+		<h3>[method:undefined pasteState] ()</h3>
 		<p>
 			Set the controls state from the clipboard, assumes that the clipboard stores a JSON text as saved from [page:.copyState].
 		</p>
 
-		<h3>[method:null reset] ()</h3>
+		<h3>[method:undefined reset] ()</h3>
 		<p>
 			Reset the controls to their state from either the last time the [page:.saveState] was called, or the initial state.
 		</p>
 
-		<h3>[method:null saveState] ()</h3>
+		<h3>[method:undefined saveState] ()</h3>
 		<p>
 			Save the current state of the controls. This can later be recovered with [page:.reset].
 		</p>
 
-		<h3>[method:null setCamera] ( [param:Camera camera] )</h3>
+		<h3>[method:undefined setCamera] ( [param:Camera camera] )</h3>
 		<p>
 			Set the camera to be controlled. Must be called in order to set a new camera to be controlled.
 		</p>
 
-		<h3>[method:null setGizmosVisible] ( [param:Boolean value] )</h3>
+		<h3>[method:undefined setGizmosVisible] ( [param:Boolean value] )</h3>
 		<p>
 			Set the visible property of gizmos.
 		</p>
 
-		<h3>[method:null setTbRadius] ( [param:Float value] )</h3>
+		<h3>[method:undefined setTbRadius] ( [param:Float value] )</h3>
 		<p>
 			Update the `radiusFactor` value, redraw the gizmo and send a `changeEvent` to visualise the changes.
 		</p>
@@ -252,7 +252,7 @@
 			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
 		</p>
 
-		<h3>[method:null setTarget] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:undefined setTarget] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 			Set the trackball center point.
 		</p>
@@ -264,7 +264,7 @@
 			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
 		</p>
 
-		<h3>[method:null update] ()</h3>
+		<h3>[method:undefined update] ()</h3>
 		<p>
 			Update the controls. Must be called after any manual changes to the camera's transform.
 		</p>
