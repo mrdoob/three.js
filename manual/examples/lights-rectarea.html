@@ -21,11 +21,11 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
-import {RectAreaLightUniformsLib} from './resources/threejs/r132/examples/jsm/lights/RectAreaLightUniformsLib.js';
-import {RectAreaLightHelper} from './resources/threejs/r132/examples/jsm/helpers/RectAreaLightHelper.js';
-import {GUI} from '../3rdparty/dat.gui.module.js';
+import * as THREE from '../../build/three.module.js';
+import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
+import {RectAreaLightUniformsLib} from '../../examples/jsm/lights/RectAreaLightUniformsLib.js';
+import {RectAreaLightHelper} from '../../examples/jsm/helpers/RectAreaLightHelper.js';
+import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
 
 function main() {
   const canvas = document.querySelector('#c');

@@ -26,8 +26,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
-import {GLTFLoader} from './resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from '../../build/three.module.js';
+import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
 
 class ResourceTracker {
   constructor() {
@@ -154,10 +154,10 @@ function main() {
   }
 
   const fileURLs = [
-    'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf',  /* threejsfundamentals: url */
-    'resources/models/3dbustchallange_submission/scene.gltf',            /* threejsfundamentals: url */
-    'resources/models/mountain_landscape/scene.gltf',                    /* threejsfundamentals: url */
-    'resources/models/simple_house_scene/scene.gltf',                    /* threejsfundamentals: url */
+    'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf',  /* threejs.org: url */
+    'resources/models/3dbustchallange_submission/scene.gltf',            /* threejs.org: url */
+    'resources/models/mountain_landscape/scene.gltf',                    /* threejs.org: url */
+    'resources/models/simple_house_scene/scene.gltf',                    /* threejs.org: url */
   ];
 
   async function loadFiles() {

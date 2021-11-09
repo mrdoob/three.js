@@ -2,63 +2,51 @@
 /* eslint-disable strict */
 'use strict';  // eslint-disable-line
 
-/* global jQuery, settings, contributors */
+(function(){
 
-(function($){
-
-function getQueryParams() {
-  return Object.fromEntries(new URLSearchParams(window.location.search).entries());
-}
-
-//
-function replaceParams(str, subs) {
-  return str.replace(/\${(\w+)}/g, function(m, key) {
-    return subs[key];
-  });
-}
-
-function showContributors() {
-  // contribTemplate: 'Thank you
-  // <a href="${html_url}">
-  // <img src="${avatar_url}">${login}<a/>
-  //  for <a href="https://github.com/${owner}/${repo}/commits?author=${login}">${contributions} contributions</a>',
-  try {
-    const subs = {...settings, ...contributors[Math.random() * contributors.length | 0]};
-    const template = settings.contribTemplate;
-    const html = replaceParams(template, subs);
-    const parent = document.querySelector('#forkongithub>div');
-    const div = document.createElement('div');
-    div.className = 'contributors';
-    div.innerHTML = html;
-    parent.appendChild(div);
-  } catch (e) {
-    console.error(e);
+  if (window.frameElement) {
+    // in iframe
+    document.querySelectorAll('a').forEach(a => {
+      // we have to send all links to the parent
+      // otherwise we'll end up with 3rd party
+      // sites under the frame.
+      a.addEventListener('click', e => {
+        // opening a new tab?
+        if (a.target === '_blank') {
+          return;
+        }
+        // change changing hashes?
+        if (a.origin !== window.location.origin || a.pathname !== window.location.pathname) {
+          e.preventDefault();
+        }
+        window.parent.setUrl(a.href);
+      });
+    });
+    window.parent.setTitle(document.title);
+  } else {
+    if (window.location.protocol !== 'file:') {
+      const re = /^(.*?\/manual\/)(.*?)$/;
+      const [,baseURL, articlePath] = re.exec(window.location.href);
+      const href = `${baseURL}#${articlePath.replace('.html', '')}`;
+      window.location.replace(href);  // lgtm[js/client-side-unvalidated-url-redirection]
+    }
   }
-}
-showContributors();
 
-$(document).ready(function($){
   if (window.prettyPrint) {
     window.prettyPrint();
   }
-  $('span[class=com]')
-    .addClass('translate yestranslate')
-    .attr('translate', 'yes');
 
-  const params = getQueryParams();
-  if (params.doubleSpace || params.doublespace) {
-    document.body.className = document.body.className + ' doubleSpace';
-  }
-
-  $('.language').on('change', function() {
-    window.location.href = this.value;
+  // help translation services translate comments.
+  document.querySelectorAll('span[class=com]').forEach(elem => {
+    elem.classList.add('translate', 'yestranslate');
+    elem.setAttribute('translate', 'yes');
   });
 
   if (window.threejsLessonUtils) {
     window.threejsLessonUtils.afterPrettify();
   }
-});
-}(jQuery));
+
+}());
 
 // ios needs this to allow touch events in an iframe
 window.addEventListener('touchstart', {});

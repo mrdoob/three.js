@@ -1,4 +1,4 @@
-import * as THREE from './resources/threejs/r132/build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 const state = {
   width: 300,   // canvas default
@@ -99,7 +99,7 @@ const handlers = {
 
 self.onmessage = function(e) {
   const fn = handlers[e.data.type];
-  if (!fn) {
+  if (typeof fn !== 'function') {
     throw new Error('no handler for type: ' + e.data.type);
   }
   fn(e.data);

@@ -1,58 +1,75 @@
-Title: Настройка окружения Three.js
-Description: Как настроить разрабочее окружение для Three.js
-TOC: Настройка
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Настройка окружения </title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Настройка окружения ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-Эта статья является частью серии статей о three.js. 
-Первая статья - [основы Three.js](threejs-fundamentals.html).
-Если вы её еще не читали, советую вам сделать это.
-
-Прежде чем мы пойдем дальше, нам нужно поговорить о настройке вашего компьютера для разработки. 
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Настройка окружения </h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Эта статья является частью серии статей о three.js. 
+Первая статья - <a href="fundamentals.html">основы Three.js</a>.
+Если вы её еще не читали, советую вам сделать это.</p>
+<p>Прежде чем мы пойдем дальше, нам нужно поговорить о настройке вашего компьютера для разработки. 
 В частности, по соображениям безопасности WebGL не может напрямую использовать изображения с 
 вашего жесткого диска. Это означает, что для разработки вам необходимо использовать веб-сервер. 
-К счастью, веб-серверы разработки очень просты в настройке и использовании.
+К счастью, веб-серверы разработки очень просты в настройке и использовании.</p>
+<p>Прежде всего, если вы хотите, вы можете скачать весь этот сайт по <a href="https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip">этой ссылке</a>.
+После загрузки дважды щелкните по zip-файлу, чтобы распаковать файлы.</p>
+<p>Затем загрузите один из этих простых веб-серверов или воспользуйтесь средствами вашего ide</p>
+<p>Если вы предпочитаете веб-сервер с пользовательским интерфейсом, есть 
+<a href="https://greggman.github.io/servez">Servez</a></p>
+<p></p><div class="threejs_image border">
+  <img class="" src="../resources/servez.gif">
+</div>
 
-Прежде всего, если вы хотите, вы можете скачать весь этот сайт по [этой ссылке](https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip).
-После загрузки дважды щелкните по zip-файлу, чтобы распаковать файлы.
-
-Затем загрузите один из этих простых веб-серверов или воспользуйтесь средствами вашего ide
-
-Если вы предпочитаете веб-сервер с пользовательским интерфейсом, есть 
-[Servez](https://greggman.github.io/servez)
-
-{{{image url="resources/servez.gif" className="border" }}}
-
-Просто укажите на папку, в которую вы распаковали файлы, нажмите "Start", затем 
-перейдите в браузере на [`http://localhost:8080/`](http://localhost:8080/) или, если 
-вы хотите просмотреть примеры, перейдите в [`http://localhost:8080/threejs`](http://localhost:8080/threejs).
-
-Чтобы остановить сервер нажмите stop или выйдите из Servez.
-
-Если вы предпочитаете командную строку (как я), еще один способ заключается 
-в использовании [node.js](https://nodejs.org).
+<p></p>
+<p>Просто укажите на папку, в которую вы распаковали файлы, нажмите "Start", затем 
+перейдите в браузере на <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a> или, если 
+вы хотите просмотреть примеры, перейдите в <a href="http://localhost:8080/threejs"><code class="notranslate" translate="no">http://localhost:8080/threejs</code></a>.</p>
+<p>Чтобы остановить сервер нажмите stop или выйдите из Servez.</p>
+<p>Если вы предпочитаете командную строку (как я), еще один способ заключается 
+в использовании <a href="https://nodejs.org">node.js</a>.
 Загрузите его, установите его, затем откройте окно командной строки / консоли / терминала. 
-Если вы работаете в Windows, установщик добавит специальную "Node Command Prompt", используйте ее.
+Если вы работаете в Windows, установщик добавит специальную "Node Command Prompt", используйте ее.</p>
+<p>Затем установите <a href="https://github.com/greggman/servez-cli"><code class="notranslate" translate="no">servez</code></a> набрав в консоли</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">npm -g install servez
+</pre><p>Если вы используете OSX</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">sudo npm -g install servez
+</pre><p>Как только вы сделали это, напишите</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">servez path/to/folder/where/you/unzipped/files
+</pre><p>Это должно вывести что-то вроде</p>
+<p></p><div class="threejs_image ">
+  <img class="" src="../resources/servez-response.png">
+</div>
 
-Затем установите [`servez`](https://github.com/greggman/servez-cli) набрав в консоли
+<p></p>
+<p>Затем в вашем браузере перейдите на <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>.</p>
+<p>Если вы не укажете путь, тогда http-сервер будет хостить(размещать на сервере) текущую папку.</p>
+<p>Если какой-либо из этих вариантов вам не по вкусу,
+<a href="https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver">есть много других простых серверов на выбор</a>.</p>
+<p>Теперь, когда вы настроили сервер, мы можем перейти к <a href="textures.html">текстурам</a>.</p>
 
-    npm -g install servez
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
 
-Если вы используете OSX
 
-    sudo npm -g install servez
 
-Как только вы сделали это, напишите
 
-    servez path/to/folder/where/you/unzipped/files
-
-Это должно вывести что-то вроде
-
-{{{image url="resources/servez-response.png" }}}
-
-Затем в вашем браузере перейдите на [`http://localhost:8080/`](http://localhost:8080/).
-
-Если вы не укажете путь, тогда http-сервер будет хостить(размещать на сервере) текущую папку.
-
-Если какой-либо из этих вариантов вам не по вкусу,
-[есть много других простых серверов на выбор](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver).
-
-Теперь, когда вы настроили сервер, мы можем перейти к [текстурам](threejs-textures.html).
+</body></html>

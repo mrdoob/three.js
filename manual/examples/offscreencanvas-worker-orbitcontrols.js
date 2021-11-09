@@ -1,5 +1,5 @@
 import {init} from './shared-orbitcontrols.js';
-import {EventDispatcher} from './resources/threejs/r132/build/three.module.js';
+import {EventDispatcher} from '../../build/three.module.js';
 
 function noop() {
 }
@@ -88,7 +88,7 @@ const handlers = {
 
 self.onmessage = function(e) {
   const fn = handlers[e.data.type];
-  if (!fn) {
+  if (typeof fn !== 'function') {
     throw new Error('no handler for type: ' + e.data.type);
   }
   fn(e.data);

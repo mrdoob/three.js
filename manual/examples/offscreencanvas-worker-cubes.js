@@ -12,7 +12,7 @@ const handlers = {
 
 self.onmessage = function(e) {
   const fn = handlers[e.data.type];
-  if (!fn) {
+  if (typeof fn !== 'function') {
     throw new Error('no handler for type: ' + e.data.type);
   }
   fn(e.data);

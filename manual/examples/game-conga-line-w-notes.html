@@ -149,11 +149,11 @@
     <div id="labels"></div>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js';
-import * as SkeletonUtils from './resources/threejs/r132/examples/jsm/utils/SkeletonUtils.js';
-import {GUI} from '../3rdparty/dat.gui.module.js';
+import * as THREE from '../../build/three.module.js';
+import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
+import * as SkeletonUtils from '../../examples/jsm/utils/SkeletonUtils.js';
+import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -347,12 +347,12 @@ function main() {
     }
   }
 
-  function* waitFrames(numFrames) {  // eslint-disable-line no-unused-vars
-    while (numFrames > 0) {
-      --numFrames;
-      yield;
-    }
-  }
+  // function* waitFrames(numFrames) {
+  //   while (numFrames > 0) {
+  //     --numFrames;
+  //     yield;
+  //   }
+  // }
 
   function* waitSeconds(duration) {
     while (duration > 0) {

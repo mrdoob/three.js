@@ -940,7 +940,7 @@ var prettyPrint;
       // only when not followint [|&;<>].
       '^.[^\\s\\w.$@\'"`/\\\\]*';
     if (options['regexLiterals']) {
-      punctuation += '(?!\s*\/)';
+      punctuation += '(?!s*/)';
     }
 
     fallthroughStylePatterns.push(
@@ -1226,7 +1226,7 @@ var prettyPrint;
       i = end;
     }
   
-    nDecorations = decorations.length = decPos;
+    decorations.length = decPos;
   
     var sourceNode = job.sourceNode;
     var oldDisplay;
@@ -1235,9 +1235,8 @@ var prettyPrint;
       sourceNode.style.display = 'none';
     }
     try {
-      var decoration = null;
+      decoration = null;
       while (spanIndex < nSpans) {
-        var spanStart = spans[spanIndex];
         var spanEnd = spans[spanIndex + 2] || sourceLength;
   
         var decEnd = decorations[decorationIndex + 2] || sourceLength;

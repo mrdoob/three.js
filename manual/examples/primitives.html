@@ -21,7 +21,10 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
+import * as THREE from '../../build/three.module.js';
+import {FontLoader} from '../../examples/jsm/loaders/FontLoader.js';
+import {ParametricGeometry} from '../../examples/jsm/geometries/ParametricGeometry.js';
+import {TextGeometry} from '../../examples/jsm/geometries/TextGeometry.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -203,7 +206,7 @@ function main() {
 
     const slices = 25;
     const stacks = 25;
-    addSolidGeometry(2, 1, new THREE.ParametricGeometry(klein, slices, stacks));
+    addSolidGeometry(2, 1, new ParametricGeometry(klein, slices, stacks));
   }
   {
     const width = 9;
@@ -259,7 +262,7 @@ function main() {
     addSolidGeometry(-2, -1, new THREE.TetrahedronGeometry(radius));
   }
   {
-    const loader = new THREE.FontLoader();
+    const loader = new FontLoader();
     // promisify font loading
     function loadFont(url) {
       return new Promise((resolve, reject) => {
@@ -268,8 +271,8 @@ function main() {
     }
 
     async function doit() {
-      const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');  /* threejsfundamentals: url */
-      const geometry = new THREE.TextGeometry('three.js', {
+      const font = await loadFont('/examples/fonts/helvetiker_regular.typeface.json');  /* threejs.org: url */
+      const geometry = new TextGeometry('three.js', {
         font: font,
         size: 3.0,
         height: .2,

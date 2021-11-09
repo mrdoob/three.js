@@ -21,8 +21,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '../../build/three.module.js';
+import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -82,8 +82,8 @@ function main() {
     });
   }
 
-  makeInstance(geometry, 'pink',       0,             'resources/images/happyface.png');  /* threejsfundamentals: url */
-  makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.png');   /* threejsfundamentals: url */
+  makeInstance(geometry, 'pink',       0,             'resources/images/happyface.png');  /* threejs.org: url */
+  makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.png');   /* threejs.org: url */
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;

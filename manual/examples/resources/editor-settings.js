@@ -13,6 +13,25 @@ function getPrefix(url) {
   return prefix;
 }
 
+function getRootPrefix(url) {
+  const u = new URL(url, window.location.href);
+  return u.origin;
+}
+
+function removeDotDotSlash(url) {
+  // assumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
+  const parts = url.split('/');
+  for (;;) {
+    const dotDotNdx = parts.indexOf('..');
+    if (dotDotNdx < 0) {
+      break;
+    }
+    parts.splice(dotDotNdx - 1, 2);
+  }
+  const newUrl = parts.join('/');
+  return newUrl;
+}
+
 /**
  * Fix any local URLs into fully qualified urls.
  *
@@ -37,16 +56,25 @@ function fixSourceLinks(url, source) {
   const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
   const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
   const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
-  const threejsfundamentalsUrlRE = /(.*?)('|")([^"']*?)('|")([^'"]*?)(\/\*\s+threejsfundamentals:\s+url\s+\*\/)/ig;
+  const threejsUrlRE = /(.*?)('|")([^"']*?)('|")([^'"]*?)(\/\*\s+threejs.org:\s+url\s+\*\/)/ig;
   const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
   const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
   const workerRE = /(new\s+Worker\s*\(\s*)('|")(.*?)('|")/g;
   const importScriptsRE = /(importScripts\s*\(\s*)('|")(.*?)('|")/g;
   const moduleRE = /(import.*?)('|")(.*?)('|")/g;
   const prefix = getPrefix(url);
+  const rootPrefix = getRootPrefix(url);
+
+  function addCorrectPrefix(url) {
+    return (url.startsWith('/'))
+       ? `${rootPrefix}${url}`
+       : removeDotDotSlash((prefix + url).replace(/\/.\//g, '/'));
+  }
 
   function addPrefix(url) {
-    return url.indexOf('://') < 0 && !url.startsWith('data:') && url[0] !== '?' ? (prefix + url).replace(/\/.\//g, '/') : url;
+    return url.indexOf('://') < 0 && !url.startsWith('data:') && url[0] !== '?'
+        ? removeDotDotSlash(addCorrectPrefix(url))
+        : url;
   }
   function makeLinkFDedQuotes(match, fn, q1, url, q2) {
     return fn + q1 + addPrefix(url) + q2;
@@ -76,7 +104,7 @@ function fixSourceLinks(url, source) {
   source = source.replace(workerRE, makeLinkFDedQuotes);
   source = source.replace(importScriptsRE, makeLinkFDedQuotes);
   source = source.replace(loaderArrayLoadRE, makeArrayLinksFDed);
-  source = source.replace(threejsfundamentalsUrlRE, makeTaggedFDedQuotes);
+  source = source.replace(threejsUrlRE, makeTaggedFDedQuotes);
   source = source.replace(moduleRE, makeFDedQuotes);
 
   return source;
@@ -98,8 +126,43 @@ function extraHTMLParsing(html /* , htmlParts */) {
  * @param {string} js JavaScript source
  * @returns {string} The JavaScript source with any fixes applied.
  */
-function fixJSForCodeSite(js) {
-  // not yet needed for three.js
+let version;
+async function fixJSForCodeSite(js) {
+  const moduleRE = /(import.*?)('|")(.*?)('|")/g;
+
+  // convert https://threejs.org/build/three.module.js -> https://cdn.skypack.dev/three@<version>
+  // convert https://threejs.org/examples/jsm/.?? -> https://cdn.skypack.dev/three@<version>/examples/jsm/.??
+
+  if (!version) {
+    try {
+      const res = await fetch('https://raw.githubusercontent.com/mrdoob/three.js/master/package.json');
+      const json = await res.json();
+      version = json.version;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function addVersion(href) {
+    if (href.startsWith(window.location.origin)) {
+      if (href.includes('/build/three.module.js')) {
+        return `https://cdn.skypack.dev/three@${version}`;
+      } else if (href.includes('/examples/jsm/')) {
+        const url = new URL(href);
+        return `https://cdn.skypack.dev/three@${version}${url.pathname}${url.search}${url.hash}`;
+      }
+    }
+    return href;
+  }
+
+  function addVersionToURL(match, start, q1, url, q2) {
+    return start + q1 + addVersion(url) + q2;
+  }
+
+  if (version !== undefined) {
+    js = js.replace(moduleRE, addVersionToURL);
+  }
+
   return js;
 }
 
@@ -111,9 +174,9 @@ window.lessonEditorSettings = {
   lessonSettings: {
     glDebug: false,
   },
-  tags: ['three.js', 'threejsfundamentals.org'],
-  name: 'threejsfundamentals',
-  icon: '/threejs/lessons/resources/threejsfundamentals-icon-256.png',
+  tags: ['three.js'],
+  name: 'three.js',
+  icon: '/files/icon.svg',
 };
 
 }());

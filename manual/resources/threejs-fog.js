@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r132/build/three.module.js';
-import {GLTFLoader} from '../../resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from '../../build/three.module.js';
+import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
@@ -34,7 +34,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
       roughness: 1,
       metalness: 0,
     };
-    loader.load('/threejs/resources/models/simple_house_scene/scene.gltf', (gltf) => {
+    loader.load('/manual/examples/resources/models/simple_house_scene/scene.gltf', (gltf) => {
       const hackGeometry = new THREE.CircleGeometry(0.5, 32);
       const box = new THREE.Box3();
       const size = new THREE.Vector3();

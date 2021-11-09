@@ -1,4 +1,4 @@
-import * as THREE from '../../resources/threejs/r132/build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
@@ -18,7 +18,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     };
   }
 
-  const filterTextureInfo = loadTextureAndPromise('/threejs/lessons/resources/images/mip-example.png');
+  const filterTextureInfo = loadTextureAndPromise('/manual/resources/images/mip-example.png');
   const filterTexture = filterTextureInfo.texture;
   const filterTexturePromise = filterTextureInfo.promise;
 
@@ -99,7 +99,6 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     ctx.canvas.width = size * scale;
     ctx.canvas.height = size * scale;
     ctx.scale(scale, scale);
-    ctx.fillStyle = level & 1 ? '#DDD' : '#000';
     ctx.fillStyle = `hsl(${180 + u * 360 | 0},100%,20%)`;
     ctx.fillRect(0, 0, size, size);
     ctx.fillStyle = `hsl(${u * 360 | 0},100%,50%)`;

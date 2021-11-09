@@ -21,8 +21,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
-import {GUI} from '../3rdparty/dat.gui.module.js';
+import * as THREE from '../../build/three.module.js';
+import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -38,10 +38,10 @@ function main() {
 
   const scene = new THREE.Scene();
 
-  // We use this class to pass to dat.gui
+  // We use this class to pass to lil-gui
   // so when it manipulates near or far
   // near is never > far and far is never < near
-  // Also when dat.gui maniplates color we'll
+  // Also when lil-gui maniplates color we'll
   // update both the fog and background colors.
   class FogGUIHelper {
     constructor(fog, backgroundColor) {

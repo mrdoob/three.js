@@ -1,9 +1,22 @@
+:root {
+	--page-padding: 24px;
+
+  /* these are overridden in manual/<lang>/lang.css */
+  --article-font-family: Georgia, serif;
+  --headline-font-family: sans-serif;
+  /* a block of code */
+  --code-block-font-family: "Lucida Console", Monaco, monospace;
+  /* a word in a sentence */
+  --code-font-family: monospace;
+
+}
 
 body {
   margin: 0;
   font-family: var(--article-font-family);
   font-size: 19px;
   line-height: 150%;
+  padding: var(--page-padding);
 }
 
 p + p {
@@ -132,60 +145,6 @@ div[data-diagram] {
 .threejs_example {
     width: 100%;
     height: 500px;
-}
-.threejs_header {
-    background-image: url(/threejs/lessons/resources/banner-00.jpg);
-    background-size: cover;
-    background-position: center, center;
-    padding: 1em;
-    text-align: center;
-    position: relative;
-}
-.threejs_header h1 {
-    font-size: 5vw;
-    margin: 0;
-    background-image: url(/threejs/lessons/resources/logo.png);
-    background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
-
-    font-weight: bold;
-    color: black;
-    /*
-    text-shadow: 0px 0px 15px #fff,
-                 0px 0px 5px #fff,
-                 0px 0px 10px #fff;
-    */
-}
-.threejs_header a {
-    color: rgba(0, 0, 0, 0);
-    text-decoration: none;
-}
-.threejs_navbar {
-    background: black;
-    color: white;
-}
-.threejs_navbar a {
-    color: white;
-}
-.threejs_navbar>div {
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.threejs_navbar>div>* {
-    display: block;
-    margin: .25em 0;
-}
-.threejs_navbar select {
-    background: #444;
-    border: none;
-    font-size: large;
-    color: white;
-}
-.home-lang select {
-    font-size: large;
 }
 .color {
   padding: 0.25em;
@@ -538,6 +497,17 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
     }
 }
 
+@media all and ( min-width: 1700px ) {
+  :root {
+    --page-padding: 28px;
+  }
+}
+
+@media all and ( max-width: 640px ) {
+  :root {
+    --page-padding: 16px;
+  }
+}
 
 @media (prefers-color-scheme: dark) {
   html {

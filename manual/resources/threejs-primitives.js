@@ -1,9 +1,8 @@
-console.log('here!');
-
-import * as THREE from '../../resources/threejs/r132/build/three.module.js';
-console.log('here!2');
+import * as THREE from '../../build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
-console.log('here!3');
+import {FontLoader} from '../../examples/jsm/loaders/FontLoader.js';
+import {ParametricGeometry} from '../../examples/jsm/geometries/ParametricGeometry.js';
+import {TextGeometry} from '../../examples/jsm/geometries/TextGeometry.js';
 
 {
   const darkColors = {
@@ -17,9 +16,9 @@ console.log('here!3');
   const isDarkMode = darkMatcher.matches;
   const colors = isDarkMode ? darkColors : lightColors;
 
-  const fontLoader = new THREE.FontLoader();
+  const fontLoader = new FontLoader();
   const fontPromise = new Promise((resolve) => {
-    fontLoader.load('/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json', resolve);
+    fontLoader.load('/examples/fonts/helvetiker_regular.typeface.json', resolve);
   });
 
   const diagrams = {
@@ -332,7 +331,7 @@ return geometry;
           target.set(x, y, z).multiplyScalar(0.75);
         }
 
-        return new THREE.ParametricGeometry(
+        return new ParametricGeometry(
             klein, slices, stacks);
       },
     },
@@ -475,7 +474,7 @@ return geometry;
       create(text = 'three.js', size = 3, height = 0.2, curveSegments = 12, bevelEnabled = true, bevelThickness = 0.15, bevelSize = 0.3, bevelSegments = 5) {
         return new Promise((resolve) => {
           fontPromise.then((font) => {
-            resolve(new THREE.TextGeometry(text, {
+            resolve(new TextGeometry(text, {
               font: font,
               size,
               height,
@@ -966,7 +965,7 @@ const geometry = new THREE.WireframeGeometry(
               inputHolder.appendChild(input);
               input.addEventListener('input', () => {
                 params[name] = input.value;
-                valueElem.textContent = `'${input.value.replace(/'/g, '\'')}'`;
+                valueElem.textContent = `'${input.value}'`;
                 updateGeometry(root, info, params);
               });
               break;

@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Three.js - WebVR - Point to Select w/Move</title>
+    <title>Three.js - WebXR - Point to Select w/Move</title>
     <style>
     html, body {
         height: 100%;
@@ -21,8 +21,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
-import {VRButton} from './resources/threejs/r132/examples/jsm/webxr/VRButton.js';
+import * as THREE from '../../build/three.module.js';
+import {VRButton} from '../../examples/jsm/webxr/VRButton.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -38,6 +38,11 @@ function main() {
   camera.position.set(0, 1.6, 0);
 
   const scene = new THREE.Scene();
+  // object to put pickable objects on so we can easily
+  // separate them from non-pickable objects
+  const pickRoot = new THREE.Object3D();
+  scene.add(pickRoot);
+
   {
     const loader = new THREE.CubeTextureLoader();
     const texture = loader.load([
@@ -71,7 +76,7 @@ function main() {
     const material = new THREE.MeshPhongMaterial({color});
 
     const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    pickRoot.add(cube);
 
     cube.position.x = x;
     cube.position.y = 1.6;
@@ -146,7 +151,7 @@ function main() {
       this.objectToColorMap.clear();
       this.controllerToObjectMap.clear();
     }
-    update(scene, time) {
+    update(pickablesParent, time) {
       this.reset();
       for (const {controller, line} of this.controllers) {
         // cast a ray through the from the controller
@@ -154,7 +159,7 @@ function main() {
         this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
         this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix);
         // get the list of objects the ray intersected
-        const intersections = this.raycaster.intersectObjects(scene.children);
+        const intersections = this.raycaster.intersectObjects(pickablesParent.children);
         if (intersections.length) {
           const intersection = intersections[0];
           // make the line touch the object
@@ -229,7 +234,7 @@ function main() {
       ++ndx;
     }
 
-    pickHelper.update(scene, time);
+    pickHelper.update(pickRoot, time);
 
     renderer.render(scene, camera);
   }

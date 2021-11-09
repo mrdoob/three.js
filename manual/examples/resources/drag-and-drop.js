@@ -68,7 +68,7 @@ export function setup(options) {
   dragElem.addEventListener('drop', (e) => {
     e.preventDefault();
     showDragInfo(false);
-    if (e.dataTransfer.items && e.dataTransfer.items) {
+    if (e.dataTransfer.items) {
       let fileNdx = 0;
       for (let i = 0; i < e.dataTransfer.items.length; ++i) {
         const item = e.dataTransfer.items[i];

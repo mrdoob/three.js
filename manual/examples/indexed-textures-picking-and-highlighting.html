@@ -59,8 +59,8 @@
     </div>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r132/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '../../build/three.module.js';
+import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -179,7 +179,7 @@ function main() {
   let numCountriesSelected = 0;
   let countryInfos;
   async function loadCountryData() {
-    countryInfos = await loadJSON('resources/data/world/country-info.json');  /* threejsfundamentals: url */
+    countryInfos = await loadJSON('resources/data/world/country-info.json');  /* threejs.org: url */
 
     const lonFudge = Math.PI * 1.5;
     const latFudge = Math.PI;
