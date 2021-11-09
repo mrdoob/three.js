@@ -1,5 +1,0 @@
-{{#each langs}}
-  <link rel="alternate" hreflang="{{lang}}" href="https://webglfundamentals.org{{url}}">
-{{/each}}
-
-
