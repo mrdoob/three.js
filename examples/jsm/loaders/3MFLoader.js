@@ -47,7 +47,7 @@ class ThreeMFLoader extends Loader {
 		super( manager );
 
 		this.availableExtensions = [];
-		this.defaultMaterialColor = new Color (0xaaaaff);
+		this.defaultMaterialColor = new Color( 0xaaaaff );
 
 	}
 
