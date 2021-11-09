@@ -47,7 +47,14 @@ class ThreeMFLoader extends Loader {
 		super( manager );
 
 		this.availableExtensions = [];
+		this.defaultMaterialColor = 0xaaaaff;
 
+	}
+
+	setDefaultMaterialColor( defaultMaterialColor ) {
+		
+		this.defaultMaterialColor = defaultMaterialColor;
+		
 	}
 
 	load( url, onLoad, onProgress, onError ) {
@@ -1077,7 +1084,7 @@ class ThreeMFLoader extends Loader {
 			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
 			geometry.setAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
-			const material = new MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
+			const material = new MeshPhongMaterial( { color: scope.defaultMaterialColor, flatShading: true } );
 
 			const mesh = new Mesh( geometry, material );
 
