@@ -10,7 +10,6 @@ import {
 	RGBDEncoding,
 	RGBEEncoding,
 	RGBEFormat,
-	RGBAFormat,
 	RGBM16Encoding,
 	RGBM7Encoding,
 	UnsignedByteType,
@@ -350,7 +349,7 @@ class PMREMGenerator {
 
 	_setEncoding( uniform, texture ) {
 
-		if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
+		/* if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
 
 			uniform.value = ENCODINGS[ LinearEncoding ];
 
@@ -358,7 +357,9 @@ class PMREMGenerator {
 
 			uniform.value = ENCODINGS[ texture.encoding ];
 
-		}
+		} */
+
+		uniform.value = ENCODINGS[ texture.encoding ];
 
 	}
 
