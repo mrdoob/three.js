@@ -285,6 +285,6 @@ class LineSegments2 extends Mesh {
 
 }
 
-LineSegments2.prototype.LineSegments2 = true;
+LineSegments2.prototype.isLineSegments2 = true;
 
 export { LineSegments2 };
