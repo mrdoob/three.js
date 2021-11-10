@@ -51,5 +51,15 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 			This could be because of face culling. Faces have an orientation that  decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
+
+		<h2>Why is non-uniform scaling problematic?</h2>
+		<p>
+			Applying non-uniform vector components like (1, 2, 1) to [page:Object3D.scale] results in so called non-uniform scaling. This type of transformation is only partially
+			supported by three.js since certain methods like [page:Object3D.attach]() do not properly handle it. The most common errror appears when an object has a non-uniformly scaled parent.
+			In this case, it is not possible to decompose the object's world matrix which eventually breaks subsequent code.
+		</p>
+		<p>
+			To avoid siutations like that in the first place, try to avoid non-uniform scaling whenever possible.
+		</p>
 	</body>
 </html>
