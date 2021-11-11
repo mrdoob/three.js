@@ -469,28 +469,28 @@ class BufferGeometry extends EventDispatcher {
 
 	computeTangents() {
 
-		const index = this.index;
 		const attributes = this.attributes;
 
 		// based on http://www.terathon.com/code/tangent.html
 		// (per vertex tangents)
 
-		if ( index === null ||
-			 attributes.position === undefined ||
+		if ( attributes.position === undefined ||
 			 attributes.normal === undefined ||
 			 attributes.uv === undefined ) {
 
-			console.error( 'THREE.BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)' );
+			console.error( 'THREE.BufferGeometry: .computeTangents() failed. Missing required attributes (position, normal or uv)' );
 			return;
 
 		}
 
-		const indices = index.array;
+		const index = this.index;
+		const indices = index ? index.array : null;
 		const positions = attributes.position.array;
 		const normals = attributes.normal.array;
 		const uvs = attributes.uv.array;
 
 		const nVertices = positions.length / 3;
+		const nIndices = index ? index.count : nVertices;
 
 		if ( attributes.tangent === undefined ) {
 
@@ -561,7 +561,7 @@ class BufferGeometry extends EventDispatcher {
 
 			groups = [ {
 				start: 0,
-				count: indices.length
+				count: nIndices
 			} ];
 
 		}
@@ -575,11 +575,23 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
-				handleTriangle(
-					indices[ j + 0 ],
-					indices[ j + 1 ],
-					indices[ j + 2 ]
-				);
+				if ( indices !== null ) {
+
+					handleTriangle(
+						indices[ j + 0 ],
+						indices[ j + 1 ],
+						indices[ j + 2 ]
+					);
+
+				} else {
+
+					handleTriangle(
+						j + 0,
+						j + 1,
+						j + 2,
+					);
+
+				}
 
 			}
 
@@ -622,9 +634,19 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
-				handleVertex( indices[ j + 0 ] );
-				handleVertex( indices[ j + 1 ] );
-				handleVertex( indices[ j + 2 ] );
+				if ( indices !== null ) {
+
+					handleVertex( indices[ j + 0 ] );
+					handleVertex( indices[ j + 1 ] );
+					handleVertex( indices[ j + 2 ] );
+
+				} else {
+
+					handleVertex( j + 0 );
+					handleVertex( j + 1 );
+					handleVertex( j + 2 );
+
+				}
 
 			}
 
