@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -26,7 +25,7 @@
 
 		} else {
 
-			var warning = WEBGL.getWebGLErrorMessage();
+			const warning = WEBGL.getWebGLErrorMessage();
 			document.getElementById( 'container' ).appendChild( warning );
 
 		}

@@ -1,17 +1,20 @@
-import { UIPanel, UIRow, UISelect, UIText, UIInteger } from './libs/ui.js';
+import { UIPanel, UIRow, UISelect, UISpan, UIText } from './libs/ui.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
+import { SidebarSettingsHistory } from './Sidebar.Settings.History.js';
 
 function SidebarSettings( editor ) {
 
 	var config = editor.config;
 	var strings = editor.strings;
 
-	var container = new UIPanel();
-	container.setBorderTop( '0' );
-	container.setPaddingTop( '20px' );
-	container.setPaddingBottom( '20px' );
+	var container = new UISpan();
+
+	var settings = new UIPanel();
+	settings.setBorderTop( '0' );
+	settings.setPaddingTop( '20px' );
+	container.add( settings );
 
 	// language
 
@@ -42,30 +45,13 @@ function SidebarSettings( editor ) {
 	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
 	languageRow.add( language );
 
-	container.add( languageRow );
-
-	// export precision
-
-	var exportPrecisionRow = new UIRow();
-	var exportPrecision = new UIInteger( config.getKey( 'exportPrecision' ) ).setRange( 2, Infinity );
-
-	exportPrecision.onChange( function () {
-
-		var value = this.getValue();
-
-		editor.config.setKey( 'exportPrecision', value );
-
-	} );
-
-	exportPrecisionRow.add( new UIText( strings.getKey( 'sidebar/settings/exportPrecision' ) ).setWidth( '90px' ) );
-	exportPrecisionRow.add( exportPrecision );
-
-	container.add( exportPrecisionRow );
+	settings.add( languageRow );
 
 	//
 
-	container.add( new SidebarSettingsShortcuts( editor ) );
 	container.add( new SidebarSettingsViewport( editor ) );
+	container.add( new SidebarSettingsShortcuts( editor ) );
+	container.add( new SidebarSettingsHistory( editor ) );
 
 	return container;
 

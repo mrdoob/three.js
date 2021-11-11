@@ -155,13 +155,13 @@ export default QUnit.module( 'Core', () => {
 			var raycaster = getRaycaster();
 			var objectsToCheck = getObjectsToCheck();
 
-			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ] ).length === 1,
+			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ], false ).length === 1,
 				"no recursive search should lead to one hit" );
 
-			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ], true ).length === 3,
+			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ] ).length === 3,
 				"recursive search should lead to three hits" );
 
-			var intersections = raycaster.intersectObject( objectsToCheck[ 0 ], true );
+			var intersections = raycaster.intersectObject( objectsToCheck[ 0 ] );
 			for ( var i = 0; i < intersections.length - 1; i ++ ) {
 
 				assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, "intersections are sorted" );
@@ -175,13 +175,13 @@ export default QUnit.module( 'Core', () => {
 			var raycaster = getRaycaster();
 			var objectsToCheck = getObjectsToCheck();
 
-			assert.ok( raycaster.intersectObjects( objectsToCheck ).length === 1,
+			assert.ok( raycaster.intersectObjects( objectsToCheck, false ).length === 1,
 				"no recursive search should lead to one hit" );
 
-			assert.ok( raycaster.intersectObjects( objectsToCheck, true ).length === 3,
+			assert.ok( raycaster.intersectObjects( objectsToCheck ).length === 3,
 				"recursive search should lead to three hits" );
 
-			var intersections = raycaster.intersectObjects( objectsToCheck, true );
+			var intersections = raycaster.intersectObjects( objectsToCheck );
 			for ( var i = 0; i < intersections.length - 1; i ++ ) {
 
 				assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, "intersections are sorted" );

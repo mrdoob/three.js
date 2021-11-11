@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,7 +18,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var controls = new DragControls( objects, camera, renderer.domElement );
+		const controls = new DragControls( objects, camera, renderer.domElement );
 
 		// add event listener to highlight dragged objects
 
@@ -102,17 +101,17 @@
 
 		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
 
-		<h3>[method:null activate] ()</h3>
+		<h3>[method:undefined activate] ()</h3>
 		<p>
 			添加控制器的事件监听。
 		</p>
 
-		<h3>[method:null deactivate] ()</h3>
+		<h3>[method:undefined deactivate] ()</h3>
 		<p>
 			移除控制器的事件监听。
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			若不再需要该控制器，则应当调用此函数。
 		</p>

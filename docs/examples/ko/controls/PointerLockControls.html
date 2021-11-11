@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		해당 클래스의 구현은 [link:https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API Pointer Lock API] 를 기반으로 합니다. [name] 은 1 인칭 3D 게임을 위한 완벽한 선택입니다.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const controls = new PointerLockControls( camera, document.body );
+
+		// UI를 표시하거나 숨기기 위해 이벤트 리스너를 추가합니다. (예시: 게임 메뉴)
+
+		controls.addEventListener( 'lock', function () {
+
+			menu.style.display = 'none';
+
+		} );
+
+		controls.addEventListener( 'unlock', function () {
+
+			menu.style.display = 'block';
+
+		} );
+		</code>
+
+		<h2>예시</h2>
+
+		<p>[example:misc_controls_pointerlock misc / controls / pointerlock ]</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+			[page:Camera camera]: 렌더링 된 장면의 카메라입니다.
+			</p>
+			<p>
+			[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
+			</p>
+			<p>
+				새로운 [name] 객체를 생성합니다.
+			</p>
+		</p>
+
+		<h2>이벤트</h2>
+
+		<h3>change</h3>
+		<p>
+			사용자 마우스가 움직일 떄 호출됩니다.
+		</p>
+
+		<h3>lock</h3>
+		<p>
+			포인터의 잠금 상태가 "잠김" 일 때 호출됩니다 (in other words: the mouse is captured).
+		</p>
+
+		<h3>unlock</h3>
+		<p>
+			포인터의 잠금 상태가 "잠금 해제" 일 때 호출됩니다. (in other words: the mouse is not captured anymore)
+		</p>
+
+		<h2>특성</h2>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			마우스 / 터치 이벤트를 수신하는 데 사용되는 HTMLDOMElement입니다. 이것은 생성자에 의해 설정되어야 합니다; 
+			생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
+		</p>
+
+
+		<h3>[property:Boolean isLocked]</h3>
+		<p>
+			컨트롤의 잠김 여부를 설정합니다.
+		</p>
+
+		<h3>[property:Float maxPolarAngle]</h3>
+		<p>
+			카메라 피치(pitch)의 상한값을 설정합니다. 0 부터 Math.PI 라디안까지 범위를 가질 수 있습니다. 기본값은 Math.PI 입니다.
+		</p>
+
+		<h3>[property:Float minPolarAngle]</h3>
+		<p>
+			카메라 피치(pitch)의 하한값을 설정합니다. 0 부터 Math.PI 라디안까지 범위를 가질 수 있습니다. 기본값은 0 입니다.
+		</p>
+
+		<h2>메소드</h2>
+		<p>일반적인 메소드는 [page:EventDispatcher] 클래스를 참조하세요.</p>
+		
+
+		<h3>[method:undefined connect] ()</h3>
+		<p>
+			컨트롤의 이벤트 리스너를 추가합니다.			
+		</p>
+
+		<h3>[method:undefined disconnect] ()</h3>
+		<p>
+			컨트롤의 이벤트 리스너를 제거합니다.
+		</p>
+
+		<h3>[method:Vector3 getDirection] ( [param:Vector3 target] )</h3>
+		<p>
+			<p>
+				[page:Vector3 target]: 타겟 벡터를 의미합니다.
+			</p>
+			<p>
+				카메라가 보고있는 방향을 반환합니다.
+			</p>
+		</p>
+
+		<h3>[method:undefined lock] ()</h3>
+		<p>
+			포인터 잠금을 활성화합니다.
+		</p>
+
+		<h3>[method:undefined moveForward] ( [param:Number distance] )</h3>
+		<p>
+			<p>
+				[page:Number distance]: 앞으로 이동할 거리를 설정합니다.
+			</p>
+			<p>
+				카메라를 xz-평면에 평행하게 앞으로 이동합니다. camera.up을 y-up이라고 가정합니다.
+			</p>
+		</p>
+
+		<h3>[method:undefined moveRight] ( [param:Number distance] )</h3>
+		<p>
+			<p>
+				[page:Number distance]: 오른쪽으로 이동할 거리를 설정합니다.
+			</p>
+			<p>
+				카메라를 xz 평면에 평행하게 옆으로 이동합니다.
+			</p>
+		</p>
+
+		<h3>[method:undefined unlock] ()</h3>
+		<p>
+			포인터 잠금을 종료합니다.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js examples/jsm/controls/PointerLockControls.js]
+		</p>
+	</body>
+</html>

@@ -9,13 +9,15 @@ export default QUnit.module( 'Maths', () => {
 		// Since this is an abstract base class, we have to make it concrete in order
 		// to QUnit.test its functionality...
 
-		function Mock( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+		class Mock extends Interpolant {
 
-			Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+			constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+				super( parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+			}
 
 		}
-
-		Mock.prototype = Object.create( Interpolant.prototype );
 
 		Mock.prototype.intervalChanged_ = function intervalChanged( i1, t0, t1 ) {
 

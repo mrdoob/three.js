@@ -16,52 +16,52 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ColladaExporter } from './jsm/exporters/ColladaExporter.js';
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
 			////////////////////////////////////////////////////////////////////////////////
 			/*global window */
 
-			var camera, scene, renderer;
-			var cameraControls;
-			var effectController;
-			var teapotSize = 400;
-			var ambientLight, light;
+			let camera, scene, renderer;
+			let cameraControls;
+			let effectController;
+			const teapotSize = 100; // vertical height of the teapot is about 2x this, we scale it to millimeters.
+			let ambientLight, light;
 
-			var tess = - 1;	// force initialization
-			var bBottom;
-			var bLid;
-			var bBody;
-			var bFitLid;
-			var bNonBlinn;
-			var shading;
-			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, normalMaterial, reflectiveMaterial;
+			let tess = - 1;	// force initialization
+			let bBottom;
+			let bLid;
+			let bBody;
+			let bFitLid;
+			let bNonBlinn;
+			let shading;
+			let wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, normalMaterial, reflectiveMaterial;
 
-			var teapot, textureCube;
+			let teapot, textureCube;
 
 			// allocate these just once
-			var diffuseColor = new THREE.Color();
-			var specularColor = new THREE.Color();
+			const diffuseColor = new THREE.Color();
+			const specularColor = new THREE.Color();
 
 			init();
 			render();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				// CAMERA
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
-				camera.position.set( - 600, 550, 1300 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( - 150, 137.5, 325 );
 
 				// LIGHTS
 				ambientLight = new THREE.AmbientLight( 0x333333 );	// 0.2
@@ -77,38 +77,38 @@
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// CONTROLS
 				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var loader = new THREE.TextureLoader();
+				const loader = new THREE.TextureLoader();
 
-				var textureMap = loader.load( 'textures/uv_grid_opengl.jpg' );
+				const textureMap = loader.load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
 				textureMap.encoding = THREE.sRGBEncoding;
 
 				// NORMAL MAP
 
-				var diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
-				var normalMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
+				const diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				const normalMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 
 				// REFLECTION MAP
-				var path = "textures/cube/pisa/";
-				var urls = [
-					path + "px.png", path + "nx.png",
-					path + "py.png", path + "ny.png",
-					path + "pz.png", path + "nz.png"
+				const path = 'textures/cube/pisa/';
+				const urls = [
+					path + 'px.png', path + 'nx.png',
+					path + 'py.png', path + 'ny.png',
+					path + 'pz.png', path + 'nz.png'
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
-				var materialColor = new THREE.Color();
+				const materialColor = new THREE.Color();
 				materialColor.setRGB( 1.0, 1.0, 1.0 );
 
 				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
@@ -141,8 +141,8 @@
 
 			function onWindowResize() {
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				renderer.setSize( canvasWidth, canvasHeight );
 
@@ -182,60 +182,60 @@
 					body: true,
 					fitLid: false,
 					nonblinn: false,
-					newShading: "glossy"
+					newShading: 'glossy'
 				};
 
-				var h;
+				let h;
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				// material (attributes)
 
-				h = gui.addFolder( "Material control" );
+				h = gui.addFolder( 'Material control' );
 
-				h.add( effectController, "shininess", 1.0, 400.0, 1.0 ).name( "shininess" ).onChange( render );
-				h.add( effectController, "kd", 0.0, 1.0, 0.025 ).name( "diffuse strength" ).onChange( render );
-				h.add( effectController, "ks", 0.0, 1.0, 0.025 ).name( "specular strength" ).onChange( render );
-				h.add( effectController, "metallic" ).onChange( render );
+				h.add( effectController, 'shininess', 1.0, 400.0, 1.0 ).name( 'shininess' ).onChange( render );
+				h.add( effectController, 'kd', 0.0, 1.0, 0.025 ).name( 'diffuse strength' ).onChange( render );
+				h.add( effectController, 'ks', 0.0, 1.0, 0.025 ).name( 'specular strength' ).onChange( render );
+				h.add( effectController, 'metallic' ).onChange( render );
 
 				// material (color)
 
-				h = gui.addFolder( "Material color" );
+				h = gui.addFolder( 'Material color' );
 
-				h.add( effectController, "hue", 0.0, 1.0, 0.025 ).name( "hue" ).onChange( render );
-				h.add( effectController, "saturation", 0.0, 1.0, 0.025 ).name( "saturation" ).onChange( render );
-				h.add( effectController, "lightness", 0.0, 1.0, 0.025 ).name( "lightness" ).onChange( render );
+				h.add( effectController, 'hue', 0.0, 1.0, 0.025 ).name( 'hue' ).onChange( render );
+				h.add( effectController, 'saturation', 0.0, 1.0, 0.025 ).name( 'saturation' ).onChange( render );
+				h.add( effectController, 'lightness', 0.0, 1.0, 0.025 ).name( 'lightness' ).onChange( render );
 
 				// light (point)
 
-				h = gui.addFolder( "Lighting" );
+				h = gui.addFolder( 'Lighting' );
 
-				h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name( "hue" ).onChange( render );
-				h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name( "saturation" ).onChange( render );
-				h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name( "lightness" ).onChange( render );
-				h.add( effectController, "ka", 0.0, 1.0, 0.025 ).name( "ambient" ).onChange( render );
+				h.add( effectController, 'lhue', 0.0, 1.0, 0.025 ).name( 'hue' ).onChange( render );
+				h.add( effectController, 'lsaturation', 0.0, 1.0, 0.025 ).name( 'saturation' ).onChange( render );
+				h.add( effectController, 'llightness', 0.0, 1.0, 0.025 ).name( 'lightness' ).onChange( render );
+				h.add( effectController, 'ka', 0.0, 1.0, 0.025 ).name( 'ambient' ).onChange( render );
 
 				// light (directional)
 
-				h = gui.addFolder( "Light direction" );
+				h = gui.addFolder( 'Light direction' );
 
-				h.add( effectController, "lx", - 1.0, 1.0, 0.025 ).name( "x" ).onChange( render );
-				h.add( effectController, "ly", - 1.0, 1.0, 0.025 ).name( "y" ).onChange( render );
-				h.add( effectController, "lz", - 1.0, 1.0, 0.025 ).name( "z" ).onChange( render );
+				h.add( effectController, 'lx', - 1.0, 1.0, 0.025 ).name( 'x' ).onChange( render );
+				h.add( effectController, 'ly', - 1.0, 1.0, 0.025 ).name( 'y' ).onChange( render );
+				h.add( effectController, 'lz', - 1.0, 1.0, 0.025 ).name( 'z' ).onChange( render );
 
-				h = gui.addFolder( "Tessellation control" );
-				h.add( effectController, "newTess", [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( "Tessellation Level" ).onChange( render );
-				h.add( effectController, "lid" ).name( "display lid" ).onChange( render );
-				h.add( effectController, "body" ).name( "display body" ).onChange( render );
-				h.add( effectController, "bottom" ).name( "display bottom" ).onChange( render );
-				h.add( effectController, "fitLid" ).name( "snug lid" ).onChange( render );
-				h.add( effectController, "nonblinn" ).name( "original scale" ).onChange( render );
+				h = gui.addFolder( 'Tessellation control' );
+				h.add( effectController, 'newTess', [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( 'Tessellation Level' ).onChange( render );
+				h.add( effectController, 'lid' ).name( 'display lid' ).onChange( render );
+				h.add( effectController, 'body' ).name( 'display body' ).onChange( render );
+				h.add( effectController, 'bottom' ).name( 'display bottom' ).onChange( render );
+				h.add( effectController, 'fitLid' ).name( 'snug lid' ).onChange( render );
+				h.add( effectController, 'nonblinn' ).name( 'original scale' ).onChange( render );
 
 				// shading
 
-				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "normal", "reflective" ] ).name( "Shading" ).onChange( render );
+				gui.add( effectController, 'newShading', [ 'wireframe', 'flat', 'smooth', 'glossy', 'textured', 'normal', 'reflective' ] ).name( 'Shading' ).onChange( render );
 
-				var exportButton = document.getElementById( 'export' );
+				const exportButton = document.getElementById( 'export' );
 				exportButton.addEventListener( 'click', exportCollada );
 
 			}
@@ -303,7 +303,7 @@
 				light.color.setHSL( effectController.lhue, effectController.lsaturation, effectController.llightness );
 
 				// skybox is rendered separately, so that it is always behind the teapot.
-				if ( shading === "reflective" ) {
+				if ( shading === 'reflective' ) {
 
 					scene.background = textureCube;
 
@@ -327,7 +327,7 @@
 
 				}
 
-				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
+				const teapotGeometry = new TeapotGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,
@@ -337,35 +337,37 @@
 
 				teapot = new THREE.Mesh(
 					teapotGeometry,
-					shading === "wireframe" ? wireMaterial : (
-						shading === "flat" ? flatMaterial : (
-							shading === "smooth" ? gouraudMaterial : (
-								shading === "glossy" ? phongMaterial : (
-									shading === "textured" ? texturedMaterial : (
-										shading === "normal" ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
+					shading === 'wireframe' ? wireMaterial : (
+						shading === 'flat' ? flatMaterial : (
+							shading === 'smooth' ? gouraudMaterial : (
+								shading === 'glossy' ? phongMaterial : (
+									shading === 'textured' ? texturedMaterial : (
+										shading === 'normal' ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
 
 				scene.add( teapot );
 
 			}
 
-			var exporter = new ColladaExporter();
+			const exporter = new ColladaExporter();
 
 			function exportCollada() {
 
-				var result = exporter.parse( teapot );
-				var material_type = "Phong";
-				if ( shading === "wireframe" ) {
+				const result = exporter.parse( teapot, undefined, { upAxis: 'Y_UP', unitName: 'millimeter', unitMeter: 0.001 } );
+				let materialType = 'Phong';
 
-					material_type = "Constant";
+				if ( shading === 'wireframe' ) {
 
-				}
-				if ( shading === "smooth" ) {
-
-					material_type = "Lambert";
+					materialType = 'Constant';
 
 				}
 
-				saveString( result.data, 'teapot_' + shading + "_" + material_type + '.dae' );
+				if ( shading === 'smooth' ) {
+
+					materialType = 'Lambert';
+
+				}
+
+				saveString( result.data, 'teapot_' + shading + '_' + materialType + '.dae' );
 
 				result.textures.forEach( tex => {
 
@@ -395,7 +397,7 @@
 
 			}
 
-			var link = document.createElement( 'a' );
+			const link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
 

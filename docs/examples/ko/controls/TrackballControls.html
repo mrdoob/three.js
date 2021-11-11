@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			<p>
+				[name] 는 [page:OrbitControls] 와 유사하지만, 카메라의 일정한 [page:Object3D.up up] vector 값을 유지하지 않습니다.
+				이 말인즉슨, 카메라가 위쪽 방향이나 아럐쪽 방향으로 회전할 경우, "오른쪽을 위로" 유지하기 위해 뒤집을 수 없습니다.
+			</p>
+		</p>
+
+		<h2>예시</h2>
+
+		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera camera]: 렌더링 된 장면의 카메라입니다.
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
+			</p>
+			<p>
+				새로운 [name] 객체를 생성합니다.
+			</p>
+		</p>
+
+		<h2>이벤트</h2>
+
+		<h3>change</h3>
+		<p>
+			컨트롤에 의해 카메라가 변환될 경우 호출됩니다.
+		</p>
+
+		<h3>start</h3>
+		<p>
+			처음으로 상호 작용이 실행되면 호출됩니다. (e.g. 터치패드)
+		</p>
+
+		<h3>end</h3>
+		<p>
+			상호 작용이 완료되면 호출됩니다.
+		</p>
+
+		<h2>특성</h2>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			마우스 / 터치 이벤트를 수신하는 데 사용되는 HTMLDOMElement입니다. 이것은 생성자에 의해 설정되어야 합니다; 생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
+		</p>
+
+		<h3>[property:Number dynamicDampingFactor]</h3>
+		<p>
+			댐핑의 강도를 조절합니다. [page:.staticMoving staticMoving] 이 * false * 로 설정된 경우에만 고려됩니다. 기본값은 *0.2* 입니다.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			컨트롤을 활성화 여부를 설정합니다.
+		</p>
+
+		<h3>[property:Array keys]</h3>
+		<p>
+			이 배열은 상호 작용을 제어하기위한 키 코드를 보유합니다.
+			<ul>
+				<li>처음 정의 된 키를 누르면 모든 마우스 상호 작용 (왼쪽, 가운데, 오른쪽)이 궤도를 회전합니다.</li>
+				<li>두 번째로 정의 된 키를 누르면 모든 마우스 상호 작용 (왼쪽, 가운데, 오른쪽)이 확대 / 축소를 수행합니다.</li>
+				<li>세 번째로 정의 된 키를 누르면 모든 마우스 상호 작용 (왼쪽, 가운데, 오른쪽)이 패닝을 수행합니다.</li>
+			</ul>
+			기본값은 A, S, D를 나타내는 *KeyA, KeyS, KeyD* 입니다.
+		</p>
+
+		<h3>[property:Number maxDistance]</h3>
+		<p>
+			축소할 수 있는 범위를 설정합니다. 기본값은 *무한대* 입니다.
+		</p>
+
+		<h3>[property:Number minDistance]</h3>
+		<p>
+			확대할 수 있는 범위를 설정합니다. 기본값은 *0* 입니다.
+		</p>
+
+		<h3>
+			[property:Object mouseButtons]</h3>
+		<p>
+			해당 객체는 컨트롤에서 사용하는 마우스 동작에 대한 참조를 포함합니다.
+			<ul>
+				<li>.LEFT 는 *THREE.MOUSE>ROTATE* 에 대입됩니다.</li>
+				<li>.MIDDLE 은 *THREE.MOUSE.ZOOM* 에 대입됩니다.</li>
+				<li>.RIGHT 는 *THREE.MOUSE.PAN* 에 대입됩니다.</li>
+			</ul>
+		</p>
+
+		<h3>[property:Boolean noPan]</h3>
+		<p>
+			패닝의 비활성화 여부를 설정합니다. 기본값은 *false* 입니다.
+		</p>
+
+		<h3>[property:Boolean noRotate]</h3>
+		<p>
+			회전의 비활성화 여부를 설정합니다. 기본값은 *false* 입니다.
+		</p>
+
+		<h3>[property:Boolean noZoom]</h3>
+		<p>
+			줌잉의 비활성화 여부를 설정합니다. 기본값은 *false* 입니다.
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			제어할 카메라 객체입니다.
+		</p>
+
+		<h3>[property:Number panSpeed]</h3>
+		<p>
+			확대 속도를 설정합니다. 기본값은 *0.3* 입니다.
+		</p>
+
+		<h3>[property:Number rotateSpeed]</h3>
+		<p>
+			회전 속도를 설정합니다. 기본값은 *1.0* 입니다.
+		</p>
+
+		<h3>[property:Object screen]</h3>
+		<p>
+			화면 속성을 나타냅니다. [page:.handleResize handleResize]()을 호출할 시 자동적으로 설정됩니다.
+			<ul>
+				<li>왼쪽: 화면의 왼쪽 경계면의 오프셋을 픽셀 단위로 나타냅니다.</li>
+				<li>상단: 화면의 상단 경계면의 오프셋을 픽셀 단위로 나타냅니다.</li>
+				<li>넓이: 화면의 넓이를 픽셀 단위로 나타냅니다.</li>
+				<li>높이: 화면의 높이를 픽셀 단위로 나타냅니다.</li>
+			</ul>
+		</p>
+
+		<h3>[property:Boolean staticMoving]</h3>
+		<p>
+			댐핑의 비활성화 여부를 설정합니다. 기본값은 *false* 입니다.
+		</p>
+
+		<h3>[property:Number zoomSpeed]</h3>
+		<p>
+			줌 속도를 설정합니다. 기본값은 *1.2* 입니다.
+		</p>
+
+		<h2>메소드</h2>
+
+		<h3>[method:undefined checkDistances] ()</h3>
+		<p>
+			컨트롤이 [minDistance, maxDistance] 범위내에 있는지 확인합니다. [page:.update update]() 에 의해 호출됩니다.
+			
+		</p>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			컨트롤이 더 이상 필요하지 않을 경우 호출해야 합니다.
+
+		</p>
+
+		<h3>[method:undefined handleResize] ()</h3>
+		<p>
+			어플리케이션의 창 크기를 조절 하려면 호출해야 합니다.
+
+		</p>
+
+		<h3>[method:undefined panCamera] ()</h3>
+		<p>
+			패닝이 필요한 경우 [page:.update update]() 을 호출하여 수행합니다.
+		</p>
+
+		<h3>[method:undefined reset] ()</h3>
+		<p>
+			컨트롤을 초기 상태로 전환합니다.
+		</p>
+
+		<h3>[method:undefined rotateCamera] ()</h3>
+		<p>
+			카메라의 회전이 필요한 경우 [page:.update update]() 을 호출하여 수행합니다.
+		</p>
+
+		<h3>[method:undefined update] ()</h3>
+		<p>
+			컨트롤을 업데이트합니다. 보통은 애니메이션 루프에서 수행합니다.
+		</p>
+
+		<h3>[method:undefined zoomCamera] ()</h3>
+		<p>
+			줌잉이 필요항 경우 [page:.update update]() 을 호출하여 수행합니다.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/TrackballControls.js examples/jsm/controls/TrackballControls.js]
+		</p>
+	</body>
+</html>

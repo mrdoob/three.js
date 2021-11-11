@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[link:https://en.wikipedia.org/wiki/Perspective_(graphical) perspective projection]을 사용하는 카메라입니다.<br /><br />
+
+			이 투영 모드는 사람의 눈으로 보는 방식을 모방하여 설계되었습니다. 3D 장면을 렌더링하는데 가장 널리 쓰이는 투영 모드입니다.
+		</p>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+		scene.add( camera );
+		</code>
+
+		<h2>예제</h2>
+
+		<p>
+			[example:webgl_animation_skinning_blending animation / skinning / blending ]<br />
+			[example:webgl_animation_skinning_morph animation / skinning / morph ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_interactive_cubes interactive / cubes ]<br />
+			[example:webgl_loader_collada_skinning loader / collada / skinning ]
+		</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
+		<p>
+		fov — 카메라 절두체 수직 시야.<br />
+		aspect — 카메라 절두체 종횡비.<br />
+		near — 카메라 절두체 근평면.<br />
+		far — 카메라 절두체 원평면.<br /><br />
+
+			카메라의 [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]을 정의합니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+		<p>
+			일반 프로퍼티는 기본 [page:Camera] 클래스를 참고하세요.<br>
+			대부분의 이 프로퍼티들은 수정한 후에 반드시 변경된 효과 적용을 위해
+			[page:PerspectiveCamera.updateProjectionMatrix .updateProjectionMatrix]를 호출해야 하는 점을 주의하세요.
+		</p>
+
+		<h3>[property:Float aspect]</h3>
+		<p>카메라 절두체 종횡비, 대부분의 경우 화면 너비 / 화면 높이 입니다. 기본값은 *1* (정사각형 화면)입니다.</p>
+
+		<h3>[property:Float far]</h3>
+		<p>
+			카메라 절두체 원평면입니다. 기본값은 *2000*입니다.<br /><br />
+
+			[page:.near near](근평면)의 현재값보다 커야 합니다.
+		</p>
+
+		<h3>[property:Float filmGauge]</h3>
+		<p>큰 축에 사용되는 필름 크기입니다. 기본값은 35(밀리미터)입니다. .filmOffset을 0이 아닌 값으로 설정하지 않는 한 이 파라미터는 투영 매트릭스에 영향을 주지 않습니다.
+		</p>
+
+		<h3>[property:Float filmOffset]</h3>
+		<p>.filmGauge와 동일한 장치의 수평 오프센터 오프셋. 기본값은 *0*입니다.</p>
+
+		<h3>[property:Float focus]</h3>
+		<p>입체 투시 및 필드 깊이 효과에 사용되는 객체 거리.
+			이 파라미터는 [page:StereoCamera]를 사용하지 않는 한 투영 매트릭스에 영향을 주지 않습니다.
+			기본값은 *10*입니다.
+		</p>
+
+		<h3>[property:Float fov]</h3>
+		<p>카메라 아래부터 위까지, 도 단위로 표시되는 수직 시야입니다. 기본값은 *50*입니다.</p>
+
+
+		<h3>[property:Float near]</h3>
+		<p>
+			카메라 절두체 근평면입니다. 기본값은 *0.1*입니다.<br /><br />
+
+			유효 범위는 0보다 크고 현재 [page:.far far](원평면) 값보다 작습니다.
+			[page:OrthographicCamera]와 달리, PerspectiveCamera의 근평면 값으로 *0*은 유요한 값이 <em>아님</em>을 주의해주세요
+		</p>
+
+		<h3>[property:Object view]</h3>
+		<p>
+			절두체 윈도우 상세 혹은 null값입니다.
+			[page:PerspectiveCamera.setViewOffset .setViewOffset] 메서드로 설정하고 [page:PerspectiveCamera.clearViewOffset .clearViewOffset]로 제거됩니다.
+		</p>
+
+		<h3>[property:number zoom]</h3>
+		<p>카메라의 확대 요소를 가져오거나 설정합니다. 기본값은 *1*입니다.</p>
+
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:Camera] 클래스를 참고하세요.</p>
+
+		<h3>[method:undefined clearViewOffset]()</h3>
+		<p>[page:PerspectiveCamera.setViewOffset .setViewOffset] 메서드로 설정된 오프셋을 모두 제거합니다.</p>
+
+		<h3>[method:Float getEffectiveFOV]()</h3>
+		<p>.zoom을 고려한 현재의 수직 시야각을 도 단위로 리턴합니다.</p>
+
+		<h3>[method:Float getFilmHeight]()</h3>
+		<p>
+		필름에 있는 이미지의 높이를 리턴합니다.
+		.aspect가 1보다 작거나 같으면(portraot 포맷) 결과는 .filmGauge와 동일합니다.
+		</p>
+
+		<h3>[method:Float getFilmWidth]()</h3>
+		<p>
+		필름에 있는 이미지의 너비를 리턴합니다.
+		.aspect가 1보다 크거나 같으면(landscape 포맷) 결과는 .filmGauge와 동일합니다.
+		</p>
+
+		<h3>[method:Float getFocalLength]()</h3>
+		<p>.filmGauge에 대해 현재 .fov의 초점 길이를 리턴합니다.</p>
+
+		<h3>[method:undefined setFocalLength]( [param:Float focalLength] )</h3>
+		<p>
+		현재 [page:PerspectiveCamera.filmGauge .filmGauge]에 대해 초점 길이로 FOV를 설정합니다.<br /><br />
+
+		기본적으로 초점 길이는 35mm(전체 프레임) 카메라로 지정됩니다.
+		</p>
+
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<p>
+		fullWidth — 멀티뷰 설정의 최대너비<br />
+		fullHeight — 멀티뷰 설정의 최대높이<br />
+		x — 서브 카메라의 수평 오프셋<br />
+		y — 서브 카메라의 수직 오프셋<br />
+		width — 서브 카메라의 너비<br />
+		height — 서브 카메라의 높이
+		</p>
+
+		<p>
+		큰 절두체의 오프셋을 설정합니다. 멀티윈도우 혹은 멀티모니터/멀티 머신 설정에 유용합니다.
+		</p>
+
+		<p>
+		예를 들어, 3x2 모니터를 가지고 있고 각 모니터가 1920x1080이면 아래 그림처럼 될 것입니다.<br />
+
+		<pre>
++---+---+---+
+| A | B | C |
++---+---+---+
+| D | E | F |
++---+---+---+
+		</pre>
+
+		각 모니터에 대해 아래처럼 호출할 수 있을 것입니다:<br />
+
+		<code>const w = 1920;
+const h = 1080;
+const fullWidth = w * 3;
+const fullHeight = h * 2;
+
+// A
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+// B
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+// C
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+// D
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+// E
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+// F
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+</code>
+
+		모니터들이 반드시 같은 크기나 구조여야 할 필요가 없다는 점을 참고하세요.
+		</p>
+
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
+		<p>
+		카메라 투영 매트릭스를 업데이트합니다. 파라미터 변경 후에 반드시 호출해야합니다.
+		</p>
+
+		<h3>[method:Object toJSON]([param:Object meta])</h3>
+		<p>
+		meta -- 객체의 자식들의 이미지와 텍스쳐같은 메타데이터를 담고 있는 객체입니다.<br />
+		카메라를 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]으로 변환합니다.
+		</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

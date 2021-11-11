@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,7 +20,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var light = new THREE.PointLight( 0xff0000, 1, 100 );
+		const light = new THREE.PointLight( 0xff0000, 1, 100 );
 		light.position.set( 50, 50, 50 );
 		scene.add( light );
 		</code>
@@ -30,7 +29,6 @@
 
 		<p>
 			[example:webgl_lights_pointlights lights / pointlights ]<br />
-			[example:webgl_lights_pointlights2 lights / pointlights2 ]<br />
 			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
 			[example:webgl_geometry_text geometry / text ]<br />
 			[example:webgl_lensflares lensflares ]
@@ -96,7 +94,7 @@
 			公共方法请查看基类 [page:Light Light]。
 		</p>
 
-		<h3>[method:PointLight copy]( [param:PointLight source] )</h3>
+		<h3>[method:this copy]( [param:PointLight source] )</h3>
 		<p>
 			将所有属性的值从源 [page:PointLight source] 复制到此点光源对象。
 		</p>

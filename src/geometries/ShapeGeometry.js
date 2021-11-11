@@ -1,62 +1,20 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
+import { Vector2 } from '../math/Vector2.js';
 
-// ShapeGeometry
+class ShapeGeometry extends BufferGeometry {
 
-class ShapeGeometry extends Geometry {
-
-	constructor( shapes, curveSegments ) {
+	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 
 		super();
 		this.type = 'ShapeGeometry';
 
-		if ( typeof curveSegments === 'object' ) {
-
-			console.warn( 'THREE.ShapeGeometry: Options parameter has been removed.' );
-
-			curveSegments = curveSegments.curveSegments;
-
-		}
-
 		this.parameters = {
 			shapes: shapes,
 			curveSegments: curveSegments
 		};
-
-		this.fromBufferGeometry( new ShapeBufferGeometry( shapes, curveSegments ) );
-		this.mergeVertices();
-
-	}
-
-	toJSON() {
-
-		const data = Geometry.prototype.toJSON.call( this );
-
-		const shapes = this.parameters.shapes;
-
-		return toJSON( shapes, data );
-
-	}
-
-}
-
-// ShapeBufferGeometry
-
-class ShapeBufferGeometry extends BufferGeometry {
-
-	constructor( shapes, curveSegments ) {
-
-		super();
-		this.type = 'ShapeBufferGeometry';
-
-		this.parameters = {
-			shapes: shapes,
-			curveSegments: curveSegments
-		};
-
-		curveSegments = curveSegments || 12;
 
 		// buffers
 
@@ -173,7 +131,7 @@ class ShapeBufferGeometry extends BufferGeometry {
 
 	toJSON() {
 
-		const data = BufferGeometry.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		const shapes = this.parameters.shapes;
 
@@ -181,9 +139,23 @@ class ShapeBufferGeometry extends BufferGeometry {
 
 	}
 
-}
+	static fromJSON( data, shapes ) {
 
-//
+		const geometryShapes = [];
+
+		for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+
+			const shape = shapes[ data.shapes[ j ] ];
+
+			geometryShapes.push( shape );
+
+		}
+
+		return new ShapeGeometry( geometryShapes, data.curveSegments );
+
+	}
+
+}
 
 function toJSON( shapes, data ) {
 
@@ -209,5 +181,4 @@ function toJSON( shapes, data ) {
 
 }
 
-
-export { ShapeGeometry, ShapeBufferGeometry };
+export { ShapeGeometry, ShapeGeometry as ShapeBufferGeometry };

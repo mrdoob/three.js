@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -39,7 +38,7 @@
 		</p>
 
 		<code>
-		var composer = new EffectComposer( renderer );
+		const composer = new EffectComposer( renderer );
 		</code>
 
 		<p>
@@ -65,10 +64,10 @@
 		</p>
 
 		<code>
-		var renderPass = new RenderPass( scene, camera );
+		const renderPass = new RenderPass( scene, camera );
 		composer.addPass( renderPass );
 
-		var glitchPass = new GlitchPass();
+		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
 		</code>
 
@@ -89,7 +88,7 @@
 
 		<p>
 			有时你或许想要自己写一个自定义后期处理着色器，并将其包含到后期处理过程链中。
-			对于这个需求，你可以使用*ShaderPass*。在引入该文件以及你的自定义着色期后，可以使用下列代码来设置该过程：
+			对于这个需求，你可以使用*ShaderPass*。在引入该文件以及你的自定义着色器后，可以使用下列代码来设置该过程：
 		</p>
 
 		<code>
@@ -98,7 +97,7 @@
 
 		// later in your init routine
 
-		var luminosityPass = new ShaderPass( LuminosityShader );
+		const luminosityPass = new ShaderPass( LuminosityShader );
 		composer.addPass( luminosityPass );
 		</code>
 

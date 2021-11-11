@@ -1,10 +1,15 @@
 import {
-	SphereBufferGeometry,
-	BoxBufferGeometry,
+	DynamicDrawUsage,
+	SphereGeometry,
+	BoxGeometry,
 	MeshStandardMaterial,
-	Mesh,
-	Group
+	InstancedMesh,
+	Matrix4,
+	Vector3
 } from '../../../build/three.module.js';
+
+const _matrix = new Matrix4();
+const _vector = new Vector3();
 
 class XRHandPrimitiveModel {
 
@@ -12,73 +17,83 @@ class XRHandPrimitiveModel {
 
 		this.controller = controller;
 		this.handModel = handModel;
+		this.envMap = null;
 
-	  this.envMap = null;
+		let geometry;
 
-		this.handMesh = new Group();
-		this.handModel.add( this.handMesh );
+		if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
 
-		if ( window.XRHand ) {
+			geometry = new SphereGeometry( 1, 10, 10 );
 
-			let geometry;
+		} else if ( options.primitive === 'box' ) {
 
-			if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
-
-				geometry = new SphereBufferGeometry( 1, 10, 10 );
-
-			} else if ( options.primitive === 'box' ) {
-
-				geometry = new BoxBufferGeometry( 1, 1, 1 );
-
-			}
-
-			const jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
-			const tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
-
-			const tipIndexes = [
-				window.XRHand.THUMB_PHALANX_TIP,
-				window.XRHand.INDEX_PHALANX_TIP,
-				window.XRHand.MIDDLE_PHALANX_TIP,
-				window.XRHand.RING_PHALANX_TIP,
-				window.XRHand.LITTLE_PHALANX_TIP
-			];
-			for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
-
-				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
-				cube.castShadow = true;
-				cube.receiveShadow = true;
-				this.handMesh.add( cube );
-
-			}
+			geometry = new BoxGeometry( 1, 1, 1 );
 
 		}
+
+		const material = new MeshStandardMaterial();
+
+		this.handMesh = new InstancedMesh( geometry, material, 30 );
+		this.handMesh.instanceMatrix.setUsage( DynamicDrawUsage ); // will be updated every frame
+		this.handMesh.castShadow = true;
+		this.handMesh.receiveShadow = true;
+		this.handModel.add( this.handMesh );
+
+		this.joints = [
+			'wrist',
+			'thumb-metacarpal',
+			'thumb-phalanx-proximal',
+			'thumb-phalanx-distal',
+			'thumb-tip',
+			'index-finger-metacarpal',
+			'index-finger-phalanx-proximal',
+			'index-finger-phalanx-intermediate',
+			'index-finger-phalanx-distal',
+			'index-finger-tip',
+			'middle-finger-metacarpal',
+			'middle-finger-phalanx-proximal',
+			'middle-finger-phalanx-intermediate',
+			'middle-finger-phalanx-distal',
+			'middle-finger-tip',
+			'ring-finger-metacarpal',
+			'ring-finger-phalanx-proximal',
+			'ring-finger-phalanx-intermediate',
+			'ring-finger-phalanx-distal',
+			'ring-finger-tip',
+			'pinky-finger-metacarpal',
+			'pinky-finger-phalanx-proximal',
+			'pinky-finger-phalanx-intermediate',
+			'pinky-finger-phalanx-distal',
+			'pinky-finger-tip'
+		];
 
 	}
 
 	updateMesh() {
 
 		const defaultRadius = 0.008;
-		const objects = this.handMesh.children;
+		const joints = this.controller.joints;
 
-		// XR Joints
-		const XRJoints = this.controller.joints;
+		let count = 0;
 
-		for ( let i = 0; i < objects.length; i ++ ) {
+		for ( let i = 0; i < this.joints.length; i ++ ) {
 
-			const jointMesh = objects[ i ];
-			const XRJoint = XRJoints[ i ];
+			const joint = joints[ this.joints[ i ] ];
 
-			if ( XRJoint.visible ) {
+			if ( joint.visible ) {
 
-				jointMesh.position.copy( XRJoint.position );
-				jointMesh.quaternion.copy( XRJoint.quaternion );
-				jointMesh.scale.setScalar( XRJoint.jointRadius || defaultRadius );
+				_vector.setScalar( joint.jointRadius || defaultRadius );
+				_matrix.compose( joint.position, joint.quaternion, _vector );
+				this.handMesh.setMatrixAt( i, _matrix );
+
+				count ++;
 
 			}
 
-			jointMesh.visible = XRJoint.visible;
-
 		}
+
+		this.handMesh.count = count;
+		this.handMesh.instanceMatrix.needsUpdate = true;
 
 	}
 

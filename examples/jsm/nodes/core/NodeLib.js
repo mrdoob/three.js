@@ -1,4 +1,4 @@
-var NodeLib = {
+const NodeLib = {
 
 	nodes: {},
 	keywords: {},

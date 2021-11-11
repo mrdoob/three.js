@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,7 +19,7 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new PDBLoader();
+		const loader = new PDBLoader();
 
 		// load a PDB resource
 		loader.load(
@@ -29,9 +28,9 @@
 			// called when the resource is loaded
 			function ( pdb ) {
 
-				var geometryAtoms = pdb.geometryAtoms;
-				var geometryBonds = pdb.geometryBonds;
-				var json = pdb.json;
+				const geometryAtoms = pdb.geometryAtoms;
+				const geometryBonds = pdb.geometryBonds;
+				const json = pdb.json;
 
 				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
 
@@ -72,7 +71,7 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string containing the path/URL of the <em>.pdb</em> file.<br />
 		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the object having the following properties. [page:BufferGeometry geometryAtoms], [page:BufferGeometry geometryBonds] and the [page:Object JSON] structure.<br />

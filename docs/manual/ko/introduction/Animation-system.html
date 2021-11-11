@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>애니메이션 시스템([name])</h1>
+
+		<h2>Overview</h2>
+
+		<p class="desc">
+            three.js 애니메이션 시스템에서는 모델의 다양한 속성을 설정할 수 있습니다:
+            [page:SkinnedMesh skinned and rigged model]의 뼈, 모프타깃, 서로 다른 재질의 속성(색상, 불투명도, 참/거짓 연산),
+            가시성과 변환이 그 예입니다. 애니메이션의 속성은 페이드 아웃, 페이드 아웃, 크로스페이드, 랩이 있습니다.
+            한 오브젝트에 대한 동시에 일어나는 다른 확대 시간 및 가중치 조절이나, 서로 다른 오브젝트간의 애니메이션도 전부 개별로 변화시킬 수 있습니다.
+            같은, 혹은 서로 다른 오브젝트틀간의 다양한 애니메이션도 싱크를 맞출 수 있습니다.
+            <br /><br />
+
+            이를 한 시스템 안에 구현하기 위해서, three.js 애니메이션 시스템은 2015년에 완전히 변경되었으며([link:https://github.com/mrdoob/three.js/issues/6881 Link])
+            되었으며(지난 정보에 주의하세요!), 현재는 Unity/Unreal Engine 4와 유사한 구조를 가지고 있습니다.
+            이 페이지에서는 어떻게 시스템 메인 컴포넌트가 구성되고 동작되는지를 간단하게 알아보겠습니다.
+
+		</p>
+
+		<h3>애니메이션 클립(Animation Clips)</h3>
+
+		<p class="desc">
+            애니메이션 3D 오브젝트를 잘 불러왔다면(구조에 골자 혹은 모프 타깃이 있는지는 상관 없습니다) — 예를 들면
+            [link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter]라는 익스포터로 추출하고
+            [page:GLTFLoader]를 사용해 three.js에 불러왔다면 — 응답 필드 중 하나가 "animations"라는 이름의 배열로 되어 있고 해당 모델에 대한
+            [page:AnimationClip AnimationClips]를 담고 있을 것입니다(활용 가능한 로더는 아래 리스트를 확인하세요).
+            <br /><br />
+
+			각각의 *AnimationClip*은 대개 해당 오브젝트의 특정 행동에 대한 데이터를 담고 있습니다.
+			예를 들어 mesh가 이름이라면, walkcycle AnimationClip 한 개와, 두 번째는 jump, 세 번째는 sidestepping 등등이 들어 있을 것입니다.
+
+		</p>
+
+		<h3>키프레임 트랙(Keyframe Tracks)</h3>
+
+		<p class="desc">
+
+            이러한 *AnimationClip* 안에는 각각의 애니메이션 속성별 데이터가 별도의 [page:KeyframeTrack]에 저장되어 있습니다.
+            [page:Skeleton skeleton] 이라는 오브젝트가 있다고 가정하면, 한 키프레임 트랙은 하완골격의 위치가 수시로 변화하는 데이터를 저장할 수 있을 것이며
+            또 다른 트랙에는 같은 뼈의 회전, 세 번째 트랙에는 다른 뼈의 위치와 회전각, 치수 등을 저장할 것입니다.
+            애니매이션 클립은 이런 트랙으로 여러 번 구성될 수 있다는 것을 잘 알아야 합니다.
+            <br /><br />
+
+            가령 모형이 모프 타깃(예를 들어 한 모프타깃은 웃는 표정, 다른 하나는 화난 표정을 나타낸다거 히면)을 가지고 있다고 하면, 각 트랙은
+            해당 모프 타깃이 변화하는 동안에 어떻게 [page:Mesh.morphTargetInfluences 영향]을 미치는지에 대한 정보를 담고 있을 것입니다.
+		</p>
+
+		<h3>애니메이션 믹서(Animation Mixer)</h3>
+
+		<p class="desc">
+
+            저장된 데이터 폼은 오직 애니메이션에 대한 기본 정보일 뿐입니다. 실제 플레이백은 [page:AnimationMixer]가 담당합니다.
+            이 믹서는 단지 애니메이션 플레이어가 아닌, 리얼 믹서 콘솔처럼 여러 애니메이션을 동시재생, 혼합, 병합재생할 수 있다는 점을 알 수 있을 것입니다.
+		</p>
+
+		<h3>애니메이션 액션(Animation Actions)</h3>
+
+		<p class="desc">
+
+			*AnimationMixer*는 아주 적은(일반적인) 속성과 메서드를 가지고 있는데,
+            [page:AnimationAction AnimationActions]으로 설정할 수 있습니다. *AnimationAction*을 설정하면
+            특정 *AnimationClip*이 언제, 어떤 믹서에서 실행, 정지, 중지되어야 하는지를 조절할 수 있으며 얼마나 반복되어야 하는지, 페이드나 타임 스케일링이 필요한지,
+            크로스페이딩이나 싱크로나이징 같은 것들이 필요한지도 설정할 수 있습니다.
+		</p>
+
+		<h3>애니메이션 오브젝트 그룹(Animation Object Groups)</h3>
+
+		<p class="desc">
+
+			같은 애니메이션 효과를 공유하는 오브젝트 그룹을 만들고 싶다면,
+			[page:AnimationObjectGroup]을 사용하면 됩니다.
+
+		</p>
+
+		<h3>지원되는 포맷 및 로더</h3>
+
+		<p class="desc">
+			애니메이션을 포함한 모든 모델들(OBJ는 확실히 안 됩니다)이 지원되는 것은 아니며, 아주 몇몇
+			three.js 로더만 [page:AnimationClip AnimationClip] 시퀀스를 지원합니다. 지원<i>되는</i>
+			애니메이션 타입은 다음과 같습니다:
+		</p>
+
+			<ul>
+				<li>[page:ObjectLoader THREE.ObjectLoader]</li>
+				<li>THREE.BVHLoader</li>
+				<li>THREE.ColladaLoader</li>
+				<li>THREE.FBXLoader</li>
+				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
+				<li>THREE.MMDLoader</li>
+			</ul>
+
+		<p class="desc">
+			3ds max와 Maya는 현재 여러 애니메이션 (같은 시간대에 있지 않은 애니메이션)을 한 파일로 내보내기 할 수 없습니다.
+		</p>
+
+		<h2>예제</h2>
+
+		<code>
+		let mesh;
+
+		// AnimationMixer 만들기, AnimationClip 인스턴스 리스트 가져오기
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
+
+		// 각 프레임의 mixer 업데이트
+		function update () {
+			mixer.update( deltaSeconds );
+		}
+
+		// 특정 애니메이션 재생
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
+		action.play();
+
+		// 전체 애니메이션 재생
+		clips.forEach( function ( clip ) {
+			mixer.clipAction( clip ).play();
+		} );
+		</code>
+
+	</body>
+</html>

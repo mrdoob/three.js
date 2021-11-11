@@ -3,16 +3,18 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
-		<p class="desc">BoxGeometry is a geometry class for a [link:https://en.wikipedia.org/wiki/Cuboid rectangular cuboid] with a given 'width', 'height', and 'depth'. On creation, the cuboid is centred on the origin, with each edge parallel to one of the axes.</p>
+		<p class="desc">
+			[name] is a geometry class for a rectangular cuboid with a given 'width', 'height', and 'depth'.
+			On creation, the cuboid is centred on the origin, with each edge parallel to one of the axes.
+		</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#BoxGeometry"></iframe>
 
@@ -22,7 +24,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -34,9 +36,9 @@
 
 		<h2>Code Example</h2>
 
-		<code>var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-		var cube = new THREE.Mesh( geometry, material );
+		<code>const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
 		</code>
 
@@ -53,7 +55,7 @@
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Geometry] class for common properties.</p>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
@@ -70,7 +72,7 @@
 		</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Geometry] class for common methods.</p>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -38,14 +37,17 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var a = new THREE.Vector4( 0, 1, 0, 0 );
+		const a = new THREE.Vector4( 0, 1, 0, 0 );
 
 		//no arguments; will be initialised to (0, 0, 0, 1)
-		var b = new THREE.Vector4( );
+		const b = new THREE.Vector4( );
 
-		var d = a.dot( b );
+		const d = a.dot( b );
 		</code>
 
+		<p>
+			Iterating through a Vector4 instance will yield its components (x, y, z, w) in the corresponding order.
+		</p>
 
 		<h2>构造函数</h2>
 
@@ -241,6 +243,9 @@
 		则将该值替换为对应的最小值。
 		</p>
 
+		<h3>[method:this multiply]( [param:Vector4 v] )</h3>
+		<p>将该向量与所传入的向量[page:Vector4 v]进行相乘。</p>
+
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>将该向量与所传入的标量[page:Float s]进行相乘。</p>
 
@@ -271,9 +276,9 @@
 			将该向量的[page:.x x]、[page:.y y]和[page:.z z]设置为旋转轴，[page:.w w]为角度。
 		</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
-		[page:Integer index] - 0、1或2。<br />
+		[page:Integer index] - 0、1、2 或 3。<br />
 		[page:Float value] - [page:Float]<br /><br />
 
 		若index为 0 则设置 [page:.x x] 值为 [page:Float value]。<br />
@@ -324,7 +329,7 @@
 
 		<h3>[method:this random]()</h3>
 		<p>
-			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		将该向量的每个分量(x、y、z、w)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
 		<h2>源代码</h2>

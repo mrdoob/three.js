@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -36,16 +35,20 @@
 		vectors and so on, however these are the most common uses in three.js.
 		</p>
 
+		<p>
+		Iterating through a Vector3 instance will yield its components (x, y, z) in the corresponding order.
+		</p>
+
 
 		<h2>Code Example</h2>
 
 		<code>
-		var a = new THREE.Vector3( 0, 1, 0 );
+		const a = new THREE.Vector3( 0, 1, 0 );
 
 		//no arguments; will be initialised to (0, 0, 0)
-		var b = new THREE.Vector3( );
+		const b = new THREE.Vector3( );
 
-		var d = a.distanceTo( b );
+		const d = a.distanceTo( b );
 		</code>
 
 
@@ -139,9 +142,8 @@
 		[page:Float min] - the minimum value the length will be clamped to <br />
 		[page:Float max] - the maximum value the length will be clamped to<br /><br />
 
-		If this vector's length is greater than the max value, it is replaced by the max value. <br /><br />
-		If this vector's length is less than the min value, it is replaced by the min value.
-		</p>
+		If this vector's length is greater than the max value, the vector will be scaled down so its length is the max value. <br /><br />
+		If this vector's length is less than the min value, the vector will be scaled up so its length is the min value.</p>
 
 		<h3>[method:this clampScalar]( [param:Float min], [param:Float max] )</h3>
 		<p>
@@ -204,7 +206,7 @@
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Vector3 v] )</h3>
-		<p>Checks for strict equality of this vector and [page:Vector3 v].</p>
+		<p>Returns *true* if the components of this vector and [page:Vector3 v] are strictly equal; *false* otherwise.</p>
 
 		<h3>[method:this floor]()</h3>
 		<p>The components of this vector are rounded down to the nearest integer value.</p>
@@ -338,7 +340,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector.</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0, 1 or 2.<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -440,6 +442,11 @@
 		<h3>[method:this random]()</h3>
 		<p>
 			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
+
+		<h3>[method:this randomDirection]()</h3>
+		<p>
+		Sets this vector to a uniformly random point on a unit sphere.
 		</p>
 
 		<h2>Source</h2>

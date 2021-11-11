@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,7 +16,7 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var physics;
+		let physics;
 
 		// Load MMD resources and instantiate MMDPhysics
 		new MMDLoader().load(
@@ -32,7 +31,7 @@
 
 		function render() {
 
-			var delta = clock.getDelta();
+			const delta = clock.getDelta();
 			animate( delta );  // update bones
 			if ( physics !== undefined ) physics.update( delta );
 			renderer.render( scene, camera );
@@ -77,12 +76,12 @@
 		Return [page:MMDPhysicsHelper]. You can visualize Rigid bodies by adding the helper to scene.
 		</p>
 
-		<h3>[method:CCDIKSolver reset]()</h3>
+		<h3>[method:this reset]()</h3>
 		<p>
-		Resets Rigid bodies transorm to current bone's.
+		Resets Rigid bodies transform to current bone's.
 		</p>
 
-		<h3>[method:CCDIKSolver setGravity]( [param:Vector3 gravity] )</h3>
+		<h3>[method:this setGravity]( [param:Vector3 gravity] )</h3>
 		<p>
 		[page:Vector3 gravity] — Direction and volume of gravity.
 		</p>
@@ -90,7 +89,7 @@
 		Set gravity.
 		</p>
 
-		<h3>[method:CCDIKSolver update]( [param:Number delta] )</h3>
+		<h3>[method:this update]( [param:Number delta] )</h3>
 		<p>
 		[page:Number delta] — Time in second.
 		</p>
@@ -98,7 +97,7 @@
 		Advance Physics calculation and updates bones.
 		</p>
 
-		<h3>[method:CCDIKSolver warmup]( [param:Integer cycles] )</h3>
+		<h3>[method:this warmup]( [param:Integer cycles] )</h3>
 		<p>
 		[page:Number delta] — Time in second.
 		</p>

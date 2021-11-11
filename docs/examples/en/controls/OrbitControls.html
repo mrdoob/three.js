@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,22 +13,22 @@
 		Orbit controls allow the camera to orbit around a target.<br>
 
 		To use this, as with all files in the /examples directory, you will have to
-		include the file seperately in your HTML.
+		include the file separately in your HTML.
 
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		var renderer = new THREE.WebGLRenderer();
+		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
-		var scene = new THREE.Scene();
+		const scene = new THREE.Scene();
 
-		var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-		var controls = new OrbitControls( camera, renderer.domElement );
+		const controls = new OrbitControls( camera, renderer.domElement );
 
 		//controls.update() must be called after any manual changes to the camera's transform
 		camera.position.set( 0, 20, 100 );
@@ -87,15 +86,15 @@
 
 		<h3>[property:Float autoRotateSpeed]</h3>
 		<p>
-			How fast to rotate around the target if [property:Boolean autoRotate] is true. Default is 2.0, which equates to 30 seconds
-			per rotation at 60fps.<br> Note that if [property:Boolean autoRotate] is enabled, you must call [page:.update]
+			How fast to rotate around the target if [page:.autoRotate] is true. Default is 2.0, which equates to 30 seconds
+			per orbit at 60fps.<br> Note that if [page:.autoRotate] is enabled, you must call [page:.update]
 			() in your animation loop.
 		</p>
 
 		<h3>
 			[property:Float dampingFactor]</h3>
 		<p>
-			The damping inertia used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
+			The damping inertia used if [page:.enableDamping] is set to true.<br> Note that for this to work, you must
 			call [page:.update] () in your animation loop.
 		</p>
 
@@ -114,11 +113,6 @@
 		<p>
 			Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.<br>
 			Note that if this is enabled, you must call [page:.update] () in your animation loop.
-		</p>
-
-		<h3>[property:Boolean enableKeys]</h3>
-		<p>
-			Enable or disable the use of keyboard controls.
 		</p>
 
 		<h3>[property:Boolean enablePan]</h3>
@@ -149,13 +143,12 @@
 			This object contains references to the keycodes for controlling camera panning. Default is the 4 arrow keys.
 			<code>
 controls.keys = {
-	LEFT: 37, //left arrow
-	UP: 38, // up arrow
-	RIGHT: 39, // right arrow
-	BOTTOM: 40 // down arrow
+	LEFT: 'ArrowLeft', //left arrow
+	UP: 'ArrowUp', // up arrow
+	RIGHT: 'ArrowRight', // right arrow
+	BOTTOM: 'ArrowDown' // down arrow
 }
-			 </code> See [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode this page] for a full
-			list of keycodes.
+			 </code> See [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code KeyboardEvent.code] for a full list of keycodes.
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
@@ -223,7 +216,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 position0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Float rotateSpeed]</h3>
@@ -240,7 +233,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 target0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Vector3 target]</h3>
@@ -262,7 +255,7 @@ controls.touches = {
 
 		<h3>[property:Float zoom0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Float zoomSpeed]</h3>
@@ -274,7 +267,7 @@ controls.touches = {
 
 		<h2>Methods</h2>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Remove all the event listeners.
 		</p>
@@ -289,12 +282,22 @@ controls.touches = {
 			Get the current vertical rotation, in radians.
 		</p>
 
-		<h3>[method:null reset] ()</h3>
+		<h3>[method:Float getDistance] ()</h3>
+		<p>
+			Returns the distance from the camera to the target.
+		</p>
+
+		<h3>[method:undefined listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
+		</p>
+
+		<h3>[method:undefined reset] ()</h3>
 		<p>
 			Reset the controls to their state from either the last time the [page:.saveState] was called, or the initial state.
 		</p>
 
-		<h3>[method:null saveState] ()</h3>
+		<h3>[method:undefined saveState] ()</h3>
 		<p>
 			Save the current state of the controls. This can later be recovered with [page:.reset].
 		</p>

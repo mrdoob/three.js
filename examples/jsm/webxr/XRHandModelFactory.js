@@ -7,28 +7,26 @@ import {
 } from './XRHandPrimitiveModel.js';
 
 import {
-	XRHandOculusMeshModel
-} from './XRHandOculusMeshModel.js';
+	XRHandMeshModel
+} from './XRHandMeshModel.js';
 
-function XRHandModel( controller ) {
+class XRHandModel extends Object3D {
 
-	Object3D.call( this );
+	constructor( controller ) {
 
-	this.controller = controller;
-	this.motionController = null;
-	this.envMap = null;
+		super();
 
-	this.mesh = null;
+		this.controller = controller;
+		this.motionController = null;
+		this.envMap = null;
 
-}
+		this.mesh = null;
 
-XRHandModel.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: XRHandModel,
+	updateMatrixWorld( force ) {
 
-	updateMatrixWorld: function ( force ) {
-
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+		super.updateMatrixWorld( force );
 
 		if ( this.motionController ) {
 
@@ -36,78 +34,69 @@ XRHandModel.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	},
-} );
+	}
 
+}
 
-const XRHandModelFactory = ( function () {
+class XRHandModelFactory {
 
-	function XRHandModelFactory() {
+	constructor() {
 
-		this.path = '';
+		this.path = null;
 
 	}
 
-	XRHandModelFactory.prototype = {
+	setPath( path ) {
 
-		constructor: XRHandModelFactory,
+		this.path = path;
 
-		setPath: function ( path ) {
+		return this;
 
-			this.path = path;
-			return this;
+	}
 
-		},
+	createHandModel( controller, profile ) {
 
-		createHandModel: function ( controller, profile, options ) {
+		const handModel = new XRHandModel( controller );
 
-			const handModel = new XRHandModel( controller );
+		controller.addEventListener( 'connected', ( event ) => {
 
-			controller.addEventListener( 'connected', ( event ) => {
+			const xrInputSource = event.data;
 
-				const xrInputSource = event.data;
+			if ( xrInputSource.hand && ! handModel.motionController ) {
 
-				if ( xrInputSource.hand && ! handModel.motionController ) {
+				handModel.xrInputSource = xrInputSource;
 
-					handModel.visible = true;
-					handModel.xrInputSource = xrInputSource;
+				// @todo Detect profile if not provided
+				if ( profile === undefined || profile === 'spheres' ) {
 
-					// @todo Detect profile if not provided
-					if ( profile === undefined || profile === 'spheres' ) {
+					handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'sphere' } );
 
-						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'sphere' } );
+				} else if ( profile === 'boxes' ) {
 
-					} else if ( profile === 'boxes' ) {
+					handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'box' } );
 
-						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'box' } );
+				} else if ( profile === 'mesh' ) {
 
-					} else if ( profile === 'oculus' ) {
-
-						handModel.motionController = new XRHandOculusMeshModel( handModel, controller, this.path, xrInputSource.handedness, options );
-
-					}
+					handModel.motionController = new XRHandMeshModel( handModel, controller, this.path, xrInputSource.handedness );
 
 				}
 
-			} );
+			}
 
-			controller.addEventListener( 'disconnected', () => {
+		} );
 
-				// handModel.motionController = null;
-				// handModel.remove( scene );
-				// scene = null;
+		controller.addEventListener( 'disconnected', () => {
 
-			} );
+			// handModel.motionController = null;
+			// handModel.remove( scene );
+			// scene = null;
 
-			return handModel;
+		} );
 
-		}
+		return handModel;
 
-	};
+	}
 
-	return XRHandModelFactory;
-
-} )();
-
+}
 
 export { XRHandModelFactory };

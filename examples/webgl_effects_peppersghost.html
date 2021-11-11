@@ -19,10 +19,10 @@
 
 			import { PeppersGhostEffect } from './jsm/effects/PeppersGhostEffect.js';
 
-			var container;
+			let container;
 
-			var camera, scene, renderer, effect;
-			var group;
+			let camera, scene, renderer, effect;
+			let group;
 
 			init();
 			animate();
@@ -41,16 +41,15 @@
 
 				// Cube
 
-				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-				geometry = geometry.toNonIndexed(); // ensure unique vertices for each triangle
+				const geometry = new THREE.BoxGeometry().toNonIndexed(); // ensure unique vertices for each triangle
 
-				var position = geometry.attributes.position;
-				var colors = [];
-				var color = new THREE.Color();
+				const position = geometry.attributes.position;
+				const colors = [];
+				const color = new THREE.Color();
 
 				// generate for each side of the cube a different color
 
-				for ( var i = 0; i < position.count; i += 6 ) {
+				for ( let i = 0; i < position.count; i += 6 ) {
 
 					color.setHex( Math.random() * 0xffffff );
 
@@ -70,11 +69,11 @@
 
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
-				for ( var i = 0; i < 10; i ++ ) {
+				for ( let i = 0; i < 10; i ++ ) {
 
-					var cube = new THREE.Mesh( geometry, material );
+					const cube = new THREE.Mesh( geometry, material );
 					cube.position.x = Math.random() * 2 - 1;
 					cube.position.y = Math.random() * 2 - 1;
 					cube.position.z = Math.random() * 2 - 1;
@@ -91,7 +90,7 @@
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.cameraDistance = 5;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

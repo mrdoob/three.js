@@ -30,6 +30,7 @@ function Storage() {
 				}
 
 			};
+
 			request.onsuccess = function ( event ) {
 
 				database = event.target.result;
@@ -37,6 +38,7 @@ function Storage() {
 				callback();
 
 			};
+
 			request.onerror = function ( event ) {
 
 				console.error( 'IndexedDB', event );

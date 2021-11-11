@@ -5,7 +5,7 @@
  * The azimuthal angle (theta) is measured from the positive z-axis.
  */
 
-import { MathUtils } from './MathUtils.js';
+import * as MathUtils from './MathUtils.js';
 
 class Spherical {
 
@@ -26,12 +26,6 @@ class Spherical {
 		this.theta = theta;
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -78,6 +72,12 @@ class Spherical {
 		}
 
 		return this;
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
 
 	}
 

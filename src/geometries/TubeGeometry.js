@@ -1,14 +1,12 @@
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import * as Curves from '../extras/curves/Curves.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// TubeGeometry
+class TubeGeometry extends BufferGeometry {
 
-class TubeGeometry extends Geometry {
-
-	constructor( path, tubularSegments, radius, radialSegments, closed, taper ) {
+	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'TubeGeometry';
@@ -20,48 +18,6 @@ class TubeGeometry extends Geometry {
 			radialSegments: radialSegments,
 			closed: closed
 		};
-
-		if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
-
-		const bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
-
-		// expose internals
-
-		this.tangents = bufferGeometry.tangents;
-		this.normals = bufferGeometry.normals;
-		this.binormals = bufferGeometry.binormals;
-
-		// create geometry
-
-		this.fromBufferGeometry( bufferGeometry );
-		this.mergeVertices();
-
-	}
-
-}
-
-
-// TubeBufferGeometry
-
-class TubeBufferGeometry extends BufferGeometry {
-
-	constructor( path, tubularSegments, radius, radialSegments, closed ) {
-
-		super();
-		this.type = 'TubeBufferGeometry';
-
-		this.parameters = {
-			path: path,
-			tubularSegments: tubularSegments,
-			radius: radius,
-			radialSegments: radialSegments,
-			closed: closed
-		};
-
-		tubularSegments = tubularSegments || 64;
-		radius = radius || 1;
-		radialSegments = radialSegments || 8;
-		closed = closed || false;
 
 		const frames = path.computeFrenetFrames( tubularSegments, closed );
 
@@ -205,9 +161,10 @@ class TubeBufferGeometry extends BufferGeometry {
 		}
 
 	}
+
 	toJSON() {
 
-		const data = BufferGeometry.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		data.path = this.parameters.path.toJSON();
 
@@ -215,7 +172,21 @@ class TubeBufferGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		// This only works for built-in curves (e.g. CatmullRomCurve3).
+		// User defined curves or instances of CurvePath will not be deserialized.
+		return new TubeGeometry(
+			new Curves[ data.path.type ]().fromJSON( data.path ),
+			data.tubularSegments,
+			data.radius,
+			data.radialSegments,
+			data.closed
+		);
+
+	}
+
 }
 
 
-export { TubeGeometry, TubeBufferGeometry };
+export { TubeGeometry, TubeGeometry as TubeBufferGeometry };

@@ -19,16 +19,16 @@
 
 		import Stats from './jsm/libs/stats.module.js';
 
-		var container, stats;
-		var camera, scene, renderer, mesh;
+		let container, stats;
+		let camera, scene, renderer, mesh;
 
-		var instances = 5000;
-		var lastTime = 0;
+		const instances = 5000;
+		let lastTime = 0;
 
-		var moveQ = new THREE.Quaternion( 0.5, 0.5, 0.5, 0.0 ).normalize();
-		var tmpQ = new THREE.Quaternion();
-		var tmpM = new THREE.Matrix4();
-		var currentM = new THREE.Matrix4();
+		const moveQ = new THREE.Quaternion( 0.5, 0.5, 0.5, 0.0 ).normalize();
+		const tmpQ = new THREE.Quaternion();
+		const tmpM = new THREE.Matrix4();
+		const currentM = new THREE.Matrix4();
 
 		init();
 		animate();
@@ -44,11 +44,11 @@
 
 			// geometry
 
-			var geometry = new THREE.InstancedBufferGeometry();
+			const geometry = new THREE.InstancedBufferGeometry();
 
 			// per mesh data x,y,z,w,u,v,s,t for 4-element alignment
 			// only use x,y,z and u,v; but x, y, z, nx, ny, nz, u, v would be a good layout
-			var vertexBuffer = new THREE.InterleavedBuffer( new Float32Array( [
+			const vertexBuffer = new THREE.InterleavedBuffer( new Float32Array( [
 				// Front
 				- 1, 1, 1, 0, 0, 0, 0, 0,
 				1, 1, 1, 0, 1, 0, 0, 0,
@@ -82,13 +82,13 @@
 			] ), 8 );
 
 			// Use vertexBuffer, starting at offset 0, 3 items in position attribute
-			var positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
+			const positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
 			geometry.setAttribute( 'position', positions );
 			// Use vertexBuffer, starting at offset 4, 2 items in uv attribute
-			var uvs = new THREE.InterleavedBufferAttribute( vertexBuffer, 2, 4 );
+			const uvs = new THREE.InterleavedBufferAttribute( vertexBuffer, 2, 4 );
 			geometry.setAttribute( 'uv', uvs );
 
-			var indices = new Uint16Array( [
+			const indices = new Uint16Array( [
 				0, 2, 1,
 				2, 3, 1,
 				4, 6, 5,
@@ -107,21 +107,21 @@
 
 			// material
 
-			var material = new THREE.MeshBasicMaterial();
+			const material = new THREE.MeshBasicMaterial();
 			material.map = new THREE.TextureLoader().load( 'textures/crate.gif' );
 			material.map.flipY = false;
 
 			// per instance data
 
-			var matrix = new THREE.Matrix4();
-			var offset = new THREE.Vector3();
-			var orientation = new THREE.Quaternion();
-			var scale = new THREE.Vector3( 1, 1, 1 );
-			var x, y, z, w;
+			const matrix = new THREE.Matrix4();
+			const offset = new THREE.Vector3();
+			const orientation = new THREE.Quaternion();
+			const scale = new THREE.Vector3( 1, 1, 1 );
+			let x, y, z, w;
 
 			mesh = new THREE.InstancedMesh( geometry, material, instances );
 
-			for ( var i = 0; i < instances; i ++ ) {
+			for ( let i = 0; i < instances; i ++ ) {
 
 				// offsets
 
@@ -155,7 +155,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
-			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'ANGLE_instanced_arrays' ) === false ) {
 
 				document.getElementById( 'notSupported' ).style.display = '';
 				return;
@@ -165,7 +165,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -191,15 +191,15 @@
 
 		function render() {
 
-			var time = performance.now();
+			const time = performance.now();
 
 			mesh.rotation.y = time * 0.00005;
 
-			var delta = ( time - lastTime ) / 5000;
+			const delta = ( time - lastTime ) / 5000;
 			tmpQ.set( moveQ.x * delta, moveQ.y * delta, moveQ.z * delta, 1 ).normalize();
 			tmpM.makeRotationFromQuaternion( tmpQ );
 
-			for ( var i = 0, il = instances; i < il; i ++ ) {
+			for ( let i = 0, il = instances; i < il; i ++ ) {
 
 				mesh.getMatrixAt( i, currentM );
 				currentM.multiply( tmpM );

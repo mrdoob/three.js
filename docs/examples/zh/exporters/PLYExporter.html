@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -23,11 +22,11 @@
 
 		<code>
 		// Instantiate an exporter
-		var exporter = new PLYExporter();
+		const exporter = new PLYExporter();
 
 		// Parse the input and generate the ply output
-		var data = exporter.parse( scene, options );
-		downloadFile(data);
+		const data = exporter.parse( scene, options );
+		downloadFile( data );
 		</code>
 
 		<h2>Constructor</h2>
@@ -41,7 +40,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null parse]( [param:Object3D input], [param:Function onDone], [param:Object options] )</h3>
+		<h3>[method:Object parse]( [param:Object3D input], [param:Function onDone], [param:Object options] )</h3>
 		<p>
 		[page:Object input] — Object3D<br />
 		[page:Function onCompleted] — Will be called when the export completes. The argument will be the generated ply ascii or binary ArrayBuffer.<br />

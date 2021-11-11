@@ -16,12 +16,12 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var SCREEN_WIDTH = window.innerWidth,
+			const SCREEN_WIDTH = window.innerWidth,
 				SCREEN_HEIGHT = window.innerHeight,
 
-				r = 450,
+				r = 450;
 
-				mouseY = 0,
+			let mouseY = 0,
 
 				windowHalfY = window.innerHeight / 2,
 
@@ -37,19 +37,18 @@
 
 				scene = new THREE.Scene();
 
-				var i, line, material, p,
-					parameters = [[ 0.25, 0xff7700, 1 ], [ 0.5, 0xff9900, 1 ], [ 0.75, 0xffaa00, 0.75 ], [ 1, 0xffaa00, 0.5 ], [ 1.25, 0x000833, 0.8 ],
-							       [ 3.0, 0xaaaaaa, 0.75 ], [ 3.5, 0xffffff, 0.5 ], [ 4.5, 0xffffff, 0.25 ], [ 5.5, 0xffffff, 0.125 ]];
+				const parameters = [[ 0.25, 0xff7700, 1 ], [ 0.5, 0xff9900, 1 ], [ 0.75, 0xffaa00, 0.75 ], [ 1, 0xffaa00, 0.5 ], [ 1.25, 0x000833, 0.8 ],
+					[ 3.0, 0xaaaaaa, 0.75 ], [ 3.5, 0xffffff, 0.5 ], [ 4.5, 0xffffff, 0.25 ], [ 5.5, 0xffffff, 0.125 ]];
 
-				var geometry = createGeometry();
+				const geometry = createGeometry();
 
-				for ( i = 0; i < parameters.length; ++ i ) {
+				for ( let i = 0; i < parameters.length; ++ i ) {
 
-					p = parameters[ i ];
+					const p = parameters[ i ];
 
-					material = new THREE.LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ] } );
+					const material = new THREE.LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ] } );
 
-					line = new THREE.LineSegments( geometry, material );
+					const line = new THREE.LineSegments( geometry, material );
 					line.scale.x = line.scale.y = line.scale.z = p[ 0 ];
 					line.userData.originalScale = p[ 0 ];
 					line.rotation.y = Math.random() * Math.PI;
@@ -63,19 +62,18 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.body.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				document.body.style.touchAction = 'none';
+				document.body.addEventListener( 'pointermove', onPointerMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// test geometry swapability
 
 				setInterval( function () {
 
-					var geometry = createGeometry();
+					const geometry = createGeometry();
 
 					scene.traverse( function ( object ) {
 
@@ -94,12 +92,12 @@
 
 			function createGeometry() {
 
-				var geometry = new THREE.BufferGeometry();
-				var vertices = [];
+				const geometry = new THREE.BufferGeometry();
+				const vertices = [];
 
-				var vertex = new THREE.Vector3();
+				const vertex = new THREE.Vector3();
 
-				for ( var i = 0; i < 1500; i ++ ) {
+				for ( let i = 0; i < 1500; i ++ ) {
 
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
@@ -132,33 +130,11 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouseY = event.clientY - windowHalfY;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length > 1 ) {
-
-					event.preventDefault();
-
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
 
 			}
 
@@ -179,11 +155,11 @@
 
 				renderer.render( scene, camera );
 
-				var time = Date.now() * 0.0001;
+				const time = Date.now() * 0.0001;
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					var object = scene.children[ i ];
+					const object = scene.children[ i ];
 
 					if ( object.isLine ) {
 
@@ -191,7 +167,7 @@
 
 						if ( i < 5 ) {
 
-							var scale = object.userData.originalScale * ( i / 5 + 1 ) * ( 1 + 0.5 * Math.sin( 7 * time ) );
+							const scale = object.userData.originalScale * ( i / 5 + 1 ) * ( 1 + 0.5 * Math.sin( 7 * time ) );
 
 							object.scale.x = object.scale.y = object.scale.z = scale;
 

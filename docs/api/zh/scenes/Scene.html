@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -26,7 +25,7 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:boolean autoUpdate]</h3>
+		<h3>[property:Boolean autoUpdate]</h3>
 		<p>
 			默认值为true，若设置了这个值，则渲染器会检查每一帧是否需要更新场景及其中物体的矩阵。
 			当设为false时，你必须亲自手动维护场景中的矩阵。
@@ -36,7 +35,7 @@
 		<p>
 		若不为空，在渲染场景的时候将设置背景，且背景总是首先被渲染的。
 		可以设置一个用于的“clear”的[page:Color]（颜色）、一个覆盖canvas的[page:Texture]（纹理），
-		或是 a cubemap as a [page:CubeTexture] or [page:WebGLCubeRenderTarget] or an equirectangular as a [page:Texture]。默认值为null。
+		或是 a cubemap as a [page:CubeTexture] or an equirectangular as a [page:Texture]。默认值为null。
 		</p>
 
 		<h3>[property:Texture environment]</h3>
@@ -56,7 +55,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:JSON toJSON]</h3>
+		<h3>[method:Object toJSON]</h3>
 		<p>
 			meta -- 包含有元数据的对象，例如场景中的的纹理或图片。
 			将scene对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。

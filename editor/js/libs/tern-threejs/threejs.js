@@ -1499,18 +1499,6 @@
       "!doc": "Creates a wireframe object that shows the edges of another object's geometry. To draw a  wireframe image showing only \"hard\" edges (edges between non-coplanar faces), see [page:EdgesHelper].",
       "!type": "fn(object: +THREE.Object3D, color: +THREE.Color)"
     },
-    "ImmediateRenderObject": {
-      "!url": "http://threejs.org/docs/#Reference/extras/objects/ImmediateRenderObject",
-      "prototype": {
-        "!proto": "THREE.Object3D.prototype",
-        "render": {
-          "!type": "fn(renderCallback: function)",
-          "!doc": "This function needs to be overridden to start the creation of the object and should call renderCallback when finished."
-        }
-      },
-      "!doc": "base class for immediate rendering objects.",
-      "!type": "fn()"
-    },
     "AmbientLight": {
       "!url": "http://threejs.org/docs/#Reference/lights/AmbientLight",
       "prototype": {
@@ -2161,10 +2149,6 @@
           "!type": "boolean",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is false."
-        },
         "morphTargets": {
           "!type": "bool",
           "!doc": "Define whether the material uses morphTargets. Default is false."
@@ -2299,10 +2283,6 @@
         "vertexColors": {
           "!type": "boolean",
           "!doc": "This setting might not have any effect when used with certain renderers."
-        },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is *false*."
         },
         "morphTargets": {
           "!type": "bool",
@@ -2444,10 +2424,6 @@
           "!type": "bool",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning. Default is *false*."
-        },
         "morphTargets": {
           "!type": "bool",
           "!doc": "Define whether the material uses morphTargets. Default is *false*."
@@ -2550,10 +2526,6 @@
         "vertexColors": {
           "!type": "bool",
           "!doc": "Define how the vertices are colored, by defining how the *colors* attribute gets populated. Default is false."
-        },
-        "skinning": {
-          "!type": "bool",
-          "!doc": "Define whether the material uses skinning; true to pass skinning attributes to the shader. Default is false."
         },
         "morphTargets": {
           "!type": "bool",

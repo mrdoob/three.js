@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,10 +15,10 @@
 
 		<h2>Code Example</h2>
 		<code>
-		var positionalAudio = new THREE.PositionalAudio( listener );
+		const positionalAudio = new THREE.PositionalAudio( listener );
 		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-		var helper = new PositionalAudioHelper( positionalAudio );
+		const helper = new PositionalAudioHelper( positionalAudio );
 		positionalAudio.add( helper );
 		</code>
 
@@ -59,10 +58,10 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>Disposes of the helper.</p>
 
-		<h3>[method:null update]()</h3>
+		<h3>[method:undefined update]()</h3>
 		<p>Updates the helper.</p>
 
 		<h2>Source</h2>

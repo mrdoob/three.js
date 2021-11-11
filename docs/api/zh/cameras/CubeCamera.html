@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,15 +17,15 @@
 
 		<code>
 		// Create cube render target
-		var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 
 		// Create cube camera
-		var cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+		const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
 		scene.add( cubeCamera );
 
 		// Create car
-		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
-		var car = new Mesh( carGeometry, chromeMaterial );
+		const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
+		const car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
 		// Update the render target cube
@@ -42,8 +41,7 @@
 		<h2>例子</h2>
 
 		<p>
-			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]<br />
-			[example:webgl_shading_physical shading / physical ]
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]
 		</p>
 
 		<h2>构造器</h2>
@@ -74,19 +72,13 @@
 		<p>共有方法请参见其基类[page:Object3D]。</p>
 
 
-		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
+		<h3>[method:undefined update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
 		<p>
 		renderer -- 当前的WebGL渲染器<br />
 		scene -- 当前的场景
 		</p>
 		<p>
 		这个方法用来更新[page:CubeCamera.renderTarget renderTarget]（渲染目标对象）。
-		</p>
-
-		<h3>[method:null clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
-		<p>
-		这个方法用来来清除[page:CubeCamera.renderTarget renderTarget]的颜色、深度和/或模板缓冲区。
-		颜色缓冲区设置为渲染器当前的“清除”色。参数默认值均为*true*。
 		</p>
 
 		<h2>源代码</h2>

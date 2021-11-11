@@ -1,15 +1,12 @@
-import { Geometry } from '../core/Geometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 
-// LatheGeometry
+class LatheGeometry extends BufferGeometry {
 
-class LatheGeometry extends Geometry {
-
-	constructor( points, segments, phiStart, phiLength ) {
+	constructor( points = [ new Vector2( 0, 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, - 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
@@ -22,38 +19,11 @@ class LatheGeometry extends Geometry {
 			phiLength: phiLength
 		};
 
-		this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
-		this.mergeVertices();
-
-	}
-
-}
-
-// LatheBufferGeometry
-
-class LatheBufferGeometry extends BufferGeometry {
-
-	constructor( points, segments, phiStart, phiLength ) {
-
-		super();
-
-		this.type = 'LatheBufferGeometry';
-
-		this.parameters = {
-			points: points,
-			segments: segments,
-			phiStart: phiStart,
-			phiLength: phiLength
-		};
-
-		segments = Math.floor( segments ) || 12;
-		phiStart = phiStart || 0;
-		phiLength = phiLength || Math.PI * 2;
+		segments = Math.floor( segments );
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
 
 		phiLength = MathUtils.clamp( phiLength, 0, Math.PI * 2 );
-
 
 		// buffers
 
@@ -174,7 +144,13 @@ class LatheBufferGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new LatheGeometry( data.points, data.segments, data.phiStart, data.phiLength );
+
+	}
+
 }
 
 
-export { LatheGeometry, LatheBufferGeometry };
+export { LatheGeometry, LatheGeometry as LatheBufferGeometry };

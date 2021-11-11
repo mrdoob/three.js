@@ -4,12 +4,10 @@ const _vector = /*@__PURE__*/ new Vector2();
 
 class Box2 {
 
-	constructor( min, max ) {
+	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
-		Object.defineProperty( this, 'isBox2', { value: true } );
-
-		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
-		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
+		this.min = min;
+		this.max = max;
 
 	}
 
@@ -80,25 +78,11 @@ class Box2 {
 
 	getCenter( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box2: .getCenter() target is now required' );
-			target = new Vector2();
-
-		}
-
 		return this.isEmpty() ? target.set( 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	}
 
 	getSize( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box2: .getSize() target is now required' );
-			target = new Vector2();
-
-		}
 
 		return this.isEmpty() ? target.set( 0, 0 ) : target.subVectors( this.max, this.min );
 
@@ -150,13 +134,6 @@ class Box2 {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box2: .getParameter() target is now required' );
-			target = new Vector2();
-
-		}
-
 		return target.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y )
@@ -174,13 +151,6 @@ class Box2 {
 	}
 
 	clampPoint( point, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box2: .clampPoint() target is now required' );
-			target = new Vector2();
-
-		}
 
 		return target.copy( point ).clamp( this.min, this.max );
 
@@ -228,5 +198,6 @@ class Box2 {
 
 }
 
+Box2.prototype.isBox2 = true;
 
 export { Box2 };

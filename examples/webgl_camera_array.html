@@ -12,27 +12,27 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var mesh;
-			var AMOUNT = 6;
+			let camera, scene, renderer;
+			let mesh;
+			const AMOUNT = 6;
 
 			init();
 			animate();
 
 			function init() {
 
-				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
+				const ASPECT_RATIO = window.innerWidth / window.innerHeight;
 
-				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
-				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
+				const WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				const HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
 
-				var cameras = [];
+				const cameras = [];
 
-				for ( var y = 0; y < AMOUNT; y ++ ) {
+				for ( let y = 0; y < AMOUNT; y ++ ) {
 
-					for ( var x = 0; x < AMOUNT; x ++ ) {
+					for ( let x = 0; x < AMOUNT; x ++ ) {
 
-						var subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
+						const subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
 						subcamera.viewport = new THREE.Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
 						subcamera.position.x = ( x / AMOUNT ) - 0.5;
 						subcamera.position.y = 0.5 - ( y / AMOUNT );
@@ -53,24 +53,24 @@
 
 				scene.add( new THREE.AmbientLight( 0x222244 ) );
 
-				var light = new THREE.DirectionalLight();
+				const light = new THREE.DirectionalLight();
 				light.position.set( 0.5, 0.5, 1 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4; // tighter shadow map
 				scene.add( light );
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x000066 } );
+				const geometryBackground = new THREE.PlaneGeometry( 100, 100 );
+				const materialBackground = new THREE.MeshPhongMaterial( { color: 0x000066 } );
 
-				var background = new THREE.Mesh( geometry, material );
+				const background = new THREE.Mesh( geometryBackground, materialBackground );
 				background.receiveShadow = true;
 				background.position.set( 0, 0, - 1 );
 				scene.add( background );
 
-				var geometry = new THREE.CylinderBufferGeometry( 0.5, 0.5, 1, 32 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
+				const geometryCylinder = new THREE.CylinderGeometry( 0.5, 0.5, 1, 32 );
+				const materialCylinder = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometryCylinder, materialCylinder );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
@@ -83,24 +83,24 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
-				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
-				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
+				const ASPECT_RATIO = window.innerWidth / window.innerHeight;
+				const WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				const HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
 
 				camera.aspect = ASPECT_RATIO;
 				camera.updateProjectionMatrix();
 
-				for ( var y = 0; y < AMOUNT; y ++ ) {
+				for ( let y = 0; y < AMOUNT; y ++ ) {
 
-					for ( var x = 0; x < AMOUNT; x ++ ) {
+					for ( let x = 0; x < AMOUNT; x ++ ) {
 
-						var subcamera = camera.cameras[ AMOUNT * y + x ];
+						const subcamera = camera.cameras[ AMOUNT * y + x ];
 
 						subcamera.viewport.set(
 							Math.floor( x * WIDTH ),

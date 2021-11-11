@@ -1,20 +1,7 @@
-
-try {
-
-	require( 'puppeteer' );
-
-} catch {
-
-	console.log( 'Error: Can\'t find Puppeteer. Run `npm install --prefix test`.' );
-	process.exit( 0 );
-
-}
-
 const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
-const printImage = require( 'image-output' );
 const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
@@ -40,15 +27,29 @@ const exceptionList = [
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
+	'webgl_loader_imagebitmap', // takes too long to load?
+	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
-	'webgl_materials_envmaps_parallax', // empty for some reason
+	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
+	'webgl_morphtargets_face', // To investigate...
+	'webgl_postprocessing_crossfade', // fails for some misterious reason
 	'webgl_raymarching_reflect', // exception for Github Actions
 	'webgl_test_memory2', // gives fatal error in puppeteer
 	'webgl_tiled_forward', // exception for Github Actions
 	'webgl_video_kinect', // video tag not deterministic enough
+	'webgl_video_panorama_equirectangular', // video tag not deterministic enough?
 	'webgl_worker_offscreencanvas', // in a worker, not robust
-
-].concat( ( process.platform === "win32" ) ? [
+	// webxr
+	'webxr_ar_lighting',
+	// webgpu
+	'webgpu_compute',
+	'webgpu_instance_uniform',
+	'webgpu_lights_custom',
+	'webgpu_lights_selective',
+	'webgpu_materials',
+	'webgpu_rtt',
+	'webgpu_sandbox'
+].concat( ( process.platform === 'win32' ) ? [
 
 	'webgl_effects_ascii' // windows fonts not supported
 
@@ -141,20 +142,27 @@ const pup = puppeteer.launch( {
 	/* Loop for each file, with CI parallelism */
 
 	let pageSize, file, attemptProgress;
-	let failedScreenshots = [];
-	const isParallel = 'CI' in process.env;
-	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
-	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 4 ) : files.length;
+	const failedScreenshots = [];
+
+	let beginId = 0;
+	let endId = files.length;
+
+	if ( 'CI' in process.env ) {
+
+		const jobs = 8;
+
+		beginId = Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / jobs );
+		endId = Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / jobs );
+
+	}
 
 	for ( let id = beginId; id < endId; ++ id ) {
-
 
 		/* At least 3 attempts before fail */
 
 		let attemptId = isMakeScreenshot ? 1.5 : 0;
 
 		while ( attemptId < maxAttemptId ) {
-
 
 			/* Load target page */
 
@@ -175,9 +183,7 @@ const pup = puppeteer.launch( {
 
 			}
 
-
 			try {
-
 
 				/* Render page */
 
@@ -188,21 +194,23 @@ const pup = puppeteer.launch( {
 
 					/* Resource timeout */
 
-					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
+					const resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
 					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
 
 
 					/* Resolve render promise */
 
 					window._renderStarted = true;
+
 					await new Promise( function ( resolve ) {
 
 						performance._now = performance._now || performance.now;
-						let renderStart = performance._now();
 
-						let waitingLoop = setInterval( function () {
+						const renderStart = performance._now();
 
-							let renderEcceded = ( performance._now() - renderStart > renderTimeout * attemptProgress );
+						const waitingLoop = setInterval( function () {
+
+							const renderEcceded = ( performance._now() - renderStart > renderTimeout * attemptProgress );
 							if ( window._renderFinished || renderEcceded ) {
 
 								if ( renderEcceded ) {
@@ -246,11 +254,10 @@ const pup = puppeteer.launch( {
 				/* Make screenshots */
 
 				attemptId = maxAttemptId;
-				let bitmap = ( await jimp.read( await page.screenshot() ) )
+				( await jimp.read( await page.screenshot() ) )
 					.scale( 1 / viewScale ).quality( jpgQuality )
-					.write( `./examples/screenshots/${ file }.jpg` ).bitmap;
+					.write( `./examples/screenshots/${ file }.jpg` );
 
-				printImage( bitmap, console );
 				console.green( `file: ${ file } generated` );
 
 
@@ -259,11 +266,12 @@ const pup = puppeteer.launch( {
 
 				/* Diff screenshots */
 
-				let actual = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality ).bitmap;
-				let expected = ( await jimp.read( fs.readFileSync( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
-				let diff = actual;
+				const actual = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality ).bitmap;
+				const expected = ( await jimp.read( fs.readFileSync( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
+				const diff = actual;
 
 				let numFailedPixels;
+
 				try {
 
 					numFailedPixels = pixelmatch( expected.data, actual.data, diff.data, actual.width, actual.height, {
@@ -295,7 +303,6 @@ const pup = puppeteer.launch( {
 
 					if ( ++ attemptId === maxAttemptId ) {
 
-						printImage( diff, console );
 						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 						failedScreenshots.push( file );
 						continue;

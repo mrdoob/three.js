@@ -17,7 +17,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { WEBGL } from './jsm/WebGL.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
@@ -81,7 +81,7 @@
 
 				// Material
 
-				const vertexShader = `#version 300 es
+				const vertexShader = /* glsl */`
 					in vec3 position;
 
 					uniform mat4 modelMatrix;
@@ -102,7 +102,7 @@
 					}
 				`;
 
-				const fragmentShader = `#version 300 es
+				const fragmentShader = /* glsl */`
 					precision highp float;
 					precision highp sampler3D;
 
@@ -189,8 +189,9 @@
 					}
 				`;
 
-				const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 				const material = new THREE.RawShaderMaterial( {
+					glslVersion: THREE.GLSL3,
 					uniforms: {
 						map: { value: texture },
 						cameraPos: { value: new THREE.Vector3() },
@@ -220,7 +221,7 @@
 				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
 				gui.add( parameters, 'steps', 0, 300, 1 ).onChange( update );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

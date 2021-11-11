@@ -2,8 +2,9 @@ import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping,
 import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
+import { hashString } from '../../utils.js';
 
-function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingStates, clipping ) {
+function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
 	const programs = [];
 
@@ -34,19 +35,22 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 	};
 
 	const parameterNames = [
-		"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "instancingColor",
-		"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
-		"lightMap", "lightMapEncoding", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatMap", "clearcoatRoughnessMap", "clearcoatNormalMap", "displacementMap", "specularMap",
-		"roughnessMap", "metalnessMap", "gradientMap",
-		"alphaMap", "combine", "vertexColors", "vertexTangents", "vertexUvs", "uvsVertexOnly", "fog", "useFog", "fogExp2",
-		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
-		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
-		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
-		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows",
-		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
-		"sheen", "transmissionMap"
+		'precision', 'isWebGL2', 'supportsVertexTextures', 'outputEncoding', 'instancing', 'instancingColor',
+		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
+		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap',
+		'objectSpaceNormalMap', 'tangentSpaceNormalMap',
+		'clearcoat', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap',
+		'displacementMap', 'specularMap', , 'roughnessMap', 'metalnessMap', 'gradientMap',
+		'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
+		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
+		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'morphTargetsCount', 'premultipliedAlpha',
+		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
+		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
+		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
+		'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering', 'format',
+		'specularIntensityMap', 'specularColorMap', 'specularColorMapEncoding',
+		'transmission', 'transmissionMap', 'thicknessMap',
+		'sheen', 'sheenColorMap', 'sheenColorMapEncoding', 'sheenRoughnessMap'
 	];
 
 	function getMaxBones( object ) {
@@ -89,20 +93,26 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 		let encoding;
 
-		if ( ! map ) {
-
-			encoding = LinearEncoding;
-
-		} else if ( map.isTexture ) {
+		if ( map && map.isTexture ) {
 
 			encoding = map.encoding;
 
-		} else if ( map.isWebGLRenderTarget ) {
+		} else if ( map && map.isWebGLRenderTarget ) {
 
-			console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
+			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
 			encoding = map.texture.encoding;
 
+		} else {
+
+			encoding = LinearEncoding;
+
 		}
+
+		/* if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
+
+			encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
+
+		} */
 
 		return encoding;
 
@@ -113,7 +123,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
-		const envMap = cubemaps.get( material.envMap || environment );
+		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 
 		const shaderID = shaderIDs[ material.type ];
 
@@ -151,6 +161,9 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		}
 
 		const currentRenderTarget = renderer.getRenderTarget();
+
+		const useAlphaTest = material.alphaTest > 0;
+		const useClearcoat = material.clearcoat > 0;
 
 		const parameters = {
 
@@ -190,45 +203,58 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			normalMap: !! material.normalMap,
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
-			clearcoatMap: !! material.clearcoatMap,
-			clearcoatRoughnessMap: !! material.clearcoatRoughnessMap,
-			clearcoatNormalMap: !! material.clearcoatNormalMap,
+
+			clearcoat: useClearcoat,
+			clearcoatMap: useClearcoat && !! material.clearcoatMap,
+			clearcoatRoughnessMap: useClearcoat && !! material.clearcoatRoughnessMap,
+			clearcoatNormalMap: useClearcoat && !! material.clearcoatNormalMap,
+
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
 			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
+			specularIntensityMap: !! material.specularIntensityMap,
+			specularColorMap: !! material.specularColorMap,
+			specularColorMapEncoding: getTextureEncodingFromMap( material.specularColorMap ),
+
 			alphaMap: !! material.alphaMap,
+			alphaTest: useAlphaTest,
 
 			gradientMap: !! material.gradientMap,
 
-			sheen: !! material.sheen,
+			sheen: material.sheen > 0,
+			sheenColorMap: !! material.sheenColorMap,
+			sheenColorMapEncoding: getTextureEncodingFromMap( material.sheenColorMap ),
+			sheenRoughnessMap: !! material.sheenRoughnessMap,
 
+			transmission: material.transmission > 0,
 			transmissionMap: !! material.transmissionMap,
+			thicknessMap: !! material.thicknessMap,
 
 			combine: material.combine,
 
-			vertexTangents: ( material.normalMap && material.vertexTangents ),
+			vertexTangents: ( !! material.normalMap && !! object.geometry && !! object.geometry.attributes.tangent ),
 			vertexColors: material.vertexColors,
-			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap,
-			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || !! material.transmissionMap ) && !! material.displacementMap,
+			vertexAlphas: material.vertexColors === true && !! object.geometry && !! object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4,
+			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || material.sheenRoughnessMap,
+			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || material.sheen > 0 || !! material.sheenColorMap || !! material.sheenRoughnessMap ) && !! material.displacementMap,
 
 			fog: !! fog,
 			useFog: material.fog,
 			fogExp2: ( fog && fog.isFogExp2 ),
 
-			flatShading: material.flatShading,
+			flatShading: !! material.flatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
-			skinning: material.skinning && maxBones > 0,
+			skinning: object.isSkinnedMesh === true && maxBones > 0,
 			maxBones: maxBones,
 			useVertexTexture: floatVertexTextures,
 
-			morphTargets: material.morphTargets,
-			morphNormals: material.morphNormals,
-			maxMorphTargets: renderer.maxMorphTargets,
-			maxMorphNormals: renderer.maxMorphNormals,
+			morphTargets: !! object.geometry && !! object.geometry.morphAttributes.position,
+			morphNormals: !! object.geometry && !! object.geometry.morphAttributes.normal,
+			morphTargetsCount: ( !! object.geometry && !! object.geometry.morphAttributes.position ) ? object.geometry.morphAttributes.position.length : 0,
 
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
@@ -243,6 +269,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
 
+			format: material.format,
 			dithering: material.dithering,
 
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
@@ -253,7 +280,6 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 			premultipliedAlpha: material.premultipliedAlpha,
 
-			alphaTest: material.alphaTest,
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 
@@ -288,8 +314,8 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 		} else {
 
-			array.push( parameters.fragmentShader );
-			array.push( parameters.vertexShader );
+			array.push( hashString( parameters.fragmentShader ) );
+			array.push( hashString( parameters.vertexShader ) );
 
 		}
 

@@ -39,16 +39,14 @@
 			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
 			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
 
-			var container;
+			let mesh, camera, scene, renderer, effect;
+			let helper;
 
-			var mesh, camera, scene, renderer, effect;
-			var helper;
+			let ready = false;
 
-			var ready = false;
+			const clock = new THREE.Clock();
 
-			var clock = new THREE.Clock();
-
-			var startButton = document.getElementById( 'startButton' );
+			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', function () {
 
 				Ammo().then( function () {
@@ -62,10 +60,10 @@
 
 			function init() {
 
-				var overlay = document.getElementById( 'overlay' );
+				const overlay = document.getElementById( 'overlay' );
 				overlay.remove();
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -77,14 +75,14 @@
 
 				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
 
-				var listener = new THREE.AudioListener();
+				const listener = new THREE.AudioListener();
 				camera.add( listener );
 				scene.add( camera );
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0x887766 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
@@ -103,22 +101,22 @@
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
 
 				}
 
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
-				var cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
-				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
-				var audioParams = { delayTime: 160 * 1 / 30 };
+				const modelFile = 'models/mmd/miku/miku_v2.pmd';
+				const vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				const cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
+				const audioFile = 'models/mmd/audios/wavefile_short.mp3';
+				const audioParams = { delayTime: 160 * 1 / 30 };
 
 				helper = new MMDAnimationHelper();
 
-				var loader = new MMDLoader();
+				const loader = new MMDLoader();
 
 				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
@@ -137,7 +135,7 @@
 
 						new THREE.AudioLoader().load( audioFile, function ( buffer ) {
 
-							var audio = new THREE.Audio( listener ).setBuffer( buffer );
+							const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 							helper.add( audio, audioParams );
 							scene.add( mesh );
@@ -152,7 +150,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

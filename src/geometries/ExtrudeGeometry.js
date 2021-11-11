@@ -1,10 +1,3 @@
-import { Geometry } from '../core/Geometry.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
-import { ShapeUtils } from '../extras/ShapeUtils.js';
-
 /**
  * Creates extruded geometry from a path shape.
  *
@@ -27,49 +20,21 @@ import { ShapeUtils } from '../extras/ShapeUtils.js';
  * }
  */
 
-// ExtrudeGeometry
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import * as Curves from '../extras/curves/Curves.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Shape } from '../extras/core/Shape.js';
+import { ShapeUtils } from '../extras/ShapeUtils.js';
 
-class ExtrudeGeometry extends Geometry {
+class ExtrudeGeometry extends BufferGeometry {
 
-	constructor( shapes, options ) {
+	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
 
 		super();
 
 		this.type = 'ExtrudeGeometry';
-
-		this.parameters = {
-			shapes: shapes,
-			options: options
-		};
-
-		this.fromBufferGeometry( new ExtrudeBufferGeometry( shapes, options ) );
-		this.mergeVertices();
-
-	}
-
-	toJSON() {
-
-		const data = super.toJSON();
-
-		const shapes = this.parameters.shapes;
-		const options = this.parameters.options;
-
-		return toJSON( shapes, options, data );
-
-	}
-
-}
-
-
-// ExtrudeBufferGeometry
-
-class ExtrudeBufferGeometry extends BufferGeometry {
-
-	constructor( shapes, options ) {
-
-		super();
-
-		this.type = 'ExtrudeBufferGeometry';
 
 		this.parameters = {
 			shapes: shapes,
@@ -107,11 +72,11 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 
 			const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 			const steps = options.steps !== undefined ? options.steps : 1;
-			let depth = options.depth !== undefined ? options.depth : 100;
+			let depth = options.depth !== undefined ? options.depth : 1;
 
 			let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
-			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
-			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
+			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
+			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
 			let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 			let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
@@ -212,7 +177,7 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 
 			function scalePt2( pt, vec, size ) {
 
-				if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
+				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
 				return vec.clone().multiplyScalar( size ).add( pt );
 
@@ -723,12 +688,36 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 
 	toJSON() {
 
-		const data = BufferGeometry.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		const shapes = this.parameters.shapes;
 		const options = this.parameters.options;
 
 		return toJSON( shapes, options, data );
+
+	}
+
+	static fromJSON( data, shapes ) {
+
+		const geometryShapes = [];
+
+		for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+
+			const shape = shapes[ data.shapes[ j ] ];
+
+			geometryShapes.push( shape );
+
+		}
+
+		const extrudePath = data.options.extrudePath;
+
+		if ( extrudePath !== undefined ) {
+
+			data.options.extrudePath = new Curves[ extrudePath.type ]().fromJSON( extrudePath );
+
+		}
+
+		return new ExtrudeGeometry( geometryShapes, data.options );
 
 	}
 
@@ -768,7 +757,7 @@ const WorldUVGenerator = {
 		const d_y = vertices[ indexD * 3 + 1 ];
 		const d_z = vertices[ indexD * 3 + 2 ];
 
-		if ( Math.abs( a_y - b_y ) < 0.01 ) {
+		if ( Math.abs( a_y - b_y ) < Math.abs( a_x - b_x ) ) {
 
 			return [
 				new Vector2( a_x, 1 - a_z ),
@@ -789,6 +778,7 @@ const WorldUVGenerator = {
 		}
 
 	}
+
 };
 
 function toJSON( shapes, options, data ) {
@@ -818,4 +808,4 @@ function toJSON( shapes, options, data ) {
 }
 
 
-export { ExtrudeGeometry, ExtrudeBufferGeometry };
+export { ExtrudeGeometry, ExtrudeGeometry as ExtrudeBufferGeometry };

@@ -1,50 +1,56 @@
-console.warn( "THREE.BlendShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-/**
+( function () {
+
+	/**
  * Blend two textures
  */
+	const BlendShader = {
+		uniforms: {
+			'tDiffuse1': {
+				value: null
+			},
+			'tDiffuse2': {
+				value: null
+			},
+			'mixRatio': {
+				value: 0.5
+			},
+			'opacity': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-THREE.BlendShader = {
+		varying vec2 vUv;
 
-	uniforms: {
+		void main() {
 
-		"tDiffuse1": { value: null },
-		"tDiffuse2": { value: null },
-		"mixRatio": { value: 0.5 },
-		"opacity": { value: 1.0 }
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	},
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-	vertexShader: [
+		uniform float opacity;
+		uniform float mixRatio;
 
-		"varying vec2 vUv;",
+		uniform sampler2D tDiffuse1;
+		uniform sampler2D tDiffuse2;
 
-		"void main() {",
+		varying vec2 vUv;
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		void main() {
 
-		"}"
+			vec4 texel1 = texture2D( tDiffuse1, vUv );
+			vec4 texel2 = texture2D( tDiffuse2, vUv );
+			gl_FragColor = opacity * mix( texel1, texel2, mixRatio );
 
-	].join( "\n" ),
+		}`
+	};
 
-	fragmentShader: [
+	THREE.BlendShader = BlendShader;
 
-		"uniform float opacity;",
-		"uniform float mixRatio;",
-
-		"uniform sampler2D tDiffuse1;",
-		"uniform sampler2D tDiffuse2;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-		"	vec4 texel1 = texture2D( tDiffuse1, vUv );",
-		"	vec4 texel2 = texture2D( tDiffuse2, vUv );",
-		"	gl_FragColor = opacity * mix( texel1, texel2, mixRatio );",
-
-		"}"
-
-	].join( "\n" )
-
-};
+} )();

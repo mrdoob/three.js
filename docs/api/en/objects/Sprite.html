@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,9 +21,10 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var spriteMap = new THREE.TextureLoader().load( "sprite.png" );
-		var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap } );
-		var sprite = new THREE.Sprite( spriteMaterial );
+		const map = new THREE.TextureLoader().load( 'sprite.png' );
+		const material = new THREE.SpriteMaterial( { map: map } );
+
+		const sprite = new THREE.Sprite( material );
 		scene.add( sprite );
 		</code>
 
@@ -63,12 +63,12 @@
 		Returns a clone of this Sprite object and any descendants.
 		</p>
 
-		<h3>[method:Sprite copy]( [param:Sprite sprite] )</h3>
+		<h3>[method:this copy]( [param:Sprite sprite] )</h3>
 		<p>
 		Copies the properties of the passed sprite to this one.
 		</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		Get intersections between a casted ray and this sprite. [page:Raycaster.intersectObject]() will call this method.
 		The raycaster must be initialized by calling [page:Raycaster.setFromCamera]() before raycasting against sprites.

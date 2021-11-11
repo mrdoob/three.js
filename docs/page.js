@@ -4,11 +4,11 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 	// redirect to the index page (using the current URL without extension as the new fragment).
 	// If this URL itself has a fragment, append it with a dot (since '#' in an URL fragment is not allowed).
 
-	var href = window.location.href;
-	var splitIndex = href.lastIndexOf( '/docs/' ) + 6;
-	var docsBaseURL = href.substr( 0, splitIndex );
+	let href = window.location.href;
+	const splitIndex = href.lastIndexOf( '/docs/' ) + 6;
+	const docsBaseURL = href.substr( 0, splitIndex );
 
-	var hash = window.location.hash;
+	let hash = window.location.hash;
 
 	if ( hash !== '' ) {
 
@@ -17,19 +17,21 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	}
 
-	var pathSnippet = href.slice( splitIndex, - 5 );
+	const extension = href.split( '.' ).pop();
+	const end = ( extension === 'html' ) ? - 5 : href.length;
+	const pathSnippet = href.slice( splitIndex, end );
 
 	window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
 
 }
 
 
-function onDocumentLoad( event ) {
+function onDocumentLoad() {
 
-	var path, localizedPath;
-	var pathname = window.location.pathname;
-	var section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
-	var name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
+	let path, localizedPath;
+	const pathname = window.location.pathname;
+	const section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
+	let name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
 
 	switch ( section ) {
 
@@ -54,25 +56,25 @@ function onDocumentLoad( event ) {
 
 	}
 
-	var text = document.body.innerHTML;
+	let text = document.body.innerHTML;
 
 	text = text.replace( /\[name\]/gi, name );
 	text = text.replace( /\[path\]/gi, path );
-	text = text.replace( /\[page:([\w\.]+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
-	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, "[page:" + name + ".$1 $2]" ); // [page:.member title] to [page:name.member title]
-	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
+	text = text.replace( /\[page:([\w\.]+)\]/gi, '[page:$1 $1]' ); // [page:name] to [page:name title]
+	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, '[page:' + name + '.$1 $2]' ); // [page:.member title] to [page:name.member title]
+	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, '<a onclick="window.parent.setUrlFragment(\'$1\')" title="$1">$2</a>' ); // [page:name title]
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
-	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, "[$1:$2 $2]" ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" target=\"_parent\" title=\"" + name + ".$2\" class=\"permalink\">#</a> .<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" id=\"$2\">$2</a> $3 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" );
-	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, "$2 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" ); // [param:name title]
+	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, '[$1:$2 $2]' ); // [member:name] to [member:name title]
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, '<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" target="_parent" title="' + name + '.$2" class="permalink">#</a> .<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" id="$2">$2</a> $3 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' );
+	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' ); // [param:name title]
 
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!]+) ([\w|\:|\/|\.|\-|\_|\s]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
-	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, "<strong>$1</strong>" ); // *
+	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+)\]/gi, '<a href="$1"  target="_blank">$1</a>' ); // [link:url]
+	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+) ([\w|\:|\/|\.|\-|\_|\'|\s]+)\]/gi, '<a href="$1"  target="_blank">$2</a>' ); // [link:url title]
+	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, '<strong>$1</strong>' ); // *
 
-	text = text.replace( /\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
-	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, "<a href=\"../examples/#$1\"  target=\"_blank\">$2</a>" ); // [example:name title]
+	text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
+	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../examples/#$1"  target="_blank">$2</a>' ); // [example:name title]
 
 	text = text.replace( /<a class="param" onclick="window.parent.setUrlFragment\('\w+'\)">(null|this|Boolean|Object|Array|Number|String|Integer|Float|TypedArray|ArrayBuffer)<\/a>/gi, '<span class="param">$1</span>' ); // remove links to primitive types
 
@@ -80,11 +82,11 @@ function onDocumentLoad( event ) {
 
 	// handle code snippets formatting
 
-	var elements = document.getElementsByTagName( 'code' );
+	const elements = document.getElementsByTagName( 'code' );
 
-	for ( var i = 0; i < elements.length; i ++ ) {
+	for ( let i = 0; i < elements.length; i ++ ) {
 
-		var element = elements[ i ];
+		const element = elements[ i ];
 
 		text = element.textContent.trim();
 		text = text.replace( /^\t\t/gm, '' );
@@ -95,10 +97,10 @@ function onDocumentLoad( event ) {
 
 	// Edit button
 
-	var button = document.createElement( 'div' );
+	const button = document.createElement( 'div' );
 	button.id = 'button';
 	button.innerHTML = '<img src="../files/ic_mode_edit_black_24dp.svg">';
-	button.addEventListener( 'click', function ( event ) {
+	button.addEventListener( 'click', function () {
 
 		window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/' + section + '/' + localizedPath + '.html' );
 
@@ -108,27 +110,27 @@ function onDocumentLoad( event ) {
 
 	// Syntax highlighting
 
-	var styleBase = document.createElement( 'link' );
+	const styleBase = document.createElement( 'link' );
 	styleBase.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.css';
 	styleBase.rel = 'stylesheet';
 
-	var styleCustom = document.createElement( 'link' );
+	const styleCustom = document.createElement( 'link' );
 	styleCustom.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/threejs.css';
 	styleCustom.rel = 'stylesheet';
 
 	document.head.appendChild( styleBase );
 	document.head.appendChild( styleCustom );
 
-	var prettify = document.createElement( 'script' );
+	const prettify = document.createElement( 'script' );
 	prettify.src = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.js';
 
 	prettify.onload = function () {
 
-		var elements = document.getElementsByTagName( 'code' );
+		const elements = document.getElementsByTagName( 'code' );
 
-		for ( var i = 0; i < elements.length; i ++ ) {
+		for ( let i = 0; i < elements.length; i ++ ) {
 
-			var e = elements[ i ];
+			const e = elements[ i ];
 			e.className += ' prettyprint';
 			e.setAttribute( 'translate', 'no' );
 
@@ -140,6 +142,6 @@ function onDocumentLoad( event ) {
 
 	document.head.appendChild( prettify );
 
-};
+}
 
 document.addEventListener( 'DOMContentLoaded', onDocumentLoad, false );

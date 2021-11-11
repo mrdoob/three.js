@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -56,7 +55,10 @@
 		<h3>Vertex shader (conditional):</h3>
 		<div>
 		<code>
-		#ifdef USE_COLOR
+		#if defined( USE_COLOR_ALPHA )
+			// vertex color attribute with alpha
+			attribute vec4 color;
+		#elif defined( USE_COLOR )
 			// vertex color attribute
 			attribute vec3 color;
 		#endif
@@ -90,6 +92,16 @@
 		#ifdef USE_SKINNING
 			attribute vec4 skinIndex;
 			attribute vec4 skinWeight;
+		#endif
+		</code>
+		<code>
+		#ifdef USE_INSTANCING
+			// Note that modelViewMatrix is not set when rendering an instanced model,
+			// but can be calculated from viewMatrix * modelMatrix.
+			//
+			// Basic Usage:
+			//   gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+			attribute mat4 instanceMatrix;
 		#endif
 		</code>
 		</div>
@@ -126,10 +138,10 @@
 		<p>The actual shader program.</p>
 
 		<h3>[property:WebGLShader vertexShader]</h3>
-		<p>An instance of [page:WebGLShader] representing the vertex shader.</p>
+		<p>The vertex shader.</p>
 
 		<h3>[property:WebGLShader fragmentShader]</h3>
-		<p>An instance of [page:WebGLShader] representing the frament shader.</p>
+		<p>The frament shader.</p>
 
 		<h2>Methods</h2>
 
@@ -143,7 +155,7 @@
 		Returns a name-value mapping of all active vertex attribute locations.
 		</p>
 
-		<h3>[method:null destroy]()</h3>
+		<h3>[method:undefined destroy]()</h3>
 		<p>
 		Destroys an instance of [name].
 		</p>

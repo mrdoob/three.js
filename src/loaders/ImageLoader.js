@@ -1,17 +1,16 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
+import { createElementNS } from '../utils.js';
 
-function ImageLoader( manager ) {
+class ImageLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: ImageLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.path !== undefined ) url = this.path + url;
 
@@ -37,12 +36,11 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		const image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+		const image = createElementNS( 'img' );
 
 		function onImageLoad() {
 
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+			removeEventListeners();
 
 			Cache.add( url, this );
 
@@ -54,13 +52,19 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function onImageError( event ) {
 
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+			removeEventListeners();
 
 			if ( onError ) onError( event );
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
+
+		}
+
+		function removeEventListeners() {
+
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 		}
 
@@ -81,7 +85,7 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { ImageLoader };

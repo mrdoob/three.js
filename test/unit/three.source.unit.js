@@ -1,8 +1,8 @@
+import './utils/console-wrapper.js';
 import './utils/qunit-utils.js';
 
 //src
 import './src/constants.tests';
-import './src/polyfills.tests';
 import './src/utils.tests';
 
 
@@ -46,10 +46,7 @@ import './src/cameras/StereoCamera.tests';
 import './src/core/BufferAttribute.tests';
 import './src/core/BufferGeometry.tests';
 import './src/core/Clock.tests';
-import './src/core/DirectGeometry.tests';
 import './src/core/EventDispatcher.tests';
-import './src/core/Face3.tests';
-import './src/core/Geometry.tests';
 import './src/core/InstancedBufferAttribute.tests';
 import './src/core/InstancedBufferGeometry.tests';
 import './src/core/InstancedInterleavedBuffer.tests';
@@ -67,7 +64,6 @@ import './src/extras/ShapeUtils.tests';
 //src/extras/core
 import './src/extras/core/Curve.tests';
 import './src/extras/core/CurvePath.tests';
-import './src/extras/core/Font.tests';
 import './src/extras/core/Interpolations.tests';
 import './src/extras/core/Path.tests';
 import './src/extras/core/Shape.tests';
@@ -85,10 +81,6 @@ import './src/extras/curves/QuadraticBezierCurve.tests';
 import './src/extras/curves/QuadraticBezierCurve3.tests';
 import './src/extras/curves/SplineCurve.tests';
 
-//src/extras/objects
-import './src/extras/objects/ImmediateRenderObject.tests';
-
-
 //src/geometries
 import './src/geometries/BoxGeometry.tests';
 import './src/geometries/CircleGeometry.tests';
@@ -100,14 +92,12 @@ import './src/geometries/ExtrudeGeometry.tests';
 import './src/geometries/IcosahedronGeometry.tests';
 import './src/geometries/LatheGeometry.tests';
 import './src/geometries/OctahedronGeometry.tests';
-import './src/geometries/ParametricGeometry.tests';
 import './src/geometries/PlaneGeometry.tests';
 import './src/geometries/PolyhedronGeometry.tests';
 import './src/geometries/RingGeometry.tests';
 import './src/geometries/ShapeGeometry.tests';
 import './src/geometries/SphereGeometry.tests';
 import './src/geometries/TetrahedronGeometry.tests';
-import './src/geometries/TextGeometry.tests';
 import './src/geometries/TorusGeometry.tests';
 import './src/geometries/TorusKnotGeometry.tests';
 import './src/geometries/TubeGeometry.tests';
@@ -152,7 +142,6 @@ import './src/loaders/CompressedTextureLoader.tests';
 import './src/loaders/CubeTextureLoader.tests';
 import './src/loaders/DataTextureLoader.tests';
 import './src/loaders/FileLoader.tests';
-import './src/loaders/FontLoader.tests';
 import './src/loaders/ImageLoader.tests';
 import './src/loaders/Loader.tests';
 import './src/loaders/LoaderUtils.tests';

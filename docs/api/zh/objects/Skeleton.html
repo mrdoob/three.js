@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,11 +18,11 @@
 		<code>
 		// Create a simple "arm"
 
-		var bones = [];
+		const bones = [];
 
-		var shoulder = new THREE.Bone();
-		var elbow = new THREE.Bone();
-		var hand = new THREE.Bone();
+		const shoulder = new THREE.Bone();
+		const elbow = new THREE.Bone();
+		const hand = new THREE.Bone();
 
 		shoulder.add( elbow );
 		elbow.add( hand );
@@ -36,7 +35,7 @@
 		elbow.position.y = 0;
 		hand.position.y = 5;
 
-		var armSkeleton = new THREE.Skeleton( bones );
+		const armSkeleton = new THREE.Skeleton( bones );
 		</code>
 
 		<p>
@@ -77,6 +76,10 @@
 		当使用顶点纹理时，[page:DataTexture]保存着骨骼数据。
 		</p>
 
+		<h3>[property:Integer boneTextureSize]</h3>
+		<p>
+		The size of the [page:.boneTexture].
+		</p>
 
 		<h2>方法</h2>
 
@@ -85,17 +88,17 @@
 			返回一个当前Skeleton对象的克隆。
 		</p>
 
-
-		<h3>[method:null calculateInverses]()</h3>
+		<h3>[method:undefined calculateInverses]()</h3>
 		<p>如果没有在构造器中提供，生成[page:.boneInverses boneInverses]数组。
 		</p>
 
+		<h3>[method:this computeBoneTexture]()</h3>
+		<p>Computes an instance of [page:DataTexture] in order to pass the bone data more efficiently to the shader. The texture is assigned to [page:.boneTexture boneTexture].</p>
 
-		<h3>[method:null pose]()</h3>
+		<h3>[method:undefined pose]()</h3>
 		<p>返回骨架的基础姿势。</p>
 
-
-		<h3>[method:null update]()</h3>
+		<h3>[method:undefined update]()</h3>
 		<p>
 			在改变骨骼后，更新[page:Float32Array boneMatrices] 和 [page:DataTexture boneTexture]的值。
 			如果骨架被用于[page:SkinnedMesh]，则它将会被[page:WebGLRenderer]自动调用。
@@ -108,7 +111,7 @@
 		在骨架中的骨骼数组中遍览，并返回第一个能够和name匹配上的骨骼对象。<br />
 		</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 		Can be used if an instance of [name] becomes obsolete in an application. The method will free internal resources.
 		</p>

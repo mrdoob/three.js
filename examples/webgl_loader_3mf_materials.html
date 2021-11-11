@@ -24,7 +24,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ThreeMFLoader } from './jsm/loaders/3MFLoader.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 
@@ -40,11 +40,11 @@
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 100, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( - 0, 40, 50 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 50;
@@ -56,13 +56,13 @@
 				dirLight.shadow.mapSize.set( 1024, 1024 );
 				scene.add( dirLight );
 
-				// scene.add( new CameraHelper( dirLight.shadow.camera ) );
+				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 				//
 
-				var manager = new THREE.LoadingManager();
+				const manager = new THREE.LoadingManager();
 
-				var loader = new ThreeMFLoader( manager );
+				const loader = new ThreeMFLoader( manager );
 				loader.load( './models/3mf/truck.3mf', function ( object ) {
 
 					object.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) ); 	// z-up conversion
@@ -87,7 +87,7 @@
 
 				//
 
-				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1000, 1000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.position.y = 11;
 				ground.receiveShadow = true;
@@ -105,7 +105,7 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
@@ -113,7 +113,7 @@
 				controls.target.set( 0, 20, 0 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				render();
 

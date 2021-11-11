@@ -1,5 +1,6 @@
-console.warn( "THREE.TriangleBlurShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-/**
+( function () {
+
+	/**
  * Triangle blur shader
  * based on glfx.js triangle blur shader
  * https://github.com/evanw/glfx.js
@@ -9,63 +10,65 @@ console.warn( "THREE.TriangleBlurShader: As part of the transition to ES6 Module
  * perpendicular triangle filters.
  */
 
-THREE.TriangleBlurShader = {
+	const TriangleBlurShader = {
+		uniforms: {
+			'texture': {
+				value: null
+			},
+			'delta': {
+				value: new THREE.Vector2( 1, 1 )
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-	uniforms: {
+		varying vec2 vUv;
 
-		"texture": { value: null },
-		"delta": { value: new THREE.Vector2( 1, 1 ) }
+		void main() {
 
-	},
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	vertexShader: [
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-		"varying vec2 vUv;",
+		#include <common>
 
-		"void main() {",
+		#define ITERATIONS 10.0
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		uniform sampler2D texture;
+		uniform vec2 delta;
 
-		"}"
+		varying vec2 vUv;
 
-	].join( "\n" ),
+		void main() {
 
-	fragmentShader: [
+			vec4 color = vec4( 0.0 );
 
-		"#include <common>",
-
-		"#define ITERATIONS 10.0",
-
-		"uniform sampler2D texture;",
-		"uniform vec2 delta;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-		"	vec4 color = vec4( 0.0 );",
-
-		"	float total = 0.0;",
+			float total = 0.0;
 
 		// randomize the lookup values to hide the fixed number of samples
 
-		"	float offset = rand( vUv );",
+			float offset = rand( vUv );
 
-		"	for ( float t = -ITERATIONS; t <= ITERATIONS; t ++ ) {",
+			for ( float t = -ITERATIONS; t <= ITERATIONS; t ++ ) {
 
-		"		float percent = ( t + offset - 0.5 ) / ITERATIONS;",
-		"		float weight = 1.0 - abs( percent );",
+				float percent = ( t + offset - 0.5 ) / ITERATIONS;
+				float weight = 1.0 - abs( percent );
 
-		"		color += texture2D( texture, vUv + delta * percent ) * weight;",
-		"		total += weight;",
+				color += texture2D( texture, vUv + delta * percent ) * weight;
+				total += weight;
 
-		"	}",
+			}
 
-		"	gl_FragColor = color / total;",
+			gl_FragColor = color / total;
 
-		"}"
+		}`
+	};
 
-	].join( "\n" )
+	THREE.TriangleBlurShader = TriangleBlurShader;
 
-};
+} )();

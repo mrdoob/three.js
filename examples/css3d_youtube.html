@@ -30,24 +30,24 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
-			var camera, scene, renderer;
-			var controls;
+			let camera, scene, renderer;
+			let controls;
 
-			var Element = function ( id, x, y, z, ry ) {
+			function Element( id, x, y, z, ry ) {
 
-				var div = document.createElement( 'div' );
+				const div = document.createElement( 'div' );
 				div.style.width = '480px';
 				div.style.height = '360px';
 				div.style.backgroundColor = '#000';
 
-				var iframe = document.createElement( 'iframe' );
+				const iframe = document.createElement( 'iframe' );
 				iframe.style.width = '480px';
 				iframe.style.height = '360px';
 				iframe.style.border = '0px';
 				iframe.src = [ 'https://www.youtube.com/embed/', id, '?rel=0' ].join( '' );
 				div.appendChild( iframe );
 
-				var object = new CSS3DObject( div );
+				const object = new CSS3DObject( div );
 				object.position.set( x, y, z );
 				object.rotation.y = ry;
 
@@ -60,7 +60,7 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 500, 350, 750 );
@@ -71,7 +71,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var group = new THREE.Group();
+				const group = new THREE.Group();
 				group.add( new Element( 'SJOz3qjfQXU', 0, 0, 240, 0 ) );
 				group.add( new Element( 'Y2-xZ-1HE-Q', 240, 0, 0, Math.PI / 2 ) );
 				group.add( new Element( 'IrydklNpcFI', 0, 0, - 240, Math.PI ) );
@@ -81,11 +81,11 @@
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 4;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// Block iframe events when dragging camera
 
-				var blocker = document.getElementById( 'blocker' );
+				const blocker = document.getElementById( 'blocker' );
 				blocker.style.display = 'none';
 
 				controls.addEventListener( 'start', function () {

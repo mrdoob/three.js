@@ -1,6 +1,6 @@
-import './polyfills.js';
 import { REVISION } from './constants.js';
 
+export { WebGLMultipleRenderTargets } from './renderers/WebGLMultipleRenderTargets.js';
 export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
 export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
@@ -47,7 +47,6 @@ export { BufferGeometryLoader } from './loaders/BufferGeometryLoader.js';
 export { DefaultLoadingManager, LoadingManager } from './loaders/LoadingManager.js';
 export { ImageLoader } from './loaders/ImageLoader.js';
 export { ImageBitmapLoader } from './loaders/ImageBitmapLoader.js';
-export { FontLoader } from './loaders/FontLoader.js';
 export { FileLoader } from './loaders/FileLoader.js';
 export { Loader } from './loaders/Loader.js';
 export { LoaderUtils } from './loaders/LoaderUtils.js';
@@ -61,7 +60,6 @@ export { HemisphereLightProbe } from './lights/HemisphereLightProbe.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
 export { AmbientLight } from './lights/AmbientLight.js';
 export { AmbientLightProbe } from './lights/AmbientLightProbe.js';
-export { LightShadow } from './lights/LightShadow.js';
 export { Light } from './lights/Light.js';
 export { LightProbe } from './lights/LightProbe.js';
 export { StereoCamera } from './cameras/StereoCamera.js';
@@ -91,14 +89,12 @@ export { AnimationClip } from './animation/AnimationClip.js';
 export { Uniform } from './core/Uniform.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 export { BufferGeometry } from './core/BufferGeometry.js';
-export { Geometry } from './core/Geometry.js';
 export { InterleavedBufferAttribute } from './core/InterleavedBufferAttribute.js';
 export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js';
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
 export { GLBufferAttribute } from './core/GLBufferAttribute.js';
 export * from './core/BufferAttribute.js';
-export { Face3 } from './core/Face3.js';
 export { Object3D } from './core/Object3D.js';
 export { Raycaster } from './core/Raycaster.js';
 export { Layers } from './core/Layers.js';
@@ -110,7 +106,7 @@ export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js'
 export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
 export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
-export { MathUtils } from './math/MathUtils.js';
+export * as MathUtils from './math/MathUtils.js';
 export { Spherical } from './math/Spherical.js';
 export { Cylindrical } from './math/Cylindrical.js';
 export { Plane } from './math/Plane.js';
@@ -129,7 +125,6 @@ export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
 export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
-export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './helpers/SkeletonHelper.js';
 export { PointLightHelper } from './helpers/PointLightHelper.js';
@@ -147,9 +142,9 @@ export * from './extras/curves/Curves.js';
 export { Shape } from './extras/core/Shape.js';
 export { Path } from './extras/core/Path.js';
 export { ShapePath } from './extras/core/ShapePath.js';
-export { Font } from './extras/core/Font.js';
 export { CurvePath } from './extras/core/CurvePath.js';
 export { Curve } from './extras/core/Curve.js';
+export { DataUtils } from './extras/DataUtils.js';
 export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
@@ -164,5 +159,19 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 		revision: REVISION,
 	} } ) );
 	/* eslint-enable no-undef */
+
+}
+
+if ( typeof window !== 'undefined' ) {
+
+	if ( window.__THREE__ ) {
+
+		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
+
+	} else {
+
+		window.__THREE__ = REVISION;
+
+	}
 
 }

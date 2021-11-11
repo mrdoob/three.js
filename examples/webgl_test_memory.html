@@ -25,16 +25,14 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var container;
-
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -52,11 +50,11 @@
 
 			function createImage() {
 
-				var canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 				canvas.width = 256;
 				canvas.height = 256;
 
-				var context = canvas.getContext( '2d' );
+				const context = canvas.getContext( '2d' );
 				context.fillStyle = 'rgb(' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ')';
 				context.fillRect( 0, 0, 256, 256 );
 
@@ -76,13 +74,13 @@
 
 			function render() {
 
-				var geometry = new THREE.SphereBufferGeometry( 50, Math.random() * 64, Math.random() * 32 );
+				const geometry = new THREE.SphereGeometry( 50, Math.random() * 64, Math.random() * 32 );
 
-				var texture = new THREE.CanvasTexture( createImage() );
+				const texture = new THREE.CanvasTexture( createImage() );
 
-				var material = new THREE.MeshBasicMaterial( { map: texture, wireframe: true } );
+				const material = new THREE.MeshBasicMaterial( { map: texture, wireframe: true } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 
 				scene.add( mesh );
 

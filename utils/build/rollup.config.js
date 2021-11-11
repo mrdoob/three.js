@@ -1,9 +1,11 @@
-import buble from 'rollup-plugin-buble';
+import babel from '@rollup/plugin-babel';
+import { terser } from 'rollup-plugin-terser';
+import babelrc from './.babelrc.json';
 
-function glconstants() {
+export function glconstants() {
 
 	var constants = {
-		POINTS: 0, ZERO: 0,
+		POINTS: 0, ZERO: 0, NONE: 0,
 		LINES: 1, ONE: 1,
 		LINE_LOOP: 2,
 		LINE_STRIP: 3,
@@ -37,7 +39,9 @@ function glconstants() {
 		CULL_FACE: 2884,
 		DEPTH_TEST: 2929,
 		STENCIL_TEST: 2960,
+		VIEWPORT: 2978,
 		BLEND: 3042,
+		SCISSOR_BOX: 3088,
 		SCISSOR_TEST: 3089,
 		UNPACK_ALIGNMENT: 3317,
 		MAX_TEXTURE_SIZE: 3379,
@@ -58,6 +62,7 @@ function glconstants() {
 		RGBA: 6408,
 		LUMINANCE: 6409,
 		LUMINANCE_ALPHA: 6410,
+		KEEP: 7680,
 		RED_INTEGER: 36244,
 		RG: 33319,
 		RG_INTEGER: 33320,
@@ -120,6 +125,9 @@ function glconstants() {
 		FRAGMENT_SHADER: 35632,
 		MAX_VERTEX_TEXTURE_IMAGE_UNITS: 35660,
 		MAX_COMBINED_TEXTURE_IMAGE_UNITS: 35661,
+		FLOAT_MAT2: 35674,
+		FLOAT_MAT3: 35675,
+		FLOAT_MAT4: 35676,
 		COMPILE_STATUS: 35713,
 		LINK_STATUS: 35714,
 		VALIDATE_STATUS: 35715,
@@ -141,9 +149,17 @@ function glconstants() {
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
 		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
+		UNPACK_COLORSPACE_CONVERSION_WEBGL: 37443,
+		UNPACK_ROW_LENGTH: 3314,
+		UNPACK_IMAGE_HEIGHT: 32878,
+		UNPACK_SKIP_PIXELS: 3316,
+		UNPACK_SKIP_ROWS: 3315,
+		UNPACK_SKIP_IMAGES: 32877,
 		MAX_SAMPLES: 36183,
 		READ_FRAMEBUFFER: 36008,
-		DRAW_FRAMEBUFFER: 36009
+		DRAW_FRAMEBUFFER: 36009,
+		SAMPLE_ALPHA_TO_COVERAGE: 32926,
+		SRGB8_ALPHA8: 35907
 	};
 
 	return {
@@ -169,7 +185,28 @@ function glconstants() {
 
 }
 
-function glsl() {
+function addons() {
+
+	return {
+
+		transform( code, id ) {
+
+			if ( /\/examples\/jsm\//.test( id ) === false ) return;
+
+			code = code.replace( 'build/three.module.js', 'src/Three.js' );
+
+			return {
+				code: code,
+				map: null
+			};
+
+		}
+
+	};
+
+}
+
+export function glsl() {
 
 	return {
 
@@ -177,7 +214,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.|\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -201,33 +238,15 @@ function glsl() {
 
 }
 
-function bubleCleanup() {
+function babelCleanup() {
 
-	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
-	const wrappedClass = /(var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n).*(return \2;\s+}\(\3\)\);\n)/s;
-	const unwrap = function ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
-
-		return match
-			.replace( wrapperStart, '' )
-			.replace( `if ( ${parentClass} ) ${klass}.__proto__ = ${parentClass};`, '' )
-			.replace(
-				`${klass}.prototype = Object.create( ${parentClass} && ${parentClass}.prototype );`,
-				`${klass}.prototype = Object.create( ${parentClass}.prototype );`
-			)
-			.replace( wrapperEnd, '' )
-			.replace( danglingTabs, '' );
-
-	};
+	const doubleSpaces = / {2}/g;
 
 	return {
 
 		transform( code ) {
 
-			while ( wrappedClass.test( code ) ) {
-
-				code = code.replace( wrappedClass, unwrap );
-
-			}
+			code = code.replace( doubleSpaces, '\t' );
 
 			return {
 				code: code,
@@ -240,19 +259,54 @@ function bubleCleanup() {
 
 }
 
-export default [
+function header() {
+
+	return {
+
+		renderChunk( code ) {
+
+			return `/**
+ * @license
+ * Copyright 2010-2021 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+${ code }`;
+
+		}
+
+	};
+
+}
+
+let builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			addons(),
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
+			glsl(),
+			babel( {
+				babelHelpers: 'bundled',
+				compact: false,
+				babelrc: false,
+				...babelrc
 			} ),
-			bubleCleanup()
+			babelCleanup(),
+			header()
 		],
 		output: [
 			{
@@ -266,15 +320,33 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			addons(),
 			glconstants(),
-			glsl()
+			glsl(),
+			babel( {
+				babelHelpers: 'bundled',
+				babelrc: false,
+				...babelrc
+			} ),
+			babelCleanup(),
+			terser(),
+			header()
 		],
 		output: [
 			{
-				format: 'esm',
-				file: 'build/three.module.js',
-				indent: '\t'
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.min.js'
 			}
 		]
 	}
 ];
+
+
+if ( process.env.ONLY_MODULE === 'true' ) {
+
+	builds = builds[ 0 ];
+
+}
+
+export default builds;

@@ -4,9 +4,10 @@ import {
 	LinearFilter,
 	Mesh,
 	MeshBasicMaterial,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	Texture
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
+
 /**
  * This class has been made to hold a slice of a volume data
  * @class
@@ -15,7 +16,7 @@ import {
  * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
  * @see Volume
  */
-var VolumeSlice = function ( volume, index, axis ) {
+function VolumeSlice( volume, index, axis ) {
 
 	var slice = this;
 	/**
@@ -94,7 +95,7 @@ var VolumeSlice = function ( volume, index, axis ) {
 	 */
 
 
-};
+}
 
 VolumeSlice.prototype = {
 
@@ -208,7 +209,7 @@ VolumeSlice.prototype = {
 
 		if ( this.geometry ) this.geometry.dispose(); // dispose existing geometry
 
-		this.geometry = new PlaneBufferGeometry( extracted.planeWidth, extracted.planeHeight );
+		this.geometry = new PlaneGeometry( extracted.planeWidth, extracted.planeHeight );
 
 		if ( this.mesh ) {
 

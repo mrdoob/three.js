@@ -52,11 +52,11 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var renderer, scene, camera, stats;
+			let renderer, scene, camera, stats;
 
-			var particleSystem, uniforms, geometry;
+			let particleSystem, uniforms, geometry;
 
-			var particles = 100000;
+			const particles = 100000;
 
 			init();
 			animate();
@@ -74,7 +74,7 @@
 
 				};
 
-				var shaderMaterial = new THREE.ShaderMaterial( {
+				const shaderMaterial = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
@@ -88,17 +88,17 @@
 				} );
 
 
-				var radius = 200;
+				const radius = 200;
 
 				geometry = new THREE.BufferGeometry();
 
-				var positions = [];
-				var colors = [];
-				var sizes = [];
+				const positions = [];
+				const colors = [];
+				const sizes = [];
 
-				var color = new THREE.Color();
+				const color = new THREE.Color();
 
-				for ( var i = 0; i < particles; i ++ ) {
+				for ( let i = 0; i < particles; i ++ ) {
 
 					positions.push( ( Math.random() * 2 - 1 ) * radius );
 					positions.push( ( Math.random() * 2 - 1 ) * radius );
@@ -124,7 +124,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -132,7 +132,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -156,13 +156,13 @@
 
 			function render() {
 
-				var time = Date.now() * 0.005;
+				const time = Date.now() * 0.005;
 
 				particleSystem.rotation.z = 0.01 * time;
 
-				var sizes = geometry.attributes.size.array;
+				const sizes = geometry.attributes.size.array;
 
-				for ( var i = 0; i < particles; i ++ ) {
+				for ( let i = 0; i < particles; i ++ ) {
 
 					sizes[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
 

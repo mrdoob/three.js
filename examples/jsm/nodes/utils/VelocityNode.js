@@ -2,173 +2,169 @@ import { Vector3 } from '../../../../build/three.module.js';
 
 import { Vector3Node } from '../inputs/Vector3Node.js';
 
-function VelocityNode( target, params ) {
+class VelocityNode extends Vector3Node {
 
-	Vector3Node.call( this );
+	constructor( target, params ) {
 
-	this.params = {};
+		super();
 
-	this.velocity = new Vector3();
+		this.params = {};
 
-	this.setTarget( target );
-	this.setParams( params );
+		this.velocity = new Vector3();
 
-}
-
-VelocityNode.prototype = Object.create( Vector3Node.prototype );
-VelocityNode.prototype.constructor = VelocityNode;
-VelocityNode.prototype.nodeType = "Velocity";
-
-VelocityNode.prototype.getReadonly = function ( /*builder*/ ) {
-
-	return false;
-
-};
-
-VelocityNode.prototype.setParams = function ( params ) {
-
-	switch ( this.params.type ) {
-
-		case "elastic":
-
-			delete this.moment;
-
-			delete this.speed;
-			delete this.springVelocity;
-
-			delete this.lastVelocity;
-
-			break;
+		this.setTarget( target );
+		this.setParams( params );
 
 	}
 
-	this.params = params || {};
+	getReadonly( /*builder*/ ) {
 
-	switch ( this.params.type ) {
-
-		case "elastic":
-
-			this.moment = new Vector3();
-
-			this.speed = new Vector3();
-			this.springVelocity = new Vector3();
-
-			this.lastVelocity = new Vector3();
-
-			break;
+		return false;
 
 	}
 
-};
+	setParams( params ) {
 
-VelocityNode.prototype.setTarget = function ( target ) {
+		switch ( this.params.type ) {
 
-	if ( this.target ) {
+			case 'elastic':
 
-		delete this.position;
-		delete this.oldPosition;
+				delete this.moment;
 
-	}
+				delete this.speed;
+				delete this.springVelocity;
 
-	this.target = target;
+				delete this.lastVelocity;
 
-	if ( target ) {
+				break;
 
-		this.position = target.getWorldPosition( this.position || new Vector3() );
-		this.oldPosition = this.position.clone();
+		}
 
-	}
+		this.params = params || {};
 
-};
+		switch ( this.params.type ) {
 
-VelocityNode.prototype.updateFrameVelocity = function ( /*frame*/ ) {
+			case 'elastic':
 
-	if ( this.target ) {
+				this.moment = new Vector3();
 
-		this.position = this.target.getWorldPosition( this.position || new Vector3() );
-		this.velocity.subVectors( this.position, this.oldPosition );
-		this.oldPosition.copy( this.position );
+				this.speed = new Vector3();
+				this.springVelocity = new Vector3();
 
-	}
+				this.lastVelocity = new Vector3();
 
-};
+				break;
 
-VelocityNode.prototype.updateFrame = function ( frame ) {
-
-	this.updateFrameVelocity( frame );
-
-	switch ( this.params.type ) {
-
-		case "elastic":
-
-			// convert to real scale: 0 at 1 values
-			var deltaFps = frame.delta * ( this.params.fps || 60 );
-
-			var spring = Math.pow( this.params.spring, deltaFps ),
-				damping = Math.pow( this.params.damping, deltaFps );
-
-			// fix relative frame-rate
-			this.velocity.multiplyScalar( Math.exp( - this.params.damping * deltaFps ) );
-
-			// elastic
-			this.velocity.add( this.springVelocity );
-			this.velocity.add( this.speed.multiplyScalar( damping ).multiplyScalar( 1 - spring ) );
-
-			// speed
-			this.speed.subVectors( this.velocity, this.lastVelocity );
-
-			// spring velocity
-			this.springVelocity.add( this.speed );
-			this.springVelocity.multiplyScalar( spring );
-
-			// moment
-			this.moment.add( this.springVelocity );
-
-			// damping
-			this.moment.multiplyScalar( damping );
-
-			this.lastVelocity.copy( this.velocity );
-			this.value.copy( this.moment );
-
-			break;
-
-		default:
-
-			this.value.copy( this.velocity );
+		}
 
 	}
 
-};
+	setTarget( target ) {
 
-VelocityNode.prototype.copy = function ( source ) {
+		if ( this.target ) {
 
-	Vector3Node.prototype.copy.call( this, source );
+			delete this.position;
+			delete this.oldPosition;
 
-	if ( source.target ) this.setTarget( source.target );
+		}
 
-	this.setParams( source.params );
+		this.target = target;
 
-	return this;
+		if ( target ) {
 
-};
+			this.position = target.getWorldPosition( this.position || new Vector3() );
+			this.oldPosition = this.position.clone();
 
-VelocityNode.prototype.toJSON = function ( meta ) {
+		}
 
-	var data = this.getJSONNode( meta );
+	}
 
-	if ( ! data ) {
+	updateFrameVelocity( /*frame*/ ) {
 
-		data = this.createJSONNode( meta );
+		if ( this.target ) {
+
+			this.position = this.target.getWorldPosition( this.position || new Vector3() );
+			this.velocity.subVectors( this.position, this.oldPosition );
+			this.oldPosition.copy( this.position );
+
+		}
+
+	}
+
+	updateFrame( frame ) {
+
+		this.updateFrameVelocity( frame );
+
+		switch ( this.params.type ) {
+
+			case 'elastic':
+
+				// convert to real scale: 0 at 1 values
+				const deltaFps = frame.delta * ( this.params.fps || 60 );
+
+				const spring = Math.pow( this.params.spring, deltaFps ),
+					damping = Math.pow( this.params.damping, deltaFps );
+
+				// fix relative frame-rate
+				this.velocity.multiplyScalar( Math.exp( - this.params.damping * deltaFps ) );
+
+				// elastic
+				this.velocity.add( this.springVelocity );
+				this.velocity.add( this.speed.multiplyScalar( damping ).multiplyScalar( 1 - spring ) );
+
+				// speed
+				this.speed.subVectors( this.velocity, this.lastVelocity );
+
+				// spring velocity
+				this.springVelocity.add( this.speed );
+				this.springVelocity.multiplyScalar( spring );
+
+				// moment
+				this.moment.add( this.springVelocity );
+
+				// damping
+				this.moment.multiplyScalar( damping );
+
+				this.lastVelocity.copy( this.velocity );
+				this.value.copy( this.moment );
+
+				break;
+
+			default:
+
+				this.value.copy( this.velocity );
+
+		}
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		if ( source.target ) this.setTarget( source.target );
+
+		this.setParams( source.params );
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
 
 		if ( this.target ) data.target = this.target.uuid;
 
 		// clone params
 		data.params = JSON.parse( JSON.stringify( this.params ) );
 
+		return data;
+
 	}
 
-	return data;
+}
 
-};
+VelocityNode.prototype.nodeType = 'Velocity';
 
 export { VelocityNode };

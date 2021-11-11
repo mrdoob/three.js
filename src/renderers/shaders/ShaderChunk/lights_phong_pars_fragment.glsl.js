@@ -1,13 +1,6 @@
 export default /* glsl */`
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
-
-	varying vec3 vNormal;
-
-#endif
-
-
 struct BlinnPhongMaterial {
 
 	vec3 diffuseColor;
@@ -22,21 +15,15 @@ void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in Geometri
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
 	vec3 irradiance = dotNL * directLight.color;
 
-	#ifndef PHYSICALLY_CORRECT_LIGHTS
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
-		irradiance *= PI; // punctual light
-
-	#endif
-
-	reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
-
-	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;
+	reflectedLight.directSpecular += irradiance * BRDF_BlinnPhong( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularShininess ) * material.specularStrength;
 
 }
 
 void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
 }
 

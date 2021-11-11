@@ -26,7 +26,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { AMFLoader } from './jsm/loaders/AMFLoader.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 
@@ -48,7 +48,7 @@
 
 				scene.add( camera );
 
-				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
 				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI / 180 ) );
 				scene.add( grid );
 
@@ -57,7 +57,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new AMFLoader();
+				const loader = new AMFLoader();
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
 
 					scene.add( amfobject );
@@ -65,12 +65,12 @@
 
 				} );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.target.set( 0, 1.2, 2 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
