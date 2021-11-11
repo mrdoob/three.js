@@ -575,23 +575,18 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
+				let j0 = j + 0;
+				let j1 = j + 1;
+				let j2 = j + 2;
 				if ( indices !== null ) {
 
-					handleTriangle(
-						indices[ j + 0 ],
-						indices[ j + 1 ],
-						indices[ j + 2 ]
-					);
-
-				} else {
-
-					handleTriangle(
-						j + 0,
-						j + 1,
-						j + 2,
-					);
+					j0 = indices[ j0 ];
+					j1 = indices[ j1 ];
+					j2 = indices[ j2 ];
 
 				}
+
+				handleTriangle( j0, j1, j2 );
 
 			}
 
@@ -634,19 +629,20 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
+				let j0 = j + 0;
+				let j1 = j + 1;
+				let j2 = j + 2;
 				if ( indices !== null ) {
 
-					handleVertex( indices[ j + 0 ] );
-					handleVertex( indices[ j + 1 ] );
-					handleVertex( indices[ j + 2 ] );
-
-				} else {
-
-					handleVertex( j + 0 );
-					handleVertex( j + 1 );
-					handleVertex( j + 2 );
+					j0 = indices[ j0 ];
+					j1 = indices[ j1 ];
+					j2 = indices[ j2 ];
 
 				}
+
+				handleVertex( j0 );
+				handleVertex( j1 );
+				handleVertex( j2 );
 
 			}
 
