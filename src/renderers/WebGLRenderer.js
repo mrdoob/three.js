@@ -216,10 +216,10 @@ function WebGLRenderer( parameters = {} ) {
 			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat
 		};
 
-		_canvas.setAttribute( 'data-engine', `three.js r${REVISION}` );
+		// OffscreenCanvas does not have setAttribute, see #22811
+		if ( 'setAttribute' in _canvas ) _canvas.setAttribute( 'data-engine', `three.js r${REVISION}` );
 
 		// event listeners must be registered before WebGL context is created, see #12753
-
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
