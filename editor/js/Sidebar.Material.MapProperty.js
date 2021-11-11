@@ -58,13 +58,15 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		const newMap = enabled.getValue() ? map.getValue() : null;
 
-		if ( material[ 'property' ] !== newMap ) {
+		if ( material[ property ] !== newMap ) {
 
-			const geometry = object.geometry;
+			if ( newMap !== null ) {
 
-			if ( newMap !== null && geometry.isBufferGeometry && geometry.attributes.uv === undefined ) {
+				const geometry = object.geometry;
 
-				console.warn( 'Geometry doesn\'t have uvs:', geometry );
+				if ( geometry.hasAttribute( 'uv' ) === false ) console.warn( 'Geometry doesn\'t have uvs:', geometry );
+
+				if ( property === 'envMap' ) newMap.mapping = THREE.EquirectangularReflectionMapping;
 
 			}
 
