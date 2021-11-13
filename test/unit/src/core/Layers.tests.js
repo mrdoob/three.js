@@ -110,6 +110,22 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "testLayer", ( assert ) => {
+
+			var a = new Layers();
+
+			a.enable( 1 );
+			assert.ok( a.testLayer( 1 ), "Enable channel 1 and pass the QUnit.test" );
+
+			a.enable( 2 );
+			assert.ok( a.testLayer( 2 ), "Enable channel 2 and pass the QUnit.test" );
+
+			a.toggle( 1 );
+			assert.notOk( a.testLayer( 1 ), "Toggle channel 1 and fail the QUnit.test" );
+			assert.ok( a.testLayer( 2 ), "Channel 2 still enabled and pass the QUnit.test" );
+
+		} );
+
 	} );
 
 } );

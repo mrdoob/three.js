@@ -48,6 +48,12 @@ class Layers {
 
 	}
 
+	testLayer( channel ) {
+
+		return ( this.mask & ( 1 << channel | 0 ) ) !== 0;
+
+	}
+
 }
 
 
