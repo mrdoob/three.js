@@ -30,7 +30,6 @@
 			let camera, scene, renderer;
 
 			init();
-			animate();
 
 			function init( ) {
 
@@ -57,7 +56,7 @@
 						side: THREE.DoubleSide
 					} );
 
-					const message = "   Three.js\nSimple text.";
+					const message = '   Three.js\nSimple text.';
 
 					const shapes = font.generateShapes( message, 100 );
 
@@ -116,6 +115,8 @@
 
 					scene.add( lineText );
 
+					render();
+
 				} ); //end load function
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -127,6 +128,8 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
+				controls.addEventListener( 'change', render );
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			} // end init
@@ -137,12 +140,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 
