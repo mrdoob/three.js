@@ -5,6 +5,9 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { FrontSide, BackSide } from '../constants.js';
+import { Vector3 } from '../math/Vector3.js';
+
+const _planeHelperTargetVector = new Vector3();
 
 class PlaneHelper extends Line {
 
@@ -46,7 +49,9 @@ class PlaneHelper extends Line {
 
 		this.children[ 0 ].material.side = ( scale < 0 ) ? BackSide : FrontSide; // renderer flips side when determinant < 0; flipping not wanted here
 
-		this.lookAt( this.plane.normal );
+		_planeHelperTargetVector.addVectors( this.position, this.plane.normal );
+
+		this.lookAt( _planeHelperTargetVector );
 
 		super.updateMatrixWorld( force );
 
