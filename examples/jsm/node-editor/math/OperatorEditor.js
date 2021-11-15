@@ -29,8 +29,8 @@ export class OperatorEditor extends ObjectNode {
 
 		} );
 
-		const aElement = new LabelElement( 'A' ).setRIO( 3 );
-		const bElement = new LabelElement( 'B' ).setRIO( 3 );
+		const aElement = new LabelElement( 'A' ).setInput( 3 );
+		const bElement = new LabelElement( 'B' ).setInput( 3 );
 
 		aElement.onConnect( () => {
 
