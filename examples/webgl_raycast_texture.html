@@ -180,7 +180,7 @@
 			const height = window.innerHeight;
 
 			let canvas;
-			let planeTexture, cubeTexture, circleTexture;
+			let planeTexture, cubeTexture, circleTexture, circleSampler;
 
 			let container;
 
@@ -255,8 +255,9 @@
 				// A circle on the right.
 
 				circleTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				circleSampler = new THREE.Sampler( circleTexture );
 				canvas.addParent( circleTexture );
-				const circleMaterial = new THREE.MeshBasicMaterial( { map: circleTexture } );
+				const circleMaterial = new THREE.MeshBasicMaterial( { map: circleSampler } );
 				const circleGeometry = new THREE.CircleGeometry( 25, 40, 0, Math.PI * 2 );
 				uvs = circleGeometry.attributes.uv.array;
 
@@ -355,31 +356,31 @@
 
 			function setOffsetU( event ) {
 
-				circleTexture.offset.x = parseFloat( event.target.value );
+				circleSampler.offset.x = parseFloat( event.target.value );
 
 			}
 
 			function setOffsetV( event ) {
 
-				circleTexture.offset.y = parseFloat( event.target.value );
+				circleSampler.offset.y = parseFloat( event.target.value );
 
 			}
 
 			function setRepeatU( event ) {
 
-				circleTexture.repeat.x = parseFloat( event.target.value );
+				circleSampler.repeat.x = parseFloat( event.target.value );
 
 			}
 
 			function setRepeatV( event ) {
 
-				circleTexture.repeat.y = parseFloat( event.target.value );
+				circleSampler.repeat.y = parseFloat( event.target.value );
 
 			}
 
 			function setRotation( event ) {
 
-				circleTexture.rotation = parseFloat( event.target.value );
+				circleSampler.rotation = parseFloat( event.target.value );
 
 			}
 

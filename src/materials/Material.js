@@ -204,51 +204,51 @@ class Material extends EventDispatcher {
 		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
 		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
 
-		if ( this.clearcoatMap && this.clearcoatMap.isTexture ) {
+		if ( this.clearcoatMap && this.clearcoatMap.isTexture && this.clearcoatMap.isSampler ) {
 
 			data.clearcoatMap = this.clearcoatMap.toJSON( meta ).uuid;
 
 		}
 
-		if ( this.clearcoatRoughnessMap && this.clearcoatRoughnessMap.isTexture ) {
+		if ( this.clearcoatRoughnessMap && ( this.clearcoatRoughnessMap.isTexture || this.clearcoatRoughnessMap.isSampler ) ) {
 
 			data.clearcoatRoughnessMap = this.clearcoatRoughnessMap.toJSON( meta ).uuid;
 
 		}
 
-		if ( this.clearcoatNormalMap && this.clearcoatNormalMap.isTexture ) {
+		if ( this.clearcoatNormalMap && ( this.clearcoatNormalMap.isTexture || this.clearcoatNormalMap.isSampler ) ) {
 
 			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
 			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
 
 		}
 
-		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
-		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
-		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
+		if ( this.map && ( this.map.isTexture || this.map.isSampler ) ) data.map = this.map.toJSON( meta ).uuid;
+		if ( this.matcap && ( this.matcap.isTexture || this.matcap.isSampler ) ) data.matcap = this.matcap.toJSON( meta ).uuid;
+		if ( this.alphaMap && ( this.alphaMap.isTexture || this.alphaMap.isSampler ) ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
 
-		if ( this.lightMap && this.lightMap.isTexture ) {
+		if ( this.lightMap && ( this.lightMap.isTexture || this.lightMap.isSampler ) ) {
 
 			data.lightMap = this.lightMap.toJSON( meta ).uuid;
 			data.lightMapIntensity = this.lightMapIntensity;
 
 		}
 
-		if ( this.aoMap && this.aoMap.isTexture ) {
+		if ( this.aoMap && ( this.aoMap.isTexture || this.aoMap.isSampler ) ) {
 
 			data.aoMap = this.aoMap.toJSON( meta ).uuid;
 			data.aoMapIntensity = this.aoMapIntensity;
 
 		}
 
-		if ( this.bumpMap && this.bumpMap.isTexture ) {
+		if ( this.bumpMap && ( this.bumpMap.isTexture || this.bumpMap.isSampler ) ) {
 
 			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
 			data.bumpScale = this.bumpScale;
 
 		}
 
-		if ( this.normalMap && this.normalMap.isTexture ) {
+		if ( this.normalMap && ( this.normalMap.isTexture || this.normalMap.isSampler ) ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
 			data.normalMapType = this.normalMapType;
@@ -256,7 +256,7 @@ class Material extends EventDispatcher {
 
 		}
 
-		if ( this.displacementMap && this.displacementMap.isTexture ) {
+		if ( this.displacementMap && ( this.displacementMap.isTexture || this.displacementMap.isSampler ) ) {
 
 			data.displacementMap = this.displacementMap.toJSON( meta ).uuid;
 			data.displacementScale = this.displacementScale;
@@ -264,13 +264,13 @@ class Material extends EventDispatcher {
 
 		}
 
-		if ( this.roughnessMap && this.roughnessMap.isTexture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
-		if ( this.metalnessMap && this.metalnessMap.isTexture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
+		if ( this.roughnessMap && ( this.roughnessMap.isTexture || this.roughnessMap.isSampler ) ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
+		if ( this.metalnessMap && ( this.metalnessMap.isTexture || this.metalnessMap.isSampler ) ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
 
-		if ( this.emissiveMap && this.emissiveMap.isTexture ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
-		if ( this.specularMap && this.specularMap.isTexture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
-		if ( this.specularIntensityMap && this.specularIntensityMap.isTexture ) data.specularIntensityMap = this.specularIntensityMap.toJSON( meta ).uuid;
-		if ( this.specularColorMap && this.specularColorMap.isTexture ) data.specularColorMap = this.specularColorMap.toJSON( meta ).uuid;
+		if ( this.emissiveMap && ( this.emissiveMap.isTexture || this.emissiveMap.isSampler ) ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
+		if ( this.specularMap && ( this.specularMap.isTexture || this.specularMap.isSampler ) ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
+		if ( this.specularIntensityMap && ( this.specularIntensityMap.isTexture || this.specularIntensityMap.isSampler ) ) data.specularIntensityMap = this.specularIntensityMap.toJSON( meta ).uuid;
+		if ( this.specularColorMap && ( this.specularColorMap.isTexture || this.specularColorMap.isSampler ) ) data.specularColorMap = this.specularColorMap.toJSON( meta ).uuid;
 
 		if ( this.envMap && this.envMap.isTexture ) {
 
@@ -284,16 +284,16 @@ class Material extends EventDispatcher {
 		if ( this.reflectivity !== undefined ) data.reflectivity = this.reflectivity;
 		if ( this.refractionRatio !== undefined ) data.refractionRatio = this.refractionRatio;
 
-		if ( this.gradientMap && this.gradientMap.isTexture ) {
+		if ( this.gradientMap && ( this.gradientMap.isTexture || this.gradientMap.isSampler ) ) {
 
 			data.gradientMap = this.gradientMap.toJSON( meta ).uuid;
 
 		}
 
 		if ( this.transmission !== undefined ) data.transmission = this.transmission;
-		if ( this.transmissionMap && this.transmissionMap.isTexture ) data.transmissionMap = this.transmissionMap.toJSON( meta ).uuid;
+		if ( this.transmissionMap && ( this.transmissionMap.isTexture || this.transmissionMap.isSampler ) ) data.transmissionMap = this.transmissionMap.toJSON( meta ).uuid;
 		if ( this.thickness !== undefined ) data.thickness = this.thickness;
-		if ( this.thicknessMap && this.thicknessMap.isTexture ) data.thicknessMap = this.thicknessMap.toJSON( meta ).uuid;
+		if ( this.thicknessMap && ( this.thicknessMap.isTexture || this.thicknessMap.isSampler ) ) data.thicknessMap = this.thicknessMap.toJSON( meta ).uuid;
 		if ( this.attenuationDistance !== undefined ) data.attenuationDistance = this.attenuationDistance;
 		if ( this.attenuationColor !== undefined ) data.attenuationColor = this.attenuationColor.getHex();
 

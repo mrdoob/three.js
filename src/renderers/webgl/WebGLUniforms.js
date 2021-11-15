@@ -467,6 +467,8 @@ function setValueT1( gl, v, textures ) {
 
 	}
 
+	if ( v.isSampler ) v = v.texture;
+
 	textures.safeSetTexture2D( v || emptyTexture, unit );
 
 }

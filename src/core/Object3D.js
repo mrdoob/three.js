@@ -643,6 +643,7 @@ class Object3D extends EventDispatcher {
 				geometries: {},
 				materials: {},
 				textures: {},
+				samplers: {},
 				images: {},
 				shapes: {},
 				skeletons: {},
@@ -826,6 +827,7 @@ class Object3D extends EventDispatcher {
 			const geometries = extractFromCache( meta.geometries );
 			const materials = extractFromCache( meta.materials );
 			const textures = extractFromCache( meta.textures );
+			const samplers = extractFromCache( meta.samplers );
 			const images = extractFromCache( meta.images );
 			const shapes = extractFromCache( meta.shapes );
 			const skeletons = extractFromCache( meta.skeletons );
@@ -834,6 +836,7 @@ class Object3D extends EventDispatcher {
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
 			if ( textures.length > 0 ) output.textures = textures;
+			if ( samplers.length > 0 ) output.samplers = samplers;
 			if ( images.length > 0 ) output.images = images;
 			if ( shapes.length > 0 ) output.shapes = shapes;
 			if ( skeletons.length > 0 ) output.skeletons = skeletons;

@@ -276,13 +276,13 @@ function WebGLMaterials( properties ) {
 
 			}
 
-			if ( uvScaleMap.matrixAutoUpdate === true ) {
+			if ( uvScaleMap.isSampler === true ) {
 
-				uvScaleMap.updateMatrix();
+				if ( uvScaleMap.matrixAutoUpdate === true ) uvScaleMap.updateMatrix();
+
+				uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 			}
-
-			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
 
@@ -311,13 +311,17 @@ function WebGLMaterials( properties ) {
 
 			}
 
-			if ( uv2ScaleMap.matrixAutoUpdate === true ) {
+			if ( uv2ScaleMap.isSampler === true ) {
 
-				uv2ScaleMap.updateMatrix();
+				if ( uv2ScaleMap.matrixAutoUpdate === true ) {
+
+					uv2ScaleMap.updateMatrix();
+
+				}
+
+				uniforms.uv2Transform.value.copy( uv2ScaleMap.matrix );
 
 			}
-
-			uniforms.uv2Transform.value.copy( uv2ScaleMap.matrix );
 
 		}
 
@@ -379,7 +383,7 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( uvScaleMap !== undefined ) {
+		if ( uvScaleMap !== undefined && uvScaleMap.isSampler === true ) {
 
 			if ( uvScaleMap.matrixAutoUpdate === true ) {
 
@@ -433,7 +437,7 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( uvScaleMap !== undefined ) {
+		if ( uvScaleMap !== undefined && uvScaleMap.isSampler === true ) {
 
 			if ( uvScaleMap.matrixAutoUpdate === true ) {
 

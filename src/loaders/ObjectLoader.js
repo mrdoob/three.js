@@ -47,6 +47,7 @@ import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
+import { Sampler } from '../textures/Sampler.js';
 import { Texture } from '../textures/Texture.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { ImageLoader } from './ImageLoader.js';
@@ -153,7 +154,8 @@ class ObjectLoader extends Loader {
 		} );
 
 		const textures = this.parseTextures( json.textures, images );
-		const materials = this.parseMaterials( json.materials, textures );
+		const samplers = this.parseSamplers( json.samplers, textures );
+		const materials = this.parseMaterials( json.materials, textures, samplers );
 
 		const object = this.parseObject( json.object, geometries, materials, textures, animations );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
@@ -194,7 +196,8 @@ class ObjectLoader extends Loader {
 		const images = await this.parseImagesAsync( json.images );
 
 		const textures = this.parseTextures( json.textures, images );
-		const materials = this.parseMaterials( json.materials, textures );
+		const samplers = this.parseSamplers( json.samplers, textures );
+		const materials = this.parseMaterials( json.materials, textures, samplers );
 
 		const object = this.parseObject( json.object, geometries, materials, textures, animations );
 		const skeletons = this.parseSkeletons( json.skeletons, object );
@@ -313,7 +316,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	parseMaterials( json, textures ) {
+	parseMaterials( json, textures, samplers ) {
 
 		const cache = {}; // MultiMaterial
 		const materials = {};
@@ -322,6 +325,7 @@ class ObjectLoader extends Loader {
 
 			const loader = new MaterialLoader();
 			loader.setTextures( textures );
+			loader.setSamplers( samplers );
 
 			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
@@ -671,11 +675,6 @@ class ObjectLoader extends Loader {
 
 				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TEXTURE_MAPPING );
 
-				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
-				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
-				if ( data.center !== undefined ) texture.center.fromArray( data.center );
-				if ( data.rotation !== undefined ) texture.rotation = data.rotation;
-
 				if ( data.wrap !== undefined ) {
 
 					texture.wrapS = parseConstant( data.wrap[ 0 ], TEXTURE_WRAPPING );
@@ -705,6 +704,40 @@ class ObjectLoader extends Loader {
 		}
 
 		return textures;
+
+	}
+
+	parseSamplers( json, textures ) {
+
+		const samplers = {};
+
+		if ( json !== undefined ) {
+
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+				const data = json[ i ];
+
+				const texture = textures[ data.texture ];
+
+				const sampler = new Sampler( texture );
+
+				sampler.uuid = data.uuid;
+
+				if ( data.name !== undefined ) sampler.name = data.name;
+
+				if ( data.offset !== undefined ) sampler.offset.fromArray( data.offset );
+				if ( data.repeat !== undefined ) sampler.repeat.fromArray( data.repeat );
+				if ( data.center !== undefined ) sampler.center.fromArray( data.center );
+				if ( data.rotation !== undefined ) sampler.rotation = data.rotation;
+
+				samplers[ data.uuid ] = sampler;
+
+			}
+
+		}
+
+		return samplers;
+
 
 	}
 

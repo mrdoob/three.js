@@ -14,6 +14,7 @@ class MaterialLoader extends Loader {
 
 		super( manager );
 		this.textures = {};
+		this.samplers = {};
 
 	}
 
@@ -54,16 +55,23 @@ class MaterialLoader extends Loader {
 	parse( json ) {
 
 		const textures = this.textures;
+		const samplers = this.samplers;
 
 		function getTexture( name ) {
 
-			if ( textures[ name ] === undefined ) {
+			if ( textures[ name ] !== undefined ) {
 
-				console.warn( 'THREE.MaterialLoader: Undefined texture', name );
+				return textures[ name ];
+
+			} else if ( samplers[ name ] !== undefined ) {
+
+				return samplers[ name ];
+
+			} else {
+
+				console.warn( 'THREE.MaterialLoader: Undefined texture or sampler', name );
 
 			}
-
-			return textures[ name ];
 
 		}
 
@@ -298,6 +306,13 @@ class MaterialLoader extends Loader {
 	setTextures( value ) {
 
 		this.textures = value;
+		return this;
+
+	}
+
+	setSamplers( value ) {
+
+		this.samplers = value;
 		return this;
 
 	}
