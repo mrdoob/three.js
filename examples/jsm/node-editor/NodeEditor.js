@@ -3,13 +3,21 @@ import { StandardMaterialEditor } from './materials/StandardMaterialEditor.js';
 import { OperatorEditor } from './math/OperatorEditor.js';
 import { FloatEditor } from './inputs/FloatEditor.js';
 import { ColorEditor } from './inputs/ColorEditor.js';
+import { UVEditor } from './accessors/UVEditor.js';
+import { PositionEditor } from './accessors/PositionEditor.js';
+import { NormalEditor } from './accessors/NormalEditor.js';
+import { CheckerEditor } from './procedural/CheckerEditor.js';
 import { EventDispatcher } from 'three';
 
 export const ClassLib = {
 	'StandardMaterialEditor': StandardMaterialEditor,
 	'OperatorEditor': OperatorEditor,
 	'FloatEditor': FloatEditor,
-	'ColorEditor': ColorEditor
+	'ColorEditor': ColorEditor,
+	'UVEditor': UVEditor,
+	'PositionEditor': PositionEditor,
+	'NormalEditor': NormalEditor,
+	'CheckerEditor': CheckerEditor
 };
 
 export class NodeEditor extends EventDispatcher {
@@ -148,7 +156,10 @@ export class NodeEditor extends EventDispatcher {
 
 		};
 
-		// inputs
+		//**************//
+		//* INPUTS
+		//**************//
+
 		const inputsContext = new ContextMenu();
 
 		const floatInput = new ButtonInput( 'Float' ).setIcon( 'ti ti-box-multiple-1' )
@@ -174,7 +185,10 @@ export class NodeEditor extends EventDispatcher {
 			.add( colorInput );
 		//.add( sliderInput );
 
-		// math
+		//**************//
+		//* MATH
+		//**************//
+
 		const mathContext = new ContextMenu();
 		const operatorsNode = new ButtonInput( 'Operators' ).setIcon( 'ti ti-math-symbols' )
 			.onClick( () => add( new OperatorEditor() ) );
@@ -182,9 +196,46 @@ export class NodeEditor extends EventDispatcher {
 		mathContext
 			.add( operatorsNode );
 
-		// main
+		//**************//
+		//* ACCESSORS
+		//**************//
+
+		const accessorsContext = new ContextMenu();
+
+		const uvNode = new ButtonInput( 'UV' ).setIcon( 'ti ti-details' )
+			.onClick( () => add( new UVEditor() ) );
+
+		const positionNode = new ButtonInput( 'Position' ).setIcon( 'ti ti-hierarchy' )
+			.onClick( () => add( new PositionEditor() ) );
+
+		const normalNode = new ButtonInput( 'Normal' ).setIcon( 'ti ti-fold-up' )
+			.onClick( () => add( new NormalEditor() ) );
+
+		accessorsContext
+			.add( uvNode )
+			.add( positionNode )
+			.add( normalNode );
+
+		//**************//
+		//* PROCEDURAL
+		//**************//
+
+		const proceduralContext = new ContextMenu();
+
+		const checkerNode = new ButtonInput( 'Checker' ).setIcon( 'ti ti-border-outer' )
+			.onClick( () => add( new CheckerEditor() ) );
+
+		proceduralContext
+			.add( checkerNode );
+
+		//**************//
+		//* MAIN
+		//**************//
+
 		context.add( new ButtonInput( 'Inputs' ).setIcon( 'ti ti-forms' ), inputsContext );
+		context.add( new ButtonInput( 'Accessors' ).setIcon( 'ti ti-vector-triangle' ), accessorsContext );
 		context.add( new ButtonInput( 'Math' ).setIcon( 'ti ti-calculator' ), mathContext );
+		context.add( new ButtonInput( 'Procedural' ).setIcon( 'ti ti-infinity' ), proceduralContext );
 
 		this.domElement.appendChild( context.dom );
 
