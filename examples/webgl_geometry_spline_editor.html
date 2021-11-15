@@ -87,7 +87,7 @@
 
 				const planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
-				const planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
+				const planeMaterial = new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.2 } );
 
 				const plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = - 200;
