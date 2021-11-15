@@ -273,25 +273,17 @@
 
 	}
 
-	let _seed = 1234567;
-	const DEG2RAD = Math.PI / 180;
-	const RAD2DEG = 180 / Math.PI; //
-
 	const _lut = [];
 
 	for (let i = 0; i < 256; i++) {
 		_lut[i] = (i < 16 ? '0' : '') + i.toString(16);
 	}
 
-	const hasRandomUUID = typeof crypto !== 'undefined' && 'randomUUID' in crypto;
+	let _seed = 1234567;
+	const DEG2RAD = Math.PI / 180;
+	const RAD2DEG = 180 / Math.PI; // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
 	function generateUUID() {
-		if (hasRandomUUID) {
-			return crypto.randomUUID().toUpperCase();
-		} // TODO Remove this code when crypto.randomUUID() is available everywhere
-		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
-
-
 		const d0 = Math.random() * 0xffffffff | 0;
 		const d1 = Math.random() * 0xffffffff | 0;
 		const d2 = Math.random() * 0xffffffff | 0;
@@ -5373,6 +5365,7 @@
 
 		attach(object) {
 			// adds object as a child of this, while maintaining the object's world transform
+			// Note: This method does not support scene graphs having non-uniformly-scaled nodes(s)
 			this.updateWorldMatrix(true, false);
 
 			_m1$1.copy(this.matrixWorld).invert();
@@ -11820,11 +11813,12 @@
 		}
 
 		_setEncoding(uniform, texture) {
-			if (this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding) {
-				uniform.value = ENCODINGS[LinearEncoding];
-			} else {
-				uniform.value = ENCODINGS[texture.encoding];
-			}
+			/* if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
+					uniform.value = ENCODINGS[ LinearEncoding ];
+				} else {
+					uniform.value = ENCODINGS[ texture.encoding ];
+				} */
+			uniform.value = ENCODINGS[texture.encoding];
 		}
 
 		_textureToCubeUV(texture, cubeUVRenderTarget) {
@@ -14337,10 +14331,10 @@
 			} else {
 				encoding = LinearEncoding;
 			}
+			/* if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
+					encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
+				} */
 
-			if (isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding) {
-				encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
-			}
 
 			return encoding;
 		}
@@ -16412,7 +16406,9 @@
 			_gl.generateMipmap(target);
 		}
 
-		function getInternalFormat(internalFormatName, glFormat, glType, encoding) {
+		function getInternalFormat(internalFormatName, glFormat, glType
+		/*, encoding*/
+		) {
 			if (isWebGL2 === false) return glFormat;
 
 			if (internalFormatName !== null) {
@@ -16436,8 +16432,9 @@
 
 			if (glFormat === _gl.RGBA) {
 				if (glType === _gl.FLOAT) internalFormat = _gl.RGBA32F;
-				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F;
-				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F; //if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+
+				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.RGBA8;
 			}
 
 			if (internalFormat === _gl.R16F || internalFormat === _gl.R32F || internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F) {
@@ -18819,10 +18816,9 @@
 				preserveDrawingBuffer: _preserveDrawingBuffer,
 				powerPreference: _powerPreference,
 				failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat
-			};
+			}; // OffscreenCanvas does not have setAttribute, see #22811
 
-			_canvas.setAttribute('data-engine', `three.js r${REVISION}`); // event listeners must be registered before WebGL context is created, see #12753
-
+			if ('setAttribute' in _canvas) _canvas.setAttribute('data-engine', `three.js r${REVISION}`); // event listeners must be registered before WebGL context is created, see #12753
 
 			_canvas.addEventListener('webglcontextlost', onContextLost, false);
 
@@ -30413,6 +30409,8 @@
 
 	const _eyeLeft = /*@__PURE__*/new Matrix4();
 
+	const _projectionMatrix = /*@__PURE__*/new Matrix4();
+
 	class StereoCamera {
 		constructor() {
 			this.type = 'StereoCamera';
@@ -30449,7 +30447,8 @@
 				cache.eyeSep = this.eyeSep; // Off-axis stereoscopic effect based on
 				// http://paulbourke.net/stereographics/stereorender/
 
-				const projectionMatrix = camera.projectionMatrix.clone();
+				_projectionMatrix.copy(camera.projectionMatrix);
+
 				const eyeSepHalf = cache.eyeSep / 2;
 				const eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
 				const ymax = cache.near * Math.tan(DEG2RAD * cache.fov * 0.5) / cache.zoom;
@@ -30460,15 +30459,15 @@
 
 				xmin = -ymax * cache.aspect + eyeSepOnProjection;
 				xmax = ymax * cache.aspect + eyeSepOnProjection;
-				projectionMatrix.elements[0] = 2 * cache.near / (xmax - xmin);
-				projectionMatrix.elements[8] = (xmax + xmin) / (xmax - xmin);
-				this.cameraL.projectionMatrix.copy(projectionMatrix); // for right eye
+				_projectionMatrix.elements[0] = 2 * cache.near / (xmax - xmin);
+				_projectionMatrix.elements[8] = (xmax + xmin) / (xmax - xmin);
+				this.cameraL.projectionMatrix.copy(_projectionMatrix); // for right eye
 
 				xmin = -ymax * cache.aspect - eyeSepOnProjection;
 				xmax = ymax * cache.aspect - eyeSepOnProjection;
-				projectionMatrix.elements[0] = 2 * cache.near / (xmax - xmin);
-				projectionMatrix.elements[8] = (xmax + xmin) / (xmax - xmin);
-				this.cameraR.projectionMatrix.copy(projectionMatrix);
+				_projectionMatrix.elements[0] = 2 * cache.near / (xmax - xmin);
+				_projectionMatrix.elements[8] = (xmax + xmin) / (xmax - xmin);
+				this.cameraR.projectionMatrix.copy(_projectionMatrix);
 			}
 
 			this.cameraL.matrixWorld.copy(camera.matrixWorld).multiply(_eyeLeft);
