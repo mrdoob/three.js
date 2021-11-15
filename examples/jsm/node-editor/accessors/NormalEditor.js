@@ -10,6 +10,8 @@ export class NormalEditor extends ObjectNode {
 
 		super( 'Normal', 3, node );
 
+		this.title.setStyle( 'red' );
+
 		const optionsField = new SelectInput( [
 			{ name: 'Local', value: NormalNode.LOCAL },
 			{ name: 'World', value: NormalNode.WORLD },

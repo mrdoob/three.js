@@ -10,6 +10,8 @@ export class PositionEditor extends ObjectNode {
 
 		super( 'Position', 3, node );
 
+		this.title.setStyle( 'red' );
+
 		const optionsField = new SelectInput( [
 			{ name: 'Local', value: PositionNode.LOCAL },
 			{ name: 'World', value: PositionNode.WORLD },

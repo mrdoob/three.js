@@ -10,6 +10,8 @@ export class UVEditor extends ObjectNode {
 
 		super( 'UV', 2, node );
 
+		this.title.setStyle( 'red' );
+
 		const optionsField = new SelectInput( [ '1', '2' ] ).onChange( () => {
 
 			node.value = Number( optionsField.getValue() );

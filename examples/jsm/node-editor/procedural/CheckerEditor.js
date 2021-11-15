@@ -12,6 +12,8 @@ export class CheckerEditor extends ObjectNode {
 
 		super( 'Checker', 1, node );
 
+		this.title.setStyle( 'yellow' );
+
 		const field = new LabelElement( 'UV' ).setStyle( 'right' ).setInput( 2 );
 
 		field.onConnect( () => {
