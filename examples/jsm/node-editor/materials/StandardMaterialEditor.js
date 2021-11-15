@@ -18,10 +18,10 @@ export class StandardMaterialEditor extends ObjectNode {
 
 		this.setWidth( 300 );
 
-		const color = new LabelElement( 'color' ).setStyle( 'right' ).setInput( 3 );
-		const opacity = new LabelElement( 'opacity' ).setStyle( 'right' ).setInput( 1 );
-		const metalness = new LabelElement( 'metalness' ).setStyle( 'right' ).setInput( 1 );
-		const roughness = new LabelElement( 'roughness' ).setStyle( 'right' ).setInput( 1 );
+		const color = new LabelElement( 'color' ).setInput( 3 );
+		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
+		const metalness = new LabelElement( 'metalness' ).setInput( 1 );
+		const roughness = new LabelElement( 'roughness' ).setInput( 1 );
 
 		color.onConnect( () => this.update(), true );
 		opacity.onConnect( () => this.update(), true );

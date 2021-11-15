@@ -113,7 +113,7 @@
 			nodeEditor.addEventListener( 'new', () => {
 
 				const materialEditor = new StandardMaterialEditor();
-				materialEditor.setPosition( 150, 100 );
+				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 );
 
 				nodeEditor.add( materialEditor );
 
@@ -136,7 +136,7 @@
 			loaderFBX.load( 'models/fbx/stanford-bunny.fbx', ( object ) => {
 
 				const materialEditor = new StandardMaterialEditor();
-				materialEditor.setPosition( 150, 100 ); // canvas position
+				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 ); // canvas position
 
 				nodeEditor.add( materialEditor );
 
