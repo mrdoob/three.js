@@ -64,6 +64,12 @@ class DragControls extends EventDispatcher {
 
 		}
 
+		function getRaycaster() {
+
+			return _raycaster;
+
+		}
+
 		function onPointerMove( event ) {
 
 			if ( scope.enabled === false ) return;
