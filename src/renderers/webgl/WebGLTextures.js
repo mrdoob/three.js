@@ -179,29 +179,25 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getMipLevels( texture, image, supportsMips ) {
 
-		let levels;
-
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) === true ) {
 
 			// generated mipmaps via gl.generateMipmap()
 
-			levels = Math.log2( Math.max( image.width, image.height ) ) + 1;
+			return Math.log2( Math.max( image.width, image.height ) ) + 1;
 
 		} else if ( texture.mipmaps.length > 0 ) {
 
 			// user-defined mipmaps
 
-			levels = texture.mipmaps.length;
+			return texture.mipmaps.length;
 
 		} else {
 
 			// texture without mipmaps (only base level)
 
-			levels = 1;
+			return 1;
 
 		}
-
-		return levels;
 
 	}
 
