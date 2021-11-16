@@ -216,7 +216,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 position0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Float rotateSpeed]</h3>
@@ -233,7 +233,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Vector3 target0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Vector3 target]</h3>
@@ -255,7 +255,7 @@ controls.touches = {
 
 		<h3>[property:Float zoom0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			Used internally by the [page:.saveState] and [page:.reset] methods.
 		</p>
 
 		<h3>[property:Float zoomSpeed]</h3>
@@ -267,7 +267,7 @@ controls.touches = {
 
 		<h2>Methods</h2>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Remove all the event listeners.
 		</p>
@@ -282,17 +282,22 @@ controls.touches = {
 			Get the current vertical rotation, in radians.
 		</p>
 
-		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<h3>[method:Float getDistance] ()</h3>
+		<p>
+			Returns the distance from the camera to the target.
+		</p>
+
+		<h3>[method:undefined listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
 		</p>
 
-		<h3>[method:null reset] ()</h3>
+		<h3>[method:undefined reset] ()</h3>
 		<p>
 			Reset the controls to their state from either the last time the [page:.saveState] was called, or the initial state.
 		</p>
 
-		<h3>[method:null saveState] ()</h3>
+		<h3>[method:undefined saveState] ()</h3>
 		<p>
 			Save the current state of the controls. This can later be recovered with [page:.reset].
 		</p>

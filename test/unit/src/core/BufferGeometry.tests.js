@@ -364,12 +364,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( "computeFaceNormals", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		QUnit.test( "computeVertexNormals", ( assert ) => {
 
 			// get normals for a counter clockwise created triangle

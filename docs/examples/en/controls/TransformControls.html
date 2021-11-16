@@ -103,7 +103,7 @@
 		<h3>[property:Number rotationSnap]</h3>
 		<p>
 			By default, 3D objects are continuously rotated. If you set this property to a numeric value (radians), you can define in which
-			steps the 3D object should be rotated. Deault is *null*.
+			steps the 3D object should be rotated. Default is *null*.
 		</p>
 
 		<h3>[property:Boolean showX]</h3>
@@ -134,7 +134,7 @@
 		<h3>[property:Number translationSnap]</h3>
 		<p>
 			By default, 3D objects are continuously translated. If you set this property to a numeric value (world units), you can define in which
-			steps the 3D object should be translated. Deault is *null*.
+			steps the 3D object should be translated. Default is *null*.
 		</p>
 
 		<h2>Methods</h2>
@@ -156,9 +156,17 @@
 			Removes the current 3D object from the controls and makes the helper UI is invisible.
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the [page:Raycaster] object that is used for user interaction. This object is shared between all instances of
+			TransformControls. If you set the [page:Object3D.layers .layers] property of the [name], you will also want to
+			set the [page:Raycaster.layers .layers] property on the [page:Raycaster] with a matching value, or else the [name]
+			won't work as expected.
 		</p>
 
 		<h3>[method:String getMode] ()</h3>
@@ -166,7 +174,7 @@
 			Returns the transformation mode.
 		</p>
 
-		<h3>[method:null setMode] ( [param:String mode] )</h3>
+		<h3>[method:undefined setMode] ( [param:String mode] )</h3>
 		<p>
 			<p>
 				[page:String mode]: The transformation mode.
@@ -176,7 +184,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setRotationSnap] ( [param:Number rotationSnap] )</h3>
+		<h3>[method:undefined setRotationSnap] ( [param:Number rotationSnap] )</h3>
 		<p>
 			<p>
 				[page:Number rotationSnap]: The rotation snap.
@@ -186,7 +194,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setSize] ( [param:Number size] )</h3>
+		<h3>[method:undefined setSize] ( [param:Number size] )</h3>
 		<p>
 			<p>
 				[page:Number size]: The size of the helper UI.
@@ -196,7 +204,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setSpace] ( [param:String space] )</h3>
+		<h3>[method:undefined setSpace] ( [param:String space] )</h3>
 		<p>
 			<p>
 				[page:String space]: The coordinate space in which transformations are applied.
@@ -206,7 +214,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setTranslationSnap] ( [param:Number translationSnap] )</h3>
+		<h3>[method:undefined setTranslationSnap] ( [param:Number translationSnap] )</h3>
 		<p>
 			<p>
 				[page:Number translationSnap]: The translation snap.

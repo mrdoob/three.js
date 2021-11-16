@@ -35,6 +35,10 @@
 		vectors and so on, however these are the most common uses in three.js.
 		</p>
 
+		<p>
+		Iterating through a Vector3 instance will yield its components (x, y, z) in the corresponding order.
+		</p>
+
 
 		<h2>Code Example</h2>
 
@@ -202,7 +206,7 @@
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Vector3 v] )</h3>
-		<p>Checks for strict equality of this vector and [page:Vector3 v].</p>
+		<p>Returns *true* if the components of this vector and [page:Vector3 v] are strictly equal; *false* otherwise.</p>
 
 		<h3>[method:this floor]()</h3>
 		<p>The components of this vector are rounded down to the nearest integer value.</p>
@@ -336,7 +340,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector.</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0, 1 or 2.<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -438,6 +442,11 @@
 		<h3>[method:this random]()</h3>
 		<p>
 			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
+
+		<h3>[method:this randomDirection]()</h3>
+		<p>
+		Sets this vector to a uniformly random point on a unit sphere.
 		</p>
 
 		<h2>Source</h2>

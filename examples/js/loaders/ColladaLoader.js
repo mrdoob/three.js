@@ -1110,6 +1110,10 @@
 							data.parameters = parseEffectParameters( child );
 							break;
 
+						case 'extra':
+							data.extra = parseEffectExtra( child );
+							break;
+
 					}
 
 				}
@@ -1267,6 +1271,10 @@
 
 							break;
 
+						case 'bump':
+							data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
+							break;
+
 					}
 
 				}
@@ -1309,6 +1317,37 @@
 
 						case 'double_sided':
 							data[ child.nodeName ] = parseInt( child.textContent );
+							break;
+
+						case 'bump':
+							data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
+							break;
+
+					}
+
+				}
+
+				return data;
+
+			}
+
+			function parseEffectExtraTechniqueBump( xml ) {
+
+				var data = {};
+
+				for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+					var child = xml.childNodes[ i ];
+					if ( child.nodeType !== 1 ) continue;
+
+					switch ( child.nodeName ) {
+
+						case 'texture':
+							data[ child.nodeName ] = {
+								id: child.getAttribute( 'texture' ),
+								texcoord: child.getAttribute( 'texcoord' ),
+								extra: parseEffectParameterTexture( child )
+							};
 							break;
 
 					}
@@ -1383,7 +1422,6 @@
 
 				const effect = getEffect( data.url );
 				const technique = effect.profile.technique;
-				const extra = effect.profile.extra;
 				let material;
 
 				switch ( technique.type ) {
@@ -1559,6 +1597,7 @@
 								break;
 
 							default:
+								material.opacity = 1 - transparency.float;
 								console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
 
 						}
@@ -1570,9 +1609,28 @@
 				} //
 
 
-				if ( extra !== undefined && extra.technique !== undefined && extra.technique.double_sided === 1 ) {
+				if ( technique.extra !== undefined && technique.extra.technique !== undefined ) {
 
-					material.side = THREE.DoubleSide;
+					const techniques = technique.extra.technique;
+
+					for ( const k in techniques ) {
+
+						const v = techniques[ k ];
+
+						switch ( k ) {
+
+							case 'double_sided':
+								material.side = v === 1 ? THREE.DoubleSide : THREE.FrontSide;
+								break;
+
+							case 'bump':
+								material.normalMap = getTexture( v.texture );
+								material.normalScale = new THREE.Vector2( 1, 1 );
+								break;
+
+						}
+
+					}
 
 				}
 

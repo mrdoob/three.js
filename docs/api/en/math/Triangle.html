@@ -67,7 +67,7 @@
 		Returns true if the passed point, when projected onto the plane of the triangle, lies within the triangle.
 		</p>
 
-		<h3>[method:Triangle copy]( [param:Triangle triangle] )</h3>
+		<h3>[method:this copy]( [param:Triangle triangle] )</h3>
 		<p>
 			Copies the values of the passed triangles's [page:.a a], [page:.b b] and [page:.c c]
 			properties to this triangle.
@@ -120,13 +120,23 @@
 		Determines whether or not this triangle intersects [page:Box3 box].
 		</p>
 
-		<h3>[method:Triangle set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
+		<h3>[method:this set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
 		<p>
 		Sets the triangle's [page:.a a], [page:.b b] and [page:.c c] properties to the passed [page:Vector3 vector3s].<br>
 		Please note that this method only copies the values from the given objects.
 		</p>
 
-		<h3>[method:Triangle setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<h3>[method:this setFromAttributeAndIndices]( [param:BufferAttribute attribute], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<p>
+		attribute - [page:BufferAttribute] of vertex data <br />
+		i0 - [page:Integer] index <br />
+		i1 - [page:Integer] index <br />
+		i2 - [page:Integer] index<br /><br />
+
+		Sets the triangle's vertices from the buffer attribute vertex data.
+		</p>
+
+		<h3>[method:this setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
 		<p>
 		points - [page:Array] of [page:Vector3]s <br />
 		i0 - [page:Integer] index <br />

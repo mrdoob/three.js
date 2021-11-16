@@ -4,6 +4,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-97), expires 12/13/2021 -->
+		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
 	</head>
 	<body>
 		<div id="info">
@@ -26,10 +28,8 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			import ContextNode from './jsm/renderers/nodes/core/ContextNode.js';
-			import FunctionNode from './jsm/renderers/nodes/core/FunctionNode.js';
-
-			import LightsNode from './jsm/renderers/nodes/lights/LightsNode.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import { addTo } from './jsm/renderers/nodes/ShaderNode.js';
 
 			let camera, scene, renderer;
 
@@ -71,7 +71,7 @@
 
 				//light nodes ( selective lights )
 
-				const allLightsNode = LightsNode.fromLights( [ light1, light2, light3 ] );
+				const allLightsNode = Nodes.LightsNode.fromLights( [ light1, light2, light3 ] );
 
 				// points
 
@@ -85,30 +85,20 @@
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new THREE.PointsMaterial();
+				const materialPoints = new Nodes.PointsNodeMaterial();
 
 				// custom lighting model
 
-				const RE_Direct = new FunctionNode( `
-					void ( vec3 lightColor ) {
+				const customLightingModel = new Nodes.ShaderNode( ( inputs ) => {
 
-						// lightColor returns the light color with the intensity calculated
+					const { lightColor, directDiffuse } = inputs;
 
-						ReflectedLightDirectDiffuse += lightColor;
+					addTo( directDiffuse, lightColor );
 
-					}` );
+				} );
 
-
-				const RE_IndirectDiffuse = new FunctionNode( `
-					void ( ) {
-
-						//ReflectedLightIndirectDiffuse += vec3( 0.0 );
-
-					}` );
-
-				const lightingModelContext = new ContextNode( allLightsNode );
-				lightingModelContext.setParameter( 'RE_Direct', RE_Direct );
-				lightingModelContext.setParameter( 'RE_IndirectDiffuse', RE_IndirectDiffuse );
+				const lightingModelContext = new Nodes.ContextNode( allLightsNode );
+				lightingModelContext.context.lightingModel = customLightingModel;
 
 				materialPoints.lightNode = lightingModelContext;
 
@@ -132,7 +122,7 @@
 
 				// events
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 

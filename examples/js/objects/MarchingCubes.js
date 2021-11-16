@@ -4,18 +4,19 @@
  * Port of http://webglsamples.org/blob/blob.html
  */
 
-	class MarchingCubes extends THREE.ImmediateRenderObject {
+	class MarchingCubes extends THREE.Mesh {
 
-		constructor( resolution, material, enableUvs, enableColors ) {
+		constructor( resolution, material, enableUvs = false, enableColors = false, maxPolyCount = 10000 ) {
 
-			super( material );
+			const geometry = new THREE.BufferGeometry();
+			super( geometry, material );
 			const scope = this; // temp buffers used in polygonize
 
 			const vlist = new Float32Array( 12 * 3 );
 			const nlist = new Float32Array( 12 * 3 );
 			const clist = new Float32Array( 12 * 3 );
-			this.enableUvs = enableUvs !== undefined ? enableUvs : false;
-			this.enableColors = enableColors !== undefined ? enableColors : false; // functions have to be object properties
+			this.enableUvs = enableUvs;
+			this.enableColors = enableColors; // functions have to be object properties
 			// prototype functions kill performance
 			// (tested and it was 4x slower !!!)
 
@@ -35,27 +36,34 @@
 				this.zd = this.size2;
 				this.field = new Float32Array( this.size3 );
 				this.normal_cache = new Float32Array( this.size3 * 3 );
-				this.palette = new Float32Array( this.size3 * 3 ); // immediate render mode simulator
-
-				this.maxCount = 4096; // TODO: find the fastest size for this buffer
+				this.palette = new Float32Array( this.size3 * 3 ); //
 
 				this.count = 0;
-				this.hasPositions = false;
-				this.hasNormals = false;
-				this.hasColors = false;
-				this.hasUvs = false;
-				this.positionArray = new Float32Array( this.maxCount * 3 );
-				this.normalArray = new Float32Array( this.maxCount * 3 );
+				const maxVertexCount = maxPolyCount * 3;
+				this.positionArray = new Float32Array( maxVertexCount * 3 );
+				const positionAttribute = new THREE.BufferAttribute( this.positionArray, 3 );
+				positionAttribute.setUsage( THREE.DynamicDrawUsage );
+				geometry.setAttribute( 'position', positionAttribute );
+				this.normalArray = new Float32Array( maxVertexCount * 3 );
+				const normalAttribute = new THREE.BufferAttribute( this.normalArray, 3 );
+				normalAttribute.setUsage( THREE.DynamicDrawUsage );
+				geometry.setAttribute( 'normal', normalAttribute );
 
 				if ( this.enableUvs ) {
 
-					this.uvArray = new Float32Array( this.maxCount * 2 );
+					this.uvArray = new Float32Array( maxVertexCount * 2 );
+					const uvAttribute = new THREE.BufferAttribute( this.uvArray, 2 );
+					uvAttribute.setUsage( THREE.DynamicDrawUsage );
+					geometry.setAttribute( 'uv', uvAttribute );
 
 				}
 
 				if ( this.enableColors ) {
 
-					this.colorArray = new Float32Array( this.maxCount * 3 );
+					this.colorArray = new Float32Array( maxVertexCount * 3 );
+					const colorAttribute = new THREE.BufferAttribute( this.colorArray, 3 );
+					colorAttribute.setUsage( THREE.DynamicDrawUsage );
+					geometry.setAttribute( 'color', colorAttribute );
 
 				}
 
@@ -136,7 +144,7 @@
 			// (this is where most of time is spent - it's inner work of O(n3) loop )
 
 
-			function polygonize( fx, fy, fz, q, isol, renderCallback ) {
+			function polygonize( fx, fy, fz, q, isol ) {
 
 				// cache indices
 				const q1 = q + 1,
@@ -282,7 +290,7 @@
 					o1 = cubeindex + i;
 					o2 = o1 + 1;
 					o3 = o1 + 2;
-					posnormtriv( vlist, nlist, clist, 3 * triTable[ o1 ], 3 * triTable[ o2 ], 3 * triTable[ o3 ], renderCallback );
+					posnormtriv( vlist, nlist, clist, 3 * triTable[ o1 ], 3 * triTable[ o2 ], 3 * triTable[ o3 ] );
 					i += 3;
 					numtris ++;
 
@@ -290,12 +298,9 @@
 
 				return numtris;
 
-			} /////////////////////////////////////
-			// Immediate render mode simulator
-			/////////////////////////////////////
+			}
 
-
-			function posnormtriv( pos, norm, colors, o1, o2, o3, renderCallback ) {
+			function posnormtriv( pos, norm, colors, o1, o2, o3 ) {
 
 				const c = scope.count * 3; // positions
 
@@ -368,67 +373,7 @@
 
 				scope.count += 3;
 
-				if ( scope.count >= scope.maxCount - 3 ) {
-
-					scope.hasPositions = true;
-					scope.hasNormals = true;
-
-					if ( scope.enableUvs ) {
-
-						scope.hasUvs = true;
-
-					}
-
-					if ( scope.enableColors ) {
-
-						scope.hasColors = true;
-
-					}
-
-					renderCallback( scope );
-
-				}
-
-			}
-
-			this.begin = function () {
-
-				this.count = 0;
-				this.hasPositions = false;
-				this.hasNormals = false;
-				this.hasUvs = false;
-				this.hasColors = false;
-
-			};
-
-			this.end = function ( renderCallback ) {
-
-				if ( this.count === 0 ) return;
-
-				for ( let i = this.count * 3; i < this.positionArray.length; i ++ ) {
-
-					this.positionArray[ i ] = 0.0;
-
-				}
-
-				this.hasPositions = true;
-				this.hasNormals = true;
-
-				if ( this.enableUvs && this.material.map ) {
-
-					this.hasUvs = true;
-
-				}
-
-				if ( this.enableColors && this.material.vertexColors !== THREE.NoColors ) {
-
-					this.hasColors = true;
-
-				}
-
-				renderCallback( this );
-
-			}; /////////////////////////////////////
+			} /////////////////////////////////////
 			// Metaballs
 			/////////////////////////////////////
 			// Adds a reciprocal ball (nice and blobby) that, to be fast, fades to zero after
@@ -729,9 +674,9 @@
 
 			};
 
-			this.render = function ( renderCallback ) {
+			this.onBeforeRender = function () {
 
-				this.begin(); // Triangulate. Yeah, this is slow.
+				this.count = 0; // Triangulate. Yeah, this is slow.
 
 				const smin2 = this.size - 2;
 
@@ -750,59 +695,28 @@
 							const fx = ( x - this.halfsize ) / this.halfsize; //+ 1
 
 							const q = y_offset + x;
-							polygonize( fx, fy, fz, q, this.isolation, renderCallback );
+							polygonize( fx, fy, fz, q, this.isolation );
 
 						}
 
 					}
 
-				}
+				} // reset unneeded data
 
-				this.end( renderCallback );
 
-			};
+				for ( let i = this.count * 3; i < this.positionArray.length; i ++ ) {
 
-			this.generateGeometry = function () {
+					this.positionArray[ i ] = 0.0;
 
-				console.warn( 'THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry' );
-				return this.generateBufferGeometry();
+				} // update geometry data
 
-			};
 
-			function concatenate( a, b, length ) {
+				geometry.getAttribute( 'position' ).needsUpdate = true;
+				geometry.getAttribute( 'normal' ).needsUpdate = true;
+				if ( this.enableUvs ) geometry.getAttribute( 'uv' ).needsUpdate = true;
+				if ( this.enableColors ) geometry.getAttribute( 'color' ).needsUpdate = true; // safety check
 
-				const result = new Float32Array( a.length + length );
-				result.set( a, 0 );
-				result.set( b.slice( 0, length ), a.length );
-				return result;
-
-			}
-
-			this.generateBufferGeometry = function () {
-
-				const geo = new THREE.BufferGeometry();
-				let posArray = new Float32Array();
-				let normArray = new Float32Array();
-				let colorArray = new Float32Array();
-				let uvArray = new Float32Array();
-				const scope = this;
-
-				const geo_callback = function ( object ) {
-
-					if ( scope.hasPositions ) posArray = concatenate( posArray, object.positionArray, object.count * 3 );
-					if ( scope.hasNormals ) normArray = concatenate( normArray, object.normalArray, object.count * 3 );
-					if ( scope.hasColors ) colorArray = concatenate( colorArray, object.colorArray, object.count * 3 );
-					if ( scope.hasUvs ) uvArray = concatenate( uvArray, object.uvArray, object.count * 2 );
-					object.count = 0;
-
-				};
-
-				this.render( geo_callback );
-				if ( this.hasPositions ) geo.setAttribute( 'position', new THREE.BufferAttribute( posArray, 3 ) );
-				if ( this.hasNormals ) geo.setAttribute( 'normal', new THREE.BufferAttribute( normArray, 3 ) );
-				if ( this.hasColors ) geo.setAttribute( 'color', new THREE.BufferAttribute( colorArray, 3 ) );
-				if ( this.hasUvs ) geo.setAttribute( 'uv', new THREE.BufferAttribute( uvArray, 2 ) );
-				return geo;
+				if ( this.count / 3 > maxPolyCount ) console.warn( 'THREE.MarchingCubes: Geometry buffers too small for rendering. Please create an instance with a higher poly count.' );
 
 			};
 
@@ -816,7 +730,7 @@
 	// Marching cubes lookup tables
 	/////////////////////////////////////
 	// These tables are straight from Paul Bourke's page:
-	// http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/
+	// http://paulbourke.net/geometry/polygonise/
 	// who in turn got them from Cory Gene Bloyd.
 
 	const edgeTable = new Int32Array( [ 0x0, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c, 0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00, 0x190, 0x99, 0x393, 0x29a, 0x596, 0x49f, 0x795, 0x69c, 0x99c, 0x895, 0xb9f, 0xa96, 0xd9a, 0xc93, 0xf99, 0xe90, 0x230, 0x339, 0x33, 0x13a, 0x636, 0x73f, 0x435, 0x53c, 0xa3c, 0xb35, 0x83f, 0x936, 0xe3a, 0xf33, 0xc39, 0xd30, 0x3a0, 0x2a9, 0x1a3, 0xaa, 0x7a6, 0x6af, 0x5a5, 0x4ac, 0xbac, 0xaa5, 0x9af, 0x8a6, 0xfaa, 0xea3, 0xda9, 0xca0, 0x460, 0x569, 0x663, 0x76a, 0x66, 0x16f, 0x265, 0x36c, 0xc6c, 0xd65, 0xe6f, 0xf66, 0x86a, 0x963, 0xa69, 0xb60, 0x5f0, 0x4f9, 0x7f3, 0x6fa, 0x1f6, 0xff, 0x3f5, 0x2fc, 0xdfc, 0xcf5, 0xfff, 0xef6, 0x9fa, 0x8f3, 0xbf9, 0xaf0, 0x650, 0x759, 0x453, 0x55a, 0x256, 0x35f, 0x55, 0x15c, 0xe5c, 0xf55, 0xc5f, 0xd56, 0xa5a, 0xb53, 0x859, 0x950, 0x7c0, 0x6c9, 0x5c3, 0x4ca, 0x3c6, 0x2cf, 0x1c5, 0xcc, 0xfcc, 0xec5, 0xdcf, 0xcc6, 0xbca, 0xac3, 0x9c9, 0x8c0, 0x8c0, 0x9c9, 0xac3, 0xbca, 0xcc6, 0xdcf, 0xec5, 0xfcc, 0xcc, 0x1c5, 0x2cf, 0x3c6, 0x4ca, 0x5c3, 0x6c9, 0x7c0, 0x950, 0x859, 0xb53, 0xa5a, 0xd56, 0xc5f, 0xf55, 0xe5c, 0x15c, 0x55, 0x35f, 0x256, 0x55a, 0x453, 0x759, 0x650, 0xaf0, 0xbf9, 0x8f3, 0x9fa, 0xef6, 0xfff, 0xcf5, 0xdfc, 0x2fc, 0x3f5, 0xff, 0x1f6, 0x6fa, 0x7f3, 0x4f9, 0x5f0, 0xb60, 0xa69, 0x963, 0x86a, 0xf66, 0xe6f, 0xd65, 0xc6c, 0x36c, 0x265, 0x16f, 0x66, 0x76a, 0x663, 0x569, 0x460, 0xca0, 0xda9, 0xea3, 0xfaa, 0x8a6, 0x9af, 0xaa5, 0xbac, 0x4ac, 0x5a5, 0x6af, 0x7a6, 0xaa, 0x1a3, 0x2a9, 0x3a0, 0xd30, 0xc39, 0xf33, 0xe3a, 0x936, 0x83f, 0xb35, 0xa3c, 0x53c, 0x435, 0x73f, 0x636, 0x13a, 0x33, 0x339, 0x230, 0xe90, 0xf99, 0xc93, 0xd9a, 0xa96, 0xb9f, 0x895, 0x99c, 0x69c, 0x795, 0x49f, 0x596, 0x29a, 0x393, 0x99, 0x190, 0xf00, 0xe09, 0xd03, 0xc0a, 0xb06, 0xa0f, 0x905, 0x80c, 0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0 ] );

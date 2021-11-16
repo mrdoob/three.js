@@ -87,7 +87,7 @@
 		<p>
 			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
-			Default is *THREE.StaticDrawUsage*.
+			Default is [page:BufferAttributeUsage StaticDrawUsage]. See usage [page:BufferAttributeUsage constants] for all possible values.
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -111,7 +111,7 @@
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>返回该 BufferAttribute 的拷贝。</p>
 
-		<h3>[method:BufferAttribute copyArray]( array ) </h3>
+		<h3>[method:this copyArray]( array ) </h3>
 		<p>将参数中所给定的普通队列或 TypedArray 拷贝到 [page:BufferAttribute.array array] 中。<br /><br />
 			拷贝 TypedArray 相关注意事项详见 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]。
 		</p>
@@ -119,16 +119,16 @@
 		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>将一个矢量从 bufferAttribute[index2] 拷贝到 [page:BufferAttribute.array array][index1] 中。</p>
 
-		<h3>[method:BufferAttribute copyColorsArray]( [param:Array colors] ) </h3>
+		<h3>[method:this copyColorsArray]( [param:Array colors] ) </h3>
 		<p>将一个存储 RGB 颜色值的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
-		<h3>[method:BufferAttribute copyVector2sArray]( [param:Array vectors] ) </h3>
+		<h3>[method:this copyVector2sArray]( [param:Array vectors] ) </h3>
 		<p>将一个存储 [page:Vector2] 的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
-		<h3>[method:BufferAttribute copyVector3sArray]( [param:Array vectors] ) </h3>
+		<h3>[method:this copyVector3sArray]( [param:Array vectors] ) </h3>
 		<p>将一个存储 [page:Vector3] 的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
-		<h3>[method:BufferAttribute copyVector4sArray]( [param:Array vectors] ) </h3>
+		<h3>[method:this copyVector4sArray]( [param:Array vectors] ) </h3>
 		<p>将一个存储 [page:Vector4] 的队列拷贝到 [page:BufferAttribute.array array] 中。</p>
 
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
@@ -148,7 +148,7 @@
 			在 [example:webgl_buffergeometry WebGL / Buffergeometry] 中，该方在缓存数据传递给 GPU 后，用于释放内存。
 		</p>
 
-		<h3>[method:BufferAttribute set] ( [param:Array value], [param:Integer offset] ) </h3>
+		<h3>[method:this set] ( [param:Array value], [param:Integer offset] ) </h3>
 		<p>
 		value -- 被拷贝的 [page:Array] 或 [page:TypedArray] 类型的数据。 <br />
 		offset -- (可选) [page:BufferAttribute.array array] 中开始拷贝的位置索引。<br /><br />
@@ -159,28 +159,28 @@
 		特别的, 对将 [page:Array value] 转为  [page:TypedArray] 的要求详见上述链接。
 		</p>
 
-		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:BufferAttribute.usage usage] to value.</p>
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:BufferAttribute.usage usage] to value. See usage [page:BufferAttributeUsage constants] for all possible input values.</p>
 
-		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
+		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>设置给定索引的矢量的第一维数据（设置 X 值）。</p>
 
-		<h3>[method:BufferAttribute setY]( [param:Integer index], [param:Float y] ) </h3>
+		<h3>[method:this setY]( [param:Integer index], [param:Float y] ) </h3>
 		<p>设置给定索引的矢量的第二维数据（设置 Y 值）。</p>
 
-		<h3>[method:BufferAttribute setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<h3>[method:this setZ]( [param:Integer index], [param:Float z] ) </h3>
 		<p>设置给定索引的矢量的第三维数据（设置 Z 值）。</p>
 
-		<h3>[method:BufferAttribute setW]( [param:Integer index], [param:Float w] ) </h3>
+		<h3>[method:this setW]( [param:Integer index], [param:Float w] ) </h3>
 		<p>设置给定索引的矢量的第四维数据（设置 W 值）。</p>
 
-		<h3>[method:BufferAttribute setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<h3>[method:this setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
 		<p>设置给定索引的矢量的第一、二维数据（设置 X 和 Y 值）。</p>
 
-		<h3>[method:BufferAttribute setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<h3>[method:this setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
 		<p>设置给定索引的矢量的第一、二、三维数据（设置 X、Y 和 Z 值）。</p>
 
-		<h3>[method:BufferAttribute setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<h3>[method:this setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
 		<p>设置给定索引的矢量的第一、二、三、四维数据（设置 X、Y、Z 和 W 值）。</p>
 
 

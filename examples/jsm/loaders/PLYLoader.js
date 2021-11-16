@@ -363,25 +363,51 @@ class PLYLoader extends Loader {
 
 		function handleElement( buffer, elementName, element ) {
 
+			function findAttrName( names ) {
+
+				for ( let i = 0, l = names.length; i < l; i ++ ) {
+
+					const name = names[ i ];
+
+					if ( name in element ) return name;
+
+				}
+
+				return null;
+
+			}
+
+			const attrX = findAttrName( [ 'x', 'px', 'posx' ] ) || 'x';
+			const attrY = findAttrName( [ 'y', 'py', 'posy' ] ) || 'y';
+			const attrZ = findAttrName( [ 'z', 'pz', 'posz' ] ) || 'z';
+			const attrNX = findAttrName( [ 'nx', 'normalx' ] );
+			const attrNY = findAttrName( [ 'ny', 'normaly' ] );
+			const attrNZ = findAttrName( [ 'nz', 'normalz' ] );
+			const attrS = findAttrName( [ 's', 'u', 'texture_u', 'tx' ] );
+			const attrT = findAttrName( [ 't', 'v', 'texture_v', 'ty' ] );
+			const attrR = findAttrName( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ] );
+			const attrG = findAttrName( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ] );
+			const attrB = findAttrName( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ] );
+
 			if ( elementName === 'vertex' ) {
 
-				buffer.vertices.push( element.x, element.y, element.z );
+				buffer.vertices.push( element[ attrX ], element[ attrY ], element[ attrZ ] );
 
-				if ( 'nx' in element && 'ny' in element && 'nz' in element ) {
+				if ( attrNX !== null && attrNY !== null && attrNZ !== null ) {
 
-					buffer.normals.push( element.nx, element.ny, element.nz );
-
-				}
-
-				if ( 's' in element && 't' in element ) {
-
-					buffer.uvs.push( element.s, element.t );
+					buffer.normals.push( element[ attrNX ], element[ attrNY ], element[ attrNZ ] );
 
 				}
 
-				if ( 'red' in element && 'green' in element && 'blue' in element ) {
+				if ( attrS !== null && attrT !== null ) {
 
-					buffer.colors.push( element.red / 255.0, element.green / 255.0, element.blue / 255.0 );
+					buffer.uvs.push( element[ attrS ], element[ attrT ] );
+
+				}
+
+				if ( attrR !== null && attrG !== null && attrB !== null ) {
+
+					buffer.colors.push( element[ attrR ] / 255.0, element[ attrG ] / 255.0, element[ attrB ] / 255.0 );
 
 				}
 

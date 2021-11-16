@@ -6,7 +6,7 @@
 
 			super( manager );
 			this.hdrLoader = new THREE.RGBELoader();
-			this.type = THREE.UnsignedByteType;
+			this.type = THREE.HalfFloatType;
 
 		}
 

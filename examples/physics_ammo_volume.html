@@ -26,7 +26,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
 
 			// Graphics variables
 			let container, stats;
@@ -149,7 +149,7 @@
 				const ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 				ground.castShadow = true;
 				ground.receiveShadow = true;
-				textureLoader.load( "textures/grid.png", function ( texture ) {
+				textureLoader.load( 'textures/grid.png', function ( texture ) {
 
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
@@ -251,7 +251,7 @@
 				volume.frustumCulled = false;
 				scene.add( volume );
 
-				textureLoader.load( "textures/colors.png", function ( texture ) {
+				textureLoader.load( 'textures/colors.png', function ( texture ) {
 
 					volume.material.map = texture;
 					volume.material.needsUpdate = true;

@@ -107,6 +107,10 @@ Default is *false*.
 	在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
 </p>
 
+<h3>[property:Number format]</h3>
+<p>
+When this property is set to [page:Textures THREE.RGBFormat], the material is considered to be opaque and alpha values are ignored. Default is [page:Textures THREE.RGBAFormat].
+</p>
 
 <h3>[property:Boolean stencilWrite]</h3>
 <p>
@@ -274,14 +278,14 @@ This starts at *0* and counts how many times [property:Boolean needsUpdate] is s
 <h3>[method:Material clone]( )</h3>
 <p> 返回与此材质具有相同参数的新材质。</p>
 
-<h3>[method:Material copy]( [param:material material] )</h3>
+<h3>[method:this copy]( [param:material material] )</h3>
 <p> 将被传入材质中的参数复制到此材质中。</p>
 
-<h3>[method:null dispose]()</h3>
+<h3>[method:undefined dispose]()</h3>
 <p> 处理材质。材质的纹理不会被处理。需要通过[page:Texture Texture]处理。
 </p>
 
-<h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
+<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 <p> 在编译shader程序之前立即执行的可选回调。此函数使用shader源码作为参数。用于修改内置材质。
 </p>
 <p>
@@ -318,7 +322,7 @@ then customProgramCacheKey should be set like this:<br />
 Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 </p>
 
-<h3>[method:null setValues]( [param:Object values] )</h3>
+<h3>[method:undefined setValues]( [param:Object values] )</h3>
 <p> values -- 具有参数的容器。
 	根据*values*设置属性。<br/>
 </p>

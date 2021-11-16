@@ -6,7 +6,7 @@ import FloatNode from '../inputs/FloatNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import MathNode from '../math/MathNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { punctualLightIntensityToIrradianceFactor } from '../functions/BSDFs.js';
+import { getDistanceAttenuation } from '../functions/BSDFs.js';
 
 import { Color } from 'three';
 
@@ -20,60 +20,57 @@ class LightNode extends Node {
 
 		this.light = light;
 
-		this.color = new ColorNode( new Color() );
+		this.colorNode = new ColorNode( new Color() );
 
-		this.lightCutoffDistance = new FloatNode( 0 );
-		this.lightDecayExponent = new FloatNode( 0 );
-
-		this.lightPositionView = new Object3DNode( Object3DNode.VIEW_POSITION );
-		this.positionView = new PositionNode( PositionNode.VIEW );
-
-		this.lVector = new OperatorNode( '-', this.lightPositionView, this.positionView );
-
-		this.lightDirection = new MathNode( MathNode.NORMALIZE, this.lVector );
-
-		this.lightDistance = new MathNode( MathNode.LENGTH, this.lVector );
-
-		this.lightIntensity = punctualLightIntensityToIrradianceFactor.call( {
-			lightDistance: this.lightDistance,
-			cutoffDistance: this.lightCutoffDistance,
-			decayExponent: this.lightDecayExponent
-		} );
-
-		this.lightColor = new OperatorNode( '*', this.color, this.lightIntensity );
+		this.lightCutoffDistanceNode = new FloatNode( 0 );
+		this.lightDecayExponentNode = new FloatNode( 0 );
 
 	}
 
 	update( /* frame */ ) {
 
-		this.color.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
-		this.lightCutoffDistance.value = this.light.distance;
-		this.lightDecayExponent.value = this.light.decay;
+		this.colorNode.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		this.lightCutoffDistanceNode.value = this.light.distance;
+		this.lightDecayExponentNode.value = this.light.decay;
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		this.lightPositionView.object3d = this.light;
+		const lightPositionView = new Object3DNode( Object3DNode.VIEW_POSITION );
+		const positionView = new PositionNode( PositionNode.VIEW );
 
-		const directFunctionNode = builder.getContextParameter( 'RE_Direct' );
-		const indirectDiffuseFunctionNode = builder.getContextParameter( 'RE_IndirectDiffuse' );
+		const lVector = new OperatorNode( '-', lightPositionView, positionView );
 
-		const directFunctionCallNode = directFunctionNode.call( {
-			lightDirection: this.lightDirection,
-			lightColor: this.lightColor
+		const lightDirection = new MathNode( MathNode.NORMALIZE, lVector );
+
+		const lightDistance = new MathNode( MathNode.LENGTH, lVector );
+
+		const lightAttenuation = getDistanceAttenuation( {
+			lightDistance,
+			cutoffDistance: this.lightCutoffDistanceNode,
+			decayExponent: this.lightDecayExponentNode
 		} );
 
-		const indirectDiffuseFunctionCallNode = indirectDiffuseFunctionNode.call( {
-			lightDirection: this.lightDirection,
-			lightColor: this.lightColor
-		} );
+		const lightColor = new OperatorNode( '*', this.colorNode, lightAttenuation );
 
-		builder.addFlowCode( directFunctionCallNode.build( builder ) );
+		lightPositionView.object3d = this.light;
 
-		builder.addFlowCode( indirectDiffuseFunctionCallNode.build( builder ) );
+		const lightingModelFunction = builder.context.lightingModel;
 
-		return this.color.build( builder, output );
+		if ( lightingModelFunction !== undefined ) {
+
+			const directDiffuse = builder.context.directDiffuse;
+			const directSpecular = builder.context.directSpecular;
+
+			lightingModelFunction( {
+				lightDirection,
+				lightColor,
+				directDiffuse,
+				directSpecular
+			}, builder );
+
+		}
 
 	}
 

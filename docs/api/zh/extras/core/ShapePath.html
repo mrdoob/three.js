@@ -11,7 +11,6 @@
 
 		<p class="desc">
 		该类用于转换一系列的形状为一个[page:Path]数组，例如转换SVG中的Path为three.js中的Path（请参阅下方的example）。
-		在内部它由[page:Font]所使用，用于将JSON字体转换为一系列路径。
 		</p>
 
 		<h2>例子</h2>
@@ -59,7 +58,7 @@
 		<h3>[method:this bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
 		<p>
 			这一方法从[page:ShapePath.currentPath currentPath]（当前路径）的偏移量创建一条到X和Y的贝塞尔曲线，
-			cp1X、cp1Y和cp1X、cp1Y为控制点，并将[page:ShapePath.currentPath currentPath]的偏移量更新为x和y。
+			cp1X、cp1Y和cp2X、cp2Y为控制点，并将[page:ShapePath.currentPath currentPath]的偏移量更新为x和y。
 		</p>
 
 		<h3>[method:this splineThru] ( [param:Array points] ) </h3>

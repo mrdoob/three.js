@@ -47,12 +47,12 @@
 
 		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] to test.<br /><br />
+		[page:Vector3 point] - [page:Vector3] 被检测的点。<br /><br />
 
 		检测该点 [page:Vector3 point] 是否在视锥体内。
 		</p>
 
-		<h3>[method:Frustum copy]( [param:Frustum frustum] )</h3>
+		<h3>[method:this copy]( [param:Frustum frustum] )</h3>
 		<p>
 		[page:Frustum frustum] - 用于拷贝的视锥体。<br /><br />
 
@@ -88,13 +88,13 @@
 		<h3>[method:this set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
 		<p>
 		从传入的平面设置当前视锥体。没有隐式的顺序。<br>
-		Note that this method only copies the values from the given objects.
+		请注意，此方法仅复制给定对象的值。
 		</p>
 
 		<h3>[method:this setFromProjectionMatrix]( [param:Matrix4 matrix] )</h3>
 		<p>
-		[page:Matrix4 matrix] - Projection [page:Matrix4] used to set the [page:.planes planes]<br /><br />
-		Sets the frustum planes from the projection matrix.
+		[page:Matrix4 matrix] - 投影矩阵 [page:Matrix4] 会被用来设置该视椎体的 [page:.planes planes]<br /><br />
+		根据投影矩阵 matrix 来设置当前视椎体的六个面。
 		</p>
 
 

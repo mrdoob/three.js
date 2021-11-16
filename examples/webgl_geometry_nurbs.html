@@ -28,6 +28,7 @@
 
 			import { NURBSCurve } from './jsm/curves/NURBSCurve.js';
 			import { NURBSSurface } from './jsm/curves/NURBSSurface.js';
+			import { ParametricGeometry } from './jsm/geometries/ParametricGeometry.js';
 
 			let container, stats;
 
@@ -152,7 +153,7 @@
 
 				}
 
-				const geometry = new THREE.ParametricBufferGeometry( getSurfacePoint, 20, 20 );
+				const geometry = new ParametricGeometry( getSurfacePoint, 20, 20 );
 				const material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
 				const object = new THREE.Mesh( geometry, material );
 				object.position.set( - 200, 100, 0 );

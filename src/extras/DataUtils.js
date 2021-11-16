@@ -7,6 +7,14 @@ class DataUtils {
 
 	static toHalfFloat( val ) {
 
+		if ( val > 65504 ) {
+
+			console.warn( 'THREE.DataUtils.toHalfFloat(): value exceeds 65504.' );
+
+			val = 65504; // maximum representable value in float16
+
+		}
+
 		// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
 
 		/* This method is faster than the OpenEXR implementation (very often

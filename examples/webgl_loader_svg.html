@@ -25,7 +25,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
@@ -84,7 +84,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new GUI( { width: 350 } );
+				gui = new GUI();
 
 				gui.add( guiData, 'currentURL', {
 

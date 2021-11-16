@@ -34,7 +34,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
 			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
@@ -136,7 +136,7 @@
 
 				} );
 
-				const vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, morphTargets: false, side: THREE.DoubleSide, color: 0xff0000 } );
+				const vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, side: THREE.DoubleSide, color: 0xff0000 } );
 
 				const vtkloader = new VTKLoader();
 				vtkloader.load( "models/vtk/liver.vtk", function ( geometry ) {
