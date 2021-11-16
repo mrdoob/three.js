@@ -5,7 +5,7 @@ const _vector = /*@__PURE__*/ new Vector3();
 
 class InterleavedBufferAttribute {
 
-	constructor( interleavedBuffer, itemSize, offset, normalized ) {
+	constructor( interleavedBuffer, itemSize, offset, normalized = false ) {
 
 		this.name = '';
 

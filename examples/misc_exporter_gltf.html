@@ -41,21 +41,30 @@
 					binary: document.getElementById( 'option_binary' ).checked,
 					maxTextureSize: Number( document.getElementById( 'option_maxsize' ).value ) || Infinity // To prevent NaN value
 				};
-				gltfExporter.parse( input, function ( result ) {
+				gltfExporter.parse(
+					input,
+					function ( result ) {
 
-					if ( result instanceof ArrayBuffer ) {
+						if ( result instanceof ArrayBuffer ) {
 
-						saveArrayBuffer( result, 'scene.glb' );
+							saveArrayBuffer( result, 'scene.glb' );
 
-					} else {
+						} else {
 
-						const output = JSON.stringify( result, null, 2 );
-						console.log( output );
-						saveString( output, 'scene.gltf' );
+							const output = JSON.stringify( result, null, 2 );
+							console.log( output );
+							saveString( output, 'scene.gltf' );
 
-					}
+						}
 
-				}, options );
+					},
+					function ( error ) {
+
+						console.log( 'An error happened during parsing', error );
+
+					},
+					options
+				);
 
 			}
 
@@ -162,7 +171,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 600, 400, 0 );
 
-				camera.name = "PerspectiveCamera";
+				camera.name = 'PerspectiveCamera';
 				scene1.add( camera );
 
 				// ---------------------------------------------------------------------
@@ -187,14 +196,14 @@
 				// ---------------------------------------------------------------------
 				gridHelper = new THREE.GridHelper( 2000, 20, 0x888888, 0x444444 );
 				gridHelper.position.y = - 50;
-				gridHelper.name = "Grid";
+				gridHelper.name = 'Grid';
 				scene1.add( gridHelper );
 
 				// ---------------------------------------------------------------------
 				// Axes
 				// ---------------------------------------------------------------------
 				const axes = new THREE.AxesHelper( 500 );
-				axes.name = "AxesHelper";
+				axes.name = 'AxesHelper';
 				scene1.add( axes );
 
 				// ---------------------------------------------------------------------
@@ -248,7 +257,7 @@
 				material.map = gradientTexture;
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 70, 10, 10 ), material );
 				sphere.position.set( 0, 0, 0 );
-				sphere.name = "Sphere";
+				sphere.name = 'Sphere';
 				scene1.add( sphere );
 
 				// Cylinder
@@ -258,7 +267,7 @@
 				} );
 				object = new THREE.Mesh( new THREE.CylinderGeometry( 10, 80, 100 ), material );
 				object.position.set( 200, 0, 0 );
-				object.name = "Cylinder";
+				object.name = 'Cylinder';
 				scene1.add( object );
 
 				// TorusKnot
@@ -268,7 +277,7 @@
 				} );
 				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 15, 40, 10 ), material );
 				object.position.set( - 200, 0, 0 );
-				object.name = "Cylinder";
+				object.name = 'Cylinder';
 				scene1.add( object );
 
 
@@ -280,13 +289,13 @@
 
 				object = new THREE.Mesh( new THREE.BoxGeometry( 40, 100, 100 ), material );
 				object.position.set( - 200, 0, 400 );
-				object.name = "Cube";
+				object.name = 'Cube';
 				scene1.add( object );
 
 				object2 = new THREE.Mesh( new THREE.BoxGeometry( 40, 40, 40, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
-				object2.name = "SubCube";
+				object2.name = 'SubCube';
 				object.add( object2 );
 
 
@@ -294,16 +303,16 @@
 				// Groups
 				// ---------------------------------------------------------------------
 				const group1 = new THREE.Group();
-				group1.name = "Group";
+				group1.name = 'Group';
 				scene1.add( group1 );
 
 				const group2 = new THREE.Group();
-				group2.name = "subGroup";
+				group2.name = 'subGroup';
 				group2.position.set( 0, 50, 0 );
 				group1.add( group2 );
 
 				object2 = new THREE.Mesh( new THREE.BoxGeometry( 30, 30, 30 ), material );
-				object2.name = "Cube in group";
+				object2.name = 'Cube in group';
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
 
@@ -406,7 +415,7 @@
 
 				const pointsMaterial = new THREE.PointsMaterial( { color: 0xffff00, size: 5 } );
 				const pointCloud = new THREE.Points( pointsGeo, pointsMaterial );
-				pointCloud.name = "Points";
+				pointCloud.name = 'Points';
 				pointCloud.position.set( - 200, 0, - 200 );
 				scene1.add( pointCloud );
 
@@ -455,7 +464,7 @@
 				} );
 				object = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
 				object.position.set( 0, 0, 0 );
-				object.name = "CubeHidden";
+				object.name = 'CubeHidden';
 				object.visible = false;
 				scene1.add( object );
 
@@ -479,7 +488,7 @@
 				scene2 = new THREE.Scene();
 				object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
 				object.position.set( 0, 0, 0 );
-				object.name = "Cube2ndScene";
+				object.name = 'Cube2ndScene';
 				scene2.name = 'Scene2';
 				scene2.add( object );
 

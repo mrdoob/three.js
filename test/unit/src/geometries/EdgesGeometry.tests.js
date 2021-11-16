@@ -85,8 +85,6 @@ function createIndexedBufferGeometry( vertList, idxList ) {
 	geom.setIndex( new BufferAttribute( indices, 1 ) );
 	geom.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
-	geom.computeFaceNormals();
-
 	return geom;
 
 }

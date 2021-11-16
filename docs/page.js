@@ -60,21 +60,21 @@ function onDocumentLoad() {
 
 	text = text.replace( /\[name\]/gi, name );
 	text = text.replace( /\[path\]/gi, path );
-	text = text.replace( /\[page:([\w\.]+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
-	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, "[page:" + name + ".$1 $2]" ); // [page:.member title] to [page:name.member title]
-	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
+	text = text.replace( /\[page:([\w\.]+)\]/gi, '[page:$1 $1]' ); // [page:name] to [page:name title]
+	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, '[page:' + name + '.$1 $2]' ); // [page:.member title] to [page:name.member title]
+	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, '<a onclick="window.parent.setUrlFragment(\'$1\')" title="$1">$2</a>' ); // [page:name title]
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
-	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, "[$1:$2 $2]" ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" target=\"_parent\" title=\"" + name + ".$2\" class=\"permalink\">#</a> .<a onclick=\"window.parent.setUrlFragment('" + name + ".$2')\" id=\"$2\">$2</a> $3 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" );
-	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, "$2 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" ); // [param:name title]
+	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, '[$1:$2 $2]' ); // [member:name] to [member:name title]
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, '<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" target="_parent" title="' + name + '.$2" class="permalink">#</a> .<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" id="$2">$2</a> $3 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' );
+	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' ); // [param:name title]
 
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!]+) ([\w|\:|\/|\.|\-|\_|\s]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
-	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, "<strong>$1</strong>" ); // *
+	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+)\]/gi, '<a href="$1"  target="_blank">$1</a>' ); // [link:url]
+	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+) ([\w|\:|\/|\.|\-|\_|\'|\s]+)\]/gi, '<a href="$1"  target="_blank">$2</a>' ); // [link:url title]
+	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, '<strong>$1</strong>' ); // *
 
-	text = text.replace( /\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
-	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, "<a href=\"../examples/#$1\"  target=\"_blank\">$2</a>" ); // [example:name title]
+	text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
+	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../examples/#$1"  target="_blank">$2</a>' ); // [example:name title]
 
 	text = text.replace( /<a class="param" onclick="window.parent.setUrlFragment\('\w+'\)">(null|this|Boolean|Object|Array|Number|String|Integer|Float|TypedArray|ArrayBuffer)<\/a>/gi, '<span class="param">$1</span>' ); // remove links to primitive types
 
@@ -100,7 +100,7 @@ function onDocumentLoad() {
 	const button = document.createElement( 'div' );
 	button.id = 'button';
 	button.innerHTML = '<img src="../files/ic_mode_edit_black_24dp.svg">';
-	button.addEventListener( 'click', function ( event ) {
+	button.addEventListener( 'click', function () {
 
 		window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/' + section + '/' + localizedPath + '.html' );
 

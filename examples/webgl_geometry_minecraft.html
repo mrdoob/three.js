@@ -28,7 +28,7 @@
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
-			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
 
 			let container, stats;
 
@@ -214,7 +214,7 @@
 
 			function getY( x, z ) {
 
-				return ( data[ x + z * worldWidth ] * 0.2 ) | 0;
+				return ( data[ x + z * worldWidth ] * 0.15 ) | 0;
 
 			}
 

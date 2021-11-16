@@ -1,4 +1,4 @@
-import { UIPanel, UIRow, UISelect, UISpan, UIText, UIInteger } from './libs/ui.js';
+import { UIPanel, UIRow, UISelect, UISpan, UIText } from './libs/ui.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
@@ -46,24 +46,6 @@ function SidebarSettings( editor ) {
 	languageRow.add( language );
 
 	settings.add( languageRow );
-
-	// export precision
-
-	var exportPrecisionRow = new UIRow();
-	var exportPrecision = new UIInteger( config.getKey( 'exportPrecision' ) ).setRange( 2, Infinity );
-
-	exportPrecision.onChange( function () {
-
-		var value = this.getValue();
-
-		editor.config.setKey( 'exportPrecision', value );
-
-	} );
-
-	exportPrecisionRow.add( new UIText( strings.getKey( 'sidebar/settings/exportPrecision' ) ).setWidth( '90px' ) );
-	exportPrecisionRow.add( exportPrecision );
-
-	settings.add( exportPrecisionRow );
 
 	//
 

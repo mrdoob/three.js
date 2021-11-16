@@ -61,7 +61,7 @@
 
 		<p>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, three.js comes with a few others, often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.</p>
 
-		<p>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, which will make the app render at half size.</p>
+		<p>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, which will make the app render at quarter size.</p>
 
 		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling <strong>setSize</strong> with false as <strong>updateStyle</strong> (the third argument). For example, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
 
@@ -111,7 +111,7 @@
 		cube.rotation.y += 0.01;
 		</code>
 
-		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with a <strong>animate</strong> function that's hundreds of lines.</p>
+		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with an <strong>animate</strong> function that's hundreds of lines.</p>
 
 		<h2>The result</h2>
 		<p>Congratulations! You have now completed your first three.js application. It's simple, but you have to start somewhere.</p>

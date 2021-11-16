@@ -49,7 +49,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -156,6 +156,7 @@
 						THREE.ShaderChunk[ "common" ],
 						THREE.ShaderChunk[ "bsdfs" ],
 						THREE.ShaderChunk[ "lights_pars_begin" ],
+						THREE.ShaderChunk[ "normal_pars_fragment" ],
 						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 
 						"void main() {",

@@ -9,9 +9,11 @@ class CameraNode extends Object3DNode {
 
 		super( scope );
 
+		this._inputNode = null;
+
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		const scope = this.scope;
 
@@ -21,7 +23,7 @@ class CameraNode extends Object3DNode {
 
 		}
 
-		return super.getType( builder );
+		return super.getNodeType( builder );
 
 	}
 
@@ -47,37 +49,17 @@ class CameraNode extends Object3DNode {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const nodeData = builder.getDataFromNode( this );
+		const scope = this.scope;
 
-		let inputNode = this._inputNode;
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-		if ( nodeData.inputNode === undefined ) {
-
-			const scope = this.scope;
-
-			if ( scope === CameraNode.PROJECTION_MATRIX ) {
-
-				if ( inputNode === null || inputNode.isMatrix4Node !== true ) {
-
-					inputNode = new Matrix4Node( null );
-
-				}
-
-			} else {
-
-				return super.generate( builder, output );
-
-			}
-
-			this._inputNode = inputNode;
-
-			nodeData.inputNode = inputNode;
+			this._inputNode = new Matrix4Node( null );
 
 		}
 
-		return inputNode.build( builder, output );
+		return super.generate( builder );
 
 	}
 

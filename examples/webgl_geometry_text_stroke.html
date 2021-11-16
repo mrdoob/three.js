@@ -26,11 +26,11 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
 
 			let camera, scene, renderer;
 
 			init();
-			animate();
 
 			function init( ) {
 
@@ -40,7 +40,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					const color = new THREE.Color( 0x006699 );
@@ -57,7 +57,7 @@
 						side: THREE.DoubleSide
 					} );
 
-					const message = "   Three.js\nStroke text.";
+					const message = '   Three.js\nStroke text.';
 
 					const shapes = font.generateShapes( message, 100 );
 
@@ -119,6 +119,8 @@
 
 					scene.add( strokeText );
 
+					render();
+
 				} ); //end load function
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -130,6 +132,8 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
+				controls.addEventListener( 'change', render );
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			} // end init
@@ -140,12 +144,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 

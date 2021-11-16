@@ -17,7 +17,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
@@ -48,7 +48,6 @@
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
 				new EXRLoader()
-					.setDataType( THREE.FloatType )
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
 						// memorial.exr is NPOT

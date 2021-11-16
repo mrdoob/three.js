@@ -113,8 +113,9 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	onBeforeRender() {}
-	onAfterRender() {}
+	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
+
+	onAfterRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
 	applyMatrix4( matrix ) {
 
@@ -404,6 +405,8 @@ class Object3D extends EventDispatcher {
 
 		// adds object as a child of this, while maintaining the object's world transform
 
+		// Note: This method does not support scene graphs having non-uniformly-scaled nodes(s)
+
 		this.updateWorldMatrix( true, false );
 
 		_m1.copy( this.matrixWorld ).invert();
@@ -461,13 +464,6 @@ class Object3D extends EventDispatcher {
 
 	getWorldPosition( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldPosition() target is now required' );
-			target = new Vector3();
-
-		}
-
 		this.updateWorldMatrix( true, false );
 
 		return target.setFromMatrixPosition( this.matrixWorld );
@@ -475,13 +471,6 @@ class Object3D extends EventDispatcher {
 	}
 
 	getWorldQuaternion( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldQuaternion() target is now required' );
-			target = new Quaternion();
-
-		}
 
 		this.updateWorldMatrix( true, false );
 
@@ -493,13 +482,6 @@ class Object3D extends EventDispatcher {
 
 	getWorldScale( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldScale() target is now required' );
-			target = new Vector3();
-
-		}
-
 		this.updateWorldMatrix( true, false );
 
 		this.matrixWorld.decompose( _position, _quaternion, target );
@@ -509,13 +491,6 @@ class Object3D extends EventDispatcher {
 	}
 
 	getWorldDirection( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
-			target = new Vector3();
-
-		}
 
 		this.updateWorldMatrix( true, false );
 
@@ -727,7 +702,29 @@ class Object3D extends EventDispatcher {
 
 		}
 
-		if ( this.isMesh || this.isLine || this.isPoints ) {
+		if ( this.isScene ) {
+
+			if ( this.background ) {
+
+				if ( this.background.isColor ) {
+
+					object.background = this.background.toJSON();
+
+				} else if ( this.background.isTexture ) {
+
+					object.background = this.background.toJSON( meta ).uuid;
+
+				}
+
+			}
+
+			if ( this.environment && this.environment.isTexture ) {
+
+				object.environment = this.environment.toJSON( meta ).uuid;
+
+			}
+
+		} else if ( this.isMesh || this.isLine || this.isPoints ) {
 
 			object.geometry = serialize( meta.geometries, this.geometry );
 
