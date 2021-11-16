@@ -736,7 +736,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( useTexStorage ) {
 
-					if ( allocateMemory ) state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+					if ( allocateMemory ) {
+
+						state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+
+					}
 
 					state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, glFormat, glType, image );
 
