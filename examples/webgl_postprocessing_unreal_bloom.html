@@ -44,7 +44,8 @@
 				exposure: 1,
 				bloomStrength: 1.5,
 				bloomThreshold: 0,
-				bloomRadius: 0
+				bloomRadius: 0,
+				backgroundColor: '#0a0000'
 			};
 
 			init();
@@ -65,6 +66,7 @@
 				container.appendChild( renderer.domElement );
 
 				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( params.backgroundColor );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( - 5, 2.5, - 3.5 );
@@ -128,6 +130,12 @@
 				gui.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
 					bloomPass.radius = Number( value );
+
+				} );
+
+				gui.addColor( params, 'backgroundColor' ).onChange( function ( value ) {
+
+					scene.background = new THREE.Color( value );
 
 				} );
 
