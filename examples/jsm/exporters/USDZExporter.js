@@ -22,23 +22,22 @@ class USDZExporter {
 
 		let output = buildHeader();
 
-		output += `
-		def Xform "Root"
-		{
-			def Scope "Scenes" (
-					kind = "sceneLibrary"
-			)
-				{
-					def Xform "Scene" (
-						customData = {
-								bool preliminary_collidesWithEnvironment = 0
-								string sceneName = "Scene"
-						}
-						sceneName = "Scene"
-					)
-					{
-							token preliminary:anchoring:type = "${this.options.ar.anchoring.type}"
-							token preliminary:planeAnchoring:alignment = "${this.options.ar.planeAnchoring.alignment}"
+		output += `def Xform "Root"
+{
+    def Scope "Scenes" (
+        kind = "sceneLibrary"
+    )
+    {
+        def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+        )
+        {
+        token preliminary:anchoring:type = "${this.options.ar.anchoring.type}"
+        token preliminary:planeAnchoring:alignment = "${this.options.ar.planeAnchoring.alignment}"
 
 `;
 
@@ -75,10 +74,11 @@ class USDZExporter {
 
 
 		output += `
-					}
-				}
-		}
-		`;
+        }
+    }
+}
+
+`;
 
 		output += buildMaterials( materials, textures );
 
@@ -184,11 +184,11 @@ function buildHeader() {
 
 	return `#usda 1.0
 (
-		customLayerData = {
-				string creator = "Three.js USDZExporter"
-		}
-		metersPerUnit = 1
-		upAxis = "Y"
+    customLayerData = {
+        string creator = "Three.js USDZExporter"
+    }
+    metersPerUnit = 1
+    upAxis = "Y"
 )
 
 `;
@@ -217,13 +217,13 @@ function buildXform( object, geometry, material ) {
 	}
 
 	return `def Xform "${ name }" (
-		prepend references = @./geometries/Geometry_${ geometry.id }.usd@</Geometry>
+    prepend references = @./geometries/Geometry_${ geometry.id }.usd@</Geometry>
 )
 {
-		matrix4d xformOp:transform = ${ transform }
-		uniform token[] xformOpOrder = ["xformOp:transform"]
+    matrix4d xformOp:transform = ${ transform }
+    uniform token[] xformOpOrder = ["xformOp:transform"]
 
-		rel material:binding = </Materials/Material_${ material.id }>
+    rel material:binding = </Materials/Material_${ material.id }>
 }
 
 `;
@@ -252,7 +252,7 @@ function buildMeshObject( geometry ) {
 	return `
 def "Geometry"
 {
-	${mesh}
+  ${mesh}
 }
 `;
 
@@ -265,19 +265,19 @@ function buildMesh( geometry ) {
 	const count = attributes.position.count;
 
 	return `
-		def Mesh "${ name }"
-		{
-				int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
-				int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
-				normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
-						interpolation = "vertex"
-				)
-				point3f[] points = [${ buildVector3Array( attributes.position, count )}]
-				float2[] primvars:st = [${ buildVector2Array( attributes.uv, count )}] (
-						interpolation = "vertex"
-				)
-				uniform token subdivisionScheme = "none"
-		}
+    def Mesh "${ name }"
+    {
+        int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
+        int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
+        normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
+            interpolation = "vertex"
+        )
+        point3f[] points = [${ buildVector3Array( attributes.position, count )}]
+        float2[] primvars:st = [${ buildVector2Array( attributes.uv, count )}] (
+            interpolation = "vertex"
+        )
+        uniform token subdivisionScheme = "none"
+    }
 `;
 
 }
@@ -394,31 +394,31 @@ function buildMaterial( material, textures ) {
 		textures[ id ] = texture;
 
 		return `
-				def Shader "Transform2d_${ mapType }" (
-						sdrMetadata = {
-								string role = "math"
-						}
-				)
-				{
-						uniform token info:id = "UsdTransform2d"
-						float2 inputs:in.connect = </Materials/Material_${ material.id }/uvReader_st.outputs:result>
-						float2 inputs:scale = ${ buildVector2( texture.repeat ) }
-						float2 inputs:translation = ${ buildVector2( texture.offset ) }
-						float2 outputs:result
-				}
+        def Shader "Transform2d_${ mapType }" (
+            sdrMetadata = {
+                string role = "math"
+            }
+        )
+        {
+            uniform token info:id = "UsdTransform2d"
+            float2 inputs:in.connect = </Materials/Material_${ material.id }/uvReader_st.outputs:result>
+            float2 inputs:scale = ${ buildVector2( texture.repeat ) }
+            float2 inputs:translation = ${ buildVector2( texture.offset ) }
+            float2 outputs:result
+        }
 
-				def Shader "Texture_${ texture.id }_${ mapType }"
-				{
-						uniform token info:id = "UsdUVTexture"
-						asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
-						float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
-						token inputs:wrapS = "repeat"
-						token inputs:wrapT = "repeat"
-						float outputs:r
-						float outputs:g
-						float outputs:b
-						float3 outputs:rgb
-				}`;
+        def Shader "Texture_${ texture.id }_${ mapType }"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
+            float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
+            token inputs:wrapS = "repeat"
+            token inputs:wrapT = "repeat"
+            float outputs:r
+            float outputs:g
+            float outputs:b
+            float3 outputs:rgb
+        }`;
 
 	}
 
@@ -497,30 +497,30 @@ function buildMaterial( material, textures ) {
 	}
 
 	return `
-		def Material "Material_${ material.id }"
-		{
-				def Shader "PreviewSurface"
-				{
-						uniform token info:id = "UsdPreviewSurface"
+    def Material "Material_${ material.id }"
+    {
+        def Shader "PreviewSurface"
+        {
+            uniform token info:id = "UsdPreviewSurface"
 ${ inputs.join( '\n' ) }
-						int inputs:useSpecularWorkflow = 0
-						token outputs:surface
-				}
+            int inputs:useSpecularWorkflow = 0
+            token outputs:surface
+        }
 
-				token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
-				token inputs:frame:stPrimvarName = "st"
+        token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
+        token inputs:frame:stPrimvarName = "st"
 
-				def Shader "uvReader_st"
-				{
-						uniform token info:id = "UsdPrimvarReader_float2"
-						token inputs:varname.connect = </Materials/Material_${ material.id }.inputs:frame:stPrimvarName>
-						float2 inputs:fallback = (0.0, 0.0)
-						float2 outputs:result
-				}
+        def Shader "uvReader_st"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            token inputs:varname.connect = </Materials/Material_${ material.id }.inputs:frame:stPrimvarName>
+            float2 inputs:fallback = (0.0, 0.0)
+            float2 outputs:result
+        }
 
 ${ samplers.join( '\n' ) }
 
-		}
+    }
 `;
 
 }
