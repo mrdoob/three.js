@@ -241,7 +241,7 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
-				if ( ( session.renderState.layers === undefined ) || ( gl instanceof WebGLRenderingContext ) ) {
+				if ( ( session.renderState.layers === undefined ) || ( renderer.capabilities.isWebGL2 === false ) ) {
 
 					const layerInit = {
 						antialias: ( session.renderState.layers === undefined ) ? attributes.antialias : true,
