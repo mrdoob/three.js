@@ -6,12 +6,11 @@ import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
 class WebGPUTextures {
 
-	constructor( device, properties, info, glslang ) {
+	constructor( device, properties, info ) {
 
 		this.device = device;
 		this.properties = properties;
 		this.info = info;
-		this.glslang = glslang;
 
 		this.defaultTexture = null;
 		this.defaultCubeTexture = null;
@@ -481,7 +480,7 @@ class WebGPUTextures {
 
 		if ( this.utils === null ) {
 
-			this.utils = new WebGPUTextureUtils( this.device, this.glslang ); // only create this helper if necessary
+			this.utils = new WebGPUTextureUtils( this.device ); // only create this helper if necessary
 
 		}
 

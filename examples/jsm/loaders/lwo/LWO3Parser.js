@@ -38,8 +38,8 @@ LWO3Parser.prototype = {
 			case 'NORM':
 
 			// ENVL FORM skipped
-			case 'PRE ':
-			case 'POST':
+			case 'PRE ': // Pre-loop behavior for the keyframe
+			case 'POST': // Post-loop behavior for the keyframe
 			case 'KEY ':
 			case 'SPAN':
 

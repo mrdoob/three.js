@@ -72,37 +72,37 @@
 			Returns this mixer's root object.
 		</p>
 
-		<h3>[method:AnimationMixer stopAllAction]()</h3>
+		<h3>[method:this stopAllAction]()</h3>
 		<p>
 			Deactivates all previously scheduled actions on this mixer.
 		</p>
 
-		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
+		<h3>[method:this update]([param:Number deltaTimeInSeconds]) </h3>
 		<p>
 			Advances the global mixer time and updates the animation.<br /><br />
 
 			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale]).
 		</p>
 
-		<h3>[method:AnimationMixer setTime]([param:Number timeInSeconds]) </h3>
+		<h3>[method:this setTime]([param:Number timeInSeconds]) </h3>
 		<p>
 			Sets the global mixer to a specific time and updates the animation accordingly.<br /><br />
 
 			This is useful when you need to jump to an exact time in an animation. The input parameter will be scaled by the mixer's [page:.timeScale timeScale].
 		</p>
 
-		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
+		<h3>[method:undefined uncacheClip]([param:AnimationClip clip])</h3>
 
 		<p>
 			Deallocates all memory resources for a clip. Before using this method make sure to call [page:AnimationAction.stop]() for all related actions.
 		</p>
 
-		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
+		<h3>[method:undefined uncacheRoot]([param:Object3D root]) </h3>
 		<p>
 			Deallocates all memory resources for a root object. Before using this method make sure to call [page:AnimationAction.stop]() for all related actions.
 		</p>
 
-		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<h3>[method:undefined uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
 			Deallocates all memory resources for an action. Before using this method make sure to call [page:AnimationAction.stop]() to deactivate the action.
 		</p>

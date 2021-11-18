@@ -20,7 +20,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, stats, controls, loader;
 
@@ -94,7 +94,7 @@
 
 				//
 
-				const gui = new GUI( { width: 300 } );
+				const gui = new GUI();
 				gui.add( params, 'asset', assets ).onChange( function ( value ) {
 
 					if ( vrmlScene ) {

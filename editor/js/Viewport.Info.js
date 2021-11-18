@@ -51,24 +51,15 @@ function ViewportInfo( editor ) {
 
 					var geometry = object.geometry;
 
-					if ( geometry.isGeometry ) {
+					vertices += geometry.attributes.position.count;
 
-						vertices += geometry.vertices.length;
-						triangles += geometry.faces.length;
+					if ( geometry.index !== null ) {
 
-					} else if ( geometry.isBufferGeometry ) {
+						triangles += geometry.index.count / 3;
 
-						vertices += geometry.attributes.position.count;
+					} else {
 
-						if ( geometry.index !== null ) {
-
-							triangles += geometry.index.count / 3;
-
-						} else {
-
-							triangles += geometry.attributes.position.count / 3;
-
-						}
+						triangles += geometry.attributes.position.count / 3;
 
 					}
 

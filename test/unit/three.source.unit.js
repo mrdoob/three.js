@@ -81,10 +81,6 @@ import './src/extras/curves/QuadraticBezierCurve.tests';
 import './src/extras/curves/QuadraticBezierCurve3.tests';
 import './src/extras/curves/SplineCurve.tests';
 
-//src/extras/objects
-import './src/extras/objects/ImmediateRenderObject.tests';
-
-
 //src/geometries
 import './src/geometries/BoxGeometry.tests';
 import './src/geometries/CircleGeometry.tests';

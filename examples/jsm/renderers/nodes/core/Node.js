@@ -38,12 +38,6 @@ class Node {
 
 	}
 
-	getTypeLength( builder ) {
-
-		return builder.getTypeLength( this.getNodeType( builder ) );
-
-	}
-
 	update( /*frame*/ ) {
 
 		console.warn( 'Abstract function.' );
@@ -83,7 +77,7 @@ class Node {
 
 			if ( snippet === undefined ) {
 
-				snippet = this.generate( builder );
+				snippet = this.generate( builder ) || '';
 
 				nodeData.snippet = snippet;
 
@@ -93,7 +87,7 @@ class Node {
 
 		} else {
 
-			snippet = this.generate( builder, output );
+			snippet = this.generate( builder, output ) || '';
 
 		}
 

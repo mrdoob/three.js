@@ -48,6 +48,12 @@ class Layers {
 
 	}
 
+	isEnabled( channel ) {
+
+		return ( this.mask & ( 1 << channel | 0 ) ) !== 0;
+
+	}
+
 }
 
 

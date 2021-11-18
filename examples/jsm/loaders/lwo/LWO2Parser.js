@@ -106,6 +106,7 @@ LWO2Parser.prototype = {
 			case 'WRPW': // image wrap w ( for cylindrical and spherical projections)
 			case 'WRPH': // image wrap h
 			case 'NMOD':
+			case 'NSEL':
 			case 'NPRW':
 			case 'NPLA':
 			case 'NODS':

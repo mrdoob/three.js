@@ -19,7 +19,13 @@ class BypassNode extends Node {
 
 	generate( builder, output ) {
 
-		builder.addFlowCode( this.callNode.build( builder, 'void' ) );
+		const snippet = this.callNode.build( builder, 'void' );
+
+		if ( snippet !== '' ) {
+
+			builder.addFlowCode( snippet );
+
+		}
 
 		return this.outputNode.build( builder, output );
 
