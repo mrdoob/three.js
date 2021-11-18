@@ -425,9 +425,9 @@ UTIF.toRGBA = function ( out, type ) {
 				const X = ( sX * bY ) / sY, Y = bY, Z = ( 1 - sX - sY ) * bY / sY;
 
 				// XYZ to linear RGB
-				const r = 2.3706743 * X - 0.9000405 * Y - 0.4706338 * Z;
-				const g = - 0.5138850 * X + 1.4253036 * Y + 0.0885814 * Z;
-				const b = 0.0052982 * X - 0.0146949 * Y + 1.0093968 * Z;
+				const r = 2.690 * X - 1.276 * Y - 0.414 * Z;
+				const g = - 1.022 * X + 1.978 * Y + 0.044 * Z;
+				const b = 0.061 * X - 0.224 * Y + 1.163 * Z;
 
 				if ( type === HalfFloatType ) {
 
