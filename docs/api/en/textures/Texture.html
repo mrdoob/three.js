@@ -9,7 +9,13 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Create a texture to apply to a surface or as a reflection or refraction map.</p>
+		<p class="desc">
+			Create a texture to apply to a surface or as a reflection or refraction map.
+		</p>
+
+		<p>
+			Note: After the initial use of a texture, its dimensions, format, and type cannot be changed. Instead, call [page:.dispose]() on the texture and instantiate a new one.
+		</p>
 
 		<h2>Code Example</h2>
 
@@ -286,7 +292,7 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Call [page:EventDispatcher EventDispatcher].dispatchEvent with a 'dispose' event type.
+		Frees the GPU related resources allocated by a texture. Call this method whenever a texture is no longer used in your app.
 		</p>
 
 		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>
