@@ -288,6 +288,10 @@ class Rhino3dmLoader extends Loader {
 
 				}
 
+				map.wrapS = texture.wrapU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+				map.wrapT = texture.wrapV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+				map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+
 			}
 
 		}
@@ -958,6 +962,12 @@ function Rhino3dmWorker() {
 					const texture = { type: textureType };
 
 					const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+
+					texture.wrapU = _texture.wrapU;
+					texture.wrapV = _texture.wrapV;
+					texture.wrapW = _texture.wrapW;
+					const uvw = _texture.uvwTransform.toFloatArray( true );
+					texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
 
 					if ( image ) {
 
