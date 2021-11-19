@@ -424,7 +424,7 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
-				} else if ( object.isBone && !object.parent.isBone ) {
+				} else if ( object.isBone && ( !object.parent || !object.parent.isBone ) ) {
 
 					helper = new THREE.SkeletonHelper( object );
 
