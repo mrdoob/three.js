@@ -393,13 +393,33 @@
 
 			}
 
+			function addOobGround(){
+				let geo = new THREE.BoxGeometry( 200 , 1, 200 );
+				let mat = new THREE.MeshBasicMaterial( { color:0x88ccff } );
+				let mesh = new THREE.Mesh( geo , mat );
+				mesh.position.y -= 25;
+				return mesh;
+			}
+
+			function groupOobGroundAndGltfSceneTogether( gltfscene ){
+				let mapAndOobGround = new THREE.Group();
+				mapAndOobGround.add( gltfscene );
+				mapAndOobGround.add( addOobGround() );
+				scene.add( mapAndOobGround );
+				return mapAndOobGround;
+			}
+
+			function makeOctreeUseOobGround( gltfscene ){
+				let gltfWithOob = groupOobGroundAndGltfSceneTogether( gltfscene );
+				worldOctree.fromGraphNode( gltfWithOob );
+			}
+
 			const loader = new GLTFLoader().setPath( './models/gltf/' );
 
 			loader.load( 'collision-world.glb', ( gltf ) => {
 
-				scene.add( gltf.scene );
-
-				worldOctree.fromGraphNode( gltf.scene );
+				//build game world with an out-of-bounds floor
+				makeOctreeUseOobGround( gltf.scene );
 
 				gltf.scene.traverse( child => {
 
