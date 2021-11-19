@@ -2,9 +2,11 @@ import Node from './Node.js';
 
 class InputNode extends Node {
 
-	constructor( type ) {
+	constructor( inputType ) {
 
-		super( type );
+		super( inputType );
+
+		this.inputType = inputType;
 
 		this.constant = false;
 
@@ -24,15 +26,21 @@ class InputNode extends Node {
 
 	}
 
+	getInputType( builder ) {
+
+		return this.inputType;
+
+	}
+
 	generateConst( builder ) {
 
-		return builder.getConst( this.getType( builder ), this.value );
+		return builder.getConst( this.getNodeType( builder ), this.value );
 
 	}
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 
 		if ( this.constant === true ) {
 
@@ -40,7 +48,9 @@ class InputNode extends Node {
 
 		} else {
 
-			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, this.getType( builder ) );
+			const inputType = this.getInputType( builder );
+
+			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, inputType );
 			const propertyName = builder.getPropertyName( nodeUniform );
 
 			return builder.format( propertyName, type, output );

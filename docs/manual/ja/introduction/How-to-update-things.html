@@ -126,33 +126,6 @@ line.geometry.computeBoundingSphere();
 
     </div>
 
-    <h2>Geometry</h2>
-    <div>
-        <p>
-            下記に示してあるフラグはさまざまなジオメトリの要素の更新をコントロールします。 更新にはコストがかかるので、更新が必要な要素のみを、更新するように設定してください。 バッファが変化すると、自動的にこれらのフラグはflaseにリセットされます。 バッファを更新し続けたいのであれば、このフラグをtrueに設定し続ける必要があります。 これは[page:Geometry]にのみ適用されて、[page:BufferGeometry]には適用されないことに注意してください。
-        </p>
-        <code>
-const geometry = new THREE.Geometry();
-geometry.verticesNeedUpdate = true;
-geometry.elementsNeedUpdate = true;
-geometry.morphTargetsNeedUpdate = true;
-geometry.uvsNeedUpdate = true;
-geometry.normalsNeedUpdate = true;
-geometry.colorsNeedUpdate = true;
-geometry.tangentsNeedUpdate = true;
-			</code>
-
-        <p>
-            [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66]以前のバージョンでは、メッシュは<em>dynamic</em>フラグを有効にする必要があります。これは内部で型付き配列を保持するために必要になります。
-        </p>
-
-        <code>
-// removed after r66
-geometry.dynamic = true;
-			</code>
-
-    </div>
-
     <h2>Materials</h2>
     <div>
         <p>

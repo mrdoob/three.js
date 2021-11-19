@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from '../../build/three.module.js';
-			import * as DAT from '../../examples/jsm/libs/dat.gui.module.js';
+			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
 			import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
 
 			const constants = {
@@ -715,7 +715,7 @@
 
 			document.getElementById( 'newWindow' ).href += window.location.hash;
 
-			const gui = new DAT.GUI();
+			const gui = new GUI();
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );

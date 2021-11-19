@@ -968,7 +968,7 @@
 				geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xaaaaff,
+					color: 0xffffff,
 					flatShading: true
 				} );
 				const mesh = new THREE.Mesh( geometry, material );
@@ -1299,7 +1299,7 @@
 				for ( let i = 0; i < buildData.length; i ++ ) {
 
 					const buildItem = buildData[ i ];
-					const object3D = objects[ buildItem[ 'objectId' ] ]; // apply transform
+					const object3D = objects[ buildItem[ 'objectId' ] ].clone(); // apply transform
 
 					const transform = buildItem[ 'transform' ];
 

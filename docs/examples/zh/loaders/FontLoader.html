@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		使用JSON格式中加载字体的一个类。返回font, 返回值是表示字体的[page:Shape Shape]类型的数组。
+		其内部使用[page:FileLoader]来加载文件。 <br /><br />
+
+		你可以使用[link:https://gero3.github.io/facetype.js/ facetype.js]在线转换字体。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const loader = new FontLoader();
+		const font = loader.load(
+			// 资源URL
+			'fonts/helvetiker_bold.typeface.json',
+
+			// onLoad回调
+			function ( font ) {
+				// do something with the font
+				console.log( font );
+			},
+
+			// onProgress回调
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError回调
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+		[example:webgl_geometry_text_shapes geometry / text / shapes ]<br/>
+		[example:webgl_geometry_text geometry / text ]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器所使用的[page:LoadingManager loadingManager]。默认值为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 文件的URL或者路径，也可以为
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — 加载完成时将调用。回调参数是将要被加载的[page:Texture texture].<br />
+		[page:Function onProgress] — 将在加载过程中进行调用。参数为XMLHttpRequest实例，实例包含[page:Integer total]和[page:Integer loaded]字节。<br />
+		[page:Function onError] — 在加载错误时被调用。<br /><br />
+
+			从URL中进行加载，并将被加载的[page:Texture texture]传递给onLoad。
+		</p>
+
+		<h3>[method:Font parse]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
+		以<em>JSON</em>格式进行解析，并返回一个font.
+		</p>
+
+		<h2>源</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/FontLoader.js examples/jsm/loaders/FontLoader.js]
+		</p>
+	</body>
+</html>

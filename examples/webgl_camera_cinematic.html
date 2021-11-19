@@ -26,7 +26,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { CinematicCamera } from './jsm/cameras/CinematicCamera.js';
 
@@ -188,7 +188,7 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				const intersects = raycaster.intersectObjects( scene.children );
+				const intersects = raycaster.intersectObjects( scene.children, false );
 
 				if ( intersects.length > 0 ) {
 

@@ -97,15 +97,13 @@
 		<p>
 			一个包含当前渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])的功能细节的对象。<br />
 
-		- [page:Boolean floatFragmentTextures]: 环境是否支持[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float]扩展。
-			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月，超过95％的支持WebGL的设备支持此功能<br />
+		- [page:Boolean floatFragmentTextures]: 环境是否支持[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float]扩展<br />
 		- [page:Boolean floatVertexTextures]: 如果[page:Boolean floatFragmentTextures]和[page:Boolean vertexTextures]都是true， 则此值为*true* <br />
 		- [page:Method getMaxAnisotropy](): 返回最大可用各向异性。<br />
 		- [page:Method getMaxPrecision](): 返回顶点着色器和片元着色器的最大可用精度。 <br />
 		- [page:Boolean isWebGL2]: *true* if the context in use is a WebGL2RenderingContext object.<br />
 		- [page:Boolean logarithmicDepthBuffer]: 如果[page:parameter logarithmicDepthBuffer]在构造器中被设为true且
-		环境支持[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth]扩展，则此值为*true*
-			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月， 约66%的支持WebGL的设备支持此功能<br />
+		环境支持[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth]扩展，则此值为*true*<br />
 		- [page:Integer maxAttributes]: *gl.MAX_VERTEX_ATTRIBS*的值<br />
 		- [page:Integer maxCubemapSize]: *gl.MAX_CUBE_MAP_TEXTURE_SIZE* 的值，着色器可使用的立方体贴图纹理的最大宽度*高度<br />
 		- [page:Integer maxFragmentUniforms]: *gl.MAX_FRAGMENT_UNIFORM_VECTORS*的值，片元着色器可使用的全局变量(uniforms)数量<br />
@@ -250,22 +248,22 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<h3>[method:undefined clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
 		告诉渲染器清除颜色、深度或模板缓存.
 		此方法将颜色缓存初始化为当前颜色。参数们默认都是*true*
 		</p>
 
-		<h3>[method:null clearColor]( )</h3>
+		<h3>[method:undefined clearColor]( )</h3>
 		<p>清除颜色缓存。 相当于调用[page:WebGLRenderer.clear .clear]( true, false, false )</p>
 
-		<h3>[method:null clearDepth]( )</h3>
+		<h3>[method:undefined clearDepth]( )</h3>
 		<p>清除深度缓存。相当于调用[page:WebGLRenderer.clear .clear]( false, true, false )</p>
 
-		<h3>[method:null clearStencil]( )</h3>
+		<h3>[method:undefined clearStencil]( )</h3>
 		<p>清除模板缓存。相当于调用[page:WebGLRenderer.clear .clear]( false, false, true )</p>
 
-		<h3>[method:null clearTarget]([param:WebGLRenderTarget renderTarget], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil])</h3>
+		<h3>[method:undefined clearTarget]([param:WebGLRenderTarget renderTarget], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil])</h3>
 		<p>
 		renderTarget -- 需要被清除的[page:WebGLRenderTarget renderTarget]<br />
 		color -- 如果设置, 颜色会被清除 <br />
@@ -276,16 +274,16 @@
 		该方法清楚了一个rendertarget。为此它会激活此endertarget
 		</p>
 
-		<h3>[method:null compile]( [param:Object3D scene], [param:Camera camera] )</h3>
+		<h3>[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>使用相机编译场景中的所有材质。这对于在首次渲染之前预编译着色器很有用。</p>
 
-		<h3>[method:null copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
+		<h3>[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
 		<p>将当前WebGLFramebuffer中的像素复制到2D纹理中。可访问[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</p>
 
-		<h3>[method:null copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
+		<h3>[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
 		<p>将纹理的所有像素复制到一个已有的从给定位置开始的纹理中。可访问[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].</p>
 
-		<h3>[method:null dispose]( )</h3>
+		<h3>[method:undefined dispose]( )</h3>
 		<p>处理当前的渲染环境</p>
 
 		<h3>[method:Object extensions.get]( [param:String extensionName] )</h3>
@@ -300,11 +298,16 @@
 		- *WEBGL_compressed_texture_etc1*
 		</p>
 
-		<h3>[method:null forceContextLoss]( )</h3>
+		<h3>[method:undefined forceContextLoss]()</h3>
 		<p>
 		模拟WebGL环境的丢失。需要支持
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context]扩展才能用。
-		根据[link:https://webglstats.com/ WebGLStats], as of February 2016 90% of WebGL enabled devices support this.
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] 扩展才能用。
+		</p>
+
+		<h3>[method:undefined forceContextRestore]( )</h3>
+		<p>
+		模拟WebGL环境的恢复。需要支持
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] 扩展才能用。
 		</p>
 
 		<h3>[method:Float getClearAlpha]()</h3>
@@ -340,19 +343,19 @@
 		<h3>[method:Object getSize]()</h3>
 		<p>返回包含渲染器输出canvas的宽度和高度(单位像素)的对象。</p>
 
-		<h3>[method:null initTexture]( [param:Texture texture] )</h3>
+		<h3>[method:undefined initTexture]( [param:Texture texture] )</h3>
 		<p> Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
 
-		<h3>[method:null resetGLState]( )</h3>
+		<h3>[method:undefined resetGLState]( )</h3>
 		<p>将GL状态重置为默认值。WebGL环境丢失时会内部调用</p>
 
-		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
+		<h3>[method:undefined readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
 		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
 		<p>将enderTarget中的像素数据读取到传入的缓冲区中。这是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]()的包装器<br />
 		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]</p>
 		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
-		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
+		<h3>[method:undefined render]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>
 			用相机([page:Camera camera])渲染一个场景([page:Scene scene])或是其它类型的[page:Object3D object]。<br />
 
@@ -363,33 +366,23 @@
 			即便forceClear设为true, 也可以通过将[page:WebGLRenderer.autoClearColor autoClearColor]、[page:WebGLRenderer.autoClearStencil autoClearStencil]或[page:WebGLRenderer.autoClearDepth autoClearDepth]属性的值设为false来阻止对应缓存被清除。
 		</p>
 
-		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:BufferGeometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
-		<p>使用相机和指定材质渲染缓冲几何组。</p>
-
-		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
-		<p>object - an instance of [page:Object3D]<br />
-		program - an instance of [page:WebGLProgram]<br />
-
-		Renders an instance of [page:ImmediateRenderObject]，由renderObjectImmediate对象调用。
-		</p>
-
-		<h3>[method:null resetState]()</h3>
+		<h3>[method:undefined resetState]()</h3>
 		<p>Can be used to reset the internal WebGL state. This method is mostly relevant for applications which share a single WebGL context across multiple WebGL libraries.</p>
 
-		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
+		<h3>[method:undefined setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — 每个可用帧都会调用的函数。 如果传入‘null’,所有正在进行的动画都会停止。</p>
 		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebXR项目，必须使用此函数。</p>
 
-		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
+		<h3>[method:undefined setClearAlpha]( [param:Float alpha] )</h3>
 		<p>设置alpha。合法参数是一个*0.0*到 *1.0*之间的浮点数</p>
 
-		<h3>[method:null setClearColor]( [param:Color color], [param:Float alpha] )</h3>
+		<h3>[method:undefined setClearColor]( [param:Color color], [param:Float alpha] )</h3>
 		<p>设置颜色及其透明度</p>
 
-		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
+		<h3>[method:undefined setPixelRatio]( [param:number value] )</h3>
 		<p>设置设备像素比。通常用于避免HiDPI设备上绘图模糊</p>
 
-		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
+		<h3>[method:undefined setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
 		renderTarget -- 需要被激活的[page:WebGLRenderTarget renderTarget](可选)。若此参数为空，则将canvas设置成活跃render target。<br />
 		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLCubeRenderTarget] (optional).<br />
@@ -397,24 +390,24 @@
 		该方法设置活跃rendertarget。
 		</p>
 
-		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
+		<h3>[method:undefined setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
 		<p>
 		将剪裁区域设为(x, y)到(x + width, y + height)
 		Sets the scissor area from
 		</p>
 
-		<h3>[method:null setScissorTest]( [param:Boolean boolean] )</h3>
+		<h3>[method:undefined setScissorTest]( [param:Boolean boolean] )</h3>
 		<p>
 		启用或禁用剪裁检测. 若启用，则只有在所定义的裁剪区域内的像素才会受之后的渲染器影响。
 		</p>
 
-		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>
+		<h3>[method:undefined setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>
 		<p>
 		将输出canvas的大小调整为(width, height)并考虑设备像素比，且将视口从(0, 0)开始调整到适合大小
 		将[page:Boolean updateStyle]设置为false以阻止对canvas的样式做任何改变。
 		</p>
 
-		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
+		<h3>[method:undefined setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
 		<p>将视口大小设置为(x, y)到 (x + width, y + height).</p>
 
 		<h2>源码</h2>

@@ -452,7 +452,7 @@
 
 		}
 
-		addNewSubray( ) {
+		addNewSubray() {
 
 			return this.subrays[ this.numSubrays ++ ];
 

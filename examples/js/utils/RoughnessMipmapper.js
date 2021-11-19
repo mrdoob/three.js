@@ -77,6 +77,7 @@
 				material.roughnessMap.repeat.copy( roughnessMap.repeat );
 				material.roughnessMap.center.copy( roughnessMap.center );
 				material.roughnessMap.rotation = roughnessMap.rotation;
+				material.roughnessMap.image = roughnessMap.image;
 				material.roughnessMap.matrixAutoUpdate = roughnessMap.matrixAutoUpdate;
 				material.roughnessMap.matrix.copy( roughnessMap.matrix );
 

@@ -81,7 +81,6 @@
 		<h2>例子</h2>
 
 		<p>
-			[example:webgl_animation_cloth webgl / animation / cloth ]<br />
 			[example:webgl_buffergeometry_custom_attributes_particles webgl / buffergeometry / custom / attributes / particles]<br />
 			[example:webgl_buffergeometry_selective_draw webgl / buffergeometry / selective / draw]<br />
 			[example:webgl_custom_attributes webgl / custom / attributes]<br />
@@ -99,8 +98,6 @@
 			[example:webgl_marchingcubes webgl / marchingcubes]<br />
 			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
 			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
-			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
-			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
@@ -323,14 +320,6 @@ this.extensions = {
 		<h3>[property:Float linewidth]</h3>
 		<p>控制线框宽度。默认值为1。<br /><br />
 			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p> When set to true, morph target attributes are available in the vertex shader. Default is *false*.
-		</p>
-
-		<h3>[property:Boolean morphNormals]</h3>
-		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>

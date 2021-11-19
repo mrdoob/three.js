@@ -5,6 +5,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-97), expires 12/13/2021 -->
+		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
 	</head>
 	<body>
 		<div id="info">
@@ -27,22 +29,19 @@
 
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
-			import Node from './jsm/renderers/nodes/core/Node.js';
-			import AttributeNode from './jsm/renderers/nodes/core/AttributeNode.js';
-			import { NodeUpdateType } from './jsm/renderers/nodes/core/constants.js';
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			class InstanceUniformNode extends Node {
+			class InstanceUniformNode extends Nodes.Node {
 
 				constructor() {
 
 					super( 'vec3' );
 
-					this.updateType = NodeUpdateType.Object;
+					this.updateType = Nodes.NodeUpdateType.Object;
 
-					this.inputNode = new ColorNode();
+					this.inputNode = new Nodes.ColorNode();
 
 				}
 
@@ -91,7 +90,7 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = new AttributeNode( 'color', 'vec3' );
+				helper.material.colorNode = new Nodes.AttributeNode( 'color', 'vec3' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
@@ -99,7 +98,7 @@
 
 				const instanceUniform = new InstanceUniformNode();
 
-				const material = new THREE.MeshBasicMaterial();
+				const material = new Nodes.MeshBasicNodeMaterial();
 				material.colorNode = instanceUniform;
 
 				// Geometry

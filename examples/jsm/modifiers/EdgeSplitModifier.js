@@ -3,7 +3,7 @@ import {
 	BufferGeometry,
 	Vector3
 } from '../../../build/three.module.js';
-import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js';
+import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
 const _A = new Vector3();
 const _B = new Vector3();

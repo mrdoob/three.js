@@ -7,7 +7,7 @@ import {
 	Vector2,
 	WebGLRenderTarget
 } from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
 

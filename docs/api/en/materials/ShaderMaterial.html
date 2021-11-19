@@ -53,7 +53,7 @@
 						The loop variable has to be *i*.
 					</li>
 					<li>
-						The value *UNROLLED_LOOP_INDEX* will be replaced with the explicity value of *i* for the given iteration and can be used in preprocessor statements.
+						The value *UNROLLED_LOOP_INDEX* will be replaced with the explicitly value of *i* for the given iteration and can be used in preprocessor statements.
 					</li>
 				</ul>
 				<code>
@@ -91,7 +91,6 @@
 		<h2>Examples</h2>
 
 		<p>
-			[example:webgl_animation_cloth webgl / animation / cloth ]<br />
 			[example:webgl_buffergeometry_custom_attributes_particles webgl / buffergeometry / custom / attributes / particles]<br />
 			[example:webgl_buffergeometry_selective_draw webgl / buffergeometry / selective / draw]<br />
 			[example:webgl_custom_attributes webgl / custom / attributes]<br />
@@ -109,8 +108,6 @@
 			[example:webgl_marchingcubes webgl / marchingcubes]<br />
 			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
 			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
-			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
-			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
@@ -365,17 +362,6 @@ this.extensions = {
 		Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
 		with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will
 		always be 1 regardless of the set value.
-		</p>
-
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>
-		When set to true, morph target attributes are available in the vertex shader. Default is *false*.
-		</p>
-
-		<h3>[property:Boolean morphNormals]</h3>
-		<p>
-		When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>

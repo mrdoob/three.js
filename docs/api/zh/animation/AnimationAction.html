@@ -131,7 +131,7 @@
 		<h2>方法</h2>
 
 
-		<h3>[method:AnimationAction crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<h3>[method:this crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
 			在传入的时间段内，让此动作淡入([page:.fadeIn fade in]),同时让另一个动作淡出。此方法可链式调用。<br /><br />
 
@@ -141,7 +141,7 @@
 
 		</p>
 
-		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<h3>[method:this crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
 			在传入的时间段内, 让此动作淡出（[page:.fadeOut fade out]），同时让另一个动作淡入。此方法可链式调用。<br /><br />
 			如果warpBoolean值是true, 额外的 [page:.warp warping] (时间比例的渐变)将会被应用。<br /><br />
@@ -149,12 +149,12 @@
 			说明: 与 *fadeIn*/*fadeOut*一样, 淡入淡出动作开始/结束时的权重是1.
 		</p>
 
-		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this fadeIn]( [param:Number durationInSeconds] )</h3>
 		<p>
 			在传入的时间间隔内，逐渐将此动作的权重（[page:.weight weight]）由0升到1。此方法可链式调用。
 		</p>
 
-		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this fadeOut]( [param:Number durationInSeconds] )</h3>
 		<p>
 			在传入的时间间隔内，逐渐将此动作的权重（[page:.weight weight]）由1降至0。此方法可链式调用。
 		</p>
@@ -184,7 +184,7 @@
 			返回执行此动作的根对象
 		</p>
 
-		<h3>[method:AnimationAction halt]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this halt]( [param:Number durationInSeconds] )</h3>
 		<p>
 			在传入的时间间隔内，通过从当前值开始逐渐降低时间比例([page:.timeScale timeScale])使动画逐渐减速至0。此方法可链式调用。
 		</p>
@@ -206,7 +206,7 @@
 			说明: 这并不意味着动画正在执行中 (需要额外判断[page:.isRunning isRunning]值)
 		</p>
 
-		<h3>[method:AnimationAction play]()</h3>
+		<h3>[method:this play]()</h3>
 		<p>
 			让混合器激活动作。此方法可链式调用。<br /><br />
 
@@ -215,7 +215,7 @@
 			[page:.weight weight]=0, [page:.timeScale timeScale]=0) 也可以阻止动画的开始。
 		</p>
 
-		<h3>[method:AnimationAction reset]()</h3>
+		<h3>[method:this reset]()</h3>
 		<p>
 			重置动作。此方法可链式调用。<br /><br />
 
@@ -226,12 +226,12 @@
 			这就表示: 如果你想要这两者, 重置并且停止, 不要调用*reset*; 而应该调用*stop*。
 		</p>
 
-		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this setDuration]( [param:Number durationInSeconds] )</h3>
 		<p>
 			设置单此循环的持续时间(通过调整时间比例（[page:.timeScale timeScale]）以及停用所有的变形)。此方法可以链式调用。
 		</p>
 
-		<h3>[method:AnimationAction setEffectiveTimeScale]( [param:Number timeScale] )</h3>
+		<h3>[method:this setEffectiveTimeScale]( [param:Number timeScale] )</h3>
 		<p>
 			设置时间比例（[page:.timeScale timeScale]）以及停用所有的变形)。 此方法可以链式调用。<br /><br />
 
@@ -241,7 +241,7 @@
 			说明: 如果时间比例.*timeScale* 被此方法设为0，暂停值*paused*不会被自动改为*true*。
 		</p>
 
-		<h3>[method:AnimationAction setEffectiveWeight]( [param:Number weight] )</h3>
+		<h3>[method:this setEffectiveWeight]( [param:Number weight] )</h3>
 		<p>
 			设置权重（[page:.weight weight]）以及停止所有淡入淡出。该方法可以链式调用。<br /><br />
 
@@ -250,12 +250,12 @@
 			说明: 如果该方法将权重*weight*值设为0，启用值*enabled*不会被自动改为*false*。
 		</p>
 
-		<h3>[method:AnimationAction setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
+		<h3>[method:this setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
 		<p>
 			设置循环（[page:.loop loop mode]）及循环重复次数（[page:.repetitions repetitions]）。改方法可被链式调用。
 		</p>
 
-		<h3>[method:AnimationAction startAt]( [param:Number startTimeInSeconds] )</h3>
+		<h3>[method:this startAt]( [param:Number startTimeInSeconds] )</h3>
 		<p>
 			定义延时启动的事件 (通常会传入[page:AnimationMixer.time] +
 			deltaTimeInSeconds)。 该方法可以链式调用。<br /><br />
@@ -263,7 +263,7 @@
 			说明: 如果 *startAt*方法是和[page:.play play]方法一起链式调用, 或者动画已经在混合器中被激活 (通过先行调用*play*, 同时没有停止或重置)，动画将仅在给定时间开始.
 		</p>
 
-		<h3>[method:AnimationAction stop]()</h3>
+		<h3>[method:this stop]()</h3>
 		<p>
 			让混合器停止动作。该方法可以被链式调用。<br /><br />
 
@@ -272,17 +272,17 @@
 			说明: 你可以通过[page:AnimationMixer.stopAllAction mixer.stopAllAction]在一个混合器中一举停止所有处于激活态的动作。
 		</p>
 
-		<h3>[method:AnimationAction stopFading]()</h3>
+		<h3>[method:this stopFading]()</h3>
 		<p>
 			停止动作中所有预定的淡入淡出（[page:.fadeIn fading]）。该方法可以被链式调用。
 		</p>
 
-		<h3>[method:AnimationAction stopWarping]()</h3>
+		<h3>[method:this stopWarping]()</h3>
 		<p>
 			停用动作中所有预定的变形[page:.warp warping]。该方法可被链式调用。
 		</p>
 
-		<h3>[method:AnimationAction syncWith]( [param:AnimationAction otherAction] )</h3>
+		<h3>[method:this syncWith]( [param:AnimationAction otherAction] )</h3>
 		<p>
 			将此动作与传入的其它动作同步。此方法可被链式调用。<br /><br />
 
@@ -292,7 +292,7 @@
 			说明: 另一动作的 *time* 和 *timeScale*未来变化将不会被检测到.
 		</p>
 
-		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
+		<h3>[method:this warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
 		<p>
 			在传入的事件间隔内，通过逐渐将时间比例[page:.timeScale timeScale]由*startTimeScale*修改至*endTimeScale*来改变回放速度。该方法可被链式调用。
 		</p>

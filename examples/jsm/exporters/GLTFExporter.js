@@ -46,6 +46,24 @@ class GLTFExporter {
 
 		} );
 
+		this.register( function ( writer ) {
+
+			return new GLTFMaterialsTransmissionExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
+			return new GLTFMaterialsVolumeExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
+			return new GLTFMaterialsClearcoatExtension( writer );
+
+		} );
+
 	}
 
 	register( callback ) {
@@ -76,9 +94,18 @@ class GLTFExporter {
 	 * Parse scenes and generate GLTF output
 	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
+	 * @param  {Function} onError  Callback on errors
 	 * @param  {Object} options options
 	 */
-	parse( input, onDone, options ) {
+	parse( input, onDone, onError, options ) {
+
+		if ( typeof onError === 'object' ) {
+
+			console.warn( 'THREE.GLTFExporter: parse() expects options as the fourth argument now.' );
+
+			options = onError;
+
+		}
 
 		const writer = new GLTFWriter();
 		const plugins = [];
@@ -90,7 +117,19 @@ class GLTFExporter {
 		}
 
 		writer.setPlugins( plugins );
-		writer.write( input, onDone, options );
+		writer.write( input, onDone, options ).catch( onError );
+
+	}
+
+	parseAsync( input, options ) {
+
+		const scope = this;
+
+		return new Promise( function ( resolve, reject ) {
+
+			scope.parse( input, resolve, reject, options );
+
+		} );
 
 	}
 
@@ -369,7 +408,7 @@ class GLTFWriter {
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
-	write( input, onDone, options ) {
+	async write( input, onDone, options ) {
 
 		this.options = Object.assign( {}, {
 			// default options
@@ -392,97 +431,95 @@ class GLTFWriter {
 
 		this.processInput( input );
 
+		await Promise.all( this.pending );
+
 		const writer = this;
+		const buffers = writer.buffers;
+		const json = writer.json;
+		options = writer.options;
+		const extensionsUsed = writer.extensionsUsed;
 
-		Promise.all( this.pending ).then( function () {
+		// Merge buffers.
+		const blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
-			const buffers = writer.buffers;
-			const json = writer.json;
-			const options = writer.options;
-			const extensionsUsed = writer.extensionsUsed;
+		// Declare extensions.
+		const extensionsUsedList = Object.keys( extensionsUsed );
 
-			// Merge buffers.
-			const blob = new Blob( buffers, { type: 'application/octet-stream' } );
+		if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList;
 
-			// Declare extensions.
-			const extensionsUsedList = Object.keys( extensionsUsed );
+		// Update bytelength of the single buffer.
+		if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
 
-			if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList;
+		if ( options.binary === true ) {
 
-			// Update bytelength of the single buffer.
-			if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
+			// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
 
-			if ( options.binary === true ) {
+			const reader = new window.FileReader();
+			reader.readAsArrayBuffer( blob );
+			reader.onloadend = function () {
 
-				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+				// Binary chunk.
+				const binaryChunk = getPaddedArrayBuffer( reader.result );
+				const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+				binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+				binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
+
+				// JSON chunk.
+				const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
+				const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+				jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+				jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
+
+				// GLB header.
+				const header = new ArrayBuffer( GLB_HEADER_BYTES );
+				const headerView = new DataView( header );
+				headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+				headerView.setUint32( 4, GLB_VERSION, true );
+				const totalByteLength = GLB_HEADER_BYTES
+					+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
+					+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+				headerView.setUint32( 8, totalByteLength, true );
+
+				const glbBlob = new Blob( [
+					header,
+					jsonChunkPrefix,
+					jsonChunk,
+					binaryChunkPrefix,
+					binaryChunk
+				], { type: 'application/octet-stream' } );
+
+				const glbReader = new window.FileReader();
+				glbReader.readAsArrayBuffer( glbBlob );
+				glbReader.onloadend = function () {
+
+					onDone( glbReader.result );
+
+				};
+
+			};
+
+		} else {
+
+			if ( json.buffers && json.buffers.length > 0 ) {
 
 				const reader = new window.FileReader();
-				reader.readAsArrayBuffer( blob );
+				reader.readAsDataURL( blob );
 				reader.onloadend = function () {
 
-					// Binary chunk.
-					const binaryChunk = getPaddedArrayBuffer( reader.result );
-					const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
-
-					// JSON chunk.
-					const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
-					const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
-
-					// GLB header.
-					const header = new ArrayBuffer( GLB_HEADER_BYTES );
-					const headerView = new DataView( header );
-					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-					headerView.setUint32( 4, GLB_VERSION, true );
-					const totalByteLength = GLB_HEADER_BYTES
-						+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
-						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-					headerView.setUint32( 8, totalByteLength, true );
-
-					const glbBlob = new Blob( [
-						header,
-						jsonChunkPrefix,
-						jsonChunk,
-						binaryChunkPrefix,
-						binaryChunk
-					], { type: 'application/octet-stream' } );
-
-					const glbReader = new window.FileReader();
-					glbReader.readAsArrayBuffer( glbBlob );
-					glbReader.onloadend = function () {
-
-						onDone( glbReader.result );
-
-					};
+					const base64data = reader.result;
+					json.buffers[ 0 ].uri = base64data;
+					onDone( json );
 
 				};
 
 			} else {
 
-				if ( json.buffers && json.buffers.length > 0 ) {
-
-					const reader = new window.FileReader();
-					reader.readAsDataURL( blob );
-					reader.onloadend = function () {
-
-						const base64data = reader.result;
-						json.buffers[ 0 ].uri = base64data;
-						onDone( json );
-
-					};
-
-				} else {
-
-					onDone( json );
-
-				}
+				onDone( json );
 
 			}
 
-		} );
+		}
+
 
 	}
 
@@ -986,11 +1023,20 @@ class GLTFWriter {
 
 				}
 
-				let data = image.data;
+				const data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-				if ( format === RGBFormat ) {
+				if ( format === RGBAFormat ) {
 
-					data = new Uint8ClampedArray( image.height * image.width * 4 );
+					for ( let i = 0; i < data.length; i += 4 ) {
+
+						data[ i + 0 ] = image.data[ i + 0 ];
+						data[ i + 1 ] = image.data[ i + 1 ];
+						data[ i + 2 ] = image.data[ i + 2 ];
+						data[ i + 3 ] = image.data[ i + 3 ];
+
+					}
+
+				} else {
 
 					for ( let i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
 
@@ -1176,12 +1222,21 @@ class GLTFWriter {
 
 		if ( material.emissive ) {
 
-			// emissiveFactor
-			const emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
+			// note: emissive components are limited to stay within the 0 - 1 range to accommodate glTF spec. see #21849 and #22000.
+			const emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity );
+			const maxEmissiveComponent = Math.max( emissive.r, emissive.g, emissive.b );
 
-			if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
+			if ( maxEmissiveComponent > 1 ) {
 
-				materialDef.emissiveFactor = emissive;
+				emissive.multiplyScalar( 1 / maxEmissiveComponent );
+
+				console.warn( 'THREE.GLTFExporter: Some emissive components exceed 1; emissive has been limited' );
+
+			}
+
+			if ( maxEmissiveComponent > 0 ) {
+
+				materialDef.emissiveFactor = emissive.toArray();
 
 			}
 
@@ -1201,14 +1256,10 @@ class GLTFWriter {
 
 			const normalMapDef = { index: this.processTexture( material.normalMap ) };
 
-			if ( material.normalScale && material.normalScale.x !== - 1 ) {
+			if ( material.normalScale && material.normalScale.x !== 1 ) {
 
-				if ( material.normalScale.x !== material.normalScale.y ) {
-
-					console.warn( 'THREE.GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
-
-				}
-
+				// glTF normal scale is univariate. Ignore `y`, which may be flipped.
+				// Context: https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 				normalMapDef.scale = material.normalScale.x;
 
 			}
@@ -2195,6 +2246,154 @@ class GLTFMaterialsPBRSpecularGlossiness {
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+/**
+ * Clearcoat Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
+ */
+class GLTFMaterialsClearcoatExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_clearcoat';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		extensionDef.clearcoatFactor = material.clearcoat;
+
+		if ( material.clearcoatMap ) {
+
+			const clearcoatMapDef = { index: writer.processTexture( material.clearcoatMap ) };
+			writer.applyTextureTransform( clearcoatMapDef, material.clearcoatMap );
+			extensionDef.clearcoatTexture = clearcoatMapDef;
+
+		}
+
+		extensionDef.clearcoatRoughnessFactor = material.clearcoatRoughness;
+
+		if ( material.clearcoatRoughnessMap ) {
+
+			const clearcoatRoughnessMapDef = { index: writer.processTexture( material.clearcoatRoughnessMap ) };
+			writer.applyTextureTransform( clearcoatRoughnessMapDef, material.clearcoatRoughnessMap );
+			extensionDef.clearcoatRoughnessTexture = clearcoatRoughnessMapDef;
+
+		}
+
+		if ( material.clearcoatNormalMap ) {
+
+			const clearcoatNormalMapDef = { index: writer.processTexture( material.clearcoatNormalMap ) };
+			writer.applyTextureTransform( clearcoatNormalMapDef, material.clearcoatNormalMap );
+			extensionDef.clearcoatNormalTexture = clearcoatNormalMapDef;
+
+		}
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
+
+
+	}
+
+}
+
+/**
+ * Transmission Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
+ */
+class GLTFMaterialsTransmissionExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_transmission';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial || material.transmission === 0 ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		extensionDef.transmissionFactor = material.transmission;
+
+		if ( material.transmissionMap ) {
+
+			const transmissionMapDef = { index: writer.processTexture( material.transmissionMap ) };
+			writer.applyTextureTransform( transmissionMapDef, material.transmissionMap );
+			extensionDef.transmissionTexture = transmissionMapDef;
+
+		}
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+/**
+ * Materials Volume Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_volume
+ */
+class GLTFMaterialsVolumeExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_volume';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial || material.transmission === 0 ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		extensionDef.thicknessFactor = material.thickness;
+
+		if ( material.thicknessMap ) {
+
+			const thicknessMapDef = { index: writer.processTexture( material.thicknessMap ) };
+			writer.applyTextureTransform( thicknessMapDef, material.thicknessMap );
+			extensionDef.thicknessTexture = thicknessMapDef;
+
+		}
+
+		extensionDef.attenuationDistance = material.attenuationDistance;
+		extensionDef.attenuationColor = material.attenuationColor.toArray();
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
 		extensionsUsed[ this.name ] = true;
 
 	}

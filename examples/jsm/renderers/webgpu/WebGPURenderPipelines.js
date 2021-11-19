@@ -3,12 +3,11 @@ import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
 
 class WebGPURenderPipelines {
 
-	constructor( renderer, properties, device, glslang, sampleCount, nodes ) {
+	constructor( renderer, properties, device, sampleCount, nodes ) {
 
 		this.renderer = renderer;
 		this.properties = properties;
 		this.device = device;
-		this.glslang = glslang;
 		this.sampleCount = sampleCount;
 		this.nodes = nodes;
 
@@ -25,7 +24,6 @@ class WebGPURenderPipelines {
 	get( object ) {
 
 		const device = this.device;
-		const glslang = this.glslang;
 		const properties = this.properties;
 
 		const material = object.material;
@@ -47,7 +45,7 @@ class WebGPURenderPipelines {
 
 			if ( stageVertex === undefined ) {
 
-				stageVertex = new WebGPUProgrammableStage( device, glslang, nodeBuilder.vertexShader, 'vertex' );
+				stageVertex = new WebGPUProgrammableStage( device, nodeBuilder.vertexShader, 'vertex' );
 				this.stages.vertex.set( nodeBuilder.vertexShader, stageVertex );
 
 			}
@@ -56,7 +54,7 @@ class WebGPURenderPipelines {
 
 			if ( stageFragment === undefined ) {
 
-				stageFragment = new WebGPUProgrammableStage( device, glslang, nodeBuilder.fragmentShader, 'fragment' );
+				stageFragment = new WebGPUProgrammableStage( device, nodeBuilder.fragmentShader, 'fragment' );
 				this.stages.fragment.set( nodeBuilder.fragmentShader, stageFragment );
 
 			}

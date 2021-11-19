@@ -39,7 +39,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null parse]( [param:Object3D input], [param:Function onCompleted], [param:Object options] )</h3>
+		<h3>[method:Object parse]( [param:Object3D input], [param:Function onCompleted], [param:Object options] )</h3>
 		<p>
 		[page:Object input] — Object3D to be exported<br />
 		[page:Function onCompleted] — Will be called when the export completes. Optional. The same data is immediately returned from the function.<br />
@@ -48,6 +48,9 @@
 			<li>version - string. Which version of Collada to export. The options are "1.4.1" or "1.5.0". Defaults to "1.4.1".</li>
 			<li>author - string. The name to include in the author field. Author field is excluded by default.</li>
 			<li>textureDirectory - string. The directory relative to the Collada file to save the textures to.</li>
+			<li>upAxis - string. Either Y_UP (default), Z_UP or X_UP.</li>
+			<li>unitName - string. Name of the unit. Can be any string, but could be for example "meter", "inch", or "parsec".</li>
+			<li>unitMeter - number. Length of the unit in meters.</li>
 		</ul>
 		</p>
 		<p>

@@ -12,8 +12,6 @@ import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
 
-import glslang from '../../libs/glslang.js';
-
 import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
@@ -138,8 +136,8 @@ class WebGPURenderer {
 
 		}
 
-		this._parameters.nonGuaranteedFeatures = ( parameters.nonGuaranteedFeatures === undefined ) ? [] : parameters.nonGuaranteedFeatures;
-		this._parameters.nonGuaranteedLimits = ( parameters.nonGuaranteedLimits === undefined ) ? {} : parameters.nonGuaranteedLimits;
+		this._parameters.requiredFeatures = ( parameters.requiredFeatures === undefined ) ? [] : parameters.requiredFeatures;
+		this._parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 	}
 
@@ -153,20 +151,24 @@ class WebGPURenderer {
 
 		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
+		if ( adapter === null ) {
+
+			throw new Error( 'WebGPURenderer: Unable to create WebGPU adapter.' );
+
+		}
+
 		const deviceDescriptor = {
-			nonGuaranteedFeatures: parameters.nonGuaranteedFeatures,
-			nonGuaranteedLimits: parameters.nonGuaranteedLimits
+			requiredFeatures: parameters.requiredFeatures,
+			requiredLimits: parameters.requiredLimits
 		};
 
 		const device = await adapter.requestDevice( deviceDescriptor );
 
-		const compiler = await glslang();
+		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
 
-		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'gpupresent' );
-
-		const swapChain = context.configureSwapChain( {
+		const swapChain = context.configure( {
 			device: device,
-			format: GPUTextureFormat.BRGA8Unorm // this is the only valid swap chain format right now (r121)
+			format: GPUTextureFormat.BGRA8Unorm // this is the only valid swap chain format right now (r121)
 		} );
 
 		this._adapter = adapter;
@@ -178,11 +180,11 @@ class WebGPURenderer {
 		this._properties = new WebGPUProperties();
 		this._attributes = new WebGPUAttributes( device );
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
-		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
+		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
 		this._nodes = new WebGPUNodes( this );
-		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount, this._nodes );
-		this._computePipelines = new WebGPUComputePipelines( device, compiler );
+		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, parameters.sampleCount, this._nodes );
+		this._computePipelines = new WebGPUComputePipelines( device );
 		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
 		this._background = new WebGPUBackground( this );
@@ -256,11 +258,11 @@ class WebGPURenderer {
 			if ( this._parameters.antialias === true ) {
 
 				colorAttachment.view = this._colorBuffer.createView();
-				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
+				colorAttachment.resolveTarget = this._context.getCurrentTexture().createView();
 
 			} else {
 
-				colorAttachment.view = this._swapChain.getCurrentTexture().createView();
+				colorAttachment.view = this._context.getCurrentTexture().createView();
 				colorAttachment.resolveTarget = undefined;
 
 			}
@@ -360,6 +362,7 @@ class WebGPURenderer {
 		this.domElement.width = Math.floor( width * pixelRatio );
 		this.domElement.height = Math.floor( height * pixelRatio );
 
+		this._configureContext();
 		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
@@ -380,6 +383,7 @@ class WebGPURenderer {
 
 		}
 
+		this._configureContext();
 		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
@@ -485,7 +489,7 @@ class WebGPURenderer {
 
 		} else {
 
-			format = GPUTextureFormat.BRGA8Unorm; // default swap chain format
+			format = GPUTextureFormat.BGRA8Unorm; // default swap chain format
 
 		}
 
@@ -631,7 +635,6 @@ class WebGPURenderer {
 
 	_projectObject( object, camera, groupOrder ) {
 
-		const info = this._info;
 		const currentRenderList = this._currentRenderList;
 
 		if ( object.visible === false ) return;
@@ -684,19 +687,6 @@ class WebGPURenderer {
 				console.error( 'THREE.WebGPURenderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
-
-				if ( object.isSkinnedMesh ) {
-
-					// update skeleton only once in a frame
-
-					if ( object.skeleton.frame !== info.render.frame ) {
-
-						object.skeleton.update();
-						object.skeleton.frame = info.render.frame;
-
-					}
-
-				}
 
 				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
@@ -901,12 +891,12 @@ class WebGPURenderer {
 
 			this._colorBuffer = this._device.createTexture( {
 				size: {
-					width: this._width * this._pixelRatio,
-					height: this._height * this._pixelRatio,
+					width: Math.floor( this._width * this._pixelRatio ),
+					height: Math.floor( this._height * this._pixelRatio ),
 					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
-				format: GPUTextureFormat.BRGA8Unorm,
+				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT
 			} );
 
@@ -924,13 +914,34 @@ class WebGPURenderer {
 
 			this._depthBuffer = this._device.createTexture( {
 				size: {
-					width: this._width * this._pixelRatio,
-					height: this._height * this._pixelRatio,
+					width: Math.floor( this._width * this._pixelRatio ),
+					height: Math.floor( this._height * this._pixelRatio ),
 					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.Depth24PlusStencil8,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT
+			} );
+
+		}
+
+	}
+
+	_configureContext() {
+
+		const device = this._device;
+
+		if ( device ) {
+
+			this._context.configure( {
+				device: device,
+				format: GPUTextureFormat.BGRA8Unorm,
+				usage: GPUTextureUsage.RENDER_ATTACHMENT,
+				size: {
+					width: Math.floor( this._width * this._pixelRatio ),
+					height: Math.floor( this._height * this._pixelRatio ),
+					depthOrArrayLayers: 1
+				},
 			} );
 
 		}
@@ -946,5 +957,7 @@ class WebGPURenderer {
 	}
 
 }
+
+WebGPURenderer.prototype.isWebGPURenderer = true;
 
 export default WebGPURenderer;

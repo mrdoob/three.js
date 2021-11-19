@@ -35,7 +35,7 @@
 
 			if ( DracoEncoderModule === undefined ) {
 
-				throw new Error( 'THREE.DRACOExporter: required the draco_decoder to work.' );
+				throw new Error( 'THREE.DRACOExporter: required the draco_encoder to work.' );
 
 			}
 

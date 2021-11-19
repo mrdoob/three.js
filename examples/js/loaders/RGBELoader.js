@@ -7,7 +7,7 @@
 		constructor( manager ) {
 
 			super( manager );
-			this.type = THREE.UnsignedByteType;
+			this.type = THREE.HalfFloatType;
 
 		} // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 
@@ -349,10 +349,11 @@
 			const RGBEByteToRGBHalf = function ( sourceArray, sourceOffset, destArray, destOffset ) {
 
 				const e = sourceArray[ sourceOffset + 3 ];
-				const scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
-				destArray[ destOffset + 0 ] = THREE.DataUtils.toHalfFloat( sourceArray[ sourceOffset + 0 ] * scale );
-				destArray[ destOffset + 1 ] = THREE.DataUtils.toHalfFloat( sourceArray[ sourceOffset + 1 ] * scale );
-				destArray[ destOffset + 2 ] = THREE.DataUtils.toHalfFloat( sourceArray[ sourceOffset + 2 ] * scale );
+				const scale = Math.pow( 2.0, e - 128.0 ) / 255.0; // clamping to 65504, the maximum representable value in float16
+
+				destArray[ destOffset + 0 ] = THREE.DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 0 ] * scale, 65504 ) );
+				destArray[ destOffset + 1 ] = THREE.DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 1 ] * scale, 65504 ) );
+				destArray[ destOffset + 2 ] = THREE.DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 2 ] * scale, 65504 ) );
 
 			};
 
@@ -381,8 +382,8 @@
 							break;
 
 						case THREE.FloatType:
-							numElements = image_rgba_data.length / 4 * 3;
-							const floatArray = new Float32Array( numElements );
+							numElements = image_rgba_data.length / 4;
+							const floatArray = new Float32Array( numElements * 3 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 
@@ -396,8 +397,8 @@
 							break;
 
 						case THREE.HalfFloatType:
-							numElements = image_rgba_data.length / 4 * 3;
-							const halfArray = new Uint16Array( numElements );
+							numElements = image_rgba_data.length / 4;
+							const halfArray = new Uint16Array( numElements * 3 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 

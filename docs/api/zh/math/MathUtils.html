@@ -42,11 +42,11 @@
 
 		<h3>[method:Float inverseLerp]( [param:Float x], [param:Float y], [param:Float value] )</h3>
 		<p>
-		[page:Float x] - Start point.<br />
-		[page:Float y] - End point.<br />
-		[page:Float value] - A value between start and end.<br><br />
+		[page:Float x] - 起始点<br />
+		[page:Float y] - 终点<br />
+		[page:Float value] - 介于起始点和终点的值<br><br />
 
-		Returns the percentage in the closed interval [0, 1] of the given value between the start and end point.
+		返回参数 value 在起点 x 与终点 y 的闭区间 [0,1] 中的百分比。
 		</p>
 
 		<h3>[method:Float lerp]( [param:Float x], [param:Float y], [param:Float t] )</h3>
@@ -61,13 +61,12 @@
 
 		<h3>[method:Float damp]( [param:Float x], [param:Float y], [param:Float lambda], [param:Float dt] )</h3>
 		<p>
-		[page:Float x] - Current point. <br />
-		[page:Float y] - Target point. <br />
-		[page:Float lambda] - A higher lambda value will make the movement more sudden, and a lower value will make the movement more gradual. <br />
-		[page:Float dt] - Delta time in seconds.<br><br />
+		[page:Float x] - 当前点<br />
+		[page:Float y] - 目标点<br />
+		[page:Float lambda] - 较高的参数 lambda 值会使运动更加突然，而较低的值会使运动更加平缓。<br />
+		[page:Float dt] - 以秒为单位的增量时间<br><br />
 
-		Smoothly interpolate a number from [page:Float x] toward [page:Float y] in a spring-like manner using the [page:Float dt] to maintain frame rate independent movement.
-		For details, see [link:http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/ Frame rate independent damping using lerp].
+		使用 [page:Float dt] 以类似弹簧的方式从 [page:Float x] 向 [page:Float y] 平滑地插入一个数字，以保持与帧速率无关的运动。有关详细信息，请参阅 [link:http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/ Frame rate independent damping using lerp].
 		</p>
 
 		<h3>[method:Float mapLinear]( [param:Float x], [param:Float a1], [param:Float a2], [param:Float b1], [param:Float b2] )</h3>
@@ -83,10 +82,10 @@
 
 		<h3>[method:Float pingpong]( [param:Float x], [param:Float length] )</h3>
 		<p>
-		[page:Float x] — The value to pingpong.<br />
-		[page:Float length] — The positive value the function will pingpong to. Default is 1.<br /><br />
+		[page:Float x] — pingpong 的值<br />
+		[page:Float length] — 函数将 pingpong 传递到的正值。默认值为 1。<br /><br />
 
-		Returns a value that alternates between 0 and [param:Float length].</p>
+		返回一个介于 0 和 [param:Float length] 之间的值。</p>
 
 		<h3>[method:Integer ceilPowerOfTwo]( [param:Number n] )</h3>
 		<p>返回大于等于 [page:Number n] 的2的最小次幂。</p>
@@ -129,17 +128,16 @@
 		返回一个0-1之间的值。它和smoothstep相同，但变动更平缓。[link:https://en.wikipedia.org/wiki/Smoothstep#Variations variation on smoothstep] 在x=0和x=1处有0阶和二阶导数。
 		</p>
 
-		<h3>[method:null setQuaternionFromProperEuler]( [param:Quaternion q], [param:Float a], [param:Float b], [param:Float c], [param:String order] )</h3>
+		<h3>[method:undefined setQuaternionFromProperEuler]( [param:Quaternion q], [param:Float a], [param:Float b], [param:Float c], [param:String order] )</h3>
 		<p>
-		[page:Quaternion q] - the quaternion to be set<br />
-		[page:Float a] - the rotation applied to the first axis, in radians <br />
-		[page:Float b] - the rotation applied to the second axis, in radians <br />
-		[page:Float c] - the rotation applied to the third axis, in radians <br />
-		[page:String order] - a string specifying the axes order: 'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', or 'ZYZ'<br /><br />
+		[page:Quaternion q] - 将被设置的的四元数。<br />
+		[page:Float a] - 应用于第一个轴的旋转，以弧度为单位。<br />
+		[page:Float b] - 应用于第二个轴的旋转，以弧度为单位。<br />
+		[page:Float c] - 应用于第三个轴的旋转，以弧度为单位。<br />
+		[page:String order] - 指定轴旋转顺序的字符串：'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', 或 'ZYZ'<br /><br />
 
-		Sets quaternion [page:Quaternion q] from the [link:http://en.wikipedia.org/wiki/Euler_angles intrinsic Proper Euler Angles] defined by angles [page:Float a], [page:Float b], and [page:Float c], and order [page:String order].<br />
-
-		Rotations are applied to the axes in the order specified by [page:String order]: rotation by angle [page:Float a] is applied first, then by angle [page:Float b], then by angle [page:Float c]. Angles are in radians.
+		根据 [page:Float a]、[page:Float b]、[page:Float c]、[page:String order] 组成的欧拉角 [link:http://en.wikipedia.org/wiki/Euler_angles intrinsic Proper Euler Angles] 来设置四元数 [page:Quaternion q]。<br />
+		按照 [page:String order] 指定的轴旋转顺序：先旋转角度 [page:Float a]，再旋转角度 [page:Float b]，最后旋转角度 [page:Float c]。角度以弧度为单位。
 		</p>
 
 		<h2>Source</h2>

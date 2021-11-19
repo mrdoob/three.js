@@ -4,6 +4,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-97), expires 12/13/2021 -->
+		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
 	</head>
 	<body>
 		<div id="info">
@@ -21,19 +23,23 @@
 
 			import * as THREE from 'three';
 
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
 			import WebGPUStorageBuffer from './jsm/renderers/webgpu/WebGPUStorageBuffer.js';
+			import WebGPUUniformBuffer from './jsm/renderers/webgpu/WebGPUUniformBuffer.js';
+			import * as WebGPUBufferUtils from './jsm/renderers/webgpu/WebGPUBufferUtils.js';
 			import WebGPUUniformsGroup from './jsm/renderers/webgpu/WebGPUUniformsGroup.js';
 			import { Vector2Uniform } from './jsm/renderers/webgpu/WebGPUUniform.js';
 
-			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
-			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
+			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 			let pointer;
+			let scaleUniformBuffer;
+			let scaleVector = new THREE.Vector3( 1, 1, 1 );
 
 			const computeParams = [];
 
@@ -55,13 +61,13 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
 
-				const particleNum = 100000;
-				const particleSize = 3;
+				const particleNum = 65000; // 16-bit limit
+				const particleSize = 4; // 16-byte stride align
 
 				const particleArray = new Float32Array( particleNum * particleSize );
 				const velocityArray = new Float32Array( particleNum * particleSize );
 
-				for ( let i = 0; i < particleArray.length; i += 3 ) {
+				for ( let i = 0; i < particleArray.length; i += particleSize ) {
 
 					const r = Math.random() * 0.01 + 0.0005;
 					const degree = Math.random() * 360;
@@ -70,8 +76,12 @@
 
 				}
 
-				const particleBuffer = new WebGPUStorageBuffer( 'particle', new THREE.BufferAttribute( particleArray, 3 ) );
-				const velocityBuffer = new WebGPUStorageBuffer( 'velocity', new THREE.BufferAttribute( velocityArray, 3 ) );
+				const particleBuffer = new WebGPUStorageBuffer( 'particle', new THREE.BufferAttribute( particleArray, particleSize ) );
+				const velocityBuffer = new WebGPUStorageBuffer( 'velocity', new THREE.BufferAttribute( velocityArray, particleSize ) );
+
+				const scaleUniformLength = WebGPUBufferUtils.getVectorLength( 2, 3 ); // two vector3 for array
+
+				scaleUniformBuffer = new WebGPUUniformBuffer( 'scaleUniform', new Float32Array( scaleUniformLength ) );
 
 				pointer = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
 
@@ -79,63 +89,107 @@
 					new Vector2Uniform( 'pointer', pointer )
 				);
 
+				// Object keys need follow the binding shader sequence
+
 				const computeBindings = [
 					particleBuffer,
 					velocityBuffer,
+					scaleUniformBuffer,
 					pointerGroup
 				];
 
-				const computeShader = /* glsl */`#version 450
-					#define PARTICLE_NUM ${particleNum}
-					#define PARTICLE_SIZE ${particleSize}
-					#define ROOM_SIZE 1.0
-					#define POINTER_SIZE 0.1
+				const computeShader = `
 
-					// Limitation for now: the order should be the same as bindings order
+					//
+					// Buffer
+					//
 
-					layout(set = 0, binding = 0) buffer Particle {
-						float particle[ PARTICLE_NUM * PARTICLE_SIZE ];
-					} particle;
+					[[ block ]]
+					struct Particle {
+						value : array< vec4<f32> >;
+					};
+					[[ binding( 0 ), group( 0 ) ]]
+					var<storage,read_write> particle : Particle;
 
-					layout(set = 0, binding = 1) buffer Velocity {
-						float velocity[ PARTICLE_NUM * PARTICLE_SIZE ];
-					} velocity;
+					[[ block ]]
+					struct Velocity {
+						value : array< vec4<f32> >;
+					};
+					[[ binding( 1 ), group( 0 ) ]]
+					var<storage,read_write> velocity : Velocity;
 
-					layout(set = 0, binding = 2) uniform MouseUniforms {
-						vec2 pointer;
-					} mouseUniforms;
+					//
+					// Uniforms
+					//
 
-					void main() {
-						uint index = gl_GlobalInvocationID.x;
-						if ( index >= PARTICLE_NUM ) { return; }
+					[[ block ]]
+					struct Scale {
+						value : array< vec3<f32>, 2 >;
+					};
+					[[ binding( 2 ), group( 0 ) ]]
+					var<uniform> scaleUniform : Scale;
 
-						vec3 position = vec3(
-							particle.particle[ index * 3 + 0 ] + velocity.velocity[ index * 3 + 0 ],
-							particle.particle[ index * 3 + 1 ] + velocity.velocity[ index * 3 + 1 ],
-							particle.particle[ index * 3 + 2 ] + velocity.velocity[ index * 3 + 2 ]
-						);
+					[[block]]
+					struct MouseUniforms {
+						pointer : vec2<f32>;
+					};
+					[[ binding( 3 ), group( 0 ) ]]
+					var<uniform> mouseUniforms : MouseUniforms;
 
-						if ( abs( position.x ) >= ROOM_SIZE ) {
+					[[ stage( compute ), workgroup_size( 64 ) ]]
+					fn main( [[builtin(global_invocation_id)]] id : vec3<u32> ) {
 
-							velocity.velocity[ index * 3 + 0 ] = - velocity.velocity[ index * 3 + 0 ];
+						// get particle index
+
+						let index : u32 = id.x * 3u;
+
+						// update speed
+
+						var position : vec4<f32> = particle.value[ index ] + velocity.value[ index ];
+
+						// update limit
+
+						let limit : vec2<f32> = scaleUniform.value[ 0 ].xy;
+
+						if ( abs( position.x ) >= limit.x ) {
+
+							if ( position.x > 0.0 ) {
+
+								position.x = limit.x;
+
+							} else {
+
+								position.x = -limit.x;
+
+							}
+
+							velocity.value[ index ].x = - velocity.value[ index ].x;
 
 						}
 
-						if ( abs( position.y ) >= ROOM_SIZE ) {
+						if ( abs( position.y ) >= limit.y ) {
 
-							velocity.velocity[ index * 3 + 1 ] = - velocity.velocity[ index * 3 + 1 ];
+							if ( position.y > 0.0 ) {
+
+								position.y = limit.y;
+
+							} else {
+
+								position.y = -limit.y;
+
+							}
+
+							velocity.value[ index ].y = - velocity.value[ index ].y;
 
 						}
 
-						if ( abs( position.z ) >= ROOM_SIZE ) {
+						// update mouse
 
-							velocity.velocity[ index * 3 + 2 ] = - velocity.velocity[ index * 3 + 2 ];
+						let POINTER_SIZE : f32 = .1;
 
-						}
-
-						float dx = mouseUniforms.pointer.x - position.x;
-						float dy = mouseUniforms.pointer.y - position.y;
-						float distanceFromPointer = sqrt( dx * dx + dy * dy );
+						let dx : f32 = mouseUniforms.pointer.x - position.x;
+						let dy : f32 = mouseUniforms.pointer.y - position.y;
+						let distanceFromPointer : f32 = sqrt( dx * dx + dy * dy );
 
 						if ( distanceFromPointer <= POINTER_SIZE ) {
 
@@ -145,10 +199,12 @@
 
 						}
 
-						particle.particle[ index * 3 + 0 ] = position.x;
-						particle.particle[ index * 3 + 1 ] = position.y;
-						particle.particle[ index * 3 + 2 ] = position.z;
+						// update buffer
+
+						particle.value[ index ] = position;
+
 					}
+
 				`;
 
 				computeParams.push( {
@@ -163,8 +219,8 @@
 					'position', particleBuffer.attribute
 				);
 
-				const pointsMaterial = new THREE.PointsMaterial();
-				pointsMaterial.colorNode = new OperatorNode( '+', new PositionNode(), new ColorNode( new THREE.Color( 0x0000FF ) ) );
+				const pointsMaterial = new Nodes.PointsNodeMaterial();
+				pointsMaterial.colorNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode(), new Nodes.ColorNode( new THREE.Color( 0xFFFFFF ) ) );
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
 				scene.add( mesh );
@@ -176,6 +232,13 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'mousemove', onMouseMove );
+
+				// gui
+
+				const gui = new GUI();
+
+				gui.add( scaleVector, 'x', 0, 1, 0.01 );
+				gui.add( scaleVector, 'y', 0, 1, 0.01 );
 
 				return renderer.init();
 
@@ -210,6 +273,8 @@
 
 				renderer.compute( computeParams );
 				renderer.render( scene, camera );
+
+				scaleVector.toArray( scaleUniformBuffer.buffer, 0 );
 
 			}
 
