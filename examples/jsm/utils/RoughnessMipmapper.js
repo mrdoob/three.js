@@ -7,6 +7,7 @@
  */
 
 import {
+	LinearFilter,
 	MathUtils,
 	Mesh,
 	NoBlending,
@@ -71,16 +72,15 @@ class RoughnessMipmapper {
 		if ( width !== roughnessMap.image.width || height !== roughnessMap.image.height ) {
 
 			const params = {
+				generateMipmaps: true,
 				wrapS: roughnessMap.wrapS,
 				wrapT: roughnessMap.wrapT,
 				magFilter: roughnessMap.magFilter,
-				minFilter: roughnessMap.minFilter,
+				minFilter: LinearFilter,
 				depthBuffer: false
 			};
 
 			const newRoughnessTarget = new WebGLRenderTarget( width, height, params );
-
-			newRoughnessTarget.texture.generateMipmaps = true;
 
 			// Setting the render target causes the memory to be allocated.
 
@@ -136,6 +136,8 @@ class RoughnessMipmapper {
 			_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
 
 		}
+
+		// material.roughnessMap.minFilter = roughnessMap.minFilter;
 
 		if ( roughnessMap !== material.roughnessMap ) roughnessMap.dispose();
 
