@@ -393,33 +393,39 @@
 
 			}
 
-			function addOobGround(){
-				let geo = new THREE.BoxGeometry( 200 , 1, 200 );
-				let mat = new THREE.MeshBasicMaterial( { color:0x88ccff } );
-				let mesh = new THREE.Mesh( geo , mat );
-				mesh.position.y -= 25;
+			function createInvisibleWall(dimensions, position){
+				let geo = new THREE.BoxGeometry(dimensions.x, dimensions.y, dimensions.z);
+				let mat = new THREE.MeshBasicMaterial({transparent: true, opacity: 0.0});
+				let mesh = new THREE.Mesh(geo,mat);
+				mesh.position.x = position.x;
+				mesh.position.y = position.y;
+				mesh.position.z = position.z;
 				return mesh;
 			}
 
-			function groupOobGroundAndGltfSceneTogether( gltfscene ){
-				let mapAndOobGround = new THREE.Group();
-				mapAndOobGround.add( gltfscene );
-				mapAndOobGround.add( addOobGround() );
-				scene.add( mapAndOobGround );
-				return mapAndOobGround;
+			function createGroupOfInvisibleWalls(){
+				let group = new THREE.Group();
+				//create walls at very specific locations to prevent player from jumping out
+				group.add(createInvisibleWall({x:1, y:25, z:45}, {x:-15.8,y:0,z:0}));
+				group.add(createInvisibleWall({x:45, y:25, z:1}, {x:0,y:0,z:-14.8}));
+				group.add(createInvisibleWall({x:1, y:25, z:45}, {x:+20.8,y:0,z:0}));
+				group.add(createInvisibleWall({x:45, y:25, z:1}, {x:0,y:0,z:+20.8}));
+				return group;
 			}
 
-			function makeOctreeUseOobGround( gltfscene ){
-				let gltfWithOob = groupOobGroundAndGltfSceneTogether( gltfscene );
-				worldOctree.fromGraphNode( gltfWithOob );
+			function buildWorldWithOobBarriers(gltf){
+				//combine gltf into a group with invisible walls
+				let barriers = createGroupOfInvisibleWalls();
+				barriers.add(gltf);
+				scene.add(barriers);
+				worldOctree.fromGraphNode(barriers);
 			}
 
 			const loader = new GLTFLoader().setPath( './models/gltf/' );
 
 			loader.load( 'collision-world.glb', ( gltf ) => {
 
-				//build game world with an out-of-bounds floor
-				makeOctreeUseOobGround( gltf.scene );
+				buildWorldWithOobBarriers(gltf.scene);
 
 				gltf.scene.traverse( child => {
 
