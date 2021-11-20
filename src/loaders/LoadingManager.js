@@ -17,11 +17,11 @@ class LoadingManager {
 		this.onLoad = onLoad;
 		this.onProgress = onProgress;
 		this.onError = onError;
-		
+
 		let resolvePromise;
 		let rejectPromise;
 
-		this.promise = new Promise ( function ( resolve, reject ) {
+		this.promise = new Promise( function ( resolve, reject ) {
 
 			resolvePromise = resolve;
 			rejectPromise = reject;
@@ -67,6 +67,7 @@ class LoadingManager {
 				}
 
 				resolvePromise();
+
 			}
 
 		};
@@ -78,7 +79,7 @@ class LoadingManager {
 				scope.onError( url );
 
 			}
-			
+
 			rejectPromise( url );
 
 		};
