@@ -706,7 +706,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const levels = getMipLevels( texture, image, supportsMips );
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( texture.version === 1 );
+			const allocateMemory = ( textureProperties.__version === undefined );
 
 			if ( mipmaps.length > 0 && supportsMips ) {
 
