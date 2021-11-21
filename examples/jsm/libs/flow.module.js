@@ -16,7 +16,7 @@ function __flow__addCSS( css ) {
 
 }
 
-__flow__addCSS( `f-canvas,f-canvas canvas { position: absolute; top: 0; left: 0; margin: 0; padding: 0; width: 100%; height: 100%; -webkit-touch-callout: none; }f-canvas { overflow: auto; cursor: grab;}f-canvas canvas.front { z-index: 10;}body.dragging f-canvas,body.connecting f-canvas { overflow: hidden !important;}body.dragging *:not(.drag) { pointer-events: none !important;}f-canvas.grabbing * { cursor: grabbing; user-select: none;}f-canvas canvas { position: fixed; overflow: hidden; pointer-events: none;}f-canvas::-webkit-scrollbar { width: 8px; height: 8px;}f-canvas::-webkit-scrollbar-thumb:hover{ background: #014fc5;}f-canvas::-webkit-scrollbar-track { background: #363636;}f-canvas::-webkit-scrollbar-thumb { background-color: #666666; border-radius: 10px; border: 0;}f-canvas f-content,f-canvas f-area { position: absolute; display: block;}f-node { position: absolute; margin: 0; padding: 0; user-select: none; width: 320px; z-index: 1; cursor: auto; filter: drop-shadow(0 0 10px #00000061); backdrop-filter: blur(4px);}f-node.selected { z-index: 2;}f-node.selected,f-canvas.dragging-rio f-node:hover,f-canvas.dragging-lio f-node:hover { filter: drop-shadow(0 0 10px #00000061) drop-shadow(0 0 8px #4444dd);}f-node.closed f-element:not(:first-child) { display: none;}f-node.center { top: 50%; left: 50%; transform: translate( -50%, -50% );}f-node.top-right { top: 0; right: 0;}f-node.top-center { top: 0; left: 50%; transform: translateX( -50% );}f-node.top-left { top: 0; left: 0;}f-node { transition: filter 0.2s ease;}@keyframes f-open { 0% { transform: scale(.5); filter: blur(30px); } 100% { transform: scale(1); filter: unset }}f-node { animation: .2s f-open 1 alternate ease-out;}f-menu,f-menu button,f-element,f-element input,f-element select,f-element button,f-element textarea { font-family: 'Open Sans', sans-serif; font-size: 13px; text-transform: capitalize; color: #eeeeee; outline: solid 0px #000; letter-spacing: .2px; margin: 0; padding: 0; border: 0; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.2s ease;}f-element input { transition: background 0.1s ease;}f-element input,f-element select,f-element button,f-element textarea { background-color: #242427;}f-element { position: relative; width: calc( 100% - 14px ); background: rgba(45, 45, 48, 0.95); pointer-events: auto; border-bottom: 2px solid #232323; display: flex; padding-left: 7px; padding-right: 7px; padding-top: 2px; padding-bottom: 2px;}f-element { height: 24px;}f-element input { margin-top: 2px; margin-bottom: 2px; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%); margin-left: 2px; margin-right: 2px; width: 100%; padding-left: 4px; padding-right: 4px;}f-element input.number { cursor: col-resize;}f-element input:focus[type='text'], f-element input:focus[type='range'], f-element input:focus[type='color'] { background: rgba( 0, 0, 0, 0.6 ); outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-element input[type='color'] { appearance: none; padding: 0; margin-left: 2px; margin-right: 2px; height: calc( 100% - 4px ); margin-top: 2px; border: none; }f-element input[type='color']::-webkit-color-swatch-wrapper { padding: 2px;}f-element input[type='color']::-webkit-color-swatch { border: none; cursor: alias;}f-element input[type='range'] { appearance: none; width: 100%; overflow: hidden; padding: 0; cursor: ew-resize;}f-element input[type='range']::-webkit-slider-runnable-track { appearance: none; height: 10px; color: #13bba4; margin: 0;}f-element input[type='range']::-webkit-slider-thumb { appearance: none; width: 0; background: #434343; box-shadow: -500px 0 0 500px rgba( 0, 120, 255, 0.98 ); border-radius: 50%; border: 0 !important;}f-element input[type='range']::-webkit-slider-runnable-track { margin-left: -4px; margin-right: -5px;}f-element input[type='checkbox'] { appearance: none; cursor: pointer;}f-element input[type='checkbox'].toggle { height: 20px; width: 45px; border-radius: 16px; display: inline-block; position: relative; margin: 0; margin-top: 2px; background: linear-gradient( 0deg, #292929 0%, #0a0a0ac2 100% ); transition: all 0.2s ease;}f-element input[type='checkbox'].toggle:after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2); transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);}f-element input[type='checkbox'].toggle:checked { background: linear-gradient( 0deg, #0177fb 0%, #0177fb 100% );}f-element input[type='checkbox'].toggle:checked:after { transform: translatex(25px);}f-element.auto-height { display: table;}f-element textarea { width: calc( 100% - 18px ); padding-top: 1px; padding-bottom: 3px; padding-left: 3px; padding-right: 8px; margin-top: 2px; margin-left: 2px; height: calc( 100% - 8px ); max-height: 300px; border-radius: 2px; resize: none; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element.auto-height textarea { resize: auto;}f-element select { width: 100%; margin-top: 2px; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; padding-left: 5px; cursor: pointer; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element f-toolbar { position: absolute; display: flex; top: 0; width: 100%; height: 100%; align-content: space-around;}f-element.output-right f-toolbar { right: 7px; float: right; justify-content: end;}f-element f-toolbar { margin-top: auto; margin-bottom: auto; margin-left: 3px; margin-right: 3px; font-size: 18px; line-height: 18px;}f-element f-toolbar button { opacity: .7; cursor: pointer; font-size: 14px; width: unset; height: unset; border-radius: unset; border: unset; outline: 0; background-color: unset; box-shadow: unset;}f-element f-toolbar button:hover,f-element f-toolbar button:active { opacity: 1; border: 0; background-color: unset;}f-element input.range-value { width: 60px; text-align: center;}f-menu.context button,f-element button { width: 100%; height: calc( 100% - 4px ); margin-left: 2px; margin-right: 2px; margin-top: 2px; border-radius: 3px; cursor: pointer;}f-element button { box-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 17%), inset -2px -2px 2px 0 rgb(0 0 0 / 26%);}f-element button:hover { color: #fff; background-color: #2a2a2a;}f-element button:active { border: 1px solid rgba( 0, 120, 255, 0.98 );}f-element f-inputs,f-element f-subinputs { display: flex; width: 100%;}f-element f-inputs { left: 100px; top: 50%; transform: translateY(-50%); position: absolute; width: calc( 100% - 106px ); height: calc( 100% - 4px ); z-index: 1;}f-element f-label,f-element span { margin: auto; text-shadow: 1px 1px 0px #0007;}f-element f-label { padding-left: 4px; white-space: nowrap; position: absolute; top: 50%; transform: translateY(-50%); width: calc( 100% - 20px );}f-element.right f-label { text-align: right;}f-element f-label i { float: left; font-size: 18px; margin-right: 6px;}f-element f-label.center { width: 100%; text-align: center; display: block;}f-element.title { height: 29px; background-color: #3a3a3ab0; background-color: #3b3b43ed; cursor: all-scroll; border-top-left-radius: 6px; border-top-right-radius: 6px;}f-element.blue { background-color: #014fc5;}f-element.red { background-color: #bd0b0b;}f-element.green { background-color: #148d05;}f-element.yellow { background-color: #d6b100;}f-element.title.left { text-align: left; display: inline-grid; justify-content: start;}f-element.title span { text-align: center; font-size: 15px; padding-top: 2px;}f-element.title i { font-size: 18px; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: .5;}f-element.output-right.title i { left: 10px; right: unset;}f-element.title.left span { text-align: left;}f-element f-io { border: 2px solid #dadada; width: 7px; height: 7px; position: absolute; background: #242427; border-radius: 8px; float: left; left: -7px; top: calc( 50% - 5px ); cursor: alias; box-shadow: 0 0 3px 2px #0000005e; z-index: 1;}f-element f-io.connect,f-canvas.dragging-rio f-element:hover f-io.lio,f-canvas.dragging-lio f-element:hover f-io.rio { border: 2px solid #0177fb; zoom: 1.4;}f-node.io-connect f-io:not(.connect) { border: 2px solid #dadada !important; zoom: 1 !important;}f-element f-io.rio { float: right; right: -7px; left: unset;}f-element f-disconnect { position: absolute; left: -35px; top: 50%; font-size: 22px; transform: translateY( -50% ); filter: drop-shadow(0 0 5px #000); text-shadow: 0px 0px 5px black; cursor: pointer;}f-element.output-right f-disconnect { right: -35px; left: unset;}f-element f-disconnect:hover { color: #ff3300;}f-element textarea::-webkit-scrollbar { width: 6px;}f-element textarea::-webkit-scrollbar-track { background: #111; } f-element textarea::-webkit-scrollbar-thumb { background: #0177fb; }f-element textarea::-webkit-scrollbar-thumb:hover { background: #1187ff; }f-element.small { height: 18px;}f-element.large { height: 36px;}body.connecting f-node:not(.io-connect) f-element:hover,f-element.select { background-color: rgba(61, 70, 82, 0.98);}f-tooltip { pointer-events: none;}f-menu.context { position: absolute; width: 170px; padding: 2px; margin: 0; background: #17171794; z-index: 110; font-size: 12px; border-radius: 6px; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; box-shadow: 3px 3px 6px rgba(0,0,0,.2);}f-menu.context.hidden { visibility: hidden;}f-menu.context f-item { display: block; position: relative; margin: 0; padding: 0; white-space: nowrap;}f-menu.context f-item.submenu::after { content: ""; position: absolute; right: 6px; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); border: 5px solid transparent; border-left-color: #808080;}f-menu.context f-item:hover > f-menu { visibility: unset;}f-menu.context f-menu { top: 0px; left: calc( 100% - 4px );}f-menu.context f-item button { overflow: visible; display: block; width: calc( 100% - 6px ); text-align: left; cursor: pointer; white-space: nowrap; padding: 6px 8px; border-radius: 3px; background: #2d2d32; border: 0; color: #ddd; margin: 3px; text-shadow: 1px 1px 0px #0007;}f-menu.context f-item button i { float: left; font-size: 16px;}f-menu.context f-item button span { margin-left: 6px;}f-menu.context f-item:hover > button { color: #fff; background: #313136;}f-menu.context f-item button:active { outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-menu.circle { position: absolute; left: 30px; top: 30px; z-index: 100;}f-menu.circle f-item { display: flex; justify-content: end; align-content: space-around; margin-bottom: 12px;}f-menu.circle f-item button { width: 50px; height: 50px; font-size: 26px; background: #17171794; border-radius: 50%; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; line-height: 100%; cursor: pointer; box-shadow: 3px 3px 6px rgba(0,0,0,.2);}f-menu.circle f-item f-tooltip { position: absolute; left: 0; top: 0; margin-left: 50px; background: rgba(0,0,0,.8); backdrop-filter: blur(4px); font-size: 14px; padding: 7px; border-radius: 10px; top: 50%; transform: translateY(-50%); visibility: hidden; pointer-events: none; opacity: 0; transition: all 0.3s ease;}f-menu.circle f-item button:hover { background-color: #2a2a2a;}f-menu.circle f-item button:hover > f-tooltip { visibility: visible; transform: translate(10px, -50%); opacity: 1;}.f-rounded f-node f-element,.f-rounded f-node f-element.title.left { border-radius: 10px 5px 10px 5px;}.f-rounded f-node f-element input, .f-rounded f-node f-element select,.f-rounded f-node f-element button,.f-rounded f-node f-element textarea,.f-rounded f-node f-element input[type='checkbox'].toggle,.f-rounded f-node f-element input[type='checkbox'].toggle:after { border-radius: 20px 10px;}.f-rounded f-node f-element input { padding-left: 7px; padding-right: 7px;}.f-rounded f-menu.context,.f-rounded f-menu.context f-item button { border-radius: 20px 10px;}@media (hover: hover) and (pointer: fine) { f-element f-io:hover { border: 2px solid #0177fb; zoom: 1.4; }}f-canvas { will-change: top, left;}f-node { will-change: transform !important;}` );
+__flow__addCSS( `f-canvas,f-canvas canvas { position: absolute; top: 0; left: 0; margin: 0; padding: 0; width: 100%; height: 100%; -webkit-touch-callout: none; }f-canvas { overflow: auto; cursor: grab;}f-canvas canvas.front { z-index: 10;}body.dragging f-canvas,body.connecting f-canvas { overflow: hidden !important;}body.dragging *:not(.drag) { pointer-events: none !important;}f-canvas.grabbing * { cursor: grabbing; user-select: none;}f-canvas canvas { position: fixed; overflow: hidden; pointer-events: none;}f-canvas::-webkit-scrollbar { width: 8px; height: 8px;}f-canvas::-webkit-scrollbar-thumb:hover{ background: #014fc5;}f-canvas::-webkit-scrollbar-track { background: #363636;}f-canvas::-webkit-scrollbar-thumb { background-color: #666666; border-radius: 10px; border: 0;}f-canvas f-content,f-canvas f-area { position: absolute; display: block;}f-node { position: absolute; margin: 0; padding: 0; user-select: none; width: 320px; z-index: 1; cursor: auto; filter: drop-shadow(0 0 10px #00000061); backdrop-filter: blur(4px);}f-node.selected { z-index: 2;}f-node.selected,f-canvas.dragging-rio f-node:hover,f-canvas.dragging-lio f-node:hover { filter: drop-shadow(0 0 10px #00000061) drop-shadow(0 0 8px #4444dd);}f-node.closed f-element:not(:first-child) { display: none;}f-node.center { top: 50%; left: 50%; transform: translate( -50%, -50% );}f-node.top-right { top: 0; right: 0;}f-node.top-center { top: 0; left: 50%; transform: translateX( -50% );}f-node.top-left { top: 0; left: 0;}f-node { transition: filter 0.2s ease;}@keyframes f-open { 0% { transform: scale(.5); filter: blur(30px); } 100% { transform: scale(1); filter: unset }}f-node { animation: .2s f-open 1 alternate ease-out;}f-menu,f-menu button,f-element,f-element input,f-element select,f-element button,f-element textarea { font-family: 'Open Sans', sans-serif; font-size: 13px; text-transform: capitalize; color: #eeeeee; outline: solid 0px #000; letter-spacing: .2px; margin: 0; padding: 0; border: 0; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.2s ease;}f-element input { transition: background 0.1s ease;}f-element input,f-element select,f-element button,f-element textarea { background-color: #242427;}f-element { position: relative; width: calc( 100% - 14px ); background: rgba(45, 45, 48, 0.95); pointer-events: auto; border-bottom: 2px solid #232323; display: flex; padding-left: 7px; padding-right: 7px; padding-top: 2px; padding-bottom: 2px;}f-element { height: 24px;}f-element input { margin-top: 2px; margin-bottom: 2px; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%); margin-left: 2px; margin-right: 2px; width: 100%; padding-left: 4px; padding-right: 4px;}f-element input.number { cursor: col-resize;}f-element input:focus[type='text'], f-element input:focus[type='range'], f-element input:focus[type='color'] { background: rgba( 0, 0, 0, 0.6 ); outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-element input[type='color'] { appearance: none; padding: 0; margin-left: 2px; margin-right: 2px; height: calc( 100% - 4px ); margin-top: 2px; border: none; }f-element input[type='color']::-webkit-color-swatch-wrapper { padding: 2px;}f-element input[type='color']::-webkit-color-swatch { border: none; cursor: alias;}f-element input[type='range'] { appearance: none; width: 100%; overflow: hidden; padding: 0; cursor: ew-resize;}f-element input[type='range']::-webkit-slider-runnable-track { appearance: none; height: 10px; color: #13bba4; margin: 0;}f-element input[type='range']::-webkit-slider-thumb { appearance: none; width: 0; background: #434343; box-shadow: -500px 0 0 500px rgba( 0, 120, 255, 0.98 ); border-radius: 50%; border: 0 !important;}f-element input[type='range']::-webkit-slider-runnable-track { margin-left: -4px; margin-right: -5px;}f-element input[type='checkbox'] { appearance: none; cursor: pointer;}f-element input[type='checkbox'].toggle { height: 20px; width: 45px; border-radius: 16px; display: inline-block; position: relative; margin: 0; margin-top: 2px; background: linear-gradient( 0deg, #292929 0%, #0a0a0ac2 100% ); transition: all 0.2s ease;}f-element input[type='checkbox'].toggle:after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2); transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);}f-element input[type='checkbox'].toggle:checked { background: linear-gradient( 0deg, #0177fb 0%, #0177fb 100% );}f-element input[type='checkbox'].toggle:checked:after { transform: translatex(25px);}f-element.auto-height { display: table;}f-element textarea { width: calc( 100% - 18px ); padding-top: 1px; padding-bottom: 3px; padding-left: 3px; padding-right: 8px; margin-top: 2px; margin-left: 2px; height: calc( 100% - 8px ); max-height: 300px; border-radius: 2px; resize: none; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element.auto-height textarea { resize: auto;}f-element select { width: 100%; margin-top: 2px; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; padding-left: 5px; cursor: pointer; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element f-toolbar { position: absolute; display: flex; top: 0; width: 100%; height: 100%; align-content: space-around;}f-element.output-right f-toolbar { right: 7px; float: right; justify-content: end;}f-element f-toolbar { margin-top: auto; margin-bottom: auto; margin-left: 3px; margin-right: 3px; font-size: 18px; line-height: 18px;}f-element f-toolbar button { opacity: .7; cursor: pointer; font-size: 14px; width: unset; height: unset; border-radius: unset; border: unset; outline: 0; background-color: unset; box-shadow: unset;}f-element f-toolbar button:hover,f-element f-toolbar button:active { opacity: 1; border: 0; background-color: unset;}f-element input.range-value { width: 60px; text-align: center;}f-menu.context button,f-element button { width: 100%; height: calc( 100% - 4px ); margin-left: 2px; margin-right: 2px; margin-top: 2px; border-radius: 3px; cursor: pointer;}f-element button { box-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 17%), inset -2px -2px 2px 0 rgb(0 0 0 / 26%);}f-element button:hover { color: #fff; background-color: #2a2a2a;}f-element button:active { border: 1px solid rgba( 0, 120, 255, 0.98 );}f-element f-inputs,f-element f-subinputs { display: flex; width: 100%;}f-element f-inputs { left: 100px; top: 50%; transform: translateY(-50%); position: absolute; width: calc( 100% - 106px ); height: calc( 100% - 4px ); z-index: 1;}f-element f-label,f-element span { margin: auto; text-shadow: 1px 1px 0px #0007;}f-element f-label { padding-left: 4px; white-space: nowrap; position: absolute; top: 50%; transform: translateY(-50%); width: calc( 100% - 20px );}f-element.right f-label { text-align: right;}f-element f-label i { float: left; font-size: 18px; margin-right: 6px;}f-element f-label.center { width: 100%; text-align: center; display: block;}f-element.title { height: 29px; background-color: #3a3a3ab0; background-color: #3b3b43ed; cursor: all-scroll; border-top-left-radius: 6px; border-top-right-radius: 6px;}f-element.blue { background-color: #014fc5;}f-element.red { background-color: #bd0b0b;}f-element.green { background-color: #148d05;}f-element.yellow { background-color: #d6b100;}f-element.title.left { text-align: left; display: inline-grid; justify-content: start;}f-element.title span { text-align: center; font-size: 15px; padding-top: 2px;}f-element.title i { font-size: 18px; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: .5;}f-element.output-right.title i { left: 10px; right: unset;}f-element.title.left span { text-align: left;}f-element f-io { border: 2px solid #dadada; width: 7px; height: 7px; position: absolute; background: #242427; border-radius: 8px; float: left; left: -7px; top: calc( 50% - 5px ); cursor: alias; box-shadow: 0 0 3px 2px #0000005e; z-index: 1;}f-element f-io.connect,f-canvas.dragging-rio f-element:hover f-io.lio,f-canvas.dragging-lio f-element:hover f-io.rio { border: 2px solid #0177fb; zoom: 1.4;}f-node.io-connect f-io:not(.connect) { border: 2px solid #dadada !important; zoom: 1 !important;}f-element f-io.rio { float: right; right: -7px; left: unset;}f-element f-disconnect { position: absolute; left: -35px; top: 50%; font-size: 22px; transform: translateY( -50% ); filter: drop-shadow(0 0 5px #000); text-shadow: 0px 0px 5px black; cursor: pointer;}f-element.output-right f-disconnect { right: -35px; left: unset;}f-element f-disconnect:hover { color: #ff3300;}f-element textarea::-webkit-scrollbar { width: 6px;}f-element textarea::-webkit-scrollbar-track { background: #111; } f-element textarea::-webkit-scrollbar-thumb { background: #0177fb; }f-element textarea::-webkit-scrollbar-thumb:hover { background: #1187ff; }f-element.small { height: 18px;}f-element.large { height: 36px;}body.connecting f-node:not(.io-connect) f-element:hover,f-element.select { background-color: rgba(61, 70, 82, 0.98);}f-tooltip { pointer-events: none;}f-tooltip { position: absolute; left: 0; top: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(4px); font-size: 14px; padding: 7px; border-radius: 10px; top: 50%; transform: translateY(-50%); visibility: hidden; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 150; white-space: nowrap;}f-menu.context { position: absolute; width: 170px; padding: 2px; margin: 0; background: #17171794; z-index: 110; font-size: 12px; border-radius: 6px; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; box-shadow: 3px 3px 6px rgba(0,0,0,.2);}f-menu.context.hidden { visibility: hidden;}f-menu.context f-item { display: block; position: relative; margin: 0; padding: 0; white-space: nowrap;}f-menu.context f-item.submenu::after { content: ""; position: absolute; right: 6px; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); border: 5px solid transparent; border-left-color: #808080;}f-menu.context f-item:hover > f-menu { visibility: unset;}f-menu.context f-menu { top: 0px; left: calc( 100% - 4px );}f-menu.context f-item button { overflow: visible; display: block; width: calc( 100% - 6px ); text-align: left; cursor: pointer; white-space: nowrap; padding: 6px 8px; border-radius: 3px; background: #2d2d32; border: 0; color: #ddd; margin: 3px; text-shadow: 1px 1px 0px #0007;}f-menu.context f-item button i { float: left; font-size: 16px;}f-menu.context f-item button span { margin-left: 6px;}f-menu.context f-item:hover > button { color: #fff; background: #313136;}f-menu.context f-item button:active { outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-menu.context f-item f-tooltip { margin-left: 120px;}f-menu.circle { position: absolute; left: 30px; top: 30px; z-index: 100;}f-menu.circle f-item { display: flex; justify-content: end; align-content: space-around; margin-bottom: 12px;}f-menu.circle f-item button { width: 50px; height: 50px; font-size: 26px; background: #17171794; border-radius: 50%; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; line-height: 100%; cursor: pointer; box-shadow: 3px 3px 6px rgba(0,0,0,.2);}f-menu.circle f-item f-tooltip { margin-left: 50px;}.f-rounded f-node f-element,.f-rounded f-node f-element.title.left { border-radius: 10px 5px 10px 5px;}.f-rounded f-node f-element input, .f-rounded f-node f-element select,.f-rounded f-node f-element button,.f-rounded f-node f-element textarea,.f-rounded f-node f-element input[type='checkbox'].toggle,.f-rounded f-node f-element input[type='checkbox'].toggle:after { border-radius: 20px 10px;}.f-rounded f-node f-element input { padding-left: 7px; padding-right: 7px;}.f-rounded f-menu.context,.f-rounded f-menu.context f-item button { border-radius: 20px 10px;}@media (hover: hover) and (pointer: fine) { f-element f-io:hover { border: 2px solid #0177fb; zoom: 1.4; } f-menu.circle f-item button:hover { background-color: #2a2a2a; } f-menu.circle f-item button:hover > f-tooltip, f-menu.context f-item button:hover > f-tooltip { visibility: visible; transform: translate(10px, -50%); opacity: 1; } f-menu.circle f-item button:focus > f-tooltip, f-menu.context f-item button:focus > f-tooltip { visibility: hidden; }}f-canvas { will-change: top, left;}f-node { will-change: transform !important;}` );
 
 var Flow = /*#__PURE__*/Object.freeze({
 	__proto__: null,
@@ -27,6 +27,7 @@ var Flow = /*#__PURE__*/Object.freeze({
 	get Serializer () { return Serializer; },
 	get Loader () { return Loader; },
 	get Utils () { return Utils; },
+	get ObjectNode () { return ObjectNode; },
 	get PanelNode () { return PanelNode; },
 	get Menu () { return Menu; },
 	get ContextMenu () { return ContextMenu; },
@@ -54,11 +55,27 @@ class Serializer extends EventTarget {
 
 		this._id = _id ++;
 
+		this._serializable = true;
+
 	}
 
 	get id() {
 
 		return this._id;
+
+	}
+
+	setSerializable( value ) {
+
+		this._serializable = value;
+
+		return this;
+
+	}
+
+	getSerializable() {
+
+		return this._serializable;
 
 	}
 
@@ -193,7 +210,7 @@ const draggableDOM = ( dom, callback = null, className = 'dragging' ) => {
 
 		} else {
 
-			if ( Math.abs( delta.x ) > 1 || Math.abs( delta.y ) > 1 ) {
+			if ( Math.abs( delta.x ) > 2 || Math.abs( delta.y ) > 2 ) {
 
 				dragData.dragging = true;
 
@@ -308,31 +325,31 @@ class Link {
 	}
 
 	get lioElement() {
-		
+
 		if ( Link.InputDirection === 'left' ) {
-		
+
 			return this.outputElement;
-			
+
 		} else {
-			
+
 			return this.inputElement;
-			
+
 		}
-		
+
 	}
-	
+
 	get rioElement() {
-		
+
 		if ( Link.InputDirection === 'left' ) {
-		
+
 			return this.inputElement;
-			
+
 		} else {
-			
+
 			return this.outputElement;
-			
+
 		}
-		
+
 	}
 
 }
@@ -408,6 +425,8 @@ class Element extends Serializer {
 
 		this.extra = null;
 
+		this.visible = true;
+
 		this.inputsDOM = dom;
 
 		this.disconnectDOM = null;
@@ -462,6 +481,22 @@ class Element extends Serializer {
 
 	}
 
+	setVisible( value ) {
+
+		this.visible = value;
+
+		this.dom.style.display = value ? '' : 'none';
+
+		return this;
+
+	}
+
+	getVisible() {
+
+		return this.visible;
+
+	}
+
 	setStyle( style ) {
 
 		const dom = this.dom;
@@ -481,11 +516,11 @@ class Element extends Serializer {
 		if ( Link.InputDirection === 'left' ) {
 
 			return this.setLIO( length );
-			
+
 		} else {
-			
+
 			return this.setRIO( length );
-			
+
 		}
 
 	}
@@ -495,11 +530,11 @@ class Element extends Serializer {
 		if ( Link.InputDirection === 'left' ) {
 
 			return this.setRIO( length );
-			
+
 		} else {
-			
+
 			return this.setLIO( length );
-			
+
 		}
 
 	}
@@ -509,11 +544,11 @@ class Element extends Serializer {
 		if ( Link.InputDirection === 'left' ) {
 
 			return this.lioLength;
-			
+
 		} else {
-			
+
 			return this.rioLength;
-			
+
 		}
 
 	}
@@ -523,11 +558,11 @@ class Element extends Serializer {
 		if ( Link.InputDirection === 'left' ) {
 
 			return this.rioLength;
-			
+
 		} else {
-			
+
 			return this.lioLength;
-			
+
 		}
 
 	}
@@ -807,7 +842,7 @@ class Element extends Serializer {
 			dom.classList.add( 'select' );
 
 			const defaultOutput = Link.InputDirection === 'left' ? 'lio' : 'rio';
-			
+
 			const link = type === defaultOutput ? new Link( this ) : new Link( null, this );
 
 			this.links.push( link );
@@ -880,6 +915,8 @@ class Input extends Serializer {
 
 		this.element = null;
 
+		this.extra = null;
+
 		this.events = {
 			'change': [],
 			'click': []
@@ -896,6 +933,20 @@ class Input extends Serializer {
 			dispatchEventList( this.events.click, this );
 
 		} );
+
+	}
+
+	setExtra( value ) {
+
+		this.extra = value;
+
+		return this;
+
+	}
+
+	getExtra() {
+
+		return this.extra;
 
 	}
 
@@ -926,11 +977,11 @@ class Input extends Serializer {
 
 	}
 
-	setValue( value ) {
+	setValue( value, dispatch = true ) {
 
 		this.dom.value = value;
 
-		this.dispatchEvent( new Event( 'change' ) );
+		if ( dispatch ) this.dispatchEvent( new Event( 'change' ) );
 
 		return this;
 
@@ -1021,7 +1072,28 @@ class Node extends Serializer {
 
 		this.elements = [];
 
+		this.events = {
+			'focus': [],
+			'blur': []
+		};
+
 		this.setPosition( 0, 0 );
+
+	}
+
+	onFocus( callback ) {
+
+		this.events.focus.push( callback );
+
+		return this;
+
+	}
+
+	onBlur( callback ) {
+
+		this.events.blur.push( callback );
+
+		return this;
 
 	}
 
@@ -1581,9 +1653,17 @@ class Canvas extends Serializer {
 
 	select( node = null ) {
 
-		if ( this.selected !== null ) {
+		if ( node === this.selected ) return;
 
-			this.selected.dom.classList.remove( 'selected' );
+		const previousNode = this.selected;
+
+		if ( previousNode !== null ) {
+
+			previousNode.dom.classList.remove( 'selected' );
+
+			this.selected = null;
+
+			dispatchEventList( previousNode.events.blur, previousNode );
 
 		}
 
@@ -1591,9 +1671,11 @@ class Canvas extends Serializer {
 
 			node.dom.classList.add( 'selected' );
 
-		}
+			this.selected = node;
 
-		this.selected = node;
+			dispatchEventList( node.events.focus, node );
+
+		}
 
 	}
 
@@ -1783,19 +1865,51 @@ class Canvas extends Serializer {
 
 class Loader extends EventTarget {
 
-	constructor() {
+	constructor( parseType = Loader.DEFAULT ) {
 
 		super();
 
+		this.parseType = parseType;
+
+		this.events = {
+			'load': []
+		};
+
 	}
 
-	async load( url ) {
+	setParseType( type ) {
+
+		this.parseType = type;
+
+		return this;
+
+	}
+
+	getParseType() {
+
+		return this.parseType;
+
+	}
+
+	onLoad( callback ) {
+
+		this.events.load.push( callback );
+
+		return this;
+
+	}
+
+	async load( url, lib = null ) {
 
 		return await fetch( url )
 			.then( response => response.json() )
 			.then( result => {
 
-				return this.parse( result );
+				this.data = this.parse( result, lib );
+
+				dispatchEventList( this.events.load, this );
+
+				return this.data;
 
 			} )
 			.catch( err => {
@@ -1806,18 +1920,33 @@ class Loader extends EventTarget {
 
 	}
 
-	static parse( json, lib = null ) {
+	parse( json, lib = null ) {
 
-		json = Loader.parseObjects( json, lib );
+		json = this._parseObjects( json, lib );
 
-		const flowObj = new Flow[ json.type ]();
-		flowObj.deserialize( json );
+		const parseType = this.parseType;
 
-		return flowObj;
+		if ( parseType === Loader.DEFAULT ) {
+
+			const flowObj = new Flow[ json.type ]();
+
+			if ( flowObj.getSerializable() ) {
+
+				flowObj.deserialize( json );
+
+			}
+
+			return flowObj;
+
+		} else if ( parseType === Loader.OBJECTS ) {
+
+			return json;
+
+		}
 
 	}
 
-	static parseObjects( json, lib = null ) {
+	_parseObjects( json, lib = null ) {
 
 		json = { ...json };
 
@@ -1846,7 +1975,11 @@ class Loader extends EventTarget {
 
 					ref.set( newObject, true );
 
-					newObject.deserialize( json.objects[ id ] );
+					if ( newObject.getSerializable() ) {
+
+						newObject.deserialize( json.objects[ id ] );
+
+					}
 
 				}
 
@@ -1867,388 +2000,8 @@ class Loader extends EventTarget {
 
 }
 
-const ENTER_KEY$1 = 13;
-
-class StringInput extends Input {
-
-	constructor( value = '' ) {
-
-		const dom = document.createElement( 'input' );
-		super( dom );
-
-		dom.type = 'text';
-		dom.value = value;
-		dom.spellcheck = false;
-		dom.autocomplete = 'off';
-
-		dom.onblur = () => {
-
-			this.dispatchEvent( new Event( 'blur' ) );
-
-		};
-
-		dom.onchange = () => {
-
-			this.dispatchEvent( new Event( 'change' ) );
-
-		};
-
-		dom.onkeydown = ( e ) => {
-
-			if ( e.keyCode === ENTER_KEY$1 ) {
-
-				e.target.blur();
-
-			}
-
-			e.stopPropagation();
-
-		};
-
-	}
-
-}
-
-const ENTER_KEY = 13;
-
-class NumberInput extends Input {
-
-	constructor( value = 0, min = - Infinity, max = Infinity, step = .01 ) {
-
-		const dom = document.createElement( 'input' );
-		super( dom );
-
-		this.min = min;
-		this.max = max;
-		this.step = step;
-
-		this.integer = false;
-
-		dom.type = 'text';
-		dom.className = 'number';
-		dom.value = this._getString( value );
-		dom.spellcheck = false;
-		dom.autocomplete = 'off';
-
-		dom.onblur = () => {
-
-			this.dispatchEvent( new Event( 'blur' ) );
-
-		};
-
-		dom.onkeydown = ( e ) => {
-
-			if ( e.key.length === 1 && /\d|\/./.test( e.key ) !== true ) {
-
-				return false;
-
-			}
-
-			this.dispatchEvent( new Event( 'change' ) );
-
-			if ( e.keyCode === ENTER_KEY ) {
-
-				e.target.blur();
-
-			}
-
-			e.stopPropagation();
-
-		};
-
-		draggableDOM( dom, ( data ) => {
-
-			const { delta } = data;
-
-			if ( data.value === undefined ) {
-
-				data.value = this.getValue();
-
-			}
-
-			const diff = delta.x - delta.y;
-
-			const value = data.value + ( diff * this.step );
-
-			this.dom.value = this._getString( value.toFixed( this.precision ) );
-
-			this.dispatchEvent( new Event( 'change' ) );
-
-		} );
-
-	}
-
-	setRange( min, max, step ) {
-
-		this.min = min;
-		this.max = max;
-		this.step = step;
-
-		this.dom.value = this._getString( this.value );
-
-		this.dispatchEvent( new Event( 'range' ) );
-		this.dispatchEvent( new Event( 'change' ) );
-
-		return this;
-
-	}
-
-	get precision() {
-
-		if ( this.integer === true ) return 0;
-
-		const fract = this.step % 1;
-
-		return fract !== 0 ? fract.toString().split( '.' )[ 1 ].length : 1;
-
-	}
-
-	setValue( val ) {
-
-		return super.setValue( this._getString( val ) );
-
-	}
-
-	getValue() {
-
-		return Number( this.dom.value );
-
-	}
-
-	serialize( data ) {
-
-		const { min, max } = this;
-
-		if ( min !== - Infinity && max !== Infinity ) {
-
-			data.min = this.min;
-			data.max = this.max;
-			data.step = this.step;
-
-		}
-
-		super.serialize( data );
-
-	}
-
-	deserialize( data ) {
-
-		if ( data.min !== undefined ) {
-
-			const { min, max, step } = this;
-
-			this.setRange( min, max, step );
-
-		}
-
-		super.deserialize( data );
-
-	}
-
-	_getString( value ) {
-
-		let num = Math.min( Math.max( Number( value ), this.min ), this.max );
-
-		if ( this.integer === true ) {
-
-			return Math.floor( num );
-
-		} else {
-
-			return num + ( num % 1 ? '' : '.0' );
-
-		}
-
-	}
-
-}
-
-const getStep = ( min, max ) => {
-
-	const sensibility = .001;
-
-	return ( max - min ) * sensibility;
-
-};
-
-class SliderInput extends Input {
-
-	constructor( value = 0, min = 0, max = 100 ) {
-
-		const dom = document.createElement( 'f-subinputs' );
-		super( dom );
-
-		value = Math.min( Math.max( value, min ), max );
-
-		const step = getStep( min, max );
-
-		const rangeDOM = document.createElement( 'input' );
-		rangeDOM.type = 'range';
-		rangeDOM.min = min;
-		rangeDOM.max = max;
-		rangeDOM.step = step;
-		rangeDOM.value = value;
-
-		const field = new NumberInput( value, min, max, step );
-		field.dom.className = 'range-value';
-		field.onChange( () => {
-
-			rangeDOM.value = field.getValue();
-
-		} );
-
-		field.addEventListener( 'range', () => {
-
-			rangeDOM.min = field.min;
-			rangeDOM.max = field.max;
-			rangeDOM.step = field.step;
-			rangeDOM.value = field.getValue();
-
-		} );
-
-		dom.appendChild( rangeDOM );
-		dom.appendChild( field.dom );
-
-		this.min = min;
-		this.max = max;
-		this.step = step;
-
-		this.rangeDOM = rangeDOM;
-		this.field = field;
-
-		const updateRangeValue = () => {
-
-			let value = Number( rangeDOM.value );
-
-			if ( value !== this.max && value + this.step >= this.max ) {
-
-				// fix not end range fraction
-
-				rangeDOM.value = value = this.max;
-
-			}
-
-			this.field.setValue( value );
-
-		};
-
-		draggableDOM( rangeDOM, () => {
-
-			updateRangeValue();
-
-			this.dispatchEvent( new Event( 'change' ) );
-
-		}, '' );
-
-	}
-
-	setRange( min, max ) {
-
-		this.field.setRange( min, max, getStep( min, max ) );
-
-		this.dispatchEvent( new Event( 'range' ) );
-		this.dispatchEvent( new Event( 'change' ) );
-
-		return this;
-
-	}
-
-	setValue( val ) {
-
-		this.field.setValue( val );
-		this.rangeDOM.value = val;
-
-		this.dispatchEvent( new Event( 'change' ) );
-
-		return this;
-
-	}
-
-	getValue() {
-
-		return this.field.getValue();
-
-	}
-
-	serialize( data ) {
-
-		data.min = this.min;
-		data.max = this.max;
-
-		super.serialize( data );
-
-	}
-
-	deserialize( data ) {
-
-		const { min, max } = data;
-
-		this.setRange( min, max );
-
-		super.deserialize( data );
-
-	}
-
-}
-
-class ColorInput extends Input {
-
-	constructor( value = 0x0099ff ) {
-
-		const dom = document.createElement( 'input' );
-		super( dom );
-
-		dom.type = 'color';
-		dom.value = toHex( value );
-
-		dom.oninput = () => {
-
-			this.dispatchEvent( new Event( 'change' ) );
-
-		};
-
-	}
-
-	setValue( value ) {
-
-		return super.setValue( toHex( value ) );
-
-	}
-
-	getValue() {
-
-		return parseInt( super.getValue().substr( 1 ), 16 );
-
-	}
-
-}
-
-class TextInput extends Input {
-
-	constructor( innerText = '' ) {
-
-		const dom = document.createElement( 'textarea' );
-		super( dom );
-
-		dom.innerText = innerText;
-
-	}
-
-	setValue( val ) {
-
-		this.dom.innerText = val;
-
-		return this;
-
-	}
-
-	getValue() {
-
-		return this.dom.innerText;
-
-	}
-
-}
+Loader.DEFAULT = 'default';
+Loader.OBJECTS = 'objects';
 
 class ButtonInput extends Input {
 
@@ -2269,7 +2022,11 @@ class ButtonInput extends Input {
 
 		spanDOM.innerText = innterText;
 
-		dom.onclick = () => {
+		dom.onclick = dom.ontouchstart = ( e ) => {
+
+			e.preventDefault();
+
+			e.stopPropagation();
 
 			this.dispatchEvent( new Event( 'click' ) );
 
@@ -2296,97 +2053,6 @@ class ButtonInput extends Input {
 	getValue() {
 
 		return this.spanDOM.innerText;
-
-	}
-
-}
-
-class LabelElement extends Element {
-
-	constructor( label = '', align = '' ) {
-
-		super();
-
-		this.labelDOM = document.createElement( 'f-label' );
-		this.inputsDOM = document.createElement( 'f-inputs' );
-
-		const spanDOM = document.createElement( 'span' );
-		const iconDOM = document.createElement( 'i' );
-
-		this.spanDOM = spanDOM;
-		this.iconDOM = iconDOM;
-
-		this.labelDOM.appendChild( this.spanDOM );
-		this.labelDOM.appendChild( this.iconDOM );
-
-		this.dom.appendChild( this.labelDOM );
-		this.dom.appendChild( this.inputsDOM );
-
-		this.setLabel( label );
-		this.setAlign( align );
-
-	}
-
-	setIcon( value ) {
-
-		this.iconDOM.className = value;
-
-		return this;
-
-	}
-
-	getIcon() {
-
-		return this.iconDOM.className;
-
-	}
-
-	setAlign( align ) {
-
-		this.labelDOM.className = align;
-
-	}
-
-	setLabel( val ) {
-
-		this.spanDOM.innerText = val;
-
-	}
-
-	getLabel() {
-
-		return this.spanDOM.innerText;
-
-	}
-
-	serialize( data ) {
-
-		super.serialize( data );
-
-		const label = this.getLabel();
-		const icon = this.getIcon();
-
-		data.label = label;
-
-		if ( icon !== '' ) {
-
-			data.icon = icon;
-
-		}
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		this.setLabel( data.label );
-
-		if ( data.icon !== undefined ) {
-
-			this.setIcon( data.icon );
-
-		}
 
 	}
 
@@ -2521,6 +2187,560 @@ class TitleElement extends DraggableElement {
 
 }
 
+class ObjectNode extends Node {
+
+	constructor( name, inputLength, extra = null, width = 300 ) {
+
+		super();
+
+		this.setWidth( width );
+
+		const title = new TitleElement( name )
+			.setExtra( extra )
+			.setOutput( inputLength );
+
+		const closeButton = new ButtonInput( '✖' ).onClick( () => {
+
+			this.dispose();
+
+		} );
+
+		title.addButton( closeButton );
+
+		this.add( title );
+
+		this.title = title;
+		this.closeButton = closeButton;
+
+	}
+
+	setExtra( value ) {
+
+		this.title.setExtra( value );
+
+		return this;
+
+	}
+
+	getExtra( value ) {
+
+		return this.title.getExtra();
+
+	}
+
+	invalidate() {
+
+		this.title.dispatchEvent( new Event( 'connect' ) );
+
+	}
+
+}
+
+const ENTER_KEY$1 = 13;
+
+class StringInput extends Input {
+
+	constructor( value = '' ) {
+
+		const dom = document.createElement( 'input' );
+		super( dom );
+
+		dom.type = 'text';
+		dom.value = value;
+		dom.spellcheck = false;
+		dom.autocomplete = 'off';
+
+		dom.onblur = () => {
+
+			this.dispatchEvent( new Event( 'blur' ) );
+
+		};
+
+		dom.onchange = () => {
+
+			this.dispatchEvent( new Event( 'change' ) );
+
+		};
+
+		dom.onkeyup = ( e ) => {
+
+			if ( e.keyCode === ENTER_KEY$1 ) {
+
+				e.target.blur();
+
+			}
+
+			e.stopPropagation();
+
+			this.dispatchEvent( new Event( 'change' ) );
+
+		};
+
+	}
+
+}
+
+const ENTER_KEY = 13;
+
+class NumberInput extends Input {
+
+	constructor( value = 0, min = - Infinity, max = Infinity, step = .01 ) {
+
+		const dom = document.createElement( 'input' );
+		super( dom );
+
+		this.min = min;
+		this.max = max;
+		this.step = step;
+
+		this.integer = false;
+
+		dom.type = 'text';
+		dom.className = 'number';
+		dom.value = this._getString( value );
+		dom.spellcheck = false;
+		dom.autocomplete = 'off';
+
+		dom.ondragstart = dom.oncontextmenu = ( e ) => {
+
+			e.preventDefault();
+
+			e.stopPropagation();
+
+		};
+
+		dom.onfocus = dom.onclick = () => {
+
+			dom.select();
+
+		};
+
+		dom.onblur = () => {
+
+			this.dispatchEvent( new Event( 'blur' ) );
+
+		};
+
+		dom.onchange = () => {
+
+			this.dispatchEvent( new Event( 'change' ) );
+
+		};
+
+		dom.onkeydown = ( e ) => {
+
+			if ( e.key.length === 1 && /\d|\./.test( e.key ) !== true ) {
+
+				return false;
+
+			}
+
+			if ( e.keyCode === ENTER_KEY ) {
+
+				e.target.blur();
+
+			}
+
+			e.stopPropagation();
+
+		};
+
+		draggableDOM( dom, ( data ) => {
+
+			const { delta } = data;
+
+			if ( data.value === undefined ) {
+
+				data.value = this.getValue();
+
+			}
+
+			const diff = delta.x - delta.y;
+
+			const value = data.value + ( diff * this.step );
+
+			this.dom.value = this._getString( value.toFixed( this.precision ) );
+
+			this.dispatchEvent( new Event( 'change' ) );
+
+		} );
+
+	}
+
+	setRange( min, max, step ) {
+
+		this.min = min;
+		this.max = max;
+		this.step = step;
+
+		this.dispatchEvent( new Event( 'range' ) );
+
+		return this.setValue( this.getValue() );
+
+	}
+
+	get precision() {
+
+		if ( this.integer === true ) return 0;
+
+		const fract = this.step % 1;
+
+		return fract !== 0 ? fract.toString().split( '.' )[ 1 ].length : 1;
+
+	}
+
+	setValue( val, dispatch = true ) {
+
+		return super.setValue( this._getString( val ), dispatch );
+
+	}
+
+	getValue() {
+
+		return Number( this.dom.value );
+
+	}
+
+	serialize( data ) {
+
+		const { min, max } = this;
+
+		if ( min !== - Infinity && max !== Infinity ) {
+
+			data.min = this.min;
+			data.max = this.max;
+			data.step = this.step;
+
+		}
+
+		super.serialize( data );
+
+	}
+
+	deserialize( data ) {
+
+		if ( data.min !== undefined ) {
+
+			const { min, max, step } = this;
+
+			this.setRange( min, max, step );
+
+		}
+
+		super.deserialize( data );
+
+	}
+
+	_getString( value ) {
+
+		let num = Math.min( Math.max( Number( value ), this.min ), this.max );
+
+		if ( this.integer === true ) {
+
+			return Math.floor( num );
+
+		} else {
+
+			return num + ( num % 1 ? '' : '.0' );
+
+		}
+
+	}
+
+}
+
+const getStep = ( min, max ) => {
+
+	const sensibility = .001;
+
+	return ( max - min ) * sensibility;
+
+};
+
+class SliderInput extends Input {
+
+	constructor( value = 0, min = 0, max = 100 ) {
+
+		const dom = document.createElement( 'f-subinputs' );
+		super( dom );
+
+		value = Math.min( Math.max( value, min ), max );
+
+		const step = getStep( min, max );
+
+		const rangeDOM = document.createElement( 'input' );
+		rangeDOM.type = 'range';
+		rangeDOM.min = min;
+		rangeDOM.max = max;
+		rangeDOM.step = step;
+		rangeDOM.value = value;
+
+		const field = new NumberInput( value, min, max, step );
+		field.dom.className = 'range-value';
+		field.onChange( () => {
+
+			rangeDOM.value = field.getValue();
+
+		} );
+
+		field.addEventListener( 'range', () => {
+
+			rangeDOM.min = field.min;
+			rangeDOM.max = field.max;
+			rangeDOM.step = field.step;
+			rangeDOM.value = field.getValue();
+
+		} );
+
+		dom.appendChild( rangeDOM );
+		dom.appendChild( field.dom );
+
+		this.rangeDOM = rangeDOM;
+		this.field = field;
+
+		const updateRangeValue = () => {
+
+			let value = Number( rangeDOM.value );
+
+			if ( value !== this.max && value + this.step >= this.max ) {
+
+				// fix not end range fraction
+
+				rangeDOM.value = value = this.max;
+
+			}
+
+			this.field.setValue( value );
+
+		};
+
+		draggableDOM( rangeDOM, () => {
+
+			updateRangeValue();
+
+			this.dispatchEvent( new Event( 'change' ) );
+
+		}, '' );
+
+	}
+
+	get min() {
+
+		return this.field.min;
+
+	}
+
+	get max() {
+
+		return this.field.max;
+
+	}
+
+	get step() {
+
+		return this.field.step;
+
+	}
+
+	setRange( min, max ) {
+
+		this.field.setRange( min, max, getStep( min, max ) );
+
+		this.dispatchEvent( new Event( 'range' ) );
+		this.dispatchEvent( new Event( 'change' ) );
+
+		return this;
+
+	}
+
+	setValue( val, dispatch = true ) {
+
+		this.field.setValue( val );
+		this.rangeDOM.value = val;
+
+		if ( dispatch ) this.dispatchEvent( new Event( 'change' ) );
+
+		return this;
+
+	}
+
+	getValue() {
+
+		return this.field.getValue();
+
+	}
+
+	serialize( data ) {
+
+		data.min = this.min;
+		data.max = this.max;
+
+		super.serialize( data );
+
+	}
+
+	deserialize( data ) {
+
+		const { min, max } = data;
+
+		this.setRange( min, max );
+
+		super.deserialize( data );
+
+	}
+
+}
+
+class ColorInput extends Input {
+
+	constructor( value = 0x0099ff ) {
+
+		const dom = document.createElement( 'input' );
+		super( dom );
+
+		dom.type = 'color';
+		dom.value = toHex( value );
+
+		dom.oninput = () => {
+
+			this.dispatchEvent( new Event( 'change' ) );
+
+		};
+
+	}
+
+	setValue( value, dispatch = true ) {
+
+		return super.setValue( toHex( value ), dispatch );
+
+	}
+
+	getValue() {
+
+		return parseInt( super.getValue().substr( 1 ), 16 );
+
+	}
+
+}
+
+class TextInput extends Input {
+
+	constructor( innerText = '' ) {
+
+		const dom = document.createElement( 'textarea' );
+		super( dom );
+
+		dom.innerText = innerText;
+
+	}
+
+	setValue( val ) {
+
+		this.dom.innerText = val;
+
+		return this;
+
+	}
+
+	getValue() {
+
+		return this.dom.innerText;
+
+	}
+
+}
+
+class LabelElement extends Element {
+
+	constructor( label = '', align = '' ) {
+
+		super();
+
+		this.labelDOM = document.createElement( 'f-label' );
+		this.inputsDOM = document.createElement( 'f-inputs' );
+
+		const spanDOM = document.createElement( 'span' );
+		const iconDOM = document.createElement( 'i' );
+
+		this.spanDOM = spanDOM;
+		this.iconDOM = iconDOM;
+
+		this.labelDOM.appendChild( this.spanDOM );
+		this.labelDOM.appendChild( this.iconDOM );
+
+		this.dom.appendChild( this.labelDOM );
+		this.dom.appendChild( this.inputsDOM );
+
+		this.setLabel( label );
+		this.setAlign( align );
+
+	}
+
+	setIcon( value ) {
+
+		this.iconDOM.className = value;
+
+		return this;
+
+	}
+
+	getIcon() {
+
+		return this.iconDOM.className;
+
+	}
+
+	setAlign( align ) {
+
+		this.labelDOM.className = align;
+
+	}
+
+	setLabel( val ) {
+
+		this.spanDOM.innerText = val;
+
+	}
+
+	getLabel() {
+
+		return this.spanDOM.innerText;
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		const label = this.getLabel();
+		const icon = this.getIcon();
+
+		data.label = label;
+
+		if ( icon !== '' ) {
+
+			data.icon = icon;
+
+		}
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.setLabel( data.label );
+
+		if ( data.icon !== undefined ) {
+
+			this.setIcon( data.icon );
+
+		}
+
+	}
+
+}
+
 class PanelNode extends Node {
 
 	constructor( title = 'Panel', align = 'top-right' ) {
@@ -2642,9 +2862,11 @@ class PanelNode extends Node {
 
 }
 
-class Menu {
+class Menu extends EventTarget {
 
 	constructor( className, target = null ) {
+
+		super();
 
 		const dom = document.createElement( 'f-menu' );
 		dom.className = className + ' hidden';
@@ -2653,7 +2875,25 @@ class Menu {
 
 		this.visible = false;
 
+		this.events = {
+			'context': []
+		};
+
+		this.addEventListener( 'context', ( ) => {
+
+			dispatchEventList( this.events.context, this );
+
+		} );
+
 		this.setTarget( target );
+
+	}
+
+	onContext( callback ) {
+
+		this.events.context.push( callback );
+
+		return this;
 
 	}
 
@@ -2665,6 +2905,8 @@ class Menu {
 
 		this.visible = true;
 
+		this.dispatchEvent( new Event( 'show' ) );
+
 		return this;
 
 	}
@@ -2672,6 +2914,8 @@ class Menu {
 	hide() {
 
 		this.dom.classList.add( 'hidden' );
+
+		this.dispatchEvent( new Event( 'hide' ) );
 
 		this.visible = false;
 
@@ -2685,9 +2929,13 @@ class Menu {
 
 				e.preventDefault();
 
+				if ( e.pointerType !== 'mouse' || ( e.pageX === 0 && e.pageY === 0 ) ) return;
+
 				const rect = this.target.getBoundingClientRect();
 
-				this.show( e.pageX  - rect.left, e.pageY - rect.top );
+				this.dispatchEvent( new Event( 'context' ) );
+
+				this.show( e.pageX - rect.left, e.pageY - rect.top );
 
 			};
 
@@ -2707,6 +2955,8 @@ class Menu {
 			target.addEventListener( 'touchstart', onDown, true );
 
 			target.addEventListener( 'contextmenu', onContextMenu, false );
+
+			target.appendChild( this.dom );
 
 		}
 
@@ -2747,11 +2997,39 @@ class Menu {
 
 }
 
+let lastContext = null;
+
 class ContextMenu extends Menu {
 
 	constructor( target = null ) {
 
 		super( 'context', target );
+
+	}
+
+	show( x, y ) {
+
+		if ( lastContext !== null ) {
+
+			lastContext.hide();
+
+		}
+
+		lastContext = this;
+
+		return super.show( x, y );
+
+	}
+
+	hide() {
+
+		if ( lastContext === this ) {
+
+			lastContext = null;
+
+		}
+
+		return super.hide();
 
 	}
 
@@ -2830,7 +3108,13 @@ class SelectInput extends Input {
 
 	deserialize( data ) {
 
-		this.setOptions( data.options );
+		const currentOptions = this.options;
+
+		if ( currentOptions.length > 0 ) {
+
+			this.setOptions( data.options );
+
+		}
 
 		super.deserialize( data );
 
@@ -2869,4 +3153,4 @@ class ToggleInput extends Input {
 
 }
 
-export { ButtonInput, Canvas, CircleMenu, ColorInput, ContextMenu, DraggableElement, Element, Input, LabelElement, Loader, Menu, Node, NumberInput, PanelNode, SelectInput, Serializer, SliderInput, StringInput, TextInput, TitleElement, ToggleInput, Utils };
+export { ButtonInput, Canvas, CircleMenu, ColorInput, ContextMenu, DraggableElement, Element, Input, LabelElement, Loader, Menu, Node, NumberInput, ObjectNode, PanelNode, SelectInput, Serializer, SliderInput, StringInput, TextInput, TitleElement, ToggleInput, Utils };
