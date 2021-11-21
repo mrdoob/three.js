@@ -278,7 +278,10 @@ export const positionView = new PositionNode( PositionNode.VIEW );
 export const positionViewDirection = new PositionNode( PositionNode.VIEW_DIRECTION );
 
 export const PI = float( 3.141592653589793 );
+export const PI2 = float( 6.283185307179586 );
+export const PI_HALF = float( 1.5707963267948966 );
 export const RECIPROCAL_PI = float( 0.3183098861837907 );
+export const RECIPROCAL_PI2 = float( 0.15915494309189535 );
 export const EPSILON = float( 1e-6 );
 
 export const diffuseColor = new PropertyNode( 'DiffuseColor', 'vec4' );
@@ -287,12 +290,17 @@ export const metalness = new PropertyNode( 'Metalness', 'float' );
 export const alphaTest = new PropertyNode( 'AlphaTest', 'float' );
 export const specularColor = new PropertyNode( 'SpecularColor', 'color' );
 
+export const abs = ShaderNodeProxy( MathNode, 'abs' );
 export const negate = ShaderNodeProxy( MathNode, 'negate' );
 export const floor = ShaderNodeProxy( MathNode, 'floor' );
 export const mod = ShaderNodeProxy( MathNode, 'mod' );
 export const cross = ShaderNodeProxy( MathNode, 'cross' );
+export const fract = ShaderNodeProxy( MathNode, 'fract' );
+export const round = ShaderNodeProxy( MathNode, 'round' );
 export const max = ShaderNodeProxy( MathNode, 'max' );
 export const min = ShaderNodeProxy( MathNode, 'min' );
+export const sin = ShaderNodeProxy( MathNode, 'sin' );
+export const cos = ShaderNodeProxy( MathNode, 'cos' );
 export const dot = ShaderNodeProxy( MathNode, 'dot' );
 export const normalize = ShaderNodeProxy( MathNode, 'normalize' );
 export const sqrt = ShaderNodeProxy( MathNode, 'sqrt' );
