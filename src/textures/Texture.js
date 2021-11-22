@@ -123,7 +123,7 @@ class Texture extends EventDispatcher {
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
-		this.version = source.version;
+		this.version++;
 
 		return this;
 
