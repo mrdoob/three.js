@@ -159,7 +159,6 @@ export const LinearEncoding = 3000;
 export const sRGBEncoding = 3001;
 export const GammaEncoding = 3007;
 export const RGBEEncoding = 3002;
-export const LogLuvEncoding = 3003;
 export const RGBM7Encoding = 3004;
 export const RGBM16Encoding = 3005;
 export const RGBDEncoding = 3006;

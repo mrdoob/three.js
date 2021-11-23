@@ -3,7 +3,7 @@ import { ShaderNode } from '../ShaderNode.js';
 
 import { LinearEncoding/*,
 	sRGBEncoding, RGBEEncoding, RGBM7Encoding, RGBM16Encoding,
-	RGBDEncoding, GammaEncoding, LogLuvEncoding*/ } from 'three';
+	RGBDEncoding, GammaEncoding*/ } from 'three';
 
 export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
@@ -30,8 +30,6 @@ function getEncodingComponents ( encoding ) {
 			return [ 'RGBD', new FloatNode( 256.0 ).setConst( true ) ];
 		case GammaEncoding:
 			return [ 'Gamma', new CodeNode( 'float( GAMMA_FACTOR )' ) ];
-		case LogLuvEncoding:
-			return [ 'LogLuv' ];
 */
 	}
 
@@ -55,9 +53,6 @@ class ColorSpaceNode extends TempNode {
 
 	static RGBD_TO_LINEAR = 'RGBDToLinear';
 	static LINEAR_TO_RGBD = 'LinearToRGBD';
-
-	static LINEAR_TO_LOG_LUV = 'LinearToLogLuv';
-	static LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
 */
 	constructor( method, node ) {
 
