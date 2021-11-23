@@ -773,7 +773,7 @@ class WebGPURenderer {
 						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
 						this._nodes.update( object, camera2 );
-						this._bindings.update( object, camera2 );
+						this._bindings.update( object );
 						this._renderObject( object, passEncoder );
 
 					}
@@ -783,7 +783,7 @@ class WebGPURenderer {
 			} else {
 
 				this._nodes.update( object, camera );
-				this._bindings.update( object, camera );
+				this._bindings.update( object );
 				this._renderObject( object, passEncoder );
 
 			}
