@@ -579,11 +579,8 @@ class WebXRManager extends EventDispatcher {
 
 				if ( glBaseLayer !== null ) {
 
-					renderer.setRenderTarget(
-						newRenderTarget,
-						0,
-						0,
-						glBaseLayer.framebuffer );
+					renderer.setRenderTargetFramebuffer( newRenderTarget, glBaseLayer.framebuffer );
+					renderer.setRenderTarget( newRenderTarget );
 
 				}
 
@@ -616,15 +613,12 @@ class WebXRManager extends EventDispatcher {
 						// For side-by-side projection, we only produce a single texture for both eyes.
 						if ( i === 0 ) {
 
-							renderer.setRenderTarget(
+							renderer.setRenderTargetTextures(
 								newRenderTarget,
-								0,
-								0,
-								undefined,
-								{
-									colorTexture: glSubImage.colorTexture,
-									depthTexture: glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture
-								} );
+								glSubImage.colorTexture,
+								glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture );
+
+							renderer.setRenderTarget( newRenderTarget );
 
 						}
 

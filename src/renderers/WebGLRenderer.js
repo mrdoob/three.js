@@ -1762,59 +1762,69 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0, defaultFramebuffer = undefined, options = {} ) {
+	this.setRenderTargetTextures = function ( renderTarget, colorTexture, depthTexture ) {
+
+		properties.get( renderTarget.texture ).__webglTexture = colorTexture;
+		properties.get( renderTarget.depthTexture ).__webglTexture = depthTexture;
+
+		const renderTargetProperties = properties.get( renderTarget );
+		renderTargetProperties.__hasExternalTextures = true;
+
+		if ( renderTargetProperties.__hasExternalTextures ) {
+
+			renderTargetProperties.__autoAllocateDepthBuffer = depthTexture === undefined;
+
+			if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
+
+				// The multisample_render_to_texture extension doesn't work properly if there
+				// are midframe flushes and an external depth buffer. Disable use of the extension.
+				if ( renderTarget.useRenderToTexture ) {
+
+					console.warn( 'render-to-texture extension was disabled because an external texture was provided' );
+					renderTarget.useRenderToTexture = false;
+					renderTarget.useRenderbuffer = true;
+
+				}
+
+			}
+
+		}
+
+	};
+
+	this.setRenderTargetFramebuffer = function ( renderTarget, defaultFramebuffer ) {
+
+		const renderTargetProperties = properties.get( renderTarget );
+		renderTargetProperties.__webglFramebuffer = defaultFramebuffer;
+		renderTargetProperties.__useDefaultFramebuffer = defaultFramebuffer === undefined;
+
+	};
+
+	this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
 
 		_currentRenderTarget = renderTarget;
 		_currentActiveCubeFace = activeCubeFace;
 		_currentActiveMipmapLevel = activeMipmapLevel;
-		const useDefaultFramebuffer = defaultFramebuffer === undefined;
+		let useDefaultFramebuffer = true;
 
 		if ( renderTarget ) {
 
 			const renderTargetProperties = properties.get( renderTarget );
-			let hasNewExternalTextures = false;
 
-			if ( options.colorTexture !== undefined ) {
-
-				hasNewExternalTextures = true;
-				properties.get( renderTarget.texture ).__webglTexture = options.colorTexture;
-
-				renderTargetProperties.__autoAllocateDepthBuffer = options.depthTexture === undefined;
-
-				if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
-
-					properties.get( renderTarget.depthTexture ).__webglTexture = options.depthTexture;
-
-					// The multisample_render_to_texture extension doesn't work properly if there
-					// are midframe flushes and an external depth buffer. Disable use of the extension.
-					if ( renderTarget.useRenderToTexture ) {
-
-						console.warn( 'render-to-texture extension was disabled because an external texture was provided' );
-						renderTarget.useRenderToTexture = false;
-						renderTarget.useRenderbuffer = true;
-
-					}
-
-				}
-
-				renderTargetProperties.__hasExternalTextures = true;
-
-			}
-
-			if ( ! useDefaultFramebuffer ) {
+			if ( renderTargetProperties.__useDefaultFramebuffer !== undefined ) {
 
 				// We need to make sure to rebind the framebuffer.
 				state.bindFramebuffer( _gl.FRAMEBUFFER, null );
-				renderTargetProperties.__webglFramebuffer = defaultFramebuffer;
+				useDefaultFramebuffer = false;
 
 			} else if ( renderTargetProperties.__webglFramebuffer === undefined ) {
 
 				textures.setupRenderTarget( renderTarget );
 
-			} else if ( hasNewExternalTextures ) {
+			} else if ( renderTargetProperties.__hasExternalTextures ) {
 
 				// Color and depth texture must be rebound in order for the swapchain to update.
-				textures.rebindTextures( renderTarget, options.colorTexture, options.depthTexture );
+				textures.rebindTextures( renderTarget, properties.get( renderTarget.texture ).__webglTexture, properties.get( renderTarget.depthTexture ).__webglTexture );
 
 			}
 
