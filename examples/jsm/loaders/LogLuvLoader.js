@@ -399,7 +399,8 @@ UTIF.toRGBA = function ( out, type ) {
 
 	}
 
-	const intp = ( out[ 't262' ] ? out[ 't262' ][ 0 ] : 2 ), bps = ( out[ 't258' ] ? Math.min( 32, out[ 't258' ][ 0 ] ) : 1 );
+	let intp = out[ 't262' ] ? out[ 't262' ][ 0 ] : 2;
+	const bps = out[ 't258' ] ? Math.min( 32, out[ 't258' ][ 0 ] ) : 1;
 
 	if ( out[ 't262' ] == null && bps == 1 ) intp = 0;
 
