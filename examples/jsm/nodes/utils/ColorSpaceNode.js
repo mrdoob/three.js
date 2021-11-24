@@ -9,7 +9,6 @@ import {
 } from '../../../../build/three.module.js';
 
 import { TempNode } from '../core/TempNode.js';
-import { ConstNode } from '../core/ConstNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';

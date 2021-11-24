@@ -115,7 +115,6 @@ UTIF.decodeImage = function ( buff, img, ifds ) {
 		var tx = Math.floor( ( img.width + tw - 1 ) / tw );
 		var ty = Math.floor( ( img.height + th - 1 ) / th );
 		var tbuff = new Uint8Array( Math.ceil( tw * th * bipp / 8 ) | 0 );
-		console.log( '====', tx, ty );
 		for ( var y = 0; y < ty; y ++ )
 			for ( var x = 0; x < tx; x ++ ) {
 
@@ -132,7 +131,6 @@ UTIF.decodeImage = function ( buff, img, ifds ) {
 	} else {
 
 		var rps = img[ 't278' ] ? img[ 't278' ][ 0 ] : img.height; rps = Math.min( rps, img.height );
-		console.log( '====', img.width, rps );
 		for ( var i = 0; i < soff.length; i ++ ) {
 
 			UTIF.decode._decompress( img, ifds, data, soff[ i ], bcnt[ i ], cmpr, bytes, Math.ceil( bilen / 8 ) | 0, fo );
@@ -152,7 +150,7 @@ UTIF.decode._decompress = function ( img, ifds, data, off, len, cmpr, tgt, toff 
 
 	//console.log("compression", cmpr);
 	//var time = Date.now();
-	if ( false ) {} else if ( cmpr == 34676 ) UTIF.decode._decodeLogLuv32( img, data, off, len, tgt, toff );
+	if ( cmpr == 34676 ) UTIF.decode._decodeLogLuv32( img, data, off, len, tgt, toff );
 	else console.log( 'Unsupported compression', cmpr );
 
 	//console.log(Date.now()-time);
