@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js - misc - octree collisions</title>
-		<meta charset=utf-8 />
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
-	<body>
-		<div id="info">Octree threejs demo - basic collisions with static triangle mesh<br />WASD to move, space to jump, use mouse to throw balls and move the camera.</div>
-		<div id="container"></div>
+<head>
+	<title>three.js - misc - octree collisions</title>
+	<meta charset=utf-8 />
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+<body>
+<div id="info">Octree threejs demo - basic collisions with static triangle mesh<br />WASD to move, space to jump, use mouse to throw balls and move the camera.</div>
+<div id="container"></div>
 
-		<script type="module">
+<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
@@ -385,7 +385,7 @@
 
 					if ( keyStates[ 'Space' ] ) {
 
-						playerVelocity.y = 10;
+						playerVelocity.y = 15;
 
 					}
 
@@ -422,6 +422,16 @@
 
 			} );
 
+			function teleportPlayerIfOob(){
+				if (camera.position.y <= -25){
+					playerCollider.start = new THREE.Vector3( 0, 0.35, 0 );
+					playerCollider.end = new THREE.Vector3( 0, 1, 0 );
+					playerCollider.radius =  0.35;
+					camera.position.copy( playerCollider.end );
+				}
+			}
+
+
 			function animate() {
 
 				const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
@@ -437,6 +447,8 @@
 
 					updateSpheres( deltaTime );
 
+					teleportPlayerIfOob();
+
 				}
 
 				renderer.render( scene, camera );
@@ -448,5 +460,5 @@
 			}
 
 		</script>
-	</body>
+</body>
 </html>
