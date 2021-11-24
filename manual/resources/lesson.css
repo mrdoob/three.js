@@ -1,0 +1,567 @@
+:root {
+	--page-padding: 24px;
+
+  /* these are overridden in manual/<lang>/lang.css */
+  --article-font-family: Georgia, serif;
+  --headline-font-family: sans-serif;
+  /* a block of code */
+  --code-block-font-family: "Lucida Console", Monaco, monospace;
+  /* a word in a sentence */
+  --code-font-family: monospace;
+
+}
+
+body {
+  margin: 0;
+  font-family: var(--article-font-family);
+  font-size: 19px;
+  line-height: 150%;
+  padding: var(--page-padding);
+}
+
+p + p {
+  margin-top: 1.5em;
+}
+li > p {
+  width: calc(100% - 2em);
+}
+
+table {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.warning {
+  padding: 1em;
+  background: red;
+}
+
+.footnote {
+  font-size: smaller;
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
+}
+.footnotes {
+  font-size: smaller;
+}
+.deep-link {
+  position: absolute;
+  transform: translateX(-1em);
+}
+
+pre {
+  background: rgb(143, 140, 140);
+  padding: 1em;
+}
+pre>code {
+  white-space: inherit;
+  background: none;
+}
+pre.prettyprint {
+    margin-top: 2em !important;
+    margin-bottom: 2em !important;
+    position: relative;
+}
+pre.prettyprint li {
+    white-space: pre;
+}
+pre.prettyprint code, .dos {
+    color: #CCC;
+    font-family: var(--code-block-font-family);
+    display: block;
+}
+
+/* to handle long words in paragraph */
+p code {
+  word-break: break-word;
+  white-space: normal;
+}
+
+div[data-diagram] {
+  height: 100%;
+}
+.spread {
+  display: flex;
+  text-align: center;
+  margin: 2em auto 3em;
+}
+.spread div[data-diagram] {
+    height: 150px;
+}
+.spread>div {
+  flex: 1 1 100%;
+}
+.spread .code {
+  font-family: var(--code-font-family);
+}
+.spread .code>div {
+  text-align: left;
+}
+#c {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -100;
+}
+.border {
+  border: 1px solid black;
+}
+
+.lesson-comment-notes {
+  padding: 1em;
+  margin: 1em;
+  background: #DDD;
+  color: red;
+}
+
+.threejs_navbar>div,
+.lesson-title,
+.lesson-comments,
+.lesson-comment-sep,
+.lesson-main>* {
+    margin: 0 auto 1em;
+    max-width: 700px;
+    width: calc(100% - 40px);
+}
+.lesson-main>h1:not(:first-child),
+.lesson-main>h2:not(:first-child),
+.lesson-main>h3:not(:first-child),
+.lesson-main>h4:not(:first-child),
+.lesson-main>h5:not(:first-child),
+.lesson-main>h6:not(:first-child) {
+    margin-top: 1.66em;
+}
+
+.lesson-main>.threejs_example_container {
+    max-width: 90%;
+}
+.lesson-main>img {
+  width: unset;
+}
+
+.threejs_example {
+    width: 100%;
+    height: 500px;
+}
+.color {
+  padding: 0.25em;
+  border-radius: 0.5em;
+  color: black;
+}
+.dark-color {
+  padding: 0.25em;
+  border-radius: 0.5em;
+  color: white;
+}
+.checkerboard {
+  background-color: #404040;
+  background-image:
+     linear-gradient(45deg, #808080 25%, transparent 25%),
+     linear-gradient(-45deg, #808080 25%, transparent 25%),
+     linear-gradient(45deg, transparent 75%, #808080 75%),
+     linear-gradient(-45deg, transparent 75%, #808080 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+.fullscreen {
+    position: fixed !important;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 100;
+}
+.lesson-main>blockquote {
+    background-color: #DEF;
+    padding: 1em;
+}
+.lesson-title {
+    margin-top: 3em;
+    margin-bottom: 2em;
+}
+.lesson-sidebar {
+    font-size: small;
+    columns: 220px;
+    padding: 1em;
+    column-rule: dashed 1px #CCC;
+    background: #eee;
+    margin-bottom: 1em;
+}
+.lesson-sidebar>ul>li {
+    line-height: 1.3em;
+}
+.lesson-sidebar ul {
+    line-height: 1.3em;
+    margin-bottom: 1em;
+}
+.lesson-sidebar ul {
+    list-style-type: none;
+    padding-left: 1em;
+    text-indent: -1em;
+}
+h1, h2, h3, h4 {
+  font-family: var(--headline-font-family);
+  line-height: 1.2;
+}
+h3 {
+  font-size: medium;
+}
+code {
+    color: black;
+    font-family: var(--code-font-family);
+    background-color: #ddd;
+    padding: 0.1em 0.2em 0.1em 0.2em;
+    border-radius: 0.5em;
+    white-space: nowrap;
+}
+
+.threejs_table_div_center {
+  text-align: center;
+}
+
+.threejs_table_center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.threejs_center {
+  margin-left: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-right: auto;
+  display: block;
+  text-align: center;
+  max-width: 95%;
+}
+.threejs_center>img,
+.threejs_center>object {
+  max-width: 100%;
+}
+.threejs_image>img {
+  width: 100%;
+  display: block;
+}
+.threejs_math {
+  margin-left: auto;
+  margin-right: auto;
+  display: inline-block;
+  text-align: left;
+}
+
+.threejs_math_center {
+  display: block;
+  text-align: center;
+}
+
+.hcenter {
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-pack: center;
+  -moz-box-align: center;
+
+  display: box;
+  box-orient: horizontal;
+  box-pack: center;
+  box-align: center;
+}
+
+table.vertex_table {
+  border: 1px solid black;
+  border-collapse: collapse;
+  font-family: monospace;
+  font-size: small;
+}
+
+table.vertex_table th {
+  background-color: #88ccff;
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+table.vertex_table td {
+  border: 1px solid black;
+  text-align: right;
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+iframe {
+    display: block;
+}
+
+iframe.body {
+  height: 100%;
+}
+iframe.threejs_example, iframe.threejs_diagram {
+  border: none;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+iframe.threejs_example {
+  background: black;
+}
+iframe.noborder {
+  border: none !important;
+}
+.threejs_example_container>div {
+  border: 1px solid black;
+  margin: 0 auto;
+}
+
+iframe.external_diagram {
+  border: none;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+div.threejs_bottombar {
+  border: 1px solid #000;
+  background-color: #def;
+  padding: 1em;
+  width: calc(100% - 80px);
+}
+div.threejs_bottombar>h3 {
+  font-size: x-large;
+  font-weight: bold;
+  margin-bottom: 1em;
+}
+div.threejs_bottombar code {
+    background-color: #ccc;
+}
+
+/* --- Prettify --- */
+pre.prettyprint .nocode { background-color: none; color: #FFF }
+pre.prettyprint .str { color: #b9ca4a } /* string          */
+pre.prettyprint .kwd { color: #c397d8 } /* keyword         */
+pre.prettyprint .com { color: #f3efb2 } /* comment         */
+pre.prettyprint .typ { color: #7aa6da } /* type            */
+pre.prettyprint .lit { color: #45e7a6 } /* literal         */
+pre.prettyprint .pun { color: #7ecce0 } /* punctuation     */
+pre.prettyprint .pln { color: #eaeaea } /* plaintext       */
+pre.prettyprint .tag { color: #d54e53 } /* html/xml tag    */
+pre.prettyprint .atn { color: #e78c45 } /* attribute name  */
+pre.prettyprint .atv { color: #70c0b1 } /* attribute value */
+pre.prettyprint .dec { color: #e78c45 } /* decimal         */
+pre.prettyprint .var { color: #d54e53 } /* variable name   */
+pre.prettyprint .fun { color: #7aa6da } /* function name   */
+foo{ color: #FF8080}
+pre.prettyprint ul.modifiedlines {
+    list-style-type: none;
+    padding-left: 0;
+}
+pre.prettyprint ul.modifiedlines li.linemodified {
+    list-style-type: none;
+    background-color: #324840;
+}
+pre.prettyprint ul.modifiedlines li.linedeleted {
+    list-style-type: none;
+    background-color: #4c1414;
+    text-decoration: line-through;
+}
+
+pre.prettyprint ul.modifiedlines li.lineadded {
+    list-style-type: none;
+    background-color: #3f4463;
+}
+
+
+pre.prettyprint, code.prettyprint, .dos {
+    color: #FFF;
+    background: #222;
+    border: 1px solid #000;
+    box-shadow: 10px 10px 0px #ccc;
+    font-size: 9pt;
+    font-family: var(--code-block-font-family);
+    margin: auto;
+    padding: 1em;
+    text-align: left;           /* override justify on body */
+    /* this was disabled until 2016-08-26 but I don't know why */
+    overflow: auto;             /* allow scroll bar in case of long lines - goes together with white-space: nowrap! */
+    white-space: pre;        /* was nowrap, prevent line wrapping */
+    line-height: 1.5em;
+    width: calc(100% - 80px);
+}
+
+.dos {
+  line-height: 1;
+}
+
+pre.prettyprint.lighttheme, code.prettyprint.lighttheme {
+    color: #222;
+    background: #fff;
+    border: 1px solid #888;
+    box-shadow: none;
+}
+
+pre.prettyprint.lighttheme .str { color: #183691; }  /* string content */
+pre.prettyprint.lighttheme .kwd { color: #a71d5d; }  /* keyword */
+pre.prettyprint.lighttheme .com { color: #969896; }  /* comment */
+pre.prettyprint.lighttheme .typ { color: #0086b3; }  /* type name */
+pre.prettyprint.lighttheme .lit { color: #0086b3; }  /* literal value */
+pre.prettyprint.lighttheme .pun { color: #333; }  /* punctuation */
+pre.prettyprint.lighttheme .opn { color: #333; }  /* lisp open bracket */
+pre.prettyprint.lighttheme .clo { color: #333; }  /* lisp close bracket */
+pre.prettyprint.lighttheme .tag { color: #000080; }  /* markup tag name */
+pre.prettyprint.lighttheme .atn { color: #795da3; }  /* markup attribute name */
+pre.prettyprint.lighttheme .atv { color: #183691; }  /* markup attribute value */
+pre.prettyprint.lighttheme .dec { color: #333; }  /* declaration */
+pre.prettyprint.lighttheme .var { color: #008080; }  /* variable name */
+pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
+
+@media print {
+    pre.prettyprint .str, code.prettyprint .str{color:#060}
+    pre.prettyprint .kwd, code.prettyprint .kwd{color:#006;font-weight:bold}
+    pre.prettyprint .com, code.prettyprint .com{color:#600;font-style:italic}
+    pre.prettyprint .typ, code.prettyprint .typ{color:#404;font-weight:bold}
+    pre.prettyprint .lit, code.prettyprint .lit{color:#044}
+    pre.prettyprint .pun, code.prettyprint .pun{color:#440}
+    pre.prettyprint .pln, code.prettyprint .pln{color:#000}
+    pre.prettyprint .tag, code.prettyprint .tag{color:#006;font-weight:bold}
+    pre.prettyprint .atn, code.prettyprint .atn{color:#404}
+    pre.prettyprint .atv, code.prettyprint .atv{color:#060}
+    pre.prettyprint, code.prettyprint {
+        color: #000;
+        background: #EEE;
+        font-size: 8pt;
+        font-family: var(--code-block-font-family);
+        width: 95%;
+        margin: auto;
+        padding: 1em;
+        text-align: left;           /* override justify on body */
+        overflow: visible;
+        white-space: pre;        /* was nowrap, prevent line wrapping */
+        line-height: 1.5;
+    }
+
+    pre.prettyprint ul.modifiedlines li.linemodified {
+        list-style-type: none;
+        background-color: #DDD;
+    }
+    pre.prettyprint ul.modifiedlines li.linedeleted {
+        list-style-type: none;
+        background-color: #CCC;
+        text-decoration: line-through;
+    }
+
+    pre.prettyprint ul.modifiedlines li.lineadded {
+        list-style-type: none;
+        background-color: #EEE;
+    }
+
+    body {
+        margin: 10mm;
+    }
+    .doubleSpace p {
+        line-height: 2.5;
+        font-size: x-large;
+    }
+    .doubleSpace pre.prettyprint {
+        font-size: 14pt;
+    }
+    .threejs_navbar,
+    .lesson-comment-sep,
+    .lesson-sidebar,
+    .lesson-comments {
+        display: none;
+    }
+}
+
+@media (max-width: 720px) {
+    body {
+        font-size: 16px;
+    }
+    h1 {
+        font-size: 24px;
+    }
+    .threejs_example {
+        max-height: 400px;
+    }
+    .threejs_example_container>div {
+        max-width: 95%;
+    }
+    .threejs_diagram_container iframe {
+      max-width: 95%;
+    }
+    iframe.background {
+        max-width: 100%;
+    }
+}
+
+@media all and ( min-width: 1700px ) {
+  :root {
+    --page-padding: 28px;
+  }
+}
+
+@media all and ( max-width: 640px ) {
+  :root {
+    --page-padding: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    scrollbar-color: hsl(0, 0%, 35%) hsl(0, 0%, 13%);
+  }
+  body {
+    background: #333;
+    color: #CCC;
+  }
+  a {
+    color: #56d3fd;
+  }
+  .warning {
+    background: darkred;
+  }
+  pre.prettyprint, code.prettyprint, .dos {
+    box-shadow: 10px 10px 0px #292929;
+  }
+  code {
+    background: #666;
+    color: #CCC;
+  }
+  img {
+    background: #DDD;
+  }
+  img[src$=".svg"] {
+    filter: invert(1) hue-rotate(180deg);
+    background: none;
+  }
+  .noinvertdark {
+    filter: none !important;
+  }
+  .nobg {
+    background: none;
+  }
+  .lesson-sidebar {
+    background: #222;
+  }
+  .lesson-main>blockquote {
+    background-color: #1b1b44;
+  }
+  div.threejs_bottombar {
+    background-color: #1b1b44;
+  }
+  div.threejs_bottombar code {
+    background-color: #348;
+  }
+  .lesson-comment-notes {
+    background: #222;
+  }
+  input[type=text] {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 3px;
+  }
+}
