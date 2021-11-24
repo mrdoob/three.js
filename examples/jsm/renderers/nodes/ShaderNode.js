@@ -263,6 +263,7 @@ export const div = ShaderNodeProxy( OperatorNode, '/' );
 export const equal = ShaderNodeProxy( OperatorNode, '==' );
 export const assign = ShaderNodeProxy( OperatorNode, '=' );
 export const greaterThan = ShaderNodeProxy( OperatorNode, '>' );
+export const lessThanEqual = ShaderNodeProxy( OperatorNode, '<=' );
 export const and = ShaderNodeProxy( OperatorNode, '&&' );
 
 export const element = ShaderNodeProxy( ArrayElementNode );
@@ -314,5 +315,6 @@ export const pow3 = ShaderNodeProxy( MathNode, 'pow', 3 );
 export const pow4 = ShaderNodeProxy( MathNode, 'pow', 4 );
 export const exp = ShaderNodeProxy( MathNode, 'exp' );
 export const exp2 = ShaderNodeProxy( MathNode, 'exp2' );
+export const mix = ShaderNodeProxy( MathNode, 'mix' );
 export const saturate = ShaderNodeProxy( MathNode, 'saturate' );
 export const transformDirection = ShaderNodeProxy( MathNode, 'transformDirection' );
