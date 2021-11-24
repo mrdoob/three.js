@@ -1,8 +1,8 @@
 import TempNode from '../core/Node.js';
-import { ShaderNode } from '../ShaderNode.js';
+import { ShaderNode, vec3, pow, mul, add, mix, join, lessThanEqual } from '../ShaderNode.js';
 
-import { LinearEncoding/*,
-	sRGBEncoding, RGBEEncoding, RGBM7Encoding, RGBM16Encoding,
+import { LinearEncoding,
+	sRGBEncoding/*, RGBEEncoding, RGBM7Encoding, RGBM16Encoding,
 	RGBDEncoding, GammaEncoding*/ } from 'three';
 
 export const LinearToLinear = new ShaderNode( ( inputs ) => {
@@ -11,15 +11,36 @@ export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
 } );
 
+export const sRGBToLinear = new ShaderNode( ( inputs ) => {
+
+	const { value } = inputs;
+
+	const rgb = value.rgb;
+
+	const a = pow( add( mul( rgb, 0.9478672986 ), vec3( 0.0521327014 ) ), vec3( 2.4 ) );
+	const b = mul( rgb, 0.0773993808 );
+	const factor = vec3( lessThanEqual( rgb, vec3( 0.04045 ) ) );
+
+	const rgbResult = mix( a, b, factor );
+
+	return join( rgbResult.r, rgbResult.g, rgbResult.b, value.a );
+
+} );
+
+const EncodingLib = {
+	LinearToLinear,
+	sRGBToLinear
+};
+
 function getEncodingComponents ( encoding ) {
 
 	switch ( encoding ) {
 
 		case LinearEncoding:
 			return [ 'Linear' ];
-/*
 		case sRGBEncoding:
 			return [ 'sRGB' ];
+/*
 		case RGBEEncoding:
 			return [ 'RGBE' ];
 		case RGBM7Encoding:
@@ -38,12 +59,12 @@ function getEncodingComponents ( encoding ) {
 class ColorSpaceNode extends TempNode {
 
 	static LINEAR_TO_LINEAR = 'LinearToLinear';
-/*
-	static GAMMA_TO_LINEAR = 'GammaToLinear';
-	static LINEAR_TO_GAMMA = 'LinearToGamma';
 
 	static SRGB_TO_LINEAR = 'sRGBToLinear';
 	static LINEAR_TO_SRGB = 'LinearTosRGB';
+/*
+	static GAMMA_TO_LINEAR = 'GammaToLinear';
+	static LINEAR_TO_GAMMA = 'LinearToGamma';
 
 	static RGBE_TO_LINEAR = 'RGBEToLinear';
 	static LINEAR_TO_RGBE = 'LinearToRGBE';
@@ -96,8 +117,7 @@ class ColorSpaceNode extends TempNode {
 
 		if ( method !== ColorSpaceNode.LINEAR_TO_LINEAR ) {
 
-			// disable for now color space
-			const encodingFunctionNode = LinearToLinear;
+			const encodingFunctionNode = EncodingLib[ method ];			
 			const factor = this.factor;
 
 			return encodingFunctionNode( {
