@@ -285,7 +285,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 	}
 
 	getTextureEncodingFromMap( map ) {
-
+/*
 		const isWebGL2 = this.renderer.capabilities.isWebGL2;
 
 		if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
@@ -293,7 +293,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 			return LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
 
 		}
-
+*/
 		return super.getTextureEncodingFromMap( map );
 
 	}
