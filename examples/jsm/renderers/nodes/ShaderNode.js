@@ -20,6 +20,7 @@ import MathNode from './math/MathNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
+import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
@@ -208,43 +209,67 @@ export const cond = ( ...params ) => {
 
 export const vec2 = ( ...params ) => {
 
-	// Providing one scalar value: This value is used for all components
+	if ( params[0]?.isNode === true ) {
 
-	if ( params.length === 1 ) {
+		return ShaderNodeObject( new ConvertNode( params[0], 'vec2' ) );
 
-		params[ 1 ] = params[ 0 ];
+	} else {
+
+		// Providing one scalar value: This value is used for all components
+
+		if ( params.length === 1 ) {
+
+			params[ 1 ] = params[ 0 ];
+
+		}
+
+		return ShaderNodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
 
 	}
-
-	return ShaderNodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
 
 };
 
 export const vec3 = ( ...params ) => {
 
-	// Providing one scalar value: This value is used for all components
+	if ( params[0]?.isNode === true ) {
 
-	if ( params.length === 1 ) {
+		return ShaderNodeObject( new ConvertNode( params[0], 'vec3' ) );
 
-		params[ 1 ] = params[ 2 ] = params[ 0 ];
+	} else {
+
+		// Providing one scalar value: This value is used for all components
+
+		if ( params.length === 1 ) {
+
+			params[ 1 ] = params[ 2 ] = params[ 0 ];
+
+		}
+
+		return ShaderNodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
 
 	}
-
-	return ShaderNodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
 
 };
 
 export const vec4 = ( ...params ) => {
 
-	// Providing one scalar value: This value is used for all components
+	if ( params[0]?.isNode === true ) {
 
-	if ( params.length === 1 ) {
+		return ShaderNodeObject( new ConvertNode( params[0], 'vec4' ) );
 
-		params[ 1 ] = params[ 2 ] = params[ 3 ] = params[ 0 ];
+	} else {
+
+		// Providing one scalar value: This value is used for all components
+
+		if ( params.length === 1 ) {
+
+			params[ 1 ] = params[ 2 ] = params[ 3 ] = params[ 0 ];
+
+		}
+
+		return ShaderNodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
 
 	}
-
-	return ShaderNodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
 
 };
 
