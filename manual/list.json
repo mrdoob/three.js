@@ -304,59 +304,59 @@
 			"Таблица материалов": "ru/material-table"
 		}
 	},
-	"zh_cn": {
+	"zh": {
 		"基础": {
-			"图元": "zh_cn/primitives",
-			"场景图": "zh_cn/scenegraph",
-			"材质": "zh_cn/materials",
-			"纹理": "zh_cn/textures",
-			"光照": "zh_cn/lights",
-			"摄像机": "zh_cn/cameras",
-			"阴影": "zh_cn/shadows",
-			"雾": "zh_cn/fog",
-			"渲染目标": "zh_cn/rendertargets",
-			"自定义缓冲几何体": "zh_cn/custom-buffergeometry"
+			"图元": "zh/primitives",
+			"场景图": "zh/scenegraph",
+			"材质": "zh/materials",
+			"纹理": "zh/textures",
+			"光照": "zh/lights",
+			"摄像机": "zh/cameras",
+			"阴影": "zh/shadows",
+			"雾": "zh/fog",
+			"渲染目标": "zh/rendertargets",
+			"自定义缓冲几何体": "zh/custom-buffergeometry"
 		},
 		"技巧": {
-			"按需渲染": "zh_cn/rendering-on-demand",
-			"Debugging JavaScript": "zh_cn/debugging-javascript",
-			"调试着色器": "zh_cn/debugging-glsl",
-			"Taking a screenshot": "zh_cn/tips#screenshot",
-			"Prevent the Canvas Being Cleared": "zh_cn/tips#preservedrawingbuffer",
-			"Get Keyboard Input From a Canvas": "zh_cn/tips#tabindex",
-			"Make the Canvas Transparent": "zh_cn/tips#transparent-canvas",
-			"Use three.js as Background in HTML": "zh_cn/tips#html-background"
+			"按需渲染": "zh/rendering-on-demand",
+			"Debugging JavaScript": "zh/debugging-javascript",
+			"调试着色器": "zh/debugging-glsl",
+			"Taking a screenshot": "zh/tips#screenshot",
+			"Prevent the Canvas Being Cleared": "zh/tips#preservedrawingbuffer",
+			"Get Keyboard Input From a Canvas": "zh/tips#tabindex",
+			"Make the Canvas Transparent": "zh/tips#transparent-canvas",
+			"Use three.js as Background in HTML": "zh/tips#html-background"
 		},
 		"优化": {
-			"大量对象的优化": "zh_cn/optimize-lots-of-objects",
-			"优化对象的同时保持动画效果": "zh_cn/optimize-lots-of-objects-animated",
-			"Using OffscreenCanvas in a Web Worker": "zh_cn/offscreencanvas"
+			"大量对象的优化": "zh/optimize-lots-of-objects",
+			"优化对象的同时保持动画效果": "zh/optimize-lots-of-objects-animated",
+			"Using OffscreenCanvas in a Web Worker": "zh/offscreencanvas"
 		},
 		"解决方案": {
-			"加载 .OBJ 文件": "zh_cn/load-obj",
-			"Load a .GLTF file": "zh_cn/load-gltf",
-			"Add a Background or Skybox": "zh_cn/backgrounds",
-			"How to Draw Transparent Objects": "zh_cn/transparency",
-			"Multiple Canvases, Multiple Scenes": "zh_cn/multiple-scenes",
-			"鼠标选取对象": "zh_cn/picking",
-			"后期处理": "zh_cn/post-processing",
-			"Applying a LUT File for effects": "zh_cn/post-processing-3dlut",
-			"Using Shadertoy shaders": "zh_cn/shadertoy",
-			"Aligning HTML Elements to 3D": "zh_cn/align-html-elements-to-3d",
-			"Using Indexed Textures for Picking and Color": "zh_cn/indexed-textures",
-			"Using A Canvas for Dynamic Textures": "zh_cn/canvas-textures",
-			"Billboards and Facades": "zh_cn/billboards",
-			"Freeing Resources": "zh_cn/cleanup",
-			"Making Voxel Geometry (Minecraft)": "zh_cn/voxel-geometry",
-			"Start making a Game.": "zh_cn/game"
+			"加载 .OBJ 文件": "zh/load-obj",
+			"Load a .GLTF file": "zh/load-gltf",
+			"Add a Background or Skybox": "zh/backgrounds",
+			"How to Draw Transparent Objects": "zh/transparency",
+			"Multiple Canvases, Multiple Scenes": "zh/multiple-scenes",
+			"鼠标选取对象": "zh/picking",
+			"后期处理": "zh/post-processing",
+			"Applying a LUT File for effects": "zh/post-processing-3dlut",
+			"Using Shadertoy shaders": "zh/shadertoy",
+			"Aligning HTML Elements to 3D": "zh/align-html-elements-to-3d",
+			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
+			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
+			"Billboards and Facades": "zh/billboards",
+			"Freeing Resources": "zh/cleanup",
+			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
+			"Start making a Game.": "zh/game"
 		},
 		"WebXR": {
-			"VR - Basics": "zh_cn/webxr",
-			"VR - Look To Select": "zh_cn/webxr-look-to-select",
-			"VR - Point To Select": "zh_cn/webxr-point-to-select"
+			"VR - Basics": "zh/webxr",
+			"VR - Look To Select": "zh/webxr-look-to-select",
+			"VR - Point To Select": "zh/webxr-point-to-select"
 		},
 		"参考": {
-			"Material Table": "zh_cn/material-table"
+			"Material Table": "zh/material-table"
 		}
 	}
 }
