@@ -294,6 +294,11 @@ export class Object3D extends EventDispatcher {
 	attach( object: Object3D ): this;
 
 	/**
+	 * Removes object as a child of this, while maintaining the object's world transform.
+	 */
+	detach( object: Object3D ): this;
+
+	/**
 	 * Searches through the object's children and returns the first with a matching id.
 	 * @param id	Unique number of the object instance
 	 */

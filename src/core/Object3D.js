@@ -404,6 +404,36 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	detach: function ( object ) {
+
+		if ( arguments.length > 1 ) {
+
+			for ( var i = 0; i < arguments.length; i ++ ) {
+
+				this.detach( arguments[ i ] );
+
+			}
+
+			return this;
+
+		}
+
+		var index = this.children.indexOf( object );
+
+		if ( index !== - 1 ) {
+
+			object.parent = null;
+			this.children.splice( index, 1 );
+
+			object.matrixWorld.decompose( object.position, object.quaternion, object.scale );
+			object.dispatchEvent( _removedEvent );
+
+		}
+
+		return this;
+
+	},
+
 	getObjectById: function ( id ) {
 
 		return this.getObjectByProperty( 'id', id );
