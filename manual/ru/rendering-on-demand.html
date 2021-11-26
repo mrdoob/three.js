@@ -1,0 +1,212 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Рендеринг по требованию</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Рендеринг по требованию">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Рендеринг по требованию</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Эта тема может быть очевидна для многих людей, но на всякий случай ... большинство примеров Three.js отображаются непрерывно. Другими словами, они устанавливают цикл
+<code class="notranslate" translate="no">requestAnimationFrame</code> или "<em>цикл RAF</em>" примерно так </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+  ...
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</pre>
+<p>Для чего-то, что анимируется, это имеет смысл, но как насчет чего-то, что не анимируется? В этом случае непрерывный рендеринг 
+является пустой тратой энергии устройств, а если пользователь находится на портативном устройстве, он расходует батарею пользователя. </p>
+<p>Самый очевидный способ решить эту проблему - рендерить один раз в начале, а затем рендерить только тогда, когда что-то меняется. 
+Изменения включают в себя окончательную загрузку текстур или моделей, 
+данные, поступающие из какого-либо внешнего источника, пользователь, изменяющий настройку или камеру, или другой соответствующий ввод. </p>
+<p>Давайте возьмем пример из <a href="responsive.html">статьи об отзывчивости</a>
+и изменим его для отображения по требованию. </p>
+<p>Сначала мы добавим в OrbitControls, чтобы можно было что-то изменить, что мы можем сделать в ответ. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
++import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
+</pre>
+<p>и настроить их</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+const far = 5;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+camera.position.z = 2;
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 0, 0);
++controls.update();
+</pre>
+<p>Поскольку мы больше не будем анимировать кубы, нам больше не нужно отслеживать их </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
+-  makeInstance(geometry, 0x44aa88,  0),
+-  makeInstance(geometry, 0x8844aa, -2),
+-  makeInstance(geometry, 0xaa8844,  2),
+-];
++makeInstance(geometry, 0x44aa88,  0);
++makeInstance(geometry, 0x8844aa, -2);
++makeInstance(geometry, 0xaa8844,  2);
+</pre>
+<p>Мы можем удалить код для анимации кубов и вызовы <code class="notranslate" translate="no">requestAnimationFrame</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(time) {
+-  time *= 0.001;
++function render() {
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+-  cubes.forEach((cube, ndx) =&gt; {
+-    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
+-    cube.rotation.x = rot;
+-    cube.rotation.y = rot;
+-  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
+-requestAnimationFrame(render);
+</pre>
+<p>тогда нам нужно отрендерить один раз</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
+</pre>
+<p>Нам нужно рендерить каждый раз, когда <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> меняет настройки камеры. К счастью, <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> отправляет событие <code class="notranslate" translate="no">change</code> каждый раз, когда что-то меняется. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
+</pre>
+<p>Нам также нужно обработать случай, когда пользователь изменяет размер окна. 
+Раньше это было обработано автоматически, так как мы рендерили непрерывно, 
+но теперь нам это не нужно, нужно рендерить, когда окно меняет размер. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('resize', render);
+</pre>
+<p>И с этим мы получаем что-то, что рендерит по требованию.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-on-demand.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>У <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> есть опции для добавления некоторой инерции, чтобы они чувствовали себя менее интенсивными. 
+Мы можем включить это, установив для свойства <code class="notranslate" translate="no">enableDamping</code> значение true. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
+</pre>
+<p>С включенной функцией <code class="notranslate" translate="no">enableDamping</code> нам нужно вызвать <code class="notranslate" translate="no">controls.update</code> в нашей функции рендеринга, 
+чтобы <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> продолжал предоставлять нам новые настройки камеры, поскольку они сглаживают движение. 
+Но это означает, что мы не можем вызвать <code class="notranslate" translate="no">render</code> напрямую из события <code class="notranslate" translate="no">change</code>, потому что мы окажемся в бесконечном цикле. 
+Элементы управления отправят нам событие <code class="notranslate" translate="no">change</code> и вызовут <code class="notranslate" translate="no">render</code>, <code class="notranslate" translate="no">render</code> вызовет <code class="notranslate" translate="no">controls.update</code>.
+<code class="notranslate" translate="no">controls.update</code> отправит еще одно событие <code class="notranslate" translate="no">change</code>. </p>
+<p>Мы можем исправить это, используя <code class="notranslate" translate="no">requestAnimationFrame</code> для вызова <code class="notranslate" translate="no">render</code>, но нам нужно убедиться, что мы запрашиваем новый кадр,
+только если он еще не был запрошен, что мы можем сделать, сохраняя переменную, которая отслеживает, если мы уже запросили кадр. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let renderRequested = false;
+
+function render() {
++  renderRequested = false;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  renderer.render(scene, camera);
+}
+render();
+
++function requestRenderIfNotRequested() {
++  if (!renderRequested) {
++    renderRequested = true;
++    requestAnimationFrame(render);
++  }
++}
+
+-controls.addEventListener('change', render);
++controls.addEventListener('change', requestRenderIfNotRequested);
+</pre>
+<p>Возможно, нам также следует использовать <code class="notranslate" translate="no">requestRenderIfNotRequested</code> для изменения размера </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-window.addEventListener('resize', render);
++window.addEventListener('resize', requestRenderIfNotRequested);
+</pre>
+<p>Может быть трудно увидеть разницу. Попробуйте нажать на приведенный ниже пример и использовать
+клавиши со стрелками для перемещения или перетаскивать для вращения. 
+Затем попробуйте нажать на приведенный выше пример и сделайте то же самое, и вы сможете увидеть разницу. 
+В приведенном примере при нажатии клавиши со стрелкой или перетаскивании мышью, кубики проскальзывают. </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-damping.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-on-demand-w-damping.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Давайте также добавим простой графический интерфейс lil-gui и внесем его изменения по запросу. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
+import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
++import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+</pre>
+<p>Давайте позволим установить цвет и шкалу х каждого куба. Чтобы установить цвет, мы будем использовать <code class="notranslate" translate="no">ColorGUIHelper</code>, который мы создали в <a href="lights.html">статье о светах</a>.</p>
+<p>Сначала нам нужно создать графический интерфейс</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+</pre>
+<p>а затем для каждого куба мы создадим папку и добавим 2 элемента управления, 
+один для <code class="notranslate" translate="no">material.color</code> и другой для <code class="notranslate" translate="no">cube.scale.x</code>. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  cube.position.x = x;
+
++  const folder = gui.addFolder(`Cube${x}`);
++  folder.addColor(new ColorGUIHelper(material, 'color'), 'value')
++      .name('color')
++      .onChange(requestRenderIfNotRequested);
++  folder.add(cube.scale, 'x', .1, 1.5)
++      .name('scale x')
++      .onChange(requestRenderIfNotRequested);
++  folder.open();
+
+  return cube;
+}
+</pre>
+<p>Вы можете видеть выше элементы управления lil-gui имеют метод <code class="notranslate" translate="no">onChange</code>, 
+который вы можете передать обратный вызов для вызова, когда графический интерфейс изменяет значение.
+В нашем случае нам просто нужно вызвать <code class="notranslate" translate="no">requestRenderIfNotRequested</code>. При вызове <code class="notranslate" translate="no">folder.open</code> папка запускается расширенной. </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-gui.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-on-demand-w-gui.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Я надеюсь, что это дает некоторое представление о том, как сделать three.js визуализированным 
+по требованию, а не непрерывно. Приложения / страницы, которые отображают Three.js по требованию, 
+не так часто встречаются, так как большинство страниц, использующих Three.js, являются либо играми, 
+либо 3D-анимацией, но примеры страниц, которые могут быть лучше прорисованы по требованию, - это, 
+скажем, просмотрщик карт, 3D-редактор, генератор трехмерных графиков, каталог продуктов и т. д. </p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

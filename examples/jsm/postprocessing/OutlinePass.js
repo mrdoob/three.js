@@ -15,7 +15,7 @@ import {
 	Vector3,
 	WebGLRenderTarget
 } from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 class OutlinePass extends Pass {
