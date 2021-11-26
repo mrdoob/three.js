@@ -1,27 +1,96 @@
+/* TODO Use ../files/main.css instead */
+
 :root {
+	color-scheme: light dark;
+
+	--color-blue: #049EF4;
+	--text-color: #444;
+
+	--font-size: 16px;
+	--line-height: 26px;
+
+	--border-style: 1px solid #E8E8E8;
+	--panel-width: 300px;
 	--page-padding: 24px;
+	--max-width: 760px;
+	--icon-size: 20px;
+}
 
-  /* these are overridden in manual/<lang>/lang.css */
-  --article-font-family: Georgia, serif;
-  --headline-font-family: sans-serif;
-  /* a block of code */
-  --code-block-font-family: "Lucida Console", Monaco, monospace;
-  /* a word in a sentence */
-  --code-font-family: monospace;
+@media (prefers-color-scheme: dark) {
 
+	:root {
+		--background-color: #222;
+		--secondary-background-color: #2e2e2e;
+
+		--text-color: #bbb;
+		--secondary-text-color: #666;
+
+		--border-style: 1px solid #444;
+	}
+
+}
+
+@font-face {
+	font-family: 'Roboto Mono';
+	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('../../files/RobotoMono-Regular.woff2') format('woff2');
+	font-style: normal;
+	font-weight: 400;
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Inter-Regular'), url("../../files/Inter-Regular.woff2?v=3.6") format("woff2");
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 600;
+	src: local('Inter-SemiBold'), url("../../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
+}
+
+html {
+	font-family: 'Inter', sans-serif;
+	font-size: var(--font-size);
+	line-height: var(--line-height);
 }
 
 body {
-  margin: 0;
-  font-family: var(--article-font-family);
-  font-size: 19px;
-  line-height: 150%;
-  padding: var(--page-padding);
+	color: var(--text-color);
+	tab-size: 4;
+	overflow: auto;
+	max-width: var(--max-width);
+	margin: 0 auto;
+	padding-top: var(--page-padding);
+	padding-bottom: var(--page-padding);
+	padding-right: var(--page-padding);
+	padding-left: calc(var(--page-padding) + var(--panel-width));
+	word-break: break-word;
 }
 
-p + p {
-  margin-top: 1.5em;
+a {
+	color: var(--color-blue);
+	cursor: pointer;
+	text-decoration: none;
 }
+
+h1 {
+	font-size: 40px;
+	line-height: 48px;
+	font-weight: normal;
+	margin-left: -2px;
+	margin-top: 16px;
+	margin-bottom: -8px;
+}
+
+p {
+	margin-top: 16px;
+	margin-bottom: 16px;
+	padding-right: 16px;
+}
+
 li > p {
   width: calc(100% - 2em);
 }
@@ -53,23 +122,24 @@ table {
 pre {
   background: rgb(143, 140, 140);
   padding: 1em;
+	position: relative;
 }
 pre>code {
   white-space: inherit;
   background: none;
 }
 pre.prettyprint {
-    margin-top: 2em !important;
-    margin-bottom: 2em !important;
-    position: relative;
+  margin-top: 2em !important;
+  margin-bottom: 2em !important;
+  position: relative;
 }
 pre.prettyprint li {
-    white-space: pre;
+  white-space: pre;
 }
 pre.prettyprint code, .dos {
-    color: #CCC;
-    font-family: var(--code-block-font-family);
-    display: block;
+  color: #CCC;
+  font-family: var(--code-block-font-family);
+  display: block;
 }
 
 /* to handle long words in paragraph */
@@ -118,14 +188,8 @@ div[data-diagram] {
 }
 
 .threejs_navbar>div,
-.lesson-title,
 .lesson-comments,
 .lesson-comment-sep,
-.lesson-main>* {
-    margin: 0 auto 1em;
-    max-width: 700px;
-    width: calc(100% - 40px);
-}
 .lesson-main>h1:not(:first-child),
 .lesson-main>h2:not(:first-child),
 .lesson-main>h3:not(:first-child),
@@ -178,10 +242,6 @@ div[data-diagram] {
     background-color: #DEF;
     padding: 1em;
 }
-.lesson-title {
-    margin-top: 3em;
-    margin-bottom: 2em;
-}
 .lesson-sidebar {
     font-size: small;
     columns: 220px;
@@ -202,19 +262,10 @@ div[data-diagram] {
     padding-left: 1em;
     text-indent: -1em;
 }
-h1, h2, h3, h4 {
-  font-family: var(--headline-font-family);
-  line-height: 1.2;
-}
-h3 {
-  font-size: medium;
-}
 code {
     color: black;
-    font-family: var(--code-font-family);
     background-color: #ddd;
     padding: 0.1em 0.2em 0.1em 0.2em;
-    border-radius: 0.5em;
     white-space: nowrap;
 }
 
@@ -325,10 +376,9 @@ iframe.external_diagram {
 }
 
 div.threejs_bottombar {
-  border: 1px solid #000;
   background-color: #def;
-  padding: 1em;
-  width: calc(100% - 80px);
+  margin-top: var(--page-padding);
+  outline: var(--page-padding) solid #def;
 }
 div.threejs_bottombar>h3 {
   font-size: x-large;
@@ -339,150 +389,12 @@ div.threejs_bottombar code {
     background-color: #ccc;
 }
 
-/* --- Prettify --- */
-pre.prettyprint .nocode { background-color: none; color: #FFF }
-pre.prettyprint .str { color: #b9ca4a } /* string          */
-pre.prettyprint .kwd { color: #c397d8 } /* keyword         */
-pre.prettyprint .com { color: #f3efb2 } /* comment         */
-pre.prettyprint .typ { color: #7aa6da } /* type            */
-pre.prettyprint .lit { color: #45e7a6 } /* literal         */
-pre.prettyprint .pun { color: #7ecce0 } /* punctuation     */
-pre.prettyprint .pln { color: #eaeaea } /* plaintext       */
-pre.prettyprint .tag { color: #d54e53 } /* html/xml tag    */
-pre.prettyprint .atn { color: #e78c45 } /* attribute name  */
-pre.prettyprint .atv { color: #70c0b1 } /* attribute value */
-pre.prettyprint .dec { color: #e78c45 } /* decimal         */
-pre.prettyprint .var { color: #d54e53 } /* variable name   */
-pre.prettyprint .fun { color: #7aa6da } /* function name   */
-foo{ color: #FF8080}
-pre.prettyprint ul.modifiedlines {
-    list-style-type: none;
-    padding-left: 0;
-}
-pre.prettyprint ul.modifiedlines li.linemodified {
-    list-style-type: none;
-    background-color: #324840;
-}
-pre.prettyprint ul.modifiedlines li.linedeleted {
-    list-style-type: none;
-    background-color: #4c1414;
-    text-decoration: line-through;
-}
-
-pre.prettyprint ul.modifiedlines li.lineadded {
-    list-style-type: none;
-    background-color: #3f4463;
-}
-
-
-pre.prettyprint, code.prettyprint, .dos {
-    color: #FFF;
-    background: #222;
-    border: 1px solid #000;
-    box-shadow: 10px 10px 0px #ccc;
-    font-size: 9pt;
-    font-family: var(--code-block-font-family);
-    margin: auto;
-    padding: 1em;
-    text-align: left;           /* override justify on body */
-    /* this was disabled until 2016-08-26 but I don't know why */
-    overflow: auto;             /* allow scroll bar in case of long lines - goes together with white-space: nowrap! */
-    white-space: pre;        /* was nowrap, prevent line wrapping */
-    line-height: 1.5em;
-    width: calc(100% - 80px);
-}
-
 .dos {
+  color: var(--text-color);
   line-height: 1;
 }
 
-pre.prettyprint.lighttheme, code.prettyprint.lighttheme {
-    color: #222;
-    background: #fff;
-    border: 1px solid #888;
-    box-shadow: none;
-}
-
-pre.prettyprint.lighttheme .str { color: #183691; }  /* string content */
-pre.prettyprint.lighttheme .kwd { color: #a71d5d; }  /* keyword */
-pre.prettyprint.lighttheme .com { color: #969896; }  /* comment */
-pre.prettyprint.lighttheme .typ { color: #0086b3; }  /* type name */
-pre.prettyprint.lighttheme .lit { color: #0086b3; }  /* literal value */
-pre.prettyprint.lighttheme .pun { color: #333; }  /* punctuation */
-pre.prettyprint.lighttheme .opn { color: #333; }  /* lisp open bracket */
-pre.prettyprint.lighttheme .clo { color: #333; }  /* lisp close bracket */
-pre.prettyprint.lighttheme .tag { color: #000080; }  /* markup tag name */
-pre.prettyprint.lighttheme .atn { color: #795da3; }  /* markup attribute name */
-pre.prettyprint.lighttheme .atv { color: #183691; }  /* markup attribute value */
-pre.prettyprint.lighttheme .dec { color: #333; }  /* declaration */
-pre.prettyprint.lighttheme .var { color: #008080; }  /* variable name */
-pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
-
-@media print {
-    pre.prettyprint .str, code.prettyprint .str{color:#060}
-    pre.prettyprint .kwd, code.prettyprint .kwd{color:#006;font-weight:bold}
-    pre.prettyprint .com, code.prettyprint .com{color:#600;font-style:italic}
-    pre.prettyprint .typ, code.prettyprint .typ{color:#404;font-weight:bold}
-    pre.prettyprint .lit, code.prettyprint .lit{color:#044}
-    pre.prettyprint .pun, code.prettyprint .pun{color:#440}
-    pre.prettyprint .pln, code.prettyprint .pln{color:#000}
-    pre.prettyprint .tag, code.prettyprint .tag{color:#006;font-weight:bold}
-    pre.prettyprint .atn, code.prettyprint .atn{color:#404}
-    pre.prettyprint .atv, code.prettyprint .atv{color:#060}
-    pre.prettyprint, code.prettyprint {
-        color: #000;
-        background: #EEE;
-        font-size: 8pt;
-        font-family: var(--code-block-font-family);
-        width: 95%;
-        margin: auto;
-        padding: 1em;
-        text-align: left;           /* override justify on body */
-        overflow: visible;
-        white-space: pre;        /* was nowrap, prevent line wrapping */
-        line-height: 1.5;
-    }
-
-    pre.prettyprint ul.modifiedlines li.linemodified {
-        list-style-type: none;
-        background-color: #DDD;
-    }
-    pre.prettyprint ul.modifiedlines li.linedeleted {
-        list-style-type: none;
-        background-color: #CCC;
-        text-decoration: line-through;
-    }
-
-    pre.prettyprint ul.modifiedlines li.lineadded {
-        list-style-type: none;
-        background-color: #EEE;
-    }
-
-    body {
-        margin: 10mm;
-    }
-    .doubleSpace p {
-        line-height: 2.5;
-        font-size: x-large;
-    }
-    .doubleSpace pre.prettyprint {
-        font-size: 14pt;
-    }
-    .threejs_navbar,
-    .lesson-comment-sep,
-    .lesson-sidebar,
-    .lesson-comments {
-        display: none;
-    }
-}
-
 @media (max-width: 720px) {
-    body {
-        font-size: 16px;
-    }
-    h1 {
-        font-size: 24px;
-    }
     .threejs_example {
         max-height: 400px;
     }
@@ -498,33 +410,50 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
 }
 
 @media all and ( min-width: 1700px ) {
-  :root {
-    --page-padding: 28px;
-  }
+
+	:root {
+		--panel-width: 360px;
+		--font-size: 18px;
+		--line-height: 28px;
+		--max-width: 880px;
+		--page-padding: 28px;
+		--icon-size: 24px;
+	}
+
+	h1 {
+		font-size: 42px;
+		line-height: 50px;
+	}
+
 }
 
 @media all and ( max-width: 640px ) {
-  :root {
-    --page-padding: 16px;
-  }
+
+	:root {
+		--page-padding: 16px;
+		--icon-size: 24px;
+	}
+
+	body {
+		padding: var(--page-padding);
+	}
+
+	h1 {
+		font-size: 28px;
+		line-height: 36px;
+		padding-right: 20px;
+		margin-top: 0;
+	}
+
 }
 
 @media (prefers-color-scheme: dark) {
+
   html {
     scrollbar-color: hsl(0, 0%, 35%) hsl(0, 0%, 13%);
   }
-  body {
-    background: #333;
-    color: #CCC;
-  }
-  a {
-    color: #56d3fd;
-  }
   .warning {
     background: darkred;
-  }
-  pre.prettyprint, code.prettyprint, .dos {
-    box-shadow: 10px 10px 0px #292929;
   }
   code {
     background: #666;
@@ -551,6 +480,7 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   }
   div.threejs_bottombar {
     background-color: #1b1b44;
+    outline: var(--page-padding) solid #1b1b44;
   }
   div.threejs_bottombar code {
     background-color: #348;
@@ -564,4 +494,5 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
     border: none;
     padding: 3px;
   }
+
 }
