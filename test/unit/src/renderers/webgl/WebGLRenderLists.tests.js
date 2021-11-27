@@ -62,32 +62,19 @@ export default QUnit.module( 'Renderers', () => {
 				var list = new WebGLRenderList( properties );
 				var objA = { id: 'A', renderOrder: 0 };
 				var matA = { transparent: true };
-				var proA = { id: 1 };
 				var geoA = {};
 
 				var objB = { id: 'B', renderOrder: 0 };
 				var matB = { transparent: true };
-				var proB = { id: 2 };
 				var geoB = {};
 
 				var objC = { id: 'C', renderOrder: 0 };
 				var matC = { transparent: false };
-				var proC = { id: 3 };
 				var geoC = {};
 
 				var objD = { id: 'D', renderOrder: 0 };
 				var matD = { transparent: false };
-				var proD = { id: 4 };
 				var geoD = {};
-
-				var materialProperties = properties.get( matA );
-				materialProperties.program = proA;
-				materialProperties = properties.get( matB );
-				materialProperties.program = proB;
-				materialProperties = properties.get( matC );
-				materialProperties.program = proC;
-				materialProperties = properties.get( matD );
-				materialProperties.program = proD;
 
 				list.push( objA, geoA, matA, 0, 0.5, {} );
 				assert.ok( list.transparent.length === 1, 'Transparent list is length 1 after adding transparent item.' );
@@ -99,7 +86,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objA,
 						geometry: geoA,
 						material: matA,
-						program: proA,
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
@@ -118,7 +104,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objB,
 						geometry: geoB,
 						material: matB,
-						program: proB,
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
@@ -137,7 +122,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objC,
 						geometry: geoC,
 						material: matC,
-						program: proC,
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
@@ -156,7 +140,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objD,
 						geometry: geoD,
 						material: matD,
-						program: proD,
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
@@ -173,32 +156,20 @@ export default QUnit.module( 'Renderers', () => {
 				var list = new WebGLRenderList( properties );
 				var objA = { id: 'A', renderOrder: 0 };
 				var matA = { transparent: true };
-				var proA = { id: 1 };
 				var geoA = {};
 
 				var objB = { id: 'B', renderOrder: 0 };
 				var matB = { transparent: true };
-				var proB = { id: 2 };
 				var geoB = {};
 
 				var objC = { id: 'C', renderOrder: 0 };
 				var matC = { transparent: false };
-				var proC = { id: 3 };
 				var geoC = {};
 
 				var objD = { id: 'D', renderOrder: 0 };
 				var matD = { transparent: false };
-				var proD = { id: 4 };
 				var geoD = {};
 
-				var materialProperties = properties.get( matA );
-				materialProperties.program = proA;
-				materialProperties = properties.get( matB );
-				materialProperties.program = proB;
-				materialProperties = properties.get( matC );
-				materialProperties.program = proC;
-				materialProperties = properties.get( matD );
-				materialProperties.program = proD;
 
 				list.unshift( objA, geoA, matA, 0, 0.5, {} );
 				assert.ok( list.transparent.length === 1, 'Transparent list is length 1 after adding transparent item.' );
@@ -210,7 +181,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objA,
 						geometry: geoA,
 						material: matA,
-						program: proA,
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
@@ -229,7 +199,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objB,
 						geometry: geoB,
 						material: matB,
-						program: proB,
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
@@ -248,7 +217,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objC,
 						geometry: geoC,
 						material: matC,
-						program: proC,
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
@@ -267,7 +235,6 @@ export default QUnit.module( 'Renderers', () => {
 						object: objD,
 						geometry: geoD,
 						material: matD,
-						program: proD,
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
@@ -306,71 +273,6 @@ export default QUnit.module( 'Renderers', () => {
 				);
 
 			} );
-
-			// QUnit.test( 'finish', ( assert ) => {
-
-			// 	var list = new WebGLRenderList( properties );
-			// 	var obj = { id: 'A', renderOrder: 0 };
-			// 	var mat = { transparent: false, program: { id: 0 } };
-			// 	var geom = {};
-
-			// 	assert.ok( list.renderItems.length === 0, 'Render items length defaults to 0.' );
-
-			// 	list.push( obj, geom, mat, 0, 0, {} );
-			// 	list.push( obj, geom, mat, 0, 0, {} );
-			// 	list.push( obj, geom, mat, 0, 0, {} );
-			// 	assert.ok( list.renderItems.length === 3, 'Render items length expands as items are added.' );
-
-			// 	list.finish();
-			// 	assert.deepEqual(
-			// 		list.renderItems.map( item => item.object ),
-			// 		[ obj, obj, obj ],
-			// 		'Render items are not cleaned if they are being used.'
-			// 	);
-			// 	assert.deepEqual(
-			// 		list.renderItems[ 1 ],
-			// 		{
-			// 			id: 'A',
-			// 			object: obj,
-			// 			geometry: geom,
-			// 			material: mat,
-			// 			program: mat.program,
-			// 			groupOrder: 0,
-			// 			renderOrder: 0,
-			// 			z: 0,
-			// 			group: {}
-			// 		},
-			// 		'Unused render item is structured correctly before clearing.'
-			// 	);
-
-			// 	list.init();
-			// 	list.push( obj, geom, mat, 0, 0, {} );
-			// 	assert.ok( list.renderItems.length === 3, 'Render items length does not shrink.' );
-
-			// 	list.finish();
-			// 	assert.deepEqual(
-			// 		list.renderItems.map( item => item.object ),
-			// 		[ obj, null, null ],
-			// 		'Render items are cleaned if they are not being used.'
-			// 	);
-
-			// 	assert.deepEqual(
-			// 		list.renderItems[ 1 ],
-			// 		{
-			// 			id: null,
-			// 			object: null,
-			// 			geometry: null,
-			// 			material: null,
-			// 			program: null,
-			// 			groupOrder: 0,
-			// 			renderOrder: 0,
-			// 			z: 0,
-			// 			group: null
-			// 		},
-			// 		'Unused render item is structured correctly before clearing.'
-			// 	);
-
-			// } );
 
 		} );
 
