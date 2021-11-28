@@ -1,3 +1,5 @@
+import { LinearEncoding } from 'three';
+
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -263,6 +265,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			}
 
 			// RESULT
+
+			const outputEncoding = this.renderer.outputEncoding;
+
+			if ( outputEncoding !== LinearEncoding ) {
+				
+				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, vec4( outputNode ) );
+				outputNode.fromEncoding( outputEncoding );
+				
+			}
 
 			this.addFlow( 'fragment', new VarNode( outputNode, 'Output', 'vec4' ) );
 
