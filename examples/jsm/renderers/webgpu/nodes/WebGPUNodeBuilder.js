@@ -19,9 +19,12 @@ import PositionNode from '../../nodes/accessors/PositionNode.js';
 import NormalNode from '../../nodes/accessors/NormalNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
 import SkinningNode from '../../nodes/accessors/SkinningNode.js';
+import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import OperatorNode from '../../nodes/math/OperatorNode.js';
 import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
+import { vec4 } from '../../nodes/ShaderNode.js';
+import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
 	float: 'f32',
@@ -143,7 +146,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
+			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec3' ) );
+
+			const diffuseNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
 
 			// OPACITY
 
@@ -219,11 +224,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
+				roughnessNode = getRoughness( { roughness: roughnessNode } );
+
 				this.addFlow( 'fragment', new VarNode( roughnessNode, 'Roughness', 'float' ) );
 
 				// SPECULAR_TINT
 
-				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), DiffuseColor.rgb, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
+				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), Color, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
 
 				// NORMAL_VIEW
 
