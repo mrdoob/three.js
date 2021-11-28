@@ -30,6 +30,7 @@ const wgslTypeLib = {
 	vec3: 'vec3<f32>',
 	vec4: 'vec4<f32>',
 	uvec4: 'vec4<u32>',
+	bvec3: 'vec3<bool>',
 	mat3: 'mat3x3<f32>',
 	mat4: 'mat4x4<f32>'
 };
