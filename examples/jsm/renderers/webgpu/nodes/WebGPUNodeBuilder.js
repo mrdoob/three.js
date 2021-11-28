@@ -40,6 +40,13 @@ const wgslMethods = {
 };
 
 const wgslPolyfill = {
+	lessThanEqual: new CodeNode( `
+fn lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
+
+	return vec3<bool>( a.x <= b.x, a.y <= b.y, a.z <= b.z );
+
+}
+` ),
 	mod: new CodeNode( `
 fn mod( x : f32, y : f32 ) -> f32 {
 
