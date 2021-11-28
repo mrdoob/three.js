@@ -47,7 +47,7 @@ function reversePainterSortStable( a, b ) {
 }
 
 
-function WebGLRenderList( properties ) {
+function WebGLRenderList() {
 
 	const renderItems = [];
 	let renderItemsIndex = 0;
@@ -188,7 +188,7 @@ function WebGLRenderList( properties ) {
 
 }
 
-function WebGLRenderLists( properties ) {
+function WebGLRenderLists() {
 
 	let lists = new WeakMap();
 
@@ -198,14 +198,14 @@ function WebGLRenderLists( properties ) {
 
 		if ( lists.has( scene ) === false ) {
 
-			list = new WebGLRenderList( properties );
+			list = new WebGLRenderList();
 			lists.set( scene, [ list ] );
 
 		} else {
 
 			if ( renderCallDepth >= lists.get( scene ).length ) {
 
-				list = new WebGLRenderList( properties );
+				list = new WebGLRenderList();
 				lists.get( scene ).push( list );
 
 			} else {
