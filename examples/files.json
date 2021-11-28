@@ -323,6 +323,7 @@
 		"webgpu_lights_custom",
 		"webgpu_lights_selective",
 		"webgpu_materials",
+		"webgpu_nodes_playground",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_skinning",
