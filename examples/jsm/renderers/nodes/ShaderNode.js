@@ -293,6 +293,7 @@ export const and = ShaderNodeProxy( OperatorNode, '&&' );
 
 export const element = ShaderNodeProxy( ArrayElementNode );
 
+export const normalGeometry = new NormalNode( NormalNode.GEOMETRY );
 export const normalLocal = new NormalNode( NormalNode.LOCAL );
 export const normalWorld = new NormalNode( NormalNode.WORLD );
 export const normalView = new NormalNode( NormalNode.VIEW );
