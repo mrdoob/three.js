@@ -26,7 +26,7 @@ class WebGPURenderPipelines {
 		const device = this.device;
 		const material = object.material;
 
-		let cache = this._getCache( object );
+		const cache = this._getCache( object );
 
 		let currentPipeline;
 
