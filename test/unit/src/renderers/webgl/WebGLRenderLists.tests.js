@@ -1,7 +1,6 @@
 /* global QUnit */
 
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists';
-import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties';
 import { Scene } from '../../../../../src/scenes/Scene';
 
 export default QUnit.module( 'Renderers', () => {
@@ -11,20 +10,18 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLRenderLists', () => {
 
 			// PUBLIC STUFF
-			QUnit.test( "get", ( assert ) => {
+			QUnit.test( 'get', ( assert ) => {
 
-				var properties = new WebGLProperties();
-
-				var renderLists = new WebGLRenderLists( properties );
+				var renderLists = new WebGLRenderLists();
 				var sceneA = new Scene();
 				var sceneB = new Scene();
 
 				var listA = renderLists.get( sceneA );
 				var listB = renderLists.get( sceneB );
 
-				assert.propEqual( listA, new WebGLRenderList( properties ), "listA is type of WebGLRenderList." );
-				assert.propEqual( listB, new WebGLRenderList( properties ), "listB is type of WebGLRenderList." );
-				assert.ok( listA !== listB, "Render lists are different." );
+				assert.propEqual( listA, new WebGLRenderList(), 'listA is type of WebGLRenderList.' );
+				assert.propEqual( listB, new WebGLRenderList(), 'listB is type of WebGLRenderList.' );
+				assert.ok( listA !== listB, 'Render lists are different.' );
 
 
 			} );
@@ -36,8 +33,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'init', ( assert ) => {
 
-				var properties = new WebGLProperties();
-				var list = new WebGLRenderList( properties );
+				var list = new WebGLRenderList();
 
 				assert.ok( list.transparent.length === 0, 'Transparent list defaults to length 0.' );
 				assert.ok( list.opaque.length === 0, 'Opaque list defaults to length 0.' );
@@ -57,9 +53,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'push', ( assert ) => {
 
-				var properties = new WebGLProperties();
-
-				var list = new WebGLRenderList( properties );
+				var list = new WebGLRenderList();
 				var objA = { id: 'A', renderOrder: 0 };
 				var matA = { transparent: true };
 				var geoA = {};
@@ -152,8 +146,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'unshift', ( assert ) => {
 
-				var properties = new WebGLProperties();
-				var list = new WebGLRenderList( properties );
+				var list = new WebGLRenderList();
 				var objA = { id: 'A', renderOrder: 0 };
 				var matA = { transparent: true };
 				var geoA = {};
@@ -247,8 +240,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'sort', ( assert ) => {
 
-				var properties = new WebGLProperties();
-				var list = new WebGLRenderList( properties );
+				var list = new WebGLRenderList();
 				var items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
 
 				items.forEach( item => {
