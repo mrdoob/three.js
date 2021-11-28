@@ -108,12 +108,7 @@ class WebGPUBindings {
 
 				if ( needsBufferWrite === true ) {
 
-					this.device.queue.writeBuffer(
-						bufferGPU,
-						0,
-						buffer,
-						0
-					);
+					this.device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
 
 				}
 
