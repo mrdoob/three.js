@@ -624,7 +624,7 @@ class NodeBuilder {
 
 	getSignature() {
 
-		return `// Three.js r${ REVISION } • NodeMaterial System\n`;
+		return `// Three.js r${ REVISION } - NodeMaterial System\n`;
 
 	}
 
