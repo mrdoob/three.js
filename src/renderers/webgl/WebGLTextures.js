@@ -709,6 +709,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			state.texImage3D( _gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
 
+		} else if ( texture.isFramebufferTexture ) {
+
+			// texture data extracted from framebuffers require mutuable textures defined via gl.copyTexImage2D()
+
 		} else {
 
 			// regular Texture (image, video, canvas)
