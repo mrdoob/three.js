@@ -235,7 +235,7 @@
 			"게임 만들기": "ko/game"
 		},
 		"웹VR": {
-			"VR - Basics": "ko/webxr",
+			"VR - 기본 사항": "ko/webxr",
 			"VR - Look To Select": "ko/webxr-look-to-select",
 			"VR - Point To Select": "ko/webxr-point-to-select"
 		},
