@@ -13,9 +13,10 @@ import {
 	DepthStencilFormat,
 	RGBAFormat,
 	RGBFormat,
+	sRGBEncoding,
 	UnsignedByteType,
 	UnsignedShortType,
-	UnsignedInt248Type,
+	UnsignedInt248Type
 } from '../../constants.js';
 
 class WebXRManager extends EventDispatcher {
@@ -269,7 +270,7 @@ class WebXRManager extends EventDispatcher {
 
 					if ( attributes.depth ) {
 
-						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT16;
+						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 						depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
 						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedShortType;
 
@@ -299,6 +300,7 @@ class WebXRManager extends EventDispatcher {
 								stencilBuffer: attributes.stencil,
 								ignoreDepth: glProjLayer.ignoreDepthValues,
 								useRenderToTexture: hasMultisampledRenderToTexture,
+								encoding: sRGBEncoding
 							} );
 
 					} else {
@@ -312,6 +314,7 @@ class WebXRManager extends EventDispatcher {
 								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 								stencilBuffer: attributes.stencil,
 								ignoreDepth: glProjLayer.ignoreDepthValues,
+								encoding: sRGBEncoding
 							} );
 
 					}

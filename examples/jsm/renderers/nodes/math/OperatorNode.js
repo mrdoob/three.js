@@ -149,11 +149,11 @@ class OperatorNode extends TempNode {
 
 			} else if ( op === '>' && outputLength > 1 ) {
 
-				return `greaterThan( ${a}, ${b} )`;
+				return `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`;
 
 			} else if ( op === '<=' && outputLength > 1 ) {
 
-				return `lessThanEqual( ${a}, ${b} )`;
+				return `${ builder.getMethod( 'lessThanEqual' ) }( ${a}, ${b} )`;
 
 			} else {
 

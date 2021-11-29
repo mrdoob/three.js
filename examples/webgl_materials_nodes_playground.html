@@ -70,18 +70,13 @@
 
 			// Lights
 
-			//scene.add( new THREE.AmbientLight( 0x111111 ) );
+			const topLight = new THREE.PointLight( 0xF4F6F0, 1 );
+			topLight.position.set( 0, 100000, 100000 );
+			scene.add( topLight );
 
-			const directionalLight = new THREE.DirectionalLight( 0xF4F6F0, 0.8 );
-			directionalLight.position.set( 0.0, 0.5, 0.5 ).normalize();
-			scene.add( directionalLight );
-
-			const pointLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x0c1445 } ) );
-			pointLight.add( new THREE.PointLight( 0x0c1445, 0.7, 500 ) );
-			scene.add( pointLight );
-			pointLight.position.x = - 100;
-			pointLight.position.y = 20;
-			pointLight.position.z = - 260;
+			const backLight = new THREE.PointLight( 0x0c1445, 1.4 );
+			backLight.position.set( - 100, 20, - 260 );
+			scene.add( backLight );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			document.body.appendChild( renderer.domElement );
