@@ -49,7 +49,7 @@
 			"Billboards and Facades": "en/billboards",
 			"Freeing Resources": "en/cleanup",
 			"Making Voxel Geometry (Minecraft)": "en/voxel-geometry",
-			"Start making a Game.": "en/game"
+			"Start making a Game": "en/game"
 		},
 		"WebXR": {
 			"VR - Basics": "en/webxr",
@@ -110,7 +110,7 @@
 			"Billboards and Facades": "fr/billboards",
 			"Freeing Resources": "fr/cleanup",
 			"Making Voxel Geometry (Minecraft)": "fr/voxel-geometry",
-			"Start making a Game.": "fr/game"
+			"Start making a Game": "fr/game"
 		},
 		"WebXR": {
 			"VR - Basics": "fr/webxr",
@@ -171,7 +171,7 @@
 			"Billboards and Facades": "ja/billboards",
 			"Freeing Resources": "ja/cleanup",
 			"Making Voxel Geometry (Minecraft)": "ja/voxel-geometry",
-			"Start making a Game.": "ja/game"
+			"Start making a Game": "ja/game"
 		},
 		"WebXR": {
 			"VR - Basics": "ja/webxr",
@@ -293,7 +293,7 @@
 			"Billboards and Facades": "ru/billboards",
 			"Freeing Resources": "ru/cleanup",
 			"Making Voxel Geometry (Minecraft)": "ru/voxel-geometry",
-			"Start making a Game.": "ru/game"
+			"Start making a Game": "ru/game"
 		},
 		"WebXR": {
 			"VR - Basics": "ru/webxr",
@@ -348,7 +348,7 @@
 			"Billboards and Facades": "zh/billboards",
 			"Freeing Resources": "zh/cleanup",
 			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
-			"Start making a Game.": "zh/game"
+			"Start making a Game": "zh/game"
 		},
 		"WebXR": {
 			"VR - Basics": "zh/webxr",
