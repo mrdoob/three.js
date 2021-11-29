@@ -319,7 +319,7 @@ class WebXRManager extends EventDispatcher {
 				}
 
 				// Set foveation to maximum.
-				this.setFoveation( 0 );
+				this.setFoveation( 1.0 );
 
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
