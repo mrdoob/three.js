@@ -563,6 +563,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		let mipmap;
 		const mipmaps = texture.mipmaps;
 
+		const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
+		const allocateMemory = ( textureProperties.__version === undefined );
+
 		if ( texture.isDepthTexture ) {
 
 			// populate depth texture with dummy data
@@ -639,7 +642,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			//
 
-			state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+			if ( useTexStorage && allocateMemory ) {
+
+				state.texStorage2D( _gl.TEXTURE_2D, 1, glInternalFormat, image.width, image.height );
+
+			} else {
+
+				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+
+			}
 
 		} else if ( texture.isDataTexture ) {
 
@@ -707,8 +718,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// set 0 level mipmap and then use GL to generate other mipmap levels
 
 			const levels = getMipLevels( texture, image, supportsMips );
-			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( texture.version === 1 );
 
 			if ( mipmaps.length > 0 && supportsMips ) {
 

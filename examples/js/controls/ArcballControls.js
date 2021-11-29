@@ -42,6 +42,8 @@
 	};
 
 	const _raycaster = new THREE.Raycaster();
+
+	const _offset = new THREE.Vector3();
 	/**
  *
  * @param {Camera} camera Virtual camera used in the scene
@@ -930,9 +932,9 @@
 									this.setFov( newFov );
 									this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
 
-									const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
+									_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
 
-									this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+									this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 								}
 
@@ -1322,9 +1324,9 @@
 					this.setFov( newFov );
 					this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
 
-					const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
+					_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
 
-					this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+					this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 					this.dispatchEvent( _changeEvent );
 
@@ -1614,11 +1616,10 @@
 
 			this.focus = ( point, size, amount = 1 ) => {
 
-				const focusPoint = point.clone(); //move center of camera (along with gizmos) towards point of interest
+				//move center of camera (along with gizmos) towards point of interest
+				_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
 
-				focusPoint.sub( this._gizmos.position ).multiplyScalar( amount );
-
-				this._translationMatrix.makeTranslation( focusPoint.x, focusPoint.y, focusPoint.z );
+				this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 				const gizmoStateTemp = this._gizmoMatrixState.clone();
 
@@ -2234,9 +2235,9 @@
 
 					}
 
-					let direction = scalePoint.clone().sub( this._v3_1 ).normalize().multiplyScalar( amount );
+					_offset.copy( scalePoint ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
 
-					this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+					this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 					if ( scaleGizmos ) {
 
@@ -2244,13 +2245,14 @@
 						const pos = this._v3_2;
 						distance = pos.distanceTo( scalePoint );
 						amount = distance - distance * sizeInverse;
-						direction = scalePoint.clone().sub( this._v3_2 ).normalize().multiplyScalar( amount );
+
+						_offset.copy( scalePoint ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
 
 						this._translationMatrix.makeTranslation( pos.x, pos.y, pos.z );
 
 						this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
 
-						this._m4_2.makeTranslation( direction.x, direction.y, direction.z ).multiply( this._translationMatrix );
+						this._m4_2.makeTranslation( _offset.x, _offset.y, _offset.z ).multiply( this._translationMatrix );
 
 						this._m4_2.multiply( this._scaleMatrix );
 

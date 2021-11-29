@@ -22,21 +22,31 @@ class SplitNode extends Node {
 		const node = this.node;
 		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );
 
-		const components = this.components;
+		if ( nodeTypeLength > 1 ) {
 
-		let type = null;
+			const components = this.components;
 
-		if ( components.length >= nodeTypeLength ) {
+			let type = null;
 
-			// need expand the input node
+			if ( components.length >= nodeTypeLength ) {
 
-			type = this.getNodeType( builder );
+				// need expand the input node
+
+				type = this.getNodeType( builder );
+
+			}
+
+			const nodeSnippet = node.build( builder, type );
+
+			return `${nodeSnippet}.${this.components}`;
+
+		} else {
+
+			// ignore components if node is a float
+
+			return node.build( builder );
 
 		}
-
-		const nodeSnippet = node.build( builder, type );
-
-		return `${nodeSnippet}.${this.components}`;
 
 	}
 

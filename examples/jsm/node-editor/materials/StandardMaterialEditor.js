@@ -1,5 +1,4 @@
-import { ObjectNode } from '../core/ObjectNode.js';
-import { LabelElement } from '../../libs/flow.module.js';
+import { ObjectNode, LabelElement } from '../../libs/flow.module.js';
 import { MeshStandardNodeMaterial, ColorNode, FloatNode } from '../../renderers/nodes/Nodes.js';
 import * as THREE from 'three';
 

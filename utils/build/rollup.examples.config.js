@@ -180,6 +180,7 @@ const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	// no non-module library
 	// https://unpkg.com/browse/web-ifc@0.0.17/
 	'loaders/IFCLoader.js',
+	'node-editor/**/*',
 
 	'renderers/webgl/**/*',
 	'renderers/webgpu/**/*',

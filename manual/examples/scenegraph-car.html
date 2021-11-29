@@ -1,0 +1,123 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Scenegraph - Car</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script src="resources/threejs-lessons-helper.js"></script> <!-- you can and should delete this script. it is only used on the site to help with errors -->
+<script type="module">
+import * as THREE from '../../build/three.module.js';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas});
+  renderer.setClearColor(0xAAAAAA);
+
+  const fov = 40;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 1000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(8, 4, 10);
+  camera.lookAt(0, 0, 0);
+
+  const scene = new THREE.Scene();
+
+  {
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
+  }
+  {
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, -2, -4);
+    scene.add(light);
+  }
+
+  const carWidth = 4;
+  const carHeight = 1;
+  const carLength = 8;
+
+  const bodyGeometry = new THREE.BoxGeometry(carWidth, carHeight, carLength);
+  const bodyMaterial = new THREE.MeshPhongMaterial({color: 0x6688AA});
+  const bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  scene.add(bodyMesh);
+
+  const wheelRadius = 1;
+  const wheelThickness = .5;
+  const wheelSegments = 6;
+  const wheelGeometry = new THREE.CylinderGeometry(
+      wheelRadius,     // top radius
+      wheelRadius,     // bottom radius
+      wheelThickness,  // height of cylinder
+      wheelSegments);
+  const wheelMaterial = new THREE.MeshPhongMaterial({color: 0x888888});
+  const wheelPositions = [
+    [-carWidth / 2 + wheelThickness / 2, -carHeight / 2,  carLength / 3],
+    [ carWidth / 2 + wheelThickness / 2, -carHeight / 2,  carLength / 3],
+    [-carWidth / 2 + wheelThickness / 2, -carHeight / 2, -carLength / 3],
+    [ carWidth / 2 + wheelThickness / 2, -carHeight / 2, -carLength / 3],
+  ];
+  const wheelMeshes = wheelPositions.map((position) => {
+    const mesh = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    mesh.position.set(...position);
+    mesh.rotation.z = Math.PI * .5;
+    scene.add(mesh);
+    return mesh;
+  });
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  // const carPosition = [0, 0, 0];
+
+  function render(time) {
+    time *= 0.001;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    wheelMeshes.forEach((obj) => {
+      obj.rotation.x = time;
+    });
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</script>
+</html>
+
+
