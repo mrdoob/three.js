@@ -14,7 +14,8 @@ import {
 	PlaneGeometry,
 	RawShaderMaterial,
 	Vector2,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	FramebufferTexture
 } from '../../../build/three.module.js';
 
 const _mipmapMaterial = _getMipmapMaterial();
@@ -68,42 +69,27 @@ class RoughnessMipmapper {
 
 		}
 
-		if ( width !== roughnessMap.image.width || height !== roughnessMap.image.height ) {
+		const newRoughnessTexture = new FramebufferTexture( width, height, roughnessMap.format );
+		newRoughnessTexture.wrapS = roughnessMap.wrapS;
+		newRoughnessTexture.wrapT = roughnessMap.wrapT;
+		newRoughnessTexture.minFilter = roughnessMap.minFilter;
+		newRoughnessTexture.magFilter = roughnessMap.magFilter;
 
-			const params = {
-				wrapS: roughnessMap.wrapS,
-				wrapT: roughnessMap.wrapT,
-				magFilter: roughnessMap.magFilter,
-				minFilter: roughnessMap.minFilter,
-				depthBuffer: false
-			};
+		material.roughnessMap = newRoughnessTexture;
 
-			const newRoughnessTarget = new WebGLRenderTarget( width, height, params );
+		if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
 
-			newRoughnessTarget.texture.generateMipmaps = true;
+		if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap;
 
-			// Setting the render target causes the memory to be allocated.
+		// Copy UV transform parameters
 
-			_renderer.setRenderTarget( newRoughnessTarget );
+		material.roughnessMap.offset.copy( roughnessMap.offset );
+		material.roughnessMap.repeat.copy( roughnessMap.repeat );
+		material.roughnessMap.center.copy( roughnessMap.center );
+		material.roughnessMap.rotation = roughnessMap.rotation;
 
-			material.roughnessMap = newRoughnessTarget.texture;
-
-			if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
-
-			if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap;
-
-			// Copy UV transform parameters
-
-			material.roughnessMap.offset.copy( roughnessMap.offset );
-			material.roughnessMap.repeat.copy( roughnessMap.repeat );
-			material.roughnessMap.center.copy( roughnessMap.center );
-			material.roughnessMap.rotation = roughnessMap.rotation;
-			material.roughnessMap.image = roughnessMap.image;
-
-			material.roughnessMap.matrixAutoUpdate = roughnessMap.matrixAutoUpdate;
-			material.roughnessMap.matrix.copy( roughnessMap.matrix );
-
-		}
+		material.roughnessMap.matrixAutoUpdate = roughnessMap.matrixAutoUpdate;
+		material.roughnessMap.matrix.copy( roughnessMap.matrix );
 
 		_mipmapMaterial.uniforms.roughnessMap.value = roughnessMap;
 
@@ -132,8 +118,6 @@ class RoughnessMipmapper {
 			_renderer.render( _mesh, _flatCamera );
 
 			_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
-
-			_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
 
 		}
 
