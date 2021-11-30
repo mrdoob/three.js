@@ -92,7 +92,7 @@
 		<p>맨 처음에 있던 HTML 파일을 복사해서 열어놨다면, 아무것도 보이지 않을 것입니다. 왜냐하면 아직 아무것도 렌더링하지 않았기 때문입니다. 이를 해결하려면 <strong>render or animate loop</strong>라는 것이 필요합니다..</p>
 
 		<code>
-		function animate () {
+		function animate() {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -147,7 +147,7 @@
 
 					camera.position.z = 5;
 
-					function animate () {
+					function animate() {
 						requestAnimationFrame( animate );
 
 						cube.rotation.x += 0.01;

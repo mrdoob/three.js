@@ -91,7 +91,7 @@
 		<p>现在，如果将之前写好的代码复制到HTML文件中，你不会在页面中看到任何东西。这是因为我们还没有对它进行真正的渲染。为此，我们需要使用一个被叫做“<strong>渲染循环</strong>”（render loop）或者“<strong>动画循环</strong>”（animate loop）的东西。</p>
 
 		<code>
-		function animate () {
+		function animate() {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -145,7 +145,7 @@
 
 					camera.position.z = 5;
 
-					function animate () {
+					function animate() {
 						requestAnimationFrame( animate );
 
 						cube.rotation.x += 0.01;

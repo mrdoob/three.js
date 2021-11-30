@@ -91,7 +91,7 @@
 		<p>先ほど作成したHTMLファイルに上のコードをコピーしても何も表示されません。これは、実際にはまだ何も描画していないからです。そのためには、<strong>レンダリングまたはアニメーションループ</strong>と呼ばれるものが必要です。</p>
 
 		<code>
-		function animate () {
+		function animate() {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -144,7 +144,7 @@
 
 					camera.position.z = 5;
 
-					function animate () {
+					function animate() {
 						requestAnimationFrame( animate );
 
 						cube.rotation.x += 0.01;
