@@ -197,9 +197,11 @@ class FileLoader extends Loader {
 
 				const callbacks = loading[ url ];
 
-				if( ! callbacks ) {
+				if ( ! callbacks ) {
+
 					// When onLoad was called and url was deleted in `loading`
 					throw err;
+
 				}
 
 				delete loading[ url ];
