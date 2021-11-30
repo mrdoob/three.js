@@ -196,6 +196,12 @@ class FileLoader extends Loader {
 				// Abort errors and other errors are handled the same
 
 				const callbacks = loading[ url ];
+
+				if( ! callbacks ) {
+					// When onLoad was called and url was deleted in `loading`
+					throw err;
+				}
+
 				delete loading[ url ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
