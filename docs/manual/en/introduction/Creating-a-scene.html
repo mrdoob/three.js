@@ -91,7 +91,7 @@
 		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render or animate loop</strong>.</p>
 
 		<code>
-		function animate() {
+		const animate = () => {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -145,7 +145,7 @@
 
 					camera.position.z = 5;
 
-					const animate = function () {
+					const animate = () => {
 						requestAnimationFrame( animate );
 
 						cube.rotateX( 0.01 );
