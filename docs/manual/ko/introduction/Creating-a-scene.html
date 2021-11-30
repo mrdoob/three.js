@@ -92,7 +92,7 @@
 		<p>맨 처음에 있던 HTML 파일을 복사해서 열어놨다면, 아무것도 보이지 않을 것입니다. 왜냐하면 아직 아무것도 렌더링하지 않았기 때문입니다. 이를 해결하려면 <strong>render or animate loop</strong>라는 것이 필요합니다..</p>
 
 		<code>
-		function animate() {
+		const animate = () => {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -108,8 +108,8 @@
 		<p>다음 코드를 <strong>animate</strong>함수 안의 <strong>renderer.render</strong> 바로 위에 넣어주세요.</p>
 
 		<code>
-		cube.rotation.x += 0.01;
-		cube.rotation.y += 0.01;
+		cube.rotateX( 0.01 );
+		cube.rotateY( 0.01 );
 		</code>
 
 		<p>위 코드는 모든 프레임마다 실행되면서 (일반적으로 1초에 60번), 큐브가 멋지게 돌아가도록 만들어 줄겁니다. 기본적으로 앱을 실행하는 동안 무언가를 움직이거나 변형하고 싶을때, animate loop를 사용하면 됩니다. 물론 다른 함수를 불러올 수도 있고, <strong>animate</strong> 함수 안에 수백줄을 작성할 필요도 없습니다.</p>
@@ -147,11 +147,11 @@
 
 					camera.position.z = 5;
 
-					const animate = function () {
+					const animate = () => {
 						requestAnimationFrame( animate );
 
-						cube.rotation.x += 0.01;
-						cube.rotation.y += 0.01;
+						cube.rotateX( 0.01 );
+						cube.rotateY( 0.01 );
 
 						renderer.render( scene, camera );
 					};

@@ -91,7 +91,7 @@
 		<p>先ほど作成したHTMLファイルに上のコードをコピーしても何も表示されません。これは、実際にはまだ何も描画していないからです。そのためには、<strong>レンダリングまたはアニメーションループ</strong>と呼ばれるものが必要です。</p>
 
 		<code>
-		function animate() {
+		const animate = () => {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -107,8 +107,8 @@
 		<p><strong>animate</strong> 関数の中で<strong>renderer.render</strong> を呼び出している箇所のすぐ上に以下のコードを追加します。</p>
 
 		<code>
-		cube.rotation.x += 0.01;
-		cube.rotation.y += 0.01;
+		cube.rotateX( 0.01 );
+		cube.rotateY( 0.01 );
 		</code>
 
 		<p>これはフレームごとに実行され(通常は1秒間に60回)、キューブに素敵な回転アニメーションを与えます。基本的に、アプリの実行中に移動または変更したいものはすべて、アニメーションループを通過する必要があります。もちろん、そこから他の関数を呼び出すこともできます。</p>
@@ -144,11 +144,11 @@
 
 					camera.position.z = 5;
 
-					const animate = function () {
+					const animate = () => {
 						requestAnimationFrame( animate );
 
-						cube.rotation.x += 0.01;
-						cube.rotation.y += 0.01;
+						cube.rotateX( 0.01 );
+						cube.rotateY( 0.01 );
 
 						renderer.render( scene, camera );
 					};

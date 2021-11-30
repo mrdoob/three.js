@@ -91,7 +91,7 @@
 		<p>现在，如果将之前写好的代码复制到HTML文件中，你不会在页面中看到任何东西。这是因为我们还没有对它进行真正的渲染。为此，我们需要使用一个被叫做“<strong>渲染循环</strong>”（render loop）或者“<strong>动画循环</strong>”（animate loop）的东西。</p>
 
 		<code>
-		function animate() {
+		const animate = () => {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -108,8 +108,8 @@
 		<p>将下列代码添加到animate()函数中<strong>renderer.render</strong>调用的上方：</p>
 
 		<code>
-		cube.rotation.x += 0.01;
-		cube.rotation.y += 0.01;
+		cube.rotateX( 0.01 );
+		cube.rotateY( 0.01 );
 		</code>
 
 		<p>这段代码每帧都会执行（正常情况下是60次/秒），这就让立方体有了一个看起来很不错的旋转动画。基本上来说，当应用程序运行时，如果你想要移动或者改变任何场景中的东西，都必须要经过这个动画循环。当然，你可以在这个动画循环里调用别的函数，这样你就不会写出有上百行代码的<strong>animate</strong>函数。</p>
@@ -145,11 +145,11 @@
 
 					camera.position.z = 5;
 
-					const animate = function () {
+					const animate = () => {
 						requestAnimationFrame( animate );
 
-						cube.rotation.x += 0.01;
-						cube.rotation.y += 0.01;
+						cube.rotateX( 0.01 );
+						cube.rotateY( 0.01 );
 
 						renderer.render( scene, camera );
 					};
