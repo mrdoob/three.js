@@ -168,7 +168,7 @@
 		</p>
 
 		<code>
-		const animate = () => {
+		function animate () {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
@@ -200,8 +200,8 @@
 		</p>
 
 		<code>
-		cube.rotateX( 0.01 );
-		cube.rotateY( 0.01 );
+		cube.rotation.x += 0.01;
+		cube.rotation.y += 0.01;
 		</code>
 
 		<p>
@@ -249,11 +249,11 @@
 
 					camera.position.z = 5;
 
-					const animate = () => {
+					function animate () {
 						requestAnimationFrame( animate );
 
-						cube.rotateX( 0.01 );
-						cube.rotateY( 0.01 );
+						cube.rotation.x += 0.01;
+						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
 					};
