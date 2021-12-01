@@ -12,7 +12,8 @@ import {
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	WebGLMultisampleRenderTarget
 } from '../../../build/three.module.js';
 
 class Refractor extends Mesh {
@@ -30,6 +31,7 @@ class Refractor extends Mesh {
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Refractor.RefractorShader;
+		const antialias = options.antialias || false;
 
 		//
 
@@ -50,7 +52,9 @@ class Refractor extends Mesh {
 			format: RGBFormat
 		};
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
+		const renderTarget = antialias 
+			? new WebGLMultisampleRenderTarget( textureWidth, textureHeight, parameters )
+			: new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
 		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
