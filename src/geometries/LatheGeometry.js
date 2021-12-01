@@ -40,7 +40,9 @@ class LatheGeometry extends BufferGeometry {
 		const uv = new Vector2();
 		const normal = new Vector3();
 		const curNormal = new Vector3();
-		const prevNormal = newVector3();
+		const prevNormal = new Vector3();
+		let dx = 0;
+		let dy = 0;
 		
 		// pre-compute normals for initial "meridian"
 		
