@@ -5,6 +5,20 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	const geometries = {};
 	const wireframeAttributes = new WeakMap();
+	const useWeakRef = typeof WeakRef !== 'undefined' && typeof FinalizationRegistry !== 'undefined';
+	let finalizer = null;
+	let weakRefGeometries = null;
+
+	if ( useWeakRef ) {
+
+		weakRefGeometries = new Set();
+		finalizer = new FinalizationRegistry( handle => {
+
+			weakRefGeometries.delete( handle );
+
+		} );
+
+	}
 
 	function onGeometryDispose( event ) {
 
@@ -56,6 +70,14 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 		geometry.addEventListener( 'dispose', onGeometryDispose );
 
 		geometries[ geometry.id ] = true;
+
+		if ( useWeakRef ) {
+
+			const handle = new WeakRef( geometry );
+			weakRefGeometries.add( handle );
+			finalizer.register( geometry, handle );
+
+		}
 
 		info.memory.geometries ++;
 
@@ -180,12 +202,35 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	}
 
+	function dispose() {
+
+		if ( useWeakRef ) {
+
+			weakRefGeometries.forEach( handle => {
+
+				const geometry = handle.deref();
+				if ( geometry ) {
+
+					onGeometryDispose( { target: geometry } );
+
+				}
+
+			} );
+			weakRefGeometries.clear();
+
+		}
+
+		geometries.clear();
+
+	}
+
 	return {
 
 		get: get,
 		update: update,
 
-		getWireframeAttribute: getWireframeAttribute
+		getWireframeAttribute: getWireframeAttribute,
+		dispose: dispose
 
 	};
 

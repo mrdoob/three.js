@@ -573,6 +573,7 @@ function WebGLRenderer( parameters = {} ) {
 		cubeuvmaps.dispose();
 		objects.dispose();
 		bindingStates.dispose();
+		geometries.dispose();
 
 		xr.dispose();
 
