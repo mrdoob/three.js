@@ -565,6 +565,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
 		const allocateMemory = ( textureProperties.__version === undefined );
+		const levels = getMipLevels( texture, image, supportsMips );
 
 		if ( texture.isDepthTexture ) {
 
@@ -677,6 +678,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isCompressedTexture ) {
 
+			if ( useTexStorage && allocateMemory ) {
+
+				state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height );
+
+			}
+
 			for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 				mipmap = mipmaps[ i ];
@@ -685,7 +692,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( glFormat !== null ) {
 
-						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+						if ( useTexStorage ) {
+
+							state.compressedTexSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+						} else {
+
+							state.compressedTexImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+						}
 
 					} else {
 
@@ -695,7 +710,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				} else {
 
-					state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					if ( useTexStorage ) {
+
+						state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+					} else {
+
+						state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
+					}
 
 				}
 
@@ -720,8 +743,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// use manually created mipmaps if available
 			// if there are no manual mipmaps
 			// set 0 level mipmap and then use GL to generate other mipmap levels
-
-			const levels = getMipLevels( texture, image, supportsMips );
 
 			if ( mipmaps.length > 0 && supportsMips ) {
 
