@@ -43,9 +43,9 @@ class LatheGeometry extends BufferGeometry {
 		const prevNormal = new Vector3();
 		let dx = 0;
 		let dy = 0;
-		
+
 		// pre-compute normals for initial "meridian"
-		
+
 		for ( let j = 0; j <= ( points.length - 1 ); j ++ ) {
 
 			switch ( j ) {
