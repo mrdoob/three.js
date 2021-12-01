@@ -197,9 +197,10 @@ class FileLoader extends Loader {
 
 				const callbacks = loading[ url ];
 
-				if ( ! callbacks ) {
+				if ( callbacks === undefined ) {
 
 					// When onLoad was called and url was deleted in `loading`
+					this.manager.itemError( url );
 					throw err;
 
 				}
