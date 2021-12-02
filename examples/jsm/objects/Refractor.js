@@ -262,6 +262,13 @@ class Refractor extends Mesh {
 
 		};
 
+		this.dispose = function () {
+
+			renderTarget.dispose();
+			scope.material.dispose();
+
+		};
+
 	}
 
 }
