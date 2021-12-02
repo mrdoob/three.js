@@ -23,27 +23,27 @@ import { CheckerEditor } from './procedural/CheckerEditor.js';
 import { EventDispatcher } from 'three';
 
 export const ClassLib = {
-	'StandardMaterialEditor': StandardMaterialEditor,
-	'OperatorEditor': OperatorEditor,
-	'NormalizeEditor': NormalizeEditor,
-	'InvertEditor': InvertEditor,
-	'LimiterEditor': LimiterEditor,
-	'DotEditor': DotEditor,
-	'PowerEditor': PowerEditor,
-	'TrigonometryEditor': TrigonometryEditor,
-	'FloatEditor': FloatEditor,
-	'Vector2Editor': Vector2Editor,
-	'Vector3Editor': Vector3Editor,
-	'Vector4Editor': Vector4Editor,
-	'SliderEditor': SliderEditor,
-	'ColorEditor': ColorEditor,
-	'BlendEditor': BlendEditor,
-	'UVEditor': UVEditor,
-	'PositionEditor': PositionEditor,
-	'NormalEditor': NormalEditor,
-	'TimerEditor': TimerEditor,
-	'OscillatorEditor': OscillatorEditor,
-	'CheckerEditor': CheckerEditor
+	StandardMaterialEditor,
+	OperatorEditor,
+	NormalizeEditor,
+	InvertEditor,
+	LimiterEditor,
+	DotEditor,
+	PowerEditor,
+	TrigonometryEditor,
+	FloatEditor,
+	Vector2Editor,
+	Vector3Editor,
+	Vector4Editor,
+	SliderEditor,
+	ColorEditor,
+	BlendEditor,
+	UVEditor,
+	PositionEditor,
+	NormalEditor,
+	TimerEditor,
+	OscillatorEditor,
+	CheckerEditor
 };
 
 export class NodeEditor extends EventDispatcher {
