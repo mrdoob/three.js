@@ -1,27 +1,6 @@
 function WebGLExtensions( gl ) {
 
 	const extensions = {};
-	const aliasses = {
-		'WEBGL_depth_texture': [
-			'WEBGL_depth_texture',
-			'MOZ_WEBGL_depth_texture',
-			'WEBKIT_WEBGL_depth_texture'
-		],
-		'EXT_texture_filter_anisotropic': [
-			'EXT_texture_filter_anisotropic',
-			'MOZ_EXT_texture_filter_anisotropic',
-			'WEBKIT_EXT_texture_filter_anisotropic'
-		],
-		'WEBGL_compressed_texture_s3tc': [
-			'WEBGL_compressed_texture_s3tc',
-			'MOZ_WEBGL_compressed_texture_s3tc',
-			'WEBKIT_WEBGL_compressed_texture_s3tc'
-		],
-		'WEBGL_compressed_texture_pvrtc': [
-			'WEBGL_compressed_texture_pvrtc',
-			'WEBKIT_WEBGL_compressed_texture_pvrtc'
-		]
-	};
 
 	function getExtension( name ) {
 
@@ -33,23 +12,26 @@ function WebGLExtensions( gl ) {
 
 		let extension;
 
-		if ( aliasses[ name ] === undefined ) {
+		switch ( name ) {
 
-			extension = gl.getExtension( name );
+			case 'WEBGL_depth_texture':
+				extension = gl.getExtension( 'WEBGL_depth_texture' ) || gl.getExtension( 'MOZ_WEBGL_depth_texture' ) || gl.getExtension( 'WEBKIT_WEBGL_depth_texture' );
+				break;
 
-		} else {
+			case 'EXT_texture_filter_anisotropic':
+				extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+				break;
 
-			for ( let i = 0; i < aliasses[ name ].length; i ++ ) {
+			case 'WEBGL_compressed_texture_s3tc':
+				extension = gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
+				break;
 
-				extension = gl.getExtension( aliasses[ name ][ i ] );
+			case 'WEBGL_compressed_texture_pvrtc':
+				extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+				break;
 
-				if ( extension !== null ) {
-
-					break;
-
-				}
-
-			}
+			default:
+				extension = gl.getExtension( name );
 
 		}
 
