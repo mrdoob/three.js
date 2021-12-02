@@ -1,6 +1,6 @@
 import { ObjectNode, LabelElement } from '../../libs/flow.module.js';
 import { MeshStandardNodeMaterial, ColorNode, FloatNode } from '../../renderers/nodes/Nodes.js';
-import * as THREE from 'three';
+import * as THREE from '../../../../build/three.module.js';
 
 const NULL_COLOR = new ColorNode();
 const NULL_FLOAT = new FloatNode();

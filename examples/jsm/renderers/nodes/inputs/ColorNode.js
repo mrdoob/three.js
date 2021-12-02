@@ -1,5 +1,5 @@
 import InputNode from '../core/InputNode.js';
-import { Color } from 'three';
+import { Color } from '../../../../../build/three.module.js';
 
 class ColorNode extends InputNode {
 

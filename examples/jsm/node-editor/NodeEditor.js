@@ -20,7 +20,8 @@ import { NormalEditor } from './accessors/NormalEditor.js';
 import { TimerEditor } from './utils/TimerEditor.js';
 import { OscillatorEditor } from './utils/OscillatorEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
-import { EventDispatcher } from 'three';
+
+import { EventDispatcher } from '../../../build/three.module.js';
 
 export const ClassLib = {
 	StandardMaterialEditor,
