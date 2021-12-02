@@ -21,7 +21,7 @@ class TextureNode extends InputNode {
 
 		if ( ! texture || texture.isTexture !== true ) {
 
-			throw new Error( `TextureNode: Need a three.js texture.` );
+			throw new Error( 'TextureNode: Need a three.js texture.' );
 
 		}
 

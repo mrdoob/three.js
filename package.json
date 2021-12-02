@@ -39,14 +39,18 @@
       "html"
     ],
     "globals": {
-      "potpack": true,
-      "fflate": true,
-      "ZSTDDecoder": true,
-      "bodymovin": true,
-      "OIMO": true,
-      "Stats": true,
-      "XRWebGLBinding": true,
-      "XRWebGLLayer": true
+      "potpack": "readonly",
+      "fflate": "readonly",
+      "ZSTDDecoder": "readonly",
+      "bodymovin": "readonly",
+      "OIMO": "readonly",
+      "Stats": "readonly",
+      "XRWebGLBinding": "readonly",
+      "XRWebGLLayer": "readonly",
+
+      "GPUShaderStage": "readonly",
+      "GPUBufferUsage": "readonly",
+      "GPUTextureUsage": "readonly"
     },
     "rules": {
       "quotes": [

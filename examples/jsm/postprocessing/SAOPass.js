@@ -78,7 +78,7 @@ class SAOPass extends Pass {
 			format: RGBAFormat
 		} );
 		this.depthRenderTarget = this.normalRenderTarget.clone();
-		
+
 		let depthTexture;
 
 		if ( this.supportsDepthTextureExtension ) {

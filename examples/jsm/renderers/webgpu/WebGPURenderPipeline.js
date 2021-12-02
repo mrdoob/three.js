@@ -706,7 +706,7 @@ class WebGPURenderPipeline {
 		const nodeAttributes = nodeBuilder.attributes;
 		const attributes = [];
 
-		for ( let slot = 0; slot < nodeAttributes.length; slot++ ) {
+		for ( let slot = 0; slot < nodeAttributes.length; slot ++ ) {
 
 			const nodeAttribute = nodeAttributes[ slot ];
 

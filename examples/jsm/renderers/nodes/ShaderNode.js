@@ -209,9 +209,9 @@ export const cond = ( ...params ) => {
 
 export const vec2 = ( ...params ) => {
 
-	if ( params[0]?.isNode === true ) {
+	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[0], 'vec2' ) );
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec2' ) );
 
 	} else {
 
@@ -231,9 +231,9 @@ export const vec2 = ( ...params ) => {
 
 export const vec3 = ( ...params ) => {
 
-	if ( params[0]?.isNode === true ) {
+	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[0], 'vec3' ) );
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec3' ) );
 
 	} else {
 
@@ -253,9 +253,9 @@ export const vec3 = ( ...params ) => {
 
 export const vec4 = ( ...params ) => {
 
-	if ( params[0]?.isNode === true ) {
+	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[0], 'vec4' ) );
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec4' ) );
 
 	} else {
 
