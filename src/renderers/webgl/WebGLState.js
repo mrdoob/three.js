@@ -878,6 +878,20 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function compressedTexSubImage2D() {
+
+		try {
+
+			gl.compressedTexSubImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
 	function texStorage2D() {
 
 		try {
@@ -1070,6 +1084,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		texStorage2D: texStorage2D,
 		texSubImage2D: texSubImage2D,
+		compressedTexSubImage2D: compressedTexSubImage2D,
 
 		scissor: scissor,
 		viewport: viewport,
