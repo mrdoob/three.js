@@ -4,7 +4,7 @@ import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensi
 
 const WebglContextMock = function ( supportedExtensions ) {
 
-	this.supportedExtensions = supportedExtensions ?? [];
+	this.supportedExtensions = supportedExtensions || [];
 	this.getExtension = function ( name ) {
 
 		if ( this.supportedExtensions.indexOf( name ) > - 1 ) {
