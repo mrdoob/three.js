@@ -6,7 +6,7 @@ import { ShaderNode,
 
 import { LinearEncoding,
 	sRGBEncoding/*, RGBEEncoding, RGBM7Encoding, RGBM16Encoding,
-	RGBDEncoding, GammaEncoding*/ } from 'three';
+	RGBDEncoding, GammaEncoding*/ } from '../../../../../build/three.module.js';
 
 export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
