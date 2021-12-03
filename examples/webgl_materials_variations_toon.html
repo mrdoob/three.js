@@ -77,6 +77,7 @@
 					}
 
 					const gradientMap = new THREE.DataTexture( colors, colors.length, 1, format );
+					gradientMap.needsUpdate = true;
 
 					for ( let beta = 0; beta <= 1.0; beta += stepSize ) {
 

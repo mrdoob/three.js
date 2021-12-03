@@ -878,6 +878,20 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function texSubImage3D() {
+
+		try {
+
+			gl.texSubImage3D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
 	function compressedTexSubImage2D() {
 
 		try {
@@ -897,6 +911,20 @@ function WebGLState( gl, extensions, capabilities ) {
 		try {
 
 			gl.texStorage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function texStorage3D() {
+
+		try {
+
+			gl.texStorage3D.apply( gl, arguments );
 
 		} catch ( error ) {
 
@@ -1083,7 +1111,9 @@ function WebGLState( gl, extensions, capabilities ) {
 		texImage3D: texImage3D,
 
 		texStorage2D: texStorage2D,
+		texStorage3D: texStorage3D,
 		texSubImage2D: texSubImage2D,
+		texSubImage3D: texSubImage3D,
 		compressedTexSubImage2D: compressedTexSubImage2D,
 
 		scissor: scissor,

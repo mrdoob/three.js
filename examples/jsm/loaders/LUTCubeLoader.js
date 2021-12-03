@@ -124,6 +124,7 @@ export class LUTCubeLoader extends Loader {
 		texture.wrapS = ClampToEdgeWrapping;
 		texture.wrapT = ClampToEdgeWrapping;
 		texture.generateMipmaps = false;
+		texture.needsUpdate = true;
 
 		const texture3D = new DataTexture3D();
 		texture3D.image.data = data;
@@ -138,6 +139,7 @@ export class LUTCubeLoader extends Loader {
 		texture3D.wrapT = ClampToEdgeWrapping;
 		texture3D.wrapR = ClampToEdgeWrapping;
 		texture3D.generateMipmaps = false;
+		texture3D.needsUpdate = true;
 
 		return {
 			title,
