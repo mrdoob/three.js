@@ -189,11 +189,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			return Math.log2( Math.max( image.width, image.height ) ) + 1;
 
-		} else if ( texture.mipmaps.length > 0 ) {
+		} else if ( texture.mipmaps !== undefined && texture.mipmaps.length > 0 ) {
 
 			// user-defined mipmaps
 
 			return texture.mipmaps.length;
+
+		} else if ( texture.isCompressedTexture && Array.isArray( texture.image ) ) {
+
+			return image.mipmaps.length;
 
 		} else {
 
@@ -900,11 +904,21 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
+		const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
+		const allocateMemory = ( textureProperties.__version === undefined );
+		let levels = getMipLevels( texture, image, supportsMips );
+
 		setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
 
 		let mipmaps;
 
 		if ( isCompressed ) {
+
+			if ( useTexStorage && allocateMemory ) {
+
+				state.texStorage2D( _gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, image.width, image.height );
+
+			}
 
 			for ( let i = 0; i < 6; i ++ ) {
 
@@ -918,7 +932,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( glFormat !== null ) {
 
-							state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+							if ( useTexStorage ) {
+
+								state.compressedTexSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+							} else {
+
+								state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+							}
 
 						} else {
 
@@ -928,7 +950,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					} else {
 
-						state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+						if ( useTexStorage ) {
+
+							state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+						} else {
+
+							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
+						}
 
 					}
 
@@ -940,30 +970,74 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			mipmaps = texture.mipmaps;
 
+			if ( useTexStorage && allocateMemory ) {
+
+				// TODO: Uniformly handle mipmap definitions
+				// Normal textures and compressed cube textures define base level + mips with their mipmap array
+				// Uncompressed cube textures use their mipmap array only for mips (no base level)
+
+				if ( mipmaps.length > 0 ) levels ++;
+
+				state.texStorage2D( _gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, cubeImage[ 0 ].width, cubeImage[ 0 ].height );
+
+			}
+
 			for ( let i = 0; i < 6; i ++ ) {
 
 				if ( isDataTexture ) {
 
-					state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+					if ( useTexStorage ) {
+
+						state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, cubeImage[ i ].width, cubeImage[ i ].height, glFormat, glType, cubeImage[ i ].data );
+
+					} else {
+
+						state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+
+					}
 
 					for ( let j = 0; j < mipmaps.length; j ++ ) {
 
 						const mipmap = mipmaps[ j ];
 						const mipmapImage = mipmap.image[ i ].image;
 
-						state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
+						if ( useTexStorage ) {
+
+							state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, mipmapImage.width, mipmapImage.height, glFormat, glType, mipmapImage.data );
+
+						} else {
+
+							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
+
+						}
 
 					}
 
 				} else {
 
-					state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+					if ( useTexStorage ) {
+
+						state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, glFormat, glType, cubeImage[ i ] );
+
+					} else {
+
+						state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+
+					}
 
 					for ( let j = 0; j < mipmaps.length; j ++ ) {
 
 						const mipmap = mipmaps[ j ];
 
-						state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+						if ( useTexStorage ) {
+
+							state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, glFormat, glType, mipmap.image[ i ] );
+
+						} else {
+
+							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+
+						}
 
 					}
 
