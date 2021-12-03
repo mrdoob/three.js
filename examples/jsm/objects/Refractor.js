@@ -53,7 +53,8 @@ class Refractor extends Mesh {
 		};
 
 		let renderTarget = null;
-		if (multisample > 0) {
+
+		if ( multisample > 0 ) {
 			
 			renderTarget = new WebGLMultisampleRenderTarget( textureWidth, textureHeight, parameters );
 			renderTarget.samples = multisample;
