@@ -14,7 +14,7 @@ vec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {
 
 	#ifdef USE_GRADIENTMAP
 
-		return texture2D( gradientMap, coord ).rgb;
+		return vec3( texture2D( gradientMap, coord ).r );
 
 	#else
 

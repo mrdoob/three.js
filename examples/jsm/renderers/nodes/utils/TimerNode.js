@@ -3,7 +3,7 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class TimerNode extends FloatNode {
 
-	static LOCAL = 'local';	
+	static LOCAL = 'local';
 	static GLOBAL = 'global';
 	static DELTA = 'delta';
 

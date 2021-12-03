@@ -48,12 +48,21 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x444488 );
 
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
 				// Materials
 
 				const cubeWidth = 400;
 				const numberOfSphersPerSide = 5;
 				const sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
 				const stepSize = 1.0 / numberOfSphersPerSide;
+				const format = ( renderer.capabilities.isWebGL2 ) ? THREE.RedFormat : THREE.LuminanceFormat;
 
 				const geometry = new THREE.SphereGeometry( sphereRadius, 32, 16 );
 
@@ -67,10 +76,8 @@
 
 					}
 
-					const gradientMap = new THREE.DataTexture( colors, colors.length, 1, THREE.LuminanceFormat );
-					gradientMap.minFilter = THREE.NearestFilter;
-					gradientMap.magFilter = THREE.NearestFilter;
-					gradientMap.generateMipmaps = false;
+					const gradientMap = new THREE.DataTexture( colors, colors.length, 1, format );
+					gradientMap.needsUpdate = true;
 
 					for ( let beta = 0; beta <= 1.0; beta += stepSize ) {
 
@@ -137,12 +144,6 @@
 				particleLight.add( pointLight );
 
 				//
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				effect = new OutlineEffect( renderer );
 

@@ -1,4 +1,4 @@
-export const REVISION = '135dev';
+export const REVISION = '136dev';
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export const CullFaceNone = 0;
@@ -159,7 +159,6 @@ export const LinearEncoding = 3000;
 export const sRGBEncoding = 3001;
 export const GammaEncoding = 3007;
 export const RGBEEncoding = 3002;
-export const LogLuvEncoding = 3003;
 export const RGBM7Encoding = 3004;
 export const RGBM16Encoding = 3005;
 export const RGBDEncoding = 3006;

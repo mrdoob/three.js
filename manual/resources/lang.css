@@ -1,0 +1,81 @@
+/* https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow.css */
+pre.prettyprint .str { color: #718c00; } /* string */
+pre.prettyprint .kwd { color: #8959a8; } /* keyword */
+pre.prettyprint .com { color: #8e908c; } /* comment */
+pre.prettyprint .typ { color: #4271ae; } /* type */
+pre.prettyprint .lit { color: #f5871f; } /* literal */
+pre.prettyprint .pun { color: #4d4d4c; } /* punctuation */
+pre.prettyprint .pln { color: #4d4d4c; } /* plaintext */
+pre.prettyprint .tag { color: #c82829 } /* html tag */
+pre.prettyprint .atn { color: #f5871f } /* attribute name */
+pre.prettyprint .atv { color: #3e999f } /* attribute value */
+pre.prettyprint .dec { color: #f5871f; } /* decimal */
+pre.prettyprint .var { color: #4271ae } /* variable name */
+pre.prettyprint .fun { color: #4271ae } /* function name */
+
+pre.prettyprint ul.modifiedlines {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+pre.prettyprint ul.modifiedlines li.linemodified {
+    list-style-type: none;
+    background-color: #ffffff;
+}
+
+pre.prettyprint ul.modifiedlines li.linedeleted {
+    list-style-type: none;
+    background-color: #ffebe9;
+}
+
+pre.prettyprint ul.modifiedlines li.lineadded {
+    list-style-type: none;
+    background-color: #e6ffec;
+}
+
+pre.prettyprint, code.prettyprint, .dos {
+    background: #f5f5f5;
+    font-family: 'Roboto Mono', monospace;
+    font-size: calc(var(--font-size) - 1px);
+    line-height: calc(var(--line-height) - 1px);
+    margin: 16px calc(-1 * var(--page-padding));
+    padding: calc(var(--page-padding) - 6px) var(--page-padding);
+    overflow: auto;
+    white-space: pre-wrap;
+    box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+
+	/* https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.css */
+	pre.prettyprint .str { color: #b5bd68; } /* string */
+	pre.prettyprint .kwd { color: #b294bb; } /* keyword */
+	pre.prettyprint .com { color: #969896; } /* comment */
+	pre.prettyprint .typ { color: #81a2be; } /* type */
+	pre.prettyprint .lit { color: #de935f; } /* literal */
+	pre.prettyprint .pun { color: #c5c8c6; } /* punctuation */
+	pre.prettyprint .pln { color: #c5c8c6; } /* plaintext */
+	pre.prettyprint .tag { color: #cc6666 } /* html tag */
+	pre.prettyprint .atn { color: #de935f } /* attribute name */
+	pre.prettyprint .atv { color: #8abeb7 } /* attribute value */
+	pre.prettyprint .dec { color: #de935f; } /* decimal */
+	pre.prettyprint .var { color: #cc6666 } /* variable name */
+	pre.prettyprint .fun { color: #81a2be } /* function name */
+
+	pre.prettyprint ul.modifiedlines li.linemodified {
+			background-color: #222222;
+	}
+
+	pre.prettyprint ul.modifiedlines li.linedeleted {
+			background-color: #412e32;
+	}
+
+	pre.prettyprint ul.modifiedlines li.lineadded {
+			background-color: #293832;
+	}
+
+	pre.prettyprint, code.prettyprint, .dos {
+		background: #333333;
+	}
+
+}

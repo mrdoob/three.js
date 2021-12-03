@@ -21,7 +21,7 @@ import {
 	WebGLRenderTarget,
 	ZeroFactor
 } from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
 import { SSAOShader } from '../shaders/SSAOShader.js';
 import { SSAOBlurShader } from '../shaders/SSAOShader.js';
@@ -413,6 +413,7 @@ class SSAOPass extends Pass {
 		this.noiseTexture = new DataTexture( data, width, height, RGBAFormat, FloatType );
 		this.noiseTexture.wrapS = RepeatWrapping;
 		this.noiseTexture.wrapT = RepeatWrapping;
+		this.noiseTexture.needsUpdate = true;
 
 	}
 

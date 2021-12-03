@@ -94,9 +94,18 @@ class GLTFExporter {
 	 * Parse scenes and generate GLTF output
 	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
+	 * @param  {Function} onError  Callback on errors
 	 * @param  {Object} options options
 	 */
-	parse( input, onDone, options ) {
+	parse( input, onDone, onError, options ) {
+
+		if ( typeof onError === 'object' ) {
+
+			console.warn( 'THREE.GLTFExporter: parse() expects options as the fourth argument now.' );
+
+			options = onError;
+
+		}
 
 		const writer = new GLTFWriter();
 		const plugins = [];
@@ -108,7 +117,7 @@ class GLTFExporter {
 		}
 
 		writer.setPlugins( plugins );
-		writer.write( input, onDone, options );
+		writer.write( input, onDone, options ).catch( onError );
 
 	}
 
@@ -118,15 +127,7 @@ class GLTFExporter {
 
 		return new Promise( function ( resolve, reject ) {
 
-			try {
-
-				scope.parse( input, resolve, options );
-
-			} catch ( e ) {
-
-				reject( e );
-
-			}
+			scope.parse( input, resolve, reject, options );
 
 		} );
 
@@ -407,7 +408,7 @@ class GLTFWriter {
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
-	write( input, onDone, options ) {
+	async write( input, onDone, options ) {
 
 		this.options = Object.assign( {}, {
 			// default options
@@ -430,97 +431,95 @@ class GLTFWriter {
 
 		this.processInput( input );
 
+		await Promise.all( this.pending );
+
 		const writer = this;
+		const buffers = writer.buffers;
+		const json = writer.json;
+		options = writer.options;
+		const extensionsUsed = writer.extensionsUsed;
 
-		Promise.all( this.pending ).then( function () {
+		// Merge buffers.
+		const blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
-			const buffers = writer.buffers;
-			const json = writer.json;
-			const options = writer.options;
-			const extensionsUsed = writer.extensionsUsed;
+		// Declare extensions.
+		const extensionsUsedList = Object.keys( extensionsUsed );
 
-			// Merge buffers.
-			const blob = new Blob( buffers, { type: 'application/octet-stream' } );
+		if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList;
 
-			// Declare extensions.
-			const extensionsUsedList = Object.keys( extensionsUsed );
+		// Update bytelength of the single buffer.
+		if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
 
-			if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList;
+		if ( options.binary === true ) {
 
-			// Update bytelength of the single buffer.
-			if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
+			// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
 
-			if ( options.binary === true ) {
+			const reader = new window.FileReader();
+			reader.readAsArrayBuffer( blob );
+			reader.onloadend = function () {
 
-				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+				// Binary chunk.
+				const binaryChunk = getPaddedArrayBuffer( reader.result );
+				const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+				binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+				binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
+
+				// JSON chunk.
+				const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
+				const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+				jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+				jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
+
+				// GLB header.
+				const header = new ArrayBuffer( GLB_HEADER_BYTES );
+				const headerView = new DataView( header );
+				headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+				headerView.setUint32( 4, GLB_VERSION, true );
+				const totalByteLength = GLB_HEADER_BYTES
+					+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
+					+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+				headerView.setUint32( 8, totalByteLength, true );
+
+				const glbBlob = new Blob( [
+					header,
+					jsonChunkPrefix,
+					jsonChunk,
+					binaryChunkPrefix,
+					binaryChunk
+				], { type: 'application/octet-stream' } );
+
+				const glbReader = new window.FileReader();
+				glbReader.readAsArrayBuffer( glbBlob );
+				glbReader.onloadend = function () {
+
+					onDone( glbReader.result );
+
+				};
+
+			};
+
+		} else {
+
+			if ( json.buffers && json.buffers.length > 0 ) {
 
 				const reader = new window.FileReader();
-				reader.readAsArrayBuffer( blob );
+				reader.readAsDataURL( blob );
 				reader.onloadend = function () {
 
-					// Binary chunk.
-					const binaryChunk = getPaddedArrayBuffer( reader.result );
-					const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
-
-					// JSON chunk.
-					const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
-					const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
-
-					// GLB header.
-					const header = new ArrayBuffer( GLB_HEADER_BYTES );
-					const headerView = new DataView( header );
-					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-					headerView.setUint32( 4, GLB_VERSION, true );
-					const totalByteLength = GLB_HEADER_BYTES
-						+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
-						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-					headerView.setUint32( 8, totalByteLength, true );
-
-					const glbBlob = new Blob( [
-						header,
-						jsonChunkPrefix,
-						jsonChunk,
-						binaryChunkPrefix,
-						binaryChunk
-					], { type: 'application/octet-stream' } );
-
-					const glbReader = new window.FileReader();
-					glbReader.readAsArrayBuffer( glbBlob );
-					glbReader.onloadend = function () {
-
-						onDone( glbReader.result );
-
-					};
+					const base64data = reader.result;
+					json.buffers[ 0 ].uri = base64data;
+					onDone( json );
 
 				};
 
 			} else {
 
-				if ( json.buffers && json.buffers.length > 0 ) {
-
-					const reader = new window.FileReader();
-					reader.readAsDataURL( blob );
-					reader.onloadend = function () {
-
-						const base64data = reader.result;
-						json.buffers[ 0 ].uri = base64data;
-						onDone( json );
-
-					};
-
-				} else {
-
-					onDone( json );
-
-				}
+				onDone( json );
 
 			}
 
-		} );
+		}
+
 
 	}
 

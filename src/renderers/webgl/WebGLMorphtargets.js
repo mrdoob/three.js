@@ -84,6 +84,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 				const texture = new DataTexture2DArray( buffer, width, height, numberOfMorphTargets );
 				texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
 				texture.type = FloatType;
+				texture.needsUpdate = true;
 
 				// fill buffer
 

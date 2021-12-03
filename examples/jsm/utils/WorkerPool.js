@@ -4,7 +4,7 @@
 
 export class WorkerPool {
 
-	constructor ( pool = 4 ) {
+	constructor( pool = 4 ) {
 
 		this.pool = pool;
 		this.queue = [];
@@ -14,9 +14,9 @@ export class WorkerPool {
 
 	}
 
-	_initWorker ( workerId ) {
+	_initWorker( workerId ) {
 
-		if ( !this.workers[ workerId ] ) {
+		if ( ! this.workers[ workerId ] ) {
 
 			const worker = this.workerCreator();
 			worker.addEventListener( 'message', this._onMessage.bind( this, workerId ) );
@@ -26,12 +26,12 @@ export class WorkerPool {
 
 	}
 
-	_getIdleWorker () {
+	_getIdleWorker() {
 
-		for ( let i = 0 ; i < this.pool ; i ++ ) 
+		for ( let i = 0; i < this.pool; i ++ )
 			if ( ! ( this.workerStatus & ( 1 << i ) ) ) return i;
 
-		return -1;
+		return - 1;
 
 	}
 
@@ -54,25 +54,25 @@ export class WorkerPool {
 
 	}
 
-	setWorkerCreator ( workerCreator ) {
+	setWorkerCreator( workerCreator ) {
 
 		this.workerCreator = workerCreator;
 
 	}
 
-	setWorkerLimit ( pool ) {
+	setWorkerLimit( pool ) {
 
 		this.pool = pool;
 
 	}
 
-	postMessage ( msg, transfer ) {
+	postMessage( msg, transfer ) {
 
 		return new Promise( ( resolve ) => {
 
 			const workerId = this._getIdleWorker();
 
-			if ( workerId !== -1 ) {
+			if ( workerId !== - 1 ) {
 
 				this._initWorker( workerId );
 				this.workerStatus |= 1 << workerId;
@@ -89,7 +89,7 @@ export class WorkerPool {
 
 	}
 
-	dispose () {
+	dispose() {
 
 		this.workers.forEach( ( worker ) => worker.terminate() );
 		this.workersResolve.length = 0;
