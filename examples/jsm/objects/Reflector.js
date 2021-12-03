@@ -63,7 +63,7 @@ class Reflector extends Mesh {
 			
 		} else {
 		
-			renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters )
+			renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 			
 		}		
 
