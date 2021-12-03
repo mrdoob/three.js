@@ -234,7 +234,7 @@ div[data-diagram] {
     position: fixed !important;
     left: var(--panel-width);
     top: 0;
-    right: 0;
+    width: calc(100% - var(--panel-width)) !important;
     height: 100% !important;
     z-index: 100;
 }
