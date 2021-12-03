@@ -12822,7 +12822,7 @@ var fog_fragment = "#ifdef USE_FOG\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = 1.0
 
 var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying float vFogDepth;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif";
 
-var gradientmap_pars_fragment = "#ifdef USE_GRADIENTMAP\n\tuniform sampler2D gradientMap;\n#endif\nvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\tfloat dotNL = dot( normal, lightDirection );\n\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t#ifdef USE_GRADIENTMAP\n\t\treturn texture2D( gradientMap, coord ).rgb;\n\t#else\n\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t#endif\n}";
+var gradientmap_pars_fragment = "#ifdef USE_GRADIENTMAP\n\tuniform sampler2D gradientMap;\n#endif\nvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\tfloat dotNL = dot( normal, lightDirection );\n\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t#ifdef USE_GRADIENTMAP\n\t\treturn vec3( texture2D( gradientMap, coord ).r );\n\t#else\n\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t#endif\n}";
 
 var lightmap_fragment = "#ifdef USE_LIGHTMAP\n\tvec4 lightMapTexel = texture2D( lightMap, vUv2 );\n\tvec3 lightMapIrradiance = lightMapTexelToLinear( lightMapTexel ).rgb * lightMapIntensity;\n\t#ifndef PHYSICALLY_CORRECT_LIGHTS\n\t\tlightMapIrradiance *= PI;\n\t#endif\n\treflectedLight.indirectDiffuse += lightMapIrradiance;\n#endif";
 
@@ -14603,10 +14603,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-	/* eslint-disable no-undef */
 	const isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext ) ||
 		( typeof WebGL2ComputeRenderingContext !== 'undefined' && gl instanceof WebGL2ComputeRenderingContext );
-	/* eslint-enable no-undef */
 
 	let precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 	const maxPrecision = getMaxPrecision( precision );
@@ -16611,8 +16609,6 @@ class DataTexture2DArray extends Texture {
 		this.flipY = false;
 		this.unpackAlignment = 1;
 
-		this.needsUpdate = true;
-
 	}
 
 }
@@ -16700,6 +16696,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 				const texture = new DataTexture2DArray( buffer, width, height, numberOfMorphTargets );
 				texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
 				texture.type = FloatType;
+				texture.needsUpdate = true;
 
 				// fill buffer
 
@@ -16989,8 +16986,6 @@ class DataTexture3D extends Texture {
 		this.generateMipmaps = false;
 		this.flipY = false;
 		this.unpackAlignment = 1;
-
-		this.needsUpdate = true;
 
 	}
 
@@ -18741,7 +18736,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		prefixFragment = [
 			'#define varying in',
-			( parameters.glslVersion === GLSL3 ) ? '' : 'out highp vec4 pc_fragColor;',
+			( parameters.glslVersion === GLSL3 ) ? '' : 'layout(location = 0) out highp vec4 pc_fragColor;',
 			( parameters.glslVersion === GLSL3 ) ? '' : '#define gl_FragColor pc_fragColor',
 			'#define gl_FragDepthEXT gl_FragDepth',
 			'#define texture2D texture',
@@ -18949,7 +18944,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap',
 		'objectSpaceNormalMap', 'tangentSpaceNormalMap',
 		'clearcoat', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap',
-		'displacementMap', 'specularMap', , 'roughnessMap', 'metalnessMap', 'gradientMap',
+		'displacementMap', 'specularMap', 'roughnessMap', 'metalnessMap', 'gradientMap',
 		'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
 		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
 		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'morphTargetsCount', 'premultipliedAlpha',
@@ -19145,7 +19140,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: ( !! material.normalMap && !! object.geometry && !! object.geometry.attributes.tangent ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! object.geometry && !! object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4,
-			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || material.sheenRoughnessMap,
+			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || !! material.sheenRoughnessMap,
 			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || material.sheen > 0 || !! material.sheenColorMap || !! material.sheenRoughnessMap ) && !! material.displacementMap,
 
 			fog: !! fog,
@@ -21647,11 +21642,53 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function texSubImage3D() {
+
+		try {
+
+			gl.texSubImage3D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function compressedTexSubImage2D() {
+
+		try {
+
+			gl.compressedTexSubImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
 	function texStorage2D() {
 
 		try {
 
 			gl.texStorage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function texStorage3D() {
+
+		try {
+
+			gl.texStorage3D.apply( gl, arguments );
 
 		} catch ( error ) {
 
@@ -21838,7 +21875,10 @@ function WebGLState( gl, extensions, capabilities ) {
 		texImage3D: texImage3D,
 
 		texStorage2D: texStorage2D,
+		texStorage3D: texStorage3D,
 		texSubImage2D: texSubImage2D,
+		texSubImage3D: texSubImage3D,
+		compressedTexSubImage2D: compressedTexSubImage2D,
 
 		scissor: scissor,
 		viewport: viewport,
@@ -22036,11 +22076,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			return Math.log2( Math.max( image.width, image.height ) ) + 1;
 
-		} else if ( texture.mipmaps.length > 0 ) {
+		} else if ( texture.mipmaps !== undefined && texture.mipmaps.length > 0 ) {
 
 			// user-defined mipmaps
 
 			return texture.mipmaps.length;
+
+		} else if ( texture.isCompressedTexture && Array.isArray( texture.image ) ) {
+
+			return image.mipmaps.length;
 
 		} else {
 
@@ -22412,6 +22456,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
 		const allocateMemory = ( textureProperties.__version === undefined );
+		const levels = getMipLevels( texture, image, supportsMips );
 
 		if ( texture.isDepthTexture ) {
 
@@ -22507,10 +22552,25 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( mipmaps.length > 0 && supportsMips ) {
 
+				if ( useTexStorage && allocateMemory ) {
+
+					state.texStorage2D( 3553, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height );
+
+				}
+
 				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					state.texImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
+					if ( useTexStorage ) {
+
+						state.texSubImage2D( 3553, 0, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+					} else {
+
+						state.texImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
+					}
 
 				}
 
@@ -22518,11 +22578,31 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				state.texImage2D( 3553, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+				if ( useTexStorage ) {
+
+					if ( allocateMemory ) {
+
+						state.texStorage2D( 3553, levels, glInternalFormat, image.width, image.height );
+
+					}
+
+					state.texSubImage2D( 3553, 0, 0, 0, image.width, image.height, glFormat, glType, image.data );
+
+				} else {
+
+					state.texImage2D( 3553, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+
+				}
 
 			}
 
 		} else if ( texture.isCompressedTexture ) {
+
+			if ( useTexStorage && allocateMemory ) {
+
+				state.texStorage2D( 3553, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height );
+
+			}
 
 			for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -22532,7 +22612,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( glFormat !== null ) {
 
-						state.compressedTexImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+						if ( useTexStorage ) {
+
+							state.compressedTexSubImage2D( 3553, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+						} else {
+
+							state.compressedTexImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+						}
 
 					} else {
 
@@ -22542,7 +22630,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				} else {
 
-					state.texImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					if ( useTexStorage ) {
+
+						state.texSubImage2D( 3553, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+					} else {
+
+						state.texImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
+					}
 
 				}
 
@@ -22550,11 +22646,39 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isDataTexture2DArray ) {
 
-			state.texImage3D( 35866, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+			if ( useTexStorage ) {
+
+				if ( allocateMemory ) {
+
+					state.texStorage3D( 35866, levels, glInternalFormat, image.width, image.height, image.depth );
+
+				}
+
+				state.texSubImage3D( 35866, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+			} else {
+
+				state.texImage3D( 35866, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+
+			}
 
 		} else if ( texture.isDataTexture3D ) {
 
-			state.texImage3D( 32879, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+			if ( useTexStorage ) {
+
+				if ( allocateMemory ) {
+
+					state.texStorage3D( 32879, levels, glInternalFormat, image.width, image.height, image.depth );
+
+				}
+
+				state.texSubImage3D( 32879, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+			} else {
+
+				state.texImage3D( 32879, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
+
+			}
 
 		} else if ( texture.isFramebufferTexture ) ; else {
 
@@ -22563,8 +22687,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// use manually created mipmaps if available
 			// if there are no manual mipmaps
 			// set 0 level mipmap and then use GL to generate other mipmap levels
-
-			const levels = getMipLevels( texture, image, supportsMips );
 
 			if ( mipmaps.length > 0 && supportsMips ) {
 
@@ -22665,11 +22787,21 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
+		const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
+		const allocateMemory = ( textureProperties.__version === undefined );
+		let levels = getMipLevels( texture, image, supportsMips );
+
 		setTextureParameters( 34067, texture, supportsMips );
 
 		let mipmaps;
 
 		if ( isCompressed ) {
+
+			if ( useTexStorage && allocateMemory ) {
+
+				state.texStorage2D( 34067, levels, glInternalFormat, image.width, image.height );
+
+			}
 
 			for ( let i = 0; i < 6; i ++ ) {
 
@@ -22683,7 +22815,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( glFormat !== null ) {
 
-							state.compressedTexImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+							if ( useTexStorage ) {
+
+								state.compressedTexSubImage2D( 34069 + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+							} else {
+
+								state.compressedTexImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+							}
 
 						} else {
 
@@ -22693,7 +22833,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					} else {
 
-						state.texImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+						if ( useTexStorage ) {
+
+							state.texSubImage2D( 34069 + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+						} else {
+
+							state.texImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
+						}
 
 					}
 
@@ -22705,30 +22853,74 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			mipmaps = texture.mipmaps;
 
+			if ( useTexStorage && allocateMemory ) {
+
+				// TODO: Uniformly handle mipmap definitions
+				// Normal textures and compressed cube textures define base level + mips with their mipmap array
+				// Uncompressed cube textures use their mipmap array only for mips (no base level)
+
+				if ( mipmaps.length > 0 ) levels ++;
+
+				state.texStorage2D( 34067, levels, glInternalFormat, cubeImage[ 0 ].width, cubeImage[ 0 ].height );
+
+			}
+
 			for ( let i = 0; i < 6; i ++ ) {
 
 				if ( isDataTexture ) {
 
-					state.texImage2D( 34069 + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+					if ( useTexStorage ) {
+
+						state.texSubImage2D( 34069 + i, 0, 0, 0, cubeImage[ i ].width, cubeImage[ i ].height, glFormat, glType, cubeImage[ i ].data );
+
+					} else {
+
+						state.texImage2D( 34069 + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+
+					}
 
 					for ( let j = 0; j < mipmaps.length; j ++ ) {
 
 						const mipmap = mipmaps[ j ];
 						const mipmapImage = mipmap.image[ i ].image;
 
-						state.texImage2D( 34069 + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
+						if ( useTexStorage ) {
+
+							state.texSubImage2D( 34069 + i, j + 1, 0, 0, mipmapImage.width, mipmapImage.height, glFormat, glType, mipmapImage.data );
+
+						} else {
+
+							state.texImage2D( 34069 + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
+
+						}
 
 					}
 
 				} else {
 
-					state.texImage2D( 34069 + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+					if ( useTexStorage ) {
+
+						state.texSubImage2D( 34069 + i, 0, 0, 0, glFormat, glType, cubeImage[ i ] );
+
+					} else {
+
+						state.texImage2D( 34069 + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+
+					}
 
 					for ( let j = 0; j < mipmaps.length; j ++ ) {
 
 						const mipmap = mipmaps[ j ];
 
-						state.texImage2D( 34069 + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+						if ( useTexStorage ) {
+
+							state.texSubImage2D( 34069 + i, j + 1, 0, 0, glFormat, glType, mipmap.image[ i ] );
+
+						} else {
+
+							state.texImage2D( 34069 + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+
+						}
 
 					}
 
@@ -27550,7 +27742,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
 
 	}
 
@@ -27645,7 +27837,7 @@ class Scene extends Object3D {
 
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
 
 		}
 
@@ -28699,8 +28891,6 @@ class DataTexture extends Texture {
 		this.flipY = false;
 		this.unpackAlignment = 1;
 
-		this.needsUpdate = true;
-
 	}
 
 }
@@ -28878,6 +29068,7 @@ class Skeleton {
 		boneMatrices.set( this.boneMatrices ); // copy current values
 
 		const boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
+		boneTexture.needsUpdate = true;
 
 		this.boneMatrices = boneMatrices;
 		this.boneTexture = boneTexture;
@@ -49934,11 +50125,9 @@ function ImmediateRenderObject() {
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-	/* eslint-disable no-undef */
 	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
 		revision: REVISION,
 	} } ) );
-	/* eslint-enable no-undef */
 
 }
 
