@@ -180,6 +180,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
+			vertexShaderHash: material._vertexShaderHash,
+			fragmentShaderHash: material._fragmentShaderHash,
 			defines: material.defines,
 
 			isRawShaderMaterial: material.isRawShaderMaterial === true,
@@ -320,8 +322,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		} else {
 
-			array.push( hashString( parameters.fragmentShader ) );
-			array.push( hashString( parameters.vertexShader ) );
+			array.push( /*hashString( parameters.fragmentShader ) /**/parameters.vertexShaderHash/**/ );
+			array.push( /*hashString( parameters.vertexShader ) /**/parameters.fragmentShaderHash/**/ );
 
 		}
 
@@ -338,12 +340,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		if ( parameters.isRawShaderMaterial === false ) {
 
-			for ( let i = 0; i < parameterNames.length; i ++ ) {
-
-				array.push( parameters[ parameterNames[ i ] ] );
-
-			}
-
+			getProgramCacheKeyParameters( array, parameters );
 			getProgramCacheKeyBooleans( parameters, array );
 			array.push( renderer.outputEncoding );
 			array.push( renderer.gammaFactor );
@@ -353,6 +350,40 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.customProgramCacheKey );
 
 		return array.join();
+
+	}
+
+	function getProgramCacheKeyParameters( array, parameters ) {
+
+		array.push( parameters.precision );
+		array.push( parameters.outputEncoding );
+		array.push( parameters.mapEncoding );
+		array.push( parameters.matcapEncoding );
+		array.push( parameters.envMapMode );
+		array.push( parameters.envMapEncoding );
+		array.push( parameters.lightMapEncoding );
+		array.push( parameters.emissiveMapEncoding );
+		array.push( parameters.combine );
+		array.push( parameters.vertexUvs );
+		array.push( parameters.fogExp2 );
+		array.push( parameters.sizeAttenuation );
+		array.push( parameters.maxBones );
+		array.push( parameters.morphTargetsCount );
+		array.push( parameters.numDirLights );
+		array.push( parameters.numPointLights );
+		array.push( parameters.numSpotLights );
+		array.push( parameters.numHemiLights );
+		array.push( parameters.numRectAreaLights );
+		array.push( parameters.numDirLightShadows );
+		array.push( parameters.numPointLightShadows );
+		array.push( parameters.numSpotLightShadows );
+		array.push( parameters.shadowMapType );
+		array.push( parameters.toneMapping );
+		array.push( parameters.numClippingPlanes );
+		array.push( parameters.numClipIntersection );
+		array.push( parameters.format );
+		array.push( parameters.specularColorMapEncoding );
+		array.push( parameters.sheenColorMapEncoding );
 
 	}
 

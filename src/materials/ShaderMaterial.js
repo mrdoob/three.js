@@ -3,6 +3,7 @@ import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
 
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
 import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
+import { hashString } from '../utils.js';
 
 /**
  * parameters = {
@@ -30,8 +31,11 @@ class ShaderMaterial extends Material {
 		this.defines = {};
 		this.uniforms = {};
 
-		this.vertexShader = default_vertex;
-		this.fragmentShader = default_fragment;
+		this._vertexShader = default_vertex;
+		this._fragmentShader = default_fragment;
+
+		this._vertexShaderHash = hashString( default_vertex );
+		this._fragmentShaderHash = hashString( default_fragment );
 
 		this.linewidth = 1;
 
@@ -73,6 +77,32 @@ class ShaderMaterial extends Material {
 			this.setValues( parameters );
 
 		}
+
+	}
+
+	get vertexShader() {
+
+		return this._vertexShader;
+
+	}
+
+	set vertexShader( value ) {
+
+		this._vertexShader = value;
+		this._vertexShaderHash = hashString( value );
+
+	}
+
+	get fragmentShader() {
+
+		return this._fragmentShader;
+
+	}
+
+	set fragmentShader( value ) {
+
+		this._fragmentShader = value;
+		this._fragmentShaderHash = hashString( value );
 
 	}
 
