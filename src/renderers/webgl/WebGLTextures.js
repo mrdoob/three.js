@@ -988,7 +988,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( useTexStorage ) {
 
-						state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, cubeImage[ i ].width, cubeImage[ i ].height, glFormat, glType, cubeImage[ i ] );
+						state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, cubeImage[ i ].width, cubeImage[ i ].height, glFormat, glType, cubeImage[ i ].data );
 
 					} else {
 
