@@ -30,7 +30,7 @@ class Reflector extends Mesh {
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Reflector.ReflectorShader;
-		const antialias = options.antialias || false;
+		const multisample = options.multisample || 4;
 
 		//
 
@@ -55,9 +55,17 @@ class Reflector extends Mesh {
 			format: RGBFormat
 		};
 
-		const renderTarget = antialias 
-			? new WebGLMultisampleRenderTarget( textureWidth, textureHeight, parameters )
-			: new WebGLRenderTarget( textureWidth, textureHeight, parameters );
+		let renderTarget = null;
+		if (multisample > 0) {
+			
+			renderTarget = new WebGLMultisampleRenderTarget( textureWidth, textureHeight, parameters );
+			renderTarget.samples = multisample;
+			
+		} else {
+		
+			new WebGLRenderTarget( textureWidth, textureHeight, parameters )
+			
+		}		
 
 		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
