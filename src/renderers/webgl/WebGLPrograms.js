@@ -34,23 +34,29 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		SpriteMaterial: 'sprite'
 	};
 
+	const booleanParameterNames = [
+		'isWebGL2', 'supportsVertexTextures', 'instancing', 'instancingColor', 'map', 'matcap', 'envMap',
+		'envMapCubeUV', 'lightMap', 'aoMap', 'emissiveMap', 'bumpMap', 'normalMap', 'objectSpaceNormalMap',
+		'tangentSpaceNormalMap', 'clearcoat', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap',
+		'displacementMap', 'specularMap', 'roughnessMap', 'metalnessMap', 'gradientMap', 'alphaMap', 'alphaTest',
+		'vertexColors', 'vertexAlphas', 'vertexTangents', 'uvsVertexOnly', 'fog', 'useFog', 'flatShading',
+		'logarithmicDepthBuffer', 'skinning', 'useVertexTexture', 'morphTargets', 'morphNormals',
+		'premultipliedAlpha', 'shadowMapEnabled', 'physicallyCorrectLights', 'doubleSided', 'flipSided',
+		'depthPacking', 'dithering', 'specularIntensityMap', 'specularColorMap', 'transmission',
+		'transmissionMap', 'thicknessMap', 'sheen', 'sheenColorMap', 'sheenRoughnessMap' ];
+
 	const parameterNames = [
-		'precision', 'isWebGL2', 'supportsVertexTextures', 'outputEncoding', 'instancing', 'instancingColor',
-		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
-		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap',
-		'objectSpaceNormalMap', 'tangentSpaceNormalMap',
-		'clearcoat', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap',
-		'displacementMap', 'specularMap', , 'roughnessMap', 'metalnessMap', 'gradientMap',
-		'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
-		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
-		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'morphTargetsCount', 'premultipliedAlpha',
+		'precision', 'outputEncoding',
+		'mapEncoding', 'matcapEncoding', 'envMapMode', 'envMapEncoding',
+		'lightMapEncoding', 'emissiveMapEncoding',
+		'combine', 'fogExp2',
+		'sizeAttenuation',
+		'maxBones', 'morphTargetsCount',
 		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
 		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
-		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
-		'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering', 'format',
-		'specularIntensityMap', 'specularColorMap', 'specularColorMapEncoding',
-		'transmission', 'transmissionMap', 'thicknessMap',
-		'sheen', 'sheenColorMap', 'sheenColorMapEncoding', 'sheenRoughnessMap'
+		'shadowMapType', 'toneMapping',
+		'numClippingPlanes', 'numClipIntersection', 'format',
+		'specularColorMapEncoding', 'sheenColorMapEncoding'
 	];
 
 	function getMaxBones( object ) {
@@ -236,12 +242,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: ( !! material.normalMap && !! object.geometry && !! object.geometry.attributes.tangent ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! object.geometry && !! object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4,
-			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || material.sheenRoughnessMap,
+			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || !! material.sheenRoughnessMap,
 			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || material.sheen > 0 || !! material.sheenColorMap || !! material.sheenRoughnessMap ) && !! material.displacementMap,
 
 			fog: !! fog,
 			useFog: material.fog,
-			fogExp2: ( fog && fog.isFogExp2 ),
+			fogExp2: ( !! fog && fog.isFogExp2 ),
 
 			flatShading: !! material.flatShading,
 
@@ -338,6 +344,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			}
 
+			getProgramCacheKeyBooleans( parameters, array );
 			array.push( renderer.outputEncoding );
 			array.push( renderer.gammaFactor );
 
@@ -346,6 +353,126 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.customProgramCacheKey );
 
 		return array.join();
+
+	}
+
+	function getProgramCacheKeyBooleans( parameters, array ) {
+
+		let booleancount = 0;
+		if ( parameters.isWebGL2 )
+			booleancount += 1;
+		if ( parameters.supportsVertexTextures )
+			booleancount += 2;
+		if ( parameters.instancing )
+			booleancount += 4;
+		if ( parameters.instancingColor )
+			booleancount += 8;
+		if ( parameters.map )
+			booleancount += 16;
+		if ( parameters.matcap )
+			booleancount += 32;
+		if ( parameters.envMap )
+			booleancount += 64;
+		if ( parameters.envMapCubeUV )
+			booleancount += 128;
+		if ( parameters.lightMap )
+			booleancount += 256;
+		if ( parameters.aoMap )
+			booleancount += 512;
+		if ( parameters.emissiveMap )
+			booleancount += 1024;
+		if ( parameters.bumpMap )
+			booleancount += 2048;
+		if ( parameters.normalMap )
+			booleancount += 4096;
+		if ( parameters.objectSpaceNormalMap )
+			booleancount += 8192;
+		if ( parameters.tangentSpaceNormalMap )
+			booleancount += 16384;
+		if ( parameters.clearcoat )
+			booleancount += 32768;
+		if ( parameters.clearcoatMap )
+			booleancount += 65536;
+		if ( parameters.clearcoatRoughnessMap )
+			booleancount += 131072;
+		if ( parameters.clearcoatNormalMap )
+			booleancount += 262144;
+		if ( parameters.displacementMap )
+			booleancount += 524288;
+		if ( parameters.specularMap )
+			booleancount += 1048576;
+		if ( parameters.roughnessMap )
+			booleancount += 2097152;
+		if ( parameters.metalnessMap )
+			booleancount += 4194304;
+		if ( parameters.gradientMap )
+			booleancount += 8388608;
+		if ( parameters.alphaMap )
+			booleancount += 16777216;
+		if ( parameters.alphaTest )
+			booleancount += 33554432;
+		if ( parameters.vertexColors )
+			booleancount += 67108864;
+		if ( parameters.vertexAlphas )
+			booleancount += 134217728;
+		if ( parameters.vertexUvs )
+			booleancount += 268435456;
+		if ( parameters.vertexTangents )
+			booleancount += 536870912;
+		if ( parameters.uvsVertexOnly )
+			booleancount += 1073741824;
+		if ( parameters.fog )
+			booleancount += 2147483648;
+		array.push( booleancount );
+		booleancount = 0;
+
+
+		if ( parameters.useFog )
+			booleancount += 1;
+		if ( parameters.flatShading )
+			booleancount += 2;
+		if ( parameters.logarithmicDepthBuffer )
+			booleancount += 4;
+		if ( parameters.skinning )
+			booleancount += 8;
+		if ( parameters.useVertexTexture )
+			booleancount += 16;
+		if ( parameters.morphTargets )
+			booleancount += 32;
+		if ( parameters.morphNormals )
+			booleancount += 64;
+		if ( parameters.premultipliedAlpha )
+			booleancount += 128;
+		if ( parameters.shadowMapEnabled )
+			booleancount += 256;
+		if ( parameters.physicallyCorrectLights )
+			booleancount += 512;
+		if ( parameters.doubleSided )
+			booleancount += 1024;
+		if ( parameters.flipSided )
+			booleancount += 2048;
+		if ( parameters.depthPacking )
+			booleancount += 4096;
+		if ( parameters.dithering )
+			booleancount += 8192;
+		if ( parameters.specularIntensityMap )
+			booleancount += 16384;
+		if ( parameters.specularColorMap )
+			booleancount += 32768;
+		if ( parameters.transmission )
+			booleancount += 65536;
+		if ( parameters.transmissionMap )
+			booleancount += 131072;
+		if ( parameters.thicknessMap )
+			booleancount += 262144;
+		if ( parameters.sheen )
+			booleancount += 524288;
+		if ( parameters.sheenColorMap )
+			booleancount += 1048576;
+		if ( parameters.sheenRoughnessMap )
+			booleancount += 2097152;
+
+		array.push( booleancount );
 
 	}
 
