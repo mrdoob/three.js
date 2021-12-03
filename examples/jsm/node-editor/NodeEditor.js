@@ -259,7 +259,7 @@ export class NodeEditor extends EventDispatcher {
 		const context = new ContextMenu( this.domElement );
 
 		let isContext = false;
-		let contextPosition = {};
+		const contextPosition = {};
 
 		const add = ( node ) => {
 

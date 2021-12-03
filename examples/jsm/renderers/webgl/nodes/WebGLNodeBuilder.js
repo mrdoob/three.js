@@ -3,7 +3,7 @@ import SlotNode from './SlotNode.js';
 import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { ShaderChunk, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from '../../../../../build/three.module.js';
+import { ShaderChunk /*, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding */ } from '../../../../../build/three.module.js';
 
 const shaderStages = [ 'vertex', 'fragment' ];
 
@@ -216,7 +216,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarys( shaderStage ) {
+	getVarys( /* shaderStage */ ) {
 
 		let snippet = '';
 
@@ -285,7 +285,8 @@ class WebGLNodeBuilder extends NodeBuilder {
 	}
 
 	getTextureEncodingFromMap( map ) {
-/*
+
+		/*
 		const isWebGL2 = this.renderer.capabilities.isWebGL2;
 
 		if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {

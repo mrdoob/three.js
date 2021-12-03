@@ -150,7 +150,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec3' ) );
 
-			const diffuseNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
+			this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
 
 			// OPACITY
 
@@ -269,10 +269,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			const outputEncoding = this.renderer.outputEncoding;
 
 			if ( outputEncoding !== LinearEncoding ) {
-				
+
 				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, vec4( outputNode ) );
 				outputNode.fromEncoding( outputEncoding );
-				
+
 			}
 
 			this.addFlow( 'fragment', new VarNode( outputNode, 'Output', 'vec4' ) );
@@ -293,7 +293,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet, biasSnippet = null, shaderStage = this.shaderStage ) {
+	getTexture( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 

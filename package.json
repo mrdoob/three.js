@@ -48,7 +48,11 @@
       "OIMO": "readonly",
       "Stats": "readonly",
       "XRWebGLBinding": "readonly",
-      "XRWebGLLayer": "readonly"
+      "XRWebGLLayer": "readonly",
+
+      "GPUShaderStage": "readonly",
+      "GPUBufferUsage": "readonly",
+      "GPUTextureUsage": "readonly"
     },
     "rules": {
       "quotes": [
