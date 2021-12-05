@@ -314,7 +314,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		if ( parameters.isRawShaderMaterial === false ) {
 
 			getProgramCacheKeyParameters( array, parameters );
-
+			getProgramCacheKeyBooleans( array, parameters );
 			array.push( renderer.outputEncoding );
 			array.push( renderer.gammaFactor );
 
@@ -328,59 +328,20 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	function getProgramCacheKeyParameters( array, parameters ) {
 
-		array.push( precision );
-		array.push( parameters.isWebGL2 );
-		array.push( parameters.supportsVertexTextures );
+		array.push( parameters.precision );
 		array.push( parameters.outputEncoding );
-		array.push( parameters.instancing );
-		array.push( parameters.instancingColor );
-		array.push( parameters.map );
 		array.push( parameters.mapEncoding );
-		array.push( parameters.matcap );
 		array.push( parameters.matcapEncoding );
-		array.push( parameters.envMap );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapEncoding );
-		array.push( parameters.envMapCubeUV );
-		array.push( parameters.lightMap );
 		array.push( parameters.lightMapEncoding );
-		array.push( parameters.aoMap );
-		array.push( parameters.emissiveMap );
 		array.push( parameters.emissiveMapEncoding );
-		array.push( parameters.bumpMap );
-		array.push( parameters.normalMap );
-		array.push( parameters.objectSpaceNormalMap );
-		array.push( parameters.tangentSpaceNormalMap );
-		array.push( parameters.clearcoat );
-		array.push( parameters.clearcoatMap );
-		array.push( parameters.clearcoatRoughnessMap );
-		array.push( parameters.clearcoatNormalMap );
-		array.push( parameters.displacementMap );
-		array.push( parameters.specularMap );
-		array.push( parameters.roughnessMap );
-		array.push( parameters.metalnessMap );
-		array.push( parameters.gradientMap );
-		array.push( parameters.alphaMap );
-		array.push( parameters.alphaTest );
 		array.push( parameters.combine );
-		array.push( parameters.vertexColors );
-		array.push( parameters.vertexAlphas );
-		array.push( parameters.vertexTangents );
 		array.push( parameters.vertexUvs );
-		array.push( parameters.uvsVertexOnly );
-		array.push( parameters.fog );
-		array.push( parameters.useFog );
 		array.push( parameters.fogExp2 );
-		array.push( parameters.flatShading );
 		array.push( parameters.sizeAttenuation );
-		array.push( parameters.logarithmicDepthBuffer );
-		array.push( parameters.skinning );
 		array.push( parameters.maxBones );
-		array.push( parameters.useVertexTexture );
-		array.push( parameters.morphTargets );
-		array.push( parameters.morphNormals );
 		array.push( parameters.morphTargetsCount );
-		array.push( parameters.premultipliedAlpha );
 		array.push( parameters.numDirLights );
 		array.push( parameters.numPointLights );
 		array.push( parameters.numSpotLights );
@@ -389,27 +350,133 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.numDirLightShadows );
 		array.push( parameters.numPointLightShadows );
 		array.push( parameters.numSpotLightShadows );
-		array.push( parameters.shadowMapEnabled );
 		array.push( parameters.shadowMapType );
 		array.push( parameters.toneMapping );
-		array.push( parameters.physicallyCorrectLights );
-		array.push( parameters.doubleSided );
-		array.push( parameters.flipSided );
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
-		array.push( parameters.depthPacking );
-		array.push( parameters.dithering );
 		array.push( parameters.format );
-		array.push( parameters.specularIntensityMap );
-		array.push( parameters.specularColorMap );
 		array.push( parameters.specularColorMapEncoding );
-		array.push( parameters.transmission );
-		array.push( parameters.transmissionMap );
-		array.push( parameters.thicknessMap );
-		array.push( parameters.sheen );
-		array.push( parameters.sheenColorMap );
 		array.push( parameters.sheenColorMapEncoding );
-		array.push( parameters.sheenRoughnessMap );
+
+	}
+
+	function getProgramCacheKeyBooleans( array, parameters ) {
+
+		let booleancount = 0;
+		if ( parameters.isWebGL2 )
+			booleancount += 1;
+		if ( parameters.supportsVertexTextures )
+			booleancount += 2;
+		if ( parameters.instancing )
+			booleancount += 4;
+		if ( parameters.instancingColor )
+			booleancount += 8;
+		if ( parameters.map )
+			booleancount += 16;
+		if ( parameters.matcap )
+			booleancount += 32;
+		if ( parameters.envMap )
+			booleancount += 64;
+		if ( parameters.envMapCubeUV )
+			booleancount += 128;
+		if ( parameters.lightMap )
+			booleancount += 256;
+		if ( parameters.aoMap )
+			booleancount += 512;
+		if ( parameters.emissiveMap )
+			booleancount += 1024;
+		if ( parameters.bumpMap )
+			booleancount += 2048;
+		if ( parameters.normalMap )
+			booleancount += 4096;
+		if ( parameters.objectSpaceNormalMap )
+			booleancount += 8192;
+		if ( parameters.tangentSpaceNormalMap )
+			booleancount += 16384;
+		if ( parameters.clearcoat )
+			booleancount += 32768;
+		if ( parameters.clearcoatMap )
+			booleancount += 65536;
+		if ( parameters.clearcoatRoughnessMap )
+			booleancount += 131072;
+		if ( parameters.clearcoatNormalMap )
+			booleancount += 262144;
+		if ( parameters.displacementMap )
+			booleancount += 524288;
+		if ( parameters.specularMap )
+			booleancount += 1048576;
+		if ( parameters.roughnessMap )
+			booleancount += 2097152;
+		if ( parameters.metalnessMap )
+			booleancount += 4194304;
+		if ( parameters.gradientMap )
+			booleancount += 8388608;
+		if ( parameters.alphaMap )
+			booleancount += 16777216;
+		if ( parameters.alphaTest )
+			booleancount += 33554432;
+		if ( parameters.vertexColors )
+			booleancount += 67108864;
+		if ( parameters.vertexAlphas )
+			booleancount += 134217728;
+		if ( parameters.vertexUvs )
+			booleancount += 268435456;
+		if ( parameters.vertexTangents )
+			booleancount += 536870912;
+		if ( parameters.uvsVertexOnly )
+			booleancount += 1073741824;
+		if ( parameters.fog )
+			booleancount += 2147483648;
+		array.push( booleancount );
+		booleancount = 0;
+
+
+		if ( parameters.useFog )
+			booleancount += 1;
+		if ( parameters.flatShading )
+			booleancount += 2;
+		if ( parameters.logarithmicDepthBuffer )
+			booleancount += 4;
+		if ( parameters.skinning )
+			booleancount += 8;
+		if ( parameters.useVertexTexture )
+			booleancount += 16;
+		if ( parameters.morphTargets )
+			booleancount += 32;
+		if ( parameters.morphNormals )
+			booleancount += 64;
+		if ( parameters.premultipliedAlpha )
+			booleancount += 128;
+		if ( parameters.shadowMapEnabled )
+			booleancount += 256;
+		if ( parameters.physicallyCorrectLights )
+			booleancount += 512;
+		if ( parameters.doubleSided )
+			booleancount += 1024;
+		if ( parameters.flipSided )
+			booleancount += 2048;
+		if ( parameters.depthPacking )
+			booleancount += 4096;
+		if ( parameters.dithering )
+			booleancount += 8192;
+		if ( parameters.specularIntensityMap )
+			booleancount += 16384;
+		if ( parameters.specularColorMap )
+			booleancount += 32768;
+		if ( parameters.transmission )
+			booleancount += 65536;
+		if ( parameters.transmissionMap )
+			booleancount += 131072;
+		if ( parameters.thicknessMap )
+			booleancount += 262144;
+		if ( parameters.sheen )
+			booleancount += 524288;
+		if ( parameters.sheenColorMap )
+			booleancount += 1048576;
+		if ( parameters.sheenRoughnessMap )
+			booleancount += 2097152;
+
+		array.push( booleancount );
 
 	}
 
