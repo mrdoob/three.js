@@ -7,7 +7,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
 	const REVISION = '136dev';
 	const MOUSE = {
@@ -11817,12 +11817,11 @@
 		}
 
 		_setEncoding(uniform, texture) {
-			/* if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
-					uniform.value = ENCODINGS[ LinearEncoding ];
-				} else {
-					uniform.value = ENCODINGS[ texture.encoding ];
-				} */
-			uniform.value = ENCODINGS[texture.encoding];
+			if (this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding) {
+				uniform.value = ENCODINGS[LinearEncoding];
+			} else {
+				uniform.value = ENCODINGS[texture.encoding];
+			}
 		}
 
 		_textureToCubeUV(texture, cubeUVRenderTarget) {
@@ -14370,10 +14369,10 @@
 			} else {
 				encoding = LinearEncoding;
 			}
-			/* if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
-					encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
-				} */
 
+			if (isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding) {
+				encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
+			}
 
 			return encoding;
 		}
@@ -16471,9 +16470,7 @@
 			_gl.generateMipmap(target);
 		}
 
-		function getInternalFormat(internalFormatName, glFormat, glType
-		/*, encoding*/
-		) {
+		function getInternalFormat(internalFormatName, glFormat, glType, encoding) {
 			if (isWebGL2 === false) return glFormat;
 
 			if (internalFormatName !== null) {
@@ -16497,9 +16494,8 @@
 
 			if (glFormat === _gl.RGBA) {
 				if (glType === _gl.FLOAT) internalFormat = _gl.RGBA32F;
-				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F; //if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
-
-				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.RGBA8;
+				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F;
+				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 			}
 
 			if (internalFormat === _gl.R16F || internalFormat === _gl.R32F || internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F) {
@@ -24465,7 +24461,9 @@
 
 
 	function isValidDiagonal(a, b) {
-		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && (area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
+		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // dones't intersect other edges
+		locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && ( // locally visible
+		area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
 		equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
 	} // signed area of a triangle
 
@@ -28403,11 +28401,16 @@
 					const callback = callbacks[i];
 					if (callback.onLoad) callback.onLoad(data);
 				}
-
-				this.manager.itemEnd(url);
 			}).catch(err => {
 				// Abort errors and other errors are handled the same
 				const callbacks = loading[url];
+
+				if (callbacks === undefined) {
+					// When onLoad was called and url was deleted in `loading`
+					this.manager.itemError(url);
+					throw err;
+				}
+
 				delete loading[url];
 
 				for (let i = 0, il = callbacks.length; i < il; i++) {
@@ -28416,6 +28419,7 @@
 				}
 
 				this.manager.itemError(url);
+			}).finally(() => {
 				this.manager.itemEnd(url);
 			});
 			this.manager.itemStart(url);
@@ -36602,4 +36606,4 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
