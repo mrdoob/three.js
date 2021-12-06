@@ -1201,7 +1201,7 @@ class LDrawLoader extends Loader {
 			case FINISH_TYPE_PEARLESCENT:
 
 				// Try to imitate pearlescency by making the surface glossy
-				material = new MeshStandardMaterial( { color: colour, roughness: 0.5, metalness: 0.25 } );
+				material = new MeshStandardMaterial( { color: colour, roughness: 0.3, metalness: 0.25 } );
 				break;
 
 			case FINISH_TYPE_CHROME:
