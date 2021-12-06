@@ -6,79 +6,52 @@ class EventDispatcher {
 
 	addEventListener( type, listener ) {
 
-		if ( this._listeners === undefined ) this._listeners = {};
-
-		const listeners = this._listeners;
-
-		if ( listeners[ type ] === undefined ) {
-
-			listeners[ type ] = [];
-
-		}
-
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
-
-			listeners[ type ].push( listener );
-
-		}
-
+		const listeners = this.getEventListeners( type );
+		
+		listeners.add( listener );
+		
 	}
 
 	hasEventListener( type, listener ) {
 
-		if ( this._listeners === undefined ) return false;
-
-		const listeners = this._listeners;
-
-		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
-
+		return this.getEventListeners( type ).has( listener );
 	}
 
 	removeEventListener( type, listener ) {
 
-		if ( this._listeners === undefined ) return;
-
-		const listeners = this._listeners;
-		const listenerArray = listeners[ type ];
-
-		if ( listenerArray !== undefined ) {
-
-			const index = listenerArray.indexOf( listener );
-
-			if ( index !== - 1 ) {
-
-				listenerArray.splice( index, 1 );
-
-			}
-
-		}
+		this.getEventListeners( type ).remove( listener );
 
 	}
 
 	dispatchEvent( event ) {
 
-		if ( this._listeners === undefined ) return;
-
-		const listeners = this._listeners;
-		const listenerArray = listeners[ event.type ];
-
-		if ( listenerArray !== undefined ) {
-
 			event.target = this;
-
-			// Make a copy, in case listeners are removed while iterating.
-			const array = listenerArray.slice( 0 );
-
-			for ( let i = 0, l = array.length; i < l; i ++ ) {
-
-				array[ i ].call( this, event );
-
-			}
+		
+			const invokeListener = listener => listener.call( this, event ); 
+		
+			this.getEventListeners( event.type ).forEach( invokeListener );
 
 			event.target = null;
 
 		}
-
+	
+	
+	getEventListeners( type ){
+		
+		if ( undefined === this._listeners ) {
+			
+			this._listeners = new Map();
+			
+		}
+		
+		if (  ! this._listeners.has( type ) )  {
+		
+			this._listeners.set( type, new Set( ) );
+			
+		}
+		
+		return this._listeners.get( type );
+		
 	}
 
 }
