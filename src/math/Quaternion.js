@@ -422,39 +422,38 @@ class Quaternion {
 		return this;
 
 	}
-	
+
 	pow( exp ) {
-		
+
 		// const _vec3 = new Vector3();
 		// const _vec4 = new Vector4();
 		// _vec4.setAxisAngleFromQuaternion( this );
 		// this.setFromAxisAngle( _vec3.set( _vec4.x, _vec4.y, _vec4.z ), _vec4.w * exp );
-		
+
 		const newHalfAngle = Math.acos( this._w ) * exp;
-		
+
 		const oldS = Math.sqrt( 1 - this._w * this._w );
 		const newS = Math.sin( newHalfAngle );
 		const ratio = newS / oldS;
-		
+
 		if ( ratio === Infinity ) {
-			
+	
 			return this;
-			
+	
 		} else {
-			
+	
 			this._x *= ratio;
 			this._y *= ratio;
 			this._z *= ratio;
 			this._w = Math.sqrt( 1 - newS * newS );
-			
-		}
-		
-		this._onChangeCallback();
-		
-		return this;
-		
-	}
 	
+		}
+
+		this._onChangeCallback();
+
+		return this;
+
+	}
 
 	identity() {
 
