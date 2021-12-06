@@ -564,6 +564,29 @@ class TransformControls extends Object3D {
 
 	}
 
+	reset( stopCurrentTransform ) {
+
+		if ( ! this.enabled ) return;
+
+		if ( this.dragging ) {
+
+			this.object.position.copy( this._positionStart );
+			this.object.quaternion.copy( this._quaternionStart );
+			this.object.scale.copy( this._scaleStart );
+
+			this.dispatchEvent( _changeEvent );
+			this.dispatchEvent( _objectChangeEvent );
+
+		}
+
+		if ( stopCurrentTransform ) {
+
+			this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
+
+		}
+
+	}
+
 	getRaycaster() {
 
 		return _raycaster;
