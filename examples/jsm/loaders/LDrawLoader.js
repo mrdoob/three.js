@@ -9,7 +9,6 @@ import {
 	Loader,
 	Matrix4,
 	Mesh,
-	MeshPhongMaterial,
 	MeshStandardMaterial,
 	ShaderMaterial,
 	UniformsLib,
@@ -1201,14 +1200,8 @@ class LDrawLoader extends Loader {
 
 			case FINISH_TYPE_PEARLESCENT:
 
-				// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-				const specular = new Color( colour );
-				const hsl = specular.getHSL( { h: 0, s: 0, l: 0 } );
-				hsl.h = ( hsl.h + 0.5 ) % 1;
-				hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
-				specular.setHSL( hsl.h, hsl.s, hsl.l );
-
-				material = new MeshPhongMaterial( { color: colour, specular: specular, shininess: 10, reflectivity: 0.3 } );
+				// Try to imitate pearlescency by making the surface glossy
+				material = new MeshStandardMaterial( { color: colour, roughness: 0.3, metalness: 0.25 } );
 				break;
 
 			case FINISH_TYPE_CHROME:
