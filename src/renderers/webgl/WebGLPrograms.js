@@ -1,4 +1,5 @@
 import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, LinearEncoding, sRGBEncoding, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, RGBAFormat, UnsignedByteType } from '../../constants.js';
+import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
@@ -6,6 +7,7 @@ import { hashString } from '../../utils.js';
 
 function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
+	const _programLayers = new Layers();
 	const programs = [];
 
 	const isWebGL2 = capabilities.isWebGL2;
@@ -13,7 +15,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	const floatVertexTextures = capabilities.floatVertexTextures;
 	const maxVertexUniforms = capabilities.maxVertexUniforms;
 	const vertexTextures = capabilities.vertexTextures;
-
 	let precision = capabilities.precision;
 
 	const shaderIDs = {
@@ -362,121 +363,122 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	function getProgramCacheKeyBooleans( array, parameters ) {
 
-		let booleancount = 0;
-		if ( parameters.isWebGL2 )
-			booleancount += 1;
-		if ( parameters.supportsVertexTextures )
-			booleancount += 2;
-		if ( parameters.instancing )
-			booleancount += 4;
-		if ( parameters.instancingColor )
-			booleancount += 8;
-		if ( parameters.map )
-			booleancount += 16;
-		if ( parameters.matcap )
-			booleancount += 32;
-		if ( parameters.envMap )
-			booleancount += 64;
-		if ( parameters.envMapCubeUV )
-			booleancount += 128;
-		if ( parameters.lightMap )
-			booleancount += 256;
-		if ( parameters.aoMap )
-			booleancount += 512;
-		if ( parameters.emissiveMap )
-			booleancount += 1024;
-		if ( parameters.bumpMap )
-			booleancount += 2048;
-		if ( parameters.normalMap )
-			booleancount += 4096;
-		if ( parameters.objectSpaceNormalMap )
-			booleancount += 8192;
-		if ( parameters.tangentSpaceNormalMap )
-			booleancount += 16384;
-		if ( parameters.clearcoat )
-			booleancount += 32768;
-		if ( parameters.clearcoatMap )
-			booleancount += 65536;
-		if ( parameters.clearcoatRoughnessMap )
-			booleancount += 131072;
-		if ( parameters.clearcoatNormalMap )
-			booleancount += 262144;
-		if ( parameters.displacementMap )
-			booleancount += 524288;
-		if ( parameters.specularMap )
-			booleancount += 1048576;
-		if ( parameters.roughnessMap )
-			booleancount += 2097152;
-		if ( parameters.metalnessMap )
-			booleancount += 4194304;
-		if ( parameters.gradientMap )
-			booleancount += 8388608;
-		if ( parameters.alphaMap )
-			booleancount += 16777216;
-		if ( parameters.alphaTest )
-			booleancount += 33554432;
-		if ( parameters.vertexColors )
-			booleancount += 67108864;
-		if ( parameters.vertexAlphas )
-			booleancount += 134217728;
-		if ( parameters.vertexUvs )
-			booleancount += 268435456;
-		if ( parameters.vertexTangents )
-			booleancount += 536870912;
-		if ( parameters.uvsVertexOnly )
-			booleancount += 1073741824;
-		if ( parameters.fog )
-			booleancount += 2147483648;
-		array.push( booleancount );
-		booleancount = 0;
+		_programLayers.disableAll();
 
+		if ( parameters.isWebGL2 )
+			_programLayers.enable( 0 );
+		if ( parameters.supportsVertexTextures )
+			_programLayers.enable( 1 );
+		if ( parameters.instancing )
+			_programLayers.enable( 2 );
+		if ( parameters.instancingColor )
+			_programLayers.enable( 3 );
+		if ( parameters.map )
+			_programLayers.enable( 4 );
+		if ( parameters.matcap )
+			_programLayers.enable( 5 );
+		if ( parameters.envMap )
+			_programLayers.enable( 6 );
+		if ( parameters.envMapCubeUV )
+			_programLayers.enable( 7 );
+		if ( parameters.lightMap )
+			_programLayers.enable( 8 );
+		if ( parameters.aoMap )
+			_programLayers.enable( 9 );
+		if ( parameters.emissiveMap )
+			_programLayers.enable( 10 );
+		if ( parameters.bumpMap )
+			_programLayers.enable( 11 );
+		if ( parameters.normalMap )
+			_programLayers.enable( 12 );
+		if ( parameters.objectSpaceNormalMap )
+			_programLayers.enable( 13 );
+		if ( parameters.tangentSpaceNormalMap )
+			_programLayers.enable( 14 );
+		if ( parameters.clearcoat )
+			_programLayers.enable( 15 );
+		if ( parameters.clearcoatMap )
+			_programLayers.enable( 16 );
+		if ( parameters.clearcoatRoughnessMap )
+			_programLayers.enable( 17 );
+		if ( parameters.clearcoatNormalMap )
+			_programLayers.enable( 18 );
+		if ( parameters.displacementMap )
+			_programLayers.enable( 19 );
+		if ( parameters.specularMap )
+			_programLayers.enable( 20 );
+		if ( parameters.roughnessMap )
+			_programLayers.enable( 21 );
+		if ( parameters.metalnessMap )
+			_programLayers.enable( 22 );
+		if ( parameters.gradientMap )
+			_programLayers.enable( 23 );
+		if ( parameters.alphaMap )
+			_programLayers.enable( 24 );
+		if ( parameters.alphaTest )
+			_programLayers.enable( 25 );
+		if ( parameters.vertexColors )
+			_programLayers.enable( 26 );
+		if ( parameters.vertexAlphas )
+			_programLayers.enable( 27 );
+		if ( parameters.vertexUvs )
+			_programLayers.enable( 28 );
+		if ( parameters.vertexTangents )
+			_programLayers.enable( 29 );
+		if ( parameters.uvsVertexOnly )
+			_programLayers.enable( 30 );
+		if ( parameters.fog )
+			_programLayers.enable( 31 );
+
+		array.push( _programLayers.mask );
+		_programLayers.disableAll();
 
 		if ( parameters.useFog )
-			booleancount += 1;
+			_programLayers.enable( 0 );
 		if ( parameters.flatShading )
-			booleancount += 2;
+			_programLayers.enable( 1 );
 		if ( parameters.logarithmicDepthBuffer )
-			booleancount += 4;
+			_programLayers.enable( 2 );
 		if ( parameters.skinning )
-			booleancount += 8;
+			_programLayers.enable( 3 );
 		if ( parameters.useVertexTexture )
-			booleancount += 16;
+			_programLayers.enable( 4 );
 		if ( parameters.morphTargets )
-			booleancount += 32;
+			_programLayers.enable( 5 );
 		if ( parameters.morphNormals )
-			booleancount += 64;
+			_programLayers.enable( 6 );
 		if ( parameters.premultipliedAlpha )
-			booleancount += 128;
+			_programLayers.enable( 7 );
 		if ( parameters.shadowMapEnabled )
-			booleancount += 256;
+			_programLayers.enable( 8 );
 		if ( parameters.physicallyCorrectLights )
-			booleancount += 512;
+			_programLayers.enable( 9 );
 		if ( parameters.doubleSided )
-			booleancount += 1024;
+			_programLayers.enable( 10 );
 		if ( parameters.flipSided )
-			booleancount += 2048;
+			_programLayers.enable( 11 );
 		if ( parameters.depthPacking )
-			booleancount += 4096;
+			_programLayers.enable( 12 );
 		if ( parameters.dithering )
-			booleancount += 8192;
+			_programLayers.enable( 13 );
 		if ( parameters.specularIntensityMap )
-			booleancount += 16384;
+			_programLayers.enable( 14 );
 		if ( parameters.specularColorMap )
-			booleancount += 32768;
+			_programLayers.enable( 15 );
 		if ( parameters.transmission )
-			booleancount += 65536;
+			_programLayers.enable( 16 );
 		if ( parameters.transmissionMap )
-			booleancount += 131072;
+			_programLayers.enable( 17 );
 		if ( parameters.thicknessMap )
-			booleancount += 262144;
+			_programLayers.enable( 18 );
 		if ( parameters.sheen )
-			booleancount += 524288;
+			_programLayers.enable( 19 );
 		if ( parameters.sheenColorMap )
-			booleancount += 1048576;
+			_programLayers.enable( 20 );
 		if ( parameters.sheenRoughnessMap )
-			booleancount += 2097152;
+			_programLayers.enable( 21 );
 
-		array.push( booleancount );
+		array.push( _programLayers.mask );
 
 	}
 
