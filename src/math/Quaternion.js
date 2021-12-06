@@ -437,16 +437,16 @@ class Quaternion {
 		const ratio = newS / oldS;
 
 		if ( ratio === Infinity ) {
-	
+
 			return this;
-	
+
 		} else {
-	
+
 			this._x *= ratio;
 			this._y *= ratio;
 			this._z *= ratio;
 			this._w = Math.sqrt( 1 - newS * newS );
-	
+
 		}
 
 		this._onChangeCallback();
