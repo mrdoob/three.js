@@ -525,7 +525,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "pow", ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
+			var a = new Quaternion( x, y, z, w ).normalize(); // pow works only on normalized quaternions
 			var b = new Quaternion();
 
 			var _vec3 = new Vector3();
@@ -535,10 +535,10 @@ export default QUnit.module( 'Maths', () => {
 			_vec3.set( _vec4.x, _vec4.y, _vec4.z );
 
 			b.setFromAxisAngle( _vec3, _vec4.w / 50 );
-			assert.ok( b.equals( a.clone().pow( 1 / 50 ) ) === true, "Passed!" );
+			assert.ok( Math.abs( b.dot( a.clone().pow( 1 / 50 ) ) - 1 ) <= 1E-15, "Passed!" );
 
 			b.setFromAxisAngle( _vec3, _vec4.w * 50 );
-			assert.ok( b.equals( a.clone().pow( 50 ) ) === true, "Passed!" );
+			assert.ok( Math.abs( b.dot( a.clone().pow( 50 ) ) - 1 ) <= 1E-15, "Passed!" );
 
 			a = new Quaternion( 0, 0, 0, 1 ); 
 			b = new Quaternion( 0, 0, 0, 1 );
