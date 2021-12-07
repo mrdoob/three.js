@@ -532,7 +532,7 @@
 
 		}
 
-		reset( stopCurrentTransform ) {
+		reset() {
 
 			if ( ! this.enabled ) return;
 
@@ -544,12 +544,6 @@
 
 				this.dispatchEvent( _changeEvent );
 				this.dispatchEvent( _objectChangeEvent );
-
-			}
-
-			if ( stopCurrentTransform ) {
-
-				this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 
 			}
 
