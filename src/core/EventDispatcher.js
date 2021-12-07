@@ -26,17 +26,16 @@ class EventDispatcher {
 
 	dispatchEvent( event ) {
 
-			event.target = this;
+		event.target = this;
 
-			const invokeListener = listener => listener.call( this, event ); 
+		const invokeListener = listener => listener.call( this, event ); 
 
-			this.getEventListeners( event.type ).forEach( invokeListener );
+		this.getEventListeners( event.type ).forEach( invokeListener );
 
-			event.target = null;
+		event.target = null;
 
 	}
-	
-	
+
 	getEventListeners( type ) {
 
 		if ( undefined === this._listeners ) {
