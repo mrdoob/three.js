@@ -1153,8 +1153,8 @@ function WebGLState( gl, extensions, capabilities ) {
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
-    
-    updateUBOMapping: updateUBOMapping,
+
+		updateUBOMapping: updateUBOMapping,
 		uniformBlockBinding: uniformBlockBinding,
 
 		texStorage2D: texStorage2D,
