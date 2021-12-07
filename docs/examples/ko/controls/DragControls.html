@@ -93,7 +93,7 @@
 
 		<h3>[property:Boolean transformGroup]</h3>
 		<p>
-		
+
 			해당 속성은 [page:DragControls.objects] 배열에 드래그 가능한 단일 그룹 객체가 포함된 경우에만 작동합니다.
 			*true* 값으로 설정 되어있다면, [name]은 개별 객체가 아닌 전체 그룹은 드래그 합니다. 기본 값은 *false* 입니다.
 		</p>
@@ -102,17 +102,17 @@
 
 		<p>일반적인 메소드는 [page:EventDispatcher] 클래스를 참조하세요.</p>
 
-		<h3>[method:null activate] ()</h3>
+		<h3>[method:undefined activate] ()</h3>
 		<p>
 			컨트롤에 이벤트 리스너를 추가합니다.
 		</p>
 
-		<h3>[method:null deactivate] ()</h3>
+		<h3>[method:undefined deactivate] ()</h3>
 		<p>
 			컨트롤에 추가된 이벤트 리스너를 제거합니다.
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			컨트롤이 더 이상 필요하지 않을 경우 호출해야 합니다.
 		</p>
@@ -120,6 +120,11 @@
 		<h3>[method:Array getObjects] ()</h3>
 		<p>
 			드래그 가능한 객체 배열을 반환 합니다.
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the internal [page:Raycaster] instance that is used for intersection tests.
 		</p>
 
 		<h2>Source</h2>

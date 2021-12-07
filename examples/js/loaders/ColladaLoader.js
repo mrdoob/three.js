@@ -1422,7 +1422,6 @@
 
 				const effect = getEffect( data.url );
 				const technique = effect.profile.technique;
-				const extra = effect.profile.extra;
 				let material;
 
 				switch ( technique.type ) {
@@ -1598,6 +1597,7 @@
 								break;
 
 							default:
+								material.opacity = 1 - transparency.float;
 								console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
 
 						}

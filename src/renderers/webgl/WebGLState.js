@@ -319,7 +319,6 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	let enabledCapabilities = {};
 
-	let xrFramebuffer = null;
 	let currentBoundFramebuffers = {};
 
 	let currentProgram = null;
@@ -431,21 +430,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
-	function bindXRFramebuffer( framebuffer ) {
-
-		if ( framebuffer !== xrFramebuffer ) {
-
-			gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
-
-			xrFramebuffer = framebuffer;
-
-		}
-
-	}
-
 	function bindFramebuffer( target, framebuffer ) {
-
-		if ( framebuffer === null && xrFramebuffer !== null ) framebuffer = xrFramebuffer; // use active XR framebuffer if available
 
 		if ( currentBoundFramebuffers[ target ] !== framebuffer ) {
 
@@ -882,6 +867,76 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function texSubImage2D() {
+
+		try {
+
+			gl.texSubImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function texSubImage3D() {
+
+		try {
+
+			gl.texSubImage3D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function compressedTexSubImage2D() {
+
+		try {
+
+			gl.compressedTexSubImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function texStorage2D() {
+
+		try {
+
+			gl.texStorage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function texStorage3D() {
+
+		try {
+
+			gl.texStorage3D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
 	function texImage2D() {
 
 		try {
@@ -1035,7 +1090,6 @@ function WebGLState( gl, extensions, capabilities ) {
 		currentTextureSlot = null;
 		currentBoundTextures = {};
 
-		xrFramebuffer = null;
 		currentBoundFramebuffers = {};
 
 		currentProgram = null;
@@ -1079,7 +1133,6 @@ function WebGLState( gl, extensions, capabilities ) {
 		disable: disable,
 
 		bindFramebuffer: bindFramebuffer,
-		bindXRFramebuffer: bindXRFramebuffer,
 
 		useProgram: useProgram,
 
@@ -1100,9 +1153,15 @@ function WebGLState( gl, extensions, capabilities ) {
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
-
-		updateUBOMapping: updateUBOMapping,
+    
+    updateUBOMapping: updateUBOMapping,
 		uniformBlockBinding: uniformBlockBinding,
+
+		texStorage2D: texStorage2D,
+		texStorage3D: texStorage3D,
+		texSubImage2D: texSubImage2D,
+		texSubImage3D: texSubImage3D,
+		compressedTexSubImage2D: compressedTexSubImage2D,
 
 		scissor: scissor,
 		viewport: viewport,

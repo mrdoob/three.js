@@ -1,7 +1,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { RGBFormat, NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding, GLSL3 } from '../../constants.js';
+import { RGBFormat, NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, GLSL3 } from '../../constants.js';
 
 let programIdCount = 0;
 
@@ -37,8 +37,6 @@ function getEncodingComponents( encoding ) {
 			return [ 'RGBD', '( value, 256.0 )' ];
 		case GammaEncoding:
 			return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
-		case LogLuvEncoding:
-			return [ 'LogLuv', '( value )' ];
 		default:
 			console.warn( 'THREE.WebGLProgram: Unsupported encoding:', encoding );
 			return [ 'Linear', '( value )' ];
@@ -478,7 +476,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.specularIntensityMap ? '#define USE_SPECULARINTENSITYMAP' : '',
-			parameters.specularTintMap ? '#define USE_SPECULARTINTMAP' : '',
+			parameters.specularColorMap ? '#define USE_SPECULARCOLORMAP' : '',
 
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
@@ -487,6 +485,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.transmission ? '#define USE_TRANSMISSION' : '',
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
+
+			parameters.sheenColorMap ? '#define USE_SHEENCOLORMAP' : '',
+			parameters.sheenRoughnessMap ? '#define USE_SHEENROUGHNESSMAP' : '',
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
@@ -626,7 +627,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.specularIntensityMap ? '#define USE_SPECULARINTENSITYMAP' : '',
-			parameters.specularTintMap ? '#define USE_SPECULARTINTMAP' : '',
+			parameters.specularColorMap ? '#define USE_SPECULARCOLORMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 
@@ -634,6 +635,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.alphaTest ? '#define USE_ALPHATEST' : '',
 
 			parameters.sheen ? '#define USE_SHEEN' : '',
+			parameters.sheenColorMap ? '#define USE_SHEENCOLORMAP' : '',
+			parameters.sheenRoughnessMap ? '#define USE_SHEENROUGHNESSMAP' : '',
 
 			parameters.transmission ? '#define USE_TRANSMISSION' : '',
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
@@ -680,7 +683,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.matcap ? getTexelDecodingFunction( 'matcapTexelToLinear', parameters.matcapEncoding ) : '',
 			parameters.envMap ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
 			parameters.emissiveMap ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
-			parameters.specularTintMap ? getTexelDecodingFunction( 'specularTintMapTexelToLinear', parameters.specularTintMapEncoding ) : '',
+			parameters.specularColorMap ? getTexelDecodingFunction( 'specularColorMapTexelToLinear', parameters.specularColorMapEncoding ) : '',
+			parameters.sheenColorMap ? getTexelDecodingFunction( 'sheenColorMapTexelToLinear', parameters.sheenColorMapEncoding ) : '',
 			parameters.lightMap ? getTexelDecodingFunction( 'lightMapTexelToLinear', parameters.lightMapEncoding ) : '',
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ),
 
@@ -718,7 +722,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		prefixFragment = [
 			'#define varying in',
-			( parameters.glslVersion === GLSL3 ) ? '' : 'out highp vec4 pc_fragColor;',
+			( parameters.glslVersion === GLSL3 ) ? '' : 'layout(location = 0) out highp vec4 pc_fragColor;',
 			( parameters.glslVersion === GLSL3 ) ? '' : '#define gl_FragColor pc_fragColor',
 			'#define gl_FragDepthEXT gl_FragDepth',
 			'#define texture2D texture',

@@ -66,7 +66,7 @@
 		如果传入的点投影到三角形的平面内，则返回true。
 		</p>
 
-		<h3>[method:Triangle copy]( [param:Triangle triangle] )</h3>
+		<h3>[method:this copy]( [param:Triangle triangle] )</h3>
 		<p>
 			将传入的三角形的[page:.a a]、[page:.b b]和[page:.c c]属性复制给这一三角形。
 		</p>
@@ -117,13 +117,13 @@
 		判定三角形与传入的[page:Box3 box]是否相交。
 		</p>
 
-		<h3>[method:Triangle set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
+		<h3>[method:this set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
 		<p>
 			将三角形的[page:.a a]、[page:.b b]和[page:.c c]属性设置为所传入的[page:Vector3 vector3]。<br>
 			请注意，此方法仅复制给定对象的值。
 		</p>
 
-		<h3>[method:Triangle setFromAttributeAndIndices]( [param:BufferAttribute attribute], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<h3>[method:this setFromAttributeAndIndices]( [param:BufferAttribute attribute], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
 		<p>
 		attribute - [page:BufferAttribute] of vertex data <br />
 		i0 - [page:Integer] index <br />
@@ -134,7 +134,7 @@
 		</p>
 
 
-		<h3>[method:Triangle setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<h3>[method:this setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
 		<p>
 		points - [page:Vector3]数组（[page:Array]） <br />
 		i0 - 整数（[page:Integer]）索引 <br />

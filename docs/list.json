@@ -315,6 +315,7 @@
 				"DataTexture2DArray": "api/en/textures/DataTexture2DArray",
 				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
+				"FramebufferTexture": "api/en/textures/FramebufferTexture",
 				"Texture": "api/en/textures/Texture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
@@ -427,9 +428,7 @@
 			},
 
 			"WebGLRenderer": {
-				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram",
-				"WebGLShader": "api/en/renderers/webgl/WebGLShader",
-				"WebGLState": "api/en/renderers/webgl/WebGLState"
+				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
 			}
 
 		}
@@ -819,6 +818,7 @@
 				"DataTexture2DArray": "api/zh/textures/DataTexture2DArray",
 				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
+				"FramebufferTexture": "api/zh/textures/FramebufferTexture",
 				"Texture": "api/zh/textures/Texture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
 			}
@@ -926,9 +926,7 @@
 			},
 
 			"WebGL渲染器": {
-				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram",
-				"WebGLShader": "api/zh/renderers/webgl/WebGLShader",
-				"WebGLState": "api/zh/renderers/webgl/WebGLState"
+				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram"
 			}
 
 		}

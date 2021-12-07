@@ -62,16 +62,6 @@ function SidebarGeometry( editor ) {
 
 				break;
 
-			case 'Convert':
-
-				if ( geometry && geometry.isGeometry ) {
-
-					editor.execute( new SetGeometryCommand( editor, object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
-
-				}
-
-				break;
-
 			case 'Flatten':
 
 				var newGeometry = geometry.clone();

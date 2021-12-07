@@ -1,0 +1,362 @@
+{
+	"en": {
+		"Basics": {
+			"Fundamentals": "en/fundamentals",
+			"Responsive Design": "en/responsive",
+			"Prerequisites": "en/prerequisites",
+			"Setup": "en/setup"
+		},
+		"Fundamentals": {
+			"Primitives": "en/primitives",
+			"Scenegraph": "en/scenegraph",
+			"Materials": "en/materials",
+			"Textures": "en/textures",
+			"Lights": "en/lights",
+			"Cameras": "en/cameras",
+			"Shadows": "en/shadows",
+			"Fog": "en/fog",
+			"Render Targets": "en/rendertargets",
+			"Custom BufferGeometry": "en/custom-buffergeometry"
+		},
+		"Tips": {
+			"Rendering On Demand": "en/rendering-on-demand",
+			"Debugging JavaScript": "en/debugging-javascript",
+			"Debugging GLSL": "en/debugging-glsl",
+			"Taking a screenshot": "en/tips#screenshot",
+			"Prevent the Canvas Being Cleared": "en/tips#preservedrawingbuffer",
+			"Get Keyboard Input From a Canvas": "en/tips#tabindex",
+			"Make the Canvas Transparent": "en/tips#transparent-canvas",
+			"Use three.js as Background in HTML": "en/tips#html-background"
+		},
+		"Optimization": {
+			"Optimizing Lots of Objects": "en/optimize-lots-of-objects",
+			"Optimizing Lots of Objects Animated": "en/optimize-lots-of-objects-animated",
+			"Using OffscreenCanvas in a Web Worker": "en/offscreencanvas"
+		},
+		"Solutions": {
+			"Load an .OBJ file": "en/load-obj",
+			"Load a .GLTF file": "en/load-gltf",
+			"Add a Background or Skybox": "en/backgrounds",
+			"How to Draw Transparent Objects": "en/transparency",
+			"Multiple Canvases, Multiple Scenes": "en/multiple-scenes",
+			"Picking Objects with the mouse": "en/picking",
+			"Post Processing": "en/post-processing",
+			"Applying a LUT File for effects": "en/post-processing-3dlut",
+			"Using Shadertoy shaders": "en/shadertoy",
+			"Aligning HTML Elements to 3D": "en/align-html-elements-to-3d",
+			"Using Indexed Textures for Picking and Color": "en/indexed-textures",
+			"Using A Canvas for Dynamic Textures": "en/canvas-textures",
+			"Billboards and Facades": "en/billboards",
+			"Freeing Resources": "en/cleanup",
+			"Making Voxel Geometry (Minecraft)": "en/voxel-geometry",
+			"Start making a Game": "en/game"
+		},
+		"WebXR": {
+			"VR - Basics": "en/webxr",
+			"VR - Look To Select": "en/webxr-look-to-select",
+			"VR - Point To Select": "en/webxr-point-to-select"
+		},
+		"Reference": {
+			"Material Table": "en/material-table"
+		}
+	},
+	"fr": {
+		"Bases": {
+			"Principes de base": "fr/fundamentals",
+			"Design réactif": "fr/responsive",
+			"Pré-requis": "fr/prerequisites",
+			"Configuration": "fr/setup"
+		},
+		"Principes de base": {
+			"Primitives": "fr/primitives",
+			"Graphique de scène": "fr/scenegraph",
+			"Matériaux": "fr/materials",
+			"Textures": "fr/textures",
+			"Lumières": "fr/lights",
+			"Caméras": "fr/cameras",
+			"Ombres": "fr/shadows",
+			"Brouillard": "fr/fog",
+			"Render Targets": "fr/rendertargets",
+			"Custom BufferGeometry": "fr/custom-buffergeometry"
+		},
+		"Сonseils": {
+			"Rendering On Demand": "fr/rendering-on-demand",
+			"Debugging JavaScript": "fr/debugging-javascript",
+			"Debugging GLSL": "fr/debugging-glsl",
+			"Taking a screenshot": "fr/tips#screenshot",
+			"Prevent the Canvas Being Cleared": "fr/tips#preservedrawingbuffer",
+			"Get Keyboard Input From a Canvas": "fr/tips#tabindex",
+			"Make the Canvas Transparent": "fr/tips#transparent-canvas",
+			"Use three.js as Background in HTML": "fr/tips#html-background"
+		},
+		"Optimisation": {
+			"Optimizing Lots of Objects": "fr/optimize-lots-of-objects",
+			"Optimizing Lots of Objects Animated": "fr/optimize-lots-of-objects-animated",
+			"Using OffscreenCanvas in a Web Worker": "fr/offscreencanvas"
+		},
+		"Solutions": {
+			"Load an .OBJ file": "fr/load-obj",
+			"Load a .GLTF file": "fr/load-gltf",
+			"Add a Background or Skybox": "fr/backgrounds",
+			"How to Draw Transparent Objects": "fr/transparency",
+			"Multiple Canvases, Multiple Scenes": "fr/multiple-scenes",
+			"Picking Objects with the mouse": "fr/picking",
+			"Post Processing": "fr/post-processing",
+			"Applying a LUT File for effects": "fr/post-processing-3dlut",
+			"Using Shadertoy shaders": "fr/shadertoy",
+			"Aligning HTML Elements to 3D": "fr/align-html-elements-to-3d",
+			"Using Indexed Textures for Picking and Color": "fr/indexed-textures",
+			"Using A Canvas for Dynamic Textures": "fr/canvas-textures",
+			"Billboards and Facades": "fr/billboards",
+			"Freeing Resources": "fr/cleanup",
+			"Making Voxel Geometry (Minecraft)": "fr/voxel-geometry",
+			"Start making a Game": "fr/game"
+		},
+		"WebXR": {
+			"VR - Basics": "fr/webxr",
+			"VR - Look To Select": "fr/webxr-look-to-select",
+			"VR - Point To Select": "fr/webxr-point-to-select"
+		},
+		"Référence": {
+			"Material Table": "fr/material-table"
+		}
+	},
+	"ja": {
+		"基本": {
+			"基礎知識": "ja/fundamentals",
+			"レスポンシブデザイン": "ja/responsive",
+			"前提条件": "ja/prerequisites",
+			"セットアップ": "ja/setup"
+		},
+		"基礎": {
+			"プリミティブ": "ja/primitives",
+			"シーングラフ": "ja/scenegraph",
+			"マテリアル": "ja/materials",
+			"テクスチャ": "ja/textures",
+			"ライト": "ja/lights",
+			"カメラ": "ja/cameras",
+			"シャドウ": "ja/shadows",
+			"フォグ": "ja/fog",
+			"レンダーターゲット": "ja/rendertargets",
+			"カスタムバッファジオメトリ": "ja/custom-buffergeometry"
+		},
+		"Tips": {
+			"要求されたレンダリング": "ja/rendering-on-demand",
+			"JavaScriptのデバッグ": "ja/debugging-javascript",
+			"GLSLのデバッグ": "ja/debugging-glsl",
+			"スクリーンショットを撮る": "ja/tips#screenshot",
+			"キャンバスがクリアされるのを防ぐ": "ja/tips#preservedrawingbuffer",
+			"キャンバスからキーボード入力を取得する": "ja/tips#tabindex",
+			"キャンバスを透明にする": "ja/tips#transparent-canvas",
+			"HTMLの背景にthree.jsを使う": "ja/tips#html-background"
+		},
+		"最適化": {
+			"多くのオブジェクトを最適化": "ja/optimize-lots-of-objects",
+			"アニメーションする多くのオブジェクトを最適化": "ja/optimize-lots-of-objects-animated",
+			"Web WorkerでOffscreenCanvasを使用する": "ja/offscreencanvas"
+		},
+		"解決策": {
+			"OBJファイルの読み込み": "ja/load-obj",
+			"GLTFファイルの読み込み": "ja/load-gltf",
+			"背景やスカイボックスを追加する": "ja/backgrounds",
+			"透明なオブジェクトの描画方法": "ja/transparency",
+			"複数キャンバスと複数シーン": "ja/multiple-scenes",
+			"マウスでオブジェクトをピッキング": "ja/picking",
+			"ポストプロセス": "ja/post-processing",
+			"エフェクトにLUTファイルを適用する": "ja/post-processing-3dlut",
+			"Shadertoyのシェーダーを使う": "ja/shadertoy",
+			"HTML要素を3Dに揃える": "ja/align-html-elements-to-3d",
+			"圧縮テクスチャのピッキングとカラー": "ja/indexed-textures",
+			"動的なテクスチャのキャンバスを使用する": "ja/canvas-textures",
+			"Billboards and Facades": "ja/billboards",
+			"Freeing Resources": "ja/cleanup",
+			"Making Voxel Geometry (Minecraft)": "ja/voxel-geometry",
+			"Start making a Game": "ja/game"
+		},
+		"WebXR": {
+			"VR - Basics": "ja/webxr",
+			"VR - Look To Select": "ja/webxr-look-to-select",
+			"VR - Point To Select": "ja/webxr-point-to-select"
+		},
+		"参照": {
+			"Material Table": "ja/material-table"
+		}
+	},
+	"ko": {
+		"Three.js란?": {
+			"Three.js란?": "ko/fundamentals",
+			"반응형 디자인": "ko/responsive",
+			"먼저 알아야 할 것들": "ko/prerequisites",
+			"개발 환경": "ko/setup"
+		},
+		"기본 구조": {
+			"원시 모델": "ko/primitives",
+			"씬 그래프": "ko/scenegraph",
+			"재질(Materials)": "ko/materials",
+			"텍스처(Textures)": "ko/textures",
+			"조명(Lights)": "ko/lights",
+			"카메라(Cameras)": "ko/cameras",
+			"그림자(Shadows)": "ko/shadows",
+			"안개(Fog)": "ko/fog",
+			"렌더 타겟(Render Targets)": "ko/rendertargets",
+			"사용자 지정 BufferGeometry": "ko/custom-buffergeometry"
+		},
+		"팁": {
+			"불필요한 렌더링 없애기": "ko/rendering-on-demand",
+			"자바스크립트 디버깅": "ko/debugging-javascript",
+			"GLSL 디버깅": "ko/debugging-glsl",
+			"스크린샷 찍기": "ko/tips#screenshot",
+			"캔버스 초기화 방지하기": "ko/tips#preservedrawingbuffer",
+			"캔버스에서 키 입력 받기": "ko/tips#tabindex",
+			"캔버스를 투명하게 만들기": "ko/tips#transparent-canvas",
+			"Three.js를 HTML 요소의 배경으로 사용하기": "ko/tips#html-background"
+		},
+		"최적화하기": {
+			"요소가 많을 때 최적화하는 방법": "ko/optimize-lots-of-objects",
+			"애니메이션 요소가 많을 때 최적화하는 방법": "ko/optimize-lots-of-objects-animated",
+			"웹 워커에서 OffscreenCanvas 사용하기": "ko/offscreencanvas"
+		},
+		"활용하기": {
+			".OBJ 파일 불러오기": "ko/load-obj",
+			".GLTF 파일 불러오기": "ko/load-gltf",
+			"배경, 하늘 상자 추가하기": "ko/backgrounds",
+			"물체의 투명도 설정하기": "ko/transparency",
+			"다중 캔버스, 다중 장면 만들기": "ko/multiple-scenes",
+			"물체를 마우스로 피킹하기": "ko/picking",
+			"후처리": "ko/post-processing",
+			"LUT 파일로 후처리 효과 적용하기": "ko/post-processing-3dlut",
+			"쉐이더토이 쉐이더 활용하기": "ko/shadertoy",
+			"HTML 요소를 3D로 정렬하기": "ko/align-html-elements-to-3d",
+			"피킹과 색상에 인덱스 텍스처 사용하기": "ko/indexed-textures",
+			"캔버스로 동적 텍스처 만들기": "ko/canvas-textures",
+			"빌보드와 파사드": "ko/billboards",
+			"메모리 해제하기": "ko/cleanup",
+			"복셀 Geometry(마인크래프트) 만들기": "ko/voxel-geometry",
+			"게임 만들기": "ko/game"
+		},
+		"웹VR": {
+			"VR - 기본 사항": "ko/webxr",
+			"VR - Look To Select": "ko/webxr-look-to-select",
+			"VR - Point To Select": "ko/webxr-point-to-select"
+		},
+		"레퍼런스": {
+			"재질(Material) 속성표": "ko/material-table"
+		}
+	},
+	"ru": {
+		"Введение": {
+			"Базовые принципы": "ru/fundamentals",
+			"Адаптивный дизайн": "ru/responsive",
+			"Необходимые условия": "ru/prerequisites",
+			"Настройка": "ru/setup"
+		},
+		"Фунаментальные понятия": {
+			"Примитивы": "ru/primitives",
+			"Граф сцены": "ru/scenegraph",
+			"Материалы": "ru/materials",
+			"Текстуры": "ru/textures",
+			"Освещение": "ru/lights",
+			"Камера": "ru/cameras",
+			"Тени": "ru/shadows",
+			"Туман": "ru/fog",
+			"Цели рендеринга": "ru/rendertargets",
+			"Пользовательская BufferGeometry": "ru/custom-buffergeometry"
+		},
+		"Советы": {
+			"Рендеринг по требованию": "ru/rendering-on-demand",
+			"Отладка JavaScript": "ru/debugging-javascript",
+			"Отладка GLSL": "ru/debugging-glsl",
+			"Делаем скриншот холста": "ru/tips#screenshot",
+			"Предотвращение очистки холста ": "ru/tips#preservedrawingbuffer",
+			"Ввод с клавиатуры": "ru/tips#tabindex",
+			"Делаем холст прозрачным ": "ru/tips#transparent-canvas",
+			"Создание анимированного фона в three.js ": "ru/tips#html-background"
+		},
+		"Оптимизация": {
+			"Оптимизация большого количества объектов": "ru/optimize-lots-of-objects",
+			"Оптимизация множества анимированных объектов": "ru/optimize-lots-of-objects-animated",
+			"Использование OffscreenCanvas в воркере": "ru/offscreencanvas"
+		},
+		"Решения": {
+			"Load an .OBJ file": "ru/load-obj",
+			"Load a .GLTF file": "ru/load-gltf",
+			"Add a Background or Skybox": "ru/backgrounds",
+			"How to Draw Transparent Objects": "ru/transparency",
+			"Несколько холстов, несколько сцен": "ru/multiple-scenes",
+			"Picking Objects with the mouse": "ru/picking",
+			"Post Processing": "ru/post-processing",
+			"Applying a LUT File for effects": "ru/post-processing-3dlut",
+			"Using Shadertoy shaders": "ru/shadertoy",
+			"Aligning HTML Elements to 3D": "ru/align-html-elements-to-3d",
+			"Using Indexed Textures for Picking and Color": "ru/indexed-textures",
+			"Using A Canvas for Dynamic Textures": "ru/canvas-textures",
+			"Billboards and Facades": "ru/billboards",
+			"Freeing Resources": "ru/cleanup",
+			"Making Voxel Geometry (Minecraft)": "ru/voxel-geometry",
+			"Start making a Game": "ru/game"
+		},
+		"WebXR": {
+			"VR - Basics": "ru/webxr",
+			"VR - Look To Select": "ru/webxr-look-to-select",
+			"VR - Point To Select": "ru/webxr-point-to-select"
+		},
+		"Ссылки": {
+			"Таблица материалов": "ru/material-table"
+		}
+	},
+	"zh": {
+		"基础": {
+			"图元": "zh/primitives",
+			"场景图": "zh/scenegraph",
+			"材质": "zh/materials",
+			"纹理": "zh/textures",
+			"光照": "zh/lights",
+			"摄像机": "zh/cameras",
+			"阴影": "zh/shadows",
+			"雾": "zh/fog",
+			"渲染目标": "zh/rendertargets",
+			"自定义缓冲几何体": "zh/custom-buffergeometry"
+		},
+		"技巧": {
+			"按需渲染": "zh/rendering-on-demand",
+			"Debugging JavaScript": "zh/debugging-javascript",
+			"调试着色器": "zh/debugging-glsl",
+			"Taking a screenshot": "zh/tips#screenshot",
+			"Prevent the Canvas Being Cleared": "zh/tips#preservedrawingbuffer",
+			"Get Keyboard Input From a Canvas": "zh/tips#tabindex",
+			"Make the Canvas Transparent": "zh/tips#transparent-canvas",
+			"Use three.js as Background in HTML": "zh/tips#html-background"
+		},
+		"优化": {
+			"大量对象的优化": "zh/optimize-lots-of-objects",
+			"优化对象的同时保持动画效果": "zh/optimize-lots-of-objects-animated",
+			"Using OffscreenCanvas in a Web Worker": "zh/offscreencanvas"
+		},
+		"解决方案": {
+			"加载 .OBJ 文件": "zh/load-obj",
+			"Load a .GLTF file": "zh/load-gltf",
+			"Add a Background or Skybox": "zh/backgrounds",
+			"How to Draw Transparent Objects": "zh/transparency",
+			"多个画布, 多个场景": "zh/multiple-scenes",
+			"鼠标选取对象": "zh/picking",
+			"后期处理": "zh/post-processing",
+			"Applying a LUT File for effects": "zh/post-processing-3dlut",
+			"Using Shadertoy shaders": "zh/shadertoy",
+			"Aligning HTML Elements to 3D": "zh/align-html-elements-to-3d",
+			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
+			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
+			"Billboards and Facades": "zh/billboards",
+			"Freeing Resources": "zh/cleanup",
+			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
+			"Start making a Game": "zh/game"
+		},
+		"WebXR": {
+			"VR - Basics": "zh/webxr",
+			"VR - Look To Select": "zh/webxr-look-to-select",
+			"VR - Point To Select": "zh/webxr-point-to-select"
+		},
+		"参考": {
+			"Material Table": "zh/material-table"
+		}
+	}
+}

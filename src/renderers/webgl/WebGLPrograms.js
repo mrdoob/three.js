@@ -40,8 +40,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap',
 		'objectSpaceNormalMap', 'tangentSpaceNormalMap',
 		'clearcoat', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap',
-		'displacementMap',
-		'specularMap', 'specularIntensityMap', 'specularTintMap', 'specularTintMapEncoding', 'roughnessMap', 'metalnessMap', 'gradientMap',
+		'displacementMap', 'specularMap', 'roughnessMap', 'metalnessMap', 'gradientMap',
 		'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
 		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
 		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'morphTargetsCount', 'premultipliedAlpha',
@@ -49,7 +48,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
 		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
 		'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering', 'format',
-		'sheen', 'transmission', 'transmissionMap', 'thicknessMap'
+		'specularIntensityMap', 'specularColorMap', 'specularColorMapEncoding',
+		'transmission', 'transmissionMap', 'thicknessMap',
+		'sheen', 'sheenColorMap', 'sheenColorMapEncoding', 'sheenRoughnessMap'
 	];
 
 	function getMaxBones( object ) {
@@ -213,8 +214,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			metalnessMap: !! material.metalnessMap,
 			specularMap: !! material.specularMap,
 			specularIntensityMap: !! material.specularIntensityMap,
-			specularTintMap: !! material.specularTintMap,
-			specularTintMapEncoding: getTextureEncodingFromMap( material.specularTintMap ),
+			specularColorMap: !! material.specularColorMap,
+			specularColorMapEncoding: getTextureEncodingFromMap( material.specularColorMap ),
 
 			alphaMap: !! material.alphaMap,
 			alphaTest: useAlphaTest,
@@ -222,6 +223,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			gradientMap: !! material.gradientMap,
 
 			sheen: material.sheen > 0,
+			sheenColorMap: !! material.sheenColorMap,
+			sheenColorMapEncoding: getTextureEncodingFromMap( material.sheenColorMap ),
+			sheenRoughnessMap: !! material.sheenRoughnessMap,
 
 			transmission: material.transmission > 0,
 			transmissionMap: !! material.transmissionMap,
@@ -232,8 +236,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: ( !! material.normalMap && !! object.geometry && !! object.geometry.attributes.tangent ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! object.geometry && !! object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4,
-			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularTintMap,
-			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularTintMap ) && !! material.displacementMap,
+			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || !! material.sheenRoughnessMap,
+			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || material.sheen > 0 || !! material.sheenColorMap || !! material.sheenRoughnessMap ) && !! material.displacementMap,
 
 			fog: !! fog,
 			useFog: material.fog,

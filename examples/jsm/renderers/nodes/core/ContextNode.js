@@ -11,20 +11,6 @@ class ContextNode extends Node {
 
 	}
 
-	setContextValue( name, value ) {
-
-		this.context[ name ] = value;
-
-		return this;
-
-	}
-
-	getContextValue( name ) {
-
-		return this.context[ name ];
-
-	}
-
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );

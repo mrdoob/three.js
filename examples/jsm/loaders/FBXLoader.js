@@ -1421,7 +1421,7 @@ class FBXTreeParser {
 
 			for ( const nodeID in BindPoseNode ) {
 
-				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' && BindPoseNode[ nodeID ].NbPoseNodes > 0 ) {
 
 					const poseNodes = BindPoseNode[ nodeID ].PoseNode;
 

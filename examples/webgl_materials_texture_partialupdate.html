@@ -50,8 +50,8 @@
 				const width = 32;
 				const height = 32;
 
-				const data = new Uint8Array( width * height * 3 );
-				dataTexture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+				const data = new Uint8Array( width * height * 4 );
+				dataTexture = new THREE.DataTexture( data, width, height );
 
 				//
 
@@ -117,11 +117,12 @@
 
 				for ( let i = 0; i < size; i ++ ) {
 
-					const stride = i * 3;
+					const stride = i * 4;
 
 					data[ stride ] = r;
 					data[ stride + 1 ] = g;
 					data[ stride + 2 ] = b;
+					data[ stride + 3 ] = 1;
 
 				}
 

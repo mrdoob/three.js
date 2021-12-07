@@ -1,6 +1,6 @@
 import { NodeUpdateType } from './constants.js';
 
-import { MathUtils } from 'three';
+import { MathUtils } from '../../../../../build/three.module.js';
 
 class Node {
 
@@ -35,12 +35,6 @@ class Node {
 	getNodeType( /*builder*/ ) {
 
 		return this.nodeType;
-
-	}
-
-	getTypeLength( builder ) {
-
-		return builder.getTypeLength( this.getNodeType( builder ) );
 
 	}
 
@@ -83,7 +77,7 @@ class Node {
 
 			if ( snippet === undefined ) {
 
-				snippet = this.generate( builder );
+				snippet = this.generate( builder ) || '';
 
 				nodeData.snippet = snippet;
 
@@ -93,7 +87,7 @@ class Node {
 
 		} else {
 
-			snippet = this.generate( builder, output );
+			snippet = this.generate( builder, output ) || '';
 
 		}
 

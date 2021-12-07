@@ -16,7 +16,7 @@
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { GUI } from './jsm/libs/lil-gui.module.min.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
 		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
@@ -90,6 +90,7 @@
 				texture.type = THREE.FloatType;
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
+				texture.needsUpdate = true;
 
 				// Colormap textures
 				cmtextures = {

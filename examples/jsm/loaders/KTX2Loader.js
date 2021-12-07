@@ -169,7 +169,7 @@ class KTX2Loader extends Loader {
 
 			}
 
-			_activeLoaders++;
+			_activeLoaders ++;
 
 		}
 
@@ -265,7 +265,7 @@ class KTX2Loader extends Loader {
 		URL.revokeObjectURL( this.workerSourceURL );
 		this.workerPool.dispose();
 
-		_activeLoaders--;
+		_activeLoaders --;
 
 		return this;
 
