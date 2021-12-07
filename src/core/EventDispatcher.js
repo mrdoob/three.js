@@ -4,7 +4,7 @@
 
 class EventDispatcher {
 
-	addEventListener( type, listener ){
+	addEventListener( type, listener ) {
 
 		const listeners = this.getEventListeners( type );
 
@@ -12,19 +12,19 @@ class EventDispatcher {
 		
 	}
 
-	hasEventListener( type, listener ){
+	hasEventListener( type, listener ) {
 
 		return this.getEventListeners( type ).has( listener );
 
 	}
 
-	removeEventListener( type, listener ){
+	removeEventListener( type, listener ) {
 
 		this.getEventListeners( type ).remove( listener );
 
 	}
 
-	dispatchEvent( event ){
+	dispatchEvent( event ) {
 
 			event.target = this;
 
@@ -37,7 +37,7 @@ class EventDispatcher {
 	}
 	
 	
-	getEventListeners( type ){
+	getEventListeners( type ) {
 
 		if ( undefined === this._listeners ) {
 
