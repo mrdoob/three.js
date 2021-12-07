@@ -9,7 +9,7 @@ class EventDispatcher {
 		const listeners = this.getEventListeners( type );
 
 		listeners.add( listener );
-		
+
 	}
 
 	hasEventListener( type, listener ) {
@@ -28,7 +28,7 @@ class EventDispatcher {
 
 		event.target = this;
 
-		const invokeListener = listener => listener.call( this, event ); 
+		const invokeListener = listener => listener.call( this, event );
 
 		this.getEventListeners( event.type ).forEach( invokeListener );
 
@@ -43,8 +43,8 @@ class EventDispatcher {
 			this._listeners = new Map();
 
 		}
-		
-		if ( !this._listeners.has( type ) ) {
+
+		if ( ! this._listeners.has( type ) ) {
 
 			this._listeners.set( type, new Set() );
 
