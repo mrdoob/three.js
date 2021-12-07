@@ -523,6 +523,30 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "pow", ( assert ) => {
+
+			var a = new Quaternion( x, y, z, w );
+			var b = new Quaternion();
+
+			var _vec3 = new Vector3();
+			var _vec4 = new Vector4();
+
+			_vec4.setAxisAngleFromQuaternion( a );
+			_vec3.set( _vec4.x, _vec4.y, _vec4.z );
+
+			b.setFromAxisAngle( _vec3, _vec4.w / 50 );
+			assert.ok( b.equals( a.clone().pow( 1 / 50 ) ) === true, "Passed!" );
+
+			b.setFromAxisAngle( _vec3, _vec4.w * 50 );
+			assert.ok( b.equals( a.clone().pow( 50 ) ) === true, "Passed!" );
+
+			a = new Quaternion( 0, 0, 0, 1 ); 
+			b = new Quaternion( 0, 0, 0, 1 );
+
+			assert.ok( b.equals( a.pow( 50 ) ) === true, "Passed!" ); // test for zero angle - then oldS is zero
+
+		} );
+
 		QUnit.test( "identity", ( assert ) => {
 
 			var a = new Quaternion();
