@@ -375,6 +375,7 @@
 		"misc_animation_groups",
 		"misc_animation_keys",
 		"misc_boxselection",
+		"misc_boxselection_instance",
 		"misc_controls_arcball",
 		"misc_controls_drag",
 		"misc_controls_fly",

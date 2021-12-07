@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - box selection</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #f0f0f0;
+				color: #000;
+				touch-action: none;
+			}
+
+			a {
+				color: #08e;
+			}
+
+			.selectBox {
+				border: 1px solid #55aaff;
+				background-color: rgba(75, 160, 255, 0.3);
+				position: fixed;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			import { SelectionBox } from './jsm/interactive/SelectionBox.js';
+			import { SelectionHelper } from './jsm/interactive/SelectionHelper.js';
+
+			let container, stats;
+			let camera, scene, renderer, control, im, selection;
+
+			let selectStarted = false;
+
+			const color = new THREE.Color();
+			const evt = new THREE.EventDispatcher();
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1500;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
+
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
+				light.position.set( 0, 800, 4000 );
+				light.angle = Math.PI / 9;
+
+				scene.add( light );
+
+				const geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+
+				im = new THREE.InstancedMesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff } ), 5000 );
+
+				const cube = new THREE.Object3D();
+
+				for ( let i = 0; i < 5000; i ++ ) {
+
+					cube.position.set( Math.random() * 2000 - 800, Math.random() * 800 - 450, Math.random() * 800 - 500 );
+					cube.scale.set( Math.random() * 2 + 1, Math.random() * 2 + 1, Math.random() * 2 + 1 );
+					cube.updateMatrix();
+					im.setMatrixAt( i, cube.matrix );
+					im.setColorAt( i, color.setHex( Math.random() * 0xffffff ) );
+
+				}
+
+				im.instanceMatrix.needsUpdate = true;
+				im.instanceColor.needsUpdate = true;
+
+				scene.add( im );
+
+				const matrix = new THREE.Matrix4().makeTranslation( 100, 100, 0 );
+				im.applyMatrix4( matrix );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				control = new OrbitControls( camera, renderer.domElement );
+
+				initButton();
+
+			}
+
+			function initButton() {
+
+				const startBtn = document.createElement( 'button' );
+				startBtn.style.position = 'absolute';
+				startBtn.style.left = '20px';
+				startBtn.style.bottom = '100px';
+				startBtn.style.width = '150px';
+				startBtn.innerText = 'start select';
+				startBtn.onclick = startSelect;
+				document.body.appendChild( startBtn );
+
+				const cancelBtn = document.createElement( 'button' );
+				cancelBtn.style.position = 'absolute';
+				cancelBtn.style.left = '20px';
+				cancelBtn.style.bottom = '50px';
+				cancelBtn.style.width = '150px';
+				cancelBtn.innerText = 'cancel select';
+				cancelBtn.onclick = cancelSelect;
+				document.body.appendChild( cancelBtn );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+				control.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			function initSelection() {
+
+				const box = new SelectionBox( camera, scene );
+				const helper = new SelectionHelper( box, renderer, 'selectBox' );
+				selection = {
+					box: box,
+					helper: helper,
+
+					pointerdownEvent: function ( event ) {
+
+						box.startPoint.set(
+						  ( event.clientX / window.innerWidth ) * 2 - 1,
+						  - ( event.clientY / window.innerHeight ) * 2 + 1,
+						  0.5 );
+
+		      },
+
+					pointermoveEvent: function ( event ) {
+
+						if ( helper.isDown ) {
+
+						  box.endPoint.set(
+						    ( event.clientX / window.innerWidth ) * 2 - 1,
+						    ( event.clientX / window.innerWidth ) * 2 - 1,
+						    - ( event.clientY / window.innerHeight ) * 2 + 1,
+						    0.5 );
+
+				      } else {}
+
+				    },
+
+				    pointerupEvent: function ( event ) {
+
+				      box.endPoint.set(
+						    ( event.clientX / window.innerWidth ) * 2 - 1,
+						    - ( event.clientY / window.innerHeight ) * 2 + 1,
+						    0.5 );
+
+						  box.select();
+				      evt.dispatchEvent( {
+
+				        type: 'selectend',
+				        message: {
+				          instances: box.instances,
+				          collection: box.collection
+				        }
+				      } );
+
+				    }
+				};
+
+				selectStarted = true;
+
+			}
+
+			function cancelSelect() {
+
+				if ( ! selectStarted ) return;
+
+				selection.helper.dispose();
+
+				document.removeEventListener( 'pointerdown', selection.pointerdownEvent );
+				document.removeEventListener( 'pointermove', selection.pointermoveEvent );
+				document.removeEventListener( 'pointerup', selection.pointerupEvent );
+				evt.removeEventListener( 'selectend', handleSelection );
+				selectStarted = false;
+				control = new OrbitControls( camera, renderer.domElement );
+
+			}
+
+			function startSelect() {
+
+				if ( selectStarted ) return;
+
+				control.dispose();
+
+				initSelection();
+
+				evt.addEventListener( 'selectend', handleSelection );
+				document.addEventListener( 'pointerdown', selection.pointerdownEvent );
+				document.addEventListener( 'pointermove', selection.pointermoveEvent );
+				document.addEventListener( 'pointerup', selection.pointerupEvent );
+
+			}
+
+			function handleSelection( e ) {
+
+				for ( const [ key, value ] of Object.entries( e.message.instances ) ) {
+
+					if ( key === im.uuid ) {
+
+				    value.forEach( v => {
+
+							im.setColorAt( v, color.setHex( 0xff0000 ) );
+
+				    } );
+
+				    im.instanceColor.needsUpdate = true;
+
+					} else {}
+
+				}
+
+			}
+
+
+		</script>
+
+	</body>
+</html>
