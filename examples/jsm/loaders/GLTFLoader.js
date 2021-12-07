@@ -74,6 +74,10 @@ class GLTFLoader extends Loader {
 		this.ktx2Loader = null;
 		this.meshoptDecoder = null;
 
+		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
+		// expensive work of uploading a texture to the GPU off the main thread.
+		this.imageBitmapLoaderEnabled = typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false;
+
 		this.pluginCallbacks = [];
 
 		this.register( function ( parser ) {
@@ -240,6 +244,13 @@ class GLTFLoader extends Loader {
 
 	}
 
+	setImageBitmapLoaderEnabled( enabled ) {
+
+		this.imageBitmapLoaderEnabled = enabled;
+		return this;
+
+	}
+
 	register( callback ) {
 
 		if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
@@ -317,7 +328,8 @@ class GLTFLoader extends Loader {
 			requestHeader: this.requestHeader,
 			manager: this.manager,
 			ktx2Loader: this.ktx2Loader,
-			meshoptDecoder: this.meshoptDecoder
+			meshoptDecoder: this.meshoptDecoder,
+			imageBitmapLoaderEnabled: this.imageBitmapLoaderEnabled,
 
 		} );
 
@@ -2251,9 +2263,7 @@ class GLTFParser {
 		// Track node names, to ensure no duplicates
 		this.nodeNamesUsed = {};
 
-		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
-		// expensive work of uploading a texture to the GPU off the main thread.
-		if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
+		if ( this.options.imageBitmapLoaderEnabled ) {
 
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
 

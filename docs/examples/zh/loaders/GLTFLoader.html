@@ -204,6 +204,23 @@
 		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
 		</p>
 
+		<h3>[method:this setKTX2Loader]( [param:KTX2Loader ktx2Loader] )</h3>
+		<p>
+		[page:KTX2Loader ktx2Loader] — Instance of THREE.KTX2Loader, to be used for loading KTX2 compressed textures.
+		</p>
+
+		<h3>[method:this setImageBitmapLoaderEnabled]( [param:boolean enabled] )</h3>
+		<p>
+		Configures whether the [link:https://developer.mozilla.org/en-US/docs/Web/API/createImageBitmap createImageBitmap] API is used. When enabled,
+		image decoding is transferred off the main thread reducing GPU texture upload latency. Disabling may be necessary to avoid certain browser bugs.
+		By default, createImageBitmap is enabled when available.
+		</p>
+
+		<h3>[method:this setMeshoptDecoder]( [param:MeshoptDecoder MeshoptDecoder] )</h3>
+		<p>
+		MeshoptDecoder — MeshoptDecoder module, to be used for decoding assets compressed with EXT_meshopt_compression.
+		</p>
+
 		<h3>[method:undefined parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<p>
 		[page:ArrayBuffer data] — 需要解析的glTF文件，值为一个ArrayBuffer或<em>JSON</em>字符串。<br />
