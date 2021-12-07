@@ -108,7 +108,7 @@ class ShaderMaterial extends Material {
 
 			MaterialShaderCache.removeShaderMaterial( this, this._fragmentShader );
 			this._fragmentShader = value;
-			this._fragmentShaderIndex = MaterialShaderCache.addShaderMaterial( this, this._fragmentShader );
+			this._fragmentShaderID = MaterialShaderCache.addShaderMaterial( this, this._fragmentShader );
 
 		}
 
