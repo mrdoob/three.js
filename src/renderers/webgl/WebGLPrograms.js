@@ -126,7 +126,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		}
 
-		let vertexShader, fragmentShader;
+		let vertexShader, fragmentShader, vertexShaderID, fragmentShaderID;
 
 		if ( shaderID ) {
 
@@ -139,6 +139,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			vertexShader = material.vertexShader;
 			fragmentShader = material.fragmentShader;
+			vertexShaderID = material.vertexShaderID;
+			fragmentShaderID = material.fragmentShaderID;
 
 		}
 
@@ -155,7 +157,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shaderName: material.type,
 
 			vertexShader: vertexShader,
+			vertexShaderIndex: vertexShaderID,
 			fragmentShader: fragmentShader,
+			fragmentShaderIndex: fragmentShaderID,
 			defines: material.defines,
 
 			isRawShaderMaterial: material.isRawShaderMaterial === true,
@@ -296,8 +300,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		} else {
 
-			array.push( hashString( parameters.fragmentShader ) );
-			array.push( hashString( parameters.vertexShader ) );
+			array.push( parameters.fragmentShaderID );
+			array.push( parameters.vertexShaderID );
 
 		}
 

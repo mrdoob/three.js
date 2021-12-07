@@ -1,4 +1,5 @@
 import { Material } from './Material.js';
+import { MaterialShaderCache } from './MaterialShaderCache.js';
 import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
 
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
@@ -73,6 +74,48 @@ class ShaderMaterial extends Material {
 			this.setValues( parameters );
 
 		}
+
+	}
+	get vertexShader() {
+
+		return this._vertexShader;
+
+	}
+	set vertexShader( value ) {
+
+		if ( value !== this._vertexShader ) {
+
+			MaterialShaderCache.removeShaderMaterial( this, this._vertexShader );
+			this._vertexShader = value;
+			this._vertexShaderID = MaterialShaderCache.addShaderMaterial( this, this._vertexShader );
+
+		}
+
+	}
+	get vertexShaderID() {
+
+		return this._vertexShaderID;
+
+	}
+	get fragmentShader() {
+
+		return this._fragmentShader;
+
+	}
+	set fragmentShader( value ) {
+
+		if ( value !== this._fragmentShader ) {
+
+			MaterialShaderCache.removeShaderMaterial( this, this._fragmentShader );
+			this._fragmentShader = value;
+			this._fragmentShaderIndex = MaterialShaderCache.addShaderMaterial( this, this._fragmentShader );
+
+		}
+
+	}
+	get fragmentShaderID() {
+
+		return this._fragmentShaderID;
 
 	}
 
@@ -190,6 +233,14 @@ class ShaderMaterial extends Material {
 		if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
 
 		return data;
+
+	}
+
+	dispose() {
+
+		MaterialShaderCache.removeShaderMaterial( this, this._vertexShader );
+		MaterialShaderCache.removeShaderMaterial( this, this._fragmentShader );
+		super.dispose();
 
 	}
 
