@@ -443,7 +443,7 @@ class Quaternion {
 		} else {
 
 			const mod = newHalfAngle - Math.floor( newHalfAngle / ( 2 * Math.PI ) ) * 2 * Math.PI;
-			const sign = ( mod > Math.PI / 2 ) && ( mod < 3 * Math.PI / 2 ) ? -1 : 1;
+			const sign = ( mod > Math.PI / 2 ) && ( mod < 3 * Math.PI / 2 ) ? - 1 : 1;
 
 			this._x *= ratio;
 			this._y *= ratio;
