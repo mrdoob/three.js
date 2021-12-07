@@ -436,7 +436,7 @@ class Quaternion {
 		const newS = Math.sin( newHalfAngle );
 		const ratio = newS / oldS;
 
-		if ( ratio === Infinity ) {
+		if ( oldS === 0 ) {
 
 			return this;
 
