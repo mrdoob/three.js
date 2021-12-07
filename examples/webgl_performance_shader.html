@@ -77,14 +77,9 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
-			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
 			import Stats from './jsm/libs/stats.module.js';
 
-			let camera, renderer, composer, clock, scene;
+			let camera, renderer, clock, scene;
 
 			let uniforms, stats;
 			const materials = [];
@@ -125,21 +120,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
-				renderer.autoClear = false;
-	            renderer.info.autoReset = false;
-
-				//
-
-				const renderModel = new RenderPass( scene, camera );
-				const effectBloom = new BloomPass( 1.25 );
-				const effectFilm = new FilmPass( 0.35, 0.95, 2048, false );
-
-				composer = new EffectComposer( renderer );
-
-				composer.addPass( renderModel );
-				composer.addPass( effectBloom );
-				composer.addPass( effectFilm );
-
+			
 				//
 
 				stats = new Stats();
@@ -158,7 +139,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 				addMeshes();
 
 			}
@@ -243,13 +223,9 @@
 				} );
 
 				const delta = 5 * clock.getDelta();
-
 				uniforms[ 'time' ].value += 0.2 * delta;
 
-				renderer.clear();
-				composer.render( 0.01 );
-	            console.log( renderer.info.render.calls );
-	            renderer.info.reset();
+				renderer.render( scene, camera );
 
 }
 
