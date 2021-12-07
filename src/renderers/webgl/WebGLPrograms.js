@@ -157,9 +157,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shaderName: material.type,
 
 			vertexShader: vertexShader,
-			vertexShaderIndex: vertexShaderID,
+			vertexShaderID: vertexShaderID,
 			fragmentShader: fragmentShader,
-			fragmentShaderIndex: fragmentShaderID,
+			fragmentShaderID: fragmentShaderID,
 			defines: material.defines,
 
 			isRawShaderMaterial: material.isRawShaderMaterial === true,
