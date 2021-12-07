@@ -18,14 +18,14 @@ class SelectionHelper {
 
 		this.isDown = false;
 
-		this.renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
+		this.pointerdownEvent = function ( event ) {
 
 			this.isDown = true;
 			this.onSelectStart( event );
 
-		}.bind( this ) );
+		}.bind( this );
 
-		this.renderer.domElement.addEventListener( 'pointermove', function ( event ) {
+		this.pointermoveEvent = function ( event ) {
 
 			if ( this.isDown ) {
 
@@ -33,14 +33,30 @@ class SelectionHelper {
 
 			}
 
-		}.bind( this ) );
+		}.bind( this );
 
-		this.renderer.domElement.addEventListener( 'pointerup', function ( event ) {
+		this.pointerupEvent = function ( ) {
 
 			this.isDown = false;
-			this.onSelectOver( event );
+			this.onSelectOver();
 
-		}.bind( this ) );
+		}.bind( this );
+
+		this.renderer.domElement.addEventListener( 'pointerdown', this.pointerdownEvent );
+
+		this.renderer.domElement.addEventListener( 'pointermove', this.pointermoveEvent );
+
+		this.renderer.domElement.addEventListener( 'pointerup', this.pointerupEvent );
+
+	}
+
+	dispose() {
+
+		this.renderer.domElement.removeEventListener( 'pointerdown', this.pointerdownEvent );
+
+		this.renderer.domElement.removeEventListener( 'pointermove', this.pointermoveEvent );
+
+		this.renderer.domElement.removeEventListener( 'pointerup', this.pointerupEvent );
 
 	}
 
