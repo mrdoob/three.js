@@ -161,11 +161,6 @@
 			Should be called if the controls is no longer required.
 		</p>
 
-		<h3>[method:undefined reset] ()</h3>
-		<p>
-			Resets the object's position, rotation and scale to when the current dragging's transform action began.
-		</p>
-
 		<h3>[method:Raycaster getRaycaster] ()</h3>
 		<p>
 			Returns the [page:Raycaster] object that is used for user interaction. This object is shared between all instances of
@@ -177,6 +172,11 @@
 		<h3>[method:String getMode] ()</h3>
 		<p>
 			Returns the transformation mode.
+		</p>
+
+		<h3>[method:undefined reset] ()</h3>
+		<p>
+			Resets the object's position, rotation and scale to when the current transform began.
 		</p>
 
 		<h3>[method:undefined setMode] ( [param:String mode] )</h3>
@@ -196,6 +196,16 @@
 			</p>
 			<p>
 				Sets the rotation snap.
+			</p>
+		</p>
+
+		<h3>[method:undefined setScaleSnap] ( [param:Number scaleSnap] )</h3>
+		<p>
+			<p>
+				[page:Number scaleSnap]: The scale snap.
+			</p>
+			<p>
+				Sets the scale snap.
 			</p>
 		</p>
 
