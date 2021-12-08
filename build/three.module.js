@@ -15395,7 +15395,7 @@ class PMREMGenerator {
 
 	_setEncoding( uniform, texture ) {
 
-		/* if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
+		if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
 
 			uniform.value = ENCODINGS[ LinearEncoding ];
 
@@ -15403,9 +15403,7 @@ class PMREMGenerator {
 
 			uniform.value = ENCODINGS[ texture.encoding ];
 
-		} */
-
-		uniform.value = ENCODINGS[ texture.encoding ];
+		}
 
 	}
 
@@ -19012,11 +19010,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		}
 
-		/* if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
+		if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
 
 			encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
 
-		} */
+		}
 
 		return encoding;
 
@@ -22017,7 +22015,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( internalFormatName, glFormat, glType/*, encoding*/ ) {
+	function getInternalFormat( internalFormatName, glFormat, glType, encoding ) {
 
 		if ( isWebGL2 === false ) return glFormat;
 
@@ -22051,9 +22049,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( glType === 5126 ) internalFormat = 34836;
 			if ( glType === 5131 ) internalFormat = 34842;
-			//if ( glType === 5121 ) internalFormat = ( encoding === sRGBEncoding ) ? 35907 : 32856;
-			if ( glType === 5121 ) internalFormat = 32856;
-
+			if ( glType === 5121 ) internalFormat = ( encoding === sRGBEncoding ) ? 35907 : 32856;
 
 		}
 
@@ -39127,14 +39123,21 @@ class FileLoader extends Loader {
 
 				}
 
-				this.manager.itemEnd( url );
-
 			} )
 			.catch( err => {
 
 				// Abort errors and other errors are handled the same
 
 				const callbacks = loading[ url ];
+
+				if ( callbacks === undefined ) {
+
+					// When onLoad was called and url was deleted in `loading`
+					this.manager.itemError( url );
+					throw err;
+
+				}
+
 				delete loading[ url ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
@@ -39145,6 +39148,10 @@ class FileLoader extends Loader {
 				}
 
 				this.manager.itemError( url );
+
+			} )
+			.finally( () => {
+
 				this.manager.itemEnd( url );
 
 			} );
