@@ -425,6 +425,9 @@ class Quaternion {
 
 	pow( exp ) {
 
+		// Assumes that this quaternion is normalized
+		// Is based on Quaternion.setFromAxisAngle and Vector4.setAxisAngleFromQuaternion (and function pow from glMatrix: https://github.com/toji/gl-matrix/blob/master/src/quat.js#L280)
+
 		// const _vec3 = new Vector3();
 		// const _vec4 = new Vector4();
 		// _vec4.setAxisAngleFromQuaternion( this );
