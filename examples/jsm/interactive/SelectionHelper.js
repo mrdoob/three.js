@@ -18,14 +18,14 @@ class SelectionHelper {
 
 		this.isDown = false;
 
-		this.pointerdownEvent = function ( event ) {
+		this.onPointerDown = function ( event ) {
 
 			this.isDown = true;
 			this.onSelectStart( event );
 
 		}.bind( this );
 
-		this.pointermoveEvent = function ( event ) {
+		this.onPointerMove = function ( event ) {
 
 			if ( this.isDown ) {
 
@@ -35,28 +35,24 @@ class SelectionHelper {
 
 		}.bind( this );
 
-		this.pointerupEvent = function ( ) {
+		this.onPointerUp = function ( ) {
 
 			this.isDown = false;
 			this.onSelectOver();
 
 		}.bind( this );
 
-		this.renderer.domElement.addEventListener( 'pointerdown', this.pointerdownEvent );
-
-		this.renderer.domElement.addEventListener( 'pointermove', this.pointermoveEvent );
-
-		this.renderer.domElement.addEventListener( 'pointerup', this.pointerupEvent );
+		this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
+		this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
+		this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
 
 	}
 
 	dispose() {
 
-		this.renderer.domElement.removeEventListener( 'pointerdown', this.pointerdownEvent );
-
-		this.renderer.domElement.removeEventListener( 'pointermove', this.pointermoveEvent );
-
-		this.renderer.domElement.removeEventListener( 'pointerup', this.pointerupEvent );
+		this.renderer.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
+		this.renderer.domElement.removeEventListener( 'pointermove', this.onPointerMove );
+		this.renderer.domElement.removeEventListener( 'pointerup', this.onPointerUp );
 
 	}
 
