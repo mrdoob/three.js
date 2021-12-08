@@ -102,6 +102,7 @@ class KTX2Loader extends Loader {
 
 		}
 
+
 		return this;
 
 	}
