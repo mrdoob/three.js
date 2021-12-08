@@ -577,6 +577,8 @@ class TransformControls extends Object3D {
 			this.dispatchEvent( _changeEvent );
 			this.dispatchEvent( _objectChangeEvent );
 
+			this.pointStart.copy( this.pointEnd );
+
 		}
 
 	}
