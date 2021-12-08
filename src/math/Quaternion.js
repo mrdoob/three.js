@@ -433,27 +433,25 @@ class Quaternion {
 		// _vec4.setAxisAngleFromQuaternion( this );
 		// this.setFromAxisAngle( _vec3.set( _vec4.x, _vec4.y, _vec4.z ), _vec4.w * exp );
 
+		if ( ( this._w === 1 ) || ( this._w === - 1 ) ) {
+
+			return this;
+
+		}
+
 		const newHalfAngle = Math.acos( this._w ) * exp;
 
 		const oldS = Math.sqrt( 1 - this._w * this._w );
 		const newS = Math.sin( newHalfAngle );
 		const ratio = newS / oldS;
 
-		if ( oldS === 0 ) {
+		const mod = newHalfAngle - Math.floor( newHalfAngle / ( 2 * Math.PI ) ) * 2 * Math.PI;
+		const sign = ( mod > Math.PI / 2 ) && ( mod < 3 * Math.PI / 2 ) ? - 1 : 1;
 
-			return this;
-
-		} else {
-
-			const mod = newHalfAngle - Math.floor( newHalfAngle / ( 2 * Math.PI ) ) * 2 * Math.PI;
-			const sign = ( mod > Math.PI / 2 ) && ( mod < 3 * Math.PI / 2 ) ? - 1 : 1;
-
-			this._x *= ratio;
-			this._y *= ratio;
-			this._z *= ratio;
-			this._w = sign * Math.sqrt( 1 - newS * newS ); // Math.cos( newHalfAngle );
-
-		}
+		this._x *= ratio;
+		this._y *= ratio;
+		this._z *= ratio;
+		this._w = sign * Math.sqrt( 1 - newS * newS ); // Math.cos( newHalfAngle );
 
 		this._onChangeCallback();
 
