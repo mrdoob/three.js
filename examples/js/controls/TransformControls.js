@@ -545,6 +545,8 @@
 				this.dispatchEvent( _changeEvent );
 				this.dispatchEvent( _objectChangeEvent );
 
+				this.pointStart.copy( this.pointEnd );
+
 			}
 
 		}
