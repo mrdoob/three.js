@@ -74,7 +74,7 @@ class RoughnessMipmapper {
 		newRoughnessTexture.wrapT = roughnessMap.wrapT;
 		newRoughnessTexture.minFilter = roughnessMap.minFilter;
 		newRoughnessTexture.magFilter = roughnessMap.magFilter;
-		
+
 		material.roughnessMap = newRoughnessTexture;
 
 		if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
