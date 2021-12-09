@@ -793,9 +793,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isFramebufferTexture ) {
 
-			const mips = ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) ? Math.log2( Math.max( image.width, image.height ) ) + 1 : 1;
+			if ( useTexStorage && allocateMemory ) {
 
-			state.texStorage2D( _gl.TEXTURE_2D, mips, glInternalFormat, image.width, image.height );
+				const mips = ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) ? Math.log2( Math.max( image.width, image.height ) ) + 1 : 1;
+
+				state.texStorage2D( _gl.TEXTURE_2D, mips, glInternalFormat, image.width, image.height );
+
+			} else {
+
+				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+
+			}
 
 		} else {
 
