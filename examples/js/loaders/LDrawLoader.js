@@ -916,11 +916,12 @@
 				mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
 				currentMatrix: new THREE.Matrix4(),
 				matrix: new THREE.Matrix4(),
+				type: 'Model',
 				// If false, it is a root material scope previous to parse
 				isFromParse: true,
-				faces: null,
-				lineSegments: null,
-				conditionalSegments: null,
+				faces: [],
+				lineSegments: [],
+				conditionalSegments: [],
 				totalFaces: 0,
 				// If true, this object is the start of a construction step
 				startingConstructionStep: false
@@ -1135,21 +1136,11 @@
 					break;
 
 				case FINISH_TYPE_PEARLESCENT:
-					// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-					const specular = new THREE.Color( colour );
-					const hsl = specular.getHSL( {
-						h: 0,
-						s: 0,
-						l: 0
-					} );
-					hsl.h = ( hsl.h + 0.5 ) % 1;
-					hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
-					specular.setHSL( hsl.h, hsl.s, hsl.l );
-					material = new THREE.MeshPhongMaterial( {
+					// Try to imitate pearlescency by making the surface glossy
+					material = new THREE.MeshStandardMaterial( {
 						color: colour,
-						specular: specular,
-						shininess: 10,
-						reflectivity: 0.3
+						roughness: 0.3,
+						metalness: 0.25
 					} );
 					break;
 
@@ -1375,9 +1366,6 @@
 
 								case '!LDRAW_ORG':
 									type = lp.getToken();
-									currentParseScope.faces = [];
-									currentParseScope.lineSegments = [];
-									currentParseScope.conditionalSegments = [];
 									currentParseScope.type = type;
 									const isRoot = ! parentParseScope.isFromParse;
 
@@ -1737,6 +1725,13 @@
 
 		finalizeObject( subobjectParseScope ) {
 
+			// fail gracefully if an object could not be loaded
+			if ( subobjectParseScope === null ) {
+
+				return;
+
+			}
+
 			const parentParseScope = subobjectParseScope.parentScope; // Smooth the normals if this is a part or if this is a case where the subpart
 			// is added directly into the parent model (meaning it will never get smoothed by
 			// being added to a part)
@@ -1919,6 +1914,7 @@
 				} ).catch( function () {
 
 					console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be found.' );
+					return null;
 
 				} );
 

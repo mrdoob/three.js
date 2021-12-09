@@ -97,7 +97,7 @@
 
 						const texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
 						texture.format = THREE.RedFormat;
-						texture.type = THREE.UnsignedByteType;
+						texture.needsUpdate = true;
 
 						const material = new THREE.ShaderMaterial( {
 							uniforms: {

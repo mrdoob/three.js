@@ -188,14 +188,21 @@ class FileLoader extends Loader {
 
 				}
 
-				this.manager.itemEnd( url );
-
 			} )
 			.catch( err => {
 
 				// Abort errors and other errors are handled the same
 
 				const callbacks = loading[ url ];
+
+				if ( callbacks === undefined ) {
+
+					// When onLoad was called and url was deleted in `loading`
+					this.manager.itemError( url );
+					throw err;
+
+				}
+
 				delete loading[ url ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
@@ -206,6 +213,10 @@ class FileLoader extends Loader {
 				}
 
 				this.manager.itemError( url );
+
+			} )
+			.finally( () => {
+
 				this.manager.itemEnd( url );
 
 			} );

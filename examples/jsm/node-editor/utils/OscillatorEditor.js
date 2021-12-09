@@ -33,7 +33,7 @@ export class OscillatorEditor extends ObjectNode {
 			node.timeNode = timeElement.linkedExtra || NULL_VALUE;
 
 		} );
-		
+
 		this.add( new LabelElement( 'Method' ).add( methodInput ) )
 			.add( timeElement );
 

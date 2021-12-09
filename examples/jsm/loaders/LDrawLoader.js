@@ -9,7 +9,6 @@ import {
 	Loader,
 	Matrix4,
 	Mesh,
-	MeshPhongMaterial,
 	MeshStandardMaterial,
 	ShaderMaterial,
 	UniformsLib,
@@ -967,13 +966,14 @@ class LDrawLoader extends Loader {
 			mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
 			currentMatrix: new Matrix4(),
 			matrix: new Matrix4(),
+			type: 'Model',
 
 			// If false, it is a root material scope previous to parse
 			isFromParse: true,
 
-			faces: null,
-			lineSegments: null,
-			conditionalSegments: null,
+			faces: [],
+			lineSegments: [],
+			conditionalSegments: [],
 			totalFaces: 0,
 
 			// If true, this object is the start of a construction step
@@ -1200,14 +1200,8 @@ class LDrawLoader extends Loader {
 
 			case FINISH_TYPE_PEARLESCENT:
 
-				// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-				const specular = new Color( colour );
-				const hsl = specular.getHSL( { h: 0, s: 0, l: 0 } );
-				hsl.h = ( hsl.h + 0.5 ) % 1;
-				hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
-				specular.setHSL( hsl.h, hsl.s, hsl.l );
-
-				material = new MeshPhongMaterial( { color: colour, specular: specular, shininess: 10, reflectivity: 0.3 } );
+				// Try to imitate pearlescency by making the surface glossy
+				material = new MeshStandardMaterial( { color: colour, roughness: 0.3, metalness: 0.25 } );
 				break;
 
 			case FINISH_TYPE_CHROME:
@@ -1443,9 +1437,6 @@ class LDrawLoader extends Loader {
 
 								type = lp.getToken();
 
-								currentParseScope.faces = [];
-								currentParseScope.lineSegments = [];
-								currentParseScope.conditionalSegments = [];
 								currentParseScope.type = type;
 
 								const isRoot = ! parentParseScope.isFromParse;
@@ -1856,6 +1847,13 @@ class LDrawLoader extends Loader {
 
 	finalizeObject( subobjectParseScope ) {
 
+		// fail gracefully if an object could not be loaded
+		if ( subobjectParseScope === null ) {
+
+			return;
+
+		}
+
 		const parentParseScope = subobjectParseScope.parentScope;
 
 		// Smooth the normals if this is a part or if this is a case where the subpart
@@ -2045,6 +2043,7 @@ class LDrawLoader extends Loader {
 			} ).catch( function () {
 
 				console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be found.' );
+				return null;
 
 			} );
 

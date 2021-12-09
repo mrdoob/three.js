@@ -20,30 +20,31 @@ import { NormalEditor } from './accessors/NormalEditor.js';
 import { TimerEditor } from './utils/TimerEditor.js';
 import { OscillatorEditor } from './utils/OscillatorEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
-import { EventDispatcher } from 'three';
+
+import { EventDispatcher } from '../../../build/three.module.js';
 
 export const ClassLib = {
-	'StandardMaterialEditor': StandardMaterialEditor,
-	'OperatorEditor': OperatorEditor,
-	'NormalizeEditor': NormalizeEditor,
-	'InvertEditor': InvertEditor,
-	'LimiterEditor': LimiterEditor,
-	'DotEditor': DotEditor,
-	'PowerEditor': PowerEditor,
-	'TrigonometryEditor': TrigonometryEditor,
-	'FloatEditor': FloatEditor,
-	'Vector2Editor': Vector2Editor,
-	'Vector3Editor': Vector3Editor,
-	'Vector4Editor': Vector4Editor,
-	'SliderEditor': SliderEditor,
-	'ColorEditor': ColorEditor,
-	'BlendEditor': BlendEditor,
-	'UVEditor': UVEditor,
-	'PositionEditor': PositionEditor,
-	'NormalEditor': NormalEditor,
-	'TimerEditor': TimerEditor,
-	'OscillatorEditor': OscillatorEditor,
-	'CheckerEditor': CheckerEditor
+	StandardMaterialEditor,
+	OperatorEditor,
+	NormalizeEditor,
+	InvertEditor,
+	LimiterEditor,
+	DotEditor,
+	PowerEditor,
+	TrigonometryEditor,
+	FloatEditor,
+	Vector2Editor,
+	Vector3Editor,
+	Vector4Editor,
+	SliderEditor,
+	ColorEditor,
+	BlendEditor,
+	UVEditor,
+	PositionEditor,
+	NormalEditor,
+	TimerEditor,
+	OscillatorEditor,
+	CheckerEditor
 };
 
 export class NodeEditor extends EventDispatcher {
@@ -258,7 +259,7 @@ export class NodeEditor extends EventDispatcher {
 		const context = new ContextMenu( this.domElement );
 
 		let isContext = false;
-		let contextPosition = {};
+		const contextPosition = {};
 
 		const add = ( node ) => {
 

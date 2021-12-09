@@ -119,9 +119,11 @@ class RoughnessMipmapper {
 
 			_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
 
+			_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
+
 		}
 
-		if ( roughnessMap !== material.roughnessMap ) roughnessMap.dispose();
+		roughnessMap.dispose();
 
 		_renderer.setRenderTarget( oldTarget );
 

@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '135';
+	const REVISION = '136dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -3676,7 +3676,11 @@
 			// To enclose another sphere into this sphere, we only need to enclose two points:
 			// 1) Enclose the farthest point on the other sphere into this sphere.
 			// 2) Enclose the opposite point of the farthest point into this sphere.
-			_toFarthestPoint.subVectors(sphere.center, this.center).normalize().multiplyScalar(sphere.radius);
+			if (this.center.equals(sphere.center) === true) {
+				_toFarthestPoint.set(0, 0, 1).multiplyScalar(sphere.radius);
+			} else {
+				_toFarthestPoint.subVectors(sphere.center, this.center).normalize().multiplyScalar(sphere.radius);
+			}
 
 			this.expandByPoint(_v1$6.copy(sphere.center).add(_toFarthestPoint));
 			this.expandByPoint(_v1$6.copy(sphere.center).sub(_toFarthestPoint));
@@ -9755,7 +9759,7 @@
 
 	var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying float vFogDepth;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif";
 
-	var gradientmap_pars_fragment = "#ifdef USE_GRADIENTMAP\n\tuniform sampler2D gradientMap;\n#endif\nvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\tfloat dotNL = dot( normal, lightDirection );\n\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t#ifdef USE_GRADIENTMAP\n\t\treturn texture2D( gradientMap, coord ).rgb;\n\t#else\n\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t#endif\n}";
+	var gradientmap_pars_fragment = "#ifdef USE_GRADIENTMAP\n\tuniform sampler2D gradientMap;\n#endif\nvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\tfloat dotNL = dot( normal, lightDirection );\n\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t#ifdef USE_GRADIENTMAP\n\t\treturn vec3( texture2D( gradientMap, coord ).r );\n\t#else\n\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t#endif\n}";
 
 	var lightmap_fragment = "#ifdef USE_LIGHTMAP\n\tvec4 lightMapTexel = texture2D( lightMap, vUv2 );\n\tvec3 lightMapIrradiance = lightMapTexelToLinear( lightMapTexel ).rgb * lightMapIntensity;\n\t#ifndef PHYSICALLY_CORRECT_LIGHTS\n\t\tlightMapIrradiance *= PI;\n\t#endif\n\treflectedLight.indirectDiffuse += lightMapIrradiance;\n#endif";
 
@@ -11214,12 +11218,8 @@
 
 			return 'lowp';
 		}
-		/* eslint-disable no-undef */
-
 
 		const isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext || typeof WebGL2ComputeRenderingContext !== 'undefined' && gl instanceof WebGL2ComputeRenderingContext;
-		/* eslint-enable no-undef */
-
 		let precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 		const maxPrecision = getMaxPrecision(precision);
 
@@ -11821,12 +11821,11 @@
 		}
 
 		_setEncoding(uniform, texture) {
-			/* if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
-					uniform.value = ENCODINGS[ LinearEncoding ];
-				} else {
-					uniform.value = ENCODINGS[ texture.encoding ];
-				} */
-			uniform.value = ENCODINGS[texture.encoding];
+			if (this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding) {
+				uniform.value = ENCODINGS[LinearEncoding];
+			} else {
+				uniform.value = ENCODINGS[texture.encoding];
+			}
 		}
 
 		_textureToCubeUV(texture, cubeUVRenderTarget) {
@@ -12806,7 +12805,6 @@
 			this.generateMipmaps = false;
 			this.flipY = false;
 			this.unpackAlignment = 1;
-			this.needsUpdate = true;
 		}
 
 	}
@@ -12868,7 +12866,8 @@
 					const texture = new DataTexture2DArray(buffer, width, height, numberOfMorphTargets);
 					texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
 
-					texture.type = FloatType; // fill buffer
+					texture.type = FloatType;
+					texture.needsUpdate = true; // fill buffer
 
 					const vertexDataStride = numberOfVertexData * 4;
 
@@ -13068,7 +13067,6 @@
 			this.generateMipmaps = false;
 			this.flipY = false;
 			this.unpackAlignment = 1;
-			this.needsUpdate = true;
 		}
 
 	}
@@ -14210,7 +14208,7 @@
 			// GLSL 3.0 conversion for built-in materials and ShaderMaterial
 			versionString = '#version 300 es\n';
 			prefixVertex = ['precision mediump sampler2DArray;', '#define attribute in', '#define varying out', '#define texture2D texture'].join('\n') + '\n' + prefixVertex;
-			prefixFragment = ['#define varying in', parameters.glslVersion === GLSL3 ? '' : 'out highp vec4 pc_fragColor;', parameters.glslVersion === GLSL3 ? '' : '#define gl_FragColor pc_fragColor', '#define gl_FragDepthEXT gl_FragDepth', '#define texture2D texture', '#define textureCube texture', '#define texture2DProj textureProj', '#define texture2DLodEXT textureLod', '#define texture2DProjLodEXT textureProjLod', '#define textureCubeLodEXT textureLod', '#define texture2DGradEXT textureGrad', '#define texture2DProjGradEXT textureProjGrad', '#define textureCubeGradEXT textureGrad'].join('\n') + '\n' + prefixFragment;
+			prefixFragment = ['#define varying in', parameters.glslVersion === GLSL3 ? '' : 'layout(location = 0) out highp vec4 pc_fragColor;', parameters.glslVersion === GLSL3 ? '' : '#define gl_FragColor pc_fragColor', '#define gl_FragDepthEXT gl_FragDepth', '#define texture2D texture', '#define textureCube texture', '#define texture2DProj textureProj', '#define texture2DLodEXT textureLod', '#define texture2DProjLodEXT textureProjLod', '#define textureCubeLodEXT textureLod', '#define texture2DGradEXT textureGrad', '#define texture2DProjGradEXT textureProjGrad', '#define textureCubeGradEXT textureGrad'].join('\n') + '\n' + prefixFragment;
 		}
 
 		const vertexGlsl = versionString + prefixVertex + vertexShader;
@@ -14312,6 +14310,8 @@
 	}
 
 	function WebGLPrograms(renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping) {
+		const _programLayers = new Layers();
+
 		const programs = [];
 		const isWebGL2 = capabilities.isWebGL2;
 		const logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
@@ -14336,7 +14336,6 @@
 			ShadowMaterial: 'shadow',
 			SpriteMaterial: 'sprite'
 		};
-		const parameterNames = ['precision', 'isWebGL2', 'supportsVertexTextures', 'outputEncoding', 'instancing', 'instancingColor', 'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV', 'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap', 'objectSpaceNormalMap', 'tangentSpaceNormalMap', 'clearcoat', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'displacementMap', 'specularMap',, 'roughnessMap', 'metalnessMap', 'gradientMap', 'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2', 'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning', 'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'morphTargetsCount', 'premultipliedAlpha', 'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights', 'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows', 'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights', 'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering', 'format', 'specularIntensityMap', 'specularColorMap', 'specularColorMapEncoding', 'transmission', 'transmissionMap', 'thicknessMap', 'sheen', 'sheenColorMap', 'sheenColorMapEncoding', 'sheenRoughnessMap'];
 
 		function getMaxBones(object) {
 			const skeleton = object.skeleton;
@@ -14375,10 +14374,10 @@
 			} else {
 				encoding = LinearEncoding;
 			}
-			/* if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
-					encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
-				} */
 
+			if (isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding) {
+				encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
+			}
 
 			return encoding;
 		}
@@ -14470,7 +14469,7 @@
 				vertexTangents: !!material.normalMap && !!object.geometry && !!object.geometry.attributes.tangent,
 				vertexColors: material.vertexColors,
 				vertexAlphas: material.vertexColors === true && !!object.geometry && !!object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4,
-				vertexUvs: !!material.map || !!material.bumpMap || !!material.normalMap || !!material.specularMap || !!material.alphaMap || !!material.emissiveMap || !!material.roughnessMap || !!material.metalnessMap || !!material.clearcoatMap || !!material.clearcoatRoughnessMap || !!material.clearcoatNormalMap || !!material.displacementMap || !!material.transmissionMap || !!material.thicknessMap || !!material.specularIntensityMap || !!material.specularColorMap || !!material.sheenColorMap || material.sheenRoughnessMap,
+				vertexUvs: !!material.map || !!material.bumpMap || !!material.normalMap || !!material.specularMap || !!material.alphaMap || !!material.emissiveMap || !!material.roughnessMap || !!material.metalnessMap || !!material.clearcoatMap || !!material.clearcoatRoughnessMap || !!material.clearcoatNormalMap || !!material.displacementMap || !!material.transmissionMap || !!material.thicknessMap || !!material.specularIntensityMap || !!material.specularColorMap || !!material.sheenColorMap || !!material.sheenRoughnessMap,
 				uvsVertexOnly: !(!!material.map || !!material.bumpMap || !!material.normalMap || !!material.specularMap || !!material.alphaMap || !!material.emissiveMap || !!material.roughnessMap || !!material.metalnessMap || !!material.clearcoatNormalMap || material.transmission > 0 || !!material.transmissionMap || !!material.thicknessMap || !!material.specularIntensityMap || !!material.specularColorMap || material.sheen > 0 || !!material.sheenColorMap || !!material.sheenRoughnessMap) && !!material.displacementMap,
 				fog: !!fog,
 				useFog: material.fog,
@@ -14535,16 +14534,110 @@
 			}
 
 			if (parameters.isRawShaderMaterial === false) {
-				for (let i = 0; i < parameterNames.length; i++) {
-					array.push(parameters[parameterNames[i]]);
-				}
-
+				getProgramCacheKeyParameters(array, parameters);
+				getProgramCacheKeyBooleans(array, parameters);
 				array.push(renderer.outputEncoding);
 				array.push(renderer.gammaFactor);
 			}
 
 			array.push(parameters.customProgramCacheKey);
 			return array.join();
+		}
+
+		function getProgramCacheKeyParameters(array, parameters) {
+			array.push(parameters.precision);
+			array.push(parameters.outputEncoding);
+			array.push(parameters.mapEncoding);
+			array.push(parameters.matcapEncoding);
+			array.push(parameters.envMapMode);
+			array.push(parameters.envMapEncoding);
+			array.push(parameters.lightMapEncoding);
+			array.push(parameters.emissiveMapEncoding);
+			array.push(parameters.combine);
+			array.push(parameters.vertexUvs);
+			array.push(parameters.fogExp2);
+			array.push(parameters.sizeAttenuation);
+			array.push(parameters.maxBones);
+			array.push(parameters.morphTargetsCount);
+			array.push(parameters.numDirLights);
+			array.push(parameters.numPointLights);
+			array.push(parameters.numSpotLights);
+			array.push(parameters.numHemiLights);
+			array.push(parameters.numRectAreaLights);
+			array.push(parameters.numDirLightShadows);
+			array.push(parameters.numPointLightShadows);
+			array.push(parameters.numSpotLightShadows);
+			array.push(parameters.shadowMapType);
+			array.push(parameters.toneMapping);
+			array.push(parameters.numClippingPlanes);
+			array.push(parameters.numClipIntersection);
+			array.push(parameters.format);
+			array.push(parameters.specularColorMapEncoding);
+			array.push(parameters.sheenColorMapEncoding);
+		}
+
+		function getProgramCacheKeyBooleans(array, parameters) {
+			_programLayers.disableAll();
+
+			if (parameters.isWebGL2) _programLayers.enable(0);
+			if (parameters.supportsVertexTextures) _programLayers.enable(1);
+			if (parameters.instancing) _programLayers.enable(2);
+			if (parameters.instancingColor) _programLayers.enable(3);
+			if (parameters.map) _programLayers.enable(4);
+			if (parameters.matcap) _programLayers.enable(5);
+			if (parameters.envMap) _programLayers.enable(6);
+			if (parameters.envMapCubeUV) _programLayers.enable(7);
+			if (parameters.lightMap) _programLayers.enable(8);
+			if (parameters.aoMap) _programLayers.enable(9);
+			if (parameters.emissiveMap) _programLayers.enable(10);
+			if (parameters.bumpMap) _programLayers.enable(11);
+			if (parameters.normalMap) _programLayers.enable(12);
+			if (parameters.objectSpaceNormalMap) _programLayers.enable(13);
+			if (parameters.tangentSpaceNormalMap) _programLayers.enable(14);
+			if (parameters.clearcoat) _programLayers.enable(15);
+			if (parameters.clearcoatMap) _programLayers.enable(16);
+			if (parameters.clearcoatRoughnessMap) _programLayers.enable(17);
+			if (parameters.clearcoatNormalMap) _programLayers.enable(18);
+			if (parameters.displacementMap) _programLayers.enable(19);
+			if (parameters.specularMap) _programLayers.enable(20);
+			if (parameters.roughnessMap) _programLayers.enable(21);
+			if (parameters.metalnessMap) _programLayers.enable(22);
+			if (parameters.gradientMap) _programLayers.enable(23);
+			if (parameters.alphaMap) _programLayers.enable(24);
+			if (parameters.alphaTest) _programLayers.enable(25);
+			if (parameters.vertexColors) _programLayers.enable(26);
+			if (parameters.vertexAlphas) _programLayers.enable(27);
+			if (parameters.vertexUvs) _programLayers.enable(28);
+			if (parameters.vertexTangents) _programLayers.enable(29);
+			if (parameters.uvsVertexOnly) _programLayers.enable(30);
+			if (parameters.fog) _programLayers.enable(31);
+			array.push(_programLayers.mask);
+
+			_programLayers.disableAll();
+
+			if (parameters.useFog) _programLayers.enable(0);
+			if (parameters.flatShading) _programLayers.enable(1);
+			if (parameters.logarithmicDepthBuffer) _programLayers.enable(2);
+			if (parameters.skinning) _programLayers.enable(3);
+			if (parameters.useVertexTexture) _programLayers.enable(4);
+			if (parameters.morphTargets) _programLayers.enable(5);
+			if (parameters.morphNormals) _programLayers.enable(6);
+			if (parameters.premultipliedAlpha) _programLayers.enable(7);
+			if (parameters.shadowMapEnabled) _programLayers.enable(8);
+			if (parameters.physicallyCorrectLights) _programLayers.enable(9);
+			if (parameters.doubleSided) _programLayers.enable(10);
+			if (parameters.flipSided) _programLayers.enable(11);
+			if (parameters.depthPacking) _programLayers.enable(12);
+			if (parameters.dithering) _programLayers.enable(13);
+			if (parameters.specularIntensityMap) _programLayers.enable(14);
+			if (parameters.specularColorMap) _programLayers.enable(15);
+			if (parameters.transmission) _programLayers.enable(16);
+			if (parameters.transmissionMap) _programLayers.enable(17);
+			if (parameters.thicknessMap) _programLayers.enable(18);
+			if (parameters.sheen) _programLayers.enable(19);
+			if (parameters.sheenColorMap) _programLayers.enable(20);
+			if (parameters.sheenRoughnessMap) _programLayers.enable(21);
+			array.push(_programLayers.mask);
 		}
 
 		function getUniforms(material) {
@@ -14643,8 +14736,6 @@
 			return a.groupOrder - b.groupOrder;
 		} else if (a.renderOrder !== b.renderOrder) {
 			return a.renderOrder - b.renderOrder;
-		} else if (a.program !== b.program) {
-			return a.program.id - b.program.id;
 		} else if (a.material.id !== b.material.id) {
 			return a.material.id - b.material.id;
 		} else if (a.z !== b.z) {
@@ -14666,15 +14757,12 @@
 		}
 	}
 
-	function WebGLRenderList(properties) {
+	function WebGLRenderList() {
 		const renderItems = [];
 		let renderItemsIndex = 0;
 		const opaque = [];
 		const transmissive = [];
 		const transparent = [];
-		const defaultProgram = {
-			id: -1
-		};
 
 		function init() {
 			renderItemsIndex = 0;
@@ -14685,7 +14773,6 @@
 
 		function getNextRenderItem(object, geometry, material, groupOrder, z, group) {
 			let renderItem = renderItems[renderItemsIndex];
-			const materialProperties = properties.get(material);
 
 			if (renderItem === undefined) {
 				renderItem = {
@@ -14693,7 +14780,6 @@
 					object: object,
 					geometry: geometry,
 					material: material,
-					program: materialProperties.program || defaultProgram,
 					groupOrder: groupOrder,
 					renderOrder: object.renderOrder,
 					z: z,
@@ -14705,7 +14791,6 @@
 				renderItem.object = object;
 				renderItem.geometry = geometry;
 				renderItem.material = material;
-				renderItem.program = materialProperties.program || defaultProgram;
 				renderItem.groupOrder = groupOrder;
 				renderItem.renderOrder = object.renderOrder;
 				renderItem.z = z;
@@ -14755,7 +14840,6 @@
 				renderItem.object = null;
 				renderItem.geometry = null;
 				renderItem.material = null;
-				renderItem.program = null;
 				renderItem.group = null;
 			}
 		}
@@ -14772,18 +14856,18 @@
 		};
 	}
 
-	function WebGLRenderLists(properties) {
+	function WebGLRenderLists() {
 		let lists = new WeakMap();
 
 		function get(scene, renderCallDepth) {
 			let list;
 
 			if (lists.has(scene) === false) {
-				list = new WebGLRenderList(properties);
+				list = new WebGLRenderList();
 				lists.set(scene, [list]);
 			} else {
 				if (renderCallDepth >= lists.get(scene).length) {
-					list = new WebGLRenderList(properties);
+					list = new WebGLRenderList();
 					lists.get(scene).push(list);
 				} else {
 					list = lists.get(scene)[renderCallDepth];
@@ -16244,9 +16328,33 @@
 			}
 		}
 
+		function texSubImage3D() {
+			try {
+				gl.texSubImage3D.apply(gl, arguments);
+			} catch (error) {
+				console.error('THREE.WebGLState:', error);
+			}
+		}
+
+		function compressedTexSubImage2D() {
+			try {
+				gl.compressedTexSubImage2D.apply(gl, arguments);
+			} catch (error) {
+				console.error('THREE.WebGLState:', error);
+			}
+		}
+
 		function texStorage2D() {
 			try {
 				gl.texStorage2D.apply(gl, arguments);
+			} catch (error) {
+				console.error('THREE.WebGLState:', error);
+			}
+		}
+
+		function texStorage3D() {
+			try {
+				gl.texStorage3D.apply(gl, arguments);
 			} catch (error) {
 				console.error('THREE.WebGLState:', error);
 			}
@@ -16371,7 +16479,10 @@
 			texImage2D: texImage2D,
 			texImage3D: texImage3D,
 			texStorage2D: texStorage2D,
+			texStorage3D: texStorage3D,
 			texSubImage2D: texSubImage2D,
+			texSubImage3D: texSubImage3D,
+			compressedTexSubImage2D: compressedTexSubImage2D,
 			scissor: scissor,
 			viewport: viewport,
 			reset: reset
@@ -16458,9 +16569,7 @@
 			_gl.generateMipmap(target);
 		}
 
-		function getInternalFormat(internalFormatName, glFormat, glType
-		/*, encoding*/
-		) {
+		function getInternalFormat(internalFormatName, glFormat, glType, encoding) {
 			if (isWebGL2 === false) return glFormat;
 
 			if (internalFormatName !== null) {
@@ -16484,9 +16593,8 @@
 
 			if (glFormat === _gl.RGBA) {
 				if (glType === _gl.FLOAT) internalFormat = _gl.RGBA32F;
-				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F; //if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
-
-				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.RGBA8;
+				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F;
+				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 			}
 
 			if (internalFormat === _gl.R16F || internalFormat === _gl.R32F || internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F) {
@@ -16497,12 +16605,13 @@
 		}
 
 		function getMipLevels(texture, image, supportsMips) {
-			if (textureNeedsGenerateMipmaps(texture, supportsMips) === true) {
-				// generated mipmaps via gl.generateMipmap()
+			if (textureNeedsGenerateMipmaps(texture, supportsMips) === true || texture.isFramebufferTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter) {
 				return Math.log2(Math.max(image.width, image.height)) + 1;
-			} else if (texture.mipmaps.length > 0) {
+			} else if (texture.mipmaps !== undefined && texture.mipmaps.length > 0) {
 				// user-defined mipmaps
 				return texture.mipmaps.length;
+			} else if (texture.isCompressedTexture && Array.isArray(texture.image)) {
+				return image.mipmaps.length;
 			} else {
 				// texture without mipmaps (only base level)
 				return 1;
@@ -16769,6 +16878,9 @@
 			setTextureParameters(textureType, texture, supportsMips);
 			let mipmap;
 			const mipmaps = texture.mipmaps;
+			const useTexStorage = isWebGL2 && texture.isVideoTexture !== true;
+			const allocateMemory = textureProperties.__version === undefined;
+			const levels = getMipLevels(texture, image, supportsMips);
 
 			if (texture.isDepthTexture) {
 				// populate depth texture with dummy data
@@ -16817,48 +16929,99 @@
 				} //
 
 
-				state.texImage2D(_gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null);
+				if (useTexStorage && allocateMemory) {
+					state.texStorage2D(_gl.TEXTURE_2D, 1, glInternalFormat, image.width, image.height);
+				} else {
+					state.texImage2D(_gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null);
+				}
 			} else if (texture.isDataTexture) {
 				// use manually created mipmaps if available
 				// if there are no manual mipmaps
 				// set 0 level mipmap and then use GL to generate other mipmap levels
 				if (mipmaps.length > 0 && supportsMips) {
+					if (useTexStorage && allocateMemory) {
+						state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[0].width, mipmaps[0].height);
+					}
+
 					for (let i = 0, il = mipmaps.length; i < il; i++) {
 						mipmap = mipmaps[i];
-						state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+
+						if (useTexStorage) {
+							state.texSubImage2D(_gl.TEXTURE_2D, 0, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
+						} else {
+							state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+						}
 					}
 
 					texture.generateMipmaps = false;
 				} else {
-					state.texImage2D(_gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data);
+					if (useTexStorage) {
+						if (allocateMemory) {
+							state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height);
+						}
+
+						state.texSubImage2D(_gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, glFormat, glType, image.data);
+					} else {
+						state.texImage2D(_gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data);
+					}
 				}
 			} else if (texture.isCompressedTexture) {
+				if (useTexStorage && allocateMemory) {
+					state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[0].width, mipmaps[0].height);
+				}
+
 				for (let i = 0, il = mipmaps.length; i < il; i++) {
 					mipmap = mipmaps[i];
 
 					if (texture.format !== RGBAFormat && texture.format !== RGBFormat) {
 						if (glFormat !== null) {
-							state.compressedTexImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+							if (useTexStorage) {
+								state.compressedTexSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data);
+							} else {
+								state.compressedTexImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+							}
 						} else {
 							console.warn('THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()');
 						}
 					} else {
-						state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+						if (useTexStorage) {
+							state.texSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
+						} else {
+							state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+						}
 					}
 				}
 			} else if (texture.isDataTexture2DArray) {
-				state.texImage3D(_gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data);
+				if (useTexStorage) {
+					if (allocateMemory) {
+						state.texStorage3D(_gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, image.width, image.height, image.depth);
+					}
+
+					state.texSubImage3D(_gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data);
+				} else {
+					state.texImage3D(_gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data);
+				}
 			} else if (texture.isDataTexture3D) {
-				state.texImage3D(_gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data);
+				if (useTexStorage) {
+					if (allocateMemory) {
+						state.texStorage3D(_gl.TEXTURE_3D, levels, glInternalFormat, image.width, image.height, image.depth);
+					}
+
+					state.texSubImage3D(_gl.TEXTURE_3D, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data);
+				} else {
+					state.texImage3D(_gl.TEXTURE_3D, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data);
+				}
+			} else if (texture.isFramebufferTexture) {
+				if (useTexStorage && allocateMemory) {
+					state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height);
+				} else {
+					state.texImage2D(_gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null);
+				}
 			} else {
 				// regular Texture (image, video, canvas)
 				// use manually created mipmaps if available
 				// if there are no manual mipmaps
 				// set 0 level mipmap and then use GL to generate other mipmap levels
-				const levels = getMipLevels(texture, image, supportsMips);
-				const useTexStorage = isWebGL2 && texture.isVideoTexture !== true;
-				const allocateMemory = textureProperties.__version === undefined;
-
 				if (mipmaps.length > 0 && supportsMips) {
 					if (useTexStorage && allocateMemory) {
 						state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[0].width, mipmaps[0].height);
@@ -16927,10 +17090,17 @@
 						glFormat = utils.convert(texture.format),
 						glType = utils.convert(texture.type),
 						glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
+			const useTexStorage = isWebGL2 && texture.isVideoTexture !== true;
+			const allocateMemory = textureProperties.__version === undefined;
+			let levels = getMipLevels(texture, image, supportsMips);
 			setTextureParameters(_gl.TEXTURE_CUBE_MAP, texture, supportsMips);
 			let mipmaps;
 
 			if (isCompressed) {
+				if (useTexStorage && allocateMemory) {
+					state.texStorage2D(_gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, image.width, image.height);
+				}
+
 				for (let i = 0; i < 6; i++) {
 					mipmaps = cubeImage[i].mipmaps;
 
@@ -16939,33 +17109,67 @@
 
 						if (texture.format !== RGBAFormat && texture.format !== RGBFormat) {
 							if (glFormat !== null) {
-								state.compressedTexImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+								if (useTexStorage) {
+									state.compressedTexSubImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data);
+								} else {
+									state.compressedTexImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+								}
 							} else {
 								console.warn('THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()');
 							}
 						} else {
-							state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+							if (useTexStorage) {
+								state.texSubImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
+							} else {
+								state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+							}
 						}
 					}
 				}
 			} else {
 				mipmaps = texture.mipmaps;
 
+				if (useTexStorage && allocateMemory) {
+					// TODO: Uniformly handle mipmap definitions
+					// Normal textures and compressed cube textures define base level + mips with their mipmap array
+					// Uncompressed cube textures use their mipmap array only for mips (no base level)
+					if (mipmaps.length > 0) levels++;
+					state.texStorage2D(_gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, cubeImage[0].width, cubeImage[0].height);
+				}
+
 				for (let i = 0; i < 6; i++) {
 					if (isDataTexture) {
-						state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[i].width, cubeImage[i].height, 0, glFormat, glType, cubeImage[i].data);
+						if (useTexStorage) {
+							state.texSubImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, cubeImage[i].width, cubeImage[i].height, glFormat, glType, cubeImage[i].data);
+						} else {
+							state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[i].width, cubeImage[i].height, 0, glFormat, glType, cubeImage[i].data);
+						}
 
 						for (let j = 0; j < mipmaps.length; j++) {
 							const mipmap = mipmaps[j];
 							const mipmapImage = mipmap.image[i].image;
-							state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data);
+
+							if (useTexStorage) {
+								state.texSubImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, mipmapImage.width, mipmapImage.height, glFormat, glType, mipmapImage.data);
+							} else {
+								state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data);
+							}
 						}
 					} else {
-						state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[i]);
+						if (useTexStorage) {
+							state.texSubImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, glFormat, glType, cubeImage[i]);
+						} else {
+							state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[i]);
+						}
 
 						for (let j = 0; j < mipmaps.length; j++) {
 							const mipmap = mipmaps[j];
-							state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[i]);
+
+							if (useTexStorage) {
+								state.texSubImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, glFormat, glType, mipmap.image[i]);
+							} else {
+								state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[i]);
+							}
 						}
 					}
 				}
@@ -17980,7 +18184,7 @@
 						let glDepthFormat = null;
 
 						if (attributes.depth) {
-							glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT16;
+							glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 							depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
 							depthType = attributes.stencil ? UnsignedInt248Type : UnsignedShortType;
 						}
@@ -18003,7 +18207,8 @@
 								depthTexture: new DepthTexture(glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat),
 								stencilBuffer: attributes.stencil,
 								ignoreDepth: glProjLayer.ignoreDepthValues,
-								useRenderToTexture: hasMultisampledRenderToTexture
+								useRenderToTexture: hasMultisampledRenderToTexture,
+								encoding: renderer.outputEncoding
 							});
 						} else {
 							newRenderTarget = new WebGLRenderTarget(glProjLayer.textureWidth, glProjLayer.textureHeight, {
@@ -18011,13 +18216,14 @@
 								type: UnsignedByteType,
 								depthTexture: new DepthTexture(glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat),
 								stencilBuffer: attributes.stencil,
-								ignoreDepth: glProjLayer.ignoreDepthValues
+								ignoreDepth: glProjLayer.ignoreDepthValues,
+								encoding: renderer.outputEncoding
 							});
 						}
 					} // Set foveation to maximum.
 
 
-					this.setFoveation(0);
+					this.setFoveation(1.0);
 					referenceSpace = await session.requestReferenceSpace(referenceSpaceType);
 					animation.setContext(session);
 					animation.start();
@@ -19008,7 +19214,7 @@
 			clipping = new WebGLClipping(properties);
 			programCache = new WebGLPrograms(_this, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping);
 			materials = new WebGLMaterials(properties);
-			renderLists = new WebGLRenderLists(properties);
+			renderLists = new WebGLRenderLists();
 			renderStates = new WebGLRenderStates(extensions, capabilities);
 			background = new WebGLBackground(_this, cubemaps, state, objects, _premultipliedAlpha);
 			shadowMap = new WebGLShadowMap(_this, objects, capabilities);
@@ -20154,21 +20360,17 @@
 		};
 
 		this.copyFramebufferToTexture = function (position, texture, level = 0) {
+			if (texture.isFramebufferTexture !== true) {
+				console.error('THREE.WebGLRenderer: copyFramebufferToTexture() can only be used with FramebufferTexture.');
+				return;
+			}
+
 			const levelScale = Math.pow(2, -level);
 			const width = Math.floor(texture.image.width * levelScale);
 			const height = Math.floor(texture.image.height * levelScale);
-			let glFormat = utils.convert(texture.format);
-
-			if (capabilities.isWebGL2) {
-				// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
-				// Not needed in Chrome 93+
-				if (glFormat === _gl.RGB) glFormat = _gl.RGB8;
-				if (glFormat === _gl.RGBA) glFormat = _gl.RGBA8;
-			}
-
 			textures.setTexture2D(texture, 0);
 
-			_gl.copyTexImage2D(_gl.TEXTURE_2D, level, glFormat, position.x, position.y, width, height, 0);
+			_gl.copyTexSubImage2D(_gl.TEXTURE_2D, level, 0, 0, position.x, position.y, width, height);
 
 			state.unbindTexture();
 		};
@@ -20297,8 +20499,7 @@
 		if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 			__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('observe', {
 				detail: this
-			})); // eslint-disable-line no-undef
-
+			}));
 		}
 	}
 
@@ -20369,8 +20570,7 @@
 			if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 				__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('observe', {
 					detail: this
-				})); // eslint-disable-line no-undef
-
+				}));
 			}
 		}
 
@@ -21135,7 +21335,6 @@
 			this.generateMipmaps = false;
 			this.flipY = false;
 			this.unpackAlignment = 1;
-			this.needsUpdate = true;
 		}
 
 	}
@@ -21259,6 +21458,7 @@
 			boneMatrices.set(this.boneMatrices); // copy current values
 
 			const boneTexture = new DataTexture(boneMatrices, size, size, RGBAFormat, FloatType);
+			boneTexture.needsUpdate = true;
 			this.boneMatrices = boneMatrices;
 			this.boneTexture = boneTexture;
 			this.boneTextureSize = size;
@@ -21922,6 +22122,23 @@
 	}
 
 	VideoTexture.prototype.isVideoTexture = true;
+
+	class FramebufferTexture extends Texture {
+		constructor(width, height, format) {
+			super({
+				width,
+				height
+			});
+			this.format = format;
+			this.magFilter = NearestFilter;
+			this.minFilter = NearestFilter;
+			this.generateMipmaps = false;
+			this.needsUpdate = true;
+		}
+
+	}
+
+	FramebufferTexture.prototype.isFramebufferTexture = true;
 
 	class CompressedTexture extends Texture {
 		constructor(mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding) {
@@ -28279,11 +28496,16 @@
 					const callback = callbacks[i];
 					if (callback.onLoad) callback.onLoad(data);
 				}
-
-				this.manager.itemEnd(url);
 			}).catch(err => {
 				// Abort errors and other errors are handled the same
 				const callbacks = loading[url];
+
+				if (callbacks === undefined) {
+					// When onLoad was called and url was deleted in `loading`
+					this.manager.itemError(url);
+					throw err;
+				}
+
 				delete loading[url];
 
 				for (let i = 0, il = callbacks.length; i < il; i++) {
@@ -28292,6 +28514,7 @@
 				}
 
 				this.manager.itemError(url);
+			}).finally(() => {
 				this.manager.itemEnd(url);
 			});
 			this.manager.itemStart(url);
@@ -36002,14 +36225,11 @@
 	}
 
 	if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
-		/* eslint-disable no-undef */
 		__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('register', {
 			detail: {
 				revision: REVISION
 			}
 		}));
-		/* eslint-enable no-undef */
-
 	}
 
 	if (typeof window !== 'undefined') {
@@ -36147,6 +36367,7 @@
 	exports.FogExp2 = FogExp2;
 	exports.Font = Font;
 	exports.FontLoader = FontLoader;
+	exports.FramebufferTexture = FramebufferTexture;
 	exports.FrontSide = FrontSide;
 	exports.Frustum = Frustum;
 	exports.GLBufferAttribute = GLBufferAttribute;
