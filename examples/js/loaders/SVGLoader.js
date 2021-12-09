@@ -1887,6 +1887,7 @@
 				}
 
 				return {
+					curves: p.curves,
 					points: points,
 					isCW: THREE.ShapeUtils.isClockWise( points ),
 					identifier: identifier ++,
@@ -1904,12 +1905,15 @@
 
 				if ( ! amIAHole.isHole ) {
 
-					const shape = new THREE.Shape( p.points );
+					const shape = new THREE.Shape();
+					shape.curves = p.curves;
 					const holes = isAHole.filter( h => h.isHole && h.for === p.identifier );
 					holes.forEach( h => {
 
-						const path = simplePaths[ h.identifier ];
-						shape.holes.push( new THREE.Path( path.points ) );
+						const hole = simplePaths[ h.identifier ];
+						const path = new THREE.Path();
+						path.curves = hole.curves;
+						shape.holes.push( path );
 
 					} );
 					shapesToReturn.push( shape );

@@ -79,7 +79,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.transmissionMap = null;
 
-		this.thickness = 0.01;
+		this.thickness = 0;
 		this.thicknessMap = null;
 		this.attenuationDistance = 0.0;
 		this.attenuationColor = new Color( 1, 1, 1 );

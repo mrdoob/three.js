@@ -91,16 +91,16 @@
 		Returns a clone of this Skeleton object.
 		</p>
 
-		<h3>[method:null calculateInverses]()</h3>
+		<h3>[method:undefined calculateInverses]()</h3>
 		<p>Generates the [page:.boneInverses boneInverses] array if not provided in the constructor.</p>
 
-		<h3>[method:null computeBoneTexture]()</h3>
+		<h3>[method:this computeBoneTexture]()</h3>
 		<p>Computes an instance of [page:DataTexture] in order to pass the bone data more efficiently to the shader. The texture is assigned to [page:.boneTexture boneTexture].</p>
 
-		<h3>[method:null pose]()</h3>
+		<h3>[method:undefined pose]()</h3>
 		<p>Returns the skeleton to the base pose.</p>
 
-		<h3>[method:null update]()</h3>
+		<h3>[method:undefined update]()</h3>
 		<p>
 		Updates the [page:Float32Array boneMatrices] and [page:DataTexture boneTexture] after changing the bones.
 		This is called automatically by the [page:WebGLRenderer] if the skeleton is used with a [page:SkinnedMesh].
@@ -113,7 +113,7 @@
 		Searches through the skeleton's bone array and returns the first with a matching name.<br />
 		</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 		Can be used if an instance of [name] becomes obsolete in an application. The method will free internal resources.
 		</p>

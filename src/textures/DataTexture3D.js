@@ -26,8 +26,6 @@ class DataTexture3D extends Texture {
 		this.flipY = false;
 		this.unpackAlignment = 1;
 
-		this.needsUpdate = true;
-
 	}
 
 }

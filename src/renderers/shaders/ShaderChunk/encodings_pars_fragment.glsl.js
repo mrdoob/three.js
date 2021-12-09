@@ -59,31 +59,4 @@ vec4 LinearToRGBD( in vec4 value, in float maxRange ) {
 	D = clamp( floor( D ) / 255.0, 0.0, 1.0 );
 	return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );
 }
-
-// LogLuv reference: http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
-
-// M matrix, for encoding
-const mat3 cLogLuvM = mat3( 0.2209, 0.3390, 0.4184, 0.1138, 0.6780, 0.7319, 0.0102, 0.1130, 0.2969 );
-vec4 LinearToLogLuv( in vec4 value ) {
-	vec3 Xp_Y_XYZp = cLogLuvM * value.rgb;
-	Xp_Y_XYZp = max( Xp_Y_XYZp, vec3( 1e-6, 1e-6, 1e-6 ) );
-	vec4 vResult;
-	vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;
-	float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;
-	vResult.w = fract( Le );
-	vResult.z = ( Le - ( floor( vResult.w * 255.0 ) ) / 255.0 ) / 255.0;
-	return vResult;
-}
-
-// Inverse M matrix, for decoding
-const mat3 cLogLuvInverseM = mat3( 6.0014, -2.7008, -1.7996, -1.3320, 3.1029, -5.7721, 0.3008, -1.0882, 5.6268 );
-vec4 LogLuvToLinear( in vec4 value ) {
-	float Le = value.z * 255.0 + value.w;
-	vec3 Xp_Y_XYZp;
-	Xp_Y_XYZp.y = exp2( ( Le - 127.0 ) / 2.0 );
-	Xp_Y_XYZp.z = Xp_Y_XYZp.y / value.y;
-	Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;
-	vec3 vRGB = cLogLuvInverseM * Xp_Y_XYZp.rgb;
-	return vec4( max( vRGB, 0.0 ), 1.0 );
-}
 `;

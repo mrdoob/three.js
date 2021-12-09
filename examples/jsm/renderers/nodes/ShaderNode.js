@@ -20,11 +20,12 @@ import MathNode from './math/MathNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
+import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
 // core
-import { Vector2, Vector3, Vector4, Color } from 'three';
+import { Vector2, Vector3, Vector4, Color } from '../../../../build/three.module.js';
 
 const NodeHandler = {
 
@@ -208,43 +209,67 @@ export const cond = ( ...params ) => {
 
 export const vec2 = ( ...params ) => {
 
-	// Providing one scalar value: This value is used for all components
+	if ( params[ 0 ]?.isNode === true ) {
 
-	if ( params.length === 1 ) {
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec2' ) );
 
-		params[ 1 ] = params[ 0 ];
+	} else {
+
+		// Providing one scalar value: This value is used for all components
+
+		if ( params.length === 1 ) {
+
+			params[ 1 ] = params[ 0 ];
+
+		}
+
+		return ShaderNodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
 
 	}
-
-	return ShaderNodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
 
 };
 
 export const vec3 = ( ...params ) => {
 
-	// Providing one scalar value: This value is used for all components
+	if ( params[ 0 ]?.isNode === true ) {
 
-	if ( params.length === 1 ) {
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec3' ) );
 
-		params[ 1 ] = params[ 2 ] = params[ 0 ];
+	} else {
+
+		// Providing one scalar value: This value is used for all components
+
+		if ( params.length === 1 ) {
+
+			params[ 1 ] = params[ 2 ] = params[ 0 ];
+
+		}
+
+		return ShaderNodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
 
 	}
-
-	return ShaderNodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
 
 };
 
 export const vec4 = ( ...params ) => {
 
-	// Providing one scalar value: This value is used for all components
+	if ( params[ 0 ]?.isNode === true ) {
 
-	if ( params.length === 1 ) {
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec4' ) );
 
-		params[ 1 ] = params[ 2 ] = params[ 3 ] = params[ 0 ];
+	} else {
+
+		// Providing one scalar value: This value is used for all components
+
+		if ( params.length === 1 ) {
+
+			params[ 1 ] = params[ 2 ] = params[ 3 ] = params[ 0 ];
+
+		}
+
+		return ShaderNodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
 
 	}
-
-	return ShaderNodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
 
 };
 
@@ -263,10 +288,12 @@ export const div = ShaderNodeProxy( OperatorNode, '/' );
 export const equal = ShaderNodeProxy( OperatorNode, '==' );
 export const assign = ShaderNodeProxy( OperatorNode, '=' );
 export const greaterThan = ShaderNodeProxy( OperatorNode, '>' );
+export const lessThanEqual = ShaderNodeProxy( OperatorNode, '<=' );
 export const and = ShaderNodeProxy( OperatorNode, '&&' );
 
 export const element = ShaderNodeProxy( ArrayElementNode );
 
+export const normalGeometry = new NormalNode( NormalNode.GEOMETRY );
 export const normalLocal = new NormalNode( NormalNode.LOCAL );
 export const normalWorld = new NormalNode( NormalNode.WORLD );
 export const normalView = new NormalNode( NormalNode.VIEW );
@@ -278,7 +305,10 @@ export const positionView = new PositionNode( PositionNode.VIEW );
 export const positionViewDirection = new PositionNode( PositionNode.VIEW_DIRECTION );
 
 export const PI = float( 3.141592653589793 );
+export const PI2 = float( 6.283185307179586 );
+export const PI_HALF = float( 1.5707963267948966 );
 export const RECIPROCAL_PI = float( 0.3183098861837907 );
+export const RECIPROCAL_PI2 = float( 0.15915494309189535 );
 export const EPSILON = float( 1e-6 );
 
 export const diffuseColor = new PropertyNode( 'DiffuseColor', 'vec4' );
@@ -287,12 +317,17 @@ export const metalness = new PropertyNode( 'Metalness', 'float' );
 export const alphaTest = new PropertyNode( 'AlphaTest', 'float' );
 export const specularColor = new PropertyNode( 'SpecularColor', 'color' );
 
+export const abs = ShaderNodeProxy( MathNode, 'abs' );
 export const negate = ShaderNodeProxy( MathNode, 'negate' );
 export const floor = ShaderNodeProxy( MathNode, 'floor' );
 export const mod = ShaderNodeProxy( MathNode, 'mod' );
 export const cross = ShaderNodeProxy( MathNode, 'cross' );
+export const fract = ShaderNodeProxy( MathNode, 'fract' );
+export const round = ShaderNodeProxy( MathNode, 'round' );
 export const max = ShaderNodeProxy( MathNode, 'max' );
 export const min = ShaderNodeProxy( MathNode, 'min' );
+export const sin = ShaderNodeProxy( MathNode, 'sin' );
+export const cos = ShaderNodeProxy( MathNode, 'cos' );
 export const dot = ShaderNodeProxy( MathNode, 'dot' );
 export const normalize = ShaderNodeProxy( MathNode, 'normalize' );
 export const sqrt = ShaderNodeProxy( MathNode, 'sqrt' );
@@ -306,5 +341,6 @@ export const pow3 = ShaderNodeProxy( MathNode, 'pow', 3 );
 export const pow4 = ShaderNodeProxy( MathNode, 'pow', 4 );
 export const exp = ShaderNodeProxy( MathNode, 'exp' );
 export const exp2 = ShaderNodeProxy( MathNode, 'exp2' );
+export const mix = ShaderNodeProxy( MathNode, 'mix' );
 export const saturate = ShaderNodeProxy( MathNode, 'saturate' );
 export const transformDirection = ShaderNodeProxy( MathNode, 'transformDirection' );

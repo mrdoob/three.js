@@ -2,7 +2,7 @@
 
 	const _cameraToLightMatrix = new THREE.Matrix4();
 
-	const _lightSpaceFrustum = new THREE.Frustum();
+	const _lightSpaceFrustum = new THREE.CSMFrustum();
 
 	const _center = new THREE.Vector3();
 
@@ -29,7 +29,7 @@
 			this.lightMargin = data.lightMargin || 200;
 			this.customSplitsCallback = data.customSplitsCallback;
 			this.fade = false;
-			this.mainFrustum = new THREE.Frustum();
+			this.mainFrustum = new THREE.CSMFrustum();
 			this.frustums = [];
 			this.breaks = [];
 			this.lights = [];

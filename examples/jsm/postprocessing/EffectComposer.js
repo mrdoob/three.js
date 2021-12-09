@@ -10,9 +10,9 @@ import {
 	WebGLRenderTarget
 } from '../../../build/three.module.js';
 import { CopyShader } from '../shaders/CopyShader.js';
-import { ShaderPass } from '../postprocessing/ShaderPass.js';
-import { MaskPass } from '../postprocessing/MaskPass.js';
-import { ClearMaskPass } from '../postprocessing/MaskPass.js';
+import { ShaderPass } from './ShaderPass.js';
+import { MaskPass } from './MaskPass.js';
+import { ClearMaskPass } from './MaskPass.js';
 
 class EffectComposer {
 

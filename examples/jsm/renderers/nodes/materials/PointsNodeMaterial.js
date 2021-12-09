@@ -1,4 +1,4 @@
-import { PointsMaterial } from 'three';
+import { PointsMaterial } from '../../../../../build/three.module.js';
 
 class PointsNodeMaterial extends PointsMaterial {
 
