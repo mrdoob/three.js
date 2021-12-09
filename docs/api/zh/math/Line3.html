@@ -38,14 +38,14 @@
 
 		<h2>方法（Methods）</h2>
 
-		<h3>[method:Line3 applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>对此线段应用矩阵变换。</p>
 
 		<h3>[method:Vector3 at]( [param:Float t], [param:Vector3 target] )</h3>
 		<p>
 		[page:Float t] - 使用值0-1返回沿线段的位置。<br />
 		[page:Vector3 target] — 计算结果会被拷贝到target。<br /><br />
-		
+
 		返回一个线段某一位置的向量，当 [page:Float t] = 0的时候返回起始点，当[page:Float t] = 1的时候返回终点。<br />
 		</p>
 
@@ -69,7 +69,7 @@
 		返回一个基于点投影到线段上的点的参数。如果 [page:Boolean clampToLine] 为true则返回值将在0到1之间。
 		</p>
 
-		<h3>[method:Line3 copy]( [param:Line3 line] )</h3>
+		<h3>[method:this copy]( [param:Line3 line] )</h3>
 		<p>拷贝传入线段的起始点 [page:.start start] 和终点 [page:.end end] 向量到当前线段。</p>
 
 		<h3>[method:Vector3 delta]( [param:Vector3 target] )</h3>
@@ -101,7 +101,7 @@
 		返回线段的中心点。
 		</p>
 
-		<h3>[method:Line3 set]( [param:Vector3 start], [param:Vector3 end] )</h3>
+		<h3>[method:this set]( [param:Vector3 start], [param:Vector3 end] )</h3>
 		<p>
 		[page:Vector3 start] - 设置线段的起点 [page:.start start point]。<br />
 		[page:Vector3 end] - 设置线段的终点 [page:.end end point]。<br /><br />

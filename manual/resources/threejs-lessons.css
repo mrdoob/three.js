@@ -1,0 +1,69 @@
+/* Licensed under a BSD license. See ../license.html for license */
+
+html, body {
+  background-color: #aaa;
+  font-family: Sans-Serif;
+}
+
+canvas {
+  background-color: #fff;
+  border: 1px solid black;
+}
+
+#uiContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+}
+
+.gman-slider-label {
+  float: left;
+  gbackground-color: green;
+}
+.gman-slider-value {
+  float: right;
+  gbackground-color: blue;
+}
+.gman-slider-upper {
+  gbackground-color: yellow;
+  height: 1.5em;
+}
+.gman-slider-outer {
+  gbackground-color: purple;
+  height: 2.5em;
+}
+.gman-slider-slider {
+  font-size: x-small;
+  gbackground-color: red;
+}
+
+/* styles to apply if in an iframe */
+
+body.iframe {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
+}
+
+.iframe>.description {
+  display: none;
+}
+
+.iframe>canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.iframe canvas {
+  border: none;
+}
+
+.iframe>#example {
+  width: 100%;
+  height: 100%;
+}
+
+

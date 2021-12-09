@@ -1,4 +1,6 @@
 import {
+	CubeReflectionMapping,
+	CubeRefractionMapping,
 	CubeUVReflectionMapping,
 	GammaEncoding,
 	LinearEncoding,
@@ -7,6 +9,7 @@ import {
 	NoBlending,
 	RGBDEncoding,
 	RGBEEncoding,
+	RGBAFormat,
 	RGBEFormat,
 	RGBM16Encoding,
 	RGBM7Encoding,
@@ -53,13 +56,6 @@ const ENCODINGS = {
 	[ RGBDEncoding ]: 5,
 	[ GammaEncoding ]: 6
 };
-
-const backgroundMaterial = new MeshBasicMaterial( {
-	side: BackSide,
-	depthWrite: false,
-	depthTest: false,
-} );
-const backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
@@ -279,8 +275,18 @@ class PMREMGenerator {
 		renderer.outputEncoding = LinearEncoding;
 		renderer.autoClear = false;
 
+		const backgroundMaterial = new MeshBasicMaterial( {
+			name: 'PMREM.Background',
+			side: BackSide,
+			depthWrite: false,
+			depthTest: false,
+		} );
+
+		const backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
+
 		let useSolidColor = false;
 		const background = scene.background;
+
 		if ( background ) {
 
 			if ( background.isColor ) {
@@ -297,7 +303,6 @@ class PMREMGenerator {
 			useSolidColor = true;
 
 		}
-
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -333,6 +338,9 @@ class PMREMGenerator {
 
 		}
 
+		backgroundBox.geometry.dispose();
+		backgroundBox.material.dispose();
+
 		renderer.toneMapping = toneMapping;
 		renderer.outputEncoding = outputEncoding;
 		renderer.autoClear = originalAutoClear;
@@ -340,11 +348,27 @@ class PMREMGenerator {
 
 	}
 
+	_setEncoding( uniform, texture ) {
+
+		if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
+
+			uniform.value = ENCODINGS[ LinearEncoding ];
+
+		} else {
+
+			uniform.value = ENCODINGS[ texture.encoding ];
+
+		}
+
+	}
+
 	_textureToCubeUV( texture, cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
 
-		if ( texture.isCubeTexture ) {
+		const isCubeTexture = ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping );
+
+		if ( isCubeTexture ) {
 
 			if ( this._cubemapShader == null ) {
 
@@ -362,21 +386,21 @@ class PMREMGenerator {
 
 		}
 
-		const material = texture.isCubeTexture ? this._cubemapShader : this._equirectShader;
+		const material = isCubeTexture ? this._cubemapShader : this._equirectShader;
 		const mesh = new Mesh( _lodPlanes[ 0 ], material );
 
 		const uniforms = material.uniforms;
 
 		uniforms[ 'envMap' ].value = texture;
 
-		if ( ! texture.isCubeTexture ) {
+		if ( ! isCubeTexture ) {
 
 			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
 
 		}
 
-		uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
-		uniforms[ 'outputEncoding' ].value = ENCODINGS[ cubeUVRenderTarget.texture.encoding ];
+		this._setEncoding( uniforms[ 'inputEncoding' ], texture );
+		this._setEncoding( uniforms[ 'outputEncoding' ], cubeUVRenderTarget.texture );
 
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 
@@ -507,8 +531,9 @@ class PMREMGenerator {
 
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
-		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
-		blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
+
+		this._setEncoding( blurUniforms[ 'inputEncoding' ], targetIn.texture );
+		this._setEncoding( blurUniforms[ 'outputEncoding' ], targetIn.texture );
 
 		const outputSize = _sizeLods[ lodOut ];
 		const x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );

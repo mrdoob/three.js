@@ -61,13 +61,13 @@
 			[page:.z z] and [page:.w w] properties to this one.
 		</p>
 
-		<h3>[method:Quaternion conjugate]()</h3>
+		<h3>[method:this conjugate]()</h3>
 		<p>
 		Returns the rotational conjugate of this quaternion. The conjugate of a quaternion
 		represents the same rotation in the opposite direction about the rotational axis.
 		</p>
 
-		<h3>[method:Quaternion copy]( [param:Quaternion q] )</h3>
+		<h3>[method:this copy]( [param:Quaternion q] )</h3>
 		<p>
 			Copies the [page:.x x], [page:.y y],	[page:.z z] and [page:.w w] properties
 			of [page:Quaternion q] into this quaternion.
@@ -88,7 +88,7 @@
 			quaternions [page:Quaternion v] and this one.
 		</p>
 
-		<h3>[method:Quaternion fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
 		[page:Array array] - array of format (x, y, z, w) used to construct the quaternion.<br />
 		[page:Integer offset] - (optional) an offset into the array.<br /><br />
@@ -97,12 +97,12 @@
 		from an array.
 		</p>
 
-		<h3>[method:Quaternion identity]()</h3>
+		<h3>[method:this identity]()</h3>
 		<p>
 			Sets this quaternion to the identity quaternion; that is, to the quaternion that represents "no rotation".
 		</p>
 
-		<h3>[method:Quaternion invert]()</h3>
+		<h3>[method:this invert]()</h3>
 		<p>
 			Inverts this quaternion - calculates the [page:.conjugate conjugate]. The quaternion is assumed to have unit length.
 		</p>
@@ -119,26 +119,31 @@
 			as this is a slightly more efficient calculation than [page:.length length]().
 		</p>
 
-		<h3>[method:Quaternion normalize]()</h3>
+		<h3>[method:this normalize]()</h3>
 		<p>
 			[link:https://en.wikipedia.org/wiki/Normalized_vector Normalizes] this quaternion - that is,
 		calculated the quaternion that performs the same rotation as this one, but has  [page:.length length]
 		equal to *1*.
 		</p>
 
-		<h3>[method:Quaternion multiply]( [param:Quaternion q] )</h3>
+		<h3>[method:this multiply]( [param:Quaternion q] )</h3>
 		<p>Multiplies this quaternion by [page:Quaternion q].</p>
 
-		<h3>[method:Quaternion multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
+		<h3>[method:this multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
 		<p>
 		Sets this quaternion to [page:Quaternion a] x [page:Quaternion b].<br />
 		Adapted from the method outlined [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here].
 		</p>
 
-		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
+		<h3>[method:this premultiply]( [param:Quaternion q] )</h3>
 		<p>Pre-multiplies this quaternion by [page:Quaternion q].</p>
 
-		<h3>[method:Quaternion rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
+		<h3>[method:this random]()</h3>
+		<p>
+		Sets this quaternion to a uniformly random, normalized quaternion.
+		</p>
+
+		<h3>[method:this rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
 		<p>
 			[page:Quaternion q] - The target quaternion.<br />
 			[page:Float step] - The angular step in radians.<br /><br />
@@ -147,7 +152,7 @@
 			The method ensures that the final quaternion will not overshoot *q*.
 		</p>
 
-		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:Float t] )</h3>
+		<h3>[method:this slerp]( [param:Quaternion qb], [param:Float t] )</h3>
 		<p>
 			[page:Quaternion qb] - The other quaternion rotation<br />
 			[page:Float t] - interpolation factor in the closed interval [0, 1].<br /><br />
@@ -166,20 +171,20 @@
 		<h3>[method:this slerpQuaternions]( [param:Quaternion qa], [param:Quaternion qb], [param:Float t] )</h3>
 		<p>Performs a spherical linear interpolation between the given quaternions and stores the result in this quaternion.</p>
 
-		<h3>[method:Quaternion set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>Sets [page:.x x], [page:.y y], [page:.z z], [page:.w w] properties of this quaternion.</p>
 
-		<h3>[method:Quaternion setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<h3>[method:this setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
 		Sets this quaternion from rotation specified by [page:Vector3 axis] and [page:Float angle].<br />
 		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here].<br />
 		*Axis* is assumed to be normalized, *angle* is in radians.
 		</p>
 
-		<h3>[method:Quaternion setFromEuler]( [param:Euler euler] )</h3>
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
 		<p>Sets this quaternion from the rotation specified by [page:Euler] angle.</p>
 
-		<h3>[method:Quaternion setFromRotationMatrix]( [param:Matrix4 m] )</h3>
+		<h3>[method:this setFromRotationMatrix]( [param:Matrix4 m] )</h3>
 		<p>
 		[page:Matrix4 m] - a [page:Matrix4] of which the upper 3x3 of matrix is a pure
 		[link:https://en.wikipedia.org/wiki/Rotation_matrix rotation matrix] (i.e. unscaled).<br />
@@ -187,7 +192,7 @@
 		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here].
 		</p>
 
-		<h3>[method:Quaternion setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>
+		<h3>[method:this setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>
 		<p>
 		Sets this quaternion to the rotation required to rotate direction vector [page:Vector3 vFrom] to
 		direction vector [page:Vector3 vTo].<br />
@@ -214,7 +219,7 @@
 
 		<h2>Static Methods</h2>
 
-		<h3>[method:null slerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float t] )</h3>
+		<h3>[method:undefined slerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float t] )</h3>
 		<p>
 		[page:Array dst] - The output array.<br />
 		[page:Integer dstOffset] - An offset into the output array.<br />

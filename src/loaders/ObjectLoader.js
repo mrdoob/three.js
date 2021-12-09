@@ -18,7 +18,7 @@ import {
 	LinearMipmapNearestFilter,
 	LinearMipmapLinearFilter
 } from '../constants.js';
-import { BufferAttribute } from '../core/BufferAttribute.js';
+import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
@@ -696,6 +696,8 @@ class ObjectLoader extends Loader {
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 
+				if ( data.userData !== undefined ) texture.userData = data.userData;
+
 				textures[ data.uuid ] = texture;
 
 			}
@@ -908,8 +910,8 @@ class ObjectLoader extends Loader {
 				const instanceColor = data.instanceColor;
 
 				object = new InstancedMesh( geometry, material, count );
-				object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
-				if ( instanceColor !== undefined ) object.instanceColor = new BufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
+				object.instanceMatrix = new InstancedBufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
+				if ( instanceColor !== undefined ) object.instanceColor = new InstancedBufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
 
 				break;
 

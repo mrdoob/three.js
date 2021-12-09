@@ -1007,6 +1007,7 @@ class SVGLoader extends Loader {
 
 			addStyle( 'fill', 'fill' );
 			addStyle( 'fill-opacity', 'fillOpacity', clamp );
+			addStyle( 'fill-rule', 'fillRule' );
 			addStyle( 'opacity', 'opacity', clamp );
 			addStyle( 'stroke', 'stroke' );
 			addStyle( 'stroke-opacity', 'strokeOpacity', clamp );
@@ -2083,7 +2084,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			return { points: points, isCW: ShapeUtils.isClockWise( points ), identifier: identifier ++, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
+			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: identifier ++, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
 
 		} );
 
@@ -2100,12 +2101,15 @@ class SVGLoader extends Loader {
 
 			if ( ! amIAHole.isHole ) {
 
-				const shape = new Shape( p.points );
+				const shape = new Shape();
+				shape.curves = p.curves;
 				const holes = isAHole.filter( h => h.isHole && h.for === p.identifier );
 				holes.forEach( h => {
 
-					const path = simplePaths[ h.identifier ];
-					shape.holes.push( new Path( path.points ) );
+					const hole = simplePaths[ h.identifier ];
+					const path = new Path();
+					path.curves = hole.curves;
+					shape.holes.push( path );
 
 				} );
 				shapesToReturn.push( shape );

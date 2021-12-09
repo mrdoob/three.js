@@ -180,10 +180,7 @@ const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	// no non-module library
 	// https://unpkg.com/browse/web-ifc@0.0.17/
 	'loaders/IFCLoader.js',
-
-	// no non-module library
-	// https://unpkg.com/browse/ktx-parse@0.2.1/dist/
-	'loaders/KTX2Loader.js',
+	'node-editor/**/*',
 
 	'renderers/webgl/**/*',
 	'renderers/webgpu/**/*',

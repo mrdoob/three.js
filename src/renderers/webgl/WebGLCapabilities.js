@@ -52,10 +52,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-	/* eslint-disable no-undef */
 	const isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext ) ||
 		( typeof WebGL2ComputeRenderingContext !== 'undefined' && gl instanceof WebGL2ComputeRenderingContext );
-	/* eslint-enable no-undef */
 
 	let precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 	const maxPrecision = getMaxPrecision( precision );

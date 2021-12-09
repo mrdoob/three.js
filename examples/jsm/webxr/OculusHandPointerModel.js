@@ -329,31 +329,31 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
-	intersectObject( object ) {
+	intersectObject( object, recursive = true ) {
 
 		if ( this.raycaster ) {
 
-			return this.raycaster.intersectObject( object );
+			return this.raycaster.intersectObject( object, recursive );
 
 		}
 
 	}
 
-	intersectObjects( objects ) {
+	intersectObjects( objects, recursive = true ) {
 
 		if ( this.raycaster ) {
 
-			return this.raycaster.intersectObjects( objects );
+			return this.raycaster.intersectObjects( objects, recursive );
 
 		}
 
 	}
 
-	checkIntersections( objects ) {
+	checkIntersections( objects, recursive = false ) {
 
 		if ( this.raycaster && ! this.attached ) {
 
-			const intersections = this.raycaster.intersectObjects( objects );
+			const intersections = this.raycaster.intersectObjects( objects, recursive );
 			const direction = new THREE.Vector3( 0, 0, - 1 );
 			if ( intersections.length > 0 ) {
 

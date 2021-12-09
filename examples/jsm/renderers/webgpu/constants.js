@@ -107,8 +107,8 @@ export const GPUTextureFormat = {
 	RGBA8Snorm: 'rgba8snorm',
 	RGBA8Uint: 'rgba8uint',
 	RGBA8Sint: 'rgba8sint',
-	BRGA8Unorm: 'bgra8unorm',
-	BRGA8UnormSRGB: 'bgra8unorm-srgb',
+	BGRA8Unorm: 'bgra8unorm',
+	BGRA8UnormSRGB: 'bgra8unorm-srgb',
 	// Packed 32-bit formats
 	RGB9E5UFloat: 'rgb9e5ufloat',
 	RGB10A2Unorm: 'rgb10a2unorm',
@@ -251,6 +251,8 @@ export const GPUInputStepMode = {
 	Vertex: 'vertex',
 	Instance: 'instance'
 };
+
+export const GPUChunkSize = 16; // size of a chunk in bytes (STD140 layout)
 
 // @TODO: Move to src/constants.js
 

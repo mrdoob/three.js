@@ -315,11 +315,11 @@ class UITextArea extends UIElement {
 
 				event.preventDefault();
 
-				const cursor = this.dom.selectionStart;
+				const cursor = this.selectionStart;
 
-				this.dom.value = this.dom.value.substring( 0, cursor ) + '\t' + this.dom.value.substring( cursor );
-				this.dom.selectionStart = cursor + 1;
-				this.dom.selectionEnd = this.dom.selectionStart;
+				this.value = this.value.substring( 0, cursor ) + '\t' + this.value.substring( cursor );
+				this.selectionStart = cursor + 1;
+				this.selectionEnd = this.selectionStart;
 
 			}
 

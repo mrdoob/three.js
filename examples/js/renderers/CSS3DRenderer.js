@@ -4,12 +4,18 @@
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  */
 
+	const _position = new THREE.Vector3();
+
+	const _quaternion = new THREE.Quaternion();
+
+	const _scale = new THREE.Vector3();
+
 	class CSS3DObject extends THREE.Object3D {
 
-		constructor( element ) {
+		constructor( element = document.createElement( 'div' ) ) {
 
 			super();
-			this.element = element || document.createElement( 'div' );
+			this.element = element;
 			this.element.style.position = 'absolute';
 			this.element.style.pointerEvents = 'auto';
 			this.element.style.userSelect = 'none';
@@ -69,7 +75,7 @@
 
 	class CSS3DRenderer {
 
-		constructor() {
+		constructor( parameters = {} ) {
 
 			const _this = this;
 
@@ -84,7 +90,7 @@
 				},
 				objects: new WeakMap()
 			};
-			const domElement = document.createElement( 'div' );
+			const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
 			domElement.style.overflow = 'hidden';
 			this.domElement = domElement;
 			const cameraElement = document.createElement( 'div' );
@@ -186,10 +192,11 @@
 						_matrix.transpose();
 
 						if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
+						object.matrixWorld.decompose( _position, _quaternion, _scale );
 
-						_matrix.copyPosition( object.matrixWorld );
+						_matrix.setPosition( _position );
 
-						_matrix.scale( object.scale );
+						_matrix.scale( _scale );
 
 						_matrix.elements[ 3 ] = 0;
 						_matrix.elements[ 7 ] = 0;

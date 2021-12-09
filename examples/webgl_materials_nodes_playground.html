@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+		<title>three.js webgl - node-editor playground</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" href="fonts/open-sans/open-sans.css" type="text/css"/>
+		<link rel="stylesheet" href="fonts/tabler-icons/tabler-icons.min.css" type="text/css"/>
+		<link type="text/css" rel="stylesheet" href="main.css">
+  </head>
+  <body>
+	<style>
+	body {
+		overflow: hidden;
+		width: 100%;
+		height: 100%;
+	}
+	.renderer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 50%;
+		width: 100%;
+	}
+	flow {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		height: 50%;
+		width: 100%;
+		background: #222;
+		box-shadow: inset 0 0 20px 0px #000000;
+	}
+	</style>
+	<script type="module">
+
+		import * as THREE from '../build/three.module.js';
+
+		import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+
+		import { NodeEditor } from './jsm/node-editor/NodeEditor.js';
+		import { StandardMaterialEditor } from './jsm/node-editor/materials/StandardMaterialEditor.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+
+		let stats;
+		let camera, scene, renderer;
+		let model;
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 5000 );
+			camera.position.set( 0.0, 300, 400 * 3 );
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x333333 );
+
+			// Lights
+
+			const topLight = new THREE.PointLight( 0xF4F6F0, 1 );
+			topLight.position.set( 0, 100000, 100000 );
+			scene.add( topLight );
+
+			const backLight = new THREE.PointLight( 0x0c1445, 1.4 );
+			backLight.position.set( - 100, 20, - 260 );
+			scene.add( backLight );
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			document.body.appendChild( renderer.domElement );
+			renderer.outputEncoding = THREE.sRGBEncoding;
+
+			renderer.domElement.className = 'renderer';
+
+			//
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 500;
+			controls.maxDistance = 3000;
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			onWindowResize();
+
+			initEditor();
+
+		}
+
+		function initEditor() {
+
+			const nodeEditor = new NodeEditor();
+
+			nodeEditor.addEventListener( 'new', () => {
+
+				const materialEditor = new StandardMaterialEditor();
+				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 );
+
+				nodeEditor.add( materialEditor );
+
+				model.material = materialEditor.material;
+
+			} );
+
+			nodeEditor.addEventListener( 'load', () => {
+
+				const materialEditor = nodeEditor.nodes[ 0 ];
+				materialEditor.update(); // need move to deserialization
+
+				model.material = materialEditor.material;
+
+			} );
+
+			document.body.appendChild( nodeEditor.domElement );
+
+			const loaderFBX = new FBXLoader();
+			loaderFBX.load( 'models/fbx/stanford-bunny.fbx', ( object ) => {
+
+				const materialEditor = new StandardMaterialEditor();
+				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 ); // canvas position
+
+				nodeEditor.add( materialEditor );
+
+				model = object.children[ 0 ];
+				model.position.set( 0, 0, 10 );
+				model.scale.setScalar( 1 );
+				model.material = materialEditor.material;
+				scene.add( model );
+
+			} );
+
+		}
+
+		function onWindowResize() {
+
+			const width = window.innerWidth;
+			const height = window.innerHeight / 2;
+
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( width, height );
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			nodeFrame.update();
+
+			render();
+
+			stats.update();
+
+		}
+
+		function render() {
+
+			//if ( model ) model.rotation.y = performance.now() / 5000;
+
+			renderer.render( scene, camera );
+
+		}
+
+	</script>
+
+  </body>
+</html>

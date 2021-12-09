@@ -70,6 +70,7 @@ function WebGLExtensions( gl ) {
 
 			getExtension( 'OES_texture_float_linear' );
 			getExtension( 'EXT_color_buffer_half_float' );
+			getExtension( 'WEBGL_multisampled_render_to_texture' );
 
 		},
 

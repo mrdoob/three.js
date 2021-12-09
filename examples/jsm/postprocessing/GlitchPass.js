@@ -6,7 +6,7 @@ import {
 	ShaderMaterial,
 	UniformsUtils
 } from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
 
 class GlitchPass extends Pass {
@@ -106,7 +106,9 @@ class GlitchPass extends Pass {
 
 		}
 
-		return new DataTexture( data_arr, dt_size, dt_size, RGBFormat, FloatType );
+		const texture = new DataTexture( data_arr, dt_size, dt_size, RGBFormat, FloatType );
+		texture.needsUpdate = true;
+		return texture;
 
 	}
 

@@ -48,7 +48,7 @@ class CurvePath extends Curve {
 	// 3. Get t for the curve
 	// 4. Return curve.getPointAt(t')
 
-	getPoint( t ) {
+	getPoint( t, optionalTarget ) {
 
 		const d = t * this.getLength();
 		const curveLengths = this.getCurveLengths();
@@ -66,7 +66,7 @@ class CurvePath extends Curve {
 				const segmentLength = curve.getLength();
 				const u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
 
-				return curve.getPointAt( u );
+				return curve.getPointAt( u, optionalTarget );
 
 			}
 

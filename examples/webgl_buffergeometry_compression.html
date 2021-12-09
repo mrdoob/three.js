@@ -21,7 +21,7 @@
 			import * as GeometryCompressionUtils from './jsm/utils/GeometryCompressionUtils.js';
 			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			const statsEnabled = true;
 
@@ -236,14 +236,6 @@
 			//
 
 			function updateGroupGeometry( mesh, lineSegments, geometry, data ) {
-
-				if ( geometry.isGeometry ) {
-
-					geometry = new THREE.BufferGeometry().fromGeometry( geometry );
-
-					console.log( 'THREE.GeometryCompression: Converted Geometry to BufferGeometry.' );
-
-				}
 
 				// dispose first
 				lineSegments.geometry.dispose();

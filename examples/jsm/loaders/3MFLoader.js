@@ -1077,7 +1077,7 @@ class ThreeMFLoader extends Loader {
 			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
 			geometry.setAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
-			const material = new MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
+			const material = new MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 			const mesh = new Mesh( geometry, material );
 
@@ -1431,7 +1431,7 @@ class ThreeMFLoader extends Loader {
 			for ( let i = 0; i < buildData.length; i ++ ) {
 
 				const buildItem = buildData[ i ];
-				const object3D = objects[ buildItem[ 'objectId' ] ];
+				const object3D = objects[ buildItem[ 'objectId' ] ].clone();
 
 				// apply transform
 

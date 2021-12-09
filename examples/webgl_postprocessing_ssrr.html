@@ -25,9 +25,11 @@
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { GUI } from './jsm/libs/lil-gui.module.min.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRrPass } from './jsm/postprocessing/SSRrPass.js';
+		import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+		import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
@@ -147,7 +149,6 @@
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.autoClear = false;
 			container.appendChild( renderer.domElement );
 
@@ -177,11 +178,11 @@
 				camera,
 				width: innerWidth,
 				height: innerHeight,
-				encoding: THREE.sRGBEncoding,
 				selects: selects
 			} );
 
 			composer.addPass( ssrrPass );
+			composer.addPass( new ShaderPass( GammaCorrectionShader ) );
 
 			// GUI
 
@@ -243,7 +244,7 @@
 
 
 			raycaster.setFromCamera( mouse, camera );
-			const intersect = raycaster.intersectObjects( objects )[ 0 ];
+			const intersect = raycaster.intersectObjects( objects, false )[ 0 ];
 
 			if ( intersect ) {
 

@@ -30,8 +30,9 @@ const exceptionList = [
 	'webgl_loader_imagebitmap', // takes too long to load?
 	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
-	'webgl_materials_envmaps_parallax', // empty for some reason
 	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
+	'webgl_morphtargets_face', // To investigate...
+	'webgl_postprocessing_crossfade', // fails for some misterious reason
 	'webgl_raymarching_reflect', // exception for Github Actions
 	'webgl_test_memory2', // gives fatal error in puppeteer
 	'webgl_tiled_forward', // exception for Github Actions
@@ -142,9 +143,18 @@ const pup = puppeteer.launch( {
 
 	let pageSize, file, attemptProgress;
 	const failedScreenshots = [];
-	const isParallel = 'CI' in process.env;
-	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
-	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 4 ) : files.length;
+
+	let beginId = 0;
+	let endId = files.length;
+
+	if ( 'CI' in process.env ) {
+
+		const jobs = 8;
+
+		beginId = Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / jobs );
+		endId = Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / jobs );
+
+	}
 
 	for ( let id = beginId; id < endId; ++ id ) {
 

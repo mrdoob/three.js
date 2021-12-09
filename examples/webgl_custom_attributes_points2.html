@@ -78,7 +78,7 @@
 				let sphereGeometry = new THREE.SphereGeometry( radius, segments, rings );
 				let boxGeometry = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
 
-				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate identical vertices with different normal/uv data
 
 				sphereGeometry.deleteAttribute( 'normal' );
 				sphereGeometry.deleteAttribute( 'uv' );

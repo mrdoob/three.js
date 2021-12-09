@@ -238,7 +238,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
@@ -505,7 +505,7 @@
 
 			function initGUI() {
 
-				const gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 280 } );
 
 				const folder1 = gui.addFolder( 'Dynamic parameters' );
 

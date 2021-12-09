@@ -1,0 +1,494 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Debugging JavaScript</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Debugging JavaScript">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Debugging JavaScript</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Most of this article is not directly about THREE.js but is
+rather about debugging JavaScript in general. It seemed important in
+that many people just starting with THREE.js are also just
+starting with JavaScript so I hope this can help them more easily
+solve any issues they run into.</p>
+<p>Debugging is a big topic and I probably can't begin to cover
+everything there is to know but if you're new to JavaScript
+then here's an attempt to give a few pointers. I strongly
+suggest you take some time to learn them. They'll help you 
+enormously in your learning.</p>
+<h2 id="learn-your-browser-s-developer-tools">Learn your Browser's Developer Tools</h2>
+<p>All browsers have developer tools. 
+<a href="https://developers.google.com/web/tools/chrome-devtools/">Chrome</a>,
+<a href="https://developer.mozilla.org/en-US/docs/Tools">Firefox</a>, 
+<a href="https://developer.apple.com/safari/tools/">Safari</a>, 
+<a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide">Edge</a>.</p>
+<p>In Chrome you can click the the <code class="notranslate" translate="no">⋮</code> icon, pick More Tools-&gt;Developer Tools
+to get to the developer tools. A keyboard shortcut is also shown there.</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-chrome.jpg" style="width: 789px;"></div>
+
+<p>In Firefox you click the <code class="notranslate" translate="no">☰</code> icon, pick "Web Developer", then pick
+"Toggle Tools"</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-firefox.jpg" style="width: 786px;"></div>
+
+<p>In Safari you first have to enable the Develop menu from the 
+Advanced Safari Preferences.</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-enable-safari.jpg" style="width: 775px;"></div>
+
+<p>Then in the Develop menu you can pick "Show/Connect Web Inspector".</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-safari.jpg" style="width: 777px;"></div>
+
+<p>With Chrome you can also <a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">use Chrome on your computer to debug webpages running on Chrome on your Android phone or tablet</a>.
+Similarly with Safari you can 
+<a href="https://www.google.com/search?q=safari+remote+debugging+ios">use your computer to debug webpages running on Safari on iPhones and iPads</a>.</p>
+<p>I'm most familiar with Chrome so this guide will be using Chrome
+as an example when referring to tools but most browsers have similar
+features so it should be easy to apply anything here to all browsers.</p>
+<h2 id="turn-off-the-cache">Turn off the cache</h2>
+<p>Browsers try to reuse data they've already downloaded. This is great
+for users so if you visit a website a second time many of the files
+used to display the site will not have be downloaded again.</p>
+<p>On the other hand this can be bad for web development. You change
+a file on your computer, reload the page, and you don't see the changes
+because the browser uses the version it got last time.</p>
+<p>One solution during web development is to turn off the cache. This
+way the browser will always get the newest versions of your files.</p>
+<p>First pick settings from the corner menu</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-chrome-settings.jpg" style="width: 778px"></div>
+
+<p>Then pick "Disable Cache (while DevTools is open)".</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-chrome-disable-cache.jpg" style="width: 779px"></div>
+
+<h2 id="use-the-javascript-console">Use the JavaScript console</h2>
+<p>Inside all devtools is a <em>console</em>. It shows warnings and error messages.</p>
+<p><strong> READ THE MESSAGES!! </strong></p>
+<p>Typically there should be only 1 or 2 messages.</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-no-errors.jpg" style="width: 779px"></div>
+
+<p>If you see any others <strong>READ THEM</strong>. For example:</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-errors.jpg" style="width: 779px"></div>
+
+<p>I mis-spelled "three" as "threee"</p>
+<p>You can also print your own info to the console with with <code class="notranslate" translate="no">console.log</code> as in</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">console.log(someObject.position.x, someObject.position.y, someObject.position.z);
+</pre>
+<p>Even cooler, if you log an object you can inspect it. For example if we log
+the root scene object from <a href="load-gltf.html">the gLTF article</a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  {
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
+      const root = gltf.scene;
+      scene.add(root);
++      console.log(root);
+</pre>
+<p>Then we can expand that object in the JavaScript console</p>
+<div class="threejs_center"><img class="border" src="../resources/images/devtools-console-object.gif"></div>
+
+<p>You can also use <code class="notranslate" translate="no">console.error</code> which reports the message in red
+in includes a stack trace.</p>
+<h2 id="put-data-on-screen">Put data on screen</h2>
+<p>Another obvious but often overlooked way is to add <code class="notranslate" translate="no">&lt;div&gt;</code> or <code class="notranslate" translate="no">&lt;pre&gt;</code> tags
+and put data in them.</p>
+<p>The most obvious way is to make some HTML elements</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
++&lt;div id="debug"&gt;
++  &lt;div&gt;x:&lt;span id="x"&gt;&lt;/span&gt;&lt;/div&gt;
++  &lt;div&gt;y:&lt;span id="y"&gt;&lt;/span&gt;&lt;/div&gt;
++  &lt;div&gt;z:&lt;span id="z"&gt;&lt;/span&gt;&lt;/div&gt;
++&lt;/div&gt;
+</pre>
+<p>Style them so they stay on top of the canvas. (assuming your canvas
+fills the page)</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
+#debug {
+  position: absolute;
+  left: 1em;
+  top: 1em;
+  padding: 1em;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-family: monospace;
+}
+&lt;/style&gt;
+</pre>
+<p>And then looking the elements up and setting their content.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// at init time
+const xElem = document.querySelector('#x');
+const yElem = document.querySelector('#y');
+const zElem = document.querySelector('#z');
+
+// at render or update time
+xElem.textContent = someObject.position.x.toFixed(3);
+yElem.textContent = someObject.position.y.toFixed(3);
+zElem.textContent = someObject.position.z.toFixed(3);
+</pre>
+<p>This is more useful for real time values</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/debug-js-html-elements.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/debug-js-html-elements.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Another way to put data on the screen is to make a clearing logger.
+I just made that term up but lots of games I've worked on have used this solution. The idea
+is you have a buffer that displays messages for only one frame.
+Any part of your code that wants to display data calls some function
+to add data to that buffer every frame. This is much less work
+than making an element per piece of data above.</p>
+<p>For example let's change the HTML from above to just this</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
+&lt;div id="debug"&gt;
+  &lt;pre&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</pre>
+<p>And let's make simple class to manage this <em>clear back buffer</em>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ClearingLogger {
+  constructor(elem) {
+    this.elem = elem;
+    this.lines = [];
+  }
+  log(...args) {
+    this.lines.push([...args].join(' '));
+  }
+  render() {
+    this.elem.textContent = this.lines.join('\n');
+    this.lines = [];
+  }
+}
+</pre>
+<p>Then let's make a simple example that every time we click the mouse makes a mesh
+that moves in a random direction for 2 seconds. We'll start with one of the
+examples from the article on <a href="responsive.html">making things responsive</a></p>
+<p>Here's the code that adds a new <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> every time we click the mouse</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry();
+const material = new THREE.MeshBasicMaterial({color: 'red'});
+
+const things = [];
+
+function rand(min, max) {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return Math.random() * (max - min) + min;
+}
+
+function createThing() {
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+  things.push({
+    mesh,
+    timer: 2,
+    velocity: new THREE.Vector3(rand(-5, 5), rand(-5, 5), rand(-5, 5)),
+  });
+}
+
+canvas.addEventListener('click', createThing);
+</pre>
+<p>And here's the code that moves the meshes we created, logs them,
+and removes them when their timer has run out</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const logger = new ClearingLogger(document.querySelector('#debug pre'));
+
+let then = 0;
+function render(now) {
+  now *= 0.001;  // convert to seconds
+  const deltaTime = now - then;
+  then = now;
+
+  ...
+
+  logger.log('fps:', (1 / deltaTime).toFixed(1));
+  logger.log('num things:', things.length);
+  for (let i = 0; i &lt; things.length;) {
+    const thing = things[i];
+    const mesh = thing.mesh;
+    const pos = mesh.position;
+    logger.log(
+        'timer:', thing.timer.toFixed(3), 
+        'pos:', pos.x.toFixed(3), pos.y.toFixed(3), pos.z.toFixed(3));
+    thing.timer -= deltaTime;
+    if (thing.timer &lt;= 0) {
+      // remove this thing. Note we don't advance `i`
+      things.splice(i, 1);
+      scene.remove(mesh);
+    } else {
+      mesh.position.addScaledVector(thing.velocity, deltaTime);
+      ++i;
+    }
+  }
+
+  renderer.render(scene, camera);
+  logger.render();
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>Now click the mouse a bunch in the example below</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/debug-js-clearing-logger.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/debug-js-clearing-logger.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<h2 id="query-parameters">Query Parameters</h2>
+<p>Another thing to remember is that webpages can have data passed
+into them either via query parameters or the anchor, sometimes called
+the search and the hash.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">https://domain/path/?query#anchor
+</pre><p>You can use this to make features optional or pass in parameters.</p>
+<p>For example let's take the previous example and make it so
+the debug stuff only shows up if we put <code class="notranslate" translate="no">?debug=true</code> in the URL.</p>
+<p>First we need some code to parse the query string</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">/**
+  * Returns the query parameters as a key/value object. 
+  * Example: If the query parameters are
+  *
+  *    abc=123&amp;def=456&amp;name=gman
+  *
+  * Then `getQuery()` will return an object like
+  *
+  *    {
+  *      abc: '123',
+  *      def: '456',
+  *      name: 'gman',
+  *    }
+  */
+function getQuery() {
+  return Object.fromEntries(new URLSearchParams(window.location.search).entries());
+}
+</pre>
+<p>Then we might make the debug element not show by default</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
++&lt;div id="debug" style="display: none;"&gt;
+  &lt;pre&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</pre>
+<p>Then in the code we read the params and choose to un-hide the
+debug info if and only if <code class="notranslate" translate="no">?debug=true</code> is passed in</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const query = getQuery();
+const debug = query.debug === 'true';
+const logger = debug
+   ? new ClearingLogger(document.querySelector('#debug pre'))
+   : new DummyLogger();
+if (debug) {
+  document.querySelector('#debug').style.display = '';
+}
+</pre>
+<p>We also made a <code class="notranslate" translate="no">DummyLogger</code> that does nothing and chose to use it if <code class="notranslate" translate="no">?debug=true</code> has not been passed in.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class DummyLogger {
+  log() {}
+  render() {}
+}
+</pre>
+<p>You can see if we use this url:</p>
+<p><a target="_blank" href="../examples/debug-js-params.html">debug-js-params.html</a></p>
+<p>there is no debug info but if we use this url:</p>
+<p><a target="_blank" href="../examples/debug-js-params.html?debug=true">debug-js-params.html?debug=true</a></p>
+<p>there is debug info.</p>
+<p>Multiple parameters can be passed in by separating with '&amp;' as in <code class="notranslate" translate="no">somepage.html?someparam=somevalue&amp;someotherparam=someothervalue</code>. 
+Using parameters like this we can pass in all kinds of options. Maybe <code class="notranslate" translate="no">speed=0.01</code> to slow down our app for making it easier to understand something or <code class="notranslate" translate="no">showHelpers=true</code> for whether or not to add helpers
+that show the lights, shadow, or camera frustum seen in other lessons.</p>
+<h2 id="learn-to-use-the-debugger">Learn to use the Debugger</h2>
+<p>Every browser has a debugger where you can pause your program
+step through line by line and inspect all the variables.</p>
+<p>Teaching you how to use a debugger is too big a topic for this
+article but here's a few links</p>
+<ul>
+<li><a href="https://developers.google.com/web/tools/chrome-devtools/javascript/">Get Started with Debugging JavaScript in Chrome DevTools</a></li>
+<li><a href="https://javascript.info/debugging-chrome">Debugging in Chrome</a></li>
+<li><a href="https://hackernoon.com/tips-and-tricks-for-debugging-in-chrome-developer-tools-458ade27c7ab">Tips and Tricks for Debugging in Chrome Developer Tools</a></li>
+</ul>
+<h2 id="check-for-nan-in-the-debugger-or-elsewhere">Check for <code class="notranslate" translate="no">NaN</code> in the debugger or elsewhere</h2>
+<p><code class="notranslate" translate="no">NaN</code> is short for Not A Number. It's what JavaScript will assign
+as a value when you do something that doesn't make sense mathwise.</p>
+<p>As a simple example</p>
+<div class="threejs_center"><img class="border" src="../resources/images/nan-banana.png" style="width: 180px;"></div>
+
+<p>Often when I'm making something and nothing appears on the screen
+I'll check some values and if I see <code class="notranslate" translate="no">NaN</code> I will instantly have a 
+place to start looking.</p>
+<p>As an example when I first started making the path for the
+<a href="load-gltf.html">article about loading gLTF files</a> I made
+a curve using the <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> class which makes a 2D curve.</p>
+<p>I then used that curve to move the cars like this</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">curve.getPointAt(zeroToOnePointOnCurve, car.position);
+</pre>
+<p>Internally <code class="notranslate" translate="no">curve.getPointAt</code> calls the <code class="notranslate" translate="no">set</code> function
+on the object passed as the second argument. In this case that
+second argument is <code class="notranslate" translate="no">car.position</code> which is a <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>. <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>'s
+<code class="notranslate" translate="no">set</code> function requires 3 arguments, x, y, and z but <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> is a 2D curve
+and so it calls <code class="notranslate" translate="no">car.position.set</code> with just x and y.</p>
+<p>The result is that <code class="notranslate" translate="no">car.position.set</code> sets x to x, y to y, and z to <code class="notranslate" translate="no">undefined</code>.</p>
+<p>A quick glance in the debugger looking at the car's <code class="notranslate" translate="no">matrixWorld</code>
+showed a bunch of <code class="notranslate" translate="no">NaN</code> values.</p>
+<div class="threejs_center"><img class="border" src="../resources/images/debugging-nan.gif" style="width: 476px;"></div>
+
+<p>Seeing the matrix had <code class="notranslate" translate="no">NaN</code>s in it suggested something like <code class="notranslate" translate="no">position</code>,
+<code class="notranslate" translate="no">rotation</code>, <code class="notranslate" translate="no">scale</code> or some other function that affects that matrix had bad
+data. Working backward from their it was easy to track down the issue.</p>
+<p>In top of <code class="notranslate" translate="no">NaN</code> there's also <code class="notranslate" translate="no">Infinity</code> which is a similar sign there
+is a math bug somewhere.</p>
+<h2 id="look-in-the-code-">Look In the Code!</h2>
+<p>THREE.js is Open Source. Don't be afraid to look inside the code!
+You can look inside on <a href="https://github.com/mrdoob/three.js">github</a>.
+You can also look inside by stepping into functions in the debugger.</p>
+<h2 id="put-requestanimationframe-at-bottom-of-your-render-function-">Put <code class="notranslate" translate="no">requestAnimationFrame</code> at bottom of your render function.</h2>
+<p>I see this pattern often</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+   requestAnimationFrame(render);
+
+   // -- do stuff --
+
+   renderer.render(scene, camera);
+}
+requestAnimationFrame(render);
+</pre>
+<p>I'd suggest that putting the call to <code class="notranslate" translate="no">requestAnimationFrame</code> at
+the bottom as in</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+   // -- do stuff --
+
+   renderer.render(scene, camera);
+
+   requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</pre>
+<p>The biggest reason is it means your code will stop if you have an error. Putting
+<code class="notranslate" translate="no">requestAnimationFrame</code> at the top means your code will keep running even if you
+have an error since you already requested another frame. IMO it's better to find
+those errors than to ignore them. They could easily be the reason something is
+not appearing as you expect it to but unless your code stops you might not even
+notice.</p>
+<h2 id="check-your-units-">Check your units!</h2>
+<p>This basically means knowing for example when to use degrees vs
+when to use radians. It's unfortunate that THREE.js does not
+consistently use the same units everywhere. Off the top of my head
+the camera's field of view is in degrees. All other angles are in
+radians.</p>
+<p>The other place to look out is your world unit size. Until
+recently 3D apps could choose any unit size they wanted. One app might choose
+1 unit = 1cm. Another might choose 1 unit = 1 foot. It's actually still
+true that you can chose any units you want for certain applications.
+That said, THREE.js assumes 1 unit = 1 meter. This is important for
+things like physically based rendering which uses meters to compute
+lighting effects. It's also important for AR and VR which need to
+deal with real world units like where your phone is or where the VR
+controllers are.</p>
+<h2 id="making-a-minimal-complete-verifiable-example-for-stack-overflow">Making a <em>Minimal, Complete, Verifiable, Example</em> for Stack Overflow</h2>
+<p>If you decide to ask a question about THREE.js it's almost always
+required for you to provide an MCVE which stands for Minimal, Complete,
+Verifiable, Example.</p>
+<p>The <strong>Minimal</strong> part is important. Let's say you where having an issue with the
+path movement in the last example of the <a href="load-gltf.html">loading a gLTF
+article</a>. That example has many parts. Listing them out
+it has</p>
+<ol>
+<li>A bunch of HTML</li>
+<li>Some CSS</li>
+<li>Lights</li>
+<li>Shadows</li>
+<li>lil-gui code to manipulate shadows</li>
+<li>Code to load a .GLTF file</li>
+<li>Code to resize the canvas.</li>
+<li>Code to move the cars along paths</li>
+</ol>
+<p>That's pretty huge. If your question is only about the path following part you
+can remove most of the HTML as you only need a <code class="notranslate" translate="no">&lt;canvas&gt;</code> and a <code class="notranslate" translate="no">&lt;script&gt;</code> tag
+for THREE.js. You can remove the CSS and the resizing code. You can remove .GLTF
+code because you only care about the path. You can remove the lights and the
+shadows by using a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>. You can certainly remove the lil-gui
+code. The code makes a ground plane with a texture. It would be easier to use a
+<a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. Finally if our question is about moving things on a path we could
+just use cubes on the path instead of loaded car models.</p>
+<p>Here's a more minimal example taking all the above into account. It
+shrunk from 271 lines to 135. We might consider shrinking it even
+more by simplifying our path. Maybe a path with 3 or 4 points would
+work just as well as our path with 21 points.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/debugging-mcve.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/debugging-mcve.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>I kept the <code class="notranslate" translate="no">OrbitController</code> just because it's useful for others
+to move the camera and figure out what's going on but depending
+on your issue you might be able to remove that as well.</p>
+<p>The best thing about making an MCVE is we'll often solve our own
+problem. The process of removing everything that's not needed and
+making the smallest example we can that reproduces the issue more
+often than not leads us to our bug.</p>
+<p>On top of that it's respectful of all the people's time who you are
+asking to look at your code on Stack Overflow. By making the minimal
+example you make it much easier for them to help you. You'll also
+learn in the process.</p>
+<p>Also important, when you go to Stack Overflow to post your question <strong>put your
+code <a href="https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/">in a snippet</a>.</strong>
+Of course you are welcome to use JSFiddle or Codepen or similar site to test out
+your MCVE but once you actually get to posting your question on Stack Overflow
+you're required to put the code to reproduce your issue <strong>in the question itself</strong>. 
+By making a snippet you satisfy that requirement.</p>
+<p>Also note all the live examples on this site should run as snippets.
+Just copy the HTML, CSS, and JavaScript parts to their respective
+parts of the <a href="https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/">snippet editor</a>.
+Just remember to try to remove the parts that are not relevant to
+your issue and try to make your code the minimal amount needed.</p>
+<p>Follow these suggestions and you're far more likely to get help
+with your issue.</p>
+<h2 id="use-a-meshbasicmaterial-">Use a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a></h2>
+<p>Because the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> uses no lights this is one way to 
+remove reasons something might not be showing up. If your objects
+show up using <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> but not with whatever materials
+you were using then you know the issue is likely with the materials
+or the lights and not some other part of the code.</p>
+<h2 id="check-your-near-and-far-settings-for-your-camera">Check your <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings for your camera</h2>
+<p>A <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> has <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings which are covered in the
+<a href="cameras.html">article on cameras</a>. Make sure they are set to fit the
+space that contains your objects. Maybe even just <strong>temporarily</strong> set them to
+something large like <code class="notranslate" translate="no">near</code> = 0.001 and <code class="notranslate" translate="no">far</code> = 1000000. You will likely run
+into depth resolution issues but you'll at least be able to see your objects
+provided they are in front of the camera.</p>
+<h2 id="check-your-scene-is-in-front-of-the-camera">Check your scene is in front of the camera</h2>
+<p>Sometimes things don't appear because they are not in front of the camera. If
+your camera is not controllable try adding camera control like the
+<code class="notranslate" translate="no">OrbitController</code> so you can look around and find your scene. Or, try framing
+the scene using code which is covered in <a href="load-obj.html">this article</a>.
+That code finds the size of part of the scene and then moves the camera and
+adjusts the <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings to make it visible. You can then look in
+the debugger or add some <code class="notranslate" translate="no">console.log</code> messages to print the size and center of
+the scene.</p>
+<h2 id="put-something-in-front-of-the-camera">Put something in front of the camera</h2>
+<p>This is just another way of saying if all else fails start with
+something that works and then slowly add stuff back in. If you get
+a screen with nothing on it then try putting something directly in
+front of the camera. Make a sphere or box, give it a simple material
+like the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> and make sure you can get that on the screen.
+Then start adding things back a little at time and testing. Eventually
+you'll either reproduce your bug or you'll find it on the way.</p>
+<hr>
+<p>These were a few tips for debugging JavaScript. Let's also go
+over <a href="debugging-glsl.html">some tips for debugging GLSL</a>.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

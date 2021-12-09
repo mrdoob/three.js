@@ -21,7 +21,7 @@
 	<h2>기하학</h2>
 
 	<p>
-        기하학은 속성 집합으로 정의된 꼭짓점 정보를 표시하는데, *three.js*는 속성마다 하나의 [link: https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer] 유형의 대상을 만들어 내부에 저장합니다.
+        기하학은 속성 집합으로 정의된 꼭짓점 정보를 표시하는데, *three.js*는 속성마다 하나의 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer] 유형의 대상을 만들어 내부에 저장합니다.
         이러한 개체는 [page:BufferGeometry.dispose]를 호출할 때만 폐기됩니다.
         만약 애플리케이션에서 기하학을 더이상 사용하지 않는다면, 이 방법을 실행하여 모든 관련 자원을 폐기하세요.
 	</p>
@@ -38,15 +38,15 @@
 
 	<p>
         재질의 폐기는 텍스쳐에 영향을 미치지 않습니다. 이들은 분리되어 있어 하나의 텍스쳐를 여러 재질로 동시에 사용할 수 있습니다.
-        [page:Texture] 인스턴스를 만들 때마다 three.js는 내부에서 [link: https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture] 인스턴스를 만듭니다.
+        [page:Texture] 인스턴스를 만들 때마다 three.js는 내부에서 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture] 인스턴스를 만듭니다.
         buffer와 비슷하게, 이 오브젝트는 [page:Texture.dispose]() 호출로만 삭제가 가능합니다.
 	</p>
 
 	<h2>렌더링 대상</h2>
 
 	<p>
-        [page:WebGLRenderTarget] 타입의 오브젝트는 [link: https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]의 인스턴스가 할당되어 있을 뿐만 아니라,
-        [link: https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer WebGLFramebuffer]와 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderbuffer WebGLRenderbuffer] 도 할당되어, 
+        [page:WebGLRenderTarget] 타입의 오브젝트는 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]의 인스턴스가 할당되어 있을 뿐만 아니라,
+        [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer WebGLFramebuffer]와 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderbuffer WebGLRenderbuffer] 도 할당되어, 
         커스텀 렌더링 목표를 실체화합니다. 이러한 오브젝트는 [page:WebGLRenderTarget.dispose]()를 실행해야만 폐기할 수 있습니다.
 	</p>
 

@@ -53,7 +53,7 @@ class Raycaster {
 
 	}
 
-	intersectObject( object, recursive = false, intersects = [] ) {
+	intersectObject( object, recursive = true, intersects = [] ) {
 
 		intersectObject( object, this, intersects, recursive );
 
@@ -63,7 +63,7 @@ class Raycaster {
 
 	}
 
-	intersectObjects( objects, recursive = false, intersects = [] ) {
+	intersectObjects( objects, recursive = true, intersects = [] ) {
 
 		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 

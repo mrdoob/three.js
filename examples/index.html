@@ -4,7 +4,8 @@
 		<meta charset="utf-8">
 		<title>three.js examples</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="shortcut icon" href="../files/favicon.ico" />
+		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 	</head>
 	<body>
@@ -52,8 +53,10 @@
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
-
 		const previewsToggler = document.getElementById( 'previewsToggler' );
+
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
 
 		const links = {};
 		const validRedirects = new Map();
@@ -118,6 +121,10 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter( files, tags );
+
+			} else {
+
+				updateLink( '' );
 
 			}
 
@@ -265,6 +272,25 @@
 			}
 
 			layoutList( files );
+
+			updateLink( v );
+
+		}
+
+		function updateLink( search ) {
+
+			// update docs link
+
+			if ( search ) {
+
+				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				sectionLink.href = `${link}?q=${search}`;
+
+			} else {
+
+				sectionLink.href = sectionDefaultHref;
+
+			}
 
 		}
 

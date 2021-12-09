@@ -26,6 +26,7 @@ export { Line } from './objects/Line.js';
 export { Points } from './objects/Points.js';
 export { Group } from './objects/Group.js';
 export { VideoTexture } from './textures/VideoTexture.js';
+export { FramebufferTexture } from './textures/FramebufferTexture.js';
 export { DataTexture } from './textures/DataTexture.js';
 export { DataTexture2DArray } from './textures/DataTexture2DArray.js';
 export { DataTexture3D } from './textures/DataTexture3D.js';
@@ -47,7 +48,6 @@ export { BufferGeometryLoader } from './loaders/BufferGeometryLoader.js';
 export { DefaultLoadingManager, LoadingManager } from './loaders/LoadingManager.js';
 export { ImageLoader } from './loaders/ImageLoader.js';
 export { ImageBitmapLoader } from './loaders/ImageBitmapLoader.js';
-export { FontLoader } from './loaders/FontLoader.js';
 export { FileLoader } from './loaders/FileLoader.js';
 export { Loader } from './loaders/Loader.js';
 export { LoaderUtils } from './loaders/LoaderUtils.js';
@@ -126,7 +126,6 @@ export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
 export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
-export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './helpers/SkeletonHelper.js';
 export { PointLightHelper } from './helpers/PointLightHelper.js';
@@ -144,7 +143,6 @@ export * from './extras/curves/Curves.js';
 export { Shape } from './extras/core/Shape.js';
 export { Path } from './extras/core/Path.js';
 export { ShapePath } from './extras/core/ShapePath.js';
-export { Font } from './extras/core/Font.js';
 export { CurvePath } from './extras/core/CurvePath.js';
 export { Curve } from './extras/core/Curve.js';
 export { DataUtils } from './extras/DataUtils.js';
@@ -157,11 +155,9 @@ export * from './Three.Legacy.js';
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-	/* eslint-disable no-undef */
 	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
 		revision: REVISION,
 	} } ) );
-	/* eslint-enable no-undef */
 
 }
 

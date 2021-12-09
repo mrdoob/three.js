@@ -133,7 +133,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.sRGBEncoding, 3001, 'sRGBEncoding is equal to 3001' );
 		assert.equal( Constants.GammaEncoding, 3007, 'GammaEncoding is equal to 3007' );
 		assert.equal( Constants.RGBEEncoding, 3002, 'RGBEEncoding is equal to 3002' );
-		assert.equal( Constants.LogLuvEncoding, 3003, 'LogLuvEncoding is equal to 3003' );
 		assert.equal( Constants.RGBM7Encoding, 3004, 'RGBM7Encoding is equal to 3004' );
 		assert.equal( Constants.RGBM16Encoding, 3005, 'RGBM16Encoding is equal to 3005' );
 		assert.equal( Constants.RGBDEncoding, 3006, 'RGBDEncoding is equal to 3006' );

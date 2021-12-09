@@ -34,6 +34,9 @@
 		There are other things a 4D vector can be used to represent, however these are the most common uses in three.js.
 		</p>
 
+		<p>
+		Iterating through a Vector4 instance will yield its components (x, y, z, w) in the corresponding order.
+		</p>
 
 		<h2>Code Example</h2>
 
@@ -152,7 +155,7 @@
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Vector4 v] )</h3>
-		<p>Checks for strict equality of this vector and [page:Vector4 v].</p>
+		<p>Returns *true* if the components of this vector and [page:Vector4 v] are strictly equal; *false* otherwise.</p>
 
 		<h3>[method:this floor]()</h3>
 		<p>The components of this vector are rounded down to the nearest integer value.</p>
@@ -273,7 +276,7 @@
 			Sets the [page:.x x], [page:.y y] and [page:.z z] to the axis of rotation and [page:.w w] to the angle.
 		</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0, 1 or 2.<br />
 		[page:Float value] - [page:Float]<br /><br />

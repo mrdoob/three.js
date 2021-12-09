@@ -104,12 +104,12 @@
 
 		<h2>메서드</h2>
 
-		<h3>[method:Audio connect]()</h3>
+		<h3>[method:this connect]()</h3>
 		<p>
 		[page:Audio.source]에 연결합니다. 시작 및 필터 설정/제거 시에 내부적으로 사용됩니다.
 		</p>
 
-		<h3>[method:Audio disconnect]()</h3>
+		<h3>[method:this disconnect]()</h3>
 		<p>
 		[page:Audio.source] 연결을 해제합니다. 필터 설정/제거 시에 내부적으로 사용됩니다.
 		</p>
@@ -144,82 +144,82 @@
 		현재 볼륨을 리턴합니다.
 		</p>
 
-		<h3>[method:Audio play]( delay )</h3>
+		<h3>[method:this play]( delay )</h3>
 		<p>
 		[page:Audio.hasPlaybackControl hasPlaybackControl]가 true면, 재생을 시작합니다.
 		</p>
 
-		<h3>[method:Audio pause]()</h3>
+		<h3>[method:this pause]()</h3>
 		<p>
 		[page:Audio.hasPlaybackControl hasPlaybackControl]가 true면, 재생을 멈춥니다.
 		</p>
 
-		<h3>[method:null onEnded]()</h3>
+		<h3>[method:undefined onEnded]()</h3>
 		<p>
 		재생이 끝나면 자동으로 호출됩니다.
 		</p>
 
-		<h3>[method:Audio setBuffer]( audioBuffer )</h3>
+		<h3>[method:this setBuffer]( audioBuffer )</h3>
 		<p>
 		[page:Audio.source source]를 audioBuffer에 설치하고, [page:Audio.sourceType sourceType]를 'buffer'에 설정합니다.<br />
 		[page:Audio.autoplay autoplay]의 경우에는 재생도 시작합니다.
 		</p>
 
-		<h3>[method:Audio setFilter]( filter )</h3>
+		<h3>[method:this setFilter]( filter )</h3>
 		<p>
 		Applies a single filter node to the audio.
 		</p>
 
-		<h3>[method:Audio setFilters]( [param:Array value] )</h3>
+		<h3>[method:this setFilters]( [param:Array value] )</h3>
 		<p>
 		value - arrays of filters.<br />
 		Applies an array of filter nodes to the audio.
 		</p>
 
-		<h3>[method:Audio setLoop]( [param:Boolean value] )</h3>
+		<h3>[method:this setLoop]( [param:Boolean value] )</h3>
 		<p>
 		*value*를 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop]로 설정합니다(재생이 반복되는지).
 		</p>
 
-		<h3>[method:Audio setLoopStart]( [param:Float value] )</h3>
+		<h3>[method:this setLoopStart]( [param:Float value] )</h3>
 		<p>
 		*value*를 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart]로 설정합니다.
 		</p>
 
-		<h3>[method:Audio setLoopEnd]( [param:Float value] )</h3>
+		<h3>[method:this setLoopEnd]( [param:Float value] )</h3>
 		<p>
 		*value*를 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd]로 설정합니다.
 		</p>
 
-		<h3>[method:Audio setMediaElementSource]( mediaElement )</h3>
+		<h3>[method:this setMediaElementSource]( mediaElement )</h3>
 		<p>
 		이 오디오 소스에 [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement HTMLMediaElement]타입의 오브젝트를 적용합니다.<br />
 		[page:Audio.hasPlaybackControl hasPlaybackControl]를 false로 설정합니다.
 		</p>
 
-		<h3>[method:Audio setMediaStreamSource]( mediaStream )</h3>
+		<h3>[method:this setMediaStreamSource]( mediaStream )</h3>
 		<p>
 		이 오디오 소스에 [link:https://developer.mozilla.org/en-US/docs/Web/API/MediaStream MediaStream]타입의 오브젝트를 적용합니다.<br />
 		[page:Audio.hasPlaybackControl hasPlaybackControl]를 false로 설정합니다.
 		</p>
 
-		<h3>[method:Audio setNodeSource]( audioNode )</h3>
+		<h3>[method:this setNodeSource]( audioNode )</h3>
 		<p>
 		audioBuffer에 [page:Audio.source source]를 설치하고 'audioNode'를 [page:Audio.sourceType sourceType]로 설정합니다.<br />
 		[page:Audio.hasPlaybackControl hasPlaybackControl]를 false로 설정합니다.
 		</p>
 
-		<h3>[method:Audio setPlaybackRate]( [param:Float value] )</h3>
+		<h3>[method:this setPlaybackRate]( [param:Float value] )</h3>
 		<p>
 		[page:Audio.hasPlaybackControl hasPlaybackControl]이 활성화되어 있으면 *value*를 [page:Audio.playbackRate playbackRate]로 설정합니다.
 		</p>
 
-		<h3>[method:Audio setVolume]( [param:Float value] )</h3>
+		<h3>[method:this setVolume]( [param:Float value] )</h3>
 		<p>
 		볼륨을 설정합니다.
 		</p>
 
-		<h3>[method:Audio stop]()</h3>
+		<h3>[method:this stop]()</h3>
 		<p>
 		[page:Audio.hasPlaybackControl hasPlaybackControl]가 활성화되어 있으면 재생을 중단합니다.
 		</p>

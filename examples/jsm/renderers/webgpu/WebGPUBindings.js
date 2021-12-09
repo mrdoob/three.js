@@ -49,6 +49,12 @@ class WebGPUBindings {
 
 	}
 
+	remove( object ) {
+
+		this.uniformsData.delete( object );
+
+	}
+
 	getForCompute( param ) {
 
 		let data = this.uniformsData.get( param );
@@ -78,7 +84,7 @@ class WebGPUBindings {
 
 	}
 
-	update( object, camera ) {
+	update( object ) {
 
 		const textures = this.textures;
 
@@ -99,23 +105,16 @@ class WebGPUBindings {
 
 			if ( isShared && isUpdated ) continue;
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
-				const array = binding.array;
+				const buffer = binding.getBuffer();
 				const bufferGPU = binding.bufferGPU;
-
-				binding.onBeforeUpdate( object, camera );
 
 				const needsBufferWrite = binding.update();
 
 				if ( needsBufferWrite === true ) {
 
-					this.device.queue.writeBuffer(
-						bufferGPU,
-						0,
-						array,
-						0
-					);
+					this.device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
 
 				}
 
@@ -143,10 +142,10 @@ class WebGPUBindings {
 
 				const texture = binding.getTexture();
 
-				const forceUpdate = textures.updateTexture( texture );
+				const needsTextureRefresh = textures.updateTexture( texture );
 				const textureGPU = textures.getTextureGPU( texture );
 
-				if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
+				if ( textureGPU !== undefined && binding.textureGPU !== textureGPU || needsTextureRefresh === true ) {
 
 					binding.textureGPU = textureGPU;
 					needsBindGroupRefresh = true;
@@ -181,13 +180,11 @@ class WebGPUBindings {
 
 		for ( const binding of bindings ) {
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
 				if ( binding.bufferGPU === null ) {
 
 					const byteLength = binding.getByteLength();
-
-					binding.array = new Float32Array( new ArrayBuffer( byteLength ) );
 
 					binding.bufferGPU = this.device.createBuffer( {
 						size: byteLength,

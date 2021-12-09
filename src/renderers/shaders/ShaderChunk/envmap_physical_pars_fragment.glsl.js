@@ -7,11 +7,11 @@ export default /* glsl */`
 
 	#endif
 
-	vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {
+	vec3 getIBLIrradiance( const in vec3 normal ) {
 
 		#if defined( ENVMAP_TYPE_CUBE_UV )
 
-			vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+			vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
 
 			vec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );
 
@@ -25,7 +25,7 @@ export default /* glsl */`
 
 	}
 
-	vec3 getLightProbeIndirectRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in int maxMIPLevel ) {
+	vec3 getIBLRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
 
 		#if defined( ENVMAP_TYPE_CUBE_UV )
 

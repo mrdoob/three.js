@@ -1,84 +1,171 @@
-import Node from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
 
-class OperatorNode extends Node {
+class OperatorNode extends TempNode {
 
-	constructor( op, a, b ) {
+	constructor( op, aNode, bNode, ...params ) {
 
 		super();
 
 		this.op = op;
 
-		this.a = a;
-		this.b = b;
+		if ( params.length > 0 ) {
 
-	}
+			let finalBNode = bNode;
 
-	getType( builder ) {
+			for ( let i = 0; i < params.length; i ++ ) {
 
-		const typeA = this.a.getType( builder );
-		const typeB = this.b.getType( builder );
+				finalBNode = new OperatorNode( op, finalBNode, params[ i ] );
 
-		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+			}
 
-			// matrix x vector
-
-			return typeB;
-
-		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
-
-			// vector x matrix
-
-			return typeA;
-
-		} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
-
-			// anytype x anytype: use the greater length vector
-
-			return typeB;
+			bNode = finalBNode;
 
 		}
 
-		return typeA;
+		this.aNode = aNode;
+		this.bNode = bNode;
 
 	}
 
-	getVectorFromMatrix( type ) {
+	getNodeType( builder, output ) {
 
-		return 'vec' + type.substr( 3 );
+		const op = this.op;
+
+		const aNode = this.aNode;
+		const bNode = this.bNode;
+
+		const typeA = aNode.getNodeType( builder );
+		const typeB = bNode.getNodeType( builder );
+
+		if ( typeA === 'void' || typeB === 'void' ) {
+
+			return 'void';
+
+		} else if ( op === '=' ) {
+
+			return typeA;
+
+		} else if ( op === '==' || op === '&&' ) {
+
+			return 'bool';
+
+		} else if ( op === '<=' || op === '>' ) {
+
+			const length = builder.getTypeLength( output );
+
+			return length > 1 ? `bvec${ length }` : 'bool';
+
+		} else {
+
+			if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
+
+				return typeB;
+
+			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+
+				// matrix x vector
+
+				return builder.getVectorFromMatrix( typeA );
+
+			} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+
+				// vector x matrix
+
+				return builder.getVectorFromMatrix( typeB );
+
+			} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+
+				// anytype x anytype: use the greater length vector
+
+				return typeB;
+
+			}
+
+			return typeA;
+
+		}
 
 	}
 
 	generate( builder, output ) {
 
-		let typeA = this.a.getType( builder );
-		let typeB = this.b.getType( builder );
+		const op = this.op;
 
-		let type = this.getType( builder );
+		const aNode = this.aNode;
+		const bNode = this.bNode;
 
-		if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+		const type = this.getNodeType( builder, output );
 
-			// matrix x vector
+		let typeA = null;
+		let typeB = null;
 
-			type = typeB = this.getVectorFromMatrix( typeA );
+		if ( type !== 'void' ) {
 
-		} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+			typeA = aNode.getNodeType( builder );
+			typeB = bNode.getNodeType( builder );
 
-			// vector x matrix
+			if ( op === '=' ) {
 
-			type = typeB = this.getVectorFromMatrix( typeB );
+				typeB = typeA;
+
+			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+
+				// matrix x vector
+
+				typeB = builder.getVectorFromMatrix( typeA );
+
+			} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+
+				// vector x matrix
+
+				typeA = builder.getVectorFromMatrix( typeB );
+
+			} else {
+
+				// anytype x anytype
+
+				typeA = typeB = type;
+
+			}
 
 		} else {
-
-			// anytype x anytype
 
 			typeA = typeB = type;
 
 		}
 
-		const a = this.a.build( builder, typeA );
-		const b = this.b.build( builder, typeB );
+		const a = aNode.build( builder, typeA );
+		const b = bNode.build( builder, typeB );
 
-		return builder.format( `( ${a} ${this.op} ${b} )`, type, output );
+		const outputLength = builder.getTypeLength( output );
+
+		if ( output !== 'void' ) {
+
+			if ( op === '=' ) {
+
+				builder.addFlowCode( `${a} ${this.op} ${b}` );
+
+				return a;
+
+			} else if ( op === '>' && outputLength > 1 ) {
+
+				return `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`;
+
+			} else if ( op === '<=' && outputLength > 1 ) {
+
+				return `${ builder.getMethod( 'lessThanEqual' ) }( ${a}, ${b} )`;
+
+			} else {
+
+				return `( ${a} ${this.op} ${b} )`;
+
+			}
+
+		} else if ( typeA !== 'void' ) {
+
+			return `${a} ${this.op} ${b}`;
+
+		}
 
 	}
 
