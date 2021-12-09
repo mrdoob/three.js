@@ -7,7 +7,6 @@
  */
 
 import {
-	LinearFilter,
 	MathUtils,
 	Mesh,
 	NoBlending,
@@ -75,20 +74,11 @@ class RoughnessMipmapper {
 		newRoughnessTexture.wrapT = roughnessMap.wrapT;
 		newRoughnessTexture.minFilter = roughnessMap.minFilter;
 		newRoughnessTexture.magFilter = roughnessMap.magFilter;
-
-		const params = {
-			generateMipmaps: true,
-			wrapS: roughnessMap.wrapS,
-			wrapT: roughnessMap.wrapT,
-			magFilter: roughnessMap.magFilter,
-			minFilter: LinearFilter,
-			depthBuffer: false
-		};
+		
 		material.roughnessMap = newRoughnessTexture;
 
 		if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
 
-		// Setting the render target causes the memory to be allocated.
 		if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap;
 
 		// Copy UV transform parameters
@@ -129,11 +119,11 @@ class RoughnessMipmapper {
 
 			_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
 
+			_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
+
 		}
 
-		// material.roughnessMap.minFilter = roughnessMap.minFilter;
-
-		if ( roughnessMap !== material.roughnessMap ) roughnessMap.dispose();
+		roughnessMap.dispose();
 
 		_renderer.setRenderTarget( oldTarget );
 

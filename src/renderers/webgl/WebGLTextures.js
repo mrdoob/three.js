@@ -793,7 +793,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isFramebufferTexture ) {
 
-			// texture data extracted from framebuffers require mutuable textures defined via gl.copyTexImage2D()
+			const mips = (texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter) ? Math.log2( Math.max( image.width, image.height ) ) + 1 : 1;
+			
+			state.texStorage2D( _gl.TEXTURE_2D, mips, glInternalFormat, image.width, image.height );
 
 		} else {
 
