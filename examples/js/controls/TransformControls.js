@@ -541,10 +541,8 @@
 				this.object.position.copy( this._positionStart );
 				this.object.quaternion.copy( this._quaternionStart );
 				this.object.scale.copy( this._scaleStart );
-
 				this.dispatchEvent( _changeEvent );
 				this.dispatchEvent( _objectChangeEvent );
-
 				this.pointStart.copy( this.pointEnd );
 
 			}

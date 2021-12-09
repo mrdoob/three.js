@@ -1282,6 +1282,7 @@
 							}
 
 							texture = new THREE.DataTexture( data, width, height, useAlpha === true ? THREE.RGBAFormat : THREE.RGBFormat );
+							texture.needsUpdate = true;
 							texture.__type = textureType; // needed for material modifications
 
 							break;
