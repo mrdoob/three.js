@@ -67,7 +67,8 @@ function WebGLRenderer( parameters = {} ) {
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
-		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
+		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false,
+		_skipInvalidateFramebuffer = parameters.skipInvalidateFramebuffer !== undefined ? parameters._skipInvalidateFramebuffer : false;
 
 	let currentRenderList = null;
 	let currentRenderState = null;
@@ -1196,7 +1197,8 @@ function WebGLRenderer( parameters = {} ) {
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
 				wrapT: ClampToEdgeWrapping,
-				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
+				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' ),
+				skipInvalidateFramebuffer: _skipInvalidateFramebuffer
 			} );
 
 		}
