@@ -296,6 +296,17 @@
 
 		}
 
+		parseAsync( data, path ) {
+
+			const scope = this;
+			return new Promise( function ( resolve, reject ) {
+
+				scope.parse( data, path, resolve, reject );
+
+			} );
+
+		}
+
 	}
 	/* GLTFREGISTRY */
 
@@ -636,14 +647,14 @@
 			}
 
 			const pending = [];
-			materialParams.sheenTint = new THREE.Color( 0, 0, 0 );
+			materialParams.sheenColor = new THREE.Color( 0, 0, 0 );
 			materialParams.sheenRoughness = 0;
 			materialParams.sheen = 1;
 			const extension = materialDef.extensions[ this.name ];
 
 			if ( extension.sheenColorFactor !== undefined ) {
 
-				materialParams.sheenTint.fromArray( extension.sheenColorFactor );
+				materialParams.sheenColor.fromArray( extension.sheenColorFactor );
 
 			}
 
@@ -651,8 +662,19 @@
 
 				materialParams.sheenRoughness = extension.sheenRoughnessFactor;
 
-			} // TODO sheenColorTexture and sheenRoughnessTexture
+			}
 
+			if ( extension.sheenColorTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture ) );
+
+			}
+
+			if ( extension.sheenRoughnessTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'sheenRoughnessMap', extension.sheenRoughnessTexture ) );
+
+			}
 
 			return Promise.all( pending );
 
@@ -764,7 +786,7 @@
 
 			materialParams.attenuationDistance = extension.attenuationDistance || 0;
 			const colorArray = extension.attenuationColor || [ 1, 1, 1 ];
-			materialParams.attenuationTint = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+			materialParams.attenuationColor = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
 			return Promise.all( pending );
 
 		}
@@ -860,11 +882,11 @@
 			}
 
 			const colorArray = extension.specularColorFactor || [ 1, 1, 1 ];
-			materialParams.specularTint = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
+			materialParams.specularColor = new THREE.Color( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ] );
 
 			if ( extension.specularColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'specularTintMap', extension.specularColorTexture ).then( function ( texture ) {
+				pending.push( parser.assignTexture( materialParams, 'specularColorMap', extension.specularColorTexture ).then( function ( texture ) {
 
 					texture.encoding = THREE.sRGBEncoding;
 
@@ -3297,10 +3319,9 @@
 
 					if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
 
-						// Node may be a THREE.Group (glTF mesh with several primitives) or a THREE.Mesh.
 						node.traverse( function ( object ) {
 
-							if ( object.isMesh === true && object.morphTargetInfluences ) {
+							if ( object.morphTargetInfluences ) {
 
 								targetNames.push( object.name ? object.name : object.uuid );
 

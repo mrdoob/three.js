@@ -1382,6 +1382,7 @@ class VRMLLoader extends Loader {
 						}
 
 						texture = new DataTexture( data, width, height, ( useAlpha === true ) ? RGBAFormat : RGBFormat );
+						texture.needsUpdate = true;
 						texture.__type = textureType; // needed for material modifications
 						break;
 

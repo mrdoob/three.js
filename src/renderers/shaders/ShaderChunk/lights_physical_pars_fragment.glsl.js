@@ -14,7 +14,7 @@ struct PhysicalMaterial {
 	#endif
 
 	#ifdef USE_SHEEN
-		vec3 sheenTint;
+		vec3 sheenColor;
 		float sheenRoughness;
 	#endif
 
@@ -133,7 +133,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#ifdef USE_SHEEN
 
-		reflectedLight.directSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenTint, material.sheenRoughness );
+		reflectedLight.directSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenColor, material.sheenRoughness );
 
 	#endif
 

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1.76,0,0,1.76,-176,-176)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(235,235,235);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,-176,0)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(245,245,245);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,-176,176)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(219,219,219);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,0,-176)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(223,223,223);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,0,0)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(205,205,205);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,0,176)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(193,193,193);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,176,-176)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(219,219,219);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,176,0)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(187,187,187);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,176,176)">
+        <rect x="100" y="100" width="100" height="100" style="fill:rgb(164,164,164);"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,-88,-158.4)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,-4.26326e-14,-68.8)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,-88,17.6)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,-88,193.6)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,88,-158.4)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,88,17.6)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,88,193.6)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,264,-158.4)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,264,17.6)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <g transform="matrix(1.76,0,0,1.76,264,193.6)">
+        <circle cx="100" cy="140" r="10"/>
+    </g>
+    <rect x="88" y="88" width="176" height="176" style="fill:none;stroke:black;stroke-width:1px;"/>
+    <path d="M88,90L264,264" style="fill:none;stroke:black;stroke-width:1px;"/>
+    <path d="M88,264L264,88" style="fill:none;stroke:black;stroke-width:1px;"/>
+    <g transform="matrix(1,0,0,1,-14.5571,13.91)">
+        <text x="59.142px" y="53.754px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">2</text>
+    </g>
+    <g transform="matrix(1,0,0,1,216.658,13.5467)">
+        <text x="59.142px" y="53.754px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">3</text>
+    </g>
+    <g transform="matrix(1,0,0,1,-18.3071,267.82)">
+        <text x="59.142px" y="53.754px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">0</text>
+    </g>
+    <g transform="matrix(1,0,0,1,215.978,267.476)">
+        <text x="59.142px" y="53.754px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">1</text>
+    </g>
+    <g transform="matrix(1,0,0,1,143.634,141.23)">
+        <text x="59.142px" y="53.754px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">4</text>
+    </g>
+</svg>

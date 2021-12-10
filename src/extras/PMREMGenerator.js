@@ -9,6 +9,7 @@ import {
 	RGBDEncoding,
 	RGBEEncoding,
 	RGBFormat,
+	RGBAFormat,
 	RGBM16Encoding,
 	RGBM7Encoding,
 	UnsignedByteType,

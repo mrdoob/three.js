@@ -77,14 +77,14 @@ uniform float opacity;
 
 #ifdef SPECULAR
 	uniform float specularIntensity;
-	uniform vec3 specularTint;
+	uniform vec3 specularColor;
 
 	#ifdef USE_SPECULARINTENSITYMAP
 		uniform sampler2D specularIntensityMap;
 	#endif
 
-	#ifdef USE_SPECULARTINTMAP
-		uniform sampler2D specularTintMap;
+	#ifdef USE_SPECULARCOLORMAP
+		uniform sampler2D specularColorMap;
 	#endif
 #endif
 
@@ -94,8 +94,16 @@ uniform float opacity;
 #endif
 
 #ifdef USE_SHEEN
-	uniform vec3 sheenTint;
+	uniform vec3 sheenColor;
 	uniform float sheenRoughness;
+
+	#ifdef USE_SHEENCOLORMAP
+		uniform sampler2D sheenColorMap;
+	#endif
+
+	#ifdef USE_SHEENROUGHNESSMAP
+		uniform sampler2D sheenRoughnessMap;
+	#endif
 #endif
 
 varying vec3 vViewPosition;
@@ -173,7 +181,7 @@ void main() {
 
 		vec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );
 
-		outgoingLight = outgoingLight * ( 1.0 - clearcoat * Fcc ) + clearcoatSpecular * clearcoat;
+		outgoingLight = outgoingLight * ( 1.0 - material.clearcoat * Fcc ) + clearcoatSpecular * material.clearcoat;
 
 	#endif
 

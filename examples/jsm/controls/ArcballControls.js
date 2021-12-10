@@ -65,6 +65,7 @@ const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
 const _raycaster = new Raycaster();
+const _offset = new Vector3();
 
 
 /**
@@ -82,6 +83,7 @@ class ArcballControls extends EventDispatcher {
 		this.domElement = domElement;
 		this.scene = scene;
 		this.target = new Vector3( 0, 0, 0 );
+		this.radiusFactor = 0.67;
 
 		this.mouseActions = [];
 		this._mouseOp = null;
@@ -1132,8 +1134,8 @@ class ArcballControls extends EventDispatcher {
 							this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
 
 							//adjusting distance
-							const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
-							this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+							_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
+							this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 						}
 
@@ -1542,8 +1544,8 @@ class ArcballControls extends EventDispatcher {
 			this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
 
 			//adjusting distance
-			const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
-			this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+			_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
+			this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 			this.dispatchEvent( _changeEvent );
 
@@ -1976,18 +1978,17 @@ class ArcballControls extends EventDispatcher {
 	 */
 	calculateTbRadius = ( camera ) => {
 
-		const factor = 0.67;
 		const distance = camera.position.distanceTo( this._gizmos.position );
 
 		if ( camera.type == 'PerspectiveCamera' ) {
 
 			const halfFovV = MathUtils.DEG2RAD * camera.fov * 0.5; //vertical fov/2 in radians
 			const halfFovH = Math.atan( ( camera.aspect ) * Math.tan( halfFovV ) ); //horizontal fov/2 in radians
-			return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * factor;
+			return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * this.radiusFactor;
 
 		} else if ( camera.type == 'OrthographicCamera' ) {
 
-			return Math.min( camera.top, camera.right ) * factor;
+			return Math.min( camera.top, camera.right ) * this.radiusFactor;
 
 		}
 
@@ -2001,11 +2002,9 @@ class ArcballControls extends EventDispatcher {
 	 */
 	focus = ( point, size, amount = 1 ) => {
 
-		const focusPoint = point.clone();
-
 		//move center of camera (along with gizmos) towards point of interest
-		focusPoint.sub( this._gizmos.position ).multiplyScalar( amount );
-		this._translationMatrix.makeTranslation( focusPoint.x, focusPoint.y, focusPoint.z );
+		_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
+		this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 		const gizmoStateTemp = this._gizmoMatrixState.clone();
 		this._gizmoMatrixState.premultiply( this._translationMatrix );
@@ -2239,6 +2238,30 @@ class ArcballControls extends EventDispatcher {
 	setGizmosVisible( value ) {
 
 		this._gizmos.visible = value;
+		this.dispatchEvent( _changeEvent );
+
+	}
+
+	/**
+	 * Set gizmos radius factor and redraws gizmos
+	 * @param {Float} value Value of radius factor
+	 */
+	setTbRadius( value ) {
+
+		this.radiusFactor = value;
+		this._tbRadius = this.calculateTbRadius( this.camera );
+
+		const curve = new EllipseCurve( 0, 0, this._tbRadius, this._tbRadius );
+		const points = curve.getPoints( this._curvePts );
+		const curveGeometry = new BufferGeometry().setFromPoints( points );
+
+
+		for ( const gizmo in this._gizmos.children ) {
+
+			this._gizmos.children[ gizmo ].geometry = curveGeometry;
+
+		}
+
 		this.dispatchEvent( _changeEvent );
 
 	}
@@ -2669,9 +2692,9 @@ class ArcballControls extends EventDispatcher {
 
 			}
 
-			let direction = scalePoint.clone().sub( this._v3_1 ).normalize().multiplyScalar( amount );
+			_offset.copy( scalePoint ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
 
-			this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+			this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 
 			if ( scaleGizmos ) {
@@ -2681,12 +2704,12 @@ class ArcballControls extends EventDispatcher {
 
 				distance = pos.distanceTo( scalePoint );
 				amount = distance - ( distance * sizeInverse );
-				direction = scalePoint.clone().sub( this._v3_2 ).normalize().multiplyScalar( amount );
+				_offset.copy( scalePoint ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
 
 				this._translationMatrix.makeTranslation( pos.x, pos.y, pos.z );
 				this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
 
-				this._m4_2.makeTranslation( direction.x, direction.y, direction.z ).multiply( this._translationMatrix );
+				this._m4_2.makeTranslation( _offset.x, _offset.y, _offset.z ).multiply( this._translationMatrix );
 				this._m4_2.multiply( this._scaleMatrix );
 
 				this._translationMatrix.makeTranslation( - pos.x, - pos.y, - pos.z );

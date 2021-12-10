@@ -345,7 +345,9 @@ class GPUComputationRenderer {
 		this.createTexture = function () {
 
 			const data = new Float32Array( sizeX * sizeY * 4 );
-			return new DataTexture( data, sizeX, sizeY, RGBAFormat, FloatType );
+			const texture = new DataTexture( data, sizeX, sizeY, RGBAFormat, FloatType );
+			texture.needsUpdate = true;
+			return texture;
 
 		};
 

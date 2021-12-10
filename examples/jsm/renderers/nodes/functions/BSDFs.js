@@ -2,7 +2,7 @@ import { ShaderNode,
 	add, addTo, sub, mul, div, saturate, dot, pow, pow2, exp2, normalize, max, sqrt, negate,
 	cond, greaterThan, and,
 	transformedNormalView, positionViewDirection,
-	diffuseColor, specularTint, roughness,
+	diffuseColor, specularColor, roughness,
 	PI, RECIPROCAL_PI, EPSILON
 } from '../ShaderNode.js';
 
@@ -75,7 +75,7 @@ export const D_GGX = new ShaderNode( ( inputs ) => {
 
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-export const BRDF_Specular_GGX = new ShaderNode( ( inputs ) => {
+export const BRDF_GGX = new ShaderNode( ( inputs ) => {
 
 	const { lightDirection, f0, f90, roughness } = inputs;
 
@@ -109,7 +109,7 @@ export const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 
 	addTo( directDiffuse, mul( irradiance, BRDF_Lambert( { diffuseColor } ) ) );
 
-	addTo( directSpecular, mul( irradiance, BRDF_Specular_GGX( { lightDirection, f0: specularTint, f90: 1, roughness } ) ) );
+	addTo( directSpecular, mul( irradiance, BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness } ) ) );
 
 } );
 

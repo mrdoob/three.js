@@ -968,7 +968,7 @@
 				geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xaaaaff,
+					color: 0xffffff,
 					flatShading: true
 				} );
 				const mesh = new THREE.Mesh( geometry, material );

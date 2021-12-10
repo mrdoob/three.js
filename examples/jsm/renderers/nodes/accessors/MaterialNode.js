@@ -85,15 +85,15 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR ) {
 
-			const specularTintNode = new MaterialReferenceNode( 'specularTint', 'color' );
+			const specularColorNode = new MaterialReferenceNode( 'specularColor', 'color' );
 
-			if ( material.specularTintMap !== null && material.specularTintMap !== undefined && material.specularTintMap.isTexture === true ) {
+			if ( material.specularColorMap !== null && material.specularColorMap !== undefined && material.specularColorMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', specularTintNode, new MaterialReferenceNode( 'specularTintMap', 'texture' ) );
+				node = new OperatorNode( '*', specularColorNode, new MaterialReferenceNode( 'specularColorMap', 'texture' ) );
 
 			} else {
 
-				node = specularTintNode;
+				node = specularColorNode;
 
 			}
 

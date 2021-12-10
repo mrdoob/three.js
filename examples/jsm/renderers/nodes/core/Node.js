@@ -1,6 +1,6 @@
 import { NodeUpdateType } from './constants.js';
 
-import { MathUtils } from 'three';
+import { MathUtils } from '../../../../../build/three.module.js';
 
 class Node {
 

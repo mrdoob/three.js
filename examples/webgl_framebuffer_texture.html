@@ -95,9 +95,7 @@
 
 				//
 
-				const data = new Uint8Array( textureSize * textureSize * 3 );
-
-				texture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+				texture = new THREE.FramebufferTexture( textureSize, textureSize, THREE.RGBFormat );
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
 

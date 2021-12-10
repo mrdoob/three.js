@@ -42,6 +42,8 @@
 	};
 
 	const _raycaster = new THREE.Raycaster();
+
+	const _offset = new THREE.Vector3();
 	/**
  *
  * @param {Camera} camera Virtual camera used in the scene
@@ -50,7 +52,7 @@
  */
 
 
-	class ArcballControls extends THREE.Object3D {
+	class ArcballControls extends THREE.EventDispatcher {
 
 		constructor( _camera, domElement, scene = null ) {
 
@@ -464,11 +466,11 @@
 
 									}
 
-									this.applyTransformMatrix( this.applyScale( size, scalePoint ) );
+									this.applyTransformMatrix( this.scale( size, scalePoint ) );
 
 								} else {
 
-									this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
+									this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
 
 								}
 
@@ -541,7 +543,7 @@
 									const newDistance = y / Math.tan( THREE.MathUtils.DEG2RAD * ( newFov / 2 ) );
 									size = x / newDistance;
 									this.setFov( newFov );
-									this.applyTransformMatrix( this.applyScale( size, this._gizmos.position, false ) );
+									this.applyTransformMatrix( this.scale( size, this._gizmos.position, false ) );
 
 								}
 
@@ -859,7 +861,7 @@
 
 									}
 
-									this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
+									this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
 
 								}
 
@@ -928,11 +930,11 @@
 									this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
 									this.setFov( newFov );
-									this.applyTransformMatrix( this.applyScale( size, this._v3_2, false ) ); //adjusting distance
+									this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
 
-									const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
+									_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
 
-									this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+									this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 								}
 
@@ -1216,7 +1218,7 @@
 
 					}
 
-					this.applyTransformMatrix( this.applyScale( amount, scalePoint ) );
+					this.applyTransformMatrix( this.scale( amount, scalePoint ) );
 					this.dispatchEvent( _changeEvent );
 
 				}
@@ -1320,11 +1322,11 @@
 					this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
 					this.setFov( newFov );
-					this.applyTransformMatrix( this.applyScale( size, this._v3_2, false ) ); //adjusting distance
+					this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
 
-					const direction = this._gizmos.position.clone().sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
+					_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
 
-					this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+					this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 					this.dispatchEvent( _changeEvent );
 
@@ -1594,7 +1596,6 @@
 
 			this.calculateTbRadius = camera => {
 
-				const factor = 0.67;
 				const distance = camera.position.distanceTo( this._gizmos.position );
 
 				if ( camera.type == 'PerspectiveCamera' ) {
@@ -1603,11 +1604,11 @@
 
 					const halfFovH = Math.atan( camera.aspect * Math.tan( halfFovV ) ); //horizontal fov/2 in radians
 
-					return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * factor;
+					return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * this.radiusFactor;
 
 				} else if ( camera.type == 'OrthographicCamera' ) {
 
-					return Math.min( camera.top, camera.right ) * factor;
+					return Math.min( camera.top, camera.right ) * this.radiusFactor;
 
 				}
 
@@ -1615,11 +1616,10 @@
 
 			this.focus = ( point, size, amount = 1 ) => {
 
-				const focusPoint = point.clone(); //move center of camera (along with gizmos) towards point of interest
+				//move center of camera (along with gizmos) towards point of interest
+				_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
 
-				focusPoint.sub( this._gizmos.position ).multiplyScalar( amount );
-
-				this._translationMatrix.makeTranslation( focusPoint.x, focusPoint.y, focusPoint.z );
+				this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 				const gizmoStateTemp = this._gizmoMatrixState.clone();
 
@@ -1636,7 +1636,7 @@
 
 				if ( this.enableZoom ) {
 
-					this.applyTransformMatrix( this.applyScale( size, this._gizmos.position ) );
+					this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
 
 				}
 
@@ -2161,7 +2161,7 @@
 
 			};
 
-			this.applyScale = ( size, point, scaleGizmos = true ) => {
+			this.scale = ( size, point, scaleGizmos = true ) => {
 
 				const scalePoint = point.clone();
 				let sizeInverse = 1 / size;
@@ -2235,9 +2235,9 @@
 
 					}
 
-					let direction = scalePoint.clone().sub( this._v3_1 ).normalize().multiplyScalar( amount );
+					_offset.copy( scalePoint ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
 
-					this._m4_1.makeTranslation( direction.x, direction.y, direction.z );
+					this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 					if ( scaleGizmos ) {
 
@@ -2245,13 +2245,14 @@
 						const pos = this._v3_2;
 						distance = pos.distanceTo( scalePoint );
 						amount = distance - distance * sizeInverse;
-						direction = scalePoint.clone().sub( this._v3_2 ).normalize().multiplyScalar( amount );
+
+						_offset.copy( scalePoint ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
 
 						this._translationMatrix.makeTranslation( pos.x, pos.y, pos.z );
 
 						this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
 
-						this._m4_2.makeTranslation( direction.x, direction.y, direction.z ).multiply( this._translationMatrix );
+						this._m4_2.makeTranslation( _offset.x, _offset.y, _offset.z ).multiply( this._translationMatrix );
 
 						this._m4_2.multiply( this._scaleMatrix );
 
@@ -2586,7 +2587,7 @@
 					if ( this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom ) {
 
 						const newZoom = THREE.MathUtils.clamp( this.camera.zoom, this.minZoom, this.maxZoom );
-						this.applyTransformMatrix( this.applyScale( newZoom / this.camera.zoom, this._gizmos.position, true ) );
+						this.applyTransformMatrix( this.scale( newZoom / this.camera.zoom, this._gizmos.position, true ) );
 
 					}
 
@@ -2598,7 +2599,7 @@
 					if ( distance > this.maxDistance + EPS || distance < this.minDistance - EPS ) {
 
 						const newDistance = THREE.MathUtils.clamp( distance, this.minDistance, this.maxDistance );
-						this.applyTransformMatrix( this.applyScale( newDistance / distance, this._gizmos.position ) );
+						this.applyTransformMatrix( this.scale( newDistance / distance, this._gizmos.position ) );
 						this.updateMatrixState();
 
 					} //check fov
@@ -2684,6 +2685,7 @@
 			this.domElement = domElement;
 			this.scene = scene;
 			this.target = new THREE.Vector3( 0, 0, 0 );
+			this.radiusFactor = 0.67;
 			this.mouseActions = [];
 			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
 
@@ -2929,6 +2931,29 @@
 		setGizmosVisible( value ) {
 
 			this._gizmos.visible = value;
+			this.dispatchEvent( _changeEvent );
+
+		}
+		/**
+   * Set gizmos radius factor and redraws gizmos
+   * @param {Float} value Value of radius factor
+   */
+
+
+		setTbRadius( value ) {
+
+			this.radiusFactor = value;
+			this._tbRadius = this.calculateTbRadius( this.camera );
+			const curve = new THREE.EllipseCurve( 0, 0, this._tbRadius, this._tbRadius );
+			const points = curve.getPoints( this._curvePts );
+			const curveGeometry = new THREE.BufferGeometry().setFromPoints( points );
+
+			for ( const gizmo in this._gizmos.children ) {
+
+				this._gizmos.children[ gizmo ].geometry = curveGeometry;
+
+			}
+
 			this.dispatchEvent( _changeEvent );
 
 		}

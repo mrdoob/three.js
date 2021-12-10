@@ -1,3 +1,5 @@
+import { LinearEncoding } from 'three';
+
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -19,8 +21,12 @@ import PositionNode from '../../nodes/accessors/PositionNode.js';
 import NormalNode from '../../nodes/accessors/NormalNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
 import SkinningNode from '../../nodes/accessors/SkinningNode.js';
+import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import OperatorNode from '../../nodes/math/OperatorNode.js';
+import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
+import { vec4 } from '../../nodes/ShaderNode.js';
+import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
 	float: 'f32',
@@ -29,6 +35,7 @@ const wgslTypeLib = {
 	vec3: 'vec3<f32>',
 	vec4: 'vec4<f32>',
 	uvec4: 'vec4<u32>',
+	bvec3: 'vec3<bool>',
 	mat3: 'mat3x3<f32>',
 	mat4: 'mat4x4<f32>'
 };
@@ -39,6 +46,13 @@ const wgslMethods = {
 };
 
 const wgslPolyfill = {
+	lessThanEqual: new CodeNode( `
+fn lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
+
+	return vec3<bool>( a.x <= b.x, a.y <= b.y, a.z <= b.z );
+
+}
+` ),
 	mod: new CodeNode( `
 fn mod( x : f32, y : f32 ) -> f32 {
 
@@ -68,7 +82,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, lightNode = null ) {
 
-		super( object, renderer );
+		super( object, renderer, new WGSLNodeParser() );
 
 		this.lightNode = lightNode;
 
@@ -134,7 +148,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
+			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec3' ) );
+
+			this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
 
 			// OPACITY
 
@@ -170,7 +186,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( alphaTest !== null ) {
 
-				alphaTest = this.addFlow( 'fragment', new VarNode( alphaTest, 'AlphaTest', 'float' ) );
+				this.addFlow( 'fragment', new VarNode( alphaTest, 'AlphaTest', 'float' ) );
 
 				this.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
 
@@ -210,11 +226,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
+				roughnessNode = getRoughness( { roughness: roughnessNode } );
+
 				this.addFlow( 'fragment', new VarNode( roughnessNode, 'Roughness', 'float' ) );
 
 				// SPECULAR_TINT
 
-				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), DiffuseColor.rgb, Metalness )', 'vec3' ), 'SpecularTint', 'color' ) );
+				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), Color, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
 
 				// NORMAL_VIEW
 
@@ -248,6 +266,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			// RESULT
 
+			const outputEncoding = this.renderer.outputEncoding;
+
+			if ( outputEncoding !== LinearEncoding ) {
+
+				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, vec4( outputNode ) );
+				outputNode.fromEncoding( outputEncoding );
+
+			}
+
 			this.addFlow( 'fragment', new VarNode( outputNode, 'Output', 'vec4' ) );
 
 		}
@@ -266,7 +293,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet, biasSnippet = null, shaderStage = this.shaderStage ) {
+	getTexture( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
@@ -440,7 +467,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			const attributes = this.attributes;
 			const length = attributes.length;
 
-			snippet += `\n`;
+			snippet += '\n';
 
 			for ( let index = 0; index < length; index ++ ) {
 
@@ -452,13 +479,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( index + 1 < length ) {
 
-					snippet += `,\n`;
+					snippet += ',\n';
 
 				}
 
 			}
 
-			snippet += `\n`;
+			snippet += '\n';
 
 		}
 
@@ -493,7 +520,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'vertex' ) {
 
-			snippet += `\t[[ builtin( position ) ]] Vertex: vec4<f32>;\n`;
+			snippet += '\t[[ builtin( position ) ]] Vertex: vec4<f32>;\n';
 
 			const varys = this.varys;
 
@@ -511,7 +538,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const varys = this.varys;
 
-			snippet += `\n`;
+			snippet += '\n';
 
 			for ( let index = 0; index < varys.length; index ++ ) {
 
@@ -521,13 +548,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( index + 1 < varys.length ) {
 
-					snippet += `,\n`;
+					snippet += ',\n';
 
 				}
 
 			}
 
-			snippet += `\n`;
+			snippet += '\n';
 
 		}
 
@@ -602,7 +629,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		for ( const shaderStage in shadersData ) {
 
-			let flow = `// code\n`;
+			let flow = '// code\n';
 			flow += `\t${ this.flowCode[ shaderStage ] }`;
 			flow += '\n';
 
@@ -616,7 +643,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( slotName ) {
 
-					if ( flow.length > 0 ) flow += `\n`;
+					if ( flow.length > 0 ) flow += '\n';
 
 					flow += `\t// FLOW -> ${ slotName }\n\t`;
 
@@ -626,15 +653,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( node === mainNode ) {
 
-					flow += `// FLOW RESULT\n\t`;
+					flow += '// FLOW RESULT\n\t';
 
 					if ( shaderStage === 'vertex' ) {
 
-						flow += `NodeVarys.Vertex = `;
+						flow += 'NodeVarys.Vertex = ';
 
 					} else if ( shaderStage === 'fragment' ) {
 
-						flow += `return `;
+						flow += 'return ';
 
 					}
 
@@ -660,7 +687,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getMethod( method, shaderStage = this.shaderStage ) {
+	getMethod( method ) {
 
 		if ( wgslPolyfill[ method ] !== undefined ) {
 
