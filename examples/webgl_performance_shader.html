@@ -149,7 +149,9 @@
 
 					const obj = scene.children[ i ];
 					scene.remove( obj );
-
+					obj.geometry.dispose();
+					obj.material.dispose();
+			
 				}
 
 			}
