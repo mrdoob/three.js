@@ -783,7 +783,7 @@ fn main( ${shaderData.varys} ) -> [[ location( 0 ) ]] vec4<f32> {
 
 	_getWGSLStruct( name, vars ) {
 
-		return `[[ block ]]
+		return `
 struct ${name} {
 \n${vars}
 };`;
