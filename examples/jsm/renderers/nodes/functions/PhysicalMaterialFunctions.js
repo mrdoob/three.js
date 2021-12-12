@@ -18,7 +18,7 @@ export const getRoughness = new ShaderNode( ( inputs ) => {
 
 	const geometryRoughness = getGeometryRoughness();
 
-	let roughnessFactor = max( roughness.r, 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.
+	let roughnessFactor = max( roughness, 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.
 	roughnessFactor = add( roughnessFactor, geometryRoughness );
 	roughnessFactor = min( roughnessFactor, 1.0 );
 
