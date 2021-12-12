@@ -2283,7 +2283,7 @@ class EXRLoader extends DataTextureLoader {
 
 					const cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
 
-					for ( var x = 0; x < EXRDecoder.width; x ++ ) {
+					for ( let x = 0; x < EXRDecoder.width; x ++ ) {
 
 						tmpOffset.value = ( line_y * ( EXRDecoder.channels * EXRDecoder.width ) + channelID * EXRDecoder.width + x ) * EXRDecoder.inputSize;
 						const outIndex = ( EXRDecoder.height - 1 - true_y ) * ( EXRDecoder.width * EXRDecoder.outputChannels ) + x * EXRDecoder.outputChannels + cOff;
