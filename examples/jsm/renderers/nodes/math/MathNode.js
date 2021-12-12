@@ -127,7 +127,9 @@ class MathNode extends TempNode {
 		const b = this.bNode;
 		const c = this.cNode;
 
-		if ( builder.renderer.isWebGLRenderer === true && ( method === MathNode.DFDX || method === MathNode.DFDY ) && output === 'vec3' ) {
+		const isWebGL = builder.renderer.isWebGLRenderer === true;
+
+		if ( isWebGL && ( method === MathNode.DFDX || method === MathNode.DFDY ) && output === 'vec3' ) {
 
 			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
@@ -189,7 +191,7 @@ class MathNode extends TempNode {
 					b.build( builder, inputType )
 				);
 
-			} else if ( method === MathNode.MIN || method === MathNode.MAX || method === MathNode.MOD ) {
+			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
 
 				params.push(
 					a.build( builder, inputType ),
