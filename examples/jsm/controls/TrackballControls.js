@@ -12,7 +12,7 @@ const _endEvent = { type: 'end' };
 
 class TrackballControls extends EventDispatcher {
 
-	constructor( object, domElement ) {
+	constructor( object, domElement, target ) {
 
 		super();
 
@@ -52,7 +52,7 @@ class TrackballControls extends EventDispatcher {
 
 		// internals
 
-		this.target = new Vector3();
+		this.target = (typeof target !== 'undefined') ?  target : new Vector3();
 
 		const EPS = 0.000001;
 
