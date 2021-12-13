@@ -282,6 +282,8 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
+
+		Cloning a texture does not automatically mark it for a texture update. You have to set [page:Texture.needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
