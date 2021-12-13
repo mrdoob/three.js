@@ -1,6 +1,5 @@
 /**
- * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/
- * Maybe more about this later with a blog post at http://lab4games.net/zz85/blog
+ * Ascii generation is based on https://github.com/hassadee/jsascii/blob/master/jsascii.js
  *
  * 16 April 2012 - @blurspline
  */
@@ -57,7 +56,7 @@ class AsciiEffect {
 		this.domElement = domElement;
 
 
-		// Throw in ascii library from http://www.nihilogic.dk/labs/jsascii/jsascii.js
+		// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js
 
 		/*
 		* jsAscii 0.1
