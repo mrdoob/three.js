@@ -117,7 +117,8 @@ function WebGLMaterials( properties ) {
 
 		if ( material.emissive ) {
 
-			uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
+			uniforms.emissive.value.copy( material.emissive );
+			uniforms.emissiveIntensity.value = material.emissiveIntensity;
 
 		}
 

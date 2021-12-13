@@ -36,7 +36,8 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: new Color( 0x000000 ) },
+				emissiveIntensity: { value: 1.0 }
 			}
 		] ),
 
@@ -61,6 +62,7 @@ const ShaderLib = {
 			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) },
+				emissiveIntensity: { value: 1.0 },
 				specular: { value: new Color( 0x111111 ) },
 				shininess: { value: 30 }
 			}
@@ -88,6 +90,7 @@ const ShaderLib = {
 			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) },
+				emissiveIntensity: { value: 1.0 },
 				roughness: { value: 1.0 },
 				metalness: { value: 0.0 },
 				envMapIntensity: { value: 1 } // temporary
@@ -113,7 +116,8 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: new Color( 0x000000 ) },
+				emissiveIntensity: { value: 1.0 }
 			}
 		] ),
 
