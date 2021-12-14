@@ -1,6 +1,6 @@
 /**
  * Bezier Curves formulas obtained from
- * http://en.wikipedia.org/wiki/Bézier_curve
+ * https://en.wikipedia.org/wiki/Bézier_curve
  */
 
 function CatmullRom( t, p0, p1, p2, p3 ) {
