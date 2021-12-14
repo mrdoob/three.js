@@ -204,13 +204,7 @@
 			 * @returns {object|null}
 			 */
 			function getModelByName(name) {
-				for (let i = 0; i < MODELS.length; ++i) {
-					if (MODELS[i].name === name) {
-						return MODELS[i];
-					}
-				}
-
-				return null;
+				return MODELS.find(model => model.name === name)
 			}
 
 			/**
