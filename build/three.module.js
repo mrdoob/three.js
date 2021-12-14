@@ -24508,7 +24508,12 @@ class WebXRManager extends EventDispatcher {
 
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
-						glBaseLayer.framebufferHeight
+						glBaseLayer.framebufferHeight,
+						{
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							encoding: renderer.outputEncoding
+						}
 					);
 
 				} else {

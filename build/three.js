@@ -18176,7 +18176,11 @@
 						session.updateRenderState({
 							baseLayer: glBaseLayer
 						});
-						newRenderTarget = new WebGLRenderTarget(glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight);
+						newRenderTarget = new WebGLRenderTarget(glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, {
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							encoding: renderer.outputEncoding
+						});
 					} else {
 						isMultisample = attributes.antialias;
 						let depthFormat = null;
