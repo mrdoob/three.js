@@ -30,13 +30,13 @@ This script will start a local server similar to [threejs.org](https://threejs.o
 
 The next most important script runs all the appropriate testing. The E-2-E testing is intended to be run by github actions.
 
-    npm test
+    npm run test
 
 The linting is there to keep a consistent code style across all of the code and the testing is there to help catch bugs and check that the code behaves as expected. It is important that neither of these steps comes up with any errors due to your changes.
 
 Many linting errors can be fixed automatically by running
 
-    npm lint-fix
+    npm run lint-fix
 
 If you’d like to make a minified version of the build files i.e. ‘build/three.min.js’ run:
 
