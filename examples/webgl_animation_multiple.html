@@ -109,7 +109,7 @@
 		async function loadModel(model) {
 			const url = `models/gltf/${model.name}.glb`;
 			const gltf = await loadGltfModel(url)
-			
+
 			// Mutate model
 			model.animations = gltf.animations;
 			model.scene = gltf.scene;
@@ -217,26 +217,23 @@
 		 * Load a 3D model from a GLTF file. Use the GLTFLoader.
 		 * @param model {object} Model config, one item from the MODELS array. It will be updated inside the function!
 		 */
-		function loadGltfModel(url = "") {
+		async function loadGltfModel(url = "") {
 			const loader = new GLTFLoader();
 
-			return new Promise((resolve, reject) => {
-				loader.load(url, function (gltf) {
+			const gltf = await loader.loadAsync(url)
 
-					// Enable Shadows
-					gltf.scene.traverse(function (object) {
-						if (object.isMesh) {
-							object.castShadow = true;
-						}
-					});
+			// Enable Shadows
+			gltf.scene.traverse(function (object) {
+				if (object.isMesh) {
+					object.castShadow = true;
+				}
+			});
 
-					// console.log("Done loading model", model.name);
-					// model.animations = gltf.animations;
-					// model.scene = scene;
+			// console.log("Done loading model", model.name);
+			// model.animations = gltf.animations;
+			// model.scene = scene;
 
-					resolve(gltf);
-				});
-			})
+			return gltf
 		}
 
 		/**
