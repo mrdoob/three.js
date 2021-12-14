@@ -252,7 +252,7 @@
     if ((/chrome|opera/i).test(browser.name)) {
       lineNdx = 3;
       matcher = function(line) {
-        const m = /at ([^(]+)*?\(*(.*?):(\d+):(\d+)/.exec(line);
+        const m = /at ([^(]*?)\(*(.*?):(\d+):(\d+)/.exec(line);
         if (m) {
           let userFnName = m[1];
           let url = m[2];
