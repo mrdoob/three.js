@@ -310,7 +310,9 @@
 			this.createTexture = function () {
 
 				const data = new Float32Array( sizeX * sizeY * 4 );
-				return new THREE.DataTexture( data, sizeX, sizeY, THREE.RGBAFormat, THREE.FloatType );
+				const texture = new THREE.DataTexture( data, sizeX, sizeY, THREE.RGBAFormat, THREE.FloatType );
+				texture.needsUpdate = true;
+				return texture;
 
 			};
 

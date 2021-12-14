@@ -6,7 +6,7 @@ import {
  * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
  * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
  *
- * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Tools/babylon.khronosTextureContainer.ts
+ * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts
  */
 
 

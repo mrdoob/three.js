@@ -4870,7 +4870,16 @@ class Sphere {
 		// 1) Enclose the farthest point on the other sphere into this sphere.
 		// 2) Enclose the opposite point of the farthest point into this sphere.
 
-		_toFarthestPoint.subVectors( sphere.center, this.center ).normalize().multiplyScalar( sphere.radius );
+		 if ( this.center.equals( sphere.center ) === true ) {
+
+			 _toFarthestPoint.set( 0, 0, 1 ).multiplyScalar( sphere.radius );
+
+
+		} else {
+
+			_toFarthestPoint.subVectors( sphere.center, this.center ).normalize().multiplyScalar( sphere.radius );
+
+		}
 
 		this.expandByPoint( _v1$6.copy( sphere.center ).add( _toFarthestPoint ) );
 		this.expandByPoint( _v1$6.copy( sphere.center ).sub( _toFarthestPoint ) );
@@ -7135,7 +7144,7 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	raycast() {}
+	raycast( /* raycaster, intersects */ ) {}
 
 	traverse( callback ) {
 
@@ -18908,6 +18917,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
+	const _programLayers = new Layers();
 	const programs = [];
 
 	const isWebGL2 = capabilities.isWebGL2;
@@ -18915,7 +18925,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	const floatVertexTextures = capabilities.floatVertexTextures;
 	const maxVertexUniforms = capabilities.maxVertexUniforms;
 	const vertexTextures = capabilities.vertexTextures;
-
 	let precision = capabilities.precision;
 
 	const shaderIDs = {
@@ -18935,25 +18944,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		ShadowMaterial: 'shadow',
 		SpriteMaterial: 'sprite'
 	};
-
-	const parameterNames = [
-		'precision', 'isWebGL2', 'supportsVertexTextures', 'outputEncoding', 'instancing', 'instancingColor',
-		'map', 'mapEncoding', 'matcap', 'matcapEncoding', 'envMap', 'envMapMode', 'envMapEncoding', 'envMapCubeUV',
-		'lightMap', 'lightMapEncoding', 'aoMap', 'emissiveMap', 'emissiveMapEncoding', 'bumpMap', 'normalMap',
-		'objectSpaceNormalMap', 'tangentSpaceNormalMap',
-		'clearcoat', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap',
-		'displacementMap', 'specularMap', 'roughnessMap', 'metalnessMap', 'gradientMap',
-		'alphaMap', 'alphaTest', 'combine', 'vertexColors', 'vertexAlphas', 'vertexTangents', 'vertexUvs', 'uvsVertexOnly', 'fog', 'useFog', 'fogExp2',
-		'flatShading', 'sizeAttenuation', 'logarithmicDepthBuffer', 'skinning',
-		'maxBones', 'useVertexTexture', 'morphTargets', 'morphNormals', 'morphTargetsCount', 'premultipliedAlpha',
-		'numDirLights', 'numPointLights', 'numSpotLights', 'numHemiLights', 'numRectAreaLights',
-		'numDirLightShadows', 'numPointLightShadows', 'numSpotLightShadows',
-		'shadowMapEnabled', 'shadowMapType', 'toneMapping', 'physicallyCorrectLights',
-		'doubleSided', 'flipSided', 'numClippingPlanes', 'numClipIntersection', 'depthPacking', 'dithering', 'format',
-		'specularIntensityMap', 'specularColorMap', 'specularColorMapEncoding',
-		'transmission', 'transmissionMap', 'thicknessMap',
-		'sheen', 'sheenColorMap', 'sheenColorMapEncoding', 'sheenRoughnessMap'
-	];
 
 	function getMaxBones( object ) {
 
@@ -19234,12 +19224,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		if ( parameters.isRawShaderMaterial === false ) {
 
-			for ( let i = 0; i < parameterNames.length; i ++ ) {
-
-				array.push( parameters[ parameterNames[ i ] ] );
-
-			}
-
+			getProgramCacheKeyParameters( array, parameters );
+			getProgramCacheKeyBooleans( array, parameters );
 			array.push( renderer.outputEncoding );
 			array.push( renderer.gammaFactor );
 
@@ -19248,6 +19234,161 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.customProgramCacheKey );
 
 		return array.join();
+
+	}
+
+	function getProgramCacheKeyParameters( array, parameters ) {
+
+		array.push( parameters.precision );
+		array.push( parameters.outputEncoding );
+		array.push( parameters.mapEncoding );
+		array.push( parameters.matcapEncoding );
+		array.push( parameters.envMapMode );
+		array.push( parameters.envMapEncoding );
+		array.push( parameters.lightMapEncoding );
+		array.push( parameters.emissiveMapEncoding );
+		array.push( parameters.combine );
+		array.push( parameters.vertexUvs );
+		array.push( parameters.fogExp2 );
+		array.push( parameters.sizeAttenuation );
+		array.push( parameters.maxBones );
+		array.push( parameters.morphTargetsCount );
+		array.push( parameters.numDirLights );
+		array.push( parameters.numPointLights );
+		array.push( parameters.numSpotLights );
+		array.push( parameters.numHemiLights );
+		array.push( parameters.numRectAreaLights );
+		array.push( parameters.numDirLightShadows );
+		array.push( parameters.numPointLightShadows );
+		array.push( parameters.numSpotLightShadows );
+		array.push( parameters.shadowMapType );
+		array.push( parameters.toneMapping );
+		array.push( parameters.numClippingPlanes );
+		array.push( parameters.numClipIntersection );
+		array.push( parameters.format );
+		array.push( parameters.specularColorMapEncoding );
+		array.push( parameters.sheenColorMapEncoding );
+
+	}
+
+	function getProgramCacheKeyBooleans( array, parameters ) {
+
+		_programLayers.disableAll();
+
+		if ( parameters.isWebGL2 )
+			_programLayers.enable( 0 );
+		if ( parameters.supportsVertexTextures )
+			_programLayers.enable( 1 );
+		if ( parameters.instancing )
+			_programLayers.enable( 2 );
+		if ( parameters.instancingColor )
+			_programLayers.enable( 3 );
+		if ( parameters.map )
+			_programLayers.enable( 4 );
+		if ( parameters.matcap )
+			_programLayers.enable( 5 );
+		if ( parameters.envMap )
+			_programLayers.enable( 6 );
+		if ( parameters.envMapCubeUV )
+			_programLayers.enable( 7 );
+		if ( parameters.lightMap )
+			_programLayers.enable( 8 );
+		if ( parameters.aoMap )
+			_programLayers.enable( 9 );
+		if ( parameters.emissiveMap )
+			_programLayers.enable( 10 );
+		if ( parameters.bumpMap )
+			_programLayers.enable( 11 );
+		if ( parameters.normalMap )
+			_programLayers.enable( 12 );
+		if ( parameters.objectSpaceNormalMap )
+			_programLayers.enable( 13 );
+		if ( parameters.tangentSpaceNormalMap )
+			_programLayers.enable( 14 );
+		if ( parameters.clearcoat )
+			_programLayers.enable( 15 );
+		if ( parameters.clearcoatMap )
+			_programLayers.enable( 16 );
+		if ( parameters.clearcoatRoughnessMap )
+			_programLayers.enable( 17 );
+		if ( parameters.clearcoatNormalMap )
+			_programLayers.enable( 18 );
+		if ( parameters.displacementMap )
+			_programLayers.enable( 19 );
+		if ( parameters.specularMap )
+			_programLayers.enable( 20 );
+		if ( parameters.roughnessMap )
+			_programLayers.enable( 21 );
+		if ( parameters.metalnessMap )
+			_programLayers.enable( 22 );
+		if ( parameters.gradientMap )
+			_programLayers.enable( 23 );
+		if ( parameters.alphaMap )
+			_programLayers.enable( 24 );
+		if ( parameters.alphaTest )
+			_programLayers.enable( 25 );
+		if ( parameters.vertexColors )
+			_programLayers.enable( 26 );
+		if ( parameters.vertexAlphas )
+			_programLayers.enable( 27 );
+		if ( parameters.vertexUvs )
+			_programLayers.enable( 28 );
+		if ( parameters.vertexTangents )
+			_programLayers.enable( 29 );
+		if ( parameters.uvsVertexOnly )
+			_programLayers.enable( 30 );
+		if ( parameters.fog )
+			_programLayers.enable( 31 );
+
+		array.push( _programLayers.mask );
+		_programLayers.disableAll();
+
+		if ( parameters.useFog )
+			_programLayers.enable( 0 );
+		if ( parameters.flatShading )
+			_programLayers.enable( 1 );
+		if ( parameters.logarithmicDepthBuffer )
+			_programLayers.enable( 2 );
+		if ( parameters.skinning )
+			_programLayers.enable( 3 );
+		if ( parameters.useVertexTexture )
+			_programLayers.enable( 4 );
+		if ( parameters.morphTargets )
+			_programLayers.enable( 5 );
+		if ( parameters.morphNormals )
+			_programLayers.enable( 6 );
+		if ( parameters.premultipliedAlpha )
+			_programLayers.enable( 7 );
+		if ( parameters.shadowMapEnabled )
+			_programLayers.enable( 8 );
+		if ( parameters.physicallyCorrectLights )
+			_programLayers.enable( 9 );
+		if ( parameters.doubleSided )
+			_programLayers.enable( 10 );
+		if ( parameters.flipSided )
+			_programLayers.enable( 11 );
+		if ( parameters.depthPacking )
+			_programLayers.enable( 12 );
+		if ( parameters.dithering )
+			_programLayers.enable( 13 );
+		if ( parameters.specularIntensityMap )
+			_programLayers.enable( 14 );
+		if ( parameters.specularColorMap )
+			_programLayers.enable( 15 );
+		if ( parameters.transmission )
+			_programLayers.enable( 16 );
+		if ( parameters.transmissionMap )
+			_programLayers.enable( 17 );
+		if ( parameters.thicknessMap )
+			_programLayers.enable( 18 );
+		if ( parameters.sheen )
+			_programLayers.enable( 19 );
+		if ( parameters.sheenColorMap )
+			_programLayers.enable( 20 );
+		if ( parameters.sheenRoughnessMap )
+			_programLayers.enable( 21 );
+
+		array.push( _programLayers.mask );
 
 	}
 
@@ -22066,9 +22207,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getMipLevels( texture, image, supportsMips ) {
 
-		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) === true ) {
-
-			// generated mipmaps via gl.generateMipmap()
+		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) === true || ( texture.isFramebufferTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) ) {
 
 			return Math.log2( Math.max( image.width, image.height ) ) + 1;
 
@@ -22676,7 +22815,19 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-		} else if ( texture.isFramebufferTexture ) ; else {
+		} else if ( texture.isFramebufferTexture ) {
+
+			if ( useTexStorage && allocateMemory ) {
+
+				state.texStorage2D( 3553, levels, glInternalFormat, image.width, image.height );
+
+			} else {
+
+				state.texImage2D( 3553, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+
+			}
+
+		} else {
 
 			// regular Texture (image, video, canvas)
 
@@ -24357,7 +24508,12 @@ class WebXRManager extends EventDispatcher {
 
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
-						glBaseLayer.framebufferHeight
+						glBaseLayer.framebufferHeight,
+						{
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							encoding: renderer.outputEncoding
+						}
 					);
 
 				} else {
@@ -27574,21 +27730,9 @@ function WebGLRenderer( parameters = {} ) {
 		const width = Math.floor( texture.image.width * levelScale );
 		const height = Math.floor( texture.image.height * levelScale );
 
-		let glFormat = utils.convert( texture.format );
-
-		if ( capabilities.isWebGL2 ) {
-
-			// Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1120100
-			// Not needed in Chrome 93+
-
-			if ( glFormat === 6407 ) glFormat = 32849;
-			if ( glFormat === 6408 ) glFormat = 32856;
-
-		}
-
 		textures.setTexture2D( texture, 0 );
 
-		_gl.copyTexImage2D( 3553, level, glFormat, position.x, position.y, width, height, 0 );
+		_gl.copyTexSubImage2D( 3553, level, 0, 0, position.x, position.y, width, height );
 
 		state.unbindTexture();
 
