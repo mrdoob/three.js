@@ -232,7 +232,6 @@ class ArcballControls extends EventDispatcher {
 		this.domElement.addEventListener( 'pointerdown', this.onPointerDown );
 		this.domElement.addEventListener( 'pointercancel', this.onPointerCancel );
 
-		window.addEventListener( 'keydown', this.onKeyDown );
 		window.addEventListener( 'resize', this.onWindowResize );
 
 	}
@@ -767,28 +766,6 @@ class ArcballControls extends EventDispatcher {
 						break;
 
 				}
-
-			}
-
-		}
-
-	};
-
-	onKeyDown = ( event ) => {
-
-		if ( event.key == 'c' ) {
-
-			if ( event.ctrlKey || event.metaKey ) {
-
-				this.copyState();
-
-			}
-
-		} else if ( event.key == 'v' ) {
-
-			if ( event.ctrlKey || event.metaKey ) {
-
-				this.pasteState();
 
 			}
 
