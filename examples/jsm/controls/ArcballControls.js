@@ -2008,7 +2008,7 @@ class ArcballControls extends EventDispatcher {
 		_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
 		this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
 
-		_gizmoMatrixStateTemp.copy( this._gizmoMatrixState.copy() );
+		_gizmoMatrixStateTemp.copy( this._gizmoMatrixState );
 		this._gizmoMatrixState.premultiply( this._translationMatrix );
 		this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
