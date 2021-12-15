@@ -861,33 +861,31 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	// compileTarget
+	// compileAsync
 
-	this.compileTarget = function ( scene, target, callback ) {
+	this.compileAsync = function ( scene, targetScene = null ) {
 
-		// temporary camera just for the compile
-		const camera = new Camera();
+		// If no explicit targetScene was given use the scene instead
+		if ( ! targetScene ) {
 
-		currentRenderState = renderStates.get( scene, camera );
-		currentRenderState.init();
-
-		// if no explicit target was given use the full scene
-
-		if ( typeof target === 'unknown' ) {
-
-			target = scene;
+			targetScene = scene;
 
 		}
 
-		let foundTarget = scene === target;
+		currentRenderState = renderStates.get( targetScene );
+		currentRenderState.init();
+
+		renderStateStack.push( currentRenderState );
+
+		let foundScene = scene === targetScene;
 
 		// Gather lights from both the scene and the new object that will be added
 		// to the scene.
-		scene.traverse( function ( object ) {
+		targetScene.traverseVisible( function ( object ) {
 
-			if ( object === target ) {
+			if ( object === scene ) {
 
-				foundTarget = true;
+				foundScene = true;
 
 			}
 
@@ -905,12 +903,11 @@ function WebGLRenderer( parameters = {} ) {
 
 		} );
 
-		// If the target wasn't already part of the scene, add any lights it
+		// If the scene wasn't already part of the targetScene, add any lights it
 		// contains as well.
+		if ( !foundScene ) {
 
-		if ( !foundTarget ) {
-
-			target.traverse( function ( object ) {
+			scene.traverseVisible( function ( object ) {
 
 				if ( object.isLight ) {
 
@@ -928,15 +925,15 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		currentRenderState.setupLights( camera );
+		currentRenderState.setupLights( _this.physicallyCorrectLights );
 
 		const compiling = new Set();
 
-		// only initialize materials in the new object
+		// Only initialize materials in the new scene, not the targetScene.
 
-		target.traverse( function ( object ) {
+		scene.traverse( function ( object ) {
 
-			let material = object.material;
+			const material = object.material;
 
 			if ( material ) {
 
@@ -944,79 +941,78 @@ function WebGLRenderer( parameters = {} ) {
 
 					for ( let i = 0; i < material.length; i ++ ) {
 
-						let material2 = material[ i ];
+						const material2 = material[ i ];
 
-						if ( compiling.has( material2 ) === false ) {
-
-							initMaterial( material2, scene, object );
-							compiling.add( material2 );
-
-						}
-
+						getProgram( material2, targetScene, object );
+						compiling.add( material2 );
 					}
 
-				} else if ( compiling.has( material ) === false ) {
+				} else {
 
-					initMaterial( material, scene, object );
+					getProgram( material, targetScene, object );
 					compiling.add( material );
-
 				}
 
 			}
 
 		} );
 
-		if ( typeof callback === 'undefined' ) return;
+		currentRenderState = null;
 
-		// if we've been given a callback, wait for all the materials in the new
-		// object to indicate that they're ready to be used before calling it
+		// Wait for all the materials in the new object to indicate that they're
+		// ready to be used before resolving the promise.
 
-		function checkMaterialsReady() {
+		return new Promise((resolve) => {
 
-			compiling.forEach( function ( material ) {
+			function checkMaterialsReady() {
 
-				const materialProperties = properties.get( material );
-				const program = materialProperties.program;
-
-				if ( program.isReady() ) {
-
-					// remove any programs that report they're ready to use from the list
-					compiling.delete( material );
-
+				compiling.forEach( function ( material ) {
+	
+					const materialProperties = properties.get( material );
+					const program = materialProperties.currentProgram;
+	
+					if ( program.isReady() ) {
+	
+						// remove any programs that report they're ready to use from the list
+						compiling.delete( material );
+	
+					}
+	
+				} );
+	
+				// once the list of compiling materials is empty, call the callback
+	
+				if ( compiling.size === 0 ) {
+	
+					resolve( scene );
+					return;
+	
 				}
-
-			} );
-
-			// once the list of compiling materials is empty, call the callback
-
-			if ( compiling.size === 0 ) {
-
-				callback( target );
-				return;
-
+	
+				// if some materials are still not ready, wait a bit and check again
+	
+				setTimeout( checkMaterialsReady, 10 );
+	
+			}
+		
+			if ( extensions.get( 'KHR_parallel_shader_compile' ) !== null ) {
+	
+				// If we can check the compilation status of the materials without
+				// blocking then do so right away.
+	
+				checkMaterialsReady();
+	
+			} else {
+	
+				// Otherwise start by waiting a bit to give the materials we just
+				// initialized a chance to finish.
+	
+				setTimeout( checkMaterialsReady, 10 );
+	
 			}
 
-			// if some materials are still not ready, wait a bit and check again
+		});
 
-			setTimeout( checkMaterialsReady, 10 );
-
-		}
-
-		if ( extensions.get( 'KHR_parallel_shader_compile' ) !== null ) {
-
-			// if we can check the compilation status of the materials without
-			// blocking then do so right away.
-
-			checkMaterialsReady();
-
-		} else {
-
-			// otherwise start by waiting a bit to give the materials we just
-			// initialized a chance to finish.
-
-			setTimeout( checkMaterialsReady, 10 );
-
-		}
 	};
 
 	// Animation Loop

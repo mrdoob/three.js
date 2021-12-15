@@ -59,7 +59,16 @@
 
 								mixer = new THREE.AnimationMixer( gltf.scene );
 								mixer.clipAction( gltf.animations[ 0 ] ).play();
-								scene.add( gltf.scene );
+
+								// Calling compileAsync returns a promise that resolves when gltf.scene can be added
+								// to scene without unnecessary stalling on shader compiation. This helps the page
+								// stay responsive during startup.
+
+								renderer.compileAsync( gltf.scene, scene ).then( () => {
+
+									scene.add( gltf.scene );
+
+								} );
 
 							} );
 
