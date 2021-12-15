@@ -67,9 +67,9 @@ const _endEvent = { type: 'end' };
 const _raycaster = new Raycaster();
 const _offset = new Vector3();
 
-const gizmoMatrixStateTemp = new Matrix4();
-const cameraMatrixStateTemp = new Matrix4();
-const scalePointTemp = new Vector3();
+const _gizmoMatrixStateTemp = new Matrix4();
+const _cameraMatrixStateTemp = new Matrix4();
+const _scalePointTemp = new Vector3();
 /**
  *
  * @param {Camera} camera Virtual camera used in the scene
@@ -2008,11 +2008,11 @@ class ArcballControls extends EventDispatcher {
 		_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
 		this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
 
-		gizmoMatrixStateTemp.copy( this._gizmoMatrixState.copy() );
+		_gizmoMatrixStateTemp.copy( this._gizmoMatrixState.copy() );
 		this._gizmoMatrixState.premultiply( this._translationMatrix );
 		this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
-		cameraMatrixStateTemp.copy( this._cameraMatrixState );
+		_cameraMatrixStateTemp.copy( this._cameraMatrixState );
 		this._cameraMatrixState.premultiply( this._translationMatrix );
 		this._cameraMatrixState.decompose( this.camera.position, this.camera.quaternion, this.camera.scale );
 
@@ -2023,8 +2023,8 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-		this._gizmoMatrixState.copy( gizmoMatrixStateTemp );
-		this._cameraMatrixState.copy( cameraMatrixStateTemp );
+		this._gizmoMatrixState.copy( _gizmoMatrixStateTemp );
+		this._cameraMatrixState.copy( _cameraMatrixStateTemp );
 
 	};
 
@@ -2625,7 +2625,7 @@ class ArcballControls extends EventDispatcher {
 	 */
 	scale = ( size, point, scaleGizmos = true ) => {
 
-		scalePointTemp.copy( point );
+		_scalePointTemp.copy( point );
 		let sizeInverse = 1 / size;
 
 		if ( this.camera.isOrthographicCamera ) {
@@ -2660,12 +2660,12 @@ class ArcballControls extends EventDispatcher {
 
 
 			//move camera and gizmos to obtain pinch effect
-			scalePointTemp.sub( this._v3_1 );
+			_scalePointTemp.sub( this._v3_1 );
 
-			const amount = scalePointTemp.clone().multiplyScalar( sizeInverse );
-			scalePointTemp.sub( amount );
+			const amount = _scalePointTemp.clone().multiplyScalar( sizeInverse );
+			_scalePointTemp.sub( amount );
 
-			this._m4_1.makeTranslation( scalePointTemp.x, scalePointTemp.y, scalePointTemp.z );
+			this._m4_1.makeTranslation( _scalePointTemp.x, _scalePointTemp.y, _scalePointTemp.z );
 			this._m4_2.premultiply( this._m4_1 );
 
 			this.setTransformationMatrices( this._m4_1, this._m4_2 );
@@ -2677,7 +2677,7 @@ class ArcballControls extends EventDispatcher {
 			this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
 			//move camera
-			let distance = this._v3_1.distanceTo( scalePointTemp );
+			let distance = this._v3_1.distanceTo( _scalePointTemp );
 			let amount = distance - ( distance * sizeInverse );
 
 			//check min and max distance
@@ -2694,7 +2694,7 @@ class ArcballControls extends EventDispatcher {
 
 			}
 
-			_offset.copy( scalePointTemp ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
+			_offset.copy( _scalePointTemp ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
 
 			this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
@@ -2704,9 +2704,9 @@ class ArcballControls extends EventDispatcher {
 				//scale gizmos so they appear in the same spot having the same dimension
 				const pos = this._v3_2;
 
-				distance = pos.distanceTo( scalePointTemp );
+				distance = pos.distanceTo( _scalePointTemp );
 				amount = distance - ( distance * sizeInverse );
-				_offset.copy( scalePointTemp ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
+				_offset.copy( _scalePointTemp ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
 
 				this._translationMatrix.makeTranslation( pos.x, pos.y, pos.z );
 				this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
