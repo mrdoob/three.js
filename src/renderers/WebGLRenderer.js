@@ -11,8 +11,7 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter,
 	NearestFilter,
-	ClampToEdgeWrapping,
-	NoToneMapping
+	ClampToEdgeWrapping
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
