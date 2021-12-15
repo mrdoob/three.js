@@ -573,6 +573,7 @@ function WebGLRenderer( parameters = {} ) {
 		cubeuvmaps.dispose();
 		objects.dispose();
 		bindingStates.dispose();
+		programCache.dispose();
 
 		xr.dispose();
 
@@ -656,6 +657,12 @@ function WebGLRenderer( parameters = {} ) {
 				programCache.releaseProgram( program );
 
 			} );
+
+			if ( material.isShaderMaterial ) {
+
+				programCache.releaseShaderCache( material );
+
+			}
 
 		}
 
