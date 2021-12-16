@@ -1874,6 +1874,7 @@
 							"}"
 						].join( "\n" ) );
 
+						// Based off of iq's described here: https://www.iquilezles.org/www/articles/voronoilines/voronoilines.htm
 						var voronoi = new Nodes.FunctionNode( [
 							"float voronoi(vec2 p, in float time) {",
 							"	vec2 n = floor(p);",
