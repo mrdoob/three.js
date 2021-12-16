@@ -868,11 +868,11 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	// if the KHR_parallel_shader_compile extension isn't supported, flag the
 	// program as ready immediately. It may cause a stall when it's first used.
-	let programReady = !parameters.rendererExtensionParallelShaderCompile;
+	let programReady = ! parameters.rendererExtensionParallelShaderCompile;
 
 	this.isReady = function () {
 
-		if (!programReady) {
+		if ( ! programReady ) {
 
 			programReady = gl.getProgramParameter( program, COMPLETION_STATUS_KHR );
 

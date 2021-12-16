@@ -905,7 +905,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		// If the scene wasn't already part of the targetScene, add any lights it
 		// contains as well.
-		if ( !foundScene ) {
+		if ( ! foundScene ) {
 
 			scene.traverseVisible( function ( object ) {
 
@@ -945,12 +945,14 @@ function WebGLRenderer( parameters = {} ) {
 
 						getProgram( material2, targetScene, object );
 						compiling.add( material2 );
+
 					}
 
 				} else {
 
 					getProgram( material, targetScene, object );
 					compiling.add( material );
+
 				}
 
 			}
@@ -962,56 +964,56 @@ function WebGLRenderer( parameters = {} ) {
 		// Wait for all the materials in the new object to indicate that they're
 		// ready to be used before resolving the promise.
 
-		return new Promise((resolve) => {
+		return new Promise( ( resolve ) => {
 
 			function checkMaterialsReady() {
 
 				compiling.forEach( function ( material ) {
-	
+
 					const materialProperties = properties.get( material );
 					const program = materialProperties.currentProgram;
-	
+
 					if ( program.isReady() ) {
-	
+
 						// remove any programs that report they're ready to use from the list
 						compiling.delete( material );
-	
+
 					}
-	
+
 				} );
-	
+
 				// once the list of compiling materials is empty, call the callback
-	
+
 				if ( compiling.size === 0 ) {
-	
+
 					resolve( scene );
 					return;
-	
+
 				}
-	
+
 				// if some materials are still not ready, wait a bit and check again
-	
+
 				setTimeout( checkMaterialsReady, 10 );
-	
-			}
-		
-			if ( extensions.get( 'KHR_parallel_shader_compile' ) !== null ) {
-	
-				// If we can check the compilation status of the materials without
-				// blocking then do so right away.
-	
-				checkMaterialsReady();
-	
-			} else {
-	
-				// Otherwise start by waiting a bit to give the materials we just
-				// initialized a chance to finish.
-	
-				setTimeout( checkMaterialsReady, 10 );
-	
+
 			}
 
-		});
+			if ( extensions.get( 'KHR_parallel_shader_compile' ) !== null ) {
+
+				// If we can check the compilation status of the materials without
+				// blocking then do so right away.
+
+				checkMaterialsReady();
+
+			} else {
+
+				// Otherwise start by waiting a bit to give the materials we just
+				// initialized a chance to finish.
+
+				setTimeout( checkMaterialsReady, 10 );
+
+			}
+
+		} );
 
 	};
 
