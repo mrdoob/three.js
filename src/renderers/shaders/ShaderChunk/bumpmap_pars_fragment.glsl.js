@@ -5,7 +5,7 @@ export default /* glsl */`
 	uniform float bumpScale;
 
 	// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
-	// http://api.unrealengine.com/attachments/Engine/Rendering/LightingAndShadows/BumpMappingWithoutTangentSpace/mm_sfgrad_bump.pdf
+	// https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
 	// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 

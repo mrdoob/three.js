@@ -6,7 +6,7 @@
  * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
  *
  * First implemented by Simon Wallner
- * http://www.simonwallner.at/projects/atmospheric-scattering
+ * http://simonwallner.at/project/atmospheric-scattering/
  *
  * Improved by Martin Upitis
  * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR

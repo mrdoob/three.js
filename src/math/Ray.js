@@ -399,7 +399,7 @@ class Ray {
 
 		// Compute the offset origin, edges, and normal.
 
-		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
 		_edge1.subVectors( b, a );
 		_edge2.subVectors( c, a );

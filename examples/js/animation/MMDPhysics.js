@@ -1221,7 +1221,7 @@
 
 				}
 
-			} // copy from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mytest37.js?ver=20160815
+			}
 
 
 			function createCapsuleGeometry( radius, cylinderHeight, segmentsRadius, segmentsHeight ) {
