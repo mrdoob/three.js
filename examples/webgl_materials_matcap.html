@@ -62,9 +62,7 @@
 				const manager = new THREE.LoadingManager( render );
 
 				// matcap
-				const loaderEXR = new EXRLoader( manager )
-					.setDataType( THREE.UnsignedByteType ); // default: FloatType
-
+				const loaderEXR = new EXRLoader( manager );
 				const matcap = loaderEXR.load( 'textures/matcaps/040full.exr' );
 
 				// normalmap
