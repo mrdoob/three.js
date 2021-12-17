@@ -56,13 +56,17 @@ function WebGLRenderList() {
 	const transmissive = [];
 	const transparent = [];
 
+	let opaquelength = 0;
+	let transmissivelength = 0;
+	let transparentlength = 0;
+
 	function init() {
 
 		renderItemsIndex = 0;
 
-		opaque.length = 0;
-		transmissive.length = 0;
-		transparent.length = 0;
+		opaquelength = 0;
+		transmissivelength = 0;
+		transparentlength = 0;
 
 	}
 
@@ -110,15 +114,18 @@ function WebGLRenderList() {
 
 		if ( material.transmission > 0.0 ) {
 
-			transmissive.push( renderItem );
+			transmissive[ transmissivelength ] = renderItem;
+			transmissivelength ++;
 
 		} else if ( material.transparent === true ) {
 
-			transparent.push( renderItem );
+			transparent[ transparentlength ] = renderItem;
+			transparentlength ++;
 
 		} else {
 
-			opaque.push( renderItem );
+			opaque[ opaquelength ] = renderItem;
+			opaquelength ++;
 
 		}
 
@@ -131,14 +138,17 @@ function WebGLRenderList() {
 		if ( material.transmission > 0.0 ) {
 
 			transmissive.unshift( renderItem );
+			transmissivelength ++;
 
 		} else if ( material.transparent === true ) {
 
 			transparent.unshift( renderItem );
+			transparentlength ++;
 
 		} else {
 
 			opaque.unshift( renderItem );
+			opaquelength ++;
 
 		}
 
@@ -146,6 +156,9 @@ function WebGLRenderList() {
 
 	function sort( customOpaqueSort, customTransparentSort ) {
 
+		opaque.length = opaquelength;
+		transmissive.length = transmissivelength;
+		transparent.length = transparentlength;
 		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
 		if ( transmissive.length > 1 ) transmissive.sort( customTransparentSort || reversePainterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
@@ -172,11 +185,32 @@ function WebGLRenderList() {
 
 	}
 
+	function getOpaqueList() {
+
+		opaque.length = opaquelength;
+		return opaque;
+
+	}
+
+	function getTransmissiveList() {
+
+		transmissive.length = transmissivelength;
+		return transmissive;
+
+	}
+
+	function getTransparentList() {
+
+		transparent.length = transparentlength;
+		return transparent;
+
+	}
+
 	return {
 
-		opaque: opaque,
-		transmissive: transmissive,
-		transparent: transparent,
+		getOpaqueList: getOpaqueList,
+		getTransmissiveList: getTransmissiveList,
+		getTransparentList: getTransparentList,
 
 		init: init,
 		push: push,

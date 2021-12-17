@@ -1173,9 +1173,9 @@ function WebGLRenderer( parameters = {} ) {
 
 	function renderScene( currentRenderList, scene, camera, viewport ) {
 
-		const opaqueObjects = currentRenderList.opaque;
-		const transmissiveObjects = currentRenderList.transmissive;
-		const transparentObjects = currentRenderList.transparent;
+		const opaqueObjects = currentRenderList.getOpaqueList();
+		const transmissiveObjects = currentRenderList.getTransmissiveList();
+		const transparentObjects = currentRenderList.getTransparentList();
 
 		currentRenderState.setupLightsView( camera );
 
