@@ -56,13 +56,7 @@ class AsciiEffect {
 		this.domElement = domElement;
 
 
-		// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js
-
-		/*
-		* jsAscii 0.1
-		* Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
-		* MIT License [http://www.nihilogic.dk/licenses/mit-license.txt]
-		*/
+		// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
 
 		function initAsciiSize() {
 
