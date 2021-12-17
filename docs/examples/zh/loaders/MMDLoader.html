@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>MMD加载器（[name]）</h1>
+
+		<p class="desc">一个用于加载<a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a>资源的加载器。<br /><br />
+		[name]从MMD资源（例如PMD、PMX、VMD和VPD文件）中创建Three.js物体（对象）。
+		请参阅[page:MMDAnimationHelper]来了解MMD动画的处理，例如IK、Grant和Physics。<br /><br />
+
+		如果你想要MMD资源的原始内容，请使用.loadPMD/PMX/VMD/VPD方法。
+
+		<h2>代码示例</h2>
+
+		<code>
+		// Instantiate a loader
+		const loader = new MMDLoader();
+
+		// Load a MMD model
+		loader.load(
+			// path to PMD/PMX file
+			'models/mmd/miku.pmd',
+			// called when the resource is loaded
+			function ( mesh ) {
+
+				scene.add( mesh );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		<h2>例子</h2>
+		<p>
+		[example:webgl_loader_mmd]<br />
+		[example:webgl_loader_mmd_pose]<br />
+		[example:webgl_loader_mmd_audio]
+		</p>
+
+ 		<h2>构造函数</h2>
+
+ 		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]（加载管理器），默认值是[page:LoadingManager THREE.DefaultLoadingManager]。
+		</p>
+		<p>
+		创建一个新的[name]。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 一个包含有<em>.pmd</em>或<em>.pmx</em>文件的路径或URL的字符串。<br />
+		[page:Function onLoad] — 当加载过程成功完成以后将被调用的函数。<br />
+		[page:Function onProgress] — （可选）加载过程正在进行的时候被调用的函数。其参数是一个XMLHttpRequest实例，其包含了[page:Integer total] bytes（总的字节数）和[page:Integer loaded] bytes（已经载入的字节数）。<br />
+		[page:Function onError] — （可选） 加载过程中若发生了错误将被调用的函数。这一函数接收错误作为参数。<br />
+		</p>
+		<p>
+		开始从URL中加载PMD/PMX模型文件，并使用包含有已被解析的[page:SkinnedMesh]和[page:MeshToonMaterial]数组的[page:BufferGeometry]对象来触发回调函数。
+		</p>
+
+		<h3>[method:undefined loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 一个包含有<em>.vmd</em>文件的路径或URL的字符串或字符串数组。如果两个及以上文件被指定，它们将会合并。<br />
+		[page:Object3D object] — [page:SkinnedMesh] 或 [page:Camera]。 剪辑及其轨道将会适应到该对象。<br />
+		[page:Function onLoad] — 成功加载完成后被调用的函数。<br />
+		[page:Function onProgress] — （可选）当加载正在进行时被调用的函数，参数将是XMLHttpRequest实例，其包含了 .[page:Integer total] （总的）和 .[page:Integer loaded] （已加载的）字节数。<br />
+		[page:Function onError] — （可选）如果加载过程中发生错误时被调用的函数，该函数接受一个错误来作为参数。<br />
+		</p>
+		<p>
+		开始从url(s)加载VMD动画文件（可能有多个文件），并使用已解析的[page:AnimatioinClip]触发回调函数。
+		</p>
+
+		<h3>[method:undefined loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String modelUrl] — 一个包含有<em>.pmd</em>或<em>.pmx</em>文件的路径或URL的字符串。<br />
+		[page:String vmdUrl] — 一个包含有<em>.vmd</em>文件的路径或URL的字符串或字符串数组。<br />
+		[page:Function onLoad] — 成功加载完成后被调用的函数。<br />
+		[page:Function onProgress] — （可选）当加载正在进行时被调用的函数，参数将是XMLHttpRequest实例，其包含了 .[page:Integer total] （总的）和 .[page:Integer loaded] （已加载的）字节数。<br />
+		[page:Function onError] — （可选）如果加载过程中发生错误时被调用的函数，该函数接受一个错误来作为参数。<br />
+		</p>
+		<p>
+		开始从URL中加载PMD/PMX模型文件和VMD动画文件（可能有多个文件），并使用一个[page:Object] —— 包含有已解析的[page:SkinnedMesh]和适应[page:SkinnedMesh]的[page:AnimationClip]，来触发回调函数。
+		</p>
+
+		<h3>[method:this setAnimationPath]( [param:String animationPath] )</h3>
+		<p>
+		[page:String animationPath] — 用于加载动画数据（VMD/VPD 文件）的基础路径。 Base path for loading animation data (VMD/VPD files).
+		</p>
+		<p>
+		设置额外资源（例如贴图）的基础路径。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/MMDLoader.js examples/jsm/loaders/MMDLoader.js]
+		</p>
+	</body>
+</html>

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -11,8 +10,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Object for keeping track of time. This uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">performance.now()</a>
-		if it is available, otherwise it reverts to the less accurate <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now">Date.now()</a>.
+		Object for keeping track of time. This uses [link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now]
+		if it is available, otherwise it reverts to the less accurate [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now Date.now].
 		</p>
 
 
@@ -56,13 +55,13 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null start]()</h3>
+		<h3>[method:undefined start]()</h3>
 		<p>
 		Starts clock. Also sets the [page:Clock.startTime startTime] and [page:Clock.oldTime oldTime]
 		to the current time, sets [page:Clock.elapsedTime elapsedTime] to *0* and [page:Clock.running running] to *true*.
 		</p>
 
-		<h3>[method:null stop]()</h3>
+		<h3>[method:undefined stop]()</h3>
 		<p>
 		Stops clock and sets [page:Clock.oldTime oldTime] to the current time.
 		</p>
@@ -82,6 +81,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

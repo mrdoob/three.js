@@ -1,34 +1,35 @@
-/**
- * @author Artur Trzesiok
- */
-
 import { Texture } from './Texture.js';
-import { NearestFilter } from '../constants.js';
+import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
-function DataTexture3D( data, width, height, depth ) {
+class DataTexture3D extends Texture {
 
-	// We're going to add .setXXX() methods for setting properties later.
-	// Users can still set in DataTexture3D directly.
-	//
-	//	var texture = new THREE.DataTexture3D( data, width, height, depth );
-	// 	texture.anisotropy = 16;
-	//
-	// See #14839
+	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
-	Texture.call( this, null );
+		// We're going to add .setXXX() methods for setting properties later.
+		// Users can still set in DataTexture3D directly.
+		//
+		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
+		// 	texture.anisotropy = 16;
+		//
+		// See #14839
 
-	this.image = { data: data, width: width, height: height, depth: depth };
+		super( null );
 
-	this.magFilter = NearestFilter;
-	this.minFilter = NearestFilter;
+		this.image = { data, width, height, depth };
 
-	this.generateMipmaps = false;
-	this.flipY = false;
+		this.magFilter = NearestFilter;
+		this.minFilter = NearestFilter;
+
+		this.wrapR = ClampToEdgeWrapping;
+
+		this.generateMipmaps = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
+
+	}
 
 }
 
-DataTexture3D.prototype = Object.create( Texture.prototype );
-DataTexture3D.prototype.constructor = DataTexture3D;
 DataTexture3D.prototype.isDataTexture3D = true;
 
 export { DataTexture3D };

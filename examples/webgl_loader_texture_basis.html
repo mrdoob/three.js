@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - basis texture loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - basis texture loader<br />
+			<a href="https://github.com/binomialLLC/basis_universal" target="_blank">Basis Universal GPU Texture Codec</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { BasisTextureLoader } from './jsm/loaders/BasisTextureLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			let camera, scene, renderer;
+			let mesh;
+
+			init();
+			render();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, 1 );
+				camera.lookAt( scene.position );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+
+				const geometry = flipY( new THREE.PlaneBufferGeometry() );
+				const material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } );
+
+				mesh = new THREE.Mesh( geometry, material );
+
+				scene.add( mesh );
+
+				const loader = new BasisTextureLoader();
+				loader.setTranscoderPath( 'js/libs/basis/' );
+				loader.detectSupport( renderer );
+				loader.load( 'textures/compressed/canestra_di_frutta_caravaggio.basis', function ( texture ) {
+
+					texture.encoding = THREE.sRGBEncoding;
+					material.map = texture;
+					material.needsUpdate = true;
+
+					render();
+
+				}, undefined, function ( error ) {
+
+					console.error( error );
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			/** Correct UVs to be compatible with `flipY=false` textures. */
+			function flipY( geometry ) {
+
+				const uv = geometry.attributes.uv;
+
+				for ( let i = 0; i < uv.count; i ++ ) {
+
+					uv.setY( i, 1 - uv.getY( i ) );
+
+				}
+
+				return geometry;
+
+			}
+
+		</script>
+
+	</body>
+</html>

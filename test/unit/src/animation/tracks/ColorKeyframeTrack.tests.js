@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { ColorKeyframeTrack } from '../../../../../src/animation/tracks/ColorKeyframeTrack';

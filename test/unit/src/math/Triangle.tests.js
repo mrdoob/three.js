@@ -1,9 +1,6 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
+import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { Triangle } from '../../../../src/math/Triangle';
 import { Box3 } from '../../../../src/math/Box3';
 import { Plane } from '../../../../src/math/Plane';
@@ -70,6 +67,18 @@ export default QUnit.module( 'Maths', () => {
 
 			var points = [ one3, one3.clone().negate(), two3 ];
 			a.setFromPointsAndIndices( points, 1, 0, 2 );
+			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
+			assert.ok( a.b.equals( one3 ), "Passed!" );
+			assert.ok( a.c.equals( two3 ), "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromAttributeAndIndices", ( assert ) => {
+
+			var a = new Triangle();
+			var attribute = new BufferAttribute( new Float32Array( [ 1, 1, 1, - 1, - 1, - 1, 2, 2, 2 ] ), 3 );
+
+			a.setFromAttributeAndIndices( attribute, 1, 0, 2 );
 			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
 			assert.ok( a.b.equals( one3 ), "Passed!" );
 			assert.ok( a.c.equals( two3 ), "Passed!" );
@@ -302,6 +311,21 @@ export default QUnit.module( 'Maths', () => {
 
 			a.closestPointToPoint( new Vector3( 0, - 2, 0 ), point );
 			assert.ok( point.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+
+		} );
+
+		QUnit.test( "isFrontFacing", ( assert ) => {
+
+			var a = new Triangle();
+			var dir = new Vector3();
+			assert.ok( ! a.isFrontFacing( dir ), "Passed!" );
+
+			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
+			var dir = new Vector3( 0, 0, - 1 );
+			assert.ok( a.isFrontFacing( dir ), "Passed!" );
+
+			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 1, 0, 0 ) );
+			assert.ok( ! a.isFrontFacing( dir ), "Passed!" );
 
 		} );
 

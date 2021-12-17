@@ -1,43 +1,37 @@
-/**
- * @author thespite / http://clicktorelease.com/
- */
-
 import { Cache } from './Cache.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
+class ImageBitmapLoader extends Loader {
 
-function ImageBitmapLoader( manager ) {
+	constructor( manager ) {
 
-	if ( typeof createImageBitmap === 'undefined' ) {
+		super( manager );
 
-		console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+		if ( typeof createImageBitmap === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+
+		}
+
+		if ( typeof fetch === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
+
+		}
+
+		this.options = { premultiplyAlpha: 'none' };
 
 	}
 
-	if ( typeof fetch === 'undefined' ) {
-
-		console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
-
-	}
-
-	this.manager = manager !== undefined ? manager : DefaultLoadingManager;
-	this.options = undefined;
-
-}
-
-ImageBitmapLoader.prototype = {
-
-	constructor: ImageBitmapLoader,
-
-	setOptions: function setOptions( options ) {
+	setOptions( options ) {
 
 		this.options = options;
 
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
@@ -45,9 +39,9 @@ ImageBitmapLoader.prototype = {
 
 		url = this.manager.resolveURL( url );
 
-		var scope = this;
+		const scope = this;
 
-		var cached = Cache.get( url );
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -65,13 +59,17 @@ ImageBitmapLoader.prototype = {
 
 		}
 
-		fetch( url ).then( function ( res ) {
+		const fetchOptions = {};
+		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
+		fetchOptions.headers = this.requestHeader;
+
+		fetch( url, fetchOptions ).then( function ( res ) {
 
 			return res.blob();
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, scope.options );
+			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 
@@ -90,21 +88,12 @@ ImageBitmapLoader.prototype = {
 
 		} );
 
-	},
-
-	setCrossOrigin: function ( /* value */ ) {
-
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
+		scope.manager.itemStart( url );
 
 	}
 
-};
+}
+
+ImageBitmapLoader.prototype.isImageBitmapLoader = true;
 
 export { ImageBitmapLoader };

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>变换控制器（[name]）</h1>
+
+		<p class="desc">
+			该类可提供一种类似于在数字内容创建工具（例如Blender）中对模型进行交互的方式，来在3D空间中变换物体。
+			和其他控制器不同的是，变换控制器不倾向于对场景摄像机的变换进行改变。<br /><br />
+
+			[name] 期望其所附加的3D对象是场景图的一部分。
+		</p>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_transform misc / controls / transform ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera camera]: 被控制的摄像机。
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+			</p>
+			<p>
+				创建一个新的 [name] 实例。
+			</p>
+		</p>
+
+		<h2>事件</h2>
+
+		<h3>change</h3>
+		<p>
+			如果发生了任何类型的改变（对象或属性的改变）则触发该事件。
+			属性改变是单独的事件，你也可以为此添加单独的事件监听；该事件类型为"propertyname-changed"（“属性名称-changed”）。
+		</p>
+
+		<h3>mouseDown</h3>
+		<p>
+			如果指针（鼠标/触摸）为活动状态则触发该事件。
+		</p>
+
+		<h3>mouseUp</h3>
+		<p>
+			如果指针（鼠标/触摸）不再为活动状态则触发该事件。
+		</p>
+
+		<h3>objectChange</h3>
+		<p>
+			如果被控制的3D对象发生改变则触发该事件。
+		</p>
+
+		<h2>属性</h2>
+
+		<p>共有属性请参见其基类[page:Object3D]。</p>
+
+		<h3>[property:String axis]</h3>
+		<p>
+			当前变换轴。
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+			渲染场景的摄像机。
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
+		</p>
+
+		<h3>[property:Boolean dragging]</h3>
+		<p>
+			当前是否正在拖动。只读属性。
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			是否启用控制器。默认为*true*。
+		</p>
+
+		<h3>[property:String mode]</h3>
+		<p>
+			当前的变换模式。可能的值包括"translate"、"rotate" 和 "scale"。默认为*translate*。
+		</p>
+
+		<h3>[property:Object3D object]</h3>
+		<p>
+			正在被控制的3D对象。
+		</p>
+
+		<h3>[property:Number rotationSnap]</h3>
+		<p>
+			默认情况下，3D对象是可以被连续旋转的。如果你将该值设为一个数值（弧度），则你将可以定义每次旋转3D对象时的步幅。
+			默认为*null*。
+		</p>
+
+		<h3>[property:Boolean showX]</h3>
+		<p>
+			x轴手柄是否显示。默认为*true*。
+		</p>
+
+		<h3>[property:Boolean showY]</h3>
+		<p>
+			y轴手柄是否显示。默认为*true*。
+		</p>
+
+		<h3>[property:Boolean showZ]</h3>
+		<p>
+			z轴手柄是否显示。默认为*true*。
+		</p>
+
+		<h3>[property:Number size]</h3>
+		<p>
+			手柄UI（轴/平面）的大小。默认为*1*。
+		</p>
+
+		<h3>[property:String space]</h3>
+		<p>
+			定义了在哪种坐标空间中进行变换。可能的值有"world" 和 "local"。默认为*world*。
+		</p>
+
+		<h3>[property:Number translationSnap]</h3>
+		<p>
+			默认情况下，3D对象是可以被连续平移的。如果你将该值设为一个数值（世界单位），则你将可以定义每次平移3D对象时的步幅。
+			默认为*null*。
+		</p>
+
+		<h2>方法</h2>
+
+		<p>共有方法请参见其基类[page:Object3D]。</p>
+
+		<h3>[method:TransformControls attach] ( [param:Object3D object] )</h3>
+		<p>
+			<p>
+				[page:Object3D object]: 应当变换的3D对象。
+			</p>
+			<p>
+				设置应当变换的3D对象，并确保控制器UI是可见的。
+			</p>
+		</p>
+
+		<h3>[method:TransformControls detach] ()</h3>
+		<p>
+			从控制器中移除当前3D对象，并确保控制器UI是不可见的。
+		</p>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			若不再需要该控制器，则应当调用此函数。
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			返回用于用户交互的 [page:Raycaster] 对象。 此对象在所有实例之间共享 变换控件。 如果您设置 [name] 的
+			[page:Object3D.layers .layers] 属性，您还需要 使用匹配值设置 [page:Raycaster] 上的
+			[page:Raycaster.layers .layers] 属性，否则设置 [name] 不会按预期工作。
+		</p>
+
+		<h3>[method:String getMode] ()</h3>
+		<p>
+			返回变换模式。
+		</p>
+
+		<h3>[method:undefined setMode] ( [param:String mode] )</h3>
+		<p>
+			<p>
+				[page:String mode]: 变换模式。
+			</p>
+			<p>
+				设置变换模式。
+			</p>
+		</p>
+
+		<h3>[method:undefined setRotationSnap] ( [param:Number rotationSnap] )</h3>
+		<p>
+			<p>
+				[page:Number rotationSnap]: 旋转捕捉步幅。
+			</p>
+			<p>
+				设置旋转捕捉。
+			</p>
+		</p>
+
+		<h3>[method:undefined setSize] ( [param:Number size] )</h3>
+		<p>
+			<p>
+				[page:Number size]: 手柄UI的大小。
+			</p>
+			<p>
+				设置手柄UI的大小。
+			</p>
+		</p>
+
+		<h3>[method:undefined setSpace] ( [param:String space] )</h3>
+		<p>
+			<p>
+				[page:String space]: 应用变换的坐标空间。
+			</p>
+			<p>
+				设置应用变换的坐标空间。
+			</p>
+		</p>
+
+		<h3>[method:undefined setTranslationSnap] ( [param:Number translationSnap] )</h3>
+		<p>
+			<p>
+				[page:Number translationSnap]: 平移捕捉步幅。
+			</p>
+			<p>
+				设置平移捕捉。
+			</p>
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/TransformControls.js examples/jsm/controls/TransformControls.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Creates an array of textures directly from raw data, width and height and depth. This type of texture can only be used with a WebGL 2 rendering context.</p>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( data, width, height, depth )</h3>
+		<p>
+			The data argument must be an [link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView].
+			The properties inherited from [page:Texture] are the default, except magFilter and minFilter default to THREE.NearestFilter. The properties flipY and generateMipmaps are initially set to false.
+		</p>
+		<p>
+			The interpretation of the data depends on type and format:
+			If the type is THREE.UnsignedByteType, a Uint8Array will be useful for addressing the texel data.
+			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity). Similarly, THREE.RGBFormat specifies a format where only three values are used for each texel.<br />
+
+			For the packed types, THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type or THREE.UnsignedShort565Type, all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
+
+			In order to use the types THREE.FloatType and THREE.HalfFloatType, the WebGL implementation must support the respective extensions OES_texture_float and OES_texture_half_float. In order to use THREE.LinearFilter for component-wise, bilinear interpolation of the texels based on these types, the WebGL extensions OES_texture_float_linear or OES_texture_half_float_linear must also be present.
+		</p>
+
+		<h2>代码示例</h2>
+
+		<p>This creates a [name] where each texture has a different color.</p>
+
+		<code>
+		// create a buffer with color data
+
+		const width = 512;
+		const height = 512;
+		const depth = 100;
+
+		const size = width * height;
+		const data = new Uint8Array( 3 * size * depth );
+
+		for ( let i = 0; i < depth; i ++ ) {
+
+			const color = new THREE.Color( Math.random(), Math.random(), Math.random() );
+			const r = Math.floor( color.r * 255 );
+			const g = Math.floor( color.g * 255 );
+			const b = Math.floor( color.b * 255 );
+
+			for ( let j = 0; j < size; j ++ ) {
+
+				const stride = ( i * size + j ) * 3;
+
+				data[ stride ] = r;
+				data[ stride + 1 ] = g;
+				data[ stride + 2 ] = b;
+
+			}
+		}
+
+		// used the buffer to create a [name]
+
+		const texture = new THREE.DataTexture2DArray( data, width, height, depth );
+		texture.format = THREE.RGBFormat;
+		texture.needsUpdate = true;
+		</code>
+
+		<p>
+			[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]
+		</p>
+
+		<h2>Properties</h2>
+
+		<p>
+		See the base [page:Texture Texture] class for common properties.
+		</p>
+
+		<h3>[property:Image image]</h3>
+		<p>
+		Overridden with a record type holding data, width and height and depth.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>
+		See the base [page:Texture Texture] class for common methods.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

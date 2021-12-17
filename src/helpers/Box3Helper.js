@@ -1,55 +1,49 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Object3D } from '../core/Object3D.js';
 
-function Box3Helper( box, hex ) {
+class Box3Helper extends LineSegments {
 
-	this.type = 'Box3Helper';
+	constructor( box, color = 0xffff00 ) {
 
-	this.box = box;
+		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 
-	var color = ( hex !== undefined ) ? hex : 0xffff00;
+		const positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 1, - 1, 1, - 1, - 1 ];
 
-	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+		const geometry = new BufferGeometry();
 
-	var positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 1, - 1, 1, - 1, - 1 ];
+		geometry.setIndex( new BufferAttribute( indices, 1 ) );
 
-	var geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-	geometry.setIndex( new BufferAttribute( indices, 1 ) );
+		super( geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+		this.box = box;
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
+		this.type = 'Box3Helper';
 
-	this.geometry.computeBoundingSphere();
+		this.geometry.computeBoundingSphere();
+
+	}
+
+	updateMatrixWorld( force ) {
+
+		const box = this.box;
+
+		if ( box.isEmpty() ) return;
+
+		box.getCenter( this.position );
+
+		box.getSize( this.scale );
+
+		this.scale.multiplyScalar( 0.5 );
+
+		super.updateMatrixWorld( force );
+
+	}
 
 }
-
-Box3Helper.prototype = Object.create( LineSegments.prototype );
-Box3Helper.prototype.constructor = Box3Helper;
-
-Box3Helper.prototype.updateMatrixWorld = function ( force ) {
-
-	var box = this.box;
-
-	if ( box.isEmpty() ) return;
-
-	box.getCenter( this.position );
-
-	box.getSize( this.scale );
-
-	this.scale.multiplyScalar( 0.5 );
-
-	Object3D.prototype.updateMatrixWorld.call( this, force );
-
-};
 
 export { Box3Helper };

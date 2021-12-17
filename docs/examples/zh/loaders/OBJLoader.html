@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>OBJ加载器（[name]）</h1>
+
+		<p class="desc">用于加载 <em>.obj</em> 资源的加载器。<br />
+		<a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ 文件格式</a>是一种简单的数据格式，
+		这种格式以人类可读的形式来表示3D几何体，即每个顶点的位置、每个纹理坐标顶点的UV位置、顶点法线、
+		将使每个多边形定义为顶点列表的面以及纹理顶点。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// instantiate a loader
+		const loader = new OBJLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'models/monster.obj',
+			// called when resource is loaded
+			function ( object ) {
+
+				scene.add( object );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_loader_obj]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]（加载管理器），默认值是[page:LoadingManager THREE.DefaultLoadingManager]。
+		</p>
+		<p>
+		创建一个新的[name]。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 一个包含有<em>.obj</em>文件的路径或URL的字符串。<br />
+		[page:Function onLoad] — 当加载过程成功完成以后将被调用的函数。<br />
+		[page:Function onProgress] — （可选）加载过程正在进行的时候被调用的函数。其参数是一个XMLHttpRequest实例，其包含了[page:Integer total] bytes（总的字节数）和[page:Integer loaded] bytes（已经载入的字节数）。<br />
+		[page:Function onError] — （可选） 加载过程中若发生了错误将被调用的函数。这一函数接收错误作为参数。<br />
+		</p>
+		<p>
+		开始从URL中加载，并使用包含有已被解析响应内容来调用onLoad。
+		</p>
+
+		<h3>[method:Object3D parse]( [param:String text] )</h3>
+		<p>
+		[page:String text] — 要解析的表示 <em>obj</em> 结构的文本。
+		</p>
+		<p>
+		返回一个[page:Object3D]。它包含了解析过后的网格（解析为[page:Mesh]）以及线条（解析为[page:LineSegments]）。<br />
+		所有的几何体被创建为[page:BufferGeometry]，默认材质被创建为[page:MeshPhongMaterial]。<br />
+		如果<em>obj</em>物体或组在声明面时使用了多个材质，则使用几何体组和材质数组。
+		</p>
+
+		<h3>[method:this setMaterials]( [param:MTLLoader.MaterialCreator materials] )</h3>
+		<p>
+		[page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator materials] - 一个 MaterialCreator 实例。
+		</p>
+		<p>
+		设置由 MTLLoader 载入的材质，或是其它由 [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] 提供的材质。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/OBJLoader.js examples/jsm/loaders/OBJLoader.js]
+		</p>
+	</body>
+</html>

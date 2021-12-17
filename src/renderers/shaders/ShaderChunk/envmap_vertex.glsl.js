@@ -1,13 +1,23 @@
 export default /* glsl */`
 #ifdef USE_ENVMAP
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )
+	#ifdef ENV_WORLDPOS
 
 		vWorldPosition = worldPosition.xyz;
 
 	#else
 
-		vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );
+		vec3 cameraToVertex;
+
+		if ( isOrthographic ) {
+
+			cameraToVertex = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );
+
+		} else {
+
+			cameraToVertex = normalize( worldPosition.xyz - cameraPosition );
+
+		}
 
 		vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
 

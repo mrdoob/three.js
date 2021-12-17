@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils';

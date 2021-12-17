@@ -1,15 +1,11 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { WebGLLights } from './WebGLLights.js';
 
-function WebGLRenderState() {
+function WebGLRenderState( extensions, capabilities ) {
 
-	var lights = new WebGLLights();
+	const lights = new WebGLLights( extensions, capabilities );
 
-	var lightsArray = [];
-	var shadowsArray = [];
+	const lightsArray = [];
+	const shadowsArray = [];
 
 	function init() {
 
@@ -30,13 +26,19 @@ function WebGLRenderState() {
 
 	}
 
-	function setupLights( camera ) {
+	function setupLights( physicallyCorrectLights ) {
 
-		lights.setup( lightsArray, shadowsArray, camera );
+		lights.setup( lightsArray, physicallyCorrectLights );
 
 	}
 
-	var state = {
+	function setupLightsView( camera ) {
+
+		lights.setupView( lightsArray, camera );
+
+	}
+
+	const state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
 
@@ -47,6 +49,7 @@ function WebGLRenderState() {
 		init: init,
 		state: state,
 		setupLights: setupLights,
+		setupLightsView: setupLightsView,
 
 		pushLight: pushLight,
 		pushShadow: pushShadow
@@ -54,30 +57,29 @@ function WebGLRenderState() {
 
 }
 
-function WebGLRenderStates() {
+function WebGLRenderStates( extensions, capabilities ) {
 
-	var renderStates = {};
+	let renderStates = new WeakMap();
 
-	function get( scene, camera ) {
+	function get( scene, renderCallDepth = 0 ) {
 
-		var renderState;
+		let renderState;
 
-		if ( renderStates[ scene.id ] === undefined ) {
+		if ( renderStates.has( scene ) === false ) {
 
-			renderState = new WebGLRenderState();
-			renderStates[ scene.id ] = {};
-			renderStates[ scene.id ][ camera.id ] = renderState;
+			renderState = new WebGLRenderState( extensions, capabilities );
+			renderStates.set( scene, [ renderState ] );
 
 		} else {
 
-			if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+			if ( renderCallDepth >= renderStates.get( scene ).length ) {
 
-				renderState = new WebGLRenderState();
-				renderStates[ scene.id ][ camera.id ] = renderState;
+				renderState = new WebGLRenderState( extensions, capabilities );
+				renderStates.get( scene ).push( renderState );
 
 			} else {
 
-				renderState = renderStates[ scene.id ][ camera.id ];
+				renderState = renderStates.get( scene )[ renderCallDepth ];
 
 			}
 
@@ -89,7 +91,7 @@ function WebGLRenderStates() {
 
 	function dispose() {
 
-		renderStates = {};
+		renderStates = new WeakMap();
 
 	}
 

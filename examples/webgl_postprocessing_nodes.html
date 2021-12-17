@@ -4,56 +4,35 @@
 		<title>three.js webgl - postprocessing with nodes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Post-Processing
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Post-Processing
 		</div>
-
-		<script src="../build/three.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script type="module">
 
-			import './js/nodes/THREE.Nodes.js';
-			import './js/loaders/NodeMaterialLoader.js';
+			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var object, light, nodepost;
-			var gui;
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import * as Nodes from './jsm/nodes/Nodes.js';
 
-			var clock = new THREE.Clock();
-			var frame = new THREE.NodeFrame();
+			let camera, scene, renderer;
+			let object, light, nodepost;
+			let gui;
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'color-adjustment' };
+			const clock = new THREE.Clock();
+			const frame = new Nodes.NodeFrame();
 
-			var textureLoader = new THREE.TextureLoader();
+			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'color-adjustment' };
 
-			var lensflare2 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
+			const textureLoader = new THREE.TextureLoader();
+
+			const lensflare2 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
 			lensflare2.wrapS = lensflare2.wrapT = THREE.RepeatWrapping;
 
-			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
+			const decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 			decalNormal.wrapS = decalNormal.wrapT = THREE.RepeatWrapping;
 
 			init();
@@ -63,7 +42,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( param, 'example', {
 					'basic / color-adjustment': 'color-adjustment',
@@ -87,7 +66,7 @@
 
 			function addGui( name, value, callback, isColor, min, max ) {
 
-				var node;
+				let node;
 
 				param[ name ] = value;
 
@@ -125,7 +104,9 @@
 
 			function updateMaterial() {
 
-				var name = param.example;
+				const name = param.example;
+
+				let screen, fade, scale, size;
 
 				clearGui();
 
@@ -135,19 +116,19 @@
 
 						// POST
 
-						var screen = new THREE.ScreenNode();
+						screen = new Nodes.ScreenNode();
 
-						var hue = new THREE.FloatNode();
-						var sataturation = new THREE.FloatNode( 1 );
-						var vibrance = new THREE.FloatNode();
-						var brightness = new THREE.FloatNode( 0 );
-						var contrast = new THREE.FloatNode( 1 );
+						const hue = new Nodes.FloatNode();
+						const sataturation = new Nodes.FloatNode( 1 );
+						const vibrance = new Nodes.FloatNode();
+						const brightness = new Nodes.FloatNode( 0 );
+						const contrast = new Nodes.FloatNode( 1 );
 
-						var hueNode = new THREE.ColorAdjustmentNode( screen, hue, THREE.ColorAdjustmentNode.HUE );
-						var satNode = new THREE.ColorAdjustmentNode( hueNode, sataturation, THREE.ColorAdjustmentNode.SATURATION );
-						var vibranceNode = new THREE.ColorAdjustmentNode( satNode, vibrance, THREE.ColorAdjustmentNode.VIBRANCE );
-						var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
-						var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
+						const hueNode = new Nodes.ColorAdjustmentNode( screen, hue, Nodes.ColorAdjustmentNode.HUE );
+						const satNode = new Nodes.ColorAdjustmentNode( hueNode, sataturation, Nodes.ColorAdjustmentNode.SATURATION );
+						const vibranceNode = new Nodes.ColorAdjustmentNode( satNode, vibrance, Nodes.ColorAdjustmentNode.VIBRANCE );
+						const brightnessNode = new Nodes.ColorAdjustmentNode( vibranceNode, brightness, Nodes.ColorAdjustmentNode.BRIGHTNESS );
+						const contrastNode = new Nodes.ColorAdjustmentNode( brightnessNode, contrast, Nodes.ColorAdjustmentNode.CONTRAST );
 
 						nodepost.output = contrastNode;
 
@@ -189,14 +170,14 @@
 
 						// POST
 
-						var color = new THREE.ColorNode( 0xFFFFFF );
-						var percent = new THREE.FloatNode( .5 );
+						const color = new Nodes.ColorNode( 0xFFFFFF );
+						const percent = new Nodes.FloatNode( .5 );
 
-						var fade = new THREE.Math3Node(
-							new THREE.ScreenNode(),
+						fade = new Nodes.MathNode(
+							new Nodes.ScreenNode(),
 							color,
 							percent,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
 						nodepost.output = fade;
@@ -221,16 +202,16 @@
 
 						// POST
 
-						var alpha = new THREE.FloatNode( 1 );
+						const alpha = new Nodes.FloatNode( 1 );
 
-						var screen = new THREE.ScreenNode();
-						var inverted = new THREE.Math1Node( screen, THREE.Math1Node.INVERT );
+						screen = new Nodes.ScreenNode();
+						const inverted = new Nodes.MathNode( screen, Nodes.MathNode.INVERT );
 
-						var fade = new THREE.Math3Node(
+						fade = new Nodes.MathNode(
 							screen,
 							inverted,
 							alpha,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
 						nodepost.output = fade;
@@ -249,10 +230,10 @@
 
 						// POST
 
-						var multiply = new THREE.OperatorNode(
-							new THREE.ScreenNode(),
-							new THREE.TextureNode( lensflare2 ),
-							THREE.OperatorNode.ADD
+						const multiply = new Nodes.OperatorNode(
+							new Nodes.ScreenNode(),
+							new Nodes.TextureNode( lensflare2 ),
+							Nodes.OperatorNode.ADD
 						);
 
 						nodepost.output = multiply;
@@ -260,10 +241,10 @@
 						// GUI
 
 						addGui( 'blend', {
-							'addition': THREE.OperatorNode.ADD,
-							'subtract': THREE.OperatorNode.SUB,
-							'multiply': THREE.OperatorNode.MUL,
-							'division': THREE.OperatorNode.DIV
+							'addition': Nodes.OperatorNode.ADD,
+							'subtract': Nodes.OperatorNode.SUB,
+							'multiply': Nodes.OperatorNode.MUL,
+							'division': Nodes.OperatorNode.DIV
 						}, function ( val ) {
 
 							multiply.op = val;
@@ -278,18 +259,18 @@
 
 						// PASS
 
-						var screen = new THREE.ScreenNode();
-						var sat = new THREE.FloatNode( 0 );
+						screen = new Nodes.ScreenNode();
+						const sat = new Nodes.FloatNode( 0 );
 
-						var satrgb = new THREE.FunctionNode( [
+						const satrgb = new Nodes.FunctionNode( [
 							"vec3 satrgb( vec3 rgb, float adjustment ) {",
 							// include luminance function from LuminanceNode
 							"	vec3 intensity = vec3( luminance( rgb ) );",
 							"	return mix( intensity, rgb, adjustment );",
 							"}"
-						].join( "\n" ), [ THREE.LuminanceNode.Nodes.luminance ] );
+						].join( "\n" ), [ Nodes.LuminanceNode.Nodes.luminance ] );
 
-						var saturation = new THREE.FunctionCallNode( satrgb );
+						const saturation = new Nodes.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = screen;
 						saturation.inputs.adjustment = sat;
 
@@ -309,41 +290,41 @@
 
 						// POST
 
-						var normal = new THREE.TextureNode( decalNormal );
-						var normalXY = new THREE.SwitchNode( normal, 'xy' );
-						var scale = new THREE.FloatNode( .5 );
+						const normal = new Nodes.TextureNode( decalNormal );
+						const normalXY = new Nodes.SwitchNode( normal, 'xy' );
+						scale = new Nodes.FloatNode( .5 );
 
-						var normalXYFlip = new THREE.Math1Node(
+						const normalXYFlip = new Nodes.MathNode(
 							normalXY,
-							THREE.Math1Node.INVERT
+							Nodes.MathNode.INVERT
 						);
 
-						var offsetNormal = new THREE.OperatorNode(
+						const offsetNormal = new Nodes.OperatorNode(
 							normalXYFlip,
-							new THREE.FloatNode( .5 ),
-							THREE.OperatorNode.ADD
+							new Nodes.FloatNode( .5 ),
+							Nodes.OperatorNode.ADD
 						);
 
-						var scaleTexture = new THREE.OperatorNode(
-							new THREE.SwitchNode( normal, 'z' ),
+						const scaleTexture = new Nodes.OperatorNode(
+							new Nodes.SwitchNode( normal, 'z' ),
 							offsetNormal,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var scaleNormal = new THREE.Math3Node(
-							new THREE.FloatNode( 1 ),
+						const scaleNormal = new Nodes.MathNode(
+							new Nodes.FloatNode( 1 ),
 							scaleTexture,
 							scale,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						var offsetCoord = new THREE.OperatorNode(
-							new THREE.UVNode(),
+						const offsetCoord = new Nodes.OperatorNode(
+							new Nodes.UVNode(),
 							scaleNormal,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var screen = new THREE.ScreenNode( offsetCoord );
+						screen = new Nodes.ScreenNode( offsetCoord );
 
 						nodepost.output = screen;
 
@@ -369,20 +350,20 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize();
+						size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
-						var screen = new THREE.ScreenNode();
+						screen = new Nodes.ScreenNode();
 
-						var previousFrame = new THREE.RTTNode( size.width, size.height, screen );
+						const previousFrame = new Nodes.RTTNode( size.width, size.height, screen );
 
-						var motionBlur = new THREE.Math3Node(
+						const motionBlur = new Nodes.MathNode(
 							previousFrame,
 							screen,
-							new THREE.FloatNode( .5 ),
-							THREE.Math3Node.MIX
+							new Nodes.FloatNode( .5 ),
+							Nodes.MathNode.MIX
 						);
 
-						var currentFrame = new THREE.RTTNode( size.width, size.height, motionBlur );
+						const currentFrame = new Nodes.RTTNode( size.width, size.height, motionBlur );
 						currentFrame.saveTo = previousFrame;
 
 						nodepost.output = currentFrame;
@@ -393,35 +374,35 @@
 
 						// POST
 
-						var scale = new THREE.FloatNode( 128 );
-						var fade = new THREE.FloatNode( 1 );
-						var uv = new THREE.UVNode();
+						scale = new Nodes.FloatNode( 128 );
+						fade = new Nodes.FloatNode( 1 );
+						const uv = new Nodes.UVNode();
 
-						var blocks = new THREE.OperatorNode(
+						const blocks = new Nodes.OperatorNode(
 							uv,
 							scale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var blocksSize = new THREE.Math1Node(
+						const blocksSize = new Nodes.MathNode(
 							blocks,
-							THREE.Math1Node.FLOOR
+							Nodes.MathNode.FLOOR
 						);
 
-						var mosaicUV = new THREE.OperatorNode(
+						const mosaicUV = new Nodes.OperatorNode(
 							blocksSize,
 							scale,
-							THREE.OperatorNode.DIV
+							Nodes.OperatorNode.DIV
 						);
 
-						var fadeScreen = new THREE.Math3Node(
+						const fadeScreen = new Nodes.MathNode(
 							uv,
 							mosaicUV,
 							fade,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						nodepost.output = new THREE.ScreenNode( fadeScreen );
+						nodepost.output = new Nodes.ScreenNode( fadeScreen );
 
 						// GUI
 
@@ -439,7 +420,7 @@
 
 						addGui( 'mask', false, function ( val ) {
 
-							fadeScreen.c = val ? new THREE.TextureNode( lensflare2 ) : fade;
+							fadeScreen.c = val ? new Nodes.TextureNode( lensflare2 ) : fade;
 
 							nodepost.needsUpdate = true;
 
@@ -451,9 +432,9 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize();
+						size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
-						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
+						const blurScreen = new Nodes.BlurNode( new Nodes.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );
 
 						nodepost.output = blurScreen;
@@ -480,13 +461,13 @@
 
 				// test serialization
 				/*
-							var library = {};
+							let library = {};
 							library[ lensflare2.uuid ] = lensflare2;
 							library[ decalNormal.uuid ] = decalNormal;
 
-							var json = nodepost.toJSON();
+							let json = nodepost.toJSON();
 
-							nodepost.output = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
+							nodepost.output = new NodeMaterialLoader( null, library ).parse( json ).value;
 						*/
 
 			}
@@ -498,7 +479,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				nodepost = new THREE.NodePostProcessing( renderer );
+				nodepost = new Nodes.NodePostProcessing( renderer );
 
 				//
 
@@ -511,12 +492,12 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				var geometry = new THREE.SphereBufferGeometry( 1, 4, 4 );
+				const geometry = new THREE.SphereGeometry( 1, 4, 4 );
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( let i = 0; i < 100; i ++ ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0x888888 + ( Math.random() * 0x888888 ), flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshPhongMaterial( { color: 0x888888 + ( Math.random() * 0x888888 ), flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
 					mesh.position.multiplyScalar( Math.random() * 400 );
 					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
@@ -535,7 +516,7 @@
 
 				updateMaterial();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -552,7 +533,7 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;

@@ -1,50 +1,49 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
+( function () {
+
+	/**
  * Luminosity
  * http://en.wikipedia.org/wiki/Luminosity
  */
+	const LuminosityShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-THREE.LuminosityShader = {
+		varying vec2 vUv;
 
-	uniforms: {
+		void main() {
 
-		"tDiffuse": { value: null }
+			vUv = uv;
 
-	},
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	vertexShader: [
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-		"varying vec2 vUv;",
+		#include <common>
 
-		"void main() {",
+		uniform sampler2D tDiffuse;
 
-			"vUv = uv;",
+		varying vec2 vUv;
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		void main() {
 
-		"}"
+			vec4 texel = texture2D( tDiffuse, vUv );
 
-	].join( "\n" ),
+			float l = linearToRelativeLuminance( texel.rgb );
 
-	fragmentShader: [
+			gl_FragColor = vec4( l, l, l, texel.w );
 
-		"#include <common>",
+		}`
+	};
 
-		"uniform sampler2D tDiffuse;",
+	THREE.LuminosityShader = LuminosityShader;
 
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec4 texel = texture2D( tDiffuse, vUv );",
-
-			"float l = linearToRelativeLuminance( texel.rgb );",
-
-			"gl_FragColor = vec4( l, l, l, texel.w );",
-
-		"}"
-
-	].join( "\n" )
-
-};
+} )();

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>轨迹球控制器（[name]）</h1>
+
+		<p class="desc">
+			<p>
+				[name] 与 [page:OrbitControls] 相类似。然而，它不能恒定保持摄像机的[page:Object3D.up up]向量。
+				这意味着，如果摄像机绕过“北极”和“南极”，则不会翻转以保持“右侧朝上”。
+			</p>
+		</p>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera camera]: 渲染场景的摄像机。
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+			</p>
+			<p>
+				创建一个新的 [name] 实例。
+			</p>
+		</p>
+
+		<h2>事件</h2>
+
+		<h3>change</h3>
+		<p>
+			当摄像机被控制器变换后触发。
+		</p>
+
+		<h3>start</h3>
+		<p>
+			当交互（例如触摸）被初始化后触发。
+		</p>
+
+		<h3>end</h3>
+		<p>
+			当交互完成后触发。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
+		</p>
+
+		<h3>[property:Number dynamicDampingFactor]</h3>
+		<p>
+			设置阻尼的强度。仅在[page:.staticMoving staticMoving]设为*false*时考虑。默认为*0.2*。
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			是否启用控制器。
+		</p>
+
+		<h3>[property:Array keys]</h3>
+		<p>
+			该数组包含用于控制交互的按键代码。
+			<ul>
+				<li>当定义的第一个按键按下后，所有的鼠标交互（左/中/右键）表现为环绕。</li>
+				<li>当定义的第二个按键按下后，所有的鼠标交互（左/中/右键）表现为缩放。</li>
+				<li>当定义的第三个按键按下后，所有的鼠标交互（左/中/右键）表现为平移。</li>
+			</ul>
+			默认为*KeyA, KeyS, KeyD*，分别表示A, S, D。
+		</p>
+
+		<h3>[property:Number maxDistance]</h3>
+		<p>
+			你能够将相机向外移动多少，其默认值为*Infinity*。
+		</p>
+
+		<h3>[property:Number minDistance]</h3>
+		<p>
+			你能够将相机向内移动多少，其默认值为*0*。
+		</p>
+
+		<h3>
+			[property:Object mouseButtons]</h3>
+		<p>
+			该对象包含由控件所使用的鼠标操作的引用。
+			<ul>
+				<li>.LEFT 指定给 *THREE.MOUSE.ROTATE*</li>
+				<li>.MIDDLE 指定给 *THREE.MOUSE.ZOOM*</li>
+				<li>.RIGHT 指定给 *THREE.MOUSE.PAN*</li>
+			</ul>
+		</p>
+
+		<h3>[property:Boolean noPan]</h3>
+		<p>
+			是否禁用平移，默认为*false*。
+		</p>
+
+		<h3>[property:Boolean noRotate]</h3>
+		<p>
+			是否禁用旋转，默认为*false*。
+		</p>
+
+		<h3>[property:Boolean noZoom]</h3>
+		<p>
+			是否禁用缩放，默认为*false*。
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			正被控制的摄像机。
+		</p>
+
+		<h3>[property:Number panSpeed]</h3>
+		<p>
+			平移的速度，其默认值为*0.3*。
+		</p>
+
+		<h3>[property:Number rotateSpeed]</h3>
+		<p>
+			旋转的速度，其默认值为*1.0*。
+		</p>
+
+		<h3>[property:Object screen]</h3>
+		<p>
+			表示屏幕的属性。在[page:.handleResize handleResize]()被调用时会自动设置。
+			<ul>
+				<li>left: 表示到屏幕左侧边界的偏移量（单位为像素）。</li>
+				<li>top: 表示到屏幕顶部边界的偏移量（单位为像素）。</li>
+				<li>width: 表示屏幕的宽度（单位为像素）。</li>
+				<li>height: 表示屏幕的高度（单位为像素）。</li>
+			</ul>
+		</p>
+
+		<h3>[property:Boolean staticMoving]</h3>
+		<p>
+			阻尼是否被禁用。默认为*false*。
+		</p>
+
+		<h3>[property:Number zoomSpeed]</h3>
+		<p>
+			缩放的速度，其默认值为*1.2*。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:undefined checkDistances] ()</h3>
+		<p>
+			确保控制器位于 [minDistance, maxDistance] 范围内。由[page:.update update]()调用。
+		</p>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			若不再需要该控制器，则应当调用此函数。
+		</p>
+
+		<h3>[method:undefined handleResize] ()</h3>
+		<p>
+			若应用程序窗口大小发生改变，则应当调用此函数。
+		</p>
+
+		<h3>[method:undefined panCamera] ()</h3>
+		<p>
+			如有必要，执行平移。由[page:.update update]()调用。
+		</p>
+
+		<h3>[method:undefined reset] ()</h3>
+		<p>
+			重置控制器到初始状态。
+		</p>
+
+		<h3>[method:undefined rotateCamera] ()</h3>
+		<p>
+			如有必要，旋转相机。由[page:.update update]()调用。
+		</p>
+
+		<h3>[method:undefined update] ()</h3>
+		<p>
+			更新控制器，常被用在动画循环中。
+		</p>
+
+		<h3>[method:undefined zoomCamera] ()</h3>
+		<p>
+			如有必要，执行缩放。由[page:.update update]()调用。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/TrackballControls.js examples/jsm/controls/TrackballControls.js]
+		</p>
+	</body>
+</html>

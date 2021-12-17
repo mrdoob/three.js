@@ -4,91 +4,54 @@
 		<title>three.js webgl - teapot buffer geometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #fff;
-			}
-
-			a { color: blue; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - the Utah Teapot<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - the Utah Teapot<br />
 			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291" target="_blank" rel="noopener">Udacity Interactive 3D Graphics</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
+			let camera, scene, renderer;
+			let cameraControls;
+			let effectController;
+			const teapotSize = 400;
+			let ambientLight, light;
 
-		<script>
+			let tess = - 1;	// force initialization
+			let bBottom;
+			let bLid;
+			let bBody;
+			let bFitLid;
+			let bNonBlinn;
+			let shading;
+			let wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
 
-			////////////////////////////////////////////////////////////////////////////////
-			// Utah/Newell Teapot demo
-			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, WEBGL, dat, window */
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var camera, scene, renderer;
-			var cameraControls;
-			var effectController;
-			var teapotSize = 400;
-			var ambientLight, light;
-
-			var tess = - 1;	// force initialization
-			var bBottom;
-			var bLid;
-			var bBody;
-			var bFitLid;
-			var bNonBlinn;
-			var shading;
-			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
-
-			var teapot, textureCube;
+			let teapot, textureCube;
 
 			// allocate these just once
-			var diffuseColor = new THREE.Color();
-			var specularColor = new THREE.Color();
+			const diffuseColor = new THREE.Color();
+			const specularColor = new THREE.Color();
 
 			init();
 			render();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				// CAMERA
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
@@ -104,34 +67,35 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// CONTROLS
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				const textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
+				textureMap.encoding = THREE.sRGBEncoding;
 
 				// REFLECTION MAP
-				var path = "textures/cube/skybox/";
-				var urls = [
-					path + "px.jpg", path + "nx.jpg",
-					path + "py.jpg", path + "ny.jpg",
-					path + "pz.jpg", path + "nz.jpg"
+				const path = "textures/cube/pisa/";
+				const urls = [
+					path + "px.png", path + "nx.png",
+					path + "py.png", path + "ny.png",
+					path + "pz.png", path + "nz.png"
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
-				var materialColor = new THREE.Color();
+				const materialColor = new THREE.Color();
 				materialColor.setRGB( 1.0, 1.0, 1.0 );
 
 				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
@@ -162,8 +126,8 @@
 
 			function onWindowResize() {
 
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
+				const canvasWidth = window.innerWidth;
+				const canvasHeight = window.innerHeight;
 
 				renderer.setSize( canvasWidth, canvasHeight );
 
@@ -206,9 +170,9 @@
 					newShading: "glossy"
 				};
 
-				var h;
+				let h;
 
-				var gui = new dat.GUI();
+				const gui = new GUI();
 
 				// material (attributes)
 
@@ -342,7 +306,7 @@
 
 				}
 
-				var teapotGeometry = new THREE.TeapotBufferGeometry( teapotSize,
+				const teapotGeometry = new TeapotGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,

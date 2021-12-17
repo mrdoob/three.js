@@ -1,57 +1,34 @@
-/**
- * @author timothypratley / https://github.com/timothypratley
- * @author Mugen87 / https://github.com/Mugen87
- */
+import { PolyhedronGeometry } from './PolyhedronGeometry.js';
 
-import { Geometry } from '../core/Geometry.js';
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry.js';
+class TetrahedronGeometry extends PolyhedronGeometry {
 
-// TetrahedronGeometry
+	constructor( radius = 1, detail = 0 ) {
 
-function TetrahedronGeometry( radius, detail ) {
+		const vertices = [
+			1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
+		];
 
-	Geometry.call( this );
+		const indices = [
+			2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
+		];
 
-	this.type = 'TetrahedronGeometry';
+		super( vertices, indices, radius, detail );
 
-	this.parameters = {
-		radius: radius,
-		detail: detail
-	};
+		this.type = 'TetrahedronGeometry';
 
-	this.fromBufferGeometry( new TetrahedronBufferGeometry( radius, detail ) );
-	this.mergeVertices();
+		this.parameters = {
+			radius: radius,
+			detail: detail
+		};
 
-}
+	}
 
-TetrahedronGeometry.prototype = Object.create( Geometry.prototype );
-TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+	static fromJSON( data ) {
 
-// TetrahedronBufferGeometry
+		return new TetrahedronGeometry( data.radius, data.detail );
 
-function TetrahedronBufferGeometry( radius, detail ) {
-
-	var vertices = [
-		1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
-	];
-
-	var indices = [
-		2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
-	];
-
-	PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
-
-	this.type = 'TetrahedronBufferGeometry';
-
-	this.parameters = {
-		radius: radius,
-		detail: detail
-	};
+	}
 
 }
 
-TetrahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
-TetrahedronBufferGeometry.prototype.constructor = TetrahedronBufferGeometry;
-
-
-export { TetrahedronGeometry, TetrahedronBufferGeometry };
+export { TetrahedronGeometry, TetrahedronGeometry as TetrahedronBufferGeometry };

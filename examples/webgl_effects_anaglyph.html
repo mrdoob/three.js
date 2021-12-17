@@ -4,62 +4,31 @@
 		<title>three.js webgl - effects - anaglyph</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - anaglyph. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - anaglyph<br/>
+			skybox by <a href="https://www.pauldebevec.com/" target="_blank" rel="noopener">Paul Debevec</a>
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/effects/AnaglyphEffect.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { AnaglyphEffect } from './jsm/effects/AnaglyphEffect.js';
 
-		<script>
+			let container, camera, scene, renderer, effect;
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			const spheres = [];
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			let mouseX = 0;
+			let mouseY = 0;
 
-			}
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			var container, camera, scene, renderer, effect;
-
-			var spheres = [];
-
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
 			animate();
@@ -73,25 +42,25 @@
 				camera.position.z = 3;
 				camera.focalLength = 3;
 
-				var path = "textures/cube/pisa/";
-				var format = '.png';
-				var urls = [
+				const path = "textures/cube/pisa/";
+				const format = '.png';
+				const urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				const textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				scene = new THREE.Scene();
 				scene.background = textureCube;
 
-				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+				const geometry = new THREE.SphereGeometry( 0.1, 32, 16 );
+				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( let i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10 - 5;
 					mesh.position.y = Math.random() * 10 - 5;
@@ -111,15 +80,15 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
-				var width = window.innerWidth || 2;
-				var height = window.innerHeight || 2;
+				const width = window.innerWidth || 2;
+				const height = window.innerHeight || 2;
 
-				effect = new THREE.AnaglyphEffect( renderer );
+				effect = new AnaglyphEffect( renderer );
 				effect.setSize( width, height );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -154,16 +123,16 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				const timer = 0.0001 * Date.now();
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
+				for ( let i = 0, il = spheres.length; i < il; i ++ ) {
 
-					var sphere = spheres[ i ];
+					const sphere = spheres[ i ];
 
 					sphere.position.x = 5 * Math.cos( timer + i );
 					sphere.position.y = 5 * Math.sin( timer + i * 1.1 );

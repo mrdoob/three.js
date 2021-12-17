@@ -1,24 +1,75 @@
 export default /* glsl */`
 struct PhysicalMaterial {
 
-	vec3	diffuseColor;
-	float	specularRoughness;
-	vec3	specularColor;
+	vec3 diffuseColor;
+	float roughness;
+	vec3 specularColor;
+	float specularF90;
 
-	#ifndef STANDARD
-		float clearCoat;
-		float clearCoatRoughness;
+	#ifdef USE_CLEARCOAT
+		float clearcoat;
+		float clearcoatRoughness;
+		vec3 clearcoatF0;
+		float clearcoatF90;
+	#endif
+
+	#ifdef USE_SHEEN
+		vec3 sheenColor;
+		float sheenRoughness;
 	#endif
 
 };
 
-#define MAXIMUM_SPECULAR_COEFFICIENT 0.16
-#define DEFAULT_SPECULAR_COEFFICIENT 0.04
+// temporary
+vec3 clearcoatSpecular = vec3( 0.0 );
 
-// Clear coat directional hemishperical reflectance (this approximation should be improved)
-float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
+// Analytical approximation of the DFG LUT, one half of the
+// split-sum approximation used in indirect specular lighting.
+// via 'environmentBRDF' from "Physically Based Shading on Mobile"
+// https://www.unrealengine.com/blog/physically-based-shading-on-mobile
+vec2 DFGApprox( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
 
-	return DEFAULT_SPECULAR_COEFFICIENT + ( 1.0 - DEFAULT_SPECULAR_COEFFICIENT ) * ( pow( 1.0 - dotNL, 5.0 ) * pow( 1.0 - roughness, 2.0 ) );
+	float dotNV = saturate( dot( normal, viewDir ) );
+
+	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
+
+	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
+
+	vec4 r = roughness * c0 + c1;
+
+	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
+
+	vec2 fab = vec2( - 1.04, 1.04 ) * a004 + r.zw;
+
+	return fab;
+
+}
+
+vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {
+
+	vec2 fab = DFGApprox( normal, viewDir, roughness );
+
+	return specularColor * fab.x + specularF90 * fab.y;
+
+}
+
+// Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
+// Approximates multiscattering in order to preserve energy.
+// http://www.jcgt.org/published/0008/01/03/
+void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+
+	vec2 fab = DFGApprox( normal, viewDir, roughness );
+
+	vec3 FssEss = specularColor * fab.x + specularF90 * fab.y;
+
+	float Ess = fab.x + fab.y;
+	float Ems = 1.0 - Ess;
+
+	vec3 Favg = specularColor + ( 1.0 - specularColor ) * 0.047619; // 1/21
+	vec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );
+
+	singleScatter += FssEss;
+	multiScatter += Fms * Ems;
 
 }
 
@@ -33,7 +84,7 @@ float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
 		vec3 halfWidth = rectAreaLight.halfWidth;
 		vec3 halfHeight = rectAreaLight.halfHeight;
 		vec3 lightColor = rectAreaLight.color;
-		float roughness = material.specularRoughness;
+		float roughness = material.roughness;
 
 		vec3 rectCoords[ 4 ];
 		rectCoords[ 0 ] = lightPos + halfWidth - halfHeight; // counterclockwise; light shines in local neg z direction
@@ -70,53 +121,56 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	vec3 irradiance = dotNL * directLight.color;
 
-	#ifndef PHYSICALLY_CORRECT_LIGHTS
+	#ifdef USE_CLEARCOAT
 
-		irradiance *= PI; // punctual light
+		float dotNLcc = saturate( dot( geometry.clearcoatNormal, directLight.direction ) );
 
-	#endif
+		vec3 ccIrradiance = dotNLcc * directLight.color;
 
-	#ifndef STANDARD
-		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );
-	#else
-		float clearCoatDHR = 0.0;
-	#endif
-
-	reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );
-
-	reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
-
-	#ifndef STANDARD
-
-		reflectedLight.directSpecular += irradiance * material.clearCoat * BRDF_Specular_GGX( directLight, geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
+		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.clearcoatNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 
 	#endif
 
+	#ifdef USE_SHEEN
+
+		reflectedLight.directSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenColor, material.sheenRoughness );
+
+	#endif
+
+	reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.roughness );
+
+
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
 }
 
-void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
-	#ifndef STANDARD
-		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
-		float dotNL = dotNV;
-		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );
-	#else
-		float clearCoatDHR = 0.0;
-	#endif
+	#ifdef USE_CLEARCOAT
 
-	reflectedLight.indirectSpecular += ( 1.0 - clearCoatDHR ) * radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
-
-	#ifndef STANDARD
-
-		reflectedLight.indirectSpecular += clearCoatRadiance * material.clearCoat * BRDF_Specular_GGX_Environment( geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
+		clearcoatSpecular += clearcoatRadiance * EnvironmentBRDF( geometry.clearcoatNormal, geometry.viewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 
 	#endif
+
+	// Both indirect specular and indirect diffuse light accumulate here
+
+	vec3 singleScattering = vec3( 0.0 );
+	vec3 multiScattering = vec3( 0.0 );
+	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
+
+	computeMultiscattering( geometry.normal, geometry.viewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
+
+	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+
+	reflectedLight.indirectSpecular += radiance * singleScattering;
+	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
+
+	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
 
 }
 
@@ -124,9 +178,6 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearCo
 #define RE_Direct_RectArea		RE_Direct_RectArea_Physical
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Physical
 #define RE_IndirectSpecular		RE_IndirectSpecular_Physical
-
-#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )
-#define Material_ClearCoat_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.clearCoatRoughness )
 
 // ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {

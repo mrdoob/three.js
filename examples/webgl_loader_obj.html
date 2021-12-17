@@ -4,47 +4,30 @@
 		<title>three.js webgl - loaders - OBJ loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			var container;
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-			var camera, scene, renderer;
+			let container;
 
-			var mouseX = 0, mouseY = 0;
+			let camera, scene, renderer;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let mouseX = 0, mouseY = 0;
 
-			var object;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
+
+			let object;
 
 			init();
 			animate();
@@ -62,10 +45,10 @@
 
 				scene = new THREE.Scene();
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -84,7 +67,7 @@
 
 				}
 
-				var manager = new THREE.LoadingManager( loadModel );
+				const manager = new THREE.LoadingManager( loadModel );
 
 				manager.onProgress = function ( item, loaded, total ) {
 
@@ -94,9 +77,8 @@
 
 				// texture
 
-				var textureLoader = new THREE.TextureLoader( manager );
-
-				var texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+				const textureLoader = new THREE.TextureLoader( manager );
+				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
 
 				// model
 
@@ -104,7 +86,7 @@
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
@@ -113,8 +95,7 @@
 
 				function onError() {}
 
-				var loader = new THREE.OBJLoader( manager );
-
+				const loader = new OBJLoader( manager );
 				loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
 
 					object = obj;
@@ -128,11 +109,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

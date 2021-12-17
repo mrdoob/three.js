@@ -1,19 +1,15 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- */
-
 import { Earcut } from './Earcut.js';
 
-var ShapeUtils = {
+class ShapeUtils {
 
 	// calculate area of the contour polygon
 
-	area: function ( contour ) {
+	static area( contour ) {
 
-		var n = contour.length;
-		var a = 0.0;
+		const n = contour.length;
+		let a = 0.0;
 
-		for ( var p = n - 1, q = 0; q < n; p = q ++ ) {
+		for ( let p = n - 1, q = 0; q < n; p = q ++ ) {
 
 			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
 
@@ -21,30 +17,30 @@ var ShapeUtils = {
 
 		return a * 0.5;
 
-	},
+	}
 
-	isClockWise: function ( pts ) {
+	static isClockWise( pts ) {
 
 		return ShapeUtils.area( pts ) < 0;
 
-	},
+	}
 
-	triangulateShape: function ( contour, holes ) {
+	static triangulateShape( contour, holes ) {
 
-		var vertices = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
-		var holeIndices = []; // array of hole indices
-		var faces = []; // final array of vertex indices like [ [ a,b,d ], [ b,c,d ] ]
+		const vertices = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
+		const holeIndices = []; // array of hole indices
+		const faces = []; // final array of vertex indices like [ [ a,b,d ], [ b,c,d ] ]
 
 		removeDupEndPts( contour );
 		addContour( vertices, contour );
 
 		//
 
-		var holeIndex = contour.length;
+		let holeIndex = contour.length;
 
 		holes.forEach( removeDupEndPts );
 
-		for ( var i = 0; i < holes.length; i ++ ) {
+		for ( let i = 0; i < holes.length; i ++ ) {
 
 			holeIndices.push( holeIndex );
 			holeIndex += holes[ i ].length;
@@ -54,11 +50,11 @@ var ShapeUtils = {
 
 		//
 
-		var triangles = Earcut.triangulate( vertices, holeIndices );
+		const triangles = Earcut.triangulate( vertices, holeIndices );
 
 		//
 
-		for ( var i = 0; i < triangles.length; i += 3 ) {
+		for ( let i = 0; i < triangles.length; i += 3 ) {
 
 			faces.push( triangles.slice( i, i + 3 ) );
 
@@ -68,11 +64,11 @@ var ShapeUtils = {
 
 	}
 
-};
+}
 
 function removeDupEndPts( points ) {
 
-	var l = points.length;
+	const l = points.length;
 
 	if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
 
@@ -84,7 +80,7 @@ function removeDupEndPts( points ) {
 
 function addContour( vertices, contour ) {
 
-	for ( var i = 0; i < contour.length; i ++ ) {
+	for ( let i = 0; i < contour.length; i ++ ) {
 
 		vertices.push( contour[ i ].x );
 		vertices.push( contour[ i ].y );

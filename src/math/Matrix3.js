@@ -1,37 +1,26 @@
-import { Vector3 } from './Vector3.js';
+class Matrix3 {
 
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://clara.io
- * @author tschw
- */
+	constructor() {
 
-function Matrix3() {
+		this.elements = [
 
-	this.elements = [
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
 
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1
+		];
 
-	];
+		if ( arguments.length > 0 ) {
 
-	if ( arguments.length > 0 ) {
+			console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
 
-		console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+		}
 
 	}
 
-}
+	set( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
-Object.assign( Matrix3.prototype, {
-
-	isMatrix3: true,
-
-	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
-
-		var te = this.elements;
+		const te = this.elements;
 
 		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
 		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
@@ -39,9 +28,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	identity: function () {
+	identity() {
 
 		this.set(
 
@@ -53,18 +42,12 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	copy( m ) {
 
-		return new this.constructor().fromArray( this.elements );
-
-	},
-
-	copy: function ( m ) {
-
-		var te = this.elements;
-		var me = m.elements;
+		const te = this.elements;
+		const me = m.elements;
 
 		te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ];
 		te[ 3 ] = me[ 3 ]; te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ];
@@ -72,11 +55,21 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromMatrix4: function ( m ) {
+	extractBasis( xAxis, yAxis, zAxis ) {
 
-		var me = m.elements;
+		xAxis.setFromMatrix3Column( this, 0 );
+		yAxis.setFromMatrix3Column( this, 1 );
+		zAxis.setFromMatrix3Column( this, 2 );
+
+		return this;
+
+	}
+
+	setFromMatrix4( m ) {
+
+		const me = m.elements;
 
 		this.set(
 
@@ -88,57 +81,33 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyToBufferAttribute: function () {
-
-		var v1 = new Vector3();
-
-		return function applyToBufferAttribute( attribute ) {
-
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-				v1.x = attribute.getX( i );
-				v1.y = attribute.getY( i );
-				v1.z = attribute.getZ( i );
-
-				v1.applyMatrix3( this );
-
-				attribute.setXYZ( i, v1.x, v1.y, v1.z );
-
-			}
-
-			return attribute;
-
-		};
-
-	}(),
-
-	multiply: function ( m ) {
+	multiply( m ) {
 
 		return this.multiplyMatrices( this, m );
 
-	},
+	}
 
-	premultiply: function ( m ) {
+	premultiply( m ) {
 
 		return this.multiplyMatrices( m, this );
 
-	},
+	}
 
-	multiplyMatrices: function ( a, b ) {
+	multiplyMatrices( a, b ) {
 
-		var ae = a.elements;
-		var be = b.elements;
-		var te = this.elements;
+		const ae = a.elements;
+		const be = b.elements;
+		const te = this.elements;
 
-		var a11 = ae[ 0 ], a12 = ae[ 3 ], a13 = ae[ 6 ];
-		var a21 = ae[ 1 ], a22 = ae[ 4 ], a23 = ae[ 7 ];
-		var a31 = ae[ 2 ], a32 = ae[ 5 ], a33 = ae[ 8 ];
+		const a11 = ae[ 0 ], a12 = ae[ 3 ], a13 = ae[ 6 ];
+		const a21 = ae[ 1 ], a22 = ae[ 4 ], a23 = ae[ 7 ];
+		const a31 = ae[ 2 ], a32 = ae[ 5 ], a33 = ae[ 8 ];
 
-		var b11 = be[ 0 ], b12 = be[ 3 ], b13 = be[ 6 ];
-		var b21 = be[ 1 ], b22 = be[ 4 ], b23 = be[ 7 ];
-		var b31 = be[ 2 ], b32 = be[ 5 ], b33 = be[ 8 ];
+		const b11 = be[ 0 ], b12 = be[ 3 ], b13 = be[ 6 ];
+		const b21 = be[ 1 ], b22 = be[ 4 ], b23 = be[ 7 ];
+		const b31 = be[ 2 ], b32 = be[ 5 ], b33 = be[ 8 ];
 
 		te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31;
 		te[ 3 ] = a11 * b12 + a12 * b22 + a13 * b32;
@@ -154,11 +123,11 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar( s ) {
 
-		var te = this.elements;
+		const te = this.elements;
 
 		te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
 		te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
@@ -166,34 +135,27 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	determinant: function () {
+	determinant() {
 
-		var te = this.elements;
+		const te = this.elements;
 
-		var a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
+		const a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
 			d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
 			g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
 
 		return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 
-	},
+	}
 
-	getInverse: function ( matrix, throwOnDegenerate ) {
+	invert() {
 
-		if ( matrix && matrix.isMatrix4 ) {
+		const te = this.elements,
 
-			console.error( "THREE.Matrix3: .getInverse() no longer takes a Matrix4 argument." );
-
-		}
-
-		var me = matrix.elements,
-			te = this.elements,
-
-			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ],
-			n12 = me[ 3 ], n22 = me[ 4 ], n32 = me[ 5 ],
-			n13 = me[ 6 ], n23 = me[ 7 ], n33 = me[ 8 ],
+			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ],
+			n12 = te[ 3 ], n22 = te[ 4 ], n32 = te[ 5 ],
+			n13 = te[ 6 ], n23 = te[ 7 ], n33 = te[ 8 ],
 
 			t11 = n33 * n22 - n32 * n23,
 			t12 = n32 * n13 - n33 * n12,
@@ -201,25 +163,9 @@ Object.assign( Matrix3.prototype, {
 
 			det = n11 * t11 + n21 * t12 + n31 * t13;
 
-		if ( det === 0 ) {
+		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-			var msg = "THREE.Matrix3: .getInverse() can't invert matrix, determinant is 0";
-
-			if ( throwOnDegenerate === true ) {
-
-				throw new Error( msg );
-
-			} else {
-
-				console.warn( msg );
-
-			}
-
-			return this.identity();
-
-		}
-
-		var detInv = 1 / det;
+		const detInv = 1 / det;
 
 		te[ 0 ] = t11 * detInv;
 		te[ 1 ] = ( n31 * n23 - n33 * n21 ) * detInv;
@@ -235,11 +181,12 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	transpose: function () {
+	transpose() {
 
-		var tmp, m = this.elements;
+		let tmp;
+		const m = this.elements;
 
 		tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
 		tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
@@ -247,17 +194,17 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getNormalMatrix: function ( matrix4 ) {
+	getNormalMatrix( matrix4 ) {
 
-		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
+		return this.setFromMatrix4( matrix4 ).invert().transpose();
 
-	},
+	}
 
-	transposeIntoArray: function ( r ) {
+	transposeIntoArray( r ) {
 
-		var m = this.elements;
+		const m = this.elements;
 
 		r[ 0 ] = m[ 0 ];
 		r[ 1 ] = m[ 3 ];
@@ -271,12 +218,12 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setUvTransform: function ( tx, ty, sx, sy, rotation, cx, cy ) {
+	setUvTransform( tx, ty, sx, sy, rotation, cx, cy ) {
 
-		var c = Math.cos( rotation );
-		var s = Math.sin( rotation );
+		const c = Math.cos( rotation );
+		const s = Math.sin( rotation );
 
 		this.set(
 			sx * c, sx * s, - sx * ( c * cx + s * cy ) + cx + tx,
@@ -284,28 +231,30 @@ Object.assign( Matrix3.prototype, {
 			0, 0, 1
 		);
 
-	},
+		return this;
 
-	scale: function ( sx, sy ) {
+	}
 
-		var te = this.elements;
+	scale( sx, sy ) {
+
+		const te = this.elements;
 
 		te[ 0 ] *= sx; te[ 3 ] *= sx; te[ 6 ] *= sx;
 		te[ 1 ] *= sy; te[ 4 ] *= sy; te[ 7 ] *= sy;
 
 		return this;
 
-	},
+	}
 
-	rotate: function ( theta ) {
+	rotate( theta ) {
 
-		var c = Math.cos( theta );
-		var s = Math.sin( theta );
+		const c = Math.cos( theta );
+		const s = Math.sin( theta );
 
-		var te = this.elements;
+		const te = this.elements;
 
-		var a11 = te[ 0 ], a12 = te[ 3 ], a13 = te[ 6 ];
-		var a21 = te[ 1 ], a22 = te[ 4 ], a23 = te[ 7 ];
+		const a11 = te[ 0 ], a12 = te[ 3 ], a13 = te[ 6 ];
+		const a21 = te[ 1 ], a22 = te[ 4 ], a23 = te[ 7 ];
 
 		te[ 0 ] = c * a11 + s * a21;
 		te[ 3 ] = c * a12 + s * a22;
@@ -317,25 +266,25 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	translate: function ( tx, ty ) {
+	translate( tx, ty ) {
 
-		var te = this.elements;
+		const te = this.elements;
 
 		te[ 0 ] += tx * te[ 2 ]; te[ 3 ] += tx * te[ 5 ]; te[ 6 ] += tx * te[ 8 ];
 		te[ 1 ] += ty * te[ 2 ]; te[ 4 ] += ty * te[ 5 ]; te[ 7 ] += ty * te[ 8 ];
 
 		return this;
 
-	},
+	}
 
-	equals: function ( matrix ) {
+	equals( matrix ) {
 
-		var te = this.elements;
-		var me = matrix.elements;
+		const te = this.elements;
+		const me = matrix.elements;
 
-		for ( var i = 0; i < 9; i ++ ) {
+		for ( let i = 0; i < 9; i ++ ) {
 
 			if ( te[ i ] !== me[ i ] ) return false;
 
@@ -343,13 +292,11 @@ Object.assign( Matrix3.prototype, {
 
 		return true;
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset = 0 ) {
 
-		if ( offset === undefined ) offset = 0;
-
-		for ( var i = 0; i < 9; i ++ ) {
+		for ( let i = 0; i < 9; i ++ ) {
 
 			this.elements[ i ] = array[ i + offset ];
 
@@ -357,14 +304,11 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array = [], offset = 0 ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
-
-		var te = this.elements;
+		const te = this.elements;
 
 		array[ offset ] = te[ 0 ];
 		array[ offset + 1 ] = te[ 1 ];
@@ -382,7 +326,14 @@ Object.assign( Matrix3.prototype, {
 
 	}
 
-} );
+	clone() {
 
+		return new this.constructor().fromArray( this.elements );
+
+	}
+
+}
+
+Matrix3.prototype.isMatrix3 = true;
 
 export { Matrix3 };

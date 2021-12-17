@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		해당 클래스는 드래그 앤 드롭 상호작용에 대해 사용 됩니다.
+		</p>
+
+		<h2>코드 예시</h2>
+
+		<code>
+		const controls = new DragControls( objects, camera, renderer.domElement );
+
+		// 이벤트 리스너에 드래그 될 대상을 추가합니다.
+
+		controls.addEventListener( 'dragstart', function ( event ) {
+
+			event.object.material.emissive.set( 0xaaaaaa );
+
+		} );
+
+		controls.addEventListener( 'dragend', function ( event ) {
+
+			event.object.material.emissive.set( 0x000000 );
+
+		} );
+		</code>
+
+		<h2>예시</h2>
+
+		<p>[example:misc_controls_drag misc / controls / drag ]</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Array objects], [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Array objects]: 드래그 가능한 3D 객체의 배열 입니다.
+			</p>
+			<p>
+			[page:Camera camera]: 렌더링 된 장면의 카메라입니다.
+			</p>
+			<p>
+			[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
+			</p>
+			<p>
+				새로운 [name] 객체를 생성합니다.
+			</p>
+		</p>
+
+		<h2>이벤트</h2>
+
+		<h3>dragstart</h3>
+		<p>
+			사용자가 3D 객체를 첫번째로 드래그 할 경우 호출 됩니다.
+		</p>
+
+		<h3>drag</h3>
+		<p>
+			사용자가 3D 객체를 드래그 할 경우 호출 됩니다.
+		</p>
+
+		<h3>dragend</h3>
+		<p>
+			사용자가 3D 객체를 드래그를 완료하면 호출 됩니다.
+		</p>
+
+		<h3>hoveron</h3>
+		<p>
+			마우스 포인터가 3D 객체 위에 오거나, 자식 객체 위에 올 경우 호출 됩니다.
+		</p>
+
+		<h3>hoveroff</h3>
+		<p>
+			포인터가 3D 객체 밖으로 이동할 경우 호출 됩니다.
+		</p>
+
+		<h2>속성</h2>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			컨트롤의 활성화 여부를 지정합니다.
+		</p>
+
+		<h3>[property:Boolean transformGroup]</h3>
+		<p>
+
+			해당 속성은 [page:DragControls.objects] 배열에 드래그 가능한 단일 그룹 객체가 포함된 경우에만 작동합니다.
+			*true* 값으로 설정 되어있다면, [name]은 개별 객체가 아닌 전체 그룹은 드래그 합니다. 기본 값은 *false* 입니다.
+		</p>
+
+		<h2>메소드</h2>
+
+		<p>일반적인 메소드는 [page:EventDispatcher] 클래스를 참조하세요.</p>
+
+		<h3>[method:undefined activate] ()</h3>
+		<p>
+			컨트롤에 이벤트 리스너를 추가합니다.
+		</p>
+
+		<h3>[method:undefined deactivate] ()</h3>
+		<p>
+			컨트롤에 추가된 이벤트 리스너를 제거합니다.
+		</p>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			컨트롤이 더 이상 필요하지 않을 경우 호출해야 합니다.
+		</p>
+
+		<h3>[method:Array getObjects] ()</h3>
+		<p>
+			드래그 가능한 객체 배열을 반환 합니다.
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the internal [page:Raycaster] instance that is used for intersection tests.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/DragControls.js examples/jsm/controls/DragControls.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>CSS 2D渲染器（[name]）</h1>
+
+		<p class="desc">[name]是[page:CSS3DRenderer]（CSS 3D渲染器）的简化版本，唯一支持的变换是位移。<br /><br />
+			如果你希望将三维物体和基于HTML的标签相结合，则这一渲染器将十分有用。在这里，各个DOM元素也被包含到一个*CSS2DObject*实例中，并被添加到场景图中。<br />
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:css2d_label]<br>
+			[example:webgl_loader_pdb molecules]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>方法</h2>
+
+		<h3>[method:Object getSize]()</h3>
+		<p>
+			返回一个包含有渲染器宽和高的对象。
+		</p>
+
+		<h3>[method:undefined render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<p>
+			使用[page:Camera camera]渲染[page:Scene scene]。<br />
+		</p>
+
+		<h3>[method:undefined setSize]([param:Number width], [param:Number height])</h3>
+		<p>
+			将渲染器的尺寸调整为(width, height).
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/CSS2DRenderer.js examples/jsm/renderers/CSS2DRenderer.js]
+		</p>
+	</body>
+</html>

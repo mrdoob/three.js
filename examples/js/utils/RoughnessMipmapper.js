@@ -1,0 +1,268 @@
+( function () {
+
+	/**
+ * This class generates custom mipmaps for a roughness map by encoding the lost variation in the
+ * normal map mip levels as increased roughness in the corresponding roughness mip levels. This
+ * helps with rendering accuracy for MeshStandardMaterial, and also helps with anti-aliasing when
+ * using PMREM. If the normal map is larger than the roughness map, the roughness map will be
+ * enlarged to match the dimensions of the normal map.
+ */
+
+	const _mipmapMaterial = _getMipmapMaterial();
+
+	const _mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _mipmapMaterial );
+
+	const _flatCamera = new THREE.OrthographicCamera( 0, 1, 0, 1, 0, 1 );
+
+	let _tempTarget = null;
+	let _renderer = null;
+
+	class RoughnessMipmapper {
+
+		constructor( renderer ) {
+
+			_renderer = renderer;
+
+			_renderer.compile( _mesh, _flatCamera );
+
+		}
+
+		generateMipmaps( material ) {
+
+			if ( 'roughnessMap' in material === false ) return;
+			const {
+				roughnessMap,
+				normalMap
+			} = material;
+			if ( roughnessMap === null || normalMap === null || ! roughnessMap.generateMipmaps || material.userData.roughnessUpdated ) return;
+			material.userData.roughnessUpdated = true;
+			let width = Math.max( roughnessMap.image.width, normalMap.image.width );
+			let height = Math.max( roughnessMap.image.height, normalMap.image.height );
+			if ( ! THREE.MathUtils.isPowerOfTwo( width ) || ! THREE.MathUtils.isPowerOfTwo( height ) ) return;
+
+			const oldTarget = _renderer.getRenderTarget();
+
+			const autoClear = _renderer.autoClear;
+			_renderer.autoClear = false;
+
+			if ( _tempTarget === null || _tempTarget.width !== width || _tempTarget.height !== height ) {
+
+				if ( _tempTarget !== null ) _tempTarget.dispose();
+				_tempTarget = new THREE.WebGLRenderTarget( width, height, {
+					depthBuffer: false
+				} );
+				_tempTarget.scissorTest = true;
+
+			}
+
+			const newRoughnessTexture = new THREE.FramebufferTexture( width, height, roughnessMap.format );
+			newRoughnessTexture.wrapS = roughnessMap.wrapS;
+			newRoughnessTexture.wrapT = roughnessMap.wrapT;
+			newRoughnessTexture.minFilter = roughnessMap.minFilter;
+			newRoughnessTexture.magFilter = roughnessMap.magFilter;
+			material.roughnessMap = newRoughnessTexture;
+			if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
+			if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap; // Copy UV transform parameters
+
+			material.roughnessMap.offset.copy( roughnessMap.offset );
+			material.roughnessMap.repeat.copy( roughnessMap.repeat );
+			material.roughnessMap.center.copy( roughnessMap.center );
+			material.roughnessMap.rotation = roughnessMap.rotation;
+			material.roughnessMap.image = roughnessMap.image; // required for USDZExporter, see #22741
+
+			material.roughnessMap.matrixAutoUpdate = roughnessMap.matrixAutoUpdate;
+			material.roughnessMap.matrix.copy( roughnessMap.matrix );
+			_mipmapMaterial.uniforms.roughnessMap.value = roughnessMap;
+			_mipmapMaterial.uniforms.normalMap.value = normalMap;
+			const position = new THREE.Vector2( 0, 0 );
+			const texelSize = _mipmapMaterial.uniforms.texelSize.value;
+
+			for ( let mip = 0; width >= 1 && height >= 1; ++ mip, width /= 2, height /= 2 ) {
+
+				// Rendering to a mip level is not allowed in webGL1. Instead we must set
+				// up a secondary texture to write the result to, then copy it back to the
+				// proper mipmap level.
+				texelSize.set( 1.0 / width, 1.0 / height );
+				if ( mip == 0 ) texelSize.set( 0.0, 0.0 );
+
+				_tempTarget.viewport.set( position.x, position.y, width, height );
+
+				_tempTarget.scissor.set( position.x, position.y, width, height );
+
+				_renderer.setRenderTarget( _tempTarget );
+
+				_renderer.render( _mesh, _flatCamera );
+
+				_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
+
+				_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
+
+			}
+
+			roughnessMap.dispose();
+
+			_renderer.setRenderTarget( oldTarget );
+
+			_renderer.autoClear = autoClear;
+
+		}
+
+		dispose() {
+
+			_mipmapMaterial.dispose();
+
+			_mesh.geometry.dispose();
+
+			if ( _tempTarget != null ) _tempTarget.dispose();
+
+		}
+
+	}
+
+	function _getMipmapMaterial() {
+
+		const shaderMaterial = new THREE.RawShaderMaterial( {
+			uniforms: {
+				roughnessMap: {
+					value: null
+				},
+				normalMap: {
+					value: null
+				},
+				texelSize: {
+					value: new THREE.Vector2( 1, 1 )
+				}
+			},
+			vertexShader:
+    /* glsl */
+    `
+			precision mediump float;
+			precision mediump int;
+
+			attribute vec3 position;
+			attribute vec2 uv;
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+
+				gl_Position = vec4( position, 1.0 );
+
+			}
+		`,
+			fragmentShader:
+    /* glsl */
+    `
+			precision mediump float;
+			precision mediump int;
+
+			varying vec2 vUv;
+
+			uniform sampler2D roughnessMap;
+			uniform sampler2D normalMap;
+			uniform vec2 texelSize;
+
+			#define ENVMAP_TYPE_CUBE_UV
+
+			vec4 envMapTexelToLinear( vec4 a ) { return a; }
+
+			#include <cube_uv_reflection_fragment>
+
+			float roughnessToVariance( float roughness ) {
+
+				float variance = 0.0;
+
+				if ( roughness >= r1 ) {
+
+					variance = ( r0 - roughness ) * ( v1 - v0 ) / ( r0 - r1 ) + v0;
+
+				} else if ( roughness >= r4 ) {
+
+					variance = ( r1 - roughness ) * ( v4 - v1 ) / ( r1 - r4 ) + v1;
+
+				} else if ( roughness >= r5 ) {
+
+					variance = ( r4 - roughness ) * ( v5 - v4 ) / ( r4 - r5 ) + v4;
+
+				} else {
+
+					float roughness2 = roughness * roughness;
+
+					variance = 1.79 * roughness2 * roughness2;
+
+				}
+
+				return variance;
+
+			}
+
+			float varianceToRoughness( float variance ) {
+
+				float roughness = 0.0;
+
+				if ( variance >= v1 ) {
+
+					roughness = ( v0 - variance ) * ( r1 - r0 ) / ( v0 - v1 ) + r0;
+
+				} else if ( variance >= v4 ) {
+
+					roughness = ( v1 - variance ) * ( r4 - r1 ) / ( v1 - v4 ) + r1;
+
+				} else if ( variance >= v5 ) {
+
+					roughness = ( v4 - variance ) * ( r5 - r4 ) / ( v4 - v5 ) + r4;
+
+				} else {
+
+					roughness = pow( 0.559 * variance, 0.25 ); // 0.559 = 1.0 / 1.79
+
+				}
+
+				return roughness;
+
+			}
+
+			void main() {
+
+				gl_FragColor = texture2D( roughnessMap, vUv, - 1.0 );
+
+				if ( texelSize.x == 0.0 ) return;
+
+				float roughness = gl_FragColor.g;
+
+				float variance = roughnessToVariance( roughness );
+
+				vec3 avgNormal;
+
+				for ( float x = - 1.0; x < 2.0; x += 2.0 ) {
+
+					for ( float y = - 1.0; y < 2.0; y += 2.0 ) {
+
+						vec2 uv = vUv + vec2( x, y ) * 0.25 * texelSize;
+
+						avgNormal += normalize( texture2D( normalMap, uv, - 1.0 ).xyz - 0.5 );
+
+					}
+
+				}
+
+				variance += 1.0 - 0.25 * length( avgNormal );
+
+				gl_FragColor.g = varianceToRoughness( variance );
+
+			}
+		`,
+			blending: THREE.NoBlending,
+			depthTest: false,
+			depthWrite: false
+		} );
+		shaderMaterial.type = 'RoughnessMipmapper';
+		return shaderMaterial;
+
+	}
+
+	THREE.RoughnessMipmapper = RoughnessMipmapper;
+
+} )();

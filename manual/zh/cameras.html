@@ -1,0 +1,470 @@
+<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="utf-8">
+    <title>摄像机</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 摄像机">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="/manual/zh/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>摄像机</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>本文是关于 three.js 系列文章的一部分。第一篇文章是 <a href="fundamentals.html">three.js 基础</a>。如果你还没看过而且对three.js 还不熟悉，那应该从那里开始，并且了解如何<a href="setup.html">设置开发环境</a>。上一篇文章介绍了 three.js 中的 <a href="textures.html">纹理</a>。</p>
+<p>我们开始谈谈three.js中的摄像机. 我们已经在<a href="fundamentals.html">第一篇文章</a> 中涉及到了摄像机的一些知识, 这里我们要更深入一些. </p>
+<p>在three.js中最常用的摄像机并且之前我们一直用的摄像机是<code class="notranslate" translate="no">透视摄像机 PerspectiveCamera</code>, 它可以提供一个近大远小的3D视觉效果. </p>
+<p><a href="/docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> 定义了一个 <em>视锥frustum</em>. <a href="https://en.wikipedia.org/wiki/Frustum"><em>frustum</em> 是一个切掉顶的三角锥或者说实心金字塔型</a>.
+说到<em>实心体solid</em>, 在这里通常是指一个立方体, 一个圆锥, 一个球, 一个圆柱或锥台.</p>
+<div class="spread">
+  <div><div data-diagram="shapeCube"></div><div>立方体</div></div>
+  <div><div data-diagram="shapeCone"></div><div>圆锥</div></div>
+  <div><div data-diagram="shapeSphere"></div><div>球</div></div>
+  <div><div data-diagram="shapeCylinder"></div><div>圆柱</div></div>
+  <div><div data-diagram="shapeFrustum"></div><div>锥台</div></div>
+</div>
+
+<p>重新讲一遍这些东西是因为我好久没有在意过了. 很多书或者文章提到<em>锥台</em>这个东西的时候我扫一眼就过去了. 再了解一下不同几何体会让下面的一些表述变得更为感性...吧😅</p>
+<p><a href="/docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>通过四个属性来定义一个视锥. <code class="notranslate" translate="no">near</code>定义了视锥的前端, <code class="notranslate" translate="no">far</code>定义了后端, <code class="notranslate" translate="no">fov</code>是视野, 通过计算正确的高度来从摄像机的位置获得指定的以<code class="notranslate" translate="no">near</code>为单位的视野, 定义的是视锥的前端和后端的高度. <code class="notranslate" translate="no">aspect</code>间接地定义了视锥前端和后端的宽度, 实际上视锥的宽度是通过高度乘以aspect来得到的. </p>
+<p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
+<p>我们借用<a href="lights.html">上一篇文章</a>的场景. 其中包含一个地平面, 一个球和一个立方体, 我们可以在其中调整摄像机的设置. 
+·
+我们通过<code class="notranslate" translate="no">MinMaxGUIHelper</code>来调整<code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code>的设置. 显然<code class="notranslate" translate="no">near</code>应该总是比<code class="notranslate" translate="no">far</code>要小. lil-gui有<code class="notranslate" translate="no">min</code>和<code class="notranslate" translate="no">max</code>两个属性可调, 然后这两个属性将决定摄像机的设置. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class MinMaxGUIHelper {
+  constructor(obj, minProp, maxProp, minDif) {
+    this.obj = obj;
+    this.minProp = minProp;
+    this.maxProp = maxProp;
+    this.minDif = minDif;
+  }
+  get min() {
+    return this.obj[this.minProp];
+  }
+  set min(v) {
+    this.obj[this.minProp] = v;
+    this.obj[this.maxProp] = Math.max(this.obj[this.maxProp], v + this.minDif);
+  }
+  get max() {
+    return this.obj[this.maxProp];
+  }
+  set max(v) {
+    this.obj[this.maxProp] = v;
+    this.min = this.min;  // 这将调用min的setter
+  }
+}
+</pre>
+<p>现在我们可以将GUI设置为</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
+  camera.updateProjectionMatrix();
+}
+
+const gui = new GUI();
+gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
+const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
+gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
+</pre>
+<p>任何时候摄像机的设置变动, 我们需要调用摄像机的<a href="/docs/#api/zh/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a>来更新设置. 我们写一个函数<code class="notranslate" translate="no">updataCamera</code>, 当lil-gui改变了属性的时候会调用它来更新参数. </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-perspective.html" target="_blank">点击此处在新标签页中打开</a>
+</div>
+
+<p></p>
+<p>现在可以调整这些数值来观察这些参数是如何影响摄像机的. 注意我们并没有改变<code class="notranslate" translate="no">aspect</code>, 因为这个参数来自于窗口的大小. 如果想调整<code class="notranslate" translate="no">aspect</code>, 只需要开个新窗口然后调整窗口大小就可以了. </p>
+<p>即便是这样, 观察参数对视野的影响还是挺麻烦的. 所以我们来设置两台摄像机吧! 一台是跟上面一样展现出摄像机中看到的实际场景, 另一个则是用来观察这个实际工作的摄像机, 然后画出摄像机的视锥. </p>
+<p>我们需要用到three.js的剪函数(scissor function)来画两个场景和两个摄像机. </p>
+<p>首先让我们用HTML和CSS来定义两个肩并肩的元素. 这也将帮助我们将两个摄像机赋予不同的<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. </p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div class="split"&gt;
++     &lt;div id="view1" tabindex="1"&gt;&lt;/div&gt;
++     &lt;div id="view2" tabindex="2"&gt;&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>CSS将控制两个视窗并排显示在canvas中</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">.split {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.split&gt;div {
+  width: 100%;
+  height: 100%;
+}
+</pre>
+<p>接下来将添加一个<a href="/docs/#api/zh/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>, 它可以把摄像机的视锥画出来</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(camera);
+
+...
+
+scene.add(cameraHelper);
+</pre>
+<p>我们现在需要查找到刚刚定义的两个元素</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const view1Elem = document.querySelector('#view1');
+const view2Elem = document.querySelector('#view2');
+</pre>
+<p>现在只给第一个视窗中的摄像机分配<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const controls = new OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, view1Elem);
+</pre>
+<p>我们定义第二个<a href="/docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>和<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera2 = new THREE.PerspectiveCamera(
+  60,  // fov
+  2,   // aspect
+  0.1, // near
+  500, // far
+);
+camera2.position.set(40, 10, 30);
+camera2.lookAt(0, 5, 0);
+
+const controls2 = new OrbitControls(camera2, view2Elem);
+controls2.target.set(0, 5, 0);
+controls2.update();
+</pre>
+<p>最后我们需要</p>
+<p>最后，我们需要使用剪刀功能从每个摄影机的视角渲染场景，以仅渲染画布的一部分。
+这个函数接受一个元素, 计算这个元素在canvas上的重叠面积, 这将设置剪刀函数和视角长宽并返回aspect</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setScissorForElement(elem) {
+  const canvasRect = canvas.getBoundingClientRect();
+  const elemRect = elem.getBoundingClientRect();
+
+  // 计算canvas的尺寸
+  const right = Math.min(elemRect.right, canvasRect.right) - canvasRect.left;
+  const left = Math.max(0, elemRect.left - canvasRect.left);
+  const bottom = Math.min(elemRect.bottom, canvasRect.bottom) - canvasRect.top;
+  const top = Math.max(0, elemRect.top - canvasRect.top);
+
+  const width = Math.min(canvasRect.width, right - left);
+  const height = Math.min(canvasRect.height, bottom - top);
+
+  // 设置剪函数以仅渲染一部分场景
+  const positiveYUpBottom = canvasRect.height - bottom;
+  renderer.setScissor(left, positiveYUpBottom, width, height);
+  renderer.setViewport(left, positiveYUpBottom, width, height);
+
+  // 返回aspect
+  return width / height;
+}
+</pre>
+<p>我们用这个函数在<code class="notranslate" translate="no">render</code>中绘制两遍场景</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  function render() {
+
+-    if (resizeRendererToDisplaySize(renderer)) {
+-      const canvas = renderer.domElement;
+-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+-      camera.updateProjectionMatrix();
+-    }
+
++    resizeRendererToDisplaySize(renderer);
++
++    // 启用剪刀函数
++    renderer.setScissorTest(true);
++
++    // 渲染主视野
++    {
++      const aspect = setScissorForElement(view1Elem);
++
++      // 用计算出的aspect修改摄像机参数
++      camera.aspect = aspect;
++      camera.updateProjectionMatrix();
++      cameraHelper.update();
++
++      // 来原视野中不要绘制cameraHelper
++      cameraHelper.visible = false;
++
++      scene.background.set(0x000000);
++
++      // 渲染
++      renderer.render(scene, camera);
++    }
++
++    // 渲染第二台摄像机
++    {
++      const aspect = setScissorForElement(view2Elem);
++
++      // 调整aspect
++      camera2.aspect = aspect;
++      camera2.updateProjectionMatrix();
++
++      // 在第二台摄像机中绘制cameraHelper
++      cameraHelper.visible = true;
++
++      scene.background.set(0x000040);
++
++      renderer.render(scene, camera2);
++    }
+
+-    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>上面的代码还将主辅摄像机的背景色区分开以利观察. </p>
+<p>我们可以移除<code class="notranslate" translate="no">updateCamera</code>了, 因为所有的东西在<code class="notranslate" translate="no">render</code>中更新过了.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function updateCamera() {
+-  camera.updateProjectionMatrix();
+-}
+
+const gui = new GUI();
+-gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
++gui.add(camera, 'fov', 1, 180);
+const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+-gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
+-gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
++gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near');
++gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
+</pre>
+<p>现在我们就可以在辅摄像机中观察到主摄像机的视锥轮廓了. </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-perspective-2-scenes.html" target="_blank">点击此处在新标签页中打开</a>
+</div>
+
+<p></p>
+<p>左侧可以看到主摄像机的视角, 右侧则是辅摄像机观察主摄像机和主摄像机的视锥轮廓. 可以调整<code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code>, <code class="notranslate" translate="no">fov</code>和用鼠标移动摄像机来观察视锥轮廓和场景之间的关系. </p>
+<p>将<code class="notranslate" translate="no">near</code>调整到大概20左右, 前景就会在视锥中消失. <code class="notranslate" translate="no">far</code>低于35时, 远景也不复存在. </p>
+<p>这带来一个问题, 为什么不把<code class="notranslate" translate="no">near</code>设置到0.0000000001然后将<code class="notranslate" translate="no">far</code>设置成100000000, 使得一切都可以尽收眼底? 原因是你的GPU 8太行, 没有足够的精度来决定什么在前什么在后. 更糟的是, 在默认情况下, 离摄像机近的将会更清晰, 远的模糊, 从<code class="notranslate" translate="no">near</code>到<code class="notranslate" translate="no">far</code>逐渐过渡. </p>
+<p>从上面的例子出发, 我们向场景中添加20个球</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const sphereRadius = 3;
+  const sphereWidthDivisions = 32;
+  const sphereHeightDivisions = 16;
+  const sphereGeo = new THREE.SphereBufferGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+  const numSpheres = 20;
+  for (let i = 0; i &lt; numSpheres; ++i) {
+    const sphereMat = new THREE.MeshPhongMaterial();
+    sphereMat.color.setHSL(i * .73, 1, 0.5);
+    const mesh = new THREE.Mesh(sphereGeo, sphereMat);
+    mesh.position.set(-sphereRadius - 1, sphereRadius + 2, i * sphereRadius * -2.2);
+    scene.add(mesh);
+  }
+}
+</pre>
+<p>把 <code class="notranslate" translate="no">near</code> 设置成0.00001</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 45;
+const aspect = 2;  // canvas 默认
+-const near = 0.1;
++const near = 0.00001;
+const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+</pre>
+<p>调整一下GUI使得能设置到0.00001</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
++gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
+</pre>
+<p>你觉得会发生什么?</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-z-fighting.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-z-fighting.html" target="_blank">点击此处在新标签页中打开</a>
+</div>
+
+<p></p>
+<p>这就是一个典型的<em>z冲突</em>的例子. GPU没有足够的精度来决定哪个像素在前哪个在后. </p>
+<p>以防你的机器太好出现不了我说的情况, 我把我看到的截图放在这</p>
+<div class="threejs_center"><img src="../resources/images/z-fighting.png" style="width: 570px;"></div>
+
+<p>解决的方法之一是告诉three.js使用不同的方法计算像素的前后关系. 我们可以在创建<a href="/docs/#api/zh/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>时开启<code class="notranslate" translate="no">logarithmicDepthBuffer</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  logarithmicDepthBuffer: true,
++});
+</pre>
+<p>这看起来就行了</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-logarithmic-depth-buffer.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-logarithmic-depth-buffer.html" target="_blank">点击此处在新标签页中打开</a>
+</div>
+
+<p></p>
+<p>如果这不行的话, 那你就遇到了<em>为什么不能无脑使用这种解决方案</em>的情况了. 到2018年9月, 绝大多数台式机可以但是几乎没有移动设备支持这个功能. </p>
+<p>另一个最好别用这种解决方案的原因是这会大大降低运行速度. </p>
+<p>即便是现在跑得好好地, 选择太小的<code class="notranslate" translate="no">near</code>和太大的<code class="notranslate" translate="no">far</code>最终也会遇到同样的问题. </p>
+<p>所以说你需要选择好好抉择<code class="notranslate" translate="no">near</code>和<code class="notranslate" translate="no">far</code>的设置, 来和你的场景配合. 既不丢失重要的近景, 也不让远处的东西消失不见. 如果你想渲染一个巨大的场景, 不但能看清面前的人的眼睫毛又想看到50公里以外的玩意, 你得自己想一个<em>厉害的</em>方案, 这里就不涉及了. 现在, 好好地选个需要的参数就行. </p>
+<p>第二种常见的摄像机是<code class="notranslate" translate="no">正交摄像机 OrthographicCamera</code>, 和指定一个视锥不同的是, 它需要设置<code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>
+<code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, 和<code class="notranslate" translate="no">far</code>指定一个长方体, 使得视野是平行的而不是透视的. </p>
+<p>我们来把上面的例子改成<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>, 首先来设置摄像机</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -1;
+const right = 1;
+const top = 1;
+const bottom = -1;
+const near = 5;
+const far = 50;
+const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+camera.zoom = 0.2;
+</pre>
+<p>我们将<code class="notranslate" translate="no">left</code>和<code class="notranslate" translate="no">bottom</code>设置成 -1 <code class="notranslate" translate="no">right</code> 和 <code class="notranslate" translate="no">top</code>设成 1, 这样就使盒子宽为两个单位, 高两个单位. 我们接下来通过调整<code class="notranslate" translate="no">left</code>和<code class="notranslate" translate="no">top</code>来选择其aspect. 我们将用<code class="notranslate" translate="no">zoom</code>属性来调整相机到底展现多少的单位大小. </p>
+<p>给GUI添加<code class="notranslate" translate="no">zoom</code>设置</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
++gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
+</pre>
+<p><code class="notranslate" translate="no">listen</code>调用告诉lil-gui去监视属性的变化. 写在这里是因为<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>同样可以控制缩放. 在这个例子中, 鼠标滚轮将会通过<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>控件来控制缩放. </p>
+<p>最后更改aspect然后更新摄像机</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const aspect = setScissorForElement(view1Elem);
+
+  // 使用aspect更新摄像机
+-  camera.aspect = aspect;
++  camera.left   = -aspect;
++  camera.right  =  aspect;
+  camera.updateProjectionMatrix();
+  cameraHelper.update();
+
+  // 在主摄像机中不绘制视野辅助线
+  cameraHelper.visible = false;
+
+  scene.background.set(0x000000);
+  renderer.render(scene, camera);
+}
+</pre>
+<p>现在就可以看到<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>工作了. </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-orthographic-2-scenes.html" target="_blank">点击此处在新标签页中打开</a>
+</div>
+
+<p></p>
+<p>大多数情况下, 绘制2D图像的时候会用到<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>. 你可以自己决定摄像机的视野大小. 比如说你想让canvas的一个像素匹配摄像机的一个单位, 你可以这么做</p>
+<p>将原点置于中心, 令一个像素等于一个单位</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">camera.left = -canvas.width / 2;
+camera.right = canvas.width / 2;
+camera.top = canvas.height / 2;
+camera.bottom = -canvas.height / 2;
+camera.near = -1;
+camera.far = 1;
+camera.zoom = 1;
+</pre>
+<p>或者如果我们想让原点在左上, 就像是2D canvas</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">camera.left = 0;
+camera.right = canvas.width;
+camera.top = 0;
+camera.bottom = canvas.height;
+camera.near = -1;
+camera.far = 1;
+camera.zoom = 1;
+</pre>
+<p>这样左上角就成了0,0</p>
+<p>试试, 这样设置摄像机</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = 0;
+const right = 300;  // 默认的canvas大小
+const top = 0;
+const bottom = 150;  // 默认的canvas大小
+const near = -1;
+const far = 1;
+const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+camera.zoom = 1;
+</pre>
+<p>然后我们载入六个材质, 生成六个平面, 一一对应. 把每一个平面绑定到父对象<a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>上, 以便调整每个平面和左上角原点的相对关系</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+const textures = [
+  loader.load('resources/images/flower-1.jpg'),
+  loader.load('resources/images/flower-2.jpg'),
+  loader.load('resources/images/flower-3.jpg'),
+  loader.load('resources/images/flower-4.jpg'),
+  loader.load('resources/images/flower-5.jpg'),
+  loader.load('resources/images/flower-6.jpg'),
+];
+const planeSize = 256;
+const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
+const planes = textures.map((texture) =&gt; {
+  const planePivot = new THREE.Object3D();
+  scene.add(planePivot);
+  texture.magFilter = THREE.NearestFilter;
+  const planeMat = new THREE.MeshBasicMaterial({
+    map: texture,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(planeGeo, planeMat);
+  planePivot.add(mesh);
+  // 调整平面使得左上角为原点
+  mesh.position.set(planeSize / 2, planeSize / 2, 0);
+  return planePivot;
+});
+</pre>
+<p>然后当canvas更新后我们更新摄像机设置</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    camera.right = canvas.width;
+    camera.bottom = canvas.height;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p><code class="notranslate" translate="no">planes</code> 是<a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a>的数组, 每一个对应一个平面. 
+现在让它随着时间移动</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;  // 转换为秒;
+
+  ...
+
+  const distAcross = Math.max(20, canvas.width - planeSize);
+  const distDown = Math.max(20, canvas.height - planeSize);
+
+  // 来回运动的总距离
+  const xRange = distAcross * 2;
+  const yRange = distDown * 2;
+  const speed = 180;
+
+  planes.forEach((plane, ndx) =&gt; {
+    // 为每个平面单独计算时间
+    const t = time * speed + ndx * 300;
+
+    // 在0到最远距离之间获取一个值
+    const xt = t % xRange;
+    const yt = t % yRange;
+
+    // 0到距离的一半, 向前运动
+    // 另一半的时候往回运动
+    const x = xt &lt; distAcross ? xt : xRange - xt;
+    const y = yt &lt; distDown   ? yt : yRange - yt;
+
+    plane.position.set(x, y, 0);
+  });
+
+  renderer.render(scene, camera);
+</pre>
+<p>你可以看到图片在其中弹跳, 和边际完美契合, 就是2D canvas的效果一样</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-canvas-top-left-origin.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cameras-orthographic-canvas-top-left-origin.html" target="_blank">点击此处在新标签页中打开</a>
+</div>
+
+<p></p>
+<p>另一个常见的用途是用<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>来展示模型的三视图.</p>
+<div class="threejs_center"><img src="../resources/images/quad-viewport.png" style="width: 574px;"></div>
+
+<p>上面的截图展示了一个透视图和三个正交视角.</p>
+<p>这就是摄像机的基础. 我们在其他的文章中会介绍另外的一些摄像机用法. 现在, 我们移步到<a href="shadows.html">阴影</a>.</p>
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-cameras.js"></script>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

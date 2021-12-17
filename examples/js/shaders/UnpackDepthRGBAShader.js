@@ -1,49 +1,50 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
+( function () {
+
+	/**
  * Unpack RGBA depth shader
  * - show RGBA encoded depth as monochrome color
  */
+	const UnpackDepthRGBAShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'opacity': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-THREE.UnpackDepthRGBAShader = {
+		varying vec2 vUv;
 
-	uniforms: {
+		void main() {
 
-		"tDiffuse": { value: null },
-		"opacity":  { value: 1.0 }
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	},
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-	vertexShader: [
+		uniform float opacity;
 
-		"varying vec2 vUv;",
+		uniform sampler2D tDiffuse;
 
-		"void main() {",
+		varying vec2 vUv;
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		#include <packing>
 
-		"}"
+		void main() {
 
-	].join( "\n" ),
+			float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );
+			gl_FragColor = vec4( vec3( depth ), opacity );
 
-	fragmentShader: [
+		}`
+	};
 
-		"uniform float opacity;",
+	THREE.UnpackDepthRGBAShader = UnpackDepthRGBAShader;
 
-		"uniform sampler2D tDiffuse;",
-
-		"varying vec2 vUv;",
-
-		"#include <packing>",
-
-		"void main() {",
-
-			"float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );",
-			"gl_FragColor = vec4( vec3( depth ), opacity );",
-
-		"}"
-
-	].join( "\n" )
-
-};
+} )();
