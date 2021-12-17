@@ -1106,36 +1106,6 @@
 	function createElementNS(name) {
 		return document.createElementNS('http://www.w3.org/1999/xhtml', name);
 	}
-	/**
-		* cyrb53 hash for string from: https://stackoverflow.com/a/52171480
-		*
-		* Public Domain, @bryc - https://stackoverflow.com/users/815680/bryc
-		*
-		* It is roughly similar to the well-known MurmurHash/xxHash algorithms. It uses a combination
-		* of multiplication and Xorshift to generate the hash, but not as thorough. As a result it's
-		* faster than either would be in JavaScript and significantly simpler to implement. Keep in
-		* mind this is not a secure algorithm, if privacy/security is a concern, this is not for you.
-		*
-		* @param {string} str
-		* @param {number} seed, default 0
-		* @returns number
-		*/
-
-
-	function hashString(str, seed = 0) {
-		let h1 = 0xdeadbeef ^ seed,
-				h2 = 0x41c6ce57 ^ seed;
-
-		for (let i = 0, ch; i < str.length; i++) {
-			ch = str.charCodeAt(i);
-			h1 = Math.imul(h1 ^ ch, 2654435761);
-			h2 = Math.imul(h2 ^ ch, 1597334677);
-		}
-
-		h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507) ^ Math.imul(h2 ^ h2 >>> 13, 3266489909);
-		h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507) ^ Math.imul(h1 ^ h1 >>> 13, 3266489909);
-		return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-	}
 
 	let _canvas;
 
@@ -3772,7 +3742,7 @@
 		}
 
 		distanceSqToSegment(v0, v1, optionalPointOnRay, optionalPointOnSegment) {
-			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
+			// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteDistRaySegment.h
 			// It returns the min distance between the ray and the segment
 			// defined by v0 and v1
 			// It can also set two optional targets :
@@ -3983,7 +3953,7 @@
 
 		intersectTriangle(a, b, c, backfaceCulling, target) {
 			// Compute the offset origin, edges, and normal.
-			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+			// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 			_edge1.subVectors(b, a);
 
 			_edge2.subVectors(c, a);
@@ -7354,7 +7324,7 @@
 
 	} //
 
-	let _id = 0;
+	let _id$1 = 0;
 
 	const _m1 = /*@__PURE__*/new Matrix4();
 
@@ -7372,7 +7342,7 @@
 		constructor() {
 			super();
 			Object.defineProperty(this, 'id', {
-				value: _id++
+				value: _id$1++
 			});
 			this.uuid = generateUUID();
 			this.name = '';
@@ -9725,7 +9695,7 @@
 
 	var common = "#define PI 3.141592653589793\n#define PI2 6.283185307179586\n#define PI_HALF 1.5707963267948966\n#define RECIPROCAL_PI 0.3183098861837907\n#define RECIPROCAL_PI2 0.15915494309189535\n#define EPSILON 1e-6\n#ifndef saturate\n#define saturate( a ) clamp( a, 0.0, 1.0 )\n#endif\n#define whiteComplement( a ) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat max3( const in vec3 v ) { return max( max( v.x, v.y ), v.z ); }\nfloat average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }\nhighp float rand( const in vec2 uv ) {\n\tconst highp float a = 12.9898, b = 78.233, c = 43758.5453;\n\thighp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );\n\treturn fract( sin( sn ) * c );\n}\n#ifdef HIGH_PRECISION\n\tfloat precisionSafeLength( vec3 v ) { return length( v ); }\n#else\n\tfloat precisionSafeLength( vec3 v ) {\n\t\tfloat maxComponent = max3( abs( v ) );\n\t\treturn length( v / maxComponent ) * maxComponent;\n\t}\n#endif\nstruct IncidentLight {\n\tvec3 color;\n\tvec3 direction;\n\tbool visible;\n};\nstruct ReflectedLight {\n\tvec3 directDiffuse;\n\tvec3 directSpecular;\n\tvec3 indirectDiffuse;\n\tvec3 indirectSpecular;\n};\nstruct GeometricContext {\n\tvec3 position;\n\tvec3 normal;\n\tvec3 viewDir;\n#ifdef USE_CLEARCOAT\n\tvec3 clearcoatNormal;\n#endif\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nmat3 transposeMat3( const in mat3 m ) {\n\tmat3 tmp;\n\ttmp[ 0 ] = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x );\n\ttmp[ 1 ] = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y );\n\ttmp[ 2 ] = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z );\n\treturn tmp;\n}\nfloat linearToRelativeLuminance( const in vec3 color ) {\n\tvec3 weights = vec3( 0.2126, 0.7152, 0.0722 );\n\treturn dot( weights, color.rgb );\n}\nbool isPerspectiveMatrix( mat4 m ) {\n\treturn m[ 2 ][ 3 ] == - 1.0;\n}\nvec2 equirectUv( in vec3 dir ) {\n\tfloat u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;\n\tfloat v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\treturn vec2( u, v );\n}";
 
-	var cube_uv_reflection_fragment = "#ifdef ENVMAP_TYPE_CUBE_UV\n\t#define cubeUV_maxMipLevel 8.0\n\t#define cubeUV_minMipLevel 4.0\n\t#define cubeUV_maxTileSize 256.0\n\t#define cubeUV_minTileSize 16.0\n\tfloat getFace( vec3 direction ) {\n\t\tvec3 absDirection = abs( direction );\n\t\tfloat face = - 1.0;\n\t\tif ( absDirection.x > absDirection.z ) {\n\t\t\tif ( absDirection.x > absDirection.y )\n\t\t\t\tface = direction.x > 0.0 ? 0.0 : 3.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t} else {\n\t\t\tif ( absDirection.z > absDirection.y )\n\t\t\t\tface = direction.z > 0.0 ? 2.0 : 5.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t}\n\t\treturn face;\n\t}\n\tvec2 getUV( vec3 direction, float face ) {\n\t\tvec2 uv;\n\t\tif ( face == 0.0 ) {\n\t\t\tuv = vec2( direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 1.0 ) {\n\t\t\tuv = vec2( - direction.x, - direction.z ) / abs( direction.y );\n\t\t} else if ( face == 2.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.y ) / abs( direction.z );\n\t\t} else if ( face == 3.0 ) {\n\t\t\tuv = vec2( - direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 4.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.z ) / abs( direction.y );\n\t\t} else {\n\t\t\tuv = vec2( direction.x, direction.y ) / abs( direction.z );\n\t\t}\n\t\treturn 0.5 * ( uv + 1.0 );\n\t}\n\tvec3 bilinearCubeUV( sampler2D envMap, vec3 direction, float mipInt ) {\n\t\tfloat face = getFace( direction );\n\t\tfloat filterInt = max( cubeUV_minMipLevel - mipInt, 0.0 );\n\t\tmipInt = max( mipInt, cubeUV_minMipLevel );\n\t\tfloat faceSize = exp2( mipInt );\n\t\tfloat texelSize = 1.0 / ( 3.0 * cubeUV_maxTileSize );\n\t\tvec2 uv = getUV( direction, face ) * ( faceSize - 1.0 );\n\t\tvec2 f = fract( uv );\n\t\tuv += 0.5 - f;\n\t\tif ( face > 2.0 ) {\n\t\t\tuv.y += faceSize;\n\t\t\tface -= 3.0;\n\t\t}\n\t\tuv.x += face * faceSize;\n\t\tif ( mipInt < cubeUV_maxMipLevel ) {\n\t\t\tuv.y += 2.0 * cubeUV_maxTileSize;\n\t\t}\n\t\tuv.y += filterInt * 2.0 * cubeUV_minTileSize;\n\t\tuv.x += 3.0 * max( 0.0, cubeUV_maxTileSize - 2.0 * faceSize );\n\t\tuv *= texelSize;\n\t\tvec3 tl = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;\n\t\tuv.x += texelSize;\n\t\tvec3 tr = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;\n\t\tuv.y += texelSize;\n\t\tvec3 br = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;\n\t\tuv.x -= texelSize;\n\t\tvec3 bl = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;\n\t\tvec3 tm = mix( tl, tr, f.x );\n\t\tvec3 bm = mix( bl, br, f.x );\n\t\treturn mix( tm, bm, f.y );\n\t}\n\t#define r0 1.0\n\t#define v0 0.339\n\t#define m0 - 2.0\n\t#define r1 0.8\n\t#define v1 0.276\n\t#define m1 - 1.0\n\t#define r4 0.4\n\t#define v4 0.046\n\t#define m4 2.0\n\t#define r5 0.305\n\t#define v5 0.016\n\t#define m5 3.0\n\t#define r6 0.21\n\t#define v6 0.0038\n\t#define m6 4.0\n\tfloat roughnessToMip( float roughness ) {\n\t\tfloat mip = 0.0;\n\t\tif ( roughness >= r1 ) {\n\t\t\tmip = ( r0 - roughness ) * ( m1 - m0 ) / ( r0 - r1 ) + m0;\n\t\t} else if ( roughness >= r4 ) {\n\t\t\tmip = ( r1 - roughness ) * ( m4 - m1 ) / ( r1 - r4 ) + m1;\n\t\t} else if ( roughness >= r5 ) {\n\t\t\tmip = ( r4 - roughness ) * ( m5 - m4 ) / ( r4 - r5 ) + m4;\n\t\t} else if ( roughness >= r6 ) {\n\t\t\tmip = ( r5 - roughness ) * ( m6 - m5 ) / ( r5 - r6 ) + m5;\n\t\t} else {\n\t\t\tmip = - 2.0 * log2( 1.16 * roughness );\t\t}\n\t\treturn mip;\n\t}\n\tvec4 textureCubeUV( sampler2D envMap, vec3 sampleDir, float roughness ) {\n\t\tfloat mip = clamp( roughnessToMip( roughness ), m0, cubeUV_maxMipLevel );\n\t\tfloat mipF = fract( mip );\n\t\tfloat mipInt = floor( mip );\n\t\tvec3 color0 = bilinearCubeUV( envMap, sampleDir, mipInt );\n\t\tif ( mipF == 0.0 ) {\n\t\t\treturn vec4( color0, 1.0 );\n\t\t} else {\n\t\t\tvec3 color1 = bilinearCubeUV( envMap, sampleDir, mipInt + 1.0 );\n\t\t\treturn vec4( mix( color0, color1, mipF ), 1.0 );\n\t\t}\n\t}\n#endif";
+	var cube_uv_reflection_fragment = "#ifdef ENVMAP_TYPE_CUBE_UV\n\t#define cubeUV_maxMipLevel 8.0\n\t#define cubeUV_minMipLevel 4.0\n\t#define cubeUV_maxTileSize 256.0\n\t#define cubeUV_minTileSize 16.0\n\tfloat getFace( vec3 direction ) {\n\t\tvec3 absDirection = abs( direction );\n\t\tfloat face = - 1.0;\n\t\tif ( absDirection.x > absDirection.z ) {\n\t\t\tif ( absDirection.x > absDirection.y )\n\t\t\t\tface = direction.x > 0.0 ? 0.0 : 3.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t} else {\n\t\t\tif ( absDirection.z > absDirection.y )\n\t\t\t\tface = direction.z > 0.0 ? 2.0 : 5.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t}\n\t\treturn face;\n\t}\n\tvec2 getUV( vec3 direction, float face ) {\n\t\tvec2 uv;\n\t\tif ( face == 0.0 ) {\n\t\t\tuv = vec2( direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 1.0 ) {\n\t\t\tuv = vec2( - direction.x, - direction.z ) / abs( direction.y );\n\t\t} else if ( face == 2.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.y ) / abs( direction.z );\n\t\t} else if ( face == 3.0 ) {\n\t\t\tuv = vec2( - direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 4.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.z ) / abs( direction.y );\n\t\t} else {\n\t\t\tuv = vec2( direction.x, direction.y ) / abs( direction.z );\n\t\t}\n\t\treturn 0.5 * ( uv + 1.0 );\n\t}\n\tvec3 bilinearCubeUV( sampler2D envMap, vec3 direction, float mipInt ) {\n\t\tfloat face = getFace( direction );\n\t\tfloat filterInt = max( cubeUV_minMipLevel - mipInt, 0.0 );\n\t\tmipInt = max( mipInt, cubeUV_minMipLevel );\n\t\tfloat faceSize = exp2( mipInt );\n\t\tfloat texelSize = 1.0 / ( 3.0 * cubeUV_maxTileSize );\n\t\tvec2 uv = getUV( direction, face ) * ( faceSize - 1.0 ) + 0.5;\n\t\tif ( face > 2.0 ) {\n\t\t\tuv.y += faceSize;\n\t\t\tface -= 3.0;\n\t\t}\n\t\tuv.x += face * faceSize;\n\t\tif ( mipInt < cubeUV_maxMipLevel ) {\n\t\t\tuv.y += 2.0 * cubeUV_maxTileSize;\n\t\t}\n\t\tuv.y += filterInt * 2.0 * cubeUV_minTileSize;\n\t\tuv.x += 3.0 * max( 0.0, cubeUV_maxTileSize - 2.0 * faceSize );\n\t\tuv *= texelSize;\n\t\treturn texture2D( envMap, uv ).rgb;\n\t}\n\t#define r0 1.0\n\t#define v0 0.339\n\t#define m0 - 2.0\n\t#define r1 0.8\n\t#define v1 0.276\n\t#define m1 - 1.0\n\t#define r4 0.4\n\t#define v4 0.046\n\t#define m4 2.0\n\t#define r5 0.305\n\t#define v5 0.016\n\t#define m5 3.0\n\t#define r6 0.21\n\t#define v6 0.0038\n\t#define m6 4.0\n\tfloat roughnessToMip( float roughness ) {\n\t\tfloat mip = 0.0;\n\t\tif ( roughness >= r1 ) {\n\t\t\tmip = ( r0 - roughness ) * ( m1 - m0 ) / ( r0 - r1 ) + m0;\n\t\t} else if ( roughness >= r4 ) {\n\t\t\tmip = ( r1 - roughness ) * ( m4 - m1 ) / ( r1 - r4 ) + m1;\n\t\t} else if ( roughness >= r5 ) {\n\t\t\tmip = ( r4 - roughness ) * ( m5 - m4 ) / ( r4 - r5 ) + m4;\n\t\t} else if ( roughness >= r6 ) {\n\t\t\tmip = ( r5 - roughness ) * ( m6 - m5 ) / ( r5 - r6 ) + m5;\n\t\t} else {\n\t\t\tmip = - 2.0 * log2( 1.16 * roughness );\t\t}\n\t\treturn mip;\n\t}\n\tvec4 textureCubeUV( sampler2D envMap, vec3 sampleDir, float roughness ) {\n\t\tfloat mip = clamp( roughnessToMip( roughness ), m0, cubeUV_maxMipLevel );\n\t\tfloat mipF = fract( mip );\n\t\tfloat mipInt = floor( mip );\n\t\tvec3 color0 = bilinearCubeUV( envMap, sampleDir, mipInt );\n\t\tif ( mipF == 0.0 ) {\n\t\t\treturn vec4( color0, 1.0 );\n\t\t} else {\n\t\t\tvec3 color1 = bilinearCubeUV( envMap, sampleDir, mipInt + 1.0 );\n\t\t\treturn vec4( mix( color0, color1, mipF ), 1.0 );\n\t\t}\n\t}\n#endif";
 
 	var defaultnormal_vertex = "vec3 transformedNormal = objectNormal;\n#ifdef USE_INSTANCING\n\tmat3 m = mat3( instanceMatrix );\n\ttransformedNormal /= vec3( dot( m[ 0 ], m[ 0 ] ), dot( m[ 1 ], m[ 1 ] ), dot( m[ 2 ], m[ 2 ] ) );\n\ttransformedNormal = m * transformedNormal;\n#endif\ntransformedNormal = normalMatrix * transformedNormal;\n#ifdef FLIP_SIDED\n\ttransformedNormal = - transformedNormal;\n#endif\n#ifdef USE_TANGENT\n\tvec3 transformedTangent = ( modelViewMatrix * vec4( objectTangent, 0.0 ) ).xyz;\n\t#ifdef FLIP_SIDED\n\t\ttransformedTangent = - transformedTangent;\n\t#endif\n#endif";
 
@@ -11730,12 +11700,12 @@
 		_allocateTargets(texture) {
 			// warning: null texture is valid
 			const params = {
-				magFilter: NearestFilter,
-				minFilter: NearestFilter,
+				magFilter: LinearFilter,
+				minFilter: LinearFilter,
 				generateMipmaps: false,
-				type: UnsignedByteType,
-				format: RGBEFormat,
-				encoding: _isLDR(texture) ? texture.encoding : RGBEEncoding,
+				type: HalfFloatType,
+				format: RGBAFormat,
+				encoding: LinearEncoding,
 				depthBuffer: false
 			};
 
@@ -11760,11 +11730,9 @@
 			const forwardSign = [1, 1, 1, -1, -1, -1];
 			const renderer = this._renderer;
 			const originalAutoClear = renderer.autoClear;
-			const outputEncoding = renderer.outputEncoding;
 			const toneMapping = renderer.toneMapping;
 			renderer.getClearColor(_clearColor);
 			renderer.toneMapping = NoToneMapping;
-			renderer.outputEncoding = LinearEncoding;
 			renderer.autoClear = false;
 			const backgroundMaterial = new MeshBasicMaterial({
 				name: 'PMREM.Background',
@@ -11815,7 +11783,6 @@
 			backgroundBox.geometry.dispose();
 			backgroundBox.material.dispose();
 			renderer.toneMapping = toneMapping;
-			renderer.outputEncoding = outputEncoding;
 			renderer.autoClear = originalAutoClear;
 			scene.background = background;
 		}
@@ -11852,8 +11819,6 @@
 			}
 
 			this._setEncoding(uniforms['inputEncoding'], texture);
-
-			this._setEncoding(uniforms['outputEncoding'], cubeUVRenderTarget.texture);
 
 			_setViewport(cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX);
 
@@ -11943,11 +11908,6 @@
 
 			blurUniforms['dTheta'].value = radiansPerPixel;
 			blurUniforms['mipInt'].value = LOD_MAX - lodIn;
-
-			this._setEncoding(blurUniforms['inputEncoding'], targetIn.texture);
-
-			this._setEncoding(blurUniforms['outputEncoding'], targetIn.texture);
-
 			const outputSize = _sizeLods[lodOut];
 			const x = 3 * Math.max(0, SIZE_MAX - 2 * outputSize);
 			const y = (lodOut === 0 ? 0 : 2 * SIZE_MAX) + 2 * outputSize * (lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0);
@@ -11958,11 +11918,6 @@
 			renderer.render(blurMesh, _flatCamera);
 		}
 
-	}
-
-	function _isLDR(texture) {
-		if (texture === undefined || texture.type !== UnsignedByteType) return false;
-		return texture.encoding === LinearEncoding || texture.encoding === sRGBEncoding || texture.encoding === GammaEncoding;
 	}
 
 	function _createPlanes() {
@@ -12070,12 +12025,6 @@
 				},
 				'poleAxis': {
 					value: poleAxis
-				},
-				'inputEncoding': {
-					value: ENCODINGS[LinearEncoding]
-				},
-				'outputEncoding': {
-					value: ENCODINGS[LinearEncoding]
 				}
 			},
 			vertexShader: _getCommonVertexShader(),
@@ -12142,8 +12091,6 @@
 
 				}
 
-				gl_FragColor = linearToOutputTexel( gl_FragColor );
-
 			}
 		`,
 			blending: NoBlending,
@@ -12165,9 +12112,6 @@
 					value: texelSize
 				},
 				'inputEncoding': {
-					value: ENCODINGS[LinearEncoding]
-				},
-				'outputEncoding': {
 					value: ENCODINGS[LinearEncoding]
 				}
 			},
@@ -12209,8 +12153,6 @@
 				vec3 bm = mix( bl, br, f.x );
 				gl_FragColor.rgb = mix( tm, bm, f.y );
 
-				gl_FragColor = linearToOutputTexel( gl_FragColor );
-
 			}
 		`,
 			blending: NoBlending,
@@ -12228,9 +12170,6 @@
 					value: null
 				},
 				'inputEncoding': {
-					value: ENCODINGS[LinearEncoding]
-				},
-				'outputEncoding': {
 					value: ENCODINGS[LinearEncoding]
 				}
 			},
@@ -12250,9 +12189,7 @@
 
 			void main() {
 
-				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
-				gl_FragColor.rgb = envMapTexelToLinear( textureCube( envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ) ) ).rgb;
-				gl_FragColor = linearToOutputTexel( gl_FragColor );
+				gl_FragColor = envMapTexelToLinear( textureCube( envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ) ) );
 
 			}
 		`,
@@ -12333,7 +12270,6 @@
 			`
 
 		uniform int inputEncoding;
-		uniform int outputEncoding;
 
 		#include <encodings_pars_fragment>
 
@@ -12366,40 +12302,6 @@
 			} else {
 
 				return GammaToLinear( value, 2.2 );
-
-			}
-
-		}
-
-		vec4 linearToOutputTexel( vec4 value ) {
-
-			if ( outputEncoding == 0 ) {
-
-				return value;
-
-			} else if ( outputEncoding == 1 ) {
-
-				return LinearTosRGB( value );
-
-			} else if ( outputEncoding == 2 ) {
-
-				return LinearToRGBE( value );
-
-			} else if ( outputEncoding == 3 ) {
-
-				return LinearToRGBM( value, 7.0 );
-
-			} else if ( outputEncoding == 4 ) {
-
-				return LinearToRGBM( value, 16.0 );
-
-			} else if ( outputEncoding == 5 ) {
-
-				return LinearToRGBD( value, 256.0 );
-
-			} else {
-
-				return LinearToGamma( value, 2.2 );
 
 			}
 
@@ -14309,8 +14211,97 @@
 		return this;
 	}
 
+	let _id = 0;
+
+	class WebGLShaderCache {
+		constructor() {
+			this.shaderCache = new Map();
+			this.materialCache = new Map();
+		}
+
+		update(material) {
+			const vertexShader = material.vertexShader;
+			const fragmentShader = material.fragmentShader;
+
+			const vertexShaderStage = this._getShaderStage(vertexShader);
+
+			const fragmentShaderStage = this._getShaderStage(fragmentShader);
+
+			const materialShaders = this._getShaderCacheForMaterial(material);
+
+			if (materialShaders.has(vertexShaderStage) === false) {
+				materialShaders.add(vertexShaderStage);
+				vertexShaderStage.usedTimes++;
+			}
+
+			if (materialShaders.has(fragmentShaderStage) === false) {
+				materialShaders.add(fragmentShaderStage);
+				fragmentShaderStage.usedTimes++;
+			}
+
+			return this;
+		}
+
+		remove(material) {
+			const materialShaders = this.materialCache.get(material);
+
+			for (const shaderStage of materialShaders) {
+				shaderStage.usedTimes--;
+				if (shaderStage.usedTimes === 0) this.shaderCache.delete(shaderStage);
+			}
+
+			this.materialCache.delete(material);
+			return this;
+		}
+
+		getVertexShaderID(material) {
+			return this._getShaderStage(material.vertexShader).id;
+		}
+
+		getFragmentShaderID(material) {
+			return this._getShaderStage(material.fragmentShader).id;
+		}
+
+		dispose() {
+			this.shaderCache.clear();
+			this.materialCache.clear();
+		}
+
+		_getShaderCacheForMaterial(material) {
+			const cache = this.materialCache;
+
+			if (cache.has(material) === false) {
+				cache.set(material, new Set());
+			}
+
+			return cache.get(material);
+		}
+
+		_getShaderStage(code) {
+			const cache = this.shaderCache;
+
+			if (cache.has(code) === false) {
+				const stage = new WebGLShaderStage();
+				cache.set(code, stage);
+			}
+
+			return cache.get(code);
+		}
+
+	}
+
+	class WebGLShaderStage {
+		constructor() {
+			this.id = _id++;
+			this.usedTimes = 0;
+		}
+
+	}
+
 	function WebGLPrograms(renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping) {
 		const _programLayers = new Layers();
+
+		const _customShaders = new WebGLShaderCache();
 
 		const programs = [];
 		const isWebGL2 = capabilities.isWebGL2;
@@ -14400,6 +14391,7 @@
 			}
 
 			let vertexShader, fragmentShader;
+			let customVertexShaderID, customFragmentShaderID;
 
 			if (shaderID) {
 				const shader = ShaderLib[shaderID];
@@ -14408,6 +14400,11 @@
 			} else {
 				vertexShader = material.vertexShader;
 				fragmentShader = material.fragmentShader;
+
+				_customShaders.update(material);
+
+				customVertexShaderID = _customShaders.getVertexShaderID(material);
+				customFragmentShaderID = _customShaders.getFragmentShaderID(material);
 			}
 
 			const currentRenderTarget = renderer.getRenderTarget();
@@ -14420,6 +14417,8 @@
 				vertexShader: vertexShader,
 				fragmentShader: fragmentShader,
 				defines: material.defines,
+				customVertexShaderID: customVertexShaderID,
+				customFragmentShaderID: customFragmentShaderID,
 				isRawShaderMaterial: material.isRawShaderMaterial === true,
 				glslVersion: material.glslVersion,
 				precision: precision,
@@ -14522,8 +14521,8 @@
 			if (parameters.shaderID) {
 				array.push(parameters.shaderID);
 			} else {
-				array.push(hashString(parameters.fragmentShader));
-				array.push(hashString(parameters.vertexShader));
+				array.push(parameters.customVertexShaderID);
+				array.push(parameters.customFragmentShaderID);
 			}
 
 			if (parameters.defines !== undefined) {
@@ -14686,14 +14685,24 @@
 			}
 		}
 
+		function releaseShaderCache(material) {
+			_customShaders.remove(material);
+		}
+
+		function dispose() {
+			_customShaders.dispose();
+		}
+
 		return {
 			getParameters: getParameters,
 			getProgramCacheKey: getProgramCacheKey,
 			getUniforms: getUniforms,
 			acquireProgram: acquireProgram,
 			releaseProgram: releaseProgram,
+			releaseShaderCache: releaseShaderCache,
 			// Exposed for resource monitoring & error feedback via renderer.info:
-			programs: programs
+			programs: programs,
+			dispose: dispose
 		};
 	}
 
@@ -18176,7 +18185,11 @@
 						session.updateRenderState({
 							baseLayer: glBaseLayer
 						});
-						newRenderTarget = new WebGLRenderTarget(glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight);
+						newRenderTarget = new WebGLRenderTarget(glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, {
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							encoding: renderer.outputEncoding
+						});
 					} else {
 						isMultisample = attributes.antialias;
 						let depthFormat = null;
@@ -19398,6 +19411,7 @@
 			cubeuvmaps.dispose();
 			objects.dispose();
 			bindingStates.dispose();
+			programCache.dispose();
 			xr.dispose();
 			xr.removeEventListener('sessionstart', onXRSessionStart);
 			xr.removeEventListener('sessionend', onXRSessionEnd);
@@ -19453,6 +19467,10 @@
 				programs.forEach(function (program) {
 					programCache.releaseProgram(program);
 				});
+
+				if (material.isShaderMaterial) {
+					programCache.releaseShaderCache(material);
+				}
 			}
 		} // Buffer rendering
 
@@ -19944,6 +19962,7 @@
 			materialProperties.numIntersection = parameters.numClipIntersection;
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
 			materialProperties.vertexTangents = parameters.vertexTangents;
+			materialProperties.toneMapping = parameters.toneMapping;
 		}
 
 		function setProgram(camera, scene, geometry, material, object) {
@@ -19959,6 +19978,7 @@
 			const morphTargets = !!geometry.morphAttributes.position;
 			const morphNormals = !!geometry.morphAttributes.normal;
 			const morphTargetsCount = !!geometry.morphAttributes.position ? geometry.morphAttributes.position.length : 0;
+			const toneMapping = material.toneMapped ? _this.toneMapping : NoToneMapping;
 			const materialProperties = properties.get(material);
 			const lights = currentRenderState.state.lights;
 
@@ -20001,6 +20021,8 @@
 				} else if (materialProperties.morphTargets !== morphTargets) {
 					needsProgramChange = true;
 				} else if (materialProperties.morphNormals !== morphNormals) {
+					needsProgramChange = true;
+				} else if (materialProperties.toneMapping !== toneMapping) {
 					needsProgramChange = true;
 				} else if (capabilities.isWebGL2 === true && materialProperties.morphTargetsCount !== morphTargetsCount) {
 					needsProgramChange = true;
@@ -23338,7 +23360,7 @@
 
 	/**
 	 * Bezier Curves formulas obtained from
-	 * http://en.wikipedia.org/wiki/Bézier_curve
+	 * https://en.wikipedia.org/wiki/B%C3%A9zier_curve
 	 */
 	function CatmullRom(t, p0, p1, p2, p3) {
 		const v0 = (p2 - p0) * 0.5;
@@ -25325,11 +25347,55 @@
 
 			const indices = [];
 			const vertices = [];
-			const uvs = []; // helper variables
+			const uvs = [];
+			const initNormals = [];
+			const normals = []; // helper variables
 
 			const inverseSegments = 1.0 / segments;
 			const vertex = new Vector3();
-			const uv = new Vector2(); // generate vertices and uvs
+			const uv = new Vector2();
+			const normal = new Vector3();
+			const curNormal = new Vector3();
+			const prevNormal = new Vector3();
+			let dx = 0;
+			let dy = 0; // pre-compute normals for initial "meridian"
+
+			for (let j = 0; j <= points.length - 1; j++) {
+				switch (j) {
+					case 0:
+						// special handling for 1st vertex on path
+						dx = points[j + 1].x - points[j].x;
+						dy = points[j + 1].y - points[j].y;
+						normal.x = dy * 1.0;
+						normal.y = -dx;
+						normal.z = dy * 0.0;
+						prevNormal.copy(normal);
+						normal.normalize();
+						initNormals.push(normal.x, normal.y, normal.z);
+						break;
+
+					case points.length - 1:
+						// special handling for last Vertex on path
+						initNormals.push(prevNormal.x, prevNormal.y, prevNormal.z);
+						break;
+
+					default:
+						// default handling for all vertices in between
+						dx = points[j + 1].x - points[j].x;
+						dy = points[j + 1].y - points[j].y;
+						normal.x = dy * 1.0;
+						normal.y = -dx;
+						normal.z = dy * 0.0;
+						curNormal.copy(normal);
+						normal.x += prevNormal.x;
+						normal.y += prevNormal.y;
+						normal.z += prevNormal.z;
+						normal.normalize();
+						initNormals.push(normal.x, normal.y, normal.z);
+						prevNormal.copy(curNormal);
+				}
+			} // generate vertices, uvs and normals
+
 
 			for (let i = 0; i <= segments; i++) {
 				const phi = phiStart + i * inverseSegments * phiLength;
@@ -25345,7 +25411,12 @@
 
 					uv.x = i / segments;
 					uv.y = j / (points.length - 1);
-					uvs.push(uv.x, uv.y);
+					uvs.push(uv.x, uv.y); // normal
+
+					const x = initNormals[3 * j + 0] * sin;
+					const y = initNormals[3 * j + 1];
+					const z = initNormals[3 * j + 0] * cos;
+					normals.push(x, y, z);
 				}
 			} // indices
 
@@ -25366,36 +25437,8 @@
 
 			this.setIndex(indices);
 			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2)); // generate normals
-
-			this.computeVertexNormals(); // if the geometry is closed, we need to average the normals along the seam.
-			// because the corresponding vertices are identical (but still have different UVs).
-
-			if (phiLength === Math.PI * 2) {
-				const normals = this.attributes.normal.array;
-				const n1 = new Vector3();
-				const n2 = new Vector3();
-				const n = new Vector3(); // this is the buffer offset for the last line of vertices
-
-				const base = segments * points.length * 3;
-
-				for (let i = 0, j = 0; i < points.length; i++, j += 3) {
-					// select the normal of the vertex in the first line
-					n1.x = normals[j + 0];
-					n1.y = normals[j + 1];
-					n1.z = normals[j + 2]; // select the normal of the vertex in the last line
-
-					n2.x = normals[base + j + 0];
-					n2.y = normals[base + j + 1];
-					n2.z = normals[base + j + 2]; // average normals
-
-					n.addVectors(n1, n2).normalize(); // assign the new values to both normals
-
-					normals[j + 0] = normals[base + j + 0] = n.x;
-					normals[j + 1] = normals[base + j + 1] = n.y;
-					normals[j + 2] = normals[base + j + 2] = n.z;
-				}
-			}
+			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
 		}
 
 		static fromJSON(data) {
@@ -34278,7 +34321,7 @@
 	 *	- shows frustum, line of sight and up of the camera
 	 *	- suitable for fast updates
 	 * 	- based on frustum visualization in lightgl.js shadowmap example
-	 *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
+	 *		https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html
 	 */
 
 
