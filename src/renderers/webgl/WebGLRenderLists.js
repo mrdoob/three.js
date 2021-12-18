@@ -52,9 +52,9 @@ function WebGLRenderList() {
 	const renderItems = [];
 	let renderItemsIndex = 0;
 
-	const opaque = [];
-	const transmissive = [];
-	const transparent = [];
+	const opaque = new WebGLRenderListStorage();
+	const transmissive = new WebGLRenderListStorage();
+	const transparent = new WebGLRenderListStorage();
 
 	function init() {
 
@@ -230,6 +230,23 @@ function WebGLRenderLists() {
 		get: get,
 		dispose: dispose
 	};
+
+}
+
+function WebGLRenderListStorage() {
+
+	this.length = 0;
+
+	this.push = function ( item ) {
+
+		this[ this.length ] = item;
+		this.length ++;
+
+	};
+
+	this.unshift = [].unshift.bind( this );
+
+	this.sort = [].sort.bind( this );
 
 }
 
