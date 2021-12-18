@@ -114,6 +114,13 @@
 
 			}
 
+			if ( viewer.src === '' ) {
+
+				viewer.src = 'placeholder.html';
+				viewer.style.display = 'unset';
+		
+			}
+
 			filterInput.value = extractQuery();
 
 			if ( filterInput.value !== '' ) {
@@ -283,7 +290,7 @@
 
 			if ( search ) {
 
-				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
 				sectionLink.href = `${link}?q=${search}`;
 
 			} else {
