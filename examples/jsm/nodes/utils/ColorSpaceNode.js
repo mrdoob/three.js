@@ -2,12 +2,10 @@ import {
 	GammaEncoding,
 	LinearEncoding,
 	RGBEEncoding,
-	RGBDEncoding,
 	sRGBEncoding
 } from '../../../../build/three.module.js';
 
 import { TempNode } from '../core/TempNode.js';
-import { FloatNode } from '../inputs/FloatNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
 
@@ -163,26 +161,6 @@ ColorSpaceNode.Nodes = ( function () {
 		}`
 	);
 
-	// reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
-
-	const RGBDToLinear = new FunctionNode( /* glsl */`
-		vec3 RGBDToLinear( in vec4 value, in float maxRange ) {
-
-			return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );
-
-		}`
-	);
-
-	const LinearToRGBD = new FunctionNode( /* glsl */`
-		vec3 LinearToRGBD( in vec4 value, in float maxRange ) {
-
-			float maxRGB = max( value.x, max( value.g, value.b ) );
-			float D      = max( maxRange / maxRGB, 1.0 );
-			D            = clamp( floor( D ) / 255.0, 0.0, 1.0 );
-			return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );
-
-		}`
-	);
 
 	return {
 		LinearToLinear: LinearToLinear,
@@ -191,9 +169,7 @@ ColorSpaceNode.Nodes = ( function () {
 		sRGBToLinear: sRGBToLinear,
 		LinearTosRGB: LinearTosRGB,
 		RGBEToLinear: RGBEToLinear,
-		LinearToRGBE: LinearToRGBE,
-		RGBDToLinear: RGBDToLinear,
-		LinearToRGBD: LinearToRGBD
+		LinearToRGBE: LinearToRGBE
 	};
 
 } )();
@@ -209,10 +185,6 @@ ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
 ColorSpaceNode.RGBE_TO_LINEAR = 'RGBEToLinear';
 ColorSpaceNode.LINEAR_TO_RGBE = 'LinearToRGBE';
 
-
-ColorSpaceNode.RGBD_TO_LINEAR = 'RGBDToLinear';
-ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD';
-
 ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
 	switch ( encoding ) {
@@ -223,8 +195,6 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 			return [ 'sRGB' ];
 		case RGBEEncoding:
 			return [ 'RGBE' ];
-		case RGBDEncoding:
-			return [ 'RGBD', new FloatNode( 256.0 ).setReadonly( true ) ];
 		case GammaEncoding:
 			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )', 'f' ) ];
 

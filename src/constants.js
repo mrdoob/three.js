@@ -159,7 +159,6 @@ export const LinearEncoding = 3000;
 export const sRGBEncoding = 3001;
 export const GammaEncoding = 3007;
 export const RGBEEncoding = 3002;
-export const RGBDEncoding = 3006;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;

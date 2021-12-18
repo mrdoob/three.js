@@ -7,7 +7,6 @@ import {
 	LinearFilter,
 	NoToneMapping,
 	NoBlending,
-	RGBDEncoding,
 	RGBEEncoding,
 	RGBAFormat,
 	UnsignedByteType,
@@ -49,7 +48,6 @@ const ENCODINGS = {
 	[ LinearEncoding ]: 0,
 	[ sRGBEncoding ]: 1,
 	[ RGBEEncoding ]: 2,
-	[ RGBDEncoding ]: 5,
 	[ GammaEncoding ]: 6
 };
 
@@ -915,10 +913,6 @@ function _getEncodings() {
 			} else if ( inputEncoding == 2 ) {
 
 				return RGBEToLinear( value );
-
-			} else if ( inputEncoding == 5 ) {
-
-				return RGBDToLinear( value, 256.0 );
 
 			} else {
 
