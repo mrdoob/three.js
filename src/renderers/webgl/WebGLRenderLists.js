@@ -233,18 +233,27 @@ function WebGLRenderLists() {
 
 }
 
+const methods = [];
+const tempArray = [];
+const methodNames = Object.getOwnPropertyNames( Array.prototype );
+for ( let i = 0; i < methodNames.length; i ++ ) {
+
+	const methodName = methodNames[ i ];
+	if ( methodName === 'constructor' ) continue;
+	if ( typeof tempArray[ methodName ] !== 'function' ) continue;
+
+	methods.push( { name: methodName, fn: tempArray[ methodName ] } );
+
+}
+
 function WebGLRenderListStorage() {
 
 	this.length = 0;
 
-	const methodNames = Object.getOwnPropertyNames( Array.prototype );
-	for ( let i = 0; i < methodNames.length; i ++ ) {
+	for ( let i = 0; i < methods.length; i ++ ) {
 
-		const methodName = methodNames[ i ];
-		if ( methodName === 'constructor' ) continue;
-		if ( typeof [][ methodName ] !== 'function' ) continue;
-
-		this[ methodName ] = [][ methodName ].bind( this );
+		const method = methods[ i ];
+		this[ method.name ] = method.fn.bind( this );
 
 	}
 
