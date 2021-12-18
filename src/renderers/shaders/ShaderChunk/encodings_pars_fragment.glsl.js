@@ -33,18 +33,6 @@ vec4 LinearToRGBE( in vec4 value ) {
 }
 
 // reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
-vec4 RGBMToLinear( in vec4 value, in float maxRange ) {
-	return vec4( value.rgb * value.a * maxRange, 1.0 );
-}
-
-vec4 LinearToRGBM( in vec4 value, in float maxRange ) {
-	float maxRGB = max( value.r, max( value.g, value.b ) );
-	float M = clamp( maxRGB / maxRange, 0.0, 1.0 );
-	M = ceil( M * 255.0 ) / 255.0;
-	return vec4( value.rgb / ( M * maxRange ), M );
-}
-
-// reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
 vec4 RGBDToLinear( in vec4 value, in float maxRange ) {
 	return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );
 }
@@ -53,7 +41,7 @@ vec4 LinearToRGBD( in vec4 value, in float maxRange ) {
 	float maxRGB = max( value.r, max( value.g, value.b ) );
 	float D = max( maxRange / maxRGB, 1.0 );
 	// NOTE: The implementation with min causes the shader to not compile on
-	// a common Alcatel A502DL in Chrome 78/Android 8.1. Some research suggests 
+	// a common Alcatel A502DL in Chrome 78/Android 8.1. Some research suggests
 	// that the chipset is Mediatek MT6739 w/ IMG PowerVR GE8100 GPU.
 	// D = min( floor( D ) / 255.0, 1.0 );
 	D = clamp( floor( D ) / 255.0, 0.0, 1.0 );

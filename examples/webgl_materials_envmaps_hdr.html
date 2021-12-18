@@ -112,11 +112,9 @@
 
 
 				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				rgbmCubeMap = new RGBMLoader()
+				rgbmCubeMap = new RGBMLoader().setMaxRange( 16 )
 					.setPath( './textures/cube/pisaRGBM16/' )
 					.loadCubemap( rgbmUrls, function () {
-
-						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 
 						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
 

@@ -10,8 +10,6 @@ import {
 	RGBDEncoding,
 	RGBEEncoding,
 	RGBAFormat,
-	RGBM16Encoding,
-	RGBM7Encoding,
 	UnsignedByteType,
 	sRGBEncoding,
 	HalfFloatType
@@ -51,8 +49,6 @@ const ENCODINGS = {
 	[ LinearEncoding ]: 0,
 	[ sRGBEncoding ]: 1,
 	[ RGBEEncoding ]: 2,
-	[ RGBM7Encoding ]: 3,
-	[ RGBM16Encoding ]: 4,
 	[ RGBDEncoding ]: 5,
 	[ GammaEncoding ]: 6
 };
@@ -919,14 +915,6 @@ function _getEncodings() {
 			} else if ( inputEncoding == 2 ) {
 
 				return RGBEToLinear( value );
-
-			} else if ( inputEncoding == 3 ) {
-
-				return RGBMToLinear( value, 7.0 );
-
-			} else if ( inputEncoding == 4 ) {
-
-				return RGBMToLinear( value, 16.0 );
 
 			} else if ( inputEncoding == 5 ) {
 
