@@ -237,16 +237,16 @@ function WebGLRenderListStorage() {
 
 	this.length = 0;
 
-	this.push = function ( item ) {
+	const methodNames = Object.getOwnPropertyNames( Array.prototype );
+	for ( let i = 0; i < methodNames.length; i ++ ) {
 
-		this[ this.length ] = item;
-		this.length ++;
+		const methodName = methodNames[ i ];
+		if ( methodName === 'constructor' ) continue;
+		if ( typeof [][ methodName ] !== 'function' ) continue;
 
-	};
+		this[ methodName ] = [][ methodName ].bind( this );
 
-	this.unshift = [].unshift.bind( this );
-
-	this.sort = [].sort.bind( this );
+	}
 
 }
 
