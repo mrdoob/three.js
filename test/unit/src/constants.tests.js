@@ -4,7 +4,7 @@ import * as Constants from '../../../src/constants';
 
 export default QUnit.module( 'Constants', () => {
 
-	QUnit.test( "default values", ( assert ) => {
+	QUnit.test( 'default values', ( assert ) => {
 
 		assert.propEqual( Constants.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }, 'MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }' );
 		assert.propEqual( Constants.TOUCH, { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }, 'TOUCH equal { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }' );
@@ -103,20 +103,20 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.RGBA_PVRTC_4BPPV1_Format, 35842, 'RGBA_PVRTC_4BPPV1_Format is equal to 35842' );
 		assert.equal( Constants.RGBA_PVRTC_2BPPV1_Format, 35843, 'RGBA_PVRTC_2BPPV1_Format is equal to 35843' );
 		assert.equal( Constants.RGB_ETC1_Format, 36196, 'RGB_ETC1_Format is equal to 36196' );
-		assert.equal( Constants.RGBA_ASTC_4x4_Format, 37808, "Constants.RGBA_ASTC_4x4_Format is equal to 37808" );
-		assert.equal( Constants.RGBA_ASTC_5x4_Format, 37809, "Constants.RGBA_ASTC_5x4_Format is equal to 37809" );
-		assert.equal( Constants.RGBA_ASTC_5x5_Format, 37810, "Constants.RGBA_ASTC_5x5_Format is equal to 37810" );
-		assert.equal( Constants.RGBA_ASTC_6x5_Format, 37811, "Constants.RGBA_ASTC_6x5_Format is equal to 37811" );
-		assert.equal( Constants.RGBA_ASTC_6x6_Format, 37812, "Constants.RGBA_ASTC_6x6_Format is equal to 37812" );
-		assert.equal( Constants.RGBA_ASTC_8x5_Format, 37813, "Constants.RGBA_ASTC_8x5_Format is equal to 37813" );
-		assert.equal( Constants.RGBA_ASTC_8x6_Format, 37814, "Constants.RGBA_ASTC_8x6_Format is equal to 37814" );
-		assert.equal( Constants.RGBA_ASTC_8x8_Format, 37815, "Constants.RGBA_ASTC_8x8_Format is equal to 37815" );
-		assert.equal( Constants.RGBA_ASTC_10x5_Format, 37816, "Constants.RGBA_ASTC_10x5_Format is equal to 37816" );
-		assert.equal( Constants.RGBA_ASTC_10x6_Format, 37817, "Constants.RGBA_ASTC_10x6_Format is equal to 37817" );
-		assert.equal( Constants.RGBA_ASTC_10x8_Format, 37818, "Constants.RGBA_ASTC_10x8_Format is equal to 37818" );
-		assert.equal( Constants.RGBA_ASTC_10x10_Format, 37819, "Constants.RGBA_ASTC_10x10_Format is equal to 37819" );
-		assert.equal( Constants.RGBA_ASTC_12x10_Format, 37820, "Constants.RGBA_ASTC_12x10_Format is equal to 37820" );
-		assert.equal( Constants.RGBA_ASTC_12x12_Format, 37821, "Constants.RGBA_ASTC_12x12_Format is equal to 37821" );
+		assert.equal( Constants.RGBA_ASTC_4x4_Format, 37808, 'Constants.RGBA_ASTC_4x4_Format is equal to 37808' );
+		assert.equal( Constants.RGBA_ASTC_5x4_Format, 37809, 'Constants.RGBA_ASTC_5x4_Format is equal to 37809' );
+		assert.equal( Constants.RGBA_ASTC_5x5_Format, 37810, 'Constants.RGBA_ASTC_5x5_Format is equal to 37810' );
+		assert.equal( Constants.RGBA_ASTC_6x5_Format, 37811, 'Constants.RGBA_ASTC_6x5_Format is equal to 37811' );
+		assert.equal( Constants.RGBA_ASTC_6x6_Format, 37812, 'Constants.RGBA_ASTC_6x6_Format is equal to 37812' );
+		assert.equal( Constants.RGBA_ASTC_8x5_Format, 37813, 'Constants.RGBA_ASTC_8x5_Format is equal to 37813' );
+		assert.equal( Constants.RGBA_ASTC_8x6_Format, 37814, 'Constants.RGBA_ASTC_8x6_Format is equal to 37814' );
+		assert.equal( Constants.RGBA_ASTC_8x8_Format, 37815, 'Constants.RGBA_ASTC_8x8_Format is equal to 37815' );
+		assert.equal( Constants.RGBA_ASTC_10x5_Format, 37816, 'Constants.RGBA_ASTC_10x5_Format is equal to 37816' );
+		assert.equal( Constants.RGBA_ASTC_10x6_Format, 37817, 'Constants.RGBA_ASTC_10x6_Format is equal to 37817' );
+		assert.equal( Constants.RGBA_ASTC_10x8_Format, 37818, 'Constants.RGBA_ASTC_10x8_Format is equal to 37818' );
+		assert.equal( Constants.RGBA_ASTC_10x10_Format, 37819, 'Constants.RGBA_ASTC_10x10_Format is equal to 37819' );
+		assert.equal( Constants.RGBA_ASTC_12x10_Format, 37820, 'Constants.RGBA_ASTC_12x10_Format is equal to 37820' );
+		assert.equal( Constants.RGBA_ASTC_12x12_Format, 37821, 'Constants.RGBA_ASTC_12x12_Format is equal to 37821' );
 		assert.equal( Constants.LoopOnce, 2200, 'LoopOnce is equal to 2200' );
 		assert.equal( Constants.LoopRepeat, 2201, 'LoopRepeat is equal to 2201' );
 		assert.equal( Constants.LoopPingPong, 2202, 'LoopPingPong is equal to 2202' );
