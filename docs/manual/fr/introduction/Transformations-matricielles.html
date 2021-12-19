@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+    <h1>Transformations matricielles</h1>
+
+    <p>
+        Three.js utilise des *matrices* pour coder les transformations 3D --- les traductions (position), les rotations et la mise à l'échelle. Chaque instance de [page:Object3D] a une [page:Object3D.matrix matrice] qui stocke la position, la rotation et l'échelle de cet objet. Cette page décrit comment mettre à jour la transformation d'un objet.
+    </p>
+
+    <h2>Propriétés de commodité et *matrixAutoUpdate*</h2>
+
+    <p>
+        Il existe deux manières de mettre à jour la transformation d'un objet :
+    </p>
+
+    <ol>
+        <li>
+            Modifiez les propriétés *position*, *quaternion* et *scale* de l'objet et laissez three.js recalculer
+            la matrice de l'objet à partir de ces propriétés :
+            <code>
+                object.position.copy( start_position );
+                object.quaternion.copy( quaternion );
+            </code>
+            Par défaut, la propriété *matrixAutoUpdate* est définie sur true et la matrice sera automatiquement recalculée.
+            Si l'objet est statique ou si vous souhaitez contrôler manuellement le moment où le recalcul se produit, de meilleures performances peuvent être obtenues en définissant la propriété false :
+            <code>
+                object.matrixUpdate = false;
+            </code>
+            Et après avoir modifié les propriétés, mettez à jour manuellement la matrice :
+            <code>
+                object.updateMatrix();
+            </code>
+        </li>
+
+        <li>
+            Modifiez directement la matrice de l'objet. La classe [page:Matrix4] dispose de plusieurs méthodes pour modifier la matrice :
+            <code>
+                object.matrix.setRotationFromQuaternion( quaternion );
+                object.matrix.setPosition( start_position );
+                object.matrixAutoUpdate = false;
+            </code>
+            Notez que *matrixAutoUpdate* <em>doit</em> être défini sur *false* dans ce cas, et vous devez vous assurer de ne <em>pas</em> appeler *updateMatrix*. L'appel de *updateMatrix* supprimera les modifications manuelles apportées à la matrice, recalculant la matrice à partir de *position*, *scale*, etc.
+        </li>
+    </ol>
+
+    <h2>Matrices objet et monde</h2>
+
+    <p>
+        La [page:Object3D.matrix matrix] d'un objet stocke la transformation <em>relative</em> de l'objet en [page:Object3D.parent parent] ; pour obtenir la transformation de l'objet en coordonnées <em>world</em>, vous devez accéder à la [page:Object3D.matrixWorld] de l'objet.
+    </p>
+
+    <p>
+        Lorsque la transformation de l'objet parent ou enfant change, vous pouvez demander que la [page:Object3D.matrixWorld matrixWorld] de l'objet enfant soit mise à jour en appelant [page:Object3D.updateMatrixWorld updateMatrixWorld]().
+    </p>
+
+    <h2>Rotation et Quaternion</h2>
+
+    <p>
+        Three.js propose deux manières de représenter les rotations 3D : [page:Euler Angles d'Euler] et [page:Quaternion Quaternions], ainsi que des méthodes de conversion entre les deux. Les angles d'Euler sont soumis à un problème appelé "verrou de cardan", où certaines configurations peuvent perdre un degré de liberté (empêchant l'objet d'être tourné autour d'un axe). Pour cette raison, les rotations d'objets sont <em>toujours</em> stockées dans le [page:Object3D.quaternion quaternion] de l'objet.
+    </p>
+
+    <p>
+        Les versions précédentes de la bibliothèque incluaient une propriété *useQuaternion* qui, lorsqu'elle était définie sur false, entraînerait le calcul de la [page:Object3D.matrix matrice] de l'objet à partir d'un angle d'Euler. Cette pratique est déconseillée --- à la place, vous devez utiliser la méthode [page:Object3D.setRotationFromEuler setRotationFromEuler], qui mettra à jour le quaternion.
+    </p>
+
+    <p><small>Traduit en Français par <a href="https://github.com/David-Moisan" target="_blank">David Moisan</a></small></p>
+</body>
+</html>

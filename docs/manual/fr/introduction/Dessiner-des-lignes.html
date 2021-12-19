@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>[name]</h1>
+	<div>
+		<p>
+			Disons que vous voulez dessiner une ligne ou un cercle, pas un wireframe [page:Mesh].
+			Nous devons d'abord configurer le [page:WebGLRenderer renderer], [page:Scene scene] et la caméra (voir la
+			page Créer une scène).
+		</p>
+
+		<p>Voici le code que nous utiliserons :</p>
+		<code>
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+			camera.position.set( 0, 0, 100 );
+			camera.lookAt( 0, 0, 0 );
+
+			const scene = new THREE.Scene();
+		</code>
+
+		<p>La prochaine chose que nous allons faire est de définir un matériau. Pour les lignes, nous devons utiliser
+			[page:LineBasicMaterial] ou [page:LineDashedMaterial].</p>
+
+		<code>
+			//create a blue LineBasicMaterial
+			const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+		</code>
+
+		<p>
+			Après le matériau, nous aurons besoin d'une géométrie avec quelques sommets :
+		</p>
+
+		<code>
+			const points = [];
+			points.push( new THREE.Vector3( - 10, 0, 0 ) );
+			points.push( new THREE.Vector3( 0, 10, 0 ) );
+			points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+			const geometry = new THREE.BufferGeometry().setFromPoints( points );
+		</code>
+
+		<p>
+			Notez que des lignes sont tracées entre chaque paire de sommets consécutifs, mais pas entre le premier et le
+			dernier (la ligne n'est pas fermée.)
+		</p>
+
+		<p>
+			Maintenant que nous avons des points pour deux lignes et un matériau, nous pouvons les assembler pour former
+			une ligne.
+		</p>
+
+		<code>
+			const line = new THREE.Line( geometry, material );
+		</code>
+
+		<p>Il ne reste plus qu'à l'ajouter à la scène et à appeler [page:WebGLRenderer.render render].</p>
+
+		<code>
+			scene.add( line );
+			renderer.render( scene, camera );
+		</code>
+
+		<p>Vous devriez maintenant voir une flèche pointant vers le haut, composée de deux lignes bleues.</p>
+	</div>
+
+	<p><small>Traduit en Français par <a href="https://github.com/David-Moisan" target="_blank">David Moisan</a></small></p>
+</body>
+
+</html>

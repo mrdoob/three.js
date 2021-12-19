@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+    <h1>[name]</h1>
+    <div>
+    	<p>
+    		Il y a souvent des moments où vous pourriez avoir besoin d'utiliser du texte dans votre application three.js
+    		- voici
+    		quelques façons que vous pouvez faire.
+    	</p>
+    </div>
+
+    <h2>1. DOM + CSS</h2>
+    <div>
+    	<p>
+    		L'utilisation de HTML est généralement la manière la plus simple et la plus rapide d'ajouter du texte. C'est
+    		la méthode
+    		utilisé pour les superpositions descriptives dans la plupart des exemples three.js.
+    	</p>
+    	<p>Vous pouvez ajouter du contenu à un</p>
+    	<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
+
+    	<p>
+    		et utilisez le balisage CSS pour vous positionner absolument au-dessus de toutes les autres avec un
+    		z-index surtout si vous exécutez three.js en plein écran.
+    	</p>
+
+    	<code>
+    		#info {
+    		position: absolute;
+    		top: 10px;
+    		width: 100% ;
+    		text-align: center;
+    		z-index: 100;
+    		display: block;
+    		}
+    	</code>
+
+    </div>
+
+    <h2>2. Dessiner du texte sur le canevas et utilisez-le comme [page:Texture]</h2>
+	<div>
+		<p>Utilisez cette méthode si vous souhaitez dessiner facilement du texte sur un plan dans votre scène three.js.</p>
+	</div>
+
+	<h2>3. Créez un modèle dans votre application 3D préférée et exportez-le vers three.js</h2>
+	<div>
+		<p>Utilisez cette méthode si vous préférez travailler avec vos applications 3D et importer les modèles dans three.js</p>
+	</div>
+
+	<h2>4. Géométrie de texte procédurale</h2>
+	<div>
+		<p>
+			Si vous préférez travailler uniquement en THREE.js ou créer de la géométrie de texte 3D procédurale et dynamique, 
+			vous pouvez créer un maillage dont la géométrie est une instance de THREE.TextGeometry :
+		</p>
+		<p>
+			<code>new THREE.TextGeometry( text, parameters);</code>
+		</p>
+		<p>
+			Cependant, pour que cela fonctionne, votre TextGeometry aura besoin d'une instance de THREE.Font
+			à définir sur son paramètre "font".
+
+			Voir la page [page:TextGeometry] pour plus d'informations sur la façon dont cela peut être fait, les descriptions de chaque
+			paramètre accepté et une liste des polices JSON fournies avec la distribution THREE.js elle-même.
+		</p>
+
+		<h3>Exemples</h3>
+
+		<p>
+			[example:webgl_geometry_text WebGL / geometry / text]<br />
+			[example:webgl_shadowmap WebGL / shadowmap]
+		</p>
+
+		<p>
+			Si la police est en panne ou si vous souhaitez utiliser une police qui n'est pas là, il y a un tutoriel
+			avec un script python pour blender qui vous permet d'exporter du texte au format JSON de Three.js :
+			[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
+		</p>
+
+	</div>
+
+	<h2>5. Les polices bitmap</h2>
+	<div>
+		<p>
+			Les BMFonts (polices bitmap) permettent de regrouper des glyphes dans un seul BufferGeometry. Le rendu Bitmap Font 
+			prend en charge l'emballage de mots, l'espacement des lettres, le crénage, les champs de distance signés avec la norme
+			dérivés, les champs de distance signés multicanaux, les polices multitextures, etc.
+			Voir [link:https://github.com/felixmariotto/three-mesh-ui three-mesh-ui] ou [link:https://github.com/Jam3/three-bmfont-text three-bmfont-text].
+		</p>
+		<p>
+			Les polices standard sont disponibles dans des projets tels que
+			[link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts], ou vous pouvez créer les vôtres
+			à partir de n'importe quelle police .TTF, optimisé pour n'inclure que les caractères requis pour votre projet.
+		</p>
+		<p>
+			Quelques outils utiles:
+		</p>
+		<ul>
+			<li>[link:http://msdf-bmfont.donmccurdy.com/ msdf-bmfont-web] <i>(web-based)</i></li>
+			<li>[link:https://github.com/soimy/msdf-bmfont-xml msdf-bmfont-xml] <i>(commandline)</i></li>
+			<li>[link:https://github.com/libgdx/libgdx/wiki/Hiero hiero] <i>(desktop app)</i></li>
+		</ul>
+	</div>
+
+	<h2>6. Texte de la Troïka</h2>
+	<div>
+		<p>
+			Le [link:https://www.npmjs.com/package/troika-three-text troika-three-text] paquet de rendus de texte anticrenélé (antialias) de qualité
+			utilisant une technique similaire à celle des Bitmap Fonts, mais fontionne directement avec n'importe quel .TTF ou un fichier de police type .WOFF 
+			afin que vous n'ayez pas à prégénérer une texture de glyphe hors ligne. Il ajoute également les
+			capacités comprenant :
+		</p>
+		<ul>
+			<li>Effets comme les traits, les ombres portées et la courbure</li>
+			<li>La possibilité d'appliquer n'importe quel matériau three.js, même un ShaderMaterial personnalisé</li>
+			<li>Prise en charge des ligatures de polices, des scripts avec lettres jointes et de la disposition de droite à gauche/bidirectionnelle</li>
+			<li>Optimisation pour de grandes quantités de texte dynamique, effectuant la plupart des travaux à partir du fil principal dans un travailleur Web</li>
+		</ul>
+	</div>
+
+	<p><small>Traduit en Français par <a href="https://github.com/David-Moisan" target="_blank">David Moisan</a></small></p>
+</body>
+</html>

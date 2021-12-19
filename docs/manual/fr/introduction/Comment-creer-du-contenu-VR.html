@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+    <h1>[name]</h1>
+
+    <p>
+        Ce guide fournit un bref aperçu des composants de base d'une application de réalité virtuelle basée sur le Web.
+        fait avec three.js.
+    </p>
+
+    <h2>Flux de travail</h2>
+
+    <p>
+        Tout d'abord, vous devez inclure [link: https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]
+        dans votre projet.
+    </p>
+
+    <code>
+        import  { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+    </code>
+
+    <p>
+        *VRButton.createButton()* fait deux choses importantes : Il crée un bouton qui indique
+        Compatibilité RV. De plus, il lance une session VR si l'utilisateur active le bouton. La seule chose qu'il vous reste as
+        à faire est d'ajouter la ligne de code suivante à votre application.
+    </p>
+
+    <code>
+        document.body.appendChild( VRButton.createButton( renderer ) );
+    </code>
+
+    <p>
+        Ensuite, vous devez indiquer à votre instance de *WebGLRenderer* pour activer le rendu XR.
+    </p>
+
+    <code>
+        renderer.xr.enabled = true;
+    </code>
+
+    <p>
+        Enfin, vous devez ajuster votre boucle d'animation car nous ne pouvons pas utiliser notre bien connu
+        Fonction *window.requestAnimationFrame()*. Pour les projets VR, nous utilisons [page:WebGLRenderer.setAnimationLoop setAnimationLoop].
+        Le code minimal ressemble à ceci :
+    </p>
+
+    <code>
+        renderer.setAnimationLoop( function () {
+            renderer.render( scene, camera );
+        });
+    </code>
+
+    <h2>Prochaines étapes</h2>
+
+    <p>
+        Jetez un œil à l'un des exemples WebVR officiels pour voir ce workflow en action.<br /><br />
+
+        [example:webxr_vr_ballshooter WebXR / VR / ballshooter]<br />
+		[example:webxr_vr_cubes WebXR / VR / cubes]<br />
+		[example:webxr_vr_dragging WebXR / VR / dragging]<br />
+		[example:webxr_vr_paint WebXR / VR / paint]<br />
+		[example:webxr_vr_panorama_depth WebXR / VR / panorama_depth]<br />
+		[example:webxr_vr_panorama WebXR / VR / panorama]<br />
+		[example:webxr_vr_rollercoaster WebXR / VR / rollercoaster]<br />
+		[example:webxr_vr_sandbox WebXR / VR / sandbox]<br />
+		[example:webxr_vr_sculpt WebXR / VR / sculpt]<br />
+		[example:webxr_vr_video WebXR / VR / video]
+    </p>
+
+    <p><small>Traduit en Français par <a href="https://github.com/David-Moisan" target="_blank">David Moisan</a></small></p>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+    <h1>[name]</h1>
+
+    <h2>Quel format de modèle 3D est le mieux pris en charge ?</h2>
+    <div>
+        <p>
+            Le format recommandé pour l'importation et l'exportation d'actifs est le glTF (GL Transmission Format). Étant donné que glTF se concentre sur la livraison d'actifs d'exécution, il est compact à transmettre et rapide à charger.
+        </p>
+        <p>
+            three.js fournit également des chargeurs pour de nombreux autres formats populaires tels que FBX, Collada ou OBJ. Néanmoins, vous devriez toujours essayer d'établir d'abord un flux de travail basé sur glTF dans vos projets. Pour plus d'informations, voir [link:#manual/introduction/Loading-3D-models loading 3D models].
+        </p>
+    </div>
+    
+    
+    <h2>Pourquoi y a-t-il des balises meta viewport dans les exemples ?</h2>
+    <div>
+        <code>
+            &lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;
+        </code>
+
+        <p>Ces balises contrôlent la taille et l'échelle de la fenêtre d'affichage pour les navigateurs mobiles (où le contenu de la page peut être rendu à une taille différente de celle de la fenêtre d'affichage visible).</p>
+
+        <p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Utiliser les Viewport]</p>
+
+        <p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Utiliser les meta viewport]</p>
+    </div>
+
+    <h2>Comment conserver l'échelle de la scène lors du redimensionnement?</h2>
+    <p>
+        Nous voulons que tous les objets, quelle que soit leur distance par rapport à la caméra, aient la même taille, même lorsque la fenêtre est redimensionnée.
+
+        L'équation clé pour résoudre ce problème est cette formule pour la hauteur visible à une distance donnée :
+
+        <code>
+            visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+        </code>
+
+        Si nous augmentons la hauteur de la fenêtre d'un certain pourcentage, ce que nous voulons, c'est que la hauteur visible à toutes les distances
+        augmentent du même pourcentage.
+
+        Cela ne peut pas être fait en changeant la position de la caméra. Au lieu de cela, vous devez modifier le champ de vision de la caméra.
+        [link:http://jsfiddle.net/Q4Jpu/ Example].
+    </p>
+
+    <h2>Pourquoi une partie de mon objet est-elle invisible ?</h2>
+    <p>
+        Cela pourrait être dû à l'élimination des faces. Les faces ont une orientation qui décide quel côté elles apparaissent. Et l'abattage enlève l'arrière dans des circonstances normales. Pour voir si c'est votre problème, changez le côté matériel en THREE.DoubleSide.
+        <code>matériau.side = TROIS.DoubleSide</code>
+    </p>
+
+    <p><small>Traduit en Français par <a href="https://github.com/David-Moisan" target="_blank">David Moisan</a></small></p>
+</body>
+</html>

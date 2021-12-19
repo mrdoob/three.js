@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+    <h1>[name]</h1>
+    <div>
+        <p>Tous les objets par défaut mettent automatiquement à jour leurs matrices s'ils ont été ajoutés à la scène avec</p>
+        <code>
+            const object = new THREE.Object3D();
+            scene.add( object );
+        </code>
+        ou s'ils sont l'enfant d'un autre objet qui a été ajouté à la scène :
+        <code>
+            const object1 = new THREE.Object3D();
+            const object2 = new THREE.Object3D();
+
+            object1.add( object2 );
+            scene.add( object1 ); //object1 et object2 mettront automatiquement à jour leurs matrices
+        </code>
+    </div>
+
+    <p>
+        Cependant, si vous savez que l'objet sera statique, vous pouvez le désactiver et mettre à jour la matrice de transformation manuellement juste au besoin.
+    </p>
+
+    <code>
+        object.matrixAutoUpdate  = false;
+        object.updateMatrix();
+    </code>
+
+    <h2>BufferGéométrie</h2>
+    <div>
+        <p>
+            Les BufferGeometries stockent des informations (telles que les positions des sommets, les indices de face, les normales, les couleurs,
+            UVs, et tous les attributs personnalisés) dans [page:BufferAttribute buffers] - c'est-à-dire, [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays]. 
+            Cela les rend généralement plus rapides que les géométries standard, au prix d'être un peu plus difficiles à
+            travailler avec.
+        </p>
+        <p>
+            En ce qui concerne la mise à jour de BufferGeometries, la chose la plus importante à comprendre est que
+            vous ne pouvez pas redimensionner les tampons (c'est très coûteux, fondamentalement l'équivalent de la création d'une nouvelle géométrie).
+            Vous pouvez cependant mettre à jour le contenu des buffers.
+        </p>
+        <p>
+            Cela signifie que si vous savez qu'un attribut de votre BufferGeometry augmentera, disons le nombre de sommets,
+            vous devez pré-allouer un tampon suffisamment grand pour contenir tous les nouveaux sommets qui peuvent être créés.
+            Bien sûr, cela signifie également qu'il y aura une taille maximale pour votre BufferGeometry - il y a
+            aucun moyen de créer un BufferGeometry qui peut efficacement être étendu indéfiniment.
+        </p>
+        <p>
+            Nous utiliserons l'exemple d'une ligne qui se prolonge au moment du rendu. Nous allouerons de l'espace
+            dans le tampon pour 500 sommets mais n'en dessinez que deux au début, en utilisant [page:BufferGeometry.drawRange].
+        </p>
+
+        <code>
+            const MAX_POINTS = 500;
+
+            // géométrie
+            const geometry = new THREE.BufferGeometry();
+
+            // attributs
+            const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices par point
+            geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+            // plage de tirage
+            const drawCount = 2; // tirer les 2 premiers points, seulement
+            geometry.setDrawRange( 0, drawCount );
+
+            // matériel
+            const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+            // ligne
+            const line = new THREE.Line( geometry,  material );
+            scene.add( line );
+        </code>
+
+        <p>
+            Ensuite, nous ajouterons aléatoirement des points à la ligne en utilisant un motif comme :
+        </p>
+
+        <code>
+            const positions = line.geometry.attributes.position.array;
+
+            let x, y, z, index;
+            x = y = z = index = 0;
+
+            for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+
+                positions[ index ++ ] = x;
+                positions[ index ++ ] = y;
+                positions[ index ++ ] = z;
+
+                x += ( Math.random() - 0.5 ) * 30;
+                y += ( Math.random() - 0.5 ) * 30;
+                z += ( Math.random() - 0.5 ) * 30;
+
+            }
+        </code>
+
+        <p>
+            Si vous souhaitez modifier le <em>nombre de points</em> rendu après le premier rendu, procédez comme suit :
+        </p>
+
+        <code>
+            line.geometry.setDrawRange( 0, newValue );
+        </code>
+        <p>
+            Si vous souhaitez modifier les valeurs des données de position après le premier rendu, vous devez
+            définir l'indicateur needUpdate comme ceci :
+        </p>
+
+        <code>
+            line.geometry.attributes.position.needsUpdate = true; // requis après le premier rendu
+        </code>
+
+        <p>
+            Si vous modifiez les valeurs des données de position après le rendu initial, vous devrez peut-être recalculer en 
+            délimitant les volumes afin que d'autres fonctionnalités du moteur, telles que l'élimination des vues frustum ou les assistants, fonctionnent correctement.
+        </p>
+
+        <code>
+            line.geometry.computeBoundingBox();
+            line.geometry.computeBoundingSphere();
+        </code>
+
+        <p>
+            [link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle] montrant une ligne animée que vous pouvez adapter à votre cas d'utilisation.
+        </p>
+
+        <h3>Exemples</h3>
+
+        <p>
+            [example:webgl_custom_attributes WebGL / custom / attributes]<br />
+			[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
+        </p>
+
+    </div>
+
+    <h2>Matériels</h2>
+    <div>
+        <p>Toutes les valeurs d'uniformes peuvent être modifiées librement (par exemple, les couleurs, les textures, l'opacité, etc.), les valeurs sont envoyées au shader à chaque image.</p>
+
+        <p>De plus, les paramètres liés à GLstate peuvent changer à tout moment (depthTest, blending, polygonOffset, etc.).</p>
+
+        <p>Les propriétés suivantes ne peuvent pas être facilement modifiées lors de l'exécution (une fois que le matériau est rendu au moins une fois) :</p>
+
+        <ul>
+            <li>nombres et types d'uniformes</li>
+			<li>présence ou non de
+				<ul>
+					<li>texture</li>
+					<li>brouillard - (fog)</li>
+					<li>couleurs des sommets</li>
+					<li>morphing</li>
+					<li>carte d'ombre</li>
+					<li>test alpha</li>
+				</ul>
+			</li>
+        </ul>
+
+        <p>Les modifications de ces derniers nécessitent la construction d'un nouveau programme de shader. Vous devrez définir</p>
+        <code>
+            material.needsUpdate = true
+        </code>
+
+        <p>Gardez à l'esprit que cela peut être assez lent et provoquer des saccades dans le framerate (surtout sous Windows, car la compilation des shaders est plus lente dans DirectX qu'OpenGL).</p>
+
+        <p>Pour une expérience plus fluide, vous pouvez émuler les changements de ces fonctionnalités dans une certaine mesure en ayant des valeurs "factices" telles que des lumières à intensité nulle, des textures blanches ou un brouillard à densité nulle.</p>
+
+        <p>Vous pouvez modifier librement le matériau utilisé pour les morceaux de géométrie, mais vous ne pouvez pas changer la façon dont un objet est divisé en morceaux (selon les matériaux de face). </p>
+
+        <h3>Si vous devez avoir différentes configurations de matériaux pendant l'exécution :</h3>
+
+        <p>Si le nombre de matériaux/morceaux est petit, vous pouvez pré-diviser l'objet au préalable (par exemple cheveux/visage/corps/haut de vêtements/pantalon pour un humain, devant/côtés/dessus/verre/pneu/intérieur pour une voiture). </p>
+
+        <p>Si le nombre est grand (par exemple, chaque visage peut être potentiellement différent), envisagez une solution différente, telle que l'utilisation d'attributs/textures pour générer un aspect différent par visage.</p>
+
+        <h3>Exemples</h3>
+
+        <p>
+            [example:webgl_materials_car WebGL / materials / car]<br />
+            [example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
+        </p>
+    </div>
+
+    <h2>Textures</h2>
+    <div>
+        <p>Les textures d'image, de canevas, de vidéo et de données doivent avoir le drapeau suivant défini si elles sont modifiées :</p>
+        <code>
+            texture.needsUpdate = true;
+        </code>
+
+        <p>Les cibles de rendu se mettent à jour automatiquement.</p>
+
+        <h3>Exemples</h3>
+        <p>
+            [example:webgl_materials_video WebGL / materials / video]<br />
+            [example:webgl_rtt WebGL / rtt]
+        </p>
+    </div>
+
+    <h2>Caméras</h2>
+    <div>
+        <p>La position et la cible d'une caméra sont mises à jour automatiquement. Si vous devez changer</p>
+        <ul>
+            <li>fov</li>
+            <li>aspect</li>
+            <li>près</li>
+            <li>loin</li>
+        </ul>
+        <p>alors vous devrez recalculer la matrice de projection :</p>
+        <code>
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        </code>
+    </div>
+
+    <p><small>Traduit en Français par <a href="https://github.com/David-Moisan" target="_blank">David Moisan</a></small></p>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+    <h1>[name]</h1>
+    <p>
+    	Si vous utilisez uniquement des géométries procédurales et ne chargez aucune texture, les pages Web devraient
+    	fonctionner
+    	directement depuis le système de fichiers, double-cliquez simplement sur le fichier HTML dans un gestionnaire de
+    	fichiers et il
+    	devrait apparaître dans le navigateur (vous verrez <em>file:///votreFichier.html</em> dans la barre d'adresse).
+    </p>
+
+    <h2>Contenu chargé à partir de fichiers externes</h2>
+    <div>
+        <p>
+            Si vous chargez des modèles ou des textures à partir de fichiers externes, en raison de la
+            [link:http://en.wikipedia.org/wiki/Same_origin_policy politique de même origine]
+            restrictions de sécurité, le chargement à partir d'un système de fichiers échouera avec une exception de
+            sécurité.
+        </p>
+    
+        <p>Il existe deux manières de résoudre ce problème :</p>
+    
+        <ol>
+            <li>
+                Modifiez la sécurité des fichiers locaux dans un navigateur. Cela vous permet d'accéder à votre page en tant
+                que : <code>file:///votreFichier.html</code>
+            </li>
+            <li>
+                Exécutez les fichiers à partir d'un serveur Web local. Cela vous permet d'accéder à votre page en tant que :
+                <code>http://localhost/yourFile.html</code>
+            </li>
+        </ol>
+    
+        <p>
+            Si vous utilisez l'option 1, sachez que vous pouvez vous ouvrir à certaines vulnérabilités si vous utilisez
+            le même navigateur pour une navigation régulière sur le Web. Vous pouvez créer un navigateur séparé
+            profil/raccourci utilisé uniquement pour que le développement local soit sécurisé. Passons en revue chaque
+            option à tour de rôle.
+        </p>
+    </div>
+
+    <h2>Exécuter un serveur local</h2>
+    <div>
+        <p>
+            De nombreux langages de programmation ont de simples serveurs HTTP intégrés. Ils ne sont pas aussi complets que
+            serveurs de production tels que [link:https://www.apache.org/ Apache] ou [link:https://nginx.org NGINX], cependant
+            ils devraient être suffisants pour tester votre
+            application three.js.
+        </p>
+
+        <h3>Plugins pour les éditeurs de code populaires</h3>
+        <div>
+            <p>Certains éditeurs de code ont des plugins qui généreront un simple serveur à la demande.</p>
+            <ul>
+                <li>[link :https://marketplace.visualstudio.com/items?itemName=yandeu.five-server Five Server] pour Visual Studio
+                    Code.</li>
+                <li>[lien :https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer Live Server] pour Visual Studio
+                    Code.</li>
+                <li>[lien :https://atom.io/packages/atom-live-server Live Server] pour Atom.</li>
+            </ul>
+        </div>
+
+        <h3>Servez</h3>
+        <div>
+            <p>
+                [link:https://greggman.github.io/servez Servez] est un serveur simple avec une interface graphique.
+            </p>
+        </div>
+
+        <h3>Node.js five-server</h3>
+        <div>
+            <p>Serveur de développement avec capacité de rechargement en direct. Pour installer :</p>
+            <code>
+            	# Remove live-server (if you have it)
+            	npm -g rm live-server
+
+            	# Install five-server
+            	npm -g i five-server
+
+            	# Update five-server (from time to time)
+            	npm -g i five-server@latest
+            </code>
+
+            <p>Pour exécuter (depuis votre répertoire local):</p>
+            <code>five-server . -p 8000</code>
+        </div>
+
+        <h3>Node.js http-server</h3>
+        <div>
+            <p>Node.js a un package de serveur HTTP simple. Pour installer :</p>
+            <code>npm install http-server -g</code>
+
+            <p>Pour exécuter (depuis le répertoire local):</p>
+            <code>http-server . -p 8000</code>
+        </div>
+
+        <h3>Serveur Python</h3>
+        <div>
+            <p>
+                Si vous avez installé [link:http://python.org/ Python], cela devrait suffire pour exécuter ceci
+                depuis une ligne de commande (depuis votre répertoire de travail) :
+            </p>
+            <code>
+            	//Python 2.x
+            	python -m SimpleHTTPServer
+
+            	//Python 3.x
+            	python -m http.server
+            </code>
+
+            <p>Cela servira les fichiers du répertoire actuel sur localhost sous le port 8000, c'est-à-dire dans la barre d'adresse, tapez :</p>
+
+            <code>http://localhost:8000/</code>
+        </div>
+
+        <h3>Serveur Ruby</h3>
+        <div>
+            <p>Si vous avez installé Ruby, vous pouvez obtenir le même résultat en exécutant ceci à la place :</p>
+            <code>
+            	ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => Dir.pwd); trap('INT') {
+            	s.shutdown }; s.start"
+            </code>
+        </div>
+
+        <h3>Serveur PHP</h3>
+        <div>
+            <p>PHP dispose également d'un serveur Web intégré, à partir de php 5.4.0 :</p>
+            <code>php -S localhost:8000</code>
+        </div>
+
+        <h3>Lighttpd</h3>
+        <div>
+            <p>
+            	Lighttpd est un serveur Web à usage général très léger. Nous couvrirons son installation sur OSX avec
+            	HomeBrew ici. Contrairement aux autres serveurs discutés ici, lighttpd est une production à part entière
+            	serveur intégret.
+            </p>
+
+            <ol>
+                <li>
+                	Installez-le via homebrew
+                	<code>brew install lighttpd</code>
+                </li>
+                <li>
+                	Créez un fichier de configuration appelé lighttpd.conf dans le répertoire où vous souhaitez exécuter
+                	votre serveur web. Il y a un exemple
+                	[link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration ici].
+                </li>
+                <li>
+                	Dans le fichier conf, remplacez server.document-root par le répertoire à partir duquel vous
+                	souhaitez servir les fichiers.
+                </li>
+                <li>
+                	Commencez avec
+                	<code>lighttpd -f lighttpd.conf</code>
+                </li>
+                <li>
+                	Accédez à http://localhost:3000/ et il servira les fichiers statiques du répertoire que vous
+                	choisi.
+                </li>
+            </ol>
+        </div>
+
+        <h3>IIS</h3>
+        <div>
+            <p>
+                Si vous utilisez Microsoft IIS comme serveur Web. Veuillez ajouter un paramètre de type MIME concernant
+            	l'extension .fbx avant le chargement.
+            </p>
+            <code>File name extension: fbx        MIME Type: text/plain</code>
+            <p>
+                Par défaut, IIS bloque les téléchargements de fichiers .fbx, .obj. Vous devez configurer IIS pour
+            	permettre le téléchargement de ce type de fichiers.
+            </p>
+        </div>
+        <p>
+            D'autres alternatives simples sont [link:http://stackoverflow.com/q/12905426/24874 discuté ici]
+            sur Stack Overflow.
+        </p>
+    </div>
+
+    <p><small>Traduit en Français par <a href="https://github.com/David-Moisan" target="_blank">David Moisan</a></small></p>
+</body>
+</html>
