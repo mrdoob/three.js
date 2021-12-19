@@ -9,10 +9,7 @@ class WebGLShaderCache {
 
 	}
 
-	update( material ) {
-
-		const vertexShader = material.vertexShader;
-		const fragmentShader = material.fragmentShader;
+	update( material, vertexShader, fragmentShader ) {
 
 		const vertexShaderStage = this._getShaderStage( vertexShader );
 		const fragmentShaderStage = this._getShaderStage( fragmentShader );

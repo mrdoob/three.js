@@ -128,7 +128,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		}
 
 		let vertexShader, fragmentShader;
-		let customVertexShaderID, customFragmentShaderID;
 
 		if ( shaderID ) {
 
@@ -142,12 +141,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexShader = material.vertexShader;
 			fragmentShader = material.fragmentShader;
 
-			_customShaders.update( material );
-
-			customVertexShaderID = _customShaders.getVertexShaderID( material );
-			customFragmentShaderID = _customShaders.getFragmentShaderID( material );
-
 		}
+
+		_customShaders.update( material, vertexShader, fragmentShader );
+
+		const customVertexShaderID = _customShaders.getVertexShaderID( material );
+		const customFragmentShaderID = _customShaders.getFragmentShaderID( material );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
@@ -300,16 +299,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const array = [];
 
-		if ( parameters.shaderID ) {
-
-			array.push( parameters.shaderID );
-
-		} else {
-
-			array.push( parameters.customVertexShaderID );
-			array.push( parameters.customFragmentShaderID );
-
-		}
+		array.push( parameters.customVertexShaderID );
+		array.push( parameters.customFragmentShaderID );
 
 		if ( parameters.defines !== undefined ) {
 
