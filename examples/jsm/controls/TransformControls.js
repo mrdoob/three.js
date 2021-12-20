@@ -688,7 +688,7 @@ function onPointerDown( event ) {
 
 	if ( ! this.enabled ) return;
 
-	if (!document.pointerLockElement) {
+	if ( ! document.pointerLockElement ) {
 
 		this.domElement.setPointerCapture( event.pointerId );
 
