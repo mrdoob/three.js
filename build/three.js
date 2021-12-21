@@ -113,7 +113,6 @@
 	const RGBAFormat = 1023;
 	const LuminanceFormat = 1024;
 	const LuminanceAlphaFormat = 1025;
-	const RGBEFormat = RGBAFormat;
 	const DepthFormat = 1026;
 	const DepthStencilFormat = 1027;
 	const RedFormat = 1028;
@@ -179,7 +178,6 @@
 	const LinearEncoding = 3000;
 	const sRGBEncoding = 3001;
 	const GammaEncoding = 3007;
-	const RGBEEncoding = 3002;
 	const BasicDepthPacking = 3200;
 	const RGBADepthPacking = 3201;
 	const TangentSpaceNormalMap = 0;
@@ -9706,7 +9704,7 @@
 
 	var encodings_fragment = "gl_FragColor = linearToOutputTexel( gl_FragColor );";
 
-	var encodings_pars_fragment = "\nvec4 LinearToLinear( in vec4 value ) {\n\treturn value;\n}\nvec4 GammaToLinear( in vec4 value, in float gammaFactor ) {\n\treturn vec4( pow( value.rgb, vec3( gammaFactor ) ), value.a );\n}\nvec4 LinearToGamma( in vec4 value, in float gammaFactor ) {\n\treturn vec4( pow( value.rgb, vec3( 1.0 / gammaFactor ) ), value.a );\n}\nvec4 sRGBToLinear( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.a );\n}\nvec4 LinearTosRGB( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );\n}\nvec4 RGBEToLinear( in vec4 value ) {\n\treturn vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );\n}\nvec4 LinearToRGBE( in vec4 value ) {\n\tfloat maxComponent = max( max( value.r, value.g ), value.b );\n\tfloat fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );\n\treturn vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );\n}";
+	var encodings_pars_fragment = "\nvec4 LinearToLinear( in vec4 value ) {\n\treturn value;\n}\nvec4 GammaToLinear( in vec4 value, in float gammaFactor ) {\n\treturn vec4( pow( value.rgb, vec3( gammaFactor ) ), value.a );\n}\nvec4 LinearToGamma( in vec4 value, in float gammaFactor ) {\n\treturn vec4( pow( value.rgb, vec3( 1.0 / gammaFactor ) ), value.a );\n}\nvec4 sRGBToLinear( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.a );\n}\nvec4 LinearTosRGB( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );\n}";
 
 	var envmap_fragment = "#ifdef USE_ENVMAP\n\t#ifdef ENV_WORLDPOS\n\t\tvec3 cameraToFrag;\n\t\tif ( isOrthographic ) {\n\t\t\tcameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );\n\t\t} else {\n\t\t\tcameraToFrag = normalize( vWorldPosition - cameraPosition );\n\t\t}\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToFrag, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToFrag, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t\tenvColor = envMapTexelToLinear( envColor );\n\t#elif defined( ENVMAP_TYPE_CUBE_UV )\n\t\tvec4 envColor = textureCubeUV( envMap, reflectVec, 0.0 );\n\t#else\n\t\tvec4 envColor = vec4( 0.0 );\n\t#endif\n\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t#endif\n#endif";
 
@@ -11530,7 +11528,6 @@
 	const ENCODINGS = {
 		[LinearEncoding]: 0,
 		[sRGBEncoding]: 1,
-		[RGBEEncoding]: 2,
 		[GammaEncoding]: 6
 	};
 
@@ -11604,7 +11601,7 @@
 		}
 		/**
 		 * Generates a PMREM from an equirectangular texture, which can be either LDR
-		 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
+		 * or HDR. The ideal input image size is 1k (1024 x 512),
 		 * as this matches best with the 256 x 256 cubemap output.
 		 */
 
@@ -11614,7 +11611,7 @@
 		}
 		/**
 		 * Generates a PMREM from an cubemap texture, which can be either LDR
-		 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
+		 * or HDR. The ideal input cube size is 256 x 256,
 		 * as this matches best with the 256 x 256 cubemap output.
 		 */
 
@@ -12276,10 +12273,6 @@
 			} else if ( inputEncoding == 1 ) {
 
 				return sRGBToLinear( value );
-
-			} else if ( inputEncoding == 2 ) {
-
-				return RGBEToLinear( value );
 
 			} else {
 
@@ -13792,9 +13785,6 @@
 
 			case sRGBEncoding:
 				return ['sRGB', '( value )'];
-
-			case RGBEEncoding:
-				return ['RGBE', '( value )'];
 
 			case GammaEncoding:
 				return ['Gamma', '( value, float( GAMMA_FACTOR ) )'];
@@ -28437,6 +28427,10 @@
 						console.warn('THREE.FileLoader: HTTP Status 0 received.');
 					}
 
+					if (typeof ReadableStream === 'undefined' || response.body.getReader === undefined) {
+						return response;
+					}
+
 					const callbacks = loading[url];
 					const reader = response.body.getReader();
 					const contentLength = response.headers.get('Content-Length');
@@ -28444,7 +28438,7 @@
 					const lengthComputable = total !== 0;
 					let loaded = 0; // periodically read data into the new stream tracking while download progress
 
-					return new ReadableStream({
+					const stream = new ReadableStream({
 						start(controller) {
 							readData();
 
@@ -28476,12 +28470,11 @@
 						}
 
 					});
+					return new Response(stream);
 				} else {
 					throw Error(`fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`);
 				}
-			}).then(stream => {
-				const response = new Response(stream);
-
+			}).then(response => {
 				switch (this.responseType) {
 					case 'arraybuffer':
 						return response.arrayBuffer();
@@ -36574,8 +36567,6 @@
 	exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
 	exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
 	exports.RGBA_S3TC_DXT5_Format = RGBA_S3TC_DXT5_Format;
-	exports.RGBEEncoding = RGBEEncoding;
-	exports.RGBEFormat = RGBEFormat;
 	exports.RGBFormat = RGBFormat;
 	exports.RGBIntegerFormat = RGBIntegerFormat;
 	exports.RGB_ETC1_Format = RGB_ETC1_Format;
