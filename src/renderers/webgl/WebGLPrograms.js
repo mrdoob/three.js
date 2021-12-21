@@ -295,74 +295,38 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	}
 
+	const booleanValues = { 'value1': 0, 'value2': 0 };
 	function getProgramCacheKey( parameters ) {
 
-		const array = [];
+		let key;
 
-		array.push( parameters.customVertexShaderID );
-		array.push( parameters.customFragmentShaderID );
+		if ( parameters.isRawShaderMaterial === false ) {
+
+			calculateBooleanValues( parameters, booleanValues );
+
+			key = `${parameters.customVertexShaderID},${parameters.customFragmentShaderID},${parameters.precision},${parameters.outputEncoding},${parameters.mapEncoding},${parameters.matcapEncoding},${parameters.envMapMode},${parameters.envMapEncoding},${parameters.lightMapEncoding},${parameters.emissiveMapEncoding},${parameters.combine},${parameters.vertexUvs},${parameters.fogExp2},${parameters.sizeAttenuation},${parameters.maxBones},${parameters.morphTargetsCount},${parameters.numDirLights},${parameters.numPointLights},${parameters.numSpotLights},${parameters.numHemiLights},${parameters.numRectAreaLights},${parameters.numDirLightShadows},${parameters.numPointLightShadows},${parameters.numSpotLightShadows},${parameters.shadowMapType},${parameters.toneMapping},${parameters.numClippingPlanes},${parameters.numClipIntersection},${parameters.format},${parameters.specularColorMapEncoding},${parameters.sheenColorMapEncoding},${booleanValues.value1},${booleanValues.value2},${renderer.outputEncoding},${renderer.gammaFactor},${parameters.customProgramCacheKey}`;
+
+		} else {
+
+			key = `${parameters.customVertexShaderID},${parameters.customFragmentShaderID},${parameters.customProgramCacheKey}`;
+
+		}
 
 		if ( parameters.defines !== undefined ) {
 
 			for ( const name in parameters.defines ) {
 
-				array.push( name );
-				array.push( parameters.defines[ name ] );
+				key = `${key},${name},${parameters.defines[ name ]}`;
 
 			}
 
 		}
 
-		if ( parameters.isRawShaderMaterial === false ) {
-
-			getProgramCacheKeyParameters( array, parameters );
-			getProgramCacheKeyBooleans( array, parameters );
-			array.push( renderer.outputEncoding );
-			array.push( renderer.gammaFactor );
-
-		}
-
-		array.push( parameters.customProgramCacheKey );
-
-		return array.join();
+		return key;
 
 	}
 
-	function getProgramCacheKeyParameters( array, parameters ) {
-
-		array.push( parameters.precision );
-		array.push( parameters.outputEncoding );
-		array.push( parameters.mapEncoding );
-		array.push( parameters.matcapEncoding );
-		array.push( parameters.envMapMode );
-		array.push( parameters.envMapEncoding );
-		array.push( parameters.lightMapEncoding );
-		array.push( parameters.emissiveMapEncoding );
-		array.push( parameters.combine );
-		array.push( parameters.vertexUvs );
-		array.push( parameters.fogExp2 );
-		array.push( parameters.sizeAttenuation );
-		array.push( parameters.maxBones );
-		array.push( parameters.morphTargetsCount );
-		array.push( parameters.numDirLights );
-		array.push( parameters.numPointLights );
-		array.push( parameters.numSpotLights );
-		array.push( parameters.numHemiLights );
-		array.push( parameters.numRectAreaLights );
-		array.push( parameters.numDirLightShadows );
-		array.push( parameters.numPointLightShadows );
-		array.push( parameters.numSpotLightShadows );
-		array.push( parameters.shadowMapType );
-		array.push( parameters.toneMapping );
-		array.push( parameters.numClippingPlanes );
-		array.push( parameters.numClipIntersection );
-		array.push( parameters.format );
-		array.push( parameters.specularColorMapEncoding );
-		array.push( parameters.sheenColorMapEncoding );
-
-	}
-
-	function getProgramCacheKeyBooleans( array, parameters ) {
+	function calculateBooleanValues( parameters, booleanValues ) {
 
 		_programLayers.disableAll();
 
@@ -431,7 +395,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		if ( parameters.fog )
 			_programLayers.enable( 31 );
 
-		array.push( _programLayers.mask );
+		booleanValues.value1 = _programLayers.mask;
 		_programLayers.disableAll();
 
 		if ( parameters.useFog )
@@ -479,7 +443,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		if ( parameters.sheenRoughnessMap )
 			_programLayers.enable( 21 );
 
-		array.push( _programLayers.mask );
+		booleanValues.value2 = _programLayers.mask;
 
 	}
 
