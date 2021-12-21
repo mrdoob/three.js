@@ -1,7 +1,6 @@
 import {
 	GammaEncoding,
 	LinearEncoding,
-	RGBEEncoding,
 	sRGBEncoding
 } from '../../../../build/three.module.js';
 
@@ -143,33 +142,12 @@ ColorSpaceNode.Nodes = ( function () {
 		}`
 	);
 
-	const RGBEToLinear = new FunctionNode( /* glsl */`
-		vec4 RGBEToLinear( in vec4 value ) {
-
-			return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
-
-		}`
-	);
-
-	const LinearToRGBE = new FunctionNode( /* glsl */`
-		vec4 LinearToRGBE( in vec4 value ) {
-
-			float maxComponent = max( max( value.r, value.g ), value.b );
-			float fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );
-			return vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );
-
-		}`
-	);
-
-
 	return {
 		LinearToLinear: LinearToLinear,
 		GammaToLinear: GammaToLinear,
 		LinearToGamma: LinearToGamma,
 		sRGBToLinear: sRGBToLinear,
-		LinearTosRGB: LinearTosRGB,
-		RGBEToLinear: RGBEToLinear,
-		LinearToRGBE: LinearToRGBE
+		LinearTosRGB: LinearTosRGB
 	};
 
 } )();
@@ -182,9 +160,6 @@ ColorSpaceNode.LINEAR_TO_GAMMA = 'LinearToGamma';
 ColorSpaceNode.SRGB_TO_LINEAR = 'sRGBToLinear';
 ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
 
-ColorSpaceNode.RGBE_TO_LINEAR = 'RGBEToLinear';
-ColorSpaceNode.LINEAR_TO_RGBE = 'LinearToRGBE';
-
 ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
 	switch ( encoding ) {
@@ -193,8 +168,6 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 			return [ 'Linear' ];
 		case sRGBEncoding:
 			return [ 'sRGB' ];
-		case RGBEEncoding:
-			return [ 'RGBE' ];
 		case GammaEncoding:
 			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )', 'f' ) ];
 
