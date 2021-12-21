@@ -106,39 +106,6 @@
 			const LOSSY_DCT = 1;
 			const RLE = 2;
 			const logBase = Math.pow( 2.7182818, 2.2 );
-			var tmpDataView = new DataView( new ArrayBuffer( 8 ) );
-
-			function frexp( value ) {
-
-				if ( value === 0 ) return [ value, 0 ];
-				tmpDataView.setFloat64( 0, value );
-				var bits = tmpDataView.getUint32( 0 ) >>> 20 & 0x7FF;
-
-				if ( bits === 0 ) {
-
-					// denormal
-					tmpDataView.setFloat64( 0, value * Math.pow( 2, 64 ) ); // exp + 64
-
-					bits = ( tmpDataView.getUint32( 0 ) >>> 20 & 0x7FF ) - 64;
-
-				}
-
-				var exponent = bits - 1022;
-				var mantissa = ldexp( value, - exponent );
-				return [ mantissa, exponent ];
-
-			}
-
-			function ldexp( mantissa, exponent ) {
-
-				var steps = Math.min( 3, Math.ceil( Math.abs( exponent ) / 1023 ) );
-				var result = mantissa;
-
-				for ( var i = 0; i < steps; i ++ ) result *= Math.pow( 2, Math.floor( ( exponent + i ) / steps ) );
-
-				return result;
-
-			}
 
 			function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -1980,7 +1947,6 @@
 					// half
 					switch ( outputType ) {
 
-						case THREE.UnsignedByteType:
 						case THREE.FloatType:
 							EXRDecoder.getter = parseFloat16;
 							EXRDecoder.inputSize = INT16_SIZE;
@@ -1998,7 +1964,6 @@
 					// float
 					switch ( outputType ) {
 
-						case THREE.UnsignedByteType:
 						case THREE.FloatType:
 							EXRDecoder.getter = parseFloat32;
 							EXRDecoder.inputSize = FLOAT32_SIZE;
@@ -2028,7 +1993,6 @@
 
 				switch ( outputType ) {
 
-					case THREE.UnsignedByteType:
 					case THREE.FloatType:
 						EXRDecoder.byteArray = new Float32Array( size ); // Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
 
@@ -2052,7 +2016,7 @@
 				if ( EXRDecoder.outputChannels == 4 ) {
 
 					EXRDecoder.format = THREE.RGBAFormat;
-					EXRDecoder.encoding = outputType == THREE.UnsignedByteType ? THREE.RGBEEncoding : THREE.LinearEncoding;
+					EXRDecoder.encoding = THREE.LinearEncoding;
 
 				} else {
 
@@ -2118,47 +2082,6 @@
 
 				}
 
-			} // convert to RGBE if user specifies Uint8 output on a RGB input texture
-
-
-			if ( EXRDecoder.encoding == THREE.RGBEEncoding ) {
-
-				let v, i;
-				const size = EXRDecoder.byteArray.length;
-				const RGBEArray = new Uint8Array( size );
-
-				for ( let h = 0; h < EXRDecoder.height; ++ h ) {
-
-					for ( let w = 0; w < EXRDecoder.width; ++ w ) {
-
-						i = h * EXRDecoder.width * 4 + w * 4;
-						const red = EXRDecoder.byteArray[ i ];
-						const green = EXRDecoder.byteArray[ i + 1 ];
-						const blue = EXRDecoder.byteArray[ i + 2 ];
-						v = red > green ? red : green;
-						v = blue > v ? blue : v;
-
-						if ( v < 1e-32 ) {
-
-							RGBEArray[ i ] = RGBEArray[ i + 1 ] = RGBEArray[ i + 2 ] = RGBEArray[ i + 3 ] = 0;
-
-						} else {
-
-							const res = frexp( v );
-							v = res[ 0 ] * 256 / v;
-							RGBEArray[ i ] = red * v;
-							RGBEArray[ i + 1 ] = green * v;
-							RGBEArray[ i + 2 ] = blue * v;
-							RGBEArray[ i + 3 ] = res[ 1 ] + 128;
-
-						}
-
-					}
-
-				}
-
-				EXRDecoder.byteArray = RGBEArray;
-
 			}
 
 			return {
@@ -2185,8 +2108,8 @@
 			function onLoadCallback( texture, texData ) {
 
 				texture.encoding = texData.encoding;
-				texture.minFilter = texture.encoding == THREE.RGBEEncoding ? THREE.NearestFilter : THREE.LinearFilter;
-				texture.magFilter = texture.encoding == THREE.RGBEEncoding ? THREE.NearestFilter : THREE.LinearFilter;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
 				texture.generateMipmaps = false;
 				texture.flipY = false;
 				if ( onLoad ) onLoad( texture, texData );
