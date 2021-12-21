@@ -11,12 +11,12 @@
 // See https://github.com/mrdoob/three.js/issues/20760#issuecomment-735190998
 
 export const CONSOLE_LEVEL = {
-	OFF : 0,
-	ERROR : 1,
-	WARN : 2,
-	LOG : 3,
-	INFO : 4,
-	DEBUG : 5,
+	OFF: 0,
+	ERROR: 1,
+	WARN: 2,
+	LOG: 3,
+	INFO: 4,
+	DEBUG: 5,
 	ALL: 6,
 	DEFAULT: 6
 };

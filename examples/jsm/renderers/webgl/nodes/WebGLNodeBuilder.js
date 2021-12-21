@@ -116,15 +116,15 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
-		if ( material.sizeNode && material.sizeNode.isNode ) {
-
-			this.addSlot( 'vertex', new SlotNode( material.sizeNode, 'SIZE', 'float' ) );
-
-		}
-
 		if ( material.positionNode && material.positionNode.isNode ) {
 
 			this.addSlot( 'vertex', new SlotNode( material.positionNode, 'POSITION', 'vec3' ) );
+
+		}
+
+		if ( material.sizeNode && material.sizeNode.isNode ) {
+
+			this.addSlot( 'vertex', new SlotNode( material.sizeNode, 'SIZE', 'float' ) );
 
 		}
 

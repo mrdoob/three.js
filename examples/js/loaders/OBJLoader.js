@@ -583,8 +583,6 @@
 
 					/*
         	 * http://paulbourke.net/dataformats/obj/
-        	 * or
-        	 * http://www.cs.utah.edu/~boulos/cs3505/obj_spec.pdf
         	 *
         	 * From chapter "Grouping" Syntax explanation "s group_number":
         	 * "group_number is the smoothing group number. To turn off smoothing groups, use a value of 0 or off.

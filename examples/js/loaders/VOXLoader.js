@@ -236,6 +236,7 @@
 			this.minFilter = THREE.NearestFilter;
 			this.magFilter = THREE.LinearFilter;
 			this.unpackAlignment = 1;
+			this.needsUpdate = true;
 
 		}
 

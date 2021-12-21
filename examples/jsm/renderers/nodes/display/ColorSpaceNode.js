@@ -5,8 +5,7 @@ import { ShaderNode,
 	lessThanEqual } from '../ShaderNode.js';
 
 import { LinearEncoding,
-	sRGBEncoding/*, RGBEEncoding, RGBM7Encoding, RGBM16Encoding,
-	RGBDEncoding, GammaEncoding*/ } from '../../../../../build/three.module.js';
+	sRGBEncoding/*, GammaEncoding*/ } from '../../../../../build/three.module.js';
 
 export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
@@ -61,14 +60,6 @@ function getEncodingComponents( encoding ) {
 		case sRGBEncoding:
 			return [ 'sRGB' ];
 /*
-		case RGBEEncoding:
-			return [ 'RGBE' ];
-		case RGBM7Encoding:
-			return [ 'RGBM', new FloatNode( 7.0 ).setConst( true ) ];
-		case RGBM16Encoding:
-			return [ 'RGBM', new FloatNode( 16.0 ).setConst( true ) ];
-		case RGBDEncoding:
-			return [ 'RGBD', new FloatNode( 256.0 ).setConst( true ) ];
 		case GammaEncoding:
 			return [ 'Gamma', new CodeNode( 'float( GAMMA_FACTOR )' ) ];
 */
@@ -86,15 +77,6 @@ class ColorSpaceNode extends TempNode {
 	/*
 	static GAMMA_TO_LINEAR = 'GammaToLinear';
 	static LINEAR_TO_GAMMA = 'LinearToGamma';
-
-	static RGBE_TO_LINEAR = 'RGBEToLinear';
-	static LINEAR_TO_RGBE = 'LinearToRGBE';
-
-	static RGBM_TO_LINEAR = 'RGBMToLinear';
-	static LINEAR_TO_RGBM = 'LinearToRGBM';
-
-	static RGBD_TO_LINEAR = 'RGBDToLinear';
-	static LINEAR_TO_RGBD = 'LinearToRGBD';
 */
 	constructor( method, node ) {
 

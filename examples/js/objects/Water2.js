@@ -2,8 +2,8 @@
 
 	/**
  * References:
- *	http://www.valvesoftware.com/publications/2010/siggraph2010_vlachos_waterflow.pdf
- * 	http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html
+ *	https://alex.vlachos.com/graphics/Vlachos-SIGGRAPH10-WaterFlow.pdf
+ *	http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html
  *
  */
 
@@ -23,7 +23,6 @@
 			const reflectivity = options.reflectivity || 0.02;
 			const scale = options.scale || 1;
 			const shader = options.shader || Water.WaterShader;
-			const encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 			const textureLoader = new THREE.TextureLoader();
 			const flowMap = options.flowMap || undefined;
 			const normalMap0 = options.normalMap0 || textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
@@ -51,14 +50,12 @@
 			const reflector = new THREE.Reflector( geometry, {
 				textureWidth: textureWidth,
 				textureHeight: textureHeight,
-				clipBias: clipBias,
-				encoding: encoding
+				clipBias: clipBias
 			} );
 			const refractor = new THREE.Refractor( geometry, {
 				textureWidth: textureWidth,
 				textureHeight: textureHeight,
-				clipBias: clipBias,
-				encoding: encoding
+				clipBias: clipBias
 			} );
 			reflector.matrixAutoUpdate = false;
 			refractor.matrixAutoUpdate = false; // material
