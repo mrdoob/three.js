@@ -7,7 +7,6 @@ import {
 	LinearFilter,
 	NoToneMapping,
 	NoBlending,
-	RGBEEncoding,
 	RGBAFormat,
 	UnsignedByteType,
 	sRGBEncoding,
@@ -47,7 +46,6 @@ const MAX_SAMPLES = 20;
 const ENCODINGS = {
 	[ LinearEncoding ]: 0,
 	[ sRGBEncoding ]: 1,
-	[ RGBEEncoding ]: 2,
 	[ GammaEncoding ]: 6
 };
 
@@ -132,7 +130,7 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
+	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
 	fromEquirectangular( equirectangular ) {
@@ -143,7 +141,7 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
-	 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
+	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
 	fromCubemap( cubemap ) {
@@ -909,10 +907,6 @@ function _getEncodings() {
 			} else if ( inputEncoding == 1 ) {
 
 				return sRGBToLinear( value );
-
-			} else if ( inputEncoding == 2 ) {
-
-				return RGBEToLinear( value );
 
 			} else {
 
