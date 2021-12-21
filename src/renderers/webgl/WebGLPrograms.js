@@ -145,8 +145,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		_customShaders.update( material, vertexShader, fragmentShader );
 
-		const customVertexShaderID = _customShaders.getVertexShaderID( material );
-		const customFragmentShaderID = _customShaders.getFragmentShaderID( material );
+		const customVertexShaderID = _customShaders.getVertexShaderID( vertexShader );
+		const customFragmentShaderID = _customShaders.getFragmentShaderID( fragmentShader );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
@@ -299,7 +299,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	function getProgramCacheKey( parameters ) {
 
 		let key;
-
 		if ( parameters.isRawShaderMaterial === false ) {
 
 			calculateBooleanValues( parameters, booleanValues );

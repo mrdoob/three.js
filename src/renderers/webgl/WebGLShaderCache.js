@@ -52,15 +52,15 @@ class WebGLShaderCache {
 
 	}
 
-	getVertexShaderID( material ) {
+	getVertexShaderID( vertexShader ) {
 
-		return this._getShaderStage( material.vertexShader ).id;
+		return this._getShaderStage( vertexShader ).id;
 
 	}
 
-	getFragmentShaderID( material ) {
+	getFragmentShaderID( fragmentShader ) {
 
-		return this._getShaderStage( material.fragmentShader ).id;
+		return this._getShaderStage( fragmentShader ).id;
 
 	}
 
