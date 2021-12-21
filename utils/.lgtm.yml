@@ -1,0 +1,9 @@
+path_classifiers:
+  library:
+    - "**/*.*"
+    - "exclude:editor/js/libs/**/*.*"
+    - "exclude:examples/jsm/libs/**/*.*"
+    - "exclude:examples/js/libs/**/*.*"
+    - "exclude:examples/jsm/loaders/ifc/**/*.*"
+    - "exclude:examples/js/loaders/ifc/**/*.*"
+
