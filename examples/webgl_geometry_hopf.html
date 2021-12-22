@@ -587,7 +587,7 @@
             renderHopfTorus = (t, c, b) => {
                 group2.clear();
                 const catmull = CatmullRom(t, c, b);
-                const hopfGeometry = new THREE.ParametricGeometry(Hopf(catmull), 200, 200);
+                const hopfGeometry = new ParametricGeometry(Hopf(catmull), 200, 200);
                 const hopfMesh = new THREE.Mesh(hopfGeometry, hopfMaterial);
                 group2.add(hopfMesh);
                 object2.add(group2);
