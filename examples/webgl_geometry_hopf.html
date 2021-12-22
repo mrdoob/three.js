@@ -384,7 +384,7 @@
                 continuity: 0,
                 bias: 0
             };
-            let gui = new dat.GUI({ autoplace: false, width: 300 });
+            let gui = new GUI({ autoplace: false, width: 300 });
             gui.domElement.id = "gui";
             gui.add(lgcontrols, "rotationSpeed").min(0).max(0.05).step(0.005).name("Rotation speed");
             gui.add(lgcontrols, "tension").min(-3).max(3).step(0.2).name("Tension")
