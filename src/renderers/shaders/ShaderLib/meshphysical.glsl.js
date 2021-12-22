@@ -185,6 +185,14 @@ void main() {
 
 	#endif
 
+	#ifdef USE_SHEEN
+
+		float sheen = max( material.sheenColor.r, max( material.sheenColor.g, material.sheenColor.b ) );
+
+		outgoingLight = outgoingLight * ( 1.0 - 0.157 * sheen ) + sheenSpecular;
+
+	#endif
+
 	#include <output_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
