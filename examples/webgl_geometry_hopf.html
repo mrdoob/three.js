@@ -11,9 +11,11 @@
             width: 100%;
             height: 100%;
         }
+
         #container {
             display: flex;
         }
+
         #gui {
             position: absolute;
             top: 2px;
@@ -378,7 +380,7 @@
             container.appendChild(container2);
 
             // lil-gui controls -------------------------------------------------
-            lgcontrols = { 
+            lgcontrols = {
                 rotationSpeed: 0.005,
                 tension: 0,
                 continuity: 0,
@@ -402,20 +404,6 @@
                     renderSphericalCurve(lgcontrols.tension, lgcontrols.continuity, value);
                     renderHopfTorus(lgcontrols.tension, lgcontrols.continuity, value);
                 });
-
-            window.addEventListener("resize", onWindowResize);
-        }
-
-
-        function onWindowResize() {
-
-            camera1.aspect = windowHalfX / windowY;
-            camera2.aspect = windowHalfX / windowY;
-            camera1.updateProjectionMatrix();
-            camera2.updateProjectionMatrix();
-
-            renderer1.setSize(windowHalfX, windowY);
-            renderer2.setSize(windowHalfX, windowY);
 
         }
 
@@ -544,7 +532,7 @@
             renderSphericalCurve = (t, c, b) => {
                 group.clear();
                 const yellowPoints = YellowPoints(t, c, b);
-                for (pt of yellowPoints) {
+                for (let pt of yellowPoints) {
                     const geom = new THREE.SphereGeometry(0.15).translate(pt.x, pt.y, pt.z);
                     group.add(new THREE.Mesh(geom, yellowMaterial));
                 }
@@ -611,6 +599,21 @@
             renderer2.setSize(windowHalfX, windowY);
             container2.appendChild(renderer2.domElement);
 
+            window.addEventListener("resize", onWindowResize);
+
+        }
+
+
+        function onWindowResize() {
+
+            camera1.aspect = windowHalfX / windowY;
+            camera2.aspect = windowHalfX / windowY;
+            camera1.updateProjectionMatrix();
+            camera2.updateProjectionMatrix();
+
+            renderer1.setSize(windowHalfX, windowY);
+            renderer2.setSize(windowHalfX, windowY);
+
         }
 
 
@@ -636,29 +639,29 @@
                     isDragging1 = true;
                 }
             renderer1.domElement.onmousemove = function (e) {
-                    let deltaMove = {
-                        x: e.offsetX - previousMousePosition1.x,
-                        y: e.offsetY - previousMousePosition1.y
-                    };
-                    if (isDragging1) {
-                        let deltaRotationQuaternion = new THREE.Quaternion().setFromEuler(
-                            new THREE.Euler(
-                                (Math.PI / 180) * (deltaMove.y * 1),
-                                (Math.PI / 180) * (deltaMove.x * 1),
-                                0,
-                                "XYZ"
-                            )
-                        );
-                        object1.quaternion.multiplyQuaternions(
-                            deltaRotationQuaternion,
-                            object1.quaternion
-                        );
-                    }
-                    previousMousePosition1 = {
-                        x: e.offsetX,
-                        y: e.offsetY
-                    };
+                let deltaMove = {
+                    x: e.offsetX - previousMousePosition1.x,
+                    y: e.offsetY - previousMousePosition1.y
                 };
+                if (isDragging1) {
+                    let deltaRotationQuaternion = new THREE.Quaternion().setFromEuler(
+                        new THREE.Euler(
+                            (Math.PI / 180) * (deltaMove.y * 1),
+                            (Math.PI / 180) * (deltaMove.x * 1),
+                            0,
+                            "XYZ"
+                        )
+                    );
+                    object1.quaternion.multiplyQuaternions(
+                        deltaRotationQuaternion,
+                        object1.quaternion
+                    );
+                }
+                previousMousePosition1 = {
+                    x: e.offsetX,
+                    y: e.offsetY
+                };
+            };
             let isDragging2 = false;
             let previousMousePosition2 = { x: 0, y: 0 };
             renderer2.domElement
@@ -666,29 +669,29 @@
                     isDragging2 = true;
                 };
             renderer2.domElement.onmousemove = function (e) {
-                    let deltaMove = {
-                        x: e.offsetX - previousMousePosition2.x,
-                        y: e.offsetY - previousMousePosition2.y
-                    };
-                    if (isDragging2) {
-                        var deltaRotationQuaternion = new THREE.Quaternion().setFromEuler(
-                            new THREE.Euler(
-                                (Math.PI / 180) * (deltaMove.y * 1),
-                                (Math.PI / 180) * (deltaMove.x * 1),
-                                0,
-                                "XYZ"
-                            )
-                        );
-                        object2.quaternion.multiplyQuaternions(
-                            deltaRotationQuaternion,
-                            object2.quaternion
-                        );
-                    }
-                    previousMousePosition2 = {
-                        x: e.offsetX,
-                        y: e.offsetY
-                    };
+                let deltaMove = {
+                    x: e.offsetX - previousMousePosition2.x,
+                    y: e.offsetY - previousMousePosition2.y
                 };
+                if (isDragging2) {
+                    var deltaRotationQuaternion = new THREE.Quaternion().setFromEuler(
+                        new THREE.Euler(
+                            (Math.PI / 180) * (deltaMove.y * 1),
+                            (Math.PI / 180) * (deltaMove.x * 1),
+                            0,
+                            "XYZ"
+                        )
+                    );
+                    object2.quaternion.multiplyQuaternions(
+                        deltaRotationQuaternion,
+                        object2.quaternion
+                    );
+                }
+                previousMousePosition2 = {
+                    x: e.offsetX,
+                    y: e.offsetY
+                };
+            };
 
             document.addEventListener("mouseup", function (e) {
                 isDragging1 = false;
