@@ -35,7 +35,7 @@
         import * as THREE from '../build/three.module.js';
         import { ParametricGeometry } from './jsm/geometries/ParametricGeometry.js';
 
-        // import {GUI} ???????????????????????????????????????????
+        import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 
         // quaternion stuff
@@ -55,7 +55,7 @@
 
         const container = document.getElementById("container");
         let container1, container2;
-        let dgcontrols;
+        let lgcontrols;
         let camera1, camera2, object1, object2, scene1, scene2, renderer1, renderer2;
         const windowHalfX = window.innerWidth / 2;
         const windowY = window.innerHeight;
@@ -377,30 +377,30 @@
             container.appendChild(container1);
             container.appendChild(container2);
 
-            // dat.gui controls -------------------------------------------------
-            dgcontrols = new (function () {
-                this.rotationSpeed = 0.005;
-                this.tension = 0;
-                this.continuity = 0;
-                this.bias = 0;
-            })();
+            // lil-gui controls -------------------------------------------------
+            lgcontrols = { 
+                rotationSpeed: 0.005,
+                tension: 0,
+                continuity: 0,
+                bias: 0
+            };
             let gui = new dat.GUI({ autoplace: false, width: 300 });
             gui.domElement.id = "gui";
-            gui.add(dgcontrols, "rotationSpeed").min(0).max(0.05).step(0.005).name("Rotation speed");
-            gui.add(dgcontrols, "tension").min(-3).max(3).step(0.2).name("Tension")
+            gui.add(lgcontrols, "rotationSpeed").min(0).max(0.05).step(0.005).name("Rotation speed");
+            gui.add(lgcontrols, "tension").min(-3).max(3).step(0.2).name("Tension")
                 .onFinishChange(function (value) {
-                    renderSphericalCurve(value, dgcontrols.continuity, dgcontrols.bias);
-                    renderHopfTorus(value, dgcontrols.continuity, dgcontrols.bias);
+                    renderSphericalCurve(value, lgcontrols.continuity, lgcontrols.bias);
+                    renderHopfTorus(value, lgcontrols.continuity, lgcontrols.bias);
                 });
-            gui.add(dgcontrols, "continuity").min(-4).max(4).step(0.5).name("Continuity")
+            gui.add(lgcontrols, "continuity").min(-4).max(4).step(0.5).name("Continuity")
                 .onFinishChange(function (value) {
-                    renderSphericalCurve(dgcontrols.tension, value, dgcontrols.bias);
-                    renderHopfTorus(dgcontrols.tension, value, dgcontrols.bias);
+                    renderSphericalCurve(lgcontrols.tension, value, lgcontrols.bias);
+                    renderHopfTorus(lgcontrols.tension, value, lgcontrols.bias);
                 });
-            gui.add(dgcontrols, "bias").min(-2).max(2).step(0.1).name("Bias")
+            gui.add(lgcontrols, "bias").min(-2).max(2).step(0.1).name("Bias")
                 .onFinishChange(function (value) {
-                    renderSphericalCurve(dgcontrols.tension, dgcontrols.continuity, value);
-                    renderHopfTorus(dgcontrols.tension, dgcontrols.continuity, value);
+                    renderSphericalCurve(lgcontrols.tension, lgcontrols.continuity, value);
+                    renderHopfTorus(lgcontrols.tension, lgcontrols.continuity, value);
                 });
 
             window.addEventListener("resize", onWindowResize);
@@ -551,7 +551,7 @@
                 object1.add(group);
             };
 
-            renderSphericalCurve(dgcontrols.tension, dgcontrols.continuity, dgcontrols.bias);
+            renderSphericalCurve(lgcontrols.tension, lgcontrols.continuity, lgcontrols.bias);
 
             CatmullRom = (t, c, b) => {
                 const yellowPoints = YellowPoints(t, c, b);
@@ -605,7 +605,7 @@
                 object2.add(group2);
             };
 
-            renderHopfTorus(dgcontrols.tension, dgcontrols.continuity, dgcontrols.bias);
+            renderHopfTorus(lgcontrols.tension, lgcontrols.continuity, lgcontrols.bias);
 
             renderer2 = new THREE.WebGLRenderer({ antialias: true });
             renderer2.setSize(windowHalfX, windowY);
@@ -616,15 +616,15 @@
 
         const render1 = () => {
             requestAnimationFrame(render1);
-            object1.rotation.x += dgcontrols.rotationSpeed;
-            object1.rotation.y += dgcontrols.rotationSpeed;
+            object1.rotation.x += lgcontrols.rotationSpeed;
+            object1.rotation.y += lgcontrols.rotationSpeed;
             renderer1.render(scene1, camera1);
         };
 
         const render2 = () => {
             renderer2.render(scene2, camera2);
-            object2.rotation.x += dgcontrols.rotationSpeed;
-            object2.rotation.y += dgcontrols.rotationSpeed;
+            object2.rotation.x += lgcontrols.rotationSpeed;
+            object2.rotation.y += lgcontrols.rotationSpeed;
             requestAnimationFrame(render2);
         };
 
