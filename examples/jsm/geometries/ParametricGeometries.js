@@ -11,14 +11,14 @@ import { ParametricGeometry } from './ParametricGeometry.js';
 
 const ParametricGeometries = {
 
-	hopf: function( u, v, target ) {
+	hopf: function ( u, v, target ) {
 
 		const pi = Math.PI;
 
 		const t = 2 * pi * u;
 		const phi = 2 * pi * v;
 
-		const a = pi / 2 - (pi / 2 - 0.44) * Math.cos( 3 * t );
+		const a = pi / 2 - ( pi / 2 - 0.44 ) * Math.cos( 3 * t );
 		const b = t + 0.44 * Math.sin( 2 * 3 * t );
 
 		const p1 = Math.cos( a );
@@ -26,8 +26,8 @@ const ParametricGeometries = {
 		const p2 = sin_a * Math.cos( b );
 		const p3 = sin_a * Math.sin( b );
 
-		const yden = Math.sqrt( 2 * (1 + p1) );
-		const y1 = (1 + p1) / yden;
+		const yden = Math.sqrt( 2 * ( 1 + p1 ) );
+		const y1 = ( 1 + p1 ) / yden;
 		const y2 = p2 / yden;
 		const y3 = p3 / yden;
 
@@ -38,7 +38,7 @@ const ParametricGeometries = {
 		const x3 = cos_phi * y1;
 		const x4 = sin_phi * y1;
 
-		target.set( x1 / (1 - x4), x2 / (1 - x4), x3 / (1 - x4) );
+		target.set( x1 / ( 1 - x4 ), x2 / ( 1 - x4 ), x3 / ( 1 - x4 ) );
 	},
 
 	klein: function ( v, u, target ) {
