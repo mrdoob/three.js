@@ -11,6 +11,20 @@ import { ParametricGeometry } from './ParametricGeometry.js';
 
 const ParametricGeometries = {
 
+	bonanjeenerklein: function( u, v, target ) {
+
+		u *= 2 * Math.PI;
+		v *= 2 * Math.PI;
+
+		const a = Math.sin( 3 * u ) + 1.5;
+		const x = 4 * Math.cos( u ) - Math.cos( 4 * u ) - 3 * a * Math.sin( 5 * u / 2 ) * Math.cos( v ) / 4;
+		const y = a * Math.sin( v );
+		const z = 4 * Math.sin( u ) - Math.sin( 4 * u ) + 3 * a * Math.cos( 5 * u / 2 ) * Math.cos( v ) / 4;
+
+		target.set( x / 2, y, z / 2 );
+	
+	},
+
 	hopf: function( u, v, target ) {
 
 		const pi = Math.PI;
@@ -39,6 +53,7 @@ const ParametricGeometries = {
 		const x4 = sin_phi * y1;
 
 		target.set( x1 / (1 - x4), x2 / (1 - x4), x3 / (1 - x4) );
+
 	},
 
 	klein: function ( v, u, target ) {

@@ -101,6 +101,12 @@
 				object.scale.multiplyScalar( 2 );
 				scene.add( object );
 
+				geometry = new ParametricGeometry( ParametricGeometries.bonanjeenerklein, 200, 200 );
+				object = new THREE.Mesh( geometry, material );
+				object.position.set( 350, 0, 0 );
+				object.scale.multiplyScalar( 13 );
+				scene.add( object );
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
