@@ -97,7 +97,8 @@
 					conditionalLines: true,
 					smoothNormals: true,
 					constructionStep: 0,
-					noConstructionSteps: 'No steps.'
+					noConstructionSteps: 'No steps.',
+					flatColors: false,
 				};
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -174,6 +175,43 @@
 
 						model = group2;
 
+						if ( guiData.flatColors ) {
+
+							function convertMaterial( material ) {
+
+								const newMaterial = new THREE.MeshBasicMaterial();
+								newMaterial.color.copy( material.color );
+								newMaterial.polygonOffset = material.polygonOffset;
+								newMaterial.polygonOffsetUnits = material.polygonOffsetUnits;
+								newMaterial.polygonOffsetFactor = material.polygonOffsetFactor;
+								newMaterial.opacity = material.opacity;
+								newMaterial.transparent = material.transparent;
+								newMaterial.depthWrite = material.depthWrite;
+
+								return newMaterial;
+
+							}
+
+							model.traverse( c => {
+
+								if ( c.isMesh ) {
+
+									if ( Array.isArray( c.material ) ) {
+
+										c.material = c.material.map( convertMaterial );
+
+									} else {
+
+										c.material = convertMaterial( c.material );
+
+									}
+
+								}
+
+							} );
+
+						}
+
 						// Convert from LDraw coordinates: rotate 180 degrees around OX
 						model.rotation.x = Math.PI;
 
@@ -231,6 +269,12 @@
 				} );
 
 				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function () {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'flatColors' ).name( 'Flat Colors' ).onChange( function () {
 
 					reloadObject( false );
 
