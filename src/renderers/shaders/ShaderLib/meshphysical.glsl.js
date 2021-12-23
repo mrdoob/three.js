@@ -177,9 +177,9 @@ void main() {
 
 	#ifdef USE_SHEEN
 
-		float sheen = max3( material.sheenColor );
+		float sheenEnergyComp = 1.0 - 0.157 * max3( material.sheenColor );
 
-		outgoingLight = outgoingLight * ( 1.0 - 0.157 * sheen ) + sheenSpecular;
+		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecular;
 
 	#endif
 
