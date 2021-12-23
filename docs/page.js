@@ -101,7 +101,6 @@ function onDocumentLoad() {
 		const element = event.target;
 		if ( element.classList.contains( 'links' ) && event.button === 0 && ! event.shiftKey && ! event.ctrlKey && ! event.metaKey && ! event.altKey ) {
 
-			//alert( element.dataset.fragment );
 			window.parent.setUrlFragment( element.dataset.fragment );
 			event.preventDefault();
 
