@@ -1,12 +1,10 @@
 import {
-	GammaEncoding,
 	LinearEncoding,
 	sRGBEncoding
 } from '../../../../build/three.module.js';
 
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
-import { ExpressionNode } from '../core/ExpressionNode.js';
 
 class ColorSpaceNode extends TempNode {
 
@@ -100,28 +98,10 @@ class ColorSpaceNode extends TempNode {
 
 ColorSpaceNode.Nodes = ( function () {
 
-	// For a discussion of what this is, please read this: http://lousodrome.net/blog/light/2013/05/26/gamma-correct-and-hdr-rendering-in-a-32-bits-buffer/
-
 	const LinearToLinear = new FunctionNode( /* glsl */`
 		vec4 LinearToLinear( in vec4 value ) {
 
 			return value;
-
-		}`
-	);
-
-	const GammaToLinear = new FunctionNode( /* glsl */`
-		vec4 GammaToLinear( in vec4 value, in float gammaFactor ) {
-
-			return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );
-
-		}`
-	);
-
-	const LinearToGamma = new FunctionNode( /* glsl */`
-		vec4 LinearToGamma( in vec4 value, in float gammaFactor ) {
-
-			return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );
 
 		}`
 	);
@@ -144,8 +124,6 @@ ColorSpaceNode.Nodes = ( function () {
 
 	return {
 		LinearToLinear: LinearToLinear,
-		GammaToLinear: GammaToLinear,
-		LinearToGamma: LinearToGamma,
 		sRGBToLinear: sRGBToLinear,
 		LinearTosRGB: LinearTosRGB
 	};
@@ -153,9 +131,6 @@ ColorSpaceNode.Nodes = ( function () {
 } )();
 
 ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
-
-ColorSpaceNode.GAMMA_TO_LINEAR = 'GammaToLinear';
-ColorSpaceNode.LINEAR_TO_GAMMA = 'LinearToGamma';
 
 ColorSpaceNode.SRGB_TO_LINEAR = 'sRGBToLinear';
 ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
@@ -168,8 +143,6 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 			return [ 'Linear' ];
 		case sRGBEncoding:
 			return [ 'sRGB' ];
-		case GammaEncoding:
-			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )', 'f' ) ];
 
 	}
 

@@ -2,7 +2,6 @@ import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
-	GammaEncoding,
 	LinearEncoding,
 	LinearFilter,
 	NoToneMapping,
@@ -45,8 +44,7 @@ const MAX_SAMPLES = 20;
 
 const ENCODINGS = {
 	[ LinearEncoding ]: 0,
-	[ sRGBEncoding ]: 1,
-	[ GammaEncoding ]: 6
+	[ sRGBEncoding ]: 1
 };
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
@@ -904,13 +902,9 @@ function _getEncodings() {
 
 				return value;
 
-			} else if ( inputEncoding == 1 ) {
-
-				return sRGBToLinear( value );
-
 			} else {
 
-				return GammaToLinear( value, 2.2 );
+				return sRGBToLinear( value );
 
 			}
 

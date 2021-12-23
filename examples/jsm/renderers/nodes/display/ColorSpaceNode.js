@@ -4,8 +4,7 @@ import { ShaderNode,
 	pow, mul, add, sub, mix, join,
 	lessThanEqual } from '../ShaderNode.js';
 
-import { LinearEncoding,
-	sRGBEncoding/*, GammaEncoding*/ } from '../../../../../build/three.module.js';
+import { LinearEncoding, sRGBEncoding } from '../../../../../build/three.module.js';
 
 export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
@@ -59,10 +58,6 @@ function getEncodingComponents( encoding ) {
 			return [ 'Linear' ];
 		case sRGBEncoding:
 			return [ 'sRGB' ];
-/*
-		case GammaEncoding:
-			return [ 'Gamma', new CodeNode( 'float( GAMMA_FACTOR )' ) ];
-*/
 
 	}
 
@@ -74,10 +69,7 @@ class ColorSpaceNode extends TempNode {
 
 	static SRGB_TO_LINEAR = 'sRGBToLinear';
 	static LINEAR_TO_SRGB = 'LinearTosRGB';
-	/*
-	static GAMMA_TO_LINEAR = 'GammaToLinear';
-	static LINEAR_TO_GAMMA = 'LinearToGamma';
-*/
+
 	constructor( method, node ) {
 
 		super( 'vec4' );

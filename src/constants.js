@@ -156,7 +156,6 @@ export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
 export const LinearEncoding = 3000;
 export const sRGBEncoding = 3001;
-export const GammaEncoding = 3007;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;
