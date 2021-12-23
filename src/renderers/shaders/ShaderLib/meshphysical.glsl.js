@@ -175,6 +175,14 @@ void main() {
 
 	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 
+	#ifdef USE_SHEEN
+
+		float sheen = max3( material.sheenColor );
+
+		outgoingLight = outgoingLight * ( 1.0 - 0.157 * sheen ) + sheenSpecular;
+
+	#endif
+
 	#ifdef USE_CLEARCOAT
 
 		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
