@@ -1074,6 +1074,7 @@ class LDrawLoader extends Loader {
 			lineSegments: [],
 			conditionalSegments: [],
 			totalFaces: 0,
+			faceMaterials: new Set(),
 
 			// If true, this object is the start of a construction step
 			startingConstructionStep: false
@@ -1837,6 +1838,8 @@ class LDrawLoader extends Loader {
 
 					}
 
+					currentParseScope.faceMaterials.add( material );
+
 					break;
 
 					// Line type 4: Quadrilateral
@@ -1968,7 +1971,10 @@ class LDrawLoader extends Loader {
 
 		if ( this.smoothNormals && doSmooth ) {
 
-			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
+			// only check subsetgments if we have multiple materials in a single part because this seems to be the case where it's needed most --
+			// there may be cases where a single edge line crosses over polygon edges that are broken up by multiple materials.
+			const checkSubSegments = subobjectParseScope.faceMaterials.size > 1;
+			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments, checkSubSegments );
 
 		}
 
