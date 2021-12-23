@@ -25,18 +25,19 @@ vec3 clearcoatSpecular = vec3( 0.0 );
 vec3 sheenSpecular = vec3( 0.0 );
 
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from 
-// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
-float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float r) {
+// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
+// in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
+float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
 
-	float r2 = r * r;
+	float r2 = roughness * roughness;
 
-	float a = r < 0.25 ? -339.2 * r2 + 161.4 * r - 25.9 : -8.48 * r2 + 14.3 * r - 9.95;
+	float a = roughness < 0.25 ? -339.2 * r2 + 161.4 * roughness - 25.9 : -8.48 * r2 + 14.3 * roughness - 9.95;
 
-	float b = r < 0.25 ? 44.0 * r2 - 23.7 * r + 3.26 : 1.97 * r2 - 3.27 * r + 0.72;
+	float b = roughness < 0.25 ? 44.0 * r2 - 23.7 * roughness + 3.26 : 1.97 * r2 - 3.27 * roughness + 0.72;
 
-	float DG = exp( a * dotNV + b ) + ( r < 0.25 ? 0.0 : 0.1 * ( r - 0.25 ) );
+	float DG = exp( a * dotNV + b ) + ( roughness < 0.25 ? 0.0 : 0.1 * ( roughness - 0.25 ) );
 
 	return saturate( DG * RECIPROCAL_PI );
 

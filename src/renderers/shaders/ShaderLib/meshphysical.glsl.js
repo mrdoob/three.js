@@ -175,6 +175,14 @@ void main() {
 
 	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 
+	#ifdef USE_SHEEN
+
+		float sheen = max3( material.sheenColor );
+
+		outgoingLight = outgoingLight * ( 1.0 - 0.157 * sheen ) + sheenSpecular;
+
+	#endif
+
 	#ifdef USE_CLEARCOAT
 
 		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
@@ -182,14 +190,6 @@ void main() {
 		vec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );
 
 		outgoingLight = outgoingLight * ( 1.0 - material.clearcoat * Fcc ) + clearcoatSpecular * material.clearcoat;
-
-	#endif
-
-	#ifdef USE_SHEEN
-
-		float sheen = max( material.sheenColor.r, max( material.sheenColor.g, material.sheenColor.b ) );
-
-		outgoingLight = outgoingLight * ( 1.0 - 0.157 * sheen ) + sheenSpecular;
 
 	#endif
 
