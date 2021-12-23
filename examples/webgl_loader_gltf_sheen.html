@@ -5,6 +5,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background: #bbbbbb;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -34,7 +39,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20 );
-				camera.position.set( 0, 0.75, 1.25 );
+				camera.position.set( - 0.75, 0.7, 1.25 );
 
 				scene = new THREE.Scene();
 
