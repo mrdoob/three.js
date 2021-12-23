@@ -80,13 +80,17 @@ function onDocumentLoad() {
 
 	document.body.innerHTML = text;
 
-	const links = document.querySelectorAll( '.links' );
-	for ( let i = 0; i < links.length; i ++ ) {
+	if ( window.parent.getPageURL ) {
 
-		const pageURL = window.parent.getPageURL( links[ i ].dataset.fragment );
-		if ( pageURL ) {
+		const links = document.querySelectorAll( '.links' );
+		for ( let i = 0; i < links.length; i ++ ) {
 
-			links[ i ].href = './index.html#' + pageURL;
+			const pageURL = window.parent.getPageURL( links[ i ].dataset.fragment );
+			if ( pageURL ) {
+
+				links[ i ].href = './index.html#' + pageURL;
+
+			}
 
 		}
 
