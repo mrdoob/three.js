@@ -118,7 +118,7 @@
 
 				viewer.srcdoc = document.getElementById( 'PlaceholderHTML' ).innerHTML;
 				viewer.style.display = 'unset';
-		
+
 			}
 
 			filterInput.value = extractQuery();
@@ -407,21 +407,19 @@
 						<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 						<link rel="stylesheet" type="text/css" href="../files/main.css">
 						<style>
-						section {
-							color: rgb(117, 117, 117);
-							padding: 1em;
-							position: absolute;
-							top: 50%;
-							left: 50%;
-							margin-right: -50%;
-							transform: translate(-50%, -50%) 
+						html, body {
+							height: 100%;
+						}
+						body {
+							height: 100%;
+							display: flex;
+							align-items: center;
+							justify-content: center;
 						}
 						</style>
 					</head>
 					<body>
-						<section>
-							<p>Select an example from the sidebar.</p>
-						</section>
+						Select an example from the sidebar
 					</body>
 				</html>
 		</template>
