@@ -2018,10 +2018,12 @@ class LDrawLoader extends Loader {
 			const parentLineSegments = parentParseScope.lineSegments;
 			const parentConditionalSegments = parentParseScope.conditionalSegments;
 			const parentFaces = parentParseScope.faces;
+			const parentFaceMaterials = parentParseScope.faceMaterials;
 
 			const lineSegments = subobjectParseScope.lineSegments;
 			const conditionalSegments = subobjectParseScope.conditionalSegments;
 			const faces = subobjectParseScope.faces;
+			const faceMaterials = subobjectParseScope.faceMaterials;
 
 			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
@@ -2082,6 +2084,7 @@ class LDrawLoader extends Loader {
 			}
 
 			parentParseScope.totalFaces += subobjectParseScope.totalFaces;
+			faceMaterials.forEach( material => parentFaceMaterials.add( material ) );
 
 		}
 
