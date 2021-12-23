@@ -189,6 +189,8 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 	}
 
+	// converts the two vertices to a ray with a normalized direction and origin of 0, 0, 0 projected
+	// onto the original line.
 	function toNormalizedRay( v0, v1, targetRay ) {
 
 		targetRay.direction.subVectors( v1, v0 ).normalize();
@@ -225,6 +227,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 		// and requires more memory.
 		if ( checkSubSegments ) {
 
+			// add both ray directions to the map
 			const ray = toNormalizedRay( v0, v1, new Ray() );
 			const rh1 = hashRay( ray );
 			if ( ! hardEdgeRays.has( rh1 ) ) {
@@ -242,6 +245,8 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 			}
 
+			// store both segments ends in min, max order in the distances array to check if a face edge is a
+			// subsegment later.
 			const info = hardEdgeRays.get( rh1 );
 			let d0 = info.ray.direction.dot( v0 );
 			let d1 = info.ray.direction.dot( v1 );
@@ -297,6 +302,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 					}
 
+					// return early if the face edge is found to be a subsegment of a line edge meaning the edge will have "hard" normals
 					let found = false;
 					for ( let i = 0, l = distances.length; i < l; i += 2 ) {
 
