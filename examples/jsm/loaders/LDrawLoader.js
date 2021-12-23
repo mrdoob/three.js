@@ -967,6 +967,7 @@ class LDrawLoader extends Loader {
 			currentMatrix: new Matrix4(),
 			matrix: new Matrix4(),
 			type: 'Model',
+			groupObject: null,
 
 			// If false, it is a root material scope previous to parse
 			isFromParse: true,
@@ -1439,15 +1440,6 @@ class LDrawLoader extends Loader {
 
 								currentParseScope.type = type;
 
-								const isRoot = ! parentParseScope.isFromParse;
-								if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
-
-									currentParseScope.groupObject = new Group();
-
-									currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
-
-								}
-
 								// If the scale of the object is negated then the triangle winding order
 								// needs to be flipped.
 								if (
@@ -1816,6 +1808,14 @@ class LDrawLoader extends Loader {
 		currentParseScope.subobjects = subobjects;
 		currentParseScope.numSubobjects = subobjects.length;
 		currentParseScope.subobjectIndex = 0;
+
+		const isRoot = ! parentParseScope.isFromParse;
+		if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
+
+			currentParseScope.groupObject = new Group();
+			currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
+
+		}
 
 	}
 
