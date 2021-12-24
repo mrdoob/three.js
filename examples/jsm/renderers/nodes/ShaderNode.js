@@ -25,7 +25,7 @@ import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
 // core
-import { Vector2, Vector3, Vector4, Color } from 'three';
+import { Vector2, Vector3, Vector4, Color } from '../../../../build/three.module.js';
 
 const NodeHandler = {
 
@@ -209,9 +209,9 @@ export const cond = ( ...params ) => {
 
 export const vec2 = ( ...params ) => {
 
-	if ( params[0]?.isNode === true ) {
+	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[0], 'vec2' ) );
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec2' ) );
 
 	} else {
 
@@ -231,9 +231,9 @@ export const vec2 = ( ...params ) => {
 
 export const vec3 = ( ...params ) => {
 
-	if ( params[0]?.isNode === true ) {
+	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[0], 'vec3' ) );
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec3' ) );
 
 	} else {
 
@@ -253,9 +253,9 @@ export const vec3 = ( ...params ) => {
 
 export const vec4 = ( ...params ) => {
 
-	if ( params[0]?.isNode === true ) {
+	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[0], 'vec4' ) );
+		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec4' ) );
 
 	} else {
 
@@ -293,6 +293,7 @@ export const and = ShaderNodeProxy( OperatorNode, '&&' );
 
 export const element = ShaderNodeProxy( ArrayElementNode );
 
+export const normalGeometry = new NormalNode( NormalNode.GEOMETRY );
 export const normalLocal = new NormalNode( NormalNode.LOCAL );
 export const normalWorld = new NormalNode( NormalNode.WORLD );
 export const normalView = new NormalNode( NormalNode.VIEW );

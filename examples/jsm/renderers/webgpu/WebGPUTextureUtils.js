@@ -29,7 +29,6 @@ class WebGPUTextureUtils {
 		this.device = device;
 
 		const mipmapVertexSource = `
-[[ block ]]
 struct VarysStruct {
 
 	[[ builtin( position ) ]] Position: vec4<f32>;

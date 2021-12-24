@@ -151,6 +151,7 @@ export {
 
 	// utils
 	ArrayElementNode,
+	ConvertNode,
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,

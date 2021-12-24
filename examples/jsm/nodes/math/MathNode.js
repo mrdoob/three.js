@@ -18,6 +18,14 @@ class MathNode extends TempNode {
 
 		switch ( this.method ) {
 
+			// variable
+
+			case MathNode.ARCTAN:
+
+				return this.b ? 2 : 1;
+
+			// 3
+
 			case MathNode.MIX:
 			case MathNode.CLAMP:
 			case MathNode.REFRACT:
@@ -25,6 +33,8 @@ class MathNode extends TempNode {
 			case MathNode.FACEFORWARD:
 
 				return 3;
+
+			// 2
 
 			case MathNode.MIN:
 			case MathNode.MAX:
@@ -37,6 +47,8 @@ class MathNode extends TempNode {
 			case MathNode.POW:
 
 				return 2;
+
+			// 1
 
 			default:
 

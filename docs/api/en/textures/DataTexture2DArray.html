@@ -67,7 +67,7 @@
 
 		const texture = new THREE.DataTexture2DArray( data, width, height, depth );
 		texture.format = THREE.RGBFormat;
-		texture.type = THREE.UnsignedByteType;
+		texture.needsUpdate = true;
 		</code>
 
 		<h2>Examples</h2>

@@ -106,7 +106,9 @@ class GlitchPass extends Pass {
 
 		}
 
-		return new DataTexture( data_arr, dt_size, dt_size, RGBFormat, FloatType );
+		const texture = new DataTexture( data_arr, dt_size, dt_size, RGBFormat, FloatType );
+		texture.needsUpdate = true;
+		return texture;
 
 	}
 

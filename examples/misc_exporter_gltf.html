@@ -161,6 +161,7 @@
 				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBFormat );
 				gradientTexture.minFilter = THREE.LinearFilter;
 				gradientTexture.magFilter = THREE.LinearFilter;
+				gradientTexture.needsUpdate = true;
 
 				scene1 = new THREE.Scene();
 				scene1.name = 'Scene1';

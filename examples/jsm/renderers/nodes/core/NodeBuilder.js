@@ -6,7 +6,7 @@ import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
-import { REVISION, LinearEncoding } from 'three';
+import { REVISION, LinearEncoding } from '../../../../../build/three.module.js';
 
 const shaderStages = [ 'fragment', 'vertex' ];
 
@@ -624,7 +624,7 @@ class NodeBuilder {
 
 	getSignature() {
 
-		return `// Three.js r${ REVISION } • NodeMaterial System\n`;
+		return `// Three.js r${ REVISION } - NodeMaterial System\n`;
 
 	}
 

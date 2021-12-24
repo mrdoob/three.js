@@ -49,6 +49,12 @@ class WebGPUBindings {
 
 	}
 
+	remove( object ) {
+
+		this.uniformsData.delete( object );
+
+	}
+
 	getForCompute( param ) {
 
 		let data = this.uniformsData.get( param );
@@ -108,12 +114,7 @@ class WebGPUBindings {
 
 				if ( needsBufferWrite === true ) {
 
-					this.device.queue.writeBuffer(
-						bufferGPU,
-						0,
-						buffer,
-						0
-					);
+					this.device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
 
 				}
 

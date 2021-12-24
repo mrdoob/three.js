@@ -44,6 +44,12 @@
 	const _raycaster = new THREE.Raycaster();
 
 	const _offset = new THREE.Vector3();
+
+	const _gizmoMatrixStateTemp = new THREE.Matrix4();
+
+	const _cameraMatrixStateTemp = new THREE.Matrix4();
+
+	const _scalePointTemp = new THREE.Vector3();
 	/**
  *
  * @param {Camera} camera Virtual camera used in the scene
@@ -560,28 +566,6 @@
 								break;
 
 						}
-
-					}
-
-				}
-
-			};
-
-			this.onKeyDown = event => {
-
-				if ( event.key == 'c' ) {
-
-					if ( event.ctrlKey || event.metaKey ) {
-
-						this.copyState();
-
-					}
-
-				} else if ( event.key == 'v' ) {
-
-					if ( event.ctrlKey || event.metaKey ) {
-
-						this.pasteState();
 
 					}
 
@@ -1621,13 +1605,13 @@
 
 				this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
 
-				const gizmoStateTemp = this._gizmoMatrixState.clone();
+				_gizmoMatrixStateTemp.copy( this._gizmoMatrixState );
 
 				this._gizmoMatrixState.premultiply( this._translationMatrix );
 
 				this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
-				const cameraStateTemp = this._cameraMatrixState.clone();
+				_cameraMatrixStateTemp.copy( this._cameraMatrixState );
 
 				this._cameraMatrixState.premultiply( this._translationMatrix );
 
@@ -1640,9 +1624,9 @@
 
 				}
 
-				this._gizmoMatrixState.copy( gizmoStateTemp );
+				this._gizmoMatrixState.copy( _gizmoMatrixStateTemp );
 
-				this._cameraMatrixState.copy( cameraStateTemp );
+				this._cameraMatrixState.copy( _cameraMatrixStateTemp );
 
 			};
 
@@ -1710,7 +1694,6 @@
 				window.removeEventListener( 'pointermove', this.onPointerMove );
 				window.removeEventListener( 'pointerup', this.onPointerUp );
 				window.removeEventListener( 'resize', this.onWindowResize );
-				window.removeEventListener( 'keydown', this.onKeyDown );
 				if ( this.scene !== null ) this.scene.remove( this._gizmos );
 				this.disposeGrid();
 
@@ -2163,7 +2146,8 @@
 
 			this.scale = ( size, point, scaleGizmos = true ) => {
 
-				const scalePoint = point.clone();
+				_scalePointTemp.copy( point );
+
 				let sizeInverse = 1 / size;
 
 				if ( this.camera.isOrthographicCamera ) {
@@ -2199,11 +2183,13 @@
 					this._m4_2.multiply( this._translationMatrix ); //move camera and gizmos to obtain pinch effect
 
 
-					scalePoint.sub( this._v3_1 );
-					const amount = scalePoint.clone().multiplyScalar( sizeInverse );
-					scalePoint.sub( amount );
+					_scalePointTemp.sub( this._v3_1 );
 
-					this._m4_1.makeTranslation( scalePoint.x, scalePoint.y, scalePoint.z );
+					const amount = _scalePointTemp.clone().multiplyScalar( sizeInverse );
+
+					_scalePointTemp.sub( amount );
+
+					this._m4_1.makeTranslation( _scalePointTemp.x, _scalePointTemp.y, _scalePointTemp.z );
 
 					this._m4_2.premultiply( this._m4_1 );
 
@@ -2217,7 +2203,7 @@
 					this._v3_2.setFromMatrixPosition( this._gizmoMatrixState ); //move camera
 
 
-					let distance = this._v3_1.distanceTo( scalePoint );
+					let distance = this._v3_1.distanceTo( _scalePointTemp );
 
 					let amount = distance - distance * sizeInverse; //check min and max distance
 
@@ -2235,7 +2221,7 @@
 
 					}
 
-					_offset.copy( scalePoint ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
+					_offset.copy( _scalePointTemp ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
 
 					this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
@@ -2243,10 +2229,10 @@
 
 						//scale gizmos so they appear in the same spot having the same dimension
 						const pos = this._v3_2;
-						distance = pos.distanceTo( scalePoint );
+						distance = pos.distanceTo( _scalePointTemp );
 						amount = distance - distance * sizeInverse;
 
-						_offset.copy( scalePoint ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
+						_offset.copy( _scalePointTemp ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
 
 						this._translationMatrix.makeTranslation( pos.x, pos.y, pos.z );
 
@@ -2282,19 +2268,6 @@
 					this.camera.updateProjectionMatrix();
 
 				}
-
-			};
-
-			this.setTarget = ( x, y, z ) => {
-
-				this.target.set( x, y, z );
-
-				this._gizmos.position.set( x, y, z ); //for correct radius calculation
-
-
-				this._tbRadius = this.calculateTbRadius( this.camera );
-				this.makeGizmos( this.target, this._tbRadius );
-				this.camera.lookAt( this.target );
 
 			};
 
@@ -2579,7 +2552,20 @@
 
 			this.update = () => {
 
-				const EPS = 0.000001; //check min/max parameters
+				const EPS = 0.000001;
+
+				if ( this.target.equals( this._currentTarget ) === false ) {
+
+					this._gizmos.position.copy( this.target ); //for correct radius calculation
+
+
+					this._tbRadius = this.calculateTbRadius( this.camera );
+					this.makeGizmos( this.target, this._tbRadius );
+
+					this._currentTarget.copy( this.target );
+
+				} //check min/max parameters
+
 
 				if ( this.camera.isOrthographicCamera ) {
 
@@ -2684,7 +2670,8 @@
 			this.camera = null;
 			this.domElement = domElement;
 			this.scene = scene;
-			this.target = new THREE.Vector3( 0, 0, 0 );
+			this.target = new THREE.Vector3();
+			this._currentTarget = new THREE.Vector3();
 			this.radiusFactor = 0.67;
 			this.mouseActions = [];
 			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
@@ -2827,7 +2814,6 @@
 			this.domElement.addEventListener( 'wheel', this.onWheel );
 			this.domElement.addEventListener( 'pointerdown', this.onPointerDown );
 			this.domElement.addEventListener( 'pointercancel', this.onPointerCancel );
-			window.addEventListener( 'keydown', this.onKeyDown );
 			window.addEventListener( 'resize', this.onWindowResize );
 
 		} //listeners
