@@ -5,4 +5,5 @@ path_classifiers:
     - "examples/js/libs/**/*.*"
     - "examples/jsm/loaders/ifc/**/*.*"
     - "examples/js/loaders/ifc/**/*.*"
+    - "build/*.*"
 
