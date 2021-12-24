@@ -319,7 +319,7 @@
 		},
 		"技巧": {
 			"按需渲染": "zh/rendering-on-demand",
-			"Debugging JavaScript": "zh/debugging-javascript",
+			"调试JavaScript": "zh/debugging-javascript",
 			"调试着色器": "zh/debugging-glsl",
 			"Taking a screenshot": "zh/tips#screenshot",
 			"Prevent the Canvas Being Cleared": "zh/tips#preservedrawingbuffer",
