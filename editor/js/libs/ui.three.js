@@ -50,7 +50,7 @@ class UITexture extends UISpan {
 			const extension = file.name.split( '.' ).pop().toLowerCase();
 			const reader = new FileReader();
 
-			if ( extension === 'hdr' ) {
+			if ( extension === 'hdr' || extension === 'pic' ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
