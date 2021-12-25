@@ -696,8 +696,11 @@
 			}
 
 			//
+			if ( guis[ window.location.hash.substring( 1 ) ] ) {
 
-			document.getElementById( 'newWindow' ).href += window.location.hash;
+				document.getElementById( 'newWindow' ).href += window.location.hash;
+
+			}
 
 			const gui = new GUI();
 
