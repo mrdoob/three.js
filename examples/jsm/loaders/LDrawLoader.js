@@ -1862,8 +1862,7 @@ class LDrawLoader extends Loader {
 		const doSmooth =
 			isPartType( subobjectParseScope.type ) ||
 			(
-				! isPartType( subobjectParseScope.type ) &&
-				! isModelType( subobjectParseScope.type ) &&
+				isPrimitiveType( subobjectParseScope.type ) &&
 				isModelType( subobjectParseScope.parentScope.type )
 			);
 
