@@ -11,11 +11,11 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from "./jsm/controls/OrbitControls.js";
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			let camera, scene, renderer, controls, stats;
+			let renderRequested = false;
+			let camera, scene, renderer, controls;
 
 			let mesh;
 			const amount = parseInt( window.location.search.substr( 1 ) ) || 10;
@@ -28,7 +28,7 @@
 			const white = new THREE.Color().setHex( 0xffffff );
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -76,7 +76,7 @@
 				//
 
 				const gui = new GUI();
-				gui.add( mesh, 'count', 0, count );
+				gui.add( mesh, 'count', 0, count ).onChange( render );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -87,9 +87,7 @@
 				controls.enableDamping = true;
 				controls.enableZoom = false;
 				controls.enablePan = false;
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				controls.addEventListener( 'change', onControlsChange );
 
 				window.addEventListener( 'resize', onWindowResize );
 				document.addEventListener( 'mousemove', onMouseMove );
@@ -103,6 +101,8 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
 			function onMouseMove( event ) {
@@ -111,14 +111,6 @@
 
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				controls.update();
 
 				raycaster.setFromCamera( mouse, camera );
 
@@ -138,11 +130,28 @@
 
 					}
 
+					render();
+
 				}
 
-				render();
+			}
 
-				stats.update();
+			function onControlsChange() {
+
+				if ( ! renderRequested ) {
+
+					renderRequested = true;
+					requestAnimationFrame( renderDamping );
+
+				}
+
+			}
+
+			function renderDamping() {
+
+				renderRequested = false;
+				controls.update();
+				render();
 
 			}
 
