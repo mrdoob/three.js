@@ -315,6 +315,7 @@
 				"DataTexture2DArray": "api/en/textures/DataTexture2DArray",
 				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
+				"FramebufferTexture": "api/en/textures/FramebufferTexture",
 				"Texture": "api/en/textures/Texture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
@@ -421,10 +422,6 @@
 		},
 
 		"Developer Reference": {
-
-			"Polyfills": {
-				"Polyfills": "api/en/Polyfills"
-			},
 
 			"WebGLRenderer": {
 				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
@@ -817,6 +814,7 @@
 				"DataTexture2DArray": "api/zh/textures/DataTexture2DArray",
 				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
+				"FramebufferTexture": "api/zh/textures/FramebufferTexture",
 				"Texture": "api/zh/textures/Texture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
 			}
@@ -918,10 +916,6 @@
 		},
 
 		"开发者参考": {
-
-			"差异化支持": {
-				"Polyfills": "api/zh/Polyfills"
-			},
 
 			"WebGL渲染器": {
 				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram"

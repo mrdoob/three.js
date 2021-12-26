@@ -30,6 +30,11 @@
 				return new GLTFMaterialsVolumeExtension( writer );
 
 			} );
+			this.register( function ( writer ) {
+
+				return new GLTFMaterialsClearcoatExtension( writer );
+
+			} );
 
 		}
 
@@ -60,11 +65,19 @@
    * Parse scenes and generate GLTF output
    * @param  {Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
    * @param  {Function} onDone  Callback on completed
+   * @param  {Function} onError  Callback on errors
    * @param  {Object} options options
    */
 
 
-		parse( input, onDone, options ) {
+		parse( input, onDone, onError, options ) {
+
+			if ( typeof onError === 'object' ) {
+
+				console.warn( 'THREE.GLTFExporter: parse() expects options as the fourth argument now.' );
+				options = onError;
+
+			}
 
 			const writer = new GLTFWriter();
 			const plugins = [];
@@ -76,7 +89,18 @@
 			}
 
 			writer.setPlugins( plugins );
-			writer.write( input, onDone, options );
+			writer.write( input, onDone, options ).catch( onError );
+
+		}
+
+		parseAsync( input, options ) {
+
+			const scope = this;
+			return new Promise( function ( resolve, reject ) {
+
+				scope.parse( input, resolve, reject, options );
+
+			} );
 
 		}
 
@@ -337,7 +361,7 @@
    */
 
 
-		write( input, onDone, options ) {
+		async write( input, onDone, options ) {
 
 			this.options = Object.assign( {}, {
 				// default options
@@ -359,86 +383,83 @@
 			}
 
 			this.processInput( input );
+			await Promise.all( this.pending );
 			const writer = this;
-			Promise.all( this.pending ).then( function () {
+			const buffers = writer.buffers;
+			const json = writer.json;
+			options = writer.options;
+			const extensionsUsed = writer.extensionsUsed; // Merge buffers.
 
-				const buffers = writer.buffers;
-				const json = writer.json;
-				const options = writer.options;
-				const extensionsUsed = writer.extensionsUsed; // Merge buffers.
+			const blob = new Blob( buffers, {
+				type: 'application/octet-stream'
+			} ); // Declare extensions.
 
-				const blob = new Blob( buffers, {
-					type: 'application/octet-stream'
-				} ); // Declare extensions.
+			const extensionsUsedList = Object.keys( extensionsUsed );
+			if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList; // Update bytelength of the single buffer.
 
-				const extensionsUsedList = Object.keys( extensionsUsed );
-				if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList; // Update bytelength of the single buffer.
+			if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
 
-				if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
+			if ( options.binary === true ) {
 
-				if ( options.binary === true ) {
+				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+				const reader = new window.FileReader();
+				reader.readAsArrayBuffer( blob );
 
-					// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+				reader.onloadend = function () {
+
+					// Binary chunk.
+					const binaryChunk = getPaddedArrayBuffer( reader.result );
+					const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true ); // JSON chunk.
+
+					const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
+					const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true ); // GLB header.
+
+					const header = new ArrayBuffer( GLB_HEADER_BYTES );
+					const headerView = new DataView( header );
+					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+					headerView.setUint32( 4, GLB_VERSION, true );
+					const totalByteLength = GLB_HEADER_BYTES + jsonChunkPrefix.byteLength + jsonChunk.byteLength + binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+					headerView.setUint32( 8, totalByteLength, true );
+					const glbBlob = new Blob( [ header, jsonChunkPrefix, jsonChunk, binaryChunkPrefix, binaryChunk ], {
+						type: 'application/octet-stream'
+					} );
+					const glbReader = new window.FileReader();
+					glbReader.readAsArrayBuffer( glbBlob );
+
+					glbReader.onloadend = function () {
+
+						onDone( glbReader.result );
+
+					};
+
+				};
+
+			} else {
+
+				if ( json.buffers && json.buffers.length > 0 ) {
+
 					const reader = new window.FileReader();
-					reader.readAsArrayBuffer( blob );
+					reader.readAsDataURL( blob );
 
 					reader.onloadend = function () {
 
-						// Binary chunk.
-						const binaryChunk = getPaddedArrayBuffer( reader.result );
-						const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true ); // JSON chunk.
-
-						const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
-						const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true ); // GLB header.
-
-						const header = new ArrayBuffer( GLB_HEADER_BYTES );
-						const headerView = new DataView( header );
-						headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-						headerView.setUint32( 4, GLB_VERSION, true );
-						const totalByteLength = GLB_HEADER_BYTES + jsonChunkPrefix.byteLength + jsonChunk.byteLength + binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-						headerView.setUint32( 8, totalByteLength, true );
-						const glbBlob = new Blob( [ header, jsonChunkPrefix, jsonChunk, binaryChunkPrefix, binaryChunk ], {
-							type: 'application/octet-stream'
-						} );
-						const glbReader = new window.FileReader();
-						glbReader.readAsArrayBuffer( glbBlob );
-
-						glbReader.onloadend = function () {
-
-							onDone( glbReader.result );
-
-						};
+						const base64data = reader.result;
+						json.buffers[ 0 ].uri = base64data;
+						onDone( json );
 
 					};
 
 				} else {
 
-					if ( json.buffers && json.buffers.length > 0 ) {
-
-						const reader = new window.FileReader();
-						reader.readAsDataURL( blob );
-
-						reader.onloadend = function () {
-
-							const base64data = reader.result;
-							json.buffers[ 0 ].uri = base64data;
-							onDone( json );
-
-						};
-
-					} else {
-
-						onDone( json );
-
-					}
+					onDone( json );
 
 				}
 
-			} );
+			}
 
 		}
 		/**
@@ -2013,7 +2034,7 @@
 	/**
  * Specular-Glossiness Extension
  *
- * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Archived/KHR_materials_pbrSpecularGlossiness
  */
 
 
@@ -2057,6 +2078,69 @@
 				};
 				writer.applyTextureTransform( specularMapDef, material.specularMap );
 				extensionDef.specularGlossinessTexture = specularMapDef;
+
+			}
+
+			materialDef.extensions = materialDef.extensions || {};
+			materialDef.extensions[ this.name ] = extensionDef;
+			extensionsUsed[ this.name ] = true;
+
+		}
+
+	}
+	/**
+ * Clearcoat Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
+ */
+
+
+	class GLTFMaterialsClearcoatExtension {
+
+		constructor( writer ) {
+
+			this.writer = writer;
+			this.name = 'KHR_materials_clearcoat';
+
+		}
+
+		writeMaterial( material, materialDef ) {
+
+			if ( ! material.isMeshPhysicalMaterial ) return;
+			const writer = this.writer;
+			const extensionsUsed = writer.extensionsUsed;
+			const extensionDef = {};
+			extensionDef.clearcoatFactor = material.clearcoat;
+
+			if ( material.clearcoatMap ) {
+
+				const clearcoatMapDef = {
+					index: writer.processTexture( material.clearcoatMap )
+				};
+				writer.applyTextureTransform( clearcoatMapDef, material.clearcoatMap );
+				extensionDef.clearcoatTexture = clearcoatMapDef;
+
+			}
+
+			extensionDef.clearcoatRoughnessFactor = material.clearcoatRoughness;
+
+			if ( material.clearcoatRoughnessMap ) {
+
+				const clearcoatRoughnessMapDef = {
+					index: writer.processTexture( material.clearcoatRoughnessMap )
+				};
+				writer.applyTextureTransform( clearcoatRoughnessMapDef, material.clearcoatRoughnessMap );
+				extensionDef.clearcoatRoughnessTexture = clearcoatRoughnessMapDef;
+
+			}
+
+			if ( material.clearcoatNormalMap ) {
+
+				const clearcoatNormalMapDef = {
+					index: writer.processTexture( material.clearcoatNormalMap )
+				};
+				writer.applyTextureTransform( clearcoatNormalMapDef, material.clearcoatNormalMap );
+				extensionDef.clearcoatNormalTexture = clearcoatNormalMapDef;
 
 			}
 
@@ -2126,7 +2210,7 @@
 
 		writeMaterial( material, materialDef ) {
 
-			if ( ! material.isMeshPhysicalMaterial || material.thickness === 0 ) return;
+			if ( ! material.isMeshPhysicalMaterial || material.transmission === 0 ) return;
 			const writer = this.writer;
 			const extensionsUsed = writer.extensionsUsed;
 			const extensionDef = {};

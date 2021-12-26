@@ -175,13 +175,23 @@ void main() {
 
 	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 
+	#ifdef USE_SHEEN
+
+		// Sheen energy compensation approximation calculation can be found at the end of
+		// https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
+		float sheenEnergyComp = 1.0 - 0.157 * max3( material.sheenColor );
+
+		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecular;
+
+	#endif
+
 	#ifdef USE_CLEARCOAT
 
 		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
 
 		vec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );
 
-		outgoingLight = outgoingLight * ( 1.0 - clearcoat * Fcc ) + clearcoatSpecular * clearcoat;
+		outgoingLight = outgoingLight * ( 1.0 - material.clearcoat * Fcc ) + clearcoatSpecular * material.clearcoat;
 
 	#endif
 

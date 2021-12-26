@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - glTF 2.0 - transmission</title>
+		<title>three.js webgl - GLTFloader + sheen</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background: #bbbbbb;
+			}
+		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_sheen" target="_blank" rel="noopener">KHR_materials_sheen</a> extension<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_sheen" target="_blank" rel="noopener">KHR_materials_sheen</a><br />
 			Sheen Chair from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/SheenChair" target="_blank" rel="noopener">glTF-Sample-Models</a>
 		</div>
 
@@ -34,7 +39,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20 );
-				camera.position.set( 0, 1, 2 );
+				camera.position.set( - 0.75, 0.7, 1.25 );
 
 				scene = new THREE.Scene();
 
@@ -73,7 +78,7 @@
 				controls.enableDamping = true;
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
-				controls.target.set( 0, 0.5, 0 );
+				controls.target.set( 0, 0.35, 0 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );

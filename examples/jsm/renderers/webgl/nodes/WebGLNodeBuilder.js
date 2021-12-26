@@ -3,7 +3,7 @@ import SlotNode from './SlotNode.js';
 import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { ShaderChunk, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
+import { ShaderChunk, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from '../../../../../build/three.module.js';
 
 const shaderStages = [ 'vertex', 'fragment' ];
 
@@ -116,15 +116,15 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
-		if ( material.sizeNode && material.sizeNode.isNode ) {
-
-			this.addSlot( 'vertex', new SlotNode( material.sizeNode, 'SIZE', 'float' ) );
-
-		}
-
 		if ( material.positionNode && material.positionNode.isNode ) {
 
 			this.addSlot( 'vertex', new SlotNode( material.positionNode, 'POSITION', 'vec3' ) );
+
+		}
+
+		if ( material.sizeNode && material.sizeNode.isNode ) {
+
+			this.addSlot( 'vertex', new SlotNode( material.sizeNode, 'SIZE', 'float' ) );
 
 		}
 
@@ -216,7 +216,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarys( shaderStage ) {
+	getVarys( /* shaderStage */ ) {
 
 		let snippet = '';
 
@@ -376,8 +376,8 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 		this.parseInclude( 'fragment', 'lights_physical_fragment' );
 
 		const colorSlot = this.getSlot( 'fragment', 'COLOR' );
-		const normalSlot = this.getSlot( 'fragment', 'NORMAL' );
 		const opacityNode = this.getSlot( 'fragment', 'OPACITY' );
+		const normalSlot = this.getSlot( 'fragment', 'NORMAL' );
 		const emissiveNode = this.getSlot( 'fragment', 'EMISSIVE' );
 		const roughnessNode = this.getSlot( 'fragment', 'ROUGHNESS' );
 		const metalnessNode = this.getSlot( 'fragment', 'METALNESS' );
@@ -397,22 +397,22 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		}
 
+		if ( opacityNode !== undefined ) {
+
+			this.addCodeAfterInclude(
+				'fragment',
+				'alphatest_fragment',
+				`${opacityNode.code}\n\tdiffuseColor.a = ${opacityNode.result};`
+			);
+
+		}
+
 		if ( normalSlot !== undefined ) {
 
 			this.addCodeAfterInclude(
 				'fragment',
 				'normal_fragment_begin',
 				`${normalSlot.code}\n\tnormal = ${normalSlot.result};`
-			);
-
-		}
-
-		if ( opacityNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'alphamap_fragment',
-				`${opacityNode.code}\n\tdiffuseColor.a = ${opacityNode.result};`
 			);
 
 		}

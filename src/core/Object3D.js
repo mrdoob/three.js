@@ -405,6 +405,8 @@ class Object3D extends EventDispatcher {
 
 		// adds object as a child of this, while maintaining the object's world transform
 
+		// Note: This method does not support scene graphs having non-uniformly-scaled nodes(s)
+
 		this.updateWorldMatrix( true, false );
 
 		_m1.copy( this.matrixWorld ).invert();
@@ -498,7 +500,7 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	raycast() {}
+	raycast( /* raycaster, intersects */ ) {}
 
 	traverse( callback ) {
 

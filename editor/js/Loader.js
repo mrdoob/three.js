@@ -199,6 +199,7 @@ function Loader( editor ) {
 
 						}
 
+						loader.dispose();
 						editor.execute( new AddObjectCommand( editor, object ) );
 
 					} );

@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.134.0",
+  "version": "0.136.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
@@ -39,14 +39,20 @@
       "html"
     ],
     "globals": {
-      "potpack": true,
-      "fflate": true,
-      "ZSTDDecoder": true,
-      "bodymovin": true,
-      "OIMO": true,
-      "Stats": true,
-      "XRWebGLBinding": true,
-      "XRWebGLLayer": true
+      "__THREE_DEVTOOLS__": "readonly",
+      "WebGL2ComputeRenderingContext": "readonly",
+
+      "potpack": "readonly",
+      "fflate": "readonly",
+      "bodymovin": "readonly",
+      "OIMO": "readonly",
+      "Stats": "readonly",
+      "XRWebGLBinding": "readonly",
+      "XRWebGLLayer": "readonly",
+
+      "GPUShaderStage": "readonly",
+      "GPUBufferUsage": "readonly",
+      "GPUTextureUsage": "readonly"
     },
     "rules": {
       "quotes": [

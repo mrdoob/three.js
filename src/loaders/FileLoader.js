@@ -84,6 +84,12 @@ class FileLoader extends Loader {
 
 					}
 
+					if ( typeof ReadableStream === 'undefined' || response.body.getReader === undefined ) {
+
+						return response;
+
+					}
+
 					const callbacks = loading[ url ];
 					const reader = response.body.getReader();
 					const contentLength = response.headers.get( 'Content-Length' );
@@ -92,7 +98,7 @@ class FileLoader extends Loader {
 					let loaded = 0;
 
 					// periodically read data into the new stream tracking while download progress
-					return new ReadableStream( {
+					const stream = new ReadableStream( {
 						start( controller ) {
 
 							readData();
@@ -130,6 +136,8 @@ class FileLoader extends Loader {
 
 					} );
 
+					return new Response( stream );
+
 				} else {
 
 					throw Error( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}` );
@@ -137,9 +145,7 @@ class FileLoader extends Loader {
 				}
 
 			} )
-			.then( stream => {
-
-				const response = new Response( stream );
+			.then( response => {
 
 				switch ( this.responseType ) {
 
@@ -188,14 +194,21 @@ class FileLoader extends Loader {
 
 				}
 
-				this.manager.itemEnd( url );
-
 			} )
 			.catch( err => {
 
 				// Abort errors and other errors are handled the same
 
 				const callbacks = loading[ url ];
+
+				if ( callbacks === undefined ) {
+
+					// When onLoad was called and url was deleted in `loading`
+					this.manager.itemError( url );
+					throw err;
+
+				}
+
 				delete loading[ url ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
@@ -206,6 +219,10 @@ class FileLoader extends Loader {
 				}
 
 				this.manager.itemError( url );
+
+			} )
+			.finally( () => {
+
 				this.manager.itemEnd( url );
 
 			} );

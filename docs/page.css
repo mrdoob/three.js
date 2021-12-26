@@ -250,6 +250,7 @@ a.param:hover {
 
 
 @media all and ( min-width: 1700px ) {
+
 	:root {
 		--panel-width: 360px;
 		--font-size: 18px;
@@ -258,10 +259,12 @@ a.param:hover {
 		--page-padding: 28px;
 		--icon-size: 24px;
 	}
+
 	h1 {
 		font-size: 42px;
 		line-height: 50px;
 	}
+
 	h2 {
 		font-size: 32px;
 		line-height: 40px;
@@ -271,15 +274,18 @@ a.param:hover {
 		font-size: 24px;
 		line-height: 32px;
 	}
+
 }
 
 /* mobile */
 
 @media all and ( max-width: 640px ) {
+
 	:root {
 		--page-padding: 16px;
 		--icon-size: 24px;
 	}
+
 	body {
 		padding: var(--page-padding);
 	}
@@ -301,4 +307,5 @@ a.param:hover {
 		font-size: 20px;
 		line-height: 28px;
 	}
+
 }

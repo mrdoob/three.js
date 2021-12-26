@@ -93,7 +93,9 @@
 
 			}
 
-			return new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RGBFormat, THREE.FloatType );
+			const texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RGBFormat, THREE.FloatType );
+			texture.needsUpdate = true;
+			return texture;
 
 		}
 
