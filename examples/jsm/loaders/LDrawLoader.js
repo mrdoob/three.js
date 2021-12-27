@@ -899,6 +899,12 @@ class LDrawLoader extends Loader {
 
 	parse( text, path, onLoad ) {
 
+		if ( ! this.fileMap ) {
+
+			this.fileMap = {};
+
+		}
+
 		// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 		this.processObject( text, null, path, this.rootParseScope )
 			.then( function ( result ) {
