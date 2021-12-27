@@ -815,7 +815,7 @@ class LDrawLoader extends Loader {
 		this.cache = new LDrawFileCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
-		this.fileMap = null;
+		this.fileMap = {};
 
 		this.rootParseScope = this.newParseScopeLevel();
 
@@ -874,12 +874,6 @@ class LDrawLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
-		if ( ! this.fileMap ) {
-
-			this.fileMap = {};
-
-		}
-
 		const fileLoader = new FileLoader( this.manager );
 		fileLoader.setPath( this.path );
 		fileLoader.setRequestHeader( this.requestHeader );
@@ -898,12 +892,6 @@ class LDrawLoader extends Loader {
 	}
 
 	parse( text, path, onLoad ) {
-
-		if ( ! this.fileMap ) {
-
-			this.fileMap = {};
-
-		}
 
 		// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 		this.processObject( text, null, path, this.rootParseScope )
