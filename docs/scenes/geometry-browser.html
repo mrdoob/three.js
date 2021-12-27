@@ -696,7 +696,10 @@
 			}
 
 			//
-			if ( guis[ window.location.hash.substring( 1 ) ] ) {
+			
+			const selectedGeometry = window.location.hash.substring( 1 );
+
+			if ( guis[ selectedGeometry ] !== undefined ) {
 
 				document.getElementById( 'newWindow' ).href += window.location.hash;
 
