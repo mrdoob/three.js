@@ -160,9 +160,10 @@
 				updateProgressBar( 0 );
 				showProgressBar();
 
+				// only smooth when not rendering with flat colors to improve processing time
 				const lDrawLoader = new LDrawLoader();
 				lDrawLoader.separateObjects = guiData.separateObjects;
-				lDrawLoader.smoothNormals = guiData.smoothNormals;
+				lDrawLoader.smoothNormals = guiData.smoothNormals && ! guiData.flatColors;
 				lDrawLoader
 					.setPath( ldrawPath )
 					.load( guiData.modelFileName, function ( group2 ) {
@@ -210,6 +211,12 @@
 								}
 
 							} );
+
+							renderer.toneMapping = THREE.NoToneMapping;
+
+						} else {
+
+							renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 						}
 
