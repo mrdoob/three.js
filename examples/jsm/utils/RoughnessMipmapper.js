@@ -100,7 +100,7 @@ class RoughnessMipmapper {
 
 		const texelSize = _mipmapMaterial.uniforms.texelSize.value;
 
-		for ( let mip = 0; width >= 1 && height >= 1; ++ mip, width /= 2, height /= 2 ) {
+		for ( let mip = 0; width >= 2 && height >= 2; ++ mip, width /= 2, height /= 2 ) {
 
 			// Rendering to a mip level is not allowed in webGL1. Instead we must set
 			// up a secondary texture to write the result to, then copy it back to the
@@ -123,8 +123,6 @@ class RoughnessMipmapper {
 			_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
 
 		}
-
-		roughnessMap.dispose();
 
 		_renderer.setRenderTarget( oldTarget );
 
