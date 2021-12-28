@@ -59,8 +59,7 @@
 				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256, {
 					format: THREE.RGBFormat,
 					generateMipmaps: true,
-					minFilter: THREE.LinearMipmapLinearFilter,
-					encoding: THREE.sRGBEncoding // temporary -- to prevent the material's shader from recompiling every frame
+					minFilter: THREE.LinearMipmapLinearFilter
 				} );
 
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
@@ -68,8 +67,7 @@
 				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, {
 					format: THREE.RGBFormat,
 					generateMipmaps: true,
-					minFilter: THREE.LinearMipmapLinearFilter,
-					encoding: THREE.sRGBEncoding
+					minFilter: THREE.LinearMipmapLinearFilter
 				} );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
