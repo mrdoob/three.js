@@ -1597,7 +1597,19 @@ Object.defineProperties( WebGLRenderer.prototype, {
 
 		}
 	},
+	gammaFactor: {
+		get: function () {
 
+			console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+			return 2;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+
+		}
+	}
 } );
 
 Object.defineProperties( WebGLShadowMap.prototype, {

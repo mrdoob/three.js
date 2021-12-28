@@ -327,7 +327,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			getProgramCacheKeyParameters( array, parameters );
 			getProgramCacheKeyBooleans( array, parameters );
 			array.push( renderer.outputEncoding );
-			array.push( renderer.gammaFactor );
 
 		}
 

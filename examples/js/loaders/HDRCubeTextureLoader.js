@@ -28,14 +28,6 @@
 
 			switch ( texture.type ) {
 
-				case THREE.UnsignedByteType:
-					texture.encoding = THREE.RGBEEncoding;
-					texture.format = THREE.RGBAFormat;
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
-					texture.generateMipmaps = false;
-					break;
-
 				case THREE.FloatType:
 					texture.encoding = THREE.LinearEncoding;
 					texture.format = THREE.RGBFormat;

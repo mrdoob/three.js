@@ -374,13 +374,6 @@
 
 					switch ( this.type ) {
 
-						case THREE.UnsignedByteType:
-							data = image_rgba_data;
-							format = THREE.RGBEFormat; // handled as THREE.RGBAFormat in shaders
-
-							type = THREE.UnsignedByteType;
-							break;
-
 						case THREE.FloatType:
 							numElements = image_rgba_data.length / 4;
 							const floatArray = new Float32Array( numElements * 3 );
@@ -448,14 +441,6 @@
 			function onLoadCallback( texture, texData ) {
 
 				switch ( texture.type ) {
-
-					case THREE.UnsignedByteType:
-						texture.encoding = THREE.RGBEEncoding;
-						texture.minFilter = THREE.NearestFilter;
-						texture.magFilter = THREE.NearestFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = true;
-						break;
 
 					case THREE.FloatType:
 						texture.encoding = THREE.LinearEncoding;

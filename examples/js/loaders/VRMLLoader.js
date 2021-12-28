@@ -139,7 +139,7 @@
 
 				const StringLiteral = createToken( {
 					name: 'StringLiteral',
-					pattern: /"(:?[^\\"\n\r]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+					pattern: /"(?:[^\\"\n\r]|\\[bfnrtv"\\/]|\\u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])*"/
 				} );
 				const HexLiteral = createToken( {
 					name: 'HexLiteral',

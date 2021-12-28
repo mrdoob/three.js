@@ -917,6 +917,7 @@
 				currentMatrix: new THREE.Matrix4(),
 				matrix: new THREE.Matrix4(),
 				type: 'Model',
+				groupObject: null,
 				// If false, it is a root material scope previous to parse
 				isFromParse: true,
 				faces: [],
@@ -1366,17 +1367,8 @@
 
 								case '!LDRAW_ORG':
 									type = lp.getToken();
-									currentParseScope.type = type;
-									const isRoot = ! parentParseScope.isFromParse;
-
-									if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
-
-										currentParseScope.groupObject = new THREE.Group();
-										currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
-
-									} // If the scale of the object is negated then the triangle winding order
+									currentParseScope.type = type; // If the scale of the object is negated then the triangle winding order
 									// needs to be flipped.
-
 
 									if ( currentParseScope.matrix.determinant() < 0 && ( scope.separateObjects && isPrimitiveType( type ) || ! scope.separateObjects ) ) {
 
@@ -1697,6 +1689,14 @@
 			currentParseScope.subobjects = subobjects;
 			currentParseScope.numSubobjects = subobjects.length;
 			currentParseScope.subobjectIndex = 0;
+			const isRoot = ! parentParseScope.isFromParse;
+
+			if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
+
+				currentParseScope.groupObject = new THREE.Group();
+				currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
+
+			}
 
 		}
 
