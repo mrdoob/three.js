@@ -392,7 +392,6 @@ function Loader( editor ) {
 					var { LDrawLoader } = await import( '../../examples/jsm/loaders/LDrawLoader.js' );
 
 					var loader = new LDrawLoader();
-					loader.fileMap = {}; // TODO Uh...
 					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
 					loader.parse( event.target.result, undefined, function ( group ) {
 

@@ -815,7 +815,7 @@ class LDrawLoader extends Loader {
 		this.cache = new LDrawFileCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
-		this.fileMap = null;
+		this.fileMap = {};
 
 		this.rootParseScope = this.newParseScopeLevel();
 
@@ -873,12 +873,6 @@ class LDrawLoader extends Loader {
 	}
 
 	load( url, onLoad, onProgress, onError ) {
-
-		if ( ! this.fileMap ) {
-
-			this.fileMap = {};
-
-		}
 
 		const fileLoader = new FileLoader( this.manager );
 		fileLoader.setPath( this.path );
