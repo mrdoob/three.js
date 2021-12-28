@@ -189,6 +189,7 @@
 								newMaterial.opacity = material.opacity;
 								newMaterial.transparent = material.transparent;
 								newMaterial.depthWrite = material.depthWrite;
+								newMaterial.toneMapping = false;
 
 								return newMaterial;
 
@@ -211,12 +212,6 @@
 								}
 
 							} );
-
-							renderer.toneMapping = THREE.NoToneMapping;
-
-						} else {
-
-							renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 						}
 
