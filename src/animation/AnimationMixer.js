@@ -48,6 +48,7 @@ class AnimationMixer extends EventDispatcher {
 
 			if ( binding !== undefined ) {
 
+				++ binding.referenceCount;
 				bindings[ i ] = binding;
 
 			} else {

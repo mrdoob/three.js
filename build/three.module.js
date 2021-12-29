@@ -3,7 +3,7 @@
  * Copyright 2010-2021 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '136';
+const REVISION = '137dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -16588,6 +16588,18 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 				};
 
 				morphTextures.set( geometry, entry );
+
+				function disposeTexture() {
+
+					texture.dispose();
+
+					morphTextures.delete( geometry );
+
+					geometry.removeEventListener( 'dispose', disposeTexture );
+
+				}
+
+				geometry.addEventListener( 'dispose', disposeTexture );
 
 			}
 
@@ -45544,6 +45556,7 @@ class AnimationMixer extends EventDispatcher {
 
 			if ( binding !== undefined ) {
 
+				++ binding.referenceCount;
 				bindings[ i ] = binding;
 
 			} else {

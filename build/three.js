@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '136';
+	const REVISION = '137dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -12748,6 +12748,14 @@
 						size: new Vector2(width, height)
 					};
 					morphTextures.set(geometry, entry);
+
+					function disposeTexture() {
+						texture.dispose();
+						morphTextures.delete(geometry);
+						geometry.removeEventListener('dispose', disposeTexture);
+					}
+
+					geometry.addEventListener('dispose', disposeTexture);
 				} //
 
 
@@ -32845,6 +32853,7 @@
 				let binding = bindingsByName[trackName];
 
 				if (binding !== undefined) {
+					++binding.referenceCount;
 					bindings[i] = binding;
 				} else {
 					binding = bindings[i];
