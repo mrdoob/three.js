@@ -212,17 +212,16 @@
 		THREE.RGBA_S3TC_DXT1_Format
 		THREE.RGBA_S3TC_DXT3_Format
 		THREE.RGBA_S3TC_DXT5_Format
+		THREE.SRGB_S3TC_DXT1_Format
+		THREE.SRGBA_S3TC_DXT1_Format
+		THREE.SRGBA_S3TC_DXT3_Format
+		THREE.SRGBA_S3TC_DXT5_Format
 		</code>
 		<p>
-		[page:CompressedTexture CompressedTexture]의 [page:Texture.format format] 프로퍼티와 함께 사용되며,
-		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc] 확장 지원이 필요합니다.
-		<br /><br />
-
-		이 확장으로는 네 개의 [link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC] 포맷을 사용할 수 있습니다. 포맷들은 다음과 같습니다:<br />
-		[page:constant RGB_S3TC_DXT1_Format]: RGB 이미지 포맷의 DXT1 압축 이미지.<br />
-		[page:constant RGBA_S3TC_DXT1_Format]: 단순 온/오프 alpha을 가진 RGB 이미지 포맷의 DXT1 압축 이미지.<br />
-		[page:constant RGBA_S3TC_DXT3_Format]: RGB 이미지 포맷의 DXT3 압축 이미지. 32비트 RGBA 텍스쳐와 비교해 4:1의 압축률을 가지고 있습니다.<br />
-		[page:constant RGBA_S3TC_DXT5_Format]: RGB 이미지 포맷의 DXT5 압축 이미지. 마찬가지로 4:1의 압축률을 가지고 있지만 DXT3 압축과는 alpha 압축방식에서 차이가 있습니다.<br />
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+		these require support for the
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc] or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc_srgb/ WEBGL_compressed_texture_s3tc_srgb]
+		extension.
 		</p>
 
 		<h2>PVRTC 압축 텍스쳐 포맷</h2>
@@ -235,27 +234,22 @@
 		<p>
 		[page:CompressedTexture CompressedTexture]'s [page:Texture.format format] 프로퍼티와 함께 사용되며,
 		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]
-		확장 지원이 필요합니다. <br />
-		PVRTC은 일반적으로 PowerVR 칩셋이 있는 모바일 기기에서만 가능하며 주로 Apple 기기에서 사용됩니다.<br /><br />
-
-		이 확장으로는 네 개의 [link:https://en.wikipedia.org/wiki/PVRTC PVRTC] 포맷을 사용할 수 있습니다. 포맷들은 다음과 같습니다:<br />
-		[page:constant RGB_PVRTC_4BPPV1_Format]: 4비트 모드 RGB 압축. 각 4×4 픽셀당 한 블럭입니다.<br />
-		[page:constant RGB_PVRTC_2BPPV1_Format]: 2비트 모드 RGB 압축. 각 8×4 픽셀당 한 블럭입니다.<br />
-		[page:constant RGBA_PVRTC_4BPPV1_Format]: 4비트 모드 RGBA 압축. 각 4×4 픽셀당 한 블럭입니다.<br />
-		[page:constant RGBA_PVRTC_2BPPV1_Format]: 2비트 모드 RGBA 압축. 각 8×4 픽셀당 한 블럭입니다.<br />
+		확장 지원이 필요합니다.
 		</p>
 
 		<h2>ETC 압축 텍스쳐 포맷</h2>
 		<code>
 		THREE.RGB_ETC1_Format
 		THREE.RGB_ETC2_Format
+		THREE.SRGB_ETC2_Format
 		THREE.RGBA_ETC2_EAC_Format
+		THREE.SRGBA_ETC2_EAC_Format
 		</code>
 		<p>
 		[page:CompressedTexture CompressedTexture]'s [page:Texture.format format] 프로퍼티와 함께 사용되며,
 		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
 		(ETC1) 혹은 [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
-		(ETC2) 확장 지원이 필요합니다. <br /><br />
+		(ETC2) 확장 지원이 필요합니다.
 		</p>
 
 		<h2>ASTC 압축 텍스쳐 포맷</h2>
@@ -291,7 +285,17 @@
 		</code>
 		<p>
 		[page:CompressedTexture CompressedTexture]'s [page:Texture.format format] 프로퍼티와 함께 사용되며,
-		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] 확장 지원이 필요합니다. <br /><br />
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] 확장 지원이 필요합니다.
+		</p>
+
+		<h2>BPTC Compressed Texture Format</h2>
+		<code>
+		THREE.RGBA_BPTC_Format
+		THREE.SRGBA_BPTC_Format
+		</code>
+		<p>
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/EXT_texture_compression_bptc/ EXT_texture_compression_bptc] extension.
 		</p>
 
 		<h2>내부 포맷</h2>

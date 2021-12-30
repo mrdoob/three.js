@@ -216,18 +216,16 @@
 		THREE.RGBA_S3TC_DXT1_Format
 		THREE.RGBA_S3TC_DXT3_Format
 		THREE.RGBA_S3TC_DXT5_Format
+		THREE.SRGB_S3TC_DXT1_Format
+		THREE.SRGBA_S3TC_DXT1_Format
+		THREE.SRGBA_S3TC_DXT3_Format
+		THREE.SRGBA_S3TC_DXT5_Format
 		</code>
 		<p>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
 		these require support for the
-		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc]
-		extension. <br /><br />
-
-		There are four [link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC] formats available via this extension. These are:<br />
-		[page:constant RGB_S3TC_DXT1_Format]: A DXT1-compressed image in an RGB image format.<br />
-		[page:constant RGBA_S3TC_DXT1_Format]: A DXT1-compressed image in an RGB image format with a simple on/off alpha value.<br />
-		[page:constant RGBA_S3TC_DXT3_Format]: A DXT3-compressed image in an RGBA image format. Compared to a 32-bit RGBA texture, it offers 4:1 compression.<br />
-		[page:constant RGBA_S3TC_DXT5_Format]: A DXT5-compressed image in an RGBA image format. It also provides a 4:1 compression, but differs to the DXT3 compression in how the alpha compression is done.<br />
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc] or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc_srgb/ WEBGL_compressed_texture_s3tc_srgb]
+		extension.
 		</p>
 
 		<h2>PVRTC Compressed Texture Formats</h2>
@@ -240,27 +238,22 @@
 		<p>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
 		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]
-		extension. <br />
-		PVRTC is typically only available on mobile devices with PowerVR chipsets, which are mainly Apple devices.<br /><br />
-
-		There are four [link:https://en.wikipedia.org/wiki/PVRTC PVRTC] formats available via this extension. These are:<br />
-		[page:constant RGB_PVRTC_4BPPV1_Format]: RGB compression in 4-bit mode. One block for each 4×4 pixels.<br />
-		[page:constant RGB_PVRTC_2BPPV1_Format]: RGB compression in 2-bit mode. One block for each 8×4 pixels.<br />
-		[page:constant RGBA_PVRTC_4BPPV1_Format]: RGBA compression in 4-bit mode. One block for each 4×4 pixels.<br />
-		[page:constant RGBA_PVRTC_2BPPV1_Format]: RGBA compression in 2-bit mode. One block for each 8×4 pixels.<br />
+		extension.
 		</p>
 
 		<h2>ETC Compressed Texture Format</h2>
 		<code>
 		THREE.RGB_ETC1_Format
 		THREE.RGB_ETC2_Format
+		THREE.SRGB_ETC2_Format
 		THREE.RGBA_ETC2_EAC_Format
+		THREE.SRGBA_ETC2_EAC_Format
 		</code>
 		<p>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
 		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
 		(ETC1) or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
-		(ETC2) extensions. <br /><br />
+		(ETC2) extensions.
 		</p>
 
 		<h2>ASTC Compressed Texture Format</h2>
@@ -296,7 +289,17 @@
 		</code>
 		<p>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
-		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] extension. <br /><br />
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] extension.
+		</p>
+
+		<h2>BPTC Compressed Texture Format</h2>
+		<code>
+		THREE.RGBA_BPTC_Format
+		THREE.SRGBA_BPTC_Format
+		</code>
+		<p>
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/EXT_texture_compression_bptc/ EXT_texture_compression_bptc] extension.
 		</p>
 
 		<h2>Internal Formats</h2>

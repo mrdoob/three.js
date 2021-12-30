@@ -203,18 +203,16 @@
 		THREE.RGBA_S3TC_DXT1_Format
 		THREE.RGBA_S3TC_DXT3_Format
 		THREE.RGBA_S3TC_DXT5_Format
-		</code>
+		THREE.SRGB_S3TC_DXT1_Format
+		THREE.SRGBA_S3TC_DXT1_Format
+		THREE.SRGBA_S3TC_DXT3_Format
+		THREE.SRGBA_S3TC_DXT5_Format
+	</code>
 	<p>
-		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，
-		需要获得[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc]
-		扩展的支持。<br /><br />
-
-		通过这个扩展，这里的四种[link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC]格式将可以使用：<br />
-
-		[page:constant RGB_S3TC_DXT1_Format]：RGB图像格式的DXT1压缩图像。
-		[page:constant RGBA_S3TC_DXT1_Format]：RGB图像格式的DXT1压缩图像，Alpha仅具有是/否透明两个值。<br />
-		[page:constant RGBA_S3TC_DXT3_Format]：RGBA图像格式的DXT3压缩图像，和32位RGBA纹理贴图相比，它提供了4:1的压缩比。<br />
-		[page:constant RGBA_S3TC_DXT5_Format]：RGBA图像格式的DXT5压缩图像，它也提供了4:1的压缩比，但与DX3格式的不同之处在于其Alpha是如何被压缩的。<br />
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+		these require support for the
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc] or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc_srgb/ WEBGL_compressed_texture_s3tc_srgb]
+		extension.
 	</p>
 
 	<h2>PVRTC 压缩纹理格式（PVRTC Compressed Texture Formats）</h2>
@@ -227,30 +225,23 @@
 	<p>
 		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，需要获得
 		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]
-		扩展的支持。<br />
-		PVRTC通常只在具有PowerVR芯片的移动设备上可用，这些设备主要是苹果设备。<br /><br />
-
-
-		通过这个扩展，这里的四种[link:https://en.wikipedia.org/wiki/PVRTC PVRTC]格式将可以使用：<br />
-
-		[page:constant RGB_PVRTC_4BPPV1_Format]：4位模式下的RGB压缩，每4x4像素一个块。<br />
-		[page:constant RGB_PVRTC_2BPPV1_Format]：2位模式下的RGB压缩，每8x4像素一个块。<br />
-		[page:constant RGBA_PVRTC_4BPPV1_Format]: 4位模式下的RGBA压缩，每4x4像素一个块。<br />
-		[page:constant RGBA_PVRTC_2BPPV1_Format]: 2位模式下的RGB压缩，每8x4像素一个块。<br />
+		扩展的支持。
 	</p>
 
 	<h2>ETC 压缩纹理格式</h2>
 	<code>
 		THREE.RGB_ETC1_Format
 		THREE.RGB_ETC2_Format
+		THREE.SRGB_ETC2_Format
 		THREE.RGBA_ETC2_EAC_Format
-		</code>
-		<p>
-		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
-		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
-		(ETC1) or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
-		(ETC2) extensions. <br /><br />
-		</p>
+		THREE.SRGBA_ETC2_EAC_Format
+	</code>
+	<p>
+	For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+	these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
+	(ETC1) or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
+	(ETC2) extensions.
+	</p>
 
 	<h2>ASTC Compressed Texture Format</h2>
 	<code>
@@ -285,7 +276,17 @@
 	</code>
 	<p>
 	For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
-	these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] extension. <br /><br />
+	these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] extension.
+	</p>
+
+	<h2>BPTC Compressed Texture Format</h2>
+	<code>
+		THREE.RGBA_BPTC_Format
+		THREE.SRGBA_BPTC_Format
+	</code>
+	<p>
+	For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+	these require support for the [link:https://www.khronos.org/registry/webgl/extensions/EXT_texture_compression_bptc/ EXT_texture_compression_bptc] extension.
 	</p>
 
 	<h2>Internal Formats</h2>
