@@ -299,7 +299,7 @@ ShaderLib.physical = {
 			sheen: { value: 0 },
 			sheenColor: { value: new Color( 0x000000 ) },
 			sheenColorMap: { value: null },
-			sheenRoughness: { value: 0 },
+			sheenRoughness: { value: 1 },
 			sheenRoughnessMap: { value: null },
 			transmission: { value: 0 },
 			transmissionMap: { value: null },
