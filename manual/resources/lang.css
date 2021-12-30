@@ -26,6 +26,7 @@ pre.prettyprint ul.modifiedlines li.linemodified {
 pre.prettyprint ul.modifiedlines li.linedeleted {
     list-style-type: none;
     background-color: #ffebe9;
+    text-decoration: 2px line-through;
 }
 
 pre.prettyprint ul.modifiedlines li.lineadded {
