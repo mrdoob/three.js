@@ -1,4 +1,4 @@
-import { RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RedFormat, RGBAFormat, RGBFormat, AlphaFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RGBIntegerFormat, RGBAIntegerFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, SRGB8_ALPHA8_ASTC_4x4_Format, SRGB8_ALPHA8_ASTC_5x4_Format, SRGB8_ALPHA8_ASTC_5x5_Format, SRGB8_ALPHA8_ASTC_6x5_Format, SRGB8_ALPHA8_ASTC_6x6_Format, SRGB8_ALPHA8_ASTC_8x5_Format, SRGB8_ALPHA8_ASTC_8x6_Format, SRGB8_ALPHA8_ASTC_8x8_Format, SRGB8_ALPHA8_ASTC_10x5_Format, SRGB8_ALPHA8_ASTC_10x6_Format, SRGB8_ALPHA8_ASTC_10x8_Format, SRGB8_ALPHA8_ASTC_10x10_Format, SRGB8_ALPHA8_ASTC_12x10_Format, SRGB8_ALPHA8_ASTC_12x12_Format, RGBA_BPTC_Format } from '../../constants.js';
+import { RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGB_ETC1_Format, RGB_ETC2_Format, SRGB_ETC2_Format, RGBA_ETC2_EAC_Format, SRGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SRGB_S3TC_DXT1_Format, SRGBA_S3TC_DXT1_Format, SRGBA_S3TC_DXT3_Format, SRGBA_S3TC_DXT5_Format, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RedFormat, RGBAFormat, RGBFormat, AlphaFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RGBIntegerFormat, RGBAIntegerFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, SRGB8_ALPHA8_ASTC_4x4_Format, SRGB8_ALPHA8_ASTC_5x4_Format, SRGB8_ALPHA8_ASTC_5x5_Format, SRGB8_ALPHA8_ASTC_6x5_Format, SRGB8_ALPHA8_ASTC_6x6_Format, SRGB8_ALPHA8_ASTC_8x5_Format, SRGB8_ALPHA8_ASTC_8x6_Format, SRGB8_ALPHA8_ASTC_8x8_Format, SRGB8_ALPHA8_ASTC_10x5_Format, SRGB8_ALPHA8_ASTC_10x6_Format, SRGB8_ALPHA8_ASTC_10x8_Format, SRGB8_ALPHA8_ASTC_10x10_Format, SRGB8_ALPHA8_ASTC_12x10_Format, SRGB8_ALPHA8_ASTC_12x12_Format, RGBA_BPTC_Format, SRGBA_BPTC_Format } from '../../constants.js';
 
 function WebGLUtils( gl, extensions, capabilities ) {
 
@@ -75,6 +75,26 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		}
 
+		if ( p === SRGB_S3TC_DXT1_Format || p === SRGBA_S3TC_DXT1_Format ||
+			p === SRGBA_S3TC_DXT3_Format || p === SRGBA_S3TC_DXT5_Format ) {
+
+			extension = extensions.get( 'WEBGL_compressed_texture_s3tc_srgb' );
+
+			if ( extension !== null ) {
+
+				if ( p === SRGB_S3TC_DXT1_Format ) return extension.COMPRESSED_SRGB_S3TC_DXT1_EXT;
+				if ( p === SRGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
+				if ( p === SRGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
+				if ( p === SRGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+
+			} else {
+
+				return null;
+
+			}
+
+		}
+
 		if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
 			p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
 
@@ -111,14 +131,20 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		}
 
-		if ( p === RGB_ETC2_Format || p === RGBA_ETC2_EAC_Format ) {
+		if ( p === RGB_ETC2_Format || p === SRGB_ETC2_Format || p === RGBA_ETC2_EAC_Format || SRGBA_ETC2_EAC_Format ) {
 
 			extension = extensions.get( 'WEBGL_compressed_texture_etc' );
 
 			if ( extension !== null ) {
 
 				if ( p === RGB_ETC2_Format ) return extension.COMPRESSED_RGB8_ETC2;
+				if ( p === SRGB_ETC2_Format ) return extension.COMPRESSED_SRGB8_ETC2;
 				if ( p === RGBA_ETC2_EAC_Format ) return extension.COMPRESSED_RGBA8_ETC2_EAC;
+				if ( p === SRGBA_ETC2_EAC_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
+
+			} else {
+
+				return null;
 
 			}
 
@@ -139,9 +165,35 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 			if ( extension !== null ) {
 
-				// TODO Complete?
+				if ( p === RGBA_ASTC_4x4_Format ) return extension.COMPRESSED_RGBA_ASTC_4x4_KHR;
+				if ( p === RGBA_ASTC_5x4_Format ) return extension.COMPRESSED_RGBA_ASTC_5x4_KHR;
+				if ( p === RGBA_ASTC_5x5_Format ) return extension.COMPRESSED_RGBA_ASTC_5x5_KHR;
+				if ( p === RGBA_ASTC_6x5_Format ) return extension.COMPRESSED_RGBA_ASTC_6x5_KHR;
+				if ( p === RGBA_ASTC_6x6_Format ) return extension.COMPRESSED_RGBA_ASTC_6x6_KHR;
+				if ( p === RGBA_ASTC_8x5_Format ) return extension.COMPRESSED_RGBA_ASTC_8x5_KHR;
+				if ( p === RGBA_ASTC_8x6_Format ) return extension.COMPRESSED_RGBA_ASTC_8x6_KHR;
+				if ( p === RGBA_ASTC_8x8_Format ) return extension.COMPRESSED_RGBA_ASTC_8x8_KHR;
+				if ( p === RGBA_ASTC_10x5_Format ) return extension.COMPRESSED_RGBA_ASTC_10x5_KHR;
+				if ( p === RGBA_ASTC_10x6_Format ) return extension.COMPRESSED_RGBA_ASTC_10x6_KHR;
+				if ( p === RGBA_ASTC_10x8_Format ) return extension.COMPRESSED_RGBA_ASTC_10x8_KHR;
+				if ( p === RGBA_ASTC_10x10_Format ) return extension.COMPRESSED_RGBA_ASTC_10x10_KHR;
+				if ( p === RGBA_ASTC_12x10_Format ) return extension.COMPRESSED_RGBA_ASTC_12x10_KHR;
+				if ( p === RGBA_ASTC_12x12_Format ) return extension.COMPRESSED_RGBA_ASTC_12x12_KHR;
 
-				return p;
+				if ( p === SRGB8_ALPHA8_ASTC_4x4_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_5x4_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_5x5_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_6x5_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_6x6_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_8x5_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_8x6_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_8x8_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_10x5_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_10x6_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_10x8_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_10x10_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_12x10_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
+				if ( p === SRGB8_ALPHA8_ASTC_12x12_Format ) return extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
 
 			} else {
 
@@ -151,13 +203,14 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		}
 
-		if ( p === RGBA_BPTC_Format ) {
+		if ( p === RGBA_BPTC_Format || p === SRGBA_BPTC_Format ) {
 
 			extension = extensions.get( 'EXT_texture_compression_bptc' );
 
 			if ( extension !== null ) {
 
-				// TODO Complete?
+				if ( p === RGBA_BPTC_Format ) return extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
+				if ( p === SRGBA_BPTC_Format ) return extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT;
 
 				return p;
 
