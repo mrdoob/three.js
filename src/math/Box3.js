@@ -191,7 +191,9 @@ class Box3 {
 	expandByObject( object ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and children's, world transforms
+		// accounting for both the object's, and children's, world transforms.
+
+		// For computational efficiency, the computed bounding box may be larger than the minimal world-axis-aligned bounding box.
 
 		object.updateWorldMatrix( false, false );
 
