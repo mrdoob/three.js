@@ -43,7 +43,6 @@
 				camera.position.set( 0, 0, 30 );
 
 				const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, {
-					encoding: THREE.sRGBEncoding, // since gamma is applied during rendering, the cubeCamera renderTarget texture encoding must be sRGBEncoding
 					format: THREE.RGBAFormat
 				} );
 

@@ -38,8 +38,6 @@ export default /* glsl */`
 
 		vec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
 
-		envColor = envMapTexelToLinear( envColor );
-
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 
 		vec4 envColor = textureCubeUV( envMap, reflectVec, 0.0 );

@@ -24,7 +24,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 		#ifdef USE_SPECULARCOLORMAP
 
-			specularColorFactor *= specularColorMapTexelToLinear( texture2D( specularColorMap, vUv ) ).rgb;
+			specularColorFactor *= texture2D( specularColorMap, vUv ).rgb;
 
 		#endif
 
@@ -79,7 +79,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#ifdef USE_SHEENCOLORMAP
 
-		material.sheenColor *= sheenColorMapTexelToLinear( texture2D( sheenColorMap, vUv ) ).rgb;
+		material.sheenColor *= texture2D( sheenColorMap, vUv ).rgb;
 
 	#endif
 

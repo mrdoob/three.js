@@ -40,13 +40,13 @@
 			const library = {};
 			let serialized = false;
 			const textures = {
-				brick: { url: 'textures/brick_diffuse.jpg' },
-				grass: { url: 'textures/terrain/grasslight-big.jpg' },
-				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg' },
-				decalDiffuse: { url: 'textures/decal/decal-diffuse.png' },
-				decalNormal: { url: 'textures/decal/decal-normal.jpg' },
-				cloud: { url: 'textures/lava/cloud.png' },
-				spherical: { url: 'textures/envmap.png' }
+				brick: { url: 'textures/brick_diffuse.jpg', encoding: THREE.sRGBEncoding },
+				grass: { url: 'textures/terrain/grasslight-big.jpg', encoding: THREE.sRGBEncoding },
+				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg', encoding: THREE.LinearEncoding },
+				decalDiffuse: { url: 'textures/decal/decal-diffuse.png', encoding: THREE.sRGBEncoding },
+				decalNormal: { url: 'textures/decal/decal-normal.jpg', encoding: THREE.LinearEncoding },
+				cloud: { url: 'textures/lava/cloud.png', encoding: THREE.sRGBEncoding },
+				spherical: { url: 'textures/envmap.png', encoding: THREE.sRGBEncoding }
 			};
 
 			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
@@ -59,6 +59,7 @@
 
 					texture = textures[ name ].texture = new THREE.TextureLoader().load( textures[ name ].url );
 					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+					texture.encoding = textures[ name ].encoding;
 
 					library[ texture.uuid ] = texture;
 
@@ -187,7 +188,7 @@
 					'basic / spherical-reflection': 'spherical-reflection',
 					'basic / standard': 'standard',
 					'basic / uv-transform': 'uv-transform',
-			
+
 					'adv / bias': 'bias',
 					'adv / camera-depth': 'camera-depth',
 					'adv / caustic': 'caustic',
@@ -215,7 +216,7 @@
 					'node / normal': 'node-normal',
 					'node / position': 'node-position',
 					'node / reflect': 'node-reflect',
-			
+
 					'misc / basic-material': 'basic-material',
 					'misc / custom-attribute': 'custom-attribute',
 					'misc / firefly': 'firefly',

@@ -57,9 +57,11 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
-	fromDecoding( encoding ) {
+	fromDecoding() {
 
-		const components = ColorSpaceNode.getEncodingComponents( encoding );
+		// TODO: Remove fromDecoding()
+
+		const components = ColorSpaceNode.getEncodingComponents( LinearEncoding );
 
 		this.method = components[ 0 ] + 'ToLinear';
 		this.factor = components[ 1 ];
@@ -106,14 +108,6 @@ ColorSpaceNode.Nodes = ( function () {
 		}`
 	);
 
-	const sRGBToLinear = new FunctionNode( /* glsl */`
-		vec4 sRGBToLinear( in vec4 value ) {
-
-			return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.w );
-
-		}`
-	);
-
 	const LinearTosRGB = new FunctionNode( /* glsl */`
 		vec4 LinearTosRGB( in vec4 value ) {
 
@@ -124,15 +118,12 @@ ColorSpaceNode.Nodes = ( function () {
 
 	return {
 		LinearToLinear: LinearToLinear,
-		sRGBToLinear: sRGBToLinear,
 		LinearTosRGB: LinearTosRGB
 	};
 
 } )();
 
 ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
-
-ColorSpaceNode.SRGB_TO_LINEAR = 'sRGBToLinear';
 ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
 
 ColorSpaceNode.getEncodingComponents = function ( encoding ) {
