@@ -144,20 +144,21 @@ const pup = puppeteer.launch( {
 	let pageSize, file, attemptProgress;
 	const failedScreenshots = [];
 
-	let beginId = 0;
-	let endId = files.length;
+	const beginId = 0;
+	const endId = files.length;
+	let jobs = 1;
+	let jobID = 0;
 
 	if ( 'CI' in process.env ) {
 
-		const jobs = 8;
-
-		beginId = Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / jobs );
-		endId = Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / jobs );
+		jobs = parseInt( process.env.JOBS, 10 );
+		jobID = parseInt( process.env.CI, 10 );
 
 	}
 
 	for ( let id = beginId; id < endId; ++ id ) {
 
+		if ( id % jobs !== jobID ) continue;
 		/* At least 3 attempts before fail */
 
 		let attemptId = isMakeScreenshot ? 1.5 : 0;
