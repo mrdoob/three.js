@@ -122,9 +122,13 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'isObject3D', ( assert ) => {
+		QUnit.test( 'isObject3D', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Object3D();
+			assert.ok( object.isObject3D, 'Object3D.isObject3D should be true' );
+
+			const object2 = {};
+			assert.ok( object2.isObject3D === undefined, 'other object isObject3D should be undefined' );
 
 		} );
 
