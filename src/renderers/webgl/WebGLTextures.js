@@ -1651,7 +1651,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( isWebGL2 === false ) {
 
-					// in WebGL 1, try to use EXT_sRGB extension and sized formats
+					// in WebGL 1, try to use EXT_sRGB extension and unsized formats
 
 					if ( extensions.has( 'EXT_sRGB' ) === true && ( format === RGBFormat || format === RGBAFormat ) ) {
 
