@@ -156,12 +156,13 @@
 
 				}
 
-				const manager = new THREE.LoadingManager( loadModel );
-				const loader = new GLTFLoader( manager );
+				/*const manager = new THREE.LoadingManager( /*loadModel );*/
+				const loader = new GLTFLoader( /*manager*/ );
 				loader.load( 'models/gltf/ShadowmappableMesh.glb', function ( obj ) {
 
 					object = obj.scene.children[ 0 ];
-
+					loadModel( object );
+			
 				} );
 
 				// controls
