@@ -101,7 +101,7 @@
 				scene.add( groundMesh );
 
 				// model
-				function loadModel() {
+				async function loadModel() {
 
 					object.traverse( function ( child ) {
 
@@ -148,8 +148,13 @@
 
 						for ( let i = 0; i < 300; i ++ ) {
 
-							render();
+							await ( async () => {
 
+								console.log( `render ${i}` );
+								render();
+			
+							} )();
+			
 						}
 
 					}
@@ -180,6 +185,7 @@
 
 			function createGUI() {
 
+				console.log( 'createGUI' );
 				const gui = new GUI( { name: 'Accumulation Settings' } );
 				gui.add( params, 'Enable' );
 				gui.add( params, 'Blur Edges' );
@@ -192,6 +198,7 @@
 
 			function onWindowResize() {
 
+				console.log( 'onWindowResize' );
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -199,6 +206,8 @@
 			}
 
 			function render() {
+
+				const start = performance._now();
 
 				// Update the inertia on the orbit controls
 				controls.update();
@@ -245,11 +254,13 @@
 
 				// Render Scene
 				renderer.render( scene, camera );
+				console.log( `render ended in  ${performance._now() - start} milliseconds` );
 
 			}
 
 			function animate() {
 
+				console.log( 'animate' );
 				requestAnimationFrame( animate );
 				render();
 

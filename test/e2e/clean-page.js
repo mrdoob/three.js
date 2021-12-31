@@ -2,6 +2,7 @@
 ( function () {
 
 
+	console.log( 'cleanPage started' );
 	/* Remove start screen ( or press some button ) */
 
 	const button = document.getElementById( 'startButton' );
@@ -12,6 +13,7 @@
 
 	}
 
+	console.log( 'button clicked' );
 
 	/* Remove gui and fonts */
 
@@ -20,6 +22,7 @@
 	style.innerHTML = `body { font size: 0 !important; }
       #info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; }`;
 
+	console.log( 'style created' );
 	const head = document.getElementsByTagName( 'head' );
 
 	if ( head.length > 0 ) {
@@ -27,6 +30,8 @@
 		head[ 0 ].appendChild( style );
 
 	}
+
+	console.log( 'style added' );
 
 	/* Remove stats.js */
 
@@ -41,5 +46,7 @@
 		}
 
 	}
+
+	console.log( 'canvas hidden' );
 
 }() );

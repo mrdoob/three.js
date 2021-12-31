@@ -34,6 +34,7 @@
 	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
 
+		console.log( 'requestAnimationFrame' );
 		if ( ! _renderStarted ) {
 
 			setTimeout( function () {

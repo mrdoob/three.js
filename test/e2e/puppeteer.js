@@ -92,9 +92,10 @@ const pup = puppeteer.launch( {
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
 	await page.setRequestInterception( true );
 
-	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
+	page.on( 'console', msg => console.log( msg.text() ) );
 	page.on( 'request', async ( request ) => {
 
+		console.log( `response: ${request.url()}` );
 		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
 
 			await request.respond( {
@@ -112,6 +113,7 @@ const pup = puppeteer.launch( {
 	} );
 	page.on( 'response', async ( response ) => {
 
+		console.log( `response: ${response.request().url()}` );
 		try {
 
 			await response.buffer().then( buffer => pageSize += buffer.length );
@@ -187,17 +189,18 @@ const pup = puppeteer.launch( {
 			try {
 
 				/* Render page */
-
+				console.log( 'cleanPage started' );
 				await page.evaluate( cleanPage );
-
+				console.log( 'cleanPage ended' );
 				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress ) => {
 
 
 					/* Resource timeout */
-
 					const resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
-					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
 
+					console.log( resourcesSize );
+					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
+					console.log( networkTax * resourcesSize * attemptProgress );
 
 					/* Resolve render promise */
 
