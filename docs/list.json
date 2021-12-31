@@ -362,7 +362,6 @@
 
 			"Loaders": {
 				"3DMLoader": "examples/en/loaders/3DMLoader",
-				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"FontLoader": "examples/en/loaders/FontLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
@@ -859,7 +858,6 @@
 			},
 
 			"加载器": {
-				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"FontLoader": "examples/zh/loaders/FontLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",

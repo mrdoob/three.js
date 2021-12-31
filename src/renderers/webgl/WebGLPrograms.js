@@ -97,6 +97,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		}
 
+		if ( map && map.isCompressedTexture ) {
+
+			encoding = LinearEncoding; // disable inline decode for sRGB compressed textures
+
+		}
+
 		return encoding;
 
 	}

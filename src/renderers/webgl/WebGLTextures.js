@@ -553,7 +553,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
 
 		const supportsMips = isPowerOfTwo( image ) || isWebGL2,
-			glFormat = utils.convert( texture.format );
+			glFormat = utils.convert( texture.format, texture.encoding );
 
 		let glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
@@ -904,7 +904,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const image = cubeImage[ 0 ],
 			supportsMips = isPowerOfTwo( image ) || isWebGL2,
-			glFormat = utils.convert( texture.format ),
+			glFormat = utils.convert( texture.format, texture.encoding ),
 			glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
@@ -1069,7 +1069,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup storage for target texture and bind it to correct framebuffer
 	function setupFrameBufferTexture( framebuffer, renderTarget, texture, attachment, textureTarget ) {
 
-		const glFormat = utils.convert( texture.format );
+		const glFormat = utils.convert( texture.format, texture.encoding );
 		const glType = utils.convert( texture.type );
 		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 		const renderTargetProperties = properties.get( renderTarget );
@@ -1177,7 +1177,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// Use the first texture for MRT so far
 			const texture = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture[ 0 ] : renderTarget.texture;
 
-			const glFormat = utils.convert( texture.format );
+			const glFormat = utils.convert( texture.format, texture.encoding );
 			const glType = utils.convert( texture.type );
 			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 			const samples = getRenderTargetSamples( renderTarget );
@@ -1412,7 +1412,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer );
 
-					const glFormat = utils.convert( texture.format );
+					const glFormat = utils.convert( texture.format, texture.encoding );
 					const glType = utils.convert( texture.type );
 					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 					const samples = getRenderTargetSamples( renderTarget );
