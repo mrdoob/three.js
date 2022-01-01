@@ -189,6 +189,13 @@
 
 			};
 
+			this.dispose = function () {
+
+				renderTarget.dispose();
+				scope.material.dispose();
+
+			};
+
 		}
 
 	}

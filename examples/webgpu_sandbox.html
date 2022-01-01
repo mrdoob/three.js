@@ -227,7 +227,7 @@
 
 				}
 
-				const texture = THREE.DataTexture( data, width, height, THREE.RGBAFormat );
+				const texture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
 				texture.needsUpdate = true;
 				return texture;
 

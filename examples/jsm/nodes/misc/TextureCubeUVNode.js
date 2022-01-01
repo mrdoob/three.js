@@ -26,19 +26,15 @@ class TextureCubeUVNode extends TempNode {
 		const bilinearCubeUV = new FunctionCallNode( TextureCubeUVNode.Nodes.bilinearCubeUV, [ texture, uv, mipInt ] );
 
 		this.colorSpaceTL = this.colorSpaceTL || new ColorSpaceNode( new ExpressionNode( '', 'v4' ) );
-		this.colorSpaceTL.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 		this.colorSpaceTL.input.parse( bilinearCubeUV.build( builder ) + '.tl' );
 
 		this.colorSpaceTR = this.colorSpaceTR || new ColorSpaceNode( new ExpressionNode( '', 'v4' ) );
-		this.colorSpaceTR.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 		this.colorSpaceTR.input.parse( bilinearCubeUV.build( builder ) + '.tr' );
 
 		this.colorSpaceBL = this.colorSpaceBL || new ColorSpaceNode( new ExpressionNode( '', 'v4' ) );
-		this.colorSpaceBL.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 		this.colorSpaceBL.input.parse( bilinearCubeUV.build( builder ) + '.bl' );
 
 		this.colorSpaceBR = this.colorSpaceBR || new ColorSpaceNode( new ExpressionNode( '', 'v4' ) );
-		this.colorSpaceBR.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 		this.colorSpaceBR.input.parse( bilinearCubeUV.build( builder ) + '.br' );
 
 		// add a custom context for fix incompatibility with the core
@@ -230,6 +226,7 @@ TextureCubeUVNode.Nodes = ( function () {
 
 			return TextureCubeUVData( tl, tr, br, bl, f );
 		}`, [ TextureCubeUVData, getFace, getUV, cubeUV_maxMipLevel, cubeUV_minMipLevel, cubeUV_maxTileSize, cubeUV_minTileSize ] );
+
 	bilinearCubeUV.useKeywords = false;
 
 	// These defines must match with PMREMGenerator

@@ -139,7 +139,7 @@
 
 				const StringLiteral = createToken( {
 					name: 'StringLiteral',
-					pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+					pattern: /"(?:[^\\"\n\r]|\\[bfnrtv"\\/]|\\u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])*"/
 				} );
 				const HexLiteral = createToken( {
 					name: 'HexLiteral',
@@ -1282,6 +1282,7 @@
 							}
 
 							texture = new THREE.DataTexture( data, width, height, useAlpha === true ? THREE.RGBAFormat : THREE.RGBFormat );
+							texture.needsUpdate = true;
 							texture.__type = textureType; // needed for material modifications
 
 							break;

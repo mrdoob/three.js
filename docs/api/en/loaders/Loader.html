@@ -70,7 +70,7 @@
 		<h3>[method:Promise loadAsync]( [param:String url], [param:Function onProgress] )</h3>
 		<p>
 		[page:String url] — A string containing the path/URL of the file to be loaded.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		</p>
 		<p>
 		This method is equivalent to [page:.load], but returns a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise].

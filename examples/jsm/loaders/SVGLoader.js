@@ -248,7 +248,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 ) firstPoint.copy( point );
 
 						}
 
@@ -440,7 +440,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 ) firstPoint.copy( point );
 
 						}
 

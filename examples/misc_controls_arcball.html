@@ -143,7 +143,6 @@
 						render();
 
 						new RGBELoader()
-							.setDataType( THREE.UnsignedByteType )
 							.setPath( 'textures/equirectangular/' )
 							.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
@@ -156,6 +155,7 @@
 							} );
 
 
+						window.addEventListener( 'keydown', onKeyDown );
 						window.addEventListener( 'resize', onWindowResize );
 
 						//
@@ -235,6 +235,28 @@
 			function render() {
 
 				renderer.render( scene, camera );
+
+			}
+
+			function onKeyDown( event ) {
+
+				if ( event.key === 'c' ) {
+
+					if ( event.ctrlKey || event.metaKey ) {
+
+						controls.copyState();
+
+					}
+
+				} else if ( event.key === 'v' ) {
+
+					if ( event.ctrlKey || event.metaKey ) {
+
+						controls.pasteState();
+
+					}
+
+				}
 
 			}
 

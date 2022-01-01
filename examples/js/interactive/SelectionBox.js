@@ -215,6 +215,8 @@
 
 						_matrix.decompose( _center, _quaternion, _scale );
 
+						_center.applyMatrix4( object.matrixWorld );
+
 						if ( frustum.containsPoint( _center ) ) {
 
 							this.instances[ object.uuid ].push( instanceId );

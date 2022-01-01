@@ -55,34 +55,23 @@
 
 			}
 
-			if ( width !== roughnessMap.image.width || height !== roughnessMap.image.height ) {
+			const newRoughnessTexture = new THREE.FramebufferTexture( width, height, roughnessMap.format );
+			newRoughnessTexture.wrapS = roughnessMap.wrapS;
+			newRoughnessTexture.wrapT = roughnessMap.wrapT;
+			newRoughnessTexture.minFilter = roughnessMap.minFilter;
+			newRoughnessTexture.magFilter = roughnessMap.magFilter;
+			material.roughnessMap = newRoughnessTexture;
+			if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
+			if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap; // Copy UV transform parameters
 
-				const params = {
-					wrapS: roughnessMap.wrapS,
-					wrapT: roughnessMap.wrapT,
-					magFilter: roughnessMap.magFilter,
-					minFilter: roughnessMap.minFilter,
-					depthBuffer: false
-				};
-				const newRoughnessTarget = new THREE.WebGLRenderTarget( width, height, params );
-				newRoughnessTarget.texture.generateMipmaps = true; // Setting the render target causes the memory to be allocated.
+			material.roughnessMap.offset.copy( roughnessMap.offset );
+			material.roughnessMap.repeat.copy( roughnessMap.repeat );
+			material.roughnessMap.center.copy( roughnessMap.center );
+			material.roughnessMap.rotation = roughnessMap.rotation;
+			material.roughnessMap.image = roughnessMap.image; // required for USDZExporter, see #22741
 
-				_renderer.setRenderTarget( newRoughnessTarget );
-
-				material.roughnessMap = newRoughnessTarget.texture;
-				if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
-				if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap; // Copy UV transform parameters
-
-				material.roughnessMap.offset.copy( roughnessMap.offset );
-				material.roughnessMap.repeat.copy( roughnessMap.repeat );
-				material.roughnessMap.center.copy( roughnessMap.center );
-				material.roughnessMap.rotation = roughnessMap.rotation;
-				material.roughnessMap.image = roughnessMap.image;
-				material.roughnessMap.matrixAutoUpdate = roughnessMap.matrixAutoUpdate;
-				material.roughnessMap.matrix.copy( roughnessMap.matrix );
-
-			}
-
+			material.roughnessMap.matrixAutoUpdate = roughnessMap.matrixAutoUpdate;
+			material.roughnessMap.matrix.copy( roughnessMap.matrix );
 			_mipmapMaterial.uniforms.roughnessMap.value = roughnessMap;
 			_mipmapMaterial.uniforms.normalMap.value = normalMap;
 			const position = new THREE.Vector2( 0, 0 );
@@ -110,7 +99,7 @@
 
 			}
 
-			if ( roughnessMap !== material.roughnessMap ) roughnessMap.dispose();
+			roughnessMap.dispose();
 
 			_renderer.setRenderTarget( oldTarget );
 

@@ -1,13 +1,14 @@
 import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, LinearEncoding, sRGBEncoding, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, RGBAFormat, UnsignedByteType } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
+import { WebGLShaderCache } from './WebGLShaderCache.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
-import { hashString } from '../../utils.js';
 
 function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
 	const _programLayers = new Layers();
+	const _customShaders = new WebGLShaderCache();
 	const programs = [];
 
 	const isWebGL2 = capabilities.isWebGL2;
@@ -96,6 +97,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		}
 
+		if ( map && map.isCompressedTexture ) {
+
+			encoding = LinearEncoding; // disable inline decode for sRGB compressed textures
+
+		}
+
 		return encoding;
 
 	}
@@ -127,6 +134,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		}
 
 		let vertexShader, fragmentShader;
+		let customVertexShaderID, customFragmentShaderID;
 
 		if ( shaderID ) {
 
@@ -139,6 +147,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			vertexShader = material.vertexShader;
 			fragmentShader = material.fragmentShader;
+
+			_customShaders.update( material );
+
+			customVertexShaderID = _customShaders.getVertexShaderID( material );
+			customFragmentShaderID = _customShaders.getFragmentShaderID( material );
 
 		}
 
@@ -157,6 +170,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
 			defines: material.defines,
+
+			customVertexShaderID: customVertexShaderID,
+			customFragmentShaderID: customFragmentShaderID,
 
 			isRawShaderMaterial: material.isRawShaderMaterial === true,
 			glslVersion: material.glslVersion,
@@ -296,8 +312,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		} else {
 
-			array.push( hashString( parameters.fragmentShader ) );
-			array.push( hashString( parameters.vertexShader ) );
+			array.push( parameters.customVertexShaderID );
+			array.push( parameters.customFragmentShaderID );
 
 		}
 
@@ -317,7 +333,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			getProgramCacheKeyParameters( array, parameters );
 			getProgramCacheKeyBooleans( array, parameters );
 			array.push( renderer.outputEncoding );
-			array.push( renderer.gammaFactor );
 
 		}
 
@@ -549,14 +564,28 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	}
 
+	function releaseShaderCache( material ) {
+
+		_customShaders.remove( material );
+
+	}
+
+	function dispose() {
+
+		_customShaders.dispose();
+
+	}
+
 	return {
 		getParameters: getParameters,
 		getProgramCacheKey: getProgramCacheKey,
 		getUniforms: getUniforms,
 		acquireProgram: acquireProgram,
 		releaseProgram: releaseProgram,
+		releaseShaderCache: releaseShaderCache,
 		// Exposed for resource monitoring & error feedback via renderer.info:
-		programs: programs
+		programs: programs,
+		dispose: dispose
 	};
 
 }

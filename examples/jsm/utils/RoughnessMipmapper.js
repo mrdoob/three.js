@@ -87,6 +87,7 @@ class RoughnessMipmapper {
 		material.roughnessMap.repeat.copy( roughnessMap.repeat );
 		material.roughnessMap.center.copy( roughnessMap.center );
 		material.roughnessMap.rotation = roughnessMap.rotation;
+		material.roughnessMap.image = roughnessMap.image; // required for USDZExporter, see #22741
 
 		material.roughnessMap.matrixAutoUpdate = roughnessMap.matrixAutoUpdate;
 		material.roughnessMap.matrix.copy( roughnessMap.matrix );
@@ -119,9 +120,11 @@ class RoughnessMipmapper {
 
 			_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
 
+			_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
+
 		}
 
-		if ( roughnessMap !== material.roughnessMap ) roughnessMap.dispose();
+		roughnessMap.dispose();
 
 		_renderer.setRenderTarget( oldTarget );
 

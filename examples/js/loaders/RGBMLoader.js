@@ -2,6 +2,28 @@
 
 	class RGBMLoader extends THREE.DataTextureLoader {
 
+		constructor( manager ) {
+
+			super( manager );
+			this.type = THREE.HalfFloatType;
+			this.maxRange = 7; // more information about this property at https://iwasbeingirony.blogspot.com/2010/06/difference-between-rgbm-and-rgbd.html
+
+		}
+
+		setDataType( value ) {
+
+			this.type = value;
+			return this;
+
+		}
+
+		setMaxRange( value ) {
+
+			this.maxRange = value;
+			return this;
+
+		}
+
 		loadCubemap( urls, onLoad, onProgress, onError ) {
 
 			const texture = new THREE.CubeTexture();
@@ -32,7 +54,7 @@
 
 			}
 
-			texture.encoding = THREE.RGBM7Encoding;
+			texture.type = this.type;
 			texture.format = THREE.RGBAFormat;
 			texture.minFilter = THREE.LinearFilter;
 			texture.generateMipmaps = false;
@@ -44,14 +66,42 @@
 
 			const img = UPNG.decode( buffer );
 			const rgba = UPNG.toRGBA8( img )[ 0 ];
+			const data = new Uint8Array( rgba );
+			const size = img.width * img.height * 4;
+			const output = this.type === THREE.HalfFloatType ? new Uint16Array( size ) : new Float32Array( size ); // decode RGBM
+
+			for ( let i = 0; i < data.length; i += 4 ) {
+
+				const r = data[ i + 0 ] / 255;
+				const g = data[ i + 1 ] / 255;
+				const b = data[ i + 2 ] / 255;
+				const a = data[ i + 3 ] / 255;
+
+				if ( this.type === THREE.HalfFloatType ) {
+
+					output[ i + 0 ] = THREE.DataUtils.toHalfFloat( Math.min( r * a * this.maxRange, 65504 ) );
+					output[ i + 1 ] = THREE.DataUtils.toHalfFloat( Math.min( g * a * this.maxRange, 65504 ) );
+					output[ i + 2 ] = THREE.DataUtils.toHalfFloat( Math.min( b * a * this.maxRange, 65504 ) );
+					output[ i + 3 ] = THREE.DataUtils.toHalfFloat( 1 );
+
+				} else {
+
+					output[ i + 0 ] = r * a * this.maxRange;
+					output[ i + 1 ] = g * a * this.maxRange;
+					output[ i + 2 ] = b * a * this.maxRange;
+					output[ i + 3 ] = 1;
+
+				}
+
+			}
+
 			return {
 				width: img.width,
 				height: img.height,
-				data: new Uint8Array( rgba ),
+				data: output,
 				format: THREE.RGBAFormat,
-				type: THREE.UnsignedByteType,
-				flipY: true,
-				encoding: THREE.RGBM7Encoding
+				type: this.type,
+				flipY: true
 			};
 
 		}

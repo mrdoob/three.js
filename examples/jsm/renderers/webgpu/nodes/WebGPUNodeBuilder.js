@@ -148,7 +148,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec3' ) );
+			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec4' ) );
 
 			this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
 
@@ -232,7 +232,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				// SPECULAR_TINT
 
-				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), Color, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
+				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), Color.rgb, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
 
 				// NORMAL_VIEW
 
@@ -783,7 +783,7 @@ fn main( ${shaderData.varys} ) -> [[ location( 0 ) ]] vec4<f32> {
 
 	_getWGSLStruct( name, vars ) {
 
-		return `[[ block ]]
+		return `
 struct ${name} {
 \n${vars}
 };`;

@@ -80,7 +80,7 @@
 				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 			[page:Function onLoad] (optional) — Will be called when loading completes. The argument will be the loaded response.<br />
 			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the XMLHttpRequest instance,
-				which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+				which contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 			[page:Function onError] (optional) — Will be called if an error occurs.<br /><br />
 
 			Load the URL and pass the response to the onLoad function.
