@@ -42,7 +42,7 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 
@@ -82,7 +82,7 @@
 
 				const textureNode = new Nodes.TextureNode( texture, animateUV );
 
-				materialBox.colorNode = new Nodes.MathNode( 'mix', textureNode, new Nodes.CheckerNode( animateUV ), new Nodes.FloatNode( .5) );
+				materialBox.colorNode = new Nodes.MathNode( 'mix', textureNode, new Nodes.CheckerNode( animateUV ), new Nodes.FloatNode( .5 ) );
 
 				// test uv 2
 				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
