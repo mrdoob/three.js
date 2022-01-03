@@ -2,16 +2,11 @@ import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
-	GammaEncoding,
 	LinearEncoding,
 	LinearFilter,
 	NoToneMapping,
 	NoBlending,
-	RGBDEncoding,
-	RGBEEncoding,
 	RGBAFormat,
-	RGBM16Encoding,
-	RGBM7Encoding,
 	UnsignedByteType,
 	sRGBEncoding,
 	HalfFloatType
@@ -49,12 +44,7 @@ const MAX_SAMPLES = 20;
 
 const ENCODINGS = {
 	[ LinearEncoding ]: 0,
-	[ sRGBEncoding ]: 1,
-	[ RGBEEncoding ]: 2,
-	[ RGBM7Encoding ]: 3,
-	[ RGBM16Encoding ]: 4,
-	[ RGBDEncoding ]: 5,
-	[ GammaEncoding ]: 6
+	[ sRGBEncoding ]: 1
 };
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
@@ -138,7 +128,7 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
+	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
 	fromEquirectangular( equirectangular ) {
@@ -149,7 +139,7 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
-	 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
+	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
 	fromCubemap( cubemap ) {
@@ -912,29 +902,9 @@ function _getEncodings() {
 
 				return value;
 
-			} else if ( inputEncoding == 1 ) {
-
-				return sRGBToLinear( value );
-
-			} else if ( inputEncoding == 2 ) {
-
-				return RGBEToLinear( value );
-
-			} else if ( inputEncoding == 3 ) {
-
-				return RGBMToLinear( value, 7.0 );
-
-			} else if ( inputEncoding == 4 ) {
-
-				return RGBMToLinear( value, 16.0 );
-
-			} else if ( inputEncoding == 5 ) {
-
-				return RGBDToLinear( value, 256.0 );
-
 			} else {
 
-				return GammaToLinear( value, 2.2 );
+				return sRGBToLinear( value );
 
 			}
 

@@ -114,6 +114,13 @@
 
 			}
 
+			if ( viewer.src === '' ) {
+
+				viewer.srcdoc = document.getElementById( 'PlaceholderHTML' ).innerHTML;
+				viewer.style.display = 'unset';
+
+			}
+
 			filterInput.value = extractQuery();
 
 			if ( filterInput.value !== '' ) {
@@ -283,7 +290,7 @@
 
 			if ( search ) {
 
-				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
 				sectionLink.href = `${link}?q=${search}`;
 
 			} else {
@@ -391,6 +398,31 @@
 		}
 
 		</script>
-
+		<template id="PlaceholderHTML">
+			<!DOCTYPE html>
+				<html lang="en">
+					<head>
+						<meta charset="utf-8">
+						<title>three.js examples</title>
+						<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+						<link rel="stylesheet" type="text/css" href="../files/main.css">
+						<style>
+						html, body {
+							height: 100%;
+						}
+						body {
+							height: 100%;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							user-select: none;
+						}
+						</style>
+					</head>
+					<body>
+						Select an example from the sidebar
+					</body>
+				</html>
+		</template>
 	</body>
 </html>

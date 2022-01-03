@@ -50,13 +50,13 @@ class UITexture extends UISpan {
 			const extension = file.name.split( '.' ).pop().toLowerCase();
 			const reader = new FileReader();
 
-			if ( extension === 'hdr' ) {
+			if ( extension === 'hdr' || extension === 'pic' ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
 					// assuming RGBE/Radiance HDR iamge format
 
-					const loader = new RGBELoader().setDataType( THREE.FloatType );
+					const loader = new RGBELoader();
 					loader.load( event.target.result, function ( hdrTexture ) {
 
 						hdrTexture.sourceFile = file.name;

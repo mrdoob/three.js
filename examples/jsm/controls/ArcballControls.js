@@ -84,7 +84,8 @@ class ArcballControls extends EventDispatcher {
 		this.camera = null;
 		this.domElement = domElement;
 		this.scene = scene;
-		this.target = new Vector3( 0, 0, 0 );
+		this.target = new Vector3();
+		this._currentTarget = new Vector3();
 		this.radiusFactor = 0.67;
 
 		this.mouseActions = [];
@@ -2077,7 +2078,6 @@ class ArcballControls extends EventDispatcher {
 		window.removeEventListener( 'pointerup', this.onPointerUp );
 
 		window.removeEventListener( 'resize', this.onWindowResize );
-		window.removeEventListener( 'keydown', this.onKeyDown );
 
 		if ( this.scene !== null ) this.scene.remove( this._gizmos );
 		this.disposeGrid();
@@ -2725,23 +2725,6 @@ class ArcballControls extends EventDispatcher {
 	};
 
 	/**
-	 * Set the trackball's center point
-	 * @param {Number} x X coordinate
-	 * @param {Number} y Y coordinate
-	 * @param {Number} z Z coordinate
-	 */
-	setTarget = ( x, y, z ) => {
-
-		this.target.set( x, y, z );
-		this._gizmos.position.set( x, y, z );	//for correct radius calculation
-		this._tbRadius = this.calculateTbRadius( this.camera );
-
-		this.makeGizmos( this.target, this._tbRadius );
-		this.camera.lookAt( this.target );
-
-	};
-
-	/**
 	 * Set values in transformation object
 	 * @param {Matrix4} camera Transformation to be applied to the camera
 	 * @param {Matrix4} gizmos Transformation to be applied to gizmos
@@ -3101,6 +3084,15 @@ class ArcballControls extends EventDispatcher {
 	update = () => {
 
 		const EPS = 0.000001;
+
+		if ( this.target.equals( this._currentTarget ) === false ) {
+
+			this._gizmos.position.copy( this.target );	//for correct radius calculation
+			this._tbRadius = this.calculateTbRadius( this.camera );
+			this.makeGizmos( this.target, this._tbRadius );
+			this._currentTarget.copy( this.target );
+
+		}
 
 		//check min/max parameters
 		if ( this.camera.isOrthographicCamera ) {

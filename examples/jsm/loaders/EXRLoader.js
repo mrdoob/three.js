@@ -5,11 +5,8 @@ import {
 	HalfFloatType,
 	LinearEncoding,
 	LinearFilter,
-	NearestFilter,
 	RedFormat,
-	RGBAFormat,
-	RGBEEncoding,
-	UnsignedByteType
+	RGBAFormat
 } from '../../../build/three.module.js';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -130,41 +127,6 @@ class EXRLoader extends DataTextureLoader {
 		const RLE = 2;
 
 		const logBase = Math.pow( 2.7182818, 2.2 );
-
-		var tmpDataView = new DataView( new ArrayBuffer( 8 ) );
-
-		function frexp( value ) {
-
-			if ( value === 0 ) return [ value, 0 ];
-
-			tmpDataView.setFloat64( 0, value );
-
-			var bits = ( tmpDataView.getUint32( 0 ) >>> 20 ) & 0x7FF;
-			if ( bits === 0 ) { // denormal
-
-				tmpDataView.setFloat64( 0, value * Math.pow( 2, 64 ) ); // exp + 64
-				bits = ( ( tmpDataView.getUint32( 0 ) >>> 20 ) & 0x7FF ) - 64;
-
-			}
-
-			var exponent = bits - 1022;
-			var mantissa = ldexp( value, - exponent );
-
-			return [ mantissa, exponent ];
-
-		}
-
-		function ldexp( mantissa, exponent ) {
-
-			var steps = Math.min( 3, Math.ceil( Math.abs( exponent ) / 1023 ) );
-			var result = mantissa;
-
-			for ( var i = 0; i < steps; i ++ )
-				result *= Math.pow( 2, Math.floor( ( exponent + i ) / steps ) );
-
-			return result;
-
-		}
 
 		function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -2031,6 +1993,7 @@ class EXRLoader extends DataTextureLoader {
 			const EXRHeader = {};
 
 			if ( dataView.getUint32( 0, true ) != 20000630 ) // magic
+
 				throw new Error( 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.' );
 
 			EXRHeader.version = dataView.getUint8( 4, true );
@@ -2163,7 +2126,6 @@ class EXRLoader extends DataTextureLoader {
 				// half
 				switch ( outputType ) {
 
-					case UnsignedByteType:
 					case FloatType:
 						EXRDecoder.getter = parseFloat16;
 						EXRDecoder.inputSize = INT16_SIZE;
@@ -2181,7 +2143,6 @@ class EXRLoader extends DataTextureLoader {
 				// float
 				switch ( outputType ) {
 
-					case UnsignedByteType:
 					case FloatType:
 						EXRDecoder.getter = parseFloat32;
 						EXRDecoder.inputSize = FLOAT32_SIZE;
@@ -2212,7 +2173,6 @@ class EXRLoader extends DataTextureLoader {
 
 			switch ( outputType ) {
 
-				case UnsignedByteType:
 				case FloatType:
 					EXRDecoder.byteArray = new Float32Array( size );
 
@@ -2241,7 +2201,7 @@ class EXRLoader extends DataTextureLoader {
 			if ( EXRDecoder.outputChannels == 4 ) {
 
 				EXRDecoder.format = RGBAFormat;
-				EXRDecoder.encoding = ( outputType == UnsignedByteType ) ? RGBEEncoding : LinearEncoding;
+				EXRDecoder.encoding = LinearEncoding;
 
 			} else {
 
@@ -2303,47 +2263,6 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		// convert to RGBE if user specifies Uint8 output on a RGB input texture
-		if ( EXRDecoder.encoding == RGBEEncoding ) {
-
-			let v, i;
-			const size = EXRDecoder.byteArray.length;
-			const RGBEArray = new Uint8Array( size );
-
-			for ( let h = 0; h < EXRDecoder.height; ++ h ) {
-
-				for ( let w = 0; w < EXRDecoder.width; ++ w ) {
-
-					i = h * EXRDecoder.width * 4 + w * 4;
-					const red = EXRDecoder.byteArray[ i ];
-					const green = EXRDecoder.byteArray[ i + 1 ];
-					const blue = EXRDecoder.byteArray[ i + 2 ];
-					v = red > green ? red : green;
-					v = blue > v ? blue : v;
-
-					if ( v < 1e-32 ) {
-
-						RGBEArray[ i ] = RGBEArray[ i + 1 ] = RGBEArray[ i + 2 ] = RGBEArray[ i + 3 ] = 0;
-
-					} else {
-
-						const res = frexp( v );
-						v = res[ 0 ] * 256 / v;
-						RGBEArray[ i ] = red * v;
-						RGBEArray[ i + 1 ] = green * v;
-						RGBEArray[ i + 2 ] = blue * v;
-						RGBEArray[ i + 3 ] = res[ 1 ] + 128;
-
-					}
-
-				}
-
-			}
-
-			EXRDecoder.byteArray = RGBEArray;
-
-		}
-
 		return {
 			header: EXRHeader,
 			width: EXRDecoder.width,
@@ -2368,8 +2287,8 @@ class EXRLoader extends DataTextureLoader {
 		function onLoadCallback( texture, texData ) {
 
 			texture.encoding = texData.encoding;
-			texture.minFilter = ( texture.encoding == RGBEEncoding ) ? NearestFilter : LinearFilter;
-			texture.magFilter = ( texture.encoding == RGBEEncoding ) ? NearestFilter : LinearFilter;
+			texture.minFilter = LinearFilter;
+			texture.magFilter = LinearFilter;
 			texture.generateMipmaps = false;
 			texture.flipY = false;
 
