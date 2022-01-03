@@ -39,7 +39,7 @@
 			let camera, scene, renderer;
 			let pointer;
 			let scaleUniformBuffer;
-			let scaleVector = new THREE.Vector3( 1, 1, 1 );
+			const scaleVector = new THREE.Vector3( 1, 1, 1 );
 
 			const computeParams = [];
 
@@ -51,7 +51,7 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 
