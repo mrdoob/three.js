@@ -1992,9 +1992,11 @@ class EXRLoader extends DataTextureLoader {
 
 			const EXRHeader = {};
 
-			if ( dataView.getUint32( 0, true ) != 20000630 ) // magic
+			if ( dataView.getUint32( 0, true ) != 20000630 ) { // magic
 
 				throw new Error( 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.' );
+
+			}
 
 			EXRHeader.version = dataView.getUint8( 4, true );
 
