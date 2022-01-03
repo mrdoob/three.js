@@ -1784,7 +1784,6 @@ class LDrawLoader extends Loader {
 
 				default:
 					throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
-					break;
 
 			}
 
