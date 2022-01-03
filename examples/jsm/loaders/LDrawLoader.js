@@ -1055,7 +1055,7 @@ class LDrawLoader extends Loader {
 		const name = lineParser.getToken();
 		if ( ! name ) {
 
-			throw 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.';
+			throw new Error( 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.' );
 
 		}
 
@@ -1087,7 +1087,7 @@ class LDrawLoader extends Loader {
 
 					} else if ( ! colour.startsWith( '#' ) ) {
 
-						throw 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + '.';
+						throw new Error( 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + '.' );
 
 					}
 
@@ -1106,7 +1106,7 @@ class LDrawLoader extends Loader {
 						edgeMaterial = this.getMaterial( edgeColour );
 						if ( ! edgeMaterial ) {
 
-							throw 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.';
+							throw new Error( 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -1123,7 +1123,7 @@ class LDrawLoader extends Loader {
 
 					if ( isNaN( alpha ) ) {
 
-						throw 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.';
+						throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
 
 					}
 
@@ -1143,7 +1143,7 @@ class LDrawLoader extends Loader {
 
 					if ( isNaN( luminance ) ) {
 
-						throw 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.';
+						throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
 
 					}
 
@@ -1177,8 +1177,7 @@ class LDrawLoader extends Loader {
 					break;
 
 				default:
-					throw 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.';
-					break;
+					throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
 
 			}
 
@@ -1345,7 +1344,7 @@ class LDrawLoader extends Loader {
 
 			if ( ! material ) {
 
-				throw 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + lineParser.getLineNumberString() + ' but it was not defined previously.';
+				throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + lineParser.getLineNumberString() + ' but it was not defined previously.' );
 
 			}
 
@@ -1784,8 +1783,7 @@ class LDrawLoader extends Loader {
 					break;
 
 				default:
-					throw 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.';
-					break;
+					throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
 
 			}
 
