@@ -717,7 +717,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 			for ( let j = 0, l = elemNormals.length; j < l; j ++ ) {
 
-				// handle face normal if
+				// use face normal if a vertex normal is not provided
 				let n = elem.faceNormal;
 				if ( elemNormals[ j ] ) {
 
