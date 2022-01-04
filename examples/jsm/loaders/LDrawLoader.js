@@ -965,10 +965,6 @@ class LDrawLoader extends Loader {
 			this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
 		] );
 
-		// If this flag is set to true, each subobject will be a Object.
-		// If not (the default), only one object which contains all the merged primitives will be created.
-		this.separateObjects = false;
-
 		// If this flag is set to true the vertex normals will be smoothed.
 		this.smoothNormals = true;
 
@@ -1494,15 +1490,7 @@ class LDrawLoader extends Loader {
 
 		const parseVector = lp => {
 
-			const v = new Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-
-			if ( ! this.separateObjects ) {
-
-				v.applyMatrix4( currentParseScope.currentMatrix );
-
-			}
-
-			return v;
+			return new Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
 
 		};
 
@@ -1575,11 +1563,7 @@ class LDrawLoader extends Loader {
 
 								// If the scale of the object is negated then the triangle winding order
 								// needs to be flipped.
-								if (
-									currentParseScope.matrix.determinant() < 0 && (
-										this.separateObjects && isPrimitiveType( type ) ||
-											! this.separateObjects
-									) ) {
+								if ( currentParseScope.matrix.determinant() < 0 && isPrimitiveType( type ) ) {
 
 									currentParseScope.inverted = ! currentParseScope.inverted;
 
@@ -1932,7 +1916,7 @@ class LDrawLoader extends Loader {
 		currentParseScope.subobjectIndex = 0;
 
 		const isRoot = ! parentParseScope.isFromParse;
-		if ( isRoot || this.separateObjects && ! isPrimitiveType( type ) ) {
+		if ( isRoot || ! isPrimitiveType( type ) ) {
 
 			currentParseScope.groupObject = new Group();
 			currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
@@ -2000,7 +1984,7 @@ class LDrawLoader extends Loader {
 		}
 
 		const isRoot = ! parentParseScope.isFromParse;
-		if ( this.separateObjects && ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
+		if ( ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
 
 			const objGroup = subobjectParseScope.groupObject;
 
@@ -2035,7 +2019,6 @@ class LDrawLoader extends Loader {
 
 		} else {
 
-			const separateObjects = this.separateObjects;
 			const parentLineSegments = parentParseScope.lineSegments;
 			const parentConditionalSegments = parentParseScope.conditionalSegments;
 			const parentFaces = parentParseScope.faces;
@@ -2049,14 +2032,9 @@ class LDrawLoader extends Loader {
 			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 				const ls = lineSegments[ i ];
-
-				if ( separateObjects ) {
-
-					const vertices = ls.vertices;
-					vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-					vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-				}
+				const vertices = ls.vertices;
+				vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+				vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
 
 				parentLineSegments.push( ls );
 
@@ -2065,17 +2043,12 @@ class LDrawLoader extends Loader {
 			for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
 				const os = conditionalSegments[ i ];
-
-				if ( separateObjects ) {
-
-					const vertices = os.vertices;
-					const controlPoints = os.controlPoints;
-					vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-					vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-					controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-					controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-				}
+				const vertices = os.vertices;
+				const controlPoints = os.controlPoints;
+				vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+				vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+				controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
+				controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
 
 				parentConditionalSegments.push( os );
 
@@ -2084,15 +2057,10 @@ class LDrawLoader extends Loader {
 			for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 				const tri = faces[ i ];
+				const vertices = tri.vertices;
+				for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-				if ( separateObjects ) {
-
-					const vertices = tri.vertices;
-					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
-
-						vertices[ i ].applyMatrix4( subobjectParseScope.matrix );
-
-					}
+					vertices[ i ].applyMatrix4( subobjectParseScope.matrix );
 
 				}
 
