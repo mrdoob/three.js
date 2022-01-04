@@ -74,10 +74,10 @@
 
 				//
 
-				material = new THREE.MeshBasicMaterial( {
+				material = new THREE.MeshStandardMaterial( {
 					envMap: cubeRenderTarget2.texture,
-					combine: THREE.MultiplyOperation,
-					reflectivity: 1
+					roughness: 0,
+					metalness: 1
 				} );
 
 				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 20, 8 ), material );
