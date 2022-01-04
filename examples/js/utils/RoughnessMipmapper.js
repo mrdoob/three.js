@@ -166,8 +166,6 @@
 
 			#define ENVMAP_TYPE_CUBE_UV
 
-			vec4 envMapTexelToLinear( vec4 a ) { return a; }
-
 			#include <cube_uv_reflection_fragment>
 
 			float roughnessToVariance( float roughness ) {

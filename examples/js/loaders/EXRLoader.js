@@ -210,7 +210,7 @@
 
 						if ( p.value - inOffset.value > ni ) {
 
-							throw 'Something wrong with hufUnpackEncTable';
+							throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 						}
 
@@ -221,7 +221,7 @@
 
 						if ( im + zerun > iM + 1 ) {
 
-							throw 'Something wrong with hufUnpackEncTable';
+							throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 						}
 
@@ -235,7 +235,7 @@
 
 						if ( im + zerun > iM + 1 ) {
 
-							throw 'Something wrong with hufUnpackEncTable';
+							throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 						}
 
@@ -272,7 +272,7 @@
 
 					if ( c >> l ) {
 
-						throw 'Invalid table entry';
+						throw new Error( 'Invalid table entry' );
 
 					}
 
@@ -282,7 +282,7 @@
 
 						if ( pl.len ) {
 
-							throw 'Invalid table entry';
+							throw new Error( 'Invalid table entry' );
 
 						}
 
@@ -317,7 +317,7 @@
 
 							if ( pl.len || pl.p ) {
 
-								throw 'Invalid table entry';
+								throw new Error( 'Invalid table entry' );
 
 							}
 
@@ -576,7 +576,7 @@
 
 							if ( ! pl.p ) {
 
-								throw 'hufDecode issues';
+								throw new Error( 'hufDecode issues' );
 
 							}
 
@@ -612,7 +612,7 @@
 
 							if ( j == pl.lit ) {
 
-								throw 'hufDecode issues';
+								throw new Error( 'hufDecode issues' );
 
 							}
 
@@ -639,7 +639,7 @@
 
 					} else {
 
-						throw 'hufDecode issues';
+						throw new Error( 'hufDecode issues' );
 
 					}
 
@@ -663,7 +663,7 @@
 
 				if ( im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE ) {
 
-					throw 'Something wrong with HUF_ENCSIZE';
+					throw new Error( 'Something wrong with HUF_ENCSIZE' );
 
 				}
 
@@ -675,7 +675,7 @@
 
 				if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
 
-					throw 'Something wrong with hufUncompress';
+					throw new Error( 'Something wrong with hufUncompress' );
 
 				}
 
@@ -1198,7 +1198,7 @@
 
 				if ( maxNonZero >= BITMAP_SIZE ) {
 
-					throw 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE';
+					throw new Error( 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE' );
 
 				}
 
@@ -1346,7 +1346,7 @@
 					totalDcUncompressedCount: parseInt64( inDataView, inOffset ),
 					acCompression: parseInt64( inDataView, inOffset )
 				};
-				if ( dwaHeader.version < 2 ) throw 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported'; // Read channel ruleset information
+				if ( dwaHeader.version < 2 ) throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported' ); // Read channel ruleset information
 
 				var channelRules = new Array();
 				var ruleSize = parseUint16( inDataView, inOffset ) - INT16_SIZE;
@@ -1523,7 +1523,7 @@
 						case LOSSY_DCT: // skip
 
 						default:
-							throw 'EXRLoader.parse: unsupported channel compression';
+							throw new Error( 'EXRLoader.parse: unsupported channel compression' );
 
 					}
 
@@ -1818,8 +1818,14 @@
 			function parseHeader( dataView, buffer, offset ) {
 
 				const EXRHeader = {};
-				if ( dataView.getUint32( 0, true ) != 20000630 ) // magic
-					throw 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.';
+
+				if ( dataView.getUint32( 0, true ) != 20000630 ) {
+
+					// magic
+					throw new Error( 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.' );
+
+				}
+
 				EXRHeader.version = dataView.getUint8( 4, true );
 				const spec = dataView.getUint8( 5, true ); // fullMask
 
@@ -1865,7 +1871,7 @@
 				if ( spec != 0 ) {
 
 					console.error( 'EXRHeader:', EXRHeader );
-					throw 'THREE.EXRLoader: provided file is currently unsupported.';
+					throw new Error( 'THREE.EXRLoader: provided file is currently unsupported.' );
 
 				}
 
@@ -1936,7 +1942,7 @@
 						break;
 
 					default:
-						throw 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported';
+						throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported' );
 
 				}
 
@@ -1977,7 +1983,7 @@
 
 				} else {
 
-					throw 'EXRLoader.parse: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.';
+					throw new Error( 'EXRLoader.parse: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.' );
 
 				}
 
