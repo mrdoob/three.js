@@ -13,6 +13,7 @@ import {
 	DepthStencilFormat,
 	RGBAFormat,
 	RGBFormat,
+	sRGBEncoding,
 	UnsignedByteType,
 	UnsignedShortType,
 	UnsignedInt248Type,
@@ -285,6 +286,12 @@ class WebXRManager extends EventDispatcher {
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
+
+					if ( renderer.outputEncoding === sRGBEncoding ) {
+
+						projectionlayerInit.colorFormat = ( attributes.alpha || isMultisample ) ? gl.SRGB8_ALPHA8 : gl.SRGB8;
+
+					}
 
 					glBinding = new XRWebGLBinding( session, gl );
 
