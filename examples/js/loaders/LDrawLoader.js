@@ -162,7 +162,9 @@
 
 	}
 
-	function smoothNormals( faces, lineSegments ) {
+	const _ray = new THREE.Ray();
+
+	function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 		function hashVertex( v ) {
 
@@ -180,9 +182,27 @@
 
 			return `${hashVertex( v0 )}_${hashVertex( v1 )}`;
 
+		} // converts the two vertices to a ray with a normalized direction and origin of 0, 0, 0 projected
+		// onto the original line.
+
+
+		function toNormalizedRay( v0, v1, targetRay ) {
+
+			targetRay.direction.subVectors( v1, v0 ).normalize();
+			const scalar = v0.dot( targetRay.direction );
+			targetRay.origin.copy( v0 ).addScaledVector( targetRay.direction, - scalar );
+			return targetRay;
+
+		}
+
+		function hashRay( ray ) {
+
+			return hashEdge( ray.origin, ray.direction );
+
 		}
 
 		const hardEdges = new Set();
+		const hardEdgeRays = new Map();
 		const halfEdgeList = {};
 		const normals = []; // Save the list of hard edges by hash
 
@@ -193,7 +213,43 @@
 			const v0 = vertices[ 0 ];
 			const v1 = vertices[ 1 ];
 			hardEdges.add( hashEdge( v0, v1 ) );
-			hardEdges.add( hashEdge( v1, v0 ) );
+			hardEdges.add( hashEdge( v1, v0 ) ); // only generate the hard edge ray map if we're checking subsegments because it's more expensive to check
+			// and requires more memory.
+
+			if ( checkSubSegments ) {
+
+				// add both ray directions to the map
+				const ray = toNormalizedRay( v0, v1, new THREE.Ray() );
+				const rh1 = hashRay( ray );
+
+				if ( ! hardEdgeRays.has( rh1 ) ) {
+
+					toNormalizedRay( v1, v0, ray );
+					const rh2 = hashRay( ray );
+					const info = {
+						ray,
+						distances: []
+					};
+					hardEdgeRays.set( rh1, info );
+					hardEdgeRays.set( rh2, info );
+
+				} // store both segments ends in min, max order in the distances array to check if a face edge is a
+				// subsegment later.
+
+
+				const info = hardEdgeRays.get( rh1 );
+				let d0 = info.ray.direction.dot( v0 );
+				let d1 = info.ray.direction.dot( v1 );
+
+				if ( d0 > d1 ) {
+
+					[ d0, d1 ] = [ d1, d0 ];
+
+				}
+
+				info.distances.push( d0, d1 );
+
+			}
 
 		} // track the half edges associated with each triangle
 
@@ -212,7 +268,58 @@
 				const v1 = vertices[ next ];
 				const hash = hashEdge( v0, v1 ); // don't add the triangle if the edge is supposed to be hard
 
-				if ( hardEdges.has( hash ) ) continue;
+				if ( hardEdges.has( hash ) ) {
+
+					continue;
+
+				} // if checking subsegments then check to see if this edge lies on a hard edge ray and whether its within any ray bounds
+
+
+				if ( checkSubSegments ) {
+
+					toNormalizedRay( v0, v1, _ray );
+					const rayHash = hashRay( _ray );
+
+					if ( hardEdgeRays.has( rayHash ) ) {
+
+						const info = hardEdgeRays.get( rayHash );
+						const {
+							ray,
+							distances
+						} = info;
+						let d0 = ray.direction.dot( v0 );
+						let d1 = ray.direction.dot( v1 );
+
+						if ( d0 > d1 ) {
+
+							[ d0, d1 ] = [ d1, d0 ];
+
+						} // return early if the face edge is found to be a subsegment of a line edge meaning the edge will have "hard" normals
+
+
+						let found = false;
+
+						for ( let i = 0, l = distances.length; i < l; i += 2 ) {
+
+							if ( d0 >= distances[ i ] && d1 <= distances[ i + 1 ] ) {
+
+								found = true;
+								break;
+
+							}
+
+						}
+
+						if ( found ) {
+
+							continue;
+
+						}
+
+					}
+
+				}
+
 				const info = {
 					index: index,
 					tri: tri
@@ -450,6 +557,12 @@
 			const pos1 = this.currentCharIndex;
 			this.seekNonSpace();
 			return this.line.substring( pos0, pos1 );
+
+		}
+
+		getVector() {
+
+			return new THREE.Vector3( parseFloat( this.getToken() ), parseFloat( this.getToken() ), parseFloat( this.getToken() ) );
 
 		}
 
@@ -820,10 +933,7 @@
 			this.fileMap = {};
 			this.rootParseScope = this.newParseScopeLevel(); // Add default main triangle and line edge materials (used in pieces that can be coloured with a main color)
 
-			this.setMaterials( [ this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true, each subobject will be a Object.
-			// If not (the default), only one object which contains all the merged primitives will be created.
-
-			this.separateObjects = false; // If this flag is set to true the vertex normals will be smoothed.
+			this.setMaterials( [ this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true the vertex normals will be smoothed.
 
 			this.smoothNormals = true; // The path to load parts from the LDraw parts library from.
 
@@ -944,7 +1054,6 @@
 				currentFileName: null,
 				mainColourCode: parentScope ? parentScope.mainColourCode : '16',
 				mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
-				currentMatrix: new THREE.Matrix4(),
 				matrix: new THREE.Matrix4(),
 				type: 'Model',
 				groupObject: null,
@@ -954,6 +1063,7 @@
 				lineSegments: [],
 				conditionalSegments: [],
 				totalFaces: 0,
+				faceMaterials: new Set(),
 				// If true, this object is the start of a construction step
 				startingConstructionStep: false
 			};
@@ -1321,20 +1431,6 @@
 
 				return material;
 
-			};
-
-			const parseVector = lp => {
-
-				const v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-
-				if ( ! this.separateObjects ) {
-
-					v.applyMatrix4( currentParseScope.currentMatrix );
-
-				}
-
-				return v;
-
 			}; // Parse all line commands
 
 
@@ -1395,15 +1491,7 @@
 
 								case '!LDRAW_ORG':
 									type = lp.getToken();
-									currentParseScope.type = type; // If the scale of the object is negated then the triangle winding order
-									// needs to be flipped.
-
-									if ( currentParseScope.matrix.determinant() < 0 && ( this.separateObjects && isPrimitiveType( type ) || ! this.separateObjects ) ) {
-
-										currentParseScope.inverted = ! currentParseScope.inverted;
-
-									}
-
+									currentParseScope.type = type;
 									faces = currentParseScope.faces;
 									lineSegments = currentParseScope.lineSegments;
 									conditionalSegments = currentParseScope.conditionalSegments;
@@ -1566,8 +1654,8 @@
 
 					case '2':
 						material = parseColourCode( lp, true );
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
 						segment = {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
@@ -1581,10 +1669,10 @@
 
 					case '5':
 						material = parseColourCode( lp, true );
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
-						c0 = parseVector( lp );
-						c1 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						c0 = lp.getVector();
+						c1 = lp.getVector();
 						segment = {
 							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
 							colourCode: material.userData.code,
@@ -1603,15 +1691,15 @@
 
 						if ( ccw === true ) {
 
-							v0 = parseVector( lp );
-							v1 = parseVector( lp );
-							v2 = parseVector( lp );
+							v0 = lp.getVector();
+							v1 = lp.getVector();
+							v2 = lp.getVector();
 
 						} else {
 
-							v2 = parseVector( lp );
-							v1 = parseVector( lp );
-							v0 = parseVector( lp );
+							v2 = lp.getVector();
+							v1 = lp.getVector();
+							v0 = lp.getVector();
 
 						}
 
@@ -1637,6 +1725,7 @@
 
 						}
 
+						currentParseScope.faceMaterials.add( material );
 						break;
 						// Line type 4: Quadrilateral
 
@@ -1648,17 +1737,17 @@
 
 						if ( ccw === true ) {
 
-							v0 = parseVector( lp );
-							v1 = parseVector( lp );
-							v2 = parseVector( lp );
-							v3 = parseVector( lp );
+							v0 = lp.getVector();
+							v1 = lp.getVector();
+							v2 = lp.getVector();
+							v3 = lp.getVector();
 
 						} else {
 
-							v3 = parseVector( lp );
-							v2 = parseVector( lp );
-							v1 = parseVector( lp );
-							v0 = parseVector( lp );
+							v3 = lp.getVector();
+							v2 = lp.getVector();
+							v1 = lp.getVector();
+							v0 = lp.getVector();
 
 						} // specifically place the triangle diagonal in the v0 and v1 slots so we can
 						// account for the doubling of vertices later when smoothing normals.
@@ -1708,7 +1797,7 @@
 			currentParseScope.subobjectIndex = 0;
 			const isRoot = ! parentParseScope.isFromParse;
 
-			if ( isRoot || this.separateObjects && ! isPrimitiveType( type ) ) {
+			if ( isRoot || ! isPrimitiveType( type ) ) {
 
 				currentParseScope.groupObject = new THREE.Group();
 				currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
@@ -1757,14 +1846,17 @@
 
 			if ( this.smoothNormals && doSmooth ) {
 
-				generateFaceNormals( subobjectParseScope.faces );
-				smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
+				generateFaceNormals( subobjectParseScope.faces ); // only check subsetgments if we have multiple materials in a single part because this seems to be the case where it's needed most --
+				// there may be cases where a single edge line crosses over polygon edges that are broken up by multiple materials.
+
+				const checkSubSegments = subobjectParseScope.faceMaterials.size > 1;
+				smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments, checkSubSegments );
 
 			}
 
 			const isRoot = ! parentParseScope.isFromParse;
 
-			if ( this.separateObjects && ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
+			if ( ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
 
 				const objGroup = subobjectParseScope.groupObject;
 
@@ -1798,26 +1890,23 @@
 
 			} else {
 
-				const separateObjects = this.separateObjects;
 				const parentLineSegments = parentParseScope.lineSegments;
 				const parentConditionalSegments = parentParseScope.conditionalSegments;
 				const parentFaces = parentParseScope.faces;
+				const parentFaceMaterials = parentParseScope.faceMaterials;
 				const lineSegments = subobjectParseScope.lineSegments;
 				const conditionalSegments = subobjectParseScope.conditionalSegments;
 				const faces = subobjectParseScope.faces;
+				const faceMaterials = subobjectParseScope.faceMaterials;
+				const matrix = subobjectParseScope.matrix;
+				const matrixScaleInverted = matrix.determinant() < 0;
 
 				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 					const ls = lineSegments[ i ];
-
-					if ( separateObjects ) {
-
-						const vertices = ls.vertices;
-						vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-						vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-					}
-
+					const vertices = ls.vertices;
+					vertices[ 0 ].applyMatrix4( matrix );
+					vertices[ 1 ].applyMatrix4( matrix );
 					parentLineSegments.push( ls );
 
 				}
@@ -1825,18 +1914,12 @@
 				for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
 					const os = conditionalSegments[ i ];
-
-					if ( separateObjects ) {
-
-						const vertices = os.vertices;
-						const controlPoints = os.controlPoints;
-						vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-						vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-						controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-						controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-					}
-
+					const vertices = os.vertices;
+					const controlPoints = os.controlPoints;
+					vertices[ 0 ].applyMatrix4( matrix );
+					vertices[ 1 ].applyMatrix4( matrix );
+					controlPoints[ 0 ].applyMatrix4( matrix );
+					controlPoints[ 1 ].applyMatrix4( matrix );
 					parentConditionalSegments.push( os );
 
 				}
@@ -1844,16 +1927,19 @@
 				for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 					const tri = faces[ i ];
+					const vertices = tri.vertices;
 
-					if ( separateObjects ) {
+					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-						const vertices = tri.vertices;
+						vertices[ i ].applyMatrix4( matrix );
 
-						for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+					} // If the scale of the object is negated then the triangle winding order
+					// needs to be flipped.
 
-							vertices[ i ].applyMatrix4( subobjectParseScope.matrix );
 
-						}
+					if ( matrixScaleInverted ) {
+
+						vertices.reverse();
 
 					}
 
@@ -1862,6 +1948,7 @@
 				}
 
 				parentParseScope.totalFaces += subobjectParseScope.totalFaces;
+				faceMaterials.forEach( material => parentFaceMaterials.add( material ) );
 
 			}
 
@@ -1876,7 +1963,6 @@
 
 			if ( subobject ) {
 
-				parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
 				parseScope.matrix.copy( subobject.matrix );
 				parseScope.inverted = subobject.inverted;
 				parseScope.startingConstructionStep = subobject.startingConstructionStep;
