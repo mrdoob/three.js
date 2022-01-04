@@ -1647,7 +1647,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			// sRGB
 
-			if ( encoding === sRGBEncoding ) {
+			if ( encoding === sRGBEncoding && texture.isVideoTexture !== true ) {
 
 				if ( isWebGL2 === false ) {
 
