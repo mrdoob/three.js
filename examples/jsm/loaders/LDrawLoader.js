@@ -1560,14 +1560,6 @@ class LDrawLoader extends Loader {
 
 								currentParseScope.type = type;
 
-								// If the scale of the object is negated then the triangle winding order
-								// needs to be flipped.
-								if ( currentParseScope.matrix.determinant() < 0 && isPrimitiveType( type ) ) {
-
-									currentParseScope.inverted = ! currentParseScope.inverted;
-
-								}
-
 								faces = currentParseScope.faces;
 								lineSegments = currentParseScope.lineSegments;
 								conditionalSegments = currentParseScope.conditionalSegments;
@@ -2027,13 +2019,14 @@ class LDrawLoader extends Loader {
 			const conditionalSegments = subobjectParseScope.conditionalSegments;
 			const faces = subobjectParseScope.faces;
 			const faceMaterials = subobjectParseScope.faceMaterials;
+			const matrix = subobjectParseScope.matrix;
 
 			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 				const ls = lineSegments[ i ];
 				const vertices = ls.vertices;
-				vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-				vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+				vertices[ 0 ].applyMatrix4( matrix );
+				vertices[ 1 ].applyMatrix4( matrix );
 
 				parentLineSegments.push( ls );
 
@@ -2044,10 +2037,10 @@ class LDrawLoader extends Loader {
 				const os = conditionalSegments[ i ];
 				const vertices = os.vertices;
 				const controlPoints = os.controlPoints;
-				vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-				vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-				controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-				controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
+				vertices[ 0 ].applyMatrix4( matrix );
+				vertices[ 1 ].applyMatrix4( matrix );
+				controlPoints[ 0 ].applyMatrix4( matrix );
+				controlPoints[ 1 ].applyMatrix4( matrix );
 
 				parentConditionalSegments.push( os );
 
@@ -2059,7 +2052,15 @@ class LDrawLoader extends Loader {
 				const vertices = tri.vertices;
 				for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-					vertices[ i ].applyMatrix4( subobjectParseScope.matrix );
+					vertices[ i ].applyMatrix4( matrix );
+
+				}
+
+				// If the scale of the object is negated then the triangle winding order
+				// needs to be flipped.
+				if ( matrix.determinant() < 0 ) {
+
+					vertices.reverse();
 
 				}
 
