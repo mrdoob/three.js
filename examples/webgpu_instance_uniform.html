@@ -20,6 +20,19 @@
 			}
 		}
 		</script>
+
+		<script type="module">
+
+			import ImportMaps from './jsm/capabilities/ImportMaps.js';
+
+			if ( ImportMaps.isAvailable() === false ) {
+
+				document.body.appendChild( ImportMaps.getErrorMessage() );
+
+			}
+
+		</script>
+
 		<script type="module">
 
 			import * as THREE from 'three';
