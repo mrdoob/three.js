@@ -18158,6 +18158,11 @@
 							depthFormat: glDepthFormat,
 							scaleFactor: framebufferScaleFactor
 						};
+
+						if (renderer.outputEncoding === sRGBEncoding) {
+							projectionlayerInit.colorFormat = attributes.alpha || isMultisample ? gl.SRGB8_ALPHA8 : gl.SRGB8;
+						}
+
 						glBinding = new XRWebGLBinding(session, gl);
 						glProjLayer = glBinding.createProjectionLayer(projectionlayerInit);
 						session.updateRenderState({

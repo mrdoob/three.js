@@ -24572,6 +24572,12 @@ class WebXRManager extends EventDispatcher {
 						scaleFactor: framebufferScaleFactor
 					};
 
+					if ( renderer.outputEncoding === sRGBEncoding ) {
+
+						projectionlayerInit.colorFormat = ( attributes.alpha || isMultisample ) ? 35907 : 35905;
+
+					}
+
 					glBinding = new XRWebGLBinding( session, gl );
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
