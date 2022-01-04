@@ -1094,7 +1094,6 @@ class LDrawLoader extends Loader {
 			currentFileName: null,
 			mainColourCode: parentScope ? parentScope.mainColourCode : '16',
 			mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
-			currentMatrix: new Matrix4(),
 			matrix: new Matrix4(),
 			type: 'Model',
 			groupObject: null,
@@ -2087,7 +2086,6 @@ class LDrawLoader extends Loader {
 		// Set current matrix
 		if ( subobject ) {
 
-			parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
 			parseScope.matrix.copy( subobject.matrix );
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
