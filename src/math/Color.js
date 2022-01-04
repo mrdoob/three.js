@@ -563,4 +563,4 @@ Color.prototype.r = 1;
 Color.prototype.g = 1;
 Color.prototype.b = 1;
 
-export { Color };
+export { Color, SRGBToLinear };
