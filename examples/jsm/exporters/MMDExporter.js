@@ -186,7 +186,7 @@ function unicodeToShiftjis( str ) {
 
 		if ( value === undefined ) {
 
-			throw 'cannot convert charcode 0x' + code.toString( 16 );
+			throw new Error( 'cannot convert charcode 0x' + code.toString( 16 ) );
 
 		} else if ( value > 0xff ) {
 

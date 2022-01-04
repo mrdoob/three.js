@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, LinearEncoding, sRGBEncoding, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, RGBAFormat, UnsignedByteType } from '../../constants.js';
+import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, sRGBEncoding } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -69,35 +69,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			return maxBones;
 
 		}
-
-	}
-
-	function getTextureEncodingFromMap( map ) {
-
-		let encoding;
-
-		if ( map && map.isTexture ) {
-
-			encoding = map.encoding;
-
-		} else if ( map && map.isWebGLRenderTarget ) {
-
-			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
-			encoding = map.texture.encoding;
-
-		} else {
-
-			encoding = LinearEncoding;
-
-		}
-
-		if ( isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
-
-			encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
-
-		}
-
-		return encoding;
 
 	}
 
@@ -177,24 +148,21 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			instancingColor: object.isInstancedMesh === true && object.instanceColor !== null,
 
 			supportsVertexTextures: vertexTextures,
-			outputEncoding: ( currentRenderTarget !== null ) ? getTextureEncodingFromMap( currentRenderTarget.texture ) : renderer.outputEncoding,
+			outputEncoding: ( currentRenderTarget !== null ) ? currentRenderTarget.texture.encoding : renderer.outputEncoding,
 			map: !! material.map,
-			mapEncoding: getTextureEncodingFromMap( material.map ),
 			matcap: !! material.matcap,
-			matcapEncoding: getTextureEncodingFromMap( material.matcap ),
 			envMap: !! envMap,
 			envMapMode: envMap && envMap.mapping,
-			envMapEncoding: getTextureEncodingFromMap( envMap ),
 			envMapCubeUV: ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ),
 			lightMap: !! material.lightMap,
-			lightMapEncoding: getTextureEncodingFromMap( material.lightMap ),
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
-			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
+
+			decodeVideoTexture: !! material.map && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
 
 			clearcoat: useClearcoat,
 			clearcoatMap: useClearcoat && !! material.clearcoatMap,
@@ -207,7 +175,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			specularMap: !! material.specularMap,
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
-			specularColorMapEncoding: getTextureEncodingFromMap( material.specularColorMap ),
 
 			alphaMap: !! material.alphaMap,
 			alphaTest: useAlphaTest,
@@ -216,7 +183,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			sheen: material.sheen > 0,
 			sheenColorMap: !! material.sheenColorMap,
-			sheenColorMapEncoding: getTextureEncodingFromMap( material.sheenColorMap ),
 			sheenRoughnessMap: !! material.sheenRoughnessMap,
 
 			transmission: material.transmission > 0,
@@ -340,12 +306,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		array.push( parameters.precision );
 		array.push( parameters.outputEncoding );
-		array.push( parameters.mapEncoding );
-		array.push( parameters.matcapEncoding );
 		array.push( parameters.envMapMode );
-		array.push( parameters.envMapEncoding );
-		array.push( parameters.lightMapEncoding );
-		array.push( parameters.emissiveMapEncoding );
 		array.push( parameters.combine );
 		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
@@ -365,8 +326,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
 		array.push( parameters.format );
-		array.push( parameters.specularColorMapEncoding );
-		array.push( parameters.sheenColorMapEncoding );
 
 	}
 
@@ -486,6 +445,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 20 );
 		if ( parameters.sheenRoughnessMap )
 			_programLayers.enable( 21 );
+		if ( parameters.decodeVideoTexture )
+			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );
 
