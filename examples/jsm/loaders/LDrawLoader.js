@@ -1447,7 +1447,7 @@ class LDrawLoader extends Loader {
 			let inverted;
 			let ccw;
 			let doubleSided;
-			let v0, v1, v2, v3, c0, c1, faceNormal;
+			let v0, v1, v2, v3, c0, c1;
 
 			switch ( lineType ) {
 
