@@ -2020,6 +2020,7 @@ class LDrawLoader extends Loader {
 			const faces = subobjectParseScope.faces;
 			const faceMaterials = subobjectParseScope.faceMaterials;
 			const matrix = subobjectParseScope.matrix;
+			const matrixScaleInverted = matrix.determinant() < 0;
 
 			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
@@ -2058,7 +2059,7 @@ class LDrawLoader extends Loader {
 
 				// If the scale of the object is negated then the triangle winding order
 				// needs to be flipped.
-				if ( matrix.determinant() < 0 ) {
+				if ( matrixScaleInverted ) {
 
 					vertices.reverse();
 
