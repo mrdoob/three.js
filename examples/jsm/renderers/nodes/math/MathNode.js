@@ -187,7 +187,7 @@ class MathNode extends TempNode {
 			} else if ( method === MathNode.STEP ) {
 
 				params.push(
-					b.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
+					a.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
 					b.build( builder, inputType )
 				);
 

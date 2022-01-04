@@ -183,7 +183,7 @@ class EdgeSplitModifier {
 
 			if ( BufferGeometryUtils === undefined ) {
 
-				throw 'THREE.EdgeSplitModifier relies on BufferGeometryUtils';
+				throw new Error( 'THREE.EdgeSplitModifier relies on BufferGeometryUtils' );
 
 			}
 

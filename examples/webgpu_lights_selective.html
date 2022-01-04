@@ -51,7 +51,7 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 

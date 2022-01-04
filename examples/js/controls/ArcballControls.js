@@ -1694,7 +1694,6 @@
 				window.removeEventListener( 'pointermove', this.onPointerMove );
 				window.removeEventListener( 'pointerup', this.onPointerUp );
 				window.removeEventListener( 'resize', this.onWindowResize );
-				window.removeEventListener( 'keydown', this.onKeyDown );
 				if ( this.scene !== null ) this.scene.remove( this._gizmos );
 				this.disposeGrid();
 
@@ -2272,19 +2271,6 @@
 
 			};
 
-			this.setTarget = ( x, y, z ) => {
-
-				this.target.set( x, y, z );
-
-				this._gizmos.position.set( x, y, z ); //for correct radius calculation
-
-
-				this._tbRadius = this.calculateTbRadius( this.camera );
-				this.makeGizmos( this.target, this._tbRadius );
-				this.camera.lookAt( this.target );
-
-			};
-
 			this.zRotate = ( point, angle ) => {
 
 				this._rotationMatrix.makeRotationAxis( this._rotationAxis, angle );
@@ -2566,7 +2552,20 @@
 
 			this.update = () => {
 
-				const EPS = 0.000001; //check min/max parameters
+				const EPS = 0.000001;
+
+				if ( this.target.equals( this._currentTarget ) === false ) {
+
+					this._gizmos.position.copy( this.target ); //for correct radius calculation
+
+
+					this._tbRadius = this.calculateTbRadius( this.camera );
+					this.makeGizmos( this.target, this._tbRadius );
+
+					this._currentTarget.copy( this.target );
+
+				} //check min/max parameters
+
 
 				if ( this.camera.isOrthographicCamera ) {
 
@@ -2671,7 +2670,8 @@
 			this.camera = null;
 			this.domElement = domElement;
 			this.scene = scene;
-			this.target = new THREE.Vector3( 0, 0, 0 );
+			this.target = new THREE.Vector3();
+			this._currentTarget = new THREE.Vector3();
 			this.radiusFactor = 0.67;
 			this.mouseActions = [];
 			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)

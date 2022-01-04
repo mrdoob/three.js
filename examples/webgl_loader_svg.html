@@ -22,17 +22,13 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
-			import Stats from './jsm/libs/stats.module.js';
-
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
-			let renderer, stats, scene, camera, gui, guiData;
+			let renderer, scene, camera, gui, guiData;
 
 			init();
-			animate();
 
 			//
 
@@ -55,12 +51,8 @@
 				//
 
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
 				controls.screenSpacePanning = true;
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				//
 
@@ -222,6 +214,8 @@
 
 					scene.add( group );
 
+					render();
+
 				} );
 
 			}
@@ -232,15 +226,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
 
 			}
 

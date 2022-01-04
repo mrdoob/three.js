@@ -141,7 +141,6 @@
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
 		THREE.LuminanceAlphaFormat
-		THREE.RGBEFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 	</code>
@@ -184,8 +183,6 @@
 
 		[page:constant LuminanceAlphaFormat] 将每个元素同时作为亮度分量和Alpha分量来读取。
 		和上面[page:constant LuminanceFormat]的处理过程是一致的，除了Alpha分量具有除了*1.0*以外的值。<br /><br />
-
-		[page:constant RGBEFormat] 与 [page:constant RGBAFormat] 是相同的。<br /><br />
 
 		[page:constant DepthFormat]将每个元素作为单独的深度值来读取，将其转换为范围限制在[0,1]区间的浮点数。
 		它是[page:DepthTexture DepthTexture]的默认值。<br /><br />
@@ -271,20 +268,6 @@
 		THREE.RGBA_ASTC_10x10_Format
 		THREE.RGBA_ASTC_12x10_Format
 		THREE.RGBA_ASTC_12x12_Format
-		THREE.SRGB8_ALPHA8_ASTC_4x4_Format
-		THREE.SRGB8_ALPHA8_ASTC_5x4_Format
-		THREE.SRGB8_ALPHA8_ASTC_5x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_6x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_6x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x8_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x8_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x10_Format
-		THREE.SRGB8_ALPHA8_ASTC_12x10_Format
-		THREE.SRGB8_ALPHA8_ASTC_12x12_Format
 	</code>
 	<p>
 	For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
@@ -548,12 +531,6 @@
 	<code>
 		THREE.LinearEncoding
 		THREE.sRGBEncoding
-		THREE.GammaEncoding
-		THREE.RGBEEncoding
-		THREE.LogLuvEncoding
-		THREE.RGBM7Encoding
-		THREE.RGBM16Encoding
-		THREE.RGBDEncoding
 		THREE.BasicDepthPacking
 		THREE.RGBADepthPacking
 		</code>

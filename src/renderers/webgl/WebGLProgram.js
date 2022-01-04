@@ -1,7 +1,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { RGBFormat, NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, GLSL3 } from '../../constants.js';
+import { RGBFormat, NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, sRGBEncoding, LinearEncoding, GLSL3 } from '../../constants.js';
 
 let programIdCount = 0;
 
@@ -27,16 +27,6 @@ function getEncodingComponents( encoding ) {
 			return [ 'Linear', '( value )' ];
 		case sRGBEncoding:
 			return [ 'sRGB', '( value )' ];
-		case RGBEEncoding:
-			return [ 'RGBE', '( value )' ];
-		case RGBM7Encoding:
-			return [ 'RGBM', '( value, 7.0 )' ];
-		case RGBM16Encoding:
-			return [ 'RGBM', '( value, 16.0 )' ];
-		case RGBDEncoding:
-			return [ 'RGBD', '( value, 256.0 )' ];
-		case GammaEncoding:
-			return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
 		default:
 			console.warn( 'THREE.WebGLProgram: Unsupported encoding:', encoding );
 			return [ 'Linear', '( value )' ];
@@ -56,13 +46,6 @@ function getShaderErrors( gl, shader, type ) {
 	// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
 
 	return type.toUpperCase() + '\n\n' + errors + '\n\n' + addLineNumbers( gl.getShaderSource( shader ) );
-
-}
-
-function getTexelDecodingFunction( functionName, encoding ) {
-
-	const components = getEncodingComponents( encoding );
-	return 'vec4 ' + functionName + '( vec4 value ) { return ' + components[ 0 ] + 'ToLinear' + components[ 1 ] + '; }';
 
 }
 
@@ -397,9 +380,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const envMapModeDefine = generateEnvMapModeDefine( parameters );
 	const envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
 
-
-	const gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
-
 	const customExtensions = parameters.isWebGL2 ? '' : generateExtensions( parameters );
 
 	const customDefines = generateDefines( defines );
@@ -450,8 +430,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
 
 			parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
-
-			'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 			'#define MAX_BONES ' + parameters.maxBones,
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
@@ -601,8 +579,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			customDefines,
 
-			'#define GAMMA_FACTOR ' + gammaFactorDefine,
-
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
 			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
@@ -642,6 +618,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
+			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
+
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
@@ -679,13 +657,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.format === RGBFormat ? '#define OPAQUE' : '',
 
 			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
-			parameters.map ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
-			parameters.matcap ? getTexelDecodingFunction( 'matcapTexelToLinear', parameters.matcapEncoding ) : '',
-			parameters.envMap ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
-			parameters.emissiveMap ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
-			parameters.specularColorMap ? getTexelDecodingFunction( 'specularColorMapTexelToLinear', parameters.specularColorMapEncoding ) : '',
-			parameters.sheenColorMap ? getTexelDecodingFunction( 'sheenColorMapTexelToLinear', parameters.sheenColorMapEncoding ) : '',
-			parameters.lightMap ? getTexelDecodingFunction( 'lightMapTexelToLinear', parameters.lightMapEncoding ) : '',
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ),
 
 			parameters.depthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',

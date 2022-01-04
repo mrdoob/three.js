@@ -1,17 +1,10 @@
 import {
-	GammaEncoding,
 	LinearEncoding,
-	RGBEEncoding,
-	RGBM7Encoding,
-	RGBM16Encoding,
-	RGBDEncoding,
 	sRGBEncoding
 } from '../../../../build/three.module.js';
 
 import { TempNode } from '../core/TempNode.js';
-import { FloatNode } from '../inputs/FloatNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
-import { ExpressionNode } from '../core/ExpressionNode.js';
 
 class ColorSpaceNode extends TempNode {
 
@@ -64,9 +57,11 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
-	fromDecoding( encoding ) {
+	fromDecoding() {
 
-		const components = ColorSpaceNode.getEncodingComponents( encoding );
+		// TODO: Remove fromDecoding()
+
+		const components = ColorSpaceNode.getEncodingComponents( LinearEncoding );
 
 		this.method = components[ 0 ] + 'ToLinear';
 		this.factor = components[ 1 ];
@@ -105,36 +100,10 @@ class ColorSpaceNode extends TempNode {
 
 ColorSpaceNode.Nodes = ( function () {
 
-	// For a discussion of what this is, please read this: http://lousodrome.net/blog/light/2013/05/26/gamma-correct-and-hdr-rendering-in-a-32-bits-buffer/
-
 	const LinearToLinear = new FunctionNode( /* glsl */`
 		vec4 LinearToLinear( in vec4 value ) {
 
 			return value;
-
-		}`
-	);
-
-	const GammaToLinear = new FunctionNode( /* glsl */`
-		vec4 GammaToLinear( in vec4 value, in float gammaFactor ) {
-
-			return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );
-
-		}`
-	);
-
-	const LinearToGamma = new FunctionNode( /* glsl */`
-		vec4 LinearToGamma( in vec4 value, in float gammaFactor ) {
-
-			return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );
-
-		}`
-	);
-
-	const sRGBToLinear = new FunctionNode( /* glsl */`
-		vec4 sRGBToLinear( in vec4 value ) {
-
-			return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.w );
 
 		}`
 	);
@@ -147,98 +116,15 @@ ColorSpaceNode.Nodes = ( function () {
 		}`
 	);
 
-	const RGBEToLinear = new FunctionNode( /* glsl */`
-		vec4 RGBEToLinear( in vec4 value ) {
-
-			return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );
-
-		}`
-	);
-
-	const LinearToRGBE = new FunctionNode( /* glsl */`
-		vec4 LinearToRGBE( in vec4 value ) {
-
-			float maxComponent = max( max( value.r, value.g ), value.b );
-			float fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );
-			return vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );
-
-		}`
-	);
-
-	// reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
-
-	const RGBMToLinear = new FunctionNode( /* glsl */`
-		vec3 RGBMToLinear( in vec4 value, in float maxRange ) {
-
-			return vec4( value.xyz * value.w * maxRange, 1.0 );
-
-		}`
-	);
-
-	const LinearToRGBM = new FunctionNode( /* glsl */`
-		vec3 LinearToRGBM( in vec4 value, in float maxRange ) {
-
-			float maxRGB = max( value.x, max( value.g, value.b ) );
-			float M      = clamp( maxRGB / maxRange, 0.0, 1.0 );
-			M            = ceil( M * 255.0 ) / 255.0;
-			return vec4( value.rgb / ( M * maxRange ), M );
-
-		}`
-	);
-
-	// reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
-
-	const RGBDToLinear = new FunctionNode( /* glsl */`
-		vec3 RGBDToLinear( in vec4 value, in float maxRange ) {
-
-			return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );
-
-		}`
-	);
-
-	const LinearToRGBD = new FunctionNode( /* glsl */`
-		vec3 LinearToRGBD( in vec4 value, in float maxRange ) {
-
-			float maxRGB = max( value.x, max( value.g, value.b ) );
-			float D      = max( maxRange / maxRGB, 1.0 );
-			D            = clamp( floor( D ) / 255.0, 0.0, 1.0 );
-			return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );
-
-		}`
-	);
-
 	return {
 		LinearToLinear: LinearToLinear,
-		GammaToLinear: GammaToLinear,
-		LinearToGamma: LinearToGamma,
-		sRGBToLinear: sRGBToLinear,
-		LinearTosRGB: LinearTosRGB,
-		RGBEToLinear: RGBEToLinear,
-		LinearToRGBE: LinearToRGBE,
-		RGBMToLinear: RGBMToLinear,
-		LinearToRGBM: LinearToRGBM,
-		RGBDToLinear: RGBDToLinear,
-		LinearToRGBD: LinearToRGBD
+		LinearTosRGB: LinearTosRGB
 	};
 
 } )();
 
 ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
-
-ColorSpaceNode.GAMMA_TO_LINEAR = 'GammaToLinear';
-ColorSpaceNode.LINEAR_TO_GAMMA = 'LinearToGamma';
-
-ColorSpaceNode.SRGB_TO_LINEAR = 'sRGBToLinear';
 ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
-
-ColorSpaceNode.RGBE_TO_LINEAR = 'RGBEToLinear';
-ColorSpaceNode.LINEAR_TO_RGBE = 'LinearToRGBE';
-
-ColorSpaceNode.RGBM_TO_LINEAR = 'RGBMToLinear';
-ColorSpaceNode.LINEAR_TO_RGBM = 'LinearToRGBM';
-
-ColorSpaceNode.RGBD_TO_LINEAR = 'RGBDToLinear';
-ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD';
 
 ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
@@ -248,16 +134,6 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 			return [ 'Linear' ];
 		case sRGBEncoding:
 			return [ 'sRGB' ];
-		case RGBEEncoding:
-			return [ 'RGBE' ];
-		case RGBM7Encoding:
-			return [ 'RGBM', new FloatNode( 7.0 ).setReadonly( true ) ];
-		case RGBM16Encoding:
-			return [ 'RGBM', new FloatNode( 16.0 ).setReadonly( true ) ];
-		case RGBDEncoding:
-			return [ 'RGBD', new FloatNode( 256.0 ).setReadonly( true ) ];
-		case GammaEncoding:
-			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )', 'f' ) ];
 
 	}
 
