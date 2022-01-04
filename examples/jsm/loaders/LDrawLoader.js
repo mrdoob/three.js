@@ -167,6 +167,26 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 }
 
+function generateFaceNormals( faces ) {
+
+	for ( let i = 0, l = faces.length; i < l; i ++ ) {
+
+		const face = faces[ i ];
+		const vertices = face.vertices;
+		const v0 = vertices[ 0 ];
+		const v1 = vertices[ 1 ];
+		const v2 = vertices[ 2 ];
+
+		_tempVec0.subVectors( v1, v0 );
+		_tempVec1.subVectors( v2, v1 );
+		face.faceNormal = new Vector3()
+			.crossVectors( _tempVec0, _tempVec1 )
+			.normalize();
+
+	}
+
+}
+
 function smoothNormals( faces, lineSegments ) {
 
 	function hashVertex( v ) {
@@ -666,7 +686,21 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 		}
 
+		// create the normals array if this is a set of faces
 		if ( elementSize === 3 ) {
+
+			if ( ! elem.faceNormal ) {
+
+				const v0 = vertices[ 0 ];
+				const v1 = vertices[ 1 ];
+				const v2 = vertices[ 2 ];
+				_tempVec0.subVectors( v1, v0 );
+				_tempVec1.subVectors( v2, v1 );
+				elem.faceNormal = new Vector3()
+					.crossVectors( _tempVec0, _tempVec1 )
+					.normalize();
+
+			}
 
 			let elemNormals = elem.normals;
 			if ( elemNormals.length === 4 ) {
@@ -683,6 +717,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 			for ( let j = 0, l = elemNormals.length; j < l; j ++ ) {
 
+				// use face normal if a vertex normal is not provided
 				let n = elem.faceNormal;
 				if ( elemNormals[ j ] ) {
 
@@ -1321,8 +1356,7 @@ class LDrawLoader extends Loader {
 
 		let startingConstructionStep = false;
 
-		const scope = this;
-		function parseColourCode( lineParser, forEdge ) {
+		const parseColourCode = ( lineParser, forEdge ) => {
 
 			// Parses next colour code and returns a THREE.Material
 
@@ -1340,7 +1374,7 @@ class LDrawLoader extends Loader {
 
 			}
 
-			const material = scope.getMaterial( colourCode, currentParseScope );
+			const material = this.getMaterial( colourCode, currentParseScope );
 
 			if ( ! material ) {
 
@@ -1350,13 +1384,13 @@ class LDrawLoader extends Loader {
 
 			return material;
 
-		}
+		};
 
-		function parseVector( lp ) {
+		const parseVector = lp => {
 
 			const v = new Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
 
-			if ( ! scope.separateObjects ) {
+			if ( ! this.separateObjects ) {
 
 				v.applyMatrix4( currentParseScope.currentMatrix );
 
@@ -1364,7 +1398,7 @@ class LDrawLoader extends Loader {
 
 			return v;
 
-		}
+		};
 
 		// Parse all line commands
 		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -1413,7 +1447,7 @@ class LDrawLoader extends Loader {
 			let inverted;
 			let ccw;
 			let doubleSided;
-			let v0, v1, v2, v3, c0, c1, faceNormal;
+			let v0, v1, v2, v3, c0, c1;
 
 			switch ( lineType ) {
 
@@ -1437,8 +1471,8 @@ class LDrawLoader extends Loader {
 								// needs to be flipped.
 								if (
 									currentParseScope.matrix.determinant() < 0 && (
-										scope.separateObjects && isPrimitiveType( type ) ||
-											! scope.separateObjects
+										this.separateObjects && isPrimitiveType( type ) ||
+											! this.separateObjects
 									) ) {
 
 									currentParseScope.inverted = ! currentParseScope.inverted;
@@ -1600,10 +1634,10 @@ class LDrawLoader extends Loader {
 
 					let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
-					if ( scope.fileMap[ fileName ] ) {
+					if ( this.fileMap[ fileName ] ) {
 
 						// Found the subobject path in the preloaded file path map
-						fileName = scope.fileMap[ fileName ];
+						fileName = this.fileMap[ fileName ];
 
 					} else {
 
@@ -1695,16 +1729,10 @@ class LDrawLoader extends Loader {
 
 					}
 
-					_tempVec0.subVectors( v1, v0 );
-					_tempVec1.subVectors( v2, v1 );
-					faceNormal = new Vector3()
-						.crossVectors( _tempVec0, _tempVec1 )
-						.normalize();
-
 					faces.push( {
 						material: material,
 						colourCode: material.userData.code,
-						faceNormal: faceNormal,
+						faceNormal: null,
 						vertices: [ v0, v1, v2 ],
 						normals: [ null, null, null ],
 					} );
@@ -1715,7 +1743,7 @@ class LDrawLoader extends Loader {
 						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
-							faceNormal: faceNormal,
+							faceNormal: null,
 							vertices: [ v2, v1, v0 ],
 							normals: [ null, null, null ],
 						} );
@@ -1750,18 +1778,12 @@ class LDrawLoader extends Loader {
 
 					}
 
-					_tempVec0.subVectors( v1, v0 );
-					_tempVec1.subVectors( v2, v1 );
-					faceNormal = new Vector3()
-						.crossVectors( _tempVec0, _tempVec1 )
-						.normalize();
-
 					// specifically place the triangle diagonal in the v0 and v1 slots so we can
 					// account for the doubling of vertices later when smoothing normals.
 					faces.push( {
 						material: material,
 						colourCode: material.userData.code,
-						faceNormal: faceNormal,
+						faceNormal: null,
 						vertices: [ v0, v1, v2, v3 ],
 						normals: [ null, null, null, null ],
 					} );
@@ -1772,7 +1794,7 @@ class LDrawLoader extends Loader {
 						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
-							faceNormal: faceNormal,
+							faceNormal: null,
 							vertices: [ v3, v2, v1, v0 ],
 							normals: [ null, null, null, null ],
 						} );
@@ -1802,7 +1824,7 @@ class LDrawLoader extends Loader {
 		currentParseScope.subobjectIndex = 0;
 
 		const isRoot = ! parentParseScope.isFromParse;
-		if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
+		if ( isRoot || this.separateObjects && ! isPrimitiveType( type ) ) {
 
 			currentParseScope.groupObject = new Group();
 			currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
@@ -1860,6 +1882,7 @@ class LDrawLoader extends Loader {
 
 		if ( this.smoothNormals && doSmooth ) {
 
+			generateFaceNormals( subobjectParseScope.faces );
 			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
 
 		}
@@ -1953,13 +1976,9 @@ class LDrawLoader extends Loader {
 					const vertices = tri.vertices;
 					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-						vertices[ i ] = vertices[ i ].clone().applyMatrix4( subobjectParseScope.matrix );
+						vertices[ i ].applyMatrix4( subobjectParseScope.matrix );
 
 					}
-
-					_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
-					_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
-					tri.faceNormal.crossVectors( _tempVec0, _tempVec1 ).normalize();
 
 				}
 
@@ -2031,9 +2050,10 @@ class LDrawLoader extends Loader {
 
 				return scope.processObject( text, subobject, url, parseScope );
 
-			} ).catch( function () {
+			} ).catch( function ( err ) {
 
-				console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be found.' );
+				console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be loaded.' );
+				console.warn( err );
 				return null;
 
 			} );
