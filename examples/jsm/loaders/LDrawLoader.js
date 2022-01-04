@@ -587,6 +587,12 @@ class LineParser {
 
 	}
 
+	getVector() {
+
+		return new Vector3( parseFloat( this.getToken() ), parseFloat( this.getToken() ), parseFloat( this.getToken() ) );
+
+	}
+
 	getRemainingString() {
 
 		return this.line.substring( this.currentCharIndex, this.lineLength );
@@ -1487,12 +1493,6 @@ class LDrawLoader extends Loader {
 
 		};
 
-		const parseVector = lp => {
-
-			return new Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-
-		};
-
 		// Parse all line commands
 		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
@@ -1759,8 +1759,8 @@ class LDrawLoader extends Loader {
 				case '2':
 
 					material = parseColourCode( lp, true );
-					v0 = parseVector( lp );
-					v1 = parseVector( lp );
+					v0 = lp.getVector();
+					v1 = lp.getVector();
 
 					segment = {
 						material: material.userData.edgeMaterial,
@@ -1779,10 +1779,10 @@ class LDrawLoader extends Loader {
 				case '5':
 
 					material = parseColourCode( lp, true );
-					v0 = parseVector( lp );
-					v1 = parseVector( lp );
-					c0 = parseVector( lp );
-					c1 = parseVector( lp );
+					v0 = lp.getVector();
+					v1 = lp.getVector();
+					c0 = lp.getVector();
+					c1 = lp.getVector();
 
 					segment = {
 						material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
@@ -1806,15 +1806,15 @@ class LDrawLoader extends Loader {
 
 					if ( ccw === true ) {
 
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
-						v2 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						v2 = lp.getVector();
 
 					} else {
 
-						v2 = parseVector( lp );
-						v1 = parseVector( lp );
-						v0 = parseVector( lp );
+						v2 = lp.getVector();
+						v1 = lp.getVector();
+						v0 = lp.getVector();
 
 					}
 
@@ -1855,17 +1855,17 @@ class LDrawLoader extends Loader {
 
 					if ( ccw === true ) {
 
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
-						v2 = parseVector( lp );
-						v3 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						v2 = lp.getVector();
+						v3 = lp.getVector();
 
 					} else {
 
-						v3 = parseVector( lp );
-						v2 = parseVector( lp );
-						v1 = parseVector( lp );
-						v0 = parseVector( lp );
+						v3 = lp.getVector();
+						v2 = lp.getVector();
+						v1 = lp.getVector();
+						v0 = lp.getVector();
 
 					}
 
