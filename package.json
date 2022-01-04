@@ -55,6 +55,9 @@
       "GPUTextureUsage": "readonly"
     },
     "rules": {
+      "no-throw-literal": [
+        "error"
+      ],
       "quotes": [
         "error",
         "single"
