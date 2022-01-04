@@ -13,7 +13,8 @@ import {
 	ShaderMaterial,
 	UniformsLib,
 	UniformsUtils,
-	Vector3
+	Vector3,
+	Ray
 } from '../../../build/three.module.js';
 
 // Special surface finish tag types.
@@ -187,7 +188,8 @@ function generateFaceNormals( faces ) {
 
 }
 
-function smoothNormals( faces, lineSegments ) {
+const _ray = new Ray();
+function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 	function hashVertex( v ) {
 
@@ -207,7 +209,27 @@ function smoothNormals( faces, lineSegments ) {
 
 	}
 
+	// converts the two vertices to a ray with a normalized direction and origin of 0, 0, 0 projected
+	// onto the original line.
+	function toNormalizedRay( v0, v1, targetRay ) {
+
+		targetRay.direction.subVectors( v1, v0 ).normalize();
+
+		const scalar = v0.dot( targetRay.direction );
+		targetRay.origin.copy( v0 ).addScaledVector( targetRay.direction, - scalar );
+
+		return targetRay;
+
+	}
+
+	function hashRay( ray ) {
+
+		return hashEdge( ray.origin, ray.direction );
+
+	}
+
 	const hardEdges = new Set();
+	const hardEdgeRays = new Map();
 	const halfEdgeList = {};
 	const normals = [];
 
@@ -220,6 +242,43 @@ function smoothNormals( faces, lineSegments ) {
 		const v1 = vertices[ 1 ];
 		hardEdges.add( hashEdge( v0, v1 ) );
 		hardEdges.add( hashEdge( v1, v0 ) );
+
+		// only generate the hard edge ray map if we're checking subsegments because it's more expensive to check
+		// and requires more memory.
+		if ( checkSubSegments ) {
+
+			// add both ray directions to the map
+			const ray = toNormalizedRay( v0, v1, new Ray() );
+			const rh1 = hashRay( ray );
+			if ( ! hardEdgeRays.has( rh1 ) ) {
+
+				toNormalizedRay( v1, v0, ray );
+				const rh2 = hashRay( ray );
+
+				const info = {
+					ray,
+					distances: [],
+				};
+
+				hardEdgeRays.set( rh1, info );
+				hardEdgeRays.set( rh2, info );
+
+			}
+
+			// store both segments ends in min, max order in the distances array to check if a face edge is a
+			// subsegment later.
+			const info = hardEdgeRays.get( rh1 );
+			let d0 = info.ray.direction.dot( v0 );
+			let d1 = info.ray.direction.dot( v1 );
+			if ( d0 > d1 ) {
+
+				[ d0, d1 ] = [ d1, d0 ];
+
+			}
+
+			info.distances.push( d0, d1 );
+
+		}
 
 	}
 
@@ -238,7 +297,53 @@ function smoothNormals( faces, lineSegments ) {
 			const hash = hashEdge( v0, v1 );
 
 			// don't add the triangle if the edge is supposed to be hard
-			if ( hardEdges.has( hash ) ) continue;
+			if ( hardEdges.has( hash ) ) {
+
+				continue;
+
+			}
+
+			// if checking subsegments then check to see if this edge lies on a hard edge ray and whether its within any ray bounds
+			if ( checkSubSegments ) {
+
+				toNormalizedRay( v0, v1, _ray );
+
+				const rayHash = hashRay( _ray );
+				if ( hardEdgeRays.has( rayHash ) ) {
+
+					const info = hardEdgeRays.get( rayHash );
+					const { ray, distances } = info;
+					let d0 = ray.direction.dot( v0 );
+					let d1 = ray.direction.dot( v1 );
+
+					if ( d0 > d1 ) {
+
+						[ d0, d1 ] = [ d1, d0 ];
+
+					}
+
+					// return early if the face edge is found to be a subsegment of a line edge meaning the edge will have "hard" normals
+					let found = false;
+					for ( let i = 0, l = distances.length; i < l; i += 2 ) {
+
+						if ( d0 >= distances[ i ] && d1 <= distances[ i + 1 ] ) {
+
+							found = true;
+							break;
+
+						}
+
+					}
+
+					if ( found ) {
+
+						continue;
+
+					}
+
+				}
+
+			}
 
 			const info = {
 				index: index,
@@ -1005,6 +1110,7 @@ class LDrawLoader extends Loader {
 			lineSegments: [],
 			conditionalSegments: [],
 			totalFaces: 0,
+			faceMaterials: new Set(),
 
 			// If true, this object is the start of a construction step
 			startingConstructionStep: false
@@ -1751,6 +1857,8 @@ class LDrawLoader extends Loader {
 
 					}
 
+					currentParseScope.faceMaterials.add( material );
+
 					break;
 
 					// Line type 4: Quadrilateral
@@ -1883,7 +1991,11 @@ class LDrawLoader extends Loader {
 		if ( this.smoothNormals && doSmooth ) {
 
 			generateFaceNormals( subobjectParseScope.faces );
-			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
+
+			// only check subsetgments if we have multiple materials in a single part because this seems to be the case where it's needed most --
+			// there may be cases where a single edge line crosses over polygon edges that are broken up by multiple materials.
+			const checkSubSegments = subobjectParseScope.faceMaterials.size > 1;
+			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments, checkSubSegments );
 
 		}
 
@@ -1927,10 +2039,12 @@ class LDrawLoader extends Loader {
 			const parentLineSegments = parentParseScope.lineSegments;
 			const parentConditionalSegments = parentParseScope.conditionalSegments;
 			const parentFaces = parentParseScope.faces;
+			const parentFaceMaterials = parentParseScope.faceMaterials;
 
 			const lineSegments = subobjectParseScope.lineSegments;
 			const conditionalSegments = subobjectParseScope.conditionalSegments;
 			const faces = subobjectParseScope.faces;
+			const faceMaterials = subobjectParseScope.faceMaterials;
 
 			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
@@ -1987,6 +2101,7 @@ class LDrawLoader extends Loader {
 			}
 
 			parentParseScope.totalFaces += subobjectParseScope.totalFaces;
+			faceMaterials.forEach( material => parentFaceMaterials.add( material ) );
 
 		}
 
