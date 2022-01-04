@@ -587,6 +587,12 @@ class LineParser {
 
 	}
 
+	getVector() {
+
+		return new Vector3( parseFloat( this.getToken() ), parseFloat( this.getToken() ), parseFloat( this.getToken() ) );
+
+	}
+
 	getRemainingString() {
 
 		return this.line.substring( this.currentCharIndex, this.lineLength );
@@ -965,10 +971,6 @@ class LDrawLoader extends Loader {
 			this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
 		] );
 
-		// If this flag is set to true, each subobject will be a Object.
-		// If not (the default), only one object which contains all the merged primitives will be created.
-		this.separateObjects = false;
-
 		// If this flag is set to true the vertex normals will be smoothed.
 		this.smoothNormals = true;
 
@@ -1098,7 +1100,6 @@ class LDrawLoader extends Loader {
 			currentFileName: null,
 			mainColourCode: parentScope ? parentScope.mainColourCode : '16',
 			mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
-			currentMatrix: new Matrix4(),
 			matrix: new Matrix4(),
 			type: 'Model',
 			groupObject: null,
@@ -1492,20 +1493,6 @@ class LDrawLoader extends Loader {
 
 		};
 
-		const parseVector = lp => {
-
-			const v = new Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-
-			if ( ! this.separateObjects ) {
-
-				v.applyMatrix4( currentParseScope.currentMatrix );
-
-			}
-
-			return v;
-
-		};
-
 		// Parse all line commands
 		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
@@ -1572,18 +1559,6 @@ class LDrawLoader extends Loader {
 								type = lp.getToken();
 
 								currentParseScope.type = type;
-
-								// If the scale of the object is negated then the triangle winding order
-								// needs to be flipped.
-								if (
-									currentParseScope.matrix.determinant() < 0 && (
-										this.separateObjects && isPrimitiveType( type ) ||
-											! this.separateObjects
-									) ) {
-
-									currentParseScope.inverted = ! currentParseScope.inverted;
-
-								}
 
 								faces = currentParseScope.faces;
 								lineSegments = currentParseScope.lineSegments;
@@ -1776,8 +1751,8 @@ class LDrawLoader extends Loader {
 				case '2':
 
 					material = parseColourCode( lp, true );
-					v0 = parseVector( lp );
-					v1 = parseVector( lp );
+					v0 = lp.getVector();
+					v1 = lp.getVector();
 
 					segment = {
 						material: material.userData.edgeMaterial,
@@ -1796,10 +1771,10 @@ class LDrawLoader extends Loader {
 				case '5':
 
 					material = parseColourCode( lp, true );
-					v0 = parseVector( lp );
-					v1 = parseVector( lp );
-					c0 = parseVector( lp );
-					c1 = parseVector( lp );
+					v0 = lp.getVector();
+					v1 = lp.getVector();
+					c0 = lp.getVector();
+					c1 = lp.getVector();
 
 					segment = {
 						material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
@@ -1823,15 +1798,15 @@ class LDrawLoader extends Loader {
 
 					if ( ccw === true ) {
 
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
-						v2 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						v2 = lp.getVector();
 
 					} else {
 
-						v2 = parseVector( lp );
-						v1 = parseVector( lp );
-						v0 = parseVector( lp );
+						v2 = lp.getVector();
+						v1 = lp.getVector();
+						v0 = lp.getVector();
 
 					}
 
@@ -1872,17 +1847,17 @@ class LDrawLoader extends Loader {
 
 					if ( ccw === true ) {
 
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
-						v2 = parseVector( lp );
-						v3 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						v2 = lp.getVector();
+						v3 = lp.getVector();
 
 					} else {
 
-						v3 = parseVector( lp );
-						v2 = parseVector( lp );
-						v1 = parseVector( lp );
-						v0 = parseVector( lp );
+						v3 = lp.getVector();
+						v2 = lp.getVector();
+						v1 = lp.getVector();
+						v0 = lp.getVector();
 
 					}
 
@@ -1932,7 +1907,7 @@ class LDrawLoader extends Loader {
 		currentParseScope.subobjectIndex = 0;
 
 		const isRoot = ! parentParseScope.isFromParse;
-		if ( isRoot || this.separateObjects && ! isPrimitiveType( type ) ) {
+		if ( isRoot || ! isPrimitiveType( type ) ) {
 
 			currentParseScope.groupObject = new Group();
 			currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
@@ -2000,7 +1975,7 @@ class LDrawLoader extends Loader {
 		}
 
 		const isRoot = ! parentParseScope.isFromParse;
-		if ( this.separateObjects && ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
+		if ( ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
 
 			const objGroup = subobjectParseScope.groupObject;
 
@@ -2035,7 +2010,6 @@ class LDrawLoader extends Loader {
 
 		} else {
 
-			const separateObjects = this.separateObjects;
 			const parentLineSegments = parentParseScope.lineSegments;
 			const parentConditionalSegments = parentParseScope.conditionalSegments;
 			const parentFaces = parentParseScope.faces;
@@ -2045,18 +2019,15 @@ class LDrawLoader extends Loader {
 			const conditionalSegments = subobjectParseScope.conditionalSegments;
 			const faces = subobjectParseScope.faces;
 			const faceMaterials = subobjectParseScope.faceMaterials;
+			const matrix = subobjectParseScope.matrix;
+			const matrixScaleInverted = matrix.determinant() < 0;
 
 			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 				const ls = lineSegments[ i ];
-
-				if ( separateObjects ) {
-
-					const vertices = ls.vertices;
-					vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-					vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-				}
+				const vertices = ls.vertices;
+				vertices[ 0 ].applyMatrix4( matrix );
+				vertices[ 1 ].applyMatrix4( matrix );
 
 				parentLineSegments.push( ls );
 
@@ -2065,17 +2036,12 @@ class LDrawLoader extends Loader {
 			for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
 				const os = conditionalSegments[ i ];
-
-				if ( separateObjects ) {
-
-					const vertices = os.vertices;
-					const controlPoints = os.controlPoints;
-					vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-					vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-					controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-					controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-				}
+				const vertices = os.vertices;
+				const controlPoints = os.controlPoints;
+				vertices[ 0 ].applyMatrix4( matrix );
+				vertices[ 1 ].applyMatrix4( matrix );
+				controlPoints[ 0 ].applyMatrix4( matrix );
+				controlPoints[ 1 ].applyMatrix4( matrix );
 
 				parentConditionalSegments.push( os );
 
@@ -2084,15 +2050,18 @@ class LDrawLoader extends Loader {
 			for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 				const tri = faces[ i ];
+				const vertices = tri.vertices;
+				for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-				if ( separateObjects ) {
+					vertices[ i ].applyMatrix4( matrix );
 
-					const vertices = tri.vertices;
-					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+				}
 
-						vertices[ i ].applyMatrix4( subobjectParseScope.matrix );
+				// If the scale of the object is negated then the triangle winding order
+				// needs to be flipped.
+				if ( matrixScaleInverted ) {
 
-					}
+					vertices.reverse();
 
 				}
 
@@ -2119,7 +2088,6 @@ class LDrawLoader extends Loader {
 		// Set current matrix
 		if ( subobject ) {
 
-			parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
 			parseScope.matrix.copy( subobject.matrix );
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
