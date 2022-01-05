@@ -747,7 +747,7 @@ class LDrawParsedCache {
 
 			return original.clone();
 
-		} else if ( Array.isArray() ) {
+		} else if ( Array.isArray( original ) ) {
 
 			return original.map( e => this.cloneResult( e ) );
 
@@ -756,10 +756,12 @@ class LDrawParsedCache {
 			const result = {};
 			for ( const key in original ) {
 
-				if ( key === 'materials' ) result.materials = [ ...result.materials ];
-				else result[ key ] = this.cloneResult( original );
+				if ( key === 'materials' ) result.materials = [ ...original.materials ];
+				else result[ key ] = this.cloneResult( original[ key ] );
 
 			}
+
+			return result;
 
 		} else {
 
@@ -1064,9 +1066,6 @@ class LDrawParsedCache {
 					segment = {
 						material: null,
 						colourCode: colourCode,
-						v0: v0,
-						v1: v1,
-
 						vertices: [ v0, v1 ],
 					};
 
@@ -1197,7 +1196,7 @@ class LDrawParsedCache {
 
 		if ( parsingEmbeddedFiles ) {
 
-			this._loadAndParse( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+			this._loadAndParse( currentEmbeddedFileName, currentEmbeddedText );
 
 		}
 
@@ -1225,18 +1224,19 @@ class LDrawParsedCache {
 
 	_loadAndParse( fileName, text = null ) {
 
-		if ( fileName in this.cache ) {
+		const key = fileName.toLowerCase();
+		if ( key in this.cache ) {
 
-			return this.cache[ fileName ];
+			return this.cache[ key ];
 
 		}
 
-		this.cache[ fileName ] = new Promise( async resolve => {
+		this.cache[ key ] = new Promise( async resolve => {
 
 			// load the text data if not provided
 			if ( text === null ) {
 
-				text = await this.loader.fileCache.loadData( fileName );
+				text = await this.loader.fileCache.loadData( key );
 
 			}
 
@@ -1244,7 +1244,7 @@ class LDrawParsedCache {
 
 		} );
 
-		return this.cache[ fileName ];
+		return this.cache[ key ];
 
 	}
 
@@ -1545,7 +1545,8 @@ class LDrawLoader extends Loader {
 		fileLoader.setWithCredentials( this.withCredentials );
 		fileLoader.load( url, text => {
 
-			this.processObject( text, null, url, this.rootParseScope )
+			const parsedInfo = this.parseCache.parse( text );
+			this.processObject( parsedInfo, null, url, this.rootParseScope )
 				.then( function ( result ) {
 
 					onLoad( result.groupObject );
@@ -1559,7 +1560,8 @@ class LDrawLoader extends Loader {
 	parse( text, path, onLoad ) {
 
 		// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
-		this.processObject( text, null, path, this.rootParseScope )
+		const parsedInfo = this.parseCache.parse( text );
+		this.processObject( parsedInfo, null, path, this.rootParseScope )
 			.then( function ( result ) {
 
 				onLoad( result.groupObject );
@@ -1943,7 +1945,7 @@ class LDrawLoader extends Loader {
 
 	//
 
-	objectParse( text, parseScope ) {
+	objectParse( info, parseScope ) {
 
 		// Retrieve data from the parent parse scope
 		const currentParseScope = parseScope;
@@ -1953,11 +1955,9 @@ class LDrawLoader extends Loader {
 		const mainColourCode = currentParseScope.mainColourCode;
 		const mainEdgeColourCode = currentParseScope.mainEdgeColourCode;
 
-		const parseColourCode = ( lineParser, forEdge ) => {
+		const parseColourCode = ( colourCode, forEdge ) => {
 
 			// Parses next colour code and returns a THREE.Material
-
-			let colourCode = lineParser.getToken();
 
 			if ( ! forEdge && colourCode === '16' ) {
 
@@ -1975,7 +1975,7 @@ class LDrawLoader extends Loader {
 
 			if ( ! material ) {
 
-				throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + lineParser.getLineNumberString() + ' but it was not defined previously.' );
+				throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + ' but it was not defined previously.' );
 
 			}
 
@@ -1983,7 +1983,6 @@ class LDrawLoader extends Loader {
 
 		};
 
-		const info = this.parseCache.parse( text );
 		const faces = info.faces;
 		const lineSegments = info.lineSegments;
 		const conditionalSegments = info.conditionalSegments;
@@ -2004,7 +2003,7 @@ class LDrawLoader extends Loader {
 
 			const face = faces[ i ];
 			const colourCode = face.colourCode;
-			face.material = this.getMaterial( colourCode, currentParseScope );
+			face.material = parseColourCode( colourCode, currentParseScope );
 
 		}
 
@@ -2012,7 +2011,7 @@ class LDrawLoader extends Loader {
 
 			const ls = lineSegments[ i ];
 			const colourCode = ls.colourCode;
-			ls.material = this.getMaterial( colourCode, currentParseScope );
+			ls.material = parseColourCode( colourCode, currentParseScope );
 
 		}
 
@@ -2020,18 +2019,20 @@ class LDrawLoader extends Loader {
 
 			const cs = conditionalSegments[ i ];
 			const colourCode = cs.colourCode;
-			cs.material = this.getMaterial( colourCode, currentParseScope );
+			cs.material = parseColourCode( colourCode, currentParseScope );
 
 		}
 
 		currentParseScope.faces = info.faces;
-		currentParseScope.conditionalSegments = info.faces;
+		currentParseScope.conditionalSegments = info.conditionalSegments;
 		currentParseScope.lineSegments = info.lineSegments;
 		currentParseScope.category = info.category;
 		currentParseScope.keywords = info.keywords;
 		currentParseScope.subobjects = info.subobjects;
 		currentParseScope.numSubobjects = info.subobjects.length;
 		currentParseScope.subobjectIndex = 0;
+		currentParseScope.type = info.type;
+		currentParseScope.totalFaces = info.totalFaces;
 
 		const isRoot = ! parentParseScope.isFromParse;
 		if ( isRoot || ! isPrimitiveType( info.type ) ) {
@@ -2203,7 +2204,7 @@ class LDrawLoader extends Loader {
 
 	}
 
-	async processObject( text, subobject, url, parentScope ) {
+	async processObject( parsedInfo, subobject, url, parentScope ) {
 
 		const scope = this;
 
@@ -2218,14 +2219,14 @@ class LDrawLoader extends Loader {
 			parseScope.matrix.copy( subobject.matrix );
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
-			parseScope.mainColourCode = subobject.material.userData.code;
-			parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
+			parseScope.mainColourCode = subobject.colourCode;
+			parseScope.mainEdgeColourCode = subobject.colourCode;
 			parseScope.fileName = subobject.fileName;
 
 		}
 
 		// Parse the object
-		this.objectParse( text, parseScope );
+		this.objectParse( parsedInfo, parseScope );
 
 		const subobjects = parseScope.subobjects;
 		const promises = [];
@@ -2256,9 +2257,9 @@ class LDrawLoader extends Loader {
 
 		function loadSubobject( subobject ) {
 
-			return scope.cache.loadData( subobject.fileName ).then( function ( text ) {
+			return scope.parseCache.loadData( subobject.fileName ).then( function ( parsedInfo ) {
 
-				return scope.processObject( text, subobject, url, parseScope );
+				return scope.processObject( parsedInfo, subobject, url, parseScope );
 
 			} ).catch( function ( err ) {
 
