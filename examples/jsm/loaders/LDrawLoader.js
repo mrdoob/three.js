@@ -958,7 +958,7 @@ class LDrawLoader extends Loader {
 
 		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
-		this.cache = new LDrawFileCache( this );
+		this.fileCache = new LDrawFileCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = {};
@@ -1505,7 +1505,7 @@ class LDrawLoader extends Loader {
 				if ( line.startsWith( '0 FILE ' ) ) {
 
 					// Save previous embedded file in the cache
-					this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+					this.fileCache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
 
 					// New embedded text file
 					currentEmbeddedFileName = line.substring( 7 );
@@ -1896,7 +1896,7 @@ class LDrawLoader extends Loader {
 
 		if ( parsingEmbeddedFiles ) {
 
-			this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+			this.fileCache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
 
 		}
 
