@@ -619,22 +619,57 @@ class LineParser {
 
 }
 
-class LDrawFileCache {
+class LDrawParsedCache {
 
 	constructor( loader ) {
 
-		this.cache = {};
 		this.loader = loader;
+		this.cache = {};
 
 	}
 
-	setData( key, contents ) {
+	cloneResult( original, depth = 0 ) {
 
-		this.cache[ key.toLowerCase() ] = contents;
+		if ( original === null ) {
+
+			return null;
+
+		} else if ( original.isVector3 ) {
+
+			return original.clone();
+
+		} else if ( Array.isArray( original ) ) {
+
+			return original.map( e => this.cloneResult( e, depth + 1 ) );
+
+		} else if ( typeof original === 'object' ) {
+
+			const result = {};
+			for ( const key in original ) {
+
+				if ( key === 'materials' && depth === 0 ) {
+
+					result.materials = [ ...original.materials ];
+
+				} else {
+
+					result[ key ] = this.cloneResult( original[ key ], depth + 1 );
+
+				}
+
+			}
+
+			return result;
+
+		} else {
+
+			return original;
+
+		}
 
 	}
 
-	async loadData( fileName ) {
+	async fetchData( fileName ) {
 
 		const key = fileName.toLowerCase();
 		if ( key in this.cache ) {
@@ -706,7 +741,6 @@ class LDrawFileCache {
 				try {
 
 					const text = await fileLoader.loadAsync( subobjectURL );
-					this.setData( fileName, text );
 					resolve( text );
 					return;
 
@@ -723,51 +757,6 @@ class LDrawFileCache {
 		} );
 
 		return this.cache[ fileName ];
-
-	}
-
-}
-
-class LDrawParsedCache {
-
-	constructor( loader ) {
-
-		this.loader = loader;
-		this.cache = {};
-
-	}
-
-	cloneResult( original ) {
-
-		if ( original === null ) {
-
-			return null;
-
-		} else if ( original.isVector3 ) {
-
-			return original.clone();
-
-		} else if ( Array.isArray( original ) ) {
-
-			return original.map( e => this.cloneResult( e ) );
-
-		} else if ( typeof original === 'object' ) {
-
-			const result = {};
-			for ( const key in original ) {
-
-				if ( key === 'materials' ) result.materials = [ ...original.materials ];
-				else result[ key ] = this.cloneResult( original[ key ] );
-
-			}
-
-			return result;
-
-		} else {
-
-			return original;
-
-		}
 
 	}
 
@@ -1236,7 +1225,7 @@ class LDrawParsedCache {
 			// load the text data if not provided
 			if ( text === null ) {
 
-				text = await this.loader.fileCache.loadData( key );
+				text = await this.fetchData( key );
 
 			}
 
@@ -1480,7 +1469,6 @@ class LDrawLoader extends Loader {
 
 		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
-		this.fileCache = new LDrawFileCache( this );
 		this.parseCache = new LDrawParsedCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
@@ -2219,9 +2207,19 @@ class LDrawLoader extends Loader {
 			parseScope.matrix.copy( subobject.matrix );
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
-			parseScope.mainColourCode = subobject.colourCode;
-			parseScope.mainEdgeColourCode = subobject.colourCode;
 			parseScope.fileName = subobject.fileName;
+			if ( subobject.colourCode === '16' && parseScope.parentScope ) {
+
+				const parentScope = parseScope.parentScope;
+				parseScope.mainColourCode = parentScope.mainColourCode;
+				parseScope.mainEdgeColourCode = parentScope.mainEdgeColourCode;
+
+			} else if ( subobject.colourCode !== '16' ) {
+
+				parseScope.mainColourCode = subobject.colourCode;
+				parseScope.mainEdgeColourCode = subobject.colourCode;
+
+			}
 
 		}
 
