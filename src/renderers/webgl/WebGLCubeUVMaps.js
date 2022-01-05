@@ -30,14 +30,10 @@ function WebGLCubeUVMaps( renderer ) {
 
 					if ( ( isEquirectMap && image && image.height > 0 ) || ( isCubeMap && image && isCubeTextureComplete( image ) ) ) {
 
-						const currentRenderTarget = renderer.getRenderTarget();
-
 						if ( pmremGenerator === null ) pmremGenerator = new PMREMGenerator( renderer );
 
 						const renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture ) : pmremGenerator.fromCubemap( texture );
 						cubeUVmaps.set( texture, renderTarget );
-
-						renderer.setRenderTarget( currentRenderTarget );
 
 						texture.addEventListener( 'dispose', onTextureDispose );
 
