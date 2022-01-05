@@ -2003,7 +2003,7 @@ class LDrawLoader extends Loader {
 
 			const face = faces[ i ];
 			const colourCode = face.colourCode;
-			face.material = parseColourCode( colourCode, currentParseScope );
+			face.material = parseColourCode( colourCode, false );
 
 		}
 
@@ -2011,7 +2011,7 @@ class LDrawLoader extends Loader {
 
 			const ls = lineSegments[ i ];
 			const colourCode = ls.colourCode;
-			ls.material = parseColourCode( colourCode, currentParseScope );
+			ls.material = parseColourCode( colourCode, true ).userData.edgeMaterial;
 
 		}
 
@@ -2019,7 +2019,7 @@ class LDrawLoader extends Loader {
 
 			const cs = conditionalSegments[ i ];
 			const colourCode = cs.colourCode;
-			cs.material = parseColourCode( colourCode, currentParseScope );
+			cs.material = parseColourCode( colourCode, true ).userData.edgeMaterial.userData.conditionalEdgeMaterial
 
 		}
 
@@ -2187,7 +2187,7 @@ class LDrawLoader extends Loader {
 
 				// If the scale of the object is negated then the triangle winding order
 				// needs to be flipped.
-				if ( matrixScaleInverted ) {
+				if ( matrixScaleInverted !== subobjectParseScope.inverted ) {
 
 					vertices.reverse();
 
