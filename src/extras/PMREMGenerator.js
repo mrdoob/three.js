@@ -124,9 +124,9 @@ class PMREMGenerator {
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromEquirectangular( equirectangular ) {
+	fromEquirectangular( equirectangular, renderTarget = null ) {
 
-		return this._fromTexture( equirectangular );
+		return this._fromTexture( equirectangular, renderTarget );
 
 	}
 
@@ -135,9 +135,9 @@ class PMREMGenerator {
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromCubemap( cubemap ) {
+	fromCubemap( cubemap, renderTarget = null ) {
 
-		return this._fromTexture( cubemap );
+		return this._fromTexture( cubemap, renderTarget );
 
 	}
 
@@ -202,10 +202,10 @@ class PMREMGenerator {
 
 	}
 
-	_fromTexture( texture ) {
+	_fromTexture( texture, renderTarget ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
-		const cubeUVRenderTarget = this._allocateTargets( texture );
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets( texture );
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
