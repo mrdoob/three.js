@@ -762,7 +762,6 @@ class LDrawParsedCache {
 
 	parse( text ) {
 
-		// TODO: we should specify any locally available materials here?
 		const loader = this.loader;
 
 		// final results
@@ -771,6 +770,13 @@ class LDrawParsedCache {
 		const conditionalSegments = [];
 		const subobjects = [];
 		const materials = [];
+		const materialMap = {};
+
+		const getLocalMaterial = colourCode => {
+
+			return colourCode in materialMap ? materialMap[ colourCode ] : null;
+
+		};
 
 		let type = 'Model';
 		let category = null;
@@ -870,6 +876,7 @@ class LDrawParsedCache {
 								if ( material ) {
 
 									materials.push( material );
+									materialMap[ material.userData.colourCode ] = material;
 
 								}	else {
 
@@ -990,6 +997,7 @@ class LDrawParsedCache {
 				case '1':
 
 					colourCode = lp.getToken();
+					material = getLocalMaterial( colourCode );
 
 					const posX = parseFloat( lp.getToken() );
 					const posY = parseFloat( lp.getToken() );
@@ -1034,6 +1042,7 @@ class LDrawParsedCache {
 					}
 
 					subobjects.push( {
+						material: material,
 						colourCode: colourCode,
 						matrix: matrix,
 						fileName: fileName,
@@ -1049,11 +1058,12 @@ class LDrawParsedCache {
 				case '2':
 
 					colourCode = lp.getToken();
+					material = getLocalMaterial( colourCode );
 					v0 = lp.getVector();
 					v1 = lp.getVector();
 
 					segment = {
-						material: null,
+						material: material,
 						colourCode: colourCode,
 						vertices: [ v0, v1 ],
 					};
@@ -1066,13 +1076,14 @@ class LDrawParsedCache {
 				case '5':
 
 					colourCode = lp.getToken();
+					material = getLocalMaterial( colourCode );
 					v0 = lp.getVector();
 					v1 = lp.getVector();
 					c0 = lp.getVector();
 					c1 = lp.getVector();
 
 					segment = {
-						material: null,
+						material: material,
 						colourCode: colourCode,
 						vertices: [ v0, v1 ],
 						controlPoints: [ c0, c1 ],
@@ -1086,6 +1097,7 @@ class LDrawParsedCache {
 				case '3':
 
 					colourCode = lp.getToken();
+					material = getLocalMaterial( colourCode );
 					ccw = bfcCCW;
 					doubleSided = ! bfcCertified || ! bfcCull;
 
@@ -1104,7 +1116,7 @@ class LDrawParsedCache {
 					}
 
 					faces.push( {
-						material: null,
+						material: material,
 						colourCode: colourCode,
 						faceNormal: null,
 						vertices: [ v0, v1, v2 ],
@@ -1115,7 +1127,7 @@ class LDrawParsedCache {
 					if ( doubleSided === true ) {
 
 						faces.push( {
-							material: null,
+							material: material,
 							colourCode: colourCode,
 							faceNormal: null,
 							vertices: [ v2, v1, v0 ],
@@ -1131,6 +1143,7 @@ class LDrawParsedCache {
 				case '4':
 
 					colourCode = lp.getToken();
+					material = getLocalMaterial( colourCode );
 					ccw = bfcCCW;
 					doubleSided = ! bfcCertified || ! bfcCull;
 
@@ -1153,7 +1166,7 @@ class LDrawParsedCache {
 					// specifically place the triangle diagonal in the v0 and v1 slots so we can
 					// account for the doubling of vertices later when smoothing normals.
 					faces.push( {
-						material: null,
+						material: material,
 						colourCode: colourCode,
 						faceNormal: null,
 						vertices: [ v0, v1, v2, v3 ],
@@ -1164,7 +1177,7 @@ class LDrawParsedCache {
 					if ( doubleSided === true ) {
 
 						faces.push( {
-							material: null,
+							material: material,
 							colourCode: colourCode,
 							faceNormal: null,
 							vertices: [ v3, v2, v1, v0 ],
@@ -1364,7 +1377,24 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 			}
 
-			materials.push( elem.material );
+			const material = elem.material;
+			if ( elementSize === 3 ) {
+
+				materials.push( material );
+
+			} else if ( elementSize === 2 ) {
+
+				if ( isConditionalSegments ) {
+
+					materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
+
+				} else {
+
+					materials.push( material.userData.edgeMaterial );
+
+				}
+
+			}
 
 			prevMaterial = elem.material;
 			index0 = offset / 3;
@@ -1547,7 +1577,7 @@ class LDrawLoader extends Loader {
 
 	parse( text, path, onLoad ) {
 
-		// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
+		// Async parse. This function calls onParse with the parsed THREE.Object3D as parameter
 		const parsedInfo = this.parseCache.parse( text );
 		this.processObject( parsedInfo, null, path, this.rootParseScope )
 			.then( function ( result ) {
@@ -1990,24 +2020,33 @@ class LDrawLoader extends Loader {
 		for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 			const face = faces[ i ];
-			const colourCode = face.colourCode;
-			face.material = parseColourCode( colourCode, false );
+			if ( face.material === null ) {
+
+				face.material = parseColourCode( face.colourCode, false );
+
+			}
 
 		}
 
 		for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 			const ls = lineSegments[ i ];
-			const colourCode = ls.colourCode;
-			ls.material = parseColourCode( colourCode, true ).userData.edgeMaterial;
+			if ( ls.material === null ) {
+
+				ls.material = parseColourCode( ls.colourCode, true );
+
+			}
 
 		}
 
 		for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
 			const cs = conditionalSegments[ i ];
-			const colourCode = cs.colourCode;
-			cs.material = parseColourCode( colourCode, true ).userData.edgeMaterial.userData.conditionalEdgeMaterial
+			if ( cs.material === null ) {
+
+				cs.material = parseColourCode( cs.colourCode, true );
+
+			}
 
 		}
 
