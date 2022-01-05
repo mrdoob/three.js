@@ -728,6 +728,528 @@ class LDrawFileCache {
 
 }
 
+class LDrawParsedCache {
+
+	constructor( loader ) {
+
+		this.loader = loader;
+		this.cache = {};
+
+	}
+
+	cloneResult( original ) {
+
+		if ( original === null ) {
+
+			return null;
+
+		} else if ( original.isVector3 ) {
+
+			return original.clone();
+
+		} else if ( Array.isArray() ) {
+
+			return original.map( e => this.cloneResult( e ) );
+
+		} else if ( typeof original === 'object' ) {
+
+			const result = {};
+			for ( const key in original ) {
+
+				if ( key === 'materials' ) result.materials = [ ...result.materials ];
+				else result[ key ] = this.cloneResult( original );
+
+			}
+
+		} else {
+
+			return original;
+
+		}
+
+	}
+
+	parse( text ) {
+
+		// TODO: we should specify any locally available materials here?
+		const loader = this.loader;
+
+		// final results
+		const faces = [];
+		const lineSegments = [];
+		const conditionalSegments = [];
+		const subobjects = [];
+		const materials = [];
+
+		let type = 'Model';
+		let category = null;
+		let keywords = null;
+		let totalFaces = 0;
+
+		// split into lines
+		if ( text.indexOf( '\r\n' ) !== - 1 ) {
+
+			// This is faster than String.split with regex that splits on both
+			text = text.replace( /\r\n/g, '\n' );
+
+		}
+
+		const lines = text.split( '\n' );
+		const numLines = lines.length;
+
+		let parsingEmbeddedFiles = false;
+		let currentEmbeddedFileName = null;
+		let currentEmbeddedText = null;
+
+		let bfcCertified = false;
+		let bfcCCW = true;
+		let bfcInverted = false;
+		let bfcCull = true;
+
+		let startingConstructionStep = false;
+
+		// Parse all line commands
+		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
+
+			const line = lines[ lineIndex ];
+
+			if ( line.length === 0 ) continue;
+
+			if ( parsingEmbeddedFiles ) {
+
+				if ( line.startsWith( '0 FILE ' ) ) {
+
+					// Save previous embedded file in the cache
+					this._loadAndParse( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+
+					// New embedded text file
+					currentEmbeddedFileName = line.substring( 7 );
+					currentEmbeddedText = '';
+
+				} else {
+
+					currentEmbeddedText += line + '\n';
+
+				}
+
+				continue;
+
+			}
+
+			const lp = new LineParser( line, lineIndex + 1 );
+			lp.seekNonSpace();
+
+			if ( lp.isAtTheEnd() ) {
+
+				// Empty line
+				continue;
+
+			}
+
+			// Parse the line type
+			const lineType = lp.getToken();
+
+			let material;
+			let colourCode;
+			let segment;
+			let ccw;
+			let doubleSided;
+			let v0, v1, v2, v3, c0, c1;
+
+			switch ( lineType ) {
+
+				// Line type 0: Comment or META
+				case '0':
+
+					// Parse meta directive
+					const meta = lp.getToken();
+
+					if ( meta ) {
+
+						switch ( meta ) {
+
+							case '!LDRAW_ORG':
+
+								type = lp.getToken();
+								break;
+
+							case '!COLOUR':
+
+								material = loader.parseColourMetaDirective( lp );
+								if ( material ) {
+
+									materials.push( material );
+
+								}	else {
+
+									console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
+
+								}
+
+								break;
+
+							case '!CATEGORY':
+
+								category = lp.getToken();
+								break;
+
+							case '!KEYWORDS':
+
+								const newKeywords = lp.getRemainingString().split( ',' );
+								if ( newKeywords.length > 0 ) {
+
+									if ( ! keywords ) {
+
+										keywords = [];
+
+									}
+
+									newKeywords.forEach( function ( keyword ) {
+
+										keywords.push( keyword.trim() );
+
+									} );
+
+								}
+
+								break;
+
+							case 'FILE':
+
+								if ( lineIndex > 0 ) {
+
+									// Start embedded text files parsing
+									parsingEmbeddedFiles = true;
+									currentEmbeddedFileName = lp.getRemainingString();
+									currentEmbeddedText = '';
+
+									bfcCertified = false;
+									bfcCCW = true;
+
+								}
+
+								break;
+
+							case 'BFC':
+
+								// Changes to the backface culling state
+								while ( ! lp.isAtTheEnd() ) {
+
+									const token = lp.getToken();
+
+									switch ( token ) {
+
+										case 'CERTIFY':
+										case 'NOCERTIFY':
+
+											bfcCertified = token === 'CERTIFY';
+											bfcCCW = true;
+
+											break;
+
+										case 'CW':
+										case 'CCW':
+
+											bfcCCW = token === 'CCW';
+
+											break;
+
+										case 'INVERTNEXT':
+
+											bfcInverted = true;
+
+											break;
+
+										case 'CLIP':
+										case 'NOCLIP':
+
+											bfcCull = token === 'CLIP';
+
+											break;
+
+										default:
+
+											console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
+
+											break;
+
+									}
+
+								}
+
+								break;
+
+							case 'STEP':
+
+								startingConstructionStep = true;
+
+								break;
+
+							default:
+								// Other meta directives are not implemented
+								break;
+
+						}
+
+					}
+
+					break;
+
+					// Line type 1: Sub-object file
+				case '1':
+
+					colourCode = lp.getToken();
+
+					const posX = parseFloat( lp.getToken() );
+					const posY = parseFloat( lp.getToken() );
+					const posZ = parseFloat( lp.getToken() );
+					const m0 = parseFloat( lp.getToken() );
+					const m1 = parseFloat( lp.getToken() );
+					const m2 = parseFloat( lp.getToken() );
+					const m3 = parseFloat( lp.getToken() );
+					const m4 = parseFloat( lp.getToken() );
+					const m5 = parseFloat( lp.getToken() );
+					const m6 = parseFloat( lp.getToken() );
+					const m7 = parseFloat( lp.getToken() );
+					const m8 = parseFloat( lp.getToken() );
+
+					const matrix = new Matrix4().set(
+						m0, m1, m2, posX,
+						m3, m4, m5, posY,
+						m6, m7, m8, posZ,
+						0, 0, 0, 1
+					);
+
+					let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
+
+					if ( loader.fileMap[ fileName ] ) {
+
+						// Found the subobject path in the preloaded file path map
+						fileName = loader.fileMap[ fileName ];
+
+					} else {
+
+						// Standardized subfolders
+						if ( fileName.startsWith( 's/' ) ) {
+
+							fileName = 'parts/' + fileName;
+
+						} else if ( fileName.startsWith( '48/' ) ) {
+
+							fileName = 'p/' + fileName;
+
+						}
+
+					}
+
+					subobjects.push( {
+						colourCode: colourCode,
+						matrix: matrix,
+						fileName: fileName,
+						inverted: bfcInverted,
+						startingConstructionStep: startingConstructionStep
+					} );
+
+					bfcInverted = false;
+
+					break;
+
+					// Line type 2: Line segment
+				case '2':
+
+					colourCode = lp.getToken();
+					v0 = lp.getVector();
+					v1 = lp.getVector();
+
+					segment = {
+						material: null,
+						colourCode: colourCode,
+						v0: v0,
+						v1: v1,
+
+						vertices: [ v0, v1 ],
+					};
+
+					lineSegments.push( segment );
+
+					break;
+
+					// Line type 5: Conditional Line segment
+				case '5':
+
+					colourCode = lp.getToken();
+					v0 = lp.getVector();
+					v1 = lp.getVector();
+					c0 = lp.getVector();
+					c1 = lp.getVector();
+
+					segment = {
+						material: null,
+						colourCode: colourCode,
+						vertices: [ v0, v1 ],
+						controlPoints: [ c0, c1 ],
+					};
+
+					conditionalSegments.push( segment );
+
+					break;
+
+					// Line type 3: Triangle
+				case '3':
+
+					colourCode = lp.getToken();
+					ccw = bfcCCW;
+					doubleSided = ! bfcCertified || ! bfcCull;
+
+					if ( ccw === true ) {
+
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						v2 = lp.getVector();
+
+					} else {
+
+						v2 = lp.getVector();
+						v1 = lp.getVector();
+						v0 = lp.getVector();
+
+					}
+
+					faces.push( {
+						material: null,
+						colourCode: colourCode,
+						faceNormal: null,
+						vertices: [ v0, v1, v2 ],
+						normals: [ null, null, null ],
+					} );
+					totalFaces ++;
+
+					if ( doubleSided === true ) {
+
+						faces.push( {
+							material: null,
+							colourCode: colourCode,
+							faceNormal: null,
+							vertices: [ v2, v1, v0 ],
+							normals: [ null, null, null ],
+						} );
+						totalFaces ++;
+
+					}
+
+					break;
+
+					// Line type 4: Quadrilateral
+				case '4':
+
+					colourCode = lp.getToken();
+					ccw = bfcCCW;
+					doubleSided = ! bfcCertified || ! bfcCull;
+
+					if ( ccw === true ) {
+
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						v2 = lp.getVector();
+						v3 = lp.getVector();
+
+					} else {
+
+						v3 = lp.getVector();
+						v2 = lp.getVector();
+						v1 = lp.getVector();
+						v0 = lp.getVector();
+
+					}
+
+					// specifically place the triangle diagonal in the v0 and v1 slots so we can
+					// account for the doubling of vertices later when smoothing normals.
+					faces.push( {
+						material: null,
+						colourCode: colourCode,
+						faceNormal: null,
+						vertices: [ v0, v1, v2, v3 ],
+						normals: [ null, null, null, null ],
+					} );
+					totalFaces += 2;
+
+					if ( doubleSided === true ) {
+
+						faces.push( {
+							material: null,
+							colourCode: colourCode,
+							faceNormal: null,
+							vertices: [ v3, v2, v1, v0 ],
+							normals: [ null, null, null, null ],
+						} );
+						totalFaces += 2;
+
+					}
+
+					break;
+
+				default:
+					throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
+
+			}
+
+		}
+
+		if ( parsingEmbeddedFiles ) {
+
+			this._loadAndParse( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+
+		}
+
+		return {
+			faces,
+			conditionalSegments,
+			lineSegments,
+			type,
+			category,
+			keywords,
+			subobjects,
+			totalFaces,
+			startingConstructionStep,
+			materials
+		};
+
+	}
+
+	async loadData( fileName ) {
+
+		const result = await this._loadAndParse( fileName );
+		return this.cloneResult( result );
+
+	}
+
+	_loadAndParse( fileName, text = null ) {
+
+		if ( fileName in this.cache ) {
+
+			return this.cache[ fileName ];
+
+		}
+
+		this.cache[ fileName ] = new Promise( async resolve => {
+
+			// load the text data if not provided
+			if ( text === null ) {
+
+				text = await this.loader.fileCache.loadData( fileName );
+
+			}
+
+			resolve( this.parse( text ) );
+
+		} );
+
+		return this.cache[ fileName ];
+
+	}
+
+}
+
 function sortByMaterial( a, b ) {
 
 	if ( a.colourCode === b.colourCode ) {
@@ -959,6 +1481,7 @@ class LDrawLoader extends Loader {
 		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
 		this.fileCache = new LDrawFileCache( this );
+		this.parseCache = new LDrawParsedCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = {};
@@ -1430,39 +1953,6 @@ class LDrawLoader extends Loader {
 		const mainColourCode = currentParseScope.mainColourCode;
 		const mainEdgeColourCode = currentParseScope.mainEdgeColourCode;
 
-
-		// Parse result variables
-		let faces;
-		let lineSegments;
-		let conditionalSegments;
-
-		const subobjects = [];
-
-		let category = null;
-		let keywords = null;
-
-		if ( text.indexOf( '\r\n' ) !== - 1 ) {
-
-			// This is faster than String.split with regex that splits on both
-			text = text.replace( /\r\n/g, '\n' );
-
-		}
-
-		const lines = text.split( '\n' );
-		const numLines = lines.length;
-
-		let parsingEmbeddedFiles = false;
-		let currentEmbeddedFileName = null;
-		let currentEmbeddedText = null;
-
-		let bfcCertified = false;
-		let bfcCCW = true;
-		let bfcInverted = false;
-		let bfcCull = true;
-		let type = '';
-
-		let startingConstructionStep = false;
-
 		const parseColourCode = ( lineParser, forEdge ) => {
 
 			// Parses next colour code and returns a THREE.Material
@@ -1493,421 +1983,58 @@ class LDrawLoader extends Loader {
 
 		};
 
-		// Parse all line commands
-		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
-
-			const line = lines[ lineIndex ];
-
-			if ( line.length === 0 ) continue;
-
-			if ( parsingEmbeddedFiles ) {
-
-				if ( line.startsWith( '0 FILE ' ) ) {
-
-					// Save previous embedded file in the cache
-					this.fileCache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
-
-					// New embedded text file
-					currentEmbeddedFileName = line.substring( 7 );
-					currentEmbeddedText = '';
-
-				} else {
-
-					currentEmbeddedText += line + '\n';
-
-				}
-
-				continue;
-
-			}
-
-			const lp = new LineParser( line, lineIndex + 1 );
-
-			lp.seekNonSpace();
-
-			if ( lp.isAtTheEnd() ) {
-
-				// Empty line
-				continue;
-
-			}
-
-			// Parse the line type
-			const lineType = lp.getToken();
-
-			let material;
-			let segment;
-			let inverted;
-			let ccw;
-			let doubleSided;
-			let v0, v1, v2, v3, c0, c1;
-
-			switch ( lineType ) {
-
-				// Line type 0: Comment or META
-				case '0':
-
-					// Parse meta directive
-					const meta = lp.getToken();
-
-					if ( meta ) {
-
-						switch ( meta ) {
-
-							case '!LDRAW_ORG':
-
-								type = lp.getToken();
-
-								currentParseScope.type = type;
-
-								faces = currentParseScope.faces;
-								lineSegments = currentParseScope.lineSegments;
-								conditionalSegments = currentParseScope.conditionalSegments;
-
-								break;
-
-							case '!COLOUR':
-
-								material = this.parseColourMetaDirective( lp );
-								if ( material ) {
-
-									this.addMaterial( material, parseScope );
-
-								}	else {
-
-									console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
-
-								}
-
-								break;
-
-							case '!CATEGORY':
-
-								category = lp.getToken();
-								break;
-
-							case '!KEYWORDS':
-
-								const newKeywords = lp.getRemainingString().split( ',' );
-								if ( newKeywords.length > 0 ) {
-
-									if ( ! keywords ) {
-
-										keywords = [];
-
-									}
-
-									newKeywords.forEach( function ( keyword ) {
-
-										keywords.push( keyword.trim() );
-
-									} );
-
-								}
-
-								break;
-
-							case 'FILE':
-
-								if ( lineIndex > 0 ) {
-
-									// Start embedded text files parsing
-									parsingEmbeddedFiles = true;
-									currentEmbeddedFileName = lp.getRemainingString();
-									currentEmbeddedText = '';
-
-									bfcCertified = false;
-									bfcCCW = true;
-
-								}
-
-								break;
-
-							case 'BFC':
-
-								// Changes to the backface culling state
-								while ( ! lp.isAtTheEnd() ) {
-
-									const token = lp.getToken();
-
-									switch ( token ) {
-
-										case 'CERTIFY':
-										case 'NOCERTIFY':
-
-											bfcCertified = token === 'CERTIFY';
-											bfcCCW = true;
-
-											break;
-
-										case 'CW':
-										case 'CCW':
-
-											bfcCCW = token === 'CCW';
-
-											break;
-
-										case 'INVERTNEXT':
-
-											bfcInverted = true;
-
-											break;
-
-										case 'CLIP':
-										case 'NOCLIP':
-
-											  bfcCull = token === 'CLIP';
-
-											break;
-
-										default:
-
-											console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
-
-											break;
-
-									}
-
-								}
-
-								break;
-
-							case 'STEP':
-
-								startingConstructionStep = true;
-
-								break;
-
-							default:
-								// Other meta directives are not implemented
-								break;
-
-						}
-
-					}
-
-					break;
-
-					// Line type 1: Sub-object file
-				case '1':
-
-					material = parseColourCode( lp );
-
-					const posX = parseFloat( lp.getToken() );
-					const posY = parseFloat( lp.getToken() );
-					const posZ = parseFloat( lp.getToken() );
-					const m0 = parseFloat( lp.getToken() );
-					const m1 = parseFloat( lp.getToken() );
-					const m2 = parseFloat( lp.getToken() );
-					const m3 = parseFloat( lp.getToken() );
-					const m4 = parseFloat( lp.getToken() );
-					const m5 = parseFloat( lp.getToken() );
-					const m6 = parseFloat( lp.getToken() );
-					const m7 = parseFloat( lp.getToken() );
-					const m8 = parseFloat( lp.getToken() );
-
-					const matrix = new Matrix4().set(
-						m0, m1, m2, posX,
-						m3, m4, m5, posY,
-						m6, m7, m8, posZ,
-						0, 0, 0, 1
-					);
-
-					let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
-
-					if ( this.fileMap[ fileName ] ) {
-
-						// Found the subobject path in the preloaded file path map
-						fileName = this.fileMap[ fileName ];
-
-					} else {
-
-						// Standardized subfolders
-						if ( fileName.startsWith( 's/' ) ) {
-
-							fileName = 'parts/' + fileName;
-
-						} else if ( fileName.startsWith( '48/' ) ) {
-
-							fileName = 'p/' + fileName;
-
-						}
-
-					}
-
-					subobjects.push( {
-						material: material,
-						matrix: matrix,
-						fileName: fileName,
-						inverted: bfcInverted !== currentParseScope.inverted,
-						startingConstructionStep: startingConstructionStep
-					} );
-
-					bfcInverted = false;
-
-					break;
-
-					// Line type 2: Line segment
-				case '2':
-
-					material = parseColourCode( lp, true );
-					v0 = lp.getVector();
-					v1 = lp.getVector();
-
-					segment = {
-						material: material.userData.edgeMaterial,
-						colourCode: material.userData.code,
-						v0: v0,
-						v1: v1,
-
-						vertices: [ v0, v1 ],
-					};
-
-					lineSegments.push( segment );
-
-					break;
-
-					// Line type 5: Conditional Line segment
-				case '5':
-
-					material = parseColourCode( lp, true );
-					v0 = lp.getVector();
-					v1 = lp.getVector();
-					c0 = lp.getVector();
-					c1 = lp.getVector();
-
-					segment = {
-						material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
-						colourCode: material.userData.code,
-						vertices: [ v0, v1 ],
-						controlPoints: [ c0, c1 ],
-					};
-
-					conditionalSegments.push( segment );
-
-					break;
-
-					// Line type 3: Triangle
-				case '3':
-
-					material = parseColourCode( lp );
-
-					inverted = currentParseScope.inverted;
-					ccw = bfcCCW !== inverted;
-					doubleSided = ! bfcCertified || ! bfcCull;
-
-					if ( ccw === true ) {
-
-						v0 = lp.getVector();
-						v1 = lp.getVector();
-						v2 = lp.getVector();
-
-					} else {
-
-						v2 = lp.getVector();
-						v1 = lp.getVector();
-						v0 = lp.getVector();
-
-					}
-
-					faces.push( {
-						material: material,
-						colourCode: material.userData.code,
-						faceNormal: null,
-						vertices: [ v0, v1, v2 ],
-						normals: [ null, null, null ],
-					} );
-					currentParseScope.totalFaces ++;
-
-					if ( doubleSided === true ) {
-
-						faces.push( {
-							material: material,
-							colourCode: material.userData.code,
-							faceNormal: null,
-							vertices: [ v2, v1, v0 ],
-							normals: [ null, null, null ],
-						} );
-						currentParseScope.totalFaces ++;
-
-					}
-
-					currentParseScope.faceMaterials.add( material );
-
-					break;
-
-					// Line type 4: Quadrilateral
-				case '4':
-
-					material = parseColourCode( lp );
-
-					inverted = currentParseScope.inverted;
-					ccw = bfcCCW !== inverted;
-					doubleSided = ! bfcCertified || ! bfcCull;
-
-					if ( ccw === true ) {
-
-						v0 = lp.getVector();
-						v1 = lp.getVector();
-						v2 = lp.getVector();
-						v3 = lp.getVector();
-
-					} else {
-
-						v3 = lp.getVector();
-						v2 = lp.getVector();
-						v1 = lp.getVector();
-						v0 = lp.getVector();
-
-					}
-
-					// specifically place the triangle diagonal in the v0 and v1 slots so we can
-					// account for the doubling of vertices later when smoothing normals.
-					faces.push( {
-						material: material,
-						colourCode: material.userData.code,
-						faceNormal: null,
-						vertices: [ v0, v1, v2, v3 ],
-						normals: [ null, null, null, null ],
-					} );
-					currentParseScope.totalFaces += 2;
-
-					if ( doubleSided === true ) {
-
-						faces.push( {
-							material: material,
-							colourCode: material.userData.code,
-							faceNormal: null,
-							vertices: [ v3, v2, v1, v0 ],
-							normals: [ null, null, null, null ],
-						} );
-						currentParseScope.totalFaces += 2;
-
-					}
-
-					break;
-
-				default:
-					throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
-
-			}
+		const info = this.parseCache.parse( text );
+		const faces = info.faces;
+		const lineSegments = info.lineSegments;
+		const conditionalSegments = info.conditionalSegments;
+		const materials = info.materials;
+		if ( currentParseScope.inverted ) {
+
+			faces.reverse();
 
 		}
 
-		if ( parsingEmbeddedFiles ) {
+		materials.forEach( m => {
 
-			this.fileCache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+			this.addMaterial( m, currentParseScope );
+
+		} );
+
+		for ( let i = 0, l = faces.length; i < l; i ++ ) {
+
+			const face = faces[ i ];
+			const colourCode = face.colourCode;
+			face.material = this.getMaterial( colourCode, currentParseScope );
 
 		}
 
-		currentParseScope.category = category;
-		currentParseScope.keywords = keywords;
-		currentParseScope.subobjects = subobjects;
-		currentParseScope.numSubobjects = subobjects.length;
+		for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
+
+			const ls = lineSegments[ i ];
+			const colourCode = ls.colourCode;
+			ls.material = this.getMaterial( colourCode, currentParseScope );
+
+		}
+
+		for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+
+			const cs = conditionalSegments[ i ];
+			const colourCode = cs.colourCode;
+			cs.material = this.getMaterial( colourCode, currentParseScope );
+
+		}
+
+		currentParseScope.faces = info.faces;
+		currentParseScope.conditionalSegments = info.faces;
+		currentParseScope.lineSegments = info.lineSegments;
+		currentParseScope.category = info.category;
+		currentParseScope.keywords = info.keywords;
+		currentParseScope.subobjects = info.subobjects;
+		currentParseScope.numSubobjects = info.subobjects.length;
 		currentParseScope.subobjectIndex = 0;
 
 		const isRoot = ! parentParseScope.isFromParse;
-		if ( isRoot || ! isPrimitiveType( type ) ) {
+		if ( isRoot || ! isPrimitiveType( info.type ) ) {
 
 			currentParseScope.groupObject = new Group();
 			currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
