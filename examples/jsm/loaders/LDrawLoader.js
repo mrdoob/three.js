@@ -671,92 +671,78 @@ class LDrawParsedCache {
 
 	async fetchData( fileName ) {
 
-		const key = fileName.toLowerCase();
-		if ( key in this.cache ) {
+		let triedLowerCase = false;
+		let locationState = FILE_LOCATION_AS_IS;
+		while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
 
-			return this.cache[ key ];
+			let subobjectURL = fileName;
+			switch ( locationState ) {
 
-		}
+				case FILE_LOCATION_AS_IS:
+					locationState = locationState + 1;
+					break;
 
-		this.cache[ fileName ] = new Promise( async ( resolve, reject ) => {
+				case FILE_LOCATION_TRY_PARTS:
+					subobjectURL = 'parts/' + subobjectURL;
+					locationState = locationState + 1;
+					break;
 
-			let triedLowerCase = false;
-			let locationState = FILE_LOCATION_AS_IS;
-			while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
+				case FILE_LOCATION_TRY_P:
+					subobjectURL = 'p/' + subobjectURL;
+					locationState = locationState + 1;
+					break;
 
-				let subobjectURL = fileName;
-				switch ( locationState ) {
+				case FILE_LOCATION_TRY_MODELS:
+					subobjectURL = 'models/' + subobjectURL;
+					locationState = locationState + 1;
+					break;
 
-					case FILE_LOCATION_AS_IS:
-						locationState = locationState + 1;
-						break;
+				case FILE_LOCATION_TRY_RELATIVE:
+					subobjectURL = fileName.substring( 0, fileName.lastIndexOf( '/' ) + 1 ) + subobjectURL;
+					locationState = locationState + 1;
+					break;
 
-					case FILE_LOCATION_TRY_PARTS:
-						subobjectURL = 'parts/' + subobjectURL;
-						locationState = locationState + 1;
-						break;
+				case FILE_LOCATION_TRY_ABSOLUTE:
 
-					case FILE_LOCATION_TRY_P:
-						subobjectURL = 'p/' + subobjectURL;
-						locationState = locationState + 1;
-						break;
+					if ( triedLowerCase ) {
 
-					case FILE_LOCATION_TRY_MODELS:
-						subobjectURL = 'models/' + subobjectURL;
-						locationState = locationState + 1;
-						break;
+						// Try absolute path
+						locationState = FILE_LOCATION_NOT_FOUND;
 
-					case FILE_LOCATION_TRY_RELATIVE:
-						subobjectURL = fileName.substring( 0, fileName.lastIndexOf( '/' ) + 1 ) + subobjectURL;
-						locationState = locationState + 1;
-						break;
+					} else {
 
-					case FILE_LOCATION_TRY_ABSOLUTE:
+						// Next attempt is lower case
+						fileName = fileName.toLowerCase();
+						subobjectURL = fileName;
+						triedLowerCase = true;
+						locationState = FILE_LOCATION_AS_IS;
 
-						if ( triedLowerCase ) {
+					}
 
-							// Try absolute path
-							locationState = FILE_LOCATION_NOT_FOUND;
-
-						} else {
-
-							// Next attempt is lower case
-							fileName = fileName.toLowerCase();
-							subobjectURL = fileName;
-							triedLowerCase = true;
-							locationState = FILE_LOCATION_AS_IS;
-
-						}
-
-						break;
-
-				}
-
-				const loader = this.loader;
-				const fileLoader = new FileLoader( loader.manager );
-				fileLoader.setPath( loader.partsLibraryPath );
-				fileLoader.setRequestHeader( loader.requestHeader );
-				fileLoader.setWithCredentials( loader.withCredentials );
-
-				try {
-
-					const text = await fileLoader.loadAsync( subobjectURL );
-					resolve( text );
-					return;
-
-				} catch {
-
-					continue;
-
-				}
+					break;
 
 			}
 
-			reject();
+			const loader = this.loader;
+			const fileLoader = new FileLoader( loader.manager );
+			fileLoader.setPath( loader.partsLibraryPath );
+			fileLoader.setRequestHeader( loader.requestHeader );
+			fileLoader.setWithCredentials( loader.withCredentials );
 
-		} );
+			try {
 
-		return this.cache[ fileName ];
+				const text = await fileLoader.loadAsync( subobjectURL );
+				return text;
+
+			} catch {
+
+				continue;
+
+			}
+
+		}
+
+		throw new Error( 'LDrawLoader: Subobject "' + fileName + '" could not be loaded.' );
 
 	}
 
@@ -817,7 +803,7 @@ class LDrawParsedCache {
 				if ( line.startsWith( '0 FILE ' ) ) {
 
 					// Save previous embedded file in the cache
-					this._loadAndParse( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+					this._loadAndParse( currentEmbeddedFileName, currentEmbeddedText );
 
 					// New embedded text file
 					currentEmbeddedFileName = line.substring( 7 );
@@ -1233,16 +1219,20 @@ class LDrawParsedCache {
 
 		}
 
-		this.cache[ key ] = new Promise( async resolve => {
+		let textPromise;
+		if ( text === null ) {
 
-			// load the text data if not provided
-			if ( text === null ) {
+			textPromise = this.fetchData( fileName );
 
-				text = await this.fetchData( key );
+		} else {
 
-			}
+			textPromise = Promise.resolve( text );
 
-			resolve( this.parse( text ) );
+		}
+
+		this.cache[ key ] = textPromise.then( text => {
+
+			return this.parse( text );
 
 		} );
 
@@ -2300,7 +2290,6 @@ class LDrawLoader extends Loader {
 
 			} ).catch( function ( err ) {
 
-				console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be loaded.' );
 				console.warn( err );
 				return null;
 
