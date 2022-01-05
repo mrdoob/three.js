@@ -628,7 +628,7 @@ class LDrawParsedCache {
 
 	}
 
-	cloneResult( original, depth = 0 ) {
+	cloneResult( original ) {
 
 		if ( original === null ) {
 
@@ -638,24 +638,20 @@ class LDrawParsedCache {
 
 			return original.clone();
 
+		} else if ( original.isMaterial ) {
+
+			return original;
+
 		} else if ( Array.isArray( original ) ) {
 
-			return original.map( e => this.cloneResult( e, depth + 1 ) );
+			return original.map( e => this.cloneResult( e ) );
 
 		} else if ( typeof original === 'object' ) {
 
 			const result = {};
 			for ( const key in original ) {
 
-				if ( key === 'materials' && depth === 0 ) {
-
-					result.materials = [ ...original.materials ];
-
-				} else {
-
-					result[ key ] = this.cloneResult( original[ key ], depth + 1 );
-
-				}
+				result[ key ] = this.cloneResult( original[ key ] );
 
 			}
 
@@ -755,12 +751,11 @@ class LDrawParsedCache {
 		const lineSegments = [];
 		const conditionalSegments = [];
 		const subobjects = [];
-		const materials = [];
-		const materialMap = {};
+		const materials = {};
 
 		const getLocalMaterial = colourCode => {
 
-			return colourCode in materialMap ? materialMap[ colourCode ] : null;
+			return colourCode in materials ? materials[ colourCode ] : null;
 
 		};
 
@@ -861,8 +856,7 @@ class LDrawParsedCache {
 								material = loader.parseColourMetaDirective( lp );
 								if ( material ) {
 
-									materials.push( material );
-									materialMap[ material.userData.colourCode ] = material;
+									materials[ material.userData.colourCode ] = material;
 
 								}	else {
 
@@ -2001,11 +1995,11 @@ class LDrawLoader extends Loader {
 
 		}
 
-		materials.forEach( m => {
+		for ( const colourCode in materials ) {
 
-			this.addMaterial( m, currentParseScope );
+			this.addMaterial( materials[ colourCode ], currentParseScope );
 
-		} );
+		}
 
 		for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
