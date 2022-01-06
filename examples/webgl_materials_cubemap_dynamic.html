@@ -19,7 +19,9 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			let camera, scene, renderer;
+			import Stats from './jsm/libs/stats.module.js';
+
+			let camera, scene, renderer, stats;
 			let cube, sphere, torus, material;
 
 			let count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
@@ -48,6 +50,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				scene = new THREE.Scene();
 				scene.background = texture;
@@ -192,6 +197,8 @@
 				count ++;
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
