@@ -630,38 +630,52 @@ class LDrawParsedCache {
 
 	cloneResult( original ) {
 
-		if ( original === null ) {
+		const result = {};
 
-			return null;
+		// vertices are transformed and normals computed before being converted to geometry
+		// so these pieces must be cloned.
+		result.faces = original.faces.map( face => {
 
-		} else if ( original.isVector3 ) {
+			return {
+				colourCode: face.colourCode,
+				material: face.material,
+				vertices: face.vertices.map( v => v.clone() ),
+				normals: face.normals.map( () => null ),
+				faceNormal: null
+			};
 
-			return original.clone();
+		} );
 
-		} else if ( original.isMaterial ) {
+		result.conditionalSegments = original.conditionalSegments.map( face => {
 
-			return original;
+			return {
+				colourCode: face.colourCode,
+				material: face.material,
+				vertices: face.vertices.map( v => v.clone() ),
+				controlPoints: face.controlPoints.map( v => v.clone() )
+			};
 
-		} else if ( Array.isArray( original ) ) {
+		} );
 
-			return original.map( e => this.cloneResult( e ) );
+		result.lineSegments = original.lineSegments.map( face => {
 
-		} else if ( typeof original === 'object' ) {
+			return {
+				colourCode: face.colourCode,
+				material: face.material,
+				vertices: face.vertices.map( v => v.clone() )
+			};
 
-			const result = {};
-			for ( const key in original ) {
+		} );
 
-				result[ key ] = this.cloneResult( original[ key ] );
-
-			}
-
-			return result;
-
-		} else {
-
-			return original;
-
-		}
+		// none if this is subsequently modified
+		result.type = original.type;
+		result.category = original.category;
+		result.keywords = original.keywords;
+		result.subobjects = original.subobjects;
+		result.totalFaces = original.totalFaces;
+		result.startingConstructionStep = original.startingConstructionStep;
+		result.materials = original.materials;
+		return result;
 
 	}
 
