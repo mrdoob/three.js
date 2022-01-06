@@ -342,7 +342,7 @@ class PMREMGenerator {
 
 			}
 
-			this._cubemapShader.uniforms.flipEnvMap.value = ( texture.isCubeTexture && texture.isRenderTargetTexture === false ) ? - 1 : 1;
+			this._cubemapShader.uniforms.flipEnvMap.value = ( texture.isRenderTargetTexture === false ) ? - 1 : 1;
 
 		} else {
 
