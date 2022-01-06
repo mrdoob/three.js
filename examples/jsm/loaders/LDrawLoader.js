@@ -812,7 +812,7 @@ class LDrawParsedCache {
 				if ( line.startsWith( '0 FILE ' ) ) {
 
 					// Save previous embedded file in the cache
-					this._loadAndParse( currentEmbeddedFileName, currentEmbeddedText );
+					this.setData( currentEmbeddedFileName, currentEmbeddedText );
 
 					// New embedded text file
 					currentEmbeddedFileName = line.substring( 7 );
@@ -1192,7 +1192,7 @@ class LDrawParsedCache {
 
 		if ( parsingEmbeddedFiles ) {
 
-			this._loadAndParse( currentEmbeddedFileName, currentEmbeddedText );
+			this.setData( currentEmbeddedFileName, currentEmbeddedText );
 
 		}
 
@@ -1211,40 +1211,31 @@ class LDrawParsedCache {
 
 	}
 
-	async loadData( fileName ) {
-
-		const result = await this._loadAndParse( fileName );
-		return this.cloneResult( result );
-
-	}
-
-	_loadAndParse( fileName, text = null ) {
+	loadData( fileName ) {
 
 		const key = fileName.toLowerCase();
-		if ( key in this.cache ) {
+		if ( ! ( key in this.cache ) ) {
 
-			return this.cache[ key ];
+			this.cache[ key ] = this.fetchData( fileName ).then( text => {
 
-		}
+				return this.parse( text );
 
-		let textPromise;
-		if ( text === null ) {
-
-			textPromise = this.fetchData( fileName );
-
-		} else {
-
-			textPromise = Promise.resolve( text );
+			} );
 
 		}
 
-		this.cache[ key ] = textPromise.then( text => {
+		return this.cache[ key ].then( result => {
 
-			return this.parse( text );
+			return this.cloneResult( result );
 
 		} );
 
-		return this.cache[ key ];
+	}
+
+	setData( fileName, text ) {
+
+		const key = fileName.toLowerCase();
+		this.cache[ key ] = Promise.resolve( this.parse( text ) );
 
 	}
 
@@ -1991,7 +1982,7 @@ class LDrawLoader extends Loader {
 
 			if ( ! material ) {
 
-				throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + ' but it was not defined previously.' );
+				throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used but it was not defined previously.' );
 
 			}
 
