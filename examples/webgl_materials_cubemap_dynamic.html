@@ -73,7 +73,7 @@
 
 				material = new THREE.MeshStandardMaterial( {
 					envMap: cubeRenderTarget2.texture,
-					roughness: 0,
+					roughness: 0.2,
 					metalness: 1
 				} );
 
@@ -146,11 +146,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				render();
-
-			}
-
-			function render() {
 
 				const time = Date.now();
 
@@ -196,9 +191,15 @@
 
 				count ++;
 
-				renderer.render( scene, camera );
+				render();
 
 				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
 
 			}
 
