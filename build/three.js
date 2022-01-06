@@ -7,7 +7,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
-})(this, (function (exports) { 'use strict';
+}(this, (function (exports) { 'use strict';
 
 	const REVISION = '137dev';
 	const MOUSE = {
@@ -9085,7 +9085,6 @@
 			this.texture.isRenderTargetTexture = true;
 			this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 			this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
-			this.texture._needsFlipEnvMap = false;
 		}
 
 		fromEquirectangularTexture(renderer, texture) {
@@ -11784,6 +11783,8 @@
 				if (this._cubemapShader == null) {
 					this._cubemapShader = _getCubemapShader();
 				}
+
+				this._cubemapShader.uniforms.flipEnvMap.value = texture.isRenderTargetTexture === false ? -1 : 1;
 			} else {
 				if (this._equirectShader == null) {
 					this._equirectShader = _getEquirectShader();
@@ -12140,6 +12141,9 @@
 			uniforms: {
 				'envMap': {
 					value: null
+				},
+				'flipEnvMap': {
+					value: -1
 				}
 			},
 			vertexShader: _getCommonVertexShader(),
@@ -12150,13 +12154,15 @@
 			precision mediump float;
 			precision mediump int;
 
+			uniform float flipEnvMap;
+
 			varying vec3 vOutputDirection;
 
 			uniform samplerCube envMap;
 
 			void main() {
 
-				gl_FragColor = textureCube( envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ) );
+				gl_FragColor = textureCube( envMap, vec3( flipEnvMap * vOutputDirection.x, vOutputDirection.yz ) );
 
 			}
 		`,
@@ -24539,9 +24545,7 @@
 
 
 	function isValidDiagonal(a, b) {
-		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // dones't intersect other edges
-		locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && ( // locally visible
-		area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
+		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && (area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
 		equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
 	} // signed area of a triangle
 
@@ -36700,4 +36704,4 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));

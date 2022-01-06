@@ -11935,8 +11935,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
-		this.texture._needsFlipEnvMap = false;
-
 	}
 
 	fromEquirectangularTexture( renderer, texture ) {
@@ -15373,6 +15371,8 @@ class PMREMGenerator {
 
 			}
 
+			this._cubemapShader.uniforms.flipEnvMap.value = ( texture.isRenderTargetTexture === false ) ? - 1 : 1;
+
 		} else {
 
 			if ( this._equirectShader == null ) {
@@ -15794,7 +15794,8 @@ function _getCubemapShader() {
 		name: 'CubemapToCubeUV',
 
 		uniforms: {
-			'envMap': { value: null }
+			'envMap': { value: null },
+			'flipEnvMap': { value: - 1 }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -15804,13 +15805,15 @@ function _getCubemapShader() {
 			precision mediump float;
 			precision mediump int;
 
+			uniform float flipEnvMap;
+
 			varying vec3 vOutputDirection;
 
 			uniform samplerCube envMap;
 
 			void main() {
 
-				gl_FragColor = textureCube( envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ) );
+				gl_FragColor = textureCube( envMap, vec3( flipEnvMap * vOutputDirection.x, vOutputDirection.yz ) );
 
 			}
 		`,
