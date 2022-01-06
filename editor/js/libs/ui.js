@@ -295,6 +295,31 @@ class UIInput extends UIElement {
 
 }
 
+class UIFile extends UIElement {
+
+	constructor() {
+
+		super( document.createElement( 'input' ) );
+		this.dom.multiple = true;
+		this.dom.type = 'file';
+		
+
+	}
+
+	onChange( func ) {
+
+		this.dom.addEventListener( 'change', func );
+
+	}
+
+	onClick() {
+
+		this.dom.click();
+
+	}
+
+}
+
 class UITextArea extends UIElement {
 
 	constructor() {
@@ -1279,4 +1304,4 @@ class ListboxItem extends UIDiv {
 
 }
 
-export { UIElement, UISpan, UIDiv, UIRow, UIPanel, UIText, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UIProgress, UITabbedPanel, UIListbox, ListboxItem };
+export { UIElement, UISpan, UIDiv, UIRow, UIPanel, UIText, UIFile, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UIProgress, UITabbedPanel, UIListbox, ListboxItem };

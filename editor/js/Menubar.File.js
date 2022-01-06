@@ -2,7 +2,7 @@ import * as THREE from '../../build/three.module.js';
 
 import { zipSync, strToU8 } from '../../examples/jsm/libs/fflate.module.js';
 
-import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
+import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './libs/ui.js';
 
 function MenubarFile( editor ) {
 
@@ -47,23 +47,22 @@ function MenubarFile( editor ) {
 	form.style.display = 'none';
 	document.body.appendChild( form );
 
-	var fileInput = document.createElement( 'input' );
-	fileInput.multiple = true;
-	fileInput.type = 'file';
-	fileInput.addEventListener( 'change', function () {
+	var fileInput = new UIFile();
+	fileInput.onChange( function () {
 
 		editor.loader.loadFiles( fileInput.files );
 		form.reset();
 
 	} );
-	form.appendChild( fileInput );
+
+	form.appendChild( fileInput.dom );
 
 	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
 
-		fileInput.click();
+		fileInput.onClick();
 
 	} );
 	options.add( option );
