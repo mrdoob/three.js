@@ -56,19 +56,11 @@
 
 				//
 
-				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256, {
-					format: THREE.RGBFormat,
-					generateMipmaps: true,
-					minFilter: THREE.LinearMipmapLinearFilter
-				} );
+				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256 );
 
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
 
-				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, {
-					format: THREE.RGBFormat,
-					generateMipmaps: true,
-					minFilter: THREE.LinearMipmapLinearFilter
-				} );
+				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256 );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
 
