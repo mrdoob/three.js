@@ -870,7 +870,7 @@ class LDrawParsedCache {
 								material = loader.parseColourMetaDirective( lp );
 								if ( material ) {
 
-									materials[ material.userData.colourCode ] = material;
+									materials[ material.userData.code ] = material;
 
 								}	else {
 
