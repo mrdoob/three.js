@@ -17,11 +17,11 @@
         	</p>
 
 <code>
-if (WEBGL.isWebGLAvailable()) {
+if (WebGL.isWebGLAvailable()) {
     // Initiate function or other initializations here
     animate();
 } else {
-    const warning = WEBGL.getWebGLErrorMessage();
+    const warning = WebGL.getWebGLErrorMessage();
     document.getElementById('container').appendChild(warning);
 }
 </code>
