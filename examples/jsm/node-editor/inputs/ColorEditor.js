@@ -30,9 +30,9 @@ export class ColorEditor extends BaseNode {
 
 			if ( editing !== 'rgb' ) {
 
-				fieldR.setValue( value.r.toFixed( 3 ), false )
-				fieldG.setValue( value.g.toFixed( 3 ), false )
-				fieldB.setValue( value.b.toFixed( 3 ), false )
+				fieldR.setValue( value.r.toFixed( 3 ), false );
+				fieldG.setValue( value.g.toFixed( 3 ), false );
+				fieldB.setValue( value.b.toFixed( 3 ), false );
 
 			}
 
