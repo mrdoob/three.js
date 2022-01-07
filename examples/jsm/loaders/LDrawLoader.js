@@ -191,14 +191,22 @@ function generateFaceNormals( faces ) {
 const _ray = new Ray();
 function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
+	// NOTE: 1e2 is pretty coarse but was chosen to quantize the resulting value because
+	// it allows edges to be smoothed as expected (see minifig arms).
+	// --
+	// And the vector values are initialize multiplied by 1 + 1e-10 to account for floating
+	// point errors on vertices along quantization boundaries. Ie after matrix multiplication
+	// vertices that should be merged might be set to "1.7" and "1.6999..." meaning they won't
+	// get merged. This added epsilon attempts to push these error values to the same quantized
+	// value for the sake of hashing. See "AT-ST mini" dishes.
+
+	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
 	function hashVertex( v ) {
 
-		// NOTE: 1e2 is pretty coarse but was chosen because it allows edges
-		// to be smoothed as expected (see minifig arms). The errors between edges
-		// could be due to matrix multiplication.
-		const x = ~ ~ ( v.x * 1e2 );
-		const y = ~ ~ ( v.y * 1e2 );
-		const z = ~ ~ ( v.z * 1e2 );
+		const x = ~ ~ ( v.x * hashMultiplier );
+		const y = ~ ~ ( v.y * hashMultiplier );
+		const z = ~ ~ ( v.z * hashMultiplier );
+
 		return `${ x },${ y },${ z }`;
 
 	}
