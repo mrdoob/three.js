@@ -8,7 +8,7 @@ export class ColorEditor extends BaseNode {
 
 		const node = new ColorNode();
 
-		super( 'Color', 1, node );
+		super( 'Color', 3, node );
 
 		const updateFields = ( editing ) => {
 
