@@ -39,7 +39,9 @@
 		import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
 
 		import { NodeEditor } from './jsm/node-editor/NodeEditor.js';
-		import { StandardMaterialEditor } from './jsm/node-editor/materials/StandardMaterialEditor.js';
+		import { MeshEditor } from './jsm/node-editor/scene/MeshEditor.js';
+
+		import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -96,25 +98,14 @@
 
 		function initEditor() {
 
-			const nodeEditor = new NodeEditor();
+			const nodeEditor = new NodeEditor( scene );
 
 			nodeEditor.addEventListener( 'new', () => {
 
-				const materialEditor = new StandardMaterialEditor();
-				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 );
+				const materialEditor = new MeshEditor( model );
 
 				nodeEditor.add( materialEditor );
-
-				model.material = materialEditor.material;
-
-			} );
-
-			nodeEditor.addEventListener( 'load', () => {
-
-				const materialEditor = nodeEditor.nodes[ 0 ];
-				materialEditor.update(); // need move to deserialization
-
-				model.material = materialEditor.material;
+				nodeEditor.centralizeNode( materialEditor );
 
 			} );
 
@@ -123,16 +114,29 @@
 			const loaderFBX = new FBXLoader();
 			loaderFBX.load( 'models/fbx/stanford-bunny.fbx', ( object ) => {
 
-				const materialEditor = new StandardMaterialEditor();
-				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 ); // canvas position
+				const defaultMaterial = new Nodes.MeshBasicNodeMaterial();
+				defaultMaterial.colorNode = new Nodes.FloatNode( 0 );
 
-				nodeEditor.add( materialEditor );
+				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 32, 16 ), defaultMaterial  ) ;
+				sphere.name = 'Sphere';
+				sphere.position.set( 500, 0, -500 );
+				scene.add( sphere );
+
+				const box = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), defaultMaterial  ) ;
+				box.name = 'Box';
+				box.position.set( -500, 0, -500 );
+				scene.add( box );
 
 				model = object.children[ 0 ];
 				model.position.set( 0, 0, 10 );
 				model.scale.setScalar( 1 );
-				model.material = materialEditor.material;
+				model.material = defaultMaterial;
 				scene.add( model );
+
+				const materialEditor = new MeshEditor( model );
+
+				nodeEditor.add( materialEditor );
+				nodeEditor.centralizeNode( materialEditor );
 
 			} );
 
