@@ -3665,17 +3665,39 @@ class Search extends Menu {
 
 	}
 
+	getFilterByButton( button ) {
+
+		for ( const filter of this.filtered ) {
+
+			if ( filter.button === button ) {
+
+				return filter;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
 	add( button ) {
 
 		super.add( button );
 
-		button.onClick( () => {
+		const onDown = ( e ) => {
 
+			const filter = this.getFilterByButton( button );
+
+			this.filteredIndex = this.filtered.indexOf( filter );
 			this.value = button.getValue();
 
 			this.submit();
 
-		} );
+		};
+
+		button.dom.addEventListener( 'mousedown', onDown );
+		button.dom.addEventListener( 'touchstart', onDown );
 
 		this.domButtons.get( button ).remove();
 
