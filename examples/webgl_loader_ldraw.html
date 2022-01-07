@@ -420,7 +420,9 @@
 
 					const condLineGeometry = condLinesGeometries[ condLinesMaterialsIds[ i ] ];
 					const mergedGeometry = mergeBufferGeometries( condLineGeometry.arr );
-					mergedObject.add( new THREE.LineSegments( mergedGeometry, condLineGeometry.mat ) );
+					const condLines = new THREE.LineSegments( mergedGeometry, condLineGeometry.mat );
+					condLines.isConditionalLine = true;
+					mergedObject.add( condLines );
 
 				}
 
@@ -485,12 +487,7 @@
 				} );
 
 				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( updateObjectsVisibility );
-
-				if ( ! guiData.mergeModel ) {
-
-					gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( updateObjectsVisibility );
-
-				}
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( updateObjectsVisibility );
 
 			}
 
