@@ -10,5 +10,6 @@
       "type": "image/png",
       "sizes": "144x144"
     }
-  ]
+  ],
+  "display_override": ["window-controls-overlay"]
 }

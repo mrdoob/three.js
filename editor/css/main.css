@@ -341,12 +341,14 @@ select {
 	margin: 0;
 	right: 0;
 	top: 0;
+	app-region: drag;
 }
 
 	#menubar .menu {
 		float: left;
 		cursor: pointer;
 		padding-right: 8px;
+		app-region: no-drag;
 	}
 
 	#menubar .menu.right {
