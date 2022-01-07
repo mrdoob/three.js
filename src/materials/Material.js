@@ -24,7 +24,7 @@ class Material extends EventDispatcher {
 		this.vertexColors = false;
 
 		this.opacity = 1;
-		this._transparent = false;
+		this.transparent = false;
 
 		this.blendSrc = SrcAlphaFactor;
 		this.blendDst = OneMinusSrcAlphaFactor;
@@ -75,24 +75,6 @@ class Material extends EventDispatcher {
 		this.version = 0;
 
 		this._alphaTest = 0;
-
-	}
-
-	get transparent() {
-
-		return this._transparent;
-
-	}
-
-	set transparent( value ) {
-
-		if ( value ) {
-
-			this.alphaWrite = true;
-
-		}
-
-		this._transparent = value;
 
 	}
 
