@@ -1,4 +1,4 @@
-class WEBGL {
+class WebGL {
 
 	static isWebGLAvailable() {
 
@@ -88,4 +88,4 @@ class WEBGL {
 
 }
 
-export { WEBGL };
+export default WebGL;

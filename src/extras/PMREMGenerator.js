@@ -7,8 +7,6 @@ import {
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
-	UnsignedByteType,
-	sRGBEncoding,
 	HalfFloatType
 } from '../constants.js';
 
@@ -41,11 +39,6 @@ const TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
 // The maximum length of the blur for loop. Smaller sigmas will use fewer
 // samples and exit early, but not recompile the shader.
 const MAX_SAMPLES = 20;
-
-const ENCODINGS = {
-	[ LinearEncoding ]: 0,
-	[ sRGBEncoding ]: 1
-};
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
@@ -131,9 +124,9 @@ class PMREMGenerator {
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromEquirectangular( equirectangular ) {
+	fromEquirectangular( equirectangular, renderTarget = null ) {
 
-		return this._fromTexture( equirectangular );
+		return this._fromTexture( equirectangular, renderTarget );
 
 	}
 
@@ -142,9 +135,9 @@ class PMREMGenerator {
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromCubemap( cubemap ) {
+	fromCubemap( cubemap, renderTarget = null ) {
 
-		return this._fromTexture( cubemap );
+		return this._fromTexture( cubemap, renderTarget );
 
 	}
 
@@ -209,10 +202,10 @@ class PMREMGenerator {
 
 	}
 
-	_fromTexture( texture ) {
+	_fromTexture( texture, renderTarget ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
-		const cubeUVRenderTarget = this._allocateTargets( texture );
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets( texture );
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
@@ -335,20 +328,6 @@ class PMREMGenerator {
 
 	}
 
-	_setEncoding( uniform, texture ) {
-
-		if ( this._renderer.capabilities.isWebGL2 === true && texture.format === RGBAFormat && texture.type === UnsignedByteType && texture.encoding === sRGBEncoding ) {
-
-			uniform.value = ENCODINGS[ LinearEncoding ];
-
-		} else {
-
-			uniform.value = ENCODINGS[ texture.encoding ];
-
-		}
-
-	}
-
 	_textureToCubeUV( texture, cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
@@ -362,6 +341,8 @@ class PMREMGenerator {
 				this._cubemapShader = _getCubemapShader();
 
 			}
+
+			this._cubemapShader.uniforms.flipEnvMap.value = ( texture.isRenderTargetTexture === false ) ? - 1 : 1;
 
 		} else {
 
@@ -385,8 +366,6 @@ class PMREMGenerator {
 			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
 
 		}
-
-		this._setEncoding( uniforms[ 'inputEncoding' ], texture );
 
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 
@@ -662,8 +641,6 @@ function _getBlurShader( maxSamples ) {
 			uniform float mipInt;
 			uniform vec3 poleAxis;
 
-			${ _getEncodings() }
-
 			#define ENVMAP_TYPE_CUBE_UV
 			#include <cube_uv_reflection_fragment>
 
@@ -730,8 +707,7 @@ function _getEquirectShader() {
 
 		uniforms: {
 			'envMap': { value: null },
-			'texelSize': { value: texelSize },
-			'inputEncoding': { value: ENCODINGS[ LinearEncoding ] }
+			'texelSize': { value: texelSize }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -746,8 +722,6 @@ function _getEquirectShader() {
 			uniform sampler2D envMap;
 			uniform vec2 texelSize;
 
-			${ _getEncodings() }
-
 			#include <common>
 
 			void main() {
@@ -759,13 +733,13 @@ function _getEquirectShader() {
 
 				vec2 f = fract( uv / texelSize - 0.5 );
 				uv -= f * texelSize;
-				vec3 tl = envMapTexelToLinear( texture2D ( envMap, uv ) ).rgb;
+				vec3 tl = texture2D ( envMap, uv ).rgb;
 				uv.x += texelSize.x;
-				vec3 tr = envMapTexelToLinear( texture2D ( envMap, uv ) ).rgb;
+				vec3 tr = texture2D ( envMap, uv ).rgb;
 				uv.y += texelSize.y;
-				vec3 br = envMapTexelToLinear( texture2D ( envMap, uv ) ).rgb;
+				vec3 br = texture2D ( envMap, uv ).rgb;
 				uv.x -= texelSize.x;
-				vec3 bl = envMapTexelToLinear( texture2D ( envMap, uv ) ).rgb;
+				vec3 bl = texture2D ( envMap, uv ).rgb;
 
 				vec3 tm = mix( tl, tr, f.x );
 				vec3 bm = mix( bl, br, f.x );
@@ -792,7 +766,7 @@ function _getCubemapShader() {
 
 		uniforms: {
 			'envMap': { value: null },
-			'inputEncoding': { value: ENCODINGS[ LinearEncoding ] }
+			'flipEnvMap': { value: - 1 }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -802,15 +776,15 @@ function _getCubemapShader() {
 			precision mediump float;
 			precision mediump int;
 
+			uniform float flipEnvMap;
+
 			varying vec3 vOutputDirection;
 
 			uniform samplerCube envMap;
 
-			${ _getEncodings() }
-
 			void main() {
 
-				gl_FragColor = envMapTexelToLinear( textureCube( envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ) ) );
+				gl_FragColor = textureCube( envMap, vec3( flipEnvMap * vOutputDirection.x, vOutputDirection.yz ) );
 
 			}
 		`,
@@ -882,37 +856,6 @@ function _getCommonVertexShader() {
 
 			vOutputDirection = getDirection( uv, faceIndex );
 			gl_Position = vec4( position, 1.0 );
-
-		}
-	`;
-
-}
-
-function _getEncodings() {
-
-	return /* glsl */`
-
-		uniform int inputEncoding;
-
-		#include <encodings_pars_fragment>
-
-		vec4 inputTexelToLinear( vec4 value ) {
-
-			if ( inputEncoding == 0 ) {
-
-				return value;
-
-			} else {
-
-				return sRGBToLinear( value );
-
-			}
-
-		}
-
-		vec4 envMapTexelToLinear( vec4 color ) {
-
-			return inputTexelToLinear( color );
 
 		}
 	`;

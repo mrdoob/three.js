@@ -58,11 +58,11 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { unzipSync } from './jsm/libs/fflate.module.js';
 
-			import { WEBGL } from './jsm/WebGL.js';
+			import WebGL from './jsm/capabilities/WebGL.js';
 
-			if ( WEBGL.isWebGL2Available() === false ) {
+			if ( WebGL.isWebGL2Available() === false ) {
 
-				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
 
 			}
 

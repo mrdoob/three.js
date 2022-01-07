@@ -142,7 +142,29 @@
 
 	}
 
-	function smoothNormals( faces, lineSegments ) {
+	function generateFaceNormals( faces ) {
+
+		for ( let i = 0, l = faces.length; i < l; i ++ ) {
+
+			const face = faces[ i ];
+			const vertices = face.vertices;
+			const v0 = vertices[ 0 ];
+			const v1 = vertices[ 1 ];
+			const v2 = vertices[ 2 ];
+
+			_tempVec0.subVectors( v1, v0 );
+
+			_tempVec1.subVectors( v2, v1 );
+
+			face.faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
+
+		}
+
+	}
+
+	const _ray = new THREE.Ray();
+
+	function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 		function hashVertex( v ) {
 
@@ -160,9 +182,27 @@
 
 			return `${hashVertex( v0 )}_${hashVertex( v1 )}`;
 
+		} // converts the two vertices to a ray with a normalized direction and origin of 0, 0, 0 projected
+		// onto the original line.
+
+
+		function toNormalizedRay( v0, v1, targetRay ) {
+
+			targetRay.direction.subVectors( v1, v0 ).normalize();
+			const scalar = v0.dot( targetRay.direction );
+			targetRay.origin.copy( v0 ).addScaledVector( targetRay.direction, - scalar );
+			return targetRay;
+
+		}
+
+		function hashRay( ray ) {
+
+			return hashEdge( ray.origin, ray.direction );
+
 		}
 
 		const hardEdges = new Set();
+		const hardEdgeRays = new Map();
 		const halfEdgeList = {};
 		const normals = []; // Save the list of hard edges by hash
 
@@ -173,7 +213,43 @@
 			const v0 = vertices[ 0 ];
 			const v1 = vertices[ 1 ];
 			hardEdges.add( hashEdge( v0, v1 ) );
-			hardEdges.add( hashEdge( v1, v0 ) );
+			hardEdges.add( hashEdge( v1, v0 ) ); // only generate the hard edge ray map if we're checking subsegments because it's more expensive to check
+			// and requires more memory.
+
+			if ( checkSubSegments ) {
+
+				// add both ray directions to the map
+				const ray = toNormalizedRay( v0, v1, new THREE.Ray() );
+				const rh1 = hashRay( ray );
+
+				if ( ! hardEdgeRays.has( rh1 ) ) {
+
+					toNormalizedRay( v1, v0, ray );
+					const rh2 = hashRay( ray );
+					const info = {
+						ray,
+						distances: []
+					};
+					hardEdgeRays.set( rh1, info );
+					hardEdgeRays.set( rh2, info );
+
+				} // store both segments ends in min, max order in the distances array to check if a face edge is a
+				// subsegment later.
+
+
+				const info = hardEdgeRays.get( rh1 );
+				let d0 = info.ray.direction.dot( v0 );
+				let d1 = info.ray.direction.dot( v1 );
+
+				if ( d0 > d1 ) {
+
+					[ d0, d1 ] = [ d1, d0 ];
+
+				}
+
+				info.distances.push( d0, d1 );
+
+			}
 
 		} // track the half edges associated with each triangle
 
@@ -192,7 +268,58 @@
 				const v1 = vertices[ next ];
 				const hash = hashEdge( v0, v1 ); // don't add the triangle if the edge is supposed to be hard
 
-				if ( hardEdges.has( hash ) ) continue;
+				if ( hardEdges.has( hash ) ) {
+
+					continue;
+
+				} // if checking subsegments then check to see if this edge lies on a hard edge ray and whether its within any ray bounds
+
+
+				if ( checkSubSegments ) {
+
+					toNormalizedRay( v0, v1, _ray );
+					const rayHash = hashRay( _ray );
+
+					if ( hardEdgeRays.has( rayHash ) ) {
+
+						const info = hardEdgeRays.get( rayHash );
+						const {
+							ray,
+							distances
+						} = info;
+						let d0 = ray.direction.dot( v0 );
+						let d1 = ray.direction.dot( v1 );
+
+						if ( d0 > d1 ) {
+
+							[ d0, d1 ] = [ d1, d0 ];
+
+						} // return early if the face edge is found to be a subsegment of a line edge meaning the edge will have "hard" normals
+
+
+						let found = false;
+
+						for ( let i = 0, l = distances.length; i < l; i += 2 ) {
+
+							if ( d0 >= distances[ i ] && d1 <= distances[ i + 1 ] ) {
+
+								found = true;
+								break;
+
+							}
+
+						}
+
+						if ( found ) {
+
+							continue;
+
+						}
+
+					}
+
+				}
+
 				const info = {
 					index: index,
 					tri: tri
@@ -433,6 +560,12 @@
 
 		}
 
+		getVector() {
+
+			return new THREE.Vector3( parseFloat( this.getToken() ), parseFloat( this.getToken() ), parseFloat( this.getToken() ) );
+
+		}
+
 		getRemainingString() {
 
 			return this.line.substring( this.currentCharIndex, this.lineLength );
@@ -635,9 +768,24 @@
 				positions[ index + 1 ] = v.y;
 				positions[ index + 2 ] = v.z;
 
-			}
+			} // create the normals array if this is a set of faces
+
 
 			if ( elementSize === 3 ) {
+
+				if ( ! elem.faceNormal ) {
+
+					const v0 = vertices[ 0 ];
+					const v1 = vertices[ 1 ];
+					const v2 = vertices[ 2 ];
+
+					_tempVec0.subVectors( v1, v0 );
+
+					_tempVec1.subVectors( v2, v1 );
+
+					elem.faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
+
+				}
 
 				let elemNormals = elem.normals;
 
@@ -655,6 +803,7 @@
 
 				for ( let j = 0, l = elemNormals.length; j < l; j ++ ) {
 
+					// use face normal if a vertex normal is not provided
 					let n = elem.faceNormal;
 
 					if ( elemNormals[ j ] ) {
@@ -781,13 +930,10 @@
 
 			this.cache = new LDrawFileCache( this ); // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 
-			this.fileMap = null;
+			this.fileMap = {};
 			this.rootParseScope = this.newParseScopeLevel(); // Add default main triangle and line edge materials (used in pieces that can be coloured with a main color)
 
-			this.setMaterials( [ this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true, each subobject will be a Object.
-			// If not (the default), only one object which contains all the merged primitives will be created.
-
-			this.separateObjects = false; // If this flag is set to true the vertex normals will be smoothed.
+			this.setMaterials( [ this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true the vertex normals will be smoothed.
 
 			this.smoothNormals = true; // The path to load parts from the LDraw parts library from.
 
@@ -832,12 +978,6 @@
 		}
 
 		load( url, onLoad, onProgress, onError ) {
-
-			if ( ! this.fileMap ) {
-
-				this.fileMap = {};
-
-			}
 
 			const fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path );
@@ -914,7 +1054,6 @@
 				currentFileName: null,
 				mainColourCode: parentScope ? parentScope.mainColourCode : '16',
 				mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
-				currentMatrix: new THREE.Matrix4(),
 				matrix: new THREE.Matrix4(),
 				type: 'Model',
 				groupObject: null,
@@ -924,6 +1063,7 @@
 				lineSegments: [],
 				conditionalSegments: [],
 				totalFaces: 0,
+				faceMaterials: new Set(),
 				// If true, this object is the start of a construction step
 				startingConstructionStep: false
 			};
@@ -997,7 +1137,7 @@
 
 			if ( ! name ) {
 
-				throw 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.';
+				throw new Error( 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.' );
 
 			} // Parse tag tokens and their parameters
 
@@ -1029,7 +1169,7 @@
 
 						} else if ( ! colour.startsWith( '#' ) ) {
 
-							throw 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + '.';
+							throw new Error( 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -1049,7 +1189,7 @@
 
 							if ( ! edgeMaterial ) {
 
-								throw 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.';
+								throw new Error( 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.' );
 
 							} // Get the edge material for this triangle material
 
@@ -1065,7 +1205,7 @@
 
 						if ( isNaN( alpha ) ) {
 
-							throw 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.';
+							throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -1084,7 +1224,7 @@
 
 						if ( isNaN( luminance ) ) {
 
-							throw 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.';
+							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -1117,8 +1257,7 @@
 						break;
 
 					default:
-						throw 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.';
-						break;
+						throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
 
 				}
 
@@ -1264,9 +1403,8 @@
 			let bfcCull = true;
 			let type = '';
 			let startingConstructionStep = false;
-			const scope = this;
 
-			function parseColourCode( lineParser, forEdge ) {
+			const parseColourCode = ( lineParser, forEdge ) => {
 
 				// Parses next colour code and returns a THREE.Material
 				let colourCode = lineParser.getToken();
@@ -1283,31 +1421,17 @@
 
 				}
 
-				const material = scope.getMaterial( colourCode, currentParseScope );
+				const material = this.getMaterial( colourCode, currentParseScope );
 
 				if ( ! material ) {
 
-					throw 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + lineParser.getLineNumberString() + ' but it was not defined previously.';
+					throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + lineParser.getLineNumberString() + ' but it was not defined previously.' );
 
 				}
 
 				return material;
 
-			}
-
-			function parseVector( lp ) {
-
-				const v = new THREE.Vector3( parseFloat( lp.getToken() ), parseFloat( lp.getToken() ), parseFloat( lp.getToken() ) );
-
-				if ( ! scope.separateObjects ) {
-
-					v.applyMatrix4( currentParseScope.currentMatrix );
-
-				}
-
-				return v;
-
-			} // Parse all line commands
+			}; // Parse all line commands
 
 
 			for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -1352,7 +1476,7 @@
 				let inverted;
 				let ccw;
 				let doubleSided;
-				let v0, v1, v2, v3, c0, c1, faceNormal;
+				let v0, v1, v2, v3, c0, c1;
 
 				switch ( lineType ) {
 
@@ -1367,15 +1491,7 @@
 
 								case '!LDRAW_ORG':
 									type = lp.getToken();
-									currentParseScope.type = type; // If the scale of the object is negated then the triangle winding order
-									// needs to be flipped.
-
-									if ( currentParseScope.matrix.determinant() < 0 && ( scope.separateObjects && isPrimitiveType( type ) || ! scope.separateObjects ) ) {
-
-										currentParseScope.inverted = ! currentParseScope.inverted;
-
-									}
-
+									currentParseScope.type = type;
 									faces = currentParseScope.faces;
 									lineSegments = currentParseScope.lineSegments;
 									conditionalSegments = currentParseScope.conditionalSegments;
@@ -1505,10 +1621,10 @@
 						const matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
 						let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
 
-						if ( scope.fileMap[ fileName ] ) {
+						if ( this.fileMap[ fileName ] ) {
 
 							// Found the subobject path in the preloaded file path map
-							fileName = scope.fileMap[ fileName ];
+							fileName = this.fileMap[ fileName ];
 
 						} else {
 
@@ -1538,8 +1654,8 @@
 
 					case '2':
 						material = parseColourCode( lp, true );
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
 						segment = {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
@@ -1553,10 +1669,10 @@
 
 					case '5':
 						material = parseColourCode( lp, true );
-						v0 = parseVector( lp );
-						v1 = parseVector( lp );
-						c0 = parseVector( lp );
-						c1 = parseVector( lp );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						c0 = lp.getVector();
+						c1 = lp.getVector();
 						segment = {
 							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
 							colourCode: material.userData.code,
@@ -1575,27 +1691,22 @@
 
 						if ( ccw === true ) {
 
-							v0 = parseVector( lp );
-							v1 = parseVector( lp );
-							v2 = parseVector( lp );
+							v0 = lp.getVector();
+							v1 = lp.getVector();
+							v2 = lp.getVector();
 
 						} else {
 
-							v2 = parseVector( lp );
-							v1 = parseVector( lp );
-							v0 = parseVector( lp );
+							v2 = lp.getVector();
+							v1 = lp.getVector();
+							v0 = lp.getVector();
 
 						}
 
-						_tempVec0.subVectors( v1, v0 );
-
-						_tempVec1.subVectors( v2, v1 );
-
-						faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
 						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
-							faceNormal: faceNormal,
+							faceNormal: null,
 							vertices: [ v0, v1, v2 ],
 							normals: [ null, null, null ]
 						} );
@@ -1606,7 +1717,7 @@
 							faces.push( {
 								material: material,
 								colourCode: material.userData.code,
-								faceNormal: faceNormal,
+								faceNormal: null,
 								vertices: [ v2, v1, v0 ],
 								normals: [ null, null, null ]
 							} );
@@ -1614,6 +1725,7 @@
 
 						}
 
+						currentParseScope.faceMaterials.add( material );
 						break;
 						// Line type 4: Quadrilateral
 
@@ -1625,31 +1737,26 @@
 
 						if ( ccw === true ) {
 
-							v0 = parseVector( lp );
-							v1 = parseVector( lp );
-							v2 = parseVector( lp );
-							v3 = parseVector( lp );
+							v0 = lp.getVector();
+							v1 = lp.getVector();
+							v2 = lp.getVector();
+							v3 = lp.getVector();
 
 						} else {
 
-							v3 = parseVector( lp );
-							v2 = parseVector( lp );
-							v1 = parseVector( lp );
-							v0 = parseVector( lp );
+							v3 = lp.getVector();
+							v2 = lp.getVector();
+							v1 = lp.getVector();
+							v0 = lp.getVector();
 
-						}
-
-						_tempVec0.subVectors( v1, v0 );
-
-						_tempVec1.subVectors( v2, v1 );
-
-						faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize(); // specifically place the triangle diagonal in the v0 and v1 slots so we can
+						} // specifically place the triangle diagonal in the v0 and v1 slots so we can
 						// account for the doubling of vertices later when smoothing normals.
+
 
 						faces.push( {
 							material: material,
 							colourCode: material.userData.code,
-							faceNormal: faceNormal,
+							faceNormal: null,
 							vertices: [ v0, v1, v2, v3 ],
 							normals: [ null, null, null, null ]
 						} );
@@ -1660,7 +1767,7 @@
 							faces.push( {
 								material: material,
 								colourCode: material.userData.code,
-								faceNormal: faceNormal,
+								faceNormal: null,
 								vertices: [ v3, v2, v1, v0 ],
 								normals: [ null, null, null, null ]
 							} );
@@ -1671,8 +1778,7 @@
 						break;
 
 					default:
-						throw 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.';
-						break;
+						throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
 
 				}
 
@@ -1691,7 +1797,7 @@
 			currentParseScope.subobjectIndex = 0;
 			const isRoot = ! parentParseScope.isFromParse;
 
-			if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
+			if ( isRoot || ! isPrimitiveType( type ) ) {
 
 				currentParseScope.groupObject = new THREE.Group();
 				currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
@@ -1736,17 +1842,21 @@
 			// is added directly into the parent model (meaning it will never get smoothed by
 			// being added to a part)
 
-			const doSmooth = isPartType( subobjectParseScope.type ) || ! isPartType( subobjectParseScope.type ) && ! isModelType( subobjectParseScope.type ) && isModelType( subobjectParseScope.parentScope.type );
+			const doSmooth = isPartType( subobjectParseScope.type ) || isPrimitiveType( subobjectParseScope.type ) && isModelType( subobjectParseScope.parentScope.type );
 
 			if ( this.smoothNormals && doSmooth ) {
 
-				smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments );
+				generateFaceNormals( subobjectParseScope.faces ); // only check subsetgments if we have multiple materials in a single part because this seems to be the case where it's needed most --
+				// there may be cases where a single edge line crosses over polygon edges that are broken up by multiple materials.
+
+				const checkSubSegments = subobjectParseScope.faceMaterials.size > 1;
+				smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments, checkSubSegments );
 
 			}
 
 			const isRoot = ! parentParseScope.isFromParse;
 
-			if ( this.separateObjects && ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
+			if ( ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
 
 				const objGroup = subobjectParseScope.groupObject;
 
@@ -1780,26 +1890,23 @@
 
 			} else {
 
-				const separateObjects = this.separateObjects;
 				const parentLineSegments = parentParseScope.lineSegments;
 				const parentConditionalSegments = parentParseScope.conditionalSegments;
 				const parentFaces = parentParseScope.faces;
+				const parentFaceMaterials = parentParseScope.faceMaterials;
 				const lineSegments = subobjectParseScope.lineSegments;
 				const conditionalSegments = subobjectParseScope.conditionalSegments;
 				const faces = subobjectParseScope.faces;
+				const faceMaterials = subobjectParseScope.faceMaterials;
+				const matrix = subobjectParseScope.matrix;
+				const matrixScaleInverted = matrix.determinant() < 0;
 
 				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 					const ls = lineSegments[ i ];
-
-					if ( separateObjects ) {
-
-						const vertices = ls.vertices;
-						vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-						vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-					}
-
+					const vertices = ls.vertices;
+					vertices[ 0 ].applyMatrix4( matrix );
+					vertices[ 1 ].applyMatrix4( matrix );
 					parentLineSegments.push( ls );
 
 				}
@@ -1807,18 +1914,12 @@
 				for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
 					const os = conditionalSegments[ i ];
-
-					if ( separateObjects ) {
-
-						const vertices = os.vertices;
-						const controlPoints = os.controlPoints;
-						vertices[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-						vertices[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-						controlPoints[ 0 ].applyMatrix4( subobjectParseScope.matrix );
-						controlPoints[ 1 ].applyMatrix4( subobjectParseScope.matrix );
-
-					}
-
+					const vertices = os.vertices;
+					const controlPoints = os.controlPoints;
+					vertices[ 0 ].applyMatrix4( matrix );
+					vertices[ 1 ].applyMatrix4( matrix );
+					controlPoints[ 0 ].applyMatrix4( matrix );
+					controlPoints[ 1 ].applyMatrix4( matrix );
 					parentConditionalSegments.push( os );
 
 				}
@@ -1826,22 +1927,19 @@
 				for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 					const tri = faces[ i ];
+					const vertices = tri.vertices;
 
-					if ( separateObjects ) {
+					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-						const vertices = tri.vertices;
+						vertices[ i ].applyMatrix4( matrix );
 
-						for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+					} // If the scale of the object is negated then the triangle winding order
+					// needs to be flipped.
 
-							vertices[ i ] = vertices[ i ].clone().applyMatrix4( subobjectParseScope.matrix );
 
-						}
+					if ( matrixScaleInverted ) {
 
-						_tempVec0.subVectors( vertices[ 1 ], vertices[ 0 ] );
-
-						_tempVec1.subVectors( vertices[ 2 ], vertices[ 1 ] );
-
-						tri.faceNormal.crossVectors( _tempVec0, _tempVec1 ).normalize();
+						vertices.reverse();
 
 					}
 
@@ -1850,6 +1948,7 @@
 				}
 
 				parentParseScope.totalFaces += subobjectParseScope.totalFaces;
+				faceMaterials.forEach( material => parentFaceMaterials.add( material ) );
 
 			}
 
@@ -1864,7 +1963,6 @@
 
 			if ( subobject ) {
 
-				parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
 				parseScope.matrix.copy( subobject.matrix );
 				parseScope.inverted = subobject.inverted;
 				parseScope.startingConstructionStep = subobject.startingConstructionStep;
@@ -1911,9 +2009,10 @@
 
 					return scope.processObject( text, subobject, url, parseScope );
 
-				} ).catch( function () {
+				} ).catch( function ( err ) {
 
-					console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be found.' );
+					console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be loaded.' );
+					console.warn( err );
 					return null;
 
 				} );

@@ -328,7 +328,7 @@ UPNG.decode = function ( buff ) {
 	var fd, foff = 0;	// frames
 
 	var mgck = [ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a ];
-	for ( var i = 0; i < 8; i ++ ) if ( data[ i ] != mgck[ i ] ) throw 'The input is not a PNG file!';
+	for ( var i = 0; i < 8; i ++ ) if ( data[ i ] != mgck[ i ] ) throw new Error( 'The input is not a PNG file!' );
 
 	while ( offset < data.length ) {
 
