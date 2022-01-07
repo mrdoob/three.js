@@ -358,14 +358,6 @@
 
 						if ( c.isConditionalLine ) {
 
-							if ( matrixIsInverted ) {
-
-								permuteAttribute( c.geometry.attributes.control0, elemSize );
-								permuteAttribute( c.geometry.attributes.control1, elemSize );
-								permuteAttribute( c.geometry.attributes.direction, elemSize );
-
-							}
-
 							c.geometry.attributes.control0.applyMatrix4( c.matrixWorld );
 							c.geometry.attributes.control1.applyMatrix4( c.matrixWorld );
 							normalMatrix.getNormalMatrix( c.matrixWorld );
