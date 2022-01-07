@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp, RGBAFormat } from '../constants.js';
+import { FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
 
 let materialId = 0;
@@ -24,8 +24,7 @@ class Material extends EventDispatcher {
 		this.vertexColors = false;
 
 		this.opacity = 1;
-		this.format = RGBAFormat;
-		this.transparent = false;
+		this._transparent = false;
 
 		this.blendSrc = SrcAlphaFactor;
 		this.blendDst = OneMinusSrcAlphaFactor;
@@ -54,6 +53,7 @@ class Material extends EventDispatcher {
 		this.shadowSide = null;
 
 		this.colorWrite = true;
+		this.alphaWrite = true;
 
 		this.precision = null; // override the renderer's default precision for this material
 
@@ -75,6 +75,24 @@ class Material extends EventDispatcher {
 		this.version = 0;
 
 		this._alphaTest = 0;
+
+	}
+
+	get transparent() {
+
+		return this._transparent;
+
+	}
+
+	set transparent( value ) {
+
+		if ( value ) {
+
+			this.alphaWrite = true;
+
+		}
+
+		this._transparent = value;
 
 	}
 
@@ -306,13 +324,13 @@ class Material extends EventDispatcher {
 		if ( this.vertexColors ) data.vertexColors = true;
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
-		if ( this.format !== RGBAFormat ) data.format = this.format;
 		if ( this.transparent === true ) data.transparent = this.transparent;
 
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
 		data.colorWrite = this.colorWrite;
+		data.alphaWrite = this.alphaWrite;
 
 		data.stencilWrite = this.stencilWrite;
 		data.stencilWriteMask = this.stencilWriteMask;
@@ -403,7 +421,6 @@ class Material extends EventDispatcher {
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
-		this.format = source.format;
 		this.transparent = source.transparent;
 
 		this.blendSrc = source.blendSrc;
@@ -449,6 +466,7 @@ class Material extends EventDispatcher {
 		this.shadowSide = source.shadowSide;
 
 		this.colorWrite = source.colorWrite;
+		this.alphaWrite = source.alphaWrite;
 
 		this.precision = source.precision;
 

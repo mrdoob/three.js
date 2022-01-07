@@ -47,7 +47,6 @@ import {
 	PropertyBinding,
 	Quaternion,
 	QuaternionKeyframeTrack,
-	RGBFormat,
 	RepeatWrapping,
 	Skeleton,
 	SkinnedMesh,
@@ -3178,8 +3177,8 @@ class GLTFParser {
 
 		} else {
 
-			materialParams.format = RGBFormat;
 			materialParams.transparent = false;
+			materialParams.alphaWrite = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {
 
