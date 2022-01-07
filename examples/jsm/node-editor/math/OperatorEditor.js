@@ -1,22 +1,23 @@
-import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { SelectInput, LabelElement, Element } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
 import { OperatorNode, FloatNode } from '../../renderers/nodes/Nodes.js';
 
 const NULL_VALUE = new FloatNode();
 
-export class OperatorEditor extends ObjectNode {
+export class OperatorEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new OperatorNode( '+', NULL_VALUE, NULL_VALUE );
 
-		super( 'Operator', 1, node, 250 );
+		super( 'Operator', 1, node, 150 );
 
 		const opInput = new SelectInput( [
-			{ name: '+ Addition', value: '+' },
-			{ name: '- Subtraction', value: '-' },
-			{ name: '* Multiplication', value: '*' },
-			{ name: '/ Division', value: '/' }
-		] );
+			{ name: 'Addition ( + )', value: '+' },
+			{ name: 'Subtraction ( - )', value: '-' },
+			{ name: 'Multiplication ( * )', value: '*' },
+			{ name: 'Division ( / )', value: '/' }
+		], '+' );
 
 		opInput.onChange( ( data ) => {
 
@@ -31,17 +32,17 @@ export class OperatorEditor extends ObjectNode {
 
 		aElement.onConnect( () => {
 
-			node.aNode = aElement.linkedExtra || NULL_VALUE;
+			node.aNode = aElement.getLinkedObject() || NULL_VALUE;
 
 		} );
 
 		bElement.onConnect( () => {
 
-			node.bNode = bElement.linkedExtra || NULL_VALUE;
+			node.bNode = bElement.getLinkedObject() || NULL_VALUE;
 
 		} );
 
-		this.add( new LabelElement( 'Operator' ).add( opInput ) )
+		this.add( new Element().add( opInput ) )
 			.add( aElement )
 			.add( bElement );
 

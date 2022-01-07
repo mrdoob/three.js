@@ -1,7 +1,8 @@
-import { ObjectNode, ColorInput, StringInput, NumberInput, LabelElement } from '../../libs/flow.module.js';
+import { ColorInput, StringInput, NumberInput, LabelElement, Element } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
 import { ColorNode } from '../../renderers/nodes/Nodes.js';
 
-export class ColorEditor extends ObjectNode {
+export class ColorEditor extends BaseNode {
 
 	constructor() {
 
@@ -9,12 +10,11 @@ export class ColorEditor extends ObjectNode {
 
 		super( 'Color', 1, node );
 
-		this.title.setIcon( 'ti ti-palette' );
-
 		const updateFields = ( editing ) => {
 
 			const value = node.value;
 			const hexValue = value.getHex();
+			const hexString = hexValue.toString( 16 ).toUpperCase().padStart( 6, '0' );
 
 			if ( editing !== 'color' ) {
 
@@ -24,17 +24,21 @@ export class ColorEditor extends ObjectNode {
 
 			if ( editing !== 'hex' ) {
 
-				hexField.setValue( '#' + hexValue.toString( 16 ).toUpperCase().padEnd( 6, '0' ), false );
+				hexField.setValue( '#' + hexString, false );
 
 			}
 
 			if ( editing !== 'rgb' ) {
 
-				fieldR.setValue( value.r.toFixed( 3 ), false );
-				fieldG.setValue( value.g.toFixed( 3 ), false );
-				fieldB.setValue( value.b.toFixed( 3 ), false );
+				fieldR.setValue( value.r.toFixed( 3 ), false )
+				fieldG.setValue( value.g.toFixed( 3 ), false )
+				fieldB.setValue( value.b.toFixed( 3 ), false )
 
 			}
+
+			fieldR.setTagColor( `#${hexString.substr( 0, 2 )}0000` );
+			fieldG.setTagColor( `#00${hexString.substr( 2, 2 )}00` );
+			fieldB.setTagColor( `#0000${hexString.substr( 4, 2 )}` );
 
 		};
 
@@ -76,11 +80,11 @@ export class ColorEditor extends ObjectNode {
 
 		};
 
-		const fieldR = new NumberInput( 1, 0, 1 ).onChange( onChangeRGB );
-		const fieldG = new NumberInput( 1, 0, 1 ).onChange( onChangeRGB );
-		const fieldB = new NumberInput( 1, 0, 1 ).onChange( onChangeRGB );
+		const fieldR = new NumberInput( 1, 0, 1 ).setTagColor( 'red' ).onChange( onChangeRGB );
+		const fieldG = new NumberInput( 1, 0, 1 ).setTagColor( 'green' ).onChange( onChangeRGB );
+		const fieldB = new NumberInput( 1, 0, 1 ).setTagColor( 'blue' ).onChange( onChangeRGB );
 
-		this.add( new LabelElement( 'Value' ).add( field ).setSerializable( false ) )
+		this.add( new Element().add( field ).setSerializable( false ) )
 			.add( new LabelElement( 'Hex' ).add( hexField ).setSerializable( false ) )
 			.add( new LabelElement( 'RGB' ).add( fieldR ).add( fieldG ).add( fieldB ) );
 
