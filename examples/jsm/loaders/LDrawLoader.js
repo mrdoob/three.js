@@ -637,7 +637,7 @@ class LDrawParsedCache {
 		result.faces = original.faces.map( face => {
 
 			return {
-				colourCode: face.colourCode,
+				colorCode: face.colorCode,
 				material: face.material,
 				vertices: face.vertices.map( v => v.clone() ),
 				normals: face.normals.map( () => null ),
@@ -649,7 +649,7 @@ class LDrawParsedCache {
 		result.conditionalSegments = original.conditionalSegments.map( face => {
 
 			return {
-				colourCode: face.colourCode,
+				colorCode: face.colorCode,
 				material: face.material,
 				vertices: face.vertices.map( v => v.clone() ),
 				controlPoints: face.controlPoints.map( v => v.clone() )
@@ -660,7 +660,7 @@ class LDrawParsedCache {
 		result.lineSegments = original.lineSegments.map( face => {
 
 			return {
-				colourCode: face.colourCode,
+				colorCode: face.colorCode,
 				material: face.material,
 				vertices: face.vertices.map( v => v.clone() )
 			};
@@ -767,9 +767,9 @@ class LDrawParsedCache {
 		const subobjects = [];
 		const materials = {};
 
-		const getLocalMaterial = colourCode => {
+		const getLocalMaterial = colorCode => {
 
-			return colourCode in materials ? materials[ colourCode ] : null;
+			return colorCode in materials ? materials[ colorCode ] : null;
 
 		};
 
@@ -842,7 +842,7 @@ class LDrawParsedCache {
 			const lineType = lp.getToken();
 
 			let material;
-			let colourCode;
+			let colorCode;
 			let segment;
 			let ccw;
 			let doubleSided;
@@ -867,7 +867,7 @@ class LDrawParsedCache {
 
 							case '!COLOUR':
 
-								material = loader.parseColourMetaDirective( lp );
+								material = loader.parseColorMetaDirective( lp );
 								if ( material ) {
 
 									materials[ material.userData.code ] = material;
@@ -990,8 +990,8 @@ class LDrawParsedCache {
 					// Line type 1: Sub-object file
 				case '1':
 
-					colourCode = lp.getToken();
-					material = getLocalMaterial( colourCode );
+					colorCode = lp.getToken();
+					material = getLocalMaterial( colorCode );
 
 					const posX = parseFloat( lp.getToken() );
 					const posY = parseFloat( lp.getToken() );
@@ -1037,7 +1037,7 @@ class LDrawParsedCache {
 
 					subobjects.push( {
 						material: material,
-						colourCode: colourCode,
+						colorCode: colorCode,
 						matrix: matrix,
 						fileName: fileName,
 						inverted: bfcInverted,
@@ -1051,14 +1051,14 @@ class LDrawParsedCache {
 					// Line type 2: Line segment
 				case '2':
 
-					colourCode = lp.getToken();
-					material = getLocalMaterial( colourCode );
+					colorCode = lp.getToken();
+					material = getLocalMaterial( colorCode );
 					v0 = lp.getVector();
 					v1 = lp.getVector();
 
 					segment = {
 						material: material,
-						colourCode: colourCode,
+						colorCode: colorCode,
 						vertices: [ v0, v1 ],
 					};
 
@@ -1069,8 +1069,8 @@ class LDrawParsedCache {
 					// Line type 5: Conditional Line segment
 				case '5':
 
-					colourCode = lp.getToken();
-					material = getLocalMaterial( colourCode );
+					colorCode = lp.getToken();
+					material = getLocalMaterial( colorCode );
 					v0 = lp.getVector();
 					v1 = lp.getVector();
 					c0 = lp.getVector();
@@ -1078,7 +1078,7 @@ class LDrawParsedCache {
 
 					segment = {
 						material: material,
-						colourCode: colourCode,
+						colorCode: colorCode,
 						vertices: [ v0, v1 ],
 						controlPoints: [ c0, c1 ],
 					};
@@ -1090,8 +1090,8 @@ class LDrawParsedCache {
 					// Line type 3: Triangle
 				case '3':
 
-					colourCode = lp.getToken();
-					material = getLocalMaterial( colourCode );
+					colorCode = lp.getToken();
+					material = getLocalMaterial( colorCode );
 					ccw = bfcCCW;
 					doubleSided = ! bfcCertified || ! bfcCull;
 
@@ -1111,7 +1111,7 @@ class LDrawParsedCache {
 
 					faces.push( {
 						material: material,
-						colourCode: colourCode,
+						colorCode: colorCode,
 						faceNormal: null,
 						vertices: [ v0, v1, v2 ],
 						normals: [ null, null, null ],
@@ -1122,7 +1122,7 @@ class LDrawParsedCache {
 
 						faces.push( {
 							material: material,
-							colourCode: colourCode,
+							colorCode: colorCode,
 							faceNormal: null,
 							vertices: [ v2, v1, v0 ],
 							normals: [ null, null, null ],
@@ -1136,8 +1136,8 @@ class LDrawParsedCache {
 					// Line type 4: Quadrilateral
 				case '4':
 
-					colourCode = lp.getToken();
-					material = getLocalMaterial( colourCode );
+					colorCode = lp.getToken();
+					material = getLocalMaterial( colorCode );
 					ccw = bfcCCW;
 					doubleSided = ! bfcCertified || ! bfcCull;
 
@@ -1161,7 +1161,7 @@ class LDrawParsedCache {
 					// account for the doubling of vertices later when smoothing normals.
 					faces.push( {
 						material: material,
-						colourCode: colourCode,
+						colorCode: colorCode,
 						faceNormal: null,
 						vertices: [ v0, v1, v2, v3 ],
 						normals: [ null, null, null, null ],
@@ -1172,7 +1172,7 @@ class LDrawParsedCache {
 
 						faces.push( {
 							material: material,
-							colourCode: colourCode,
+							colorCode: colorCode,
 							faceNormal: null,
 							vertices: [ v3, v2, v1, v0 ],
 							normals: [ null, null, null, null ],
@@ -1243,13 +1243,13 @@ class LDrawParsedCache {
 
 function sortByMaterial( a, b ) {
 
-	if ( a.colourCode === b.colourCode ) {
+	if ( a.colorCode === b.colorCode ) {
 
 		return 0;
 
 	}
 
-	if ( a.colourCode < b.colourCode ) {
+	if ( a.colorCode < b.colorCode ) {
 
 		return - 1;
 
@@ -1264,7 +1264,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 	// Creates a LineSegments (elementSize = 2) or a Mesh (elementSize = 3 )
 	// With per face / segment material, implemented with mesh groups and materials array
 
-	// Sort the faces or line segments by colour code to make later the mesh groups
+	// Sort the faces or line segments by color code to make later the mesh groups
 	elements.sort( sortByMaterial );
 
 	if ( totalElements === null ) {
@@ -1495,10 +1495,10 @@ class LDrawLoader extends Loader {
 
 		this.rootParseScope = this.newParseScopeLevel();
 
-		// Add default main triangle and line edge materials (used in pieces that can be coloured with a main color)
+		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 		this.setMaterials( [
-			this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ),
-			this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
+			this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ),
+			this.parseColorMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
 		] );
 
 		// If this flag is set to true the vertex normals will be smoothed.
@@ -1533,7 +1533,7 @@ class LDrawLoader extends Loader {
 			if ( colorLineRegex.test( line ) ) {
 
 				const directive = line.replace( colorLineRegex, '' );
-				const material = this.parseColourMetaDirective( new LineParser( directive ) );
+				const material = this.parseColorMetaDirective( new LineParser( directive ) );
 				materials.push( material );
 
 			}
@@ -1630,8 +1630,8 @@ class LDrawLoader extends Loader {
 
 			// Current subobject
 			currentFileName: null,
-			mainColourCode: parentScope ? parentScope.mainColourCode : '16',
-			mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
+			mainColorCode: parentScope ? parentScope.mainColorCode : '16',
+			mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : '24',
 			matrix: new Matrix4(),
 			type: 'Model',
 			groupObject: null,
@@ -1671,23 +1671,23 @@ class LDrawLoader extends Loader {
 
 	}
 
-	getMaterial( colourCode, parseScope = this.rootParseScope ) {
+	getMaterial( colorCode, parseScope = this.rootParseScope ) {
 
-		// Given a colour code search its material in the parse scopes stack
+		// Given a color code search its material in the parse scopes stack
 
-		if ( colourCode.startsWith( '0x2' ) ) {
+		if ( colorCode.startsWith( '0x2' ) ) {
 
-			// Special 'direct' material value (RGB colour)
+			// Special 'direct' material value (RGB color)
 
-			const colour = colourCode.substring( 3 );
+			const color = colorCode.substring( 3 );
 
-			return this.parseColourMetaDirective( new LineParser( 'Direct_Color_' + colour + ' CODE -1 VALUE #' + colour + ' EDGE #' + colour + '' ) );
+			return this.parseColorMetaDirective( new LineParser( 'Direct_Color_' + color + ' CODE -1 VALUE #' + color + ' EDGE #' + color + '' ) );
 
 		}
 
 		while ( parseScope ) {
 
-			const material = parseScope.lib[ colourCode ];
+			const material = parseScope.lib[ colorCode ];
 
 			if ( material ) {
 
@@ -1706,15 +1706,15 @@ class LDrawLoader extends Loader {
 
 	}
 
-	parseColourMetaDirective( lineParser ) {
+	parseColorMetaDirective( lineParser ) {
 
-		// Parses a colour definition and returns a THREE.Material
+		// Parses a color definition and returns a THREE.Material
 
 		let code = null;
 
-		// Triangle and line colours
-		let colour = 0xFF00FF;
-		let edgeColour = 0xFF00FF;
+		// Triangle and line colors
+		let color = 0xFF00FF;
+		let edgeColor = 0xFF00FF;
 
 		// Transparency
 		let alpha = 1;
@@ -1754,14 +1754,14 @@ class LDrawLoader extends Loader {
 
 				case 'VALUE':
 
-					colour = lineParser.getToken();
-					if ( colour.startsWith( '0x' ) ) {
+					color = lineParser.getToken();
+					if ( color.startsWith( '0x' ) ) {
 
-						colour = '#' + colour.substring( 2 );
+						color = '#' + color.substring( 2 );
 
-					} else if ( ! colour.startsWith( '#' ) ) {
+					} else if ( ! color.startsWith( '#' ) ) {
 
-						throw new Error( 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + '.' );
+						throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
 
 					}
 
@@ -1769,18 +1769,18 @@ class LDrawLoader extends Loader {
 
 				case 'EDGE':
 
-					edgeColour = lineParser.getToken();
-					if ( edgeColour.startsWith( '0x' ) ) {
+					edgeColor = lineParser.getToken();
+					if ( edgeColor.startsWith( '0x' ) ) {
 
-						edgeColour = '#' + edgeColour.substring( 2 );
+						edgeColor = '#' + edgeColor.substring( 2 );
 
-					} else if ( ! edgeColour.startsWith( '#' ) ) {
+					} else if ( ! edgeColor.startsWith( '#' ) ) {
 
-						// Try to see if edge colour is a colour code
-						edgeMaterial = this.getMaterial( edgeColour );
+						// Try to see if edge color is a color code
+						edgeMaterial = this.getMaterial( edgeColor );
 						if ( ! edgeMaterial ) {
 
-							throw new Error( 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
 
 						}
 
@@ -1863,37 +1863,37 @@ class LDrawLoader extends Loader {
 
 			case FINISH_TYPE_DEFAULT:
 
-				material = new MeshStandardMaterial( { color: colour, roughness: 0.3, metalness: 0 } );
+				material = new MeshStandardMaterial( { color: color, roughness: 0.3, metalness: 0 } );
 				break;
 
 			case FINISH_TYPE_PEARLESCENT:
 
 				// Try to imitate pearlescency by making the surface glossy
-				material = new MeshStandardMaterial( { color: colour, roughness: 0.3, metalness: 0.25 } );
+				material = new MeshStandardMaterial( { color: color, roughness: 0.3, metalness: 0.25 } );
 				break;
 
 			case FINISH_TYPE_CHROME:
 
 				// Mirror finish surface
-				material = new MeshStandardMaterial( { color: colour, roughness: 0, metalness: 1 } );
+				material = new MeshStandardMaterial( { color: color, roughness: 0, metalness: 1 } );
 				break;
 
 			case FINISH_TYPE_RUBBER:
 
 				// Rubber finish
-				material = new MeshStandardMaterial( { color: colour, roughness: 0.9, metalness: 0 } );
+				material = new MeshStandardMaterial( { color: color, roughness: 0.9, metalness: 0 } );
 				break;
 
 			case FINISH_TYPE_MATTE_METALLIC:
 
 				// Brushed metal finish
-				material = new MeshStandardMaterial( { color: colour, roughness: 0.8, metalness: 0.4 } );
+				material = new MeshStandardMaterial( { color: color, roughness: 0.8, metalness: 0.4 } );
 				break;
 
 			case FINISH_TYPE_METAL:
 
 				// Average metal finish
-				material = new MeshStandardMaterial( { color: colour, roughness: 0.2, metalness: 0.85 } );
+				material = new MeshStandardMaterial( { color: color, roughness: 0.2, metalness: 0.85 } );
 				break;
 
 			default:
@@ -1920,7 +1920,7 @@ class LDrawLoader extends Loader {
 
 			// This is the material used for edges
 			edgeMaterial = new LineBasicMaterial( {
-				color: edgeColour,
+				color: edgeColor,
 				transparent: isTransparent,
 				opacity: alpha,
 				depthWrite: ! isTransparent
@@ -1934,7 +1934,7 @@ class LDrawLoader extends Loader {
 				fog: true,
 				transparent: isTransparent,
 				depthWrite: ! isTransparent,
-				color: edgeColour,
+				color: edgeColor,
 				opacity: alpha,
 
 			} );
@@ -1958,31 +1958,31 @@ class LDrawLoader extends Loader {
 		const currentParseScope = parseScope;
 		const parentParseScope = currentParseScope.parentScope;
 
-		// Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
-		const mainColourCode = currentParseScope.mainColourCode;
-		const mainEdgeColourCode = currentParseScope.mainEdgeColourCode;
+		// Main color codes passed to this subobject (or default codes 16 and 24 if it is the root object)
+		const mainColorCode = currentParseScope.mainColorCode;
+		const mainEdgeColorCode = currentParseScope.mainEdgeColorCode;
 
-		const parseColourCode = ( colourCode, forEdge ) => {
+		const parseColorCode = ( colorCode, forEdge ) => {
 
-			// Parses next colour code and returns a THREE.Material
+			// Parses next color code and returns a THREE.Material
 
-			if ( ! forEdge && colourCode === '16' ) {
+			if ( ! forEdge && colorCode === '16' ) {
 
-				colourCode = mainColourCode;
-
-			}
-
-			if ( forEdge && colourCode === '24' ) {
-
-				colourCode = mainEdgeColourCode;
+				colorCode = mainColorCode;
 
 			}
 
-			const material = this.getMaterial( colourCode, currentParseScope );
+			if ( forEdge && colorCode === '24' ) {
+
+				colorCode = mainEdgeColorCode;
+
+			}
+
+			const material = this.getMaterial( colorCode, currentParseScope );
 
 			if ( ! material ) {
 
-				throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used but it was not defined previously.' );
+				throw new Error( 'LDrawLoader: Unknown color code "' + colorCode + '" is used but it was not defined previously.' );
 
 			}
 
@@ -2000,9 +2000,9 @@ class LDrawLoader extends Loader {
 
 		}
 
-		for ( const colourCode in materials ) {
+		for ( const colorCode in materials ) {
 
-			this.addMaterial( materials[ colourCode ], currentParseScope );
+			this.addMaterial( materials[ colorCode ], currentParseScope );
 
 		}
 
@@ -2011,7 +2011,7 @@ class LDrawLoader extends Loader {
 			const face = faces[ i ];
 			if ( face.material === null ) {
 
-				face.material = parseColourCode( face.colourCode, false );
+				face.material = parseColorCode( face.colorCode, false );
 
 			}
 
@@ -2022,7 +2022,7 @@ class LDrawLoader extends Loader {
 			const ls = lineSegments[ i ];
 			if ( ls.material === null ) {
 
-				ls.material = parseColourCode( ls.colourCode, true );
+				ls.material = parseColorCode( ls.colorCode, true );
 
 			}
 
@@ -2033,7 +2033,7 @@ class LDrawLoader extends Loader {
 			const cs = conditionalSegments[ i ];
 			if ( cs.material === null ) {
 
-				cs.material = parseColourCode( cs.colourCode, true );
+				cs.material = parseColorCode( cs.colorCode, true );
 
 			}
 
@@ -2236,16 +2236,16 @@ class LDrawLoader extends Loader {
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
 			parseScope.fileName = subobject.fileName;
-			if ( subobject.colourCode === '16' && parseScope.parentScope ) {
+			if ( subobject.colorCode === '16' && parseScope.parentScope ) {
 
 				const parentScope = parseScope.parentScope;
-				parseScope.mainColourCode = parentScope.mainColourCode;
-				parseScope.mainEdgeColourCode = parentScope.mainEdgeColourCode;
+				parseScope.mainColorCode = parentScope.mainColorCode;
+				parseScope.mainEdgeColorCode = parentScope.mainEdgeColorCode;
 
-			} else if ( subobject.colourCode !== '16' ) {
+			} else if ( subobject.colorCode !== '16' ) {
 
-				parseScope.mainColourCode = subobject.colourCode;
-				parseScope.mainEdgeColourCode = subobject.colourCode;
+				parseScope.mainColorCode = subobject.colorCode;
+				parseScope.mainEdgeColorCode = subobject.colorCode;
 
 			}
 
