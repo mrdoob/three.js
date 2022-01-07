@@ -202,8 +202,20 @@ export default files.map( file => {
 	return {
 
 		input: inputPath,
-		treeshake: false,
-		external: () => true, // don't bundle anything
+		treeshake: true,
+		external: ( id ) => {
+
+			// Small utility methods can be individually inlined into examples,
+			// so users don't have to import the entire utility file.
+			if ( /BufferGeometryUtils/.test( id ) ) {
+
+				return false;
+
+			}
+
+			return true;
+
+		},
 		plugins: [
 			babel( {
 				babelHelpers: 'bundled',

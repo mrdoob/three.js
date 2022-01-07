@@ -3,7 +3,7 @@ import {
 	Float32BufferAttribute,
 	Vector3
 } from '../../../build/three.module.js';
-import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
+import { mergeVertices } from '../utils/BufferGeometryUtils.js';
 
 /**
  *	Simplification Geometry Modifier
@@ -16,16 +16,6 @@ import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 const _cb = new Vector3(), _ab = new Vector3();
 
 class SimplifyModifier {
-
-	constructor() {
-
-		if ( BufferGeometryUtils === undefined ) {
-
-			throw new Error( 'THREE.SimplifyModifier relies on BufferGeometryUtils' );
-
-		}
-
-	}
 
 	modify( geometry, count ) {
 
@@ -47,7 +37,7 @@ class SimplifyModifier {
 
 		}
 
-		geometry = BufferGeometryUtils.mergeVertices( geometry );
+		geometry = mergeVertices( geometry );
 
 		//
 		// put data of original geometry in different data structures
