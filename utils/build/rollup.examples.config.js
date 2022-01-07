@@ -191,6 +191,11 @@ const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	'offscreen/**/*',
 ] } );
 
+// Small utilities can be individually inlined into examples.
+const inline = [
+	'BufferGeometryUtils.js',
+	'WorkerPool.js',
+];
 
 // Create a rollup config for each .js file
 export default files.map( file => {
@@ -202,12 +207,10 @@ export default files.map( file => {
 	return {
 
 		input: inputPath,
-		treeshake: true,
+		treeshake: 'recommended',
 		external: ( id ) => {
 
-			// Small utility methods can be individually inlined into examples,
-			// so users don't have to import the entire utility file.
-			if ( /BufferGeometryUtils/.test( id ) ) {
+			if ( inline.some( ( _id ) => id.includes( _id ) ) ) {
 
 				return false;
 
