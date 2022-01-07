@@ -198,7 +198,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 	// point errors on vertices along quantization boundaries. Ie after matrix multiplication
 	// vertices that should be merged might be set to "1.7" and "1.6999..." meaning they won't
 	// get merged. This added epsilon attempts to push these error values to the same quantized
-	// value for the sake of hashing. See "AT-ST mini" dishes.
+	// value for the sake of hashing. See "AT-ST mini" dishes. See mrdoob/three#23169.
 
 	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
 	function hashVertex( v ) {
