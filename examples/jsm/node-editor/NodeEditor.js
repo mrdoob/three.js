@@ -105,19 +105,9 @@ export const NodeList = [
 				nodeClass: OperatorEditor
 			},
 			{
-				name: 'Normalize',
-				icon: 'fold',
-				nodeClass: OperatorEditor
-			},
-			{
 				name: 'Invert',
 				icon: 'flip-vertical',
 				tip: 'Negate',
-				nodeClass: OperatorEditor
-			},
-			{
-				name: 'Operator',
-				icon: 'math-symbols',
 				nodeClass: OperatorEditor
 			},
 			{
@@ -141,6 +131,11 @@ export const NodeList = [
 				icon: 'wave-sine',
 				tip: 'Sin / Cos / Tan',
 				nodeClass: TrigonometryEditor
+			},
+			{
+				name: 'Normalize',
+				icon: 'fold',
+				nodeClass: OperatorEditor
 			}
 		]
 	},
