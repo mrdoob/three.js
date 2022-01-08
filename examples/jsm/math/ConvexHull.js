@@ -46,27 +46,21 @@ class ConvexHull {
 
 	setFromPoints( points ) {
 
-		if ( Array.isArray( points ) !== true ) {
+		// The algorithm needs at least four points.
 
-			console.error( 'THREE.ConvexHull: Points parameter is not an array.' );
+		if ( points.length >= 4 ) {
 
-		}
+			this.makeEmpty();
 
-		if ( points.length < 4 ) {
+			for ( let i = 0, l = points.length; i < l; i ++ ) {
 
-			console.error( 'THREE.ConvexHull: The algorithm needs at least four points.' );
+				this.vertices.push( new VertexNode( points[ i ] ) );
 
-		}
+			}
 
-		this.makeEmpty();
-
-		for ( let i = 0, l = points.length; i < l; i ++ ) {
-
-			this.vertices.push( new VertexNode( points[ i ] ) );
+			this.compute();
 
 		}
-
-		this.compute();
 
 		return this;
 
