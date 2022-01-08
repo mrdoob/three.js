@@ -293,10 +293,12 @@
 
 					const geoms = geometries[ mat.uuid ];
 					if ( ! geoms ) {
+
 						geometries[ mat.uuid ] = {
 							mat: mat,
 							arr: [ geometry ]
 						};
+
 					}
 					else geoms.arr.push( geometry );
 
