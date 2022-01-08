@@ -17,6 +17,7 @@ class CubeTextureLoader extends Loader {
 		const loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
+		loader.setAbortSignal( this.abortSignal );
 
 		let loaded = 0;
 

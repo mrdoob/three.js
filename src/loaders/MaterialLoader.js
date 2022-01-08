@@ -25,6 +25,8 @@ class MaterialLoader extends Loader {
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
+
 		loader.load( url, function ( text ) {
 
 			try {

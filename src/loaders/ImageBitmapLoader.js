@@ -59,11 +59,14 @@ class ImageBitmapLoader extends Loader {
 
 		}
 
-		const fetchOptions = {};
-		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
-		fetchOptions.headers = this.requestHeader;
+		const req = new Request( url, {
+			credentials: ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include',
+			headers: new Headers( this.requestHeader ),
+		} );
 
-		fetch( url, fetchOptions ).then( function ( res ) {
+		fetch( req, {
+			signal: this.abortSignal,
+		} ).then( function ( res ) {
 
 			return res.blob();
 

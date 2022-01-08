@@ -79,6 +79,8 @@ class ObjectLoader extends Loader {
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
+
 		loader.load( url, function ( text ) {
 
 			let json = null;
@@ -123,6 +125,7 @@ class ObjectLoader extends Loader {
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		const text = await loader.loadAsync( url, onProgress );
 
@@ -451,6 +454,7 @@ class ObjectLoader extends Loader {
 
 			loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
+			loader.setAbortSignal( this.abortSignal );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 
@@ -550,6 +554,7 @@ class ObjectLoader extends Loader {
 
 			loader = new ImageLoader( this.manager );
 			loader.setCrossOrigin( this.crossOrigin );
+			loader.setAbortSignal( this.abortSignal );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 

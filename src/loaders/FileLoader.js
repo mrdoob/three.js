@@ -66,11 +66,12 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
-			// An abort controller could be added within a future PR
 		} );
 
 		// start the fetch
-		fetch( req )
+		fetch( req, {
+			signal: this.abortSignal,
+		} )
 			.then( response => {
 
 				if ( response.status === 200 || response.status === 0 ) {

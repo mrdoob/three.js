@@ -30,6 +30,7 @@ class CompressedTextureLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		let loaded = 0;
 

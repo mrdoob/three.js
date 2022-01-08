@@ -61,15 +61,33 @@ class ImageLoader extends Loader {
 
 		}
 
+		function onAbortSignal() {
+
+			image.src = null;
+
+		}
+
 		function removeEventListeners() {
 
 			image.removeEventListener( 'load', onImageLoad, false );
 			image.removeEventListener( 'error', onImageError, false );
 
+			if ( this.abortSignal ) {
+
+				this.abortSignal.removeEventListener( 'abort', onAbortSignal, false );
+
+			}
+
 		}
 
 		image.addEventListener( 'load', onImageLoad, false );
 		image.addEventListener( 'error', onImageError, false );
+
+		if ( this.abortSignal ) {
+
+			this.abortSignal.addEventListener( 'abort', onAbortSignal, false );
+
+		}
 
 		if ( url.substr( 0, 5 ) !== 'data:' ) {
 
