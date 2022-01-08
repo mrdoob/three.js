@@ -54,7 +54,24 @@ class ImageLoader extends Loader {
 
 			removeEventListeners();
 
-			if ( onError ) onError( event );
+			if ( onError ) {
+
+				if ( this.abortSignal && this.abortSignal.aborted ) {
+
+					// Simulate an error similar to the DOMException thrown by the Fetch API
+					// (DOMException is not instanciable)
+					const e = new Error();
+					e.name = 'AbortError';
+					e.message = 'The operation was aborted.';
+					onError( e );
+
+				} else {
+
+					onError( event );
+
+				}
+
+			}
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
