@@ -334,13 +334,13 @@ select {
 
 #menubar {
 	position: absolute;
-	width: 100%;
-	height: 32px;
 	background: #eee;
 	padding: 0;
 	margin: 0;
-	right: 0;
-	top: 0;
+	top: env(titlebar-area-y, 0);
+	left: env(titlebar-area-x, 0);
+	width: env(titlebar-area-width, 100%);
+	height: env(titlebar-area-height, 32px);
 	app-region: drag;
 }
 
