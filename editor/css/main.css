@@ -341,6 +341,7 @@ select {
 	left: env(titlebar-area-x, 0);
 	width: env(titlebar-area-width, 100%);
 	height: env(titlebar-area-height, 32px);
+	min-width: 600px;
 	app-region: drag;
 }
 
