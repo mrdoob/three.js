@@ -25,6 +25,10 @@ class NodeMaterialLoader extends Loader {
 
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( scope.abortSignal );
+
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );

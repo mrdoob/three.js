@@ -58,6 +58,8 @@ class ThreeMFLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( scope.abortSignal );
+
 		loader.load( url, function ( buffer ) {
 
 			try {
@@ -88,6 +90,8 @@ class ThreeMFLoader extends Loader {
 
 		const scope = this;
 		const textureLoader = new TextureLoader( this.manager );
+		textureLoader.setCrossOrigin( this.crossOrigin );
+		textureLoader.setAbortSignal( this.abortSignal );
 
 		function loadDocument( data ) {
 

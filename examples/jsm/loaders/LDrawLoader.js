@@ -746,6 +746,7 @@ class LDrawParsedCache {
 			fileLoader.setPath( loader.partsLibraryPath );
 			fileLoader.setRequestHeader( loader.requestHeader );
 			fileLoader.setWithCredentials( loader.withCredentials );
+			fileLoader.setAbortSignal( loader.abortSignal );
 
 			try {
 
@@ -1558,6 +1559,8 @@ class LDrawLoader extends Loader {
 		fileLoader.setPath( this.path );
 		fileLoader.setRequestHeader( this.requestHeader );
 		fileLoader.setWithCredentials( this.withCredentials );
+		fileLoader.setAbortSignal( this.abortSignal );
+
 		fileLoader.load( url, text => {
 
 			const parsedInfo = this.parseCache.parse( text );

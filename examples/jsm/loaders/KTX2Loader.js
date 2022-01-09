@@ -123,6 +123,8 @@ class KTX2Loader extends Loader {
 			const jsLoader = new FileLoader( this.manager );
 			jsLoader.setPath( this.transcoderPath );
 			jsLoader.setWithCredentials( this.withCredentials );
+			jsLoader.setAbortSignal( this.abortSignal );
+
 			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
 
 			// Load transcoder WASM binary.
@@ -130,6 +132,8 @@ class KTX2Loader extends Loader {
 			binaryLoader.setPath( this.transcoderPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			binaryLoader.setWithCredentials( this.withCredentials );
+			binaryLoader.setAbortSignal( this.abortSignal );
+
 			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
@@ -161,6 +165,18 @@ class KTX2Loader extends Loader {
 						return worker;
 
 					} );
+
+				} )
+				.catch( ( error ) => {
+
+					// on user abort
+					if ( error.name === 'AbortError' ) {
+
+						this.transcoderPending = null;
+
+					}
+
+					throw error;
 
 				} );
 
@@ -194,9 +210,9 @@ class KTX2Loader extends Loader {
 		}
 
 		const loader = new FileLoader( this.manager );
-
 		loader.setResponseType( 'arraybuffer' );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		const texture = new CompressedTexture();
 
@@ -257,6 +273,7 @@ class KTX2Loader extends Loader {
 		const taskConfig = config;
 		const texturePending = this.init().then( () => {
 
+			// TODO if abortSignal is defined, listen to it to cancel the worker
 			return this.workerPool.postMessage( { type: 'transcode', buffers, taskConfig: taskConfig }, buffers );
 
 		} ).then( ( e ) => this._createTextureFrom( e.data ) );

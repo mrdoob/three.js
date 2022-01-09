@@ -28,6 +28,10 @@ class VRMLoader extends Loader {
 
 		const scope = this;
 
+		this.gltfLoader.setRequestHeader( this.requestHeader );
+		this.gltfLoader.setWithCredentials( this.withCredentials );
+		this.gltfLoader.setAbortSignal( this.abortSignal );
+
 		this.gltfLoader.load( url, function ( gltf ) {
 
 			try {

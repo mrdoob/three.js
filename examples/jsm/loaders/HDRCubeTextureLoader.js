@@ -73,6 +73,7 @@ class HDRCubeTextureLoader extends Loader {
 				.setPath( scope.path )
 				.setResponseType( 'arraybuffer' )
 				.setWithCredentials( scope.withCredentials )
+				.setAbortSignal( scope.abortSignal )
 				.load( urls[ i ], function ( buffer ) {
 
 					loaded ++;

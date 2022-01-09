@@ -65,11 +65,11 @@ class DRACOLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
-
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		loader.load( url, ( buffer ) => {
 
@@ -165,6 +165,7 @@ class DRACOLoader extends Loader {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
 
+					// TODO if abortSignal is defined, listen to it to cancel the worker
 					worker.postMessage( { type: 'decode', id: taskID, taskConfig, buffer }, [ buffer ] );
 
 					// this.debug();
@@ -233,12 +234,9 @@ class DRACOLoader extends Loader {
 		loader.setPath( this.decoderPath );
 		loader.setResponseType( responseType );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
-		return new Promise( ( resolve, reject ) => {
-
-			loader.load( url, resolve, undefined, reject );
-
-		} );
+		return loader.loadAsync( url );
 
 	}
 
@@ -290,6 +288,18 @@ class DRACOLoader extends Loader {
 				].join( '\n' );
 
 				this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
+
+			} )
+			.catch( ( error ) => {
+
+				// on user abort
+				if ( error.name === 'AbortError' ) {
+
+					this.decoderPending = null;
+
+				}
+
+				throw error;
 
 			} );
 

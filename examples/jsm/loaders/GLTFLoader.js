@@ -185,6 +185,7 @@ class GLTFLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		loader.load( url, function ( data ) {
 
@@ -314,13 +315,12 @@ class GLTFLoader extends Loader {
 			path: path || this.resourcePath || '',
 			crossOrigin: this.crossOrigin,
 			requestHeader: this.requestHeader,
+			abortSignal: this.abortSignal,
 			manager: this.manager,
 			ktx2Loader: this.ktx2Loader,
 			meshoptDecoder: this.meshoptDecoder
 
 		} );
-
-		parser.fileLoader.setRequestHeader( this.requestHeader );
 
 		for ( let i = 0; i < this.pluginCallbacks.length; i ++ ) {
 
@@ -2263,9 +2263,12 @@ class GLTFParser {
 
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 		this.textureLoader.setRequestHeader( this.options.requestHeader );
+		this.textureLoader.setAbortSignal( this.options.abortSignal );
 
 		this.fileLoader = new FileLoader( this.options.manager );
 		this.fileLoader.setResponseType( 'arraybuffer' );
+		this.fileLoader.setRequestHeader( this.options.requestHeader );
+		this.fileLoader.setAbortSignal( this.options.abortSignal );
 
 		if ( this.options.crossOrigin === 'use-credentials' ) {
 

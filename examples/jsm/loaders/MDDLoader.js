@@ -33,6 +33,9 @@ class MDDLoader extends Loader {
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
+
 		loader.load( url, function ( data ) {
 
 			onLoad( scope.parse( data ) );

@@ -65,6 +65,8 @@ class LWOLoader extends Loader {
 		const loader = new FileLoader( this.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( scope.abortSignal );
 
 		loader.load( url, function ( buffer ) {
 
@@ -102,7 +104,10 @@ class LWOLoader extends Loader {
 
 		// console.log( 'lwoTree', lwoTree );
 
-		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const textureLoader = new TextureLoader( this.manager );
+		textureLoader.setPath( this.resourcePath || path );
+		textureLoader.setCrossOrigin( this.crossOrigin );
+		textureLoader.setAbortSignal( this.abortSignal );
 
 		return new LWOTreeParser( textureLoader ).parse( modelName );
 

@@ -23,6 +23,7 @@ class LottieLoader extends Loader {
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		loader.load( url, function ( text ) {
 

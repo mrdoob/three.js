@@ -2387,6 +2387,8 @@ class IFCLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( scope.abortSignal );
+
 		loader.load( url, async function ( buffer ) {
 
 			try {

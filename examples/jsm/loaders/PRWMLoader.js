@@ -236,6 +236,7 @@ class PRWMLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( scope.abortSignal );
 
 		url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
 

@@ -110,7 +110,9 @@ class MMDLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const builder = this.meshBuilder.setCrossOrigin( this.crossOrigin );
+		const builder = this.meshBuilder
+			.setCrossOrigin( this.crossOrigin )
+			.setAbortSignal( this.abortSignal );
 
 		// resource path
 
@@ -223,6 +225,7 @@ class MMDLoader extends Loader {
 			.setResponseType( 'arraybuffer' )
 			.setRequestHeader( this.requestHeader )
 			.setWithCredentials( this.withCredentials )
+			.setAbortSignal( this.abortSignal )
 			.load( url, function ( buffer ) {
 
 				onLoad( parser.parsePmd( buffer, true ) );
@@ -249,6 +252,7 @@ class MMDLoader extends Loader {
 			.setResponseType( 'arraybuffer' )
 			.setRequestHeader( this.requestHeader )
 			.setWithCredentials( this.withCredentials )
+			.setAbortSignal( this.abortSignal )
 			.load( url, function ( buffer ) {
 
 				onLoad( parser.parsePmx( buffer, true ) );
@@ -280,7 +284,8 @@ class MMDLoader extends Loader {
 			.setPath( this.animationPath )
 			.setResponseType( 'arraybuffer' )
 			.setRequestHeader( this.requestHeader )
-			.setWithCredentials( this.withCredentials );
+			.setWithCredentials( this.withCredentials )
+			.setAbortSignal( this.abortSignal );
 
 		for ( let i = 0, il = urls.length; i < il; i ++ ) {
 
@@ -315,6 +320,7 @@ class MMDLoader extends Loader {
 			.setResponseType( 'text' )
 			.setRequestHeader( this.requestHeader )
 			.setWithCredentials( this.withCredentials )
+			.setAbortSignal( this.abortSignal )
 			.load( url, function ( text ) {
 
 				onLoad( parser.parseVpd( text, true ) );
@@ -390,6 +396,7 @@ class MeshBuilder {
 	constructor( manager ) {
 
 		this.crossOrigin = 'anonymous';
+		this.abortSignal = null;
 		this.geometryBuilder = new GeometryBuilder();
 		this.materialBuilder = new MaterialBuilder( manager );
 
@@ -407,6 +414,17 @@ class MeshBuilder {
 	}
 
 	/**
+	 * @param {AbortSignal} abortSignal
+	 * @return {MeshBuilder}
+	 */
+	setAbortSignal( abortSignal ) {
+
+		this.abortSignal = abortSignal;
+		return this;
+
+	}
+
+	/**
 	 * @param {Object} data - parsed PMD/PMX data
 	 * @param {string} resourcePath
 	 * @param {function} onProgress
@@ -418,6 +436,7 @@ class MeshBuilder {
 		const geometry = this.geometryBuilder.build( data );
 		const material = this.materialBuilder
 			.setCrossOrigin( this.crossOrigin )
+			.setAbortSignal( this.abortSignal )
 			.setResourcePath( resourcePath )
 			.build( data, geometry, onProgress, onError );
 
@@ -1046,6 +1065,7 @@ class MaterialBuilder {
 		this.tgaLoader = null; // lazy generation
 
 		this.crossOrigin = 'anonymous';
+		this.abortSignal = null;
 		this.resourcePath = undefined;
 
 	}
@@ -1057,6 +1077,17 @@ class MaterialBuilder {
 	setCrossOrigin( crossOrigin ) {
 
 		this.crossOrigin = crossOrigin;
+		return this;
+
+	}
+
+	/**
+	 * @param {AbortSignal} abortSignal
+	 * @return {MaterialBuilder}
+	 */
+	setAbortSignal( abortSignal ) {
+
+		this.abortSignal = abortSignal;
 		return this;
 
 	}
@@ -1086,6 +1117,7 @@ class MaterialBuilder {
 		const textures = {};
 
 		this.textureLoader.setCrossOrigin( this.crossOrigin );
+		this.textureLoader.setAbortSignal( this.abortSignal );
 
 		// materials
 
@@ -1347,6 +1379,9 @@ class MaterialBuilder {
 			this.tgaLoader = new TGALoader( this.manager );
 
 		}
+
+		this.tgaLoader.setWithCredentials( this.crossOrigin === 'use-credentials' );
+		this.tgaLoader.setAbortSignal( this.abortSignal );
 
 		return this.tgaLoader;
 

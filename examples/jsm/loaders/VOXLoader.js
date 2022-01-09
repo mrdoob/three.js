@@ -21,6 +21,8 @@ class VOXLoader extends Loader {
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setAbortSignal( scope.abortSignal );
+
 		loader.load( url, function ( buffer ) {
 
 			try {

@@ -19,7 +19,9 @@ class FontLoader extends Loader {
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
+		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
+
 		loader.load( url, function ( text ) {
 
 			let json;

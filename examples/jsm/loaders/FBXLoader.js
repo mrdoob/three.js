@@ -83,6 +83,7 @@ class FBXLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( scope.abortSignal );
 
 		loader.load( url, function ( buffer ) {
 
@@ -138,7 +139,10 @@ class FBXLoader extends Loader {
 
 		// console.log( fbxTree );
 
-		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const textureLoader = new TextureLoader( this.manager );
+		textureLoader.setPath( this.resourcePath || path );
+		textureLoader.setCrossOrigin( this.crossOrigin );
+		textureLoader.setAbortSignal( this.abortSignal );
 
 		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 

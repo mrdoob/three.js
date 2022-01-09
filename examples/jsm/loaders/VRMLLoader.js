@@ -63,6 +63,8 @@ class VRMLLoader extends Loader {
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
+		loader.setAbortSignal( scope.abortSignal );
+
 		loader.load( url, function ( text ) {
 
 			try {
@@ -3189,7 +3191,9 @@ class VRMLLoader extends Loader {
 		//
 
 		const textureLoader = new TextureLoader( this.manager );
-		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path );
+		textureLoader.setCrossOrigin( this.crossOrigin );
+		textureLoader.setAbortSignal( this.abortSignal );
 
 		// check version (only 2.0 is supported)
 

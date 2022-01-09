@@ -24,6 +24,7 @@ class TiltLoader extends Loader {
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		loader.load( url, function ( buffer ) {
 

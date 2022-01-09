@@ -73,6 +73,7 @@ class Rhino3dmLoader extends Loader {
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setAbortSignal( this.abortSignal );
 
 		this.url = url;
 
@@ -124,6 +125,7 @@ class Rhino3dmLoader extends Loader {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
 
+					// TODO if abortSignal is defined, listen to it to cancel the worker
 					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
 
 					// this.debug();
@@ -671,21 +673,17 @@ class Rhino3dmLoader extends Loader {
 			// Load rhino3dm wrapper.
 			const jsLoader = new FileLoader( this.manager );
 			jsLoader.setPath( this.libraryPath );
-			const jsContent = new Promise( ( resolve, reject ) => {
+			jsLoader.setAbortSignal( this.abortSignal );
 
-				jsLoader.load( 'rhino3dm.js', resolve, undefined, reject );
-
-			} );
+			const jsContent = jsLoader.loadAsync( 'rhino3dm.js' );
 
 			// Load rhino3dm WASM binary.
 			const binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setPath( this.libraryPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
-			const binaryContent = new Promise( ( resolve, reject ) => {
+			jsLoader.setAbortSignal( this.abortSignal );
 
-				binaryLoader.load( 'rhino3dm.wasm', resolve, undefined, reject );
-
-			} );
+			const binaryContent = binaryLoader.loadAsync( 'rhino3dm.wasm' );
 
 			this.libraryPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
@@ -703,6 +701,18 @@ class Rhino3dmLoader extends Loader {
 					].join( '\n' );
 
 					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
+
+				} )
+				.catch( ( error ) => {
+
+					// on user abort
+					if ( error.name === 'AbortError' ) {
+
+						this.libraryPending = null;
+
+					}
+
+					throw error;
 
 				} );
 

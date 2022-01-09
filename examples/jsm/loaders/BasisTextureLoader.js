@@ -92,9 +92,9 @@ class BasisTextureLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
-
 		loader.setResponseType( 'arraybuffer' );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setAbortSignal( this.abortSignal );
 
 		const texture = new CompressedTexture();
 
@@ -173,6 +173,7 @@ class BasisTextureLoader extends Loader {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
 
+					// TODO if abortSignal is defined, listen to it to cancel the worker
 					worker.postMessage( { type: 'transcode', id: taskID, buffers: buffers, taskConfig: taskConfig }, buffers );
 
 				} );
@@ -221,22 +222,18 @@ class BasisTextureLoader extends Loader {
 			const jsLoader = new FileLoader( this.manager );
 			jsLoader.setPath( this.transcoderPath );
 			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = new Promise( ( resolve, reject ) => {
+			jsLoader.setAbortSignal( this.abortSignal );
 
-				jsLoader.load( 'basis_transcoder.js', resolve, undefined, reject );
-
-			} );
+			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
 
 			// Load transcoder WASM binary.
 			const binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setPath( this.transcoderPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = new Promise( ( resolve, reject ) => {
+			binaryLoader.setAbortSignal( this.abortSignal );
 
-				binaryLoader.load( 'basis_transcoder.wasm', resolve, undefined, reject );
-
-			} );
+			const binaryContent = binaryLoader.loadAsync(  'basis_transcoder.wasm' );
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
@@ -256,6 +253,18 @@ class BasisTextureLoader extends Loader {
 
 					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
 					this.transcoderBinary = binaryContent;
+
+				} )
+				.catch( ( error ) => {
+
+					// on user abort
+					if ( error.name === 'AbortError' ) {
+
+						this.transcoderPending = null;
+
+					}
+
+					throw error;
 
 				} );
 
