@@ -25,7 +25,7 @@
 
 		// Create car
 		const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
-		const car = new Mesh( carGeometry, chromeMaterial );
+		const car = new THREE.Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
 		// Update the render target cube
