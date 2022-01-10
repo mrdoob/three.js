@@ -60,6 +60,11 @@
 			The [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request. See [page:.setRequestHeader]. Default is empty object.
 		</p>
 
+		<h3>[property:AbortSignal abortSignal]</h3>
+		<p>
+			An [link:https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal AbortSignal] instance used to cancel the requests. See [page:.setAbortSignal]. Default is null.
+		</p>
+
 		<h2>Methods</h2>
 
 		<h3>[method:undefined load]()</h3>
@@ -112,6 +117,20 @@
 
 			Set the [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request.
 		</p>
+
+		<h3>[method:this setAbortSignal( [param:AbortSignal abortSignal] )</h3>
+		<p>
+			[page:AbortSignal abortSignal] - Set the [link:https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal AbortSignal] instance used to cancel the requests.<br/><br />
+			<strong>Warning:</strong> once the signal has been triggered, the loader will always immediately cancel new requests, you must then provide a new signal (from a new AbortController).
+		</p>
+		<code>
+			const controller = new AbortController();
+			const loader = new FileLoader();
+			loader.setAbortSignal(controller.signal);
+
+			loader.load(/* .... */);
+			controller.abort();
+		</code>
 
 		<h2>Source</h2>
 
