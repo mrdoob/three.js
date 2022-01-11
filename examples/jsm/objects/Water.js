@@ -1,7 +1,6 @@
 import {
 	Color,
 	FrontSide,
-	LinearFilter,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
