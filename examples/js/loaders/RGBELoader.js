@@ -343,6 +343,7 @@
 				destArray[ destOffset + 0 ] = sourceArray[ sourceOffset + 0 ] * scale;
 				destArray[ destOffset + 1 ] = sourceArray[ sourceOffset + 1 ] * scale;
 				destArray[ destOffset + 2 ] = sourceArray[ sourceOffset + 2 ] * scale;
+				destArray[ destOffset + 3 ] = 1;
 
 			};
 
@@ -354,6 +355,7 @@
 				destArray[ destOffset + 0 ] = THREE.DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 0 ] * scale, 65504 ) );
 				destArray[ destOffset + 1 ] = THREE.DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 1 ] * scale, 65504 ) );
 				destArray[ destOffset + 2 ] = THREE.DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 2 ] * scale, 65504 ) );
+				destArray[ destOffset + 3 ] = THREE.DataUtils.toHalfFloat( 1 );
 
 			};
 
@@ -376,31 +378,29 @@
 
 						case THREE.FloatType:
 							numElements = image_rgba_data.length / 4;
-							const floatArray = new Float32Array( numElements * 3 );
+							const floatArray = new Float32Array( numElements * 4 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 
-								RGBEByteToRGBFloat( image_rgba_data, j * 4, floatArray, j * 3 );
+								RGBEByteToRGBFloat( image_rgba_data, j * 4, floatArray, j * 4 );
 
 							}
 
 							data = floatArray;
-							format = THREE.RGBFormat;
 							type = THREE.FloatType;
 							break;
 
 						case THREE.HalfFloatType:
 							numElements = image_rgba_data.length / 4;
-							const halfArray = new Uint16Array( numElements * 3 );
+							const halfArray = new Uint16Array( numElements * 4 );
 
 							for ( let j = 0; j < numElements; j ++ ) {
 
-								RGBEByteToRGBHalf( image_rgba_data, j * 4, halfArray, j * 3 );
+								RGBEByteToRGBHalf( image_rgba_data, j * 4, halfArray, j * 4 );
 
 							}
 
 							data = halfArray;
-							format = THREE.RGBFormat;
 							type = THREE.HalfFloatType;
 							break;
 

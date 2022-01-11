@@ -30,7 +30,6 @@
 
 				case THREE.FloatType:
 					texture.encoding = THREE.LinearEncoding;
-					texture.format = THREE.RGBFormat;
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
 					texture.generateMipmaps = false;
@@ -38,7 +37,6 @@
 
 				case THREE.HalfFloatType:
 					texture.encoding = THREE.LinearEncoding;
-					texture.format = THREE.RGBFormat;
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
 					texture.generateMipmaps = false;
