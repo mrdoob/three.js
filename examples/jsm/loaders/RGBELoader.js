@@ -4,8 +4,7 @@ import {
 	FloatType,
 	HalfFloatType,
 	LinearEncoding,
-	LinearFilter,
-	RGBFormat,
+	LinearFilter
 } from '../../../build/three.module.js';
 
 // https://github.com/mrdoob/three.js/issues/5552
@@ -342,6 +341,7 @@ class RGBELoader extends DataTextureLoader {
 			destArray[ destOffset + 0 ] = sourceArray[ sourceOffset + 0 ] * scale;
 			destArray[ destOffset + 1 ] = sourceArray[ sourceOffset + 1 ] * scale;
 			destArray[ destOffset + 2 ] = sourceArray[ sourceOffset + 2 ] * scale;
+			destArray[ destOffset + 3 ] = 1;
 
 		};
 
@@ -354,6 +354,7 @@ class RGBELoader extends DataTextureLoader {
 			destArray[ destOffset + 0 ] = DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 0 ] * scale, 65504 ) );
 			destArray[ destOffset + 1 ] = DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 1 ] * scale, 65504 ) );
 			destArray[ destOffset + 2 ] = DataUtils.toHalfFloat( Math.min( sourceArray[ sourceOffset + 2 ] * scale, 65504 ) );
+			destArray[ destOffset + 3 ] = DataUtils.toHalfFloat( 1 );
 
 		};
 
@@ -377,32 +378,30 @@ class RGBELoader extends DataTextureLoader {
 					case FloatType:
 
 						numElements = image_rgba_data.length / 4;
-						const floatArray = new Float32Array( numElements * 3 );
+						const floatArray = new Float32Array( numElements * 4 );
 
 						for ( let j = 0; j < numElements; j ++ ) {
 
-							RGBEByteToRGBFloat( image_rgba_data, j * 4, floatArray, j * 3 );
+							RGBEByteToRGBFloat( image_rgba_data, j * 4, floatArray, j * 4 );
 
 						}
 
 						data = floatArray;
-						format = RGBFormat;
 						type = FloatType;
 						break;
 
 					case HalfFloatType:
 
 						numElements = image_rgba_data.length / 4;
-						const halfArray = new Uint16Array( numElements * 3 );
+						const halfArray = new Uint16Array( numElements * 4 );
 
 						for ( let j = 0; j < numElements; j ++ ) {
 
-							RGBEByteToRGBHalf( image_rgba_data, j * 4, halfArray, j * 3 );
+							RGBEByteToRGBHalf( image_rgba_data, j * 4, halfArray, j * 4 );
 
 						}
 
 						data = halfArray;
-						format = RGBFormat;
 						type = HalfFloatType;
 						break;
 
