@@ -1,13 +1,11 @@
 import {
 	Color,
 	LinearFilter,
-	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
 	Plane,
 	Quaternion,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector3,
@@ -44,19 +42,7 @@ class Refractor extends Mesh {
 
 		// render target
 
-		const parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBFormat
-		};
-
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-			renderTarget.texture.generateMipmaps = false;
-
-		}
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
 
 		// material
 
