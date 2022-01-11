@@ -1319,10 +1319,8 @@ class LDrawParsedCache {
 
 function getMaterialFromCode( colorCode, fallbackColorCode, materialHierarchy, forEdge ) {
 
-	// TODO: do we really need to handle '16' and '24' separately here?
 	if ( ! forEdge && colorCode === '16' ) {
 
-		// console.log( 'fALLING BACK TO ', fallbackColorCode )
 		colorCode = fallbackColorCode;
 
 	}
@@ -1333,16 +1331,7 @@ function getMaterialFromCode( colorCode, fallbackColorCode, materialHierarchy, f
 
 	}
 
-	const res = materialHierarchy[ colorCode ] || null;
-
-	if ( res === null ) {
-
-		// console.log( colorCode, materialHierarchy );
-		// return new MeshStandardMaterial( { color: 0xff00ff } )
-
-	}
-
-	return res;
+	return materialHierarchy[ colorCode ] || null;
 
 }
 
@@ -1411,7 +1400,7 @@ class LDrawPartsBuilderCache {
 		const childParts = [];
 		let totalFaces = info.totalFaces;
 
-		const processInfo = async ( info, root ) => {
+		const processInfo = async ( info ) => {
 
 			const subobjects = info.subobjects;
 			const promises = [];
@@ -1421,7 +1410,7 @@ class LDrawPartsBuilderCache {
 				const subobject = subobjects[ i ];
 				const promise = parseCache.loadData( subobject.fileName, false ).then( subInfo => {
 
-					// if ( subInfo.type === 'Part' ) {
+					// if ( isPartType( subInfo.type ) ) {
 
 					// 	return this.loadModel( subInfo.fileName, subobject.colorCode, localMaterials ).then( group => {
 
@@ -1433,19 +1422,14 @@ class LDrawPartsBuilderCache {
 
 					// }
 
-					const r = parseCache.getData( subobject.fileName );
-					r.fileName = subobject.fileName;
-					return processInfo( r ).then( finalInfo => {
+					return processInfo( parseCache.getData( subobject.fileName ) ).then( finalInfo => {
 
-						console.log( r.fileName );
 						finalInfo.subobjects = null;
 						finalInfo.matrix = subobject.matrix;
 						finalInfo.inverted = subobject.inverted;
 						finalInfo.startingConstructionStep = subobject.startingConstructionStep;
 						finalInfo.colorCode = subobject.colorCode;
 						finalInfo.fileName = subobject.fileName;
-
-						console.log( finalInfo );
 
 						return finalInfo;
 
@@ -1520,8 +1504,6 @@ class LDrawPartsBuilderCache {
 
 					}
 
-					// console.log( tri.colorCode, subInfo.colorCode );
-					// if ( tri.material === null ) console.log( tri.colorCode, subInfo.colorCode );
 					tri.colorCode = tri.colorCode === '16' ? subInfo.colorCode : tri.colorCode;
 					tri.material = tri.material || getMaterialFromCode( tri.colorCode, subInfo.colorCode, info.materials, false );
 					faceMaterials.add( tri.material );
@@ -1559,9 +1541,13 @@ class LDrawPartsBuilderCache {
 
 		await processInfo( info, true );
 
-		const checkSubSegments = faceMaterials.size > 1;
-		generateFaceNormals( info.faces );
-		// smoothNormals( info.faces, info.lineSegments, checkSubSegments );
+		if ( this.loader.smoothNormals ) {
+
+			const checkSubSegments = faceMaterials.size > 1;
+			generateFaceNormals( info.faces );
+			smoothNormals( info.faces, info.lineSegments, checkSubSegments );
+
+		}
 
 		const group = new Group();
 		if ( info.faces.length > 0 ) {
@@ -1640,11 +1626,11 @@ class LDrawPartsBuilderCache {
 			const immutableInfo = await parseCache.loadData( fileName, false );
 			const promise = this.processIntoMesh( parseCache.getData( fileName ) );
 
-			// if ( immutableInfo.type === 'Part' ) {
+			if ( isPartType( immutableInfo.type ) ) {
 
-			// 	this.cache = promise;
+				this.cache = promise;
 
-			// }
+			}
 
 			// console.log( 'INF', immutableInfo );
 
@@ -1665,7 +1651,7 @@ class LDrawPartsBuilderCache {
 		const parseCache = this.loader.parseCache;
 		const info = parseCache.parse( text );
 
-		if ( info.type === 'Part' && this.hasCachedModel( info.fileName ) ) {
+		if ( isPartType( info.type ) && this.hasCachedModel( info.fileName ) ) {
 
 			return this.getCachedModel( info.fileName, { ...materialHierarchy, ...info.materials } );
 
@@ -2057,12 +2043,10 @@ class LDrawLoader extends Loader {
 				const materials = {};
 				materials[ '16' ] = this.materials[0];
 				materials[ '24' ] = this.materials[1];
-				// console.log( this.materials )
 				this.computeConstructionSteps( group );
 
 				// applyMaterialsToMesh( group, null, materials );
 
-				// console.log( group )
 				onLoad( group );
 
 			} ).catch( err => {
