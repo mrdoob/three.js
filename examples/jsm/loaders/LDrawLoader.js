@@ -1219,31 +1219,86 @@ class LDrawParsedCache {
 
 	}
 
-	loadData( fileName ) {
+	// returns whether the cache has loaded or is currently loading the given data
+	hasData( fileName ) {
+
+		const key = fileName.toLowerCase();
+		return key in this.cache;
+
+	}
+
+	// returns whether the data for the given file name is full loaded
+	isDataLoaded( fileName ) {
+
+		const key = fileName.toLowerCase();
+		const cache = this.cache;
+		return key in cache && ! ( cache[ key ] instanceof Promise );
+
+	}
+
+	// returns an (optionally cloned) instance of the data
+	getData( fileName, clone = true ) {
+
+		const key = fileName.toLowerCase();
+		if ( this.hasData( key ) ) {
+
+			if ( clone ) {
+
+				const result = this.cache[ key ];
+				if ( result instanceof Promise ) {
+
+					return result.then( info => {
+
+						return this.cloneResult( info );
+
+					} );
+
+				} else {
+
+					return this.cloneResult( result );
+
+				}
+
+			} else {
+
+				return this.cache[ key ];
+
+			}
+
+		} else {
+
+			return null;
+
+		}
+
+	}
+
+	// kicks off a fetch and parse of the requested data if it hasn't already been loaded
+	async loadData( fileName, clone = true ) {
 
 		const key = fileName.toLowerCase();
 		if ( ! ( key in this.cache ) ) {
 
+			// replace the promise with a copy of the parsed data for immediate processing
 			this.cache[ key ] = this.fetchData( fileName ).then( text => {
 
-				return this.parse( text );
+				const info = this.parse( text );
+				this.cache[ key ] = info;
+				return info;
 
 			} );
 
 		}
 
-		return this.cache[ key ].then( result => {
-
-			return this.cloneResult( result );
-
-		} );
+		return await this.getData( fileName, clone );
 
 	}
 
+	// sets the data in the cache from parsed data
 	setData( fileName, text ) {
 
 		const key = fileName.toLowerCase();
-		this.cache[ key ] = Promise.resolve( this.parse( text ) );
+		this.cache[ key ] = this.parse( text );
 
 	}
 
