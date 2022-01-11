@@ -764,7 +764,7 @@ class LDrawParsedCache {
 
 	}
 
-	parse( text ) {
+	parse( text, fileName = null ) {
 
 		const loader = this.loader;
 
@@ -1214,7 +1214,8 @@ class LDrawParsedCache {
 			subobjects,
 			totalFaces,
 			startingConstructionStep,
-			materials
+			materials,
+			fileName,
 		};
 
 	}
@@ -1282,7 +1283,7 @@ class LDrawParsedCache {
 			// replace the promise with a copy of the parsed data for immediate processing
 			this.cache[ key ] = this.fetchData( fileName ).then( text => {
 
-				const info = this.parse( text );
+				const info = this.parse( text, fileName );
 				this.cache[ key ] = info;
 				return info;
 
@@ -1298,11 +1299,436 @@ class LDrawParsedCache {
 	setData( fileName, text ) {
 
 		const key = fileName.toLowerCase();
-		this.cache[ key ] = this.parse( text );
+		this.cache[ key ] = this.parse( text, fileName );
 
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////
+
+
+function getMaterialFromCode( colorCode, fallbackColorCode, materialHierarchy, forEdge ) {
+
+	// TODO: do we really need to handle '16' and '24' separately here?
+	if ( ! forEdge && colorCode === '16' ) {
+
+		// console.log( 'fALLING BACK TO ', fallbackColorCode )
+		colorCode = fallbackColorCode;
+
+	}
+
+	if ( forEdge && colorCode === '24' ) {
+
+		colorCode = fallbackColorCode;
+
+	}
+
+	const res = materialHierarchy[ colorCode ] || null;
+
+	if ( res === null ) {
+
+		// console.log( colorCode, materialHierarchy );
+		// return new MeshStandardMaterial( { color: 0xff00ff } )
+
+	}
+
+	return res;
+
+}
+
+function applyMaterialsToMesh( group, colorCode, materialHierarchy ) {
+
+	if ( colorCode == '16' || colorCode === '24' ) {
+
+		return;
+
+	}
+
+	group.traverse( c => {
+
+		if ( c.isMesh || c.isLineSegments ) {
+
+			let material = materialHierarchy[ colorCode ];
+			if ( c.isLineSegments ) {
+
+				material = material.userData.edgeMaterial;
+
+				if ( c.isConditionalLine ) {
+
+					material = material.userData.conditionalEdgeMaterial;
+
+				}
+
+			}
+
+			if ( Array.isArray( c.material ) ) {
+
+				for ( let i = 0, l = c.material.length; i < l; i ++ ) {
+
+					if ( c.material[ i ] === null ) {
+
+						c.material[ i ] = material;
+
+					}
+
+				}
+
+			} else if ( c.material === null ) {
+
+				c.material = material;
+
+			}
+
+		}
+
+	} );
+
+}
+
+class LDrawPartsBuilderCache {
+
+	constructor( loader ) {
+
+		this.loader = loader;
+		this.cache = {};
+
+	}
+
+	async processIntoMesh( info ) {
+
+		const parseCache = this.loader.parseCache;
+		const faceMaterials = new Set();
+		const childParts = [];
+		let totalFaces = info.totalFaces;
+
+		const processInfo = async ( info, root ) => {
+
+			const subobjects = info.subobjects;
+			const promises = [];
+
+			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
+
+				const subobject = subobjects[ i ];
+				const promise = parseCache.loadData( subobject.fileName, false ).then( subInfo => {
+
+					// if ( subInfo.type === 'Part' ) {
+
+					// 	return this.loadModel( subInfo.fileName, subobject.colorCode, localMaterials ).then( group => {
+
+					// 		subobject.matrix.decompose( group.position, group.quaternion, group.scale );
+					// 		childParts.push( group );
+					// 		return null;
+
+					// 	} );
+
+					// }
+
+					const r = parseCache.getData( subobject.fileName );
+					r.fileName = subobject.fileName;
+					return processInfo( r ).then( finalInfo => {
+
+						console.log( r.fileName );
+						finalInfo.subobjects = null;
+						finalInfo.matrix = subobject.matrix;
+						finalInfo.inverted = subobject.inverted;
+						finalInfo.startingConstructionStep = subobject.startingConstructionStep;
+						finalInfo.colorCode = subobject.colorCode;
+						finalInfo.fileName = subobject.fileName;
+
+						console.log( finalInfo );
+
+						return finalInfo;
+
+					} );
+
+				} );
+
+				promises.push( promise );
+
+			}
+
+
+			const subInfos = await Promise.all( promises );
+			for ( let i = 0, l = subInfos.length; i < l; i ++ ) {
+
+				const subInfo = subInfos[ i ];
+				if ( subInfo === null ) {
+
+					continue;
+
+				}
+
+				const parentLineSegments = info.lineSegments;
+				const parentConditionalSegments = info.conditionalSegments;
+				const parentFaces = info.faces;
+
+				const lineSegments = subInfo.lineSegments;
+				const conditionalSegments = subInfo.conditionalSegments;
+				const faces = subInfo.faces;
+				const matrix = subInfo.matrix;
+				const inverted = subInfo.inverted;
+				const matrixScaleInverted = matrix.determinant() < 0;
+
+				const lineColorCode = subInfo.colorCode === '16' ? '24' : subInfo.colorCode;
+				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
+
+					const ls = lineSegments[ i ];
+					const vertices = ls.vertices;
+					vertices[ 0 ].applyMatrix4( matrix );
+					vertices[ 1 ].applyMatrix4( matrix );
+					ls.colorCode = ls.colorCode === '24' ? lineColorCode : ls.colorCode;
+					ls.material = ls.material || getMaterialFromCode( ls.colorCode, ls.colorCode, info.materials, true );
+
+					parentLineSegments.push( ls );
+
+				}
+
+				for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+
+					const os = conditionalSegments[ i ];
+					const vertices = os.vertices;
+					const controlPoints = os.controlPoints;
+					vertices[ 0 ].applyMatrix4( matrix );
+					vertices[ 1 ].applyMatrix4( matrix );
+					controlPoints[ 0 ].applyMatrix4( matrix );
+					controlPoints[ 1 ].applyMatrix4( matrix );
+					os.colorCode = os.colorCode === '24' ? lineColorCode : os.colorCode;
+					os.material = os.material || getMaterialFromCode( os.colorCode, os.colorCode, info.materials, true );
+
+					parentConditionalSegments.push( os );
+
+				}
+
+				// if ( info. ) debugger
+				for ( let i = 0, l = faces.length; i < l; i ++ ) {
+
+					const tri = faces[ i ];
+					const vertices = tri.vertices;
+					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
+
+						vertices[ i ].applyMatrix4( matrix );
+
+					}
+
+					// console.log( tri.colorCode, subInfo.colorCode );
+					// if ( tri.material === null ) console.log( tri.colorCode, subInfo.colorCode );
+					tri.colorCode = tri.colorCode === '16' ? subInfo.colorCode : tri.colorCode;
+					tri.material = tri.material || getMaterialFromCode( tri.colorCode, subInfo.colorCode, info.materials, false );
+					faceMaterials.add( tri.material );
+
+					// If the scale of the object is negated then the triangle winding order
+					// needs to be flipped.
+					if ( matrixScaleInverted !== inverted ) {
+
+						vertices.reverse();
+
+					}
+
+					parentFaces.push( tri );
+
+				}
+
+				totalFaces += subInfo.totalFaces;
+
+			}
+
+			return info;
+
+		};
+
+		for ( let i = 0, l = info.faces; i < l; i ++ ) {
+
+			const material = info.faces[ i ].material;
+			if ( material ) {
+
+				faceMaterials.add( material );
+
+			}
+
+		}
+
+		await processInfo( info, true );
+
+		const checkSubSegments = faceMaterials.size > 1;
+		generateFaceNormals( info.faces );
+		// smoothNormals( info.faces, info.lineSegments, checkSubSegments );
+
+		const group = new Group();
+		if ( info.faces.length > 0 ) {
+
+			group.add( createObject( info.faces, 3, false, totalFaces ) );
+
+		}
+
+		if ( info.lineSegments.length > 0 ) {
+
+			group.add( createObject( info.lineSegments, 2 ) );
+
+		}
+
+		if ( info.conditionalSegments.length > 0 ) {
+
+			group.add( createObject( info.conditionalSegments, 2, true ) );
+
+		}
+
+		group.name = info.fileName;
+		group.userData.category = info.category;
+		group.userData.keywords = info.keywords;
+		if ( childParts.length ) {
+
+			group.add( ...childParts );
+
+		}
+
+		group.userData.startingConstructionStep = info.startingConstructionStep;
+
+		return group;
+
+
+
+	}
+
+	hasCachedModel( fileName ) {
+
+		return fileName in this.cache;
+
+	}
+
+	async getCachedModel( fileName, fallbackColorCode = null, materialHierarchy = {} ) {
+
+		if ( this.hasCachedModel( fileName ) ) {
+
+			const group = await this.cache[ fileName ];
+			const result = group.clone();
+			if ( fallbackColorCode !== null ) {
+
+				applyMaterialsToMesh( result, fallbackColorCode, materialHierarchy );
+
+			}
+
+			return result;
+
+		} else {
+
+			return null;
+
+		}
+
+	}
+
+	async loadModel( fileName, fallbackColorCode = null, materialHierarchy = {} ) {
+
+		if ( this.hasCachedModel( fileName ) ) {
+
+			return this.getCachedModel( fileName, fallbackColorCode, materialHierarchy );
+
+		} else {
+
+			// prepare data to be ready
+			const parseCache = this.loader.parseCache;
+			const immutableInfo = await parseCache.loadData( fileName, false );
+			const promise = this.processIntoMesh( parseCache.getData( fileName ) );
+
+			// if ( immutableInfo.type === 'Part' ) {
+
+			// 	this.cache = promise;
+
+			// }
+
+			// console.log( 'INF', immutableInfo );
+
+			return promise.then( cachedResult => {
+
+				const result = cachedResult.clone();
+
+				return result;
+
+			} );
+
+		}
+
+	}
+
+	parseModel( text, materialHierarchy = {} ) {
+
+		const parseCache = this.loader.parseCache;
+		const info = parseCache.parse( text );
+
+		if ( info.type === 'Part' && this.hasCachedModel( info.fileName ) ) {
+
+			return this.getCachedModel( info.fileName, { ...materialHierarchy, ...info.materials } );
+
+		}
+
+		return this.processIntoMesh( info, { ...materialHierarchy, ...info.materials } );
+
+	}
+
+}
+
+//////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function sortByMaterial( a, b ) {
 
@@ -1342,7 +1768,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 	const quadArray = new Array( 6 );
 	const bufferGeometry = new BufferGeometry();
-	let prevMaterial = null;
+	let prevMaterial = undefined;
 	let index0 = 0;
 	let numGroupVerts = 0;
 	let offset = 0;
@@ -1436,13 +1862,21 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 			} else if ( elementSize === 2 ) {
 
-				if ( isConditionalSegments ) {
+				if ( material !== null ) {
 
-					materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
+					if ( isConditionalSegments ) {
+
+						materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
+
+					} else {
+
+						materials.push( material.userData.edgeMaterial );
+
+					}
 
 				} else {
 
-					materials.push( material.userData.edgeMaterial );
+					materials.push( null );
 
 				}
 
@@ -1552,6 +1986,7 @@ class LDrawLoader extends Loader {
 		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
 		this.parseCache = new LDrawParsedCache( this );
+		this.partsBuilder = new LDrawPartsBuilderCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = {};
@@ -1615,13 +2050,36 @@ class LDrawLoader extends Loader {
 		fileLoader.setWithCredentials( this.withCredentials );
 		fileLoader.load( url, text => {
 
-			const parsedInfo = this.parseCache.parse( text );
-			this.processObject( parsedInfo, null, url, this.rootParseScope )
-				.then( function ( result ) {
+			const res = this.partsBuilder.parseModel( text, this.rootParseScope.lib );
+			res.then( group => {
 
-					onLoad( result.groupObject );
 
-				} );
+				const materials = {};
+				materials[ '16' ] = this.materials[0];
+				materials[ '24' ] = this.materials[1];
+				// console.log( this.materials )
+				this.computeConstructionSteps( group );
+
+				// applyMaterialsToMesh( group, null, materials );
+
+				// console.log( group )
+				onLoad( group );
+
+			} ).catch( err => {
+
+				console.error(err)
+
+			} );
+
+
+
+			// const parsedInfo = this.parseCache.parse( text );
+			// this.processObject( parsedInfo, null, url, this.rootParseScope )
+			// 	.then( function ( result ) {
+
+			// 		onLoad( result.groupObject );
+
+			// 	} );
 
 		}, onProgress, onError );
 
