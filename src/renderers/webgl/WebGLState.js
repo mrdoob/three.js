@@ -500,10 +500,9 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			} else {
 
-				if ( drawBuffers.length !== 1 || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+				if ( drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
 
 					drawBuffers[ 0 ] = gl.COLOR_ATTACHMENT0;
-					drawBuffers.length = 1;
 
 					needsUpdate = true;
 
@@ -513,10 +512,9 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		} else {
 
-			if ( drawBuffers.length !== 1 || drawBuffers[ 0 ] !== gl.BACK ) {
+			if ( drawBuffers[ 0 ] !== gl.BACK ) {
 
 				drawBuffers[ 0 ] = gl.BACK;
-				drawBuffers.length = 1;
 
 				needsUpdate = true;
 
