@@ -8456,7 +8456,6 @@ class Material extends EventDispatcher {
 		this.vertexColors = false;
 
 		this.opacity = 1;
-		this.format = RGBAFormat;
 		this.transparent = false;
 
 		this.blendSrc = SrcAlphaFactor;
@@ -8486,6 +8485,7 @@ class Material extends EventDispatcher {
 		this.shadowSide = null;
 
 		this.colorWrite = true;
+		this.alphaWrite = true;
 
 		this.precision = null; // override the renderer's default precision for this material
 
@@ -8738,13 +8738,13 @@ class Material extends EventDispatcher {
 		if ( this.vertexColors ) data.vertexColors = true;
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
-		if ( this.format !== RGBAFormat ) data.format = this.format;
 		if ( this.transparent === true ) data.transparent = this.transparent;
 
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
 		data.colorWrite = this.colorWrite;
+		data.alphaWrite = this.alphaWrite;
 
 		data.stencilWrite = this.stencilWrite;
 		data.stencilWriteMask = this.stencilWriteMask;
@@ -8835,7 +8835,6 @@ class Material extends EventDispatcher {
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
-		this.format = source.format;
 		this.transparent = source.transparent;
 
 		this.blendSrc = source.blendSrc;
@@ -8881,6 +8880,7 @@ class Material extends EventDispatcher {
 		this.shadowSide = source.shadowSide;
 
 		this.colorWrite = source.colorWrite;
+		this.alphaWrite = source.alphaWrite;
 
 		this.precision = source.precision;
 
@@ -18528,7 +18528,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
-			parameters.format === RGBFormat ? '#define OPAQUE' : '',
+			parameters.alphaWrite ? '' : '#define OPAQUE',
 
 			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ),
@@ -19031,6 +19031,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			alphaMap: !! material.alphaMap,
 			alphaTest: useAlphaTest,
+			alphaWrite: material.alphaWrite || material.transparent,
 
 			gradientMap: !! material.gradientMap,
 
@@ -19080,7 +19081,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
 
-			format: material.format,
 			dithering: material.dithering,
 
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
@@ -19178,7 +19178,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.toneMapping );
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
-		array.push( parameters.format );
+		array.push( parameters.alphaWrite );
 
 	}
 
@@ -21147,6 +21147,8 @@ function WebGLState( gl, extensions, capabilities ) {
 	let enabledCapabilities = {};
 
 	let currentBoundFramebuffers = {};
+	let currentDrawbuffers = new WeakMap();
+	let defaultDrawbuffers = [];
 
 	let currentProgram = null;
 
@@ -21288,6 +21290,84 @@ function WebGLState( gl, extensions, capabilities ) {
 		}
 
 		return false;
+
+	}
+
+	function drawBuffers( renderTarget, framebuffer ) {
+
+		let drawBuffers = defaultDrawbuffers;
+
+		let needsUpdate = false;
+
+		if ( renderTarget ) {
+
+			drawBuffers = currentDrawbuffers.get( framebuffer );
+
+			if ( drawBuffers === undefined ) {
+
+				drawBuffers = [];
+				currentDrawbuffers.set( framebuffer, drawBuffers );
+
+			}
+
+			if ( renderTarget.isWebGLMultipleRenderTargets ) {
+
+				const textures = renderTarget.texture;
+
+				if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== 36064 ) {
+
+					for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
+						drawBuffers[ i ] = 36064 + i;
+
+					}
+
+					drawBuffers.length = textures.length;
+
+					needsUpdate = true;
+
+				}
+
+			} else {
+
+				if ( drawBuffers.length !== 1 || drawBuffers[ 0 ] !== 36064 ) {
+
+					drawBuffers[ 0 ] = 36064;
+					drawBuffers.length = 1;
+
+					needsUpdate = true;
+
+				}
+
+			}
+
+		} else {
+
+			if ( drawBuffers.length !== 1 || drawBuffers[ 0 ] !== 1029 ) {
+
+				drawBuffers[ 0 ] = 1029;
+				drawBuffers.length = 1;
+
+				needsUpdate = true;
+
+			}
+
+		}
+
+		if ( needsUpdate ) {
+
+			if ( capabilities.isWebGL2 ) {
+
+				gl.drawBuffers( drawBuffers );
+
+			} else {
+
+				extensions.get( 'WEBGL_draw_buffers' ).drawBuffersWEBGL( drawBuffers );
+
+			}
+
+		}
+
 
 	}
 
@@ -21877,6 +21957,8 @@ function WebGLState( gl, extensions, capabilities ) {
 		currentBoundTextures = {};
 
 		currentBoundFramebuffers = {};
+		currentDrawbuffers = new WeakMap();
+		defaultDrawbuffers = [];
 
 		currentProgram = null;
 
@@ -21919,6 +22001,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		disable: disable,
 
 		bindFramebuffer: bindFramebuffer,
+		drawBuffers: drawBuffers,
 
 		useProgram: useProgram,
 
@@ -25890,10 +25973,6 @@ function WebGLRenderer( parameters = {} ) {
 	const _scissor = new Vector4( 0, 0, _width, _height );
 	let _scissorTest = false;
 
-	//
-
-	const _currentDrawBuffers = [];
-
 	// frustum
 
 	const _frustum = new Frustum();
@@ -26025,8 +26104,6 @@ function WebGLRenderer( parameters = {} ) {
 		utils = new WebGLUtils( _gl, extensions, capabilities );
 
 		state = new WebGLState( _gl, extensions, capabilities );
-
-		_currentDrawBuffers[ 0 ] = 1029;
 
 		info = new WebGLInfo( _gl );
 		properties = new WebGLProperties();
@@ -27626,67 +27703,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( framebufferBound && capabilities.drawBuffers && useDefaultFramebuffer ) {
 
-			let needsUpdate = false;
-
-			if ( renderTarget ) {
-
-				if ( renderTarget.isWebGLMultipleRenderTargets ) {
-
-					const textures = renderTarget.texture;
-
-					if ( _currentDrawBuffers.length !== textures.length || _currentDrawBuffers[ 0 ] !== 36064 ) {
-
-						for ( let i = 0, il = textures.length; i < il; i ++ ) {
-
-							_currentDrawBuffers[ i ] = 36064 + i;
-
-						}
-
-						_currentDrawBuffers.length = textures.length;
-
-						needsUpdate = true;
-
-					}
-
-				} else {
-
-					if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== 36064 ) {
-
-						_currentDrawBuffers[ 0 ] = 36064;
-						_currentDrawBuffers.length = 1;
-
-						needsUpdate = true;
-
-					}
-
-				}
-
-			} else {
-
-				if ( _currentDrawBuffers.length !== 1 || _currentDrawBuffers[ 0 ] !== 1029 ) {
-
-					_currentDrawBuffers[ 0 ] = 1029;
-					_currentDrawBuffers.length = 1;
-
-					needsUpdate = true;
-
-				}
-
-			}
-
-			if ( needsUpdate ) {
-
-				if ( capabilities.isWebGL2 ) {
-
-					_gl.drawBuffers( _currentDrawBuffers );
-
-				} else {
-
-					extensions.get( 'WEBGL_draw_buffers' ).drawBuffersWEBGL( _currentDrawBuffers );
-
-				}
-
-			}
+			state.drawBuffers( renderTarget, framebuffer );
 
 		}
 
@@ -40842,12 +40859,12 @@ class MaterialLoader extends Loader {
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.shadowSide !== undefined ) material.shadowSide = json.shadowSide;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
-		if ( json.format !== undefined ) material.format = json.format;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
+		if ( json.alphaWrite !== undefined ) material.alphaWrite = json.alphaWrite;
 
 		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
 		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;

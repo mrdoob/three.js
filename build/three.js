@@ -7,7 +7,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
 	const REVISION = '137dev';
 	const MOUSE = {
@@ -6536,7 +6536,6 @@
 			this.side = FrontSide;
 			this.vertexColors = false;
 			this.opacity = 1;
-			this.format = RGBAFormat;
 			this.transparent = false;
 			this.blendSrc = SrcAlphaFactor;
 			this.blendDst = OneMinusSrcAlphaFactor;
@@ -6560,6 +6559,7 @@
 			this.clipShadows = false;
 			this.shadowSide = null;
 			this.colorWrite = true;
+			this.alphaWrite = true;
 			this.precision = null; // override the renderer's default precision for this material
 
 			this.polygonOffset = false;
@@ -6745,12 +6745,12 @@
 			if (this.side !== FrontSide) data.side = this.side;
 			if (this.vertexColors) data.vertexColors = true;
 			if (this.opacity < 1) data.opacity = this.opacity;
-			if (this.format !== RGBAFormat) data.format = this.format;
 			if (this.transparent === true) data.transparent = this.transparent;
 			data.depthFunc = this.depthFunc;
 			data.depthTest = this.depthTest;
 			data.depthWrite = this.depthWrite;
 			data.colorWrite = this.colorWrite;
+			data.alphaWrite = this.alphaWrite;
 			data.stencilWrite = this.stencilWrite;
 			data.stencilWriteMask = this.stencilWriteMask;
 			data.stencilFunc = this.stencilFunc;
@@ -6814,7 +6814,6 @@
 			this.side = source.side;
 			this.vertexColors = source.vertexColors;
 			this.opacity = source.opacity;
-			this.format = source.format;
 			this.transparent = source.transparent;
 			this.blendSrc = source.blendSrc;
 			this.blendDst = source.blendDst;
@@ -6850,6 +6849,7 @@
 			this.clipShadows = source.clipShadows;
 			this.shadowSide = source.shadowSide;
 			this.colorWrite = source.colorWrite;
+			this.alphaWrite = source.alphaWrite;
 			this.precision = source.precision;
 			this.polygonOffset = source.polygonOffset;
 			this.polygonOffsetFactor = source.polygonOffsetFactor;
@@ -14007,7 +14007,7 @@
 		} else {
 			prefixVertex = [generatePrecision(parameters), '#define SHADER_NAME ' + parameters.shaderName, customDefines, parameters.instancing ? '#define USE_INSTANCING' : '', parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '', parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '', '#define MAX_BONES ' + parameters.maxBones, parameters.useFog && parameters.fog ? '#define USE_FOG' : '', parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP2' : '', parameters.map ? '#define USE_MAP' : '', parameters.envMap ? '#define USE_ENVMAP' : '', parameters.envMap ? '#define ' + envMapModeDefine : '', parameters.lightMap ? '#define USE_LIGHTMAP' : '', parameters.aoMap ? '#define USE_AOMAP' : '', parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '', parameters.bumpMap ? '#define USE_BUMPMAP' : '', parameters.normalMap ? '#define USE_NORMALMAP' : '', parameters.normalMap && parameters.objectSpaceNormalMap ? '#define OBJECTSPACE_NORMALMAP' : '', parameters.normalMap && parameters.tangentSpaceNormalMap ? '#define TANGENTSPACE_NORMALMAP' : '', parameters.clearcoatMap ? '#define USE_CLEARCOATMAP' : '', parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '', parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '', parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '', parameters.specularMap ? '#define USE_SPECULARMAP' : '', parameters.specularIntensityMap ? '#define USE_SPECULARINTENSITYMAP' : '', parameters.specularColorMap ? '#define USE_SPECULARCOLORMAP' : '', parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '', parameters.metalnessMap ? '#define USE_METALNESSMAP' : '', parameters.alphaMap ? '#define USE_ALPHAMAP' : '', parameters.transmission ? '#define USE_TRANSMISSION' : '', parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '', parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '', parameters.sheenColorMap ? '#define USE_SHEENCOLORMAP' : '', parameters.sheenRoughnessMap ? '#define USE_SHEENROUGHNESSMAP' : '', parameters.vertexTangents ? '#define USE_TANGENT' : '', parameters.vertexColors ? '#define USE_COLOR' : '', parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '', parameters.vertexUvs ? '#define USE_UV' : '', parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '', parameters.flatShading ? '#define FLAT_SHADED' : '', parameters.skinning ? '#define USE_SKINNING' : '', parameters.useVertexTexture ? '#define BONE_TEXTURE' : '', parameters.morphTargets ? '#define USE_MORPHTARGETS' : '', parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '', parameters.morphTargets && parameters.isWebGL2 ? '#define MORPHTARGETS_TEXTURE' : '', parameters.morphTargets && parameters.isWebGL2 ? '#define MORPHTARGETS_COUNT ' + parameters.morphTargetsCount : '', parameters.doubleSided ? '#define DOUBLE_SIDED' : '', parameters.flipSided ? '#define FLIP_SIDED' : '', parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '', parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '', parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '', parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '', parameters.logarithmicDepthBuffer && parameters.rendererExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '', 'uniform mat4 modelMatrix;', 'uniform mat4 modelViewMatrix;', 'uniform mat4 projectionMatrix;', 'uniform mat4 viewMatrix;', 'uniform mat3 normalMatrix;', 'uniform vec3 cameraPosition;', 'uniform bool isOrthographic;', '#ifdef USE_INSTANCING', '	attribute mat4 instanceMatrix;', '#endif', '#ifdef USE_INSTANCING_COLOR', '	attribute vec3 instanceColor;', '#endif', 'attribute vec3 position;', 'attribute vec3 normal;', 'attribute vec2 uv;', '#ifdef USE_TANGENT', '	attribute vec4 tangent;', '#endif', '#if defined( USE_COLOR_ALPHA )', '	attribute vec4 color;', '#elif defined( USE_COLOR )', '	attribute vec3 color;', '#endif', '#if ( defined( USE_MORPHTARGETS ) && ! defined( MORPHTARGETS_TEXTURE ) )', '	attribute vec3 morphTarget0;', '	attribute vec3 morphTarget1;', '	attribute vec3 morphTarget2;', '	attribute vec3 morphTarget3;', '	#ifdef USE_MORPHNORMALS', '		attribute vec3 morphNormal0;', '		attribute vec3 morphNormal1;', '		attribute vec3 morphNormal2;', '		attribute vec3 morphNormal3;', '	#else', '		attribute vec3 morphTarget4;', '		attribute vec3 morphTarget5;', '		attribute vec3 morphTarget6;', '		attribute vec3 morphTarget7;', '	#endif', '#endif', '#ifdef USE_SKINNING', '	attribute vec4 skinIndex;', '	attribute vec4 skinWeight;', '#endif', '\n'].filter(filterEmptyLine).join('\n');
 			prefixFragment = [customExtensions, generatePrecision(parameters), '#define SHADER_NAME ' + parameters.shaderName, customDefines, parameters.useFog && parameters.fog ? '#define USE_FOG' : '', parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP2' : '', parameters.map ? '#define USE_MAP' : '', parameters.matcap ? '#define USE_MATCAP' : '', parameters.envMap ? '#define USE_ENVMAP' : '', parameters.envMap ? '#define ' + envMapTypeDefine : '', parameters.envMap ? '#define ' + envMapModeDefine : '', parameters.envMap ? '#define ' + envMapBlendingDefine : '', parameters.lightMap ? '#define USE_LIGHTMAP' : '', parameters.aoMap ? '#define USE_AOMAP' : '', parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '', parameters.bumpMap ? '#define USE_BUMPMAP' : '', parameters.normalMap ? '#define USE_NORMALMAP' : '', parameters.normalMap && parameters.objectSpaceNormalMap ? '#define OBJECTSPACE_NORMALMAP' : '', parameters.normalMap && parameters.tangentSpaceNormalMap ? '#define TANGENTSPACE_NORMALMAP' : '', parameters.clearcoat ? '#define USE_CLEARCOAT' : '', parameters.clearcoatMap ? '#define USE_CLEARCOATMAP' : '', parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '', parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '', parameters.specularMap ? '#define USE_SPECULARMAP' : '', parameters.specularIntensityMap ? '#define USE_SPECULARINTENSITYMAP' : '', parameters.specularColorMap ? '#define USE_SPECULARCOLORMAP' : '', parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '', parameters.metalnessMap ? '#define USE_METALNESSMAP' : '', parameters.alphaMap ? '#define USE_ALPHAMAP' : '', parameters.alphaTest ? '#define USE_ALPHATEST' : '', parameters.sheen ? '#define USE_SHEEN' : '', parameters.sheenColorMap ? '#define USE_SHEENCOLORMAP' : '', parameters.sheenRoughnessMap ? '#define USE_SHEENROUGHNESSMAP' : '', parameters.transmission ? '#define USE_TRANSMISSION' : '', parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '', parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '', parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '', parameters.vertexTangents ? '#define USE_TANGENT' : '', parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '', parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '', parameters.vertexUvs ? '#define USE_UV' : '', parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '', parameters.gradientMap ? '#define USE_GRADIENTMAP' : '', parameters.flatShading ? '#define FLAT_SHADED' : '', parameters.doubleSided ? '#define DOUBLE_SIDED' : '', parameters.flipSided ? '#define FLIP_SIDED' : '', parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '', parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '', parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '', parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '', parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '', parameters.logarithmicDepthBuffer && parameters.rendererExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '', (parameters.extensionShaderTextureLOD || parameters.envMap) && parameters.rendererExtensionShaderTextureLod ? '#define TEXTURE_LOD_EXT' : '', 'uniform mat4 viewMatrix;', 'uniform vec3 cameraPosition;', 'uniform bool isOrthographic;', parameters.toneMapping !== NoToneMapping ? '#define TONE_MAPPING' : '', parameters.toneMapping !== NoToneMapping ? ShaderChunk['tonemapping_pars_fragment'] : '', // this code is required here because it is used by the toneMapping() function defined below
-			parameters.toneMapping !== NoToneMapping ? getToneMappingFunction('toneMapping', parameters.toneMapping) : '', parameters.dithering ? '#define DITHERING' : '', parameters.format === RGBFormat ? '#define OPAQUE' : '', ShaderChunk['encodings_pars_fragment'], // this code is required here because it is used by the various encoding/decoding function defined below
+			parameters.toneMapping !== NoToneMapping ? getToneMappingFunction('toneMapping', parameters.toneMapping) : '', parameters.dithering ? '#define DITHERING' : '', parameters.alphaWrite ? '' : '#define OPAQUE', ShaderChunk['encodings_pars_fragment'], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction('linearToOutputTexel', parameters.outputEncoding), parameters.depthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '', '\n'].filter(filterEmptyLine).join('\n');
 		}
 
@@ -14346,6 +14346,7 @@
 				specularColorMap: !!material.specularColorMap,
 				alphaMap: !!material.alphaMap,
 				alphaTest: useAlphaTest,
+				alphaWrite: material.alphaWrite || material.transparent,
 				gradientMap: !!material.gradientMap,
 				sheen: material.sheen > 0,
 				sheenColorMap: !!material.sheenColorMap,
@@ -14381,7 +14382,6 @@
 				numSpotLightShadows: lights.spotShadowMap.length,
 				numClippingPlanes: clipping.numPlanes,
 				numClipIntersection: clipping.numIntersection,
-				format: material.format,
 				dithering: material.dithering,
 				shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 				shadowMapType: renderer.shadowMap.type,
@@ -14453,7 +14453,7 @@
 			array.push(parameters.toneMapping);
 			array.push(parameters.numClippingPlanes);
 			array.push(parameters.numClipIntersection);
-			array.push(parameters.format);
+			array.push(parameters.alphaWrite);
 		}
 
 		function getProgramCacheKeyBooleans(array, parameters) {
@@ -15831,6 +15831,8 @@
 		const stencilBuffer = new StencilBuffer();
 		let enabledCapabilities = {};
 		let currentBoundFramebuffers = {};
+		let currentDrawbuffers = new WeakMap();
+		let defaultDrawbuffers = [];
 		let currentProgram = null;
 		let currentBlendingEnabled = false;
 		let currentBlending = null;
@@ -15929,6 +15931,53 @@
 			}
 
 			return false;
+		}
+
+		function drawBuffers(renderTarget, framebuffer) {
+			let drawBuffers = defaultDrawbuffers;
+			let needsUpdate = false;
+
+			if (renderTarget) {
+				drawBuffers = currentDrawbuffers.get(framebuffer);
+
+				if (drawBuffers === undefined) {
+					drawBuffers = [];
+					currentDrawbuffers.set(framebuffer, drawBuffers);
+				}
+
+				if (renderTarget.isWebGLMultipleRenderTargets) {
+					const textures = renderTarget.texture;
+
+					if (drawBuffers.length !== textures.length || drawBuffers[0] !== gl.COLOR_ATTACHMENT0) {
+						for (let i = 0, il = textures.length; i < il; i++) {
+							drawBuffers[i] = gl.COLOR_ATTACHMENT0 + i;
+						}
+
+						drawBuffers.length = textures.length;
+						needsUpdate = true;
+					}
+				} else {
+					if (drawBuffers.length !== 1 || drawBuffers[0] !== gl.COLOR_ATTACHMENT0) {
+						drawBuffers[0] = gl.COLOR_ATTACHMENT0;
+						drawBuffers.length = 1;
+						needsUpdate = true;
+					}
+				}
+			} else {
+				if (drawBuffers.length !== 1 || drawBuffers[0] !== gl.BACK) {
+					drawBuffers[0] = gl.BACK;
+					drawBuffers.length = 1;
+					needsUpdate = true;
+				}
+			}
+
+			if (needsUpdate) {
+				if (capabilities.isWebGL2) {
+					gl.drawBuffers(drawBuffers);
+				} else {
+					extensions.get('WEBGL_draw_buffers').drawBuffersWEBGL(drawBuffers);
+				}
+			}
 		}
 
 		function useProgram(program) {
@@ -16324,6 +16373,8 @@
 			currentTextureSlot = null;
 			currentBoundTextures = {};
 			currentBoundFramebuffers = {};
+			currentDrawbuffers = new WeakMap();
+			defaultDrawbuffers = [];
 			currentProgram = null;
 			currentBlendingEnabled = false;
 			currentBlending = null;
@@ -16355,6 +16406,7 @@
 			enable: enable,
 			disable: disable,
 			bindFramebuffer: bindFramebuffer,
+			drawBuffers: drawBuffers,
 			useProgram: useProgram,
 			setBlending: setBlending,
 			setMaterial: setMaterial,
@@ -19074,9 +19126,7 @@
 
 		const _scissor = new Vector4(0, 0, _width, _height);
 
-		let _scissorTest = false; //
-
-		const _currentDrawBuffers = []; // frustum
+		let _scissorTest = false; // frustum
 
 		const _frustum = new Frustum(); // clipping
 
@@ -19180,7 +19230,6 @@
 			extensions.init(capabilities);
 			utils = new WebGLUtils(_gl, extensions, capabilities);
 			state = new WebGLState(_gl, extensions, capabilities);
-			_currentDrawBuffers[0] = _gl.BACK;
 			info = new WebGLInfo(_gl);
 			properties = new WebGLProperties();
 			textures = new WebGLTextures(_gl, extensions, state, properties, capabilities, utils, info);
@@ -20242,42 +20291,7 @@
 			const framebufferBound = state.bindFramebuffer(_gl.FRAMEBUFFER, framebuffer);
 
 			if (framebufferBound && capabilities.drawBuffers && useDefaultFramebuffer) {
-				let needsUpdate = false;
-
-				if (renderTarget) {
-					if (renderTarget.isWebGLMultipleRenderTargets) {
-						const textures = renderTarget.texture;
-
-						if (_currentDrawBuffers.length !== textures.length || _currentDrawBuffers[0] !== _gl.COLOR_ATTACHMENT0) {
-							for (let i = 0, il = textures.length; i < il; i++) {
-								_currentDrawBuffers[i] = _gl.COLOR_ATTACHMENT0 + i;
-							}
-
-							_currentDrawBuffers.length = textures.length;
-							needsUpdate = true;
-						}
-					} else {
-						if (_currentDrawBuffers.length !== 1 || _currentDrawBuffers[0] !== _gl.COLOR_ATTACHMENT0) {
-							_currentDrawBuffers[0] = _gl.COLOR_ATTACHMENT0;
-							_currentDrawBuffers.length = 1;
-							needsUpdate = true;
-						}
-					}
-				} else {
-					if (_currentDrawBuffers.length !== 1 || _currentDrawBuffers[0] !== _gl.BACK) {
-						_currentDrawBuffers[0] = _gl.BACK;
-						_currentDrawBuffers.length = 1;
-						needsUpdate = true;
-					}
-				}
-
-				if (needsUpdate) {
-					if (capabilities.isWebGL2) {
-						_gl.drawBuffers(_currentDrawBuffers);
-					} else {
-						extensions.get('WEBGL_draw_buffers').drawBuffersWEBGL(_currentDrawBuffers);
-					}
-				}
+				state.drawBuffers(renderTarget, framebuffer);
 			}
 
 			state.viewport(_currentViewport);
@@ -24545,7 +24559,9 @@
 
 
 	function isValidDiagonal(a, b) {
-		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && (area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
+		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // dones't intersect other edges
+		locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && ( // locally visible
+		area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
 		equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
 	} // signed area of a triangle
 
@@ -29544,12 +29560,12 @@
 			if (json.side !== undefined) material.side = json.side;
 			if (json.shadowSide !== undefined) material.shadowSide = json.shadowSide;
 			if (json.opacity !== undefined) material.opacity = json.opacity;
-			if (json.format !== undefined) material.format = json.format;
 			if (json.transparent !== undefined) material.transparent = json.transparent;
 			if (json.alphaTest !== undefined) material.alphaTest = json.alphaTest;
 			if (json.depthTest !== undefined) material.depthTest = json.depthTest;
 			if (json.depthWrite !== undefined) material.depthWrite = json.depthWrite;
 			if (json.colorWrite !== undefined) material.colorWrite = json.colorWrite;
+			if (json.alphaWrite !== undefined) material.alphaWrite = json.alphaWrite;
 			if (json.stencilWrite !== undefined) material.stencilWrite = json.stencilWrite;
 			if (json.stencilWriteMask !== undefined) material.stencilWriteMask = json.stencilWriteMask;
 			if (json.stencilFunc !== undefined) material.stencilFunc = json.stencilFunc;
@@ -36704,4 +36720,4 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
