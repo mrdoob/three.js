@@ -166,14 +166,21 @@
 
 	function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
+		// NOTE: 1e2 is pretty coarse but was chosen to quantize the resulting value because
+		// it allows edges to be smoothed as expected (see minifig arms).
+		// --
+		// And the vector values are initialize multiplied by 1 + 1e-10 to account for floating
+		// point errors on vertices along quantization boundaries. Ie after matrix multiplication
+		// vertices that should be merged might be set to "1.7" and "1.6999..." meaning they won't
+		// get merged. This added epsilon attempts to push these error values to the same quantized
+		// value for the sake of hashing. See "AT-ST mini" dishes. See mrdoob/three#23169.
+		const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
+
 		function hashVertex( v ) {
 
-			// NOTE: 1e2 is pretty coarse but was chosen because it allows edges
-			// to be smoothed as expected (see minifig arms). The errors between edges
-			// could be due to matrix multiplication.
-			const x = ~ ~ ( v.x * 1e2 );
-			const y = ~ ~ ( v.y * 1e2 );
-			const z = ~ ~ ( v.z * 1e2 );
+			const x = ~ ~ ( v.x * hashMultiplier );
+			const y = ~ ~ ( v.y * hashMultiplier );
+			const z = ~ ~ ( v.z * hashMultiplier );
 			return `${x},${y},${z}`;
 
 		}
@@ -592,111 +599,573 @@
 
 	}
 
-	class LDrawFileCache {
+	class LDrawParsedCache {
 
 		constructor( loader ) {
 
-			this.cache = {};
 			this.loader = loader;
+			this.cache = {};
 
 		}
 
-		setData( key, contents ) {
+		cloneResult( original ) {
 
-			this.cache[ key.toLowerCase() ] = contents;
+			const result = {}; // vertices are transformed and normals computed before being converted to geometry
+			// so these pieces must be cloned.
+
+			result.faces = original.faces.map( face => {
+
+				return {
+					colorCode: face.colorCode,
+					material: face.material,
+					vertices: face.vertices.map( v => v.clone() ),
+					normals: face.normals.map( () => null ),
+					faceNormal: null
+				};
+
+			} );
+			result.conditionalSegments = original.conditionalSegments.map( face => {
+
+				return {
+					colorCode: face.colorCode,
+					material: face.material,
+					vertices: face.vertices.map( v => v.clone() ),
+					controlPoints: face.controlPoints.map( v => v.clone() )
+				};
+
+			} );
+			result.lineSegments = original.lineSegments.map( face => {
+
+				return {
+					colorCode: face.colorCode,
+					material: face.material,
+					vertices: face.vertices.map( v => v.clone() )
+				};
+
+			} ); // none if this is subsequently modified
+
+			result.type = original.type;
+			result.category = original.category;
+			result.keywords = original.keywords;
+			result.subobjects = original.subobjects;
+			result.totalFaces = original.totalFaces;
+			result.startingConstructionStep = original.startingConstructionStep;
+			result.materials = original.materials;
+			return result;
 
 		}
 
-		async loadData( fileName ) {
+		async fetchData( fileName ) {
 
-			const key = fileName.toLowerCase();
+			let triedLowerCase = false;
+			let locationState = FILE_LOCATION_AS_IS;
 
-			if ( key in this.cache ) {
+			while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
 
-				return this.cache[ key ];
+				let subobjectURL = fileName;
 
-			}
+				switch ( locationState ) {
 
-			this.cache[ fileName ] = new Promise( async ( resolve, reject ) => {
+					case FILE_LOCATION_AS_IS:
+						locationState = locationState + 1;
+						break;
 
-				let triedLowerCase = false;
-				let locationState = FILE_LOCATION_AS_IS;
+					case FILE_LOCATION_TRY_PARTS:
+						subobjectURL = 'parts/' + subobjectURL;
+						locationState = locationState + 1;
+						break;
 
-				while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
+					case FILE_LOCATION_TRY_P:
+						subobjectURL = 'p/' + subobjectURL;
+						locationState = locationState + 1;
+						break;
 
-					let subobjectURL = fileName;
+					case FILE_LOCATION_TRY_MODELS:
+						subobjectURL = 'models/' + subobjectURL;
+						locationState = locationState + 1;
+						break;
 
-					switch ( locationState ) {
+					case FILE_LOCATION_TRY_RELATIVE:
+						subobjectURL = fileName.substring( 0, fileName.lastIndexOf( '/' ) + 1 ) + subobjectURL;
+						locationState = locationState + 1;
+						break;
 
-						case FILE_LOCATION_AS_IS:
-							locationState = locationState + 1;
-							break;
+					case FILE_LOCATION_TRY_ABSOLUTE:
+						if ( triedLowerCase ) {
 
-						case FILE_LOCATION_TRY_PARTS:
-							subobjectURL = 'parts/' + subobjectURL;
-							locationState = locationState + 1;
-							break;
+							// Try absolute path
+							locationState = FILE_LOCATION_NOT_FOUND;
 
-						case FILE_LOCATION_TRY_P:
-							subobjectURL = 'p/' + subobjectURL;
-							locationState = locationState + 1;
-							break;
+						} else {
 
-						case FILE_LOCATION_TRY_MODELS:
-							subobjectURL = 'models/' + subobjectURL;
-							locationState = locationState + 1;
-							break;
+							// Next attempt is lower case
+							fileName = fileName.toLowerCase();
+							subobjectURL = fileName;
+							triedLowerCase = true;
+							locationState = FILE_LOCATION_AS_IS;
 
-						case FILE_LOCATION_TRY_RELATIVE:
-							subobjectURL = fileName.substring( 0, fileName.lastIndexOf( '/' ) + 1 ) + subobjectURL;
-							locationState = locationState + 1;
-							break;
+						}
 
-						case FILE_LOCATION_TRY_ABSOLUTE:
-							if ( triedLowerCase ) {
-
-								// Try absolute path
-								locationState = FILE_LOCATION_NOT_FOUND;
-
-							} else {
-
-								// Next attempt is lower case
-								fileName = fileName.toLowerCase();
-								subobjectURL = fileName;
-								triedLowerCase = true;
-								locationState = FILE_LOCATION_AS_IS;
-
-							}
-
-							break;
-
-					}
-
-					const loader = this.loader;
-					const fileLoader = new THREE.FileLoader( loader.manager );
-					fileLoader.setPath( loader.partsLibraryPath );
-					fileLoader.setRequestHeader( loader.requestHeader );
-					fileLoader.setWithCredentials( loader.withCredentials );
-
-					try {
-
-						const text = await fileLoader.loadAsync( subobjectURL );
-						this.setData( fileName, text );
-						resolve( text );
-						return;
-
-					} catch {
-
-						continue;
-
-					}
+						break;
 
 				}
 
-				reject();
+				const loader = this.loader;
+				const fileLoader = new THREE.FileLoader( loader.manager );
+				fileLoader.setPath( loader.partsLibraryPath );
+				fileLoader.setRequestHeader( loader.requestHeader );
+				fileLoader.setWithCredentials( loader.withCredentials );
+
+				try {
+
+					const text = await fileLoader.loadAsync( subobjectURL );
+					return text;
+
+				} catch {
+
+					continue;
+
+				}
+
+			}
+
+			throw new Error( 'LDrawLoader: Subobject "' + fileName + '" could not be loaded.' );
+
+		}
+
+		parse( text ) {
+
+			const loader = this.loader; // final results
+
+			const faces = [];
+			const lineSegments = [];
+			const conditionalSegments = [];
+			const subobjects = [];
+			const materials = {};
+
+			const getLocalMaterial = colorCode => {
+
+				return colorCode in materials ? materials[ colorCode ] : null;
+
+			};
+
+			let type = 'Model';
+			let category = null;
+			let keywords = null;
+			let totalFaces = 0; // split into lines
+
+			if ( text.indexOf( '\r\n' ) !== - 1 ) {
+
+				// This is faster than String.split with regex that splits on both
+				text = text.replace( /\r\n/g, '\n' );
+
+			}
+
+			const lines = text.split( '\n' );
+			const numLines = lines.length;
+			let parsingEmbeddedFiles = false;
+			let currentEmbeddedFileName = null;
+			let currentEmbeddedText = null;
+			let bfcCertified = false;
+			let bfcCCW = true;
+			let bfcInverted = false;
+			let bfcCull = true;
+			let startingConstructionStep = false; // Parse all line commands
+
+			for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
+
+				const line = lines[ lineIndex ];
+				if ( line.length === 0 ) continue;
+
+				if ( parsingEmbeddedFiles ) {
+
+					if ( line.startsWith( '0 FILE ' ) ) {
+
+						// Save previous embedded file in the cache
+						this.setData( currentEmbeddedFileName, currentEmbeddedText ); // New embedded text file
+
+						currentEmbeddedFileName = line.substring( 7 );
+						currentEmbeddedText = '';
+
+					} else {
+
+						currentEmbeddedText += line + '\n';
+
+					}
+
+					continue;
+
+				}
+
+				const lp = new LineParser( line, lineIndex + 1 );
+				lp.seekNonSpace();
+
+				if ( lp.isAtTheEnd() ) {
+
+					// Empty line
+					continue;
+
+				} // Parse the line type
+
+
+				const lineType = lp.getToken();
+				let material;
+				let colorCode;
+				let segment;
+				let ccw;
+				let doubleSided;
+				let v0, v1, v2, v3, c0, c1;
+
+				switch ( lineType ) {
+
+					// Line type 0: Comment or META
+					case '0':
+						// Parse meta directive
+						const meta = lp.getToken();
+
+						if ( meta ) {
+
+							switch ( meta ) {
+
+								case '!LDRAW_ORG':
+									type = lp.getToken();
+									break;
+
+								case '!COLOUR':
+									material = loader.parseColorMetaDirective( lp );
+
+									if ( material ) {
+
+										materials[ material.userData.code ] = material;
+
+									} else {
+
+										console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
+
+									}
+
+									break;
+
+								case '!CATEGORY':
+									category = lp.getToken();
+									break;
+
+								case '!KEYWORDS':
+									const newKeywords = lp.getRemainingString().split( ',' );
+
+									if ( newKeywords.length > 0 ) {
+
+										if ( ! keywords ) {
+
+											keywords = [];
+
+										}
+
+										newKeywords.forEach( function ( keyword ) {
+
+											keywords.push( keyword.trim() );
+
+										} );
+
+									}
+
+									break;
+
+								case 'FILE':
+									if ( lineIndex > 0 ) {
+
+										// Start embedded text files parsing
+										parsingEmbeddedFiles = true;
+										currentEmbeddedFileName = lp.getRemainingString();
+										currentEmbeddedText = '';
+										bfcCertified = false;
+										bfcCCW = true;
+
+									}
+
+									break;
+
+								case 'BFC':
+									// Changes to the backface culling state
+									while ( ! lp.isAtTheEnd() ) {
+
+										const token = lp.getToken();
+
+										switch ( token ) {
+
+											case 'CERTIFY':
+											case 'NOCERTIFY':
+												bfcCertified = token === 'CERTIFY';
+												bfcCCW = true;
+												break;
+
+											case 'CW':
+											case 'CCW':
+												bfcCCW = token === 'CCW';
+												break;
+
+											case 'INVERTNEXT':
+												bfcInverted = true;
+												break;
+
+											case 'CLIP':
+											case 'NOCLIP':
+												bfcCull = token === 'CLIP';
+												break;
+
+											default:
+												console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
+												break;
+
+										}
+
+									}
+
+									break;
+
+								case 'STEP':
+									startingConstructionStep = true;
+									break;
+
+								default:
+									// Other meta directives are not implemented
+									break;
+
+							}
+
+						}
+
+						break;
+						// Line type 1: Sub-object file
+
+					case '1':
+						colorCode = lp.getToken();
+						material = getLocalMaterial( colorCode );
+						const posX = parseFloat( lp.getToken() );
+						const posY = parseFloat( lp.getToken() );
+						const posZ = parseFloat( lp.getToken() );
+						const m0 = parseFloat( lp.getToken() );
+						const m1 = parseFloat( lp.getToken() );
+						const m2 = parseFloat( lp.getToken() );
+						const m3 = parseFloat( lp.getToken() );
+						const m4 = parseFloat( lp.getToken() );
+						const m5 = parseFloat( lp.getToken() );
+						const m6 = parseFloat( lp.getToken() );
+						const m7 = parseFloat( lp.getToken() );
+						const m8 = parseFloat( lp.getToken() );
+						const matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
+						let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
+
+						if ( loader.fileMap[ fileName ] ) {
+
+							// Found the subobject path in the preloaded file path map
+							fileName = loader.fileMap[ fileName ];
+
+						} else {
+
+							// Standardized subfolders
+							if ( fileName.startsWith( 's/' ) ) {
+
+								fileName = 'parts/' + fileName;
+
+							} else if ( fileName.startsWith( '48/' ) ) {
+
+								fileName = 'p/' + fileName;
+
+							}
+
+						}
+
+						subobjects.push( {
+							material: material,
+							colorCode: colorCode,
+							matrix: matrix,
+							fileName: fileName,
+							inverted: bfcInverted,
+							startingConstructionStep: startingConstructionStep
+						} );
+						bfcInverted = false;
+						break;
+						// Line type 2: Line segment
+
+					case '2':
+						colorCode = lp.getToken();
+						material = getLocalMaterial( colorCode );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						segment = {
+							material: material,
+							colorCode: colorCode,
+							vertices: [ v0, v1 ]
+						};
+						lineSegments.push( segment );
+						break;
+						// Line type 5: Conditional Line segment
+
+					case '5':
+						colorCode = lp.getToken();
+						material = getLocalMaterial( colorCode );
+						v0 = lp.getVector();
+						v1 = lp.getVector();
+						c0 = lp.getVector();
+						c1 = lp.getVector();
+						segment = {
+							material: material,
+							colorCode: colorCode,
+							vertices: [ v0, v1 ],
+							controlPoints: [ c0, c1 ]
+						};
+						conditionalSegments.push( segment );
+						break;
+						// Line type 3: Triangle
+
+					case '3':
+						colorCode = lp.getToken();
+						material = getLocalMaterial( colorCode );
+						ccw = bfcCCW;
+						doubleSided = ! bfcCertified || ! bfcCull;
+
+						if ( ccw === true ) {
+
+							v0 = lp.getVector();
+							v1 = lp.getVector();
+							v2 = lp.getVector();
+
+						} else {
+
+							v2 = lp.getVector();
+							v1 = lp.getVector();
+							v0 = lp.getVector();
+
+						}
+
+						faces.push( {
+							material: material,
+							colorCode: colorCode,
+							faceNormal: null,
+							vertices: [ v0, v1, v2 ],
+							normals: [ null, null, null ]
+						} );
+						totalFaces ++;
+
+						if ( doubleSided === true ) {
+
+							faces.push( {
+								material: material,
+								colorCode: colorCode,
+								faceNormal: null,
+								vertices: [ v2, v1, v0 ],
+								normals: [ null, null, null ]
+							} );
+							totalFaces ++;
+
+						}
+
+						break;
+						// Line type 4: Quadrilateral
+
+					case '4':
+						colorCode = lp.getToken();
+						material = getLocalMaterial( colorCode );
+						ccw = bfcCCW;
+						doubleSided = ! bfcCertified || ! bfcCull;
+
+						if ( ccw === true ) {
+
+							v0 = lp.getVector();
+							v1 = lp.getVector();
+							v2 = lp.getVector();
+							v3 = lp.getVector();
+
+						} else {
+
+							v3 = lp.getVector();
+							v2 = lp.getVector();
+							v1 = lp.getVector();
+							v0 = lp.getVector();
+
+						} // specifically place the triangle diagonal in the v0 and v1 slots so we can
+						// account for the doubling of vertices later when smoothing normals.
+
+
+						faces.push( {
+							material: material,
+							colorCode: colorCode,
+							faceNormal: null,
+							vertices: [ v0, v1, v2, v3 ],
+							normals: [ null, null, null, null ]
+						} );
+						totalFaces += 2;
+
+						if ( doubleSided === true ) {
+
+							faces.push( {
+								material: material,
+								colorCode: colorCode,
+								faceNormal: null,
+								vertices: [ v3, v2, v1, v0 ],
+								normals: [ null, null, null, null ]
+							} );
+							totalFaces += 2;
+
+						}
+
+						break;
+
+					default:
+						throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
+
+				}
+
+			}
+
+			if ( parsingEmbeddedFiles ) {
+
+				this.setData( currentEmbeddedFileName, currentEmbeddedText );
+
+			}
+
+			return {
+				faces,
+				conditionalSegments,
+				lineSegments,
+				type,
+				category,
+				keywords,
+				subobjects,
+				totalFaces,
+				startingConstructionStep,
+				materials
+			};
+
+		}
+
+		loadData( fileName ) {
+
+			const key = fileName.toLowerCase();
+
+			if ( ! ( key in this.cache ) ) {
+
+				this.cache[ key ] = this.fetchData( fileName ).then( text => {
+
+					return this.parse( text );
+
+				} );
+
+			}
+
+			return this.cache[ key ].then( result => {
+
+				return this.cloneResult( result );
 
 			} );
-			return this.cache[ fileName ];
+
+		}
+
+		setData( fileName, text ) {
+
+			const key = fileName.toLowerCase();
+			this.cache[ key ] = Promise.resolve( this.parse( text ) );
 
 		}
 
@@ -704,13 +1173,13 @@
 
 	function sortByMaterial( a, b ) {
 
-		if ( a.colourCode === b.colourCode ) {
+		if ( a.colorCode === b.colorCode ) {
 
 			return 0;
 
 		}
 
-		if ( a.colourCode < b.colourCode ) {
+		if ( a.colorCode < b.colorCode ) {
 
 			return - 1;
 
@@ -724,7 +1193,7 @@
 
 		// Creates a THREE.LineSegments (elementSize = 2) or a THREE.Mesh (elementSize = 3 )
 		// With per face / segment material, implemented with mesh groups and materials array
-		// Sort the faces or line segments by colour code to make later the mesh groups
+		// Sort the faces or line segments by color code to make later the mesh groups
 		elements.sort( sortByMaterial );
 
 		if ( totalElements === null ) {
@@ -829,7 +1298,26 @@
 
 				}
 
-				materials.push( elem.material );
+				const material = elem.material;
+
+				if ( elementSize === 3 ) {
+
+					materials.push( material );
+
+				} else if ( elementSize === 2 ) {
+
+					if ( isConditionalSegments ) {
+
+						materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
+
+					} else {
+
+						materials.push( material.userData.edgeMaterial );
+
+					}
+
+				}
+
 				prevMaterial = elem.material;
 				index0 = offset / 3;
 				numGroupVerts = vertices.length;
@@ -928,12 +1416,12 @@
 			this.materials = []; // Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 			// This also allows to handle the embedded text files ("0 FILE" lines)
 
-			this.cache = new LDrawFileCache( this ); // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
+			this.parseCache = new LDrawParsedCache( this ); // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 
 			this.fileMap = {};
-			this.rootParseScope = this.newParseScopeLevel(); // Add default main triangle and line edge materials (used in pieces that can be coloured with a main color)
+			this.rootParseScope = this.newParseScopeLevel(); // Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 
-			this.setMaterials( [ this.parseColourMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColourMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true the vertex normals will be smoothed.
+			this.setMaterials( [ this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ), this.parseColorMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) ] ); // If this flag is set to true the vertex normals will be smoothed.
 
 			this.smoothNormals = true; // The path to load parts from the LDraw parts library from.
 
@@ -966,7 +1454,7 @@
 				if ( colorLineRegex.test( line ) ) {
 
 					const directive = line.replace( colorLineRegex, '' );
-					const material = this.parseColourMetaDirective( new LineParser( directive ) );
+					const material = this.parseColorMetaDirective( new LineParser( directive ) );
 					materials.push( material );
 
 				}
@@ -985,7 +1473,8 @@
 			fileLoader.setWithCredentials( this.withCredentials );
 			fileLoader.load( url, text => {
 
-				this.processObject( text, null, url, this.rootParseScope ).then( function ( result ) {
+				const parsedInfo = this.parseCache.parse( text );
+				this.processObject( parsedInfo, null, url, this.rootParseScope ).then( function ( result ) {
 
 					onLoad( result.groupObject );
 
@@ -997,8 +1486,9 @@
 
 		parse( text, path, onLoad ) {
 
-			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
-			this.processObject( text, null, path, this.rootParseScope ).then( function ( result ) {
+			// Async parse. This function calls onParse with the parsed THREE.Object3D as parameter
+			const parsedInfo = this.parseCache.parse( text );
+			this.processObject( parsedInfo, null, path, this.rootParseScope ).then( function ( result ) {
 
 				onLoad( result.groupObject );
 
@@ -1052,8 +1542,8 @@
 				keywords: null,
 				// Current subobject
 				currentFileName: null,
-				mainColourCode: parentScope ? parentScope.mainColourCode : '16',
-				mainEdgeColourCode: parentScope ? parentScope.mainEdgeColourCode : '24',
+				mainColorCode: parentScope ? parentScope.mainColorCode : '16',
+				mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : '24',
 				matrix: new THREE.Matrix4(),
 				type: 'Model',
 				groupObject: null,
@@ -1087,20 +1577,20 @@
 
 		}
 
-		getMaterial( colourCode, parseScope = this.rootParseScope ) {
+		getMaterial( colorCode, parseScope = this.rootParseScope ) {
 
-			// Given a colour code search its material in the parse scopes stack
-			if ( colourCode.startsWith( '0x2' ) ) {
+			// Given a color code search its material in the parse scopes stack
+			if ( colorCode.startsWith( '0x2' ) ) {
 
-				// Special 'direct' material value (RGB colour)
-				const colour = colourCode.substring( 3 );
-				return this.parseColourMetaDirective( new LineParser( 'Direct_Color_' + colour + ' CODE -1 VALUE #' + colour + ' EDGE #' + colour + '' ) );
+				// Special 'direct' material value (RGB color)
+				const color = colorCode.substring( 3 );
+				return this.parseColorMetaDirective( new LineParser( 'Direct_Color_' + color + ' CODE -1 VALUE #' + color + ' EDGE #' + color + '' ) );
 
 			}
 
 			while ( parseScope ) {
 
-				const material = parseScope.lib[ colourCode ];
+				const material = parseScope.lib[ colorCode ];
 
 				if ( material ) {
 
@@ -1119,13 +1609,13 @@
 
 		}
 
-		parseColourMetaDirective( lineParser ) {
+		parseColorMetaDirective( lineParser ) {
 
-			// Parses a colour definition and returns a THREE.Material
-			let code = null; // Triangle and line colours
+			// Parses a color definition and returns a THREE.Material
+			let code = null; // Triangle and line colors
 
-			let colour = 0xFF00FF;
-			let edgeColour = 0xFF00FF; // Transparency
+			let color = 0xFF00FF;
+			let edgeColor = 0xFF00FF; // Transparency
 
 			let alpha = 1;
 			let isTransparent = false; // Self-illumination:
@@ -1161,35 +1651,35 @@
 						break;
 
 					case 'VALUE':
-						colour = lineParser.getToken();
+						color = lineParser.getToken();
 
-						if ( colour.startsWith( '0x' ) ) {
+						if ( color.startsWith( '0x' ) ) {
 
-							colour = '#' + colour.substring( 2 );
+							color = '#' + color.substring( 2 );
 
-						} else if ( ! colour.startsWith( '#' ) ) {
+						} else if ( ! color.startsWith( '#' ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
 
 						}
 
 						break;
 
 					case 'EDGE':
-						edgeColour = lineParser.getToken();
+						edgeColor = lineParser.getToken();
 
-						if ( edgeColour.startsWith( '0x' ) ) {
+						if ( edgeColor.startsWith( '0x' ) ) {
 
-							edgeColour = '#' + edgeColour.substring( 2 );
+							edgeColor = '#' + edgeColor.substring( 2 );
 
-						} else if ( ! edgeColour.startsWith( '#' ) ) {
+						} else if ( ! edgeColor.startsWith( '#' ) ) {
 
-							// Try to see if edge colour is a colour code
-							edgeMaterial = this.getMaterial( edgeColour );
+							// Try to see if edge color is a color code
+							edgeMaterial = this.getMaterial( edgeColor );
 
 							if ( ! edgeMaterial ) {
 
-								throw new Error( 'LDrawLoader: Invalid edge colour while parsing material' + lineParser.getLineNumberString() + '.' );
+								throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
 
 							} // Get the edge material for this triangle material
 
@@ -1269,7 +1759,7 @@
 
 				case FINISH_TYPE_DEFAULT:
 					material = new THREE.MeshStandardMaterial( {
-						color: colour,
+						color: color,
 						roughness: 0.3,
 						metalness: 0
 					} );
@@ -1278,7 +1768,7 @@
 				case FINISH_TYPE_PEARLESCENT:
 					// Try to imitate pearlescency by making the surface glossy
 					material = new THREE.MeshStandardMaterial( {
-						color: colour,
+						color: color,
 						roughness: 0.3,
 						metalness: 0.25
 					} );
@@ -1287,7 +1777,7 @@
 				case FINISH_TYPE_CHROME:
 					// Mirror finish surface
 					material = new THREE.MeshStandardMaterial( {
-						color: colour,
+						color: color,
 						roughness: 0,
 						metalness: 1
 					} );
@@ -1296,7 +1786,7 @@
 				case FINISH_TYPE_RUBBER:
 					// Rubber finish
 					material = new THREE.MeshStandardMaterial( {
-						color: colour,
+						color: color,
 						roughness: 0.9,
 						metalness: 0
 					} );
@@ -1305,7 +1795,7 @@
 				case FINISH_TYPE_MATTE_METALLIC:
 					// Brushed metal finish
 					material = new THREE.MeshStandardMaterial( {
-						color: colour,
+						color: color,
 						roughness: 0.8,
 						metalness: 0.4
 					} );
@@ -1314,7 +1804,7 @@
 				case FINISH_TYPE_METAL:
 					// Average metal finish
 					material = new THREE.MeshStandardMaterial( {
-						color: colour,
+						color: color,
 						roughness: 0.2,
 						metalness: 0.85
 					} );
@@ -1343,7 +1833,7 @@
 
 				// This is the material used for edges
 				edgeMaterial = new THREE.LineBasicMaterial( {
-					color: edgeColour,
+					color: edgeColor,
 					transparent: isTransparent,
 					opacity: alpha,
 					depthWrite: ! isTransparent
@@ -1355,7 +1845,7 @@
 					fog: true,
 					transparent: isTransparent,
 					depthWrite: ! isTransparent,
-					color: edgeColour,
+					color: edgeColor,
 					opacity: alpha
 				} );
 
@@ -1369,435 +1859,108 @@
 		} //
 
 
-		objectParse( text, parseScope ) {
+		objectParse( info, parseScope ) {
 
 			// Retrieve data from the parent parse scope
 			const currentParseScope = parseScope;
-			const parentParseScope = currentParseScope.parentScope; // Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
+			const parentParseScope = currentParseScope.parentScope; // Main color codes passed to this subobject (or default codes 16 and 24 if it is the root object)
 
-			const mainColourCode = currentParseScope.mainColourCode;
-			const mainEdgeColourCode = currentParseScope.mainEdgeColourCode; // Parse result variables
+			const mainColorCode = currentParseScope.mainColorCode;
+			const mainEdgeColorCode = currentParseScope.mainEdgeColorCode;
 
-			let faces;
-			let lineSegments;
-			let conditionalSegments;
-			const subobjects = [];
-			let category = null;
-			let keywords = null;
+			const parseColorCode = ( colorCode, forEdge ) => {
 
-			if ( text.indexOf( '\r\n' ) !== - 1 ) {
+				// Parses next color code and returns a THREE.Material
+				if ( ! forEdge && colorCode === '16' ) {
 
-				// This is faster than String.split with regex that splits on both
-				text = text.replace( /\r\n/g, '\n' );
-
-			}
-
-			const lines = text.split( '\n' );
-			const numLines = lines.length;
-			let parsingEmbeddedFiles = false;
-			let currentEmbeddedFileName = null;
-			let currentEmbeddedText = null;
-			let bfcCertified = false;
-			let bfcCCW = true;
-			let bfcInverted = false;
-			let bfcCull = true;
-			let type = '';
-			let startingConstructionStep = false;
-
-			const parseColourCode = ( lineParser, forEdge ) => {
-
-				// Parses next colour code and returns a THREE.Material
-				let colourCode = lineParser.getToken();
-
-				if ( ! forEdge && colourCode === '16' ) {
-
-					colourCode = mainColourCode;
+					colorCode = mainColorCode;
 
 				}
 
-				if ( forEdge && colourCode === '24' ) {
+				if ( forEdge && colorCode === '24' ) {
 
-					colourCode = mainEdgeColourCode;
+					colorCode = mainEdgeColorCode;
 
 				}
 
-				const material = this.getMaterial( colourCode, currentParseScope );
+				const material = this.getMaterial( colorCode, currentParseScope );
 
 				if ( ! material ) {
 
-					throw new Error( 'LDrawLoader: Unknown colour code "' + colourCode + '" is used' + lineParser.getLineNumberString() + ' but it was not defined previously.' );
+					throw new Error( 'LDrawLoader: Unknown color code "' + colorCode + '" is used but it was not defined previously.' );
 
 				}
 
 				return material;
 
-			}; // Parse all line commands
+			};
 
+			const faces = info.faces;
+			const lineSegments = info.lineSegments;
+			const conditionalSegments = info.conditionalSegments;
+			const materials = info.materials;
 
-			for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
+			if ( currentParseScope.inverted ) {
 
-				const line = lines[ lineIndex ];
-				if ( line.length === 0 ) continue;
+				faces.reverse();
 
-				if ( parsingEmbeddedFiles ) {
+			}
 
-					if ( line.startsWith( '0 FILE ' ) ) {
+			for ( const colorCode in materials ) {
 
-						// Save previous embedded file in the cache
-						this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText ); // New embedded text file
+				this.addMaterial( materials[ colorCode ], currentParseScope );
 
-						currentEmbeddedFileName = line.substring( 7 );
-						currentEmbeddedText = '';
+			}
 
-					} else {
+			for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-						currentEmbeddedText += line + '\n';
+				const face = faces[ i ];
 
-					}
+				if ( face.material === null ) {
 
-					continue;
-
-				}
-
-				const lp = new LineParser( line, lineIndex + 1 );
-				lp.seekNonSpace();
-
-				if ( lp.isAtTheEnd() ) {
-
-					// Empty line
-					continue;
-
-				} // Parse the line type
-
-
-				const lineType = lp.getToken();
-				let material;
-				let segment;
-				let inverted;
-				let ccw;
-				let doubleSided;
-				let v0, v1, v2, v3, c0, c1;
-
-				switch ( lineType ) {
-
-					// Line type 0: Comment or META
-					case '0':
-						// Parse meta directive
-						const meta = lp.getToken();
-
-						if ( meta ) {
-
-							switch ( meta ) {
-
-								case '!LDRAW_ORG':
-									type = lp.getToken();
-									currentParseScope.type = type;
-									faces = currentParseScope.faces;
-									lineSegments = currentParseScope.lineSegments;
-									conditionalSegments = currentParseScope.conditionalSegments;
-									break;
-
-								case '!COLOUR':
-									material = this.parseColourMetaDirective( lp );
-
-									if ( material ) {
-
-										this.addMaterial( material, parseScope );
-
-									} else {
-
-										console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
-
-									}
-
-									break;
-
-								case '!CATEGORY':
-									category = lp.getToken();
-									break;
-
-								case '!KEYWORDS':
-									const newKeywords = lp.getRemainingString().split( ',' );
-
-									if ( newKeywords.length > 0 ) {
-
-										if ( ! keywords ) {
-
-											keywords = [];
-
-										}
-
-										newKeywords.forEach( function ( keyword ) {
-
-											keywords.push( keyword.trim() );
-
-										} );
-
-									}
-
-									break;
-
-								case 'FILE':
-									if ( lineIndex > 0 ) {
-
-										// Start embedded text files parsing
-										parsingEmbeddedFiles = true;
-										currentEmbeddedFileName = lp.getRemainingString();
-										currentEmbeddedText = '';
-										bfcCertified = false;
-										bfcCCW = true;
-
-									}
-
-									break;
-
-								case 'BFC':
-									// Changes to the backface culling state
-									while ( ! lp.isAtTheEnd() ) {
-
-										const token = lp.getToken();
-
-										switch ( token ) {
-
-											case 'CERTIFY':
-											case 'NOCERTIFY':
-												bfcCertified = token === 'CERTIFY';
-												bfcCCW = true;
-												break;
-
-											case 'CW':
-											case 'CCW':
-												bfcCCW = token === 'CCW';
-												break;
-
-											case 'INVERTNEXT':
-												bfcInverted = true;
-												break;
-
-											case 'CLIP':
-											case 'NOCLIP':
-												bfcCull = token === 'CLIP';
-												break;
-
-											default:
-												console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
-												break;
-
-										}
-
-									}
-
-									break;
-
-								case 'STEP':
-									startingConstructionStep = true;
-									break;
-
-								default:
-									// Other meta directives are not implemented
-									break;
-
-							}
-
-						}
-
-						break;
-						// Line type 1: Sub-object file
-
-					case '1':
-						material = parseColourCode( lp );
-						const posX = parseFloat( lp.getToken() );
-						const posY = parseFloat( lp.getToken() );
-						const posZ = parseFloat( lp.getToken() );
-						const m0 = parseFloat( lp.getToken() );
-						const m1 = parseFloat( lp.getToken() );
-						const m2 = parseFloat( lp.getToken() );
-						const m3 = parseFloat( lp.getToken() );
-						const m4 = parseFloat( lp.getToken() );
-						const m5 = parseFloat( lp.getToken() );
-						const m6 = parseFloat( lp.getToken() );
-						const m7 = parseFloat( lp.getToken() );
-						const m8 = parseFloat( lp.getToken() );
-						const matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
-						let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
-
-						if ( this.fileMap[ fileName ] ) {
-
-							// Found the subobject path in the preloaded file path map
-							fileName = this.fileMap[ fileName ];
-
-						} else {
-
-							// Standardized subfolders
-							if ( fileName.startsWith( 's/' ) ) {
-
-								fileName = 'parts/' + fileName;
-
-							} else if ( fileName.startsWith( '48/' ) ) {
-
-								fileName = 'p/' + fileName;
-
-							}
-
-						}
-
-						subobjects.push( {
-							material: material,
-							matrix: matrix,
-							fileName: fileName,
-							inverted: bfcInverted !== currentParseScope.inverted,
-							startingConstructionStep: startingConstructionStep
-						} );
-						bfcInverted = false;
-						break;
-						// Line type 2: Line segment
-
-					case '2':
-						material = parseColourCode( lp, true );
-						v0 = lp.getVector();
-						v1 = lp.getVector();
-						segment = {
-							material: material.userData.edgeMaterial,
-							colourCode: material.userData.code,
-							v0: v0,
-							v1: v1,
-							vertices: [ v0, v1 ]
-						};
-						lineSegments.push( segment );
-						break;
-						// Line type 5: Conditional Line segment
-
-					case '5':
-						material = parseColourCode( lp, true );
-						v0 = lp.getVector();
-						v1 = lp.getVector();
-						c0 = lp.getVector();
-						c1 = lp.getVector();
-						segment = {
-							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
-							colourCode: material.userData.code,
-							vertices: [ v0, v1 ],
-							controlPoints: [ c0, c1 ]
-						};
-						conditionalSegments.push( segment );
-						break;
-						// Line type 3: Triangle
-
-					case '3':
-						material = parseColourCode( lp );
-						inverted = currentParseScope.inverted;
-						ccw = bfcCCW !== inverted;
-						doubleSided = ! bfcCertified || ! bfcCull;
-
-						if ( ccw === true ) {
-
-							v0 = lp.getVector();
-							v1 = lp.getVector();
-							v2 = lp.getVector();
-
-						} else {
-
-							v2 = lp.getVector();
-							v1 = lp.getVector();
-							v0 = lp.getVector();
-
-						}
-
-						faces.push( {
-							material: material,
-							colourCode: material.userData.code,
-							faceNormal: null,
-							vertices: [ v0, v1, v2 ],
-							normals: [ null, null, null ]
-						} );
-						currentParseScope.totalFaces ++;
-
-						if ( doubleSided === true ) {
-
-							faces.push( {
-								material: material,
-								colourCode: material.userData.code,
-								faceNormal: null,
-								vertices: [ v2, v1, v0 ],
-								normals: [ null, null, null ]
-							} );
-							currentParseScope.totalFaces ++;
-
-						}
-
-						currentParseScope.faceMaterials.add( material );
-						break;
-						// Line type 4: Quadrilateral
-
-					case '4':
-						material = parseColourCode( lp );
-						inverted = currentParseScope.inverted;
-						ccw = bfcCCW !== inverted;
-						doubleSided = ! bfcCertified || ! bfcCull;
-
-						if ( ccw === true ) {
-
-							v0 = lp.getVector();
-							v1 = lp.getVector();
-							v2 = lp.getVector();
-							v3 = lp.getVector();
-
-						} else {
-
-							v3 = lp.getVector();
-							v2 = lp.getVector();
-							v1 = lp.getVector();
-							v0 = lp.getVector();
-
-						} // specifically place the triangle diagonal in the v0 and v1 slots so we can
-						// account for the doubling of vertices later when smoothing normals.
-
-
-						faces.push( {
-							material: material,
-							colourCode: material.userData.code,
-							faceNormal: null,
-							vertices: [ v0, v1, v2, v3 ],
-							normals: [ null, null, null, null ]
-						} );
-						currentParseScope.totalFaces += 2;
-
-						if ( doubleSided === true ) {
-
-							faces.push( {
-								material: material,
-								colourCode: material.userData.code,
-								faceNormal: null,
-								vertices: [ v3, v2, v1, v0 ],
-								normals: [ null, null, null, null ]
-							} );
-							currentParseScope.totalFaces += 2;
-
-						}
-
-						break;
-
-					default:
-						throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
+					face.material = parseColorCode( face.colorCode, false );
 
 				}
 
 			}
 
-			if ( parsingEmbeddedFiles ) {
+			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
-				this.cache.setData( currentEmbeddedFileName.toLowerCase(), currentEmbeddedText );
+				const ls = lineSegments[ i ];
+
+				if ( ls.material === null ) {
+
+					ls.material = parseColorCode( ls.colorCode, true );
+
+				}
 
 			}
 
-			currentParseScope.category = category;
-			currentParseScope.keywords = keywords;
-			currentParseScope.subobjects = subobjects;
-			currentParseScope.numSubobjects = subobjects.length;
+			for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+
+				const cs = conditionalSegments[ i ];
+
+				if ( cs.material === null ) {
+
+					cs.material = parseColorCode( cs.colorCode, true );
+
+				}
+
+			}
+
+			currentParseScope.faces = info.faces;
+			currentParseScope.conditionalSegments = info.conditionalSegments;
+			currentParseScope.lineSegments = info.lineSegments;
+			currentParseScope.category = info.category;
+			currentParseScope.keywords = info.keywords;
+			currentParseScope.subobjects = info.subobjects;
+			currentParseScope.numSubobjects = info.subobjects.length;
 			currentParseScope.subobjectIndex = 0;
+			currentParseScope.type = info.type;
+			currentParseScope.totalFaces = info.totalFaces;
 			const isRoot = ! parentParseScope.isFromParse;
 
-			if ( isRoot || ! isPrimitiveType( type ) ) {
+			if ( isRoot || ! isPrimitiveType( info.type ) ) {
 
 				currentParseScope.groupObject = new THREE.Group();
 				currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
@@ -1937,7 +2100,7 @@
 					// needs to be flipped.
 
 
-					if ( matrixScaleInverted ) {
+					if ( matrixScaleInverted !== subobjectParseScope.inverted ) {
 
 						vertices.reverse();
 
@@ -1954,7 +2117,7 @@
 
 		}
 
-		async processObject( text, subobject, url, parentScope ) {
+		async processObject( parsedInfo, subobject, url, parentScope ) {
 
 			const scope = this;
 			const parseScope = this.newParseScopeLevel( null, parentScope );
@@ -1966,14 +2129,25 @@
 				parseScope.matrix.copy( subobject.matrix );
 				parseScope.inverted = subobject.inverted;
 				parseScope.startingConstructionStep = subobject.startingConstructionStep;
-				parseScope.mainColourCode = subobject.material.userData.code;
-				parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
 				parseScope.fileName = subobject.fileName;
+
+				if ( subobject.colorCode === '16' && parseScope.parentScope ) {
+
+					const parentScope = parseScope.parentScope;
+					parseScope.mainColorCode = parentScope.mainColorCode;
+					parseScope.mainEdgeColorCode = parentScope.mainEdgeColorCode;
+
+				} else if ( subobject.colorCode !== '16' ) {
+
+					parseScope.mainColorCode = subobject.colorCode;
+					parseScope.mainEdgeColorCode = subobject.colorCode;
+
+				}
 
 			} // Parse the object
 
 
-			this.objectParse( text, parseScope );
+			this.objectParse( parsedInfo, parseScope );
 			const subobjects = parseScope.subobjects;
 			const promises = [];
 
@@ -2005,13 +2179,12 @@
 
 			function loadSubobject( subobject ) {
 
-				return scope.cache.loadData( subobject.fileName ).then( function ( text ) {
+				return scope.parseCache.loadData( subobject.fileName ).then( function ( parsedInfo ) {
 
-					return scope.processObject( text, subobject, url, parseScope );
+					return scope.processObject( parsedInfo, subobject, url, parseScope );
 
 				} ).catch( function ( err ) {
 
-					console.warn( 'LDrawLoader: Subobject "' + subobject.fileName + '" could not be loaded.' );
 					console.warn( err );
 					return null;
 
