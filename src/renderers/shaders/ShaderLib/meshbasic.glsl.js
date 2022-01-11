@@ -86,8 +86,17 @@ void main() {
 	// accumulation (baked indirect lighting only)
 	#ifdef USE_LIGHTMAP
 
-		vec4 lightMapTexel= texture2D( lightMap, vUv2 );
-		reflectedLight.indirectDiffuse += lightMapTexel.rgb * lightMapIntensity;
+		vec4 lightMapTexel = texture2D( lightMap, vUv2 );
+		vec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;
+
+		// Lightmaps are the only source of "light" for basic materials, respect them being "phsyically correct"
+		#ifdef PHYSICALLY_CORRECT_LIGHTS
+
+			lightMapIrradiance *= RECIPROCAL_PI;
+
+		#endif
+
+		reflectedLight.indirectDiffuse += lightMapIrradiance;
 
 	#else
 
