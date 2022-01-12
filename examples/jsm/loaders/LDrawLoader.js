@@ -1554,6 +1554,8 @@ class LDrawPartsBuilderCache {
 
 			}
 
+			// TODO: we should pass the main color code down into the child scope so the main color codes can be applied
+			// earlier instead of applying materials so many times recursively.
 			if ( subobject ) {
 
 				applyMaterialsToMesh( info.group, subobject.colorCode, localMaterials );
