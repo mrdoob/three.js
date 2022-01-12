@@ -114,12 +114,8 @@
 
 				//
 
-				const parameters = {
-					format: THREE.RGBFormat
-				};
-
 				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-				const renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				const renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height );
 
 				const renderPass = new RenderPass( scene, camera );
 				const copyPass = new ShaderPass( CopyShader );

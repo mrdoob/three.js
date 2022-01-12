@@ -3139,7 +3139,7 @@
 
 						// RTT ( get back distance )
 
-						rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+						rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 
 						library[ rtTexture.texture.uuid ] = rtTexture.texture;
 

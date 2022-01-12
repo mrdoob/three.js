@@ -143,12 +143,9 @@
 				const type = parseFloat( params.type );
 
 				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				target.texture.format = THREE.RGBFormat;
 				target.texture.minFilter = THREE.NearestFilter;
 				target.texture.magFilter = THREE.NearestFilter;
-				target.texture.generateMipmaps = false;
 				target.stencilBuffer = ( format === THREE.DepthStencilFormat ) ? true : false;
-				target.depthBuffer = true;
 				target.depthTexture = new THREE.DepthTexture();
 				target.depthTexture.format = format;
 				target.depthTexture.type = type;
