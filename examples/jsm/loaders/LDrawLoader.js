@@ -1433,16 +1433,14 @@ class LDrawPartsBuilderCache {
 					const subInfo = parseCache.getData( subobject.fileName );
 					if ( isPartType( subInfo.type ) ) {
 
-						// TODO: need to apply colors somewhere here
-						console.log( subInfo )
-						return this.loadModel( subInfo.fileName ).then( group => {
+						return this.loadModel( subobject.fileName ).then( group => {
 
 							subobject.matrix.decompose( group.position, group.quaternion, group.scale );
-							info.group.add( group );
+							group.userData.startingConstructionStep = subobject.startingConstructionStep;
 
 							applyMaterialsToMesh( group, subobject.colorCode, localMaterials );
 
-							return null;
+							return group;
 
 						} );
 
@@ -1467,13 +1465,13 @@ class LDrawPartsBuilderCache {
 
 			}
 
-
 			const subInfos = await Promise.all( promises );
 			for ( let i = 0, l = subInfos.length; i < l; i ++ ) {
 
 				const subInfo = subInfos[ i ];
-				if ( subInfo === null ) {
+				if ( subInfo.isGroup ) {
 
+					info.group.add( subInfo );
 					continue;
 
 				}
@@ -1525,7 +1523,6 @@ class LDrawPartsBuilderCache {
 
 				}
 
-				// if ( info. ) debugger
 				for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 					const tri = faces[ i ];
