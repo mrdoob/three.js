@@ -1418,9 +1418,9 @@ class LDrawPartsBuilderCache {
 			const promises = [];
 			const localMaterials = { ...parentMaterialHierarchy, ...info.materials };
 			info.group = new Group();
-			info.group.name = info.fileName || '';
 			if ( subobject && subobject.matrix ) {
 
+				info.group.name = subobject.fileName;
 				subobject.matrix.decompose( info.group.position, info.group.quaternion, info.group.scale );
 
 			}
@@ -1437,6 +1437,7 @@ class LDrawPartsBuilderCache {
 
 							subobject.matrix.decompose( group.position, group.quaternion, group.scale );
 							group.userData.startingConstructionStep = subobject.startingConstructionStep;
+							group.name = subobject.fileName;
 
 							applyMaterialsToMesh( group, subobject.colorCode, localMaterials );
 
@@ -1553,6 +1554,12 @@ class LDrawPartsBuilderCache {
 
 			}
 
+			if ( subobject ) {
+
+				applyMaterialsToMesh( info.group, subobject.colorCode, localMaterials );
+
+			}
+
 			return info;
 
 		};
@@ -1578,38 +1585,6 @@ class LDrawPartsBuilderCache {
 
 		}
 
-
-		// info.faces.forEach( f => {
-
-		// 	if ( f.material === null ) {
-
-		// 		f.material = this.loader.materials[ 1 ];
-
-		// 	}
-
-		// } );
-
-		// info.conditionalSegments.forEach( f => {
-
-		// 	if ( f.material === null ) {
-
-		// 		f.material = this.loader.materials[ 1 ];
-
-		// 	}
-
-		// } );
-
-		// info.lineSegments.forEach( f => {
-
-		// 	if ( f.material === null ) {
-
-		// 		f.material = this.loader.materials[ 1 ];
-
-		// 	}
-
-		// } );
-
-
 		const group = info.group;
 		if ( info.faces.length > 0 ) {
 
@@ -1629,7 +1604,6 @@ class LDrawPartsBuilderCache {
 
 		}
 
-		group.name = info.fileName;
 		group.userData.category = info.category;
 		group.userData.keywords = info.keywords;
 		if ( childParts.length ) {
@@ -1641,8 +1615,6 @@ class LDrawPartsBuilderCache {
 		group.userData.startingConstructionStep = info.startingConstructionStep;
 
 		return group;
-
-
 
 	}
 
@@ -2144,8 +2116,8 @@ class LDrawLoader extends Loader {
 
 								}
 
-
 							}
+
 						} else if ( c.material === null ) {
 
 							c.material = new MeshStandardMaterial( { color: 0xff00ff } );
