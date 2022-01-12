@@ -173,8 +173,7 @@
 				const mesh = generateInstancedMesh( geometry, material, 500 );
 				scene.add( mesh );
 
-				const renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
+				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 
 				this.render = function ( delta, rtt ) {
 

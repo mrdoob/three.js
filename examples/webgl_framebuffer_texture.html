@@ -95,7 +95,7 @@
 
 				//
 
-				texture = new THREE.FramebufferTexture( textureSize, textureSize, THREE.RGBFormat );
+				texture = new THREE.FramebufferTexture( textureSize, textureSize, THREE.RGBAFormat );
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
 
@@ -110,7 +110,8 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setClearAlpha( 1 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;

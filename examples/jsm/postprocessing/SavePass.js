@@ -1,6 +1,4 @@
 import {
-	LinearFilter,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
@@ -34,7 +32,7 @@ class SavePass extends Pass {
 
 		if ( this.renderTarget === undefined ) {
 
-			this.renderTarget = new WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBFormat } );
+			this.renderTarget = new WebGLRenderTarget( window.innerWidth, window.innerHeight );
 			this.renderTarget.texture.name = 'SavePass.rt';
 
 		}
