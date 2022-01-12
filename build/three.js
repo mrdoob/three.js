@@ -13735,6 +13735,7 @@
 		return shader;
 	}
 
+	const COMPLETION_STATUS_KHR = 0x91B1;
 	let programIdCount = 0;
 
 	function addLineNumbers(string) {
@@ -14057,54 +14058,61 @@
 			gl.bindAttribLocation(program, 0, 'position');
 		}
 
-		gl.linkProgram(program); // check for link errors
+		gl.linkProgram(program);
 
-		if (renderer.debug.checkShaderErrors) {
-			const programLog = gl.getProgramInfoLog(program).trim();
-			const vertexLog = gl.getShaderInfoLog(glVertexShader).trim();
-			const fragmentLog = gl.getShaderInfoLog(glFragmentShader).trim();
-			let runnable = true;
-			let haveDiagnostics = true;
+		function onFirstUse() {
+			// check for link errors
+			if (renderer.debug.checkShaderErrors) {
+				const programLog = gl.getProgramInfoLog(program).trim();
+				const vertexLog = gl.getShaderInfoLog(glVertexShader).trim();
+				const fragmentLog = gl.getShaderInfoLog(glFragmentShader).trim();
+				let runnable = true;
+				let haveDiagnostics = true;
 
-			if (gl.getProgramParameter(program, gl.LINK_STATUS) === false) {
-				runnable = false;
-				const vertexErrors = getShaderErrors(gl, glVertexShader, 'vertex');
-				const fragmentErrors = getShaderErrors(gl, glFragmentShader, 'fragment');
-				console.error('THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' + 'VALIDATE_STATUS ' + gl.getProgramParameter(program, gl.VALIDATE_STATUS) + '\n\n' + 'Program Info Log: ' + programLog + '\n' + vertexErrors + '\n' + fragmentErrors);
-			} else if (programLog !== '') {
-				console.warn('THREE.WebGLProgram: Program Info Log:', programLog);
-			} else if (vertexLog === '' || fragmentLog === '') {
-				haveDiagnostics = false;
-			}
+				if (gl.getProgramParameter(program, gl.LINK_STATUS) === false) {
+					runnable = false;
+					const vertexErrors = getShaderErrors(gl, glVertexShader, 'vertex');
+					const fragmentErrors = getShaderErrors(gl, glFragmentShader, 'fragment');
+					console.error('THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' + 'VALIDATE_STATUS ' + gl.getProgramParameter(program, gl.VALIDATE_STATUS) + '\n\n' + 'Program Info Log: ' + programLog + '\n' + vertexErrors + '\n' + fragmentErrors);
+				} else if (programLog !== '') {
+					console.warn('THREE.WebGLProgram: Program Info Log:', programLog);
+				} else if (vertexLog === '' || fragmentLog === '') {
+					haveDiagnostics = false;
+				}
 
-			if (haveDiagnostics) {
-				this.diagnostics = {
-					runnable: runnable,
-					programLog: programLog,
-					vertexShader: {
-						log: vertexLog,
-						prefix: prefixVertex
-					},
-					fragmentShader: {
-						log: fragmentLog,
-						prefix: prefixFragment
-					}
-				};
-			}
-		} // Clean up
-		// Crashes in iOS9 and iOS10. #18402
-		// gl.detachShader( program, glVertexShader );
-		// gl.detachShader( program, glFragmentShader );
+				if (haveDiagnostics) {
+					this.diagnostics = {
+						runnable: runnable,
+						programLog: programLog,
+						vertexShader: {
+							log: vertexLog,
+							prefix: prefixVertex
+						},
+						fragmentShader: {
+							log: fragmentLog,
+							prefix: prefixFragment
+						}
+					};
+				}
+			} // Clean up
+			// Crashes in iOS9 and iOS10. #18402
+			// gl.detachShader( program, glVertexShader );
+			// gl.detachShader( program, glFragmentShader );
 
 
-		gl.deleteShader(glVertexShader);
-		gl.deleteShader(glFragmentShader); // set up caching for uniform locations
+			gl.deleteShader(glVertexShader);
+			gl.deleteShader(glFragmentShader);
+			cachedUniforms = new WebGLUniforms(gl, program);
+			cachedAttributes = fetchAttributeLocations(gl, program);
+		} // set up caching for uniform locations
+
 
 		let cachedUniforms;
 
 		this.getUniforms = function () {
 			if (cachedUniforms === undefined) {
-				cachedUniforms = new WebGLUniforms(gl, program);
+				// Populates cachedUniforms and cachedAttributes
+				onFirstUse();
 			}
 
 			return cachedUniforms;
@@ -14115,10 +14123,24 @@
 
 		this.getAttributes = function () {
 			if (cachedAttributes === undefined) {
-				cachedAttributes = fetchAttributeLocations(gl, program);
+				// Populates cachedAttributes and cachedUniforms
+				onFirstUse();
 			}
 
 			return cachedAttributes;
+		}; // indicate when the program is ready to be used
+		// if the KHR_parallel_shader_compile extension isn't supported, flag the
+		// program as ready immediately. It may cause a stall when it's first used.
+
+
+		let programReady = !parameters.rendererExtensionParallelShaderCompile;
+
+		this.isReady = function () {
+			if (!programReady) {
+				programReady = gl.getProgramParameter(program, COMPLETION_STATUS_KHR);
+			}
+
+			return programReady;
 		}; // free resource
 
 
@@ -14438,6 +14460,7 @@
 				rendererExtensionFragDepth: isWebGL2 || extensions.has('EXT_frag_depth'),
 				rendererExtensionDrawBuffers: isWebGL2 || extensions.has('WEBGL_draw_buffers'),
 				rendererExtensionShaderTextureLod: isWebGL2 || extensions.has('EXT_shader_texture_lod'),
+				rendererExtensionParallelShaderCompile: extensions.has('KHR_parallel_shader_compile'),
 				customProgramCacheKey: material.customProgramCacheKey()
 			};
 			return parameters;
@@ -19357,7 +19380,9 @@
 			_isContextLost = true;
 		}
 
-		function onContextRestore() {
+		function
+			/* event */
+		onContextRestore() {
 			console.log('THREE.WebGLRenderer: Context Restored.');
 			_isContextLost = false;
 			const infoAutoReset = info.autoReset;
@@ -19512,6 +19537,116 @@
 			});
 			renderStateStack.pop();
 			currentRenderState = null;
+		}; // compileAsync
+
+
+		this.compileAsync = function (scene, targetScene = null) {
+			// If no explicit targetScene was given use the scene instead
+			if (!targetScene) {
+				targetScene = scene;
+			}
+
+			currentRenderState = renderStates.get(targetScene);
+			currentRenderState.init();
+			renderStateStack.push(currentRenderState);
+			let foundScene = scene === targetScene; // Gather lights from both the scene and the new object that will be added
+			// to the scene.
+
+			targetScene.traverseVisible(function (object) {
+				if (object === scene) {
+					foundScene = true;
+				}
+
+				if (object.isLight) {
+					currentRenderState.pushLight(object);
+
+					if (object.castShadow) {
+						currentRenderState.pushShadow(object);
+					}
+				}
+			}); // If the scene wasn't already part of the targetScene, add any lights it
+			// contains as well.
+
+			if (!foundScene) {
+				scene.traverseVisible(function (object) {
+					if (object.isLight) {
+						currentRenderState.pushLight(object);
+
+						if (object.castShadow) {
+							currentRenderState.pushShadow(object);
+						}
+					}
+				});
+			}
+
+			currentRenderState.setupLights(_this.physicallyCorrectLights);
+			const compiling = new Set(); // Only initialize materials in the new scene, not the targetScene.
+
+			const _compileMaterial = function (material, object) {
+				if (Array.isArray(material)) {
+					for (let i = 0; i < material.length; i++) {
+						const material2 = material[i];
+						getProgram(material2, targetScene, object);
+						compiling.add(material2);
+					}
+				} else {
+					getProgram(material, targetScene, object);
+					compiling.add(material);
+				}
+			};
+
+			if (scene.overrideMaterial) {
+				scene.traverse(function (object) {
+					const material = object.material;
+
+					if (material) {
+						_compileMaterial(scene.overrideMaterial, object);
+					}
+				});
+			} else {
+				scene.traverse(function (object) {
+					const material = object.material;
+
+					if (material) {
+						_compileMaterial(material, object);
+					}
+				});
+			}
+
+			currentRenderState = null; // Wait for all the materials in the new object to indicate that they're
+			// ready to be used before resolving the promise.
+
+			return new Promise(resolve => {
+				function checkMaterialsReady() {
+					compiling.forEach(function (material) {
+						const materialProperties = properties.get(material);
+						const program = materialProperties.currentProgram;
+
+						if (program.isReady()) {
+							// remove any programs that report they're ready to use from the list
+							compiling.delete(material);
+						}
+					}); // once the list of compiling materials is empty, call the callback
+
+					if (compiling.size === 0) {
+						resolve(scene);
+						return;
+					} // if some materials are still not ready, wait a bit and check again
+
+
+					setTimeout(checkMaterialsReady, 10);
+				}
+
+				if (extensions.get('KHR_parallel_shader_compile') !== null) {
+					// If we can check the compilation status of the materials without
+					// blocking then do so right away.
+					checkMaterialsReady();
+				} else {
+					// Otherwise start by waiting a bit to give the materials we just
+					// initialized a chance to finish.
+					setTimeout(checkMaterialsReady, 10);
+				}
+			});
 		}; // Animation Loop
 
 
@@ -19868,11 +20003,18 @@
 				uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix; // TODO (abelnation): add area lights shadow info to uniforms
 			}
 
-			const progUniforms = program.getUniforms();
-			const uniformsList = WebGLUniforms.seqWithValue(progUniforms.seq, uniforms);
 			materialProperties.currentProgram = program;
-			materialProperties.uniformsList = uniformsList;
+			materialProperties.uniformsList = null;
 			return program;
+		}
+
+		function getUniformList(materialProperties) {
+			if (materialProperties.uniformsList === null) {
+				const progUniforms = materialProperties.currentProgram.getUniforms();
+				materialProperties.uniformsList = WebGLUniforms.seqWithValue(progUniforms.seq, materialProperties.uniforms);
+			}
+
+			return materialProperties.uniformsList;
 		}
 
 		function updateCommonMaterialProperties(material, parameters) {
@@ -20065,11 +20207,11 @@
 				}
 
 				materials.refreshMaterialUniforms(m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget);
-				WebGLUniforms.upload(_gl, materialProperties.uniformsList, m_uniforms, textures);
+				WebGLUniforms.upload(_gl, getUniformList(materialProperties), m_uniforms, textures);
 			}
 
 			if (material.isShaderMaterial && material.uniformsNeedUpdate === true) {
-				WebGLUniforms.upload(_gl, materialProperties.uniformsList, m_uniforms, textures);
+				WebGLUniforms.upload(_gl, getUniformList(materialProperties), m_uniforms, textures);
 				material.uniformsNeedUpdate = false;
 			}
 
@@ -33997,15 +34139,15 @@
 			// TODO: delete this comment?
 			const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
 			const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
-			this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+				this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 			this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
-			const d = light.distance;
-			if ( d === 0.0 ) {
-				this.lightDistance.visible = false;
-			} else {
-				this.lightDistance.scale.set( d, d, d );
-			}
-			this.add( this.lightDistance );
+				const d = light.distance;
+				if ( d === 0.0 ) {
+					this.lightDistance.visible = false;
+				} else {
+					this.lightDistance.scale.set( d, d, d );
+				}
+				this.add( this.lightDistance );
 			*/
 		}
 
@@ -34022,12 +34164,12 @@
 			}
 			/*
 			const d = this.light.distance;
-				if ( d === 0.0 ) {
-					this.lightDistance.visible = false;
-				} else {
-					this.lightDistance.visible = true;
+					if ( d === 0.0 ) {
+						this.lightDistance.visible = false;
+					} else {
+						this.lightDistance.visible = true;
 				this.lightDistance.scale.set( d, d, d );
-				}
+					}
 			*/
 
 		}
@@ -34426,7 +34568,7 @@
 			1/___0/|
 			| 6__|_7
 			2/___3/
-				0: max.x, max.y, max.z
+					0: max.x, max.y, max.z
 			1: min.x, max.y, max.z
 			2: min.x, min.y, max.z
 			3: max.x, min.y, max.z
@@ -35076,10 +35218,14 @@
 	};
 
 	Loader.Handlers = {
-		add: function () {
+		add: function
+			/* regex, loader */
+		() {
 			console.error('THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.');
 		},
-		get: function () {
+		get: function
+			/* file */
+		() {
 			console.error('THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.');
 		}
 	};
@@ -35167,7 +35313,9 @@
 		return vector.applyMatrix3(this);
 	};
 
-	Matrix3.prototype.multiplyVector3Array = function () {
+	Matrix3.prototype.multiplyVector3Array = function
+		/* a */
+	() {
 		console.error('THREE.Matrix3: .multiplyVector3Array() has been removed.');
 	};
 
@@ -35176,7 +35324,9 @@
 		return attribute.applyMatrix3(this);
 	};
 
-	Matrix3.prototype.applyToVector3Array = function () {
+	Matrix3.prototype.applyToVector3Array = function
+		/* array, offset, length */
+	() {
 		console.error('THREE.Matrix3: .applyToVector3Array() has been removed.');
 	};
 
@@ -35220,7 +35370,9 @@
 		return vector.applyMatrix4(this);
 	};
 
-	Matrix4.prototype.multiplyVector3Array = function () {
+	Matrix4.prototype.multiplyVector3Array = function
+		/* a */
+	() {
 		console.error('THREE.Matrix4: .multiplyVector3Array() has been removed.');
 	};
 
@@ -35259,7 +35411,9 @@
 		return attribute.applyMatrix4(this);
 	};
 
-	Matrix4.prototype.applyToVector3Array = function () {
+	Matrix4.prototype.applyToVector3Array = function
+		/* array, offset, length */
+	() {
 		console.error('THREE.Matrix4: .applyToVector3Array() has been removed.');
 	};
 
@@ -35592,7 +35746,9 @@
 				console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 				return this.usage === DynamicDrawUsage;
 			},
-			set: function () {
+			set: function
+				/* value */
+			() {
 				console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 				this.setUsage(DynamicDrawUsage);
 			}
@@ -35605,9 +35761,13 @@
 		return this;
 	};
 
-	BufferAttribute.prototype.copyIndicesArray = function () {
+	BufferAttribute.prototype.copyIndicesArray = function
+		/* indices */
+	() {
 		console.error('THREE.BufferAttribute: .copyIndicesArray() has been removed.');
-	}, BufferAttribute.prototype.setArray = function () {
+	}, BufferAttribute.prototype.setArray = function
+		/* array */
+	() {
 		console.error('THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 	}; //
 
@@ -35682,7 +35842,9 @@
 		return this;
 	};
 
-	InterleavedBuffer.prototype.setArray = function () {
+	InterleavedBuffer.prototype.setArray = function
+		/* array */
+	() {
 		console.error('THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 	}; //
 
@@ -35916,7 +36078,9 @@
 				console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 				return undefined;
 			},
-			set: function () {
+			set: function
+				/* value */
+			() {
 				console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 			}
 		},
@@ -35976,7 +36140,9 @@
 				console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 				return undefined;
 			},
-			set: function () {
+			set: function
+				/* cullFace */
+			() {
 				console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 			}
 		},
@@ -36171,13 +36337,19 @@
 	} //
 
 	const SceneUtils = {
-		createMultiMaterialObject: function () {
+		createMultiMaterialObject: function
+			/* geometry, materials */
+		() {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		},
-		detach: function () {
+		detach: function
+			/* child, parent, scene */
+		() {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		},
-		attach: function () {
+		attach: function
+			/* child, scene, parent */
+		() {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		}
 	}; //

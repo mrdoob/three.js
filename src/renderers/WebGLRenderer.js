@@ -864,7 +864,6 @@ function WebGLRenderer( parameters = {} ) {
 	// compileAsync
 
 	this.compileAsync = function ( scene, targetScene = null ) {
-
 		// If no explicit targetScene was given use the scene instead
 		if ( ! targetScene ) {
 
@@ -931,33 +930,47 @@ function WebGLRenderer( parameters = {} ) {
 
 		// Only initialize materials in the new scene, not the targetScene.
 
-		scene.traverse( function ( object ) {
+    const _compileMaterial = function ( material, object ) {
+		  if ( Array.isArray( material ) ) {
 
-			const material = object.material;
+				for ( let i = 0; i < material.length; i ++ ) {
 
-			if ( material ) {
+					const material2 = material[ i ];
 
-				if ( Array.isArray( material ) ) {
-
-					for ( let i = 0; i < material.length; i ++ ) {
-
-						const material2 = material[ i ];
-
-						getProgram( material2, targetScene, object );
-						compiling.add( material2 );
-
-					}
-
-				} else {
-
-					getProgram( material, targetScene, object );
-					compiling.add( material );
+					getProgram( material2, targetScene, object );
+					compiling.add( material2 );
 
 				}
 
-			}
+			} else {
 
-		} );
+				getProgram( material, targetScene, object );
+				compiling.add( material );
+
+			}
+		};
+
+		if (scene.overrideMaterial) {
+			scene.traverse( function ( object ) {
+				const material = object.material;
+
+				if ( material ) {
+					_compileMaterial(scene.overrideMaterial, object);
+				}
+			});
+		} else {
+			scene.traverse( function ( object ) {
+
+				const material = object.material;
+
+				if ( material ) {
+
+					_compileMaterial(material, object);
+
+				}
+
+			} );
+		}
 
 		currentRenderState = null;
 
