@@ -1285,8 +1285,9 @@ class LDrawParsedCache {
 
 	}
 
-	// kicks off a fetch and parse of the requested data if it hasn't already been loaded
-	async loadData( fileName, clone = true ) {
+	// kicks off a fetch and parse of the requested data if it hasn't already been loaded. Returns when
+	// the data is ready to use and can be retrieved synchronously with "getData".
+	async ensureDataLoaded( fileName ) {
 
 		const key = fileName.toLowerCase();
 		if ( ! ( key in this.cache ) ) {
@@ -1302,7 +1303,7 @@ class LDrawParsedCache {
 
 		}
 
-		return await this.getData( fileName, clone );
+		await this.cache[ key ];
 
 	}
 
@@ -1411,31 +1412,33 @@ class LDrawPartsBuilderCache {
 		const childParts = [];
 		let totalFaces = info.totalFaces;
 
-		const processInfo = async ( info, parentMaterialHierarchy ) => {
+		const processInfo = async ( info, parentMaterialHierarchy, subobject = null ) => {
 
 			const subobjects = info.subobjects;
 			const promises = [];
 			const localMaterials = { ...parentMaterialHierarchy, ...info.materials };
+			info.group = new Group();
+			info.group.name = info.fileName || '';
+			if ( subobject && subobject.matrix ) {
+
+				subobject.matrix.decompose( info.group.position, info.group.quaternion, info.group.scale );
+
+			}
 
 			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
 				const subobject = subobjects[ i ];
-				const promise = parseCache.loadData( subobject.fileName, false ).then( subInfo => {
+				const promise = parseCache.ensureDataLoaded( subobject.fileName ).then( () => {
 
+					const subInfo = parseCache.getData( subobject.fileName );
 					if ( isPartType( subInfo.type ) ) {
 
 						// TODO: need to apply colors somewhere here
+						console.log( subInfo )
 						return this.loadModel( subInfo.fileName ).then( group => {
 
-							if ( subobject.fileName === 'parts/3829c01.dat' ) {
-
-								console.log('GOT HERE')
-
-							}
-
-							console.log( subobject.fileName )
 							subobject.matrix.decompose( group.position, group.quaternion, group.scale );
-							childParts.push( group );
+							info.group.add( group );
 
 							applyMaterialsToMesh( group, subobject.colorCode, localMaterials );
 
@@ -1445,7 +1448,7 @@ class LDrawPartsBuilderCache {
 
 					}
 
-					return processInfo( parseCache.getData( subobject.fileName ), localMaterials ).then( finalInfo => {
+					return processInfo( parseCache.getData( subobject.fileName ), localMaterials, subobject ).then( finalInfo => {
 
 						finalInfo.subobjects = null;
 						finalInfo.matrix = subobject.matrix;
@@ -1472,6 +1475,12 @@ class LDrawPartsBuilderCache {
 				if ( subInfo === null ) {
 
 					continue;
+
+				}
+
+				if ( subInfo.group.children.length ) {
+
+					info.group.add( subInfo.group );
 
 				}
 
@@ -1604,7 +1613,7 @@ class LDrawPartsBuilderCache {
 		// } );
 
 
-		const group = new Group();
+		const group = info.group;
 		if ( info.faces.length > 0 ) {
 
 			group.add( createObject( info.faces, 3, false, totalFaces ) );
@@ -1642,15 +1651,17 @@ class LDrawPartsBuilderCache {
 
 	hasCachedModel( fileName ) {
 
-		return fileName in this.cache;
+		return fileName.toLowerCase() in this.cache;
 
 	}
 
 	async getCachedModel( fileName, fallbackColorCode = null, materialHierarchy = {} ) {
 
-		if ( this.hasCachedModel( fileName ) ) {
+		const key = fileName.toLowerCase();
+		if ( this.hasCachedModel( key ) ) {
 
-			const group = await this.cache[ fileName ];
+			const group = await this.cache[ key ];
+
 			const result = group.clone();
 			if ( fallbackColorCode !== null ) {
 
@@ -1678,12 +1689,23 @@ class LDrawPartsBuilderCache {
 
 			// prepare data to be ready
 			const parseCache = this.loader.parseCache;
-			const immutableInfo = await parseCache.loadData( fileName, false );
+			await parseCache.ensureDataLoaded( fileName );
+
+			const immutableInfo = parseCache.getData( fileName, false );
 			const promise = this.processIntoMesh( parseCache.getData( fileName ), materialHierarchy );
+
+			// now that the file has loaded it's possible that another part parse has been waiting in parallel
+			// so check the cache again to see if it's been added since the last async operation.
+			if ( this.hasCachedModel( fileName ) ) {
+
+				return this.getCachedModel( fileName, fallbackColorCode, materialHierarchy );
+
+			}
 
 			if ( isPartType( immutableInfo.type ) ) {
 
-				this.cache = promise;
+				const key = fileName.toLowerCase();
+				this.cache[ key ] = promise;
 
 			}
 
