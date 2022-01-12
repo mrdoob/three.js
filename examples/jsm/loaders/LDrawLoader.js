@@ -168,6 +168,17 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 
 }
 
+class ConditionalLineSegments extends LineSegments {
+
+	constructor( geometry, material ) {
+
+		super( geometry, material );
+		this.isConditionalLine = true;
+
+	}
+
+}
+
 function generateFaceNormals( faces ) {
 
 	for ( let i = 0, l = faces.length; i < l; i ++ ) {
@@ -1337,7 +1348,7 @@ function getMaterialFromCode( colorCode, fallbackColorCode, materialHierarchy, f
 
 function applyMaterialsToMesh( group, colorCode, materialHierarchy ) {
 
-	if ( colorCode == '16' || colorCode === '24' ) {
+	if ( colorCode == '16' || colorCode === '24' || ! ( colorCode in materialHierarchy ) ) {
 
 		return;
 
@@ -1393,36 +1404,48 @@ class LDrawPartsBuilderCache {
 
 	}
 
-	async processIntoMesh( info ) {
+	async processIntoMesh( info, parentMaterialHierarchy ) {
 
 		const parseCache = this.loader.parseCache;
 		const faceMaterials = new Set();
 		const childParts = [];
 		let totalFaces = info.totalFaces;
 
-		const processInfo = async ( info ) => {
+		const processInfo = async ( info, parentMaterialHierarchy ) => {
 
 			const subobjects = info.subobjects;
 			const promises = [];
+			const localMaterials = { ...parentMaterialHierarchy, ...info.materials };
 
 			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
 				const subobject = subobjects[ i ];
 				const promise = parseCache.loadData( subobject.fileName, false ).then( subInfo => {
 
-					// if ( isPartType( subInfo.type ) ) {
+					if ( isPartType( subInfo.type ) ) {
 
-					// 	return this.loadModel( subInfo.fileName, subobject.colorCode, localMaterials ).then( group => {
+						// TODO: need to apply colors somewhere here
+						return this.loadModel( subInfo.fileName ).then( group => {
 
-					// 		subobject.matrix.decompose( group.position, group.quaternion, group.scale );
-					// 		childParts.push( group );
-					// 		return null;
+							if ( subobject.fileName === 'parts/3829c01.dat' ) {
 
-					// 	} );
+								console.log('GOT HERE')
 
-					// }
+							}
 
-					return processInfo( parseCache.getData( subobject.fileName ) ).then( finalInfo => {
+							console.log( subobject.fileName )
+							subobject.matrix.decompose( group.position, group.quaternion, group.scale );
+							childParts.push( group );
+
+							applyMaterialsToMesh( group, subobject.colorCode, localMaterials );
+
+							return null;
+
+						} );
+
+					}
+
+					return processInfo( parseCache.getData( subobject.fileName ), localMaterials ).then( finalInfo => {
 
 						finalInfo.subobjects = null;
 						finalInfo.matrix = subobject.matrix;
@@ -1539,7 +1562,7 @@ class LDrawPartsBuilderCache {
 
 		}
 
-		await processInfo( info, true );
+		await processInfo( info, parentMaterialHierarchy );
 
 		if ( this.loader.smoothNormals ) {
 
@@ -1548,6 +1571,38 @@ class LDrawPartsBuilderCache {
 			smoothNormals( info.faces, info.lineSegments, checkSubSegments );
 
 		}
+
+
+		// info.faces.forEach( f => {
+
+		// 	if ( f.material === null ) {
+
+		// 		f.material = this.loader.materials[ 1 ];
+
+		// 	}
+
+		// } );
+
+		// info.conditionalSegments.forEach( f => {
+
+		// 	if ( f.material === null ) {
+
+		// 		f.material = this.loader.materials[ 1 ];
+
+		// 	}
+
+		// } );
+
+		// info.lineSegments.forEach( f => {
+
+		// 	if ( f.material === null ) {
+
+		// 		f.material = this.loader.materials[ 1 ];
+
+		// 	}
+
+		// } );
+
 
 		const group = new Group();
 		if ( info.faces.length > 0 ) {
@@ -1624,7 +1679,7 @@ class LDrawPartsBuilderCache {
 			// prepare data to be ready
 			const parseCache = this.loader.parseCache;
 			const immutableInfo = await parseCache.loadData( fileName, false );
-			const promise = this.processIntoMesh( parseCache.getData( fileName ) );
+			const promise = this.processIntoMesh( parseCache.getData( fileName ), materialHierarchy );
 
 			if ( isPartType( immutableInfo.type ) ) {
 
@@ -1900,7 +1955,15 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 	if ( elementSize === 2 ) {
 
-		object3d = new LineSegments( bufferGeometry, materials.length === 1 ? materials[ 0 ] : materials );
+		if ( isConditionalSegments ) {
+
+			object3d = new ConditionalLineSegments( bufferGeometry, materials.length === 1 ? materials[ 0 ] : materials );
+
+		} else {
+
+			object3d = new LineSegments( bufferGeometry, materials.length === 1 ? materials[ 0 ] : materials );
+
+		}
 
 	} else if ( elementSize === 3 ) {
 
@@ -2046,6 +2109,33 @@ class LDrawLoader extends Loader {
 				this.computeConstructionSteps( group );
 
 				// applyMaterialsToMesh( group, null, materials );
+
+
+				group.traverse( c => {
+
+					if ( 'material' in c ) {
+
+						if ( Array.isArray( c ) ) {
+
+							for ( let i = 0, l = c.material.length; i < l; i ++ ) {
+
+								if ( c.material[ i ] === null ) {
+
+									c.material[ i ] = new MeshStandardMaterial( { color: 0xff00ff });
+
+								}
+
+
+							}
+						} else if ( c.material === null ) {
+
+							c.material = new MeshStandardMaterial( { color: 0xff00ff } );
+
+						}
+
+					}
+
+				} );
 
 				onLoad( group );
 
