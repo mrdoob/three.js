@@ -1376,7 +1376,7 @@ function applyMaterialsToMesh( group, colorCode, materialHierarchy ) {
 
 				for ( let i = 0, l = c.material.length; i < l; i ++ ) {
 
-					if ( c.material[ i ] === null ) {
+					if ( c.material[ i ] === null || ! c.material[ i ].isMaterial ) {
 
 						c.material[ i ] = material;
 
@@ -1384,7 +1384,7 @@ function applyMaterialsToMesh( group, colorCode, materialHierarchy ) {
 
 				}
 
-			} else if ( c.material === null ) {
+			} else if ( c.material === null || ! c.material.isMaterial ) {
 
 				c.material = material;
 
@@ -1405,7 +1405,7 @@ class LDrawPartsBuilderCache {
 
 	}
 
-	async processIntoMesh( info, parentMaterialHierarchy ) {
+	async processIntoMesh( info ) {
 
 		const parseCache = this.loader.parseCache;
 		const faceMaterials = new Set();
@@ -1578,7 +1578,7 @@ class LDrawPartsBuilderCache {
 
 		}
 
-		await processInfo( info, parentMaterialHierarchy );
+		await processInfo( info, {} );
 
 		if ( this.loader.smoothNormals ) {
 
@@ -1625,7 +1625,7 @@ class LDrawPartsBuilderCache {
 
 	}
 
-	async getCachedModel( fileName, fallbackColorCode = null, materialHierarchy = {} ) {
+	async getCachedModel( fileName ) {
 
 		const key = fileName.toLowerCase();
 		if ( this.hasCachedModel( key ) ) {
@@ -1633,12 +1633,6 @@ class LDrawPartsBuilderCache {
 			const group = await this.cache[ key ];
 
 			const result = group.clone();
-			if ( fallbackColorCode !== null ) {
-
-				applyMaterialsToMesh( result, fallbackColorCode, materialHierarchy );
-
-			}
-
 			return result;
 
 		} else {
@@ -1649,11 +1643,11 @@ class LDrawPartsBuilderCache {
 
 	}
 
-	async loadModel( fileName, fallbackColorCode = null, materialHierarchy = {} ) {
+	async loadModel( fileName ) {
 
 		if ( this.hasCachedModel( fileName ) ) {
 
-			return this.getCachedModel( fileName, fallbackColorCode, materialHierarchy );
+			return this.getCachedModel( fileName );
 
 		} else {
 
@@ -1662,13 +1656,13 @@ class LDrawPartsBuilderCache {
 			await parseCache.ensureDataLoaded( fileName );
 
 			const immutableInfo = parseCache.getData( fileName, false );
-			const promise = this.processIntoMesh( parseCache.getData( fileName ), materialHierarchy );
+			const promise = this.processIntoMesh( parseCache.getData( fileName ) );
 
 			// now that the file has loaded it's possible that another part parse has been waiting in parallel
 			// so check the cache again to see if it's been added since the last async operation.
 			if ( this.hasCachedModel( fileName ) ) {
 
-				return this.getCachedModel( fileName, fallbackColorCode, materialHierarchy );
+				return this.getCachedModel( fileName );
 
 			}
 
@@ -1693,18 +1687,18 @@ class LDrawPartsBuilderCache {
 
 	}
 
-	parseModel( text, materialHierarchy = {} ) {
+	parseModel( text ) {
 
 		const parseCache = this.loader.parseCache;
 		const info = parseCache.parse( text );
 
 		if ( isPartType( info.type ) && this.hasCachedModel( info.fileName ) ) {
 
-			return this.getCachedModel( info.fileName, { ...materialHierarchy, ...info.materials } );
+			return this.getCachedModel( info.fileName );
 
 		}
 
-		return this.processIntoMesh( info, { ...materialHierarchy, ...info.materials } );
+		return this.processIntoMesh( info );
 
 	}
 
@@ -1880,7 +1874,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 		}
 
-		if ( prevMaterial !== elem.material ) {
+		if ( prevMaterial !== elem.colorCode ) {
 
 			if ( prevMaterial !== null ) {
 
@@ -1889,33 +1883,41 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 			}
 
 			const material = elem.material;
-			if ( elementSize === 3 ) {
+			if ( material !== null ) {
 
-				materials.push( material );
+				if ( elementSize === 3 ) {
 
-			} else if ( elementSize === 2 ) {
+					materials.push( material );
 
-				if ( material !== null ) {
+				} else if ( elementSize === 2 ) {
 
-					if ( isConditionalSegments ) {
+					if ( material !== null ) {
 
-						materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
+						if ( isConditionalSegments ) {
+
+							materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
+
+						} else {
+
+							materials.push( material.userData.edgeMaterial );
+
+						}
 
 					} else {
 
-						materials.push( material.userData.edgeMaterial );
+						materials.push( null );
 
 					}
 
-				} else {
-
-					materials.push( null );
-
 				}
+
+			} else {
+
+				materials.push( elem.colorCode );
 
 			}
 
-			prevMaterial = elem.material;
+			prevMaterial = elem.colorCode;
 			index0 = offset / 3;
 			numGroupVerts = vertices.length;
 
@@ -2096,8 +2098,8 @@ class LDrawLoader extends Loader {
 
 
 				const materials = {};
-				materials[ '16' ] = this.materials[0];
-				materials[ '24' ] = this.materials[1];
+				materials[ '16' ] = this.materials[ 0 ];
+				materials[ '24' ] = this.materials[ 1 ];
 				this.computeConstructionSteps( group );
 
 				// applyMaterialsToMesh( group, null, materials );
@@ -2107,19 +2109,19 @@ class LDrawLoader extends Loader {
 
 					if ( 'material' in c ) {
 
-						if ( Array.isArray( c ) ) {
+						if ( Array.isArray( c.material ) ) {
 
 							for ( let i = 0, l = c.material.length; i < l; i ++ ) {
 
-								if ( c.material[ i ] === null ) {
+								if ( c.material[ i ] === null || ! c.material[ i ].isMaterial ) {
 
-									c.material[ i ] = new MeshStandardMaterial( { color: 0xff00ff });
+									c.material[ i ] = new MeshStandardMaterial( { color: 0xff00ff } );
 
 								}
 
 							}
 
-						} else if ( c.material === null ) {
+						} else if ( c.material === null || ! c.material.isMaterial ) {
 
 							c.material = new MeshStandardMaterial( { color: 0xff00ff } );
 
@@ -2133,7 +2135,7 @@ class LDrawLoader extends Loader {
 
 			} ).catch( err => {
 
-				console.error(err)
+				console.error( err )
 
 			} );
 
