@@ -1,4 +1,4 @@
-import { MeshStandardMaterial } from '../../../../../build/three.module.js';
+import { MeshStandardMaterial } from 'three';
 
 class MeshStandardNodeMaterial extends MeshStandardMaterial {
 
