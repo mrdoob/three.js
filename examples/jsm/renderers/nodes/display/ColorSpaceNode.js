@@ -33,19 +33,6 @@ const EncodingLib = {
 	LinearTosRGB
 };
 
-function getEncodingComponents( encoding ) {
-
-	switch ( encoding ) {
-
-		case LinearEncoding:
-			return [ 'Linear' ];
-		case sRGBEncoding:
-			return [ 'sRGB' ];
-
-	}
-
-}
-
 class ColorSpaceNode extends TempNode {
 
 	static LINEAR_TO_LINEAR = 'LinearToLinear';
@@ -58,29 +45,24 @@ class ColorSpaceNode extends TempNode {
 		this.method = method;
 
 		this.node = node;
-		this.factor = null;
 
 	}
 
 	fromEncoding( encoding ) {
 
-		const components = getEncodingComponents( encoding );
+		let method = null;
 
-		this.method = 'LinearTo' + components[ 0 ];
-		this.factor = components[ 1 ];
+		if ( encoding === LinearEncoding ) {
 
-		return this;
+			method = 'Linear';
 
-	}
+		} else if ( encoding === sRGBEncoding ) {
 
-	fromDecoding() {
+			method = 'sRGB';
 
-		// TODO: Remove fromDecoding()
+		}
 
-		const components = getEncodingComponents( LinearEncoding );
-
-		this.method = components[ 0 ] + 'ToLinear';
-		this.factor = components[ 1 ];
+		this.method = 'LinearTo' + method;
 
 		return this;
 
@@ -96,11 +78,9 @@ class ColorSpaceNode extends TempNode {
 		if ( method !== ColorSpaceNode.LINEAR_TO_LINEAR ) {
 
 			const encodingFunctionNode = EncodingLib[ method ];
-			const factor = this.factor;
 
 			return encodingFunctionNode( {
-				value: node,
-				factor
+				value: node
 			} ).build( builder, type );
 
 		} else {
