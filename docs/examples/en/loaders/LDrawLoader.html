@@ -59,6 +59,12 @@
 			// called when the resource is loaded
 			function ( group ) {
 
+				// Optionally, use LDrawUtils.mergeObject() from
+				// 'examples/jsm/utils/LDrawUtils.js' to merge all
+				// geometries by material (it gives better runtime
+				// performance, but construction steps are lost)
+				// group = LDrawUtils.mergeObject( group );
+
 				scene.add( group );
 
 			},
