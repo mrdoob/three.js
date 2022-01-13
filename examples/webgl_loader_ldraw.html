@@ -30,6 +30,7 @@
 			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
 
 			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
+			import { LDrawUtils } from './jsm/utils/LDrawUtils.js';
 
 			let container, progressBarDiv;
 
@@ -215,7 +216,7 @@
 						}
 
 						// Merge model geometries by material
-						if ( guiData.mergeModel ) model = LDrawLoader.mergeObject( model );
+						if ( guiData.mergeModel ) model = LDrawUtils.mergeObject( model );
 
 						// Convert from LDraw coordinates: rotate 180 degrees around OX
 						model.rotation.x = Math.PI;
