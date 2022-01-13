@@ -1347,11 +1347,36 @@ function getMaterialFromCode( colorCode, fallbackColorCode, materialHierarchy, f
 
 }
 
-function applyMaterialsToMesh( group, colorCode, materialHierarchy ) {
+function applyMaterialsToMesh( group, fallbackColorCode, materialHierarchy ) {
 
-	if ( colorCode == '16' || colorCode === '24' || ! ( colorCode in materialHierarchy ) ) {
+	function getMaterial( c, colorCode ) {
 
-		return;
+		if ( colorCode == '16' || colorCode === '24' ) {
+
+			colorCode = fallbackColorCode;
+
+		}
+
+		if ( colorCode === '16' || colorCode === '24' || ! ( colorCode in materialHierarchy ) ) {
+
+			return colorCode;
+
+		}
+
+		let material = materialHierarchy[ colorCode ];
+		if ( c.isLineSegments ) {
+
+			material = material.userData.edgeMaterial;
+
+			if ( c.isConditionalLine ) {
+
+				material = material.userData.conditionalEdgeMaterial;
+
+			}
+
+		}
+
+		return material;
 
 	}
 
@@ -1359,34 +1384,22 @@ function applyMaterialsToMesh( group, colorCode, materialHierarchy ) {
 
 		if ( c.isMesh || c.isLineSegments ) {
 
-			let material = materialHierarchy[ colorCode ];
-			if ( c.isLineSegments ) {
-
-				material = material.userData.edgeMaterial;
-
-				if ( c.isConditionalLine ) {
-
-					material = material.userData.conditionalEdgeMaterial;
-
-				}
-
-			}
 
 			if ( Array.isArray( c.material ) ) {
 
 				for ( let i = 0, l = c.material.length; i < l; i ++ ) {
 
-					if ( c.material[ i ] === null || ! c.material[ i ].isMaterial ) {
+					if ( ! c.material[ i ].isMaterial ) {
 
-						c.material[ i ] = material;
+						c.material[ i ] = getMaterial( c, c.material[ i ] );
 
 					}
 
 				}
 
-			} else if ( c.material === null || ! c.material.isMaterial ) {
+			} else if ( ! c.material.isMaterial ) {
 
-				c.material = material;
+				c.material = getMaterial( c, c.material );
 
 			}
 
@@ -1655,8 +1668,8 @@ class LDrawPartsBuilderCache {
 			const parseCache = this.loader.parseCache;
 			await parseCache.ensureDataLoaded( fileName );
 
-			const immutableInfo = parseCache.getData( fileName, false );
-			const promise = this.processIntoMesh( parseCache.getData( fileName ) );
+			const info = parseCache.getData( fileName );
+			const promise = this.processIntoMesh( info );
 
 			// now that the file has loaded it's possible that another part parse has been waiting in parallel
 			// so check the cache again to see if it's been added since the last async operation.
@@ -1666,14 +1679,12 @@ class LDrawPartsBuilderCache {
 
 			}
 
-			if ( isPartType( immutableInfo.type ) ) {
+			if ( isPartType( info.type ) ) {
 
 				const key = fileName.toLowerCase();
 				this.cache[ key ] = promise;
 
 			}
-
-			// console.log( 'INF', immutableInfo );
 
 			return promise.then( cachedResult => {
 
