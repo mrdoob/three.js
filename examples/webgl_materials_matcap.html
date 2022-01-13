@@ -182,7 +182,7 @@
 
 				const loader = new EXRLoader();
 
-				loader.setDataType( THREE.UnsignedByteType ); // default: FloatType
+				loader.setDataType( THREE.HalfFloatType );
 
 				const texData = loader.parse( contents );
 
@@ -194,29 +194,11 @@
 
 				texture.format = texData.format;
 				texture.type = texData.type;
-
-				switch ( texture.type ) {
-
-					case THREE.UnsignedByteType:
-
-						texture.encoding = THREE.RGBEEncoding;
-						texture.minFilter = THREE.NearestFilter;
-						texture.magFilter = THREE.NearestFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-					case THREE.FloatType:
-					case THREE.HalfFloatType:
-
-						texture.encoding = THREE.LinearEncoding;
-						texture.minFilter = THREE.LinearFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-				}
+				texture.encoding = THREE.LinearEncoding;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = false;
 
 				updateMatcap( texture );
 

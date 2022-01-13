@@ -168,7 +168,7 @@
 
 				if ( THREE.BufferGeometryUtils === undefined ) {
 
-					throw 'THREE.EdgeSplitModifier relies on THREE.BufferGeometryUtils';
+					throw new Error( 'THREE.EdgeSplitModifier relies on THREE.BufferGeometryUtils' );
 
 				}
 

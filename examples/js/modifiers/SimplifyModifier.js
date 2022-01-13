@@ -17,7 +17,7 @@
 
 			if ( THREE.BufferGeometryUtils === undefined ) {
 
-				throw 'THREE.SimplifyModifier relies on THREE.BufferGeometryUtils';
+				throw new Error( 'THREE.SimplifyModifier relies on THREE.BufferGeometryUtils' );
 
 			}
 

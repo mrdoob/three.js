@@ -135,6 +135,18 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 				morphTextures.set( geometry, entry );
 
+				function disposeTexture() {
+
+					texture.dispose();
+
+					morphTextures.delete( geometry );
+
+					geometry.removeEventListener( 'dispose', disposeTexture );
+
+				}
+
+				geometry.addEventListener( 'dispose', disposeTexture );
+
 			}
 
 			//

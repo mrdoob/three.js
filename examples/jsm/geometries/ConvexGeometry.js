@@ -6,7 +6,7 @@ import { ConvexHull } from '../math/ConvexHull.js';
 
 class ConvexGeometry extends BufferGeometry {
 
-	constructor( points ) {
+	constructor( points = [] ) {
 
 		super();
 

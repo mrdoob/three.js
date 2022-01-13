@@ -230,7 +230,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( p.value - inOffset.value > ni ) {
 
-						throw 'Something wrong with hufUnpackEncTable';
+						throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 					}
 
@@ -242,7 +242,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( im + zerun > iM + 1 ) {
 
-						throw 'Something wrong with hufUnpackEncTable';
+						throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 					}
 
@@ -256,7 +256,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( im + zerun > iM + 1 ) {
 
-						throw 'Something wrong with hufUnpackEncTable';
+						throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 					}
 
@@ -293,7 +293,7 @@ class EXRLoader extends DataTextureLoader {
 
 				if ( c >> l ) {
 
-					throw 'Invalid table entry';
+					throw new Error( 'Invalid table entry' );
 
 				}
 
@@ -303,7 +303,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( pl.len ) {
 
-						throw 'Invalid table entry';
+						throw new Error( 'Invalid table entry' );
 
 					}
 
@@ -338,7 +338,7 @@ class EXRLoader extends DataTextureLoader {
 
 						if ( pl.len || pl.p ) {
 
-							throw 'Invalid table entry';
+							throw new Error( 'Invalid table entry' );
 
 						}
 
@@ -626,7 +626,7 @@ class EXRLoader extends DataTextureLoader {
 
 						if ( ! pl.p ) {
 
-							throw 'hufDecode issues';
+							throw new Error( 'hufDecode issues' );
 
 						}
 
@@ -666,7 +666,7 @@ class EXRLoader extends DataTextureLoader {
 
 						if ( j == pl.lit ) {
 
-							throw 'hufDecode issues';
+							throw new Error( 'hufDecode issues' );
 
 						}
 
@@ -696,7 +696,7 @@ class EXRLoader extends DataTextureLoader {
 
 				} else {
 
-					throw 'hufDecode issues';
+					throw new Error( 'hufDecode issues' );
 
 				}
 
@@ -722,7 +722,7 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE ) {
 
-				throw 'Something wrong with HUF_ENCSIZE';
+				throw new Error( 'Something wrong with HUF_ENCSIZE' );
 
 			}
 
@@ -737,7 +737,7 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
 
-				throw 'Something wrong with hufUncompress';
+				throw new Error( 'Something wrong with hufUncompress' );
 
 			}
 
@@ -1299,7 +1299,7 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( maxNonZero >= BITMAP_SIZE ) {
 
-				throw 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE';
+				throw new Error( 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE' );
 
 			}
 
@@ -1470,7 +1470,7 @@ class EXRLoader extends DataTextureLoader {
 			};
 
 			if ( dwaHeader.version < 2 )
-				throw 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported';
+				throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported' );
 
 			// Read channel ruleset information
 			var channelRules = new Array();
@@ -1655,7 +1655,7 @@ class EXRLoader extends DataTextureLoader {
 					case LOSSY_DCT: // skip
 
 					default:
-						throw 'EXRLoader.parse: unsupported channel compression';
+						throw new Error( 'EXRLoader.parse: unsupported channel compression' );
 
 				}
 
@@ -1992,8 +1992,11 @@ class EXRLoader extends DataTextureLoader {
 
 			const EXRHeader = {};
 
-			if ( dataView.getUint32( 0, true ) != 20000630 ) // magic
-				throw 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.';
+			if ( dataView.getUint32( 0, true ) != 20000630 ) { // magic
+
+				throw new Error( 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.' );
+
+			}
 
 			EXRHeader.version = dataView.getUint8( 4, true );
 
@@ -2043,7 +2046,7 @@ class EXRLoader extends DataTextureLoader {
 			if ( spec != 0 ) {
 
 				console.error( 'EXRHeader:', EXRHeader );
-				throw 'THREE.EXRLoader: provided file is currently unsupported.';
+				throw new Error( 'THREE.EXRLoader: provided file is currently unsupported.' );
 
 			}
 
@@ -2114,7 +2117,7 @@ class EXRLoader extends DataTextureLoader {
 					break;
 
 				default:
-					throw 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported';
+					throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported' );
 
 			}
 
@@ -2155,7 +2158,7 @@ class EXRLoader extends DataTextureLoader {
 
 			} else {
 
-				throw 'EXRLoader.parse: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.';
+				throw new Error( 'EXRLoader.parse: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.' );
 
 			}
 

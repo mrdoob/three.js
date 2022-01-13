@@ -32,6 +32,7 @@ class StandardNode extends Node {
 		if ( useClearcoat ) {
 
 			builder.define( 'CLEARCOAT' );
+			builder.define( 'USE_CLEARCOAT' );
 
 		}
 

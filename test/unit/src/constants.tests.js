@@ -91,7 +91,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.RGBAFormat, 1023, 'RGBAFormat is equal to 1023' );
 		assert.equal( Constants.LuminanceFormat, 1024, 'LuminanceFormat is equal to 1024' );
 		assert.equal( Constants.LuminanceAlphaFormat, 1025, 'LuminanceAlphaFormat is equal to 1025' );
-		assert.equal( Constants.RGBEFormat, Constants.RGBAFormat, 'RGBEFormat is equal to RGBAFormat' );
 		assert.equal( Constants.DepthFormat, 1026, 'DepthFormat is equal to 1026' );
 		assert.equal( Constants.DepthStencilFormat, 1027, 'DepthStencilFormat is equal to 1027' );
 		assert.equal( Constants.RGB_S3TC_DXT1_Format, 33776, 'RGB_S3TC_DXT1_Format is equal to 33776' );
@@ -131,9 +130,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.TriangleFanDrawMode, 2, 'TriangleFanDrawMode is equal to 2' );
 		assert.equal( Constants.LinearEncoding, 3000, 'LinearEncoding is equal to 3000' );
 		assert.equal( Constants.sRGBEncoding, 3001, 'sRGBEncoding is equal to 3001' );
-		assert.equal( Constants.GammaEncoding, 3007, 'GammaEncoding is equal to 3007' );
-		assert.equal( Constants.RGBEEncoding, 3002, 'RGBEEncoding is equal to 3002' );
-		assert.equal( Constants.RGBDEncoding, 3006, 'RGBDEncoding is equal to 3006' );
 		assert.equal( Constants.BasicDepthPacking, 3200, 'BasicDepthPacking is equal to 3200' );
 		assert.equal( Constants.RGBADepthPacking, 3201, 'RGBADepthPacking is equal to 3201' );
 

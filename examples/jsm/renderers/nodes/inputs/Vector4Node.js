@@ -1,5 +1,5 @@
 import InputNode from '../core/InputNode.js';
-import { Vector4 } from '../../../../../build/three.module.js';
+import { Vector4 } from 'three';
 
 class Vector4Node extends InputNode {
 

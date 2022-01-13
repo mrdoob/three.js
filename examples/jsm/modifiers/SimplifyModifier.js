@@ -21,7 +21,7 @@ class SimplifyModifier {
 
 		if ( BufferGeometryUtils === undefined ) {
 
-			throw 'THREE.SimplifyModifier relies on BufferGeometryUtils';
+			throw new Error( 'THREE.SimplifyModifier relies on BufferGeometryUtils' );
 
 		}
 

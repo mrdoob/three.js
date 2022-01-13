@@ -151,7 +151,12 @@
 
 			// Activate content and title change on browser navigation
 
-			window.onpopstate = createNewIframe;
+			window.onpopstate = function() {
+
+				updateNavigation();
+				createNewIframe();
+
+			}
 
 			// Create the navigation panel and configure the iframe
 
@@ -189,14 +194,7 @@
 				window.location.hash = pageURL;
 				panel.classList.remove( 'open' );
 
-
-				content.querySelectorAll( 'a' ).forEach( function ( item ) {
-
-					item.classList.remove( 'selected' );
-
-				} );
-
-				link.classList.add( 'selected' );
+				updateNavigation();
 
 			} );
 
@@ -224,7 +222,7 @@
 			}
 
 			const categories = list[ language ];
-			const selectedPage = window.location.hash.substring( 1 );
+			const selectedPage = window.location.hash.substring( 1 ).replace( /\.html$/, '' );
 
 			for ( const category in categories ) {
 
@@ -283,6 +281,26 @@
 				categoryElements.push( categoryContent );
 
 			}
+
+		}
+
+		function updateNavigation() {
+
+			const selectedPage = window.location.hash.substring( 1 ).replace( /\.html$/, '' );
+
+			content.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+				if ( item.href.includes( selectedPage ) ) {
+
+					item.classList.add( 'selected' );
+
+				} else {
+
+					item.classList.remove( 'selected' );
+
+				}
+
+			} );
 
 		}
 
@@ -430,6 +448,7 @@
 					} else {
 
 						window.location.hash = newHash;
+						updateNavigation();
 						createNewIframe();
 
 					}

@@ -6,7 +6,7 @@ import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
-import { REVISION, LinearEncoding } from '../../../../../build/three.module.js';
+import { REVISION, LinearEncoding } from 'three';
 
 const shaderStages = [ 'fragment', 'vertex' ];
 

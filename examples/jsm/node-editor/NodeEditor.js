@@ -21,8 +21,7 @@ import { TimerEditor } from './utils/TimerEditor.js';
 import { OscillatorEditor } from './utils/OscillatorEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
-
-import { EventDispatcher } from '../../../build/three.module.js';
+import { EventDispatcher } from 'three';
 
 Styles.icons.unlink = 'ti ti-unlink';
 

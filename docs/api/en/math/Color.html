@@ -113,18 +113,6 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			Copies the [page:.r r], [page:.g g] and [page:.b b] parameters from [page:Color color] in to this color.
 		</p>
 
-		<h3>[method:this convertGammaToLinear]( [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-		Converts this color from gamma space to linear space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
-		</p>
-
-		<h3>[method:this convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-		Converts this color from linear space to gamma space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
-		</p>
-
 		<h3>[method:this convertLinearToSRGB]() </h3>
 		<p>
 		Converts this color from linear space to sRGB space.
@@ -133,24 +121,6 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<h3>[method:this convertSRGBToLinear]() </h3>
 		<p>
 		Converts this color from sRGB space to linear space.
-		</p>
-
-		<h3>[method:this copyGammaToLinear]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Color color] — Color to copy.<br />
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-
-		Copies the given color into this color, and then converts this color from gamma space to linear space
-		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
-		</p>
-
-		<h3>[method:this copyLinearToGamma]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Color color] — Color to copy.<br />
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-
-		Copies the given color into this color, and then converts this color from linear space to gamma space
-		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
 		</p>
 
 		<h3>[method:this copyLinearToSRGB]( [param:Color color]] ) </h3>
