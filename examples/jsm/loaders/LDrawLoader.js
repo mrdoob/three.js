@@ -1420,6 +1420,7 @@ class LDrawPartsBuilderCache {
 			info.group = new Group();
 			if ( subobject && subobject.matrix ) {
 
+				info.group.userData.startingConstructionStep = subobject.startingConstructionStep;
 				info.group.name = subobject.fileName;
 				subobject.matrix.decompose( info.group.position, info.group.quaternion, info.group.scale );
 
@@ -1613,8 +1614,6 @@ class LDrawPartsBuilderCache {
 			group.add( ...childParts );
 
 		}
-
-		group.userData.startingConstructionStep = info.startingConstructionStep;
 
 		return group;
 
