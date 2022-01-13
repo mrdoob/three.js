@@ -98,7 +98,6 @@ class UITexture extends UISpan {
 
 						const texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
-						texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
 						texture.needsUpdate = true;
 
 						scope.setValue( texture );

@@ -43,7 +43,7 @@
 		const depth = 100;
 
 		const size = width * height;
-		const data = new Uint8Array( 3 * size * depth );
+		const data = new Uint8Array( 4 * size * depth );
 
 		for ( let i = 0; i < depth; i ++ ) {
 
@@ -54,11 +54,12 @@
 
 			for ( let j = 0; j < size; j ++ ) {
 
-				const stride = ( i * size + j ) * 3;
+				const stride = ( i * size + j ) * 4;
 
 				data[ stride ] = r;
 				data[ stride + 1 ] = g;
 				data[ stride + 2 ] = b;
+				data[ stride + 3 ] = 255;
 
 			}
 		}
@@ -66,7 +67,6 @@
 		// used the buffer to create a [name]
 
 		const texture = new THREE.DataTexture2DArray( data, width, height, depth );
-		texture.format = THREE.RGBFormat;
 		texture.needsUpdate = true;
 		</code>
 
