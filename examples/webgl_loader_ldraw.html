@@ -30,6 +30,7 @@
 			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
 
 			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
+			import { LDrawUtils } from './jsm/utils/LDrawUtils.js';
 
 			let container, progressBarDiv;
 
@@ -98,6 +99,7 @@
 					constructionStep: 0,
 					noConstructionSteps: 'No steps.',
 					flatColors: false,
+					mergeModel: false
 				};
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -213,6 +215,9 @@
 
 						}
 
+						// Merge model geometries by material
+						if ( guiData.mergeModel ) model = LDrawUtils.mergeObject( model );
+
 						// Convert from LDraw coordinates: rotate 180 degrees around OX
 						model.rotation.x = Math.PI;
 
@@ -270,6 +275,12 @@
 				} );
 
 				gui.add( guiData, 'flatColors' ).name( 'Flat Colors' ).onChange( function () {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'mergeModel' ).name( 'Merge model' ).onChange( function () {
 
 					reloadObject( false );
 
