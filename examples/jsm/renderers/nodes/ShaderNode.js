@@ -69,6 +69,8 @@ const NodeHandler = {
 
 };
 
+const nodeObjects = new WeakMap();
+
 const ShaderNodeObject = ( obj ) => {
 
 	const type = typeof obj;
@@ -81,15 +83,16 @@ const ShaderNodeObject = ( obj ) => {
 
 		if ( obj.isNode === true ) {
 
-			const node = obj;
+			let nodeObject = nodeObjects.get( obj );
 
-			if ( node.isProxyNode !== true ) {
+			if ( nodeObject === undefined ) {
 
-				node.isProxyNode = true;
-
-				return new Proxy( node, NodeHandler );
+				nodeObject = new Proxy( obj, NodeHandler );
+				nodeObjects.set( obj, nodeObject );
 
 			}
+
+			return nodeObject;
 
 		}
 
