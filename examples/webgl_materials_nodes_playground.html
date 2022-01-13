@@ -9,6 +9,13 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
   </head>
   <body>
+	<script type="importmap">
+	{
+		"imports": {
+			"three": "../build/three.module.js"
+		}
+	}
+	</script>
 	<style>
 	body {
 		overflow: hidden;
@@ -34,7 +41,7 @@
 	</style>
 	<script type="module">
 
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
 
