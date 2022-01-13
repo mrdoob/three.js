@@ -25,7 +25,7 @@ import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import OperatorNode from '../../nodes/math/OperatorNode.js';
 import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
-import { vec4 } from '../../nodes/ShaderNode.js';
+import { vec4, join, nodeObject } from '../../nodes/ShaderNode.js';
 import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
@@ -150,7 +150,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec4' ) );
 
-			this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
+			const diffuseColorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
 
 			// OPACITY
 
@@ -254,7 +254,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			// LIGHT
 
-			let outputNode = colorNode;
+			let outputNode = diffuseColorNode;
 
 			if ( lightNode && lightNode.isNode ) {
 
@@ -266,11 +266,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			// RESULT
 
+			const outputNodeObj = nodeObject( outputNode );
+
+			outputNode = join( outputNodeObj.x, outputNodeObj.y, outputNodeObj.z, nodeObject( diffuseColorNode ).w );
+
+			//
+
 			const outputEncoding = this.renderer.outputEncoding;
 
 			if ( outputEncoding !== LinearEncoding ) {
 
-				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, vec4( outputNode ) );
+				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, outputNode );
 				outputNode.fromEncoding( outputEncoding );
 
 			}
