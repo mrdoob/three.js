@@ -87,7 +87,6 @@ export const UnsignedShort5551Type = 1018;
 export const UnsignedShort565Type = 1019;
 export const UnsignedInt248Type = 1020;
 export const AlphaFormat = 1021;
-export const RGBFormat = 1022;
 export const RGBAFormat = 1023;
 export const LuminanceFormat = 1024;
 export const LuminanceAlphaFormat = 1025;
@@ -178,5 +177,4 @@ export const StreamCopyUsage = 35042;
 export const GLSL1 = '100';
 export const GLSL3 = '300 es';
 
-export const _SRGBFormat = 1034; // fallback for WebGL 1
 export const _SRGBAFormat = 1035; // fallback for WebGL 1

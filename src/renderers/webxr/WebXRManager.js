@@ -12,7 +12,6 @@ import {
 	DepthFormat,
 	DepthStencilFormat,
 	RGBAFormat,
-	RGBFormat,
 	sRGBEncoding,
 	UnsignedByteType,
 	UnsignedShortType,
@@ -282,16 +281,10 @@ class WebXRManager extends EventDispatcher {
 					}
 
 					const projectionlayerInit = {
-						colorFormat: ( attributes.alpha || isMultisample ) ? gl.RGBA8 : gl.RGB8,
+						colorFormat: ( renderer.outputEncoding === sRGBEncoding ) ? gl.SRGB8_ALPHA8 : gl.RGBA8,
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
-
-					if ( renderer.outputEncoding === sRGBEncoding ) {
-
-						projectionlayerInit.colorFormat = ( attributes.alpha || isMultisample ) ? gl.SRGB8_ALPHA8 : gl.SRGB8;
-
-					}
 
 					glBinding = new XRWebGLBinding( session, gl );
 
@@ -320,7 +313,7 @@ class WebXRManager extends EventDispatcher {
 							glProjLayer.textureWidth,
 							glProjLayer.textureHeight,
 							{
-								format: attributes.alpha ? RGBAFormat : RGBFormat,
+								format: RGBAFormat,
 								type: UnsignedByteType,
 								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 								stencilBuffer: attributes.stencil,
