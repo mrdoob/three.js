@@ -183,27 +183,33 @@ export const uniform = new ShaderNode( ( inputNode ) => {
 
 } );
 
+export const nodeObject = ( val ) => {
+
+	return ShaderNodeObject( val );
+
+};
+
 export const float = ( val ) => {
 
-	return ShaderNodeObject( new FloatNode( val ).setConst( true ) );
+	return nodeObject( new FloatNode( val ).setConst( true ) );
 
 };
 
 export const color = ( ...params ) => {
 
-	return ShaderNodeObject( new ColorNode( new Color( ...params ) ).setConst( true ) );
+	return nodeObject( new ColorNode( new Color( ...params ) ).setConst( true ) );
 
 };
 
 export const join = ( ...params ) => {
 
-	return ShaderNodeObject( new JoinNode( ShaderNodeArray( params ) ) );
+	return nodeObject( new JoinNode( ShaderNodeArray( params ) ) );
 
 };
 
 export const cond = ( ...params ) => {
 
-	return ShaderNodeObject( new CondNode( ...ShaderNodeArray( params ) ) );
+	return nodeObject( new CondNode( ...ShaderNodeArray( params ) ) );
 
 };
 
@@ -211,7 +217,7 @@ export const vec2 = ( ...params ) => {
 
 	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec2' ) );
+		return nodeObject( new ConvertNode( params[ 0 ], 'vec2' ) );
 
 	} else {
 
@@ -223,7 +229,7 @@ export const vec2 = ( ...params ) => {
 
 		}
 
-		return ShaderNodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
+		return nodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
 
 	}
 
@@ -233,7 +239,7 @@ export const vec3 = ( ...params ) => {
 
 	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec3' ) );
+		return nodeObject( new ConvertNode( params[ 0 ], 'vec3' ) );
 
 	} else {
 
@@ -245,7 +251,7 @@ export const vec3 = ( ...params ) => {
 
 		}
 
-		return ShaderNodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
+		return nodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
 
 	}
 
@@ -255,7 +261,7 @@ export const vec4 = ( ...params ) => {
 
 	if ( params[ 0 ]?.isNode === true ) {
 
-		return ShaderNodeObject( new ConvertNode( params[ 0 ], 'vec4' ) );
+		return nodeObject( new ConvertNode( params[ 0 ], 'vec4' ) );
 
 	} else {
 
@@ -267,7 +273,7 @@ export const vec4 = ( ...params ) => {
 
 		}
 
-		return ShaderNodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
+		return nodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
 
 	}
 
@@ -277,7 +283,7 @@ export const addTo = ( varNode, ...params ) => {
 
 	varNode.node = add( varNode.node, ...ShaderNodeArray( params ) );
 
-	return ShaderNodeObject( varNode );
+	return nodeObject( varNode );
 
 };
 
