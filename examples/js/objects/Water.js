@@ -39,19 +39,7 @@
 			const q = new THREE.Vector4();
 			const textureMatrix = new THREE.Matrix4();
 			const mirrorCamera = new THREE.PerspectiveCamera();
-			const parameters = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBFormat
-			};
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-				renderTarget.texture.generateMipmaps = false;
-
-			}
-
+			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight );
 			const mirrorShader = {
 				uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib[ 'fog' ], THREE.UniformsLib[ 'lights' ], {
 					'normalSampler': {

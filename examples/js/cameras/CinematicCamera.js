@@ -91,13 +91,8 @@
 				this.postprocessing.scene = new THREE.Scene();
 				this.postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				this.postprocessing.scene.add( this.postprocessing.camera );
-				const pars = {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBFormat
-				};
-				this.postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				this.postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				this.postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				this.postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 				const bokeh_shader = THREE.BokehShader;
 				this.postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 				this.postprocessing.bokeh_uniforms[ 'tColor' ].value = this.postprocessing.rtTextureColor.texture;
