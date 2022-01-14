@@ -1383,7 +1383,7 @@ class LDrawPartsBuilderCache {
 	constructor( loader ) {
 
 		this.loader = loader;
-		this.parseCache = new LDrawParsedCache();
+		this.parseCache = new LDrawParsedCache( loader );
 		this._cache = {};
 
 	}
