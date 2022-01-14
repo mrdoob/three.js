@@ -561,7 +561,7 @@
 					for ( let j = 0; j < selectorList.length; j ++ ) {
 
 						// Remove empty rules
-						const definitions = Object.fromEntries( Object.entries( stylesheet.style ).filter( ( [ _, v ] ) => v !== '' ) );
+						const definitions = Object.fromEntries( Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' ) );
 						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, definitions );
 
 					}

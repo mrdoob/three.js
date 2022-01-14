@@ -1407,6 +1407,9 @@
 	} //
 
 
+	const MAIN_COLOUR_CODE = '16';
+	const MAIN_EDGE_COLOUR_CODE = '24';
+
 	class LDrawLoader extends THREE.Loader {
 
 		constructor( manager ) {
@@ -1535,15 +1538,13 @@
 				url: null,
 				// Subobjects
 				subobjects: null,
-				numSubobjects: 0,
-				subobjectIndex: 0,
 				inverted: false,
 				category: null,
 				keywords: null,
 				// Current subobject
 				currentFileName: null,
-				mainColorCode: parentScope ? parentScope.mainColorCode : '16',
-				mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : '24',
+				mainColorCode: parentScope ? parentScope.mainColorCode : MAIN_COLOUR_CODE,
+				mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : MAIN_EDGE_COLOUR_CODE,
 				matrix: new THREE.Matrix4(),
 				type: 'Model',
 				groupObject: null,
@@ -1606,6 +1607,18 @@
 
 
 			return null;
+
+		}
+
+		getMainMaterial() {
+
+			return this.getMaterial( MAIN_COLOUR_CODE );
+
+		}
+
+		getMainEdgeMaterial() {
+
+			return this.getMaterial( MAIN_EDGE_COLOUR_CODE );
 
 		}
 
@@ -1871,13 +1884,13 @@
 			const parseColorCode = ( colorCode, forEdge ) => {
 
 				// Parses next color code and returns a THREE.Material
-				if ( ! forEdge && colorCode === '16' ) {
+				if ( ! forEdge && colorCode === MAIN_COLOUR_CODE ) {
 
 					colorCode = mainColorCode;
 
 				}
 
-				if ( forEdge && colorCode === '24' ) {
+				if ( forEdge && colorCode === MAIN_EDGE_COLOUR_CODE ) {
 
 					colorCode = mainEdgeColorCode;
 
@@ -1954,8 +1967,6 @@
 			currentParseScope.category = info.category;
 			currentParseScope.keywords = info.keywords;
 			currentParseScope.subobjects = info.subobjects;
-			currentParseScope.numSubobjects = info.subobjects.length;
-			currentParseScope.subobjectIndex = 0;
 			currentParseScope.type = info.type;
 			currentParseScope.totalFaces = info.totalFaces;
 			const isRoot = ! parentParseScope.isFromParse;
@@ -2121,8 +2132,7 @@
 
 			const scope = this;
 			const parseScope = this.newParseScopeLevel( null, parentScope );
-			parseScope.url = url;
-			const parentParseScope = parseScope.parentScope; // Set current matrix
+			parseScope.url = url; // Set current matrix
 
 			if ( subobject ) {
 
@@ -2131,13 +2141,12 @@
 				parseScope.startingConstructionStep = subobject.startingConstructionStep;
 				parseScope.fileName = subobject.fileName;
 
-				if ( subobject.colorCode === '16' && parseScope.parentScope ) {
+				if ( subobject.colorCode === MAIN_COLOUR_CODE && parentScope ) {
 
-					const parentScope = parseScope.parentScope;
 					parseScope.mainColorCode = parentScope.mainColorCode;
 					parseScope.mainEdgeColorCode = parentScope.mainEdgeColorCode;
 
-				} else if ( subobject.colorCode !== '16' ) {
+				} else if ( subobject.colorCode !== MAIN_COLOUR_CODE ) {
 
 					parseScope.mainColorCode = subobject.colorCode;
 					parseScope.mainEdgeColorCode = subobject.colorCode;
@@ -2153,7 +2162,7 @@
 
 			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
-				promises.push( loadSubobject( parseScope.subobjects[ i ] ) );
+				promises.push( loadSubobject( subobjects[ i ] ) );
 
 			} // Kick off of the downloads in parallel but process all the subobjects
 			// in order so all the assembly instructions are correct
@@ -2168,7 +2177,7 @@
 			} // If it is root object then finalize this object and compute construction steps
 
 
-			if ( ! parentParseScope.isFromParse ) {
+			if ( ! parentScope.isFromParse ) {
 
 				this.finalizeObject( parseScope );
 				this.computeConstructionSteps( parseScope.groupObject );
