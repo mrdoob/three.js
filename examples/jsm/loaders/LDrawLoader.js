@@ -36,6 +36,9 @@ const FILE_LOCATION_TRY_RELATIVE = 4;
 const FILE_LOCATION_TRY_ABSOLUTE = 5;
 const FILE_LOCATION_NOT_FOUND = 6;
 
+const MAIN_COLOUR_CODE = '16';
+const MAIN_EDGE_COLOUR_CODE = '24';
+
 const _tempVec0 = new Vector3();
 const _tempVec1 = new Vector3();
 
@@ -1287,7 +1290,7 @@ class LDrawParsedCache {
 // an edge then the passthroughColorCode is used.
 function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, forEdge ) {
 
-	const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
+	const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
 	if ( isPassthrough ) {
 
 		colorCode = parentColorCode;
@@ -1303,7 +1306,7 @@ function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, for
 function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalMaterialPass = false ) {
 
 	// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
-	const parentIsPassthrough = parentColorCode === '16';
+	const parentIsPassthrough = parentColorCode === MAIN_COLOUR_CODE;
 	group.traverse( c => {
 
 		if ( c.isMesh || c.isLineSegments ) {
@@ -1345,7 +1348,7 @@ function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalM
 		}
 
 		const forEdge = c.isLineSegments || c.isConditionalLine;
-		const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
+		const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
 		if ( isPassthrough ) {
 
 			colorCode = parentColorCode;
@@ -1483,14 +1486,14 @@ class LDrawPartsGeometryCache {
 				const matrixScaleInverted = matrix.determinant() < 0;
 				const colorCode = subobject.colorCode;
 
-				const lineColorCode = colorCode === '16' ? '24' : colorCode;
+				const lineColorCode = colorCode === MAIN_COLOUR_CODE ? MAIN_EDGE_COLOUR_CODE : colorCode;
 				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 					const ls = lineSegments[ i ];
 					const vertices = ls.vertices;
 					vertices[ 0 ].applyMatrix4( matrix );
 					vertices[ 1 ].applyMatrix4( matrix );
-					ls.colorCode = ls.colorCode === '24' ? lineColorCode : ls.colorCode;
+					ls.colorCode = ls.colorCode === MAIN_EDGE_COLOUR_CODE ? lineColorCode : ls.colorCode;
 					ls.material = ls.material || getMaterialFromCode( ls.colorCode, ls.colorCode, info.materials, true );
 
 					parentLineSegments.push( ls );
@@ -1506,7 +1509,7 @@ class LDrawPartsGeometryCache {
 					vertices[ 1 ].applyMatrix4( matrix );
 					controlPoints[ 0 ].applyMatrix4( matrix );
 					controlPoints[ 1 ].applyMatrix4( matrix );
-					os.colorCode = os.colorCode === '24' ? lineColorCode : os.colorCode;
+					os.colorCode = os.colorCode === MAIN_EDGE_COLOUR_CODE ? lineColorCode : os.colorCode;
 					os.material = os.material || getMaterialFromCode( os.colorCode, os.colorCode, info.materials, true );
 
 					parentConditionalSegments.push( os );
@@ -1523,7 +1526,7 @@ class LDrawPartsGeometryCache {
 
 					}
 
-					tri.colorCode = tri.colorCode === '16' ? colorCode : tri.colorCode;
+					tri.colorCode = tri.colorCode === MAIN_COLOUR_CODE ? colorCode : tri.colorCode;
 					tri.material = tri.material || getMaterialFromCode( tri.colorCode, colorCode, info.materials, false );
 					faceMaterials.add( tri.colorCode );
 
@@ -2014,7 +2017,7 @@ class LDrawLoader extends Loader {
 				.parseModel( text, this.materialLibrary )
 				.then( group => {
 
-					applyMaterialsToMesh( group, '16', this.materialLibrary, true );
+					applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 					this.computeConstructionSteps( group );
 					onLoad( group );
 
@@ -2080,38 +2083,30 @@ class LDrawLoader extends Loader {
 
 	}
 
-	getMaterial( colorCode, parseScope = this.rootParseScope ) {
-
-		// Given a color code search its material in the parse scopes stack
+	getMaterial( colorCode ) {
 
 		if ( colorCode.startsWith( '0x2' ) ) {
 
 			// Special 'direct' material value (RGB color)
-
 			const color = colorCode.substring( 3 );
 
 			return this.parseColorMetaDirective( new LineParser( 'Direct_Color_' + color + ' CODE -1 VALUE #' + color + ' EDGE #' + color + '' ) );
 
 		}
 
-		while ( parseScope ) {
+		return this.materialLibrary[ colorCode ] || null;
 
-			const material = parseScope.lib[ colorCode ];
+	}
 
-			if ( material ) {
+	getMainMaterial() {
 
-				return material;
+		return this.getMaterial( MAIN_COLOUR_CODE );
 
-			} else {
+	}
 
-				parseScope = parseScope.parentScope;
+	getMainEdgeMaterial() {
 
-			}
-
-		}
-
-		// Material was not found
-		return null;
+		return this.getMaterial( MAIN_EDGE_COLOUR_CODE );
 
 	}
 
