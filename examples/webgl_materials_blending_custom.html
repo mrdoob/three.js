@@ -298,7 +298,10 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer();
+				const canvas = document.createElement( 'canvas' );
+				const context = canvas.getContext( 'webgl', { alpha: false } ); // TODO Fix this workaround
+
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
