@@ -2260,7 +2260,7 @@ class LDrawLoader extends Loader {
 		const promises = [];
 		for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
-			promises.push( loadSubobject( parseScope.subobjects[ i ] ) );
+			promises.push( loadSubobject( subobjects[ i ] ) );
 
 		}
 
