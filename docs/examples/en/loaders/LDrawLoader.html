@@ -184,8 +184,8 @@
 		To get the main material this code can be used after the asset has been loaded:
 
 		<code>
-		const mainMaterial = loader.getMaterial( LDrawLoader.MAIN_COLOUR_CODE );
-		const mainEdgeMaterial = loader.getMaterial( LDrawLoader.MAIN_EDGE_COLOUR_CODE );
+		const mainMaterial = loader.getMaterial( LDrawLoader.getMainColorCode() );
+		const mainEdgeMaterial = loader.getMaterial( LDrawLoader.getMainEdgeColorCode() );
 		// ... Modify materials colors, etc
 		</code>
 
@@ -193,6 +193,16 @@
 		a complete model will not expose the main color (that is, no part uses the code '16' at the top level, because they
 		are assigned other specific colors) An LDraw part file on the other hand will expose the code '16' to be colored, and
 		can have additional fixed colors.
+
+		<h3>[method:String getMainColorCode]()</h3>
+		<p>
+		Returns the standard code for the main LDraw color.
+		</p>
+
+		<h3>[method:String getMainEdgeColorCode]()</h3>
+		<p>
+		Returns the standard code for the edges main LDraw color.
+		</p>
 
 		<h3>[method:void preloadMaterials]( [param:String path] )</h3>
 		<p>
