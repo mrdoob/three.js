@@ -1429,6 +1429,10 @@ class LDrawPartsGeometryCache {
 			}
 
 			const group = new Group();
+			group.userData.category = info.category;
+			group.userData.keywords = info.keywords;
+			info.group = group;
+
 			const subobjectInfos = await Promise.all( promises );
 			for ( let i = 0, l = subobjectInfos.length; i < l; i ++ ) {
 
@@ -1547,8 +1551,6 @@ class LDrawPartsGeometryCache {
 
 			}
 
-			info.group = group;
-
 			return info;
 
 		};
@@ -1589,9 +1591,6 @@ class LDrawPartsGeometryCache {
 			group.add( createObject( info.conditionalSegments, 2, true ) );
 
 		}
-
-		group.userData.category = info.category;
-		group.userData.keywords = info.keywords;
 
 		return group;
 
