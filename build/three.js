@@ -2516,10 +2516,9 @@
 			this.height = source.height;
 			this.depth = source.depth;
 			this.viewport.copy(source.viewport);
-			this.texture = source.texture.clone();
-			this.texture.image = { ...this.texture.image
-			}; // See #20328.
+			this.texture = source.texture.clone(); // ensure image object is not shared, see #20328
 
+			this.texture.image = Object.assign({}, source.texture.image);
 			this.depthBuffer = source.depthBuffer;
 			this.stencilBuffer = source.stencilBuffer;
 			this.depthTexture = source.depthTexture;
@@ -10576,9 +10575,9 @@
 		fragmentShader: ShaderChunk.meshphysical_frag
 	};
 
-	function WebGLBackground(renderer, cubemaps, state, objects, premultipliedAlpha) {
+	function WebGLBackground(renderer, cubemaps, state, objects, alpha, premultipliedAlpha) {
 		const clearColor = new Color(0x000000);
-		let clearAlpha = 0;
+		let clearAlpha = alpha === true ? 0 : 1;
 		let planeMesh;
 		let boxMesh;
 		let currentBackground = null;
@@ -19153,7 +19152,7 @@
 
 		try {
 			const contextAttributes = {
-				alpha: _alpha,
+				alpha: true,
 				depth: _depth,
 				stencil: _stencil,
 				antialias: _antialias,
@@ -19229,7 +19228,7 @@
 			materials = new WebGLMaterials(properties);
 			renderLists = new WebGLRenderLists();
 			renderStates = new WebGLRenderStates(extensions, capabilities);
-			background = new WebGLBackground(_this, cubemaps, state, objects, _premultipliedAlpha);
+			background = new WebGLBackground(_this, cubemaps, state, objects, _alpha, _premultipliedAlpha);
 			shadowMap = new WebGLShadowMap(_this, objects, capabilities);
 			bufferRenderer = new WebGLBufferRenderer(_gl, extensions, info, capabilities);
 			indexedBufferRenderer = new WebGLIndexedBufferRenderer(_gl, extensions, info, capabilities);
