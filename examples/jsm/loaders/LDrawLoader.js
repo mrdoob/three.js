@@ -1486,6 +1486,9 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 //
 
+const MAIN_COLOUR_CODE = '16';
+const MAIN_EDGE_COLOUR_CODE = '24';
+
 class LDrawLoader extends Loader {
 
 	constructor( manager ) {
@@ -1517,9 +1520,6 @@ class LDrawLoader extends Loader {
 		this.partsLibraryPath = '';
 
 	}
-
-	static const MAIN_COLOUR_CODE = '16';
-	static const MAIN_EDGE_COLOUR_CODE = '24';
 
 	setPartsLibraryPath( path ) {
 
@@ -1714,6 +1714,16 @@ class LDrawLoader extends Loader {
 		// Material was not found
 		return null;
 
+	}
+
+	getMainColorCode() {
+
+		return MAIN_COLOUR_CODE;
+	}
+
+	getMainEdgeColorCode() {
+
+		return MAIN_EDGE_COLOUR_CODE;
 	}
 
 	parseColorMetaDirective( lineParser ) {
