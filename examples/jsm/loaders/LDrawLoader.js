@@ -537,12 +537,6 @@ function isPartType( type ) {
 
 }
 
-function isModelType( type ) {
-
-	return type === 'Model' || type === 'Unofficial_Model';
-
-}
-
 function isPrimitiveType( type ) {
 
 	return /primitive/i.test( type ) || type === 'Subpart';
@@ -788,7 +782,7 @@ class LDrawParsedCache {
 
 		const getLocalMaterial = colorCode => {
 
-			return colorCode in materials ? materials[ colorCode ] : null;
+			return materials[ colorCode ] || null;
 
 		};
 
@@ -1600,13 +1594,11 @@ class LDrawPartsBuilderCache {
 
 	async getCachedModel( fileName ) {
 
-		const key = fileName.toLowerCase();
-		if ( this.hasCachedModel( key ) ) {
+		if ( this.hasCachedModel( fileName ) ) {
 
+			const key = fileName.toLowerCase();
 			const group = await this.cache[ key ];
-
-			const result = group.clone();
-			return result;
+			return group.clone();
 
 		} else {
 
@@ -1618,6 +1610,8 @@ class LDrawPartsBuilderCache {
 
 	async loadModel( fileName ) {
 
+		const parseCache = this.loader.parseCache;
+		const key = fileName.toLowerCase();
 		if ( this.hasCachedModel( fileName ) ) {
 
 			return this.getCachedModel( fileName );
@@ -1625,7 +1619,6 @@ class LDrawPartsBuilderCache {
 		} else {
 
 			// prepare data to be ready
-			const parseCache = this.loader.parseCache;
 			await parseCache.ensureDataLoaded( fileName );
 
 			const info = parseCache.getData( fileName );
@@ -1641,18 +1634,12 @@ class LDrawPartsBuilderCache {
 
 			if ( isPartType( info.type ) ) {
 
-				const key = fileName.toLowerCase();
 				this.cache[ key ] = promise;
 
 			}
 
-			return promise.then( cachedResult => {
-
-				const result = cachedResult.clone();
-
-				return result;
-
-			} );
+			const group = await promise;
+			return group.clone();
 
 		}
 
@@ -1662,7 +1649,6 @@ class LDrawPartsBuilderCache {
 
 		const parseCache = this.loader.parseCache;
 		const info = parseCache.parse( text );
-
 		if ( isPartType( info.type ) && this.hasCachedModel( info.fileName ) ) {
 
 			return this.getCachedModel( info.fileName );
@@ -2110,62 +2096,6 @@ class LDrawLoader extends Loader {
 		this.fileMap = fileMap;
 
 		return this;
-
-	}
-
-	newParseScopeLevel( materials = null, parentScope = null ) {
-
-		// Adds a new scope level, assign materials to it and returns it
-
-		const matLib = {};
-
-		if ( materials ) {
-
-			for ( let i = 0, n = materials.length; i < n; i ++ ) {
-
-				const material = materials[ i ];
-				matLib[ material.userData.code ] = material;
-
-			}
-
-		}
-
-		const newParseScope = {
-
-			parentScope: parentScope,
-			lib: matLib,
-			url: null,
-
-			// Subobjects
-			subobjects: null,
-			numSubobjects: 0,
-			subobjectIndex: 0,
-			inverted: false,
-			category: null,
-			keywords: null,
-
-			// Current subobject
-			currentFileName: null,
-			mainColorCode: parentScope ? parentScope.mainColorCode : '16',
-			mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : '24',
-			matrix: new Matrix4(),
-			type: 'Model',
-			groupObject: null,
-
-			// If false, it is a root material scope previous to parse
-			isFromParse: true,
-
-			faces: [],
-			lineSegments: [],
-			conditionalSegments: [],
-			totalFaces: 0,
-			faceMaterials: new Set(),
-
-			// If true, this object is the start of a construction step
-			startingConstructionStep: false
-		};
-
-		return newParseScope;
 
 	}
 
