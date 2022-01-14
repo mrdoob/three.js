@@ -7,7 +7,6 @@ import {
 	LineBasicMaterial,
 	LineSegments,
 	Loader,
-	Matrix3,
 	Matrix4,
 	Mesh,
 	MeshStandardMaterial,
