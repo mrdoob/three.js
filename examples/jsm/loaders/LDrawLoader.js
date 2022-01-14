@@ -1716,14 +1716,14 @@ class LDrawLoader extends Loader {
 
 	}
 
-	getMainColorCode() {
+	getMainMaterial() {
 
-		return MAIN_COLOUR_CODE;
+		return this.getMaterial( MAIN_COLOUR_CODE );
 	}
 
-	getMainEdgeColorCode() {
+	getMainEdgeMaterial() {
 
-		return MAIN_EDGE_COLOUR_CODE;
+		return this.getMaterial( MAIN_EDGE_COLOUR_CODE );;
 	}
 
 	parseColorMetaDirective( lineParser ) {
