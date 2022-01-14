@@ -40,7 +40,7 @@
 		const height = 512;
 
 		const size = width * height;
-		const data = new Uint8Array( 3 * size );
+		const data = new Uint8Array( 4 * size );
 		const color = new THREE.Color( 0xffffff );
 
 		const r = Math.floor( color.r * 255 );
@@ -49,17 +49,18 @@
 
 		for ( let i = 0; i < size; i ++ ) {
 
-			const stride = i * 3;
+			const stride = i * 4;
 
 			data[ stride ] = r;
 			data[ stride + 1 ] = g;
 			data[ stride + 2 ] = b;
+			data[ stride + 3 ] = 255;
 
 		}
 
 		// used the buffer to create a [name]
 
-		const texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+		const texture = new THREE.DataTexture( data, width, height );
 		texture.needsUpdate = true;
 		</code>
 

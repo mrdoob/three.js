@@ -123,11 +123,9 @@
 				];
 
 				const reflectionCube = cubeTextureLoader.load( urls );
-				reflectionCube.format = THREE.RGBFormat;
 
 				const refractionCube = cubeTextureLoader.load( urls );
 				refractionCube.mapping = THREE.CubeRefractionMapping;
-				refractionCube.format = THREE.RGBFormat;
 
 				return {
 					none: null,

@@ -55,6 +55,7 @@ import NormalMapNode from './display/NormalMapNode.js';
 // math
 import MathNode from './math/MathNode.js';
 import OperatorNode from './math/OperatorNode.js';
+import CondNode from './math/CondNode.js';
 
 // lights
 import LightContextNode from './lights/LightContextNode.js';
@@ -143,6 +144,7 @@ export {
 	// math
 	MathNode,
 	OperatorNode,
+	CondNode,
 
 	// lights
 	LightContextNode,

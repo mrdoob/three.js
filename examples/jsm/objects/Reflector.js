@@ -1,12 +1,9 @@
 import {
 	Color,
-	LinearFilter,
-	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
 	Plane,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector3,
@@ -47,19 +44,7 @@ class Reflector extends Mesh {
 		const textureMatrix = new Matrix4();
 		const virtualCamera = new PerspectiveCamera();
 
-		const parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBFormat
-		};
-
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-			renderTarget.texture.generateMipmaps = false;
-
-		}
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
 
 		const material = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( shader.uniforms ),

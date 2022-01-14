@@ -180,6 +180,8 @@ class PMREMGenerator {
 
 		this._blurMaterial.dispose();
 
+		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
+
 		if ( this._cubemapShader !== null ) this._cubemapShader.dispose();
 		if ( this._equirectShader !== null ) this._equirectShader.dispose();
 
@@ -195,7 +197,6 @@ class PMREMGenerator {
 
 	_cleanup( outputTarget ) {
 
-		this._pingPongRenderTarget.dispose();
 		this._renderer.setRenderTarget( _oldTarget );
 		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
@@ -228,7 +229,13 @@ class PMREMGenerator {
 
 		const cubeUVRenderTarget = _createRenderTarget( params );
 		cubeUVRenderTarget.depthBuffer = texture ? false : true;
-		this._pingPongRenderTarget = _createRenderTarget( params );
+
+		if ( this._pingPongRenderTarget === null ) {
+
+			this._pingPongRenderTarget = _createRenderTarget( params );
+
+		}
+
 		return cubeUVRenderTarget;
 
 	}
@@ -288,12 +295,12 @@ class PMREMGenerator {
 		for ( let i = 0; i < 6; i ++ ) {
 
 			const col = i % 3;
-			if ( col == 0 ) {
+			if ( col === 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
 				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
 
-			} else if ( col == 1 ) {
+			} else if ( col === 1 ) {
 
 				cubeCamera.up.set( 0, 0, upSign[ i ] );
 				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
@@ -336,7 +343,7 @@ class PMREMGenerator {
 
 		if ( isCubeTexture ) {
 
-			if ( this._cubemapShader == null ) {
+			if ( this._cubemapShader === null ) {
 
 				this._cubemapShader = _getCubemapShader();
 
@@ -346,7 +353,7 @@ class PMREMGenerator {
 
 		} else {
 
-			if ( this._equirectShader == null ) {
+			if ( this._equirectShader === null ) {
 
 				this._equirectShader = _getEquirectShader();
 
@@ -465,7 +472,7 @@ class PMREMGenerator {
 			const weight = Math.exp( - x * x / 2 );
 			weights.push( weight );
 
-			if ( i == 0 ) {
+			if ( i === 0 ) {
 
 				sum += weight;
 
@@ -527,7 +534,7 @@ function _createPlanes() {
 
 			sigma = EXTRA_LOD_SIGMA[ i - LOD_MAX + LOD_MIN - 1 ];
 
-		} else if ( i == 0 ) {
+		} else if ( i === 0 ) {
 
 			sigma = 0;
 

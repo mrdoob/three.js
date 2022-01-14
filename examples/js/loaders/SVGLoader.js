@@ -560,7 +560,9 @@
 
 					for ( let j = 0; j < selectorList.length; j ++ ) {
 
-						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, stylesheet.style );
+						// Remove empty rules
+						const definitions = Object.fromEntries( Object.entries( stylesheet.style ).filter( ( [ _, v ] ) => v !== '' ) );
+						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, definitions );
 
 					}
 
