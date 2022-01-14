@@ -179,29 +179,25 @@
 		[page:String colourCode] — Color code to get the associated [page:Material].
 		</p>
 
-		<p>For an already loaded LDraw asset, returns the [page:Material] associated with the parameter color code.
-		This method can be useful to modify the main color code material of a model or part that exposes it.
-		To get the main material this code can be used after the asset has been loaded:
+		<h3>[method:String getMainMaterial]()</h3>
+		<p>
+		Returns the [page:Material] for the main LDraw color.
+		</p>
 
-		<code>
-		const mainMaterial = loader.getMaterial( LDrawLoader.getMainColorCode() );
-		const mainEdgeMaterial = loader.getMaterial( LDrawLoader.getMainEdgeColorCode() );
-		// ... Modify materials colors, etc
-		</code>
+		<p>For an already loaded LDraw asset, returns the [page:Material] associated with the main color code.
+		This method can be useful to modify the main material of a model or part that exposes it.
+		</p>
 
+		<p>
 		The main color code is the standard way to color an LDraw part. It is '16' for triangles and '24' for edges. Usually
 		a complete model will not expose the main color (that is, no part uses the code '16' at the top level, because they
 		are assigned other specific colors) An LDraw part file on the other hand will expose the code '16' to be colored, and
 		can have additional fixed colors.
-
-		<h3>[method:String getMainColorCode]()</h3>
-		<p>
-		Returns the standard code for the main LDraw color.
 		</p>
 
-		<h3>[method:String getMainEdgeColorCode]()</h3>
+		<h3>[method:String getMainEdgeMaterial]()</h3>
 		<p>
-		Returns the standard code for the edges main LDraw color.
+		Returns the [page:Material] for the edges main LDraw color.
 		</p>
 
 		<h3>[method:void preloadMaterials]( [param:String path] )</h3>
