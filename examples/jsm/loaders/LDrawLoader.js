@@ -1518,6 +1518,9 @@ class LDrawLoader extends Loader {
 
 	}
 
+	static const MAIN_COLOUR_CODE = '16';
+	static const MAIN_EDGE_COLOUR_CODE = '24';
+
 	setPartsLibraryPath( path ) {
 
 		this.partsLibraryPath = path;
@@ -1637,8 +1640,8 @@ class LDrawLoader extends Loader {
 
 			// Current subobject
 			currentFileName: null,
-			mainColorCode: parentScope ? parentScope.mainColorCode : '16',
-			mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : '24',
+			mainColorCode: parentScope ? parentScope.mainColorCode : MAIN_COLOUR_CODE,
+			mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : MAIN_EDGE_COLOUR_CODE,
 			matrix: new Matrix4(),
 			type: 'Model',
 			groupObject: null,
@@ -1973,13 +1976,13 @@ class LDrawLoader extends Loader {
 
 			// Parses next color code and returns a THREE.Material
 
-			if ( ! forEdge && colorCode === '16' ) {
+			if ( ! forEdge && colorCode === MAIN_COLOUR_CODE ) {
 
 				colorCode = mainColorCode;
 
 			}
 
-			if ( forEdge && colorCode === '24' ) {
+			if ( forEdge && colorCode === MAIN_EDGE_COLOUR_CODE ) {
 
 				colorCode = mainEdgeColorCode;
 
@@ -2239,12 +2242,12 @@ class LDrawLoader extends Loader {
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
 			parseScope.fileName = subobject.fileName;
-			if ( subobject.colorCode === '16' && parentScope ) {
+			if ( subobject.colorCode === MAIN_COLOUR_CODE && parentScope ) {
 
 				parseScope.mainColorCode = parentScope.mainColorCode;
 				parseScope.mainEdgeColorCode = parentScope.mainEdgeColorCode;
 
-			} else if ( subobject.colorCode !== '16' ) {
+			} else if ( subobject.colorCode !== MAIN_COLOUR_CODE ) {
 
 				parseScope.mainColorCode = subobject.colorCode;
 				parseScope.mainEdgeColorCode = subobject.colorCode;
