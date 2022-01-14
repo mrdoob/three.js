@@ -1293,12 +1293,12 @@ class LDrawParsedCache {
 
 // returns the material for an associated color code. If the color code is 16 for a face or 24 for
 // an edge then the passthroughColorCode is used.
-function getMaterialFromCode( colorCode, passthroughColorCode, materialHierarchy, forEdge ) {
+function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, forEdge ) {
 
 	const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
 	if ( isPassthrough ) {
 
-		colorCode = passthroughColorCode;
+		colorCode = parentColorCode;
 
 	}
 
@@ -1308,59 +1308,10 @@ function getMaterialFromCode( colorCode, passthroughColorCode, materialHierarchy
 
 // Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
 // in the material array if they need to be filled in.
-function applyMaterialsToMesh( group, passthroughColorCode, materialHierarchy, finalMaterialPass = false ) {
-
-	// Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
-	// (24 for lines, 16 for edges) then the pass through color code is used. If that is also pass through then it's
-	// simply returned for the subsequent material application.
-	function getMaterial( c, colorCode ) {
-
-		const originalColorCode = colorCode;
-		const forEdge = c.isLineSegments || c.isConditionalLine;
-		const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
-		if ( isPassthrough ) {
-
-			colorCode = passthroughColorCode;
-
-		}
-
-		// Only if processing the final pass of material applications do we want to use materials associated with
-		// the 24 and 16 color codes.
-		if ( ! finalMaterialPass ) {
-
-			const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
-			if ( isPassthrough ) {
-
-				return originalColorCode;
-
-			}
-
-		}
-
-		if ( ! ( colorCode in materialHierarchy ) ) {
-
-			return colorCode;
-
-		}
-
-		let material = materialHierarchy[ colorCode ];
-		if ( c.isLineSegments ) {
-
-			material = material.userData.edgeMaterial;
-
-			if ( c.isConditionalLine ) {
-
-				material = material.userData.conditionalEdgeMaterial;
-
-			}
-
-		}
-
-		return material;
-
-	}
+function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalMaterialPass = false ) {
 
 	// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
+	const parentIsPassthrough = parentColorCode === '16';
 	group.traverse( c => {
 
 		if ( c.isMesh || c.isLineSegments ) {
@@ -1386,6 +1337,51 @@ function applyMaterialsToMesh( group, passthroughColorCode, materialHierarchy, f
 		}
 
 	} );
+
+
+	// Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
+	// (24 for lines, 16 for edges) then the pass through color code is used. If that is also pass through then it's
+	// simply returned for the subsequent material application.
+	function getMaterial( c, colorCode ) {
+
+		// if our parent is a passthrough color code and we don't have the current material color available then
+		// return early.
+		if ( parentIsPassthrough && ! ( colorCode in materialHierarchy ) && ! finalMaterialPass ) {
+
+			return colorCode;
+
+		}
+
+		const forEdge = c.isLineSegments || c.isConditionalLine;
+		const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
+		if ( isPassthrough ) {
+
+			colorCode = parentColorCode;
+
+		}
+
+		if ( ! ( colorCode in materialHierarchy ) ) {
+
+			return colorCode;
+
+		}
+
+		let material = materialHierarchy[ colorCode ];
+		if ( c.isLineSegments ) {
+
+			material = material.userData.edgeMaterial;
+
+			if ( c.isConditionalLine ) {
+
+				material = material.userData.conditionalEdgeMaterial;
+
+			}
+
+		}
+
+		return material;
+
+	}
 
 }
 
