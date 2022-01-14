@@ -114,7 +114,7 @@ class LDrawUtils {
 
 				const elemSize = c.isMesh ? 3 : 2;
 
-				const geometry = c.geometry;
+				const geometry = c.geometry.clone();
 				const matrixIsInverted = c.matrixWorld.determinant() < 0;
 				if ( matrixIsInverted ) {
 
