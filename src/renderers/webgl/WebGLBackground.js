@@ -10,7 +10,7 @@ import { cloneUniforms } from '../shaders/UniformsUtils.js';
 function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha ) {
 
 	const clearColor = new Color( 0x000000 );
-	let clearAlpha = 0;
+	let clearAlpha = 1;
 
 	let planeMesh;
 	let boxMesh;

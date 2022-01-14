@@ -57,10 +57,15 @@ function createCanvasElement() {
 
 function WebGLRenderer( parameters = {} ) {
 
+	if ( parameters.alpha === true ) {
+
+		console.warn( 'WebGLRenderer no longer uses the "alpha" parameter. Use renderer.setClearAlpha( 0 ) instead.' );
+
+	}
+
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
-		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 		_depth = parameters.depth !== undefined ? parameters.depth : true,
 		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
@@ -201,7 +206,7 @@ function WebGLRenderer( parameters = {} ) {
 	try {
 
 		const contextAttributes = {
-			alpha: _alpha,
+			alpha: true,
 			depth: _depth,
 			stencil: _stencil,
 			antialias: _antialias,
