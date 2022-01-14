@@ -688,6 +688,7 @@ class LDrawParsedCache {
 		result.totalFaces = original.totalFaces;
 		result.startingConstructionStep = original.startingConstructionStep;
 		result.materials = original.materials;
+		result.group = null;
 		return result;
 
 	}
@@ -1221,6 +1222,7 @@ class LDrawParsedCache {
 			startingConstructionStep,
 			materials,
 			fileName,
+			group: null
 		};
 
 	}
@@ -1434,9 +1436,7 @@ class LDrawPartsBuilderCache {
 
 			}
 
-			// TODO
-			info.group = new Group();
-
+			const group = new Group();
 			const subobjectInfos = await Promise.all( promises );
 			for ( let i = 0, l = subobjectInfos.length; i < l; i ++ ) {
 
@@ -1460,7 +1460,7 @@ class LDrawPartsBuilderCache {
 
 					applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
 
-					info.group.add( subobjectGroup );
+					group.add( subobjectGroup );
 					continue;
 
 				}
@@ -1468,7 +1468,7 @@ class LDrawPartsBuilderCache {
 				// add the subobject group if it has children in case it has both children and primitives
 				if ( subobjectInfo.group.children.length ) {
 
-					info.group.add( subobjectInfo.group );
+					group.add( subobjectInfo.group );
 
 				}
 
@@ -1551,9 +1551,11 @@ class LDrawPartsBuilderCache {
 			// to material scoping.
 			if ( subobject ) {
 
-				applyMaterialsToMesh( info.group, subobject.colorCode, info.materials );
+				applyMaterialsToMesh( group, subobject.colorCode, info.materials );
 
 			}
+
+			info.group = group;
 
 			return info;
 
@@ -1605,13 +1607,13 @@ class LDrawPartsBuilderCache {
 
 	hasCachedModel( fileName ) {
 
-		return fileName.toLowerCase() in this.cache;
+		return fileName !== null && fileName.toLowerCase() in this.cache;
 
 	}
 
 	async getCachedModel( fileName ) {
 
-		if ( this.hasCachedModel( fileName ) ) {
+		if ( fileName !== null && this.hasCachedModel( fileName ) ) {
 
 			const key = fileName.toLowerCase();
 			const group = await this.cache[ key ];
@@ -1669,7 +1671,7 @@ class LDrawPartsBuilderCache {
 	}
 
 	// parses the given model text into a renderable object. Returns cached copy if available.
-	parseModel( text ) {
+	async parseModel( text ) {
 
 		const parseCache = this.loader.parseCache;
 		const info = parseCache.parse( text );
