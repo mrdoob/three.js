@@ -1282,17 +1282,6 @@ class LDrawParsedCache {
 
 }
 
-
-
-
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////
-
 // returns the material for an associated color code. If the color code is 16 for a face or 24 for
 // an edge then the passthroughColorCode is used.
 function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, forEdge ) {
@@ -1387,6 +1376,7 @@ function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalM
 
 }
 
+// Class used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
 class LDrawPartsBuilderCache {
 
 	constructor( loader ) {
