@@ -2232,8 +2232,6 @@ class LDrawLoader extends Loader {
 		const parseScope = this.newParseScopeLevel( null, parentScope );
 		parseScope.url = url;
 
-		const parentParseScope = parseScope.parentScope;
-
 		// Set current matrix
 		if ( subobject ) {
 
@@ -2241,9 +2239,8 @@ class LDrawLoader extends Loader {
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
 			parseScope.fileName = subobject.fileName;
-			if ( subobject.colorCode === '16' && parseScope.parentScope ) {
+			if ( subobject.colorCode === '16' && parentScope ) {
 
-				const parentScope = parseScope.parentScope;
 				parseScope.mainColorCode = parentScope.mainColorCode;
 				parseScope.mainEdgeColorCode = parentScope.mainEdgeColorCode;
 
@@ -2277,7 +2274,7 @@ class LDrawLoader extends Loader {
 		}
 
 		// If it is root object then finalize this object and compute construction steps
-		if ( ! parentParseScope.isFromParse ) {
+		if ( ! parentScope.isFromParse ) {
 
 			this.finalizeObject( parseScope );
 			this.computeConstructionSteps( parseScope.groupObject );
