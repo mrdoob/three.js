@@ -57,15 +57,10 @@ function createCanvasElement() {
 
 function WebGLRenderer( parameters = {} ) {
 
-	if ( parameters.alpha === true ) {
-
-		console.warn( 'WebGLRenderer no longer uses the "alpha" parameter. Use renderer.setClearAlpha( 0 ) instead.' );
-
-	}
-
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
+		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 		_depth = parameters.depth !== undefined ? parameters.depth : true,
 		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
@@ -305,7 +300,7 @@ function WebGLRenderer( parameters = {} ) {
 		materials = new WebGLMaterials( properties );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates( extensions, capabilities );
-		background = new WebGLBackground( _this, cubemaps, state, objects, _premultipliedAlpha );
+		background = new WebGLBackground( _this, cubemaps, state, objects, _alpha, _premultipliedAlpha );
 		shadowMap = new WebGLShadowMap( _this, objects, capabilities );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
