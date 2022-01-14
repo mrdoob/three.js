@@ -1400,11 +1400,11 @@ class LDrawPartsBuilderCache {
 			const promises = [];
 			const localMaterials = { ...parentMaterialHierarchy, ...info.materials };
 			info.group = new Group();
-			if ( subobject && subobject.matrix ) {
+			if ( subobject ) {
 
+				subobject.matrix.decompose( info.group.position, info.group.quaternion, info.group.scale );
 				info.group.userData.startingConstructionStep = subobject.startingConstructionStep;
 				info.group.name = subobject.fileName;
-				subobject.matrix.decompose( info.group.position, info.group.quaternion, info.group.scale );
 
 			}
 
@@ -1413,9 +1413,10 @@ class LDrawPartsBuilderCache {
 				const subobject = subobjects[ i ];
 				const promise = parseCache.ensureDataLoaded( subobject.fileName ).then( () => {
 
-					const subInfo = parseCache.getData( subobject.fileName );
-					if ( isPartType( subInfo.type ) ) {
+					const subobjectInfo = parseCache.getData( subobject.fileName, false );
+					if ( isPartType( subobjectInfo.type ) ) {
 
+						// TODO: should this logic go in loadModel? Then we can remove it from above, too
 						return this.loadModel( subobject.fileName ).then( group => {
 
 							subobject.matrix.decompose( group.position, group.quaternion, group.scale );
@@ -1430,18 +1431,7 @@ class LDrawPartsBuilderCache {
 
 					}
 
-					return processInfo( parseCache.getData( subobject.fileName ), localMaterials, subobject ).then( finalInfo => {
-
-						finalInfo.subobjects = null;
-						finalInfo.matrix = subobject.matrix;
-						finalInfo.inverted = subobject.inverted;
-						finalInfo.startingConstructionStep = subobject.startingConstructionStep;
-						finalInfo.colorCode = subobject.colorCode;
-						finalInfo.fileName = subobject.fileName;
-
-						return finalInfo;
-
-					} );
+					return processInfo( parseCache.getData( subobject.fileName ), localMaterials, subobject );
 
 				} );
 
@@ -1449,20 +1439,20 @@ class LDrawPartsBuilderCache {
 
 			}
 
-			const subInfos = await Promise.all( promises );
-			for ( let i = 0, l = subInfos.length; i < l; i ++ ) {
+			const subobjectInfos = await Promise.all( promises );
+			for ( let i = 0, l = subobjectInfos.length; i < l; i ++ ) {
 
-				const subInfo = subInfos[ i ];
-				if ( subInfo.isGroup ) {
+				const subobjectInfo = subobjectInfos[ i ];
+				if ( subobjectInfo.isGroup ) {
 
-					info.group.add( subInfo );
+					info.group.add( subobjectInfo );
 					continue;
 
 				}
 
-				if ( subInfo.group.children.length ) {
+				if ( subobjectInfo.group.children.length ) {
 
-					info.group.add( subInfo.group );
+					info.group.add( subobjectInfo.group );
 
 				}
 
@@ -1470,14 +1460,17 @@ class LDrawPartsBuilderCache {
 				const parentConditionalSegments = info.conditionalSegments;
 				const parentFaces = info.faces;
 
-				const lineSegments = subInfo.lineSegments;
-				const conditionalSegments = subInfo.conditionalSegments;
-				const faces = subInfo.faces;
-				const matrix = subInfo.matrix;
-				const inverted = subInfo.inverted;
-				const matrixScaleInverted = matrix.determinant() < 0;
+				const lineSegments = subobjectInfo.lineSegments;
+				const conditionalSegments = subobjectInfo.conditionalSegments;
 
-				const lineColorCode = subInfo.colorCode === '16' ? '24' : subInfo.colorCode;
+				const subobject = info.subobjects[ i ];
+				const faces = subobjectInfo.faces;
+				const matrix = subobject.matrix;
+				const inverted = subobject.inverted;
+				const matrixScaleInverted = matrix.determinant() < 0;
+				const colorCode = subobject.colorCode;
+
+				const lineColorCode = colorCode === '16' ? '24' : colorCode;
 				for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 					const ls = lineSegments[ i ];
@@ -1517,8 +1510,8 @@ class LDrawPartsBuilderCache {
 
 					}
 
-					tri.colorCode = tri.colorCode === '16' ? subInfo.colorCode : tri.colorCode;
-					tri.material = tri.material || getMaterialFromCode( tri.colorCode, subInfo.colorCode, info.materials, false );
+					tri.colorCode = tri.colorCode === '16' ? colorCode : tri.colorCode;
+					tri.material = tri.material || getMaterialFromCode( tri.colorCode, colorCode, info.materials, false );
 					faceMaterials.add( tri.material );
 
 					// If the scale of the object is negated then the triangle winding order
@@ -1533,12 +1526,10 @@ class LDrawPartsBuilderCache {
 
 				}
 
-				totalFaces += subInfo.totalFaces;
+				totalFaces += subobjectInfo.totalFaces;
 
 			}
 
-			// TODO: we should pass the main color code down into the child scope so the main color codes can be applied
-			// earlier instead of applying materials so many times recursively.
 			if ( subobject ) {
 
 				applyMaterialsToMesh( info.group, subobject.colorCode, localMaterials );
@@ -2005,6 +1996,7 @@ class LDrawLoader extends Loader {
 
 		// Array of THREE.Material
 		this.materials = [];
+		this.materialLibrary = {};
 
 		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
@@ -2013,8 +2005,6 @@ class LDrawLoader extends Loader {
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = {};
-
-		this.rootParseScope = this.newParseScopeLevel();
 
 		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 		this.setMaterials( [
@@ -2073,74 +2063,28 @@ class LDrawLoader extends Loader {
 		fileLoader.setWithCredentials( this.withCredentials );
 		fileLoader.load( url, text => {
 
-			const res = this.partsBuilder.parseModel( text, this.rootParseScope.lib );
-			res.then( group => {
+			this.partsBuilder
+				.parseModel( text, this.materialLibrary )
+				.then( group => {
 
+					this.computeConstructionSteps( group );
+					onLoad( group );
 
-				const materials = {};
-				materials[ '16' ] = this.materials[ 0 ];
-				materials[ '24' ] = this.materials[ 1 ];
-				this.computeConstructionSteps( group );
-
-				// applyMaterialsToMesh( group, null, materials );
-
-
-				group.traverse( c => {
-
-					if ( 'material' in c ) {
-
-						if ( Array.isArray( c.material ) ) {
-
-							for ( let i = 0, l = c.material.length; i < l; i ++ ) {
-
-								if ( c.material[ i ] === null || ! c.material[ i ].isMaterial ) {
-
-									c.material[ i ] = new MeshStandardMaterial( { color: 0xff00ff } );
-
-								}
-
-							}
-
-						} else if ( c.material === null || ! c.material.isMaterial ) {
-
-							c.material = new MeshStandardMaterial( { color: 0xff00ff } );
-
-						}
-
-					}
-
-				} );
-
-				onLoad( group );
-
-			} ).catch( err => {
-
-				console.error( err )
-
-			} );
-
-
-
-			// const parsedInfo = this.parseCache.parse( text );
-			// this.processObject( parsedInfo, null, url, this.rootParseScope )
-			// 	.then( function ( result ) {
-
-			// 		onLoad( result.groupObject );
-
-			// 	} );
+				} )
+				.catch( onError );
 
 		}, onProgress, onError );
 
 	}
 
-	parse( text, path, onLoad ) {
+	parse( text, onLoad ) {
 
-		// Async parse. This function calls onParse with the parsed THREE.Object3D as parameter
-		const parsedInfo = this.parseCache.parse( text );
-		this.processObject( parsedInfo, null, path, this.rootParseScope )
-			.then( function ( result ) {
+		this.partsBuilder
+			.parseModel( text, this.materialLibrary )
+			.then( group => {
 
-				onLoad( result.groupObject );
+				this.computeConstructionSteps( group );
+				onLoad( group );
 
 			} );
 
@@ -2148,11 +2092,14 @@ class LDrawLoader extends Loader {
 
 	setMaterials( materials ) {
 
-		// Clears parse scopes stack, adds new scope with material library
-		this.rootParseScope = this.newParseScopeLevel( materials );
-		this.rootParseScope.isFromParse = false;
+		this.materialLibrary = {};
+		this.materials = [];
+		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
-		this.materials = materials;
+			const material = materials[ i ];
+			this.addMaterial( material );
+
+		}
 
 		return this;
 
@@ -2222,19 +2169,17 @@ class LDrawLoader extends Loader {
 
 	}
 
-	addMaterial( material, parseScope ) {
+	addMaterial( material ) {
 
 		// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
 
-		const matLib = parseScope.lib;
-
+		const matLib = this.materialLibrary;
 		if ( ! matLib[ material.userData.code ] ) {
 
 			this.materials.push( material );
+			matLib[ material.userData.code ] = material;
 
 		}
-
-		matLib[ material.userData.code ] = material;
 
 		return this;
 
@@ -2515,117 +2460,9 @@ class LDrawLoader extends Loader {
 
 		material.userData.edgeMaterial = edgeMaterial;
 
+		this.addMaterial( material );
+
 		return material;
-
-	}
-
-	//
-
-	objectParse( info, parseScope ) {
-
-		// Retrieve data from the parent parse scope
-		const currentParseScope = parseScope;
-		const parentParseScope = currentParseScope.parentScope;
-
-		// Main color codes passed to this subobject (or default codes 16 and 24 if it is the root object)
-		const mainColorCode = currentParseScope.mainColorCode;
-		const mainEdgeColorCode = currentParseScope.mainEdgeColorCode;
-
-		const parseColorCode = ( colorCode, forEdge ) => {
-
-			// Parses next color code and returns a THREE.Material
-
-			if ( ! forEdge && colorCode === '16' ) {
-
-				colorCode = mainColorCode;
-
-			}
-
-			if ( forEdge && colorCode === '24' ) {
-
-				colorCode = mainEdgeColorCode;
-
-			}
-
-			const material = this.getMaterial( colorCode, currentParseScope );
-
-			if ( ! material ) {
-
-				throw new Error( 'LDrawLoader: Unknown color code "' + colorCode + '" is used but it was not defined previously.' );
-
-			}
-
-			return material;
-
-		};
-
-		const faces = info.faces;
-		const lineSegments = info.lineSegments;
-		const conditionalSegments = info.conditionalSegments;
-		const materials = info.materials;
-		if ( currentParseScope.inverted ) {
-
-			faces.reverse();
-
-		}
-
-		for ( const colorCode in materials ) {
-
-			this.addMaterial( materials[ colorCode ], currentParseScope );
-
-		}
-
-		for ( let i = 0, l = faces.length; i < l; i ++ ) {
-
-			const face = faces[ i ];
-			if ( face.material === null ) {
-
-				face.material = parseColorCode( face.colorCode, false );
-
-			}
-
-		}
-
-		for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
-
-			const ls = lineSegments[ i ];
-			if ( ls.material === null ) {
-
-				ls.material = parseColorCode( ls.colorCode, true );
-
-			}
-
-		}
-
-		for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
-
-			const cs = conditionalSegments[ i ];
-			if ( cs.material === null ) {
-
-				cs.material = parseColorCode( cs.colorCode, true );
-
-			}
-
-		}
-
-		currentParseScope.faces = info.faces;
-		currentParseScope.conditionalSegments = info.conditionalSegments;
-		currentParseScope.lineSegments = info.lineSegments;
-		currentParseScope.category = info.category;
-		currentParseScope.keywords = info.keywords;
-		currentParseScope.subobjects = info.subobjects;
-		currentParseScope.numSubobjects = info.subobjects.length;
-		currentParseScope.subobjectIndex = 0;
-		currentParseScope.type = info.type;
-		currentParseScope.totalFaces = info.totalFaces;
-
-		const isRoot = ! parentParseScope.isFromParse;
-		if ( isRoot || ! isPrimitiveType( info.type ) ) {
-
-			currentParseScope.groupObject = new Group();
-			currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
-
-		}
 
 	}
 
@@ -2652,218 +2489,6 @@ class LDrawLoader extends Loader {
 		} );
 
 		model.userData.numConstructionSteps = stepNumber + 1;
-
-	}
-
-	finalizeObject( subobjectParseScope ) {
-
-		// fail gracefully if an object could not be loaded
-		if ( subobjectParseScope === null ) {
-
-			return;
-
-		}
-
-		const parentParseScope = subobjectParseScope.parentScope;
-
-		// Smooth the normals if this is a part or if this is a case where the subpart
-		// is added directly into the parent model (meaning it will never get smoothed by
-		// being added to a part)
-		const doSmooth =
-			isPartType( subobjectParseScope.type ) ||
-			(
-				isPrimitiveType( subobjectParseScope.type ) &&
-				isModelType( subobjectParseScope.parentScope.type )
-			);
-
-		if ( this.smoothNormals && doSmooth ) {
-
-			generateFaceNormals( subobjectParseScope.faces );
-
-			// only check subsetgments if we have multiple materials in a single part because this seems to be the case where it's needed most --
-			// there may be cases where a single edge line crosses over polygon edges that are broken up by multiple materials.
-			const checkSubSegments = subobjectParseScope.faceMaterials.size > 1;
-			smoothNormals( subobjectParseScope.faces, subobjectParseScope.lineSegments, checkSubSegments );
-
-		}
-
-		const isRoot = ! parentParseScope.isFromParse;
-		if ( ! isPrimitiveType( subobjectParseScope.type ) || isRoot ) {
-
-			const objGroup = subobjectParseScope.groupObject;
-
-			if ( subobjectParseScope.faces.length > 0 ) {
-
-				objGroup.add( createObject( subobjectParseScope.faces, 3, false, subobjectParseScope.totalFaces ) );
-
-			}
-
-			if ( subobjectParseScope.lineSegments.length > 0 ) {
-
-				objGroup.add( createObject( subobjectParseScope.lineSegments, 2 ) );
-
-			}
-
-			if ( subobjectParseScope.conditionalSegments.length > 0 ) {
-
-				objGroup.add( createObject( subobjectParseScope.conditionalSegments, 2, true ) );
-
-			}
-
-			if ( parentParseScope.groupObject ) {
-
-				objGroup.name = subobjectParseScope.fileName;
-				objGroup.userData.category = subobjectParseScope.category;
-				objGroup.userData.keywords = subobjectParseScope.keywords;
-				subobjectParseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
-
-				parentParseScope.groupObject.add( objGroup );
-
-			}
-
-		} else {
-
-			const parentLineSegments = parentParseScope.lineSegments;
-			const parentConditionalSegments = parentParseScope.conditionalSegments;
-			const parentFaces = parentParseScope.faces;
-			const parentFaceMaterials = parentParseScope.faceMaterials;
-
-			const lineSegments = subobjectParseScope.lineSegments;
-			const conditionalSegments = subobjectParseScope.conditionalSegments;
-			const faces = subobjectParseScope.faces;
-			const faceMaterials = subobjectParseScope.faceMaterials;
-			const matrix = subobjectParseScope.matrix;
-			const matrixScaleInverted = matrix.determinant() < 0;
-
-			for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
-
-				const ls = lineSegments[ i ];
-				const vertices = ls.vertices;
-				vertices[ 0 ].applyMatrix4( matrix );
-				vertices[ 1 ].applyMatrix4( matrix );
-
-				parentLineSegments.push( ls );
-
-			}
-
-			for ( let i = 0, l = conditionalSegments.length; i < l; i ++ ) {
-
-				const os = conditionalSegments[ i ];
-				const vertices = os.vertices;
-				const controlPoints = os.controlPoints;
-				vertices[ 0 ].applyMatrix4( matrix );
-				vertices[ 1 ].applyMatrix4( matrix );
-				controlPoints[ 0 ].applyMatrix4( matrix );
-				controlPoints[ 1 ].applyMatrix4( matrix );
-
-				parentConditionalSegments.push( os );
-
-			}
-
-			for ( let i = 0, l = faces.length; i < l; i ++ ) {
-
-				const tri = faces[ i ];
-				const vertices = tri.vertices;
-				for ( let i = 0, l = vertices.length; i < l; i ++ ) {
-
-					vertices[ i ].applyMatrix4( matrix );
-
-				}
-
-				// If the scale of the object is negated then the triangle winding order
-				// needs to be flipped.
-				if ( matrixScaleInverted !== subobjectParseScope.inverted ) {
-
-					vertices.reverse();
-
-				}
-
-				parentFaces.push( tri );
-
-			}
-
-			parentParseScope.totalFaces += subobjectParseScope.totalFaces;
-			faceMaterials.forEach( material => parentFaceMaterials.add( material ) );
-
-		}
-
-	}
-
-	async processObject( parsedInfo, subobject, url, parentScope ) {
-
-		const scope = this;
-
-		const parseScope = this.newParseScopeLevel( null, parentScope );
-		parseScope.url = url;
-
-		const parentParseScope = parseScope.parentScope;
-
-		// Set current matrix
-		if ( subobject ) {
-
-			parseScope.matrix.copy( subobject.matrix );
-			parseScope.inverted = subobject.inverted;
-			parseScope.startingConstructionStep = subobject.startingConstructionStep;
-			parseScope.fileName = subobject.fileName;
-			if ( subobject.colorCode === '16' && parseScope.parentScope ) {
-
-				const parentScope = parseScope.parentScope;
-				parseScope.mainColorCode = parentScope.mainColorCode;
-				parseScope.mainEdgeColorCode = parentScope.mainEdgeColorCode;
-
-			} else if ( subobject.colorCode !== '16' ) {
-
-				parseScope.mainColorCode = subobject.colorCode;
-				parseScope.mainEdgeColorCode = subobject.colorCode;
-
-			}
-
-		}
-
-		// Parse the object
-		this.objectParse( parsedInfo, parseScope );
-
-		const subobjects = parseScope.subobjects;
-		const promises = [];
-		for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
-
-			promises.push( loadSubobject( parseScope.subobjects[ i ] ) );
-
-		}
-
-		// Kick off of the downloads in parallel but process all the subobjects
-		// in order so all the assembly instructions are correct
-		const subobjectScopes = await Promise.all( promises );
-		for ( let i = 0, l = subobjectScopes.length; i < l; i ++ ) {
-
-			this.finalizeObject( subobjectScopes[ i ] );
-
-		}
-
-		// If it is root object then finalize this object and compute construction steps
-		if ( ! parentParseScope.isFromParse ) {
-
-			this.finalizeObject( parseScope );
-			this.computeConstructionSteps( parseScope.groupObject );
-
-		}
-
-		return parseScope;
-
-		function loadSubobject( subobject ) {
-
-			return scope.parseCache.loadData( subobject.fileName ).then( function ( parsedInfo ) {
-
-				return scope.processObject( parsedInfo, subobject, url, parseScope );
-
-			} ).catch( function ( err ) {
-
-				console.warn( err );
-				return null;
-
-			} );
-
-		}
 
 	}
 
