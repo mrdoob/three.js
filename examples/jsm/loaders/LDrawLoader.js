@@ -1956,11 +1956,8 @@ class LDrawLoader extends Loader {
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = {};
 
-		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
-		this.setMaterials( [
-			this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ),
-			this.parseColorMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) )
-		] );
+		// Initializes the materials library with default materials
+		this.setMaterials( [] );
 
 		// If this flag is set to true the vertex normals will be smoothed.
 		this.smoothNormals = true;
@@ -2047,10 +2044,13 @@ class LDrawLoader extends Loader {
 		this.materials = [];
 		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
-			const material = materials[ i ];
-			this.addMaterial( material );
+			this.addMaterial( materials[ i ] );
 
 		}
+
+		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
+		this.addMaterial( this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ) );
+		this.addMaterial( this.parseColorMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) );
 
 		return this;
 
