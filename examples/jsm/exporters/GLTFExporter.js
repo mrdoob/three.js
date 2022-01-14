@@ -758,10 +758,6 @@ class GLTFWriter {
 
 			return new Texture( canvas );
 
-		} else {
-
-			return null;
-
 		}
 
 	}
