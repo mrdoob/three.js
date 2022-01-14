@@ -1378,7 +1378,7 @@ function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalM
 }
 
 // Class used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
-class LDrawPartsBuilderCache {
+class LDrawPartsGeometryCache {
 
 	constructor( loader ) {
 
@@ -1952,7 +1952,7 @@ class LDrawLoader extends Loader {
 		this.materialLibrary = {};
 
 		// This also allows to handle the embedded text files ("0 FILE" lines)
-		this.partsCache = new LDrawPartsBuilderCache( this );
+		this.partsCache = new LDrawPartsGeometryCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = {};
