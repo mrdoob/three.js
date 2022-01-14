@@ -533,7 +533,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 function isPartType( type ) {
 
-	return type === 'Part';
+	return type === 'Part' || type === 'Unofficial_Part';
 
 }
 
@@ -1408,20 +1408,9 @@ class LDrawPartsBuilderCache {
 				const promise = parseCache.ensureDataLoaded( subobject.fileName ).then( () => {
 
 					const subobjectInfo = parseCache.getData( subobject.fileName, false );
-					if ( isPartType( subobjectInfo.type ) ) {
+					if ( ! isPrimitiveType( subobjectInfo.type ) ) {
 
-						// TODO: should this logic go in loadModel? Then we can remove it from above, too
-						return this.loadModel( subobject.fileName ).then( group => {
-
-							subobject.matrix.decompose( group.position, group.quaternion, group.scale );
-							group.userData.startingConstructionStep = subobject.startingConstructionStep;
-							group.name = subobject.fileName;
-
-							applyMaterialsToMesh( group, subobject.colorCode, localMaterials );
-
-							return group;
-
-						} );
+						return this.loadModel( subobject.fileName );
 
 					}
 
@@ -1436,10 +1425,18 @@ class LDrawPartsBuilderCache {
 			const subobjectInfos = await Promise.all( promises );
 			for ( let i = 0, l = subobjectInfos.length; i < l; i ++ ) {
 
+				const subobject = info.subobjects[ i ];
 				const subobjectInfo = subobjectInfos[ i ];
 				if ( subobjectInfo.isGroup ) {
 
-					info.group.add( subobjectInfo );
+					const subobjectGroup = subobjectInfo;
+					subobject.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
+					subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
+					subobjectGroup.name = subobject.fileName;
+
+					applyMaterialsToMesh( subobjectGroup, subobject.colorCode, localMaterials );
+
+					info.group.add( subobjectGroup );
 					continue;
 
 				}
@@ -1457,7 +1454,6 @@ class LDrawPartsBuilderCache {
 				const lineSegments = subobjectInfo.lineSegments;
 				const conditionalSegments = subobjectInfo.conditionalSegments;
 
-				const subobject = info.subobjects[ i ];
 				const faces = subobjectInfo.faces;
 				const matrix = subobject.matrix;
 				const inverted = subobject.inverted;
