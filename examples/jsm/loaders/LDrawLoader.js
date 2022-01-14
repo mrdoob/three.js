@@ -1291,18 +1291,14 @@ class LDrawParsedCache {
 
 /////////////////////////////////////////////////////////////////
 
+// returns the material for an associated color code. If the color code is 16 for a face or 24 for
+// an edge then the passthroughColorCode is used.
+function getMaterialFromCode( colorCode, passthroughColorCode, materialHierarchy, forEdge ) {
 
-function getMaterialFromCode( colorCode, fallbackColorCode, materialHierarchy, forEdge ) {
+	const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
+	if ( isPassthrough ) {
 
-	if ( ! forEdge && colorCode === '16' ) {
-
-		colorCode = fallbackColorCode;
-
-	}
-
-	if ( forEdge && colorCode === '24' ) {
-
-		colorCode = fallbackColorCode;
+		colorCode = passthroughColorCode;
 
 	}
 
@@ -1310,17 +1306,38 @@ function getMaterialFromCode( colorCode, fallbackColorCode, materialHierarchy, f
 
 }
 
-function applyMaterialsToMesh( group, fallbackColorCode, materialHierarchy ) {
+// Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
+// in the material array if they need to be filled in.
+function applyMaterialsToMesh( group, passthroughColorCode, materialHierarchy, finalMaterialPass = false ) {
 
+	// Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
+	// (24 for lines, 16 for edges) then the pass through color code is used. If that is also pass through then it's
+	// simply returned for the subsequent material application.
 	function getMaterial( c, colorCode ) {
 
-		if ( colorCode == '16' || colorCode === '24' ) {
+		const originalColorCode = colorCode;
+		const forEdge = c.isLineSegments || c.isConditionalLine;
+		const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
+		if ( isPassthrough ) {
 
-			colorCode = fallbackColorCode;
+			colorCode = passthroughColorCode;
 
 		}
 
-		if ( colorCode === '16' || colorCode === '24' || ! ( colorCode in materialHierarchy ) ) {
+		// Only if processing the final pass of material applications do we want to use materials associated with
+		// the 24 and 16 color codes.
+		if ( ! finalMaterialPass ) {
+
+			const isPassthrough = ! forEdge && colorCode === '16' || forEdge && colorCode === '24';
+			if ( isPassthrough ) {
+
+				return originalColorCode;
+
+			}
+
+		}
+
+		if ( ! ( colorCode in materialHierarchy ) ) {
 
 			return colorCode;
 
@@ -1343,10 +1360,10 @@ function applyMaterialsToMesh( group, fallbackColorCode, materialHierarchy ) {
 
 	}
 
+	// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
 	group.traverse( c => {
 
 		if ( c.isMesh || c.isLineSegments ) {
-
 
 			if ( Array.isArray( c.material ) ) {
 
@@ -1381,27 +1398,23 @@ class LDrawPartsBuilderCache {
 
 	}
 
+	// Convert the given file information into a mesh by processing subobjects.
 	async processIntoMesh( info ) {
 
 		const parseCache = this.loader.parseCache;
 		const faceMaterials = new Set();
-		const childParts = [];
-		let totalFaces = info.totalFaces;
 
-		const processInfo = async ( info, parentMaterialHierarchy, subobject = null ) => {
+		// Processes the part subobject information to load child parts and merge geometry onto part
+		// piece object.
+		const processInfoSubobjects = async ( info, parentMaterialHierarchy, subobject = null ) => {
 
+			// TODO: do we need localMaterials?
 			const subobjects = info.subobjects;
 			const promises = [];
 			const localMaterials = { ...parentMaterialHierarchy, ...info.materials };
-			info.group = new Group();
-			if ( subobject ) {
 
-				subobject.matrix.decompose( info.group.position, info.group.quaternion, info.group.scale );
-				info.group.userData.startingConstructionStep = subobject.startingConstructionStep;
-				info.group.name = subobject.fileName;
-
-			}
-
+			// Trigger load of all subobjects. If a subobject isn't a primitive then load it as a separate
+			// group which lets instruction steps apply correctly.
 			for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
 				const subobject = subobjects[ i ];
@@ -1414,7 +1427,7 @@ class LDrawPartsBuilderCache {
 
 					}
 
-					return processInfo( parseCache.getData( subobject.fileName ), localMaterials, subobject );
+					return processInfoSubobjects( parseCache.getData( subobject.fileName ), localMaterials, subobject );
 
 				} );
 
@@ -1422,11 +1435,16 @@ class LDrawPartsBuilderCache {
 
 			}
 
+			// TODO
+			info.group = new Group();
+
 			const subobjectInfos = await Promise.all( promises );
 			for ( let i = 0, l = subobjectInfos.length; i < l; i ++ ) {
 
 				const subobject = info.subobjects[ i ];
 				const subobjectInfo = subobjectInfos[ i ];
+
+				// if the subobject was loaded as a separate group then apply the parent scopes materials
 				if ( subobjectInfo.isGroup ) {
 
 					const subobjectGroup = subobjectInfo;
@@ -1441,12 +1459,15 @@ class LDrawPartsBuilderCache {
 
 				}
 
+				// add the subobject group if it has children in case it has both children and primitives
 				if ( subobjectInfo.group.children.length ) {
 
 					info.group.add( subobjectInfo.group );
 
 				}
 
+				// transform the primitives into the local space of the parent piece and append them to
+				// to the parent primitives list.
 				const parentLineSegments = info.lineSegments;
 				const parentConditionalSegments = info.conditionalSegments;
 				const parentFaces = info.faces;
@@ -1516,10 +1537,12 @@ class LDrawPartsBuilderCache {
 
 				}
 
-				totalFaces += subobjectInfo.totalFaces;
+				info.totalFaces += subobjectInfo.totalFaces;
 
 			}
 
+			// Apply the parent subobjects pass through material code to this object. This is done several times due
+			// to material scoping.
 			if ( subobject ) {
 
 				applyMaterialsToMesh( info.group, subobject.colorCode, localMaterials );
@@ -1530,6 +1553,7 @@ class LDrawPartsBuilderCache {
 
 		};
 
+		// Track material use to see if we need to use the normal smooth slow path for hard edges.
 		for ( let i = 0, l = info.faces; i < l; i ++ ) {
 
 			const material = info.faces[ i ].material;
@@ -1541,7 +1565,7 @@ class LDrawPartsBuilderCache {
 
 		}
 
-		await processInfo( info, {} );
+		await processInfoSubobjects( info, {} );
 
 		if ( this.loader.smoothNormals ) {
 
@@ -1551,10 +1575,11 @@ class LDrawPartsBuilderCache {
 
 		}
 
+		// Add the primitive objects and metadata.
 		const group = info.group;
 		if ( info.faces.length > 0 ) {
 
-			group.add( createObject( info.faces, 3, false, totalFaces ) );
+			group.add( createObject( info.faces, 3, false, info.totalFaces ) );
 
 		}
 
@@ -1572,11 +1597,6 @@ class LDrawPartsBuilderCache {
 
 		group.userData.category = info.category;
 		group.userData.keywords = info.keywords;
-		if ( childParts.length ) {
-
-			group.add( ...childParts );
-
-		}
 
 		return group;
 
@@ -1604,36 +1624,42 @@ class LDrawPartsBuilderCache {
 
 	}
 
+	// Loads and parses the model with the given file name. Returns a cached copy if available.
 	async loadModel( fileName ) {
 
 		const parseCache = this.loader.parseCache;
 		const key = fileName.toLowerCase();
 		if ( this.hasCachedModel( fileName ) ) {
 
+			// Return cached model if available.
 			return this.getCachedModel( fileName );
 
 		} else {
 
-			// prepare data to be ready
+			// Otherwise parse a new model.
+			// Ensure the file data is loaded and pre parsed.
 			await parseCache.ensureDataLoaded( fileName );
 
 			const info = parseCache.getData( fileName );
 			const promise = this.processIntoMesh( info );
 
-			// now that the file has loaded it's possible that another part parse has been waiting in parallel
-			// so check the cache again to see if it's been added since the last async operation.
+			// Now that the file has loaded it's possible that another part parse has been waiting in parallel
+			// so check the cache again to see if it's been added since the last async operation so we don't
+			// do unnecessary work.
 			if ( this.hasCachedModel( fileName ) ) {
 
 				return this.getCachedModel( fileName );
 
 			}
 
+			// Cache object if it's a part so it can be reused later.
 			if ( isPartType( info.type ) ) {
 
 				this.cache[ key ] = promise;
 
 			}
 
+			// return a copy
 			const group = await promise;
 			return group.clone();
 
@@ -1641,6 +1667,7 @@ class LDrawPartsBuilderCache {
 
 	}
 
+	// parses the given model text into a renderable object. Returns cached copy if available.
 	parseModel( text ) {
 
 		const parseCache = this.loader.parseCache;
@@ -1656,59 +1683,6 @@ class LDrawPartsBuilderCache {
 	}
 
 }
-
-//////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function sortByMaterial( a, b ) {
 
@@ -1866,6 +1840,8 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 			} else {
 
+				// If a material has not been made available yet then keep the color code string in the material array
+				// to save the spot for the material once a parent scopes materials are being applied to the object.
 				materials.push( elem.colorCode );
 
 			}
@@ -2049,6 +2025,7 @@ class LDrawLoader extends Loader {
 				.parseModel( text, this.materialLibrary )
 				.then( group => {
 
+					applyMaterialsToMesh( group, '16', this.materialLibrary, true );
 					this.computeConstructionSteps( group );
 					onLoad( group );
 
