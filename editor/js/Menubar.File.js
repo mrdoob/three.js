@@ -253,7 +253,7 @@ function MenubarFile( editor ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-		}, { binary: true, animations: animations } );
+		}, undefined, { binary: true, animations: animations } );
 
 	} );
 	options.add( option );
@@ -276,7 +276,7 @@ function MenubarFile( editor ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
-		}, { animations: animations } );
+		}, undefined, { animations: animations } );
 
 
 	} );

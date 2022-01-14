@@ -1,4 +1,4 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, sRGBEncoding, LinearEncoding, UnsignedByteType, _SRGBFormat, _SRGBAFormat } from '../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, sRGBEncoding, LinearEncoding, UnsignedByteType, _SRGBAFormat } from '../../constants.js';
 import * as MathUtils from '../../math/MathUtils.js';
 import { ImageUtils } from '../../extras/ImageUtils.js';
 import { createElementNS } from '../../utils.js';
@@ -719,7 +719,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				mipmap = mipmaps[ i ];
 
-				if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
+				if ( texture.format !== RGBAFormat ) {
 
 					if ( glFormat !== null ) {
 
@@ -936,7 +936,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					const mipmap = mipmaps[ j ];
 
-					if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
+					if ( texture.format !== RGBAFormat ) {
 
 						if ( glFormat !== null ) {
 
@@ -1355,16 +1355,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
-		// Handles WebGL2 RGBFormat fallback - #18858
-
-		if ( isWebGL2 && texture.format === RGBFormat && ( texture.type === FloatType || texture.type === HalfFloatType ) ) {
-
-			texture.format = RGBAFormat;
-
-			console.warn( 'THREE.WebGLRenderer: Rendering to textures with RGB format is not supported. Using RGBA format instead.' );
-
-		}
-
 		// Setup framebuffer
 
 		if ( isCube ) {
@@ -1641,7 +1631,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const format = texture.format;
 		const type = texture.type;
 
-		if ( texture.isCompressedTexture === true || texture.format === _SRGBFormat || texture.format === _SRGBAFormat ) return image;
+		if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
 
 		if ( encoding !== LinearEncoding ) {
 
@@ -1653,12 +1643,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					// in WebGL 1, try to use EXT_sRGB extension and unsized formats
 
-					if ( extensions.has( 'EXT_sRGB' ) === true && ( format === RGBFormat || format === RGBAFormat ) ) {
+					if ( extensions.has( 'EXT_sRGB' ) === true && format === RGBAFormat ) {
 
-						if ( format === RGBFormat ) texture.format = _SRGBFormat;
-						if ( format === RGBAFormat ) texture.format = _SRGBAFormat;
+						texture.format = _SRGBAFormat;
 
-						// it's not possible to generate mips in WebGL 1 with the above formats
+						// it's not possible to generate mips in WebGL 1 with this extension
 
 						texture.minFilter = LinearFilter;
 						texture.generateMipmaps = false;

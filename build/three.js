@@ -109,7 +109,6 @@
 	const UnsignedShort565Type = 1019;
 	const UnsignedInt248Type = 1020;
 	const AlphaFormat = 1021;
-	const RGBFormat = 1022;
 	const RGBAFormat = 1023;
 	const LuminanceFormat = 1024;
 	const LuminanceAlphaFormat = 1025;
@@ -194,8 +193,6 @@
 	const StreamCopyUsage = 35042;
 	const GLSL1 = '100';
 	const GLSL3 = '300 es';
-	const _SRGBFormat = 1034; // fallback for WebGL 1
-
 	const _SRGBAFormat = 1035; // fallback for WebGL 1
 
 	/**
@@ -16918,7 +16915,7 @@
 				for (let i = 0, il = mipmaps.length; i < il; i++) {
 					mipmap = mipmaps[i];
 
-					if (texture.format !== RGBAFormat && texture.format !== RGBFormat) {
+					if (texture.format !== RGBAFormat) {
 						if (glFormat !== null) {
 							if (useTexStorage) {
 								state.compressedTexSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data);
@@ -17054,7 +17051,7 @@
 					for (let j = 0; j < mipmaps.length; j++) {
 						const mipmap = mipmaps[j];
 
-						if (texture.format !== RGBAFormat && texture.format !== RGBFormat) {
+						if (texture.format !== RGBAFormat) {
 							if (glFormat !== null) {
 								if (useTexStorage) {
 									state.compressedTexSubImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data);
@@ -17319,13 +17316,7 @@
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 			const isMultipleRenderTargets = renderTarget.isWebGLMultipleRenderTargets === true;
 			const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
-			const supportsMips = isPowerOfTwo$1(renderTarget) || isWebGL2; // Handles WebGL2 RGBFormat fallback - #18858
-
-			if (isWebGL2 && texture.format === RGBFormat && (texture.type === FloatType || texture.type === HalfFloatType)) {
-				texture.format = RGBAFormat;
-				console.warn('THREE.WebGLRenderer: Rendering to textures with RGB format is not supported. Using RGBA format instead.');
-			} // Setup framebuffer
-
+			const supportsMips = isPowerOfTwo$1(renderTarget) || isWebGL2; // Setup framebuffer
 
 			if (isCube) {
 				renderTargetProperties.__webglFramebuffer = [];
@@ -17520,16 +17511,15 @@
 			const encoding = texture.encoding;
 			const format = texture.format;
 			const type = texture.type;
-			if (texture.isCompressedTexture === true || texture.format === _SRGBFormat || texture.format === _SRGBAFormat) return image;
+			if (texture.isCompressedTexture === true || texture.format === _SRGBAFormat) return image;
 
 			if (encoding !== LinearEncoding) {
 				// sRGB
 				if (encoding === sRGBEncoding && texture.isVideoTexture !== true) {
 					if (isWebGL2 === false) {
 						// in WebGL 1, try to use EXT_sRGB extension and unsized formats
-						if (extensions.has('EXT_sRGB') === true && (format === RGBFormat || format === RGBAFormat)) {
-							if (format === RGBFormat) texture.format = _SRGBFormat;
-							if (format === RGBAFormat) texture.format = _SRGBAFormat; // it's not possible to generate mips in WebGL 1 with the above formats
+						if (extensions.has('EXT_sRGB') === true && format === RGBAFormat) {
+							texture.format = _SRGBAFormat; // it's not possible to generate mips in WebGL 1 with this extension
 
 							texture.minFilter = LinearFilter;
 							texture.generateMipmaps = false;
@@ -17626,7 +17616,6 @@
 			}
 
 			if (p === AlphaFormat) return gl.ALPHA;
-			if (p === RGBFormat) return gl.RGB;
 			if (p === RGBAFormat) return gl.RGBA;
 			if (p === LuminanceFormat) return gl.LUMINANCE;
 			if (p === LuminanceAlphaFormat) return gl.LUMINANCE_ALPHA;
@@ -17634,12 +17623,11 @@
 			if (p === DepthStencilFormat) return gl.DEPTH_STENCIL;
 			if (p === RedFormat) return gl.RED; // WebGL 1 sRGB fallback
 
-			if (p === _SRGBFormat || p === _SRGBAFormat) {
+			if (p === _SRGBAFormat) {
 				extension = extensions.get('EXT_sRGB');
 
 				if (extension !== null) {
-					if (p === _SRGBFormat) return extension.SRGB_EXT;
-					if (p === _SRGBAFormat) return extension.SRGB_ALPHA_EXT;
+					return extension.SRGB_ALPHA_EXT;
 				} else {
 					return null;
 				}
@@ -18220,15 +18208,10 @@
 						}
 
 						const projectionlayerInit = {
-							colorFormat: attributes.alpha || isMultisample ? gl.RGBA8 : gl.RGB8,
+							colorFormat: renderer.outputEncoding === sRGBEncoding ? gl.SRGB8_ALPHA8 : gl.RGBA8,
 							depthFormat: glDepthFormat,
 							scaleFactor: framebufferScaleFactor
 						};
-
-						if (renderer.outputEncoding === sRGBEncoding) {
-							projectionlayerInit.colorFormat = attributes.alpha || isMultisample ? gl.SRGB8_ALPHA8 : gl.SRGB8;
-						}
-
 						glBinding = new XRWebGLBinding(session, gl);
 						glProjLayer = glBinding.createProjectionLayer(projectionlayerInit);
 						session.updateRenderState({
@@ -18247,7 +18230,7 @@
 							});
 						} else {
 							newRenderTarget = new WebGLRenderTarget(glProjLayer.textureWidth, glProjLayer.textureHeight, {
-								format: attributes.alpha ? RGBAFormat : RGBFormat,
+								format: RGBAFormat,
 								type: UnsignedByteType,
 								depthTexture: new DepthTexture(glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat),
 								stencilBuffer: attributes.stencil,
@@ -22094,7 +22077,6 @@
 	class VideoTexture extends Texture {
 		constructor(video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy) {
 			super(video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
-			this.format = format !== undefined ? format : RGBFormat;
 			this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
 			this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
 			this.generateMipmaps = false;
@@ -36595,7 +36577,6 @@
 	exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
 	exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
 	exports.RGBA_S3TC_DXT5_Format = RGBA_S3TC_DXT5_Format;
-	exports.RGBFormat = RGBFormat;
 	exports.RGBIntegerFormat = RGBIntegerFormat;
 	exports.RGB_ETC1_Format = RGB_ETC1_Format;
 	exports.RGB_ETC2_Format = RGB_ETC2_Format;
@@ -36716,7 +36697,6 @@
 	exports.ZeroSlopeEnding = ZeroSlopeEnding;
 	exports.ZeroStencilOp = ZeroStencilOp;
 	exports._SRGBAFormat = _SRGBAFormat;
-	exports._SRGBFormat = _SRGBFormat;
 	exports.sRGBEncoding = sRGBEncoding;
 
 	Object.defineProperty(exports, '__esModule', { value: true });

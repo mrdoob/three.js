@@ -474,6 +474,12 @@ export default QUnit.module( 'Maths', () => {
 			a.setPosition( b );
 			assert.ok( matrixEquals4( a, c ), 'Passed!' );
 
+			var d = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			var e = new Matrix4().set( 0, 1, 2, - 1, 4, 5, 6, - 2, 8, 9, 10, - 3, 12, 13, 14, 15 );
+
+			d.setPosition( - 1, - 2, - 3 );
+			assert.ok( matrixEquals4( d, e ), 'Passed!' );
+
 		} );
 
 		QUnit.test( 'invert', ( assert ) => {

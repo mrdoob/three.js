@@ -87,7 +87,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.UnsignedShort565Type, 1019, 'UnsignedShort565Type is equal to 1019' );
 		assert.equal( Constants.UnsignedInt248Type, 1020, 'UnsignedInt248Type is equal to 1020' );
 		assert.equal( Constants.AlphaFormat, 1021, 'AlphaFormat is equal to 1021' );
-		assert.equal( Constants.RGBFormat, 1022, 'RGBFormat is equal to 1022' );
 		assert.equal( Constants.RGBAFormat, 1023, 'RGBAFormat is equal to 1023' );
 		assert.equal( Constants.LuminanceFormat, 1024, 'LuminanceFormat is equal to 1024' );
 		assert.equal( Constants.LuminanceAlphaFormat, 1025, 'LuminanceAlphaFormat is equal to 1025' );

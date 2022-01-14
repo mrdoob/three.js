@@ -661,7 +661,7 @@ class SVGLoader extends Loader {
 
 					// Remove empty rules
 					const definitions = Object.fromEntries(
-						Object.entries( stylesheet.style ).filter( ( [ _, v ] ) => v !== '' )
+						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
 					);
 
 					stylesheets[ selectorList[ j ] ] = Object.assign(
