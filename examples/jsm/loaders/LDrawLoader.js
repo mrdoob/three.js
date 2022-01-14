@@ -1402,12 +1402,10 @@ class LDrawPartsBuilderCache {
 
 		// Processes the part subobject information to load child parts and merge geometry onto part
 		// piece object.
-		const processInfoSubobjects = async ( info, parentMaterialHierarchy, subobject = null ) => {
+		const processInfoSubobjects = async ( info, subobject = null ) => {
 
-			// TODO: do we need localMaterials?
 			const subobjects = info.subobjects;
 			const promises = [];
-			const localMaterials = { ...parentMaterialHierarchy, ...info.materials };
 
 			// Trigger load of all subobjects. If a subobject isn't a primitive then load it as a separate
 			// group which lets instruction steps apply correctly.
@@ -1428,7 +1426,7 @@ class LDrawPartsBuilderCache {
 
 					}
 
-					return processInfoSubobjects( parseCache.getData( subobject.fileName ), localMaterials, subobject );
+					return processInfoSubobjects( parseCache.getData( subobject.fileName ), subobject );
 
 				} );
 
@@ -1460,7 +1458,7 @@ class LDrawPartsBuilderCache {
 					subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
 					subobjectGroup.name = subobject.fileName;
 
-					applyMaterialsToMesh( subobjectGroup, subobject.colorCode, localMaterials );
+					applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
 
 					info.group.add( subobjectGroup );
 					continue;
@@ -1553,7 +1551,7 @@ class LDrawPartsBuilderCache {
 			// to material scoping.
 			if ( subobject ) {
 
-				applyMaterialsToMesh( info.group, subobject.colorCode, localMaterials );
+				applyMaterialsToMesh( info.group, subobject.colorCode, info.materials );
 
 			}
 
@@ -1568,7 +1566,7 @@ class LDrawPartsBuilderCache {
 
 		}
 
-		await processInfoSubobjects( info, {} );
+		await processInfoSubobjects( info );
 
 		if ( this.loader.smoothNormals ) {
 
