@@ -1423,7 +1423,12 @@ class LDrawPartsBuilderCache {
 					const subobjectInfo = parseCache.getData( subobject.fileName, false );
 					if ( ! isPrimitiveType( subobjectInfo.type ) ) {
 
-						return this.loadModel( subobject.fileName );
+						return this.loadModel( subobject.fileName ).catch( error => {
+
+							console.warn( error );
+							return null;
+
+						} );
 
 					}
 
@@ -1443,6 +1448,13 @@ class LDrawPartsBuilderCache {
 
 				const subobject = info.subobjects[ i ];
 				const subobjectInfo = subobjectInfos[ i ];
+
+				if ( subobjectInfo === null ) {
+
+					// the subobject failed to load
+					continue;
+
+				}
 
 				// if the subobject was loaded as a separate group then apply the parent scopes materials
 				if ( subobjectInfo.isGroup ) {
