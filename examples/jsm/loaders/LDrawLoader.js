@@ -632,12 +632,13 @@ class LineParser {
 
 }
 
+// Fetches and parses an intermediate representation of LDraw parts files.
 class LDrawParsedCache {
 
 	constructor( loader ) {
 
 		this.loader = loader;
-		this.cache = {};
+		this._cache = {};
 
 	}
 
@@ -1231,7 +1232,7 @@ class LDrawParsedCache {
 	getData( fileName, clone = true ) {
 
 		const key = fileName.toLowerCase();
-		const result = this.cache[ key ];
+		const result = this._cache[ key ];
 		if ( result === null || result instanceof Promise ) {
 
 			return null;
@@ -1255,20 +1256,20 @@ class LDrawParsedCache {
 	async ensureDataLoaded( fileName ) {
 
 		const key = fileName.toLowerCase();
-		if ( ! ( key in this.cache ) ) {
+		if ( ! ( key in this._cache ) ) {
 
 			// replace the promise with a copy of the parsed data for immediate processing
-			this.cache[ key ] = this.fetchData( fileName ).then( text => {
+			this._cache[ key ] = this.fetchData( fileName ).then( text => {
 
 				const info = this.parse( text, fileName );
-				this.cache[ key ] = info;
+				this._cache[ key ] = info;
 				return info;
 
 			} );
 
 		}
 
-		await this.cache[ key ];
+		await this._cache[ key ];
 
 	}
 
@@ -1276,7 +1277,7 @@ class LDrawParsedCache {
 	setData( fileName, text ) {
 
 		const key = fileName.toLowerCase();
-		this.cache[ key ] = this.parse( text, fileName );
+		this._cache[ key ] = this.parse( text, fileName );
 
 	}
 
@@ -1382,14 +1383,15 @@ class LDrawPartsBuilderCache {
 	constructor( loader ) {
 
 		this.loader = loader;
-		this.cache = {};
+		this.parseCache = new LDrawParsedCache();
+		this._cache = {};
 
 	}
 
 	// Convert the given file information into a mesh by processing subobjects.
 	async processIntoMesh( info ) {
 
-		const parseCache = this.loader.parseCache;
+		const parseCache = this.parseCache;
 		const faceMaterials = new Set();
 
 		// Processes the part subobject information to load child parts and merge geometry onto part
@@ -1597,7 +1599,7 @@ class LDrawPartsBuilderCache {
 
 	hasCachedModel( fileName ) {
 
-		return fileName !== null && fileName.toLowerCase() in this.cache;
+		return fileName !== null && fileName.toLowerCase() in this._cache;
 
 	}
 
@@ -1606,7 +1608,7 @@ class LDrawPartsBuilderCache {
 		if ( fileName !== null && this.hasCachedModel( fileName ) ) {
 
 			const key = fileName.toLowerCase();
-			const group = await this.cache[ key ];
+			const group = await this._cache[ key ];
 			return group.clone();
 
 		} else {
@@ -1620,7 +1622,7 @@ class LDrawPartsBuilderCache {
 	// Loads and parses the model with the given file name. Returns a cached copy if available.
 	async loadModel( fileName ) {
 
-		const parseCache = this.loader.parseCache;
+		const parseCache = this.parseCache;
 		const key = fileName.toLowerCase();
 		if ( this.hasCachedModel( fileName ) ) {
 
@@ -1646,9 +1648,9 @@ class LDrawPartsBuilderCache {
 			}
 
 			// Cache object if it's a part so it can be reused later.
-			if ( isPartType( info.type ) ) {
+			if ( true || isPartType( info.type ) ) {
 
-				this.cache[ key ] = promise;
+				this._cache[ key ] = promise;
 
 			}
 
@@ -1663,7 +1665,7 @@ class LDrawPartsBuilderCache {
 	// parses the given model text into a renderable object. Returns cached copy if available.
 	async parseModel( text ) {
 
-		const parseCache = this.loader.parseCache;
+		const parseCache = this.parseCache;
 		const info = parseCache.parse( text );
 		if ( isPartType( info.type ) && this.hasCachedModel( info.fileName ) ) {
 
@@ -1949,10 +1951,8 @@ class LDrawLoader extends Loader {
 		this.materials = [];
 		this.materialLibrary = {};
 
-		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
-		this.parseCache = new LDrawParsedCache( this );
-		this.partsBuilder = new LDrawPartsBuilderCache( this );
+		this.partsCache = new LDrawPartsBuilderCache( this );
 
 		// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
 		this.fileMap = {};
@@ -2014,7 +2014,7 @@ class LDrawLoader extends Loader {
 		fileLoader.setWithCredentials( this.withCredentials );
 		fileLoader.load( url, text => {
 
-			this.partsBuilder
+			this.partsCache
 				.parseModel( text, this.materialLibrary )
 				.then( group => {
 
@@ -2031,7 +2031,7 @@ class LDrawLoader extends Loader {
 
 	parse( text, onLoad ) {
 
-		this.partsBuilder
+		this.partsCache
 			.parseModel( text, this.materialLibrary )
 			.then( group => {
 
