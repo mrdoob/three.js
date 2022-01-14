@@ -1231,55 +1231,24 @@ class LDrawParsedCache {
 
 	}
 
-	// returns whether the cache has loaded or is currently loading the given data
-	hasData( fileName ) {
-
-		const key = fileName.toLowerCase();
-		return key in this.cache;
-
-	}
-
-	// returns whether the data for the given file name is full loaded
-	isDataLoaded( fileName ) {
-
-		const key = fileName.toLowerCase();
-		const cache = this.cache;
-		return key in cache && ! ( cache[ key ] instanceof Promise );
-
-	}
-
 	// returns an (optionally cloned) instance of the data
 	getData( fileName, clone = true ) {
 
 		const key = fileName.toLowerCase();
-		if ( this.hasData( key ) ) {
+		const result = this.cache[ key ];
+		if ( result === null || result instanceof Promise ) {
 
-			if ( clone ) {
+			return null;
 
-				const result = this.cache[ key ];
-				if ( result instanceof Promise ) {
+		}
 
-					return result.then( info => {
+		if ( clone ) {
 
-						return this.cloneResult( info );
-
-					} );
-
-				} else {
-
-					return this.cloneResult( result );
-
-				}
-
-			} else {
-
-				return this.cache[ key ];
-
-			}
+			return this.cloneResult( result );
 
 		} else {
 
-			return null;
+			return result;
 
 		}
 
