@@ -1486,6 +1486,9 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 //
 
+const MAIN_COLOUR_CODE = '16';
+const MAIN_EDGE_COLOUR_CODE = '24';
+
 class LDrawLoader extends Loader {
 
 	constructor( manager ) {
@@ -1631,16 +1634,14 @@ class LDrawLoader extends Loader {
 
 			// Subobjects
 			subobjects: null,
-			numSubobjects: 0,
-			subobjectIndex: 0,
 			inverted: false,
 			category: null,
 			keywords: null,
 
 			// Current subobject
 			currentFileName: null,
-			mainColorCode: parentScope ? parentScope.mainColorCode : '16',
-			mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : '24',
+			mainColorCode: parentScope ? parentScope.mainColorCode : MAIN_COLOUR_CODE,
+			mainEdgeColorCode: parentScope ? parentScope.mainEdgeColorCode : MAIN_EDGE_COLOUR_CODE,
 			matrix: new Matrix4(),
 			type: 'Model',
 			groupObject: null,
@@ -1713,6 +1714,16 @@ class LDrawLoader extends Loader {
 		// Material was not found
 		return null;
 
+	}
+
+	getMainMaterial() {
+
+		return this.getMaterial( MAIN_COLOUR_CODE );
+	}
+
+	getMainEdgeMaterial() {
+
+		return this.getMaterial( MAIN_EDGE_COLOUR_CODE );;
 	}
 
 	parseColorMetaDirective( lineParser ) {
@@ -1975,13 +1986,13 @@ class LDrawLoader extends Loader {
 
 			// Parses next color code and returns a THREE.Material
 
-			if ( ! forEdge && colorCode === '16' ) {
+			if ( ! forEdge && colorCode === MAIN_COLOUR_CODE ) {
 
 				colorCode = mainColorCode;
 
 			}
 
-			if ( forEdge && colorCode === '24' ) {
+			if ( forEdge && colorCode === MAIN_EDGE_COLOUR_CODE ) {
 
 				colorCode = mainEdgeColorCode;
 
@@ -2054,8 +2065,6 @@ class LDrawLoader extends Loader {
 		currentParseScope.category = info.category;
 		currentParseScope.keywords = info.keywords;
 		currentParseScope.subobjects = info.subobjects;
-		currentParseScope.numSubobjects = info.subobjects.length;
-		currentParseScope.subobjectIndex = 0;
 		currentParseScope.type = info.type;
 		currentParseScope.totalFaces = info.totalFaces;
 
@@ -2236,8 +2245,6 @@ class LDrawLoader extends Loader {
 		const parseScope = this.newParseScopeLevel( null, parentScope );
 		parseScope.url = url;
 
-		const parentParseScope = parseScope.parentScope;
-
 		// Set current matrix
 		if ( subobject ) {
 
@@ -2245,13 +2252,12 @@ class LDrawLoader extends Loader {
 			parseScope.inverted = subobject.inverted;
 			parseScope.startingConstructionStep = subobject.startingConstructionStep;
 			parseScope.fileName = subobject.fileName;
-			if ( subobject.colorCode === '16' && parseScope.parentScope ) {
+			if ( subobject.colorCode === MAIN_COLOUR_CODE && parentScope ) {
 
-				const parentScope = parseScope.parentScope;
 				parseScope.mainColorCode = parentScope.mainColorCode;
 				parseScope.mainEdgeColorCode = parentScope.mainEdgeColorCode;
 
-			} else if ( subobject.colorCode !== '16' ) {
+			} else if ( subobject.colorCode !== MAIN_COLOUR_CODE ) {
 
 				parseScope.mainColorCode = subobject.colorCode;
 				parseScope.mainEdgeColorCode = subobject.colorCode;
@@ -2267,7 +2273,7 @@ class LDrawLoader extends Loader {
 		const promises = [];
 		for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
-			promises.push( loadSubobject( parseScope.subobjects[ i ] ) );
+			promises.push( loadSubobject( subobjects[ i ] ) );
 
 		}
 
@@ -2281,7 +2287,7 @@ class LDrawLoader extends Loader {
 		}
 
 		// If it is root object then finalize this object and compute construction steps
-		if ( ! parentParseScope.isFromParse ) {
+		if ( ! parentScope.isFromParse ) {
 
 			this.finalizeObject( parseScope );
 			this.computeConstructionSteps( parseScope.groupObject );

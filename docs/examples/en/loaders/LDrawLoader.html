@@ -37,7 +37,7 @@
 		</p>
 
 		<ul>
-			<li>!COLOUR: Colour and surface finish declarations.</li>
+			<li>!COLOUR: Color and surface finish declarations.</li>
 			<li>BFC: Back Face Culling specification.</li>
 			<li>!CATEGORY: Model/part category declarations.</li>
 			<li>!KEYWORDS: Model/part keywords declarations.</li>
@@ -176,8 +176,40 @@
 
 		<h3>[method:Material getMaterial]( [param:String colourCode] )</h3>
 		<p>
-		[page:String colourCode] — For an already loaded LDraw asset, returns the [page:Material] associated with the parameter colour code.
+		[page:String colourCode] — Color code to get the associated [page:Material].
 		</p>
+
+		<h3>[method:String getMainMaterial]()</h3>
+		<p>
+		Returns the [page:Material] for the main LDraw color.
+		</p>
+
+		<p>For an already loaded LDraw asset, returns the [page:Material] associated with the main color code.
+		This method can be useful to modify the main material of a model or part that exposes it.
+		</p>
+
+		<p>
+		The main color code is the standard way to color an LDraw part. It is '16' for triangles and '24' for edges. Usually
+		a complete model will not expose the main color (that is, no part uses the code '16' at the top level, because they
+		are assigned other specific colors) An LDraw part file on the other hand will expose the code '16' to be colored, and
+		can have additional fixed colors.
+		</p>
+
+		<h3>[method:String getMainEdgeMaterial]()</h3>
+		<p>
+		Returns the [page:Material] for the edges main LDraw color.
+		</p>
+
+		<h3>[method:void preloadMaterials]( [param:String path] )</h3>
+		<p>
+		[page:String path] — Path of the LDraw materials asset.
+		</p>
+
+		<p>This async method preloads materials from a single LDraw file. In the official parts library there is a special
+		file which is loaded always the first (LDConfig.ldr) and contains all the standard color codes. This method is
+		intended to be used with not packed files, for example in an editor where materials are preloaded and parts are
+		loaded on demand.</p>
+
 
 		<h2>Source</h2>
 
