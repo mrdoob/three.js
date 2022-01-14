@@ -1523,7 +1523,7 @@ class LDrawPartsBuilderCache {
 
 					tri.colorCode = tri.colorCode === '16' ? colorCode : tri.colorCode;
 					tri.material = tri.material || getMaterialFromCode( tri.colorCode, colorCode, info.materials, false );
-					faceMaterials.add( tri.material );
+					faceMaterials.add( tri.colorCode );
 
 					// If the scale of the object is negated then the triangle winding order
 					// needs to be flipped.
@@ -1556,12 +1556,7 @@ class LDrawPartsBuilderCache {
 		// Track material use to see if we need to use the normal smooth slow path for hard edges.
 		for ( let i = 0, l = info.faces; i < l; i ++ ) {
 
-			const material = info.faces[ i ].material;
-			if ( material ) {
-
-				faceMaterials.add( material );
-
-			}
+			faceMaterials.add( info.faces[ i ].colorCode );
 
 		}
 
