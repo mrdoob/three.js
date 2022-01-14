@@ -689,7 +689,7 @@ class GLTFWriter {
 
 	}
 
-	buildOMRTexture( material ) {
+	buildORMTexture( material ) {
 
 		const occlusion = material.aoMap?.image;
 		const roughness = material.roughnessMap?.image;
@@ -1256,12 +1256,12 @@ class GLTFWriter {
 
 		}
 
-		const omrTexture = this.buildOMRTexture( material );
+		const ormTexture = this.buildORMTexture( material );
 
 		// pbrMetallicRoughness.metallicRoughnessTexture
 		if ( material.metalnessMap || material.roughnessMap ) {
 
-			const metalRoughMapDef = { index: this.processTexture( omrTexture ) };
+			const metalRoughMapDef = { index: this.processTexture( ormTexture ) };
 			this.applyTextureTransform( metalRoughMapDef, material.metalnessMap || material.roughnessMap );
 			materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
@@ -1329,7 +1329,7 @@ class GLTFWriter {
 		if ( material.aoMap ) {
 
 			const occlusionMapDef = {
-				index: this.processTexture( omrTexture ),
+				index: this.processTexture( ormTexture ),
 				texCoord: 1
 			};
 
