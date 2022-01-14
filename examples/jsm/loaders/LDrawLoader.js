@@ -1631,8 +1631,6 @@ class LDrawLoader extends Loader {
 
 			// Subobjects
 			subobjects: null,
-			numSubobjects: 0,
-			subobjectIndex: 0,
 			inverted: false,
 			category: null,
 			keywords: null,
@@ -2054,8 +2052,6 @@ class LDrawLoader extends Loader {
 		currentParseScope.category = info.category;
 		currentParseScope.keywords = info.keywords;
 		currentParseScope.subobjects = info.subobjects;
-		currentParseScope.numSubobjects = info.subobjects.length;
-		currentParseScope.subobjectIndex = 0;
 		currentParseScope.type = info.type;
 		currentParseScope.totalFaces = info.totalFaces;
 
