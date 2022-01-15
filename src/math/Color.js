@@ -298,44 +298,6 @@ class Color {
 
 	}
 
-	copyGammaToLinear( color, gammaFactor = 2.0 ) {
-
-		this.r = Math.pow( color.r, gammaFactor );
-		this.g = Math.pow( color.g, gammaFactor );
-		this.b = Math.pow( color.b, gammaFactor );
-
-		return this;
-
-	}
-
-	copyLinearToGamma( color, gammaFactor = 2.0 ) {
-
-		const safeInverse = ( gammaFactor > 0 ) ? ( 1.0 / gammaFactor ) : 1.0;
-
-		this.r = Math.pow( color.r, safeInverse );
-		this.g = Math.pow( color.g, safeInverse );
-		this.b = Math.pow( color.b, safeInverse );
-
-		return this;
-
-	}
-
-	convertGammaToLinear( gammaFactor ) {
-
-		this.copyGammaToLinear( this, gammaFactor );
-
-		return this;
-
-	}
-
-	convertLinearToGamma( gammaFactor ) {
-
-		this.copyLinearToGamma( this, gammaFactor );
-
-		return this;
-
-	}
-
 	copySRGBToLinear( color ) {
 
 		this.r = SRGBToLinear( color.r );
@@ -601,4 +563,4 @@ Color.prototype.r = 1;
 Color.prototype.g = 1;
 Color.prototype.b = 1;
 
-export { Color };
+export { Color, SRGBToLinear };

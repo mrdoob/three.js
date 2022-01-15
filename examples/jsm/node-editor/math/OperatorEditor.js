@@ -1,5 +1,4 @@
-import { ObjectNode } from '../core/ObjectNode.js';
-import { SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
 import { OperatorNode, FloatNode } from '../../renderers/nodes/Nodes.js';
 
 const NULL_VALUE = new FloatNode();
@@ -10,9 +9,7 @@ export class OperatorEditor extends ObjectNode {
 
 		const node = new OperatorNode( '+', NULL_VALUE, NULL_VALUE );
 
-		super( 'Float', 1, node );
-
-		this.title.setStyle( 'green' );
+		super( 'Operator', 1, node, 250 );
 
 		const opInput = new SelectInput( [
 			{ name: '+ Addition', value: '+' },

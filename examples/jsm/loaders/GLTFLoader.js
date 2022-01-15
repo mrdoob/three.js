@@ -47,7 +47,6 @@ import {
 	PropertyBinding,
 	Quaternion,
 	QuaternionKeyframeTrack,
-	RGBFormat,
 	RepeatWrapping,
 	Skeleton,
 	SkinnedMesh,
@@ -1445,7 +1444,7 @@ class GLTFTextureTransformExtension {
 /**
  * Specular-Glossiness Extension
  *
- * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Archived/KHR_materials_pbrSpecularGlossiness
  */
 
 /**
@@ -1478,7 +1477,6 @@ class GLTFMeshStandardSGMaterial extends MeshStandardMaterial {
 			'vec3 specularFactor = specular;',
 			'#ifdef USE_SPECULARMAP',
 			'	vec4 texelSpecular = texture2D( specularMap, vUv );',
-			'	texelSpecular = sRGBToLinear( texelSpecular );',
 			'	// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture',
 			'	specularFactor *= texelSpecular.rgb;',
 			'#endif'
@@ -2253,7 +2251,7 @@ class GLTFParser {
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
+		if ( typeof createImageBitmap !== 'undefined' && /Firefox|Safari/.test( navigator.userAgent ) === false ) {
 
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
 
@@ -3179,8 +3177,8 @@ class GLTFParser {
 
 		} else {
 
-			materialParams.format = RGBFormat;
 			materialParams.transparent = false;
+			materialParams.alphaWrite = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {
 

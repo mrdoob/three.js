@@ -258,11 +258,10 @@ class NodeBuilder {
 	getTypeLength( type ) {
 
 		const vecType = this.getVectorType( type );
+		const vecNum = /vec([2-4])/.exec( vecType );
 
-		if ( vecType === 'float' ) return 1;
-		if ( vecType === 'vec2' ) return 2;
-		if ( vecType === 'vec3' ) return 3;
-		if ( vecType === 'vec4' ) return 4;
+		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
+		if ( vecType === 'float' || vecType === 'bool' ) return 1;
 
 		return 0;
 
@@ -625,7 +624,7 @@ class NodeBuilder {
 
 	getSignature() {
 
-		return `// Three.js r${ REVISION } • NodeMaterial System\n`;
+		return `// Three.js r${ REVISION } - NodeMaterial System\n`;
 
 	}
 

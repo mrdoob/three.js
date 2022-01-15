@@ -248,7 +248,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 ) firstPoint.copy( point );
 
 						}
 
@@ -440,7 +440,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 ) firstPoint.copy( point );
 
 						}
 
@@ -659,9 +659,14 @@ class SVGLoader extends Loader {
 
 				for ( let j = 0; j < selectorList.length; j ++ ) {
 
+					// Remove empty rules
+					const definitions = Object.fromEntries(
+						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
+					);
+
 					stylesheets[ selectorList[ j ] ] = Object.assign(
 						stylesheets[ selectorList[ j ] ] || {},
-						stylesheet.style
+						definitions
 					);
 
 				}

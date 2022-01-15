@@ -208,7 +208,11 @@ class NRRDLoader extends Loader {
 			if ( ! headerObject.vectors ) {
 
 				//if no space direction is set, let's use the identity
-				headerObject.vectors = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
+				headerObject.vectors = [ ];
+				headerObject.vectors.push( [ 1, 0, 0 ] );
+				headerObject.vectors.push( [ 0, 1, 0 ] );
+				headerObject.vectors.push( [ 0, 0, 1 ] );
+
 				//apply spacing if defined
 				if ( headerObject.spacings ) {
 
@@ -216,7 +220,11 @@ class NRRDLoader extends Loader {
 
 						if ( ! isNaN( headerObject.spacings[ i ] ) ) {
 
-							headerObject.vectors[ i ].multiplyScalar( headerObject.spacings[ i ] );
+							for ( let j = 0; j <= 2; j ++ ) {
+
+								headerObject.vectors[ i ][ j ] *= headerObject.spacings[ i ];
+
+							}
 
 						}
 

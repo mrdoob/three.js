@@ -89,7 +89,6 @@
 				const hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
@@ -112,11 +111,9 @@
 
 
 				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				rgbmCubeMap = new RGBMLoader()
+				rgbmCubeMap = new RGBMLoader().setMaxRange( 16 )
 					.setPath( './textures/cube/pisaRGBM16/' )
 					.loadCubemap( rgbmUrls, function () {
-
-						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 
 						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
 

@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="utf-8">
+    <title>의 원시 모델</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 의 원시 모델">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="/manual/ko/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>의 원시 모델</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>※ 이 글은 Three.js의 튜토리얼 시리즈로서,
+먼저 <a href="fundamentals.html">Three.js의 기본 구조에 관한 글</a>을
+읽고 오길 권장합니다.</p>
+<p>Three.js에는 다양한 원시 모델이 있습니다. 먼저 Three.js의 원시 모델이란,
+주로 런타임에서 다양한 인자들로 정의한 3D 모양을 의미합니다.</p>
+<p>원시 모델은 주로 구체로 공 모양을 만든다거나, 수많은 육면체를 모아
+3D 그래프를 만드는 데 사용합니다. 또한 3D에 입문한다거나, 모의
+프로젝트를 만들 때 사용하기도 하죠. 물론 대부분의 3D 앱은 그래픽
+전문가가 <a href="https://blender.org">블렌더(Blender)</a>, <a href="https://www.autodesk.com/products/maya/">마야(Maya)</a>,
+<a href="https://www.maxon.net/en-us/products/cinema-4d/">시네마 4D(Cinema 4D)</a> 등으로
+만든 그래픽 모델을 사용합니다. Three.js도 이런 외부 모델을 불러올 수
+있지만, 이건 나중에 알아보기로 하고 일단 이 글에서는 사용 가능한 원시
+모델에 무엇이 있는지 살펴보도록 하죠.</p>
+<p>앞으로 소개할 원시 모델들은 대부분 기본값이 있으므로 필요에 따라
+인자를 넣어주면 됩니다.</p>
+<div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">육면체(Box)</div>
+<div id="Diagram-CircleGeometry" data-primitive="CircleGeometry">원(flat circle)</div>
+<div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">원뿔(Cone)</div>
+<div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">원통(Cylinder)</div>
+<div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">십이면체(Dodecahedron)</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">사각(bevel)을 주어 깍아낸(extruded) 2D 모양입니다.
+아래에서는 하트 모양으로 깍아냈죠. <code class="notranslate" translate="no">ExtrudedGeometry</code>는 나중에 설명할
+<a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>과 <a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>의 기초 모델입니다.</div>
+<div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">이십면체(Icosahedron)</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">선(line)을 회전시켜 만든 모양입니다. 램프, 볼링핀, 초, 초 받침, 와인잔, 유리잔 등이 있죠(물레로 도자기를 만드는 것처럼. 역주). 2D 형태를 점(point, Vector2 클래스를 말함. 역주)을 사용해 지정하고, Three.js에게 축을 따라 세분값(아래 예제의 <code class="notranslate" translate="no">segments</code> 값. 역주)과 회전값(아래 예제의 <code class="notranslate" translate="no">phiLength</code> 값. 역주)을 지정해주면 됩니다.</div>
+<div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">팔면체(Octahedron)</div>
+<div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">2D 격자값(격자 하나의 벡터값)을 받아 3D 값을 반환하는 함수를 인자로 전달하여 면을 만듭니다.</div>
+<div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">2D 평면(2D plane)</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">다면체입니다. 주어진 3D 점들(아래 <code class="notranslate" translate="no">verticesOfCube</code>. 역주)을 중심으로 삼각형(아래 <code class="notranslate" translate="no">indicesOfFaces</code>. 역주)을 구 형태로 잇습니다.</div>
+<div id="Diagram-RingGeometry" data-primitive="RingGeometry">중앙이 빈 2D 디스크(disc)입니다.</div>
+<div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">삼각형으로 이루어진 2D 윤곽선입니다.</div>
+<div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">구(Sphere)</div>
+<div id="Diagram-TetrahedronGeometry" data-primitive="TetrahedronGeometry">사면체(tetrahedron)</div>
+<div id="Diagram-TextGeometry" data-primitive="TextGeometry">3D 폰트와 문자열로 만든 3D 텍스트입니다.</div>
+<div id="Diagram-TorusGeometry" data-primitive="TorusGeometry">원환체(torus), 도넛(donut)</div>
+<div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">원환체 매듭(torus knot)</div>
+<div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">패스를 따라 이어진 원입니다.</div>
+<div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">다른 <code class="notranslate" translate="no">geometry</code>를 받는 헬퍼 객체로, 각 면 사이의 각이 일정 값 이상일 때만 모서리를 표시합니다. 상단의 육면체 예제를 보면 육면체를 만드는 삼각형이 표면에 전부 표시된 것을 확인할 수 있는데, <a href="/docs/#api/ko/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>를 사용할 경우 표면에 있던 선들이 전부 사라집니다. 아래 예제의 <code class="notranslate" translate="no">thresholdAngle</code> 값을 조정해 해당 값 이하인 모서리가 전부 사라지는 것을 확인해보세요.</div>
+<div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">매개변수로 받은 <code class="notranslate" translate="no">geometry</code>의 모서리 하나당 하나의 선분(2개의 점)을 가진 <code class="notranslate" translate="no">geometry</code>를 생성합니다. WebGl은 보통 선분 하나당 2개의 점을 필요로 합니다. 때문에 이 모델을 사용하지 않는 경우, 모서리가 없어지거나 추가되는 현상이 발생할 수 있습니다. 예를 들어 2D 삼각형을 만드는 경우, 대부분 3개의 점을 이용해 삼각형을 만들려고 할 겁니다. <code class="notranslate" translate="no">wireframe: true</code>라는 옵션이 있기는 하나, 이를 이용해 삼각형을 만들면 (WebGl은 삼각형을 만들 때 6개의 점을 요구하므로. 역주) 출력되는 건 선 하나 뿐일 겁니다. 삼각형 <code class="notranslate" translate="no">geometry</code>를 <a href="/docs/#api/ko/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>에 넘겨주면 6개의 점과 3개의 선분을 가진 새 <code class="notranslate" translate="no">geometry</code>를 생성합니다.</div>
+
+<p><a href="custom-buffergeometry.html">커스텀 geometry를 만드는 법</a>에 대해서는
+나중에 자세히 다룰 것이므로, 지금은 각 원시 모델로 예제를 만들어 보겠습니다.
+예제 코드는 <a href="responsive.html">지난 글</a>에서 썼던 예제를 쓸 거에요.</p>
+<p>먼저 배경색을 지정합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++scene.background = new THREE.Color(0xAAAAAA);
+</pre>
+<p>이는 옅은 회색으로 배경을 칠하라는 의미이죠.</p>
+<p>모든 물체를 봐야 하므로 카메라도 수정합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const fov = 75;
++const fov = 40;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+-const far = 5;
++const far = 1000;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.z = 120;
+</pre>
+<p>다음으로 x, y 좌표와 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 매개변수로 받아 씬에 추가하는 <code class="notranslate" translate="no">addObject</code>
+함수를 만듭니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const objects = [];
+const spread = 15;
+
+function addObject(x, y, obj) {
+  obj.position.x = x * spread;
+  obj.position.y = y * spread;
+
+  scene.add(obj);
+  objects.push(obj);
+}
+</pre>
+<p>물체를 무작위로 채색하는 함수도 하나 만듭니다. hue, 채도, 명도로
+색을 지정하는 <a href="/docs/#api/ko/math/Color"><code class="notranslate" translate="no">Color</code></a>의 기능을 활용할 거에요.</p>
+<p><code class="notranslate" translate="no">hue</code>는 0부터 1까지의 색상값을 고리 모양으로 배치한 것으로,
+12시는 빨강, 4시는 녹색, 8시는 파랑입니다. <code class="notranslate" translate="no">채도(saturation)</code>
+또한 마찬가지로 0부터 1까지이며, 0은 색이 가장 옅은 것, 1은
+색이 가장 진한 것을 의미합니다. <code class="notranslate" translate="no">명도(luminance)</code>에서 0.0은
+검정, 1.0은 하양으로, 0.5가 가장 색이 가장 풍부합니다. 쉽게
+말해 명도가 0.0에서 0.5로 갈수록 검정에서 <code class="notranslate" translate="no">hue</code>에 가까워지고,
+0.5에서 1.0으로 갈수록 <code class="notranslate" translate="no">hue</code>에서 하양에 가까워지는 것이죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function createMaterial() {
+  const material = new THREE.MeshPhongMaterial({
+    side: THREE.DoubleSide,
+  });
+
+  const hue = Math.random();
+  const saturation = 1;
+  const luminance = .5;
+  material.color.setHSL(hue, saturation, luminance);
+
+  return material;
+}
+</pre>
+<p>위 예제에서는 <code class="notranslate" translate="no">material</code>에 <code class="notranslate" translate="no">side: THREE.DoubleSide</code> 옵션을
+지정했습니다. 이는 Three.js에게 삼각형의 양면 모두를 렌더링하라고
+알려주는 것이죠. 구나 정육면체 같은 물체는 보이지 않는 안쪽 면을
+굳이 렌더링할 이유가 없지만, 예제의 경우 <a href="/docs/#api/ko/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a>나
+<a href="/docs/#api/ko/geometries/ShapeGeometry"><code class="notranslate" translate="no">ShapeGeometry</code></a> 등 안쪽 면이 없는 물체를 만들 것이므로
+<code class="notranslate" translate="no">side: THREE.DoubleSide</code> 옵션을 설정하지 않으면 반대편에서 봤을 때
+물체가 사라진 것처럼 보일 겁니다.</p>
+<p>중요한 건 <code class="notranslate" translate="no">side: THREE.DoubleSide</code> 옵션은 <strong>렌더링 속도에 영향을 줍니다</strong>.
+실제로 사용할 때는 필요한 물체에만 지정하는 게 좋겠지만, 지금은
+물체의 수가 많지 않으므로 일단 넘어가겠습니다.</p>
+<p>다음으로 <code class="notranslate" translate="no">addSolidGeometry</code> 함수를 만듭니다. 이 함수는 매개변수로
+받은 <code class="notranslate" translate="no">geometry</code>와 앞서 만든 <code class="notranslate" translate="no">createMaterial</code> 함수를 사용해
+무작위로 색칠한 물체를 만들고, <code class="notranslate" translate="no">addObject</code> 함수로 씬에 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addSolidGeometry(x, y, geometry) {
+  const mesh = new THREE.Mesh(geometry, createMaterial());
+  addObject(x, y, mesh);
+}
+</pre>
+<p>이제 이를 활용해 주요 원시 모델을 생성할 수 있습니다.
+예를 들어 정육면체를 만든다고 해보죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const width = 8;
+  const height = 8;
+  const depth = 8;
+  addSolidGeometry(-2, -2, new THREE.BoxGeometry(width, height, depth));
+}
+</pre>
+<p>아래 코드를 보면 각 <code class="notranslate" translate="no">geometry</code>마다 비슷한 단락으로 이루어진 것을 확인할 수 있습니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/primitives.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>몇몇 예외가 보일 텐데, 가장 크게 두드러진 것은 아마 <a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>일 겁니다.
+<a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>는 텍스트의 <code class="notranslate" translate="no">mesh</code>를 생성하기 위해 3D 폰트 데이터를 필요로 합니다.
+이 데이터는 비동기로 로드되므로, 객체를 생성하기 전에 3D 폰트 데이터가 로드되기를 기다려야
+하죠. 폰트 로드 과정을 프로미스화 하면 이 과정를 더 쉽게 만들 수 있습니다. 먼저 <a href="/docs/#api/ko/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a>를
+생성하고, Promise를 반환하는 <code class="notranslate" translate="no">loadFont</code> 함수를 만들어 요청을 Promise로 감쌉니다.
+그리고 <code class="notranslate" translate="no">doit</code>이라는 비동기 함수를 만들어 <code class="notranslate" translate="no">await</code> 키워드로 폰트를 로드한 후, <code class="notranslate" translate="no">geometry</code>를
+만들고 <code class="notranslate" translate="no">addObject</code> 함수로 씬에 추가하죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new FontLoader();
+  // promisify font loading
+  function loadFont(url) {
+    return new Promise((resolve, reject) =&gt; {
+      loader.load(url, resolve, undefined, reject);
+    });
+  }
+
+  async function doit() {
+    const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');  /* threejs.org: url */
+    const geometry = new TextGeometry('three.js', {
+      font: font,
+      size: 3.0,
+      height: .2,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.15,
+      bevelSize: .3,
+      bevelSegments: 5,
+    });
+    const mesh = new THREE.Mesh(geometry, createMaterial());
+    geometry.computeBoundingBox();
+    geometry.boundingBox.getCenter(mesh.position).multiplyScalar(-1);
+
+    const parent = new THREE.Object3D();
+    parent.add(mesh);
+
+    addObject(-1, -1, parent);
+  }
+  doit();
+}
+</pre>
+<p>또 다른 차이점은 Three.js의 텍스트는 기본적으로 중앙을 중심으로 돌지
+않는다는 것입니다. 기본 회전축은 왼쪽 모서리로, 중앙을 중심으로 돌게
+하려면 Three.js에게 <code class="notranslate" translate="no">geometry</code>의 bounding box(경계 좌표)를 계산해
+달라고 요청한 뒤, bounding box의 <code class="notranslate" translate="no">getCenter</code> 메서드에 해당 <code class="notranslate" translate="no">mesh</code>의
+위치값 객체를 넘겨주어야 합니다. 이러면 <code class="notranslate" translate="no">getCenter</code> 메서드는 넘겨받은
+위치값의 중앙 좌표값을 자신의 위치값으로 복사합니다. 그리고 변경된 위치값
+객체를 반환하는데, 이 객체의 <code class="notranslate" translate="no">multiplyScalar(-1)</code> 메서드로 전체 텍스트의
+회전 중심이 텍스트의 중앙에 오도록 조정할 수 있습니다.</p>
+<p>만약 이대로 다른 예제처럼 <code class="notranslate" translate="no">addSolidGeometry</code> 함수를 호출한다면 위치값을
+재할당해버릴 겁니다. 그러니 대신 Three.js의 씬 그래프의 기본 요소(node)인
+<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 하나 만듭니다(<a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 또한 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식 요소임).
+씬 그래프가 어떻게 작동하는가에 대해서는 <a href="scenegraph.html">다른 글</a>에서 자세히 다룰 것이므로,
+당장은 DOM 요소처럼 자식 요소가 부모 요소를 기반으로 생성된다는
+것만 알아둡시다. <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 생성해 텍스트를 감싸면 텍스트의 회전 중심은
+유지한 채로 위치값을 얼마든지 조정할 수 있습니다.</p>
+<p>만약 <code class="notranslate" translate="no">addSolidGeometry</code>를 그냥 사용한다면 아래 왼쪽의 예제처럼
+회전축이 아예 빗나가겠죠.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives-text.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/primitives-text.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>예제의 왼쪽 텍스트는 회전축이 중앙에서 벗어났지만, 오른쪽 텍스트는
+중앙을 중심으로 회전합니다.</p>
+<p>다른 예외는 2개의 선을 기반으로 한 <a href="/docs/#api/ko/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>와 <a href="/docs/#api/ko/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>입니다.
+<code class="notranslate" translate="no">addSolidGeometry</code> 함수 대신 아래와 같은 <code class="notranslate" translate="no">addLineGeometry</code> 함수를 호출했죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addLineGeometry(x, y, geometry) {
+  const material = new THREE.LineBasicMaterial({color: 0x000000});
+  const mesh = new THREE.LineSegments(geometry, material);
+  addObject(x, y, mesh);
+}
+</pre>
+<p>이 함수는 검은 <a href="/docs/#api/ko/materials/LineBasicMaterial"><code class="notranslate" translate="no">LineBasicMaterial</code></a>을 만들고 이를 기반으로 <a href="/docs/#api/ko/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>를
+만듭니다. <a href="/docs/#api/ko/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>는 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>의 자식 객체로, Three.js의 선분(line segments, 선분 하나당 점 2개)
+렌더링을 도와주는 객체입니다.</p>
+<p>원시 모델을 생성할 때 인자는 차이가 있으니 <a href="https://threejs.org/docs/">공식 문서</a>를 참고하시거나,
+각 원시 모델 예시 위에 공식 문서 링크가 있으니 해당 링크를 참고하시기 바랍니다.</p>
+<p>소개하지 않은 클래스 중에 위 패턴으로는 사용하기 어려운 클래스가 있습니다.
+<a href="/docs/#api/ko/materials/PointsMaterial"><code class="notranslate" translate="no">PointsMaterial</code></a>과 <a href="/docs/#api/ko/objects/Points"><code class="notranslate" translate="no">Points</code></a> 클래스인데요. <a href="/docs/#api/ko/objects/Points"><code class="notranslate" translate="no">Points</code></a>는 <code class="notranslate" translate="no">Geometry</code>나 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>를
+매개변수로 받는다는 점에서 위 예제의 <a href="/docs/#api/ko/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>와 비슷하나, 선 대신 각 정점에
+점(point)을 그린다는 점이 다릅니다. 또 점의 크기를 지정하는 <a href="/docs/#api/ko/materials/PointsMaterial#size"><code class="notranslate" translate="no">size</code></a>도
+<a href="/docs/#api/ko/materials/PointsMaterial"><code class="notranslate" translate="no">PointsMaterial</code></a>에 함께 넘겨주어야 하죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const radius = 7;
+const widthSegments = 12;
+const heightSegments = 8;
+const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+const material = new THREE.PointsMaterial({
+    color: 'red',
+    size: 0.2,     // 글로벌 단위
+});
+const points = new THREE.Points(geometry, material);
+scene.add(points);
+</pre>
+<div class="spread">
+<div data-diagram="Points"></div>
+</div>
+
+<p><a href="/docs/#api/ko/materials/PointsMaterial#sizeAttenuation"><code class="notranslate" translate="no">sizeAttenuation</code></a>을 <code class="notranslate" translate="no">false</code>로 지정하면
+카메라로부터의 거리에 상관없이 점의 크기가 일정하게 보입니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.PointsMaterial({
+    color: 'red',
++    sizeAttenuation: false,
++    size: 3,       // 픽셀
+-    size: 0.2,     // 글로벌 단위
+});
+...
+</pre>
+<div class="spread">
+<div data-diagram="PointsUniformSize"></div>
+</div>
+
+<p>또 하나 집고 넘어가야 하는 것은 Three.js의 물체 대부분이
+세분값에 대한 설정이 다양하다는 겁니다. 좋은 예로 구체가
+있죠. 구체는 얼마나 물체를 세분할지에 대한 값을 매개변수로
+받습니다.</p>
+<div class="spread">
+<div data-diagram="SphereGeometryLow"></div>
+<div data-diagram="SphereGeometryMedium"></div>
+<div data-diagram="SphereGeometryHigh"></div>
+</div>
+
+<p>위 그림에서 첫 번째 구체는 둘레로 5개, 높이로 3개의 면으로 분할되었습니다.
+이는 15개의 면 또는 30개의 삼각형이죠. 두 번째 구체는 24 x 10, 240면 또는
+480개의 삼각형입니다. 마지막 구체는 50 x 50으로 무려 2500면 또는 5000개의
+삼각형에 해당하죠.</p>
+<p>얼마나 많이 세분할지는 필요에 따라 다르게 설정하면 됩니다. 위 예제만 보면
+많이 분할할수록 좋아보이나, 선과 플랫 쉐이딩(flat shading)만 제거해도
+아래와 같은 결과가 나옵니다.</p>
+<div class="spread">
+<div data-diagram="SphereGeometryLowSmooth"></div>
+<div data-diagram="SphereGeometryMediumSmooth"></div>
+<div data-diagram="SphereGeometryHighSmooth"></div>
+</div>
+
+<p>5000 삼각형인 오른쪽 구체가 480 삼각형인 중간 구체보다 훨씬 좋다고
+이야기하기 모호합니다. 만약 지구본을 만들기 위한 구체 하나를 만든다고
+하면, 10000개의 삼각형으로 구체를 만드는 것이 나쁜 선택은 아닙니다.
+하지만 1000개의 삼각형으로 만든 구체 1000개를 렌더링할 경우, 이는 총
+천만개의 삼각형이 됩니다. 이를 부드럽게 움직이려면 브라우저가 1초에
+60프레임을 렌더링해야 하니, 결과적으로 이는 1초에 6억개의 삼각형을
+렌더링하라고 하는 것과 같죠. 절대 간단한 연산이 아닙니다.</p>
+<p>물론 선택이 쉬운 경우도 있습니다. 예를 들어 평면을 분할한다고 해보죠.</p>
+<div class="spread">
+<div data-diagram="PlaneGeometryLow"></div>
+<div data-diagram="PlaneGeometryHigh"></div>
+</div>
+
+<p>왼쪽의 평면은 2 삼각형입니다. 오른쪽 평면은 200 삼각형이죠.
+구체와 다르게 평면은 대부분의 경우 퀄리티 저하가 아예 없습니다.
+평면을 변형해 다른 것을 만드는 경우가 아니면, 평면을 분할해야할
+이유는 없죠.</p>
+<p>그러니 상황에 따라 적절한 값을 선택하기 바랍니다. 물체를 덜 분할할수록
+성능도 올라가고 메모리 점유율도 낮아질 테니까요. 상황에 따라 어떤 것을
+포기할지 결정하는 것은 순전히 여러분의 몫입니다.</p>
+<p>원시 모델 중 어떤 것도 실제 프로젝트에 적용하기가 어렵다면,
+<a href="load-obj.html">.obj 파일</a> 또는 <a href="load-gltf.html">.gltf 파일</a>을
+로드하여 사용할 수 있습니다. 또는
+<a href="custom-buffergeometry.html">커스텀 BufferGeometry</a>를 생성할 수도 있죠.</p>
+<p>다음 장에서는 <a href="scenegraph.html">씬 그래프와 그 사용법</a>에 대해
+알아보겠습니다.</p>
+<p><link rel="stylesheet" href="../resources/threejs-primitives.css"></p>
+<script type="module" src="../resources/threejs-primitives.js"></script>
+
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

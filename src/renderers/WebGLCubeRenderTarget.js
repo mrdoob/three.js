@@ -37,8 +37,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
-		this.texture._needsFlipEnvMap = false;
-
 	}
 
 	fromEquirectangularTexture( renderer, texture ) {

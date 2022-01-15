@@ -1,13 +1,10 @@
 import {
 	Color,
 	FrontSide,
-	LinearFilter,
-	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
 	Plane,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsLib,
 	UniformsUtils,
@@ -18,8 +15,8 @@ import {
 
 /**
  * Work based on :
- * http://slayvin.net : Flat mirror for three.js
- * http://www.adelphi.edu/~stemkoski : An implementation of water shader based on the flat mirror
+ * https://github.com/Slayvin: Flat mirror for three.js
+ * https://home.adelphi.edu/~stemkoski/ : An implementation of water shader based on the flat mirror
  * http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
  */
 
@@ -64,19 +61,7 @@ class Water extends Mesh {
 
 		const mirrorCamera = new PerspectiveCamera();
 
-		const parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBFormat
-		};
-
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-			renderTarget.texture.generateMipmaps = false;
-
-		}
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
 
 		const mirrorShader = {
 

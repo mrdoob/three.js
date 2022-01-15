@@ -40,13 +40,13 @@
 			const library = {};
 			let serialized = false;
 			const textures = {
-				brick: { url: 'textures/brick_diffuse.jpg' },
-				grass: { url: 'textures/terrain/grasslight-big.jpg' },
-				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg' },
-				decalDiffuse: { url: 'textures/decal/decal-diffuse.png' },
-				decalNormal: { url: 'textures/decal/decal-normal.jpg' },
-				cloud: { url: 'textures/lava/cloud.png' },
-				spherical: { url: 'textures/envmap.png' }
+				brick: { url: 'textures/brick_diffuse.jpg', encoding: THREE.sRGBEncoding },
+				grass: { url: 'textures/terrain/grasslight-big.jpg', encoding: THREE.sRGBEncoding },
+				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg', encoding: THREE.LinearEncoding },
+				decalDiffuse: { url: 'textures/decal/decal-diffuse.png', encoding: THREE.sRGBEncoding },
+				decalNormal: { url: 'textures/decal/decal-normal.jpg', encoding: THREE.LinearEncoding },
+				cloud: { url: 'textures/lava/cloud.png', encoding: THREE.sRGBEncoding },
+				spherical: { url: 'textures/envmap.png', encoding: THREE.sRGBEncoding }
 			};
 
 			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
@@ -59,6 +59,7 @@
 
 					texture = textures[ name ].texture = new THREE.TextureLoader().load( textures[ name ].url );
 					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+					texture.encoding = textures[ name ].encoding;
 
 					library[ texture.uuid ] = texture;
 
@@ -95,7 +96,7 @@
 
 			const cubemap = function () {
 
-				const path = "textures/cube/Park2/";
+				const path = 'textures/cube/Park2/';
 				const format = '.jpg';
 				const urls = [
 					path + 'posx' + format, path + 'negx' + format,
@@ -175,54 +176,58 @@
 				gui = new GUI();
 
 				gui.add( param, 'example', {
+					'basic / blur': 'blur',
+					'basic / bump': 'bump',
+					'basic / color-adjustment': 'color-adjustment',
+					'basic / layers': 'layers',
 					'basic / mesh-standard': 'mesh-standard',
-					'basic / standard': 'standard',
+					'basic / phong': 'phong',
 					'basic / physical': 'physical',
 					'basic / prem': 'prem',
-					'basic / phong': 'phong',
-					'basic / layers': 'layers',
 					'basic / rim': 'rim',
-					'basic / color-adjustment': 'color-adjustment',
-					'basic / uv-transform': 'uv-transform',
-					'basic / bump': 'bump',
-					'basic / blur': 'blur',
 					'basic / spherical-reflection': 'spherical-reflection',
-					'adv / fresnel': 'fresnel',
-					'adv / saturation': 'saturation',
-					'adv / top-bottom': 'top-bottom',
-					'adv / skin': 'skin',
-					'adv / skin-phong': 'skin-phong',
+					'basic / standard': 'standard',
+					'basic / uv-transform': 'uv-transform',
+
+					'adv / bias': 'bias',
+					'adv / camera-depth': 'camera-depth',
 					'adv / caustic': 'caustic',
+					'adv / conditional': 'conditional',
 					'adv / displace': 'displace',
 					'adv / dissolve': 'dissolve',
 					'adv / dissolve-fire': 'dissolve-fire',
+					'adv / expression': 'expression',
+					'adv / fresnel': 'fresnel',
 					'adv / plush': 'plush',
-					'adv / toon': 'toon',
-					'adv / camera-depth': 'camera-depth',
+					'adv / render-to-texture': 'rtt',
+					'adv / saturation': 'saturation',
+					'adv / skin': 'skin',
+					'adv / skin-phong': 'skin-phong',
 					'adv / soft-body': 'soft-body',
-					'adv / wave': 'wave',
+					'adv / sss': 'sss',
+					'adv / temporal-blur': 'temporal-blur',
+					'adv / toon': 'toon',
+					'adv / top-bottom': 'top-bottom',
+					'adv / translucent': 'translucent',
 					'adv / triangle-blur': 'triangle-blur',
 					'adv / triplanar-mapping': 'triplanar-mapping',
-					'adv / render-to-texture': 'rtt',
-					'adv / temporal-blur': 'temporal-blur',
-					'adv / conditional': 'conditional',
-					'adv / expression': 'expression',
-					'adv / sss': 'sss',
-					'adv / translucent': 'translucent',
-					'adv / bias': 'bias',
-					'node / position': 'node-position',
+					'adv / wave': 'wave',
+
 					'node / normal': 'node-normal',
+					'node / position': 'node-position',
 					'node / reflect': 'node-reflect',
-					'misc / sub-slot': 'sub-slot',
-					'misc / smoke': 'smoke',
-					'misc / firefly': 'firefly',
-					'misc / reserved-keywords': 'reserved-keywords',
-					'misc / varying': 'varying',
-					'misc / void-function': 'void-function',
+
 					'misc / basic-material': 'basic-material',
-					'misc / readonly': 'readonly',
+					'misc / custom-attribute': 'custom-attribute',
+					'misc / firefly': 'firefly',
 					'misc / label': 'label',
-					'misc / custom-attribute': 'custom-attribute'
+					'misc / readonly': 'readonly',
+					'misc / reserved-keywords': 'reserved-keywords',
+					'misc / smoke': 'smoke',
+					'misc / sub-slot': 'sub-slot',
+					'misc / varying': 'varying',
+					'misc / void-function': 'void-function'
+
 				} ).onFinishChange( function () {
 
 					updateMaterial();
@@ -324,14 +329,14 @@
 						//mtl.environmentAlpha = // environment alpha (float)
 						//mtl.position = // vertex local position (vec3)
 
-						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( 'decalDiffuse' ) ), 'w' );
 
-						mtl.color = new Nodes.TextureNode( getTexture( "grass" ) );
+						mtl.color = new Nodes.TextureNode( getTexture( 'grass' ) );
 						mtl.specular = new Nodes.FloatNode( .5 );
 						mtl.shininess = new Nodes.FloatNode( 15 );
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.environmentAlpha = mask;
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( 'grassNormal' ) ) );
 						mtl.normal.scale = new Nodes.MathNode( mask, Nodes.MathNode.INVERT );
 
 						break;
@@ -355,7 +360,7 @@
 						//mtl.environment = // reflection/refraction (vec3)
 						//mtl.position = // vertex local position (vec3)
 
-						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( 'decalDiffuse' ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
 
@@ -389,7 +394,7 @@
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( 'grassNormal' ) ) );
 						mtl.normal.scale = normalMask;
 
 						// GUI
@@ -451,7 +456,7 @@
 						//mtl.environment = // reflection/refraction (vec3)
 						//mtl.position = // vertex local position (vec3)
 
-						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( 'decalDiffuse' ) ), 'w' );
 
 						var intensity = new Nodes.FloatNode( 1 );
 
@@ -486,7 +491,7 @@
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( 'grassNormal' ) ) );
 						mtl.normal.scale = normalMask;
 
 						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
@@ -561,7 +566,7 @@
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( 'grassNormal' ) ) );
 						mtl.normal.scale = normalScale;
 
 						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
@@ -625,9 +630,9 @@
 
 							// default syntax ( backward-compatible )
 
-							mtl.map = useMap ? getTexture( "brick" ) : undefined;
+							mtl.map = useMap ? getTexture( 'brick' ) : undefined;
 
-							mtl.normalMap = useNormals ? getTexture( "decalNormal" ) : undefined;
+							mtl.normalMap = useNormals ? getTexture( 'decalNormal' ) : undefined;
 							mtl.normalScale = oldMaterial ? oldMaterial.normalScale : new THREE.Vector2( .5, .5 );
 
 							mtl.envMap = cubemap;
@@ -751,7 +756,7 @@
 						//mtl.environment = // reflection/refraction (vec3)
 						//mtl.position = // vertex local position (vec3)
 
-						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( 'decalDiffuse' ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
 						var clearcoatNormalScale = new Nodes.FloatNode( .1 );
@@ -798,10 +803,10 @@
 						mtl.reflectivity = reflectivity;
 						mtl.clearcoat = clearcoat;
 						mtl.clearcoatRoughness = clearcoatRoughness;
-						mtl.clearcoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.clearcoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( 'grassNormal' ) ) );
 						mtl.clearcoatNormal.scale = clearcoatNormalMask;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( 'grassNormal' ) ) );
 						mtl.normal.scale = normalMask;
 
 						// GUI
@@ -882,8 +887,8 @@
 						var colorB = new Nodes.ColorNode( 0x0054df );
 
 						// used for serialization only
-						time.name = "time";
-						speed.name = "speed";
+						time.name = 'time';
+						speed.name = 'speed';
 
 						var timeScale = new Nodes.OperatorNode(
 							time,
@@ -1075,7 +1080,7 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
+						var texture = new Nodes.TextureNode( getTexture( 'brick' ) );
 
 						var hue = new Nodes.FloatNode();
 						var sataturation = new Nodes.FloatNode( 1 );
@@ -1135,7 +1140,7 @@
 						var rotate = 0;
 						var scale = new THREE.Vector2( 1, 1 );
 
-						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
+						var texture = new Nodes.TextureNode( getTexture( 'brick' ) );
 						texture.uv = new Nodes.UVTransformNode();
 						//texture.uv.uv = new Nodes.UVNode( 1 ); // uv2 for example
 
@@ -1197,9 +1202,9 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var diffuse = new Nodes.TextureNode( getTexture( "brick" ) );
+						var diffuse = new Nodes.TextureNode( getTexture( 'brick' ) );
 
-						var bumpMap = new Nodes.BumpMapNode( new Nodes.TextureNode( getTexture( "brick" ) ) );
+						var bumpMap = new Nodes.BumpMapNode( new Nodes.TextureNode( getTexture( 'brick' ) ) );
 						bumpMap.scale = new Nodes.FloatNode( .5 );
 
 						mtl.color = diffuse;
@@ -1233,9 +1238,9 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var diffuse = new Nodes.TextureNode( getTexture( "brick" ) );
+						var diffuse = new Nodes.TextureNode( getTexture( 'brick' ) );
 
-						var blur = new Nodes.BlurNode( new Nodes.TextureNode( getTexture( "brick" ) ) );
+						var blur = new Nodes.BlurNode( new Nodes.TextureNode( getTexture( 'brick' ) ) );
 
 						mtl.color = blur;
 
@@ -1261,7 +1266,7 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						mtl.environment = new Nodes.TextureNode( getTexture( "spherical" ), new Nodes.ReflectNode( Nodes.ReflectNode.SPHERE ) );
+						mtl.environment = new Nodes.TextureNode( getTexture( 'spherical' ), new Nodes.ReflectNode( Nodes.ReflectNode.SPHERE ) );
 
 						break;
 
@@ -1325,8 +1330,8 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var tex1 = new Nodes.TextureNode( getTexture( "grass" ) );
-						var tex2 = new Nodes.TextureNode( getTexture( "brick" ) );
+						var tex1 = new Nodes.TextureNode( getTexture( 'grass' ) );
+						var tex2 = new Nodes.TextureNode( getTexture( 'brick' ) );
 
 						var offset = new Nodes.FloatNode( 0 );
 						var scale = new Nodes.FloatNode( 1 );
@@ -1344,7 +1349,7 @@
 							Nodes.OperatorNode.MUL
 						);
 
-						var mask = new Nodes.TextureNode( getTexture( "decalDiffuse" ), uvScale );
+						var mask = new Nodes.TextureNode( getTexture( 'decalDiffuse' ), uvScale );
 						var maskAlphaChannel = new Nodes.SwitchNode( mask, 'w' );
 
 						var blend = new Nodes.MathNode(
@@ -1378,16 +1383,16 @@
 
 						mtl = new Nodes.StandardNodeMaterial();
 
-						var tex = new Nodes.TextureNode( getTexture( "brick" ) );
+						var tex = new Nodes.TextureNode( getTexture( 'brick' ) );
 						var sat = new Nodes.FloatNode( 0 );
 
 						var satrgb = new Nodes.FunctionNode( [
-							"vec3 satrgb( vec3 rgb, float adjustment ) {",
+							'vec3 satrgb( vec3 rgb, float adjustment ) {',
 							// include luminance function from LuminanceNode
-							"	vec3 intensity = vec3( luminance( rgb ) );",
-							"	return mix( intensity, rgb, adjustment );",
-							"}"
-						].join( "\n" ), [ Nodes.LuminanceNode.Nodes.luminance ] );
+							'	vec3 intensity = vec3( luminance( rgb ) );',
+							'	return mix( intensity, rgb, adjustment );',
+							'}'
+						].join( '\n' ), [ Nodes.LuminanceNode.Nodes.luminance ] );
 
 						var saturation = new Nodes.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = tex;
@@ -1416,8 +1421,8 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var top = new Nodes.TextureNode( getTexture( "grass" ) );
-						var bottom = new Nodes.TextureNode( getTexture( "brick" ) );
+						var top = new Nodes.TextureNode( getTexture( 'grass' ) );
+						var bottom = new Nodes.TextureNode( getTexture( 'brick' ) );
 
 						var normal = new Nodes.NormalNode( Nodes.NormalNode.WORLD );
 						var normalY = new Nodes.SwitchNode( normal, 'y' );
@@ -1472,8 +1477,8 @@
 						var colorB = new Nodes.ColorNode( 0x0054df );
 
 						// used for serialization only
-						time.name = "time";
-						speed.name = "speed";
+						time.name = 'time';
+						speed.name = 'speed';
 
 						var uv = new Nodes.UVNode();
 
@@ -1489,7 +1494,7 @@
 							Nodes.OperatorNode.ADD
 						);
 
-						var tex = new Nodes.TextureNode( getTexture( "cloud" ), displaceOffset );
+						var tex = new Nodes.TextureNode( getTexture( 'cloud' ), displaceOffset );
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
 						var displace = new Nodes.OperatorNode(
@@ -1561,7 +1566,7 @@
 						var threshold = new Nodes.FloatNode( .1 );
 						var borderSize = new Nodes.FloatNode( .2 );
 
-						var tex = new Nodes.TextureNode( getTexture( "cloud" ) );
+						var tex = new Nodes.TextureNode( getTexture( 'cloud' ) );
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
 						var thresholdBorder = new Nodes.MathNode(
@@ -1645,7 +1650,7 @@
 						// offset to +.9
 						cycle = new Nodes.OperatorNode( cycle, new Nodes.FloatNode( .9 ), Nodes.OperatorNode.ADD );
 
-						var tex = new Nodes.TextureNode( getTexture( "cloud" ) );
+						var tex = new Nodes.TextureNode( getTexture( 'cloud' ) );
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
 						var thresholdBorder = new Nodes.MathNode(
@@ -1791,8 +1796,8 @@
 							Nodes.OperatorNode.ADD
 						);
 
-						var cloudA = new Nodes.TextureNode( getTexture( "cloud" ), uvOffsetA );
-						var cloudB = new Nodes.TextureNode( getTexture( "cloud" ), uvOffsetB );
+						var cloudA = new Nodes.TextureNode( getTexture( 'cloud' ), uvOffsetA );
+						var cloudB = new Nodes.TextureNode( getTexture( 'cloud' ), uvOffsetB );
 
 						var clouds = new Nodes.OperatorNode(
 							cloudA,
@@ -1869,55 +1874,55 @@
 						mtl = new Nodes.StandardNodeMaterial();
 
 						var hash2 = new Nodes.FunctionNode( [
-							"vec2 hash2(vec2 p) {",
-							"	return fract(sin(vec2(dot(p, vec2(123.4, 748.6)), dot(p, vec2(547.3, 659.3))))*5232.85324);",
-							"}"
-						].join( "\n" ) );
+							'vec2 hash2(vec2 p) {',
+							'	return fract(sin(vec2(dot(p, vec2(123.4, 748.6)), dot(p, vec2(547.3, 659.3))))*5232.85324);',
+							'}'
+						].join( '\n' ) );
 
+						// Based off of iq's described here: https://www.iquilezles.org/www/articles/voronoilines/voronoilines.htm
 						var voronoi = new Nodes.FunctionNode( [
-							// Based off of iq's described here: http://www.iquilezles.org/www/articles/voronoili
-							"float voronoi(vec2 p, in float time) {",
-							"	vec2 n = floor(p);",
-							"	vec2 f = fract(p);",
-							"	float md = 5.0;",
-							"	vec2 m = vec2(0.0);",
-							"	for (int i = -1; i <= 1; i++) {",
-							"		for (int j = -1; j <= 1; j++) {",
-							"			vec2 g = vec2(i, j);",
-							"			vec2 o = hash2(n + g);",
-							"			o = 0.5 + 0.5 * sin(time + 5.038 * o);",
-							"			vec2 r = g + o - f;",
-							"			float d = dot(r, r);",
-							"			if (d < md) {",
-							"				md = d;",
-							"				m = n+g+o;",
-							"			}",
-							"		}",
-							"	}",
-							"	return md;",
-							"}"
-						].join( "\n" ), [ hash2 ] ); // define hash2 as dependencies
+							'float voronoi(vec2 p, in float time) {',
+							'	vec2 n = floor(p);',
+							'	vec2 f = fract(p);',
+							'	float md = 5.0;',
+							'	vec2 m = vec2(0.0);',
+							'	for (int i = -1; i <= 1; i++) {',
+							'		for (int j = -1; j <= 1; j++) {',
+							'			vec2 g = vec2(i, j);',
+							'			vec2 o = hash2(n + g);',
+							'			o = 0.5 + 0.5 * sin(time + 5.038 * o);',
+							'			vec2 r = g + o - f;',
+							'			float d = dot(r, r);',
+							'			if (d < md) {',
+							'				md = d;',
+							'				m = n+g+o;',
+							'			}',
+							'		}',
+							'	}',
+							'	return md;',
+							'}'
+						].join( '\n' ), [ hash2 ] ); // define hash2 as dependencies
 
 						var voronoiLayers = new Nodes.FunctionNode( [
 							// based on https://www.shadertoy.com/view/4tXSDf
-							"float voronoiLayers(vec2 p, in float time) {",
-							"	float v = 0.0;",
-							"	float a = 0.4;",
-							"	for (int i = 0; i < 3; i++) {",
-							"		v += voronoi(p, time) * a;",
-							"		p *= 2.0;",
-							"		a *= 0.5;",
-							"	}",
-							"	return v;",
-							"}"
-						].join( "\n" ), [ voronoi ] ); // define voronoi as dependencies
+							'float voronoiLayers(vec2 p, in float time) {',
+							'	float v = 0.0;',
+							'	float a = 0.4;',
+							'	for (int i = 0; i < 3; i++) {',
+							'		v += voronoi(p, time) * a;',
+							'		p *= 2.0;',
+							'		a *= 0.5;',
+							'	}',
+							'	return v;',
+							'}'
+						].join( '\n' ), [ voronoi ] ); // define voronoi as dependencies
 
 						var time = new Nodes.TimerNode();
 						var timeScale = new Nodes.FloatNode( 2 );
 
 						// used for serialization only
-						time.name = "time";
-						timeScale.name = "speed";
+						time.name = 'time';
+						timeScale.name = 'speed';
 
 						var alpha = new Nodes.FloatNode( 1 );
 						var scale = new Nodes.FloatNode( .1 );
@@ -2152,7 +2157,7 @@
 						);
 
 						mtl.color = color;
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( 'grassNormal' ) ) );
 						mtl.normal.scale = furScale;
 						mtl.environment = mildnessColor;
 						mtl.environmentAlpha = new Nodes.MathNode( viewZ, Nodes.MathNode.INVERT );
@@ -2387,7 +2392,7 @@
 
 							mtl.ao = val ? new Nodes.FloatNode() : undefined;
 
-							mtl.needsUpdate = true;
+							mtl.dispose();
 
 						} );
 
@@ -2404,7 +2409,7 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						mtl.color = new Nodes.AttributeNode( "custom", 3 );
+						mtl.color = new Nodes.AttributeNode( 'custom', 3 );
 
 						// or
 
@@ -2420,14 +2425,14 @@
 
 						var speed = new Nodes.FloatNode( .5 );
 
-						var myspeed = new Nodes.ExpressionNode( "speed * time", "float" );
-						myspeed.keywords[ "speed" ] = speed;
+						var myspeed = new Nodes.ExpressionNode( 'speed * time', 'float' );
+						myspeed.keywords[ 'speed' ] = speed;
 
-						mtl.color = new Nodes.ExpressionNode( "myCustomUv + (sin(myspeed)*.5) + (position * .05)", "vec3" );
-						mtl.color.keywords[ "myspeed" ] = myspeed;
+						mtl.color = new Nodes.ExpressionNode( 'myCustomUv + (sin(myspeed)*.5) + (position * .05)', 'vec3' );
+						mtl.color.keywords[ 'myspeed' ] = myspeed;
 
-						mtl.position = new Nodes.ExpressionNode( "mod(myspeed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))", "vec3" );
-						mtl.position.keywords[ "myspeed" ] = myspeed;
+						mtl.position = new Nodes.ExpressionNode( 'mod(myspeed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))', 'vec3' );
+						mtl.position.keywords[ 'myspeed' ] = myspeed;
 
 						// add global keyword ( variable or const )
 						Nodes.NodeLib.addKeyword( 'myCustomUv', function () {
@@ -2454,13 +2459,13 @@
 
 						var keywordsexample = new Nodes.FunctionNode( [
 							// use "uv" reserved keyword
-							"vec4 keywordsexample( sampler2D texture ) {",
-							"	return texture2D( texture, myUV ) + vec4( position * myAlpha, 0.0 );",
-							"}"
-						].join( "\n" ) );
+							'vec4 keywordsexample( sampler2D tex ) {',
+							'	return texture2D( tex, myUV ) + vec4( position * myAlpha, 0.0 );',
+							'}'
+						].join( '\n' ) );
 
 						// add local keyword ( const only )
-						keywordsexample.keywords[ "myAlpha" ] = new Nodes.ConstNode( "float myAlpha .05" );
+						keywordsexample.keywords[ 'myAlpha' ] = new Nodes.ConstNode( 'float myAlpha .05' );
 
 						// add global keyword ( const only )
 						Nodes.NodeLib.addKeyword( 'myUV', function () {
@@ -2479,7 +2484,7 @@
 						// keywords conflit? use this to disable:
 						//blurtexture.useKeywords = false; // ( true is default )
 
-						mtl.color = new Nodes.FunctionCallNode( keywordsexample, [ new Nodes.TextureNode( getTexture( "brick" ) ) ] );
+						mtl.color = new Nodes.FunctionCallNode( keywordsexample, [ new Nodes.TextureNode( getTexture( 'brick' ) ) ] );
 
 						break;
 
@@ -2640,7 +2645,7 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var varying = new Nodes.VarNode( "vec3" );
+						var varying = new Nodes.VarNode( 'vec3' );
 						varying.value = new Nodes.NormalNode( Nodes.NormalNode.VIEW );
 
 						// using BypassNode the NormalNode not apply the value in .position slot
@@ -2652,7 +2657,7 @@
 
 						// you can also set a independent value in .position slot using BypassNode
 						// such this expression using ExpressionNode
-						mtl.position.value = new Nodes.ExpressionNode( "position * ( .1 + abs( sin( time ) ) )", "vec3" );
+						mtl.position.value = new Nodes.ExpressionNode( 'position * ( .1 + abs( sin( time ) ) )', 'vec3' );
 
 						break;
 
@@ -2662,25 +2667,25 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var varying = new Nodes.VarNode( "vec3" );
+						var varying = new Nodes.VarNode( 'vec3' );
 
 						// VERTEX
 
 						var setMyVar = new Nodes.FunctionNode( [
-							"void setMyVar( vec3 pos ) {",
+							'void setMyVar( vec3 pos ) {',
 							// set "myVar" in vertex shader in this example,
 							// can be used in fragment shader too or in rest of the current shader
-							"	myVar = pos;",
+							'	myVar = pos;',
 
-							"}"
-						].join( "\n" ) );
+							'}'
+						].join( '\n' ) );
 
 						// add keyword
-						setMyVar.keywords[ "myVar" ] = varying;
+						setMyVar.keywords[ 'myVar' ] = varying;
 
-						var position = new Nodes.ExpressionNode( "setMyVar( position * .1 )", "vec3" );
+						var position = new Nodes.ExpressionNode( 'setMyVar( position * .1 )', 'vec3' );
 						position.includes = [ setMyVar ];
-						position.keywords[ "tex" ] = new Nodes.TextureNode( getTexture( "brick" ) );
+						position.keywords[ 'tex' ] = new Nodes.TextureNode( getTexture( 'brick' ) );
 
 						// use BypassNode to "void" functions
 						mtl.position = new Nodes.BypassNode( position );
@@ -2688,12 +2693,12 @@
 						// FRAGMENT
 
 						var clipFromPos = new Nodes.FunctionNode( [
-							"void clipFromPos( vec3 pos ) {",
+							'void clipFromPos( vec3 pos ) {',
 
-							"	if ( pos.y < .0 ) discard;",
+							'	if ( pos.y < .0 ) discard;',
 
-							"}"
-						].join( "\n" ) );
+							'}'
+						].join( '\n' ) );
 
 						var clipFromPosCall = new Nodes.FunctionCallNode( clipFromPos, {
 							pos: varying
@@ -2841,7 +2846,7 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
+						var texture = new Nodes.TextureNode( getTexture( 'brick' ) );
 
 						var rttStore = new Nodes.RTTNode( 512, 512, texture );
 						var blur = new Nodes.BlurNode( rttStore );
@@ -2906,14 +2911,14 @@
 						// same as the code can be writed in the same line (inline)
 						// for optimization this is not recommended
 
-						var colorInput = new Nodes.ColorNode( 0xFFFFFF ).setLabel( "colorInput" );
-						var specularInput = new Nodes.FloatNode( .5 ).setLabel( "specularInput" );
+						var colorInput = new Nodes.ColorNode( 0xFFFFFF ).setLabel( 'colorInput' );
+						var specularInput = new Nodes.FloatNode( .5 ).setLabel( 'specularInput' );
 
 						var colorMix = new Nodes.OperatorNode(
 							colorInput,
 							new Nodes.ColorNode( 0x6495ED ).setReadonly( true ),
 							Nodes.OperatorNode.MUL
-						).setLabel( "colorMix" );
+						).setLabel( 'colorMix' );
 
 						mtl.color = colorMix;
 						mtl.specular = specularInput;
@@ -2947,29 +2952,29 @@
 
 						var blurtexture = new Nodes.FunctionNode( [
 							// Reference: TriangleBlurShader.js
-							"vec4 blurtexture(sampler2D map, vec2 uv, vec2 delta) {",
-							"	vec4 color = vec4( 0.0 );",
-							"	float total = 0.0;",
+							'vec4 blurtexture(sampler2D map, vec2 uv, vec2 delta) {',
+							'	vec4 color = vec4( 0.0 );',
+							'	float total = 0.0;',
 							// randomize the lookup values to hide the fixed number of samples
-							"	float offset = rand( uv );",
-							"	for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {",
-							"		float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;",
-							"		float weight = 1.0 - abs( percent );",
-							"		color += texture2D( map, uv + delta * percent ) * weight;",
-							"		total += weight;",
-							"	}",
-							"	return color / total;",
-							"}"
-						].join( "\n" ), [ new Nodes.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
+							'	float offset = rand( uv );',
+							'	for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {',
+							'		float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;',
+							'		float weight = 1.0 - abs( percent );',
+							'		color += texture2D( map, uv + delta * percent ) * weight;',
+							'		total += weight;',
+							'	}',
+							'	return color / total;',
+							'}'
+						].join( '\n' ), [ new Nodes.ConstNode( 'float BLUR_ITERATIONS 10.0' ) ] );
 
 						var blurredTexture = new Nodes.FunctionCallNode( blurtexture, {
-							map: new Nodes.TextureNode( getTexture( "brick" ) ),
+							map: new Nodes.TextureNode( getTexture( 'brick' ) ),
 							delta: delta,
 							uv: new Nodes.UVNode()
 						} );
 
 						var color = new Nodes.MathNode(
-							new Nodes.TextureNode( getTexture( "brick" ) ),
+							new Nodes.TextureNode( getTexture( 'brick' ) ),
 							blurredTexture,
 							alpha,
 							Nodes.MathNode.MIX
@@ -3009,29 +3014,29 @@
 
 						var triplanarMapping = new Nodes.FunctionNode( [
 							// Reference: https://github.com/keijiro/StandardTriplanar
-							"vec4 triplanar_mapping( sampler2D map, vec3 normal, vec3 position, float scale ) {",
+							'vec4 triplanar_mapping( sampler2D map, vec3 normal, vec3 position, float scale ) {',
 
 							// Blending factor of triplanar mapping
-							"	vec3 bf = normalize( abs( normal ) );",
-							"	bf /= dot( bf, vec3( 1.0 ) );",
+							'	vec3 bf = normalize( abs( normal ) );',
+							'	bf /= dot( bf, vec3( 1.0 ) );',
 
 							// Triplanar mapping
-							"	vec2 tx = position.yz * scale;",
-							"	vec2 ty = position.zx * scale;",
-							"	vec2 tz = position.xy * scale;",
+							'	vec2 tx = position.yz * scale;',
+							'	vec2 ty = position.zx * scale;',
+							'	vec2 tz = position.xy * scale;',
 
 							// Base color
-							"	vec4 cx = texture2D(map, tx) * bf.x;",
-							"	vec4 cy = texture2D(map, ty) * bf.y;",
-							"	vec4 cz = texture2D(map, tz) * bf.z;",
+							'	vec4 cx = texture2D(map, tx) * bf.x;',
+							'	vec4 cy = texture2D(map, ty) * bf.y;',
+							'	vec4 cz = texture2D(map, tz) * bf.z;',
 
-							"	return cx + cy + cz;",
+							'	return cx + cy + cz;',
 
-							"}"
-						].join( "\n" ) );
+							'}'
+						].join( '\n' ) );
 
 						var triplanarMappingTexture = new Nodes.FunctionCallNode( triplanarMapping, {
-							map: new Nodes.TextureNode( getTexture( "brick" ) ),
+							map: new Nodes.TextureNode( getTexture( 'brick' ) ),
 							normal: new Nodes.NormalNode( Nodes.NormalNode.WORLD ),
 							position: new Nodes.PositionNode( Nodes.PositionNode.WORLD ),
 							scale: scale,
@@ -3134,7 +3139,7 @@
 
 						// RTT ( get back distance )
 
-						rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+						rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 
 						library[ rtTexture.texture.uuid ] = rtTexture.texture;
 
@@ -3286,7 +3291,7 @@
 				// gui
 
 				const div = document.getElementById( 'serialize' );
-				div.textContent = "Serialize and apply";
+				div.textContent = 'Serialize and apply';
 
 			}
 
@@ -3296,11 +3301,11 @@
 
 				// replace uuid to url (facilitates the load of textures using url otherside uuid) e.g:
 
-				const cloud = getTexture( "cloud" );
+				const cloud = getTexture( 'cloud' );
 
-				NodeMaterialLoaderUtils.replaceUUID( json, cloud, "cloud" );
+				NodeMaterialLoaderUtils.replaceUUID( json, cloud, 'cloud' );
 
-				library[ "cloud" ] = cloud;
+				library[ 'cloud' ] = cloud;
 
 				// --
 
@@ -3318,7 +3323,7 @@
 				// gui
 
 				const div = document.getElementById( 'serialize' );
-				div.textContent = "Click to reset - JSON Generate: " + ( jsonStr.length / 1024 ).toFixed( 3 ) + "kB";
+				div.textContent = 'Click to reset - JSON Generate: ' + ( jsonStr.length / 1024 ).toFixed( 3 ) + 'kB';
 
 				if ( gui ) gui.destroy();
 

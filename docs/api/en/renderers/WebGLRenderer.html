@@ -158,9 +158,6 @@
 		various WebGL extensions are supported.
 		</p>
 
-		<h3>[property:Float gammaFactor]</h3>
-		<p>Default is *2*. </p>
-
 		<h3>[property:number outputEncoding]</h3>
 		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
 		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
@@ -290,7 +287,7 @@
 		<h3>[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</p>
 
-		<h3>[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
+		<h3>[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )</h3>
 		<p>Copies pixels from the current WebGLFramebuffer into a 2D texture. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</p>
 
 		<h3>[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>

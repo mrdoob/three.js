@@ -1,3 +1,5 @@
+import { LinearEncoding } from 'three';
+
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -19,9 +21,12 @@ import PositionNode from '../../nodes/accessors/PositionNode.js';
 import NormalNode from '../../nodes/accessors/NormalNode.js';
 import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
 import SkinningNode from '../../nodes/accessors/SkinningNode.js';
+import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import OperatorNode from '../../nodes/math/OperatorNode.js';
 import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
+import { vec4, join, nodeObject } from '../../nodes/ShaderNode.js';
+import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
 	float: 'f32',
@@ -30,6 +35,7 @@ const wgslTypeLib = {
 	vec3: 'vec3<f32>',
 	vec4: 'vec4<f32>',
 	uvec4: 'vec4<u32>',
+	bvec3: 'vec3<bool>',
 	mat3: 'mat3x3<f32>',
 	mat4: 'mat4x4<f32>'
 };
@@ -40,6 +46,13 @@ const wgslMethods = {
 };
 
 const wgslPolyfill = {
+	lessThanEqual: new CodeNode( `
+fn lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
+
+	return vec3<bool>( a.x <= b.x, a.y <= b.y, a.z <= b.z );
+
+}
+` ),
 	mod: new CodeNode( `
 fn mod( x : f32, y : f32 ) -> f32 {
 
@@ -135,7 +148,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
+			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec4' ) );
+
+			const diffuseColorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
 
 			// OPACITY
 
@@ -211,11 +226,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
+				roughnessNode = getRoughness( { roughness: roughnessNode } );
+
 				this.addFlow( 'fragment', new VarNode( roughnessNode, 'Roughness', 'float' ) );
 
 				// SPECULAR_TINT
 
-				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), DiffuseColor.rgb, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
+				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), Color.rgb, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
 
 				// NORMAL_VIEW
 
@@ -237,7 +254,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			// LIGHT
 
-			let outputNode = colorNode;
+			let outputNode = diffuseColorNode;
 
 			if ( lightNode && lightNode.isNode ) {
 
@@ -248,6 +265,21 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			}
 
 			// RESULT
+
+			const outputNodeObj = nodeObject( outputNode );
+
+			outputNode = join( outputNodeObj.x, outputNodeObj.y, outputNodeObj.z, nodeObject( diffuseColorNode ).w );
+
+			//
+
+			const outputEncoding = this.renderer.outputEncoding;
+
+			if ( outputEncoding !== LinearEncoding ) {
+
+				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, outputNode );
+				outputNode.fromEncoding( outputEncoding );
+
+			}
 
 			this.addFlow( 'fragment', new VarNode( outputNode, 'Output', 'vec4' ) );
 
@@ -267,7 +299,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet, biasSnippet = null, shaderStage = this.shaderStage ) {
+	getTexture( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
@@ -757,7 +789,7 @@ fn main( ${shaderData.varys} ) -> [[ location( 0 ) ]] vec4<f32> {
 
 	_getWGSLStruct( name, vars ) {
 
-		return `[[ block ]]
+		return `
 struct ${name} {
 \n${vars}
 };`;

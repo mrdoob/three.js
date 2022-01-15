@@ -94,6 +94,14 @@ class KTX2Loader extends Loader {
 				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
 		};
 
+
+		if ( renderer.capabilities.isWebGL2 ) {
+
+			// https://github.com/mrdoob/three.js/pull/22928
+			this.workerConfig.etc1Supported = false;
+
+		}
+
 		return this;
 
 	}
@@ -169,7 +177,7 @@ class KTX2Loader extends Loader {
 
 			}
 
-			_activeLoaders++;
+			_activeLoaders ++;
 
 		}
 
@@ -265,7 +273,7 @@ class KTX2Loader extends Loader {
 		URL.revokeObjectURL( this.workerSourceURL );
 		this.workerPool.dispose();
 
-		_activeLoaders--;
+		_activeLoaders --;
 
 		return this;
 
@@ -519,8 +527,8 @@ KTX2Loader.BasisWorker = function () {
 		{
 			if: 'etc1Supported',
 			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.ETC1, TranscoderFormat.ETC1 ],
-			engineFormat: [ EngineFormat.RGB_ETC1_Format, EngineFormat.RGB_ETC1_Format ],
+			transcoderFormat: [ TranscoderFormat.ETC1 ],
+			engineFormat: [ EngineFormat.RGB_ETC1_Format ],
 			priorityETC1S: 2,
 			priorityUASTC: 4,
 			needsPowerOfTwo: false,
@@ -560,6 +568,7 @@ KTX2Loader.BasisWorker = function () {
 
 			if ( ! config[ opt.if ] ) continue;
 			if ( ! opt.basisFormat.includes( basisFormat ) ) continue;
+			if ( hasAlpha && opt.transcoderFormat.length < 2 ) continue;
 			if ( opt.needsPowerOfTwo && ! ( isPowerOfTwo( width ) && isPowerOfTwo( height ) ) ) continue;
 
 			transcoderFormat = opt.transcoderFormat[ hasAlpha ? 1 : 0 ];

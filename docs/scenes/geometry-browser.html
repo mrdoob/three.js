@@ -696,8 +696,14 @@
 			}
 
 			//
+			
+			const selectedGeometry = window.location.hash.substring( 1 );
 
-			document.getElementById( 'newWindow' ).href += window.location.hash;
+			if ( guis[ selectedGeometry ] !== undefined ) {
+
+				document.getElementById( 'newWindow' ).href += '#' + selectedGeometry;
+
+			}
 
 			const gui = new GUI();
 

@@ -1,5 +1,4 @@
-import { ObjectNode } from '../core/ObjectNode.js';
-import { SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
 import { NormalNode } from '../../renderers/nodes/Nodes.js';
 
 export class NormalEditor extends ObjectNode {
@@ -8,7 +7,7 @@ export class NormalEditor extends ObjectNode {
 
 		const node = new NormalNode();
 
-		super( 'Normal', 3, node );
+		super( 'Normal', 3, node, 250 );
 
 		this.title.setStyle( 'red' );
 

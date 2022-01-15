@@ -866,7 +866,7 @@
 		/**
    * Process image
    * @param  {Image} image to process
-   * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
+   * @param  {Integer} format of the image (THREE.RGBAFormat)
    * @param  {Boolean} flipY before writing out the image
    * @return {Integer}     Index of the processed texture in the "images" array
    */
@@ -909,9 +909,9 @@
 
 				} else {
 
-					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat ) {
+					if ( format !== THREE.RGBAFormat ) {
 
-						console.error( 'GLTFExporter: Only RGB and RGBA formats are supported.' );
+						console.error( 'GLTFExporter: Only THREE.RGBAFormat is supported.' );
 
 					}
 
@@ -923,27 +923,12 @@
 
 					const data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-					if ( format === THREE.RGBAFormat ) {
+					for ( let i = 0; i < data.length; i += 4 ) {
 
-						for ( let i = 0; i < data.length; i += 4 ) {
-
-							data[ i + 0 ] = image.data[ i + 0 ];
-							data[ i + 1 ] = image.data[ i + 1 ];
-							data[ i + 2 ] = image.data[ i + 2 ];
-							data[ i + 3 ] = image.data[ i + 3 ];
-
-						}
-
-					} else {
-
-						for ( let i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
-
-							data[ i + 0 ] = image.data[ j + 0 ];
-							data[ i + 1 ] = image.data[ j + 1 ];
-							data[ i + 2 ] = image.data[ j + 2 ];
-							data[ i + 3 ] = 255;
-
-						}
+						data[ i + 0 ] = image.data[ i + 0 ];
+						data[ i + 1 ] = image.data[ i + 1 ];
+						data[ i + 2 ] = image.data[ i + 2 ];
+						data[ i + 3 ] = image.data[ i + 3 ];
 
 					}
 
@@ -2034,7 +2019,7 @@
 	/**
  * Specular-Glossiness Extension
  *
- * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Archived/KHR_materials_pbrSpecularGlossiness
  */
 
 

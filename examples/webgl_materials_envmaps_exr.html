@@ -77,7 +77,6 @@
 				};
 
 				new EXRLoader()
-					.setDataType( THREE.UnsignedByteType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
 						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );

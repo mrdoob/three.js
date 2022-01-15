@@ -2,19 +2,17 @@ import {
 	AdditiveBlending,
 	Box2,
 	BufferGeometry,
-	ClampToEdgeWrapping,
 	Color,
-	DataTexture,
+	FramebufferTexture,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	Mesh,
 	MeshBasicMaterial,
-	NearestFilter,
-	RGBFormat,
 	RawShaderMaterial,
 	Vector2,
 	Vector3,
-	Vector4
+	Vector4,
+	RGBAFormat
 } from '../../../build/three.module.js';
 
 class Lensflare extends Mesh {
@@ -34,17 +32,8 @@ class Lensflare extends Mesh {
 
 		// textures
 
-		const tempMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
-		tempMap.minFilter = NearestFilter;
-		tempMap.magFilter = NearestFilter;
-		tempMap.wrapS = ClampToEdgeWrapping;
-		tempMap.wrapT = ClampToEdgeWrapping;
-
-		const occlusionMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
-		occlusionMap.minFilter = NearestFilter;
-		occlusionMap.magFilter = NearestFilter;
-		occlusionMap.wrapS = ClampToEdgeWrapping;
-		occlusionMap.wrapT = ClampToEdgeWrapping;
+		const tempMap = new FramebufferTexture( 16, 16, RGBAFormat );
+		const occlusionMap = new FramebufferTexture( 16, 16, RGBAFormat );
 
 		// material
 

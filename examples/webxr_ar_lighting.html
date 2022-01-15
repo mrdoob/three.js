@@ -36,7 +36,8 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 
-				const defaultLight = new THREE.AmbientLight( 0xffffff );
+				const defaultLight = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
+				defaultLight.position.set( 0.5, 1, 0.25 );
 				scene.add( defaultLight );
 
 				//
@@ -63,7 +64,7 @@
 					// The estimated lighting also provides an environment cubemap, which we can apply here.
 					if ( xrLight.environment ) {
 
-						updateEnvironment( xrLight.environment );
+						scene.environment = xrLight.environment;
 
 					}
 
@@ -76,14 +77,13 @@
 					scene.remove( xrLight );
 
 					// Revert back to the default environment.
-					updateEnvironment( defaultEnvironment );
+					scene.environment = defaultEnvironment;
 
 				} );
 
 				//
 
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
@@ -91,7 +91,7 @@
 
 						defaultEnvironment = texture;
 
-						updateEnvironment( defaultEnvironment );
+						scene.environment = defaultEnvironment;
 
 					} );
 
@@ -106,16 +106,17 @@
 				const ballGroup = new THREE.Group();
 				ballGroup.position.z = - 2;
 
-				const rows = 1;
-				const cols = 4;
+				const rows = 3;
+				const cols = 3;
 
 				for ( let i = 0; i < rows; i ++ ) {
 
 					for ( let j = 0; j < cols; j ++ ) {
 
-						const ballMaterial = new THREE.MeshPhongMaterial( {
+						const ballMaterial = new THREE.MeshStandardMaterial( {
 							color: 0xdddddd,
-							reflectivity: j / cols
+							roughness: i / rows,
+							metalness: j / cols
 						} );
 						const ballMesh = new THREE.Mesh( ballGeometry, ballMaterial );
 						ballMesh.position.set( ( i + 0.5 - rows * 0.5 ) * 0.4, ( j + 0.5 - cols * 0.5 ) * 0.4, 0 );
@@ -168,18 +169,6 @@
 				renderer.render( scene, camera );
 
 			}
-
-			function updateEnvironment( envMap ) {
-
-				scene.traverse( function ( object ) {
-
-					if ( object.isMesh ) object.material.envMap = envMap;
-
-
-				} );
-
-			}
-
 
 		</script>
 	</body>

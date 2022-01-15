@@ -315,6 +315,7 @@
 				"DataTexture2DArray": "api/en/textures/DataTexture2DArray",
 				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
+				"FramebufferTexture": "api/en/textures/FramebufferTexture",
 				"Texture": "api/en/textures/Texture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
@@ -361,11 +362,11 @@
 
 			"Loaders": {
 				"3DMLoader": "examples/en/loaders/3DMLoader",
-				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"FontLoader": "examples/en/loaders/FontLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
+				"LDrawLoader": "examples/en/loaders/LDrawLoader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
@@ -421,10 +422,6 @@
 		},
 
 		"Developer Reference": {
-
-			"Polyfills": {
-				"Polyfills": "api/en/Polyfills"
-			},
 
 			"WebGLRenderer": {
 				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
@@ -817,6 +814,7 @@
 				"DataTexture2DArray": "api/zh/textures/DataTexture2DArray",
 				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
+				"FramebufferTexture": "api/zh/textures/FramebufferTexture",
 				"Texture": "api/zh/textures/Texture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
 			}
@@ -861,7 +859,6 @@
 			},
 
 			"加载器": {
-				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"FontLoader": "examples/zh/loaders/FontLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
@@ -918,10 +915,6 @@
 		},
 
 		"开发者参考": {
-
-			"差异化支持": {
-				"Polyfills": "api/zh/Polyfills"
-			},
 
 			"WebGL渲染器": {
 				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram"

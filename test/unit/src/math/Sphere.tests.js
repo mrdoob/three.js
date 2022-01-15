@@ -279,6 +279,16 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.center.equals( new Vector3( 1, 0, 0 ) ), 'Passed!' );
 			assert.ok( c.radius === 4, 'Passed!' );
 
+			// edge case: both spheres have the same center point
+
+			var e = new Sphere( new Vector3(), 1 );
+			var f = new Sphere( new Vector3(), 4 );
+
+			e.union( f );
+
+			assert.ok( e.center.equals( new Vector3( 0, 0, 0 ) ), 'Passed!' );
+			assert.ok( e.radius === 4, 'Passed!' );
+
 		} );
 
 		QUnit.test( 'equals', ( assert ) => {

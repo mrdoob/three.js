@@ -1,5 +1,4 @@
-import { ObjectNode } from '../core/ObjectNode.js';
-import { SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
 import { PositionNode } from '../../renderers/nodes/Nodes.js';
 
 export class PositionEditor extends ObjectNode {
@@ -8,7 +7,7 @@ export class PositionEditor extends ObjectNode {
 
 		const node = new PositionNode();
 
-		super( 'Position', 3, node );
+		super( 'Position', 3, node, 250 );
 
 		this.title.setStyle( 'red' );
 

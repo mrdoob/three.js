@@ -4,7 +4,7 @@ import {
 	CubeUVReflectionMapping,
 	CubeUVRefractionMapping,
 	LinearEncoding,
-	GammaEncoding
+	sRGBEncoding
 } from '../../../../build/three.module.js';
 
 import { NodeUniform } from './NodeUniform.js';
@@ -951,7 +951,7 @@ class NodeBuilder {
 
 		if ( encoding === LinearEncoding && this.context.gamma ) {
 
-			encoding = GammaEncoding;
+			encoding = sRGBEncoding;
 
 		}
 

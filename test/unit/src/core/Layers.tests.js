@@ -18,14 +18,12 @@ export default QUnit.module( 'Core', () => {
 
 			var a = new Layers();
 
-			a.set( 0 );
-			assert.strictEqual( a.mask, 1, 'Set channel 0' );
+			for ( var i = 0; i < 31; i ++ ) {
 
-			a.set( 1 );
-			assert.strictEqual( a.mask, 2, 'Set channel 1' );
+				a.set( i );
+				assert.strictEqual( a.mask, Math.pow( 2, i ), 'Mask has the expected value for channel: ' + i );
 
-			a.set( 2 );
-			assert.strictEqual( a.mask, 4, 'Set channel 2' );
+			}
 
 		} );
 

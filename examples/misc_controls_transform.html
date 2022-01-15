@@ -12,6 +12,7 @@
 			"W" translate | "E" rotate | "R" scale | "+/-" adjust size<br />
 			"Q" toggle world/local space |  "Shift" snap to grid<br />
 			"X" toggle X | "Y" toggle Y | "Z" toggle Z | "Spacebar" toggle enabled<br />
+			"Esc" reset current transform<br />
 			"C" toggle camera | "V" random zoom
 		</div>
 
@@ -154,6 +155,10 @@
 
 						case 32: // Spacebar
 							control.enabled = ! control.enabled;
+							break;
+
+						case 27: // Esc
+							control.reset();
 							break;
 
 					}

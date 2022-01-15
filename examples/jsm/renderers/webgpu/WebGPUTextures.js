@@ -1,6 +1,6 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
 import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
-	RGBFormat, RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
+	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
 } from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
@@ -41,7 +41,9 @@ class WebGPUTextures {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.defaultTexture = this._createTexture( texture );
+			this._uploadTexture( texture );
+
+			this.defaultTexture = this.getTextureGPU( texture );
 
 		}
 
@@ -57,7 +59,9 @@ class WebGPUTextures {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.defaultCubeTexture = this._createTexture( texture );
+			this._uploadTexture( texture );
+
+			this.defaultCubeTexture = this.getTextureGPU( texture );
 
 		}
 
@@ -83,7 +87,7 @@ class WebGPUTextures {
 
 	updateTexture( texture ) {
 
-		let forceUpdate = false;
+		let needsUpdate = false;
 
 		const textureProperties = this.properties.get( texture );
 
@@ -116,21 +120,9 @@ class WebGPUTextures {
 
 				}
 
-				// texture creation
+				//
 
-				if ( textureProperties.textureGPU !== undefined ) {
-
-					// @TODO: Avoid calling of destroy() in certain scenarios. When only the contents of a texture
-					// are updated, a buffer upload should be sufficient. However, if the user changes
-					// the dimensions of the texture, format or usage, a new instance of GPUTexture is required.
-
-					textureProperties.textureGPU.destroy();
-
-				}
-
-				textureProperties.textureGPU = this._createTexture( texture );
-				textureProperties.version = texture.version;
-				forceUpdate = true;
+				needsUpdate = this._uploadTexture( texture );
 
 			}
 
@@ -142,11 +134,11 @@ class WebGPUTextures {
 		if ( textureProperties.initializedRTT === false ) {
 
 			textureProperties.initializedRTT = true;
-			forceUpdate = true;
+			needsUpdate = true;
 
 		}
 
-		return forceUpdate;
+		return needsUpdate;
 
 	}
 
@@ -304,10 +296,14 @@ class WebGPUTextures {
 
 	}
 
-	_createTexture( texture ) {
+	_uploadTexture( texture ) {
+
+		let needsUpdate = false;
 
 		const device = this.device;
 		const image = texture.image;
+
+		const textureProperties = this.properties.get( texture );
 
 		const { width, height, depth } = this._getSize( texture );
 		const needsMipmaps = this._needsMipmaps( texture );
@@ -325,8 +321,6 @@ class WebGPUTextures {
 
 		}
 
-		// texture creation
-
 		const textureGPUDescriptor = {
 			size: {
 				width: width,
@@ -339,7 +333,19 @@ class WebGPUTextures {
 			format: format,
 			usage: usage
 		};
-		const textureGPU = device.createTexture( textureGPUDescriptor );
+
+		// texture creation
+
+		let textureGPU = textureProperties.textureGPU;
+
+		if ( textureGPU === undefined ) {
+
+			textureGPU = device.createTexture( textureGPUDescriptor );
+			textureProperties.textureGPU = textureGPU;
+
+			needsUpdate = true;
+
+		}
 
 		// transfer texture data
 
@@ -375,7 +381,9 @@ class WebGPUTextures {
 
 		}
 
-		return textureGPU;
+		textureProperties.version = texture.version;
+
+		return needsUpdate;
 
 	}
 
@@ -556,7 +564,6 @@ class WebGPUTextures {
 				formatGPU = ( encoding === sRGBEncoding ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
 				break;
 
-			case RGBFormat:
 			case RGBAFormat:
 
 				switch ( type ) {

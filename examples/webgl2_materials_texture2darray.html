@@ -58,11 +58,11 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { unzipSync } from './jsm/libs/fflate.module.js';
 
-			import { WEBGL } from './jsm/WebGL.js';
+			import WebGL from './jsm/capabilities/WebGL.js';
 
-			if ( WEBGL.isWebGL2Available() === false ) {
+			if ( WebGL.isWebGL2Available() === false ) {
 
-				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
 
 			}
 
@@ -97,7 +97,7 @@
 
 						const texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
 						texture.format = THREE.RedFormat;
-						texture.type = THREE.UnsignedByteType;
+						texture.needsUpdate = true;
 
 						const material = new THREE.ShaderMaterial( {
 							uniforms: {
