@@ -3,9 +3,25 @@ import SlotNode from './SlotNode.js';
 import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { ShaderChunk, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
+import { ShaderChunk, ShaderLib, UniformsUtils, 
+		LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding,
+		LineBasicMaterial, MeshBasicMaterial, PointsMaterial, MeshStandardMaterial } from 'three';
 
 const shaderStages = [ 'vertex', 'fragment' ];
+
+const staticMaterialProperties = {
+	LineBasicNodeMaterial: new LineBasicMaterial(),
+	MeshBasicNodeMaterial: new MeshBasicMaterial(),
+	PointsNodeMaterial: new PointsMaterial(),
+	MeshStandardNodeMaterial: new MeshStandardMaterial()
+};
+
+const nodeShaderLib = {
+	LineBasicNodeMaterial: ShaderLib.basic,
+	MeshBasicNodeMaterial: ShaderLib.basic,
+	PointsNodeMaterial: ShaderLib.points,
+	MeshStandardNodeMaterial: ShaderLib.standard
+};
 
 function getIncludeSnippet( name ) {
 
@@ -55,6 +71,20 @@ class WebGLNodeBuilder extends NodeBuilder {
 	_parseObject() {
 
 		const material = this.material;
+		const type = material.type;
+
+		// shader lib
+
+		if ( nodeShaderLib[ type ] !== undefined ) {
+
+			const shaderLib = nodeShaderLib[ type ];
+			const shader = this.shader;
+
+			shader.vertexShader = shaderLib.vertexShader;
+			shader.fragmentShader = shaderLib.fragmentShader;
+			shader.uniforms = UniformsUtils.clone( shaderLib.uniforms );
+
+		}
 
 		// parse inputs
 

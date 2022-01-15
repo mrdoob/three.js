@@ -1,6 +1,9 @@
+import NodeMaterial from './NodeMaterial.js';
 import { MeshStandardMaterial } from 'three';
 
-class MeshStandardNodeMaterial extends MeshStandardMaterial {
+const defaultValues = new MeshStandardMaterial();
+
+export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
@@ -26,6 +29,8 @@ class MeshStandardNodeMaterial extends MeshStandardMaterial {
 		this.lightNode = null;
 
 		this.positionNode = null;
+
+		this.setDefaultValues( defaultValues );
 
 	}
 
@@ -59,5 +64,3 @@ class MeshStandardNodeMaterial extends MeshStandardMaterial {
 }
 
 MeshStandardNodeMaterial.prototype.isNodeMaterial = true;
-
-export default MeshStandardNodeMaterial;
