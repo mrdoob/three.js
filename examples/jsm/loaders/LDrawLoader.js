@@ -1357,6 +1357,13 @@ function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalM
 
 		if ( ! ( colorCode in materialHierarchy ) ) {
 
+			// throw an error if this is final opportunity to set the material
+			if ( finalMaterialPass ) {
+
+				throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
+
+			}
+
 			return colorCode;
 
 		}
@@ -1650,7 +1657,7 @@ class LDrawPartsGeometryCache {
 			}
 
 			// Cache object if it's a part so it can be reused later.
-			if ( true || isPartType( info.type ) ) {
+			if ( isPartType( info.type ) ) {
 
 				this._cache[ key ] = promise;
 
