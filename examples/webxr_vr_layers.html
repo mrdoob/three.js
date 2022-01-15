@@ -112,7 +112,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setClearAlpha( 1 );
 				renderer.setClearColor( new THREE.Color( 0 ), 0 );
@@ -375,7 +375,7 @@
 								session.renderState.layers[ 0 ]
 							]
 						} );
-						
+
 						video.play();
 
 					} );
