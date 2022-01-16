@@ -2076,25 +2076,26 @@ class LDrawLoader extends Loader {
 			}
 
 			let material;
-			if ( ! ( colorCode in materialHierarchy ) ) {
+			if ( colorCode in materialHierarchy ) {
 
-				// throw an error if this is final opportunity to set the material
-				if ( finalMaterialPass ) {
+				material = materialHierarchy[ colorCode ];
 
-					const material = loader.getMaterial( colorCode );
-					if ( material === null ) {
+			} else if ( finalMaterialPass ) {
 
-						throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
+				// see if we can get the final material from from the "getMaterial" function which will attempt to
+				// parse the "direct" colors
+				material = loader.getMaterial( colorCode );
+				if ( material === null ) {
 
-					}
+					// otherwise throw an error if this is final opportunity to set the material
+					throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
 
 				}
 
-				return colorCode;
 
 			} else {
 
-				material = materialHierarchy[ colorCode ];
+				return colorCode;
 
 			}
 
