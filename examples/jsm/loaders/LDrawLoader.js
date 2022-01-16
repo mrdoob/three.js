@@ -2075,7 +2075,7 @@ class LDrawLoader extends Loader {
 
 			}
 
-			let material;
+			let material = null;
 			if ( colorCode in materialHierarchy ) {
 
 				material = materialHierarchy[ colorCode ];
