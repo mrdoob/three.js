@@ -1303,7 +1303,7 @@ function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, for
 
 // Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
 // in the material array if they need to be filled in.
-function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalMaterialPass = false ) {
+function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, loader = null, finalMaterialPass = false ) {
 
 	// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
 	const parentIsPassthrough = parentColorCode === MAIN_COLOUR_CODE;
@@ -1355,20 +1355,29 @@ function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalM
 
 		}
 
+		let material;
 		if ( ! ( colorCode in materialHierarchy ) ) {
 
 			// throw an error if this is final opportunity to set the material
 			if ( finalMaterialPass ) {
 
-				throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
+				const material = loader.getMaterial( colorCode );
+				if ( material === null ) {
+
+					throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
+
+				}
 
 			}
 
 			return colorCode;
 
+		} else {
+
+			material = materialHierarchy[ colorCode ];
+
 		}
 
-		let material = materialHierarchy[ colorCode ];
 		if ( c.isLineSegments ) {
 
 			material = material.userData.edgeMaterial;
@@ -2024,7 +2033,7 @@ class LDrawLoader extends Loader {
 				.parseModel( text, this.materialLibrary )
 				.then( group => {
 
-					applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
+					applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, this, true );
 					this.computeConstructionSteps( group );
 					onLoad( group );
 
