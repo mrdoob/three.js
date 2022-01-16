@@ -1301,101 +1301,6 @@ function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, for
 
 }
 
-// Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
-// in the material array if they need to be filled in.
-function applyMaterialsToMesh( group, parentColorCode, materialHierarchy, loader = null, finalMaterialPass = false ) {
-
-	// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
-	const parentIsPassthrough = parentColorCode === MAIN_COLOUR_CODE;
-	group.traverse( c => {
-
-		if ( c.isMesh || c.isLineSegments ) {
-
-			if ( Array.isArray( c.material ) ) {
-
-				for ( let i = 0, l = c.material.length; i < l; i ++ ) {
-
-					if ( ! c.material[ i ].isMaterial ) {
-
-						c.material[ i ] = getMaterial( c, c.material[ i ] );
-
-					}
-
-				}
-
-			} else if ( ! c.material.isMaterial ) {
-
-				c.material = getMaterial( c, c.material );
-
-			}
-
-		}
-
-	} );
-
-
-	// Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
-	// (24 for lines, 16 for edges) then the pass through color code is used. If that is also pass through then it's
-	// simply returned for the subsequent material application.
-	function getMaterial( c, colorCode ) {
-
-		// if our parent is a passthrough color code and we don't have the current material color available then
-		// return early.
-		if ( parentIsPassthrough && ! ( colorCode in materialHierarchy ) && ! finalMaterialPass ) {
-
-			return colorCode;
-
-		}
-
-		const forEdge = c.isLineSegments || c.isConditionalLine;
-		const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
-		if ( isPassthrough ) {
-
-			colorCode = parentColorCode;
-
-		}
-
-		let material;
-		if ( ! ( colorCode in materialHierarchy ) ) {
-
-			// throw an error if this is final opportunity to set the material
-			if ( finalMaterialPass ) {
-
-				const material = loader.getMaterial( colorCode );
-				if ( material === null ) {
-
-					throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
-
-				}
-
-			}
-
-			return colorCode;
-
-		} else {
-
-			material = materialHierarchy[ colorCode ];
-
-		}
-
-		if ( c.isLineSegments ) {
-
-			material = material.userData.edgeMaterial;
-
-			if ( c.isConditionalLine ) {
-
-				material = material.userData.conditionalEdgeMaterial;
-
-			}
-
-		}
-
-		return material;
-
-	}
-
-}
-
 // Class used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
 class LDrawPartsGeometryCache {
 
@@ -1410,6 +1315,7 @@ class LDrawPartsGeometryCache {
 	// Convert the given file information into a mesh by processing subobjects.
 	async processIntoMesh( info ) {
 
+		const loader = this.loader;
 		const parseCache = this.parseCache;
 		const faceMaterials = new Set();
 
@@ -1473,7 +1379,7 @@ class LDrawPartsGeometryCache {
 					subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
 					subobjectGroup.name = subobject.fileName;
 
-					applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
+					loader.applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
 
 					group.add( subobjectGroup );
 					continue;
@@ -1566,7 +1472,7 @@ class LDrawPartsGeometryCache {
 			// to material scoping.
 			if ( subobject ) {
 
-				applyMaterialsToMesh( group, subobject.colorCode, info.materials );
+				loader.applyMaterialsToMesh( group, subobject.colorCode, info.materials );
 
 			}
 
@@ -1583,7 +1489,7 @@ class LDrawPartsGeometryCache {
 
 		await processInfoSubobjects( info );
 
-		if ( this.loader.smoothNormals ) {
+		if ( loader.smoothNormals ) {
 
 			const checkSubSegments = faceMaterials.size > 1;
 			generateFaceNormals( info.faces );
@@ -2033,7 +1939,7 @@ class LDrawLoader extends Loader {
 				.parseModel( text, this.materialLibrary )
 				.then( group => {
 
-					applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, this, true );
+					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 					this.computeConstructionSteps( group );
 					onLoad( group );
 
@@ -2111,6 +2017,102 @@ class LDrawLoader extends Loader {
 		}
 
 		return this.materialLibrary[ colorCode ] || null;
+
+	}
+
+	// Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
+	// in the material array if they need to be filled in.
+	applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalMaterialPass = false ) {
+
+		// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
+		const loader = this;
+		const parentIsPassthrough = parentColorCode === MAIN_COLOUR_CODE;
+		group.traverse( c => {
+
+			if ( c.isMesh || c.isLineSegments ) {
+
+				if ( Array.isArray( c.material ) ) {
+
+					for ( let i = 0, l = c.material.length; i < l; i ++ ) {
+
+						if ( ! c.material[ i ].isMaterial ) {
+
+							c.material[ i ] = getMaterial( c, c.material[ i ] );
+
+						}
+
+					}
+
+				} else if ( ! c.material.isMaterial ) {
+
+					c.material = getMaterial( c, c.material );
+
+				}
+
+			}
+
+		} );
+
+
+		// Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
+		// (24 for lines, 16 for edges) then the pass through color code is used. If that is also pass through then it's
+		// simply returned for the subsequent material application.
+		function getMaterial( c, colorCode ) {
+
+			// if our parent is a passthrough color code and we don't have the current material color available then
+			// return early.
+			if ( parentIsPassthrough && ! ( colorCode in materialHierarchy ) && ! finalMaterialPass ) {
+
+				return colorCode;
+
+			}
+
+			const forEdge = c.isLineSegments || c.isConditionalLine;
+			const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
+			if ( isPassthrough ) {
+
+				colorCode = parentColorCode;
+
+			}
+
+			let material;
+			if ( ! ( colorCode in materialHierarchy ) ) {
+
+				// throw an error if this is final opportunity to set the material
+				if ( finalMaterialPass ) {
+
+					const material = loader.getMaterial( colorCode );
+					if ( material === null ) {
+
+						throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
+
+					}
+
+				}
+
+				return colorCode;
+
+			} else {
+
+				material = materialHierarchy[ colorCode ];
+
+			}
+
+			if ( c.isLineSegments ) {
+
+				material = material.userData.edgeMaterial;
+
+				if ( c.isConditionalLine ) {
+
+					material = material.userData.conditionalEdgeMaterial;
+
+				}
+
+			}
+
+			return material;
+
+		}
 
 	}
 
