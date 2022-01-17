@@ -1,7 +1,7 @@
 import {
 	UniformsLib,
 	UniformsUtils
-} from '../../three';
+} from 'three';
 
 import { Node } from '../../core/Node.js';
 import { ExpressionNode } from '../../core/ExpressionNode.js';
