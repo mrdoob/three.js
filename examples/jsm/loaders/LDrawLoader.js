@@ -1641,7 +1641,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 	const quadArray = new Array( 6 );
 	const bufferGeometry = new BufferGeometry();
-	let prevMaterial = undefined;
+	let prevMaterial = null;
 	let index0 = 0;
 	let numGroupVerts = 0;
 	let offset = 0;
