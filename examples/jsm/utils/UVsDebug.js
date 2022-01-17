@@ -1,6 +1,6 @@
 import {
 	Vector2
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * tool for "unwrapping" and debugging three.js geometries UV mapping
