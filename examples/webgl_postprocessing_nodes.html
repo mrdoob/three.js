@@ -11,6 +11,18 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Post-Processing
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -263,12 +275,12 @@
 						const sat = new Nodes.FloatNode( 0 );
 
 						const satrgb = new Nodes.FunctionNode( [
-							"vec3 satrgb( vec3 rgb, float adjustment ) {",
+							'vec3 satrgb( vec3 rgb, float adjustment ) {',
 							// include luminance function from LuminanceNode
-							"	vec3 intensity = vec3( luminance( rgb ) );",
-							"	return mix( intensity, rgb, adjustment );",
-							"}"
-						].join( "\n" ), [ Nodes.LuminanceNode.Nodes.luminance ] );
+							'	vec3 intensity = vec3( luminance( rgb ) );',
+							'	return mix( intensity, rgb, adjustment );',
+							'}'
+						].join( '\n' ), [ Nodes.LuminanceNode.Nodes.luminance ] );
 
 						const saturation = new Nodes.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = screen;
