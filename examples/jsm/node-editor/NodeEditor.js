@@ -19,6 +19,8 @@ import { PositionEditor } from './accessors/PositionEditor.js';
 import { NormalEditor } from './accessors/NormalEditor.js';
 import { TimerEditor } from './utils/TimerEditor.js';
 import { OscillatorEditor } from './utils/OscillatorEditor.js';
+import { SplitEditor } from './utils/SplitEditor.js';
+import { JoinEditor } from './utils/JoinEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
 import { EventDispatcher } from 'three';
@@ -162,6 +164,16 @@ export const NodeList = [
 				name: 'Oscillator',
 				icon: 'wave-sine',
 				nodeClass: OscillatorEditor
+			},
+			{
+				name: 'Split',
+				icon: 'arrows-split-2',
+				nodeClass: SplitEditor
+			},
+			{
+				name: 'Join',
+				icon: 'arrows-join-2',
+				nodeClass: JoinEditor
 			}
 		]
 	},
@@ -211,6 +223,8 @@ export const ClassLib = {
 	NormalEditor,
 	TimerEditor,
 	OscillatorEditor,
+	SplitEditor,
+	JoinEditor,
 	CheckerEditor
 };
 
