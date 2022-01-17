@@ -1,4 +1,4 @@
-import { Matrix4 } from '../three';
+import { Matrix4 } from 'three';
 
 import { InputNode } from '../core/InputNode.js';
 

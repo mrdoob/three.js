@@ -1,4 +1,4 @@
-import { Vector3 } from '../three';
+import { Vector3 } from 'three';
 
 import { Vector3Node } from '../inputs/Vector3Node.js';
 

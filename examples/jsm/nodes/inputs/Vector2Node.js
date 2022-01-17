@@ -1,4 +1,4 @@
-import { Vector2 } from '../three';
+import { Vector2 } from 'three';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';

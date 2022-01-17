@@ -1,7 +1,7 @@
 import {
 	LinearEncoding,
 	sRGBEncoding
-} from '../three';
+} from 'three';
 
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';

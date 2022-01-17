@@ -5,7 +5,7 @@ import {
 	CubeUVRefractionMapping,
 	LinearEncoding,
 	sRGBEncoding
-} from '../three';
+} from 'three';
 
 import { NodeUniform } from './NodeUniform.js';
 import { NodeUtils } from './NodeUtils.js';

@@ -1,4 +1,4 @@
-import { MathUtils } from '../three';
+import { MathUtils } from 'three';
 import { Node } from './Node.js';
 
 class TempNode extends Node {
