@@ -67,7 +67,7 @@
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -124,14 +124,14 @@
 
 				const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				const texture1 = textureLoader.load( "textures/crate.gif" );
+				const texture1 = textureLoader.load( 'textures/crate.gif' );
 				const material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
 				texture1.anisotropy = maxAnisotropy;
 				texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
 				texture1.repeat.set( 512, 512 );
 
-				const texture2 = textureLoader.load( "textures/crate.gif" );
+				const texture2 = textureLoader.load( 'textures/crate.gif' );
 				const material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
 				texture2.anisotropy = 1;
@@ -140,13 +140,13 @@
 
 				if ( maxAnisotropy > 0 ) {
 
-					document.getElementById( "val_left" ).innerHTML = texture1.anisotropy;
-					document.getElementById( "val_right" ).innerHTML = texture2.anisotropy;
+					document.getElementById( 'val_left' ).innerHTML = texture1.anisotropy;
+					document.getElementById( 'val_right' ).innerHTML = texture2.anisotropy;
 
 				} else {
 
-					document.getElementById( "val_left" ).innerHTML = "not supported";
-					document.getElementById( "val_right" ).innerHTML = "not supported";
+					document.getElementById( 'val_left' ).innerHTML = 'not supported';
+					document.getElementById( 'val_right' ).innerHTML = 'not supported';
 
 				}
 
@@ -171,7 +171,7 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 
-				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.position = 'relative';
 				container.appendChild( renderer.domElement );
 
 				// STATS1

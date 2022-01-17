@@ -27,7 +27,7 @@
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -91,7 +91,7 @@
 
 				//
 
-				const mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				const mapHeight = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg' );
 
 				const material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
@@ -102,7 +102,7 @@
 				} );
 
 				loader = new GLTFLoader();
-				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 

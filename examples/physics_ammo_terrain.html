@@ -31,7 +31,7 @@
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -139,7 +139,7 @@
 				scene.add( terrainMesh );
 
 				const textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "textures/grid.png", function ( texture ) {
+				textureLoader.load( 'textures/grid.png', function ( texture ) {
 
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
@@ -254,7 +254,7 @@
 				const upAxis = 1;
 
 				// hdt, height data type. "PHY_FLOAT" is used. Possible values are "PHY_FLOAT", "PHY_UCHAR", "PHY_SHORT"
-				const hdt = "PHY_FLOAT";
+				const hdt = 'PHY_FLOAT';
 
 				// Set this to your needs (inverts the triangles)
 				const flipQuadEdges = false;

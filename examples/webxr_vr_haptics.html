@@ -26,7 +26,7 @@
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
@@ -155,7 +155,7 @@
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
-				document.getElementById( "VRButton" ).addEventListener( "click", () => {
+				document.getElementById( 'VRButton' ).addEventListener( 'click', () => {
 
 					initAudio();
 
@@ -172,14 +172,14 @@
 				const controllerModelFactory = new XRControllerModelFactory();
 
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-				controllerGrip1.addEventListener( "connected", controllerConnected );
-				controllerGrip1.addEventListener( "disconnected", controllerDisconnected );
+				controllerGrip1.addEventListener( 'connected', controllerConnected );
+				controllerGrip1.addEventListener( 'disconnected', controllerDisconnected );
 				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
 				scene.add( controllerGrip1 );
 
 				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
-				controllerGrip2.addEventListener( "connected", controllerConnected );
-				controllerGrip2.addEventListener( "disconnected", controllerDisconnected );
+				controllerGrip2.addEventListener( 'connected', controllerConnected );
+				controllerGrip2.addEventListener( 'disconnected', controllerDisconnected );
 				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 				scene.add( controllerGrip2 );
 
@@ -240,7 +240,7 @@
 						center: grip.position
 					};
 
-					if ( "hapticActuators" in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0 ) {
+					if ( 'hapticActuators' in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0 ) {
 
 						for ( let i = 0; i < group.children.length; i ++ ) {
 

@@ -27,7 +27,7 @@
 	</script>
 
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -163,7 +163,7 @@
 			gui.add( thicknessControls, 'distortion' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
 
 				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distortion;
-				console.log('distortion')
+				console.log( 'distortion' );
 
 			} );
 

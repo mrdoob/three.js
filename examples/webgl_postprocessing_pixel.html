@@ -28,7 +28,7 @@
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
@@ -48,7 +48,7 @@
 
 			function updateGUI() {
 
-				pixelPass.uniforms[ "pixelSize" ].value = params.pixelSize;
+				pixelPass.uniforms[ 'pixelSize' ].value = params.pixelSize;
 
 			}
 
@@ -120,8 +120,8 @@
 				composer.addPass( new RenderPass( scene, camera ) );
 
 				pixelPass = new ShaderPass( PixelShader );
-				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
-				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
+				pixelPass.uniforms[ 'resolution' ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				pixelPass.uniforms[ 'resolution' ].value.multiplyScalar( window.devicePixelRatio );
 				composer.addPass( pixelPass );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -142,7 +142,7 @@
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
+				pixelPass.uniforms[ 'resolution' ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 
 			}
 
