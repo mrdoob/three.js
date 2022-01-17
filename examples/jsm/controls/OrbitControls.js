@@ -66,6 +66,9 @@ class OrbitControls extends EventDispatcher {
 		this.enableZoom = true;
 		this.zoomSpeed = 1.0;
 
+		//Set to enable dollying(zooming) with the follow of the mouse pointer on screen.
+		this.enableFollowZoom = false;
+
 		// Set to false to disable rotating
 		this.enableRotate = true;
 		this.rotateSpeed = 1.0;
@@ -581,15 +584,43 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function handleMouseWheel( event ) {
+		function followZoom(event){
+			let x = (event.offsetX / scope.domElement.clientWidth) * 2 -1,
+			y = -(event.offsetY / scope.domElement.clientHeight) * 2 + 1,
+			v = new Vector3(x, y, 0);
 
+			v.unproject(scope.object);
+			v.sub(scope.object.position).setLength(scope.zoomSpeed * 10) // it needs more speed here;
+
+			if(event.deltaY < 0){
+				scope.object.position.add(v);
+				scope.target.add(v);
+			} else {
+				scope.object.position.sub(v);
+				scope.target.sub(v);
+			}
+		}
+
+		function notFollowZoom(event){
 			if ( event.deltaY < 0 ) {
-
+	
 				dollyIn( getZoomScale() );
 
 			} else if ( event.deltaY > 0 ) {
 
 				dollyOut( getZoomScale() );
+
+			}
+		}
+
+		function handleMouseWheel( event ) {
+
+			if(scope.enableFollowZoom){
+
+				followZoom(event);
+
+			} else {
+				notFollowZoom(event);
 
 			}
 
