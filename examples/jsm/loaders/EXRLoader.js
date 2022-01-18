@@ -1760,8 +1760,8 @@ class EXRLoader extends DataTextureLoader {
 
 			let int;
 
-			if ( DataView.prototype.getBigInt64 ) {
-			
+			if ( 'getBigInt64' in DataView.prototype ) {
+				
 				int = Number( dataView.getBigInt64( offset.value, true ) );
 
 			} else {
