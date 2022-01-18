@@ -1631,13 +1631,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const format = texture.format;
 		const type = texture.type;
 
-		if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
+		if ( texture.isCompressedTexture === true || texture.isVideoTexture === true || texture.format === _SRGBAFormat ) return image;
 
 		if ( encoding !== LinearEncoding ) {
 
 			// sRGB
 
-			if ( encoding === sRGBEncoding && texture.isVideoTexture !== true ) {
+			if ( encoding === sRGBEncoding ) {
 
 				if ( isWebGL2 === false ) {
 
