@@ -1756,7 +1756,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		const parseInt64 = ( dataView, offset ) => {
+		const parseInt64 = function( dataView, offset ) {
 
 			let int;
 
