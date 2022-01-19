@@ -667,7 +667,7 @@ function WebGLState( gl, extensions, capabilities ) {
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
 							break;
 
 						case MultiplyBlending:
