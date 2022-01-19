@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import { vector } from '../core/NodeBuilder.js';
 
 class SplitNode extends Node {
 
@@ -8,6 +9,20 @@ class SplitNode extends Node {
 
 		this.node = node;
 		this.components = components;
+
+	}
+
+	getVectorLength() {
+
+		let vectorLength = this.components.length;
+
+		for ( const c of this.components ) {
+
+			vectorLength = Math.max( vector.indexOf( c ) + 1, vectorLength );
+
+		}
+
+		return vectorLength;
 
 	}
 
@@ -24,15 +39,15 @@ class SplitNode extends Node {
 
 		if ( nodeTypeLength > 1 ) {
 
-			const components = this.components;
-
 			let type = null;
 
-			if ( components.length >= nodeTypeLength ) {
+			const componentsLength = this.getVectorLength();
+
+			if ( componentsLength >= nodeTypeLength ) {
 
 				// need expand the input node
 
-				type = this.getNodeType( builder );
+				type = builder.getTypeFromLength( this.getVectorLength() );
 
 			}
 
