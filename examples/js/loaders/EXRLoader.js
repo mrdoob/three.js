@@ -1606,13 +1606,24 @@
 
 			}
 
-			function parseInt64( dataView, offset ) {
+			const parseInt64 = function ( dataView, offset ) {
 
-				var int = Number( dataView.getBigInt64( offset.value, true ) );
+				let int;
+
+				if ( 'getBigInt64' in DataView.prototype ) {
+
+					int = Number( dataView.getBigInt64( offset.value, true ) );
+
+				} else {
+
+					int = dataView.getUint32( offset.value + 4, true ) + Number( dataView.getUint32( offset.value, true ) << 32 );
+
+				}
+
 				offset.value += ULONG_SIZE;
 				return int;
 
-			}
+			};
 
 			function parseFloat32( dataView, offset ) {
 
@@ -1826,14 +1837,14 @@
 
 				}
 
-				EXRHeader.version = dataView.getUint8( 4, true );
-				const spec = dataView.getUint8( 5, true ); // fullMask
+				EXRHeader.version = dataView.getUint8( 4 );
+				const spec = dataView.getUint8( 5 ); // fullMask
 
 				EXRHeader.spec = {
-					singleTile: !! ( spec & 1 ),
-					longName: !! ( spec & 2 ),
-					deepFormat: !! ( spec & 4 ),
-					multiPart: !! ( spec & 8 )
+					singleTile: !! ( spec & 2 ),
+					longName: !! ( spec & 4 ),
+					deepFormat: !! ( spec & 8 ),
+					multiPart: !! ( spec & 16 )
 				}; // start of header
 
 				offset.value = 8; // start at 8 - after pre-amble

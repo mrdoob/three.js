@@ -70,8 +70,20 @@
 		}
 	</script>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -121,8 +133,8 @@
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					"map": { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
-					"time": { value: 0.0 }
+					'map': { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
+					'time': { value: 0.0 }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,
@@ -169,7 +181,7 @@
 
 			const time = performance.now() * 0.0005;
 
-			material.uniforms[ "time" ].value = time;
+			material.uniforms[ 'time' ].value = time;
 
 			mesh.rotation.x = time * 0.2;
 			mesh.rotation.y = time * 0.4;

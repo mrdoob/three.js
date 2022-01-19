@@ -174,7 +174,7 @@
 				event.preventDefault();
 				event.dataTransfer.dropEffect = 'copy';
 
-			}, false );
+			});
 
 			document.addEventListener( 'drop', function ( event ) {
 
@@ -194,7 +194,7 @@
 
 				}
 
-			}, false );
+			} );
 
 			function onWindowResize() {
 
@@ -202,7 +202,7 @@
 
 			}
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			onWindowResize();
 

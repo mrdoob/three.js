@@ -8,7 +8,8 @@ import { NodeUpdateType } from './constants.js';
 
 import { REVISION, LinearEncoding } from 'three';
 
-const shaderStages = [ 'fragment', 'vertex' ];
+export const shaderStages = [ 'fragment', 'vertex' ];
+export const vector = [ 'x', 'y', 'z', 'w' ];
 
 class NodeBuilder {
 
