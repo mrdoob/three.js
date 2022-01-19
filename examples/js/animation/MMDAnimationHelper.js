@@ -44,7 +44,9 @@
 				cameraAnimation: true
 			};
 
-			this.onBeforePhysics = function () {}; // experimental
+			this.onBeforePhysics = function
+			/* mesh */
+			() {}; // experimental
 
 
 			this.sharedPhysics = false;

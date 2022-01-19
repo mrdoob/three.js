@@ -181,12 +181,6 @@ class EdgeSplitModifier {
 
 		if ( geometry.index == null ) {
 
-			if ( BufferGeometryUtils === undefined ) {
-
-				throw new Error( 'THREE.EdgeSplitModifier relies on BufferGeometryUtils' );
-
-			}
-
 			geometry = BufferGeometryUtils.mergeVertices( geometry );
 
 		}

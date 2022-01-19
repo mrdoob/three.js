@@ -1,20 +1,21 @@
-import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { SelectInput, LabelElement, Element } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
 import { MathNode, FloatNode } from '../../renderers/nodes/Nodes.js';
 
 const NULL_VALUE = new FloatNode();
 
-export class LimiterEditor extends ObjectNode {
+export class LimiterEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new MathNode( MathNode.MAX, NULL_VALUE, NULL_VALUE );
+		const node = new MathNode( MathNode.MIN, NULL_VALUE, NULL_VALUE );
 
-		super( 'Limiter', 1, node, 250 );
+		super( 'Limiter', 1, node, 175 );
 
 		const methodInput = new SelectInput( [
-			{ name: 'Max', value: MathNode.MAX },
-			{ name: 'Min', value: MathNode.MIN }
-		] );
+			{ name: 'Min', value: MathNode.MIN },
+			{ name: 'Max', value: MathNode.MAX }
+		], MathNode.MIN );
 
 		methodInput.onChange( ( data ) => {
 
@@ -29,17 +30,17 @@ export class LimiterEditor extends ObjectNode {
 
 		aElement.onConnect( () => {
 
-			node.aNode = aElement.linkedExtra || NULL_VALUE;
+			node.aNode = aElement.getLinkedObject() || NULL_VALUE;
 
 		} );
 
 		bElement.onConnect( () => {
 
-			node.bNode = bElement.linkedExtra || NULL_VALUE;
+			node.bNode = bElement.getLinkedObject() || NULL_VALUE;
 
 		} );
 
-		this.add( new LabelElement( 'Method' ).add( methodInput ) )
+		this.add( new Element().add( methodInput ) )
 			.add( aElement )
 			.add( bElement );
 

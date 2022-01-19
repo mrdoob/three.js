@@ -17,16 +17,6 @@ const _cb = new Vector3(), _ab = new Vector3();
 
 class SimplifyModifier {
 
-	constructor() {
-
-		if ( BufferGeometryUtils === undefined ) {
-
-			throw new Error( 'THREE.SimplifyModifier relies on BufferGeometryUtils' );
-
-		}
-
-	}
-
 	modify( geometry, count ) {
 
 		if ( geometry.isGeometry === true ) {

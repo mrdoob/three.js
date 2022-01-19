@@ -134,7 +134,7 @@
 				// Check if each byte in query matches the corresponding byte from the current offset
 				for ( let i = 0, il = query.length; i < il; i ++ ) {
 
-					if ( query[ i ] !== reader.getUint8( offset + i, false ) ) return false;
+					if ( query[ i ] !== reader.getUint8( offset + i ) ) return false;
 
 				}
 
