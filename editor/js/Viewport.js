@@ -232,7 +232,7 @@ function Viewport( editor ) {
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
 
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		document.addEventListener( 'mouseup', onMouseUp );
 
 	}
 
@@ -243,7 +243,7 @@ function Viewport( editor ) {
 
 		handleClick();
 
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		document.removeEventListener( 'mouseup', onMouseUp );
 
 	}
 
@@ -254,7 +254,7 @@ function Viewport( editor ) {
 		var array = getMousePosition( container.dom, touch.clientX, touch.clientY );
 		onDownPosition.fromArray( array );
 
-		document.addEventListener( 'touchend', onTouchEnd, false );
+		document.addEventListener( 'touchend', onTouchEnd );
 
 	}
 
@@ -267,7 +267,7 @@ function Viewport( editor ) {
 
 		handleClick();
 
-		document.removeEventListener( 'touchend', onTouchEnd, false );
+		document.removeEventListener( 'touchend', onTouchEnd );
 
 	}
 
@@ -288,9 +288,9 @@ function Viewport( editor ) {
 
 	}
 
-	container.dom.addEventListener( 'mousedown', onMouseDown, false );
-	container.dom.addEventListener( 'touchstart', onTouchStart, false );
-	container.dom.addEventListener( 'dblclick', onDoubleClick, false );
+	container.dom.addEventListener( 'mousedown', onMouseDown );
+	container.dom.addEventListener( 'touchstart', onTouchStart );
+	container.dom.addEventListener( 'dblclick', onDoubleClick );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.

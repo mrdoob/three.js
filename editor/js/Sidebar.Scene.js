@@ -43,7 +43,7 @@ function SidebarScene( editor ) {
 				nodeStates.set( object, nodeStates.get( object ) === false ); // toggle
 				refreshUI();
 
-			}, false );
+			} );
 
 			option.insertBefore( opener, option.firstChild );
 
