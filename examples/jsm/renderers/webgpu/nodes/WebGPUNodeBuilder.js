@@ -1,4 +1,4 @@
-import { LinearEncoding } from 'three';
+import { Color, FogExp2, LinearEncoding, Vector3, Vector4 } from 'three';
 
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
 import {
@@ -11,6 +11,9 @@ import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
 import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
+import Vector3Node from '../../nodes/inputs/Vector2Node.js';
+import Vector4Node from '../../nodes/inputs/Vector4Node.js';
+import FunctionNode from '../../nodes/core/FunctionNode.js';
 import VarNode from '../../nodes/core/VarNode.js';
 import CodeNode from '../../nodes/core/CodeNode.js';
 import BypassNode from '../../nodes/core/BypassNode.js';
@@ -269,6 +272,276 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			const outputNodeObj = nodeObject( outputNode );
 
 			outputNode = join( outputNodeObj.x, outputNodeObj.y, outputNodeObj.z, nodeObject( diffuseColorNode ).w );
+
+			// FOG
+
+			if ( scene.fog ) {
+
+				let fogDensity = 0.0001;
+
+				let fogNoiseImpact = 0.5;
+
+				let fogNoiseFreq = 0.0012;
+
+				// using Vector4 it is possible to set the alpha component of the fog colors to create a disappearing effect
+
+				let fogColor = new Vector4(1.0, 1.0, 1.0, 0.0);
+
+				let nearColor = new Vector4(0.0, 0.0, 0.0, 0.0);
+
+				let near = 1.0;
+
+				let far = 1000.0;
+
+				let useNearFar = - 1.0;
+
+				if ( scene.fog.fogDensity ) {
+					fogDensity = scene.fog.fogDensity;
+				}
+
+				if ( scene.fog.fogNoiseImpact ) {
+					fogNoiseImpact = scene.fog.fogNoiseImpact;
+				}
+
+				if ( scene.fog.fogNoiseFreq ) {
+					fogNoiseFreq = scene.fog.fogNoiseFreq;
+				}
+
+				if ( scene.fog.near ) {
+
+					near = scene.fog.near;
+
+				}
+
+				if ( scene.fog.far ) {
+
+					far = scene.fog.far;
+
+				}
+
+				if ( scene.fog instanceof FogExp2 ) {
+
+					useNearFar = 1.0;
+
+				}
+
+				if ( scene.fog.color instanceof Color ) {
+
+					fogColor = new Vector4(scene.fog.color.r, scene.fog.color.g, scene.fog.color.b, 1.0);
+
+				}
+
+				if ( scene.fog.color instanceof Vector4 ) {
+
+					fogColor = scene.fog.color.clone();
+
+				}
+
+				if ( scene.fog.nearColor instanceof Color ) {
+
+					nearColor = new Vector4(scene.fog.nearColor.r, scene.fog.nearColor.g, scene.fog.nearColor.b, 1.0);
+
+				}
+
+				if ( scene.fog.nearColor instanceof Vector4 ) {
+
+					nearColor = scene.fog.nearColor.clone();
+
+				}
+
+				let useNoise = - 1.0;
+
+				if ( scene.fog.useNoise === true ) {
+
+					useNoise = 1.0;
+
+				}
+
+
+				const mod = new CodeNode(`
+				fn mod( x : f32, y : f32 ) -> f32 {
+					return x - y * floor( x / y );
+				}
+				`);
+
+				const mod3 = new CodeNode(`
+				fn mod3( x : vec3<f32>, y : f32 ) -> vec3<f32> {
+					return x - y * floor( x / y );
+				}
+				`);
+
+				const permute = new CodeNode(`
+				fn permute( x: vec4<f32> ) -> vec4<f32> {
+					return (((x*34.0)+1.0)*x) - 289.0 * floor((((x*34.0)+1.0)*x)/289.0);
+				}
+				`);
+
+				const taylorInvSqrt = new CodeNode(`
+				fn taylorInvSqrt( r: vec4<f32> ) -> vec4<f32> {
+					return 1.79284291400159 - 0.85373472095314 * r;
+				}
+				`);
+
+				const fade = new CodeNode(`
+				fn fade( t: vec3<f32> ) -> vec3<f32> {
+					return t*t*t*(t*(-15.0 + t*6.0)+10.0);
+				}
+				`);
+
+				const step4 = new CodeNode(`
+				fn step4(edge: f32, x: vec4<f32> ) -> vec4<f32> {
+					var a: f32 = 0.0;
+					var b: f32 = 0.0;
+					var c: f32 = 0.0;
+					var d: f32 = 0.0;
+					if (x.x > edge) {
+						a = 1.0;
+					}
+					if (x.y > edge) {
+						b = 1.0;
+					}
+					if (x.z > edge) {
+						c = 1.0;
+					}
+					if (x.w > edge) {
+						d = 1.0;
+					}
+				
+					return vec4<f32> (a, b, c, d);
+				}
+				`);
+
+				const step44 = new CodeNode(`
+				fn step44(edge: vec4<f32> , x: vec4<f32> ) -> vec4<f32> {
+					var a: f32 = 0.0;
+					var b: f32 = 0.0;
+					var c: f32 = 0.0;
+					var d: f32 = 0.0;
+					if (x.x > edge.x) {
+						a = 1.0;
+					}
+					if (x.y > edge.y) {
+						b = 1.0;
+					}
+					if (x.z > edge.z) {
+						c = 1.0;
+					}
+					if (x.w > edge.w) {
+						d = 1.0;
+					}
+				
+					return vec4<f32> (a, b, c, d);
+				}
+				`);
+
+				const fogWGSLNode = new FunctionNode(`
+				fn fog(color: vec4<f32> , fogColor: vec4<f32> , fogNearColor: vec4<f32> , fogSettings: vec4<f32> , nearFar: vec3<f32> , depth: vec3<f32> , world: vec3<f32> ) -> vec4<f32> {
+
+					let fogDensity: f32 = fogSettings.x;
+					let fogNoiseImpact: f32 = fogSettings.y;
+					let fogNoiseFreq: f32 = fogSettings.z;
+				
+					var vFogDepth: f32 = depth.z;
+				
+					if (fogSettings.w > 0.0) {
+				
+						//calculate perlin noise - based on https://stackblitz.com/edit/threejs-fog-hacks?file=PerlinNoise.js
+				
+						let P: vec3<f32> = fogNoiseFreq * world;
+				
+						var Pi0: vec3<f32> = floor(P); // Integer part for indexing
+						var Pi1: vec3<f32> = Pi0 + vec3<f32> (1.0); // Integer part + 1
+						Pi0 = mod3(Pi0, 289.0);
+						Pi1 = mod3(Pi1, 289.0);
+						let Pf0: vec3<f32> = fract(P); // Fractional part for interpolation
+						let Pf1: vec3<f32> = Pf0 - vec3<f32> (1.0); // Fractional part - 1.0
+						let ix: vec4<f32> = vec4<f32> (Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+						let iy: vec4<f32> = vec4<f32> (Pi0.yy, Pi1.yy);
+						let iz0: vec4<f32> = Pi0.zzzz;
+						let iz1: vec4<f32> = Pi1.zzzz;
+				
+						let ixy: vec4<f32> = permute(permute(ix) + iy);
+						let ixy0: vec4<f32> = permute(ixy + iz0);
+						let ixy1: vec4<f32> = permute(ixy + iz1);
+				
+						var gx0: vec4<f32> = ixy0 / 7.0;
+						var gy0: vec4<f32> = fract(floor(gx0) / 7.0) - 0.5;
+						gx0 = fract(gx0);
+						let gz0: vec4<f32> = vec4<f32> (0.5) - abs(gx0) - abs(gy0);
+						let sz0: vec4<f32> = step44(gz0, vec4<f32> (0.0));
+						gx0 = gx0 - (sz0 * (step4(0.0, gx0) - 0.5));
+						gy0 = gy0 - (sz0 * (step4(0.0, gy0) - 0.5));
+				
+						var gx1: vec4<f32> = ixy1 / 7.0;
+						var gy1: vec4<f32> = fract(floor(gx1) / 7.0) - 0.5;
+						gx1 = fract(gx1);
+						let gz1: vec4<f32> = vec4<f32> (0.5) - abs(gx1) - abs(gy1);
+						let sz1: vec4<f32> = step44(gz1, vec4<f32> (0.0));
+						gx1 = gx1 - (sz1 * (step4(0.0, gx1) - 0.5));
+						gy1 = gy1 - (sz1 * (step4(0.0, gy1) - 0.5));
+				
+						var g000: vec3<f32> = vec3<f32> (gx0.x, gy0.x, gz0.x);
+						var g100: vec3<f32> = vec3<f32> (gx0.y, gy0.y, gz0.y);
+						var g010: vec3<f32> = vec3<f32> (gx0.z, gy0.z, gz0.z);
+						var g110: vec3<f32> = vec3<f32> (gx0.w, gy0.w, gz0.w);
+						var g001: vec3<f32> = vec3<f32> (gx1.x, gy1.x, gz1.x);
+						var g101: vec3<f32> = vec3<f32> (gx1.y, gy1.y, gz1.y);
+						var g011: vec3<f32> = vec3<f32> (gx1.z, gy1.z, gz1.z);
+						var g111: vec3<f32> = vec3<f32> (gx1.w, gy1.w, gz1.w);
+				
+						let norm0: vec4<f32> = taylorInvSqrt(vec4<f32> (dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+						g000 = g000 * norm0.x;
+						g010 = g010 * norm0.y;
+						g100 = g100 * norm0.z;
+						g110 = g110 * norm0.w;
+						let norm1: vec4<f32> = taylorInvSqrt(vec4<f32> (dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+						g001 = g001 * norm1.x;
+						g011 = g011 * norm1.y;
+						g101 = g101 * norm1.z;
+						g111 = g111 * norm1.w;
+				
+						let n000: f32 = dot(g000, Pf0);
+						let n100: f32 = dot(g100, vec3<f32> (Pf1.x, Pf0.yz));
+						let n010: f32 = dot(g010, vec3<f32> (Pf0.x, Pf1.y, Pf0.z));
+						let n110: f32 = dot(g110, vec3<f32> (Pf1.xy, Pf0.z));
+						let n001: f32 = dot(g001, vec3<f32> (Pf0.xy, Pf1.z));
+						let n101: f32 = dot(g101, vec3<f32> (Pf1.x, Pf0.y, Pf1.z));
+						let n011: f32 = dot(g011, vec3<f32> (Pf0.x, Pf1.yz));
+						let n111: f32 = dot(g111, Pf1);
+				
+						let fade_xyz: vec3<f32> = fade(Pf0);
+						let n_z: vec4<f32> = mix(vec4<f32> (n000, n100, n010, n110), vec4<f32> (n001, n101, n011, n111), fade_xyz.z);
+						let n_yz: vec2<f32> = mix(n_z.xy, n_z.zw, fade_xyz.y);
+						let n_xyz: f32 = mix(n_yz.x, n_yz.y, fade_xyz.x);
+				
+						let noise: f32 = 2.2 * n_xyz;
+				
+						vFogDepth = depth.z - fogNoiseImpact * noise * depth.z;
+					}
+					var fogFactor: f32 = 1.0 - exp(-fogDensity * fogDensity * vFogDepth * vFogDepth);
+				
+					if (nearFar.z > 0.0) {
+						fogFactor = smoothStep(nearFar.x, nearFar.y, vFogDepth);
+					}
+				
+					var finalColor: vec4<f32> = mix(color, mix(fogNearColor, fogColor, fogFactor), fogFactor);
+				
+					return finalColor;
+				}
+				`);
+
+				fogWGSLNode.setIncludes( [ mod, mod3, permute, taylorInvSqrt, fade, step4, step44 ] );
+
+				outputNode = fogWGSLNode.call({
+					color: outputNode,
+					fogColor: new Vector4Node(fogColor),
+					fogNearColor: new Vector4Node(nearColor),
+					fogSettings: new Vector4Node(new Vector4(fogDensity, fogNoiseImpact, fogNoiseFreq, useNoise)),
+					nearFar: new Vector3Node(new Vector3(near, far, useNearFar)),
+					depth: new PositionNode(PositionNode.VIEW),
+					world: new PositionNode(PositionNode.WORLD)
+				});
+			}
 
 			//
 
