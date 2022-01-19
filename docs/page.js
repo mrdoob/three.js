@@ -31,27 +31,27 @@ function onDocumentLoad() {
 	let path, localizedPath;
 	const pathname = window.location.pathname;
 	const section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
-	let name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
+	let name = /[\-A-Za-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
 
 	switch ( section ) {
 
 		case 'api':
-			localizedPath = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			localizedPath = /\/api\/[A-Za-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
 
 			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
-			path = localizedPath.replace( /^[A-z0-9-]+\//, '' );
+			path = localizedPath.replace( /^[A-Za-z0-9-]+\//, '' );
 
 			break;
 
 		case 'examples':
-			path = localizedPath = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+			path = localizedPath = /\/examples\/[A-Za-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
 			break;
 
 		case 'manual':
 			name = name.replace( /\-/g, ' ' );
 
 			path = pathname.replace( /\ /g, '-' );
-			path = localizedPath = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
+			path = localizedPath = /\/manual\/[-A-Za-z0-9\/]+/.exec( path ).toString().substr( 8 );
 			break;
 
 	}
