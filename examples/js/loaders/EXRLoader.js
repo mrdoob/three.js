@@ -1837,8 +1837,8 @@
 
 				}
 
-				EXRHeader.version = dataView.getUint8( 4, true );
-				const spec = dataView.getUint8( 5, true ); // fullMask
+				EXRHeader.version = dataView.getUint8( 4 );
+				const spec = dataView.getUint8( 5 ); // fullMask
 
 				EXRHeader.spec = {
 					singleTile: !! ( spec & 2 ),
