@@ -3,7 +3,7 @@ import {
 	ShaderChunk,
 	ShaderLib,
 	UniformsUtils
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * ------------------------------------------------------------------------------------------

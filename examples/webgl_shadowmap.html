@@ -15,9 +15,21 @@
 		t: toggle HUD
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -189,7 +201,7 @@
 				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-					const textGeo = new TextGeometry( "THREE.JS", {
+					const textGeo = new TextGeometry( 'THREE.JS', {
 
 						font: font,
 
@@ -278,7 +290,7 @@
 
 				const gltfloader = new GLTFLoader();
 
-				gltfloader.load( "models/gltf/Horse.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Horse.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 
@@ -294,7 +306,7 @@
 
 				} );
 
-				gltfloader.load( "models/gltf/Flamingo.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					const clip = gltf.animations[ 0 ];
@@ -303,7 +315,7 @@
 
 				} );
 
-				gltfloader.load( "models/gltf/Stork.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Stork.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					const clip = gltf.animations[ 0 ];
@@ -312,7 +324,7 @@
 
 				} );
 
-				gltfloader.load( "models/gltf/Parrot.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					const clip = gltf.animations[ 0 ];
