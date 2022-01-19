@@ -199,6 +199,17 @@ function addAssetSceneToControllerModel( controllerModel, scene ) {
 
 	}
 
+	// inherit layers from the controller model
+	if ( controllerModel.layers.mask != 0 ) {
+
+		scene.traverse( ( child ) => {
+
+			child.layers.mask = controllerModel.layers.mask;
+
+		} );
+
+	}
+
 	// Add the glTF scene to the controllerModel.
 	controllerModel.add( scene );
 

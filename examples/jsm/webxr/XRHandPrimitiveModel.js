@@ -39,6 +39,7 @@ class XRHandPrimitiveModel {
 		this.handMesh.castShadow = true;
 		this.handMesh.receiveShadow = true;
 		this.handModel.add( this.handMesh );
+		this.handMesh.layers.mask = this.handModel.layers.mask;
 
 		this.joints = [
 			'wrist',

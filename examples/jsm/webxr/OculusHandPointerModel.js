@@ -237,6 +237,8 @@ class OculusHandPointerModel extends THREE.Object3D {
 		this.pointerObject.add( this.cursorObject );
 
 		this.add( this.pointerObject );
+		this.pointerObject.layers.mask = this.layers.mask;
+		this.pointerMesh.layers.mask = this.layers.mask;
 
 	}
 
