@@ -1,4 +1,4 @@
-import { Color, FogExp2, LinearEncoding, Vector3, Vector4 } from 'three';
+import { Color, Fog, LinearEncoding, Vector3, Vector4 } from 'three';
 
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
 import {
@@ -319,7 +319,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( scene.fog instanceof FogExp2 ) {
+				if ( scene.fog instanceof Fog ) {
 
 					useNearFar = 1.0;
 
