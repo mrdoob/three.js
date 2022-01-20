@@ -21480,7 +21480,7 @@ function WebGLState( gl, extensions, capabilities ) {
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFuncSeparate( 0, 0, 769, 771 );
+							gl.blendFuncSeparate( 0, 769, 0, 1 );
 							break;
 
 						case MultiplyBlending:
@@ -21506,7 +21506,7 @@ function WebGLState( gl, extensions, capabilities ) {
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFunc( 0, 769 );
+							gl.blendFuncSeparate( 0, 769, 0, 1 );
 							break;
 
 						case MultiplyBlending:
