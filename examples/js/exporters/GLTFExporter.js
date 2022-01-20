@@ -625,6 +625,71 @@
 			}
 
 		}
+
+		buildORMTexture( material ) {
+
+			const occlusion = material.aoMap?.image;
+			const roughness = material.roughnessMap?.image;
+			const metalness = material.metalnessMap?.image;
+			if ( occlusion === roughness && roughness === metalness ) return occlusion;
+
+			if ( occlusion || roughness || metalness ) {
+
+				const width = Math.max( occlusion?.width || 0, roughness?.width || 0, metalness?.width || 0 );
+				const height = Math.max( occlusion?.height || 0, roughness?.height || 0, metalness?.height || 0 );
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+				const context = canvas.getContext( '2d' );
+				context.fillStyle = '#ffffff';
+				context.fillRect( 0, 0, width, height );
+				const composite = context.getImageData( 0, 0, width, height );
+
+				if ( occlusion ) {
+
+					context.drawImage( occlusion, 0, 0, width, height );
+					const data = context.getImageData( 0, 0, width, height ).data;
+
+					for ( let i = 0; i < data.length; i += 4 ) {
+
+						composite.data[ i ] = data[ i ];
+
+					}
+
+				}
+
+				if ( roughness ) {
+
+					context.drawImage( roughness, 0, 0, width, height );
+					const data = context.getImageData( 0, 0, width, height ).data;
+
+					for ( let i = 1; i < data.length; i += 4 ) {
+
+						composite.data[ i ] = data[ i ];
+
+					}
+
+				}
+
+				if ( metalness ) {
+
+					context.drawImage( metalness, 0, 0, width, height );
+					const data = context.getImageData( 0, 0, width, height ).data;
+
+					for ( let i = 2; i < data.length; i += 4 ) {
+
+						composite.data[ i ] = data[ i ];
+
+					}
+
+				}
+
+				context.putImageData( composite, 0, 0 );
+				return new THREE.Texture( canvas );
+
+			}
+
+		}
 		/**
    * Process a buffer to append to the default one.
    * @param  {ArrayBuffer} buffer
@@ -972,7 +1037,7 @@
 		}
 		/**
    * Process sampler
-   * @param  {Texture} map Texture to process
+   * @param  {Texture} map THREE.Texture to process
    * @return {Integer}     Index of the processed texture in the "samplers" array
    */
 
@@ -1071,24 +1136,17 @@
 				materialDef.pbrMetallicRoughness.metallicFactor = 0.5;
 				materialDef.pbrMetallicRoughness.roughnessFactor = 0.5;
 
-			} // pbrMetallicRoughness.metallicRoughnessTexture
+			}
 
+			const ormTexture = this.buildORMTexture( material ); // pbrMetallicRoughness.metallicRoughnessTexture
 
 			if ( material.metalnessMap || material.roughnessMap ) {
 
-				if ( material.metalnessMap === material.roughnessMap ) {
-
-					const metalRoughMapDef = {
-						index: this.processTexture( material.metalnessMap )
-					};
-					this.applyTextureTransform( metalRoughMapDef, material.metalnessMap );
-					materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
-
-				} else {
-
-					console.warn( 'THREE.GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
-
-				}
+				const metalRoughMapDef = {
+					index: this.processTexture( ormTexture )
+				};
+				this.applyTextureTransform( metalRoughMapDef, material.metalnessMap || material.roughnessMap );
+				materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 			} // pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
 
@@ -1159,7 +1217,7 @@
 			if ( material.aoMap ) {
 
 				const occlusionMapDef = {
-					index: this.processTexture( material.aoMap ),
+					index: this.processTexture( ormTexture ),
 					texCoord: 1
 				};
 

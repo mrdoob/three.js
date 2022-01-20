@@ -24,7 +24,6 @@ import {
 	Points,
 	PointsMaterial,
 	Quaternion,
-	RGBAFormat,
 	RepeatWrapping,
 	Scene,
 	ShapeUtils,

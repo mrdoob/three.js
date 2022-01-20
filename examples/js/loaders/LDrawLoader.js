@@ -2244,6 +2244,7 @@
 			material.premultipliedAlpha = true;
 			material.opacity = alpha;
 			material.depthWrite = ! isTransparent;
+			material.color.convertSRGBToLinear();
 			material.polygonOffset = true;
 			material.polygonOffsetFactor = 1;
 
@@ -2263,7 +2264,8 @@
 					depthWrite: ! isTransparent
 				} );
 				edgeMaterial.userData.code = code;
-				edgeMaterial.name = name + ' - Edge'; // This is the material used for conditional edges
+				edgeMaterial.name = name + ' - Edge';
+				edgeMaterial.color.convertSRGBToLinear(); // This is the material used for conditional edges
 
 				edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
 					fog: true,
@@ -2272,6 +2274,7 @@
 					color: edgeColor,
 					opacity: alpha
 				} );
+				edgeMaterial.userData.conditionalEdgeMaterial.color.convertSRGBToLinear();
 
 			}
 
