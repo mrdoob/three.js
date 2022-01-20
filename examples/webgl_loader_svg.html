@@ -58,6 +58,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -169,7 +170,7 @@
 						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
 							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( fillColor ),
+								color: new THREE.Color().setStyle( fillColor ).convertSRGBToLinear(),
 								opacity: path.userData.style.fillOpacity,
 								transparent: true,
 								side: THREE.DoubleSide,
@@ -197,7 +198,7 @@
 						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
 
 							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( strokeColor ),
+								color: new THREE.Color().setStyle( strokeColor ).convertSRGBToLinear(),
 								opacity: path.userData.style.strokeOpacity,
 								transparent: true,
 								side: THREE.DoubleSide,
