@@ -7,7 +7,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
-})(this, (function (exports) { 'use strict';
+}(this, (function (exports) { 'use strict';
 
 	const REVISION = '137dev';
 	const MOUSE = {
@@ -14319,7 +14319,7 @@
 				instancing: object.isInstancedMesh === true,
 				instancingColor: object.isInstancedMesh === true && object.instanceColor !== null,
 				supportsVertexTextures: vertexTextures,
-				outputEncoding: currentRenderTarget === null ? renderer.outputEncoding : LinearEncoding,
+				outputEncoding: currentRenderTarget === null ? renderer.outputEncoding : currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.encoding : LinearEncoding,
 				map: !!material.map,
 				matcap: !!material.matcap,
 				envMap: !!envMap,
@@ -16525,6 +16525,12 @@
 				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.R8;
 			}
 
+			if (glFormat === _gl.RG) {
+				if (glType === _gl.FLOAT) internalFormat = _gl.RG32F;
+				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RG16F;
+				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.RG8;
+			}
+
 			if (glFormat === _gl.RGB) {
 				if (glType === _gl.FLOAT) internalFormat = _gl.RGB32F;
 				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGB16F;
@@ -16537,7 +16543,7 @@
 				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding && isVideoTexture === false ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 			}
 
-			if (internalFormat === _gl.R16F || internalFormat === _gl.R32F || internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F) {
+			if (internalFormat === _gl.R16F || internalFormat === _gl.R32F || internalFormat === _gl.RG16F || internalFormat === _gl.RG32F || internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F) {
 				extensions.get('EXT_color_buffer_float');
 			}
 
@@ -18236,8 +18242,10 @@
 								encoding: renderer.outputEncoding
 							});
 						}
-					} // Set foveation to maximum.
+					}
 
+					newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
+					// Set foveation to maximum.
 
 					this.setFoveation(1.0);
 					referenceSpace = await session.requestReferenceSpace(referenceSpaceType);
@@ -19430,9 +19438,7 @@
 			_isContextLost = true;
 		}
 
-		function
-			/* event */
-		onContextRestore() {
+		function onContextRestore() {
 			console.log('THREE.WebGLRenderer: Context Restored.');
 			_isContextLost = false;
 			const infoAutoReset = info.autoReset;
@@ -19971,7 +19977,7 @@
 			textures.resetTextureUnits();
 			const fog = scene.fog;
 			const environment = material.isMeshStandardMaterial ? scene.environment : null;
-			const encoding = _currentRenderTarget === null ? _this.outputEncoding : LinearEncoding;
+			const encoding = _currentRenderTarget === null ? _this.outputEncoding : _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.encoding : LinearEncoding;
 			const envMap = (material.isMeshStandardMaterial ? cubeuvmaps : cubemaps).get(material.envMap || environment);
 			const vertexAlphas = material.vertexColors === true && !!geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 			const vertexTangents = !!material.normalMap && !!geometry.attributes.tangent;
@@ -24542,9 +24548,7 @@
 
 
 	function isValidDiagonal(a, b) {
-		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // dones't intersect other edges
-		locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && ( // locally visible
-		area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
+		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && (area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
 		equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
 	} // signed area of a triangle
 
@@ -35116,14 +35120,10 @@
 	};
 
 	Loader.Handlers = {
-		add: function
-			/* regex, loader */
-		() {
+		add: function () {
 			console.error('THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.');
 		},
-		get: function
-			/* file */
-		() {
+		get: function () {
 			console.error('THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.');
 		}
 	};
@@ -35211,9 +35211,7 @@
 		return vector.applyMatrix3(this);
 	};
 
-	Matrix3.prototype.multiplyVector3Array = function
-		/* a */
-	() {
+	Matrix3.prototype.multiplyVector3Array = function () {
 		console.error('THREE.Matrix3: .multiplyVector3Array() has been removed.');
 	};
 
@@ -35222,9 +35220,7 @@
 		return attribute.applyMatrix3(this);
 	};
 
-	Matrix3.prototype.applyToVector3Array = function
-		/* array, offset, length */
-	() {
+	Matrix3.prototype.applyToVector3Array = function () {
 		console.error('THREE.Matrix3: .applyToVector3Array() has been removed.');
 	};
 
@@ -35268,9 +35264,7 @@
 		return vector.applyMatrix4(this);
 	};
 
-	Matrix4.prototype.multiplyVector3Array = function
-		/* a */
-	() {
+	Matrix4.prototype.multiplyVector3Array = function () {
 		console.error('THREE.Matrix4: .multiplyVector3Array() has been removed.');
 	};
 
@@ -35309,9 +35303,7 @@
 		return attribute.applyMatrix4(this);
 	};
 
-	Matrix4.prototype.applyToVector3Array = function
-		/* array, offset, length */
-	() {
+	Matrix4.prototype.applyToVector3Array = function () {
 		console.error('THREE.Matrix4: .applyToVector3Array() has been removed.');
 	};
 
@@ -35644,9 +35636,7 @@
 				console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 				return this.usage === DynamicDrawUsage;
 			},
-			set: function
-				/* value */
-			() {
+			set: function () {
 				console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 				this.setUsage(DynamicDrawUsage);
 			}
@@ -35659,13 +35649,9 @@
 		return this;
 	};
 
-	BufferAttribute.prototype.copyIndicesArray = function
-		/* indices */
-	() {
+	BufferAttribute.prototype.copyIndicesArray = function () {
 		console.error('THREE.BufferAttribute: .copyIndicesArray() has been removed.');
-	}, BufferAttribute.prototype.setArray = function
-		/* array */
-	() {
+	}, BufferAttribute.prototype.setArray = function () {
 		console.error('THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 	}; //
 
@@ -35740,9 +35726,7 @@
 		return this;
 	};
 
-	InterleavedBuffer.prototype.setArray = function
-		/* array */
-	() {
+	InterleavedBuffer.prototype.setArray = function () {
 		console.error('THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 	}; //
 
@@ -35976,9 +35960,7 @@
 				console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 				return undefined;
 			},
-			set: function
-				/* value */
-			() {
+			set: function () {
 				console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 			}
 		},
@@ -36038,9 +36020,7 @@
 				console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 				return undefined;
 			},
-			set: function
-				/* cullFace */
-			() {
+			set: function () {
 				console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 			}
 		},
@@ -36235,19 +36215,13 @@
 	} //
 
 	const SceneUtils = {
-		createMultiMaterialObject: function
-			/* geometry, materials */
-		() {
+		createMultiMaterialObject: function () {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		},
-		detach: function
-			/* child, parent, scene */
-		() {
+		detach: function () {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		},
-		attach: function
-			/* child, scene, parent */
-		() {
+		attach: function () {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		}
 	}; //
@@ -36730,4 +36704,4 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));

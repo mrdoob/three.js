@@ -19010,7 +19010,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			instancingColor: object.isInstancedMesh === true && object.instanceColor !== null,
 
 			supportsVertexTextures: vertexTextures,
-			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : LinearEncoding,
+			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.encoding : LinearEncoding ),
 			map: !! material.map,
 			matcap: !! material.matcap,
 			envMap: !! envMap,
@@ -22195,6 +22195,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
+		if ( glFormat === 33319 ) {
+
+			if ( glType === 5126 ) internalFormat = 33328;
+			if ( glType === 5131 ) internalFormat = 33327;
+			if ( glType === 5121 ) internalFormat = 33323;
+
+		}
+
 		if ( glFormat === 6407 ) {
 
 			if ( glType === 5126 ) internalFormat = 34837;
@@ -22212,6 +22220,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		}
 
 		if ( internalFormat === 33325 || internalFormat === 33326 ||
+			internalFormat === 33327 || internalFormat === 33328 ||
 			internalFormat === 34842 || internalFormat === 34836 ) {
 
 			extensions.get( 'EXT_color_buffer_float' );
@@ -24701,6 +24710,8 @@ class WebXRManager extends EventDispatcher {
 					}
 
 				}
+
+				newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
 
 				// Set foveation to maximum.
 				this.setFoveation( 1.0 );
@@ -27222,7 +27233,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
-		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : LinearEncoding;
+		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.encoding : LinearEncoding );
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 		const vertexTangents = !! material.normalMap && !! geometry.attributes.tangent;
