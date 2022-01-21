@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { UIPanel, UIRow } from './libs/ui.js';
 

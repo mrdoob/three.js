@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
 

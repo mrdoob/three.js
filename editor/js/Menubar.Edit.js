@@ -1,4 +1,4 @@
-import { Box3, Vector3 } from '../../build/three.module.js';
+import { Box3, Vector3 } from 'three';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
