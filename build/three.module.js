@@ -1346,19 +1346,17 @@ class Matrix3 {
 
 Matrix3.prototype.isMatrix3 = true;
 
-function arrayMax( array ) {
+function arrayNeedsUint32( array ) {
 
-	if ( array.length === 0 ) return - Infinity;
+	// assumes larger values usually on last
 
-	let max = array[ 0 ];
+	for ( let i = array.length - 1; i >= 0; -- i ) {
 
-	for ( let i = 1, l = array.length; i < l; ++ i ) {
-
-		if ( array[ i ] > max ) max = array[ i ];
+		if ( array[ i ] > 65535 ) return true;
 
 	}
 
-	return max;
+	return false;
 
 }
 
@@ -4845,11 +4843,11 @@ class Box3 {
 
 	}
 
-	setFromObject( object ) {
+	setFromObject( object, precise = false ) {
 
 		this.makeEmpty();
 
-		return this.expandByObject( object );
+		return this.expandByObject( object, precise );
 
 	}
 
@@ -4924,7 +4922,7 @@ class Box3 {
 
 	}
 
-	expandByObject( object ) {
+	expandByObject( object, precise = false ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms.
@@ -4937,16 +4935,30 @@ class Box3 {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.boundingBox === null ) {
+			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
 
-				geometry.computeBoundingBox();
+				const position = geometry.attributes.position;
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					_vector$b.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector$b );
+
+				}
+
+			} else {
+
+				if ( geometry.boundingBox === null ) {
+
+					geometry.computeBoundingBox();
+
+				}
+
+				_box$3.copy( geometry.boundingBox );
+				_box$3.applyMatrix4( object.matrixWorld );
+
+				this.union( _box$3 );
 
 			}
-
-			_box$3.copy( geometry.boundingBox );
-			_box$3.applyMatrix4( object.matrixWorld );
-
-			this.union( _box$3 );
 
 		}
 
@@ -4954,7 +4966,7 @@ class Box3 {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this.expandByObject( children[ i ] );
+			this.expandByObject( children[ i ], precise );
 
 		}
 
@@ -9579,7 +9591,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( Array.isArray( index ) ) {
 
-			this.index = new ( arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
+			this.index = new ( arrayNeedsUint32( index ) ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
 
 		} else {
 
@@ -16252,7 +16264,7 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		}
 
-		const attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+		const attribute = new ( arrayNeedsUint32( indices ) ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 		attribute.version = version;
 
 		// Updating index buffer in VAO now. See WebGLBindingStates
@@ -34987,7 +34999,7 @@ class LatheGeometry extends BufferGeometry {
 				// faces
 
 				indices.push( a, b, d );
-				indices.push( b, c, d );
+				indices.push( c, d, b );
 
 			}
 
