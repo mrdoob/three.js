@@ -70,9 +70,9 @@ class FileLoader extends Loader {
 		} );
 
 		// record current states before 'fetch' ( avoid data race )
-		const mimeType = this.mimeType;
 		const responseType = this.responseType;
-		const textualEncoding = this.textualEncoding;
+		const mimeType = this.mimeType;
+		const textEncoding = this.textEncoding;
 
 		// start the fetch
 		fetch( req )
@@ -180,7 +180,7 @@ class FileLoader extends Loader {
 
 						return response.arrayBuffer().then( ab => {
 
-							const decoder = new TextDecoder( textualEncoding );
+							const decoder = new TextDecoder( textEncoding );
 							return decoder.decode( ab );
 
 						} );
@@ -241,13 +241,25 @@ class FileLoader extends Loader {
 
 	}
 
-	setResponseType( value, textualEncoding ) {
+	setResponseType( value, encodingOrMimeType ) {
 
 		this.responseType = value;
 
-		if ( textualEncoding !== undefined ) {
+		if ( value === 'document' ) {
 
-			this.textualEncoding = textualEncoding;
+			if ( encodingOrMimeType !== undefined ) {
+
+				this.mimeType = encodingOrMimeType;
+
+			}
+
+		} else if ( value === 'text' ) {
+
+			if ( encodingOrMimeType !== undefined ) {
+
+				this.textEncoding = encodingOrMimeType;
+
+			}
 
 		}
 
@@ -256,6 +268,8 @@ class FileLoader extends Loader {
 	}
 
 	setMimeType( value ) {
+
+		console.warn( `deprecated, use .setResponseType( 'document', '${value}' ) instead.` );
 
 		this.mimeType = value;
 		return this;
