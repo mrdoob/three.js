@@ -70,6 +70,7 @@ class FileLoader extends Loader {
 		} );
 
 		// record current states before 'fetch' ( avoid data race )
+		const mimeType = this.mimeType;
 		const responseType = this.responseType;
 		const textualEncoding = this.textualEncoding;
 
@@ -167,7 +168,7 @@ class FileLoader extends Loader {
 							.then( text => {
 
 								const parser = new DOMParser();
-								return parser.parseFromString( text, this.mimeType );
+								return parser.parseFromString( text, mimeType );
 
 							} );
 
