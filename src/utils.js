@@ -30,13 +30,13 @@ function arrayMax( array ) {
 
 }
 
-function arrayContainsOver( array, value ) {
+function arrayNeedsUint32( array ) {
 
 	// assumes larger values usually on last
 
 	for ( let i = array.length - 1; i >= 0; -- i ) {
 
-		if ( array[ i ] > value ) return true;
+		if ( array[ i ] > 65535 ) return true;
 
 	}
 
@@ -68,4 +68,4 @@ function createElementNS( name ) {
 
 }
 
-export { arrayMin, arrayMax, arrayContainsOver, getTypedArray, createElementNS };
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS };
