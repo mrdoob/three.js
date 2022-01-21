@@ -97,7 +97,11 @@
 		<p>
 		If set, the texture will use the user provided WebGLRenderBuffer instead of the one created by the renderer for this texture. Default is undefined.
 		</p>
-
+		<p>Usage:</p>
+		<code>
+			const myTarget = new THREE.WebGLRenderTarget( 512, 512 );
+			myTarget.ownDepthBuffer = gl.createRenderBuffer();
+		</code>
 
 		<h2>Methods</h2>
 

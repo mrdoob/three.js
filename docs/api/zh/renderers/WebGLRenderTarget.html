@@ -93,7 +93,11 @@
 		<p>
 		如果设置，纹理将使用用户提供的 WebGLRenderBuffer，而不是渲染器为此纹理创建的缓冲区。默认是 undefined
 		</p>
-
+		<p>用法:</p>
+		<code>
+			const myTarget = new THREE.WebGLRenderTarget( 512, 512 );
+			myTarget.ownDepthBuffer = gl.createRenderBuffer();
+		</code>
 
 		<h2>方法</h2>
 
