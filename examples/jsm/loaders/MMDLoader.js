@@ -310,9 +310,9 @@ class MMDLoader extends Loader {
 		const parser = this._getParser();
 
 		this.loader
-			.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
+			//.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
 			.setPath( this.animationPath )
-			.setResponseType( 'text' )
+			.setResponseType( 'text', 'shift_jis' )
 			.setRequestHeader( this.requestHeader )
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( text ) {

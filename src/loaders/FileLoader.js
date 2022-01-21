@@ -63,17 +63,15 @@ class FileLoader extends Loader {
 		} );
 
 		// create request
-		if ( this.mimeType !== undefined ) {
-
-			this.requestHeader[ 'Content-Type' ] = this.mimeType;
-
-		}
-
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
 			// An abort controller could be added within a future PR
 		} );
+
+		// record current states before 'fetch' ( avoid data race )
+		const responseType = this.responseType;
+		const textualEncoding = this.textualEncoding;
 
 		// start the fetch
 		fetch( req )
@@ -153,7 +151,7 @@ class FileLoader extends Loader {
 			} )
 			.then( response => {
 
-				switch ( this.responseType ) {
+				switch ( responseType ) {
 
 					case 'arraybuffer':
 
@@ -181,24 +179,7 @@ class FileLoader extends Loader {
 
 						return response.arrayBuffer().then( ab => {
 
-							let label = 'utf-8';
-							if ( this.mimeType !== undefined ) {
-
-								const i = this.mimeType.indexOf( '=' );
-								if ( i !== - 1 ) {
-
-									const charset = this.mimeType.substring( i + 1 ).trim();
-									if ( charset.length !== 0 ) {
-
-										label = charset;
-
-									}
-
-								}
-
-							}
-
-							const decoder = new TextDecoder( label );
+							const decoder = new TextDecoder( textualEncoding );
 							return decoder.decode( ab );
 
 						} );
@@ -259,9 +240,16 @@ class FileLoader extends Loader {
 
 	}
 
-	setResponseType( value ) {
+	setResponseType( value, textualEncoding ) {
 
 		this.responseType = value;
+
+		if ( textualEncoding !== undefined ) {
+
+			this.textualEncoding = textualEncoding;
+
+		}
+
 		return this;
 
 	}
