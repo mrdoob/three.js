@@ -299,11 +299,11 @@ class Object3D extends EventDispatcher {
 
 		if ( arguments.length > 1 ) {
 
-			for ( let i = 0; i < arguments.length; i ++ ) {
+			Array.from( arguments ).forEach( argument => {
 
-				this.add( arguments[ i ] );
+				this.add( argument );
 
-			}
+			} );
 
 			return this;
 
@@ -343,11 +343,11 @@ class Object3D extends EventDispatcher {
 
 		if ( arguments.length > 1 ) {
 
-			for ( let i = 0; i < arguments.length; i ++ ) {
+			Array.from( arguments ).forEach( argument => {
 
-				this.remove( arguments[ i ] );
+				this.remove( argument );
 
-			}
+			} );
 
 			return this;
 
@@ -384,15 +384,13 @@ class Object3D extends EventDispatcher {
 
 	clear() {
 
-		for ( let i = 0; i < this.children.length; i ++ ) {
-
-			const object = this.children[ i ];
+		this.children.forEach( object => {
 
 			object.parent = null;
 
 			object.dispatchEvent( _removedEvent );
 
-		}
+		} );
 
 		this.children.length = 0;
 
@@ -508,11 +506,11 @@ class Object3D extends EventDispatcher {
 
 		const children = this.children;
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+		children.forEach( child => {
 
-			children[ i ].traverse( callback );
+			child.traverse( callback );
 
-		}
+		} );
 
 	}
 
@@ -524,11 +522,11 @@ class Object3D extends EventDispatcher {
 
 		const children = this.children;
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+		children.forEach( child => {
 
-			children[ i ].traverseVisible( callback );
+			child.traverseVisible( callback );
 
-		}
+		} );
 
 	}
 
@@ -580,11 +578,11 @@ class Object3D extends EventDispatcher {
 
 		const children = this.children;
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+		children.map( child => {
 
-			children[ i ].updateMatrixWorld( force );
+			child.updateMatrixWorld( force );
 
-		}
+		} );
 
 	}
 
@@ -616,11 +614,11 @@ class Object3D extends EventDispatcher {
 
 			const children = this.children;
 
-			for ( let i = 0, l = children.length; i < l; i ++ ) {
+			children.map( child => {
 
-				children[ i ].updateWorldMatrix( false, true );
+				child.updateWorldMatrix( false, true );
 
-			}
+			} );
 
 		}
 
@@ -773,13 +771,12 @@ class Object3D extends EventDispatcher {
 
 			if ( Array.isArray( this.material ) ) {
 
-				const uuids = [];
 
-				for ( let i = 0, l = this.material.length; i < l; i ++ ) {
+				const uuids = this.material.map( material => {
 
-					uuids.push( serialize( meta.materials, this.material[ i ] ) );
+					return serialize( meta.materials, material );
 
-				}
+				} );
 
 				object.material = uuids;
 
@@ -795,13 +792,15 @@ class Object3D extends EventDispatcher {
 
 		if ( this.children.length > 0 ) {
 
-			object.children = [];
 
-			for ( let i = 0; i < this.children.length; i ++ ) {
+			const children = this.animations.map( child => {
 
-				object.children.push( this.children[ i ].toJSON( meta ).object );
+				return child.toJSON( meta ).object;
 
-			}
+			} );
+
+			object.children = children;
+
 
 		}
 
@@ -809,15 +808,15 @@ class Object3D extends EventDispatcher {
 
 		if ( this.animations.length > 0 ) {
 
-			object.animations = [];
 
-			for ( let i = 0; i < this.animations.length; i ++ ) {
+			const animations = this.animations.map( animation => {
 
-				const animation = this.animations[ i ];
+				return serialize( meta.animations, animation );
 
-				object.animations.push( serialize( meta.animations, animation ) );
+			} );
 
-			}
+			object.animations = animations;
+
 
 		}
 
@@ -850,14 +849,12 @@ class Object3D extends EventDispatcher {
 		// and return as array
 		function extractFromCache( cache ) {
 
-			const values = [];
-			for ( const key in cache ) {
+			const values = cache.map( data => {
 
-				const data = cache[ key ];
 				delete data.metadata;
-				values.push( data );
+				return data;
 
-			}
+			} );
 
 			return values;
 
@@ -901,12 +898,11 @@ class Object3D extends EventDispatcher {
 
 		if ( recursive === true ) {
 
-			for ( let i = 0; i < source.children.length; i ++ ) {
+			source.children.forEach( child => {
 
-				const child = source.children[ i ];
 				this.add( child.clone() );
 
-			}
+			} );
 
 		}
 
