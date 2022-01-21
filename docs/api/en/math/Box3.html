@@ -121,13 +121,14 @@
 		Returns true if this box and [page:Box3 box] share the same lower and upper bounds.
 		</p>
 
-		<h3>[method:this expandByObject]( [param:Object3D object] )</h3>
+		<h3>[method:this expandByObject]( [param:Object3D object], [param:Boolean precise] )</h3>
 		<p>
-		[page:Object3D object] - [page:Object3D] to expand the box by.<br /><br />
+		[page:Object3D object] - [page:Object3D] to expand the box by.<br />
+		precise - (optional) expand the bounding box as little as necessary at the expense of more computation. Default is false.<br /><br />
 
 		Expands the boundaries of this box to include [page:Object3D object] and its children,
 		accounting for the object's, and children's, world transforms.
-		The function may result in a larger box than strictly necessary.
+		The function may result in a larger box than strictly necessary (unless the precise parameter is set to true).
 
 		</p>
 
@@ -264,9 +265,10 @@
 		in [page:Vector3 size]
 		</p>
 
-		<h3>[method:this setFromObject]( [param:Object3D object] )</h3>
+		<h3>[method:this setFromObject]( [param:Object3D object], [param:Boolean precise] )</h3>
 		<p>
-		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br /><br />
+		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br />
+		precise - (optional) compute the smallest world-axis-aligned bounding box at the expense of more computation. Default is false.<br /><br />
 
 		Computes a world-axis-aligned bounding box of an [page:Object3D] (including its children),
 		accounting for the object's, and children's, world transforms.<br /><br />
