@@ -30,6 +30,20 @@ function arrayMax( array ) {
 
 }
 
+function arrayContainsOver( array, value ) {
+
+	// assumes larger values usually on last
+
+	for ( let i = array.length - 1; i >= 0; -- i ) {
+
+		if ( array[ i ] > value ) return true;
+
+	}
+
+	return false;
+
+}
+
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
@@ -54,4 +68,4 @@ function createElementNS( name ) {
 
 }
 
-export { arrayMin, arrayMax, getTypedArray, createElementNS };
+export { arrayMin, arrayMax, arrayContainsOver, getTypedArray, createElementNS };
