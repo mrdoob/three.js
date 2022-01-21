@@ -849,12 +849,14 @@ class Object3D extends EventDispatcher {
 		// and return as array
 		function extractFromCache( cache ) {
 
-			const values = cache.map( data => {
+			const values = [];
+			for ( const key in cache ) {
 
+				const data = cache[ key ];
 				delete data.metadata;
-				return data;
+				values.push( data );
 
-			} );
+			}
 
 			return values;
 
