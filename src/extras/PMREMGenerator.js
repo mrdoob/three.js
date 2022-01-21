@@ -85,6 +85,11 @@ class PMREMGenerator {
 		this._renderer = renderer;
 		this._pingPongRenderTarget = null;
 
+		this._cubeSize = 256;
+		// this._lodPlanes = [];
+		// this._sizeLods = [];
+		// this._sigmas = [];
+
 		this._blurMaterial = _getBlurShader( MAX_SAMPLES );
 		this._equirectShader = null;
 		this._cubemapShader = null;
@@ -103,6 +108,8 @@ class PMREMGenerator {
 	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
+
+		this._cubeSize = 256;
 		const cubeUVRenderTarget = this._allocateTargets();
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
@@ -205,6 +212,12 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
+		// if(texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping){
+		// 	this._cubeSize = texture.image[0].width;
+		// }else{
+		// 	this._cubeSize=texture.image.width;
+		// }
+
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets( texture );
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
@@ -227,12 +240,13 @@ class PMREMGenerator {
 			depthBuffer: false
 		};
 
-		const cubeUVRenderTarget = _createRenderTarget( params );
+		const cubeUVRenderTarget = this._createRenderTarget( params );
 		cubeUVRenderTarget.depthBuffer = texture ? false : true;
+		cubeUVRenderTarget.texture.image = { width: cubeUVRenderTarget.width, height: cubeUVRenderTarget.height };
 
 		if ( this._pingPongRenderTarget === null ) {
 
-			this._pingPongRenderTarget = _createRenderTarget( params );
+			this._pingPongRenderTarget = this._createRenderTarget( params );
 
 		}
 
@@ -505,13 +519,26 @@ class PMREMGenerator {
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
 
 		const outputSize = _sizeLods[ lodOut ];
-		const x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
-		const y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) + 2 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
+		const x = 3 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
+		const y = 4 * ( SIZE_MAX - outputSize );
 
 		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
 		renderer.setRenderTarget( targetOut );
 		renderer.render( blurMesh, _flatCamera );
 
+	}
+
+	_createRenderTarget( params ) {
+
+		const width=3*Math.max(this._cubeSize,16*7);
+		const height=4*this._cubeSize-32;
+	
+		const cubeUVRenderTarget = new WebGLRenderTarget( width, height, params );
+		cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
+		cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
+		cubeUVRenderTarget.scissorTest = true;
+		return cubeUVRenderTarget;
+	
 	}
 
 }
@@ -594,16 +621,6 @@ function _createPlanes() {
 
 }
 
-function _createRenderTarget( params ) {
-
-	const cubeUVRenderTarget = new WebGLRenderTarget( 3 * SIZE_MAX, 3 * SIZE_MAX, params );
-	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
-	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
-	cubeUVRenderTarget.scissorTest = true;
-	return cubeUVRenderTarget;
-
-}
-
 function _setViewport( target, x, y, width, height ) {
 
 	target.viewport.set( x, y, width, height );
@@ -619,7 +636,12 @@ function _getBlurShader( maxSamples ) {
 
 		name: 'SphericalGaussianBlur',
 
-		defines: { 'n': maxSamples },
+		defines: { 
+			'n': maxSamples,
+			'CUBEUV_TEXEL_WIDTH':1.0/ 768,
+			'CUBEUV_TEXEL_HEIGHT':1.0/992,
+			'CUBEUV_MAX_MIP':'8.0',
+		},
 
 		uniforms: {
 			'envMap': { value: null },
