@@ -64,8 +64,11 @@ class FileLoader extends Loader {
 
 		// create request
 	  if ( this.mimeType !== undefined ) {
+
 			this.requestHeader[ 'Content-Type' ] = this.mimeType;
+
 		}
+
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
@@ -177,19 +180,27 @@ class FileLoader extends Loader {
 					default:
 
 						return response.arrayBuffer().then( ab => {
+
 							let label = 'utf-8';
 							if ( this.mimeType !== undefined ) {
+
 								const i = this.mimeType.indexOf( '=' );
-								if ( ~i ) {
+								if ( ~ i ) {
+
 									const charset = this.mimeType.substring( i + 1 ).trim();
 									if ( charset.length !== 0 ) {
+
 										label = charset;
+
 									}
-								} 
+
+								}
+
 							}
 
 							const decoder = new TextDecoder( label );
 							return decoder.decode( ab );
+
 						} );
 
 				}
