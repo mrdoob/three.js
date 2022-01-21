@@ -129,7 +129,7 @@ class OutlinePass extends Pass {
 
 		function replaceDepthToViewZ( string, camera ) {
 
-			var type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
+			const type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
 
 			return string.replace( /DEPTH_TO_VIEW_Z/g, type + 'DepthToViewZ' );
 
