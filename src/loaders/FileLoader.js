@@ -185,7 +185,7 @@ class FileLoader extends Loader {
 							if ( this.mimeType !== undefined ) {
 
 								const i = this.mimeType.indexOf( '=' );
-								if ( i !== -1 ) {
+								if ( i !== - 1 ) {
 
 									const charset = this.mimeType.substring( i + 1 ).trim();
 									if ( charset.length !== 0 ) {
