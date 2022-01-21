@@ -4,7 +4,6 @@ import {
 	DoubleSide,
 	LinearFilter,
 	Matrix4,
-	MeshBasicMaterial,
 	MeshDepthMaterial,
 	NoBlending,
 	RGBADepthPacking,
