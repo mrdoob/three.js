@@ -6,7 +6,7 @@ import {
 	LuminanceFormat,
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
+} from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
 

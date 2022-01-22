@@ -36,7 +36,7 @@ import {
 	RGB_PVRTC_2BPPV1_Format,
 	RGB_ETC1_Format,
 	RGB_ETC2_Format
-} from '../../../build/three.module.js';
+} from 'three';
 import { MMDToonShader } from '../shaders/MMDToonShader.js';
 import { TGALoader } from '../loaders/TGALoader.js';
 import { MMDParser } from '../libs/mmdparser.module.js';

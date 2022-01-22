@@ -10,71 +10,66 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		A class containing utility functions for [page:BufferGeometry BufferGeometry] instances.
+		一个包含 [page:BufferGeometry BufferGeometry] 实例的实用方法的类。
 		</p>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:BufferGeometry mergeBufferGeometries]( [param:Array geometries], [param:Boolean useGroups] )</h3>
 		<p>
-		geometries -- Array of [page:BufferGeometry BufferGeometry] instances.<br />
-		useGroups -- Whether groups should be generated for the merged geometry or not.<br /><br />
+		geometries -- 由 [page:BufferGeometry BufferGeometry] 实例的数组。<br />
+		useGroups -- 是否要为了合并几何体而产生组。<br /><br />
 
-		Merges a set of geometries into a single instance. All geometries must have compatible attributes.
-		If merge does not succeed, the method returns null.
+		将一组几何体合并到一个实例中。所有几何体都必须兼容该属性。
+		如果合并不成功，则该方法返回 null。
 
 		</p>
 
 		<h3>[method:BufferAttribute mergeBufferAttributes]( [param:Array attributes] )</h3>
 		<p>
-		attributes -- Array of [page:BufferAttribute BufferAttribute] instances.<br /><br />
+		attributes -- 由 [page:BufferAttribute BufferAttribute] 实例组成的数组。<br /><br />
 
-		Merges a set of attributes into a single instance. All attributes must have compatible properties
-		and types, and [page:InterleavedBufferAttribute InterleavedBufferAttributes] are not supported. If merge does not succeed, the method
-		returns null.
+		将一组属性合并为一个单一的实例。所有几何体都必须兼容该属性，不支持 [page:InterleavedBufferAttribute InterleavedBufferAttributes] 。
+		如果合并不成功，则该方法返回 null 。
 
 		</p>
 
 		<h3>[method:InterleavedBufferAttribute interleaveAttributes]( [param:Array attributes] )</h3>
 		<p>
-		attributes -- Array of [page:BufferAttribute BufferAttribute] instances.<br /><br />
+		attributes -- 由 [page:BufferAttribute BufferAttribute] 实例组成的数组。<br /><br />
 
-		Interleaves a set of attributes and returns a new array of corresponding attributes that share
-		a single InterleavedBuffer instance. All attributes must have compatible types. If merge does not
-		succeed, the method returns null.
+		交叉存储一组属性并返回一个新的对应属性数组，这些属性共享一个 InterleavedBuffer 实例。所有属性都必须兼容的该类型。如果合并不成功，则该方法返回 null 。
 
 		</p>
 
 		<h3>[method:Number estimateBytesUsed]( [param:BufferGeometry geometry] )</h3>
 		<p>
-		geometry -- Instance of [page:BufferGeometry BufferGeometry] to estimate the memory use of.<br /><br />
+		geometry -- 通过 [page:BufferGeometry BufferGeometry] 的实例来估计内存使用情况。<br /><br />
 
-		Returns the amount of bytes used by all attributes to represent the geometry.
+		返回所有用于表示几何体的属性所占用的字节数。
 
 		</p>
 
 		<h3>[method:BufferGeometry mergeVertices]( [param:BufferGeometry geometry], [param:Number tolerance] )</h3>
 		<p>
-		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the vertices of.<br />
-		tolerance -- The maximum allowable difference between vertex attributes to merge. Defaults to 1e-4.<br /><br />
+		geometry -- 用于合并顶点的 [page:BufferGeometry BufferGeometry] 实例。<br />
+		tolerance -- 要合并的顶点属性之间允许的最大差异。 默认为 1e-4。<br /><br />
 
-		Returns a new [page:BufferGeometry BufferGeometry] with vertices for which all similar vertex attributes
-		(within tolerance) are merged.
+		返回一个新的 [page:BufferGeometry BufferGeometry] ，其中包含将所有（在容差范围内的）具有相似属性的顶点合并而成的顶点。
 
 		</p>
 
 		<h3>[method:BufferGeometry toTrianglesDrawMode]( [param:BufferGeometry geometry], [param:TrianglesDrawMode drawMode] )</h3>
 		<p>
-		geometry -- Instance of [page:BufferGeometry BufferGeometry].<br />
-		drawMode -- The draw mode of the given geometry.<br /><br />
+		geometry -- [page:BufferGeometry BufferGeometry] 实例。<br />
+		drawMode -- 给定几何体的绘制模式。<br /><br />
 
-		Returns a new indexed [page:BufferGeometry BufferGeometry] based on the [page:DrawModes THREE.TrianglesDrawMode] draw mode. This mode
-		corresponds to the *gl.TRIANGLES* WebGL primitive.
+		基于 [page:DrawModes THREE.TrianglesDrawMode] 绘制模式，返回一个新的有索引值的 [page:BufferGeometry BufferGeometry]。 此模式对应于 WebGL 的原始术语 *gl.TRIANGLES* 。
 
 		</p>
 
-		<h2>Source</h2>
+		<h2></h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/BufferGeometryUtils.js examples/jsm/utils/BufferGeometryUtils.js]

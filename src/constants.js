@@ -96,7 +96,6 @@ export const RedFormat = 1028;
 export const RedIntegerFormat = 1029;
 export const RGFormat = 1030;
 export const RGIntegerFormat = 1031;
-export const RGBIntegerFormat = 1032;
 export const RGBAIntegerFormat = 1033;
 
 export const RGB_S3TC_DXT1_Format = 33776;
