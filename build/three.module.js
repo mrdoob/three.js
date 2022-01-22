@@ -26602,25 +26602,38 @@ function WebGLRenderer( parameters = {} ) {
 
 		// Only initialize materials in the new scene, not the targetScene.
 
-    const _compileMaterial = function ( material, object ) {
+    function getProgramSide(material, scene, object) {
+      if (material.transparent === true && material.side === DoubleSide) {
+				material.side = BackSide;
+				// material.needsUpdate = true;
+				getProgram(material, scene, object);
+				material.side = FrontSide;
+				// material.needsUpdate = true;
+				getProgram(material, scene, object);
+				material.side = DoubleSide;
+			} else {
+				getProgram(material, scene, object);
+			}
+		}
+    function _compileMaterial( material, object ) {
 		  if ( Array.isArray( material ) ) {
 
 				for ( let i = 0; i < material.length; i ++ ) {
 
 					const material2 = material[ i ];
 
-					getProgram( material2, targetScene, object );
+					getProgramSide( material2, targetScene, object );
 					compiling.add( material2 );
 
 				}
 
 			} else {
 
-				getProgram( material, targetScene, object );
+				getProgramSide( material, targetScene, object );
 				compiling.add( material );
 
 			}
-		};
+		}
 
 		if (scene.overrideMaterial) {
 			scene.traverse( function ( object ) {

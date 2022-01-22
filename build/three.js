@@ -19380,9 +19380,7 @@
 			_isContextLost = true;
 		}
 
-		function
-			/* event */
-		onContextRestore() {
+		function onContextRestore() {
 			console.log('THREE.WebGLRenderer: Context Restored.');
 			_isContextLost = false;
 			const infoAutoReset = info.autoReset;
@@ -19582,18 +19580,32 @@
 			currentRenderState.setupLights(_this.physicallyCorrectLights);
 			const compiling = new Set(); // Only initialize materials in the new scene, not the targetScene.
 
-			const _compileMaterial = function (material, object) {
+			function getProgramSide(material, scene, object) {
+				if (material.transparent === true && material.side === DoubleSide) {
+					material.side = BackSide; // material.needsUpdate = true;
+
+					getProgram(material, scene, object);
+					material.side = FrontSide; // material.needsUpdate = true;
+
+					getProgram(material, scene, object);
+					material.side = DoubleSide;
+				} else {
+					getProgram(material, scene, object);
+				}
+			}
+
+			function _compileMaterial(material, object) {
 				if (Array.isArray(material)) {
 					for (let i = 0; i < material.length; i++) {
 						const material2 = material[i];
-						getProgram(material2, targetScene, object);
+						getProgramSide(material2, targetScene, object);
 						compiling.add(material2);
 					}
 				} else {
-					getProgram(material, targetScene, object);
+					getProgramSide(material, targetScene, object);
 					compiling.add(material);
 				}
-			};
+			}
 
 			if (scene.overrideMaterial) {
 				scene.traverse(function (object) {
@@ -35218,14 +35230,10 @@
 	};
 
 	Loader.Handlers = {
-		add: function
-			/* regex, loader */
-		() {
+		add: function () {
 			console.error('THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.');
 		},
-		get: function
-			/* file */
-		() {
+		get: function () {
 			console.error('THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.');
 		}
 	};
@@ -35313,9 +35321,7 @@
 		return vector.applyMatrix3(this);
 	};
 
-	Matrix3.prototype.multiplyVector3Array = function
-		/* a */
-	() {
+	Matrix3.prototype.multiplyVector3Array = function () {
 		console.error('THREE.Matrix3: .multiplyVector3Array() has been removed.');
 	};
 
@@ -35324,9 +35330,7 @@
 		return attribute.applyMatrix3(this);
 	};
 
-	Matrix3.prototype.applyToVector3Array = function
-		/* array, offset, length */
-	() {
+	Matrix3.prototype.applyToVector3Array = function () {
 		console.error('THREE.Matrix3: .applyToVector3Array() has been removed.');
 	};
 
@@ -35370,9 +35374,7 @@
 		return vector.applyMatrix4(this);
 	};
 
-	Matrix4.prototype.multiplyVector3Array = function
-		/* a */
-	() {
+	Matrix4.prototype.multiplyVector3Array = function () {
 		console.error('THREE.Matrix4: .multiplyVector3Array() has been removed.');
 	};
 
@@ -35411,9 +35413,7 @@
 		return attribute.applyMatrix4(this);
 	};
 
-	Matrix4.prototype.applyToVector3Array = function
-		/* array, offset, length */
-	() {
+	Matrix4.prototype.applyToVector3Array = function () {
 		console.error('THREE.Matrix4: .applyToVector3Array() has been removed.');
 	};
 
@@ -35746,9 +35746,7 @@
 				console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 				return this.usage === DynamicDrawUsage;
 			},
-			set: function
-				/* value */
-			() {
+			set: function () {
 				console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 				this.setUsage(DynamicDrawUsage);
 			}
@@ -35761,13 +35759,9 @@
 		return this;
 	};
 
-	BufferAttribute.prototype.copyIndicesArray = function
-		/* indices */
-	() {
+	BufferAttribute.prototype.copyIndicesArray = function () {
 		console.error('THREE.BufferAttribute: .copyIndicesArray() has been removed.');
-	}, BufferAttribute.prototype.setArray = function
-		/* array */
-	() {
+	}, BufferAttribute.prototype.setArray = function () {
 		console.error('THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 	}; //
 
@@ -35842,9 +35836,7 @@
 		return this;
 	};
 
-	InterleavedBuffer.prototype.setArray = function
-		/* array */
-	() {
+	InterleavedBuffer.prototype.setArray = function () {
 		console.error('THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 	}; //
 
@@ -36078,9 +36070,7 @@
 				console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 				return undefined;
 			},
-			set: function
-				/* value */
-			() {
+			set: function () {
 				console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 			}
 		},
@@ -36140,9 +36130,7 @@
 				console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 				return undefined;
 			},
-			set: function
-				/* cullFace */
-			() {
+			set: function () {
 				console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 			}
 		},
@@ -36337,19 +36325,13 @@
 	} //
 
 	const SceneUtils = {
-		createMultiMaterialObject: function
-			/* geometry, materials */
-		() {
+		createMultiMaterialObject: function () {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		},
-		detach: function
-			/* child, parent, scene */
-		() {
+		detach: function () {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		},
-		attach: function
-			/* child, scene, parent */
-		() {
+		attach: function () {
 			console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 		}
 	}; //
