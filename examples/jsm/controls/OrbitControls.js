@@ -234,8 +234,11 @@ class OrbitControls extends EventDispatcher {
 				spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
 				// move target to panned location
+				if(followZoomFlag == true){
 
-				if ( scope.enableDamping === true ) {
+					scope.target.add( panOffset );
+
+				}else if ( scope.enableDamping === true ) {
 
 					scope.target.addScaledVector( panOffset, scope.dampingFactor );
 
@@ -254,7 +257,13 @@ class OrbitControls extends EventDispatcher {
 
 				scope.object.lookAt( scope.target );
 
-				if ( scope.enableDamping === true ) {
+				if(followZoomFlag === true){
+
+					panOffset.set( 0, 0, 0 );
+					sphericalDelta.set( 0, 0, 0 );
+					followZoomFlag = false;
+
+				}else if ( scope.enableDamping === true ) {
 
 					sphericalDelta.theta *= ( 1 - scope.dampingFactor );
 					sphericalDelta.phi *= ( 1 - scope.dampingFactor );
@@ -276,6 +285,7 @@ class OrbitControls extends EventDispatcher {
 				// using small-angle approximation cos(x/2) = 1 - x^2 / 8
 
 				if ( zoomChanged ||
+					
 					lastPosition.distanceToSquared( scope.object.position ) > EPS ||
 					8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
 
@@ -360,6 +370,8 @@ class OrbitControls extends EventDispatcher {
 
 		const pointers = [];
 		const pointerPositions = {};
+
+		let followZoomFlag = false;
 
 		function getAutoRotationAngle() {
 
@@ -584,24 +596,66 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
+		function getTotalOffsetLeftAndTop(dom){
+
+			let left = 0, top = 0;
+			getOffset(dom);
+
+			function getOffset(dom){
+				left += dom.offsetLeft;
+				top += dom.offsetTop;
+				if(dom.offsetParent){
+					getOffset(dom.offsetParent)
+				}
+			}
+
+			return {
+				top: top,
+				left: left
+			}
+		}
+
 		function followZoom(event){
+
 			let x = (event.offsetX / scope.domElement.clientWidth) * 2 -1,
 			y = -(event.offsetY / scope.domElement.clientHeight) * 2 + 1,
 			v = new Vector3(x, y, 0);
 
 			v.unproject(scope.object);
 			v.sub(scope.object.position).setLength(scope.zoomSpeed * 10) // it needs more speed here;
+			
+			if(scope.object.type === "PerspectiveCamera"){
 
-			if(event.deltaY < 0){
-				scope.object.position.add(v);
-				scope.target.add(v);
-			} else {
-				scope.object.position.sub(v);
-				scope.target.sub(v);
+				if(event.deltaY < 0){
+					scope.object.position.add(v);
+					scope.target.add(v);
+				} else {
+					scope.object.position.sub(v);
+					scope.target.sub(v);
+				}
+			}else if(scope.object.type === "OrthographicCamera"){
+
+				const dom = scope.domElement;
+				const domOffset = getTotalOffsetLeftAndTop(dom);
+				const centerX = dom.clientWidth * 0.5;
+				const centerY = dom.clientHeight * 0.5;
+				const panOffsetX = (event.clientX - centerX - domOffset.left) * (1 - 1/getZoomScale());
+				const panOffsetY = (event.clientY - centerY - domOffset.top) * (1 - 1/getZoomScale());
+
+				if(event.deltaY < 0){
+					dollyIn( getZoomScale() );
+					pan(panOffsetX, panOffsetY);
+
+				} else {
+					dollyOut( getZoomScale() );
+					pan(-panOffsetX, -panOffsetY);
+				}
+				followZoomFlag = true;
 			}
 		}
 
 		function notFollowZoom(event){
+
 			if ( event.deltaY < 0 ) {
 	
 				dollyIn( getZoomScale() );
