@@ -650,6 +650,7 @@ class OrbitControls extends EventDispatcher {
 					dollyOut( getZoomScale() );
 					pan(-panOffsetX, -panOffsetY);
 				}
+				
 				followZoomFlag = true;
 			}
 		}
