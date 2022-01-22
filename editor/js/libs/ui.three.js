@@ -1,4 +1,4 @@
-import * as THREE from '../../../build/three.module.js';
+import * as THREE from 'three';
 
 import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
@@ -35,14 +35,14 @@ class UITexture extends UISpan {
 
 			input.click();
 
-		}, false );
+		} );
 		canvas.addEventListener( 'drop', function ( event ) {
 
 			event.preventDefault();
 			event.stopPropagation();
 			loadFile( event.dataTransfer.files[ 0 ] );
 
-		}, false );
+		} );
 		this.dom.appendChild( canvas );
 
 		function loadFile( file ) {
@@ -368,7 +368,7 @@ class UIOutliner extends UIDiv {
 
 			}
 
-		}, false );
+		} );
 
 		// Keybindings to support arrow navigation
 		this.dom.addEventListener( 'keyup', function ( event ) {
@@ -384,7 +384,7 @@ class UIOutliner extends UIDiv {
 
 			}
 
-		}, false );
+		} );
 
 		this.editor = editor;
 

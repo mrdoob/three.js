@@ -1,16 +1,15 @@
-import { ObjectNode, ColorInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
+import { ColorInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
 import { MeshStandardNodeMaterial } from '../../renderers/nodes/Nodes.js';
 import * as THREE from 'three';
 
-export class StandardMaterialEditor extends ObjectNode {
+export class StandardMaterialEditor extends BaseNode {
 
 	constructor() {
 
 		const material = new MeshStandardNodeMaterial();
 
-		super( 'Standard Material', 0, material );
-
-		this.title.setStyle( 'blue' );
+		super( 'Standard Material', 1, material );
 
 		this.setWidth( 300 );
 
@@ -70,17 +69,17 @@ export class StandardMaterialEditor extends ObjectNode {
 
 		const { material, color, opacity, roughness, metalness } = this;
 
-		color.setEnabledInputs( ! color.linkedExtra );
-		opacity.setEnabledInputs( ! opacity.linkedExtra );
-		roughness.setEnabledInputs( ! roughness.linkedExtra );
-		metalness.setEnabledInputs( ! metalness.linkedExtra );
+		color.setEnabledInputs( ! color.getLinkedObject() );
+		opacity.setEnabledInputs( ! opacity.getLinkedObject() );
+		roughness.setEnabledInputs( ! roughness.getLinkedObject() );
+		metalness.setEnabledInputs( ! metalness.getLinkedObject() );
 
-		material.colorNode = color.linkedExtra;
+		material.colorNode = color.getLinkedObject();
 
-		material.opacityNode = opacity.linkedExtra || null;
+		material.opacityNode = opacity.getLinkedObject() || null;
 
-		material.metalnessNode = metalness.linkedExtra;
-		material.roughnessNode = roughness.linkedExtra;
+		material.metalnessNode = metalness.getLinkedObject();
+		material.roughnessNode = roughness.getLinkedObject();
 
 		material.dispose();
 
@@ -99,7 +98,7 @@ export class StandardMaterialEditor extends ObjectNode {
 
 		const { material, opacity } = this;
 
-		material.transparent = opacity.linkedExtra || material.opacity < 1 ? true : false;
+		material.transparent = opacity.getLinkedObject() || material.opacity < 1 ? true : false;
 
 		opacity.setIcon( material.transparent ? 'ti ti-layers-intersect' : 'ti ti-layers-subtract' );
 

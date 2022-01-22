@@ -6,7 +6,7 @@ import {
 	ShaderChunk,
 	Matrix4,
 	Box3
-} from '../../../build/three.module.js';
+} from 'three';
 import { CSMFrustum } from './CSMFrustum.js';
 import { CSMShader } from './CSMShader.js';
 

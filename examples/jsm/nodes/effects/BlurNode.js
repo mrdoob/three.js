@@ -1,4 +1,4 @@
-import { Vector2 } from '../../../../build/three.module.js';
+import { Vector2 } from 'three';
 
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';

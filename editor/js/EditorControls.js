@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 function EditorControls( object, domElement ) {
 
@@ -129,8 +129,8 @@ function EditorControls( object, domElement ) {
 
 		}
 
-		domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
-		domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
+		domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
+		domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
 
 	}
 
@@ -164,8 +164,8 @@ function EditorControls( object, domElement ) {
 
 		}
 
-		domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-		domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+		domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
 	}
 
@@ -241,22 +241,22 @@ function EditorControls( object, domElement ) {
 
 	this.dispose = function () {
 
-		domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		domElement.removeEventListener( 'dblclick', onMouseUp, false );
-		domElement.removeEventListener( 'wheel', onMouseWheel, false );
+		domElement.removeEventListener( 'contextmenu', contextmenu );
+		domElement.removeEventListener( 'dblclick', onMouseUp );
+		domElement.removeEventListener( 'wheel', onMouseWheel );
 
-		domElement.removeEventListener( 'pointerdown', onPointerDown, false );
+		domElement.removeEventListener( 'pointerdown', onPointerDown );
 
-		domElement.removeEventListener( 'touchstart', touchStart, false );
-		domElement.removeEventListener( 'touchmove', touchMove, false );
+		domElement.removeEventListener( 'touchstart', touchStart );
+		domElement.removeEventListener( 'touchmove', touchMove );
 
 	};
 
-	domElement.addEventListener( 'contextmenu', contextmenu, false );
-	domElement.addEventListener( 'dblclick', onMouseUp, false );
-	domElement.addEventListener( 'wheel', onMouseWheel, false );
+	domElement.addEventListener( 'contextmenu', contextmenu );
+	domElement.addEventListener( 'dblclick', onMouseUp );
+	domElement.addEventListener( 'wheel', onMouseWheel );
 
-	domElement.addEventListener( 'pointerdown', onPointerDown, false );
+	domElement.addEventListener( 'pointerdown', onPointerDown );
 
 	// touch
 
@@ -343,8 +343,8 @@ function EditorControls( object, domElement ) {
 
 	}
 
-	domElement.addEventListener( 'touchstart', touchStart, false );
-	domElement.addEventListener( 'touchmove', touchMove, false );
+	domElement.addEventListener( 'touchstart', touchStart );
+	domElement.addEventListener( 'touchmove', touchMove );
 
 }
 

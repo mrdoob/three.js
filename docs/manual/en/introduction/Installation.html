@@ -97,7 +97,7 @@
 		<code>
 		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
 		<p>
@@ -111,7 +111,7 @@
 
 		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
 
-		  const controls = new OrbitControls();
+		  const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>

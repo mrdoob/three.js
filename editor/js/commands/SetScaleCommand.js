@@ -1,5 +1,5 @@
 import { Command } from '../Command.js';
-import { Vector3 } from '../../../build/three.module.js';
+import { Vector3 } from 'three';
 
 /**
  * @param editor Editor

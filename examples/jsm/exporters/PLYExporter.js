@@ -1,7 +1,7 @@
 import {
 	Matrix3,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * https://github.com/gkjohnson/ply-exporter-js

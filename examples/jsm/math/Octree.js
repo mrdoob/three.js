@@ -5,7 +5,7 @@ import {
 	Sphere,
 	Triangle,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import { Capsule } from '../math/Capsule.js';
 
 

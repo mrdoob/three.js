@@ -5,7 +5,7 @@ import {
 	LineSegments,
 	Matrix3,
 	Mesh
-} from '../../../build/three.module.js';
+} from 'three';
 
 import { mergeBufferGeometries } from './BufferGeometryUtils.js';
 
@@ -62,8 +62,11 @@ class LDrawUtils {
 					arr: [ geometry ]
 				};
 
+			} else {
+
+				geoms.arr.push( geometry );
+
 			}
-			else geoms.arr.push( geometry );
 
 		}
 
@@ -111,22 +114,23 @@ class LDrawUtils {
 
 				const elemSize = c.isMesh ? 3 : 2;
 
+				const geometry = c.geometry.clone();
 				const matrixIsInverted = c.matrixWorld.determinant() < 0;
 				if ( matrixIsInverted ) {
 
-					permuteAttribute( c.geometry.attributes.position, elemSize );
-					permuteAttribute( c.geometry.attributes.normal, elemSize );
+					permuteAttribute( geometry.attributes.position, elemSize );
+					permuteAttribute( geometry.attributes.normal, elemSize );
 
 				}
 
-				c.geometry.applyMatrix4( c.matrixWorld );
+				geometry.applyMatrix4( c.matrixWorld );
 
 				if ( c.isConditionalLine ) {
 
-					c.geometry.attributes.control0.applyMatrix4( c.matrixWorld );
-					c.geometry.attributes.control1.applyMatrix4( c.matrixWorld );
+					geometry.attributes.control0.applyMatrix4( c.matrixWorld );
+					geometry.attributes.control1.applyMatrix4( c.matrixWorld );
 					normalMatrix.getNormalMatrix( c.matrixWorld );
-					c.geometry.attributes.direction.applyNormalMatrix( normalMatrix );
+					geometry.attributes.direction.applyNormalMatrix( normalMatrix );
 
 				}
 
@@ -134,17 +138,20 @@ class LDrawUtils {
 
 				if ( Array.isArray( c.material ) ) {
 
-					for ( const groupIndex in c.geometry.groups ) {
+					for ( const groupIndex in geometry.groups ) {
 
-						const group = c.geometry.groups[ groupIndex ];
+						const group = geometry.groups[ groupIndex ];
 						const mat = c.material[ group.materialIndex ];
-						const newGeometry = extractGroup( c.geometry, group, elemSize, c.isConditionalLine );
+						const newGeometry = extractGroup( geometry, group, elemSize, c.isConditionalLine );
 						addGeometry( mat, newGeometry, geometries );
 
 					}
 
+				} else {
+
+					addGeometry( c.material, geometry, geometries );
+
 				}
-				else addGeometry( c.material, c.geometry, geometries );
 
 			}
 

@@ -1,17 +1,16 @@
-import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
 import { UVNode } from '../../renderers/nodes/Nodes.js';
 
-export class UVEditor extends ObjectNode {
+export class UVEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new UVNode();
 
-		super( 'UV', 2, node, 250 );
+		super( 'UV', 2, node, 200 );
 
-		this.title.setStyle( 'red' );
-
-		const optionsField = new SelectInput( [ '1', '2' ] ).onChange( () => {
+		const optionsField = new SelectInput( [ '1', '2' ], 0 ).onChange( () => {
 
 			node.value = Number( optionsField.getValue() );
 
