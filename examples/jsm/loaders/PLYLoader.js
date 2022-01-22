@@ -4,7 +4,7 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
@@ -88,7 +88,7 @@ class PLYLoader extends Loader {
 
 		function parseHeader( data ) {
 
-			const patternHeader = /ply([\s\S]*)end_header\r?\n/;
+			const patternHeader = /^ply([\s\S]*)end_header\r?\n/;
 			let headerText = '';
 			let headerLength = 0;
 			const result = patternHeader.exec( data );

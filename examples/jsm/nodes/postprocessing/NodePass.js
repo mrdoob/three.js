@@ -1,4 +1,4 @@
-import { MathUtils } from '../../../../build/three.module.js';
+import { MathUtils } from 'three';
 
 import { ShaderPass } from '../../postprocessing/ShaderPass.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';

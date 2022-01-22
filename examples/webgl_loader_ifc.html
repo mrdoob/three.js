@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - IFC loader</title>
+		<title>three.js webgl - IFCLoader</title>
 		<meta charset="utf-8" />
 		<meta
 			name="viewport"
@@ -14,13 +14,24 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			-
-			<a href="https://www.buildingsmart.org/standards/bsi-standards/industry-foundation-classes/" target="_blank" rel="noopener">IFC</a>
-			loader
+			<a href="https://www.buildingsmart.org/standards/bsi-standards/industry-foundation-classes/" target="_blank" rel="noopener">IFCLoader</a>
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			import { IFCLoader } from './jsm/loaders/IFCLoader.js';
@@ -95,9 +106,9 @@
 						const props = ifcLoader.ifcManager.getItemProperties( modelID, id, true );
 						console.log( props );
 						renderer.render( scene, camera );
-			
+
 		}
-			
+
 	}
 
 				window.onpointerdown = selectObject;

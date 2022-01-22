@@ -18,8 +18,6 @@ class DataTexture2DArray extends Texture {
 		this.flipY = false;
 		this.unpackAlignment = 1;
 
-		this.needsUpdate = true;
-
 	}
 
 }

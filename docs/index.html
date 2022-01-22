@@ -404,7 +404,7 @@
 
 			if ( search ) {
 
-				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
 				sectionLink.href = `${link}?q=${search}`;
 
 			} else {
@@ -458,7 +458,7 @@
 
 		// Routing
 
-		function setUrlFragment( pageName ) { // eslint-disable-line no-undef
+		function setUrlFragment( pageName ) { // eslint-disable-line no-unused-vars
 
 			// Handle navigation from the subpages (iframes):
 			// First separate the member (if existing) from the page name,

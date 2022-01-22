@@ -1,47 +1,293 @@
-import { Canvas, CircleMenu, ButtonInput, ContextMenu, Loader } from '../libs/flow.module.js';
+import { Styles, Canvas, CircleMenu, ButtonInput, ContextMenu, Tips, Search, Loader } from '../libs/flow.module.js';
 import { StandardMaterialEditor } from './materials/StandardMaterialEditor.js';
 import { OperatorEditor } from './math/OperatorEditor.js';
+import { NormalizeEditor } from './math/NormalizeEditor.js';
+import { InvertEditor } from './math/InvertEditor.js';
+import { LimiterEditor } from './math/LimiterEditor.js';
+import { DotEditor } from './math/DotEditor.js';
+import { PowerEditor } from './math/PowerEditor.js';
+import { TrigonometryEditor } from './math/TrigonometryEditor.js';
 import { FloatEditor } from './inputs/FloatEditor.js';
+import { Vector2Editor } from './inputs/Vector2Editor.js';
+import { Vector3Editor } from './inputs/Vector3Editor.js';
+import { Vector4Editor } from './inputs/Vector4Editor.js';
+import { SliderEditor } from './inputs/SliderEditor.js';
 import { ColorEditor } from './inputs/ColorEditor.js';
+import { BlendEditor } from './display/BlendEditor.js';
 import { UVEditor } from './accessors/UVEditor.js';
 import { PositionEditor } from './accessors/PositionEditor.js';
 import { NormalEditor } from './accessors/NormalEditor.js';
+import { TimerEditor } from './utils/TimerEditor.js';
+import { OscillatorEditor } from './utils/OscillatorEditor.js';
+import { SplitEditor } from './utils/SplitEditor.js';
+import { JoinEditor } from './utils/JoinEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
+import { MeshEditor } from './scene/MeshEditor.js';
 import { EventDispatcher } from 'three';
 
+Styles.icons.unlink = 'ti ti-unlink';
+
+export const NodeList = [
+	{
+		name: 'Inputs',
+		icon: 'forms',
+		children: [
+			{
+				name: 'Slider',
+				icon: 'adjustments-horizontal',
+				nodeClass: SliderEditor
+			},
+			{
+				name: 'Float',
+				icon: 'box-multiple-1',
+				nodeClass: FloatEditor
+			},
+			{
+				name: 'Vector 2',
+				icon: 'box-multiple-2',
+				nodeClass: Vector2Editor
+			},
+			{
+				name: 'Vector 3',
+				icon: 'box-multiple-3',
+				nodeClass: Vector3Editor
+			},
+			{
+				name: 'Vector 4',
+				icon: 'box-multiple-4',
+				nodeClass: Vector4Editor
+			},
+			{
+				name: 'Color',
+				icon: 'palette',
+				nodeClass: ColorEditor
+			}
+		]
+	},
+	{
+		name: 'Accessors',
+		icon: 'vector-triangle',
+		children: [
+			{
+				name: 'UV',
+				icon: 'details',
+				nodeClass: UVEditor
+			},
+			{
+				name: 'Position',
+				icon: 'hierarchy',
+				nodeClass: PositionEditor
+			},
+			{
+				name: 'Normal',
+				icon: 'fold-up',
+				nodeClass: NormalEditor
+			}
+		]
+	},
+	{
+		name: 'Display',
+		icon: 'brightness',
+		children: [
+			{
+				name: 'Blend',
+				icon: 'layers-subtract',
+				nodeClass: BlendEditor
+			}
+		]
+	},
+	{
+		name: 'Math',
+		icon: 'calculator',
+		children: [
+			{
+				name: 'Operator',
+				icon: 'math-symbols',
+				nodeClass: OperatorEditor
+			},
+			{
+				name: 'Invert',
+				icon: 'flip-vertical',
+				tip: 'Negate',
+				nodeClass: OperatorEditor
+			},
+			{
+				name: 'Limiter',
+				icon: 'arrow-bar-to-up',
+				tip: 'Min / Max',
+				nodeClass: LimiterEditor
+			},
+			{
+				name: 'Dot Product',
+				icon: 'arrows-up-left',
+				nodeClass: DotEditor
+			},
+			{
+				name: 'Power',
+				icon: 'arrow-up-right',
+				nodeClass: PowerEditor
+			},
+			{
+				name: 'Trigonometry',
+				icon: 'wave-sine',
+				tip: 'Sin / Cos / Tan',
+				nodeClass: TrigonometryEditor
+			},
+			{
+				name: 'Normalize',
+				icon: 'fold',
+				nodeClass: OperatorEditor
+			}
+		]
+	},
+	{
+		name: 'Procedural',
+		icon: 'infinity',
+		children: [
+			{
+				name: 'Checker',
+				icon: 'border-outer',
+				nodeClass: CheckerEditor
+			}
+		]
+	},
+	{
+		name: 'Utils',
+		icon: 'apps',
+		children: [
+			{
+				name: 'Timer',
+				icon: 'clock',
+				nodeClass: TimerEditor
+			},
+			{
+				name: 'Oscillator',
+				icon: 'wave-sine',
+				nodeClass: OscillatorEditor
+			},
+			{
+				name: 'Split',
+				icon: 'arrows-split-2',
+				nodeClass: SplitEditor
+			},
+			{
+				name: 'Join',
+				icon: 'arrows-join-2',
+				nodeClass: JoinEditor
+			}
+		]
+	},
+	/*{
+		name: 'Scene',
+		icon: '3d-cube-sphere',
+		children: [
+			{
+				name: 'Mesh',
+				icon: '3d-cube-sphere',
+				nodeClass: MeshEditor
+			}
+		]
+	},*/
+	{
+		name: 'Material',
+		icon: 'circles',
+		children: [
+			{
+				name: 'Standard Material',
+				icon: 'circle',
+				nodeClass: StandardMaterialEditor
+			}
+		]
+	}
+];
+
 export const ClassLib = {
-	'StandardMaterialEditor': StandardMaterialEditor,
-	'OperatorEditor': OperatorEditor,
-	'FloatEditor': FloatEditor,
-	'ColorEditor': ColorEditor,
-	'UVEditor': UVEditor,
-	'PositionEditor': PositionEditor,
-	'NormalEditor': NormalEditor,
-	'CheckerEditor': CheckerEditor
+	StandardMaterialEditor,
+	MeshEditor,
+	OperatorEditor,
+	NormalizeEditor,
+	InvertEditor,
+	LimiterEditor,
+	DotEditor,
+	PowerEditor,
+	TrigonometryEditor,
+	FloatEditor,
+	Vector2Editor,
+	Vector3Editor,
+	Vector4Editor,
+	SliderEditor,
+	ColorEditor,
+	BlendEditor,
+	UVEditor,
+	PositionEditor,
+	NormalEditor,
+	TimerEditor,
+	OscillatorEditor,
+	SplitEditor,
+	JoinEditor,
+	CheckerEditor
 };
 
 export class NodeEditor extends EventDispatcher {
 
-	constructor() {
+	constructor( scene = null ) {
 
 		super();
 
 		const domElement = document.createElement( 'flow' );
 		const canvas = new Canvas();
 
-		domElement.appendChild( canvas.dom );
+		domElement.append( canvas.dom );
+
+		this.scene = scene;
 
 		this.canvas = canvas;
 		this.domElement = domElement;
 
+		this.nodesContext = null;
+		this.examplesContext = null;
+
+		this._initTips();
 		this._initMenu();
-		this._initContextMenu();
+		this._initSearch();
+		this._initNodesContext();
+		this._initExamplesContext();
+
+	}
+
+	centralizeNode( node ) {
+
+		const canvas = this.canvas;
+		const canvasRect = canvas.rect;
+
+		const nodeRect = node.dom.getBoundingClientRect();
+
+		const defaultOffsetX = nodeRect.width;
+		const defaultOffsetY = nodeRect.height;
+
+		node.setPosition(
+			( canvas.relativeX + ( canvasRect.width / 2 ) ) - defaultOffsetX,
+			( canvas.relativeY + ( canvasRect.height / 2 ) ) - defaultOffsetY
+		);
 
 	}
 
 	add( node ) {
 
+		const onRemove = () => {
+
+			node.removeEventListener( 'remove', onRemove );
+
+			node.setEditor( null );
+
+		};
+
+		node.setEditor( this );
+		node.addEventListener( 'remove', onRemove );
+
 		this.canvas.add( node );
+
+		this.dispatchEvent( { type: 'add', node } );
 
 		return this;
 
@@ -53,32 +299,54 @@ export class NodeEditor extends EventDispatcher {
 
 	}
 
+	newProject() {
+
+		this.canvas.clear();
+
+		this.dispatchEvent( { type: 'new' } );
+
+	}
+
+	loadJSON( json ) {
+
+		this.canvas.clear();
+
+		this.canvas.deserialize( json );
+
+		for ( const node of this.canvas.nodes ) {
+
+			this.add( node );
+
+		}
+
+		this.dispatchEvent( { type: 'load' } );
+
+	}
+
+	_initTips() {
+
+		this.tips = new Tips();
+
+		this.domElement.append( this.tips.dom );
+
+	}
+
 	_initMenu() {
 
 		const menu = new CircleMenu();
 
-		const menuButton = new ButtonInput().setIcon( 'ti ti-menu-2' );
+		const menuButton = new ButtonInput().setIcon( 'ti ti-apps' ).setToolTip( 'Add' );
+		const examplesButton = new ButtonInput().setIcon( 'ti ti-file-symlink' ).setToolTip( 'Examples' );
 		const newButton = new ButtonInput().setIcon( 'ti ti-file' ).setToolTip( 'New' );
 		const openButton = new ButtonInput().setIcon( 'ti ti-upload' ).setToolTip( 'Open' );
 		const saveButton = new ButtonInput().setIcon( 'ti ti-download' ).setToolTip( 'Save' );
 
-		menuButton.onClick( () => {
+		menuButton.onClick( () => this.nodesContext.open() );
+		examplesButton.onClick( () => this.examplesContext.open() );
 
-			this.context.show( 50, 50 );
-
-		} );
-
-		newButton.onClick( () => {
-
-			this.canvas.clear();
-
-			this.dispatchEvent( { type: 'new' } );
-
-		} );
+		newButton.onClick( () => this.newProject() );
 
 		openButton.onClick( () => {
-
-			this.context.hide();
 
 			const input = document.createElement( 'input' );
 			input.type = 'file';
@@ -92,13 +360,10 @@ export class NodeEditor extends EventDispatcher {
 
 				reader.onload = readerEvent => {
 
-					const json = Loader.parseObjects( JSON.parse( readerEvent.target.result ), ClassLib );
+					const loader = new Loader( Loader.OBJECTS );
+					const json = loader.parse( JSON.parse( readerEvent.target.result ), ClassLib );
 
-					this.canvas.clear();
-
-					this.canvas.deserialize( json );
-
-					this.dispatchEvent( { type: 'load' } );
+					this.loadJSON( json );
 
 				};
 
@@ -109,8 +374,6 @@ export class NodeEditor extends EventDispatcher {
 		} );
 
 		saveButton.onClick( () => {
-
-			this.context.hide();
 
 			const json = JSON.stringify( this.canvas.toJSON() );
 
@@ -123,30 +386,197 @@ export class NodeEditor extends EventDispatcher {
 
 		} );
 
-		menu.add( menuButton );
-		menu.add( newButton );
-		menu.add( openButton );
-		menu.add( saveButton );
+		menu.add( examplesButton )
+			.add( menuButton )
+			.add( newButton )
+			.add( openButton )
+			.add( saveButton );
 
-		this.domElement.appendChild( menu.dom );
+		this.domElement.append( menu.dom );
 
 		this.menu = menu;
 
 	}
 
-	_initContextMenu() {
+	_initExamplesContext() {
+
+		const context = new ContextMenu();
+
+		//**************//
+		// MAIN
+		//**************//
+
+		const onClickExample = async ( button ) => {
+
+			this.examplesContext.hide();
+
+			const filename = button.getExtra();
+
+			const loader = new Loader( Loader.OBJECTS );
+			const json = await loader.load( `./jsm/node-editor/examples/${filename}.json`, ClassLib );
+
+			this.loadJSON( json );
+
+		};
+
+		const addExample = ( context, name, filename = null ) => {
+
+			filename = filename || name.replaceAll( ' ', '-' ).toLowerCase();
+
+			context.add( new ButtonInput( name )
+				.setIcon( 'ti ti-file-symlink' )
+				.onClick( onClickExample )
+				.setExtra( filename )
+			);
+
+		};
+
+		//**************//
+		// EXAMPLES
+		//**************//
+
+		const basicContext = new ContextMenu();
+		const advancedContext = new ContextMenu();
+
+		addExample( basicContext, 'Animate UV' );
+		addExample( basicContext, 'Fake top light' );
+		addExample( basicContext, 'Oscillator color' );
+
+		addExample( advancedContext, 'Rim' );
+
+		//**************//
+		// MAIN
+		//**************//
+
+		context.add( new ButtonInput( 'Basic' ), basicContext );
+		context.add( new ButtonInput( 'Advanced' ), advancedContext );
+
+		this.examplesContext = context;
+
+	}
+
+	_initSearch() {
+
+		const traverseNodeEditors = ( item ) => {
+
+			if ( item.nodeClass ) {
+
+				const button = new ButtonInput( item.name );
+				button.setIcon( `ti ti-${item.icon}` );
+				button.addEventListener( 'complete', () => {
+
+					const node = new item.nodeClass();
+
+					this.add( node );
+
+					this.centralizeNode( node );
+
+				} );
+
+				search.add( button );
+
+			}
+
+			if ( item.children ) {
+
+				for ( const subItem of item.children ) {
+
+					traverseNodeEditors( subItem );
+
+				}
+
+			}
+
+		};
+
+		const search = new Search();
+		search.forceAutoComplete = true;
+
+		search.onFilter( () => {
+
+			search.clear();
+
+			for ( const item of NodeList ) {
+
+				traverseNodeEditors( item );
+
+			}
+
+			const object3d = this.scene;
+
+			object3d.traverse( ( obj3d ) => {
+
+				if ( obj3d.isMesh === true ) {
+
+					const button = new ButtonInput( `Mesh - ${obj3d.name}` );
+					button.setIcon( `ti ti-3d-cube-sphere` );
+					button.addEventListener( 'complete', () => {
+
+						for ( const node of this.canvas.nodes ) {
+
+							if ( node.value === obj3d ) {
+
+								// not duplicated node
+
+								this.canvas.select( node );
+
+								return;
+
+							}
+
+						}
+
+						const node = new MeshEditor( obj3d );
+
+						this.add( node );
+
+						this.centralizeNode( node );
+
+					} );
+
+					search.add( button );
+
+				}
+
+			} );
+
+		} );
+
+		search.onSubmit( () => {
+
+			if ( search.currentFiltered !== null ) {
+
+				search.currentFiltered.button.dispatchEvent( new Event( 'complete' ) );
+
+			}
+
+		} );
+
+		this.domElement.append( search.dom );
+
+	}
+
+	_initNodesContext() {
 
 		const context = new ContextMenu( this.domElement );
 
+		let isContext = false;
+		const contextPosition = {};
+
 		const add = ( node ) => {
 
-			const canvas = this.canvas;
-			const canvasRect = canvas.rect;
+			if ( isContext ) {
 
-			node.setPosition(
-				( canvas.relativeX + ( canvasRect.width / 2 ) ) - ( 350 / 2 ),
-				( canvas.relativeY + ( canvasRect.height / 2 ) ) - 20
-			);
+				node.setPosition(
+					contextPosition.x,
+					contextPosition.y
+				);
+
+			} else {
+
+				this.centralizeNode( node );
+
+			}
 
 			context.hide();
 
@@ -154,92 +584,71 @@ export class NodeEditor extends EventDispatcher {
 
 			this.canvas.select( node );
 
+			isContext = false;
+
 		};
 
-		//**************//
-		//* INPUTS
-		//**************//
+		context.onContext( () => {
 
-		const inputsContext = new ContextMenu();
+			isContext = true;
 
-		const floatInput = new ButtonInput( 'Float' ).setIcon( 'ti ti-box-multiple-1' )
-			.onClick( () => add( new FloatEditor() ) );
+			const { relativeClientX, relativeClientY } = this.canvas;
 
-		//const vec2Input = new ButtonInput( 'Vector 2' ).setIcon( 'ti ti-box-multiple-2' );
-		//const vec3Input = new ButtonInput( 'Vector 3' ).setIcon( 'ti ti-box-multiple-3' );
-		//const vec4Input = new ButtonInput( 'Vector 4' ).setIcon( 'ti ti-box-multiple-4' );
+			contextPosition.x = relativeClientX;
+			contextPosition.y = relativeClientY;
 
-		const colorInput = new ButtonInput( 'Color' ).setIcon( 'ti ti-palette' )
-			.onClick( () => add( new ColorEditor() ) );
-
-		//const mapInput = new ButtonInput( 'Map' ).setIcon( 'ti ti-photo' );
-		//const cubeMapInput = new ButtonInput( 'Cube Map' ).setIcon( 'ti ti-box' );
-		//const sliderInput = new ButtonInput( 'Slider' ).setIcon( 'ti ti-adjustments-horizontal' );
-		//const integerInput = new ButtonInput( 'Integer' ).setIcon( 'ti ti-list-numbers' );
-
-		inputsContext
-			.add( floatInput )
-			//.add( vec2Input )
-			//.add( vec3Input )
-			//.add( vec4Input )
-			.add( colorInput );
-		//.add( sliderInput );
+		} );
 
 		//**************//
-		//* MATH
+		// INPUTS
 		//**************//
 
-		const mathContext = new ContextMenu();
-		const operatorsNode = new ButtonInput( 'Operators' ).setIcon( 'ti ti-math-symbols' )
-			.onClick( () => add( new OperatorEditor() ) );
+		const createButtonMenu = ( item ) => {
 
-		mathContext
-			.add( operatorsNode );
+			const button = new ButtonInput( item.name );
+			button.setIcon( `ti ti-${item.icon}` );
 
-		//**************//
-		//* ACCESSORS
-		//**************//
+			let context = null;
 
-		const accessorsContext = new ContextMenu();
+			if ( item.nodeClass ) {
 
-		const uvNode = new ButtonInput( 'UV' ).setIcon( 'ti ti-details' )
-			.onClick( () => add( new UVEditor() ) );
+				button.onClick( () => add( new item.nodeClass() ) );
 
-		const positionNode = new ButtonInput( 'Position' ).setIcon( 'ti ti-hierarchy' )
-			.onClick( () => add( new PositionEditor() ) );
+			}
 
-		const normalNode = new ButtonInput( 'Normal' ).setIcon( 'ti ti-fold-up' )
-			.onClick( () => add( new NormalEditor() ) );
+			if ( item.tip ) {
 
-		accessorsContext
-			.add( uvNode )
-			.add( positionNode )
-			.add( normalNode );
+				button.setToolTip( item.tip );
 
-		//**************//
-		//* PROCEDURAL
-		//**************//
+			}
 
-		const proceduralContext = new ContextMenu();
+			if ( item.children ) {
 
-		const checkerNode = new ButtonInput( 'Checker' ).setIcon( 'ti ti-border-outer' )
-			.onClick( () => add( new CheckerEditor() ) );
+				context = new ContextMenu();
 
-		proceduralContext
-			.add( checkerNode );
+				for ( const subItem of item.children ) {
 
-		//**************//
-		//* MAIN
-		//**************//
+					const buttonMenu = createButtonMenu( subItem );
 
-		context.add( new ButtonInput( 'Inputs' ).setIcon( 'ti ti-forms' ), inputsContext );
-		context.add( new ButtonInput( 'Accessors' ).setIcon( 'ti ti-vector-triangle' ), accessorsContext );
-		context.add( new ButtonInput( 'Math' ).setIcon( 'ti ti-calculator' ), mathContext );
-		context.add( new ButtonInput( 'Procedural' ).setIcon( 'ti ti-infinity' ), proceduralContext );
+					context.add( buttonMenu.button, buttonMenu.context );
 
-		this.domElement.appendChild( context.dom );
+				}
 
-		this.context = context;
+			}
+
+			return { button, context };
+
+		};
+
+		for ( const item of NodeList ) {
+
+			const buttonMenu = createButtonMenu( item );
+
+			context.add( buttonMenu.button, buttonMenu.context );
+
+		}
+
+		this.nodesContext = context;
 
 	}
 

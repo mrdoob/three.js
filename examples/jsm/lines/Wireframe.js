@@ -3,7 +3,7 @@ import {
 	InterleavedBufferAttribute,
 	Mesh,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
 import { LineMaterial } from '../lines/LineMaterial.js';
 

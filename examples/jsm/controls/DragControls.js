@@ -5,7 +5,7 @@ import {
 	Raycaster,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _plane = new Plane();
 const _raycaster = new Raycaster();
@@ -61,6 +61,12 @@ class DragControls extends EventDispatcher {
 		function getObjects() {
 
 			return _objects;
+
+		}
+
+		function getRaycaster() {
+
+			return _raycaster;
 
 		}
 
@@ -205,6 +211,7 @@ class DragControls extends EventDispatcher {
 		this.deactivate = deactivate;
 		this.dispose = dispose;
 		this.getObjects = getObjects;
+		this.getRaycaster = getRaycaster;
 
 	}
 

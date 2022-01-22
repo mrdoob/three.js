@@ -1,7 +1,7 @@
 import {
 	Loader,
 	FileLoader
-} from '../../../build/three.module.js';
+} from 'three';
 
 import * as Nodes from '../nodes/Nodes.js';
 

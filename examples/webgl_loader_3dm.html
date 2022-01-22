@@ -32,9 +32,21 @@
 		</div>
 
 		<div id="loader"></div>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
@@ -67,7 +79,7 @@
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.11.1/' );
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );

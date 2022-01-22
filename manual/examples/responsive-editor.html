@@ -1,0 +1,75 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Responsive Editor</title>
+    <style>
+    html, body {
+        height: 100%;
+      margin: 0;
+      font-size: 16pt;
+    }
+    #editor {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+    #controls {
+      background: #AAA;
+      padding: 5px;
+    }
+    #c {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .gutter {
+        background-color: #eee;
+        background-repeat: no-repeat;
+        background-position: 50%;
+    }
+    .gutter.gutter-horizontal {
+        cursor: ew-resize;
+        background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==')
+    }
+    </style>
+  </head>
+  <body>
+    <div id="editor">
+      <div id="view"><canvas id="c"></canvas></div>
+      <div id="controls">
+        <div>
+          <p>various controls
+             would appear here</p>
+           <div>Drag this bar</div>
+           <div>⇐</div>
+        </div>
+      </div>
+    </div>
+  </body>
+<script type="module" src="threejs-responsive.js"></script>
+<script src="../3rdparty/split.min.js"></script>
+<script type="module">
+/* global Split */
+
+// This code is only related to handling the split.
+// Our three.js code has not changed
+Split(['#view', '#controls'], {  // eslint-disable-line new-cap
+  sizes: [75, 25],
+  minSize: 100,
+  elementStyle: (dimension, size, gutterSize) => {
+    return {
+      'flex-basis': `calc(${size}% - ${gutterSize}px)`,
+    };
+  },
+  gutterStyle: (dimension, gutterSize) => {
+    return {
+      'flex-basis': `${gutterSize}px`,
+    };
+  },
+});
+</script>
+</html>
+

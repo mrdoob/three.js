@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 240 360" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-miterlimit:1.5;">
+    <g transform="matrix(2.32152,0,0,2.32152,-752.899,-201.514)">
+        <path d="M370.5,158.647L350.3,178.847L336.7,165.247L363.9,138.047L336.7,110.847L350.3,97.247L377.5,124.447L404.7,97.247L418.3,110.847L391.1,138.047L418.3,165.247L404.7,178.847L384.5,158.647L384.5,176.047L394,176.047L394,232.047L361,232.047L361,176.047L370.5,176.047L370.5,158.647Z" style="fill:rgb(136,77,179);stroke:black;stroke-width:0.22px;stroke-dasharray:1.08,1.08,0,0;"/>
+    </g>
+    <g transform="matrix(0.0595514,-8.26442e-19,8.26442e-19,0.0595514,122.345,315.347)">
+        <g transform="matrix(6.77106e-17,-1.1058,2.2957,1.40571e-16,-321.813,325.87)">
+            <path d="M150,160L216,251L84,251L150,160Z" style="fill:rgb(38,185,217);"/>
+        </g>
+        <g transform="matrix(6.97078,-1.2326e-32,-1.2326e-32,7.39703,-489.533,-1027.22)">
+            <g transform="matrix(0.648649,0,0,1,29.3833,93)">
+                <rect x="21" y="57" width="37" height="21"/>
+            </g>
+            <g transform="matrix(6.12323e-17,-1,1,6.12323e-17,-1.24628,265)">
+                <path d="M104.5,57L114,78L95,78L104.5,57Z"/>
+            </g>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,176.159,22.0184)">
+        <text x="-9.111px" y="302.715px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:20px;fill:rgb(38,185,217);">camera</text>
+        <text x="-11.304px" y="323.369px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:20px;fill:rgb(38,185,217);">frustum</text>
+    </g>
+</svg>

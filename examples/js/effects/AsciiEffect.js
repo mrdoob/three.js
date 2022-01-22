@@ -1,8 +1,7 @@
 ( function () {
 
 	/**
- * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/
- * Maybe more about this later with a blog post at http://lab4games.net/zz85/blog
+ * Ascii generation is based on https://github.com/hassadee/jsascii/blob/master/jsascii.js
  *
  * 16 April 2012 - @blurspline
  */
@@ -50,13 +49,7 @@
 
 			};
 
-			this.domElement = domElement; // Throw in ascii library from http://www.nihilogic.dk/labs/jsascii/jsascii.js
-
-			/*
-    * jsAscii 0.1
-    * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
-    * MIT License [http://www.nihilogic.dk/licenses/mit-license.txt]
-    */
+			this.domElement = domElement; // Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
 
 			function initAsciiSize() {
 

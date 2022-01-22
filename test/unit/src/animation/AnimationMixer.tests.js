@@ -14,11 +14,11 @@ function getClips( pos1, pos2, scale1, scale2, dur ) {
 
 	const clips = [];
 
-	let track = new VectorKeyframeTrack( ".scale", [ 0, dur ], [ scale1.x, scale1.y, scale1.z, scale2.x, scale2.y, scale2.z ] );
-	clips.push( new AnimationClip( "scale", dur, [ track ] ) );
+	let track = new VectorKeyframeTrack( '.scale', [ 0, dur ], [ scale1.x, scale1.y, scale1.z, scale2.x, scale2.y, scale2.z ] );
+	clips.push( new AnimationClip( 'scale', dur, [ track ] ) );
 
-	track = new VectorKeyframeTrack( ".position", [ 0, dur ], [ pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z ] );
-	clips.push( new AnimationClip( "position", dur, [ track ] ) );
+	track = new VectorKeyframeTrack( '.position', [ 0, dur ], [ pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z ] );
+	clips.push( new AnimationClip( 'position', dur, [ track ] ) );
 
 	return clips;
 
@@ -29,33 +29,33 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'AnimationMixer', () => {
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "clipAction", ( assert ) => {
+		QUnit.todo( 'clipAction', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "existingAction", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( "stopAllAction", ( assert ) => {
+		QUnit.todo( 'existingAction', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'stopAllAction', ( assert ) => {
 
 			const obj = new Object3D();
 			const animMixer = new AnimationMixer( obj );
@@ -71,51 +71,51 @@ export default QUnit.module( 'Animation', () => {
 			assert.ok(
 				! actionA.isRunning() &&
 				! actionB.isRunning(),
-				"All actions stopped" );
+				'All actions stopped' );
 			assert.ok(
 				obj.position.x == 0 &&
 				obj.position.y == 0 &&
 				obj.position.z == 0,
-				"Position reset as expected"
+				'Position reset as expected'
 			);
 			assert.ok(
 				obj.scale.x == 1 &&
 				obj.scale.y == 1 &&
 				obj.scale.z == 1,
-				"Scale reset as expected"
+				'Scale reset as expected'
 			);
 
 		} );
 
-		QUnit.todo( "update", ( assert ) => {
+		QUnit.todo( 'update', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( "getRoot", ( assert ) => {
+		QUnit.test( 'getRoot', ( assert ) => {
 
 			const obj = new Object3D();
 			const animMixer = new AnimationMixer( obj );
-			assert.strictEqual( obj, animMixer.getRoot(), "Get original root object" );
+			assert.strictEqual( obj, animMixer.getRoot(), 'Get original root object' );
 
 		} );
 
-		QUnit.todo( "uncacheClip", ( assert ) => {
+		QUnit.todo( 'uncacheClip', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "uncacheRoot", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "uncacheAction", ( assert ) => {
+		QUnit.todo( 'uncacheRoot', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'uncacheAction', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -55,6 +55,7 @@ import NormalMapNode from './display/NormalMapNode.js';
 // math
 import MathNode from './math/MathNode.js';
 import OperatorNode from './math/OperatorNode.js';
+import CondNode from './math/CondNode.js';
 
 // lights
 import LightContextNode from './lights/LightContextNode.js';
@@ -63,9 +64,11 @@ import LightsNode from './lights/LightsNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
+import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
+import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
 // procedural
@@ -141,6 +144,7 @@ export {
 	// math
 	MathNode,
 	OperatorNode,
+	CondNode,
 
 	// lights
 	LightContextNode,
@@ -149,9 +153,11 @@ export {
 
 	// utils
 	ArrayElementNode,
+	ConvertNode,
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,
+	OscNode,
 	TimerNode,
 
 	// procedural

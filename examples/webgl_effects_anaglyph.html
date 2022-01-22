@@ -9,12 +9,24 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - anaglyph<br/>
-			skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
+			skybox by <a href="https://www.pauldebevec.com/" target="_blank" rel="noopener">Paul Debevec</a>
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { AnaglyphEffect } from './jsm/effects/AnaglyphEffect.js';
 
@@ -42,7 +54,7 @@
 				camera.position.z = 3;
 				camera.focalLength = 3;
 
-				const path = "textures/cube/pisa/";
+				const path = 'textures/cube/pisa/';
 				const format = '.png';
 				const urls = [
 					path + 'px' + format, path + 'nx' + format,

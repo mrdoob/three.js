@@ -26,7 +26,7 @@ class InputNode extends Node {
 
 	}
 
-	getInputType( builder ) {
+	getInputType( /* builder */ ) {
 
 		return this.inputType;
 

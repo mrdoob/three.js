@@ -13,7 +13,7 @@
  *  * Add mmd_toon_matcap_fragment.
  */
 
-import { UniformsUtils, ShaderLib } from '../../../build/three.module.js';
+import { UniformsUtils, ShaderLib } from 'three';
 
 const lights_mmd_toon_pars_fragment = `
 varying vec3 vViewPosition;
@@ -57,7 +57,6 @@ const mmd_toon_matcap_fragment = `
 	vec3 y = cross( viewDir, x );
 	vec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5; // 0.495 to remove artifacts caused by undersized matcap disks
 	vec4 matcapColor = texture2D( matcap, uv );
-	matcapColor = matcapTexelToLinear( matcapColor );
 
 	#ifdef MATCAP_BLENDING_MULTIPLY
 

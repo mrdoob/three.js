@@ -18,7 +18,7 @@ import {
 	Vector2,
 	WebGLRenderTarget,
 	ZeroFactor
-} from '../../../build/three.module.js';
+} from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SAOShader } from '../shaders/SAOShader.js';
 import { DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader.js';
@@ -78,7 +78,7 @@ class SAOPass extends Pass {
 			format: RGBAFormat
 		} );
 		this.depthRenderTarget = this.normalRenderTarget.clone();
-		
+
 		let depthTexture;
 
 		if ( this.supportsDepthTextureExtension ) {

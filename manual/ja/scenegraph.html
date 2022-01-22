@@ -1,0 +1,442 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のシーングラフ</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のシーングラフ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のシーングラフ</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>この記事はthree.jsについてのシリーズ記事の一つです。
+最初の記事は<a href="fundamentals.html">Three.jsの基礎</a>です。
+まだ読んでない人は、そちらから先に読んでみるといいかもしれません。</p>
+<p>Three.jsの核心は間違いなくシーングラフです。
+3Dエンジンのシーングラフは、各ノードがローカルな空間を表現している、グラフ内のノードの階層です。</p>
+<p><img src="../resources/images/scenegraph-generic.svg" align="center"></p>
+<p>抽象的なので、例をいくつか挙げてみましょう。</p>
+<p>例の一つは太陽系、太陽・地球・月でしょうか。</p>
+<p><img src="../resources/images/scenegraph-solarsystem.svg" align="center"></p>
+<p>地球は太陽を回っています。月は地球を回っています。
+月は地球の周りを円を描いて移動しています。月から見ると、地球の"ローカルな空間"を回っていることになります。
+太陽との相対的な動きは、月の視点から見るとクレイジーな螺旋のような曲線に見えますが、単に地球のローカルな空間を周回していると捉える必要があります。</p>
+<p></p><div class="threejs_diagram_container">
+  <iframe class="threejs_diagram " style="width: 400px; height: 300px;" src="/manual/foo/../resources/moon-orbit.html"></iframe>
+</div>
+
+<p></p>
+<p>別の考え方をしてみます。地球が地軸の周りを自転していることも、太陽の周りを公転していることも、
+地球に住んでいるあなたが考える必要はありません。
+皆さんは全くもって地球が動きも回りもしていないかのように、
+歩いたり、ドライブしたり、泳いだり、走ったりするだけです。
+地球の"ローカルな空間"で歩いたり、ドライブしたり、泳いだり、走ったり、そして生活したりしていても、みなさんは太陽と相対的に、地球の上で1,600km/hの速さで回転し、太陽の周りを107,200km/hの速度で回っています。
+太陽系上のみなさんの位置は、前述した月と同じようなものですが、気にする必要はありません。
+みなさんは地球の"ローカルな空間"で、地球との相対的な位置だけを心配していればいいのです。</p>
+<p>一歩進みましょう。私たちは太陽と地球と月の図を作りたいと想像してみてください。
+まず、太陽から始めましょう。ただ球体を作り原点に置くだけです。
+シーングラフを使う方法の演習として、太陽、地球、月を使うことを、気に留めておいてください。
+もちろん、現実の太陽、地球、月は物理学に従いますが、演習目的なので、シーングラフで代用します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// an array of objects whose rotation to update
+const objects = [];
+
+// use just one sphere for everything
+const radius = 1;
+const widthSegments = 6;
+const heightSegments = 6;
+const sphereGeometry = new THREE.SphereGeometry(
+    radius, widthSegments, heightSegments);
+
+const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00});
+const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
+sunMesh.scale.set(5, 5, 5);  // make the sun large
+scene.add(sunMesh);
+objects.push(sunMesh);
+</pre>
+<p>とても少ないポリゴンからできた球体を使います。緯度方向にたった6分割です。
+これで、回転していることが見やすくなります。</p>
+<p>同じ球体を全ての球体に使いまわすつもりなので、太陽のメッシュの大きさを5倍にしておきます。</p>
+<p>また、phong materialの<code class="notranslate" translate="no">emissive</code>属性を黄色に設定します。
+phong materialのemissive属性は、基本的に、光が当たっていない表面に描かれる色です。
+光源はその色に付け加えられます。</p>
+<p>次に、シーンの真ん中に1つ点光源を置きましょう。後ほど、より詳細に点光源について説明しますが、
+一点から発せられる明かりというのが、とりあえずの簡単な説明です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 3;
+  const light = new THREE.PointLight(color, intensity);
+  scene.add(light);
+}
+</pre>
+<p>見やすくするために、直接原点を見下ろすようにカメラを置きましょう。
+最も簡単な方法は <code class="notranslate" translate="no">lookAt</code>関数を使うことです。
+<code class="notranslate" translate="no">lookAt</code>関数は、引数に渡した位置を「見る」ようにカメラを向けます。
+その前に、カメラの上部がどの方向を向いているか、もしくは、
+カメラにとってどの方向が"上"なのかを、カメラに伝える必要があります。
+ほとんどの場合、Y軸の正が上で十分ですが、
+今は見下ろしているので、Z軸の正が上だとカメラに伝える必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+camera.position.set(0, 50, 0);
+camera.up.set(0, 0, 1);
+camera.lookAt(0, 0, 0);
+</pre>
+<p>レンダリングループの中で、前の例を参考にして、以下のコードで、<code class="notranslate" translate="no">objects</code>配列内の全てのオブジェクトを回転させています。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">objects.forEach((obj) =&gt; {
+  obj.rotation.y = time;
+});
+</pre>
+<p><code class="notranslate" translate="no">sunMesh</code>を<code class="notranslate" translate="no">objects</code>配列に追加したので、回転します。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>さて、地球を追加してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
+const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+earthMesh.position.x = 10;
+scene.add(earthMesh);
+objects.push(earthMesh);
+</pre>
+<p>青いマテリアルを作っていますが、黒背景に対して目立つよう、
+<em>emissive</em>に少し青色を設定します。</p>
+<p><code class="notranslate" translate="no">earthMesh</code>を作るため、新しく作った青色の<code class="notranslate" translate="no">earthMaterial</code>と、先と同じ<code class="notranslate" translate="no">sphereGeometry</code>を使います。
+それを太陽の10ユニット左側に置き、シーンに追加します。
+これは<code class="notranslate" translate="no">objects</code>配列にそれを追加されたので、同様に回転します。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>太陽と地球の両方が回転して見えますが、地球は太陽の周りを公転していません。
+地球を太陽の子要素にしてみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-scene.add(earthMesh);
++sunMesh.add(earthMesh);
+</pre>
+<p>そして...</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>なにが起きましたか？なぜ地球が太陽と同じ大きさで、こんなに離れているのでしょうか。
+地球を見るためには、実際のところ、カメラを50ユニット上から、150ユニット上に動かす必要がありました。</p>
+<p><code class="notranslate" translate="no">earthMesh</code>を<code class="notranslate" translate="no">sunMesh</code>の子要素としました。
+<code class="notranslate" translate="no">sunMesh</code>は<code class="notranslate" translate="no">sunMesh.scale.set(5, 5, 5)</code>によって5倍に大きさを設定しています。
+よって、<code class="notranslate" translate="no">sunMesh</code>のローカルな空間は5倍大きくなりました。
+その空間におかれるあらゆるものは5倍されるのです。
+つまり、地球が5倍大きくなり、太陽からの距離も5倍（<code class="notranslate" translate="no">earthMesh.position.x = 10</code>）になったのです。</p>
+<p>  シーングラフは、このようになります。</p>
+<p><img src="../resources/images/scenegraph-sun-earth.svg" align="center"></p>
+<p>これを修正するため、シーングラフに空のノードを追加しましょう。
+そして、太陽と地球の両方をそのノードの子要素にしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const solarSystem = new THREE.Object3D();
++scene.add(solarSystem);
++objects.push(solarSystem);
+
+const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00});
+const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
+sunMesh.scale.set(5, 5, 5);
+-scene.add(sunMesh);
++solarSystem.add(sunMesh);
+objects.push(sunMesh);
+
+const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
+const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+earthMesh.position.x = 10;
+-sunMesh.add(earthMesh);
++solarSystem.add(earthMesh);
+objects.push(earthMesh);
+</pre>
+<p>ここで<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>を作りました。<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>のように、シーングラフのノードですが、<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>とは異なり、マテリアルやジオメトリを持ちません。
+ただローカルな空間を表現するだけです。</p>
+<p>新しいシーングラフは、このようになります。</p>
+<p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
+<p><code class="notranslate" translate="no">sunMesh</code>と<code class="notranslate" translate="no">earthMesh</code>は共に<code class="notranslate" translate="no">solarSystem</code>の子要素です。3つ全部が回転していますが、
+いま<code class="notranslate" translate="no">earthMesh</code>は<code class="notranslate" translate="no">sunMesh</code>の子要素ではないので、5倍に拡大されません。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit-fixed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>とてもよくなりました。地球は太陽よりも小さく、太陽の周りを公転しつつ、自転しています。</p>
+<p>続けて、同様の方法で月を追加してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const earthOrbit = new THREE.Object3D();
++earthOrbit.position.x = 10;
++solarSystem.add(earthOrbit);
++objects.push(earthOrbit);
+
+const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
+const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+-solarSystem.add(earthMesh);
++earthOrbit.add(earthMesh);
+objects.push(earthMesh);
+
++const moonOrbit = new THREE.Object3D();
++moonOrbit.position.x = 2;
++earthOrbit.add(moonOrbit);
+
++const moonMaterial = new THREE.MeshPhongMaterial({color: 0x888888, emissive: 0x222222});
++const moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial);
++moonMesh.scale.set(.5, .5, .5);
++moonOrbit.add(moonMesh);
++objects.push(moonMesh);
+</pre>
+<p>再び、描画されないシーングラフのノードを追加しました。これは、<code class="notranslate" translate="no">earthOrbit</code>と呼ばれる<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>です。
+そして、このノードに<code class="notranslate" translate="no">earthMesh</code>と<code class="notranslate" translate="no">moonMesh</code>の両方を追加しました。
+新しいシーングラフは、このようになります。</p>
+<p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
+<p>そして、このように描画されます。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>記事の上部でお見せした螺旋のパターンに沿った月が見えます。
+しかし、手動で操作する必要はありませんでした。
+ただ、シーングラフを設定しただけです。</p>
+<p>シーングラフのノードが分かるような、なにかを描写すると、便利なことがあります。
+Three.jsはこれをするために、helpfulとか、helpersとかがあります。</p>
+<p>一つは<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>です。
+ローカルな<span style="color:red">X</span>、<span style="color:green">Y</span>、<span style="color:blue">Z</span>軸を表す
+3つの線を描画します。
+私たちが作った全てのノードに加えましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// add an AxesHelper to each node
+objects.forEach((node) =&gt; {
+  const axes = new THREE.AxesHelper();
+  axes.material.depthTest = false;
+  axes.renderOrder = 1;
+  node.add(axes);
+});
+</pre>
+<p>私たちの場合、たとえ球体の内部であったとしても、軸を表示させたいです。
+これをするために、マテリアルの<code class="notranslate" translate="no">depthTest</code>をfalseにします。
+これによって、軸がなにかの内部に描画されているかどうかチェックしなくなります。
+全ての球体の後に描画されるように、<code class="notranslate" translate="no">renderOrder</code>も1に設定します（デフォルト値は0です）。
+そうしないと、球体が軸の上に描画され、軸を覆ってしまう可能性があります。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p><span style="color:red">x (赤)</span> と<span style="color:blue">z (青)</span>の
+軸が見えます。私たちはオブジェクトをまっすぐ見下ろしていて、オブジェクトはy軸を中心に
+回転しているので、<span style="color:green">y (緑)</span>軸があまり見えません。</p>
+<p>位置が重なった軸が2組あるので、見づらいかもしれません。
+<code class="notranslate" translate="no">sunMesh</code>と<code class="notranslate" translate="no">solarSystem</code>は同じ場所にあります。
+同様に、<code class="notranslate" translate="no">earthMesh</code>と<code class="notranslate" translate="no">earthOrbit</code>は同じ場所にあります。
+各ノードに対してオン/オフできるように、簡単な操作を加えてみましょう。
+そのついでに、<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> というヘルパー関数も追加しておきましょう。
+これはX,Z平面に2次元グリッドを作ります。デフォルトでは、グリッドは10x10ユニットです。</p>
+<p><a href="https://github.com/georgealways/lil-gui">lil-gui</a>も使います。
+これはthree.jsプロジェクトでとても一般的なUIライブラリです。
+lil-guiはオブジェクトとそのオブジェクトの属性名を受け取り、
+属性の型に基づいて、自動的にその属性を操作するUIを作成します。</p>
+<p>それぞれのノードに対して、<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>と<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>の両方を作りたいです。
+それぞれのノートにラベルが必要なので、古いループを削除し、
+各ノードにhelperを加える関数を呼ぶ形式にします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// add an AxesHelper to each node
+-objects.forEach((node) =&gt; {
+-  const axes = new THREE.AxesHelper();
+-  axes.material.depthTest = false;
+-  axes.renderOrder = 1;
+-  node.add(axes);
+-});
+
++function makeAxisGrid(node, label, units) {
++  const helper = new AxisGridHelper(node, units);
++  gui.add(helper, 'visible').name(label);
++}
++
++makeAxisGrid(solarSystem, 'solarSystem', 25);
++makeAxisGrid(sunMesh, 'sunMesh');
++makeAxisGrid(earthOrbit, 'earthOrbit');
++makeAxisGrid(earthMesh, 'earthMesh');
++makeAxisGrid(moonMesh, 'moonMesh');
+</pre>
+<p><code class="notranslate" translate="no">makeAxisGrid</code>は、lil-guiをハッピーにする<code class="notranslate" translate="no">AxisGridHelper</code>クラスを作ります。
+前述したように、lil-guiは、オブジェクトの名前が付いた属性を操作するUIを自動的に生成します。
+属性の型に応じて異なるUIが作成されます。
+チェックボックスを作って欲しいので、<code class="notranslate" translate="no">bool</code>属性を指定する必要があります。
+しかし、軸とグリッドの両方を一つの属性で表示/非表示にしたいので、
+属性のgetterとsetterを持ったクラスを作成します。
+この方法で、lil-guiに一つの属性を操作するように思わせることができますが、
+内部的には各ノードに<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>と<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>の両方のvisible属性を設定することができます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Turns both axes and grid visible on/off
+// lil-gui requires a property that returns a bool
+// to decide to make a checkbox so we make a setter
+// and getter for `visible` which we can tell lil-gui
+// to look at.
+class AxisGridHelper {
+  constructor(node, units = 10) {
+    const axes = new THREE.AxesHelper();
+    axes.material.depthTest = false;
+    axes.renderOrder = 2;  // after the grid
+    node.add(axes);
+
+    const grid = new THREE.GridHelper(units, units);
+    grid.material.depthTest = false;
+    grid.renderOrder = 1;
+    node.add(grid);
+
+    this.grid = grid;
+    this.axes = axes;
+    this.visible = false;
+  }
+  get visible() {
+    return this._visible;
+  }
+  set visible(v) {
+    this._visible = v;
+    this.grid.visible = v;
+    this.axes.visible = v;
+  }
+}
+</pre>
+<p>注意することは、<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>の<code class="notranslate" translate="no">renderOrder</code>を2に設定し、<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>には1を設定することです。
+こうすることで、軸はグリッドの後に描画されます。
+そうしないと、グリッドが軸を上書きしてしまうかもしれません。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p><code class="notranslate" translate="no">solarSystem</code>のチェックをオンにすると、上で設定したように、
+どのように地球が中心からちょうど10ユニットにあるか分かるでしょう。
+地球が<code class="notranslate" translate="no">solarSystem</code>の<em>ローカルな空間</em>にどのように存在するか分かります。
+同様に、もし<code class="notranslate" translate="no">earthOrbit</code>のチェックをオンにすると、
+どのように月が<code class="notranslate" translate="no">earthOrbit</code>の<em>ローカルな空間</em>の中心から、ちょうど2ユニットあるか分かるでしょう。</p>
+<p>もう少しシーングラフの例を紹介します。
+簡単なゲームの世界の自動車は、このようなシーングラフだとしましょう。</p>
+<p><img src="../resources/images/scenegraph-car.svg" align="center"></p>
+<p>もし車のbody全体を動かすと、それに伴ってwheelsが動くでしょう。
+もしbodyにwheelsとは別にバウンドして欲しいとすると、
+bodyとwheelsを、車のフレームを表す"frame"ノードの子要素にできます。</p>
+<p>別の例はゲームの世界の人間です。</p>
+<p><img src="../resources/images/scenegraph-human.svg" align="center"></p>
+<p>とても複雑な人間のシーングラフを見てください。
+実際は、上記のシーングラフは単純化されています。
+例えば、全ての手の指(少なくとも28ノード)、全ての足の指(さらに28ノード)、
+加えて顔と顎、目、そしてもっと様々な部位もカバーするように、グラフを拡張できるかもしれません。</p>
+<p>もう少し複雑なシーングラフを作りましょう。戦車を作ります。
+戦車は6つの車輪と砲塔があります。この戦車はある道筋に沿って走ります。
+そこら中を移動する球体があり、戦車はその球体を狙うとしましょう。</p>
+<p>これがシーングラフです。メッシュは緑色、<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>は青色、明かりは金色、カメラは紫色です。
+シーングラフに追加されていないカメラが一つあります。</p>
+<div class="threejs_center"><img src="../resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
+
+<p>コードを見て、これらのノードの設定を確認してください。</p>
+<p>ターゲット、つまり戦車が狙っているものとして、<code class="notranslate" translate="no">targetOrbit</code>(<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>) があります。
+これはちょうど前述の<code class="notranslate" translate="no">earthOrbit</code>と同じように回転します。
+<code class="notranslate" translate="no">targetOrbit</code>の子要素である<code class="notranslate" translate="no">targetElevation</code> (<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>)は、
+<code class="notranslate" translate="no">targetOrbit</code>からのオフセットと基準となる高さを提供します。
+この子要素には、<code class="notranslate" translate="no">targetElevation</code>に対して相対的に浮き沈みする、<code class="notranslate" translate="no">targetBob</code>と呼ばれる<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>があります。
+最後に、<code class="notranslate" translate="no">targetMesh</code>があります。回転させて色を変えることができる、ただの立方体です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// move target
+targetOrbit.rotation.y = time * .27;
+targetBob.position.y = Math.sin(time * 2) * 4;
+targetMesh.rotation.x = time * 7;
+targetMesh.rotation.y = time * 13;
+targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
+targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
+</pre>
+<p>戦車には、<code class="notranslate" translate="no">tank</code>と呼ばれる<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>があります。
+これを使って戦車の子要素をすべて移動させることができます。
+コードでは<a href="/docs/#api/ja/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>を使っています。これは曲線に沿った位置を求めることができます。
+0.0は曲線の始点です。1.0は曲線の終点です。これにより、戦車がある現在地を求めます。
+次に、カーブの少し下の位置を求めて、<a href="/docs/#api/ja/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>を使い、戦車をその方向に向けます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tankPosition = new THREE.Vector2();
+const tankTarget = new THREE.Vector2();
+
+...
+
+// move tank
+const tankTime = time * .05;
+curve.getPointAt(tankTime % 1, tankPosition);
+curve.getPointAt((tankTime + 0.01) % 1, tankTarget);
+tank.position.set(tankPosition.x, 0, tankPosition.y);
+tank.lookAt(tankTarget.x, 0, tankTarget.y);
+</pre>
+<p>戦車のてっぺんに付いている砲塔は、戦車の子要素なので自動的に動きます。
+ターゲットの方を向かせるのに、ターゲットの位置を求め、次に再び<a href="/docs/#api/ja/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>を使うだけです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const targetPosition = new THREE.Vector3();
+
+...
+
+// face turret at target
+targetMesh.getWorldPosition(targetPosition);
+turretPivot.lookAt(targetPosition);
+</pre>
+<p><code class="notranslate" translate="no">turretCamera</code>は<code class="notranslate" translate="no">turretMesh</code>の子要素なので、砲塔と一緒に上下に動き、回転します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// make the turretCamera look at target
+turretCamera.lookAt(targetPosition);
+</pre>
+<p><code class="notranslate" translate="no">targetBob</code>の子要素である<code class="notranslate" translate="no">targetCameraPivot</code>もあります。これはターゲットと一緒に浮遊します。
+戦車に狙いを定めましょう。<code class="notranslate" translate="no">targetCamera</code>にターゲット自身に高さを合わせるためです。
+もしカメラを<code class="notranslate" translate="no">targetBob</code>の子要素にして、カメラ自身に狙いを定めさせただけだと、
+カメラがターゲットの内側に入り込んでしまうでしょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// make the targetCameraPivot look at the tank
+tank.getWorldPosition(targetPosition);
+targetCameraPivot.lookAt(targetPosition);
+</pre>
+<p>最後に、全ての車輪を回転させます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">wheelMeshes.forEach((obj) =&gt; {
+  obj.rotation.x = time * 3;
+});
+</pre>
+<p>初期化時に、4つ全てのカメラの配列を設定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameras = [
+  { cam: camera, desc: 'detached camera', },
+  { cam: turretCamera, desc: 'on turret looking at target', },
+  { cam: targetCamera, desc: 'near target looking at tank', },
+  { cam: tankCamera, desc: 'above back of tank', },
+];
+
+const infoElem = document.querySelector('#info');
+</pre>
+<p>描画時にカメラを周回させます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = cameras[time * .25 % cameras.length | 0];
+infoElem.textContent = camera.desc;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-tank.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-tank.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>シーングラフの動作と、使い方のアイデアを、この例から得られればと思います。
+<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>ノードを作り、物体をその子要素にすることは、three.jsのような3Dエンジンを上手く使うために
+重要なステップです。
+思い通りになにかを動かしたり回転させたりすることは、しばしば複雑な数学が必要に見えるかもしれません。
+例えばシーングラフなしで、月の動きを操作したり、車の車体に対して壮太知的に車輪を置いたりすることは、
+とても難しいかもしれません。しかし、シーングラフを使うことで、とても簡単になるのです。</p>
+<p><a href="materials.html">次はマテリアルを説明します</a>。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

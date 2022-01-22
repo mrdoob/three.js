@@ -25,19 +25,7 @@
 			const q = new THREE.Vector4();
 			const textureMatrix = new THREE.Matrix4();
 			const virtualCamera = new THREE.PerspectiveCamera();
-			const parameters = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBFormat
-			};
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-				renderTarget.texture.generateMipmaps = false;
-
-			}
-
+			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight );
 			const material = new THREE.ShaderMaterial( {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				fragmentShader: shader.fragmentShader,
@@ -132,6 +120,13 @@
 			this.getRenderTarget = function () {
 
 				return renderTarget;
+
+			};
+
+			this.dispose = function () {
+
+				renderTarget.dispose();
+				scope.material.dispose();
 
 			};
 

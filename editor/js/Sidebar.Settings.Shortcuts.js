@@ -166,7 +166,7 @@ function SidebarSettingsShortcuts( editor ) {
 
 		}
 
-	}, false );
+	} );
 
 	return container;
 

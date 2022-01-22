@@ -9,7 +9,7 @@ import {
 	RGBAFormat,
 	UVMapping,
 	UniformsLib
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Uniforms library for RectAreaLight shared webgl shaders
@@ -46,6 +46,9 @@ class RectAreaLightUniformsLib {
 		UniformsLib.LTC_FLOAT_1 = new DataTexture( ltc_float_1, 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 		UniformsLib.LTC_FLOAT_2 = new DataTexture( ltc_float_2, 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 
+		UniformsLib.LTC_FLOAT_1.needsUpdate = true;
+		UniformsLib.LTC_FLOAT_2.needsUpdate = true;
+
 		const ltc_half_1 = new Uint16Array( LTC_MAT_1.length );
 
 		LTC_MAT_1.forEach( function ( x, index ) {
@@ -64,6 +67,10 @@ class RectAreaLightUniformsLib {
 
 		UniformsLib.LTC_HALF_1 = new DataTexture( ltc_half_1, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 		UniformsLib.LTC_HALF_2 = new DataTexture( ltc_half_2, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
+
+		UniformsLib.LTC_HALF_1.needsUpdate = true;
+		UniformsLib.LTC_HALF_2.needsUpdate = true;
+
 
 	}
 

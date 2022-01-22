@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Советы</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Советы">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Советы</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Эта статья представляет собой набор небольших проблем, с которыми вы можете столкнуться при использовании three.js, которые кажутся слишком маленькими, чтобы иметь собственную статью. </p>
+<hr>
+<p><a id="screenshot" data-toc="Делаем скриншот холста"></a></p>
+<h1 id="-">Делаем скриншот холста</h1>
+<p>В браузере фактически есть 2 функции, которые сделают скриншот. 
+Старая 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL"><code class="notranslate" translate="no">canvas.toDataURL</code></a>
+и новая улучшенная
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob"><code class="notranslate" translate="no">canvas.toBlob</code></a></p>
+<p>Таким образом, вы думаете, что было бы легко сделать снимок экрана, просто добавив такой код, как </p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
++&lt;button id="screenshot" type="button"&gt;Save...&lt;/button&gt;
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+  });
+});
+
+const saveBlob = (function() {
+  const a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style.display = 'none';
+  return function saveData(blob, fileName) {
+     const url = window.URL.createObjectURL(blob);
+     a.href = url;
+     a.download = fileName;
+     a.click();
+  };
+}());
+</pre>
+<p>Вот пример из <a href="responsive.html">статьи об отзывчивости</a>
+с добавленным выше кодом и некоторым CSS для размещения кнопки </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-bad.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-bad.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Когда я попробовал это, я получил этот скриншот </p>
+<div class="threejs_center"><img src="../resources/images/screencapture-413x313.png"></div>
+
+<p>Да, это просто черное изображение. </p>
+<p>Возможно, это сработало для вас в зависимости от вашего браузера / ОС, но в целом это вряд ли сработает. </p>
+<p>Проблема заключается в том, что по соображениям производительности и совместимости
+браузер по умолчанию очищает буфер рисования WebGL-холста после его отрисовки. </p>
+<p>Решение состоит в том, чтобы вызвать ваш код рендеринга непосредственно перед захватом. </p>
+<p>В нашем коде нам нужно настроить несколько вещей. Сначала давайте выделим код рендеринга. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const state = {
++  time: 0,
++};
+
+-function render(time) {
+-  time *= 0.001;
++function render() {
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
++    const rot = state.time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
++function animate(time) {
++  state.time = time * 0.001;
++
++  render();
++
++  requestAnimationFrame(animate);
++}
++requestAnimationFrame(animate);
+</pre>
+<p>Теперь этот <code class="notranslate" translate="no">render</code> касается только фактического рендеринга, мы можем вызвать его непосредственно перед захватом холста. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
++  render();
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+  });
+});
+</pre>
+<p>И теперь это должно работать. </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-good.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-good.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Для другого решения см. Следующий пункт. </p>
+<hr>
+<p><a id="preservedrawingbuffer" data-toc="Предотвращение очистки холста "></a></p>
+<h1 id="-">Предотвращение очистки холста</h1>
+<p>Допустим, вы хотели, чтобы пользователь рисовал анимированный объект. 
+Вам нужно передать <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> при создании  <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. 
+Это мешает браузеру очистить холст. Вы также должны сказать three.js не очищать холст. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  preserveDrawingBuffer: true,
++  alpha: true,
++});
++renderer.autoClearColor = false;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-preservedrawingbuffer.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-preservedrawingbuffer.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Обратите внимание, что если вы серьезно относитесь к созданию программы для рисования, 
+это не будет решением, так как браузер будет очищать холст каждый раз, когда мы меняем его разрешение. 
+Мы меняем разрешение в зависимости от размера дисплея. Размер дисплея изменяется при изменении размера окна. 
+Это включает в себя, когда пользователь загружает файл, даже в другой вкладке, и браузер добавляет строку состояния. 
+Это также включает в себя, когда пользователь поворачивает свой телефон и браузер переключается с портретного на альбомный. </p>
+<p>Если вы действительно хотите создать программу для рисования, вы должны . 
+<a href="rendertargets.html">визуализировать текстуру, используя цель визуализации</a>.</p>
+<hr>
+<p><a id="tabindex" data-toc="Ввод с клавиатуры"></a></p>
+<h1 id="-">Ввод с клавиатуры</h1>
+<p>В этих уроках мы часто прикрепляли слушателей событий <code class="notranslate" translate="no">canvas</code>.
+Хотя многие события работают, по умолчанию не работают события клавиатуры. </p>
+<p>Чтобы получить события клавиатуры, установите для холста <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex"><code class="notranslate" translate="no">tabindex</code></a>
+ значение 0 или более. Например.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas tabindex="0"&gt;&lt;/canvas&gt;
+</pre>
+<p>Это в конечном итоге вызывает новую проблему, хотя. Все, что имеет установленный <code class="notranslate" translate="no">tabindex</code> будет выделено, когда оно будет в фокусе. 
+Чтобы исправить это, установите фокус CSS <code class="notranslate" translate="no">outline:none</code>.  </p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">canvas:focus {
+  outline:none;
+}
+</pre>
+<p>Для демонстрации здесь представлены 3 холста </p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c1"&gt;&lt;/canvas&gt;
+&lt;canvas id="c2" tabindex="0"&gt;&lt;/canvas&gt;
+&lt;canvas id="c3" tabindex="1"&gt;&lt;/canvas&gt;
+</pre>
+<p>и немного CSS только для последнего холста </p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c3:focus {
+    outline: none;
+}
+</pre>
+<p>Давайте прикрепим к ним всех слушателей событий </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">document.querySelectorAll('canvas').forEach((canvas) =&gt; {
+  const ctx = canvas.getContext('2d');
+
+  function draw(str) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(str, canvas.width / 2, canvas.height / 2);
+  }
+  draw(canvas.id);
+
+  canvas.addEventListener('focus', () =&gt; {
+    draw('has focus press a key');
+  });
+
+  canvas.addEventListener('blur', () =&gt; {
+    draw('lost focus');
+  });
+
+  canvas.addEventListener('keydown', (e) =&gt; {
+    draw(`keyCode: ${e.keyCode}`);
+  });
+});
+</pre>
+<p>Обратите внимание, что вы не можете получить первый холст, 
+чтобы принять ввод с клавиатуры. Второе полотно вы можете, 
+но оно подсвечивается. На третьем холсте применяются оба решения. </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-tabindex.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-tabindex.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="transparent-canvas" data-toc="Делаем холст прозрачным "></a></p>
+<h1 id="-">Делаем холст прозрачным</h1>
+<p>По умолчанию THREE.js делает холст непрозрачным. Если вы хотите, чтобы холст был прозрачным,
+передайте <a href="/docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> при создании <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  alpha: true,
++});
+</pre>
+<p>Вы, вероятно, также хотите сказать, что ваши результаты не используют предварительно умноженную альфа </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  alpha: true,
++  premultipliedAlpha: false,
+});
+</pre>
+<p>Three.js по умолчанию использует холст с использованием 
+<a href="/docs/#api/en/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a> но по умолчанию используется для материалов, которые выводят 
+<a href="/docs/#api/en/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>.</p>
+<p>Если вы хотите лучше понять, когда и когда не следует использовать предварительно умноженную альфу, 
+ <a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre"> вот хорошая статья об этом</a>.</p>
+<p>В любом случае давайте настроим простой пример с прозрачным холстом. </p>
+<p>Мы применили настройки выше к примеру из <a href="responsive.html">статьи об отзывчивости</a>.
+Давайте также сделаем материалы более прозрачными</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+-  const material = new THREE.MeshPhongMaterial({color});
++  const material = new THREE.MeshPhongMaterial({
++    color,
++    opacity: 0.5,
++  });
+
+...
+</pre>
+<p>И давайте добавим немного HTML-контента </p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="content"&gt;
++    &lt;div&gt;
++      &lt;h1&gt;Cubes-R-Us!&lt;/h1&gt;
++      &lt;p&gt;We make the best cubes!&lt;/p&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>а также немного CSS, чтобы поставить холст впереди </p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    position: fixed;
++    left: 0;
++    top: 0;
++    z-index: 2;
++    pointer-events: none;
+}
++#content {
++  font-size: 7vw;
++  font-family: sans-serif;
++  text-align: center;
++  width: 100%;
++  height: 100%;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++}
+</pre>
+<p>обратите внимание, что  <code class="notranslate" translate="no">pointer-events: none</code> делает холст невидимым для мыши и сенсорных событий, поэтому вы можете выделить текст под ним.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-transparent-canvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-transparent-canvas.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="html-background" data-toc="Создание анимированного фона в three.js "></a></p>
+<h1 id="-three-js">Создание анимированного фона в three.js</h1>
+<p>Распространенный вопрос - как сделать анимацию three.js фоном веб-страницы. </p>
+<p>Есть 2 очевидных способа. </p>
+<ul>
+<li>Установите у холста CSS <code class="notranslate" translate="no">position</code> <code class="notranslate" translate="no">fixed</code> как в </li>
+</ul>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+ position: fixed;
+ left: 0;
+ top: 0;
+ ...
+}
+</pre>
+<p>Вы можете в основном увидеть это точное решение на предыдущем примере. Просто установите <code class="notranslate" translate="no">z-index</code> на -1, и кубы появятся за текстом. </p>
+<p>Небольшим недостатком этого решения является то, что ваш JavaScript должен интегрироваться со страницей,
+и если у вас сложная страница, вам нужно убедиться, что ни один из JavaScript в вашей визуализации 
+three.js не конфликтует с JavaScript, выполняющим другие действия на странице. </p>
+<ul>
+<li>Используйте <code class="notranslate" translate="no">iframe</code></li>
+</ul>
+<p>Это решение используется на 
+<a href="/">главной странице этого сайта </a>.</p>
+<p>На вашей веб-странице просто вставьте iframe, например </p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;iframe id="background" src="responsive.html"&gt;
+&lt;div&gt;
+  Your content goes here.
+&lt;/div&gt;
+</pre>
+<p>Затем создайте стиль iframe, чтобы заполнить окно и оказаться в фоновом режиме, 
+который в основном является тем же кодом, который мы использовали выше для холста, 
+за исключением того, что нам также нужно установить значение none, поскольку
+у iframes по умолчанию есть граница. </p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">#background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    border: none;
+    pointer-events: none;
+}
+</pre><p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-html-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-html-background.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>
