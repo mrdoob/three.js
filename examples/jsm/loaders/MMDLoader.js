@@ -218,6 +218,7 @@ class MMDLoader extends Loader {
 		const parser = this._getParser();
 
 		this.loader
+			.setMimeType( undefined )
 			.setPath( this.path )
 			.setResponseType( 'arraybuffer' )
 			.setRequestHeader( this.requestHeader )
@@ -243,6 +244,7 @@ class MMDLoader extends Loader {
 		const parser = this._getParser();
 
 		this.loader
+			.setMimeType( undefined )
 			.setPath( this.path )
 			.setResponseType( 'arraybuffer' )
 			.setRequestHeader( this.requestHeader )
@@ -274,6 +276,7 @@ class MMDLoader extends Loader {
 		const parser = this._getParser();
 
 		this.loader
+			.setMimeType( undefined )
 			.setPath( this.animationPath )
 			.setResponseType( 'arraybuffer' )
 			.setRequestHeader( this.requestHeader )
@@ -307,8 +310,9 @@ class MMDLoader extends Loader {
 		const parser = this._getParser();
 
 		this.loader
+			.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
 			.setPath( this.animationPath )
-			.setResponseType( 'text', 'shift_jis' )
+			.setResponseType( 'text' )
 			.setRequestHeader( this.requestHeader )
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( text ) {
