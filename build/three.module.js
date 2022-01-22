@@ -2674,7 +2674,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 		this.ignoreDepthForMultisampleCopy = options.ignoreDepth !== undefined ? options.ignoreDepth : true;
 		this.useRenderToTexture = ( options.useRenderToTexture !== undefined ) ? options.useRenderToTexture : false;
-		this.useRenderbuffer = this.useRenderToTexture === false;
+		// this.useRenderbuffer = this.useRenderToTexture === false;
 
 	}
 

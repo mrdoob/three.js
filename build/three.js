@@ -2025,8 +2025,7 @@
 			super(width, height, options);
 			this.samples = 4;
 			this.ignoreDepthForMultisampleCopy = options.ignoreDepth !== undefined ? options.ignoreDepth : true;
-			this.useRenderToTexture = options.useRenderToTexture !== undefined ? options.useRenderToTexture : false;
-			this.useRenderbuffer = this.useRenderToTexture === false;
+			this.useRenderToTexture = options.useRenderToTexture !== undefined ? options.useRenderToTexture : false; // this.useRenderbuffer = this.useRenderToTexture === false;
 		}
 
 		copy(source) {
