@@ -69,10 +69,9 @@ class FileLoader extends Loader {
 			// An abort controller could be added within a future PR
 		} );
 
-		// record current states before 'fetch' ( avoid data race )
-		const responseType = this.responseType;
+		// record states ( avoid data race )
 		const mimeType = this.mimeType;
-		const textEncoding = this.textEncoding;
+		const responseType = this.responseType;
 
 		// start the fetch
 		fetch( req )
@@ -178,12 +177,20 @@ class FileLoader extends Loader {
 
 					default:
 
-						return response.arrayBuffer().then( ab => {
+						if ( mimeType === undefined ) {
 
-							const decoder = new TextDecoder( textEncoding );
-							return decoder.decode( ab );
+							return response.text();
 
-						} );
+						} else {
+
+							// sniff encoding
+							const re = /charset="?([^;"\s]*)"?/i;
+							const exec = re.exec( mimeType );
+							const label = exec && exec[ 1 ] ? exec[ 1 ].toLowerCase() : undefined;
+							const decoder = new TextDecoder( label );
+							return response.arrayBuffer().then( ab => decoder.decode( ab ) );
+
+						}
 
 				}
 
@@ -241,35 +248,14 @@ class FileLoader extends Loader {
 
 	}
 
-	setResponseType( value, encodingOrMimeType ) {
+	setResponseType( value ) {
 
 		this.responseType = value;
-
-		if ( value === 'document' ) {
-
-			if ( encodingOrMimeType !== undefined ) {
-
-				this.mimeType = encodingOrMimeType;
-
-			}
-
-		} else if ( value === 'text' ) {
-
-			if ( encodingOrMimeType !== undefined ) {
-
-				this.textEncoding = encodingOrMimeType;
-
-			}
-
-		}
-
 		return this;
 
 	}
 
 	setMimeType( value ) {
-
-		console.warn( `deprecated, use .setResponseType( 'document', '${value}' ) instead.` );
 
 		this.mimeType = value;
 		return this;
