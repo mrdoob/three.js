@@ -1645,7 +1645,9 @@ class TitleElement extends DraggableElement {
 
 const drawLine = ( p1x, p1y, p2x, p2y, invert, size, colorA, ctx, colorB = null ) => {
 
-	const offset = 100 * ( invert ? - 1 : 1 );
+	const dx = p2x - p1x;
+	const dy = p2y - p1y;
+	const offset = Math.sqrt( dx*dx + dy*dy ) * .3;
 
 	ctx.beginPath();
 
