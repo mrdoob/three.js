@@ -13,7 +13,8 @@ export class PositionEditor extends BaseNode {
 		const optionsField = new SelectInput( [
 			{ name: 'Local', value: PositionNode.LOCAL },
 			{ name: 'World', value: PositionNode.WORLD },
-			{ name: 'View', value: PositionNode.VIEW }
+			{ name: 'View', value: PositionNode.VIEW },
+			{ name: 'ViewDirection', value: PositionNode.VIEW_DIRECTION },
 		], PositionNode.LOCAL ).onChange( () => {
 
 			node.scope = optionsField.getValue();
