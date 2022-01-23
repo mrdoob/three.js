@@ -13,7 +13,8 @@ export class NormalEditor extends BaseNode {
 		const optionsField = new SelectInput( [
 			{ name: 'Local', value: NormalNode.LOCAL },
 			{ name: 'World', value: NormalNode.WORLD },
-			{ name: 'View', value: NormalNode.VIEW }
+			{ name: 'View', value: NormalNode.VIEW },
+			{ name: 'Geometry', value: NormalNode.GEOMETRY },
 		], NormalNode.LOCAL ).onChange( () => {
 
 			node.scope = optionsField.getValue();
