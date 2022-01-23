@@ -1,6 +1,6 @@
 import { NumberInput, StringInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { Mesh, MathUtils, Vector3} from '../../../../build/three.module.js';
+import { Mesh, MathUtils, Vector3} from 'three';
 
 export class MeshEditor extends BaseNode {
 
