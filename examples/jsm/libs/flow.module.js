@@ -1647,7 +1647,7 @@ const drawLine = ( p1x, p1y, p2x, p2y, invert, size, colorA, ctx, colorB = null 
 
 	const dx = p2x - p1x;
 	const dy = p2y - p1y;
-	const offset = Math.sqrt( dx*dx + dy*dy ) * .3;
+	const offset = Math.sqrt( dx*dx + dy*dy ) * (invert ? -.3 : .3) ;
 
 	ctx.beginPath();
 
