@@ -245,28 +245,33 @@
 						center: grip.position
 					};
 
-					if ( 'hapticActuators' in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0 ) {
+					const supportHaptic = 'hapticActuators' in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0;
 
-						for ( let i = 0; i < group.children.length; i ++ ) {
+					for ( let i = 0; i < group.children.length; i ++ ) {
 
-							const child = group.children[ i ];
-							box.setFromObject( child );
-							if ( box.intersectsSphere( sphere ) ) {
+						const child = group.children[ i ];
+						box.setFromObject( child );
+						if ( box.intersectsSphere( sphere ) ) {
 
-								child.material.emissive.b = 1;
-								const intensity = child.userData.index / group.children.length;
-								child.scale.setScalar( 1 + Math.random() * 0.1 * intensity );
+							child.material.emissive.b = 1;
+							const intensity = child.userData.index / group.children.length;
+							child.scale.setScalar( 1 + Math.random() * 0.1 * intensity );
+
+							if ( supportHaptic ) {
+
 								gamepad.hapticActuators[ 0 ].pulse( intensity, 100 );
 
-								oscillators[ g ].frequency.value = 110 * Math.pow( 2, musicScale[ child.userData.index ] / 12 );
-								controller.colliding = true;
-								group.children[ i ].collided = true;
-
 							}
+
+							oscillators[ g ].frequency.value = 110 * Math.pow( 2, musicScale[ child.userData.index ] / 12 );
+							controller.colliding = true;
+							group.children[ i ].collided = true;
 
 						}
 
 					}
+
+
 
 					if ( controller.colliding ) {
 
