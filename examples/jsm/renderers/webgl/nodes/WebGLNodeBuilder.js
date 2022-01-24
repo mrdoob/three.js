@@ -4,8 +4,7 @@ import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
 import { ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
-		LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding,
-		LineBasicMaterial, MeshBasicMaterial, PointsMaterial, MeshStandardMaterial } from 'three';
+		LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
 
 const shaderStages = [ 'vertex', 'fragment' ];
 
