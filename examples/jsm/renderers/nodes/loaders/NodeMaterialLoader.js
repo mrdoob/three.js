@@ -15,8 +15,6 @@ class NodeMaterialLoader extends MaterialLoader {
 		const material = super.parse( json );
 
 		const nodes = this.nodes;
-		const meta = { nodes, textures: this.textures };
-
 		const inputNodes = json.inputNodes;
 
 		for ( const property in inputNodes ) {

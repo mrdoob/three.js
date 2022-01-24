@@ -9,13 +9,6 @@ import { ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
 
 const shaderStages = [ 'vertex', 'fragment' ];
 
-const staticMaterialProperties = {
-	LineBasicNodeMaterial: new LineBasicMaterial(),
-	MeshBasicNodeMaterial: new MeshBasicMaterial(),
-	PointsNodeMaterial: new PointsMaterial(),
-	MeshStandardNodeMaterial: new MeshStandardMaterial()
-};
-
 const nodeShaderLib = {
 	LineBasicNodeMaterial: ShaderLib.basic,
 	MeshBasicNodeMaterial: ShaderLib.basic,
