@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { CubicInterpolant } from '../../../../../src/math/interpolants/CubicInterpolant';
+import { CubicInterpolant } from '../../../../../src/math/interpolants/CubicInterpolant.js';
 
 export default QUnit.module( 'Maths', () => {
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLObjects } from '../../../../../src/renderers/webgl/WebGLObjects';
+import { WebGLObjects } from '../../../../../src/renderers/webgl/WebGLObjects.js';
 
 export default QUnit.module( 'Renderers', () => {
 

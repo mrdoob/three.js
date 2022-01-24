@@ -1,18 +1,18 @@
 /* global QUnit */
 
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Vector4 } from '../../../../src/math/Vector4';
-import { Euler } from '../../../../src/math/Euler';
-import { Matrix4 } from '../../../../src/math/Matrix4';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { Euler } from '../../../../src/math/Euler.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import {
 	x,
 	y,
 	z,
 	w,
 	eps
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 const orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
 const eulerAngles = new Euler( 0.1, - 0.3, 0.25 );

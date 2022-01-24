@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial';
+import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ArrayCamera } from '../../../../src/cameras/ArrayCamera';
+import { ArrayCamera } from '../../../../src/cameras/ArrayCamera.js';
 
 export default QUnit.module( 'Cameras', () => {
 

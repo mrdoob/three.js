@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { MeshDepthMaterial } from '../../../../src/materials/MeshDepthMaterial';
+import { MeshDepthMaterial } from '../../../../src/materials/MeshDepthMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 

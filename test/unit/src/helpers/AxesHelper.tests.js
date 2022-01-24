@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { AxesHelper } from '../../../../src/helpers/AxesHelper';
+import { AxesHelper } from '../../../../src/helpers/AxesHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

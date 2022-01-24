@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { Color } from '../../../../src/math/Color';
-import { Vector2 } from '../../../../src/math/Vector2';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Vector4 } from '../../../../src/math/Vector4';
-import { DynamicDrawUsage } from '../../../../src/constants';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { Color } from '../../../../src/math/Color.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { DynamicDrawUsage } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Core', () => {
 

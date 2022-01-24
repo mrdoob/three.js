@@ -1,8 +1,8 @@
 /* global QUnit */
 
-import { ShapeGeometry, ShapeBufferGeometry } from '../../../../src/geometries/ShapeGeometry';
+import { ShapeGeometry, ShapeBufferGeometry } from '../../../../src/geometries/ShapeGeometry.js';
 
-import { Shape } from '../../../../src/extras/core/Shape';
+import { Shape } from '../../../../src/extras/core/Shape.js';
 
 export default QUnit.module( 'Geometries', () => {
 

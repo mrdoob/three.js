@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions';
+import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions.js';
 
 const WebglContextMock = function ( supportedExtensions ) {
 

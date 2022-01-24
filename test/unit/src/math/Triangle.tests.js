@@ -1,15 +1,15 @@
 /* global QUnit */
 
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { Triangle } from '../../../../src/math/Triangle';
-import { Box3 } from '../../../../src/math/Box3';
-import { Plane } from '../../../../src/math/Plane';
-import { Vector3 } from '../../../../src/math/Vector3';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { Triangle } from '../../../../src/math/Triangle.js';
+import { Box3 } from '../../../../src/math/Box3.js';
+import { Plane } from '../../../../src/math/Plane.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 import {
 	zero3,
 	one3,
 	two3
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 export default QUnit.module( 'Maths', () => {
 

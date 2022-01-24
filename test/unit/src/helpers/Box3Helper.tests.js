@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Box3Helper } from '../../../../src/helpers/Box3Helper';
+import { Box3Helper } from '../../../../src/helpers/Box3Helper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { LineSegments } from '../../../../src/objects/LineSegments';
+import { LineSegments } from '../../../../src/objects/LineSegments.js';
 
 export default QUnit.module( 'Objects', () => {
 

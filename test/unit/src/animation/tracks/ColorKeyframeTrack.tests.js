@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ColorKeyframeTrack } from '../../../../../src/animation/tracks/ColorKeyframeTrack';
+import { ColorKeyframeTrack } from '../../../../../src/animation/tracks/ColorKeyframeTrack.js';
 
 export default QUnit.module( 'Animation', () => {
 

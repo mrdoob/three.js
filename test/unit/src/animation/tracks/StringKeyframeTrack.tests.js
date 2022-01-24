@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { StringKeyframeTrack } from '../../../../../src/animation/tracks/StringKeyframeTrack';
+import { StringKeyframeTrack } from '../../../../../src/animation/tracks/StringKeyframeTrack.js';
 
 export default QUnit.module( 'Animation', () => {
 

@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils';
-import { SpotLight } from '../../../../src/lights/SpotLight';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { SpotLight } from '../../../../src/lights/SpotLight.js';
 
 export default QUnit.module( 'Lights', () => {
 

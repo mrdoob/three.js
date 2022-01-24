@@ -1,14 +1,10 @@
 /* global QUnit */
 
-import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
-import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
-import { Object3D } from '../../../../src/core/Object3D';
-import {
-	zero3,
-	one3,
-	two3
-} from '../math/Constants.tests';
+import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
+import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { zero3, one3, two3 } from '../math/Constants.tests.js';
 
 function getClips( pos1, pos2, scale1, scale2, dur ) {
 
