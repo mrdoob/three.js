@@ -54,6 +54,9 @@
 
 					this.inputNode.value.copy( meshColor );
 
+					// force refresh material uniforms
+					rendererState.useProgram( null );
+
 				}
 
 				generate( builder, output ) {
