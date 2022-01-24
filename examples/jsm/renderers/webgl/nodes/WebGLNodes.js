@@ -23,6 +23,8 @@ Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry
 		nodeFrame.object = object;
 		nodeFrame.renderer = renderer;
 
+		nodeFrame.uniformsNeedUpdate = true;
+
 		for ( const node of nodeBuilder.updateNodes ) {
 
 			nodeFrame.updateNode( node );
