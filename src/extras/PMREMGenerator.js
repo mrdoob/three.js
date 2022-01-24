@@ -272,7 +272,7 @@ class PMREMGenerator {
 
 			const { _lodMax } = this;
 			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas } = _createPlanes( _lodMax ) );
-			
+
 			this._blurMaterial = _getBlurShader( _lodMax, width, height );
 
 		}
@@ -666,7 +666,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 		name: 'SphericalGaussianBlur',
 
-		defines: { 
+		defines: {
 			'n': MAX_SAMPLES,
 			'CUBEUV_TEXEL_WIDTH': 1.0 / width,
 			'CUBEUV_TEXEL_HEIGHT': 1.0 / height,
