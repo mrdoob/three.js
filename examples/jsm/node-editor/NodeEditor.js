@@ -344,7 +344,11 @@ export class NodeEditor extends EventDispatcher {
 		menuButton.onClick( () => this.nodesContext.open() );
 		examplesButton.onClick( () => this.examplesContext.open() );
 
-		newButton.onClick( () => this.newProject() );
+		newButton.onClick( () => {
+
+			if ( confirm( 'are you sure' ) ) this.newProject();
+
+		} );
 
 		openButton.onClick( () => {
 
