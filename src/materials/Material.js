@@ -488,4 +488,12 @@ class Material extends EventDispatcher {
 
 Material.prototype.isMaterial = true;
 
+Material.fromType = function ( /*type*/ ) {
+
+	// TODO: Behavior added in Materials.js
+
+	return null;
+
+};
+
 export { Material };
