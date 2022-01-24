@@ -28,7 +28,6 @@
 
 			import * as THREE from 'three';
 
-			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 			import { MTLLoader } from './jsm/loaders/MTLLoader.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
@@ -76,21 +75,13 @@
 
 				};
 
-				const onError = function () { };
-
-				const manager = new THREE.LoadingManager();
-				manager.addHandler( /\.dds$/i, new DDSLoader() );
-
-				// comment in the following line and import TGALoader if your asset uses TGA textures
-				// manager.addHandler( /\.tga$/i, new TGALoader() );
-
-				new MTLLoader( manager )
+				new MTLLoader()
 					.setPath( 'models/obj/male02/' )
-					.load( 'male02_dds.mtl', function ( materials ) {
+					.load( 'male02.mtl', function ( materials ) {
 
 						materials.preload();
 
-						new OBJLoader( manager )
+						new OBJLoader()
 							.setMaterials( materials )
 							.setPath( 'models/obj/male02/' )
 							.load( 'male02.obj', function ( object ) {
@@ -98,7 +89,7 @@
 								object.position.y = - 95;
 								scene.add( object );
 
-							}, onProgress, onError );
+							}, onProgress );
 
 					} );
 
