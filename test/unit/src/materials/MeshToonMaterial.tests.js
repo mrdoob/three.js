@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { MeshToonMaterial } from '../../../../src/materials/MeshToonMaterial';
+import { MeshToonMaterial } from '../../../../src/materials/MeshToonMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 

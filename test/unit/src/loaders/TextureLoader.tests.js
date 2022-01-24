@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { TextureLoader } from '../../../../src/loaders/TextureLoader';
+import { TextureLoader } from '../../../../src/loaders/TextureLoader.js';
 
 export default QUnit.module( 'Loaders', () => {
 

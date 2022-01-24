@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { FileLoader } from '../../../../src/loaders/FileLoader';
+import { FileLoader } from '../../../../src/loaders/FileLoader.js';
 
 export default QUnit.module( 'Loaders', () => {
 

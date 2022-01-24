@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { AnimationLoader } from '../../../../src/loaders/AnimationLoader';
+import { AnimationLoader } from '../../../../src/loaders/AnimationLoader.js';
 
 export default QUnit.module( 'Loaders', () => {
 

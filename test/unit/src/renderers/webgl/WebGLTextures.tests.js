@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLTextures } from '../../../../../src/renderers/webgl/WebGLTextures';
+import { WebGLTextures } from '../../../../../src/renderers/webgl/WebGLTextures.js';
 
 export default QUnit.module( 'Renderers', () => {
 

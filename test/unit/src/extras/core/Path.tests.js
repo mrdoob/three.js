@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Path } from '../../../../../src/extras/core/Path';
+import { Path } from '../../../../../src/extras/core/Path.js';
 
 export default QUnit.module( 'Extras', () => {
 

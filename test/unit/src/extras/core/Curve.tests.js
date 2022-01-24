@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Curve } from '../../../../../src/extras/core/Curve';
+import { Curve } from '../../../../../src/extras/core/Curve.js';
 
 export default QUnit.module( 'Extras', () => {
 

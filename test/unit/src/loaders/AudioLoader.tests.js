@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { AudioLoader } from '../../../../src/loaders/AudioLoader';
+import { AudioLoader } from '../../../../src/loaders/AudioLoader.js';
 
 export default QUnit.module( 'Loaders', () => {
 

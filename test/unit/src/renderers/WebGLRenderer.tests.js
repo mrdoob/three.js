@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
+import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer.js';
 
 var customWebGLContext = function () {
 

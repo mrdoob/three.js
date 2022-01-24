@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils';
+import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils.js';
 
 export default QUnit.module( 'Renderers', () => {
 

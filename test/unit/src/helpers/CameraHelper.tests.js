@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { CameraHelper } from '../../../../src/helpers/CameraHelper';
+import { CameraHelper } from '../../../../src/helpers/CameraHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

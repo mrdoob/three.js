@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLCubeRenderTarget } from '../../../../src/renderers/WebGLCubeRenderTarget';
+import { WebGLCubeRenderTarget } from '../../../../src/renderers/WebGLCubeRenderTarget.js';
 
 export default QUnit.module( 'Renderers', () => {
 

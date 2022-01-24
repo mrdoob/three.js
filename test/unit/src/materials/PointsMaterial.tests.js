@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { PointsMaterial } from '../../../../src/materials/PointsMaterial';
+import { PointsMaterial } from '../../../../src/materials/PointsMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 

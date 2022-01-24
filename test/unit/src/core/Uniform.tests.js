@@ -1,12 +1,12 @@
 /* global QUnit */
 
-import { Uniform } from '../../../../src/core/Uniform';
-import { Vector3 } from '../../../../src/math/Vector3';
+import { Uniform } from '../../../../src/core/Uniform.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 import {
 	x,
 	y,
 	z
-} from '../math/Constants.tests';
+} from '../math/Constants.tests.js';
 
 export default QUnit.module( 'Core', () => {
 

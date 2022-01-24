@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { PointLightHelper } from '../../../../src/helpers/PointLightHelper';
+import { PointLightHelper } from '../../../../src/helpers/PointLightHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

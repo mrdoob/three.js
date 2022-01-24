@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { Plane } from '../../../../src/math/Plane';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Line3 } from '../../../../src/math/Line3';
-import { Sphere } from '../../../../src/math/Sphere';
-import { Box3 } from '../../../../src/math/Box3';
-import { Matrix4 } from '../../../../src/math/Matrix4';
+import { Plane } from '../../../../src/math/Plane.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Line3 } from '../../../../src/math/Line3.js';
+import { Sphere } from '../../../../src/math/Sphere.js';
+import { Box3 } from '../../../../src/math/Box3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import {
 	x,
 	y,
@@ -13,7 +13,7 @@ import {
 	w,
 	zero3,
 	one3
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 function comparePlane( a, b, threshold ) {
 

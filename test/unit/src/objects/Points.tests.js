@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Points } from '../../../../src/objects/Points';
+import { Points } from '../../../../src/objects/Points.js';
 
 export default QUnit.module( 'Objects', () => {
 
