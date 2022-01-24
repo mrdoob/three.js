@@ -221,9 +221,9 @@ class PMREMGenerator {
 	_fromTexture( texture, renderTarget ) {
 
 		if(texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping){
-			this._setSize( texture.image[0].width??texture.image[0].image.width );
+			this._setSize( texture.image.length === 0 ? 16 : texture.image[0].width ?? texture.image[0].image.width );
 		}else{// Equirectangular
-			this._setSize( this._cubeSize=texture.image.width/4 );
+			this._setSize( texture.image.width / 4 ?? 256 );
 		}
 
 		_oldTarget = this._renderer.getRenderTarget();
