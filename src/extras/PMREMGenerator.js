@@ -86,7 +86,7 @@ class PMREMGenerator {
 		this._sizeLods = [];
 		this._sigmas = [];
 
-		this._blurMaterial = null
+		this._blurMaterial = null;
 		this._equirectShader = null;
 		this._cubemapShader = null;
 
@@ -192,8 +192,10 @@ class PMREMGenerator {
 	// private interface
 
 	_setSize( cubeSize ) {
+
 		this._lodMax = Math.floor( Math.log2( cubeSize ) );
 		this._cubeSize = Math.pow( 2, this._lodMax );
+
 	}
 
 	_dispose() {
@@ -220,10 +222,14 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
-		if(texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping){
-			this._setSize( texture.image.length === 0 ? 16 : texture.image[0].width ?? texture.image[0].image.width );
-		}else{// Equirectangular
+		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
+
+			this._setSize( texture.image.length === 0 ? 16 : texture.image[ 0 ].width ?? texture.image[ 0 ].image.width );
+
+		} else { // Equirectangular
+
 			this._setSize( texture.image.width / 4 ?? 256 );
+
 		}
 
 		_oldTarget = this._renderer.getRenderTarget();
@@ -236,7 +242,7 @@ class PMREMGenerator {
 
 	}
 
-	_allocateTargets() { // warning: null texture is valid
+	_allocateTargets() {
 
 		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
 		const height = 4 * this._cubeSize - 32;
@@ -553,15 +559,7 @@ class PMREMGenerator {
 
 }
 
-function _createRenderTarget( width, height, params ) {
 
-	const cubeUVRenderTarget = new WebGLRenderTarget( width, height, params );
-	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
-	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
-	cubeUVRenderTarget.scissorTest = true;
-	return cubeUVRenderTarget;
-
-}
 
 function _createPlanes( lodMax ) {
 
@@ -640,6 +638,16 @@ function _createPlanes( lodMax ) {
 	}
 
 	return { lodPlanes, sizeLods, sigmas };
+
+}
+
+function _createRenderTarget( width, height, params ) {
+
+	const cubeUVRenderTarget = new WebGLRenderTarget( width, height, params );
+	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
+	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
+	cubeUVRenderTarget.scissorTest = true;
+	return cubeUVRenderTarget;
 
 }
 
