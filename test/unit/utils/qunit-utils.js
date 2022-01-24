@@ -2,8 +2,8 @@
 // Custom QUnit assertions.
 ///* global QUnit */
 
-import { SmartComparer } from './SmartComparer';
-import { ObjectLoader } from '../../../src/loaders/ObjectLoader';
+import { SmartComparer } from './SmartComparer.js';
+import { ObjectLoader } from '../../../src/loaders/ObjectLoader.js';
 
 QUnit.assert.success = function ( message ) {
 
