@@ -105,17 +105,9 @@ class PMREMGenerator {
 
 		_oldTarget = this._renderer.getRenderTarget();
 
-		const lastCubeSize = this._cubeSize;
 		this._setSize( 256 );
 		const cubeUVRenderTarget = this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
-		const {width, height} = cubeUVRenderTarget;
-		const { _lodMax } = this;
-
-		if(this._cubeSize!==lastCubeSize){
-			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes( _lodMax ));
-			this._blurMaterial=_getBlurShader( _lodMax, width, height );
-		}
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
 		if ( sigma > 0 ) {
@@ -190,18 +182,10 @@ class PMREMGenerator {
 	 */
 	dispose() {
 
-		this._blurMaterial.dispose();
-
-		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
+		this._dispose();
 
 		if ( this._cubemapShader !== null ) this._cubemapShader.dispose();
 		if ( this._equirectShader !== null ) this._equirectShader.dispose();
-
-		for ( let i = 0; i < this._lodPlanes.length; i ++ ) {
-
-			this._lodPlanes[ i ].dispose();
-
-		}
 
 	}
 
@@ -210,6 +194,20 @@ class PMREMGenerator {
 	_setSize( cubeSize ) {
 		this._lodMax = Math.floor( Math.log2( cubeSize ) );
 		this._cubeSize = Math.pow( 2, this._lodMax );
+	}
+
+	_dispose() {
+
+		this._blurMaterial.dispose();
+
+		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
+
+		for ( let i = 0; i < this._lodPlanes.length; i ++ ) {
+
+			this._lodPlanes[ i ].dispose();
+
+		}
+
 	}
 
 	_cleanup( outputTarget ) {
@@ -222,8 +220,6 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
-		const lastCubeSize = this._cubeSize;
-
 		if(texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping){
 			this._setSize( texture.image[0].width??texture.image[0].image.width );
 		}else{// Equirectangular
@@ -232,14 +228,6 @@ class PMREMGenerator {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
-		const {width, height} = cubeUVRenderTarget;
-		const { _lodMax } = this;
-
-		if(this._cubeSize!==lastCubeSize){
-			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes( _lodMax ));
-			this._blurMaterial=_getBlurShader( _lodMax, width, height );
-		}
-
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
@@ -249,6 +237,9 @@ class PMREMGenerator {
 	}
 
 	_allocateTargets() { // warning: null texture is valid
+
+		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
+		const height = 4 * this._cubeSize - 32;
 
 		const params = {
 			magFilter: LinearFilter,
@@ -260,12 +251,23 @@ class PMREMGenerator {
 			depthBuffer: false
 		};
 
-		const cubeUVRenderTarget = this._createRenderTarget( params );
-		cubeUVRenderTarget.texture.image = { width: cubeUVRenderTarget.width, height: cubeUVRenderTarget.height };
+		const cubeUVRenderTarget = _createRenderTarget( width, height, params );
+		cubeUVRenderTarget.texture.image = { width, height };
 
-		if ( this._pingPongRenderTarget === null ) {
+		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width ) {
 
-			this._pingPongRenderTarget = this._createRenderTarget( params );
+			if ( this._pingPongRenderTarget !== null ) {
+
+				this._dispose();
+
+			}
+
+			this._pingPongRenderTarget = _createRenderTarget( width, height, params );
+
+			const { _lodMax } = this;
+			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas } = _createPlanes( _lodMax ) );
+			
+			this._blurMaterial = _getBlurShader( _lodMax, width, height );
 
 		}
 
@@ -549,18 +551,15 @@ class PMREMGenerator {
 
 	}
 
-	_createRenderTarget( params ) {
+}
 
-		const width=3*Math.max(this._cubeSize,16*7);
-		const height=4*this._cubeSize-32;
-	
-		const cubeUVRenderTarget = new WebGLRenderTarget( width, height, params );
-		cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
-		cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
-		cubeUVRenderTarget.scissorTest = true;
-		return cubeUVRenderTarget;
-	
-	}
+function _createRenderTarget( width, height, params ) {
+
+	const cubeUVRenderTarget = new WebGLRenderTarget( width, height, params );
+	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
+	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
+	cubeUVRenderTarget.scissorTest = true;
+	return cubeUVRenderTarget;
 
 }
 
