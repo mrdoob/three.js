@@ -223,7 +223,8 @@
 
 					}
 
-					element.style.display = object.visible ? '' : 'none';
+					const visible = object.visible && object.layers.test( camera.layers );
+					element.style.display = visible ? '' : 'none';
 
 					if ( element.parentNode !== cameraElement ) {
 
