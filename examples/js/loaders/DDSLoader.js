@@ -62,8 +62,8 @@
 			function loadARGBMip( buffer, dataOffset, width, height ) {
 
 				const dataLength = width * height * 4;
-				const srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
-				const byteArray = new Uint8Array( dataLength );
+				const srcBuffer = new Uint8Array( buffer.buffer, buffer.byteOffset + dataOffset, dataLength );
+				const byteArray = new Uint8ClampedArray( dataLength );
 				let dst = 0;
 				let src = 0;
 
@@ -124,7 +124,7 @@
 			// let off_caps4 = 30;
 			// Parse header
 
-			const header = new Int32Array( buffer, 0, headerLengthInt );
+			const header = new Int32Array( buffer.buffer, buffer.byteOffset, headerLengthInt );
 
 			if ( header[ off_magic ] !== DDS_MAGIC ) {
 
@@ -223,7 +223,7 @@
 					} else {
 
 						dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
-						byteArray = new Uint8Array( buffer, dataOffset, dataLength );
+						byteArray = new Uint8ClampedArray( buffer.buffer, buffer.byteOffset + dataOffset, dataLength );
 
 					}
 
