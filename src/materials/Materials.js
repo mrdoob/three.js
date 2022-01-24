@@ -17,7 +17,7 @@ import { LineDashedMaterial } from './LineDashedMaterial.js';
 import { LineBasicMaterial } from './LineBasicMaterial.js';
 import { Material } from './Material.js';
 
-export { 
+export {
 	ShadowMaterial,
 	SpriteMaterial,
 	RawShaderMaterial,
