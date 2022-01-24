@@ -3,7 +3,7 @@ import SlotNode from './SlotNode.js';
 import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { ShaderChunk, ShaderLib, UniformsUtils, 
+import { ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
 		LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding,
 		LineBasicMaterial, MeshBasicMaterial, PointsMaterial, MeshStandardMaterial } from 'three';
 
@@ -82,7 +82,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			shader.vertexShader = shaderLib.vertexShader;
 			shader.fragmentShader = shaderLib.fragmentShader;
-			shader.uniforms = UniformsUtils.clone( shaderLib.uniforms );
+			shader.uniforms = UniformsUtils.merge( [ shaderLib.uniforms, UniformsLib.lights ] );
 
 		}
 
