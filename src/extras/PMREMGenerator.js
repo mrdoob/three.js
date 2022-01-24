@@ -41,7 +41,6 @@ const TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
 const MAX_SAMPLES = 20;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
-const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
 const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 
@@ -85,12 +84,12 @@ class PMREMGenerator {
 		this._renderer = renderer;
 		this._pingPongRenderTarget = null;
 
-		this._cubeSize = 256;
-		// this._lodPlanes = [];
-		// this._sizeLods = [];
-		// this._sigmas = [];
+		this._cubeSize = 0;
+		this._lodPlanes = [];
+		this._sizeLods = [];
+		this._sigmas = [];
 
-		this._blurMaterial = _getBlurShader( MAX_SAMPLES );
+		this._blurMaterial = null
 		this._equirectShader = null;
 		this._cubemapShader = null;
 
@@ -109,8 +108,15 @@ class PMREMGenerator {
 
 		_oldTarget = this._renderer.getRenderTarget();
 
+		const lastCubeSize = this._cubeSize;
 		this._cubeSize = 256;
 		const cubeUVRenderTarget = this._allocateTargets();
+		cubeUVRenderTarget.depthBuffer = true;
+
+		if(this._cubeSize!==lastCubeSize){
+			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes());
+			this._blurMaterial=_getBlurShader();
+		}
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
 		if ( sigma > 0 ) {
@@ -192,9 +198,9 @@ class PMREMGenerator {
 		if ( this._cubemapShader !== null ) this._cubemapShader.dispose();
 		if ( this._equirectShader !== null ) this._equirectShader.dispose();
 
-		for ( let i = 0; i < _lodPlanes.length; i ++ ) {
+		for ( let i = 0; i < this._lodPlanes.length; i ++ ) {
 
-			_lodPlanes[ i ].dispose();
+			this._lodPlanes[ i ].dispose();
 
 		}
 
@@ -212,14 +218,22 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
-		// if(texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping){
-		// 	this._cubeSize = texture.image[0].width;
-		// }else{
-		// 	this._cubeSize=texture.image.width;
-		// }
+		const lastCubeSize = this._cubeSize;
+
+		if(texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping){
+			this._cubeSize = texture.image[0].width??texture.image[0].image.width;
+		}else{// Equirectangular
+			this._cubeSize=texture.image.width/4;
+		}
 
 		_oldTarget = this._renderer.getRenderTarget();
-		const cubeUVRenderTarget = renderTarget || this._allocateTargets( texture );
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+		if(this._cubeSize!==lastCubeSize){
+			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes());
+			this._blurMaterial=_getBlurShader();
+		}
+
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
@@ -228,7 +242,7 @@ class PMREMGenerator {
 
 	}
 
-	_allocateTargets( texture ) { // warning: null texture is valid
+	_allocateTargets() { // warning: null texture is valid
 
 		const params = {
 			magFilter: LinearFilter,
@@ -241,7 +255,6 @@ class PMREMGenerator {
 		};
 
 		const cubeUVRenderTarget = this._createRenderTarget( params );
-		cubeUVRenderTarget.depthBuffer = texture ? false : true;
 		cubeUVRenderTarget.texture.image = { width: cubeUVRenderTarget.width, height: cubeUVRenderTarget.height };
 
 		if ( this._pingPongRenderTarget === null ) {
@@ -256,7 +269,7 @@ class PMREMGenerator {
 
 	_compileMaterial( material ) {
 
-		const tmpMesh = new Mesh( _lodPlanes[ 0 ], material );
+		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
 		this._renderer.compile( tmpMesh, _flatCamera );
 
 	}
@@ -376,7 +389,7 @@ class PMREMGenerator {
 		}
 
 		const material = isCubeTexture ? this._cubemapShader : this._equirectShader;
-		const mesh = new Mesh( _lodPlanes[ 0 ], material );
+		const mesh = new Mesh( this._lodPlanes[ 0 ], material );
 
 		const uniforms = material.uniforms;
 
@@ -403,7 +416,7 @@ class PMREMGenerator {
 
 		for ( let i = 1; i < TOTAL_LODS; i ++ ) {
 
-			const sigma = Math.sqrt( _sigmas[ i ] * _sigmas[ i ] - _sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
+			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
 
 			const poleAxis = _axisDirections[ ( i - 1 ) % _axisDirections.length ];
 
@@ -461,10 +474,10 @@ class PMREMGenerator {
 		// Number of standard deviations at which to cut off the discrete approximation.
 		const STANDARD_DEVIATIONS = 3;
 
-		const blurMesh = new Mesh( _lodPlanes[ lodOut ], blurMaterial );
+		const blurMesh = new Mesh( this._lodPlanes[ lodOut ], blurMaterial );
 		const blurUniforms = blurMaterial.uniforms;
 
-		const pixels = _sizeLods[ lodIn ] - 1;
+		const pixels = this._sizeLods[ lodIn ] - 1;
 		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
 		const sigmaPixels = sigmaRadians / radiansPerPixel;
 		const samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
@@ -518,7 +531,7 @@ class PMREMGenerator {
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
 
-		const outputSize = _sizeLods[ lodOut ];
+		const outputSize = this._sizeLods[ lodOut ];
 		const x = 3 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
 		const y = 4 * ( SIZE_MAX - outputSize );
 
@@ -545,16 +558,16 @@ class PMREMGenerator {
 
 function _createPlanes() {
 
-	const _lodPlanes = [];
-	const _sizeLods = [];
-	const _sigmas = [];
+	const lodPlanes = [];
+	const sizeLods = [];
+	const sigmas = [];
 
 	let lod = LOD_MAX;
 
 	for ( let i = 0; i < TOTAL_LODS; i ++ ) {
 
 		const sizeLod = Math.pow( 2, lod );
-		_sizeLods.push( sizeLod );
+		sizeLods.push( sizeLod );
 		let sigma = 1.0 / sizeLod;
 
 		if ( i > LOD_MAX - LOD_MIN ) {
@@ -567,7 +580,7 @@ function _createPlanes() {
 
 		}
 
-		_sigmas.push( sigma );
+		sigmas.push( sigma );
 
 		const texelSize = 1.0 / ( sizeLod - 1 );
 		const min = - texelSize / 2;
@@ -607,7 +620,7 @@ function _createPlanes() {
 		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
 		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
 		planes.setAttribute( 'faceIndex', new BufferAttribute( faceIndex, faceIndexSize ) );
-		_lodPlanes.push( planes );
+		lodPlanes.push( planes );
 
 		if ( lod > LOD_MIN ) {
 
@@ -617,7 +630,7 @@ function _createPlanes() {
 
 	}
 
-	return { _lodPlanes, _sizeLods, _sigmas };
+	return { lodPlanes, sizeLods, sigmas };
 
 }
 
@@ -628,16 +641,16 @@ function _setViewport( target, x, y, width, height ) {
 
 }
 
-function _getBlurShader( maxSamples ) {
+function _getBlurShader() {
 
-	const weights = new Float32Array( maxSamples );
+	const weights = new Float32Array( MAX_SAMPLES );
 	const poleAxis = new Vector3( 0, 1, 0 );
 	const shaderMaterial = new RawShaderMaterial( {
 
 		name: 'SphericalGaussianBlur',
 
 		defines: { 
-			'n': maxSamples,
+			'n': MAX_SAMPLES,
 			'CUBEUV_TEXEL_WIDTH':1.0/ 768,
 			'CUBEUV_TEXEL_HEIGHT':1.0/992,
 			'CUBEUV_MAX_MIP':'8.0',
