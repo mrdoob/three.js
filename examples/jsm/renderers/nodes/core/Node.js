@@ -97,40 +97,47 @@ class Node {
 
 	}
 
-	serialize( meta ) {
+	serialize( json ) {
 
-		const { uuid } = this;
+		const nodeKeys = getNodesKeys( this );
 
-		if ( meta.nodes[ uuid ] === undefined ) {
+		if ( nodeKeys.length > 0 ) {
 
-			const nodeKeys = getNodesKeys( this );
+			const inputNodes = {};
 
-			const data = {
-				uuid,
-				metadata: {
-					version: 4.5,
-					type: 'Node',
-					generator: 'Node.toJSON'
-				},
-				inputNodes: {}
-			};
+			for ( const property of nodeKeys ) {
 
-			for ( const name of nodeKeys ) {
-
-				data.inputNodes[ name ] = this[ name ].toJSON( meta ).uuid;
+				inputNodes[ property ] = this[ property ].toJSON( json.meta ).uuid;
 
 			}
 
-			meta.nodes[ data.uuid ] = data;
+			json.inputNodes = inputNodes;
 
 		}
 
-		return meta.nodes[ uuid ];
+	}
+
+	deserialize( json ) {
+
+		if ( json.inputNodes !== undefined ) {
+
+			const nodes = json.meta.nodes;
+
+			for ( const property in json.inputNodes ) {
+
+				const uuid = json.inputNodes[ property ];
+
+				this[ property ] = nodes[ uuid ];
+
+			}
+
+		}
 
 	}
 
 	toJSON( meta ) {
 
+		const { uuid, type } = this;
 		const isRoot = ( meta === undefined || typeof meta === 'string' );
 
 		if ( isRoot ) {
@@ -143,7 +150,30 @@ class Node {
 
 		}
 
-		const data = this.serialize( meta );
+		// serialize
+
+		let data = meta.nodes[ uuid ];
+
+		if ( data === undefined ) {
+
+			data = {
+				uuid,
+				type,
+				meta,
+				metadata: {
+					version: 4.5,
+					type: 'Node',
+					generator: 'Node.toJSON'
+				}
+			};
+
+			meta.nodes[ data.uuid ] = data;
+
+			this.serialize( data );
+
+			delete data.meta;
+
+		}
 
 		// TODO: Copied from Object3D.toJSON
 

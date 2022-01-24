@@ -7,7 +7,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
-		super( parameters );
+		super();
 
 		this.colorNode = null;
 		this.opacityNode = null;
@@ -31,6 +31,8 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 		this.positionNode = null;
 
 		this.setDefaultValues( defaultValues );
+
+		this.setValues( parameters );
 
 	}
 

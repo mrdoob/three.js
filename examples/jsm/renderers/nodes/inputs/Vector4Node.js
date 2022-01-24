@@ -11,6 +11,33 @@ class Vector4Node extends InputNode {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		const { x, y, z, w } = this.value;
+
+		data.x = x;
+		data.y = y;
+		data.z = z;
+		data.w = w;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		const { x, y, z, w } = data;
+		const value = this.value;
+
+		value.x = x;
+		value.y = y;
+		value.z = z;
+		value.w = w;
+
+	}
+
 }
 
 Vector4Node.prototype.isVector4Node = true;
