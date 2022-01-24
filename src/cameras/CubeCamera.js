@@ -100,6 +100,8 @@ class CubeCamera extends Object3D {
 
 		renderer.xr.enabled = currentXrEnabled;
 
+		renderTarget.texture.needsPMREMUpdate = true;
+
 	}
 
 }

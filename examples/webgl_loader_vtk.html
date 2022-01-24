@@ -14,9 +14,21 @@
 		Legacy vtk model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank" rel="noopener">The GeorgiaTech Lagre Geometric Model Archive</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -49,7 +61,7 @@
 				scene.add( dirLight );
 
 				const loader = new VTKLoader();
-				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
+				loader.load( 'models/vtk/bunny.vtk', function ( geometry ) {
 
 					geometry.center();
 					geometry.computeVertexNormals();

@@ -1,6 +1,6 @@
 import {
 	WireframeGeometry
-} from '../../../build/three.module.js';
+} from 'three';
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
 
 class WireframeGeometry2 extends LineSegmentsGeometry {

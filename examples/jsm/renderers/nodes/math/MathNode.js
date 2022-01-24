@@ -33,7 +33,8 @@ class MathNode extends TempNode {
 	static INVERT = 'invert';
 	static DFDX = 'dFdx';
 	static DFDY = 'dFdy';
-	static SATURATE = 'saturate'
+	static SATURATE = 'saturate';
+	static ROUND = 'round';
 
 	// 2 inputs
 

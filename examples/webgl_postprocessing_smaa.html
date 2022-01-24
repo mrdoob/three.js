@@ -13,9 +13,21 @@
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -30,7 +42,7 @@
 
 			function init() {
 
-				const container = document.getElementById( "container" );
+				const container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -54,7 +66,7 @@
 				mesh1.position.x = - 100;
 				scene.add( mesh1 );
 
-				const texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 				texture.anisotropy = 4;
 
 				const material2 = new THREE.MeshBasicMaterial( { map: texture } );

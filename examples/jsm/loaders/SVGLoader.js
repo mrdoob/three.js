@@ -11,7 +11,7 @@ import {
 	ShapeUtils,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class SVGLoader extends Loader {
 
@@ -659,9 +659,14 @@ class SVGLoader extends Loader {
 
 				for ( let j = 0; j < selectorList.length; j ++ ) {
 
+					// Remove empty rules
+					const definitions = Object.fromEntries(
+						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
+					);
+
 					stylesheets[ selectorList[ j ] ] = Object.assign(
 						stylesheets[ selectorList[ j ] ] || {},
-						stylesheet.style
+						definitions
 					);
 
 				}

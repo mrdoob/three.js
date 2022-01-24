@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.
+			A low level class for loading resources with Fetch, used internaly by most loaders.
 			It can also be used directly to load any file type that does not have a loader.
 		</p>
 
@@ -79,8 +79,7 @@
 			[page:String url] — the path or URL to the file. This can also be a
 				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 			[page:Function onLoad] (optional) — Will be called when loading completes. The argument will be the loaded response.<br />
-			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the XMLHttpRequest instance,
-				which contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
+			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the ProgressEvent instance, which contains .[page:Boolean lengthComputable], .[page:Integer total] and .[page:Integer loaded]. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 			[page:Function onError] (optional) — Will be called if an error occurs.<br /><br />
 
 			Load the URL and pass the response to the onLoad function.

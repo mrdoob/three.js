@@ -152,7 +152,7 @@ class LatheGeometry extends BufferGeometry {
 				// faces
 
 				indices.push( a, b, d );
-				indices.push( b, c, d );
+				indices.push( c, d, b );
 
 			}
 

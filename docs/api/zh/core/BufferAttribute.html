@@ -33,7 +33,7 @@
 
 			[page:Boolean normalized] -- (可选) 指明缓存中的数据如何与GLSL代码中的数据对应。例如，如果[page:TypedArray array]是
 			UInt16Array类型，且[page:Boolean normalized]的值是 true，则队列中的值将会从 0 - +65535 映射为 GLSL 中的 0.0f - +1.0f。
-			如果[page:TypedArray array]是 Int16Array (有符号)，则值将会从 -32767 - +32767 映射为 -1.0f - +1.0f。若 [page:Boolean normalized]
+			如果[page:TypedArray array]是 Int16Array (有符号)，则值将会从 -32768 - +32767 映射为 -1.0f - +1.0f。若 [page:Boolean normalized]
 			的值为 false，则数据映射不会归一化，而会直接映射为 float 值，例如，32767 将会映射为 32767.0f.
 		</p>
 

@@ -11,7 +11,7 @@ import {
 	Quaternion,
 	SphereGeometry,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Dependencies
@@ -894,7 +894,7 @@ class RigidBody {
 					return new Ammo.btCapsuleShape( p.width, p.height );
 
 				default:
-					throw 'unknown shape type ' + p.shapeType;
+					throw new Error( 'unknown shape type ' + p.shapeType );
 
 			}
 

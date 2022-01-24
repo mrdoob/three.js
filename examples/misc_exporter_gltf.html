@@ -23,9 +23,21 @@
 			<label><input id="option_maxsize" name="maxSize" type="number" value="4096" min="2" max="8192" step="1"> Max texture size</label>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
@@ -146,19 +158,25 @@
 				document.body.appendChild( container );
 
 				// Make linear gradient texture
-				const data = new Uint8ClampedArray( 100 * 100 * 3 );
+
+				const data = new Uint8ClampedArray( 100 * 100 * 4 );
+
 				for ( let y = 0; y < 100; y ++ ) {
 
 					for ( let x = 0; x < 100; x ++ ) {
 
-						data[ 3 * ( 100 * y + x ) ] = Math.round( 255 * y / 99 );
-						data[ 3 * ( 100 * y + x ) + 1 ] = Math.round( 255 - 255 * y / 99 );
+						const stride = 4 * ( 100 * y + x );
+
+						data[ stride ] = Math.round( 255 * y / 99 );
+						data[ stride + 1 ] = Math.round( 255 - 255 * y / 99 );
+						data[ stride + 2 ] = 0;
+						data[ stride + 3 ] = 1;
 
 					}
 
 				}
 
-				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBFormat );
+				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBAFormat );
 				gradientTexture.minFilter = THREE.LinearFilter;
 				gradientTexture.magFilter = THREE.LinearFilter;
 				gradientTexture.needsUpdate = true;

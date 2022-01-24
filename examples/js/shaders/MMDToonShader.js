@@ -55,7 +55,6 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 	vec3 y = cross( viewDir, x );
 	vec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5; // 0.495 to remove artifacts caused by undersized matcap disks
 	vec4 matcapColor = texture2D( matcap, uv );
-	matcapColor = matcapTexelToLinear( matcapColor );
 
 	#ifdef MATCAP_BLENDING_MULTIPLY
 

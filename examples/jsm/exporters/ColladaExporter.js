@@ -3,7 +3,7 @@ import {
 	DoubleSide,
 	Matrix4,
 	MeshBasicMaterial
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js

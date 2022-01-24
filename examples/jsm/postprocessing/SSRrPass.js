@@ -16,7 +16,7 @@ import {
 	WebGLRenderTarget,
 	HalfFloatType,
 	MeshStandardMaterial
-} from '../../../build/three.module.js';
+} from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SSRrShader } from '../shaders/SSRrShader.js';
 import { SSRrDepthShader } from '../shaders/SSRrShader.js';

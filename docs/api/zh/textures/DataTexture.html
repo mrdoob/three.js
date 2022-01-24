@@ -24,7 +24,7 @@
 		<p>
 			数据的解释取决于type与format：
 			If the type is THREE.UnsignedByteType, a Uint8Array will be useful for addressing the texel data.
-			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity). Similarly, THREE.RGBFormat specifies a format where only three values are used for each texel.<br />
+			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity).<br />
 
 			For the packed types, THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type or THREE.UnsignedShort565Type, all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
 
@@ -40,7 +40,7 @@
 		const height = 512;
 
 		const size = width * height;
-		const data = new Uint8Array( 3 * size );
+		const data = new Uint8Array( 4 * size );
 		const color = new THREE.Color( 0xffffff );
 
 		const r = Math.floor( color.r * 255 );
@@ -49,17 +49,18 @@
 
 		for ( let i = 0; i < size; i ++ ) {
 
-			const stride = i * 3;
+			const stride = i * 4;
 
 			data[ stride ] = r;
 			data[ stride + 1 ] = g;
 			data[ stride + 2 ] = b;
+			data[ stride + 3 ] = 255;
 
 		}
 
 		// used the buffer to create a [name]
 
-		const texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+		const texture = new THREE.DataTexture( data, width, height );
 		texture.needsUpdate = true;
 		</code>
 
