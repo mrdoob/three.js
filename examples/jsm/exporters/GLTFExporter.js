@@ -20,9 +20,11 @@ import {
 	RepeatWrapping,
 	Scene,
 	Source,
-	SRGBColorSpace,
+	sRGBEncoding,
+	CompressedTexture,
 	Vector3
 } from 'three';
+import { decompress } from './../utils/TextureUtils.js';
 
 
 /**
@@ -827,8 +829,20 @@ class GLTFWriter {
 
 		console.warn( 'THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.' );
 
-		const metalness = metalnessMap ? metalnessMap.image : null;
-		const roughness = roughnessMap ? roughnessMap.image : null;
+		if ( metalnessMap instanceof CompressedTexture ) {
+
+			metalnessMap = decompress( metalnessMap );
+
+		}
+
+		if ( roughnessMap instanceof CompressedTexture ) {
+
+			roughnessMap = decompress( roughnessMap );
+
+		}
+
+		const metalness = metalnessMap?.image;
+		const roughness = roughnessMap?.image;
 
 		const width = Math.max( metalness ? metalness.width : 0, roughness ? roughness.width : 0 );
 		const height = Math.max( metalness ? metalness.height : 0, roughness ? roughness.height : 0 );
@@ -1146,7 +1160,7 @@ class GLTFWriter {
 
 		} else {
 
-			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type.' );
+			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type: ' + attribute.array.constructor );
 
 		}
 
@@ -1236,7 +1250,7 @@ class GLTFWriter {
 
 				if ( format !== RGBAFormat ) {
 
-					console.error( 'GLTFExporter: Only RGBAFormat is supported.' );
+					console.error( 'GLTFExporter: Only RGBAFormat is supported.', image );
 
 				}
 
@@ -1344,12 +1358,23 @@ class GLTFWriter {
 	 */
 	processTexture( map ) {
 
+		const writer = this;
+		const options = writer.options;
 		const cache = this.cache;
 		const json = this.json;
 
 		if ( cache.textures.has( map ) ) return cache.textures.get( map );
 
 		if ( ! json.textures ) json.textures = [];
+
+		// make non-readable textures (e.g. CompressedTexture) readable by blitting them into a new texture
+		if ( map instanceof CompressedTexture ) {
+
+			map = decompress( map, options.maxTextureSize );
+			// remove from cache, as the underlaying canvas is always the same between decompressed textures
+			cache.images.delete( map.image );
+
+		}
 
 		let mimeType = map.userData.mimeType;
 
