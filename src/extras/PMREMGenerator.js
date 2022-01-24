@@ -25,16 +25,12 @@ import { BoxGeometry } from '../geometries/BoxGeometry.js';
 import { BackSide } from '../constants.js';
 
 const LOD_MIN = 4;
-const LOD_MAX = 8;
-const SIZE_MAX = Math.pow( 2, LOD_MAX );
 
 // The standard deviations (radians) associated with the extra mips. These are
 // chosen to approximate a Trowbridge-Reitz distribution function times the
 // geometric shadowing function. These sigma values squared must match the
 // variance #defines in cube_uv_reflection_fragment.glsl.js.
 const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
-
-const TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
 
 // The maximum length of the blur for loop. Smaller sigmas will use fewer
 // samples and exit early, but not recompile the shader.
@@ -84,6 +80,7 @@ class PMREMGenerator {
 		this._renderer = renderer;
 		this._pingPongRenderTarget = null;
 
+		this._lodMax = 0;
 		this._cubeSize = 0;
 		this._lodPlanes = [];
 		this._sizeLods = [];
@@ -109,13 +106,15 @@ class PMREMGenerator {
 		_oldTarget = this._renderer.getRenderTarget();
 
 		const lastCubeSize = this._cubeSize;
-		this._cubeSize = 256;
+		this._setSize( 256 );
 		const cubeUVRenderTarget = this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
+		const {width, height} = cubeUVRenderTarget;
+		const { _lodMax } = this;
 
 		if(this._cubeSize!==lastCubeSize){
-			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes());
-			this._blurMaterial=_getBlurShader();
+			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes( _lodMax ));
+			this._blurMaterial=_getBlurShader( _lodMax, width, height );
 		}
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
@@ -208,6 +207,11 @@ class PMREMGenerator {
 
 	// private interface
 
+	_setSize( cubeSize ) {
+		this._lodMax = Math.floor( Math.log2( cubeSize ) );
+		this._cubeSize = Math.pow( 2, this._lodMax );
+	}
+
 	_cleanup( outputTarget ) {
 
 		this._renderer.setRenderTarget( _oldTarget );
@@ -221,17 +225,19 @@ class PMREMGenerator {
 		const lastCubeSize = this._cubeSize;
 
 		if(texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping){
-			this._cubeSize = texture.image[0].width??texture.image[0].image.width;
+			this._setSize( texture.image[0].width??texture.image[0].image.width );
 		}else{// Equirectangular
-			this._cubeSize=texture.image.width/4;
+			this._setSize( this._cubeSize=texture.image.width/4 );
 		}
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+		const {width, height} = cubeUVRenderTarget;
+		const { _lodMax } = this;
 
 		if(this._cubeSize!==lastCubeSize){
-			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes());
-			this._blurMaterial=_getBlurShader();
+			({sizeLods:this._sizeLods, lodPlanes:this._lodPlanes, sigmas:this._sigmas}=_createPlanes( _lodMax ));
+			this._blurMaterial=_getBlurShader( _lodMax, width, height );
 		}
 
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
@@ -339,8 +345,8 @@ class PMREMGenerator {
 
 			}
 
-			_setViewport( cubeUVRenderTarget,
-				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
+			const size = this._cubeSize;
+			_setViewport( cubeUVRenderTarget, col * size, i > 2 ? size : 0, size, size );
 			renderer.setRenderTarget( cubeUVRenderTarget );
 
 			if ( useSolidColor ) {
@@ -401,7 +407,8 @@ class PMREMGenerator {
 
 		}
 
-		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+		const size = this._cubeSize;
+		_setViewport( cubeUVRenderTarget, 0, 0, 3 * size, 2 * size );
 
 		renderer.setRenderTarget( cubeUVRenderTarget );
 		renderer.render( mesh, _flatCamera );
@@ -414,7 +421,7 @@ class PMREMGenerator {
 		const autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		for ( let i = 1; i < TOTAL_LODS; i ++ ) {
+		for ( let i = 1; i < this._lodPlanes.length; i ++ ) {
 
 			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
 
@@ -528,12 +535,13 @@ class PMREMGenerator {
 
 		}
 
+		const { _lodMax } = this;
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
-		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
+		blurUniforms[ 'mipInt' ].value = _lodMax - lodIn;
 
 		const outputSize = this._sizeLods[ lodOut ];
-		const x = 3 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
-		const y = 4 * ( SIZE_MAX - outputSize );
+		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
+		const y = 4 * ( this._cubeSize - outputSize );
 
 		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
 		renderer.setRenderTarget( targetOut );
@@ -556,23 +564,25 @@ class PMREMGenerator {
 
 }
 
-function _createPlanes() {
+function _createPlanes( lodMax ) {
 
 	const lodPlanes = [];
 	const sizeLods = [];
 	const sigmas = [];
 
-	let lod = LOD_MAX;
+	let lod = lodMax;
 
-	for ( let i = 0; i < TOTAL_LODS; i ++ ) {
+	const totalLods = lodMax - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+
+	for ( let i = 0; i < totalLods; i ++ ) {
 
 		const sizeLod = Math.pow( 2, lod );
 		sizeLods.push( sizeLod );
 		let sigma = 1.0 / sizeLod;
 
-		if ( i > LOD_MAX - LOD_MIN ) {
+		if ( i > lodMax - LOD_MIN ) {
 
-			sigma = EXTRA_LOD_SIGMA[ i - LOD_MAX + LOD_MIN - 1 ];
+			sigma = EXTRA_LOD_SIGMA[ i - lodMax + LOD_MIN - 1 ];
 
 		} else if ( i === 0 ) {
 
@@ -641,7 +651,7 @@ function _setViewport( target, x, y, width, height ) {
 
 }
 
-function _getBlurShader() {
+function _getBlurShader( lodMax, width, height ) {
 
 	const weights = new Float32Array( MAX_SAMPLES );
 	const poleAxis = new Vector3( 0, 1, 0 );
@@ -651,9 +661,9 @@ function _getBlurShader() {
 
 		defines: { 
 			'n': MAX_SAMPLES,
-			'CUBEUV_TEXEL_WIDTH':1.0/ 768,
-			'CUBEUV_TEXEL_HEIGHT':1.0/992,
-			'CUBEUV_MAX_MIP':'8.0',
+			'CUBEUV_TEXEL_WIDTH': 1.0 / width,
+			'CUBEUV_TEXEL_HEIGHT': 1.0 / height,
+			'CUBEUV_MAX_MIP': `${lodMax}.0`,
 		},
 
 		uniforms: {
