@@ -1,10 +1,13 @@
+import NodeMaterial from './NodeMaterial.js';
 import { PointsMaterial } from 'three';
 
-class PointsNodeMaterial extends PointsMaterial {
+const defaultValues = new PointsMaterial();
+
+class PointsNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
-		super( parameters );
+		super();
 
 		this.colorNode = null;
 		this.opacityNode = null;
@@ -16,6 +19,10 @@ class PointsNodeMaterial extends PointsMaterial {
 		this.sizeNode = null;
 
 		this.positionNode = null;
+
+		this.setDefaultValues( defaultValues );
+
+		this.setValues( parameters );
 
 	}
 
