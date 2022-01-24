@@ -1,9 +1,9 @@
-const puppeteer = require( 'puppeteer' );
-const handler = require( 'serve-handler' );
-const http = require( 'http' );
-const pixelmatch = require( 'pixelmatch' );
-const jimp = require( 'jimp' );
-const fs = require( 'fs' );
+import puppeteer from 'puppeteer';
+import handler from 'serve-handler';
+import http from 'http';
+import pixelmatch from 'pixelmatch';
+import jimp from 'jimp';
+import fs from 'fs';
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel

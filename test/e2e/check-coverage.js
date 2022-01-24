@@ -1,4 +1,4 @@
-const fs = require( 'fs' );
+import fs from 'fs';
 
 // examples
 const E = fs.readdirSync( './examples' )
