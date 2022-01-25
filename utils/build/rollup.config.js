@@ -318,6 +318,12 @@ let builds = [
 				name: 'THREE',
 				file: 'build/three.js',
 				indent: '\t'
+			},
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.cjs',
+				indent: '\t'
 			}
 		]
 	},
