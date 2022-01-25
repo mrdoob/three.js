@@ -194,6 +194,130 @@ export default QUnit.module( 'Exporters', () => {
 
 		} );
 
+		QUnit.test( 'parse - groups with indexed geometry', ( assert ) => {
+
+			assert.timeout( 1000 );
+			var done = assert.async();
+
+			const geometry = new BoxGeometry( 50, 50, 50 );
+			geometry.clearGroups();
+			geometry.addGroup( 0, 6, 0 );
+			geometry.addGroup( 6, 6, 1 );
+			geometry.addGroup( 12, 6, 2 );
+			geometry.addGroup( 18, 6, 3 );
+			geometry.addGroup( 24, 6, 4 );
+			geometry.addGroup( 30, 6, 5 );
+
+			assert.ok( geometry.getIndex() !== undefined, 'geometry is indexed' );
+
+			const materials = [
+				new MeshStandardMaterial( { color: 0xFFFFFF } ),
+				new MeshStandardMaterial( { color: 0xFF0000 } ),
+				new MeshStandardMaterial( { color: 0x00FF00 } ),
+				new MeshStandardMaterial( { color: 0x0000FF } ),
+				new MeshStandardMaterial( { color: 0xFFFF00 } ),
+				new MeshStandardMaterial( { color: 0x00FFFF } )
+			];
+
+			const box = new Mesh( geometry, materials );
+
+			var exporter = new GLTFExporter();
+
+			exporter.parse( box, function ( gltf ) {
+
+				console.log( gltf );
+				assert.equal( 1, gltf.nodes.length, 'correct number of nodes' );
+				assert.equal( 0, gltf.nodes[ 0 ].mesh, 'node references mesh' );
+				assert.equal( 6, gltf.meshes[ 0 ].primitives.length, 'correct number of primitives' );
+
+				const expectedColors = [ undefined, [ 1, 0, 0, 1 ], [ 0, 1, 0, 1 ], [ 0, 0, 1, 1 ], [ 1, 1, 0, 1 ], [ 0, 1, 1, 1 ]];
+				for ( let i = 0; i < gltf.meshes[ 0 ].primitives.length; i ++ ) {
+
+					var primitive = gltf.meshes[ 0 ].primitives[ i ];
+					var material = gltf.materials[ primitive.material ];
+
+					assert.ok( primitive.indices !== undefined, 'primitive contains indices' );
+
+					assert.equal( 4, primitive.mode, 'mesh uses TRIANGLES mode' );
+					assert.equal( 0, primitive.attributes.POSITION, 'mesh contains position data' );
+					assert.equal( 1, primitive.attributes.NORMAL, 'mesh contains normal data' );
+
+					const expectedMaterial = { metallicFactor: 0.0, roughnessFactor: 1.0 };
+					if ( expectedColors[ i ] )
+						expectedMaterial.baseColorFactor = expectedColors[ i ];
+
+ 					assert.smartEqual( material.pbrMetallicRoughness, expectedMaterial, 'material' );
+
+				}
+
+				done();
+
+			} );
+
+		} );
+
+		QUnit.test( 'parse - groups with non-indexed geometry', ( assert ) => {
+
+			assert.timeout( 1000 );
+			var done = assert.async();
+
+			let geometry = new BoxGeometry( 50, 50, 50 );
+			geometry.clearGroups();
+			geometry.addGroup( 0, 6, 0 );
+			geometry.addGroup( 6, 6, 1 );
+			geometry.addGroup( 12, 6, 2 );
+			geometry.addGroup( 18, 6, 3 );
+			geometry.addGroup( 24, 6, 4 );
+			geometry.addGroup( 30, 6, 5 );
+			geometry = geometry.toNonIndexed();
+
+			const materials = [
+				new MeshStandardMaterial( { color: 0xFFFFFF } ),
+				new MeshStandardMaterial( { color: 0xFF0000 } ),
+				new MeshStandardMaterial( { color: 0x00FF00 } ),
+				new MeshStandardMaterial( { color: 0x0000FF } ),
+				new MeshStandardMaterial( { color: 0xFFFF00 } ),
+				new MeshStandardMaterial( { color: 0x00FFFF } )
+			];
+
+			const box = new Mesh( geometry, materials );
+
+			var exporter = new GLTFExporter();
+
+			exporter.parse( box, function ( gltf ) {
+
+				assert.equal( 1, gltf.nodes.length, 'correct number of nodes' );
+				assert.equal( 0, gltf.nodes[ 0 ].mesh, 'node references mesh' );
+				assert.equal( 6, gltf.meshes[ 0 ].primitives.length, 'correct number of primitives' );
+
+				console.log( gltf );
+				const expectedColors = [ undefined, [ 1, 0, 0, 1 ], [ 0, 1, 0, 1 ], [ 0, 0, 1, 1 ], [ 1, 1, 0, 1 ], [ 0, 1, 1, 1 ]];
+				for ( let i = 0; i < gltf.meshes[ 0 ].primitives.length; i ++ ) {
+
+					var primitive = gltf.meshes[ 0 ].primitives[ i ];
+					var material = gltf.materials[ primitive.material ];
+
+					assert.ok( primitive.indices === undefined, 'primitive does not contain indices' );
+
+					assert.equal( 4, primitive.mode, 'mesh uses TRIANGLES mode' );
+					assert.equal( 3 * i + 0, primitive.attributes.POSITION, 'mesh contains per-group position data' );
+					assert.equal( 3 * i + 1, primitive.attributes.NORMAL, 'mesh contains per-group normal data' );
+					assert.equal( 6, gltf.accessors[ primitive.attributes.POSITION ].count, 'group contains 6 points' );
+
+					const expectedMaterial = { metallicFactor: 0.0, roughnessFactor: 1.0 };
+					if ( expectedColors[ i ] )
+						expectedMaterial.baseColorFactor = expectedColors[ i ];
+
+ 					assert.smartEqual( material.pbrMetallicRoughness, expectedMaterial, 'material' );
+
+				}
+
+				done();
+
+			} );
+
+		} );
+
 		QUnit.test( 'parse - animation', ( assert ) => {
 
 			var done = assert.async();
