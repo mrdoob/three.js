@@ -6,6 +6,7 @@ import { InvertEditor } from './math/InvertEditor.js';
 import { LimiterEditor } from './math/LimiterEditor.js';
 import { DotEditor } from './math/DotEditor.js';
 import { PowerEditor } from './math/PowerEditor.js';
+import { AngleEditor } from './math/AngleEditor.js';
 import { TrigonometryEditor } from './math/TrigonometryEditor.js';
 import { FloatEditor } from './inputs/FloatEditor.js';
 import { Vector2Editor } from './inputs/Vector2Editor.js';
@@ -130,8 +131,14 @@ export const NodeList = [
 			{
 				name: 'Trigonometry',
 				icon: 'wave-sine',
-				tip: 'Sin / Cos / Tan',
+				tip: 'Sin / Cos / Tan / ...',
 				nodeClass: TrigonometryEditor
+			},
+			{
+				name: 'Angle',
+				icon: 'angle',
+				tip: 'Degress / Radians',
+				nodeClass: AngleEditor
 			},
 			{
 				name: 'Normalize',
@@ -210,6 +217,7 @@ export const ClassLib = {
 	LimiterEditor,
 	DotEditor,
 	PowerEditor,
+	AngleEditor,
 	TrigonometryEditor,
 	FloatEditor,
 	Vector2Editor,

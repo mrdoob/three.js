@@ -4,23 +4,18 @@ import { MathNode, Vector3Node } from '../../renderers/nodes/Nodes.js';
 
 const DEFAULT_VALUE = new Vector3Node();
 
-export class TrigonometryEditor extends BaseNode {
+export class AngleEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new MathNode( MathNode.SIN, DEFAULT_VALUE );
 
-		super( 'Trigonometry', 1, node, 175 );
+		super( 'Angle', 1, node, 175 );
 
 		const optionsField = new SelectInput( [
-			{ name: 'Sin', value: MathNode.SIN },
-			{ name: 'Cos', value: MathNode.COS },
-			{ name: 'Tan', value: MathNode.TAN },
-
-			{ name: 'asin', value: MathNode.ASIN },
-			{ name: 'acos', value: MathNode.ACOS },
-			{ name: 'atan', value: MathNode.ATAN }
-		], MathNode.SIN ).onChange( () => {
+			{ name: 'Degrees to Radians', value: MathNode.RAD },
+			{ name: 'Radians to Degrees', value: MathNode.DEG }
+		], MathNode.RAD ).onChange( () => {
 
 			node.method = optionsField.getValue();
 
