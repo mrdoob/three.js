@@ -102,38 +102,44 @@
 
 				if ( object.isCSS2DObject ) {
 
-					object.onBeforeRender( _this, scene, camera );
+					const visible = object.visible && _vector.z >= - 1 && _vector.z <= 1 && object.layers.test( camera.layers );
+					object.element.style.display = visible ? '' : 'none';
 
-					_vector.setFromMatrixPosition( object.matrixWorld );
+					if ( visible ) {
 
-					_vector.applyMatrix4( _viewProjectionMatrix );
+						object.onBeforeRender( _this, scene, camera );
 
-					const element = object.element;
+						_vector.setFromMatrixPosition( object.matrixWorld );
 
-					if ( /apple/i.test( navigator.vendor ) ) {
+						_vector.applyMatrix4( _viewProjectionMatrix );
 
-						// https://github.com/mrdoob/three.js/issues/21415
-						element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+						const element = object.element;
 
-					} else {
+						if ( /apple/i.test( navigator.vendor ) ) {
 
-						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+							// https://github.com/mrdoob/three.js/issues/21415
+							element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+
+						} else {
+
+							element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+
+						}
+
+						const objectData = {
+							distanceToCameraSquared: getDistanceToSquared( camera, object )
+						};
+						cache.objects.set( object, objectData );
+
+						if ( element.parentNode !== domElement ) {
+
+							domElement.appendChild( element );
+
+						}
+
+						object.onAfterRender( _this, scene, camera );
 
 					}
-
-					element.style.display = object.visible && _vector.z >= - 1 && _vector.z <= 1 ? '' : 'none';
-					const objectData = {
-						distanceToCameraSquared: getDistanceToSquared( camera, object )
-					};
-					cache.objects.set( object, objectData );
-
-					if ( element.parentNode !== domElement ) {
-
-						domElement.appendChild( element );
-
-					}
-
-					object.onAfterRender( _this, scene, camera );
 
 				}
 

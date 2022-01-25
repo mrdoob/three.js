@@ -181,58 +181,62 @@
 
 				if ( object.isCSS3DObject ) {
 
-					object.onBeforeRender( _this, scene, camera );
-					let style;
-
-					if ( object.isCSS3DSprite ) {
-
-						// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
-						_matrix.copy( camera.matrixWorldInverse );
-
-						_matrix.transpose();
-
-						if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
-						object.matrixWorld.decompose( _position, _quaternion, _scale );
-
-						_matrix.setPosition( _position );
-
-						_matrix.scale( _scale );
-
-						_matrix.elements[ 3 ] = 0;
-						_matrix.elements[ 7 ] = 0;
-						_matrix.elements[ 11 ] = 0;
-						_matrix.elements[ 15 ] = 1;
-						style = getObjectCSSMatrix( _matrix );
-
-					} else {
-
-						style = getObjectCSSMatrix( object.matrixWorld );
-
-					}
-
-					const element = object.element;
-					const cachedObject = cache.objects.get( object );
-
-					if ( cachedObject === undefined || cachedObject.style !== style ) {
-
-						element.style.transform = style;
-						const objectData = {
-							style: style
-						};
-						cache.objects.set( object, objectData );
-
-					}
-
 					const visible = object.visible && object.layers.test( camera.layers );
-					element.style.display = visible ? '' : 'none';
+					object.element.style.display = visible ? '' : 'none'; // only getObjectCSSMatrix when object.visible
 
-					if ( element.parentNode !== cameraElement ) {
+					if ( visible ) {
 
-						cameraElement.appendChild( element );
+						object.onBeforeRender( _this, scene, camera );
+						let style;
+
+						if ( object.isCSS3DSprite ) {
+
+							// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
+							_matrix.copy( camera.matrixWorldInverse );
+
+							_matrix.transpose();
+
+							if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
+							object.matrixWorld.decompose( _position, _quaternion, _scale );
+
+							_matrix.setPosition( _position );
+
+							_matrix.scale( _scale );
+
+							_matrix.elements[ 3 ] = 0;
+							_matrix.elements[ 7 ] = 0;
+							_matrix.elements[ 11 ] = 0;
+							_matrix.elements[ 15 ] = 1;
+							style = getObjectCSSMatrix( _matrix );
+
+						} else {
+
+							style = getObjectCSSMatrix( object.matrixWorld );
+
+						}
+
+						const element = object.element;
+						const cachedObject = cache.objects.get( object );
+
+						if ( cachedObject === undefined || cachedObject.style !== style ) {
+
+							element.style.transform = style;
+							const objectData = {
+								style: style
+							};
+							cache.objects.set( object, objectData );
+
+						}
+
+						if ( element.parentNode !== cameraElement ) {
+
+							cameraElement.appendChild( element );
+
+						}
+
+						object.onAfterRender( _this, scene, camera );
 
 					}
-
-					object.onAfterRender( _this, scene, camera );
 
 				}
 
