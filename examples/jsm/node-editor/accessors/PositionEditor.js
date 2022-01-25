@@ -14,7 +14,7 @@ export class PositionEditor extends BaseNode {
 			{ name: 'Local', value: PositionNode.LOCAL },
 			{ name: 'World', value: PositionNode.WORLD },
 			{ name: 'View', value: PositionNode.VIEW },
-			{ name: 'ViewDirection', value: PositionNode.VIEW_DIRECTION },
+			{ name: 'View Direction', value: PositionNode.VIEW_DIRECTION }
 		], PositionNode.LOCAL ).onChange( () => {
 
 			node.scope = optionsField.getValue();
