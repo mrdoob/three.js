@@ -320,7 +320,7 @@ let builds = [
 				indent: '\t'
 			},
 			{
-				format: 'umd',
+				format: 'cjs',
 				name: 'THREE',
 				file: 'build/three.cjs',
 				indent: '\t'
