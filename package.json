@@ -8,7 +8,7 @@
   "exports": {
     ".": {
       "import": "./build/three.module.js",
-      "require": "./build/three.js"
+      "require": "./build/three.cjs"
     },
     "./examples/jsm/*": "./examples/jsm/*.js",
     "./src/*": "./src/*.js"
@@ -20,6 +20,7 @@
   "sideEffects": false,
   "files": [
     "build/three.js",
+    "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
     "examples/js",
@@ -82,7 +83,7 @@
   "scripts": {
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
-    "build": "rollup -c utils/build/rollup.config.js",
+    "build": "rollup -c utils/build/rollup.config.js && cpy ./build/three.js ./build/ --rename=three.cjs",
     "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
     "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
@@ -128,6 +129,7 @@
     "@rollup/plugin-node-resolve": "^13.0.5",
     "chalk": "^4.1.2",
     "concurrently": "^6.2.2",
+    "cpy-cli": "^3.1.1",
     "eslint": "^7.32.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.2.0",
