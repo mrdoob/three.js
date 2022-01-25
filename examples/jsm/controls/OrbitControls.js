@@ -144,14 +144,91 @@ class OrbitControls extends EventDispatcher {
 			scope.object.updateProjectionMatrix();
 			scope.dispatchEvent( _changeEvent );
 
-			scope.update();
+			updateInternal();
 
 			state = STATE.NONE;
 
 		};
 
-		// this method is exposed, but perhaps it would be better if we can make it private...
 		this.update = function () {
+
+			if ( scope.autoRotate && state === STATE.NONE ) {
+
+				rotateLeft( getAutoRotationAngle() );
+
+			}
+
+			updateInternal();
+
+		};
+
+		this.dispose = function () {
+
+			scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
+
+			scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
+			scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
+			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
+
+			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+
+
+			if ( scope._domElementKeyEvents !== null ) {
+
+				scope._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
+
+			}
+
+			//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
+
+		};
+
+		//
+		// internals
+		//
+
+		const scope = this;
+
+		const STATE = {
+			NONE: - 1,
+			ROTATE: 0,
+			DOLLY: 1,
+			PAN: 2,
+			TOUCH_ROTATE: 3,
+			TOUCH_PAN: 4,
+			TOUCH_DOLLY_PAN: 5,
+			TOUCH_DOLLY_ROTATE: 6
+		};
+
+		let state = STATE.NONE;
+
+		const EPS = 0.000001;
+
+		// current position in spherical coordinates
+		const spherical = new Spherical();
+		const sphericalDelta = new Spherical();
+
+		let scale = 1;
+		const panOffset = new Vector3();
+		let zoomChanged = false;
+
+		const rotateStart = new Vector2();
+		const rotateEnd = new Vector2();
+		const rotateDelta = new Vector2();
+
+		const panStart = new Vector2();
+		const panEnd = new Vector2();
+		const panDelta = new Vector2();
+
+		const dollyStart = new Vector2();
+		const dollyEnd = new Vector2();
+		const dollyDelta = new Vector2();
+
+		const pointers = [];
+		const pointerPositions = {};
+
+		const updateInternal = function () {
 
 			const offset = new Vector3();
 
@@ -164,7 +241,7 @@ class OrbitControls extends EventDispatcher {
 
 			const twoPI = 2 * Math.PI;
 
-			return function update() {
+			return function updateInternal() {
 
 				const position = scope.object.position;
 
@@ -175,12 +252,6 @@ class OrbitControls extends EventDispatcher {
 
 				// angle from z-axis around y-axis
 				spherical.setFromVector3( offset );
-
-				if ( scope.autoRotate && state === STATE.NONE ) {
-
-					rotateLeft( getAutoRotationAngle() );
-
-				}
 
 				if ( scope.enableDamping ) {
 
@@ -291,72 +362,6 @@ class OrbitControls extends EventDispatcher {
 			};
 
 		}();
-
-		this.dispose = function () {
-
-			scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
-
-			scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
-			scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
-			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
-
-			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
-			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
-
-
-			if ( scope._domElementKeyEvents !== null ) {
-
-				scope._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
-
-			}
-
-			//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
-
-		};
-
-		//
-		// internals
-		//
-
-		const scope = this;
-
-		const STATE = {
-			NONE: - 1,
-			ROTATE: 0,
-			DOLLY: 1,
-			PAN: 2,
-			TOUCH_ROTATE: 3,
-			TOUCH_PAN: 4,
-			TOUCH_DOLLY_PAN: 5,
-			TOUCH_DOLLY_ROTATE: 6
-		};
-
-		let state = STATE.NONE;
-
-		const EPS = 0.000001;
-
-		// current position in spherical coordinates
-		const spherical = new Spherical();
-		const sphericalDelta = new Spherical();
-
-		let scale = 1;
-		const panOffset = new Vector3();
-		let zoomChanged = false;
-
-		const rotateStart = new Vector2();
-		const rotateEnd = new Vector2();
-		const rotateDelta = new Vector2();
-
-		const panStart = new Vector2();
-		const panEnd = new Vector2();
-		const panDelta = new Vector2();
-
-		const dollyStart = new Vector2();
-		const dollyEnd = new Vector2();
-		const dollyDelta = new Vector2();
-
-		const pointers = [];
-		const pointerPositions = {};
 
 		function getAutoRotationAngle() {
 
@@ -541,7 +546,7 @@ class OrbitControls extends EventDispatcher {
 
 			rotateStart.copy( rotateEnd );
 
-			scope.update();
+			updateInternal();
 
 		}
 
@@ -563,7 +568,7 @@ class OrbitControls extends EventDispatcher {
 
 			dollyStart.copy( dollyEnd );
 
-			scope.update();
+			updateInternal();
 
 		}
 
@@ -577,7 +582,7 @@ class OrbitControls extends EventDispatcher {
 
 			panStart.copy( panEnd );
 
-			scope.update();
+			updateInternal();
 
 		}
 
@@ -593,7 +598,7 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
-			scope.update();
+			updateInternal();
 
 		}
 
@@ -630,7 +635,7 @@ class OrbitControls extends EventDispatcher {
 				// prevent the browser from scrolling on cursor keys
 				event.preventDefault();
 
-				scope.update();
+				updateInternal();
 
 			}
 
@@ -1110,7 +1115,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMoveRotate( event );
 
-					scope.update();
+					updateInternal();
 
 					break;
 
@@ -1120,7 +1125,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMovePan( event );
 
-					scope.update();
+					updateInternal();
 
 					break;
 
@@ -1130,7 +1135,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMoveDollyPan( event );
 
-					scope.update();
+					updateInternal();
 
 					break;
 
@@ -1140,7 +1145,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMoveDollyRotate( event );
 
-					scope.update();
+					updateInternal();
 
 					break;
 
@@ -1216,7 +1221,7 @@ class OrbitControls extends EventDispatcher {
 
 		// force an update at start
 
-		this.update();
+		updateInternal();
 
 	}
 
