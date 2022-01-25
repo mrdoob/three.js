@@ -1437,7 +1437,7 @@ class GLTFWriter {
 		}
 
 		const meshDef = {};
-		const attributesPerGroup = []; // one entry if indexed, one entry per group if indexed
+		const attributesPerGroup = []; // one entry if indexed, one entry per group if non-indexed
 		const primitives = [];
 		const targets = [];
 
