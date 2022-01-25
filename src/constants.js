@@ -84,7 +84,6 @@ export const FloatType = 1015;
 export const HalfFloatType = 1016;
 export const UnsignedShort4444Type = 1017;
 export const UnsignedShort5551Type = 1018;
-export const UnsignedShort565Type = 1019;
 export const UnsignedInt248Type = 1020;
 export const AlphaFormat = 1021;
 export const RGBAFormat = 1023;
