@@ -20,6 +20,7 @@
   "sideEffects": false,
   "files": [
     "build/three.js",
+    "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
     "examples/js",
