@@ -20,7 +20,7 @@ class HTMLMesh extends Mesh {
 
 		function onEvent( event ) {
 
-			material.map.dispatchEvent( event );
+			material.map.dispatchDOMEvent( event );
 
 		}
 
@@ -48,7 +48,7 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
-	dispatchEvent( event ) {
+	dispatchDOMEvent( event ) {
 
 		htmlevent( this.dom, event.type, event.data.x, event.data.y );
 
