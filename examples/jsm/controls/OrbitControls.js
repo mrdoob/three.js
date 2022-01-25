@@ -158,7 +158,7 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
-			updateInternal();
+			return updateInternal();
 
 		};
 
