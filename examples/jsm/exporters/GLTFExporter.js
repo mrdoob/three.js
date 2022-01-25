@@ -1437,7 +1437,7 @@ class GLTFWriter {
 		}
 
 		const meshDef = {};
-		const attributes = {};
+		const attributesPerGroup = []; // one entry if indexed, one entry per group if indexed
 		const primitives = [];
 		const targets = [];
 
@@ -1464,56 +1464,74 @@ class GLTFWriter {
 		// For every attribute create an accessor
 		let modifiedAttribute = null;
 
-		for ( let attributeName in geometry.attributes ) {
+		const isMultiMaterial = Array.isArray( mesh.material );
 
-			// Ignore morph target attributes, which are exported later.
-			if ( attributeName.substr( 0, 5 ) === 'morph' ) continue;
+		if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
 
-			const attribute = geometry.attributes[ attributeName ];
-			attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
+		const isIndexed = geometry.index !== null;
+		const materials = isMultiMaterial ? mesh.material : [ mesh.material ];
+		const groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
-			// Prefix all geometry attributes except the ones specifically
-			// listed in the spec; non-spec attributes are considered custom.
-			const validVertexAttributes =
+		for ( let group = 0, il = isIndexed ? 1 : groups.length; group < il; group ++ ) {
+
+			const attributes = {};
+
+			for ( let attributeName in geometry.attributes ) {
+
+				// Ignore morph target attributes, which are exported later.
+				if ( attributeName.substr( 0, 5 ) === 'morph' ) continue;
+
+				const attribute = geometry.attributes[ attributeName ];
+				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
+
+				// Prefix all geometry attributes except the ones specifically
+				// listed in the spec; non-spec attributes are considered custom.
+				const validVertexAttributes =
 					/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
 
-			if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
+				if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
 
-			if ( cache.attributes.has( this.getUID( attribute ) ) ) {
+				const cacheKey = this.getUID( attribute ) + ':' + group;
 
-				attributes[ attributeName ] = cache.attributes.get( this.getUID( attribute ) );
-				continue;
+				if ( cache.attributes.has( cacheKey ) ) {
 
-			}
+					attributes[ attributeName ] = cache.attributes.get( cacheKey );
+					continue;
 
-			// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
-			modifiedAttribute = null;
-			const array = attribute.array;
+				}
 
-			if ( attributeName === 'JOINTS_0' &&
+				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+				modifiedAttribute = null;
+				const array = attribute.array;
+
+				if ( attributeName === 'JOINTS_0' &&
 				! ( array instanceof Uint16Array ) &&
 				! ( array instanceof Uint8Array ) ) {
 
-				console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
-				modifiedAttribute = new BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
+					console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
+					modifiedAttribute = new BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
+
+				}
+
+				const accessor = this.processAccessor( modifiedAttribute || attribute, geometry, isIndexed ? undefined : groups[ group ].start, isIndexed ? undefined : groups[ group ].count );
+
+				if ( accessor !== null ) {
+
+					attributes[ attributeName ] = accessor;
+					cache.attributes.set( cacheKey, accessor );
+
+				}
 
 			}
 
-			const accessor = this.processAccessor( modifiedAttribute || attribute, geometry );
-
-			if ( accessor !== null ) {
-
-				attributes[ attributeName ] = accessor;
-				cache.attributes.set( this.getUID( attribute ), accessor );
-
-			}
+			attributesPerGroup.push( attributes );
 
 		}
 
 		if ( originalNormal !== undefined ) geometry.setAttribute( 'normal', originalNormal );
 
 		// Skip if no exportable attributes found
-		if ( Object.keys( attributes ).length === 0 ) return null;
+		if ( attributesPerGroup[ 0 ] && Object.keys( attributesPerGroup[ 0 ] ).length === 0 ) return null;
 
 		// Morph targets
 		if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
@@ -1614,25 +1632,18 @@ class GLTFWriter {
 
 		}
 
-		const isMultiMaterial = Array.isArray( mesh.material );
-
-		if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
-
-		const materials = isMultiMaterial ? mesh.material : [ mesh.material ];
-		const groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
-
 		for ( let i = 0, il = groups.length; i < il; i ++ ) {
 
 			const primitive = {
 				mode: mode,
-				attributes: attributes,
+				attributes: attributesPerGroup[ isIndexed ? 0 : i ],
 			};
 
 			this.serializeUserData( geometry, primitive );
 
 			if ( targets.length > 0 ) primitive.targets = targets;
 
-			if ( geometry.index !== null ) {
+			if ( isIndexed ) {
 
 				let cacheKey = this.getUID( geometry.index );
 

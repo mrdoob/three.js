@@ -488,6 +488,34 @@
 				scene1.add( object );
 
 				// ---------------------------------------------------------------------
+				// Indexed and non-indexed geometry using `groups`
+				// ---------------------------------------------------------------------
+				geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				geometry.clearGroups();
+				geometry.addGroup( 0, 6, 0 );
+				geometry.addGroup( 6, 6, 1 );
+				geometry.addGroup( 12, 6, 2 );
+				geometry.addGroup( 18, 6, 3 );
+				geometry.addGroup( 24, 6, 4 );
+				geometry.addGroup( 30, 6, 5 );
+
+				const materials = [
+					new THREE.MeshBasicMaterial( { color: 0xFFFFFF, visible: true } ),
+					new THREE.MeshBasicMaterial( { color: 0xFF0000, visible: true } ),
+					new THREE.MeshBasicMaterial( { color: 0x00FF00, visible: true } ),
+					new THREE.MeshBasicMaterial( { color: 0x0000FF, visible: true } ),
+					new THREE.MeshBasicMaterial( { color: 0xFFFF00, visible: true } ),
+					new THREE.MeshBasicMaterial( { color: 0x00FFFF, visible: true } )
+				];
+
+				object = new THREE.Mesh( geometry, materials );
+				object.translateX( 350 ).translateZ( 200 );
+				scene1.add( object );
+				object = new THREE.Mesh( geometry.toNonIndexed(), materials );
+				object.translateX( 350 ).translateZ( 300 );
+				scene1.add( object );
+
+				// ---------------------------------------------------------------------
 				//
 				//
 				const loader = new OBJLoader();
