@@ -137,7 +137,7 @@ class DDSLoader extends CompressedTextureLoader {
 
 		// Parse header
 
-		const header = new Int32Array( buffer.buffer, buffer.byteOffset, HEADER_LENGTH );
+		const header = new Int32Array( buffer.buffer, buffer.byteOffset, headerLengthInt );
 
 		if ( header[ off_magic ] !== DDS_MAGIC ) {
 
