@@ -272,7 +272,7 @@ function header() {
 
 			return `/**
  * @license
- * Copyright 2010-2021 Three.js Authors
+ * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 ${ code }`;
