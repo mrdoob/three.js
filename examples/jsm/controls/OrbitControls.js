@@ -67,7 +67,7 @@ class OrbitControls extends EventDispatcher {
 		this.zoomSpeed = 1.0;
 
 		//Set to enable dollying(zooming) with the follow of the mouse pointer on screen.
-		this.enableFollowZoom = false;
+		this.zoomToCursor= false;
 
 		// Set to false to disable rotating
 		this.enableRotate = true;
@@ -234,7 +234,7 @@ class OrbitControls extends EventDispatcher {
 				spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
 				// move target to panned location
-				if(followZoomFlag == true){
+				if(zoomToCursorFlag == true){
 
 					scope.target.add( panOffset );
 
@@ -257,11 +257,11 @@ class OrbitControls extends EventDispatcher {
 
 				scope.object.lookAt( scope.target );
 
-				if(followZoomFlag === true){
+				if(zoomToCursorFlag === true){
 
 					panOffset.set( 0, 0, 0 );
 					sphericalDelta.set( 0, 0, 0 );
-					followZoomFlag = false;
+					zoomToCursorFlag = false;
 
 				}else if ( scope.enableDamping === true ) {
 
@@ -371,7 +371,7 @@ class OrbitControls extends EventDispatcher {
 		const pointers = [];
 		const pointerPositions = {};
 
-		let followZoomFlag = false;
+		let zoomToCursorFlag = false;
 
 		function getAutoRotationAngle() {
 
@@ -596,26 +596,7 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function getTotalOffsetLeftAndTop(dom){
-
-			let left = 0, top = 0;
-			getOffset(dom);
-
-			function getOffset(dom){
-				left += dom.offsetLeft;
-				top += dom.offsetTop;
-				if(dom.offsetParent){
-					getOffset(dom.offsetParent)
-				}
-			}
-
-			return {
-				top: top,
-				left: left
-			}
-		}
-
-		function followZoom(event){
+		function zoomToCursor(event){
 
 			let x = (event.offsetX / scope.domElement.clientWidth) * 2 -1,
 			y = -(event.offsetY / scope.domElement.clientHeight) * 2 + 1,
@@ -623,8 +604,8 @@ class OrbitControls extends EventDispatcher {
 
 			v.unproject(scope.object);
 			v.sub(scope.object.position).setLength(scope.zoomSpeed * 10) // it needs more speed here;
-			
-			if(scope.object.type === "PerspectiveCamera"){
+
+			if(scope.object.isPerspectiveCamera){
 
 				if(event.deltaY < 0){
 					scope.object.position.add(v);
@@ -633,10 +614,10 @@ class OrbitControls extends EventDispatcher {
 					scope.object.position.sub(v);
 					scope.target.sub(v);
 				}
-			}else if(scope.object.type === "OrthographicCamera"){
+			}else if(scope.object.isOrthographicCamera){
 
 				const dom = scope.domElement;
-				const domOffset = getTotalOffsetLeftAndTop(dom);
+				const domOffset = dom.getBoundingClientRect();
 				const centerX = dom.clientWidth * 0.5;
 				const centerY = dom.clientHeight * 0.5;
 				const panOffsetX = (event.clientX - centerX - domOffset.left) * (1 - 1/getZoomScale());
@@ -651,11 +632,11 @@ class OrbitControls extends EventDispatcher {
 					pan(-panOffsetX, -panOffsetY);
 				}
 				
-				followZoomFlag = true;
+				zoomToCursorFlag = true;
 			}
 		}
 
-		function notFollowZoom(event){
+		function notZoomToCursor(event){
 
 			if ( event.deltaY < 0 ) {
 	
@@ -670,12 +651,12 @@ class OrbitControls extends EventDispatcher {
 
 		function handleMouseWheel( event ) {
 
-			if(scope.enableFollowZoom){
+			if(scope.zoomToCursor){
 
-				followZoom(event);
+				zoomToCursor(event);
 
 			} else {
-				notFollowZoom(event);
+				notZoomToCursor(event);
 
 			}
 
