@@ -136,7 +136,7 @@ export const NodeList = [
 			{
 				name: 'Normalize',
 				icon: 'fold',
-				nodeClass: OperatorEditor
+				nodeClass: NormalizeEditor
 			}
 		]
 	},
@@ -508,41 +508,45 @@ export class NodeEditor extends EventDispatcher {
 
 			const object3d = this.scene;
 
-			object3d.traverse( ( obj3d ) => {
+			if ( object3d !== null ) {
 
-				if ( obj3d.isMesh === true ) {
+				object3d.traverse( ( obj3d ) => {
 
-					const button = new ButtonInput( `Mesh - ${obj3d.name}` );
-					button.setIcon( `ti ti-3d-cube-sphere` );
-					button.addEventListener( 'complete', () => {
+					if ( obj3d.isMesh === true ) {
 
-						for ( const node of this.canvas.nodes ) {
+						const button = new ButtonInput( `Mesh - ${obj3d.name}` );
+						button.setIcon( 'ti ti-3d-cube-sphere' );
+						button.addEventListener( 'complete', () => {
 
-							if ( node.value === obj3d ) {
+							for ( const node of this.canvas.nodes ) {
 
-								// not duplicated node
+								if ( node.value === obj3d ) {
 
-								this.canvas.select( node );
+									// not duplicated node
 
-								return;
+									this.canvas.select( node );
+
+									return;
+
+								}
 
 							}
 
-						}
+							const node = new MeshEditor( obj3d );
 
-						const node = new MeshEditor( obj3d );
+							this.add( node );
 
-						this.add( node );
+							this.centralizeNode( node );
 
-						this.centralizeNode( node );
+						} );
 
-					} );
+						search.add( button );
 
-					search.add( button );
+					}
 
-				}
+				} );
 
-			} );
+			}
 
 		} );
 
