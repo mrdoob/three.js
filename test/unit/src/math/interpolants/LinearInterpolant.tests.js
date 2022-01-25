@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { LinearInterpolant } from '../../../../../src/math/interpolants/LinearInterpolant';
+import { LinearInterpolant } from '../../../../../src/math/interpolants/LinearInterpolant.js';
 
 export default QUnit.module( 'Maths', () => {
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { CurvePath } from '../../../../../src/extras/core/CurvePath';
+import { CurvePath } from '../../../../../src/extras/core/CurvePath.js';
 
 export default QUnit.module( 'Extras', () => {
 

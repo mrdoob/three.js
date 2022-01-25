@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { DataTextureLoader } from '../../../../src/loaders/DataTextureLoader';
+import { DataTextureLoader } from '../../../../src/loaders/DataTextureLoader.js';
 
 export default QUnit.module( 'Loaders', () => {
 

@@ -1,10 +1,10 @@
 /* global QUnit */
 
-import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils';
+import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { TriangleStripDrawMode, TriangleFanDrawMode } from '../../../../src/constants';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { TriangleStripDrawMode, TriangleFanDrawMode } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Utils', () => {
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { LineLoop } from '../../../../src/objects/LineLoop';
+import { LineLoop } from '../../../../src/objects/LineLoop.js';
 
 export default QUnit.module( 'Objects', () => {
 

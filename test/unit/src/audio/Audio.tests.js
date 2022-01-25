@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Audio } from '../../../../src/audio/Audio';
+import { Audio } from '../../../../src/audio/Audio.js';
 
 export default QUnit.module( 'Audios', () => {
 

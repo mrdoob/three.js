@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterleavedBuffer';
+import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterleavedBuffer.js';
 
 export default QUnit.module( 'Core', () => {
 

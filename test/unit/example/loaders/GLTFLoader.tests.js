@@ -1,18 +1,18 @@
 /* global QUnit */
 
-import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
-import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader';
+import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter.js';
+import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 
-import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
-import { Mesh } from '../../../../src/objects/Mesh';
-import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial';
-import { Object3D } from '../../../../src/core/Object3D';
-import { Scene } from '../../../../src/scenes/Scene';
-import { DataTexture } from '../../../../src/textures/DataTexture';
-import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Scene } from '../../../../src/scenes/Scene.js';
+import { DataTexture } from '../../../../src/textures/DataTexture.js';
+import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack.js';
 
 export default QUnit.module( 'Loaders', () => {
 

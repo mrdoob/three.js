@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { SplineCurve } from '../../../../../src/extras/curves/SplineCurve';
-import { Vector2 } from '../../../../../src/math/Vector2';
+import { SplineCurve } from '../../../../../src/extras/curves/SplineCurve.js';
+import { Vector2 } from '../../../../../src/math/Vector2.js';
 
 export default QUnit.module( 'Extras', () => {
 

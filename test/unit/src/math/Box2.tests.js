@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { Box2 } from '../../../../src/math/Box2';
-import { Vector2 } from '../../../../src/math/Vector2';
+import { Box2 } from '../../../../src/math/Box2.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
 import {
 	negInf2,
 	posInf2,
@@ -9,7 +9,7 @@ import {
 	zero2,
 	one2,
 	two2
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 export default QUnit.module( 'Maths', () => {
 

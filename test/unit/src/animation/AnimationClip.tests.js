@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { AnimationClip } from '../../../../src/animation/AnimationClip';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
 
 export default QUnit.module( 'Animation', () => {
 

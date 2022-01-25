@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { PolarGridHelper } from '../../../../src/helpers/PolarGridHelper';
+import { PolarGridHelper } from '../../../../src/helpers/PolarGridHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { AnimationAction } from '../../../../src/animation/AnimationAction';
-import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
-import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
-import { Object3D } from '../../../../src/core/Object3D';
-import { LoopOnce, LoopRepeat, LoopPingPong } from '../../../../src/constants';
+import { AnimationAction } from '../../../../src/animation/AnimationAction.js';
+import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { LoopOnce, LoopRepeat, LoopPingPong } from '../../../../src/constants.js';
 
 
 function createAnimation() {
