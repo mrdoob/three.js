@@ -144,7 +144,7 @@ class OrbitControls extends EventDispatcher {
 			scope.object.updateProjectionMatrix();
 			scope.dispatchEvent( _changeEvent );
 
-			updateInternal();
+			_update();
 
 			state = STATE.NONE;
 
@@ -158,7 +158,7 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
-			return updateInternal();
+			return _update();
 
 		};
 
@@ -228,7 +228,7 @@ class OrbitControls extends EventDispatcher {
 		const pointers = [];
 		const pointerPositions = {};
 
-		const updateInternal = function () {
+		const _update = function () {
 
 			const offset = new Vector3();
 
@@ -241,7 +241,7 @@ class OrbitControls extends EventDispatcher {
 
 			const twoPI = 2 * Math.PI;
 
-			return function updateInternal() {
+			return function _update() {
 
 				const position = scope.object.position;
 
@@ -546,7 +546,7 @@ class OrbitControls extends EventDispatcher {
 
 			rotateStart.copy( rotateEnd );
 
-			updateInternal();
+			_update();
 
 		}
 
@@ -568,7 +568,7 @@ class OrbitControls extends EventDispatcher {
 
 			dollyStart.copy( dollyEnd );
 
-			updateInternal();
+			_update();
 
 		}
 
@@ -582,7 +582,7 @@ class OrbitControls extends EventDispatcher {
 
 			panStart.copy( panEnd );
 
-			updateInternal();
+			_update();
 
 		}
 
@@ -598,7 +598,7 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
-			updateInternal();
+			_update();
 
 		}
 
@@ -635,7 +635,7 @@ class OrbitControls extends EventDispatcher {
 				// prevent the browser from scrolling on cursor keys
 				event.preventDefault();
 
-				updateInternal();
+				_update();
 
 			}
 
@@ -1115,7 +1115,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMoveRotate( event );
 
-					updateInternal();
+					_update();
 
 					break;
 
@@ -1125,7 +1125,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMovePan( event );
 
-					updateInternal();
+					_update();
 
 					break;
 
@@ -1135,7 +1135,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMoveDollyPan( event );
 
-					updateInternal();
+					_update();
 
 					break;
 
@@ -1145,7 +1145,7 @@ class OrbitControls extends EventDispatcher {
 
 					handleTouchMoveDollyRotate( event );
 
-					updateInternal();
+					_update();
 
 					break;
 
@@ -1221,7 +1221,7 @@ class OrbitControls extends EventDispatcher {
 
 		// force an update at start
 
-		updateInternal();
+		_update();
 
 	}
 
