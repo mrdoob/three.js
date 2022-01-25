@@ -24,7 +24,7 @@ class MathNode extends TempNode {
 
 				return this.b ? 2 : 1;
 
-				// 3
+			// 3
 
 			case MathNode.MIX:
 			case MathNode.CLAMP:
@@ -34,7 +34,7 @@ class MathNode extends TempNode {
 
 				return 3;
 
-				// 2
+			// 2
 
 			case MathNode.MIN:
 			case MathNode.MAX:
@@ -48,7 +48,7 @@ class MathNode extends TempNode {
 
 				return 2;
 
-				// 1
+			// 1
 
 			default:
 

@@ -14,7 +14,7 @@ export class NormalEditor extends BaseNode {
 			{ name: 'Local', value: NormalNode.LOCAL },
 			{ name: 'World', value: NormalNode.WORLD },
 			{ name: 'View', value: NormalNode.VIEW },
-			{ name: 'Geometry', value: NormalNode.GEOMETRY },
+			{ name: 'Geometry', value: NormalNode.GEOMETRY }
 		], NormalNode.LOCAL ).onChange( () => {
 
 			node.scope = optionsField.getValue();

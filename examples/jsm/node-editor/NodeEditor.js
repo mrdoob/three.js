@@ -354,7 +354,11 @@ export class NodeEditor extends EventDispatcher {
 
 		newButton.onClick( () => {
 
-			if ( confirm( 'are you sure' ) ) this.newProject();
+			if ( confirm( 'Are you sure?' ) === true ) {
+
+				this.newProject();
+
+			}
 
 		} );
 
