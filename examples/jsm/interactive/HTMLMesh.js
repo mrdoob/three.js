@@ -29,6 +29,20 @@ class HTMLMesh extends Mesh {
 		this.addEventListener( 'mouseup', onEvent );
 		this.addEventListener( 'click', onEvent );
 
+		this.dispose = function () {
+
+			geometry.dispose();
+			material.dispose();
+
+			material.map.dispose();
+
+			this.removeEventListener( 'mousedown', onEvent );
+			this.removeEventListener( 'mousemove', onEvent );
+			this.removeEventListener( 'mouseup', onEvent );
+			this.removeEventListener( 'click', onEvent );
+
+		};
+
 	}
 
 }
