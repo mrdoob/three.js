@@ -1,13 +1,13 @@
 /* global QUnit */
 
-import { Vector2 } from '../../../../src/math/Vector2';
-import { Matrix3 } from '../../../../src/math/Matrix3';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Matrix3 } from '../../../../src/math/Matrix3.js';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import {
 	x,
 	y,
 	eps
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 export default QUnit.module( 'Maths', () => {
 

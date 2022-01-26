@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Line } from '../../../../src/objects/Line';
+import { Line } from '../../../../src/objects/Line.js';
 
 export default QUnit.module( 'Objects', () => {
 

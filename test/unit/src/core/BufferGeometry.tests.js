@@ -1,21 +1,17 @@
 /* global QUnit */
 
-import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import {
 	BufferAttribute,
 	Uint16BufferAttribute,
 	Uint32BufferAttribute
-} from '../../../../src/core/BufferAttribute';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import { Sphere } from '../../../../src/math/Sphere';
-import {
-	x,
-	y,
-	z
-} from '../math/Constants.tests';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
+} from '../../../../src/core/BufferAttribute.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import { Sphere } from '../../../../src/math/Sphere.js';
+import { x, y, z } from '../math/Constants.tests.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 var DegToRad = Math.PI / 180;
 

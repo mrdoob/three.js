@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLightHelper';
+import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLightHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

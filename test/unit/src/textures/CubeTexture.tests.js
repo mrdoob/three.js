@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { CubeTexture } from '../../../../src/textures/CubeTexture';
+import { CubeTexture } from '../../../../src/textures/CubeTexture.js';
 
 export default QUnit.module( 'Textures', () => {
 

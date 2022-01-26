@@ -1,19 +1,19 @@
 /* global QUnit */
 
-import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
+import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter.js';
 
-import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
-import { Mesh } from '../../../../src/objects/Mesh';
-import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
-import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial';
-import { Object3D } from '../../../../src/core/Object3D';
-import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
-import { Scene } from '../../../../src/scenes/Scene';
-import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
+import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+import { Scene } from '../../../../src/scenes/Scene.js';
+import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack.js';
 import {
 	DoubleSide,
 	InterpolateLinear,

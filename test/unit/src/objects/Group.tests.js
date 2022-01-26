@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Group } from '../../../../src/objects/Group';
+import { Group } from '../../../../src/objects/Group.js';
 
 export default QUnit.module( 'Objects', () => {
 

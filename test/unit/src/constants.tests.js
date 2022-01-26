@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import * as Constants from '../../../src/constants';
+import * as Constants from '../../../src/constants.js';
 
 export default QUnit.module( 'Constants', () => {
 
@@ -84,7 +84,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.HalfFloatType, 1016, 'HalfFloatType is equal to 1016' );
 		assert.equal( Constants.UnsignedShort4444Type, 1017, 'UnsignedShort4444Type is equal to 1017' );
 		assert.equal( Constants.UnsignedShort5551Type, 1018, 'UnsignedShort5551Type is equal to 1018' );
-		assert.equal( Constants.UnsignedShort565Type, 1019, 'UnsignedShort565Type is equal to 1019' );
 		assert.equal( Constants.UnsignedInt248Type, 1020, 'UnsignedInt248Type is equal to 1020' );
 		assert.equal( Constants.AlphaFormat, 1021, 'AlphaFormat is equal to 1021' );
 		assert.equal( Constants.RGBAFormat, 1023, 'RGBAFormat is equal to 1023' );

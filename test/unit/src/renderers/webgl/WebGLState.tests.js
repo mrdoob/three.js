@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLState } from '../../../../../src/renderers/webgl/WebGLState';
+import { WebGLState } from '../../../../../src/renderers/webgl/WebGLState.js';
 
 export default QUnit.module( 'Renderers', () => {
 

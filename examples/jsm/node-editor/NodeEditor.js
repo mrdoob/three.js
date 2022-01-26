@@ -6,6 +6,7 @@ import { InvertEditor } from './math/InvertEditor.js';
 import { LimiterEditor } from './math/LimiterEditor.js';
 import { DotEditor } from './math/DotEditor.js';
 import { PowerEditor } from './math/PowerEditor.js';
+import { AngleEditor } from './math/AngleEditor.js';
 import { TrigonometryEditor } from './math/TrigonometryEditor.js';
 import { FloatEditor } from './inputs/FloatEditor.js';
 import { Vector2Editor } from './inputs/Vector2Editor.js';
@@ -130,13 +131,19 @@ export const NodeList = [
 			{
 				name: 'Trigonometry',
 				icon: 'wave-sine',
-				tip: 'Sin / Cos / Tan',
+				tip: 'Sin / Cos / Tan / ...',
 				nodeClass: TrigonometryEditor
+			},
+			{
+				name: 'Angle',
+				icon: 'angle',
+				tip: 'Degress / Radians',
+				nodeClass: AngleEditor
 			},
 			{
 				name: 'Normalize',
 				icon: 'fold',
-				nodeClass: OperatorEditor
+				nodeClass: NormalizeEditor
 			}
 		]
 	},
@@ -210,6 +217,7 @@ export const ClassLib = {
 	LimiterEditor,
 	DotEditor,
 	PowerEditor,
+	AngleEditor,
 	TrigonometryEditor,
 	FloatEditor,
 	Vector2Editor,
@@ -344,7 +352,15 @@ export class NodeEditor extends EventDispatcher {
 		menuButton.onClick( () => this.nodesContext.open() );
 		examplesButton.onClick( () => this.examplesContext.open() );
 
-		newButton.onClick( () => this.newProject() );
+		newButton.onClick( () => {
+
+			if ( confirm( 'Are you sure?' ) === true ) {
+
+				this.newProject();
+
+			}
+
+		} );
 
 		openButton.onClick( () => {
 
@@ -504,41 +520,45 @@ export class NodeEditor extends EventDispatcher {
 
 			const object3d = this.scene;
 
-			object3d.traverse( ( obj3d ) => {
+			if ( object3d !== null ) {
 
-				if ( obj3d.isMesh === true ) {
+				object3d.traverse( ( obj3d ) => {
 
-					const button = new ButtonInput( `Mesh - ${obj3d.name}` );
-					button.setIcon( `ti ti-3d-cube-sphere` );
-					button.addEventListener( 'complete', () => {
+					if ( obj3d.isMesh === true ) {
 
-						for ( const node of this.canvas.nodes ) {
+						const button = new ButtonInput( `Mesh - ${obj3d.name}` );
+						button.setIcon( 'ti ti-3d-cube-sphere' );
+						button.addEventListener( 'complete', () => {
 
-							if ( node.value === obj3d ) {
+							for ( const node of this.canvas.nodes ) {
 
-								// not duplicated node
+								if ( node.value === obj3d ) {
 
-								this.canvas.select( node );
+									// not duplicated node
 
-								return;
+									this.canvas.select( node );
+
+									return;
+
+								}
 
 							}
 
-						}
+							const node = new MeshEditor( obj3d );
 
-						const node = new MeshEditor( obj3d );
+							this.add( node );
 
-						this.add( node );
+							this.centralizeNode( node );
 
-						this.centralizeNode( node );
+						} );
 
-					} );
+						search.add( button );
 
-					search.add( button );
+					}
 
-				}
+				} );
 
-			} );
+			}
 
 		} );
 

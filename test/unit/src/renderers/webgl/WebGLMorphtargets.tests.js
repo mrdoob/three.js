@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLMorphtargets } from '../../../../../src/renderers/webgl/WebGLMorphtargets';
+import { WebGLMorphtargets } from '../../../../../src/renderers/webgl/WebGLMorphtargets.js';
 
 export default QUnit.module( 'Renderers', () => {
 

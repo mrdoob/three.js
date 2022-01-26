@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { PlaneHelper } from '../../../../src/helpers/PlaneHelper';
+import { PlaneHelper } from '../../../../src/helpers/PlaneHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Sprite } from '../../../../src/objects/Sprite';
+import { Sprite } from '../../../../src/objects/Sprite.js';
 
 export default QUnit.module( 'Objects', () => {
 

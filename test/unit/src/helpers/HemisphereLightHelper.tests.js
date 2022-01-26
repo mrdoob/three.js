@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { HemisphereLightHelper } from '../../../../src/helpers/HemisphereLightHelper';
+import { HemisphereLightHelper } from '../../../../src/helpers/HemisphereLightHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { GridHelper } from '../../../../src/helpers/GridHelper';
+import { GridHelper } from '../../../../src/helpers/GridHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

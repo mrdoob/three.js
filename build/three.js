@@ -28434,7 +28434,10 @@
 				headers: new Headers(this.requestHeader),
 				credentials: this.withCredentials ? 'include' : 'same-origin' // An abort controller could be added within a future PR
 
-			}); // start the fetch
+			}); // record states ( avoid data race )
+
+			const mimeType = this.mimeType;
+			const responseType = this.responseType; // start the fetch
 
 			fetch(req).then(response => {
 				if (response.status === 200 || response.status === 0) {
@@ -28492,7 +28495,7 @@
 					throw Error(`fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`);
 				}
 			}).then(response => {
-				switch (this.responseType) {
+				switch (responseType) {
 					case 'arraybuffer':
 						return response.arrayBuffer();
 
@@ -28502,14 +28505,24 @@
 					case 'document':
 						return response.text().then(text => {
 							const parser = new DOMParser();
-							return parser.parseFromString(text, this.mimeType);
+							return parser.parseFromString(text, mimeType);
 						});
 
 					case 'json':
 						return response.json();
 
 					default:
-						return response.text();
+						if (mimeType === undefined) {
+							return response.text();
+						} else {
+							// sniff encoding
+							const re = /charset="?([^;"\s]*)"?/i;
+							const exec = re.exec(mimeType);
+							const label = exec && exec[1] ? exec[1].toLowerCase() : undefined;
+							const decoder = new TextDecoder(label);
+							return response.arrayBuffer().then(ab => decoder.decode(ab));
+						}
+
 				}
 			}).then(data => {
 				// Add to cache only on HTTP success, so that we do not cache

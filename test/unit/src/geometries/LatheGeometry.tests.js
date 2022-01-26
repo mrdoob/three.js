@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { LatheGeometry, LatheBufferGeometry } from '../../../../src/geometries/LatheGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { LatheGeometry, LatheBufferGeometry } from '../../../../src/geometries/LatheGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 

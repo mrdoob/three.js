@@ -1,6 +1,6 @@
 import { NumberInput, StringInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { Mesh, MathUtils, Vector3} from '../../../../build/three.module.js';
+import { Mesh, MathUtils, Vector3 } from 'three';
 
 export class MeshEditor extends BaseNode {
 
@@ -35,9 +35,9 @@ export class MeshEditor extends BaseNode {
 	setEditor( editor ) {
 
 		if ( this.editor ) {
-			
+
 			this._restoreDefault();
-			
+
 		}
 
 		super.setEditor( editor );
@@ -148,7 +148,7 @@ export class MeshEditor extends BaseNode {
 		const mesh = this.mesh;
 
 		if ( mesh ) {
-			
+
 			const { position, rotation, scale } = mesh;
 
 			position.x = this.posX.getValue();
@@ -158,17 +158,17 @@ export class MeshEditor extends BaseNode {
 			rotation.x = MathUtils.degToRad( this.rotX.getValue() );
 			rotation.y = MathUtils.degToRad( this.rotY.getValue() );
 			rotation.z = MathUtils.degToRad( this.rotZ.getValue() );
-			
+
 			scale.x = this.scaleX.getValue() / 100;
 			scale.y = this.scaleY.getValue() / 100;
 			scale.z = this.scaleZ.getValue() / 100;
-			
+
 			mesh.material = this.material || this.defaultMaterial;
 
 		}
 
 	}
-	
+
 	updateDefault() {
 
 		const { material, position, rotation, scale } = this.mesh;
@@ -182,9 +182,9 @@ export class MeshEditor extends BaseNode {
 		this._restoreDefault();
 
 	}
-	
+
 	_restoreDefault() {
-		
+
 		const position = this.defaultPosition;
 		const rotation = this.defaultRotation;
 		const scale = this.defaultScale;
@@ -200,9 +200,9 @@ export class MeshEditor extends BaseNode {
 		this.scaleX.setValue( scale.x );
 		this.scaleY.setValue( scale.y );
 		this.scaleZ.setValue( scale.z );
-		
+
 		this.mesh.material = this.defaultMaterial;
-		
+
 	}
 
 }

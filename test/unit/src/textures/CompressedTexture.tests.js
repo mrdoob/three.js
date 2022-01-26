@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { CompressedTexture } from '../../../../src/textures/CompressedTexture';
+import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
 
 export default QUnit.module( 'Textures', () => {
 

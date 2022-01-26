@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Material } from '../../../../src/materials/Material';
+import { Material } from '../../../../src/materials/Material.js';
 
 export default QUnit.module( 'Materials', () => {
 
