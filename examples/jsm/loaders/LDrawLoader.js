@@ -1729,6 +1729,7 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 			}
 
 			const material = elem.material;
+
 			if ( material !== null ) {
 
 				if ( elementSize === 3 ) {
@@ -1737,21 +1738,13 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 				} else if ( elementSize === 2 ) {
 
-					if ( material !== null ) {
+					if ( isConditionalSegments ) {
 
-						if ( isConditionalSegments ) {
-
-							materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
-
-						} else {
-
-							materials.push( material.userData.edgeMaterial );
-
-						}
+						materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
 
 					} else {
 
-						materials.push( null );
+						materials.push( material.userData.edgeMaterial );
 
 					}
 
