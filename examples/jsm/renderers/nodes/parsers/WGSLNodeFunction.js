@@ -67,20 +67,31 @@ const parse = ( source ) => {
 
 class WGSLNodeFunction extends NodeFunction {
 
-	constructor( source ) {
+	constructor( ) {
 
-		const { type, inputs, name, inputsCode, blockCode } = parse( source );
+		super();
 
-		super( type, inputs, name );
+	}
 
-		this.inputsCode = inputsCode;
-		this.blockCode = blockCode;
+	fromSource( source ) {
+
+		const { type, inputs, blockCode, name } = parse( source );
+
+		this.set( type, inputs, blockCode, name );
+
+		return this;
 
 	}
 
 	getCode( name = this.name ) {
 
-		return `fn ${ name } ( ${ this.inputsCode.trim() } ) -> ${ this.type }` + this.blockCode;
+		const inputsCode = this.inputs.map( ( { type, name } )=> {
+
+			return `${type} ${name}`;
+
+		} ).join( ', ' );
+
+		return `fn ${ name } ( ${ inputsCode.trim() } ) -> ${ this.type }` + this.blockCode;
 
 	}
 

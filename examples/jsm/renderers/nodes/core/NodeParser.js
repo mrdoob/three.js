@@ -1,6 +1,13 @@
 class NodeParser {
 
-	parseFunction( /*source*/ ) {
+
+	parseFunction( source ) {
+
+		return this.createNodeFunction( ).fromSource( source );
+
+	}
+
+	createNodeFunction( ) {
 
 		console.warn( 'Abstract function.' );
 

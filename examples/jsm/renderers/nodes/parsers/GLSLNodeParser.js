@@ -3,9 +3,9 @@ import GLSLNodeFunction from './GLSLNodeFunction.js';
 
 class GLSLNodeParser extends NodeParser {
 
-	parseFunction( source ) {
+	createNodeFunction( ) {
 
-		return new GLSLNodeFunction( source );
+		return new GLSLNodeFunction( );
 
 	}
 

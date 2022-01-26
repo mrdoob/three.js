@@ -103,15 +103,20 @@ const parse = ( source ) => {
 
 class GLSLNodeFunction extends NodeFunction {
 
-	constructor( source ) {
+	constructor( ) {
 
-		const { type, inputs, name, presicion, inputsCode, blockCode, headerCode } = parse( source );
+		super();
 
-		super( type, inputs, name, presicion );
+	}
 
-		this.inputsCode = inputsCode;
-		this.blockCode = blockCode;
-		this.headerCode = headerCode;
+	fromSource( source ) {
+
+		const { type, inputs, blockCode, name, presicion, headerCode } = parse( source );
+
+		this.set( type, inputs, blockCode, name, presicion, headerCode );
+
+
+		return this;
 
 	}
 
@@ -120,7 +125,14 @@ class GLSLNodeFunction extends NodeFunction {
 		const headerCode = this.headerCode;
 		const presicion = this.presicion;
 
-		let declarationCode = `${ this.type } ${ name } ( ${ this.inputsCode.trim() } )`;
+
+		const inputsCode = this.inputs.map( ( { type, name, count, qualifier, isconst } ) => {
+
+			return ( isconst ? 'const' : '' ) + `${qualifier} ${type} ${name}` + ( count > 1 ? `[${count}]` : '' );
+
+		} ).join( ', ' );
+
+		let declarationCode = `${ this.type } ${ name } ( ${ inputsCode.trim() } )`;
 
 		if ( presicion !== '' ) {
 

@@ -3,9 +3,9 @@ import WGSLNodeFunction from './WGSLNodeFunction.js';
 
 class WGSLNodeParser extends NodeParser {
 
-	parseFunction( source ) {
+	createNodeFunction( ) {
 
-		return new WGSLNodeFunction( source );
+		return new WGSLNodeFunction( );
 
 	}
 
