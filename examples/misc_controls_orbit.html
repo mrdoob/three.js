@@ -77,7 +77,7 @@
 
 				controls.maxPolarAngle = Math.PI / 2;
 
-				controls.enableFollowZoom = true;
+				controls.zoomToCursor = true; // require controls.update()
 
 				// world
 
@@ -128,7 +128,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true, or if controls.zoomToCursor = true;
 
 				render();
 
