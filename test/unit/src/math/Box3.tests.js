@@ -602,13 +602,12 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
-			var c = new Box3( one3.clone().negate(), one3.clone() );
-			var d = new Box3( one3.clone().negate(), zero3.clone() );
+			var c = new Box3( one3.clone().negate(), zero3.clone() );
 
 			assert.ok( a.clone().translate( one3 ).equals( new Box3( one3, one3 ) ), 'Passed!' );
 			assert.ok( a.clone().translate( one3 ).translate( one3.clone().negate() ).equals( a ), 'Passed!' );
-			assert.ok( d.clone().translate( one3 ).equals( b ), 'Passed!' );
-			assert.ok( b.clone().translate( one3.clone().negate() ).equals( d ), 'Passed!' );
+			assert.ok( c.clone().translate( one3 ).equals( b ), 'Passed!' );
+			assert.ok( b.clone().translate( one3.clone().negate() ).equals( c ), 'Passed!' );
 
 		} );
 

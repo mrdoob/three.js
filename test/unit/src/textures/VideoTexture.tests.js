@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { VideoTexture } from '../../../../src/textures/VideoTexture.js';
+// import { VideoTexture } from '../../../../src/textures/VideoTexture.js';
 
 export default QUnit.module( 'Textures', () => {
 

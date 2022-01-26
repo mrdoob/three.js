@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { FogExp2 } from '../../../../src/scenes/FogExp2.js';
+// import { FogExp2 } from '../../../../src/scenes/FogExp2.js';
 
 export default QUnit.module( 'FoxExp2', () => {
 

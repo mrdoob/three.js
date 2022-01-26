@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { SpotLightHelper } from '../../../../src/helpers/SpotLightHelper.js';
+// import { SpotLightHelper } from '../../../../src/helpers/SpotLightHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

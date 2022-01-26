@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper.js';
+// import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

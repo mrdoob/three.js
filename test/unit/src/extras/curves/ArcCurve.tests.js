@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ArcCurve } from '../../../../../src/extras/curves/ArcCurve.js';
+// import { ArcCurve } from '../../../../../src/extras/curves/ArcCurve.js';
 
 export default QUnit.module( 'Extras', () => {
 

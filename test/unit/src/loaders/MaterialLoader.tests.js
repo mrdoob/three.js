@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { MaterialLoader } from '../../../../src/loaders/MaterialLoader.js';
+// import { MaterialLoader } from '../../../../src/loaders/MaterialLoader.js';
 
 export default QUnit.module( 'Loaders', () => {
 
