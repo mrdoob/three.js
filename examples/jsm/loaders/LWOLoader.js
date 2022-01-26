@@ -37,7 +37,7 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	Vector2
-} from '../../../build/three.module.js';
+} from 'three';
 
 import { IFFParser } from './lwo/IFFParser.js';
 

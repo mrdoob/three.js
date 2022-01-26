@@ -5,7 +5,7 @@ import {
 	MeshBasicMaterial,
 	PlaneGeometry,
 	sRGBEncoding
-} from '../../../build/three.module.js';
+} from 'three';
 
 class HTMLMesh extends Mesh {
 
@@ -20,7 +20,7 @@ class HTMLMesh extends Mesh {
 
 		function onEvent( event ) {
 
-			material.map.dispatchEvent( event );
+			material.map.dispatchDOMEvent( event );
 
 		}
 
@@ -28,6 +28,20 @@ class HTMLMesh extends Mesh {
 		this.addEventListener( 'mousemove', onEvent );
 		this.addEventListener( 'mouseup', onEvent );
 		this.addEventListener( 'click', onEvent );
+
+		this.dispose = function () {
+
+			geometry.dispose();
+			material.dispose();
+
+			material.map.dispose();
+
+			this.removeEventListener( 'mousedown', onEvent );
+			this.removeEventListener( 'mousemove', onEvent );
+			this.removeEventListener( 'mouseup', onEvent );
+			this.removeEventListener( 'click', onEvent );
+
+		};
 
 	}
 
@@ -48,7 +62,7 @@ class HTMLTexture extends CanvasTexture {
 
 	}
 
-	dispatchEvent( event ) {
+	dispatchDOMEvent( event ) {
 
 		htmlevent( this.dom, event.type, event.data.x, event.data.y );
 

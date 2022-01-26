@@ -8,12 +8,12 @@ import {
 	InterleavedBufferAttribute,
 	Mesh,
 	MeshBasicMaterial,
-	RGBFormat,
 	RawShaderMaterial,
 	Vector2,
 	Vector3,
-	Vector4
-} from '../../../build/three.module.js';
+	Vector4,
+	RGBAFormat
+} from 'three';
 
 class Lensflare extends Mesh {
 
@@ -32,8 +32,8 @@ class Lensflare extends Mesh {
 
 		// textures
 
-		const tempMap = new FramebufferTexture( 16, 16, RGBFormat );
-		const occlusionMap = new FramebufferTexture( 16, 16, RGBFormat );
+		const tempMap = new FramebufferTexture( 16, 16, RGBAFormat );
+		const occlusionMap = new FramebufferTexture( 16, 16, RGBAFormat );
 
 		// material
 

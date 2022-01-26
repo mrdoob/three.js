@@ -14,7 +14,7 @@
 
 			function onEvent( event ) {
 
-				material.map.dispatchEvent( event );
+				material.map.dispatchDOMEvent( event );
 
 			}
 
@@ -22,6 +22,18 @@
 			this.addEventListener( 'mousemove', onEvent );
 			this.addEventListener( 'mouseup', onEvent );
 			this.addEventListener( 'click', onEvent );
+
+			this.dispose = function () {
+
+				geometry.dispose();
+				material.dispose();
+				material.map.dispose();
+				this.removeEventListener( 'mousedown', onEvent );
+				this.removeEventListener( 'mousemove', onEvent );
+				this.removeEventListener( 'mouseup', onEvent );
+				this.removeEventListener( 'click', onEvent );
+
+			};
 
 		}
 
@@ -40,7 +52,7 @@
 
 		}
 
-		dispatchEvent( event ) {
+		dispatchDOMEvent( event ) {
 
 			htmlevent( this.dom, event.type, event.data.x, event.data.y );
 			this.update();

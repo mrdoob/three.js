@@ -512,7 +512,7 @@
 			const oldIframe = iframe;
 			iframe = oldIframe.cloneNode();
 
-			if ( hash ) {
+			if ( hash && titles[ splitHash[ 0 ] ] ) {
 
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';

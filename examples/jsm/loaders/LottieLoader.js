@@ -3,7 +3,7 @@ import {
 	Loader,
 	CanvasTexture,
 	NearestFilter
-} from '../../../build/three.module.js';
+} from 'three';
 
 class LottieLoader extends Loader {
 

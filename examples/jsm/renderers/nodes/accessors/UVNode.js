@@ -2,19 +2,19 @@ import AttributeNode from '../core/AttributeNode.js';
 
 class UVNode extends AttributeNode {
 
-	constructor( value = 0 ) {
+	constructor( index = 0 ) {
 
 		super( null, 'vec2' );
 
-		this.value = value;
+		this.index = index;
 
 	}
 
 	getAttributeName( /*builder*/ ) {
 
-		const value = this.value;
+		const index = this.index;
 
-		return 'uv' + ( value > 0 ? value + 1 : '' );
+		return 'uv' + ( index > 0 ? index + 1 : '' );
 
 	}
 

@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { UICheckbox, UINumber, UIRow, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';

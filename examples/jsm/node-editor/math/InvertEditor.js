@@ -1,9 +1,10 @@
-import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
 import { MathNode, FloatNode } from '../../renderers/nodes/Nodes.js';
 
 const DEFAULT_VALUE = new FloatNode();
 
-export class InvertEditor extends ObjectNode {
+export class InvertEditor extends BaseNode {
 
 	constructor() {
 
@@ -26,7 +27,7 @@ export class InvertEditor extends ObjectNode {
 
 		input.onConnect( () => {
 
-			node.aNode = input.linkedExtra || DEFAULT_VALUE;
+			node.aNode = input.getLinkedObject() || DEFAULT_VALUE;
 
 		} );
 

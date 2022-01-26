@@ -64,9 +64,21 @@
 		</div>
 		<div id="menu"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
@@ -86,31 +98,31 @@
 			let visualizationType = 2;
 
 			const MOLECULES = {
-				"Ethanol": "ethanol.pdb",
-				"Aspirin": "aspirin.pdb",
-				"Caffeine": "caffeine.pdb",
-				"Nicotine": "nicotine.pdb",
-				"LSD": "lsd.pdb",
-				"Cocaine": "cocaine.pdb",
-				"Cholesterol": "cholesterol.pdb",
-				"Lycopene": "lycopene.pdb",
-				"Glucose": "glucose.pdb",
-				"Aluminium oxide": "Al2O3.pdb",
-				"Cubane": "cubane.pdb",
-				"Copper": "cu.pdb",
-				"Fluorite": "caf2.pdb",
-				"Salt": "nacl.pdb",
-				"YBCO superconductor": "ybco.pdb",
-				"Buckyball": "buckyball.pdb",
-				//"Diamond": "diamond.pdb",
-				"Graphite": "graphite.pdb"
+				'Ethanol': 'ethanol.pdb',
+				'Aspirin': 'aspirin.pdb',
+				'Caffeine': 'caffeine.pdb',
+				'Nicotine': 'nicotine.pdb',
+				'LSD': 'lsd.pdb',
+				'Cocaine': 'cocaine.pdb',
+				'Cholesterol': 'cholesterol.pdb',
+				'Lycopene': 'lycopene.pdb',
+				'Glucose': 'glucose.pdb',
+				'Aluminium oxide': 'Al2O3.pdb',
+				'Cubane': 'cubane.pdb',
+				'Copper': 'cu.pdb',
+				'Fluorite': 'caf2.pdb',
+				'Salt': 'nacl.pdb',
+				'YBCO superconductor': 'ybco.pdb',
+				'Buckyball': 'buckyball.pdb',
+				// 'Diamond': 'diamond.pdb',
+				'Graphite': 'graphite.pdb'
 			};
 
 			const loader = new PDBLoader();
 			const colorSpriteMap = {};
 			const baseSprite = document.createElement( 'img' );
 
-			const menu = document.getElementById( "menu" );
+			const menu = document.getElementById( 'menu' );
 
 			init();
 			animate();
@@ -140,7 +152,7 @@
 
 				baseSprite.onload = function () {
 
-					loadMolecule( "models/pdb/caffeine.pdb" );
+					loadMolecule( 'models/pdb/caffeine.pdb' );
 					createMenu();
 
 				};
@@ -173,15 +185,15 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					const url = "models/pdb/" + MOLECULES[ m ];
+					const url = 'models/pdb/' + MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ) );
 
 				}
 
-				const b_a = document.getElementById( "b_a" );
-				const b_b = document.getElementById( "b_b" );
-				const b_ab = document.getElementById( "b_ab" );
+				const b_a = document.getElementById( 'b_a' );
+				const b_b = document.getElementById( 'b_b' );
+				const b_ab = document.getElementById( 'b_ab' );
 
 				b_a.addEventListener( 'click', function () {
 
@@ -214,12 +226,12 @@
 
 					if ( object instanceof CSS3DSprite ) {
 
-						object.element.style.display = "";
+						object.element.style.display = '';
 						object.visible = true;
 
 					} else {
 
-						object.element.style.display = "none";
+						object.element.style.display = 'none';
 						object.visible = false;
 
 					}
@@ -236,12 +248,12 @@
 
 					if ( object instanceof CSS3DSprite ) {
 
-						object.element.style.display = "none";
+						object.element.style.display = 'none';
 						object.visible = false;
 
 					} else {
 
-						object.element.style.display = "";
+						object.element.style.display = '';
 						object.element.style.height = object.userData.bondLengthFull;
 						object.visible = true;
 
@@ -257,7 +269,7 @@
 
 					const object = objects[ i ];
 
-					object.element.style.display = "";
+					object.element.style.display = '';
 					object.visible = true;
 
 					if ( ! ( object instanceof CSS3DSprite ) ) {
@@ -397,15 +409,15 @@
 						//
 
 						let bond = document.createElement( 'div' );
-						bond.className = "bond";
-						bond.style.height = bondLength + "px";
+						bond.className = 'bond';
+						bond.style.height = bondLength + 'px';
 
 						let object = new CSS3DObject( bond );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 
-						object.userData.bondLengthShort = bondLength + "px";
-						object.userData.bondLengthFull = ( bondLength + 55 ) + "px";
+						object.userData.bondLengthShort = bondLength + 'px';
+						object.userData.bondLengthFull = ( bondLength + 55 ) + 'px';
 
 						//
 
@@ -426,8 +438,8 @@
 						//
 
 						bond = document.createElement( 'div' );
-						bond.className = "bond";
-						bond.style.height = bondLength + "px";
+						bond.className = 'bond';
+						bond.style.height = bondLength + 'px';
 
 						const joint = new THREE.Object3D( bond );
 						joint.position.copy( start );
@@ -445,8 +457,8 @@
 						object.matrixAutoUpdate = false;
 						object.updateMatrix();
 
-						object.userData.bondLengthShort = bondLength + "px";
-						object.userData.bondLengthFull = ( bondLength + 55 ) + "px";
+						object.userData.bondLengthShort = bondLength + 'px';
+						object.userData.bondLengthFull = ( bondLength + 55 ) + 'px';
 
 						object.userData.joint = joint;
 

@@ -13,18 +13,30 @@
 	</div>
 	<div id="inset"></div>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import { GUI } from './jsm/libs/lil-gui.module.min.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
 		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
-		import { WEBGL } from './jsm/WebGL.js';
+		import WebGL from './jsm/capabilities/WebGL.js';
 
-		if ( WEBGL.isWebGL2Available() === false ) {
+		if ( WebGL.isWebGL2Available() === false ) {
 
-			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+			document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
 
 		}
 
@@ -79,7 +91,7 @@
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
-			new NRRDLoader().load( "models/nrrd/stent.nrrd", function ( volume ) {
+			new NRRDLoader().load( 'models/nrrd/stent.nrrd', function ( volume ) {
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
@@ -103,12 +115,12 @@
 
 				const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "u_data" ].value = texture;
-				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
-				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-				uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
-				uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
+				uniforms[ 'u_data' ].value = texture;
+				uniforms[ 'u_size' ].value.set( volume.xLength, volume.yLength, volume.zLength );
+				uniforms[ 'u_clim' ].value.set( volconfig.clim1, volconfig.clim2 );
+				uniforms[ 'u_renderstyle' ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+				uniforms[ 'u_renderthreshold' ].value = volconfig.isothreshold; // For ISO renderstyle
+				uniforms[ 'u_cmdata' ].value = cmtextures[ volconfig.colormap ];
 
 				material = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
@@ -134,10 +146,10 @@
 
 		function updateUniforms() {
 
-			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
-			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
+			material.uniforms[ 'u_clim' ].value.set( volconfig.clim1, volconfig.clim2 );
+			material.uniforms[ 'u_renderstyle' ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+			material.uniforms[ 'u_renderthreshold' ].value = volconfig.isothreshold; // For ISO renderstyle
+			material.uniforms[ 'u_cmdata' ].value = cmtextures[ volconfig.colormap ];
 
 			render();
 
