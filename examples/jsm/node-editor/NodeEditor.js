@@ -1,5 +1,7 @@
 import { Styles, Canvas, CircleMenu, ButtonInput, ContextMenu, Tips, Search, Loader } from '../libs/flow.module.js';
+import { BasicMaterialEditor } from './materials/BasicMaterialEditor.js';
 import { StandardMaterialEditor } from './materials/StandardMaterialEditor.js';
+import { PointsMaterialEditor } from './materials/PointsMaterialEditor.js';
 import { OperatorEditor } from './math/OperatorEditor.js';
 import { NormalizeEditor } from './math/NormalizeEditor.js';
 import { InvertEditor } from './math/InvertEditor.js';
@@ -23,6 +25,7 @@ import { OscillatorEditor } from './utils/OscillatorEditor.js';
 import { SplitEditor } from './utils/SplitEditor.js';
 import { JoinEditor } from './utils/JoinEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
+import { PointsEditor } from './scene/PointsEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
 import { EventDispatcher } from 'three';
 
@@ -200,16 +203,29 @@ export const NodeList = [
 		icon: 'circles',
 		children: [
 			{
+				name: 'Basic Material',
+				icon: 'circle',
+				nodeClass: BasicMaterialEditor
+			},
+			{
 				name: 'Standard Material',
 				icon: 'circle',
 				nodeClass: StandardMaterialEditor
+			},
+			{
+				name: 'Points Material',
+				icon: 'circle-dotted',
+				nodeClass: PointsMaterialEditor
 			}
 		]
 	}
 ];
 
 export const ClassLib = {
+	BasicMaterialEditor,
 	StandardMaterialEditor,
+	PointsMaterialEditor,
+	PointsEditor,
 	MeshEditor,
 	OperatorEditor,
 	NormalizeEditor,
@@ -524,17 +540,35 @@ export class NodeEditor extends EventDispatcher {
 
 				object3d.traverse( ( obj3d ) => {
 
-					if ( obj3d.isMesh === true ) {
+					if ( obj3d.isMesh === true || obj3d.isPoints === true ) {
 
-						const button = new ButtonInput( `Mesh - ${obj3d.name}` );
-						button.setIcon( 'ti ti-3d-cube-sphere' );
+						let prefix = null;
+						let icon = null;
+						let editorClass = null;
+
+						if ( obj3d.isMesh === true ) {
+
+							prefix = 'Mesh';
+							icon = 'ti ti-3d-cube-sphere';
+							editorClass = MeshEditor;
+
+						} else if ( obj3d.isPoints === true ) {
+
+							prefix = 'Points';
+							icon = 'ti ti-border-none';
+							editorClass = PointsEditor;
+
+						}
+
+						const button = new ButtonInput( `${prefix} - ${obj3d.name}` );
+						button.setIcon( icon );
 						button.addEventListener( 'complete', () => {
 
 							for ( const node of this.canvas.nodes ) {
 
 								if ( node.value === obj3d ) {
 
-									// not duplicated node
+									// prevent duplicated node
 
 									this.canvas.select( node );
 
@@ -544,7 +578,7 @@ export class NodeEditor extends EventDispatcher {
 
 							}
 
-							const node = new MeshEditor( obj3d );
+							const node = new editorClass( obj3d );
 
 							this.add( node );
 

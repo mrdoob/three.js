@@ -1,18 +1,18 @@
 import { LabelElement } from '../../libs/flow.module.js';
 import { Object3DEditor } from './Object3DEditor.js';
-import { Mesh } from 'three';
+import { Points } from 'three';
 
-export class MeshEditor extends Object3DEditor {
+export class PointsEditor extends Object3DEditor {
 
-	constructor( mesh = null ) {
+	constructor( points = null ) {
 
-		if ( mesh === null ) {
+		if ( points === null ) {
 
-			mesh = new Mesh();
+			points = new Points();
 
 		}
 
-		super( mesh, 'Mesh' );
+		super( points, 'Points' );
 
 		this.material = null;
 
@@ -26,7 +26,7 @@ export class MeshEditor extends Object3DEditor {
 
 	}
 
-	get mesh() {
+	get points() {
 
 		return this.value;
 
@@ -70,11 +70,11 @@ export class MeshEditor extends Object3DEditor {
 
 		super.update();
 
-		const mesh = this.mesh;
+		const points = this.points;
 
-		if ( mesh ) {
+		if ( points ) {
 
-			mesh.material = this.material || this.defaultMaterial;
+			points.material = this.material || this.defaultMaterial;
 
 		}
 
@@ -84,7 +84,7 @@ export class MeshEditor extends Object3DEditor {
 
 		super.updateDefault();
 
-		this.defaultMaterial = this.mesh.material;
+		this.defaultMaterial = this.points.material;
 
 	}
 
@@ -92,7 +92,7 @@ export class MeshEditor extends Object3DEditor {
 
 		super.restoreDefault();
 
-		this.mesh.material = this.defaultMaterial;
+		this.points.material = this.defaultMaterial;
 
 	}
 
