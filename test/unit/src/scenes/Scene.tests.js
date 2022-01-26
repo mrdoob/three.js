@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Scene } from '../../../../src/scenes/Scene.js';
+// import { Scene } from '../../../../src/scenes/Scene.js';
 
 export default QUnit.module( 'Scenes', () => {
 

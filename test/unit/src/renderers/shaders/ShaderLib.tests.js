@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ShaderLib } from '../../../../../src/renderers/shaders/ShaderLib.js';
+// import { ShaderLib } from '../../../../../src/renderers/shaders/ShaderLib.js';
 
 export default QUnit.module( 'Renderers', () => {
 

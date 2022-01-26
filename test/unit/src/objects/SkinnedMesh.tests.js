@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
+// import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
 
 export default QUnit.module( 'Objects', () => {
 

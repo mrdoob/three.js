@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { CatmullRom, QuadraticBezier, CubicBezier } from '../../../../../src/extras/core/Interpolations.js';
+// import { CatmullRom, QuadraticBezier, CubicBezier } from '../../../../../src/extras/core/Interpolations.js';
 
 export default QUnit.module( 'Extras', () => {
 

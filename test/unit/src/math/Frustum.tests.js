@@ -13,17 +13,6 @@ import { zero3, one3, eps } from './Constants.tests.js';
 
 const unit3 = new Vector3( 1, 0, 0 );
 
-function planeEquals( a, b, tolerance ) {
-
-	tolerance = tolerance || 0.0001;
-
-	if ( a.normal.distanceTo( b.normal ) > tolerance ) return false;
-	if ( Math.abs( a.constant - b.constant ) > tolerance ) return false;
-
-	return true;
-
-}
-
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Frustum', () => {

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties.js';
+// import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties.js';
 
 export default QUnit.module( 'Renderers', () => {
 

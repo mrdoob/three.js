@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ArrowHelper } from '../../../../src/helpers/ArrowHelper.js';
+// import { ArrowHelper } from '../../../../src/helpers/ArrowHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 

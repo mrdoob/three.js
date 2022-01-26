@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { NumberKeyframeTrack } from '../../../../../src/animation/tracks/NumberKeyframeTrack.js';
+// import { NumberKeyframeTrack } from '../../../../../src/animation/tracks/NumberKeyframeTrack.js';
 
 export default QUnit.module( 'Animation', () => {
 

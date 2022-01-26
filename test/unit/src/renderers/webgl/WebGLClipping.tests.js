@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLClipping } from '../../../../../src/renderers/webgl/WebGLClipping.js';
+// import { WebGLClipping } from '../../../../../src/renderers/webgl/WebGLClipping.js';
 
 export default QUnit.module( 'Renderers', () => {
 

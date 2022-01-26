@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLUniforms } from '../../../../../src/renderers/webgl/WebGLUniforms.js';
+// import { WebGLUniforms } from '../../../../../src/renderers/webgl/WebGLUniforms.js';
 
 export default QUnit.module( 'Renderers', () => {
 

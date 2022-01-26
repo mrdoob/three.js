@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Bone } from '../../../../src/objects/Bone.js';
+// import { Bone } from '../../../../src/objects/Bone.js';
 
 export default QUnit.module( 'Objects', () => {
 

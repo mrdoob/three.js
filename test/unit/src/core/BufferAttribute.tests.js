@@ -17,7 +17,7 @@ export default QUnit.module( 'Core', () => {
 			assert.throws(
 				function () {
 
-					var a = new BufferAttribute( [ 1, 2, 3, 4 ], 2, false );
+					new BufferAttribute( [ 1, 2, 3, 4 ], 2, false );
 
 				},
 				/array should be a Typed Array/,

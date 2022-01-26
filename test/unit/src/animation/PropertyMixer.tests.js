@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { PropertyMixer } from '../../../../src/animation/PropertyMixer.js';
+// import { PropertyMixer } from '../../../../src/animation/PropertyMixer.js';
 
 export default QUnit.module( 'Animation', () => {
 

@@ -25,7 +25,7 @@ import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import OperatorNode from '../../nodes/math/OperatorNode.js';
 import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
-import { vec4, join, nodeObject } from '../../nodes/ShaderNode.js';
+import { join, nodeObject } from '../../nodes/ShaderNode.js';
 import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {

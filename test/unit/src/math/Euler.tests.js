@@ -34,15 +34,6 @@ function matrixEquals4( a, b, tolerance ) {
 
 }
 
-function eulerEquals( a, b, tolerance ) {
-
-	tolerance = tolerance || 0.0001;
-	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z );
-
-	return ( diff < tolerance );
-
-}
-
 function quatEquals( a, b, tolerance ) {
 
 	tolerance = tolerance || 0.0001;
