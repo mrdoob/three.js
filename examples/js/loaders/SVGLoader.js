@@ -110,8 +110,7 @@
 
 					case 'use':
 						style = parseStyle( node, style );
-
-						const href = node.getAttributeNS( "http://www.w3.org/1999/xlink", "href" ) || "";
+						const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
 						const usedNodeId = href.substring( 1 );
 						const usedNode = node.viewportElement.getElementById( usedNodeId );
 

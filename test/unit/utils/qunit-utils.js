@@ -165,15 +165,13 @@ function checkGeometryJsonReading( json, geom ) {
 	QUnit.assert.ok( output[ geom.uuid ], 'geometry matching source uuid not in output' );
 	// QUnit.assert.smartEqual( output[ geom.uuid ], geom, 'Reconstruct geometry from ObjectLoader' );
 
-	var differing = getDifferingProp( output[ geom.uuid ], geom, [ 'bones' ] );
+	var differing = getDifferingProp( output[ geom.uuid ], geom );
 	if ( differing ) console.log( differing );
 
-	var excludedProperties = [ 'bones' ];
-
-	var differingProp = getDifferingProp( output[ geom.uuid ], geom, excludedProperties );
+	var differingProp = getDifferingProp( output[ geom.uuid ], geom );
 	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 
-	differingProp = getDifferingProp( geom, output[ geom.uuid ], excludedProperties );
+	differingProp = getDifferingProp( geom, output[ geom.uuid ] );
 	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 
 }

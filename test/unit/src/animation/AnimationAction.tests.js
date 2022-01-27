@@ -130,7 +130,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'reset', ( assert ) => {
 
-			var { mixer, animationAction } = createAnimation();
+			var { animationAction } = createAnimation();
 			var animationAction2 = animationAction.stop();
 			assert.equal( animationAction, animationAction2, 'AnimationAction.reset can be chained.' );
 			assert.equal( animationAction2.paused, false, 'AnimationAction.reset() sets paused false' );
@@ -143,7 +143,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'isRunning', ( assert ) => {
 
-			var { mixer, animationAction } = createAnimation();
+			var { animationAction } = createAnimation();
 			assert.notOk( animationAction.isRunning(), 'When an animation is just made, it is not running.' );
 			animationAction.play();
 			assert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );

@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.136.0",
+  "version": "0.137.2",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.js",
@@ -10,8 +10,9 @@
       "import": "./build/three.module.js",
       "require": "./build/three.cjs"
     },
-    "./examples/jsm/*": "./examples/jsm/*.js",
-    "./src/*": "./src/*.js"
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./src/*": "./src/*"
   },
   "repository": {
     "type": "git",
@@ -92,7 +93,6 @@
     "lint-fix": "npm run lint -- --fix && npm run lint-examples -- --fix",
     "lint-docs": "eslint docs --ext html",
     "test-unit": "npm run unit --prefix test",
-    "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",

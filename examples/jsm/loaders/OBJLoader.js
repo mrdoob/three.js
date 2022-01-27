@@ -11,7 +11,8 @@ import {
 	MeshPhongMaterial,
 	Points,
 	PointsMaterial,
-	Vector3
+	Vector3,
+	Color
 } from 'three';
 
 // o object_name | g group_name
@@ -29,6 +30,8 @@ const _vC = new Vector3();
 
 const _ab = new Vector3();
 const _cb = new Vector3();
+
+const _color = new Color();
 
 function ParserState() {
 
@@ -536,12 +539,13 @@ class OBJLoader extends Loader {
 						);
 						if ( data.length >= 7 ) {
 
-							state.colors.push(
+							_color.setRGB(
 								parseFloat( data[ 4 ] ),
 								parseFloat( data[ 5 ] ),
 								parseFloat( data[ 6 ] )
+							).convertSRGBToLinear();
 
-							);
+							state.colors.push( _color.r, _color.g, _color.b );
 
 						} else {
 

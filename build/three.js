@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2010-2021 Three.js Authors
+ * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 (function (global, factory) {
@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '137dev';
+	const REVISION = '137';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -106,7 +106,6 @@
 	const HalfFloatType = 1016;
 	const UnsignedShort4444Type = 1017;
 	const UnsignedShort5551Type = 1018;
-	const UnsignedShort565Type = 1019;
 	const UnsignedInt248Type = 1020;
 	const AlphaFormat = 1021;
 	const RGBAFormat = 1023;
@@ -3816,8 +3815,7 @@
 
 		expandByObject(object, precise = false) {
 			// Computes the world-axis-aligned bounding box of an object (including its children),
-			// accounting for both the object's, and children's, world transforms.
-			// For computational efficiency, the computed bounding box may be larger than the minimal world-axis-aligned bounding box.
+			// accounting for both the object's, and children's, world transforms
 			object.updateWorldMatrix(false, false);
 			const geometry = object.geometry;
 
@@ -16539,16 +16537,12 @@
 				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.RG8;
 			}
 
-			if (glFormat === _gl.RGB) {
-				if (glType === _gl.FLOAT) internalFormat = _gl.RGB32F;
-				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGB16F;
-				if (glType === _gl.UNSIGNED_BYTE) internalFormat = _gl.RGB8;
-			}
-
 			if (glFormat === _gl.RGBA) {
 				if (glType === _gl.FLOAT) internalFormat = _gl.RGBA32F;
 				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F;
 				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding && isVideoTexture === false ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+				if (glType === _gl.UNSIGNED_SHORT_4_4_4_4) internalFormat = _gl.RGBA4;
+				if (glType === _gl.UNSIGNED_SHORT_5_5_5_1) internalFormat = _gl.RGB5_A1;
 			}
 
 			if (internalFormat === _gl.R16F || internalFormat === _gl.R32F || internalFormat === _gl.RG16F || internalFormat === _gl.RG32F || internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F) {
@@ -17609,7 +17603,6 @@
 			if (p === UnsignedByteType) return gl.UNSIGNED_BYTE;
 			if (p === UnsignedShort4444Type) return gl.UNSIGNED_SHORT_4_4_4_4;
 			if (p === UnsignedShort5551Type) return gl.UNSIGNED_SHORT_5_5_5_1;
-			if (p === UnsignedShort565Type) return gl.UNSIGNED_SHORT_5_6_5;
 			if (p === ByteType) return gl.BYTE;
 			if (p === ShortType) return gl.SHORT;
 			if (p === UnsignedShortType) return gl.UNSIGNED_SHORT;
@@ -36728,7 +36721,6 @@
 	exports.UnsignedIntType = UnsignedIntType;
 	exports.UnsignedShort4444Type = UnsignedShort4444Type;
 	exports.UnsignedShort5551Type = UnsignedShort5551Type;
-	exports.UnsignedShort565Type = UnsignedShort565Type;
 	exports.UnsignedShortType = UnsignedShortType;
 	exports.VSMShadowMap = VSMShadowMap;
 	exports.Vector2 = Vector2;

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { MeshPhongMaterial } from '../../../../src/materials/MeshPhongMaterial.js';
+// import { MeshPhongMaterial } from '../../../../src/materials/MeshPhongMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 

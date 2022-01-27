@@ -1,11 +1,14 @@
 import { Styles, Canvas, CircleMenu, ButtonInput, ContextMenu, Tips, Search, Loader } from '../libs/flow.module.js';
+import { BasicMaterialEditor } from './materials/BasicMaterialEditor.js';
 import { StandardMaterialEditor } from './materials/StandardMaterialEditor.js';
+import { PointsMaterialEditor } from './materials/PointsMaterialEditor.js';
 import { OperatorEditor } from './math/OperatorEditor.js';
 import { NormalizeEditor } from './math/NormalizeEditor.js';
 import { InvertEditor } from './math/InvertEditor.js';
 import { LimiterEditor } from './math/LimiterEditor.js';
 import { DotEditor } from './math/DotEditor.js';
 import { PowerEditor } from './math/PowerEditor.js';
+import { AngleEditor } from './math/AngleEditor.js';
 import { TrigonometryEditor } from './math/TrigonometryEditor.js';
 import { FloatEditor } from './inputs/FloatEditor.js';
 import { Vector2Editor } from './inputs/Vector2Editor.js';
@@ -22,6 +25,7 @@ import { OscillatorEditor } from './utils/OscillatorEditor.js';
 import { SplitEditor } from './utils/SplitEditor.js';
 import { JoinEditor } from './utils/JoinEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
+import { PointsEditor } from './scene/PointsEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
 import { EventDispatcher } from 'three';
 
@@ -130,13 +134,19 @@ export const NodeList = [
 			{
 				name: 'Trigonometry',
 				icon: 'wave-sine',
-				tip: 'Sin / Cos / Tan',
+				tip: 'Sin / Cos / Tan / ...',
 				nodeClass: TrigonometryEditor
+			},
+			{
+				name: 'Angle',
+				icon: 'angle',
+				tip: 'Degress / Radians',
+				nodeClass: AngleEditor
 			},
 			{
 				name: 'Normalize',
 				icon: 'fold',
-				nodeClass: OperatorEditor
+				nodeClass: NormalizeEditor
 			}
 		]
 	},
@@ -193,16 +203,29 @@ export const NodeList = [
 		icon: 'circles',
 		children: [
 			{
+				name: 'Basic Material',
+				icon: 'circle',
+				nodeClass: BasicMaterialEditor
+			},
+			{
 				name: 'Standard Material',
 				icon: 'circle',
 				nodeClass: StandardMaterialEditor
+			},
+			{
+				name: 'Points Material',
+				icon: 'circle-dotted',
+				nodeClass: PointsMaterialEditor
 			}
 		]
 	}
 ];
 
 export const ClassLib = {
+	BasicMaterialEditor,
 	StandardMaterialEditor,
+	PointsMaterialEditor,
+	PointsEditor,
 	MeshEditor,
 	OperatorEditor,
 	NormalizeEditor,
@@ -210,6 +233,7 @@ export const ClassLib = {
 	LimiterEditor,
 	DotEditor,
 	PowerEditor,
+	AngleEditor,
 	TrigonometryEditor,
 	FloatEditor,
 	Vector2Editor,
@@ -346,7 +370,11 @@ export class NodeEditor extends EventDispatcher {
 
 		newButton.onClick( () => {
 
-			if ( confirm( 'are you sure' ) ) this.newProject();
+			if ( confirm( 'Are you sure?' ) === true ) {
+
+				this.newProject();
+
+			}
 
 		} );
 
@@ -508,41 +536,63 @@ export class NodeEditor extends EventDispatcher {
 
 			const object3d = this.scene;
 
-			object3d.traverse( ( obj3d ) => {
+			if ( object3d !== null ) {
 
-				if ( obj3d.isMesh === true ) {
+				object3d.traverse( ( obj3d ) => {
 
-					const button = new ButtonInput( `Mesh - ${obj3d.name}` );
-					button.setIcon( `ti ti-3d-cube-sphere` );
-					button.addEventListener( 'complete', () => {
+					if ( obj3d.isMesh === true || obj3d.isPoints === true ) {
 
-						for ( const node of this.canvas.nodes ) {
+						let prefix = null;
+						let icon = null;
+						let editorClass = null;
 
-							if ( node.value === obj3d ) {
+						if ( obj3d.isMesh === true ) {
 
-								// not duplicated node
+							prefix = 'Mesh';
+							icon = 'ti ti-3d-cube-sphere';
+							editorClass = MeshEditor;
 
-								this.canvas.select( node );
+						} else if ( obj3d.isPoints === true ) {
 
-								return;
-
-							}
+							prefix = 'Points';
+							icon = 'ti ti-border-none';
+							editorClass = PointsEditor;
 
 						}
 
-						const node = new MeshEditor( obj3d );
+						const button = new ButtonInput( `${prefix} - ${obj3d.name}` );
+						button.setIcon( icon );
+						button.addEventListener( 'complete', () => {
 
-						this.add( node );
+							for ( const node of this.canvas.nodes ) {
 
-						this.centralizeNode( node );
+								if ( node.value === obj3d ) {
 
-					} );
+									// prevent duplicated node
 
-					search.add( button );
+									this.canvas.select( node );
 
-				}
+									return;
 
-			} );
+								}
+
+							}
+
+							const node = new editorClass( obj3d );
+
+							this.add( node );
+
+							this.centralizeNode( node );
+
+						} );
+
+						search.add( button );
+
+					}
+
+				} );
+
+			}
 
 		} );
 

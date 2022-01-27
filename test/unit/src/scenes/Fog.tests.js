@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Fog } from '../../../../src/scenes/Fog.js';
+// import { Fog } from '../../../../src/scenes/Fog.js';
 
 export default QUnit.module( 'Fog', () => {
 

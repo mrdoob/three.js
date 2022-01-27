@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial.js';
+// import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 

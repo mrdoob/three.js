@@ -536,7 +536,7 @@ export default QUnit.module( 'Core', () => {
 			var b = new Object3D();
 			var expectedSingle = new Vector3( x, y, z );
 			var expectedParent = new Vector3( x, y, 0 );
-			var expectedChild = new Vector3( x, y, 7 + ( z - z ) );
+			var expectedChild = new Vector3( x, y, 7 );
 			var position = new Vector3();
 
 			a.translateX( x );
