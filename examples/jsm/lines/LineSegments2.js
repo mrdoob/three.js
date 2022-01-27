@@ -125,7 +125,17 @@ class LineSegments2 extends Mesh {
 		const distanceToSphere = Math.max( camera.near, _sphere.distanceToPoint( ray.origin ) );
 
 		// increase the sphere bounds by the worst case line screen space width
-		const sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, lineWidth, resolution );
+		let sphereMargin;
+		if ( this.material.worldUnits ) {
+
+			sphereMargin = lineWidth * 0.5;
+
+		} else {
+
+			sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, lineWidth, resolution );
+
+		}
+
 		_sphere.radius += sphereMargin;
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) {
@@ -147,13 +157,18 @@ class LineSegments2 extends Mesh {
 		const distanceToBox = Math.max( camera.near, _box.distanceToPoint( ray.origin ) );
 
 		// increase the box bounds by the worst case line screen space width
-		const boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, lineWidth, resolution );
-		_box.max.x += boxMargin;
-		_box.max.y += boxMargin;
-		_box.max.z += boxMargin;
-		_box.min.x -= boxMargin;
-		_box.min.y -= boxMargin;
-		_box.min.z -= boxMargin;
+		let boxMargin;
+		if ( this.material.worldUnits ) {
+
+			boxMargin = lineWidth * 0.5;
+
+		} else {
+
+			boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, lineWidth, resolution );
+
+		}
+
+		_box.expandByScalar( boxMargin );
 
 		if ( raycaster.ray.intersectsBox( _box ) === false ) {
 
@@ -248,28 +263,15 @@ class LineSegments2 extends Mesh {
 			const zPos = MathUtils.lerp( _start4.z, _end4.z, param );
 			const isInClipSpace = zPos >= - 1 && zPos <= 1;
 
-			let isInside;
-			if ( this.material.worldUnits ) {
+			if ( ! isInClipSpace ) {
 
-				isInside = _ssOrigin3.distanceTo( _closestPoint ) < lineWidth * 0.5;
-
-			} else {
-
-				_line.start.fromBufferAttribute( instanceStart, i );
-				_line.end.fromBufferAttribute( instanceEnd, i );
-
-				_line.start.applyMatrix4( matrixWorld );
-				_line.end.applyMatrix4( matrixWorld );
-
-				const pointOnLine = new Vector3();
-				const point = new Vector3();
-
-				ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
-				isInside = point.distanceTo( pointOnLine ) < lineWidth * 0.5;
+				return;
 
 			}
 
-			if ( isInClipSpace && isInside ) {
+			let isInside;
+			let point, pointOnLine;
+			function getPointAndPointOnLine() {
 
 				_line.start.fromBufferAttribute( instanceStart, i );
 				_line.end.fromBufferAttribute( instanceEnd, i );
@@ -277,10 +279,34 @@ class LineSegments2 extends Mesh {
 				_line.start.applyMatrix4( matrixWorld );
 				_line.end.applyMatrix4( matrixWorld );
 
-				const pointOnLine = new Vector3();
-				const point = new Vector3();
-
 				ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
+
+			}
+
+			if ( this.material.worldUnits ) {
+
+				pointOnLine = new Vector3();
+				point = new Vector3();
+				getPointAndPointOnLine();
+
+				isInside = point.distanceTo( pointOnLine ) < lineWidth * 0.5;
+				// console.log( point.distanceTo( pointOnLine ), lineWidth * 0.5 );
+
+			} else {
+
+				isInside = _ssOrigin3.distanceTo( _closestPoint ) < lineWidth * 0.5;
+
+			}
+
+			if ( isInside ) {
+
+				if ( ! this.material.worldUnits ) {
+
+					pointOnLine = new Vector3();
+					point = new Vector3();
+					getPointAndPointOnLine();
+
+				}
 
 				intersects.push( {
 

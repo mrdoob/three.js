@@ -40,6 +40,7 @@
 			import * as GeometryUtils from './jsm/utils/GeometryUtils.js';
 
 			let line, renderer, scene, camera, camera2, controls;
+			let raycaster, sphereInter, sphereOnLine;
 			let line1;
 			let matLine, matLineBasic, matLineDashed;
 			let stats, gpuPanel;
@@ -48,6 +49,8 @@
 			// viewport
 			let insetWidth;
 			let insetHeight;
+
+			const pointer = new THREE.Vector2();
 
 			init();
 			animate();
@@ -72,6 +75,22 @@
 				controls.minDistance = 10;
 				controls.maxDistance = 500;
 
+				raycaster = new THREE.Raycaster();
+				raycaster.params.Line2 = {};
+				raycaster.params.Line2.threshold = 0;
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.5 );
+				const sphereInterMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, depthTest: false } );
+				const sphereOnLineMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, depthTest: false } );
+
+				sphereInter = new THREE.Mesh( sphereGeometry, sphereInterMaterial );
+				sphereOnLine = new THREE.Mesh( sphereGeometry, sphereOnLineMaterial );
+				sphereInter.visible = false;
+				sphereOnLine.visible = false;
+				sphereInter.renderOrder = 10;
+				sphereOnLine.renderOrder = 10;
+				scene.add( sphereInter );
+				scene.add( sphereOnLine );
 
 				// Position and THREE.Color Data
 
@@ -137,7 +156,7 @@
 				scene.add( line1 );
 
 				//
-
+				document.addEventListener( 'pointermove', onPointerMove );
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
@@ -167,6 +186,13 @@
 
 			}
 
+			function onPointerMove( event ) {
+
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			}
+
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -178,6 +204,24 @@
 				renderer.setClearColor( 0x000000, 0 );
 
 				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
+
+				raycaster.setFromCamera( pointer, camera );
+
+				const intersects = raycaster.intersectObject( line, true );
+
+				if ( intersects.length > 0 ) {
+
+					sphereInter.visible = true;
+					sphereOnLine.visible = true;
+					sphereInter.position.copy( intersects[ 0 ].point );
+					sphereOnLine.position.copy( intersects[ 0 ].pointOnLine );
+
+				} else {
+
+					sphereInter.visible = false;
+					sphereOnLine.visible = false;
+
+				}
 
 				// renderer will set this eventually
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
@@ -223,7 +267,8 @@
 					'alphaToCoverage': true,
 					'dashed': false,
 					'dash scale': 1,
-					'dash / gap': 1
+					'dash / gap': 1,
+					'threshold': raycaster.params.Line2.threshold
 				};
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1 } ).onChange( function ( val ) {
@@ -313,6 +358,12 @@
 							break;
 
 					}
+
+				} );
+
+				gui.add( param, 'threshold', 0, 10 ).onChange( function ( val ) {
+
+					raycaster.params.Line2.threshold = val;
 
 				} );
 
