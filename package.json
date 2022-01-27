@@ -10,8 +10,8 @@
       "import": "./build/three.module.js",
       "require": "./build/three.cjs"
     },
-    "./examples/jsm/*": "./examples/jsm/*.js",
-    "./src/*": "./src/*.js"
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./src/*": "./src/*"
   },
   "repository": {
     "type": "git",
