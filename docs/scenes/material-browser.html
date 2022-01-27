@@ -261,7 +261,6 @@
 
 				return function () {
 
-					material.vertexColors = material.vertexColors;
 					material.side = parseInt( material.side ); //Ensure number
 					material.needsUpdate = true;
 					geometry.attributes.position.needsUpdate = true;
@@ -454,7 +453,7 @@
 
 			}
 
-			function guiMeshMatcapMaterial( gui, mesh, material ) {
+			function guiMeshMatcapMaterial( gui, mesh, material, geometry ) {
 
 				const data = {
 					color: material.color.getHex(),
@@ -644,7 +643,7 @@
 
 						material = new THREE.MeshToonMaterial( { color: 0x049EF4, gradientMap: gradientMaps.threeTone } );
 						guiMaterial( gui, mesh, material, geometry );
-						guiMeshToonMaterial( gui, mesh, material, geometry );
+						guiMeshToonMaterial( gui, mesh, material );
 
 						// only use a single point light
 
@@ -691,7 +690,7 @@
 
 						material = new THREE.MeshDepthMaterial();
 						guiMaterial( gui, mesh, material, geometry );
-						guiMeshDepthMaterial( gui, mesh, material, geometry );
+						guiMeshDepthMaterial( gui, mesh, material );
 
 						return material;
 
@@ -757,7 +756,7 @@
 			light3.position.set( - 100, - 200, - 100 );
 			scene.add( light3 );
 
-			guiScene( gui, scene, camera );
+			guiScene( gui, scene );
 
 			const geometry = new THREE.TorusKnotGeometry( 10, 3, 200, 32 ).toNonIndexed();
 

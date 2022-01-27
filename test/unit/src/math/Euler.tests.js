@@ -404,8 +404,6 @@ export default QUnit.module( 'Maths', () => {
 
 			var f = function () {
 
-				var b = true;
-
 			};
 
 			var a = new Euler( 11, 12, 13, 'XYZ' );

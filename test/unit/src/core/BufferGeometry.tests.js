@@ -350,7 +350,7 @@ export default QUnit.module( 'Core', () => {
 
 			var bs = getBSForVertices( [ - 10, 0, 0, 10, 0, 0 ] );
 
-			assert.ok( bs.radius === ( 10 + 10 ) / 2, 'radius is equal to deltaMinMax / 2' );
+			assert.ok( bs.radius === 10, 'radius is equal to deltaMinMax / 2' );
 			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
 
 			var bs = getBSForVertices( [ - 5, 11, - 3, 5, - 11, 3 ] );
