@@ -354,7 +354,7 @@
 						const stride = data.stride;
 						const offset = geometryAttribute.offset;
 
-						if ( data && data.isInstancedInterleavedBuffer ) {
+						if ( data.isInstancedInterleavedBuffer ) {
 
 							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
 
