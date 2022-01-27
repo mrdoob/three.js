@@ -10,7 +10,7 @@
       "import": "./build/three.module.js",
       "require": "./build/three.cjs"
     },
-    "./examples/jsm/*": "./examples/jsm/*",
+    "./examples/*": "./examples/*",
     "./src/*": "./src/*"
   },
   "repository": {
