@@ -6,8 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "unit": "qunit -r failonlyreporter -f !-webonly unit/three.source.unit.js",
-    "unit-examples": "qunit -r failonlyreporter -f !-webonly unit/three.example.unit.js"
+    "unit": "qunit -r failonlyreporter -f !-webonly unit/three.source.unit.js"
   },
   "devDependencies": {
     "failonlyreporter": "^1.0.0",
