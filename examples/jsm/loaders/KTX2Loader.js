@@ -106,15 +106,6 @@ class KTX2Loader extends Loader {
 
 	}
 
-	dispose() {
-
-		this.workerPool.dispose();
-		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
-
-		return this;
-
-	}
-
 	init() {
 
 		if ( ! this.transcoderPending ) {
@@ -270,8 +261,8 @@ class KTX2Loader extends Loader {
 
 	dispose() {
 
-		URL.revokeObjectURL( this.workerSourceURL );
 		this.workerPool.dispose();
+		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
 
 		_activeLoaders --;
 

@@ -24,7 +24,7 @@ BenchClass.prototype.newSuite = function ( name ) {
 
 BenchClass.prototype.display = function () {
 
-	for ( x of this.suites ) {
+	for ( var x of this.suites ) {
 
 		var s = new SuiteUI( x );
 		s.render();
