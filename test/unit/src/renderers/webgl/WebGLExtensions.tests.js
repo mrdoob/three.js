@@ -32,7 +32,7 @@ export default QUnit.module( 'Renderers', () => {
 
 				const gl = new WebglContextMock();
 				const extensions = new WebGLExtensions( gl );
-				assert.ok( extensions !== undefined );
+				assert.ok( typeof extensions === 'object' );
 
 			} );
 
