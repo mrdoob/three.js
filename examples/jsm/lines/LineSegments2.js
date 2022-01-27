@@ -248,7 +248,26 @@ class LineSegments2 extends Mesh {
 			const zPos = MathUtils.lerp( _start4.z, _end4.z, param );
 			const isInClipSpace = zPos >= - 1 && zPos <= 1;
 
-			const isInside = _ssOrigin3.distanceTo( _closestPoint ) < lineWidth * 0.5;
+			let isInside;
+			if ( this.material.worldUnits ) {
+
+				isInside = _ssOrigin3.distanceTo( _closestPoint ) < lineWidth * 0.5;
+
+			} else {
+
+				_line.start.fromBufferAttribute( instanceStart, i );
+				_line.end.fromBufferAttribute( instanceEnd, i );
+
+				_line.start.applyMatrix4( matrixWorld );
+				_line.end.applyMatrix4( matrixWorld );
+
+				const pointOnLine = new Vector3();
+				const point = new Vector3();
+
+				ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
+				isInside = point.distanceTo( pointOnLine ) < lineWidth * 0.5;
+
+			}
 
 			if ( isInClipSpace && isInside ) {
 
