@@ -10,7 +10,8 @@
       "import": "./build/three.module.js",
       "require": "./build/three.cjs"
     },
-    "./examples/*": "./examples/*",
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
     "./src/*": "./src/*"
   },
   "repository": {
