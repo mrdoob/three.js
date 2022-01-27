@@ -1,17 +1,16 @@
-import Node from '../core/Node.js';
 import UVNode from '../accessors/UVNode.js';
+import { NodeType } from '../core/constants.js';
+import NodalFunctionNode from '../core/NodalFunctionNode.js';
+import Node from '../core/Node.js';
+import NodeFunctionInput from '../core/NodeFunctionInput.js';
+import { add, floor, mod, mul, sign, temp, temp_off } from '../ShaderNode.js';
 
-import { ShaderNode, add, mul, floor, mod, sign } from '../ShaderNode.js';
 
-const checkerShaderNode = new ShaderNode( ( inputs ) => {
+const checkerShaderNode = new NodalFunctionNode( 'checker', NodeType.Float, [ new NodeFunctionInput( 'vec2', 'uv' ) ], ( inputs ) => {
 
-	const uv = mul( inputs.uv, 2.0 );
-
-	const cx = floor( uv.x );
-	const cy = floor( uv.y );
-	const result = mod( add( cx, cy ), 2.0 );
-
-	return sign( result );
+	const { uv } = inputs;
+	const tmp = temp( floor, mul( uv, 2.0 ) );
+	return temp_off( sign( mod( add( tmp.x, tmp.y ), 2.0 ) ) );
 
 } );
 
@@ -27,7 +26,7 @@ class CheckerNode extends Node {
 
 	generate( builder ) {
 
-		return checkerShaderNode( { uv: this.uvNode } ).build( builder );
+		return checkerShaderNode.call( { uv: this.uvNode } ).build( builder );
 
 	}
 
