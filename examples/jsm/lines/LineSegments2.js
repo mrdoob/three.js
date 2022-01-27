@@ -290,7 +290,6 @@ class LineSegments2 extends Mesh {
 				getPointAndPointOnLine();
 
 				isInside = point.distanceTo( pointOnLine ) < lineWidth * 0.5;
-				// console.log( point.distanceTo( pointOnLine ), lineWidth * 0.5 );
 
 			} else {
 
