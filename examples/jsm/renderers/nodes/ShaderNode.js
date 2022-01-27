@@ -1,6 +1,7 @@
 // core
 import PropertyNode from './core/PropertyNode.js';
 import VarNode from './core/VarNode.js';
+import ContextNode from './core/ContextNode.js';
 
 // inputs
 import ColorNode from './inputs/ColorNode.js';
@@ -287,6 +288,26 @@ export const addTo = ( varNode, ...params ) => {
 	varNode.node = add( varNode.node, ...ShaderNodeArray( params ) );
 
 	return nodeObject( varNode );
+
+};
+
+
+export const context = ShaderNodeProxy( ContextNode );
+export const temp_on = ( node )=> {
+
+	return context( node, { temp: true } );
+
+};
+
+export const temp_off = ( node )=> {
+
+	return context( node, { temp: false } );
+
+};
+
+export const temp = ( fn, ...params ) => {
+
+	return temp_on( fn( ...params.map( ( _ )=> temp_off( _ ) ) ) );
 
 };
 
