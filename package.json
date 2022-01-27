@@ -136,7 +136,8 @@
     "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-visualizer": "^5.5.2",
-    "servez": "^1.12.0"
+    "servez": "^1.12.0",
+    "three": "file:"
   },
   "jspm": {
     "files": [
