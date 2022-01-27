@@ -152,7 +152,7 @@ class OrbitControls extends EventDispatcher {
 
 		this.update = function () {
 
-			if ( scope.autoRotate && state === STATE.NONE ) {
+			if ( scope.autoRotate === true && state === STATE.NONE ) {
 
 				rotateLeft( getAutoRotationAngle() );
 
