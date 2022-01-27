@@ -44,7 +44,7 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setAnimationLoop( animation );
 document.body.appendChild( renderer.domElement );
 
-// animation loop
+// animation
 
 function animation( time ) {
 
