@@ -8496,7 +8496,6 @@ class Material extends EventDispatcher {
 		this.shadowSide = null;
 
 		this.colorWrite = true;
-		this.alphaWrite = true;
 
 		this.precision = null; // override the renderer's default precision for this material
 
@@ -8755,7 +8754,6 @@ class Material extends EventDispatcher {
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
 		data.colorWrite = this.colorWrite;
-		data.alphaWrite = this.alphaWrite;
 
 		data.stencilWrite = this.stencilWrite;
 		data.stencilWriteMask = this.stencilWriteMask;
@@ -8891,7 +8889,6 @@ class Material extends EventDispatcher {
 		this.shadowSide = source.shadowSide;
 
 		this.colorWrite = source.colorWrite;
-		this.alphaWrite = source.alphaWrite;
 
 		this.precision = source.precision;
 
@@ -18546,7 +18543,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
-			parameters.alphaWrite ? '' : '#define OPAQUE',
+			parameters.transparent ? '' : '#define OPAQUE',
 
 			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ),
@@ -19047,9 +19044,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
 
+			transparent: material.transparent,
+
 			alphaMap: !! material.alphaMap,
 			alphaTest: useAlphaTest,
-			alphaWrite: material.alphaWrite || material.transparent,
 
 			gradientMap: !! material.gradientMap,
 
@@ -19196,7 +19194,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.toneMapping );
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
-		array.push( parameters.alphaWrite );
 
 	}
 
@@ -19318,6 +19315,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 21 );
 		if ( parameters.decodeVideoTexture )
 			_programLayers.enable( 22 );
+		if ( parameters.transparent )
+			_programLayers.enable( 23 );
 
 		array.push( _programLayers.mask );
 
@@ -40879,7 +40878,6 @@ class MaterialLoader extends Loader {
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
-		if ( json.alphaWrite !== undefined ) material.alphaWrite = json.alphaWrite;
 
 		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
 		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;
