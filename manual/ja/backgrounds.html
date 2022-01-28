@@ -36,7 +36,7 @@ body {
 }
 &lt;/style&gt;
 </pre>
-<p>そして、何も描画していない場所が透明になるように <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> に <code class="notranslate" translate="no">alpha</code> を指定します。</p>
+<p>そして、何も描画していない場所が透明になるように <a href="../docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> に <code class="notranslate" translate="no">alpha</code> を指定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
 -  const renderer = new THREE.WebGLRenderer({canvas});
@@ -110,7 +110,7 @@ CSSの時と比べて目に見える違いはありませんが、<a href="post-
 キューブや球体を作り<a href="textures.html">テクスチャを適用</a>し、<code class="notranslate" translate="no">THREE.BackSide</code> としてマークを付けます。
 そして、外側ではなく内側にレンダリングし、直接シーンに入れるか、上記のようにするか、2つのシーンを作るか、スカイボックス/球体/ドームを描くための特別なシーンと
 他の全てのものを描画するために使用します。
-描画には通常の <a href="/docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> を使います。<a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> は必要ないです。</p>
+描画には通常の <a href="../docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> を使います。<a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> は必要ないです。</p>
 <p>もう1つの解決策は <em>キューブマップ</em> を使用する事です。
 キューブマップは、キューブの側面である6つの側面を持つ特殊な種類のテクスチャです。
 標準的なテクスチャ座標を使用するのではなく、中心から外側に向けた方向を使用し、どこで色を取得するかを決定します。</p>
@@ -126,7 +126,7 @@ CSSの時と比べて目に見える違いはありませんが、<a href="post-
   <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-z.jpg" style="width: 200px" class="border">
 </div>
 
-<p><a href="/docs/#api/ja/loaders/CubeTextureLoader"><code class="notranslate" translate="no">CubeTextureLoader</code></a> を使用してキューブマップ画像を読み込み、シーンの背景として使用します。</p>
+<p><a href="../docs/#api/ja/loaders/CubeTextureLoader"><code class="notranslate" translate="no">CubeTextureLoader</code></a> を使用してキューブマップ画像を読み込み、シーンの背景として使用します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.CubeTextureLoader();
   const texture = loader.load([
@@ -195,7 +195,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <div class="threejs_center"><img src="../examples/resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px"></div>
 
 <p>たいして変わらないですね。
-まず、正距円筒図をテクスチャとして読み込み、読み込み後のコールバックで <a href="/docs/#api/ja/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate" translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a> を呼び出して、正距円筒図テクスチャからキューブマップを生成します。</p>
+まず、正距円筒図をテクスチャとして読み込み、読み込み後のコールバックで <a href="../docs/#api/ja/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate" translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a> を呼び出して、正距円筒図テクスチャからキューブマップを生成します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
 -  const loader = new THREE.CubeTextureLoader();
 -  const texture = loader.load([

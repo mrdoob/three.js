@@ -37,7 +37,7 @@
 material.color.setHSL(0, 1, .5);  // red
 material.flatShading = true;
 </pre>
-<p><a href="/docs/#api/ja/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>型の属性は設定方法が複数あることに注意してください。</p>
+<p><a href="../docs/#api/ja/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>型の属性は設定方法が複数あることに注意してください。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">material.color.set(0x00FFFF);    // same as CSS's #RRGGBB style
 material.color.set(cssString);   // any CSS color, eg 'purple', '#F32',
                                  // 'rgb(255, 127, 64)',
@@ -54,10 +54,10 @@ const m4 = new THREE.MeshBasicMaterial({color: 'rgb(255,0,0)'});   // red
 const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // red
 </pre>
 <p>では、three.jsのマテリアルの設定の説明をしましょう。</p>
-<p><a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>は光源の影響を受けません。
-<a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>は頂点でのみ光を計算します。
-一方で、<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は全てのピクセルで光を計算します。
-<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は、specularによるハイライトもサポートします。</p>
+<p><a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>は光源の影響を受けません。
+<a href="../docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>は頂点でのみ光を計算します。
+一方で、<a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は全てのピクセルで光を計算します。
+<a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は、specularによるハイライトもサポートします。</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshBasicMaterial"></div>
@@ -85,7 +85,7 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // red
 </div>
 <div class="threejs_center code">同じマテリアルでポリゴン数を変えたモデル</div>
 
-<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>の<code class="notranslate" translate="no">shininess</code>設定は特定のハイライトの<em>輝き</em>を決めます。デフォルトは30です。</p>
+<p><a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>の<code class="notranslate" translate="no">shininess</code>設定は特定のハイライトの<em>輝き</em>を決めます。デフォルトは30です。</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshPhongMaterialShininess0"></div>
@@ -101,8 +101,8 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // red
   </div>
 </div>
 
-<p><a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>か<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>のどちらかで、colorに対して<code class="notranslate" translate="no">emissive</code>属性を設定し、
-色を黒（phongなら<code class="notranslate" translate="no">shininess</code>を0）に設定すると、ちょうど<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>のように見えることに注意してください。</p>
+<p><a href="../docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>か<a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>のどちらかで、colorに対して<code class="notranslate" translate="no">emissive</code>属性を設定し、
+色を黒（phongなら<code class="notranslate" translate="no">shininess</code>を0）に設定すると、ちょうど<a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>のように見えることに注意してください。</p>
 <div class="spread">
   <div>
     <div data-diagram="MeshBasicMaterialCompare"></div>
@@ -130,12 +130,12 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // red
   </div>
 </div>
 
-<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>や<a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>と同じようにできるのに、なぜ3種もあるのでしょうか。
+<p><a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は<a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>や<a href="../docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>と同じようにできるのに、なぜ3種もあるのでしょうか。
 理由は、より洗練されたマテリアルは、描写するのにGPUパワーを必要とするためです。
 携帯電話といった、遅いGPCでは、より簡単なマテリアルを使うことで、描画に必要なGPUパワーを削減できるかもしれません。
 また、余計な機能を必要としないなら、一番シンプルなマテリアルを使用するとよいです。
-光源やspecularによるハイライトが不要なら、<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>を使うこともできます。</p>
-<p><a href="/docs/#api/ja/materials/MeshToonMaterial"><code class="notranslate" translate="no">MeshToonMaterial</code></a>は<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>に似ていますが、一点大きな違いがあります。
+光源やspecularによるハイライトが不要なら、<a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>を使うこともできます。</p>
+<p><a href="../docs/#api/ja/materials/MeshToonMaterial"><code class="notranslate" translate="no">MeshToonMaterial</code></a>は<a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>に似ていますが、一点大きな違いがあります。
 連続的にシェーディングするのではなく、グラデーションマップ（X×1のテクスチャ）を使ってシェーディングの方法を決めます。
 デフォルトは明るさの始まりが70%、終わりが100%のグラデーションマップを適用しますが、自分で決めたグラデーションマップを適用することもできます。
 これにより、まるでアニメのようなツートーンになります。</p>
@@ -148,23 +148,23 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // red
 <p>上記のマテリアルは、3Dに見えるマテリアルを簡単な数学で作っていますが、
 これは現実世界で本当に起きている現象にのっとっていません。
 2つのPBRマテリアルはもっと複雑な数学を使い、現実世界に近づいています。</p>
-<p>一つ目は<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>です。<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>と<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>の
+<p>一つ目は<a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>です。<a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>と<a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>の
 最大の違いは、異なるパラメータを使っていることです。
-<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は<code class="notranslate" translate="no">shininess</code>設定があります。
-<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>は<code class="notranslate" translate="no">roughness</code>と<code class="notranslate" translate="no">metalness</code>の2つの設定があります。</p>
-<p>基本的に、<a href="/docs/#api/ja/materials/MeshStandardMaterial#roughness"><code class="notranslate" translate="no">roughness</code></a>は<code class="notranslate" translate="no">shininess</code>の逆です。
+<a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は<code class="notranslate" translate="no">shininess</code>設定があります。
+<a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>は<code class="notranslate" translate="no">roughness</code>と<code class="notranslate" translate="no">metalness</code>の2つの設定があります。</p>
+<p>基本的に、<a href="../docs/#api/ja/materials/MeshStandardMaterial#roughness"><code class="notranslate" translate="no">roughness</code></a>は<code class="notranslate" translate="no">shininess</code>の逆です。
 野球ボールがほとんど反射しないように、とても粗いのものがある一方で、
 とても光沢があるビリヤード玉のように、粗くないものもあります。
 roughnessは0から1の間をとります。</p>
-<p>もう一つの設定で、<a href="/docs/#api/ja/materials/MeshStandardMaterial#metalness"><code class="notranslate" translate="no">metalness</code></a>は、マテリアルの金属っぽさです。
+<p>もう一つの設定で、<a href="../docs/#api/ja/materials/MeshStandardMaterial#metalness"><code class="notranslate" translate="no">metalness</code></a>は、マテリアルの金属っぽさです。
 金属は非金属と異なった振る舞いをします。
 0は非金属で、1は金属です。</p>
-<p>ここに、<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>のサンプルがあります。
+<p>ここに、<a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>のサンプルがあります。
 右に行くにつれて、<code class="notranslate" translate="no">roughness</code>は0から1に変わります。
 下に行くにつれて、<code class="notranslate" translate="no">metalness</code>は0から1に変わります。</p>
 <div data-diagram="MeshStandardMaterial" style="min-height: 400px"></div>
 
-<p><a href="/docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>は、<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>と同様ですが、
+<p><a href="../docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>は、<a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>と同様ですが、
 <code class="notranslate" translate="no">clearcoat</code>パラメータが追加されています。このパラメータは、0から1につれて、
 clearcoat光沢層が適用されます。
 また、<code class="notranslate" translate="no">clearCoatRoughness</code>パラメータも追加されていて、これは光沢層の粗さを決定します。</p>
@@ -173,16 +173,16 @@ clearcoat光沢層が適用されます。
 <div data-diagram="MeshPhysicalMaterial" style="min-height: 400px"></div>
 
 <p>様々な標準のマテリアルのうち、高速なものから低速なものを並べると、
-<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ➡ <a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ➡ <a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> ➡
-<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> ➡ <a href="/docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>になります。
+<a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ➡ <a href="../docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ➡ <a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> ➡
+<a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> ➡ <a href="../docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>になります。
 低速なマテリアルは、より現実味のある見た目のシーンを作ることができますが、
 パワーが低いデバイスやモバイル端末では、より高速なマテリアルを使うようにコードを設計する必要があります。</p>
 <p>続いて、特別な用途に使う3つのマテリアルがあります。
-<a href="/docs/#api/ja/materials/ShadowMaterial"><code class="notranslate" translate="no">ShadowMaterial</code></a>は影から作られたデータを得るのに使われます。
+<a href="../docs/#api/ja/materials/ShadowMaterial"><code class="notranslate" translate="no">ShadowMaterial</code></a>は影から作られたデータを得るのに使われます。
 まだ影については説明していませんでしたね。
 その際には、このマテリアルを使って、シーンの裏で何が起きているのか、のぞいてみたいと思います。</p>
-<p><a href="/docs/#api/ja/materials/MeshDepthMaterial"><code class="notranslate" translate="no">MeshDepthMaterial</code></a>は各ピクセルの深度を描写します。
-カメラの負の<a href="/docs/#api/ja/cameras/PerspectiveCamera#near"><code class="notranslate" translate="no">near</code></a>にあるピクセルは0、負の<a href="/docs/#api/ja/cameras/PerspectiveCamera#far"><code class="notranslate" translate="no">far</code></a>にあるピクセルは1です。
+<p><a href="../docs/#api/ja/materials/MeshDepthMaterial"><code class="notranslate" translate="no">MeshDepthMaterial</code></a>は各ピクセルの深度を描写します。
+カメラの負の<a href="../docs/#api/ja/cameras/PerspectiveCamera#near"><code class="notranslate" translate="no">near</code></a>にあるピクセルは0、負の<a href="../docs/#api/ja/cameras/PerspectiveCamera#far"><code class="notranslate" translate="no">far</code></a>にあるピクセルは1です。
 また別の機会に、特定の特殊効果がこのデータを使うかもしれません。</p>
 <div class="spread">
   <div>
@@ -191,9 +191,9 @@ clearcoat光沢層が適用されます。
 </div>
 
 
-<p><a href="/docs/#api/ja/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a>はジオメトリの<em>法線</em>を表示します。
+<p><a href="../docs/#api/ja/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a>はジオメトリの<em>法線</em>を表示します。
 <em>法線</em>は、特定の三角形かピクセル表面の方向です。
-<a href="/docs/#api/ja/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a>は見えている空間の法線を描画します（法線はカメラに依存します）。</p>
+<a href="../docs/#api/ja/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a>は見えている空間の法線を描画します（法線はカメラに依存します）。</p>
 <p><span style="background: red;" class="color">xは赤</span>、
 <span style="background: green;" class="dark-color">yは緑</span>そして
 <span style="background: blue;" class="dark-color">zは青</span>なので、
@@ -208,12 +208,12 @@ clearcoat光沢層が適用されます。
   </div>
 </div>
 
-<p><a href="/docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>は、three.jsのシェーダーシステムを使ったカスタムマテリアルを作るためのものです
-<a href="/docs/#api/ja/materials/RawShaderMaterial"><code class="notranslate" translate="no">RawShaderMaterial</code></a>は、three.jsの補助なしで、完全に独自シェーダーを作るためのものです。
+<p><a href="../docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>は、three.jsのシェーダーシステムを使ったカスタムマテリアルを作るためのものです
+<a href="../docs/#api/ja/materials/RawShaderMaterial"><code class="notranslate" translate="no">RawShaderMaterial</code></a>は、three.jsの補助なしで、完全に独自シェーダーを作るためのものです。
 これらのトピックはどちらも大きいため、後ほど説明します。</p>
-<p>全てのマテリアルは<a href="/docs/#api/ja/materials/Material"><code class="notranslate" translate="no">Material</code></a>によって決められた設定を共有しています。
-それらは<a href="/docs/#api/ja/materials/Material">ドキュメントを見てください</a>。けれども、最も一般的に使われる2つの属性について説明しましょう。</p>
-<p><a href="/docs/#api/ja/materials/Material#flatShading"><code class="notranslate" translate="no">flatShading</code></a>：物体の面が分割されて見えるか、滑らかに見えるか。デフォルトは<code class="notranslate" translate="no">false</code>です。</p>
+<p>全てのマテリアルは<a href="../docs/#api/ja/materials/Material"><code class="notranslate" translate="no">Material</code></a>によって決められた設定を共有しています。
+それらは<a href="../docs/#api/ja/materials/Material">ドキュメントを見てください</a>。けれども、最も一般的に使われる2つの属性について説明しましょう。</p>
+<p><a href="../docs/#api/ja/materials/Material#flatShading"><code class="notranslate" translate="no">flatShading</code></a>：物体の面が分割されて見えるか、滑らかに見えるか。デフォルトは<code class="notranslate" translate="no">false</code>です。</p>
 <div class="spread">
   <div>
     <div data-diagram="smoothShading"></div>
@@ -225,7 +225,7 @@ clearcoat光沢層が適用されます。
   </div>
 </div>
 
-<p><a href="/docs/#api/ja/materials/Material#side"><code class="notranslate" translate="no">side</code></a>：三角形の両面を表示するか。デフォルトは<code class="notranslate" translate="no">THREE.FrontSide</code>です。
+<p><a href="../docs/#api/ja/materials/Material#side"><code class="notranslate" translate="no">side</code></a>：三角形の両面を表示するか。デフォルトは<code class="notranslate" translate="no">THREE.FrontSide</code>です。
 ほかのオプションは <code class="notranslate" translate="no">THREE.BackSide</code>と<code class="notranslate" translate="no">THREE.DoubleSide</code>(両面)です。
 threeで描写されるほとんどの3Dオブジェクトは、たぶん不透明な固体です。
 そのため、裏面（固体の内側を向いている面）は描画する必要はありません。

@@ -20,8 +20,8 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p><a href="canvas-textures.html">이전 글</a>에서는 <a href="/docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>를 이용해 캐릭터에 이름표/명찰을 붙이는 법을 알아봤습니다. 때로는 이 이름표가 항상 카메라를 향하게 해야 할 경우도 있겠죠. Three.js의 <a href="/docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>와 <a href="/docs/#api/ko/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a>을 사용하면 이걸 쉽게 구현할 수 있습니다.</p>
-<p><a href="canvas-textures.html">캔버스 텍스처에 관한 글</a>의 명찰 예제를 가져와 여기에 <a href="/docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>와 <a href="/docs/#api/ko/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a>을 사용해봅시다.</p>
+          <p><a href="canvas-textures.html">이전 글</a>에서는 <a href="../docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>를 이용해 캐릭터에 이름표/명찰을 붙이는 법을 알아봤습니다. 때로는 이 이름표가 항상 카메라를 향하게 해야 할 경우도 있겠죠. Three.js의 <a href="../docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>와 <a href="../docs/#api/ko/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a>을 사용하면 이걸 쉽게 구현할 수 있습니다.</p>
+<p><a href="canvas-textures.html">캔버스 텍스처에 관한 글</a>의 명찰 예제를 가져와 여기에 <a href="../docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>와 <a href="../docs/#api/ko/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a>을 사용해봅시다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makePerson(x, labelWidth, size, name, color) {
   const canvas = makeLabelCanvas(labelWidth, size, name);
   const texture = new THREE.CanvasTexture(canvas);
@@ -107,7 +107,7 @@ const topGeometry = new THREE.ConeGeometry(
 const trunkMaterial = new THREE.MeshPhongMaterial({ color: 'brown' });
 const topMaterial = new THREE.MeshPhongMaterial({ color: 'green' });
 </pre>
-<p>다음으로 함수를 하나 만듭니다. 이 함수는 나무 줄기 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>와 윗부분 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 만들고 이 둘을 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로 넣는 역할입니다.</p>
+<p>다음으로 함수를 하나 만듭니다. 이 함수는 나무 줄기 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>와 윗부분 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 만들고 이 둘을 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로 넣는 역할입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeTree(x, z) {
   const root = new THREE.Object3D();
   const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);

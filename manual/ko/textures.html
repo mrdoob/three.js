@@ -52,8 +52,8 @@
   <img src="../examples/resources/images/wall.jpg" style="width: 600px;" class="border">
 </div>
 
-<p>예제는 처음 만들었던 것을 사용하겠습니다. 추가로 <a href="/docs/#api/ko/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>를 새로 생성한
-뒤, 인스턴스의 <a href="/docs/#api/ko/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> 메서드에 이미지의 URL을 넘겨주어 호출하고,
+<p>예제는 처음 만들었던 것을 사용하겠습니다. 추가로 <a href="../docs/#api/ko/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>를 새로 생성한
+뒤, 인스턴스의 <a href="../docs/#api/ko/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> 메서드에 이미지의 URL을 넘겨주어 호출하고,
 반환 받은 값을 재질(material)의 <code class="notranslate" translate="no">map</code> 속성에 지정합니다(<code class="notranslate" translate="no">color</code> 속성은 지정하지
 않습니다).</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
@@ -63,7 +63,7 @@ const material = new THREE.MeshBasicMaterial({
 +  map: loader.load('resources/images/wall.jpg'),
 });
 </pre>
-<p>※ <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용했으므로 광원을 사용할 필요가 없습니다.</p>
+<p>※ <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용했으므로 광원을 사용할 필요가 없습니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube.html"></iframe></div>
   <a class="threejs_center" href="../examples/textured-cube.html" target="_blank">새 탭에서 보기</a>
@@ -85,7 +85,7 @@ const material = new THREE.MeshBasicMaterial({
   </div>
 </div>
 
-<p>단순히 재질을 6개 만들어 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 생성할 때 배열로 넘겨주기만 하면 됩니다.</p>
+<p>단순히 재질을 6개 만들어 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 생성할 때 배열로 넘겨주기만 하면 됩니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 
 -const material = new THREE.MeshBasicMaterial({
@@ -110,9 +110,9 @@ const material = new THREE.MeshBasicMaterial({
 
 <p></p>
 <p>주의해야할 점은 모든 <code class="notranslate" translate="no">geometry</code>가 재질을 배열로 받진 않는다는 점입니다.
-<a href="/docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>나 <a href="/docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>는 최대 6개, <a href="/docs/#api/ko/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>와
-<a href="/docs/#api/ko/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>는 밑면과 뿔 부분에 하나씩 최대 2개, <a href="/docs/#api/ko/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>와
-<a href="/docs/#api/ko/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>는 아래, 위, 옆면 하나씩 최대 3개를 지정할 수 있죠.
+<a href="../docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>나 <a href="../docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>는 최대 6개, <a href="../docs/#api/ko/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>와
+<a href="../docs/#api/ko/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>는 밑면과 뿔 부분에 하나씩 최대 2개, <a href="../docs/#api/ko/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>와
+<a href="../docs/#api/ko/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>는 아래, 위, 옆면 하나씩 최대 3개를 지정할 수 있죠.
 다른 경우에는 <code class="notranslate" translate="no">geometry</code>를 따로 만들거나, 텍스처의 좌표를 직접 수정해야 합니다.</p>
 <p>다른 3D 엔진에서나 Three.js에서나, 하나의 <code class="notranslate" translate="no">geometry</code>에서 여러 텍스처를 쓰고 싶을 때는
 보통 <a href="https://en.wikipedia.org/wiki/Texture_atlas">텍스처 아틀라스</a>를 사용합니다.
@@ -124,8 +124,8 @@ const material = new THREE.MeshBasicMaterial({
 <h2 id="-a-name-loading-a-"><a name="loading"></a> 텍스처 불러오기</h2>
 <h3 id="-a-name-easy-a-"><a name="easy"></a> 간단한 방법</h3>
 <p>이 사이트의 예제는 대부분 텍스처를 로딩할 때 간단한 메서드를 사용했습니다.
-<a href="/docs/#api/ko/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>를 생성하고, 인스턴스의 <a href="/docs/#api/ko/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> 메서드를
-호출하는 거죠. 이 <code class="notranslate" translate="no">load</code> 메서드는 <a href="/docs/#api/ko/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> 객체를 반환합니다.</p>
+<a href="../docs/#api/ko/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>를 생성하고, 인스턴스의 <a href="../docs/#api/ko/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> 메서드를
+호출하는 거죠. 이 <code class="notranslate" translate="no">load</code> 메서드는 <a href="../docs/#api/ko/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> 객체를 반환합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const texture = loader.load('resources/images/flower-1.jpg');
 </pre>
 <p>알아둬야 할 건 이 메서드는 비동기로 작동한다는 점입니다. 이미지를 완전히
@@ -156,9 +156,9 @@ loader.load('resources/images/wall.jpg', (texture) =&gt; {
 
 <p></p>
 <h3 id="-a-name-waitmany-a-"><a name="waitmany"></a> 다수의 텍스처를 불러온 후 처리하기</h3>
-<p>다수의 텍스처를 한 번에 불러와야 할 경우 <a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>를 사용할 수 있습니다.
-<a href="/docs/#api/ko/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>를 생성할 때 미리 생성한 <a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 인스턴스를 인자로
-넘겨주고, <a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> 인스턴스의 <a href="/docs/#api/ko/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> 속성에
+<p>다수의 텍스처를 한 번에 불러와야 할 경우 <a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>를 사용할 수 있습니다.
+<a href="../docs/#api/ko/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>를 생성할 때 미리 생성한 <a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 인스턴스를 인자로
+넘겨주고, <a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> 인스턴스의 <a href="../docs/#api/ko/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> 속성에
 콜백 함수를 설정해주는 거죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadManager = new THREE.LoadingManager();
 *const loader = new THREE.TextureLoader(loadManager);
@@ -178,7 +178,7 @@ const materials = [
 +  cubes.push(cube);  // 회전 애니메이션을 위해 배열에 추가
 +};
 </pre>
-<p><a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 <a href="/docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>에 콜백 함수를 지정하면
+<p><a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 <a href="../docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>에 콜백 함수를 지정하면
 현재 진행 상태를 추적할 수 있습니다.</p>
 <p>일단 HTML로 프로그래스 바(progress bar)를 만들겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
@@ -302,7 +302,7 @@ PNG 형식보다 메모리 점유율이 낮진 않습니다.</p>
 작은 밉을 선택해 텍스처를 적용하기만 하면 되죠.</p>
 <p>Three.js에서는 텍스처의 크기가 원본보다 클 때와 작을 때 각각 어떻게 표현할지를
 설정할 수 있습니다.</p>
-<p>텍스처의 크기가 원본보다 클 때의 필터는 <a href="/docs/#api/ko/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a>
+<p>텍스처의 크기가 원본보다 클 때의 필터는 <a href="../docs/#api/ko/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a>
 속성을 <code class="notranslate" translate="no">THREE.NearestFilter</code>나 <code class="notranslate" translate="no">THREE.LinearFilter</code>로 지정해 설정합니다.</p>
 <p><code class="notranslate" translate="no">NearestFilter</code>는 말 그대로 텍스처에서 가장 가까운 픽셀을 고르는 것입니다.
 낮은 해상도라면 텍스처가 픽셀화되어 마인크래프트 같은 느낌을 주겠죠.</p>
@@ -319,7 +319,7 @@ PNG 형식보다 메모리 점유율이 낮진 않습니다.</p>
   </div>
 </div>
 
-<p>텍스처가 원본 크기보다 작을 때의 필터는 <a href="/docs/#api/ko/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a>
+<p>텍스처가 원본 크기보다 작을 때의 필터는 <a href="../docs/#api/ko/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a>
 속성을 다음 6가지 값 중 하나로 지정해 사용합니다.</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.NearestFilter</code></p>
@@ -399,8 +399,8 @@ PNG 형식보다 메모리 점유율이 낮진 않습니다.</p>
 <h2 id="-a-name-uvmanipulation-a-repeating-offseting-rotating-wrapping-"><a name="uvmanipulation"></a> 텍스처의 반복(repeating), 위치 조절(offseting), 회전(rotating), 래핑(wrapping)</h2>
 <p>텍스처에는 반복, 위치, 회전 설정이 있습니다.</p>
 <p>Three.js는 기본적으로 텍스처를 반복하지 않습니다. 반복 여부를 설정하는
-2가지 속성이 있는데, 하나는 수평 래핑을 설정하는 <a href="/docs/#api/ko/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a>이고,
-또 하나는 수직 래핑을 설정하는 <a href="/docs/#api/ko/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a>입니다.</p>
+2가지 속성이 있는데, 하나는 수평 래핑을 설정하는 <a href="../docs/#api/ko/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a>이고,
+또 하나는 수직 래핑을 설정하는 <a href="../docs/#api/ko/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a>입니다.</p>
 <p>두 속성은 다음 중 하나로 지정할 수 있습니다.</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
@@ -506,7 +506,7 @@ gui.add(texture.center, 'y', -.5, 1.5, .01).name('texture.center.y');
 gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
   .name('texture.rotation');
 </pre>
-<p>텍스처의 <code class="notranslate" translate="no">wrapS</code>나 <code class="notranslate" translate="no">wrapT</code> 속성을 변경할 경우 <a href="/docs/#api/ko/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>를
+<p>텍스처의 <code class="notranslate" translate="no">wrapS</code>나 <code class="notranslate" translate="no">wrapT</code> 속성을 변경할 경우 <a href="../docs/#api/ko/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>를
 <code class="notranslate" translate="no">true</code>로 설정해줘야 합니다. 나머지 설정만 변경한다면 굳이 이 값을 설정할 필요는 없죠.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube-adjust.html"></iframe></div>

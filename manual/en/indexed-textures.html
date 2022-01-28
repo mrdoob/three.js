@@ -328,7 +328,7 @@ our outline texture so we can look up the color from a palette texture
 and mix them for the final result.</p>
 <p>Like we <a href="optimize-lots-of-objects-animated.html">did before</a> we'll make an array
 of search and replacement strings and apply them to the shader in 
-<a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>.</p>
+<a href="../docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
@@ -402,7 +402,7 @@ const paletteTexture = new THREE.DataTexture(
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
-<p>A <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> let's us give a texture raw data. In this case
+<p>A <a href="../docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> let's us give a texture raw data. In this case
 we're giving it 512 RGB colors, 3 bytes each where each byte is
 red, green, and blue respectively using values that go from 0 to 255.</p>
 <p>Let's fill it with random colors just to see it work</p>

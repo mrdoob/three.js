@@ -73,7 +73,7 @@ import { BloomPass } from '/examples/jsm/postprocessing/BloomPass.js';
 import { FilmPass } from '/examples/jsm/postprocessing/FilmPass.js';
 </pre>
 <p>대부분의 후처리에는 <code class="notranslate" translate="no">EffectComposer.js</code>와 <code class="notranslate" translate="no">RenderPass.js</code>가 필수입니다.</p>
-<p>이제 <a href="/docs/#api/ko/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> 대신 <code class="notranslate" translate="no">EffectComposer.render</code>를 사용<em>하고</em> <code class="notranslate" translate="no">EffectComposer</code>가 결과물을 캔버스의 크기에 맞추도록 해야 합니다.</p>
+<p>이제 <a href="../docs/#api/ko/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> 대신 <code class="notranslate" translate="no">EffectComposer.render</code>를 사용<em>하고</em> <code class="notranslate" translate="no">EffectComposer</code>가 결과물을 캔버스의 크기에 맞추도록 해야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(now) {
 -  time *= 0.001;
 +let then = 0;
@@ -181,7 +181,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
   `,
 };
 </pre>
-<p>위 코드에서 <code class="notranslate" translate="no">tDiffuse</code>는 이전 pass의 결과물을 받아오기 위한 것으로 거의 모든 경우에 필수입니다. 그리고 그 바로 밑에 <code class="notranslate" translate="no">color</code> 속성을 Three.js의 <a href="/docs/#api/ko/math/Color"><code class="notranslate" translate="no">Color</code></a>로 선언했습니다.</p>
+<p>위 코드에서 <code class="notranslate" translate="no">tDiffuse</code>는 이전 pass의 결과물을 받아오기 위한 것으로 거의 모든 경우에 필수입니다. 그리고 그 바로 밑에 <code class="notranslate" translate="no">color</code> 속성을 Three.js의 <a href="../docs/#api/ko/math/Color"><code class="notranslate" translate="no">Color</code></a>로 선언했습니다.</p>
 <p>다음으로 vertex 쉐이더를 작성해야 합니다. 위 코드에서 작성한 vertex 쉐이더는 후처리에서 거의 표준처럼 사용하는 코드로, 대부분의 경우 바꿀 필요가 없습니다. 뭔가 많이 설정한 경우(아까 언급한 링크 참조)가 아니라면 <code class="notranslate" translate="no">uv</code>, <code class="notranslate" translate="no">projectionMatrix</code>, <code class="notranslate" translate="no">modelViewMatrix</code>, <code class="notranslate" translate="no">position</code> 변수는 Three.js가 알아서 넣어줍니다.</p>
 <p>마지막으로 fragment 쉐이더를 생성합니다. 아래 코드로 이전 pass에서 넘겨준 결과물의 픽셀 색상값을 가져올 수 있습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 previousPassColor = texture2D(tDiffuse, vUv);

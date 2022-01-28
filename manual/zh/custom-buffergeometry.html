@@ -20,7 +20,7 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>在three.js中， <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 是用来代表所有几何体的一种方式。 <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 本质上是一系列 <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>s 的 <em>名称</em> 。每一个 <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 代表一种类型数据的数组：位置，法线，颜色，uv，等等…… 这些合起来， <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>s 代表每个顶点所有数据的 <em>并行数组</em> 。</p>
+          <p>在three.js中， <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 是用来代表所有几何体的一种方式。 <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 本质上是一系列 <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>s 的 <em>名称</em> 。每一个 <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 代表一种类型数据的数组：位置，法线，颜色，uv，等等…… 这些合起来， <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>s 代表每个顶点所有数据的 <em>并行数组</em> 。</p>
 <div class="threejs_center"><img src="../resources/threejs-attributes.svg" style="width: 700px"></div>
 
 <p>上面提到，我们有四个属性：<code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">color</code>, <code class="notranslate" translate="no">uv</code> 。
@@ -31,7 +31,7 @@
 <p>考虑下方块的单个角，不同的面都需要一个不同的法线。法线是面朝向的信息。在图中，在方块的角周围用箭头表示的法线，代表共用顶点位置的面需要指向不同方向的法线。</p>
 <p>同理，一个角在不同的面需要不同的UVs。UVs是用来指定纹理区域中，画在相应顶点位置三角形的纹理坐标。你可以看到，绿色的面需要顶点的UV对应于F纹理的右上角，蓝色的面需要的UV对应于F纹理的左上角，红色的面需要的UV对应于F纹理的左下角。</p>
 <p>一个简单的 <em>顶点</em> 是所有组成部分的集合。如果顶点需要其中任一部分变得不同，那么它必须是一个不同的顶点。</p>
-<p>举一个简单的例子，让我们创建一个使用 <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 的方块。方块很有趣，因为它看起来在角的地方共用顶点但实际上不是。在我们的例子中，我们将列出所有顶点数据，然后转化成并行数组，最后用它们创建 <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>s 并添加到 <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 。</p>
+<p>举一个简单的例子，让我们创建一个使用 <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 的方块。方块很有趣，因为它看起来在角的地方共用顶点但实际上不是。在我们的例子中，我们将列出所有顶点数据，然后转化成并行数组，最后用它们创建 <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>s 并添加到 <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 。</p>
 <p>我们从方块所需的所有数据开始。再次记住如果顶点有任何独一无二的部分，它必须是不同的顶点。像这里创建一个方块需要36个顶点，每个面2个三角形，每个三角形3个顶点，6个面=36个顶点。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertices = [
   // front
@@ -94,7 +94,7 @@ for (const vertex of vertices) {
   uvs.push(...vertex.uv);
 }
 </pre>
-<p>最终我们能创建一个 <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> ，然后为每个数组创建一个 <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 并添加到 <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 。</p>
+<p>最终我们能创建一个 <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> ，然后为每个数组创建一个 <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 并添加到 <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const geometry = new THREE.BufferGeometry();
   const positionNumComponents = 3;
   const normalNumComponents = 3;
@@ -111,7 +111,7 @@ for (const vertex of vertices) {
 </pre>
 <p>注意名字很重要。你必须将属性的名字命名成three.js所期望的(除非你正在创建自定义着色器)，在这里是 <code class="notranslate" translate="no">position</code>、 <code class="notranslate" translate="no">normal</code> 和 <code class="notranslate" translate="no">uv</code> 。如果你想要设置顶点颜色则命名属性为 <code class="notranslate" translate="no">color</code> 。</p>
 <p>在上面我们创建了3个JavaScript原生数组， <code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code> 和 <code class="notranslate" translate="no">uvs</code> 。
-然后我们将他们转换为 <code class="notranslate" translate="no">Float32Array</code> 的类型数组<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>。 <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 是类型数组而不是原生数组。同时 <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 需要你设定每个顶点有多少组成成分。对于位置和法线，每个顶点我们需要3个组成成分，x、y和z。对于UVs我们需要2个，u和v。</p>
+然后我们将他们转换为 <code class="notranslate" translate="no">Float32Array</code> 的类型数组<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>。 <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 是类型数组而不是原生数组。同时 <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 需要你设定每个顶点有多少组成成分。对于位置和法线，每个顶点我们需要3个组成成分，x、y和z。对于UVs我们需要2个，u和v。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../custom-buffergeometry-cube.html"></iframe></div>
   <a class="threejs_center" href="../examples/custom-buffergeometry-cube.html" target="_blank">点击此处在新标签页中打开</a>
@@ -170,7 +170,7 @@ for (const vertex of vertices) {
   { pos: [-1, -1, -1], norm: [ 0, -1,  0], uv: [1, 1], }, // 23
 ];
 </pre>
-<p>现在我们有24个唯一的顶点。然后我们为36个要画的顶点设定36个索引，通过调用 <a href="/docs/#api/zh/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a> 并传入索引数组来创建12个三角形。</p>
+<p>现在我们有24个唯一的顶点。然后我们为36个要画的顶点设定36个索引，通过调用 <a href="../docs/#api/zh/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a> 并传入索引数组来创建12个三角形。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(positions, positionNumComponents));
@@ -196,7 +196,7 @@ geometry.setAttribute(
 </div>
 
 <p></p>
-<p>如果你没有提供法线数据的话， <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 有个方法<a href="/docs/#api/zh/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a>可以用来计算法线。不幸的是，因为如果顶点的其他数据不同的话，位置数据不能被共享，调用  <code class="notranslate" translate="no">computeVertexNormals</code> 会让你的几何体像球面或者圆筒一样连接自身。</p>
+<p>如果你没有提供法线数据的话， <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 有个方法<a href="../docs/#api/zh/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a>可以用来计算法线。不幸的是，因为如果顶点的其他数据不同的话，位置数据不能被共享，调用  <code class="notranslate" translate="no">computeVertexNormals</code> 会让你的几何体像球面或者圆筒一样连接自身。</p>
 <div class="spread">
   <div>
     <div data-diagram="bufferGeometryCylinder"></div>
@@ -264,7 +264,7 @@ geometry.setIndex([
 <p>一个使用类型数组的好理由，是如果你想动态更新顶点数据的任何一部分。</p>
 <p>因为想不起动态更新顶点数据的好例子，所以我决定创建一个球面并从中央开始进进出出地移动每个四边形。但愿它是个有用的例子。</p>
 <p>这里是用来产生球面的位置和索引数据的代码。代码共享了四边形内的顶点数据，但是四边形之间的没有共享，因为我们需要分别地移动每个四边形。</p>
-<p>因为我懒，所以我通过3个 <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 对象的层级关系，计算球面的点。关于如何计算在这篇文章有解释<a href="optimize-lots-of-objects.html">the article on optimizing lots of objects</a>。</p>
+<p>因为我懒，所以我通过3个 <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 对象的层级关系，计算球面的点。关于如何计算在这篇文章有解释<a href="optimize-lots-of-objects.html">the article on optimizing lots of objects</a>。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeSpherePositions(segmentsAround, segmentsDown) {
   const numVertices = segmentsAround * segmentsDown * 6;
   const numComponents = 3;
@@ -364,7 +364,7 @@ positionAttribute.needsUpdate = true;
 </div>
 
 <p></p>
-<p>我希望这些例子能对如何使用 <a href="/docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 直接创建你自己的几何体和如何动态更新 <a href="/docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 的内容发挥作用。</p>
+<p>我希望这些例子能对如何使用 <a href="../docs/#api/zh/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> 直接创建你自己的几何体和如何动态更新 <a href="../docs/#api/zh/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 的内容发挥作用。</p>
 <!-- needed in English only to prevent warning from outdated translations -->
 <p><a href="resources/threejs-geometry.svg"></a>
 <a href="custom-geometry.html"></a></p>

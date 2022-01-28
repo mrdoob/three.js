@@ -207,7 +207,7 @@ or touch them to switch sets</p>
 with those!??! In any case how do we animate between these 4 sets of data.</p>
 <p>Lots of ideas.</p>
 <ul>
-<li><p>Just fade between them using <a href="/docs/#api/en/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a></p>
+<li><p>Just fade between them using <a href="../docs/#api/en/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a></p>
 <p>The problem with this solution is the cubes perfectly overlap which
 means there will be z-fighting issues. It's possible we could fix
 that by changing the depth function and using blending. We should
@@ -461,7 +461,7 @@ use the same colors even if they are vastly different.</p>
 be brittle. The least brittle way would probably be to 100% write our own
 shaders but I think it would be useful to see how to modify the built
 in shaders.</p>
-<p>The first thing we need to do is make the code extract color a <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> from
+<p>The first thing we need to do is make the code extract color a <a href="../docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> from
 each data set's geometry.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// use the first geometry as the base
 // and add all the geometries as morphtargets
@@ -483,7 +483,7 @@ const material = new THREE.MeshBasicMaterial({
 });
 </pre>
 <p>We then need to modify the three.js shader. Three.js materials have an
-<a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> property we can assign a function. It gives us a
+<a href="../docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> property we can assign a function. It gives us a
 chance to modify the material's shader before it is passed to WebGL. In fact the
 shader that is provided is actually a special three.js only syntax of shader
 that lists a bunch of shader <em>chunks</em> that three.js will substitute with the
@@ -527,7 +527,7 @@ the <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/S
 the <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_vertex</code> chunk</a>
 the <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl.js"><code class="notranslate" translate="no">color_pars_vertex</code> chunk</a>
 and the <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js"><code class="notranslate" translate="no">color_vertex</code> chunk</a></p>
-<p>To do that we'll make a simple array of replacements and apply them in <a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a></p>
+<p>To do that we'll make a simple array of replacements and apply them in <a href="../docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({
   vertexColors: true,
 });
@@ -665,7 +665,7 @@ difference but based on how we are displaying the info, cubes that grow from the
 surface of the earth, we'd prefer most cubes to be low. If we used one of these
 other comparisons most cubes would be about 1/2 their maximum height which would
 not make a good visualization. Feel free to change the <code class="notranslate" translate="no">amountGreaterThan</code> from
-<a href="/docs/#api/en/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> to something like <code class="notranslate" translate="no">(a - b)</code> "raw difference" or <code class="notranslate" translate="no">a / (a +
+<a href="../docs/#api/en/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> to something like <code class="notranslate" translate="no">(a - b)</code> "raw difference" or <code class="notranslate" translate="no">a / (a +
 b)</code> "percent" and you'll see what I mean.</p>
 
         </div>

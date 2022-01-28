@@ -173,8 +173,8 @@ earthMesh.position.x = 10;
 +solarSystem.add(earthMesh);
 objects.push(earthMesh);
 </pre>
-<p>Здесь мы сделали <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Как и <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> он также является узлом в графе сцены, 
-но в отличие от <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> он не имеет материала или геометрии. Это просто 
+<p>Здесь мы сделали <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Как и <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> он также является узлом в графе сцены, 
+но в отличие от <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> он не имеет материала или геометрии. Это просто 
 представляет локальное пространство.</p>
 <p>Наш новый граф сцены выглядит следующим образом</p>
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
@@ -210,7 +210,7 @@ objects.push(earthMesh);
 +moonOrbit.add(moonMesh);
 +objects.push(moonMesh);
 </pre>
-<p>Снова мы добавили еще один невидимый узел графа сцены <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> под названием <code class="notranslate" translate="no">earthOrbit</code>
+<p>Снова мы добавили еще один невидимый узел графа сцены <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> под названием <code class="notranslate" translate="no">earthOrbit</code>
 и добавили <code class="notranslate" translate="no">earthMesh</code> и <code class="notranslate" translate="no">moonMesh</code> к нему. Новый граф сцены выглядит следующим образом.</p>
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
 <p>и вот что</p>
@@ -225,7 +225,7 @@ objects.push(earthMesh);
 граф сцены, чтобы он сделал это за нас.</p>
 <p>Часто полезно рисовать что-то для визуализации узлов в графе сцены. 
 Three.js имеет несколько полезных ... ммм, помощников ... помогающих с этим.</p>
-<p>Один называется <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>. Он рисует 3 линии, представляющие локальные оси
+<p>Один называется <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>. Он рисует 3 линии, представляющие локальные оси
 <span style="color:red">X</span>,
 <span style="color:green">Y</span>, и
 <span style="color:blue">Z</span> Давайте добавим по одному к каждому узлу, 
@@ -258,14 +258,14 @@ objects.forEach((node) =&gt; {
 И <code class="notranslate" translate="no">sunMesh</code> и  <code class="notranslate" translate="no">solarSystem</code> находятся в одинаковом положении. Точно так же <code class="notranslate" translate="no">earthMesh</code> и
 <code class="notranslate" translate="no">earthOrbit</code>находятся в той же позиции. Давайте добавим несколько простых элементов управления, 
 чтобы мы могли включать и выключать их для каждого узла. Пока мы делаем это, 
-давайте также добавим еще одного помощника под названием <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. 
+давайте также добавим еще одного помощника под названием <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. 
 Создающего двумерную сетку на плоскости X, Z. По умолчанию сетка составляет 
 10х10 единиц.</p>
 <p>Мы также собираемся использовать <a href="https://github.com/georgealways/lil-gui">lil-gui</a> 
 библиотеку пользовательского интерфейса, которая очень популярна в проектах Three.js. 
 lil-gui принимает объект и имя свойства для этого объекта и в зависимости от типа 
 свойства автоматически создает пользовательский интерфейс для управления этим свойством.</p>
-<p>Мы хотим сделать <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> и <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> для каждого узла. Нам нужна метка для каждого 
+<p>Мы хотим сделать <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> и <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> для каждого узла. Нам нужна метка для каждого 
 узла, поэтому мы избавимся от старого цикла и переключимся на вызов некоторой 
 функции, чтобы добавить помощники для каждого узла</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// добавляем AxesHelper к каждому узлу
@@ -296,7 +296,7 @@ lil-gui принимает объект и имя свойства для это
 одного свойства, поэтому мы создадим класс, который имеет метод получения и 
 установки для свойства. Таким образом, мы можем позволить lil-gui думать, 
 что он манипулирует одним свойством, но внутри мы можем установить видимое 
-свойство <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> и <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> для узла.</p>
+свойство <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> и <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> для узла.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Для включения и выключения видимых осей и сетки
 // lil-gui требуется свойство, которое возвращает bool
 // это checkbox мы сделали сеттер и геттер
@@ -327,8 +327,8 @@ class AxisGridHelper {
   }
 }
 </pre>
-<p>Мы устанавливаем <code class="notranslate" translate="no">renderOrder</code> в <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>
-равным 2, а для <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> равным 1 так, что оси втянуться после появления сетки. 
+<p>Мы устанавливаем <code class="notranslate" translate="no">renderOrder</code> в <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>
+равным 2, а для <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> равным 1 так, что оси втянуться после появления сетки. 
 В противном случае сетка может перезаписать оси.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
@@ -353,7 +353,7 @@ class AxisGridHelper {
 чтобы охватить каждый палец (по крайней мере, еще 28 узлов) и каждый палец 
 (еще 28 узлов), плюс для челюсти, глаз и, возможно, больше.</p>
 <p>Я надеюсь, что это дает некоторое представление о том, как работает граф сцены 
-и как вы можете его использовать. Создание <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> узлов и родительских 
+и как вы можете его использовать. Создание <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> узлов и родительских 
 объектов для них - важный шаг к хорошему использованию трехмерного движка, 
 такого как three.js. Часто может показаться, что какая-то сложная математика 
 необходима, чтобы заставить что-то двигаться и вращаться так, как вы хотите. 

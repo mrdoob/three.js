@@ -57,7 +57,7 @@
 +scene.background = new THREE.Color('white');
 </pre>
 <p>같은 체크판 무늬 땅을 사용하되, 땅이 조명의 영향을 받을 필요는 없으니
-<a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용하겠습니다.</p>
+<a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
 {
@@ -102,12 +102,12 @@ const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, s
 const shadowGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 </pre>
 <p>이제 구체를 아주 많이 만들겠습니다. 각각 구체마다 <code class="notranslate" translate="no">컨테이너</code> 역할을 할
-<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>를 만들고, 그림자 평면 mesh, 구체 mesh를 이
+<a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>를 만들고, 그림자 평면 mesh, 구체 mesh를 이
 컨테이너의 자식으로 만듭니다. 이러면 구체와 그림자를 동시에 움직일 수
 있죠. z-파이팅 현상을 막기 위해 그림자는 땅보다 약간 위에 둡니다.
 또 <code class="notranslate" translate="no">depthWrite</code> 속성을 false로 설정해 그림자끼리 충돌하는 현상을
 막습니다. 이 충돌 현상은 <a href="transparency.html">다른 글</a>에서
-더 자세히 이야기할 거예요. 그림자는 빛을 반사하지 않으니 <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을
+더 자세히 이야기할 거예요. 그림자는 빛을 반사하지 않으니 <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을
 사용합니다.</p>
 <p>구체의 색상을 각각 다르게 지정하고, 컨테이너, 구체 mesh, 그림자 mesh와
 구체의 처음 y축 좌표를 배열에 기록합니다.</p>
@@ -146,7 +146,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   sphereShadowBases.push({ base, sphereMesh, shadowMesh, y: sphereMesh.position.y });
 }
 </pre>
-<p>조명은 2개를 만들겠습니다. 하나는 <a href="/docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>, 강도를 2로 설정해 화면을 아주
+<p>조명은 2개를 만들겠습니다. 하나는 <a href="../docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>, 강도를 2로 설정해 화면을 아주
 밝게 설정할 겁니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const skyColor = 0xB1E1FF;  // 하늘색
@@ -156,7 +156,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   scene.add(light);
 }
 </pre>
-<p>다른 하나는 구체의 윤곽을 좀 더 분명하게 해 줄 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>입니다.</p>
+<p>다른 하나는 구체의 윤곽을 좀 더 분명하게 해 줄 <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -169,7 +169,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 </pre>
 <p>이대로도 렌더링해도 좋지만, 구체들에 애니메이션을 한 번 줘봅시다.
 컨테이너를 움직여 구체, 그림자가 xz축 평면을 따라 움직이게 하고,
-<a href="/docs/#api/ko/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>를 사용해 구체에 공처럼 통통 튀는
+<a href="../docs/#api/ko/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>를 사용해 구체에 공처럼 통통 튀는
 애니메이션을 넣어줍니다. 또 그림자 재질의 투명도를 조절해 구체가
 높을수록 그림자가 옅어지도록 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
@@ -214,9 +214,9 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 분명 있습니다. 모든 그림자를 둥글게 표현한 예 중 하나는 <a href="https://www.google.com/search?tbm=isch&amp;q=animal+crossing+pocket+camp+screenshots">동물의 숲 포켓 캠프</a>입니다.
 자연스럽고 성능면에서도 이득이죠. <a href="https://www.google.com/search?q=monument+valley+screenshots&amp;tbm=isch">Monument Valley</a>도
 메인 캐릭터에 이런 그림자를 사용한 것으로 보입니다.</p>
-<p>이제 그림자 맵을 살펴보겠습니다. 그림자를 드리울 수 있는 조명은 3가지, <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>,
-<a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>, <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>입니다.</p>
-<p><a href="lights.html">조명에 관한 글</a>에서 썼던 예제로 먼저 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>부터
+<p>이제 그림자 맵을 살펴보겠습니다. 그림자를 드리울 수 있는 조명은 3가지, <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>,
+<a href="../docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>, <a href="../docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>입니다.</p>
+<p><a href="lights.html">조명에 관한 글</a>에서 썼던 예제로 먼저 <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>부터
 살펴보죠.</p>
 <p>먼저 renderer의 그림자 맵 옵션을 켜야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
@@ -251,11 +251,11 @@ mesh.receiveShadow = true;
 <p></p>
 <p>이런, 그림자 일부가 잘려나간 것이 보이나요?</p>
 <p>이는 빛의 시점에서 장면을 렌더링해 그림자 맵을 만들기 때문입니다. 위 예제를 예로 들면
-<a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>의 위치에 카메라가 있고, 해당 조명의 목표를 바라보는 것이죠. 조명의
+<a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>의 위치에 카메라가 있고, 해당 조명의 목표를 바라보는 것이죠. 조명의
 그림자에는 별도의 카메라가 있고, 이전에 <a href="cameras.html">카메라에 관한 글</a>에서
 설명한 것처럼 일정 공간 안의 그림자만 렌더링합니다. 위 예제에서는 그 공간이 너무 좁은
 것이죠.</p>
-<p>그림자용 카메라를 시각화하기 위해 조명의 그림자 속성에서 카메라를 가져와 <a href="/docs/#api/ko/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>를
+<p>그림자용 카메라를 시각화하기 위해 조명의 그림자 속성에서 카메라를 가져와 <a href="../docs/#api/ko/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>를
 생성한 뒤, 장면에 추가하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(light.shadow.camera);
 scene.add(cameraHelper);
@@ -270,11 +270,11 @@ scene.add(cameraHelper);
 <p>target의 x 값을 조정해보면 그림자용 카메라 범위 안에 있는 곳에만 그림자가 보이는
 것을 확인할 수 있을 겁니다.</p>
 <p>이 공간의 크기는 이 카메라의 속성을 수정해 바꿀 수 있습니다.</p>
-<p>그림자용 카메라의 속성을 수정하는 GUI를 추가해보죠. <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>는 빛이 평행으로
-나아가므로, <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>는  그림자용 카메라로 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>(정사영 카메라)를
-사용합니다. <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>가 뭔지 잘 기억나지 않는다면, <a href="cameras.html">카메라에 관한 이전 글</a>을
+<p>그림자용 카메라의 속성을 수정하는 GUI를 추가해보죠. <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>는 빛이 평행으로
+나아가므로, <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>는  그림자용 카메라로 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>(정사영 카메라)를
+사용합니다. <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>가 뭔지 잘 기억나지 않는다면, <a href="cameras.html">카메라에 관한 이전 글</a>을
 참고하세요.</p>
-<p><a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>의 시야는 육면체나 <em>절두체(frustum)</em>로 정의한다고 했었죠. <code class="notranslate" translate="no">left</code>,
+<p><a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>의 시야는 육면체나 <em>절두체(frustum)</em>로 정의한다고 했었죠. <code class="notranslate" translate="no">left</code>,
 <code class="notranslate" translate="no">right</code>, <code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code>, <code class="notranslate" translate="no">zoom</code> 속성을 지정해서요.</p>
 <p>lil-gui가 쓸 간단한 헬퍼 클래스를 하나 더 만들겠습니다. 이 <code class="notranslate" translate="no">DimensionGUIHelper</code>는
 객체와 속성 이름 2개를 인자로 받아, GUI가 하나의 값을 조정할 때 하나의 값은 양수로,
@@ -352,10 +352,10 @@ updateCamera();
 가능한 작게 설정하는 것이 좋습니다. 이는 그림자용 카메라의 공간도 마찬가지죠. 작을 수록
 그림자의 퀄리티가 좋아질 테니 가능한 공간을 작게 설정하는 것이 좋습니다. 또한 기기마다
 렌더링할 수 있는 텍스처의 용량이 정해져 있으니 주의해야 합니다. Three.js에서 이 용량은
-<a href="/docs/#api/ko/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>로 확인할 수 있습니다.</p>
-<p><a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>는 그림자용 카메라로 <a href="/docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>(원근 카메라)를 사용합니다. <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>의
-그림자용 카메라는 거의 모든 속성을 직접 변경할 수 있었지만, <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>의 그림자용 카메라는
-조명 속성의 영향을 받습니다. 카메라의 <code class="notranslate" translate="no">fov</code> 속성은 <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>의 <code class="notranslate" translate="no">angle</code> 속성과 직접 연결되어
+<a href="../docs/#api/ko/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>로 확인할 수 있습니다.</p>
+<p><a href="../docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>는 그림자용 카메라로 <a href="../docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>(원근 카메라)를 사용합니다. <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>의
+그림자용 카메라는 거의 모든 속성을 직접 변경할 수 있었지만, <a href="../docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>의 그림자용 카메라는
+조명 속성의 영향을 받습니다. 카메라의 <code class="notranslate" translate="no">fov</code> 속성은 <a href="../docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>의 <code class="notranslate" translate="no">angle</code> 속성과 직접 연결되어
 있죠. <code class="notranslate" translate="no">aspect</code>는 그림자 맵의 크기에 따라 자동으로 정해집니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
@@ -367,9 +367,9 @@ updateCamera();
 </div>
 
 <p></p>
-<p>마지막으로 <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>를 살펴보죠. <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>는 모든 방향으로 빛을 발산하기에
-관련 설정은 <code class="notranslate" translate="no">near</code>와 <code class="notranslate" translate="no">far</code> 정도입니다. 그리고 사실 <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>의 그림자는 정육면체의
-각 면에 <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>를 하나씩, 총 6개의 그림자를 놓은 것과 같습니다. 한 방향에 한
+<p>마지막으로 <a href="../docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>를 살펴보죠. <a href="../docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>는 모든 방향으로 빛을 발산하기에
+관련 설정은 <code class="notranslate" translate="no">near</code>와 <code class="notranslate" translate="no">far</code> 정도입니다. 그리고 사실 <a href="../docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>의 그림자는 정육면체의
+각 면에 <a href="../docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>를 하나씩, 총 6개의 그림자를 놓은 것과 같습니다. 한 방향에 한
 번씩, 총 6번을 렌더링해야 하니 렌더링 속도가 훨씬 느리겠죠.</p>
 <p>이번에는 장면 주위에 상자를 두어 벽과 천장에도 그림자가 생길 수 있도록 해보겠습니다.
 먼저 재질의 <code class="notranslate" translate="no">side</code> 속성을 <code class="notranslate" translate="no">THREE.BackSide</code>로 설정해 외부 상자의 밖이 아닌 안을 렌더링
@@ -388,7 +388,7 @@ updateCamera();
   scene.add(mesh);
 }
 </pre>
-<p>물론 조명도 <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>로 바꿔야죠.</p>
+<p>물론 조명도 <a href="../docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>로 바꿔야죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.SpotLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 

@@ -27,7 +27,7 @@
 <p><a href="webxr-look-to-select.html">이전 글</a>에서는 사용자가 보는 것을 통해 항목을 가리키며 선택할 수 있도록 하는 매우 간단한 VR 예제를 살펴보았습니다.
 이 글에서는 한 단계 더 나아가 사용자가 포인팅 장치를 사용하여 항목을 선택할 수 있도록 해보겠습니다.</p>
 <p>Three.js는 2개의 컨트롤러 개체를 VR로 제공하여 비교적 쉽게 만들며 단일 3DOF 컨트롤러와 2개의 6DOF 컨트롤러의 경우를 모두 처리하려고 합니다.
-각 컨트롤러는 컨트롤러의 방향과 위치를 제공하는 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 개체입니다.
+각 컨트롤러는 컨트롤러의 방향과 위치를 제공하는 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 개체입니다.
 또한 사용자가 컨트롤러의 "메인" 버튼을 누르기 시작하고, 누르고, 누르기를 중지할 때(끝낼 때) <code class="notranslate" translate="no">selectstart</code>, <code class="notranslate" translate="no">select</code> 및 <code class="notranslate" translate="no">selectend</code> 이벤트를 제공합니다.</p>
 <p><a href="webxr-look-to-select.html">이전 글</a>의 마지막 예시에서 <code class="notranslate" translate="no">PickHelper</code>를 <code class="notranslate" translate="no">ControllerPickHelper</code>로 변경해 보겠습니다.</p>
 <p>이번의 새로운 구현에서는 선택된 개체를 제공하는 <code class="notranslate" translate="no">select</code> 이벤트를 내보낼 것입니다.
@@ -123,7 +123,7 @@ pickHelper.addEventListener('select', (event) =&gt; {
 +  }
 }
 </pre>
-<p><a href="/docs/#api/ko/core/Raycaster"><code class="notranslate" translate="no">Raycaster</code></a>를 사용하기 전에는 그랬지만 이번에는 컨트롤러에서 ray를 가져옵니다.
+<p><a href="../docs/#api/ko/core/Raycaster"><code class="notranslate" translate="no">Raycaster</code></a>를 사용하기 전에는 그랬지만 이번에는 컨트롤러에서 ray를 가져옵니다.
 이전 <code class="notranslate" translate="no">PickHelper</code>에서는 한 가지만 선택할 수 있었지만, 여기서는 한 손에 하나씩 최대 2개의 컨트롤러가 있습니다.
 우리는 각 컨트롤러가 보고 있는 개체를 <code class="notranslate" translate="no">controllerToObjectMap</code>에 저장해야 합니다.
 또한 원래 방사체의 색을 <code class="notranslate" translate="no">objectToColorMap</code>에 저장하여 선이 가리키는 모든 부분에 닿을 수 있을 만큼 길게 만듭니다.</p>
@@ -148,7 +148,7 @@ pickHelper.addEventListener('select', (event) =&gt; {
 }
 </pre>
 <p>다음으로 우리는 사용자가 컨트롤러를 클릭했을 때 <code class="notranslate" translate="no">select</code> 이벤트를 내보내야 합니다.
-이를위해 three.js의 <a href="/docs/#api/ko/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a>를 확장한 후 컨트롤러에서 <code class="notranslate" translate="no">select</code> 이벤트를 확인하고
+이를위해 three.js의 <a href="../docs/#api/ko/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a>를 확장한 후 컨트롤러에서 <code class="notranslate" translate="no">select</code> 이벤트를 확인하고
 해당 컨트롤러가 가리키는 것이 있으면 해당 컨트롤러가 가리키는 <code class="notranslate" translate="no">select</code> 이벤트를 내보냅니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class ControllerPickHelper {
 +class ControllerPickHelper extends THREE.EventDispatcher {
@@ -321,7 +321,7 @@ pickHelper.addEventListener('select', (event) =&gt; {
 </pre>
 <p>한 개체가 선택되면 해당 개체와 원래의 부모 개체가 저장됩니다.
 사용자가 작업을 마치면 개체를 다시 돌려놓을 수 있습니다.</p>
-<p><a href="/docs/#api/ko/core/Object3D.attach"><code class="notranslate" translate="no">Object3D.attach</code></a>를 사용하여 선택한 개체를 재부모화 합니다.
+<p><a href="../docs/#api/ko/core/Object3D.attach"><code class="notranslate" translate="no">Object3D.attach</code></a>를 사용하여 선택한 개체를 재부모화 합니다.
 이러한 기능을 통해 scene에서 객체의 방향과 위치를 변경하지 않고도 객체의 부모를 변경할 수 있습니다.</p>
 <p>그리고 우리는 이를 통해 6DOF컨트롤러로 물체를 이동하거나 3DOF 컨트롤러로 방향을 전환할 수도 있을 것입니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

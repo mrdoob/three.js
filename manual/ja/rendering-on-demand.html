@@ -32,7 +32,7 @@ requestAnimationFrame(render);
 <p>これを解決する最も明確な方法は、最初に一度レンダリングして何か変更された時だけレンダリングする事です。
 変更にはテクスチャやモデルの読込完了、外部ソースからのデータ受取、ユーザーによる設定やカメラ調整などその他の関連する入力などが含まれます。</p>
 <p><a href="responsive.html">レスポンシブデザインの記事</a>を例に要求に応じてレンダリングするように修正してみましょう。</p>
-<p>最初に <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。これで何かの変更を反映してレンダリングする事ができます。</p>
+<p>最初に <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。これで何かの変更を反映してレンダリングする事ができます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 </pre>
@@ -86,8 +86,8 @@ camera.position.z = 2;
 <p>そして、もう一度レンダリングする必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
 </pre>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がカメラ設定を変更する時はレンダリングする必要があります。
-幸いな事に <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は何か変更された時に <code class="notranslate" translate="no">change</code> イベントをdispatchします。</p>
+<p><a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がカメラ設定を変更する時はレンダリングする必要があります。
+幸いな事に <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は何か変更された時に <code class="notranslate" translate="no">change</code> イベントをdispatchします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
 </pre>
 <p>ウィンドウのリサイズ時の対応も必要です。
@@ -101,12 +101,12 @@ camera.position.z = 2;
 </div>
 
 <p></p>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> には慣性のようなものを追加して動きを滑らかにするオプションがあります。
+<p><a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> には慣性のようなものを追加して動きを滑らかにするオプションがあります。
 これを有効にするには <code class="notranslate" translate="no">enableDamping</code> プロパティをtrueに設定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
 </pre>
 <p><code class="notranslate" translate="no">enableDamping</code> をオンにした状態で、render関数内で <code class="notranslate" translate="no">controls.update</code> を呼び出す必要があります。
-これで動きを滑らかにする新しいカメラ設定を <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> に与えてくれます。
+これで動きを滑らかにする新しいカメラ設定を <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> に与えてくれます。
 この設定は動きを滑らかにしてくれますが、無限ループになってしまうので <code class="notranslate" translate="no">change</code> イベントから直接 <code class="notranslate" translate="no">render</code> を呼び出す事はできません。
 controlsは <code class="notranslate" translate="no">change</code> イベントを送信し <code class="notranslate" translate="no">render</code> を呼び出します。 <code class="notranslate" translate="no">render</code> は <code class="notranslate" translate="no">controls.update</code> を呼び出します。
 <code class="notranslate" translate="no">controltrols.update</code> は別の <code class="notranslate" translate="no">change</code> イベントを送信します。</p>

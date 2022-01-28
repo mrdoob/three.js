@@ -33,12 +33,12 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 Вы создадите модель, а затем экспортируете в <a href="load-gltf.html">gLTF</a> или <a href="load-obj.html">.obj</a> и загрузите их. 
 Какой бы вариант вы ни выбрали, рассчитывайте потратить 2 или 3 недели на изучение соответствующих учебных пособий, поскольку все они имеют полезную кривую обучения. </p>
 <p>Тем не менее, бывают случаи, когда мы можем захотеть сгенерировать нашу собственную трехмерную геометрию в коде вместо использования пакета моделирования. </p>
-<p>Сначала давайте просто сделаем куб. Хотя Three.js уже предоставляет нам <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> и <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>, куб легко понять, поэтому давайте начнем с него. </p>
-<p>Есть два способа сделать пользовательскую геометрию в THREE.js. Один с классом <code class="notranslate" translate="no">Geometry</code>, другой - <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. У каждого есть свои преимущества. <code class="notranslate" translate="no">Geometry</code>, возможно, проще в использовании, но медленнее и использует больше памяти. Для нескольких тысяч треугольников это отличный выбор, но для десятков тысяч треугольников может быть лучше использовать <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
-<p><a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>, возможно, сложнее в использовании, но использует меньше памяти и работает быстрее. Если вы хотите сгенерировать более 10000 треугольников, подумайте об использовании <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
-<p>Заметьте, когда я говорю, что <code class="notranslate" translate="no">Geometry</code> медленнее, я имею в виду, что она медленнее запускается и медленнее изменяется, но отрисовывается она не медленнее, поэтому, если вы не планируете изменять свою геометрию, тогда, пока она не слишком велика, будет только немного больше. задержка для вашей программы, чтобы начать использовать <code class="notranslate" translate="no">Geometry</code> против <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. Мы изучим оба способа. Пока что давайте использовать геометрию, так как легче понять IMO. </p>
+<p>Сначала давайте просто сделаем куб. Хотя Three.js уже предоставляет нам <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> и <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>, куб легко понять, поэтому давайте начнем с него. </p>
+<p>Есть два способа сделать пользовательскую геометрию в THREE.js. Один с классом <code class="notranslate" translate="no">Geometry</code>, другой - <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. У каждого есть свои преимущества. <code class="notranslate" translate="no">Geometry</code>, возможно, проще в использовании, но медленнее и использует больше памяти. Для нескольких тысяч треугольников это отличный выбор, но для десятков тысяч треугольников может быть лучше использовать <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
+<p><a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>, возможно, сложнее в использовании, но использует меньше памяти и работает быстрее. Если вы хотите сгенерировать более 10000 треугольников, подумайте об использовании <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
+<p>Заметьте, когда я говорю, что <code class="notranslate" translate="no">Geometry</code> медленнее, я имею в виду, что она медленнее запускается и медленнее изменяется, но отрисовывается она не медленнее, поэтому, если вы не планируете изменять свою геометрию, тогда, пока она не слишком велика, будет только немного больше. задержка для вашей программы, чтобы начать использовать <code class="notranslate" translate="no">Geometry</code> против <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. Мы изучим оба способа. Пока что давайте использовать геометрию, так как легче понять IMO. </p>
 <p>Сначала давайте сделаем куб с <code class="notranslate" translate="no">Geometry</code>. Начнем с примера из <a href="responsive.html">статьи об отзывчивости</a>. </p>
-<p>Давайте удалим код, который использует <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>, и заменим ее на <code class="notranslate" translate="no">Geometry</code>. </p>
+<p>Давайте удалим код, который использует <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>, и заменим ее на <code class="notranslate" translate="no">Geometry</code>. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const boxWidth = 1;
 -const boxHeight = 1;
 -const boxDepth = 1;
@@ -64,7 +64,7 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 <p>Затем нам нужно сделать треугольники, по 2 на каждую грань куба</p>
 <div class="threejs_center"><img src="../resources/cube-triangles.svg" style="width: 500px"></div>
 
-<p>Мы делаем это, создавая объекты <a href="/docs/#api/en/core/Face3"><code class="notranslate" translate="no">Face3</code></a> и определяя индексы 3 вершин, которые составляют эту грань.</p>
+<p>Мы делаем это, создавая объекты <a href="../docs/#api/en/core/Face3"><code class="notranslate" translate="no">Face3</code></a> и определяя индексы 3 вершин, которые составляют эту грань.</p>
 <p>Порядок, в котором мы указываем вершины, важен. Чтобы указывать на внешнюю сторону куба, они должны быть указаны в направлении против часовой стрелки, когда этот треугольник направлен на камеру. </p>
 <div class="threejs_center"><img src="../resources/cube-vertex-winding-order.svg" style="width: 500px"></div>
 
@@ -91,7 +91,7 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 );
 </pre>
 <p>Несколько других мелких изменений в оригинальном коде, и он должен работать. </p>
-<p>Эти кубики в два раза больше, чем <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>, которую мы использовали раньше, поэтому давайте немного переместим камеру назад </p>
+<p>Эти кубики в два раза больше, чем <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>, которую мы использовали раньше, поэтому давайте немного переместим камеру назад </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
 const near = 0.1;
@@ -175,7 +175,7 @@ geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta')
 <p>Для нормалей грани мы бы назвали <code class="notranslate" translate="no">Geometry.computeFaceNormals</code> как в</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.computeFaceNormals();
 </pre>
-<p>Удаление цвета вершин и изменение материала обратно на <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a></p>
+<p>Удаление цвета вершин и изменение материала обратно на <a href="../docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({vertexColors: true});
 +const material = new THREE.MeshPhongMaterial({color});
 </pre>
@@ -246,7 +246,7 @@ function makeInstance(geometry, color, x) {
 <p>Ландшафт на основе карты высот - это то место, где у вас есть двумерный массив высот, который вы применяете к сетке. Простой способ получить двумерный массив высот - нарисовать их в программе для редактирования изображений. Вот изображение, которое я нарисовал. Это 96x64 пикселей </p>
 <div class="threejs_center"><img src="../examples/resources/images/heightmap-96x64.png" style="width: 512px; image-rendering: pixelated;"></div>
 
-<p>Мы загрузим это и затем сгенерируем из него сетку карты высот. Мы можем использовать <a href="/docs/#api/en/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a> для загрузки изображения. </p>
+<p>Мы загрузим это и затем сгенерируем из него сетку карты высот. Мы можем использовать <a href="../docs/#api/en/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a> для загрузки изображения. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const imgLoader = new THREE.ImageLoader();
 imgLoader.load('resources/images/heightmap-96x64.png', createHeightmap);
 
@@ -346,9 +346,9 @@ for (let z = 0; z &lt; cellsDeep; ++z) {
 }
 </pre>
 <p>Несколько небольших изменений, чтобы было удобнее просматривать. 
-включим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> </p>
+включим <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> </p>
 <ul>
-<li>добавим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a></li>
+<li>добавим <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a></li>
 </ul>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
@@ -388,8 +388,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
 <p></p>
 <p>Я надеюсь, что это была полезная инструкция для создания вашей собственной геометрии с использованием <code class="notranslate" translate="no">Geometry</code>. 
-В другой статье мы рассмотрим <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
-<p>В <a href="custom-buffergeometry.html">другой статье</a> мы рассмотрим <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
+В другой статье мы рассмотрим <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
+<p>В <a href="custom-buffergeometry.html">другой статье</a> мы рассмотрим <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
 
         </div>
       </div>

@@ -21,7 +21,7 @@
       <div class="lesson">
         <div class="lesson-main">
           <p>本文是关于 three.js 系列文章的一部分. 第一篇文章是 <a href="fundamentals.html">three.js 基础</a>. 如果你还没看过而且对three.js 还不熟悉，那应该从那里开始.</p>
-<p>three.js的优化有很多种方式. 常见的一种叫做<em>合并几何体</em>. 每一个你创建的<a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>代表一个(或多个)请求系统渲染的命令. 即便是画出来的结果一样, 画两个几何体总是比画一个要费时费力. 所以最好的方式就是将这些mesh合并起来. </p>
+<p>three.js的优化有很多种方式. 常见的一种叫做<em>合并几何体</em>. 每一个你创建的<a href="../docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>代表一个(或多个)请求系统渲染的命令. 即便是画出来的结果一样, 画两个几何体总是比画一个要费时费力. 所以最好的方式就是将这些mesh合并起来. </p>
 <p>让我们来展示一个应用这种优化方式的优秀范例. 让我们来重新创建一个<a href="https://globe.chromeexperiments.com/">WebGL Globe</a>.</p>
 <p>第一件事是获取一些数据. WebGL Globe说他们的数据是来自<a href="http://sedac.ciesin.columbia.edu/gpw/">SEDAC</a>. 点开这个网站我们可以看到<a href="https://beta.sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10">网格化的人口统计学数据</a>. 我这里下载的是以60分为解析度的数据. 打开可以看到</p>
 <pre class="prettyprint showlinemods notranslate lang-txt" translate="no"> ncols         360
@@ -229,7 +229,7 @@ function hsl(h, s, l) {
 <p>上面的<span style="color: green;">绿条条</span>代表<code class="notranslate" translate="no">lonHelper</code>, 在赤道上以经度的变化旋转. The <span style="color: blue;">
 蓝条条</span>代表 <code class="notranslate" translate="no">latHelper</code>, 在赤道上下以纬度的变化旋转. <span style="color: red;">红球球</span> 就是位置辅助器实际指向的位置. </p>
 <p>我们倒是可以计算所有的球面位置, 但是需要涉及到很多数学和库的调用, 所以就...可以但没必要.</p>
-<p>每一个数据我们都创建了一个<a href="/docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>和一个<a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, 然后我们从位置辅助器中取得world matrix并应用到新的<a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>上. 最后, 我们在它的新位置上缩放. </p>
+<p>每一个数据我们都创建了一个<a href="../docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>和一个<a href="../docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, 然后我们从位置辅助器中取得world matrix并应用到新的<a href="../docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>上. 最后, 我们在它的新位置上缩放. </p>
 <p>上面, 我们给每一个新box都创建了一个位置辅助器, 但是这将会使运行速度大大下降. </p>
 <p>这最多有360x145=52000个盒子需要被创建. 有些点数据被标为 “NO_DATA” 所以实际的盒子数大概是19000左右. 如果我们每个盒子加上三个辅助器, 全局就大概80000个节点. 使用一组辅助器来调整mesh的位置我们可以节约60000个节点的计算. </p>
 <p>注意<code class="notranslate" translate="no">lonFudge</code>是π/2也就是四分之一圈, 也就是说在在一周上是以不同的偏移开始. 也能说得通. 但是我不知道为什么<code class="notranslate" translate="no">latFudge</code>要乘以个 π * -0.135, 似乎就是一个能让盒子和材质对齐的数.</p>

@@ -37,7 +37,7 @@
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color("white");
 </pre>
-<p>然后我们将使用相同的棋盘格地面，因为这一次我们使用的是<a href="/docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>，所有我们不需要地面照明</p>
+<p>然后我们将使用相同的棋盘格地面，因为这一次我们使用的是<a href="../docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>，所有我们不需要地面照明</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
 {
@@ -85,10 +85,10 @@ const sphereGeo = new THREE.SphereGeometry(
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeSize = 1;
 const shadowGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 </pre>
-<p>现在我们将创建一堆球体，对于每个球体都将创建一个<code class="notranslate" translate="no">基础</code>的<a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>，并且我们将同时创建阴影平面网格和球体网格。这样，如果我们同时移动球体，阴影也一并移动，我们只需要将阴影稍微放置再地面上，防止 Z 轴阴影和地面重叠。
+<p>现在我们将创建一堆球体，对于每个球体都将创建一个<code class="notranslate" translate="no">基础</code>的<a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>，并且我们将同时创建阴影平面网格和球体网格。这样，如果我们同时移动球体，阴影也一并移动，我们只需要将阴影稍微放置再地面上，防止 Z 轴阴影和地面重叠。
 我们将<code class="notranslate" translate="no">depthWrite</code>属性设置为 false，这样使阴影之间不会彼此混淆。
 我们将在<a href="transparency.html">另一篇文章</a>中讨论这两个问题。
-因为阴影的材质是<a href="/docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>，所以它并不需要照明</p>
+因为阴影的材质是<a href="../docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>，所以它并不需要照明</p>
 <p>我们将每个球体使用不同的色相，然后保存每个球体的基础、球体网格、阴影网格和初始 y 位置。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const numSpheres = 15;
 for (let i = 0; i &lt; numSpheres; ++i) {
@@ -130,7 +130,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   });
 }
 </pre>
-<p>我们设置两个光源，一个是<a href="/docs/#api/zh/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>，将其光照强度设置为 2，让场景比较明亮。</p>
+<p>我们设置两个光源，一个是<a href="../docs/#api/zh/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>，将其光照强度设置为 2，让场景比较明亮。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const skyColor = 0xb1e1ff; // light blue
   const groundColor = 0xb97a20; // brownish orange
@@ -139,8 +139,8 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   scene.add(light);
 }
 </pre>
-<p>The other is a <a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> so the spheres get some definition
-另一个是 <a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> ，这将让球体看起来有些视觉的区别</p>
+<p>The other is a <a href="../docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> so the spheres get some definition
+另一个是 <a href="../docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> ，这将让球体看起来有些视觉的区别</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xffffff;
   const intensity = 1;
@@ -152,7 +152,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 }
 </pre>
 <p>现在我们设置球体动画并将其渲染。
-对于每个球体，阴影以及 base，让它们在 XZ 平面上移动。使用<a href="/docs/#api/zh/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>将球体上下移动，这样会带来一个类似弹性的动画。并且我们还设置了阴影材质的不透明度，与球体的高度相关。高度越高，阴影越模糊。</p>
+对于每个球体，阴影以及 base，让它们在 XZ 平面上移动。使用<a href="../docs/#api/zh/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>将球体上下移动，这样会带来一个类似弹性的动画。并且我们还设置了阴影材质的不透明度，与球体的高度相关。高度越高，阴影越模糊。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;  // convert to seconds
 
@@ -303,7 +303,7 @@ updateCamera();
 
 <p>我们将看到一些块状的阴影！</p>
 <p>这个问题是另一个需要注意的阴影相关设置。被投射产生的阴影也是有纹理的，这些阴影的纹理也是有单位大小的。如果阴影相机的属性设置的越大，就意味着它能投射的区域也变得很大，就意味着投射的阴影会越来越块状。</p>
-<p>你可以设置<code class="notranslate" translate="no">light.shadow.mapSize.width</code>和 <code class="notranslate" translate="no">light.shadow.mapSize.height</code>来设置阴影的纹理分辨率。他们默认为 512X512。如果设置的很大，他们在计算时将占用更多的内存，并且变得很慢。为了获得更真实的阴影，应该尽量将值设置的最小。请注意在渲染器中该属性<a href="/docs/#api/zh/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>对于每个用户都有最大纹理的上限值。</p>
+<p>你可以设置<code class="notranslate" translate="no">light.shadow.mapSize.width</code>和 <code class="notranslate" translate="no">light.shadow.mapSize.height</code>来设置阴影的纹理分辨率。他们默认为 512X512。如果设置的很大，他们在计算时将占用更多的内存，并且变得很慢。为了获得更真实的阴影，应该尽量将值设置的最小。请注意在渲染器中该属性<a href="../docs/#api/zh/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>对于每个用户都有最大纹理的上限值。</p>
 <p>当我们切换到 <code class="notranslate" translate="no">SpotLight 聚光灯</code>时，光源的阴影相机就变成了<code class="notranslate" translate="no">PerspectiveCamera透视相机</code> ，与<code class="notranslate" translate="no">DirectionalLight 定向光</code>的阴影相机不同，<code class="notranslate" translate="no">SpotLight 聚光灯</code>的阴影相机有其本身所控制，我们也可以手动设置大部分设置。<code class="notranslate" translate="no">SpotLight聚光灯</code>阴影相机的的<code class="notranslate" translate="no">fov</code>跟<code class="notranslate" translate="no">SpotLight聚光灯</code>的<code class="notranslate" translate="no">angle</code> 关联。<code class="notranslate" translate="no">aspect</code>属性是根据阴影映射自动设置大小的。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);

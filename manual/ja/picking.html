@@ -253,7 +253,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
 1回は見るための描画、もう1回はピッキングの描画です。
 洗練された解決策は、その両方を同時に行う事ですが今回はそれを試しません。</p>
 <p>1つのやり方としては、1つのピクセルしか読まないのでそのピクセルだけ描画されるようにカメラを設定します。
-これを行うには <a href="/docs/#api/ja/cameras/PerspectiveCamera.setViewOffset"><code class="notranslate" translate="no">PerspectiveCamera.setViewOffset</code></a> を使用します。
+これを行うには <a href="../docs/#api/ja/cameras/PerspectiveCamera.setViewOffset"><code class="notranslate" translate="no">PerspectiveCamera.setViewOffset</code></a> を使用します。
 これでカメラを計算できます。
 これで時間を節約できるはずです。</p>
 <p>現時点ではこのピッキングを行うには、2つのシーンを作成する必要があります。
@@ -305,10 +305,10 @@ for (let i = 0; i &lt; numObjects; ++i) {
 +  pickingCube.scale.copy(cube.scale);
 }
 </pre>
-<p>ここでは <a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> を悪用している事に注意して下さい。
+<p>ここでは <a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> を悪用している事に注意して下さい。
 <code class="notranslate" translate="no">emissive</code> をidにし、<code class="notranslate" translate="no">color</code> と <code class="notranslate" translate="no">specular</code> を0に設定しテクスチャのアルファ値が <code class="notranslate" translate="no">alphaTest</code> よりも大きい場合にのみ、idをレンダリングできます。
 また、<code class="notranslate" translate="no">blending</code> を <code class="notranslate" translate="no">NoBlending</code> に設定し、idにアルファが乗算しないようにする必要があります。</p>
-<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>を悪用する事は、最良の解決策でない事に注意して下さい。
+<p><a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>を悪用する事は、最良の解決策でない事に注意して下さい。
 さらに最適化された解決策は、テクスチャのアルファ値が <code class="notranslate" translate="no">alphaTest</code> よりも大きい場合にidを書き込むカスタムシェーダーを作成する事です。</p>
 <p>レイキャスティングではなくピクセルからピックしているので、ピック位置を設定するコードを変更してピクセルだけを使用できます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
@@ -320,7 +320,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
 }
 </pre>
 <p><code class="notranslate" translate="no">PickHelper</code> を <code class="notranslate" translate="no">GPUPickHelper</code> に変更してみましょう。
-<a href="rendertargets.html">レンダーターゲットの記事</a>で説明したように <a href="/docs/#api/ja/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> を使います。
+<a href="rendertargets.html">レンダーターゲットの記事</a>で説明したように <a href="../docs/#api/ja/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> を使います。
 ここでのレンダーターゲットは1 x 1の1ピクセルのサイズしかありません。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class PickHelper {
 +class GPUPickHelper {

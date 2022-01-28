@@ -37,7 +37,7 @@ body {
 }
 &lt;/style&gt;
 </pre>
-<p>and we need to tell the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> to use <code class="notranslate" translate="no">alpha</code> so places we are not
+<p>and we need to tell the <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> to use <code class="notranslate" translate="no">alpha</code> so places we are not
 drawing anything are transparent.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
@@ -118,8 +118,8 @@ probably figure that one out on your own. Just make a cube or sphere,
 <a href="textures.html">apply a texture</a>, mark it as <code class="notranslate" translate="no">THREE.BackSide</code> so we 
 render the inside instead of the outside, and either put it in your scene directly 
 or like above, or, make 2 scenes, a special one to draw the skybox/sphere/dome and the
-normal one to draw everything else. You'd use your normal <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> to
-draw. No need for the <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>.</p>
+normal one to draw everything else. You'd use your normal <a href="../docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> to
+draw. No need for the <a href="../docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>.</p>
 <p>Another solution is to use a <em>Cubemap</em>. A Cubemap is a special kind of texture
 that has 6 sides, the sides of a cube. Instead of using standard texture
 coordinates it uses a direction from the center pointing outward to decide where
@@ -137,7 +137,7 @@ View, California.</p>
   <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-z.jpg" style="width: 200px" class="border">
 </div>
 
-<p>To use them we use <a href="/docs/#api/en/loaders/CubeTextureLoader"><code class="notranslate" translate="no">CubeTextureLoader</code></a> to load them and then use that as a the
+<p>To use them we use <a href="../docs/#api/en/loaders/CubeTextureLoader"><code class="notranslate" translate="no">CubeTextureLoader</code></a> to load them and then use that as a the
 scene's background.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.CubeTextureLoader();
@@ -208,9 +208,9 @@ surrounds us.</p>
 <div class="threejs_center"><img src="../examples/resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px"></div>
 
 <p>It's not much different. First we load the equirectangular image as a texture
-and then, in the callback after it has loaded, we can call <a href="/docs/#api/en/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate" translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a>
+and then, in the callback after it has loaded, we can call <a href="../docs/#api/en/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate" translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a>
 which will generate a cubemap from the equirectangular texture for us.
-We pass in the size we want the cubemap to be to <a href="/docs/#api/en/renderers/WebGLCubeRenderTarget"><code class="notranslate" translate="no">WebGLCubeRenderTarget</code></a>.
+We pass in the size we want the cubemap to be to <a href="../docs/#api/en/renderers/WebGLCubeRenderTarget"><code class="notranslate" translate="no">WebGLCubeRenderTarget</code></a>.
 Passing in the height of the equirectangular image seems like a good bet.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
 -  const loader = new THREE.CubeTextureLoader();

@@ -89,8 +89,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +addLight( 1, -1, -2);
 </pre>
 <p>To make the cubes transparent we just need to set the
-<a href="/docs/#api/en/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a> flag and to set an
-<a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> level with 1 being completely opaque
+<a href="../docs/#api/en/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a> flag and to set an
+<a href="../docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> level with 1 being completely opaque
 and 0 being completely transparent.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
 -  const material = new THREE.MeshPhongMaterial({color});
@@ -121,7 +121,7 @@ missing their backs.</p>
 <div class="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
 <div class="threejs_center">no backs</div>
 
-<p>We learned about the <a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a> material property in 
+<p>We learned about the <a href="../docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a> material property in 
 <a href="materials.html">the article on materials</a>.
 So, let's set it to <code class="notranslate" translate="no">THREE.DoubleSide</code> to get both sides of each cube to be drawn.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
@@ -151,7 +151,7 @@ When the next triangle is drawn, for each pixel if the depth is deeper than the
 previously recorded depth no pixel is drawn.</p>
 <p>This works great for opaque things but it fails for transparent things.</p>
 <p>The solution is to sort transparent things and draw the stuff in back before
-drawing the stuff in front. THREE.js does this for objects like <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> otherwise
+drawing the stuff in front. THREE.js does this for objects like <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> otherwise
 the very first example would have failed between cubes with some cubes blocking
 out others. Unfortunately for individual triangles shorting would be extremely slow. </p>
 <p>The cube has 12 triangles, 2 for each face, and the order they are drawn is 
@@ -261,13 +261,13 @@ so that there really is no intersection.</p>
 </pre>
 <p>How you accomplish that is up to you. If I was using modeling package like
 <a href="https://blender.org">Blender</a> I'd probably do this manually by adjusting
-texture coordinates. Here though we're using <a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> which by
+texture coordinates. Here though we're using <a href="../docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> which by
 default stretches the texture across the plane. Like we <a href="textures.html">covered
-before</a> By setting the <a href="/docs/#api/en/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>
-and <a href="/docs/#api/en/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> we can scale and move the texture to get
+before</a> By setting the <a href="../docs/#api/en/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>
+and <a href="../docs/#api/en/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> we can scale and move the texture to get
 the correct half of the face texture on each plane.</p>
-<p>The code above also makes a <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> and parents the 2 planes to it.
-It seemed easier to rotate a parent <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> than to do the math
+<p>The code above also makes a <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> and parents the 2 planes to it.
+It seemed easier to rotate a parent <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> than to do the math
 required do it without. </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../transparency-intersecting-planes-fixed.html"></iframe></div>
@@ -291,7 +291,7 @@ The textures above were 100% opaque. These 2 use transparency.</p>
 </div>
 
 <p>Going back to the 2 planes that intersect (before we split them) let's
-use these textures and set an <a href="/docs/#api/en/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a>.</p>
+use these textures and set an <a href="../docs/#api/en/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
   const texture = loader.load(url, render);
   const material = new THREE.MeshPhongMaterial({

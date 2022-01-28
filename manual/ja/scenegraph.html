@@ -161,7 +161,7 @@ earthMesh.position.x = 10;
 +solarSystem.add(earthMesh);
 objects.push(earthMesh);
 </pre>
-<p>ここで<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>を作りました。<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>のように、シーングラフのノードですが、<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>とは異なり、マテリアルやジオメトリを持ちません。
+<p>ここで<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>を作りました。<a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>のように、シーングラフのノードですが、<a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>とは異なり、マテリアルやジオメトリを持ちません。
 ただローカルな空間を表現するだけです。</p>
 <p>新しいシーングラフは、このようになります。</p>
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
@@ -196,7 +196,7 @@ objects.push(earthMesh);
 +moonOrbit.add(moonMesh);
 +objects.push(moonMesh);
 </pre>
-<p>再び、描画されないシーングラフのノードを追加しました。これは、<code class="notranslate" translate="no">earthOrbit</code>と呼ばれる<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>です。
+<p>再び、描画されないシーングラフのノードを追加しました。これは、<code class="notranslate" translate="no">earthOrbit</code>と呼ばれる<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>です。
 そして、このノードに<code class="notranslate" translate="no">earthMesh</code>と<code class="notranslate" translate="no">moonMesh</code>の両方を追加しました。
 新しいシーングラフは、このようになります。</p>
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
@@ -212,7 +212,7 @@ objects.push(earthMesh);
 ただ、シーングラフを設定しただけです。</p>
 <p>シーングラフのノードが分かるような、なにかを描写すると、便利なことがあります。
 Three.jsはこれをするために、helpfulとか、helpersとかがあります。</p>
-<p>一つは<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>です。
+<p>一つは<a href="../docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>です。
 ローカルな<span style="color:red">X</span>、<span style="color:green">Y</span>、<span style="color:blue">Z</span>軸を表す
 3つの線を描画します。
 私たちが作った全てのノードに加えましょう。</p>
@@ -242,13 +242,13 @@ objects.forEach((node) =&gt; {
 <code class="notranslate" translate="no">sunMesh</code>と<code class="notranslate" translate="no">solarSystem</code>は同じ場所にあります。
 同様に、<code class="notranslate" translate="no">earthMesh</code>と<code class="notranslate" translate="no">earthOrbit</code>は同じ場所にあります。
 各ノードに対してオン/オフできるように、簡単な操作を加えてみましょう。
-そのついでに、<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> というヘルパー関数も追加しておきましょう。
+そのついでに、<a href="../docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> というヘルパー関数も追加しておきましょう。
 これはX,Z平面に2次元グリッドを作ります。デフォルトでは、グリッドは10x10ユニットです。</p>
 <p><a href="https://github.com/georgealways/lil-gui">lil-gui</a>も使います。
 これはthree.jsプロジェクトでとても一般的なUIライブラリです。
 lil-guiはオブジェクトとそのオブジェクトの属性名を受け取り、
 属性の型に基づいて、自動的にその属性を操作するUIを作成します。</p>
-<p>それぞれのノードに対して、<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>と<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>の両方を作りたいです。
+<p>それぞれのノードに対して、<a href="../docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>と<a href="../docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>の両方を作りたいです。
 それぞれのノートにラベルが必要なので、古いループを削除し、
 各ノードにhelperを加える関数を呼ぶ形式にします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// add an AxesHelper to each node
@@ -277,7 +277,7 @@ lil-guiはオブジェクトとそのオブジェクトの属性名を受け取�
 しかし、軸とグリッドの両方を一つの属性で表示/非表示にしたいので、
 属性のgetterとsetterを持ったクラスを作成します。
 この方法で、lil-guiに一つの属性を操作するように思わせることができますが、
-内部的には各ノードに<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>と<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>の両方のvisible属性を設定することができます。</p>
+内部的には各ノードに<a href="../docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>と<a href="../docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>の両方のvisible属性を設定することができます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Turns both axes and grid visible on/off
 // lil-gui requires a property that returns a bool
 // to decide to make a checkbox so we make a setter
@@ -309,7 +309,7 @@ class AxisGridHelper {
   }
 }
 </pre>
-<p>注意することは、<a href="/docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>の<code class="notranslate" translate="no">renderOrder</code>を2に設定し、<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>には1を設定することです。
+<p>注意することは、<a href="../docs/#api/ja/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>の<code class="notranslate" translate="no">renderOrder</code>を2に設定し、<a href="../docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>には1を設定することです。
 こうすることで、軸はグリッドの後に描画されます。
 そうしないと、グリッドが軸を上書きしてしまうかもしれません。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -338,16 +338,16 @@ bodyとwheelsを、車のフレームを表す"frame"ノードの子要素にで
 <p>もう少し複雑なシーングラフを作りましょう。戦車を作ります。
 戦車は6つの車輪と砲塔があります。この戦車はある道筋に沿って走ります。
 そこら中を移動する球体があり、戦車はその球体を狙うとしましょう。</p>
-<p>これがシーングラフです。メッシュは緑色、<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>は青色、明かりは金色、カメラは紫色です。
+<p>これがシーングラフです。メッシュは緑色、<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>は青色、明かりは金色、カメラは紫色です。
 シーングラフに追加されていないカメラが一つあります。</p>
 <div class="threejs_center"><img src="../resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
 <p>コードを見て、これらのノードの設定を確認してください。</p>
-<p>ターゲット、つまり戦車が狙っているものとして、<code class="notranslate" translate="no">targetOrbit</code>(<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>) があります。
+<p>ターゲット、つまり戦車が狙っているものとして、<code class="notranslate" translate="no">targetOrbit</code>(<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>) があります。
 これはちょうど前述の<code class="notranslate" translate="no">earthOrbit</code>と同じように回転します。
-<code class="notranslate" translate="no">targetOrbit</code>の子要素である<code class="notranslate" translate="no">targetElevation</code> (<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>)は、
+<code class="notranslate" translate="no">targetOrbit</code>の子要素である<code class="notranslate" translate="no">targetElevation</code> (<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>)は、
 <code class="notranslate" translate="no">targetOrbit</code>からのオフセットと基準となる高さを提供します。
-この子要素には、<code class="notranslate" translate="no">targetElevation</code>に対して相対的に浮き沈みする、<code class="notranslate" translate="no">targetBob</code>と呼ばれる<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>があります。
+この子要素には、<code class="notranslate" translate="no">targetElevation</code>に対して相対的に浮き沈みする、<code class="notranslate" translate="no">targetBob</code>と呼ばれる<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>があります。
 最後に、<code class="notranslate" translate="no">targetMesh</code>があります。回転させて色を変えることができる、ただの立方体です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// move target
 targetOrbit.rotation.y = time * .27;
@@ -357,11 +357,11 @@ targetMesh.rotation.y = time * 13;
 targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 </pre>
-<p>戦車には、<code class="notranslate" translate="no">tank</code>と呼ばれる<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>があります。
+<p>戦車には、<code class="notranslate" translate="no">tank</code>と呼ばれる<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>があります。
 これを使って戦車の子要素をすべて移動させることができます。
-コードでは<a href="/docs/#api/ja/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>を使っています。これは曲線に沿った位置を求めることができます。
+コードでは<a href="../docs/#api/ja/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>を使っています。これは曲線に沿った位置を求めることができます。
 0.0は曲線の始点です。1.0は曲線の終点です。これにより、戦車がある現在地を求めます。
-次に、カーブの少し下の位置を求めて、<a href="/docs/#api/ja/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>を使い、戦車をその方向に向けます。</p>
+次に、カーブの少し下の位置を求めて、<a href="../docs/#api/ja/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>を使い、戦車をその方向に向けます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tankPosition = new THREE.Vector2();
 const tankTarget = new THREE.Vector2();
 
@@ -375,7 +375,7 @@ tank.position.set(tankPosition.x, 0, tankPosition.y);
 tank.lookAt(tankTarget.x, 0, tankTarget.y);
 </pre>
 <p>戦車のてっぺんに付いている砲塔は、戦車の子要素なので自動的に動きます。
-ターゲットの方を向かせるのに、ターゲットの位置を求め、次に再び<a href="/docs/#api/ja/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>を使うだけです。</p>
+ターゲットの方を向かせるのに、ターゲットの位置を求め、次に再び<a href="../docs/#api/ja/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>を使うだけです。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const targetPosition = new THREE.Vector3();
 
 ...
@@ -422,7 +422,7 @@ infoElem.textContent = camera.desc;
 
 <p></p>
 <p>シーングラフの動作と、使い方のアイデアを、この例から得られればと思います。
-<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>ノードを作り、物体をその子要素にすることは、three.jsのような3Dエンジンを上手く使うために
+<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>ノードを作り、物体をその子要素にすることは、three.jsのような3Dエンジンを上手く使うために
 重要なステップです。
 思い通りになにかを動かしたり回転させたりすることは、しばしば複雑な数学が必要に見えるかもしれません。
 例えばシーングラフなしで、月の動きを操作したり、車の車体に対して壮太知的に車輪を置いたりすることは、

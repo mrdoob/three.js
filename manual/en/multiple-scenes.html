@@ -23,7 +23,7 @@
 Let's say you want to make an e-commerce site or you want to make
 a page with lots of 3D diagrams. At first glance it appears easy.
 Just make a canvas every where you want a diagram. For each canvas
-make a <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>.</p>
+make a <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>.</p>
 <p>You'll quickly find though that you run into problems.</p>
 <ol>
 <li><p>The browser limits how many WebGL contexts you can have.</p>
@@ -40,7 +40,7 @@ etc. It gets worse as there are more canvases.</p>
 </li>
 </ol>
 <p>So what's the solution?</p>
-<p>The solution is one canvas that fills the viewport in the background and some other element to represent each "virtual" canvas. We make a single <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> and then one <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> for each virtual canvas. We'll then check the positions of the virtual canvas elements and if they are on the screen we'll tell THREE.js to draw their scene at the correct place.</p>
+<p>The solution is one canvas that fills the viewport in the background and some other element to represent each "virtual" canvas. We make a single <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> and then one <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> for each virtual canvas. We'll then check the positions of the virtual canvas elements and if they are on the screen we'll tell THREE.js to draw their scene at the correct place.</p>
 <p>With this solution there is only 1 canvas so we solve both problem 1
 and 2 above. We won't run into the WebGL context limit because we
 will only be using one context. We also won't run into the sharing
@@ -143,7 +143,7 @@ const sceneInfo2 = setupScene2();
 <p>And then we'll make a function to render each scene
 only if the element is on the screen. We can tell THREE.js
 to only render to part of the canvas by turning on the <em>scissor</em>
-test with <a href="/docs/#api/en/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a> and then setting both the scissor and the viewport with <a href="/docs/#api/en/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> and <a href="/docs/#api/en/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>.</p>
+test with <a href="../docs/#api/en/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a> and then setting both the scissor and the viewport with <a href="../docs/#api/en/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> and <a href="../docs/#api/en/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function renderSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 

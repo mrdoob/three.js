@@ -37,7 +37,7 @@ loading, data arriving from some external source, the user adjusting a setting
 or the camera or giving other relevant input.</p>
 <p>Let's take an example from <a href="responsive.html">the article on responsiveness</a>
 and modify it to render on demand.</p>
-<p>First we'll add in the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> so there is something that could change
+<p>First we'll add in the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> so there is something that could change
 that we can render in response to.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
@@ -92,8 +92,8 @@ camera.position.z = 2;
 <p>then we need to render once</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
 </pre>
-<p>We need to render anytime the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> change the camera settings.
-Fortunately the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> dispatch a <code class="notranslate" translate="no">change</code> event anytime something
+<p>We need to render anytime the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> change the camera settings.
+Fortunately the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> dispatch a <code class="notranslate" translate="no">change</code> event anytime something
 changes.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
 </pre>
@@ -109,12 +109,12 @@ we are not we need to render when the window changes size.</p>
 </div>
 
 <p></p>
-<p>The <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> have options to add a kind of inertia to make them feel less
+<p>The <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> have options to add a kind of inertia to make them feel less
 stiff. We can enable this by setting the <code class="notranslate" translate="no">enableDamping</code> property to true.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
 </pre>
 <p>With <code class="notranslate" translate="no">enableDamping</code> on we need to call <code class="notranslate" translate="no">controls.update</code> in our render function
-so that the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> can continue to give us new camera settings as they
+so that the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> can continue to give us new camera settings as they
 smooth out the movement. But, that means we can't call <code class="notranslate" translate="no">render</code> directly from
 the <code class="notranslate" translate="no">change</code> event because we'll end up in an infinite loop. The controls will
 send us a <code class="notranslate" translate="no">change</code> event and call <code class="notranslate" translate="no">render</code>, <code class="notranslate" translate="no">render</code> will call <code class="notranslate" translate="no">controls.update</code>.

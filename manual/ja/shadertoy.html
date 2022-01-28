@@ -134,8 +134,8 @@ outは関数が値を提供する事を意味するパラメーターです。
 
 main();
 </pre>
-<p><a href="backgrounds.html">背景とスカイボックスの記事で説明したように</a>、これらのパラメーターを持つ <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> と2の長さの平面がキャンバスを塗り潰します。
-平面は赤の <a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用しているため、赤いキャンバスが表示されます。</p>
+<p><a href="backgrounds.html">背景とスカイボックスの記事で説明したように</a>、これらのパラメーターを持つ <a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> と2の長さの平面がキャンバスを塗り潰します。
+平面は赤の <a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用しているため、赤いキャンバスが表示されます。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../shadertoy-prep.html"></iframe></div>
   <a class="threejs_center" href="../examples/shadertoy-prep.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
@@ -181,7 +181,7 @@ void main() {
 </pre>
 <p>Three.jsの各ユニフォームには <code class="notranslate" translate="no">value</code> パラメータがあります。
 この値はユニフォームの型と一致してなければなりません。</p>
-<p>フラグメントシェーダーとユニフォームの両方を <a href="/docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> に渡します。</p>
+<p>フラグメントシェーダーとユニフォームの両方を <a href="../docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> に渡します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({
 -    color: 'red',
 -});
@@ -336,7 +336,7 @@ Three.jsは <code class="notranslate" translate="no">uv</code>、<code class="no
   }
 `;
 </pre>
-<p>頂点シェーダーを <a href="/docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> に渡します。</p>
+<p>頂点シェーダーを <a href="../docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> に渡します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,

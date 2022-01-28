@@ -99,7 +99,7 @@ to convey that the user must keep looking and for how long.</p>
 and use a texture offset to slide the texture across a model.</p>
 <p>Let's do this by itself to see it work before we add it to
 the VR example.</p>
-<p>First we make an <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a></p>
+<p>First we make an <a href="../docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -2;    // Use values for left
 const right = 2;    // right, top and bottom
 const top = 1;      // that match the default
@@ -123,7 +123,7 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
 </pre>
 <p>We now have a camera that shows 2 units above and below the center and aspect units
 left and right.</p>
-<p>Next let's make a 2 color texture. We'll use a <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>
+<p>Next let's make a 2 color texture. We'll use a <a href="../docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>
 which we've used a few <a href="indexed-textures.html">other</a> 
 <a href="post-processing-3dlut.html">places</a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDataTexture(data, width, height) {
@@ -140,7 +140,7 @@ const cursorColors = new Uint8Array([
 ]);
 const cursorTexture = makeDataTexture(cursorColors, 2, 1);
 </pre>
-<p>We'll then use that texture on a <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a></p>
+<p>We'll then use that texture on a <a href="../docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ringRadius = 0.4;
 const tubeRadius = 0.1;
 const tubeSegments = 4;
@@ -233,19 +233,19 @@ those 3 lines and you'll see the difference. I'm just guessing
 the inverse effect is best here as that way we can hopefully
 see the cursor regardless of the colors it is over.</p>
 </li>
-<li><p>We use a <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> and not a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a></p>
-<p>For whatever reason the <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> uses a flat
-UV mapping scheme. Because of this if we use a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
+<li><p>We use a <a href="../docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> and not a <a href="../docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a></p>
+<p>For whatever reason the <a href="../docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> uses a flat
+UV mapping scheme. Because of this if we use a <a href="../docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
 the texture slides horizontally across the ring instead of
 around it like it does above.</p>
-<p>Try it out, change the <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> to a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
+<p>Try it out, change the <a href="../docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> to a <a href="../docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
 (it's just commented out in the example above) and you'll see what I
 mean.</p>
 <p>The <em>proper</em> thing to do (for some definition of <em>proper</em>) would be
-to either use the <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> but fix the texture coordinates
+to either use the <a href="../docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> but fix the texture coordinates
 so they go around the ring. Or else, generate our own ring geometry.
 But, the torus works just fine. Placed directly in front of the camera
-with a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> it will look exactly like a ring and the
+with a <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> it will look exactly like a ring and the
 texture coordinates go around the ring so it works for our needs.</p>
 </li>
 </ul>
@@ -373,7 +373,7 @@ const boxDepth = 1;
 </pre>
 <p>Then let's create 3 pairs of box and sphere meshes. We'll
 use a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code class="notranslate" translate="no">Map</code></a>
-so that we can associate each <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> with its partner.</p>
+so that we can associate each <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> with its partner.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0),
 -  makeInstance(geometry, 0x8844aa, -2),

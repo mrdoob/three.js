@@ -71,7 +71,7 @@ VR button to our page</p>
 <p>We need to let three.js run our render loop. Until now we have used a
 <code class="notranslate" translate="no">requestAnimationFrame</code> loop but to support VR we need to let three.js handle
 our render loop for us. We can do that by calling
-<a href="/docs/#api/en/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a> and passing a function to call for the loop.</p>
+<a href="../docs/#api/en/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a> and passing a function to call for the loop.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
@@ -247,7 +247,7 @@ there's some things to cover</p>
 <p>AFAICT, at least as of r112, there is no easy way to support
 both VR and non-VR modes with three.js. Ideally
 if not in VR mode you'd be able to control the camera using
-whatever means you want, for example the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>,
+whatever means you want, for example the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>,
 and you'd get some kind of event when switching into and
 out of VR mode so that you could turn the controls on/off.</p>
 </li>

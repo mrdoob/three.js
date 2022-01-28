@@ -49,36 +49,36 @@ a small three.js app</p>
 
 <p>Things to notice about the diagram above.</p>
 <ul>
-<li><p>There is a <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>. This is arguably the main object of three.js. You pass a
-<a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> and a <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> to a <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> and it renders (draws) the portion of
+<li><p>There is a <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>. This is arguably the main object of three.js. You pass a
+<a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> and a <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> to a <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> and it renders (draws) the portion of
 the 3D scene that is inside the <em>frustum</em> of the camera as a 2D image to a
 canvas.</p>
 </li>
 <li><p>There is a <a href="scenegraph.html">scenegraph</a> which is a tree like
-structure, consisting of various objects like a <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> object, multiple
-<a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects, <a href="/docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> objects, <a href="/docs/#api/en/objects/Group"><code class="notranslate" translate="no">Group</code></a>, <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, and <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> objects. A
-<a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> object defines the root of the scenegraph and contains properties like
+structure, consisting of various objects like a <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> object, multiple
+<a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects, <a href="../docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> objects, <a href="../docs/#api/en/objects/Group"><code class="notranslate" translate="no">Group</code></a>, <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, and <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> objects. A
+<a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> object defines the root of the scenegraph and contains properties like
 the background color and fog. These objects define a hierarchical parent/child
 tree like structure and represent where objects appear and how they are
 oriented. Children are positioned and oriented relative to their parent. For
 example the wheels on a car might be children of the car so that moving and
 orienting the car's object automatically moves the wheels. You can read more
 about this in <a href="scenegraph.html">the article on scenegraphs</a>.</p>
-<p>Note in the diagram <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> is half in half out of the scenegraph. This is to
-represent that in three.js, unlike the other objects, a <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> does not have
-to be in the scenegraph to function. Just like other objects, a <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>, as a
+<p>Note in the diagram <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> is half in half out of the scenegraph. This is to
+represent that in three.js, unlike the other objects, a <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> does not have
+to be in the scenegraph to function. Just like other objects, a <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>, as a
 child of some other object, will move and orient relative to its parent object.
-There is an example of putting multiple <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> objects in a scenegraph at
+There is an example of putting multiple <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> objects in a scenegraph at
 the end of <a href="scenegraph.html">the article on scenegraphs</a>.</p>
 </li>
-<li><p><a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects represent drawing a specific <code class="notranslate" translate="no">Geometry</code> with a specific
- <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>. Both <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> objects and <code class="notranslate" translate="no">Geometry</code> objects can be used by
- multiple <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects. For example to draw two blue cubes in different
- locations we could need two <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects to represent the position and
+<li><p><a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects represent drawing a specific <code class="notranslate" translate="no">Geometry</code> with a specific
+ <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>. Both <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> objects and <code class="notranslate" translate="no">Geometry</code> objects can be used by
+ multiple <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects. For example to draw two blue cubes in different
+ locations we could need two <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects to represent the position and
  orientation of each cube. We would only need one <code class="notranslate" translate="no">Geometry</code> to hold the vertex
- data for a cube and we would only need one <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> to specify the color
- blue. Both <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects could reference the same <code class="notranslate" translate="no">Geometry</code> object and the
- same <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> object.</p>
+ data for a cube and we would only need one <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> to specify the color
+ blue. Both <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects could reference the same <code class="notranslate" translate="no">Geometry</code> object and the
+ same <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> object.</p>
 </li>
 <li><p><code class="notranslate" translate="no">Geometry</code> objects represent the vertex data of some piece of geometry like
  a sphere, cube, plane, dog, cat, human, tree, building, etc...
@@ -87,16 +87,16 @@ the end of <a href="scenegraph.html">the article on scenegraphs</a>.</p>
  <a href="custom-buffergeometry.html">create custom geometry</a> as well as
  <a href="load-obj.html">load geometry from files</a>.</p>
 </li>
-<li><p><a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> objects represent
+<li><p><a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> objects represent
 <a href="materials.html">the surface properties used to draw geometry</a>
-including things like the color to use and how shiny it is. A <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> can also
-reference one or more <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> objects which can be used, for example, 
+including things like the color to use and how shiny it is. A <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> can also
+reference one or more <a href="../docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> objects which can be used, for example, 
 to wrap an image onto the surface of a geometry.</p>
 </li>
-<li><p><a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> objects generally represent images either <a href="textures.html">loaded from image files</a>,
+<li><p><a href="../docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> objects generally represent images either <a href="textures.html">loaded from image files</a>,
 <a href="canvas-textures.html">generated from a canvas</a> or <a href="rendertargets.html">rendered from another scene</a>.</p>
 </li>
-<li><p><a href="/docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> objects represent <a href="lights.html">different kinds of lights</a>.</p>
+<li><p><a href="../docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> objects represent <a href="lights.html">different kinds of lights</a>.</p>
 </li>
 </ul>
 <p>Given all of that we're going to make the smallest <em>"Hello Cube"</em> setup
@@ -129,11 +129,11 @@ import * as THREE from '../../build/three.module.js';
 +  ...
 &lt;/script&gt;
 </pre>
-<p>After we look up the canvas we create a <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. The renderer
+<p>After we look up the canvas we create a <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. The renderer
 is the thing responsible for actually taking all the data you provide
 and rendering it to the canvas. In the past there have been other renderers
 like <code class="notranslate" translate="no">CSSRenderer</code>, a <code class="notranslate" translate="no">CanvasRenderer</code> and in the future there may be a
-<code class="notranslate" translate="no">WebGL2Renderer</code> or <code class="notranslate" translate="no">WebGPURenderer</code>. For now there's the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>
+<code class="notranslate" translate="no">WebGL2Renderer</code> or <code class="notranslate" translate="no">WebGPURenderer</code>. For now there's the <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>
 that uses WebGL to render 3D to the canvas.</p>
 <p>Note there are some esoteric details here. If you don't pass a canvas
 into three.js it will create one for you but then you have to add it
@@ -143,7 +143,7 @@ to three.js feels a little more flexible. I can put the canvas anywhere
 and the code will find it whereas if I had code to insert the canvas
 into to the document I'd likely have to change that code if my use case
 changed.</p>
-<p>Next up we need a camera. We'll create a <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>.</p>
+<p>Next up we need a camera. We'll create a <a href="../docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
 const near = 0.1;
@@ -181,12 +181,12 @@ and goes to 5 units in front of the camera. Because in this diagram we are looki
 the field of view is affected by the aspect. Our canvas is twice as wide
 as it is tall so across the canvas the field of view will be much wider than
 our specified 75 degrees which is the vertical field of view.</p>
-<p>Next we make a <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. A <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> in three.js is the root of a form of scene graph.
+<p>Next we make a <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. A <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> in three.js is the root of a form of scene graph.
 Anything you want three.js to draw needs to be added to the scene. We'll
 cover more details of <a href="scenegraph.html">how scenes work in a future article</a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 </pre>
-<p>Next up we create a <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> which contains the data for a box.
+<p>Next up we create a <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> which contains the data for a box.
 Almost anything we want to display in Three.js needs geometry which defines
 the vertices that make up our 3D object.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
@@ -198,11 +198,11 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 be specified using standard CSS style 6 digit hex color values.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre>
-<p>We then create a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. A <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> in three represents the combination
+<p>We then create a <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. A <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> in three represents the combination
 of a three things</p>
 <ol>
 <li>A <code class="notranslate" translate="no">Geometry</code> (the shape of the object)</li>
-<li>A <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> (how to draw the object, shiny or flat, what color, what texture(s) to apply. Etc.)</li>
+<li>A <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> (how to draw the object, shiny or flat, what color, what texture(s) to apply. Etc.)</li>
 <li>The position, orientation, and scale of that object in the scene relative to its parent. In the code below that parent is the scene.</li>
 </ol>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
@@ -276,8 +276,8 @@ three.js which we'll go over in <a href="lights.html">a future article</a>. For 
 case we're setting the light's position to -1, 2, 4 so it's slightly on the left,
 above, and behind our camera. The target is still 0, 0, 0 so it will shine
 toward the origin.</p>
-<p>We also need to change the material. The <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> is not affected by
-lights. Let's change it to a <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> which is affected by lights.</p>
+<p>We also need to change the material. The <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> is not affected by
+lights. Let's change it to a <a href="../docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> which is affected by lights.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
 +const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
 </pre>
@@ -311,7 +311,7 @@ sets its X position.</p>
 }
 </pre>
 <p>Then we'll call it 3 times with 3 different colors and X positions
-saving the <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> instances in an array.</p>
+saving the <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> instances in an array.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
   makeInstance(geometry, 0x44aa88,  0),
   makeInstance(geometry, 0x8844aa, -2),
@@ -347,8 +347,8 @@ across the canvas is so extreme.</p>
 <p>Our program now has this structure</p>
 <div class="threejs_center"><img src="../resources/images/threejs-3cubes-scene.svg" style="width: 610px;"></div>
 
-<p>As you can see we have 3 <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects each referencing the same <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>.
-Each <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> references a unique <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> so that each cube can have
+<p>As you can see we have 3 <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> objects each referencing the same <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>.
+Each <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> references a unique <a href="../docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> so that each cube can have
 a different color.</p>
 <p>I hope this short intro helps to get things started. <a href="responsive.html">Next up we'll cover
 making our code responsive so it is adaptable to multiple situations</a>.</p>

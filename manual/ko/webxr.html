@@ -57,7 +57,7 @@ WebXR API. <a href="setup.html">the article on setting up</a>에 언급된 서�
 </pre>
 <p>three.js가 렌더 루프를 실행하도록 해야 합니다. 지금까지 우리는 
 <code class="notranslate" translate="no">requestAnimationFrame</code>loop 를 사용하였습니다. 하지만 VR을 지원하기 위해서 우리는 three.js가 우리의 render loop를 관리할 수 있도록 해야합니다. 이 과정을 
-<a href="/docs/#api/ko/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a>를 호출 및  루프를 호출하는 함수를 전달하여 진행 가능하게 합니다.</p>
+<a href="../docs/#api/ko/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a>를 호출 및  루프를 호출하는 함수를 전달하여 진행 가능하게 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
@@ -222,7 +222,7 @@ Chrome을 실행할 때 대부분의 Android 휴대전화가 작동할 것이라
 </ul>
 <p>내가 아는한 적어도 r112에서는 three.js 에 VR과 Non-VR 모드 모두를 지원하는 쉬운 방법이 없습니다.</p>
 <p>이상적으로
-VR 모드가 아니면  <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>와 같은 것들을 사용하여 카메라를 제어할 수 있습니다.
+VR 모드가 아니면  <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>와 같은 것들을 사용하여 카메라를 제어할 수 있습니다.
 그리고 이 전환 과정에서 일조의 여러 이벤트가 발생합니다.
 VR 모드에서 벗어나 컨트롤을 켜고 끌 수 있습니다.</p>
 <p>만약 three.js가 앞서 말한 두가지를 지원해준다면 해당 artical을 업데이트 하도록 노력하겠습니다.

@@ -23,7 +23,7 @@
 ECサイトを作りたい、3Dダイアグラムをたくさん使ったページを作りたいとしましょう。
 一見簡単そうに見えます。
 ダイアグラムが欲しい所にキャンバスを作るだけです。
-それぞれのキャンバスで <a href="/docs/#api/ja/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> を作成します。</p>
+それぞれのキャンバスで <a href="../docs/#api/ja/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> を作成します。</p>
 <p>以下の問題にすぐに気づくでしょう。</p>
 <ol>
 <li><p>ブラウザはWebGLコンテキスト数を制限している</p>
@@ -40,7 +40,7 @@ ECサイトを作りたい、3Dダイアグラムをたくさん使ったペー�
 </ol>
 <p>何か解決策はないでしょうか？</p>
 <p>解決策としては、背景のViewPortを埋める1つのキャンバスと、キャンバス以外のHTML要素で"仮想"のキャンバスを持つ事です。
-仮想キャンバスごとに <a href="/docs/#api/ja/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> と <a href="/docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> を1つずつ作成します。
+仮想キャンバスごとに <a href="../docs/#api/ja/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> と <a href="../docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> を1つずつ作成します。
 次に仮想キャンバス要素の位置を確認し、その要素が画面上にある場合はシーンの正しい場所に描画するようにします。</p>
 <p>この解決策はキャンバスが1つしかないため、上記の1と2の問題を解決します。
 1つのコンテキストだけなので、WebGLコンテキストの制限は問題ありません。
@@ -140,8 +140,8 @@ const sceneInfo1 = setupScene1();
 const sceneInfo2 = setupScene2();
 </pre>
 <p>DOM要素が画面上にある場合のみ、各シーンをレンダリングする関数を作成します。
-<a href="/docs/#api/ja/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a> で <em>シザー</em> テストを有効にし、キャンバスの一部だけをレンダリングするように指定できます。
-<a href="/docs/#api/ja/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> と <a href="/docs/#api/ja/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a> でシザーとビューポートの両方を設定します。</p>
+<a href="../docs/#api/ja/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a> で <em>シザー</em> テストを有効にし、キャンバスの一部だけをレンダリングするように指定できます。
+<a href="../docs/#api/ja/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> と <a href="../docs/#api/ja/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a> でシザーとビューポートの両方を設定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function renderSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 

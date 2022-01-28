@@ -211,11 +211,11 @@ and repeat.</p>
 
 <p></p>
 <p>So that seems to work.</p>
-<p>For a loaded file though it's a little more work. Most loaders only return an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
+<p>For a loaded file though it's a little more work. Most loaders only return an <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
 as a root of the hierarchy of objects they load so we need to discover what all the resources
 are.</p>
 <p>Let's update our <code class="notranslate" translate="no">ResourceTracker</code> to try to do that.</p>
-<p>First we'll check if the object is an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> then track its geometry, material, and children</p>
+<p>First we'll check if the object is an <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> then track its geometry, material, and children</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
   constructor() {
     this.resources = new Set();

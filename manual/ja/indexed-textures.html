@@ -302,7 +302,7 @@ void main() {
 <p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">これらのスニペットを全て調べてみる</a>とthree.jsはベースマテリアルのカラーを管理するために <code class="notranslate" translate="no">diffuseColor</code> という変数が使用されています。
 これは <code class="notranslate" translate="no">&lt;color_fragment&gt;</code> <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">スニペット</a> に設定されているので修正できるはずです。</p>
 <p>シェーダーで <code class="notranslate" translate="no">diffuseColor</code> は既にアウトラインテクスチャのカラーになっているはずなので、パレットテクスチャからカラーを探して最終的な結果にそれらをミックスします。</p>
-<p><a href="optimize-lots-of-objects-animated.html">前にやった</a>ように検索文字列と置換文字列の配列を作り、<a href="/docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> でシェーダーに適用します。</p>
+<p><a href="optimize-lots-of-objects-animated.html">前にやった</a>ように検索文字列と置換文字列の配列を作り、<a href="../docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> でシェーダーに適用します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
@@ -372,7 +372,7 @@ const paletteTexture = new THREE.DataTexture(
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
-<p><a href="/docs/#api/ja/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> はテクスチャの生データを与える事ができます。
+<p><a href="../docs/#api/ja/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> はテクスチャの生データを与える事ができます。
 今回はは512のRGBカラーを3バイトずつ与え、それぞれのバイトが赤、緑、青で0〜255の値を使用します。</p>
 <p>ランダムなカラーで塗りつぶしましょう！</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {

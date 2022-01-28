@@ -145,9 +145,9 @@ entire thing</p>
 main();
 </pre>
 <p>As <a href="backgrounds.html">explained in the backgrounds article</a> an
-<a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> with these parameters and a 2 unit plane will fill the
+<a href="../docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> with these parameters and a 2 unit plane will fill the
 canvas. For now all we'll get is a red canvas as our plane is using a red
-<a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
+<a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../shadertoy-prep.html"></iframe></div>
   <a class="threejs_center" href="../examples/shadertoy-prep.html" target="_blank">click here to open in a separate window</a>
@@ -195,7 +195,7 @@ color for.</p>
 </pre>
 <p>Each uniform in THREE.js has <code class="notranslate" translate="no">value</code> parameter. That value has to match the type
 of the uniform.</p>
-<p>Then we pass both the fragment shader and uniforms to a <a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>.</p>
+<p>Then we pass both the fragment shader and uniforms to a <a href="../docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({
 -    color: 'red',
 -});
@@ -358,7 +358,7 @@ minimal three.js vertex shader. Three.js declares and will provide values for
   }
 `;
 </pre>
-<p>We need to pass the vertex shader to the <a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a></p>
+<p>We need to pass the vertex shader to the <a href="../docs/#api/en/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,

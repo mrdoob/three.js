@@ -118,7 +118,7 @@ elem.addEventListener('click', () =&gt; {
 <hr>
 <p><a id="preservedrawingbuffer" data-toc="캔버스 초기화 방지하기"></a></p>
 <h1 id="-">캔버스 초기화 방지하기</h1>
-<p>움직이는 물체로 사용자가 그림을 그리게 한다고 해봅시다. 이걸 구현하려면 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <code class="notranslate" translate="no">preserveDrawingBuffer: true</code>를 설정해야 합니다. 또한 Three.js가 캔버스를 초기화하지 않도록 해주어야 하죠.</p>
+<p>움직이는 물체로 사용자가 그림을 그리게 한다고 해봅시다. 이걸 구현하려면 <a href="../docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <code class="notranslate" translate="no">preserveDrawingBuffer: true</code>를 설정해야 합니다. 또한 Three.js가 캔버스를 초기화하지 않도록 해주어야 하죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
 -const renderer = new THREE.WebGLRenderer({ canvas });
 +const renderer = new THREE.WebGLRenderer({
@@ -193,7 +193,7 @@ elem.addEventListener('click', () =&gt; {
 <hr>
 <p><a id="transparent-canvas" data-toc="캔버스를 투명하게 만들기"></a></p>
 <h1 id="-">캔버스를 투명하게 만들기</h1>
-<p>아무런 설정을 하지 않는다면 Three.js는 기본적으로 캔버스를 불투명하게 렌더링합니다. 캔버스를 투명하게 만들려면 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <a href="/docs/#api/ko/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha: true</code></a>를 넘겨줘야 하죠.</p>
+<p>아무런 설정을 하지 않는다면 Three.js는 기본적으로 캔버스를 불투명하게 렌더링합니다. 캔버스를 투명하게 만들려면 <a href="../docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <a href="../docs/#api/ko/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha: true</code></a>를 넘겨줘야 하죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
 -const renderer = new THREE.WebGLRenderer({ canvas });
 +const renderer = new THREE.WebGLRenderer({
@@ -209,7 +209,7 @@ const renderer = new THREE.WebGLRenderer({
 +  premultipliedAlpha: false,
 });
 </pre>
-<p>Three.js는 기본적으로 캔버스에는 <a href="/docs/#api/ko/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a>를 사용하지만 재질(material)에는 <a href="/docs/#api/ko/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>를 사용합니다.</p>
+<p>Three.js는 기본적으로 캔버스에는 <a href="../docs/#api/ko/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a>를 사용하지만 재질(material)에는 <a href="../docs/#api/ko/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>를 사용합니다.</p>
 <p>premultiplied alpha를 어떻게 사용해야 하는지 알고 싶다면 <a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre">여기 이 글</a>*을 참고하기 바랍니다.</p>
 <p>※ 영어이니 읽기가 어렵다면 그냥 구글에 premultiplied alpha를 검색하는 것을 추천합니다. 역주.</p>
 <p>어쨌든 이제 한 번 투명 캔버스 예제를 만들어보죠.</p>

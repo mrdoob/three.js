@@ -23,12 +23,12 @@
 Если вы еще не читали их, и вы новичок в three.js, возможно, вы захотите начать с них. 
 Если вы еще не читали о камерах, вы можете начать с <a href="cameras.html">этой статьи</a>.</p>
 <p>Туман в 3D-движке - это, как правило, способ затухания до определенного цвета в зависимости от расстояния до камеры. 
-В three.js вы добавляете туман, создавая объект <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> или <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> и устанавливая его в свойстве сцены 
-<a href="/docs/#api/en/scenes/Scene#fog"><code class="notranslate" translate="no">fog</code></a>.</p>
-<p><a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a>  позволяет выбирать <code class="notranslate" translate="no">near</code> и <code class="notranslate" translate="no">far</code> настройки, которые находятся на расстоянии от камеры. 
+В three.js вы добавляете туман, создавая объект <a href="../docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> или <a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> и устанавливая его в свойстве сцены 
+<a href="../docs/#api/en/scenes/Scene#fog"><code class="notranslate" translate="no">fog</code></a>.</p>
+<p><a href="../docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a>  позволяет выбирать <code class="notranslate" translate="no">near</code> и <code class="notranslate" translate="no">far</code> настройки, которые находятся на расстоянии от камеры. 
 Все, что <code class="notranslate" translate="no">near</code>  не подвержено влиянию тумана. 
 Все, что <code class="notranslate" translate="no">far</code>  - это цвет тумана. Части между <code class="notranslate" translate="no">near</code> и <code class="notranslate" translate="no">far</code>  переходят от их материального цвета к цвету тумана. </p>
-<p>Есть также <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a>, который растет экспоненциально с расстоянием от камеры.</p>
+<p>Есть также <a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a>, который растет экспоненциально с расстоянием от камеры.</p>
 <p>Чтобы использовать любой тип тумана, вы создаете его и назначаете его сцене, как в </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 {
@@ -38,7 +38,7 @@
   scene.fog = new THREE.Fog(color, near, far);
 }
 </pre>
-<p>или для <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> это будет</p>
+<p>или для <a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> это будет</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 {
   const color = 0xFFFFFF;
@@ -46,7 +46,7 @@
   scene.fog = new THREE.FogExp2(color, density);
 }
 </pre>
-<p><a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> ближе к реальности, но <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> используется чаще, поскольку он позволяет вам выбрать место для нанесения тумана, 
+<p><a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> ближе к реальности, но <a href="../docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> используется чаще, поскольку он позволяет вам выбрать место для нанесения тумана, 
 чтобы вы могли решить показать чистую сцену на определенном расстоянии, а затем исчезновение до некоторого цвета за этим расстоянием. </p>
 <div class="spread">
   <div>
@@ -62,7 +62,7 @@
 <p>Важно отметить, что туман применяется к <em>вещам, которые отображаются</em>.
 Это часть расчета каждого пикселя цвета объекта.
  Это означает, что если вы хотите, чтобы ваша сцена стала блеклой, вам нужно установить туман  <strong>и</strong> цвет фона на один и тот же цвет.
-Цвет фона устанавливается с помощью свойства <a href="/docs/#api/en/scenes/Scene#background"><code class="notranslate" translate="no">scene.background</code></a>. Чтобы выбрать цвет фона, вы прикрепляете к нему <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>. Например </p>
+Цвет фона устанавливается с помощью свойства <a href="../docs/#api/en/scenes/Scene#background"><code class="notranslate" translate="no">scene.background</code></a>. Чтобы выбрать цвет фона, вы прикрепляете к нему <a href="../docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>. Например </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">scene.background = new THREE.Color('#F00');  // red
 </pre>
 <div class="spread">
@@ -147,7 +147,7 @@ class FogGUIHelper {
 Как тон, насыщенность, яркость объекта (например: <code class="notranslate" translate="no">{h: 60, s: 1, v:}</code>). 
 Как массив RGB (например: <code class="notranslate" translate="no">[255, 128, 64]</code>). Или как массив RGBA (например: <code class="notranslate" translate="no">[127, 200, 75, 0.3]</code>). </p>
 <p>Для нашей цели проще всего использовать шестнадцатеричную версию, поскольку таким образом lil-gui манипулирует только одним значением. 
-К счастью, <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a> как метод <a href="/docs/#api/en/math/Color#getHexString"><code class="notranslate" translate="no">getHexString</code></a>
+К счастью, <a href="../docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a> как метод <a href="../docs/#api/en/math/Color#getHexString"><code class="notranslate" translate="no">getHexString</code></a>
 который мы используем, чтобы легко получить такую cтроку - нам просто нужно добавить <code class="notranslate" translate="no">«#»</code> вперед. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// We use this class to pass to lil-gui
 // so when it manipulates near or far
@@ -204,7 +204,7 @@ class FogGUIHelper {
 <p></p>
 <p>Вы можете видеть <code class="notranslate" translate="no">near</code> до 1,9, а <code class="notranslate" translate="no">far</code> до 2,0 дает очень резкий переход между незатуманенным и полностью затуманенным. 
 где <code class="notranslate" translate="no">near</code> = 1,1 и <code class="notranslate" translate="no">far</code> = 2,9 должны быть примерно самыми гладкими, учитывая, что наши кубики вращаются на 2 единицы от камеры. </p>
-<p>И последнее: на материале существует логическое свойство <a href="/docs/#api/en/materials/Material#fog"><code class="notranslate" translate="no">fog</code></a>,
+<p>И последнее: на материале существует логическое свойство <a href="../docs/#api/en/materials/Material#fog"><code class="notranslate" translate="no">fog</code></a>,
 определяющее, влияет ли туман на объекты, созданные с этим материалом. 
 По умолчанию это <code class="notranslate" translate="no">true</code> для большинства материалов. В качестве примера того, почему вы можете захотеть отключить туман, представьте, 
 что вы делаете 3D-симулятор автомобиля с видом с места водителя или из кабины.

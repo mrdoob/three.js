@@ -85,7 +85,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +addLight(-1, 2, 4);
 +addLight( 1, -1, -2);
 </pre>
-<p>キューブを透過するには <a href="/docs/#api/ja/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a>フラグを設定し、<a href="/docs/#api/ja/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>を設定する必要があります。opacityは1は完全な不透明、0は完全な透明です。</p>
+<p>キューブを透過するには <a href="../docs/#api/ja/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a>フラグを設定し、<a href="../docs/#api/ja/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>を設定する必要があります。opacityは1は完全な不透明、0は完全な透明です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
 -  const material = new THREE.MeshPhongMaterial({color});
 +  const material = new THREE.MeshPhongMaterial({
@@ -114,7 +114,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <div class="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
 <div class="threejs_center">no backs</div>
 
-<p><a href="materials.html">マテリアルの記事</a>でマテリアルのプロパティ<a href="/docs/#api/ja/materials/Material#side"><code class="notranslate" translate="no">side</code></a>について学びました。
+<p><a href="materials.html">マテリアルの記事</a>でマテリアルのプロパティ<a href="../docs/#api/ja/materials/Material#side"><code class="notranslate" translate="no">side</code></a>について学びました。
 <code class="notranslate" translate="no">THREE.DoubleSide</code> に設定し、各キューブの両面が描画されるようにします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
   color,
@@ -143,7 +143,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 次の三角形が描画される時、以前に記録された深さよりも各ピクセルの深さが深い場合は描画されません。</p>
 <p>不透明なものには効果的ですが、透明なものには失敗します。</p>
 <p>解決策としては、透明なものを並べ替えて手前より奥のものから描画する事です。
-Three.jsでは <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> のようなオブジェクトに対してこれを行います。
+Three.jsでは <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> のようなオブジェクトに対してこれを行います。
 そうでなければ、最初のサンプルではいくつかのキューブが他のキューブをブロックし、描画に失敗していたでしょう。
 残念ながら、個々の三角形が破綻し非常に遅くなります。</p>
 <p>キューブには12個の三角形が各面に2個ずつあり、描画される順番は<a href="custom-buffergeometry.html">ジオメトリで作られた順番と同じ</a>です。
@@ -245,11 +245,11 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
 </pre>
 <p>どうやって達成するかはあなた次第です。
 <a href="https://blender.org">Blender</a>のようなモデリングツールを使用していた場合は、テクスチャ座標を手動で調整すると思います。
-ここでは <a href="/docs/#api/ja/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> を使用していますが、デフォルトではテクスチャを平面全体に引き伸ばします。
-<a href="textures.html">テクステャの記事で説明</a>したように <a href="/docs/#api/ja/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a> と <a href="/docs/#api/ja/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> を設定し、
+ここでは <a href="../docs/#api/ja/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> を使用していますが、デフォルトではテクスチャを平面全体に引き伸ばします。
+<a href="textures.html">テクステャの記事で説明</a>したように <a href="../docs/#api/ja/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a> と <a href="../docs/#api/ja/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> を設定し、
 各平面上の表面のテクスチャから正しい半分が得られるようにテクスチャを拡大縮小したり移動させたりできます。</p>
-<p>上記のコードでは <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を作成し、その親となる2つの平面を作成しています。
-親の <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を回転させた方が必要な計算するよりも簡単そうです。</p>
+<p>上記のコードでは <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を作成し、その親となる2つの平面を作成しています。
+親の <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を回転させた方が必要な計算するよりも簡単そうです。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../transparency-intersecting-planes-fixed.html"></iframe></div>
   <a class="threejs_center" href="../examples/transparency-intersecting-planes-fixed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
@@ -269,7 +269,7 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
   <div><img class="checkerboard" src="../examples/resources/images/tree-02.png"></div>
 </div>
 
-<p>交差する2つの平面（分割する前）に戻り、これらのテクスチャを使用して <a href="/docs/#api/ja/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a> を設定してみましょう。</p>
+<p>交差する2つの平面（分割する前）に戻り、これらのテクスチャを使用して <a href="../docs/#api/ja/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a> を設定してみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
   const texture = loader.load(url, render);
   const material = new THREE.MeshPhongMaterial({

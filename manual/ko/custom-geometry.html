@@ -40,25 +40,25 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 3주 정도는 해당 프로그램의 튜토리얼을 익히는 데 투자하기 바랍니다.</p>
 <p>하지만 때로는 모델링 프로그램을 쓰는 것보다 직접 3D geometry를
 만드는 게 유리할 수 있을 겁니다.</p>
-<p>먼저 정육면체를 하나 만들어보겠습니다. 이미 원시 모델에 <a href="/docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>와
-<a href="/docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>가 있긴 하지만, 기본 개념을 이해하는 데는 간단한 게
+<p>먼저 정육면체를 하나 만들어보겠습니다. 이미 원시 모델에 <a href="../docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>와
+<a href="../docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>가 있긴 하지만, 기본 개념을 이해하는 데는 간단한 게
 훨씬 효과적일 테니까요.</p>
-<p>Three.js에서 사용자 지정 geometry는 <code class="notranslate" translate="no">Geometry</code> 또는 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>,
+<p>Three.js에서 사용자 지정 geometry는 <code class="notranslate" translate="no">Geometry</code> 또는 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>,
 2가지 클래스를 이용해 만들 수 있습니다. <code class="notranslate" translate="no">Geometry</code>는 분명 사용하기에는
 편하지만 느리고 메모리도 많이 차지합니다. 삼각형 천 개 정도까지야 그냥
-써도 나쁠 것이 없지만, 만 개가 넘어간다면 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>를 고려하는
+써도 나쁠 것이 없지만, 만 개가 넘어간다면 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>를 고려하는
 것이 좋죠.</p>
-<p>당연하게도 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>는 훨씬 쓰기 어렵지만, 비교적 메모리도 덜 차지하고
-훨씬 빠릅니다. 대략 구상하기에 삼각형을 10000개 이상 쓰겠다 싶으면 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>를
+<p>당연하게도 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>는 훨씬 쓰기 어렵지만, 비교적 메모리도 덜 차지하고
+훨씬 빠릅니다. 대략 구상하기에 삼각형을 10000개 이상 쓰겠다 싶으면 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>를
 고려하기 바랍니다.</p>
 <p>아까 <code class="notranslate" translate="no">Geometry</code>가 느리다고 했는데, 이는 처음 로드할 때와 수정할 때 느리다는
 것이지, 렌더링 속도가 느리다는 말이 아닙니다. geometry를 수정하지 않고 geometry가
-무지막지하게 크지 않은 한, <code class="notranslate" translate="no">Geometry</code>는 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 비해 프로그램 초기화
+무지막지하게 크지 않은 한, <code class="notranslate" translate="no">Geometry</code>는 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 비해 프로그램 초기화
 단계에서만 약간 더 느릴 뿐입니다. 결국에는 둘 다 살펴보겠지만, 일단-제 생각에-훨씬
 간단하고 이해하기 쉬운 <code class="notranslate" translate="no">Geometry</code>를 먼저 써봅시다.</p>
 <p>먼저 정육면체를 만들겠습니다. <a href="responsive.html">반응형 디자인에 관한 글</a>에서
 썼던 예제를 일부 가져오도록 하죠.</p>
-<p>먼저 <a href="/docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>를 <code class="notranslate" translate="no">Geometry</code>로 교체합니다.</p>
+<p>먼저 <a href="../docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>를 <code class="notranslate" translate="no">Geometry</code>로 교체합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const boxWidth = 1;
 -const boxHeight = 1;
 -const boxDepth = 1;
@@ -84,7 +84,7 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 <p>다음으로 정육면체 한 면에 2개씩, 총 삼각형 12개를 추가해야 합니다.</p>
 <div class="threejs_center"><img src="../resources/cube-triangles.svg" style="width: 500px"></div>
 
-<p><a href="/docs/#api/ko/core/Face3"><code class="notranslate" translate="no">Face3</code></a> 인스턴스를 만들어 3 꼭지점의 인덱스(index)를 넘겨주면 삼각형
+<p><a href="../docs/#api/ko/core/Face3"><code class="notranslate" translate="no">Face3</code></a> 인스턴스를 만들어 3 꼭지점의 인덱스(index)를 넘겨주면 삼각형
 면(face)을 만들 수 있습니다.</p>
 <p>꼭지점의 인덱스를 넘겨줄 때는 순서에 유의해야 합니다. 삼각형이 카메라를
 바라볼 때, 면이 정육면체의 바깥쪽을 향하려면 시계 반대 방향 순으로 인덱스를
@@ -114,7 +114,7 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 );
 </pre>
 <p>이제 몇 가지만 더 고치면 됩니다.</p>
-<p>이 정육면체들은 <a href="/docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>보다 두 배 더 크므로, 카메라를 약간
+<p>이 정육면체들은 <a href="../docs/#api/ko/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>보다 두 배 더 크므로, 카메라를 약간
 더 뒤로 옮겨줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // canvas 기본값
@@ -136,7 +136,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 ];
 </pre>
 <p>아직 법선(normal)을 넣지 않았는데, 법선이 없으면 빛은 소용이 없으니 마지막으로
-재질(material)을 <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>로 바꿔줍니다.</p>
+재질(material)을 <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>로 바꿔줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
 -  const material = new THREE.MeshPhongMaterial({ color });
 +  const material = new THREE.MeshBasicMaterial({ color });
@@ -202,7 +202,7 @@ geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta')
 <p>삼각형 면 법선의 경우 <code class="notranslate" translate="no">Geometry.computeFaceNormals</code>를 호출하면 되죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.computeFaceNormals();
 </pre>
-<p>꼭지점 색을 제거하고 다시 재질을 <a href="/docs/#api/ko/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>로 바꾸겠습니다.</p>
+<p>꼭지점 색을 제거하고 다시 재질을 <a href="../docs/#api/ko/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>로 바꾸겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({ vertexColors: true });
 +const material = new THREE.MeshPhongMaterial({ color });
 </pre>
@@ -284,7 +284,7 @@ function makeInstance(geometry, color, x) {
 <div class="threejs_center"><img src="../examples/resources/images/heightmap-96x64.png" style="width: 512px; image-rendering: pixelated;"></div>
 
 <p>이 이미지의 데이터를 불러와 높이 맵 mesh를 만들겠습니다. 이미지 데이터를
-불러올 때는 <a href="/docs/#api/ko/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a>를 활용합니다.</p>
+불러올 때는 <a href="../docs/#api/ko/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a>를 활용합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const imgLoader = new THREE.ImageLoader();
 imgLoader.load('resources/images/heightmap-96x64.png', createHeightmap);
 
@@ -385,7 +385,7 @@ for (let z = 0; z &lt; cellsDeep; ++z) {
 }
 </pre>
 <p>장면을 보기 쉽도록 몇 가지 요소를 추가하겠습니다.</p>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가하고,</p>
+<p><a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가하고,</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
 </pre>
@@ -424,7 +424,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
 <p></p>
 <p>이 글이 <code class="notranslate" translate="no">Geometry</code>를 활용하는 데 도움이 되었으면 합니다.</p>
-<p>글이 길어졌으니 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>는 <a href="custom-buffergeometry.html">다음 글</a>에서
+<p>글이 길어졌으니 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>는 <a href="custom-buffergeometry.html">다음 글</a>에서
 살펴보도록 하겠습니다.</p>
 
         </div>

@@ -46,8 +46,8 @@ Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là.</p>
   <img src="../examples/resources/images/wall.jpg" style="width: 600px;" class="border">
 </div>
 
-<p>Modifions l'un de nos premiers échantillons. Tout ce que nous avons à faire, c'est de créer un <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>. Appelons-le avec sa méthode
-<a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> et l'URL d'une image définissons la propriété <code class="notranslate" translate="no">map</code> du matériau sur le résultat au lieu de définir sa <code class="notranslate" translate="no">color</code>.</p>
+<p>Modifions l'un de nos premiers échantillons. Tout ce que nous avons à faire, c'est de créer un <a href="../docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>. Appelons-le avec sa méthode
+<a href="../docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> et l'URL d'une image définissons la propriété <code class="notranslate" translate="no">map</code> du matériau sur le résultat au lieu de définir sa <code class="notranslate" translate="no">color</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
 const material = new THREE.MeshBasicMaterial({
@@ -55,7 +55,7 @@ const material = new THREE.MeshBasicMaterial({
 +  map: loader.load('resources/images/wall.jpg'),
 });
 </pre>
-<p>Notez que nous utilisons un <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>, donc pas besoin de lumières.</p>
+<p>Notez que nous utilisons un <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>, donc pas besoin de lumières.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube.html"></iframe></div>
   <a class="threejs_center" href="../examples/textured-cube.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -77,7 +77,7 @@ const material = new THREE.MeshBasicMaterial({
   </div>
 </div>
 
-<p>Fabriquons juste 6 materiaux et passons-les sous forme de tableau lors de la création de la <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
+<p>Fabriquons juste 6 materiaux et passons-les sous forme de tableau lors de la création de la <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 
 -const material = new THREE.MeshBasicMaterial({
@@ -101,9 +101,9 @@ const material = new THREE.MeshBasicMaterial({
 </div>
 
 <p></p>
-<p>Il convient de noter, cependant, que tous les types de géométries ne peuvent supporter la prise en charge de plusieurs matériaux. <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> ne peut utiliser que 6 materiaux,  un pour chaque face.
-<a href="/docs/#api/en/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>, seulement 2, un pour la base et un pour le cône.
-<a href="/docs/#api/en/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> peut recevoir 3 materiaux pour le bas, le haut et le côté.
+<p>Il convient de noter, cependant, que tous les types de géométries ne peuvent supporter la prise en charge de plusieurs matériaux. <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> ne peut utiliser que 6 materiaux,  un pour chaque face.
+<a href="../docs/#api/en/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>, seulement 2, un pour la base et un pour le cône.
+<a href="../docs/#api/en/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> peut recevoir 3 materiaux pour le bas, le haut et le côté.
 Dans les autres cas, vous devrez créer ou charger une géométrie personnalisée et/ou modifier les coordonnées de texture.</p>
 <p>Il est bien plus performant d'utiliser, comme dans bien d'autres moteurs 3D, un
 <a href="https://fr.wikipedia.org/wiki/Atlas_de_texture">atlas de texture</a>
@@ -111,14 +111,14 @@ si vous voulez utiliser plusieurs images sur une même géométrie. Un atlas de 
 <p>Que sont les coordonnées de texture ? Ce sont des données ajoutées à chaque sommet d'un morceau de géométrie qui spécifient quelle partie de la texture correspond à ce sommet spécifique. Nous les examinerons lorsque nous commencerons à <a href="custom-buffergeometry.html">créer une géométrie personnalisée</a>.</p>
 <h2 id="-a-name-loading-a-t-l-chargement-de-textures"><a name="loading"></a> Téléchargement de textures</h2>
 <h3 id="-a-name-easy-a-la-fa-on-la-plus-simple"><a name="easy"></a> La façon la plus simple</h3>
-<p>La plupart du code de ce site utilise la méthode la plus simple pour charger les textures. Nous créons un <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> puis appelons sa méthode de <a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">chargement</code></a>.
-Cela renvoie un objet <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a>.</p>
+<p>La plupart du code de ce site utilise la méthode la plus simple pour charger les textures. Nous créons un <a href="../docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> puis appelons sa méthode de <a href="../docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">chargement</code></a>.
+Cela renvoie un objet <a href="../docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const texture = loader.load('resources/images/flower-1.jpg');
 </pre>
 <p>Il est important de noter qu'en utilisant cette méthode, notre texture sera transparente jusqu'à ce que l'image soit chargée de manière asynchrone par Three.js, auquel cas elle mettra à jour la texture avec l'image téléchargée.</p>
 <p>Le gros avantage, c'est que nous n'avons pas besoin d'attendre que la texture soit chargée pour que notre page s'affiche. C'est probablement correct pour un grand nombre de cas d'utilisation, mais si nous le voulons, nous pouvons demander à Three.js de nous dire quand le téléchargement de la texture est terminé.</p>
 <h3 id="-a-name-wait1-a-en-attente-du-chargement-d-une-texture"><a name="wait1"></a> En attente du chargement d'une texture</h3>
-<p>Pour attendre qu'une texture se charge, la méthode <code class="notranslate" translate="no">load</code> du chargeur de texture prend une 'callback function' qui sera appelée lorsque la texture aura fini de se charger. Pour en revenir à notre meilleur exemple, nous pouvons attendre que la texture se charge avant de créer notre <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> et de l'ajouter à une scène comme celle-ci</p>
+<p>Pour attendre qu'une texture se charge, la méthode <code class="notranslate" translate="no">load</code> du chargeur de texture prend une 'callback function' qui sera appelée lorsque la texture aura fini de se charger. Pour en revenir à notre meilleur exemple, nous pouvons attendre que la texture se charge avant de créer notre <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> et de l'ajouter à une scène comme celle-ci</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 loader.load('resources/images/wall.jpg', (texture) =&gt; {
   const material = new THREE.MeshBasicMaterial({
@@ -137,7 +137,7 @@ loader.load('resources/images/wall.jpg', (texture) =&gt; {
 
 <p></p>
 <h3 id="-a-name-waitmany-a-en-attente-du-chargement-de-plusieurs-textures"><a name="waitmany"></a> En attente du chargement de plusieurs textures</h3>
-<p>Pour attendre que toutes les textures soient chargées, vous pouvez utiliser un <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>. Créez-en un et transmettez-le à <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>, puis définissez sa propriété <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> avec une 'callback function'.</p>
+<p>Pour attendre que toutes les textures soient chargées, vous pouvez utiliser un <a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>. Créez-en un et transmettez-le à <a href="../docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>, puis définissez sa propriété <a href="../docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> avec une 'callback function'.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadManager = new THREE.LoadingManager();
 *const loader = new THREE.TextureLoader(loadManager);
 
@@ -156,7 +156,7 @@ const materials = [
 +  cubes.push(cube);  // ajouter à la liste des cubes
 +};
 </pre>
-<p>Le <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> a également une propriété <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> que nous pouvons définir sur une autre 'callback' pour afficher un indicateur de progression.</p>
+<p>Le <a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> a également une propriété <a href="../docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> que nous pouvons définir sur une autre 'callback' pour afficher un indicateur de progression.</p>
 <p>Ajoutons d'abord une barre de progression en HTML</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
@@ -252,7 +252,7 @@ Encore quelques textures comme celle-la et vous serez à court de mémoire.</p>
 
 <p>Désormais, lorsque le cube est dessiné si petit qu'il ne fait que 1 ou 2 pixels de large, le GPU peut choisir d'utiliser uniquement le plus petit ou le plus petit niveau de mip pour décider de la couleur du petit cube.</p>
 <p>Dans Three.js, vous pouvez choisir ce qui se passe à la fois lorsque la texture est dessinée plus grande que sa taille d'origine et ce qui se passe lorsqu'elle est dessinée plus petite que sa taille d'origine.</p>
-<p>Pour définir le filtre lorsque la texture est dessinée plus grande que sa taille d'origine, définissez la propriété <a href="/docs/#api/en/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a> sur <code class="notranslate" translate="no">THREE.NearestFilter</code> ou
+<p>Pour définir le filtre lorsque la texture est dessinée plus grande que sa taille d'origine, définissez la propriété <a href="../docs/#api/en/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a> sur <code class="notranslate" translate="no">THREE.NearestFilter</code> ou
  <code class="notranslate" translate="no">THREE.LinearFilter</code>.  <code class="notranslate" translate="no">NearestFilter</code> signifie simplement choisir le pixel le plus proche dans la texture d'origine. Avec une texture basse résolution, cela vous donne un look très pixelisé comme Minecraft.</p>
 <p><code class="notranslate" translate="no">LinearFilter</code> signifie choisir les 4 pixels de la texture qui sont les plus proches de l'endroit où nous devrions choisir une couleur et les mélanger dans les proportions appropriées par rapport à la distance entre le point réel et chacun des 4 pixels.</p>
 <div class="spread">
@@ -266,7 +266,7 @@ Encore quelques textures comme celle-la et vous serez à court de mémoire.</p>
   </div>
 </div>
 
-<p>Pour définir le filtre lorsque la texture est dessinée plus petite que sa taille d'origine, définissez la propriété <a href="/docs/#api/en/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a> sur l'une des 6 valeurs :</p>
+<p>Pour définir le filtre lorsque la texture est dessinée plus petite que sa taille d'origine, définissez la propriété <a href="../docs/#api/en/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a> sur l'une des 6 valeurs :</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.NearestFilter</code></p>
 <p> comme ci-dessus, choisissez le pixel le plus proche dans la texture</p>
@@ -329,7 +329,7 @@ Encore quelques textures comme celle-la et vous serez à court de mémoire.</p>
 <p>En revenant à la texture d'origine, vous pouvez voir que celle en bas à droite est la plus douce et la plus haute qualité. Vous pourriez vous demander pourquoi ne pas toujours utiliser ce mode. La raison la plus évidente, c'est que parfois vous voulez que les choses soient pixelisées pour un look rétro ou pour une autre raison. La deuxième raison la plus courante, c' est que lire 8 pixels et les mélanger est plus lent que lire 1 pixel et mélanger. Bien qu'il soit peu probable qu'une seule texture fasse la différence entre rapide et lente à mesure que nous progressons dans ces articles, nous finirons par avoir des matériaux qui utilisent 4 ou 5 textures à la fois. 4 textures * 8 pixels par texture se transforment 32 pixels pour chaque pixel rendu. Cela peut être particulièrement important à considérer sur les appareils mobiles.</p>
 <h2 id="-a-name-uvmanipulation-a-r-p-tition-d-calage-rotation-emballage-d-une-texture"><a name="uvmanipulation"></a> Répétition, décalage, rotation, emballage d'une texture</h2>
 <p>Les textures ont des paramètres pour la répétition, le décalage et la rotation d'une texture.</p>
-<p>Par défaut, les textures de three.js ne se répètent pas. Pour définir si une texture se répète ou non, il existe 2 propriétés, <a href="/docs/#api/en/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> pour un habillage horizontal et <a href="/docs/#api/en/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> pour un habillage vertical.  </p>
+<p>Par défaut, les textures de three.js ne se répètent pas. Pour définir si une texture se répète ou non, il existe 2 propriétés, <a href="../docs/#api/en/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> pour un habillage horizontal et <a href="../docs/#api/en/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> pour un habillage vertical.  </p>
 <p>Ils peuvent être définis sur l'un des éléments suivants :</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
@@ -426,7 +426,7 @@ gui.add(texture.center, 'y', -.5, 1.5, .01).name('texture.center.y');
 gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
   .name('texture.rotation');
 </pre>
-<p>La dernière chose à noter à propos de l'exemple est que si vous modifiez <code class="notranslate" translate="no">wrapS</code> ou <code class="notranslate" translate="no">wrapT</code> sur la texture, vous devez également définir <a href="/docs/#api/en/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>
+<p>La dernière chose à noter à propos de l'exemple est que si vous modifiez <code class="notranslate" translate="no">wrapS</code> ou <code class="notranslate" translate="no">wrapT</code> sur la texture, vous devez également définir <a href="../docs/#api/en/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>
 afin que three.js sache appliquer ces paramètres. Les autres paramètres sont automatiquement appliqués.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube-adjust.html"></iframe></div>

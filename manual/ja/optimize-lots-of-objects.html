@@ -225,7 +225,7 @@ renderが必要なのは連続的なレンダリングでなく、<a href="rende
   </div>
 </div>
 
-<p><a href="scenegraph.html">シーングラフ</a>で説明したように、多くの <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> オブジェクトでボックスを親にして解決できますが、シーングラフにノードを追加すればするほど遅くなってしまいます。</p>
+<p><a href="scenegraph.html">シーングラフ</a>で説明したように、多くの <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> オブジェクトでボックスを親にして解決できますが、シーングラフにノードを追加すればするほど遅くなってしまいます。</p>
 <p>また <code class="notranslate" translate="no">lonHelper</code>、<code class="notranslate" translate="no">latHelper</code>、<code class="notranslate" translate="no">positionHelper</code>という小さなノード階層を設定します。
 これらのオブジェクトを使用し、ボックスを配置する球体の周りの位置を計算します。</p>
 <div class="spread">
@@ -236,7 +236,7 @@ renderが必要なのは連続的なレンダリングでなく、<a href="rende
 <span style="color: blue;">blue bar</span> は <code class="notranslate" translate="no">latHelper</code> を表し、赤道上や赤道下の緯度を回転させるために使用します。
 <span style="color: red;">red sphere</span>は <code class="notranslate" translate="no">positionHelper</code> が提供するオフセットを表します。</p>
 <p>地球儀上の位置の計算を手動で行う事もできますが、ほとんどの計算をライブラリ自体に任せてしまうので処理をする必要がありません。</p>
-<p>各データポイントに対して <a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> と <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> を作成し、<code class="notranslate" translate="no">positionHelper</code> のワールド座標を求めてそれを新しい <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> に適用します。
+<p>各データポイントに対して <a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> と <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> を作成し、<code class="notranslate" translate="no">positionHelper</code> のワールド座標を求めてそれを新しい <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> に適用します。
 最後にメッシュを新しい位置で拡大縮小します。</p>
 <p>上記のように新しいボックスを作成する度に <code class="notranslate" translate="no">latHelper</code>、<code class="notranslate" translate="no">lonHelper</code>、<code class="notranslate" translate="no">positionHelper</code> を作成できましたが、それではさらに時間がかかります。</p>
 <p>これから作るボックスは360 × 145まであります。最大で52000個のボックスです。

@@ -49,8 +49,8 @@ Three.jsにはたくさんのトピックがあり、互いに関係している
   <img src="../examples/resources/images/wall.jpg" style="width: 600px;" class="border">
 </div>
 
-<p>最初の例を修正してみましょう。<a href="/docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を作ることで、必要なことはすべてできます。
-<a href="/docs/#api/ja/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>を画像のURLを引数にして呼び、<code class="notranslate" translate="no">color</code>を設定する代わりに、
+<p>最初の例を修正してみましょう。<a href="../docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を作ることで、必要なことはすべてできます。
+<a href="../docs/#api/ja/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>を画像のURLを引数にして呼び、<code class="notranslate" translate="no">color</code>を設定する代わりに、
 マテリアルの<code class="notranslate" translate="no">map</code>属性にその結果を渡してください。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
@@ -59,7 +59,7 @@ const material = new THREE.MeshBasicMaterial({
 +  map: loader.load('resources/images/wall.jpg'),
 });
 </pre>
-<p><a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>を使っているので、光源が必要ないことに注意してください。</p>
+<p><a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>を使っているので、光源が必要ないことに注意してください。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube.html"></iframe></div>
   <a class="threejs_center" href="../examples/textured-cube.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
@@ -81,7 +81,7 @@ const material = new THREE.MeshBasicMaterial({
   </div>
 </div>
 
-<p><a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>を作るときに、単に6つのマテリアルを作り、配列として渡します。</p>
+<p><a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>を作るときに、単に6つのマテリアルを作り、配列として渡します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 
 -const material = new THREE.MeshBasicMaterial({
@@ -106,9 +106,9 @@ const material = new THREE.MeshBasicMaterial({
 
 <p></p>
 <p>ただし、全ての種類のジオメトリが複数のマテリアルに対応しているわけではないことに注意してください。
-<a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>と<a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>は、それぞれの面に6つのマテリアルを使えます。
-<a href="/docs/#api/ja/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>と<a href="/docs/#api/ja/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>は2つのマテリアルを使うことができ、一つは底面、一つは円錐面に適用されます。
-<a href="/docs/#api/ja/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>と<a href="/docs/#api/ja/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>は3つのマテリアルを使うことができ、一つは底面、一つは上面、一つは側面に適用されます。
+<a href="../docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>と<a href="../docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>は、それぞれの面に6つのマテリアルを使えます。
+<a href="../docs/#api/ja/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>と<a href="../docs/#api/ja/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>は2つのマテリアルを使うことができ、一つは底面、一つは円錐面に適用されます。
+<a href="../docs/#api/ja/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>と<a href="../docs/#api/ja/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a>は3つのマテリアルを使うことができ、一つは底面、一つは上面、一つは側面に適用されます。
 その他のケースでは、カスタムジオメトリのビルドや読み込み、テクスチャの座標の修正が必要になります。</p>
 <p>1つのジオメトリに複数の画像を適用したいなら、
 <a href="https://en.wikipedia.org/wiki/Texture_atlas">テクスチャアトラス</a>を使うのが、ほかの3Dエンジンでははるかに一般的で、はるかに高性能です。
@@ -120,8 +120,8 @@ const material = new THREE.MeshBasicMaterial({
 <h2 id="-a-name-loading-a-"><a name="loading"></a> テクスチャの読み込み</h2>
 <h3 id="-a-name-easy-a-"><a name="easy"></a> 簡単な方法</h3>
 <p>このサイトのコードのほとんどは、もっとも簡単なテクスチャの読み込み方を使っています。
-<a href="/docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を作り、その<a href="/docs/#api/ja/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>メソッドを呼びます。
-これは<a href="/docs/#api/ja/textures/Texture"><code class="notranslate" translate="no">Texture</code></a>オブジェクトを返します。</p>
+<a href="../docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を作り、その<a href="../docs/#api/ja/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>メソッドを呼びます。
+これは<a href="../docs/#api/ja/textures/Texture"><code class="notranslate" translate="no">Texture</code></a>オブジェクトを返します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const texture = loader.load('resources/images/flower-1.jpg');
 </pre>
 <p>このメソッドを使うと、画像がthree.jsによって非同期的に読み込まれるまで、テクスチャが透明になります。読み込まれた時点で、テクスチャをダウンロードした画像に更新します。</p>
@@ -129,7 +129,7 @@ const material = new THREE.MeshBasicMaterial({
 多くのケースでこの方法で問題ありませんが、テクスチャをダウンロードし終えたときにthree.jsに通知してもらうこともできます。</p>
 <h3 id="-a-name-wait1-a-"><a name="wait1"></a> テクスチャの読み込みを待つ</h3>
 <p>テクスチャの読み込みを待つために、テクスチャローダーの<code class="notranslate" translate="no">load</code>メソッドは、テクスチャの読み込みが終了したときに呼ばれるコールバックを取ります。
-冒頭の例に戻り、このように、<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>を作りシーンに追加する前に、テクスチャの読み込みを待つことができます。</p>
+冒頭の例に戻り、このように、<a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>を作りシーンに追加する前に、テクスチャの読み込みを待つことができます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 loader.load('resources/images/wall.jpg', (texture) =&gt; {
   const material = new THREE.MeshBasicMaterial({
@@ -149,8 +149,8 @@ loader.load('resources/images/wall.jpg', (texture) =&gt; {
 
 <p></p>
 <h3 id="-a-name-waitmany-a-"><a name="waitmany"></a> 複数テクスチャの読み込みを待つ</h3>
-<p>全てのテクスチャが読み込まれたことを待つために、<a href="/docs/#api/ja/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>を使うことができます。
-<a href="/docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を渡すと、<a href="/docs/#api/ja/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>属性がコールバックに設定されます。</p>
+<p>全てのテクスチャが読み込まれたことを待つために、<a href="../docs/#api/ja/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>を使うことができます。
+<a href="../docs/#api/ja/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>を渡すと、<a href="../docs/#api/ja/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>属性がコールバックに設定されます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadManager = new THREE.LoadingManager();
 *const loader = new THREE.TextureLoader(loadManager);
 
@@ -169,7 +169,7 @@ const materials = [
 +  cubes.push(cube);  // add to our list of cubes to rotate
 +};
 </pre>
-<p><a href="/docs/#api/ja/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>は<a href="/docs/#api/ja/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>属性もあり、
+<p><a href="../docs/#api/ja/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>は<a href="../docs/#api/ja/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>属性もあり、
 プログレスインジケーターを表示するためのコールバックを設定できます。</p>
 <p>まず、HTMLにプログレスバーを追加しましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
@@ -287,7 +287,7 @@ MIPは1x1ピクセルのMIPが得られるまで作られます。
 
 <p>さて、立方体が1、2ピクセルの小ささに描かれたとき、どんな色にするか決めるため、GPUは最も小さなMIPレベルか次に小さいMIPか選ぶことができます。</p>
 <p>three.jsでは、テクスチャが元の大きさより大きく描かれたときと、小さく描かれたときの両方で、処理の設定を選ぶことができます。</p>
-<p>テクスチャが元の大きさより大きく描かれたときのフィルタ設定として、<a href="/docs/#api/ja/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a>属性に<code class="notranslate" translate="no">THREE.NearestFilter</code>か<code class="notranslate" translate="no">THREE.LinearFilter</code>を設定することができます。
+<p>テクスチャが元の大きさより大きく描かれたときのフィルタ設定として、<a href="../docs/#api/ja/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a>属性に<code class="notranslate" translate="no">THREE.NearestFilter</code>か<code class="notranslate" translate="no">THREE.LinearFilter</code>を設定することができます。
 <code class="notranslate" translate="no">NearestFilter</code>は元のテクスチャから最も近い1ピクセルを使用するということです。
 低解像度のテクスチャでは、マインクラフトのようにピクセル化された見た目になります。</p>
 <p><code class="notranslate" translate="no">LinearFilter</code>はテクスチャから、色を決めたいピクセルに最も近い4ピクセルを選び、
@@ -304,7 +304,7 @@ MIPは1x1ピクセルのMIPが得られるまで作られます。
 </div>
 
 <p>元の大きさよりもテクスチャが小さく描画された時のフィルタ設定では、
-<a href="/docs/#api/ja/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a>属性を6つの値から一つ設定できます。</p>
+<a href="../docs/#api/ja/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a>属性を6つの値から一つ設定できます。</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.NearestFilter</code></p>
 <p> 上と同様に、テクスチャの最も近いピクセルを選ぶ。</p>
@@ -381,7 +381,7 @@ MIPは1x1ピクセルのMIPが得られるまで作られます。
 <p>テクスチャは、繰り返し、オフセット、回転の設定があります。</p>
 <p>three.jsのデフォルトのテクスチャは繰り返されません。
 テクスチャが繰り返されるかどうかの設定には、2つの属性があります。
-水平方向のラッピングに<a href="/docs/#api/ja/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a>と、垂直方向のラッピングに<a href="/docs/#api/ja/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a>です。</p>
+水平方向のラッピングに<a href="../docs/#api/ja/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a>と、垂直方向のラッピングに<a href="../docs/#api/ja/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a>です。</p>
 <p>以下のどれかが設定されます：</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
@@ -488,7 +488,7 @@ gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
   .name('texture.rotation');
 </pre>
 <p>最後に特記することは、もしテクスチャの<code class="notranslate" translate="no">wrapS</code>や<code class="notranslate" translate="no">wrapT</code>を変えるなら、
-three.jsが設定の適用を知るために、<a href="/docs/#api/ja/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>も設定しなければならないことです。ほかの設定は自動的に適用されます。</p>
+three.jsが設定の適用を知るために、<a href="../docs/#api/ja/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>も設定しなければならないことです。ほかの設定は自動的に適用されます。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube-adjust.html"></iframe></div>
   <a class="threejs_center" href="../examples/textured-cube-adjust.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>

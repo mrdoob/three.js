@@ -31,11 +31,11 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>Ajoutons ensuite <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> permet à l'utilisateur de tourner ou de mettre la caméra en <em>orbite</em> autour d'un certain point. Il s'agit d'une fonctionnalité facultative de Three.js, nous devons donc d'abord l'importer</p>
+<p>Ajoutons ensuite <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> permet à l'utilisateur de tourner ou de mettre la caméra en <em>orbite</em> autour d'un certain point. Il s'agit d'une fonctionnalité facultative de Three.js, nous devons donc d'abord l'importer</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 </pre>
-<p>Ensuite, nous pouvons l'utiliser. Nous passons à <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> une caméra à contrôler et l'élément DOM à utiliser.</p>
+<p>Ensuite, nous pouvons l'utiliser. Nous passons à <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> une caméra à contrôler et l'élément DOM à utiliser.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
@@ -92,8 +92,8 @@ scene.add(mesh);
 }
 </pre>
 <p>Maintenant que nous avons une scène à éclairer, ajoutons des lumières !</p>
-<h2 id="-ambientlight-"><a href="/docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a></h2>
-<p>D'abord mettons en place une <a href="/docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a></p>
+<h2 id="-ambientlight-"><a href="../docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a></h2>
+<p>D'abord mettons en place une <a href="../docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.AmbientLight(color, intensity);
@@ -129,12 +129,12 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 
 <p></p>
 <p>Cliquez/glissez pour mettre la caméra en <em>orbite</em>.</p>
-<p>Remarquez qu'il n'y a pas de définition. Les formes sont plates. L'<a href="/docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> multiplie simplement la couleur du matériau par la couleur de la lumière multipliée par l'intensité.</p>
+<p>Remarquez qu'il n'y a pas de définition. Les formes sont plates. L'<a href="../docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> multiplie simplement la couleur du matériau par la couleur de la lumière multipliée par l'intensité.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">color = materialColor * light.color * light.intensity;
 </pre><p>C'est ça. Il n'a pas de direction. Ce style d'éclairage ambiant n'est en fait pas très utile en tant qu'éclairage, à part changer la couleur de toute la scène, ce n'est pas vraiment un éclairage, ça rend juste les ténèbres moins sombres.</p>
 <p>XXXXXXXXXXXXXXXXXXXXXXX</p>
-<h2 id="-hemispherelight-"><a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a></h2>
-<p>Passons à une <a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>. Une <a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> prend une couleur de ciel et une couleur de sol et multiplie simplement la couleur du matériau entre ces 2 couleurs : la couleur du ciel si la surface de l'objet pointe vers le haut et la couleur du sol si la surface de l'objet pointe vers le bas.</p>
+<h2 id="-hemispherelight-"><a href="../docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a></h2>
+<p>Passons à une <a href="../docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>. Une <a href="../docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> prend une couleur de ciel et une couleur de sol et multiplie simplement la couleur du matériau entre ces 2 couleurs : la couleur du ciel si la surface de l'objet pointe vers le haut et la couleur du sol si la surface de l'objet pointe vers le bas.</p>
 <p>Voici le nouveau code</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const color = 0xFFFFFF;
 +const skyColor = 0xB1E1FF;  // light blue
@@ -158,10 +158,10 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 </div>
 
 <p></p>
-<p>Remarquez encore une fois qu'il n'y a presque pas de définition, tout a l'air plutôt plat. L'<a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> utilisée en combinaison avec une autre lumière peut aider à donner une belle sorte d'influence de la couleur du ciel et du sol. Retenez qu'il est préférable de l'utiliser en combinaison avec une autre lumière ou à la place d'une <a href="/docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a>.</p>
-<h2 id="-directionallight-"><a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a></h2>
-<p>Remplaçons le code par une <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>.
-Une <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> est souvent utiliser pour représenter la lumière du soleil.</p>
+<p>Remarquez encore une fois qu'il n'y a presque pas de définition, tout a l'air plutôt plat. L'<a href="../docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> utilisée en combinaison avec une autre lumière peut aider à donner une belle sorte d'influence de la couleur du ciel et du sol. Retenez qu'il est préférable de l'utiliser en combinaison avec une autre lumière ou à la place d'une <a href="../docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a>.</p>
+<h2 id="-directionallight-"><a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a></h2>
+<p>Remplaçons le code par une <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>.
+Une <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> est souvent utiliser pour représenter la lumière du soleil.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.DirectionalLight(color, intensity);
@@ -171,7 +171,7 @@ scene.add(light);
 scene.add(light.target);
 </pre>
 <p>Notez que nous avons dû ajouter une <code class="notranslate" translate="no">light</code> et une <code class="notranslate" translate="no">light.target</code>
-à la scéne. Une <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> doit illuminer une cible.</p>
+à la scéne. Une <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> doit illuminer une cible.</p>
 <p>Faisons en sorte que nous puissions déplacer la cible en l'ajoutant à lil-gui.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
@@ -187,11 +187,11 @@ gui.add(light.target.position, 'y', 0, 10);
 
 <p></p>
 <p>C'est un peu difficile de voir ce qui se passe. Three.js a un tas de 'helper' que nous pouvons ajouter à la scène pour voir les objets invibles. Utilisons, dans ce cas, 
-<a href="/docs/#api/en/helpers/DirectionalLightHelper"><code class="notranslate" translate="no">DirectionalLightHelper</code></a> qui a représente la source de lumière en direction de sa cible. Il suffit de lui ajouter une lumière et de l'ajouter à la scène.</p>
+<a href="../docs/#api/en/helpers/DirectionalLightHelper"><code class="notranslate" translate="no">DirectionalLightHelper</code></a> qui a représente la source de lumière en direction de sa cible. Il suffit de lui ajouter une lumière et de l'ajouter à la scène.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const helper = new THREE.DirectionalLightHelper(light);
 scene.add(helper);
 </pre>
-<p>Pendant que nous y sommes, faisons en sorte que nous puissions définir à la fois la position de la lumière et la cible. Pour ce faire, nous allons créer une fonction qui, étant donné un <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>, ajustera ses propriétés <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code> et <code class="notranslate" translate="no">z</code> à l'aide de <code class="notranslate" translate="no">lil-gui</code>.</p>
+<p>Pendant que nous y sommes, faisons en sorte que nous puissions définir à la fois la position de la lumière et la cible. Pour ce faire, nous allons créer une fonction qui, étant donné un <a href="../docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>, ajustera ses propriétés <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code> et <code class="notranslate" translate="no">z</code> à l'aide de <code class="notranslate" translate="no">lil-gui</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeXYZGUI(gui, vector3, name, onChangeFn) {
   const folder = gui.addFolder(name);
   folder.add(vector3, 'x', -10, 10).onChange(onChangeFn);
@@ -223,8 +223,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 
 <p></p>
 <p>Mettez la caméra en orbite et il devient plus facile de voir. Le plan représente une lumière directionnelle car une lumière directionnelle calcule la lumière venant dans une direction. Il n'y a aucun point d'où vient la lumière, c'est un plan de lumière infini qui projette des rayons de lumière parallèles.</p>
-<h2 id="-pointlight-"><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a></h2>
-<p>Un <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> est une lumière qui se trouve en un point et projette de la lumière dans toutes les directions à partir de ce point. Changeons le code.</p>
+<h2 id="-pointlight-"><a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a></h2>
+<p>Un <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> est une lumière qui se trouve en un point et projette de la lumière dans toutes les directions à partir de ce point. Changeons le code.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
 -const light = new THREE.DirectionalLight(color, intensity);
@@ -234,7 +234,7 @@ light.position.set(0, 10, 0);
 scene.add(light);
 -scene.add(light.target);
 </pre>
-<p>Passons également à un <a href="/docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a></p>
+<p>Passons également à un <a href="../docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const helper = new THREE.DirectionalLightHelper(light);
 +const helper = new THREE.PointLightHelper(light);
 scene.add(helper);
@@ -246,9 +246,9 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p>Notez qu'à un certain niveau, un <a href="/docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> n'a pas de point. Il dessine juste un petit diamant filaire. Ou n'importe quelle autre forme que vous voulez, ajoutez simplement un maillage à la lumière elle-même.</p>
-<p>Une <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> a une propriété supplémentaire, <a href="/docs/#api/en/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>.
-Si la <code class="notranslate" translate="no">distance</code> est de 0, le <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> brille à l'infini. Si la <code class="notranslate" translate="no">distance</code> est supérieure à 0, la lumière brille de toute son intensité vers la lumière et s'estompe jusqu'à n'avoir aucune influence à des unités de <code class="notranslate" translate="no">distance</code> de la lumière.</p>
+<p>Notez qu'à un certain niveau, un <a href="../docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> n'a pas de point. Il dessine juste un petit diamant filaire. Ou n'importe quelle autre forme que vous voulez, ajoutez simplement un maillage à la lumière elle-même.</p>
+<p>Une <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> a une propriété supplémentaire, <a href="../docs/#api/en/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>.
+Si la <code class="notranslate" translate="no">distance</code> est de 0, le <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> brille à l'infini. Si la <code class="notranslate" translate="no">distance</code> est supérieure à 0, la lumière brille de toute son intensité vers la lumière et s'estompe jusqu'à n'avoir aucune influence à des unités de <code class="notranslate" translate="no">distance</code> de la lumière.</p>
 <p>Mettons à jour lil-gui pour pouvoir modifier la distance.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
@@ -266,10 +266,10 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 
 <p></p>
 <p>Remarquez comment la lumière s'éteint lorsque la <code class="notranslate" translate="no">distance</code> est &gt; 0.</p>
-<h2 id="-spotlight-"><a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
-<p>La <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> (projecteur), c'est une lumière ponctuelle avec un cône attaché où la lumière ne brille qu'à l'intérieur du cône. Il y a en fait 2 cônes. Un cône extérieur et un cône intérieur. Entre le cône intérieur et le cône extérieur, la lumière passe de la pleine intensité à zéro.</p>
-<p>Pour utiliser une <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>, nous avons besoin d'une cible tout comme la lumière directionnelle. Le cône de lumière s'ouvrira vers la cible.</p>
-<p>Modifions notre <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> avec le 'helper' vu plus haut</p>
+<h2 id="-spotlight-"><a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
+<p>La <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> (projecteur), c'est une lumière ponctuelle avec un cône attaché où la lumière ne brille qu'à l'intérieur du cône. Il y a en fait 2 cônes. Un cône extérieur et un cône intérieur. Entre le cône intérieur et le cône extérieur, la lumière passe de la pleine intensité à zéro.</p>
+<p>Pour utiliser une <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>, nous avons besoin d'une cible tout comme la lumière directionnelle. Le cône de lumière s'ouvrira vers la cible.</p>
+<p>Modifions notre <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> avec le 'helper' vu plus haut</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
 -const light = new THREE.DirectionalLight(color, intensity);
@@ -281,12 +281,12 @@ scene.add(light.target);
 +const helper = new THREE.SpotLightHelper(light);
 scene.add(helper);
 </pre>
-<p>L'angle du cône de la <code class="notranslate" translate="no">Spotlight</code> est défini avec la propriété <a href="/docs/#api/en/lights/SpotLight#angle"><code class="notranslate" translate="no">angle</code></a>
+<p>L'angle du cône de la <code class="notranslate" translate="no">Spotlight</code> est défini avec la propriété <a href="../docs/#api/en/lights/SpotLight#angle"><code class="notranslate" translate="no">angle</code></a>
 en radians. Utilisons notre <code class="notranslate" translate="no">DegRadHelper</code> vu dans
 <a href="textures.html">l'article sur les textures</a> pour modifier l'angle avec lil-gui.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
 </pre>
-<p>Le cône intérieur est défini en paramétrant la propriété <a href="/docs/#api/en/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra</code></a> en pourcentage du cône extérieur. En d'autres termes, lorsque la pénombre est de 0, le cône intérieur a la même taille (0 = aucune différence) que le cône extérieur. Lorsque la pénombre est de 1, la lumière s'estompe en partant du centre du cône jusqu'au cône extérieur. Lorsque la pénombre est de 0,5, la lumière s'estompe à partir de 50 % entre le centre du cône extérieur.</p>
+<p>Le cône intérieur est défini en paramétrant la propriété <a href="../docs/#api/en/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra</code></a> en pourcentage du cône extérieur. En d'autres termes, lorsque la pénombre est de 0, le cône intérieur a la même taille (0 = aucune différence) que le cône extérieur. Lorsque la pénombre est de 1, la lumière s'estompe en partant du centre du cône jusqu'au cône extérieur. Lorsque la pénombre est de 0,5, la lumière s'estompe à partir de 50 % entre le centre du cône extérieur.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(light, 'penumbra', 0, 1, 0.01);
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -297,9 +297,9 @@ en radians. Utilisons notre <code class="notranslate" translate="no">DegRadHelpe
 <p></p>
 <p>Remarquez qu'avec la <code class="notranslate" translate="no">penumbra</code> par défaut à 0, le projecteur a un bord très net alors que lorsque vous l'ajustez à 1, le bord devient flou.</p>
 <p>Il peut être difficile de voir le <em>cône</em> des spotlight. C'est parce qu'il se trouve sous le sol. Raccourcissez la distance à environ 5 et vous verrez l'extrémité ouverte du cône.</p>
-<h2 id="-rectarealight-"><a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a></h2>
+<h2 id="-rectarealight-"><a href="../docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a></h2>
 <p>Il existe un autre type de lumière, la <a href="https://threejs.org/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>, qui ressemble à une zone de lumière rectangulaire comme une longue lampe fluorescente ou peut-être une lucarne dépolie dans un plafond.</p>
-<p>Le <a href="https://threejs.org/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> ne fonctionne qu'avec les <a href="https://threejs.org/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> et <a href="https://threejs.org/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> donc changeons tous nos matériaux en <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a></p>
+<p>Le <a href="https://threejs.org/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> ne fonctionne qu'avec les <a href="https://threejs.org/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> et <a href="https://threejs.org/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> donc changeons tous nos matériaux en <a href="../docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">  ...
 
   const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
@@ -379,7 +379,7 @@ makeXYZGUI(gui, light.position, 'position');
 
 <p></p>
 <p>Une chose que nous n'avons pas vu, c'est qu'il existe un paramètre sur le <a href="https://threejs.org/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> appelé <code class="notranslate" translate="no">physicalCorrectLights</code>. Il affecte la façon dont la lumière tombe en tant que distance de la lumière. Cela n'affecte que <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> et <a href="https://threejs.org/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>. <a href="https://threejs.org/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> le fait automatiquement.</p>
-<p>Pour les lumières, l'idée de base est de ne pas définir de distance pour qu'elles s'éteignent, et vous ne définissez pas <code class="notranslate" translate="no">intensity</code>. Au lieu de cela, vous définissez la <a href="/docs/#api/en/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> de la lumière en lumens, puis three.js utilisera des calculs physiques comme de vraies lumières. Les unités de three.js dans ce cas sont des mètres et une ampoule de 60w aurait environ 800 lumens. Il y a aussi une propriété <a href="/docs/#api/en/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>. Elle doit être réglé sur 2 pour une apparence réaliste.</p>
+<p>Pour les lumières, l'idée de base est de ne pas définir de distance pour qu'elles s'éteignent, et vous ne définissez pas <code class="notranslate" translate="no">intensity</code>. Au lieu de cela, vous définissez la <a href="../docs/#api/en/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> de la lumière en lumens, puis three.js utilisera des calculs physiques comme de vraies lumières. Les unités de three.js dans ce cas sont des mètres et une ampoule de 60w aurait environ 800 lumens. Il y a aussi une propriété <a href="../docs/#api/en/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>. Elle doit être réglé sur 2 pour une apparence réaliste.</p>
 <p>Testons ça.</p>
 <p>D'abord, définissons <code class="notranslate" translate="no">physicallyCorrectLights</code> sur true</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});

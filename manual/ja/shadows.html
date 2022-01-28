@@ -46,7 +46,7 @@ three.jsで利用できる解決策も含め様々な解決策がありますが
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color('white');
 </pre>
-<p>同じチェッカーボードの地面を使いますが、今回の地面には照明は必要ないので <a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用します。</p>
+<p>同じチェッカーボードの地面を使いますが、今回の地面には照明は必要ないので <a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
 {
@@ -91,12 +91,12 @@ const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, s
 const shadowGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 </pre>
 <p>そして、たくさんの球体を作ります。
-各球体に対して <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> を作成し <code class="notranslate" translate="no">base</code> に格納しシャドウの平面と球体メッシュの両方をbaseの子にします。
+各球体に対して <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> を作成し <code class="notranslate" translate="no">base</code> に格納しシャドウの平面と球体メッシュの両方をbaseの子にします。
 これでbaseを動かすと、球体とシャドウの両方が動きます。
 Ｚファイティングを防ぐためにシャドウを少し上にします。
 また、<code class="notranslate" translate="no">depthWrite</code> をfalseにしてシャドウがお互いに混乱しないようにします。
 この2つの問題は<a href="transparency.html">別の記事</a>で解説します。
-このシャドウは照明が不要なので <a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> にします。</p>
+このシャドウは照明が不要なので <a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> にします。</p>
 <p>各球体を異なる色相、ベース、球体メッシュ、シャドウのメッシュ、各球体のyの初期位置を保存します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const numSpheres = 15;
 for (let i = 0; i &lt; numSpheres; ++i) {
@@ -134,7 +134,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 }
 </pre>
 <p>2つのライトを設定しました。
-1つは <a href="/docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> で強度2にしました。</p>
+1つは <a href="../docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> で強度2にしました。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const skyColor = 0xB1E1FF;  // light blue
   const groundColor = 0xB97A20;  // brownish orange
@@ -143,7 +143,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   scene.add(light);
 }
 </pre>
-<p>もう1つは <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> で球体はいくつかの定義を得られます。</p>
+<p>もう1つは <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> で球体はいくつかの定義を得られます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -156,7 +156,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 </pre>
 <p>そのままレンダリングしてますが、球体をアニメーション化してみましょう。
 それぞれの球体、シャドウ、baseのセットに対して、
-baseをxz平面内で移動させて <a href="/docs/#api/ja/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a> で球体を上下に移動させると弾むようなアニメーションします。
+baseをxz平面内で移動させて <a href="../docs/#api/ja/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a> で球体を上下に移動させると弾むようなアニメーションします。
 シャドウのマテリアルの不透明度を設定し、各球体が高くなるにつれてシャドウを薄くなるようにしています。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;  // convert to seconds
@@ -200,8 +200,8 @@ baseをxz平面内で移動させて <a href="/docs/#api/ja/math/Math.abs(Math.s
 それぞれのキャラクターがシンプルな丸いシャドウになっており、レンダリングコストが低く効果的です。
 <a href="https://www.google.com/search?q=monument+valley+screenshots&amp;tbm=isch">モニュメントバレー</a>では、メインキャラクターにもこのシャドウが使われているようです。</p>
 <p>そこでシャドウマップに移りますが、シャドウを落とす事ができるライトが3つあります。
-<a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> と <a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> と <a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> です。</p>
-<p>まずは、<a href="lights.html">ライトの記事</a>のヘルパーの例を参考に <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を使ってみましょう。</p>
+<a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> と <a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> と <a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> です。</p>
+<p>まずは、<a href="lights.html">ライトの記事</a>のヘルパーの例を参考に <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を使ってみましょう。</p>
 <p>最初にレンダラーのシャドウを有効にします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
 +renderer.shadowMap.enabled = true;
@@ -236,11 +236,11 @@ mesh.receiveShadow = true;
 <p>何が起こったのでしょうか？
 なぜ影の一部が欠けているのでしょうか？</p>
 <p>これはシャドウマップは光の視点でシーンをレンダリングし作成されるからです。
-この場合、<a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> にカメラがあり、ターゲットを見ています。
+この場合、<a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> にカメラがあり、ターゲットを見ています。
 <a href="cameras.html">以前取り上げたカメラと同じように</a>
 ライトのシャドウカメラは影がレンダリングされ、内部の領域を定義します。
 上記の例ではその面積が小さすぎます。</p>
-<p>その領域を可視化するために、ライトのシャドウカメラを取得して <a href="/docs/#api/ja/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> をシーンに追加します。</p>
+<p>その領域を可視化するために、ライトのシャドウカメラを取得して <a href="../docs/#api/ja/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> をシーンに追加します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(light.shadow.camera);
 scene.add(cameraHelper);
 </pre>
@@ -254,9 +254,9 @@ scene.add(cameraHelper);
 <p>ターゲットのX値を前後に調整すると、ライトのシャドウカメラボックスの中にあるものだけが影を描画する場所が明確になります。</p>
 <p>ライトのシャドウカメラを調整するとその箱の大きさを調整できます。</p>
 <p>ライトのシャドウカメラボックスを調整するためのGUIを追加してみましょう。
-<code class="notranslate" translate="no">DirectionLight</code> は全ての光が平行な方向に進むので、<a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> はシャドウカメラに <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を使います。
-<a href="cameras.html">以前のカメラの記事</a>で <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> がどのように動作するかを説明しました。</p>
-<p><a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> は、<code class="notranslate" translate="no">left</code>、<code class="notranslate" translate="no">right</code>、<code class="notranslate" translate="no">top</code>、<code class="notranslate" translate="no">bottom</code>、<code class="notranslate" translate="no">near</code>、<code class="notranslate" translate="no">far</code>、<code class="notranslate" translate="no">zoom</code> プロパティでその箱、または <em>錐台の視点</em> を定義してる事を思い出して下さい。</p>
+<code class="notranslate" translate="no">DirectionLight</code> は全ての光が平行な方向に進むので、<a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> はシャドウカメラに <a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を使います。
+<a href="cameras.html">以前のカメラの記事</a>で <a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> がどのように動作するかを説明しました。</p>
+<p><a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> は、<code class="notranslate" translate="no">left</code>、<code class="notranslate" translate="no">right</code>、<code class="notranslate" translate="no">top</code>、<code class="notranslate" translate="no">bottom</code>、<code class="notranslate" translate="no">near</code>、<code class="notranslate" translate="no">far</code>、<code class="notranslate" translate="no">zoom</code> プロパティでその箱、または <em>錐台の視点</em> を定義してる事を思い出して下さい。</p>
 <p>ここでもlil-guiのヘルパークラスを作ってみましょう。
 オブジェクトと2つのプロパティを渡す <code class="notranslate" translate="no">DimensionGUIHelper</code> を作ります。
 lil-guiが調整できるプロパティを追加し、2つのプロパティの正と負の値を設定します。
@@ -333,14 +333,14 @@ updateCamera();
 ライトのシャドウカメラ領域も同様です。
 小さくすると影の見栄えが良くなるので、面積を小さくしてシーンをカバーしましょう。
 各ユーザーのコンピューターには、利用可能な最大テクスチャサイズがある事に注意して下さい。
-<a href="/docs/#api/ja/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>で利用可能な最大テクスチャサイズがわかります。</p>
+<a href="../docs/#api/ja/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>で利用可能な最大テクスチャサイズがわかります。</p>
 <!--
 Ok but what about `near` and `far` I hear you thinking. Can we set `near` to 0.00001 and far to `100000000`
 -->
-<p><a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> に切り替えると、ライトのシャドウカメラは <a href="/docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> になります。
-<a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> のシャドウカメラの設定を手動で行えます。
-ただ、<a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> のシャドウカメラは <a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> 自身によって制御されます。
-シャドウカメラの <code class="notranslate" translate="no">fov</code> は <a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> の <code class="notranslate" translate="no">angle</code> に接続しています。
+<p><a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> に切り替えると、ライトのシャドウカメラは <a href="../docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> になります。
+<a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> のシャドウカメラの設定を手動で行えます。
+ただ、<a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> のシャドウカメラは <a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> 自身によって制御されます。
+シャドウカメラの <code class="notranslate" translate="no">fov</code> は <a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> の <code class="notranslate" translate="no">angle</code> に接続しています。
 <code class="notranslate" translate="no">aspect</code> はシャドウマップのサイズによって自動的に設定されます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
@@ -369,10 +369,10 @@ also blur the result
 
 
 -->
-<p>そして最後に <a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> でシャドウをつけます。
-<a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> は全方向に光を放つので関連する設定は <code class="notranslate" translate="no">near</code> と <code class="notranslate" translate="no">far</code> だけです。
-それ以外の場合、<a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> のシャドウは、効果的な6つの <a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> のシャドウになります。
-これは <a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> のシャドウの描画が非常に遅くなります。</p>
+<p>そして最後に <a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> でシャドウをつけます。
+<a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> は全方向に光を放つので関連する設定は <code class="notranslate" translate="no">near</code> と <code class="notranslate" translate="no">far</code> だけです。
+それ以外の場合、<a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> のシャドウは、効果的な6つの <a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> のシャドウになります。
+これは <a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> のシャドウの描画が非常に遅くなります。</p>
 <p>シーンの周りに箱を置いて、壁や天井にシャドウが見えるようにしてみましょう。
 マテリアルの <code class="notranslate" translate="no">side</code> プロパティを <code class="notranslate" translate="no">THREE.BackSide</code> に設定します。
 これで箱の外側ではなく内側をレンダリングしています。
@@ -391,7 +391,7 @@ also blur the result
   scene.add(mesh);
 }
 </pre>
-<p>そして、ライトを <a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> に切り替えます。</p>
+<p>そして、ライトを <a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> に切り替えます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.SpotLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 

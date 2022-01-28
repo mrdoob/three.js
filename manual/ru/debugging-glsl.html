@@ -54,7 +54,7 @@
 
 <p>Вы можете делать подобные вещи для всех значений в вашем фрагментном шейдере.
 Выясните, каким может быть их диапазон, добавьте код для установки <code class="notranslate" translate="no">gl_FragColor</code> с диапазоном от 0,0 до 1,0. </p>
-<p>Чтобы проверить текстуры, попробуйте <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> или <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>, которые, как вы знаете, работают. </p>
+<p>Чтобы проверить текстуры, попробуйте <a href="../docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> или <a href="../docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>, которые, как вы знаете, работают. </p>
 <p>И наоборот, если после установки <code class="notranslate" translate="no">gl_FragColor</code> на красный я все еще ничего не вижу, 
 у меня есть подсказка, моя проблема может быть в направлении вещей, связанных с вершинным шейдером. 
 Некоторые матрицы могут быть неправильными, или мои атрибуты могут содержать неверные данные или неправильно настроены. </p>
@@ -69,7 +69,7 @@
 я изменю фрагментный шейдер так, чтобы он отображался так, как указано выше, а затем просто установите для <code class="notranslate" translate="no">vNormal</code> значение, которое я хочу отобразить,
 но масштабировать, чтобы значения изменялись от 0,0 до 1,0. Затем я смотрю на результаты и проверяю, соответствуют ли они моим ожиданиям. </p>
 <p>Еще одна полезная вещь - использовать более простой шейдер. 
-Можете ли вы нарисовать свои данные с помощью <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>? 
+Можете ли вы нарисовать свои данные с помощью <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>? 
 Если вы можете тогда попробуйте и убедитесь, что он показывает, как ожидалось. </p>
 <p>Если нет, то какой самый простой вершинный шейдер, который позволит вам визуализировать вашу геометрию? Обычно это так же просто, как </p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_Position = projection * modelView * vec4(position.xyz, 1);

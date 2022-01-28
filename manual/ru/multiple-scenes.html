@@ -22,7 +22,7 @@
           <p>Допустим, вы хотите создать сайт электронной коммерции или сделать 
 страницу с множеством трехмерных диаграмм. На первый взгляд все 
 выглядит просто. Просто сделайте холст для каждой диаграммы. 
-Для каждого холста сделайте <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>.</p>
+Для каждого холста сделайте <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>.</p>
 <p>Вы быстро обнаружите, что у вас возникли проблемы.</p>
 <ol>
 <li><p>Браузер ограничивает количество контекстов WebGL, которые вы можете иметь.</p>
@@ -41,7 +41,7 @@
 <p>Так в чем же решение?</p>
 <p>Решением является один холст, который заполняет область просмотра в фоновом режиме 
 и некоторый другой элемент для представления каждого «виртуального» холста.
-Мы делаем один <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> и затем одну <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> для каждого виртуального холста. 
+Мы делаем один <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> и затем одну <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> для каждого виртуального холста. 
 Затем мы проверим положение элементов виртуального холста и, если они будут на 
 экране, мы скажем THREE.js нарисовать их сцену в правильном месте.</p>
 <p>С этим решением есть только 1 холст, поэтому мы решаем обе задачи 1 и 2 выше. 
@@ -146,9 +146,9 @@ const sceneInfo2 = setupScene2();
 </pre>
 <p>И тогда мы сделаем функцию для рендеринга каждой сцены, только если элемент 
 находится на экране. Мы можем указать THREE.js визуализировать только часть 
-холста, включив тест <em>scissor</em> через <a href="/docs/#api/en/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a>, затем установим 
+холста, включив тест <em>scissor</em> через <a href="../docs/#api/en/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a>, затем установим 
 плоскость обрезания и область просмотра (Viewport) с помощью 
-<a href="/docs/#api/en/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> и <a href="/docs/#api/en/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>.</p>
+<a href="../docs/#api/en/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> и <a href="../docs/#api/en/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function renderSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 

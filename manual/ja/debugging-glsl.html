@@ -50,7 +50,7 @@
 
 <p>フラグメントシェーダーの全ての値に対して同様の事ができます。
 その範囲を把握し、0.0から1.0にスケーリングし <code class="notranslate" translate="no">gl_FragColor</code> に設定するコードを追加します。</p>
-<p>テクスチャを確認するには <a href="/docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> や <a href="/docs/#api/ja/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> が動作するもので試してみて下さい。</p>
+<p>テクスチャを確認するには <a href="../docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> や <a href="../docs/#api/ja/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> が動作するもので試してみて下さい。</p>
 <p>逆に言えば <code class="notranslate" translate="no">gl_FragColor</code> を赤に設定しても何も表示されない場合、問題は頂点シェーダーに関連したものにあるかもしれません。
 一部の行列が間違っていたり、attributesが間違ったデータを持っていたり、設定が間違っていたりする事があります。</p>
 <p>私ならまず行列を見ます。<code class="notranslate" translate="no">renderer.renderer.render(scene, camera)</code> の呼出直後にブレークポイントを設定し、インスペクタで展開を始めるかもしれません。
@@ -64,7 +64,7 @@
 実際にシェーダーが法線を使っている場合、値が0.0から1.0になるように <code class="notranslate" translate="no">vNormal</code> を値に設定し法線を表示するようにします。
 描画結果を見て予想通りか確認します。</p>
 <p>もう一つの良い点はよりシンプルなシェーダーを使う事です。
-<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> でデータを描画できますか？
+<a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> でデータを描画できますか？
 可能であれば試してみて期待通りに表示される事を確認して下さい。</p>
 <p>期待通りでない場合、ジオメトリをビジュアライズできる最もシンプルな頂点シェーダーは何でしょうか？
 通常は次のようなシンプルなものです。</p>

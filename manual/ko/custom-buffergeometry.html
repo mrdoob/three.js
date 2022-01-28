@@ -20,8 +20,8 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p><a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>는 Three.js 내의 모든 <code class="notranslate" translate="no">geometry</code>를 나타냅니다(r125에서부터 <code class="notranslate" translate="no">Geometry</code>가 제거되었습니다). 좀 더 자세히 말하면 특정 <a href="/docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>라고 부르는 <strong>속성</strong>의 집합이죠.</p>
-<p>각 <a href="/docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>는
+          <p><a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>는 Three.js 내의 모든 <code class="notranslate" translate="no">geometry</code>를 나타냅니다(r125에서부터 <code class="notranslate" translate="no">Geometry</code>가 제거되었습니다). 좀 더 자세히 말하면 특정 <a href="../docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>라고 부르는 <strong>속성</strong>의 집합이죠.</p>
+<p>각 <a href="../docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>는
 위치(positions), 법선(normals), 색(colors), uv 데이터의 배열이고, 이들을 모으면 각 꼭지점에
 대한 <em>평행 배열</em> 형식의 데이터가 됩니다.</p>
 <div class="threejs_center"><img src="../resources/threejs-attributes.svg" style="width: 700px"></div>
@@ -36,10 +36,10 @@ index = 4 위치의 꼭지점 데이터를 보세요. 이 묶음이 하나의 �
 마찬가지로 UV도 달라야 하죠.
 하나의 <em>꼭지점</em>은 위 4개 속성의 묶음이고, 때문에 속성이 달라진다면 그건 다른 꼭지점이
 되는 것이죠.</p>
-<p>이전과 마찬가지로 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>로 정육면체를 만들어보겠습니다. 굳이 정육면체를 쓰는
+<p>이전과 마찬가지로 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>로 정육면체를 만들어보겠습니다. 굳이 정육면체를 쓰는
 이유는 모서리의 꼭지점을 공유하는 듯해도 사실 그렇지 않기 때문이죠. 필요한 꼭지점을
-전부 생성한 후, 꼭지점 데이터를 평행 배열로 변환해 <a href="/docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>를 만들고, 이를
-<a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 추가해야 합니다.</p>
+전부 생성한 후, 꼭지점 데이터를 평행 배열로 변환해 <a href="../docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>를 만들고, 이를
+<a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 추가해야 합니다.</p>
 <p>먼저 정육면체를 만드는 데 필요한 데이터를 정렬합니다.
 아까 말했듯 꼭지점의 속성 중 하나라도 다르다면 별도의 꼭지점으로 분리해야 합니다. 정육면체의
 경우는 총 꼭지점 36개가 필요하죠. 면 6개, 면 하나당 삼각형 2개, 삼각형 하나 당 꼭지점 3개,
@@ -105,8 +105,8 @@ for (const vertex of vertices) {
   uvs.push(...vertex.uv);
 }
 </pre>
-<p>이제 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>를 만듭니다. 그리고 각 배열로 <a href="/docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 인스턴스를 생성한
-뒤 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 추가합니다.</p>
+<p>이제 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>를 만듭니다. 그리고 각 배열로 <a href="../docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> 인스턴스를 생성한
+뒤 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const geometry = new THREE.BufferGeometry();
   const positionNumComponents = 3;
   const normalNumComponents = 3;
@@ -126,7 +126,7 @@ for (const vertex of vertices) {
 지정해야 합니다.</p>
 <p>아까 <code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code>, <code class="notranslate" translate="no">uvs</code>, 3개의 자바스크립트 순수 배열을 생성했습니다.
 그리고 위에서 해당 배열을 <a href="https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">형식화 배열</a>,
-<code class="notranslate" translate="no">Float32Array</code>로 변환했죠. <a href="/docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>는 순수 배열이 아니라 형식화 배열을
+<code class="notranslate" translate="no">Float32Array</code>로 변환했죠. <a href="../docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>는 순수 배열이 아니라 형식화 배열을
 인자로 받습니다. 또한 하나의 꼭지점에 몇 개의 요소를 사용할 지 지정해줘야 하죠.
 위치(position)과 법선(normal)의 경우 x, y, z 총 3개이고, UV는 u, v 총 2개입니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -191,7 +191,7 @@ for (const vertex of vertices) {
   { pos: [-1, -1, -1], norm: [ 0, -1,  0], uv: [1, 1], }, // 23
 ];
 </pre>
-<p>이제 꼭지점 24개만 남았습니다. 중복되는 꼭지점은 없죠. 이제 <a href="/docs/#api/ko/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a>
+<p>이제 꼭지점 24개만 남았습니다. 중복되는 꼭지점은 없죠. 이제 <a href="../docs/#api/ko/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a>
 메서드에 각 꼭지점 데이터의 인덱스값 36개-삼각형이 12개이므로-를 넘겨줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.setAttribute(
     'position',
@@ -218,7 +218,7 @@ geometry.setAttribute(
 </div>
 
 <p></p>
-<p><a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 법선을 지정하지 않았다면 <a href="/docs/#api/ko/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a>
+<p><a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>에 법선을 지정하지 않았다면 <a href="../docs/#api/ko/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a>
 메서드를 호출해 자동으로 법선을 지정할 수 있습니다. 다만 데이터가 조금이라도 다르다면
 꼭지점을 공유할 수 없기에 구체나 원통 같은 물체를 만들려 하는 경우에는 이음새가 보일 수 있어요.</p>
 <div class="spread">
@@ -303,7 +303,7 @@ geometry.setIndex([
 공유할 수 있지만, 사분면은 각각 움직여야 하므로 사분면끼리는 공유하지 않도록
 합니다.</p>
 <p>구체의 정점을 구하기 위해 좀 더 복잡한 방법을 쓸 수도 있지만, 귀찮으니 그냥
-<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 3개를 계층 구조로 배열해 쓰겠습니다. 이 방식에 대해서는 <a href="optimize-lots-of-objects.html">많은 물체를
+<a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 3개를 계층 구조로 배열해 쓰겠습니다. 이 방식에 대해서는 <a href="optimize-lots-of-objects.html">많은 물체를
 최적화하는 방법</a>에서 더 자세히 다루겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeSpherePositions(segmentsAround, segmentsDown) {
   const numVertices = segmentsAround * segmentsDown * 6;
@@ -406,7 +406,7 @@ positionAttribute.needsUpdate = true;
 </div>
 
 <p></p>
-<p>이 글이 <a href="/docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>로 사용자 지정 geometry를 만들고, <a href="/docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>를 다루는
+<p>이 글이 <a href="../docs/#api/ko/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>로 사용자 지정 geometry를 만들고, <a href="../docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>를 다루는
 데 도움이 되었으면 좋겠습니다.</p>
 <p><canvas id="c"></canvas></p>
 <script type="module" src="../resources/threejs-custom-buffergeometry.js"></script>

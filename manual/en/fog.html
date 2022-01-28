@@ -26,13 +26,13 @@ consider starting there. If you haven't read about cameras you might
 want to start with <a href="cameras.html">this article</a>.</p>
 <p>Fog in a 3D engine is generally a way of fading to a specific color
 based on the distance from the camera. In three.js you add fog by
-creating <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> or <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> object and setting it on the scene's
-<a href="/docs/#api/en/scenes/Scene#fog"><code class="notranslate" translate="no">fog</code></a> property.</p>
-<p><a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> lets you choose <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings which are distances
+creating <a href="../docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> or <a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> object and setting it on the scene's
+<a href="../docs/#api/en/scenes/Scene#fog"><code class="notranslate" translate="no">fog</code></a> property.</p>
+<p><a href="../docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> lets you choose <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings which are distances
 from the camera. Anything closer than <code class="notranslate" translate="no">near</code> is unaffected by fog.
 Anything further than <code class="notranslate" translate="no">far</code> is completely the fog color. Parts between
 <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> fade from their material color to the fog color.</p>
-<p>There's also <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> which grows exponentially with distance from the camera.</p>
+<p>There's also <a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> which grows exponentially with distance from the camera.</p>
 <p>To use either type of fog you create one and and assign it to the scene as in</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 {
@@ -42,7 +42,7 @@ Anything further than <code class="notranslate" translate="no">far</code> is com
   scene.fog = new THREE.Fog(color, near, far);
 }
 </pre>
-<p>or for <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> it would be</p>
+<p>or for <a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> it would be</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 {
   const color = 0xFFFFFF;
@@ -50,7 +50,7 @@ Anything further than <code class="notranslate" translate="no">far</code> is com
   scene.fog = new THREE.FogExp2(color, density);
 }
 </pre>
-<p><a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> is closer to reality but <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> is used
+<p><a href="../docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> is closer to reality but <a href="../docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> is used
 more commonly since it lets you choose a place to apply
 the fog so you can decide to show a clear scene
 up to a certain distance and then fade out to some color
@@ -71,8 +71,8 @@ It is part of the calculation of each pixel of the color of the object.
 What that means is if you want your scene to fade to a certain color you
 need to set the fog <strong>and</strong> the background color to the same color.
 The background color is set using the
-<a href="/docs/#api/en/scenes/Scene#background"><code class="notranslate" translate="no">scene.background</code></a>
-property. To pick a background color you attach a <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a> to it. For example</p>
+<a href="../docs/#api/en/scenes/Scene#background"><code class="notranslate" translate="no">scene.background</code></a>
+property. To pick a background color you attach a <a href="../docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a> to it. For example</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">scene.background = new THREE.Color('#F00');  // red
 </pre>
 <div class="spread">
@@ -166,8 +166,8 @@ that will set both colors when lil-gui manipulates it.</p>
 <p>lil-gui can manipulate colors in 4 ways, as a CSS 6 digit hex string (eg: <code class="notranslate" translate="no">#112233</code>). As an hue, saturation, value, object (eg: <code class="notranslate" translate="no">{h: 60, s: 1, v: }</code>).
 As an RGB array (eg: <code class="notranslate" translate="no">[255, 128, 64]</code>). Or, as an RGBA array (eg: <code class="notranslate" translate="no">[127, 200, 75, 0.3]</code>).</p>
 <p>It's easiest for our purpose to use the hex string version since that way
-lil-gui is only manipulating a single value. Fortunately <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>
-as a <a href="/docs/#api/en/math/Color#getHexString"><code class="notranslate" translate="no">getHexString</code></a> method
+lil-gui is only manipulating a single value. Fortunately <a href="../docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>
+as a <a href="../docs/#api/en/math/Color#getHexString"><code class="notranslate" translate="no">getHexString</code></a> method
 we get use to easily get such a string, we just have to prepend a '#' to the front.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// We use this class to pass to lil-gui
 // so when it manipulates near or far
@@ -226,7 +226,7 @@ class FogGUIHelper {
 a very sharp transition between un-fogged and completely fogged.
 where as <code class="notranslate" translate="no">near</code> = 1.1 and <code class="notranslate" translate="no">far</code> = 2.9 should just about be
 the smoothest given our cubes are spinning 2 units away from the camera.</p>
-<p>One last thing, there is a boolean <a href="/docs/#api/en/materials/Material#fog"><code class="notranslate" translate="no">fog</code></a>
+<p>One last thing, there is a boolean <a href="../docs/#api/en/materials/Material#fog"><code class="notranslate" translate="no">fog</code></a>
 property on a material for whether or not objects rendered
 with that material are affected by fog. It defaults to <code class="notranslate" translate="no">true</code>
 for most materials. As an example of why you might want

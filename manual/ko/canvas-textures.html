@@ -21,7 +21,7 @@
       <div class="lesson">
         <div class="lesson-main">
           <p>※ 이 글은 <a href="textures.html">텍스처에 관한 글</a>에서 이어집니다. 이전 글을 읽지 않았다면 먼저 읽고 오기 바랍니다.</p>
-<p><a href="textures.html">이전 글</a>에서 텍스처를 다룰 때는 주로 이미지 파일로 텍스처를 만들었습니다. 하지만 경우에 따라서는 런타임에 텍스처를 만들어야 할 수도 있죠. <a href="/docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>를 사용하면 캔버스를 텍스처로 활용할 수 있습니다.</p>
+<p><a href="textures.html">이전 글</a>에서 텍스처를 다룰 때는 주로 이미지 파일로 텍스처를 만들었습니다. 하지만 경우에 따라서는 런타임에 텍스처를 만들어야 할 수도 있죠. <a href="../docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>를 사용하면 캔버스를 텍스처로 활용할 수 있습니다.</p>
 <p>캔버스 텍스처는 <code class="notranslate" translate="no">&lt;canvas&gt;</code> 요소를 인자로 받습니다. 2D 캔버스 API에 대해 잘 모른다면 <a href="https://developer.mozilla.org/ko/docs/Web/API/Canvas_API/Tutorial">MDN의 튜토리얼</a>을 참고하세요.</p>
 <p>간단한 2D 캔버스 앱을 만들어봅시다. 아래는 크기, 색, 위치 모두 무작위인 점을 반복해서 렌더링하는 예제입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ctx = document.createElement('canvas').getContext('2d');
@@ -62,7 +62,7 @@ requestAnimationFrame(render);
 </div>
 
 <p></p>
-<p>이제 위 캔버스를 텍스처로 만들어봅시다. <a href="textures.html">이전 글</a>에서 정육면체에 텍스처를 입혔던 예제를 가져오겠습니다. 이미지를 불러오는 코드를 제거하고 대신 <a href="/docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>에 방금 만든 캔버스를 넘겨 인스턴스를 생성합니다.</p>
+<p>이제 위 캔버스를 텍스처로 만들어봅시다. <a href="textures.html">이전 글</a>에서 정육면체에 텍스처를 입혔던 예제를 가져오겠습니다. 이미지를 불러오는 코드를 제거하고 대신 <a href="../docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>에 방금 만든 캔버스를 넘겨 인스턴스를 생성합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [];  // 정육면체를 회전시키기 위한 배열입니다.
 -const loader = new THREE.TextureLoader();
 -
@@ -106,7 +106,7 @@ cubes.push(cube);  // 정육면체 배열에 추가해 애니메이션이 적용
   requestAnimationFrame(render);
 }
 </pre>
-<p>추가로 <a href="/docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>가 변경되었을 때 Three.js가 텍스처를 업데이트하도록 <code class="notranslate" translate="no">needsUpdate</code> 속성을 <code class="notranslate" translate="no">true</code>로 설정합니다.</p>
+<p>추가로 <a href="../docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>가 변경되었을 때 Three.js가 텍스처를 업데이트하도록 <code class="notranslate" translate="no">needsUpdate</code> 속성을 <code class="notranslate" translate="no">true</code>로 설정합니다.</p>
 <p>이제 정육면체에 캔버스 텍스처가 적용되었을 겁니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../canvas-textured-cube.html"></iframe></div>
@@ -219,13 +219,13 @@ cubes.push(cube);  // 정육면체 배열에 추가해 애니메이션이 적용
 +  return root;
 +}
 </pre>
-<p>위 코드에서는 몸, 머리, 명찰을 하나의 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>에 넣고 위치를 조정했습니다. 이러면 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>만 움직여 해당 사람을 움직일 수 있겠죠. 몸은 2칸으로, 캔버스 사이즈가 픽셀 단위이고 거의 수십 픽셀이기에 여기에 0.01을 곱해 사이즈를 적당한 크기로 조정했습니다.</p>
+<p>위 코드에서는 몸, 머리, 명찰을 하나의 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>에 넣고 위치를 조정했습니다. 이러면 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>만 움직여 해당 사람을 움직일 수 있겠죠. 몸은 2칸으로, 캔버스 사이즈가 픽셀 단위이고 거의 수십 픽셀이기에 여기에 0.01을 곱해 사이즈를 적당한 크기로 조정했습니다.</p>
 <p>이제 사람과 명찰을 만듭니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+makePerson(-3, 32, 'Purple People Eater', 'purple');
 +makePerson(-0, 32, 'Green Machine', 'green');
 +makePerson(+3, 32, 'Red Menace', 'red');
 </pre>
-<p>마지막으로 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 넣어 카메라를 움직일 수 있도록 합니다.</p>
+<p>마지막으로 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 넣어 카메라를 움직일 수 있도록 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
 </pre>

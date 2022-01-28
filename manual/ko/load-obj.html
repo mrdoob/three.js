@@ -47,13 +47,13 @@
 
 <p>자 이제 한 번 화면에 띄워보죠!</p>
 <p><a href="lights.html">조명에 관한 글</a>에서 썼던 예제를 가져와 이 예제를
-반구광(hemisphere light) 예제와 합칩니다. 그러면 장면에는 <a href="/docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>
-하나, <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> 하나가 있는 셈입니다. 또 GUI 관련 코드와 정육면체,
+반구광(hemisphere light) 예제와 합칩니다. 그러면 장면에는 <a href="../docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>
+하나, <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> 하나가 있는 셈입니다. 또 GUI 관련 코드와 정육면체,
 구체 관련 코드도 지웁니다.</p>
-<p>다음으로 먼저 <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> 모듈을 스크립트에 로드합니다.</p>
+<p>다음으로 먼저 <a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> 모듈을 스크립트에 로드합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { OBJLoader } from '/examples/jsm/loaders/OBJLoader.js';
 </pre>
-<p><a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>의 인스턴스를 생성한 뒤 .OBJ 파일의 경로와 콜백 함수를 넘겨
+<p><a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>의 인스턴스를 생성한 뒤 .OBJ 파일의 경로와 콜백 함수를 넘겨
 <code class="notranslate" translate="no">load</code> 메서드를 실행합니다. 그리고 콜백 함수에서 불러온 모델을 장면에
 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
@@ -127,14 +127,14 @@ map_Ns windmill_001_base_SPEC.jpg
 <div class="threejs_center"><img style="width: 757px;" src="../resources/images/windmill-exported-files-with-textures.png"></div>
 
 <p>이제 .MTL 파일에서 사용할 텍스처를 생성했으니 .MTL 파일을 불러오도록 합시다.</p>
-<p><a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a> 모듈을 불러옵니다.</p>
+<p><a href="../docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a> 모듈을 불러옵니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from '/examples/jsm/loaders/OBJLoader.js';
 +import { MTLLoader } from '/examples/jsm/loaders/MTLLoader.js';
 </pre>
 <p></p>
-<p>우선 .MTL 파일을 불러와 <code class="notranslate" translate="no">MtlObjBridge</code>로 재질을 만듭니다. 그리고 <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>
+<p>우선 .MTL 파일을 불러와 <code class="notranslate" translate="no">MtlObjBridge</code>로 재질을 만듭니다. 그리고 <a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>
 인스턴스에 방금 만든 재질을 추가한 뒤 .OBJ 파일을 불러옵니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
 +  const mtlLoader = new MTLLoader();
@@ -366,7 +366,7 @@ Cos = Adjacent(밑변) 나누기 Hypotenuse, Tan = Oppsite 나누기 Adjacent와
 }
 </pre>
 <p>위 예제에서는 <code class="notranslate" translate="no">boxSize * 1.2</code> 값을 넘겨주어 20% 정도 빈 공간을 더 만들었습니다.
-또 카메라가 장면의 중심을 기준으로 회전하도록 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>도 업데이트했죠.</p>
+또 카메라가 장면의 중심을 기준으로 회전하도록 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>도 업데이트했죠.</p>
 <p>이제 코드를 실행하면...</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../load-obj-auto-camera.html"></iframe></div>
@@ -477,7 +477,7 @@ illum 2
 +bump windmill_normal.jpg
 </pre>
 <p>텍스처의 용량을 최적화했으니 이제 불러올 일만 남았습니다. 먼저 아까 했던 것처럼
-재질을 불러와 <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>에 지정합니다.</p>
+재질을 불러와 <a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>에 지정합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
 +  const mtlLoader = new MTLLoader();
 +  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtl) =&gt; {
@@ -506,7 +506,7 @@ illum 2
 </pre>
 <p>결과를 확인했는데 문제가 발생했습니다. 여러분에게 직접 보여주기보다 하나하나
 짚어보도록 하죠.</p>
-<p>문제 #1: 3개의 <a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>가 각각 디퓨즈(diffuse) 색과 디퓨즈 텍스처 맵으로
+<p>문제 #1: 3개의 <a href="../docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>가 각각 디퓨즈(diffuse) 색과 디퓨즈 텍스처 맵으로
 혼합하는 재질을 만듬.</p>
 <p>이는 유용한 기능이지만, .MTL 파일의 디퓨즈 색상은 0입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">Kd 0.00 0.00 0.00

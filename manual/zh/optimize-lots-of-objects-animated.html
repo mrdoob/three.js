@@ -178,7 +178,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>咋回事, 怎么还有一些点非常突出??!! 而且切换得很生硬也没有动画啊</p>
 <p>有这么一些想法</p>
 <ul>
-<li><p>通过使用<a href="/docs/#api/zh/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a>做消失过渡</p>
+<li><p>通过使用<a href="../docs/#api/zh/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a>做消失过渡</p>
 <p>这个解决方案的问题是立方体完全重叠了, 意思是在Z轴方向冲突. 我们可以通过改变depth函数和使用blending来修复. 我们应该试一试</p>
 </li>
 <li><p>放大我们想看到的集合，缩小其他集合</p>
@@ -410,13 +410,13 @@ const material = new THREE.MeshBasicMaterial({
 });
 </pre>
 <p>We then need to modify the three.js shader. Three.js materials have an
-<a href="/docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> property we can assign a function. It gives us a
+<a href="../docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> property we can assign a function. It gives us a
 chance to modify the material's shader before it is passed to WebGL. In fact the
 shader that is provided is actually a special three.js only syntax of shader
 that lists a bunch of shader <em>chunks</em> that three.js will substitute with the
 actual GLSL code for each chunk. Here is what the unmodified vertex shader code
 looks like as passed to <code class="notranslate" translate="no">onBeforeCompile</code>.</p>
-<p>我们需要改动three.js的着色器. Three.js的材质有一个<a href="/docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>属性, 我们可以为其赋一个函数. 这给了我们一个在传递给WebGL之前修改材质着色器的机会. 实际上, 提供的着色器就是一个特殊语法的three.js, 然后将会被GLSL替换. 以下是未修改的顶点着色器代码, 看起来将要传给<code class="notranslate" translate="no">onBeforeCompile</code>. (In fact the shader that is provided is actually a special three.js only syntax of shader that lists a bunch of shader <em>chunks</em> that three.js will substitute with the actual GLSL code for each chunk. Here is what the unmodified vertex shader code looks like as passed to <code class="notranslate" translate="no">onBeforeCompile</code>.)</p>
+<p>我们需要改动three.js的着色器. Three.js的材质有一个<a href="../docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>属性, 我们可以为其赋一个函数. 这给了我们一个在传递给WebGL之前修改材质着色器的机会. 实际上, 提供的着色器就是一个特殊语法的three.js, 然后将会被GLSL替换. 以下是未修改的顶点着色器代码, 看起来将要传给<code class="notranslate" translate="no">onBeforeCompile</code>. (In fact the shader that is provided is actually a special three.js only syntax of shader that lists a bunch of shader <em>chunks</em> that three.js will substitute with the actual GLSL code for each chunk. Here is what the unmodified vertex shader code looks like as passed to <code class="notranslate" translate="no">onBeforeCompile</code>.)</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
 #include &lt;uv_pars_vertex&gt;
 #include &lt;uv2_pars_vertex&gt;
@@ -450,7 +450,7 @@ void main() {
 }
 </pre>
 <p>我们需要替换一下的部分 <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_pars_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl.js"><code class="notranslate" translate="no">morphnormal_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl.js"><code class="notranslate" translate="no">color_pars_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js"><code class="notranslate" translate="no">color_vertex</code> chunk</a></p>
-<p>我们需要把待替换写成一个简单的数组, 在<a href="/docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>中应用它们.</p>
+<p>我们需要把待替换写成一个简单的数组, 在<a href="../docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>中应用它们.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({
   vertexColors: true,
 });
@@ -573,9 +573,9 @@ difference but based on how we are displaying the info, cubes that grow from the
 surface of the earth, we'd prefer most cubes to be low. If we used one of these
 other comparisons most cubes would be about 1/2 their maximum height which would
 not make a good visualization. Feel free to change the <code class="notranslate" translate="no">amountGreaterThan</code> from
-<a href="/docs/#api/zh/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> to something like <code class="notranslate" translate="no">(a - b)</code> "raw difference" or <code class="notranslate" translate="no">a / (a +
+<a href="../docs/#api/zh/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> to something like <code class="notranslate" translate="no">(a - b)</code> "raw difference" or <code class="notranslate" translate="no">a / (a +
 b)</code> "percent" and you'll see what I mean.</p>
-<p>注: 我们可以试着用图表表示男性的百分比或女性的百分比或原始差异. 但根据我们显示信息的方式, 也就是从地球表面生长出来的立方体的显示方式, 我们希望大多数立方体都是矮的. 如果我们使用其中一个做基准, 大多数立方体的高度大约是它们最大高度的1/2. 效果会很差. 自己动手改一下<code class="notranslate" translate="no">amountGreaterThan</code>中的<a href="/docs/#api/zh/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> 到<code class="notranslate" translate="no">(a - b)</code> "原始差异"或者 <code class="notranslate" translate="no">a / (a + b)</code>"百分比", 你就会明白我什么意思了. </p>
+<p>注: 我们可以试着用图表表示男性的百分比或女性的百分比或原始差异. 但根据我们显示信息的方式, 也就是从地球表面生长出来的立方体的显示方式, 我们希望大多数立方体都是矮的. 如果我们使用其中一个做基准, 大多数立方体的高度大约是它们最大高度的1/2. 效果会很差. 自己动手改一下<code class="notranslate" translate="no">amountGreaterThan</code>中的<a href="../docs/#api/zh/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> 到<code class="notranslate" translate="no">(a - b)</code> "原始差异"或者 <code class="notranslate" translate="no">a / (a + b)</code>"百分比", 你就会明白我什么意思了. </p>
 
         </div>
       </div>

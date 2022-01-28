@@ -90,7 +90,7 @@ import {BloomPass} from '/examples/jsm/postprocessing/BloomPass.js';
 import {FilmPass} from '/examples/jsm/postprocessing/FilmPass.js';
 </pre>
 <p>ほとんどのポストプロセスには <code class="notranslate" translate="no">EffectComposer.js</code> と <code class="notranslate" translate="no">RenderPass.js</code> が必須です。</p>
-<p>最後に <a href="/docs/#api/ja/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> の代わりに <code class="notranslate" translate="no">EffectComposer.render</code> を使用し、<code class="notranslate" translate="no">EffectComposer</code> にキャンバスのサイズを合わせます。</p>
+<p>最後に <a href="../docs/#api/ja/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> の代わりに <code class="notranslate" translate="no">EffectComposer.render</code> を使用し、<code class="notranslate" translate="no">EffectComposer</code> にキャンバスのサイズを合わせます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(now) {
 -  time *= 0.001;
 +let then = 0;
@@ -208,7 +208,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 };
 </pre>
 <p>上記の <code class="notranslate" translate="no">tDiffuse</code> は <code class="notranslate" translate="no">ShaderPass</code> が前のPassの結果テクスチャを渡す名前です。
-<code class="notranslate" translate="no">color</code> を Three.jsの <a href="/docs/#api/ja/math/Color"><code class="notranslate" translate="no">Color</code></a> として宣言します。</p>
+<code class="notranslate" translate="no">color</code> を Three.jsの <a href="../docs/#api/ja/math/Color"><code class="notranslate" translate="no">Color</code></a> として宣言します。</p>
 <p>次に頂点シェーダーが必要です。
 ポストプロセスでは上記コードの頂点シェーダーは標準的なものであり、ほとんど変更する必要はありません。
 あまり詳しく説明しませんが（上記のリンク先の記事を参照してください）、

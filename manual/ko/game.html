@@ -35,7 +35,7 @@
 
 <p>이 모델들로 꽤 괜찮은 게임을 만들 수 있을 것 같습니다. 모델들을 불러와보죠.</p>
 <p><a href="load-gltf.html">glTF 파일 불러오기</a>에 대해서는 이전에 다뤘었습니다. 동일한 방법을 사용하지만 이번에는 모델이 여러 개이기도 하고, 모델을 전부 불러오기 전에 게임을 시작해선 안 됩니다.</p>
-<p>이런 경우를 대비해 Three.js는 <a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>를 제공합니다. <a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 인스턴스를 생성해 다른 로더(loader)에 넘겨주기면 되죠. <a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 <a href="/docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>와 <a href="/docs/#api/ko/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> 속성에 콜백 함수를 지정하면 되는데, <a href="/docs/#api/ko/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>는 모든 파일을 불러온 뒤 호출하고, <a href="/docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>는 각 파일을 불러왔을 때 호출합니다. <a href="/docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>를 이용하면 프로그래스 바를 보여줄 수 있죠.</p>
+<p>이런 경우를 대비해 Three.js는 <a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>를 제공합니다. <a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 인스턴스를 생성해 다른 로더(loader)에 넘겨주기면 되죠. <a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>의 <a href="../docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>와 <a href="../docs/#api/ko/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> 속성에 콜백 함수를 지정하면 되는데, <a href="../docs/#api/ko/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>는 모든 파일을 불러온 뒤 호출하고, <a href="../docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>는 각 파일을 불러왔을 때 호출합니다. <a href="../docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>를 이용하면 프로그래스 바를 보여줄 수 있죠.</p>
 <p><a href="load-gltf.html">glTF 파일 불러오기</a> 예제를 가져와 카메라 절두체(frustum)를 조정하는 코드를 지우고 아래 코드를 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
 manager.onLoad = init;
@@ -62,9 +62,9 @@ function init() {
   // 나중에 작성할 예정
 }
 </pre>
-<p>위 코드는 <code class="notranslate" translate="no">models</code> 객체에 있는 파일을 불러오고, <a href="/docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>가 파일을 전부 불러왔을 때 <code class="notranslate" translate="no">init</code> 함수를 호출합니다. <code class="notranslate" translate="no">models</code> 객체를 전역으로 선언한 건 나중에 <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a>의 콜백을 이용해 각 모델의 정보를 사용할 때 불러온 각 모델에 접근할 수 있도록 하기 위함입니다.</p>
+<p>위 코드는 <code class="notranslate" translate="no">models</code> 객체에 있는 파일을 불러오고, <a href="../docs/#api/ko/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>가 파일을 전부 불러왔을 때 <code class="notranslate" translate="no">init</code> 함수를 호출합니다. <code class="notranslate" translate="no">models</code> 객체를 전역으로 선언한 건 나중에 <a href="../docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a>의 콜백을 이용해 각 모델의 정보를 사용할 때 불러온 각 모델에 접근할 수 있도록 하기 위함입니다.</p>
 <p>모든 모델과 모델의 애니메이션 데이터는 현재 약 6.6MB입니다. 꽤 용량이 크네요. 여러분의 서버가 압축을 지원(이 사이트의 웹 서버가 이 기능을 지원합니다)한다면 용량은 약 1.4MB까지 줄어들 겁니다. 6.6MB와 비교하면 확실히 적은 데이터지만 절대 작은 데이터는 아닙니다. 프로그래스 바를 만들어 사용자에게 얼마나 기다려야 하는지를 표시해준다면 좋겠네요.</p>
-<p><a href="/docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>에 콜백 함수를 지정해줍시다. 이 콜백 함수는 호출할 때 3개의 매개변수를 받습니다. 각각 마지막에 불러온 파일의 <code class="notranslate" translate="no">url</code>, 그리고 불러온 파일의 개수, 전체 파일의 개수입니다.</p>
+<p><a href="../docs/#api/ko/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a>에 콜백 함수를 지정해줍시다. 이 콜백 함수는 호출할 때 3개의 매개변수를 받습니다. 각각 마지막에 불러온 파일의 <code class="notranslate" translate="no">url</code>, 그리고 불러온 파일의 개수, 전체 파일의 개수입니다.</p>
 <p>프로그래스 바는 HTML로 간단히 구현하도록 하죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
@@ -184,8 +184,8 @@ import { GLTFLoader } from '/examples/jsm/loaders/GLTFLoader.js';
 +  });
 }
 </pre>
-<p>위 코드에서는 불러온 각 모델의 <code class="notranslate" translate="no">gltf.scene</code>을 복사해 새로운 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로 추가했습니다. 부모를 따로 만든 건 모델의 애니메이션이 모델의 각 요소의 위치값에 영향을 미치기에 코드로 직접 위치값을 수정하기도 어렵고, 제대로 반영도 안 될 것이기 때문입니다.</p>
-<p>각 모델의 애니메이션을 재생하려면 <a href="/docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>를 써야 합니다. <a href="/docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>는 하나 이상의 <a href="/docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>으로 이루어지고, 각 <a href="/docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>에는 하나의 <a href="/docs/#api/ko/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>이 있습니다. <a href="/docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>에는 여러 액션(action)을 이어서 재생하거나, 다른 애니메이션으로 부드럽게 전환하기 등 다양한 설정이 있죠. 당장은 첫 번째 <a href="/docs/#api/ko/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>으로 액션을 만들어봅시다. 설정을 바꾸지 않는다면 해당 애니메이션 클립(clip)을 반복해 재생할 겁니다.</p>
+<p>위 코드에서는 불러온 각 모델의 <code class="notranslate" translate="no">gltf.scene</code>을 복사해 새로운 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로 추가했습니다. 부모를 따로 만든 건 모델의 애니메이션이 모델의 각 요소의 위치값에 영향을 미치기에 코드로 직접 위치값을 수정하기도 어렵고, 제대로 반영도 안 될 것이기 때문입니다.</p>
+<p>각 모델의 애니메이션을 재생하려면 <a href="../docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>를 써야 합니다. <a href="../docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>는 하나 이상의 <a href="../docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>으로 이루어지고, 각 <a href="../docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>에는 하나의 <a href="../docs/#api/ko/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>이 있습니다. <a href="../docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>에는 여러 액션(action)을 이어서 재생하거나, 다른 애니메이션으로 부드럽게 전환하기 등 다양한 설정이 있죠. 당장은 첫 번째 <a href="../docs/#api/ko/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>으로 액션을 만들어봅시다. 설정을 바꾸지 않는다면 해당 애니메이션 클립(clip)을 반복해 재생할 겁니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const mixers = [];
 
 function init() {
@@ -210,7 +210,7 @@ function init() {
   });
 }
 </pre>
-<p>애니메이션을 시작하기 위해 <a href="/docs/#api/ko/animation/AnimationAction#play"><code class="notranslate" translate="no">play</code></a> 메서드를 호출했습니다. 그리고 생성한 <a href="/docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>들을 전부 <code class="notranslate" translate="no">mixers</code> 배열에 넣었죠. 마지막으로 렌더링 루프에서 각 <a href="/docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>의 <a href="/docs/#api/ko/animation/AnimationMixer.update"><code class="notranslate" translate="no">AnimationMixer.update</code></a> 메서드에 바로 직전 프레임과 현재 프레임의 시간값을 넘겨주어야 합니다.</p>
+<p>애니메이션을 시작하기 위해 <a href="../docs/#api/ko/animation/AnimationAction#play"><code class="notranslate" translate="no">play</code></a> 메서드를 호출했습니다. 그리고 생성한 <a href="../docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>들을 전부 <code class="notranslate" translate="no">mixers</code> 배열에 넣었죠. 마지막으로 렌더링 루프에서 각 <a href="../docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>의 <a href="../docs/#api/ko/animation/AnimationMixer.update"><code class="notranslate" translate="no">AnimationMixer.update</code></a> 메서드에 바로 직전 프레임과 현재 프레임의 시간값을 넘겨주어야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let then = 0;
 function render(now) {
 +  now *= 0.001;  // 초 단위로 변환
@@ -288,7 +288,7 @@ function init() {
 +  });
 +}
 </pre>
-<p>위 코드에서는 각 모델마다 액션 배열과 <a href="/docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>를 객체로 만들어 저장했습니다. 액션 배열은 모델의 각 <a href="/docs/#api/ko/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>마다 <a href="/docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>을 하나씩 생성해 배열로 만든 것이죠. 그리고 하나의 액션을 제외한 나머지 액션의 <code class="notranslate" translate="no">enabled</code> 속성을 끄는 <code class="notranslate" translate="no">playNextAction</code>을 호출했습니다.</p>
+<p>위 코드에서는 각 모델마다 액션 배열과 <a href="../docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>를 객체로 만들어 저장했습니다. 액션 배열은 모델의 각 <a href="../docs/#api/ko/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>마다 <a href="../docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>을 하나씩 생성해 배열로 만든 것이죠. 그리고 하나의 액션을 제외한 나머지 액션의 <code class="notranslate" translate="no">enabled</code> 속성을 끄는 <code class="notranslate" translate="no">playNextAction</code>을 호출했습니다.</p>
 <p>데이터 형식이 바뀌었으니 렌더링 루프의 업데이트 쪽 코드도 수정해야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-for (const mixer of mixers) {
 +for (const { mixer } of mixerInfos) {
@@ -311,10 +311,10 @@ function init() {
 </div>
 
 <p></p>
-<p>Three.js 관련 내용은 여기까지입니다. 여태까지 다수의 파일을 불러오는 법, 텍스처가 씌워진 모델을 복사하는 법, 해당 모델의 애니메이션을 재생하는 법을 알아봤죠. 실제 게임에서는 <a href="/docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> 객체로 다양한 동작을 직접 처리해줘야 합니다.</p>
+<p>Three.js 관련 내용은 여기까지입니다. 여태까지 다수의 파일을 불러오는 법, 텍스처가 씌워진 모델을 복사하는 법, 해당 모델의 애니메이션을 재생하는 법을 알아봤죠. 실제 게임에서는 <a href="../docs/#api/ko/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> 객체로 다양한 동작을 직접 처리해줘야 합니다.</p>
 <p>자, 이제 게임의 기본 틀을 만들어봅시다.</p>
 <p>최신 게임을 만들 때는 보통 <a href="https://www.google.com/search?q=entity+component+system">Entity Component System(ECS)</a>을 많이 사용합니다. Entity Component System에서는 게임의 요소를 여러 개의 <em>컴포넌트(component)</em>로 이루어진 <em>엔티티(entity)</em>라 부르죠. 새로운 엔티티를 생성할 때는 모든 코드를 새로 쓰는 것이 아닌, 미리 만들어 놓은 컴포넌트들을 엮어 생성합니다.</p>
-<p>예제에서는 엔티티를 <code class="notranslate" translate="no">GameObject</code>라 부르겠습니다. 이는 단순히 컴포넌트 배열과 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>를 합친 것입니다.</p>
+<p>예제에서는 엔티티를 <code class="notranslate" translate="no">GameObject</code>라 부르겠습니다. 이는 단순히 컴포넌트 배열과 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>를 합친 것입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function removeArrayElement(array, element) {
   const ndx = array.indexOf(element);
   if (ndx &gt;= 0) {
@@ -467,7 +467,7 @@ class Component {
   }
 }
 </pre>
-<p>이 클래스는 아까 했던 것처럼 불러온 씬 그래프를 복사하고, <a href="/docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>를 만듭니다. 클래스의 <code class="notranslate" translate="no">setAnimation</code> 메서드는 해당 클립에 대한 액션이 존재하지 않는다면 새로 생성하고, 다른 액션을 전부 끄는 역할을 합니다.</p>
+<p>이 클래스는 아까 했던 것처럼 불러온 씬 그래프를 복사하고, <a href="../docs/#api/ko/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>를 만듭니다. 클래스의 <code class="notranslate" translate="no">setAnimation</code> 메서드는 해당 클립에 대한 액션이 존재하지 않는다면 새로 생성하고, 다른 액션을 전부 끄는 역할을 합니다.</p>
 <p>이 코드는 <code class="notranslate" translate="no">globals.deltaTime</code>을 사용합니다. 이 전역 객체도 만들어야겠죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
   time: 0,
@@ -724,9 +724,9 @@ class Player extends Component {
 +  }
 }
 </pre>
-<p>위 코드에서는 플레이어를 앞으로 움직이기 위해 <a href="/docs/#api/ko/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a>를 사용했습니다. <a href="/docs/#api/ko/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a>는 지역 공간을 기준으로 하기에 해당 객체가 장면의 루트(root) 요소에 속할 때만 정상적으로 작동합니다. <a class="footnote" href="#parented" id="parented-backref">1</a></p>
+<p>위 코드에서는 플레이어를 앞으로 움직이기 위해 <a href="../docs/#api/ko/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a>를 사용했습니다. <a href="../docs/#api/ko/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a>는 지역 공간을 기준으로 하기에 해당 객체가 장면의 루트(root) 요소에 속할 때만 정상적으로 작동합니다. <a class="footnote" href="#parented" id="parented-backref">1</a></p>
 <p>또한 전역 객체에 <code class="notranslate" translate="no">moveSpeed</code>를 추가했고 이를 <code class="notranslate" translate="no">turnSpeed</code>의 기준으로 삼았습니다. 이는 캐릭터가 목표를 향해 상대적으로 빠르게 돌도록 만든 것으로, 이 <code class="notranslate" translate="no">turnSpeed</code>의 값이 너무 작다면 캐릭터는 목표 주위를 빙빙 돌기만 하고 절대 목표에 닿지는 못할 겁니다. 물론 위 값은 어떤 수학적 공식을 사용한 것이 아닙니다. 그냥 대충 때려 넣은 것이죠.</p>
-<p>이대로도 예제는 잘 작동할 테지만 플레이어가 화면을 벗어나면 캐릭터가 어디 있는지 찾기가 어려울 겁니다. 일단 화면에서 벗어난 뒤 일정 시간이 지나면 플레이어를 다시 중점으로 순간이동시키기로 합시다. Three.js의 <a href="/docs/#api/ko/math/Frustum"><code class="notranslate" translate="no">Frustum</code></a> 클래스를 이용하면 특정 점이 카메라의 절두체(frustum) 안에 있는지 알 수 있습니다.</p>
+<p>이대로도 예제는 잘 작동할 테지만 플레이어가 화면을 벗어나면 캐릭터가 어디 있는지 찾기가 어려울 겁니다. 일단 화면에서 벗어난 뒤 일정 시간이 지나면 플레이어를 다시 중점으로 순간이동시키기로 합시다. Three.js의 <a href="../docs/#api/ko/math/Frustum"><code class="notranslate" translate="no">Frustum</code></a> 클래스를 이용하면 특정 점이 카메라의 절두체(frustum) 안에 있는지 알 수 있습니다.</p>
 <p>먼저 카메라로 절두체를 만들어야 합니다. 플레이어 컴포넌트에서 이걸 처리할 수도 있지만, 다른 요소도 이 방법을 써야 할 수 있으니 카메라의 절두체를 관리하는 새로운 컴포넌트를 만들겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class CameraInfo extends Component {
   constructor(gameObject) {
@@ -956,7 +956,7 @@ class Player extends Component {
   }
 }
 </pre>
-<p>위 코드에서는 <a href="/docs/#api/ko/animation/AnimationMixer.timeScale"><code class="notranslate" translate="no">AnimationMixer.timeScale</code></a>을 설정해 애니메이션 속도가 이동 속도에 비례하도록 만들었습니다. 이러면 이동 속도와 같이 애니메이션 속도가 빨라지고 느려지겠죠.</p>
+<p>위 코드에서는 <a href="../docs/#api/ko/animation/AnimationMixer.timeScale"><code class="notranslate" translate="no">AnimationMixer.timeScale</code></a>을 설정해 애니메이션 속도가 이동 속도에 비례하도록 만들었습니다. 이러면 이동 속도와 같이 애니메이션 속도가 빨라지고 느려지겠죠.</p>
 <p>다음으로 <code class="notranslate" translate="no">init</code> 함수에서 각 동물을 배치합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
   // 프로그래스 바를 숨깁니다.
@@ -1200,7 +1200,7 @@ class Animal extends Component {
 </pre>
 <p>이제 와 생각해보니 플레이어가 아니라 기차의 머리를 바라보게 하는 편이 더 나았겠네요. 이건 나중에 돌아와 고치도록 하겠습니다.</p>
 <p>예제를 처음 만들었을 때는 동물들이 모두 같은 크기의 경계 원(radius)을 썼지만, 이렇게 하고 보니 말과 퍼그(강아지)의 크기가 같은 게 말이 안 된다는 생각이 들었습니다. 그래서 각 모델의 크기에 따라 경계 원을 따로 지정했죠. 그리고 상태를 보여주면 좋겠다는 생각이 들어 상태를 보여 줄 <code class="notranslate" translate="no">StatusDisplayHelper</code> 컴포넌트를 추가했습니다.</p>
-<p>또한 <a href="/docs/#api/ko/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a>를 써 각 캐릭터의 경계 원이 보이도록 했고, <a href="align-html-elements-to-3d.html">HTML 요소를 3D로 정렬하기</a>에서 썼던 방법으로 각 캐릭터의 상태를 HTML로 보여주도록 했습니다.</p>
+<p>또한 <a href="../docs/#api/ko/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a>를 써 각 캐릭터의 경계 원이 보이도록 했고, <a href="align-html-elements-to-3d.html">HTML 요소를 3D로 정렬하기</a>에서 썼던 방법으로 각 캐릭터의 상태를 HTML로 보여주도록 했습니다.</p>
 <p>먼저 각 요소를 담을 HTML을 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
@@ -1505,7 +1505,7 @@ function rand(min, max) {
 const noteTexture = makeTextTexture('♪');
 </pre>
 <p>위에서 만든 텍스처는 하얀색으로, 나중에 텍스처를 사용할 때 색을 따로 지정해 원하는 색의 음표를 그릴 수 있습니다.</p>
-<p>이제 음표 텍스처를 만들었으니 <code class="notranslate" translate="no">Note</code> 컴포넌트를 만들 차례입니다. 음표 컴포넌트는 <a href="billboards.html">빌보드에 관한 글</a>에서 다뤘던 <a href="/docs/#api/ko/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a>과 <a href="/docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>를 사용합니다.</p>
+<p>이제 음표 텍스처를 만들었으니 <code class="notranslate" translate="no">Note</code> 컴포넌트를 만들 차례입니다. 음표 컴포넌트는 <a href="billboards.html">빌보드에 관한 글</a>에서 다뤘던 <a href="../docs/#api/ko/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a>과 <a href="../docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>를 사용합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Note extends Component {
   constructor(gameObject) {
     super(gameObject);
@@ -1539,7 +1539,7 @@ const noteTexture = makeTextTexture('♪');
   }
 }
 </pre>
-<p>이 컴포넌트는 <a href="/docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>를 만들고 무작위로 속도를 정해 60프레임 동안 그 속도로 이동하게 합니다. 동시에 재질의 <a href="/docs/#api/ko/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> 속성을 바꿔 페이드-아웃 효과도 주죠. 반복문이 끝나면 이 컴포넌트는 위치값과 음표를 해당 GameObject에서 제거합니다.</p>
+<p>이 컴포넌트는 <a href="../docs/#api/ko/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>를 만들고 무작위로 속도를 정해 60프레임 동안 그 속도로 이동하게 합니다. 동시에 재질의 <a href="../docs/#api/ko/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> 속성을 바꿔 페이드-아웃 효과도 주죠. 반복문이 끝나면 이 컴포넌트는 위치값과 음표를 해당 GameObject에서 제거합니다.</p>
 <p>정말 마지막으로, 동물의 수를 좀 늘려보겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
 

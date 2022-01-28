@@ -526,9 +526,9 @@ window.addEventListener('touchend', clearPickPosition);
 </div>
 
 <p></p>
-<p>Сделаем еще один шаг и добавим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. Это будет немного больше.
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> довольно широко используют DOM для проверки мыши, событий касания и клавиатуры.</p>
-<p>В отличие от нашего кода, мы не можем использовать объект глобального <code class="notranslate" translate="no">state</code>, не переписав весь код <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> для работы с ним. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> принимают элемент, к которому они присоединяют большинство используемых ими событий DOM. Возможно, мы могли бы передать наш собственный объект, имеющий ту же поверхность API, что и элемент DOM. Нам нужно только поддерживать функции, которые необходимы <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.</p>
+<p>Сделаем еще один шаг и добавим <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. Это будет немного больше.
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> довольно широко используют DOM для проверки мыши, событий касания и клавиатуры.</p>
+<p>В отличие от нашего кода, мы не можем использовать объект глобального <code class="notranslate" translate="no">state</code>, не переписав весь код <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> для работы с ним. <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> принимают элемент, к которому они присоединяют большинство используемых ими событий DOM. Возможно, мы могли бы передать наш собственный объект, имеющий ту же поверхность API, что и элемент DOM. Нам нужно только поддерживать функции, которые необходимы <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.</p>
 <p>Копаясь в  <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">исходном коде OrbitControls</a>
 похоже, что нам нужно обработать следующие события.</p>
 <ul>
@@ -548,7 +548,7 @@ window.addEventListener('touchend', clearPickPosition);
 и <code class="notranslate" translate="no">keyCode</code>.</p>
 <p>Для события wheel нам нужно только свойство <code class="notranslate" translate="no">deltaY</code></p>
 <p>А для событий касания нам понадобятся только <code class="notranslate" translate="no">pageX</code> и <code class="notranslate" translate="no">pageY</code> из свойства <code class="notranslate" translate="no">touches</code>.</p>
-<p>Итак, создадим пару прокси-объектов. Одна часть будет работать на главной странице, получать все эти события и передавать соответствующие значения свойств воркеру. Другая часть будет запускаться в воркере, получать эти события и передавать их, используя события, которые имеют ту же структуру, что и исходные события DOM, поэтому <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> не сможет определить разницу.</p>
+<p>Итак, создадим пару прокси-объектов. Одна часть будет работать на главной странице, получать все эти события и передавать соответствующие значения свойств воркеру. Другая часть будет запускаться в воркере, получать эти события и передавать их, используя события, которые имеют ту же структуру, что и исходные события DOM, поэтому <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> не сможет определить разницу.</p>
 <p>Вот код рабочей части.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EventDispatcher} from '../../build/three.module.js';
 
@@ -561,7 +561,7 @@ class ElementProxyReceiver extends EventDispatcher {
   }
 }
 </pre>
-<p>Все, что он делает, - это если он получает сообщение, то отправляет его. Он наследуется от <a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a>, который предоставляет такие методы, как <code class="notranslate" translate="no">addEventListener</code> и <code class="notranslate" translate="no">removeEventListener</code>, точно так же, как элемент DOM, поэтому, если мы передадим его в <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, он должен работать.</p>
+<p>Все, что он делает, - это если он получает сообщение, то отправляет его. Он наследуется от <a href="../docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a>, который предоставляет такие методы, как <code class="notranslate" translate="no">addEventListener</code> и <code class="notranslate" translate="no">removeEventListener</code>, точно так же, как элемент DOM, поэтому, если мы передадим его в <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, он должен работать.</p>
 <p><code class="notranslate" translate="no">ElementProxyReceiver</code> обрабатывает 1 элемент. В нашем случае нам нужен только один, но лучше думать головой, так что давайте заставим менеджера управлять более чем одним из них.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ProxyManager {
   constructor() {
@@ -616,7 +616,7 @@ self.onmessage = function(e) {
   fn(e.data);
 };
 </pre>
-<p>Нам также нужно добавить <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> в начало скрипта.</p>
+<p>Нам также нужно добавить <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> в начало скрипта.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 
@@ -629,7 +629,7 @@ export function init(data) {
 +  controls.target.set(0, 0, 0);
 +  controls.update();
 </pre>
-<p>Обратите внимание, что мы передаем <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> нашему прокси через <code class="notranslate" translate="no">inputElement</code> вместо передачи холста, как в других примерах, отличных от <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<p>Обратите внимание, что мы передаем <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> нашему прокси через <code class="notranslate" translate="no">inputElement</code> вместо передачи холста, как в других примерах, отличных от <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
 <p>Затем мы можем переместить весь код события выбора из файла HTML в общий код three.js, а также изменить <code class="notranslate" translate="no">canvas</code> на <code class="notranslate" translate="no">inputElement</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
 -  const rect = canvas.getBoundingClientRect();
@@ -806,7 +806,7 @@ function filteredKeydownEventHandler(event, sendFn) {
   }
 }
 </pre>
-<p>Это кажется близким к запуску, но если мы действительно попробуем, то увидим, что <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> нужно еще кое-что.</p>
+<p>Это кажется близким к запуску, но если мы действительно попробуем, то увидим, что <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> нужно еще кое-что.</p>
 <p>Один из них - <code class="notranslate" translate="no">element.focus</code>. Нам не нужно, чтобы это происходило в воркере, поэтому давайте просто добавим заглушку.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
   constructor() {
@@ -949,7 +949,7 @@ function render(time) {
 
   ...
 </pre>
-<p>Еще несколько приемов. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> добавляют события <code class="notranslate" translate="no">pointermove</code> и <code class="notranslate" translate="no">pointerup</code> в <code class="notranslate" translate="no">ownerDocument</code> элемента для обработки захвата мыши (когда мышь выходит за пределы окна).</p>
+<p>Еще несколько приемов. <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> добавляют события <code class="notranslate" translate="no">pointermove</code> и <code class="notranslate" translate="no">pointerup</code> в <code class="notranslate" translate="no">ownerDocument</code> элемента для обработки захвата мыши (когда мышь выходит за пределы окна).</p>
 <p>Далее код ссылается на глобальный <code class="notranslate" translate="no">document</code>, но в воркере нет глобального документа.</p>
 <p>Мы можем решить все это с помощью 2 быстрых приемов. В нашем рабочем коде мы повторно используем прокси для обеих задач</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
@@ -962,9 +962,9 @@ function render(time) {
   });
 }
 </pre>
-<p>Это даст <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> возможность проверить, что соответствует их ожиданиям.</p>
+<p>Это даст <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> возможность проверить, что соответствует их ожиданиям.</p>
 <p>Я знаю, что это было довольно сложно. Краткая версия:<code class="notranslate" translate="no">ElementProxy</code> запускается на главной странице и пересылает события DOM в <code class="notranslate" translate="no">ElementProxyReceiver</code>
-в воркере, который маскируется под <code class="notranslate" translate="no">HTMLElement</code>, который мы можем использовать как с <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, так и с нашим собственным кодом.</p>
+в воркере, который маскируется под <code class="notranslate" translate="no">HTMLElement</code>, который мы можем использовать как с <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, так и с нашим собственным кодом.</p>
 <p>И последнее - это наш запасной вариант, когда мы не используем OffscreenCanvas. Все, что нам нужно сделать, это передать сам холст как наш <code class="notranslate" translate="no">inputElement</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
 -  init({canvas});

@@ -143,7 +143,7 @@ zElem.textContent = someObject.position.z.toFixed(3);
 }
 </pre>
 <p>次にマウスをクリックするたびに2秒間のランダムな方向に移動するメッシュを作成する簡単な例を作ってみましょう。<a href="responsive.html">レスポンシブデザイン</a>の記事から例を紹介します。</p>
-<p>マウスをクリックするたびに新しい <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> を追加するコードは以下の通りです。</p>
+<p>マウスをクリックするたびに新しい <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> を追加するコードは以下の通りです。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry();
 const material = new THREE.MeshBasicMaterial({color: 'red'});
 
@@ -285,7 +285,7 @@ if (debug) {
 <p>そのカーブを利用してこのように車を動かしました。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">curve.getPointAt(zeroToOnePointOnCurve, car.position);
 </pre>
-<p>内部的には <code class="notranslate" translate="no">curve.getPointAt</code> は第2引数に渡されたオブジェクトに対して <code class="notranslate" translate="no">set</code> 関数を呼び出します。この場合、第2引数は <code class="notranslate" translate="no">car.position</code> であり、これは <a href="/docs/#api/ja/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> です。<a href="/docs/#api/ja/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> の <code class="notranslate" translate="no">set</code> 関数はx, y, zの3つの引数を必要としますが、<a href="/docs/#api/ja/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> は2次元曲線なので、xとyだけを指定して <code class="notranslate" translate="no">car.position.set</code> を呼び出します。</p>
+<p>内部的には <code class="notranslate" translate="no">curve.getPointAt</code> は第2引数に渡されたオブジェクトに対して <code class="notranslate" translate="no">set</code> 関数を呼び出します。この場合、第2引数は <code class="notranslate" translate="no">car.position</code> であり、これは <a href="../docs/#api/ja/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> です。<a href="../docs/#api/ja/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> の <code class="notranslate" translate="no">set</code> 関数はx, y, zの3つの引数を必要としますが、<a href="../docs/#api/ja/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> は2次元曲線なので、xとyだけを指定して <code class="notranslate" translate="no">car.position.set</code> を呼び出します。</p>
 <p>その結果、<code class="notranslate" translate="no">car.position.set</code> はxにx、yにy、zに <code class="notranslate" translate="no">undefined</code> をセットします。</p>
 <p>デバッガで <code class="notranslate" translate="no">matrixWorld</code> を見てみると <code class="notranslate" translate="no">NaN</code> 値が表示されています。</p>
 <div class="threejs_center"><img class="border" src="../resources/images/debugging-nan.gif" style="width: 476px;"></div>
@@ -340,8 +340,8 @@ IMOを無視するよりも、それらのエラーを見つける方が良い�
 <li>キャンバスのリサイズコード</li>
 <li>パスに沿って車を移動させるコード</li>
 </ol>
-<p>このコードはかなり大きいです。もし質問がパスの後に続く部分だけであれば、THREE.jsの <code class="notranslate" translate="no">&lt;canvas&gt;</code> と <code class="notranslate" translate="no">&lt;script&gt;</code> タグだけで済むので、ほとんどのHTMLを削除する事ができます。また、CSSとリサイズのコードを削除する事ができます。GLTFのコードもパスだけを気にしているので削除できます。<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用するとライトとシャドウも削除する事ができます。lil-guiのコードも確実に削除できます。
-このコードはテクスチャ付きの地面を作ります。<a href="/docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> を使った方が簡単です。
+<p>このコードはかなり大きいです。もし質問がパスの後に続く部分だけであれば、THREE.jsの <code class="notranslate" translate="no">&lt;canvas&gt;</code> と <code class="notranslate" translate="no">&lt;script&gt;</code> タグだけで済むので、ほとんどのHTMLを削除する事ができます。また、CSSとリサイズのコードを削除する事ができます。GLTFのコードもパスだけを気にしているので削除できます。<a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用するとライトとシャドウも削除する事ができます。lil-guiのコードも確実に削除できます。
+このコードはテクスチャ付きの地面を作ります。<a href="../docs/#api/ja/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> を使った方が簡単です。
 最終的にもし質問したい事がパス上での移動についてなら、ロードされた車モデルの代わりにパス上にキューブを使用する事ができます。</p>
 <p>以上の事を考慮したミニマムなサンプルコードを紹介します。271行から135行に縮小しました。パスを単純化する事でさらに縮小する事も考られます。3,4点のパスは、21点のパスと同じように動作するかもしれません。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -358,10 +358,10 @@ IMOを無視するよりも、それらのエラーを見つける方が良い�
 スニペットを作る事でその条件を満たしています。</p>
 <p>また、このサイト上の全てのライブサンプルはスニペットとして実行されるべきである事に注意して下さい。HTML、CSS、JavaScriptの部分を<a href="https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/">スニペットエディタ</a>のそれぞれの部分にコピーするだけです。ただし、自分の問題に関係のない部分を削除し、必要最低限のコードにするのを忘れないようにして下さい。</p>
 <p>これらに従えば、あなたの問題は助けを得る可能性がはるかに高くなります。</p>
-<h2 id="-meshbasicmaterial-"><a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用する</h2>
-<p><a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> はライトを使用しないので、何かが表示されない理由を取り除く1つの方法です。もしオブジェクトが <a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用して表示されない場合は、コードの他の部分ではなくマテリアルやライトに問題がある可能性が高い事がわかります。</p>
+<h2 id="-meshbasicmaterial-"><a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用する</h2>
+<p><a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> はライトを使用しないので、何かが表示されない理由を取り除く1つの方法です。もしオブジェクトが <a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用して表示されない場合は、コードの他の部分ではなくマテリアルやライトに問題がある可能性が高い事がわかります。</p>
 <h2 id="-near-far-">カメラの <code class="notranslate" translate="no">near</code> と <code class="notranslate" translate="no">far</code> の設定を確認する</h2>
-<p><a href="/docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> には <code class="notranslate" translate="no">near</code> と <code class="notranslate" translate="no">far</code> の設定があり、それは<a href="cameras.html">カメラの記事</a> で説明しています。
+<p><a href="../docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> には <code class="notranslate" translate="no">near</code> と <code class="notranslate" translate="no">far</code> の設定があり、それは<a href="cameras.html">カメラの記事</a> で説明しています。
 オブジェクトを含む空間に合わせて設定されている事を確認して下さい。
 例えば <code class="notranslate" translate="no">near</code> = 0.001、<code class="notranslate" translate="no">far</code> = 1000000のような大きな値に<strong>一時的に</strong>設定する事もできます。
 奥行き解像度の問題が発生する可能性がありますが、少なくともカメラの前にあるオブジェクトを見る事ができるようになります。</p>
@@ -371,7 +371,7 @@ IMOを無視するよりも、それらのエラーを見つける方が良い�
 このコードはシーンの一部のサイズを見つけ、カメラを移動して <code class="notranslate" translate="no">near</code> と <code class="notranslate" translate="no">far</code> の設定を調整し、それが見えるようにします。</p>
 <h2 id="-">カメラの前に何かを置く</h2>
 <p>これは全てに失敗した場合は、動作するものから始めてゆっくりと何かを追加していくという方法です。何もない画面が表示された場合は、直接カメラの前に何かを置いてみて下さい。
-球体や箱を作り <a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>のようなシンプルなマテリアルを与えて、それを画面上に表示できるようにします。
+球体や箱を作り <a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>のようなシンプルなマテリアルを与えて、それを画面上に表示できるようにします。
 その後、少しずつ追加してテストを開始します。最終的にはバグを再現するか、途中で発見するかのどちらかになります。</p>
 <hr>
 <p>以上、JavaScriptのデバッグのヒントでした。<a href="debugging-glsl.html">GLSLをデバッグするためのいくつかのヒント</a>も見てみましょう。</p>

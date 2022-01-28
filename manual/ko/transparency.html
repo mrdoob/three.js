@@ -87,8 +87,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +addLight(-1, 2, 4);
 +addLight( 1, -1, -2);
 </pre>
-<p>정육면체를 투명하게 만들려면 <a href="/docs/#api/ko/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a> 속성을
-켜고 <a href="/docs/#api/ko/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> 속성을 설정해줘야 합니다(CSS와 마찬가지로
+<p>정육면체를 투명하게 만들려면 <a href="../docs/#api/ko/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a> 속성을
+켜고 <a href="../docs/#api/ko/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> 속성을 설정해줘야 합니다(CSS와 마찬가지로
 0은 완전히 투명함, 1은 완전히 불투명함을 의미).</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
 -  const material = new THREE.MeshPhongMaterial({color});
@@ -119,7 +119,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <div class="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
 <div class="threejs_center">뒷면이 보이지 않는다</div>
 
-<p>이전에 <a href="materials.html">재질(material)에 관해</a> 배울 때 <a href="/docs/#api/ko/materials/Material#side"><code class="notranslate" translate="no">side</code></a>
+<p>이전에 <a href="materials.html">재질(material)에 관해</a> 배울 때 <a href="../docs/#api/ko/materials/Material#side"><code class="notranslate" translate="no">side</code></a>
 속성에 대해 배웠었죠. 이 속성을 <code class="notranslate" translate="no">THREE.DoubleSide</code>로 설정해 정육면체의
 양면이 모두 보이도록 해봅시다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
@@ -148,7 +148,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 깊이가 깊다면 해당 픽셀을 렌더링하지 않죠.</p>
 <p>이는 불투명한 물체에서는 문제가 되지 않았지만 투명한 물체에서는 문제가 됩니다.</p>
 <p>이 문제를 해결하려면 투명한 물체를 분류해 뒤에 있는 물체를 앞에 있는 물체보다
-먼저 렌더링해야 합니다. <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 같은 경우는 Three.js가 자동으로 이를 처리해주죠.
+먼저 렌더링해야 합니다. <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 같은 경우는 Three.js가 자동으로 이를 처리해주죠.
 만약 그러지 않았다면 제일 첫 번째 예제에서 뒤에 있는 정육면체를 아예 볼 수
 없었을 겁니다.</p>
 <p>정육면체에는 한 면에 2개, 총 12개의 삼각형이 있습니다. 각 삼각형의 렌더링 순서는
@@ -253,12 +253,12 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
 </pre>
 <p>저걸 어떻게 구현할지는 여러분의 선택입니다. <a href="https://blender.org">블렌더(Blender)</a>
 같은 3D 에디터를 사용했다면 텍스처 좌표를 직접 수정했겠죠. 예제의 경우에는
-<a href="/docs/#api/ko/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a>를 썼습니다. <a href="textures.html">이전에 다뤘듯</a>
-이 geometry는 기본적으로 텍스처를 크기에 맞춰 늘립니다. <a href="/docs/#api/ko/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>
-속성과 <a href="/docs/#api/ko/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> 속성을 조정해 각 면에 적절한
+<a href="../docs/#api/ko/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a>를 썼습니다. <a href="textures.html">이전에 다뤘듯</a>
+이 geometry는 기본적으로 텍스처를 크기에 맞춰 늘립니다. <a href="../docs/#api/ko/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>
+속성과 <a href="../docs/#api/ko/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> 속성을 조정해 각 면에 적절한
 텍스처를 입혀줄 수 있죠.</p>
-<p>위 코드에서는 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 만들어 두 평면의 부모로 지정했습니다. 이렇게
-하면 복잡한 계산 없이 간단하게 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>만 돌려서 두 평면 다 회전시킬
+<p>위 코드에서는 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 만들어 두 평면의 부모로 지정했습니다. 이렇게
+하면 복잡한 계산 없이 간단하게 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>만 돌려서 두 평면 다 회전시킬
 수 있죠.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../transparency-intersecting-planes-fixed.html"></iframe></div>
@@ -280,7 +280,7 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
 </div>
 
 <p>아까 평면 2개를 교차해놓았던(반으로 가르기 전) 예제를 가져와 이 텍스처에
-<a href="/docs/#api/ko/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a> 속성을 지정하겠습니다.</p>
+<a href="../docs/#api/ko/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a> 속성을 지정하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
   const texture = loader.load(url, render);
   const material = new THREE.MeshPhongMaterial({

@@ -532,9 +532,9 @@ window.addEventListener('touchend', clearPickPosition);
 </div>
 
 <p></p>
-<p>もう1歩踏み込んで <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加してみましょう。
+<p>もう1歩踏み込んで <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加してみましょう。
 これはもう少し複雑です。
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> はマウス、タッチイベント、キーボードなどDOMをかなり広範囲にチェックしています。</p>
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> はマウス、タッチイベント、キーボードなどDOMをかなり広範囲にチェックしています。</p>
 <p>これまでのコードとは異なり、グローバルな <code class="notranslate" translate="no">state</code> オブジェクトを使う事はできません。
 これを使用して動作するようにOrbitControlsのコードを全て書き換える必要はありません。
 OrbitControlsは <code class="notranslate" translate="no">HTMLElement</code> を取り、それに使用するDOMイベントのほとんどをアタッチします。
@@ -571,7 +571,7 @@ class ElementProxyReceiver extends EventDispatcher {
 }
 </pre>
 <p>メッセージを受信した場合にdataを送信するだけです。
-これは <a href="/docs/#api/ja/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> を継承しており、DOM要素のように <code class="notranslate" translate="no">addEventListener</code> や <code class="notranslate" translate="no">removeEventListener</code> のようなメソッドを提供しているので、OrbitControlsに渡せば動作するはずです。</p>
+これは <a href="../docs/#api/ja/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> を継承しており、DOM要素のように <code class="notranslate" translate="no">addEventListener</code> や <code class="notranslate" translate="no">removeEventListener</code> のようなメソッドを提供しているので、OrbitControlsに渡せば動作するはずです。</p>
 <p><code class="notranslate" translate="no">ElementProxyReceiver</code> は1つの要素を扱います。
 私たちの場合は1つの頭しか必要ありませんが、頭で考えるのがベストです。
 つまり、マネージャーを作って複数のElementProxyReceiverを管理するようにしましょう。</p>
@@ -628,7 +628,7 @@ self.onmessage = function(e) {
   fn(e.data);
 };
 </pre>
-<p>共有のthree.jsコードでは <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> をインポートして設定する必要があります。</p>
+<p>共有のthree.jsコードでは <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> をインポートして設定する必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 
@@ -825,7 +825,7 @@ function filteredKeydownEventHandler(event, sendFn) {
   }
 }
 </pre>
-<p>これで動くと思われるが、実際に試してみると <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がもう少し必要なものがあると分かります。</p>
+<p>これで動くと思われるが、実際に試してみると <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がもう少し必要なものがあると分かります。</p>
 <p>1つは <code class="notranslate" translate="no">element.focus</code> です。Workerには必要ないのでStubを追加しておきましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
   constructor() {
@@ -987,11 +987,11 @@ Workerコードでは両方の問題に対してProxyを再利用します。</p
   });
 }
 </pre>
-<p>これで <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> が期待に沿った検査を行うための機能を提供します。</p>
+<p>これで <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> が期待に沿った検査を行うための機能を提供します。</p>
 <p>難しいのは分かっていますが手短に言うと:</p>
 <p><code class="notranslate" translate="no">ElementProxy</code> はメインページ上で動作し、DOMイベントを転送します。
 Worker内の <code class="notranslate" translate="no">ElementProxyReceiver</code> は一緒に使うことができる <code class="notranslate" translate="no">HTMLElement</code> を装っています。
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> と独自のコードを使用しています。</p>
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> と独自のコードを使用しています。</p>
 <p>最後にOffscreenCanvasを使用していない時のフォールバックです。
 必要なのはcanvas自体を <code class="notranslate" translate="no">inputElement</code> として渡す事です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {

@@ -189,7 +189,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>いずれにしてもこの4つのデータセットをラベルから切り替えた際にクロスフェードアニメーションさせるにはどうすればいいのでしょうか。</p>
 <p>たくさんのアイデアがあります。</p>
 <ul>
-<li><p><a href="/docs/#api/ja/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a> でクロスフェードアニメーションする</p>
+<li><p><a href="../docs/#api/ja/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a> でクロスフェードアニメーションする</p>
 <p>この解決策の問題点はキューブが完全に重なっているため、Z軸の戦いの問題を意味します。
 depth関数とブレンディングを使い修正できる可能性があります。調べてみた方が良さそうですね。</p>
 </li>
@@ -422,7 +422,7 @@ render();
 基本的には最初のデータセットの色を作るだけです。他のデータセットは色が大きく異なっていても同じ色を使用しています。</p>
 <p>色のモーフィングのサポートを追加できるかどうか見てみましょう。これは壊れやすいかもしれませんね。
 最も壊れやすい方法はおそらく100%独自のシェーダを書く事でしょうが、内蔵シェーダーをどのように修正するかを見るのは有用だと思います。</p>
-<p>まず最初に行う必要があるのは各データセットのジオメトリから色を <a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> として抽出するコードを作成する事です。</p>
+<p>まず最初に行う必要があるのは各データセットのジオメトリから色を <a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> として抽出するコードを作成する事です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// use the first geometry as the base
 // and add all the geometries as morphtargets
 const baseGeometry = geometries[0];
@@ -443,7 +443,7 @@ const material = new THREE.MeshBasicMaterial({
 });
 </pre>
 <p>次にthree.jsのシェーダーを修正する必要があります。
-Three.jsのマテリアルには <a href="/docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> プロパティがあり、関数を割り当てる事ができます。
+Three.jsのマテリアルには <a href="../docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> プロパティがあり、関数を割り当てる事ができます。
 これはWebGLに渡される前にマテリアルのシェーダーを修正する機会を与えてくれます。
 実際に提供されているシェーダーはthree.js独自の特殊なシェーダー構文になっており、
 シェーダーの<em>チャンク</em>の束をリストアップし、three.jsが各チャンクに対して実際のGLSLコードで置換します。
@@ -487,7 +487,7 @@ void main() {
 <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl.js"><code class="notranslate" translate="no">color_pars_vertex</code> チャンク</a>、
 <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js"><code class="notranslate" translate="no">color_vertex</code> チャンク</a>
 を置き換えたいと思います。</p>
-<p>これを行うには単純な置換の配列を作成して <a href="/docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> で適用します。</p>
+<p>これを行うには単純な置換の配列を作成して <a href="../docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> で適用します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({
   vertexColors: true,
 });
@@ -615,7 +615,7 @@ three.jsが提供するサービスを利用するか、カスタムシェーダ
 <p>次は<a href="align-html-elements-to-3d.html">HTML要素を3Dに整列させる</a>で説明している地球儀にラベルを追加します。</p>
 <p>注: 男性や女性の割合、または正の差をグラフ化する事もできますが、情報を表示する方法に基づいて地表から成長するキューブはほとんどのキューブが低い方が良いでしょう。
 これらの他の比較を使用した場合、ほとんどのキューブは最大高さの約1/2の大きさになり可視化として良くありません。
-<code class="notranslate" translate="no">amountGreaterThan</code> を変えたように感じますが、このような場合は <a href="/docs/#api/ja/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> を <code class="notranslate" translate="no">(a - b)</code> "正の差" や <code class="notranslate" translate="no">a / (a +b)</code> "パーセント" のようなものに変えると何を言っているのかわかるでしょう。</p>
+<code class="notranslate" translate="no">amountGreaterThan</code> を変えたように感じますが、このような場合は <a href="../docs/#api/ja/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> を <code class="notranslate" translate="no">(a - b)</code> "正の差" や <code class="notranslate" translate="no">a / (a +b)</code> "パーセント" のようなものに変えると何を言っているのかわかるでしょう。</p>
 
         </div>
       </div>

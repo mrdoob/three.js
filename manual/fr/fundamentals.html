@@ -50,35 +50,35 @@ Three.js de petite taille:</p>
 
 <p>Voici ce qui est à remarquer dans le diagramme ci-dessus :</p>
 <ul>
-<li><p>Il y a un <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>. C'est sans doute l'objet principal de Three.js. Vous passez
-une <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> et une <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> à un <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> et il effectue le rendu (dessine) de la
+<li><p>Il y a un <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>. C'est sans doute l'objet principal de Three.js. Vous passez
+une <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> et une <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> à un <a href="../docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> et il effectue le rendu (dessine) de la
 partie de la scène 3D qui est à l'intérieur de l'espace visible (en réalité une pyramide tronquée ou <em>frustum</em>)
 de la caméra dans une image 2D affichée dans un canevas (<em>canvas</em>).</p>
 </li>
 <li><p>Il y a un <a href="scenegraph.html">graphe de scène</a> qui est une structure arborescente,
-constituée de divers objets tel qu'un objet <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>, de multiple maillages (<a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>),
-des lumières (<a href="/docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a>), des groupes (<a href="/docs/#api/en/objects/Group"><code class="notranslate" translate="no">Group</code></a>), des objets 3D <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> et des objets <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>.
-Un objet <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> définit la racine d'un graphe de scène et contient des propriétés telles que
+constituée de divers objets tel qu'un objet <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>, de multiple maillages (<a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>),
+des lumières (<a href="../docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a>), des groupes (<a href="../docs/#api/en/objects/Group"><code class="notranslate" translate="no">Group</code></a>), des objets 3D <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> et des objets <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>.
+Un objet <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> définit la racine d'un graphe de scène et contient des propriétés telles que
 la couleur d'arrière plan et le brouillard. L'ensemble de ces objets définissent une structure
 hiérarchique de type parent/enfant, arborescente, et indique où les objets apparaissent et
 comment ils sont orientés. Les enfants sont positionnés et orientés par rapport à leur parent.
 Par exemple, les roues d'une voiture sont les enfants du châssis impliquant que si l'on déplace
 ou oriente la voiture, les roues suivront automatiquement son déplacement. Plus de
 détails sont donnés dans <a href="scenegraph.html">l'article sur les graphes de scène</a>.</p>
-<p>Il est à noter sur que ce diagramme <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> est patiellement placé dans le graphe de scène.
-Cela permet d'attirer l'attention qu'en Three.js, contrairement aux autres objets, une <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> ne doit
-pas forcément faire partie du graphe de scène pour être opérationnelle. Une <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>, de la même
+<p>Il est à noter sur que ce diagramme <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> est patiellement placé dans le graphe de scène.
+Cela permet d'attirer l'attention qu'en Three.js, contrairement aux autres objets, une <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> ne doit
+pas forcément faire partie du graphe de scène pour être opérationnelle. Une <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>, de la même
 façon que les autres objets, enfant d'un autre objet, se déplace et s'oriente par rapport à son
 objet parent. A la fin de <a href="scenegraph.html">l'article sur les graphes de scène</a>, l'inclusion
-de multiples objets <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> dans un unique graphe de scène est donné en exemple.</p>
+de multiples objets <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> dans un unique graphe de scène est donné en exemple.</p>
 </li>
-<li><p>Les objets de type <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> représentent une géométrie (<code class="notranslate" translate="no">Geometry</code>) liée à un matériau (<a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>)
-spécifique. Les objets <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> et <code class="notranslate" translate="no">Geometry</code> peuvent être liés à plusieurs objets <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>
+<li><p>Les objets de type <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> représentent une géométrie (<code class="notranslate" translate="no">Geometry</code>) liée à un matériau (<a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>)
+spécifique. Les objets <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> et <code class="notranslate" translate="no">Geometry</code> peuvent être liés à plusieurs objets <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>
 simultanément. Par exemple, pour dessiner deux cubes bleus à des positions différentes, nous
-pouvons soit utiliser deux objets <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> pour spécifier les positions et orientations de
+pouvons soit utiliser deux objets <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> pour spécifier les positions et orientations de
 chaque cube; soit nous pouvons utiliser seulement une géométrie unique (<code class="notranslate" translate="no">Geometry</code>) pour décrire les
-données spatiales du cube et un matériau unique (<a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>) pour spécifier la couleur bleue.
-Les deux objets <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> peuvent ainsi référencer les mêmes objets <code class="notranslate" translate="no">Geometry</code> et <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>.</p>
+données spatiales du cube et un matériau unique (<a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>) pour spécifier la couleur bleue.
+Les deux objets <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> peuvent ainsi référencer les mêmes objets <code class="notranslate" translate="no">Geometry</code> et <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>.</p>
 </li>
 <li><p>Les objets <code class="notranslate" translate="no">Geometry</code> représentent les données associées aux sommets d'une géométrie telle qu'une
 sphère, un cube, un avion, un chien, un chat, un humain, un arbre, un bâtiment, etc...
@@ -86,17 +86,17 @@ Three.js fournit plusieurs types intégrés de <a href="primitives.html">primiti
 Vous pouvez aussi <a href="custom-buffergeometry.html">créer vos propres géométries</a> ou
 <a href="load-obj.html">charger des géométries à partir d'un fichier</a>.</p>
 </li>
-<li><p>Les objets <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> représentent les
+<li><p>Les objets <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> représentent les
 <a href="materials.html">propriétés de surface utilisées pour dessiner la géométrie</a>
-telles que la couleur à utiliser ou le pouvoir réfléchissant (brillance). Un matériau (<a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>)
-peut aussi se référer à un ou plusieurs objets <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> dont l'utilité est, par exemple, de plaquer
+telles que la couleur à utiliser ou le pouvoir réfléchissant (brillance). Un matériau (<a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a>)
+peut aussi se référer à un ou plusieurs objets <a href="../docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> dont l'utilité est, par exemple, de plaquer
 une image sur la surface d'une géométrie.</p>
 </li>
-<li><p>Les objets <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> représentent généralement des images soit <a href="textures.html">chargées de fichiers image</a>,
+<li><p>Les objets <a href="../docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> représentent généralement des images soit <a href="textures.html">chargées de fichiers image</a>,
 soit <a href="canvas-textures.html">générées par le biais d'un canevas</a> ou
 <a href="rendertargets.html">résultant du rendu d'une autre scène</a>.</p>
 </li>
-<li><p>Les objets <a href="/docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> représentent <a href="lights.html">différentes sortent de lumière</a>.</p>
+<li><p>Les objets <a href="../docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> représentent <a href="lights.html">différentes sortent de lumière</a>.</p>
 </li>
 </ul>
 <p>Maintenant que tout cela a été défini, nous allons présenter un exemple de type <em>"Hello Cube"</em> utilisant un
@@ -130,11 +130,11 @@ import * as THREE from '../../build/three.module.js';
 +  ...
 &lt;/script&gt;
 </pre>
-<p>Après la recherche du canevas, nous créons un <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Le <em>renderer</em>
+<p>Après la recherche du canevas, nous créons un <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Le <em>renderer</em>
 a pour mission de charger les données fournies et d'en effectuer le rendu
 dans le canevas. Par le passé, il y a eu aussi d'autre <em>renderers</em> tels que
 <code class="notranslate" translate="no">CSSRenderer</code> ou <code class="notranslate" translate="no">CanvasRenderer</code> et, dans le futur, il pourrait y avoir un
-<code class="notranslate" translate="no">WebGL2Renderer</code> ou <code class="notranslate" translate="no">WebGPURenderer</code>. Pour le moment, il y a un <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>
+<code class="notranslate" translate="no">WebGL2Renderer</code> ou <code class="notranslate" translate="no">WebGPURenderer</code>. Pour le moment, il y a un <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>
 qui utiliser WebGL pour effectuer une rendu 3D dans le canevas.</p>
 <p>Notez qu'il y a quelques détails ésotériques ici. Si vous ne passez pas un
 canevas à Three.js, il va en créer un pour vous mais vous aurez à l'ajouter
@@ -143,7 +143,7 @@ au document. Où l'ajouter peut dépendre du contexte d'utilisation et vous aure
 plus flexible. Nous pouvons mettre le canevas n'importe où et le code le retrouvera.
 Dans le cas contraire, nous aurons à coder où insérer le canevas, ce qui amènera
 probablement à changer le code si le contexte d'utilisation change.</p>
-<p>Ensuite, nous avons besoin d'une caméra. Nous créons une <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>.</p>
+<p>Ensuite, nous avons besoin d'une caméra. Nous créons une <a href="../docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // valeur par défaut du canevas
 const near = 0.1;
@@ -180,12 +180,12 @@ Notre <em>frustum</em> démarre à 0.1 unités de la caméra et s'étend jusqu'�
 Comme le schéma est vu du haut, le champ de vue est affecté par l'aspect.
 Notre canvas est deux fois plus large que haut donc le champ de vue horizontal
 est plus grand que les 75 degrés spécifié pour le champ vertical.</p>
-<p>Ensuite, nous créons une <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. Dans Three.js, une <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> est la racine
+<p>Ensuite, nous créons une <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. Dans Three.js, une <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> est la racine
 du graphe de scène. Tout ce que nous voulons que Three.js dessine doit être ajouté
 à la scène. Cela sera davantage détaillé dans <a href="scenegraph.html">un futur article sur le fonctionnement des scènes</a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 </pre>
-<p>Ensuite nous créons une géométrie de type <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> qui contient les données pour un parallélépipède.
+<p>Ensuite nous créons une géométrie de type <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> qui contient les données pour un parallélépipède.
 Quasiment tout ce que nous souhaitons afficher avec Three.js nécessite une
 géométrie qui définit les sommets qui composent nos objets 3D.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
@@ -196,8 +196,8 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 <p>Puis nous créons un matériau basique et fixons sa couleur, qui peut être spécifiée au format hexadécimal (6 chiffres) du standard CSS.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre>
-<p>Nous créons ensuite un maillage (<a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>). Dans Three.js, il représente la combinaison
-d'une <code class="notranslate" translate="no">Geometry</code> (forme de l'objet) et d'un matériau (<a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> - aspect
+<p>Nous créons ensuite un maillage (<a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>). Dans Three.js, il représente la combinaison
+d'une <code class="notranslate" translate="no">Geometry</code> (forme de l'objet) et d'un matériau (<a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> - aspect
 d'un objet, brillant ou plat, quelle couleur, quelle texture appliquer, etc.)
 ainsi que la position, l'orientation et l'échelle de l'objet dans la scène.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
@@ -274,8 +274,8 @@ Three.js propose plusieurs type de lumière que nous détaillerons dans
 Dans notre cas, nous positionnons la lumière en -1, 2, 4, de manière à ce qu'elle soit légèrement
 sur la gauche, au dessus et derrière notre caméra. La cible est toujours 0, 0, 0 donc elle va
 éclairer vers l'origine.</p>
-<p>Nous avons également besoin de changer le matériau car <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ne s'applique pas aux
-lumières. Nous le remplaçons par un <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> qui est affecté par les sources lumineuses.</p>
+<p>Nous avons également besoin de changer le matériau car <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ne s'applique pas aux
+lumières. Nous le remplaçons par un <a href="../docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> qui est affecté par les sources lumineuses.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // cyan
 +const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // cyan
 </pre>
@@ -308,7 +308,7 @@ géométrie spécifiée, l'ajoute à la scène et change sa position en X.</p>
 }
 </pre>
 <p>Ensuite, nous l'appellons à 3 reprises avec 3 différentes couleurs
-et positions en X, puis nous conservons ces instances de <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> dans un tableau.</p>
+et positions en X, puis nous conservons ces instances de <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> dans un tableau.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
   makeInstance(geometry, 0x44aa88,  0),
   makeInstance(geometry, 0x8844aa, -2),
@@ -344,8 +344,8 @@ canevas est extrême.</p>
 <p>A présent, notre programme est schématisé par la figure suivante :</p>
 <div class="threejs_center"><img src="../resources/images/threejs-3cubes-scene.svg" style="width: 610px;"></div>
 
-<p>Comme nous pouvons le constater, nous avons 3 objets de type <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, chacun référençant
-la même <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>. Chaque <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> référence également un <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> unique
+<p>Comme nous pouvons le constater, nous avons 3 objets de type <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, chacun référençant
+la même <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>. Chaque <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> référence également un <a href="../docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> unique
 de sorte que chaque cube possède une couleur différente.</p>
 <p>Nous espérons que cette courte introduction vous aide à débuter.
 <a href="responsive.html">La prochaine étape consiste à  rendre notre code réactif et donc adaptable à de multiples situations</a>.</p>

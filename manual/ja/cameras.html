@@ -26,7 +26,7 @@
 <a href="fundamentals.html">最初の記事</a>でいくつか取り上げましたが、ここではもっと詳しく取り上げます。</p>
 <p><code class="notranslate" translate="no">PerspectiveCamera（透視投影カメラ）</code> はthree.jsで最も一般的なカメラで、今までの記事で使ってきました。
 遠くのものが近くのものよりも小さく見える3Dビューを提供します。</p>
-<p><a href="/docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> は <em>錐台</em> を定義します。
+<p><a href="../docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> は <em>錐台</em> を定義します。
 <a href="https://en.wikipedia.org/wiki/Frustum">錐台とは先端が切り取られたピラミッドのような3D形状の事です</a>。
 つまり、cube(立方体)、cone(円錐体)、sphere(球体)、cylinder(円柱)、frustum(錐台)は全て異なる種類の固体名です。</p>
 <div class="spread">
@@ -40,7 +40,7 @@
 <p>私はこの事を何年も知らなかったです。
 どこかの本やページで <em>錐台</em> について書かれていると目が点になります。
 錐台が固体名と理解すると、それらの記述を急に理解できるようになりました 😅</p>
-<p><a href="/docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> には4つのプロパティをもとに錐台が定義されています。
+<p><a href="../docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> には4つのプロパティをもとに錐台が定義されています。
 <code class="notranslate" translate="no">near</code> は錐台の正面がどこから始まるかを定義します。
 <code class="notranslate" translate="no">far</code> は錐台が終了する場所です。
 <code class="notranslate" translate="no">fov</code> は視野角で、カメラから <code class="notranslate" translate="no">near</code> 単位で指定された視野角を得るために正しい高さが計算され、錐台の前面と背面の高さを定義します。
@@ -86,7 +86,7 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
 gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
 </pre>
-<p>カメラ設定の変更時、カメラの <a href="/docs/#api/ja/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a> 関数を呼び出す必要があります。
+<p>カメラ設定の変更時、カメラの <a href="../docs/#api/ja/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a> 関数を呼び出す必要があります。
 <code class="notranslate" translate="no">updateCamera</code> という関数を作り、それをlil-gui変更時に呼び出すようにします。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../cameras-perspective.html"></iframe></div>
@@ -101,7 +101,7 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
 <p>そのためにthree.jsのシザー関数を利用します。
 シザー機能を使い、カメラを2台並べて2つのシーンを描画するように変更してみましょう。</p>
 <p>まず、HTMLとCSSを使って2つの並んでるDOM要素を定義してみましょう。
-両方のカメラが簡単に独自の <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を持てるようにします。</p>
+両方のカメラが簡単に独自の <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を持てるようにします。</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div class="split"&gt;
@@ -124,8 +124,8 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
   height: 100%;
 }
 </pre>
-<p>次に <a href="/docs/#api/ja/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> を追加します。
-<a href="/docs/#api/ja/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> は <a href="/docs/#api/ja/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> の錐台を描画します。</p>
+<p>次に <a href="../docs/#api/ja/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> を追加します。
+<a href="../docs/#api/ja/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> は <a href="../docs/#api/ja/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> の錐台を描画します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(camera);
 
 ...
@@ -136,12 +136,12 @@ scene.add(cameraHelper);
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const view1Elem = document.querySelector('#view1');
 const view2Elem = document.querySelector('#view2');
 </pre>
-<p>既存の <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> をview1にのみ反応するようにします。</p>
+<p>既存の <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> をview1にのみ反応するようにします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const controls = new OrbitControls(camera, canvas);
 +const controls = new OrbitControls(camera, view1Elem);
 </pre>
-<p>2つ目の <a href="/docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> と <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を作ってみましょう。
-2つ目の <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は2つ目のカメラに関連付けし、view2から入力を取得します。</p>
+<p>2つ目の <a href="../docs/#api/ja/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> と <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を作ってみましょう。
+2つ目の <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は2つ目のカメラに関連付けし、view2から入力を取得します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera2 = new THREE.PerspectiveCamera(
   60,  // fov
   2,   // aspect
@@ -308,7 +308,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <div class="threejs_center"><img src="../resources/images/z-fighting.png" style="width: 570px;"></div>
 
 <p>1つ目の解決策はどのピクセルが前後にあるかを計算するために、three.jsの別メソッドを使用します。
-これは <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> の作成時に <code class="notranslate" translate="no">logarithmicDepthBuffer</code> を有効にします。</p>
+これは <a href="../docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> の作成時に <code class="notranslate" translate="no">logarithmicDepthBuffer</code> を有効にします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
@@ -337,8 +337,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p>2番目に一般的なカメラは <code class="notranslate" translate="no">OrthographicCamera(平行投影カメラ)</code> です。
 錐台を指定するのではなく、<code class="notranslate" translate="no">left</code>、<code class="notranslate" translate="no">right</code>、<code class="notranslate" translate="no">top</code>、<code class="notranslate" translate="no">bottom</code>、<code class="notranslate" translate="no">near</code>、<code class="notranslate" translate="no">far</code> の設定でボックスを指定します。
 ボックスを投影しているので遠近感はありません。</p>
-<p>上記のview1とview2のサンプルを変更し、最初のビューで <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を使うようにしましょう。</p>
-<p>最初に <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を設定します。</p>
+<p>上記のview1とview2のサンプルを変更し、最初のビューで <a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を使うようにしましょう。</p>
+<p>最初に <a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を設定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -1;
 const right = 1;
 const top = 1;
@@ -356,9 +356,9 @@ camera.zoom = 0.2;
 +gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
 </pre>
 <p><code class="notranslate" translate="no">listen</code> 呼び出しはlil-guiに変更を監視するようにします。
-これは <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がズームも制御できるからです。
-例えばマウスのスクロールホイールは <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> でズームします。</p>
-<p>最後に左側をレンダリングする部分を変更して <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を更新します。</p>
+これは <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がズームも制御できるからです。
+例えばマウスのスクロールホイールは <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> でズームします。</p>
+<p>最後に左側をレンダリングする部分を変更して <a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> を更新します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const aspect = setScissorForElement(view1Elem);
 
@@ -376,14 +376,14 @@ camera.zoom = 0.2;
   renderer.render(scene, camera);
 }
 </pre>
-<p>これで <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> が動作しているのが見れるようになりました。</p>
+<p>これで <a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> が動作しているのが見れるようになりました。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../cameras-orthographic-2-scenes.html"></iframe></div>
   <a class="threejs_center" href="../examples/cameras-orthographic-2-scenes.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
-<p>three.jsで2次元のものを描画する場合には、<a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> が最もよく使われます。
+<p>three.jsで2次元のものを描画する場合には、<a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> が最もよく使われます。
 カメラの表示台数を決める必要があります。
 例えば、1ピクセルのキャンバスをカメラの1単位と一致させたい場合、次のような事ができます。</p>
 <p>原点を中心に置き、1ピクセル = three.jsの1単位とするには次のようにします。</p>
@@ -416,7 +416,7 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
 camera.zoom = 1;
 </pre>
 <p>続いて、6枚のテクスチャをロードし、6枚の平面を作ってみましょう。
-各平面は <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> を親にし、平面の中心を左上にして簡単にオフセットできるようにします。</p>
+各平面は <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> を親にし、平面の中心を左上にして簡単にオフセットできるようにします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 const textures = [
   loader.load('resources/images/flower-1.jpg'),
@@ -454,7 +454,7 @@ const planes = textures.map((texture) =&gt; {
 
   ...
 </pre>
-<p><code class="notranslate" translate="no">planes</code> は <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a> の配列であり、各平面に1つずつあります。
+<p><code class="notranslate" translate="no">planes</code> は <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a> の配列であり、各平面に1つずつあります。
 これらを時間に応じて移動させてみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;  // convert to seconds;
@@ -494,7 +494,7 @@ const planes = textures.map((texture) =&gt; {
 </div>
 
 <p></p>
-<p><a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> のもう1つの一般的な用途は3Dモデリングツールやゲームエンジンで、上、下、左、右、正面、背面のビューを描画する場合です。</p>
+<p><a href="../docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> のもう1つの一般的な用途は3Dモデリングツールやゲームエンジンで、上、下、左、右、正面、背面のビューを描画する場合です。</p>
 <div class="threejs_center"><img src="../resources/images/quad-viewport.png" style="width: 574px;"></div>
 
 <p>上記のスクリーンショットでは右上のビューが透視投影図、左上のビューが平行投影図です。</p>

@@ -44,7 +44,7 @@
   <img src="../examples/resources/images/wall.jpg" style="width: 600px;" class="border">
 </div>
 
-<p>我们将修改我们的第一个例子中的其中一个。我们需要做的就是创建一个<a href="/docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>。调用它的<a href="/docs/#api/zh/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>方法，同时传入图像的URL，并将材质的 <code class="notranslate" translate="no">map</code> 属性设置为该方法的返回值，而不是设置它的 <code class="notranslate" translate="no">color</code>属性。</p>
+<p>我们将修改我们的第一个例子中的其中一个。我们需要做的就是创建一个<a href="../docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>。调用它的<a href="../docs/#api/zh/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>方法，同时传入图像的URL，并将材质的 <code class="notranslate" translate="no">map</code> 属性设置为该方法的返回值，而不是设置它的 <code class="notranslate" translate="no">color</code>属性。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
 const material = new THREE.MeshBasicMaterial({
@@ -52,7 +52,7 @@ const material = new THREE.MeshBasicMaterial({
 +  map: loader.load('resources/images/wall.jpg'),
 });
 </pre>
-<p>注意，我们使用的是 <a href="/docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>， 所以没有必要增加光线</p>
+<p>注意，我们使用的是 <a href="../docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>， 所以没有必要增加光线</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube.html"></iframe></div>
   <a class="threejs_center" href="../examples/textured-cube.html" target="_blank">点击此处在新标签页中打开</a>
@@ -74,7 +74,7 @@ const material = new THREE.MeshBasicMaterial({
   </div>
 </div>
 
-<p>我们只需制作6种材料，并在创建 <a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 时将它们作为一个数组传递给它们。</p>
+<p>我们只需制作6种材料，并在创建 <a href="../docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 时将它们作为一个数组传递给它们。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 
 -const material = new THREE.MeshBasicMaterial({
@@ -98,13 +98,13 @@ const material = new THREE.MeshBasicMaterial({
 </div>
 
 <p></p>
-<p>但需要注意的是，并不是所有的几何体类型都支持多种材质。<a href="/docs/#api/zh/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> 和 <a href="/docs/#api/zh/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> 可以使用6种材料，每个面一个。<a href="/docs/#api/zh/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a> 和 <a href="/docs/#api/zh/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a> 可以使用2种材料，一种用于底部，一种用于侧面。 <a href="/docs/#api/zh/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> 和 <a href="/docs/#api/zh/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> 可以使用3种材料，分别是底部、顶部和侧面。对于其他情况，你需要建立或加载自定义几何体和（或）修改纹理坐标。</p>
+<p>但需要注意的是，并不是所有的几何体类型都支持多种材质。<a href="../docs/#api/zh/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> 和 <a href="../docs/#api/zh/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> 可以使用6种材料，每个面一个。<a href="../docs/#api/zh/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a> 和 <a href="../docs/#api/zh/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a> 可以使用2种材料，一种用于底部，一种用于侧面。 <a href="../docs/#api/zh/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> 和 <a href="../docs/#api/zh/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> 可以使用3种材料，分别是底部、顶部和侧面。对于其他情况，你需要建立或加载自定义几何体和（或）修改纹理坐标。</p>
 <p>在其他3D引擎中，如果你想在一个几何体上使用多个图像，使用 <a href="https://en.wikipedia.org/wiki/Texture_atlas">纹理图集（Texture Atlas）</a> 更为常见，性能也更高。纹理图集是将多个图像放在一个单一的纹理中，然后使用几何体顶点上的纹理坐标来选择在几何体的每个三角形上使用纹理的哪些部分。</p>
 <p>什么是纹理坐标？它们是添加到一块几何体的每个顶点上的数据，用于指定该顶点对应的纹理的哪个部分。当我们开始<a href="custom-buffergeometry.html">构建自定义几何体时（building custom geometry）</a>，我们会介绍它们。</p>
 <h2 id="-a-name-loading-a-"><a name="loading"></a> 加载纹理</h2>
 <h3 id="-a-name-easy-a-"><a name="easy"></a> 简单的方法</h3>
-<p>本文的大部分代码都使用最简单的加载纹理的方法。我们创建一个 <a href="/docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> ，然后调用它的<a href="/docs/#api/zh/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>方法。
-这将返回一个 <a href="/docs/#api/zh/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> 对象。</p>
+<p>本文的大部分代码都使用最简单的加载纹理的方法。我们创建一个 <a href="../docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> ，然后调用它的<a href="../docs/#api/zh/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>方法。
+这将返回一个 <a href="../docs/#api/zh/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> 对象。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const texture = loader.load('resources/images/flower-1.jpg');
 </pre>
 <p>需要注意的是，使用这个方法，我们的纹理将是透明的，直到图片被three.js异步加载完成，这时它将用下载的图片更新纹理。</p>
@@ -129,7 +129,7 @@ loader.load('resources/images/wall.jpg', (texture) =&gt; {
 
 <p></p>
 <h3 id="-a-name-waitmany-a-"><a name="waitmany"></a> 等待多个纹理加载</h3>
-<p>要等到所有纹理都加载完毕，你可以使用 <a href="/docs/#api/zh/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> 。创建一个并将其传递给 <a href="/docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>，然后将其<a href="/docs/#api/zh/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>属性设置为回调。</p>
+<p>要等到所有纹理都加载完毕，你可以使用 <a href="../docs/#api/zh/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> 。创建一个并将其传递给 <a href="../docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>，然后将其<a href="../docs/#api/zh/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>属性设置为回调。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadManager = new THREE.LoadingManager();
 *const loader = new THREE.TextureLoader(loadManager);
 
@@ -148,7 +148,7 @@ const materials = [
 +  cubes.push(cube);  // 添加到我们要旋转的立方体数组中
 +};
 </pre>
-<p><a href="/docs/#api/zh/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> 也有一个 <a href="/docs/#api/zh/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> 属性，我们可以设置为另一个回调来显示进度指示器。</p>
+<p><a href="../docs/#api/zh/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> 也有一个 <a href="../docs/#api/zh/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> 属性，我们可以设置为另一个回调来显示进度指示器。</p>
 <p>首先，我们在HTML中添加一个进度条</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
@@ -241,7 +241,7 @@ loadManager.onLoad = () =&gt; {
 
 <p>现在，当立方体被画得很小，只有1或2个像素大时，GPU可以选择只用最小或次小级别的mip来决定让小立方体变成什么颜色。</p>
 <p>在three.js中，当纹理绘制的尺寸大于其原始尺寸时，或者绘制的尺寸小于其原始尺寸时，你都可以做出相应的处理。</p>
-<p>当纹理绘制的尺寸大于其原始尺寸时，你可以将 <a href="/docs/#api/zh/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a> 属性设置为 <code class="notranslate" translate="no">THREE.NearestFilter</code> 或 <code class="notranslate" translate="no">THREE.LinearFilter</code> 。<code class="notranslate" translate="no">NearestFilter</code> 意味着只需从原始纹理中选取最接近的一个像素。对于低分辨率的纹理，这给你一个非常像素化的外观，就像Minecraft。</p>
+<p>当纹理绘制的尺寸大于其原始尺寸时，你可以将 <a href="../docs/#api/zh/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a> 属性设置为 <code class="notranslate" translate="no">THREE.NearestFilter</code> 或 <code class="notranslate" translate="no">THREE.LinearFilter</code> 。<code class="notranslate" translate="no">NearestFilter</code> 意味着只需从原始纹理中选取最接近的一个像素。对于低分辨率的纹理，这给你一个非常像素化的外观，就像Minecraft。</p>
 <p><code class="notranslate" translate="no">LinearFilter</code> 是指从纹理中选择离我们应该选择颜色的地方最近的4个像素，并根据实际点与4个像素的距离，以适当的比例进行混合。</p>
 <div class="spread">
   <div>
@@ -254,7 +254,7 @@ loadManager.onLoad = () =&gt; {
   </div>
 </div>
 
-<p>为了在绘制的纹理小于其原始尺寸时设置过滤器，你可以将 <a href="/docs/#api/zh/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a> 属性设置为下面6个值之一。</p>
+<p>为了在绘制的纹理小于其原始尺寸时设置过滤器，你可以将 <a href="../docs/#api/zh/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a> 属性设置为下面6个值之一。</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.NearestFilter</code></p>
 <p> 同上，在纹理中选择最近的像素。</p>
@@ -317,7 +317,7 @@ loadManager.onLoad = () =&gt; {
 <p>切换回原来的纹理，你可以看到右下角是最平滑的，质量最高的。你可能会问为什么不总是使用这种模式。最明显的原因是有时你希望东西是像素化的，以达到复古的效果或其他原因。其次最常见的原因是，读取8个像素并混合它们比读取1个像素并混合要慢。虽然单个纹理不太可能成为快和慢的区别，但随着我们在这些文章中的进一步深入，我们最终会有同时使用4或5个纹理的材料的情况。4个纹理*每个纹理8个像素，就是查找32个像素的永远渲染的像素。在移动设备上，这一嗲可能需要被重点考虑。</p>
 <h2 id="-a-name-uvmanipulation-a-"><a name="uvmanipulation"></a> 重复，偏移，旋转，包裹一个纹理</h2>
 <p>纹理有重复、偏移和旋转纹理的设置。</p>
-<p>默认情况下，three.js中的纹理是不重复的。要设置纹理是否重复，有2个属性，<a href="/docs/#api/zh/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> 用于水平包裹，<a href="/docs/#api/zh/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> 用于垂直包裹。</p>
+<p>默认情况下，three.js中的纹理是不重复的。要设置纹理是否重复，有2个属性，<a href="../docs/#api/zh/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> 用于水平包裹，<a href="../docs/#api/zh/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> 用于垂直包裹。</p>
 <p>它们可以被设置为一下其中一个：</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
@@ -414,7 +414,7 @@ gui.add(texture.center, 'y', -.5, 1.5, .01).name('texture.center.y');
 gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
   .name('texture.rotation');
 </pre>
-<p>最后需要注意的是，如果你改变了纹理上的 <code class="notranslate" translate="no">wrapS</code> 或 <code class="notranslate" translate="no">wrapT</code>，你还必须设置 <a href="/docs/#api/zh/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>，以便three.js知道并应用这些设置。其他的设置会自动应用。</p>
+<p>最后需要注意的是，如果你改变了纹理上的 <code class="notranslate" translate="no">wrapS</code> 或 <code class="notranslate" translate="no">wrapT</code>，你还必须设置 <a href="../docs/#api/zh/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>，以便three.js知道并应用这些设置。其他的设置会自动应用。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube-adjust.html"></iframe></div>
   <a class="threejs_center" href="../examples/textured-cube-adjust.html" target="_blank">点击此处在新标签页中打开</a>

@@ -83,7 +83,7 @@ function render(time) {
 <p>그러기 위해서 사용자가 계속 보고 있었는지, 그리고 얼마나 오래 있었는지를 전달하기 위한 일종의 미터나 게이지나 방법이 필요합니다.</p>
 <p>이를 위한 한 가지 쉬운 방법은 2가지 색상의 텍스처를 만들고 텍스처 오프셋을 사용하여 모델을 가로질러 텍스처를 이동시키는 것입니다.</p>
 <p>VR 예제에 추가하기 전에 스스로 작동하는지 보도록 합시다.</p>
-<p>먼저 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 만들어 보겠습니다.</p>
+<p>먼저 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 만들어 보겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -2;    // Use values for left
 const right = 2;    // right, top and bottom
 const top = 1;      // that match the default
@@ -106,7 +106,7 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
   ...
 </pre>
 <p>우리는 현재 중앙 위아래 두 유닛과 좌우 측면 유닛을 보여주는 카메라를 가지고 있습니다.</p>
-<p>다음으로 2가지 색 텍스처를 만들어 봅시다. 몇 군데 <a href="indexed-textures.html">다른</a> <a href="post-processing-3dlut.html">곳에서</a> 사용했던 <a href="/docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 사용할 것입니다.</p>
+<p>다음으로 2가지 색 텍스처를 만들어 봅시다. 몇 군데 <a href="indexed-textures.html">다른</a> <a href="post-processing-3dlut.html">곳에서</a> 사용했던 <a href="../docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 사용할 것입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDataTexture(data, width, height) {
   const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
   texture.minFilter = THREE.NearestFilter;
@@ -121,7 +121,7 @@ const cursorColors = new Uint8Array([
 ]);
 const cursorTexture = makeDataTexture(cursorColors, 2, 1);
 </pre>
-<p>그 다음 <a href="/docs/#api/ko/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a>에 있는 텍스처를 사용할 것입니다.</p>
+<p>그 다음 <a href="../docs/#api/ko/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a>에 있는 텍스처를 사용할 것입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ringRadius = 0.4;
 const tubeRadius = 0.1;
 const tubeSegments = 4;
@@ -205,13 +205,13 @@ const scene = new THREE.Scene();
 그 세 줄에 주석을 달면 차이를 알 수 있을 것입니다.
 저는 역효과가 가장 좋다고 생각하는데, 이렇게 하면 커서의 색깔에 상관없이 커서가 보일 수 있기 때문입니다.</p>
 </li>
-<li><p><a href="/docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>가 아닌 <a href="/docs/#api/ko/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a>를 사용해 봅시다.</p>
-<p>어떤 이유로든 <a href="/docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>는 평평한 UV 매핑 방식을 사용합니다.
-이 때문에 <a href="/docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>를 사용하면 위에서처럼 링 주위가 아닌 수평으로 링을 가로질러 텍스처가 미끄러집니다.</p>
-<p>이걸 시도해 보고 <a href="/docs/#api/ko/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a>를 <a href="/docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>(위 예시에서 설명한 대로)로 바꾸면 무슨 뜻인지 알 수 있을 것입니다.</p>
-<p><em>적절한</em> 정의를 위한 <em>적절한</em> 할 것은 <a href="/docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>를 사용하되 링 주위를 돌도록 텍스처 좌표를 고정하는 것입니다.
+<li><p><a href="../docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>가 아닌 <a href="../docs/#api/ko/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a>를 사용해 봅시다.</p>
+<p>어떤 이유로든 <a href="../docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>는 평평한 UV 매핑 방식을 사용합니다.
+이 때문에 <a href="../docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>를 사용하면 위에서처럼 링 주위가 아닌 수평으로 링을 가로질러 텍스처가 미끄러집니다.</p>
+<p>이걸 시도해 보고 <a href="../docs/#api/ko/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a>를 <a href="../docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>(위 예시에서 설명한 대로)로 바꾸면 무슨 뜻인지 알 수 있을 것입니다.</p>
+<p><em>적절한</em> 정의를 위한 <em>적절한</em> 할 것은 <a href="../docs/#api/ko/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>를 사용하되 링 주위를 돌도록 텍스처 좌표를 고정하는 것입니다.
 아니면, 자신만의 링 지오메트리를 생성하세요. 그래도 torus는 잘 작동합니다.
-<a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>과 함께 카메라 바로 앞에 배치하면 링과 똑같이 보이고 텍스처 좌표가 링 주위를 돌기 때문에 우리가 원하는 대로 작동합니다.</p>
+<a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>과 함께 카메라 바로 앞에 배치하면 링과 똑같이 보이고 텍스처 좌표가 링 주위를 돌기 때문에 우리가 원하는 대로 작동합니다.</p>
 </li>
 </ul>
 <p>이제 이것을 위의 VR 코드와 통합해 봅시다.</p>
@@ -333,7 +333,7 @@ const boxDepth = 1;
 +const sphereRadius = 0.5;
 +const sphereGeometry = new THREE.SphereGeometry(sphereRadius);
 </pre>
-<p>그리고 세 쌍의 박스와 구 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 만들어 봅시다. 각 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 파트너와 연결할 수 있도록 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code class="notranslate" translate="no">맵</code></a>을 사용할 것입니다.</p>
+<p>그리고 세 쌍의 박스와 구 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 만들어 봅시다. 각 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 파트너와 연결할 수 있도록 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code class="notranslate" translate="no">맵</code></a>을 사용할 것입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0),
 -  makeInstance(geometry, 0x8844aa, -2),

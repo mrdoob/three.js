@@ -30,8 +30,8 @@ requestAnimationFrame(render);
 <p>有些场景连续渲染是有意义的, 但是有些情况下不需要一直动呢? 这种情况下不断地渲染会浪费电, 对于移动设备来说属实不能接受. </p>
 <p>显而易见的解决方法是一开始的时候渲染一次, 只有当什么东西改变了以后再次渲染. 这种改变包括纹理的变化, 或者再入了模型, 其他源传来了什么数据, 用户调整了设置或者是动了摄像机. </p>
 <p>我们以<a href="responsive.html">响应式设计</a>这一章为例, 稍作修改以满足按需渲染.</p>
-<p>首先我们添加<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, 这样当摄像机改变之后场景就可以随之渲染</p>
-<p>First we'll add in the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> so there is something that could change
+<p>首先我们添加<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>, 这样当摄像机改变之后场景就可以随之渲染</p>
+<p>First we'll add in the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> so there is something that could change
 that we can render in response to.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
@@ -86,8 +86,8 @@ camera.position.z = 2;
 <p>我们这次只需要渲染一次</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
 </pre>
-<p>我们需要在<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>改变摄像机设置的时候渲染场景.
-幸好<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>提供了一个<code class="notranslate" translate="no">change</code>事件来监听变化</p>
+<p>我们需要在<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>改变摄像机设置的时候渲染场景.
+幸好<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>提供了一个<code class="notranslate" translate="no">change</code>事件来监听变化</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
 </pre>
 <p>我们同样需要捕捉到用户改变窗口大小的情况. 在之前连续渲染的时候这种情况是自动处理的, 但是现在是按需渲染, 我们需要在窗口改变的时候显式<code class="notranslate" translate="no">resize</code>窗口大小</p>
@@ -100,10 +100,10 @@ camera.position.z = 2;
 </div>
 
 
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 有个选项可以增加某种惯性, 让整个画面显得不那么僵硬. 我们启用<code class="notranslate" translate="no">enableDamping</code>来实现它<p></p>
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 有个选项可以增加某种惯性, 让整个画面显得不那么僵硬. 我们启用<code class="notranslate" translate="no">enableDamping</code>来实现它<p></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
 </pre>
-<p>开启<code class="notranslate" translate="no">enableDamping</code>, 我们需要在渲染函数中调用<code class="notranslate" translate="no">controls.update</code>, 让<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>可以丝滑地让摄像机移动. 但是, 这就意味着我们不能直接地在<code class="notranslate" translate="no">change</code>事件中调用<code class="notranslate" translate="no">render</code>, 如此这般会导致死循环. 控制器响应一个<code class="notranslate" translate="no">change</code>事件然后调用<code class="notranslate" translate="no">render</code>, 然后<code class="notranslate" translate="no">render</code>调用<code class="notranslate" translate="no">controls.update</code>. 这个方法会再发出另一个<code class="notranslate" translate="no">change</code>事件. </p>
+<p>开启<code class="notranslate" translate="no">enableDamping</code>, 我们需要在渲染函数中调用<code class="notranslate" translate="no">controls.update</code>, 让<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>可以丝滑地让摄像机移动. 但是, 这就意味着我们不能直接地在<code class="notranslate" translate="no">change</code>事件中调用<code class="notranslate" translate="no">render</code>, 如此这般会导致死循环. 控制器响应一个<code class="notranslate" translate="no">change</code>事件然后调用<code class="notranslate" translate="no">render</code>, 然后<code class="notranslate" translate="no">render</code>调用<code class="notranslate" translate="no">controls.update</code>. 这个方法会再发出另一个<code class="notranslate" translate="no">change</code>事件. </p>
 <p>我们可以通过使用<code class="notranslate" translate="no">requestAnimationFrame</code>调用<code class="notranslate" translate="no">render</code>, 但是需要确保仅仅在需要一个新帧的时候才执行. 如果没有请求</p>
 <p>我们可以通过使用<code class="notranslate" translate="no">requestAnimationFrame</code>调用<code class="notranslate" translate="no">render</code>来解决这个问题, 但是我们需要确保我们只在还没有请求一个新帧的情况下请求一个新帧, 我们可以通过一个变量来跟踪我们已经请求的帧</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let renderRequested = false;

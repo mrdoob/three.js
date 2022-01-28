@@ -74,7 +74,7 @@ objects.push(sunMesh);
 <p>예제에서는 로우-폴리(low poly) 구체를 사용할 겁니다. 적도를 중심으로
 딱 6분할만 한 구체이죠. 이렇게 하면 자전 운동을 쉽게 확인할 수 있습니다.</p>
 <p>같은 구체를 재활용할 것이므로 태양의 <code class="notranslate" translate="no">mesh</code>를 5배로 설정해줍니다.</p>
-<p>다음으로 <a href="/docs/#api/ko/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>의 <code class="notranslate" translate="no">emissive(방사성)</code> 속성(property)을
+<p>다음으로 <a href="../docs/#api/ko/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>의 <code class="notranslate" translate="no">emissive(방사성)</code> 속성(property)을
 노랑으로 지정합니다. 퐁-메터리얼의 <code class="notranslate" translate="no">emissive</code> 속성은 빛을 반사하지 않는
 표면 색상으로, 대신 광원에 해당 색상이 더해집니다.</p>
 <p>씬 가운데에 단방향 조명(single point light)도 하나 넣습니다. 조명에
@@ -172,7 +172,7 @@ earthMesh.position.x = 10;
 +solarSystem.add(earthMesh);
 objects.push(earthMesh);
 </pre>
-<p>여기서는 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 생성했습니다. <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>는 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>와 마찬가지로
+<p>여기서는 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 생성했습니다. <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>는 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>와 마찬가지로
 씬 그래프의 한 요소지만, <code class="notranslate" translate="no">material</code>이나 <code class="notranslate" translate="no">geometry</code>가 없다는 점이 다릅니다.
 그저 하나의 빈 "지역 공간"인 셈이죠.</p>
 <p>이제 씬 그래프는 다음과 같습니다.</p>
@@ -209,7 +209,7 @@ objects.push(earthMesh);
 +moonOrbit.add(moonMesh);
 +objects.push(moonMesh);
 </pre>
-<p>이전처럼 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 이용해 <code class="notranslate" translate="no">eathOrbit</code> "지역 공간"을 만들고 거기에
+<p>이전처럼 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 이용해 <code class="notranslate" translate="no">eathOrbit</code> "지역 공간"을 만들고 거기에
 <code class="notranslate" translate="no">earthMesh</code>와 <code class="notranslate" translate="no">moonMesh</code>를 추가했습니다. 씬 그래프는 다음과 같죠.</p>
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
 <p>그리고 결과물입니다.</p>
@@ -225,7 +225,7 @@ objects.push(earthMesh);
 <p>때론 씬 그래프의 요소를 시각화하는 것이 도움이 될 때도 있습니다.
 Three.js는 유용한.. 음... 그러니까 이 <del>거시기</del>를 도와줄
 헬퍼 클래스가 있습니다.</p>
-<p>그 중 하나는 <a href="/docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>로, 이 클래스는 지역
+<p>그 중 하나는 <a href="../docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>로, 이 클래스는 지역
 <span style="color:red">X</span>,
 <span style="color:green">Y</span>,
 <span style="color:blue">Z</span> 축을 표시해줍니다.
@@ -256,12 +256,12 @@ objects.forEach((node) =&gt; {
 <p>몇몇 축은 2개의 축이 겹쳐져 구별이 어려울 수 있습니다. <code class="notranslate" translate="no">sunMesh</code>와 <code class="notranslate" translate="no">solarSystem</code>,
 <code class="notranslate" translate="no">earthMesh</code>와 <code class="notranslate" translate="no">earthOrbit</code>이 같은 위치에 있기 때문이죠. 각 노드의 축을 켜고
 끌 수 있는 간단한 컨트롤 패널을 한 번 만들어보죠. 동시에 다른 헬퍼 클래스인
-<a href="/docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>도 추가해보겠습니다. <a href="/docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>는 X, Z축으로 2D 격자(grid)를
+<a href="../docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>도 추가해보겠습니다. <a href="../docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>는 X, Z축으로 2D 격자(grid)를
 만다는 클래스로, 기본값은 10x10 칸입니다.</p>
 <p>또 Three.js와 함께 사용하기로 유명한 <a href="https://github.com/georgealways/lil-gui">lil-gui</a>도
 사용할 겁니다. lil-gui는 UI 라이브러리로, 객체와 속성 이름을 넘겨받고, 해당 속성의
 타입을 기반으로 속성값을 UI로 조정할 수 있게 해줍니다.</p>
-<p>각 요소에 <a href="/docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>와 <a href="/docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>를 추가하겠습니다. 각 노드에 헬퍼를
+<p>각 요소에 <a href="../docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>와 <a href="../docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>를 추가하겠습니다. 각 노드에 헬퍼를
 추가하기 위해 각 노드의 이름이 필요하니, 기존 렌더링 루프를 제거하고 특정
 함수를 호출하게 변경하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// add an AxesHelper to each node
@@ -288,7 +288,7 @@ lil-gui에 붙이는 역할을 합니다. 예제에서는 체크박스를 만들
 <code class="notranslate" translate="no">boolean</code> 타입으로 속성을 지정해주겠습니다. 또 하나의 속성이 바뀔 때
 축과 격자가 동시에 나타나고 사라지게 할 것이니 getter와 setter가
 있는 간단한 클래스를 하나 만들겠습니다. 이러면 lil-gui가 하나의
-속성을 바꿀 때 요소의 <a href="/docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>와 <a href="/docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>의 속성을
+속성을 바꿀 때 요소의 <a href="../docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>와 <a href="../docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>의 속성을
 동시에 조작할 수 있죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">/* 
  * 축과 격자를 동시에 켜고 끕니다
@@ -323,8 +323,8 @@ class AxisGridHelper {
   }
 }
 </pre>
-<p>격자가 축을 가릴 수 있으니, <a href="/docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>의 <code class="notranslate" translate="no">renderOrder</code>를
-2로 설정하고 <a href="/docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>를 2로 설정해 축을 격자 다음에
+<p>격자가 축을 가릴 수 있으니, <a href="../docs/#api/ko/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>의 <code class="notranslate" translate="no">renderOrder</code>를
+2로 설정하고 <a href="../docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>를 2로 설정해 축을 격자 다음에
 렌더링하도록 합니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
@@ -351,15 +351,15 @@ class AxisGridHelper {
 포탑으로 이루어진 간단한 탱크입니다. 또 탱크의 주위를 돌아다니는 구체를
 하나 만들어 탱크가 그 구체를 조준하도록 해보겠습니다.</p>
 <p>아래는 예제를 구현하기 위한 씬 그래프입니다. <code class="notranslate" translate="no">mesh</code>는 녹색으로 칠했고,
-<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>는 청색, 광원은 갈색, 카메라는 보라색으로 칠했습니다. 하나의
+<a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>는 청색, 광원은 갈색, 카메라는 보라색으로 칠했습니다. 하나의
 카메라는 씬 그래프에 포함하지 않았습니다.</p>
 <div class="threejs_center"><img src="../resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
 <p>모든 요소를 어떻게 설정했는지 코드를 하나씩 살펴보죠.</p>
 <p>탱크가 조준할 목표를 만들기 위해 먼저 위 예제의 <code class="notranslate" translate="no">earthOrbit</code>과 유사한
-<code class="notranslate" translate="no">targetOrbit</code>(<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>)을 만듭니다. 그리고 <code class="notranslate" translate="no">targetOrbit</code>의 상대 좌표를 넘겨줄
-<code class="notranslate" translate="no">targetElevation</code>(<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>)을 만들어 <code class="notranslate" translate="no">targetOrbit</code>의 자식으로 추가한 뒤,
-또 다른 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, <code class="notranslate" translate="no">targetBob</code>을 만들어 <code class="notranslate" translate="no">targetElevation</code>의 자식으로 추가합니다.
+<code class="notranslate" translate="no">targetOrbit</code>(<a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>)을 만듭니다. 그리고 <code class="notranslate" translate="no">targetOrbit</code>의 상대 좌표를 넘겨줄
+<code class="notranslate" translate="no">targetElevation</code>(<a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>)을 만들어 <code class="notranslate" translate="no">targetOrbit</code>의 자식으로 추가한 뒤,
+또 다른 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, <code class="notranslate" translate="no">targetBob</code>을 만들어 <code class="notranslate" translate="no">targetElevation</code>의 자식으로 추가합니다.
 이 <code class="notranslate" translate="no">targetBob</code>은 위아래로 보빙(bob은 낙시찌, 권투에서 bobbing은 몸을 숙이는 동작을 말함. 역주)하는
 역할을 할 겁니다. 마지막으로 색이 색이 바뀌는 동시에 회전할 <code class="notranslate" translate="no">targetMesh</code> 육면체를
 만듭니다.</p>
@@ -371,11 +371,11 @@ targetMesh.rotation.y = time * 13;
 targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 </pre>
-<p>탱크는 먼저 <code class="notranslate" translate="no">tank</code>라는 이름으로 다른 요소를 감쌀 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 하나 생성합니다.
-예제에서는 커브에 따라 위치값을 반환받을 수 있는 <a href="/docs/#api/ko/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>를 이용하겠습니다.
+<p>탱크는 먼저 <code class="notranslate" translate="no">tank</code>라는 이름으로 다른 요소를 감쌀 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 하나 생성합니다.
+예제에서는 커브에 따라 위치값을 반환받을 수 있는 <a href="../docs/#api/ko/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>를 이용하겠습니다.
 0.0은 커브의 시작점이고, 1.0은 커브의 끝점으로, 먼저 탱크의 위치를 넘겨주어 탱크의
 다음 위치를 정한 뒤(아래 <code class="notranslate" translate="no">tankPosition</code>. 역주), 커브의 다음 값을 받아 탱크가 어디를
-바라봐야할지 구합니다(아래 <code class="notranslate" translate="no">tankTarget</code>. 역주). 그리고 구한 값을 <a href="/docs/#api/ko/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>
+바라봐야할지 구합니다(아래 <code class="notranslate" translate="no">tankTarget</code>. 역주). 그리고 구한 값을 <a href="../docs/#api/ko/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>
 메서드에 넘겨주어 탱크가 그 방향을 바라보도록 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tankPosition = new THREE.Vector2();
 const tankTarget = new THREE.Vector2();
@@ -390,7 +390,7 @@ tank.position.set(tankPosition.x, 0, tankPosition.y);
 tank.lookAt(tankTarget.x, 0, tankTarget.y);
 </pre>
 <p>그 다음 탱크의 포탑을 탱크의 자식으로 지정해서 탱크를 따라 움직이게 합니다.
-그리고 목표물의 전역 위치값(global position)을 구한 뒤 <a href="/docs/#api/ko/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>
+그리고 목표물의 전역 위치값(global position)을 구한 뒤 <a href="../docs/#api/ko/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>
 메서드를 이용, 포탑이 목표물을 조준하게 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const targetPosition = new THREE.Vector3();
 
@@ -439,7 +439,7 @@ infoElem.textContent = camera.desc;
 
 <p></p>
 <p>자, 이번 장은 여기까지입니다. 이 글이 씬 그래프가 어떻게 작동하는지,
-어떻게 사용해야할지 감을 잡는 데 도움이 되었으면 좋겠네요. <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
+어떻게 사용해야할지 감을 잡는 데 도움이 되었으면 좋겠네요. <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
 요소를 만들어 부모로 만드는 것은 Three.js 뿐만 아니라 다른 3D 엔진을
 쓸 때도 중요한 요소입니다. 뭔가를 만들다보면 종종 복잡한 수학이 필요한
 것처럼 느껴질 수 있는데, 이때 씬 그래프를 사용하지 않는다면 달의 궤도를

@@ -304,13 +304,13 @@ if (debug) {
 <p>Часто, когда я что-то делаю и на экране ничего не появляется,
 я проверяю некоторые значения, и если я вижу <code class="notranslate" translate="no">NaN</code>, имеет место быть, чтобы начать поиск. </p>
 <p>В качестве примера, когда я впервые начал создавать путь для
-<a href="load-gltf.html">статьи о загрузке файлов gLTF</a> я сделал кривую, используя класс <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>, который создает 2D-кривую. </p>
+<a href="load-gltf.html">статьи о загрузке файлов gLTF</a> я сделал кривую, используя класс <a href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>, который создает 2D-кривую. </p>
 <p>Затем я использовал эту кривую, чтобы двигать автомобили</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">curve.getPointAt(zeroToOnePointOnCurve, car.position);
 </pre>
 <p>Внутренне <code class="notranslate" translate="no">curve.getPointAt</code> вызывает функцию <code class="notranslate" translate="no">set</code> для объекта, переданного в качестве второго аргумента.
-В этом случае вторым аргументом является <code class="notranslate" translate="no">car.position</code>, который является <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>. 
- Функция <code class="notranslate" translate="no">set</code> в <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> требует 3 аргумента, x, y и z, но <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> является 2D-кривой и поэтому вызывает <code class="notranslate" translate="no">car.position.set</code> только с x и y. </p>
+В этом случае вторым аргументом является <code class="notranslate" translate="no">car.position</code>, который является <a href="../docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>. 
+ Функция <code class="notranslate" translate="no">set</code> в <a href="../docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> требует 3 аргумента, x, y и z, но <a href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> является 2D-кривой и поэтому вызывает <code class="notranslate" translate="no">car.position.set</code> только с x и y. </p>
 <p>В результате <code class="notranslate" translate="no">car.position.set</code> устанавливает x в x, y в y, а z в <code class="notranslate" translate="no">undefined</code>.</p>
 <p>Беглый взгляд в отладчике <code class="notranslate" translate="no">matrixWorld</code> автомобиля
 показал множество значений <code class="notranslate" translate="no">NaN</code>. </p>
@@ -379,8 +379,8 @@ requestAnimationFrame(render);
 <p>Это довольно много. Если ваш вопрос касается только пути, вы можете удалить большую часть HTML, 
 так как вам нужен только тег <code class="notranslate" translate="no">&lt;canvas&gt;</code> и <code class="notranslate" translate="no">&lt;script&gt;</code> для THREE.js. Вы можете удалить CSS и код изменения размера.
 Вы можете удалить код .GLTF, потому что вам нужен только путь.
-Вы можете удалить источники света и тени с помощью <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>. 
-Вы, конечно, можете удалить код <code class="notranslate" translate="no">lil-gui</code>. Код создает плоскость с текстурой. Было бы проще использовать <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. 
+Вы можете удалить источники света и тени с помощью <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>. 
+Вы, конечно, можете удалить код <code class="notranslate" translate="no">lil-gui</code>. Код создает плоскость с текстурой. Было бы проще использовать <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. 
 Наконец, если наш вопрос касается перемещения объектов по пути,
 мы могли бы просто использовать кубы на пути вместо загруженных моделей автомобилей. </p>
 <p>Вот более минимальный пример, учитывающий все вышеперечисленное. Он сократился с 271 строки до 135. 
@@ -403,12 +403,12 @@ requestAnimationFrame(render);
 <a href="https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/">редактора фрагментов</a>.
 Просто не забудьте попытаться удалить части, не относящиеся к вашей проблеме, и постарайтесь сделать свой код минимально необходимым. </p>
 <p>Следуйте этим советам, и у вас будет гораздо больше шансов получить помощь по вашей проблеме.</p>
-<h2 id="-meshbasicmaterial-">Используйте <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a></h2>
-<p>Поскольку <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> не использует источники света, это один из способов устранения причин, по которым что-то может не отображаться. 
-Если ваши объекты отображаются с использованием <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>, но не с какими-либо материалами, которые вы использовали, то вы знаете,
+<h2 id="-meshbasicmaterial-">Используйте <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a></h2>
+<p>Поскольку <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> не использует источники света, это один из способов устранения причин, по которым что-то может не отображаться. 
+Если ваши объекты отображаются с использованием <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>, но не с какими-либо материалами, которые вы использовали, то вы знаете,
 что проблема, скорее всего, связана с материалами или источниками света, а не с какой-либо другой частью кода. </p>
 <h2 id="-near-far-">Проверьте <code class="notranslate" translate="no">near</code> и <code class="notranslate" translate="no">far</code> настройки вашей камеры</h2>
-<p><a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> имеет ближние и дальние настройки, которые описаны в 
+<p><a href="../docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> имеет ближние и дальние настройки, которые описаны в 
 <a href="cameras.html">статье о камерах</a>. Убедитесь, что они установлены в соответствии с пространством, в котором находятся ваши объекты.
 Возможно, даже просто <em>временно</em> установите для них что-то большое, например, <code class="notranslate" translate="no">near</code> = 0,001 и <code class="notranslate" translate="no">far</code> = 1000000.
 Скорее всего, у вас возникнут проблемы с разрешением по глубине, но вы по крайней мере сможете увидеть ваши объекты, если они находятся перед камерой. </p>
@@ -420,7 +420,7 @@ requestAnimationFrame(render);
 <h2 id="-">Поставь что-нибудь перед сценой камеры</h2>
 <p>Это просто еще один способ сказать, если все остальное терпит неудачу начнем с того, что работает, а потом потихоньку будем добавлять код обратно. 
 Если вы получаете пустой экран, то попробуйте поместить что-то прямо перед камерой. Сделать сферу или поле, дать ему простой материал,
-как <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> и убедитесь, что вы можете сделать это на экране. 
+как <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> и убедитесь, что вы можете сделать это на экране. 
 Затем начать добавлять код немного назад во времени и тестирования.
 В конце концов вы либо найдёте вашу ошибку, или вы найдете пути её решения. </p>
 <hr>

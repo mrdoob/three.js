@@ -34,9 +34,9 @@
 </blockquote>
 <p>那么，我们该如何解决这个问题？</p>
 <h2 id="-">基本方法</h2>
-<p>解决办法就是用一张<code class="notranslate" translate="no">Canvas</code>在整个背景中填充视口，并利用一些其他元素来代表每个“虚拟画布”<code class="notranslate" translate="no">(virtual canvas)</code>，即只在一张<code class="notranslate" translate="no">Canvas</code>中加载一个<a href="/docs/#api/zh/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>，并为每个<code class="notranslate" translate="no">virtual canvas</code>创建一个场景<code class="notranslate" translate="no">(Scene)</code>。这样我们只需要确保每个<code class="notranslate" translate="no">virtual canvas</code>正确的位置，THREE.js就会将它们渲染在屏幕上相应的位置。</p>
+<p>解决办法就是用一张<code class="notranslate" translate="no">Canvas</code>在整个背景中填充视口，并利用一些其他元素来代表每个“虚拟画布”<code class="notranslate" translate="no">(virtual canvas)</code>，即只在一张<code class="notranslate" translate="no">Canvas</code>中加载一个<a href="../docs/#api/zh/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>，并为每个<code class="notranslate" translate="no">virtual canvas</code>创建一个场景<code class="notranslate" translate="no">(Scene)</code>。这样我们只需要确保每个<code class="notranslate" translate="no">virtual canvas</code>正确的位置，THREE.js就会将它们渲染在屏幕上相应的位置。</p>
 <p>利用这个方法，由于我们只添加了一张<code class="notranslate" translate="no">Canvas</code>，也就仅仅使用了一个<code class="notranslate" translate="no">WebGL contexts</code>，因此不仅解决了资源共享问题，且不会引发WebGL上下文数量限制问题。</p>
-<p>以一个只有两个<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>的简单demo为例。首先，创建HTML结构：</p>
+<p>以一个只有两个<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>的简单demo为例。首先，创建HTML结构：</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
 &lt;p&gt;
   &lt;span id="box" class="diagram left"&gt;&lt;/span&gt;
@@ -75,7 +75,7 @@
 }
 </pre>
 <p>我们将<code class="notranslate" translate="no">Canvas</code>画幅设置为充满整个屏幕，并将其<code class="notranslate" translate="no">z-index</code>设置为<code class="notranslate" translate="no">-1</code>，使它始终位于其他元素的后面。当然，我们要给<code class="notranslate" translate="no">virtual canvas</code>设置相应的宽高，因为此时还没有任何内容可以撑起它的大小。</p>
-<p>现在，创建两个<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>，其中一个添加了立方体，另一个为菱形，并分别为这两个<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>添加灯光<code class="notranslate" translate="no">（Light）</code>和相机<code class="notranslate" translate="no">（Camera）</code>。</p>
+<p>现在，创建两个<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>，其中一个添加了立方体，另一个为菱形，并分别为这两个<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>添加灯光<code class="notranslate" translate="no">（Light）</code>和相机<code class="notranslate" translate="no">（Camera）</code>。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeScene(elem) {
   const scene = new THREE.Scene();
 
@@ -128,7 +128,7 @@ function setupScene2() {
 const sceneInfo1 = setupScene1();
 const sceneInfo2 = setupScene2();
 </pre>
-<p>接着创建一个视图信息获取函数<code class="notranslate" translate="no">renderSceneInfo()</code>和视图渲染函数<code class="notranslate" translate="no">render()</code>，用来渲染那些<code class="notranslate" translate="no">virtual canvas</code>所在的元素出现在了可视区域的<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>。只需调用THREE.js的剪裁区域检测<a href="/docs/#api/zh/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a>方法，THREE.js就能实现仅渲染部分画布内容的功能，同时，我们需要调用<a href="/docs/#api/zh/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a>和<a href="/docs/#api/zh/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>来分别设定视口大小和剪裁区域。</p>
+<p>接着创建一个视图信息获取函数<code class="notranslate" translate="no">renderSceneInfo()</code>和视图渲染函数<code class="notranslate" translate="no">render()</code>，用来渲染那些<code class="notranslate" translate="no">virtual canvas</code>所在的元素出现在了可视区域的<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>。只需调用THREE.js的剪裁区域检测<a href="../docs/#api/zh/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a>方法，THREE.js就能实现仅渲染部分画布内容的功能，同时，我们需要调用<a href="../docs/#api/zh/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a>和<a href="../docs/#api/zh/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>来分别设定视口大小和剪裁区域。</p>
 <p>参数说明如下：
 &gt;</p>
 <blockquote>
@@ -196,7 +196,7 @@ Renderer.### <a href="">setViewport</a> ( x : Integer, y : Integer, width : Inte
 <p>可以看到，两个物体被分别渲染到了对应的位置。</p>
 <h2 id="-">同步滚动</h2>
 <p>虽然我们已经实现了同时渲染多个场景的功能，但是上面的代码依然存在一个问题，如果<code class="notranslate" translate="no">Scenes</code>过于复杂、或者由于其他原因需要更长时间渲染，那么画布中<code class="notranslate" translate="no">Scenes</code>渲染的位置总是会落后于页面的其他元素，如页面滚动时会出现明显的滞后。</p>
-<p>为了更直观的观察这个现象，我们给每个<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>加上边框，并设置背景颜色：</p>
+<p>为了更直观的观察这个现象，我们给每个<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>加上边框，并设置背景颜色：</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">.diagram {
   display: inline-block;
   width: 5em;
@@ -268,9 +268,9 @@ function render(time) {
   requestAnimationFrame(render);
 }
 </pre>
-<p>从中可以看出，这个函数将遍历每一个包含了所有<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>元素的数组对象，且每个元素都由各自的<code class="notranslate" translate="no">elem</code>和<code class="notranslate" translate="no">fn</code>属性。</p>
-<p>这个函数将检查每个<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>元素是否进入可视区域，一旦进入就会调用它的场景初始化函数，并传给它当前的时间和对应的尺寸位置信息。</p>
-<p>现在，把每个<a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>的信息添加到数组列表中：</p>
+<p>从中可以看出，这个函数将遍历每一个包含了所有<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>元素的数组对象，且每个元素都由各自的<code class="notranslate" translate="no">elem</code>和<code class="notranslate" translate="no">fn</code>属性。</p>
+<p>这个函数将检查每个<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>元素是否进入可视区域，一旦进入就会调用它的场景初始化函数，并传给它当前的时间和对应的尺寸位置信息。</p>
+<p>现在，把每个<a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>的信息添加到数组列表中：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const elem = document.querySelector('#box');
   const {scene, camera} = makeScene();

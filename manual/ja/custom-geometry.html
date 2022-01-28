@@ -37,17 +37,17 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 にエクスポートしたものをTHREE.jsにインポートすることもできます。
 どのモデリングツールも習得にそれなりの時間がかかります。</p>
 <p>ここまで簡単なカスタムジオメトリであれば大袈裟なモデリングツールを使わずにTHREE.jsのコードで作れます。</p>
-<p>まずは立方体を作ってみましょう。THREE.jsの<a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>や<a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>を使えば一発で
+<p>まずは立方体を作ってみましょう。THREE.jsの<a href="../docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>や<a href="../docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>を使えば一発で
 立方体を作れますが、簡単な例としてカスタムジオメトリで作ってみましょう。</p>
-<p>THREE.jsにはカスタムジオメトリを作る方法が２つあります。１つ目は<code class="notranslate" translate="no">Geometry</code>クラスで２つ目が<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>です。
+<p>THREE.jsにはカスタムジオメトリを作る方法が２つあります。１つ目は<code class="notranslate" translate="no">Geometry</code>クラスで２つ目が<a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>です。
 それぞれに利点があります。<code class="notranslate" translate="no">Geometry</code>は簡単に使えますが遅く、メモリをより消費します。1000個以下の三角形を作る際は
-よいですが、10,000個の三角形を作る時には<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>が良いでしょう。</p>
-<p><a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>は使うのが難しいですがメモリの消費が小さく速いです。１万個の三角形を作る時にはこれを使いましょう。</p>
+よいですが、10,000個の三角形を作る時には<a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>が良いでしょう。</p>
+<p><a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>は使うのが難しいですがメモリの消費が小さく速いです。１万個の三角形を作る時にはこれを使いましょう。</p>
 <p>ただし変形などがない場合はそれほど変わりません。<code class="notranslate" translate="no">Geometry</code>が遅いというのはジオメトリが編集された
 場合に遅いと言う意味で、もし編集が必要なくそれほど大きくなければこの両者はあまり変わりません。
 この記事では両方紹介します。最初は簡単な<code class="notranslate" translate="no">Geometry</code>を紹介します。</p>
 <p>まずは<code class="notranslate" translate="no">Geometry</code>で立方体を作ってみましょう。<a href="responsive.html">レスポンシブの記事</a>の例を使います。</p>
-<p><a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>を使っている部分を消して<code class="notranslate" translate="no">Geometry</code>で置き換えてみます。</p>
+<p><a href="../docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>を使っている部分を消して<code class="notranslate" translate="no">Geometry</code>で置き換えてみます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const boxWidth = 1;
 -const boxHeight = 1;
 -const boxDepth = 1;
@@ -74,7 +74,7 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 （訳註：立方体は６つの正方形で構成されます。１つの正方形は２つの三角形で構成されます。）</p>
 <div class="threejs_center"><img src="../resources/cube-triangles.svg" style="width: 500px"></div>
 
-<p>vertexを結んで三角形を作るには<a href="/docs/#api/ja/core/Face3"><code class="notranslate" translate="no">Face3</code></a>を使います。<a href="/docs/#api/ja/core/Face3"><code class="notranslate" translate="no">Face3</code></a>の３は３つのvertexでfaceを作ると言う意味です。</p>
+<p>vertexを結んで三角形を作るには<a href="../docs/#api/ja/core/Face3"><code class="notranslate" translate="no">Face3</code></a>を使います。<a href="../docs/#api/ja/core/Face3"><code class="notranslate" translate="no">Face3</code></a>の３は３つのvertexでfaceを作ると言う意味です。</p>
 <p>vertexを指定する順序は重要です。faceには表面と裏面があります。立方体を構成するfaceの
 面が外に向くためには反時計回りの順序でvertexを指定します。</p>
 <div class="threejs_center"><img src="../resources/cube-vertex-winding-order.svg" style="width: 500px"></div>
@@ -102,7 +102,7 @@ the article on <a href="custom-buffergeometry.html">custom BufferGeometry</a>.
 );
 </pre>
 <p>ちょっとコードを変えるだけで動きます。</p>
-<p>これらの立方体は前に使った<a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>の立方体より２倍のサイズがあります。
+<p>これらの立方体は前に使った<a href="../docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>の立方体より２倍のサイズがあります。
 全体が映るようにカメラを引きます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
@@ -190,7 +190,7 @@ geometry.faces[10].color = geometry.faces[11].color = new THREE.Color('magenta')
 faceのnormalに対しては<code class="notranslate" translate="no">Geometry.computeFaceNormals</code>を使います。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.computeFaceNormals();
 </pre>
-<p>vertex colorを消してマテリアルを<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>に戻します。</p>
+<p>vertex colorを消してマテリアルを<a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>に戻します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({vertexColors: true});
 +const material = new THREE.MeshPhongMaterial({color});
 </pre>
@@ -266,7 +266,7 @@ function makeInstance(geometry, color, x) {
 <div class="threejs_center"><img src="../examples/resources/images/heightmap-96x64.png" style="width: 512px; image-rendering: pixelated;"></div>
 
 <p>このPNG画像をロードして二次元配列にしてハイトマップとして使います。
-画像をロードするには<a href="/docs/#api/ja/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a>を使います。</p>
+画像をロードするには<a href="../docs/#api/ja/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a>を使います。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const imgLoader = new THREE.ImageLoader();
 imgLoader.load('resources/images/heightmap-96x64.png', createHeightmap);
 
@@ -367,7 +367,7 @@ for (let z = 0; z &lt; cellsDeep; ++z) {
 </pre>
 <p>すこし視点を変えるとみやすくなります。</p>
 <ul>
-<li><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>を追加してください。</li>
+<li><a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>を追加してください。</li>
 </ul>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
@@ -407,7 +407,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
 <p></p>
 <p><code class="notranslate" translate="no">Geometry</code>の使用方法をおわかりいただけたでしょうか？</p>
-<p><a href="custom-buffergeometry.html">この記事</a>では<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>について説明します。</p>
+<p><a href="custom-buffergeometry.html">この記事</a>では<a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>について説明します。</p>
 
         </div>
       </div>

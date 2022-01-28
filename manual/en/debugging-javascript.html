@@ -171,7 +171,7 @@ than making an element per piece of data above.</p>
 <p>Then let's make a simple example that every time we click the mouse makes a mesh
 that moves in a random direction for 2 seconds. We'll start with one of the
 examples from the article on <a href="responsive.html">making things responsive</a></p>
-<p>Here's the code that adds a new <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> every time we click the mouse</p>
+<p>Here's the code that adds a new <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> every time we click the mouse</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry();
 const material = new THREE.MeshBasicMaterial({color: 'red'});
 
@@ -321,14 +321,14 @@ I'll check some values and if I see <code class="notranslate" translate="no">NaN
 place to start looking.</p>
 <p>As an example when I first started making the path for the
 <a href="load-gltf.html">article about loading gLTF files</a> I made
-a curve using the <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> class which makes a 2D curve.</p>
+a curve using the <a href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> class which makes a 2D curve.</p>
 <p>I then used that curve to move the cars like this</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">curve.getPointAt(zeroToOnePointOnCurve, car.position);
 </pre>
 <p>Internally <code class="notranslate" translate="no">curve.getPointAt</code> calls the <code class="notranslate" translate="no">set</code> function
 on the object passed as the second argument. In this case that
-second argument is <code class="notranslate" translate="no">car.position</code> which is a <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>. <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>'s
-<code class="notranslate" translate="no">set</code> function requires 3 arguments, x, y, and z but <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> is a 2D curve
+second argument is <code class="notranslate" translate="no">car.position</code> which is a <a href="../docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>. <a href="../docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>'s
+<code class="notranslate" translate="no">set</code> function requires 3 arguments, x, y, and z but <a href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> is a 2D curve
 and so it calls <code class="notranslate" translate="no">car.position.set</code> with just x and y.</p>
 <p>The result is that <code class="notranslate" translate="no">car.position.set</code> sets x to x, y to y, and z to <code class="notranslate" translate="no">undefined</code>.</p>
 <p>A quick glance in the debugger looking at the car's <code class="notranslate" translate="no">matrixWorld</code>
@@ -409,9 +409,9 @@ it has</p>
 can remove most of the HTML as you only need a <code class="notranslate" translate="no">&lt;canvas&gt;</code> and a <code class="notranslate" translate="no">&lt;script&gt;</code> tag
 for THREE.js. You can remove the CSS and the resizing code. You can remove .GLTF
 code because you only care about the path. You can remove the lights and the
-shadows by using a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>. You can certainly remove the lil-gui
+shadows by using a <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>. You can certainly remove the lil-gui
 code. The code makes a ground plane with a texture. It would be easier to use a
-<a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. Finally if our question is about moving things on a path we could
+<a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. Finally if our question is about moving things on a path we could
 just use cubes on the path instead of loaded car models.</p>
 <p>Here's a more minimal example taking all the above into account. It
 shrunk from 271 lines to 135. We might consider shrinking it even
@@ -447,14 +447,14 @@ Just remember to try to remove the parts that are not relevant to
 your issue and try to make your code the minimal amount needed.</p>
 <p>Follow these suggestions and you're far more likely to get help
 with your issue.</p>
-<h2 id="use-a-meshbasicmaterial-">Use a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a></h2>
-<p>Because the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> uses no lights this is one way to 
+<h2 id="use-a-meshbasicmaterial-">Use a <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a></h2>
+<p>Because the <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> uses no lights this is one way to 
 remove reasons something might not be showing up. If your objects
-show up using <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> but not with whatever materials
+show up using <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> but not with whatever materials
 you were using then you know the issue is likely with the materials
 or the lights and not some other part of the code.</p>
 <h2 id="check-your-near-and-far-settings-for-your-camera">Check your <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings for your camera</h2>
-<p>A <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> has <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings which are covered in the
+<p>A <a href="../docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> has <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings which are covered in the
 <a href="cameras.html">article on cameras</a>. Make sure they are set to fit the
 space that contains your objects. Maybe even just <strong>temporarily</strong> set them to
 something large like <code class="notranslate" translate="no">near</code> = 0.001 and <code class="notranslate" translate="no">far</code> = 1000000. You will likely run
@@ -474,7 +474,7 @@ the scene.</p>
 something that works and then slowly add stuff back in. If you get
 a screen with nothing on it then try putting something directly in
 front of the camera. Make a sphere or box, give it a simple material
-like the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> and make sure you can get that on the screen.
+like the <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> and make sure you can get that on the screen.
 Then start adding things back a little at time and testing. Eventually
 you'll either reproduce your bug or you'll find it on the way.</p>
 <hr>

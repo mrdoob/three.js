@@ -100,7 +100,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   });
 </pre>
 <p>자동으로 카메라의 시야를 조정하는 코드는 그대로 두었습니다.</p>
-<p>모듈이 바뀌었으니 import 문도 변경해야 합니다. <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>를 제거하고 <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a>를
+<p>모듈이 바뀌었으니 import 문도 변경해야 합니다. <a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>를 제거하고 <a href="../docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a>를
 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import { LoaderSupport } from '/examples/jsm/loaders/LoaderSupport.js';
 -import { OBJLoader } from '/examples/jsm/loaders/OBJLoader.js';
@@ -232,14 +232,14 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 <p>이처럼 3D 프로젝트를 진행할 때는 목적에 따라 개체를 디자인해야 합니다. 그래야
 기준축이나, 크기 등이 제대로 적용될 테니까요.</p>
 <p>저는 디자이너도 아니고 블렌더를 그다지 잘 하지도 못하기에, 편법을 사용하겠습니다.
-각각의 자동차에 별도의 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 만들어 자동차를 이 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로
-지정할 겁니다. 이러면 자동차가 아닌 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>로 차를 움직일 수 있고, 자동차의
+각각의 자동차에 별도의 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 만들어 자동차를 이 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로
+지정할 겁니다. 이러면 자동차가 아닌 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>로 차를 움직일 수 있고, 자동차의
 기준축도 별도로 설정할 수 있죠.</p>
 <p>아까 봤던 씬 그래프를 다시 보니 자동차의 종류는 총 3개인 듯합니다. "Car_08",
 "CAR_03", "Car_04" 이렇게요. 종류별로 조정했을 때 제대로 적용되는지 봅시다.</p>
-<p>아래의 코드는 각 자동차를 새로운 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로 지정하고, 이 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를
+<p>아래의 코드는 각 자동차를 새로운 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로 지정하고, 이 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를
 장면에 추가한 뒤, 자동차의 <em>종류별로</em> 기준축을 정렬합니다. 그리고 새로 만든
-<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 <code class="notranslate" translate="no">cars</code> 배열에 추가하죠.</p>
+<a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 <code class="notranslate" translate="no">cars</code> 배열에 추가하죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
 +const cars = [];
 {
@@ -312,7 +312,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
   [1.004861, 5.115846, -3.641834],
 ];
 </pre>
-<p>Three.js에는 몇 가지 곡선 클래스가 있습니다. 이 경우 <a href="/docs/#api/ko/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>가
+<p>Three.js에는 몇 가지 곡선 클래스가 있습니다. 이 경우 <a href="../docs/#api/ko/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>가
 적당하겠네요. 이런 곡선은 각 정점을 지나는 부드러운 곡선을 만든다는 것이
 특징입니다.</p>
 <p>만약 위 정점으로 곡선을 생성하면 다음 그림과 같은 곡선이 생길 겁니다.</p>
@@ -320,7 +320,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 
 <p>모서리가 각지면 좀 더 깔끔할 듯하네요. 정점을 몇 개 더 추가해 원하는
 결과를 만들어봅시다. 각 정점 짝마다 10% 아래에 하나, 두 정점 사이 90%
-지점에 하나를 새로 만들어 <a href="/docs/#api/ko/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>에 넘겨주겠습니다.</p>
+지점에 하나를 새로 만들어 <a href="../docs/#api/ko/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>에 넘겨주겠습니다.</p>
 <p>우리가 원하는 곡선은 다음과 같죠.</p>
 <div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
 
@@ -580,7 +580,7 @@ for (const car of loadedCars.children.slice()) {
 <p></p>
 <p>몇 분 투자한 것 치고는 괜찮은 결과물이네요!</p>
 <p>마지막으로 그림자까지 추가하면 완벽할 것 같습니다.</p>
-<p><a href="shadows.html">그림자에 관한 글</a>의 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> 그림자 예제를 가져와
+<p><a href="shadows.html">그림자에 관한 글</a>의 <a href="../docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> 그림자 예제를 가져와
 그대로 코드에 붙여 넣습니다.</p>
 <p>그리고 파일을 불러온 뒤, 모든 요소의 그림자 설정을 켜줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{

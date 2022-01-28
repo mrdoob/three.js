@@ -23,7 +23,7 @@
           <p>本文是关于 three.js 系列文章的一部分。第一篇文章是 <a href="fundamentals.html">three.js 基础</a>。如果你还没看过而且对three.js 还不熟悉，那应该从那里开始，并且了解如何<a href="setup.html">设置开发环境</a>。上一篇文章介绍了 three.js 中的 <a href="textures.html">纹理</a>。</p>
 <p>我们开始谈谈three.js中的摄像机. 我们已经在<a href="fundamentals.html">第一篇文章</a> 中涉及到了摄像机的一些知识, 这里我们要更深入一些. </p>
 <p>在three.js中最常用的摄像机并且之前我们一直用的摄像机是<code class="notranslate" translate="no">透视摄像机 PerspectiveCamera</code>, 它可以提供一个近大远小的3D视觉效果. </p>
-<p><a href="/docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> 定义了一个 <em>视锥frustum</em>. <a href="https://en.wikipedia.org/wiki/Frustum"><em>frustum</em> 是一个切掉顶的三角锥或者说实心金字塔型</a>.
+<p><a href="../docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> 定义了一个 <em>视锥frustum</em>. <a href="https://en.wikipedia.org/wiki/Frustum"><em>frustum</em> 是一个切掉顶的三角锥或者说实心金字塔型</a>.
 说到<em>实心体solid</em>, 在这里通常是指一个立方体, 一个圆锥, 一个球, 一个圆柱或锥台.</p>
 <div class="spread">
   <div><div data-diagram="shapeCube"></div><div>立方体</div></div>
@@ -34,7 +34,7 @@
 </div>
 
 <p>重新讲一遍这些东西是因为我好久没有在意过了. 很多书或者文章提到<em>锥台</em>这个东西的时候我扫一眼就过去了. 再了解一下不同几何体会让下面的一些表述变得更为感性...吧😅</p>
-<p><a href="/docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>通过四个属性来定义一个视锥. <code class="notranslate" translate="no">near</code>定义了视锥的前端, <code class="notranslate" translate="no">far</code>定义了后端, <code class="notranslate" translate="no">fov</code>是视野, 通过计算正确的高度来从摄像机的位置获得指定的以<code class="notranslate" translate="no">near</code>为单位的视野, 定义的是视锥的前端和后端的高度. <code class="notranslate" translate="no">aspect</code>间接地定义了视锥前端和后端的宽度, 实际上视锥的宽度是通过高度乘以aspect来得到的. </p>
+<p><a href="../docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>通过四个属性来定义一个视锥. <code class="notranslate" translate="no">near</code>定义了视锥的前端, <code class="notranslate" translate="no">far</code>定义了后端, <code class="notranslate" translate="no">fov</code>是视野, 通过计算正确的高度来从摄像机的位置获得指定的以<code class="notranslate" translate="no">near</code>为单位的视野, 定义的是视锥的前端和后端的高度. <code class="notranslate" translate="no">aspect</code>间接地定义了视锥前端和后端的宽度, 实际上视锥的宽度是通过高度乘以aspect来得到的. </p>
 <p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
 <p>我们借用<a href="lights.html">上一篇文章</a>的场景. 其中包含一个地平面, 一个球和一个立方体, 我们可以在其中调整摄像机的设置. 
 ·
@@ -73,7 +73,7 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
 gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
 </pre>
-<p>任何时候摄像机的设置变动, 我们需要调用摄像机的<a href="/docs/#api/zh/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a>来更新设置. 我们写一个函数<code class="notranslate" translate="no">updataCamera</code>, 当lil-gui改变了属性的时候会调用它来更新参数. </p>
+<p>任何时候摄像机的设置变动, 我们需要调用摄像机的<a href="../docs/#api/zh/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a>来更新设置. 我们写一个函数<code class="notranslate" translate="no">updataCamera</code>, 当lil-gui改变了属性的时候会调用它来更新参数. </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../cameras-perspective.html"></iframe></div>
   <a class="threejs_center" href="../examples/cameras-perspective.html" target="_blank">点击此处在新标签页中打开</a>
@@ -83,7 +83,7 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
 <p>现在可以调整这些数值来观察这些参数是如何影响摄像机的. 注意我们并没有改变<code class="notranslate" translate="no">aspect</code>, 因为这个参数来自于窗口的大小. 如果想调整<code class="notranslate" translate="no">aspect</code>, 只需要开个新窗口然后调整窗口大小就可以了. </p>
 <p>即便是这样, 观察参数对视野的影响还是挺麻烦的. 所以我们来设置两台摄像机吧! 一台是跟上面一样展现出摄像机中看到的实际场景, 另一个则是用来观察这个实际工作的摄像机, 然后画出摄像机的视锥. </p>
 <p>我们需要用到three.js的剪函数(scissor function)来画两个场景和两个摄像机. </p>
-<p>首先让我们用HTML和CSS来定义两个肩并肩的元素. 这也将帮助我们将两个摄像机赋予不同的<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. </p>
+<p>首先让我们用HTML和CSS来定义两个肩并肩的元素. 这也将帮助我们将两个摄像机赋予不同的<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. </p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div class="split"&gt;
@@ -106,7 +106,7 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
   height: 100%;
 }
 </pre>
-<p>接下来将添加一个<a href="/docs/#api/zh/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>, 它可以把摄像机的视锥画出来</p>
+<p>接下来将添加一个<a href="../docs/#api/zh/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>, 它可以把摄像机的视锥画出来</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(camera);
 
 ...
@@ -117,11 +117,11 @@ scene.add(cameraHelper);
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const view1Elem = document.querySelector('#view1');
 const view2Elem = document.querySelector('#view2');
 </pre>
-<p>现在只给第一个视窗中的摄像机分配<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a></p>
+<p>现在只给第一个视窗中的摄像机分配<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const controls = new OrbitControls(camera, canvas);
 +const controls = new OrbitControls(camera, view1Elem);
 </pre>
-<p>我们定义第二个<a href="/docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>和<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. </p>
+<p>我们定义第二个<a href="../docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>和<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera2 = new THREE.PerspectiveCamera(
   60,  // fov
   2,   // aspect
@@ -280,7 +280,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p>以防你的机器太好出现不了我说的情况, 我把我看到的截图放在这</p>
 <div class="threejs_center"><img src="../resources/images/z-fighting.png" style="width: 570px;"></div>
 
-<p>解决的方法之一是告诉three.js使用不同的方法计算像素的前后关系. 我们可以在创建<a href="/docs/#api/zh/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>时开启<code class="notranslate" translate="no">logarithmicDepthBuffer</code></p>
+<p>解决的方法之一是告诉three.js使用不同的方法计算像素的前后关系. 我们可以在创建<a href="../docs/#api/zh/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>时开启<code class="notranslate" translate="no">logarithmicDepthBuffer</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
@@ -300,7 +300,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p>所以说你需要选择好好抉择<code class="notranslate" translate="no">near</code>和<code class="notranslate" translate="no">far</code>的设置, 来和你的场景配合. 既不丢失重要的近景, 也不让远处的东西消失不见. 如果你想渲染一个巨大的场景, 不但能看清面前的人的眼睫毛又想看到50公里以外的玩意, 你得自己想一个<em>厉害的</em>方案, 这里就不涉及了. 现在, 好好地选个需要的参数就行. </p>
 <p>第二种常见的摄像机是<code class="notranslate" translate="no">正交摄像机 OrthographicCamera</code>, 和指定一个视锥不同的是, 它需要设置<code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>
 <code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, 和<code class="notranslate" translate="no">far</code>指定一个长方体, 使得视野是平行的而不是透视的. </p>
-<p>我们来把上面的例子改成<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>, 首先来设置摄像机</p>
+<p>我们来把上面的例子改成<a href="../docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>, 首先来设置摄像机</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -1;
 const right = 1;
 const top = 1;
@@ -315,7 +315,7 @@ camera.zoom = 0.2;
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 +gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
 </pre>
-<p><code class="notranslate" translate="no">listen</code>调用告诉lil-gui去监视属性的变化. 写在这里是因为<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>同样可以控制缩放. 在这个例子中, 鼠标滚轮将会通过<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>控件来控制缩放. </p>
+<p><code class="notranslate" translate="no">listen</code>调用告诉lil-gui去监视属性的变化. 写在这里是因为<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>同样可以控制缩放. 在这个例子中, 鼠标滚轮将会通过<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>控件来控制缩放. </p>
 <p>最后更改aspect然后更新摄像机</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const aspect = setScissorForElement(view1Elem);
@@ -334,14 +334,14 @@ camera.zoom = 0.2;
   renderer.render(scene, camera);
 }
 </pre>
-<p>现在就可以看到<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>工作了. </p>
+<p>现在就可以看到<a href="../docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>工作了. </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../cameras-orthographic-2-scenes.html"></iframe></div>
   <a class="threejs_center" href="../examples/cameras-orthographic-2-scenes.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
-<p>大多数情况下, 绘制2D图像的时候会用到<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>. 你可以自己决定摄像机的视野大小. 比如说你想让canvas的一个像素匹配摄像机的一个单位, 你可以这么做</p>
+<p>大多数情况下, 绘制2D图像的时候会用到<a href="../docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>. 你可以自己决定摄像机的视野大小. 比如说你想让canvas的一个像素匹配摄像机的一个单位, 你可以这么做</p>
 <p>将原点置于中心, 令一个像素等于一个单位</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">camera.left = -canvas.width / 2;
 camera.right = canvas.width / 2;
@@ -371,7 +371,7 @@ const far = 1;
 const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
 camera.zoom = 1;
 </pre>
-<p>然后我们载入六个材质, 生成六个平面, 一一对应. 把每一个平面绑定到父对象<a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>上, 以便调整每个平面和左上角原点的相对关系</p>
+<p>然后我们载入六个材质, 生成六个平面, 一一对应. 把每一个平面绑定到父对象<a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>上, 以便调整每个平面和左上角原点的相对关系</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 const textures = [
   loader.load('resources/images/flower-1.jpg'),
@@ -409,7 +409,7 @@ const planes = textures.map((texture) =&gt; {
 
   ...
 </pre>
-<p><code class="notranslate" translate="no">planes</code> 是<a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a>的数组, 每一个对应一个平面. 
+<p><code class="notranslate" translate="no">planes</code> 是<a href="../docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a>的数组, 每一个对应一个平面. 
 现在让它随着时间移动</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;  // 转换为秒;
@@ -449,7 +449,7 @@ const planes = textures.map((texture) =&gt; {
 </div>
 
 <p></p>
-<p>另一个常见的用途是用<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>来展示模型的三视图.</p>
+<p>另一个常见的用途是用<a href="../docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>来展示模型的三视图.</p>
 <div class="threejs_center"><img src="../resources/images/quad-viewport.png" style="width: 574px;"></div>
 
 <p>上面的截图展示了一个透视图和三个正交视角.</p>

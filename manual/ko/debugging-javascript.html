@@ -137,7 +137,7 @@ zElem.textContent = someObject.position.z.toFixed(3);
 }
 </pre>
 <p>간단한 예제를 하나 만들어봅시다. 화면을 클릭했을 때 포인터 위치에 mesh를 만들고 2초 동안 무작위 방향으로 움직인 후 사라지도록 하겠습니다. 먼저 <a href="responsive.html">반응형 디자인</a>에서 썼던 예제를 가져옵니다.</p>
-<p>아래는 화면을 클릭할 때마다 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 추가하는 코드입니다.</p>
+<p>아래는 화면을 클릭할 때마다 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 추가하는 코드입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry();
 const material = new THREE.MeshBasicMaterial({ color: 'red' });
 
@@ -273,11 +273,11 @@ if (debug) {
 <div class="threejs_center"><img class="border" src="../resources/images/nan-banana.png" style="width: 180px;"></div>
 
 <p>저도 무언가를 만들다 화면에 아무것도 보이는 게 없으면 <code class="notranslate" translate="no">NaN</code>이 있는지 확인합니다. 만약 <code class="notranslate" translate="no">NaN</code>이 있다면 해당 부분부터 다시 살펴 보기 시작하죠.</p>
-<p><a href="load-gltf.html">glTF 파일 불러오기</a>에서 처음 패스를 그렸을 때 <a href="/docs/#api/ko/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> 클래스로 2D 곡선을 만들었던 것, 기억하나요?</p>
+<p><a href="load-gltf.html">glTF 파일 불러오기</a>에서 처음 패스를 그렸을 때 <a href="../docs/#api/ko/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> 클래스로 2D 곡선을 만들었던 것, 기억하나요?</p>
 <p>처음에 이 곡선을 이용해 자동차를 움직였었죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">curve.getPointAt(zeroToOnePointOnCurve, car.position);
 </pre>
-<p>이때 <code class="notranslate" translate="no">curve.getPointAt</code>은 내부적으로 두 번째 인자로 넘겨준 객체의 <code class="notranslate" translate="no">set</code> 메서드를 호출합니다. 이 경우 인자로 넘겨준 객체는 <code class="notranslate" translate="no">car.position</code>, <a href="/docs/#api/ko/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>이죠. <a href="/docs/#api/ko/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>의 <code class="notranslate" translate="no">set</code> 메서드에는 x, y, z 세 가지 인자를 넘겨줘야 합니다. 하지만 <a href="/docs/#api/ko/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>는 2D이기에 <code class="notranslate" translate="no">car.position.set</code> 메서드에 x와 y 값만 넘겨줍니다.</p>
+<p>이때 <code class="notranslate" translate="no">curve.getPointAt</code>은 내부적으로 두 번째 인자로 넘겨준 객체의 <code class="notranslate" translate="no">set</code> 메서드를 호출합니다. 이 경우 인자로 넘겨준 객체는 <code class="notranslate" translate="no">car.position</code>, <a href="../docs/#api/ko/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>이죠. <a href="../docs/#api/ko/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>의 <code class="notranslate" translate="no">set</code> 메서드에는 x, y, z 세 가지 인자를 넘겨줘야 합니다. 하지만 <a href="../docs/#api/ko/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>는 2D이기에 <code class="notranslate" translate="no">car.position.set</code> 메서드에 x와 y 값만 넘겨줍니다.</p>
 <p>이러면 x, y의 값은 넘겨 받은 값으로 지정되나, z는 <code class="notranslate" translate="no">undefined</code>로 지정될 겁니다.</p>
 <p>디버거에서 자동차의 <code class="notranslate" translate="no">matrixWorld</code>를 살펴 보니 <code class="notranslate" translate="no">NaN</code>으로 지정된 값이 많이 보입니다.</p>
 <div class="threejs_center"><img class="border" src="../resources/images/debugging-nan.gif" style="width: 476px;"></div>
@@ -324,7 +324,7 @@ requestAnimationFrame(render);
 <li>캔버스를 리사이징하는 코드</li>
 <li>자동차가 경로를 따라 움직이도록 하는 코드</li>
 </ol>
-<p>꽤 많은 양의 코드네요. 만약 오로지 경로를 따라가는 부분에 대해서만 질문할 거라면 <code class="notranslate" translate="no">&lt;canvas&gt;</code>와 <code class="notranslate" translate="no">&lt;script&gt;</code>를 제외한 나머지 HTML은 없어도 될 겁니다. .gltf 파일도 마찬가지로 불필요하죠. 조명과 그림자를 없애고 <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용할 수도, lil-gui를 제거할 수도 있습니다. 차라리 <a href="/docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>를 쓰는 게 훨씬 간단하겠네요. 마지막으로 물체가 경로를 따라 움직이는 부분만 질문하니 자동차 대신 육면체를 써도 될 겁니다.</p>
+<p>꽤 많은 양의 코드네요. 만약 오로지 경로를 따라가는 부분에 대해서만 질문할 거라면 <code class="notranslate" translate="no">&lt;canvas&gt;</code>와 <code class="notranslate" translate="no">&lt;script&gt;</code>를 제외한 나머지 HTML은 없어도 될 겁니다. .gltf 파일도 마찬가지로 불필요하죠. 조명과 그림자를 없애고 <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용할 수도, lil-gui를 제거할 수도 있습니다. 차라리 <a href="../docs/#api/ko/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>를 쓰는 게 훨씬 간단하겠네요. 마지막으로 물체가 경로를 따라 움직이는 부분만 질문하니 자동차 대신 육면체를 써도 될 겁니다.</p>
 <p>아래는 위 요소를 모두 고려한 예제입니다. 원래 271줄이었던 코드를 135줄로 줄였죠. 21개 점으로 이루어진 복잡한 경로 대신 3개 혹은 4개의 점만 사용하는 간단한 경로를 사용해 코드를 더 줄일 수도 있을 겁니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../debugging-mcve.html"></iframe></div>
@@ -338,14 +338,14 @@ requestAnimationFrame(render);
 <p>또한 스택 오버플로우에서 질문글을 올릴 때 <strong><a href="https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/">코드의 일부분(snippet)</a>을 올리는 것</strong>도 굉장히 중요합니다. 물론 JSFiddle이나 Codepen 또는 비슷한 사이트를 써 여러분이 만든 MVCE를 테스트하게끔 할 수도 있죠. 하지만 스택 오버플로우에서 글 쓰기를 눌러보면 <strong>질문 자체</strong>에 코드 일부를 붙여넣는 게 필수 조건라는 것을 알 수 있습니다. 코드의 일부분을 집어 넣어야만 해당 조건이 만족되죠.</p>
 <p>혹시나 해서 말해두지만, 이 사이트의 예제들로 질문할 때는 코드의 모든 부분을 확인해야 합니다. HTML, CSS, 자바스크립트를 전부 <a href="https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/">스니펫(snippet) 에디터</a>에 넣으면 되죠. 추가로 궁금한 부분과 관련된 코드만 남기고 나머지는 없애 코드를 최소한으로 만드는 것만 기억하기 바랍니다.</p>
 <p>이 정도만 따르면 질문에 대한 답변을 받는 게 그다지 어렵지 않을 겁니다.</p>
-<h2 id="-meshbasicmaterial-"><a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용하라</h2>
-<p><a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>은 조명의 영향을 받지 않습니다. 때문에 재질(material)을 이걸로 바꾸면 보이지 않았던 물체가 보이는 경우가 있죠. 만약 어떤 물체가 <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 적용했을 때는 잘 나타나는데 다른 재질로 바꾸면 나타나지 않는다면, 해당 문제는 재질이나 조명 또는 다른 외부 요소 때문일 겁니다.</p>
+<h2 id="-meshbasicmaterial-"><a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용하라</h2>
+<p><a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>은 조명의 영향을 받지 않습니다. 때문에 재질(material)을 이걸로 바꾸면 보이지 않았던 물체가 보이는 경우가 있죠. 만약 어떤 물체가 <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 적용했을 때는 잘 나타나는데 다른 재질로 바꾸면 나타나지 않는다면, 해당 문제는 재질이나 조명 또는 다른 외부 요소 때문일 겁니다.</p>
 <h2 id="-near-far-">카메라의 <code class="notranslate" translate="no">near</code>와 <code class="notranslate" translate="no">far</code> 설정을 확인하라</h2>
-<p><a href="cameras.html">카메라에 관한 글</a>에서 다뤘듯, <a href="/docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>에는 <code class="notranslate" translate="no">near</code>와 <code class="notranslate" translate="no">far</code> 설정이 있습니다. 다른 것보다 먼저 장면 요소를 전부 담을 수 있도록 이 값들을 설정하세요. <strong>임시로라도</strong> <code class="notranslate" translate="no">near</code>를 0.001, <code class="notranslate" translate="no">far</code>를 1000000 등 임의의 큰 값으로 설정한다면 깊이에 따른 해상도 문제가 나타날 겁니다. 오직 카메라에 가까운 물체만 제대로 보이겠죠.</p>
+<p><a href="cameras.html">카메라에 관한 글</a>에서 다뤘듯, <a href="../docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>에는 <code class="notranslate" translate="no">near</code>와 <code class="notranslate" translate="no">far</code> 설정이 있습니다. 다른 것보다 먼저 장면 요소를 전부 담을 수 있도록 이 값들을 설정하세요. <strong>임시로라도</strong> <code class="notranslate" translate="no">near</code>를 0.001, <code class="notranslate" translate="no">far</code>를 1000000 등 임의의 큰 값으로 설정한다면 깊이에 따른 해상도 문제가 나타날 겁니다. 오직 카메라에 가까운 물체만 제대로 보이겠죠.</p>
 <h2 id="-">장면이 카메라 앞에 있는지 확인하라</h2>
 <p>장면이 화면에 나타나지 않는 경우, 장면이 카메라 앞에 없는 게 원인일 때도 있습니다. 만약 카메라를 조작할 수 없다면 <code class="notranslate" translate="no">OrbitController</code> 같은 액션을 추가해 카메라를 돌려 보기 바랍니다. 또는 제가 <a href="load-obj.html">이 글</a>에서 다뤘던 것처럼 카메라가 장면 전체를 담도록 해보세요. 제가 저 글에서 쓴 코드는 장면의 요소를 찾아 해당 요소를 전부 담도록 카메라의 위치와 <code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code> 값을 조정합니다. 저 코드에서 디버거를 사용하거나, <code class="notranslate" translate="no">console.log</code>를 추가해 요소의 크기나 장면의 중점을 출력해 볼 수도 있죠.</p>
 <h2 id="-">뭐든 카메라 앞에 배치해봐라</h2>
-<p>이건 문제가 생겼는데 어떤 점이 문제일지 모를 때, 하나씩 천천히 요소를 추가해보라는 말입니다. 만약 코드를 실행했는데 장면에 아무것도 보이지 않는다면 카메라 바로 앞에 간단한 요소를 배치해보세요. 구체나 육면체를 만들어 <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> 같이 단순한 재질을 지정해 화면에 제대로 뜨는지 확인하는 겁니다. 그런 다음 시간을 들여 다른 요소들을 하나하나 추가해 나가는 거죠. 이러다보면 버그가 다시 나타나거나 어떤 게 문제인지 알 수 있을 겁니다.</p>
+<p>이건 문제가 생겼는데 어떤 점이 문제일지 모를 때, 하나씩 천천히 요소를 추가해보라는 말입니다. 만약 코드를 실행했는데 장면에 아무것도 보이지 않는다면 카메라 바로 앞에 간단한 요소를 배치해보세요. 구체나 육면체를 만들어 <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> 같이 단순한 재질을 지정해 화면에 제대로 뜨는지 확인하는 겁니다. 그런 다음 시간을 들여 다른 요소들을 하나하나 추가해 나가는 거죠. 이러다보면 버그가 다시 나타나거나 어떤 게 문제인지 알 수 있을 겁니다.</p>
 <hr>
 <p>여기까지 자바스크립트를 디버깅하는 몇 가지 팁을 살펴봤습니다. 다음 글에서는 <a href="debugging-glsl.html">GLSL을 디버깅하는 몇 가지 팁</a>에 대해 알아보겠습니다.</p>
 

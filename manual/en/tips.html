@@ -129,7 +129,7 @@ elem.addEventListener('click', () =&gt; {
 <h1 id="preventing-the-canvas-being-cleared">Preventing the canvas being cleared</h1>
 <p>Let's say you wanted to let the user paint with an animated
 object. You need to pass in <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> when
-you create the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. This prevents the browser from
+you create the <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. This prevents the browser from
 clearing the canvas. You also need to tell three.js not to clear
 the canvas as well.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
@@ -220,8 +220,8 @@ canvas has both solutions applied.</p>
 <p><a id="transparent-canvas" data-toc="Make the Canvas Transparent"></a></p>
 <h1 id="making-the-canvas-transparent">Making the Canvas Transparent</h1>
 <p>By default THREE.js makes the canvas opaque. If you want the
-canvas to be transparent pass in <a href="/docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> when you create
-the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
+canvas to be transparent pass in <a href="../docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> when you create
+the <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
 -const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
@@ -238,8 +238,8 @@ const renderer = new THREE.WebGLRenderer({
 });
 </pre>
 <p>Three.js defaults to the canvas using
-<a href="/docs/#api/en/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a> but defaults
-to materials outputting <a href="/docs/#api/en/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>.</p>
+<a href="../docs/#api/en/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a> but defaults
+to materials outputting <a href="../docs/#api/en/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>.</p>
 <p>If you'd like a better understanding of when and when not to use premultiplied alpha
 here's <a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre">a good article on it</a>.</p>
 <p>In any case let's setup a simple example with a transparent canvas.</p>

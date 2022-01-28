@@ -62,12 +62,12 @@ do is load them.</p>
 <p>We covered <a href="load-gltf.html">loading glTF files before</a>. 
 The difference this time is we need to load multiple models and
 we can't start the game until all the models are loaded.</p>
-<p>Fortunately three.js provides the <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> just for this purpose.
-We create a <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> and pass it to the other loaders. The
-<a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> provides both <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> and 
-<a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> properties we can attach callbacks to.
-The <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> callback will be called when
-all files have been loaded. The <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> callback
+<p>Fortunately three.js provides the <a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> just for this purpose.
+We create a <a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> and pass it to the other loaders. The
+<a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> provides both <a href="../docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> and 
+<a href="../docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> properties we can attach callbacks to.
+The <a href="../docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> callback will be called when
+all files have been loaded. The <a href="../docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> callback
 as called after each individual file arrives to give as a chance to show
 loading progress.</p>
 <p>Starting with the code from <a href="load-gltf.html">loading a glTF file</a> I removed all
@@ -97,9 +97,9 @@ function init() {
   // TBD
 }
 </pre>
-<p>This code will load all the models above and the <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> will call
+<p>This code will load all the models above and the <a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> will call
 <code class="notranslate" translate="no">init</code> when done. We'll use the <code class="notranslate" translate="no">models</code> object later to let us access the
-loaded models so the <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> callback for each individual model attaches
+loaded models so the <a href="../docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> callback for each individual model attaches
 the loaded data to that model's info.</p>
 <p>All the models with all their animation are currently about 6.6meg. That's a
 pretty big download. Assuming your server supports compression (the server this
@@ -107,7 +107,7 @@ site runs on does) it's able to compress them to around 1.4meg. That's
 definitely better than 6.6meg bit it's still not a tiny amount of data. It would
 probably be good if we added a progress bar so the user has some idea how much
 longer they have to wait.</p>
-<p>So, let's add an <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> callback. It will be
+<p>So, let's add an <a href="../docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> callback. It will be
 called with 3 arguments, the <code class="notranslate" translate="no">url</code> of the last loaded object and then the number
 of items loaded so far as well as the total number of items.</p>
 <p>Let's setup some HTML for a loading bar</p>
@@ -246,15 +246,15 @@ import {GLTFLoader} from '/examples/jsm/loaders/GLTFLoader.js';
 }
 </pre>
 <p>Above, for each model, we clone the <code class="notranslate" translate="no">gltf.scene</code> we loaded and we parent that
-to a new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. We need to parent it to another object because when
+to a new <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. We need to parent it to another object because when
 we play animations the animation will apply animated positions to the nodes
 in the loaded scene which means we won't have control over those positions.</p>
-<p>To play the animations each model we clone needs an <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>.
-An <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> contains 1 or more <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s. An
-<a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> references an <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
+<p>To play the animations each model we clone needs an <a href="../docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>.
+An <a href="../docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> contains 1 or more <a href="../docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s. An
+<a href="../docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> references an <a href="../docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. <a href="../docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
 have all kinds of settings for playing then chaining to another
 action or cross fading between actions. Let's just get the first 
-<a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> and create an action for it. The default is for
+<a href="../docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> and create an action for it. The default is for
 an action to play its clip in a loop forever.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const mixers = [];
 
@@ -280,10 +280,10 @@ function init() {
   });
 }
 </pre>
-<p>We called <a href="/docs/#api/en/animation/AnimationAction#play"><code class="notranslate" translate="no">play</code></a> to start the action and stored
+<p>We called <a href="../docs/#api/en/animation/AnimationAction#play"><code class="notranslate" translate="no">play</code></a> to start the action and stored
 off all the <code class="notranslate" translate="no">AnimationMixers</code> in an array called <code class="notranslate" translate="no">mixers</code>. Finally
-we need to update each <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> in our render loop by computing
-the time since the last frame and passing that to <a href="/docs/#api/en/animation/AnimationMixer.update"><code class="notranslate" translate="no">AnimationMixer.update</code></a>.</p>
+we need to update each <a href="../docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> in our render loop by computing
+the time since the last frame and passing that to <a href="../docs/#api/en/animation/AnimationMixer.update"><code class="notranslate" translate="no">AnimationMixer.update</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let then = 0;
 function render(now) {
 +  now *= 0.001;  // convert to seconds
@@ -363,9 +363,9 @@ function init() {
 +  });
 +}
 </pre>
-<p>The code above makes an array of <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s,
-one for each <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. It makes an array of objects, <code class="notranslate" translate="no">mixerInfos</code>,
-with references to the <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> and all the <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s 
+<p>The code above makes an array of <a href="../docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s,
+one for each <a href="../docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. It makes an array of objects, <code class="notranslate" translate="no">mixerInfos</code>,
+with references to the <a href="../docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> and all the <a href="../docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s 
 for each model. It then calls <code class="notranslate" translate="no">playNextAction</code> which sets <code class="notranslate" translate="no">enabled</code> on
 all but one action for that mixer.</p>
 <p>We need to update the render loop for the new array</p>
@@ -395,7 +395,7 @@ to cycle each of the models through their available animations.</p>
 <p>So that is arguably the sum-total of the three.js portion of this
 article. We covered loading multiple files, cloning skinned models,
 and playing animations on them. In a real game you'd have to do a
-ton more manipulation of <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> objects.</p>
+ton more manipulation of <a href="../docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> objects.</p>
 <p>Let's start making a game infrastructure</p>
 <p>A common pattern for making a modern game is to use an
 <a href="https://www.google.com/search?q=entity+component+system">Entity Component System</a>.
@@ -403,7 +403,7 @@ In an Entity Component System an object in a game is called an <em>entity</em> t
 of a bunch of <em>components</em>. You build up entities by deciding which components to
 attach to them. So, let's make an Entity Component System.</p>
 <p>We'll call our entities <code class="notranslate" translate="no">GameObject</code>. It's effectively just a collection
-of components and a three.js <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>.</p>
+of components and a three.js <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function removeArrayElement(array, element) {
   const ndx = array.indexOf(element);
   if (ndx &gt;= 0) {
@@ -593,8 +593,8 @@ takes the name of the animation to play and plays it.</p>
 }
 </pre>
 <p>You can see it's basically the code we had before that clones the scene we loaded,
-then sets up an <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>. <code class="notranslate" translate="no">setAnimation</code> adds a <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> for a 
-particular <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> if one does not already exist and disables all
+then sets up an <a href="../docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>. <code class="notranslate" translate="no">setAnimation</code> adds a <a href="../docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> for a 
+particular <a href="../docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> if one does not already exist and disables all
 existing actions.</p>
 <p>The code references <code class="notranslate" translate="no">globals.deltaTime</code>. Let's make a globals object</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
@@ -870,8 +870,8 @@ class Player extends Component {
 +  }
 }
 </pre>
-<p>The code above uses <a href="/docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> to move the player
-forward. <a href="/docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> works in local space so it only
+<p>The code above uses <a href="../docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> to move the player
+forward. <a href="../docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> works in local space so it only
 works if the object in question is at the root of the scene, not if it's
 parented to something else <a class="footnote" href="#parented" id="parented-backref">1</a></p>
 <p>We also added a global <code class="notranslate" translate="no">moveSpeed</code> and based a <code class="notranslate" translate="no">turnSpeed</code> on the move speed.
@@ -883,7 +883,7 @@ turn speed for a given move speed. I just guessed.</p>
 <p>The code so far would work but if the player runs off the screen there's no
 way to find out where they are. Let's make it so if they are offscreen
 for more than a certain time they get teleported back to the origin.
-We can do that by using the three.js <a href="/docs/#api/en/math/Frustum"><code class="notranslate" translate="no">Frustum</code></a> class to check if a point
+We can do that by using the three.js <a href="../docs/#api/en/math/Frustum"><code class="notranslate" translate="no">Frustum</code></a> class to check if a point
 is inside the camera's view frustum.</p>
 <p>We need to build a frustum from the camera. We could do this in the Player
 component but other objects might want to use this too so let's add another
@@ -1127,7 +1127,7 @@ an <code class="notranslate" translate="no">Animal</code> component.</p>
   }
 }
 </pre>
-<p>The code above sets the <a href="/docs/#api/en/animation/AnimationMixer.timeScale"><code class="notranslate" translate="no">AnimationMixer.timeScale</code></a> to set the playback
+<p>The code above sets the <a href="../docs/#api/en/animation/AnimationMixer.timeScale"><code class="notranslate" translate="no">AnimationMixer.timeScale</code></a> to set the playback
 speed of the animations relative to the move speed. This way if we
 adjust the move speed the animation will speed up or slow down as well.</p>
 <p>To start we could setup one of each type of animal</p>
@@ -1395,7 +1395,7 @@ and change that later.</p>
 but of course that was no good as the pug is much smaller than the horse.
 So I added the difference sizes but I wanted to be able to visualize
 things. To do that I made a <code class="notranslate" translate="no">StatusDisplayHelper</code> component.</p>
-<p>I uses a <a href="/docs/#api/en/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a> to draw a circle around each character
+<p>I uses a <a href="../docs/#api/en/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a> to draw a circle around each character
 and it uses html elements to let each character show some status using
 the techniques covered in <a href="align-html-elements-to-3d.html">the article on aligning html elements to 3D</a>.</p>
 <p>First we need to add some HTML to host these elements</p>
@@ -1748,7 +1748,7 @@ const noteTexture = makeTextTexture('♪');
 <p>The texture we create above is white each means when we use it
 we can set the material's color and get a note of any color.</p>
 <p>Now that we have a noteTexture here's the <code class="notranslate" translate="no">Note</code> component.
-It uses <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a> and a <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a> like we covered in
+It uses <a href="../docs/#api/en/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a> and a <a href="../docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a> like we covered in
 <a href="billboards.html">the article on billboards</a> </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Note extends Component {
   constructor(gameObject) {
@@ -1783,9 +1783,9 @@ It uses <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslat
   }
 }
 </pre>
-<p>All it does is setup a <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>, then pick a random velocity and move
+<p>All it does is setup a <a href="../docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>, then pick a random velocity and move
 the transform at that velocity for 60 frames while fading out the note
-by setting the material's <a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>. 
+by setting the material's <a href="../docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>. 
 After the loop it the removes the transform
 from the scene and the note itself from active gameobjects.</p>
 <p>One last thing, let's add a few more animals</p>

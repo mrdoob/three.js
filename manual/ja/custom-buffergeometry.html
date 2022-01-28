@@ -19,11 +19,11 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p><a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>は全てのジオメトリを表現する方法です。
-BufferGeometryは<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を使います。１つの<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>はジオメトリを作るための１種類のデータに対応しています。vertexの位置情報を格納するための<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>、color情報を格納するための<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>、normal情報を格納するための<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>がそれぞれあります。</p>
+          <p><a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>は全てのジオメトリを表現する方法です。
+BufferGeometryは<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を使います。１つの<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>はジオメトリを作るための１種類のデータに対応しています。vertexの位置情報を格納するための<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>、color情報を格納するための<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>、normal情報を格納するための<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>がそれぞれあります。</p>
 <div class="threejs_center"><img src="../resources/threejs-attributes.svg" style="width: 700px"></div>
 
-<p>上の図では<code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">color</code>, <code class="notranslate" translate="no">uv</code>それぞれのattribute情報を格納した<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を表しています。これらは<em>並列な配列</em>です。<em>並列な配列</em>というのはN番目にあるデータはN番目のvertexに対応しており、それがattributeの数だけあるという意味です。図ではindex=4のattributeがハイライトされています。</p>
+<p>上の図では<code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">color</code>, <code class="notranslate" translate="no">uv</code>それぞれのattribute情報を格納した<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を表しています。これらは<em>並列な配列</em>です。<em>並列な配列</em>というのはN番目にあるデータはN番目のvertexに対応しており、それがattributeの数だけあるという意味です。図ではindex=4のattributeがハイライトされています。</p>
 <div class="threejs_center"><img src="../resources/cube-faces-vertex.svg" style="width: 500px"></div>
 
 <p>上の図のハイライトされたvertexには、このvertexに接する全ての面に異なるnormalが必要です。normalとはどの方向を向いているかの情報です。
@@ -33,7 +33,7 @@ UVはテクスチャのどの部分に頂点位置が対応しているか指定
 緑の面はFテクスチャの右上に対応するUV、青い面は左上に対応するUV、赤の面は左下に対応したUVが必要な事が分かります。</p>
 <p>単一のvertexはこれらの情報の合成として表現されます。
 頂点が異なる部分を必要とする場合、それは異なる頂点でなければなりません。</p>
-<p>簡単な例として<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を使って立方体を作ってみましょう。立方体を例にするのはvertexがfaceによって共有されているように見えて実は共有されていないからです。この例ではまずすべてのvertexの情報をリストアップして並列の配列に変換して<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を作り、最後に<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を作ります。</p>
+<p>簡単な例として<a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を使って立方体を作ってみましょう。立方体を例にするのはvertexがfaceによって共有されているように見えて実は共有されていないからです。この例ではまずすべてのvertexの情報をリストアップして並列の配列に変換して<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を作り、最後に<a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を作ります。</p>
 <p>立方体に必要な情報をすべてリストアップします。<code class="notranslate" translate="no">Geometry</code>では１つのvertexを複数のfaceで共有できましたが今回は共有できないことに注意してください。つまり１つの立方体を作るために３６個のvertexが必要になります。１つの面につき２つの三角形、１つの三角形につき３つのvertex、これが６面あるので３６個のvertexが必要になる計算です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertices = [
   // front
@@ -97,7 +97,7 @@ for (const vertex of vertices) {
   uvs.push(...vertex.uv);
 }
 </pre>
-<p>最後にそれぞれの配列に対して<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を作り<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>に指定します。</p>
+<p>最後にそれぞれの配列に対して<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を作り<a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>に指定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const geometry = new THREE.BufferGeometry();
   const positionNumComponents = 3;
   const normalNumComponents = 3;
@@ -113,7 +113,7 @@ for (const vertex of vertices) {
       new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
 </pre>
 <p>名前の付け方に注意してください。three.jsで決められている名前以外を指定することはできません（カスタムシェーダーを使用する場合は別です）。<code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">uv</code>はthree.jsで決められている名前です。ここでは指定していませんが<code class="notranslate" translate="no">color</code>も指定可能です。</p>
-<p>上の例では<code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code>, <code class="notranslate" translate="no">uvs</code>の３つのJavaScriptのネイティブ配列を作りました。次に<code class="notranslate" translate="no">Float32Array</code>型の<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>に変換します。<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>はネイティブ配列ではなくTypedArrayである必要があります。さらにそれぞれの<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>に対して「１つのvertexに対していくつの要素が必要か」を指定する必要があります。例えばpositionやnormalsは３次元なので１つのvertexつき３つの要素を必要とします。UVはテクスチャ上の２次元の点なので２つの要素を必要とします。</p>
+<p>上の例では<code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code>, <code class="notranslate" translate="no">uvs</code>の３つのJavaScriptのネイティブ配列を作りました。次に<code class="notranslate" translate="no">Float32Array</code>型の<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>に変換します。<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>はネイティブ配列ではなくTypedArrayである必要があります。さらにそれぞれの<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>に対して「１つのvertexに対していくつの要素が必要か」を指定する必要があります。例えばpositionやnormalsは３次元なので１つのvertexつき３つの要素を必要とします。UVはテクスチャ上の２次元の点なので２つの要素を必要とします。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../custom-buffergeometry-cube.html"></iframe></div>
   <a class="threejs_center" href="../examples/custom-buffergeometry-cube.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
@@ -173,7 +173,7 @@ for (const vertex of vertices) {
   { pos: [-1, -1, -1], norm: [ 0, -1,  0], uv: [1, 1], }, // 23
 ];
 </pre>
-<p>はい、24個になりました。これに対して36個のインデックスを指定して36個のvertexを作ります。<a href="/docs/#api/ja/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a>により36個のインデックスを使って12個の三角形を作ります。</p>
+<p>はい、24個になりました。これに対して36個のインデックスを指定して36個のvertexを作ります。<a href="../docs/#api/ja/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a>により36個のインデックスを使って12個の三角形を作ります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(positions, positionNumComponents));
@@ -199,7 +199,7 @@ geometry.setAttribute(
 </div>
 
 <p></p>
-<p><code class="notranslate" translate="no">Geometry</code>と同じように<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>も<a href="/docs/#api/ja/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a>メソッドを持っています。これは特に指定がない場合に自動的にnormalを計算するメソッドです。ただし<code class="notranslate" translate="no">Geometry</code>の場合と違いvertexがfaceによって共有されていないために<code class="notranslate" translate="no">computeVertexNormals</code>の結果も少し違います。</p>
+<p><code class="notranslate" translate="no">Geometry</code>と同じように<a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>も<a href="../docs/#api/ja/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a>メソッドを持っています。これは特に指定がない場合に自動的にnormalを計算するメソッドです。ただし<code class="notranslate" translate="no">Geometry</code>の場合と違いvertexがfaceによって共有されていないために<code class="notranslate" translate="no">computeVertexNormals</code>の結果も少し違います。</p>
 <div class="spread">
   <div>
     <div data-diagram="bufferGeometryCylinder"></div>
@@ -265,7 +265,7 @@ geometry.setIndex([
 <p>TypedArrayはプログラムが走っている状態でvertexの編集をしたいときに便利です。</p>
 <p>良い例が思いつかないのでとりあえずメッシュの四角形が出たり入ったりする球体を作ってみます。</p>
 <p>球体の位置とindexを生成するコードです。四角形の中でvertexを共有していますが四角形と四角形でvertexを共有することはありません。共有してしまうと１つの四角形が出たり入ったりするたびに隣の四角形が移動してしまいます。今回は別々に移動させたいのでそうしています。</p>
-<p>面倒なので３つの<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>階層を用意して球体のvertexを計算します。くわしくは<a href="optimize-lots-of-objects.html">たくさんのオブジェクトを最適化するこの記事</a>をご覧ください。</p>
+<p>面倒なので３つの<a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>階層を用意して球体のvertexを計算します。くわしくは<a href="optimize-lots-of-objects.html">たくさんのオブジェクトを最適化するこの記事</a>をご覧ください。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeSpherePositions(segmentsAround, segmentsDown) {
   const numVertices = segmentsAround * segmentsDown * 6;
   const numComponents = 3;
@@ -363,7 +363,7 @@ positionAttribute.needsUpdate = true;
 </div>
 
 <p></p>
-<p><a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を作って<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>をアップデートする方法を紹介しました。</p>
+<p><a href="../docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を作って<a href="../docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>をアップデートする方法を紹介しました。</p>
 <p><canvas id="c"></canvas></p>
 <script type="module" src="../resources/threejs-custom-buffergeometry.js"></script>
 

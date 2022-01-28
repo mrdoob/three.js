@@ -124,7 +124,7 @@ elem.addEventListener('click', () =&gt; {
 <p><a id="preservedrawingbuffer" data-toc="Предотвращение очистки холста "></a></p>
 <h1 id="-">Предотвращение очистки холста</h1>
 <p>Допустим, вы хотели, чтобы пользователь рисовал анимированный объект. 
-Вам нужно передать <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> при создании  <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. 
+Вам нужно передать <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> при создании  <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. 
 Это мешает браузеру очистить холст. Вы также должны сказать three.js не очищать холст. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
 -const renderer = new THREE.WebGLRenderer({canvas});
@@ -211,7 +211,7 @@ elem.addEventListener('click', () =&gt; {
 <p><a id="transparent-canvas" data-toc="Делаем холст прозрачным "></a></p>
 <h1 id="-">Делаем холст прозрачным</h1>
 <p>По умолчанию THREE.js делает холст непрозрачным. Если вы хотите, чтобы холст был прозрачным,
-передайте <a href="/docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> при создании <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
+передайте <a href="../docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> при создании <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
 -const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
@@ -228,8 +228,8 @@ const renderer = new THREE.WebGLRenderer({
 });
 </pre>
 <p>Three.js по умолчанию использует холст с использованием 
-<a href="/docs/#api/en/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a> но по умолчанию используется для материалов, которые выводят 
-<a href="/docs/#api/en/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>.</p>
+<a href="../docs/#api/en/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a> но по умолчанию используется для материалов, которые выводят 
+<a href="../docs/#api/en/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>.</p>
 <p>Если вы хотите лучше понять, когда и когда не следует использовать предварительно умноженную альфу, 
  <a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre"> вот хорошая статья об этом</a>.</p>
 <p>В любом случае давайте настроим простой пример с прозрачным холстом. </p>

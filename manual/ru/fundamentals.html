@@ -66,11 +66,11 @@ function main() {
 и код найдет его там, как если бы у меня был код для вставки холста в документ, 
 и мне, вероятно, пришлось бы изменить этот код, если бы изменился мой вариант 
 использования.</p>
-<p>Когда канвас найден, мы создаем <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Renderer - это то, что отвечает 
+<p>Когда канвас найден, мы создаем <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Renderer - это то, что отвечает 
 за фактическое получение всех предоставленных вами данных и их отрисовку 
 на холст. В прошлом были другие рендеры, такие как <code class="notranslate" translate="no">CSSRenderer</code>, 
 <code class="notranslate" translate="no">CanvasRenderer</code>, а в будущем могут быть
-<code class="notranslate" translate="no">WebGL2Renderer</code> или <code class="notranslate" translate="no">WebGPURenderer</code>. На данный момент есть <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>, 
+<code class="notranslate" translate="no">WebGL2Renderer</code> или <code class="notranslate" translate="no">WebGPURenderer</code>. На данный момент есть <a href="../docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>, 
 который использует WebGL для рисования 3D на холсте.</p>
 <p>Далее нам нужна камера.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const fov = 75;
@@ -107,11 +107,11 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 сторон (aspect). Так как ширина холста в 2 раза больше высоты, при просмотре поле обзора 
 будет намного шире, чем указанные нами 75 градусов, которые являются вертикальным 
 полем зрения.</p>
-<p>Далее создадим <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> в three.js корень формы графа сцены. 
+<p>Далее создадим <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> в three.js корень формы графа сцены. 
 Все, что вы хотите нарисовать необходимо добавить на сцену. Мы рассмотрим подробнее, 
 <a href="scenegraph.html">как работают сцены, в следующей статье</a>.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const scene = new THREE.Scene();
-</pre><p>Далее мы создаем <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> который содержит данные для <a href="https://ru.wikipedia.org/wiki/Прямоугольный_параллелепипед">прямоугольного параллелепипеда</a>. 
+</pre><p>Далее мы создаем <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> который содержит данные для <a href="https://ru.wikipedia.org/wiki/Прямоугольный_параллелепипед">прямоугольного параллелепипеда</a>. 
 Почти все, что мы хотим отобразить в Three.js, нуждается в геометрии, 
 которая определяет вершины нашего трехмерного объекта.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const boxWidth = 1;
@@ -123,12 +123,12 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 значений цвета, как в CSS.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre><p>Затем мы создаем <a href="https://ru.wikipedia.org/wiki/Полигональная_сетка">полигональную сетку</a> 
-<a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в three.js представляет комбинацию 
-формы объекта <code class="notranslate" translate="no">Geometry</code> и <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> (как нарисовать объект, 
+<a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в three.js представляет комбинацию 
+формы объекта <code class="notranslate" translate="no">Geometry</code> и <a href="../docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> (как нарисовать объект, 
 блестящий или плоский, какой цвет, какую текстуру(ры) применить и т.д.)
 а также положение, ориентацию, и масштаб этого объекта в сцене.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const cube = new THREE.Mesh(geometry, material);
-</pre><p>И, наконец, мы добавляем <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> на сцену</p>
+</pre><p>И, наконец, мы добавляем <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> на сцену</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">scene.add(cube);
 </pre><p>Затем мы можем отрендерить сцену, вызвав функцию <code class="notranslate" translate="no">render</code> рендерера 
 передав ей сцену и камеру.</p>
@@ -193,8 +193,8 @@ requestAnimationFrame(render);
 случае мы устанавливаем положение источника света на -1, 2, 4 чтобы оно было немного слева, 
 сверху и позади нашей камеры. Цель по-прежнему 0, 0, 0, поэтому они будут светить 
 в направлении начала координат.</p>
-<p>Нам также нужно изменить материал. <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> не воспреимчив к свету. 
-Давайте изменим его на <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>, который отражает свет.</p>
+<p>Нам также нужно изменить материал. <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> не воспреимчив к свету. 
+Давайте изменим его на <a href="../docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>, который отражает свет.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
 +const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
 </pre><p>И вот оно работает.</p>
@@ -222,7 +222,7 @@ requestAnimationFrame(render);
   return cube;
 }
 </pre><p>Затем мы будем вызывать его 3 раза с 3 разными цветами и позициями X, 
-сохраняя экземпляры <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в массив.</p>
+сохраняя экземпляры <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в массив.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const cubes = [
   makeInstance(geometry, 0x44aa88,  0),
   makeInstance(geometry, 0x8844aa, -2),

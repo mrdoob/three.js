@@ -60,10 +60,10 @@ canvasを追加する場所は、ユースケースに応じて変わる可能�
 また、コードを変更する必要があるため、canvasをthree.jsに渡す事は少し柔軟性があると感じます。
 canvasをどこにでも配置でき、コードを見つける事ができます。
 canvasをdocumentに挿入するコードがあるかのように、ユースケースが変更された場合、そのコードを変更する必要があります。</p>
-<p>canvasを検索した後、<a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> を作成します。
+<p>canvasを検索した後、<a href="../docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> を作成します。
 rendererは提供された全てのデータを取得し、canvasにレンダリングします。
 過去に <code class="notranslate" translate="no">CSSRenderer</code> や <code class="notranslate" translate="no">CanvasRenderer</code> のような他のレンダラーがありましたが、将来的には <code class="notranslate" translate="no">WebGL2Renderer</code> または <code class="notranslate" translate="no">WebGPURenderer</code> があるかもしれません。</p>
-<p>今はWebGLを使用して3Dをcanvasにレンダリングする <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> があります。</p>
+<p>今はWebGLを使用して3Dをcanvasにレンダリングする <a href="../docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> があります。</p>
 <p>次はカメラが必要です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
@@ -95,13 +95,13 @@ three.jsのほとんどの角度はラジアン単位ですが、いくつかの
 錐台は、カメラの正面から0.1単位で開始し、カメラの正面の5単位に移動します。
 この図では見下ろしているため、視野はアスペクトの影響を受けます。
 canvasは高さの2倍の幅であるため、ビュー全体で視野は垂直方向の視野である指定された75度よりもはるかに広くなります。</p>
-<p>次は <a href="/docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> を作成します。
-three.jsの <a href="/docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> は、シーングラフのフォームのルートです。
+<p>次は <a href="../docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> を作成します。
+three.jsの <a href="../docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> は、シーングラフのフォームのルートです。
 three.jsで描画するものはすべてシーンに追加する必要があります。
 <a href="scenegraph.html">Sceneの仕組みの詳細</a>は、今後の記事で説明します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 </pre>
-<p>次はボックスのデータが含まれている <a href="/docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> を作成します。
+<p>次はボックスのデータが含まれている <a href="../docs/#api/ja/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> を作成します。
 Three.jsで表示するほとんど全てのものには、3Dオブジェクトを構成する頂点を定義するジオメトリが必要です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
 const boxHeight = 1;
@@ -112,7 +112,7 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 色は標準のCSSスタイルの6桁の16進数の色値を使用して指定できます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre>
-<p>次に <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> を作成します。 <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> は <code class="notranslate" translate="no">Geometry</code> (オブジェクトの形状)と <a href="/docs/#api/ja/materials/Material"><code class="notranslate" translate="no">Material</code></a> （オブジェクトの描画方法、光沢または平坦、適用する色、適用するテクステャなど）を組み合わせます。
+<p>次に <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> を作成します。 <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> は <code class="notranslate" translate="no">Geometry</code> (オブジェクトの形状)と <a href="../docs/#api/ja/materials/Material"><code class="notranslate" translate="no">Material</code></a> （オブジェクトの描画方法、光沢または平坦、適用する色、適用するテクステャなど）を組み合わせます。
 シーン内のオブジェクトの位置、方向、スケールと同様です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
 </pre>
@@ -175,7 +175,7 @@ three.jsには <a href="lights.html">今後の記事</a> で紹介する多く�
 <p>ディレクショナルライトは位置とターゲットを持っています。どちらもデフォルト値は 0, 0, 0 です。
 今回はライトの位置を -1、2、4 に設定しているため、カメラの後ろの少し左上側にあります。
 ターゲットはまだ 0, 0, 0 なので原点に向かって輝きます。</p>
-<p>また、マテリアルを変更する必要があります。<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> はライトの影響を受けません。ライトの影響をうける <a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> に変更してみましょう。</p>
+<p>また、マテリアルを変更する必要があります。<a href="../docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> はライトの影響を受けません。ライトの影響をうける <a href="../docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> に変更してみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
 +const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
 </pre>
@@ -202,7 +202,7 @@ three.jsには <a href="lights.html">今後の記事</a> で紹介する多く�
   return cube;
 }
 </pre>
-<p>次に、異なる色とX位置を指定した <a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> インスタンスを配列に保存する関数を3回呼び出します。</p>
+<p>次に、異なる色とX位置を指定した <a href="../docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> インスタンスを配列に保存する関数を3回呼び出します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
   makeInstance(geometry, 0x44aa88,  0),
   makeInstance(geometry, 0x8844aa, -2),

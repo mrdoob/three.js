@@ -23,7 +23,7 @@
           <p>※ 이 글은 Three.js의 튜토리얼 시리즈로서,
 먼저 <a href="fundamentals.html">Three.js의 기본 구조에 관한 글</a>을
 읽고 오길 권장합니다.</p>
-<p>Three.js에서 요소를 최적화하는 방법은 아주 다양합니다. 가장 많이 언급되는 방법은 <em>geometry를 합치는 것</em>이죠. Three.js는 사용자가 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 하나 만들 때마다 매번 시스템에 하나 이상의 렌더링 요청을 보냅니다. 결과물이 완벽히 같더라도 mesh를 1개를 렌더링할 때보다 2개를 렌더링할 때 <a href="https://ko.wikipedia.org/wiki/%EC%98%A4%EB%B2%84%ED%97%A4%EB%93%9C">오버헤드(overhead)</a>가 더 많이 발생한다는 이야기죠. 그러니 이 mesh를 하나로 합친다면 오버헤드를 줄일 수 있습니다.</p>
+<p>Three.js에서 요소를 최적화하는 방법은 아주 다양합니다. 가장 많이 언급되는 방법은 <em>geometry를 합치는 것</em>이죠. Three.js는 사용자가 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 하나 만들 때마다 매번 시스템에 하나 이상의 렌더링 요청을 보냅니다. 결과물이 완벽히 같더라도 mesh를 1개를 렌더링할 때보다 2개를 렌더링할 때 <a href="https://ko.wikipedia.org/wiki/%EC%98%A4%EB%B2%84%ED%97%A4%EB%93%9C">오버헤드(overhead)</a>가 더 많이 발생한다는 이야기죠. 그러니 이 mesh를 하나로 합친다면 오버헤드를 줄일 수 있습니다.</p>
 <p>간단한 예제를 통해 이 방법이 어떤 경우 적합한지 알아보도록 하겠습니다. <a href="https://globe.chromeexperiments.com/">WebGL 지구본</a>을 베껴 직접 구현해보겠습니다.</p>
 <p>먼저 데이터를 작성합니다. WebGL 지구본 개발진은 <a href="http://sedac.ciesin.columbia.edu/gpw/">SEDAC</a>에서 데이터를 가져왔다고 합니다. 사이트를 뒤져보니 <a href="https://beta.sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10">그리드 형태의 인구 통계 데이터</a>가 있네요. resolution 값을 60 minute으로 설정해 데이터를 다운로드합니다.</p>
 <p>받은 데이터는 아래와 같습니다.</p>
@@ -223,7 +223,7 @@ function hsl(h, s, l) {
   </div>
 </div>
 
-<p><a href="scenegraph.html">씬 그래프에 관한 글</a>에서 배웠듯 육면체를 다른 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>의 자식으로 두는 것도 한 가지 해결 방법이지만, 씬 그래프 요소가 많아지만 그만큼 성능이 떨어집니다.</p>
+<p><a href="scenegraph.html">씬 그래프에 관한 글</a>에서 배웠듯 육면체를 다른 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>의 자식으로 두는 것도 한 가지 해결 방법이지만, 씬 그래프 요소가 많아지만 그만큼 성능이 떨어집니다.</p>
 <p><code class="notranslate" translate="no">lonHelper</code>, <code class="notranslate" translate="no">latHelper</code>, <code class="notranslate" translate="no">positionHelper</code>를 계층 구조로 만든 건 구체 주위에 육면체를 배치할 좌표를 찾기 위해서입니다.</p>
 <div class="spread">
   <div data-diagram="lonLatPos" style="width: 600px; height: 400px;"></div>
@@ -231,7 +231,7 @@ function hsl(h, s, l) {
 
 <p>위 예제의 <span style="color:green;">초록색 막대</span>는 <code class="notranslate" translate="no">lonHelper</code>를 상징합니다. 자전축을 중심으로 경도(longitude)를 찾는 역할을 하죠. <span style="color:blue">파란색 막대</span>는 <code class="notranslate" translate="no">latHelper</code>입니다. <code class="notranslate" translate="no">latHelper</code>는 적도 위 아래로 위도(latitude)를 찾는 역할을 합니다. <span style="color:red;">빨간 구체</span>는 <code class="notranslate" translate="no">positionHelper</code>로, 육면체의 좌표값을 나타냅니다.</p>
 <p>물론 좌표를 계산할 때 수학적으로 접근할 수도 있지만, 이렇게 라이브러리가 대신 계산하도록 하면 복잡하게 머리를 쥐어짜야할 필요가 없습니다.</p>
-<p>위 코드에서는 각 데이터 좌표마다 <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>와 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 생성했습니다. 그리고 <code class="notranslate" translate="no">positionHelper</code>의 전역 좌표를 구해 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>에 적용하고, 데이터의 양만큼 이 mesh를 키웠죠.</p>
+<p>위 코드에서는 각 데이터 좌표마다 <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>와 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 생성했습니다. 그리고 <code class="notranslate" translate="no">positionHelper</code>의 전역 좌표를 구해 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>에 적용하고, 데이터의 양만큼 이 mesh를 키웠죠.</p>
 <p>아까와 마찬가지로 각 데이터마다 <code class="notranslate" translate="no">lonHelper</code>, <code class="notranslate" translate="no">latHelper</code>, <code class="notranslate" translate="no">positionHelper</code>를 따로 생성할 수도 있지만, 그렇게 하면 성능이 훨씬 느려질 겁니다.</p>
 <p>이러면 육면체를 최대 360x145개, 거의 최대 52000개를 만드는 셈입니다. "NO_DATA"라고 표시된 곳도 있기에 그걸 제외하면 육면체의 개수는 대략 19000개가 될 겁니다. 그런데 여기에 각 육면체에 따로 3개씩 헬퍼를 생성한다면 Three.js는 거의 80000개의 씬 그래프 요소를 계산하게 되죠. 대신 헬퍼를 공통으로 사용하면 연산 요청을 약 60000번 정도 줄일 수 있습니다.</p>
 <p><code class="notranslate" translate="no">lonFudge</code>와 <code class="notranslate" translate="no">latFudge</code>에 대해 짧게 언급하겠습니다. <code class="notranslate" translate="no">lonFudge</code>는 π/2, 90도입니다. 이건 크게 신경쓸 게 없네요. 그냥 텍스처나 텍스처 좌표가 다른 각도에서 시작한다는 소리니까요. 하지만 <code class="notranslate" translate="no">latFudge</code>의 경우는 왜 π * -0.135가 필요한지 모르겠습니다. 그냥 좌표가 저 축을 기준으로 정렬되어 있습니다.</p>

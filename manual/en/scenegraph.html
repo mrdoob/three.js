@@ -175,8 +175,8 @@ earthMesh.position.x = 10;
 +solarSystem.add(earthMesh);
 objects.push(earthMesh);
 </pre>
-<p>Here we made an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Like a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> it is also a node in the scene graph
-but unlike a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> it has no material or geometry. It just represents a local space.</p>
+<p>Here we made an <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Like a <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> it is also a node in the scene graph
+but unlike a <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> it has no material or geometry. It just represents a local space.</p>
 <p>Our new scene graph looks like this</p>
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
 <p>Both the <code class="notranslate" translate="no">sunMesh</code> and the <code class="notranslate" translate="no">earthMesh</code> are children of the <code class="notranslate" translate="no">solarSystem</code>. All 3
@@ -213,7 +213,7 @@ objects.push(earthMesh);
 +moonOrbit.add(moonMesh);
 +objects.push(moonMesh);
 </pre>
-<p>Again we added more invisible scene graph nodes. The first, an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> called <code class="notranslate" translate="no">earthOrbit</code>
+<p>Again we added more invisible scene graph nodes. The first, an <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> called <code class="notranslate" translate="no">earthOrbit</code>
 and added both the <code class="notranslate" translate="no">earthMesh</code> and the <code class="notranslate" translate="no">moonOrbit</code> to it, also new. We then added the <code class="notranslate" translate="no">moonMesh</code>
 to the <code class="notranslate" translate="no">moonOrbit</code>. The new scene graph looks like this.</p>
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
@@ -229,7 +229,7 @@ of this article but we didn't have to manually compute it. We just
 setup our scene graph to do it for us.</p>
 <p>It is often useful to draw something to visualize the nodes in the scene graph.
 Three.js has some helpful ummmm, helpers to ummm, ... help with this.</p>
-<p>One is called an <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>. It draws 3 lines representing the local
+<p>One is called an <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>. It draws 3 lines representing the local
 <span style="color:red">X</span>,
 <span style="color:green">Y</span>, and
 <span style="color:blue">Z</span> axes. Let's add one to every node we
@@ -262,13 +262,13 @@ y axis we don't see much of the <span style="color:green">y (green)</span> axes.
 and the <code class="notranslate" translate="no">solarSystem</code> are at the same position. Similarly the <code class="notranslate" translate="no">earthMesh</code> and
 <code class="notranslate" translate="no">earthOrbit</code> are at the same position. Let's add some simple controls to allow us
 to turn them on/off for each node.
-While we're at it let's also add another helper called the <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. It
+While we're at it let's also add another helper called the <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. It
 makes a 2D grid on the X,Z plane. By default the grid is 10x10 units.</p>
 <p>We're also going to use <a href="https://github.com/georgealways/lil-gui">lil-gui</a> which is
 a UI library that is very popular with three.js projects. lil-gui takes an
 object and a property name on that object and based on the type of the property
 automatically makes a UI to manipulate that property.</p>
-<p>We want to make both a <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> and an <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> for each node. We need
+<p>We want to make both a <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> and an <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> for each node. We need
 a label for each node so we'll get rid of the old loop and switch to calling
 some function to add the helpers for each node</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// add an AxesHelper to each node
@@ -300,7 +300,7 @@ a <code class="notranslate" translate="no">bool</code> property. But, we want bo
 to appear/disappear based on a single property so we'll make a class
 that has a getter and setter for a property. That way we can let lil-gui
 think it's manipulating a single property but internally we can set
-the visible property of both the <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> and <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> for a node.</p>
+the visible property of both the <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> and <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> for a node.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Turns both axes and grid visible on/off
 // lil-gui requires a property that returns a bool
 // to decide to make a checkbox so we make a setter
@@ -332,8 +332,8 @@ class AxisGridHelper {
   }
 }
 </pre>
-<p>One thing to notice is we set the <code class="notranslate" translate="no">renderOrder</code> of the <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>
-to 2 and for the <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> to 1 so that the axes get drawn after the grid.
+<p>One thing to notice is we set the <code class="notranslate" translate="no">renderOrder</code> of the <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>
+to 2 and for the <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> to 1 so that the axes get drawn after the grid.
 Otherwise the grid might overwrite the axes.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
@@ -360,17 +360,17 @@ to cover every finger (at least another 28 nodes) and every toe
 <p>Let's make one semi-complex scene graph. We'll make a tank. The tank will have
 6 wheels and a turret. The tank will follow a path. There will be a sphere that
 moves around and the tank will target the sphere.</p>
-<p>Here's the scene graph. The meshes are colored in green, the <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>s in blue,
+<p>Here's the scene graph. The meshes are colored in green, the <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>s in blue,
 the lights in gold, and the cameras in purple. One camera has not been added
 to the scene graph.</p>
 <div class="threejs_center"><img src="../resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
 <p>Look in the code to see the setup of all of these nodes.</p>
 <p>For the target, the thing the tank is aiming at, there is a <code class="notranslate" translate="no">targetOrbit</code>
-(<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>) which just rotates similar to the <code class="notranslate" translate="no">earthOrbit</code> above. A
-<code class="notranslate" translate="no">targetElevation</code> (<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>) which is a child of the <code class="notranslate" translate="no">targetOrbit</code> provides an
+(<a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>) which just rotates similar to the <code class="notranslate" translate="no">earthOrbit</code> above. A
+<code class="notranslate" translate="no">targetElevation</code> (<a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>) which is a child of the <code class="notranslate" translate="no">targetOrbit</code> provides an
 offset from the <code class="notranslate" translate="no">targetOrbit</code> and a base elevation. Childed to that is another
-<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> called <code class="notranslate" translate="no">targetBob</code> which just bobs up and down relative to the
+<a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> called <code class="notranslate" translate="no">targetBob</code> which just bobs up and down relative to the
 <code class="notranslate" translate="no">targetElevation</code>. Finally there's the <code class="notranslate" translate="no">targetMesh</code> which is just a cube we
 rotate and change its colors</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// move target
@@ -381,12 +381,12 @@ targetMesh.rotation.y = time * 13;
 targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 </pre>
-<p>For the tank there's an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> called <code class="notranslate" translate="no">tank</code> which is used to move everything
-below it around. The code uses a <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> which it can ask for positions
+<p>For the tank there's an <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> called <code class="notranslate" translate="no">tank</code> which is used to move everything
+below it around. The code uses a <a href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> which it can ask for positions
 along that curve. 0.0 is the start of the curve. 1.0 is the end of the curve. It
 asks for the current position where it puts the tank. It then asks for a
 position slightly further down the curve and uses that to point the tank in that
-direction using <a href="/docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
+direction using <a href="../docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tankPosition = new THREE.Vector2();
 const tankTarget = new THREE.Vector2();
 
@@ -401,7 +401,7 @@ tank.lookAt(tankTarget.x, 0, tankTarget.y);
 </pre>
 <p>The turret on top of the tank is moved automatically by being a child
 of the tank. To point it at the target we just ask for the target's world position
-and then again use <a href="/docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a></p>
+and then again use <a href="../docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const targetPosition = new THREE.Vector3();
 
 ...
@@ -451,7 +451,7 @@ infoElem.textContent = camera.desc;
 
 <p></p>
 <p>I hope this gives some idea of how scene graphs work and how you might use them.
-Making <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> nodes and parenting things to them is an important step to using
+Making <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> nodes and parenting things to them is an important step to using
 a 3D engine like three.js well. Often it might seem like some complex math is necessary
 to make something move and rotate the way you want. For example without a scene graph
 computing the motion of the moon or where to put the wheels of the car relative to its

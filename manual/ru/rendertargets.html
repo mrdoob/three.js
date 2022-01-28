@@ -21,12 +21,12 @@
         <div class="lesson-main">
           <p>Цель рендеринга в three.js - это в основном текстура, которую вы можете рендерить. После рендеринга вы можете использовать эту текстуру как любую другую текстуру. </p>
 <p>Давайте сделаем простой пример. Начнем с примера <a href="responsive.html">статьи об отзывчивости</a>.</p>
-<p>Рендеринг к цели рендеринга практически идентичен обычному рендерингу. Сначала мы создаем <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.  </p>
+<p>Рендеринг к цели рендеринга практически идентичен обычному рендерингу. Сначала мы создаем <a href="../docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.  </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
 const rtHeight = 512;
 const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
 </pre>
-<p>Затем нам нужна <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> и <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> </p>
+<p>Затем нам нужна <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> и <a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
 const rtAspect = rtWidth / rtHeight;
 const rtNear = 0.1;
@@ -70,7 +70,7 @@ function makeInstance(geometry, color, x) {
   makeInstance(geometry, 0xaa8844,  2),
 ];
 </pre>
-<p><a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> и <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> из предыдущей статьи все еще там. Мы будем использовать их для рендеринга на холст. Нам просто нужно добавить материал для рендеринга. </p>
+<p><a href="../docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> и <a href="../docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> из предыдущей статьи все еще там. Мы будем использовать их для рендеринга на холст. Нам просто нужно добавить материал для рендеринга. </p>
 <p>Давайте добавим куб, который использует текстуру цели рендеринга.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
   map: renderTarget.texture,
@@ -117,9 +117,9 @@ scene.add(cube);
 <a href="picking.html">Сбор может использовать цель рендеринга</a>. Различные виды
 <a href="post-processing.html">эффектов постобработки</a> требуют целей рендеринга.
 Для рендеринга зеркала заднего вида в автомобиле или просмотра в реальном времени на мониторе в 3D-сцене может использоваться цель рендеринга. </p>
-<p>Несколько замечаний по использованию <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>. </p>
+<p>Несколько замечаний по использованию <a href="../docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>. </p>
 <ul>
-<li><p>По умолчанию <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> создает 2 текстуры. Цветная текстура и текстура глубины / трафарета. Если вам не нужны текстуры глубины или трафарета, вы можете попросить не создавать их, передав параметры. Пример: </p>
+<li><p>По умолчанию <a href="../docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> создает 2 текстуры. Цветная текстура и текстура глубины / трафарета. Если вам не нужны текстуры глубины или трафарета, вы можете попросить не создавать их, передав параметры. Пример: </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
     depthBuffer: false,
     stencilBuffer: false,

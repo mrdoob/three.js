@@ -104,7 +104,7 @@ float v2 = v1.x + v1.y;  // adds 1.0 + 2.0
 
 main();
 </pre>
-<p><a href="backgrounds.html">배경과 하늘상자 추가하기</a>에서도 설명했지만 위와 같이 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 설정하면 2칸짜리 평면이 캔버스 전체를 채우게 됩니다. 당장은 평면이 빨간 <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용했기에 캔버스 전체가 빨갛게 보입니다.</p>
+<p><a href="backgrounds.html">배경과 하늘상자 추가하기</a>에서도 설명했지만 위와 같이 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 설정하면 2칸짜리 평면이 캔버스 전체를 채우게 됩니다. 당장은 평면이 빨간 <a href="../docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용했기에 캔버스 전체가 빨갛게 보입니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../shadertoy-prep.html"></iframe></div>
   <a class="threejs_center" href="../examples/shadertoy-prep.html" target="_blank">새 탭에서 보기</a>
@@ -145,7 +145,7 @@ void main() {
 };
 </pre>
 <p>Three.js의 균등 변수에는 <code class="notranslate" translate="no">value</code> 속성을 넣어야 합니다. 물론 값으로 들어가는 데이터도 균등 변수의 타입과 맞아야 하죠.</p>
-<p>fragment 쉐이더와 균등 변수를 <a href="/docs/#api/ko/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>에 넘겨줍니다.</p>
+<p>fragment 쉐이더와 균등 변수를 <a href="../docs/#api/ko/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>에 넘겨줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({
 -    color: 'red',
 -});
@@ -274,7 +274,7 @@ void main() {
   }
 `;
 </pre>
-<p>vertex 쉐이더도 같이 <a href="/docs/#api/ko/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>에 넘겨줍니다.</p>
+<p>vertex 쉐이더도 같이 <a href="../docs/#api/ko/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>에 넘겨줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,

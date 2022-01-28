@@ -22,12 +22,12 @@
         <div class="lesson-main">
           <p>在three.js中，渲染目标大体上指的是可以被渲染的纹理。当它被渲染之后，你可以像使用其他纹理一样使用它。</p>
 <p>让我们举个简单的例子。我们将从<a href="responsive.html">the article on responsiveness</a>开始。</p>
-<p>渲染到渲染目标基本上跟通常的渲染一样。首先我们创建一个 <a href="/docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>。</p>
+<p>渲染到渲染目标基本上跟通常的渲染一样。首先我们创建一个 <a href="../docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
 const rtHeight = 512;
 const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
 </pre>
-<p>然后我们需要一个 <a href="/docs/#api/zh/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>  和一个 <a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a></p>
+<p>然后我们需要一个 <a href="../docs/#api/zh/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>  和一个 <a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
 const rtAspect = rtWidth / rtHeight;
 const rtNear = 0.1;
@@ -71,7 +71,7 @@ function makeInstance(geometry, color, x) {
   makeInstance(geometry, 0xaa8844,  2),
 ];
 </pre>
-<p>在上个例子中的 <a href="/docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> 和 <a href="/docs/#api/zh/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> 保持不变，我们将在画布中继续使用它们，只需要添加渲染的物体。</p>
+<p>在上个例子中的 <a href="../docs/#api/zh/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> 和 <a href="../docs/#api/zh/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> 保持不变，我们将在画布中继续使用它们，只需要添加渲染的物体。</p>
 <p>让我们添加使用了渲染目标纹理的方块。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
   map: renderTarget.texture,
@@ -116,9 +116,9 @@ scene.add(cube);
 <p>方块是红色的，这是因为我们设置了 <code class="notranslate" translate="no">rtScene</code> 的 <code class="notranslate" translate="no">background</code> 为红色，所以渲染目标的纹理所处的背景为红色。</p>
 <p>渲染目标可以用在各种各样的物体上。<a href="shadows.html">Shadows</a>用了渲染目标，<a href="picking.html">Picking can use a render target</a>，多种效果<a href="post-processing.html">post processing effects</a>需要用到渲染目标。
 渲染汽车的后视镜，或者3D场景中的监控实时画面，都可能用到渲染目标。</p>
-<p>关于 <a href="/docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> 的笔记。</p>
+<p>关于 <a href="../docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> 的笔记。</p>
 <ul>
-<li><p>默认情况下 <a href="/docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> 会创建两个纹理。 颜色纹理和深度/模版纹理。如果你不需要深度或者模版纹理，你可以通过可选设置取消创建。例如：</p>
+<li><p>默认情况下 <a href="../docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> 会创建两个纹理。 颜色纹理和深度/模版纹理。如果你不需要深度或者模版纹理，你可以通过可选设置取消创建。例如：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
     depthBuffer: false,
     stencilBuffer: false,

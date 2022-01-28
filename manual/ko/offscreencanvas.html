@@ -498,8 +498,8 @@ window.addEventListener('touchend', clearPickPosition);
 </div>
 
 <p></p>
-<p>좀 더 욕심을 내 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>까지 추가해봅시다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 DOM에 꽤 다양하게 접근하기에 처리해줘야 할 것이 좀 많습니다. 제대로 작동하려면 마우스 이벤트, 터치 이벤트, 키보드 이벤트를 모두 처리해줘야 하죠.</p>
-<p>여태까지는 전역 <code class="notranslate" translate="no">state</code> 객체를 사용했지만, <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>의 경우는 객체 속성이 너무 많아 그걸 전부 다 하드 코딩하는 건 너무 번거롭습니다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 필요한 DOM 이벤트의 대부분을 인자로 받는 <code class="notranslate" translate="no">HTMLElement</code>에 바인딩합니다. 이를 이용해 DOM 요소와 같은 구조의 객체를 넘겨준다면 어떨까요? <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 필요한 기능만 살려서 말이죠.</p>
+<p>좀 더 욕심을 내 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>까지 추가해봅시다. <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 DOM에 꽤 다양하게 접근하기에 처리해줘야 할 것이 좀 많습니다. 제대로 작동하려면 마우스 이벤트, 터치 이벤트, 키보드 이벤트를 모두 처리해줘야 하죠.</p>
+<p>여태까지는 전역 <code class="notranslate" translate="no">state</code> 객체를 사용했지만, <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>의 경우는 객체 속성이 너무 많아 그걸 전부 다 하드 코딩하는 건 너무 번거롭습니다. <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 필요한 DOM 이벤트의 대부분을 인자로 받는 <code class="notranslate" translate="no">HTMLElement</code>에 바인딩합니다. 이를 이용해 DOM 요소와 같은 구조의 객체를 넘겨준다면 어떨까요? <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 필요한 기능만 살려서 말이죠.</p>
 <p><a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls</code>의 소스 코드</a>를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.</p>
 <ul>
 <li>contextmenu</li>
@@ -512,11 +512,11 @@ window.addEventListener('touchend', clearPickPosition);
 <li>wheel</li>
 <li>keydown</li>
 </ul>
-<p>마우스 이벤트 중 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 사용하는 속성은 <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, <code class="notranslate" translate="no">button</code>, <code class="notranslate" translate="no">pointerType</code>, <code class="notranslate" translate="no">clientX</code>, <code class="notranslate" translate="no">clientY</code>, <code class="notranslate" translate="no">pageX</code>, <code class="notranslate" translate="no">pageY</code>이고,</p>
+<p>마우스 이벤트 중 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 사용하는 속성은 <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, <code class="notranslate" translate="no">button</code>, <code class="notranslate" translate="no">pointerType</code>, <code class="notranslate" translate="no">clientX</code>, <code class="notranslate" translate="no">clientY</code>, <code class="notranslate" translate="no">pageX</code>, <code class="notranslate" translate="no">pageY</code>이고,</p>
 <p>keydown 이벤트의 경우는 <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, <code class="notranslate" translate="no">keyCode</code> 속성,</p>
 <p>wheel 이벤트는 <code class="notranslate" translate="no">deltaY</code> 속성만,</p>
 <p>터치 이벤트의 경우는 <code class="notranslate" translate="no">touches</code> 속성의 <code class="notranslate" translate="no">pageX</code>, <code class="notranslate" translate="no">pageY</code> 속성이 필요하네요.</p>
-<p>이를 처리할 경유(proxy) 객체를 한 쌍 만들어봅시다. 한쪽은 메인 페이지에서 위 이벤트를 받아 필요한 속성을 워커에 넘겨주는 역할을 할 겁니다. 그리고 다른 한쪽은 워커 안에서 이 이벤트를 받아 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 넘겨줄 겁니다. 이벤트 객체가 DOM 이벤트와 같은 구조이기에 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 이 이벤트가 DOM 이벤트가 아니란 걸 눈치채지 못하겠죠.</p>
+<p>이를 처리할 경유(proxy) 객체를 한 쌍 만들어봅시다. 한쪽은 메인 페이지에서 위 이벤트를 받아 필요한 속성을 워커에 넘겨주는 역할을 할 겁니다. 그리고 다른 한쪽은 워커 안에서 이 이벤트를 받아 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 넘겨줄 겁니다. 이벤트 객체가 DOM 이벤트와 같은 구조이기에 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 이 이벤트가 DOM 이벤트가 아니란 걸 눈치채지 못하겠죠.</p>
 <p>아래는 워커 안의 코드입니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EventDispatcher } from '../../build/three.module.js';
 
@@ -529,7 +529,7 @@ class ElementProxyReceiver extends EventDispatcher {
   }
 }
 </pre>
-<p>위 코드는 단순히 메시지를 받았을 때 그걸 다시 내보내는(dispatch) 역할을 합니다. 부모 클래스인 <a href="/docs/#api/ko/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a>는 DOM 요소처럼 <code class="notranslate" translate="no">addEventListener</code>나 <code class="notranslate" translate="no">removeEventListener</code> 메서드를 제공하기에 HTML 요소 대신 이 클래스의 인스턴스를 넘겨줘도 문제없이 작동할 겁니다.</p>
+<p>위 코드는 단순히 메시지를 받았을 때 그걸 다시 내보내는(dispatch) 역할을 합니다. 부모 클래스인 <a href="../docs/#api/ko/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a>는 DOM 요소처럼 <code class="notranslate" translate="no">addEventListener</code>나 <code class="notranslate" translate="no">removeEventListener</code> 메서드를 제공하기에 HTML 요소 대신 이 클래스의 인스턴스를 넘겨줘도 문제없이 작동할 겁니다.</p>
 <p><code class="notranslate" translate="no">ElementProxyReceiver</code>는 하나의 요소만 대신할 수 있습니다. 예제의 경우 하나만 필요하기는 하나 나중에 캔버스를 여러 개 사용할 수도 있으니 여러 <code class="notranslate" translate="no">ElementProxyReceiver</code>를 관리하는 클래스를 만들겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ProxyManager {
   constructor() {
@@ -584,7 +584,7 @@ self.onmessage = function(e) {
   fn(e.data);
 };
 </pre>
-<p>Three.js의 공통 코드에 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 모듈도 불러와 설정해야 합니다.</p>
+<p>Three.js의 공통 코드에 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 모듈도 불러와 설정해야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
 +import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
 
@@ -597,7 +597,7 @@ export function init(data) {
 +  controls.target.set(0, 0, 0);
 +  controls.update();
 </pre>
-<p>위 코드에서는 이전과 달리 <code class="notranslate" translate="no">inputElement</code>로 경유 객체를 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 넘겨줬습니다.</p>
+<p>위 코드에서는 이전과 달리 <code class="notranslate" translate="no">inputElement</code>로 경유 객체를 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 넘겨줬습니다.</p>
 <p>하는 김에 피킹 이벤트도 경유 객체를 사용하도록 바꿉니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
 -  const rect = canvas.getBoundingClientRect();
@@ -776,7 +776,7 @@ function filteredKeydownEventHandler(event, sendFn) {
 }
 </pre>
 <p>거의 다 된 듯합니다. 하지만 실제로 예제를 실행해보니 아직 처리해줘야 할 것들이 몇 개 더 있네요.</p>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 <code class="notranslate" translate="no">element.focus</code> 메서드를 호출합니다. 이는 워커에서 그다지 쓸모가 없으니 빈 함수로 대체하겠습니다.</p>
+<p><a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 <code class="notranslate" translate="no">element.focus</code> 메서드를 호출합니다. 이는 워커에서 그다지 쓸모가 없으니 빈 함수로 대체하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
   constructor() {
     super();
@@ -918,7 +918,7 @@ function render(time) {
 
   ...
 </pre>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 마우스 이벤트를 감지하기 위해 해당 요소의 <code class="notranslate" translate="no">ownerDocument</code>에 <code class="notranslate" translate="no">pointermove</code>와 <code class="notranslate" translate="no">pointerup</code> 리스너를 추가합니다(마우스가 창 밖으로 나갔을 경우를 위해).</p>
+<p><a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 마우스 이벤트를 감지하기 위해 해당 요소의 <code class="notranslate" translate="no">ownerDocument</code>에 <code class="notranslate" translate="no">pointermove</code>와 <code class="notranslate" translate="no">pointerup</code> 리스너를 추가합니다(마우스가 창 밖으로 나갔을 경우를 위해).</p>
 <p>또한 코드는 전역 <code class="notranslate" translate="no">document</code> 객체를 참조하지만 워커에는 전역 <code class="notranslate" translate="no">document</code> 객체가 없습니다.</p>
 <p>이 문제는 간단한 편법(hack)을 써 해결할 수 있습니다. 다시 한 번 워커의 경유 객체를 이용하도록 하죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
@@ -931,8 +931,8 @@ function render(time) {
   });
 }
 </pre>
-<p>이러면 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 에러를 던지지 않을 겁니다.</p>
-<p>예제가 복잡해 이해하기 어려웠을 수 있습니다. 동작을 요약하자면 <code class="notranslate" translate="no">ElementProxy</code>가 메인 페이지의 DOM 이벤트를 워커의 <code class="notranslate" translate="no">ElementProxyReceiver</code>에 넘기고, <code class="notranslate" translate="no">ElementProxyReceiver</code>는 <code class="notranslate" translate="no">HTMLElement</code>를 가장해 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>와 공통 코드에서 쓸 수 있는 대체 DOM 요소로 기능합니다.</p>
+<p>이러면 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 에러를 던지지 않을 겁니다.</p>
+<p>예제가 복잡해 이해하기 어려웠을 수 있습니다. 동작을 요약하자면 <code class="notranslate" translate="no">ElementProxy</code>가 메인 페이지의 DOM 이벤트를 워커의 <code class="notranslate" translate="no">ElementProxyReceiver</code>에 넘기고, <code class="notranslate" translate="no">ElementProxyReceiver</code>는 <code class="notranslate" translate="no">HTMLElement</code>를 가장해 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>와 공통 코드에서 쓸 수 있는 대체 DOM 요소로 기능합니다.</p>
 <p>마지막으로 <code class="notranslate" translate="no">OffscreenCanvas</code>를 지원하지 않는 경우의 예외 코드만 수정해주면 끝입니다. 간단히 <code class="notranslate" translate="no">inputElement</code>에 캔버스 요소자체를 넘겨주기만 하면 되죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
 -  init({ canvas });
@@ -940,7 +940,7 @@ function render(time) {
   console.log('using regular canvas');
 }
 </pre>
-<p>이제 <code class="notranslate" translate="no">OffscreenCanvas</code>에서도 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 잘 작동합니다.</p>
+<p>이제 <code class="notranslate" translate="no">OffscreenCanvas</code>에서도 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 잘 작동합니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../offscreencanvas-w-orbitcontrols.html"></iframe></div>
   <a class="threejs_center" href="../examples/offscreencanvas-w-orbitcontrols.html" target="_blank">새 탭에서 보기</a>

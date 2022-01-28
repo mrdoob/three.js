@@ -39,7 +39,7 @@ requestAnimationFrame(render);
 변경된 경우 등 다양하겠죠.</p>
 <p><a href="responsive.html">반응형 디자인에 관한 글</a>에서 썼던 예제를 수정해
 필요에 따른 렌더링을 구현해봅시다.</p>
-<p>먼저 뭔가 변화를 일으킬 수 있는 요소가 필요하니 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다.</p>
+<p>먼저 뭔가 변화를 일으킬 수 있는 요소가 필요하니 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
 
@@ -94,8 +94,8 @@ camera.position.z = 2;
 <p>그리고 <code class="notranslate" translate="no">render</code> 함수를 직접 호출합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
 </pre>
-<p>이제 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 카메라 설정을 바꿀 때마다 직접 <code class="notranslate" translate="no">render</code> 함수를 호출해야
-합니다. 뭔가 복잡할 것 같지만 다행히 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에는 <code class="notranslate" translate="no">change</code> 이벤트가 있습니다.</p>
+<p>이제 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 카메라 설정을 바꿀 때마다 직접 <code class="notranslate" translate="no">render</code> 함수를 호출해야
+합니다. 뭔가 복잡할 것 같지만 다행히 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에는 <code class="notranslate" translate="no">change</code> 이벤트가 있습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
 </pre>
 <p>또한 창 크기가 바뀔 때의 동작도 직접 처리해야 합니다. <code class="notranslate" translate="no">render</code> 함수를 계속 호출할
@@ -110,12 +110,12 @@ camera.position.z = 2;
 </div>
 
 <p></p>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에는 관성(inertia) 옵션이 있습니다. <code class="notranslate" translate="no">enableDamping</code> 속성을 ture로
+<p><a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에는 관성(inertia) 옵션이 있습니다. <code class="notranslate" translate="no">enableDamping</code> 속성을 ture로
 설정하면 동작이 좀 더 부드러워지죠.</p>
 <p>※ damping: 감쇠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
 </pre>
-<p>또한 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 부드러운 동작을 구현할 때 변경된 카메라 값을 계속 넘겨주도록
+<p>또한 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 부드러운 동작을 구현할 때 변경된 카메라 값을 계속 넘겨주도록
 <code class="notranslate" translate="no">render</code> 함수 안에서 <code class="notranslate" translate="no">controls.update</code> 메서드를 호출해야 합니다. 하지만 이렇게 하면
 <code class="notranslate" translate="no">change</code> 이벤트가 발생했을 때 <code class="notranslate" translate="no">render</code> 함수가 무한정 호출될 겁니다. controls가 <code class="notranslate" translate="no">change</code>
 이벤트를 보내면 <code class="notranslate" translate="no">render</code> 함수가 호출되고, <code class="notranslate" translate="no">render</code> 함수는 <code class="notranslate" translate="no">controls.update</code> 메서드를

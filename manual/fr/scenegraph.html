@@ -132,7 +132,7 @@ earthMesh.position.x = 10;
 +solarSystem.add(earthMesh);
 objects.push(earthMesh);
 </pre>
-<p>Ici, nous avons fait un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Comme une <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, c'est aussi un nœud, mais contrairement à une <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, il n'a ni matériau ni géométrie. Il ne représente qu'un espace local.</p>
+<p>Ici, nous avons fait un <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Comme une <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, c'est aussi un nœud, mais contrairement à une <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, il n'a ni matériau ni géométrie. Il ne représente qu'un espace local.</p>
 <p>Notre nouvelle scène ressemble à ceci :</p>
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
 <p>La  <code class="notranslate" translate="no">sunMesh</code> et la <code class="notranslate" translate="no">earthMesh</code> sont tous les deux des enfants de <code class="notranslate" translate="no">solarSystem</code>. Les trois sont en train de tournés, et comme <code class="notranslate" translate="no">earthMesh</code> n'est pas un enfant de <code class="notranslate" translate="no">sunMesh</code>, elle n'est plus mise à l'échelle.</p>
@@ -166,7 +166,7 @@ objects.push(earthMesh);
 +moonOrbit.add(moonMesh);
 +objects.push(moonMesh);
 </pre>
-<p>Ajoutons à nouveau d'autres noeuds à notre scène. D'abord, un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">earthOrbit</code>
+<p>Ajoutons à nouveau d'autres noeuds à notre scène. D'abord, un <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">earthOrbit</code>
 ensuite ajoutons-lui un <code class="notranslate" translate="no">earthMesh</code> et un <code class="notranslate" translate="no">moonOrbit</code>. Finalement, ajoutons un <code class="notranslate" translate="no">moonMesh</code>
 au <code class="notranslate" translate="no">moonOrbit</code>. Notre scène devrait ressembler à ceci :</p>
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
@@ -180,7 +180,7 @@ au <code class="notranslate" translate="no">moonOrbit</code>. Notre scène devra
 <p>Vous pouvez voir que la lune suit le modèle de spirographe indiqué en haut de cet article, mais nous n'avons pas eu à le calculer manuellement. Nous venons de configurer notre graphe de scène pour le faire pour nous.</p>
 <p>Il est souvent utile de dessiner quelque chose pour visualiser les nœuds dans le graphe de scène.
 Three.js dispose pour cela de Helpers.</p>
-<p>L'un d'entre eux s'appelle <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>. Il dessine trois lignes représentant les axes 
+<p>L'un d'entre eux s'appelle <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>. Il dessine trois lignes représentant les axes 
 <span style="color:red">X</span>,
 <span style="color:green">Y</span>, et
 <span style="color:blue">Z</span>. Ajoutons-en un à chacun de nos noeuds. </p>
@@ -203,9 +203,9 @@ Pour cela, nous définissons le <code class="notranslate" translate="no">depthTe
 <p>Vous pouvez voir les axes
 <span style="color:red">x (rouge)</span> et
 <span style="color:blue">z (bleu)</span>. Comme nous regardons vers le bas et que chacun de nos objets tourne autour de son axe y, nous ne voyons pas bien l'axe <span style="color:green">y (verte)</span>.</p>
-<p>Il peut être difficile de voir certains d'entre eux car il y a 2 paires d'axes qui se chevauchent. Le <code class="notranslate" translate="no">sunMesh</code> et le <code class="notranslate" translate="no">solarSystem</code> sont tous les deux à la même position. De même, <code class="notranslate" translate="no">earthMesh</code> et <code class="notranslate" translate="no">earthOrbit</code> sont à la même position. Ajoutons quelques contrôles simples pour nous permettre de les activer/désactiver pour chaque nœud. Pendant que nous y sommes, ajoutons également un autre assistant appelé <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. Il crée une grille 2D sur le plan X,Z. Par défaut, la grille est de 10x10 unités.</p>
+<p>Il peut être difficile de voir certains d'entre eux car il y a 2 paires d'axes qui se chevauchent. Le <code class="notranslate" translate="no">sunMesh</code> et le <code class="notranslate" translate="no">solarSystem</code> sont tous les deux à la même position. De même, <code class="notranslate" translate="no">earthMesh</code> et <code class="notranslate" translate="no">earthOrbit</code> sont à la même position. Ajoutons quelques contrôles simples pour nous permettre de les activer/désactiver pour chaque nœud. Pendant que nous y sommes, ajoutons également un autre assistant appelé <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. Il crée une grille 2D sur le plan X,Z. Par défaut, la grille est de 10x10 unités.</p>
 <p>Nous allons également utiliser <a href="https://github.com/georgealways/lil-gui">lil-gui</a>, une librairie d'interface utilisateur très populaire pour les projets Three.js. lil-gui prend un objet et un nom de propriété sur cet objet et, en fonction du type de la propriété, crée automatiquement une interface utilisateur pour manipuler cette propriété.</p>
-<p>Nous voulons créer à la fois un <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> et un <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> pour chaque nœud. Nous avons besoin d'un label pour chaque nœud, nous allons donc nous débarrasser de l'ancienne boucle et faire appel à une fonction pour ajouter les helpers pour chaque nœud.</p>
+<p>Nous voulons créer à la fois un <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> et un <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> pour chaque nœud. Nous avons besoin d'un label pour chaque nœud, nous allons donc nous débarrasser de l'ancienne boucle et faire appel à une fonction pour ajouter les helpers pour chaque nœud.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// add an AxesHelper to each node
 -objects.forEach((node) =&gt; {
 -  const axes = new THREE.AxesHelper();
@@ -226,7 +226,7 @@ Pour cela, nous définissons le <code class="notranslate" translate="no">depthTe
 +makeAxisGrid(moonOrbit, 'moonOrbit');
 +makeAxisGrid(moonMesh, 'moonMesh');
 </pre>
-<p><code class="notranslate" translate="no">makeAxisGrid</code> crée un <code class="notranslate" translate="no">AxisGridHelper</code> qui est une classe que nous allons créer pour rendre lil-gui heureux. Comme il est dit ci-dessus, lil-gui créera automatiquement une interface utilisateur qui manipule la propriété nommée d'un objet. Cela créera une interface utilisateur différente selon le type de propriété. Nous voulons qu'il crée une case à cocher, nous devons donc spécifier une propriété bool. Mais, nous voulons que les axes et la grille apparaissent/disparaissent en fonction d'une seule propriété, nous allons donc créer une classe qui a un getter et un setter pour une propriété. De cette façon, nous pouvons laisser lil-gui penser qu'il manipule une seule propriété, mais en interne, nous pouvons définir la propriété visible de <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> et <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> pour un nœud.</p>
+<p><code class="notranslate" translate="no">makeAxisGrid</code> crée un <code class="notranslate" translate="no">AxisGridHelper</code> qui est une classe que nous allons créer pour rendre lil-gui heureux. Comme il est dit ci-dessus, lil-gui créera automatiquement une interface utilisateur qui manipule la propriété nommée d'un objet. Cela créera une interface utilisateur différente selon le type de propriété. Nous voulons qu'il crée une case à cocher, nous devons donc spécifier une propriété bool. Mais, nous voulons que les axes et la grille apparaissent/disparaissent en fonction d'une seule propriété, nous allons donc créer une classe qui a un getter et un setter pour une propriété. De cette façon, nous pouvons laisser lil-gui penser qu'il manipule une seule propriété, mais en interne, nous pouvons définir la propriété visible de <a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> et <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> pour un nœud.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Activer/désactiver les axes et la grille lil-gui 
 // nécessite une propriété qui renvoie un bool 
 // pour décider de faire une case à cocher 
@@ -258,7 +258,7 @@ class AxisGridHelper {
   }
 }
 </pre>
-<p>Une chose à noter est que nous définissons le <code class="notranslate" translate="no">renderOrder</code> de l'<a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> sur 2 et pour le <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> sur 1 afin que les axes soient dessinés après la grille. Sinon, la grille pourrait écraser les axes.</p>
+<p>Une chose à noter est que nous définissons le <code class="notranslate" translate="no">renderOrder</code> de l'<a href="../docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> sur 2 et pour le <a href="../docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> sur 1 afin que les axes soient dessinés après la grille. Sinon, la grille pourrait écraser les axes.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
@@ -276,11 +276,11 @@ class AxisGridHelper {
 <p>Let's make one semi-complex scene graph. We'll make a tank. The tank will have
 6 wheels and a turret. The tank will follow a path. There will be a sphere that
 moves around and the tank will target the sphere.</p>
-<p>Voici le graphique de la scène. Les maillages sont colorés en vert, les <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> en bleu, les lumières en or et les caméras en violet. Une caméra n'a pas été ajoutée au graphique de la scène.</p>
+<p>Voici le graphique de la scène. Les maillages sont colorés en vert, les <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> en bleu, les lumières en or et les caméras en violet. Une caméra n'a pas été ajoutée au graphique de la scène.</p>
 <div class="threejs_center"><img src="../resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
 <p>Regardez dans le code pour voir la configuration de tous ces nœuds.</p>
-<p>Pour la cible, la chose que le char vise, il y a une <code class="notranslate" translate="no">targetOrbit</code> (Object3D) qui tourne juste de la même manière que la <code class="notranslate" translate="no">earthOrbit</code> ci-dessus. Une <code class="notranslate" translate="no">targetElevation</code> (Object3D) qui est un enfant de <code class="notranslate" translate="no">targetOrbit</code> fournit un décalage par rapport à <code class="notranslate" translate="no">targetOrbit</code> et une élévation de base. Un autre <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">targetBob</code> qui monte et descend par rapport à la <code class="notranslate" translate="no">targetElevation</code>. Enfin, il y a le <code class="notranslate" translate="no">targetMesh</code> qui est juste un cube que nous faisons pivoter et changeons ses couleurs.</p>
+<p>Pour la cible, la chose que le char vise, il y a une <code class="notranslate" translate="no">targetOrbit</code> (Object3D) qui tourne juste de la même manière que la <code class="notranslate" translate="no">earthOrbit</code> ci-dessus. Une <code class="notranslate" translate="no">targetElevation</code> (Object3D) qui est un enfant de <code class="notranslate" translate="no">targetOrbit</code> fournit un décalage par rapport à <code class="notranslate" translate="no">targetOrbit</code> et une élévation de base. Un autre <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">targetBob</code> qui monte et descend par rapport à la <code class="notranslate" translate="no">targetElevation</code>. Enfin, il y a le <code class="notranslate" translate="no">targetMesh</code> qui est juste un cube que nous faisons pivoter et changeons ses couleurs.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// mettre en mouvement la cible
 targetOrbit.rotation.y = time * .27;
 targetBob.position.y = Math.sin(time * 2) * 4;
@@ -289,7 +289,7 @@ targetMesh.rotation.y = time * 13;
 targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 </pre>
-<p>Pour le char, il y a un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">tank</code> qui est utilisé pour déplacer tout ce qui se trouve en dessous. Le code utilise une <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> à laquelle il peut demander des positions le long de cette courbe. 0.0 est le début de la courbe. 1,0 est la fin de la courbe. Il demande la position actuelle où il met le réservoir. Il demande ensuite une position légèrement plus bas dans la courbe et l'utilise pour pointer le réservoir dans cette direction à l'aide de <a href="/docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
+<p>Pour le char, il y a un <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> appelé <code class="notranslate" translate="no">tank</code> qui est utilisé pour déplacer tout ce qui se trouve en dessous. Le code utilise une <a href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> à laquelle il peut demander des positions le long de cette courbe. 0.0 est le début de la courbe. 1,0 est la fin de la courbe. Il demande la position actuelle où il met le réservoir. Il demande ensuite une position légèrement plus bas dans la courbe et l'utilise pour pointer le réservoir dans cette direction à l'aide de <a href="../docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tankPosition = new THREE.Vector2();
 const tankTarget = new THREE.Vector2();
 
@@ -302,7 +302,7 @@ curve.getPointAt((tankTime + 0.01) % 1, tankTarget);
 tank.position.set(tankPosition.x, 0, tankPosition.y);
 tank.lookAt(tankTarget.x, 0, tankTarget.y);
 </pre>
-<p>La tourelle sur le dessus du char est déplacée automatiquement en tant qu'enfant du char. Pour le pointer sur la cible, nous demandons simplement la position de la cible, puis utilisons à nouveau <a href="/docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
+<p>La tourelle sur le dessus du char est déplacée automatiquement en tant qu'enfant du char. Pour le pointer sur la cible, nous demandons simplement la position de la cible, puis utilisons à nouveau <a href="../docs/#api/en/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const targetPosition = new THREE.Vector3();
 
 ...

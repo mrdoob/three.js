@@ -23,7 +23,7 @@
 まだ読んでない人はそちらから先に読んでみるといいかもしれません。</p>
 <p><a href="textures.html">前回のテクスチャの記事</a>ではテクスチャは画像ファイルを使っていました。
 実行時にテクスチャを生成したい場合もあります。
-これを行う方法の1つは <a href="/docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> を使用する事です。</p>
+これを行う方法の1つは <a href="../docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> を使用する事です。</p>
 <p>キャンバステクスチャは <code class="notranslate" translate="no">&lt;canvas&gt;</code> を入力として受け取ります。
 2D canvas APIでキャンバスに描画する方法を知らない場合、<a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial">MDNに良いチュートリアルがあります</a>。</p>
 <p>簡単なキャンバスのプログラムを作ってみましょう。
@@ -70,7 +70,7 @@ requestAnimationFrame(render);
 <p>これをテクスチャとして使ってみましょう。
 まずは<a href="textures.html">前回の記事</a>の立方体のテクスチャにしてみます。
 画像を読込するコードを削除します。
-代わりにキャンバスを作成し <a href="/docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> を作成してキャンバスに渡します。</p>
+代わりにキャンバスを作成し <a href="../docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> を作成してキャンバスに渡します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [];  // just an array we can use to rotate the cubes
 -const loader = new THREE.TextureLoader();
 -
@@ -114,7 +114,7 @@ cubes.push(cube);  // add to our list of cubes to rotate
   requestAnimationFrame(render);
 }
 </pre>
-<p>唯一の余計な事は <a href="/docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> の <code class="notranslate" translate="no">needsUpdate</code> プロパティを設定し、Three.jsにキャンバスの最新のコンテンツでテクスチャを更新する事です。</p>
+<p>唯一の余計な事は <a href="../docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> の <code class="notranslate" translate="no">needsUpdate</code> プロパティを設定し、Three.jsにキャンバスの最新のコンテンツでテクスチャを更新する事です。</p>
 <p>これでキャンバスのテクスチャキューブができました。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../canvas-textured-cube.html"></iframe></div>
@@ -231,7 +231,7 @@ cubes.push(cube);  // add to our list of cubes to rotate
 +  return root;
 +}
 </pre>
-<p>上記のようにルートの <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> に体、頭、ラベルを配置して位置を調整しています。
+<p>上記のようにルートの <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> に体、頭、ラベルを配置して位置を調整しています。
 これでキャラクターを移動させたい場合、ルートオブジェクトを移動します。
 体の高さは2です。
 1が1メートルに等しい場合、上記のコードはラベルをcm単位で作成してます。
@@ -241,7 +241,7 @@ cubes.push(cube);  // add to our list of cubes to rotate
 +makePerson(-0, 32, 'Green Machine', 'green');
 +makePerson(+3, 32, 'Red Menace', 'red');
 </pre>
-<p>残作業はカメラを動かせるように <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。</p>
+<p>残作業はカメラを動かせるように <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 </pre>

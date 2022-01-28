@@ -51,8 +51,8 @@ put this image on cube.</p>
   <img src="../examples/resources/images/wall.jpg" style="width: 600px;" class="border">
 </div>
 
-<p>We'll modify one of our first samples. All we need to do is create a <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>. Call its
-<a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> method with the URL of an
+<p>We'll modify one of our first samples. All we need to do is create a <a href="../docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>. Call its
+<a href="../docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> method with the URL of an
 image and and set the material's <code class="notranslate" translate="no">map</code> property to the result instead of setting its <code class="notranslate" translate="no">color</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
@@ -61,7 +61,7 @@ const material = new THREE.MeshBasicMaterial({
 +  map: loader.load('resources/images/wall.jpg'),
 });
 </pre>
-<p>Note that we're using <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> so no need for any lights.</p>
+<p>Note that we're using <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> so no need for any lights.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube.html"></iframe></div>
   <a class="threejs_center" href="../examples/textured-cube.html" target="_blank">click here to open in a separate window</a>
@@ -83,7 +83,7 @@ const material = new THREE.MeshBasicMaterial({
   </div>
 </div>
 
-<p>We just make 6 materials and pass them as an array when we create the <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
+<p>We just make 6 materials and pass them as an array when we create the <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 
 -const material = new THREE.MeshBasicMaterial({
@@ -108,9 +108,9 @@ const material = new THREE.MeshBasicMaterial({
 
 <p></p>
 <p>It should be noted though that not all geometry types supports multiple
-materials. <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> can use 6 materials one for each face.
-<a href="/docs/#api/en/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a> can use 2 materials, one for the bottom and one for the cone.
-<a href="/docs/#api/en/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> can use 3 materials, bottom, top, and side.
+materials. <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> can use 6 materials one for each face.
+<a href="../docs/#api/en/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a> can use 2 materials, one for the bottom and one for the cone.
+<a href="../docs/#api/en/geometries/CylinderGeometry"><code class="notranslate" translate="no">CylinderGeometry</code></a> can use 3 materials, bottom, top, and side.
 For other cases you will need to build or load custom geometry and/or modify texture coordinates.</p>
 <p>It's far more common in other 3D engines and far more performant to use a
 <a href="https://en.wikipedia.org/wiki/Texture_atlas">Texture Atlas</a>
@@ -124,8 +124,8 @@ We'll go over them when we start <a href="custom-buffergeometry.html">building c
 <h2 id="-a-name-loading-a-loading-textures"><a name="loading"></a> Loading Textures</h2>
 <h3 id="-a-name-easy-a-the-easy-way"><a name="easy"></a> The Easy Way</h3>
 <p>Most of the code on this site uses the easiest method of loading textures.
-We create a <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> and then call its <a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> method.
-This returns a <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> object.</p>
+We create a <a href="../docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> and then call its <a href="../docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> method.
+This returns a <a href="../docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> object.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const texture = loader.load('resources/images/flower-1.jpg');
 </pre>
 <p>It's important to note that using this method our texture will be transparent until
@@ -137,7 +137,7 @@ but if we want we can ask three.js to tell us when the texture has finished down
 <h3 id="-a-name-wait1-a-waiting-for-a-texture-to-load"><a name="wait1"></a> Waiting for a texture to load</h3>
 <p>To wait for a texture to load the <code class="notranslate" translate="no">load</code> method of the texture loader takes a callback
 that will be called when the texture has finished loading. Going back to our top example
-we can wait for the texture to load before creating our <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> and adding it to scene
+we can wait for the texture to load before creating our <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> and adding it to scene
 like this</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 loader.load('resources/images/wall.jpg', (texture) =&gt; {
@@ -158,8 +158,8 @@ to see the any difference but rest assured it is waiting for the texture to load
 
 <p></p>
 <h3 id="-a-name-waitmany-a-waiting-for-multiple-textures-to-load"><a name="waitmany"></a> Waiting for multiple textures to load</h3>
-<p>To wait until all textures have loaded you can use a <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>. Create one
-and pass it to the <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> then set its  <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>
+<p>To wait until all textures have loaded you can use a <a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>. Create one
+and pass it to the <a href="../docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> then set its  <a href="../docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a>
 property to a callback.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadManager = new THREE.LoadingManager();
 *const loader = new THREE.TextureLoader(loadManager);
@@ -179,7 +179,7 @@ const materials = [
 +  cubes.push(cube);  // add to our list of cubes to rotate
 +};
 </pre>
-<p>The <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> also has an <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> property
+<p>The <a href="../docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> also has an <a href="../docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> property
 we can set to another callback to show a progress indicator.</p>
 <p>First we'll add a progress bar in HTML</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
@@ -309,7 +309,7 @@ tiny cube.</p>
 larger than its original size and what happens when it's drawn smaller than its
 original size.</p>
 <p>For setting the filter when the texture is drawn larger than its original size
-you set <a href="/docs/#api/en/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a> property to either <code class="notranslate" translate="no">THREE.NearestFilter</code> or
+you set <a href="../docs/#api/en/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a> property to either <code class="notranslate" translate="no">THREE.NearestFilter</code> or
  <code class="notranslate" translate="no">THREE.LinearFilter</code>.  <code class="notranslate" translate="no">NearestFilter</code> means
 just pick the closet single pixel from the original texture. With a low
 resolution texture this gives you a very pixelated look like Minecraft.</p>
@@ -329,7 +329,7 @@ each of the 4 pixels.</p>
 </div>
 
 <p>For setting the filter when the texture is drawn smaller than its original size
-you set the <a href="/docs/#api/en/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a> property to one of 6 values.</p>
+you set the <a href="../docs/#api/en/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a> property to one of 6 values.</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.NearestFilter</code></p>
 <p> same as above, choose the closest pixel in the texture</p>
@@ -410,8 +410,8 @@ This can be especially important to consider on mobile devices.</p>
 <h2 id="-a-name-uvmanipulation-a-repeating-offseting-rotating-wrapping-a-texture"><a name="uvmanipulation"></a> Repeating, offseting, rotating, wrapping a texture</h2>
 <p>Textures have settings for repeating, offseting, and rotating a texture.</p>
 <p>By default textures in three.js do not repeat. To set whether or not a
-texture repeats there are 2 properties, <a href="/docs/#api/en/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> for horizontal wrapping
-and <a href="/docs/#api/en/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> for vertical wrapping.</p>
+texture repeats there are 2 properties, <a href="../docs/#api/en/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> for horizontal wrapping
+and <a href="../docs/#api/en/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> for vertical wrapping.</p>
 <p>They can be set to one of:</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
@@ -519,7 +519,7 @@ gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
   .name('texture.rotation');
 </pre>
 <p>The last thing to note about the example is that if you change <code class="notranslate" translate="no">wrapS</code> or
-<code class="notranslate" translate="no">wrapT</code> on the texture you must also set <a href="/docs/#api/en/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>
+<code class="notranslate" translate="no">wrapT</code> on the texture you must also set <a href="../docs/#api/en/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>
 so three.js knows to apply those settings. The other settings are automatically applied.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../textured-cube-adjust.html"></iframe></div>

@@ -33,14 +33,14 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>次に <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は、カメラをある点を中心に<em>軌道</em>を回転できます。
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> はthree.jsのオプション機能なので、importする必要があります。</p>
+<p>次に <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は、カメラをある点を中心に<em>軌道</em>を回転できます。
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> はthree.jsのオプション機能なので、importする必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 </pre>
 <p>これでOrbitControlsを利用できます。
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> にカメラと入力イベントを取得するDOM要素を渡します。</p>
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> にカメラと入力イベントを取得するDOM要素を渡します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
@@ -102,7 +102,7 @@ scene.add(mesh);
 </pre>
 <p>ライトアップするシーンができたのでライトを追加しましょう！</p>
 <h2 id="-ambientlight-"><code class="notranslate" translate="no">AmbientLight（環境光源）</code></h2>
-<p>最初に <a href="/docs/#api/ja/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> を作りましょう。</p>
+<p>最初に <a href="../docs/#api/ja/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> を作りましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.AmbientLight(color, intensity);
@@ -141,14 +141,14 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <p></p>
 <p>シーンをクリックしてドラッグして、カメラを<em>軌道</em>に乗せます。</p>
 <p>環境光源だけでは正しくライティング表現できてません。キューブと球体に陰影がなく形状が平面に見えます。
-以下のように <a href="/docs/#api/ja/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> はマテリアルの色とライトの色、ライトの強度(intensity)を掛けてます。</p>
+以下のように <a href="../docs/#api/ja/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> はマテリアルの色とライトの色、ライトの強度(intensity)を掛けてます。</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">color = materialColor * light.color * light.intensity;
 </pre><p>それだけで方向性がないです。
 この環境光源は100％均一でシーン内の全ての色を変える以外は<em>ライティング</em>としてはあまり役に立ちません。
 環境光源は暗すぎない暗さを作る事ができます。</p>
 <h2 id="-hemispherelight-"><code class="notranslate" translate="no">HemisphereLight（半球光源）</code></h2>
-<p>コードを <a href="/docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> に切り替えてみましょう。
-<a href="/docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> は空と地面の色を取得し、その2色とマテリアルの色を掛け合わせます。</p>
+<p>コードを <a href="../docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> に切り替えてみましょう。
+<a href="../docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> は空と地面の色を取得し、その2色とマテリアルの色を掛け合わせます。</p>
 <p>これが新しいコードです。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const color = 0xFFFFFF;
 +const skyColor = 0xB1E1FF;  // light blue
@@ -173,11 +173,11 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 
 <p></p>
 <p>まだ正しくライティング表現ができてなく、キューブと球体が平面に見えます。
-別のライトと組み合わせて使用される <a href="/docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> は、空や地面の色に良い影響を与えます。
-この方法では他のライトと組み合わせて使うか、<a href="/docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> を代わりに使うのがベストです。</p>
+別のライトと組み合わせて使用される <a href="../docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> は、空や地面の色に良い影響を与えます。
+この方法では他のライトと組み合わせて使うか、<a href="../docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> を代わりに使うのがベストです。</p>
 <h2 id="-directionallight-"><code class="notranslate" translate="no">DirectionalLight（平行光源）</code></h2>
-<p>コードを <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> に切り替えてみましょう。
-<a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> は太陽を表すのによく使われます。</p>
+<p>コードを <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> に切り替えてみましょう。
+<a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> は太陽を表すのによく使われます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.DirectionalLight(color, intensity);
@@ -187,7 +187,7 @@ scene.add(light);
 scene.add(light.target);
 </pre>
 <p>シーンに <code class="notranslate" translate="no">light</code> と <code class="notranslate" translate="no">light.target</code> を追加する必要があります。
-three.jsの <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> はターゲットの方向にライティングします。</p>
+three.jsの <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> はターゲットの方向にライティングします。</p>
 <p>GUIに追加してlight.targetを動かせるようにしてみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
@@ -204,13 +204,13 @@ gui.add(light.target.position, 'y', 0, 10);
 <p></p>
 <p>なんだか見づらいですね。
 Three.jsにはシーンに追加できるヘルパーオブジェクトがたくさんあり、シーンの見えない部分を視覚化するのに役立ちます。
-今回は <a href="/docs/#api/ja/helpers/DirectionalLightHelper"><code class="notranslate" translate="no">DirectionalLightHelper</code></a> を使い、ライトから平面までの線を描画します。
+今回は <a href="../docs/#api/ja/helpers/DirectionalLightHelper"><code class="notranslate" translate="no">DirectionalLightHelper</code></a> を使い、ライトから平面までの線を描画します。
 lightをDirectionalLightHelperに渡してシーンに追加します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const helper = new THREE.DirectionalLightHelper(light);
 scene.add(helper);
 </pre>
 <p>ライトの位置とターゲットの両方を設定できるようにしておきましょう。
-<a href="/docs/#api/ja/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> が与えられた時に <code class="notranslate" translate="no">lil-gui</code> を使い <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code>, <code class="notranslate" translate="no">z</code> プロパティを調整できる関数を作ります。</p>
+<a href="../docs/#api/ja/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> が与えられた時に <code class="notranslate" translate="no">lil-gui</code> を使い <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code>, <code class="notranslate" translate="no">z</code> プロパティを調整できる関数を作ります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeXYZGUI(gui, vector3, name, onChangeFn) {
   const folder = gui.addFolder(name);
   folder.add(vector3, 'x', -10, 10).onChange(onChangeFn);
@@ -243,10 +243,10 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 
 <p></p>
 <p>カメラを軌道に乗せると見やすくなります。
-この平面は <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を表しており、DirectionalLightが一方向からのライティングを計算します。
+この平面は <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を表しており、DirectionalLightが一方向からのライティングを計算します。
 光の出所は<em>点</em>ではなく、平面を無限に照らす平行光線です。</p>
 <h2 id="-pointlight-"><code class="notranslate" translate="no">PointLight（点光源）</code></h2>
-<p><a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> はある点から全方向に光を放つライトです。
+<p><a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> はある点から全方向に光を放つライトです。
 コード変更しましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
@@ -257,7 +257,7 @@ light.position.set(0, 10, 0);
 scene.add(light);
 -scene.add(light.target);
 </pre>
-<p><a href="/docs/#api/ja/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> に切り替えます。</p>
+<p><a href="../docs/#api/ja/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> に切り替えます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const helper = new THREE.DirectionalLightHelper(light);
 +const helper = new THREE.PointLightHelper(light);
 scene.add(helper);
@@ -269,11 +269,11 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p><a href="/docs/#api/ja/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> には点がない事に注意して下さい。
+<p><a href="../docs/#api/ja/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> には点がない事に注意して下さい。
 小さなダイヤモンドのワイヤーフレームを描画します。
 簡単に望む任意の形状にできて、ライト自体にメッシュを追加します。</p>
-<p><a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> は <a href="/docs/#api/ja/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>プロパティを持ちます。
-<code class="notranslate" translate="no">distance</code> が0ならば <a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> は無限大に輝きます。
+<p><a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> は <a href="../docs/#api/ja/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>プロパティを持ちます。
+<code class="notranslate" translate="no">distance</code> が0ならば <a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> は無限大に輝きます。
 <code class="notranslate" translate="no">distance</code> が0よりも大きい場合、ライトに向かってライトの全強度を照らし、ライトから離れた <code class="notranslate" translate="no">distance</code> では影響を受けないようにフェードアウトします。</p>
 <p>distanceを調整できるようにGUIを設定してみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
@@ -296,9 +296,9 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 <p>集中光源は円錐体にライティングする時に効果的です。
 実際は2つの円錐体があります。外側と内側の円錐体です。
 内側と外側の円錐体の間では、ライトは強度のMAX値から0にフェードします。</p>
-<p><a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> を使うには、平行光源と同じようにターゲットが必要です。
+<p><a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> を使うには、平行光源と同じようにターゲットが必要です。
 ライトの円錐体がターゲットに向かって照らされます。</p>
-<p>上記のヘルパーを使って <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を修正します。</p>
+<p>上記のヘルパーを使って <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を修正します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
 -const light = new THREE.DirectionalLight(color, intensity);
@@ -310,11 +310,11 @@ scene.add(light.target);
 +const helper = new THREE.SpotLightHelper(light);
 scene.add(helper);
 </pre>
-<p>集中光源の円錐体の角度は <a href="/docs/#api/ja/lights/SpotLight#angle"><code class="notranslate" translate="no">angle</code></a>プロパティでラジアン単位で設定します。
+<p>集中光源の円錐体の角度は <a href="../docs/#api/ja/lights/SpotLight#angle"><code class="notranslate" translate="no">angle</code></a>プロパティでラジアン単位で設定します。
 <a href="textures.html">テクスチャ記事</a>の <code class="notranslate" translate="no">DegRadHelper</code> を使い、度数でUIに表示します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
 </pre>
-<p>内側の円錐は<a href="/docs/#api/ja/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra</code></a>プロパティを外側の円錐からの%として設定します。
+<p>内側の円錐は<a href="../docs/#api/ja/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra</code></a>プロパティを外側の円錐からの%として設定します。
 <code class="notranslate" translate="no">penumbra</code> が1の時、ライトは円錐の中心から外側の円錐に向かってフェードしていきます。
 <code class="notranslate" translate="no">penumbra</code> が5の時、ライトは外側の円錐体の中心から50%からフェードしていきます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(light, 'penumbra', 0, 1, 0.01);
@@ -330,9 +330,9 @@ scene.add(helper);
 その理由は地面にあります。
 距離を5くらいまで縮めると、円錐体の端が開いているのが見えてきます。</p>
 <h2 id="-rectarealight-"><code class="notranslate" translate="no">RectAreaLight（矩形光源）</code></h2>
-<p>もう1種類のライトに <a href="/docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> があります。
+<p>もう1種類のライトに <a href="../docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> があります。
 これはまさにその名の通り、長い蛍光灯のような長方形のエリアのライトや天井にある曇り空のライトです。</p>
-<p><a href="/docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> は <a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> と <a href="/docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> でしか動作しないので、全てのマテリアルを <a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> に変更しましょう。</p>
+<p><a href="../docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> は <a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> と <a href="../docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> でしか動作しないので、全てのマテリアルを <a href="../docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> に変更しましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">  ...
 
   const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
@@ -366,8 +366,8 @@ scene.add(helper);
   scene.add(mesh);
 }
 </pre>
-<p><a href="/docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> を使用するには、three.jsから追加のimportが必要です。
-ライトを可視化するために <a href="/docs/#api/ja/helpers/RectAreaLightHelper"><code class="notranslate" translate="no">RectAreaLightHelper</code></a> をimportします。</p>
+<p><a href="../docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> を使用するには、three.jsから追加のimportが必要です。
+ライトを可視化するために <a href="../docs/#api/ja/helpers/RectAreaLightHelper"><code class="notranslate" translate="no">RectAreaLightHelper</code></a> をimportします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {RectAreaLightUniformsLib} from '/examples/jsm/lights/RectAreaLightUniformsLib.js';
 +import {RectAreaLightHelper} from '/examples/jsm/helpers/RectAreaLightHelper.js';
@@ -392,7 +392,7 @@ scene.add(light);
 *const helper = new RectAreaLightHelper(light);
 *light.add(helper);
 </pre>
-<p>注意すべき点は <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> や <a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> と異なり、<a href="/docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> はターゲットを使いません。
+<p>注意すべき点は <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> や <a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> と異なり、<a href="../docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> はターゲットを使いません。
 その回転を利用しているだけです。
 もう1つ気をつける事は、ヘルパーがライトの子である必要があります。
 他のヘルパーのようにシーンの子ではありません。</p>
@@ -416,14 +416,14 @@ makeXYZGUI(gui, light.position, 'position');
 </div>
 
 <p></p>
-<p>説明してない事が1つあり、 <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> に <code class="notranslate" translate="no">physicallyCorrectLights</code> を設定します。
+<p>説明してない事が1つあり、 <a href="../docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> に <code class="notranslate" translate="no">physicallyCorrectLights</code> を設定します。
 ライトとの距離は、ライトの落ち方に影響を与えます。
-これは <a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> と <a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> にのみ影響します。
-<a href="/docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> は自動的にこれを行います。</p>
+これは <a href="../docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> と <a href="../docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> にのみ影響します。
+<a href="../docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> は自動的にこれを行います。</p>
 <p>ライトの場合の基本的な考え方は、フェードアウトする距離を設定しない、<code class="notranslate" translate="no">intensity</code> を設定しない事です。
-代わりにライトの<a href="/docs/#api/ja/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a>をルーメン単位で設定すると、three.jsは実際のライトのように物理計算を行います。
+代わりにライトの<a href="../docs/#api/ja/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a>をルーメン単位で設定すると、three.jsは実際のライトのように物理計算を行います。
 この場合の単位はメートルで、60Wの電球であれば800ルーメン程度の明るさになります。
-また<a href="/docs/#api/ja/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>プロパティもあります。
+また<a href="../docs/#api/ja/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>プロパティもあります。
 現実的な減衰のためには <code class="notranslate" translate="no">2</code> に設定します。</p>
 <p>試してみましょう。</p>
 <p>まずは物理的に正しいライトを作ります。</p>

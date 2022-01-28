@@ -45,7 +45,7 @@
 <div class="threejs_center"><img src="../resources/images/standard-primitive-uvs.jpg" style="width: 650px;"></div>
 
 <p>fragment 쉐이더의 다른 값으로도 비슷한 방법을 사용할 수 있습니다. 해당 값의 범위를 알아낸 뒤 해당 값을 0.0부터 1.0 사이의 값으로 변환해 <code class="notranslate" translate="no">gl_FragColor</code>에 지정하는 거죠.</p>
-<p>텍스처를 확인하려면 <a href="/docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>나 <a href="/docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 사용해보기 바랍니다.</p>
+<p>텍스처를 확인하려면 <a href="../docs/#api/ko/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>나 <a href="../docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 사용해보기 바랍니다.</p>
 <p>만약 <code class="notranslate" translate="no">gl_FragColor</code>에 빨간색을 지정했는데도 아무것도 보이지 않는다면, vertex 쉐이더 관련 물체의 방향 문제일 수 있습니다. 특정 행렬 좌표(matrix)가 잘못되었거나 어떤 속성의 값이 잘못되었거나 설정이 이상할 수 있죠.</p>
 <p>그럼 먼저 행렬 좌표를 살펴봐야 합니다. <code class="notranslate" translate="no">renderer.render(scene, camera)</code>를 한 번만 호출한 뒤 콘솔에서 객체를 펼쳐 보는 것이죠. 카메라의 전역 행렬 좌표나 투사 행렬 좌표에 <code class="notranslate" translate="no">NaN</code>이 있는 걸까요? 장면 객체를 펼쳐 <code class="notranslate" translate="no">children</code> 속성을 확인하니 전역 행렬 좌표는 멀쩡해 보입니다(<code class="notranslate" translate="no">NaN</code>이 없음). 또한 다른 행렬 좌표의 4가지 값들도 모두 멀쩡해 보입니다. 만약 장면의 크기가 50x50x50인데 어떤 좌표값이 552352623.123이라면 확실히 뭔가 잘못된 겁니다.</p>
 <div class="threejs_center"><img src="../resources/images/inspect-matrices.gif"></div>

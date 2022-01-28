@@ -42,28 +42,28 @@ to be useful.</p>
 <p>Still, there are times when we might want to generate our own
 3D geometry in code instead of using a modeling package.</p>
 <p>First let's just make a cube. Even though three.js already
-provides us with <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> and <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> a
+provides us with <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> and <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> a
 cube is easy to understand so let's start there.</p>
 <p>There are 2 ways to make custom geometry in THREE.js. One
-is with the <code class="notranslate" translate="no">Geometry</code> class, the other is <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.
+is with the <code class="notranslate" translate="no">Geometry</code> class, the other is <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.
 Each has their advantages. <code class="notranslate" translate="no">Geometry</code> is arguably easier to
 use but slower and uses more memory. For few 1000s triangles
 it's a great choice but for 10s of thousands of triangles
-it might be better to use <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.</p>
-<p><a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> is arguably harder to use but uses less
+it might be better to use <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.</p>
+<p><a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> is arguably harder to use but uses less
 memory and is faster. If quick rule of thumb might be
 if you're going to generate more than 10000 triangles
-consider using <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.</p>
+consider using <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.</p>
 <p>Note when I say <code class="notranslate" translate="no">Geometry</code> is slower I mean it is slower to
 start and slower to modify but it is not slower to draw so
 if you're not planning on modifying your geometry then
 as long as it's not too large there will only be slightly more
 delay for your program to start using <code class="notranslate" translate="no">Geometry</code> vs using
-<a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. We'll go over both eventually. For now
+<a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. We'll go over both eventually. For now
 though let's use geometry as it's easier to understand IMO.</p>
 <p>First let's make a cube with <code class="notranslate" translate="no">Geometry</code>. We'll start
 with an example from <a href="responsive.html">the article on responsiveness</a>.</p>
-<p>Let's remove the part that uses <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> and replace it with
+<p>Let's remove the part that uses <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> and replace it with
 a <code class="notranslate" translate="no">Geometry</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const boxWidth = 1;
 -const boxHeight = 1;
@@ -90,7 +90,7 @@ a <code class="notranslate" translate="no">Geometry</code>.</p>
 <p>We then need to make triangles, 2 for each face of the cube</p>
 <div class="threejs_center"><img src="../resources/cube-triangles.svg" style="width: 500px"></div>
 
-<p>We do that by creating <a href="/docs/#api/en/core/Face3"><code class="notranslate" translate="no">Face3</code></a> objects and specifying the indices
+<p>We do that by creating <a href="../docs/#api/en/core/Face3"><code class="notranslate" translate="no">Face3</code></a> objects and specifying the indices
 of the 3 vertices that make up that face.</p>
 <p>The order we specify the vertices is important. To be pointing toward the
 outside of the cube they must be specified in a counter clockwise direction
@@ -122,7 +122,7 @@ the cube like this</p>
 </pre>
 <p>A few other minor changes to the original code and it should
 work.</p>
-<p>These cubes are twice as large as the <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> we were
+<p>These cubes are twice as large as the <a href="../docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> we were
 using before so let's move the camera back a little</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
@@ -215,7 +215,7 @@ for us based on the positions we specified.</p>
 <p>For face normals we'd call <code class="notranslate" translate="no">Geometry.computeFaceNormals</code> as in</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.computeFaceNormals();
 </pre>
-<p>Removing the vertex color stuff and changing the material back to <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a></p>
+<p>Removing the vertex color stuff and changing the material back to <a href="../docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({vertexColors: true});
 +const material = new THREE.MeshPhongMaterial({color});
 </pre>
@@ -298,7 +298,7 @@ It's 96x64 pixels</p>
 <div class="threejs_center"><img src="../examples/resources/images/heightmap-96x64.png" style="width: 512px; image-rendering: pixelated;"></div>
 
 <p>We'll load that and then generate a heightmap mesh from it.
-We can use the <a href="/docs/#api/en/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a> to load the image.</p>
+We can use the <a href="../docs/#api/en/loaders/ImageLoader"><code class="notranslate" translate="no">ImageLoader</code></a> to load the image.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const imgLoader = new THREE.ImageLoader();
 imgLoader.load('resources/images/heightmap-96x64.png', createHeightmap);
 
@@ -403,7 +403,7 @@ for (let z = 0; z &lt; cellsDeep; ++z) {
 </pre>
 <p>A few minor changes to make it easier to view.</p>
 <ul>
-<li>include the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a></li>
+<li>include the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a></li>
 </ul>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
@@ -444,7 +444,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p></p>
 <p>I hope that was a useful instruction to making your own
 geometry using <code class="notranslate" translate="no">Geometry</code>.</p>
-<p>In <a href="custom-buffergeometry.html">another article</a> we'll go over <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.</p>
+<p>In <a href="custom-buffergeometry.html">another article</a> we'll go over <a href="../docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.</p>
 
         </div>
       </div>

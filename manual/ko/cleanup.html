@@ -185,9 +185,9 @@ process();
 
 <p></p>
 <p>딱히 오류는 없네요.</p>
-<p>불러온 파일을 해제하려면 코드를 좀 더 추가해야 합니다. Three.js의 로더는 대부분 최상위 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>만을 반환하기에 어떤 자원을 사용했는지 체크하려면 일일이 하위 요소를 뒤져봐야 합니다.</p>
+<p>불러온 파일을 해제하려면 코드를 좀 더 추가해야 합니다. Three.js의 로더는 대부분 최상위 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>만을 반환하기에 어떤 자원을 사용했는지 체크하려면 일일이 하위 요소를 뒤져봐야 합니다.</p>
 <p><code class="notranslate" translate="no">ResourceTracker</code>를 업데이트해 저 역할을 맡겨보죠.</p>
-<p>먼저 자원이 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>인지 확인해 해당 요소의 geometry, 재질, 하위 요소를 추적하도록 합니다.</p>
+<p>먼저 자원이 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>인지 확인해 해당 요소의 geometry, 재질, 하위 요소를 추적하도록 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
   constructor() {
     this.resources = new Set();

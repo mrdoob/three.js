@@ -100,7 +100,7 @@ import {FilmPass} from '/examples/jsm/postprocessing/FilmPass.js';
 <p>For pretty much any post processing <code class="notranslate" translate="no">EffectComposer.js</code>, and <code class="notranslate" translate="no">RenderPass.js</code>
 are required.</p>
 <p>The last things we need to do are to use <code class="notranslate" translate="no">EffectComposer.render</code> instead of
-<a href="/docs/#api/en/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> <em>and</em> to tell the <code class="notranslate" translate="no">EffectComposer</code> to match the size of
+<a href="../docs/#api/en/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> <em>and</em> to tell the <code class="notranslate" translate="no">EffectComposer</code> to match the size of
 the canvas.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(now) {
 -  time *= 0.001;
@@ -230,7 +230,7 @@ result by a color. </p>
 </pre>
 <p>Above <code class="notranslate" translate="no">tDiffuse</code> is the name that <code class="notranslate" translate="no">ShaderPass</code> uses to pass in the previous
 pass's result texture so we pretty much always need that. We then declare
-<code class="notranslate" translate="no">color</code> as a THREE.js <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a>.</p>
+<code class="notranslate" translate="no">color</code> as a THREE.js <a href="../docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a>.</p>
 <p>Next we need a vertex shader. For post processing the vertex shader shown here
 is pretty much standard and rarely needs to be changed. Without going into too
 many details (see articles linked above) the variables <code class="notranslate" translate="no">uv</code>, <code class="notranslate" translate="no">projectionMatrix</code>,

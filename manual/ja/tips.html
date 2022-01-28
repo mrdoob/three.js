@@ -119,7 +119,7 @@ elem.addEventListener('click', () =&gt; {
 <p><a id="preservedrawingbuffer" data-toc="キャンバスがクリアされるのを防ぐ"></a></p>
 <h1 id="-">キャンバスのクリアを防ぐ</h1>
 <p>アニメーションオブジェクトを使って、ユーザーにお絵かきさせたいとしましょう。
-<a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 作成時に <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> を渡す必要があります。
+<a href="../docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 作成時に <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> を渡す必要があります。
 これによりブラウザがキャンバスをクリアできなくなります。また、three.jsでもキャンバスをクリアしないようにする必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
 -const renderer = new THREE.WebGLRenderer({canvas});
@@ -203,7 +203,7 @@ elem.addEventListener('click', () =&gt; {
 <p><a id="transparent-canvas" data-toc="キャンバスを透明にする"></a></p>
 <h1 id="-">キャンバスを透明にする</h1>
 <p>デフォルトではthree.jsはキャンバスを不透明にします。
-キャンバスを透明にしたい場合は <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 作成時に<a href="/docs/#api/ja/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a>を指定します。</p>
+キャンバスを透明にしたい場合は <a href="../docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 作成時に<a href="../docs/#api/ja/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a>を指定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
 -const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
@@ -219,7 +219,7 @@ const renderer = new THREE.WebGLRenderer({
 +  premultipliedAlpha: false,
 });
 </pre>
-<p>Three.jsのデフォルトではキャンバスは<a href="/docs/#api/ja/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a>で出力されますが、マテリアルは<a href="/docs/#api/ja/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>で出力されます。</p>
+<p>Three.jsのデフォルトではキャンバスは<a href="../docs/#api/ja/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a>で出力されますが、マテリアルは<a href="../docs/#api/ja/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>で出力されます。</p>
 <p>プリマルチプライドアルファを利用するタイミングの理解を深めたいのであれば、この<a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre">良い記事</a>を参照して下さい。</p>
 <p>いずれにしても透明なキャンバスを使った簡単な例で設定してみましょう。</p>
 <p><a href="responsive.html">レスポンシブデザインの記事</a>の例に上記の設定を適用してみました。

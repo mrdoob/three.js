@@ -36,11 +36,11 @@
 <div class="threejs_center"><img style="width: 239px;" src="../resources/images/windmill-export-options.jpg"></div>
 
 <p>让我们一起来尝试将它展示出来。</p>
-<p>基于<a href="lights.html">光线文章</a>中的定向光线（<a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>）示例，结合半球光线（<a href="/docs/#api/zh/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>）示例。相对于示例，我删除了所有与调整灯光相关的GUI内容，还删除了添加到场景中的立方体和球体。</p>
-<p>第一件要做的事就是将<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>添加到代码中。</p>
+<p>基于<a href="lights.html">光线文章</a>中的定向光线（<a href="../docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>）示例，结合半球光线（<a href="../docs/#api/zh/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>）示例。相对于示例，我删除了所有与调整灯光相关的GUI内容，还删除了添加到场景中的立方体和球体。</p>
+<p>第一件要做的事就是将<a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>添加到代码中。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
 </pre>
-<p>然后创建<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>的实例并通过URL加载我们的.OBJ文件，并在回调函数中将已加载完的模型添加到场景（scene）里。</p>
+<p>然后创建<a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>的实例并通过URL加载我们的.OBJ文件，并在回调函数中将已加载完的模型添加到场景（scene）里。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const objLoader = new OBJLoader();
   objLoader.load('resources/models/windmill/windmill.obj', (root) =&gt; {
@@ -103,14 +103,14 @@ map_Ns windmill_001_base_SPEC.jpg
 <div class="threejs_center"><img style="width: 757px;" src="../resources/images/windmill-exported-files-with-textures.png"></div>
 
 <p>现在.MTL文件就能加载到这些纹理。</p>
-<p>首先要引用 <a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>;</p>
+<p>首先要引用 <a href="../docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>;</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
 import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
 +import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
 </pre>
 <p></p>
-<p>然后我们先加载.MTL文件，在它加载完材质后利用<code class="notranslate" translate="no">MtlObjBridge</code>将材质传给<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>，再加载.OBJ文件。</p>
+<p>然后我们先加载.MTL文件，在它加载完材质后利用<code class="notranslate" translate="no">MtlObjBridge</code>将材质传给<a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>，再加载.OBJ文件。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
 +  const mtlLoader = new MTLLoader();
 +  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtl) =&gt; {
@@ -306,7 +306,7 @@ center p {x: -0.00006103515625, y: 770.0909731090069, z: -3.313507080078125}
   });
 }
 </pre>
-<p>你可以看到在上面，我们传递了<code class="notranslate" translate="no">boxSize * 1.2</code>，当试图把它放入截锥体时，给了20%额外空间在盒子的上下面。我们还更新了<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>，使相机转动时是围绕它进行转动。</p>
+<p>你可以看到在上面，我们传递了<code class="notranslate" translate="no">boxSize * 1.2</code>，当试图把它放入截锥体时，给了20%额外空间在盒子的上下面。我们还更新了<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>，使相机转动时是围绕它进行转动。</p>
 <p>现在的效果是：</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../load-obj-auto-camera.html"></iframe></div>
@@ -397,7 +397,7 @@ illum 2
 +map_bump windmill_normal.jpg 
 +bump windmill_normal.jpg
 </pre>
-<p>现在。mtl文件指向一些合理大小的纹理，我们需要加载它，所以我们就像上面做的那样，首先加载材质，然后将它们设置在<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>上。</p>
+<p>现在。mtl文件指向一些合理大小的纹理，我们需要加载它，所以我们就像上面做的那样，首先加载材质，然后将它们设置在<a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>上。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
 +  const mtlLoader = new MTLLoader();
 +  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtl) =&gt; {
@@ -426,7 +426,7 @@ illum 2
 }
 </pre>
 <p>在我们真正尝试之前，我想到了一些问题，我不想显示出失败，我只是要检查一下。</p>
-<p>问题1：三个<a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>创建的材质会将材质的漫反射颜色，乘以漫反射纹理贴图。</p>
+<p>问题1：三个<a href="../docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>创建的材质会将材质的漫反射颜色，乘以漫反射纹理贴图。</p>
 <p>这是一个很有用的特性，但是要查看行上面的.MTL文件</p>
 <pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">Kd 0.00 0.00 0.00
 </pre>

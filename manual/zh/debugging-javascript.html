@@ -174,7 +174,7 @@ render() {
 				<p>接着我们做一个简单的例子：每次我们点击鼠标后，就会产生一个出现2秒钟的物体，并朝着一个随机的方向移动。我们将从一篇文章中的一个示例开始 <a href="responsive.html">making
 						things
 						responsive</a></p>
-				<p>下面是每次点击鼠标都新增一个<a href="/docs/#api/en/objects/Mesh"><code class="notranslate"
+				<p>下面是每次点击鼠标都新增一个<a href="../docs/#api/en/objects/Mesh"><code class="notranslate"
 							translate="no">Mesh</code></a>
 					的代码</p>
 				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry();
@@ -338,7 +338,7 @@ render() {}
 					我会立即知道问题所在</p>
 				<p>举一个例子，当我第一次在
 					<a href="load-gltf.html">article about loading gLTF files</a> 文章中创建路径的时候，我使用<a
-						href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate"
+						href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate"
 							translate="no">SplineCurve</code></a> ——一个专门制作2D曲线的类，做了一条曲线。
 				</p>
 				<p>接着我使用这条曲线使汽车像这样移动</p>
@@ -346,11 +346,11 @@ render() {}
 </pre>
 				<p>在内部 <code class="notranslate" translate="no">curve.getPointAt</code> 方法将调用传入的第二个参数对象上的 <code
 						class="notranslate" translate="no">set</code> 函数。在例子中第二个变量是<code class="notranslate"
-						translate="no">car.position</code>也就是一个<a href="/docs/#api/en/math/Vector3"><code
+						translate="no">car.position</code>也就是一个<a href="../docs/#api/en/math/Vector3"><code
 							class="notranslate" translate="no">Vector3</code></a>类型。 <a
-						href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>的
+						href="../docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a>的
 					<code class="notranslate" translate="no">set</code> 函数需要三个参数, x， y， 和 z 但是 <a
-						href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate"
+						href="../docs/#api/en/extras/curves/SplineCurve"><code class="notranslate"
 							translate="no">SplineCurve</code></a> 是一个2D曲线，因此它仅向<code class="notranslate"
 						translate="no">car.position.set</code>方法传入了x和y值。
 				</p>
@@ -430,9 +430,9 @@ requestAnimationFrame(render);
 						translate="no">&lt;canvas&gt;</code>
 					和一个<code class="notranslate"
 						translate="no">&lt;script&gt;</code>标记就可以了。你可以删除CSS和调整大小的代码，也可以删除.GLTF代码，因为你只关心路径。
-					你可以使用<a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
+					你可以使用<a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
 							translate="no">MeshBasicMaterial</code></a>删除灯光和阴影。你当然也可以删除lil gui代码。代码中纹理创建地平面，如果使用<a
-						href="/docs/#api/en/helpers/GridHelper"><code class="notranslate"
+						href="../docs/#api/en/helpers/GridHelper"><code class="notranslate"
 							translate="no">GridHelper</code></a>.会更容易。
 					最后，如果我们的问题是关于在路径上移动物体，我们可以在路径上使用立方体，而不是装载的汽车模型。
 				</p>
@@ -470,18 +470,18 @@ requestAnimationFrame(render);
 					各自的部分。请记住，尽量删除与您的问题无关的部分，并尽量使您的代码达到所需的最小数量。
 				</p>
 				<p>遵循这些建议你就可能在解决问题上得到帮助</p>
-				<h2 id="use-a-meshbasicmaterial-">使用<a href="/docs/#api/en/materials/MeshBasicMaterial"><code
+				<h2 id="use-a-meshbasicmaterial-">使用<a href="../docs/#api/en/materials/MeshBasicMaterial"><code
 							class="notranslate" translate="no">MeshBasicMaterial</code></a></h2>
-				<p>由于<a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
+				<p>由于<a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
 							translate="no">MeshBasicMaterial</code></a>不使用光照，这样做就不会产生一些物体不显示的问题了。如果你的物体在使用<a
-						href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
+						href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
 							translate="no">MeshBasicMaterial</code></a>
 					的时候显示，但是在使用其他任何材料时候不显示，那么你便知道问题出在材料或者光照上而不是其他地方的代码。
 				</p>
 				<h2 id="check-your-near-and-far-settings-for-your-camera">检查你相机的 <code class="notranslate"
 						translate="no">near</code> 和 <code class="notranslate" translate="no">far</code> 设置
 				</h2>
-				<p>一个 <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate"
+				<p>一个 <a href="../docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate"
 							translate="no">PerspectiveCamera</code></a> 有 <code class="notranslate"
 						translate="no">near</code> 和
 					<code class="notranslate" translate="no">far</code> 设置——在
@@ -501,7 +501,7 @@ requestAnimationFrame(render);
 				<p>
 					这只是另一种说法，如果所有其他方法都失败了，那么就从一些有效的方法开始，然后慢慢地再添加一些东西。
 					如果你得到一个屏幕上没有任何东西，那么试着把一些东西直接放在相机前面。制作一个球体或长方体，给它一个简单的材质，比如 <a
-						href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
+						href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
 							translate="no">MeshBasicMaterial</code></a> ，
 					确保你可以在屏幕上看到它。然后可以一次添加一些东西，然后再测试它。最终，你要么复现出你的bug，要么在途中发现它。
 				</p>

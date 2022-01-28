@@ -88,7 +88,7 @@ camera.position.z = 2;
 <p>тогда нам нужно отрендерить один раз</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
 </pre>
-<p>Нам нужно рендерить каждый раз, когда <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> меняет настройки камеры. К счастью, <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> отправляет событие <code class="notranslate" translate="no">change</code> каждый раз, когда что-то меняется. </p>
+<p>Нам нужно рендерить каждый раз, когда <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> меняет настройки камеры. К счастью, <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> отправляет событие <code class="notranslate" translate="no">change</code> каждый раз, когда что-то меняется. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
 </pre>
 <p>Нам также нужно обработать случай, когда пользователь изменяет размер окна. 
@@ -103,12 +103,12 @@ camera.position.z = 2;
 </div>
 
 <p></p>
-<p>У <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> есть опции для добавления некоторой инерции, чтобы они чувствовали себя менее интенсивными. 
+<p>У <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> есть опции для добавления некоторой инерции, чтобы они чувствовали себя менее интенсивными. 
 Мы можем включить это, установив для свойства <code class="notranslate" translate="no">enableDamping</code> значение true. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
 </pre>
 <p>С включенной функцией <code class="notranslate" translate="no">enableDamping</code> нам нужно вызвать <code class="notranslate" translate="no">controls.update</code> в нашей функции рендеринга, 
-чтобы <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> продолжал предоставлять нам новые настройки камеры, поскольку они сглаживают движение. 
+чтобы <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> продолжал предоставлять нам новые настройки камеры, поскольку они сглаживают движение. 
 Но это означает, что мы не можем вызвать <code class="notranslate" translate="no">render</code> напрямую из события <code class="notranslate" translate="no">change</code>, потому что мы окажемся в бесконечном цикле. 
 Элементы управления отправят нам событие <code class="notranslate" translate="no">change</code> и вызовут <code class="notranslate" translate="no">render</code>, <code class="notranslate" translate="no">render</code> вызовет <code class="notranslate" translate="no">controls.update</code>.
 <code class="notranslate" translate="no">controls.update</code> отправит еще одно событие <code class="notranslate" translate="no">change</code>. </p>

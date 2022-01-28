@@ -94,7 +94,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   });
 </pre>
 <p>自動フレーミングのコードは以前のままです。</p>
-<p>また <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> を取り除き <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> を含める必要があります。</p>
+<p>また <a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> を取り除き <a href="../docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> を含める必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from '/examples/jsm/loaders/LoaderSupport.js';
 -import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
 -import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
@@ -220,13 +220,13 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 <p>うーん、残念ながら子のオリジンが回転目的のために設定されておらず、アニメーション用に設計されてないようです。トラックの回転方向が間違っています。</p>
 <p>3Dで何かする場合の重要なポイントは、事前に計画を立ててアセットを設計する必要があります。アセットを正しい場所に配置し、正しいスケールになるようにデザインします。</p>
 <p>私は3DCGアーティストではなくBlenderもよく知らないので、ハックしてみます。
-それぞれの車で別の <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を親にします。
-次に <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> オブジェクトを移動させて車を移動させます。
-個々に車のオリジンに <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を設定して向きを変えられるので、必要な位置に設定する事ができます。</p>
+それぞれの車で別の <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を親にします。
+次に <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> オブジェクトを移動させて車を移動させます。
+個々に車のオリジンに <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を設定して向きを変えられるので、必要な位置に設定する事ができます。</p>
 <p>シーングラフのリストを見返すと "Car_08", "CAR_03", "Car_04" の3種類しかないようです。上手くいけば3種類の調整で済みます。</p>
 <p>コードを以下のように変更しました。
-それぞれの車でインスタンス作成した <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を親にし、その <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> をシーンに追加します。
-<em>車種</em>ごとの設定で向きを固定し、車の親の <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> の <code class="notranslate" translate="no">cars</code> 配列を追加します。</p>
+それぞれの車でインスタンス作成した <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を親にし、その <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> をシーンに追加します。
+<em>車種</em>ごとの設定で向きを固定し、車の親の <a href="../docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> の <code class="notranslate" translate="no">cars</code> 配列を追加します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
 +const cars = [];
 {
@@ -299,14 +299,14 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 ];
 </pre>
 <p>THREE.jsにはいくつかの曲線クラスがあります。
-<a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> が使えそうな気がしたので <a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> を使ってみた。
+<a href="../docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> が使えそうな気がしたので <a href="../docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> を使ってみた。
 この曲線は頂点を通る滑らかな曲線を作ります。</p>
 <p>実際にはこれらの頂点を直接入力すると次のような曲線が生成されます。</p>
 <div class="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
 
 <p>しかし、もっと角をシャープにして欲しいです。
 いくつかの頂点を追加し計算すれば、望んだ角度が得られる気がします。
-各頂点のペアで2つのポイントの間の10%と90%の道を計算し、その結果を <a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> に渡します。</p>
+各頂点のペアで2つのポイントの間の10%と90%の道を計算し、その結果を <a href="../docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> に渡します。</p>
 <p>このような曲線が得られます。</p>
 <div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
 
@@ -555,7 +555,7 @@ for (const car of loadedCars.children.slice()) {
 <p></p>
 <p>数分間の作業にしては悪くない結果です。</p>
 <p>最後にやりたいのはシャドウをつける事です。</p>
-<p>これを行うために<a href="shadows.html">シャドウの記事</a>にある <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> の例から全てのGUIコードを取得し、最新のコードに貼り付けました。</p>
+<p>これを行うために<a href="shadows.html">シャドウの記事</a>にある <a href="../docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> の例から全てのGUIコードを取得し、最新のコードに貼り付けました。</p>
 <p>読み込み後に全てのオブジェクトにシャドウをオンにする必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const gltfLoader = new GLTFLoader();

@@ -39,7 +39,7 @@
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">Додекаэдр (12 граней)</div>
 <div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">Выдавленная 2d фигура с скругленными краями.
 Здесь мы выдавливаем форму сердца. Обратите внимание, это основа 
-для <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> и <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> соответственно.</div>
+для <a href="../docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> и <a href="../docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> соответственно.</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">Икосаэдр (20 граней)</div>
 <div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">Форма, созданная вращением линии. Например, лампы, кегли для боулинга, свечи, подсвечники, бокалы для вина, стаканы для питья и т. Д. Вы указываете 2-мерный силуэт в виде серии точек, а затем указываете three.js , сколько секций нужно сделать, когда он вращает силуэт вокруг оси.</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">Октаэдр (8 граней)</div>
@@ -55,7 +55,7 @@
 <div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">Торический узел</div>
 <div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">Труба - круг проходящий путь</div>
 <div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">Вспомогательный объект, который принимает другую геометрию в качестве входных данных и генерирует ребра, только если угол между гранями больше некоторого порога. Например, если вы посмотрите на прямоугольник сверху, он показывает линию, проходящую через каждую грань, показывая каждый треугольник, из которого состоит прямоугольник. Используя EdgesGeometry, вместо этого удаляются средние линии.</div>
-<div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">Создает геометрию, которая содержит один отрезок (2 точки) на ребро в заданной геометрии. Без этого вы часто теряете ребра или получаете дополнительные ребра, поскольку WebGL обычно требует 2 точки на отрезок. Например, если бы у вас был только один треугольник, было бы только 3 очка. Если вы попытаетесь нарисовать его, используя материал с <code class="notranslate" translate="no">wireframe: true</code> вы получите только одну линию. А передача этой triangle geometry в <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a> создаст новую геометрию, которая имеет 3 отрезка линий, используя 6 точек..</div>
+<div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">Создает геометрию, которая содержит один отрезок (2 точки) на ребро в заданной геометрии. Без этого вы часто теряете ребра или получаете дополнительные ребра, поскольку WebGL обычно требует 2 точки на отрезок. Например, если бы у вас был только один треугольник, было бы только 3 очка. Если вы попытаетесь нарисовать его, используя материал с <code class="notranslate" translate="no">wireframe: true</code> вы получите только одну линию. А передача этой triangle geometry в <a href="../docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a> создаст новую геометрию, которая имеет 3 отрезка линий, используя 6 точек..</div>
 
 <p>Мы рассмотрим создание пользовательской геометрии в другой статье. 
 А пока давайте создадим пример создания каждого типа примитива. 
@@ -74,7 +74,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 -camera.position.z = 2;
 +camera.position.z = 120;
 </pre><p>Давайте добавим функцию, <code class="notranslate" translate="no">addObject</code>, которая добавляет 
-объект <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> на сцену в позицию x, y.</p>
+объект <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> на сцену в позицию x, y.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const objects = [];
 const spread = 15;
 
@@ -86,7 +86,7 @@ function addObject(x, y, obj) {
   objects.push(obj);
 }
 </pre><p>Давайте также сделаем функцию для создания случайно раскрашенного материала.
-Мы будем использовать особенность <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a> которая позволяет вам установить цвет 
+Мы будем использовать особенность <a href="../docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a> которая позволяет вам установить цвет 
 на основе оттенка, насыщенности и яркости (hue, saturation, luminance).</p>
 <p><code class="notranslate" translate="no">hue</code> идет от 0 до 1 вокруг цветового круга с красным на 0, 
 зеленым на .33 и синим на .66. <code class="notranslate" translate="no">saturation</code> 
@@ -113,7 +113,7 @@ function addObject(x, y, obj) {
 такой как сфера или куб, обычно нет причин рисовать 
 задние стороны треугольников, поскольку все они обращены 
 внутрь фигуры. В нашем случае мы рисуем несколько вещей, 
-таких как  <a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> и <a href="/docs/#api/en/geometries/ShapeGeometry"><code class="notranslate" translate="no">ShapeGeometry</code></a>
+таких как  <a href="../docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> и <a href="../docs/#api/en/geometries/ShapeGeometry"><code class="notranslate" translate="no">ShapeGeometry</code></a>
 которые являются двухмерными и поэтому не имеют внутренней 
 части. Без установки <code class="notranslate" translate="no">side: THREE.DoubleSide</code> они исчезнут,
 при взгляде на их задние стороны.</p>
@@ -147,11 +147,11 @@ function addObject(x, y, obj) {
 
 <p></p>
 <p>Есть несколько заметных исключений из шаблона выше. 
-Самым большим, вероятно, является <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>. Он должен 
+Самым большим, вероятно, является <a href="../docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>. Он должен 
 загрузить данные 3D шрифта, прежде чем он сможет сгенерировать 
 сетку для текста. Эти данные загружаются асинхронно, поэтому 
 нам нужно дождаться их загрузки, прежде чем пытаться создать 
-геометрию. Вы можете увидеть ниже, мы создаем <a href="/docs/#api/en/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a> 
+геометрию. Вы можете увидеть ниже, мы создаем <a href="../docs/#api/en/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a> 
 и передаем его URL нашему шрифту и обратному вызову (callback). 
 Обратный вызов срабатывает после загрузки шрифта. 
 В обратном вызове мы создаем геометрию и вызываем <code class="notranslate" translate="no">addObject</code>, 
@@ -191,12 +191,12 @@ function addObject(x, y, obj) {
 чтобы его центр вращения находился в центре объекта.</p>
 <p>Если бы мы тогда просто вызвали <code class="notranslate" translate="no">addSolidGeometry</code> как в предыдущих 
 примерах, это снова установило бы позицию, что не годится. 
-Итак, в этом случае мы создаем <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> стандартный узел для графа 
-сцены three.js. <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> так же наследуется от <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Мы рассмотрим, 
+Итак, в этом случае мы создаем <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> стандартный узел для графа 
+сцены three.js. <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> так же наследуется от <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Мы рассмотрим, 
 <a href="scenegraph.html">как работает график сцены, в другой статье</a>.
 На данный момент достаточно знать, что, как и DOM-узлы, дети рисуются 
-относительно своего родителя. Сделав <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> и сделав нашу сетку 
-дочерней по отношению к этому, мы можем расположить <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>  в то 
+относительно своего родителя. Сделав <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> и сделав нашу сетку 
+дочерней по отношению к этому, мы можем расположить <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>  в то 
 место, где мы хотим, и при этом сохранить смещение центра, 
 которое мы установили раньше.</p>
 <p>Если бы мы этого не делали, текст был бы оторван от центра.</p>
@@ -208,16 +208,16 @@ function addObject(x, y, obj) {
 <p></p>
 <p>Обратите внимание, что то что слева не вращается вокруг своего центра, 
 как то, что справа.</p>
-<p>Другие исключения - это 2-строчные примеры для <a href="/docs/#api/en/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>
-и <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>. Вместо того, чтобы вызвать <code class="notranslate" translate="no">addSolidGeometry</code> 
+<p>Другие исключения - это 2-строчные примеры для <a href="../docs/#api/en/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>
+и <a href="../docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>. Вместо того, чтобы вызвать <code class="notranslate" translate="no">addSolidGeometry</code> 
 они вызвают <code class="notranslate" translate="no">addLineGeomtry</code> который выглядит так</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">function addLineGeometry(x, y, geometry) {
   const material = new THREE.LineBasicMaterial({color: 0x000000});
   const mesh = new THREE.LineSegments(geometry, material);
   addObject(x, y, mesh);
 }
-</pre><p>Он создает черный цвет <a href="/docs/#api/en/materials/LineBasicMaterial"><code class="notranslate" translate="no">LineBasicMaterial</code></a>, а затем создает <a href="/docs/#api/en/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>, 
-который является оберткой <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, который помогает three знать, что вы 
+</pre><p>Он создает черный цвет <a href="../docs/#api/en/materials/LineBasicMaterial"><code class="notranslate" translate="no">LineBasicMaterial</code></a>, а затем создает <a href="../docs/#api/en/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>, 
+который является оберткой <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, который помогает three знать, что вы 
 отрисовываете отрезки линии (2 точки на отрезок).</p>
 <p>Каждый из примитивов имеет несколько параметров, которые вы можете 
 передать при создании, и лучше всего <a href="https://threejs.org/docs/">посмотреть в документации</a> 

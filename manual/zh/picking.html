@@ -225,7 +225,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
 <p>对于这些问题的解决方案，就是使用基于GPU的拾取方法。可惜，该方法概念上简单，但是相比于射线追踪法，用起来就复杂了。</p>
 <p>为了完成GPU拾取，对每一个对象使用唯一的颜色进行离屏渲染。然后，检查鼠标位置关联的像素的颜色。这个颜色就能告诉我们哪个对象被选中。</p>
 <p>这能解决上面的问题2，3。至于问题1的速度问题，这取决于业务场景。每个对象会被绘制两次，一次用于观看，一次用于拾取。也许存在开脑洞的解决方案，可以只绘制一次就完成查看和拾取，此处我们不会尝试。</p>
-<p>但是有一件事值得去做，因为拾取时我们只需读取1px，所以我们可以设置摄像机，只绘制1px，通过 <a href="/docs/#api/zh/cameras/PerspectiveCamera.setViewOffset"><code class="notranslate" translate="no">PerspectiveCamera.setViewOffset</code></a> 方法，可以告诉THREE.js 计算出一个摄像机 只呈现一个大矩形的一个很小的部分。这应该能节省一些运行时间。</p>
+<p>但是有一件事值得去做，因为拾取时我们只需读取1px，所以我们可以设置摄像机，只绘制1px，通过 <a href="../docs/#api/zh/cameras/PerspectiveCamera.setViewOffset"><code class="notranslate" translate="no">PerspectiveCamera.setViewOffset</code></a> 方法，可以告诉THREE.js 计算出一个摄像机 只呈现一个大矩形的一个很小的部分。这应该能节省一些运行时间。</p>
 <p>此时，要在THREE.js中实现这种拾取方式，需要创建两个场景。一个使用正常的网格对象填充。另外一个使用“拾取材质”的网格对象填充。</p>
 <p>因此，首先创建第二个场景，并将其清理为黑色背景。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
@@ -271,8 +271,8 @@ for (let i = 0; i &lt; numObjects; ++i) {
 +  pickingCube.scale.copy(cube.scale);
 }
 </pre>
-<p>注意到，此时，我们利用 <a href="/docs/#api/zh/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> 创建材质，使用id生成颜色，设置到它的<code class="notranslate" translate="no">emissive</code>属性，<code class="notranslate" translate="no">color</code> 和 <code class="notranslate" translate="no">specular</code>属性设置为0，设置 <code class="notranslate" translate="no">alphaTest</code> 属性，只渲染纹理的alpha值大于该属性值的部分，还需要将<code class="notranslate" translate="no">blending</code> 设置为 <code class="notranslate" translate="no">NoBlending</code>，这样alpha通道不会作用到id生成色</p>
-<p>注意到，利用 <a href="/docs/#api/zh/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> 可能并不是最优的解决方案，因为，在绘制拾取场景时，仍然需要计算所有的光线，尽管我们不需要这些计算。一个更优的方案是使用自定义的着色器，只为纹理alpha值大于 <code class="notranslate" translate="no">alphaTest</code> 属性值的部分，输出id生成色</p>
+<p>注意到，此时，我们利用 <a href="../docs/#api/zh/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> 创建材质，使用id生成颜色，设置到它的<code class="notranslate" translate="no">emissive</code>属性，<code class="notranslate" translate="no">color</code> 和 <code class="notranslate" translate="no">specular</code>属性设置为0，设置 <code class="notranslate" translate="no">alphaTest</code> 属性，只渲染纹理的alpha值大于该属性值的部分，还需要将<code class="notranslate" translate="no">blending</code> 设置为 <code class="notranslate" translate="no">NoBlending</code>，这样alpha通道不会作用到id生成色</p>
+<p>注意到，利用 <a href="../docs/#api/zh/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> 可能并不是最优的解决方案，因为，在绘制拾取场景时，仍然需要计算所有的光线，尽管我们不需要这些计算。一个更优的方案是使用自定义的着色器，只为纹理alpha值大于 <code class="notranslate" translate="no">alphaTest</code> 属性值的部分，输出id生成色</p>
 <p>由于我们是从像素点拾取，而不是射线追踪，只需将代码修改为使用像素拾取方式，获取拾取位置。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
   const pos = getCanvasRelativePosition(event);
@@ -282,7 +282,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
 +  pickPosition.y = pos.y;
 }
 </pre>
-<p>首先，我们将 <code class="notranslate" translate="no">PickHelper</code> 修改为 <code class="notranslate" translate="no">GPUPickHelper</code>。这里使用了 <a href="/docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>，如同我们在 <a href="rendertargets.html">多个渲染目标</a>中介绍的一样，此处，我们的渲染目标只有1像素的尺寸，1×1。</p>
+<p>首先，我们将 <code class="notranslate" translate="no">PickHelper</code> 修改为 <code class="notranslate" translate="no">GPUPickHelper</code>。这里使用了 <a href="../docs/#api/zh/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>，如同我们在 <a href="rendertargets.html">多个渲染目标</a>中介绍的一样，此处，我们的渲染目标只有1像素的尺寸，1×1。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class PickHelper {
 +class GPUPickHelper {
   constructor() {

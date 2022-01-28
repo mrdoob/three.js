@@ -25,9 +25,9 @@
 읽고 오길 권장합니다.</p>
 <p>이번 장에서는 카메라(cameras)에 대해 알아보겠습니다. <a href="fundamentals.html">첫 번째 장</a>에서
 일부 다루긴 했지만, 중요 요소인 만큼 더 자세히 살펴볼 필요가 있습니다.</p>
-<p>Three.js에서 가장 자주 사용하는 카메라는 여태까지 썼던 <a href="/docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>(원근 카메라)입니다.
+<p>Three.js에서 가장 자주 사용하는 카메라는 여태까지 썼던 <a href="../docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>(원근 카메라)입니다.
 이 카메라는 멀리 있는 물체를 가까이 있는 것보다 상대적으로 작게 보이도록 해주죠.</p>
-<p><a href="/docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>는 <em>절두체(frustum)</em>를 만듭니다. <a href="https://ko.wikipedia.org/wiki/%EC%A0%88%EB%91%90%EC%B2%B4">절두체(frustum)는 입체(보통 원뿔이나 각뿔)를
+<p><a href="../docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>는 <em>절두체(frustum)</em>를 만듭니다. <a href="https://ko.wikipedia.org/wiki/%EC%A0%88%EB%91%90%EC%B2%B4">절두체(frustum)는 입체(보통 원뿔이나 각뿔)를
 절단하는 하나나 두 평행면 사이의 부분</a>을
 의미하죠. 여기서 입체란 정육면체, 원뿔, 구, 원통, 절두체 등의 3D 요소입니다.</p>
 <div class="spread">
@@ -41,7 +41,7 @@
 <p>이걸 굳이 언급하는 이유는 글을 쓰는 저도 몇 년 동안 이를 몰랐기 때문입니다. 책이든 인터넷 글이든,
 <em>절두체</em>라는 단어를 봤다면 눈이 뒤집어졌을 겁니다. 입체의 이름을 알면 이해하기도, 기억하기도 훨씬
 쉽죠 😅.</p>
-<p><a href="/docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>는 4가지 속성을 바탕으로 절두체를 만듭니다. <code class="notranslate" translate="no">near</code>는 절두체가 어디서 시작할지
+<p><a href="../docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>는 4가지 속성을 바탕으로 절두체를 만듭니다. <code class="notranslate" translate="no">near</code>는 절두체가 어디서 시작할지
 결정하는 속성이고, <code class="notranslate" translate="no">far</code>는 절두체의 끝입니다. <code class="notranslate" translate="no">fov</code>는 시아갹(field of view)으로, <code class="notranslate" translate="no">near</code>와 카메라의
 거리에 따라 절두체의 높이를 계산해 적용합니다. <code class="notranslate" translate="no">aspect</code>는 절두체의 너비에 관여하는 비율으로, 절두체의
 너비는 절두체의 높이에 이 비율을 곱한 값입니다.</p>
@@ -85,7 +85,7 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
 gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
 </pre>
-<p>카메라의 속성을 변경할 때마다 카메라의 <a href="/docs/#api/ko/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a>
+<p>카메라의 속성을 변경할 때마다 카메라의 <a href="../docs/#api/ko/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a>
 메서드를 호출해야 하므로, <code class="notranslate" translate="no">updateCamera</code>라는 함수를 만들어 값이 변경될 때마다 함수를 호출하도록
 합니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -101,7 +101,7 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
 카메라가 어떻게 움직이는지 관찰할 수 있도록 만들겠습니다.</p>
 <p>Three.js의 가위 함수(scissor function)을 이용하면 쉽습니다. 가위 함수를 사용해 양쪽에
 장면 두 개, 카메라 두 개를 렌더링하겠습니다.</p>
-<p>먼저 HTML과 CSS로 양쪽에 div 요소를 배치합니다. 이러면 각각의 카메라에 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를
+<p>먼저 HTML과 CSS로 양쪽에 div 요소를 배치합니다. 이러면 각각의 카메라에 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를
 두어 이벤트 처리하기도 훨씬 간단합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
@@ -125,7 +125,7 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
   height: 100%;
 }
 </pre>
-<p>카메라의 절두체를 시각화할 <a href="/docs/#api/ko/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>를 추가합니다.</p>
+<p>카메라의 절두체를 시각화할 <a href="../docs/#api/ko/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a>를 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(camera);
 
 ...
@@ -136,11 +136,11 @@ scene.add(cameraHelper);
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const view1Elem = document.querySelector('#view1');
 const view2Elem = document.querySelector('#view2');
 </pre>
-<p>그리고 기존 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 왼쪽 div 요소의 이벤트에만 반응하도록 설정합니다.</p>
+<p>그리고 기존 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 왼쪽 div 요소의 이벤트에만 반응하도록 설정합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const controls = new OrbitControls(camera, canvas);
 +const controls = new OrbitControls(camera, view1Elem);
 </pre>
-<p>다음으로 <a href="/docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>와 두 번째 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다. 이 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를
+<p>다음으로 <a href="../docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>와 두 번째 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다. 이 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를
 두 번째 카메라에 종속시키고, 오른쪽 div 요소의 이벤트에만 반응하도록 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera2 = new THREE.PerspectiveCamera(
   60,  // 시야각(fov)
@@ -312,7 +312,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <div class="threejs_center"><img src="../resources/images/z-fighting.png" style="width: 570px;"></div>
 
 <p>한 가지 해결책은 Three.js에게 픽셀의 앞 뒤를 결정할 때 다른 방법을 쓰도록 설정하는
-것입니다. <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <code class="notranslate" translate="no">logarithmicDepthBuffer</code> 속성을 활성화해주면
+것입니다. <a href="../docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <code class="notranslate" translate="no">logarithmicDepthBuffer</code> 속성을 활성화해주면
 되죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
 +const renderer = new THREE.WebGLRenderer({
@@ -341,11 +341,11 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 속눈썹과 50km 떨어진 산을 동시에 보이게 하려면 다른 해결책-나중에 다룰지도 모르는-을
 찾아야 합니다. 당장은 <code class="notranslate" translate="no">near</code>와 <code class="notranslate" translate="no">far</code>를 적절하게 설정하는 게 중요하다는 것만
 알아둡시다.</p>
-<p>두 번째로 자주 사용하는 카메라는 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>(정사영 카메라)입니다.
+<p>두 번째로 자주 사용하는 카메라는 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>(정사영 카메라)입니다.
 절두체 대신 <code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>, <code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code>로 육면체를
 정의해 사용하죠. 육면체로 화면을 투사하기에 원근 효과가 없습니다.</p>
-<p>2분할 화면 예제를 수정해 첫 번째 화면을 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>로 바꾸겠습니다.</p>
-<p>먼저 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 만들어보죠.</p>
+<p>2분할 화면 예제를 수정해 첫 번째 화면을 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>로 바꾸겠습니다.</p>
+<p>먼저 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 만들어보죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -1;
 const right = 1;
 const top = 1;
@@ -363,9 +363,9 @@ camera.zoom = 0.2;
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 +gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
 </pre>
-<p><code class="notranslate" translate="no">listen</code> 메서드를 호출하면 lil-gui가 변화를 감지합니다. 이렇게 한 이유는 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>이
+<p><code class="notranslate" translate="no">listen</code> 메서드를 호출하면 lil-gui가 변화를 감지합니다. 이렇게 한 이유는 <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>이
 마우스 휠 스크롤을 감지해 <code class="notranslate" translate="no">zoom</code> 속성을 변경하기 때문이죠.</p>
-<p>끝으로 왼쪽 화면을 렌더링할 때 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 업데이트하도록 설정합니다.</p>
+<p>끝으로 왼쪽 화면을 렌더링할 때 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 업데이트하도록 설정합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const aspect = setScissorForElement(view1Elem);
 
@@ -383,14 +383,14 @@ camera.zoom = 0.2;
   renderer.render(scene, camera);
 }
 </pre>
-<p>이제 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>가 어떻게 작동하는지 확인할 차례입니다.</p>
+<p>이제 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>가 어떻게 작동하는지 확인할 차례입니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../cameras-orthographic-2-scenes.html"></iframe></div>
   <a class="threejs_center" href="../examples/cameras-orthographic-2-scenes.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
-<p>Three.js에서 <a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>는 주로 2D 요소를 표현하기 위해 사용합니다.
+<p>Three.js에서 <a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>는 주로 2D 요소를 표현하기 위해 사용합니다.
 카메라에 얼마나 많은 요소를 보여줄지만 결정하면 되죠. 만약 canvas의 1픽셀을
 카메라의 한 칸과 같은 크기로 지정하고 싶다면...</p>
 <p>중점을 장면의 중심에 두고 1 픽셀을 Three.js의 한 칸으로 만들 수 있습니다.</p>
@@ -423,7 +423,7 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
 camera.zoom = 1;
 </pre>
 <p>다음으로 평면(plane) 6개를 만들어 각각 다른 텍스처를 적용하겠습니다.
-각 평면마다 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> 인스턴스를 만들어 평면의 부모로 설정합니다.
+각 평면마다 <a href="../docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> 인스턴스를 만들어 평면의 부모로 설정합니다.
 이러면 중점을 0, 0, 상단 좌측으로 지정해 좌표를 지정하기가 쉽습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 const textures = [
@@ -463,7 +463,7 @@ const planes = textures.map((texture) =&gt; {
 
   ...
 </pre>
-<p><code class="notranslate" translate="no">planes</code>는 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a>, 평면의 배열입니다. 시간값을 기반으로 이 평면이 따로
+<p><code class="notranslate" translate="no">planes</code>는 <a href="../docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">THREE.Mesh</code></a>, 평면의 배열입니다. 시간값을 기반으로 이 평면이 따로
 움직이도록 하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;  // 초 단위로 변경
@@ -504,7 +504,7 @@ const planes = textures.map((texture) =&gt; {
 </div>
 
 <p></p>
-<p><a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>는 게임 엔진 에디터 등에서처럼 3D 모델링 결과물의 상, 하, 좌, 우,
+<p><a href="../docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>는 게임 엔진 에디터 등에서처럼 3D 모델링 결과물의 상, 하, 좌, 우,
 앞, 뒤를 렌더링할 때도 사용합니다.</p>
 <div class="threejs_center"><img src="../resources/images/quad-viewport.png" style="width: 574px;"></div>
 

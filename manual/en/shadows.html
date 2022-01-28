@@ -61,7 +61,7 @@ draw it above the ground below your object.</p>
 +scene.background = new THREE.Color('white');
 </pre>
 <p>Then we'll setup the same checkerboard ground but this time it's using
-a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> as we don't need lighting for the ground.</p>
+a <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> as we don't need lighting for the ground.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
 {
@@ -107,12 +107,12 @@ const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, s
 const shadowGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 </pre>
 <p>Now we'll make a bunch of spheres. For each sphere we'll create a <code class="notranslate" translate="no">base</code>
-<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> and we'll make both the shadow plane mesh and the sphere mesh
+<a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a> and we'll make both the shadow plane mesh and the sphere mesh
 children of the base. That way if we move the base both the sphere and the shadow
 will move. We need to put the shadow slightly above the ground to prevent z-fighting.
 We also set <code class="notranslate" translate="no">depthWrite</code> to false so that the shadows don't mess each other up.
 We'll go over both of these issues in <a href="transparency.html">another article</a>.
-The shadow is a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> because it doesn't need lighting.</p>
+The shadow is a <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> because it doesn't need lighting.</p>
 <p>We make each sphere a different hue and then save off the base, the sphere mesh,
 the shadow mesh and the initial y position of each sphere.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const numSpheres = 15;
@@ -150,7 +150,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   sphereShadowBases.push({base, sphereMesh, shadowMesh, y: sphereMesh.position.y});
 }
 </pre>
-<p>We setup 2 lights. One is a <a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> with the intensity set to 2 to really
+<p>We setup 2 lights. One is a <a href="../docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> with the intensity set to 2 to really
 brighten things up.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const skyColor = 0xB1E1FF;  // light blue
@@ -160,7 +160,7 @@ brighten things up.</p>
   scene.add(light);
 }
 </pre>
-<p>The other is a <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> so the spheres get some definition</p>
+<p>The other is a <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> so the spheres get some definition</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -173,7 +173,7 @@ brighten things up.</p>
 </pre>
 <p>It would render as is but let's animate there spheres.
 For each sphere, shadow, base set we move the base in the xz plane, we
-move the sphere up and down using <a href="/docs/#api/en/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>
+move the sphere up and down using <a href="../docs/#api/en/math/Math.abs(Math.sin(time))"><code class="notranslate" translate="no">Math.abs(Math.sin(time))</code></a>
 which gives us a bouncy animation. And, we also set the shadow material's
 opacity so that as each sphere goes higher its shadow fades out.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
@@ -218,9 +218,9 @@ of shadow is <a href="https://www.google.com/search?tbm=isch&amp;q=animal+crossi
 where you can see each character has a simple round shadow. It's effective and cheap.
 <a href="https://www.google.com/search?q=monument+valley+screenshots&amp;tbm=isch">Monument Valley</a>
 appears to also use this kind of shadow for the main character.</p>
-<p>So, moving on to shadow maps, there are 3 lights which can cast shadows. The <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>,
-the <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>, and the <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
-<p>Let's start with the <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> with the helper example from <a href="lights.html">the lights article</a>.</p>
+<p>So, moving on to shadow maps, there are 3 lights which can cast shadows. The <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>,
+the <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>, and the <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
+<p>Let's start with the <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> with the helper example from <a href="lights.html">the lights article</a>.</p>
 <p>The first thing we need to do is turn on shadows in the renderer.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
 +renderer.shadowMap.enabled = true;
@@ -256,12 +256,12 @@ mesh.receiveShadow = true;
 <p></p>
 <p>What happened? Why are parts of the shadows missing?</p>
 <p>The reason is shadow maps are created by rendering the scene from the point
-of view of the light. In this case there is a camera at the <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>
+of view of the light. In this case there is a camera at the <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>
 that is looking at its target. Just like <a href="cameras.html">the camera's we previously covered</a>
 the light's shadow camera defines an area inside of which
 the shadows get rendered. In the example above that area is too small.</p>
 <p>In order to visualize that area we can get the light's shadow camera and add
-a <a href="/docs/#api/en/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> to the scene.</p>
+a <a href="../docs/#api/en/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> to the scene.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cameraHelper = new THREE.CameraHelper(light.shadow.camera);
 scene.add(cameraHelper);
 </pre>
@@ -276,10 +276,10 @@ scene.add(cameraHelper);
 what's inside the light's shadow camera box is where shadows are drawn.</p>
 <p>We can adjust the size of that box by adjusting the light's shadow camera.</p>
 <p>Let's add some GUI setting to adjust the light's shadow camera box. Since a
-<a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> represents light all going in a parallel direction, the
-<a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> uses an <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> for its shadow camera.
-We went over how an <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> works in <a href="cameras.html">the previous article about cameras</a>.</p>
-<p>Recall an <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> defines
+<a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> represents light all going in a parallel direction, the
+<a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> uses an <a href="../docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> for its shadow camera.
+We went over how an <a href="../docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> works in <a href="cameras.html">the previous article about cameras</a>.</p>
+<p>Recall an <a href="../docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> defines
 its box or <em>view frustum</em> by its <code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>, <code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code>,
 and <code class="notranslate" translate="no">zoom</code> properties.</p>
 <p>Again let's make a helper class for the lil-gui. We'll make a <code class="notranslate" translate="no">DimensionGUIHelper</code>
@@ -361,13 +361,13 @@ The larger you make them the more memory they take and the slower they are to co
 to set them as small as you can and still make your scene work. The same is true with the
 light's shadow camera area. Smaller means better looking shadows so make the area as small as you
 can and still cover your scene. Be aware that each user's machine has a maximum texture size
-allowed which is available on the renderer as <a href="/docs/#api/en/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>.</p>
+allowed which is available on the renderer as <a href="../docs/#api/en/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>.</p>
 <!--
 Ok but what about `near` and `far` I hear you thinking. Can we set `near` to 0.00001 and far to `100000000`
 -->
-<p>Switching to the <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> the light's shadow camera becomes a <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. Unlike the <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>'s shadow camera
-where we could manually set most its settings, <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>'s shadow camera is controlled by the <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> itself. The <code class="notranslate" translate="no">fov</code> for the shadow
-camera is directly connected to the <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>'s <code class="notranslate" translate="no">angle</code> setting.
+<p>Switching to the <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> the light's shadow camera becomes a <a href="../docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. Unlike the <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>'s shadow camera
+where we could manually set most its settings, <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>'s shadow camera is controlled by the <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> itself. The <code class="notranslate" translate="no">fov</code> for the shadow
+camera is directly connected to the <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>'s <code class="notranslate" translate="no">angle</code> setting.
 The <code class="notranslate" translate="no">aspect</code> is set automatically based on the size of the shadow map.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
@@ -397,11 +397,11 @@ also blur the result
 
 
 -->
-<p>And finally there's shadows with a <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>. Since a <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>
+<p>And finally there's shadows with a <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>. Since a <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>
 shines in all directions the only relevant settings are <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code>.
-Otherwise the <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> shadow is effectively 6 <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> shadows
+Otherwise the <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> shadow is effectively 6 <a href="../docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> shadows
 each one pointing to the face of a cube around the light. This means
-<a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> shadows are much slower since the entire scene must be
+<a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> shadows are much slower since the entire scene must be
 drawn 6 times, one for each direction.</p>
 <p>Let's put a box around our scene so we can see shadows on the walls
 and ceiling. We'll set the material's <code class="notranslate" translate="no">side</code> property to <code class="notranslate" translate="no">THREE.BackSide</code>
@@ -422,7 +422,7 @@ of the box don't z-fight.</p>
   scene.add(mesh);
 }
 </pre>
-<p>And of course we need to switch the light to a <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>.</p>
+<p>And of course we need to switch the light to a <a href="../docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.SpotLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 

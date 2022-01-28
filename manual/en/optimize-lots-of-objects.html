@@ -23,7 +23,7 @@
 is <a href="fundamentals.html">three.js fundamentals</a>. If you haven't read that
 yet and you're new to three.js you might want to consider starting there. </p>
 <p>There are many ways to optimize things for three.js. One way is often referred
-to as <em>merging geometry</em>. Every <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> you create and three.js represents 1 or
+to as <em>merging geometry</em>. Every <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> you create and three.js represents 1 or
 more requests by the system to draw something. Drawing 2 things has more
 overhead than drawing 1 even if the results are the same so one way to optimize
 is to merge meshes.</p>
@@ -240,7 +240,7 @@ didn't do this it would scale from the center but we want them to grow away from
   </div>
 </div>
 
-<p>Of course we could also solve that by parenting the box to more <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>
+<p>Of course we could also solve that by parenting the box to more <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">THREE.Object3D</code></a>
 objects like we covered in <a href="scenegraph.html">scene graphs</a> but the more
 nodes we add to a scene graph the slower it gets.</p>
 <p>We also setup this small hierarchy of nodes of <code class="notranslate" translate="no">lonHelper</code>, <code class="notranslate" translate="no">latHelper</code>, and
@@ -258,8 +258,8 @@ sphere</span> represents the offset that that <code class="notranslate" translat
 <p>We could do all of the math manually to figure out positions on the globe but
 doing it this way leaves most of the math to the library itself so we don't need
 to deal with.</p>
-<p>For each data point we create a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> and a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> and then we ask
-for the world matrix of the <code class="notranslate" translate="no">positionHelper</code> and apply that to the new <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>.
+<p>For each data point we create a <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> and a <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> and then we ask
+for the world matrix of the <code class="notranslate" translate="no">positionHelper</code> and apply that to the new <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>.
 Finally we scale the mesh at its new position.</p>
 <p>Like above, we could also have created a <code class="notranslate" translate="no">latHelper</code>, <code class="notranslate" translate="no">lonHelper</code>, and
 <code class="notranslate" translate="no">positionHelper</code> for every new box but that would be even slower.</p>

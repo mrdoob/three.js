@@ -100,7 +100,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   });
 </pre>
 <p>I kept the auto framing code as before</p>
-<p>We also need to include the <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> and we can get rid of the <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>.</p>
+<p>We also need to include the <a href="../docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> and we can get rid of the <a href="../docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from '/examples/jsm/loaders/LoaderSupport.js';
 -import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
 -import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
@@ -239,16 +239,16 @@ so they have their origins in the correct places, so they are
 the correct scale, etc.</p>
 <p>Since I'm not an artist and I don't know blender that well I
 will hack this example. We'll take each car and parent it to
-another <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. We will then move those <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> objects
+another <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. We will then move those <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> objects
 to move the cars but separately we can set the car's original
-<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> to re-orient it so it's about where we really need it.</p>
+<a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> to re-orient it so it's about where we really need it.</p>
 <p>Looking back at the scene graph listing it looks like there
 are really only 3 types of cars, "Car_08", "CAR_03", and "Car_04".
 Hopefully each type of car will work with the same adjustments.</p>
 <p>I wrote this code to go through each car, parent it to a new
-<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, parent that new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> to the scene, and apply
+<a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, parent that new <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> to the scene, and apply
 some per car <em>type</em> settings to fix its orientation, and add
-the new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> a <code class="notranslate" translate="no">cars</code> array.</p>
+the new <a href="../docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> a <code class="notranslate" translate="no">cars</code> array.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
 +const cars = [];
 {
@@ -323,7 +323,7 @@ which I formatted into this</p>
   [1.004861, 5.115846, -3.641834],
 ];
 </pre>
-<p>THREE.js has some curve classes. The <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> seemed
+<p>THREE.js has some curve classes. The <a href="../docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> seemed
 like it might work. The thing about that kind of curve is
 it tries to make a smooth curve going through the points.</p>
 <p>In fact putting those points in directly will generate
@@ -334,7 +334,7 @@ a curve like this</p>
 some extra points we could get what we want. For each pair
 of points we'll compute a point 10% of the way between
 the 2 points and another 90% of the way between the 2 points
-and pass the result to <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>.</p>
+and pass the result to <a href="../docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>.</p>
 <p>This will give us a curve like this</p>
 <div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
 
@@ -607,7 +607,7 @@ for (const car of loadedCars.children.slice()) {
 <p></p>
 <p>Not bad for a few minutes work.</p>
 <p>The last thing I wanted to do is turn on shadows.</p>
-<p>To do this I grabbed all the GUI code from the <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> shadows
+<p>To do this I grabbed all the GUI code from the <a href="../docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> shadows
 example in <a href="shadows.html">the article on shadows</a> and pasted it
 into our latest code.</p>
 <p>Then, after loading, we need to turn on shadows on all the objects.</p>

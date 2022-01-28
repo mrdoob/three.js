@@ -561,8 +561,8 @@ window.addEventListener('touchend', clearPickPosition);
 </div>
 
 <p></p>
-<p>Let's take it one more step and add in the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.
-This will be little more involved. The <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> use
+<p>Let's take it one more step and add in the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.
+This will be little more involved. The <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> use
 the DOM pretty extensively checking the mouse, touch events,
 and the keyboard.</p>
 <p>Unlike our code so far we can't really use a global <code class="notranslate" translate="no">state</code> object
@@ -610,7 +610,7 @@ class ElementProxyReceiver extends EventDispatcher {
 }
 </pre>
 <p>All it does is if it receives a message it dispatches it.
-It inherits from <a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> which provides methods like
+It inherits from <a href="../docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> which provides methods like
 <code class="notranslate" translate="no">addEventListener</code> and <code class="notranslate" translate="no">removeEventListener</code> just like a DOM
 element so if we pass it to the OrbitControls it should work.</p>
 <p><code class="notranslate" translate="no">ElementProxyReceiver</code> handles 1 element. In our case we only need
@@ -671,7 +671,7 @@ self.onmessage = function(e) {
   fn(e.data);
 };
 </pre>
-<p>In our shared three.js code we need to import the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> and set them up.</p>
+<p>In our shared three.js code we need to import the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> and set them up.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
 +import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
 
@@ -874,7 +874,7 @@ function filteredKeydownEventHandler(event, sendFn) {
 }
 </pre>
 <p>This seems close to running but if we actually try it we'll see
-that the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> need a few more things.</p>
+that the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> need a few more things.</p>
 <p>One is they call <code class="notranslate" translate="no">element.focus</code>. We don't need that to happen
 in the worker so let's just add a stub.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
@@ -1040,13 +1040,13 @@ code we'll re-use our proxy for both problems.</p>
   });
 }
 </pre>
-<p>This will give the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> something to inspect which
+<p>This will give the <a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> something to inspect which
 matches their expectations.</p>
 <p>I know that was kind of hard to follow. The short version is:
 <code class="notranslate" translate="no">ElementProxy</code> runs on the main page and forwards DOM events 
 to <code class="notranslate" translate="no">ElementProxyReceiver</code> in the worker which
 masquerades as an <code class="notranslate" translate="no">HTMLElement</code> that we can use both with the
-<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> and with our own code.</p>
+<a href="../docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> and with our own code.</p>
 <p>The final thing is our fallback when we are not using OffscreenCanvas.
 All we have to do is pass the canvas itself as our <code class="notranslate" translate="no">inputElement</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {

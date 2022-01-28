@@ -243,8 +243,8 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 <span style="color: red;">Красная сфера</span> представляет смещение, которое обеспечивает этот <code class="notranslate" translate="no">positionHelper</code>.</p>
 <p>Мы могли бы сделать всю математику вручную, чтобы выяснить позиции на земном шаре, но, делая это таким образом,
 мы оставляем большую часть математики самой библиотеке, поэтому нам не нужно иметь с ней дело. </p>
-<p>Для каждой точки данных мы создаем <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> и <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, а затем запрашиваем мировую матрицу
-<code class="notranslate" translate="no">positionHelper</code> и применяем ее к новой <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. Наконец мы масштабируем сетку в новой позиции. </p>
+<p>Для каждой точки данных мы создаем <a href="../docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> и <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, а затем запрашиваем мировую матрицу
+<code class="notranslate" translate="no">positionHelper</code> и применяем ее к новой <a href="../docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. Наконец мы масштабируем сетку в новой позиции. </p>
 <p>Как и выше, мы могли бы также создать <code class="notranslate" translate="no">latHelper</code>, <code class="notranslate" translate="no">lonHelper</code> и <code class="notranslate" translate="no">positionHelper</code> для каждого нового окна, но это было бы еще медленнее. </p>
 <p>Мы собираемся создать до 360х145 коробок. Это до 52000 коробок. 
 Поскольку некоторые точки данных помечены как «NO_DATA», фактическое

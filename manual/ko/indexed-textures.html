@@ -268,7 +268,7 @@ void main() {
 </pre>
 <p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">위 코드의 쉐이더 조각</a>을 일일이 뒤져 보니 Three.js는 <code class="notranslate" translate="no">diffuseColor</code>라는 변수로 재질(material)의 색상값을 제어합니다. 이 변수는 <code class="notranslate" translate="no">&lt;color_fragment&gt;</code>라는 <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">쉐이더 조각</a>에서 선언하니 변수 선언 후에 색상값을 수정하면 되겠네요.</p>
 <p>저 때 <code class="notranslate" translate="no">diffuseColor</code>는 아까 만들었던 윤곽선 텍스처에서 색상을 가져온 상태일 테니, 이 색상값으로 팔레트 텍스처에서 새로운 색상값을 가져 올 수 있을 겁니다.</p>
-<p><a href="optimize-lots-of-objects-animated.html">이전에 했던 것</a>처럼 바꿀 문자열 정보를 배열로 만들어 <a href="/docs/#api/ko/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>에서 쉐이더를 수정하겠습니다.</p>
+<p><a href="optimize-lots-of-objects-animated.html">이전에 했던 것</a>처럼 바꿀 문자열 정보를 배열로 만들어 <a href="../docs/#api/ko/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>에서 쉐이더를 수정하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
@@ -329,7 +329,7 @@ const paletteTexture = new THREE.DataTexture(
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
-<p><a href="/docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 쓰면 텍스처를 로우-데이터(raw data) 형식으로 넘길 수 있습니다. 예제의 경우에는 512 RGB 색상을 넘겨주면 되겠죠. 각 값은 3바이트로, 이 바이트는 각각 red, green, blue을 0부터 255까지의 숫자로 나타냅니다.</p>
+<p><a href="../docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 쓰면 텍스처를 로우-데이터(raw data) 형식으로 넘길 수 있습니다. 예제의 경우에는 512 RGB 색상을 넘겨주면 되겠죠. 각 값은 3바이트로, 이 바이트는 각각 red, green, blue을 0부터 255까지의 숫자로 나타냅니다.</p>
 <p>일단은 무작위로 색을 지정해 잘 작동하는지 테스트해봅시다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
   palette[i] = Math.random() * 256;
@@ -360,7 +360,7 @@ scene.add(new THREE.Mesh(geometry, material));
 
 <p></p>
 <p>인덱싱과 팔레트 텍스처가 잘 작동하는 것을 확인했으니, 이제 팔레트를 조작해 선택한 나라의 색상만 바꾸도록 해봅시다.</p>
-<p>먼저 함수를 하나 만듭니다. 이 함수는 Three.js의 <a href="/docs/#api/ko/math/Color"><code class="notranslate" translate="no">Color</code></a>를 매개변수로 받아 팔레트 텍스처에 지정할 수 있는 값을 반환할 겁니다.</p>
+<p>먼저 함수를 하나 만듭니다. 이 함수는 Three.js의 <a href="../docs/#api/ko/math/Color"><code class="notranslate" translate="no">Color</code></a>를 매개변수로 받아 팔레트 텍스처에 지정할 수 있는 값을 반환할 겁니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
 function get255BasedColor(color) {
   tempColor.set(color);

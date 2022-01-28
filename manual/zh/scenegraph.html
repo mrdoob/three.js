@@ -134,7 +134,7 @@ earthMesh.position.x = 10;
 +solarSystem.add(earthMesh);
 objects.push(earthMesh);
 </pre>
-<p>这里我们创建了一个 <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 。像 <a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 一样，它也是场景图中的一个节点，但与 <a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 不同的是，它没有材质（material）和几何体（geometry）。它只是代表一个局部空间。</p>
+<p>这里我们创建了一个 <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 。像 <a href="../docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 一样，它也是场景图中的一个节点，但与 <a href="../docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 不同的是，它没有材质（material）和几何体（geometry）。它只是代表一个局部空间。</p>
 <p>我们的新场景图是这样的：</p>
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
 <p><code class="notranslate" translate="no">sunMesh</code> 和 <code class="notranslate" translate="no">earthMesh</code> 都是 <code class="notranslate" translate="no">solarSystem</code> 的子网格。三者都在旋转，现在因为 <code class="notranslate" translate="no">earthMesh</code> 不是 <code class="notranslate" translate="no">sunMesh</code> 的子网格，所以不再按 5 倍比例缩放。</p>
@@ -168,7 +168,7 @@ objects.push(earthMesh);
 +moonOrbit.add(moonMesh);
 +objects.push(moonMesh);
 </pre>
-<p>我们再次添加了更多的隐形场景图节点。首先是一个名为 <code class="notranslate" translate="no">earthOrbit</code> 的 <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> ，并将新增 <code class="notranslate" translate="no">earthMesh</code> 和 <code class="notranslate" translate="no">moonOrbit</code> 都添加到其中。然后，我们把 <code class="notranslate" translate="no">moonMesh</code> 添加到 <code class="notranslate" translate="no">moonOrbit</code> 上。</p>
+<p>我们再次添加了更多的隐形场景图节点。首先是一个名为 <code class="notranslate" translate="no">earthOrbit</code> 的 <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> ，并将新增 <code class="notranslate" translate="no">earthMesh</code> 和 <code class="notranslate" translate="no">moonOrbit</code> 都添加到其中。然后，我们把 <code class="notranslate" translate="no">moonMesh</code> 添加到 <code class="notranslate" translate="no">moonOrbit</code> 上。</p>
 <p>新的场景图是这样的：</p>
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
 <p>就是这样</p>
@@ -180,7 +180,7 @@ objects.push(earthMesh);
 <p></p>
 <p>你可以看到月亮照着本文开头所提到的螺线图形式旋转，但我们不必手动计算它。我们只需要设置我们的场景图来为我们做这件事。</p>
 <p>绘制一些东西来可视化场景图中的节点通常很有用。Three.js 有一些很有帮助的，ummmm, 帮助工具可以用来 ummmm，...帮助我们实现这个功能。</p>
-<p>其中一个叫做 <a href="/docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> 。它画了 3 条线，分别代表本地的
+<p>其中一个叫做 <a href="../docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> 。它画了 3 条线，分别代表本地的
 <span style="color:red">X</span>，
 <span style="color:green">Y</span>， 以及
 <span style="color:blue">Z</span>轴。让我们为我们创建的每个节点都加上一个。</p>
@@ -201,9 +201,9 @@ objects.forEach((node) =&gt; {
 <p></p>
 <p>我们可以看到<span style="color:red">x (红色)</span> 和
 <span style="color:blue">z (蓝色)</span>轴。由于我们是直视下方，而每个物体只是围绕 y 轴旋转，所以我们看不到<span style="color:green">y (绿色)</span>轴。</p>
-<p>可能很难看到其中一些轴，因为有 2 对重叠的轴。<code class="notranslate" translate="no">sunMesh</code> 和 <code class="notranslate" translate="no">solarSystem</code> 都在同一位置。同样地，<code class="notranslate" translate="no">earthMesh</code> 和 <code class="notranslate" translate="no">earthOrbit</code> 也在同一位置。让我们添加一些简单的控制方法，让我们可以为每个节点打开/关闭它们。同时，我们还可以添加另一个名为 <a href="/docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> 的帮助工具。它可以在 X,Z 平面上创建一个 2D 网格。默认情况下，网格是 10x10 单位。</p>
+<p>可能很难看到其中一些轴，因为有 2 对重叠的轴。<code class="notranslate" translate="no">sunMesh</code> 和 <code class="notranslate" translate="no">solarSystem</code> 都在同一位置。同样地，<code class="notranslate" translate="no">earthMesh</code> 和 <code class="notranslate" translate="no">earthOrbit</code> 也在同一位置。让我们添加一些简单的控制方法，让我们可以为每个节点打开/关闭它们。同时，我们还可以添加另一个名为 <a href="../docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> 的帮助工具。它可以在 X,Z 平面上创建一个 2D 网格。默认情况下，网格是 10x10 单位。</p>
 <p>我们还将使用<a href="https://github.com/georgealways/lil-gui">lil-gui</a>，这是一个在 three.js 项目中非常流行的 UI 库。lil-gui 会获取一个对象和该对象上的属性名，并根据属性的类型自动生成一个 UI 来操作该属性。</p>
-<p>我们要为每个节点制作一个 <a href="/docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> 和一个 <a href="/docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>。我们需要为每个节点添加一个标签，所以我们将删除旧的循环，转而调用一些函数为每个节点添加帮助程序。</p>
+<p>我们要为每个节点制作一个 <a href="../docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> 和一个 <a href="../docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>。我们需要为每个节点添加一个标签，所以我们将删除旧的循环，转而调用一些函数为每个节点添加帮助程序。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// 为每个节点添加一个AxesHelper
 -objects.forEach((node) =&gt; {
 -  const axes = new THREE.AxesHelper();
@@ -224,7 +224,7 @@ objects.forEach((node) =&gt; {
 +makeAxisGrid(moonOrbit, 'moonOrbit');
 +makeAxisGrid(moonMesh, 'moonMesh');
 </pre>
-<p><code class="notranslate" translate="no">makeAxisGrid</code> 创建了一个 <code class="notranslate" translate="no">AxisGridHelper</code> 类，这是一个我们将创建的让 lil-gui 满意的类。就像上面说的那样，lil-gui 会自动地生成一个 UI 来操作某个对象的命名属性。它将根据属性的类型创建不同的 UI。我们希望它创建一个复选框，所以我们需要指定一个 <code class="notranslate" translate="no">bool</code> 属性。但是，我们希望坐标轴和网格都能基于一个单一的属性出现/消失，所以我们将创建一个类，其有一个属性绑定了 getter 和 setter。这样我们就可以让 lil-gui 认为它在操作一个单一的属性，但是在内部我们可以为一个节点设置 <a href="/docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> 和 <a href="/docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> 的可见（visible）属性。</p>
+<p><code class="notranslate" translate="no">makeAxisGrid</code> 创建了一个 <code class="notranslate" translate="no">AxisGridHelper</code> 类，这是一个我们将创建的让 lil-gui 满意的类。就像上面说的那样，lil-gui 会自动地生成一个 UI 来操作某个对象的命名属性。它将根据属性的类型创建不同的 UI。我们希望它创建一个复选框，所以我们需要指定一个 <code class="notranslate" translate="no">bool</code> 属性。但是，我们希望坐标轴和网格都能基于一个单一的属性出现/消失，所以我们将创建一个类，其有一个属性绑定了 getter 和 setter。这样我们就可以让 lil-gui 认为它在操作一个单一的属性，但是在内部我们可以为一个节点设置 <a href="../docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> 和 <a href="../docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> 的可见（visible）属性。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 打开/关闭轴和网格的可见性
 // lil-gui 要求一个返回类型为bool型的属性
 // 来创建一个复选框，所以我们为 `visible`属性
@@ -256,7 +256,7 @@ class AxisGridHelper {
   }
 }
 </pre>
-<p>需要注意的是，我们将 <a href="/docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> 的 <code class="notranslate" translate="no">renderOrder</code> 设置为 2，将<a href="/docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>的设置为 1，这样轴就会在网格之后绘制。否则网格可能会覆盖轴。</p>
+<p>需要注意的是，我们将 <a href="../docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> 的 <code class="notranslate" translate="no">renderOrder</code> 设置为 2，将<a href="../docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>的设置为 1，这样轴就会在网格之后绘制。否则网格可能会覆盖轴。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">点击此处在新标签页中打开</a>
@@ -271,11 +271,11 @@ class AxisGridHelper {
 <p><img src="../resources/images/scenegraph-human.svg" align="center"></p>
 <p>你可以看到对于人类来说，场景图会变得很复杂。事实上，上面的场景图已经被简化了。例如，你可以把它扩展到覆盖每根手指（至少还有 28 个节点）和每个脚趾（还有 28 个节点），再加上脸部和下巴、眼睛，也许还有更多。</p>
 <p>我们来做一个稍微复杂的场景图。我们来做一辆坦克。坦克将有 6 个轮子和一个炮塔。坦克会沿着一条路径行驶。会有一个球体在周围移动，坦克会瞄准球体。</p>
-<p>这是场景图。网格（mesh）的颜色为绿色，<a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 为蓝色，灯光（light）为金色，摄像机（camera）为紫色。其中一台摄像机没有被添加进场景图。</p>
+<p>这是场景图。网格（mesh）的颜色为绿色，<a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 为蓝色，灯光（light）为金色，摄像机（camera）为紫色。其中一台摄像机没有被添加进场景图。</p>
 <div class="threejs_center"><img src="../resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
 <p>在代码中查看这些节点的设置。</p>
-<p>对于目标，也就是坦克要瞄准的东西，有一个 <code class="notranslate" translate="no">targetOrbit</code> ( <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> )，它的旋转方式与上面的 <code class="notranslate" translate="no">earthOrbit</code> 一样。<code class="notranslate" translate="no">targetElevation</code> ( <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> )是 <code class="notranslate" translate="no">targetOrbit</code> 的一个子节点，它提供了一个从 <code class="notranslate" translate="no">targetOrbit</code> 的偏移量和一个基准高度。它的子节点是另一个叫做 <code class="notranslate" translate="no">targetBob</code> 的 <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>，它只是相对于 <code class="notranslate" translate="no">targetElevation</code> 上下摆动。最后是 <code class="notranslate" translate="no">targetMesh</code>，它只是一个立方体，我们可以旋转并改变它的颜色。</p>
+<p>对于目标，也就是坦克要瞄准的东西，有一个 <code class="notranslate" translate="no">targetOrbit</code> ( <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> )，它的旋转方式与上面的 <code class="notranslate" translate="no">earthOrbit</code> 一样。<code class="notranslate" translate="no">targetElevation</code> ( <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> )是 <code class="notranslate" translate="no">targetOrbit</code> 的一个子节点，它提供了一个从 <code class="notranslate" translate="no">targetOrbit</code> 的偏移量和一个基准高度。它的子节点是另一个叫做 <code class="notranslate" translate="no">targetBob</code> 的 <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>，它只是相对于 <code class="notranslate" translate="no">targetElevation</code> 上下摆动。最后是 <code class="notranslate" translate="no">targetMesh</code>，它只是一个立方体，我们可以旋转并改变它的颜色。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 移动目标
 targetOrbit.rotation.y = time * 0.27;
 targetBob.position.y = Math.sin(time * 2) * 4;
@@ -284,7 +284,7 @@ targetMesh.rotation.y = time * 13;
 targetMaterial.emissive.setHSL((time * 10) % 1, 1, 0.25);
 targetMaterial.color.setHSL((time * 10) % 1, 1, 0.25);
 </pre>
-<p>对于坦克来说，有一个叫做 <code class="notranslate" translate="no">tank</code> 的 <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>，用来移动它下面的所有子节点。代码中使用了 <a href="/docs/#api/zh/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>，其接受用来定义曲线的一系列坐标为参数。0.0 是曲线的起始点，1.0 是曲线的终点。它首先获取当前的位置，也就是放置坦克的位置。然后获取在曲线稍远处的位置，并使用 <a href="/docs/#api/zh/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a> 将坦克指向该方向。</p>
+<p>对于坦克来说，有一个叫做 <code class="notranslate" translate="no">tank</code> 的 <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>，用来移动它下面的所有子节点。代码中使用了 <a href="../docs/#api/zh/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a>，其接受用来定义曲线的一系列坐标为参数。0.0 是曲线的起始点，1.0 是曲线的终点。它首先获取当前的位置，也就是放置坦克的位置。然后获取在曲线稍远处的位置，并使用 <a href="../docs/#api/zh/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a> 将坦克指向该方向。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tankPosition = new THREE.Vector2();
 const tankTarget = new THREE.Vector2();
 
@@ -297,7 +297,7 @@ curve.getPointAt((tankTime + 0.01) % 1, tankTarget);
 tank.position.set(tankPosition.x, 0, tankPosition.y);
 tank.lookAt(tankTarget.x, 0, tankTarget.y);
 </pre>
-<p>由于坦克顶部的炮塔是坦克的子节点，所以它会自动移动。如果要将它指向目标，我们只需要获取目标的世界位置（world position），然后再次使用 <a href="/docs/#api/zh/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>。</p>
+<p>由于坦克顶部的炮塔是坦克的子节点，所以它会自动移动。如果要将它指向目标，我们只需要获取目标的世界位置（world position），然后再次使用 <a href="../docs/#api/zh/core/Object3D.lookAt"><code class="notranslate" translate="no">Object3D.lookAt</code></a>。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const targetPosition = new THREE.Vector3();
 
 ...
@@ -340,7 +340,7 @@ infoElem.textContent = camera.desc;
 </div>
 
 <p></p>
-<p>我希望这能让你对场景图的工作原理以及你可能使用它们的方法有一些了解。制作 <a href="/docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 节点，并将东西作为它们的子节点，是使用好 three.js 这样的 3D 引擎的重要一步。通常来说，让东西按照你想要的方式移动和旋转可能需要一些复杂的数学来。例如，如果没有场景图，计算月亮的运动或者汽车的轮子相对于车身的位置会非常复杂，但是使用场景图就会变得简单很多。</p>
+<p>我希望这能让你对场景图的工作原理以及你可能使用它们的方法有一些了解。制作 <a href="../docs/#api/zh/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 节点，并将东西作为它们的子节点，是使用好 three.js 这样的 3D 引擎的重要一步。通常来说，让东西按照你想要的方式移动和旋转可能需要一些复杂的数学来。例如，如果没有场景图，计算月亮的运动或者汽车的轮子相对于车身的位置会非常复杂，但是使用场景图就会变得简单很多。</p>
 <p><a href="materials.html">接下来，我们会介绍一下材质</a>.</p>
 
         </div>
