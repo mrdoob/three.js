@@ -518,6 +518,11 @@ function transformManualHTML(h) {
 				s.src = url.href;
 			}
 		}
+		if (s.nodeName === 'SCRIPT') {debugger
+			if (s.src && s.type === 'module') {
+				s.type = 'module-shim'
+			}
+		}
 	});
 
 	// importmap polyfill
@@ -528,7 +533,7 @@ function transformManualHTML(h) {
 		
 	{ // importmap
 		const s = document.createElement('script');
-		s.type = 'importmap';
+		s.type = 'importmap-shim';
 		s.textContent = `
 		{
 			"imports": {
