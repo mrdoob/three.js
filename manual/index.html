@@ -519,7 +519,7 @@ function transformManualHTML(h) {
 			}
 		}
 		if (s.nodeName === 'SCRIPT') {
-			if (s.src && s.type === 'module') {
+			if (s.type === 'module') {
 				s.type = 'module-shim'
 			}
 		}
