@@ -106,6 +106,7 @@ const UnsignedShort4444Type = 1017;
 const UnsignedShort5551Type = 1018;
 const UnsignedInt248Type = 1020;
 const AlphaFormat = 1021;
+const RGBFormat = 1022;
 const RGBAFormat = 1023;
 const LuminanceFormat = 1024;
 const LuminanceAlphaFormat = 1025;
@@ -17622,7 +17623,13 @@ function WebGLUtils(gl, extensions, capabilities) {
 		if (p === LuminanceAlphaFormat) return gl.LUMINANCE_ALPHA;
 		if (p === DepthFormat) return gl.DEPTH_COMPONENT;
 		if (p === DepthStencilFormat) return gl.DEPTH_STENCIL;
-		if (p === RedFormat) return gl.RED; // WebGL 1 sRGB fallback
+		if (p === RedFormat) return gl.RED;
+
+		if (p === RGBFormat) {
+			console.warn('THREE.WebGLRenderer: THREE.RGBFormat has been removed. Use THREE.RGBAFormat instead. https://github.com/mrdoob/three.js/pull/23228');
+			return gl.RGBA;
+		} // WebGL 1 sRGB fallback
+
 
 		if (p === _SRGBAFormat) {
 			extension = extensions.get('EXT_sRGB');
@@ -36623,6 +36630,7 @@ exports.RGBA_PVRTC_4BPPV1_Format = RGBA_PVRTC_4BPPV1_Format;
 exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
 exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
 exports.RGBA_S3TC_DXT5_Format = RGBA_S3TC_DXT5_Format;
+exports.RGBFormat = RGBFormat;
 exports.RGB_ETC1_Format = RGB_ETC1_Format;
 exports.RGB_ETC2_Format = RGB_ETC2_Format;
 exports.RGB_PVRTC_2BPPV1_Format = RGB_PVRTC_2BPPV1_Format;
