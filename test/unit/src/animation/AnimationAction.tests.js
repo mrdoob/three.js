@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { AnimationAction } from '../../../../src/animation/AnimationAction';
-import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
-import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
-import { Object3D } from '../../../../src/core/Object3D';
-import { LoopOnce, LoopRepeat, LoopPingPong } from '../../../../src/constants';
+import { AnimationAction } from '../../../../src/animation/AnimationAction.js';
+import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { LoopOnce, LoopRepeat, LoopPingPong } from '../../../../src/constants.js';
 
 
 function createAnimation() {
@@ -130,7 +130,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'reset', ( assert ) => {
 
-			var { mixer, animationAction } = createAnimation();
+			var { animationAction } = createAnimation();
 			var animationAction2 = animationAction.stop();
 			assert.equal( animationAction, animationAction2, 'AnimationAction.reset can be chained.' );
 			assert.equal( animationAction2.paused, false, 'AnimationAction.reset() sets paused false' );
@@ -143,7 +143,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'isRunning', ( assert ) => {
 
-			var { mixer, animationAction } = createAnimation();
+			var { animationAction } = createAnimation();
 			assert.notOk( animationAction.isRunning(), 'When an animation is just made, it is not running.' );
 			animationAction.play();
 			assert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );

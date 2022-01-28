@@ -1,6 +1,6 @@
 import { UIPanel } from './libs/ui.js';
 
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 class ViewHelper extends THREE.Object3D {
 

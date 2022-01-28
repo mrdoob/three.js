@@ -1,8 +1,8 @@
 /* global QUnit */
 
-import { Color } from '../../../../src/math/Color';
-import { eps } from './Constants.tests';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
+import { Color } from '../../../../src/math/Color.js';
+import { eps } from './Constants.tests.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Maths', () => {
 

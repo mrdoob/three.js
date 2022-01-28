@@ -92,6 +92,7 @@ export function glconstants() {
 		POLYGON_OFFSET_FILL: 32823,
 		RGB8: 32849,
 		RGBA4: 32854,
+		RGB5_A1: 32855,
 		RGBA8: 32856,
 		TEXTURE_3D: 32879,
 		CLAMP_TO_EDGE: 33071,
@@ -271,7 +272,7 @@ function header() {
 
 			return `/**
  * @license
- * Copyright 2010-2021 Three.js Authors
+ * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 ${ code }`;
@@ -317,6 +318,12 @@ let builds = [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.js',
+				indent: '\t'
+			},
+			{
+				format: 'cjs',
+				name: 'THREE',
+				file: 'build/three.cjs',
 				indent: '\t'
 			}
 		]

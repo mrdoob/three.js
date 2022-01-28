@@ -3,7 +3,8 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	LoaderUtils
+	LoaderUtils,
+	Color
 } from 'three';
 
 /**
@@ -32,6 +33,7 @@ import {
  *
  */
 
+const _color = new Color();
 
 class PLYLoader extends Loader {
 
@@ -407,7 +409,13 @@ class PLYLoader extends Loader {
 
 				if ( attrR !== null && attrG !== null && attrB !== null ) {
 
-					buffer.colors.push( element[ attrR ] / 255.0, element[ attrG ] / 255.0, element[ attrB ] / 255.0 );
+					_color.setRGB(
+						element[ attrR ] / 255.0,
+						element[ attrG ] / 255.0,
+						element[ attrB ] / 255.0
+					).convertSRGBToLinear();
+
+					buffer.colors.push( _color.r, _color.g, _color.b );
 
 				}
 

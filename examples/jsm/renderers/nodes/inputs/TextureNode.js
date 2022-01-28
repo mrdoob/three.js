@@ -1,5 +1,4 @@
 import InputNode from '../core/InputNode.js';
-import ExpressionNode from '../core/ExpressionNode.js';
 import UVNode from '../accessors/UVNode.js';
 
 class TextureNode extends InputNode {

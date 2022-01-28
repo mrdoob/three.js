@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
 
@@ -62,7 +62,7 @@ function Viewport( editor ) {
 
 	var box = new THREE.Box3();
 
-	var selectionBox = new THREE.BoxHelper();
+	var selectionBox = new THREE.Box3Helper( box );
 	selectionBox.material.depthTest = false;
 	selectionBox.material.transparent = true;
 	selectionBox.visible = false;
@@ -79,7 +79,7 @@ function Viewport( editor ) {
 
 		if ( object !== undefined ) {
 
-			selectionBox.setFromObject( object );
+			box.setFromObject( object, true );
 
 			var helper = editor.helpers[ object.id ];
 
@@ -412,11 +412,10 @@ function Viewport( editor ) {
 
 		if ( object !== null && object !== scene && object !== camera ) {
 
-			box.setFromObject( object );
+			box.setFromObject( object, true );
 
 			if ( box.isEmpty() === false ) {
 
-				selectionBox.setFromObject( object );
 				selectionBox.visible = true;
 
 			}
@@ -439,7 +438,7 @@ function Viewport( editor ) {
 
 		if ( object !== undefined ) {
 
-			selectionBox.setFromObject( object );
+			box.setFromObject( object, true );
 
 		}
 
@@ -461,7 +460,7 @@ function Viewport( editor ) {
 
 		if ( editor.selected === object ) {
 
-			selectionBox.setFromObject( object );
+			box.setFromObject( object, true );
 
 		}
 

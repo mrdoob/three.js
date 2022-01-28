@@ -1,4 +1,4 @@
-export const REVISION = '137dev';
+export const REVISION = '137';
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export const CullFaceNone = 0;
@@ -84,7 +84,6 @@ export const FloatType = 1015;
 export const HalfFloatType = 1016;
 export const UnsignedShort4444Type = 1017;
 export const UnsignedShort5551Type = 1018;
-export const UnsignedShort565Type = 1019;
 export const UnsignedInt248Type = 1020;
 export const AlphaFormat = 1021;
 export const RGBAFormat = 1023;

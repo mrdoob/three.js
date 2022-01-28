@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ShaderChunk } from '../../../../../src/renderers/shaders/ShaderChunk';
+// import { ShaderChunk } from '../../../../../src/renderers/shaders/ShaderChunk.js';
 
 export default QUnit.module( 'Renderers', () => {
 

@@ -1,8 +1,8 @@
 /* global QUnit */
 
-import { ObjectLoader } from '../../../../src/loaders/ObjectLoader';
-import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
-import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow';
+import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
+import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow.js';
 
 export default QUnit.module( 'Lights', () => {
 

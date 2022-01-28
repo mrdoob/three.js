@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { AudioAnalyser } from '../../../../src/audio/AudioAnalyser.js';
+// import { AudioAnalyser } from '../../../../src/audio/AudioAnalyser.js';
 
 export default QUnit.module( 'Audios', () => {
 

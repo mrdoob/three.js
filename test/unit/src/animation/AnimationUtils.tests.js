@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { AnimationUtils } from '../../../../src/animation/AnimationUtils';
+// import { AnimationUtils } from '../../../../src/animation/AnimationUtils.js';
 
 export default QUnit.module( 'Animation', () => {
 
@@ -46,4 +46,3 @@ export default QUnit.module( 'Animation', () => {
 	} );
 
 } );
-

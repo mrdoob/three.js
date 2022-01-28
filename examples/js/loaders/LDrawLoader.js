@@ -2029,7 +2029,8 @@
 
 		getMainEdgeMaterial() {
 
-			return this.getMaterial( MAIN_EDGE_COLOUR_CODE );
+			const mainMat = this.getMainMaterial();
+			return mainMat && mainMat.userData ? mainMat.userData.edgeMaterial : null;
 
 		}
 

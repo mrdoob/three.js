@@ -25,10 +25,6 @@
 			};
 			const resx = Math.round( this.resolution.x / this.downSampleRatio );
 			const resy = Math.round( this.resolution.y / this.downSampleRatio );
-			this.maskBufferMaterial = new THREE.MeshBasicMaterial( {
-				color: 0xffffff
-			} );
-			this.maskBufferMaterial.side = THREE.DoubleSide;
 			this.renderTargetMaskBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
 			this.renderTargetMaskBuffer.texture.name = 'OutlinePass.mask';
 			this.renderTargetMaskBuffer.texture.generateMipmaps = false;
@@ -93,7 +89,7 @@
 
 			function replaceDepthToViewZ( string, camera ) {
 
-				var type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
+				const type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
 				return string.replace( /DEPTH_TO_VIEW_Z/g, type + 'DepthToViewZ' );
 
 			}
