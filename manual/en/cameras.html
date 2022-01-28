@@ -9,8 +9,8 @@
     <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
   </head>
   <body>
     <div class="container">
@@ -91,8 +91,8 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
 <a href="/docs/#api/en/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a> function
 so we made a function called <code class="notranslate" translate="no">updateCamera</code> add passed it to lil-gui to call it when things change.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-perspective.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-perspective.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-perspective.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -263,8 +263,8 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 </pre>
 <p>And now you can use one view to see the frustum of the other.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective-2-scenes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-perspective-2-scenes.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-perspective-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-perspective-2-scenes.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -315,8 +315,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 </pre>
 <p>What do you think will happen?</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-z-fighting.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-z-fighting.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-z-fighting.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-z-fighting.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -336,8 +336,8 @@ pixels are in front and which are behind. We can do that by enabling
 </pre>
 <p>and with that it might work</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-logarithmic-depth-buffer.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-logarithmic-depth-buffer.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-logarithmic-depth-buffer.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-logarithmic-depth-buffer.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -406,8 +406,8 @@ side to update the <a href="/docs/#api/en/cameras/OrthographicCamera"><code clas
 </pre>
 <p>and now you can see an <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> at work.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-2-scenes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-orthographic-2-scenes.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-orthographic-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-orthographic-2-scenes.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -525,8 +525,8 @@ Let's move them around based on the time.</p>
 <p>And you can see the images bounce pixel perfect off the edges of the
 canvas using pixel math just like a 2D canvas</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-canvas-top-left-origin.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-orthographic-canvas-top-left-origin.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-orthographic-canvas-top-left-origin.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-orthographic-canvas-top-left-origin.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -546,8 +546,8 @@ in other articles. For now let's move on to <a href="shadows.html">shadows</a>.<
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

@@ -9,9 +9,9 @@
     <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
-    <link rel="stylesheet" href="/manual/zh/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="../zh/lang.css">
   </head>
   <body>
     <div class="container">
@@ -75,8 +75,8 @@ gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera)
 </pre>
 <p>任何时候摄像机的设置变动, 我们需要调用摄像机的<a href="/docs/#api/zh/cameras/PerspectiveCamera#updateProjectionMatrix"><code class="notranslate" translate="no">updateProjectionMatrix</code></a>来更新设置. 我们写一个函数<code class="notranslate" translate="no">updataCamera</code>, 当lil-gui改变了属性的时候会调用它来更新参数. </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-perspective.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-perspective.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-perspective.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -233,8 +233,8 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 </pre>
 <p>现在我们就可以在辅摄像机中观察到主摄像机的视锥轮廓了. </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-perspective-2-scenes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-perspective-2-scenes.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-perspective-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-perspective-2-scenes.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -271,8 +271,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 </pre>
 <p>你觉得会发生什么?</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-z-fighting.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-z-fighting.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-z-fighting.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-z-fighting.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -289,8 +289,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 </pre>
 <p>这看起来就行了</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-logarithmic-depth-buffer.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-logarithmic-depth-buffer.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-logarithmic-depth-buffer.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-logarithmic-depth-buffer.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -336,8 +336,8 @@ camera.zoom = 0.2;
 </pre>
 <p>现在就可以看到<a href="/docs/#api/zh/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>工作了. </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-2-scenes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-orthographic-2-scenes.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-orthographic-2-scenes.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-orthographic-2-scenes.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -444,8 +444,8 @@ const planes = textures.map((texture) =&gt; {
 </pre>
 <p>你可以看到图片在其中弹跳, 和边际完美契合, 就是2D canvas的效果一样</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cameras-orthographic-canvas-top-left-origin.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/cameras-orthographic-canvas-top-left-origin.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/cameras-orthographic-canvas-top-left-origin.html"></iframe></div>
+  <a class="threejs_center" href="../examples/cameras-orthographic-canvas-top-left-origin.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -461,8 +461,8 @@ const planes = textures.map((texture) =&gt; {
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

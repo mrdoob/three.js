@@ -9,9 +9,9 @@
     <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
-    <link rel="stylesheet" href="/manual/zh/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <link rel="stylesheet" href="../zh/lang.css">
   </head>
   <body>
     <div class="container">
@@ -28,7 +28,7 @@
 <p><img src="../resources/images/scenegraph-solarsystem.svg" align="center"></p>
 <p>地球绕着太阳转，月球绕着地球转，月球绕着地球转了一圈。从月球的角度看，它是在地球的 "局部空间 "中旋转。尽管它相对于太阳的运动是一些疯狂的像螺线图一样的曲线，但从月球的角度来看，它只需要关注自身围绕地球这个局部空间的旋转即可。</p>
 <p></p><div class="threejs_diagram_container">
-  <iframe class="threejs_diagram " style="width: 400px; height: 300px;" src="/manual/foo/../resources/moon-orbit.html"></iframe>
+  <iframe class="threejs_diagram " style="width: 400px; height: 300px;" src="../foo/../resources/moon-orbit.html"></iframe>
 </div>
 
 <p></p>
@@ -77,8 +77,8 @@ camera.lookAt(0, 0, 0);
 </pre>
 <p>由于我们将 <code class="notranslate" translate="no">sunMesh</code> 添加到 <code class="notranslate" translate="no">objects</code> 数组中，它将会旋转。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -95,8 +95,8 @@ objects.push(earthMesh);
 <p>我们做的材料是蓝色的，但是我们给它加了少量的放射蓝（<em>emissive</em> blue），这样它就会在我们的黑色背景下显示出来。</p>
 <p>我们使用相同的 <code class="notranslate" translate="no">sphereGeometry</code> 和新的蓝色的 <code class="notranslate" translate="no">earthMaterial</code> 来制作一个 <code class="notranslate" translate="no">earthMesh</code> 。我们将其定位在太阳的左边 10 个单位，并将其添加到场景中。由于我们将它添加到了我们的 <code class="notranslate" translate="no">objects</code> 数组中，所以它也会旋转。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -106,8 +106,8 @@ objects.push(earthMesh);
 </pre>
 <p>然后...</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-orbit.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -139,8 +139,8 @@ objects.push(earthMesh);
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
 <p><code class="notranslate" translate="no">sunMesh</code> 和 <code class="notranslate" translate="no">earthMesh</code> 都是 <code class="notranslate" translate="no">solarSystem</code> 的子网格。三者都在旋转，现在因为 <code class="notranslate" translate="no">earthMesh</code> 不是 <code class="notranslate" translate="no">sunMesh</code> 的子网格，所以不再按 5 倍比例缩放。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit-fixed.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-orbit-fixed.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -173,8 +173,8 @@ objects.push(earthMesh);
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
 <p>就是这样</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -194,8 +194,8 @@ objects.forEach((node) =&gt; {
 </pre>
 <p>在我们的例子中，我们希望轴即使在球体内部也能出现。要做到这一点，我们将其材质（material）的 <code class="notranslate" translate="no">depthTest</code> 属性设置为 false，这意味着它们不会检查其是否在其他东西后面进行绘制。我们还将它们的 <code class="notranslate" translate="no">renderOrder</code> 属性设置为 1（默认值为 0），这样它们就会在所有球体之后被绘制。否则一个球体可能会画在它们上面，把它们遮住。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -258,8 +258,8 @@ class AxisGridHelper {
 </pre>
 <p>需要注意的是，我们将 <a href="/docs/#api/zh/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> 的 <code class="notranslate" translate="no">renderOrder</code> 设置为 2，将<a href="/docs/#api/zh/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>的设置为 1，这样轴就会在网格之后绘制。否则网格可能会覆盖轴。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -335,8 +335,8 @@ const infoElem = document.querySelector("#info");
 infoElem.textContent = camera.desc;
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-tank.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-tank.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-tank.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-tank.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -347,8 +347,8 @@ infoElem.textContent = camera.desc;
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

@@ -9,8 +9,8 @@
     <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
   </head>
   <body>
     <div class="container">
@@ -47,8 +47,8 @@ One of the common ways to post process is called a LUT or 3DLUT. LUT stands for 
 <p>To use it we need a scene to apply it to. Let's throw together a quick scene. We'll start with a glTF file and display it like we covered in <a href="load-gltf.html">the article on loading a glTF</a>. The model we're loading is <a href="https://sketchfab.com/models/a1d315908e9f45e5a3bc618bdfd2e7ee">this model</a> by <a href="https://sketchfab.com/sarath.irn.kat005">The Ice Wolves</a>. It uses no lights so I removed the lights.</p>
 <p>We'll also add a background image like we covered in <a href="backgrounds.html">backgrounds and skyboxs</a>.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut-prep.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing-3dlut-prep.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut-prep.html"></iframe></div>
+  <a class="threejs_center" href="../examples/postprocessing-3dlut-prep.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -204,8 +204,8 @@ composer.render(delta);
 </pre>
 <p>Given it's the identity 3DLUT nothing changes</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut-identity.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing-3dlut-identity.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut-identity.html"></iframe></div>
+  <a class="threejs_center" href="../examples/postprocessing-3dlut-identity.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -244,8 +244,8 @@ drawColorCubeImage(ctx, 8);
 </pre>
 <p>then we can generate a identity 3d lookup table for any size.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/3dlut-base-cube-maker.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/3dlut-base-cube-maker.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/3dlut-base-cube-maker.html"></iframe></div>
+  <a class="threejs_center" href="../examples/3dlut-base-cube-maker.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -369,8 +369,8 @@ separately and then copying and pasting it into the screen capture worked.</p>
 </pre>
 <p>And here's a bunch of luts to choose from.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing-3dlut.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut.html"></iframe></div>
+  <a class="threejs_center" href="../examples/postprocessing-3dlut.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -435,16 +435,16 @@ updateGUI();
 </pre>
 <p>so you should be able to <a href="https://www.google.com/search?q=lut+files">download an Adobe LUT</a> and then drag and drop it on the example below.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut-w-loader.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing-3dlut-w-loader.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/postprocessing-3dlut-w-loader.html"></iframe></div>
+  <a class="threejs_center" href="../examples/postprocessing-3dlut-w-loader.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>Note that Adobe LUTs are not designed for online usage. They are large files. You can convert them to smaller files and save as our PNG format by dragging and dropping on the sample below, choosing a size and clicking "Save...".</p>
 <p>The sample below is just a modification of the code above. We only draw the background picture, no glTF file. That picture is an identity lut image created from the script above. We then use the effect to apply whatever LUT file is loaded so the result is the image we'd need to reproduce the LUT file as a PNG.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-adobe-lut-to-png-converter.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing-adobe-lut-to-png-converter.html" target="_blank">click here to open in a separate window</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/postprocessing-adobe-lut-to-png-converter.html"></iframe></div>
+  <a class="threejs_center" href="../examples/postprocessing-adobe-lut-to-png-converter.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -456,8 +456,8 @@ updateGUI();
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

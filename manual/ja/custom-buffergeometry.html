@@ -9,8 +9,8 @@
     <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
   </head>
   <body>
     <div class="container">
@@ -115,8 +115,8 @@ for (const vertex of vertices) {
 <p>名前の付け方に注意してください。three.jsで決められている名前以外を指定することはできません（カスタムシェーダーを使用する場合は別です）。<code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">uv</code>はthree.jsで決められている名前です。ここでは指定していませんが<code class="notranslate" translate="no">color</code>も指定可能です。</p>
 <p>上の例では<code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code>, <code class="notranslate" translate="no">uvs</code>の３つのJavaScriptのネイティブ配列を作りました。次に<code class="notranslate" translate="no">Float32Array</code>型の<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>に変換します。<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>はネイティブ配列ではなくTypedArrayである必要があります。さらにそれぞれの<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>に対して「１つのvertexに対していくつの要素が必要か」を指定する必要があります。例えばpositionやnormalsは３次元なので１つのvertexつき３つの要素を必要とします。UVはテクスチャ上の２次元の点なので２つの要素を必要とします。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-cube.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube.html"></iframe></div>
+  <a class="threejs_center" href="../examples/custom-buffergeometry-cube.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -194,8 +194,8 @@ geometry.setAttribute(
 +]);
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube-indexed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-cube-indexed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube-indexed.html"></iframe></div>
+  <a class="threejs_center" href="../examples/custom-buffergeometry-cube-indexed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -257,8 +257,8 @@ geometry.setIndex([
 ]);
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube-typedarrays.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-cube-typedarrays.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube-typedarrays.html"></iframe></div>
+  <a class="threejs_center" href="../examples/custom-buffergeometry-cube-typedarrays.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -358,8 +358,8 @@ positionAttribute.needsUpdate = true;
 </pre>
 <p>最後に<code class="notranslate" translate="no">positionAttribute.needsUpdate</code>を設定してTHREE.jsに変更が必要であることを伝えます。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-dynamic.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-dynamic.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-dynamic.html"></iframe></div>
+  <a class="threejs_center" href="../examples/custom-buffergeometry-dynamic.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -372,8 +372,8 @@ positionAttribute.needsUpdate = true;
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

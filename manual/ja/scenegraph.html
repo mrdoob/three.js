@@ -9,8 +9,8 @@
     <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
   </head>
   <body>
     <div class="container">
@@ -32,7 +32,7 @@
 月は地球の周りを円を描いて移動しています。月から見ると、地球の"ローカルな空間"を回っていることになります。
 太陽との相対的な動きは、月の視点から見るとクレイジーな螺旋のような曲線に見えますが、単に地球のローカルな空間を周回していると捉える必要があります。</p>
 <p></p><div class="threejs_diagram_container">
-  <iframe class="threejs_diagram " style="width: 400px; height: 300px;" src="/manual/foo/../resources/moon-orbit.html"></iframe>
+  <iframe class="threejs_diagram " style="width: 400px; height: 300px;" src="../foo/../resources/moon-orbit.html"></iframe>
 </div>
 
 <p></p>
@@ -97,8 +97,8 @@ camera.lookAt(0, 0, 0);
 </pre>
 <p><code class="notranslate" translate="no">sunMesh</code>を<code class="notranslate" translate="no">objects</code>配列に追加したので、回転します。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -115,8 +115,8 @@ objects.push(earthMesh);
 それを太陽の10ユニット左側に置き、シーンに追加します。
 これは<code class="notranslate" translate="no">objects</code>配列にそれを追加されたので、同様に回転します。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -127,8 +127,8 @@ objects.push(earthMesh);
 </pre>
 <p>そして...</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-orbit.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -168,8 +168,8 @@ objects.push(earthMesh);
 <p><code class="notranslate" translate="no">sunMesh</code>と<code class="notranslate" translate="no">earthMesh</code>は共に<code class="notranslate" translate="no">solarSystem</code>の子要素です。3つ全部が回転していますが、
 いま<code class="notranslate" translate="no">earthMesh</code>は<code class="notranslate" translate="no">sunMesh</code>の子要素ではないので、5倍に拡大されません。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit-fixed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-orbit-fixed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -202,8 +202,8 @@ objects.push(earthMesh);
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
 <p>そして、このように描画されます。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -230,8 +230,8 @@ objects.forEach((node) =&gt; {
 全ての球体の後に描画されるように、<code class="notranslate" translate="no">renderOrder</code>も1に設定します（デフォルト値は0です）。
 そうしないと、球体が軸の上に描画され、軸を覆ってしまう可能性があります。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -313,8 +313,8 @@ class AxisGridHelper {
 こうすることで、軸はグリッドの後に描画されます。
 そうしないと、グリッドが軸を上書きしてしまうかもしれません。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -416,8 +416,8 @@ const infoElem = document.querySelector('#info');
 infoElem.textContent = camera.desc;
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-tank.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/scenegraph-tank.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-tank.html"></iframe></div>
+  <a class="threejs_center" href="../examples/scenegraph-tank.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -433,8 +433,8 @@ infoElem.textContent = camera.desc;
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

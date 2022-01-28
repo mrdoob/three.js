@@ -9,8 +9,8 @@
     <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
   </head>
   <body>
     <div class="container">
@@ -57,8 +57,8 @@ const material = new THREE.MeshBasicMaterial({
 </pre>
 <p>Notez que nous utilisons un <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>, donc pas besoin de lumières.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/textured-cube.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/textured-cube.html"></iframe></div>
+  <a class="threejs_center" href="../examples/textured-cube.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
@@ -96,8 +96,8 @@ const material = new THREE.MeshBasicMaterial({
 </pre>
 <p>Ça marche !</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-6-textures.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/textured-cube-6-textures.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/textured-cube-6-textures.html"></iframe></div>
+  <a class="threejs_center" href="../examples/textured-cube-6-textures.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
@@ -131,8 +131,8 @@ loader.load('resources/images/wall.jpg', (texture) =&gt; {
 </pre>
 <p>À moins de vider le cache de votre navigateur et d'avoir une connexion lente, il est peu probable que vous voyiez la différence, mais soyez assuré qu'il attend le chargement de la texture.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-texture.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/textured-cube-wait-for-texture.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-texture.html"></iframe></div>
+  <a class="threejs_center" href="../examples/textured-cube-wait-for-texture.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
@@ -207,8 +207,8 @@ loadManager.onLoad = () =&gt; {
 </pre>
 <p>À moins que vous ne vidiez votre cache et que votre connexion soit lente, vous ne verrez peut-être pas la barre de chargement.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-all-textures.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/textured-cube-wait-for-all-textures.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-all-textures.html"></iframe></div>
+  <a class="threejs_center" href="../examples/textured-cube-wait-for-all-textures.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
@@ -429,8 +429,8 @@ gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
 <p>La dernière chose à noter à propos de l'exemple est que si vous modifiez <code class="notranslate" translate="no">wrapS</code> ou <code class="notranslate" translate="no">wrapT</code> sur la texture, vous devez également définir <a href="/docs/#api/en/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a>
 afin que three.js sache appliquer ces paramètres. Les autres paramètres sont automatiquement appliqués.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-adjust.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/textured-cube-adjust.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/textured-cube-adjust.html"></iframe></div>
+  <a class="threejs_center" href="../examples/textured-cube-adjust.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
@@ -454,8 +454,8 @@ roughness
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 
