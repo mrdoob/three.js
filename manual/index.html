@@ -537,7 +537,7 @@ function transformManualHTML(h) {
 		s.textContent = `
 		{
 			"imports": {
-				"three": "${location.href.slice(0, location.href.indexOf('manual'))}build/three.module.js"
+				"three": "${location.href.slice(0, location.href.indexOf('/manual/'))}build/three.module.js"
 			}
 		}	
 		`
