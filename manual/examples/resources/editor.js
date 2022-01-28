@@ -392,8 +392,8 @@ function getSourceBlob(htmlParts) {
 // polyfill, in ff, not support relpath "../../../build/three.module.js"
 // use abspath ( ${location.origin} )
 // for demo in githack, the abspath is origin + ghusername + reponame + branch
-const abspath = /githack.com/.test(location.origin) 
-  ? location.origin + /([^/]+?\/[^/]+?\/[^/]+)\/*/.exec(location.pathname)[1]
+const abspath = /githack\.com/.test(location.origin) 
+  ? location.origin + /\/([^/]+?\/[^/]+?\/[^/]+)\//.exec(location.pathname)[1]
   : location.origin
 //------------------------------------------------------------------------------
 
