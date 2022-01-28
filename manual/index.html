@@ -509,6 +509,13 @@ function transformManualHTML(h) {
 	Array.from(h.querySelectorAll('script, img, iframe, link')).forEach(s => {
 		if (/githack\.com/.test(location.origin)) {
 			debugger;
+			const tuple = /(\/[^/]+?\/[^/]+?\/[^/]+)\/*/.exec(location.pathname)[1];
+			const p = (s.nodeName === 'LINK') ? 'href' : 'src';
+			const v = s.getAttribute(p);
+			const base = v.startsWith('/') 
+				? location.origin + tuple + '/'
+				: location.origin + '/';
+			s.setAttribute(p, base + s[p].slice(location.origin.length + 1));
 		} else {
 			if (s.nodeName === 'LINK') {
 				const url = new URL(s.href, `${location.origin}${location.pathname}`);
@@ -518,8 +525,6 @@ function transformManualHTML(h) {
 				s.src = url.href;
 			}
 		}
-			// ? location.origin + /(\/[^/]+?\/[^/]+?\/[^/]+)\/*/.exec(location.pathname)[1]
-			// : location.origin + location.pathname;
 	});
 
 	// importmap polyfill
