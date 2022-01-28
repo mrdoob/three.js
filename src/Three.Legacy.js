@@ -1975,3 +1975,10 @@ export function ImmediateRenderObject() {
 	console.error( 'THREE.ImmediateRenderObject has been removed.' );
 
 }
+
+export const RGBFormat = ( function () {
+
+	console.warn( 'THREE.RGBFormat has been removed. Please ues THREE.RGBAFormat instead. https://github.com/mrdoob/three.js/pull/23228' );
+	return 1022;
+
+} )();
