@@ -403,6 +403,7 @@ function getSourceBlob(htmlParts) {
   const scriptNdx = source.search(/<script(\s+type="module"\s*)?>/);
   g.rootScriptInfo.numLinesBeforeScript = (source.substring(0, scriptNdx).match(/\n/g) || []).length;
 
+  source = source.replace(/type=['"]module['"]/, 'type="module-shim"');
   return source;
 
   // const blob = new Blob([source], {type: 'text/html'});
