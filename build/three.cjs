@@ -10962,7 +10962,7 @@ function WebGLBindingStates(gl, extensions, attributes, capabilities) {
 						const stride = data.stride;
 						const offset = geometryAttribute.offset;
 
-						if (data && data.isInstancedInterleavedBuffer) {
+						if (data.isInstancedInterleavedBuffer) {
 							for (let i = 0; i < programAttribute.locationSize; i++) {
 								enableAttributeAndDivisor(programAttribute.location + i, data.meshPerAttribute);
 							}
@@ -16603,7 +16603,6 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		const texture = renderTarget.texture;
 		const renderTargetProperties = properties.get(renderTarget);
 		const textureProperties = properties.get(texture);
-		if (!renderTarget) return;
 
 		if (textureProperties.__webglTexture !== undefined) {
 			_gl.deleteTexture(textureProperties.__webglTexture);
@@ -20115,7 +20114,7 @@ function WebGLRenderer(parameters = {}) {
 			}
 		}
 
-		if (!!geometry && (geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined)) {
+		if (geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined) {
 			morphtargets.update(object, geometry, material, program);
 		}
 
@@ -26092,7 +26091,8 @@ function isUniqueEdge(start, end, edges) {
 	if (edges.has(hash1) === true || edges.has(hash2) === true) {
 		return false;
 	} else {
-		edges.add(hash1, hash2);
+		edges.add(hash1);
+		edges.add(hash2);
 		return true;
 	}
 }
@@ -33519,11 +33519,11 @@ class Raycaster {
 	}
 
 	setFromCamera(coords, camera) {
-		if (camera && camera.isPerspectiveCamera) {
+		if (camera.isPerspectiveCamera) {
 			this.ray.origin.setFromMatrixPosition(camera.matrixWorld);
 			this.ray.direction.set(coords.x, coords.y, 0.5).unproject(camera).sub(this.ray.origin).normalize();
 			this.camera = camera;
-		} else if (camera && camera.isOrthographicCamera) {
+		} else if (camera.isOrthographicCamera) {
 			this.ray.origin.set(coords.x, coords.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera); // set origin in plane of camera
 
 			this.ray.direction.set(0, 0, -1).transformDirection(camera.matrixWorld);
@@ -34022,7 +34022,7 @@ class SkeletonHelper extends LineSegments {
 function getBoneList(object) {
 	const boneList = [];
 
-	if (object && object.isBone) {
+	if (object.isBone === true) {
 		boneList.push(object);
 	}
 
@@ -34053,15 +34053,15 @@ class PointLightHelper extends Mesh {
 		// TODO: delete this comment?
 		const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
 		const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
-		this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+			this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 		this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
-		const d = light.distance;
-		if ( d === 0.0 ) {
-			this.lightDistance.visible = false;
-		} else {
-			this.lightDistance.scale.set( d, d, d );
-		}
-		this.add( this.lightDistance );
+			const d = light.distance;
+			if ( d === 0.0 ) {
+				this.lightDistance.visible = false;
+			} else {
+				this.lightDistance.scale.set( d, d, d );
+			}
+			this.add( this.lightDistance );
 		*/
 	}
 
@@ -34078,12 +34078,12 @@ class PointLightHelper extends Mesh {
 		}
 		/*
 		const d = this.light.distance;
-			if ( d === 0.0 ) {
-				this.lightDistance.visible = false;
-			} else {
-				this.lightDistance.visible = true;
+				if ( d === 0.0 ) {
+					this.lightDistance.visible = false;
+				} else {
+					this.lightDistance.visible = true;
 			this.lightDistance.scale.set( d, d, d );
-			}
+				}
 		*/
 
 	}
@@ -34482,7 +34482,7 @@ class BoxHelper extends LineSegments {
 		1/___0/|
 		| 6__|_7
 		2/___3/
-			0: max.x, max.y, max.z
+				0: max.x, max.y, max.z
 		1: min.x, max.y, max.z
 		2: min.x, min.y, max.z
 		3: max.x, min.y, max.z
@@ -36742,3 +36742,4 @@ exports.ZeroSlopeEnding = ZeroSlopeEnding;
 exports.ZeroStencilOp = ZeroStencilOp;
 exports._SRGBAFormat = _SRGBAFormat;
 exports.sRGBEncoding = sRGBEncoding;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuY2pzIiwic291cmNlcyI6W10sInNvdXJjZXNDb250ZW50IjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9

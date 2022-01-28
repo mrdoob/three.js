@@ -502,8 +502,63 @@
 					src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				}
 
-				iframe.src = src;  // lgtm[js/client-side-unvalidated-url-redirection]
-				iframe.style.display = 'unset';
+//------------------------------------------------------------------------------
+
+function transformManualHTML(h) {
+	// script src
+	Array.from(h.querySelectorAll('script, img')).forEach(s => {
+		if (!s.src) return;
+		const url = new URL(s.src, `${location.origin}${location.pathname}`);
+		s.src = url.href;
+	});
+
+	// importmap polyfill
+	const s = document.createElement('script');
+	s.async = true;
+	s.src = "https://ga.jspm.io/npm:es-module-shims@1.4.3/dist/es-module-shims.js";
+	h.querySelector('head').append(s);
+		
+	{ // importmap
+		const s = document.createElement('script');
+		s.type = 'importmap';
+		s.textContent = `
+		{
+			"imports": {
+				"three": "${location.origin}/build/three.module.js",
+				"three/": "${location.origin}/"
+			}
+		}	
+		`
+		h.querySelector('head').append(s);
+	}
+	return h
+}
+
+
+const xhr = new XMLHttpRequest();
+xhr.open('GET', src, true);
+xhr.responseType = "document";
+xhr.onreadystatechange = () => {
+	if (xhr.readyState === 4) {
+		transformManualHTML(xhr.response);
+		iframe.srcdoc = xhr.response.documentElement.outerHTML;
+		iframe.style.display = 'unset';
+	}
+};
+xhr.send(null);
+
+//  work for editor, but not <img src=..
+// fetch(src).then(r => r.text()).then(x => new DOMParser().parseFromString(x, 'text/html'))
+// 	.then((r) => {
+// 		transformManualHTML(r);
+// 		iframe.srcdoc = r.documentElement.outerHTML;
+// 		iframe.style.display = 'unset';
+// 	})
+
+//------------------------------------------------------------------------------
+
+				// iframe.src = src;  // lgtm[js/client-side-unvalidated-url-redirection]
+				// iframe.style.display = 'unset';
 
 			} else {
 
