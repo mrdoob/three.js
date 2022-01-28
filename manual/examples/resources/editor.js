@@ -388,21 +388,12 @@ function getSourceBlob(htmlParts) {
   <link rel="stylesheet" href="${prefix}/resources/lesson-helper.css" type="text/css">
   <script match="false">self.lessonSettings = ${JSON.stringify(lessonSettings)}</script>`);
 
-//------------------------------------------------------------------------------
-// polyfill, in ff, not support relpath "../../../build/three.module.js"
-// use abspath ( ${location.origin} )
-// for demo in githack, the abspath is origin + ghusername + reponame + branch
-const abspath = /githack\.com/.test(location.origin) 
-  ? location.origin + /(\/[^/]+?\/[^/]+?\/[^/]+)\/*/.exec(location.pathname)[1]
-  : location.origin
-//------------------------------------------------------------------------------
-
   source = source.replace('</head>', `
   <script async src="https://ga.jspm.io/npm:es-module-shims@1.4.3/dist/es-module-shims.js"></script>
   <script type='importmap'>
   {
     "imports": {
-      "three": "${abspath}/build/three.module.js"
+      "three": "${location.origin}/build/three.module.js"
     }
   }
   </script>
