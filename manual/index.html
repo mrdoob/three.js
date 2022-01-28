@@ -505,11 +505,14 @@
 //------------------------------------------------------------------------------
 
 function transformManualHTML(h) {
-	// script src
-	Array.from(h.querySelectorAll('script, img')).forEach(s => {
-		if (!s.src) return;
-		const url = new URL(s.src, `${location.origin}${location.pathname}`);
-		s.src = url.href;
+	// script img iframe link
+	Array.from(h.querySelectorAll('script, img, iframe, link')).forEach(s => {
+		const abspath = /githack.com/.test(location.origin) 
+			? location.origin + /(.*?\/.*?\/.*?)\/*/.exec(location.pathname)[1]
+			: location.origin;
+		const attr = (s.nodeName === 'LINK') ? 'href' : 'src'; 
+		const url = new URL(s[attr], `${abspath}${location.pathname}`);
+		s[attr] = url.href;
 	});
 
 	// importmap polyfill
@@ -524,8 +527,7 @@ function transformManualHTML(h) {
 		s.textContent = `
 		{
 			"imports": {
-				"three": "${location.origin}/build/three.module.js",
-				"three/": "${location.origin}/"
+				"three": "${location.origin}/build/three.module.js"
 			}
 		}	
 		`
