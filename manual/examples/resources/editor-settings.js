@@ -176,7 +176,7 @@ window.lessonEditorSettings = {
   },
   tags: ['three.js'],
   name: 'three.js',
-  icon: '/files/icon.svg',
+  icon: '../../../files/icon.svg',
 };
 
 }());
