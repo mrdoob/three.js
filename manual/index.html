@@ -507,8 +507,8 @@
 function transformManualHTML(h) {
 	// script img iframe link
 	Array.from(h.querySelectorAll('script, img, iframe, link')).forEach(s => {
-		const abspath = /githack.com/.test(location.origin) 
-			? location.origin + /(.*?\/.*?\/.*?)\/*/.exec(location.pathname)[1]
+		const abspath = /githack\.com/.test(location.origin) 
+			? location.origin + /([^/]+?\/[^/]+?\/[^/]+)\/*/.exec(location.pathname)[1]
 			: location.origin;
 		const attr = (s.nodeName === 'LINK') ? 'href' : 'src'; 
 		const url = new URL(s[attr], `${abspath}${location.pathname}`);
