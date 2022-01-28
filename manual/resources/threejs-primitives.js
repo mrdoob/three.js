@@ -18,7 +18,7 @@ import {TextGeometry} from '../../examples/jsm/geometries/TextGeometry.js';
 
   const fontLoader = new FontLoader();
   const fontPromise = new Promise((resolve) => {
-    fontLoader.load('/../../examples/fonts/helvetiker_regular.typeface.json', resolve);
+    fontLoader.load('../../examples/fonts/helvetiker_regular.typeface.json', resolve);
   });
 
   const diagrams = {
