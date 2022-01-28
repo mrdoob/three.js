@@ -393,7 +393,7 @@ function getSourceBlob(htmlParts) {
   <script type='importmap'>
   {
     "imports": {
-      "three": "${prefix.slice(0, prefix.indexOf('manual'))}build/three.module.js"
+      "three": "${location.href.slice(0, location.href.indexOf('manual'))}build/three.module.js"
     }
   }
   </script>
