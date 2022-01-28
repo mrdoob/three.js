@@ -61,7 +61,7 @@ function fixSourceLinks(url, source) {
   const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
   const workerRE = /(new\s+Worker\s*\(\s*)('|")(.*?)('|")/g;
   const importScriptsRE = /(importScripts\s*\(\s*)('|")(.*?)('|")/g;
-  const moduleRE = /(import.*?)('|")(.*?)('|")/g;
+  const moduleRE = /(import.*?)(?!'three')('|")(.*?)('|")/g;
   const prefix = getPrefix(url);
   const rootPrefix = getRootPrefix(url);
 
