@@ -135,8 +135,6 @@ export * from './loaders/PCDLoader.js';
 export * from './loaders/LWOLoader.js';
 export * from './loaders/PLYLoader.js';
 
-export * from './nodes/Nodes.js';
-
 export * from './objects/Lensflare.js';
 export * from './objects/MarchingCubes.js';
 export * from './objects/LightningStorm.js';
@@ -147,7 +145,7 @@ export * from './objects/Refractor.js';
 export * from './objects/ShadowMesh.js';
 export * from './objects/Sky.js';
 export * from './objects/Water.js';
-export * from './objects/Water2.js';
+export { Water as Water2 } from './objects/Water2.js';
 
 export * from './math/ConvexHull.js';
 export * from './math/MeshSurfaceSampler.js';
@@ -238,14 +236,14 @@ export * from './shaders/VerticalBlurShader.js';
 export * from './shaders/SSRrShader.js';
 export * from './shaders/ColorCorrectionShader.js';
 export * from './shaders/PixelShader.js';
-export * from './shaders/BokehShader2.js';
+export * from './shaders/BokehShader.js';
+export { BokehShader as BokehShader2 } from './shaders/BokehShader2.js';
 export * from './shaders/FocusShader.js';
 export * from './shaders/WaterRefractionShader.js';
 export * from './shaders/RGBShiftShader.js';
 export * from './shaders/TriangleBlurShader.js';
 export * from './shaders/FilmShader.js';
 export * from './shaders/SepiaShader.js';
-export * from './shaders/BokehShader.js';
 export * from './shaders/FXAAShader.js';
 export * from './shaders/AfterimageShader.js';
 export * from './shaders/DotScreenShader.js';
