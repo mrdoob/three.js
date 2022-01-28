@@ -507,12 +507,19 @@
 function transformManualHTML(h) {
 	// script img iframe link
 	Array.from(h.querySelectorAll('script, img, iframe, link')).forEach(s => {
-		const abspath = /githack\.com/.test(location.origin) 
-			? location.origin + /(\/[^/]+?\/[^/]+?\/[^/]+)\/*/.exec(location.pathname)[1]
-			: location.origin + location.pathname;
-		const attr = (s.nodeName === 'LINK') ? 'href' : 'src'; 
-		const url = new URL(s[attr], abspath);
-		s[attr] = url.href;
+		if (/githack\.com/.test(location.origin)) {
+			debugger;
+		} else {
+			if (s.nodeName === 'LINK') {
+				const url = new URL(s.href, `${location.origin}${location.pathname}`);
+				s.href = url.href;
+			} else {
+				const url = new URL(s.src, `${location.origin}${location.pathname}`);
+				s.src = url.href;
+			}
+		}
+			// ? location.origin + /(\/[^/]+?\/[^/]+?\/[^/]+)\/*/.exec(location.pathname)[1]
+			// : location.origin + location.pathname;
 	});
 
 	// importmap polyfill
