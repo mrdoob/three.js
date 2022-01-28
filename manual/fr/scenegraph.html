@@ -75,7 +75,7 @@ camera.lookAt(0, 0, 0);
 </pre>
 <p>Ajouter la <code class="notranslate" translate="no">sunMesh</code> au tableau <code class="notranslate" translate="no">objects</code>, la fait pivoter.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
@@ -91,7 +91,7 @@ objects.push(earthMesh);
 <p>Nous utilisons la même <code class="notranslate" translate="no">sphereGeometry</code> avec notre nouveau <code class="notranslate" translate="no">EarthMaterial</code> bleu pour faire une <code class="notranslate" translate="no">earthMesh</code>. 
 Nous positionnons ces 10 unités à gauche du soleil et l'ajoutons à la scène. L'ajouter à notre tableau <code class="notranslate" translate="no">objects</code>, la met en mouvement également.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
@@ -102,7 +102,7 @@ Nous positionnons ces 10 unités à gauche du soleil et l'ajoutons à la scène.
 </pre>
 <p>et...</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-orbit.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth-orbit.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
@@ -137,7 +137,7 @@ objects.push(earthMesh);
 <p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
 <p>La  <code class="notranslate" translate="no">sunMesh</code> et la <code class="notranslate" translate="no">earthMesh</code> sont tous les deux des enfants de <code class="notranslate" translate="no">solarSystem</code>. Les trois sont en train de tournés, et comme <code class="notranslate" translate="no">earthMesh</code> n'est pas un enfant de <code class="notranslate" translate="no">sunMesh</code>, elle n'est plus mise à l'échelle.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth-orbit-fixed.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
@@ -172,7 +172,7 @@ au <code class="notranslate" translate="no">moonOrbit</code>. Notre scène devra
 <p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
 <p>et à ça :</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
@@ -195,7 +195,7 @@ objects.forEach((node) =&gt; {
 <p>Dans notre cas, nous voulons que les axes apparaissent même s'ils sont à l'intérieur des sphères.
 Pour cela, nous définissons le <code class="notranslate" translate="no">depthTest</code> de material à false, pour ne pas vérifier s'ils dessinent derrière quelque chose. Nous définissons également leur <code class="notranslate" translate="no">renderOrder</code> sur 1 (la valeur par défaut est 0) afin qu'ils soient dessinés après toutes les sphères. Sinon, une sphère pourrait les recouvrir et les recouvrir.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon-axes.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
@@ -260,7 +260,7 @@ class AxisGridHelper {
 </pre>
 <p>Une chose à noter est que nous définissons le <code class="notranslate" translate="no">renderOrder</code> de l'<a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> sur 2 et pour le <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> sur 1 afin que les axes soient dessinés après la grille. Sinon, la grille pourrait écraser les axes.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
@@ -343,7 +343,7 @@ const infoElem = document.querySelector('#info');
 infoElem.textContent = camera.desc;
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=/manual/examples/scenegraph-tank.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="../examples/resources/editor.html?url=../scenegraph-tank.html"></iframe></div>
   <a class="threejs_center" href="../examples/scenegraph-tank.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
