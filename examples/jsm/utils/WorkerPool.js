@@ -2,7 +2,7 @@
  * @author Deepkolos / https://github.com/deepkolos
  */
 
-export class WorkerPool {
+class WorkerPool {
 
 	constructor( pool = 4 ) {
 
@@ -100,3 +100,5 @@ export class WorkerPool {
 	}
 
 }
+
+export { WorkerPool };

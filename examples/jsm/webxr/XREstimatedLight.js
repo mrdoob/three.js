@@ -133,7 +133,7 @@ class SessionLightProbe {
 
 }
 
-export class XREstimatedLight extends Group {
+class XREstimatedLight extends Group {
 
 	constructor( renderer, environmentEstimation = true ) {
 
@@ -221,3 +221,5 @@ export class XREstimatedLight extends Group {
 	}
 
 }
+
+export { XREstimatedLight };

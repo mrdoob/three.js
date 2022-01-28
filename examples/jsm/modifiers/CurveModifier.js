@@ -20,7 +20,7 @@ import {
  *
  * @param { number } numberOfCurves the number of curves needed to be described by this texture.
  */
-export function initSplineTexture( numberOfCurves = 1 ) {
+function initSplineTexture( numberOfCurves = 1 ) {
 
 	const dataArray = new Float32Array( TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS );
 	const dataTexture = new DataTexture(
@@ -47,7 +47,7 @@ export function initSplineTexture( numberOfCurves = 1 ) {
  * @param { Curve } splineCurve The curve to describe
  * @param { number } offset Which curve slot to write to
  */
-export function updateSplineTexture( texture, splineCurve, offset = 0 ) {
+function updateSplineTexture( texture, splineCurve, offset = 0 ) {
 
 	const numberOfPoints = Math.floor( TEXTURE_WIDTH * ( TEXTURE_HEIGHT / 4 ) );
 	splineCurve.arcLengthDivisions = numberOfPoints / 2;
@@ -93,7 +93,7 @@ function setTextureValue( texture, index, x, y, z, o ) {
  *
  * @param { DataTexture } Texture which holds the curve description
  */
-export function getUniforms( splineTexture ) {
+function getUniforms( splineTexture ) {
 
 	const uniforms = {
 		spineTexture: { value: splineTexture },
@@ -107,7 +107,7 @@ export function getUniforms( splineTexture ) {
 
 }
 
-export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
+function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 
 	if ( material.__ok ) return;
 	material.__ok = true;
@@ -196,7 +196,7 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 /**
  * A helper class for making meshes bend aroudn curves
  */
-export class Flow {
+class Flow {
 
 	/**
 	 * @param {Mesh} mesh The mesh to clone and modify to bend around the curve
@@ -253,7 +253,7 @@ const matrix = new Matrix4();
 /**
  * A helper class for creating instanced versions of flow, where the instances are placed on the curve.
  */
-export class InstancedFlow extends Flow {
+class InstancedFlow extends Flow {
 
 	/**
 	 *
@@ -323,3 +323,12 @@ export class InstancedFlow extends Flow {
 	}
 
 }
+
+export {
+	initSplineTexture,
+	updateSplineTexture,
+	getUniforms,
+	modifyShader,
+	Flow,
+	InstancedFlow,
+};

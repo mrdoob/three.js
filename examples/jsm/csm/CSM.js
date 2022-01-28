@@ -17,7 +17,7 @@ const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
 
-export class CSM {
+class CSM {
 
 	constructor( data ) {
 
@@ -375,3 +375,5 @@ export class CSM {
 	}
 
 }
+
+export { CSM };

@@ -11,7 +11,7 @@ import {
 	LinearFilter,
 } from 'three';
 
-export class LUT3dlLoader extends Loader {
+class LUT3dlLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
@@ -149,3 +149,5 @@ export class LUT3dlLoader extends Loader {
 	}
 
 }
+
+export { LUT3dlLoader };

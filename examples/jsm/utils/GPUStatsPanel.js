@@ -2,7 +2,7 @@ import Stats from '../libs/stats.module.js';
 
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query/
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
-export class GPUStatsPanel extends Stats.Panel {
+class GPUStatsPanel extends Stats.Panel {
 
 	constructor( context, name = 'GPU MS' ) {
 
@@ -126,3 +126,5 @@ export class GPUStatsPanel extends Stats.Panel {
 	}
 
 }
+
+export { GPUStatsPanel };
