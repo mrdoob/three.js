@@ -518,7 +518,7 @@ function transformManualHTML(h) {
 				s.src = url.href;
 			}
 		}
-		if (s.nodeName === 'SCRIPT') {debugger
+		if (s.nodeName === 'SCRIPT') {
 			if (s.src && s.type === 'module') {
 				s.type = 'module-shim'
 			}
