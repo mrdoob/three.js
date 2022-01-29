@@ -10,8 +10,8 @@
 		<h1>행렬 변환([name])</h1>
 
 		<p>
-        Three.js는 *matrices*를 사용해 3D 변형---변환(위치), 회전, 확대 인코딩합니다. 
-        [page:Object3D]의 모든 인스턴스는 [page:Object3D.matrix matrix]를 가지고 있어 오브젝트의 위치, 회전, 확대 정보를 담고 있습니다. 
+        Three.js는 *matrices*를 사용해 3D 변형---변환(위치), 회전, 확대 인코딩합니다.
+        [page:Object3D]의 모든 인스턴스는 [page:Object3D.matrix matrix]를 가지고 있어 오브젝트의 위치, 회전, 확대 정보를 담고 있습니다.
         이 페이지에서는 오브젝트의 변형과 관련해 설명합니다.
 		</p>
 
@@ -59,12 +59,12 @@ object.matrixAutoUpdate = false;
 
 		<h2>회전 및 사원수(Rotation and Quaternion)</h2>
 		<p>
-        Three.js는 3D 회전을 두 가지 방법으로 나타냅니다: [page:Euler Euler angles] 와 [page:Quaternion Quaternions]이며 둘 사이의 변한 메서드도 포함입니다. 
-        Euler angles는 "gimbal lock" 이라는 문제와 관련이 있어서, 특정 설정은 자유도가 제한됩니다(한 축에서만 오브젝트가 회전하는 것을 방지). 
+        Three.js는 3D 회전을 두 가지 방법으로 나타냅니다: [page:Euler Euler angles] 와 [page:Quaternion Quaternions]이며 둘 사이의 변한 메서드도 포함입니다.
+        Euler angles는 "gimbal lock" 이라는 문제와 관련이 있어서, 특정 설정은 자유도가 제한됩니다(한 축에서만 오브젝트가 회전하는 것을 방지).
         이 때문에, 오브젝트 회전은 <em>언제나</em> 오브젝트의 [page:Object3D.quaternion quaternion]에 저장됩니다.
 		</p>
 		<p>
-        이전 버전의 라이브러리는 *useQuaternion* 속성을 불러와서 false로 설정하면 [page:Object3D.matrix matrix]를 Euler angle로 계산하게 합니다. 
+        이전 버전의 라이브러리는 *useQuaternion* 속성을 불러와서 false로 설정하면 [page:Object3D.matrix matrix]를 Euler angle로 계산하게 합니다.
         이 예제는 삭제되었습니다. 대신 [page:Object3D.setRotationFromEuler setRotationFromEuler] 메서드를 사용해 사원수를 업데이트 합니다.
 		</p>
 
