@@ -229,7 +229,7 @@ function html2canvas( element ) {
 			drawBorder( style, 'borderBottom', x, y + height, width, 0 );
 			drawBorder( style, 'borderRight', x + width, y, 0, height );
 
-			if ( element.type === 'color' || element.type === 'text' ) {
+			if ( element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
 
 				clipper.add( { x: x, y: y, width: width, height: height } );
 
