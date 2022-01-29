@@ -171,8 +171,7 @@ function main() {
 
   const rtParameters = {
     minFilter: THREE.NearestFilter,
-    magFilter: THREE.NearestFilter,
-    format: THREE.RGBFormat,
+    magFilter: THREE.NearestFilter
   };
   const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
 

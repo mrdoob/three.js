@@ -170,6 +170,7 @@ import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
+  renderer.outputEncoding = THREE.sRGBEncoding;
 
   const fov = 45;
   const aspect = 2;  // the canvas default
@@ -188,7 +189,7 @@ function main() {
 
   function addLight(...pos) {
     const color = 0xFFFFFF;
-    const intensity = 1;
+    const intensity = 0.8;
     const light = new THREE.DirectionalLight(color, intensity);
     light.position.set(...pos);
     scene.add(light);
@@ -816,4 +817,3 @@ function main() {
 main();
 </script>
 </html>
-
