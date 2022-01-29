@@ -41,6 +41,7 @@ import {MTLLoader} from '../../examples/jsm/loaders/MTLLoader.js';
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
+  renderer.outputEncoding = THREE.sRGBEncoding;
 
   const fov = 45;
   const aspect = 2;  // the canvas default
@@ -61,6 +62,7 @@ function main() {
 
     const loader = new THREE.TextureLoader();
     const texture = loader.load('resources/images/checker.png');
+    texture.encoding = THREE.sRGBEncoding;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.magFilter = THREE.NearestFilter;
@@ -177,4 +179,3 @@ function main() {
 main();
 </script>
 </html>
-
