@@ -86,6 +86,7 @@ export const UnsignedShort4444Type = 1017;
 export const UnsignedShort5551Type = 1018;
 export const UnsignedInt248Type = 1020;
 export const AlphaFormat = 1021;
+export const RGBFormat = 1022;
 export const RGBAFormat = 1023;
 export const LuminanceFormat = 1024;
 export const LuminanceAlphaFormat = 1025;
