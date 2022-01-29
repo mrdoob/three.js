@@ -251,7 +251,7 @@ class OBJExporter {
 
 					if ( colors !== undefined ) {
 
-						color.fromBufferAttribute( colors, i );
+						color.fromBufferAttribute( colors, i ).convertLinearToSRGB();
 
 						output += ' ' + color.r + ' ' + color.g + ' ' + color.b;
 
