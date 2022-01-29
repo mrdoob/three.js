@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.136.0/build/three.module.js';
 
 const state = {
   width: 300,   // canvas default

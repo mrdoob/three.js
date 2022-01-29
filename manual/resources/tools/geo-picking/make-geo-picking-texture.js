@@ -108,7 +108,7 @@ async function main() {
 
     const handler = geoHandlers[type];
     if (!handler) {
-      throw new Error('unknown geometry type:', type);
+      throw new Error('unknown geometry type.');
     }
 
     resetMinMax();
@@ -270,5 +270,3 @@ function base64ToUint8Array(base64) {
 }
 
 main();
-
-
