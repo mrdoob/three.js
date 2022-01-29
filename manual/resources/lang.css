@@ -28,9 +28,21 @@ pre.prettyprint ul.modifiedlines li.linedeleted {
     background-color: #ffebe9;
 }
 
+pre.prettyprint ul.modifiedlines li.linedeleted:before {
+    content: '-';
+    background-color: #ffebe9;
+    padding-right: 8px;
+}
+
 pre.prettyprint ul.modifiedlines li.lineadded {
     list-style-type: none;
     background-color: #e6ffec;
+}
+
+pre.prettyprint ul.modifiedlines li.lineadded:before {
+    content: '+';
+    background-color: #e6ffec;
+    padding-right: 8px;
 }
 
 pre.prettyprint, code.prettyprint, .dos {
@@ -70,7 +82,15 @@ pre.prettyprint, code.prettyprint, .dos {
 			background-color: #412e32;
 	}
 
+	pre.prettyprint ul.modifiedlines li.linedeleted:before {
+			background-color: #412e32;
+	}
+
 	pre.prettyprint ul.modifiedlines li.lineadded {
+			background-color: #293832;
+	}
+
+	pre.prettyprint ul.modifiedlines li.lineadded:before {
 			background-color: #293832;
 	}
 
