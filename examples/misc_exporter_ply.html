@@ -77,7 +77,17 @@
 				// export mesh
 
 				const geometry = new THREE.BoxGeometry( 50, 50, 50 );
-				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				const material = new THREE.MeshPhongMaterial( { vertexColors: true } );
+
+				// color vertices based on vertex positions
+				const colors = geometry.getAttribute( 'position' ).array.slice();
+				for ( let i = 0, l = colors.length; i < l; i ++ ) {
+
+					if ( colors[ i ] > 0 ) colors[ i ] = 0.5;
+					else colors[ i ] = 0;
+
+				}
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3, false ) );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
@@ -87,6 +97,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
