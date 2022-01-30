@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { LoadingManager } from '../../../../src/loaders/LoadingManager';
-import { Loader } from '../../../../src/loaders/Loader';
+import { LoadingManager } from '../../../../src/loaders/LoadingManager.js';
+import { Loader } from '../../../../src/loaders/Loader.js';
 
 export default QUnit.module( 'Loaders', () => {
 

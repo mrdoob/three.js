@@ -1,9 +1,19 @@
 {
   "name": "three",
-  "version": "0.136.0",
+  "version": "0.137.5",
   "description": "JavaScript 3D library",
-  "main": "build/three.js",
-  "module": "build/three.module.js",
+  "type": "module",
+  "main": "./build/three.js",
+  "module": "./build/three.module.js",
+  "exports": {
+    ".": {
+      "import": "./build/three.module.js",
+      "require": "./build/three.cjs"
+    },
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./src/*": "./src/*"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
@@ -11,6 +21,7 @@
   "sideEffects": false,
   "files": [
     "build/three.js",
+    "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
     "examples/js",
@@ -41,7 +52,6 @@
     "globals": {
       "__THREE_DEVTOOLS__": "readonly",
       "WebGL2ComputeRenderingContext": "readonly",
-
       "potpack": "readonly",
       "fflate": "readonly",
       "bodymovin": "readonly",
@@ -49,10 +59,10 @@
       "Stats": "readonly",
       "XRWebGLBinding": "readonly",
       "XRWebGLLayer": "readonly",
-
       "GPUShaderStage": "readonly",
       "GPUBufferUsage": "readonly",
-      "GPUTextureUsage": "readonly"
+      "GPUTextureUsage": "readonly",
+      "QUnit": "readonly"
     },
     "rules": {
       "no-throw-literal": [
@@ -83,7 +93,6 @@
     "lint-fix": "npm run lint -- --fix && npm run lint-examples -- --fix",
     "lint-docs": "eslint docs --ext html",
     "test-unit": "npm run unit --prefix test",
-    "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
@@ -123,7 +132,6 @@
     "eslint": "^7.32.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.2.0",
-    "glob": "^7.2.0",
     "rollup": "^2.57.0",
     "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-terser": "^7.0.2",

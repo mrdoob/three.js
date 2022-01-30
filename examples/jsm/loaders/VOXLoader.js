@@ -107,7 +107,7 @@ class VOXLoader extends Loader {
 
 			for ( let j = 0; j < 4; j ++ ) {
 
-				id += String.fromCharCode( data.getUint8( i ++, true ) );
+				id += String.fromCharCode( data.getUint8( i ++ ) );
 
 			}
 

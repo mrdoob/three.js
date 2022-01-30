@@ -1,9 +1,9 @@
 /* global QUnit */
 
-import { Line3 } from '../../../../src/math/Line3';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Vector4 } from '../../../../src/math/Vector4';
-import { Matrix4 } from '../../../../src/math/Matrix4';
+import { Line3 } from '../../../../src/math/Line3.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import {
 	x,
 	y,
@@ -11,7 +11,7 @@ import {
 	zero3,
 	one3,
 	two3
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 export default QUnit.module( 'Maths', () => {
 

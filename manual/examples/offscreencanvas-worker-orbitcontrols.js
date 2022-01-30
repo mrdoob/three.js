@@ -1,5 +1,5 @@
 import {init} from './shared-orbitcontrols.js';
-import {EventDispatcher} from '../../build/three.module.js';
+import {EventDispatcher} from 'https://cdn.skypack.dev/three@0.136.0/build/three.module.js';
 
 function noop() {
 }

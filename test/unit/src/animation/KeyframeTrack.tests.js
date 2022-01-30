@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Animation', () => {
 

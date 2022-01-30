@@ -1654,7 +1654,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		if ( !! geometry && ( geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined ) ) {
+		if ( geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined ) {
 
 			morphtargets.update( object, geometry, material, program );
 

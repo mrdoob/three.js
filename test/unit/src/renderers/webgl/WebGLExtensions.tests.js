@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions';
+import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions.js';
 
 const WebglContextMock = function ( supportedExtensions ) {
 
@@ -32,7 +32,7 @@ export default QUnit.module( 'Renderers', () => {
 
 				const gl = new WebglContextMock();
 				const extensions = new WebGLExtensions( gl );
-				assert.ok( extensions !== undefined );
+				assert.ok( typeof extensions === 'object' );
 
 			} );
 

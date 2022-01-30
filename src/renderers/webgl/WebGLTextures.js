@@ -163,19 +163,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( glFormat === _gl.RGB ) {
-
-			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGB32F;
-			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGB16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGB8;
-
-		}
-
 		if ( glFormat === _gl.RGBA ) {
 
 			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGBA32F;
 			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGBA16F;
 			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding && isVideoTexture === false ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+			if ( glType === _gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = _gl.RGBA4;
+			if ( glType === _gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = _gl.RGB5_A1;
 
 		}
 
@@ -318,8 +312,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const renderTargetProperties = properties.get( renderTarget );
 		const textureProperties = properties.get( texture );
-
-		if ( ! renderTarget ) return;
 
 		if ( textureProperties.__webglTexture !== undefined ) {
 
@@ -1029,7 +1021,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE );
 
-			const isCompressed = ( texture && ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture ) );
+			const isCompressed = ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture );
 			const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 			const cubeImage = [];

@@ -608,7 +608,7 @@ class ColladaExporter {
 					`<instance_geometry url="#${ meshid }">` +
 
 					(
-						matids != null ?
+						matids.length > 0 ?
 							'<bind_material><technique_common>' +
 							matids.map( ( id, i ) =>
 

@@ -26,7 +26,7 @@
 			If the type is THREE.UnsignedByteType, a Uint8Array will be useful for addressing the texel data.
 			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity).<br />
 
-			For the packed types, THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type or THREE.UnsignedShort565Type, all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
+			For the packed types, THREE.UnsignedShort4444Type and THREE.UnsignedShort5551Type all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
 
 			In order to use the types THREE.FloatType and THREE.HalfFloatType, the WebGL implementation must support the respective extensions OES_texture_float and OES_texture_half_float. In order to use THREE.LinearFilter for component-wise, bilinear interpolation of the texels based on these types, the WebGL extensions OES_texture_float_linear or OES_texture_half_float_linear must also be present.
 		</p>

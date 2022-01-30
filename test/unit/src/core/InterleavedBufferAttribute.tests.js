@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
-import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBufferAttribute';
+import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
+import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBufferAttribute.js';
 
 export default QUnit.module( 'Core', () => {
 

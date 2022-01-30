@@ -1,21 +1,17 @@
 /* global QUnit */
 
-import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import {
 	BufferAttribute,
 	Uint16BufferAttribute,
 	Uint32BufferAttribute
-} from '../../../../src/core/BufferAttribute';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import { Sphere } from '../../../../src/math/Sphere';
-import {
-	x,
-	y,
-	z
-} from '../math/Constants.tests';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
+} from '../../../../src/core/BufferAttribute.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import { Sphere } from '../../../../src/math/Sphere.js';
+import { x, y, z } from '../math/Constants.tests.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 var DegToRad = Math.PI / 180;
 
@@ -354,7 +350,7 @@ export default QUnit.module( 'Core', () => {
 
 			var bs = getBSForVertices( [ - 10, 0, 0, 10, 0, 0 ] );
 
-			assert.ok( bs.radius === ( 10 + 10 ) / 2, 'radius is equal to deltaMinMax / 2' );
+			assert.ok( bs.radius === 10, 'radius is equal to deltaMinMax / 2' );
 			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
 
 			var bs = getBSForVertices( [ - 5, 11, - 3, 5, - 11, 3 ] );

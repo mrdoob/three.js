@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
-import { Matrix4 } from '../../../../src/math/Matrix4';
+import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 
 export default QUnit.module( 'Cameras', () => {
 

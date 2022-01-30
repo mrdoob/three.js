@@ -17,6 +17,7 @@ export class StandardMaterialEditor extends BaseNode {
 		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
 		const metalness = new LabelElement( 'metalness' ).setInput( 1 );
 		const roughness = new LabelElement( 'roughness' ).setInput( 1 );
+		const position = new LabelElement( 'position' ).setInput( 3 );
 
 		color.add( new ColorInput( material.color.getHex() ).onChange( ( input ) => {
 
@@ -48,16 +49,19 @@ export class StandardMaterialEditor extends BaseNode {
 		opacity.onConnect( () => this.update(), true );
 		metalness.onConnect( () => this.update(), true );
 		roughness.onConnect( () => this.update(), true );
+		position.onConnect(() => this.update(), true );
 
 		this.add( color )
 			.add( opacity )
 			.add( metalness )
-			.add( roughness );
+			.add( roughness )
+			.add( position );
 
 		this.color = color;
 		this.opacity = opacity;
 		this.metalness = metalness;
 		this.roughness = roughness;
+		this.position = position;
 
 		this.material = material;
 
@@ -67,7 +71,7 @@ export class StandardMaterialEditor extends BaseNode {
 
 	update() {
 
-		const { material, color, opacity, roughness, metalness } = this;
+		const { material, color, opacity, roughness, metalness, position } = this;
 
 		color.setEnabledInputs( ! color.getLinkedObject() );
 		opacity.setEnabledInputs( ! opacity.getLinkedObject() );
@@ -75,11 +79,11 @@ export class StandardMaterialEditor extends BaseNode {
 		metalness.setEnabledInputs( ! metalness.getLinkedObject() );
 
 		material.colorNode = color.getLinkedObject();
-
 		material.opacityNode = opacity.getLinkedObject() || null;
-
 		material.metalnessNode = metalness.getLinkedObject();
 		material.roughnessNode = roughness.getLinkedObject();
+
+		material.positionNode = position.getLinkedObject() || null;
 
 		material.dispose();
 

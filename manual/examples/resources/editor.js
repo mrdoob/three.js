@@ -178,7 +178,7 @@ async function getWorkerScripts(text, baseUrl, scriptInfos = {}) {
   const parentScriptInfo = scriptInfos[baseUrl];
   const workerRE = /(new\s+Worker\s*\(\s*)('|")(.*?)('|")/g;
   const importScriptsRE = /(importScripts\s*\(\s*)('|")(.*?)('|")/g;
-  const importRE = /(import.*?)('|")(.*?)('|")/g;
+  const importRE = /(import.*?)(?!'three')('|")(.*?)('|")/g;
 
   const newScripts = [];
   const slashRE = /\/manual\/examples\/[^/]+$/;
@@ -295,6 +295,8 @@ async function parseHTML(url, html) {
   // We need a way to pass parameters to a blob. Normally they'd be passed as
   // query params but that only works in Firefox >:(
   html = html.replace('</head>', '<script id="hackedparams">window.hackedParams = ${hackedParams}\n</script>\n</head>');
+
+	html = html.replace('../../build/three.module.js', window.location.origin + '/build/three.module.js');
 
   html = extraHTMLParsing(html, htmlParts);
 
@@ -1440,6 +1442,3 @@ function start() {
 
 start();
 }());
-
-
-
