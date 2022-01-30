@@ -98,8 +98,7 @@ function main() {
 
     return function(filter) {
       const texture = new THREE.DataTexture(identityLUT, 4, 2);
-      texture.minFilter = filter;
-      texture.magFilter = filter;
+      texture.minFilter = texture.magFilter = filter ? THREE.LinearFilter : THREE.NearestFilter;
       texture.needsUpdate = true;
       texture.flipY = false;
       return texture;
@@ -111,21 +110,16 @@ function main() {
     const ctx = document.createElement('canvas').getContext('2d');
 
     return function(info) {
-      const texture = makeIdentityLutTexture(
-          info.filter ? THREE.LinearFilter : THREE.NearestFilter);
+      const lutSize = info.size;
+      const width = lutSize * lutSize;
+      const height = lutSize;
+      const texture = new THREE.DataTexture(new Uint8Array(width * height), width, height);
+      texture.minFilter = texture.magFilter = info.filter ? THREE.LinearFilter : THREE.NearestFilter;
+      texture.flipY = false;
 
       if (info.url) {
-        const lutSize = info.size;
-
-        // set the size to 2 (the identity size). We'll restore it when the
-        // image has loaded. This way the code using the lut doesn't have to
-        // care if the image has loaded or not
-        info.size = 2;
 
         imgLoader.load(info.url, function(image) {
-          const width = lutSize * lutSize;
-          const height = lutSize;
-          info.size = lutSize;
           ctx.canvas.width = width;
           ctx.canvas.height = height;
           ctx.drawImage(image, 0, 0);
@@ -157,9 +151,10 @@ function main() {
         info.size = parseInt(m[1]);
         info.filter = info.filter === undefined ? m[2] !== 'n' : info.filter;
       }
+      info.texture = makeLUTTexture(info);
+    } else {
+      info.texture = makeIdentityLutTexture(info.filter);
     }
-
-    info.texture = makeLUTTexture(info);
   });
 
   let lutNameIndexMap = {};
@@ -332,14 +327,15 @@ function main() {
   const renderModel = new RenderPass(scene, camera);
   renderModel.clear = false;  // so we don't clear out the background
   const renderBG = new RenderPass(sceneBG, cameraBG);
+  const gammaPass = new ShaderPass(GammaCorrectionShader);
 
-  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1));
+  const composer = new EffectComposer(renderer);
 
   composer.addPass(renderBG);
   composer.addPass(renderModel);
   composer.addPass(effectLUT);
   composer.addPass(effectLUTNearest);
-  composer.addPass(new ShaderPass(GammaCorrectionShader));
+  composer.addPass(gammaPass);
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
