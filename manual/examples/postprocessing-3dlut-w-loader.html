@@ -157,31 +157,16 @@ function main() {
     }
   });
 
-  let lutNameIndexMap = {};
-  function makeLutNameIndexMap() {
-    lutNameIndexMap = {};
-    lutTextures.forEach((info, ndx) => {
-      lutNameIndexMap[info.name] = ndx;
-    });
-  }
-  makeLutNameIndexMap();  // called so we can set lutSettings below
+  const lutNameIndexMap = {};
+  lutTextures.forEach((info, ndx) => {
+    lutNameIndexMap[info.name] = ndx;
+  });
 
   const lutSettings = {
-    dummy: () => {},
-    lut: lutNameIndexMap.thermal,
+    lut: lutNameIndexMap.custom,
   };
   const gui = new GUI({ width: 300 });
-  gui.addFolder('Choose LUT or Drag&Drop LUT File(s)');
-
-  let lutGUI;
-  function updateGUI() {
-    makeLutNameIndexMap();
-    if (lutGUI) {
-      gui.remove(lutGUI);
-    }
-    lutGUI = gui.add(lutSettings, 'lut', lutNameIndexMap);
-  }
-  updateGUI();
+  gui.add(lutSettings, 'lut', lutNameIndexMap);
 
   const scene = new THREE.Scene();
 
@@ -400,9 +385,9 @@ function main() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const type = ext(file.name);
-      const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+      const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
       const {size, data, name} = lut;
-      const texture = new THREE.DataTexture(data, size * size, size, THREE.RGBFormat);
+      const texture = new THREE.DataTexture(data, size * size, size);
       texture.magFilter = THREE.LinearFilter;
       texture.minFilter = THREE.LinearFilter;
       texture.needsUpdate = true;
@@ -417,7 +402,6 @@ function main() {
       };
       lutTextures.push(lutTexture);
       lutSettings.lut = lutTextures.length - 1;
-      updateGUI();
 
     };
 

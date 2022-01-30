@@ -283,23 +283,16 @@ drawColorCubeImage(ctx, 8);
   const ctx = document.createElement('canvas').getContext('2d');
 
   return function(info) {
-    const texture = makeIdentityLutTexture(
-        info.filter ? THREE.LinearFilter : THREE.NearestFilter);
+    const lutSize = info.size;
+    const width = lutSize * lutSize;
+    const height = lutSize;
+    const texture = new THREE.DataTexture(new Uint8Array(width * height), width, height);
+    texture.minFilter = texture.magFilter = info.filter ? THREE.LinearFilter : THREE.NearestFilter;
+    texture.flipY = false;
 
     if (info.url) {
-      const lutSize = info.size;
-
-      /**
-       * 크기를 2(identity LUT의 크기)로 설정합니다. 이 크기는 나중에 이미지를
-       * 불러온 뒤 복원합니다. 이러면 lut를 사용하는 코드는 이미지의 적용 여부를
-       * 신경쓰지 않아도 됩니다.
-       **/
-      info.size = 2;
 
       imgLoader.load(info.url, function(image) {
-        const width = lutSize * lutSize;
-        const height = lutSize;
-        info.size = lutSize;
         ctx.canvas.width = width;
         ctx.canvas.height = height;
         ctx.drawImage(image, 0, 0);
@@ -404,9 +397,9 @@ function readLUTFile(file) {
   const reader = new FileReader();
   reader.onload = (e) =&gt; {
     const type = ext(file.name);
-    const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+    const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
     const {size, data, name} = lut;
-    const texture = new THREE.DataTexture(data, size * size, size, THREE.RGBFormat);
+    const texture = new THREE.DataTexture(data, size * size, size);
     texture.minFilter = THREE.LinearFilter;
     texture.needsUpdate = true;
     texture.flipY = false;
@@ -425,23 +418,6 @@ function readLUTFile(file) {
 
   reader.readAsText(file);
 }
-</pre>
-<p>GUI가 새로 불러온 파일을 반영하도록 코드를 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lutSettings = {
-  lut: lutNameIndexMap.thermal,
-};
-const gui = new GUI({ width: 300 });
-gui.addFolder('Choose LUT or Drag&amp;Drop LUT File(s)');
-
-let lutGUI;
-function updateGUI() {
-  makeLutNameIndexMap();
-  if (lutGUI) {
-    gui.remove(lutGUI);
-  }
-  lutGUI = gui.add(lutSettings, 'lut', lutNameIndexMap);
-}
-updateGUI();
 </pre>
 <p>이제 <a href="https://www.google.com/search?q=lut+files">Adobe LUT 파일</a>을 다운해 아래 예제에 드래그-앤-드롭으로 불러올 수 있을 겁니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

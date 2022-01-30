@@ -315,21 +315,16 @@ Photoshopの場合、使用できる調整のほとんどは画像 → 調整メ
   const ctx = document.createElement('canvas').getContext('2d');
 
   return function(info) {
-    const texture = makeIdentityLutTexture(
-        info.filter ? THREE.LinearFilter : THREE.NearestFilter);
+    const lutSize = info.size;
+    const width = lutSize * lutSize;
+    const height = lutSize;
+    const texture = new THREE.DataTexture(new Uint8Array(width * height), width, height);
+    texture.minFilter = texture.magFilter = info.filter ? THREE.LinearFilter : THREE.NearestFilter;
+    texture.flipY = false;
 
     if (info.url) {
-      const lutSize = info.size;
-
-      // set the size to 2 (the identity size). We'll restore it when the
-      // image has loaded. This way the code using the lut doesn't have to
-      // care if the image has loaded or not
-      info.size = 2;
 
       imgLoader.load(info.url, function(image) {
-        const width = lutSize * lutSize;
-        const height = lutSize;
-        info.size = lutSize;
         ctx.canvas.width = width;
         ctx.canvas.height = height;
         ctx.drawImage(image, 0, 0);
@@ -436,9 +431,9 @@ function readLUTFile(file) {
   const reader = new FileReader();
   reader.onload = (e) =&gt; {
     const type = ext(file.name);
-    const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+    const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
     const {size, data, name} = lut;
-    const texture = new THREE.DataTexture(data, size * size, size, THREE.RGBFormat);
+    const texture = new THREE.DataTexture(data, size * size, size);
     texture.minFilter = THREE.LinearFilter;
     texture.needsUpdate = true;
     texture.flipY = false;
@@ -457,23 +452,6 @@ function readLUTFile(file) {
 
   reader.readAsText(file);
 }
-</pre>
-<p>新しいファイルを含むようにGUIを更新する必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lutSettings = {
-  lut: lutNameIndexMap.thermal,
-};
-const gui = new GUI({ width: 300 });
-gui.addFolder('Choose LUT or Drag&amp;Drop LUT File(s)');
-
-let lutGUI;
-function updateGUI() {
-  makeLutNameIndexMap();
-  if (lutGUI) {
-    gui.remove(lutGUI);
-  }
-  lutGUI = gui.add(lutSettings, 'lut', lutNameIndexMap);
-}
-updateGUI();
 </pre>
 <p><a href="https://www.google.com/search?q=lut+files">Adobe LUTをダウンロード</a>し、下の例にドラッグ＆ドロップできます。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
