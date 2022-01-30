@@ -210,14 +210,13 @@ function main() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const type = ext(file.name);
-      const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+      const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
 
       effectLUT.uniforms.lutMapSize.value = lut.size;
 
       lutTexture.image.data = lut.data;
       lutTexture.image.width = lut.size * lut.size;
       lutTexture.image.height = lut.size;
-      lutTexture.format = THREE.RGBFormat;
       lutTexture.needsUpdate = true;
 
       render();
