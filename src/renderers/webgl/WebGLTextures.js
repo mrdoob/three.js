@@ -1,5 +1,6 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, sRGBEncoding } from '../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, sRGBEncoding, LinearEncoding, UnsignedByteType, _SRGBAFormat } from '../../constants.js';
 import * as MathUtils from '../../math/MathUtils.js';
+import { ImageUtils } from '../../extras/ImageUtils.js';
 import { createElementNS } from '../../utils.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
@@ -130,7 +131,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( internalFormatName, glFormat, glType, encoding ) {
+	function getInternalFormat( internalFormatName, glFormat, glType, encoding, isVideoTexture = false ) {
 
 		if ( isWebGL2 === false ) return glFormat;
 
@@ -152,11 +153,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( glFormat === _gl.RGB ) {
+		if ( glFormat === _gl.RG ) {
 
-			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGB32F;
-			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGB16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGB8;
+			if ( glType === _gl.FLOAT ) internalFormat = _gl.RG32F;
+			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RG16F;
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RG8;
 
 		}
 
@@ -164,11 +165,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( glType === _gl.FLOAT ) internalFormat = _gl.RGBA32F;
 			if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGBA16F;
-			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding && isVideoTexture === false ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+			if ( glType === _gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = _gl.RGBA4;
+			if ( glType === _gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = _gl.RGB5_A1;
 
 		}
 
 		if ( internalFormat === _gl.R16F || internalFormat === _gl.R32F ||
+			internalFormat === _gl.RG16F || internalFormat === _gl.RG32F ||
 			internalFormat === _gl.RGBA16F || internalFormat === _gl.RGBA32F ) {
 
 			extensions.get( 'EXT_color_buffer_float' );
@@ -181,9 +185,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getMipLevels( texture, image, supportsMips ) {
 
-		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) === true ) {
-
-			// generated mipmaps via gl.generateMipmap()
+		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) === true || ( texture.isFramebufferTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) ) {
 
 			return Math.log2( Math.max( image.width, image.height ) ) + 1;
 
@@ -271,8 +273,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const renderTargetProperties = properties.get( renderTarget );
 		const textureProperties = properties.get( texture );
-
-		if ( ! renderTarget ) return;
 
 		if ( textureProperties.__webglTexture !== undefined ) {
 
@@ -552,13 +552,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE );
 
 		const needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
-		const image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
+		let image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
+		image = verifyColorSpace( texture, image );
 
 		const supportsMips = isPowerOfTwo( image ) || isWebGL2,
-			glFormat = utils.convert( texture.format );
+			glFormat = utils.convert( texture.format, texture.encoding );
 
 		let glType = utils.convert( texture.type ),
-			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding, texture.isVideoTexture );
 
 		setTextureParameters( textureType, texture, supportsMips );
 
@@ -719,7 +720,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				mipmap = mipmaps[ i ];
 
-				if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
+				if ( texture.format !== RGBAFormat ) {
 
 					if ( glFormat !== null ) {
 
@@ -793,7 +794,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isFramebufferTexture ) {
 
-			// texture data extracted from framebuffers require mutuable textures defined via gl.copyTexImage2D()
+			if ( useTexStorage && allocateMemory ) {
+
+				state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+
+			} else {
+
+				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+
+			}
 
 		} else {
 
@@ -877,7 +886,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 		_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE );
 
-		const isCompressed = ( texture && ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture ) );
+		const isCompressed = ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture );
 		const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 		const cubeImage = [];
@@ -894,11 +903,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
+			cubeImage[ i ] = verifyColorSpace( texture, cubeImage[ i ] );
+
 		}
 
 		const image = cubeImage[ 0 ],
 			supportsMips = isPowerOfTwo( image ) || isWebGL2,
-			glFormat = utils.convert( texture.format ),
+			glFormat = utils.convert( texture.format, texture.encoding ),
 			glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
@@ -926,7 +937,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					const mipmap = mipmaps[ j ];
 
-					if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
+					if ( texture.format !== RGBAFormat ) {
 
 						if ( glFormat !== null ) {
 
@@ -1063,7 +1074,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup storage for target texture and bind it to correct framebuffer
 	function setupFrameBufferTexture( framebuffer, renderTarget, texture, attachment, textureTarget ) {
 
-		const glFormat = utils.convert( texture.format );
+		const glFormat = utils.convert( texture.format, texture.encoding );
 		const glType = utils.convert( texture.type );
 		const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 		const renderTargetProperties = properties.get( renderTarget );
@@ -1171,7 +1182,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			// Use the first texture for MRT so far
 			const texture = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture[ 0 ] : renderTarget.texture;
 
-			const glFormat = utils.convert( texture.format );
+			const glFormat = utils.convert( texture.format, texture.encoding );
 			const glType = utils.convert( texture.type );
 			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 			const samples = getRenderTargetSamples( renderTarget );
@@ -1345,16 +1356,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
-		// Handles WebGL2 RGBFormat fallback - #18858
-
-		if ( isWebGL2 && texture.format === RGBFormat && ( texture.type === FloatType || texture.type === HalfFloatType ) ) {
-
-			texture.format = RGBAFormat;
-
-			console.warn( 'THREE.WebGLRenderer: Rendering to textures with RGB format is not supported. Using RGBA format instead.' );
-
-		}
-
 		// Setup framebuffer
 
 		if ( isCube ) {
@@ -1406,7 +1407,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer );
 
-					const glFormat = utils.convert( texture.format );
+					const glFormat = utils.convert( texture.format, texture.encoding );
 					const glType = utils.convert( texture.type );
 					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 					const samples = getRenderTargetSamples( renderTarget );
@@ -1622,6 +1623,65 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			texture.update();
 
 		}
+
+	}
+
+	function verifyColorSpace( texture, image ) {
+
+		const encoding = texture.encoding;
+		const format = texture.format;
+		const type = texture.type;
+
+		if ( texture.isCompressedTexture === true || texture.isVideoTexture === true || texture.format === _SRGBAFormat ) return image;
+
+		if ( encoding !== LinearEncoding ) {
+
+			// sRGB
+
+			if ( encoding === sRGBEncoding ) {
+
+				if ( isWebGL2 === false ) {
+
+					// in WebGL 1, try to use EXT_sRGB extension and unsized formats
+
+					if ( extensions.has( 'EXT_sRGB' ) === true && format === RGBAFormat ) {
+
+						texture.format = _SRGBAFormat;
+
+						// it's not possible to generate mips in WebGL 1 with this extension
+
+						texture.minFilter = LinearFilter;
+						texture.generateMipmaps = false;
+
+					} else {
+
+						// slow fallback (CPU decode)
+
+						image = ImageUtils.sRGBToLinear( image );
+
+					}
+
+				} else {
+
+					// in WebGL 2 uncompressed textures can only be sRGB encoded if they have the RGBA8 format
+
+					if ( format !== RGBAFormat || type !== UnsignedByteType ) {
+
+						console.warn( 'THREE.WebGLTextures: sRGB encoded textures have to use RGBAFormat and UnsignedByteType.' );
+
+					}
+
+				}
+
+			} else {
+
+				console.error( 'THREE.WebGLTextures: Unsupported texture encoding:', encoding );
+
+			}
+
+		}
+
+		return image;
 
 	}
 

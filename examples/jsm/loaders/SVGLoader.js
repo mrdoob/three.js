@@ -11,7 +11,7 @@ import {
 	ShapeUtils,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class SVGLoader extends Loader {
 
@@ -129,7 +129,9 @@ class SVGLoader extends Loader {
 
 				case 'use':
 					style = parseStyle( node, style );
-					const usedNodeId = node.href.baseVal.substring( 1 );
+
+					const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
+					const usedNodeId = href.substring( 1 );
 					const usedNode = node.viewportElement.getElementById( usedNodeId );
 					if ( usedNode ) {
 
@@ -248,7 +250,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 ) firstPoint.copy( point );
 
 						}
 
@@ -440,7 +442,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 ) firstPoint.copy( point );
 
 						}
 
@@ -659,9 +661,14 @@ class SVGLoader extends Loader {
 
 				for ( let j = 0; j < selectorList.length; j ++ ) {
 
+					// Remove empty rules
+					const definitions = Object.fromEntries(
+						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
+					);
+
 					stylesheets[ selectorList[ j ] ] = Object.assign(
 						stylesheets[ selectorList[ j ] ] || {},
-						stylesheet.style
+						definitions
 					);
 
 				}

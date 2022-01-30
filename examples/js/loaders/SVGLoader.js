@@ -110,7 +110,8 @@
 
 					case 'use':
 						style = parseStyle( node, style );
-						const usedNodeId = node.href.baseVal.substring( 1 );
+						const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
+						const usedNodeId = href.substring( 1 );
 						const usedNode = node.viewportElement.getElementById( usedNodeId );
 
 						if ( usedNode ) {
@@ -225,7 +226,7 @@
 
 								}
 
-								if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+								if ( j === 0 ) firstPoint.copy( point );
 
 							}
 
@@ -382,7 +383,7 @@
 
 								}
 
-								if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+								if ( j === 0 ) firstPoint.copy( point );
 
 							}
 
@@ -560,7 +561,9 @@
 
 					for ( let j = 0; j < selectorList.length; j ++ ) {
 
-						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, stylesheet.style );
+						// Remove empty rules
+						const definitions = Object.fromEntries( Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' ) );
+						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, definitions );
 
 					}
 

@@ -1,3 +1,4 @@
+@ -1,189 +0,0 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,39 +8,56 @@
 		<link rel="stylesheet" href="fonts/open-sans/open-sans.css" type="text/css"/>
 		<link rel="stylesheet" href="fonts/tabler-icons/tabler-icons.min.css" type="text/css"/>
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+			.renderer {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 50%;
+				width: 100%;
+			}
+			flow {
+				position: absolute;
+				top: 50%;
+				left: 0;
+				height: 50%;
+				width: 100%;
+				background: #222;
+				box-shadow: inset 0 0 20px 0px #000000;
+			}
+		</style>
   </head>
   <body>
-	<style>
-	body {
-		overflow: hidden;
-		width: 100%;
-		height: 100%;
+
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL - Node Editor ( Playground version )<br />
+	</div>
+
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+	{
+		"imports": {
+			"three": "../build/three.module.js"
+		}
 	}
-	.renderer {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 50%;
-		width: 100%;
-	}
-	flow {
-		position: absolute;
-		top: 50%;
-		left: 0;
-		height: 50%;
-		width: 100%;
-		background: #222;
-		box-shadow: inset 0 0 20px 0px #000000;
-	}
-	</style>
+	</script>
+
 	<script type="module">
 
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
 
 		import { NodeEditor } from './jsm/node-editor/NodeEditor.js';
-		import { StandardMaterialEditor } from './jsm/node-editor/materials/StandardMaterialEditor.js';
+		import { MeshEditor } from './jsm/node-editor/scene/MeshEditor.js';
+
+		import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -96,25 +114,14 @@
 
 		function initEditor() {
 
-			const nodeEditor = new NodeEditor();
+			const nodeEditor = new NodeEditor( scene );
 
 			nodeEditor.addEventListener( 'new', () => {
 
-				const materialEditor = new StandardMaterialEditor();
-				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 );
+				const materialEditor = new MeshEditor( model );
 
 				nodeEditor.add( materialEditor );
-
-				model.material = materialEditor.material;
-
-			} );
-
-			nodeEditor.addEventListener( 'load', () => {
-
-				const materialEditor = nodeEditor.nodes[ 0 ];
-				materialEditor.update(); // need move to deserialization
-
-				model.material = materialEditor.material;
+				nodeEditor.centralizeNode( materialEditor );
 
 			} );
 
@@ -123,16 +130,37 @@
 			const loaderFBX = new FBXLoader();
 			loaderFBX.load( 'models/fbx/stanford-bunny.fbx', ( object ) => {
 
-				const materialEditor = new StandardMaterialEditor();
-				materialEditor.setPosition( ( window.innerWidth / 2 ) - 150, 100 ); // canvas position
+				const defaultMaterial = new Nodes.MeshBasicNodeMaterial();
+				defaultMaterial.colorNode = new Nodes.FloatNode( 0 );
 
-				nodeEditor.add( materialEditor );
+				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 32, 16 ), defaultMaterial ) ;
+				sphere.name = 'Sphere';
+				sphere.position.set( 500, 0, -500 );
+				scene.add( sphere );
+
+				const box = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), defaultMaterial ) ;
+				box.name = 'Box';
+				box.position.set( -500, 0, -500 );
+				scene.add( box );
+
+				const defaultPointsMaterial = new Nodes.PointsNodeMaterial();
+				defaultPointsMaterial.colorNode = new Nodes.FloatNode( 0 );
+
+				const torusKnot = new THREE.Points( new THREE.TorusKnotGeometry( 100, 30, 100, 16 ), defaultPointsMaterial ) ;
+				torusKnot.name = 'Torus Knot ( Points )';
+				torusKnot.position.set( 0, 0, -500 );
+				scene.add( torusKnot );
 
 				model = object.children[ 0 ];
 				model.position.set( 0, 0, 10 );
 				model.scale.setScalar( 1 );
-				model.material = materialEditor.material;
+				model.material = defaultMaterial;
 				scene.add( model );
+
+				const materialEditor = new MeshEditor( model );
+
+				nodeEditor.add( materialEditor );
+				nodeEditor.centralizeNode( materialEditor );
 
 			} );
 

@@ -1,96 +1,96 @@
 /* global QUnit */
 
-import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'KeyframeTrack', () => {
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.todo( "toJSON", ( assert ) => {
+		QUnit.todo( 'toJSON', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "TimeBufferType", ( assert ) => {
+		QUnit.todo( 'TimeBufferType', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "ValueBufferType", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "DefaultInterpolation", ( assert ) => {
+		QUnit.todo( 'ValueBufferType', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "InterpolantFactoryMethodDiscrete", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "InterpolantFactoryMethodLinear", ( assert ) => {
+		QUnit.todo( 'DefaultInterpolation', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "InterpolantFactoryMethodSmooth", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "setInterpolation", ( assert ) => {
+		QUnit.todo( 'InterpolantFactoryMethodDiscrete', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "getInterpolation", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "getValueSize", ( assert ) => {
+		QUnit.todo( 'InterpolantFactoryMethodLinear', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "shift", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "scale", ( assert ) => {
+		QUnit.todo( 'InterpolantFactoryMethodSmooth', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "trim", ( assert ) => {
+		QUnit.todo( 'setInterpolation', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getInterpolation', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getValueSize', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'shift', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'scale', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'trim', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

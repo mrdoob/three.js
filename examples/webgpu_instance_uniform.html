@@ -10,8 +10,10 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Instance Uniform<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Instance Uniform
 		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 		{
@@ -20,12 +22,13 @@
 			}
 		}
 		</script>
+
 		<script type="module">
 
 			import * as THREE from 'three';
 
+			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
@@ -75,7 +78,7 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 

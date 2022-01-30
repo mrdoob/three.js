@@ -92,6 +92,7 @@ export function glconstants() {
 		POLYGON_OFFSET_FILL: 32823,
 		RGB8: 32849,
 		RGBA4: 32854,
+		RGB5_A1: 32855,
 		RGBA8: 32856,
 		TEXTURE_3D: 32879,
 		CLAMP_TO_EDGE: 33071,
@@ -100,8 +101,11 @@ export function glconstants() {
 		DEPTH_COMPONENT32F: 36012,
 		DEPTH_STENCIL_ATTACHMENT: 33306,
 		R8: 33321,
+		RG8: 33323,
 		R16F: 33325,
 		R32F: 33326,
+		RG16F: 33327,
+		RG32F: 33328,
 		UNSIGNED_SHORT_5_6_5: 33635,
 		MIRRORED_REPEAT: 33648,
 		TEXTURE0: 33984,
@@ -159,6 +163,7 @@ export function glconstants() {
 		READ_FRAMEBUFFER: 36008,
 		DRAW_FRAMEBUFFER: 36009,
 		SAMPLE_ALPHA_TO_COVERAGE: 32926,
+		SRGB8: 35905,
 		SRGB8_ALPHA8: 35907
 	};
 
@@ -267,7 +272,7 @@ function header() {
 
 			return `/**
  * @license
- * Copyright 2010-2021 Three.js Authors
+ * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 ${ code }`;
@@ -313,6 +318,12 @@ let builds = [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.js',
+				indent: '\t'
+			},
+			{
+				format: 'cjs',
+				name: 'THREE',
+				file: 'build/three.cjs',
 				indent: '\t'
 			}
 		]

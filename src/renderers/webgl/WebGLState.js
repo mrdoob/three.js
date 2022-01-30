@@ -317,6 +317,8 @@ function WebGLState( gl, extensions, capabilities ) {
 	let enabledCapabilities = {};
 
 	let currentBoundFramebuffers = {};
+	let currentDrawbuffers = new WeakMap();
+	let defaultDrawbuffers = [];
 
 	let currentProgram = null;
 
@@ -461,6 +463,82 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function drawBuffers( renderTarget, framebuffer ) {
+
+		let drawBuffers = defaultDrawbuffers;
+
+		let needsUpdate = false;
+
+		if ( renderTarget ) {
+
+			drawBuffers = currentDrawbuffers.get( framebuffer );
+
+			if ( drawBuffers === undefined ) {
+
+				drawBuffers = [];
+				currentDrawbuffers.set( framebuffer, drawBuffers );
+
+			}
+
+			if ( renderTarget.isWebGLMultipleRenderTargets ) {
+
+				const textures = renderTarget.texture;
+
+				if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+
+					for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
+						drawBuffers[ i ] = gl.COLOR_ATTACHMENT0 + i;
+
+					}
+
+					drawBuffers.length = textures.length;
+
+					needsUpdate = true;
+
+				}
+
+			} else {
+
+				if ( drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+
+					drawBuffers[ 0 ] = gl.COLOR_ATTACHMENT0;
+
+					needsUpdate = true;
+
+				}
+
+			}
+
+		} else {
+
+			if ( drawBuffers[ 0 ] !== gl.BACK ) {
+
+				drawBuffers[ 0 ] = gl.BACK;
+
+				needsUpdate = true;
+
+			}
+
+		}
+
+		if ( needsUpdate ) {
+
+			if ( capabilities.isWebGL2 ) {
+
+				gl.drawBuffers( drawBuffers );
+
+			} else {
+
+				extensions.get( 'WEBGL_draw_buffers' ).drawBuffersWEBGL( drawBuffers );
+
+			}
+
+		}
+
+
+	}
+
 	function useProgram( program ) {
 
 		if ( currentProgram !== program ) {
@@ -563,7 +641,7 @@ function WebGLState( gl, extensions, capabilities ) {
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
 							break;
 
 						case MultiplyBlending:
@@ -589,7 +667,7 @@ function WebGLState( gl, extensions, capabilities ) {
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
 							break;
 
 						case MultiplyBlending:
@@ -1047,6 +1125,8 @@ function WebGLState( gl, extensions, capabilities ) {
 		currentBoundTextures = {};
 
 		currentBoundFramebuffers = {};
+		currentDrawbuffers = new WeakMap();
+		defaultDrawbuffers = [];
 
 		currentProgram = null;
 
@@ -1089,6 +1169,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		disable: disable,
 
 		bindFramebuffer: bindFramebuffer,
+		drawBuffers: drawBuffers,
 
 		useProgram: useProgram,
 

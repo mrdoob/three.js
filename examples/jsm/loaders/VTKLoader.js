@@ -5,7 +5,7 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils
-} from '../../../build/three.module.js';
+} from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
 class VTKLoader extends Loader {
@@ -890,44 +890,7 @@ class VTKLoader extends Loader {
 
 			// Main part
 			// Get Dom
-			var dom = null;
-
-			if ( window.DOMParser ) {
-
-				try {
-
-					dom = ( new DOMParser() ).parseFromString( stringFile, 'text/xml' );
-
-				} catch ( e ) {
-
-					dom = null;
-
-				}
-
-			} else if ( window.ActiveXObject ) {
-
-				try {
-
-					dom = new ActiveXObject( 'Microsoft.XMLDOM' ); // eslint-disable-line no-undef
-					dom.async = false;
-
-					if ( ! dom.loadXML( /* xml */ ) ) {
-
-						throw new Error( dom.parseError.reason + dom.parseError.srcText );
-
-					}
-
-				} catch ( e ) {
-
-					dom = null;
-
-				}
-
-			} else {
-
-				throw new Error( 'Cannot parse xml string!' );
-
-			}
+			var dom = new DOMParser().parseFromString( stringFile, 'application/xml' );
 
 			// Get the doc
 			var doc = dom.documentElement;

@@ -79,7 +79,7 @@
 
 			function parseHeader( data ) {
 
-				const patternHeader = /ply([\s\S]*)end_header\r?\n/;
+				const patternHeader = /^ply([\s\S]*)end_header\r?\n/;
 				let headerText = '';
 				let headerLength = 0;
 				const result = patternHeader.exec( data );

@@ -6,7 +6,7 @@ import {
 	Loader,
 	LoaderUtils,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
@@ -151,7 +151,7 @@ class STLLoader extends Loader {
 
 			for ( let i = 0, il = query.length; i < il; i ++ ) {
 
-				if ( query[ i ] !== reader.getUint8( offset + i, false ) ) return false;
+				if ( query[ i ] !== reader.getUint8( offset + i ) ) return false;
 
 			}
 

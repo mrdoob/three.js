@@ -34,7 +34,7 @@
 
 		[page:Boolean normalized] -- (생략가능) 정수 데이터에만 적용됩니다. 버퍼에 있는 기저 데이터가 GLSL 코드에서 값으로 맵핑되는 방식입니다.
 		예를 들어 [page:TypedArray array]가 UInt16Array의 인스턴스이고, [page:Boolean normalized]가 true면 배열에 있는 0 - +65535 값들은
-		GLSL 속성에서 0.0f - +1.0f로 매핑될 것입니다. Int16Array (기호 있는)는 -32767 - +32767 가 -1.0f - +1.0f 로 매핑될 것입니다.
+		GLSL 속성에서 0.0f - +1.0f로 매핑될 것입니다. Int16Array (기호 있는)는 -32768 - +32767 가 -1.0f - +1.0f 로 매핑될 것입니다.
 		[page:Boolean normalized]가 false라면, 값은 수정 없이 floats로 변환될 것입니다. 예) 32767은 32767.0f로 변환.
 		</p>
 

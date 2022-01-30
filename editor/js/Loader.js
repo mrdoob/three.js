@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
 
@@ -392,7 +392,6 @@ function Loader( editor ) {
 					var { LDrawLoader } = await import( '../../examples/jsm/loaders/LDrawLoader.js' );
 
 					var loader = new LDrawLoader();
-					loader.fileMap = {}; // TODO Uh...
 					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
 					loader.parse( event.target.result, undefined, function ( group ) {
 

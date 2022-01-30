@@ -1,7 +1,5 @@
 import InputNode from '../core/InputNode.js';
-import ExpressionNode from '../core/ExpressionNode.js';
 import UVNode from '../accessors/UVNode.js';
-import ColorSpaceNode from '../display/ColorSpaceNode.js';
 
 class TextureNode extends InputNode {
 
@@ -41,9 +39,9 @@ class TextureNode extends InputNode {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			let colorSpace = nodeData.colorSpace;
+			let snippet = nodeData.snippet;
 
-			if ( colorSpace === undefined ) {
+			if ( snippet === undefined ) {
 
 				const uvSnippet = this.uv.build( builder, 'vec2' );
 				const bias = this.bias;
@@ -56,17 +54,13 @@ class TextureNode extends InputNode {
 
 				}
 
-				const textureCallSnippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
+				snippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
 
-				colorSpace = new ColorSpaceNode();
-				colorSpace.node = new ExpressionNode( textureCallSnippet, 'vec4' );
-				colorSpace.fromDecoding( builder.getTextureEncodingFromMap( texture ) );
-
-				nodeData.colorSpace = colorSpace;
+				nodeData.snippet = snippet;
 
 			}
 
-			return colorSpace.build( builder, output );
+			return builder.format( snippet, 'vec4', output );
 
 		}
 

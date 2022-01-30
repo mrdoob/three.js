@@ -1145,7 +1145,7 @@
 
 						case 'transparent':
 							data[ child.nodeName ] = {
-								opaque: child.getAttribute( 'opaque' ),
+								opaque: child.hasAttribute( 'opaque' ) ? child.getAttribute( 'opaque' ) : 'A_ONE',
 								data: parseEffectParameter( child )
 							};
 							break;
@@ -1597,7 +1597,6 @@
 								break;
 
 							default:
-								material.opacity = 1 - transparency.float;
 								console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
 
 						}

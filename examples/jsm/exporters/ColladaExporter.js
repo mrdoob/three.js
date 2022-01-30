@@ -3,7 +3,7 @@ import {
 	DoubleSide,
 	Matrix4,
 	MeshBasicMaterial
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js
@@ -608,7 +608,7 @@ class ColladaExporter {
 					`<instance_geometry url="#${ meshid }">` +
 
 					(
-						matids != null ?
+						matids.length > 0 ?
 							'<bind_material><technique_common>' +
 							matids.map( ( id, i ) =>
 

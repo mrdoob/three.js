@@ -145,7 +145,6 @@
 					}
 
 					angle = math.acos( angle ); // skip if changing angle is too small to prevent vibration of bone
-					// Refer to http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
 
 					if ( angle < 1e-5 ) continue;
 

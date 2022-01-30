@@ -10,12 +10,24 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl normalmap demo.<br/>
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
+			<a href="https://casual-effects.com/data/" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -77,13 +89,13 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
-				const diffuseMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				const diffuseMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
 				diffuseMap.encoding = THREE.sRGBEncoding;
 
-				const specularMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
+				const specularMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' );
 				specularMap.encoding = THREE.sRGBEncoding;
 
-				const normalMap = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				const normalMap = textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				const material = new THREE.MeshPhongMaterial( {
 					color: 0xdddddd,
@@ -96,7 +108,7 @@
 				} );
 
 				loader = new GLTFLoader();
-				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 

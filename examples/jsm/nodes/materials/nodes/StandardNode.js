@@ -1,7 +1,7 @@
 import {
 	UniformsLib,
 	UniformsUtils
-} from '../../../../../build/three.module.js';
+} from 'three';
 
 import { Node } from '../../core/Node.js';
 import { ExpressionNode } from '../../core/ExpressionNode.js';
@@ -32,6 +32,7 @@ class StandardNode extends Node {
 		if ( useClearcoat ) {
 
 			builder.define( 'CLEARCOAT' );
+			builder.define( 'USE_CLEARCOAT' );
 
 		}
 

@@ -11,8 +11,9 @@ import {
 	MeshPhongMaterial,
 	Points,
 	PointsMaterial,
-	Vector3
-} from '../../../build/three.module.js';
+	Vector3,
+	Color
+} from 'three';
 
 // o object_name | g group_name
 const _object_pattern = /^[og]\s*(.+)?/;
@@ -29,6 +30,8 @@ const _vC = new Vector3();
 
 const _ab = new Vector3();
 const _cb = new Vector3();
+
+const _color = new Color();
 
 function ParserState() {
 
@@ -536,12 +539,13 @@ class OBJLoader extends Loader {
 						);
 						if ( data.length >= 7 ) {
 
-							state.colors.push(
+							_color.setRGB(
 								parseFloat( data[ 4 ] ),
 								parseFloat( data[ 5 ] ),
 								parseFloat( data[ 6 ] )
+							).convertSRGBToLinear();
 
-							);
+							state.colors.push( _color.r, _color.g, _color.b );
 
 						} else {
 
@@ -684,8 +688,6 @@ class OBJLoader extends Loader {
 
 				/*
 					 * http://paulbourke.net/dataformats/obj/
-					 * or
-					 * http://www.cs.utah.edu/~boulos/cs3505/obj_spec.pdf
 					 *
 					 * From chapter "Grouping" Syntax explanation "s group_number":
 					 * "group_number is the smoothing group number. To turn off smoothing groups, use a value of 0 or off.

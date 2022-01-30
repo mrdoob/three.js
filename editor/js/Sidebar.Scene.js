@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture } from './libs/ui.three.js';
@@ -43,7 +43,7 @@ function SidebarScene( editor ) {
 				nodeStates.set( object, nodeStates.get( object ) === false ); // toggle
 				refreshUI();
 
-			}, false );
+			} );
 
 			option.insertBefore( opener, option.firstChild );
 

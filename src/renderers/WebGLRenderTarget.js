@@ -86,7 +86,10 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
-		this.texture.image = { ...this.texture.image }; // See #20328.
+
+		// ensure image object is not shared, see #20328
+
+		this.texture.image = Object.assign( {}, source.texture.image );
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;

@@ -117,8 +117,7 @@
 
 		<h3>[property:number format]</h3>
 		<p>
-		The default is [page:Textures THREE.RGBAFormat], although the [page:TextureLoader TextureLoader] will automatically
-		set this to [page:Textures THREE.RGBFormat] for JPG images. <br /><br />
+		The default is [page:Textures THREE.RGBAFormat].<br /><br />
 
 		See the [page:Textures texture constants] page for details of other formats.
 		</p>
@@ -282,6 +281,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
+		Besides, cloning a texture does not automatically mark it for a texture upload. You have to set [page:Texture.needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>

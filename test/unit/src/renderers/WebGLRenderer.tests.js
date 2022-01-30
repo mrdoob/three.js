@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
-
+import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer.js';
+/*
 var customWebGLContext = function () {
 
 	this.DEPTH_BUFFER_BIT = 256;
@@ -303,71 +303,133 @@ var customWebGLContext = function () {
 
 
 	this.activeTexture = function () {};
+
 	this.attachShader = function () {};
+
 	this.bindAttribLocation = function () {};
+
 	this.bindBuffer = function () {};
+
 	this.bindFramebuffer = function () {};
+
 	this.bindRenderbuffer = function () {};
+
 	this.bindTexture = function () {};
+
 	this.blendColor = function () {};
+
 	this.blendEquation = function () {};
+
 	this.blendEquationSeparate = function () {};
+
 	this.blendFunc = function () {};
+
 	this.blendFuncSeparate = function () {};
+
 	this.bufferData = function () {};
+
 	this.bufferSubData = function () {};
+
 	this.checkFramebufferStatus = function () {};
+
 	this.clear = function () {};
+
 	this.clearColor = function () {};
+
 	this.clearDepth = function () {};
+
 	this.clearStencil = function () {};
+
 	this.colorMask = function () {};
+
 	this.compileShader = function () {};
+
 	this.compressedTexImage2D = function () {};
+
 	this.compressedTexSubImage2D = function () {};
+
 	this.copyTexImage2D = function () {};
+
 	this.copyTexSubImage2D = function () {};
+
 	this.createBuffer = function () {};
+
 	this.createFramebuffer = function () {};
+
 	this.createProgram = function () {};
+
 	this.createRenderbuffer = function () {};
+
 	this.createShader = function () {};
+
 	this.createTexture = function () {};
+
 	this.cullFace = function () {};
+
 	this.deleteBuffer = function () {};
+
 	this.deleteFramebuffer = function () {};
+
 	this.deleteProgram = function () {};
+
 	this.deleteRenderbuffer = function () {};
+
 	this.deleteShader = function () {};
+
 	this.deleteTexture = function () {};
+
 	this.depthFunc = function () {};
+
 	this.depthMask = function () {};
+
 	this.depthRange = function () {};
+
 	this.detachShader = function () {};
+
 	this.disable = function () {};
+
 	this.disableVertexAttribArray = function () {};
+
 	this.drawArrays = function () {};
+
 	this.drawElements = function () {};
+
 	this.enable = function () {};
+
 	this.enableVertexAttribArray = function () {};
+
 	this.finish = function () {};
+
 	this.flush = function () {};
+
 	this.framebufferRenderbuffer = function () {};
+
 	this.framebufferTexture2D = function () {};
+
 	this.frontFace = function () {};
+
 	this.generateMipmap = function () {};
+
 	this.getActiveAttrib = function () {};
+
 	this.getActiveUniform = function () {};
+
 	this.getAttachedShaders = function () {};
+
 	this.getAttribLocation = function () {};
+
 	this.getBufferParameter = function () {};
+
 	this.getContextAttributes = function () {};
+
 	this.getError = function () {};
+
 	this.getExtension = function () {};
+
 	this.getFramebufferAttachmentParameter = function () {};
 
 	var parameters = {};
-	parameters[ this.VERSION ] = "Custom";
+	parameters[ this.VERSION ] = 'Custom';
 	this.getParameter = function ( parameterID ) {
 
 		return parameters[ parameterID ];
@@ -375,92 +437,163 @@ var customWebGLContext = function () {
 	};
 
 	this.getProgramParameter = function () {};
+
 	this.getProgramInfoLog = function () {};
+
 	this.getRenderbufferParameter = function () {};
+
 	this.getShaderParameter = function () {};
+
 	this.getShaderInfoLog = function () {};
+
 	this.getShaderPrecisionFormat = function () {
 
 		return { 'rangeMin': 1, 'rangeMax': 1, 'precision': 1 };
 
 	};
+
 	this.getShaderSource = function () {};
+
 	this.getSupportedExtensions = function () {};
+
 	this.getTexParameter = function () {};
+
 	this.getUniform = function () {};
+
 	this.getUniformLocation = function () {};
+
 	this.getVertexAttrib = function () {};
+
 	this.getVertexAttribOffset = function () {};
+
 	this.hint = function () {};
+
 	this.isBuffer = function () {};
+
 	this.isContextLost = function () {};
+
 	this.isEnabled = function () {};
+
 	this.isFramebuffer = function () {};
+
 	this.isProgram = function () {};
+
 	this.isRenderbuffer = function () {};
+
 	this.isShader = function () {};
+
 	this.isTexture = function () {};
+
 	this.lineWidth = function () {};
+
 	this.linkProgram = function () {};
+
 	this.pixelStorei = function () {};
+
 	this.polygonOffset = function () {};
+
 	this.readPixels = function () {};
+
 	this.renderbufferStorage = function () {};
+
 	this.sampleCoverage = function () {};
+
 	this.scissor = function () {};
+
 	this.shaderSource = function () {};
+
 	this.stencilFunc = function () {};
+
 	this.stencilFuncSeparate = function () {};
+
 	this.stencilMask = function () {};
+
 	this.stencilMaskSeparate = function () {};
+
 	this.stencilOp = function () {};
+
 	this.stencilOpSeparate = function () {};
+
 	this.texParameterf = function () {};
+
 	this.texParameteri = function () {};
+
 	this.texImage2D = function () {};
+
 	this.texSubImage2D = function () {};
+
 	this.uniform1f = function () {};
+
 	this.uniform1fv = function () {};
+
 	this.uniform1i = function () {};
+
 	this.uniform1iv = function () {};
+
 	this.uniform2f = function () {};
+
 	this.uniform2fv = function () {};
+
 	this.uniform2i = function () {};
+
 	this.uniform2iv = function () {};
+
 	this.uniform3f = function () {};
+
 	this.uniform3fv = function () {};
+
 	this.uniform3i = function () {};
+
 	this.uniform3iv = function () {};
+
 	this.uniform4f = function () {};
+
 	this.uniform4fv = function () {};
+
 	this.uniform4i = function () {};
+
 	this.uniform4iv = function () {};
+
 	this.uniformMatrix2fv = function () {};
+
 	this.uniformMatrix3fv = function () {};
+
 	this.uniformMatrix4fv = function () {};
+
 	this.useProgram = function () {};
+
 	this.validateProgram = function () {};
+
 	this.vertexAttrib1f = function () {};
+
 	this.vertexAttrib1fv = function () {};
+
 	this.vertexAttrib2f = function () {};
+
 	this.vertexAttrib2fv = function () {};
+
 	this.vertexAttrib3f = function () {};
+
 	this.vertexAttrib3fv = function () {};
+
 	this.vertexAttrib4f = function () {};
+
 	this.vertexAttrib4fv = function () {};
+
 	this.vertexAttribPointer = function () {};
+
 	this.viewport = function () {};
 
 
 };
-
+*/
 export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGLRenderer-webonly', () => {
 
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( new WebGLRenderer(), "Can instantiate a renderer." );
+			assert.ok( new WebGLRenderer(), 'Can instantiate a renderer.' );
 
 		} );
 

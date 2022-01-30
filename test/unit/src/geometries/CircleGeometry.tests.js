@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { CircleGeometry, CircleBufferGeometry } from '../../../../src/geometries/CircleGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { CircleGeometry, CircleBufferGeometry } from '../../../../src/geometries/CircleGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -23,22 +23,22 @@ export default QUnit.module( 'Geometries', () => {
 				new CircleGeometry( parameters.radius, parameters.segments ),
 				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
 				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
-					new CircleBufferGeometry(),
+				new CircleBufferGeometry(),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
