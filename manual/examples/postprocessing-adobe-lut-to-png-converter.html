@@ -63,7 +63,7 @@ function main() {
     ]);
 
     return function(filter) {
-      const texture = new THREE.DataTexture(identityLUT, 4, 2, THREE.RGBAFormat);
+      const texture = new THREE.DataTexture(identityLUT, 4, 2);
       texture.minFilter = filter;
       texture.magFilter = filter;
       texture.needsUpdate = true;

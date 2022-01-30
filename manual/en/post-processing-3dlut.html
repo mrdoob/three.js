@@ -166,9 +166,7 @@ const lutNearestShader = {
 <p>To generate the second shader we comment out that line.</p>
 <p>Then we use them to make 2 custom effects</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const effectLUT = new THREE.ShaderPass(lutShader);
-effectLUT.renderToScreen = true;
 const effectLUTNearest = new THREE.ShaderPass(lutNearestShader);
-effectLUTNearest.renderToScreen = true;
 </pre>
 <p>Translating our existing code that draws the background as a separate scene we a <code class="notranslate" translate="no">RenderPass</code> for both the scene drawing the glTF and the scene drawing the background.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderModel = new THREE.RenderPass(scene, camera);
@@ -176,17 +174,14 @@ renderModel.clear = false;  // so we don't clear out the background
 const renderBG = new THREE.RenderPass(sceneBG, cameraBG);
 </pre>
 <p>and we can setup our <code class="notranslate" translate="no">EffectComposer</code> to use all the passes</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtParameters = {
-  minFilter: THREE.LinearFilter,
-  magFilter: THREE.LinearFilter,
-  format: THREE.RGBFormat,
-};
-const composer = new THREE.EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const composer = new THREE.EffectComposer(renderer);
 
 composer.addPass(renderBG);
 composer.addPass(renderModel);
 composer.addPass(effectLUT);
 composer.addPass(effectLUTNearest);
+composer.addPass(effectLUTNearest);
+composer.addPass(gammaPass);
 </pre>
 <p>Let's make some GUI code to select one lut or the other</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lutNameIndexMap = {};
@@ -466,7 +461,7 @@ updateGUI();
         </div>
       </div>
     </div>
-  
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 

@@ -186,9 +186,7 @@ const lutNearestShader = {
 <p>2番目のシェーダーを生成するためにその行をコメントアウトします。</p>
 <p>これらを使用して2つのカスタムエフェクトを作成します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const effectLUT = new THREE.ShaderPass(lutShader);
-effectLUT.renderToScreen = true;
 const effectLUTNearest = new THREE.ShaderPass(lutNearestShader);
-effectLUTNearest.renderToScreen = true;
 </pre>
 <p>背景を別のシーンに描画する既存コードを変更し、glTFと背景を描画するシーンの両方に <code class="notranslate" translate="no">RenderPass</code> を適用します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderModel = new THREE.RenderPass(scene, camera);
@@ -196,17 +194,13 @@ renderModel.clear = false;  // so we don't clear out the background
 const renderBG = new THREE.RenderPass(sceneBG, cameraBG);
 </pre>
 <p>全てのパスを使用するように <code class="notranslate" translate="no">EffectComposer</code> を設定できます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtParameters = {
-  minFilter: THREE.LinearFilter,
-  magFilter: THREE.LinearFilter,
-  format: THREE.RGBFormat,
-};
-const composer = new THREE.EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const composer = new THREE.EffectComposer(renderer);
 
 composer.addPass(renderBG);
 composer.addPass(renderModel);
 composer.addPass(effectLUT);
 composer.addPass(effectLUTNearest);
+composer.addPass(gammaPass);
 </pre>
 <p>LUTを選択するためのGUIコードを作ってみましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lutNameIndexMap = {};
@@ -510,7 +504,7 @@ updateGUI();
         </div>
       </div>
     </div>
-  
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 
