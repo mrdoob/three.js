@@ -2026,7 +2026,7 @@ class ColladaLoader extends Loader {
 
 					case 'color':
 						const array = parseFloats( child.textContent );
-						data.color = new Color().fromArray( array );
+						data.color = new Color().fromArray( array ).convertSRGBToLinear();
 						break;
 
 					case 'falloff_angle':
@@ -2492,7 +2492,7 @@ class ColladaLoader extends Loader {
 							break;
 
 						case 'COLOR':
-							buildGeometryData( primitive, sources[ input.id ], input.offset, color.array );
+							buildGeometryData( primitive, sources[ input.id ], input.offset, color.array, true );
 							color.stride = sources[ input.id ].stride;
 							break;
 
@@ -2531,7 +2531,7 @@ class ColladaLoader extends Loader {
 
 		}
 
-		function buildGeometryData( primitive, source, offset, array ) {
+		function buildGeometryData( primitive, source, offset, array, isColor = false ) {
 
 			const indices = primitive.p;
 			const stride = primitive.stride;
@@ -2545,6 +2545,21 @@ class ColladaLoader extends Loader {
 				for ( ; index < length; index ++ ) {
 
 					array.push( sourceArray[ index ] );
+
+				}
+
+				if ( isColor ) {
+
+					const startIndex = array.length - sourceStride - 1;
+					tempColor.setRGB(
+						array[ startIndex + 0 ],
+						array[ startIndex + 1 ],
+						array[ startIndex + 2 ]
+					).convertSRGBToLinear();
+
+					array[ startIndex + 0 ] = tempColor.r;
+					array[ startIndex + 1 ] = tempColor.g;
+					array[ startIndex + 2 ] = tempColor.b;
 
 				}
 
@@ -3992,6 +4007,7 @@ class ColladaLoader extends Loader {
 
 		//
 
+		const tempColor = new Color();
 		const animations = [];
 		let kinematics = {};
 		let count = 0;
