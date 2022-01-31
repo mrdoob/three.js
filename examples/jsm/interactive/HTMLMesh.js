@@ -60,13 +60,32 @@ class HTMLTexture extends CanvasTexture {
 		this.minFilter = LinearFilter;
 		this.magFilter = LinearFilter;
 
+		// Create an observer on the DOM, and run html2canvas update in the next loop
+		const observer = new MutationObserver( () => {
+
+			if ( ! this.scheduleUpdate ) {
+
+				// ideally should use xr.requestAnimationFrame, here setTimeout to avoid passing the renderer
+				this.scheduleUpdate = setTimeout( () => this.update(), 16 );
+
+			}
+
+		} );
+
+		const config = { attributes: true, childList: true, subtree: true, characterData: true };
+		observer.observe( dom, config );
+
+		this.observer = observer;
+
 	}
 
 	dispatchDOMEvent( event ) {
 
-		htmlevent( this.dom, event.type, event.data.x, event.data.y );
+		if ( event.data ) {
 
-		this.update();
+			htmlevent( this.dom, event.type, event.data.x, event.data.y );
+
+		}
 
 	}
 
@@ -75,9 +94,26 @@ class HTMLTexture extends CanvasTexture {
 		this.image = html2canvas( this.dom );
 		this.needsUpdate = true;
 
+		this.scheduleUpdate = null;
+
+	}
+
+	dispose() {
+
+		if ( this.observer ) {
+
+			this.observer.disconnect();
+
+		}
+
+		this.scheduleUpdate = clearTimeout( this.scheduleUpdate );
+
+		super.dispose();
+
 	}
 
 }
+
 
 //
 
@@ -201,6 +237,17 @@ function html2canvas( element ) {
 			height = rect.height;
 
 			drawText( style, x, y, element.nodeValue.trim() );
+
+		} else if ( element instanceof HTMLCanvasElement ) {
+
+			// Canvas element
+			if ( element.style.display === 'none' ) return;
+
+			context.save();
+			const dpr = window.devicePixelRatio;
+			context.scale(1/dpr, 1/dpr);
+			context.drawImage(element, 0, 0 );
+			context.restore();
 
 		} else {
 
