@@ -118,7 +118,7 @@ class NodePostProcessing {
 
 		}
 
-		if ( meta && ! meta.post ) meta.post = {};
+		if ( ! meta.post ) meta.post = {};
 
 		if ( ! meta.post[ this.uuid ] ) {
 

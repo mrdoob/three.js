@@ -531,7 +531,7 @@ class NodeBuilder {
 
 			if ( formatType === undefined ) {
 
-				throw new Error( 'Node pars ' + formatType + ' not found.' );
+				throw new Error( 'Node pars not found.' );
 
 			}
 
