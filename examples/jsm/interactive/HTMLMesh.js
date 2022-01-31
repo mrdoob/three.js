@@ -121,12 +121,12 @@ const canvases = new WeakMap();
 
 function html2canvas( element ) {
 
-	var range = document.createRange();
+	const range = document.createRange();
 
 	function Clipper( context ) {
 
-		var clips = [];
-		var isClipping = false;
+		const clips = [];
+		let isClipping = false;
 
 		function doClip() {
 
@@ -139,12 +139,12 @@ function html2canvas( element ) {
 
 			if ( clips.length === 0 ) return;
 
-			var minX = - Infinity, minY = - Infinity;
-			var maxX = Infinity, maxY = Infinity;
+			let minX = - Infinity, minY = - Infinity;
+			let maxX = Infinity, maxY = Infinity;
 
-			for ( var i = 0; i < clips.length; i ++ ) {
+			for ( let i = 0; i < clips.length; i ++ ) {
 
-				var clip = clips[ i ];
+				const clip = clips[ i ];
 
 				minX = Math.max( minX, clip.x );
 				minY = Math.max( minY, clip.y );
@@ -203,9 +203,9 @@ function html2canvas( element ) {
 
 	function drawBorder( style, which, x, y, width, height ) {
 
-		var borderWidth = style[ which + 'Width' ];
-		var borderStyle = style[ which + 'Style' ];
-		var borderColor = style[ which + 'Color' ];
+		const borderWidth = style[ which + 'Width' ];
+		const borderStyle = style[ which + 'Style' ];
+		const borderColor = style[ which + 'Color' ];
 
 		if ( borderWidth !== '0px' && borderStyle !== 'none' && borderColor !== 'transparent' && borderColor !== 'rgba(0, 0, 0, 0)' ) {
 
@@ -221,7 +221,7 @@ function html2canvas( element ) {
 
 	function drawElement( element, style ) {
 
-		var x = 0, y = 0, width = 0, height = 0;
+		let x = 0, y = 0, width = 0, height = 0;
 
 		if ( element.nodeType === 3 ) {
 
@@ -229,7 +229,7 @@ function html2canvas( element ) {
 
 			range.selectNode( element );
 
-			var rect = range.getBoundingClientRect();
+			const rect = range.getBoundingClientRect();
 
 			x = rect.left - offset.left - 0.5;
 			y = rect.top - offset.top - 0.5;
@@ -253,7 +253,7 @@ function html2canvas( element ) {
 
 			if ( element.style.display === 'none' ) return;
 
-			var rect = element.getBoundingClientRect();
+			const rect = element.getBoundingClientRect();
 
 			x = rect.left - offset.left - 0.5;
 			y = rect.top - offset.top - 0.5;
@@ -262,7 +262,7 @@ function html2canvas( element ) {
 
 			style = window.getComputedStyle( element );
 
-			var backgroundColor = style.backgroundColor;
+			const backgroundColor = style.backgroundColor;
 
 			if ( backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
 
@@ -294,11 +294,11 @@ function html2canvas( element ) {
 		context.strokeRect( x - 0.5, y - 0.5, width + 1, height + 1 );
 		*/
 
-		var isClipping = style.overflow === 'auto' || style.overflow === 'hidden';
+		const isClipping = style.overflow === 'auto' || style.overflow === 'hidden';
 
 		if ( isClipping ) clipper.add( { x: x, y: y, width: width, height: height } );
 
-		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+		for ( let i = 0; i < element.childNodes.length; i ++ ) {
 
 			drawElement( element.childNodes[ i ], style );
 
@@ -365,7 +365,7 @@ function htmlevent( element, event, x, y ) {
 
 			}
 
-			for ( var i = 0; i < element.childNodes.length; i ++ ) {
+			for ( let i = 0; i < element.childNodes.length; i ++ ) {
 
 				traverse( element.childNodes[ i ] );
 
