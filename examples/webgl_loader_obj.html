@@ -81,12 +81,6 @@
 
 				const manager = new THREE.LoadingManager( loadModel );
 
-				manager.onProgress = function ( item, loaded, total ) {
-
-					console.log( item, loaded, total );
-
-				};
-
 				// texture
 
 				const textureLoader = new THREE.TextureLoader( manager );

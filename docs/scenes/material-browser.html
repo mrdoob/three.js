@@ -722,7 +722,13 @@
 
 			//
 
-			document.getElementById( 'newWindow' ).href += window.location.hash;
+			const selectedMaterial = window.location.hash.substring( 1 );
+
+			if ( THREE[ selectedMaterial ] !== undefined ) {
+
+				document.getElementById( 'newWindow' ).href += '#' + selectedMaterial;
+
+			}
 
 			const gui = new GUI();
 
