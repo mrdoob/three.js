@@ -78,13 +78,13 @@
 		<p>
 		object -- Instance of [page:Mesh Mesh] | [page:Line Line] | [page:Points Points].<br /><br />
 
-		Returns the current attributes (Position and Normal) of a morphed/skinned [page:Object3D Object3D] whose geometry is a 
-		[page:BufferGeometry BufferGeometry], together with the original ones: An Object with 4 properties: 
+		Returns the current attributes (Position and Normal) of a morphed/skinned [page:Object3D Object3D] whose geometry is a
+		[page:BufferGeometry BufferGeometry], together with the original ones: An Object with 4 properties:
 		`positionAttribute`, `normalAttribute`, `morphedPositionAttribute` and `morphedNormalAttribute`.
 
-		Helpful for Raytracing or Decals (i.e. a [page:DecalGeometry DecalGeometry] applied to a morphed Object 
-		with a [page:BufferGeometry BufferGeometry] will use the original BufferGeometry, not the morphed/skinned one, 
-		generating an incorrect result. 
+		Helpful for Raytracing or Decals (i.e. a [page:DecalGeometry DecalGeometry] applied to a morphed Object
+		with a [page:BufferGeometry BufferGeometry] will use the original BufferGeometry, not the morphed/skinned one,
+		generating an incorrect result.
 		Using this function to create a shadow Object3D the DecalGeometry can be correctly generated).
 
 		</p>
