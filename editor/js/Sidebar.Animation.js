@@ -2,24 +2,24 @@ import { UIPanel, UIBreak, UISelect, UIButton, UIText, UINumber, UIRow } from '.
 
 function SidebarAnimation( editor ) {
 
-	var strings = editor.strings;
-	var signals = editor.signals;
-	var mixer = editor.mixer;
+	const strings = editor.strings;
+	const signals = editor.signals;
+	const mixer = editor.mixer;
 
-	var actions = {};
+	const actions = {};
 
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object !== null && object.animations.length > 0 ) {
 
-			var animations = object.animations;
+			const animations = object.animations;
 
 			container.setDisplay( '' );
 
-			var options = {};
-			var firstAnimation;
+			const options = {};
+			let firstAnimation;
 
-			for ( var animation of animations ) {
+			for ( const animation of animations ) {
 
 				if ( firstAnimation === undefined ) firstAnimation = animation.name;
 
@@ -70,7 +70,7 @@ function SidebarAnimation( editor ) {
 
 	}
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setDisplay( 'none' );
 
 	container.add( new UIText( strings.getKey( 'sidebar/animations' ) ).setTextTransform( 'uppercase' ) );
@@ -79,9 +79,9 @@ function SidebarAnimation( editor ) {
 
 	//
 
-	var animationsRow = new UIRow();
+	const animationsRow = new UIRow();
 
-	var animationsSelect = new UISelect().setFontSize( '12px' );
+	const animationsSelect = new UISelect().setFontSize( '12px' );
 	animationsRow.add( animationsSelect );
 	animationsRow.add( new UIButton( strings.getKey( 'sidebar/animations/play' ) ).setMarginLeft( '4px' ).onClick( playAction ) );
 	animationsRow.add( new UIButton( strings.getKey( 'sidebar/animations/stop' ) ).setMarginLeft( '4px' ).onClick( stopAction ) );
@@ -90,8 +90,8 @@ function SidebarAnimation( editor ) {
 
 	//
 
-	var mixerTimeScaleRow = new UIRow();
-	var mixerTimeScaleNumber = new UINumber( 0.5 ).setWidth( '60px' ).setRange( - 10, 10 ).onChange( changeTimeScale );
+	const mixerTimeScaleRow = new UIRow();
+	const mixerTimeScaleNumber = new UINumber( 0.5 ).setWidth( '60px' ).setRange( - 10, 10 ).onChange( changeTimeScale );
 
 	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setWidth( '90px' ) );
 	mixerTimeScaleRow.add( mixerTimeScaleNumber );
