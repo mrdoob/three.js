@@ -2550,6 +2550,7 @@ class ColladaLoader extends Loader {
 
 				if ( isColor ) {
 
+					// convert the vertex colors from srgb to linear if present
 					const startIndex = array.length - sourceStride - 1;
 					tempColor.setRGB(
 						array[ startIndex + 0 ],
