@@ -136,12 +136,6 @@ class CSS2DRenderer {
 
 					}
 
-					const objectData = {
-						distanceToCameraSquared: getDistanceToSquared( camera, object )
-					};
-
-					cache.objects.set( object, objectData );
-
 					if ( element.parentNode !== domElement ) {
 
 						domElement.appendChild( element );
@@ -151,6 +145,12 @@ class CSS2DRenderer {
 					object.onAfterRender( _this, scene, camera );
 
 				}
+
+				const objectData = {
+					distanceToCameraSquared: getDistanceToSquared( camera, object )
+				};
+
+				cache.objects.set( object, objectData );
 
 			}
 
