@@ -36,7 +36,8 @@ import {
 	TextureLoader,
 	Vector2,
 	Vector3,
-	VectorKeyframeTrack
+	VectorKeyframeTrack,
+	sRGBEncoding
 } from 'three';
 import { TGALoader } from '../loaders/TGALoader.js';
 
@@ -1579,7 +1580,7 @@ class ColladaLoader extends Loader {
 
 			material.name = data.name || '';
 
-			function getTexture( textureObject ) {
+			function getTexture( textureObject, encoding = null ) {
 
 				const sampler = effect.profile.samplers[ textureObject.id ];
 				let image = null;
@@ -1627,6 +1628,12 @@ class ColladaLoader extends Loader {
 
 						}
 
+						if ( encoding !== null ) {
+
+							texture.encoding = encoding;
+
+						}
+
 						return texture;
 
 					} else {
@@ -1657,7 +1664,7 @@ class ColladaLoader extends Loader {
 
 					case 'diffuse':
 						if ( parameter.color ) material.color.fromArray( parameter.color );
-						if ( parameter.texture ) material.map = getTexture( parameter.texture );
+						if ( parameter.texture ) material.map = getTexture( parameter.texture, sRGBEncoding );
 						break;
 					case 'specular':
 						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
@@ -1674,12 +1681,16 @@ class ColladaLoader extends Loader {
 						break;
 					case 'emission':
 						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
-						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
+						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, sRGBEncoding );
 						break;
 
 				}
 
 			}
+
+			material.specular.convertSRGBToLinear();
+			material.color.convertSRGBToLinear();
+			material.emissive.convertSRGBToLinear();
 
 			//
 
