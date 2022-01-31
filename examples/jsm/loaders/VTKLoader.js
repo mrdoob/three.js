@@ -645,15 +645,8 @@ class VTKLoader extends Loader {
 			function Base64toByteArray( b64 ) {
 
 				const Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
-				const lookup = [];
 				const revLookup = [];
 				const code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-				for ( let i = 0, l = code.length; i < l; i ++ ) {
-
-					lookup[ i ] = code[ i ];
-
-				}
 
 				for ( let i = 0, l = code.length; i < l; ++ i ) {
 
