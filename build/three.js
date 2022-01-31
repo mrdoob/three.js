@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '137';
+	const REVISION = '138dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -6761,11 +6761,11 @@
 			data.stencilZFail = this.stencilZFail;
 			data.stencilZPass = this.stencilZPass; // rotation (SpriteMaterial)
 
-			if (this.rotation && this.rotation !== 0) data.rotation = this.rotation;
+			if (this.rotation !== undefined && this.rotation !== 0) data.rotation = this.rotation;
 			if (this.polygonOffset === true) data.polygonOffset = true;
 			if (this.polygonOffsetFactor !== 0) data.polygonOffsetFactor = this.polygonOffsetFactor;
 			if (this.polygonOffsetUnits !== 0) data.polygonOffsetUnits = this.polygonOffsetUnits;
-			if (this.linewidth && this.linewidth !== 1) data.linewidth = this.linewidth;
+			if (this.linewidth !== undefined && this.linewidth !== 1) data.linewidth = this.linewidth;
 			if (this.dashSize !== undefined) data.dashSize = this.dashSize;
 			if (this.gapSize !== undefined) data.gapSize = this.gapSize;
 			if (this.scale !== undefined) data.scale = this.scale;
@@ -10965,7 +10965,7 @@
 							const stride = data.stride;
 							const offset = geometryAttribute.offset;
 
-							if (data && data.isInstancedInterleavedBuffer) {
+							if (data.isInstancedInterleavedBuffer) {
 								for (let i = 0; i < programAttribute.locationSize; i++) {
 									enableAttributeAndDivisor(programAttribute.location + i, data.meshPerAttribute);
 								}
@@ -15538,7 +15538,7 @@
 			_renderer.renderBufferDirect(camera, null, geometry, shadowMaterialHorizontal, fullScreenMesh, null);
 		}
 
-		function getDepthMaterial(object, geometry, material, light, shadowCameraNear, shadowCameraFar, type) {
+		function getDepthMaterial(object, material, light, shadowCameraNear, shadowCameraFar, type) {
 			let result = null;
 			const customMaterial = light.isPointLight === true ? object.customDistanceMaterial : object.customDepthMaterial;
 
@@ -15619,13 +15619,13 @@
 							const groupMaterial = material[group.materialIndex];
 
 							if (groupMaterial && groupMaterial.visible) {
-								const depthMaterial = getDepthMaterial(object, geometry, groupMaterial, light, shadowCamera.near, shadowCamera.far, type);
+								const depthMaterial = getDepthMaterial(object, groupMaterial, light, shadowCamera.near, shadowCamera.far, type);
 
 								_renderer.renderBufferDirect(shadowCamera, null, geometry, depthMaterial, object, group);
 							}
 						}
 					} else if (material.visible) {
-						const depthMaterial = getDepthMaterial(object, geometry, material, light, shadowCamera.near, shadowCamera.far, type);
+						const depthMaterial = getDepthMaterial(object, material, light, shadowCamera.near, shadowCamera.far, type);
 
 						_renderer.renderBufferDirect(shadowCamera, null, geometry, depthMaterial, object, null);
 					}
@@ -16606,7 +16606,6 @@
 			const texture = renderTarget.texture;
 			const renderTargetProperties = properties.get(renderTarget);
 			const textureProperties = properties.get(texture);
-			if (!renderTarget) return;
 
 			if (textureProperties.__webglTexture !== undefined) {
 				_gl.deleteTexture(textureProperties.__webglTexture);
@@ -17020,7 +17019,7 @@
 
 			_gl.pixelStorei(_gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, _gl.NONE);
 
-			const isCompressed = texture && (texture.isCompressedTexture || texture.image[0].isCompressedTexture);
+			const isCompressed = texture.isCompressedTexture || texture.image[0].isCompressedTexture;
 			const isDataTexture = texture.image[0] && texture.image[0].isDataTexture;
 			const cubeImage = [];
 
@@ -20124,7 +20123,7 @@
 				}
 			}
 
-			if (!!geometry && (geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined)) {
+			if (geometry.morphAttributes.position !== undefined || geometry.morphAttributes.normal !== undefined) {
 				morphtargets.update(object, geometry, material, program);
 			}
 
@@ -23875,7 +23874,7 @@
 
 			for (let i = 0, curves = this.curves; i < curves.length; i++) {
 				const curve = curves[i];
-				const resolution = curve && curve.isEllipseCurve ? divisions * 2 : curve && (curve.isLineCurve || curve.isLineCurve3) ? 1 : curve && curve.isSplineCurve ? divisions * curve.points.length : divisions;
+				const resolution = curve.isEllipseCurve ? divisions * 2 : curve.isLineCurve || curve.isLineCurve3 ? 1 : curve.isSplineCurve ? divisions * curve.points.length : divisions;
 				const pts = curve.getPoints(resolution);
 
 				for (let j = 0; j < pts.length; j++) {
@@ -26101,7 +26100,8 @@
 		if (edges.has(hash1) === true || edges.has(hash2) === true) {
 			return false;
 		} else {
-			edges.add(hash1, hash2);
+			edges.add(hash1);
+			edges.add(hash2);
 			return true;
 		}
 	}
@@ -33528,11 +33528,11 @@
 		}
 
 		setFromCamera(coords, camera) {
-			if (camera && camera.isPerspectiveCamera) {
+			if (camera.isPerspectiveCamera) {
 				this.ray.origin.setFromMatrixPosition(camera.matrixWorld);
 				this.ray.direction.set(coords.x, coords.y, 0.5).unproject(camera).sub(this.ray.origin).normalize();
 				this.camera = camera;
-			} else if (camera && camera.isOrthographicCamera) {
+			} else if (camera.isOrthographicCamera) {
 				this.ray.origin.set(coords.x, coords.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera); // set origin in plane of camera
 
 				this.ray.direction.set(0, 0, -1).transformDirection(camera.matrixWorld);
@@ -34031,7 +34031,7 @@
 	function getBoneList(object) {
 		const boneList = [];
 
-		if (object && object.isBone) {
+		if (object.isBone === true) {
 			boneList.push(object);
 		}
 
