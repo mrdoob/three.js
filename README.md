@@ -17,7 +17,7 @@ The aim of the project is to create an easy to use, lightweight, cross-browser, 
 [Questions](https://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
 [Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw) &mdash;
-[Discord](https://discordapp.com/invite/HF4UdyF)
+[Discord](https://discord.gg/56GBJwAnUS)
 
 ### Usage ###
 
