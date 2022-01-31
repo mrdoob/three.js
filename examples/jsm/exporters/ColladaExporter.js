@@ -442,6 +442,7 @@ class ColladaExporter {
 				const reflectivity = m.reflectivity || 0;
 
 				emissive.convertLinearToSRGB();
+				specular.convertLinearToSRGB();
 				diffuse.convertLinearToSRGB();
 
 				// Do not export and alpha map for the reasons mentioned in issue (#13792)
