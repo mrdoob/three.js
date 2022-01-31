@@ -1,4 +1,4 @@
-import { LabelElement, Element, ToggleInput, SelectInput } from '../../libs/flow.module.js';
+import { LabelElement, ToggleInput, SelectInput } from '../../libs/flow.module.js';
 import { BaseNode, onNodeValidElement } from '../core/BaseNode.js';
 import { TextureNode, UVNode } from '../../renderers/nodes/Nodes.js';
 import { Texture, TextureLoader, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from 'three';
