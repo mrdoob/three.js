@@ -30,7 +30,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -39,7 +40,7 @@
 
 			import * as THREE from 'three';
 
-			import { DragControls } from './jsm/controls/DragControls.js';
+			import { DragControls } from 'three/addons/controls/DragControls.js';
 
 			let container;
 			let camera, scene, renderer;

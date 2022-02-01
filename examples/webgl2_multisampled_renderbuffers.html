@@ -40,7 +40,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -49,11 +50,11 @@
 
 			import * as THREE from 'three';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
-			import WebGL from './jsm/capabilities/WebGL.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			let camera, renderer, clock, group, container;
 

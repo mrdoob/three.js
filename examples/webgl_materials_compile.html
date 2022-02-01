@@ -40,7 +40,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -49,8 +50,8 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			import {
 				NodeFrame,
@@ -62,7 +63,7 @@
 				OperatorNode,
 				TimerNode,
 				PhongNodeMaterial
-			} from './jsm/nodes/Nodes.js';
+			} from 'three/addons/nodes/Nodes.js';
 
 			const container = document.getElementById( 'container' );
 

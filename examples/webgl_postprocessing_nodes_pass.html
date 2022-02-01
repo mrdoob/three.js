@@ -18,7 +18,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,11 +28,11 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { NodePass } from './jsm/nodes/postprocessing/NodePass.js';
-			import * as Nodes from './jsm/nodes/Nodes.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { NodePass } from 'three/addons/nodes/postprocessing/NodePass.js';
+			import * as Nodes from 'three/addons/nodes/Nodes.js';
 
 			let camera, scene, renderer, composer;
 			let object, light, nodepass;

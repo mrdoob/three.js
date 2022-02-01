@@ -17,7 +17,8 @@
 		<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 		</script>
@@ -26,12 +27,12 @@
 
 			import * as THREE from 'three';
 
-			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import * as Nodes from 'three/addons/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 

@@ -18,7 +18,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,11 +28,11 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import * as Nodes from 'three/addons/renderers/nodes/Nodes.js';
 
 			class InstanceUniformNode extends Nodes.Node {
 

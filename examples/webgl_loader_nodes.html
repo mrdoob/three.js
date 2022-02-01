@@ -21,7 +21,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,12 +31,12 @@
 
 				import * as THREE from 'three';
 
-				import { GUI } from './jsm/libs/lil-gui.module.min.js';
-				import { OrbitControls } from './jsm/controls/OrbitControls.js';
-				import { NodeMaterialLoader } from './jsm/loaders/NodeMaterialLoader.js';
-				import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
-				import { NodeFrame } from './jsm/nodes/core/NodeFrame.js';
-				import { NodeMaterial } from './jsm/nodes/materials/NodeMaterial.js';
+				import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+				import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+				import { NodeMaterialLoader } from 'three/addons/loaders/NodeMaterialLoader.js';
+				import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+				import { NodeFrame } from 'three/addons/nodes/core/NodeFrame.js';
+				import { NodeMaterial } from 'three/addons/nodes/materials/NodeMaterial.js';
 
 				const container = document.getElementById( 'container' );
 

@@ -17,7 +17,8 @@
 		<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 		</script>
@@ -26,18 +27,18 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import WebGPUStorageBuffer from './jsm/renderers/webgpu/WebGPUStorageBuffer.js';
-			import WebGPUUniformBuffer from './jsm/renderers/webgpu/WebGPUUniformBuffer.js';
-			import * as WebGPUBufferUtils from './jsm/renderers/webgpu/WebGPUBufferUtils.js';
-			import WebGPUUniformsGroup from './jsm/renderers/webgpu/WebGPUUniformsGroup.js';
-			import { Vector2Uniform } from './jsm/renderers/webgpu/WebGPUUniform.js';
+			import WebGPUStorageBuffer from 'three/addons/renderers/webgpu/WebGPUStorageBuffer.js';
+			import WebGPUUniformBuffer from 'three/addons/renderers/webgpu/WebGPUUniformBuffer.js';
+			import * as WebGPUBufferUtils from 'three/addons/renderers/webgpu/WebGPUBufferUtils.js';
+			import WebGPUUniformsGroup from 'three/addons/renderers/webgpu/WebGPUUniformsGroup.js';
+			import { Vector2Uniform } from 'three/addons/renderers/webgpu/WebGPUUniform.js';
 
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import * as Nodes from 'three/addons/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 			let pointer;

@@ -18,7 +18,8 @@
 		<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 		</script>
@@ -27,14 +28,14 @@
 
 			import * as THREE from 'three';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import * as Nodes from 'three/addons/renderers/nodes/Nodes.js';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			class InstanceUniformNode extends Nodes.Node {
 

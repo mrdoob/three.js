@@ -24,7 +24,8 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
@@ -32,18 +33,18 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import Stats from './jsm/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		import { GUI } from './jsm/libs/lil-gui.module.min.js';
-		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
-		import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-		import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
-		import { ReflectorForSSRPass } from './jsm/objects/ReflectorForSSRPass.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+		import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
 
-		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 		const params = {
 			enableSSR: true,
