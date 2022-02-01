@@ -1688,9 +1688,9 @@ class ColladaLoader extends Loader {
 
 			}
 
-			material.specular.convertSRGBToLinear();
 			material.color.convertSRGBToLinear();
-			material.emissive.convertSRGBToLinear();
+			if ( material.specular ) material.specular.convertSRGBToLinear();
+			if ( material.emissive ) material.emissive.convertSRGBToLinear();
 
 			//
 
