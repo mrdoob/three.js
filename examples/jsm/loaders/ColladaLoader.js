@@ -1674,7 +1674,7 @@ class ColladaLoader extends Loader {
 						if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
 						break;
 					case 'ambient':
-						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
+						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, sRGBEncoding );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
