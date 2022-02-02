@@ -235,7 +235,7 @@
 								output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 								vOffset += 4;
 
-							} else if ( includeUVs !== false ) {
+							} else {
 
 								output.setFloat32( vOffset, 0, options.littleEndian );
 								vOffset += 4;

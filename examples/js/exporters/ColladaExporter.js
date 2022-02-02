@@ -131,8 +131,6 @@
 
 			function attrBufferToArray( attr, isColor = false ) {
 
-				console.log( attr, attr.count, isColor );
-
 				if ( isColor ) {
 
 					// convert the colors to srgb before export
