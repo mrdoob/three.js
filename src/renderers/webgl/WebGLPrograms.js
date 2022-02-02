@@ -78,7 +78,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
-		const cubeUVHeight = ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ) ? envMap.image.height : null;
+		const envMapCubeUVHeight = ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ) ? envMap.image.height : null;
 
 		const shaderID = shaderIDs[ material.type ];
 
@@ -154,7 +154,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			matcap: !! material.matcap,
 			envMap: !! envMap,
 			envMapMode: envMap && envMap.mapping,
-			cubeUVHeight: cubeUVHeight,
+			envMapCubeUVHeight: envMapCubeUVHeight,
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
@@ -309,7 +309,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.precision );
 		array.push( parameters.outputEncoding );
 		array.push( parameters.envMapMode );
-		array.push( parameters.cubeUVHeight );
+		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.combine );
 		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
