@@ -18,6 +18,8 @@
 
 	const _cb = new THREE.Vector3();
 
+	const _color = new THREE.Color();
+
 	function ParserState() {
 
 		const state = {
@@ -464,7 +466,9 @@
 
 							if ( data.length >= 7 ) {
 
-								state.colors.push( parseFloat( data[ 4 ] ), parseFloat( data[ 5 ] ), parseFloat( data[ 6 ] ) );
+								_color.setRGB( parseFloat( data[ 4 ] ), parseFloat( data[ 5 ] ), parseFloat( data[ 6 ] ) ).convertSRGBToLinear();
+
+								state.colors.push( _color.r, _color.g, _color.b );
 
 							} else {
 

@@ -285,7 +285,7 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 			var off = y * bpl, to = y * w;
 			if ( depth == 1 ) for ( var x = 0; x < w; x ++ ) {
 
-				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( ( x & 7 ) ) ) ) & 1 ), al = ( gr == tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( x & 7 ) ) ) & 1 ), al = ( gr == tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
 
 			}
 			else if ( depth == 2 ) for ( var x = 0; x < w; x ++ ) {

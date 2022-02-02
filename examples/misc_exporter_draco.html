@@ -8,8 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
-			<button id="exportFile">Export DRC</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco
 		</div>
 
 		<script src="js/libs/draco/draco_encoder.js"></script>
@@ -33,8 +32,13 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh;
+
+			const params = {
+				export: exportFile
+			};
 
 			init();
 			animate();
@@ -109,8 +113,11 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const exportButton = document.getElementById( 'exportFile' );
-				exportButton.addEventListener( 'click', exportFile );
+				const gui = new GUI();
+
+				gui.add( params, 'export' ).name( 'Export DRC' );
+				gui.open();
+
 
 			}
 

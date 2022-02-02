@@ -103,6 +103,7 @@
 				}
 
 			} );
+			const tempColor = new THREE.Color();
 			const includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
 			includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 			includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
@@ -243,18 +244,19 @@
 
 							}
 
-						} // Color information
+						} // THREE.Color information
 
 
 						if ( includeColors === true ) {
 
 							if ( colors != null ) {
 
-								output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
+								tempColor.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+								output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 								vOffset += 1;
-								output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
+								output.setUint8( vOffset, Math.floor( tempColor.g * 255 ) );
 								vOffset += 1;
-								output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
+								output.setUint8( vOffset, Math.floor( tempColor.b * 255 ) );
 								vOffset += 1;
 
 							} else {
@@ -372,14 +374,15 @@
 
 							}
 
-						} // Color information
+						} // THREE.Color information
 
 
 						if ( includeColors === true ) {
 
 							if ( colors != null ) {
 
-								line += ' ' + Math.floor( colors.getX( i ) * 255 ) + ' ' + Math.floor( colors.getY( i ) * 255 ) + ' ' + Math.floor( colors.getZ( i ) * 255 );
+								tempColor.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+								line += ' ' + Math.floor( tempColor.r * 255 ) + ' ' + Math.floor( tempColor.g * 255 ) + ' ' + Math.floor( tempColor.b * 255 );
 
 							} else {
 

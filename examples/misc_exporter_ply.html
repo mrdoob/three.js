@@ -8,8 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - ply<br/><br/>
-			<button id="exportASCII">export ASCII</button> <button id="exportBinaryBigEndian">export binary (Big Endian)</button> <button id="exportBinaryLittleEndian">export binary (Little Endian)</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - ply
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -31,8 +30,15 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh;
+
+			const params = {
+				exportASCII: exportASCII,
+				exportBinaryBigEndian: exportBinaryBigEndian,
+				exportBinaryLittleEndian: exportBinaryLittleEndian
+			};
 
 			init();
 			animate();
@@ -115,14 +121,12 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const buttonExportASCII = document.getElementById( 'exportASCII' );
-				buttonExportASCII.addEventListener( 'click', exportASCII );
+				const gui = new GUI();
 
-				const buttonExportBinaryBE = document.getElementById( 'exportBinaryBigEndian' );
-				buttonExportBinaryBE.addEventListener( 'click', exportBinaryBigEndian );
-
-				const buttonExportBinaryLE = document.getElementById( 'exportBinaryLittleEndian' );
-				buttonExportBinaryLE.addEventListener( 'click', exportBinaryLittleEndian );
+				gui.add( params, 'exportASCII' ).name( 'Export PLY (ASCII)' );
+				gui.add( params, 'exportBinaryBigEndian' ).name( 'Export PLY (Binary BE)' );
+				gui.add( params, 'exportBinaryLittleEndian' ).name( 'Export PLY (Binary LE)' );
+				gui.open();
 
 			}
 
