@@ -138,9 +138,9 @@
 			const mergedObject = new THREE.Group();
 			const meshMaterialsIds = Object.keys( meshGeometries );
 
-			for ( const i in meshMaterialsIds ) {
+			for ( const meshMaterialsId of meshMaterialsIds ) {
 
-				const meshGeometry = meshGeometries[ meshMaterialsIds[ i ] ];
+				const meshGeometry = meshGeometries[ meshMaterialsId ];
 				const mergedGeometry = THREE.mergeBufferGeometries( meshGeometry.arr );
 				mergedObject.add( new THREE.Mesh( mergedGeometry, meshGeometry.mat ) );
 
@@ -148,9 +148,9 @@
 
 			const linesMaterialsIds = Object.keys( linesGeometries );
 
-			for ( const i in linesMaterialsIds ) {
+			for ( const linesMaterialsId of linesMaterialsIds ) {
 
-				const lineGeometry = linesGeometries[ linesMaterialsIds[ i ] ];
+				const lineGeometry = linesGeometries[ linesMaterialsId ];
 				const mergedGeometry = THREE.mergeBufferGeometries( lineGeometry.arr );
 				mergedObject.add( new THREE.LineSegments( mergedGeometry, lineGeometry.mat ) );
 
@@ -158,9 +158,9 @@
 
 			const condLinesMaterialsIds = Object.keys( condLinesGeometries );
 
-			for ( const i in condLinesMaterialsIds ) {
+			for ( const condLinesMaterialsId of condLinesMaterialsIds ) {
 
-				const condLineGeometry = condLinesGeometries[ condLinesMaterialsIds[ i ] ];
+				const condLineGeometry = condLinesGeometries[ condLinesMaterialsId ];
 				const mergedGeometry = THREE.mergeBufferGeometries( condLineGeometry.arr );
 				const condLines = new THREE.LineSegments( mergedGeometry, condLineGeometry.mat );
 				condLines.isConditionalLine = true;
