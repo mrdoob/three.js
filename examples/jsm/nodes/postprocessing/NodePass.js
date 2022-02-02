@@ -63,7 +63,7 @@ class NodePass extends ShaderPass {
 
 		}
 
-		if ( meta && ! meta.passes ) meta.passes = {};
+		if ( ! meta.passes ) meta.passes = {};
 
 		if ( ! meta.passes[ this.uuid ] ) {
 
