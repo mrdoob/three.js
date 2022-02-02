@@ -510,9 +510,6 @@
 							_state = STATE.PAN;
 							break;
 
-						default:
-							_state = STATE.NONE;
-
 					}
 
 				}

@@ -26,6 +26,8 @@
  *
  */
 
+	const _color = new THREE.Color();
+
 	class PLYLoader extends THREE.Loader {
 
 		constructor( manager ) {
@@ -386,7 +388,9 @@
 
 					if ( attrR !== null && attrG !== null && attrB !== null ) {
 
-						buffer.colors.push( element[ attrR ] / 255.0, element[ attrG ] / 255.0, element[ attrB ] / 255.0 );
+						_color.setRGB( element[ attrR ] / 255.0, element[ attrG ] / 255.0, element[ attrB ] / 255.0 ).convertSRGBToLinear();
+
+						buffer.colors.push( _color.r, _color.g, _color.b );
 
 					}
 
