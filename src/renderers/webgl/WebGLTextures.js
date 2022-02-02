@@ -1692,7 +1692,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function safeSetTexture2D( texture, slot ) {
 
-		if ( texture && texture.isWebGLRenderTarget ) {
+		if ( texture.isWebGLRenderTarget ) {
 
 			if ( warnedTexture2D === false ) {
 
@@ -1711,7 +1711,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function safeSetTextureCube( texture, slot ) {
 
-		if ( texture && texture.isWebGLCubeRenderTarget ) {
+		if ( texture.isWebGLCubeRenderTarget ) {
 
 			if ( warnedTextureCube === false ) {
 

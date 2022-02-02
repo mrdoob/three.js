@@ -162,27 +162,27 @@ class LDrawUtils {
 		const mergedObject = new Group();
 
 		const meshMaterialsIds = Object.keys( meshGeometries );
-		for ( const i in meshMaterialsIds ) {
+		for ( const meshMaterialsId of meshMaterialsIds ) {
 
-			const meshGeometry = meshGeometries[ meshMaterialsIds[ i ] ];
+			const meshGeometry = meshGeometries[ meshMaterialsId ];
 			const mergedGeometry = mergeBufferGeometries( meshGeometry.arr );
 			mergedObject.add( new Mesh( mergedGeometry, meshGeometry.mat ) );
 
 		}
 
 		const linesMaterialsIds = Object.keys( linesGeometries );
-		for ( const i in linesMaterialsIds ) {
+		for ( const linesMaterialsId of linesMaterialsIds ) {
 
-			const lineGeometry = linesGeometries[ linesMaterialsIds[ i ] ];
+			const lineGeometry = linesGeometries[ linesMaterialsId ];
 			const mergedGeometry = mergeBufferGeometries( lineGeometry.arr );
 			mergedObject.add( new LineSegments( mergedGeometry, lineGeometry.mat ) );
 
 		}
 
 		const condLinesMaterialsIds = Object.keys( condLinesGeometries );
-		for ( const i in condLinesMaterialsIds ) {
+		for ( const condLinesMaterialsId of condLinesMaterialsIds ) {
 
-			const condLineGeometry = condLinesGeometries[ condLinesMaterialsIds[ i ] ];
+			const condLineGeometry = condLinesGeometries[ condLinesMaterialsId ];
 			const mergedGeometry = mergeBufferGeometries( condLineGeometry.arr );
 			const condLines = new LineSegments( mergedGeometry, condLineGeometry.mat );
 			condLines.isConditionalLine = true;

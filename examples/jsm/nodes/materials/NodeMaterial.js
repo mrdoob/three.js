@@ -150,7 +150,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( meta && ! meta.materials ) meta.materials = {};
+		if ( ! meta.materials ) meta.materials = {};
 
 		if ( ! meta.materials[ this.uuid ] ) {
 
