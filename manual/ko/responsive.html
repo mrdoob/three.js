@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="utf-8">
+    <title>반응형 디자인</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 반응형 디자인">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+    <link rel="stylesheet" href="/manual/ko/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>반응형 디자인</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Three.js 두 번째 튜토리얼에 오신 것을 환영합니다!
+첫 번째 튜토리얼은 <a href="fundamentals.html">Three.js의 기초</a>에 관한 내용이었죠.
+아직 이전 장을 보지 않았다면 (예제가 이어지므로. 역주) 이전 글을 먼저 읽어보기 바랍니다.</p>
+<p>이 장에서는 Three.js 앱을 어떤 환경에서든 구동할 수 있도록
+반응형으로 만드는 법에 대해 알아볼 것입니다. 웹에서 반응형이란
+웹 페이지를 PC, 타블렛, 스마트폰 등 다양한 환경에서 이용하기
+용이하도록 사이즈에 맞춰 콘텐츠를 최적화하는 것을 의미하죠.</p>
+<p>Three.js의 경우 일반 웹보다 고려해야 할 요소가 많습니다.
+예를 들어 상하좌우에 컨트롤 패널이 있는 3D 에디터라든가,
+문서 사이에 들어가는 동적 그래프를 상상해볼 수 있죠.</p>
+<p>이전 글에서는 사이즈나 CSS 스타일을 정의하지 않은 canvas를 썼었죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
+</pre>
+<p>canvas 요소는 기본적으로 300x150 픽셀입니다.</p>
+<p>웹에서 어떤 요소의 크기를 지정할 때는 보통 CSS를 권장하죠.</p>
+<p>canvas가 페이지 전체를 차지하도록 CSS를 작성해봅시다.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
+html, body {
+   margin: 0;
+   height: 100%;
+}
+#c {
+   width: 100%;
+   height: 100%;
+   display: block;
+}
+&lt;/style&gt;
+</pre>
+<p>body 요소는 기본적으로 5픽셀의 margin이 지정되어 있으니 <code class="notranslate" translate="no">margin: 0</code>으로
+설정해 여백을 모두 없앱니다. html과 body 요소의 높이를 지정하지 않으면
+컨텐츠의 높이만큼만 커지니, 높이를 100%로 맞춰 창 전체를 채우도록 합니다.</p>
+<p>그리고 <code class="notranslate" translate="no">id=c</code>인 요소의 크기를 100%로 지정해 컨테이너, 이 예제에서는 body
+요소의 크기와 동일하게 맞춥니다.</p>
+<p>canvas 요소의 기본 <code class="notranslate" translate="no">display</code> 속성은 <code class="notranslate" translate="no">inline</code>입니다. <code class="notranslate" translate="no">inline</code> 속성은 글자
+처럼 취급되어 흰 공백을 남길 수 있으니 <code class="notranslate" translate="no">display</code> 속성을 <code class="notranslate" translate="no">block</code>으로 지정합니다.</p>
+<p>아래는 이전 장에서 만든 예제에 방금 작성한 CSS 스타일을 덧붙인 것입니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-no-resize.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-no-resize.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>canvas가 창 전체를 채우긴 했지만 문제가 좀 있네요. 정육면체가 창 크기에
+따라 늘어나 정육면체라기보다 너무 길거나 넓은 육면체처럼 보입니다. 예제를
+새 창에서 열어 창 크기를 조절해보세요. 정육면체가 어떻게 변하는지 확인할
+수 있을 겁니다.</p>
+<p><img src="../resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center nobg"></p>
+<p>또 다른 문제는 저화질, 그러니까 깨지고 흐릿하게 보인다는 점입니다.
+창을 아주 크게 조절하면 문제를 바로 알 수 있을 거에요.</p>
+<p><img src="../resources/images/resize-low-res.png" class="threejs_center nobg"></p>
+<p>창 크기에 따라 늘어나는 문제부터 해결해봅시다. 먼저 카메라의 aspect(비율)
+속성을 canvas의 화면 크기에 맞춰야 합니다. 이는 canvas의 <code class="notranslate" translate="no">clientWidth</code>와
+<code class="notranslate" translate="no">clientHeight</code> 속성을 이용해 간단히 해결할 수 있죠.</p>
+<p>그리고 렌더링 함수를 다음처럼 수정합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
++  const canvas = renderer.domElement;
++  camera.aspect = canvas.clientWidth / canvas.clientHeight;
++  camera.updateProjectionMatrix();
+
+  ...
+</pre>
+<p>이제 정육면체는 더이상 늘어나거나 찌그러들지 않을 겁니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-update-camera.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-update-camera.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>예제를 새 창에서 열어 창 크기를 조절해보면, 정육면체의 비율이
+창 크기와 상관없이 그대로 유지되는 것을 확인할 수 있을 겁니다.</p>
+<p><img src="../resources/images/resize-correct-aspect.png" width="407" class="threejs_center nobg"></p>
+<p>이제 계단현상을 없애 봅시다.</p>
+<p>canvas 요소에는 두 종류의 크기값이 있습니다. 하나는 아까 CSS로
+설정한 canvas 요소의 크기이고, 다른 하나는 canvas 원본 픽셀 수에
+대한 값입니다. 예를 들어 128x64 픽셀인 이미지가 있다고 합시다.
+우리는 CSS를 이용해 이 이미지 요소를 400x200 픽셀로 보이도록 할 수
+있죠. canvas도 마찬가지입니다. 편의상 CSS로 지정한 크기를 디스플레이
+크기라고 부르겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;img src="some128x64image.jpg" style="width:400px; height:200px"&gt;
+</pre>
+<p>canvas의 원본 크기, 해상도는 드로잉버퍼(drawingbuffer)라고 불립니다.
+Three.js에서는 <code class="notranslate" translate="no">renderer.setSize</code> 메서드를 호출해 canvas의 드로잉버퍼
+크기를 지정할 수 있죠. 어떤 크기를 골라야 하냐구요? 당연히 "canvas의
+디스플레이 크기"죠! 다시 canvas의 <code class="notranslate" translate="no">clientWidth</code>와 <code class="notranslate" translate="no">clientHeight</code>를
+이용합시다.</p>
+<p>canvas의 원본 크기와 디스플레이 크기를 비교해 원본 크기를 변경할지 결정하는
+함수를 하나 만들어줍니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre>
+<p>canvas를 리사이징할 필요가 있는지 검사했다는 점에 주의하세요.
+canvas 스펙상 리사이징은 화면을 다시 렌더링해야만 하므로, 같은
+사이즈일 때는 리사이징을 하지 않으므로써 불필요한 자원 낭비를
+막는 것이 좋습니다.</p>
+<p>canvas의 크기가 다르다면, <code class="notranslate" translate="no">renderer.setSize</code> 메서드를 호출해
+새로운 width와 height를 넘겨줍니다. <code class="notranslate" translate="no">renderer.setSize</code> 메서드는
+기본적으로 CSS의 크기를 설정하니 마지막 인자로 <code class="notranslate" translate="no">false</code>를 넘겨주는
+것을 잊지 마세요. canvas가 다른 요소와 어울리려면 Three.js에서
+CSS를 제어하는 것 보다 다른 요소들처럼 CSS로 제어하는 것이 일관성
+있는 프로그래밍일 테니까요.</p>
+<p>위 함수는 canvas를 리사이징했으면 <code class="notranslate" translate="no">true</code>를 반환합니다. 이 값을
+이용해 다른 요소들이 업데이트 해야 할지도 결정할 수 있겠네요.
+새로 만든 함수를 이용해 <code class="notranslate" translate="no">render</code> 함수를 수정합시다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
++  if (resizeRendererToDisplaySize(renderer)) {
++    const canvas = renderer.domElement;
++    camera.aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.updateProjectionMatrix();
++  }
+
+  ...
+</pre>
+<p>canvas의 비율이 변하려면 canvas의 사이즈가 변해야 하므로,
+<code class="notranslate" translate="no">resizeRendererToDisplaySize</code> 함수가 <code class="notranslate" translate="no">true</code>를 반환했을 때만
+카메라의 비율을 변경합니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>이제 디스플레이 크기에 맞는 해상도로 렌더링될 겁니다.</p>
+<p>CSS가 디스플레이 크기를 제어하도록 해야 한다는 주장을 보충해보겠습니다.
+일단 이 코드를 <a href="../examples/threejs-responsive.js">별도의 js 파일</a>로 저장해주세요.
+아래의 예시들은 CSS가 디스플레이 크기를 제어하도록 한 예시입니다.
+잘 살펴보면 추가로 다른 코드를 써야할 필요가 없다는 걸 알 수 있죠.</p>
+<p>먼저 canvas를 텍스트 사이에 끼워 넣어보죠.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-paragraph.html&amp;startPane=html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-paragraph.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>다음은 우측 컨트롤 패널 크기를 조정할 수 있는 에디터 형태의
+레이아웃에서 활용한 예시입니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-editor.html&amp;startPane=html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-editor.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>HTML, CSS만 바뀌고 자바스크립트 코드는 한 줄도 바뀌지 않았습니다.</p>
+<h2 id="hd-dpi-">HD-DPI 디스플레이 다루기</h2>
+<p>HD-DPI는 고해상도(high-density dot per inch)의 줄임말입니다.
+많은 Windows 기기나 맥, 스마트폰이 이 디스플레이를 사용하죠(스마트폰의
+실제 화면 크기가 데스크탑에 비해 훨씬 작지만, 해상도는 비슷한 경우를
+생각하면 됩니다. 한 픽셀을 선명하게 표현하기 위해 다수의 작은 픽셀을
+넣는 것. 역주).</p>
+<p>브라우저에서는 이에 대응하기 위해 픽셀의 집적도에 상관 없이
+CSS 픽셀을 이용해 요소의 크기를 지정합니다. 스마트폰이든,
+데스크탑이든 브라우저는 요소를 같은 크기로 좀 더 촘촘하게
+할 뿐이죠.</p>
+<p>Three.js로 HD-DPI를 다루는 방법은 아주 다양합니다.</p>
+<p>첫째는 아무것도 하지 않는 것입니다. 3D 렌더링은 많은 GPU 자원을
+소모하기 때문에 아마 가장 흔한 경우일 겁니다. 2018년의 이야기이긴
+하지만, 모바일 기기는 데스크탑에 비해 GPU 성능이 부족함에도 더 높은
+해상도를 가진 경우가 대부분입니다. 현재 플래그쉽 스마트폰은 HD-DPI
+약 3배의 해상도를 지녔습니다. 쉽게 말해 HD-DPI가 아닌 기기와 비교했을
+때 한 픽셀 당 픽셀 수가 1:9라는 것이고 이는 9배나 더 많은 렌더링
+작업을 처리해야 한다는 것을 의미하죠.</p>
+<p>9배 많은 픽셀을 처리하는 건 굉장히 까다로운 작업이지만, 만약 코드를
+저대로 내버려 둔다면 우리의 코드가 1픽셀을 계산할 때마다 브라우저는
+해당 픽셀보다 3배 큰 픽셀을 렌더링해야 합니다(3배 곱하기 3배 = 9배 많은 픽셀).</p>
+<p>이는 낮은 FPS, 즉 화면이 버벅거리게 만들 것이므로 특히 무거운 Three.js
+앱을 만들 때는 지양해야 하는 요소이죠.</p>
+<p>물론 지양해야 한다는 건 기기의 해상도에 따라 화면을 렌더링할
+다른 방법들이 더 있다는 의미입니다.</p>
+<p>하나는 <code class="notranslate" translate="no">rederer.setPixelRatio</code> 메서드를 이용해 해상도 배율을 알려주는
+것입니다. 브라우저로부터 CSS 픽셀과 실제 기기 픽셀의 배율을 받아
+Three.js에게 넘겨주는 것이죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    renderer.setPixelRatio(window.devicePixelRatio);
+</pre>
+<p>그러면 <code class="notranslate" translate="no">renderer.setSize</code>는 이제 알아서 사이즈에 배율을 곱해
+리사이징할 것입니다....만 <strong>이 방법은 추천하지 않습니다</strong>.</p>
+<p>다른 방법은 canvas를 리사이징할 때 직접 계산하는 것입니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    function resizeRendererToDisplaySize(renderer) {
+      const canvas = renderer.domElement;
+      const pixelRatio = window.devicePixelRatio;
+      const width  = canvas.clientWidth  * pixelRatio | 0;
+      const height = canvas.clientHeight * pixelRatio | 0;
+      const needResize = canvas.width !== width || canvas.height !== height;
+      if (needResize) {
+        renderer.setSize(width, height, false);
+      }
+      return needResize;
+    }
+</pre>
+<p>객관적으로 따져봐도 이 방법이 훨씬 낫습니다. 이 방법으로는 개발자가
+원하는 결과가 나오니까요. Three.js로 앱을 만들 때 언제 canvas의
+드로잉버퍼 사이즈를 가져와야 할지 특정하기란 어렵습니다. 예를 들어
+전처리 필터를 만든다거나, <code class="notranslate" translate="no">gl_FragCoord</code>에 접근하는 쉐이더를 만든다거나,
+스크린샷을 찍는다거나, GPU가 제어하는 픽셀 수를 가져 온다거나, 2D
+canvas에 뭔가를 그린다던가 하는 경우가 있죠. 실제 크기 대신 <code class="notranslate" translate="no">setPixelRatio</code>를
+사용하면 대부분의 경우 반환값이 개발자가 예상한 것과 다를 뿐더러,
+이 반환값을 언제 사용할지, Three.js가 쓰는 크기는 무엇인지 일일이
+계산해야 합니다. 직접 배율을 계산하면 어떤 값을 Three.js가 쓰는지
+확실히 알 수 있고, 예외도 줄어듭니다.</p>
+<p>아래는 맨 마지막 방법을 적용한 예시입니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-hd-dpi.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-hd-dpi.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>결과물로는 차이를 구별하기 어렵지만, HD-DPI 기기에서 예시를 비교해
+보면 이전 예시의 모서리가 좀 더 깨진 것이 보일 겁니다.</p>
+<p>이 장에서는 아주 기초적인 예시만을 다루었습니다. 다음 장에서는
+<a href="primitives.html">Three.js의 원시 모델</a>에 대해서 빠르게
+훑어보겠습니다.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

@@ -2,15 +2,15 @@ import {
 	Matrix4,
 	Object3D,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class CSS2DObject extends Object3D {
 
- 	constructor( element ) {
+	constructor( element = document.createElement( 'div' ) ) {
 
 		super();
 
-		this.element = element || document.createElement( 'div' );
+		this.element = element;
 
 		this.element.style.position = 'absolute';
 		this.element.style.userSelect = 'none';
@@ -57,7 +57,7 @@ const _b = new Vector3();
 
 class CSS2DRenderer {
 
-	constructor() {
+	constructor( parameters = {} ) {
 
 		const _this = this;
 
@@ -68,7 +68,8 @@ class CSS2DRenderer {
 			objects: new WeakMap()
 		};
 
-		const domElement = document.createElement( 'div' );
+		const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
+
 		domElement.style.overflow = 'hidden';
 
 		this.domElement = domElement;
@@ -112,39 +113,44 @@ class CSS2DRenderer {
 
 			if ( object.isCSS2DObject ) {
 
-				object.onBeforeRender( _this, scene, camera );
+				const visible = object.visible && _vector.z >= - 1 && _vector.z <= 1 && object.layers.test( camera.layers );
+				object.element.style.display = visible ? '' : 'none';
 
-				_vector.setFromMatrixPosition( object.matrixWorld );
-				_vector.applyMatrix4( _viewProjectionMatrix );
+				if ( visible ) {
 
-				const element = object.element;
+					object.onBeforeRender( _this, scene, camera );
 
-				if ( /apple/i.test( navigator.vendor ) ) {
+					_vector.setFromMatrixPosition( object.matrixWorld );
+					_vector.applyMatrix4( _viewProjectionMatrix );
 
-					// https://github.com/mrdoob/three.js/issues/21415
-					element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+					const element = object.element;
 
-				} else {
+					if ( /apple/i.test( navigator.vendor ) ) {
 
-					element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+						// https://github.com/mrdoob/three.js/issues/21415
+						element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+
+					} else {
+
+						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+
+					}
+
+					if ( element.parentNode !== domElement ) {
+
+						domElement.appendChild( element );
+
+					}
+
+					object.onAfterRender( _this, scene, camera );
 
 				}
-
-				element.style.display = ( object.visible && _vector.z >= - 1 && _vector.z <= 1 ) ? '' : 'none';
 
 				const objectData = {
 					distanceToCameraSquared: getDistanceToSquared( camera, object )
 				};
 
 				cache.objects.set( object, objectData );
-
-				if ( element.parentNode !== domElement ) {
-
-					domElement.appendChild( element );
-
-				}
-
-				object.onAfterRender( _this, scene, camera );
 
 			}
 

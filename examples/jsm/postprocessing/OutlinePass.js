@@ -4,7 +4,6 @@ import {
 	DoubleSide,
 	LinearFilter,
 	Matrix4,
-	MeshBasicMaterial,
 	MeshDepthMaterial,
 	NoBlending,
 	RGBADepthPacking,
@@ -14,8 +13,8 @@ import {
 	Vector2,
 	Vector3,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 class OutlinePass extends Pass {
@@ -46,8 +45,6 @@ class OutlinePass extends Pass {
 		const resx = Math.round( this.resolution.x / this.downSampleRatio );
 		const resy = Math.round( this.resolution.y / this.downSampleRatio );
 
-		this.maskBufferMaterial = new MeshBasicMaterial( { color: 0xffffff } );
-		this.maskBufferMaterial.side = DoubleSide;
 		this.renderTargetMaskBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
 		this.renderTargetMaskBuffer.texture.name = 'OutlinePass.mask';
 		this.renderTargetMaskBuffer.texture.generateMipmaps = false;
@@ -129,7 +126,7 @@ class OutlinePass extends Pass {
 
 		function replaceDepthToViewZ( string, camera ) {
 
-			var type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
+			const type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
 
 			return string.replace( /DEPTH_TO_VIEW_Z/g, type + 'DepthToViewZ' );
 

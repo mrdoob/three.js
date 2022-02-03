@@ -8,16 +8,18 @@ class UVNode extends AttributeNode {
 
 		this.index = index;
 
-		Object.defineProperty( this, 'isUVNode', { value: true } );
-
 	}
 
 	getAttributeName( /*builder*/ ) {
 
-		return 'uv' + ( this.index > 0 ? this.index + 1 : '' );
+		const index = this.index;
+
+		return 'uv' + ( index > 0 ? index + 1 : '' );
 
 	}
 
 }
+
+UVNode.prototype.isUVNode = true;
 
 export default UVNode;

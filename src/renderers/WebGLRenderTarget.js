@@ -24,10 +24,12 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.viewport = new Vector4( 0, 0, width, height );
 
 		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+		this.texture.isRenderTargetTexture = true;
 
 		this.texture.image = { width: width, height: height, depth: 1 };
 
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+		this.texture.internalFormat = options.internalFormat !== undefined ? options.internalFormat : null;
 		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
@@ -84,7 +86,10 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
-		this.texture.image = { ...this.texture.image }; // See #20328.
+
+		// ensure image object is not shared, see #20328
+
+		this.texture.image = Object.assign( {}, source.texture.image );
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;

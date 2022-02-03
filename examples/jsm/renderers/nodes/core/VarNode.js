@@ -2,39 +2,47 @@ import Node from './Node.js';
 
 class VarNode extends Node {
 
-	constructor( value, name = '' ) {
+	constructor( node, name = null, nodeType = null ) {
 
-		super();
+		super( nodeType );
 
-		this.value = value;
+		this.node = node;
 		this.name = name;
 
 	}
 
-	getType( builder ) {
+	getHash( builder ) {
 
-		return this.value.getType( builder );
+		return this.name || super.getHash( builder );
 
 	}
 
-	generate( builder, output ) {
+	getNodeType( builder ) {
 
-		const snippet = this.value.build( builder );
+		return super.getNodeType( builder ) || this.node.getNodeType( builder );
 
-		const type = this.getType( builder );
+	}
 
-		const nodeVary = builder.getVarFromNode( this, type );
-		nodeVary.snippet = snippet;
+	generate( builder ) {
 
-		if ( this.name !== '' ) {
+		const type = builder.getVectorType( this.getNodeType( builder ) );
+		const node = this.node;
+		const name = this.name;
 
-			nodeVary.name = this.name;
+		const snippet = node.build( builder, type );
+		const nodeVar = builder.getVarFromNode( this, type );
+
+		if ( name !== null ) {
+
+			nodeVar.name = name;
 
 		}
 
-		const propertyName = builder.getPropertyName( nodeVary );
+		const propertyName = builder.getPropertyName( nodeVar );
 
-		return builder.format( propertyName, type, output );
+		builder.addFlowCode( `${propertyName} = ${snippet}` );
+
+		return propertyName;
 
 	}
 

@@ -11,7 +11,7 @@ import {
 	Quaternion,
 	SphereGeometry,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Dependencies
@@ -894,7 +894,7 @@ class RigidBody {
 					return new Ammo.btCapsuleShape( p.width, p.height );
 
 				default:
-					throw 'unknown shape type ' + p.shapeType;
+					throw new Error( 'unknown shape type ' + p.shapeType );
 
 			}
 
@@ -1203,7 +1203,6 @@ class Constraint {
 
 			for ( let i = 0; i < 6; i ++ ) {
 
-				// this parameter is from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
 				constraint.setParam( 2, 0.475, i );
 
 			}
@@ -1368,7 +1367,6 @@ class MMDPhysicsHelper extends Object3D {
 
 		}
 
-		// copy from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mytest37.js?ver=20160815
 		function createCapsuleGeometry( radius, cylinderHeight, segmentsRadius, segmentsHeight ) {
 
 			var geometry = new CylinderGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );

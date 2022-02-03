@@ -62,13 +62,25 @@
 			</div>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			let camera, scene, renderer, controls, stats;
@@ -143,12 +155,9 @@
 				const type = parseFloat( params.type );
 
 				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				target.texture.format = THREE.RGBFormat;
 				target.texture.minFilter = THREE.NearestFilter;
 				target.texture.magFilter = THREE.NearestFilter;
-				target.texture.generateMipmaps = false;
 				target.stencilBuffer = ( format === THREE.DepthStencilFormat ) ? true : false;
-				target.depthBuffer = true;
 				target.depthTexture = new THREE.DepthTexture();
 				target.depthTexture.format = format;
 				target.depthTexture.type = type;

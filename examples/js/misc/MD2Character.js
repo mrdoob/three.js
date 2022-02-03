@@ -29,16 +29,12 @@
 
 				const materialWireframe = new THREE.MeshLambertMaterial( {
 					color: 0xffaa00,
-					wireframe: true,
-					morphTargets: true,
-					morphNormals: true
+					wireframe: true
 				} );
 				const materialTexture = new THREE.MeshLambertMaterial( {
 					color: 0xffffff,
 					wireframe: false,
-					map: skinMap,
-					morphTargets: true,
-					morphNormals: true
+					map: skinMap
 				} ); //
 
 				const mesh = new THREE.Mesh( geometry, materialTexture );

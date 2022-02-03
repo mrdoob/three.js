@@ -2,10 +2,9 @@ import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
 
 class WebGPUComputePipelines {
 
-	constructor( device, glslang ) {
+	constructor( device ) {
 
 		this.device = device;
-		this.glslang = glslang;
 
 		this.pipelines = new WeakMap();
 		this.stages = {
@@ -23,7 +22,6 @@ class WebGPUComputePipelines {
 		if ( pipeline === undefined ) {
 
 			const device = this.device;
-			const glslang = this.glslang;
 
 			const shader = {
 				computeShader: param.shader
@@ -35,7 +33,7 @@ class WebGPUComputePipelines {
 
 			if ( stageCompute === undefined ) {
 
- 				stageCompute = new WebGPUProgrammableStage( device, glslang, shader.computeShader, 'compute' );
+ 				stageCompute = new WebGPUProgrammableStage( device, shader.computeShader, 'compute' );
 
 				this.stages.compute.set( shader, stageCompute );
 

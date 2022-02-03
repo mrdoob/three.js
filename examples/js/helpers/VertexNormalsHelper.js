@@ -10,22 +10,8 @@
 
 		constructor( object, size = 1, color = 0xff0000 ) {
 
-			let nNormals = 0;
-			const objGeometry = object.geometry;
-
-			if ( objGeometry && objGeometry.isGeometry ) {
-
-				console.error( 'THREE.VertexNormalsHelper no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-				return;
-
-			} else if ( objGeometry && objGeometry.isBufferGeometry ) {
-
-				nNormals = objGeometry.attributes.normal.count;
-
-			} //
-
-
 			const geometry = new THREE.BufferGeometry();
+			const nNormals = object.geometry.attributes.normal.count;
 			const positions = new THREE.Float32BufferAttribute( nNormals * 2 * 3, 3 );
 			geometry.setAttribute( 'position', positions );
 			super( geometry, new THREE.LineBasicMaterial( {

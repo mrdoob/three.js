@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>マテリアル</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – マテリアル">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>マテリアル</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>この記事はthree.jsについてのシリーズ記事の一つです。
+最初の記事は<a href="fundamentals.html">Three.jsの基礎知識</a>です。
+まだ読んでない人は、そちらから先に読んでみるといいかもしれません。</p>
+<p>Three.jsはいくつかの種類のマテリアルを提供しています。
+これらは、オブジェクトがどのようにシーンに表示されるかを定義します。
+どのマテリアルを使うべきかは、皆さんが何をしたいかによります。</p>
+<p>マテリアルの属性の設定方法は、だいたい2つです。
+一つは、表示される前の作成時です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+  color: 0xFF0000,    // red (can also use a CSS color string here)
+  flatShading: true,
+});
+</pre>
+<p>もう一つは作成後です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial();
+material.color.setHSL(0, 1, .5);  // red
+material.flatShading = true;
+</pre>
+<p><a href="/docs/#api/ja/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>型の属性は設定方法が複数あることに注意してください。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">material.color.set(0x00FFFF);    // same as CSS's #RRGGBB style
+material.color.set(cssString);   // any CSS color, eg 'purple', '#F32',
+                                 // 'rgb(255, 127, 64)',
+                                 // 'hsl(180, 50%, 25%)'
+material.color.set(someColor)    // some other THREE.Color
+material.color.setHSL(h, s, l)   // where h, s, and l are 0 to 1
+material.color.setRGB(r, g, b)   // where r, g, and b are 0 to 1
+</pre>
+<p>作成時に、16進数かCSS文字列を渡すことができます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const m1 = new THREE.MeshBasicMaterial({color: 0xFF0000});         // red
+const m2 = new THREE.MeshBasicMaterial({color: 'red'});            // red
+const m3 = new THREE.MeshBasicMaterial({color: '#F00'});           // red
+const m4 = new THREE.MeshBasicMaterial({color: 'rgb(255,0,0)'});   // red
+const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // red
+</pre>
+<p>では、three.jsのマテリアルの設定の説明をしましょう。</p>
+<p><a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>は光源の影響を受けません。
+<a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>は頂点でのみ光を計算します。
+一方で、<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は全てのピクセルで光を計算します。
+<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は、specularによるハイライトもサポートします。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="MeshBasicMaterial"></div>
+    <div class="code">Basic</div>
+  </div>
+  <div>
+    <div data-diagram="MeshLambertMaterial"></div>
+    <div class="code">Lambert</div>
+  </div>
+  <div>
+    <div data-diagram="MeshPhongMaterial"></div>
+    <div class="code">Phong</div>
+  </div>
+</div>
+<div class="spread">
+  <div>
+    <div data-diagram="MeshBasicMaterialLowPoly"></div>
+  </div>
+  <div>
+    <div data-diagram="MeshLambertMaterialLowPoly"></div>
+  </div>
+  <div>
+    <div data-diagram="MeshPhongMaterialLowPoly"></div>
+  </div>
+</div>
+<div class="threejs_center code">同じマテリアルでポリゴン数を変えたモデル</div>
+
+<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>の<code class="notranslate" translate="no">shininess</code>設定は特定のハイライトの<em>輝き</em>を決めます。デフォルトは30です。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="MeshPhongMaterialShininess0"></div>
+    <div class="code">shininess: 0</div>
+  </div>
+  <div>
+    <div data-diagram="MeshPhongMaterialShininess30"></div>
+    <div class="code">shininess: 30</div>
+  </div>
+  <div>
+    <div data-diagram="MeshPhongMaterialShininess150"></div>
+    <div class="code">shininess: 150</div>
+  </div>
+</div>
+
+<p><a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>か<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>のどちらかで、colorに対して<code class="notranslate" translate="no">emissive</code>属性を設定し、
+色を黒（phongなら<code class="notranslate" translate="no">shininess</code>を0）に設定すると、ちょうど<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>のように見えることに注意してください。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="MeshBasicMaterialCompare"></div>
+    <div class="code">
+      <div>Basic</div>
+      <div>color: 'purple'</div>
+    </div>
+  </div>
+  <div>
+    <div data-diagram="MeshLambertMaterialCompare"></div>
+    <div class="code">
+      <div>Lambert</div>
+      <div>color: 'black'</div>
+      <div>emissive: 'purple'</div>
+    </div>
+  </div>
+  <div>
+    <div data-diagram="MeshPhongMaterialCompare"></div>
+    <div class="code">
+      <div>Phong</div>
+      <div>color: 'black'</div>
+      <div>emissive: 'purple'</div>
+      <div>shininess: 0</div>
+    </div>
+  </div>
+</div>
+
+<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>や<a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a>と同じようにできるのに、なぜ3種もあるのでしょうか。
+理由は、より洗練されたマテリアルは、描写するのにGPUパワーを必要とするためです。
+携帯電話といった、遅いGPCでは、より簡単なマテリアルを使うことで、描画に必要なGPUパワーを削減できるかもしれません。
+また、余計な機能を必要としないなら、一番シンプルなマテリアルを使用するとよいです。
+光源やspecularによるハイライトが不要なら、<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>を使うこともできます。</p>
+<p><a href="/docs/#api/ja/materials/MeshToonMaterial"><code class="notranslate" translate="no">MeshToonMaterial</code></a>は<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>に似ていますが、一点大きな違いがあります。
+連続的にシェーディングするのではなく、グラデーションマップ（X×1のテクスチャ）を使ってシェーディングの方法を決めます。
+デフォルトは明るさの始まりが70%、終わりが100%のグラデーションマップを適用しますが、自分で決めたグラデーションマップを適用することもできます。
+これにより、まるでアニメのようなツートーンになります。</p>
+<div class="spread">
+  <div data-diagram="MeshToonMaterial"></div>
+</div>
+
+<p>続いて２つの<em>物理ベースレンダリング</em>のマテリアルがあります。
+物理ベースレンダリングはよくPBRと略します。</p>
+<p>上記のマテリアルは、3Dに見えるマテリアルを簡単な数学で作っていますが、
+これは現実世界で本当に起きている現象にのっとっていません。
+2つのPBRマテリアルはもっと複雑な数学を使い、現実世界に近づいています。</p>
+<p>一つ目は<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>です。<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>と<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>の
+最大の違いは、異なるパラメータを使っていることです。
+<a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>は<code class="notranslate" translate="no">shininess</code>設定があります。
+<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>は<code class="notranslate" translate="no">roughness</code>と<code class="notranslate" translate="no">metalness</code>の2つの設定があります。</p>
+<p>基本的に、<a href="/docs/#api/ja/materials/MeshStandardMaterial#roughness"><code class="notranslate" translate="no">roughness</code></a>は<code class="notranslate" translate="no">shininess</code>の逆です。
+野球ボールがほとんど反射しないように、とても粗いのものがある一方で、
+とても光沢があるビリヤード玉のように、粗くないものもあります。
+roughnessは0から1の間をとります。</p>
+<p>もう一つの設定で、<a href="/docs/#api/ja/materials/MeshStandardMaterial#metalness"><code class="notranslate" translate="no">metalness</code></a>は、マテリアルの金属っぽさです。
+金属は非金属と異なった振る舞いをします。
+0は非金属で、1は金属です。</p>
+<p>ここに、<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>のサンプルがあります。
+右に行くにつれて、<code class="notranslate" translate="no">roughness</code>は0から1に変わります。
+下に行くにつれて、<code class="notranslate" translate="no">metalness</code>は0から1に変わります。</p>
+<div data-diagram="MeshStandardMaterial" style="min-height: 400px"></div>
+
+<p><a href="/docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>は、<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>と同様ですが、
+<code class="notranslate" translate="no">clearcoat</code>パラメータが追加されています。このパラメータは、0から1につれて、
+clearcoat光沢層が適用されます。
+また、<code class="notranslate" translate="no">clearCoatRoughness</code>パラメータも追加されていて、これは光沢層の粗さを決定します。</p>
+<p>ここに、上と同じ<code class="notranslate" translate="no">metalness</code>と<code class="notranslate" translate="no">roughness</code>のグリッドがあります。
+ただし、<code class="notranslate" translate="no">clearcoat</code>と<code class="notranslate" translate="no">clearCoatRoughness</code>の設定が付いています。</p>
+<div data-diagram="MeshPhysicalMaterial" style="min-height: 400px"></div>
+
+<p>様々な標準のマテリアルのうち、高速なものから低速なものを並べると、
+<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> ➡ <a href="/docs/#api/ja/materials/MeshLambertMaterial"><code class="notranslate" translate="no">MeshLambertMaterial</code></a> ➡ <a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> ➡
+<a href="/docs/#api/ja/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> ➡ <a href="/docs/#api/ja/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>になります。
+低速なマテリアルは、より現実味のある見た目のシーンを作ることができますが、
+パワーが低いデバイスやモバイル端末では、より高速なマテリアルを使うようにコードを設計する必要があります。</p>
+<p>続いて、特別な用途に使う3つのマテリアルがあります。
+<a href="/docs/#api/ja/materials/ShadowMaterial"><code class="notranslate" translate="no">ShadowMaterial</code></a>は影から作られたデータを得るのに使われます。
+まだ影については説明していませんでしたね。
+その際には、このマテリアルを使って、シーンの裏で何が起きているのか、のぞいてみたいと思います。</p>
+<p><a href="/docs/#api/ja/materials/MeshDepthMaterial"><code class="notranslate" translate="no">MeshDepthMaterial</code></a>は各ピクセルの深度を描写します。
+カメラの負の<a href="/docs/#api/ja/cameras/PerspectiveCamera#near"><code class="notranslate" translate="no">near</code></a>にあるピクセルは0、負の<a href="/docs/#api/ja/cameras/PerspectiveCamera#far"><code class="notranslate" translate="no">far</code></a>にあるピクセルは1です。
+また別の機会に、特定の特殊効果がこのデータを使うかもしれません。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="MeshDepthMaterial"></div>
+  </div>
+</div>
+
+
+<p><a href="/docs/#api/ja/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a>はジオメトリの<em>法線</em>を表示します。
+<em>法線</em>は、特定の三角形かピクセル表面の方向です。
+<a href="/docs/#api/ja/materials/MeshNormalMaterial"><code class="notranslate" translate="no">MeshNormalMaterial</code></a>は見えている空間の法線を描画します（法線はカメラに依存します）。</p>
+<p><span style="background: red;" class="color">xは赤</span>、
+<span style="background: green;" class="dark-color">yは緑</span>そして
+<span style="background: blue;" class="dark-color">zは青</span>なので、
+物体の右側は<span style="background: #FF7F7F;" class="color">pink</span>、
+左側は<span style="background: #007F7F;" class="dark-color">aqua</span>、
+上側は<span style="background: #7FFF7F;" class="color">light green</span>、
+下側は<span style="background: #7F007F;" class="dark-color">purple</span>、
+そして画面側は<span style="background: #7F7FFF;" class="color">lavender</span>になるでしょう。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="MeshNormalMaterial"></div>
+  </div>
+</div>
+
+<p><a href="/docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a>は、three.jsのシェーダーシステムを使ったカスタムマテリアルを作るためのものです
+<a href="/docs/#api/ja/materials/RawShaderMaterial"><code class="notranslate" translate="no">RawShaderMaterial</code></a>は、three.jsの補助なしで、完全に独自シェーダーを作るためのものです。
+これらのトピックはどちらも大きいため、後ほど説明します。</p>
+<p>全てのマテリアルは<a href="/docs/#api/ja/materials/Material"><code class="notranslate" translate="no">Material</code></a>によって決められた設定を共有しています。
+それらは<a href="/docs/#api/ja/materials/Material">ドキュメントを見てください</a>。けれども、最も一般的に使われる2つの属性について説明しましょう。</p>
+<p><a href="/docs/#api/ja/materials/Material#flatShading"><code class="notranslate" translate="no">flatShading</code></a>：物体の面が分割されて見えるか、滑らかに見えるか。デフォルトは<code class="notranslate" translate="no">false</code>です。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="smoothShading"></div>
+    <div class="code">flatShading: false</div>
+  </div>
+  <div>
+    <div data-diagram="flatShading"></div>
+    <div class="code">flatShading: true</div>
+  </div>
+</div>
+
+<p><a href="/docs/#api/ja/materials/Material#side"><code class="notranslate" translate="no">side</code></a>：三角形の両面を表示するか。デフォルトは<code class="notranslate" translate="no">THREE.FrontSide</code>です。
+ほかのオプションは <code class="notranslate" translate="no">THREE.BackSide</code>と<code class="notranslate" translate="no">THREE.DoubleSide</code>(両面)です。
+threeで描写されるほとんどの3Dオブジェクトは、たぶん不透明な固体です。
+そのため、裏面（固体の内側を向いている面）は描画する必要はありません。
+<code class="notranslate" translate="no">side</code>を設定する最も一般的な理由は、平面やほかの固体ではないオブジェクトのためです。
+これらは、三角形の裏面を見ることが普通だからです。</p>
+<p>ここに、<code class="notranslate" translate="no">THREE.FrontSide</code>と<code class="notranslate" translate="no">THREE.DoubleSide</code>で描画された6つの平面があります。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="sideDefault" style="height: 250px;"></div>
+    <div class="code">side: THREE.FrontSide</div>
+  </div>
+  <div>
+    <div data-diagram="sideDouble" style="height: 250px;"></div>
+    <div class="code">side: THREE.DoubleSide</div>
+  </div>
+</div>
+
+<p>マテリアルについては、本当にたくさん考えることがあり、実際にはもっとたくさんの説明したいパラメータがあります。
+特に、私たちは多くのオプションの話につながる、テクスチャをほとんど無視していました。
+テクスチャを説明する前に、休憩を取って、<a href="setup.html">開発環境のセットアップ</a>を説明する必要があります。</p>
+<div class="threejs_bottombar">
+<h3>material.needsUpdate</h3>
+
+<p>
+このトピックはめったにthree.jsアプリに影響しませんが、単にFYIのつもりで...。
+Three.jsはマテリアルが"使われた"ときに設定を適用します。
+"使われた"は"マテリアルを使って何かが描画される"ということです。
+マテリアルの設定はたった一度だけ適用されます。変更するとthree.jsに多くの仕事が必要になります。
+変更するケースでは、three.jsに変更を伝えるため、<code class="notranslate" translate="no">material.needsUpdate = true</code>を設定する必要があります。
+マテリアルを試用した後で、<code class="notranslate" translate="no">needsUpdate</code>の設定を必要とする一般的な設定はこのようになります：
+
+</p>
+<ul>
+  <li><code class="notranslate" translate="no">flatShading</code></li>
+  <li>テクスチャの追加や削除
+    <p>
+    テクスチャの変更はOKですが、テクスチャを使わない状態から使う状態に変更したり、
+    テクスチャを使っている状態から使わない状態に変更したいとすると、
+    <code class="notranslate" translate="no">needsUpdate = true</code>を設定する必要があります。
+    </p>
+    <p>テクスチャありからテクスチャなしに変更するケースでは、
+    1x1ピクセルのホワイトテクスチャを使うことがよいです。</p>
+  </li>
+</ul>
+<p>この問題は、ほとんどのアプリには関係ありません。
+ほとんどのアプリではフラットシェードありとフラットシェードなしを切り替えません。
+また、ほとんどのアプリは、与えられたマテリアルにテクスチャか固定の色のどちらかを使い、
+めったに一方からもう一方に切り替えたりしません。
+</p>
+</div>
+
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-materials.js"></script>
+
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

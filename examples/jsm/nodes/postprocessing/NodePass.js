@@ -1,4 +1,4 @@
-import { MathUtils } from '../../../../build/three.module.js';
+import { MathUtils } from 'three';
 
 import { ShaderPass } from '../../postprocessing/ShaderPass.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';
@@ -63,7 +63,7 @@ class NodePass extends ShaderPass {
 
 		}
 
-		if ( meta && ! meta.passes ) meta.passes = {};
+		if ( ! meta.passes ) meta.passes = {};
 
 		if ( ! meta.passes[ this.uuid ] ) {
 

@@ -1,7 +1,7 @@
 import {
 	Matrix4,
 	Vector2
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * References:
@@ -134,7 +134,7 @@ const SSAOShader = {
 			vec3 viewNormal = getViewNormal( vUv );
 
 			vec2 noiseScale = vec2( resolution.x / 4.0, resolution.y / 4.0 );
-			vec3 random = texture2D( tNoise, vUv * noiseScale ).xyz;
+			vec3 random = vec3( texture2D( tNoise, vUv * noiseScale ).r );
 
 			// compute matrix used to reorient a kernel vector
 

@@ -59,7 +59,7 @@
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					id += String.fromCharCode( data.getUint8( i ++, true ) );
+					id += String.fromCharCode( data.getUint8( i ++ ) );
 
 				}
 
@@ -236,6 +236,7 @@
 			this.minFilter = THREE.NearestFilter;
 			this.magFilter = THREE.LinearFilter;
 			this.unpackAlignment = 1;
+			this.needsUpdate = true;
 
 		}
 

@@ -6,15 +6,15 @@
 
 	class SAOPass extends THREE.Pass {
 
-		constructor( scene, camera, depthTexture, useNormals, resolution ) {
+		constructor( scene, camera, useDepthTexture = false, useNormals = false, resolution = new THREE.Vector2( 256, 256 ) ) {
 
 			super();
 			this.scene = scene;
 			this.camera = camera;
 			this.clear = true;
 			this.needsSwap = false;
-			this.supportsDepthTextureExtension = depthTexture !== undefined ? depthTexture : false;
-			this.supportsNormalTexture = useNormals !== undefined ? useNormals : false;
+			this.supportsDepthTextureExtension = useDepthTexture;
+			this.supportsNormalTexture = useNormals;
 			this.originalClearColor = new THREE.Color();
 			this._oldClearColor = new THREE.Color();
 			this.oldClearAlpha = 1;
@@ -30,7 +30,7 @@
 				saoBlurStdDev: 4,
 				saoBlurDepthCutoff: 0.01
 			};
-			this.resolution = resolution !== undefined ? new THREE.Vector2( resolution.x, resolution.y ) : new THREE.Vector2( 256, 256 );
+			this.resolution = new THREE.Vector2( resolution.x, resolution.y );
 			this.saoRenderTarget = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, {
 				minFilter: THREE.LinearFilter,
 				magFilter: THREE.LinearFilter,
@@ -44,10 +44,11 @@
 				format: THREE.RGBAFormat
 			} );
 			this.depthRenderTarget = this.normalRenderTarget.clone();
+			let depthTexture;
 
 			if ( this.supportsDepthTextureExtension ) {
 
-				const depthTexture = new THREE.DepthTexture();
+				depthTexture = new THREE.DepthTexture();
 				depthTexture.type = THREE.UnsignedShortType;
 				this.beautyRenderTarget.depthTexture = depthTexture;
 				this.beautyRenderTarget.depthBuffer = true;

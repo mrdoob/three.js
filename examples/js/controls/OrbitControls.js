@@ -111,6 +111,12 @@
 
 			};
 
+			this.getDistance = function () {
+
+				return this.object.position.distanceTo( this.target );
+
+			};
+
 			this.listenToKeyEvents = function ( domElement ) {
 
 				domElement.addEventListener( 'keydown', onKeyDown );
@@ -508,9 +514,6 @@
 
 			}
 
-			function handleMouseUp( ) { // no-op
-			}
-
 			function handleMouseWheel( event ) {
 
 				if ( event.deltaY < 0 ) {
@@ -690,9 +693,6 @@
 				if ( scope.enableZoom ) handleTouchMoveDolly( event );
 				if ( scope.enableRotate ) handleTouchMoveRotate( event );
 
-			}
-
-			function handleTouchEnd( ) { // no-op
 			} //
 			// event handlers - FSM: listen for events and reset state
 			//
@@ -743,19 +743,7 @@
 
 			function onPointerUp( event ) {
 
-				if ( scope.enabled === false ) return;
-
-				if ( event.pointerType === 'touch' ) {
-
-					onTouchEnd();
-
-				} else {
-
-					onMouseUp( event );
-
-				}
-
-				removePointer( event ); //
+				removePointer( event );
 
 				if ( pointers.length === 0 ) {
 
@@ -764,6 +752,9 @@
 					scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
 				}
+
+				scope.dispatchEvent( _endEvent );
+				state = STATE.NONE;
 
 			}
 
@@ -876,17 +867,9 @@
 
 			}
 
-			function onMouseUp( event ) {
-
-				handleMouseUp( event );
-				scope.dispatchEvent( _endEvent );
-				state = STATE.NONE;
-
-			}
-
 			function onMouseWheel( event ) {
 
-				if ( scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE && state !== STATE.ROTATE ) return;
+				if ( scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE ) return;
 				event.preventDefault();
 				scope.dispatchEvent( _startEvent );
 				handleMouseWheel( event );
@@ -998,14 +981,6 @@
 						state = STATE.NONE;
 
 				}
-
-			}
-
-			function onTouchEnd( event ) {
-
-				handleTouchEnd( event );
-				scope.dispatchEvent( _endEvent );
-				state = STATE.NONE;
 
 			}
 

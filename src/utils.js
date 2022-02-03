@@ -30,6 +30,20 @@ function arrayMax( array ) {
 
 }
 
+function arrayNeedsUint32( array ) {
+
+	// assumes larger values usually on last
+
+	for ( let i = array.length - 1; i >= 0; -- i ) {
+
+		if ( array[ i ] > 65535 ) return true;
+
+	}
+
+	return false;
+
+}
+
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
@@ -48,4 +62,10 @@ function getTypedArray( type, buffer ) {
 
 }
 
-export { arrayMin, arrayMax, getTypedArray };
+function createElementNS( name ) {
+
+	return document.createElementNS( 'http://www.w3.org/1999/xhtml', name );
+
+}
+
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS };

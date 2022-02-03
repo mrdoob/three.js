@@ -68,8 +68,12 @@
 		<h3>[method:Array getLengths]( [param:Integer divisions] )</h3>
 		<p>Get list of cumulative segment lengths.</p>
 
-		<h3>[method:null updateArcLengths]()</h3>
-		<p>Update the cumlative segment distance cache.</p>
+		<h3>[method:undefined updateArcLengths]()</h3>
+		<p>
+			Update the cumlative segment distance cache. The method must be called every time curve parameters are changed.
+			If an updated curve is part of a composed curve like [page:CurvePath], [page:.updateArcLengths]() must be
+			called on the composed curve, too.
+		</p>
 
 		<h3>[method:Float getUtoTmapping]( [param:Float u], [param:Float distance] )</h3>
 		<p>
@@ -107,13 +111,13 @@
 		<h3>[method:Curve clone]()</h3>
 		<p>Creates a clone of this instance.</p>
 
-		<h3>[method:Curve copy]( [param:Curve source] )</h3>
+		<h3>[method:this copy]( [param:Curve source] )</h3>
 		<p>Copies another [name] object to this instance.</p>
 
 		<h3>[method:Object toJSON]()</h3>
 		<p>Returns a JSON object representation of this instance.</p>
 
-		<h3>[method:Curve fromJSON]( [param:Object json] )</h3>
+		<h3>[method:this fromJSON]( [param:Object json] )</h3>
 		<p>Copies the data from the given JSON object to this instance.</p>
 
 		<h2>Source</h2>

@@ -18,7 +18,7 @@ import {
 	LinearMipmapNearestFilter,
 	LinearMipmapLinearFilter
 } from '../constants.js';
-import { BufferAttribute } from '../core/BufferAttribute.js';
+import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
@@ -48,6 +48,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
+import { Source } from '../textures/Source.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { ImageLoader } from './ImageLoader.js';
 import { LoadingManager } from './LoadingManager.js';
@@ -461,7 +462,7 @@ class ObjectLoader extends Loader {
 
 					// load array of images e.g CubeTexture
 
-					images[ image.uuid ] = [];
+					const imageArray = [];
 
 					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -473,13 +474,13 @@ class ObjectLoader extends Loader {
 
 							if ( deserializedImage instanceof HTMLImageElement ) {
 
-								images[ image.uuid ].push( deserializedImage );
+								imageArray.push( deserializedImage );
 
 							} else {
 
 								// special case: handle array of data textures for cube textures
 
-								images[ image.uuid ].push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
+								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 							}
 
@@ -487,17 +488,15 @@ class ObjectLoader extends Loader {
 
 					}
 
+					images[ image.uuid ] = new Source( imageArray );
+
 				} else {
 
 					// load single image
 
 					const deserializedImage = deserializeImage( image.url );
+					images[ image.uuid ] = new Source( deserializedImage );
 
-					if ( deserializedImage !== null ) {
-
-						images[ image.uuid ] = deserializedImage;
-
-					}
 
 				}
 
@@ -560,7 +559,7 @@ class ObjectLoader extends Loader {
 
 					// load array of images e.g CubeTexture
 
-					images[ image.uuid ] = [];
+					const imageArray = [];
 
 					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -572,13 +571,13 @@ class ObjectLoader extends Loader {
 
 							if ( deserializedImage instanceof HTMLImageElement ) {
 
-								images[ image.uuid ].push( deserializedImage );
+								imageArray.push( deserializedImage );
 
 							} else {
 
 								// special case: handle array of data textures for cube textures
 
-								images[ image.uuid ].push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
+								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 							}
 
@@ -586,17 +585,14 @@ class ObjectLoader extends Loader {
 
 					}
 
+					images[ image.uuid ] = new Source( imageArray );
+
 				} else {
 
 					// load single image
 
 					const deserializedImage = await deserializeImage( image.url );
-
-					if ( deserializedImage !== null ) {
-
-						images[ image.uuid ] = deserializedImage;
-
-					}
+					images[ image.uuid ] = new Source( deserializedImage );
 
 				}
 
@@ -640,12 +636,14 @@ class ObjectLoader extends Loader {
 
 				}
 
+				const source = images[ data.image ];
+				const image = source.data;
+
 				let texture;
-				const image = images[ data.image ];
 
 				if ( Array.isArray( image ) ) {
 
-					texture = new CubeTexture( image );
+					texture = new CubeTexture();
 
 					if ( image.length === 6 ) texture.needsUpdate = true;
 
@@ -653,17 +651,19 @@ class ObjectLoader extends Loader {
 
 					if ( image && image.data ) {
 
-						texture = new DataTexture( image.data, image.width, image.height );
+						texture = new DataTexture();
 
 					} else {
 
-						texture = new Texture( image );
+						texture = new Texture();
 
 					}
 
 					if ( image ) texture.needsUpdate = true; // textures can have undefined image data
 
 				}
+
+				texture.source = source;
 
 				texture.uuid = data.uuid;
 
@@ -695,6 +695,8 @@ class ObjectLoader extends Loader {
 
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
+
+				if ( data.userData !== undefined ) texture.userData = data.userData;
 
 				textures[ data.uuid ] = texture;
 
@@ -792,7 +794,11 @@ class ObjectLoader extends Loader {
 
 				}
 
-				if ( data.environment !== undefined ) object.environment = getTexture( data.environment );
+				if ( data.environment !== undefined ) {
+
+					object.environment = getTexture( data.environment );
+
+				}
 
 				if ( data.fog !== undefined ) {
 
@@ -904,8 +910,8 @@ class ObjectLoader extends Loader {
 				const instanceColor = data.instanceColor;
 
 				object = new InstancedMesh( geometry, material, count );
-				object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
-				if ( instanceColor !== undefined ) object.instanceColor = new BufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
+				object.instanceMatrix = new InstancedBufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
+				if ( instanceColor !== undefined ) object.instanceColor = new InstancedBufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
 
 				break;
 

@@ -19,7 +19,7 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	sRGBEncoding
-} from '../../../build/three.module.js';
+} from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
 /**
@@ -99,13 +99,11 @@ class ThreeMFLoader extends Loader {
 			const modelPartNames = [];
 			const printTicketPartNames = [];
 			const texturesPartNames = [];
-			const otherPartNames = [];
 
 			let modelRels;
 			const modelParts = {};
 			const printTicketParts = {};
 			const texturesParts = {};
-			const otherParts = {};
 
 			try {
 
@@ -143,10 +141,6 @@ class ThreeMFLoader extends Loader {
 				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 					texturesPartNames.push( file );
-
-				} else if ( file.match( /^3D\/Other\/.*/ ) ) {
-
-					otherPartNames.push( file );
 
 				}
 
@@ -225,8 +219,7 @@ class ThreeMFLoader extends Loader {
 				modelRels: modelRels,
 				model: modelParts,
 				printTicket: printTicketParts,
-				texture: texturesParts,
-				other: otherParts
+				texture: texturesParts
 			};
 
 		}
@@ -1004,7 +997,7 @@ class ThreeMFLoader extends Loader {
 
 		}
 
-		function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) {
+		function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) {
 
 			// geometry
 
@@ -1077,7 +1070,7 @@ class ThreeMFLoader extends Loader {
 			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
 			geometry.setAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
-			const material = new MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
+			const material = new MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 			const mesh = new Mesh( geometry, material );
 
@@ -1117,7 +1110,7 @@ class ThreeMFLoader extends Loader {
 
 					case 'vertexColors':
 						const colorgroup = modelData.resources.colorgroup[ resourceId ];
-						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) );
+						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) );
 						break;
 
 					case 'default':
@@ -1431,7 +1424,7 @@ class ThreeMFLoader extends Loader {
 			for ( let i = 0; i < buildData.length; i ++ ) {
 
 				const buildItem = buildData[ i ];
-				const object3D = objects[ buildItem[ 'objectId' ] ];
+				const object3D = objects[ buildItem[ 'objectId' ] ].clone();
 
 				// apply transform
 

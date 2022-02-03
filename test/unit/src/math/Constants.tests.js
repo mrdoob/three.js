@@ -1,5 +1,5 @@
-import { Vector2 } from '../../../../src/math/Vector2';
-import { Vector3 } from '../../../../src/math/Vector3';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 
 export const x = 2;
 export const y = 3;

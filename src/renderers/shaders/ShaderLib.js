@@ -193,8 +193,8 @@ const ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.normal_vert,
-		fragmentShader: ShaderChunk.normal_frag
+		vertexShader: ShaderChunk.meshnormal_vert,
+		fragmentShader: ShaderChunk.meshnormal_frag
 
 	},
 
@@ -296,7 +296,11 @@ ShaderLib.physical = {
 			clearcoatRoughnessMap: { value: null },
 			clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
 			clearcoatNormalMap: { value: null },
-			sheen: { value: new Color( 0x000000 ) },
+			sheen: { value: 0 },
+			sheenColor: { value: new Color( 0x000000 ) },
+			sheenColorMap: { value: null },
+			sheenRoughness: { value: 1 },
+			sheenRoughnessMap: { value: null },
 			transmission: { value: 0 },
 			transmissionMap: { value: null },
 			transmissionSamplerSize: { value: new Vector2() },
@@ -304,7 +308,11 @@ ShaderLib.physical = {
 			thickness: { value: 0 },
 			thicknessMap: { value: null },
 			attenuationDistance: { value: 0 },
-			attenuationColor: { value: new Color( 0x000000 ) }
+			attenuationColor: { value: new Color( 0x000000 ) },
+			specularIntensity: { value: 1 },
+			specularIntensityMap: { value: null },
+			specularColor: { value: new Color( 1, 1, 1 ) },
+			specularColorMap: { value: null },
 		}
 	] ),
 

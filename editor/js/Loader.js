@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
 
@@ -199,6 +199,7 @@ function Loader( editor ) {
 
 						}
 
+						loader.dispose();
 						editor.execute( new AddObjectCommand( editor, object ) );
 
 					} );
@@ -391,7 +392,6 @@ function Loader( editor ) {
 					var { LDrawLoader } = await import( '../../examples/jsm/loaders/LDrawLoader.js' );
 
 					var loader = new LDrawLoader();
-					loader.fileMap = {}; // TODO Uh...
 					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
 					loader.parse( event.target.result, undefined, function ( group ) {
 
@@ -417,10 +417,7 @@ function Loader( editor ) {
 					var { MD2Loader } = await import( '../../examples/jsm/loaders/MD2Loader.js' );
 
 					var geometry = new MD2Loader().parse( contents );
-					var material = new THREE.MeshStandardMaterial( {
-						morphTargets: true,
-						morphNormals: true
-					} );
+					var material = new THREE.MeshStandardMaterial();
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.mixer = new THREE.AnimationMixer( mesh );

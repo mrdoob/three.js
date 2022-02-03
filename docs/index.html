@@ -4,7 +4,8 @@
 		<meta charset="utf-8">
 		<title>three.js docs</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="shortcut icon" href="../files/favicon.ico" />
+		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 		<!-- console sandbox -->
 		<script src="../build/three.min.js" async defer></script>
@@ -17,7 +18,7 @@
 
 				<div id="sections">
 					<span class="selected">docs</span>
-					<a href="../examples/#webgl_animation_cloth">examples</a>
+					<a href="../examples/#webgl_animation_keyframes">examples</a>
 				</div>
 
 				<div id="expandButton"></div>
@@ -54,6 +55,9 @@
 		const filterInput = document.getElementById( 'filterInput' );
 		let iframe = document.querySelector( 'iframe' );
 
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
+
 		const pageProperties = {};
 		const titles = {};
 		const categoryElements = [];
@@ -68,7 +72,7 @@
 
 			// *BufferGeometry to *Geometry
 
-			if ( /Instanced/.exec( window.location.hash ) !== null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+			if ( /Instanced/.exec( window.location.hash ) === null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
 
 				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
 
@@ -183,6 +187,10 @@
 				panel.classList.add( 'searchFocused' );
 
 				updateFilter();
+
+			} else {
+
+				updateLink( '' );
 
 			}
 
@@ -386,6 +394,25 @@
 
 			displayFilteredPanel();
 
+			updateLink( v );
+
+		}
+
+		function updateLink( search ) {
+
+			// update examples link
+
+			if ( search ) {
+
+				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				sectionLink.href = `${link}?q=${search}`;
+
+			} else {
+
+				sectionLink.href = sectionDefaultHref;
+
+			}
+
 		}
 
 		function displayFilteredPanel() {
@@ -431,10 +458,10 @@
 
 		// Routing
 
-		function setUrlFragment( pageName ) { // eslint-disable-line no-undef
+		function setUrlFragment( pageName ) { // eslint-disable-line no-unused-vars
 
 			// Handle navigation from the subpages (iframes):
-			// First separate the memeber (if existing) from the page name,
+			// First separate the member (if existing) from the page name,
 			// then identify the subpage's URL and set it as URL fragment (re-adding the member)
 
 			const splitPageName = decomposePageName( pageName, '.', '.' );
@@ -471,7 +498,7 @@
 			const oldIframe = iframe;
 			iframe = oldIframe.cloneNode();
 
-			if ( hash ) {
+			if ( hash && titles[ splitHash[ 0 ] ] ) {
 
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';

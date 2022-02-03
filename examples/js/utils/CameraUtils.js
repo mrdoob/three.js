@@ -16,73 +16,71 @@
 		// temporary vector
 		_quat = /*@__PURE__*/new THREE.Quaternion(); // temporary quaternion
 
-
-	class CameraUtils {
-
-		/** Set a PerspectiveCamera's projectionMatrix and quaternion
-   * to exactly frame the corners of an arbitrary rectangle.
-   * NOTE: This function ignores the standard parameters;
-   * do not call updateProjectionMatrix() after this!
-   * @param {Vector3} bottomLeftCorner
-   * @param {Vector3} bottomRightCorner
-   * @param {Vector3} topLeftCorner
-   * @param {boolean} estimateViewFrustum */
-		static frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorner, estimateViewFrustum = false ) {
-
-			const pa = bottomLeftCorner,
-				pb = bottomRightCorner,
-				pc = topLeftCorner;
-			const pe = camera.position; // eye position
-
-			const n = camera.near; // distance of near clipping plane
-
-			const f = camera.far; //distance of far clipping plane
-
-			_vr.copy( pb ).sub( pa ).normalize();
-
-			_vu.copy( pc ).sub( pa ).normalize();
-
-			_vn.crossVectors( _vr, _vu ).normalize();
-
-			_va.copy( pa ).sub( pe ); // from pe to pa
+	/** Set a PerspectiveCamera's projectionMatrix and quaternion
+ * to exactly frame the corners of an arbitrary rectangle.
+ * NOTE: This function ignores the standard parameters;
+ * do not call updateProjectionMatrix() after this!
+ * @param {Vector3} bottomLeftCorner
+ * @param {Vector3} bottomRightCorner
+ * @param {Vector3} topLeftCorner
+ * @param {boolean} estimateViewFrustum */
 
 
-			_vb.copy( pb ).sub( pe ); // from pe to pb
+	function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorner, estimateViewFrustum = false ) {
+
+		const pa = bottomLeftCorner,
+			pb = bottomRightCorner,
+			pc = topLeftCorner;
+		const pe = camera.position; // eye position
+
+		const n = camera.near; // distance of near clipping plane
+
+		const f = camera.far; //distance of far clipping plane
+
+		_vr.copy( pb ).sub( pa ).normalize();
+
+		_vu.copy( pc ).sub( pa ).normalize();
+
+		_vn.crossVectors( _vr, _vu ).normalize();
+
+		_va.copy( pa ).sub( pe ); // from pe to pa
 
 
-			_vc.copy( pc ).sub( pe ); // from pe to pc
+		_vb.copy( pb ).sub( pe ); // from pe to pb
 
 
-			const d = - _va.dot( _vn ); // distance from eye to screen
+		_vc.copy( pc ).sub( pe ); // from pe to pc
 
-			const l = _vr.dot( _va ) * n / d; // distance to left screen edge
 
-			const r = _vr.dot( _vb ) * n / d; // distance to right screen edge
+		const d = - _va.dot( _vn ); // distance from eye to screen
 
-			const b = _vu.dot( _va ) * n / d; // distance to bottom screen edge
+		const l = _vr.dot( _va ) * n / d; // distance to left screen edge
 
-			const t = _vu.dot( _vc ) * n / d; // distance to top screen edge
-			// Set the camera rotation to match the focal plane to the corners' plane
+		const r = _vr.dot( _vb ) * n / d; // distance to right screen edge
 
-			_quat.setFromUnitVectors( _vec.set( 0, 1, 0 ), _vu );
+		const b = _vu.dot( _va ) * n / d; // distance to bottom screen edge
 
-			camera.quaternion.setFromUnitVectors( _vec.set( 0, 0, 1 ).applyQuaternion( _quat ), _vn ).multiply( _quat ); // Set the off-axis projection matrix to match the corners
+		const t = _vu.dot( _vc ) * n / d; // distance to top screen edge
+		// Set the camera rotation to match the focal plane to the corners' plane
 
-			camera.projectionMatrix.set( 2.0 * n / ( r - l ), 0.0, ( r + l ) / ( r - l ), 0.0, 0.0, 2.0 * n / ( t - b ), ( t + b ) / ( t - b ), 0.0, 0.0, 0.0, ( f + n ) / ( n - f ), 2.0 * f * n / ( n - f ), 0.0, 0.0, - 1.0, 0.0 );
-			camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert(); // FoV estimation to fix frustum culling
+		_quat.setFromUnitVectors( _vec.set( 0, 1, 0 ), _vu );
 
-			if ( estimateViewFrustum ) {
+		camera.quaternion.setFromUnitVectors( _vec.set( 0, 0, 1 ).applyQuaternion( _quat ), _vn ).multiply( _quat ); // Set the off-axis projection matrix to match the corners
 
-				// Set fieldOfView to a conservative estimate
-				// to make frustum tall/wide enough to encompass it
-				camera.fov = THREE.MathUtils.RAD2DEG / Math.min( 1.0, camera.aspect ) * Math.atan( ( _vec.copy( pb ).sub( pa ).length() + _vec.copy( pc ).sub( pa ).length() ) / _va.length() );
+		camera.projectionMatrix.set( 2.0 * n / ( r - l ), 0.0, ( r + l ) / ( r - l ), 0.0, 0.0, 2.0 * n / ( t - b ), ( t + b ) / ( t - b ), 0.0, 0.0, 0.0, ( f + n ) / ( n - f ), 2.0 * f * n / ( n - f ), 0.0, 0.0, - 1.0, 0.0 );
+		camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert(); // FoV estimation to fix frustum culling
 
-			}
+		if ( estimateViewFrustum ) {
+
+			// Set fieldOfView to a conservative estimate
+			// to make frustum tall/wide enough to encompass it
+			camera.fov = THREE.MathUtils.RAD2DEG / Math.min( 1.0, camera.aspect ) * Math.atan( ( _vec.copy( pb ).sub( pa ).length() + _vec.copy( pc ).sub( pa ).length() ) / _va.length() );
 
 		}
 
 	}
 
-	THREE.CameraUtils = CameraUtils;
+	THREE.CameraUtils = {};
+	THREE.CameraUtils.frameCorners = frameCorners;
 
 } )();

@@ -1,5 +1,6 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
+import { createElementNS } from '../utils.js';
 
 class ImageLoader extends Loader {
 
@@ -35,12 +36,11 @@ class ImageLoader extends Loader {
 
 		}
 
-		const image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+		const image = createElementNS( 'img' );
 
 		function onImageLoad() {
 
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+			removeEventListeners();
 
 			Cache.add( url, this );
 
@@ -52,13 +52,19 @@ class ImageLoader extends Loader {
 
 		function onImageError( event ) {
 
-			image.removeEventListener( 'load', onImageLoad, false );
-			image.removeEventListener( 'error', onImageError, false );
+			removeEventListeners();
 
 			if ( onError ) onError( event );
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
+
+		}
+
+		function removeEventListeners() {
+
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 		}
 

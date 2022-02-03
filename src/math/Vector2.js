@@ -470,6 +470,13 @@ class Vector2 {
 
 	}
 
+	*[ Symbol.iterator ]() {
+
+		yield this.x;
+		yield this.y;
+
+	}
+
 }
 
 Vector2.prototype.isVector2 = true;

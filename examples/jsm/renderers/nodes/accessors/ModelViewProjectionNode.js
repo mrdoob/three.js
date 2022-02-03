@@ -12,18 +12,16 @@ class ModelViewProjectionNode extends Node {
 
 		this.position = position;
 
-		this._mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION_MATRIX ), new ModelNode( ModelNode.VIEW_MATRIX ) );
-
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getType( builder );
+		const position = this.position;
 
-		const mvpSnipped = this._mvpMatrix.build( builder );
-		const positionSnipped = this.position.build( builder, 'vec3' );
+		const mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION_MATRIX ), new ModelNode( ModelNode.VIEW_MATRIX ) );
+		const mvpNode = new OperatorNode( '*', mvpMatrix, position );
 
-		return builder.format( `( ${mvpSnipped} * vec4( ${positionSnipped}, 1.0 ) )`, type, output );
+		return mvpNode.build( builder );
 
 	}
 

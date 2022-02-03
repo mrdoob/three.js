@@ -4,9 +4,9 @@ import { APP } from './libs/app.js';
 
 function SidebarProjectVideo( editor ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setId( 'render' );
 
 	// Video
@@ -16,30 +16,30 @@ function SidebarProjectVideo( editor ) {
 
 	// Resolution
 
-	var resolutionRow = new UIRow();
+	const resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
 	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setWidth( '90px' ) );
 
-	var videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
+	const videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( videoWidth );
 
 	resolutionRow.add( new UIText( '×' ).setTextAlign( 'center' ).setFontSize( '12px' ).setWidth( '12px' ) );
 
-	var videoHeight = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
+	const videoHeight = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( videoHeight );
 
-	var videoFPS = new UIInteger( 30 ).setTextAlign( 'center' ).setWidth( '20px' );
+	const videoFPS = new UIInteger( 30 ).setTextAlign( 'center' ).setWidth( '20px' );
 	resolutionRow.add( videoFPS );
 
 	resolutionRow.add( new UIText( 'fps' ).setFontSize( '12px' ) );
 
 	// Duration
 
-	var videoDurationRow = new UIRow();
+	const videoDurationRow = new UIRow();
 	videoDurationRow.add( new UIText( strings.getKey( 'sidebar/project/duration' ) ).setWidth( '90px' ) );
 
-	var videoDuration = new UIInteger( 10 );
+	const videoDuration = new UIInteger( 10 );
 	videoDurationRow.add( videoDuration );
 
 	container.add( videoDurationRow );

@@ -41,7 +41,11 @@ function unmodularize() {
 	return {
 
 
-		renderChunk( code ) {
+		renderChunk( code, { fileName } ) {
+
+			// Namespace the modules that end with Utils
+			const fileNameNoExtension = fileName.slice( 0, fileName.indexOf( '.' ) );
+			const namespace = fileNameNoExtension.endsWith( 'Utils' ) ? fileNameNoExtension : undefined;
 
 			// export { Example };
 			// ↓
@@ -49,7 +53,22 @@ function unmodularize() {
 			code = code.replace( /export { ([a-zA-Z0-9_, ]+) };/g, ( match, p1 ) => {
 
 				const exps = p1.split( ', ' );
-				return exps.map( exp => `THREE.${exp} = ${exp};` ).join( EOL );
+
+				let output = '';
+
+				if ( namespace ) {
+
+					output += `THREE.${namespace} = {};${ EOL }`;
+					output += exps.map( exp => `THREE.${namespace}.${exp} = ${exp};` ).join( EOL );
+
+				} else {
+
+					output += exps.map( exp => `THREE.${exp} = ${exp};` ).join( EOL );
+
+				}
+
+
+				return output;
 
 			} );
 
@@ -65,6 +84,22 @@ function unmodularize() {
 				return '';
 
 			} );
+
+			// import * as Example from '...';
+			// but excluding imports importing from the libs/ folder
+			code = code.replace( /import \* as ([a-zA-Z0-9_, ]+) from '((?!libs).)*';/g, ( match, p1 ) => {
+
+				const imp = p1;
+				if ( imp !== 'THREE' ) {
+
+					imports.push( imp );
+
+				}
+
+				return '';
+
+			} );
+
 
 			// new Example()
 			// (Example)
@@ -135,6 +170,7 @@ const jsmFolder = path.resolve( __dirname, '../../examples/jsm' );
 // list of all .js file nested in the examples/jsm folder
 const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	// don't convert libs
+	'capabilities/*',
 	'libs/**/*',
 	'loaders/ifc/**/*',
 
@@ -145,10 +181,7 @@ const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	// no non-module library
 	// https://unpkg.com/browse/web-ifc@0.0.17/
 	'loaders/IFCLoader.js',
-
-	// no non-module library
-	// https://unpkg.com/browse/ktx-parse@0.2.1/dist/
-	'loaders/KTX2Loader.js',
+	'node-editor/**/*',
 
 	'renderers/webgl/**/*',
 	'renderers/webgpu/**/*',

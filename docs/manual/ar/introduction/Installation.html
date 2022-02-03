@@ -104,7 +104,7 @@
 		<h2>أمثلة</h2>
 
 		<p>
-			يركز جوهر three.js على أهم المكونات المكونة لمحرك ثلاثي الأبعاد.  العديد من المكونات المفيدة الأخرى - مثل الضوابط ، عناصر التحميل ، وتأثيرات ما بعد المعالجة - هي جزء من المجلد [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. .يشار إليها باسم "أمثلة" ، لأنه بينما يمكنك استخدامها ببساطة، من المفترض أيضًا إعادة دمجها وتخصيصها. هذه المكونات تضل  متزامنة مع المكتبة الأساسية
+			يركز جوهر three.js على أهم المكونات المكونة لمحرك ثلاثي الأبعاد.  العديد من المكونات المفيدة الأخرى - مثل الضوابط ، عناصر التحميل ، وتأثيرات ما بعد المعالجة - هي جزء من المجلد [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. .يشار إليها باسم "أمثلة" ، لأنه بينما يمكنك استخدامها ببساطة، من المفترض أيضًا إعادة دمجها وتخصيصها. هذه المكونات تضل متزامنة مع المكتبة الأساسية
 			بينما يتم الاحتفاظ بحزم الجهات الخارجية المماثلة على npm بواسطة أشخاص مختلفين وقد لا تكون محدثة.
 		</p>
 
@@ -115,7 +115,7 @@
 		<code>
 		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
 		<p>
@@ -129,7 +129,7 @@
 
 		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
 
-		  const controls = new OrbitControls();
+		  const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>
@@ -167,7 +167,7 @@
 		</p>
 
 		<p>
-			أولاً ، نظرًا لأن three.js مصممة للويب ، فإنها تعتمد على المتصفح وواجهات برمجة تطبيقات DOM التي لا تتواجد دائمًا في Node.js. يمكن حل بعض هذه المشكلات باستخدام (shims) مثل [link:https://github.com/stackgl/headless-gl headless-gl]، أو عن طريق استبدال مكونات مثل [page: TextureLoader] ببدائل مخصصة. قد تتشابك واجهات برمجة تطبيقات DOM الأخرى بعمق مع الكود الذي يستخدمها ، وسيكون من الصعب حلها. نرحب بطلبات السحب البسيطة والقابلة للصيانة لتحسين دعم Node.js ، لكننا نوصي بفتح مشكلة لمناقشة التحسينات التي أجريتها أولاً.
+			أولاً ، نظرًا لأن three.js مصممة للويب ، فإنها تعتمد على المتصفح وواجهات برمجة تطبيقات DOM التي لا تتواجد دائمًا في Node.js. يمكن حل بعض هذه المشكلات باستخدام (shims) مثل [link:https://github.com/stackgl/headless-gl headless-gl]، أو عن طريق استبدال مكونات مثل [page:TextureLoader] ببدائل مخصصة. قد تتشابك واجهات برمجة تطبيقات DOM الأخرى بعمق مع الكود الذي يستخدمها ، وسيكون من الصعب حلها. نرحب بطلبات السحب البسيطة والقابلة للصيانة لتحسين دعم Node.js ، لكننا نوصي بفتح مشكلة لمناقشة التحسينات التي أجريتها أولاً.
 		</p>
 
 		<p>

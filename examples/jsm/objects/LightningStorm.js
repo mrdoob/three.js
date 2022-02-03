@@ -3,7 +3,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	Object3D
-} from '../../../build/three.module.js';
+} from 'three';
 import { LightningStrike } from '../geometries/LightningStrike.js';
 
 /**

@@ -1,6 +1,7 @@
 .CodeMirror-Tern-completion {
   padding-left: 22px;
   position: relative;
+  line-height: 1.5;
 }
 .CodeMirror-Tern-completion:before {
   position: absolute;

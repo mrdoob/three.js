@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties';
+// import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties.js';
 
 export default QUnit.module( 'Renderers', () => {
 
@@ -9,28 +9,28 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLProperties', () => {
 
 			// INSTANCING
-			QUnit.todo( "Instancing", ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.todo( "get", ( assert ) => {
+			QUnit.todo( 'get', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
-
-			} );
-
-			QUnit.todo( "remove", ( assert ) => {
-
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( "clear", ( assert ) => {
+			QUnit.todo( 'remove', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'clear', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

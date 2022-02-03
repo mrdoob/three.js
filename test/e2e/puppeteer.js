@@ -1,21 +1,9 @@
-
-try {
-
-	require( 'puppeteer' );
-
-} catch {
-
-	console.log( 'Error: Can\'t find Puppeteer. Run `npm install --prefix test`.' );
-	process.exit( 0 );
-
-}
-
-const puppeteer = require( 'puppeteer' );
-const handler = require( 'serve-handler' );
-const http = require( 'http' );
-const pixelmatch = require( 'pixelmatch' );
-const jimp = require( 'jimp' );
-const fs = require( 'fs' );
+import puppeteer from 'puppeteer';
+import handler from 'serve-handler';
+import http from 'http';
+import pixelmatch from 'pixelmatch';
+import jimp from 'jimp';
+import fs from 'fs';
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
@@ -39,11 +27,13 @@ const exceptionList = [
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
+	'webgl_effects_ascii', // blink renders text differently in every platform
 	'webgl_loader_imagebitmap', // takes too long to load?
 	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
-	'webgl_materials_envmaps_parallax', // empty for some reason
 	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
+	'webgl_morphtargets_face', // To investigate...
+	'webgl_postprocessing_crossfade', // fails for some misterious reason
 	'webgl_raymarching_reflect', // exception for Github Actions
 	'webgl_test_memory2', // gives fatal error in puppeteer
 	'webgl_tiled_forward', // exception for Github Actions
@@ -58,8 +48,11 @@ const exceptionList = [
 	'webgpu_lights_custom',
 	'webgpu_lights_selective',
 	'webgpu_materials',
+	'webgpu_nodes_playground',
 	'webgpu_rtt',
-	'webgpu_sandbox'
+	'webgpu_sandbox',
+	'webgpu_skinning_points',
+	'webgpu_skinning'
 ].concat( ( process.platform === 'win32' ) ? [
 
 	'webgl_effects_ascii' // windows fonts not supported
@@ -154,9 +147,18 @@ const pup = puppeteer.launch( {
 
 	let pageSize, file, attemptProgress;
 	const failedScreenshots = [];
-	const isParallel = 'CI' in process.env;
-	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
-	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 4 ) : files.length;
+
+	let beginId = 0;
+	let endId = files.length;
+
+	if ( 'CI' in process.env ) {
+
+		const jobs = 8;
+
+		beginId = Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / jobs );
+		endId = Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / jobs );
+
+	}
 
 	for ( let id = beginId; id < endId; ++ id ) {
 

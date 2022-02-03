@@ -14,11 +14,25 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - curve modifier
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 			import Stats from './jsm/libs/stats.module.js';
 			import { Flow } from './jsm/modifiers/CurveModifier.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 
 			const ACTION_SELECT = 1, ACTION_NONE = 0;
 			const curveHandles = [];
@@ -95,10 +109,10 @@
 
 				//
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-					const geometry = new THREE.TextGeometry( 'Hello three.js!', {
+					const geometry = new TextGeometry( 'Hello three.js!', {
 						font: font,
 						size: 0.2,
 						height: 0.05,
@@ -179,7 +193,7 @@
 
 					rayCaster.setFromCamera( mouse, camera );
 					action = ACTION_NONE;
-					const intersects = rayCaster.intersectObjects( curveHandles );
+					const intersects = rayCaster.intersectObjects( curveHandles, false );
 					if ( intersects.length ) {
 
 						const target = intersects[ 0 ].object;

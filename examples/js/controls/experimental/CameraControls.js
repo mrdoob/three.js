@@ -510,7 +510,9 @@
 
 		}
 
-		function handleMouseUp( ) { // no-op
+		function
+		/*event*/
+		handleMouseUp() { // no-op
 		}
 
 		function handleMouseWheel( event ) {
@@ -691,7 +693,9 @@
 
 		}
 
-		function handleTouchEnd( ) { // no-op
+		function
+		/*event*/
+		handleTouchEnd() { // no-op
 		} //
 		// event handlers - FSM: listen for events and reset state
 		//

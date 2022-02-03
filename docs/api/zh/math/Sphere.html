@@ -29,11 +29,11 @@
 		<p>A [page:Vector3]定义了球心的位置，默认值位于(0, 0, 0)。</p>
 
 		<h3>[property:Float radius]</h3>
-		<p>球的半径，默认值为0。</p>
+		<p>球的半径，默认值为-1。</p>
 
 		<h2>方法</h2>
 
-		<h3>[method:Sphere applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>
 			[page:Matrix4 matrix] - 将被应用的[Page:Matrix4]矩阵。<br /><br />
 
@@ -53,12 +53,12 @@
 
 		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - the [page:Vector3] to be checked<br /><br />
+		[page:Vector3 point] - [page:Vector3] 要被检查的点<br /><br />
 
 		检查球体中是否包含所传入的[page:Vector3 point]点，包括球的表面。
 		</p>
 
-		<h3>[method:Sphere copy]( [param:Sphere sphere] )</h3>
+		<h3>[method:this copy]( [param:Sphere sphere] )</h3>
 		<p>
 		复制所传入的球的[page:.center center]和[page:.radius radius]到这个球上。
 		</p>
@@ -66,24 +66,23 @@
 		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
 		<p>
 		返回球的边界到所传入的[page:Vector3 point]点的最近距离。
-		若这个点，则距离将为负值。
+		若这个点位于球内，则距离将为负值。
 		</p>
 
 		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] that should be included in the sphere.<br /><br />
+		[page:Vector3 point] - [page:Vector3] 将被包含在球内的点<br /><br />
 
-		Expands the boundaries of this sphere to include [page:Vector3 point].
+		扩展该球的边界以包含此点 [page:Vector3 point]。
 		</p>
 
 		<h3>[method:Boolean isEmpty]()</h3>
 		<p>
-		检查球是否为空（the radius set to a negative number）.
-		Spheres with a radius of 0 contain only their center point and are not considered to be empty.
+		检查球是否为空(球半径为负值)。半径为 0 的球体仅包含其中心点，并不会被视为空。
 		</p>
 
-		<h3>[method:Sphere makeEmpty]()</h3>
-		<p>Makes the sphere empty by setting [page:.center center] to (0, 0, 0) and [page:.radius radius] to -1.</p>
+		<h3>[method:this makeEmpty]()</h3>
+		<p>将该球修改为空，即中心点 [page:.center center] 为 (0,0,0)，半径 [page:.radius radius] 为 -1。</p>
 
 		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
 		<p>
@@ -118,16 +117,16 @@
 		检测两球之间是否有交集。
 		</p>
 
-		<h3>[method:Sphere set]( [param:Vector3 center], [param:Float radius] )</h3>
+		<h3>[method:this set]( [param:Vector3 center], [param:Float radius] )</h3>
 		<p>
 			[page:Vector3 center] - 球心位置。<br />
 			[page:Float radius] - 球的半径。<br /><br />
 
 		设置球的[page:.center center]和[page:.radius radius]属性。<br>
-		Please note that this method only copies the values from the given center.
+		请注意此，方法使用复制的方式来设置中心值。
 		</p>
 
-		<h3>[method:Sphere setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
+		<h3>[method:this setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
 		<p>
 		[page:Array points] - 一个包含有[page:Vector3]位置的[page:Array]。<br />
 		[page:Vector3 optionalCenter] - 可选， [page:Vector3] 球心位置。<br /><br />
@@ -136,16 +135,16 @@
 		否则，环绕[page:Array points]的包围盒的轴心将通过计算来得到。
 		</p>
 
-		<h3>[method:Sphere translate]( [param:Vector3 offset] )</h3>
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
 		<p>
 		使用所给定[page:Vector3] offset（偏移量）平移球心。
 		</p>
 
 		<h3>[method:this union]( [param:Sphere sphere] )</h3>
 		<p>
-		[page:Sphere sphere] - Bounding sphere that will be unioned with this sphere.<br /><br />
+		[page:Sphere sphere] - 将与该球体即将结合的边界球体。<br /><br />
 
-		Expands this sphere to enclose both the original sphere and the given sphere.
+		扩展此球体以包含原始球体和给定球体。
 		</p>
 
 		<h2>源代码</h2>

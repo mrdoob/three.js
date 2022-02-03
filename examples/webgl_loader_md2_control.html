@@ -18,14 +18,25 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader -
-			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader<br />
 			use arrows to control characters, mouse for camera
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -102,7 +113,7 @@
 
 				//  GROUND
 
-				const gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
+				const gt = new THREE.TextureLoader().load( 'textures/terrain/grasslight-big.jpg' );
 				const gg = new THREE.PlaneGeometry( 16000, 16000 );
 				const gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
@@ -151,21 +162,21 @@
 
 				const configOgro = {
 
-					baseUrl: "models/md2/ogro/",
+					baseUrl: 'models/md2/ogro/',
 
-					body: "ogro.md2",
-					skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
-							 "gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
-							 "sharokh.png" ],
-					weapons: [[ "weapon.md2", "weapon.jpg" ]],
+					body: 'ogro.md2',
+					skins: [ 'grok.jpg', 'ogrobase.png', 'arboshak.png', 'ctf_r.png', 'ctf_b.png', 'darkam.png', 'freedom.png',
+							 'gib.png', 'gordogh.png', 'igdosh.png', 'khorne.png', 'nabogro.png',
+							 'sharokh.png' ],
+					weapons: [[ 'weapon.md2', 'weapon.jpg' ]],
 					animations: {
-						move: "run",
-						idle: "stand",
-						jump: "jump",
-						attack: "attack",
-						crouchMove: "cwalk",
-						crouchIdle: "cstand",
-						crouchAttach: "crattack"
+						move: 'run',
+						idle: 'stand',
+						jump: 'jump',
+						attack: 'attack',
+						crouchMove: 'cwalk',
+						crouchIdle: 'cstand',
+						crouchAttach: 'crattack'
 					},
 
 					walkSpeed: 350,

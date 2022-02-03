@@ -25,9 +25,6 @@ import { Color } from '../math/Color.js';
  *
  *  alphaMap: new THREE.Texture( <Image> ),
  *
- *  morphTargets: <bool>,
- *  morphNormals: <bool>
- *
  *  flatShading: <bool>
  * }
  */
@@ -61,9 +58,6 @@ class MeshMatcapMaterial extends Material {
 
 		this.alphaMap = null;
 
-		this.morphTargets = false;
-		this.morphNormals = false;
-
 		this.flatShading = false;
 
 		this.setValues( parameters );
@@ -95,9 +89,6 @@ class MeshMatcapMaterial extends Material {
 		this.displacementBias = source.displacementBias;
 
 		this.alphaMap = source.alphaMap;
-
-		this.morphTargets = source.morphTargets;
-		this.morphNormals = source.morphNormals;
 
 		this.flatShading = source.flatShading;
 

@@ -4,7 +4,19 @@ import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
+import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
+import { DepthTexture } from '../../textures/DepthTexture.js';
+import { WebGLMultisampleRenderTarget } from '../WebGLMultisampleRenderTarget.js';
+import {
+	DepthFormat,
+	DepthStencilFormat,
+	RGBAFormat,
+	sRGBEncoding,
+	UnsignedByteType,
+	UnsignedShortType,
+	UnsignedInt248Type,
+} from '../../constants.js';
 
 class WebXRManager extends EventDispatcher {
 
@@ -13,19 +25,23 @@ class WebXRManager extends EventDispatcher {
 		super();
 
 		const scope = this;
-		const state = renderer.state;
 
 		let session = null;
 		let framebufferScaleFactor = 1.0;
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
+		const hasMultisampledRenderToTexture = renderer.extensions.has( 'WEBGL_multisampled_render_to_texture' );
 
 		let pose = null;
 		let glBinding = null;
-		let glFramebuffer = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
+		let isMultisample = false;
+		let xrFrame = null;
+		const attributes = gl.getContextAttributes();
+		let initialRenderTarget = null;
+		let newRenderTarget = null;
 
 		const controllers = [];
 		const inputSourcesMap = new Map();
@@ -130,8 +146,13 @@ class WebXRManager extends EventDispatcher {
 
 			// restore framebuffer/rendering state
 
-			state.bindXRFramebuffer( null );
-			renderer.setRenderTarget( renderer.getRenderTarget() );
+			renderer.setRenderTarget( initialRenderTarget );
+
+			glBaseLayer = null;
+			glProjLayer = null;
+			glBinding = null;
+			session = null;
+			newRenderTarget = null;
 
 			//
 
@@ -173,6 +194,24 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getBaseLayer = function () {
+
+			return glProjLayer !== null ? glProjLayer : glBaseLayer;
+
+		};
+
+		this.getBinding = function () {
+
+			return glBinding;
+
+		};
+
+		this.getFrame = function () {
+
+			return xrFrame;
+
+		};
+
 		this.getSession = function () {
 
 			return session;
@@ -185,6 +224,8 @@ class WebXRManager extends EventDispatcher {
 
 			if ( session !== null ) {
 
+				initialRenderTarget = renderer.getRenderTarget();
+
 				session.addEventListener( 'select', onSessionEvent );
 				session.addEventListener( 'selectstart', onSessionEvent );
 				session.addEventListener( 'selectend', onSessionEvent );
@@ -194,18 +235,16 @@ class WebXRManager extends EventDispatcher {
 				session.addEventListener( 'end', onSessionEnd );
 				session.addEventListener( 'inputsourceschange', onInputSourcesChange );
 
-				const attributes = gl.getContextAttributes();
-
 				if ( attributes.xrCompatible !== true ) {
 
 					await gl.makeXRCompatible();
 
 				}
 
-				if ( session.renderState.layers === undefined ) {
+				if ( ( session.renderState.layers === undefined ) || ( renderer.capabilities.isWebGL2 === false ) ) {
 
 					const layerInit = {
-						antialias: attributes.antialias,
+						antialias: ( session.renderState.layers === undefined ) ? attributes.antialias : true,
 						alpha: attributes.alpha,
 						depth: attributes.depth,
 						stencil: attributes.stencil,
@@ -216,50 +255,80 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { baseLayer: glBaseLayer } );
 
+					newRenderTarget = new WebGLRenderTarget(
+						glBaseLayer.framebufferWidth,
+						glBaseLayer.framebufferHeight,
+						{
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							encoding: renderer.outputEncoding
+						}
+					);
+
 				} else {
 
-					let depthFormat = 0;
+					isMultisample = attributes.antialias;
+					let depthFormat = null;
+					let depthType = null;
+					let glDepthFormat = null;
 
-					// for anti-aliased output, use classic webgllayer for now
-					if ( attributes.antialias ) {
+					if ( attributes.depth ) {
 
-						const layerInit = {
-							antialias: true,
-							alpha: attributes.alpha,
-							depth: attributes.depth,
-							stencil: attributes.stencil,
-							framebufferScaleFactor: framebufferScaleFactor
-						};
+						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
+						depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
+						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedShortType;
 
-						glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
+					}
 
-						session.updateRenderState( { layers: [ glBaseLayer ] } );
+					const projectionlayerInit = {
+						colorFormat: ( renderer.outputEncoding === sRGBEncoding ) ? gl.SRGB8_ALPHA8 : gl.RGBA8,
+						depthFormat: glDepthFormat,
+						scaleFactor: framebufferScaleFactor
+					};
+
+					glBinding = new XRWebGLBinding( session, gl );
+
+					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+					session.updateRenderState( { layers: [ glProjLayer ] } );
+
+					if ( isMultisample ) {
+
+						newRenderTarget = new WebGLMultisampleRenderTarget(
+							glProjLayer.textureWidth,
+							glProjLayer.textureHeight,
+							{
+								format: RGBAFormat,
+								type: UnsignedByteType,
+								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+								stencilBuffer: attributes.stencil,
+								ignoreDepth: glProjLayer.ignoreDepthValues,
+								useRenderToTexture: hasMultisampledRenderToTexture,
+								encoding: renderer.outputEncoding
+							} );
 
 					} else {
 
-						if ( attributes.depth ) {
-
-							depthFormat = attributes.stencil ? gl.DEPTH_STENCIL : gl.DEPTH_COMPONENT;
-
-						}
-
-						const projectionlayerInit = {
-							colorFormat: attributes.alpha ? gl.RGBA : gl.RGB,
-							depthFormat: depthFormat,
-							scaleFactor: framebufferScaleFactor
-						};
-
-						glBinding = new XRWebGLBinding( session, gl );
-
-						glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
-
-						glFramebuffer = gl.createFramebuffer();
-
-						session.updateRenderState( { layers: [ glProjLayer ] } );
+						newRenderTarget = new WebGLRenderTarget(
+							glProjLayer.textureWidth,
+							glProjLayer.textureHeight,
+							{
+								format: RGBAFormat,
+								type: UnsignedByteType,
+								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+								stencilBuffer: attributes.stencil,
+								ignoreDepth: glProjLayer.ignoreDepthValues,
+								encoding: renderer.outputEncoding
+							} );
 
 					}
 
 				}
+
+				newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
+
+				// Set foveation to maximum.
+				this.setFoveation( 1.0 );
 
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
@@ -467,6 +536,43 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getFoveation = function () {
+
+			if ( glProjLayer !== null ) {
+
+				return glProjLayer.fixedFoveation;
+
+			}
+
+			if ( glBaseLayer !== null ) {
+
+				return glBaseLayer.fixedFoveation;
+
+			}
+
+			return undefined;
+
+		};
+
+		this.setFoveation = function ( foveation ) {
+
+			// 0 = no foveation = full resolution
+			// 1 = maximum foveation = the edges render at lower resolution
+
+			if ( glProjLayer !== null ) {
+
+				glProjLayer.fixedFoveation = foveation;
+
+			}
+
+			if ( glBaseLayer !== null && glBaseLayer.fixedFoveation !== undefined ) {
+
+				glBaseLayer.fixedFoveation = foveation;
+
+			}
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -474,6 +580,7 @@ class WebXRManager extends EventDispatcher {
 		function onAnimationFrame( time, frame ) {
 
 			pose = frame.getViewerPose( referenceSpace );
+			xrFrame = frame;
 
 			if ( pose !== null ) {
 
@@ -481,7 +588,8 @@ class WebXRManager extends EventDispatcher {
 
 				if ( glBaseLayer !== null ) {
 
-					state.bindXRFramebuffer( glBaseLayer.framebuffer );
+					renderer.setRenderTargetFramebuffer( newRenderTarget, glBaseLayer.framebuffer );
+					renderer.setRenderTarget( newRenderTarget );
 
 				}
 
@@ -492,9 +600,7 @@ class WebXRManager extends EventDispatcher {
 				if ( views.length !== cameraVR.cameras.length ) {
 
 					cameraVR.cameras.length = 0;
-
 					cameraVRNeedsUpdate = true;
-
 
 				}
 
@@ -511,27 +617,26 @@ class WebXRManager extends EventDispatcher {
 					} else {
 
 						const glSubImage = glBinding.getViewSubImage( glProjLayer, view );
+						viewport = glSubImage.viewport;
 
-						state.bindXRFramebuffer( glFramebuffer );
+						// For side-by-side projection, we only produce a single texture for both eyes.
+						if ( i === 0 ) {
 
-						if ( glSubImage.depthStencilTexture !== undefined ) {
+							renderer.setRenderTargetTextures(
+								newRenderTarget,
+								glSubImage.colorTexture,
+								glProjLayer.ignoreDepthValues ? undefined : glSubImage.depthStencilTexture );
 
-							gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glSubImage.depthStencilTexture, 0 );
+							renderer.setRenderTarget( newRenderTarget );
 
 						}
-
-						gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glSubImage.colorTexture, 0 );
-
-						viewport = glSubImage.viewport;
 
 					}
 
 					const camera = cameras[ i ];
 
 					camera.matrix.fromArray( view.transform.matrix );
-
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
-
 					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
 					if ( i === 0 ) {
@@ -564,6 +669,8 @@ class WebXRManager extends EventDispatcher {
 			}
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
+
+			xrFrame = null;
 
 		}
 

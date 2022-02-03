@@ -20,24 +20,27 @@
 			任何3D物体[page:Object3D]都有三个关联的矩阵：
 			<ul>
 				<li>
-					[page:Object3D.matrix]: 存储物体的本地变换。 这是对象相对于其父对象的变换。
+					[page:Object3D.matrix]: 存储物体的本地变换矩阵。 这是对象相对于其父对象的变换矩阵。
 				</li>
 				<li>
-					[page:Object3D.matrixWorld]: 对象的全局或世界变换。如果对象没有父对象，那么这与存储在矩阵[page:Object3D.matrix matrix]中的本地变换相同。
+					[page:Object3D.matrixWorld]: 对象的全局或世界变换矩阵。如果对象没有父对象，那么这与存储在矩阵[page:Object3D.matrix matrix]中的本地变换矩阵相同。
 				</li>
 				<li>
-					[page:Object3D.modelViewMatrix]: 表示对象相坐标相对于摄像机空间坐标转换，
+					[page:Object3D.modelViewMatrix]: 表示对象相对于摄像机坐标系的变换矩阵，
 					一个对象的 modelViewMatrix 是物体世界变换矩阵乘以摄像机相对于世界空间变换矩阵的逆矩阵。
 				</li>
 			</ul>
 
-			摄像机[page:Camera Cameras] 有两个额外的四维矩阵:
+			摄像机[page:Camera Cameras] 有三个额外的四维矩阵:
 			<ul>
 				<li>
 					[page:Camera.matrixWorldInverse]: 视矩阵 - 摄像机世界坐标变换的逆矩阵。
 				</li>
 				<li>
-					[page:Camera.projectionMatrix]: 表示将场景中的信息投影到裁剪空间。
+					[page:Camera.projectionMatrix]: 投影变换矩阵，表示将场景中的信息投影到裁剪空间。
+				</li>
+				<li>
+					[page:Camera.projectionMatrixInverse]: 投影变换矩阵的逆矩阵。
 				</li>
 			</ul>
 			注意：物体的正规矩阵 [page:Object3D.normalMatrix] 并不是一个4维矩阵，而是一个三维矩阵[page:Matrix3]。
@@ -70,21 +73,21 @@ m.elements = [ 11, 21, 31, 41,
 		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
 		</p>
 
-		<h2>Extracting position, rotation and scale</h2>
+		<h2>提取位置(平移)、旋转和缩放</h2>
 		<p>
-			There are several options available for extracting position, rotation and scale from a Matrix4.
+			有多种选项可用于从 Matrix4 中提取位置、旋转和缩放。
 			<ul>
 				<li>
-					[page:Vector3.setFromMatrixPosition]: can be used to extract the translation component.
+					[page:Vector3.setFromMatrixPosition]：可用于提取位置相关的分量。
 				</li>
 				<li>
-					[page:Vector3.setFromMatrixScale]: can be used to extract the scale component.
+					[page:Vector3.setFromMatrixScale]：可用于提取缩放相关的分量。
 				</li>
 				<li>
-					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] or [page:.extractRotation extractRotation] can be used to extract the rotation component.
+					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] 或 [page:.extractRotation extractRotation]：可用于从纯(未缩放)矩阵中提取旋转相关分量。
 				</li>
 				<li>
-					[page:.decompose decompose] can be used to extract position, rotation and scale all at once.
+					[page:.decompose decompose]：可用于一次性提取位置、旋转和缩放
 				</li>
 			</ul>
 		</p>
@@ -123,13 +126,13 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:this copyPosition]( [param:Matrix4 m] )</h3>
 		<p>
-		将给定矩阵[param:Matrix4 m] 的平移分量拷贝到当前矩阵中。
+		将给定矩阵 [param:Matrix4 m] 的平移分量拷贝到当前矩阵中。
 		</p>
 
-		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
+		<h3>[method:this decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
 			将矩阵分解到给定的平移[page:Vector3 position] ,旋转 [page:Quaternion quaternion]，缩放[page:Vector3 scale]分量中。<br/><br/>
-			Note: Not all matrices are decomposable in this way. For example, if an object has a non-uniformly scaled parent, then the object's world matrix may not be decomposable, and this method may not be appropriate.
+			注意：并非所有矩阵都可以通过这种方式分解。 例如，如果一个对象有一个非均匀缩放的父对象，那么该对象的世界矩阵可能是不可分解的，这种方法可能不合适。
 		</p>
 
 		<h3>[method:Float determinant]()</h3>
@@ -175,9 +178,7 @@ zAxis = (c, g, k)
 
 		<h3>[method:this invert]()</h3>
 		<p>
-		Inverts this matrix, using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
-
-		You can not invert with a determinant of zero. If you attempt this, the method produces a zero matrix instead.
+		将当前矩阵翻转为它的逆矩阵，使用 [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method] 解析方式。你不能对行或列为 0 的矩阵进行翻转，如果你尝试这样做，该方法将生成一个零矩阵。
 		</p>
 
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
@@ -186,11 +187,9 @@ zAxis = (c, g, k)
 		<h3>[method:this identity]()</h3>
 		<p>将当前矩阵重置为单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix]。</p>
 
-		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 center], [param:Vector3 up], )</h3>
+		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 target], [param:Vector3 up], )</h3>
 		<p>
-			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 center]，由向量 [param:Vector3 up] 定向。
-<!--			Constructs a rotation matrix, looking from [page:Vector3 eye] towards [page:Vector3 center]
-			oriented by the [page:Vector3 up] vector.-->
+			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 target]，由向量 [page:Vector3 up] 定向。
 		</p>
 
 		<h3>[method:this makeRotationAxis]( [param:Vector3 axis], [param:Float theta] )</h3>
@@ -353,7 +352,7 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this setFromMatrix3]( [param:Matrix3 m] )</h3>
-		<p>Set the upper 3x3 elements of this matrix to the values of the Matrix3 [page:Matrix3 m].</p>
+		<p>根据参数 [page:Matrix3 m] 的值，设置当前矩阵左上 3x3 的矩阵值。</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>

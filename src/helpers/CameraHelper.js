@@ -13,7 +13,7 @@ const _camera = /*@__PURE__*/ new Camera();
  *	- shows frustum, line of sight and up of the camera
  *	- suitable for fast updates
  * 	- based on frustum visualization in lightgl.js shadowmap example
- *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
+ *		https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html
  */
 
 class CameraHelper extends LineSegments {

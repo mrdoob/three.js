@@ -195,7 +195,7 @@
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom *= factor;
+						scope.object.zoom /= factor;
 						scope.object.updateProjectionMatrix();
 
 					} else {
@@ -509,9 +509,6 @@
 						case scope.mouseButtons.RIGHT:
 							_state = STATE.PAN;
 							break;
-
-						default:
-							_state = STATE.NONE;
 
 					}
 

@@ -94,7 +94,7 @@
 
 			alpha = ( alpha - this.minV ) / ( this.maxV - this.minV );
 			let colorPosition = Math.round( alpha * this.n );
-			colorPosition == this.n ? colorPosition -= 1 : colorPosition;
+			if ( colorPosition === this.n ) colorPosition -= 1;
 			return this.lut[ colorPosition ];
 
 		}

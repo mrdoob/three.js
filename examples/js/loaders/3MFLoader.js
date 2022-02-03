@@ -75,12 +75,10 @@
 				const modelPartNames = [];
 				const printTicketPartNames = [];
 				const texturesPartNames = [];
-				const otherPartNames = [];
 				let modelRels;
 				const modelParts = {};
 				const printTicketParts = {};
 				const texturesParts = {};
-				const otherParts = {};
 
 				try {
 
@@ -118,10 +116,6 @@
 					} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 						texturesPartNames.push( file );
-
-					} else if ( file.match( /^3D\/Other\/.*/ ) ) {
-
-						otherPartNames.push( file );
 
 					}
 
@@ -195,8 +189,7 @@
 					modelRels: modelRels,
 					model: modelParts,
 					printTicket: printTicketParts,
-					texture: texturesParts,
-					other: otherParts
+					texture: texturesParts
 				};
 
 			}
@@ -909,7 +902,7 @@
 
 			}
 
-			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) {
+			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) {
 
 				// geometry
 				const geometry = new THREE.BufferGeometry();
@@ -968,7 +961,7 @@
 				geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xaaaaff,
+					color: 0xffffff,
 					flatShading: true
 				} );
 				const mesh = new THREE.Mesh( geometry, material );
@@ -1008,7 +1001,7 @@
 
 						case 'vertexColors':
 							const colorgroup = modelData.resources.colorgroup[ resourceId ];
-							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) );
+							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) );
 							break;
 
 						case 'default':
@@ -1299,7 +1292,7 @@
 				for ( let i = 0; i < buildData.length; i ++ ) {
 
 					const buildItem = buildData[ i ];
-					const object3D = objects[ buildItem[ 'objectId' ] ]; // apply transform
+					const object3D = objects[ buildItem[ 'objectId' ] ].clone(); // apply transform
 
 					const transform = buildItem[ 'transform' ];
 

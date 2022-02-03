@@ -21,9 +21,8 @@
 		</p>
 
 		<p>
-			This loader parses the KTX 2.0 container and then relies on
-			[page:BasisTextureLoader] to complete the transcoding process. 
-			The required WASM transcoder and JS wrapper are available from the 
+			This loader parses the KTX 2.0 container and transcodes to a supported GPU compressed
+			texture format. The required WASM transcoder and JS wrapper are available from the
 			[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/basis examples/js/libs/basis]
 			directory.
 		</p>
@@ -35,17 +34,17 @@
 		ktx2Loader.setTranscoderPath( 'examples/js/libs/basis/' );
 		ktx2Loader.detectSupport( renderer );
 		ktx2Loader.load( 'diffuse.ktx2', function ( texture ) {
-		
+
 			var material = new THREE.MeshStandardMaterial( { map: texture } );
-		
+
 		}, function () {
-		
+
 			console.log( 'onProgress' );
-		
+
 		}, function ( e ) {
-		
+
 			console.error( e );
-		
+
 		} );
 		</code>
 
@@ -81,11 +80,11 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:CompressedTexture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string containing the path/URL of the <em>.basis</em> file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>

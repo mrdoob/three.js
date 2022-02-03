@@ -28,6 +28,8 @@
 			const ltc_float_2 = new Float32Array( LTC_MAT_2 );
 			THREE.UniformsLib.LTC_FLOAT_1 = new THREE.DataTexture( ltc_float_1, 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
 			THREE.UniformsLib.LTC_FLOAT_2 = new THREE.DataTexture( ltc_float_2, 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
+			THREE.UniformsLib.LTC_FLOAT_1.needsUpdate = true;
+			THREE.UniformsLib.LTC_FLOAT_2.needsUpdate = true;
 			const ltc_half_1 = new Uint16Array( LTC_MAT_1.length );
 			LTC_MAT_1.forEach( function ( x, index ) {
 
@@ -42,6 +44,8 @@
 			} );
 			THREE.UniformsLib.LTC_HALF_1 = new THREE.DataTexture( ltc_half_1, 64, 64, THREE.RGBAFormat, THREE.HalfFloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
 			THREE.UniformsLib.LTC_HALF_2 = new THREE.DataTexture( ltc_half_2, 64, 64, THREE.RGBAFormat, THREE.HalfFloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
+			THREE.UniformsLib.LTC_HALF_1.needsUpdate = true;
+			THREE.UniformsLib.LTC_HALF_2.needsUpdate = true;
 
 		}
 

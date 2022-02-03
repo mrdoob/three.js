@@ -29,8 +29,6 @@ class MeshDepthMaterial extends Material {
 
 		this.depthPacking = BasicDepthPacking;
 
-		this.morphTargets = false;
-
 		this.map = null;
 
 		this.alphaMap = null;
@@ -53,8 +51,6 @@ class MeshDepthMaterial extends Material {
 		super.copy( source );
 
 		this.depthPacking = source.depthPacking;
-
-		this.morphTargets = source.morphTargets;
 
 		this.map = source.map;
 

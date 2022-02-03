@@ -2,19 +2,21 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Color,
-	ImmediateRenderObject,
-	NoColors
-} from '../../../build/three.module.js';
+	DynamicDrawUsage,
+	Mesh
+} from 'three';
 
 /**
  * Port of http://webglsamples.org/blob/blob.html
  */
 
-class MarchingCubes extends ImmediateRenderObject {
+class MarchingCubes extends Mesh {
 
-	constructor( resolution, material, enableUvs, enableColors ) {
+	constructor( resolution, material, enableUvs = false, enableColors = false, maxPolyCount = 10000 ) {
 
-		super( material );
+		const geometry = new BufferGeometry();
+
+		super( geometry, material );
 
 		const scope = this;
 
@@ -24,8 +26,8 @@ class MarchingCubes extends ImmediateRenderObject {
 		const nlist = new Float32Array( 12 * 3 );
 		const clist = new Float32Array( 12 * 3 );
 
-		this.enableUvs = enableUvs !== undefined ? enableUvs : false;
-		this.enableColors = enableColors !== undefined ? enableColors : false;
+		this.enableUvs = enableUvs;
+		this.enableColors = enableColors;
 
 		// functions have to be object properties
 		// prototype functions kill performance
@@ -56,28 +58,37 @@ class MarchingCubes extends ImmediateRenderObject {
 			this.normal_cache = new Float32Array( this.size3 * 3 );
 			this.palette = new Float32Array( this.size3 * 3 );
 
-			// immediate render mode simulator
+			//
 
-			this.maxCount = 4096; // TODO: find the fastest size for this buffer
 			this.count = 0;
 
-			this.hasPositions = false;
-			this.hasNormals = false;
-			this.hasColors = false;
-			this.hasUvs = false;
+			const maxVertexCount = maxPolyCount * 3;
 
-			this.positionArray = new Float32Array( this.maxCount * 3 );
-			this.normalArray = new Float32Array( this.maxCount * 3 );
+			this.positionArray = new Float32Array( maxVertexCount * 3 );
+			const positionAttribute = new BufferAttribute( this.positionArray, 3 );
+			positionAttribute.setUsage( DynamicDrawUsage );
+			geometry.setAttribute( 'position', positionAttribute );
+
+			this.normalArray = new Float32Array( maxVertexCount * 3 );
+			const normalAttribute = new BufferAttribute( this.normalArray, 3 );
+			normalAttribute.setUsage( DynamicDrawUsage );
+			geometry.setAttribute( 'normal', normalAttribute );
 
 			if ( this.enableUvs ) {
 
-				this.uvArray = new Float32Array( this.maxCount * 2 );
+				this.uvArray = new Float32Array( maxVertexCount * 2 );
+				const uvAttribute = new BufferAttribute( this.uvArray, 2 );
+				uvAttribute.setUsage( DynamicDrawUsage );
+				geometry.setAttribute( 'uv', uvAttribute );
 
 			}
 
 			if ( this.enableColors ) {
 
-				this.colorArray = new Float32Array( this.maxCount * 3 );
+				this.colorArray = new Float32Array( maxVertexCount * 3 );
+				const colorAttribute = new BufferAttribute( this.colorArray, 3 );
+				colorAttribute.setUsage( DynamicDrawUsage );
+				geometry.setAttribute( 'color', colorAttribute );
 
 			}
 
@@ -173,7 +184,7 @@ class MarchingCubes extends ImmediateRenderObject {
 		// Returns total number of triangles. Fills triangles.
 		// (this is where most of time is spent - it's inner work of O(n3) loop )
 
-		function polygonize( fx, fy, fz, q, isol, renderCallback ) {
+		function polygonize( fx, fy, fz, q, isol ) {
 
 			// cache indices
 			const q1 = q + 1,
@@ -369,8 +380,7 @@ class MarchingCubes extends ImmediateRenderObject {
 					clist,
 					3 * triTable[ o1 ],
 					3 * triTable[ o2 ],
-					3 * triTable[ o3 ],
-					renderCallback
+					3 * triTable[ o3 ]
 				);
 
 				i += 3;
@@ -382,11 +392,7 @@ class MarchingCubes extends ImmediateRenderObject {
 
 		}
 
-		/////////////////////////////////////
-		// Immediate render mode simulator
-		/////////////////////////////////////
-
-		function posnormtriv( pos, norm, colors, o1, o2, o3, renderCallback ) {
+		function posnormtriv( pos, norm, colors, o1, o2, o3 ) {
 
 			const c = scope.count * 3;
 
@@ -477,68 +483,7 @@ class MarchingCubes extends ImmediateRenderObject {
 
 			scope.count += 3;
 
-			if ( scope.count >= scope.maxCount - 3 ) {
-
-				scope.hasPositions = true;
-				scope.hasNormals = true;
-
-				if ( scope.enableUvs ) {
-
-					scope.hasUvs = true;
-
-				}
-
-				if ( scope.enableColors ) {
-
-					scope.hasColors = true;
-
-				}
-
-				renderCallback( scope );
-
-			}
-
 		}
-
-		this.begin = function () {
-
-			this.count = 0;
-
-			this.hasPositions = false;
-			this.hasNormals = false;
-			this.hasUvs = false;
-			this.hasColors = false;
-
-		};
-
-		this.end = function ( renderCallback ) {
-
-			if ( this.count === 0 ) return;
-
-			for ( let i = this.count * 3; i < this.positionArray.length; i ++ ) {
-
-				this.positionArray[ i ] = 0.0;
-
-			}
-
-			this.hasPositions = true;
-			this.hasNormals = true;
-
-			if ( this.enableUvs && this.material.map ) {
-
-				this.hasUvs = true;
-
-			}
-
-			if ( this.enableColors && this.material.vertexColors !== NoColors ) {
-
-				this.hasColors = true;
-
-			}
-
-			renderCallback( this );
-
-		};
 
 		/////////////////////////////////////
 		// Metaballs
@@ -867,9 +812,9 @@ class MarchingCubes extends ImmediateRenderObject {
 
 		};
 
-		this.render = function ( renderCallback ) {
+		this.onBeforeRender = function () {
 
-			this.begin();
+			this.count = 0;
 
 			// Triangulate. Yeah, this is slow.
 
@@ -890,7 +835,7 @@ class MarchingCubes extends ImmediateRenderObject {
 						const fx = ( x - this.halfsize ) / this.halfsize; //+ 1
 						const q = y_offset + x;
 
-						polygonize( fx, fy, fz, q, this.isolation, renderCallback );
+						 polygonize( fx, fy, fz, q, this.isolation );
 
 					}
 
@@ -898,76 +843,25 @@ class MarchingCubes extends ImmediateRenderObject {
 
 			}
 
-			this.end( renderCallback );
+			// reset unneeded data
 
-		};
+			for ( let i = this.count * 3; i < this.positionArray.length; i ++ ) {
 
-		this.generateGeometry = function () {
+				this.positionArray[ i ] = 0.0;
 
-			console.warn(
-				'THREE.MarchingCubes: generateGeometry() now returns BufferGeometry'
-			);
-			return this.generateBufferGeometry();
+			}
 
-		};
+			// update geometry data
 
-		function concatenate( a, b, length ) {
+			geometry.getAttribute( 'position' ).needsUpdate = true;
+			geometry.getAttribute( 'normal' ).needsUpdate = true;
 
-			const result = new Float32Array( a.length + length );
-			result.set( a, 0 );
-			result.set( b.slice( 0, length ), a.length );
-			return result;
+			if ( this.enableUvs ) geometry.getAttribute( 'uv' ).needsUpdate = true;
+			if ( this.enableColors ) geometry.getAttribute( 'color' ).needsUpdate = true;
 
-		}
+			// safety check
 
-		this.generateBufferGeometry = function () {
-
-			const geo = new BufferGeometry();
-			let posArray = new Float32Array();
-			let normArray = new Float32Array();
-			let colorArray = new Float32Array();
-			let uvArray = new Float32Array();
-			const scope = this;
-
-			const geo_callback = function ( object ) {
-
-				if ( scope.hasPositions )
-					posArray = concatenate(
-						posArray,
-						object.positionArray,
-						object.count * 3
-					);
-				if ( scope.hasNormals )
-					normArray = concatenate(
-						normArray,
-						object.normalArray,
-						object.count * 3
-					);
-				if ( scope.hasColors )
-					colorArray = concatenate(
-						colorArray,
-						object.colorArray,
-						object.count * 3
-					);
-				if ( scope.hasUvs )
-					uvArray = concatenate( uvArray, object.uvArray, object.count * 2 );
-
-				object.count = 0;
-
-			};
-
-			this.render( geo_callback );
-
-			if ( this.hasPositions )
-				geo.setAttribute( 'position', new BufferAttribute( posArray, 3 ) );
-			if ( this.hasNormals )
-				geo.setAttribute( 'normal', new BufferAttribute( normArray, 3 ) );
-			if ( this.hasColors )
-				geo.setAttribute( 'color', new BufferAttribute( colorArray, 3 ) );
-			if ( this.hasUvs )
-				geo.setAttribute( 'uv', new BufferAttribute( uvArray, 2 ) );
-
-			return geo;
+			if ( this.count / 3 > maxPolyCount ) console.warn( 'THREE.MarchingCubes: Geometry buffers too small for rendering. Please create an instance with a higher poly count.' );
 
 		};
 
@@ -984,7 +878,7 @@ MarchingCubes.prototype.isMarchingCubes = true;
 /////////////////////////////////////
 
 // These tables are straight from Paul Bourke's page:
-// http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/
+// http://paulbourke.net/geometry/polygonise/
 // who in turn got them from Cory Gene Bloyd.
 
 const edgeTable = new Int32Array( [

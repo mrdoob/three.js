@@ -42,10 +42,10 @@
 		<h3>[method:VertexNode last]()</h3>
 		<p>Returns the tail reference.</p>
 
-		<h3>[method:VertexList clear]()</h3>
+		<h3>[method:this clear]()</h3>
 		<p>Clears the linked list.</p>
 
-		<h3>[method:VertexList insertBefore]( [param:Vertex target], [param:Vertex vertex] )</h3>
+		<h3>[method:this insertBefore]( [param:Vertex target], [param:Vertex vertex] )</h3>
 		<p>
 			[page:Vertex target] - The target vertex. It's assumed that this vertex belongs to the linked list.<br />
 			[page:Vertex vertex] - The vertex to insert.<br /><br />
@@ -53,7 +53,7 @@
 			Inserts a vertex <strong>before</strong> a target vertex.
 		</p>
 
-		<h3>[method:VertexList insertAfter]( [param:Vertex target], [param:Vertex vertex] )</h3>
+		<h3>[method:this insertAfter]( [param:Vertex target], [param:Vertex vertex] )</h3>
 		<p>
 			[page:Vertex target] - The target vertex. It's assumed that this vertex belongs to the linked list.<br />
 			[page:Vertex vertex] - The vertex to insert.<br /><br />
@@ -61,28 +61,28 @@
 			Inserts a vertex <strong>after</strong> a target vertex.
 		</p>
 
-		<h3>[method:VertexList append]( [param:Vertex vertex] )</h3>
+		<h3>[method:this append]( [param:Vertex vertex] )</h3>
 		<p>
 			[page:Vertex vertex] - The vertex to append.<br /><br />
 
 			Appends a vertex to the end of the linked list.
 		</p>
 
-		<h3>[method:VertexList appendChain]( [param:Vertex vertex] )</h3>
+		<h3>[method:this appendChain]( [param:Vertex vertex] )</h3>
 		<p>
 			[page:Vertex vertex] - The head vertex of a chain of vertices.<br /><br />
 
 			Appends a chain of vertices where the given vertex is the head.
 		</p>
 
-		<h3>[method:VertexList remove]( [param:Vertex vertex] )</h3>
+		<h3>[method:this remove]( [param:Vertex vertex] )</h3>
 		<p>
 			[page:Vertex vertex] - The vertex to remove.<br /><br />
 
 			Removes a vertex from the linked list.
 		</p>
 
-		<h3>[method:VertexList removeSubList]( [param:Vertex a], [param:Vertex b] )</h3>
+		<h3>[method:this removeSubList]( [param:Vertex a], [param:Vertex b] )</h3>
 		<p>
 			[page:Vertex a] - The head of the sublist.<br />
 			[page:Vertex b] - The tail of the sublist.<br /><br />

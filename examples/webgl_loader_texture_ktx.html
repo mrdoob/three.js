@@ -13,8 +13,20 @@
 	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+	{
+		"imports": {
+			"three": "../build/three.module.js"
+		}
+	}
+</script>
+
 <script type="module">
-	import * as THREE from '../build/three.module.js';
+	import * as THREE from 'three';
 
 	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
 

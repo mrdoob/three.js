@@ -13,26 +13,34 @@
 			const textures = {};
 			scene.traverseVisible( object => {
 
-				if ( object.isMesh && object.material.isMeshStandardMaterial ) {
+				if ( object.isMesh ) {
 
-					const geometry = object.geometry;
-					const material = object.material;
-					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+					if ( object.material.isMeshStandardMaterial ) {
 
-					if ( ! ( geometryFileName in files ) ) {
+						const geometry = object.geometry;
+						const material = object.material;
+						const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 
-						const meshObject = buildMeshObject( geometry );
-						files[ geometryFileName ] = buildUSDFileAsString( meshObject );
+						if ( ! ( geometryFileName in files ) ) {
+
+							const meshObject = buildMeshObject( geometry );
+							files[ geometryFileName ] = buildUSDFileAsString( meshObject );
+
+						}
+
+						if ( ! ( material.uuid in materials ) ) {
+
+							materials[ material.uuid ] = material;
+
+						}
+
+						output += buildXform( object, geometry, material );
+
+					} else {
+
+						console.warn( 'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)', object );
 
 					}
-
-					if ( ! ( material.uuid in materials ) ) {
-
-						materials[ material.uuid ] = material;
-
-					}
-
-					output += buildXform( object, geometry, material );
 
 				}
 
@@ -228,25 +236,33 @@ def "Geometry"
 
 	function buildMeshVertexCount( geometry ) {
 
-		const count = geometry.index !== null ? geometry.index.array.length : geometry.attributes.position.count;
+		const count = geometry.index !== null ? geometry.index.count : geometry.attributes.position.count;
 		return Array( count / 3 ).fill( 3 ).join( ', ' );
 
 	}
 
 	function buildMeshVertexIndices( geometry ) {
 
-		if ( geometry.index !== null ) {
-
-			return geometry.index.array.join( ', ' );
-
-		}
-
+		const index = geometry.index;
 		const array = [];
-		const length = geometry.attributes.position.count;
 
-		for ( let i = 0; i < length; i ++ ) {
+		if ( index !== null ) {
 
-			array.push( i );
+			for ( let i = 0; i < index.count; i ++ ) {
+
+				array.push( index.getX( i ) );
+
+			}
+
+		} else {
+
+			const length = geometry.attributes.position.count;
+
+			for ( let i = 0; i < length; i ++ ) {
+
+				array.push( i );
+
+			}
 
 		}
 
@@ -264,11 +280,13 @@ def "Geometry"
 		}
 
 		const array = [];
-		const data = attribute.array;
 
-		for ( let i = 0; i < data.length; i += 3 ) {
+		for ( let i = 0; i < attribute.count; i ++ ) {
 
-			array.push( `(${data[ i + 0 ].toPrecision( PRECISION )}, ${data[ i + 1 ].toPrecision( PRECISION )}, ${data[ i + 2 ].toPrecision( PRECISION )})` );
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			const z = attribute.getZ( i );
+			array.push( `(${x.toPrecision( PRECISION )}, ${y.toPrecision( PRECISION )}, ${z.toPrecision( PRECISION )})` );
 
 		}
 
@@ -286,11 +304,12 @@ def "Geometry"
 		}
 
 		const array = [];
-		const data = attribute.array;
 
-		for ( let i = 0; i < data.length; i += 2 ) {
+		for ( let i = 0; i < attribute.count; i ++ ) {
 
-			array.push( `(${data[ i + 0 ].toPrecision( PRECISION )}, ${1 - data[ i + 1 ].toPrecision( PRECISION )})` );
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			array.push( `(${x.toPrecision( PRECISION )}, ${1 - y.toPrecision( PRECISION )})` );
 
 		}
 
@@ -396,7 +415,7 @@ ${array.join( '' )}
 
 		}
 
-		if ( material.roughnessMap !== null ) {
+		if ( material.roughnessMap !== null && material.roughness === 1 ) {
 
 			inputs.push( `${pad}float inputs:roughness.connect = </Materials/Material_${material.id}/Texture_${material.roughnessMap.id}_roughness.outputs:g>` );
 			samplers.push( buildTexture( material.roughnessMap, 'roughness' ) );
@@ -407,7 +426,7 @@ ${array.join( '' )}
 
 		}
 
-		if ( material.metalnessMap !== null ) {
+		if ( material.metalnessMap !== null && material.metalness === 1 ) {
 
 			inputs.push( `${pad}float inputs:metallic.connect = </Materials/Material_${material.id}/Texture_${material.metalnessMap.id}_metallic.outputs:b>` );
 			samplers.push( buildTexture( material.metalnessMap, 'metallic' ) );
@@ -418,7 +437,17 @@ ${array.join( '' )}
 
 		}
 
-		inputs.push( `${pad}float inputs:opacity = ${material.opacity}` );
+		if ( material.alphaMap !== null ) {
+
+			inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.alphaMap.id}_opacity.outputs:r>` );
+			inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
+			samplers.push( buildTexture( material.alphaMap, 'opacity' ) );
+
+		} else {
+
+			inputs.push( `${pad}float inputs:opacity = ${material.opacity}` );
+
+		}
 
 		if ( material.isMeshPhysicalMaterial ) {
 

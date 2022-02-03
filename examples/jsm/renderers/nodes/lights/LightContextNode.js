@@ -1,5 +1,8 @@
 import ContextNode from '../core/ContextNode.js';
-import { RE_Direct_BlinnPhong, RE_IndirectDiffuse_BlinnPhong } from '../functions/BSDFs.js';
+import VarNode from '../core/VarNode.js';
+import Vector3Node from '../inputs/Vector3Node.js';
+import OperatorNode from '../math/OperatorNode.js';
+import { PhysicalLightingModel } from '../functions/BSDFs.js';
 
 class LightContextNode extends ContextNode {
 
@@ -9,49 +12,45 @@ class LightContextNode extends ContextNode {
 
 	}
 
-	getType( /*builder*/ ) {
+	getNodeType( /*builder*/ ) {
 
 		return 'vec3';
 
 	}
 
-	generate( builder, output ) {
-
-		const type = this.getType( builder );
+	generate( builder ) {
 
 		const material = builder.material;
 
-		let RE_Direct = null;
-		let RE_IndirectDiffuse = null;
+		let lightingModel = null;
 
-		if ( material.isMeshPhongMaterial === true ) {
+		if ( material.isMeshStandardMaterial === true ) {
 
-			RE_Direct = RE_Direct_BlinnPhong;
-			RE_IndirectDiffuse = RE_IndirectDiffuse_BlinnPhong;
+			lightingModel = PhysicalLightingModel;
 
 		}
 
-		if ( RE_Direct !== null ) {
+		const directDiffuse = new VarNode( new Vector3Node(), 'DirectDiffuse', 'vec3' );
+		const directSpecular = new VarNode( new Vector3Node(), 'DirectSpecular', 'vec3' );
 
-			this.setParameter( 'RE_Direct', RE_Direct );
-			this.setParameter( 'RE_IndirectDiffuse', RE_IndirectDiffuse );
+		this.context.directDiffuse = directDiffuse;
+		this.context.directSpecular = directSpecular;
+
+		if ( lightingModel !== null ) {
+
+			this.context.lightingModel = lightingModel;
 
 		}
-
-		const resetTotalLight = 'Irradiance = vec3( 0.0 ); ReflectedLightDirectDiffuse = vec3( 0.0 ); ReflectedLightDirectSpecular = vec3( 0.0 );';
-		const resultTotalLight = 'ReflectedLightDirectDiffuse + ReflectedLightDirectSpecular';
-
-		// include keywords
-
-		builder.getContextParameter( 'keywords' ).include( builder, resetTotalLight );
 
 		// add code
 
-		builder.addFlowCode( resetTotalLight );
+		const type = this.getNodeType( builder );
 
-		super.generate( builder, output );
+		super.generate( builder, type );
 
-		return builder.format( resultTotalLight, type, output );
+		const totalLight = new OperatorNode( '+', directDiffuse, directSpecular );
+
+		return totalLight.build( builder, type );
 
 	}
 

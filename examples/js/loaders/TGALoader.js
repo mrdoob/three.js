@@ -179,11 +179,10 @@
 
 					for ( x = x_start; x !== x_end; x += x_step, i += 2 ) {
 
-						color = image[ i + 0 ] + ( image[ i + 1 ] << 8 ); // Inversed ?
-
+						color = image[ i + 0 ] + ( image[ i + 1 ] << 8 );
 						imageData[ ( x + width * y ) * 4 + 0 ] = ( color & 0x7C00 ) >> 7;
 						imageData[ ( x + width * y ) * 4 + 1 ] = ( color & 0x03E0 ) >> 2;
-						imageData[ ( x + width * y ) * 4 + 2 ] = ( color & 0x001F ) >> 3;
+						imageData[ ( x + width * y ) * 4 + 2 ] = ( color & 0x001F ) << 3;
 						imageData[ ( x + width * y ) * 4 + 3 ] = color & 0x8000 ? 0 : 255;
 
 					}

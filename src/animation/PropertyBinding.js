@@ -261,7 +261,7 @@ class PropertyBinding {
 
 	_getValue_direct( buffer, offset ) {
 
-		buffer[ offset ] = this.node[ this.propertyName ];
+		buffer[ offset ] = this.targetObject[ this.propertyName ];
 
 	}
 

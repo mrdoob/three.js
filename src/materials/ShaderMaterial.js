@@ -15,10 +15,7 @@ import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  lights: <bool>,
- *
- *  morphTargets: <bool>,
- *  morphNormals: <bool>
+ *  lights: <bool>
  * }
  */
 
@@ -44,9 +41,6 @@ class ShaderMaterial extends Material {
 		this.fog = false; // set to use scene fog
 		this.lights = false; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
-
-		this.morphTargets = false; // set to use morph targets
-		this.morphNormals = false; // set to use morph normals
 
 		this.extensions = {
 			derivatives: false, // set to use derivatives
@@ -98,9 +92,6 @@ class ShaderMaterial extends Material {
 
 		this.lights = source.lights;
 		this.clipping = source.clipping;
-
-		this.morphTargets = source.morphTargets;
-		this.morphNormals = source.morphNormals;
 
 		this.extensions = Object.assign( {}, source.extensions );
 

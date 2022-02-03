@@ -2,17 +2,15 @@ import Node from './Node.js';
 
 class CodeNode extends Node {
 
-	constructor( code = '', type = 'code' ) {
+	constructor( code = '', nodeType = 'code' ) {
 
-		super( type );
+		super( nodeType );
 
 		this.code = code;
 
 		this.useKeywords = false;
 
 		this._includes = [];
-
-		Object.defineProperty( this, 'isCodeNode', { value: true } );
 
 	}
 
@@ -30,11 +28,11 @@ class CodeNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		if ( this.useKeywords === true ) {
 
-			const contextKeywords = builder.getContextParameter( 'keywords' );
+			const contextKeywords = builder.context.keywords;
 
 			if ( contextKeywords !== undefined ) {
 
@@ -66,9 +64,7 @@ class CodeNode extends Node {
 
 		}
 
-		const type = this.getType( builder );
-		const nodeCode = builder.getCodeFromNode( this, type );
-
+		const nodeCode = builder.getCodeFromNode( this, this.getNodeType( builder ) );
 		nodeCode.code = this.code;
 
 		return nodeCode.code;
@@ -76,5 +72,7 @@ class CodeNode extends Node {
 	}
 
 }
+
+CodeNode.prototype.isCodeNode = true;
 
 export default CodeNode;

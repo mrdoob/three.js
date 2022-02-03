@@ -32,7 +32,7 @@ scene.add( object1 ); //object1 and object2 will automatically update their matr
     </p>
 
     <code>
-object.matrixAutoUpdate  = false;
+object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
@@ -69,7 +69,7 @@ geometry.setDrawRange( 0, drawCount );
 const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-const line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry, material );
 scene.add( line );
 			</code>
         <p>
@@ -123,33 +123,6 @@ line.geometry.computeBoundingSphere();
         <p>
             [example:webgl_custom_attributes WebGL / custom / attributes]<br /> [example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
         </p>
-
-    </div>
-
-    <h2>Geometry</h2>
-    <div>
-        <p>
-            下記に示してあるフラグはさまざまなジオメトリの要素の更新をコントロールします。 更新にはコストがかかるので、更新が必要な要素のみを、更新するように設定してください。 バッファが変化すると、自動的にこれらのフラグはflaseにリセットされます。 バッファを更新し続けたいのであれば、このフラグをtrueに設定し続ける必要があります。 これは[page:Geometry]にのみ適用されて、[page:BufferGeometry]には適用されないことに注意してください。
-        </p>
-        <code>
-const geometry = new THREE.Geometry();
-geometry.verticesNeedUpdate = true;
-geometry.elementsNeedUpdate = true;
-geometry.morphTargetsNeedUpdate = true;
-geometry.uvsNeedUpdate = true;
-geometry.normalsNeedUpdate = true;
-geometry.colorsNeedUpdate = true;
-geometry.tangentsNeedUpdate = true;
-			</code>
-
-        <p>
-            [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66]以前のバージョンでは、メッシュは<em>dynamic</em>フラグを有効にする必要があります。これは内部で型付き配列を保持するために必要になります。
-        </p>
-
-        <code>
-// removed after r66
-geometry.dynamic = true;
-			</code>
 
     </div>
 

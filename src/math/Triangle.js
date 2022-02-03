@@ -124,6 +124,16 @@ class Triangle {
 
 	}
 
+	setFromAttributeAndIndices( attribute, i0, i1, i2 ) {
+
+		this.a.fromBufferAttribute( attribute, i0 );
+		this.b.fromBufferAttribute( attribute, i1 );
+		this.c.fromBufferAttribute( attribute, i2 );
+
+		return this;
+
+	}
+
 	clone() {
 
 		return new this.constructor().copy( this );

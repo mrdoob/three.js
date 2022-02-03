@@ -12,8 +12,8 @@
 
 			this.IFF.debugger.offset = this.IFF.reader.offset;
 			this.IFF.debugger.closeForms();
-			var blockID = this.IFF.reader.getIDTag();
-			var length = this.IFF.reader.getUint32(); // size of data in bytes
+			const blockID = this.IFF.reader.getIDTag();
+			const length = this.IFF.reader.getUint32(); // size of data in bytes
 
 			this.IFF.debugger.dataOffset = this.IFF.reader.offset;
 			this.IFF.debugger.length = length; // Data types may be found in either LWO2 OR LWO3 spec
@@ -38,8 +38,10 @@
 
 				case 'NORM': // ENVL FORM skipped
 
-				case 'PRE ':
-				case 'POST':
+				case 'PRE ': // Pre-loop behavior for the keyframe
+
+				case 'POST': // Post-loop behavior for the keyframe
+
 				case 'KEY ':
 				case 'SPAN': // CLIP FORM skipped
 
@@ -210,7 +212,7 @@
 					break;
 
 				case 'IMAG':
-					var index = this.IFF.reader.getVariableLengthIndex();
+					const index = this.IFF.reader.getVariableLengthIndex();
 					this.IFF.currentForm.imageIndex = index;
 					break;
 					// Texture Mapping Form
@@ -278,7 +280,7 @@
 					// LWO2 Spec chunks: these are needed since the SURF FORMs are often in LWO2 format
 
 				case 'SMAN':
-					var maxSmoothingAngle = this.IFF.reader.getFloat32();
+					const maxSmoothingAngle = this.IFF.reader.getFloat32();
 					this.IFF.currentSurface.attributes.smooth = maxSmoothingAngle < 0 ? false : true;
 					break;
 					// LWO2: Basic Surface Parameters

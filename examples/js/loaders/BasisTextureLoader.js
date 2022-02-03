@@ -28,6 +28,7 @@
 			this.workerNextTaskID = 1;
 			this.workerSourceURL = '';
 			this.workerConfig = null;
+			console.warn( 'THREE.BasisTextureLoader: This loader is deprecated, and will be removed in a future release. ' + 'Instead, use Basis Universal compression in KTX2 (.ktx2) files with THREE.KTX2Loader.' );
 
 		}
 

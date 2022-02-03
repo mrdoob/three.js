@@ -112,7 +112,7 @@
     <code>
 		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
     <p>
@@ -126,7 +126,7 @@
 
 		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
 
-		  const controls = new OrbitControls();
+		  const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>
@@ -141,8 +141,7 @@
 
     <p>
         대부분의 자바스크립트 번들러는 이제 ES 모듈을 기본적으로 지원하지만, 오래된 빌드 도구들은 그렇지 않을 수 있습니다.
-        이 경우에, 번들러에 ES 모듈을 인식할 수 있도록 설정해줄 수 있습니다. 예를들어 [link:http://browserify.org/
-        Browserify] 는 [link:https://github.com/babel/babelify babelify] 플러그인을 불러오기만 하면 됩니다.
+        이 경우에, 번들러에 ES 모듈을 인식할 수 있도록 설정해줄 수 있습니다. 예를들어 [link:http://browserify.org/ Browserify] 는 [link:https://github.com/babel/babelify babelify] 플러그인을 불러오기만 하면 됩니다.
     </p>
 
     <h3>maps 불러오기</h3>
@@ -159,7 +158,7 @@
         이는 npm 패키지에서 주로 쓰이는 경로 작성법과 일치하고, 두 사용자군 모두에게 파일을 불러오는 데에 동일한 코드를 사용할 수 있게 해 줄 것입니다.
         빌드 도구를 사용하지 않는 것을 선호하는 사용자들에게도, 간단한 JSON 맵핑을 통해 CDN이나 직접 파일 폴더에서 불러오는 것을 가능하게 해 줄 것입니다.
         실험적 방법으로, [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map
-        예제]처럼 map polyfill과 함께 import 해서 더 간단하게 사용해볼 수도 있습니다.
+        example]처럼 map polyfill과 함께 import 해서 더 간단하게 사용해볼 수도 있습니다.
     </p>
 
     <h3>Node.js</h3>
@@ -170,8 +169,7 @@
 
     <p>
         첫 번째로, three.js는 웹을 목적으로 만들어졌기때문에, Node.js에서 항상 활용 가능하다고 보증할 수 없는 브라우저와 DOM API에 의존하고 있는 까닭입니다.
-        이러한 문제들은 shims를 통해 [link:https://github.com/stackgl/headless-gl
-        headless-gl]처럼 해결하거나, [page:TextureLoader] 같은 컴포넌트를 커스터마이징 해서 해결 가능합니다. 다른 DOM API는 관련된 코드가 더 복잡하게 연관되어 있어, 수정하기 더 까다롭습니다.
+        이러한 문제들은 shims를 통해 [link:https://github.com/stackgl/headless-gl headless-gl]처럼 해결하거나, [page:TextureLoader] 같은 컴포넌트를 커스터마이징 해서 해결 가능합니다. 다른 DOM API는 관련된 코드가 더 복잡하게 연관되어 있어, 수정하기 더 까다롭습니다.
         Node.js 지원을 향상시키기 위한 더 간단하고, 유지보수 가능한 pull 요청은 언제든지 환영이지만, 본인의 작업을 위한 issue 생성을 더 권장합니다.
     </p>
 

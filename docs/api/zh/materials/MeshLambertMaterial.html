@@ -73,7 +73,7 @@
 		<h3>[property:Integer combine]</h3>
 		<p> 如何将表面颜色的结果与环境贴图（如果有）结合起来。<br /><br />
 
-			选项为[page:Materials THREE.Multiply]（默认值），[page:Materials THREE.MixOperation]，
+			选项为[page:Materials THREE.MultiplyOperation]（默认值），[page:Materials THREE.MixOperation]，
 			[page:Materials THREE.AddOperation]。如果选择多个，则使用[page:.reflectivity]在两种颜色之间进行混合。
 		</p>
 
@@ -100,13 +100,6 @@
 
 		<h3>[property:Texture map]</h3>
 		<p>颜色贴图。默认为null。</p>
-
-		<h3>[property:Boolean morphNormals]</h3>
-		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从geometry传递到shader。默认值为*false*。
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>定义材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Float reflectivity]</h3>
 		<p> 环境贴图对表面的影响程度; 见[page:.combine]。默认值为1，有效范围介于0（无反射）和1（完全反射）之间。</p>
