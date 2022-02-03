@@ -7,7 +7,7 @@ import {
 	Scene,
 	Vector2,
 	WebGLRenderTarget
-} from '../../../../build/three.module.js';
+} from 'three';
 
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';
@@ -118,7 +118,7 @@ class NodePostProcessing {
 
 		}
 
-		if ( meta && ! meta.post ) meta.post = {};
+		if ( ! meta.post ) meta.post = {};
 
 		if ( ! meta.post[ this.uuid ] ) {
 

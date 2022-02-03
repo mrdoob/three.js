@@ -1,6 +1,6 @@
 function Storage() {
 
-	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+	const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
 	if ( indexedDB === undefined ) {
 
@@ -9,19 +9,19 @@ function Storage() {
 
 	}
 
-	var name = 'threejs-editor';
-	var version = 1;
+	const name = 'threejs-editor';
+	const version = 1;
 
-	var database;
+	let database;
 
 	return {
 
 		init: function ( callback ) {
 
-			var request = indexedDB.open( name, version );
+			const request = indexedDB.open( name, version );
 			request.onupgradeneeded = function ( event ) {
 
-				var db = event.target.result;
+				const db = event.target.result;
 
 				if ( db.objectStoreNames.contains( 'states' ) === false ) {
 
@@ -50,9 +50,9 @@ function Storage() {
 
 		get: function ( callback ) {
 
-			var transaction = database.transaction( [ 'states' ], 'readwrite' );
-			var objectStore = transaction.objectStore( 'states' );
-			var request = objectStore.get( 0 );
+			const transaction = database.transaction( [ 'states' ], 'readwrite' );
+			const objectStore = transaction.objectStore( 'states' );
+			const request = objectStore.get( 0 );
 			request.onsuccess = function ( event ) {
 
 				callback( event.target.result );
@@ -63,11 +63,11 @@ function Storage() {
 
 		set: function ( data ) {
 
-			var start = performance.now();
+			const start = performance.now();
 
-			var transaction = database.transaction( [ 'states' ], 'readwrite' );
-			var objectStore = transaction.objectStore( 'states' );
-			var request = objectStore.put( data, 0 );
+			const transaction = database.transaction( [ 'states' ], 'readwrite' );
+			const objectStore = transaction.objectStore( 'states' );
+			const request = objectStore.put( data, 0 );
 			request.onsuccess = function () {
 
 				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
@@ -80,9 +80,9 @@ function Storage() {
 
 			if ( database === undefined ) return;
 
-			var transaction = database.transaction( [ 'states' ], 'readwrite' );
-			var objectStore = transaction.objectStore( 'states' );
-			var request = objectStore.clear();
+			const transaction = database.transaction( [ 'states' ], 'readwrite' );
+			const objectStore = transaction.objectStore( 'states' );
+			const request = objectStore.clear();
 			request.onsuccess = function () {
 
 				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Cleared IndexedDB.' );

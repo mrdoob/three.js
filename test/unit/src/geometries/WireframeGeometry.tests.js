@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry';
+import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 

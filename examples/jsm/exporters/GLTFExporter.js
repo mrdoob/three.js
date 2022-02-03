@@ -15,11 +15,11 @@ import {
 	NearestMipmapNearestFilter,
 	PropertyBinding,
 	RGBAFormat,
-	RGBFormat,
 	RepeatWrapping,
 	Scene,
+	Texture,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 
 class GLTFExporter {
@@ -689,6 +689,79 @@ class GLTFWriter {
 
 	}
 
+	buildORMTexture( material ) {
+
+		const occlusion = material.aoMap?.image;
+		const roughness = material.roughnessMap?.image;
+		const metalness = material.metalnessMap?.image;
+
+		if ( occlusion === roughness && roughness === metalness ) return occlusion;
+
+		if ( occlusion || roughness || metalness ) {
+
+			const width = Math.max( occlusion?.width || 0, roughness?.width || 0, metalness?.width || 0 );
+			const height = Math.max( occlusion?.height || 0, roughness?.height || 0, metalness?.height || 0 );
+
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = width;
+			canvas.height = height;
+
+			const context = canvas.getContext( '2d' );
+			context.fillStyle = '#ffffff';
+			context.fillRect( 0, 0, width, height );
+
+			const composite = context.getImageData( 0, 0, width, height );
+
+			if ( occlusion ) {
+
+				context.drawImage( occlusion, 0, 0, width, height );
+
+				const data = context.getImageData( 0, 0, width, height ).data;
+
+				for ( let i = 0; i < data.length; i += 4 ) {
+
+					composite.data[ i ] = data[ i ];
+
+				}
+
+			}
+
+			if ( roughness ) {
+
+				context.drawImage( roughness, 0, 0, width, height );
+
+				const data = context.getImageData( 0, 0, width, height ).data;
+
+				for ( let i = 1; i < data.length; i += 4 ) {
+
+					composite.data[ i ] = data[ i ];
+
+				}
+
+			}
+
+			if ( metalness ) {
+
+				context.drawImage( metalness, 0, 0, width, height );
+
+				const data = context.getImageData( 0, 0, width, height ).data;
+
+				for ( let i = 2; i < data.length; i += 4 ) {
+
+					composite.data[ i ] = data[ i ];
+
+				}
+
+			}
+
+			context.putImageData( composite, 0, 0 );
+
+			return new Texture( canvas );
+
+		}
+
+	}
+
 	/**
 	 * Process a buffer to append to the default one.
 	 * @param  {ArrayBuffer} buffer
@@ -962,7 +1035,7 @@ class GLTFWriter {
 	/**
 	 * Process image
 	 * @param  {Image} image to process
-	 * @param  {Integer} format of the image (e.g. RGBFormat, RGBAFormat etc)
+	 * @param  {Integer} format of the image (RGBAFormat)
 	 * @param  {Boolean} flipY before writing out the image
 	 * @return {Integer}     Index of the processed texture in the "images" array
 	 */
@@ -977,7 +1050,7 @@ class GLTFWriter {
 		if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
 
 		const cachedImages = cache.images.get( image );
-		const mimeType = format === RGBAFormat ? 'image/png' : 'image/jpeg';
+		const mimeType = 'image/png';
 		const key = mimeType + ':flipY/' + flipY.toString();
 
 		if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
@@ -1011,9 +1084,9 @@ class GLTFWriter {
 
 			} else {
 
-				if ( format !== RGBAFormat && format !== RGBFormat ) {
+				if ( format !== RGBAFormat ) {
 
-					console.error( 'GLTFExporter: Only RGB and RGBA formats are supported.' );
+					console.error( 'GLTFExporter: Only RGBAFormat is supported.' );
 
 				}
 
@@ -1025,27 +1098,12 @@ class GLTFWriter {
 
 				const data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-				if ( format === RGBAFormat ) {
+				for ( let i = 0; i < data.length; i += 4 ) {
 
-					for ( let i = 0; i < data.length; i += 4 ) {
-
-						data[ i + 0 ] = image.data[ i + 0 ];
-						data[ i + 1 ] = image.data[ i + 1 ];
-						data[ i + 2 ] = image.data[ i + 2 ];
-						data[ i + 3 ] = image.data[ i + 3 ];
-
-					}
-
-				} else {
-
-					for ( let i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
-
-						data[ i + 0 ] = image.data[ j + 0 ];
-						data[ i + 1 ] = image.data[ j + 1 ];
-						data[ i + 2 ] = image.data[ j + 2 ];
-						data[ i + 3 ] = 255;
-
-					}
+					data[ i + 0 ] = image.data[ i + 0 ];
+					data[ i + 1 ] = image.data[ i + 1 ];
+					data[ i + 2 ] = image.data[ i + 2 ];
+					data[ i + 3 ] = image.data[ i + 3 ];
 
 				}
 
@@ -1194,20 +1252,14 @@ class GLTFWriter {
 
 		}
 
+		const ormTexture = this.buildORMTexture( material );
+
 		// pbrMetallicRoughness.metallicRoughnessTexture
 		if ( material.metalnessMap || material.roughnessMap ) {
 
-			if ( material.metalnessMap === material.roughnessMap ) {
-
-				const metalRoughMapDef = { index: this.processTexture( material.metalnessMap ) };
-				this.applyTextureTransform( metalRoughMapDef, material.metalnessMap );
-				materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
-
-			} else {
-
-				console.warn( 'THREE.GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
-
-			}
+			const metalRoughMapDef = { index: this.processTexture( ormTexture ) };
+			this.applyTextureTransform( metalRoughMapDef, material.metalnessMap || material.roughnessMap );
+			materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 		}
 
@@ -1273,7 +1325,7 @@ class GLTFWriter {
 		if ( material.aoMap ) {
 
 			const occlusionMapDef = {
-				index: this.processTexture( material.aoMap ),
+				index: this.processTexture( ormTexture ),
 				texCoord: 1
 			};
 

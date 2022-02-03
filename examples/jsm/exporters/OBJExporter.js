@@ -3,7 +3,7 @@ import {
 	Matrix3,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class OBJExporter {
 
@@ -251,7 +251,7 @@ class OBJExporter {
 
 					if ( colors !== undefined ) {
 
-						color.fromBufferAttribute( colors, i );
+						color.fromBufferAttribute( colors, i ).convertLinearToSRGB();
 
 						output += ' ' + color.r + ' ' + color.g + ' ' + color.b;
 

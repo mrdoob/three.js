@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { ConeGeometry, ConeBufferGeometry } from '../../../../src/geometries/ConeGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { ConeGeometry, ConeBufferGeometry } from '../../../../src/geometries/ConeGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 

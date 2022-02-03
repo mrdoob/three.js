@@ -1,8 +1,8 @@
 function Strings( config ) {
 
-	var language = config.getKey( 'language' );
+	const language = config.getKey( 'language' );
 
-	var values = {
+	const values = {
 
 		en: {
 

@@ -11,7 +11,7 @@ import {
 	TextureLoader,
 	Quaternion,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
 class TiltLoader extends Loader {

@@ -1,12 +1,12 @@
 /* global QUnit */
 
-import { Matrix3 } from '../../../../src/math/Matrix3';
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Euler } from '../../../../src/math/Euler';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import * as MathUtils from '../../../../src/math/MathUtils';
-import { eps } from './Constants.tests';
+import { Matrix3 } from '../../../../src/math/Matrix3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Euler } from '../../../../src/math/Euler.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import * as MathUtils from '../../../../src/math/MathUtils.js';
+import { eps } from './Constants.tests.js';
 
 
 function matrixEquals4( a, b, tolerance ) {
@@ -473,6 +473,12 @@ export default QUnit.module( 'Maths', () => {
 
 			a.setPosition( b );
 			assert.ok( matrixEquals4( a, c ), 'Passed!' );
+
+			var d = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			var e = new Matrix4().set( 0, 1, 2, - 1, 4, 5, 6, - 2, 8, 9, 10, - 3, 12, 13, 14, 15 );
+
+			d.setPosition( - 1, - 2, - 3 );
+			assert.ok( matrixEquals4( d, e ), 'Passed!' );
 
 		} );
 

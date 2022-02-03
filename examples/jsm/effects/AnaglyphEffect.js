@@ -10,7 +10,7 @@ import {
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 
 class AnaglyphEffect {
 
@@ -154,10 +154,10 @@ class AnaglyphEffect {
 
 		this.dispose = function () {
 
-			if ( _renderTargetL ) _renderTargetL.dispose();
-			if ( _renderTargetR ) _renderTargetR.dispose();
-			if ( _mesh ) _mesh.geometry.dispose();
-			if ( _material ) _material.dispose();
+			_renderTargetL.dispose();
+			_renderTargetR.dispose();
+			_mesh.geometry.dispose();
+			_mesh.material.dispose();
 
 		};
 

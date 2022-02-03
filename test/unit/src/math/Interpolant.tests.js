@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Interpolant } from '../../../../src/math/Interpolant';
+import { Interpolant } from '../../../../src/math/Interpolant.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -80,19 +80,6 @@ export default QUnit.module( 'Maths', () => {
 		// Call capturing facility
 
 		Mock.calls = null;
-
-		Mock.captureCall = function ( args ) {
-
-			if ( Mock.calls !== null ) {
-
-				Mock.calls.push( {
-					func: Mock.captureCall.caller.name,
-					args: Array.prototype.slice.call( args )
-				} );
-
-			}
-
-		};
 
 		// Tests
 

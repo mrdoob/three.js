@@ -8,7 +8,7 @@ import {
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 
 function computeTangents( geometry ) {
@@ -834,7 +834,7 @@ function computeMorphedAttributes( object ) {
 
 		}
 
-	} else if ( positionAttribute !== undefined ) {
+	} else {
 
 		// non-indexed buffer geometry
 

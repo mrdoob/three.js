@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve';
-import { Vector2 } from '../../../../../src/math/Vector2';
+import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve.js';
+import { Vector2 } from '../../../../../src/math/Vector2.js';
 
 export default QUnit.module( 'Extras', () => {
 

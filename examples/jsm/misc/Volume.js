@@ -2,7 +2,7 @@ import {
 	Matrix3,
 	Matrix4,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import { VolumeSlice } from '../misc/VolumeSlice.js';
 
 /**
@@ -99,7 +99,7 @@ function Volume( xLength, yLength, zLength, type, arrayBuffer ) {
 			case 'unsigned long long int' :
 			case 'uint64' :
 			case 'uint64_t' :
-				throw 'Error in Volume constructor : this type is not supported in JavaScript';
+				throw new Error( 'Error in Volume constructor : this type is not supported in JavaScript' );
 				break;
 			case 'Float32' :
 			case 'float32' :
@@ -118,7 +118,7 @@ function Volume( xLength, yLength, zLength, type, arrayBuffer ) {
 
 		if ( this.data.length !== this.xLength * this.yLength * this.zLength ) {
 
-			throw 'Error in Volume constructor, lengths are not matching arrayBuffer size';
+			throw new Error( 'Error in Volume constructor, lengths are not matching arrayBuffer size' );
 
 		}
 

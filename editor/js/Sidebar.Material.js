@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { UIButton, UIInput, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 

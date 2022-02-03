@@ -75,14 +75,6 @@
 
 		}
 
-		dispose() {
-
-			this.workerPool.dispose();
-			if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
-			return this;
-
-		}
-
 		init() {
 
 			if ( ! this.transcoderPending ) {
@@ -224,8 +216,8 @@
 
 		dispose() {
 
-			URL.revokeObjectURL( this.workerSourceURL );
 			this.workerPool.dispose();
+			if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
 			_activeLoaders --;
 			return this;
 

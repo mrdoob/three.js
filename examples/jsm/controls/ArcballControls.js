@@ -14,7 +14,7 @@ import {
 	Matrix4,
 	MathUtils,
 	EventDispatcher
-} from '../../../build/three.module.js';
+} from 'three';
 
 //trackball state
 const STATE = {
@@ -2078,7 +2078,6 @@ class ArcballControls extends EventDispatcher {
 		window.removeEventListener( 'pointerup', this.onPointerUp );
 
 		window.removeEventListener( 'resize', this.onWindowResize );
-		window.removeEventListener( 'keydown', this.onKeyDown );
 
 		if ( this.scene !== null ) this.scene.remove( this._gizmos );
 		this.disposeGrid();

@@ -1,5 +1,5 @@
-import * as THREE from '../../build/three.module.js';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.136.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js';
 
 export function init(data) {   /* eslint-disable-line no-unused-vars */
   const {canvas, inputElement} = data;
@@ -156,4 +156,3 @@ export function init(data) {   /* eslint-disable-line no-unused-vars */
 
   inputElement.addEventListener('touchend', clearPickPosition);
 }
-

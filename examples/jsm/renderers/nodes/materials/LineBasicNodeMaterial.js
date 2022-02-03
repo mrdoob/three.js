@@ -1,4 +1,4 @@
-import { LineBasicMaterial } from '../../../../../build/three.module.js';
+import { LineBasicMaterial } from 'three';
 
 class LineBasicNodeMaterial extends LineBasicMaterial {
 

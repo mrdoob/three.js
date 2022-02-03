@@ -4,7 +4,7 @@ import {
 	Quaternion,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
@@ -540,9 +540,6 @@ class TrackballControls extends EventDispatcher {
 					case scope.mouseButtons.RIGHT:
 						_state = STATE.PAN;
 						break;
-
-					default:
-						_state = STATE.NONE;
 
 				}
 

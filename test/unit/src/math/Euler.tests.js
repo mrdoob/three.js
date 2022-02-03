@@ -1,10 +1,10 @@
 /* global QUnit */
 
-import { Euler } from '../../../../src/math/Euler';
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { x, y, z } from './Constants.tests';
+import { Euler } from '../../../../src/math/Euler.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { x, y, z } from './Constants.tests.js';
 
 const eulerZero = new Euler( 0, 0, 0, 'XYZ' );
 const eulerAxyz = new Euler( 1, 0, 0, 'XYZ' );
@@ -31,15 +31,6 @@ function matrixEquals4( a, b, tolerance ) {
 	}
 
 	return true;
-
-}
-
-function eulerEquals( a, b, tolerance ) {
-
-	tolerance = tolerance || 0.0001;
-	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z );
-
-	return ( diff < tolerance );
 
 }
 
@@ -412,8 +403,6 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( '_onChange', ( assert ) => {
 
 			var f = function () {
-
-				var b = true;
 
 			};
 

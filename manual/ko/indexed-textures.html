@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
     <link rel="stylesheet" href="/manual/ko/lang.css">
   </head>
   <body>
@@ -201,11 +212,11 @@ canvas.addEventListener('pointerup', pickCountry);
 <p>위 예제는 여전히 영역 크기에 따라 나라 이름을 보여주긴 하나, 특정 나라를 클릭하면 해당 나라의 이름만 보여줄 겁니다.</p>
 <p>이만하면 각 나라를 피킹하는 예제로 충분해 보이지만... 선택한 나라의 색을 바꾸려면 어떻게 해야 할까요?</p>
 <p><em>컬러 팔레트(color palette)</em>를 사용하면 이 문제를 해결할 수 있습니다.</p>
-<p><a href="https://ko.wikipedia.org/wiki/%ED%8C%94%EB%A0%88%ED%8A%B8_(%EC%BB%B4%ED%93%A8%ED%8C%85">컬러 팔레트</a>) 혹은 <a href="https://en.wikipedia.org/wiki/Indexed_color">인덱스 팔레트</a>는 아타리 800, Amiga, NES, 슈퍼 닌텐도, 구형 IBM PC 등 구형 시스템에서 사용하던 기법입니다. 비트맵을 색상당 8비트 혹은 24바이트 이상의 RGB 색상으로 적용하는 대신 비트맵을 8비트 이하의 값으로 저장하는 기법이죠. 각 픽셀의 색상값은 팔레트의 인덱스 값으로, 픽셀의 색상값이 3이라면 특정 "팔레트"의 3번 색상을 사용한다는 의미입니다.</p>
+<p><a href="https://ko.wikipedia.org/wiki/%ED%8C%94%EB%A0%88%ED%8A%B8_(%EC%BB%B4%ED%93%A8%ED%8C%85">컬러 팔레트</a>) 혹은 <a href="https://en.wikipedia.org/wiki/Indexed_color">인덱스 팔레트</a>는 아타리 800, Amiga, NES, 슈퍼 닌텐도, 구형 IBM PC 등 구형 시스템에서 사용하던 기법입니다. 비트맵을 색상당 8비트 혹은 32바이트 이상의 RGBA 색상으로 적용하는 대신 비트맵을 8비트 이하의 값으로 저장하는 기법이죠. 각 픽셀의 색상값은 팔레트의 인덱스 값으로, 픽셀의 색상값이 3이라면 특정 "팔레트"의 3번 색상을 사용한다는 의미입니다.</p>
 <p>자바스크립트로 설명하자면 아래와 같은 형식을 생각할 수 있습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
   0, 1, 1, 1, 1, 1, 0,
-  1, 0, 0, 0, 0, 0, 1, 
+  1, 0, 0, 0, 0, 0, 1,
   1, 0, 2, 0, 2, 0, 1,
   1, 0, 0, 0, 0, 0, 1,
   1, 0, 3, 3, 3, 0, 1,
@@ -323,19 +334,19 @@ void main() {
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
 const paletteTextureWidth = maxNumCountries;
 const paletteTextureHeight = 1;
-const palette = new Uint8Array(paletteTextureWidth * 3);
+const palette = new Uint8Array(paletteTextureWidth * 4);
 const paletteTexture = new THREE.DataTexture(
-    palette, paletteTextureWidth, paletteTextureHeight, THREE.RGBFormat);
+    palette, paletteTextureWidth, paletteTextureHeight);
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
-<p><a href="/docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 쓰면 텍스처를 로우-데이터(raw data) 형식으로 넘길 수 있습니다. 예제의 경우에는 512 RGB 색상을 넘겨주면 되겠죠. 각 값은 3바이트로, 이 바이트는 각각 red, green, blue을 0부터 255까지의 숫자로 나타냅니다.</p>
+<p><a href="/docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 쓰면 텍스처를 로우-데이터(raw data) 형식으로 넘길 수 있습니다. 예제의 경우에는 512 RGBA 색상을 넘겨주면 되겠죠. 각 값은 3바이트로, 이 바이트는 각각 red, green, blue을 0부터 255까지의 숫자로 나타냅니다.</p>
 <p>일단은 무작위로 색을 지정해 잘 작동하는지 테스트해봅시다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
   palette[i] = Math.random() * 256;
 }
 // 바다의 색을 지정합니다. (index #0)
-palette.set([100, 200, 255], 0);
+palette.set([100, 200, 255, 255], 0);
 paletteTexture.needsUpdate = true;
 </pre>
 <p><code class="notranslate" translate="no">palette</code> 배열로 팔레트 텍스처를 업데이트할 때마다 장면을 업데이트해야 하니 <code class="notranslate" translate="no">paletteTexture.needsUpdate</code>를 <code class="notranslate" translate="no">true</code>로 설정합니다.</p>
@@ -364,7 +375,9 @@ scene.add(new THREE.Mesh(geometry, material));
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
 function get255BasedColor(color) {
   tempColor.set(color);
-  return tempColor.toArray().map(v =&gt; v * 255);
+  const base = tempColor.toArray().map(v =&gt; v * 255);
+  base.push(255); // alpha
+  return base;
 }
 </pre>
 <p>위 함수를 <code class="notranslate" translate="no">color = get255BasedColor('red')</code>와 같은 식으로 호출하면 <code class="notranslate" translate="no">[255, 0, 0]</code> 이런 식의 배열을 반환합니다.</p>
@@ -375,7 +388,7 @@ const oceanColor = get255BasedColor('rgb(100,200,255)');
 resetPalette();
 
 function setPaletteColor(index, color) {
-  palette.set(color, index * 3);
+  palette.set(color, index * 4);
 }
 
 function resetPalette() {
@@ -523,7 +536,7 @@ canvas.addEventListener('pointerup', pickCountry);
         </div>
       </div>
     </div>
-  
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 

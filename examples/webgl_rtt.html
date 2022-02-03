@@ -55,9 +55,21 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -101,7 +113,7 @@
 				light.position.set( 0, 0, - 1 ).normalize();
 				sceneRTT.add( light );
 
-				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 
 				material = new THREE.ShaderMaterial( {
 
@@ -216,13 +228,13 @@
 
 				}
 
-				if ( material.uniforms[ "time" ].value > 1 || material.uniforms[ "time" ].value < 0 ) {
+				if ( material.uniforms[ 'time' ].value > 1 || material.uniforms[ 'time' ].value < 0 ) {
 
 					delta *= - 1;
 
 				}
 
-				material.uniforms[ "time" ].value += delta;
+				material.uniforms[ 'time' ].value += delta;
 
 
 				// Render first scene into texture

@@ -1,17 +1,15 @@
 import InputNode from '../core/InputNode.js';
-import ExpressionNode from '../core/ExpressionNode.js';
 import UVNode from '../accessors/UVNode.js';
-import ColorSpaceNode from '../display/ColorSpaceNode.js';
 
 class TextureNode extends InputNode {
 
-	constructor( value = null, uv = new UVNode(), bias = null ) {
+	constructor( value = null, uvNode = new UVNode(), biasNode = null ) {
 
 		super( 'texture' );
 
 		this.value = value;
-		this.uv = uv;
-		this.bias = bias;
+		this.uvNode = uvNode;
+		this.biasNode = biasNode;
 
 	}
 
@@ -41,32 +39,28 @@ class TextureNode extends InputNode {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			let colorSpace = nodeData.colorSpace;
+			let snippet = nodeData.snippet;
 
-			if ( colorSpace === undefined ) {
+			if ( snippet === undefined ) {
 
-				const uvSnippet = this.uv.build( builder, 'vec2' );
-				const bias = this.bias;
+				const uvSnippet = this.uvNode.build( builder, 'vec2' );
+				const biasNode = this.biasNode;
 
 				let biasSnippet = null;
 
-				if ( bias !== null ) {
+				if ( biasNode !== null ) {
 
-					biasSnippet = bias.build( builder, 'float' );
+					biasSnippet = biasNode.build( builder, 'float' );
 
 				}
 
-				const textureCallSnippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
+				snippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
 
-				colorSpace = new ColorSpaceNode();
-				colorSpace.node = new ExpressionNode( textureCallSnippet, 'vec4' );
-				colorSpace.fromDecoding( builder.getTextureEncodingFromMap( texture ) );
-
-				nodeData.colorSpace = colorSpace;
+				nodeData.snippet = snippet;
 
 			}
 
-			return colorSpace.build( builder, output );
+			return builder.format( snippet, 'vec4', output );
 
 		}
 

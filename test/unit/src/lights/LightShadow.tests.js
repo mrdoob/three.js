@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { LightShadow } from '../../../../src/lights/LightShadow';
-import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
+import { LightShadow } from '../../../../src/lights/LightShadow.js';
+import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
 export default QUnit.module( 'Lights', () => {
 

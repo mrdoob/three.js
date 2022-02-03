@@ -14,18 +14,18 @@
 		</p>
 
 		<p>
-			أضف [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/WebGL.js] إلى جافا سكريبت الخاص بك وقم بتشغيل ما يلي قبل محاولة تقديم أي شيء.
+			أضف [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js] إلى جافا سكريبت الخاص بك وقم بتشغيل ما يلي قبل محاولة تقديم أي شيء.
 		</p>
 
 		<code>
-		if ( WEBGL.isWebGLAvailable() ) {
+		if ( WebGL.isWebGLAvailable() ) {
 
 			// Initiate function or other initializations here
 			animate();
 
 		} else {
 
-			const warning = WEBGL.getWebGLErrorMessage();
+			const warning = WebGL.getWebGLErrorMessage();
 			document.getElementById( 'container' ).appendChild( warning );
 
 		}

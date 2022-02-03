@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import * as Constants from '../../../src/constants';
+import * as Constants from '../../../src/constants.js';
 
 export default QUnit.module( 'Constants', () => {
 
@@ -84,10 +84,8 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.HalfFloatType, 1016, 'HalfFloatType is equal to 1016' );
 		assert.equal( Constants.UnsignedShort4444Type, 1017, 'UnsignedShort4444Type is equal to 1017' );
 		assert.equal( Constants.UnsignedShort5551Type, 1018, 'UnsignedShort5551Type is equal to 1018' );
-		assert.equal( Constants.UnsignedShort565Type, 1019, 'UnsignedShort565Type is equal to 1019' );
 		assert.equal( Constants.UnsignedInt248Type, 1020, 'UnsignedInt248Type is equal to 1020' );
 		assert.equal( Constants.AlphaFormat, 1021, 'AlphaFormat is equal to 1021' );
-		assert.equal( Constants.RGBFormat, 1022, 'RGBFormat is equal to 1022' );
 		assert.equal( Constants.RGBAFormat, 1023, 'RGBAFormat is equal to 1023' );
 		assert.equal( Constants.LuminanceFormat, 1024, 'LuminanceFormat is equal to 1024' );
 		assert.equal( Constants.LuminanceAlphaFormat, 1025, 'LuminanceAlphaFormat is equal to 1025' );
@@ -130,7 +128,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.TriangleFanDrawMode, 2, 'TriangleFanDrawMode is equal to 2' );
 		assert.equal( Constants.LinearEncoding, 3000, 'LinearEncoding is equal to 3000' );
 		assert.equal( Constants.sRGBEncoding, 3001, 'sRGBEncoding is equal to 3001' );
-		assert.equal( Constants.GammaEncoding, 3007, 'GammaEncoding is equal to 3007' );
 		assert.equal( Constants.BasicDepthPacking, 3200, 'BasicDepthPacking is equal to 3200' );
 		assert.equal( Constants.RGBADepthPacking, 3201, 'RGBADepthPacking is equal to 3201' );
 

@@ -13,9 +13,21 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Sprites
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
@@ -72,7 +84,7 @@
 				//
 
 				// https://openclipart.org/detail/239883/walking-man-sprite-sheet
-				walkingManTextureURL = "textures/WalkingManSpriteSheet.png";
+				walkingManTextureURL = 'textures/WalkingManSpriteSheet.png';
 
 				walkingManTexture = new THREE.TextureLoader().load( walkingManTextureURL );
 				walkingManTexture.wrapS = walkingManTexture.wrapT = THREE.RepeatWrapping;
@@ -150,13 +162,13 @@
 
 				const sineWaveFunction = new FunctionNode( [
 					// https://stackoverflow.com/questions/36174431/how-to-make-a-wave-warp-effect-in-shader
-					"vec2 sineWave(vec2 uv, vec2 phase) {",
+					'vec2 sineWave(vec2 uv, vec2 phase) {',
 					// wave distortion
-					"	float x = sin( 25.0*uv.y + 30.0*uv.x + 6.28*phase.x) * 0.01;",
-					"	float y = sin( 25.0*uv.y + 30.0*uv.x + 6.28*phase.y) * 0.03;",
-					"	return vec2(uv.x+x, uv.y+y);",
-					"}"
-				].join( "\n" ) );
+					'	float x = sin( 25.0*uv.y + 30.0*uv.x + 6.28*phase.x) * 0.01;',
+					'	float y = sin( 25.0*uv.y + 30.0*uv.x + 6.28*phase.y) * 0.03;',
+					'	return vec2(uv.x+x, uv.y+y);',
+					'}'
+				].join( '\n' ) );
 
 				scene.add( sprite3 = new THREE.Sprite( new SpriteNodeMaterial() ) );
 				sprite3.position.x = - 30;
@@ -164,8 +176,8 @@
 				sprite3.scale.y = spriteHeight;
 				sprite3.material.color = new TextureNode( walkingManTexture );
 				sprite3.material.color.uv = new FunctionCallNode( sineWaveFunction, {
-					"uv": createHorizontalSpriteSheetNode( 8, 10 ),
-					"phase": new TimerNode()
+					'uv': createHorizontalSpriteSheetNode( 8, 10 ),
+					'phase': new TimerNode()
 				} );
 				sprite3.material.fog = true;
 

@@ -1,10 +1,10 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { BoxHelper } from '../../../../src/helpers/BoxHelper';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
-import { Mesh } from '../../../../src/objects/Mesh';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { BoxHelper } from '../../../../src/helpers/BoxHelper.js';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
 
 export default QUnit.module( 'Helpers', () => {
 

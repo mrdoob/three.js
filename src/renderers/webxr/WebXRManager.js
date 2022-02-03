@@ -12,7 +12,7 @@ import {
 	DepthFormat,
 	DepthStencilFormat,
 	RGBAFormat,
-	RGBFormat,
+	sRGBEncoding,
 	UnsignedByteType,
 	UnsignedShortType,
 	UnsignedInt248Type,
@@ -281,7 +281,7 @@ class WebXRManager extends EventDispatcher {
 					}
 
 					const projectionlayerInit = {
-						colorFormat: ( attributes.alpha || isMultisample ) ? gl.RGBA8 : gl.RGB8,
+						colorFormat: ( renderer.outputEncoding === sRGBEncoding ) ? gl.SRGB8_ALPHA8 : gl.RGBA8,
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
@@ -313,7 +313,7 @@ class WebXRManager extends EventDispatcher {
 							glProjLayer.textureWidth,
 							glProjLayer.textureHeight,
 							{
-								format: attributes.alpha ? RGBAFormat : RGBFormat,
+								format: RGBAFormat,
 								type: UnsignedByteType,
 								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 								stencilBuffer: attributes.stencil,
@@ -324,6 +324,8 @@ class WebXRManager extends EventDispatcher {
 					}
 
 				}
+
+				newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
 
 				// Set foveation to maximum.
 				this.setFoveation( 1.0 );

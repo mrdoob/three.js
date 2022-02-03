@@ -8,20 +8,36 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
-			<button id="exportFile">Export DRC</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco
 		</div>
 
 		<script src="js/libs/draco/draco_encoder.js"></script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { DRACOExporter } from './jsm/exporters/DRACOExporter.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh;
+
+			const params = {
+				export: exportFile
+			};
 
 			init();
 			animate();
@@ -96,8 +112,11 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const exportButton = document.getElementById( 'exportFile' );
-				exportButton.addEventListener( 'click', exportFile );
+				const gui = new GUI();
+
+				gui.add( params, 'export' ).name( 'Export DRC' );
+				gui.open();
+
 
 			}
 

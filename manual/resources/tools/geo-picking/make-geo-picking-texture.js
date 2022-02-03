@@ -108,7 +108,7 @@ async function main() {
 
     const handler = geoHandlers[type];
     if (!handler) {
-      throw new Error('unknown geometry type:', type);
+      throw new Error('unknown geometry type.');
     }
 
     resetMinMax();
@@ -238,37 +238,4 @@ function wait(ms = 0) {
   });
 }
 
-function r(min, max) {
-  if (min === undefined) {
-    min = 0;
-    max = 1;
-  } else if (max === undefined){
-    max = min;
-    min = 0;
-  }
-  return min + Math.random() * (max - min);
-}
-
-function rgb(r, g, b) {
-  return `rgb(${r * 255 | 0},${g * 255 | 0},${b * 255 | 0})`;
-}
-
-function hsl(h, s, l) {
-  return `hsl(${h * 360 | 0},${s * 100 | 0}%,${l * 100 | 0}%)`;
-}
-
-function base64ToUint8Array(base64) {
-  const raw = window.atob(base64);
-  const rawLength = raw.length;
-  const array = new Uint8Array(new ArrayBuffer(rawLength));
-
-  for (let i = 0; i < rawLength; ++i) {
-    array[i] = raw.charCodeAt(i);
-  }
-
-  return array;
-}
-
 main();
-
-

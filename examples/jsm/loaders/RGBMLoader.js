@@ -5,7 +5,7 @@ import {
 	CubeTexture,
 	HalfFloatType,
 	DataUtils
-} from '../../../build/three.module.js';
+} from 'three';
 
 class RGBMLoader extends DataTextureLoader {
 
@@ -285,7 +285,7 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 			var off = y * bpl, to = y * w;
 			if ( depth == 1 ) for ( var x = 0; x < w; x ++ ) {
 
-				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( ( x & 7 ) ) ) ) & 1 ), al = ( gr == tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( x & 7 ) ) ) & 1 ), al = ( gr == tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
 
 			}
 			else if ( depth == 2 ) for ( var x = 0; x < w; x ++ ) {
@@ -328,7 +328,7 @@ UPNG.decode = function ( buff ) {
 	var fd, foff = 0;	// frames
 
 	var mgck = [ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a ];
-	for ( var i = 0; i < 8; i ++ ) if ( data[ i ] != mgck[ i ] ) throw 'The input is not a PNG file!';
+	for ( var i = 0; i < 8; i ++ ) if ( data[ i ] != mgck[ i ] ) throw new Error( 'The input is not a PNG file!' );
 
 	while ( offset < data.length ) {
 

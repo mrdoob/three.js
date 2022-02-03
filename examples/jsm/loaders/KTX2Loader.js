@@ -30,7 +30,7 @@ import {
 	RGB_S3TC_DXT1_Format,
 	sRGBEncoding,
 	UnsignedByteType
-} from '../../../build/three.module.js';
+} from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 
 const KTX2TransferSRGB = 2;
@@ -101,15 +101,6 @@ class KTX2Loader extends Loader {
 			this.workerConfig.etc1Supported = false;
 
 		}
-
-		return this;
-
-	}
-
-	dispose() {
-
-		this.workerPool.dispose();
-		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
 
 		return this;
 
@@ -270,8 +261,8 @@ class KTX2Loader extends Loader {
 
 	dispose() {
 
-		URL.revokeObjectURL( this.workerSourceURL );
 		this.workerPool.dispose();
+		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
 
 		_activeLoaders --;
 

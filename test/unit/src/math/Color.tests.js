@@ -1,8 +1,8 @@
 /* global QUnit */
 
-import { Color } from '../../../../src/math/Color';
-import { eps } from './Constants.tests';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper';
+import { Color } from '../../../../src/math/Color.js';
+import { eps } from './Constants.tests.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -177,49 +177,49 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copyGammaToLinear', ( assert ) => {
+		QUnit.test( 'copySRGBToLinear', ( assert ) => {
 
 			var c = new Color();
 			var c2 = new Color();
 			c2.setRGB( 0.3, 0.5, 0.9 );
-			c.copyGammaToLinear( c2 );
-			assert.ok( c.r == 0.09, 'Red c: ' + c.r + ' Red c2: ' + c2.r );
-			assert.ok( c.g == 0.25, 'Green c: ' + c.g + ' Green c2: ' + c2.g );
-			assert.ok( c.b == 0.81, 'Blue c: ' + c.b + ' Blue c2: ' + c2.b );
+			c.copySRGBToLinear( c2 );
+			assert.numEqual( c.r, 0.09, 'Red c: ' + c.r + ' Red c2: ' + c2.r );
+			assert.numEqual( c.g, 0.25, 'Green c: ' + c.g + ' Green c2: ' + c2.g );
+			assert.numEqual( c.b, 0.81, 'Blue c: ' + c.b + ' Blue c2: ' + c2.b );
 
 		} );
 
-		QUnit.test( 'copyLinearToGamma', ( assert ) => {
+		QUnit.test( 'copyLinearToSRGB', ( assert ) => {
 
 			var c = new Color();
 			var c2 = new Color();
 			c2.setRGB( 0.09, 0.25, 0.81 );
-			c.copyLinearToGamma( c2 );
-			assert.ok( c.r == 0.3, 'Red c: ' + c.r + ' Red c2: ' + c2.r );
-			assert.ok( c.g == 0.5, 'Green c: ' + c.g + ' Green c2: ' + c2.g );
-			assert.ok( c.b == 0.9, 'Blue c: ' + c.b + ' Blue c2: ' + c2.b );
+			c.copyLinearToSRGB( c2 );
+			assert.numEqual( c.r, 0.3, 'Red c: ' + c.r + ' Red c2: ' + c2.r );
+			assert.numEqual( c.g, 0.5, 'Green c: ' + c.g + ' Green c2: ' + c2.g );
+			assert.numEqual( c.b, 0.9, 'Blue c: ' + c.b + ' Blue c2: ' + c2.b );
 
 		} );
 
-		QUnit.test( 'convertGammaToLinear', ( assert ) => {
+		QUnit.test( 'convertSRGBToLinear', ( assert ) => {
 
 			var c = new Color();
 			c.setRGB( 0.3, 0.5, 0.9 );
-			c.convertGammaToLinear();
-			assert.ok( c.r == 0.09, 'Red: ' + c.r );
-			assert.ok( c.g == 0.25, 'Green: ' + c.g );
-			assert.ok( c.b == 0.81, 'Blue: ' + c.b );
+			c.convertSRGBToLinear();
+			assert.numEqual( c.r, 0.09, 'Red: ' + c.r );
+			assert.numEqual( c.g, 0.25, 'Green: ' + c.g );
+			assert.numEqual( c.b, 0.81, 'Blue: ' + c.b );
 
 		} );
 
-		QUnit.test( 'convertLinearToGamma', ( assert ) => {
+		QUnit.test( 'convertLinearToSRGB', ( assert ) => {
 
 			var c = new Color();
 			c.setRGB( 4, 9, 16 );
-			c.convertLinearToGamma();
-			assert.ok( c.r == 2, 'Red: ' + c.r );
-			assert.ok( c.g == 3, 'Green: ' + c.g );
-			assert.ok( c.b == 4, 'Blue: ' + c.b );
+			c.convertLinearToSRGB();
+			assert.numEqual( c.r, 1.82, 'Red: ' + c.r );
+			assert.numEqual( c.g, 2.58, 'Green: ' + c.g );
+			assert.numEqual( c.b, 3.29, 'Blue: ' + c.b );
 
 		} );
 

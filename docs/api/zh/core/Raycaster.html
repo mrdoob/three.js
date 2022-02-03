@@ -17,21 +17,21 @@
 		<h2>代码示例</h2>
 		<code>
 		const raycaster = new THREE.Raycaster();
-		const mouse = new THREE.Vector2();
+		const pointer = new THREE.Vector2();
 
-		function onMouseMove( event ) {
+		function onPointerMove( event ) {
 
 			// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
 
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 		}
 
 		function render() {
 
 			// 通过摄像机和鼠标位置更新射线
-			raycaster.setFromCamera( mouse, camera );
+			raycaster.setFromCamera( pointer, camera );
 
 			// 计算物体和射线的焦点
 			const intersects = raycaster.intersectObjects( scene.children );
@@ -46,7 +46,7 @@
 
 		}
 
-		window.addEventListener( 'mousemove', onMouseMove, false );
+		window.addEventListener( 'pointermove', onPointerMove );
 
 		window.requestAnimationFrame(render);
 

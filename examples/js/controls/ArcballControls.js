@@ -1694,7 +1694,6 @@
 				window.removeEventListener( 'pointermove', this.onPointerMove );
 				window.removeEventListener( 'pointerup', this.onPointerUp );
 				window.removeEventListener( 'resize', this.onWindowResize );
-				window.removeEventListener( 'keydown', this.onKeyDown );
 				if ( this.scene !== null ) this.scene.remove( this._gizmos );
 				this.disposeGrid();
 

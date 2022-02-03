@@ -2,7 +2,7 @@
 
 	class ConvexGeometry extends THREE.BufferGeometry {
 
-		constructor( points ) {
+		constructor( points = [] ) {
 
 			super(); // buffers
 

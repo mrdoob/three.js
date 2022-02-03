@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { LineCurve } from '../../../../../src/extras/curves/LineCurve';
-import { Vector2 } from '../../../../../src/math/Vector2';
+import { LineCurve } from '../../../../../src/extras/curves/LineCurve.js';
+import { Vector2 } from '../../../../../src/math/Vector2.js';
 
 export default QUnit.module( 'Extras', () => {
 

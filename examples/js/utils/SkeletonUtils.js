@@ -64,7 +64,7 @@
 				bone = bones[ i ];
 				name = options.names[ bone.name ] || bone.name;
 
-				if ( options.offsets && options.offsets[ name ] ) {
+				if ( options.offsets[ name ] ) {
 
 					bone.matrix.multiply( options.offsets[ name ] );
 					bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );

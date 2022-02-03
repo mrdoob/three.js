@@ -362,11 +362,11 @@
 
 			"Loaders": {
 				"3DMLoader": "examples/en/loaders/3DMLoader",
-				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"FontLoader": "examples/en/loaders/FontLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
+				"LDrawLoader": "examples/en/loaders/LDrawLoader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
@@ -859,7 +859,6 @@
 			},
 
 			"加载器": {
-				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"FontLoader": "examples/zh/loaders/FontLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
@@ -1003,7 +1002,59 @@
 				"Materials": "api/ko/constants/Materials",
 				"Renderer": "api/ko/constants/Renderer",
 				"Textures": "api/ko/constants/Textures"
+			},
+
+			"Core": {
+				"BufferAttribute": "api/ko/core/BufferAttribute",
+				"BufferGeometry": "api/ko/core/BufferGeometry",
+				"Clock": "api/ko/core/Clock",
+				"EventDispatcher": "api/ko/core/EventDispatcher",
+				"GLBufferAttribute": "api/ko/core/GLBufferAttribute",
+				"InstancedBufferAttribute": "api/ko/core/InstancedBufferAttribute",
+				"InstancedBufferGeometry": "api/ko/core/InstancedBufferGeometry",
+				"InstancedInterleavedBuffer": "api/ko/core/InstancedInterleavedBuffer",
+				"InterleavedBuffer": "api/ko/core/InterleavedBuffer",
+				"InterleavedBufferAttribute": "api/ko/core/InterleavedBufferAttribute",
+				"Layers": "api/ko/core/Layers",
+				"Object3D": "api/ko/core/Object3D",
+				"Raycaster": "api/ko/core/Raycaster",
+				"Uniform": "api/ko/core/Uniform"
+			},
+
+			"Core / BufferAttributes": {
+				"BufferAttribute Types": "api/ko/core/bufferAttributeTypes/BufferAttributeTypes"
+			},
+
+			"Extras": {
+				"DataUtils": "api/ko/extras/DataUtils",
+				"Earcut": "api/ko/extras/Earcut",
+				"ImageUtils": "api/ko/extras/ImageUtils",
+				"PMREMGenerator": "api/ko/extras/PMREMGenerator",
+				"ShapeUtils": "api/ko/extras/ShapeUtils"
+			},
+
+			"Extras / Core": {
+				"Curve": "api/ko/extras/core/Curve",
+				"CurvePath": "api/ko/extras/core/CurvePath",
+				"Interpolations": "api/ko/extras/core/Interpolations",
+				"Path": "api/ko/extras/core/Path",
+				"Shape": "api/ko/extras/core/Shape",
+				"ShapePath": "api/ko/extras/core/ShapePath"
+			},
+
+			"Extras / Curves": {
+				"ArcCurve": "api/ko/extras/curves/ArcCurve",
+				"CatmullRomCurve3": "api/ko/extras/curves/CatmullRomCurve3",
+				"CubicBezierCurve": "api/ko/extras/curves/CubicBezierCurve",
+				"CubicBezierCurve3": "api/ko/extras/curves/CubicBezierCurve3",
+				"EllipseCurve": "api/ko/extras/curves/EllipseCurve",
+				"LineCurve": "api/ko/extras/curves/LineCurve",
+				"LineCurve3": "api/ko/extras/curves/LineCurve3",
+				"QuadraticBezierCurve": "api/ko/extras/curves/QuadraticBezierCurve",
+				"QuadraticBezierCurve3": "api/ko/extras/curves/QuadraticBezierCurve3",
+				"SplineCurve": "api/ko/extras/curves/SplineCurve"
 			}
+
 		},
 
 		"예제": {
