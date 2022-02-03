@@ -298,7 +298,7 @@ class Texture extends EventDispatcher {
 
 }
 
-Texture.DEFAULT_IMAGE = undefined;
+Texture.DEFAULT_IMAGE = null;
 Texture.DEFAULT_MAPPING = UVMapping;
 
 Texture.prototype.isTexture = true;
