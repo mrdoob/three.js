@@ -35,7 +35,6 @@
 			const params = {
 
 				animate: true,
-				alphaToCoverage: true,
 				planeX: {
 
 					constant: 0,
@@ -162,7 +161,6 @@
 							metalness: 0.1,
 							roughness: 0.75,
 							clippingPlanes: planes.filter( p => p !== plane ),
-							alphaToCoverage: true,
 
 							stencilWrite: true,
 							stencilRef: 0,
@@ -240,16 +238,6 @@
 				// GUI
 				const gui = new GUI();
 				gui.add( params, 'animate' );
-				gui.add( params, 'alphaToCoverage' ).onChange( function ( value ) {
-
-					planeObjects.forEach( p => {
-
-						p.material.alphaToCoverage = value;
-						p.material.needsUpdate = true;
-
-					} );
-
-				} );
 
 				const planeX = gui.addFolder( 'planeX' );
 				planeX.add( params.planeX, 'displayHelper' ).onChange( v => planeHelpers[ 0 ].visible = v );
