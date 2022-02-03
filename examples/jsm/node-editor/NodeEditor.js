@@ -120,7 +120,7 @@ export const NodeList = [
 				name: 'Invert',
 				icon: 'flip-vertical',
 				tip: 'Negate',
-				nodeClass: OperatorEditor
+				nodeClass: InvertEditor
 			},
 			{
 				name: 'Limiter',
