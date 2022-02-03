@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding } from '../../constants.js';
+import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding, NormalBlending } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -178,7 +178,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
 
-			transparent: material.transparent,
+			opaque: material.transparent === false && material.blending === NormalBlending,
 
 			alphaMap: !! material.alphaMap,
 			alphaTest: useAlphaTest,
@@ -448,7 +448,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 21 );
 		if ( parameters.decodeVideoTexture )
 			_programLayers.enable( 22 );
-		if ( parameters.transparent )
+		if ( parameters.opaque )
 			_programLayers.enable( 23 );
 		if ( parameters.alphaToCoverage )
 			_programLayers.enable( 24 );

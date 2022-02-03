@@ -316,6 +316,7 @@
 				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
 				"FramebufferTexture": "api/en/textures/FramebufferTexture",
+				"Source": "api/en/textures/Source",
 				"Texture": "api/en/textures/Texture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
@@ -815,6 +816,7 @@
 				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
 				"FramebufferTexture": "api/zh/textures/FramebufferTexture",
+				"Source": "api/zh/textures/Source",
 				"Texture": "api/zh/textures/Texture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
 			}
