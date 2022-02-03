@@ -147,9 +147,15 @@
 		This method sets the skinned mesh in the rest pose (resets the pose).
 		</p>
 
-		<h3>[method:Vector3 boneTransform]( [index:Integer], [target:Vector3] )</h3>
+		<h3>[method:Vector3 boneTransform]( [param:Integer index], [param:Vector3 target] )</h3>
 		<p>
 		Calculates the position of the vertex at the given index relative to the current bone transformations.
+		Target vector must be initialized with the vetrex coordinates prior to the transformation:
+		<code>
+const target = new THREE.Vector3();
+target.fromBufferAttribute( mesh.geometry.attributes.position, index );
+mesh.boneTransform( index, target );
+		</code>
 		</p>
 
 		<h2>Source</h2>
