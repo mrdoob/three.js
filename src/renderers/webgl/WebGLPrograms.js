@@ -150,6 +150,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			supportsVertexTextures: vertexTextures,
 			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.encoding : LinearEncoding ),
+			alphaToCoverage: !! material.alphaToCoverage,
 			map: !! material.map,
 			matcap: !! material.matcap,
 			envMap: !! envMap,
@@ -449,6 +450,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 22 );
 		if ( parameters.transparent )
 			_programLayers.enable( 23 );
+		if ( parameters.alphaToCoverage )
+			_programLayers.enable( 24 );
 
 		array.push( _programLayers.mask );
 
