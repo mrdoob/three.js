@@ -431,9 +431,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const image = texture.image;
 
-			if ( image === undefined ) {
+			if ( image === null ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined' );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but no image data found.' );
 
 			} else if ( image.complete === false ) {
 
