@@ -2243,7 +2243,7 @@ class GLTFParser {
 		this.cameraCache = { refs: {}, uses: {} };
 		this.lightCache = { refs: {}, uses: {} };
 
-		this.sourceCache = {}
+		this.sourceCache = {};
 		this.textureCache = {};
 
 		// Track node names, to ensure no duplicates
@@ -2828,7 +2828,6 @@ class GLTFParser {
 
 		const parser = this;
 		const json = this.json;
-		const options = this.options;
 
 		const textureDef = json.textures[ textureIndex ];
 		const sourceDef = json.images[ sourceIndex ];
@@ -2842,7 +2841,7 @@ class GLTFParser {
 
 		}
 
-		const promise = this.loadImageSource( sourceIndex, loader ).then( function( texture ) {
+		const promise = this.loadImageSource( sourceIndex, loader ).then( function ( texture ) {
 
 			texture.flipY = false;
 
