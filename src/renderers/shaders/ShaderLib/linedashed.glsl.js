@@ -43,6 +43,7 @@ varying float vLineDistance;
 
 void main() {
 
+	vec4 diffuseColor = vec4( diffuse, opacity );
 	#include <clipping_planes_fragment>
 
 	if ( mod( vLineDistance, totalSize ) > dashSize ) {
@@ -52,7 +53,6 @@ void main() {
 	}
 
 	vec3 outgoingLight = vec3( 0.0 );
-	vec4 diffuseColor = vec4( diffuse, opacity );
 
 	#include <logdepthbuf_fragment>
 	#include <color_fragment>
