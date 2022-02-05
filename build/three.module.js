@@ -3162,10 +3162,10 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
-		this.texture.isRenderTargetTexture = true;
+		const image = { width: width, height: height, depth: 1 };
 
-		this.texture.image = { width: width, height: height, depth: 1 };
+		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+		this.texture.isRenderTargetTexture = true;
 
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 		this.texture.internalFormat = options.internalFormat !== undefined ? options.internalFormat : null;
@@ -11985,7 +11985,10 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		// and the flag isRenderTargetTexture controls this conversion. The flip is not required when using WebGLCubeRenderTarget.texture
 		// as a cube texture (this is detected when isRenderTargetTexture is set to true for cube textures).
 
-		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+		const image = { width: size, height: size, depth: 1 };
+		const images = [ image, image, image, image, image, image ];
+
+		this.texture = new CubeTexture( images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 		this.texture.isRenderTargetTexture = true;
 
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
