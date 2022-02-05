@@ -11,7 +11,7 @@
 
 	function VolumeSlice( volume, index, axis ) {
 
-		var slice = this;
+		const slice = this;
 		/**
    * @member {Volume} volume The associated volume
    */
@@ -60,10 +60,10 @@
 
 		this.canvasBuffer = document.createElement( 'canvas' );
 		this.updateGeometry();
-		var canvasMap = new THREE.Texture( this.canvas );
+		const canvasMap = new THREE.Texture( this.canvas );
 		canvasMap.minFilter = THREE.LinearFilter;
 		canvasMap.wrapS = canvasMap.wrapT = THREE.ClampToEdgeWrapping;
-		var material = new THREE.MeshBasicMaterial( {
+		const material = new THREE.MeshBasicMaterial( {
 			map: canvasMap,
 			side: THREE.DoubleSide,
 			transparent: true
@@ -113,33 +113,33 @@
 
 			}
 
-			var iLength = this.iLength,
+			const iLength = this.iLength,
 				jLength = this.jLength,
 				sliceAccess = this.sliceAccess,
 				volume = this.volume,
 				canvas = this.canvasBuffer,
 				ctx = this.ctxBuffer; // get the imageData and pixel array from the canvas
 
-			var imgData = ctx.getImageData( 0, 0, iLength, jLength );
-			var data = imgData.data;
-			var volumeData = volume.data;
-			var upperThreshold = volume.upperThreshold;
-			var lowerThreshold = volume.lowerThreshold;
-			var windowLow = volume.windowLow;
-			var windowHigh = volume.windowHigh; // manipulate some pixel elements
+			const imgData = ctx.getImageData( 0, 0, iLength, jLength );
+			const data = imgData.data;
+			const volumeData = volume.data;
+			const upperThreshold = volume.upperThreshold;
+			const lowerThreshold = volume.lowerThreshold;
+			const windowLow = volume.windowLow;
+			const windowHigh = volume.windowHigh; // manipulate some pixel elements
 
-			var pixelCount = 0;
+			let pixelCount = 0;
 
 			if ( volume.dataType === 'label' ) {
 
 				//this part is currently useless but will be used when colortables will be handled
-				for ( var j = 0; j < jLength; j ++ ) {
+				for ( let j = 0; j < jLength; j ++ ) {
 
-					for ( var i = 0; i < iLength; i ++ ) {
+					for ( let i = 0; i < iLength; i ++ ) {
 
-						var label = volumeData[ sliceAccess( i, j ) ];
+						let label = volumeData[ sliceAccess( i, j ) ];
 						label = label >= this.colorMap.length ? label % this.colorMap.length + 1 : label;
-						var color = this.colorMap[ label ];
+						const color = this.colorMap[ label ];
 						data[ 4 * pixelCount ] = color >> 24 & 0xff;
 						data[ 4 * pixelCount + 1 ] = color >> 16 & 0xff;
 						data[ 4 * pixelCount + 2 ] = color >> 8 & 0xff;
@@ -152,12 +152,12 @@
 
 			} else {
 
-				for ( var j = 0; j < jLength; j ++ ) {
+				for ( let j = 0; j < jLength; j ++ ) {
 
-					for ( var i = 0; i < iLength; i ++ ) {
+					for ( let i = 0; i < iLength; i ++ ) {
 
-						var value = volumeData[ sliceAccess( i, j ) ];
-						var alpha = 0xff; //apply threshold
+						let value = volumeData[ sliceAccess( i, j ) ];
+						let alpha = 0xff; //apply threshold
 
 						alpha = upperThreshold >= value ? lowerThreshold <= value ? alpha : 0 : 0; //apply window level
 
@@ -188,7 +188,7 @@
    */
 		updateGeometry: function () {
 
-			var extracted = this.volume.extractPerpendicularPlane( this.axis, this.index );
+			const extracted = this.volume.extractPerpendicularPlane( this.axis, this.index );
 			this.sliceAccess = extracted.sliceAccess;
 			this.jLength = extracted.jLength;
 			this.iLength = extracted.iLength;
