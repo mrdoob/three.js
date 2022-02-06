@@ -1,4 +1,4 @@
-import { Material, ShaderMaterial } from '../../../../../build/three.module.js';
+import { Material, ShaderMaterial } from 'three';
 import { getNodesKeys } from '../core/NodeUtils.js';
 
 class NodeMaterial extends ShaderMaterial {
