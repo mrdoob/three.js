@@ -5,6 +5,7 @@ three.js
 [![Build Size][build-size]][build-size-url]
 [![NPM Downloads][npm-downloads]][npmtrends-url]
 [![Language Grade][lgtm]][lgtm-url]
+[![Discord][discord]][discord-url]
 
 #### JavaScript 3D library ####
 
@@ -16,8 +17,7 @@ The aim of the project is to create an easy to use, lightweight, cross-browser, 
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](https://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw) &mdash;
-[Discord](https://discord.gg/56GBJwAnUS)
+[Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw)
 
 ### Usage ###
 
@@ -79,3 +79,6 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [npmtrends-url]: https://www.npmtrends.com/three
 [lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
 [lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/
+[discord]: https://img.shields.io/discord/685241246557667386
+[discord-url]: https://discord.gg/56GBJwAnUS
+
