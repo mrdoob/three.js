@@ -3,8 +3,8 @@ three.js
 
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
+[![DeepScan][deepscan]][deepscan-url]
 [![NPM Downloads][npm-downloads]][npmtrends-url]
-[![Language Grade][lgtm]][lgtm-url]
 [![Discord][discord]][discord-url]
 
 #### JavaScript 3D library ####
@@ -77,8 +77,8 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [build-size-url]: https://bundlephobia.com/result?p=three
 [npm-downloads]: https://img.shields.io/npm/dw/three
 [npmtrends-url]: https://www.npmtrends.com/three
-[lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
-[lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/
+[deepscan]: https://deepscan.io/api/teams/16600/projects/19901/branches/525701/badge/grade.svg
+[deepscan-url]: https://deepscan.io/dashboard#view=project&tid=16600&pid=19901&bid=525701
 [discord]: https://img.shields.io/discord/685241246557667386
 [discord-url]: https://discord.gg/56GBJwAnUS
 
