@@ -6109,7 +6109,8 @@
 					images: {},
 					shapes: {},
 					skeletons: {},
-					animations: {}
+					animations: {},
+					nodes: {}
 				};
 				output.metadata = {
 					version: 4.5,
@@ -6230,6 +6231,7 @@
 				const shapes = extractFromCache(meta.shapes);
 				const skeletons = extractFromCache(meta.skeletons);
 				const animations = extractFromCache(meta.animations);
+				const nodes = extractFromCache(meta.nodes);
 				if (geometries.length > 0) output.geometries = geometries;
 				if (materials.length > 0) output.materials = materials;
 				if (textures.length > 0) output.textures = textures;
@@ -6237,6 +6239,7 @@
 				if (shapes.length > 0) output.shapes = shapes;
 				if (skeletons.length > 0) output.skeletons = skeletons;
 				if (animations.length > 0) output.animations = animations;
+				if (nodes.length > 0) output.nodes = nodes;
 			}
 
 			output.object = object;
@@ -6666,9 +6669,9 @@
 		}
 
 		toJSON(meta) {
-			const isRoot = meta === undefined || typeof meta === 'string';
+			const isRootObject = meta === undefined || typeof meta === 'string';
 
-			if (isRoot) {
+			if (isRootObject) {
 				meta = {
 					textures: {},
 					images: {}
@@ -6825,7 +6828,7 @@
 				return values;
 			}
 
-			if (isRoot) {
+			if (isRootObject) {
 				const textures = extractFromCache(meta.textures);
 				const images = extractFromCache(meta.images);
 				if (textures.length > 0) data.textures = textures;
@@ -6908,6 +6911,13 @@
 	}
 
 	Material.prototype.isMaterial = true;
+
+	Material.fromType = function
+		/*type*/
+	() {
+		// TODO: Behavior added in Materials.js
+		return null;
+	};
 
 	/**
 	 * parameters = {
@@ -27130,27 +27140,30 @@
 
 	LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
-	var Materials = /*#__PURE__*/Object.freeze({
-		__proto__: null,
-		ShadowMaterial: ShadowMaterial,
-		SpriteMaterial: SpriteMaterial,
-		RawShaderMaterial: RawShaderMaterial,
-		ShaderMaterial: ShaderMaterial,
-		PointsMaterial: PointsMaterial,
-		MeshPhysicalMaterial: MeshPhysicalMaterial,
-		MeshStandardMaterial: MeshStandardMaterial,
-		MeshPhongMaterial: MeshPhongMaterial,
-		MeshToonMaterial: MeshToonMaterial,
-		MeshNormalMaterial: MeshNormalMaterial,
-		MeshLambertMaterial: MeshLambertMaterial,
-		MeshDepthMaterial: MeshDepthMaterial,
-		MeshDistanceMaterial: MeshDistanceMaterial,
-		MeshBasicMaterial: MeshBasicMaterial,
-		MeshMatcapMaterial: MeshMatcapMaterial,
-		LineDashedMaterial: LineDashedMaterial,
-		LineBasicMaterial: LineBasicMaterial,
-		Material: Material
-	});
+	const materialLib = {
+		ShadowMaterial,
+		SpriteMaterial,
+		RawShaderMaterial,
+		ShaderMaterial,
+		PointsMaterial,
+		MeshPhysicalMaterial,
+		MeshStandardMaterial,
+		MeshPhongMaterial,
+		MeshToonMaterial,
+		MeshNormalMaterial,
+		MeshLambertMaterial,
+		MeshDepthMaterial,
+		MeshDistanceMaterial,
+		MeshBasicMaterial,
+		MeshMatcapMaterial,
+		LineDashedMaterial,
+		LineBasicMaterial,
+		Material
+	};
+
+	Material.fromType = function (type) {
+		return new materialLib[type]();
+	};
 
 	const AnimationUtils = {
 		// same as Array.prototype.slice, but also works on typed arrays
@@ -29741,7 +29754,7 @@
 				return textures[name];
 			}
 
-			const material = new Materials[json.type]();
+			const material = Material.fromType(json.type);
 			if (json.uuid !== undefined) material.uuid = json.uuid;
 			if (json.name !== undefined) material.name = json.name;
 			if (json.color !== undefined && material.color !== undefined) material.color.setHex(json.color);
