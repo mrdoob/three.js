@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-
+import { getNodesKeys } from './NodeUtils.js';
 import { MathUtils } from 'three';
 
 class Node {
@@ -94,6 +94,118 @@ class Node {
 		builder.removeStack( this );
 
 		return snippet;
+
+	}
+
+	serialize( json ) {
+
+		const nodeKeys = getNodesKeys( this );
+
+		if ( nodeKeys.length > 0 ) {
+
+			const inputNodes = {};
+
+			for ( const property of nodeKeys ) {
+
+				inputNodes[ property ] = this[ property ].toJSON( json.meta ).uuid;
+
+			}
+
+			json.inputNodes = inputNodes;
+
+		}
+
+	}
+
+	deserialize( json ) {
+
+		if ( json.inputNodes !== undefined ) {
+
+			const nodes = json.meta.nodes;
+
+			for ( const property in json.inputNodes ) {
+
+				const uuid = json.inputNodes[ property ];
+
+				this[ property ] = nodes[ uuid ];
+
+			}
+
+		}
+
+	}
+
+	toJSON( meta ) {
+
+		const { uuid, type } = this;
+		const isRoot = ( meta === undefined || typeof meta === 'string' );
+
+		if ( isRoot ) {
+
+			meta = {
+				textures: {},
+				images: {},
+				nodes: {}
+			};
+
+		}
+
+		// serialize
+
+		let data = meta.nodes[ uuid ];
+
+		if ( data === undefined ) {
+
+			data = {
+				uuid,
+				type,
+				meta,
+				metadata: {
+					version: 4.5,
+					type: 'Node',
+					generator: 'Node.toJSON'
+				}
+			};
+
+			meta.nodes[ data.uuid ] = data;
+
+			this.serialize( data );
+
+			delete data.meta;
+
+		}
+
+		// TODO: Copied from Object3D.toJSON
+
+		function extractFromCache( cache ) {
+
+			const values = [];
+
+			for ( const key in cache ) {
+
+				const data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+
+			return values;
+
+		}
+
+		if ( isRoot ) {
+
+			const textures = extractFromCache( meta.textures );
+			const images = extractFromCache( meta.images );
+			const nodes = extractFromCache( meta.nodes );
+
+			if ( textures.length > 0 ) data.textures = textures;
+			if ( images.length > 0 ) data.images = images;
+			if ( nodes.length > 0 ) data.nodes = nodes;
+
+		}
+
+		return data;
 
 	}
 
