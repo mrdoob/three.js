@@ -1,12 +1,13 @@
-import { SelectInput, LabelElement, Element } from '../../libs/flow.module.js';
+import { Element, LabelElement, NumberInput, SelectInput } from '../../libs/flow.module.js';
+import { FloatNode, OperatorNode } from '../../renderers/nodes/Nodes.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { OperatorNode, FloatNode } from '../../renderers/nodes/Nodes.js';
 
-const NULL_VALUE = new FloatNode();
 
 export class OperatorEditor extends BaseNode {
 
 	constructor() {
+
+		const NULL_VALUE = new FloatNode();
 
 		const node = new OperatorNode( '+', NULL_VALUE, NULL_VALUE );
 
@@ -30,17 +31,29 @@ export class OperatorEditor extends BaseNode {
 		const aElement = new LabelElement( 'A' ).setInput( 3 );
 		const bElement = new LabelElement( 'B' ).setInput( 3 );
 
-		aElement.onConnect( () => {
 
-			node.aNode = aElement.getLinkedObject() || NULL_VALUE;
+		aElement.add( new NumberInput().onChange( ( field ) => {
+
+			node.aNode.value = field.getValue();
+
+		} ) ).onConnect( ( elmt ) => {
+
+			elmt.setEnabledInputs( ! elmt.getLinkedObject() );
+			node.aNode = elmt.getLinkedObject() || NULL_VALUE;
 
 		} );
 
-		bElement.onConnect( () => {
+		bElement.add( new NumberInput().onChange( ( field ) => {
 
-			node.bNode = bElement.getLinkedObject() || NULL_VALUE;
+			node.bNode.value = field.getValue();
+
+		} ) ).onConnect( ( elmt ) => {
+
+			elmt.setEnabledInputs( ! elmt.getLinkedObject() );
+			node.bNode = elmt.getLinkedObject() || NULL_VALUE;
 
 		} );
+
 
 		this.add( new Element().add( opInput ) )
 			.add( aElement )

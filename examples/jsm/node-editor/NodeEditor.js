@@ -1,11 +1,14 @@
 import { Styles, Canvas, CircleMenu, ButtonInput, ContextMenu, Tips, Search, Loader } from '../libs/flow.module.js';
+import { BasicMaterialEditor } from './materials/BasicMaterialEditor.js';
 import { StandardMaterialEditor } from './materials/StandardMaterialEditor.js';
+import { PointsMaterialEditor } from './materials/PointsMaterialEditor.js';
 import { OperatorEditor } from './math/OperatorEditor.js';
 import { NormalizeEditor } from './math/NormalizeEditor.js';
 import { InvertEditor } from './math/InvertEditor.js';
 import { LimiterEditor } from './math/LimiterEditor.js';
 import { DotEditor } from './math/DotEditor.js';
 import { PowerEditor } from './math/PowerEditor.js';
+import { AngleEditor } from './math/AngleEditor.js';
 import { TrigonometryEditor } from './math/TrigonometryEditor.js';
 import { FloatEditor } from './inputs/FloatEditor.js';
 import { Vector2Editor } from './inputs/Vector2Editor.js';
@@ -13,6 +16,7 @@ import { Vector3Editor } from './inputs/Vector3Editor.js';
 import { Vector4Editor } from './inputs/Vector4Editor.js';
 import { SliderEditor } from './inputs/SliderEditor.js';
 import { ColorEditor } from './inputs/ColorEditor.js';
+import { TextureEditor } from './inputs/TextureEditor.js';
 import { BlendEditor } from './display/BlendEditor.js';
 import { UVEditor } from './accessors/UVEditor.js';
 import { PositionEditor } from './accessors/PositionEditor.js';
@@ -22,7 +26,9 @@ import { OscillatorEditor } from './utils/OscillatorEditor.js';
 import { SplitEditor } from './utils/SplitEditor.js';
 import { JoinEditor } from './utils/JoinEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
+import { PointsEditor } from './scene/PointsEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
+import { FileEditor } from './core/FileEditor.js';
 import { EventDispatcher } from 'three';
 
 Styles.icons.unlink = 'ti ti-unlink';
@@ -61,6 +67,11 @@ export const NodeList = [
 				name: 'Color',
 				icon: 'palette',
 				nodeClass: ColorEditor
+			},
+			{
+				name: 'Texture',
+				icon: 'photo',
+				nodeClass: TextureEditor
 			}
 		]
 	},
@@ -109,7 +120,7 @@ export const NodeList = [
 				name: 'Invert',
 				icon: 'flip-vertical',
 				tip: 'Negate',
-				nodeClass: OperatorEditor
+				nodeClass: InvertEditor
 			},
 			{
 				name: 'Limiter',
@@ -130,13 +141,19 @@ export const NodeList = [
 			{
 				name: 'Trigonometry',
 				icon: 'wave-sine',
-				tip: 'Sin / Cos / Tan',
+				tip: 'Sin / Cos / Tan / ...',
 				nodeClass: TrigonometryEditor
+			},
+			{
+				name: 'Angle',
+				icon: 'angle',
+				tip: 'Degress / Radians',
+				nodeClass: AngleEditor
 			},
 			{
 				name: 'Normalize',
 				icon: 'fold',
-				nodeClass: OperatorEditor
+				nodeClass: NormalizeEditor
 			}
 		]
 	},
@@ -193,16 +210,29 @@ export const NodeList = [
 		icon: 'circles',
 		children: [
 			{
+				name: 'Basic Material',
+				icon: 'circle',
+				nodeClass: BasicMaterialEditor
+			},
+			{
 				name: 'Standard Material',
 				icon: 'circle',
 				nodeClass: StandardMaterialEditor
+			},
+			{
+				name: 'Points Material',
+				icon: 'circle-dotted',
+				nodeClass: PointsMaterialEditor
 			}
 		]
 	}
 ];
 
 export const ClassLib = {
+	BasicMaterialEditor,
 	StandardMaterialEditor,
+	PointsMaterialEditor,
+	PointsEditor,
 	MeshEditor,
 	OperatorEditor,
 	NormalizeEditor,
@@ -210,6 +240,7 @@ export const ClassLib = {
 	LimiterEditor,
 	DotEditor,
 	PowerEditor,
+	AngleEditor,
 	TrigonometryEditor,
 	FloatEditor,
 	Vector2Editor,
@@ -217,6 +248,7 @@ export const ClassLib = {
 	Vector4Editor,
 	SliderEditor,
 	ColorEditor,
+	TextureEditor,
 	BlendEditor,
 	UVEditor,
 	PositionEditor,
@@ -247,6 +279,7 @@ export class NodeEditor extends EventDispatcher {
 		this.nodesContext = null;
 		this.examplesContext = null;
 
+		this._initUpload();
 		this._initTips();
 		this._initMenu();
 		this._initSearch();
@@ -309,17 +342,49 @@ export class NodeEditor extends EventDispatcher {
 
 	loadJSON( json ) {
 
-		this.canvas.clear();
+		const canvas = this.canvas;
 
-		this.canvas.deserialize( json );
+		canvas.clear();
 
-		for ( const node of this.canvas.nodes ) {
+		canvas.deserialize( json );
+
+		for ( const node of canvas.nodes ) {
 
 			this.add( node );
 
 		}
 
 		this.dispatchEvent( { type: 'load' } );
+
+	}
+
+	_initUpload() {
+
+		const canvas = this.canvas;
+
+		canvas.onDrop( () => {
+
+			for ( const item of canvas.droppedItems ) {
+
+				if ( /^image\//.test( item.type ) === true ) {
+
+					const { relativeClientX, relativeClientY } = canvas;
+
+					const file = item.getAsFile();
+					const fileEditor = new FileEditor( file );
+
+					fileEditor.setPosition(
+						relativeClientX - ( fileEditor.getWidth() / 2 ),
+						relativeClientY - 20
+					);
+
+					this.add( fileEditor );
+
+				}
+
+			}
+
+		} );
 
 	}
 
@@ -344,7 +409,15 @@ export class NodeEditor extends EventDispatcher {
 		menuButton.onClick( () => this.nodesContext.open() );
 		examplesButton.onClick( () => this.examplesContext.open() );
 
-		newButton.onClick( () => this.newProject() );
+		newButton.onClick( () => {
+
+			if ( confirm( 'Are you sure?' ) === true ) {
+
+				this.newProject();
+
+			}
+
+		} );
 
 		openButton.onClick( () => {
 
@@ -504,41 +577,63 @@ export class NodeEditor extends EventDispatcher {
 
 			const object3d = this.scene;
 
-			object3d.traverse( ( obj3d ) => {
+			if ( object3d !== null ) {
 
-				if ( obj3d.isMesh === true ) {
+				object3d.traverse( ( obj3d ) => {
 
-					const button = new ButtonInput( `Mesh - ${obj3d.name}` );
-					button.setIcon( `ti ti-3d-cube-sphere` );
-					button.addEventListener( 'complete', () => {
+					if ( obj3d.isMesh === true || obj3d.isPoints === true ) {
 
-						for ( const node of this.canvas.nodes ) {
+						let prefix = null;
+						let icon = null;
+						let editorClass = null;
 
-							if ( node.value === obj3d ) {
+						if ( obj3d.isMesh === true ) {
 
-								// not duplicated node
+							prefix = 'Mesh';
+							icon = 'ti ti-3d-cube-sphere';
+							editorClass = MeshEditor;
 
-								this.canvas.select( node );
+						} else if ( obj3d.isPoints === true ) {
 
-								return;
-
-							}
+							prefix = 'Points';
+							icon = 'ti ti-border-none';
+							editorClass = PointsEditor;
 
 						}
 
-						const node = new MeshEditor( obj3d );
+						const button = new ButtonInput( `${prefix} - ${obj3d.name}` );
+						button.setIcon( icon );
+						button.addEventListener( 'complete', () => {
 
-						this.add( node );
+							for ( const node of this.canvas.nodes ) {
 
-						this.centralizeNode( node );
+								if ( node.value === obj3d ) {
 
-					} );
+									// prevent duplicated node
 
-					search.add( button );
+									this.canvas.select( node );
 
-				}
+									return;
 
-			} );
+								}
+
+							}
+
+							const node = new editorClass( obj3d );
+
+							this.add( node );
+
+							this.centralizeNode( node );
+
+						} );
+
+						search.add( button );
+
+					}
+
+				} );
+
+			}
 
 		} );
 
@@ -568,8 +663,8 @@ export class NodeEditor extends EventDispatcher {
 			if ( isContext ) {
 
 				node.setPosition(
-					contextPosition.x,
-					contextPosition.y
+					Math.round( contextPosition.x ),
+					Math.round( contextPosition.y )
 				);
 
 			} else {
@@ -594,8 +689,8 @@ export class NodeEditor extends EventDispatcher {
 
 			const { relativeClientX, relativeClientY } = this.canvas;
 
-			contextPosition.x = relativeClientX;
-			contextPosition.y = relativeClientY;
+			contextPosition.x = Math.round( relativeClientX );
+			contextPosition.y = Math.round( relativeClientY );
 
 		} );
 

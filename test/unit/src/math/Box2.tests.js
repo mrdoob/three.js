@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { Box2 } from '../../../../src/math/Box2';
-import { Vector2 } from '../../../../src/math/Vector2';
+import { Box2 } from '../../../../src/math/Box2.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
 import {
 	negInf2,
 	posInf2,
@@ -9,7 +9,7 @@ import {
 	zero2,
 	one2,
 	two2
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -359,13 +359,12 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( zero2.clone(), one2.clone() );
-			var c = new Box2( one2.clone().negate(), one2.clone() );
-			var d = new Box2( one2.clone().negate(), zero2.clone() );
+			var c = new Box2( one2.clone().negate(), zero2.clone() );
 
 			assert.ok( a.clone().translate( one2 ).equals( new Box2( one2, one2 ) ), 'Passed!' );
 			assert.ok( a.clone().translate( one2 ).translate( one2.clone().negate() ).equals( a ), 'Passed!' );
-			assert.ok( d.clone().translate( one2 ).equals( b ), 'Passed!' );
-			assert.ok( b.clone().translate( one2.clone().negate() ).equals( d ), 'Passed!' );
+			assert.ok( c.clone().translate( one2 ).equals( b ), 'Passed!' );
+			assert.ok( b.clone().translate( one2.clone().negate() ).equals( c ), 'Passed!' );
 
 		} );
 

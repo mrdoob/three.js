@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { EventDispatcher } from '../../../../src/core/EventDispatcher';
+import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
 export default QUnit.module( 'Core', () => {
 

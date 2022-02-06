@@ -1,6 +1,6 @@
-import * as THREE from 'three';
+import * as THREE from '../../../build/three.module.js';
 
-var camera, scene, renderer, group;
+let camera, scene, renderer, group;
 
 function init( canvas, width, height, pixelRatio, path ) {
 
@@ -16,24 +16,24 @@ function init( canvas, width, height, pixelRatio, path ) {
 
 	// we don't use ImageLoader since it has a DOM dependency (HTML5 image element)
 
-	var loader = new THREE.ImageBitmapLoader().setPath( path );
+	const loader = new THREE.ImageBitmapLoader().setPath( path );
 	loader.setOptions( { imageOrientation: 'flipY' } );
 	loader.load( 'textures/matcaps/matcap-porcelain-white.jpg', function ( imageBitmap ) {
 
-		var texture = new THREE.CanvasTexture( imageBitmap );
+		const texture = new THREE.CanvasTexture( imageBitmap );
 
-		var geometry = new THREE.IcosahedronGeometry( 5, 8 );
-		var materials = [
+		const geometry = new THREE.IcosahedronGeometry( 5, 8 );
+		const materials = [
 			new THREE.MeshMatcapMaterial( { color: 0xaa24df, matcap: texture } ),
 			new THREE.MeshMatcapMaterial( { color: 0x605d90, matcap: texture } ),
 			new THREE.MeshMatcapMaterial( { color: 0xe04a3f, matcap: texture } ),
 			new THREE.MeshMatcapMaterial( { color: 0xe30456, matcap: texture } )
 		];
 
-		for ( var i = 0; i < 100; i ++ ) {
+		for ( let i = 0; i < 100; i ++ ) {
 
-			var material = materials[ i % materials.length ];
-			var mesh = new THREE.Mesh( geometry, material );
+			const material = materials[ i % materials.length ];
+			const mesh = new THREE.Mesh( geometry, material );
 			mesh.position.x = random() * 200 - 100;
 			mesh.position.y = random() * 200 - 100;
 			mesh.position.z = random() * 200 - 100;
@@ -73,11 +73,11 @@ function animate() {
 
 // PRNG
 
-var seed = 1;
+let seed = 1;
 
 function random() {
 
-	var x = Math.sin( seed ++ ) * 10000;
+	const x = Math.sin( seed ++ ) * 10000;
 
 	return x - Math.floor( x );
 

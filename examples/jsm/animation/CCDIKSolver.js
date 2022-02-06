@@ -461,4 +461,4 @@ class CCDIKHelper extends Object3D {
 
 }
 
-export { CCDIKSolver };
+export { CCDIKSolver, CCDIKHelper };

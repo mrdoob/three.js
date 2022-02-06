@@ -133,15 +133,23 @@
 				const defaultMaterial = new Nodes.MeshBasicNodeMaterial();
 				defaultMaterial.colorNode = new Nodes.FloatNode( 0 );
 
-				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 32, 16 ), defaultMaterial  ) ;
+				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 32, 16 ), defaultMaterial ) ;
 				sphere.name = 'Sphere';
 				sphere.position.set( 500, 0, -500 );
 				scene.add( sphere );
 
-				const box = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), defaultMaterial  ) ;
+				const box = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), defaultMaterial ) ;
 				box.name = 'Box';
 				box.position.set( -500, 0, -500 );
 				scene.add( box );
+
+				const defaultPointsMaterial = new Nodes.PointsNodeMaterial();
+				defaultPointsMaterial.colorNode = new Nodes.FloatNode( 0 );
+
+				const torusKnot = new THREE.Points( new THREE.TorusKnotGeometry( 100, 30, 100, 16 ), defaultPointsMaterial ) ;
+				torusKnot.name = 'Torus Knot ( Points )';
+				torusKnot.position.set( 0, 0, -500 );
+				scene.add( torusKnot );
 
 				model = object.children[ 0 ];
 				model.position.set( 0, 0, 10 );

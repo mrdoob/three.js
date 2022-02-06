@@ -75,12 +75,10 @@
 				const modelPartNames = [];
 				const printTicketPartNames = [];
 				const texturesPartNames = [];
-				const otherPartNames = [];
 				let modelRels;
 				const modelParts = {};
 				const printTicketParts = {};
 				const texturesParts = {};
-				const otherParts = {};
 
 				try {
 
@@ -118,10 +116,6 @@
 					} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 						texturesPartNames.push( file );
-
-					} else if ( file.match( /^3D\/Other\/.*/ ) ) {
-
-						otherPartNames.push( file );
 
 					}
 
@@ -195,8 +189,7 @@
 					modelRels: modelRels,
 					model: modelParts,
 					printTicket: printTicketParts,
-					texture: texturesParts,
-					other: otherParts
+					texture: texturesParts
 				};
 
 			}
@@ -909,7 +902,7 @@
 
 			}
 
-			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) {
+			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) {
 
 				// geometry
 				const geometry = new THREE.BufferGeometry();
@@ -1008,7 +1001,7 @@
 
 						case 'vertexColors':
 							const colorgroup = modelData.resources.colorgroup[ resourceId ];
-							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) );
+							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) );
 							break;
 
 						case 'default':

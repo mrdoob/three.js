@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
-
+import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer.js';
+/*
 var customWebGLContext = function () {
 
 	this.DEPTH_BUFFER_BIT = 256;
@@ -586,7 +586,7 @@ var customWebGLContext = function () {
 
 
 };
-
+*/
 export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGLRenderer-webonly', () => {

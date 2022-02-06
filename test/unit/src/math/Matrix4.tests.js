@@ -1,12 +1,12 @@
 /* global QUnit */
 
-import { Matrix3 } from '../../../../src/math/Matrix3';
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Euler } from '../../../../src/math/Euler';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import * as MathUtils from '../../../../src/math/MathUtils';
-import { eps } from './Constants.tests';
+import { Matrix3 } from '../../../../src/math/Matrix3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Euler } from '../../../../src/math/Euler.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import * as MathUtils from '../../../../src/math/MathUtils.js';
+import { eps } from './Constants.tests.js';
 
 
 function matrixEquals4( a, b, tolerance ) {

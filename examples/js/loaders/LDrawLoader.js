@@ -1656,21 +1656,13 @@
 
 					} else if ( elementSize === 2 ) {
 
-						if ( material !== null ) {
+						if ( isConditionalSegments ) {
 
-							if ( isConditionalSegments ) {
-
-								materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
-
-							} else {
-
-								materials.push( material.userData.edgeMaterial );
-
-							}
+							materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
 
 						} else {
 
-							materials.push( null );
+							materials.push( material.userData.edgeMaterial );
 
 						}
 
@@ -2029,7 +2021,8 @@
 
 		getMainEdgeMaterial() {
 
-			return this.getMaterial( MAIN_EDGE_COLOUR_CODE );
+			const mainMat = this.getMainMaterial();
+			return mainMat && mainMat.userData ? mainMat.userData.edgeMaterial : null;
 
 		}
 
@@ -2244,6 +2237,7 @@
 			material.premultipliedAlpha = true;
 			material.opacity = alpha;
 			material.depthWrite = ! isTransparent;
+			material.color.convertSRGBToLinear();
 			material.polygonOffset = true;
 			material.polygonOffsetFactor = 1;
 
@@ -2263,7 +2257,8 @@
 					depthWrite: ! isTransparent
 				} );
 				edgeMaterial.userData.code = code;
-				edgeMaterial.name = name + ' - Edge'; // This is the material used for conditional edges
+				edgeMaterial.name = name + ' - Edge';
+				edgeMaterial.color.convertSRGBToLinear(); // This is the material used for conditional edges
 
 				edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
 					fog: true,
@@ -2272,6 +2267,7 @@
 					color: edgeColor,
 					opacity: alpha
 				} );
+				edgeMaterial.userData.conditionalEdgeMaterial.color.convertSRGBToLinear();
 
 			}
 

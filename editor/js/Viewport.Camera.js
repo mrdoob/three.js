@@ -2,11 +2,11 @@ import { UISelect } from './libs/ui.js';
 
 function ViewportCamera( editor ) {
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
 	//
 
-	var cameraSelect = new UISelect();
+	const cameraSelect = new UISelect();
 	cameraSelect.setPosition( 'absolute' );
 	cameraSelect.setRight( '10px' );
 	cameraSelect.setTop( '10px' );
@@ -25,13 +25,13 @@ function ViewportCamera( editor ) {
 
 	function update() {
 
-		var options = {};
+		const options = {};
 
-		var cameras = editor.cameras;
+		const cameras = editor.cameras;
 
-		for ( var key in cameras ) {
+		for ( const key in cameras ) {
 
-			var camera = cameras[ key ];
+			const camera = cameras[ key ];
 			options[ camera.uuid ] = camera.name;
 
 		}

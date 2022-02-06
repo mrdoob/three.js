@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
 

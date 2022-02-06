@@ -11,7 +11,7 @@ import { MenubarStatus } from './Menubar.Status.js';
 
 function Menubar( editor ) {
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setId( 'menubar' );
 
 	container.add( new MenubarFile( editor ) );

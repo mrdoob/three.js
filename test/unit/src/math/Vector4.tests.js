@@ -1,15 +1,15 @@
 /* global QUnit */
 
-import { Vector4 } from '../../../../src/math/Vector4';
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import {
 	x,
 	y,
 	z,
 	w,
 	eps
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 export default QUnit.module( 'Maths', () => {
 

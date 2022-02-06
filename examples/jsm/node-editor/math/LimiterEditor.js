@@ -1,12 +1,13 @@
-import { SelectInput, LabelElement, Element } from '../../libs/flow.module.js';
+import { SelectInput, LabelElement, Element, NumberInput } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { MathNode, FloatNode } from '../../renderers/nodes/Nodes.js';
 
-const NULL_VALUE = new FloatNode();
 
 export class LimiterEditor extends BaseNode {
 
 	constructor() {
+
+		const NULL_VALUE = new FloatNode();
 
 		const node = new MathNode( MathNode.MIN, NULL_VALUE, NULL_VALUE );
 
@@ -14,12 +15,15 @@ export class LimiterEditor extends BaseNode {
 
 		const methodInput = new SelectInput( [
 			{ name: 'Min', value: MathNode.MIN },
-			{ name: 'Max', value: MathNode.MAX }
+			{ name: 'Max', value: MathNode.MAX },
+			// { name: 'Clamp', value: MathNode.CLAMP }
+			{ name: 'Saturate', value: MathNode.SATURATE }
 		], MathNode.MIN );
 
 		methodInput.onChange( ( data ) => {
 
 			node.method = data.getValue();
+			bElement.setVisible( data.getValue() !== MathNode.SATURATE );
 
 			this.invalidate();
 
@@ -28,15 +32,25 @@ export class LimiterEditor extends BaseNode {
 		const aElement = new LabelElement( 'A' ).setInput( 1 );
 		const bElement = new LabelElement( 'B' ).setInput( 1 );
 
-		aElement.onConnect( () => {
+		aElement.add( new NumberInput().onChange( ( field ) => {
 
-			node.aNode = aElement.getLinkedObject() || NULL_VALUE;
+			node.aNode.value = field.getValue();
+
+		} ) ).onConnect( ( elmt ) => {
+
+			elmt.setEnabledInputs( ! elmt.getLinkedObject() );
+			node.aNode = elmt.getLinkedObject() || NULL_VALUE;
 
 		} );
 
-		bElement.onConnect( () => {
+		bElement.add( new NumberInput().onChange( ( field ) => {
 
-			node.bNode = bElement.getLinkedObject() || NULL_VALUE;
+			node.bNode.value = field.getValue();
+
+		} ) ).onConnect( ( elmt ) => {
+
+			elmt.setEnabledInputs( ! elmt.getLinkedObject() );
+			node.bNode = elmt.getLinkedObject() || NULL_VALUE;
 
 		} );
 

@@ -325,6 +325,8 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
+				newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
+
 				// Set foveation to maximum.
 				this.setFoveation( 1.0 );
 

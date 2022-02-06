@@ -191,7 +191,7 @@
 				_end4.applyMatrix4( _mvMatrix ); // skip the segment if it's entirely behind the camera
 
 
-				var isBehindCameraNear = _start4.z > near && _end4.z > near;
+				const isBehindCameraNear = _start4.z > near && _end4.z > near;
 
 				if ( isBehindCameraNear ) {
 

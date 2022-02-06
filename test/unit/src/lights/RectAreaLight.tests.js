@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils';
-import { RectAreaLight } from '../../../../src/lights/RectAreaLight';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { RectAreaLight } from '../../../../src/lights/RectAreaLight.js';
 
 export default QUnit.module( 'Lights', () => {
 

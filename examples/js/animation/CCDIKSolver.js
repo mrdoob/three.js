@@ -427,6 +427,7 @@
 
 	}
 
+	THREE.CCDIKHelper = CCDIKHelper;
 	THREE.CCDIKSolver = CCDIKSolver;
 
 } )();

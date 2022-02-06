@@ -5,11 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			#warning {
-				color: #ff0000;
-			}
-		</style>
 	</head>
 	<body>
 
@@ -255,11 +250,8 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 
-			const isIE = /Trident/i.test( navigator.userAgent );
-			const isEdge = /Edge/i.test( navigator.userAgent );
-
 			// Texture width for simulation (each texel is a debris particle)
-			const WIDTH = ( isIE || isEdge ) ? 4 : 64;
+			const WIDTH = 64;
 
 			let container, stats;
 			let camera, scene, renderer, geometry;
@@ -330,7 +322,7 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
-				if ( isSafari() ) {
+				if ( renderer.capabilities.isWebGL2 === false ) {
 
 					gpuCompute.setDataType( THREE.HalfFloatType );
 
@@ -359,12 +351,6 @@
 					console.error( error );
 
 				}
-
-			}
-
-			function isSafari() {
-
-				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 

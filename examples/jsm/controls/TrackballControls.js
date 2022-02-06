@@ -541,9 +541,6 @@ class TrackballControls extends EventDispatcher {
 						_state = STATE.PAN;
 						break;
 
-					default:
-						_state = STATE.NONE;
-
 				}
 
 			}

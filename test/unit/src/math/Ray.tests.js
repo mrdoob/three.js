@@ -1,18 +1,18 @@
 /* global QUnit */
 
-import { Ray } from '../../../../src/math/Ray';
-import { Box3 } from '../../../../src/math/Box3';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Sphere } from '../../../../src/math/Sphere';
-import { Plane } from '../../../../src/math/Plane';
-import { Matrix4 } from '../../../../src/math/Matrix4';
+import { Ray } from '../../../../src/math/Ray.js';
+import { Box3 } from '../../../../src/math/Box3.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Sphere } from '../../../../src/math/Sphere.js';
+import { Plane } from '../../../../src/math/Plane.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import {
 	zero3,
 	one3,
 	two3,
 	eps,
 	posInf3
-} from './Constants.tests';
+} from './Constants.tests.js';
 
 export default QUnit.module( 'Maths', () => {
 
