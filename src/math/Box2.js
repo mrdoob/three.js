@@ -196,6 +196,14 @@ class Box2 {
 
 	}
 
+    round() {
+
+        this.min.round();
+        this.max.round();
+
+        return this;
+    }
+
 }
 
 Box2.prototype.isBox2 = true;

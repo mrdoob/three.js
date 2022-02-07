@@ -467,6 +467,14 @@ class Box3 {
 
 	}
 
+    round() {
+
+        this.min.round();
+        this.max.round();
+
+        return this;
+    }
+
 }
 
 Box3.prototype.isBox3 = true;
