@@ -492,13 +492,13 @@ class BufferGeometry extends EventDispatcher {
 
 		const nVertices = positions.length / 3;
 
-		if ( attributes.tangent === undefined ) {
+		if ( this.hasAttribute( 'tangent' ) === false ) {
 
 			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
 
 		}
 
-		const tangents = attributes.tangent.array;
+		const tangents = this.getAttribute( 'tangent' ).array;
 
 		const tan1 = [], tan2 = [];
 
