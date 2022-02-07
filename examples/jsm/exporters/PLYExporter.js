@@ -457,7 +457,7 @@ class PLYExporter {
 								uvs.getX( i ) + ' ' +
 								uvs.getY( i );
 
-						} else if ( includeUVs !== false ) {
+						} else {
 
 							line += ' 0 0';
 
