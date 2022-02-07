@@ -104,6 +104,16 @@ class VRButton {
 
 		}
 
+		function showVRNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'VR NOT ALLOWED';
+
+		}
+
 		function stylizeElement( element ) {
 
 			element.style.position = 'absolute';
@@ -138,7 +148,7 @@ class VRButton {
 
 				}
 
-			} );
+			} ).catch( showVRNotAllowed );
 
 			return button;
 
