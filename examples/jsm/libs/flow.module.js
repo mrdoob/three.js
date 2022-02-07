@@ -12,7 +12,7 @@ function __flow__addCSS( css ) {
 		style.innerHTML = css;
 		document.head.appendChild( style );
 
-	} catch( e ) {}
+	} catch ( e ) {}
 
 }
 
@@ -339,14 +339,14 @@ const toHex = ( val ) => {
 
 };
 
-var Utils = /*#__PURE__*/Object.freeze({
+var Utils = /*#__PURE__*/Object.freeze( {
 	__proto__: null,
 	pointer: pointer,
 	draggableDOM: draggableDOM,
 	dispatchEventList: dispatchEventList,
 	toPX: toPX,
 	toHex: toHex
-});
+} );
 
 class Link {
 
@@ -810,7 +810,7 @@ class Element extends Serializer {
 
 				};
 
-				const onConnect = ( e ) => {
+				const onConnect = () => {
 
 					this.dispatchEvent( new Event( 'connectChildren' ) );
 
@@ -1452,7 +1452,7 @@ class Node extends Serializer {
 
 	serialize( data ) {
 
-		const { x, y, style } = this.getPosition();
+		const { x, y } = this.getPosition();
 
 		const elements = [];
 
@@ -1467,9 +1467,9 @@ class Node extends Serializer {
 		data.width = this.getWidth();
 		data.elements = elements;
 
-		if ( style !== '' ) {
+		if ( this.style !== '' ) {
 
-			data.style = style;
+			data.style = this.style;
 
 		}
 
@@ -2091,7 +2091,7 @@ class Canvas extends Serializer {
 					link.inputElement.connect();
 
 				}
-				
+
 			}
 
 		}
@@ -2689,7 +2689,7 @@ class NumberInput extends Input {
 
 	_getString( value ) {
 
-		let num = Math.min( Math.max( Number( value ), this.min ), this.max );
+		const num = Math.min( Math.max( Number( value ), this.min ), this.max );
 
 		if ( this.integer === true ) {
 
@@ -2982,7 +2982,7 @@ class LabelElement extends Element {
 				data.icon = icon;
 
 			}
-			
+
 		}
 
 	}
@@ -3000,7 +3000,7 @@ class LabelElement extends Element {
 				this.setIcon( data.icon );
 
 			}
-			
+
 		}
 
 	}
@@ -3437,7 +3437,7 @@ class CircleMenu extends Menu {
 		super( 'circle', target );
 
 	}
-	
+
 }
 
 class Tips extends EventTarget {
@@ -3687,7 +3687,7 @@ class Search extends Menu {
 
 		super.add( button );
 
-		const onDown = ( e ) => {
+		const onDown = () => {
 
 			const filter = this.getFilterByButton( button );
 
@@ -3811,7 +3811,7 @@ class SelectInput extends Input {
 
 		};
 
-		dom.onmousedown = dom.ontouchstart = ( e ) => {
+		dom.onmousedown = dom.ontouchstart = () => {
 
 			this.dispatchEvent( new Event( 'click' ) );
 
@@ -3925,7 +3925,7 @@ class ToggleInput extends Input {
 
 }
 
-var Flow = /*#__PURE__*/Object.freeze({
+var Flow = /*#__PURE__*/Object.freeze( {
 	__proto__: null,
 	Element: Element,
 	Input: Input,
@@ -3951,7 +3951,7 @@ var Flow = /*#__PURE__*/Object.freeze({
 	StringInput: StringInput,
 	TextInput: TextInput,
 	ToggleInput: ToggleInput
-});
+} );
 
 class Loader extends EventTarget {
 
