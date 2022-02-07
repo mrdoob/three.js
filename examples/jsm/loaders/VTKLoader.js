@@ -346,7 +346,6 @@ class VTKLoader extends Loader {
 			let normals = [];
 			let indices = [];
 
-			// Going to make a big array of strings
 			let index = 0;
 
 			function findString( buffer, start ) {
