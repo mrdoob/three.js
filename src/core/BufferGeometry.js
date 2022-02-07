@@ -498,7 +498,7 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		const tangents = this.getAttribute( 'tangent' );
+		const tangents = this.getAttribute( 'tangent' ).array;
 
 		const tan1 = [], tan2 = [];
 
