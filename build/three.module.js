@@ -2474,7 +2474,7 @@ class Texture extends EventDispatcher {
 
 }
 
-Texture.DEFAULT_IMAGE = undefined;
+Texture.DEFAULT_IMAGE = null;
 Texture.DEFAULT_MAPPING = UVMapping;
 
 Texture.prototype.isTexture = true;
@@ -3162,10 +3162,10 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
-		this.texture.isRenderTargetTexture = true;
+		const image = { width: width, height: height, depth: 1 };
 
-		this.texture.image = { width: width, height: height, depth: 1 };
+		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+		this.texture.isRenderTargetTexture = true;
 
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 		this.texture.internalFormat = options.internalFormat !== undefined ? options.internalFormat : null;
@@ -7922,7 +7922,8 @@ class Object3D extends EventDispatcher {
 				images: {},
 				shapes: {},
 				skeletons: {},
-				animations: {}
+				animations: {},
+				nodes: {}
 			};
 
 			output.metadata = {
@@ -8106,6 +8107,7 @@ class Object3D extends EventDispatcher {
 			const shapes = extractFromCache( meta.shapes );
 			const skeletons = extractFromCache( meta.skeletons );
 			const animations = extractFromCache( meta.animations );
+			const nodes = extractFromCache( meta.nodes );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
@@ -8114,6 +8116,7 @@ class Object3D extends EventDispatcher {
 			if ( shapes.length > 0 ) output.shapes = shapes;
 			if ( skeletons.length > 0 ) output.skeletons = skeletons;
 			if ( animations.length > 0 ) output.animations = animations;
+			if ( nodes.length > 0 ) output.nodes = nodes;
 
 		}
 
@@ -8651,9 +8654,9 @@ class Material extends EventDispatcher {
 
 	toJSON( meta ) {
 
-		const isRoot = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
-		if ( isRoot ) {
+		if ( isRootObject ) {
 
 			meta = {
 				textures: {},
@@ -8861,7 +8864,7 @@ class Material extends EventDispatcher {
 
 		}
 
-		if ( isRoot ) {
+		if ( isRootObject ) {
 
 			const textures = extractFromCache( meta.textures );
 			const images = extractFromCache( meta.images );
@@ -8975,6 +8978,14 @@ class Material extends EventDispatcher {
 }
 
 Material.prototype.isMaterial = true;
+
+Material.fromType = function ( /*type*/ ) {
+
+	// TODO: Behavior added in Materials.js
+
+	return null;
+
+};
 
 /**
  * parameters = {
@@ -11985,7 +11996,10 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		// and the flag isRenderTargetTexture controls this conversion. The flip is not required when using WebGLCubeRenderTarget.texture
 		// as a cube texture (this is detected when isRenderTargetTexture is set to true for cube textures).
 
-		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+		const image = { width: size, height: size, depth: 1 };
+		const images = [ image, image, image, image, image, image ];
+
+		this.texture = new CubeTexture( images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 		this.texture.isRenderTargetTexture = true;
 
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
@@ -18362,7 +18376,7 @@ function generateCubeUVSize( parameters ) {
 
 	const texelHeight = 1.0 / imageHeight;
 
-	const texelWidth = 1.0 / ( 3 * Math.max( Math.pow( 2, maxMip ), 7 ) );
+	const texelWidth = 1.0 / ( 3 * Math.max( Math.pow( 2, maxMip ), 7 * 16 ) );
 
 	return { texelWidth, texelHeight, maxMip };
 
@@ -18663,7 +18677,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
-			parameters.transparent ? '' : '#define OPAQUE',
+			parameters.opaque ? '#define OPAQUE' : '',
 
 			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ),
@@ -19165,7 +19179,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
 
-			transparent: material.transparent,
+			opaque: material.transparent === false && material.blending === NormalBlending,
 
 			alphaMap: !! material.alphaMap,
 			alphaTest: useAlphaTest,
@@ -19435,7 +19449,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 21 );
 		if ( parameters.decodeVideoTexture )
 			_programLayers.enable( 22 );
-		if ( parameters.transparent )
+		if ( parameters.opaque )
 			_programLayers.enable( 23 );
 
 		array.push( _programLayers.mask );
@@ -22601,9 +22615,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const image = texture.image;
 
-			if ( image === undefined ) {
+			if ( image === null ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined' );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but no image data found.' );
 
 			} else if ( image.complete === false ) {
 
@@ -37374,27 +37388,32 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
-var Materials = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	ShadowMaterial: ShadowMaterial,
-	SpriteMaterial: SpriteMaterial,
-	RawShaderMaterial: RawShaderMaterial,
-	ShaderMaterial: ShaderMaterial,
-	PointsMaterial: PointsMaterial,
-	MeshPhysicalMaterial: MeshPhysicalMaterial,
-	MeshStandardMaterial: MeshStandardMaterial,
-	MeshPhongMaterial: MeshPhongMaterial,
-	MeshToonMaterial: MeshToonMaterial,
-	MeshNormalMaterial: MeshNormalMaterial,
-	MeshLambertMaterial: MeshLambertMaterial,
-	MeshDepthMaterial: MeshDepthMaterial,
-	MeshDistanceMaterial: MeshDistanceMaterial,
-	MeshBasicMaterial: MeshBasicMaterial,
-	MeshMatcapMaterial: MeshMatcapMaterial,
-	LineDashedMaterial: LineDashedMaterial,
-	LineBasicMaterial: LineBasicMaterial,
-	Material: Material
-});
+const materialLib = {
+	ShadowMaterial,
+	SpriteMaterial,
+	RawShaderMaterial,
+	ShaderMaterial,
+	PointsMaterial,
+	MeshPhysicalMaterial,
+	MeshStandardMaterial,
+	MeshPhongMaterial,
+	MeshToonMaterial,
+	MeshNormalMaterial,
+	MeshLambertMaterial,
+	MeshDepthMaterial,
+	MeshDistanceMaterial,
+	MeshBasicMaterial,
+	MeshMatcapMaterial,
+	LineDashedMaterial,
+	LineBasicMaterial,
+	Material
+};
+
+Material.fromType = function ( type ) {
+
+	return new materialLib[ type ]();
+
+};
 
 const AnimationUtils = {
 
@@ -41110,7 +41129,7 @@ class MaterialLoader extends Loader {
 
 		}
 
-		const material = new Materials[ json.type ]();
+		const material = Material.fromType( json.type );
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;

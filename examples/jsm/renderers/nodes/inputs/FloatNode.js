@@ -10,6 +10,22 @@ class FloatNode extends InputNode {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.value = this.value;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		data.value = this.value;
+
+	}
+
 }
 
 FloatNode.prototype.isFloatNode = true;

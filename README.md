@@ -4,7 +4,8 @@ three.js
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
 [![NPM Downloads][npm-downloads]][npmtrends-url]
-[![Language Grade][lgtm]][lgtm-url]
+[![DeepScan][deepscan]][deepscan-url]
+[![Discord][discord]][discord-url]
 
 #### JavaScript 3D library ####
 
@@ -16,8 +17,7 @@ The aim of the project is to create an easy to use, lightweight, cross-browser, 
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](https://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw) &mdash;
-[Discord](https://discord.gg/56GBJwAnUS)
+[Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw)
 
 ### Usage ###
 
@@ -77,5 +77,8 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [build-size-url]: https://bundlephobia.com/result?p=three
 [npm-downloads]: https://img.shields.io/npm/dw/three
 [npmtrends-url]: https://www.npmtrends.com/three
-[lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
-[lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/
+[deepscan]: https://deepscan.io/api/teams/16600/projects/19901/branches/525701/badge/grade.svg
+[deepscan-url]: https://deepscan.io/dashboard#view=project&tid=16600&pid=19901&bid=525701
+[discord]: https://img.shields.io/discord/685241246557667386
+[discord-url]: https://discord.gg/56GBJwAnUS
+

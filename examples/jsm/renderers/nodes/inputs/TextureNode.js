@@ -66,6 +66,22 @@ class TextureNode extends InputNode {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.value = this.value.toJSON( data.meta ).uuid;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		this.value = data.meta.textures[ data.value ];
+
+	}
+
 }
 
 TextureNode.prototype.isTextureNode = true;

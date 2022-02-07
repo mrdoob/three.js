@@ -71,6 +71,11 @@ import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
 import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
+// loaders
+import NodeLoader from './loaders/NodeLoader.js';
+import NodeObjectLoader from './loaders/NodeObjectLoader.js';
+import NodeMaterialLoader from './loaders/NodeMaterialLoader.js';
+
 // procedural
 import CheckerNode from './procedural/CheckerNode.js';
 
@@ -85,6 +90,96 @@ export * from './materials/Materials.js';
 
 // shader node
 export * from './ShaderNode.js';
+
+const nodeLib = {
+	// core
+	ArrayInputNode,
+	AttributeNode,
+	BypassNode,
+	CodeNode,
+	ContextNode,
+	ExpressionNode,
+	FunctionCallNode,
+	FunctionNode,
+	InputNode,
+	Node,
+	NodeAttribute,
+	NodeBuilder,
+	NodeCode,
+	NodeFrame,
+	NodeFunctionInput,
+	NodeKeywords,
+	NodeUniform,
+	NodeVar,
+	NodeVary,
+	PropertyNode,
+	TempNode,
+	VarNode,
+	VaryNode,
+
+	// accessors
+	CameraNode,
+	MaterialNode,
+	MaterialReferenceNode,
+	ModelNode,
+	ModelViewProjectionNode,
+	NormalNode,
+	Object3DNode,
+	PointUVNode,
+	PositionNode,
+	ReferenceNode,
+	SkinningNode,
+	UVNode,
+
+	// inputs
+	ColorNode,
+	FloatNode,
+	IntNode,
+	Matrix3Node,
+	Matrix4Node,
+	TextureNode,
+	Vector2Node,
+	Vector3Node,
+	Vector4Node,
+
+	// display
+	ColorSpaceNode,
+	NormalMapNode,
+
+	// math
+	MathNode,
+	OperatorNode,
+	CondNode,
+
+	// lights
+	LightContextNode,
+	LightNode,
+	LightsNode,
+
+	// utils
+	ArrayElementNode,
+	ConvertNode,
+	JoinNode,
+	SplitNode,
+	SpriteSheetUVNode,
+	OscNode,
+	TimerNode,
+
+	// procedural
+	CheckerNode,
+
+	// loaders
+	NodeLoader,
+	NodeObjectLoader,
+	NodeMaterialLoader
+
+};
+
+export const fromType = ( type ) => {
+
+	return new nodeLib[ type ]();
+
+};
 
 export {
 	// core
@@ -161,6 +256,11 @@ export {
 	TimerNode,
 
 	// procedural
-	CheckerNode
-};
+	CheckerNode,
 
+	// loaders
+	NodeLoader,
+	NodeObjectLoader,
+	NodeMaterialLoader
+
+};

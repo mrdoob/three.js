@@ -74,11 +74,13 @@
 
 				//
 
-				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256 );
+				const envSize = 64; // minimum size for roughness >= 0.1
+
+				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( envSize );
 
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
 
-				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256 );
+				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( envSize );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
 
@@ -86,7 +88,7 @@
 
 				material = new THREE.MeshStandardMaterial( {
 					envMap: cubeRenderTarget2.texture,
-					roughness: 0.2,
+					roughness: 0.1,
 					metalness: 1
 				} );
 

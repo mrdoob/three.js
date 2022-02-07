@@ -234,7 +234,7 @@
 
 			/* BAKE ANIMATION INTO TEXTURE and CREATE GEOMETRY FROM BASE MODEL */
 			const BirdGeometry = new THREE.BufferGeometry();
-			let textureAnimation, durationAnimation, birdMesh, materialShader, vertexPerBird;
+			let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
 			function nextPowerOf2( n ) {
 
@@ -261,7 +261,7 @@
 				const morphAttributes = birdGeo.morphAttributes.position;
 				const tHeight = nextPowerOf2( durationAnimation );
 				const tWidth = nextPowerOf2( birdGeo.getAttribute( 'position' ).count );
-				vertexPerBird = birdGeo.getAttribute( 'position' ).count;
+				indicesPerBird = birdGeo.index.count;
 				const tData = new Float32Array( 4 * tWidth * tHeight );
 
 				for ( let i = 0; i < tWidth; i ++ ) {
@@ -415,7 +415,7 @@
 					cohesion: 20.0,
 					freedom: 0.75,
 					size: sizes[ selectModel ],
-					count: BIRDS
+					count: Math.floor( BIRDS / 4 )
 
 				};
 
@@ -426,7 +426,7 @@
 					velocityUniforms[ 'cohesionDistance' ].value = effectController.cohesion;
 					velocityUniforms[ 'freedomFactor' ].value = effectController.freedom;
 					if ( materialShader ) materialShader.uniforms[ 'size' ].value = effectController.size;
-					BirdGeometry.setDrawRange( 0, vertexPerBird * effectController.count );
+					BirdGeometry.setDrawRange( 0, indicesPerBird * effectController.count );
 
 				};
 

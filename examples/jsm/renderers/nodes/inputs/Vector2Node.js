@@ -11,6 +11,29 @@ class Vector2Node extends InputNode {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		const { x, y } = this.value;
+
+		data.x = x;
+		data.y = y;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		const { x, y } = data;
+		const value = this.value;
+
+		value.x = x;
+		value.y = y;
+
+	}
+
 }
 
 Vector2Node.prototype.isVector2Node = true;
