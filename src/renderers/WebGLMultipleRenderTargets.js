@@ -2,7 +2,7 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
 class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 
-	constructor( width, height, count, options ) {
+	constructor( width, height, count, options = {} ) {
 
 		super( width, height, options );
 
