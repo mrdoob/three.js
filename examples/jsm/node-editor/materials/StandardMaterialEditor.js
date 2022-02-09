@@ -18,7 +18,7 @@ export class StandardMaterialEditor extends BaseNode {
 		const metalness = new LabelElement( 'metalness' ).setInput( 1 );
 		const roughness = new LabelElement( 'roughness' ).setInput( 1 );
 		const emissive = new LabelElement( 'emissive' ).setInput( 3 );
-		const normal = new LabelElement( 'normal' ).setInput( 1 );
+		const normal = new LabelElement( 'normal' ).setInput( 3 );
 		const position = new LabelElement( 'position' ).setInput( 3 );
 
 		color.add( new ColorInput( material.color.getHex() ).onChange( ( input ) => {
