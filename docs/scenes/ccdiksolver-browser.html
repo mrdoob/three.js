@@ -55,7 +55,7 @@
 				Uint16BufferAttribute,
 				WebGLRenderer
 			} from 'three';
-            import { CCDIKSolver, CCDIKHelper } from "../../examples/jsm/animation/CCDIKSolver.js";
+			import { CCDIKSolver, CCDIKHelper } from "../../examples/jsm/animation/CCDIKSolver.js";
 
 			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
@@ -155,40 +155,40 @@
 
 				bones = [];
 
-                // "root bone"
-                let rootBone = new Bone();
-                rootBone.name = "root";
-                rootBone.position.y = -sizing.halfHeight;
-                bones.push( rootBone );
+				// "root bone"
+				let rootBone = new Bone();
+				rootBone.name = "root";
+				rootBone.position.y = -sizing.halfHeight;
+				bones.push( rootBone );
 
-                //
-                // "bone0", "bone1", "bone2", "bone3"
-                //
+				//
+				// "bone0", "bone1", "bone2", "bone3"
+				//
 
-                // "bone0"
+				// "bone0"
 				let prevBone = new Bone();
-                prevBone.position.y = 0;
-                rootBone.add(prevBone);
+				prevBone.position.y = 0;
+				rootBone.add(prevBone);
 				bones.push( prevBone );
 
-                // "bone1", "bone2", "bone3"
+				// "bone1", "bone2", "bone3"
 				for ( let i = 1; i <= sizing.segmentCount; i ++ ) {
 
 					const bone = new Bone();
 					bone.position.y = sizing.segmentHeight;
 					bones.push( bone );
-                    bone.name = `bone${i}`;
+					bone.name = `bone${i}`;
 					prevBone.add( bone );
 					prevBone = bone;
 
 				}
 
-                // "target"
-                const targetBone = new Bone();
-                targetBone.name = "target";
-                targetBone.position.y = sizing.height + sizing.segmentHeight; // relative to parent: rootBone
-                rootBone.add( targetBone );
-                bones.push( targetBone );
+				// "target"
+				const targetBone = new Bone();
+				targetBone.name = "target";
+				targetBone.position.y = sizing.height + sizing.segmentHeight; // relative to parent: rootBone
+				rootBone.add( targetBone );
+				bones.push( targetBone );
 
 				return bones;
 
@@ -201,7 +201,7 @@
 					emissive: 0x072534,
 					side: DoubleSide,
 					flatShading: true,
-                    wireframe: true
+					wireframe: true
 				} );
 
 				const mesh = new SkinnedMesh( geometry,	material );
@@ -221,38 +221,38 @@
 
 			function setupDatGui() {
 
-                gui.add( mesh, 'pose' ).name( 'mesh.pose()' );
+				gui.add( mesh, 'pose' ).name( 'mesh.pose()' );
 
-                mesh.skeleton.bones
-                    .filter((bone) => bone.name === "target")
-                    .forEach(function (bone) {
-                        const folder = gui.addFolder( bone.name );
+				mesh.skeleton.bones
+					.filter((bone) => bone.name === "target")
+					.forEach(function (bone) {
+						const folder = gui.addFolder( bone.name );
 
-                        const delta = 20;
-                        folder.add( bone.position, 'x', - delta + bone.position.x, delta + bone.position.x );
-                        folder.add( bone.position, 'y', - delta + bone.position.y, delta + bone.position.y );
-                        folder.add( bone.position, 'z', - delta + bone.position.z, delta + bone.position.z );
-                    });
-                
-                gui.add( ikSolver, 'update' ).name( 'ikSolver.update()' );
-                gui.add( state, 'ikSolverAutoUpdate' )
-                
+						const delta = 20;
+						folder.add( bone.position, 'x', - delta + bone.position.x, delta + bone.position.x );
+						folder.add( bone.position, 'y', - delta + bone.position.y, delta + bone.position.y );
+						folder.add( bone.position, 'z', - delta + bone.position.z, delta + bone.position.z );
+					});
+				
+				gui.add( ikSolver, 'update' ).name( 'ikSolver.update()' );
+				gui.add( state, 'ikSolverAutoUpdate' )
+				
 
 			}
 
 			function initBones() {
 
 				const segmentHeight = 8;
-                const segmentCount = 3;
-                const height = segmentHeight * segmentCount;
-                const halfHeight = height * 0.5;
+				const segmentCount = 3;
+				const height = segmentHeight * segmentCount;
+				const halfHeight = height * 0.5;
 
-                const sizing = {
-                    segmentHeight,
-                    segmentCount,
-                    height,
-                    halfHeight
-                };
+				const sizing = {
+					segmentHeight,
+					segmentCount,
+					height,
+					halfHeight
+				};
 
 				const geometry = createGeometry( sizing );
 				const bones = createBones( sizing );
@@ -260,19 +260,19 @@
 
 				scene.add( mesh );
 
-                //
-                // ikSolver
-                //
+				//
+				// ikSolver
+				//
 
-                const iks = [
-                    {
-                        target: 5,
-                        effector: 4,
-                        links: [{ index: 3 }, { index: 2 }, { index: 1 }]
-                    }
-                ];
-                ikSolver = new CCDIKSolver( mesh, iks );
-                scene.add(new CCDIKHelper( mesh, iks ));
+				const iks = [
+					{
+						target: 5,
+						effector: 4,
+						links: [{ index: 3 }, { index: 2 }, { index: 1 }]
+					}
+				];
+				ikSolver = new CCDIKSolver( mesh, iks );
+				scene.add(new CCDIKHelper( mesh, iks ));
 
 			}
 
@@ -280,9 +280,9 @@
 
 				requestAnimationFrame( render );
 
-                if (state.ikSolverAutoUpdate) {
-                    ikSolver?.update();
-                }
+				if (state.ikSolverAutoUpdate) {
+					ikSolver?.update();
+				}
 
 				renderer.render( scene, camera );
 
