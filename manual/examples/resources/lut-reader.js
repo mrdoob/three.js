@@ -87,12 +87,10 @@ export function parseCSP(str) {
   }
 
   // read ranges
-  const ranges = [];
   for (let i = 0; i < 3; ++i) {
     ++lineNdx;
     const input = splitToNumbers(lines[lineNdx++]);
     const output = splitToNumbers(lines[lineNdx++]);
-    ranges.push({input, output});
     if (input.length !== 2 || output.length !== 2 ||
         input[0] !== 0 || input[1] !==  1 ||
         output[0] !== 0 || output[1] !== 1) {

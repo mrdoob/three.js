@@ -208,7 +208,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, hcode ) {
+		function hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, hcode ) {
 
 			const p = inOffset;
 			let c = 0;
@@ -371,7 +371,7 @@ class EXRLoader extends DataTextureLoader {
 
 		const getCodeReturn = { c: 0, lc: 0 };
 
-		function getCode( po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
+		function getCode( po, rlc, c, lc, uInt8Array, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
 
 			if ( po == rlc ) {
 
@@ -595,7 +595,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function hufDecode( encodingTable, decodingTable, uInt8Array, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset ) {
+		function hufDecode( encodingTable, decodingTable, uInt8Array, inOffset, ni, rlc, no, outBuffer, outOffset ) {
 
 			let c = 0;
 			let lc = 0;
@@ -618,7 +618,7 @@ class EXRLoader extends DataTextureLoader {
 
 						lc -= pl.len;
 
-						getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+						getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 
 						c = getCodeReturn.c;
 						lc = getCodeReturn.lc;
@@ -652,7 +652,7 @@ class EXRLoader extends DataTextureLoader {
 
 									lc -= l;
 
-									getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+									getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 
 									c = getCodeReturn.c;
 									lc = getCodeReturn.lc;
@@ -690,7 +690,7 @@ class EXRLoader extends DataTextureLoader {
 
 					lc -= pl.len;
 
-					getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+					getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 
 					c = getCodeReturn.c;
 					lc = getCodeReturn.lc;
@@ -734,7 +734,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const ni = nCompressed - ( inOffset.value - initialInOffset );
 
-			hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, freq );
+			hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, freq );
 
 			if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
 
@@ -744,7 +744,7 @@ class EXRLoader extends DataTextureLoader {
 
 			hufBuildDecTable( freq, im, iM, hdec );
 
-			hufDecode( freq, hdec, uInt8Array, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
+			hufDecode( freq, hdec, uInt8Array, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
 
 		}
 

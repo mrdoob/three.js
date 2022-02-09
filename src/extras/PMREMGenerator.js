@@ -228,7 +228,7 @@ class PMREMGenerator {
 
 		} else { // Equirectangular
 
-			this._setSize( texture.image.width / 4 ?? 256 );
+			this._setSize( texture.image.width / 4 );
 
 		}
 

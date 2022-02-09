@@ -133,6 +133,16 @@ class ARButton {
 
 		}
 
+		function showARNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'AR NOT ALLOWED';
+
+		}
+
 		function stylizeElement( element ) {
 
 			element.style.position = 'absolute';
@@ -161,7 +171,7 @@ class ARButton {
 
 				supported ? showStartAR() : showARNotSupported();
 
-			} ).catch( showARNotSupported );
+			} ).catch( showARNotAllowed );
 
 			return button;
 

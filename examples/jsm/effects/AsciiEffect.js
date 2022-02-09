@@ -49,7 +49,7 @@ class AsciiEffect {
 		this.render = function ( scene, camera ) {
 
 			renderer.render( scene, camera );
-			asciifyImage( renderer, oAscii );
+			asciifyImage( oAscii );
 
 		};
 
@@ -191,7 +191,7 @@ class AsciiEffect {
 
 		// convert img element to ascii
 
-		function asciifyImage( canvasRenderer, oAscii ) {
+		function asciifyImage( oAscii ) {
 
 			oCtx.clearRect( 0, 0, iWidth, iHeight );
 			oCtx.drawImage( oCanvasImg, 0, 0, iWidth, iHeight );

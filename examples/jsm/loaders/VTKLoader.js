@@ -346,8 +346,6 @@ class VTKLoader extends Loader {
 			let normals = [];
 			let indices = [];
 
-			// Going to make a big array of strings
-			const vtk = [];
 			let index = 0;
 
 			function findString( buffer, start ) {
@@ -386,7 +384,6 @@ class VTKLoader extends Loader {
 
 				} else if ( line.indexOf( 'POINTS' ) === 0 ) {
 
-					vtk.push( line );
 					// Add the points
 					const numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
 

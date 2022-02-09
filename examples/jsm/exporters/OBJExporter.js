@@ -261,17 +261,17 @@ class OBJExporter {
 
 				}
 
+				output += 'p ';
+
+				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+
+					output += ( indexVertex + j ) + ' ';
+
+				}
+
+				output += '\n';
+
 			}
-
-			output += 'p ';
-
-			for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
-
-				output += ( indexVertex + j ) + ' ';
-
-			}
-
-			output += '\n';
 
 			// update index
 			indexVertex += nbVertex;

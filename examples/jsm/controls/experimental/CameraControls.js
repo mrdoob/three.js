@@ -157,7 +157,7 @@ var CameraControls = function ( object, domElement ) {
 
 					vec.set( 0, 1, 0 ).applyQuaternion( scope.object.quaternion );
 
-					var factor = ( scope.enableDamping ) ? scope.dampingFactor : 1;
+					const factor = ( scope.enableDamping ) ? scope.dampingFactor : 1;
 
 					q.setFromAxisAngle( vec, sphericalDelta.theta * factor );
 
@@ -172,7 +172,7 @@ var CameraControls = function ( object, domElement ) {
 
 					vec.set( 1, 0, 0 ).applyQuaternion( scope.object.quaternion );
 
-					var factor = ( scope.enableDamping ) ? scope.dampingFactor : 1;
+					const factor = ( scope.enableDamping ) ? scope.dampingFactor : 1;
 
 					q.setFromAxisAngle( vec, sphericalDelta.phi * factor );
 
