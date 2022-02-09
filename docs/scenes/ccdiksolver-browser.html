@@ -38,6 +38,10 @@
 		<a id='newWindow' href='./ccdiksolver-browser.html' target='_blank'>Open in New Window</a>
 
 		<script type="module">
+			//
+			// Forked from /docs/api/en/objects/SkinnedMesh example
+			//
+
 			import {
 				Bone,
 				Color,
@@ -60,10 +64,10 @@
 			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
 
-			let gui, scene, camera, renderer, orbit, lights, mesh, bones, skeletonHelper, ikSolver;
+			let gui, scene, camera, renderer, orbit, mesh, bones, skeletonHelper, ikSolver;
 
 			const state = {
-				ikSolverAutoUpdate: false
+				ikSolverAutoUpdate: true
 			};
 
 			function initScene() {
@@ -84,19 +88,6 @@
 
 				orbit = new OrbitControls( camera, renderer.domElement );
 				orbit.enableZoom = false;
-
-				lights = [];
-				lights[ 0 ] = new PointLight( 0xffffff, 1, 0 );
-				lights[ 1 ] = new PointLight( 0xffffff, 1, 0 );
-				lights[ 2 ] = new PointLight( 0xffffff, 1, 0 );
-
-				lights[ 0 ].position.set( 0, 200, 0 );
-				lights[ 1 ].position.set( 100, 200, 100 );
-				lights[ 2 ].position.set( - 100, - 200, - 100 );
-
-				scene.add( lights[ 0 ] );
-				scene.add( lights[ 1 ] );
-				scene.add( lights[ 2 ] );
 
 				window.addEventListener( 'resize', function () {
 
@@ -230,13 +221,12 @@
 
 						const delta = 20;
 						folder.add( bone.position, 'x', - delta + bone.position.x, delta + bone.position.x );
-						folder.add( bone.position, 'y', - delta + bone.position.y, delta + bone.position.y );
+						folder.add( bone.position, 'y', - bone.position.y, bone.position.y );
 						folder.add( bone.position, 'z', - delta + bone.position.z, delta + bone.position.z );
 					});
 				
 				gui.add( ikSolver, 'update' ).name( 'ikSolver.update()' );
 				gui.add( state, 'ikSolverAutoUpdate' )
-				
 
 			}
 
@@ -272,7 +262,7 @@
 					}
 				];
 				ikSolver = new CCDIKSolver( mesh, iks );
-				scene.add(new CCDIKHelper( mesh, iks ));
+				scene.add( new CCDIKHelper( mesh, iks ) );
 
 			}
 
@@ -280,7 +270,7 @@
 
 				requestAnimationFrame( render );
 
-				if (state.ikSolverAutoUpdate) {
+				if ( state.ikSolverAutoUpdate ) {
 					ikSolver?.update();
 				}
 
