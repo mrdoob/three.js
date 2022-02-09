@@ -2564,8 +2564,8 @@
 	WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
 
 	class WebGLMultipleRenderTargets extends WebGLRenderTarget {
-		constructor(width, height, count) {
-			super(width, height);
+		constructor(width, height, count, options = {}) {
+			super(width, height, options);
 			const texture = this.texture;
 			this.texture = [];
 
@@ -7704,11 +7704,11 @@
 			const uvs = attributes.uv.array;
 			const nVertices = positions.length / 3;
 
-			if (attributes.tangent === undefined) {
+			if (this.hasAttribute('tangent') === false) {
 				this.setAttribute('tangent', new BufferAttribute(new Float32Array(4 * nVertices), 4));
 			}
 
-			const tangents = attributes.tangent.array;
+			const tangents = this.getAttribute('tangent').array;
 			const tan1 = [],
 						tan2 = [];
 
@@ -9108,27 +9108,21 @@
 	CubeTexture.prototype.isCubeTexture = true;
 
 	class WebGLCubeRenderTarget extends WebGLRenderTarget {
-		constructor(size, options, dummy) {
-			if (Number.isInteger(options)) {
-				console.warn('THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )');
-				options = dummy;
-			}
-
+		constructor(size, options = {}) {
 			super(size, size, options);
-			options = options || {}; // By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
-			// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
-			// in a left-handed coordinate system. By continuing this convention, preexisting cube maps continued to render correctly.
-			// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
-			// and the flag isRenderTargetTexture controls this conversion. The flip is not required when using WebGLCubeRenderTarget.texture
-			// as a cube texture (this is detected when isRenderTargetTexture is set to true for cube textures).
-
 			const image = {
 				width: size,
 				height: size,
 				depth: 1
 			};
 			const images = [image, image, image, image, image, image];
-			this.texture = new CubeTexture(images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
+			this.texture = new CubeTexture(images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding); // By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
+			// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
+			// in a left-handed coordinate system. By continuing this convention, preexisting cube maps continued to render correctly.
+			// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
+			// and the flag isRenderTargetTexture controls this conversion. The flip is not required when using WebGLCubeRenderTarget.texture
+			// as a cube texture (this is detected when isRenderTargetTexture is set to true for cube textures).
+
 			this.texture.isRenderTargetTexture = true;
 			this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 			this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
@@ -9537,18 +9531,16 @@
 			gl.bindBuffer(bufferType, buffer);
 			gl.bufferData(bufferType, array, usage);
 			attribute.onUploadCallback();
-			let type = gl.FLOAT;
+			let type;
 
 			if (array instanceof Float32Array) {
 				type = gl.FLOAT;
-			} else if (array instanceof Float64Array) {
-				console.warn('THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.');
 			} else if (array instanceof Uint16Array) {
 				if (attribute.isFloat16BufferAttribute) {
 					if (isWebGL2) {
 						type = gl.HALF_FLOAT;
 					} else {
-						console.warn('THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.');
+						throw new Error('THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.');
 					}
 				} else {
 					type = gl.UNSIGNED_SHORT;
@@ -9565,6 +9557,8 @@
 				type = gl.UNSIGNED_BYTE;
 			} else if (array instanceof Uint8ClampedArray) {
 				type = gl.UNSIGNED_BYTE;
+			} else {
+				throw new Error('THREE.WebGLAttributes: Unsupported buffer data format: ' + array);
 			}
 
 			return {
@@ -11732,7 +11726,7 @@
 				this._setSize(texture.image.length === 0 ? 16 : texture.image[0].width ?? texture.image[0].image.width);
 			} else {
 				// Equirectangular
-				this._setSize(texture.image.width / 4 ?? 256);
+				this._setSize(texture.image.width / 4);
 			}
 
 			_oldTarget = this._renderer.getRenderTarget();
@@ -31944,7 +31938,7 @@
 		static parseTrackName(trackName) {
 			const matches = _trackRe.exec(trackName);
 
-			if (!matches) {
+			if (matches === null) {
 				throw new Error('PropertyBinding: Cannot parse trackName: ' + trackName);
 			}
 
@@ -31979,7 +31973,7 @@
 		}
 
 		static findNode(root, nodeName) {
-			if (!nodeName || nodeName === '' || nodeName === '.' || nodeName === -1 || nodeName === root.name || nodeName === root.uuid) {
+			if (nodeName === undefined || nodeName === '' || nodeName === '.' || nodeName === -1 || nodeName === root.name || nodeName === root.uuid) {
 				return root;
 			} // search into skeleton bones.
 
@@ -35087,7 +35081,7 @@
 
 			if (newShapes.length > 1) {
 				let ambiguous = false;
-				const toChange = [];
+				let toChange = 0;
 
 				for (let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++) {
 					betterShapeHoles[sIdx] = [];
@@ -35102,11 +35096,7 @@
 
 						for (let s2Idx = 0; s2Idx < newShapes.length; s2Idx++) {
 							if (isPointInsidePolygon(ho.p, newShapes[s2Idx].p)) {
-								if (sIdx !== s2Idx) toChange.push({
-									froms: sIdx,
-									tos: s2Idx,
-									hole: hIdx
-								});
+								if (sIdx !== s2Idx) toChange++;
 
 								if (hole_unassigned) {
 									hole_unassigned = false;
@@ -35121,12 +35111,10 @@
 							betterShapeHoles[sIdx].push(ho);
 						}
 					}
-				} // console.log("ambiguous: ", ambiguous);
+				}
 
-
-				if (toChange.length > 0) {
-					// console.log("to change: ", toChange);
-					if (!ambiguous) newShapeHoles = betterShapeHoles;
+				if (toChange > 0 && ambiguous === false) {
+					newShapeHoles = betterShapeHoles;
 				}
 			}
 
