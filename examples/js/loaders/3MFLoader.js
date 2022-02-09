@@ -73,7 +73,6 @@
 				let relsName;
 				let modelRelsName;
 				const modelPartNames = [];
-				const printTicketPartNames = [];
 				const texturesPartNames = [];
 				let modelRels;
 				const modelParts = {};
@@ -108,10 +107,6 @@
 					} else if ( file.match( /^3D\/.*\.model$/ ) ) {
 
 						modelPartNames.push( file );
-
-					} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
-
-						printTicketPartNames.push( file );
 
 					} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
@@ -902,7 +897,7 @@
 
 			}
 
-			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) {
+			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) {
 
 				// geometry
 				const geometry = new THREE.BufferGeometry();
@@ -1001,7 +996,7 @@
 
 						case 'vertexColors':
 							const colorgroup = modelData.resources.colorgroup[ resourceId ];
-							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) );
+							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) );
 							break;
 
 						case 'default':
@@ -1045,7 +1040,7 @@
 
 			}
 
-			function analyzeObject( modelData, meshData, objectData ) {
+			function analyzeObject( meshData, objectData ) {
 
 				const resourceMap = {};
 				const triangleProperties = meshData[ 'triangleProperties' ];
@@ -1068,7 +1063,7 @@
 			function buildGroup( meshData, objects, modelData, textureData, objectData ) {
 
 				const group = new THREE.Group();
-				const resourceMap = analyzeObject( modelData, meshData, objectData );
+				const resourceMap = analyzeObject( meshData, objectData );
 				const meshes = buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData );
 
 				for ( let i = 0, l = meshes.length; i < l; i ++ ) {

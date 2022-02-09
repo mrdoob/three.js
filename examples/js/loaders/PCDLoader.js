@@ -126,7 +126,7 @@
 				PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str ); // evaluate
 
 				if ( PCDheader.version !== null ) PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
-				if ( PCDheader.fields !== null ) PCDheader.fields = PCDheader.fields[ 1 ].split( ' ' );
+				PCDheader.fields = PCDheader.fields !== null ? PCDheader.fields[ 1 ].split( ' ' ) : [];
 				if ( PCDheader.type !== null ) PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
 				if ( PCDheader.width !== null ) PCDheader.width = parseInt( PCDheader.width[ 1 ] );
 				if ( PCDheader.height !== null ) PCDheader.height = parseInt( PCDheader.height[ 1 ] );

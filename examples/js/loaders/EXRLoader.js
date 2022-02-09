@@ -191,7 +191,7 @@
 
 			}
 
-			function hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, hcode ) {
+			function hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, hcode ) {
 
 				const p = inOffset;
 				let c = 0;
@@ -354,7 +354,7 @@
 				lc: 0
 			};
 
-			function getCode( po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
+			function getCode( po, rlc, c, lc, uInt8Array, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
 
 				if ( po == rlc ) {
 
@@ -548,7 +548,7 @@
 
 			}
 
-			function hufDecode( encodingTable, decodingTable, uInt8Array, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset ) {
+			function hufDecode( encodingTable, decodingTable, uInt8Array, inOffset, ni, rlc, no, outBuffer, outOffset ) {
 
 				let c = 0;
 				let lc = 0;
@@ -569,7 +569,7 @@
 						if ( pl.len ) {
 
 							lc -= pl.len;
-							getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+							getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 							c = getCodeReturn.c;
 							lc = getCodeReturn.lc;
 
@@ -600,7 +600,7 @@
 									if ( hufCode( encodingTable[ pl.p[ j ] ] ) == ( c >> lc - l & ( 1 << l ) - 1 ) ) {
 
 										lc -= l;
-										getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+										getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 										c = getCodeReturn.c;
 										lc = getCodeReturn.lc;
 										break;
@@ -634,7 +634,7 @@
 					if ( pl.len ) {
 
 						lc -= pl.len;
-						getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+						getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 						c = getCodeReturn.c;
 						lc = getCodeReturn.lc;
 
@@ -672,7 +672,7 @@
 				const hdec = new Array( HUF_DECSIZE );
 				hufClearDecTable( hdec );
 				const ni = nCompressed - ( inOffset.value - initialInOffset );
-				hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, freq );
+				hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, freq );
 
 				if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
 
@@ -681,7 +681,7 @@
 				}
 
 				hufBuildDecTable( freq, im, iM, hdec );
-				hufDecode( freq, hdec, uInt8Array, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
+				hufDecode( freq, hdec, uInt8Array, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
 
 			}
 

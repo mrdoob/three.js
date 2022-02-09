@@ -11,7 +11,8 @@
 			const textureWidth = options.textureWidth || 512;
 			const textureHeight = options.textureHeight || 512;
 			const clipBias = options.clipBias || 0;
-			const shader = options.shader || Reflector.ReflectorShader; //
+			const shader = options.shader || Reflector.ReflectorShader;
+			const multisample = options.multisample || 4; //
 
 			const reflectorPlane = new THREE.Plane();
 			const normal = new THREE.Vector3();
@@ -25,7 +26,19 @@
 			const q = new THREE.Vector4();
 			const textureMatrix = new THREE.Matrix4();
 			const virtualCamera = new THREE.PerspectiveCamera();
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight );
+			let renderTarget;
+
+			if ( multisample > 0 ) {
+
+				renderTarget = new THREE.WebGLMultisampleRenderTarget( textureWidth, textureHeight );
+				renderTarget.samples = multisample;
+
+			} else {
+
+				renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight );
+
+			}
+
 			const material = new THREE.ShaderMaterial( {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				fragmentShader: shader.fragmentShader,
