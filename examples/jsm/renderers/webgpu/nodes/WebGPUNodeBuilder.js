@@ -25,7 +25,7 @@ import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
 import LightContextNode from '../../nodes/lights/LightContextNode.js';
 import OperatorNode from '../../nodes/math/OperatorNode.js';
 import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
-import { join, nodeObject } from '../../nodes/ShaderNode.js';
+import { add, join, nodeObject } from '../../nodes/ShaderNode.js';
 import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
@@ -264,13 +264,23 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			// RESULT
+			// OUTGOING LIGHT
 
-			const outputNodeObj = nodeObject( outputNode );
+			let outgoingLightNode = nodeObject( outputNode ).xyz;
 
-			outputNode = join( outputNodeObj.x, outputNodeObj.y, outputNodeObj.z, nodeObject( diffuseColorNode ).w );
+			// EMISSIVE
 
-			//
+			const emissiveNode = material.emissiveNode;
+
+			if ( emissiveNode && emissiveNode.isNode ) {
+
+				outgoingLightNode = add( emissiveNode, outgoingLightNode );
+
+			}
+
+			outputNode = join( outgoingLightNode.xyz, nodeObject( diffuseColorNode ).w );
+
+			// OUTPUT
 
 			const outputEncoding = this.renderer.outputEncoding;
 
