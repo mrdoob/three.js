@@ -8,7 +8,8 @@ import {
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	WebGLMultisampleRenderTarget
 } from 'three';
 
 class Reflector extends Mesh {
@@ -26,6 +27,7 @@ class Reflector extends Mesh {
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Reflector.ReflectorShader;
+		const multisample = options.multisample || 4;
 
 		//
 
@@ -44,7 +46,18 @@ class Reflector extends Mesh {
 		const textureMatrix = new Matrix4();
 		const virtualCamera = new PerspectiveCamera();
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
+		let renderTarget;
+
+		if ( multisample > 0 ) {
+
+			renderTarget = new WebGLMultisampleRenderTarget( textureWidth, textureHeight );
+			renderTarget.samples = multisample;
+
+		} else {
+
+			renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
+
+		}
 
 		const material = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( shader.uniforms ),
