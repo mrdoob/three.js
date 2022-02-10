@@ -9,12 +9,11 @@ import {
 	UnsignedByteType,
 	LinearEncoding,
 	NoToneMapping,
-	LinearMipmapLinearFilter,
-	NearestFilter,
-	ClampToEdgeWrapping
+	LinearMipmapLinearFilter
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
@@ -170,6 +169,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	const _projScreenMatrix = new Matrix4();
 
+	const _vector2 = new Vector2();
 	const _vector3 = new Vector3();
 
 	const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
@@ -1184,22 +1184,32 @@ function WebGLRenderer( parameters = {} ) {
 
 	function renderTransmissionPass( opaqueObjects, scene, camera ) {
 
+		if ( capabilities.isWebGL2 === false ) {
+
+			console.error( 'THREE.WebGLRenderer: Transmission can only be used with WebGL 2.' );
+			return;
+
+		}
+
 		if ( _transmissionRenderTarget === null ) {
 
-			const needsAntialias = _antialias === true && capabilities.isWebGL2 === true;
-			const renderTargetType = needsAntialias ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+			const renderTargetType = ( _antialias === true ) ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
 
-			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
+			_transmissionRenderTarget = new renderTargetType( 1, 1, {
 				generateMipmaps: true,
-				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
+				type: HalfFloatType,
 				minFilter: LinearMipmapLinearFilter,
-				magFilter: NearestFilter,
-				wrapS: ClampToEdgeWrapping,
-				wrapT: ClampToEdgeWrapping,
 				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
 			} );
 
 		}
+
+		// set size of transmission render target to half size of drawing buffer
+
+		_this.getDrawingBufferSize( _vector2 ).multiplyScalar( 0.5 ).floor();
+		_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+
+		//
 
 		const currentRenderTarget = _this.getRenderTarget();
 		_this.setRenderTarget( _transmissionRenderTarget );
@@ -1786,7 +1796,7 @@ function WebGLRenderer( parameters = {} ) {
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
 				if ( renderTarget.useRenderToTexture ) {
 
-					console.warn( 'render-to-texture extension was disabled because an external texture was provided' );
+					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
 					renderTarget.useRenderToTexture = false;
 					renderTarget.useRenderbuffer = true;
 

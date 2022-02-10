@@ -230,17 +230,18 @@
 
 					}
 
-				}
+					output += 'p ';
 
-				output += 'p ';
+					for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
 
-				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+						output += indexVertex + j + ' ';
 
-					output += indexVertex + j + ' ';
+					}
 
-				}
+					output += '\n';
 
-				output += '\n'; // update index
+				} // update index
+
 
 				indexVertex += nbVertex;
 
