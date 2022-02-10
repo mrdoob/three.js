@@ -18,6 +18,7 @@ import { SliderEditor } from './inputs/SliderEditor.js';
 import { ColorEditor } from './inputs/ColorEditor.js';
 import { TextureEditor } from './inputs/TextureEditor.js';
 import { BlendEditor } from './display/BlendEditor.js';
+import { NormalMapEditor } from './display/NormalMapEditor.js';
 import { UVEditor } from './accessors/UVEditor.js';
 import { PositionEditor } from './accessors/PositionEditor.js';
 import { NormalEditor } from './accessors/NormalEditor.js';
@@ -104,6 +105,11 @@ export const NodeList = [
 				name: 'Blend',
 				icon: 'layers-subtract',
 				nodeClass: BlendEditor
+			},
+			{
+				name: 'Normal Map',
+				icon: 'chart-line',
+				nodeClass: NormalMapEditor
 			}
 		]
 	},
@@ -250,6 +256,7 @@ export const ClassLib = {
 	ColorEditor,
 	TextureEditor,
 	BlendEditor,
+	NormalMapEditor,
 	UVEditor,
 	PositionEditor,
 	NormalEditor,
