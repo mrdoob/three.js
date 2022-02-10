@@ -9,8 +9,7 @@ import {
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget,
-	WebGLMultisampleRenderTarget
+	WebGLRenderTarget
 } from 'three';
 
 class Refractor extends Mesh {
@@ -43,18 +42,7 @@ class Refractor extends Mesh {
 
 		// render target
 
-		let renderTarget;
-
-		if ( multisample > 0 ) {
-
-			renderTarget = new WebGLMultisampleRenderTarget( textureWidth, textureHeight );
-			renderTarget.samples = multisample;
-
-		} else {
-
-			renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
-
-		}
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample } );
 
 		// material
 

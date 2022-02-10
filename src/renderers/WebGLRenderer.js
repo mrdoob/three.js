@@ -31,7 +31,6 @@ import { WebGLGeometries } from './webgl/WebGLGeometries.js';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
 import { WebGLInfo } from './webgl/WebGLInfo.js';
 import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
-import { WebGLMultisampleRenderTarget } from './WebGLMultisampleRenderTarget.js';
 import { WebGLObjects } from './webgl/WebGLObjects.js';
 import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
@@ -1189,13 +1188,11 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
-			const renderTargetType = ( isWebGL2 && _antialias === true ) ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
-
-			_transmissionRenderTarget = new renderTargetType( 1, 1, {
+			_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
 				generateMipmaps: true,
-				type: HalfFloatType,
+				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
 				minFilter: isWebGL2 ? LinearMipmapLinearFilter : LinearFilter,
-				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
+				samples: ( isWebGL2 && _antialias === true ) ? 4 : 0
 			} );
 
 		}
@@ -1788,7 +1785,7 @@ function WebGLRenderer( parameters = {} ) {
 
 				// The multisample_render_to_texture extension doesn't work properly if there
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
-				if ( renderTarget.useRenderToTexture ) {
+				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
 
 					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
 					renderTarget.useRenderToTexture = false;
@@ -1861,7 +1858,7 @@ function WebGLRenderer( parameters = {} ) {
 				framebuffer = __webglFramebuffer[ activeCubeFace ];
 				isCube = true;
 
-			} else if ( renderTarget.useRenderbuffer ) {
+			} else if ( renderTarget.samples > 0 && textures.useMultisampledRenderToTexture( renderTarget ) === false ) {
 
 				framebuffer = properties.get( renderTarget ).__webglMultisampledFramebuffer;
 

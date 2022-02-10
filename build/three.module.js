@@ -3175,6 +3175,8 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
+		this.samples = options.samples !== undefined ? options.samples : 0;
+
 	}
 
 	setTexture( texture ) {
@@ -3233,6 +3235,8 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
 		this.depthTexture = source.depthTexture;
+
+		this.samples = source.samples;
 
 		return this;
 
@@ -3323,36 +3327,6 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 }
 
 WebGLMultipleRenderTargets.prototype.isWebGLMultipleRenderTargets = true;
-
-class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
-
-	constructor( width, height, options = {} ) {
-
-		super( width, height, options );
-
-		this.samples = 4;
-
-		this.ignoreDepthForMultisampleCopy = options.ignoreDepth !== undefined ? options.ignoreDepth : true;
-		this.useRenderToTexture = ( options.useRenderToTexture !== undefined ) ? options.useRenderToTexture : false;
-		this.useRenderbuffer = this.useRenderToTexture === false;
-
-	}
-
-	copy( source ) {
-
-		super.copy.call( this, source );
-
-		this.samples = source.samples;
-		this.useRenderToTexture = source.useRenderToTexture;
-		this.useRenderbuffer = source.useRenderbuffer;
-
-		return this;
-
-	}
-
-}
-
-WebGLMultisampleRenderTarget.prototype.isWebGLMultisampleRenderTarget = true;
 
 class Quaternion {
 
@@ -22185,8 +22159,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	const maxCubemapSize = capabilities.maxCubemapSize;
 	const maxTextureSize = capabilities.maxTextureSize;
 	const maxSamples = capabilities.maxSamples;
-	const hasMultisampledRenderToTexture = extensions.has( 'WEBGL_multisampled_render_to_texture' );
-	const MultisampledRenderToTextureExtension = hasMultisampledRenderToTexture ? extensions.get( 'WEBGL_multisampled_render_to_texture' ) : undefined;
+	const MultisampledRenderToTextureExtension = extensions.has( 'WEBGL_multisampled_render_to_texture' ) ? extensions.get( 'WEBGL_multisampled_render_to_texture' ) : null;
 
 	const _videoTextures = new WeakMap();
 	let _canvas;
@@ -23408,7 +23381,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		}
 
 		state.bindFramebuffer( 36160, framebuffer );
-		if ( renderTarget.useRenderToTexture ) {
+
+		if ( useMultisampledRenderToTexture( renderTarget ) ) {
 
 			MultisampledRenderToTextureExtension.framebufferTexture2DMultisampleEXT( 36160, attachment, textureTarget, properties.get( texture ).__webglTexture, 0, getRenderTargetSamples( renderTarget ) );
 
@@ -23432,7 +23406,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			let glInternalFormat = 33189;
 
-			if ( isMultisample || renderTarget.useRenderToTexture ) {
+			if ( isMultisample || useMultisampledRenderToTexture( renderTarget ) ) {
 
 				const depthTexture = renderTarget.depthTexture;
 
@@ -23452,7 +23426,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const samples = getRenderTargetSamples( renderTarget );
 
-				if ( renderTarget.useRenderToTexture ) {
+				if ( useMultisampledRenderToTexture( renderTarget ) ) {
 
 					MultisampledRenderToTextureExtension.renderbufferStorageMultisampleEXT( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
@@ -23474,11 +23448,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const samples = getRenderTargetSamples( renderTarget );
 
-			if ( isMultisample && renderTarget.useRenderbuffer ) {
+			if ( isMultisample && useMultisampledRenderToTexture( renderTarget ) === false ) {
 
 				_gl.renderbufferStorageMultisample( 36161, samples, 35056, renderTarget.width, renderTarget.height );
 
-			} else if ( renderTarget.useRenderToTexture ) {
+			} else if ( useMultisampledRenderToTexture( renderTarget ) ) {
 
 				MultisampledRenderToTextureExtension.renderbufferStorageMultisampleEXT( 36161, samples, 35056, renderTarget.width, renderTarget.height );
 
@@ -23501,11 +23475,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 			const samples = getRenderTargetSamples( renderTarget );
 
-			if ( isMultisample && renderTarget.useRenderbuffer ) {
+			if ( isMultisample && useMultisampledRenderToTexture( renderTarget ) === false ) {
 
 				_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
-			} else if ( renderTarget.useRenderToTexture ) {
+			} else if ( useMultisampledRenderToTexture( renderTarget ) ) {
 
 				MultisampledRenderToTextureExtension.renderbufferStorageMultisampleEXT( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
@@ -23553,7 +23527,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthTexture.format === DepthFormat ) {
 
-			if ( renderTarget.useRenderToTexture ) {
+			if ( useMultisampledRenderToTexture( renderTarget ) ) {
 
 				MultisampledRenderToTextureExtension.framebufferTexture2DMultisampleEXT( 36160, 36096, 3553, webglDepthTexture, 0, samples );
 
@@ -23565,7 +23539,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
 
-			if ( renderTarget.useRenderToTexture ) {
+			if ( useMultisampledRenderToTexture( renderTarget ) ) {
 
 				MultisampledRenderToTextureExtension.framebufferTexture2DMultisampleEXT( 36160, 33306, 3553, webglDepthTexture, 0, samples );
 
@@ -23712,7 +23686,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-			} else if ( renderTarget.useRenderbuffer ) {
+			} else if ( renderTarget.samples > 0 && useMultisampledRenderToTexture( renderTarget ) === false ) {
 
 				if ( isWebGL2 ) {
 
@@ -23743,7 +23717,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				} else {
 
-					console.warn( 'THREE.WebGLRenderer: WebGLMultisampleRenderTarget can only be used with WebGL2.' );
+					console.warn( 'THREE.WebGLRenderer: Multisampled render targets can only be used with WebGL 2.' );
 
 				}
 
@@ -23867,9 +23841,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function updateMultisampleRenderTarget( renderTarget ) {
 
-		if ( renderTarget.useRenderbuffer ) {
+		if ( isWebGL2 ) {
 
-			if ( isWebGL2 ) {
+			if ( renderTarget.samples > 0 && useMultisampledRenderToTexture( renderTarget ) === false ) {
 
 				const width = renderTarget.width;
 				const height = renderTarget.height;
@@ -23883,19 +23857,20 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				if ( ! renderTarget.ignoreDepthForMultisampleCopy ) {
+				const renderTargetProperties = properties.get( renderTarget );
+				const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : true;
+
+				if ( ignoreDepthValues === false ) {
 
 					if ( renderTarget.depthBuffer ) mask |= 256;
 					if ( renderTarget.stencilBuffer ) mask |= 1024;
 
 				}
 
-				const renderTargetProperties = properties.get( renderTarget );
-
 				state.bindFramebuffer( 36008, renderTargetProperties.__webglMultisampledFramebuffer );
 				state.bindFramebuffer( 36009, renderTargetProperties.__webglFramebuffer );
 
-				if ( renderTarget.ignoreDepthForMultisampleCopy ) {
+				if ( ignoreDepthValues === true ) {
 
 					_gl.invalidateFramebuffer( 36008, [ depthStyle ] );
 					_gl.invalidateFramebuffer( 36009, [ depthStyle ] );
@@ -23908,11 +23883,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				state.bindFramebuffer( 36008, null );
 				state.bindFramebuffer( 36009, renderTargetProperties.__webglMultisampledFramebuffer );
 
-			} else {
-
-				console.warn( 'THREE.WebGLRenderer: WebGLMultisampleRenderTarget can only be used with WebGL2.' );
-
 			}
+
+		} else {
+
+			console.warn( 'THREE.WebGLRenderer: Multisampled render targets can only be used with WebGL 2.' );
 
 		}
 
@@ -23920,8 +23895,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getRenderTargetSamples( renderTarget ) {
 
-		return ( isWebGL2 && ( renderTarget.useRenderbuffer || renderTarget.useRenderToTexture ) ) ?
-			Math.min( maxSamples, renderTarget.samples ) : 0;
+		return Math.min( maxSamples, renderTarget.samples );
+
+	}
+
+	function useMultisampledRenderToTexture( renderTarget ) {
+
+		const renderTargetProperties = properties.get( renderTarget );
+
+		return renderTarget.samples > 0 && extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true && renderTargetProperties.__useRenderToTexture !== false;
 
 	}
 
@@ -24058,6 +24040,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.updateMultisampleRenderTarget = updateMultisampleRenderTarget;
 	this.setupDepthRenderbuffer = setupDepthRenderbuffer;
 	this.setupFrameBufferTexture = setupFrameBufferTexture;
+	this.useMultisampledRenderToTexture = useMultisampledRenderToTexture;
 
 	this.safeSetTexture2D = safeSetTexture2D;
 	this.safeSetTextureCube = safeSetTextureCube;
@@ -24687,13 +24670,11 @@ class WebXRManager extends EventDispatcher {
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
-		const hasMultisampledRenderToTexture = renderer.extensions.has( 'WEBGL_multisampled_render_to_texture' );
 
 		let pose = null;
 		let glBinding = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
-		let isMultisample = false;
 		let xrFrame = null;
 		const attributes = gl.getContextAttributes();
 		let initialRenderTarget = null;
@@ -24923,7 +24904,6 @@ class WebXRManager extends EventDispatcher {
 
 				} else {
 
-					isMultisample = attributes.antialias;
 					let depthFormat = null;
 					let depthType = null;
 					let glDepthFormat = null;
@@ -24948,36 +24928,20 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
 
-					if ( isMultisample ) {
+					newRenderTarget = new WebGLRenderTarget(
+						glProjLayer.textureWidth,
+						glProjLayer.textureHeight,
+						{
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+							stencilBuffer: attributes.stencil,
+							encoding: renderer.outputEncoding,
+							samples: attributes.antialias ? 4 : 0
+						} );
 
-						newRenderTarget = new WebGLMultisampleRenderTarget(
-							glProjLayer.textureWidth,
-							glProjLayer.textureHeight,
-							{
-								format: RGBAFormat,
-								type: UnsignedByteType,
-								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-								stencilBuffer: attributes.stencil,
-								ignoreDepth: glProjLayer.ignoreDepthValues,
-								useRenderToTexture: hasMultisampledRenderToTexture,
-								encoding: renderer.outputEncoding
-							} );
-
-					} else {
-
-						newRenderTarget = new WebGLRenderTarget(
-							glProjLayer.textureWidth,
-							glProjLayer.textureHeight,
-							{
-								format: RGBAFormat,
-								type: UnsignedByteType,
-								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-								stencilBuffer: attributes.stencil,
-								ignoreDepth: glProjLayer.ignoreDepthValues,
-								encoding: renderer.outputEncoding
-							} );
-
-					}
+					const renderTargetProperties = renderer.properties.get( newRenderTarget );
+					renderTargetProperties.__ignoreDepthValues = glProjLayer.ignoreDepthValues;
 
 				}
 
@@ -27277,13 +27241,11 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
-			const renderTargetType = ( isWebGL2 && _antialias === true ) ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
-
-			_transmissionRenderTarget = new renderTargetType( 1, 1, {
+			_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
 				generateMipmaps: true,
-				type: HalfFloatType,
+				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
 				minFilter: isWebGL2 ? LinearMipmapLinearFilter : LinearFilter,
-				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
+				samples: ( isWebGL2 && _antialias === true ) ? 4 : 0
 			} );
 
 		}
@@ -27876,7 +27838,7 @@ function WebGLRenderer( parameters = {} ) {
 
 				// The multisample_render_to_texture extension doesn't work properly if there
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
-				if ( renderTarget.useRenderToTexture ) {
+				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
 
 					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
 					renderTarget.useRenderToTexture = false;
@@ -27949,7 +27911,7 @@ function WebGLRenderer( parameters = {} ) {
 				framebuffer = __webglFramebuffer[ activeCubeFace ];
 				isCube = true;
 
-			} else if ( renderTarget.useRenderbuffer ) {
+			} else if ( renderTarget.samples > 0 && textures.useMultisampledRenderToTexture( renderTarget ) === false ) {
 
 				framebuffer = properties.get( renderTarget ).__webglMultisampledFramebuffer;
 
@@ -50713,4 +50675,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, FaceColors, FileLoader, FlatShading, Float16BufferAttribute, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, FaceColors, FileLoader, FlatShading, Float16BufferAttribute, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
