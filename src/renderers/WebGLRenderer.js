@@ -1200,8 +1200,6 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		// set size of transmission render target to half size of drawing buffer
-
 		_this.getDrawingBufferSize( _vector2 );
 		_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
 
