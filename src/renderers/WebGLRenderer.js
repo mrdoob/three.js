@@ -9,6 +9,7 @@ import {
 	UnsignedByteType,
 	LinearEncoding,
 	NoToneMapping,
+	LinearFilter,
 	LinearMipmapLinearFilter
 } from '../constants.js';
 import { Frustum } from '../math/Frustum.js';
@@ -1184,29 +1185,22 @@ function WebGLRenderer( parameters = {} ) {
 
 	function renderTransmissionPass( opaqueObjects, scene, camera ) {
 
-		if ( capabilities.isWebGL2 === false ) {
-
-			console.error( 'THREE.WebGLRenderer: Transmission can only be used with WebGL 2.' );
-			return;
-
-		}
+		const isWebGL2 = capabilities.isWebGL2;
 
 		if ( _transmissionRenderTarget === null ) {
 
-			const renderTargetType = ( _antialias === true ) ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+			const renderTargetType = ( isWebGL2 && _antialias === true ) ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
 
 			_transmissionRenderTarget = new renderTargetType( 1, 1, {
 				generateMipmaps: true,
 				type: HalfFloatType,
-				minFilter: LinearMipmapLinearFilter,
+				minFilter: isWebGL2 ? LinearMipmapLinearFilter : LinearFilter,
 				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
 			} );
 
 		}
 
-		// set size of transmission render target to half size of drawing buffer
-
-		_this.getDrawingBufferSize( _vector2 ).multiplyScalar( 0.5 ).floor();
+		_this.getDrawingBufferSize( _vector2 );
 		_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
 
 		//
