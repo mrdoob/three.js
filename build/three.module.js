@@ -26258,6 +26258,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	const _projScreenMatrix = new Matrix4();
 
+	const _vector2 = new Vector2();
 	const _vector3 = new Vector3();
 
 	const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
@@ -27272,22 +27273,25 @@ function WebGLRenderer( parameters = {} ) {
 
 	function renderTransmissionPass( opaqueObjects, scene, camera ) {
 
+		const isWebGL2 = capabilities.isWebGL2;
+
 		if ( _transmissionRenderTarget === null ) {
 
-			const needsAntialias = _antialias === true && capabilities.isWebGL2 === true;
-			const renderTargetType = needsAntialias ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+			const renderTargetType = ( isWebGL2 && _antialias === true ) ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
 
-			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
+			_transmissionRenderTarget = new renderTargetType( 1, 1, {
 				generateMipmaps: true,
-				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
-				minFilter: LinearMipmapLinearFilter,
-				magFilter: NearestFilter,
-				wrapS: ClampToEdgeWrapping,
-				wrapT: ClampToEdgeWrapping,
+				type: HalfFloatType,
+				minFilter: isWebGL2 ? LinearMipmapLinearFilter : LinearFilter,
 				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
 			} );
 
 		}
+
+		_this.getDrawingBufferSize( _vector2 );
+		_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+
+		//
 
 		const currentRenderTarget = _this.getRenderTarget();
 		_this.setRenderTarget( _transmissionRenderTarget );
@@ -27874,7 +27878,7 @@ function WebGLRenderer( parameters = {} ) {
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
 				if ( renderTarget.useRenderToTexture ) {
 
-					console.warn( 'render-to-texture extension was disabled because an external texture was provided' );
+					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
 					renderTarget.useRenderToTexture = false;
 					renderTarget.useRenderbuffer = true;
 
