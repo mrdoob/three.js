@@ -9,7 +9,6 @@ import {
 	UnsignedByteType,
 	LinearEncoding,
 	NoToneMapping,
-	LinearFilter,
 	LinearMipmapLinearFilter
 } from '../constants.js';
 import { floorPowerOfTwo } from '../math/MathUtils';
@@ -1202,10 +1201,15 @@ function WebGLRenderer( parameters = {} ) {
 		}
 
 		_this.getDrawingBufferSize( _vector2 );
-		if (isWebGL2) {
+
+		if ( isWebGL2 ) {
+
 			_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+
 		} else {
+
 			_transmissionRenderTarget.setSize( floorPowerOfTwo( _vector2.x ), floorPowerOfTwo( _vector2.y ) );
+
 		}
 
 		//
