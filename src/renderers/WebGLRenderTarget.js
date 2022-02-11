@@ -37,6 +37,8 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
+		this.samples = options.samples !== undefined ? options.samples : 0;
+
 	}
 
 	setTexture( texture ) {
@@ -96,6 +98,8 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.stencilBuffer = source.stencilBuffer;
 
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
+
+		this.samples = source.samples;
 
 		return this;
 
