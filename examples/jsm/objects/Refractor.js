@@ -27,7 +27,7 @@ class Refractor extends Mesh {
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Refractor.RefractorShader;
-		const multisample = options.multisample || 4;
+		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
 
 		//
 
