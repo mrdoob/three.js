@@ -1010,6 +1010,16 @@
 
 				}
 
+				if ( objectData.name ) {
+
+					for ( let i = 0; i < meshes.length; i ++ ) {
+
+						meshes[ i ].name = objectData.name;
+
+					}
+
+				}
+
 				return meshes;
 
 			}
@@ -1216,6 +1226,12 @@
 
 					const compositeData = objectData[ 'components' ];
 					objects[ objectData.id ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite );
+
+				}
+
+				if ( objectData.name ) {
+
+					objects[ objectData.id ].name = objectData.name;
 
 				}
 
