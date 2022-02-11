@@ -3173,6 +3173,7 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
+
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
 	}
@@ -3232,7 +3233,8 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-		this.depthTexture = source.depthTexture;
+
+		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
 		return this;
 
@@ -27282,14 +27284,23 @@ function WebGLRenderer( parameters = {} ) {
 			_transmissionRenderTarget = new renderTargetType( 1, 1, {
 				generateMipmaps: true,
 				type: HalfFloatType,
-				minFilter: isWebGL2 ? LinearMipmapLinearFilter : LinearFilter,
+				minFilter: LinearMipmapLinearFilter,
 				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
 			} );
 
 		}
 
 		_this.getDrawingBufferSize( _vector2 );
-		_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+
+		if ( isWebGL2 ) {
+
+			_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+
+		} else {
+
+			_transmissionRenderTarget.setSize( floorPowerOfTwo( _vector2.x ), floorPowerOfTwo( _vector2.y ) );
+
+		}
 
 		//
 
