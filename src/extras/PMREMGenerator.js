@@ -258,7 +258,6 @@ class PMREMGenerator {
 		};
 
 		const cubeUVRenderTarget = _createRenderTarget( width, height, params );
-		cubeUVRenderTarget.texture.image = { width, height };
 
 		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width ) {
 
