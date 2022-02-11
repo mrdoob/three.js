@@ -11,7 +11,7 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter
 } from '../constants.js';
-import { floorPowerOfTwo } from '../math/MathUtils';
+import { floorPowerOfTwo } from '../math/MathUtils.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
