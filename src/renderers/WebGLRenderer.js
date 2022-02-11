@@ -12,6 +12,7 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter
 } from '../constants.js';
+import { floorPowerOfTwo } from '../math/MathUtils';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
@@ -1194,14 +1195,18 @@ function WebGLRenderer( parameters = {} ) {
 			_transmissionRenderTarget = new renderTargetType( 1, 1, {
 				generateMipmaps: true,
 				type: HalfFloatType,
-				minFilter: isWebGL2 ? LinearMipmapLinearFilter : LinearFilter,
+				minFilter: LinearMipmapLinearFilter,
 				useRenderToTexture: extensions.has( 'WEBGL_multisampled_render_to_texture' )
 			} );
 
 		}
 
 		_this.getDrawingBufferSize( _vector2 );
-		_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+		if (isWebGL2) {
+			_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+		} else {
+			_transmissionRenderTarget.setSize( floorPowerOfTwo( _vector2.x ), floorPowerOfTwo( _vector2.y ) );
+		}
 
 		//
 
