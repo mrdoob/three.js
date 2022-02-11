@@ -177,6 +177,12 @@
 
 				const sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
 
+					if ( a.renderOrder !== b.renderOrder ) {
+
+						return b.renderOrder - a.renderOrder;
+
+					}
+
 					const distanceA = cache.objects.get( a ).distanceToCameraSquared;
 					const distanceB = cache.objects.get( b ).distanceToCameraSquared;
 					return distanceA - distanceB;
