@@ -4,6 +4,7 @@ import {
 	CubeUVReflectionMapping,
 	LinearEncoding,
 	LinearFilter,
+	NearestFilter,
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
@@ -249,7 +250,7 @@ class PMREMGenerator {
 
 		const params = {
 			magFilter: LinearFilter,
-			minFilter: LinearFilter,
+			minFilter: NearestFilter,
 			generateMipmaps: false,
 			type: HalfFloatType,
 			format: RGBAFormat,
