@@ -695,7 +695,7 @@ class GLTFWriter {
 		const roughness = material.roughnessMap?.image;
 		const metalness = material.metalnessMap?.image;
 
-		if ( occlusion === roughness && roughness === metalness ) return occlusion;
+		if ( occlusion === roughness && roughness === metalness ) return material.aoMap;
 
 		if ( occlusion || roughness || metalness ) {
 
