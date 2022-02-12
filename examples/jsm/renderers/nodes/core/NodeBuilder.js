@@ -58,7 +58,8 @@ class NodeBuilder {
 			console.warn( 'Recursive node: ', node );
 
 		}
-*/
+		*/
+
 		this.stack.push( node );
 
 	}
@@ -449,25 +450,9 @@ class NodeBuilder {
 
 	}
 
-	getAttributes( shaderStage ) {
+	getAttributes( /*shaderStage*/ ) {
 
-		let snippet = '';
-
-		if ( shaderStage === 'vertex' ) {
-
-			const attributes = this.attributes;
-
-			for ( let index = 0; index < attributes.length; index ++ ) {
-
-				const attribute = attributes[ index ];
-
-				snippet += `layout(location = ${index}) in ${attribute.type} ${attribute.name}; `;
-
-			}
-
-		}
-
-		return snippet;
+		console.warn( 'Abstract function.' );
 
 	}
 
