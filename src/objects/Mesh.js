@@ -169,6 +169,12 @@ class Mesh extends Object3D {
 						const group = groups[ i ];
 						const groupMaterial = material[ group.materialIndex ];
 
+						if ( groupMaterial === undefined ) {
+
+							continue;
+
+						}
+
 						const start = Math.max( group.start, drawRange.start );
 						const end = Math.min( index.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
 
@@ -226,6 +232,12 @@ class Mesh extends Object3D {
 
 						const group = groups[ i ];
 						const groupMaterial = material[ group.materialIndex ];
+
+						if ( groupMaterial === undefined ) {
+
+							continue;
+
+						}
 
 						const start = Math.max( group.start, drawRange.start );
 						const end = Math.min( position.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
