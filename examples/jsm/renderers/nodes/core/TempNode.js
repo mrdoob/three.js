@@ -11,10 +11,9 @@ class TempNode extends Node {
 	build( builder, output ) {
 
 		const type = builder.getVectorType( this.getNodeType( builder, output ) );
+		const nodeData = builder.getDataFromNode( this );
 
-		if ( builder.context.temp !== false && type !== 'void ' && output !== 'void' ) {
-
-			const nodeData = builder.getDataFromNode( this );
+		if ( builder.context.temp !== false && type !== 'void ' && output !== 'void' && nodeData.dependenciesCount > 1 ) {
 
 			if ( nodeData.snippet === undefined ) {
 
