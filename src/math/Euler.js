@@ -275,6 +275,19 @@ class Euler {
 
 	}
 
+	clamp( min, max ) {
+
+		// assumes min < max, componentwise
+
+		this._x = Math.max( min.x, Math.min( max.x, this._x ) );
+		this._y = Math.max( min.y, Math.min( max.y, this._y ) );
+		this._z = Math.max( min.z, Math.min( max.z, this._z ) );
+		this._onChangeCallback();
+
+		return this;
+
+	}
+
 	fromArray( array ) {
 
 		this._x = array[ 0 ];
