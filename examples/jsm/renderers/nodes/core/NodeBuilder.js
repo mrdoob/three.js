@@ -528,11 +528,31 @@ class NodeBuilder {
 
 	build() {
 
+		// stage 1: analyze nodes to possible optimization and validation
+
+		for ( const shaderStage of shaderStages ) {
+
+			this.setShaderStage( shaderStage );
+
+			const flowNodes = this.flowNodes[ shaderStage ];
+
+			for ( const node of flowNodes ) {
+
+				node.analyze( this );
+
+			}
+
+		}
+
+		// stage 2: pre-build vertex code used in fragment shader
+
 		if ( this.context.vertex && this.context.vertex.isNode ) {
 
 			this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
 
 		}
+
+		// stage 3: generate shader
 
 		for ( const shaderStage of shaderStages ) {
 
@@ -549,6 +569,8 @@ class NodeBuilder {
 		}
 
 		this.setShaderStage( null );
+
+		// stage 4: build code for a specific output
 
 		this.buildCode();
 
