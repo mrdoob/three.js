@@ -231,7 +231,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return `${ builder.getMethod( method ) }( ${params.join( ', ' )} )`;
+			return builder.format( `${ builder.getMethod( method ) }( ${params.join( ', ' )} )`, type, output );
 
 		}
 
