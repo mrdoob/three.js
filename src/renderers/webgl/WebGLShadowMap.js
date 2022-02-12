@@ -300,9 +300,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		result.clippingPlanes = material.clippingPlanes;
 		result.clipIntersection = material.clipIntersection;
 
-		result.displacementMap = material.displacementMap;
-		result.displacementScale = material.displacementScale;
-		result.displacementBias = material.displacementBias;
+		result.displacementMap ||= material.displacementMap;
+		result.displacementScale ||= material.displacementScale;
+		result.displacementBias ||= material.displacementBias;
 
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
