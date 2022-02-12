@@ -264,6 +264,17 @@ class Euler {
 
 	}
 
+	lerp( e, alpha ) {
+
+		this._x += ( e.x - this._x ) * alpha;
+		this._y += ( e.y - this._y ) * alpha;
+		this._z += ( e.z - this._z ) * alpha;
+		this._onChangeCallback();
+
+		return this;
+
+	}
+
 	fromArray( array ) {
 
 		this._x = array[ 0 ];
