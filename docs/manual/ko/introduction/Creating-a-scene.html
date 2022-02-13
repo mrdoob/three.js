@@ -92,11 +92,10 @@
 		<p>맨 처음에 있던 HTML 파일을 복사해서 열어놨다면, 아무것도 보이지 않을 것입니다. 왜냐하면 아직 아무것도 렌더링하지 않았기 때문입니다. 이를 해결하려면 <strong>render or animate loop</strong>라는 것이 필요합니다..</p>
 
 		<code>
+		renderer.setAnimationLoop( animate );
 		function animate() {
-			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
-		animate();
 		</code>
 
 		<p>이 코드는 화면이 새로고침 될 때마다 계속해서 렌더링을 해 줄 것입니다. (일반적인 경우에 1초에 60번 렌더링 됩니다). 웹 브라우저에서 게임을 만들기 시작한 지 얼마 안 된 분이라면, <em>"왜 그냥 setInterval을 쓰지 않는거죠?"</em>라고 질문할 수도 있을 겁니다. 단적으로 말하면 가능은 합니다. 하지만 <strong>requestAnimationFrame</strong> 을 사용하는 것이 훨씬 이점이 많습니다. 아마 가장 큰 이점은 유저가 브라우저 창에서 이탈했을때 멈춰주는 기능일 것입니다. 이를 통해 소중한 전력과 배터리를 아낄 수 있죠.</p>
@@ -138,6 +137,7 @@
 
 					const renderer = new THREE.WebGLRenderer();
 					renderer.setSize( window.innerWidth, window.innerHeight );
+					renderer.setAnimationLoop( animate );
 					document.body.appendChild( renderer.domElement );
 
 					const geometry = new THREE.BoxGeometry();
@@ -148,15 +148,11 @@
 					camera.position.z = 5;
 
 					function animate() {
-						requestAnimationFrame( animate );
-
 						cube.rotation.x += 0.01;
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
 					};
-
-					animate();
 				&lt;/script&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;

@@ -91,11 +91,10 @@
 		<p>先ほど作成したHTMLファイルに上のコードをコピーしても何も表示されません。これは、実際にはまだ何も描画していないからです。そのためには、<strong>レンダリングまたはアニメーションループ</strong>と呼ばれるものが必要です。</p>
 
 		<code>
+		renderer.setAnimationLoop( animate );
 		function animate() {
-			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
-		animate();
 		</code>
 
 		<p>このコードでは、画面が更新されるたびにrendererがシーンを描画するループを作成しています(一般的な画面では、これは1秒間に60回を意味します)。ブラウザでゲームを書くのが初めての方は、<em>「なぜ setIntervalでやらないのか」</em>と言うかもしれません。おそらく最も重要なのは、ユーザーが別のブラウザタブに移動するときに一時停止し、貴重な処理能力とバッテリー寿命を無駄にしないことです。</p>
@@ -135,6 +134,7 @@
 
 					const renderer = new THREE.WebGLRenderer();
 					renderer.setSize( window.innerWidth, window.innerHeight );
+					renderer.setAnimationLoop( animate );
 					document.body.appendChild( renderer.domElement );
 
 					const geometry = new THREE.BoxGeometry();
@@ -145,15 +145,11 @@
 					camera.position.z = 5;
 
 					function animate() {
-						requestAnimationFrame( animate );
-
 						cube.rotation.x += 0.01;
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
 					};
-
-					animate();
 				&lt;/script&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;

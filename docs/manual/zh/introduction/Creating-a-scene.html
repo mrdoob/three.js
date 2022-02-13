@@ -91,11 +91,10 @@
 		<p>现在，如果将之前写好的代码复制到HTML文件中，你不会在页面中看到任何东西。这是因为我们还没有对它进行真正的渲染。为此，我们需要使用一个被叫做“<strong>渲染循环</strong>”（render loop）或者“<strong>动画循环</strong>”（animate loop）的东西。</p>
 
 		<code>
+		renderer.setAnimationLoop( animate );
 		function animate() {
-			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
-		animate();
 		</code>
 
 		<p>在这里我们创建了一个使渲染器能够在每次屏幕刷新时对场景进行绘制的循环（在大多数屏幕上，刷新率一般是60次/秒）。如果你是一个浏览器游戏开发的新手，你或许会说<em>“为什么我们不直接用setInterval来实现刷新的功能呢？”</em>当然啦，我们的确可以用setInterval，但是，<strong>requestAnimationFrame</strong>有很多的优点。最重要的一点或许就是当用户切换到其它的标签页时，它会暂停，因此不会浪费用户宝贵的处理器资源，也不会损耗电池的使用寿命。</p>
@@ -136,6 +135,7 @@
 
 					const renderer = new THREE.WebGLRenderer();
 					renderer.setSize( window.innerWidth, window.innerHeight );
+					renderer.setAnimationLoop( animate );
 					document.body.appendChild( renderer.domElement );
 
 					const geometry = new THREE.BoxGeometry();
@@ -146,15 +146,11 @@
 					camera.position.z = 5;
 
 					function animate() {
-						requestAnimationFrame( animate );
-
 						cube.rotation.x += 0.01;
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
 					};
-
-					animate();
 				&lt;/script&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;

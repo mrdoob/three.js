@@ -91,11 +91,10 @@
 		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render or animate loop</strong>.</p>
 
 		<code>
+        renderer.setAnimationLoop( animate );
 		function animate() {
-			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
-		animate();
 		</code>
 
 		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but <strong>requestAnimationFrame</strong> has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
@@ -136,6 +135,7 @@
 
 					const renderer = new THREE.WebGLRenderer();
 					renderer.setSize( window.innerWidth, window.innerHeight );
+					renderer.setAnimationLoop( animate );
 					document.body.appendChild( renderer.domElement );
 
 					const geometry = new THREE.BoxGeometry();
@@ -146,15 +146,11 @@
 					camera.position.z = 5;
 
 					function animate() {
-						requestAnimationFrame( animate );
-
 						cube.rotation.x += 0.01;
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
 					};
-
-					animate();
 				&lt;/script&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;
