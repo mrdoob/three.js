@@ -1,5 +1,7 @@
 import {
 	Box3,
+	Box3Helper,
+	Group,
 	Line3,
 	Plane,
 	Sphere,
@@ -129,6 +131,22 @@ class Octree {
 		this.split( 0 );
 
 		return this;
+
+	}
+
+	showTree( currentTree = this.subTrees, group = new Group() ) {
+
+		for ( let i = 0; i < currentTree.length; i ++ ) {
+
+			const box = new Box3Helper( currentTree[ i ].box, 0xffff00 );
+
+			group.add( box );
+
+			this.showTree( currentTree[ i ].subTrees, group );
+
+		}
+
+		return group;
 
 	}
 
