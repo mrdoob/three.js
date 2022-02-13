@@ -3,33 +3,35 @@ import { Group, Box3Helper } from 'three';
 
 class OctreeHelper {
 
-	constructor( octree = null, color = 0xffff00 ) {
+  constructor(octree = null, color = 0xffff00) {
 
-		this.subTrees = octree.subTrees;
-		this.color = color;
+    if (!octree) return octree
 
-		this.group = new Group();
-		this.createBoxes = this.traverseTree( this.subTrees, this.group );
+    this.subTrees = octree.subTrees;
+    this.color = color;
 
-		return this.createBoxes;
+    this.group = new Group();
+    this.createBoxes = this.traverseTree(this.subTrees, this.group);
 
-	}
+    return this.createBoxes;
 
-	traverseTree( currentTree, group ) {
+  }
 
-		for ( let i = 0; i < currentTree.length; i ++ ) {
+  traverseTree(currentTree, group) {
 
-			const box = new Box3Helper( currentTree[ i ].box, this.color );
+    for (let i = 0; i < currentTree.length; i++) {
 
-			group.add( box );
+      const box = new Box3Helper(currentTree[i].box, this.color);
 
-			this.traverseTree( currentTree[ i ].subTrees, group );
+      group.add(box);
 
-		}
+      this.traverseTree(currentTree[i].subTrees, group);
 
-		return group;
+    }
 
-	}
+    return group;
+
+  }
 
 }
 
