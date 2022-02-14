@@ -1010,8 +1010,6 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
 
-		state.setPolygonOffset( false );
-
 		// _gl.finish();
 
 		bindingStates.resetDefaultState();
@@ -1179,6 +1177,8 @@ function WebGLRenderer( parameters = {} ) {
 		state.buffers.depth.setTest( true );
 		state.buffers.depth.setMask( true );
 		state.buffers.color.setMask( true );
+
+		state.setPolygonOffset( false );
 
 	}
 
