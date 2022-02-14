@@ -11702,7 +11702,7 @@ class PMREMGenerator {
 
 	_fromTexture(texture, renderTarget) {
 		if (texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping) {
-			this._setSize(texture.image.length === 0 ? 16 : texture.image[0].width ?? texture.image[0].image.width);
+			this._setSize(texture.image.length === 0 ? 16 : texture.image[0].width || texture.image[0].image.width);
 		} else {
 			// Equirectangular
 			this._setSize(texture.image.width / 4);
@@ -11726,7 +11726,7 @@ class PMREMGenerator {
 		const height = 4 * this._cubeSize - 32;
 		const params = {
 			magFilter: LinearFilter,
-			minFilter: LinearFilter,
+			minFilter: NearestFilter,
 			generateMipmaps: false,
 			type: HalfFloatType,
 			format: RGBAFormat,
@@ -13270,7 +13270,7 @@ function setValueT1(gl, v, textures) {
 		cache[0] = unit;
 	}
 
-	textures.safeSetTexture2D(v || emptyTexture, unit);
+	textures.setTexture2D(v || emptyTexture, unit);
 }
 
 function setValueT3D1(gl, v, textures) {
@@ -13294,7 +13294,7 @@ function setValueT6(gl, v, textures) {
 		cache[0] = unit;
 	}
 
-	textures.safeSetTextureCube(v || emptyCubeTexture, unit);
+	textures.setTextureCube(v || emptyCubeTexture, unit);
 }
 
 function setValueT2DArray1(gl, v, textures) {
@@ -13498,7 +13498,7 @@ function setValueT1Array(gl, v, textures) {
 	gl.uniform1iv(this.addr, units);
 
 	for (let i = 0; i !== n; ++i) {
-		textures.safeSetTexture2D(v[i] || emptyTexture, units[i]);
+		textures.setTexture2D(v[i] || emptyTexture, units[i]);
 	}
 }
 
@@ -13518,7 +13518,7 @@ function setValueT6Array(gl, v, textures) {
 	gl.uniform1iv(this.addr, units);
 
 	for (let i = 0; i !== n; ++i) {
-		textures.safeSetTextureCube(v[i] || emptyCubeTexture, units[i]);
+		textures.setTextureCube(v[i] || emptyCubeTexture, units[i]);
 	}
 }
 
@@ -17061,7 +17061,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 						mipmap = mipmaps[i];
 
 						if (useTexStorage) {
-							state.texSubImage2D(_gl.TEXTURE_2D, 0, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
+							state.texSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
 						} else {
 							state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
 						}
@@ -17718,36 +17718,6 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		}
 
 		return image;
-	} // backwards compatibility
-
-
-	let warnedTexture2D = false;
-	let warnedTextureCube = false;
-
-	function safeSetTexture2D(texture, slot) {
-		if (texture.isWebGLRenderTarget) {
-			if (warnedTexture2D === false) {
-				console.warn('THREE.WebGLTextures.safeSetTexture2D: don\'t use render targets as textures. Use their .texture property instead.');
-				warnedTexture2D = true;
-			}
-
-			texture = texture.texture;
-		}
-
-		setTexture2D(texture, slot);
-	}
-
-	function safeSetTextureCube(texture, slot) {
-		if (texture.isWebGLCubeRenderTarget) {
-			if (warnedTextureCube === false) {
-				console.warn('THREE.WebGLTextures.safeSetTextureCube: don\'t use cube render targets as textures. Use their .texture property instead.');
-				warnedTextureCube = true;
-			}
-
-			texture = texture.texture;
-		}
-
-		setTextureCube(texture, slot);
 	} //
 
 
@@ -17764,8 +17734,6 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 	this.setupDepthRenderbuffer = setupDepthRenderbuffer;
 	this.setupFrameBufferTexture = setupFrameBufferTexture;
 	this.useMultisampledRTT = useMultisampledRTT;
-	this.safeSetTexture2D = safeSetTexture2D;
-	this.safeSetTextureCube = safeSetTextureCube;
 }
 
 function WebGLUtils(gl, extensions, capabilities) {
