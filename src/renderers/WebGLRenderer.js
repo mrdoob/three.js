@@ -1821,6 +1821,7 @@ function WebGLRenderer( parameters = {} ) {
 		_currentRenderTarget = renderTarget;
 		_currentActiveCubeFace = activeCubeFace;
 		_currentActiveMipmapLevel = activeMipmapLevel;
+
 		let useDefaultFramebuffer = true;
 
 		if ( renderTarget ) {
