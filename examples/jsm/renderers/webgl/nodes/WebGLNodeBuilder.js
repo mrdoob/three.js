@@ -1,12 +1,10 @@
-import NodeBuilder from '../../nodes/core/NodeBuilder.js';
+import NodeBuilder, { shaderStages } from '../../nodes/core/NodeBuilder.js';
 import SlotNode from './SlotNode.js';
 import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
 import { ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
-		LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
-
-const shaderStages = [ 'vertex', 'fragment' ];
+	LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
 
 const nodeShaderLib = {
 	LineBasicNodeMaterial: ShaderLib.basic,

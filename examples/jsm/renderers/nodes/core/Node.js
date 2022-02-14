@@ -50,6 +50,30 @@ class Node {
 
 	}
 
+	analyze( builder ) {
+
+		const hash = this.getHash( builder );
+		const sharedNode = builder.getNodeFromHash( hash );
+
+		if ( sharedNode !== undefined && this !== sharedNode ) {
+
+			return sharedNode.analyze( builder );
+
+		}
+
+		const nodeData = builder.getDataFromNode( this );
+		nodeData.dependenciesCount = nodeData.dependenciesCount === undefined ? 1 : nodeData.dependenciesCount + 1;
+
+		const nodeKeys = getNodesKeys( this );
+
+		for ( const property of nodeKeys ) {
+
+			this[ property ].analyze( builder );
+
+		}
+
+	}
+
 	build( builder, output = null ) {
 
 		const hash = this.getHash( builder );
@@ -64,6 +88,7 @@ class Node {
 		builder.addNode( this );
 		builder.addStack( this );
 
+		const nodeData = builder.getDataFromNode( this );
 		const isGenerateOnce = this.generate.length === 1;
 
 		let snippet = null;
@@ -71,7 +96,6 @@ class Node {
 		if ( isGenerateOnce ) {
 
 			const type = this.getNodeType( builder );
-			const nodeData = builder.getDataFromNode( this );
 
 			snippet = nodeData.snippet;
 

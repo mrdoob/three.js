@@ -302,16 +302,16 @@ export const and = ShaderNodeProxy( OperatorNode, '&&' );
 
 export const element = ShaderNodeProxy( ArrayElementNode );
 
-export const normalGeometry = new NormalNode( NormalNode.GEOMETRY );
-export const normalLocal = new NormalNode( NormalNode.LOCAL );
-export const normalWorld = new NormalNode( NormalNode.WORLD );
-export const normalView = new NormalNode( NormalNode.VIEW );
-export const transformedNormalView = new VarNode( new NormalNode( NormalNode.VIEW ), 'TransformedNormalView', 'vec3' );
+export const normalGeometry = ShaderNodeObject( new NormalNode( NormalNode.GEOMETRY ) );
+export const normalLocal = ShaderNodeObject( new NormalNode( NormalNode.LOCAL ) );
+export const normalWorld = ShaderNodeObject( new NormalNode( NormalNode.WORLD ) );
+export const normalView = ShaderNodeObject( new NormalNode( NormalNode.VIEW ) );
+export const transformedNormalView = ShaderNodeObject( new VarNode( new NormalNode( NormalNode.VIEW ), 'TransformedNormalView', 'vec3' ) );
 
-export const positionLocal = new PositionNode( PositionNode.LOCAL );
-export const positionWorld = new PositionNode( PositionNode.WORLD );
-export const positionView = new PositionNode( PositionNode.VIEW );
-export const positionViewDirection = new PositionNode( PositionNode.VIEW_DIRECTION );
+export const positionLocal = ShaderNodeObject( new PositionNode( PositionNode.LOCAL ) );
+export const positionWorld = ShaderNodeObject( new PositionNode( PositionNode.WORLD ) );
+export const positionView = ShaderNodeObject( new PositionNode( PositionNode.VIEW ) );
+export const positionViewDirection = ShaderNodeObject( new PositionNode( PositionNode.VIEW_DIRECTION ) );
 
 export const PI = float( 3.141592653589793 );
 export const PI2 = float( 6.283185307179586 );
@@ -320,11 +320,11 @@ export const RECIPROCAL_PI = float( 0.3183098861837907 );
 export const RECIPROCAL_PI2 = float( 0.15915494309189535 );
 export const EPSILON = float( 1e-6 );
 
-export const diffuseColor = new PropertyNode( 'DiffuseColor', 'vec4' );
-export const roughness = new PropertyNode( 'Roughness', 'float' );
-export const metalness = new PropertyNode( 'Metalness', 'float' );
-export const alphaTest = new PropertyNode( 'AlphaTest', 'float' );
-export const specularColor = new PropertyNode( 'SpecularColor', 'color' );
+export const diffuseColor = ShaderNodeObject( new PropertyNode( 'DiffuseColor', 'vec4' ) );
+export const roughness = ShaderNodeObject( new PropertyNode( 'Roughness', 'float' ) );
+export const metalness = ShaderNodeObject( new PropertyNode( 'Metalness', 'float' ) );
+export const alphaTest = ShaderNodeObject( new PropertyNode( 'AlphaTest', 'float' ) );
+export const specularColor = ShaderNodeObject( new PropertyNode( 'SpecularColor', 'color' ) );
 
 export const abs = ShaderNodeProxy( MathNode, 'abs' );
 export const acos = ShaderNodeProxy( MathNode, 'acos' );
