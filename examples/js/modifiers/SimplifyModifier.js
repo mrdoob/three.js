@@ -141,7 +141,7 @@
 
 	function removeFromArray( array, object ) {
 
-		var k = array.indexOf( object );
+		const k = array.indexOf( object );
 		if ( k > - 1 ) array.splice( k, 1 );
 
 	}

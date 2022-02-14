@@ -2,31 +2,31 @@ import { UIRow, UIText, UISpan, UIBreak } from './libs/ui.js';
 
 function SidebarGeometryBufferGeometry( editor ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
-	var container = new UIRow();
+	const container = new UIRow();
 
 	function update( object ) {
 
 		if ( object === null ) return; // objectSelected.dispatch( null )
 		if ( object === undefined ) return;
 
-		var geometry = object.geometry;
+		const geometry = object.geometry;
 
 		if ( geometry && geometry.isBufferGeometry ) {
 
 			container.clear();
 			container.setDisplay( 'block' );
 
-			var text = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
+			const text = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
 			container.add( text );
 
-			var container2 = new UISpan().setDisplay( 'inline-block' ).setVerticalAlign( 'middle' ).setWidth( '160px' );
+			const container2 = new UISpan().setDisplay( 'inline-block' ).setVerticalAlign( 'middle' ).setWidth( '160px' );
 			container.add( container2 );
 
-			var index = geometry.index;
+			const index = geometry.index;
 
 			if ( index !== null ) {
 
@@ -36,11 +36,11 @@ function SidebarGeometryBufferGeometry( editor ) {
 
 			}
 
-			var attributes = geometry.attributes;
+			const attributes = geometry.attributes;
 
-			for ( var name in attributes ) {
+			for ( const name in attributes ) {
 
-				var attribute = attributes[ name ];
+				const attribute = attributes[ name ];
 
 				container2.add( new UIText( name ).setWidth( '80px' ) );
 				container2.add( new UIText( ( attribute.count ).format() + ' (' + attribute.itemSize + ')' ).setFontSize( '12px' ) );

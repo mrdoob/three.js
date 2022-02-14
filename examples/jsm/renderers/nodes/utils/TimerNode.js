@@ -12,7 +12,6 @@ class TimerNode extends FloatNode {
 		super();
 
 		this.scope = scope;
-
 		this.scale = 1;
 
 		this.updateType = NodeUpdateType.Frame;
@@ -39,6 +38,24 @@ class TimerNode extends FloatNode {
 			this.value = frame.time * scale;
 
 		}
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.scope = this.scope;
+		data.scale = this.scale;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.scope = data.scope;
+		this.scale = data.scale;
 
 	}
 

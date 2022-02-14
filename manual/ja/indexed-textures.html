@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
   </head>
   <body>
     <div class="container">
@@ -224,14 +235,14 @@ canvas.addEventListener('pointerup', pickCountry);
 <p>国を選択する合理的な解決策のように思えますが、選択された国を強調表示するにはどうでしょうか？</p>
 <p><em>パレットグラフィックス</em> からインスピレーションを得る事ができます。</p>
 <p><a href="https://en.wikipedia.org/wiki/Palette_%28computing%29">パレットグラフィックス</a>や<a href="https://en.wikipedia.org/wiki/Indexed_color">インデックスカラー</a>はAtari 800、Amiga、ファミコン、スーパーファミコン、IBMの古いPCなどの古いシステムで使われていました。
-ビットマップをRGBカラー8ビット、1ピクセル24バイト以上で格納するのではなく、ビットマップを8ビット以下の値で格納していました。
+ビットマップをRGBAカラー8ビット、1ピクセル32バイト以上で格納するのではなく、ビットマップを8ビット以下の値で格納していました。
 各ピクセルの値はパレットへのインデックスです。
 そのため例えば画像内の値が3であれば "color 3を表示する" という事になります。
 color 3が何色かは "パレット" と呼ばれる別の場所で定義されています。</p>
 <p>JavaScriptでは次のようなコードにできます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
   0, 1, 1, 1, 1, 1, 0,
-  1, 0, 0, 0, 0, 0, 1, 
+  1, 0, 0, 0, 0, 0, 1,
   1, 0, 2, 0, 2, 0, 1,
   1, 0, 0, 0, 0, 0, 1,
   1, 0, 3, 3, 3, 0, 1,
@@ -366,20 +377,20 @@ void main() {
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
 const paletteTextureWidth = maxNumCountries;
 const paletteTextureHeight = 1;
-const palette = new Uint8Array(paletteTextureWidth * 3);
+const palette = new Uint8Array(paletteTextureWidth * 4);
 const paletteTexture = new THREE.DataTexture(
-    palette, paletteTextureWidth, paletteTextureHeight, THREE.RGBFormat);
+    palette, paletteTextureWidth, paletteTextureHeight);
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
 <p><a href="/docs/#api/ja/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> はテクスチャの生データを与える事ができます。
-今回はは512のRGBカラーを3バイトずつ与え、それぞれのバイトが赤、緑、青で0〜255の値を使用します。</p>
+今回はは512のRGBAカラーを4バイトずつ与え、それぞれのバイトが赤、緑、青で0〜255の値を使用します。</p>
 <p>ランダムなカラーで塗りつぶしましょう！</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
   palette[i] = Math.random() * 256;
 }
 // set the ocean color (index #0)
-palette.set([100, 200, 255], 0);
+palette.set([100, 200, 255, 255], 0);
 paletteTexture.needsUpdate = true;
 </pre>
 <p>パレットテクスチャを <code class="notranslate" translate="no">palette</code> 配列の内容で更新したい時は、常に  <code class="notranslate" translate="no">paletteTexture.needsUpdate</code> を <code class="notranslate" translate="no">true</code> にする必要があります。</p>
@@ -408,7 +419,9 @@ scene.add(new THREE.Mesh(geometry, material));
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
 function get255BasedColor(color) {
   tempColor.set(color);
-  return tempColor.toArray().map(v =&gt; v * 255);
+  const base = tempColor.toArray().map(v =&gt; v * 255);
+  base.push(255); // alpha
+  return base;
 }
 </pre>
 <p>このように <code class="notranslate" translate="no">color = get255BasedColor('red')</code> を呼び出すと <code class="notranslate" translate="no">[255, 0, 0]</code> のような配列が返されます。</p>
@@ -419,7 +432,7 @@ const oceanColor = get255BasedColor('rgb(100,200,255)');
 resetPalette();
 
 function setPaletteColor(index, color) {
-  palette.set(color, index * 3);
+  palette.set(color, index * 4);
 }
 
 function resetPalette() {
@@ -575,7 +588,7 @@ canvas.addEventListener('pointerup', pickCountry);
         </div>
       </div>
     </div>
-  
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 

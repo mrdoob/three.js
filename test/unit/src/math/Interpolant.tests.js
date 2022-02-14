@@ -81,19 +81,6 @@ export default QUnit.module( 'Maths', () => {
 
 		Mock.calls = null;
 
-		Mock.captureCall = function ( args ) {
-
-			if ( Mock.calls !== null ) {
-
-				Mock.calls.push( {
-					func: Mock.captureCall.caller.name,
-					args: Array.prototype.slice.call( args )
-				} );
-
-			}
-
-		};
-
 		// Tests
 
 		// INSTANCING

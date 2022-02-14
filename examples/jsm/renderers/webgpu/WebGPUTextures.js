@@ -365,7 +365,7 @@ class WebGPUTextures {
 
 		} else {
 
-			if ( image !== undefined ) {
+			if ( image !== null ) {
 
 				// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
 
@@ -701,7 +701,7 @@ class WebGPUTextures {
 			height = ( image.length > 0 ) ? image[ 0 ].height : 1;
 			depth = 6; // one image for each side of the cube map
 
-		} else if ( image !== undefined ) {
+		} else if ( image !== null ) {
 
 			width = image.width;
 			height = image.height;

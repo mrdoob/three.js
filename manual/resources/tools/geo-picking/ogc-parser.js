@@ -99,7 +99,7 @@ function parse(buf) {
 
   const getDouble = () => { const v = dataView.getFloat64(cursor, littleEndian); cursor += 8 ; return v; };
   // const getFloat =  () => { const v = dataView.getFloat32(cursor, littleEndian); cursor += 4 ; return v; };
-  const getInt8 =   () => { const v = dataView.getInt8(cursor, littleEndian);    cursor += 1 ; return v; };
+  const getInt8 =   () => { const v = dataView.getInt8(cursor);    cursor += 1 ; return v; };
   // const getUint8 =  () => { const v = dataView.getUint8(cursor, littleEndian);   cursor += 1 ; return v; };
   // const getInt16 =  () => { const v = dataView.getInt16(cursor, littleEndian);   cursor += 2 ; return v; };
   // const getUint16 = () => { const v = dataView.getUint16(cursor, littleEndian);  cursor += 2 ; return v; };
@@ -230,4 +230,3 @@ function parse(buf) {
 }
 
 window.ogcParser = {parse};
-

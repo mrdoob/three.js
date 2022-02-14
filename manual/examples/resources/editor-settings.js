@@ -82,8 +82,9 @@ function fixSourceLinks(url, source) {
   function makeTaggedFDedQuotes(match, start, q1, url, q2, suffix) {
     return start + q1 + addPrefix(url) + q2 + suffix;
   }
-  function makeFDedQuotes(match, start, q1, url, q2) {
-    return start + q1 + addPrefix(url) + q2;
+  function makeFDedQuotesModule(match, start, q1, url, q2) {
+    // modules require relative paths or fully qualified, otherwise they are module names
+    return `${start}${q1}${url.startsWith('.') ? addPrefix(url) : url}${q2}`;
   }
   function makeArrayLinksFDed(match, prefix, arrayStr, suffix) {
     const lines = arrayStr.split(',').map((line) => {
@@ -105,7 +106,7 @@ function fixSourceLinks(url, source) {
   source = source.replace(importScriptsRE, makeLinkFDedQuotes);
   source = source.replace(loaderArrayLoadRE, makeArrayLinksFDed);
   source = source.replace(threejsUrlRE, makeTaggedFDedQuotes);
-  source = source.replace(moduleRE, makeFDedQuotes);
+  source = source.replace(moduleRE, makeFDedQuotesModule);
 
   return source;
 }
@@ -130,8 +131,8 @@ let version;
 async function fixJSForCodeSite(js) {
   const moduleRE = /(import.*?)('|")(.*?)('|")/g;
 
-  // convert https://threejs.org/build/three.module.js -> https://cdn.skypack.dev/three@<version>
-  // convert https://threejs.org/examples/jsm/.?? -> https://cdn.skypack.dev/three@<version>/examples/jsm/.??
+  // convert https://threejs.org/build/three.module.js -> https://unpkg.com/three@<version>
+  // convert https://threejs.org/examples/jsm/.?? -> https://unpkg.com/three@<version>/examples/jsm/.??
 
   if (!version) {
     try {
@@ -146,10 +147,10 @@ async function fixJSForCodeSite(js) {
   function addVersion(href) {
     if (href.startsWith(window.location.origin)) {
       if (href.includes('/build/three.module.js')) {
-        return `https://cdn.skypack.dev/three@${version}`;
+        return `https://unpkg.com/three@${version}`;
       } else if (href.includes('/examples/jsm/')) {
         const url = new URL(href);
-        return `https://cdn.skypack.dev/three@${version}${url.pathname}${url.search}${url.hash}`;
+        return `https://unpkg.com/three@${version}${url.pathname}${url.search}${url.hash}`;
       }
     }
     return href;

@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
   </head>
   <body>
     <div class="container">
@@ -29,10 +40,10 @@ displayed country names around a 3d globe. How would we go about letting
 the user select a country and show their selection?</p>
 <p>The first idea that comes to mind is to generate geometry for each country.
 We could <a href="picking.html">use a picking solution</a> like we covered before.
-We'd build 3D geometry for each country. If the user clicks on the mesh for 
+We'd build 3D geometry for each country. If the user clicks on the mesh for
 that country we'd know what country was clicked.</p>
 <p>So, just to check that solution I tried generating 3D meshes of all the countries
-using the same data I used to generate the outlines 
+using the same data I used to generate the outlines
 <a href="align-html-elements-to-3d.html">in the previous article</a>.
 The result was a 15.5meg binary GLTF (.glb) file. Making the user download 15.5meg
 sounds like too much to me.</p>
@@ -42,11 +53,11 @@ any time pursuing that solution. For borders of the USA that's probably a huge
 win. For a borders of Canada probably much less. </p>
 <p>Another solution would be to use just actual data compression. For example gzipping
 the file brought it down to 11meg. That's 30% less but arguably not enough.</p>
-<p>We could store all the data as 16bit ranged values instead of 32bit float values. 
+<p>We could store all the data as 16bit ranged values instead of 32bit float values.
 Or we could use something like <a href="https://google.github.io/draco/">draco compression</a>
-and maybe that would be enough. I didn't check and I would encourage you to check 
+and maybe that would be enough. I didn't check and I would encourage you to check
 yourself and tell me how it goes as I'd love to know. 😅</p>
-<p>In my case I thought about <a href="picking.html">the GPU picking solution</a> 
+<p>In my case I thought about <a href="picking.html">the GPU picking solution</a>
 we covered at the end of <a href="picking.html">the article on picking</a>. In
 that solution we drew every mesh with a unique color that represented that
 mesh's id. We then drew all the meshes and looked at the color that was clicked
@@ -54,13 +65,13 @@ on.</p>
 <p>Taking inspiration from that we could pre-generate a map of countries where
 each country's color is its index number in our array of countries. We could
 then use a similar GPU picking technique. We'd draw the globe off screen using
-this index texture. Looking at the color of the pixel the user clicks would 
+this index texture. Looking at the color of the pixel the user clicks would
 tell us the country id.</p>
-<p>So, I <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">wrote some code</a> 
+<p>So, I <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">wrote some code</a>
 to generate such a texture. Here it is. </p>
 <div class="threejs_center"><img src="../examples/resources/data/world/country-index-texture.png" style="width: 700px;"></div>
 
-<p>Note: The data used to generate this texture comes from <a href="http://thematicmapping.org/downloads/world_borders.php">this website</a> 
+<p>Note: The data used to generate this texture comes from <a href="http://thematicmapping.org/downloads/world_borders.php">this website</a>
 and is therefore licensed as <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>.</p>
 <p>It's only 217k, much better than the 14meg for the country meshes. In fact we could probably
 even lower the resolution but 217k seems good enough for now.</p>
@@ -233,14 +244,14 @@ let's just update the labels.</p>
 <p></p>
 <p>The code stills shows countries based on their area but if you
 click one just that one will have a label.</p>
-<p>So that seems like a reasonable solution for picking countries 
+<p>So that seems like a reasonable solution for picking countries
 but what about highlighting the selected countries?</p>
 <p>For that we can take inspiration from <em>paletted graphics</em>.</p>
 <p><a href="https://en.wikipedia.org/wiki/Palette_%28computing%29">Paletted graphics</a>
-or <a href="https://en.wikipedia.org/wiki/Indexed_color">Indexed Color</a> is 
-what older systems like the Atari 800, Amiga, NES, 
+or <a href="https://en.wikipedia.org/wiki/Indexed_color">Indexed Color</a> is
+what older systems like the Atari 800, Amiga, NES,
 Super Nintendo, and even older IBM PCs used. Instead of storing bitmaps
-as RGB colors 8bits per color, 24 bytes per pixel or more, they stored 
+as RGBA colors 8bits per color, 32 bytes per pixel or more, they stored
 bitmaps as 8bit values or less. The value for each pixel was an index
 into a palette. So for example a value
 of 3 in the image means "display color 3". What color color#3 is is
@@ -248,7 +259,7 @@ defined somewhere else called a "palette".</p>
 <p>In JavaScript you can think of it like this</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
   0, 1, 1, 1, 1, 1, 0,
-  1, 0, 0, 0, 0, 0, 1, 
+  1, 0, 0, 0, 0, 0, 1,
   1, 0, 2, 0, 2, 0, 1,
   1, 0, 0, 0, 0, 0, 1,
   1, 0, 3, 3, 3, 0, 1,
@@ -273,8 +284,8 @@ texture to give each country its own color. By changing the palette
 texture we can color each individual country. For example by setting
 the entire palette texture to black and then for one country's entry
 in the palette a different color, we can highlight just that country.</p>
-<p>To do paletted index graphics requires some custom shader code. 
-Let's modify the default shaders in three.js. 
+<p>To do paletted index graphics requires some custom shader code.
+Let's modify the default shaders in three.js.
 That way we can use lighting and other features if we want.</p>
 <p>Like we covered in <a href="optimize-lots-of-objects-animated.html">the article on animating lots of objects</a>
 we can modify the default shaders by adding a function to a material's
@@ -320,14 +331,14 @@ void main() {
 }
 </pre>
 <p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">Digging through all those snippets</a>
-we find that three.js uses a variable called <code class="notranslate" translate="no">diffuseColor</code> to manage the 
+we find that three.js uses a variable called <code class="notranslate" translate="no">diffuseColor</code> to manage the
 base material color. It sets this in the <code class="notranslate" translate="no">&lt;color_fragment&gt;</code> <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">snippet</a>
 so we should be able to modify it after that point.</p>
-<p><code class="notranslate" translate="no">diffuseColor</code> at that point in the shader should already be the color from 
-our outline texture so we can look up the color from a palette texture 
+<p><code class="notranslate" translate="no">diffuseColor</code> at that point in the shader should already be the color from
+our outline texture so we can look up the color from a palette texture
 and mix them for the final result.</p>
 <p>Like we <a href="optimize-lots-of-objects-animated.html">did before</a> we'll make an array
-of search and replacement strings and apply them to the shader in 
+of search and replacement strings and apply them to the shader in
 <a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
@@ -378,7 +389,7 @@ of search and replacement strings and apply them to the shader in
 </pre>
 <p>Above can see above we add 3 uniforms, <code class="notranslate" translate="no">indexTexture</code>, <code class="notranslate" translate="no">paletteTexture</code>,
 and <code class="notranslate" translate="no">paletteTextureWidth</code>. We get a color from the <code class="notranslate" translate="no">indexTexture</code>
-and convert it to an index. <code class="notranslate" translate="no">vUv</code> is the texture coordinates provided by 
+and convert it to an index. <code class="notranslate" translate="no">vUv</code> is the texture coordinates provided by
 three.js. We then use that index to get a color out of the palette texture.
 We then mix the result with the current <code class="notranslate" translate="no">diffuseColor</code>. The <code class="notranslate" translate="no">diffuseColor</code>
 at this point is our black and white outline texture so if we add the 2 colors
@@ -396,21 +407,21 @@ let's choose 512.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
 const paletteTextureWidth = maxNumCountries;
 const paletteTextureHeight = 1;
-const palette = new Uint8Array(paletteTextureWidth * 3);
+const palette = new Uint8Array(paletteTextureWidth * 4);
 const paletteTexture = new THREE.DataTexture(
-    palette, paletteTextureWidth, paletteTextureHeight, THREE.RGBFormat);
+    palette, paletteTextureWidth, paletteTextureHeight);
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
 <p>A <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> let's us give a texture raw data. In this case
-we're giving it 512 RGB colors, 3 bytes each where each byte is
+we're giving it 512 RGBA colors, 4 bytes each where each byte is
 red, green, and blue respectively using values that go from 0 to 255.</p>
 <p>Let's fill it with random colors just to see it work</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
   palette[i] = Math.random() * 256;
 }
 // set the ocean color (index #0)
-palette.set([100, 200, 255], 0);
+palette.set([100, 200, 255, 255], 0);
 paletteTexture.needsUpdate = true;
 </pre>
 <p>Anytime we want three.js to update the palette texture with
@@ -443,11 +454,13 @@ style color and give us values we can put in the palette texture.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
 function get255BasedColor(color) {
   tempColor.set(color);
-  return tempColor.toArray().map(v =&gt; v * 255);
+  const base = tempColor.toArray().map(v =&gt; v * 255);
+  base.push(255); // alpha
+  return base;
 }
 </pre>
 <p>Calling it like this <code class="notranslate" translate="no">color = get255BasedColor('red')</code> will
-return an array like <code class="notranslate" translate="no">[255, 0, 0]</code>.</p>
+return an array like <code class="notranslate" translate="no">[255, 0, 0, 255]</code>.</p>
 <p>Next let's use it to make a few colors and fill out the
 palette.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const selectedColor = get255BasedColor('red');
@@ -456,7 +469,7 @@ const oceanColor = get255BasedColor('rgb(100,200,255)');
 resetPalette();
 
 function setPaletteColor(index, color) {
-  palette.set(color, index * 3);
+  palette.set(color, index * 4);
 }
 
 function resetPalette() {
@@ -617,7 +630,7 @@ this article. There are a few links to some info in
         </div>
       </div>
     </div>
-  
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 

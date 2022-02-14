@@ -126,11 +126,6 @@
 
 						}
 
-						const objectData = {
-							distanceToCameraSquared: getDistanceToSquared( camera, object )
-						};
-						cache.objects.set( object, objectData );
-
 						if ( element.parentNode !== domElement ) {
 
 							domElement.appendChild( element );
@@ -140,6 +135,11 @@
 						object.onAfterRender( _this, scene, camera );
 
 					}
+
+					const objectData = {
+						distanceToCameraSquared: getDistanceToSquared( camera, object )
+					};
+					cache.objects.set( object, objectData );
 
 				}
 
@@ -176,6 +176,12 @@
 			function zOrder( scene ) {
 
 				const sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
+
+					if ( a.renderOrder !== b.renderOrder ) {
+
+						return b.renderOrder - a.renderOrder;
+
+					}
 
 					const distanceA = cache.objects.get( a ).distanceToCameraSquared;
 					const distanceB = cache.objects.get( b ).distanceToCameraSquared;

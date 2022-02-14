@@ -151,7 +151,7 @@ UPNG.toRGBA8 = function ( out ) {
 
 		frms.push( img.buffer.slice( 0 ) );
 
-		if ( frm.dispose == 0 ) {} else if ( frm.dispose == 1 ) UPNG._copyTile( empty, fw, fh, img, w, h, fx, fy, 0 );
+		if ( frm.dispose == 1 ) UPNG._copyTile( empty, fw, fh, img, w, h, fx, fy, 0 );
 		else if ( frm.dispose == 2 ) for ( var j = 0; j < len; j ++ ) img[ j ] = prev[ j ];
 
 	}
@@ -285,7 +285,7 @@ UPNG.toRGBA8.decodeImage = function ( data, w, h, out ) {
 			var off = y * bpl, to = y * w;
 			if ( depth == 1 ) for ( var x = 0; x < w; x ++ ) {
 
-				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( ( x & 7 ) ) ) ) & 1 ), al = ( gr == tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
+				var gr = 255 * ( ( data[ off + ( x >>> 3 ) ] >>> ( 7 - ( x & 7 ) ) ) & 1 ), al = ( gr == tr * 255 ) ? 0 : 255; bf32[ to + x ] = ( al << 24 ) | ( gr << 16 ) | ( gr << 8 ) | gr;
 
 			}
 			else if ( depth == 2 ) for ( var x = 0; x < w; x ++ ) {
@@ -326,6 +326,7 @@ UPNG.decode = function ( buff ) {
 	var out = { tabs: {}, frames: [] };
 	var dd = new Uint8Array( data.length ), doff = 0;	 // put all IDAT data into it
 	var fd, foff = 0;	// frames
+	var text, keyw, bfr;
 
 	var mgck = [ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a ];
 	for ( var i = 0; i < 8; i ++ ) if ( data[ i ] != mgck[ i ] ) throw new Error( 'The input is not a PNG file!' );
@@ -387,12 +388,12 @@ UPNG.decode = function ( buff ) {
 
 			if ( out.tabs[ type ] == null ) out.tabs[ type ] = {};
 			var nz = bin.nextZero( data, offset );
-			var keyw = bin.readASCII( data, offset, nz - offset );
-			var text, tl = offset + len - nz - 1;
+			keyw = bin.readASCII( data, offset, nz - offset );
+			var tl = offset + len - nz - 1;
 			if ( type == 'tEXt' ) text = bin.readASCII( data, nz + 1, tl );
 			else {
 
-				var bfr = UPNG.decode._inflate( data.slice( nz + 2, nz + 2 + tl ) );
+				bfr = UPNG.decode._inflate( data.slice( nz + 2, nz + 2 + tl ) );
 				text = bin.readUTF8( bfr, 0, bfr.length );
 
 			}
@@ -404,17 +405,17 @@ UPNG.decode = function ( buff ) {
 			if ( out.tabs[ type ] == null ) out.tabs[ type ] = {};
 			var nz = 0, off = offset;
 			nz = bin.nextZero( data, off );
-			var keyw = bin.readASCII( data, off, nz - off ); off = nz + 1;
+			keyw = bin.readASCII( data, off, nz - off ); off = nz + 1;
 			var cflag = data[ off ]; off += 2;
 			nz = bin.nextZero( data, off );
 			bin.readASCII( data, off, nz - off ); off = nz + 1;
 			nz = bin.nextZero( data, off );
 			bin.readUTF8( data, off, nz - off ); off = nz + 1;
-			var text, tl = len - ( off - offset );
+			var tl = len - ( off - offset );
 			if ( cflag == 0 ) text = bin.readUTF8( data, off, tl );
 			else {
 
-				var bfr = UPNG.decode._inflate( data.slice( off, off + tl ) );
+				bfr = UPNG.decode._inflate( data.slice( off, off + tl ) );
 				text = bin.readUTF8( bfr, 0, bfr.length );
 
 			}
@@ -809,6 +810,8 @@ UPNG.decode._readInterlace = function ( data, out ) {
 		UPNG.decode._filterZero( data, out, di, sw, sh );
 
 		var y = 0, row = starting_row[ pass ];
+		var val;
+
 		while ( row < h ) {
 
 			var col = starting_col[ pass ];
@@ -818,21 +821,21 @@ UPNG.decode._readInterlace = function ( data, out ) {
 
 				if ( bpp == 1 ) {
 
-					var val = data[ cdi >> 3 ]; val = ( val >> ( 7 - ( cdi & 7 ) ) ) & 1;
+					val = data[ cdi >> 3 ]; val = ( val >> ( 7 - ( cdi & 7 ) ) ) & 1;
 					img[ row * bpl + ( col >> 3 ) ] |= ( val << ( 7 - ( ( col & 7 ) << 0 ) ) );
 
 				}
 
 				if ( bpp == 2 ) {
 
-					var val = data[ cdi >> 3 ]; val = ( val >> ( 6 - ( cdi & 7 ) ) ) & 3;
+					val = data[ cdi >> 3 ]; val = ( val >> ( 6 - ( cdi & 7 ) ) ) & 3;
 					img[ row * bpl + ( col >> 2 ) ] |= ( val << ( 6 - ( ( col & 3 ) << 1 ) ) );
 
 				}
 
 				if ( bpp == 4 ) {
 
-					var val = data[ cdi >> 3 ]; val = ( val >> ( 4 - ( cdi & 7 ) ) ) & 15;
+					val = data[ cdi >> 3 ]; val = ( val >> ( 4 - ( cdi & 7 ) ) ) & 15;
 					img[ row * bpl + ( col >> 1 ) ] |= ( val << ( 4 - ( ( col & 1 ) << 2 ) ) );
 
 				}

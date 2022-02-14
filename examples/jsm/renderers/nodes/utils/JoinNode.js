@@ -12,7 +12,7 @@ class JoinNode extends Node {
 
 	getNodeType( builder ) {
 
-		return builder.getTypeFromLength( this.nodes.length );
+		return builder.getTypeFromLength( this.nodes.reduce( ( count, cur ) => count + builder.getTypeLength( cur.getNodeType( builder ) ), 0 ) );
 
 	}
 
@@ -27,7 +27,7 @@ class JoinNode extends Node {
 
 			const input = nodes[ i ];
 
-			const inputSnippet = input.build( builder, 'float' );
+			const inputSnippet = input.build( builder );
 
 			snippetValues.push( inputSnippet );
 

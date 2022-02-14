@@ -237,7 +237,7 @@ const SSRrShader = {
 
 };
 
-var SSRrDepthShader = {
+const SSRrDepthShader = {
 
 	defines: {
 		'PERSPECTIVE_CAMERA': 1

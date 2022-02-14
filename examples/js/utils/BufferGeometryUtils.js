@@ -763,7 +763,7 @@
 
 			}
 
-		} else if ( positionAttribute !== undefined ) {
+		} else {
 
 			// non-indexed buffer geometry
 			if ( Array.isArray( material ) ) {

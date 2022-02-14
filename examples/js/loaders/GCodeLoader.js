@@ -185,7 +185,6 @@
 					line.y = args.y !== undefined ? args.y : line.y;
 					line.z = args.z !== undefined ? args.z : line.z;
 					line.e = args.e !== undefined ? args.e : line.e;
-					state = line;
 
 				} else { //console.warn( 'THREE.GCodeLoader: Command not supported:' + cmd );
 				}

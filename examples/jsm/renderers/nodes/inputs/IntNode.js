@@ -10,6 +10,22 @@ class IntNode extends InputNode {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.value = this.value;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		this.value = data.value;
+
+	}
+
 }
 
 IntNode.prototype.isIntNode = true;

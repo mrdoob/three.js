@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
 

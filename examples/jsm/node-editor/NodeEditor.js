@@ -16,7 +16,9 @@ import { Vector3Editor } from './inputs/Vector3Editor.js';
 import { Vector4Editor } from './inputs/Vector4Editor.js';
 import { SliderEditor } from './inputs/SliderEditor.js';
 import { ColorEditor } from './inputs/ColorEditor.js';
+import { TextureEditor } from './inputs/TextureEditor.js';
 import { BlendEditor } from './display/BlendEditor.js';
+import { NormalMapEditor } from './display/NormalMapEditor.js';
 import { UVEditor } from './accessors/UVEditor.js';
 import { PositionEditor } from './accessors/PositionEditor.js';
 import { NormalEditor } from './accessors/NormalEditor.js';
@@ -27,6 +29,7 @@ import { JoinEditor } from './utils/JoinEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
 import { PointsEditor } from './scene/PointsEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
+import { FileEditor } from './core/FileEditor.js';
 import { EventDispatcher } from 'three';
 
 Styles.icons.unlink = 'ti ti-unlink';
@@ -65,6 +68,11 @@ export const NodeList = [
 				name: 'Color',
 				icon: 'palette',
 				nodeClass: ColorEditor
+			},
+			{
+				name: 'Texture',
+				icon: 'photo',
+				nodeClass: TextureEditor
 			}
 		]
 	},
@@ -97,6 +105,11 @@ export const NodeList = [
 				name: 'Blend',
 				icon: 'layers-subtract',
 				nodeClass: BlendEditor
+			},
+			{
+				name: 'Normal Map',
+				icon: 'chart-line',
+				nodeClass: NormalMapEditor
 			}
 		]
 	},
@@ -113,7 +126,7 @@ export const NodeList = [
 				name: 'Invert',
 				icon: 'flip-vertical',
 				tip: 'Negate',
-				nodeClass: OperatorEditor
+				nodeClass: InvertEditor
 			},
 			{
 				name: 'Limiter',
@@ -241,7 +254,9 @@ export const ClassLib = {
 	Vector4Editor,
 	SliderEditor,
 	ColorEditor,
+	TextureEditor,
 	BlendEditor,
+	NormalMapEditor,
 	UVEditor,
 	PositionEditor,
 	NormalEditor,
@@ -271,6 +286,7 @@ export class NodeEditor extends EventDispatcher {
 		this.nodesContext = null;
 		this.examplesContext = null;
 
+		this._initUpload();
 		this._initTips();
 		this._initMenu();
 		this._initSearch();
@@ -333,17 +349,49 @@ export class NodeEditor extends EventDispatcher {
 
 	loadJSON( json ) {
 
-		this.canvas.clear();
+		const canvas = this.canvas;
 
-		this.canvas.deserialize( json );
+		canvas.clear();
 
-		for ( const node of this.canvas.nodes ) {
+		canvas.deserialize( json );
+
+		for ( const node of canvas.nodes ) {
 
 			this.add( node );
 
 		}
 
 		this.dispatchEvent( { type: 'load' } );
+
+	}
+
+	_initUpload() {
+
+		const canvas = this.canvas;
+
+		canvas.onDrop( () => {
+
+			for ( const item of canvas.droppedItems ) {
+
+				if ( /^image\//.test( item.type ) === true ) {
+
+					const { relativeClientX, relativeClientY } = canvas;
+
+					const file = item.getAsFile();
+					const fileEditor = new FileEditor( file );
+
+					fileEditor.setPosition(
+						relativeClientX - ( fileEditor.getWidth() / 2 ),
+						relativeClientY - 20
+					);
+
+					this.add( fileEditor );
+
+				}
+
+			}
+
+		} );
 
 	}
 
@@ -622,8 +670,8 @@ export class NodeEditor extends EventDispatcher {
 			if ( isContext ) {
 
 				node.setPosition(
-					contextPosition.x,
-					contextPosition.y
+					Math.round( contextPosition.x ),
+					Math.round( contextPosition.y )
 				);
 
 			} else {
@@ -648,8 +696,8 @@ export class NodeEditor extends EventDispatcher {
 
 			const { relativeClientX, relativeClientY } = this.canvas;
 
-			contextPosition.x = relativeClientX;
-			contextPosition.y = relativeClientY;
+			contextPosition.x = Math.round( relativeClientX );
+			contextPosition.y = Math.round( relativeClientY );
 
 		} );
 

@@ -366,9 +366,9 @@ class LineSegments2 extends Mesh {
 
 				computeStartEnd( instanceStart, instanceEnd, i );
 
-				// skip the segment if it's entirely behind the camera
-				const isBehindCameraNear = _start4.z > near && _end4.z > near;
-				if ( isBehindCameraNear ) {
+			// skip the segment if it's entirely behind the camera
+			const isBehindCameraNear = _start4.z > near && _end4.z > near;
+			if ( isBehindCameraNear ) {
 
 					continue;
 

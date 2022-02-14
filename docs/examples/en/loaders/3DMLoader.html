@@ -196,7 +196,7 @@
 
 			console.log('Loaded rhino3dm.');
 			const rhino = m; // global
-			
+
 			// create Rhino Document and add a point to it
 			const doc = new rhino.File3dm();
 			const ptA = [0, 0, 0];
@@ -209,7 +209,7 @@
 			loader.parse( buffer, function ( object ) {
 
 				scene.add( object );
-			
+
 			} );
 
 		})

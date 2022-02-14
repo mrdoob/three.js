@@ -3,13 +3,13 @@ import UVNode from '../accessors/UVNode.js';
 
 class TextureNode extends InputNode {
 
-	constructor( value = null, uv = new UVNode(), bias = null ) {
+	constructor( value = null, uvNode = new UVNode(), biasNode = null ) {
 
 		super( 'texture' );
 
 		this.value = value;
-		this.uv = uv;
-		this.bias = bias;
+		this.uvNode = uvNode;
+		this.biasNode = biasNode;
 
 	}
 
@@ -43,14 +43,14 @@ class TextureNode extends InputNode {
 
 			if ( snippet === undefined ) {
 
-				const uvSnippet = this.uv.build( builder, 'vec2' );
-				const bias = this.bias;
+				const uvSnippet = this.uvNode.build( builder, 'vec2' );
+				const biasNode = this.biasNode;
 
 				let biasSnippet = null;
 
-				if ( bias !== null ) {
+				if ( biasNode !== null ) {
 
-					biasSnippet = bias.build( builder, 'float' );
+					biasSnippet = biasNode.build( builder, 'float' );
 
 				}
 
@@ -63,6 +63,22 @@ class TextureNode extends InputNode {
 			return builder.format( snippet, 'vec4', output );
 
 		}
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.value = this.value.toJSON( data.meta ).uuid;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		this.value = data.meta.textures[ data.value ];
 
 	}
 

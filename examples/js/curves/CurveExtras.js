@@ -330,23 +330,19 @@
 
 	}
 
-	const Curves = {
-		GrannyKnot: GrannyKnot,
-		HeartCurve: HeartCurve,
-		VivianiCurve: VivianiCurve,
-		KnotCurve: KnotCurve,
-		HelixCurve: HelixCurve,
-		TrefoilKnot: TrefoilKnot,
-		TorusKnot: TorusKnot,
-		CinquefoilKnot: CinquefoilKnot,
-		TrefoilPolynomialKnot: TrefoilPolynomialKnot,
-		FigureEightPolynomialKnot: FigureEightPolynomialKnot,
-		DecoratedTorusKnot4a: DecoratedTorusKnot4a,
-		DecoratedTorusKnot4b: DecoratedTorusKnot4b,
-		DecoratedTorusKnot5a: DecoratedTorusKnot5a,
-		DecoratedTorusKnot5c: DecoratedTorusKnot5c
-	};
-
-	THREE.Curves = Curves;
+	THREE.CinquefoilKnot = CinquefoilKnot;
+	THREE.DecoratedTorusKnot4a = DecoratedTorusKnot4a;
+	THREE.DecoratedTorusKnot4b = DecoratedTorusKnot4b;
+	THREE.DecoratedTorusKnot5a = DecoratedTorusKnot5a;
+	THREE.DecoratedTorusKnot5c = DecoratedTorusKnot5c;
+	THREE.FigureEightPolynomialKnot = FigureEightPolynomialKnot;
+	THREE.GrannyKnot = GrannyKnot;
+	THREE.HeartCurve = HeartCurve;
+	THREE.HelixCurve = HelixCurve;
+	THREE.KnotCurve = KnotCurve;
+	THREE.TorusKnot = TorusKnot;
+	THREE.TrefoilKnot = TrefoilKnot;
+	THREE.TrefoilPolynomialKnot = TrefoilPolynomialKnot;
+	THREE.VivianiCurve = VivianiCurve;
 
 } )();

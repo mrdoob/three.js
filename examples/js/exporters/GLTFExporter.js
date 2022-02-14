@@ -631,7 +631,7 @@
 			const occlusion = material.aoMap?.image;
 			const roughness = material.roughnessMap?.image;
 			const metalness = material.metalnessMap?.image;
-			if ( occlusion === roughness && roughness === metalness ) return occlusion;
+			if ( occlusion === roughness && roughness === metalness ) return material.aoMap;
 
 			if ( occlusion || roughness || metalness ) {
 
@@ -946,7 +946,7 @@
 			const pending = writer.pending;
 			if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
 			const cachedImages = cache.images.get( image );
-			const mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+			const mimeType = 'image/png';
 			const key = mimeType + ':flipY/' + flipY.toString();
 			if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
 			if ( ! json.images ) json.images = [];

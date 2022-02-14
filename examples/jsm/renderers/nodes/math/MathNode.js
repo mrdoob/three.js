@@ -237,6 +237,22 @@ class MathNode extends TempNode {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.method = this.method;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.method = data.method;
+
+	}
+
 }
 
 export default MathNode;
