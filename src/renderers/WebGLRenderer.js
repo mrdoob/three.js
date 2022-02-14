@@ -1010,12 +1010,6 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( scene.isScene === true ) scene.onAfterRender( _this, scene, camera );
 
-		// Ensure depth buffer writing is enabled so it can be cleared on next render
-
-		state.buffers.depth.setTest( true );
-		state.buffers.depth.setMask( true );
-		state.buffers.color.setMask( true );
-
 		state.setPolygonOffset( false );
 
 		// _gl.finish();
@@ -1179,6 +1173,12 @@ function WebGLRenderer( parameters = {} ) {
 		if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
 		if ( transmissiveObjects.length > 0 ) renderObjects( transmissiveObjects, scene, camera );
 		if ( transparentObjects.length > 0 ) renderObjects( transparentObjects, scene, camera );
+
+		// Ensure depth buffer writing is enabled so it can be cleared on next render
+
+		state.buffers.depth.setTest( true );
+		state.buffers.depth.setMask( true );
+		state.buffers.color.setMask( true );
 
 	}
 
