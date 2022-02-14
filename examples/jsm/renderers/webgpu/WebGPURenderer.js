@@ -193,7 +193,7 @@ class WebGPURenderer {
 			colorAttachments: [ {
 				view: null
 			} ],
-			 depthStencilAttachment: {
+			depthStencilAttachment: {
 				view: null,
 				depthStoreOp: GPUStoreOp.Store,
 				stencilStoreOp: GPUStoreOp.Store
@@ -313,7 +313,7 @@ class WebGPURenderer {
 
 		// finish render pass
 
-		passEncoder.endPass();
+		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
 
 	}
@@ -620,7 +620,7 @@ class WebGPURenderer {
 
 		}
 
-		passEncoder.endPass();
+		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
 
 	}
