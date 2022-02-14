@@ -17,7 +17,7 @@ export const threejsLessonUtils = {
       powerPreference: 'low-power',
       ...options.threejsOptions,
     });
-    this.pixelRatio = Math.max(2, window.devicePixelRatio);
+    this.pixelRatio = window.devicePixelRatio;
 
     this.renderer = renderer;
     this.elemToRenderFuncMap = new Map();
