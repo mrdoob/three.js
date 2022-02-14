@@ -19553,11 +19553,11 @@
 			background.setClearAlpha.apply(background, arguments);
 		};
 
-		this.clear = function (color, depth, stencil) {
+		this.clear = function (color = true, depth = true, stencil = true) {
 			let bits = 0;
-			if (color === undefined || color) bits |= _gl.COLOR_BUFFER_BIT;
-			if (depth === undefined || depth) bits |= _gl.DEPTH_BUFFER_BIT;
-			if (stencil === undefined || stencil) bits |= _gl.STENCIL_BUFFER_BIT;
+			if (color) bits |= _gl.COLOR_BUFFER_BIT;
+			if (depth) bits |= _gl.DEPTH_BUFFER_BIT;
+			if (stencil) bits |= _gl.STENCIL_BUFFER_BIT;
 
 			_gl.clear(bits);
 		};
@@ -19866,12 +19866,7 @@
 			} //
 
 
-			if (scene.isScene === true) scene.onAfterRender(_this, scene, camera); // Ensure depth buffer writing is enabled so it can be cleared on next render
-
-			state.buffers.depth.setTest(true);
-			state.buffers.depth.setMask(true);
-			state.buffers.color.setMask(true);
-			state.setPolygonOffset(false); // _gl.finish();
+			if (scene.isScene === true) scene.onAfterRender(_this, scene, camera); // _gl.finish();
 
 			bindingStates.resetDefaultState();
 			_currentMaterialId = -1;
@@ -19972,7 +19967,12 @@
 			if (viewport) state.viewport(_currentViewport.copy(viewport));
 			if (opaqueObjects.length > 0) renderObjects(opaqueObjects, scene, camera);
 			if (transmissiveObjects.length > 0) renderObjects(transmissiveObjects, scene, camera);
-			if (transparentObjects.length > 0) renderObjects(transparentObjects, scene, camera);
+			if (transparentObjects.length > 0) renderObjects(transparentObjects, scene, camera); // Ensure depth buffer writing is enabled so it can be cleared on next render
+
+			state.buffers.depth.setTest(true);
+			state.buffers.depth.setMask(true);
+			state.buffers.color.setMask(true);
+			state.setPolygonOffset(false);
 		}
 
 		function renderTransmissionPass(opaqueObjects, scene, camera) {
