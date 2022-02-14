@@ -47,6 +47,80 @@ function getWorldSpaceHalfWidth( camera, distance, lineWidth, resolution ) {
 
 }
 
+function getPointAndPointOnLine( { ray, instanceStart, instanceEnd, matrixWorld, point, pointOnLine, i } ) {
+
+	_line.start.fromBufferAttribute( instanceStart, i );
+	_line.end.fromBufferAttribute( instanceEnd, i );
+
+	_line.start.applyMatrix4( matrixWorld );
+	_line.end.applyMatrix4( matrixWorld );
+
+	ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
+
+}
+
+function computeStartEnd( instanceStart, instanceEnd, i ) {
+
+	_start4.fromBufferAttribute( instanceStart, i );
+	_end4.fromBufferAttribute( instanceEnd, i );
+
+	_start4.w = 1;
+	_end4.w = 1;
+
+	// camera space
+	_start4.applyMatrix4( _mvMatrix );
+	_end4.applyMatrix4( _mvMatrix );
+
+}
+
+function trimSegment( near ) {
+
+	// trim the segment if it extends behind camera near
+	if ( _start4.z > near ) {
+
+		const deltaDist = _start4.z - _end4.z;
+		const t = ( _start4.z - near ) / deltaDist;
+		_start4.lerp( _end4, t );
+
+	} else if ( _end4.z > near ) {
+
+		const deltaDist = _end4.z - _start4.z;
+		const t = ( _end4.z - near ) / deltaDist;
+		_end4.lerp( _start4, t );
+
+	}
+
+}
+
+function isInClipSpace( projectionMatrix, resolution ) {
+
+	// clip space
+	_start4.applyMatrix4( projectionMatrix );
+	_end4.applyMatrix4( projectionMatrix );
+	// ndc space [ - 1.0, 1.0 ]
+	_start4.multiplyScalar( 1 / _start4.w );
+	_end4.multiplyScalar( 1 / _end4.w );
+	// screen space
+	_start4.x *= resolution.x / 2;
+	_start4.y *= resolution.y / 2;
+	_end4.x *= resolution.x / 2;
+	_end4.y *= resolution.y / 2;
+	// create 2d segment
+	_line.start.copy( _start4 );
+	_line.start.z = 0;
+	_line.end.copy( _end4 );
+	_line.end.z = 0;
+	// get closest point on ray to segment
+	const param = _line.closestPointToPointParameter( _ssOrigin3, true );
+	_line.at( param, _closestPoint );
+	// check if the intersection point is within clip space
+	const zPos = MathUtils.lerp( _start4.z, _end4.z, param );
+	return zPos >= - 1 && zPos <= 1;
+
+}
+
+
+
 class LineSegments2 extends Mesh {
 
 	constructor( geometry = new LineSegmentsGeometry(), material = new LineMaterial( { color: Math.random() * 0xffffff } ) ) {
@@ -105,6 +179,7 @@ class LineSegments2 extends Mesh {
 		const material = this.material;
 		const resolution = material.resolution;
 		const lineWidth = material.linewidth + threshold;
+		const worldUnits = this.material.worldUnits;
 
 		const instanceStart = geometry.attributes.instanceStart;
 		const instanceEnd = geometry.attributes.instanceEnd;
@@ -126,7 +201,7 @@ class LineSegments2 extends Mesh {
 
 		// increase the sphere bounds by the worst case line screen space width
 		let sphereMargin;
-		if ( this.material.worldUnits ) {
+		if ( worldUnits ) {
 
 			sphereMargin = lineWidth * 0.5;
 
@@ -178,148 +253,191 @@ class LineSegments2 extends Mesh {
 
 		//
 
-		// pick a point 1 unit out along the ray to avoid the ray origin
-		// sitting at the camera origin which will cause "w" to be 0 when
-		// applying the projection matrix.
-		ray.at( 1, _ssOrigin );
-
-		// ndc space [ - 1.0, 1.0 ]
-		_ssOrigin.w = 1;
-		_ssOrigin.applyMatrix4( camera.matrixWorldInverse );
-		_ssOrigin.applyMatrix4( projectionMatrix );
-		_ssOrigin.multiplyScalar( 1 / _ssOrigin.w );
-
-		// screen space
-		_ssOrigin.x *= resolution.x / 2;
-		_ssOrigin.y *= resolution.y / 2;
-		_ssOrigin.z = 0;
-
-		_ssOrigin3.copy( _ssOrigin );
-
+		let faceIndex;
+		let point;
+		let pointOnLine;
+		let dist = Infinity;
+		let isLoopingInside = false; // is true while isInside == true
 		_mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
 
-		for ( let i = 0, l = instanceStart.count; i < l; i ++ ) {
+		if ( worldUnits ) {
 
-			_start4.fromBufferAttribute( instanceStart, i );
-			_end4.fromBufferAttribute( instanceEnd, i );
+			for ( let i = 0, l = instanceStart.count; i < l; i ++ ) {
 
-			_start4.w = 1;
-			_end4.w = 1;
+				computeStartEnd( instanceStart, instanceEnd, i );
 
-			// camera space
-			_start4.applyMatrix4( _mvMatrix );
-			_end4.applyMatrix4( _mvMatrix );
+				// skip the segment if it's entirely behind the camera
+				const isBehindCameraNear = _start4.z > near && _end4.z > near;
+				if ( isBehindCameraNear ) {
 
-			// skip the segment if it's entirely behind the camera
-			var isBehindCameraNear = _start4.z > near && _end4.z > near;
-			if ( isBehindCameraNear ) {
-
-				continue;
-
-			}
-
-			// trim the segment if it extends behind camera near
-			if ( _start4.z > near ) {
-
-				const deltaDist = _start4.z - _end4.z;
-				const t = ( _start4.z - near ) / deltaDist;
-				_start4.lerp( _end4, t );
-
-			} else if ( _end4.z > near ) {
-
-				const deltaDist = _end4.z - _start4.z;
-				const t = ( _end4.z - near ) / deltaDist;
-				_end4.lerp( _start4, t );
-
-			}
-
-			// clip space
-			_start4.applyMatrix4( projectionMatrix );
-			_end4.applyMatrix4( projectionMatrix );
-
-			// ndc space [ - 1.0, 1.0 ]
-			_start4.multiplyScalar( 1 / _start4.w );
-			_end4.multiplyScalar( 1 / _end4.w );
-
-			// screen space
-			_start4.x *= resolution.x / 2;
-			_start4.y *= resolution.y / 2;
-
-			_end4.x *= resolution.x / 2;
-			_end4.y *= resolution.y / 2;
-
-			// create 2d segment
-			_line.start.copy( _start4 );
-			_line.start.z = 0;
-
-			_line.end.copy( _end4 );
-			_line.end.z = 0;
-
-			// get closest point on ray to segment
-			const param = _line.closestPointToPointParameter( _ssOrigin3, true );
-			_line.at( param, _closestPoint );
-
-			// check if the intersection point is within clip space
-			const zPos = MathUtils.lerp( _start4.z, _end4.z, param );
-			const isInClipSpace = zPos >= - 1 && zPos <= 1;
-
-			if ( ! isInClipSpace ) {
-
-				return;
-
-			}
-
-			let isInside;
-			let point, pointOnLine;
-			function getPointAndPointOnLine() {
-
-				_line.start.fromBufferAttribute( instanceStart, i );
-				_line.end.fromBufferAttribute( instanceEnd, i );
-
-				_line.start.applyMatrix4( matrixWorld );
-				_line.end.applyMatrix4( matrixWorld );
-
-				ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
-
-			}
-
-			if ( this.material.worldUnits ) {
-
-				pointOnLine = new Vector3();
-				point = new Vector3();
-				getPointAndPointOnLine();
-
-				isInside = point.distanceTo( pointOnLine ) < lineWidth * 0.5;
-
-			} else {
-
-				isInside = _ssOrigin3.distanceTo( _closestPoint ) < lineWidth * 0.5;
-
-			}
-
-			if ( isInside ) {
-
-				if ( ! this.material.worldUnits ) {
-
-					pointOnLine = new Vector3();
-					point = new Vector3();
-					getPointAndPointOnLine();
+					continue;
 
 				}
 
-				intersects.push( {
+				// trim the segment if it extends behind camera near
+				trimSegment( near );
 
-					point: point,
-					pointOnLine: pointOnLine,
-					distance: ray.origin.distanceTo( point ),
+				if ( ! isInClipSpace( projectionMatrix, resolution ) ) {
 
-					object: this,
-					face: null,
-					faceIndex: i,
-					uv: null,
-					uv2: null,
+					continue;
+
+				}
+
+				const pointOnLineTmp = new Vector3();
+				const pointTmp = new Vector3();
+				getPointAndPointOnLine( {
+
+					ray,
+					instanceStart,
+					instanceEnd, matrixWorld,
+					point: pointTmp,
+					pointOnLine: pointOnLineTmp,
+					i
 
 				} );
+				const distTmp = pointTmp.distanceTo( pointOnLineTmp );
+				const isInside = distTmp < lineWidth * 0.5;
+
+				if ( ! isInside && isLoopingInside ) {
+
+					intersects.push( {
+						point: point,
+						pointOnLine: pointOnLine,
+						distance: ray.origin.distanceTo( point ),
+						object: this,
+						face: null,
+						faceIndex: faceIndex,
+						uv: null,
+						uv2: null,
+					} );
+					dist = Infinity;
+					isLoopingInside = false;
+
+				}
+
+				if ( isInside && distTmp < dist ) {
+
+					isLoopingInside = true;
+					faceIndex = i;
+					dist = distTmp;
+					point = pointTmp;
+					pointOnLine = pointOnLineTmp;
+
+					if ( faceIndex === l - 1 ) {
+
+						intersects.push( {
+							point: point,
+							pointOnLine: pointOnLine,
+							distance: ray.origin.distanceTo( point ),
+							object: this,
+							face: null,
+							faceIndex: faceIndex,
+							uv: null,
+							uv2: null,
+						} );
+
+					}
+
+				}
+
+			}
+
+		} else {
+
+			// pick a point 1 unit out along the ray to avoid the ray origin
+			// sitting at the camera origin which will cause "w" to be 0 when
+			// applying the projection matrix.
+			ray.at( 1, _ssOrigin );
+
+			// ndc space [ - 1.0, 1.0 ]
+			_ssOrigin.w = 1;
+			_ssOrigin.applyMatrix4( camera.matrixWorldInverse );
+			_ssOrigin.applyMatrix4( projectionMatrix );
+			_ssOrigin.multiplyScalar( 1 / _ssOrigin.w );
+
+			// screen space
+			_ssOrigin.x *= resolution.x / 2;
+			_ssOrigin.y *= resolution.y / 2;
+			_ssOrigin.z = 0;
+
+			_ssOrigin3.copy( _ssOrigin );
+
+			for ( let i = 0, l = instanceStart.count; i < l; i ++ ) {
+
+				computeStartEnd( instanceStart, instanceEnd, i );
+
+				// skip the segment if it's entirely behind the camera
+				const isBehindCameraNear = _start4.z > near && _end4.z > near;
+				if ( isBehindCameraNear ) {
+
+					continue;
+
+				}
+
+				// trim the segment if it extends behind camera near
+				trimSegment( near );
+
+				if ( ! isInClipSpace( projectionMatrix, resolution ) ) {
+
+					continue;
+
+				}
+
+				const distTmp = _ssOrigin3.distanceTo( _closestPoint );
+				const isInside = distTmp < lineWidth * 0.5;
+
+				if ( ! isInside && isLoopingInside ) {
+
+					intersects.push( {
+						point: point,
+						pointOnLine: pointOnLine,
+						distance: ray.origin.distanceTo( point ),
+						object: this,
+						face: null,
+						faceIndex: faceIndex,
+						uv: null,
+						uv2: null,
+					} );
+					dist = Infinity;
+					isLoopingInside = false;
+
+				}
+
+				if ( isInside && distTmp < dist ) {
+
+					isLoopingInside = true;
+					pointOnLine = new Vector3();
+					point = new Vector3();
+					getPointAndPointOnLine( {
+						ray,
+						instanceStart,
+						instanceEnd,
+						matrixWorld,
+						point,
+						pointOnLine,
+						i
+					} );
+					faceIndex = i;
+					dist = distTmp;
+
+					// handling end of loop
+					if ( faceIndex === l - 1 ) {
+
+						intersects.push( {
+							point: point,
+							pointOnLine: pointOnLine,
+							distance: ray.origin.distanceTo( point ),
+							object: this,
+							face: null,
+							faceIndex: faceIndex,
+							uv: null,
+							uv2: null,
+
+						} );
+
+					}
+
+				}
 
 			}
 
