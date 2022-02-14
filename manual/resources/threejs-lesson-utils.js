@@ -197,7 +197,6 @@ export const threejsLessonUtils = {
         controls.rotateSpeed = 1 / 6;
         controls.enableZoom = false;
         controls.enablePan = false;
-        controls.enableKeys = false;
         elem.removeAttribute('tabIndex');
         //resizeFunctions.push(controls.handleResize.bind(controls));
         updateFunctions.push(controls.update.bind(controls));
