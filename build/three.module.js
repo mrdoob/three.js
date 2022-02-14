@@ -26559,13 +26559,13 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	this.clear = function ( color = true, depth = true, stencil = true ) {
+	this.clear = function ( color, depth, stencil ) {
 
 		let bits = 0;
 
-		if ( color ) bits |= 16384;
-		if ( depth ) bits |= 256;
-		if ( stencil ) bits |= 1024;
+		if ( color === undefined || color ) bits |= 16384;
+		if ( depth === undefined || depth ) bits |= 256;
+		if ( stencil === undefined || stencil ) bits |= 1024;
 
 		_gl.clear( bits );
 

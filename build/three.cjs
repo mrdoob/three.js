@@ -19551,11 +19551,11 @@ function WebGLRenderer(parameters = {}) {
 		background.setClearAlpha.apply(background, arguments);
 	};
 
-	this.clear = function (color = true, depth = true, stencil = true) {
+	this.clear = function (color, depth, stencil) {
 		let bits = 0;
-		if (color) bits |= _gl.COLOR_BUFFER_BIT;
-		if (depth) bits |= _gl.DEPTH_BUFFER_BIT;
-		if (stencil) bits |= _gl.STENCIL_BUFFER_BIT;
+		if (color === undefined || color) bits |= _gl.COLOR_BUFFER_BIT;
+		if (depth === undefined || depth) bits |= _gl.DEPTH_BUFFER_BIT;
+		if (stencil === undefined || stencil) bits |= _gl.STENCIL_BUFFER_BIT;
 
 		_gl.clear(bits);
 	};
