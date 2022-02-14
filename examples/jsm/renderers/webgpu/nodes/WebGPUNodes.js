@@ -19,7 +19,7 @@ class WebGPUNodes {
 
 		if ( nodeBuilder === undefined ) {
 
-			nodeBuilder = new WebGPUNodeBuilder( object.material, this.renderer, lightNode ).build();
+			nodeBuilder = new WebGPUNodeBuilder( object, this.renderer, lightNode ).build();
 
 			this.builders.set( object, nodeBuilder );
 

@@ -1,8 +1,8 @@
 /* global QUnit */
 
-import { ShapeGeometry, ShapeBufferGeometry } from '../../../../src/geometries/ShapeGeometry';
+import { ShapeGeometry, ShapeBufferGeometry } from '../../../../src/geometries/ShapeGeometry.js';
 
-import { Shape } from '../../../../src/extras/core/Shape';
+import { Shape } from '../../../../src/extras/core/Shape.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -24,23 +24,23 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
 		QUnit.todo( 'Standard geometry tests', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

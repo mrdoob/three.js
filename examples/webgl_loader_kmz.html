@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - KMZ</title>
+		<title>three.js webgl - KMZLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,12 +9,24 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZ</a> loader
+			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZLoader</a>
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { KMZLoader } from './jsm/loaders/KMZLoader.js';
@@ -40,10 +52,11 @@
 
 				scene.add( camera );
 
-				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x333333 );
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

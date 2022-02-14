@@ -62,7 +62,6 @@
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
 			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
-			[example:webgl_materials_physical_sheen materials / physical / sheen]<br />
 			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
 
@@ -130,10 +129,51 @@
 			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial]为*1.0*时，此属性无效。
 		</p>
 
-		<h3>[property:Color sheen]</h3>
+		<h3>[property:Float sheen]</h3>
 		<p>
-			If a color is assigned to this property, the material will use a special sheen BRDF intended for rendering cloth materials such as velvet.
-			The sheen color provides the ability to create two-tone specular materials. *null* by default.
+			The intensity of the sheen layer, from *0.0* to *1.0*. Default is *0.0*.
+		</p>
+
+		<h3>[property:Float sheenRoughness]</h3>
+		<p>
+			Roughness of the sheen layer, from *0.0* to *1.0*. Default is *1.0*.
+		</p>
+
+		<h3>[property:Texture sheenRoughnessMap]</h3>
+		<p>
+			The alpha channel of this texture is multiplied against [page:.sheenRoughness], for per-pixel control
+			over sheen roughness. Default is *null*.
+		</p>
+
+		<h3>[property:Color sheenColor]</h3>
+		<p>
+			The sheen tint. Default is *0xffffff*, white.
+		</p>
+
+		<h3>[property:Texture sheenColorMap]</h3>
+		<p>
+			The RGB channels of this texture are multiplied against [page:.sheenColor], for per-pixel control
+			over sheen tint. Default is *null*.
+		</p>
+
+		<h3>[property:Float specularIntensity]</h3>
+		<p>
+			用于控制非金属材质高光反射强度的浮点值。漫反射材质对应的值为0。范围从*0.0*到*1.0*。 默认值为*0.0*。
+		</p>
+
+		<h3>[property:Texture specularIntensityMap]</h3>
+		<p>
+			此纹理的alpha通道将与[page:.specularIntensity]相乘，用于逐像素地控制高光强度。默认值为*null*。
+		</p>
+
+		<h3>[property:Color specularColor]</h3>
+		<p>
+			非金属材质在垂直于法线方向观看时的高光反射颜色。默认值为*0xffffff*，白色。
+		</p>
+
+		<h3>[property:Texture specularColorMap]</h3>
+		<p>
+			此纹理的alpha通道将与[page:.specularColor]相乘，用于逐像素地控制高光颜色。默认值为*null*。
 		</p>
 
 		<h3>[property:Float transmission]</h3>

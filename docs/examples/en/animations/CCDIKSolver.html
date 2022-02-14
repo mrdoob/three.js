@@ -57,7 +57,7 @@
 		<ul>
 			<li>[page:Integer target] — Target bone.</li>
 			<li>[page:Integer effector] — Effector bone.</li>
-			<li>[page:Array links] — An array of [page: Object] specifying link bones.
+			<li>[page:Array links] — An array of [page:Object] specifying link bones.
 			<ul>
 				<li>[page:Integer index] — Link bone.</li>
 				<li>[page:Vector3 limitation] — (optional) Rotation axis. Default is undefined.</li>
@@ -90,12 +90,12 @@
 		Return [page:CCDIKHelper]. You can visualize IK bones by adding the helper to scene.
 		</p>
 
-		<h3>[method:CCDIKSolver update]()</h3>
+		<h3>[method:this update]()</h3>
 		<p>
 		Update IK bones quaternion by solving CCD algorithm.
 		</p>
 
-		<h3>[method:CCDIKSolver updateOne]( [param:Object ikParam] )</h3>
+		<h3>[method:this updateOne]( [param:Object ikParam] )</h3>
 		<p>
 		Update an IK bone quaternion by solving CCD algorithm.
 		</p>

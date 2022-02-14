@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc"> A loader for <em>LDraw</em> resources. <br /><br />
+		[link:https://ldraw.org LDraw] (LEGO Draw) is an
+		[link:https://ldraw.org/article/218.html open format specification] for describing LEGO
+		and other construction set 3D models.</p>
+
+		<p>An LDraw asset (a text file usually with extension .ldr, .dat or .txt) can describe
+		just a single construction piece, or an entire model.
+		In the case of a model the LDraw file can reference other LDraw files, which are loaded
+		from a library path set with [page:Function setPartsLibraryPath]. You usually download
+		the LDraw official parts library, extract to a folder and point setPartsLibraryPath to it.
+		</p>
+
+		<p>Library parts will be loaded by trial and error in subfolders 'parts', 'p' and 'models'.
+		These file accesses are not optimal for web environment, so a script tool has been made
+		to pack an LDraw file with all its dependencies into a single file, which loads much faster.
+		See section 'Packing LDraw models'. The LDrawLoader example loads several packed files.
+		The official parts library is not included due to its large size.</p>
+
+
+		<h2>Extensions</h2>
+
+		<p>
+			LDrawLoader supports the following extensions:
+		</p>
+
+		<ul>
+			<li>!COLOUR: Color and surface finish declarations.</li>
+			<li>BFC: Back Face Culling specification.</li>
+			<li>!CATEGORY: Model/part category declarations.</li>
+			<li>!KEYWORDS: Model/part keywords declarations.</li>
+		</ul>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// Instantiate a loader
+		const loader = new LDrawLoader();
+
+		// Optionally set library parts path
+		// loader.setPartsLibraryPath( path to library );
+
+		// Load a LDraw resource
+		loader.load(
+			// resource URL
+			'models/car.ldr_Packed.mpd',
+			// called when the resource is loaded
+			function ( group ) {
+
+				// Optionally, use LDrawUtils.mergeObject() from
+				// 'examples/jsm/utils/LDrawUtils.js' to merge all
+				// geometries by material (it gives better runtime
+				// performance, but construction steps are lost)
+				// group = LDrawUtils.mergeObject( group );
+
+				scene.add( group );
+
+			},
+			// called while loading is progressing
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_ldraw]
+		</p>
+
+		<h2>Packing LDraw models</h2>
+
+		<p>To pack a model with all its referenced files, download the
+		[link:https://www.ldraw.org/parts/latest-parts.html Official LDraw parts library]
+		and use the following Node script:
+		[link:https://github.com/mrdoob/three.js/blob/master/utils/packLDrawModel.js utils/packLDrawModel.js]
+		It contains instructions on how to setup the files and execute it.</p>
+
+		<h2>Metadata in .userData</h2>
+
+		<p>LDrawLoader returns a [page:Group] object which contains an object hierarchy. Depending of each subobject
+		type, its .userData member will contain the following members: <br />
+		In a [page:Group], the userData member will contain: <br />
+		<ul>
+			<li>.numConstructionSteps: Only in the root [page:Group], Indicates total number of construction steps in
+			the model. These can be used to set visibility of objects to show different construction steps, which is
+			done in the example.</li>
+			<li>.constructionStep: Indicates the construction index of this step.</li>
+			<li>.category: Contains, if not null, the [page:String] category for this piece or model.</li>
+			<li>.keywords: Contains, if not null, an array of [page:String] keywords for this piece or model.</li>
+		</ul>
+		</p>
+		<p>In a [page:Material], the userData member will contain:
+		<ul>
+			<li>.code: Indicates the LDraw code for this material.</li>
+			<li>.edgeMaterial: Only in a [page:Mesh] material, indicates the [page:LineBasicMaterial] belonging to edges
+			of the same color code (in the LDraw format, each surface material is also related to an edge material)</li>
+			<li>.conditionalEdgeMaterial: Only in a [page:LineSegments] material, indicates the [page:Material] belonging
+			to conditional edges of the same color code.</li>
+		</ul>
+		</p>
+
+		<br>
+		<hr>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — A string containing the path/URL of the LDraw file.<br />
+		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the loaded JSON response returned from [page:Function parse].<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
+		</p>
+		<p>
+		Begin loading from url and call the callback function with the parsed response content.
+		</p>
+
+		<h3>[method:this setPartsLibraryPath]( [param:String path] )</h3>
+		<p>
+		[page:String path] —  Path to library parts files to load referenced parts from. This is different from [page:Loader.setPath], which indicates the path to load the main asset from.<br />
+		</p>
+		<p>
+		This method must be called prior to [page:.load] unless the model to load does not reference library parts (usually it will be a model with all its parts packed in a single file)
+		</p>
+
+		<h3>[method:this setFileMap]( [param:Map fileMap] )</h3>
+		<p>
+		[page:Map map] — Set a map from [page:String] to [page:String] which maps referenced library filenames to new filenames. If a fileMap is not specified (the default), library parts will be accessed by trial and error in subfolders 'parts', 'p' and 'models'.
+		</p>
+
+		<h3>[method:undefined parse]( [param:String text], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
+		<p>
+		[page:String text] — LDraw asset to parse, as string.<br />
+		[page:String path] — The base path from which to find other referenced LDraw asset files.<br />
+		[page:Function onLoad] — A function to be called when parse completes.<br />
+		</p>
+		<p>
+		Parse a LDraw file contents as a String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:Group] that contains hierarchy of [page:Group], [page:Mesh] and [page:LineSegments] (with other part data in .userData fields).
+		</p>
+
+		<h3>[method:Material getMaterial]( [param:String colourCode] )</h3>
+		<p>
+		[page:String colourCode] — Color code to get the associated [page:Material].
+		</p>
+
+		<h3>[method:String getMainMaterial]()</h3>
+		<p>
+		Returns the [page:Material] for the main LDraw color.
+		</p>
+
+		<p>For an already loaded LDraw asset, returns the [page:Material] associated with the main color code.
+		This method can be useful to modify the main material of a model or part that exposes it.
+		</p>
+
+		<p>
+		The main color code is the standard way to color an LDraw part. It is '16' for triangles and '24' for edges. Usually
+		a complete model will not expose the main color (that is, no part uses the code '16' at the top level, because they
+		are assigned other specific colors) An LDraw part file on the other hand will expose the code '16' to be colored, and
+		can have additional fixed colors.
+		</p>
+
+		<h3>[method:String getMainEdgeMaterial]()</h3>
+		<p>
+		Returns the [page:Material] for the edges main LDraw color.
+		</p>
+
+		<h3>[method:void preloadMaterials]( [param:String path] )</h3>
+		<p>
+		[page:String path] — Path of the LDraw materials asset.
+		</p>
+
+		<p>This async method preloads materials from a single LDraw file. In the official parts library there is a special
+		file which is loaded always the first (LDConfig.ldr) and contains all the standard color codes. This method is
+		intended to be used with not packed files, for example in an editor where materials are preloaded and parts are
+		loaded on demand.</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/LDrawLoader.js examples/jsm/loaders/LDrawLoader.js]
+		</p>
+	</body>
+</html>

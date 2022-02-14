@@ -14,11 +14,23 @@
 			by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			let container, camera, scene, renderer, mesh;
@@ -127,21 +139,18 @@
 					Spherify: 0,
 					Twist: 0,
 				};
-				const gui = new GUI();
-				const folder = gui.addFolder( 'Morph Targets' );
+				const gui = new GUI( { title: 'Morph Targets' } );
 
-				folder.add( params, 'Spherify', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+				gui.add( params, 'Spherify', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 					mesh.morphTargetInfluences[ 0 ] = value;
 
 				} );
-				folder.add( params, 'Twist', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+				gui.add( params, 'Twist', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 					mesh.morphTargetInfluences[ 1 ] = value;
 
 				} );
-
-				folder.open();
 
 			}
 

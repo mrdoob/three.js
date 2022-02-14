@@ -1,29 +1,29 @@
 /* global QUnit */
 
-import { CanvasTexture } from '../../../../src/textures/CanvasTexture';
+// import { CanvasTexture } from '../../../../src/textures/CanvasTexture.js';
 
 export default QUnit.module( 'Textures', () => {
 
 	QUnit.module( 'CanvasTexture', () => {
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isCanvasTexture", ( assert ) => {
+		QUnit.todo( 'isCanvasTexture', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -61,7 +61,6 @@
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
 			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
-			[example:webgl_materials_physical_sheen materials / physical / sheen]<br />
 			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
 
@@ -135,17 +134,50 @@
 
 		<h3>[property:Float sheen]</h3>
 		<p>
-			The intensity of the sheen layer, from *0.0* to *1.0*. Default is *0.0*.</p>
+			The intensity of the sheen layer, from *0.0* to *1.0*. Default is *0.0*.
 		</p>
 
 		<h3>[property:Float sheenRoughness]</h3>
 		<p>
-			Roughness of the sheen layer, from *0.0* to *1.0*. Default is *1.0*.</p>
+			Roughness of the sheen layer, from *0.0* to *1.0*. Default is *1.0*.
 		</p>
 
-		<h3>[property:Color sheenTint]</h3>
+		<h3>[property:Texture sheenRoughnessMap]</h3>
+		<p>
+			The alpha channel of this texture is multiplied against [page:.sheenRoughness], for per-pixel control
+			over sheen roughness. Default is *null*.
+		</p>
+
+		<h3>[property:Color sheenColor]</h3>
 		<p>
 			The sheen tint. Default is *0xffffff*, white.
+		</p>
+
+		<h3>[property:Texture sheenColorMap]</h3>
+		<p>
+			The RGB channels of this texture are multiplied against [page:.sheenColor], for per-pixel control
+			over sheen tint. Default is *null*.
+		</p>
+
+		<h3>[property:Float specularIntensity]</h3>
+		<p>
+			A float that scales the amount of specular reflection for non-metals only. When set to zero, the model is effectively Lambertian. From *0.0* to *1.0*. Default is *0.0*.
+		</p>
+
+		<h3>[property:Texture specularIntensityMap]</h3>
+		<p>
+			The alpha channel of this texture is multiplied against [page:.specularIntensity], for per-pixel control over specular intensity. Default is *null*.
+		</p>
+
+		<h3>[property:Color specularColor]</h3>
+		<p>
+			A [page:Color] that tints the specular reflection at normal incidence for non-metals only.
+			Default is *0xffffff*, white.
+		</p>
+
+		<h3>[property:Texture specularColorMap]</h3>
+		<p>
+			The RGB channels of this texture are multiplied against [page:.specularColor], for per-pixel control over specular color. Default is *null*.
 		</p>
 
 		<h3>[property:Float transmission]</h3>

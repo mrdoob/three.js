@@ -22,7 +22,7 @@ import {
 	LinearFilter,
 	ClampToEdgeWrapping,
 	TextureLoader
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _taskCache = new WeakMap();
 
@@ -287,6 +287,10 @@ class Rhino3dmLoader extends Loader {
 						break;
 
 				}
+
+				map.wrapS = texture.wrapU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+				map.wrapT = texture.wrapV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+				map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
 
 			}
 
@@ -869,6 +873,7 @@ function Rhino3dmWorker() {
 		const views = [];
 		const namedViews = [];
 		const groups = [];
+		const strings = [];
 
 		//Handle objects
 
@@ -957,6 +962,12 @@ function Rhino3dmWorker() {
 					const texture = { type: textureType };
 
 					const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+
+					texture.wrapU = _texture.wrapU;
+					texture.wrapV = _texture.wrapV;
+					texture.wrapW = _texture.wrapW;
+					const uvw = _texture.uvwTransform.toFloatArray( true );
+					texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
 
 					if ( image ) {
 
@@ -1081,27 +1092,22 @@ function Rhino3dmWorker() {
 		// Handle bitmaps
 		// console.log( `Bitmap Count: ${doc.bitmaps().count()}` );
 
-		// Handle strings -- this seems to be broken at the moment in rhino3dm
+		// Handle strings
 		// console.log( `Document Strings Count: ${doc.strings().count()}` );
+		// Note: doc.strings().documentUserTextCount() counts any doc.strings defined in a section
+		//console.log( `Document User Text Count: ${doc.strings().documentUserTextCount()}` );
 
-		/*
-		for( var i = 0; i < doc.strings().count(); i++ ){
+		const strings_count = doc.strings().count();
 
-			var _string= doc.strings().get( i );
+		for ( let i = 0; i < strings_count; i ++ ) {
 
-			console.log(_string);
-			var string = extractProperties( _group );
-
-			strings.push( string );
-
-			_string.delete();
+			strings.push( doc.strings().get( i ) );
 
 		}
-		*/
 
 		doc.delete();
 
-		return { objects, materials, layers, views, namedViews, groups, settings };
+		return { objects, materials, layers, views, namedViews, groups, strings, settings };
 
 	}
 

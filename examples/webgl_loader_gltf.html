@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - glTF loader</title>
+		<title>three.js webgl - GLTFloader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -15,14 +15,25 @@
 			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
 			let camera, scene, renderer;
 
@@ -52,25 +63,10 @@
 
 						// model
 
-						// use of RoughnessMipmapper is optional
-						const roughnessMipmapper = new RoughnessMipmapper( renderer );
-
 						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
-							gltf.scene.traverse( function ( child ) {
-
-								if ( child.isMesh ) {
-
-									roughnessMipmapper.generateMipmaps( child.material );
-
-								}
-
-							} );
-
 							scene.add( gltf.scene );
-
-							roughnessMipmapper.dispose();
 
 							render();
 

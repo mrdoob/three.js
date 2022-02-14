@@ -101,12 +101,12 @@
 
 		<h2>الوظائف (Methods)</h2>
 
-		<h3>[method:Audio connect]()</h3>
+		<h3>[method:this connect]()</h3>
 		<p>
 		متصل بـ [page:Audio.source]. يستخدم هذا داخليًا عند التهيئة وعند ضبط / إزالة المرشحات.
 		</p>
 
-		<h3>[method:Audio disconnect]()</h3>
+		<h3>[method:this disconnect]()</h3>
 		<p>
 		قطع الاتصال من [page:Audio.source]. يستخدم هذا داخليًا عند تعيين / إزالة المرشحات.
 		</p>
@@ -141,82 +141,82 @@
 		إعادة الحجم الحالي.
 		</p>
 
-		<h3>[method:Audio play]( delay )</h3>
+		<h3>[method:this play]( delay )</h3>
 		<p>
 		إذا كانت [page:Audio.hasPlaybackControl hasPlaybackControl] تحمل قيمة *true* ، يبدأ التشغيل.
 		</p>
 
-		<h3>[method:Audio pause]()</h3>
+		<h3>[method:this pause]()</h3>
 		<p>
 		إذا كانت [page:Audio.hasPlaybackControl hasPlaybackControl] تحمل قيمة *true* ، يقوم بإقاف التشغيل.
 		</p>
 
-		<h3>[method:null onEnded]()</h3>
+		<h3>[method:undefined onEnded]()</h3>
 		<p>
 		يتم مناداته تلقائيًا عند انتهاء التشغيل.
 		</p>
 
-		<h3>[method:Audio setBuffer]( audioBuffer )</h3>
+		<h3>[method:this setBuffer]( audioBuffer )</h3>
 		<p>
 		تقوم بإعداد [page:Audio.source source] إلى *audioBuffer* ، وتقوم بتعيين [page:Audio.sourceType sourceType] إلى 'buffer'.<br />
 		إذا كان [page:Audio.autoplay autoplay] ، يبدأ التشغيل أيضًا.
 		</p>
 
-		<h3>[method:Audio setFilter]( filter )</h3>
+		<h3>[method:this setFilter]( filter )</h3>
 		<p>
 		Applies a single filter node to the audio.
 		</p>
 
-		<h3>[method:Audio setFilters]( [param:Array value] )</h3>
+		<h3>[method:this setFilters]( [param:Array value] )</h3>
 		<p>
 		value - arrays of filters.<br />
 		Applies an array of filter nodes to the audio.
 		</p>
 
-		<h3>[method:Audio setLoop]( [param:Boolean value] )</h3>
+		<h3>[method:this setLoop]( [param:Boolean value] )</h3>
 		<p>
 		يضبط [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop] على *value* (ما إذا كان يجب تكرار التشغيل).
 		</p>
 
-		<h3>[method:Audio setLoopStart]( [param:Float value] )</h3>
+		<h3>[method:this setLoopStart]( [param:Float value] )</h3>
 		<p>
 		يضبط [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart] على *value*.
 		</p>
 
-		<h3>[method:Audio setLoopEnd]( [param:Float value] )</h3>
+		<h3>[method:this setLoopEnd]( [param:Float value] )</h3>
 		<p>
 		يضبط [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd] على *value*.
 		</p>
 
-		<h3>[method:Audio setMediaElementSource]( mediaElement )</h3>
+		<h3>[method:this setMediaElementSource]( mediaElement )</h3>
 		<p>
 		يطبق الكائن المحدد من النوع [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement HTMLMediaElement] كمصدر لهذا الصوت.<br />
 		يحدد أيضًا [page:Audio.hasPlaybackControl hasPlaybackControl] إلى false.
 		</p>
 
-		<h3>[method:Audio setMediaStreamSource]( mediaStream )</h3>
+		<h3>[method:this setMediaStreamSource]( mediaStream )</h3>
 		<p>
 		يطبق الكائن المحدد من النوع [link:https://developer.mozilla.org/en-US/docs/Web/API/MediaStream MediaStream] كمصدر لهذا الصوت.<br />
 		يحدد أيضًا [page:Audio.hasPlaybackControl hasPlaybackControl] إلى false.
 		</p>
 
-		<h3>[method:Audio setNodeSource]( audioNode )</h3>
+		<h3>[method:this setNodeSource]( audioNode )</h3>
 		<p>
 		يقوم بإعداد [page:Audio.source source] إلى audioBuffer ، ويقوم بتعيين [page:Audio.sourceType sourceType] على 'audioNode'.<br />
 		يضبط أيضًا [page:Audio.hasPlaybackControl hasPlaybackControl] إلى false.
 		</p>
 
-		<h3>[method:Audio setPlaybackRate]( [param:Float value] )</h3>
+		<h3>[method:this setPlaybackRate]( [param:Float value] )</h3>
 		<p>
 		إذا تم تمكين [page:Audio.hasPlaybackControl hasPlaybackControl] ، فيتم ضبط [page:Audio.playbackRate playbackRate] على *value*.
 		</p>
 
-		<h3>[method:Audio setVolume]( [param:Float value] )</h3>
+		<h3>[method:this setVolume]( [param:Float value] )</h3>
 		<p>
 		تضبط مستوى الصوت.
 		</p>
 
-		<h3>[method:Audio stop]()</h3>
+		<h3>[method:this stop]()</h3>
 		<p>
 		إذا تم تمكين [page:Audio.hasPlaybackControl hasPlaybackControl] ، فسيتوقف عن التشغيل.
 		</p>

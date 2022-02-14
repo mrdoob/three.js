@@ -30,6 +30,11 @@
 				return new GLTFMaterialsVolumeExtension( writer );
 
 			} );
+			this.register( function ( writer ) {
+
+				return new GLTFMaterialsClearcoatExtension( writer );
+
+			} );
 
 		}
 
@@ -60,11 +65,19 @@
    * Parse scenes and generate GLTF output
    * @param  {Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
    * @param  {Function} onDone  Callback on completed
+   * @param  {Function} onError  Callback on errors
    * @param  {Object} options options
    */
 
 
-		parse( input, onDone, options ) {
+		parse( input, onDone, onError, options ) {
+
+			if ( typeof onError === 'object' ) {
+
+				console.warn( 'THREE.GLTFExporter: parse() expects options as the fourth argument now.' );
+				options = onError;
+
+			}
 
 			const writer = new GLTFWriter();
 			const plugins = [];
@@ -76,7 +89,18 @@
 			}
 
 			writer.setPlugins( plugins );
-			writer.write( input, onDone, options );
+			writer.write( input, onDone, options ).catch( onError );
+
+		}
+
+		parseAsync( input, options ) {
+
+			const scope = this;
+			return new Promise( function ( resolve, reject ) {
+
+				scope.parse( input, resolve, reject, options );
+
+			} );
 
 		}
 
@@ -337,7 +361,7 @@
    */
 
 
-		write( input, onDone, options ) {
+		async write( input, onDone, options ) {
 
 			this.options = Object.assign( {}, {
 				// default options
@@ -359,86 +383,83 @@
 			}
 
 			this.processInput( input );
+			await Promise.all( this.pending );
 			const writer = this;
-			Promise.all( this.pending ).then( function () {
+			const buffers = writer.buffers;
+			const json = writer.json;
+			options = writer.options;
+			const extensionsUsed = writer.extensionsUsed; // Merge buffers.
 
-				const buffers = writer.buffers;
-				const json = writer.json;
-				const options = writer.options;
-				const extensionsUsed = writer.extensionsUsed; // Merge buffers.
+			const blob = new Blob( buffers, {
+				type: 'application/octet-stream'
+			} ); // Declare extensions.
 
-				const blob = new Blob( buffers, {
-					type: 'application/octet-stream'
-				} ); // Declare extensions.
+			const extensionsUsedList = Object.keys( extensionsUsed );
+			if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList; // Update bytelength of the single buffer.
 
-				const extensionsUsedList = Object.keys( extensionsUsed );
-				if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList; // Update bytelength of the single buffer.
+			if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
 
-				if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
+			if ( options.binary === true ) {
 
-				if ( options.binary === true ) {
+				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+				const reader = new window.FileReader();
+				reader.readAsArrayBuffer( blob );
 
-					// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+				reader.onloadend = function () {
+
+					// Binary chunk.
+					const binaryChunk = getPaddedArrayBuffer( reader.result );
+					const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true ); // JSON chunk.
+
+					const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
+					const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true ); // GLB header.
+
+					const header = new ArrayBuffer( GLB_HEADER_BYTES );
+					const headerView = new DataView( header );
+					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+					headerView.setUint32( 4, GLB_VERSION, true );
+					const totalByteLength = GLB_HEADER_BYTES + jsonChunkPrefix.byteLength + jsonChunk.byteLength + binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+					headerView.setUint32( 8, totalByteLength, true );
+					const glbBlob = new Blob( [ header, jsonChunkPrefix, jsonChunk, binaryChunkPrefix, binaryChunk ], {
+						type: 'application/octet-stream'
+					} );
+					const glbReader = new window.FileReader();
+					glbReader.readAsArrayBuffer( glbBlob );
+
+					glbReader.onloadend = function () {
+
+						onDone( glbReader.result );
+
+					};
+
+				};
+
+			} else {
+
+				if ( json.buffers && json.buffers.length > 0 ) {
+
 					const reader = new window.FileReader();
-					reader.readAsArrayBuffer( blob );
+					reader.readAsDataURL( blob );
 
 					reader.onloadend = function () {
 
-						// Binary chunk.
-						const binaryChunk = getPaddedArrayBuffer( reader.result );
-						const binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true ); // JSON chunk.
-
-						const jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( json ) ), 0x20 );
-						const jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true ); // GLB header.
-
-						const header = new ArrayBuffer( GLB_HEADER_BYTES );
-						const headerView = new DataView( header );
-						headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-						headerView.setUint32( 4, GLB_VERSION, true );
-						const totalByteLength = GLB_HEADER_BYTES + jsonChunkPrefix.byteLength + jsonChunk.byteLength + binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-						headerView.setUint32( 8, totalByteLength, true );
-						const glbBlob = new Blob( [ header, jsonChunkPrefix, jsonChunk, binaryChunkPrefix, binaryChunk ], {
-							type: 'application/octet-stream'
-						} );
-						const glbReader = new window.FileReader();
-						glbReader.readAsArrayBuffer( glbBlob );
-
-						glbReader.onloadend = function () {
-
-							onDone( glbReader.result );
-
-						};
+						const base64data = reader.result;
+						json.buffers[ 0 ].uri = base64data;
+						onDone( json );
 
 					};
 
 				} else {
 
-					if ( json.buffers && json.buffers.length > 0 ) {
-
-						const reader = new window.FileReader();
-						reader.readAsDataURL( blob );
-
-						reader.onloadend = function () {
-
-							const base64data = reader.result;
-							json.buffers[ 0 ].uri = base64data;
-							onDone( json );
-
-						};
-
-					} else {
-
-						onDone( json );
-
-					}
+					onDone( json );
 
 				}
 
-			} );
+			}
 
 		}
 		/**
@@ -600,6 +621,71 @@
 				mapDef.extensions = mapDef.extensions || {};
 				mapDef.extensions[ 'KHR_texture_transform' ] = transformDef;
 				this.extensionsUsed[ 'KHR_texture_transform' ] = true;
+
+			}
+
+		}
+
+		buildORMTexture( material ) {
+
+			const occlusion = material.aoMap?.image;
+			const roughness = material.roughnessMap?.image;
+			const metalness = material.metalnessMap?.image;
+			if ( occlusion === roughness && roughness === metalness ) return material.aoMap;
+
+			if ( occlusion || roughness || metalness ) {
+
+				const width = Math.max( occlusion?.width || 0, roughness?.width || 0, metalness?.width || 0 );
+				const height = Math.max( occlusion?.height || 0, roughness?.height || 0, metalness?.height || 0 );
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+				const context = canvas.getContext( '2d' );
+				context.fillStyle = '#ffffff';
+				context.fillRect( 0, 0, width, height );
+				const composite = context.getImageData( 0, 0, width, height );
+
+				if ( occlusion ) {
+
+					context.drawImage( occlusion, 0, 0, width, height );
+					const data = context.getImageData( 0, 0, width, height ).data;
+
+					for ( let i = 0; i < data.length; i += 4 ) {
+
+						composite.data[ i ] = data[ i ];
+
+					}
+
+				}
+
+				if ( roughness ) {
+
+					context.drawImage( roughness, 0, 0, width, height );
+					const data = context.getImageData( 0, 0, width, height ).data;
+
+					for ( let i = 1; i < data.length; i += 4 ) {
+
+						composite.data[ i ] = data[ i ];
+
+					}
+
+				}
+
+				if ( metalness ) {
+
+					context.drawImage( metalness, 0, 0, width, height );
+					const data = context.getImageData( 0, 0, width, height ).data;
+
+					for ( let i = 2; i < data.length; i += 4 ) {
+
+						composite.data[ i ] = data[ i ];
+
+					}
+
+				}
+
+				context.putImageData( composite, 0, 0 );
+				return new THREE.Texture( canvas );
 
 			}
 
@@ -845,7 +931,7 @@
 		/**
    * Process image
    * @param  {Image} image to process
-   * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
+   * @param  {Integer} format of the image (THREE.RGBAFormat)
    * @param  {Boolean} flipY before writing out the image
    * @return {Integer}     Index of the processed texture in the "images" array
    */
@@ -860,7 +946,7 @@
 			const pending = writer.pending;
 			if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
 			const cachedImages = cache.images.get( image );
-			const mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+			const mimeType = 'image/png';
 			const key = mimeType + ':flipY/' + flipY.toString();
 			if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
 			if ( ! json.images ) json.images = [];
@@ -888,9 +974,9 @@
 
 				} else {
 
-					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat ) {
+					if ( format !== THREE.RGBAFormat ) {
 
-						console.error( 'GLTFExporter: Only RGB and RGBA formats are supported.' );
+						console.error( 'GLTFExporter: Only THREE.RGBAFormat is supported.' );
 
 					}
 
@@ -902,27 +988,12 @@
 
 					const data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-					if ( format === THREE.RGBAFormat ) {
+					for ( let i = 0; i < data.length; i += 4 ) {
 
-						for ( let i = 0; i < data.length; i += 4 ) {
-
-							data[ i + 0 ] = image.data[ i + 0 ];
-							data[ i + 1 ] = image.data[ i + 1 ];
-							data[ i + 2 ] = image.data[ i + 2 ];
-							data[ i + 3 ] = image.data[ i + 3 ];
-
-						}
-
-					} else {
-
-						for ( let i = 0, j = 0; i < data.length; i += 4, j += 3 ) {
-
-							data[ i + 0 ] = image.data[ j + 0 ];
-							data[ i + 1 ] = image.data[ j + 1 ];
-							data[ i + 2 ] = image.data[ j + 2 ];
-							data[ i + 3 ] = 255;
-
-						}
+						data[ i + 0 ] = image.data[ i + 0 ];
+						data[ i + 1 ] = image.data[ i + 1 ];
+						data[ i + 2 ] = image.data[ i + 2 ];
+						data[ i + 3 ] = image.data[ i + 3 ];
 
 					}
 
@@ -966,7 +1037,7 @@
 		}
 		/**
    * Process sampler
-   * @param  {Texture} map Texture to process
+   * @param  {Texture} map THREE.Texture to process
    * @return {Integer}     Index of the processed texture in the "samplers" array
    */
 
@@ -1065,24 +1136,17 @@
 				materialDef.pbrMetallicRoughness.metallicFactor = 0.5;
 				materialDef.pbrMetallicRoughness.roughnessFactor = 0.5;
 
-			} // pbrMetallicRoughness.metallicRoughnessTexture
+			}
 
+			const ormTexture = this.buildORMTexture( material ); // pbrMetallicRoughness.metallicRoughnessTexture
 
 			if ( material.metalnessMap || material.roughnessMap ) {
 
-				if ( material.metalnessMap === material.roughnessMap ) {
-
-					const metalRoughMapDef = {
-						index: this.processTexture( material.metalnessMap )
-					};
-					this.applyTextureTransform( metalRoughMapDef, material.metalnessMap );
-					materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
-
-				} else {
-
-					console.warn( 'THREE.GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
-
-				}
+				const metalRoughMapDef = {
+					index: this.processTexture( ormTexture )
+				};
+				this.applyTextureTransform( metalRoughMapDef, material.metalnessMap || material.roughnessMap );
+				materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 			} // pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
 
@@ -1153,7 +1217,7 @@
 			if ( material.aoMap ) {
 
 				const occlusionMapDef = {
-					index: this.processTexture( material.aoMap ),
+					index: this.processTexture( ormTexture ),
 					texCoord: 1
 				};
 
@@ -2013,7 +2077,7 @@
 	/**
  * Specular-Glossiness Extension
  *
- * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Archived/KHR_materials_pbrSpecularGlossiness
  */
 
 
@@ -2057,6 +2121,69 @@
 				};
 				writer.applyTextureTransform( specularMapDef, material.specularMap );
 				extensionDef.specularGlossinessTexture = specularMapDef;
+
+			}
+
+			materialDef.extensions = materialDef.extensions || {};
+			materialDef.extensions[ this.name ] = extensionDef;
+			extensionsUsed[ this.name ] = true;
+
+		}
+
+	}
+	/**
+ * Clearcoat Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
+ */
+
+
+	class GLTFMaterialsClearcoatExtension {
+
+		constructor( writer ) {
+
+			this.writer = writer;
+			this.name = 'KHR_materials_clearcoat';
+
+		}
+
+		writeMaterial( material, materialDef ) {
+
+			if ( ! material.isMeshPhysicalMaterial ) return;
+			const writer = this.writer;
+			const extensionsUsed = writer.extensionsUsed;
+			const extensionDef = {};
+			extensionDef.clearcoatFactor = material.clearcoat;
+
+			if ( material.clearcoatMap ) {
+
+				const clearcoatMapDef = {
+					index: writer.processTexture( material.clearcoatMap )
+				};
+				writer.applyTextureTransform( clearcoatMapDef, material.clearcoatMap );
+				extensionDef.clearcoatTexture = clearcoatMapDef;
+
+			}
+
+			extensionDef.clearcoatRoughnessFactor = material.clearcoatRoughness;
+
+			if ( material.clearcoatRoughnessMap ) {
+
+				const clearcoatRoughnessMapDef = {
+					index: writer.processTexture( material.clearcoatRoughnessMap )
+				};
+				writer.applyTextureTransform( clearcoatRoughnessMapDef, material.clearcoatRoughnessMap );
+				extensionDef.clearcoatRoughnessTexture = clearcoatRoughnessMapDef;
+
+			}
+
+			if ( material.clearcoatNormalMap ) {
+
+				const clearcoatNormalMapDef = {
+					index: writer.processTexture( material.clearcoatNormalMap )
+				};
+				writer.applyTextureTransform( clearcoatNormalMapDef, material.clearcoatNormalMap );
+				extensionDef.clearcoatNormalTexture = clearcoatNormalMapDef;
 
 			}
 
@@ -2126,7 +2253,7 @@
 
 		writeMaterial( material, materialDef ) {
 
-			if ( ! material.isMeshPhysicalMaterial || material.thickness === 0 ) return;
+			if ( ! material.isMeshPhysicalMaterial || material.transmission === 0 ) return;
 			const writer = this.writer;
 			const extensionsUsed = writer.extensionsUsed;
 			const extensionDef = {};
@@ -2143,7 +2270,7 @@
 			}
 
 			extensionDef.attenuationDistance = material.attenuationDistance;
-			extensionDef.attenuationColor = material.attenuationTint.toArray();
+			extensionDef.attenuationColor = material.attenuationColor.toArray();
 			materialDef.extensions = materialDef.extensions || {};
 			materialDef.extensions[ this.name ] = extensionDef;
 			extensionsUsed[ this.name ] = true;

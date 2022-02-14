@@ -9,7 +9,7 @@ import {
 	ShaderChunk,
 	ShaderLib,
 	UniformsUtils,
-} from '../../../build/three.module.js';
+} from 'three';
 
 class PackedPhongMaterial extends MeshPhongMaterial {
 
@@ -35,10 +35,6 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			'varying vec3 vViewPosition;',
 
-			'#ifndef FLAT_SHADED',
-			'varying vec3 vNormal;',
-			'#endif',
-
 			ShaderChunk.common,
 			ShaderChunk.uv_pars_vertex,
 			ShaderChunk.uv2_pars_vertex,
@@ -46,6 +42,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.envmap_pars_vertex,
 			ShaderChunk.color_pars_vertex,
 			ShaderChunk.fog_pars_vertex,
+			ShaderChunk.normal_pars_vertex,
 			ShaderChunk.morphtarget_pars_vertex,
 			ShaderChunk.skinning_pars_vertex,
 			ShaderChunk.shadowmap_pars_vertex,
@@ -142,10 +139,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.skinbase_vertex,
 			ShaderChunk.skinnormal_vertex,
 			ShaderChunk.defaultnormal_vertex,
-
-			'#ifndef FLAT_SHADED',
-			'	vNormal = normalize( transformedNormal );',
-			'#endif',
+			ShaderChunk.normal_vertex,
 
 			ShaderChunk.begin_vertex,
 
@@ -199,6 +193,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.fog_pars_fragment,
 			ShaderChunk.bsdfs,
 			ShaderChunk.lights_pars_begin,
+			ShaderChunk.normal_pars_fragment,
 			ShaderChunk.lights_phong_pars_fragment,
 			ShaderChunk.shadowmap_pars_fragment,
 			ShaderChunk.bumpmap_pars_fragment,

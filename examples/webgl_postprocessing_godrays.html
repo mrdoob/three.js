@@ -12,9 +12,21 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl god-rays example - tree by <a href="http://www.turbosquid.com/3d-models/free-tree-3d-model/592617" target="_blank" rel="noopener">stanloshka</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -141,8 +153,7 @@
 
 				postprocessing.scene.add( postprocessing.camera );
 
-				const pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, pars );
+				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight );
 
 				// Switching the depth formats to luminance from rgb doesn't seem to work. I didn't
 				// investigate further for now.
@@ -151,15 +162,15 @@
 				// I would have this quarter size and use it as one of the ping-pong render
 				// targets but the aliasing causes some temporal flickering
 
-				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, pars );
-				postprocessing.rtTextureDepthMask = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, pars );
+				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight );
+				postprocessing.rtTextureDepthMask = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight );
 
 				// The ping-pong render targets can use an adjusted resolution to minimize cost
 
 				const adjustedWidth = renderTargetWidth * godrayRenderTargetResolutionMultiplier;
 				const adjustedHeight = renderTargetHeight * godrayRenderTargetResolutionMultiplier;
-				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight, pars );
-				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight, pars );
+				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight );
+				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight );
 
 				// god-ray shaders
 
@@ -237,8 +248,8 @@
 
 				postprocessing.scene.overrideMaterial = postprocessing.materialGodraysGenerate;
 
-				postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepSize;
-				postprocessing.godrayGenUniforms[ "tInput" ].value = inputTex;
+				postprocessing.godrayGenUniforms[ 'fStepSize' ].value = stepSize;
+				postprocessing.godrayGenUniforms[ 'tInput' ].value = inputTex;
 
 				renderer.setRenderTarget( renderTarget );
 				renderer.render( postprocessing.scene, postprocessing.camera );
@@ -273,8 +284,8 @@
 
 					// Give it to the god-ray and sun shaders
 
-					postprocessing.godrayGenUniforms[ "vSunPositionScreenSpace" ].value.copy( screenSpacePosition );
-					postprocessing.godraysFakeSunUniforms[ "vSunPositionScreenSpace" ].value.copy( screenSpacePosition );
+					postprocessing.godrayGenUniforms[ 'vSunPositionScreenSpace' ].value.copy( screenSpacePosition );
+					postprocessing.godraysFakeSunUniforms[ 'vSunPositionScreenSpace' ].value.copy( screenSpacePosition );
 
 					// -- Draw sky and sun --
 
@@ -296,7 +307,7 @@
 					renderer.setScissor( screenSpacePosition.x - sunsqW / 2, screenSpacePosition.y - sunsqH / 2, sunsqW, sunsqH );
 					renderer.setScissorTest( true );
 
-					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
+					postprocessing.godraysFakeSunUniforms[ 'fAspect' ].value = window.innerWidth / window.innerHeight;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
 					renderer.setRenderTarget( postprocessing.rtTextureColors );
@@ -321,7 +332,7 @@
 
 					//
 
-					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
+					postprocessing.godrayMaskUniforms[ 'tInput' ].value = postprocessing.rtTextureDepth.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysDepthMask;
 					renderer.setRenderTarget( postprocessing.rtTextureDepthMask );
@@ -353,8 +364,8 @@
 
 					// final pass - composite god-rays onto colors
 
-					postprocessing.godrayCombineUniforms[ "tColors" ].value = postprocessing.rtTextureColors.texture;
-					postprocessing.godrayCombineUniforms[ "tGodRays" ].value = postprocessing.rtTextureGodRays2.texture;
+					postprocessing.godrayCombineUniforms[ 'tColors' ].value = postprocessing.rtTextureColors.texture;
+					postprocessing.godrayCombineUniforms[ 'tGodRays' ].value = postprocessing.rtTextureGodRays2.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
 

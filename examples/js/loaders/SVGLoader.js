@@ -110,7 +110,8 @@
 
 					case 'use':
 						style = parseStyle( node, style );
-						const usedNodeId = node.href.baseVal.substring( 1 );
+						const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
+						const usedNodeId = href.substring( 1 );
 						const usedNode = node.viewportElement.getElementById( usedNodeId );
 
 						if ( usedNode ) {
@@ -225,7 +226,7 @@
 
 								}
 
-								if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+								if ( j === 0 ) firstPoint.copy( point );
 
 							}
 
@@ -382,7 +383,7 @@
 
 								}
 
-								if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+								if ( j === 0 ) firstPoint.copy( point );
 
 							}
 
@@ -560,7 +561,9 @@
 
 					for ( let j = 0; j < selectorList.length; j ++ ) {
 
-						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, stylesheet.style );
+						// Remove empty rules
+						const definitions = Object.fromEntries( Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' ) );
+						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, definitions );
 
 					}
 
@@ -856,6 +859,7 @@
 
 				addStyle( 'fill', 'fill' );
 				addStyle( 'fill-opacity', 'fillOpacity', clamp );
+				addStyle( 'fill-rule', 'fillRule' );
 				addStyle( 'opacity', 'opacity', clamp );
 				addStyle( 'stroke', 'stroke' );
 				addStyle( 'stroke-opacity', 'strokeOpacity', clamp );
@@ -1886,6 +1890,7 @@
 				}
 
 				return {
+					curves: p.curves,
 					points: points,
 					isCW: THREE.ShapeUtils.isClockWise( points ),
 					identifier: identifier ++,
@@ -1903,12 +1908,15 @@
 
 				if ( ! amIAHole.isHole ) {
 
-					const shape = new THREE.Shape( p.points );
+					const shape = new THREE.Shape();
+					shape.curves = p.curves;
 					const holes = isAHole.filter( h => h.isHole && h.for === p.identifier );
 					holes.forEach( h => {
 
-						const path = simplePaths[ h.identifier ];
-						shape.holes.push( new THREE.Path( path.points ) );
+						const hole = simplePaths[ h.identifier ];
+						const path = new THREE.Path();
+						path.curves = hole.curves;
+						shape.holes.push( path );
 
 					} );
 					shapesToReturn.push( shape );

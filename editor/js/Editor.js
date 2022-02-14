@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
@@ -423,6 +423,10 @@ Editor.prototype = {
 				} else if ( object.isSkinnedMesh ) {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
+
+				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+
+					helper = new THREE.SkeletonHelper( object );
 
 				} else {
 

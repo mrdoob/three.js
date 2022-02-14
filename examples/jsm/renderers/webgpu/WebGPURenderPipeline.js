@@ -32,7 +32,7 @@ class WebGPURenderPipeline {
 
 		// determine shader attributes
 
-		const shaderAttributes = this._parseShaderAttributes( nodeBuilder.vertexShader, geometry );
+		const shaderAttributes = this._getShaderAttributes( nodeBuilder, geometry );
 
 		// vertex buffers
 
@@ -701,42 +701,34 @@ class WebGPURenderPipeline {
 
 	}
 
-	_parseShaderAttributes( shader, geometry ) {
+	_getShaderAttributes( nodeBuilder, geometry ) {
 
-		// find "layout (location = num) in type name" in vertex shader
-
-		const regex = /\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
-		let shaderAttribute = null;
-
+		const nodeAttributes = nodeBuilder.attributes;
 		const attributes = [];
 
-		while ( shaderAttribute = regex.exec( shader ) ) {
+		for ( let slot = 0; slot < nodeAttributes.length; slot ++ ) {
 
-			const name = shaderAttribute.groups.name;
+			const nodeAttribute = nodeAttributes[ slot ];
+
+			const name = nodeAttribute.name;
+			const type = nodeAttribute.type;
 
 			const geometryAttribute = geometry.getAttribute( name );
 			const bytesPerElement = ( geometryAttribute !== undefined ) ? geometryAttribute.array.BYTES_PER_ELEMENT : 4;
 
-			const shaderLocation = parseInt( shaderAttribute.groups.location );
-			const arrayStride = this._getArrayStride( shaderAttribute.groups.type, bytesPerElement );
-			const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type, bytesPerElement );
+			const arrayStride = this._getArrayStride( type, bytesPerElement );
+			const format = this._getVertexFormat( type, bytesPerElement );
 
 			attributes.push( {
-				name: name,
-				arrayStride: arrayStride,
-				slot: shaderLocation,
-				format: vertexFormat
+				name,
+				arrayStride,
+				format,
+				slot
 			} );
 
 		}
 
-		// the sort ensures to setup vertex buffers in the correct order
-
-		return attributes.sort( function ( a, b ) {
-
-			return a.slot - b.slot;
-
-		} );
+		return attributes;
 
 	}
 

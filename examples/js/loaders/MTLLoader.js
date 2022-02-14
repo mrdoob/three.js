@@ -327,6 +327,13 @@
 				map.offset.copy( texParams.offset );
 				map.wrapS = scope.wrap;
 				map.wrapT = scope.wrap;
+
+				if ( mapType === 'map' || mapType === 'emissiveMap' ) {
+
+					map.encoding = THREE.sRGBEncoding;
+
+				}
+
 				params[ mapType ] = map;
 
 			}
@@ -342,17 +349,17 @@
 					// Ns is material specular exponent
 					case 'kd':
 						// Diffuse color (color under white light) using RGB values
-						params.color = new THREE.Color().fromArray( value );
+						params.color = new THREE.Color().fromArray( value ).convertSRGBToLinear();
 						break;
 
 					case 'ks':
 						// Specular color (color when light is reflected from shiny surface) using RGB values
-						params.specular = new THREE.Color().fromArray( value );
+						params.specular = new THREE.Color().fromArray( value ).convertSRGBToLinear();
 						break;
 
 					case 'ke':
 						// Emissive using RGB values
-						params.emissive = new THREE.Color().fromArray( value );
+						params.emissive = new THREE.Color().fromArray( value ).convertSRGBToLinear();
 						break;
 
 					case 'map_kd':

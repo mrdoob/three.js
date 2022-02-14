@@ -10,11 +10,12 @@ export const fragment = /* glsl */`
 uniform sampler2D shadow_pass;
 uniform vec2 resolution;
 uniform float radius;
-uniform float samples;
 
 #include <packing>
 
 void main() {
+
+	const float samples = float( VSM_SAMPLES );
 
 	float mean = 0.0;
 	float squared_mean = 0.0;

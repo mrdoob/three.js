@@ -1,6 +1,6 @@
 import {
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 
 /**
@@ -59,7 +59,7 @@ function hilbert2D( center = new Vector3( 0, 0, 0 ), size = 10, iterations = 1, 
  * Generates 3D-Coordinates in a very fast way.
  *
  * Based on work by:
- * @link http://www.openprocessing.org/visuals/?visualID=15599
+ * @link https://openprocessing.org/user/5654
  *
  * @param center     Center of Hilbert curve.
  * @param size       Total width of Hilbert curve.

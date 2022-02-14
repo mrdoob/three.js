@@ -33,7 +33,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Sphere applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>
 			[page:Matrix4 matrix] - the [Page:Matrix4] to apply <br /><br />
 
@@ -60,7 +60,7 @@
 		surface of the sphere.
 		</p>
 
-		<h3>[method:Sphere copy]( [param:Sphere sphere] )</h3>
+		<h3>[method:this copy]( [param:Sphere sphere] )</h3>
 		<p>
 		Copies the values of the passed sphere's [page:.center center] and [page:.radius radius]
 		properties to this sphere.
@@ -85,7 +85,7 @@
 		Spheres with a radius of 0 contain only their center point and are not considered to be empty.
 		</p>
 
-		<h3>[method:Sphere makeEmpty]()</h3>
+		<h3>[method:this makeEmpty]()</h3>
 		<p>Makes the sphere empty by setting [page:.center center] to (0, 0, 0) and [page:.radius radius] to -1.</p>
 
 		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
@@ -121,7 +121,7 @@
 		Checks to see if two spheres intersect.
 		</p>
 
-		<h3>[method:Sphere set]( [param:Vector3 center], [param:Float radius] )</h3>
+		<h3>[method:this set]( [param:Vector3 center], [param:Float radius] )</h3>
 		<p>
 			[page:Vector3 center] - center of the sphere.<br />
 			[page:Float radius] - radius of the sphere.<br /><br />
@@ -130,17 +130,17 @@
 		Please note that this method only copies the values from the given center.
 		</p>
 
-		<h3>[method:Sphere setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
+		<h3>[method:this setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
 		<p>
 		[page:Array points] - an [page:Array] of [page:Vector3] positions.<br />
 		[page:Vector3 optionalCenter] - Optional [page:Vector3] position for the sphere's center.<br /><br />
 
-		Computes the minimum bounding sphere for an array of [page:Array points]. If  [page:Vector3 optionalCenter]is given,
+		Computes the minimum bounding sphere for an array of [page:Array points]. If [page:Vector3 optionalCenter]is given,
 		it is used as the sphere's center. Otherwise, the center of the axis-aligned bounding box encompassing
 		[page:Array points] is calculated.
 		</p>
 
-		<h3>[method:Sphere translate]( [param:Vector3 offset] )</h3>
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
 		<p>
 		Translate the sphere's center by the provided offset [page:Vector3].
 		</p>

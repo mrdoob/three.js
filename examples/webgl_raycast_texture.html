@@ -62,15 +62,27 @@
 			</fieldset>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			function CanvasTexture( parentTexture ) {
 
-				this._canvas = document.createElement( "canvas" );
+				this._canvas = document.createElement( 'canvas' );
 				this._canvas.width = this._canvas.height = 1024;
-				this._context2D = this._canvas.getContext( "2d" );
+				this._context2D = this._canvas.getContext( '2d' );
 
 				if ( parentTexture ) {
 
@@ -80,8 +92,8 @@
 				}
 
 				const that = this;
-				this._background = document.createElement( "img" );
-				this._background.addEventListener( "load", function () {
+				this._background = document.createElement( 'img' );
+				this._background.addEventListener( 'load', function () {
 
 					that._canvas.width = that._background.naturalWidth;
 					that._canvas.height = that._background.naturalHeight;
@@ -95,7 +107,7 @@
 
 				} );
 				this._background.crossOrigin = '';
-				this._background.src = "textures/uv_grid_opengl.jpg";
+				this._background.src = 'textures/uv_grid_opengl.jpg';
 
 				this._draw();
 
@@ -149,7 +161,7 @@
 
 					// Yellow cross.
 					this._context2D.lineWidth = this._crossThickness * 3;
-					this._context2D.strokeStyle = "#FFFF00";
+					this._context2D.strokeStyle = '#FFFF00';
 
 					this._context2D.beginPath();
 					this._context2D.moveTo( this._xCross - this._crossMax - 2, this._yCross - this._crossMax - 2 );
@@ -195,7 +207,7 @@
 
 			function init() {
 
-				container = document.getElementById( "container" );
+				container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );

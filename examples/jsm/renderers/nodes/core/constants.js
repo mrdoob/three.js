@@ -10,6 +10,8 @@ export const NodeUpdateType = {
 };
 
 export const NodeType = {
+	Boolean: 'bool',
+	Integer: 'int',
 	Float: 'float',
 	Vector2: 'vec2',
 	Vector3: 'vec3',

@@ -92,7 +92,7 @@
 
 		<h3>[property:String name]</h3>
 		<p>
-			The track's name can refer to  morph targets or [page:SkinnedMesh bones] or possibly other values within an animated object. See
+			The track's name can refer to morph targets or [page:SkinnedMesh bones] or possibly other values within an animated object. See
 			[page:PropertyBinding.parseTrackName] for the forms of strings that can be parsed for property
 			binding:
 		</p>
@@ -163,14 +163,14 @@
 			Returns a copy of this track.
 		</p>
 
-		<h3>[method:null createInterpolant]()</h3>
+		<h3>[method:Interpolant createInterpolant]()</h3>
 		<p>
 			Creates a [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
 			or [page:DiscreteInterpolant DiscreteInterpolant], depending on the value of the interpolation
 			parameter passed in the constructor.
 		</p>
 
-		<h3>[method:null getInterpolation]()</h3>
+		<h3>[method:Interpolant getInterpolation]()</h3>
 		<p>
 			Returns the interpolation type.
 		</p>
@@ -189,7 +189,7 @@
 			created automatically.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:LinearInterpolant InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			Creates a new [page:LinearInterpolant LinearInterpolant] from the
 			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
@@ -197,7 +197,7 @@
 			created automatically.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:CubicInterpolant InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			Create a new [page:CubicInterpolant CubicInterpolant] from the
 			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be

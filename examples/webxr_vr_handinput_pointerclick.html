@@ -15,9 +15,21 @@
 		(Oculus Browser 15.1+)
 	</div>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
 	<script type="module">
 
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 		import { VRButton } from './jsm/webxr/VRButton.js';
 		import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 		import { OculusHandModel } from './jsm/webxr/OculusHandModel.js';
@@ -101,7 +113,7 @@
 					this.queries.intersectable.results.forEach( entity => {
 
 						const object = entity.getComponent( Object3D ).object;
-						const intersections = hp.intersectObject( object );
+						const intersections = hp.intersectObject( object, false );
 						if ( intersections && intersections.length > 0 ) {
 
 							if ( distance == null || intersections[ 0 ].distance < distance ) {

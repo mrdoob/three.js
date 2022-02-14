@@ -8,12 +8,24 @@
 	</head>
 	<body>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -297,7 +309,7 @@
 				// GUI
 
 				const gui = new GUI(),
-					folder = gui.addFolder( "Local Clipping" ),
+					folder = gui.addFolder( 'Local Clipping' ),
 					props = {
 						get 'Enabled'() {
 
@@ -339,7 +351,7 @@
 				folder.add( props, 'Shadows' );
 				folder.add( props, 'Visualize' ).listen();
 
-				gui.addFolder( "Global Clipping" ).
+				gui.addFolder( 'Global Clipping' ).
 					add( {
 						get 'Enabled'() {
 
@@ -352,7 +364,7 @@
 								globalClippingPlanes : Empty;
 
 						}
-					}, "Enabled" );
+					}, 'Enabled' );
 
 
 				// Start

@@ -1,7 +1,7 @@
 import {
 	Group,
 	Mesh
-} from '../../../build/three.module.js';
+} from 'three';
 
 
 

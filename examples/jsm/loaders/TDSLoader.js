@@ -12,7 +12,7 @@ import {
 	Mesh,
 	MeshPhongMaterial,
 	TextureLoader
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Autodesk 3DS three.js file loader, based on lib3ds.
@@ -32,7 +32,6 @@ class TDSLoader extends Loader {
 		this.debug = false;
 
 		this.group = null;
-		this.position = 0;
 
 		this.materials = [];
 		this.meshes = [];
@@ -97,7 +96,6 @@ class TDSLoader extends Loader {
 	parse( arraybuffer, path ) {
 
 		this.group = new Group();
-		this.position = 0;
 		this.materials = [];
 		this.meshes = [];
 
@@ -123,31 +121,30 @@ class TDSLoader extends Loader {
 	readFile( arraybuffer, path ) {
 
 		const data = new DataView( arraybuffer );
-		const chunk = this.readChunk( data );
+		const chunk = new Chunk( data, 0, this.debugMessage );
 
 		if ( chunk.id === MLIBMAGIC || chunk.id === CMAGIC || chunk.id === M3DMAGIC ) {
 
-			let next = this.nextChunk( data, chunk );
+			let next = chunk.readChunk();
 
-			while ( next !== 0 ) {
+			while ( next ) {
 
-				if ( next === M3D_VERSION ) {
+				if ( next.id === M3D_VERSION ) {
 
-					const version = this.readDWord( data );
+					const version = next.readDWord();
 					this.debugMessage( '3DS file version: ' + version );
 
-				} else if ( next === MDATA ) {
+				} else if ( next.id === MDATA ) {
 
-					this.resetPosition( data );
-					this.readMeshData( data, path );
+					this.readMeshData( next, path );
 
 				} else {
 
-					this.debugMessage( 'Unknown main chunk: ' + next.toString( 16 ) );
+					this.debugMessage( 'Unknown main chunk: ' + next.hexId );
 
 				}
 
-				next = this.nextChunk( data, chunk );
+				next = chunk.readChunk();
 
 			}
 
@@ -161,46 +158,43 @@ class TDSLoader extends Loader {
 	 * Read mesh data chunk.
 	 *
 	 * @method readMeshData
-	 * @param {Dataview} data Dataview in use.
+	 * @param {Chunk} chunk to read mesh from
 	 * @param {String} path Path for external resources.
 	 */
-	readMeshData( data, path ) {
+	readMeshData( chunk, path ) {
 
-		const chunk = this.readChunk( data );
-		let next = this.nextChunk( data, chunk );
+		let next = chunk.readChunk();
 
-		while ( next !== 0 ) {
+		while ( next ) {
 
-			if ( next === MESH_VERSION ) {
+			if ( next.id === MESH_VERSION ) {
 
-				const version = + this.readDWord( data );
+				const version = + next.readDWord();
 				this.debugMessage( 'Mesh Version: ' + version );
 
-			} else if ( next === MASTER_SCALE ) {
+			} else if ( next.id === MASTER_SCALE ) {
 
-				const scale = this.readFloat( data );
+				const scale = next.readFloat();
 				this.debugMessage( 'Master scale: ' + scale );
 				this.group.scale.set( scale, scale, scale );
 
-			} else if ( next === NAMED_OBJECT ) {
+			} else if ( next.id === NAMED_OBJECT ) {
 
 				this.debugMessage( 'Named Object' );
-				this.resetPosition( data );
-				this.readNamedObject( data );
+				this.readNamedObject( next );
 
-			} else if ( next === MAT_ENTRY ) {
+			} else if ( next.id === MAT_ENTRY ) {
 
 				this.debugMessage( 'Material' );
-				this.resetPosition( data );
-				this.readMaterialEntry( data, path );
+				this.readMaterialEntry( next, path );
 
 			} else {
 
-				this.debugMessage( 'Unknown MDATA chunk: ' + next.toString( 16 ) );
+				this.debugMessage( 'Unknown MDATA chunk: ' + next.hexId );
 
 			}
 
-			next = this.nextChunk( data, chunk );
+			next = chunk.readChunk();
 
 		}
 
@@ -210,35 +204,30 @@ class TDSLoader extends Loader {
 	 * Read named object chunk.
 	 *
 	 * @method readNamedObject
-	 * @param {Dataview} data Dataview in use.
+	 * @param {Chunk} chunk Chunk in use.
 	 */
-	readNamedObject( data ) {
+	readNamedObject( chunk ) {
 
-		const chunk = this.readChunk( data );
-		const name = this.readString( data, 64 );
-		chunk.cur = this.position;
+		const name = chunk.readString();
 
-		let next = this.nextChunk( data, chunk );
-		while ( next !== 0 ) {
+		let next = chunk.readChunk();
+		while ( next ) {
 
-			if ( next === N_TRI_OBJECT ) {
+			if ( next.id === N_TRI_OBJECT ) {
 
-				this.resetPosition( data );
-				const mesh = this.readMesh( data );
+				const mesh = this.readMesh( next );
 				mesh.name = name;
 				this.meshes.push( mesh );
 
 			} else {
 
-				this.debugMessage( 'Unknown named object chunk: ' + next.toString( 16 ) );
+				this.debugMessage( 'Unknown named object chunk: ' + next.hexId );
 
 			}
 
-			next = this.nextChunk( data, chunk );
+			next = chunk.readChunk( );
 
 		}
-
-		this.endChunk( chunk );
 
 	}
 
@@ -246,106 +235,99 @@ class TDSLoader extends Loader {
 	 * Read material data chunk and add it to the material list.
 	 *
 	 * @method readMaterialEntry
-	 * @param {Dataview} data Dataview in use.
+	 * @param {Chunk} chunk Chunk in use.
 	 * @param {String} path Path for external resources.
 	 */
-	readMaterialEntry( data, path ) {
+	readMaterialEntry( chunk, path ) {
 
-		const chunk = this.readChunk( data );
-		let next = this.nextChunk( data, chunk );
+		let next = chunk.readChunk();
 		const material = new MeshPhongMaterial();
 
-		while ( next !== 0 ) {
+		while ( next ) {
 
-			if ( next === MAT_NAME ) {
+			if ( next.id === MAT_NAME ) {
 
-				material.name = this.readString( data, 64 );
+				material.name = next.readString();
 				this.debugMessage( '   Name: ' + material.name );
 
-			} else if ( next === MAT_WIRE ) {
+			} else if ( next.id === MAT_WIRE ) {
 
 				this.debugMessage( '   Wireframe' );
 				material.wireframe = true;
 
-			} else if ( next === MAT_WIRE_SIZE ) {
+			} else if ( next.id === MAT_WIRE_SIZE ) {
 
-				const value = this.readByte( data );
+				const value = next.readByte();
 				material.wireframeLinewidth = value;
 				this.debugMessage( '   Wireframe Thickness: ' + value );
 
-			} else if ( next === MAT_TWO_SIDE ) {
+			} else if ( next.id === MAT_TWO_SIDE ) {
 
 				material.side = DoubleSide;
 				this.debugMessage( '   DoubleSided' );
 
-			} else if ( next === MAT_ADDITIVE ) {
+			} else if ( next.id === MAT_ADDITIVE ) {
 
 				this.debugMessage( '   Additive Blending' );
 				material.blending = AdditiveBlending;
 
-			} else if ( next === MAT_DIFFUSE ) {
+			} else if ( next.id === MAT_DIFFUSE ) {
 
 				this.debugMessage( '   Diffuse Color' );
-				material.color = this.readColor( data );
+				material.color = this.readColor( next );
 
-			} else if ( next === MAT_SPECULAR ) {
+			} else if ( next.id === MAT_SPECULAR ) {
 
 				this.debugMessage( '   Specular Color' );
-				material.specular = this.readColor( data );
+				material.specular = this.readColor( next );
 
-			} else if ( next === MAT_AMBIENT ) {
+			} else if ( next.id === MAT_AMBIENT ) {
 
 				this.debugMessage( '   Ambient color' );
-				material.color = this.readColor( data );
+				material.color = this.readColor( next );
 
-			} else if ( next === MAT_SHININESS ) {
+			} else if ( next.id === MAT_SHININESS ) {
 
-				const shininess = this.readPercentage( data );
+				const shininess = this.readPercentage( next );
 				material.shininess = shininess * 100;
 				this.debugMessage( '   Shininess : ' + shininess );
 
-			} else if ( next === MAT_TRANSPARENCY ) {
+			} else if ( next.id === MAT_TRANSPARENCY ) {
 
-				const transparency = this.readPercentage( data );
+				const transparency = this.readPercentage( next );
 				material.opacity = 1 - transparency;
 				this.debugMessage( '  Transparency : ' + transparency );
 				material.transparent = material.opacity < 1 ? true : false;
 
-			} else if ( next === MAT_TEXMAP ) {
+			} else if ( next.id === MAT_TEXMAP ) {
 
 				this.debugMessage( '   ColorMap' );
-				this.resetPosition( data );
-				material.map = this.readMap( data, path );
+				material.map = this.readMap( next, path );
 
-			} else if ( next === MAT_BUMPMAP ) {
+			} else if ( next.id === MAT_BUMPMAP ) {
 
 				this.debugMessage( '   BumpMap' );
-				this.resetPosition( data );
-				material.bumpMap = this.readMap( data, path );
+				material.bumpMap = this.readMap( next, path );
 
-			} else if ( next === MAT_OPACMAP ) {
+			} else if ( next.id === MAT_OPACMAP ) {
 
 				this.debugMessage( '   OpacityMap' );
-				this.resetPosition( data );
-				material.alphaMap = this.readMap( data, path );
+				material.alphaMap = this.readMap( next, path );
 
-			} else if ( next === MAT_SPECMAP ) {
+			} else if ( next.id === MAT_SPECMAP ) {
 
 				this.debugMessage( '   SpecularMap' );
-				this.resetPosition( data );
-				material.specularMap = this.readMap( data, path );
+				material.specularMap = this.readMap( next, path );
 
 			} else {
 
-				this.debugMessage( '   Unknown material chunk: ' + next.toString( 16 ) );
+				this.debugMessage( '   Unknown material chunk: ' + next.hexId );
 
 			}
 
-			next = this.nextChunk( data, chunk );
+			next = chunk.readChunk();
 
 		}
-
-		this.endChunk( chunk );
 
 		this.materials[ material.name ] = material;
 
@@ -355,13 +337,12 @@ class TDSLoader extends Loader {
 	 * Read mesh data chunk.
 	 *
 	 * @method readMesh
-	 * @param {Dataview} data Dataview in use.
+	 * @param {Chunk} chunk Chunk in use.
 	 * @return {Mesh} The parsed mesh.
 	 */
-	readMesh( data ) {
+	readMesh( chunk ) {
 
-		const chunk = this.readChunk( data );
-		let next = this.nextChunk( data, chunk );
+		let next = chunk.readChunk( );
 
 		const geometry = new BufferGeometry();
 
@@ -369,11 +350,11 @@ class TDSLoader extends Loader {
 		const mesh = new Mesh( geometry, material );
 		mesh.name = 'mesh';
 
-		while ( next !== 0 ) {
+		while ( next ) {
 
-			if ( next === POINT_ARRAY ) {
+			if ( next.id === POINT_ARRAY ) {
 
-				const points = this.readWord( data );
+				const points = next.readWord( );
 
 				this.debugMessage( '   Vertex: ' + points );
 
@@ -383,22 +364,21 @@ class TDSLoader extends Loader {
 
 				for ( let i = 0; i < points; i ++ )		{
 
-					vertices.push( this.readFloat( data ) );
-					vertices.push( this.readFloat( data ) );
-					vertices.push( this.readFloat( data ) );
+					vertices.push( next.readFloat( ) );
+					vertices.push( next.readFloat( ) );
+					vertices.push( next.readFloat( ) );
 
 				}
 
 				geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
-			} else if ( next === FACE_ARRAY ) {
+			} else if ( next.id === FACE_ARRAY ) {
 
-				this.resetPosition( data );
-				this.readFaceArray( data, mesh );
+				this.readFaceArray( next, mesh );
 
-			} else if ( next === TEX_VERTS ) {
+			} else if ( next.id === TEX_VERTS ) {
 
-				const texels = this.readWord( data );
+				const texels = next.readWord( );
 
 				this.debugMessage( '   UV: ' + texels );
 
@@ -406,24 +386,24 @@ class TDSLoader extends Loader {
 
 				const uvs = [];
 
-				for ( let i = 0; i < texels; i ++ )		{
+				for ( let i = 0; i < texels; i ++ ) {
 
-					uvs.push( this.readFloat( data ) );
-					uvs.push( this.readFloat( data ) );
+					uvs.push( next.readFloat( ) );
+					uvs.push( next.readFloat( ) );
 
 				}
 
 				geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 
-			} else if ( next === MESH_MATRIX ) {
+			} else if ( next.id === MESH_MATRIX ) {
 
 				this.debugMessage( '   Tranformation Matrix (TODO)' );
 
 				const values = [];
 				for ( let i = 0; i < 12; i ++ ) {
 
-					values[ i ] = this.readFloat( data );
+					values[ i ] = next.readFloat( );
 
 				}
 
@@ -463,15 +443,13 @@ class TDSLoader extends Loader {
 
 			} else {
 
-				this.debugMessage( '   Unknown mesh chunk: ' + next.toString( 16 ) );
+				this.debugMessage( '   Unknown mesh chunk: ' + next.hexId );
 
 			}
 
-			next = this.nextChunk( data, chunk );
+			next = chunk.readChunk( );
 
 		}
-
-		this.endChunk( chunk );
 
 		geometry.computeVertexNormals();
 
@@ -483,13 +461,12 @@ class TDSLoader extends Loader {
 	 * Read face array data chunk.
 	 *
 	 * @method readFaceArray
-	 * @param {Dataview} data Dataview in use.
+	 * @param {Chunk} chunk Chunk in use.
 	 * @param {Mesh} mesh Mesh to be filled with the data read.
 	 */
-	readFaceArray( data, mesh ) {
+	readFaceArray( chunk, mesh ) {
 
-		const chunk = this.readChunk( data );
-		const faces = this.readWord( data );
+		const faces = chunk.readWord( );
 
 		this.debugMessage( '   Faces: ' + faces );
 
@@ -497,9 +474,9 @@ class TDSLoader extends Loader {
 
 		for ( let i = 0; i < faces; ++ i ) {
 
-			index.push( this.readWord( data ), this.readWord( data ), this.readWord( data ) );
+			index.push( chunk.readWord( ), chunk.readWord( ), chunk.readWord( ) );
 
-			this.readWord( data ); // visibility
+			chunk.readWord( ); // visibility
 
 		}
 
@@ -510,17 +487,15 @@ class TDSLoader extends Loader {
 		let materialIndex = 0;
 		let start = 0;
 
-		while ( this.position < chunk.end ) {
+		while ( ! chunk.endOfChunk ) {
 
-			const subchunk = this.readChunk( data );
+			const subchunk = chunk.readChunk( );
 
 			if ( subchunk.id === MSH_MAT_GROUP ) {
 
 				this.debugMessage( '      Material Group' );
 
-				this.resetPosition( data );
-
-				const group = this.readMaterialGroup( data );
+				const group = this.readMaterialGroup( subchunk );
 				const count = group.index.length * 3; // assuming successive indices
 
 				mesh.geometry.addGroup( start, count, materialIndex );
@@ -540,17 +515,13 @@ class TDSLoader extends Loader {
 
 			} else {
 
-				this.debugMessage( '      Unknown face array chunk: ' + subchunk.toString( 16 ) );
+				this.debugMessage( '      Unknown face array chunk: ' + subchunk.hexId );
 
 			}
-
-			this.endChunk( subchunk );
 
 		}
 
 		if ( mesh.material.length === 1 ) mesh.material = mesh.material[ 0 ]; // for backwards compatibility
-
-		this.endChunk( chunk );
 
 	}
 
@@ -558,59 +529,56 @@ class TDSLoader extends Loader {
 	 * Read texture map data chunk.
 	 *
 	 * @method readMap
-	 * @param {Dataview} data Dataview in use.
+	 * @param {Chunk} chunk Chunk in use.
 	 * @param {String} path Path for external resources.
 	 * @return {Texture} Texture read from this data chunk.
 	 */
-	readMap( data, path ) {
+	readMap( chunk, path ) {
 
-		const chunk = this.readChunk( data );
-		let next = this.nextChunk( data, chunk );
+		let next = chunk.readChunk( );
 		let texture = {};
 
 		const loader = new TextureLoader( this.manager );
 		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		while ( next !== 0 ) {
+		while ( next ) {
 
-			if ( next === MAT_MAPNAME ) {
+			if ( next.id === MAT_MAPNAME ) {
 
-				const name = this.readString( data, 128 );
+				const name = next.readString();
 				texture = loader.load( name );
 
 				this.debugMessage( '      File: ' + path + name );
 
-			} else if ( next === MAT_MAP_UOFFSET ) {
+			} else if ( next.id === MAT_MAP_UOFFSET ) {
 
-				texture.offset.x = this.readFloat( data );
+				texture.offset.x = next.readFloat( );
 				this.debugMessage( '      OffsetX: ' + texture.offset.x );
 
-			} else if ( next === MAT_MAP_VOFFSET ) {
+			} else if ( next.id === MAT_MAP_VOFFSET ) {
 
-				texture.offset.y = this.readFloat( data );
+				texture.offset.y = next.readFloat( );
 				this.debugMessage( '      OffsetY: ' + texture.offset.y );
 
-			} else if ( next === MAT_MAP_USCALE ) {
+			} else if ( next.id === MAT_MAP_USCALE ) {
 
-				texture.repeat.x = this.readFloat( data );
+				texture.repeat.x = next.readFloat( );
 				this.debugMessage( '      RepeatX: ' + texture.repeat.x );
 
-			} else if ( next === MAT_MAP_VSCALE ) {
+			} else if ( next.id === MAT_MAP_VSCALE ) {
 
-				texture.repeat.y = this.readFloat( data );
+				texture.repeat.y = next.readFloat( );
 				this.debugMessage( '      RepeatY: ' + texture.repeat.y );
 
 			} else {
 
-				this.debugMessage( '      Unknown map chunk: ' + next.toString( 16 ) );
+				this.debugMessage( '      Unknown map chunk: ' + next.hexId );
 
 			}
 
-			next = this.nextChunk( data, chunk );
+			next = chunk.readChunk( );
 
 		}
-
-		this.endChunk( chunk );
 
 		return texture;
 
@@ -620,14 +588,13 @@ class TDSLoader extends Loader {
 	 * Read material group data chunk.
 	 *
 	 * @method readMaterialGroup
-	 * @param {Dataview} data Dataview in use.
+	 * @param {Chunk} chunk Chunk in use.
 	 * @return {Object} Object with name and index of the object.
 	 */
-	readMaterialGroup( data ) {
+	readMaterialGroup( chunk ) {
 
-		this.readChunk( data );
-		const name = this.readString( data, 64 );
-		const numFaces = this.readWord( data );
+		const name = chunk.readString();
+		const numFaces = chunk.readWord();
 
 		this.debugMessage( '         Name: ' + name );
 		this.debugMessage( '         Faces: ' + numFaces );
@@ -635,7 +602,7 @@ class TDSLoader extends Loader {
 		const index = [];
 		for ( let i = 0; i < numFaces; ++ i ) {
 
-			index.push( this.readWord( data ) );
+			index.push( chunk.readWord( ) );
 
 		}
 
@@ -647,29 +614,29 @@ class TDSLoader extends Loader {
 	 * Read a color value.
 	 *
 	 * @method readColor
-	 * @param {DataView} data Dataview.
+	 * @param {Chunk} chunk Chunk.
 	 * @return {Color} Color value read..
 	 */
-	readColor( data ) {
+	readColor( chunk ) {
 
-		const chunk = this.readChunk( data );
+		const subChunk = chunk.readChunk( );
 		const color = new Color();
 
-		if ( chunk.id === COLOR_24 || chunk.id === LIN_COLOR_24 ) {
+		if ( subChunk.id === COLOR_24 || subChunk.id === LIN_COLOR_24 ) {
 
-			const r = this.readByte( data );
-			const g = this.readByte( data );
-			const b = this.readByte( data );
+			const r = subChunk.readByte( );
+			const g = subChunk.readByte( );
+			const b = subChunk.readByte( );
 
 			color.setRGB( r / 255, g / 255, b / 255 );
 
 			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
 
-		}	else if ( chunk.id === COLOR_F || chunk.id === LIN_COLOR_F ) {
+		}	else if ( subChunk.id === COLOR_F || subChunk.id === LIN_COLOR_F ) {
 
-			const r = this.readFloat( data );
-			const g = this.readFloat( data );
-			const b = this.readFloat( data );
+			const r = subChunk.readFloat( );
+			const g = subChunk.readFloat( );
+			const b = subChunk.readFloat( );
 
 			color.setRGB( r, g, b );
 
@@ -677,215 +644,11 @@ class TDSLoader extends Loader {
 
 		}	else {
 
-			this.debugMessage( '      Unknown color chunk: ' + chunk.toString( 16 ) );
+			this.debugMessage( '      Unknown color chunk: ' + subChunk.hexId );
 
 		}
 
-		this.endChunk( chunk );
 		return color;
-
-	}
-
-	/**
-	 * Read next chunk of data.
-	 *
-	 * @method readChunk
-	 * @param {DataView} data Dataview.
-	 * @return {Object} Chunk of data read.
-	 */
-	readChunk( data ) {
-
-		const chunk = {};
-
-		chunk.cur = this.position;
-		chunk.id = this.readWord( data );
-		chunk.size = this.readDWord( data );
-		chunk.end = chunk.cur + chunk.size;
-		chunk.cur += 6;
-
-		return chunk;
-
-	}
-
-	/**
-	 * Set position to the end of the current chunk of data.
-	 *
-	 * @method endChunk
-	 * @param {Object} chunk Data chunk.
-	 */
-	endChunk( chunk ) {
-
-		this.position = chunk.end;
-
-	}
-
-	/**
-	 * Move to the next data chunk.
-	 *
-	 * @method nextChunk
-	 * @param {DataView} data Dataview.
-	 * @param {Object} chunk Data chunk.
-	 */
-	nextChunk( data, chunk ) {
-
-		if ( chunk.cur >= chunk.end ) {
-
-			return 0;
-
-		}
-
-		this.position = chunk.cur;
-
-		try {
-
-			const next = this.readChunk( data );
-			chunk.cur += next.size;
-			return next.id;
-
-		}	catch ( e ) {
-
-			this.debugMessage( 'Unable to read chunk at ' + this.position );
-			return 0;
-
-		}
-
-	}
-
-	/**
-	 * Reset dataview position.
-	 *
-	 * @method resetPosition
-	 */
-	resetPosition() {
-
-		this.position -= 6;
-
-	}
-
-	/**
-	 * Read byte value.
-	 *
-	 * @method readByte
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
-	readByte( data ) {
-
-		const v = data.getUint8( this.position, true );
-		this.position += 1;
-		return v;
-
-	}
-
-	/**
-	 * Read 32 bit float value.
-	 *
-	 * @method readFloat
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
-	readFloat( data ) {
-
-		try {
-
-			const v = data.getFloat32( this.position, true );
-			this.position += 4;
-			return v;
-
-		}	catch ( e ) {
-
-			this.debugMessage( e + ' ' + this.position + ' ' + data.byteLength );
-
-		}
-
-	}
-
-	/**
-	 * Read 32 bit signed integer value.
-	 *
-	 * @method readInt
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
-	readInt( data ) {
-
-		const v = data.getInt32( this.position, true );
-		this.position += 4;
-		return v;
-
-	}
-
-	/**
-	 * Read 16 bit signed integer value.
-	 *
-	 * @method readShort
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
-	readShort( data ) {
-
-		const v = data.getInt16( this.position, true );
-		this.position += 2;
-		return v;
-
-	}
-
-	/**
-	 * Read 64 bit unsigned integer value.
-	 *
-	 * @method readDWord
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
-	readDWord( data ) {
-
-		const v = data.getUint32( this.position, true );
-		this.position += 4;
-		return v;
-
-	}
-
-	/**
-	 * Read 32 bit unsigned integer value.
-	 *
-	 * @method readWord
-	 * @param {DataView} data Dataview to read data from.
-	 * @return {Number} Data read from the dataview.
-	 */
-	readWord( data ) {
-
-		const v = data.getUint16( this.position, true );
-		this.position += 2;
-		return v;
-
-	}
-
-	/**
-	 * Read string value.
-	 *
-	 * @method readString
-	 * @param {DataView} data Dataview to read data from.
-	 * @param {Number} maxLength Max size of the string to be read.
-	 * @return {String} Data read from the dataview.
-	 */
-	readString( data, maxLength ) {
-
-		let s = '';
-
-		for ( let i = 0; i < maxLength; i ++ ) {
-
-			const c = this.readByte( data );
-			if ( ! c ) {
-
-				break;
-
-			}
-
-			s += String.fromCharCode( c );
-
-		}
-
-		return s;
 
 	}
 
@@ -893,32 +656,28 @@ class TDSLoader extends Loader {
 	 * Read percentage value.
 	 *
 	 * @method readPercentage
-	 * @param {DataView} data Dataview to read data from.
+	 * @param {Chunk} chunk Chunk to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readPercentage( data ) {
+	readPercentage( chunk ) {
 
-		const chunk = this.readChunk( data );
-		let value;
+		const subChunk = chunk.readChunk( );
 
-		switch ( chunk.id ) {
+		switch ( subChunk.id ) {
 
 			case INT_PERCENTAGE:
-				value = ( this.readShort( data ) / 100 );
+				return ( subChunk.readShort( ) / 100 );
 				break;
 
 			case FLOAT_PERCENTAGE:
-				value = this.readFloat( data );
+				return subChunk.readFloat( );
 				break;
 
 			default:
-				this.debugMessage( '      Unknown percentage chunk: ' + chunk.toString( 16 ) );
+				this.debugMessage( '      Unknown percentage chunk: ' + subChunk.hexId );
+				return 0;
 
 		}
-
-		this.endChunk( chunk );
-
-		return value;
 
 	}
 
@@ -937,6 +696,208 @@ class TDSLoader extends Loader {
 			console.log( message );
 
 		}
+
+	}
+
+}
+
+
+/** Read data/sub-chunks from chunk */
+class Chunk {
+
+	/**
+	 * Create a new chunk
+	 *
+	 * @class Chunk
+	 * @param {DataView} data DataView to read from.
+	 * @param {Number} position in data.
+	 * @param {Function} debugMessage logging callback.
+	 */
+	constructor( data, position, debugMessage ) {
+
+		this.data = data;
+		// the offset to the begin of this chunk
+		this.offset = position;
+		// the current reading position
+		this.position = position;
+		this.debugMessage = debugMessage;
+
+		if ( this.debugMessage instanceof Function ) {
+
+			this.debugMessage = function () {};
+
+		}
+
+		this.id = this.readWord();
+		this.size = this.readDWord();
+		this.end = this.offset + this.size;
+
+		if ( this.end > data.byteLength ) {
+
+			this.debugMessage( 'Bad chunk size for chunk at ' + position );
+
+		}
+
+	}
+
+	/**
+	 * read a sub cchunk.
+	 *
+	 * @method readChunk
+	 * @return {Chunk | null} next sub chunk
+	 */
+	readChunk() {
+
+		if ( this.endOfChunk ) {
+
+			return null;
+
+		}
+
+		try {
+
+			const next = new Chunk( this.data, this.position, this.debugMessage );
+			this.position += next.size;
+			return next;
+
+		}	catch ( e ) {
+
+			this.debugMessage( 'Unable to read chunk at ' + this.position );
+			return null;
+
+		}
+
+	}
+
+	/**
+	 * return the ID of this chunk as Hex
+	 *
+	 * @method idToString
+	 * @return {String} hex-string of id
+	 */
+	get hexId() {
+
+		return this.id.toString( 16 );
+
+	}
+
+	get endOfChunk() {
+
+		return this.position >= this.end;
+
+	}
+
+	/**
+	 * Read byte value.
+	 *
+	 * @method readByte
+	 * @return {Number} Data read from the dataview.
+	 */
+	readByte() {
+
+		const v = this.data.getUint8( this.position, true );
+		this.position += 1;
+		return v;
+
+	}
+
+	/**
+	 * Read 32 bit float value.
+	 *
+	 * @method readFloat
+	 * @return {Number} Data read from the dataview.
+	 */
+	readFloat() {
+
+		try {
+
+			const v = this.data.getFloat32( this.position, true );
+			this.position += 4;
+			return v;
+
+		}	catch ( e ) {
+
+			this.debugMessage( e + ' ' + this.position + ' ' + this.data.byteLength );
+			return 0;
+
+		}
+
+	}
+
+	/**
+	 * Read 32 bit signed integer value.
+	 *
+	 * @method readInt
+	 * @return {Number} Data read from the dataview.
+	 */
+	readInt() {
+
+		const v = this.data.getInt32( this.position, true );
+		this.position += 4;
+		return v;
+
+	}
+
+	/**
+	 * Read 16 bit signed integer value.
+	 *
+	 * @method readShort
+	 * @return {Number} Data read from the dataview.
+	 */
+	readShort() {
+
+		const v = this.data.getInt16( this.position, true );
+		this.position += 2;
+		return v;
+
+	}
+
+	/**
+	 * Read 64 bit unsigned integer value.
+	 *
+	 * @method readDWord
+	 * @return {Number} Data read from the dataview.
+	 */
+	readDWord() {
+
+		const v = this.data.getUint32( this.position, true );
+		this.position += 4;
+		return v;
+
+	}
+
+	/**
+	 * Read 32 bit unsigned integer value.
+	 *
+	 * @method readWord
+	 * @return {Number} Data read from the dataview.
+	 */
+	readWord() {
+
+		const v = this.data.getUint16( this.position, true );
+		this.position += 2;
+		return v;
+
+	}
+
+	/**
+	 * Read NULL terminated ASCII string value from chunk-pos.
+	 *
+	 * @method readString
+	 * @return {String} Data read from the dataview.
+	 */
+	readString() {
+
+		let s = '';
+		let c = this.readByte();
+		while ( c ) {
+
+			s += String.fromCharCode( c );
+			c = this.readByte();
+
+		}
+
+		return s;
 
 	}
 

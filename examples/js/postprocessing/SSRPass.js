@@ -9,7 +9,6 @@
 			width,
 			height,
 			selects,
-			encoding,
 			bouncing = false,
 			groundReflector
 		} ) {
@@ -26,7 +25,6 @@
 			this.output = 0;
 			this.maxDistance = THREE.SSRShader.uniforms.maxDistance.value;
 			this.thickness = THREE.SSRShader.uniforms.thickness.value;
-			this.encoding = encoding;
 			this.tempColor = new THREE.Color();
 			this._selects = selects;
 			this.selective = Array.isArray( this._selects );
@@ -307,7 +305,6 @@
 		) {
 
 			// render beauty and depth
-			if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 			renderer.setRenderTarget( this.beautyRenderTarget );
 			renderer.clear();
 

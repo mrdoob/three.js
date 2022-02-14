@@ -1,0 +1,459 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>VR - Look to Select</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – VR - Look to Select">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>VR - Look to Select</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><strong>NOTE: The examples on this page require a VR capable
+device. Without one they won't work. See <a href="webxr.html">previous article</a>
+as to why</strong></p>
+<p>In the <a href="webxr.html">previous article</a> we went over
+a very simple VR example using three.js and we discussed
+the various kinds of VR systems.</p>
+<p>The simplest and possibly most common is the Google Cardboard style of VR which
+is basically a phone put into a $5 - $50 face mask. This kind of VR has no
+controller so people have to come up with creative solutions for allowing user
+input.</p>
+<p>The most common solution is "look to select" where if the
+user points their head at something for a moment it gets
+selected.</p>
+<p>Let's implement "look to select"! We'll start with
+<a href="webxr.html">an example from the previous article</a>
+and to do it we'll add the <code class="notranslate" translate="no">PickHelper</code> we made in
+<a href="picking.html">the article on picking</a>. Here it is.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+</pre>
+<p>For an explanation of that code <a href="picking.html">see the article on picking</a>.</p>
+<p>To use it we just need to create an instance and call it in our render loop</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
+
+...
+function render(time) {
+  time *= 0.001;
+
+  ...
+
++  // 0, 0 is the center of the view in normalized coordinates.
++  pickHelper.pick({x: 0, y: 0}, scene, camera, time);
+</pre>
+<p>In the original picking example we converted the mouse coordinates
+from CSS pixels into normalized coordinates that go from -1 to +1
+across the canvas.</p>
+<p>In this case though we will always pick where the camera is
+facing which is the center of the screen so we pass in <code class="notranslate" translate="no">0</code> for
+both <code class="notranslate" translate="no">x</code> and <code class="notranslate" translate="no">y</code> which is the center in normalized coordinates.</p>
+<p>And with that objects will flash when we look at them</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/webxr-look-to-select.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Typically we don't want selection to be immediate. Instead we require the user
+to keep the camera on the thing they want to select for a few moments to give them
+a chance not to select something by accident.</p>
+<p>To do that we need some kind of meter or gauge or some way
+to convey that the user must keep looking and for how long.</p>
+<p>One easy way we could do that is to make a 2 color texture
+and use a texture offset to slide the texture across a model.</p>
+<p>Let's do this by itself to see it work before we add it to
+the VR example.</p>
+<p>First we make an <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -2;    // Use values for left
+const right = 2;    // right, top and bottom
+const top = 1;      // that match the default
+const bottom = -1;  // canvas size.
+const near = -1;
+const far = 1;
+const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+</pre>
+<p>And of course update it if the canvas changes size</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    const aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.left = -aspect;
++    camera.right = aspect;
+    camera.updateProjectionMatrix();
+  }
+  ...
+</pre>
+<p>We now have a camera that shows 2 units above and below the center and aspect units
+left and right.</p>
+<p>Next let's make a 2 color texture. We'll use a <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>
+which we've used a few <a href="indexed-textures.html">other</a> 
+<a href="post-processing-3dlut.html">places</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDataTexture(data, width, height) {
+  const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
+  texture.minFilter = THREE.NearestFilter;
+  texture.magFilter = THREE.NearestFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+const cursorColors = new Uint8Array([
+  64, 64, 64, 64,       // dark gray
+  255, 255, 255, 255,   // white
+]);
+const cursorTexture = makeDataTexture(cursorColors, 2, 1);
+</pre>
+<p>We'll then use that texture on a <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ringRadius = 0.4;
+const tubeRadius = 0.1;
+const tubeSegments = 4;
+const ringSegments = 64;
+const cursorGeometry = new THREE.TorusGeometry(
+    ringRadius, tubeRadius, tubeSegments, ringSegments);
+
+const cursorMaterial = new THREE.MeshBasicMaterial({
+  color: 'white',
+  map: cursorTexture,
+  transparent: true,
+  blending: THREE.CustomBlending,
+  blendSrc: THREE.OneMinusDstColorFactor,
+  blendDst: THREE.OneMinusSrcColorFactor,
+});
+const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
+scene.add(cursor);
+</pre>
+<p>and then in <code class="notranslate" translate="no">render</code> lets adjust the texture's offset</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    const aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.left = -aspect;
+    camera.right = aspect;
+    camera.updateProjectionMatrix();
+  }
+
++  const fromStart = 0;
++  const fromEnd = 2;
++  const toStart = -0.5;
++  const toEnd = 0.5;
++  cursorTexture.offset.x = THREE.MathUtils.mapLinear(
++      time % 2,
++      fromStart, fromEnd,
++      toStart, toEnd);
+
+  renderer.render(scene, camera);
+}
+</pre>
+<p><code class="notranslate" translate="no">THREE.MathUtils.mapLinear</code> takes a value that goes between <code class="notranslate" translate="no">fromStart</code> and <code class="notranslate" translate="no">fromEnd</code>
+and maps it to a value between <code class="notranslate" translate="no">toStart</code> and <code class="notranslate" translate="no">toEnd</code>. In the case above we're
+taking <code class="notranslate" translate="no">time % 2</code> which means a value that goes from 0 to 2 and maps
+that to a value that goes from -0.5 to 0.5</p>
+<p><a href="textures.html">Textures</a> are mapped to geometry using normalized texture coordinates
+that go from 0 to 1. That means our 2x1 pixel image, set to the default
+wrapping mode of <code class="notranslate" translate="no">THREE.ClampToEdge</code>, if we adjust the
+texture coordinates by -0.5 then the entire mesh will be the first color
+and if we adjust the texture coordinates by +0.5 the entire mesh will
+be the second color. In between with the filtering set to <code class="notranslate" translate="no">THREE.NearestFilter</code>
+we'll be able to move the transition between the 2 colors through the geometry.</p>
+<p>Let's add a background texture while we're at it just like we
+covered in <a href="backgrounds.html">the article on backgrounds</a>.
+We'll just use a 2x2 set of colors but set the texture's repeat
+settings to give us an 8x8 grid. This will give our cursor something
+to be rendered over so we can check it against different colors.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const backgroundColors = new Uint8Array([
++    0,   0,   0, 255,  // black
++   90,  38,  38, 255,  // dark red
++  100, 175, 103, 255,  // medium green
++  255, 239, 151, 255,  // light yellow
++]);
++const backgroundTexture = makeDataTexture(backgroundColors, 2, 2);
++backgroundTexture.wrapS = THREE.RepeatWrapping;
++backgroundTexture.wrapT = THREE.RepeatWrapping;
++backgroundTexture.repeat.set(4, 4);
+
+const scene = new THREE.Scene();
++scene.background = backgroundTexture;
+</pre>
+<p>Now if we run that you'll see we get a circle like gauge
+and that we can set where the gauge is.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-selector.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/webxr-look-to-select-selector.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>A few things to notice <strong>and try</strong>.</p>
+<ul>
+<li><p>We set the <code class="notranslate" translate="no">cursorMaterial</code>'s <code class="notranslate" translate="no">blending</code>, <code class="notranslate" translate="no">blendSrc</code> and <code class="notranslate" translate="no">blendDst</code>
+properties as follows</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">  blending: THREE.CustomBlending,
+  blendSrc: THREE.OneMinusDstColorFactor,
+  blendDst: THREE.OneMinusSrcColorFactor,
+</pre><p>This gives as an <em>inverse</em> type of effect. Comment out
+those 3 lines and you'll see the difference. I'm just guessing
+the inverse effect is best here as that way we can hopefully
+see the cursor regardless of the colors it is over.</p>
+</li>
+<li><p>We use a <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> and not a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a></p>
+<p>For whatever reason the <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> uses a flat
+UV mapping scheme. Because of this if we use a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
+the texture slides horizontally across the ring instead of
+around it like it does above.</p>
+<p>Try it out, change the <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> to a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
+(it's just commented out in the example above) and you'll see what I
+mean.</p>
+<p>The <em>proper</em> thing to do (for some definition of <em>proper</em>) would be
+to either use the <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> but fix the texture coordinates
+so they go around the ring. Or else, generate our own ring geometry.
+But, the torus works just fine. Placed directly in front of the camera
+with a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> it will look exactly like a ring and the
+texture coordinates go around the ring so it works for our needs.</p>
+</li>
+</ul>
+<p>Let's integrate it with our VR code above. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+-  constructor() {
++  constructor(camera) {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+-    this.pickedObjectSavedColor = 0;
+
++    const cursorColors = new Uint8Array([
++      64, 64, 64, 64,       // dark gray
++      255, 255, 255, 255,   // white
++    ]);
++    this.cursorTexture = makeDataTexture(cursorColors, 2, 1);
++
++    const ringRadius = 0.4;
++    const tubeRadius = 0.1;
++    const tubeSegments = 4;
++    const ringSegments = 64;
++    const cursorGeometry = new THREE.TorusGeometry(
++        ringRadius, tubeRadius, tubeSegments, ringSegments);
++
++    const cursorMaterial = new THREE.MeshBasicMaterial({
++      color: 'white',
++      map: this.cursorTexture,
++      transparent: true,
++      blending: THREE.CustomBlending,
++      blendSrc: THREE.OneMinusDstColorFactor,
++      blendDst: THREE.OneMinusSrcColorFactor,
++    });
++    const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
++    // add the cursor as a child of the camera
++    camera.add(cursor);
++    // and move it in front of the camera
++    cursor.position.z = -1;
++    const scale = 0.05;
++    cursor.scale.set(scale, scale, scale);
++    this.cursor = cursor;
++
++    this.selectTimer = 0;
++    this.selectDuration = 2;
++    this.lastTime = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
++    const elapsedTime = time - this.lastTime;
++    this.lastTime = time;
+
+-    // restore the color if there is a picked object
+-    if (this.pickedObject) {
+-      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+-      this.pickedObject = undefined;
+-    }
+
++    const lastPickedObject = this.pickedObject;
++    this.pickedObject = undefined;
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+-      // save its color
+-      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+-      // set its emissive color to flashing red/yellow
+-      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+
++    // show the cursor only if it's hitting something
++    this.cursor.visible = this.pickedObject ? true : false;
++
++    let selected = false;
++
++    // if we're looking at the same object as before
++    // increment time select timer
++    if (this.pickedObject &amp;&amp; lastPickedObject === this.pickedObject) {
++      this.selectTimer += elapsedTime;
++      if (this.selectTimer &gt;= this.selectDuration) {
++        this.selectTimer = 0;
++        selected = true;
++      }
++    } else {
++      this.selectTimer = 0;
++    }
++
++    // set cursor material to show the timer state
++    const fromStart = 0;
++    const fromEnd = this.selectDuration;
++    const toStart = -0.5;
++    const toEnd = 0.5;
++    this.cursorTexture.offset.x = THREE.MathUtils.mapLinear(
++        this.selectTimer,
++        fromStart, fromEnd,
++        toStart, toEnd);
++
++    return selected ? this.pickedObject : undefined;
+  }
+}
+</pre>
+<p>You can see the code above we added all the code to create
+the cursor geometry, texture, and material and we added it
+as a child of the camera so it will always be in front of
+the camera. Note we need to add the camera to the scene
+otherwise the cursor won't be rendered.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+scene.add(camera);
+</pre>
+<p>We then check if the thing we're picking this time is the same as it was last
+time. If so we add the elapsed time to a timer and if the timer reaches its
+limit we return the selected item.</p>
+<p>Now let's use that to pick the cubes. As a simple example
+we'll add 3 spheres as well. When a cube is picked with hide
+the cube and un-hide the corresponding sphere.</p>
+<p>So first we'll make a sphere geometry</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+-const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
++const boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
++
++const sphereRadius = 0.5;
++const sphereGeometry = new THREE.SphereGeometry(sphereRadius);
+</pre>
+<p>Then let's create 3 pairs of box and sphere meshes. We'll
+use a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code class="notranslate" translate="no">Map</code></a>
+so that we can associate each <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> with its partner.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
+-  makeInstance(geometry, 0x44aa88,  0),
+-  makeInstance(geometry, 0x8844aa, -2),
+-  makeInstance(geometry, 0xaa8844,  2),
+-];
++const meshToMeshMap = new Map();
++[
++  { x:  0, boxColor: 0x44aa88, sphereColor: 0xFF4444, },
++  { x:  2, boxColor: 0x8844aa, sphereColor: 0x44FF44, },
++  { x: -2, boxColor: 0xaa8844, sphereColor: 0x4444FF, },
++].forEach((info) =&gt; {
++  const {x, boxColor, sphereColor} = info;
++  const sphere = makeInstance(sphereGeometry, sphereColor, x);
++  const box = makeInstance(boxGeometry, boxColor, x);
++  // hide the sphere
++  sphere.visible = false;
++  // map the sphere to the box
++  meshToMeshMap.set(box, sphere);
++  // map the box to the sphere
++  meshToMeshMap.set(sphere, box);
++});
+</pre>
+<p>In <code class="notranslate" translate="no">render</code> where we rotate the cubes we need to iterate over <code class="notranslate" translate="no">meshToMeshMap</code>
+instead of <code class="notranslate" translate="no">cubes</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-cubes.forEach((cube, ndx) =&gt; {
++let ndx = 0;
++for (const mesh of meshToMeshMap.keys()) {
+  const speed = 1 + ndx * .1;
+  const rot = time * speed;
+-  cube.rotation.x = rot;
+-  cube.rotation.y = rot;
+-});
++  mesh.rotation.x = rot;
++  mesh.rotation.y = rot;
++  ++ndx;
++}
+</pre>
+<p>And now we can use our new <code class="notranslate" translate="no">PickHelper</code> implementation
+to select one of the objects. When selected we hide
+that object and un-hide its partner.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 0, 0 is the center of the view in normalized coordinates.
+-pickHelper.pick({x: 0, y: 0}, scene, camera, time);
++const selectedObject = pickHelper.pick({x: 0, y: 0}, scene, camera, time);
++if (selectedObject) {
++  selectedObject.visible = false;
++  const partnerObject = meshToMeshMap.get(selectedObject);
++  partnerObject.visible = true;
++}
+</pre>
+<p>And with that we should have a pretty decent <em>look to select</em> implementation.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-w-cursor.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/webxr-look-to-select-w-cursor.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>I hope this example gave some ideas of how to implement a "look to select"
+type of Google Cardboard level UX. Sliding textures using texture coordinates
+offsets is also a commonly useful technique.</p>
+<p>Next up <a href="webxr-point-to-select.html">let's allow the user that has a VR controller to point at and move things</a>.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

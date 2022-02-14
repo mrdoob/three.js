@@ -31,7 +31,7 @@
 		pts -- points defining a 2D polygon<br /><br />
 
 		Note that this is a linear function so it is necessary to calculate separately for
-		x, y  components of a polygon.<br /><br />
+		x, y components of a polygon.<br /><br />
 
 		Used internally by [page:Path Path],
 		[page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry].
@@ -39,8 +39,8 @@
 
 		<h3>[method:Array triangulateShape]( contour, holes )</h3>
 		<p>
-		contour -- 2D polygon.<br />
-		holes -- array of holes<br /><br />
+		contour -- 2D polygon. An array of [page:Vector2].<br />
+		holes -- An array that holds arrays of [page:Vector2]s. Each array represents a single hole definition.<br /><br />
 
 		Used internally by [page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry] to calculate faces in shapes with holes.
 		</p>

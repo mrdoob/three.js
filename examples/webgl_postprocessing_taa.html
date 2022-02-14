@@ -16,12 +16,24 @@
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -33,7 +45,7 @@
 			let gui, stats;
 			let index = 0;
 
-			const param = { TAAEnabled: "1", TAASampleLevel: 0 };
+			const param = { TAAEnabled: '1', TAASampleLevel: 0 };
 
 			init();
 			animate();
@@ -53,8 +65,8 @@
 
 					if ( taaRenderPass ) {
 
-						taaRenderPass.enabled = ( param.TAAEnabled === "1" );
-						renderPass.enabled = ( param.TAAEnabled !== "1" );
+						taaRenderPass.enabled = ( param.TAAEnabled === '1' );
+						renderPass.enabled = ( param.TAAEnabled !== '1' );
 
 					}
 
@@ -83,7 +95,7 @@
 
 			function init() {
 
-				const container = document.getElementById( "container" );
+				const container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -107,7 +119,7 @@
 				mesh1.position.x = - 100;
 				scene.add( mesh1 );
 
-				const texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
 				texture.anisotropy = 1;

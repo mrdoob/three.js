@@ -5,7 +5,7 @@ import {
 	LineBasicMaterial,
 	Matrix3,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _v1 = new Vector3();
 const _v2 = new Vector3();
@@ -15,25 +15,9 @@ class VertexNormalsHelper extends LineSegments {
 
 	constructor( object, size = 1, color = 0xff0000 ) {
 
-		let nNormals = 0;
-
-		const objGeometry = object.geometry;
-
-		if ( objGeometry && objGeometry.isGeometry ) {
-
-			console.error( 'THREE.VertexNormalsHelper no longer supports Geometry. Use BufferGeometry instead.' );
-			return;
-
-		} else if ( objGeometry && objGeometry.isBufferGeometry ) {
-
-			nNormals = objGeometry.attributes.normal.count;
-
-		}
-
-		//
-
 		const geometry = new BufferGeometry();
 
+		const nNormals = object.geometry.attributes.normal.count;
 		const positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
 
 		geometry.setAttribute( 'position', positions );

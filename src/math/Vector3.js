@@ -727,6 +727,14 @@ class Vector3 {
 
 	}
 
+	*[ Symbol.iterator ]() {
+
+		yield this.x;
+		yield this.y;
+		yield this.z;
+
+	}
+
 }
 
 Vector3.prototype.isVector3 = true;

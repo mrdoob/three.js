@@ -60,8 +60,7 @@
 			<sup>2</sup>UV transforms are supported, with several key limitations. Transforms applied to
 			a texture using the first UV slot (all textures except aoMap and lightMap) must share the same
 			transform, or no transform at all. The aoMap and lightMap textures cannot be transformed. No
-			more than one transform may be used per material. Each use of a texture with a unique
-			transform will result in an additional GPU texture upload. See
+			more than one transform may be used per material. See
 			#[link:https://github.com/mrdoob/three.js/pull/13831 13831] and
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788].
 		</i></p>
@@ -190,18 +189,18 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the loaded JSON response returned from [page:Function parse].<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
 		Begin loading from url and call the callback function with the parsed response content.
 		</p>
 
-		<h3>[method:null setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
+		<h3>[method:this setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
 		<p>
 		[page:DRACOLoader dracoLoader] — Instance of THREE.DRACOLoader, to be used for decoding assets compressed with the KHR_draco_mesh_compression extension.
 		</p>
@@ -209,12 +208,12 @@
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
 		</p>
 
-		<h3>[method:null setKTX2Loader]( [param:KTX2Loader ktx2Loader] )</h3>
+		<h3>[method:this setKTX2Loader]( [param:KTX2Loader ktx2Loader] )</h3>
 		<p>
 		[page:KTX2Loader ktx2Loader] — Instance of THREE.KTX2Loader, to be used for loading KTX2 compressed textures.
 		</p>
 
-		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
+		<h3>[method:undefined parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<p>
 		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />
 		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />

@@ -1,10 +1,13 @@
+import NodeMaterial from './NodeMaterial.js';
 import { MeshBasicMaterial } from 'three';
 
-class MeshBasicNodeMaterial extends MeshBasicMaterial {
+const defaultValues = new MeshBasicMaterial();
+
+class MeshBasicNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
-		super( parameters );
+		super();
 
 		this.colorNode = null;
 		this.opacityNode = null;
@@ -14,6 +17,10 @@ class MeshBasicNodeMaterial extends MeshBasicMaterial {
 		this.lightNode = null;
 
 		this.positionNode = null;
+
+		this.setDefaultValues( defaultValues );
+
+		this.setValues( parameters );
 
 	}
 

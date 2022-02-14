@@ -1,8 +1,8 @@
 function Strings( config ) {
 
-	var language = config.getKey( 'language' );
+	const language = config.getKey( 'language' );
 
-	var values = {
+	const values = {
 
 		en: {
 
@@ -251,7 +251,7 @@ function Strings( config ) {
 			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/transmission': 'Transmission',
 			'sidebar/material/attenuationDistance': 'Attenuation Distance',
-			'sidebar/material/attenuationTint': 'Attenuation Tint',
+			'sidebar/material/attenuationColor': 'Attenuation Color',
 			'sidebar/material/thickness': 'Thickness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
 			'sidebar/material/matcap': 'Matcap',
@@ -579,7 +579,7 @@ function Strings( config ) {
 			'sidebar/material/clearcoatroughness': 'Rugosité du vernis',
 			'sidebar/material/transmission': 'Transmission',
 			'sidebar/material/attenuationDistance': 'Attenuation Distance',
-			'sidebar/material/attenuationTint': 'Attenuation Tint',
+			'sidebar/material/attenuationColor': 'Attenuation Color',
 			'sidebar/material/thickness': 'Thickness',
 			'sidebar/material/vertexcolors': 'Couleurs aux Sommets',
 			'sidebar/material/matcap': 'Matcap',
@@ -907,7 +907,7 @@ function Strings( config ) {
 			'sidebar/material/clearcoatroughness': '清漆粗糙度',
 			'sidebar/material/transmission': '透光',
 			'sidebar/material/attenuationDistance': '衰减距离',
-			'sidebar/material/attenuationTint': '衰减色彩',
+			'sidebar/material/attenuationColor': 'Attenuation Color',
 			'sidebar/material/thickness': '厚度',
 			'sidebar/material/vertexcolors': '顶点颜色',
 			'sidebar/material/matcap': '材质捕获',

@@ -8,93 +8,66 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf<br/><br/>
-			<button id="export_scene">Export Scene1</button>
-			<button id="export_scenes">Export Scene1 and THREE.Scene 2</button>
-			<button id="export_object">Export Sphere</button><br/>
-			<button id="export_obj">Export WaltHead</button>
-			<button id="export_objects">Export Sphere and Grid</button>
-			<button id="export_scene_object">Export Scene1 and Sphere</button>
-			<br/><br/>
-			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
-			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
-			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label><br/>
-			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
-			<label><input id="option_maxsize" name="maxSize" type="number" value="4096" min="2" max="8192" step="1"> Max texture size</label>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			function exportGLTF( input ) {
 
 				const gltfExporter = new GLTFExporter();
 
 				const options = {
-					trs: document.getElementById( 'option_trs' ).checked,
-					onlyVisible: document.getElementById( 'option_visible' ).checked,
-					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
-					binary: document.getElementById( 'option_binary' ).checked,
-					maxTextureSize: Number( document.getElementById( 'option_maxsize' ).value ) || Infinity // To prevent NaN value
+					trs: params.trs,
+					onlyVisible: params.onlyVisible,
+					truncateDrawRange: params.truncateDrawRange,
+					binary: params.binary,
+					maxTextureSize: params.maxTextureSize
 				};
-				gltfExporter.parse( input, function ( result ) {
+				gltfExporter.parse(
+					input,
+					function ( result ) {
 
-					if ( result instanceof ArrayBuffer ) {
+						if ( result instanceof ArrayBuffer ) {
 
-						saveArrayBuffer( result, 'scene.glb' );
+							saveArrayBuffer( result, 'scene.glb' );
 
-					} else {
+						} else {
 
-						const output = JSON.stringify( result, null, 2 );
-						console.log( output );
-						saveString( output, 'scene.gltf' );
+							const output = JSON.stringify( result, null, 2 );
+							console.log( output );
+							saveString( output, 'scene.gltf' );
 
-					}
+						}
 
-				}, options );
+					},
+					function ( error ) {
+
+						console.log( 'An error happened during parsing', error );
+
+					},
+					options
+				);
 
 			}
-
-			document.getElementById( 'export_scene' ).addEventListener( 'click', function () {
-
-				exportGLTF( scene1 );
-
-			} );
-
-			document.getElementById( 'export_scenes' ).addEventListener( 'click', function () {
-
-				exportGLTF( [ scene1, scene2 ] );
-
-			} );
-
-			document.getElementById( 'export_object' ).addEventListener( 'click', function () {
-
-				exportGLTF( sphere );
-
-			} );
-
-			document.getElementById( 'export_obj' ).addEventListener( 'click', function () {
-
-				exportGLTF( waltHead );
-
-			} );
-
-			document.getElementById( 'export_objects' ).addEventListener( 'click', function () {
-
-				exportGLTF( [ sphere, gridHelper ] );
-
-			} );
-
-			document.getElementById( 'export_scene_object' ).addEventListener( 'click', function () {
-
-				exportGLTF( [ scene1, gridHelper ] );
-
-			} );
-
 
 			const link = document.createElement( 'a' );
 			link.style.display = 'none';
@@ -128,6 +101,20 @@
 			let camera, object, object2, material, geometry, scene1, scene2, renderer;
 			let gridHelper, sphere, waltHead;
 
+			const params = {
+				trs: false,
+				onlyVisible: true,
+				truncateDrawRange: true,
+				binary: false,
+				maxTextureSize: 4096,
+				exportScene1: exportScene1,
+				exportScenes: exportScenes,
+				exportSphere: exportSphere,
+				exportHead: exportHead,
+				exportObjects: exportObjects,
+				exportSceneObject: exportSceneObject
+			};
+
 			init();
 			animate();
 
@@ -137,21 +124,28 @@
 				document.body.appendChild( container );
 
 				// Make linear gradient texture
-				const data = new Uint8ClampedArray( 100 * 100 * 3 );
+
+				const data = new Uint8ClampedArray( 100 * 100 * 4 );
+
 				for ( let y = 0; y < 100; y ++ ) {
 
 					for ( let x = 0; x < 100; x ++ ) {
 
-						data[ 3 * ( 100 * y + x ) ] = Math.round( 255 * y / 99 );
-						data[ 3 * ( 100 * y + x ) + 1 ] = Math.round( 255 - 255 * y / 99 );
+						const stride = 4 * ( 100 * y + x );
+
+						data[ stride ] = Math.round( 255 * y / 99 );
+						data[ stride + 1 ] = Math.round( 255 - 255 * y / 99 );
+						data[ stride + 2 ] = 0;
+						data[ stride + 3 ] = 255;
 
 					}
 
 				}
 
-				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBFormat );
+				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBAFormat );
 				gradientTexture.minFilter = THREE.LinearFilter;
 				gradientTexture.magFilter = THREE.LinearFilter;
+				gradientTexture.needsUpdate = true;
 
 				scene1 = new THREE.Scene();
 				scene1.name = 'Scene1';
@@ -162,7 +156,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 600, 400, 0 );
 
-				camera.name = "PerspectiveCamera";
+				camera.name = 'PerspectiveCamera';
 				scene1.add( camera );
 
 				// ---------------------------------------------------------------------
@@ -187,14 +181,14 @@
 				// ---------------------------------------------------------------------
 				gridHelper = new THREE.GridHelper( 2000, 20, 0x888888, 0x444444 );
 				gridHelper.position.y = - 50;
-				gridHelper.name = "Grid";
+				gridHelper.name = 'Grid';
 				scene1.add( gridHelper );
 
 				// ---------------------------------------------------------------------
 				// Axes
 				// ---------------------------------------------------------------------
 				const axes = new THREE.AxesHelper( 500 );
-				axes.name = "AxesHelper";
+				axes.name = 'AxesHelper';
 				scene1.add( axes );
 
 				// ---------------------------------------------------------------------
@@ -248,7 +242,7 @@
 				material.map = gradientTexture;
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 70, 10, 10 ), material );
 				sphere.position.set( 0, 0, 0 );
-				sphere.name = "Sphere";
+				sphere.name = 'Sphere';
 				scene1.add( sphere );
 
 				// Cylinder
@@ -258,7 +252,7 @@
 				} );
 				object = new THREE.Mesh( new THREE.CylinderGeometry( 10, 80, 100 ), material );
 				object.position.set( 200, 0, 0 );
-				object.name = "Cylinder";
+				object.name = 'Cylinder';
 				scene1.add( object );
 
 				// TorusKnot
@@ -268,7 +262,7 @@
 				} );
 				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 15, 40, 10 ), material );
 				object.position.set( - 200, 0, 0 );
-				object.name = "Cylinder";
+				object.name = 'Cylinder';
 				scene1.add( object );
 
 
@@ -280,13 +274,13 @@
 
 				object = new THREE.Mesh( new THREE.BoxGeometry( 40, 100, 100 ), material );
 				object.position.set( - 200, 0, 400 );
-				object.name = "Cube";
+				object.name = 'Cube';
 				scene1.add( object );
 
 				object2 = new THREE.Mesh( new THREE.BoxGeometry( 40, 40, 40, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
-				object2.name = "SubCube";
+				object2.name = 'SubCube';
 				object.add( object2 );
 
 
@@ -294,16 +288,16 @@
 				// Groups
 				// ---------------------------------------------------------------------
 				const group1 = new THREE.Group();
-				group1.name = "Group";
+				group1.name = 'Group';
 				scene1.add( group1 );
 
 				const group2 = new THREE.Group();
-				group2.name = "subGroup";
+				group2.name = 'subGroup';
 				group2.position.set( 0, 50, 0 );
 				group1.add( group2 );
 
 				object2 = new THREE.Mesh( new THREE.BoxGeometry( 30, 30, 30 ), material );
-				object2.name = "Cube in group";
+				object2.name = 'Cube in group';
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
 
@@ -406,7 +400,7 @@
 
 				const pointsMaterial = new THREE.PointsMaterial( { color: 0xffff00, size: 5 } );
 				const pointCloud = new THREE.Points( pointsGeo, pointsMaterial );
-				pointCloud.name = "Points";
+				pointCloud.name = 'Points';
 				pointCloud.position.set( - 200, 0, - 200 );
 				scene1.add( pointCloud );
 
@@ -455,7 +449,7 @@
 				} );
 				object = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
 				object.position.set( 0, 0, 0 );
-				object.name = "CubeHidden";
+				object.name = 'CubeHidden';
 				object.visible = false;
 				scene1.add( object );
 
@@ -479,7 +473,7 @@
 				scene2 = new THREE.Scene();
 				object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
 				object.position.set( 0, 0, 0 );
-				object.name = "Cube2ndScene";
+				object.name = 'Cube2ndScene';
 				scene2.name = 'Scene2';
 				scene2.add( object );
 
@@ -494,6 +488,61 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+
+				let h = gui.addFolder( 'Settings' );
+				h.add( params, 'trs' ).name( 'Use TRS' );
+				h.add( params, 'onlyVisible' ).name( 'Only Visible Objects' );
+				h.add( params, 'truncateDrawRange' ).name( 'Truncate Draw Range' );
+				h.add( params, 'binary' ).name( 'Binary (GLB)' );
+				h.add( params, 'maxTextureSize', 2, 8192 ).name( 'Max Texture Size' ).step( 1 );
+
+				h = gui.addFolder( 'Export' );
+				h.add( params, 'exportScene1' ).name( 'Export Scene 1' );
+				h.add( params, 'exportScenes' ).name( 'Export Scene 1 and 2' );
+				h.add( params, 'exportSphere' ).name( 'Export Sphere' );
+				h.add( params, 'exportHead' ).name( 'Export Head' );
+				h.add( params, 'exportObjects' ).name( 'Export Sphere With Grid' );
+				h.add( params, 'exportSceneObject' ).name( 'Export Scene 1 and Object' );
+
+				gui.open();
+
+			}
+
+			function exportScene1() {
+
+				exportGLTF( scene1 );
+
+			}
+
+			function exportScenes() {
+
+				exportGLTF( [ scene1, scene2 ] );
+
+			}
+
+			function exportSphere() {
+
+				exportGLTF( sphere );
+
+			}
+
+			function exportHead() {
+
+				exportGLTF( waltHead );
+
+			}
+
+			function exportObjects() {
+
+				exportGLTF( [ sphere, gridHelper ] );
+
+			}
+
+			function exportSceneObject() {
+
+				exportGLTF( [ scene1, gridHelper ] );
 
 			}
 

@@ -30,11 +30,11 @@ class WebGLPhysicalContextNode extends ContextNode {
 
 			roughness = new FloatNode( 1.0 ).setConst( true );
 
-			this.setContextValue( 'uv', new NormalNode( NormalNode.WORLD ) );
+			this.context.uv = new NormalNode( NormalNode.WORLD );
 
 		}
 
-		this.setContextValue( 'roughness', roughness );
+		this.context.roughness = roughness;
 
 		return super.generate( builder, output );
 

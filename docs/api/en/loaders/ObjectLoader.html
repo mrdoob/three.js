@@ -72,13 +72,13 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Object3D object].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the ProgressEvent instance, which contains .[page:Boolean lengthComputable], .[page:Integer total] and .[page:Integer loaded]. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
+		[page:Function onError] (optional) — Will be called when load errors.<br />
 		</p>
 		<p>
 		Begin loading from url and call onLoad with the parsed response content.
@@ -90,39 +90,39 @@
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 		[page:Function onLoad] — Will be called when parsed completes. The argument will be the parsed [page:Object3D object].<br /><br />
 
-		Parse a <em>JSON</em> structure and return a threejs object.
+		Parse a <em>JSON</em> structure and return a three.js object.
 		This is used internally by [page:.load]() but can also be used directly to parse a previously loaded JSON structure.
 		</p>
 
-		<h3>[method:Object3D parseGeometries]( [param:Object json] )</h3>
+		<h3>[method:Object parseGeometries]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used by [page:.parse]() to parse any [page:BufferGeometry geometries] in the JSON structure.
 		</p>
 
-		<h3>[method:Object3D parseMaterials]( [param:Object json] )</h3>
+		<h3>[method:Object parseMaterials]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used by [page:.parse]() to parse any materials in the JSON structure using [page:MaterialLoader].
 		</p>
 
-		<h3>[method:Object3D parseAnimations]( [param:Object json] )</h3>
+		<h3>[method:Object parseAnimations]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used by [page:.parse]() to parse any animations in the JSON structure, using [page:AnimationClip.parse]().
 		</p>
 
-		<h3>[method:Object3D parseImages]( [param:Object json] )</h3>
+		<h3>[method:Object parseImages]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used by [page:.parse]() to parse any images in the JSON structure, using [page:ImageLoader].
 		</p>
 
-		<h3>[method:Object3D parseTextures]( [param:Object json] )</h3>
+		<h3>[method:Object parseTextures]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 

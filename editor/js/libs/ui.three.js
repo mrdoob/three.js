@@ -1,4 +1,4 @@
-import * as THREE from '../../../build/three.module.js';
+import * as THREE from 'three';
 
 import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
@@ -35,14 +35,14 @@ class UITexture extends UISpan {
 
 			input.click();
 
-		}, false );
+		} );
 		canvas.addEventListener( 'drop', function ( event ) {
 
 			event.preventDefault();
 			event.stopPropagation();
 			loadFile( event.dataTransfer.files[ 0 ] );
 
-		}, false );
+		} );
 		this.dom.appendChild( canvas );
 
 		function loadFile( file ) {
@@ -50,13 +50,13 @@ class UITexture extends UISpan {
 			const extension = file.name.split( '.' ).pop().toLowerCase();
 			const reader = new FileReader();
 
-			if ( extension === 'hdr' ) {
+			if ( extension === 'hdr' || extension === 'pic' ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
 					// assuming RGBE/Radiance HDR iamge format
 
-					const loader = new RGBELoader().setDataType( THREE.FloatType );
+					const loader = new RGBELoader();
 					loader.load( event.target.result, function ( hdrTexture ) {
 
 						hdrTexture.sourceFile = file.name;
@@ -98,7 +98,6 @@ class UITexture extends UISpan {
 
 						const texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
-						texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
 						texture.needsUpdate = true;
 
 						scope.setValue( texture );
@@ -369,7 +368,7 @@ class UIOutliner extends UIDiv {
 
 			}
 
-		}, false );
+		} );
 
 		// Keybindings to support arrow navigation
 		this.dom.addEventListener( 'keyup', function ( event ) {
@@ -385,7 +384,7 @@ class UIOutliner extends UIDiv {
 
 			}
 
-		}, false );
+		} );
 
 		this.editor = editor;
 

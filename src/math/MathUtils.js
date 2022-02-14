@@ -57,11 +57,11 @@ function inverseLerp( x, y, value ) {
 
 		return ( value - x ) / ( y - x );
 
-		 } else {
+	} else {
 
 		return 0;
 
-		 }
+	}
 
 }
 

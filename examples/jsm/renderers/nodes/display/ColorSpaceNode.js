@@ -1,119 +1,91 @@
 import TempNode from '../core/Node.js';
-import CodeNode from '../core/CodeNode.js';
-import * as EncodingFunctions from '../functions/EncodingFunctions.js';
+import { ShaderNode,
+	vec3,
+	pow, mul, sub, mix, join,
+	lessThanEqual } from '../ShaderNode.js';
 
-import { LinearEncoding, sRGBEncoding, RGBEEncoding, RGBM7Encoding, RGBM16Encoding,
-	RGBDEncoding, GammaEncoding, LogLuvEncoding } from 'three';
+import { LinearEncoding, sRGBEncoding } from 'three';
 
-function getEncodingComponents ( encoding ) {
+export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
-	switch ( encoding ) {
+	return inputs.value;
 
-		case LinearEncoding:
-			return [ 'Linear' ];
-		case sRGBEncoding:
-			return [ 'sRGB' ];
-		case RGBEEncoding:
-			return [ 'RGBE' ];
-		case RGBM7Encoding:
-			return [ 'RGBM', new FloatNode( 7.0 ).setConst( true ) ];
-		case RGBM16Encoding:
-			return [ 'RGBM', new FloatNode( 16.0 ).setConst( true ) ];
-		case RGBDEncoding:
-			return [ 'RGBD', new FloatNode( 256.0 ).setConst( true ) ];
-		case GammaEncoding:
-			return [ 'Gamma', new CodeNode( 'float( GAMMA_FACTOR )' ) ];
-		case LogLuvEncoding:
-			return [ 'LogLuv' ];
+} );
 
-	}
+export const LinearTosRGB = new ShaderNode( ( inputs ) => {
 
-}
+	const { value } = inputs;
+
+	const rgb = value.rgb;
+
+	const a = sub( mul( pow( value.rgb, vec3( 0.41666 ) ), 1.055 ), vec3( 0.055 ) );
+	const b = mul( rgb, 12.92 );
+	const factor = vec3( lessThanEqual( rgb, vec3( 0.0031308 ) ) );
+
+	const rgbResult = mix( a, b, factor );
+
+	return join( rgbResult.r, rgbResult.g, rgbResult.b, value.a );
+
+} );
+
+const EncodingLib = {
+	LinearToLinear,
+	LinearTosRGB
+};
 
 class ColorSpaceNode extends TempNode {
 
 	static LINEAR_TO_LINEAR = 'LinearToLinear';
-
-	static GAMMA_TO_LINEAR = 'GammaToLinear';
-	static LINEAR_TO_GAMMA = 'LinearToGamma';
-
-	static SRGB_TO_LINEAR = 'sRGBToLinear';
 	static LINEAR_TO_SRGB = 'LinearTosRGB';
 
-	static RGBE_TO_LINEAR = 'RGBEToLinear';
-	static LINEAR_TO_RGBE = 'LinearToRGBE';
-
-	static RGBM_TO_LINEAR = 'RGBMToLinear';
-	static LINEAR_TO_RGBM = 'LinearToRGBM';
-
-	static RGBD_TO_LINEAR = 'RGBDToLinear';
-	static LINEAR_TO_RGBD = 'LinearToRGBD';
-
-	static LINEAR_TO_LOG_LUV = 'LinearToLogLuv';
-	static LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
-
-	constructor( method, input ) {
+	constructor( method, node ) {
 
 		super( 'vec4' );
 
 		this.method = method;
 
-		this.input = input;
-		this.factor = null;
+		this.node = node;
 
 	}
 
 	fromEncoding( encoding ) {
 
-		const components = getEncodingComponents( encoding );
+		let method = null;
 
-		this.method = 'LinearTo' + components[ 0 ];
-		this.factor = components[ 1 ];
+		if ( encoding === LinearEncoding ) {
 
-		return this;
+			method = 'Linear';
 
-	}
+		} else if ( encoding === sRGBEncoding ) {
 
-	fromDecoding( encoding ) {
+			method = 'sRGB';
 
-		const components = getEncodingComponents( encoding );
+		}
 
-		this.method = components[ 0 ] + 'ToLinear';
-		this.factor = components[ 1 ];
+		this.method = 'LinearTo' + method;
 
 		return this;
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
+
+		const type = this.getNodeType( builder );
 
 		const method = this.method;
-		const input = this.input;
+		const node = this.node;
 
 		if ( method !== ColorSpaceNode.LINEAR_TO_LINEAR ) {
 
-			const nodeData = builder.getDataFromNode( this );
+			const encodingFunctionNode = EncodingLib[ method ];
 
-			let encodingFunctionCallNode = nodeData.encodingFunctionCallNode;
-
-			if (encodingFunctionCallNode === undefined) {
-
-				const encodingFunctionNode = EncodingFunctions[ method ];
-
-				encodingFunctionCallNode = encodingFunctionNode.call( {
-					value: input,
-					factor: this.factor
-				} );
-
-				nodeData.encodingFunctionCallNode = encodingFunctionCallNode;
-
-			}
-
-			return encodingFunctionCallNode.build( builder, output );
+			return encodingFunctionNode( {
+				value: node
+			} ).build( builder, type );
 
 		} else {
 
-			return input.build( builder, output );
+			return node.build( builder, type );
 
 		}
 

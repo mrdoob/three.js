@@ -13,11 +13,23 @@
 			Drag-and-drop JPG, PNG, or EXR MatCap image files<br/>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
@@ -62,9 +74,7 @@
 				const manager = new THREE.LoadingManager( render );
 
 				// matcap
-				const loaderEXR = new EXRLoader( manager )
-					.setDataType( THREE.UnsignedByteType ); // default: FloatType
-
+				const loaderEXR = new EXRLoader( manager );
 				const matcap = loaderEXR.load( 'textures/matcaps/040full.exr' );
 
 				// normalmap
@@ -184,7 +194,7 @@
 
 				const loader = new EXRLoader();
 
-				loader.setDataType( THREE.UnsignedByteType ); // default: FloatType
+				loader.setDataType( THREE.HalfFloatType );
 
 				const texData = loader.parse( contents );
 
@@ -196,29 +206,11 @@
 
 				texture.format = texData.format;
 				texture.type = texData.type;
-
-				switch ( texture.type ) {
-
-					case THREE.UnsignedByteType:
-
-						texture.encoding = THREE.RGBEEncoding;
-						texture.minFilter = THREE.NearestFilter;
-						texture.magFilter = THREE.NearestFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-					case THREE.FloatType:
-					case THREE.HalfFloatType:
-
-						texture.encoding = THREE.LinearEncoding;
-						texture.minFilter = THREE.LinearFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-				}
+				texture.encoding = THREE.LinearEncoding;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = false;
 
 				updateMatcap( texture );
 

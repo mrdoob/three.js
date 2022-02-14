@@ -22,7 +22,29 @@
 
 	const _sphere = new THREE.Sphere();
 
-	const _clipToWorldVector = new THREE.Vector4();
+	const _clipToWorldVector = new THREE.Vector4(); // Returns the margin required to expand by in world space given the distance from the camera,
+	// line width, resolution, and camera projection
+
+
+	function getWorldSpaceHalfWidth( camera, distance, lineWidth, resolution ) {
+
+		// transform into clip space, adjust the x and y values by the pixel width offset, then
+		// transform back into world space to get world offset. Note clip space is [-1, 1] so full
+		// width does not need to be halved.
+		_clipToWorldVector.set( 0, 0, - distance, 1.0 ).applyMatrix4( camera.projectionMatrix );
+
+		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
+
+		_clipToWorldVector.x = lineWidth / resolution.width;
+		_clipToWorldVector.y = lineWidth / resolution.height;
+
+		_clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
+
+		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
+
+		return Math.abs( Math.max( _clipToWorldVector.x, _clipToWorldVector.y ) );
+
+	}
 
 	class LineSegments2 extends THREE.Mesh {
 
@@ -84,10 +106,7 @@
 			const instanceStart = geometry.attributes.instanceStart;
 			const instanceEnd = geometry.attributes.instanceEnd; // camera forward is negative
 
-			const near = - camera.near; // clip space is [ - 1, 1 ] so multiply by two to get the full
-			// width in clip space
-
-			const ssMaxWidth = 2.0 * Math.max( lineWidth / resolution.width, lineWidth / resolution.height ); //
+			const near = - camera.near; //
 			// check if we intersect the sphere bounds
 
 			if ( geometry.boundingSphere === null ) {
@@ -98,16 +117,9 @@
 
 			_sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
 
-			const distanceToSphere = Math.max( camera.near, _sphere.distanceToPoint( ray.origin ) ); // get the w component to scale the world space line width
+			const distanceToSphere = Math.max( camera.near, _sphere.distanceToPoint( ray.origin ) ); // increase the sphere bounds by the worst case line screen space width
 
-			_clipToWorldVector.set( 0, 0, - distanceToSphere, 1.0 ).applyMatrix4( camera.projectionMatrix );
-
-			_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
-
-			_clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse ); // increase the sphere bounds by the worst case line screen space width
-
-
-			const sphereMargin = Math.abs( ssMaxWidth / _clipToWorldVector.w ) * 0.5;
+			const sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, lineWidth, resolution );
 			_sphere.radius += sphereMargin;
 
 			if ( raycaster.ray.intersectsSphere( _sphere ) === false ) {
@@ -126,16 +138,9 @@
 
 			_box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
 
-			const distanceToBox = Math.max( camera.near, _box.distanceToPoint( ray.origin ) ); // get the w component to scale the world space line width
+			const distanceToBox = Math.max( camera.near, _box.distanceToPoint( ray.origin ) ); // increase the box bounds by the worst case line screen space width
 
-			_clipToWorldVector.set( 0, 0, - distanceToBox, 1.0 ).applyMatrix4( camera.projectionMatrix );
-
-			_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
-
-			_clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse ); // increase the sphere bounds by the worst case line screen space width
-
-
-			const boxMargin = Math.abs( ssMaxWidth / _clipToWorldVector.w ) * 0.5;
+			const boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, lineWidth, resolution );
 			_box.max.x += boxMargin;
 			_box.max.y += boxMargin;
 			_box.max.z += boxMargin;
@@ -186,7 +191,7 @@
 				_end4.applyMatrix4( _mvMatrix ); // skip the segment if it's entirely behind the camera
 
 
-				var isBehindCameraNear = _start4.z > near && _end4.z > near;
+				const isBehindCameraNear = _start4.z > near && _end4.z > near;
 
 				if ( isBehindCameraNear ) {
 
@@ -276,7 +281,7 @@
 
 	}
 
-	LineSegments2.prototype.LineSegments2 = true;
+	LineSegments2.prototype.isLineSegments2 = true;
 
 	THREE.LineSegments2 = LineSegments2;
 

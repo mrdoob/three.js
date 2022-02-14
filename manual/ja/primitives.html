@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のプリミティブ</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のプリミティブ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のプリミティブ</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>この記事はthree.jsについてのシリーズ記事の一つです。
+最初の記事は<a href="fundamentals.html">Three.jsの基礎知識</a>です。
+まだ読んでない人は、そちらから先に読んでみるといいかもしれません。</p>
+<p>Three.jsは多くのプリミティブがあります。
+プリミティブは、3D形状のことで、一般的に、実行時に複数のパラメータを指定して生成されます。</p>
+<p>地球儀の球体や、3Dグラフを描くための箱の集まりのようなものに、プリミティブはよく使われます。
+特に、プリミティブを使って実験して、3Dを始めるのが一般的です。
+3Dアプリケーションの多くは、3Dモデルを<a href="https://blender.org">Blender</a>や
+<a href="https://www.autodesk.com/products/maya/">Maya</a>や
+<a href="https://www.maxon.net/en-us/products/cinema-4d/">Cinema 4D</a>といった
+3Dモデリングプログラムを使って、アーティストに作ってもらう方が一般的です。
+このシリーズの後半では、いくつかの3Dモデリングプログラムからデータを作って
+読み込む方法もカバーするつもりです。
+では、three.jsで利用できるプリミティブについて説明しましょう。</p>
+<p>以下のプリミティブの多くは、一部または全てのパラメータにデフォルト値が設定されています。
+そのため、必要に応じて、上手く使い分けることができます。</p>
+<div id="Diagram-BoxGeometry" data-primitive="BoxGeometry">立方体</div>
+<div id="Diagram-CircleGeometry" data-primitive="CircleGeometry">2次元の円</div>
+<div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">円錐</div>
+<div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">円筒</div>
+<div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">十二面体（12面のもの）</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">
+押し出しでできた2次元形状、ベベルオプション付き。
+これは<a href="/docs/#api/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>と<a href="/docs/#api/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>のそれぞれの基礎になることに注意してください。</div>
+<div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">二十面体（20面のもの）</div>
+<div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">線を回転させてできる形状。例としてはこんなところでしょうか：ランプやボーリングのピン、ろうそく、ろうそく立て、ワイングラス、ドリンクグラス、などなど...。点の連続として2次元の輪郭を与え、その輪郭を軸の周りで回転させる際に、どのくらい細分化するかthree.jsに指示することができます。</div>
+<div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">八面体（8面）</div>
+<div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">関数を与えることでできる表面。この関数は、グリッド上2次元の点を引数に取り、対応する3次元の点を返す。</div>
+<div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">2次元の四角形</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">三角形を点の周りに集めて球体にする</div>
+<div id="Diagram-RingGeometry" data-primitive="RingGeometry">真ん中に穴のあいた円盤</div>
+<div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">三角形分割された2次元の輪郭</div>
+<div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">球体</div>
+<div id="Diagram-TetrahedronGeometry" data-primitive="TetrahedronGeometry">四面体（4面のもの）</div>
+<div id="Diagram-TextGeometry" data-primitive="TextGeometry">3Dフォントと文字列からできた、3Dテキスト</div>
+<div id="Diagram-TorusGeometry" data-primitive="TorusGeometry">円環（ドーナツ）</div>
+<div id="Diagram-TorusKnotGeometry" data-primitive="TorusKnotGeometry">円環（結び目）</div>
+<div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">経路をなぞらせた管</div>
+<div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">異なるジオメトリを入力として、その面同士の角度が閾値以上なら角を作り出す、補助オブジェクト。例えば、記事の最初の方で紹介した立方体を見てみると、それぞれの面に、立方体を作っている全ての三角形の線が表示されています。<a href="/docs/#api/ja/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>を代わりに使うことで、面内の線は全て除去されます。下記のthresholdAngleを調整してみてください。閾値以下の角が消えて見えるでしょう。</div>
+<div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">1つの角ごとに1つの線分（2点）を持つジオメトリを生成する。WebGLは線分を作るのに2点が必要なので、この機能がないと、しばしば角を忘れたり、余分な角を作ってしまうでしょう。例えば、たった3点しかない1つの三角形あるとします。<code class="notranslate" translate="no">wireframe: true</code>のマテリアルを使ってそれを描こうとした場合、1本の線分しか得られません。<a href="/docs/#api/ja/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>にその三角形のジオメトリを渡すと、6点からなる3つの線分を持った新しいジオメトリを生成します。</div>
+
+<p><a href="custom-buffergeometry.html">別の記事</a>で、カスタムジオメトリの作成について説明します。
+今はそれぞれの種類のプリミティブを作成する例を作ってみます。
+<a href="responsive.html">以前の記事</a>を例に始めましょう。</p>
+<p>最初の方で、背景色を指定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++scene.background = new THREE.Color(0xAAAAAA);
+</pre>
+<p>これでthree.jsに、透明からライトグレーに変えるように伝えます。</p>
+<p>全てのオブジェクトを見られるよう、カメラの位置も変える必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const fov = 75;
++const fov = 40;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+-const far = 5;
++const far = 1000;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.z = 120;
+</pre>
+<p><code class="notranslate" translate="no">addObject</code>関数を加えましょう。これはx座標とy座標と<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>を取り、シーンにオブジェクトを追加します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const objects = [];
+const spread = 15;
+
+function addObject(x, y, obj) {
+  obj.position.x = x * spread;
+  obj.position.y = y * spread;
+
+  scene.add(obj);
+  objects.push(obj);
+}
+</pre>
+<p>ランダムに色付けされたマテリアルを作る関数も作成してみましょう。
+色相、彩度、輝度に基づいて色を設定できる、<a href="/docs/#api/ja/math/Color"><code class="notranslate" translate="no">Color</code></a>の機能を使ってみます。</p>
+<p><code class="notranslate" translate="no">hue</code>は色相環を0から1まで変化します。赤は0、緑は.33、青は.66です。
+<code class="notranslate" translate="no">saturation</code>は0から1まで変化します。0 は無色で、1は最も彩度の高いです。
+<code class="notranslate" translate="no">luminance</code>は0から1まで変化します。0は黒、1は白、0.5が色の最大量になります。
+言い換えると、<code class="notranslate" translate="no">luminance</code>が0.0から0.5に変化するにつれて、色は黒から<code class="notranslate" translate="no">hue</code>に
+変わります。0.5から1.0に変化するにつれて、<code class="notranslate" translate="no">hue</code>から白に変化します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function createMaterial() {
+  const material = new THREE.MeshPhongMaterial({
+    side: THREE.DoubleSide,
+  });
+
+  const hue = Math.random();
+  const saturation = 1;
+  const luminance = .5;
+  material.color.setHSL(hue, saturation, luminance);
+
+  return material;
+}
+</pre>
+<p>私たちは<code class="notranslate" translate="no">side: THREE.DoubleSide</code>もマテリアルに渡しました。
+これはthreeに形状を作るときに三角形の両面を描くように指示します。
+球体や立方体のような立体形状には、形状の内側を向いている裏側を描く
+理由はありません。
+しかしこの例だと、2次元で裏側が存在しない<a href="/docs/#api/ja/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a>や<a href="/docs/#api/ja/geometries/ShapeGeometry"><code class="notranslate" translate="no">ShapeGeometry</code></a>のようなものも描こうとしています。
+<code class="notranslate" translate="no">side: THREE.DoubleSide</code>を設定しないと、裏側を見たときに消えてしまうことでしょう。</p>
+<p><code class="notranslate" translate="no">side: THREE.DoubleSide</code>に<strong>not</strong>が設定された方が、描画が速くなります。
+そのため、理想的には本当に必要なときだけ設定するのが良いことを注記しておきます。
+しかしこの例だと、そんなにたくさん描画しないので心配ありません。</p>
+<p><code class="notranslate" translate="no">addSolidGeometry</code>関数を作りましょう。ジオメトリを渡すと<code class="notranslate" translate="no">createMaterial</code>によってランダムに色が付いたマテリアルを作り、<code class="notranslate" translate="no">addObject</code>によってシーンに追加してくれます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addSolidGeometry(x, y, geometry) {
+  const mesh = new THREE.Mesh(geometry, createMaterial());
+  addObject(x, y, mesh);
+}
+</pre>
+<p>これで私たちの作るプリミティブの大多数に、この関数が使用できます。
+例えば、立方体を作ってみます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const width = 8;
+  const height = 8;
+  const depth = 8;
+  addSolidGeometry(-2, -2, new THREE.BoxGeometry(width, height, depth));
+}
+</pre>
+<p>下記のコードを覗いてみると、それぞれの種類のジオメトリに対して、同じような箇所があります。</p>
+<p>結果はこのようになります：</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/primitives.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>上記のパターンには、2つの特筆すべき例外があります。
+一番大きなものは、たぶん<a href="/docs/#api/ja/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>です。テキストのメッシュを作るときは、事前に3Dフォントデータを読み込む必要があります。このデータの読み込みは非同期的に行われるので、ジオメトリを作ろうとする前に、読み込みを待つ必要があります。フォントの読み込みにpromiseを使うと、もっと速く読み込むことができます。
+<a href="/docs/#api/ja/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a>を作成し、読み込みが完了するとフォントを提供してくれるpromiseを返す<code class="notranslate" translate="no">loadFont</code>関数を作ります。
+次に、<code class="notranslate" translate="no">doit</code> と呼ばれる<code class="notranslate" translate="no">async</code>関数を作り、<code class="notranslate" translate="no">await</code>を使ってフォントを読み込みます。
+最後に、ジオメトリを作り、<code class="notranslate" translate="no">addObject</code>を呼んでシーンに追加します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new FontLoader();
+  // promisify font loading
+  function loadFont(url) {
+    return new Promise((resolve, reject) =&gt; {
+      loader.load(url, resolve, undefined, reject);
+    });
+  }
+
+  async function doit() {
+    const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');  /* threejs.org: url */
+    const geometry = new TextGeometry('three.js', {
+      font: font,
+      size: 3.0,
+      height: .2,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.15,
+      bevelSize: .3,
+      bevelSegments: 5,
+    });
+    const mesh = new THREE.Mesh(geometry, createMaterial());
+    geometry.computeBoundingBox();
+    geometry.boundingBox.getCenter(mesh.position).multiplyScalar(-1);
+
+    const parent = new THREE.Object3D();
+    parent.add(mesh);
+
+    addObject(-1, -1, parent);
+  }
+  doit();
+}
+</pre>
+<p>また、もう一つ違いがあります。私たちはテキストを、自身の中心の周りで回転させたかったのですが、
+three.jsはデフォルトで、テキストを左端中心に回転するよう作成します。
+これを回避するため、three.jsにジオメトリのバウンディングボックスの計算をさせることができます。
+バウンディングボックスの<code class="notranslate" translate="no">getCenter</code>メソッドを呼ぶことができるので、それにメッシュの位置オブジェクトに渡します。
+すると、<code class="notranslate" translate="no">getCenter</code>が箱の中心をその位置にコピーします。このとき、位置オブジェクトも返すので、回転の中心が物体の中心になるように、オブジェクト全体の位置に対して<code class="notranslate" translate="no">multiplyScalar(-1)</code>を呼ぶことができます。</p>
+<p>これだと、もし先の例のように<code class="notranslate" translate="no">addSolidGeometry</code>を呼ぶと、
+再び位置が設定されてしまいますが、それはよくありませんよね。
+そのためこの例では、three.jsのシーングラフの標準的なノードである<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>を作ります。
+<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>は同様に<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>を継承しています。
+<a href="scenegraph.html">別の記事</a>でどのようにシーングラフが働くかカバーします。
+今はとりあえず、DOMノードのように、子ノードは親ノードと関連して描画されると知っていれば十分です。
+<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>を作成し、メッシュをその子にすることで、どこにでも<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>に配置し、
+先ほど設定した中心のオフセットを維持したままにできます。</p>
+<p>こうしないと、テキストが中央からずれて回ってしまうことになります。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives-text.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/primitives-text.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>左側のものは自身の中心の周りを回転していませんが、右側のものはそうなっていることに
+注意してください。</p>
+<p>もう一つの例外は、<a href="/docs/#api/ja/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>と<a href="/docs/#api/ja/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>の、2つの直線に基づいた例です。
+<code class="notranslate" translate="no">addSolidGeometry</code>を呼ぶ代わりに、このように<code class="notranslate" translate="no">addLineGeometry</code>を呼んでいます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addLineGeometry(x, y, geometry) {
+  const material = new THREE.LineBasicMaterial({color: 0x000000});
+  const mesh = new THREE.LineSegments(geometry, material);
+  addObject(x, y, mesh);
+}
+</pre>
+<p>黒色の<a href="/docs/#api/ja/materials/LineBasicMaterial"><code class="notranslate" translate="no">LineBasicMaterial</code></a>を作り、次に<a href="/docs/#api/ja/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>オブジェクトを作成しています。
+これは<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>のラッパーで、あなたが線分（線分あたり2点）を描画しようとしていることを
+threeが知る手助けをします。</p>
+<p>プリミティブのそれぞれは、作成時に渡すことができる複数のパラメーターを持っていて、
+ここで繰り返し説明するよりも<a href="https://threejs.org/docs/">このドキュメント</a>を覗いてもらうのが最善です。
+また、各形状の横にある上記のリンクをクリックすると、その形状のドキュメントに直接案内されます。</p>
+<p>上記パターンに全然当てはまらないクラスの組があります。
+それは<a href="/docs/#api/ja/materials/PointsMaterial"><code class="notranslate" translate="no">PointsMaterial</code></a>と<a href="/docs/#api/ja/objects/Points"><code class="notranslate" translate="no">Points</code></a>クラスです。<a href="/docs/#api/ja/objects/Points"><code class="notranslate" translate="no">Points</code></a>は<a href="/docs/#api/ja/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>に似ていて、
+<code class="notranslate" translate="no">Geometry</code>か<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を引数に取ります。しかし、線の代わりに各頂点の点を描画します。
+使うためには、<a href="/docs/#api/ja/materials/PointsMaterial"><code class="notranslate" translate="no">PointsMaterial</code></a>も渡す必要があります。
+これは、点をどれくらい大きくするか決めるため<a href="/docs/#api/ja/materials/PointsMaterial#size"><code class="notranslate" translate="no">size</code></a> を引数に取ります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const radius = 7;
+const widthSegments = 12;
+const heightSegments = 8;
+const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+const material = new THREE.PointsMaterial({
+    color: 'red',
+    size: 0.2,     // in world units
+});
+const points = new THREE.Points(geometry, material);
+scene.add(points);
+</pre>
+<div class="spread">
+<div data-diagram="Points"></div>
+</div>
+
+<p>カメラからの距離に関わらず点の大きさを同じにしたいなら、<a href="/docs/#api/ja/materials/PointsMaterial#sizeAttenuation"><code class="notranslate" translate="no">sizeAttenuation</code></a> をfalseにすることで、サイズ変更を止めることができます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.PointsMaterial({
+    color: 'red',
++    sizeAttenuation: false,
++    size: 3,       // in pixels
+-    size: 0.2,     // in world units
+});
+...
+</pre>
+<div class="spread">
+<div data-diagram="PointsUniformSize"></div>
+</div>
+
+<p>もう一つ説明が必要な大切なことは、ほとんど全部の形状が、
+どのくらい細分化するか決めるための設定を持っていることです。
+球体のジオメトリが良い例かもしれません。
+球体は周囲と上下にどのくらい分割するかのパラメータがあります。
+例えば、</p>
+<div class="spread">
+<div data-diagram="SphereGeometryLow"></div>
+<div data-diagram="SphereGeometryMedium"></div>
+<div data-diagram="SphereGeometryHigh"></div>
+</div>
+
+<p>最初の球体は、15セグメントまたは30個の三角形になる、周囲に5セグメント、高さ3です。
+二つ目の球体は、240セグメントまたは480個の三角形になる、周囲に24セグメント、高さ10です。です。
+最後の球体は、2500セグメントまたは5000個の三角形になる、周囲に50セグメント、高さ50です。</p>
+<p>どのくらい分割が必要かは、みなさんが決めることです。
+多くのセグメントが必要なように見えるかもしれませんが、線を除去して、
+影をならすことで、このようになります。</p>
+<div class="spread">
+<div data-diagram="SphereGeometryLowSmooth"></div>
+<div data-diagram="SphereGeometryMediumSmooth"></div>
+<div data-diagram="SphereGeometryHighSmooth"></div>
+</div>
+
+<p>5000個の三角形からできる右側の球体が、たった480個の三角形からできる真ん中の球体よりも良いかは、明らかではありません。
+地球の地図のために1個の地球儀を作るときのように、もし少ない数の球体を描くだけなら、
+10000個の三角形の球体でも悪い選択ではありません。
+一方で、1000個の球体を書こうとしているなら、1000個の球体におのおの10000個の三角形が
+かかり、一千万個の三角形になります。
+滑らかに動かすにはブラウザが一秒間に60フレーム描画する必要があるため、
+ブラウザは1秒間に6億個の三角形を描画する必要があります。
+それは計算が多すぎます。</p>
+<p>選ぶのが簡単なときもあります。例えば、平面の細分化を選ぶこともできます。</p>
+<div class="spread">
+<div data-diagram="PlaneGeometryLow"></div>
+<div data-diagram="PlaneGeometryHigh"></div>
+</div>
+
+<p>左側の四角形は2個の三角形からできています。右側の四角形は200個の三角形からできています。
+球体のときと異なり、四角形の場合だと、質的なトレードオフは全くありません。
+いくつかの用途で、たいてい四角形を改造したり歪めたりしたいと思っているときに、細分化するだけで良いでしょう。
+立方体も同様です。</p>
+<p>みなさんの状況にふさわしいものを選びましょう。
+物体は、選んだ細分化が小さいほど、より滑らかに動いて、省メモリになることでしょう。
+あなたの特定の状況にふさわしい、正しいトレードオフは何か、決めなければいけません。</p>
+<p>みなさんの用途に適した形状がないなら、例えば、<a href="load-obj.html">.obj file</a>
+や<a href="load-gltf.html">.gltf file</a>からジオメトリを読み込むことができます。
+<a href="custom-buffergeometry.html">カスタムBufferGeometry</a>を作ることもできます。</p>
+<p>次は、<a href="scenegraph.html">threeのシーングラフの動き方と使い方</a>を説明します。</p>
+<p><link rel="stylesheet" href="../resources/threejs-primitives.css"></p>
+<script type="module" src="../resources/threejs-primitives.js"></script>
+
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

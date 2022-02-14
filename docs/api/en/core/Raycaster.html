@@ -18,22 +18,22 @@
 		<h2>Code Example</h2>
 		<code>
 		const raycaster = new THREE.Raycaster();
-		const mouse = new THREE.Vector2();
+		const pointer = new THREE.Vector2();
 
-		function onMouseMove( event ) {
+		function onPointerMove( event ) {
 
-			// calculate mouse position in normalized device coordinates
+			// calculate pointer position in normalized device coordinates
 			// (-1 to +1) for both components
 
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 		}
 
 		function render() {
 
-			// update the picking ray with the camera and mouse position
-			raycaster.setFromCamera( mouse, camera );
+			// update the picking ray with the camera and pointer position
+			raycaster.setFromCamera( pointer, camera );
 
 			// calculate objects intersecting the picking ray
 			const intersects = raycaster.intersectObjects( scene.children );
@@ -48,7 +48,7 @@
 
 		}
 
-		window.addEventListener( 'mousemove', onMouseMove, false );
+		window.addEventListener( 'pointermove', onPointerMove );
 
 		window.requestAnimationFrame(render);
 
@@ -70,7 +70,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] ) {</h3>
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] )</h3>
 		<p>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The direction vector that gives direction to the ray. Should be normalized.<br />
@@ -139,7 +139,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<h3>[method:undefined set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The normalized direction vector that gives direction to the ray.
@@ -148,7 +148,7 @@
 		Updates the ray with a new origin and direction. Please note that this method only copies the values from the arguments.
 		</p>
 
-		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
+		<h3>[method:undefined setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
 		<p>
 		[page:Vector2 coords] — 2D coordinates of the mouse, in normalized device coordinates (NDC)---X and Y components should be between -1 and 1.<br />
 		[page:Camera camera] — camera from which the ray should originate

@@ -12,10 +12,10 @@
 
 	class CSS3DObject extends THREE.Object3D {
 
-		constructor( element ) {
+		constructor( element = document.createElement( 'div' ) ) {
 
 			super();
-			this.element = element || document.createElement( 'div' );
+			this.element = element;
 			this.element.style.position = 'absolute';
 			this.element.style.pointerEvents = 'auto';
 			this.element.style.userSelect = 'none';
@@ -75,7 +75,7 @@
 
 	class CSS3DRenderer {
 
-		constructor() {
+		constructor( parameters = {} ) {
 
 			const _this = this;
 
@@ -90,7 +90,7 @@
 				},
 				objects: new WeakMap()
 			};
-			const domElement = document.createElement( 'div' );
+			const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
 			domElement.style.overflow = 'hidden';
 			this.domElement = domElement;
 			const cameraElement = document.createElement( 'div' );
@@ -181,57 +181,62 @@
 
 				if ( object.isCSS3DObject ) {
 
-					object.onBeforeRender( _this, scene, camera );
-					let style;
+					const visible = object.visible && object.layers.test( camera.layers );
+					object.element.style.display = visible ? '' : 'none'; // only getObjectCSSMatrix when object.visible
 
-					if ( object.isCSS3DSprite ) {
+					if ( visible ) {
 
-						// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
-						_matrix.copy( camera.matrixWorldInverse );
+						object.onBeforeRender( _this, scene, camera );
+						let style;
 
-						_matrix.transpose();
+						if ( object.isCSS3DSprite ) {
 
-						if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
-						object.matrixWorld.decompose( _position, _quaternion, _scale );
+							// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
+							_matrix.copy( camera.matrixWorldInverse );
 
-						_matrix.setPosition( _position );
+							_matrix.transpose();
 
-						_matrix.scale( _scale );
+							if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
+							object.matrixWorld.decompose( _position, _quaternion, _scale );
 
-						_matrix.elements[ 3 ] = 0;
-						_matrix.elements[ 7 ] = 0;
-						_matrix.elements[ 11 ] = 0;
-						_matrix.elements[ 15 ] = 1;
-						style = getObjectCSSMatrix( _matrix );
+							_matrix.setPosition( _position );
 
-					} else {
+							_matrix.scale( _scale );
 
-						style = getObjectCSSMatrix( object.matrixWorld );
+							_matrix.elements[ 3 ] = 0;
+							_matrix.elements[ 7 ] = 0;
+							_matrix.elements[ 11 ] = 0;
+							_matrix.elements[ 15 ] = 1;
+							style = getObjectCSSMatrix( _matrix );
+
+						} else {
+
+							style = getObjectCSSMatrix( object.matrixWorld );
+
+						}
+
+						const element = object.element;
+						const cachedObject = cache.objects.get( object );
+
+						if ( cachedObject === undefined || cachedObject.style !== style ) {
+
+							element.style.transform = style;
+							const objectData = {
+								style: style
+							};
+							cache.objects.set( object, objectData );
+
+						}
+
+						if ( element.parentNode !== cameraElement ) {
+
+							cameraElement.appendChild( element );
+
+						}
+
+						object.onAfterRender( _this, scene, camera );
 
 					}
-
-					const element = object.element;
-					const cachedObject = cache.objects.get( object );
-
-					if ( cachedObject === undefined || cachedObject.style !== style ) {
-
-						element.style.transform = style;
-						const objectData = {
-							style: style
-						};
-						cache.objects.set( object, objectData );
-
-					}
-
-					element.style.display = object.visible ? '' : 'none';
-
-					if ( element.parentNode !== cameraElement ) {
-
-						cameraElement.appendChild( element );
-
-					}
-
-					object.onAfterRender( _this, scene, camera );
 
 				}
 

@@ -12,11 +12,23 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { LightProbeGenerator } from './jsm/lights/LightProbeGenerator.js';
@@ -115,15 +127,9 @@
 
 
 				// gui
-				gui = new GUI();
+				gui = new GUI( { title: 'Intensity' } );
 
-				gui.width = 300;
-
-				gui.domElement.style.userSelect = 'none';
-
-				const fl = gui.addFolder( 'Intensity' );
-
-				fl.add( API, 'lightProbeIntensity', 0, 1, 0.02 )
+				gui.add( API, 'lightProbeIntensity', 0, 1, 0.02 )
 					.name( 'light probe' )
 					.onChange( function () {
 
@@ -131,7 +137,7 @@
 
 					} );
 
-				fl.add( API, 'directionalLightIntensity', 0, 1, 0.02 )
+				gui.add( API, 'directionalLightIntensity', 0, 1, 0.02 )
 					.name( 'directional light' )
 					.onChange( function () {
 
@@ -139,15 +145,13 @@
 
 					} );
 
-				fl.add( API, 'envMapIntensity', 0, 1, 0.02 )
+				gui.add( API, 'envMapIntensity', 0, 1, 0.02 )
 					.name( 'envMap' )
 					.onChange( function () {
 
 						mesh.material.envMapIntensity = API.envMapIntensity; render();
 
 					} );
-
-				fl.open();
 
 				// listener
 				window.addEventListener( 'resize', onWindowResize );

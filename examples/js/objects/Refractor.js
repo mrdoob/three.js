@@ -11,7 +11,8 @@
 			const textureWidth = options.textureWidth || 512;
 			const textureHeight = options.textureHeight || 512;
 			const clipBias = options.clipBias || 0;
-			const shader = options.shader || Refractor.RefractorShader; //
+			const shader = options.shader || Refractor.RefractorShader;
+			const multisample = options.multisample || 4; //
 
 			const virtualCamera = new THREE.PerspectiveCamera();
 			virtualCamera.matrixAutoUpdate = false;
@@ -20,16 +21,16 @@
 			const refractorPlane = new THREE.Plane();
 			const textureMatrix = new THREE.Matrix4(); // render target
 
-			const parameters = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBFormat
-			};
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
+			let renderTarget;
 
-			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
+			if ( multisample > 0 ) {
 
-				renderTarget.texture.generateMipmaps = false;
+				renderTarget = new THREE.WebGLMultisampleRenderTarget( textureWidth, textureHeight );
+				renderTarget.samples = multisample;
+
+			} else {
+
+				renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight );
 
 			} // material
 
@@ -186,6 +187,13 @@
 			this.getRenderTarget = function () {
 
 				return renderTarget;
+
+			};
+
+			this.dispose = function () {
+
+				renderTarget.dispose();
+				scope.material.dispose();
 
 			};
 

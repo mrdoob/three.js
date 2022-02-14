@@ -18,7 +18,7 @@
 
 				<div id="sections">
 					<span class="selected">docs</span>
-					<a href="../examples/#webgl_animation_cloth">examples</a>
+					<a href="../examples/#webgl_animation_keyframes">examples</a>
 				</div>
 
 				<div id="expandButton"></div>
@@ -72,7 +72,7 @@
 
 			// *BufferGeometry to *Geometry
 
-			if ( /Instanced/.exec( window.location.hash ) !== null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+			if ( /Instanced/.exec( window.location.hash ) === null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
 
 				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
 
@@ -404,7 +404,7 @@
 
 			if ( search ) {
 
-				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
 				sectionLink.href = `${link}?q=${search}`;
 
 			} else {
@@ -458,7 +458,7 @@
 
 		// Routing
 
-		function setUrlFragment( pageName ) { // eslint-disable-line no-undef
+		function setUrlFragment( pageName ) { // eslint-disable-line no-unused-vars
 
 			// Handle navigation from the subpages (iframes):
 			// First separate the member (if existing) from the page name,
@@ -498,7 +498,7 @@
 			const oldIframe = iframe;
 			iframe = oldIframe.cloneNode();
 
-			if ( hash ) {
+			if ( hash && titles[ splitHash[ 0 ] ] ) {
 
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';

@@ -14,7 +14,7 @@ struct PhysicalMaterial {
 	#endif
 
 	#ifdef USE_SHEEN
-		vec3 sheenTint;
+		vec3 sheenColor;
 		float sheenRoughness;
 	#endif
 
@@ -22,6 +22,26 @@ struct PhysicalMaterial {
 
 // temporary
 vec3 clearcoatSpecular = vec3( 0.0 );
+vec3 sheenSpecular = vec3( 0.0 );
+
+// This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from 
+// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
+// in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
+float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness) {
+
+	float dotNV = saturate( dot( normal, viewDir ) );
+
+	float r2 = roughness * roughness;
+
+	float a = roughness < 0.25 ? -339.2 * r2 + 161.4 * roughness - 25.9 : -8.48 * r2 + 14.3 * roughness - 9.95;
+
+	float b = roughness < 0.25 ? 44.0 * r2 - 23.7 * roughness + 3.26 : 1.97 * r2 - 3.27 * roughness + 0.72;
+
+	float DG = exp( a * dotNV + b ) + ( roughness < 0.25 ? 0.0 : 0.1 * ( roughness - 0.25 ) );
+
+	return saturate( DG * RECIPROCAL_PI );
+
+}
 
 // Analytical approximation of the DFG LUT, one half of the
 // split-sum approximation used in indirect specular lighting.
@@ -133,7 +153,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#ifdef USE_SHEEN
 
-		reflectedLight.directSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenTint, material.sheenRoughness );
+		sheenSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenColor, material.sheenRoughness );
 
 	#endif
 
@@ -154,6 +174,12 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	#ifdef USE_CLEARCOAT
 
 		clearcoatSpecular += clearcoatRadiance * EnvironmentBRDF( geometry.clearcoatNormal, geometry.viewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+
+	#endif
+
+	#ifdef USE_SHEEN
+
+		sheenSpecular += irradiance * material.sheenColor * IBLSheenBRDF( geometry.normal, geometry.viewDir, material.sheenRoughness );
 
 	#endif
 

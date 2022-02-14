@@ -10,8 +10,9 @@
 			background-color: rgba(0,0,0,0.75);
 		}
 
-		.dg .folder .gui-stats {
-			height: auto;
+		.lil-gui .gui-stats {
+			line-height: var(--widget-height);
+			padding: var(--padding);
 		}
 	</style>
 </head>
@@ -25,11 +26,23 @@
 
 	<div id="container"></div>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import Stats from './jsm/libs/stats.module.js';
-		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
@@ -273,10 +286,10 @@
 
 			const perfFolder = gui.addFolder( 'Performance' );
 
-			guiStatsEl = document.createElement( 'li' );
+			guiStatsEl = document.createElement( 'div' );
 			guiStatsEl.classList.add( 'gui-stats' );
 
-			perfFolder.__ul.appendChild( guiStatsEl );
+			perfFolder.$children.appendChild( guiStatsEl );
 			perfFolder.open();
 
 			// listeners

@@ -8,15 +8,26 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
-			<button id="export">Export COLLADA</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ColladaExporter } from './jsm/exporters/ColladaExporter.js';
@@ -40,6 +51,7 @@
 			let bFitLid;
 			let bNonBlinn;
 			let shading;
+			let vertexColors;
 			let wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, normalMaterial, reflectiveMaterial;
 
 			let teapot, textureCube;
@@ -97,11 +109,11 @@
 				const normalMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 
 				// REFLECTION MAP
-				const path = "textures/cube/pisa/";
+				const path = 'textures/cube/pisa/';
 				const urls = [
-					path + "px.png", path + "nx.png",
-					path + "py.png", path + "ny.png",
-					path + "pz.png", path + "nz.png"
+					path + 'px.png', path + 'nx.png',
+					path + 'py.png', path + 'ny.png',
+					path + 'pz.png', path + 'nz.png'
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
@@ -170,6 +182,7 @@
 					lhue:	0.04,
 					lsaturation: 0.01,	// non-zero so that fractions will be shown
 					llightness: 1.0,
+					vertexColors: false,
 
 					// bizarrely, if you initialize these with negative numbers, the sliders
 					// will not show any decimal places.
@@ -182,7 +195,9 @@
 					body: true,
 					fitLid: false,
 					nonblinn: false,
-					newShading: "glossy"
+					newShading: 'glossy',
+
+					export: exportCollada
 				};
 
 				let h;
@@ -191,52 +206,53 @@
 
 				// material (attributes)
 
-				h = gui.addFolder( "Material control" );
+				h = gui.addFolder( 'Material control' );
 
-				h.add( effectController, "shininess", 1.0, 400.0, 1.0 ).name( "shininess" ).onChange( render );
-				h.add( effectController, "kd", 0.0, 1.0, 0.025 ).name( "diffuse strength" ).onChange( render );
-				h.add( effectController, "ks", 0.0, 1.0, 0.025 ).name( "specular strength" ).onChange( render );
-				h.add( effectController, "metallic" ).onChange( render );
+				h.add( effectController, 'shininess', 1.0, 400.0, 1.0 ).name( 'shininess' ).onChange( render );
+				h.add( effectController, 'kd', 0.0, 1.0, 0.025 ).name( 'diffuse strength' ).onChange( render );
+				h.add( effectController, 'ks', 0.0, 1.0, 0.025 ).name( 'specular strength' ).onChange( render );
+				h.add( effectController, 'metallic' ).onChange( render );
 
 				// material (color)
 
-				h = gui.addFolder( "Material color" );
+				h = gui.addFolder( 'Material color' );
 
-				h.add( effectController, "hue", 0.0, 1.0, 0.025 ).name( "hue" ).onChange( render );
-				h.add( effectController, "saturation", 0.0, 1.0, 0.025 ).name( "saturation" ).onChange( render );
-				h.add( effectController, "lightness", 0.0, 1.0, 0.025 ).name( "lightness" ).onChange( render );
+				h.add( effectController, 'hue', 0.0, 1.0, 0.025 ).name( 'hue' ).onChange( render );
+				h.add( effectController, 'saturation', 0.0, 1.0, 0.025 ).name( 'saturation' ).onChange( render );
+				h.add( effectController, 'lightness', 0.0, 1.0, 0.025 ).name( 'lightness' ).onChange( render );
+				h.add( effectController, 'vertexColors' ).onChange( render );
 
 				// light (point)
 
-				h = gui.addFolder( "Lighting" );
+				h = gui.addFolder( 'Lighting' );
 
-				h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name( "hue" ).onChange( render );
-				h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name( "saturation" ).onChange( render );
-				h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name( "lightness" ).onChange( render );
-				h.add( effectController, "ka", 0.0, 1.0, 0.025 ).name( "ambient" ).onChange( render );
+				h.add( effectController, 'lhue', 0.0, 1.0, 0.025 ).name( 'hue' ).onChange( render );
+				h.add( effectController, 'lsaturation', 0.0, 1.0, 0.025 ).name( 'saturation' ).onChange( render );
+				h.add( effectController, 'llightness', 0.0, 1.0, 0.025 ).name( 'lightness' ).onChange( render );
+				h.add( effectController, 'ka', 0.0, 1.0, 0.025 ).name( 'ambient' ).onChange( render );
 
 				// light (directional)
 
-				h = gui.addFolder( "Light direction" );
+				h = gui.addFolder( 'Light direction' );
 
-				h.add( effectController, "lx", - 1.0, 1.0, 0.025 ).name( "x" ).onChange( render );
-				h.add( effectController, "ly", - 1.0, 1.0, 0.025 ).name( "y" ).onChange( render );
-				h.add( effectController, "lz", - 1.0, 1.0, 0.025 ).name( "z" ).onChange( render );
+				h.add( effectController, 'lx', - 1.0, 1.0, 0.025 ).name( 'x' ).onChange( render );
+				h.add( effectController, 'ly', - 1.0, 1.0, 0.025 ).name( 'y' ).onChange( render );
+				h.add( effectController, 'lz', - 1.0, 1.0, 0.025 ).name( 'z' ).onChange( render );
 
-				h = gui.addFolder( "Tessellation control" );
-				h.add( effectController, "newTess", [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( "Tessellation Level" ).onChange( render );
-				h.add( effectController, "lid" ).name( "display lid" ).onChange( render );
-				h.add( effectController, "body" ).name( "display body" ).onChange( render );
-				h.add( effectController, "bottom" ).name( "display bottom" ).onChange( render );
-				h.add( effectController, "fitLid" ).name( "snug lid" ).onChange( render );
-				h.add( effectController, "nonblinn" ).name( "original scale" ).onChange( render );
+				h = gui.addFolder( 'Tessellation control' );
+				h.add( effectController, 'newTess', [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( 'Tessellation Level' ).onChange( render );
+				h.add( effectController, 'lid' ).name( 'display lid' ).onChange( render );
+				h.add( effectController, 'body' ).name( 'display body' ).onChange( render );
+				h.add( effectController, 'bottom' ).name( 'display bottom' ).onChange( render );
+				h.add( effectController, 'fitLid' ).name( 'snug lid' ).onChange( render );
+				h.add( effectController, 'nonblinn' ).name( 'original scale' ).onChange( render );
 
 				// shading
 
-				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "normal", "reflective" ] ).name( "Shading" ).onChange( render );
+				gui.add( effectController, 'newShading', [ 'wireframe', 'flat', 'smooth', 'glossy', 'textured', 'normal', 'reflective' ] ).name( 'Shading' ).onChange( render );
 
-				const exportButton = document.getElementById( 'export' );
-				exportButton.addEventListener( 'click', exportCollada );
+				h = gui.addFolder( 'Export' );
+				h.add( effectController, 'export' ).name( 'Export Collada' );
 
 			}
 
@@ -251,7 +267,8 @@
 					effectController.body !== bBody ||
 					effectController.fitLid !== bFitLid ||
 					effectController.nonblinn !== bNonBlinn ||
-					effectController.newShading !== shading ) {
+					effectController.newShading !== shading ||
+					effectController.vertexColors !== vertexColors ) {
 
 					tess = effectController.newTess;
 					bBottom = effectController.bottom;
@@ -260,6 +277,7 @@
 					bFitLid = effectController.fitLid;
 					bNonBlinn = effectController.nonblinn;
 					shading = effectController.newShading;
+					vertexColors = effectController.vertexColors;
 
 					createNewTeapot();
 
@@ -303,7 +321,7 @@
 				light.color.setHSL( effectController.lhue, effectController.lsaturation, effectController.llightness );
 
 				// skybox is rendered separately, so that it is always behind the teapot.
-				if ( shading === "reflective" ) {
+				if ( shading === 'reflective' ) {
 
 					scene.background = textureCube;
 
@@ -337,12 +355,43 @@
 
 				teapot = new THREE.Mesh(
 					teapotGeometry,
-					shading === "wireframe" ? wireMaterial : (
-						shading === "flat" ? flatMaterial : (
-							shading === "smooth" ? gouraudMaterial : (
-								shading === "glossy" ? phongMaterial : (
-									shading === "textured" ? texturedMaterial : (
-										shading === "normal" ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
+					shading === 'wireframe' ? wireMaterial : (
+						shading === 'flat' ? flatMaterial : (
+							shading === 'smooth' ? gouraudMaterial : (
+								shading === 'glossy' ? phongMaterial : (
+									shading === 'textured' ? texturedMaterial : (
+										shading === 'normal' ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
+
+
+				if ( effectController.vertexColors ) {
+
+					teapot.geometry.computeBoundingBox();
+					const minY = teapot.geometry.boundingBox.min.y;
+					const maxY = teapot.geometry.boundingBox.max.y;
+					const sizeY = maxY - minY;
+
+					const colors = [];
+					const position = teapot.geometry.getAttribute( 'position' );
+					for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+						const y = position.getY( i );
+						const r = ( y - minY ) / sizeY;
+						const b = 1.0 - r;
+
+						colors.push( r * 128, 0, b * 128 );
+
+					}
+					teapot.geometry.setAttribute( 'color', new THREE.Uint8BufferAttribute( colors, 3, true ) );
+					teapot.material.vertexColors = true;
+					teapot.material.needsUpdate = true;
+
+				} else {
+
+					teapot.geometry.deleteAttribute( 'color' );
+					teapot.material.vertexColors = false;
+					teapot.material.needsUpdate = true;
+
+				}
 
 				scene.add( teapot );
 
@@ -353,21 +402,21 @@
 			function exportCollada() {
 
 				const result = exporter.parse( teapot, undefined, { upAxis: 'Y_UP', unitName: 'millimeter', unitMeter: 0.001 } );
-				let materialType = "Phong";
+				let materialType = 'Phong';
 
-				if ( shading === "wireframe" ) {
+				if ( shading === 'wireframe' ) {
 
-					materialType = "Constant";
-
-				}
-
-				if ( shading === "smooth" ) {
-
-					materialType = "Lambert";
+					materialType = 'Constant';
 
 				}
 
-				saveString( result.data, 'teapot_' + shading + "_" + materialType + '.dae' );
+				if ( shading === 'smooth' ) {
+
+					materialType = 'Lambert';
+
+				}
+
+				saveString( result.data, 'teapot_' + shading + '_' + materialType + '.dae' );
 
 				result.textures.forEach( tex => {
 

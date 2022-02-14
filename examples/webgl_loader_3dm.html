@@ -32,14 +32,26 @@
 		</div>
 
 		<div id="loader"></div>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 			let controls, gui;
@@ -67,7 +79,7 @@
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.11.1/' );
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );
@@ -107,15 +119,12 @@
 
 			function initGUI( layers ) {
 
-				gui = new GUI( { width: 300 } );
-
-				const layersControl = gui.addFolder( 'layers' );
-				layersControl.open();
+				gui = new GUI( { title: 'layers' } );
 
 				for ( let i = 0; i < layers.length; i ++ ) {
 
 					const layer = layers[ i ];
-					layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
+					gui.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
 
 						const name = this.object.name;
 

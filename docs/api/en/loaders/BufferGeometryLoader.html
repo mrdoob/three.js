@@ -68,13 +68,13 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].d<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:BufferGeometry].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the ProgressEvent instance, which contains .[page:Boolean lengthComputable], .[page:Integer total] and .[page:Integer loaded]. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
+		[page:Function onError] (optional) — Will be called when load errors.<br />
 		</p>
 		<p>
 		Begin loading from url and call onLoad with the parsed response content.

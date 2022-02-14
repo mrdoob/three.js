@@ -49,6 +49,12 @@ class WebGPUBindings {
 
 	}
 
+	remove( object ) {
+
+		this.uniformsData.delete( object );
+
+	}
+
 	getForCompute( param ) {
 
 		let data = this.uniformsData.get( param );
@@ -78,7 +84,7 @@ class WebGPUBindings {
 
 	}
 
-	update( object, camera ) {
+	update( object ) {
 
 		const textures = this.textures;
 
@@ -108,12 +114,7 @@ class WebGPUBindings {
 
 				if ( needsBufferWrite === true ) {
 
-					this.device.queue.writeBuffer(
-						bufferGPU,
-						0,
-						buffer,
-						0
-					);
+					this.device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
 
 				}
 
@@ -141,10 +142,10 @@ class WebGPUBindings {
 
 				const texture = binding.getTexture();
 
-				const forceUpdate = textures.updateTexture( texture );
+				const needsTextureRefresh = textures.updateTexture( texture );
 				const textureGPU = textures.getTextureGPU( texture );
 
-				if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
+				if ( textureGPU !== undefined && binding.textureGPU !== textureGPU || needsTextureRefresh === true ) {
 
 					binding.textureGPU = textureGPU;
 					needsBindGroupRefresh = true;

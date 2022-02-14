@@ -2,35 +2,18 @@ import Node from './Node.js';
 
 class ContextNode extends Node {
 
-	constructor( node, type, context = {} ) {
+	constructor( node, context = {} ) {
 
-		super( type );
+		super();
 
 		this.node = node;
-
 		this.context = context;
 
-		Object.defineProperty( this, 'isContextNode', { value: true } );
-
 	}
 
-	setContextValue( name, value ) {
+	getNodeType( builder ) {
 
-		this.context[ name ] = value;
-
-		return this;
-
-	}
-
-	getContextValue( name ) {
-
-		return this.context[ name ];
-
-	}
-
-	getType( builder ) {
-
-		return this.node.getType( builder );
+		return this.node.getNodeType( builder );
 
 	}
 
@@ -49,5 +32,7 @@ class ContextNode extends Node {
 	}
 
 }
+
+ContextNode.prototype.isContextNode = true;
 
 export default ContextNode;

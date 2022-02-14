@@ -40,7 +40,7 @@ import {
 	Vector4,
 	VectorKeyframeTrack,
 	sRGBEncoding
-} from '../../../build/three.module.js';
+} from 'three';
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
@@ -53,11 +53,10 @@ import { NURBSCurve } from '../curves/NURBSCurve.js';
  *  Morph normals / blend shape normals
  *
  * FBX format references:
- * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
- * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
+ * 	https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
  *
- * 	Binary format specification:
- *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+ * Binary format specification:
+ *	https://code.blender.org/2013/08/fbx-binary-file-format-specification/
  */
 
 
@@ -1421,7 +1420,7 @@ class FBXTreeParser {
 
 			for ( const nodeID in BindPoseNode ) {
 
-				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' && BindPoseNode[ nodeID ].NbPoseNodes > 0 ) {
 
 					const poseNodes = BindPoseNode[ nodeID ].PoseNode;
 

@@ -5,9 +5,7 @@
  *
  * Formulas collected from various sources
  * http://mathworld.wolfram.com/HeartCurve.html
- * http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page6.html
  * http://en.wikipedia.org/wiki/Viviani%27s_curve
- * http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page4.html
  * http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
  * https://prideout.net/blog/old/blog/index.html@p=44.html
  */
@@ -332,23 +330,19 @@
 
 	}
 
-	const Curves = {
-		GrannyKnot: GrannyKnot,
-		HeartCurve: HeartCurve,
-		VivianiCurve: VivianiCurve,
-		KnotCurve: KnotCurve,
-		HelixCurve: HelixCurve,
-		TrefoilKnot: TrefoilKnot,
-		TorusKnot: TorusKnot,
-		CinquefoilKnot: CinquefoilKnot,
-		TrefoilPolynomialKnot: TrefoilPolynomialKnot,
-		FigureEightPolynomialKnot: FigureEightPolynomialKnot,
-		DecoratedTorusKnot4a: DecoratedTorusKnot4a,
-		DecoratedTorusKnot4b: DecoratedTorusKnot4b,
-		DecoratedTorusKnot5a: DecoratedTorusKnot5a,
-		DecoratedTorusKnot5c: DecoratedTorusKnot5c
-	};
-
-	THREE.Curves = Curves;
+	THREE.CinquefoilKnot = CinquefoilKnot;
+	THREE.DecoratedTorusKnot4a = DecoratedTorusKnot4a;
+	THREE.DecoratedTorusKnot4b = DecoratedTorusKnot4b;
+	THREE.DecoratedTorusKnot5a = DecoratedTorusKnot5a;
+	THREE.DecoratedTorusKnot5c = DecoratedTorusKnot5c;
+	THREE.FigureEightPolynomialKnot = FigureEightPolynomialKnot;
+	THREE.GrannyKnot = GrannyKnot;
+	THREE.HeartCurve = HeartCurve;
+	THREE.HelixCurve = HelixCurve;
+	THREE.KnotCurve = KnotCurve;
+	THREE.TorusKnot = TorusKnot;
+	THREE.TrefoilKnot = TrefoilKnot;
+	THREE.TrefoilPolynomialKnot = TrefoilPolynomialKnot;
+	THREE.VivianiCurve = VivianiCurve;
 
 } )();

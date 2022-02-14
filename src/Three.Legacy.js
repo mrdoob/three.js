@@ -1597,7 +1597,19 @@ Object.defineProperties( WebGLRenderer.prototype, {
 
 		}
 	},
+	gammaFactor: {
+		get: function () {
 
+			console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+			return 2;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+
+		}
+	}
 } );
 
 Object.defineProperties( WebGLShadowMap.prototype, {
@@ -1927,5 +1939,48 @@ export const SceneUtils = {
 export function LensFlare() {
 
 	console.error( 'THREE.LensFlare has been moved to /examples/jsm/objects/Lensflare.js' );
+
+}
+
+//
+
+export function ParametricGeometry() {
+
+	console.error( 'THREE.ParametricGeometry has been moved to /examples/jsm/geometries/ParametricGeometry.js' );
+	return new BufferGeometry();
+
+}
+
+export function TextGeometry() {
+
+	console.error( 'THREE.TextGeometry has been moved to /examples/jsm/geometries/TextGeometry.js' );
+	return new BufferGeometry();
+
+}
+
+export function FontLoader() {
+
+	console.error( 'THREE.FontLoader has been moved to /examples/jsm/loaders/FontLoader.js' );
+
+}
+
+export function Font() {
+
+	console.error( 'THREE.Font has been moved to /examples/jsm/loaders/FontLoader.js' );
+
+}
+
+export function ImmediateRenderObject() {
+
+	console.error( 'THREE.ImmediateRenderObject has been removed.' );
+
+}
+
+export function WebGLMultisampleRenderTarget( width, height, options ) {
+
+	console.error( 'THREE.WebGLMultisampleRenderTarget has been removed. Use a normal render target and set the "samples" property to greater 0 to enable multisampling.' );
+	const renderTarget = new WebGLRenderTarget( width, height, options );
+	renderTarget.samples = 4;
+	return renderTarget;
 
 }

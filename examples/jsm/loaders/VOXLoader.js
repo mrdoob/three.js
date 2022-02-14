@@ -9,7 +9,7 @@ import {
 	MeshStandardMaterial,
 	NearestFilter,
 	RedFormat
-} from '../../../build/three.module.js';
+} from 'three';
 
 class VOXLoader extends Loader {
 
@@ -107,7 +107,7 @@ class VOXLoader extends Loader {
 
 			for ( let j = 0; j < 4; j ++ ) {
 
-				id += String.fromCharCode( data.getUint8( i ++, true ) );
+				id += String.fromCharCode( data.getUint8( i ++ ) );
 
 			}
 
@@ -296,6 +296,7 @@ class VOXDataTexture3D extends DataTexture3D {
 		this.minFilter = NearestFilter;
 		this.magFilter = LinearFilter;
 		this.unpackAlignment = 1;
+		this.needsUpdate = true;
 
 	}
 

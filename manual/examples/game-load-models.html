@@ -1,0 +1,222 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Game - Load Models</title>
+    <style>
+    html, body {
+        margin: 0;
+        height: 100%;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    #loading {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: xx-large;
+      font-family: sans-serif;
+        }
+    #loading>div>div {
+      padding: 2px;
+    }
+    .progress {
+      width: 50vw;
+      border: 1px solid black;
+    }
+    #progressbar {
+      width: 0%;
+      transition: width ease-out .5s;
+      height: 1em;
+      background-color: #888;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .5) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .5) 50%,
+        rgba(255, 255, 255, .5) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 50px 50px;
+      animation: progressanim 2s linear infinite;
+    }
+
+    @keyframes progressanim {
+      0% {
+        background-position: 50px 50px;
+      }
+      100% {
+        background-position: 0 0;
+      }
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="loading">
+      <div>
+        <div>...loading...</div>
+        <div class="progress"><div id="progressbar"></div></div>
+      </div>
+    </div>
+  </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
+import * as SkeletonUtils from '../../examples/jsm/utils/SkeletonUtils.js';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas});
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const fov = 45;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 100;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 20, 40);
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.set(0, 5, 0);
+  controls.update();
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('white');
+
+  function addLight(...pos) {
+    const color = 0xFFFFFF;
+    const intensity = 0.8;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(...pos);
+    scene.add(light);
+    scene.add(light.target);
+  }
+  addLight(5, 5, 2);
+  addLight(-5, 5, 5);
+
+  const manager = new THREE.LoadingManager();
+  manager.onLoad = init;
+
+  const progressbarElem = document.querySelector('#progressbar');
+  manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+    progressbarElem.style.width = `${itemsLoaded / itemsTotal * 100 | 0}%`;
+  };
+
+  const models = {
+    pig:    { url: 'resources/models/animals/Pig.gltf' },
+    cow:    { url: 'resources/models/animals/Cow.gltf' },
+    llama:  { url: 'resources/models/animals/Llama.gltf' },
+    pug:    { url: 'resources/models/animals/Pug.gltf' },
+    sheep:  { url: 'resources/models/animals/Sheep.gltf' },
+    zebra:  { url: 'resources/models/animals/Zebra.gltf' },
+    horse:  { url: 'resources/models/animals/Horse.gltf' },
+    knight: { url: 'resources/models/knight/KnightCharacter.gltf' },
+  };
+  {
+    const gltfLoader = new GLTFLoader(manager);
+    for (const model of Object.values(models)) {
+      gltfLoader.load(model.url, (gltf) => {
+        model.gltf = gltf;
+      });
+    }
+  }
+
+  function prepModelsAndAnimations() {
+    Object.values(models).forEach(model => {
+      const animsByName = {};
+      model.gltf.animations.forEach((clip) => {
+        animsByName[clip.name] = clip;
+      });
+      model.animations = animsByName;
+    });
+  }
+
+  const mixers = [];
+
+  function init() {
+    // hide the loading bar
+    const loadingElem = document.querySelector('#loading');
+    loadingElem.style.display = 'none';
+
+    prepModelsAndAnimations();
+
+    Object.values(models).forEach((model, ndx) => {
+      const clonedScene = SkeletonUtils.clone(model.gltf.scene);
+      const root = new THREE.Object3D();
+      root.add(clonedScene);
+      scene.add(root);
+      root.position.x = (ndx - 3) * 3;
+
+      const mixer = new THREE.AnimationMixer(clonedScene);
+      const firstClip = Object.values(model.animations)[0];
+      const action = mixer.clipAction(firstClip);
+      action.play();
+      mixers.push(mixer);
+    });
+  }
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  let then = 0;
+  function render(now) {
+    now *= 0.001;  // convert to seconds
+    const deltaTime = now - then;
+    then = now;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    for (const mixer of mixers) {
+      mixer.update(deltaTime);
+    }
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</script>
+</html>

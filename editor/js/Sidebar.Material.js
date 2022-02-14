@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { UIButton, UIInput, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 
@@ -142,8 +142,8 @@ function SidebarMaterial( editor ) {
 
 	// attenuation tint
 
-	const materialAttenuationTint = new SidebarMaterialColorProperty( editor, 'attenuationTint', strings.getKey( 'sidebar/material/attenuationTint' ) );
-	container.add( materialAttenuationTint );
+	const materialAttenuationColor = new SidebarMaterialColorProperty( editor, 'attenuationColor', strings.getKey( 'sidebar/material/attenuationColor' ) );
+	container.add( materialAttenuationColor );
 
 	// thickness
 

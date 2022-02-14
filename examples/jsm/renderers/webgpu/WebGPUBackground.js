@@ -1,4 +1,4 @@
-import { GPULoadOp } from './constants.js';
+import { GPULoadOp, GPUStoreOp } from './constants.js';
 import { Color } from 'three';
 
 let _clearAlpha;
@@ -57,39 +57,43 @@ class WebGPUBackground {
 
 			if ( renderer.autoClearColor === true ) {
 
-				colorAttachment.loadValue = { r: _clearColor.r, g: _clearColor.g, b: _clearColor.b, a: _clearAlpha };
+				colorAttachment.clearValue = { r: _clearColor.r, g: _clearColor.g, b: _clearColor.b, a: _clearAlpha };
+				colorAttachment.loadOp = GPULoadOp.Clear;
+				colorAttachment.storeOp = GPUStoreOp.Store;
 
 			} else {
 
-				colorAttachment.loadValue = GPULoadOp.Load;
+				colorAttachment.loadOp = GPULoadOp.Load;
 
 			}
 
 			if ( renderer.autoClearDepth === true ) {
 
-				depthStencilAttachment.depthLoadValue = renderer._clearDepth;
+				depthStencilAttachment.depthClearValue = renderer._clearDepth;
+				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
 
 			} else {
 
-				depthStencilAttachment.depthLoadValue = GPULoadOp.Load;
+				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 
 			}
 
 			if ( renderer.autoClearStencil === true ) {
 
-				depthStencilAttachment.stencilLoadValue = renderer._clearDepth;
+				depthStencilAttachment.stencilClearValue = renderer._clearStencil;
+				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
 
 			} else {
 
-				depthStencilAttachment.stencilLoadValue = GPULoadOp.Load;
+				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 			}
 
 		} else {
 
-			colorAttachment.loadValue = GPULoadOp.Load;
-			depthStencilAttachment.depthLoadValue = GPULoadOp.Load;
-			depthStencilAttachment.stencilLoadValue = GPULoadOp.Load;
+			colorAttachment.loadOp = GPULoadOp.Load;
+			depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+			depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		}
 

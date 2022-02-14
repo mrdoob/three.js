@@ -28,7 +28,6 @@
 			[example:webgl_postprocessing_glitch postprocessing glitch]<br />
 			[example:webgl_postprocessing_godrays postprocessing godrays]<br />
 			[example:webgl_postprocessing_masking postprocessing masking]<br />
-			[example:webgl_postprocessing_nodes postprocessing node material]<br />
 			[example:webgl_postprocessing_outline postprocessing outline]<br />
 			[example:webgl_postprocessing_pixel postprocessing pixelate]<br />
 			[example:webgl_postprocessing_procedural postprocessing procedural]<br />
@@ -81,7 +80,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:void addPass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined addPass]( [param:Pass pass] )</h3>
 
 		<p>
 			pass -- 将被添加到过程链的过程<br /><br />
@@ -89,7 +88,7 @@
 			将传入的过程添加到过程链。
 		</p>
 
-		<h3>[method:void insertPass]( [param:Pass pass], [param:Integer index] )</h3>
+		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>
 
 		<p>
 			pass -- 将被插入到过程链的过程。<br />
@@ -107,7 +106,7 @@
 			由[name]所使用，来决定哪一个过程应当被渲染到屏幕上。
 		</p>
 
-		<h3>[method:void removePass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined removePass]( [param:Pass pass] )</h3>
 
 		<p>
 			pass -- The pass to remove from the pass chain.<br /><br />
@@ -115,7 +114,7 @@
 			Removes the given pass from the pass chain.
 		</p>
 
-		<h3>[method:void render]( [param:Float deltaTime] )</h3>
+		<h3>[method:undefined render]( [param:Float deltaTime] )</h3>
 
 		<p>
 			deltaTime -- The delta time value.<br /><br />
@@ -123,7 +122,7 @@
 			执行所有启用的后期处理过程，来产生最终的帧，
 		</p>
 
-		<h3>[method:void reset]( [param:WebGLRenderTarget renderTarget] )</h3>
+		<h3>[method:undefined reset]( [param:WebGLRenderTarget renderTarget] )</h3>
 
 		<p>
 			[page:WebGLRenderTarget renderTarget] -- （可选）一个预先配置的渲染目标，内部由 [name] 使用。<br /><br />
@@ -131,7 +130,7 @@
 			重置所有[name]的内部状态。
 		</p>
 
-		<h3>[method:void setPixelRatio]( [param:Float pixelRatio] )</h3>
+		<h3>[method:undefined setPixelRatio]( [param:Float pixelRatio] )</h3>
 
 		<p>
 			pixelRatio -- 设备像素比<br /><br />
@@ -141,7 +140,7 @@
 
 		</p>
 
-		<h3>[method:void setSize]( [param:Integer width], [param:Integer height] )</h3>
+		<h3>[method:undefined setSize]( [param:Integer width], [param:Integer height] )</h3>
 
 		<p>
 			width -- [name]的宽度。<br />
@@ -152,7 +151,7 @@
 
 		</p>
 
-		<h3>[method:void swapBuffers]()</h3>
+		<h3>[method:undefined swapBuffers]()</h3>
 
 		<p>交换内部的读/写缓冲。</p>
 

@@ -19,10 +19,10 @@ class MaterialNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
 		const scope = this.scope;
-		const material = builder.getContextValue( 'material' );
+		const material = builder.context.material;
 
 		if ( scope === MaterialNode.COLOR ) {
 
@@ -46,7 +46,7 @@ class MaterialNode extends Node {
 
 	generate( builder, output ) {
 
-		const material = builder.getContextValue( 'material' );
+		const material = builder.context.material;
 		const scope = this.scope;
 
 		let node = null;
@@ -85,23 +85,23 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR ) {
 
-			const specularTintNode = new MaterialReferenceNode( 'specularTint', 'color' );
+			const specularColorNode = new MaterialReferenceNode( 'specularColor', 'color' );
 
-			if ( material.specularTintMap !== null && material.specularTintMap !== undefined && material.specularTintMap.isTexture === true ) {
+			if ( material.specularColorMap !== null && material.specularColorMap !== undefined && material.specularColorMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', specularTintNode, new MaterialReferenceNode( 'specularTintMap', 'texture' ) );
+				node = new OperatorNode( '*', specularColorNode, new MaterialReferenceNode( 'specularColorMap', 'texture' ) );
 
 			} else {
 
-				node = specularTintNode;
+				node = specularColorNode;
 
 			}
 
 		} else {
 
-			const type = this.getType( builder );
+			const outputType = this.getNodeType( builder );
 
-			node = new MaterialReferenceNode( scope, type );
+			node = new MaterialReferenceNode( scope, outputType );
 
 		}
 

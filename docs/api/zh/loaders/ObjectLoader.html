@@ -72,7 +72,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 文件的URL或者路径，也可以为
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -94,35 +94,35 @@
 		内部使用[page:.load]()进行加载, 但也可以直接用于解析先前加载的JSON结构。
 		</p>
 
-		<h3>[method:Object3D parseGeometries]( [param:Object json] )</h3>
+		<h3>[method:Object parseGeometries]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] — 必选参数，需要被解析的JSON源。<br /><br />
 
 			此函数以JSON结构，用[page:.parse]()去解析[page:BufferGeometry geometries]。
 		</p>
 
-		<h3>[method:Object3D parseMaterials]( [param:Object json] )</h3>
+		<h3>[method:Object parseMaterials]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
 
 		此函数通过[page:.parse()来使用[page:MaterialLoader]，以解析JSON结构中任意材质。
 		</p>
 
-		<h3>[method:Object3D parseAnimations]( [param:Object json] )</h3>
+		<h3>[method:Object parseAnimations]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
 
 		此函数通过[page:.parse]()来使用[page:AnimationClip.parse]()， 以解析JSON结构中任意动画。
 		</p>
 
-		<h3>[method:Object3D parseImages]( [param:Object json] )</h3>
+		<h3>[method:Object parseImages]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
 
 			此函数通过[page:.parse]()来使用[page:ImageLoader]， 以解析JSON结构中任意图片。
 		</p>
 
-		<h3>[method:Object3D parseTextures]( [param:Object json] )</h3>
+		<h3>[method:Object parseTextures]( [param:Object json] )</h3>
 		<p>
 		[page:Object json] —  必选参数，需要被解析的JSON源。<br /><br />
 			此函数通过[page:.parse]()来解析JSON结构中任意纹理。

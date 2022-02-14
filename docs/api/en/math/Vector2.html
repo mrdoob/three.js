@@ -36,6 +36,10 @@
 			vectors, complex numbers and so on,	however these are the most common uses in three.js.
 		</p>
 
+		<p>
+			Iterating through a Vector2 instance will yield its components (x, y) in the corresponding order.
+		</p>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -159,8 +163,7 @@
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-		Divides this vector by scalar [page:Float s].<br />
-		Sets vector to *( 0, 0 )* if [page:Float s] = 0.
+		Divides this vector by scalar [page:Float s].
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector2 v] )</h3>
@@ -288,7 +291,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y] )</h3>
 		<p>Sets the [page:.x x] and [page:.y y] components of this vector.</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0 or 1.<br />
 		[page:Float value] - [page:Float]<br /><br />

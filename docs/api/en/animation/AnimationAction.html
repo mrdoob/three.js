@@ -121,7 +121,7 @@
 		<p>
 			The degree of influence of this action (in the interval [0, 1]). Values between 0 (no impact)
 			and 1 (full impact) can be used to blend between several actions. Default is 1. <br /><br />
-			Properties/methods concerning  *weight* are:
+			Properties/methods concerning *weight* are:
 			[page:.crossFadeFrom crossFadeFrom],
 			[page:.crossFadeTo crossFadeTo],
 			[page:.enabled enabled],
@@ -146,7 +146,7 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:AnimationAction crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<h3>[method:this crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
 			Causes this action to [page:.fadeIn fade in], fading out another action simultaneously, within
 			the passed time interval. This method can be chained.<br /><br />
@@ -158,7 +158,7 @@
 
 		</p>
 
-		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<h3>[method:this crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
 			Causes this action to [page:.fadeOut fade out], fading in another action simultaneously, within
 			the passed time interval. This method can be chained.<br /><br />
@@ -168,13 +168,13 @@
 			Note: Like with *fadeIn*/*fadeOut*, the fading starts/ends with a weight of 1.
 		</p>
 
-		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this fadeIn]( [param:Number durationInSeconds] )</h3>
 		<p>
 			Increases the [page:.weight weight] of this action gradually from 0 to 1, within the passed time
 			interval. This method can be chained.
 		</p>
 
-		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this fadeOut]( [param:Number durationInSeconds] )</h3>
 		<p>
 			Decreases the [page:.weight weight] of this action gradually from 1 to 0, within the passed time
 			interval. This method can be chained.
@@ -186,7 +186,7 @@
 			[page:.paused paused]).
 		</p>
 
-		<h3>[method:number getEffectiveWeight]()</h3>
+		<h3>[method:Number getEffectiveWeight]()</h3>
 		<p>
 			Returns the effective weight (considering the current states of fading and
 			[page:.enabled enabled]).
@@ -207,7 +207,7 @@
 			Returns the root object on which this action is performed.
 		</p>
 
-		<h3>[method:AnimationAction halt]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this halt]( [param:Number durationInSeconds] )</h3>
 		<p>
 			Decelerates this animation's speed to 0 by decreasing [page:.timeScale timeScale] gradually
 			(starting from its current value), within the passed time interval. This method can be chained.
@@ -233,7 +233,7 @@
 			conditions for [page:.isRunning isRunning]).
 		</p>
 
-		<h3>[method:AnimationAction play]()</h3>
+		<h3>[method:this play]()</h3>
 		<p>
 			Tells the mixer to activate the action. This method can be chained.<br /><br />
 
@@ -245,7 +245,7 @@
 			too.
 		</p>
 
-		<h3>[method:AnimationAction reset]()</h3>
+		<h3>[method:this reset]()</h3>
 		<p>
 			Resets the action. This method can be chained.<br /><br />
 
@@ -257,13 +257,13 @@
 			This means: If you want both, resetting and stopping, don’t call .*reset*; call .*stop* instead.
 		</p>
 
-		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
+		<h3>[method:this setDuration]( [param:Number durationInSeconds] )</h3>
 		<p>
 			Sets the duration for a single loop of this action (by adjusting [page:.timeScale timeScale]
 			and stopping any scheduled warping). This method can be chained.
 		</p>
 
-		<h3>[method:AnimationAction setEffectiveTimeScale]( [param:Number timeScale] )</h3>
+		<h3>[method:this setEffectiveTimeScale]( [param:Number timeScale] )</h3>
 		<p>
 			Sets the [page:.timeScale timeScale] and stops any scheduled warping. This method can be chained.<br /><br />
 
@@ -275,7 +275,7 @@
 			this method.
 		</p>
 
-		<h3>[method:AnimationAction setEffectiveWeight]( [param:Number weight] )</h3>
+		<h3>[method:this setEffectiveWeight]( [param:Number weight] )</h3>
 		<p>
 			Sets the [page:.weight weight] and stops any scheduled fading. This method can be chained.<br /><br />
 
@@ -287,13 +287,13 @@
 			this method.
 		</p>
 
-		<h3>[method:AnimationAction setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
+		<h3>[method:this setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
 		<p>
 			Sets the [page:.loop loop mode] and the number of [page:.repetitions repetitions]. This method
 			can be chained.
 		</p>
 
-		<h3>[method:AnimationAction startAt]( [param:Number startTimeInSeconds] )</h3>
+		<h3>[method:this startAt]( [param:Number startTimeInSeconds] )</h3>
 		<p>
 			Defines the time for a delayed start (usually passed as [page:AnimationMixer.time] +
 			deltaTimeInSeconds). This method can be chained.<br /><br />
@@ -303,7 +303,7 @@
 			call of .*play*, without stopping or resetting it in the meantime).
 		</p>
 
-		<h3>[method:AnimationAction stop]()</h3>
+		<h3>[method:this stop]()</h3>
 		<p>
 			Tells the mixer to deactivate this action. This method can be chained.<br /><br />
 
@@ -313,19 +313,19 @@
 			[page:AnimationMixer.stopAllAction mixer.stopAllAction].
 		</p>
 
-		<h3>[method:AnimationAction stopFading]()</h3>
+		<h3>[method:this stopFading]()</h3>
 		<p>
 			Stops any scheduled [page:.fadeIn fading] which is applied to this action. This method can be
 			chained.
 		</p>
 
-		<h3>[method:AnimationAction stopWarping]()</h3>
+		<h3>[method:this stopWarping]()</h3>
 		<p>
 			Stops any scheduled [page:.warp warping] which is applied to this action. This method can be
 			chained.
 		</p>
 
-		<h3>[method:AnimationAction syncWith]( [param:AnimationAction otherAction] )</h3>
+		<h3>[method:this syncWith]( [param:AnimationAction otherAction] )</h3>
 		<p>
 			Synchronizes this action with the passed other action. This method can be chained.<br /><br />
 
@@ -335,7 +335,7 @@
 			Note: Future changes of the other action's *time* and *timeScale* will not be detected.
 		</p>
 
-		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
+		<h3>[method:this warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
 		<p>
 			Changes the playback speed, within the passed time interval, by modifying
 			[page:.timeScale timeScale] gradually from *startTimeScale* to *endTimeScale*. This method can

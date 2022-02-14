@@ -20,10 +20,22 @@
 
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import * as THREE from 'three';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { HTMLMesh } from './jsm/interactive/HTMLMesh.js';
 			import { InteractiveGroup } from './jsm/interactive/InteractiveGroup.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
@@ -112,7 +124,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setClearAlpha( 1 );
 				renderer.setClearColor( new THREE.Color( 0 ), 0 );
@@ -375,7 +387,7 @@
 								session.renderState.layers[ 0 ]
 							]
 						} );
-						
+
 						video.play();
 
 					} );

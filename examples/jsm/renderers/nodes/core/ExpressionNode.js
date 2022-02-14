@@ -1,21 +1,29 @@
-import Node from './Node.js';
+import TempNode from './TempNode.js';
 
-class ExpressionNode extends Node {
+class ExpressionNode extends TempNode {
 
-	constructor( snipped = '', type = null ) {
+	constructor( snipped = '', nodeType = 'void' ) {
 
-		super( type );
+		super( nodeType );
 
 		this.snipped = snipped;
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const type = this.getType( builder );
+		const type = this.getNodeType( builder );
 		const snipped = this.snipped;
 
-		return builder.format( `( ${ snipped } )`, type, output );
+		if ( type === 'void' ) {
+
+			builder.addFlowCode( snipped );
+
+		} else {
+
+			return `( ${ snipped } )`;
+
+		}
 
 	}
 

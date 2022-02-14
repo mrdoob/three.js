@@ -73,14 +73,11 @@
 				let relsName;
 				let modelRelsName;
 				const modelPartNames = [];
-				const printTicketPartNames = [];
 				const texturesPartNames = [];
-				const otherPartNames = [];
 				let modelRels;
 				const modelParts = {};
 				const printTicketParts = {};
 				const texturesParts = {};
-				const otherParts = {};
 
 				try {
 
@@ -111,17 +108,9 @@
 
 						modelPartNames.push( file );
 
-					} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
-
-						printTicketPartNames.push( file );
-
 					} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 						texturesPartNames.push( file );
-
-					} else if ( file.match( /^3D\/Other\/.*/ ) ) {
-
-						otherPartNames.push( file );
 
 					}
 
@@ -195,8 +184,7 @@
 					modelRels: modelRels,
 					model: modelParts,
 					printTicket: printTicketParts,
-					texture: texturesParts,
-					other: otherParts
+					texture: texturesParts
 				};
 
 			}
@@ -909,7 +897,7 @@
 
 			}
 
-			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) {
+			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) {
 
 				// geometry
 				const geometry = new THREE.BufferGeometry();
@@ -968,7 +956,7 @@
 				geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xaaaaff,
+					color: 0xffffff,
 					flatShading: true
 				} );
 				const mesh = new THREE.Mesh( geometry, material );
@@ -1008,7 +996,7 @@
 
 						case 'vertexColors':
 							const colorgroup = modelData.resources.colorgroup[ resourceId ];
-							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, modelData, objectData ) );
+							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) );
 							break;
 
 						case 'default':
@@ -1017,6 +1005,16 @@
 
 						default:
 							console.error( 'THREE.3MFLoader: Unsupported resource type.' );
+
+					}
+
+				}
+
+				if ( objectData.name ) {
+
+					for ( let i = 0; i < meshes.length; i ++ ) {
+
+						meshes[ i ].name = objectData.name;
 
 					}
 
@@ -1052,7 +1050,7 @@
 
 			}
 
-			function analyzeObject( modelData, meshData, objectData ) {
+			function analyzeObject( meshData, objectData ) {
 
 				const resourceMap = {};
 				const triangleProperties = meshData[ 'triangleProperties' ];
@@ -1075,7 +1073,7 @@
 			function buildGroup( meshData, objects, modelData, textureData, objectData ) {
 
 				const group = new THREE.Group();
-				const resourceMap = analyzeObject( modelData, meshData, objectData );
+				const resourceMap = analyzeObject( meshData, objectData );
 				const meshes = buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData );
 
 				for ( let i = 0, l = meshes.length; i < l; i ++ ) {
@@ -1231,6 +1229,12 @@
 
 				}
 
+				if ( objectData.name ) {
+
+					objects[ objectData.id ].name = objectData.name;
+
+				}
+
 			}
 
 			function buildObjects( data3mf ) {
@@ -1299,7 +1303,7 @@
 				for ( let i = 0; i < buildData.length; i ++ ) {
 
 					const buildItem = buildData[ i ];
-					const object3D = objects[ buildItem[ 'objectId' ] ]; // apply transform
+					const object3D = objects[ buildItem[ 'objectId' ] ].clone(); // apply transform
 
 					const transform = buildItem[ 'transform' ];
 

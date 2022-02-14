@@ -30,12 +30,14 @@ import {
 	RGB_S3TC_DXT1_Format,
 	sRGBEncoding,
 	UnsignedByteType
-} from '../../../build/three.module.js';
+} from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 
 const KTX2TransferSRGB = 2;
 const KTX2_ALPHA_PREMULTIPLIED = 1;
 const _taskCache = new WeakMap();
+
+let _activeLoaders = 0;
 
 class KTX2Loader extends Loader {
 
@@ -92,14 +94,13 @@ class KTX2Loader extends Loader {
 				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
 		};
 
-		return this;
 
-	}
+		if ( renderer.capabilities.isWebGL2 ) {
 
-	dispose() {
+			// https://github.com/mrdoob/three.js/pull/22928
+			this.workerConfig.etc1Supported = false;
 
-		this.workerPool.dispose();
-		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
+		}
 
 		return this;
 
@@ -153,6 +154,21 @@ class KTX2Loader extends Loader {
 					} );
 
 				} );
+
+			if ( _activeLoaders > 0 ) {
+
+				// Each instance loads a transcoder and allocates workers, increasing network and memory cost.
+
+				console.warn(
+
+					'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.'
+					+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
+
+				);
+
+			}
+
+			_activeLoaders ++;
 
 		}
 
@@ -245,8 +261,10 @@ class KTX2Loader extends Loader {
 
 	dispose() {
 
-		URL.revokeObjectURL( this.workerSourceURL );
 		this.workerPool.dispose();
+		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
+
+		_activeLoaders --;
 
 		return this;
 
@@ -500,8 +518,8 @@ KTX2Loader.BasisWorker = function () {
 		{
 			if: 'etc1Supported',
 			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.ETC1, TranscoderFormat.ETC1 ],
-			engineFormat: [ EngineFormat.RGB_ETC1_Format, EngineFormat.RGB_ETC1_Format ],
+			transcoderFormat: [ TranscoderFormat.ETC1 ],
+			engineFormat: [ EngineFormat.RGB_ETC1_Format ],
 			priorityETC1S: 2,
 			priorityUASTC: 4,
 			needsPowerOfTwo: false,
@@ -541,6 +559,7 @@ KTX2Loader.BasisWorker = function () {
 
 			if ( ! config[ opt.if ] ) continue;
 			if ( ! opt.basisFormat.includes( basisFormat ) ) continue;
+			if ( hasAlpha && opt.transcoderFormat.length < 2 ) continue;
 			if ( opt.needsPowerOfTwo && ! ( isPowerOfTwo( width ) && isPowerOfTwo( height ) ) ) continue;
 
 			transcoderFormat = opt.transcoderFormat[ hasAlpha ? 1 : 0 ];

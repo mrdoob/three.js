@@ -129,7 +129,7 @@ m.elements = [ 11, 21, 31, 41,
 		将给定矩阵 [param:Matrix4 m] 的平移分量拷贝到当前矩阵中。
 		</p>
 
-		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
+		<h3>[method:this decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
 			将矩阵分解到给定的平移[page:Vector3 position] ,旋转 [page:Quaternion quaternion]，缩放[page:Vector3 scale]分量中。<br/><br/>
 			注意：并非所有矩阵都可以通过这种方式分解。 例如，如果一个对象有一个非均匀缩放的父对象，那么该对象的世界矩阵可能是不可分解的，这种方法可能不合适。
@@ -187,9 +187,9 @@ zAxis = (c, g, k)
 		<h3>[method:this identity]()</h3>
 		<p>将当前矩阵重置为单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix]。</p>
 
-		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 center], [param:Vector3 up], )</h3>
+		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 target], [param:Vector3 up], )</h3>
 		<p>
-			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 center]，由向量 [page:Vector3 up] 定向。
+			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 target]，由向量 [page:Vector3 up] 定向。
 		</p>
 
 		<h3>[method:this makeRotationAxis]( [param:Vector3 axis], [param:Float theta] )</h3>

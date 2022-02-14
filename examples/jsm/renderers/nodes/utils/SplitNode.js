@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import { vector } from '../core/NodeBuilder.js';
 
 class SplitNode extends Node {
 
@@ -11,20 +12,72 @@ class SplitNode extends Node {
 
 	}
 
-	getType( builder ) {
+	getVectorLength() {
+
+		let vectorLength = this.components.length;
+
+		for ( const c of this.components ) {
+
+			vectorLength = Math.max( vector.indexOf( c ) + 1, vectorLength );
+
+		}
+
+		return vectorLength;
+
+	}
+
+	getNodeType( builder ) {
 
 		return builder.getTypeFromLength( this.components.length );
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
-		const nodeType = this.node.getType( builder );
-		const nodeSnippet = this.node.build( builder, nodeType );
+		const node = this.node;
+		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );
 
-		const snippet = `${nodeSnippet}.${this.components}`;
+		if ( nodeTypeLength > 1 ) {
 
-		return builder.format( snippet, this.getType( builder ), output );
+			let type = null;
+
+			const componentsLength = this.getVectorLength();
+
+			if ( componentsLength >= nodeTypeLength ) {
+
+				// need expand the input node
+
+				type = builder.getTypeFromLength( this.getVectorLength() );
+
+			}
+
+			const nodeSnippet = node.build( builder, type );
+
+			return `${nodeSnippet}.${this.components}`;
+
+		} else {
+
+			// ignore components if node is a float
+
+			return node.build( builder );
+
+		}
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.components = this.components;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.components = data.components;
 
 	}
 

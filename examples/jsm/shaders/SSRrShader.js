@@ -1,7 +1,7 @@
 import {
 	Matrix4,
 	Vector2
-} from '../../../build/three.module.js';
+} from 'three';
 
 const SSRrShader = {
 
@@ -190,7 +190,7 @@ const SSRrShader = {
 				vec3 vP=getViewPosition( uv, d, cW );
 
 				#ifdef PERSPECTIVE_CAMERA
-					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
+					// https://comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewRefractRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
 					float sD=surfDist*cW;
@@ -237,7 +237,7 @@ const SSRrShader = {
 
 };
 
-var SSRrDepthShader = {
+const SSRrDepthShader = {
 
 	defines: {
 		'PERSPECTIVE_CAMERA': 1

@@ -1,8 +1,9 @@
 import {
 	Curve,
-	ParametricGeometry,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
+
+import { ParametricGeometry } from './ParametricGeometry.js';
 
 /**
  * Experimenting of primitive geometry creation using Surface Parametric equations
@@ -209,9 +210,9 @@ ParametricGeometries.SphereGeometry = class SphereGeometry extends ParametricGeo
 			u *= Math.PI;
 			v *= 2 * Math.PI;
 
-			var x = size * Math.sin( u ) * Math.cos( v );
-			var y = size * Math.sin( u ) * Math.sin( v );
-			var z = size * Math.cos( u );
+			const x = size * Math.sin( u ) * Math.cos( v );
+			const y = size * Math.sin( u ) * Math.sin( v );
+			const z = size * Math.cos( u );
 
 			target.set( x, y, z );
 

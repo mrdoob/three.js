@@ -1,7 +1,8 @@
 import {
 	Matrix3,
-	Vector3
-} from '../../../build/three.module.js';
+	Vector3,
+	Color
+} from 'three';
 
 /**
  * https://github.com/gkjohnson/ply-exporter-js
@@ -112,6 +113,7 @@ class PLYExporter {
 
 		} );
 
+		const tempColor = new Color();
 		const includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
 		includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 		includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
@@ -288,7 +290,7 @@ class PLYExporter {
 							output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 							vOffset += 4;
 
-						} else if ( includeUVs !== false ) {
+						} else {
 
 							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
@@ -305,13 +307,17 @@ class PLYExporter {
 
 						if ( colors != null ) {
 
-							output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
+							tempColor
+								.fromBufferAttribute( colors, i )
+								.convertLinearToSRGB();
+
+							output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 							vOffset += 1;
 
-							output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
+							output.setUint8( vOffset, Math.floor( tempColor.g * 255 ) );
 							vOffset += 1;
 
-							output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
+							output.setUint8( vOffset, Math.floor( tempColor.b * 255 ) );
 							vOffset += 1;
 
 						} else {
@@ -451,7 +457,7 @@ class PLYExporter {
 								uvs.getX( i ) + ' ' +
 								uvs.getY( i );
 
-						} else if ( includeUVs !== false ) {
+						} else {
 
 							line += ' 0 0';
 
@@ -464,10 +470,14 @@ class PLYExporter {
 
 						if ( colors != null ) {
 
+							tempColor
+								.fromBufferAttribute( colors, i )
+								.convertLinearToSRGB();
+
 							line += ' ' +
-								Math.floor( colors.getX( i ) * 255 ) + ' ' +
-								Math.floor( colors.getY( i ) * 255 ) + ' ' +
-								Math.floor( colors.getZ( i ) * 255 );
+								Math.floor( tempColor.r * 255 ) + ' ' +
+								Math.floor( tempColor.g * 255 ) + ' ' +
+								Math.floor( tempColor.b * 255 );
 
 						} else {
 

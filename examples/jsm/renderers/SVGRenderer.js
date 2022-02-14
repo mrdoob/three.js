@@ -6,7 +6,7 @@ import {
 	Matrix4,
 	Object3D,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import { Projector } from '../renderers/Projector.js';
 import { RenderableFace } from '../renderers/Projector.js';
 import { RenderableLine } from '../renderers/Projector.js';
@@ -227,7 +227,7 @@ class SVGRenderer {
 
 					if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
-						renderLine( _v1, _v2, element, material );
+						renderLine( _v1, _v2, material );
 
 					}
 
@@ -397,7 +397,7 @@ class SVGRenderer {
 
 		}
 
-		function renderLine( v1, v2, element, material ) {
+		function renderLine( v1, v2, material ) {
 
 			const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y );
 

@@ -59,7 +59,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 文件的URL或者路径，也可以为
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -73,8 +73,7 @@
 		<h3>[method:Array parse]( [param:JSON json] )</h3>
 		<p>
 		[page:JSON json] — 请求 <br /><br />
-		Parse the JSON object and return an array of animation clips. Individual clips in the object will
-		be parsed with [page:AnimationClip.parse].
+		解析 JSON 对象并返回 animation clips 的数组。对象中的各个片段将被 [page:AnimationClip.parse] 解析。
 		</p>
 
 		<h2>源代码</h2>

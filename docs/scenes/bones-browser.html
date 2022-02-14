@@ -23,6 +23,18 @@
 	</head>
 	<body>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js"
+				}
+			}
+		</script>
+
 		<a id='newWindow' href='./bones-browser.html' target='_blank'>Open in New Window</a>
 
 		<script type="module">
@@ -42,9 +54,9 @@
 				Vector3,
 				Uint16BufferAttribute,
 				WebGLRenderer
-			} from "../../build/three.module.js";
+			} from 'three';
 
-			import { GUI } from '../../examples/jsm/libs/dat.gui.module.js';
+			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
 
 			let gui, scene, camera, renderer, orbit, lights, mesh, bones, skeletonHelper;
@@ -186,13 +198,13 @@
 
 			function setupDatGui() {
 
-				let folder = gui.addFolder( "General Options" );
+				let folder = gui.addFolder( 'General Options' );
 
-				folder.add( state, "animateBones" );
-				folder.__controllers[ 0 ].name( "Animate Bones" );
+				folder.add( state, 'animateBones' );
+				folder.controllers[ 0 ].name( 'Animate Bones' );
 
-				folder.add( mesh, "pose" );
-				folder.__controllers[ 1 ].name( ".pose()" );
+				folder.add( mesh, 'pose' );
+				folder.controllers[ 1 ].name( '.pose()' );
 
 				const bones = mesh.skeleton.bones;
 
@@ -200,7 +212,7 @@
 
 					const bone = bones[ i ];
 
-					folder = gui.addFolder( "Bone " + i );
+					folder = gui.addFolder( 'Bone ' + i );
 
 					folder.add( bone.position, 'x', - 10 + bone.position.x, 10 + bone.position.x );
 					folder.add( bone.position, 'y', - 10 + bone.position.y, 10 + bone.position.y );
@@ -214,17 +226,17 @@
 					folder.add( bone.scale, 'y', 0, 2 );
 					folder.add( bone.scale, 'z', 0, 2 );
 
-					folder.__controllers[ 0 ].name( "position.x" );
-					folder.__controllers[ 1 ].name( "position.y" );
-					folder.__controllers[ 2 ].name( "position.z" );
+					folder.controllers[ 0 ].name( 'position.x' );
+					folder.controllers[ 1 ].name( 'position.y' );
+					folder.controllers[ 2 ].name( 'position.z' );
 
-					folder.__controllers[ 3 ].name( "rotation.x" );
-					folder.__controllers[ 4 ].name( "rotation.y" );
-					folder.__controllers[ 5 ].name( "rotation.z" );
+					folder.controllers[ 3 ].name( 'rotation.x' );
+					folder.controllers[ 4 ].name( 'rotation.y' );
+					folder.controllers[ 5 ].name( 'rotation.z' );
 
-					folder.__controllers[ 6 ].name( "scale.x" );
-					folder.__controllers[ 7 ].name( "scale.y" );
-					folder.__controllers[ 8 ].name( "scale.z" );
+					folder.controllers[ 6 ].name( 'scale.x' );
+					folder.controllers[ 7 ].name( 'scale.y' );
+					folder.controllers[ 8 ].name( 'scale.z' );
 
 				}
 

@@ -60,7 +60,6 @@
 			a texture using the first UV slot (all textures except aoMap and lightMap) must share the same
 			transform, or no transform at all.
 			aoMap 和 lightMap 纹理不能被变换。每个材质最多只能使用一次变换。
-			每次对使用具有唯一变换的纹理都会导致一次额外的GPU纹理上传。
 			请参阅#[link:https://github.com/mrdoob/three.js/pull/13831 13831] 和
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788]。
 		</i></p>
@@ -185,7 +184,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 包含有<em>.gltf</em>/<em>.glb</em>文件路径/URL的字符串。<br />
 		[page:Function onLoad] — 加载成功完成后将会被调用的函数。该函数接收[page:Function parse]所返回的已加载的JSON响应。<br />
@@ -196,7 +195,7 @@
 		开始从url加载，并使用解析过的响应内容调用回调函数。
 		</p>
 
-		<h3>[method:null setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
+		<h3>[method:this setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
 		<p>
 		[page:DRACOLoader dracoLoader] — THREE.DRACOLoader的实例，用于解码使用KHR_draco_mesh_compression扩展压缩过的文件。
 		</p>
@@ -204,7 +203,7 @@
 		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
 		</p>
 
-		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
+		<h3>[method:undefined parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<p>
 		[page:ArrayBuffer data] — 需要解析的glTF文件，值为一个ArrayBuffer或<em>JSON</em>字符串。<br />
 		[page:String path] — 用于找到后续glTF资源（如纹理和.bin数据文件）的基础路径。<br />

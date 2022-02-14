@@ -2,25 +2,32 @@ import Node from './Node.js';
 
 class PropertyNode extends Node {
 
-	constructor( name, type ) {
+	constructor( name = null, nodeType = 'vec4' ) {
 
-		super();
+		super( nodeType );
 
 		this.name = name;
-		this.type = type;
 
 	}
 
-	generate( builder, output ) {
+	getHash( builder ) {
 
-		const type = this.getType( builder );
+		return this.name || super.getHash( builder );
 
-		const nodeVary = builder.getVarFromNode( this, type );
-		nodeVary.name = this.name;
+	}
 
-		const propertyName = builder.getPropertyName( nodeVary );
+	generate( builder ) {
 
-		return builder.format( propertyName, type, output );
+		const nodeVary = builder.getVarFromNode( this, this.getNodeType( builder ) );
+		const name = this.name;
+
+		if ( name !== null ) {
+
+			nodeVary.name = name;
+
+		}
+
+		return builder.getPropertyName( nodeVary );
 
 	}
 
