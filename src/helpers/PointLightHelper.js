@@ -26,7 +26,7 @@ class PointLightHelper extends Mesh {
 
 		/*
 	// TODO: delete this comment?
-	const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+	const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 	const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
 	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );

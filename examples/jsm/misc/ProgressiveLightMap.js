@@ -307,7 +307,7 @@ class ProgressiveLightMap {
 
 		};
 
-		this.blurringPlane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), blurMaterial );
+		this.blurringPlane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), blurMaterial );
 		this.blurringPlane.name = 'Blurring Plane';
 		this.blurringPlane.frustumCulled = false;
 		this.blurringPlane.renderOrder = 0;
