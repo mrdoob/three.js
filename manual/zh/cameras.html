@@ -393,7 +393,7 @@ const textures = [
   loader.load('resources/images/flower-6.jpg'),
 ];
 const planeSize = 256;
-const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
+const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 const planes = textures.map((texture) =&gt; {
   const planePivot = new THREE.Object3D();
   scene.add(planePivot);

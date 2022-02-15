@@ -177,7 +177,7 @@
 
 				/** Post-processing scene */
 
-				const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				const planeGeometry = new THREE.PlaneGeometry( 2, 2 );
 				const screenQuad = new THREE.Mesh( planeGeometry, postProcessMaterial );
 				postProcessScene.add( screenQuad );
 
@@ -221,7 +221,7 @@
 							fragmentShader: document.getElementById( 'fs' ).textContent.trim()
 						} );
 
-						var geometry = new THREE.PlaneBufferGeometry( planeWidth, planeHeight );
+						var geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 
 						mesh = new THREE.Mesh( geometry, material );
 
