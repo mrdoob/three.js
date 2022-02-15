@@ -321,11 +321,11 @@
 			"按需渲染": "zh/rendering-on-demand",
 			"调试JavaScript": "zh/debugging-javascript",
 			"调试着色器": "zh/debugging-glsl",
-			"Taking a screenshot": "zh/tips#screenshot",
-			"Prevent the Canvas Being Cleared": "zh/tips#preservedrawingbuffer",
-			"Get Keyboard Input From a Canvas": "zh/tips#tabindex",
-			"Make the Canvas Transparent": "zh/tips#transparent-canvas",
-			"Use three.js as Background in HTML": "zh/tips#html-background"
+			"canvas截图": "zh/tips#screenshot",
+			"防止canvas被清空": "zh/tips#preservedrawingbuffer",
+			"从canvas获取键盘输入": "zh/tips#tabindex",
+			"透明化canvas": "zh/tips#transparent-canvas",
+			"在HTML中使用three.js动画背景": "zh/tips#html-background"
 		},
 		"优化": {
 			"大量对象的优化": "zh/optimize-lots-of-objects",
