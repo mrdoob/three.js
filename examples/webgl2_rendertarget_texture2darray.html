@@ -138,13 +138,10 @@
 			const postProcessScene = new THREE.Scene();
 			const postProcessCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-			const renderTargetTexture = new THREE.DataTexture2DArray();
-			renderTargetTexture.format = THREE.RedFormat;
-			renderTargetTexture.type = THREE.UnsignedByteType;
-
-			const renderTarget = new THREE.WebGLRenderTarget( DIMENSIONS.width, DIMENSIONS.height );
-			renderTarget.depth = DIMENSIONS.depth;
-			renderTarget.setTexture( renderTargetTexture );
+			const renderTarget = new THREE.WebGL2DArrayRenderTarget( DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth, {
+				format: THREE.RedFormat,
+				type: THREE.UnsignedByteType
+			} );
 
 			const postProcessMaterial = new THREE.ShaderMaterial( {
 				uniforms: {

@@ -1,5 +1,7 @@
 import { REVISION } from './constants.js';
 
+export { WebGL2DArrayRenderTarget } from './renderers/WebGL2DArrayRenderTarget.js';
+export { WebGL3DRenderTarget } from './renderers/WebGL3DRenderTarget.js';
 export { WebGLMultipleRenderTargets } from './renderers/WebGLMultipleRenderTargets.js';
 export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
