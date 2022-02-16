@@ -59,7 +59,6 @@ function WebGLRenderer( parameters = {} ) {
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
-		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 		_depth = parameters.depth !== undefined ? parameters.depth : true,
 		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
@@ -67,6 +66,18 @@ function WebGLRenderer( parameters = {} ) {
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
 		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
+
+	let _alpha;
+
+	if ( parameters.context !== undefined ) {
+
+		_alpha = _context.getContextAttributes().alpha;
+
+	} else {
+
+		_alpha = parameters.alpha !== undefined ? parameters.alpha : false;
+
+	}
 
 	let currentRenderList = null;
 	let currentRenderState = null;
