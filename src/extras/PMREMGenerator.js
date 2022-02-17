@@ -4,7 +4,6 @@ import {
 	CubeUVReflectionMapping,
 	LinearEncoding,
 	LinearFilter,
-	NearestFilter,
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
@@ -216,7 +215,6 @@ class PMREMGenerator {
 	_cleanup( outputTarget ) {
 
 		this._renderer.setRenderTarget( _oldTarget );
-		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
 	}
@@ -454,9 +452,6 @@ class PMREMGenerator {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
-		cubeUVRenderTarget.texture.minFilter = NearestFilter;
-		pingPongRenderTarget.texture.minFilter = NearestFilter;
-
 		this._halfBlur(
 			cubeUVRenderTarget,
 			pingPongRenderTarget,
@@ -474,9 +469,6 @@ class PMREMGenerator {
 			sigma,
 			'longitudinal',
 			poleAxis );
-
-		cubeUVRenderTarget.texture.minFilter = LinearFilter;
-		pingPongRenderTarget.texture.minFilter = LinearFilter;
 
 	}
 
@@ -652,7 +644,6 @@ function _createRenderTarget( width, height, params ) {
 	const cubeUVRenderTarget = new WebGLRenderTarget( width, height, params );
 	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
 	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
-	cubeUVRenderTarget.scissorTest = true;
 	return cubeUVRenderTarget;
 
 }
@@ -660,7 +651,6 @@ function _createRenderTarget( width, height, params ) {
 function _setViewport( target, x, y, width, height ) {
 
 	target.viewport.set( x, y, width, height );
-	target.scissor.set( x, y, width, height );
 
 }
 
