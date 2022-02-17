@@ -1,5 +1,5 @@
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
-import { DataTexture3D } from '../textures/DataTexture3D.js';
+import { Data3DTexture } from '../textures/Data3DTexture.js';
 
 class WebGL3DRenderTarget extends WebGLRenderTarget {
 
@@ -9,7 +9,7 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 
 		this.depth = depth;
 
-		this.texture = new DataTexture3D( null, width, height, depth );
+		this.texture = new Data3DTexture( null, width, height, depth );
 
 		if ( options.format !== undefined ) this.texture.format = options.format;
 		if ( options.type !== undefined ) this.texture.type = options.type;

@@ -349,7 +349,7 @@ class WebGPUTextures {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isDataTexture2DArray || texture.isDataTexture3D ) {
+		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 			this._copyBufferToTexture( image, format, textureGPU );
 
@@ -528,7 +528,7 @@ class WebGPUTextures {
 
 		let dimension;
 
-		if ( texture.isDataTexture3D ) {
+		if ( texture.isData3DTexture ) {
 
 			dimension = GPUTextureDimension.ThreeD;
 

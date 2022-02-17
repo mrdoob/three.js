@@ -204,7 +204,7 @@
 						var zip = unzipSync( new Uint8Array( data ) );
 						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
-						const texture = new THREE.DataTexture2DArray( array, DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth );
+						const texture = new THREE.DataArrayTexture( array, DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth );
 						texture.format = THREE.RedFormat;
 						texture.needsUpdate = true;
 
@@ -279,8 +279,7 @@
 
 			function render() {
 
-				// Step 1 - Render the input DataTexture2DArray into a
-				// DataTexture2DArray render target.
+				// Step 1 - Render the input DataArrayTexture into render target
 				renderTo2DArray();
 
 				// Step 2 - Renders the scene containing the plane with a material

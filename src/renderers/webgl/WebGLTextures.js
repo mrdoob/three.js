@@ -662,8 +662,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		let textureType = _gl.TEXTURE_2D;
 
-		if ( texture.isDataTexture2DArray ) textureType = _gl.TEXTURE_2D_ARRAY;
-		if ( texture.isDataTexture3D ) textureType = _gl.TEXTURE_3D;
+		if ( texture.isDataArrayTexture ) textureType = _gl.TEXTURE_2D_ARRAY;
+		if ( texture.isData3DTexture ) textureType = _gl.TEXTURE_3D;
 
 		const forceUpload = initTexture( textureProperties, texture );
 		const source = texture.source;
@@ -883,7 +883,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-			} else if ( texture.isDataTexture2DArray ) {
+			} else if ( texture.isDataArrayTexture ) {
 
 				if ( useTexStorage ) {
 
@@ -901,7 +901,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-			} else if ( texture.isDataTexture3D ) {
+			} else if ( texture.isData3DTexture ) {
 
 				if ( useTexStorage ) {
 
@@ -1614,7 +1614,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			let glTextureType = _gl.TEXTURE_2D;
 
-			if ( renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGL2DArrayRenderTarget ) {
+			if ( renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget ) {
 
 				if ( isWebGL2 ) {
 
@@ -1622,7 +1622,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				} else {
 
-					console.error( 'THREE.WebGLTextures: THREE.DataTexture3D and THREE.DataTexture2DArray only supported with WebGL2.' );
+					console.error( 'THREE.WebGLTextures: THREE.Data3DTexture and THREE.DataArrayTexture only supported with WebGL2.' );
 
 				}
 

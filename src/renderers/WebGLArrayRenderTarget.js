@@ -1,7 +1,7 @@
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
-import { DataTexture2DArray } from '../textures/DataTexture2DArray.js';
+import { DataArrayTexture } from '../textures/DataArrayTexture.js';
 
-class WebGL2DArrayRenderTarget extends WebGLRenderTarget {
+class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
 	constructor( width, height, depth, options = {} ) {
 
@@ -9,7 +9,7 @@ class WebGL2DArrayRenderTarget extends WebGLRenderTarget {
 
 		this.depth = depth;
 
-		this.texture = new DataTexture2DArray( null, width, height, depth );
+		this.texture = new DataArrayTexture( null, width, height, depth );
 
 		if ( options.format !== undefined ) this.texture.format = options.format;
 		if ( options.type !== undefined ) this.texture.type = options.type;
@@ -28,6 +28,6 @@ class WebGL2DArrayRenderTarget extends WebGLRenderTarget {
 
 }
 
-WebGL2DArrayRenderTarget.prototype.isWebGL2DArrayRenderTarget = true;
+WebGLArrayRenderTarget.prototype.isWebGLArrayRenderTarget = true;
 
-export { WebGL2DArrayRenderTarget };
+export { WebGLArrayRenderTarget };
