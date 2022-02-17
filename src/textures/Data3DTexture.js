@@ -1,9 +1,17 @@
 import { Texture } from './Texture.js';
 import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 
-class DataTexture2DArray extends Texture {
+class Data3DTexture extends Texture {
 
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
+
+		// We're going to add .setXXX() methods for setting properties later.
+		// Users can still set in DataTexture3D directly.
+		//
+		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
+		// 	texture.anisotropy = 16;
+		//
+		// See #14839
 
 		super( null );
 
@@ -22,6 +30,6 @@ class DataTexture2DArray extends Texture {
 
 }
 
-DataTexture2DArray.prototype.isDataTexture2DArray = true;
+Data3DTexture.prototype.isData3DTexture = true;
 
-export { DataTexture2DArray };
+export { Data3DTexture };

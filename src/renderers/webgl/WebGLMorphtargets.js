@@ -1,5 +1,5 @@
 import { FloatType, RGBAFormat } from '../../constants.js';
-import { DataTexture2DArray } from '../../textures/DataTexture2DArray.js';
+import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector2 } from '../../math/Vector2.js';
 
@@ -81,7 +81,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 				const buffer = new Float32Array( width * height * 4 * numberOfMorphTargets );
 
-				const texture = new DataTexture2DArray( buffer, width, height, numberOfMorphTargets );
+				const texture = new DataArrayTexture( buffer, width, height, numberOfMorphTargets );
 				texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
 				texture.type = FloatType;
 				texture.needsUpdate = true;

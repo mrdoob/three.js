@@ -41,18 +41,6 @@ class WebGLRenderTarget extends EventDispatcher {
 
 	}
 
-	setTexture( texture ) {
-
-		texture.image = {
-			width: this.width,
-			height: this.height,
-			depth: this.depth
-		};
-
-		this.texture = texture;
-
-	}
-
 	setSize( width, height, depth = 1 ) {
 
 		if ( this.width !== width || this.height !== height || this.depth !== depth ) {
