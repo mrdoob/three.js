@@ -3631,6 +3631,13 @@ class Vector3 {
 		return this.fromArray(m.elements, index * 3);
 	}
 
+	setFromEuler(e) {
+		this.x = e._x;
+		this.y = e._y;
+		this.z = e._z;
+		return this;
+	}
+
 	equals(v) {
 		return v.x === this.x && v.y === this.y && v.z === this.z;
 	}
@@ -5569,14 +5576,6 @@ class Euler {
 		array[offset + 2] = this._z;
 		array[offset + 3] = this._order;
 		return array;
-	}
-
-	toVector3(optionalResult) {
-		if (optionalResult) {
-			return optionalResult.set(this._x, this._y, this._z);
-		} else {
-			return new Vector3(this._x, this._y, this._z);
-		}
 	}
 
 	_onChange(callback) {
@@ -34201,7 +34200,7 @@ class PointLightHelper extends Mesh {
 		this.update();
 		/*
 		// TODO: delete this comment?
-		const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+		const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 		const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 		this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 		this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
@@ -35340,6 +35339,11 @@ Box3.prototype.isIntersectionSphere = function (sphere) {
 Box3.prototype.size = function (optionalTarget) {
 	console.warn('THREE.Box3: .size() has been renamed to .getSize().');
 	return this.getSize(optionalTarget);
+}; //
+
+
+Euler.prototype.toVector3 = function () {
+	console.error('THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead');
 }; //
 
 
