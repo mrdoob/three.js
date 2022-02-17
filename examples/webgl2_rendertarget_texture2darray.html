@@ -138,7 +138,7 @@
 			const postProcessScene = new THREE.Scene();
 			const postProcessCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-			const renderTarget = new THREE.WebGL2DArrayRenderTarget( DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth, {
+			const renderTarget = new THREE.WebGLArrayRenderTarget( DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth, {
 				format: THREE.RedFormat,
 				type: THREE.UnsignedByteType
 			} );
