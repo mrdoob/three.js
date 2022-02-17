@@ -149,21 +149,21 @@ class OperatorNode extends TempNode {
 
 			} else if ( op === '>' && outputLength > 1 ) {
 
-				return `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`;
+				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`, type, output );
 
 			} else if ( op === '<=' && outputLength > 1 ) {
 
-				return `${ builder.getMethod( 'lessThanEqual' ) }( ${a}, ${b} )`;
+				return builder.format( `${ builder.getMethod( 'lessThanEqual' ) }( ${a}, ${b} )`, type, output );
 
 			} else {
 
-				return `( ${a} ${this.op} ${b} )`;
+				return builder.format( `( ${a} ${this.op} ${b} )`, type, output );
 
 			}
 
 		} else if ( typeA !== 'void' ) {
 
-			return `${a} ${this.op} ${b}`;
+			return builder.format( `${a} ${this.op} ${b}`, type, output );
 
 		}
 
