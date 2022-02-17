@@ -22,7 +22,7 @@ export class Vector4Editor extends BaseNode {
 		const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
 		const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
 		const fieldZ = new NumberInput().setTagColor( 'blue' ).onChange( onUpdate );
-		const fieldW = new NumberInput().setTagColor( 'white' ).onChange( onUpdate );
+		const fieldW = new NumberInput( 1 ).setTagColor( 'white' ).onChange( onUpdate );
 
 		this.add( new LabelElement( 'XYZW' )
 			.add( fieldX )

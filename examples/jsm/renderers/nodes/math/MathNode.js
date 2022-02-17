@@ -164,15 +164,15 @@ class MathNode extends TempNode {
 
 		} else if ( method === MathNode.SATURATE ) {
 
-			return `clamp( ${ a.build( builder, inputType ) }, 0.0, 1.0 )`;
+			return builder.format( `clamp( ${ a.build( builder, inputType ) }, 0.0, 1.0 )`, type, output );
 
 		} else if ( method === MathNode.NEGATE ) {
 
-			return '( -' + a.build( builder, inputType ) + ' )';
+			return builder.format( '( -' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else if ( method === MathNode.INVERT ) {
 
-			return '( 1.0 - ' + a.build( builder, inputType ) + ' )';
+			return builder.format( '( 1.0 - ' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else {
 

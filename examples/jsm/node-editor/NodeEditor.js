@@ -22,6 +22,7 @@ import { NormalMapEditor } from './display/NormalMapEditor.js';
 import { UVEditor } from './accessors/UVEditor.js';
 import { PositionEditor } from './accessors/PositionEditor.js';
 import { NormalEditor } from './accessors/NormalEditor.js';
+import { PreviewEditor } from './utils/PreviewEditor.js';
 import { TimerEditor } from './utils/TimerEditor.js';
 import { OscillatorEditor } from './utils/OscillatorEditor.js';
 import { SplitEditor } from './utils/SplitEditor.js';
@@ -178,6 +179,11 @@ export const NodeList = [
 		name: 'Utils',
 		icon: 'apps',
 		children: [
+			{
+				name: 'Preview',
+				icon: 'square-check',
+				nodeClass: PreviewEditor
+			},
 			{
 				name: 'Timer',
 				icon: 'clock',
