@@ -116,6 +116,11 @@
 		setting / removing filters.
 		</p>
 
+		<h3>[method:Float getDetune]()</h3>
+		<p>
+		Returns the detuning of oscillation in cents.
+		</p>
+
 		<h3>[method:BiquadFilterNode getFilter]()</h3>
 		<p>
 		Returns the first element of the [page:Audio.filters filters] array.
@@ -166,6 +171,11 @@
 		<p>
 		Setup the [page:Audio.source source] to the audioBuffer, and sets [page:Audio.sourceType sourceType] to 'buffer'.<br />
 		If [page:Audio.autoplay autoplay], also starts playback.
+		</p>
+
+		<h3>[method:this setDetune]( [param:Float value] )</h3>
+		<p>
+		Defines the detuning of oscillation in cents.
 		</p>
 
 		<h3>[method:this setFilter]( filter )</h3>
