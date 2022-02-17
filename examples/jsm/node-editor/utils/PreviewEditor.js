@@ -79,7 +79,7 @@ export class PreviewEditor extends BaseNode {
 			material.colorNode = inputElement.getLinkedObject() || nullValue;
 			material.dispose();
 
-		} );
+		}, true );
 
 		const canvas = document.createElement( 'canvas' );
 		canvas.style.position = 'absolute';
