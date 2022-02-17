@@ -3,24 +3,13 @@ import { DataArrayTexture } from '../textures/DataArrayTexture.js';
 
 class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
-	constructor( width, height, depth, options = {} ) {
+	constructor( width, height, depth ) {
 
-		super( width, height, options );
+		super( width, height );
 
 		this.depth = depth;
 
 		this.texture = new DataArrayTexture( null, width, height, depth );
-
-		if ( options.format !== undefined ) this.texture.format = options.format;
-		if ( options.type !== undefined ) this.texture.type = options.type;
-		if ( options.mapping !== undefined ) this.texture.mapping = options.mapping;
-		if ( options.wrapS !== undefined ) this.texture.wrapS = options.wrapS;
-		if ( options.wrapT !== undefined ) this.texture.wrapT = options.wrapT;
-		if ( options.wrapR !== undefined ) this.texture.wrapR = options.wrapR;
-		if ( options.magFilter !== undefined ) this.texture.magFilter = options.magFilter;
-		if ( options.minFilter !== undefined ) this.texture.minFilter = options.minFilter;
-		if ( options.anisotropy !== undefined ) this.texture.anisotropy = options.anisotropy;
-		if ( options.encoding !== undefined ) this.texture.encoding = options.encoding;
 
 		this.texture.isRenderTargetTexture = true;
 
