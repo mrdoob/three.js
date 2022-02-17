@@ -18,7 +18,7 @@
 
 	class PointerLockControls extends THREE.EventDispatcher {
 
-		constructor( camera, domElement ) {
+		constructor( camera, domElement, options = {} ) {
 
 			super();
 
@@ -37,6 +37,8 @@
 
 			this.maxPolarAngle = Math.PI; // radians
 
+			this.mouseSpeed = options.mouseSpeed || 0.002;
+
 			const scope = this;
 
 			function onMouseMove( event ) {
@@ -47,8 +49,8 @@
 
 				_euler.setFromQuaternion( camera.quaternion );
 
-				_euler.y -= movementX * 0.002;
-				_euler.x -= movementY * 0.002;
+				_euler.y -= movementX * scope.mouseSpeed;
+				_euler.x -= movementY * scope.mouseSpeed;
 				_euler.x = Math.max( _PI_2 - scope.maxPolarAngle, Math.min( _PI_2 - scope.minPolarAngle, _euler.x ) );
 				camera.quaternion.setFromEuler( _euler );
 				scope.dispatchEvent( _changeEvent );

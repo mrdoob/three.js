@@ -15,7 +15,7 @@ const _PI_2 = Math.PI / 2;
 
 class PointerLockControls extends EventDispatcher {
 
-	constructor( camera, domElement ) {
+	constructor( camera, domElement, options = {} ) {
 
 		super();
 
@@ -34,6 +34,8 @@ class PointerLockControls extends EventDispatcher {
 		this.minPolarAngle = 0; // radians
 		this.maxPolarAngle = Math.PI; // radians
 
+		this.mouseSpeed = options.mouseSpeed || 0.002;
+
 		const scope = this;
 
 		function onMouseMove( event ) {
@@ -45,8 +47,8 @@ class PointerLockControls extends EventDispatcher {
 
 			_euler.setFromQuaternion( camera.quaternion );
 
-			_euler.y -= movementX * 0.002;
-			_euler.x -= movementY * 0.002;
+			_euler.y -= movementX * scope.mouseSpeed;
+			_euler.x -= movementY * scope.mouseSpeed;
 
 			_euler.x = Math.max( _PI_2 - scope.maxPolarAngle, Math.min( _PI_2 - scope.minPolarAngle, _euler.x ) );
 
