@@ -250,7 +250,7 @@ class PMREMGenerator {
 
 		const params = {
 			magFilter: LinearFilter,
-			minFilter: NearestFilter,
+			minFilter: LinearFilter,
 			generateMipmaps: false,
 			type: HalfFloatType,
 			format: RGBAFormat,
@@ -454,6 +454,9 @@ class PMREMGenerator {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
+		cubeUVRenderTarget.texture.minFilter = NearestFilter;
+		pingPongRenderTarget.texture.minFilter = NearestFilter;
+
 		this._halfBlur(
 			cubeUVRenderTarget,
 			pingPongRenderTarget,
@@ -471,6 +474,9 @@ class PMREMGenerator {
 			sigma,
 			'longitudinal',
 			poleAxis );
+
+		cubeUVRenderTarget.texture.minFilter = LinearFilter;
+		pingPongRenderTarget.texture.minFilter = LinearFilter;
 
 	}
 
