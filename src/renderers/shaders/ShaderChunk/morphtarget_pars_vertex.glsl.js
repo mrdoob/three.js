@@ -9,14 +9,14 @@ export default /* glsl */`
 		uniform sampler2DArray morphTargetsTexture;
 		uniform vec2 morphTargetsTextureSize;
 
-		vec3 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset, const in int stride ) {
+		vec4 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset ) {
 
-			float texelIndex = float( vertexIndex * stride + offset );
+			float texelIndex = float( vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + offset );
 			float y = floor( texelIndex / morphTargetsTextureSize.x );
 			float x = texelIndex - y * morphTargetsTextureSize.x;
 
 			vec3 morphUV = vec3( ( x + 0.5 ) / morphTargetsTextureSize.x, y / morphTargetsTextureSize.y, morphTargetIndex );
-			return texture( morphTargetsTexture, morphUV ).xyz;
+			return texture( morphTargetsTexture, morphUV );
 
 		}
 
