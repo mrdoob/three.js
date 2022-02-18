@@ -16,7 +16,9 @@
 			filtered 'mips' at the same LOD_MIN resolution, associated with higher roughness levels. In this way we maintain
 			resolution to smoothly interpolate diffuse lighting while limiting sampling computation.<br/><br/>
 
-			Note: The minimum [page:MeshStandardMaterial]'s roughness depends on the size of the provided texture:
+			Note: The minimum [page:MeshStandardMaterial]'s roughness depends on the size of the provided texture.
+			If your render has small dimensions or the shiny parts have a lot of curvature, you may still be able to get away with
+			a smaller texture size.
 
 			<table>
 				<tr>
