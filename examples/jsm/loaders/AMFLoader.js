@@ -101,7 +101,7 @@ class AMFLoader extends Loader {
 
 				for ( file in zip ) {
 
-					if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
+					if ( file.toLowerCase().slice( - 4 ) === '.amf' ) {
 
 						break;
 

@@ -173,7 +173,7 @@ var require_web_ifc = __commonJS({
             scriptDirectory = _scriptDir;
           }
           if (scriptDirectory.indexOf("blob:") !== 0) {
-            scriptDirectory = scriptDirectory.substr(0, scriptDirectory.lastIndexOf("/") + 1);
+            scriptDirectory = scriptDirectory.slice(0, scriptDirectory.lastIndexOf("/") + 1);
           } else {
             scriptDirectory = "";
           }
@@ -728,7 +728,7 @@ var require_web_ifc = __commonJS({
           }
           return parts;
         }, normalize: function(path) {
-          var isAbsolute = path.charAt(0) === "/", trailingSlash = path.substr(-1) === "/";
+          var isAbsolute = path.charAt(0) === "/", trailingSlash = path.slice(-1) === "/";
           path = PATH.normalizeArray(path.split("/").filter(function(p) {
             return !!p;
           }), !isAbsolute).join("/");
@@ -745,7 +745,7 @@ var require_web_ifc = __commonJS({
             return ".";
           }
           if (dir) {
-            dir = dir.substr(0, dir.length - 1);
+            dir = dir.slice(0, dir.length - 1);
           }
           return root + dir;
         }, basename: function(path) {
@@ -756,7 +756,7 @@ var require_web_ifc = __commonJS({
           var lastSlash = path.lastIndexOf("/");
           if (lastSlash === -1)
             return path;
-          return path.substr(lastSlash + 1);
+          return path.slice(lastSlash + 1);
         }, extname: function(path) {
           return PATH.splitPath(path)[3];
         }, join: function() {
@@ -802,8 +802,8 @@ var require_web_ifc = __commonJS({
           }), !resolvedAbsolute).join("/");
           return (resolvedAbsolute ? "/" : "") + resolvedPath || ".";
         }, relative: function(from, to) {
-          from = PATH_FS.resolve(from).substr(1);
-          to = PATH_FS.resolve(to).substr(1);
+          from = PATH_FS.resolve(from).slice(1);
+          to = PATH_FS.resolve(to).slice(1);
           function trim(arr) {
             var start = 0;
             for (; start < arr.length; start++) {
@@ -2692,7 +2692,7 @@ var require_web_ifc = __commonJS({
         }, doMkdir: function(path, mode) {
           path = PATH.normalize(path);
           if (path[path.length - 1] === "/")
-            path = path.substr(0, path.length - 1);
+            path = path.slice(0, path.length - 1);
           FS.mkdir(path, mode, 0);
           return 0;
         }, doMknod: function(path, mode, dev) {
@@ -47501,3 +47501,4 @@ export {
 
 
  var WasmPath = "";
+

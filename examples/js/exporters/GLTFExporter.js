@@ -1352,7 +1352,7 @@
 			for ( let attributeName in geometry.attributes ) {
 
 				// Ignore morph target attributes, which are exported later.
-				if ( attributeName.substr( 0, 5 ) === 'morph' ) continue;
+				if ( attributeName.slice( 0, 5 ) === 'morph' ) continue;
 				const attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase(); // Prefix all geometry attributes except the ones specifically
 				// listed in the spec; non-spec attributes are considered custom.
