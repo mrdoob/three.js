@@ -271,7 +271,7 @@ class NodeBuilder {
 
 	getVectorFromMatrix( type ) {
 
-		return 'vec' + type.substr( 3 );
+		return 'vec' + type.slice( 3 );
 
 	}
 

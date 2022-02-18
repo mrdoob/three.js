@@ -574,7 +574,7 @@ class OBJLoader extends Loader {
 
 			} else if ( lineFirstChar === 'f' ) {
 
-				const lineData = line.substr( 1 ).trim();
+				const lineData = line.slice( 1 ).trim();
 				const vertexData = lineData.split( /\s+/ );
 				const faceVertices = [];
 
@@ -637,7 +637,7 @@ class OBJLoader extends Loader {
 
 			} else if ( lineFirstChar === 'p' ) {
 
-				const lineData = line.substr( 1 ).trim();
+				const lineData = line.slice( 1 ).trim();
 				const pointData = lineData.split( ' ' );
 
 				state.addPointGeometry( pointData );
@@ -649,8 +649,8 @@ class OBJLoader extends Loader {
 				// g group_name
 
 				// WORKAROUND: https://bugs.chromium.org/p/v8/issues/detail?id=2869
-				// let name = result[ 0 ].substr( 1 ).trim();
-				const name = ( ' ' + result[ 0 ].substr( 1 ).trim() ).substr( 1 );
+				// let name = result[ 0 ].slice( 1 ).trim();
+				const name = ( ' ' + result[ 0 ].slice( 1 ).trim() ).slice( 1 );
 
 				state.startObject( name );
 

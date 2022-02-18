@@ -2873,7 +2873,7 @@ class ColorInput extends Input {
 
 	getValue() {
 
-		return parseInt( super.getValue().substr( 1 ), 16 );
+		return parseInt( super.getValue().slice( 1 ), 16 );
 
 	}
 

@@ -2805,7 +2805,7 @@
 							const param = child.getElementsByTagName( 'param' )[ 0 ];
 							data.axis = param.textContent;
 							const tmpJointIndex = data.axis.split( 'inst_' ).pop().split( 'axis' )[ 0 ];
-							data.jointIndex = tmpJointIndex.substr( 0, tmpJointIndex.length - 1 );
+							data.jointIndex = tmpJointIndex.substring( 0, tmpJointIndex.length - 1 );
 							break;
 
 					}
