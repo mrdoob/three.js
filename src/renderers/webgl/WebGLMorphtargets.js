@@ -137,29 +137,14 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 						if ( hasMorphColors === true ) {
 
-							if ( morphColor.itemSize === 3 ) {
+							morph.fromBufferAttribute( morphColor, j );
 
-								morph.fromBufferAttribute( morphColor, j );
+							if ( morphColor.normalized === true ) denormalize( morph, morphNormal );
 
-								if ( morphColor.normalized === true ) denormalize( morph, morphNormal );
-
-								buffer[ offset + stride + 8 ] = morph.x;
-								buffer[ offset + stride + 9 ] = morph.y;
-								buffer[ offset + stride + 10 ] = morph.z;
-								buffer[ offset + stride + 11 ] = 1;
-
-							} else {
-
-								morph.fromBufferAttribute( morphColor, j );
-
-								if ( morphColor.normalized === true ) denormalize( morph, morphNormal );
-
-								buffer[ offset + stride + 8 ] = morph.x;
-								buffer[ offset + stride + 9 ] = morph.y;
-								buffer[ offset + stride + 10 ] = morph.z;
-								buffer[ offset + stride + 11 ] = morph.w;
-
-							}
+							buffer[ offset + stride + 8 ] = morph.x;
+							buffer[ offset + stride + 9 ] = morph.y;
+							buffer[ offset + stride + 10 ] = morph.z;
+							buffer[ offset + stride + 11 ] = ( morphColor.itemSize === 4 ) ? morph.w : 1;
 
 						}
 
