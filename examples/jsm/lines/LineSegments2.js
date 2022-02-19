@@ -53,7 +53,6 @@ function raycastWorldUnits( intersects ) {
 
 	for ( let i = 0, l = _instanceStart.count; i < l; i ++ ) {
 
-
 		_line.start.fromBufferAttribute( _instanceStart, i );
 		_line.end.fromBufferAttribute( _instanceEnd, i );
 
@@ -94,6 +93,7 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
 	const instanceEnd = geometry.attributes.instanceEnd;
 
 	const near = - camera.near;
+
 	//
 
 	// pick a point 1 unit out along the ray to avoid the ray origin
@@ -325,7 +325,7 @@ class LineSegments2 extends Mesh {
 
 		// increase the box bounds by the worst case line width
 		let boxMargin;
-		if ( this.material.worldUnits ) {
+		if ( worldUnits ) {
 
 			boxMargin = _lineWidth * 0.5;
 
