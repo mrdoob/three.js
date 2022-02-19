@@ -29,7 +29,7 @@ const _box = new Box3();
 const _sphere = new Sphere();
 const _clipToWorldVector = new Vector4();
 
-let _ray, _instanceStart, _instanceEnd, _near, _lineWidth;
+let _ray, _instanceStart, _instanceEnd, _lineWidth;
 
 // Returns the margin required to expand by in world space given the distance from the camera,
 // line width, resolution, and camera projection
@@ -49,107 +49,18 @@ function getWorldSpaceHalfWidth( camera, distance, resolution ) {
 
 }
 
-function getPointAndPointOnLine( { point, pointOnLine, faceIndex } ) {
-
-	_line.start.fromBufferAttribute( _instanceStart, faceIndex );
-	_line.end.fromBufferAttribute( _instanceEnd, faceIndex );
-
-	_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
-
-}
-
-function computeStartEnd( instanceStart, instanceEnd, i ) {
-
-	_start4.fromBufferAttribute( instanceStart, i );
-	_end4.fromBufferAttribute( instanceEnd, i );
-
-	_start4.w = 1;
-	_end4.w = 1;
-
-	_line.start.fromBufferAttribute( _instanceStart, i );
-	_line.end.fromBufferAttribute( _instanceEnd, i );
-
-	// camera space
-	_start4.applyMatrix4( _mvMatrix );
-	_end4.applyMatrix4( _mvMatrix );
-
-}
-
-function trimSegment( near ) {
-
-	// trim the segment if it extends behind camera near
-	if ( _start4.z > near ) {
-
-		const deltaDist = _start4.z - _end4.z;
-		const t = ( _start4.z - near ) / deltaDist;
-		_start4.lerp( _end4, t );
-
-	} else if ( _end4.z > near ) {
-
-		const deltaDist = _end4.z - _start4.z;
-		const t = ( _end4.z - near ) / deltaDist;
-		_end4.lerp( _start4, t );
-
-	}
-
-}
-
-function isInClipSpace( projectionMatrix, resolution ) {
-
-	// clip space
-	_start4.applyMatrix4( projectionMatrix );
-	_end4.applyMatrix4( projectionMatrix );
-	// ndc space [ - 1.0, 1.0 ]
-	_start4.multiplyScalar( 1 / _start4.w );
-	_end4.multiplyScalar( 1 / _end4.w );
-	// screen space
-	_start4.x *= resolution.x / 2;
-	_start4.y *= resolution.y / 2;
-	_end4.x *= resolution.x / 2;
-	_end4.y *= resolution.y / 2;
-	// create 2d segment
-	_line.start.copy( _start4 );
-	_line.start.z = 0;
-	_line.end.copy( _end4 );
-	_line.end.z = 0;
-	// get closest point on ray to segment
-	const param = _line.closestPointToPointParameter( _ssOrigin3, true );
-	_line.at( param, _closestPoint );
-	// check if the intersection point is within clip space
-	const zPos = MathUtils.lerp( _start4.z, _end4.z, param );
-	return zPos >= - 1 && zPos <= 1;
-
-}
-
-function raycastWorldUnits( lineSegments, camera, intersects ) {
+function raycastWorldUnits( intersects ) {
 
 	for ( let i = 0, l = _instanceStart.count; i < l; i ++ ) {
 
-		computeStartEnd( _instanceStart, _instanceEnd, i );
 
-		if ( camera ) {
-
-			// camera forward is negative
-			// skip the segment if it's entirely behind the camera
-			const isBehindCameraNear = _start4.z > _near && _end4.z > _near;
-			if ( isBehindCameraNear ) {
-
-				continue;
-
-			}
-
-			// trim the segment if it extends behind camera near
-			trimSegment( _near );
-
-		}
+		_line.start.fromBufferAttribute( _instanceStart, i );
+		_line.end.fromBufferAttribute( _instanceEnd, i );
 
 		const pointOnLine = new Vector3();
 		const point = new Vector3();
-		getPointAndPointOnLine( {
-			point,
-			pointOnLine,
-			faceIndex: i
-		} );
+
+		_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
 		const isInside = point.distanceTo( pointOnLine ) < _lineWidth * 0.5;
 
 		if ( isInside ) {
@@ -171,9 +82,19 @@ function raycastWorldUnits( lineSegments, camera, intersects ) {
 
 }
 
-function raycastScreenUnits( lineSegments, camera, intersects ) {
+function raycastScreenSpace( lineSegments, camera, intersects ) {
 
-	const resolution = lineSegments.material.resolution;
+	const projectionMatrix = camera.projectionMatrix;
+	const material = lineSegments.material;
+	const resolution = material.resolution;
+	const matrixWorld = lineSegments.matrixWorld;
+
+	const geometry = lineSegments.geometry;
+	const instanceStart = geometry.attributes.instanceStart;
+	const instanceEnd = geometry.attributes.instanceEnd;
+
+	const near = - camera.near;
+	//
 
 	// pick a point 1 unit out along the ray to avoid the ray origin
 	// sitting at the camera origin which will cause "w" to be 0 when
@@ -183,9 +104,8 @@ function raycastScreenUnits( lineSegments, camera, intersects ) {
 	// ndc space [ - 1.0, 1.0 ]
 	_ssOrigin.w = 1;
 	_ssOrigin.applyMatrix4( camera.matrixWorldInverse );
-	_ssOrigin.applyMatrix4( camera.projectionMatrix );
+	_ssOrigin.applyMatrix4( projectionMatrix );
 	_ssOrigin.multiplyScalar( 1 / _ssOrigin.w );
-
 
 	// screen space
 	_ssOrigin.x *= resolution.x / 2;
@@ -194,12 +114,22 @@ function raycastScreenUnits( lineSegments, camera, intersects ) {
 
 	_ssOrigin3.copy( _ssOrigin );
 
-	for ( let i = 0, l = _instanceStart.count; i < l; i ++ ) {
+	_mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
 
-		computeStartEnd( _instanceStart, _instanceEnd, i );
+	for ( let i = 0, l = instanceStart.count; i < l; i ++ ) {
+
+		_start4.fromBufferAttribute( instanceStart, i );
+		_end4.fromBufferAttribute( instanceEnd, i );
+
+		_start4.w = 1;
+		_end4.w = 1;
+
+		// camera space
+		_start4.applyMatrix4( _mvMatrix );
+		_end4.applyMatrix4( _mvMatrix );
 
 		// skip the segment if it's entirely behind the camera
-		const isBehindCameraNear = _start4.z > _near && _end4.z > _near;
+		const isBehindCameraNear = _start4.z > near && _end4.z > near;
 		if ( isBehindCameraNear ) {
 
 			continue;
@@ -207,41 +137,75 @@ function raycastScreenUnits( lineSegments, camera, intersects ) {
 		}
 
 		// trim the segment if it extends behind camera near
-		trimSegment( _near );
+		if ( _start4.z > near ) {
 
-		if ( ! isInClipSpace( camera.projectionMatrix, resolution ) ) {
+			const deltaDist = _start4.z - _end4.z;
+			const t = ( _start4.z - near ) / deltaDist;
+			_start4.lerp( _end4, t );
 
-			continue;
+		} else if ( _end4.z > near ) {
+
+			const deltaDist = _end4.z - _start4.z;
+			const t = ( _end4.z - near ) / deltaDist;
+			_end4.lerp( _start4, t );
 
 		}
 
+		// clip space
+		_start4.applyMatrix4( projectionMatrix );
+		_end4.applyMatrix4( projectionMatrix );
+
+		// ndc space [ - 1.0, 1.0 ]
+		_start4.multiplyScalar( 1 / _start4.w );
+		_end4.multiplyScalar( 1 / _end4.w );
+
+		// screen space
+		_start4.x *= resolution.x / 2;
+		_start4.y *= resolution.y / 2;
+
+		_end4.x *= resolution.x / 2;
+		_end4.y *= resolution.y / 2;
+
+		// create 2d segment
+		_line.start.copy( _start4 );
+		_line.start.z = 0;
+
+		_line.end.copy( _end4 );
+		_line.end.z = 0;
+
+		// get closest point on ray to segment
+		const param = _line.closestPointToPointParameter( _ssOrigin3, true );
+		_line.at( param, _closestPoint );
+
+		// check if the intersection point is within clip space
+		const zPos = MathUtils.lerp( _start4.z, _end4.z, param );
+		const isInClipSpace = zPos >= - 1 && zPos <= 1;
+
 		const isInside = _ssOrigin3.distanceTo( _closestPoint ) < _lineWidth * 0.5;
 
-		let faceIndex;
-		let point;
-		let pointOnLine;
+		if ( isInClipSpace && isInside ) {
 
-		if ( isInside ) {
+			_line.start.fromBufferAttribute( instanceStart, i );
+			_line.end.fromBufferAttribute( instanceEnd, i );
 
-			pointOnLine = new Vector3();
-			point = new Vector3();
-			getPointAndPointOnLine( {
-				point,
-				pointOnLine,
-				faceIndex: i
-			} );
-			faceIndex = i;
+			_line.start.applyMatrix4( matrixWorld );
+			_line.end.applyMatrix4( matrixWorld );
+
+			const pointOnLine = new Vector3();
+			const point = new Vector3();
+
+			_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
 
 			intersects.push( {
-				point,
-				pointOnLine,
+				point: point,
+				pointOnLine: pointOnLine,
 				distance: _ray.origin.distanceTo( point ),
+
 				object: this,
 				face: null,
-				faceIndex,
+				faceIndex: i,
 				uv: null,
 				uv2: null,
-
 			} );
 
 		}
@@ -317,7 +281,6 @@ class LineSegments2 extends Mesh {
 		if ( camera ) {
 
 			_mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
-			_near = - camera.near;
 
 		}
 
@@ -383,11 +346,11 @@ class LineSegments2 extends Mesh {
 
 		if ( worldUnits ) {
 
-			raycastWorldUnits( this, raycaster.camera, intersects );
+			raycastWorldUnits( intersects );
 
 		} else {
 
-			raycastScreenUnits( this, raycaster.camera, intersects );
+			raycastScreenSpace( this, raycaster.camera, intersects );
 
 		}
 
