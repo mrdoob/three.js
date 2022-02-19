@@ -51,7 +51,7 @@
 			let insetWidth;
 			let insetHeight;
 
-			const pointer = new THREE.Vector2();
+			const pointer = new THREE.Vector2( Infinity, Infinity );
 
 			init();
 			animate();
@@ -133,7 +133,7 @@
 				matLine = new LineMaterial( {
 
 					color: 0xffffff,
-					linewidth: 2, // in world units with size attenuation, pixels otherwise
+					linewidth: 1, // in world units with size attenuation, pixels otherwise
 					worldUnits: true,
 					vertexColors: true,
 
@@ -193,7 +193,7 @@
 				gpuPanel = new GPUStatsPanel( renderer.getContext() );
 				stats.addPanel( gpuPanel );
 				stats.showPanel( 0 );
-
+				switchLine( 1 );
 				initGui();
 
 			}
@@ -292,6 +292,32 @@
 
 			//
 
+			function switchLine( val ) {
+
+				switch ( val ) {
+
+					case 0:
+						line.visible = true;
+						thresholdLine.visible = true;
+
+						segments.visible = false;
+						thresholdSegments.visible = false;
+
+						break;
+
+					case 1:
+						line.visible = false;
+						thresholdLine.visible = false;
+
+						segments.visible = true;
+						thresholdSegments.visible = true;
+
+						break;
+
+				}
+
+			}
+
 			function initGui() {
 
 				gui = new GUI();
@@ -307,27 +333,7 @@
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, 'LineSegmentsGeometry': 1 } ).onChange( function ( val ) {
 
-					switch ( val ) {
-
-						case 0:
-							line.visible = true;
-							thresholdLine.visible = true;
-
-							segments.visible = false;
-							thresholdSegments.visible = false;
-
-							break;
-
-						case 1:
-							line.visible = false;
-							thresholdLine.visible = false;
-
-							segments.visible = true;
-							thresholdSegments.visible = true;
-
-							break;
-
-					}
+					switchLine( val );
 
 				} );
 
