@@ -256,14 +256,13 @@ class LineSegments2 extends Mesh {
 	raycast( raycaster, intersects ) {
 
 		const worldUnits = this.material.worldUnits;
+		const camera = raycaster.camera;
 
-		if ( raycaster.camera === null && ! worldUnits ) {
+		if ( camera === null && ! worldUnits ) {
 
 			console.error( 'LineSegments2: "Raycaster.camera" needs to be set in order to raycast against LineSegments2 while worldUnits is set to false.' );
 
 		}
-
-		const camera = raycaster.camera;
 
 		const threshold = ( raycaster.params.Line2 !== undefined ) ? raycaster.params.Line2.threshold || 0 : 0;
 
@@ -277,12 +276,6 @@ class LineSegments2 extends Mesh {
 
 		_instanceStart = geometry.attributes.instanceStart;
 		_instanceEnd = geometry.attributes.instanceEnd;
-
-		if ( camera ) {
-
-			_mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
-
-		}
 
 		// check if we intersect the sphere bounds
 		if ( geometry.boundingSphere === null ) {
@@ -350,7 +343,7 @@ class LineSegments2 extends Mesh {
 
 		} else {
 
-			raycastScreenSpace( this, raycaster.camera, intersects );
+			raycastScreenSpace( this, camera, intersects );
 
 		}
 
