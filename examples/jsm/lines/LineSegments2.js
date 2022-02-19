@@ -49,13 +49,10 @@ function getWorldSpaceHalfWidth( camera, distance, resolution ) {
 
 }
 
-function getPointAndPointOnLine( { matrixWorld, point, pointOnLine, faceIndex } ) {
+function getPointAndPointOnLine( { point, pointOnLine, faceIndex } ) {
 
 	_line.start.fromBufferAttribute( _instanceStart, faceIndex );
 	_line.end.fromBufferAttribute( _instanceEnd, faceIndex );
-
-	_line.start.applyMatrix4( matrixWorld );
-	_line.end.applyMatrix4( matrixWorld );
 
 	_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
 
@@ -71,9 +68,6 @@ function computeStartEnd( instanceStart, instanceEnd, i ) {
 
 	_line.start.fromBufferAttribute( _instanceStart, i );
 	_line.end.fromBufferAttribute( _instanceEnd, i );
-
-	// _line.start.applyMatrix4( matrixWorld );
-	// _line.end.applyMatrix4( matrixWorld );
 
 	// camera space
 	_start4.applyMatrix4( _mvMatrix );
@@ -136,9 +130,8 @@ function raycastWorldUnits( lineSegments, camera, intersects ) {
 		if ( camera ) {
 
 			// camera forward is negative
-			const near = - camera.near;
 			// skip the segment if it's entirely behind the camera
-			const isBehindCameraNear = _start4.z > near && _end4.z > near;
+			const isBehindCameraNear = _start4.z > _near && _end4.z > _near;
 			if ( isBehindCameraNear ) {
 
 				continue;
@@ -146,16 +139,13 @@ function raycastWorldUnits( lineSegments, camera, intersects ) {
 			}
 
 			// trim the segment if it extends behind camera near
-			trimSegment( near );
+			trimSegment( _near );
 
 		}
 
-
 		const pointOnLine = new Vector3();
 		const point = new Vector3();
-		const matrixWorld = lineSegments.matrixWorld;
 		getPointAndPointOnLine( {
-			matrixWorld,
 			point,
 			pointOnLine,
 			faceIndex: i
@@ -230,14 +220,12 @@ function raycastScreenUnits( lineSegments, camera, intersects ) {
 		let faceIndex;
 		let point;
 		let pointOnLine;
-		const matrixWorld = lineSegments.matrixWorld;
 
 		if ( isInside ) {
 
 			pointOnLine = new Vector3();
 			point = new Vector3();
 			getPointAndPointOnLine( {
-				matrixWorld,
 				point,
 				pointOnLine,
 				faceIndex: i
@@ -329,6 +317,7 @@ class LineSegments2 extends Mesh {
 		if ( camera ) {
 
 			_mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
+			_near = - camera.near;
 
 		}
 
@@ -362,8 +351,6 @@ class LineSegments2 extends Mesh {
 
 		}
 
-		//
-
 		// check if we intersect the box bounds
 		if ( geometry.boundingBox === null ) {
 
@@ -396,7 +383,7 @@ class LineSegments2 extends Mesh {
 
 		if ( worldUnits ) {
 
-			raycastWorldUnits( this, raycaster, intersects );
+			raycastWorldUnits( this, raycaster.camera, intersects );
 
 		} else {
 
