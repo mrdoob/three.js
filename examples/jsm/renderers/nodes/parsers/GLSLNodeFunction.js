@@ -12,7 +12,7 @@ const parse = ( source ) => {
 
 	const pragmaMainIndex = source.indexOf( pragmaMain );
 
-	const mainCode = pragmaMainIndex !== - 1 ? source.substr( pragmaMainIndex + pragmaMain.length ) : source;
+	const mainCode = pragmaMainIndex !== - 1 ? source.slice( pragmaMainIndex + pragmaMain.length ) : source;
 
 	const declaration = mainCode.match( declarationRegexp );
 
@@ -81,7 +81,7 @@ const parse = ( source ) => {
 
 		const presicion = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
 
-		const headerCode = pragmaMainIndex !== - 1 ? source.substr( 0, pragmaMainIndex ) : '';
+		const headerCode = pragmaMainIndex !== - 1 ? source.slice( 0, pragmaMainIndex ) : '';
 
 		return {
 			type,

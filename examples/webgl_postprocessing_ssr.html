@@ -118,7 +118,7 @@
 
 			let geometry, material, mesh;
 
-			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
+			geometry = new THREE.BoxGeometry( .05, .05, .05 );
 			material = new THREE.MeshStandardMaterial( { color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, .025, .015 );
@@ -126,7 +126,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
+			geometry = new THREE.IcosahedronGeometry( .025, 4 );
 			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, .08 );
@@ -134,7 +134,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
+			geometry = new THREE.ConeGeometry( .025, .05, 64 );
 			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, - .055 );
@@ -142,7 +142,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+			geometry = new THREE.PlaneGeometry( 1, 1 );
 			groundReflector = new ReflectorForSSRPass( geometry, {
 				clipBias: 0.0003,
 				textureWidth: window.innerWidth,

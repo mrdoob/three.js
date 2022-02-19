@@ -4,6 +4,7 @@ import {
 	CubeUVReflectionMapping,
 	LinearEncoding,
 	LinearFilter,
+	NearestFilter,
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
@@ -224,7 +225,7 @@ class PMREMGenerator {
 
 		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
-			this._setSize( texture.image.length === 0 ? 16 : texture.image[ 0 ].width ?? texture.image[ 0 ].image.width );
+			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
 
 		} else { // Equirectangular
 
@@ -453,6 +454,9 @@ class PMREMGenerator {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
+		cubeUVRenderTarget.texture.minFilter = NearestFilter;
+		pingPongRenderTarget.texture.minFilter = NearestFilter;
+
 		this._halfBlur(
 			cubeUVRenderTarget,
 			pingPongRenderTarget,
@@ -470,6 +474,9 @@ class PMREMGenerator {
 			sigma,
 			'longitudinal',
 			poleAxis );
+
+		cubeUVRenderTarget.texture.minFilter = LinearFilter;
+		pingPongRenderTarget.texture.minFilter = LinearFilter;
 
 	}
 

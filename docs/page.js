@@ -6,7 +6,7 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	let href = window.location.href;
 	const splitIndex = href.lastIndexOf( '/docs/' ) + 6;
-	const docsBaseURL = href.substr( 0, splitIndex );
+	const docsBaseURL = href.slice( 0, splitIndex );
 
 	let hash = window.location.hash;
 
@@ -36,7 +36,7 @@ function onDocumentLoad() {
 	switch ( section ) {
 
 		case 'api':
-			localizedPath = /\/api\/[A-Za-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			localizedPath = /\/api\/[A-Za-z0-9\/]+/.exec( pathname ).toString().slice( 5 );
 
 			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
 			path = localizedPath.replace( /^[A-Za-z0-9-]+\//, '' );
@@ -44,14 +44,14 @@ function onDocumentLoad() {
 			break;
 
 		case 'examples':
-			path = localizedPath = /\/examples\/[A-Za-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+			path = localizedPath = /\/examples\/[A-Za-z0-9\/]+/.exec( pathname ).toString().slice( 10 );
 			break;
 
 		case 'manual':
 			name = name.replace( /\-/g, ' ' );
 
 			path = pathname.replace( /\ /g, '-' );
-			path = localizedPath = /\/manual\/[-A-Za-z0-9\/]+/.exec( path ).toString().substr( 8 );
+			path = localizedPath = /\/manual\/[-A-Za-z0-9\/]+/.exec( path ).toString().slice( 8 );
 			break;
 
 	}

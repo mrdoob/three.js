@@ -36,9 +36,9 @@ export class ColorEditor extends BaseNode {
 
 			}
 
-			fieldR.setTagColor( `#${hexString.substr( 0, 2 )}0000` );
-			fieldG.setTagColor( `#00${hexString.substr( 2, 2 )}00` );
-			fieldB.setTagColor( `#0000${hexString.substr( 4, 2 )}` );
+			fieldR.setTagColor( `#${hexString.slice( 0, 2 )}0000` );
+			fieldG.setTagColor( `#00${hexString.slice( 2, 4 )}00` );
+			fieldB.setTagColor( `#0000${hexString.slice( 4, 6 )}` );
 
 		};
 
@@ -56,7 +56,7 @@ export class ColorEditor extends BaseNode {
 
 			if ( value.indexOf( '#' ) === 0 ) {
 
-				const hexStr = value.substr( 1 ).padEnd( 6, '0' );
+				const hexStr = value.slice( 1 ).padEnd( 6, '0' );
 
 				node.value.setHex( parseInt( hexStr, 16 ) );
 

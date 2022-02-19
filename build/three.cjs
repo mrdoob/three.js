@@ -2510,15 +2510,6 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.samples = options.samples !== undefined ? options.samples : 0;
 	}
 
-	setTexture(texture) {
-		texture.image = {
-			width: this.width,
-			height: this.height,
-			depth: this.depth
-		};
-		this.texture = texture;
-	}
-
 	setSize(width, height, depth = 1) {
 		if (this.width !== width || this.height !== height || this.depth !== depth) {
 			this.width = width;
@@ -2562,6 +2553,79 @@ class WebGLRenderTarget extends EventDispatcher {
 }
 
 WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
+
+class DataArrayTexture extends Texture {
+	constructor(data = null, width = 1, height = 1, depth = 1) {
+		super(null);
+		this.image = {
+			data,
+			width,
+			height,
+			depth
+		};
+		this.magFilter = NearestFilter;
+		this.minFilter = NearestFilter;
+		this.wrapR = ClampToEdgeWrapping;
+		this.generateMipmaps = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
+	}
+
+}
+
+DataArrayTexture.prototype.isDataArrayTexture = true;
+
+class WebGLArrayRenderTarget extends WebGLRenderTarget {
+	constructor(width, height, depth) {
+		super(width, height);
+		this.depth = depth;
+		this.texture = new DataArrayTexture(null, width, height, depth);
+		this.texture.isRenderTargetTexture = true;
+	}
+
+}
+
+WebGLArrayRenderTarget.prototype.isWebGLArrayRenderTarget = true;
+
+class Data3DTexture extends Texture {
+	constructor(data = null, width = 1, height = 1, depth = 1) {
+		// We're going to add .setXXX() methods for setting properties later.
+		// Users can still set in DataTexture3D directly.
+		//
+		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
+		// 	texture.anisotropy = 16;
+		//
+		// See #14839
+		super(null);
+		this.image = {
+			data,
+			width,
+			height,
+			depth
+		};
+		this.magFilter = NearestFilter;
+		this.minFilter = NearestFilter;
+		this.wrapR = ClampToEdgeWrapping;
+		this.generateMipmaps = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
+	}
+
+}
+
+Data3DTexture.prototype.isData3DTexture = true;
+
+class WebGL3DRenderTarget extends WebGLRenderTarget {
+	constructor(width, height, depth) {
+		super(width, height);
+		this.depth = depth;
+		this.texture = new Data3DTexture(null, width, height, depth);
+		this.texture.isRenderTargetTexture = true;
+	}
+
+}
+
+WebGL3DRenderTarget.prototype.isWebGL3DRenderTarget = true;
 
 class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 	constructor(width, height, count, options = {}) {
@@ -3629,6 +3693,13 @@ class Vector3 {
 
 	setFromMatrix3Column(m, index) {
 		return this.fromArray(m.elements, index * 3);
+	}
+
+	setFromEuler(e) {
+		this.x = e._x;
+		this.y = e._y;
+		this.z = e._z;
+		return this;
 	}
 
 	equals(v) {
@@ -5569,14 +5640,6 @@ class Euler {
 		array[offset + 2] = this._z;
 		array[offset + 3] = this._order;
 		return array;
-	}
-
-	toVector3(optionalResult) {
-		if (optionalResult) {
-			return optionalResult.set(this._x, this._y, this._z);
-		} else {
-			return new Vector3(this._x, this._y, this._z);
-		}
 	}
 
 	_onChange(callback) {
@@ -11702,7 +11765,7 @@ class PMREMGenerator {
 
 	_fromTexture(texture, renderTarget) {
 		if (texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping) {
-			this._setSize(texture.image.length === 0 ? 16 : texture.image[0].width ?? texture.image[0].image.width);
+			this._setSize(texture.image.length === 0 ? 16 : texture.image[0].width || texture.image[0].image.width);
 		} else {
 			// Equirectangular
 			this._setSize(texture.image.width / 4);
@@ -11887,10 +11950,15 @@ class PMREMGenerator {
 
 	_blur(cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis) {
 		const pingPongRenderTarget = this._pingPongRenderTarget;
+		cubeUVRenderTarget.texture.minFilter = NearestFilter;
+		pingPongRenderTarget.texture.minFilter = NearestFilter;
 
 		this._halfBlur(cubeUVRenderTarget, pingPongRenderTarget, lodIn, lodOut, sigma, 'latitudinal', poleAxis);
 
 		this._halfBlur(pingPongRenderTarget, cubeUVRenderTarget, lodOut, lodOut, sigma, 'longitudinal', poleAxis);
+
+		cubeUVRenderTarget.texture.minFilter = LinearFilter;
+		pingPongRenderTarget.texture.minFilter = LinearFilter;
 	}
 
 	_halfBlur(targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis) {
@@ -12678,27 +12746,6 @@ function WebGLInfo(gl) {
 	};
 }
 
-class DataTexture2DArray extends Texture {
-	constructor(data = null, width = 1, height = 1, depth = 1) {
-		super(null);
-		this.image = {
-			data,
-			width,
-			height,
-			depth
-		};
-		this.magFilter = NearestFilter;
-		this.minFilter = NearestFilter;
-		this.wrapR = ClampToEdgeWrapping;
-		this.generateMipmaps = false;
-		this.flipY = false;
-		this.unpackAlignment = 1;
-	}
-
-}
-
-DataTexture2DArray.prototype.isDataTexture2DArray = true;
-
 function numericalSort(a, b) {
 	return a[0] - b[0];
 }
@@ -12751,7 +12798,7 @@ function WebGLMorphtargets(gl, capabilities, textures) {
 				}
 
 				const buffer = new Float32Array(width * height * 4 * numberOfMorphTargets);
-				const texture = new DataTexture2DArray(buffer, width, height, numberOfMorphTargets);
+				const texture = new DataArrayTexture(buffer, width, height, numberOfMorphTargets);
 				texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
 
 				texture.type = FloatType;
@@ -12941,34 +12988,6 @@ function WebGLObjects(gl, geometries, attributes, info) {
 	};
 }
 
-class DataTexture3D extends Texture {
-	constructor(data = null, width = 1, height = 1, depth = 1) {
-		// We're going to add .setXXX() methods for setting properties later.
-		// Users can still set in DataTexture3D directly.
-		//
-		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
-		// 	texture.anisotropy = 16;
-		//
-		// See #14839
-		super(null);
-		this.image = {
-			data,
-			width,
-			height,
-			depth
-		};
-		this.magFilter = NearestFilter;
-		this.minFilter = NearestFilter;
-		this.wrapR = ClampToEdgeWrapping;
-		this.generateMipmaps = false;
-		this.flipY = false;
-		this.unpackAlignment = 1;
-	}
-
-}
-
-DataTexture3D.prototype.isDataTexture3D = true;
-
 /**
  * Uniforms of a program.
  * Those form a tree structure with a special top-level container for the root,
@@ -13012,8 +13031,8 @@ DataTexture3D.prototype.isDataTexture3D = true;
  *
  */
 const emptyTexture = new Texture();
-const emptyTexture2dArray = new DataTexture2DArray();
-const emptyTexture3d = new DataTexture3D();
+const emptyArrayTexture = new DataArrayTexture();
+const empty3dTexture = new Data3DTexture();
 const emptyCubeTexture = new CubeTexture(); // --- Utilities ---
 // Array Caches (provide typed arrays for temporary by size)
 
@@ -13270,7 +13289,7 @@ function setValueT1(gl, v, textures) {
 		cache[0] = unit;
 	}
 
-	textures.safeSetTexture2D(v || emptyTexture, unit);
+	textures.setTexture2D(v || emptyTexture, unit);
 }
 
 function setValueT3D1(gl, v, textures) {
@@ -13282,7 +13301,7 @@ function setValueT3D1(gl, v, textures) {
 		cache[0] = unit;
 	}
 
-	textures.setTexture3D(v || emptyTexture3d, unit);
+	textures.setTexture3D(v || empty3dTexture, unit);
 }
 
 function setValueT6(gl, v, textures) {
@@ -13294,7 +13313,7 @@ function setValueT6(gl, v, textures) {
 		cache[0] = unit;
 	}
 
-	textures.safeSetTextureCube(v || emptyCubeTexture, unit);
+	textures.setTextureCube(v || emptyCubeTexture, unit);
 }
 
 function setValueT2DArray1(gl, v, textures) {
@@ -13306,7 +13325,7 @@ function setValueT2DArray1(gl, v, textures) {
 		cache[0] = unit;
 	}
 
-	textures.setTexture2DArray(v || emptyTexture2dArray, unit);
+	textures.setTexture2DArray(v || emptyArrayTexture, unit);
 } // Helper to pick the right setter for the singular case
 
 
@@ -13498,7 +13517,7 @@ function setValueT1Array(gl, v, textures) {
 	gl.uniform1iv(this.addr, units);
 
 	for (let i = 0; i !== n; ++i) {
-		textures.safeSetTexture2D(v[i] || emptyTexture, units[i]);
+		textures.setTexture2D(v[i] || emptyTexture, units[i]);
 	}
 }
 
@@ -13508,7 +13527,7 @@ function setValueT3DArray(gl, v, textures) {
 	gl.uniform1iv(this.addr, units);
 
 	for (let i = 0; i !== n; ++i) {
-		textures.setTexture3D(v[i] || emptyTexture3d, units[i]);
+		textures.setTexture3D(v[i] || empty3dTexture, units[i]);
 	}
 }
 
@@ -13518,7 +13537,7 @@ function setValueT6Array(gl, v, textures) {
 	gl.uniform1iv(this.addr, units);
 
 	for (let i = 0; i !== n; ++i) {
-		textures.safeSetTextureCube(v[i] || emptyCubeTexture, units[i]);
+		textures.setTextureCube(v[i] || emptyCubeTexture, units[i]);
 	}
 }
 
@@ -13528,7 +13547,7 @@ function setValueT2DArrayArray(gl, v, textures) {
 	gl.uniform1iv(this.addr, units);
 
 	for (let i = 0; i !== n; ++i) {
-		textures.setTexture2DArray(v[i] || emptyTexture2dArray, units[i]);
+		textures.setTexture2DArray(v[i] || emptyArrayTexture, units[i]);
 	}
 } // Helper to pick the right setter for a pure (bottom-level) array
 
@@ -16966,8 +16985,8 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 
 	function uploadTexture(textureProperties, texture, slot) {
 		let textureType = _gl.TEXTURE_2D;
-		if (texture.isDataTexture2DArray) textureType = _gl.TEXTURE_2D_ARRAY;
-		if (texture.isDataTexture3D) textureType = _gl.TEXTURE_3D;
+		if (texture.isDataArrayTexture) textureType = _gl.TEXTURE_2D_ARRAY;
+		if (texture.isData3DTexture) textureType = _gl.TEXTURE_3D;
 		const forceUpload = initTexture(textureProperties, texture);
 		const source = texture.source;
 		state.activeTexture(_gl.TEXTURE0 + slot);
@@ -17061,7 +17080,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 						mipmap = mipmaps[i];
 
 						if (useTexStorage) {
-							state.texSubImage2D(_gl.TEXTURE_2D, 0, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
+							state.texSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
 						} else {
 							state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
 						}
@@ -17105,7 +17124,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 						}
 					}
 				}
-			} else if (texture.isDataTexture2DArray) {
+			} else if (texture.isDataArrayTexture) {
 				if (useTexStorage) {
 					if (allocateMemory) {
 						state.texStorage3D(_gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, image.width, image.height, image.depth);
@@ -17115,7 +17134,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 				} else {
 					state.texImage3D(_gl.TEXTURE_2D_ARRAY, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data);
 				}
-			} else if (texture.isDataTexture3D) {
+			} else if (texture.isData3DTexture) {
 				if (useTexStorage) {
 					if (allocateMemory) {
 						state.texStorage3D(_gl.TEXTURE_3D, levels, glInternalFormat, image.width, image.height, image.depth);
@@ -17495,7 +17514,6 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 
 		const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 		const isMultipleRenderTargets = renderTarget.isWebGLMultipleRenderTargets === true;
-		const isRenderTarget3D = texture.isDataTexture3D || texture.isDataTexture2DArray;
 		const supportsMips = isPowerOfTwo$1(renderTarget) || isWebGL2; // Setup framebuffer
 
 		if (isCube) {
@@ -17583,13 +17601,11 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		} else {
 			let glTextureType = _gl.TEXTURE_2D;
 
-			if (isRenderTarget3D) {
-				// Render targets containing layers, i.e: Texture 3D and 2d arrays
+			if (renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget) {
 				if (isWebGL2) {
-					const isTexture3D = texture.isDataTexture3D;
-					glTextureType = isTexture3D ? _gl.TEXTURE_3D : _gl.TEXTURE_2D_ARRAY;
+					glTextureType = renderTarget.isWebGL3DRenderTarget ? _gl.TEXTURE_3D : _gl.TEXTURE_2D_ARRAY;
 				} else {
-					console.warn('THREE.DataTexture3D and THREE.DataTexture2DArray only supported with WebGL2.');
+					console.error('THREE.WebGLTextures: THREE.Data3DTexture and THREE.DataArrayTexture only supported with WebGL2.');
 				}
 			}
 
@@ -17718,36 +17734,6 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		}
 
 		return image;
-	} // backwards compatibility
-
-
-	let warnedTexture2D = false;
-	let warnedTextureCube = false;
-
-	function safeSetTexture2D(texture, slot) {
-		if (texture.isWebGLRenderTarget) {
-			if (warnedTexture2D === false) {
-				console.warn('THREE.WebGLTextures.safeSetTexture2D: don\'t use render targets as textures. Use their .texture property instead.');
-				warnedTexture2D = true;
-			}
-
-			texture = texture.texture;
-		}
-
-		setTexture2D(texture, slot);
-	}
-
-	function safeSetTextureCube(texture, slot) {
-		if (texture.isWebGLCubeRenderTarget) {
-			if (warnedTextureCube === false) {
-				console.warn('THREE.WebGLTextures.safeSetTextureCube: don\'t use cube render targets as textures. Use their .texture property instead.');
-				warnedTextureCube = true;
-			}
-
-			texture = texture.texture;
-		}
-
-		setTextureCube(texture, slot);
 	} //
 
 
@@ -17764,8 +17750,6 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 	this.setupDepthRenderbuffer = setupDepthRenderbuffer;
 	this.setupFrameBufferTexture = setupFrameBufferTexture;
 	this.useMultisampledRTT = useMultisampledRTT;
-	this.safeSetTexture2D = safeSetTexture2D;
-	this.safeSetTextureCube = safeSetTextureCube;
 }
 
 function WebGLUtils(gl, extensions, capabilities) {
@@ -19211,7 +19195,6 @@ function createCanvasElement() {
 function WebGLRenderer(parameters = {}) {
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 				_context = parameters.context !== undefined ? parameters.context : null,
-				_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 				_depth = parameters.depth !== undefined ? parameters.depth : true,
 				_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 				_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
@@ -19219,6 +19202,14 @@ function WebGLRenderer(parameters = {}) {
 				_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 				_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
 				_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
+
+	let _alpha;
+
+	if (parameters.context !== undefined) {
+		_alpha = _context.getContextAttributes().alpha;
+	} else {
+		_alpha = parameters.alpha !== undefined ? parameters.alpha : false;
+	}
 
 	let currentRenderList = null;
 	let currentRenderState = null; // render() can be called from within a callback triggered by another render.
@@ -19551,11 +19542,11 @@ function WebGLRenderer(parameters = {}) {
 		background.setClearAlpha.apply(background, arguments);
 	};
 
-	this.clear = function (color, depth, stencil) {
+	this.clear = function (color = true, depth = true, stencil = true) {
 		let bits = 0;
-		if (color === undefined || color) bits |= _gl.COLOR_BUFFER_BIT;
-		if (depth === undefined || depth) bits |= _gl.DEPTH_BUFFER_BIT;
-		if (stencil === undefined || stencil) bits |= _gl.STENCIL_BUFFER_BIT;
+		if (color) bits |= _gl.COLOR_BUFFER_BIT;
+		if (depth) bits |= _gl.DEPTH_BUFFER_BIT;
+		if (stencil) bits |= _gl.STENCIL_BUFFER_BIT;
 
 		_gl.clear(bits);
 	};
@@ -19864,12 +19855,7 @@ function WebGLRenderer(parameters = {}) {
 		} //
 
 
-		if (scene.isScene === true) scene.onAfterRender(_this, scene, camera); // Ensure depth buffer writing is enabled so it can be cleared on next render
-
-		state.buffers.depth.setTest(true);
-		state.buffers.depth.setMask(true);
-		state.buffers.color.setMask(true);
-		state.setPolygonOffset(false); // _gl.finish();
+		if (scene.isScene === true) scene.onAfterRender(_this, scene, camera); // _gl.finish();
 
 		bindingStates.resetDefaultState();
 		_currentMaterialId = -1;
@@ -19970,7 +19956,12 @@ function WebGLRenderer(parameters = {}) {
 		if (viewport) state.viewport(_currentViewport.copy(viewport));
 		if (opaqueObjects.length > 0) renderObjects(opaqueObjects, scene, camera);
 		if (transmissiveObjects.length > 0) renderObjects(transmissiveObjects, scene, camera);
-		if (transparentObjects.length > 0) renderObjects(transparentObjects, scene, camera);
+		if (transparentObjects.length > 0) renderObjects(transparentObjects, scene, camera); // Ensure depth buffer writing is enabled so it can be cleared on next render
+
+		state.buffers.depth.setTest(true);
+		state.buffers.depth.setMask(true);
+		state.buffers.color.setMask(true);
+		state.setPolygonOffset(false);
 	}
 
 	function renderTransmissionPass(opaqueObjects, scene, camera) {
@@ -20426,7 +20417,7 @@ function WebGLRenderer(parameters = {}) {
 		if (renderTarget) {
 			const texture = renderTarget.texture;
 
-			if (texture.isDataTexture3D || texture.isDataTexture2DArray) {
+			if (texture.isData3DTexture || texture.isDataArrayTexture) {
 				isRenderTarget3D = true;
 			}
 
@@ -20586,10 +20577,10 @@ function WebGLRenderer(parameters = {}) {
 		const glType = utils.convert(dstTexture.type);
 		let glTarget;
 
-		if (dstTexture.isDataTexture3D) {
+		if (dstTexture.isData3DTexture) {
 			textures.setTexture3D(dstTexture, 0);
 			glTarget = _gl.TEXTURE_3D;
-		} else if (dstTexture.isDataTexture2DArray) {
+		} else if (dstTexture.isDataArrayTexture) {
 			textures.setTexture2DArray(dstTexture, 0);
 			glTarget = _gl.TEXTURE_2D_ARRAY;
 		} else {
@@ -20625,7 +20616,7 @@ function WebGLRenderer(parameters = {}) {
 
 		_gl.pixelStorei(_gl.UNPACK_SKIP_IMAGES, sourceBox.min.z);
 
-		if (srcTexture.isDataTexture || srcTexture.isDataTexture3D) {
+		if (srcTexture.isDataTexture || srcTexture.isData3DTexture) {
 			_gl.texSubImage3D(glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image.data);
 		} else {
 			if (srcTexture.isCompressedTexture) {
@@ -21499,8 +21490,6 @@ class DataTexture extends Texture {
 			width: width,
 			height: height
 		};
-		this.magFilter = magFilter;
-		this.minFilter = minFilter;
 		this.generateMipmaps = false;
 		this.flipY = false;
 		this.unpackAlignment = 1;
@@ -34233,7 +34222,7 @@ class PointLightHelper extends Mesh {
 		this.update();
 		/*
 		// TODO: delete this comment?
-		const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+		const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 		const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 		this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 		this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
@@ -35375,6 +35364,11 @@ Box3.prototype.size = function (optionalTarget) {
 }; //
 
 
+Euler.prototype.toVector3 = function () {
+	console.error('THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead');
+}; //
+
+
 Sphere.prototype.empty = function () {
 	console.warn('THREE.Sphere: .empty() has been renamed to .isEmpty().');
 	return this.isEmpty();
@@ -36471,6 +36465,14 @@ function WebGLMultisampleRenderTarget(width, height, options) {
 	renderTarget.samples = 4;
 	return renderTarget;
 }
+function DataTexture2DArray(data, width, height, depth) {
+	console.warn('THREE.DataTexture2DArray has been renamed to DataArrayTexture.');
+	return new DataArrayTexture(data, width, height, depth);
+}
+function DataTexture3D(data, width, height, depth) {
+	console.warn('THREE.DataTexture3D has been renamed to Data3DTexture.');
+	return new Data3DTexture(data, width, height, depth);
+}
 
 if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 	__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('register', {
@@ -36568,6 +36570,8 @@ exports.CustomToneMapping = CustomToneMapping;
 exports.CylinderBufferGeometry = CylinderGeometry;
 exports.CylinderGeometry = CylinderGeometry;
 exports.Cylindrical = Cylindrical;
+exports.Data3DTexture = Data3DTexture;
+exports.DataArrayTexture = DataArrayTexture;
 exports.DataTexture = DataTexture;
 exports.DataTexture2DArray = DataTexture2DArray;
 exports.DataTexture3D = DataTexture3D;
@@ -36908,6 +36912,8 @@ exports.Vertex = Vertex;
 exports.VertexColors = VertexColors;
 exports.VideoTexture = VideoTexture;
 exports.WebGL1Renderer = WebGL1Renderer;
+exports.WebGL3DRenderTarget = WebGL3DRenderTarget;
+exports.WebGLArrayRenderTarget = WebGLArrayRenderTarget;
 exports.WebGLCubeRenderTarget = WebGLCubeRenderTarget;
 exports.WebGLMultipleRenderTargets = WebGLMultipleRenderTargets;
 exports.WebGLMultisampleRenderTarget = WebGLMultisampleRenderTarget;

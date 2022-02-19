@@ -327,9 +327,9 @@
 
 			const hash = location.hash;
 			if ( hash === '' ) return;
-			const docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
-			let docLink = hash.substr( hash.indexOf( '/' ) + 1 );
-			docLink = docLink.substr( docLink.indexOf( '/' ) );
+			const docType = hash.slice( 0, hash.indexOf( '/' ) + 1 );
+			let docLink = hash.slice( hash.indexOf( '/' ) + 1 );
+			docLink = docLink.slice( docLink.indexOf( '/' ) );
 			location.href = docType + language + docLink;
 
 		}
@@ -342,7 +342,7 @@
 
 			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( search.substr( 3 ) );
+				return decodeURI( search.slice( 3 ) );
 
 			}
 

@@ -107,7 +107,7 @@ export const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 
 	irradiance = mul( irradiance, PI ); // punctual light
 
-	addTo( directDiffuse, mul( irradiance, BRDF_Lambert( { diffuseColor } ) ) );
+	addTo( directDiffuse, mul( irradiance, BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
 	addTo( directSpecular, mul( irradiance, BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness } ) ) );
 

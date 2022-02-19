@@ -378,7 +378,7 @@ function main() {
 
   function ext(s) {
     const period = s.lastIndexOf('.');
-    return s.substr(period + 1);
+    return s.slice(period + 1);
   }
 
   function readLUTFile(file) {

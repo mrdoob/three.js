@@ -49,6 +49,7 @@ import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
+import { Euler } from './math/Euler.js';
 import { Sphere } from './math/Sphere.js';
 import { Color } from './math/Color.js';
 import { Frustum } from './math/Frustum.js';
@@ -76,6 +77,8 @@ import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 import { Scene } from './scenes/Scene.js';
+import { DataArrayTexture } from './textures/DataArrayTexture.js';
+import { Data3DTexture } from './textures/Data3DTexture.js';
 
 export { MathUtils as Math };
 
@@ -398,6 +401,15 @@ Box3.prototype.size = function ( optionalTarget ) {
 	return this.getSize( optionalTarget );
 
 };
+
+//
+
+Euler.prototype.toVector3 = function () {
+
+	console.error( 'THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead' );
+
+};
+
 
 //
 
@@ -1982,5 +1994,19 @@ export function WebGLMultisampleRenderTarget( width, height, options ) {
 	const renderTarget = new WebGLRenderTarget( width, height, options );
 	renderTarget.samples = 4;
 	return renderTarget;
+
+}
+
+export function DataTexture2DArray( data, width, height, depth ) {
+
+	console.warn( 'THREE.DataTexture2DArray has been renamed to DataArrayTexture.' );
+	return new DataArrayTexture( data, width, height, depth );
+
+}
+
+export function DataTexture3D( data, width, height, depth ) {
+
+	console.warn( 'THREE.DataTexture3D has been renamed to Data3DTexture.' );
+	return new Data3DTexture( data, width, height, depth );
 
 }

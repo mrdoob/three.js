@@ -107,7 +107,7 @@
 						const zip = unzipSync( new Uint8Array( data ) );
 						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
-						const texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
+						const texture = new THREE.DataArrayTexture( array, 256, 256, 109 );
 						texture.format = THREE.RedFormat;
 						texture.needsUpdate = true;
 

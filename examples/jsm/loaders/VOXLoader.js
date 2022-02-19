@@ -1,6 +1,6 @@
 import {
 	BufferGeometry,
-	DataTexture3D,
+	Data3DTexture,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
@@ -266,7 +266,7 @@ class VOXMesh extends Mesh {
 
 }
 
-class VOXDataTexture3D extends DataTexture3D {
+class VOXData3DTexture extends Data3DTexture {
 
 	constructor( chunk ) {
 
@@ -302,4 +302,4 @@ class VOXDataTexture3D extends DataTexture3D {
 
 }
 
-export { VOXLoader, VOXMesh, VOXDataTexture3D };
+export { VOXLoader, VOXMesh, VOXData3DTexture };

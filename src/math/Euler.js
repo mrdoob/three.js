@@ -1,5 +1,4 @@
 import { Quaternion } from './Quaternion.js';
-import { Vector3 } from './Vector3.js';
 import { Matrix4 } from './Matrix4.js';
 import { clamp } from './MathUtils.js';
 
@@ -285,20 +284,6 @@ class Euler {
 		array[ offset + 3 ] = this._order;
 
 		return array;
-
-	}
-
-	toVector3( optionalResult ) {
-
-		if ( optionalResult ) {
-
-			return optionalResult.set( this._x, this._y, this._z );
-
-		} else {
-
-			return new Vector3( this._x, this._y, this._z );
-
-		}
 
 	}
 

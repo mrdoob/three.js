@@ -5,7 +5,7 @@ import {
 	FileLoader,
 	Vector3,
 	DataTexture,
-	DataTexture3D,
+	Data3DTexture,
 	UnsignedByteType,
 	ClampToEdgeWrapping,
 	LinearFilter,
@@ -125,7 +125,7 @@ export class LUTCubeLoader extends Loader {
 		texture.generateMipmaps = false;
 		texture.needsUpdate = true;
 
-		const texture3D = new DataTexture3D();
+		const texture3D = new Data3DTexture();
 		texture3D.image.data = data;
 		texture3D.image.width = size;
 		texture3D.image.height = size;

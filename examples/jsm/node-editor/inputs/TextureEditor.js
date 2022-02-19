@@ -134,7 +134,7 @@ export class TextureEditor extends BaseNode {
 			texture.wrapS = Number( this.wrapSInput.getValue() );
 			texture.wrapT = Number( this.wrapTInput.getValue() );
 			texture.flipY = this.flipYInput.getValue();
-			texture.needsUpdate = true;
+			texture.dispose();
 
 			this.invalidate();
 

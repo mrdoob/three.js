@@ -218,7 +218,7 @@ class SVGLoader extends Loader {
 				const command = commands[ i ];
 
 				const type = command.charAt( 0 );
-				const data = command.substr( 1 ).trim();
+				const data = command.slice( 1 ).trim();
 
 				if ( isFirstPoint === true ) {
 
@@ -1437,9 +1437,9 @@ class SVGLoader extends Loader {
 
 					if ( openParPos > 0 && openParPos < closeParPos ) {
 
-						const transformType = transformText.substr( 0, openParPos );
+						const transformType = transformText.slice( 0, openParPos );
 
-						const array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
+						const array = parseFloats( transformText.slice( openParPos + 1 ) );
 
 						currentTransform.identity();
 

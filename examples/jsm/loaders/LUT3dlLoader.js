@@ -4,7 +4,7 @@ import {
 	Loader,
 	FileLoader,
 	DataTexture,
-	DataTexture3D,
+	Data3DTexture,
 	RGBAFormat,
 	UnsignedByteType,
 	ClampToEdgeWrapping,
@@ -125,7 +125,7 @@ export class LUT3dlLoader extends Loader {
 		texture.generateMipmaps = false;
 		texture.needsUpdate = true;
 
-		const texture3D = new DataTexture3D();
+		const texture3D = new Data3DTexture();
 		texture3D.image.data = data;
 		texture3D.image.width = size;
 		texture3D.image.height = size;
