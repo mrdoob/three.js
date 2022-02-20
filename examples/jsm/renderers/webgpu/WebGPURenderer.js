@@ -12,50 +12,9 @@ import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
 
-import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
+import { Frustum, Matrix4, Vector3, Color, LinearEncoding, WebGPUCoordinateSystem } from 'three';
 
-console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
-
-Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, far ) {
-
-	const te = this.elements;
-	const x = 2 * near / ( right - left );
-	const y = 2 * near / ( top - bottom );
-
-	const a = ( right + left ) / ( right - left );
-	const b = ( top + bottom ) / ( top - bottom );
-	const c = - far / ( far - near );
-	const d = - far * near / ( far - near );
-
-	te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
-	te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
-	te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
-	te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
-
-	return this;
-
-};
-
-Matrix4.prototype.makeOrthographic = function ( left, right, top, bottom, near, far ) {
-
-	const te = this.elements;
-	const w = 1.0 / ( right - left );
-	const h = 1.0 / ( top - bottom );
-	const p = 1.0 / ( far - near );
-
-	const x = ( right + left ) * w;
-	const y = ( top + bottom ) * h;
-	const z = near * p;
-
-	te[ 0 ] = 2 * w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
-	te[ 1 ] = 0;	te[ 5 ] = 2 * h;	te[ 9 ] = 0;	te[ 13 ] = - y;
-	te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 1 * p;	te[ 14 ] = - z;
-	te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
-
-	return this;
-
-};
-
+Matrix4.setCoordinateSystem( WebGPUCoordinateSystem ); // see https://github.com/mrdoob/three.js/issues/20276.
 
 const _frustum = new Frustum();
 const _projScreenMatrix = new Matrix4();

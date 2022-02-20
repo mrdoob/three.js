@@ -1,4 +1,7 @@
 import { Vector3 } from './Vector3.js';
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
+
+let _coordinateSystem = WebGLCoordinateSystem;
 
 class Matrix4 {
 
@@ -771,25 +774,39 @@ class Matrix4 {
 
 	makePerspective( left, right, top, bottom, near, far ) {
 
-		if ( far === undefined ) {
-
-			console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.' );
-
-		}
-
 		const te = this.elements;
 		const x = 2 * near / ( right - left );
 		const y = 2 * near / ( top - bottom );
 
-		const a = ( right + left ) / ( right - left );
-		const b = ( top + bottom ) / ( top - bottom );
-		const c = - ( far + near ) / ( far - near );
-		const d = - 2 * far * near / ( far - near );
+		if ( _coordinateSystem === WebGLCoordinateSystem ) {
 
-		te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
-		te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
-		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
+			const a = ( right + left ) / ( right - left );
+			const b = ( top + bottom ) / ( top - bottom );
+			const c = - ( far + near ) / ( far - near );
+			const d = - 2 * far * near / ( far - near );
+
+			te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
+			te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
+			te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
+			te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
+
+		} else if ( _coordinateSystem === WebGPUCoordinateSystem ) {
+
+			const a = ( right + left ) / ( right - left );
+			const b = ( top + bottom ) / ( top - bottom );
+			const c = - far / ( far - near );
+			const d = - far * near / ( far - near );
+
+			te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
+			te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
+			te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
+			te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
+
+		} else {
+
+			throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + _coordinateSystem );
+
+		}
 
 		return this;
 
@@ -802,14 +819,33 @@ class Matrix4 {
 		const h = 1.0 / ( top - bottom );
 		const p = 1.0 / ( far - near );
 
-		const x = ( right + left ) * w;
-		const y = ( top + bottom ) * h;
-		const z = ( far + near ) * p;
+		if ( _coordinateSystem === WebGLCoordinateSystem ) {
 
-		te[ 0 ] = 2 * w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
-		te[ 1 ] = 0;	te[ 5 ] = 2 * h;	te[ 9 ] = 0;	te[ 13 ] = - y;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 2 * p;	te[ 14 ] = - z;
-		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
+			const x = ( right + left ) * w;
+			const y = ( top + bottom ) * h;
+			const z = ( far + near ) * p;
+
+			te[ 0 ] = 2 * w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
+			te[ 1 ] = 0;	te[ 5 ] = 2 * h;	te[ 9 ] = 0;	te[ 13 ] = - y;
+			te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 2 * p;	te[ 14 ] = - z;
+			te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
+
+		} else if ( _coordinateSystem === WebGPUCoordinateSystem ) {
+
+			const x = ( right + left ) * w;
+			const y = ( top + bottom ) * h;
+			const z = near * p;
+
+			te[ 0 ] = 2 * w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
+			te[ 1 ] = 0;	te[ 5 ] = 2 * h;	te[ 9 ] = 0;	te[ 13 ] = - y;
+			te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 1 * p;	te[ 14 ] = - z;
+			te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
+
+		} else {
+
+			throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + _coordinateSystem );
+
+		}
 
 		return this;
 
@@ -867,6 +903,12 @@ class Matrix4 {
 		array[ offset + 15 ] = te[ 15 ];
 
 		return array;
+
+	}
+
+	static setCoordinateSystem( value ) {
+
+		_coordinateSystem = value;
 
 	}
 
