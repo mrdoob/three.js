@@ -462,7 +462,7 @@
 		setQuaternionFromProperEuler: setQuaternionFromProperEuler
 	});
 
-	class Vector2$1 {
+	class Vector2 {
 		constructor(x = 0, y = 0) {
 			this.x = x;
 			this.y = y;
@@ -793,7 +793,7 @@
 
 	}
 
-	Vector2$1.prototype.isVector2 = true;
+	Vector2.prototype.isVector2 = true;
 
 	class Matrix3 {
 		constructor() {
@@ -1135,9 +1135,9 @@
 			this.format = format;
 			this.internalFormat = null;
 			this.type = type;
-			this.offset = new Vector2$1(0, 0);
-			this.repeat = new Vector2$1(1, 1);
-			this.center = new Vector2$1(0, 0);
+			this.offset = new Vector2(0, 0);
+			this.repeat = new Vector2(1, 1);
+			this.center = new Vector2(0, 0);
 			this.rotation = 0;
 			this.matrixAutoUpdate = true;
 			this.matrix = new Matrix3();
@@ -7072,7 +7072,7 @@
 
 	const _vector$9 = /*@__PURE__*/new Vector3();
 
-	const _vector2$1 = /*@__PURE__*/new Vector2$1();
+	const _vector2$1 = /*@__PURE__*/new Vector2();
 
 	class BufferAttribute {
 		constructor(array, itemSize, normalized) {
@@ -7159,7 +7159,7 @@
 
 				if (vector === undefined) {
 					console.warn('THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i);
-					vector = new Vector2$1();
+					vector = new Vector2();
 				}
 
 				array[offset++] = vector.x;
@@ -7823,9 +7823,9 @@
 			const vA = new Vector3(),
 						vB = new Vector3(),
 						vC = new Vector3(),
-						uvA = new Vector2$1(),
-						uvB = new Vector2$1(),
-						uvC = new Vector2$1(),
+						uvA = new Vector2(),
+						uvB = new Vector2(),
+						uvC = new Vector2(),
 						sdir = new Vector3(),
 						tdir = new Vector3();
 
@@ -8293,11 +8293,11 @@
 
 	const _morphC = /*@__PURE__*/new Vector3();
 
-	const _uvA$1 = /*@__PURE__*/new Vector2$1();
+	const _uvA$1 = /*@__PURE__*/new Vector2();
 
-	const _uvB$1 = /*@__PURE__*/new Vector2$1();
+	const _uvB$1 = /*@__PURE__*/new Vector2();
 
-	const _uvC$1 = /*@__PURE__*/new Vector2$1();
+	const _uvC$1 = /*@__PURE__*/new Vector2();
 
 	const _intersectionPoint = /*@__PURE__*/new Vector3();
 
@@ -8572,7 +8572,7 @@
 
 				_uvC$1.fromBufferAttribute(uv, c);
 
-				intersection.uv = Triangle.getUV(_intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2$1());
+				intersection.uv = Triangle.getUV(_intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2());
 			}
 
 			if (uv2) {
@@ -8582,7 +8582,7 @@
 
 				_uvC$1.fromBufferAttribute(uv2, c);
 
-				intersection.uv2 = Triangle.getUV(_intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2$1());
+				intersection.uv2 = Triangle.getUV(_intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2());
 			}
 
 			const face = {
@@ -10322,7 +10322,7 @@
 				value: null
 			},
 			normalScale: {
-				value: new Vector2$1(1, 1)
+				value: new Vector2(1, 1)
 			}
 		},
 		displacementmap: {
@@ -10503,7 +10503,7 @@
 				value: 1.0
 			},
 			center: {
-				value: new Vector2$1(0.5, 0.5)
+				value: new Vector2(0.5, 0.5)
 			},
 			rotation: {
 				value: 0.0
@@ -10703,7 +10703,7 @@
 				value: null
 			},
 			clearcoatNormalScale: {
-				value: new Vector2$1(1, 1)
+				value: new Vector2(1, 1)
 			},
 			clearcoatNormalMap: {
 				value: null
@@ -10718,7 +10718,7 @@
 				value: null
 			},
 			transmissionSamplerSize: {
-				value: new Vector2$1()
+				value: new Vector2()
 			},
 			transmissionSamplerMap: {
 				value: null
@@ -13828,7 +13828,7 @@
 							shadowBias: 0,
 							shadowNormalBias: 0,
 							shadowRadius: 1,
-							shadowMapSize: new Vector2$1()
+							shadowMapSize: new Vector2()
 						};
 						break;
 
@@ -13837,7 +13837,7 @@
 							shadowBias: 0,
 							shadowNormalBias: 0,
 							shadowRadius: 1,
-							shadowMapSize: new Vector2$1()
+							shadowMapSize: new Vector2()
 						};
 						break;
 
@@ -13846,7 +13846,7 @@
 							shadowBias: 0,
 							shadowNormalBias: 0,
 							shadowRadius: 1,
-							shadowMapSize: new Vector2$1(),
+							shadowMapSize: new Vector2(),
 							shadowCameraNear: 1,
 							shadowCameraFar: 1000
 						};
@@ -14325,8 +14325,8 @@
 	function WebGLShadowMap(_renderer, _objects, _capabilities) {
 		let _frustum = new Frustum();
 
-		const _shadowMapSize = new Vector2$1(),
-					_viewportSize = new Vector2$1(),
+		const _shadowMapSize = new Vector2(),
+					_viewportSize = new Vector2(),
 					_viewport = new Vector4(),
 					_depthMaterials = [],
 					_distanceMaterials = [],
@@ -14348,7 +14348,7 @@
 					value: null
 				},
 				resolution: {
-					value: new Vector2$1()
+					value: new Vector2()
 				},
 				radius: {
 					value: 4.0
@@ -19517,9 +19517,9 @@
 
 	const _mvPosition = /*@__PURE__*/new Vector3();
 
-	const _alignedPosition = /*@__PURE__*/new Vector2$1();
+	const _alignedPosition = /*@__PURE__*/new Vector2();
 
-	const _rotatedPosition = /*@__PURE__*/new Vector2$1();
+	const _rotatedPosition = /*@__PURE__*/new Vector2();
 
 	const _viewWorldMatrix = /*@__PURE__*/new Matrix4();
 
@@ -19529,11 +19529,11 @@
 
 	const _vC = /*@__PURE__*/new Vector3();
 
-	const _uvA = /*@__PURE__*/new Vector2$1();
+	const _uvA = /*@__PURE__*/new Vector2();
 
-	const _uvB = /*@__PURE__*/new Vector2$1();
+	const _uvB = /*@__PURE__*/new Vector2();
 
-	const _uvC = /*@__PURE__*/new Vector2$1();
+	const _uvC = /*@__PURE__*/new Vector2();
 
 	class Sprite extends Object3D {
 		constructor(material) {
@@ -19554,7 +19554,7 @@
 
 			this.geometry = _geometry;
 			this.material = material !== undefined ? material : new SpriteMaterial();
-			this.center = new Vector2$1(0.5, 0.5);
+			this.center = new Vector2(0.5, 0.5);
 		}
 
 		raycast(raycaster, intersects) {
@@ -19614,7 +19614,7 @@
 			intersects.push({
 				distance: distance,
 				point: _intersectPoint.clone(),
-				uv: Triangle.getUV(_intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2$1()),
+				uv: Triangle.getUV(_intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2()),
 				face: null,
 				object: this
 			});
@@ -20753,7 +20753,7 @@
 			const uvs = []; // helper variables
 
 			const vertex = new Vector3();
-			const uv = new Vector2$1(); // center point
+			const uv = new Vector2(); // center point
 
 			vertices.push(0, 0, 0);
 			normals.push(0, 0, 1);
@@ -20893,7 +20893,7 @@
 			function generateCap(top) {
 				// save the index of the first center vertex
 				const centerIndexStart = index;
-				const uv = new Vector2$1();
+				const uv = new Vector2();
 				const vertex = new Vector3();
 				let groupCount = 0;
 				const radius = top === true ? radiusTop : radiusBottom;
@@ -21133,9 +21133,9 @@
 				const b = new Vector3();
 				const c = new Vector3();
 				const centroid = new Vector3();
-				const uvA = new Vector2$1();
-				const uvB = new Vector2$1();
-				const uvC = new Vector2$1();
+				const uvA = new Vector2();
+				const uvB = new Vector2();
+				const uvC = new Vector2();
 
 				for (let i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6) {
 					a.set(vertexBuffer[i + 0], vertexBuffer[i + 1], vertexBuffer[i + 2]);
@@ -21493,7 +21493,7 @@
 			if (t2 > 1) t2 = 1;
 			const pt1 = this.getPoint(t1);
 			const pt2 = this.getPoint(t2);
-			const tangent = optionalTarget || (pt1.isVector2 ? new Vector2$1() : new Vector3());
+			const tangent = optionalTarget || (pt1.isVector2 ? new Vector2() : new Vector3());
 			tangent.copy(pt2).sub(pt1).normalize();
 			return tangent;
 		}
@@ -21627,7 +21627,7 @@
 		}
 
 		getPoint(t, optionalTarget) {
-			const point = optionalTarget || new Vector2$1();
+			const point = optionalTarget || new Vector2();
 			const twoPi = Math.PI * 2;
 			let deltaAngle = this.aEndAngle - this.aStartAngle;
 			const samePoints = Math.abs(deltaAngle) < Number.EPSILON; // ensures that deltaAngle is 0 .. 2 PI
@@ -21961,7 +21961,7 @@
 	}
 
 	class CubicBezierCurve extends Curve {
-		constructor(v0 = new Vector2$1(), v1 = new Vector2$1(), v2 = new Vector2$1(), v3 = new Vector2$1()) {
+		constructor(v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2()) {
 			super();
 			this.type = 'CubicBezierCurve';
 			this.v0 = v0;
@@ -21970,7 +21970,7 @@
 			this.v3 = v3;
 		}
 
-		getPoint(t, optionalTarget = new Vector2$1()) {
+		getPoint(t, optionalTarget = new Vector2()) {
 			const point = optionalTarget;
 			const v0 = this.v0,
 						v1 = this.v1,
@@ -22063,14 +22063,14 @@
 	CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
 
 	class LineCurve extends Curve {
-		constructor(v1 = new Vector2$1(), v2 = new Vector2$1()) {
+		constructor(v1 = new Vector2(), v2 = new Vector2()) {
 			super();
 			this.type = 'LineCurve';
 			this.v1 = v1;
 			this.v2 = v2;
 		}
 
-		getPoint(t, optionalTarget = new Vector2$1()) {
+		getPoint(t, optionalTarget = new Vector2()) {
 			const point = optionalTarget;
 
 			if (t === 1) {
@@ -22089,7 +22089,7 @@
 		}
 
 		getTangent(t, optionalTarget) {
-			const tangent = optionalTarget || new Vector2$1();
+			const tangent = optionalTarget || new Vector2();
 			tangent.copy(this.v2).sub(this.v1).normalize();
 			return tangent;
 		}
@@ -22170,7 +22170,7 @@
 	}
 
 	class QuadraticBezierCurve extends Curve {
-		constructor(v0 = new Vector2$1(), v1 = new Vector2$1(), v2 = new Vector2$1()) {
+		constructor(v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2()) {
 			super();
 			this.type = 'QuadraticBezierCurve';
 			this.v0 = v0;
@@ -22178,7 +22178,7 @@
 			this.v2 = v2;
 		}
 
-		getPoint(t, optionalTarget = new Vector2$1()) {
+		getPoint(t, optionalTarget = new Vector2()) {
 			const point = optionalTarget;
 			const v0 = this.v0,
 						v1 = this.v1,
@@ -22268,7 +22268,7 @@
 			this.points = points;
 		}
 
-		getPoint(t, optionalTarget = new Vector2$1()) {
+		getPoint(t, optionalTarget = new Vector2()) {
 			const point = optionalTarget;
 			const points = this.points;
 			const p = (points.length - 1) * t;
@@ -22312,7 +22312,7 @@
 
 			for (let i = 0, l = json.points.length; i < l; i++) {
 				const point = json.points[i];
-				this.points.push(new Vector2$1().fromArray(point));
+				this.points.push(new Vector2().fromArray(point));
 			}
 
 			return this;
@@ -23151,7 +23151,7 @@
 						const v_trans_lensq = v_trans_x * v_trans_x + v_trans_y * v_trans_y;
 
 						if (v_trans_lensq <= 2) {
-							return new Vector2$1(v_trans_x, v_trans_y);
+							return new Vector2(v_trans_x, v_trans_y);
 						} else {
 							shrink_by = Math.sqrt(v_trans_lensq / 2);
 						}
@@ -23188,7 +23188,7 @@
 						}
 					}
 
-					return new Vector2$1(v_trans_x / shrink_by, v_trans_y / shrink_by);
+					return new Vector2(v_trans_x / shrink_by, v_trans_y / shrink_by);
 				}
 
 				const contourMovements = [];
@@ -23469,7 +23469,7 @@
 			const b_y = vertices[indexB * 3 + 1];
 			const c_x = vertices[indexC * 3];
 			const c_y = vertices[indexC * 3 + 1];
-			return [new Vector2$1(a_x, a_y), new Vector2$1(b_x, b_y), new Vector2$1(c_x, c_y)];
+			return [new Vector2(a_x, a_y), new Vector2(b_x, b_y), new Vector2(c_x, c_y)];
 		},
 		generateSideWallUV: function (geometry, vertices, indexA, indexB, indexC, indexD) {
 			const a_x = vertices[indexA * 3];
@@ -23486,9 +23486,9 @@
 			const d_z = vertices[indexD * 3 + 2];
 
 			if (Math.abs(a_y - b_y) < Math.abs(a_x - b_x)) {
-				return [new Vector2$1(a_x, 1 - a_z), new Vector2$1(b_x, 1 - b_z), new Vector2$1(c_x, 1 - c_z), new Vector2$1(d_x, 1 - d_z)];
+				return [new Vector2(a_x, 1 - a_z), new Vector2(b_x, 1 - b_z), new Vector2(c_x, 1 - c_z), new Vector2(d_x, 1 - d_z)];
 			} else {
-				return [new Vector2$1(a_y, 1 - a_z), new Vector2$1(b_y, 1 - b_z), new Vector2$1(c_y, 1 - c_z), new Vector2$1(d_y, 1 - d_z)];
+				return [new Vector2(a_y, 1 - a_z), new Vector2(b_y, 1 - b_z), new Vector2(c_y, 1 - c_z), new Vector2(d_y, 1 - d_z)];
 			}
 		}
 	};
@@ -23548,7 +23548,7 @@
 
 			const inverseSegments = 1.0 / segments;
 			const vertex = new Vector3();
-			const uv = new Vector2$1(); // generate vertices and uvs
+			const uv = new Vector2(); // generate vertices and uvs
 
 			for (let i = 0; i <= segments; i++) {
 				const phi = phiStart + i * inverseSegments * phiLength;
@@ -23753,7 +23753,7 @@
 			let radius = innerRadius;
 			const radiusStep = (outerRadius - innerRadius) / phiSegments;
 			const vertex = new Vector3();
-			const uv = new Vector2$1(); // generate vertices, normals and uvs
+			const uv = new Vector2(); // generate vertices, normals and uvs
 
 			for (let j = 0; j <= phiSegments; j++) {
 				for (let i = 0; i <= thetaSegments; i++) {
@@ -24247,7 +24247,7 @@
 
 			const vertex = new Vector3();
 			const normal = new Vector3();
-			const uv = new Vector2$1();
+			const uv = new Vector2();
 			let P = new Vector3(); // buffer
 
 			const vertices = [];
@@ -24588,7 +24588,7 @@
 			this.bumpScale = 1;
 			this.normalMap = null;
 			this.normalMapType = TangentSpaceNormalMap;
-			this.normalScale = new Vector2$1(1, 1);
+			this.normalScale = new Vector2(1, 1);
 			this.displacementMap = null;
 			this.displacementScale = 1;
 			this.displacementBias = 0;
@@ -24690,7 +24690,7 @@
 			this.clearcoatMap = null;
 			this.clearcoatRoughness = 0.0;
 			this.clearcoatRoughnessMap = null;
-			this.clearcoatNormalScale = new Vector2$1(1, 1);
+			this.clearcoatNormalScale = new Vector2(1, 1);
 			this.clearcoatNormalMap = null;
 			this.reflectivity = 0.5; // maps to F0 = 0.04
 
@@ -24817,7 +24817,7 @@
 			this.bumpScale = 1;
 			this.normalMap = null;
 			this.normalMapType = TangentSpaceNormalMap;
-			this.normalScale = new Vector2$1(1, 1);
+			this.normalScale = new Vector2(1, 1);
 			this.displacementMap = null;
 			this.displacementScale = 1;
 			this.displacementBias = 0;
@@ -24939,7 +24939,7 @@
 			this.bumpScale = 1;
 			this.normalMap = null;
 			this.normalMapType = TangentSpaceNormalMap;
-			this.normalScale = new Vector2$1(1, 1);
+			this.normalScale = new Vector2(1, 1);
 			this.displacementMap = null;
 			this.displacementScale = 1;
 			this.displacementBias = 0;
@@ -25020,7 +25020,7 @@
 			this.bumpScale = 1;
 			this.normalMap = null;
 			this.normalMapType = TangentSpaceNormalMap;
-			this.normalScale = new Vector2$1(1, 1);
+			this.normalScale = new Vector2(1, 1);
 			this.displacementMap = null;
 			this.displacementScale = 1;
 			this.displacementBias = 0;
@@ -25194,7 +25194,7 @@
 			this.bumpScale = 1;
 			this.normalMap = null;
 			this.normalMapType = TangentSpaceNormalMap;
-			this.normalScale = new Vector2$1(1, 1);
+			this.normalScale = new Vector2(1, 1);
 			this.displacementMap = null;
 			this.displacementScale = 1;
 			this.displacementBias = 0;
@@ -27414,7 +27414,7 @@
 		constructor(points) {
 			super();
 			this.type = 'Path';
-			this.currentPoint = new Vector2$1();
+			this.currentPoint = new Vector2();
 
 			if (points) {
 				this.setFromPoints(points);
@@ -27438,21 +27438,21 @@
 		}
 
 		lineTo(x, y) {
-			const curve = new LineCurve(this.currentPoint.clone(), new Vector2$1(x, y));
+			const curve = new LineCurve(this.currentPoint.clone(), new Vector2(x, y));
 			this.curves.push(curve);
 			this.currentPoint.set(x, y);
 			return this;
 		}
 
 		quadraticCurveTo(aCPx, aCPy, aX, aY) {
-			const curve = new QuadraticBezierCurve(this.currentPoint.clone(), new Vector2$1(aCPx, aCPy), new Vector2$1(aX, aY));
+			const curve = new QuadraticBezierCurve(this.currentPoint.clone(), new Vector2(aCPx, aCPy), new Vector2(aX, aY));
 			this.curves.push(curve);
 			this.currentPoint.set(aX, aY);
 			return this;
 		}
 
 		bezierCurveTo(aCP1x, aCP1y, aCP2x, aCP2y, aX, aY) {
-			const curve = new CubicBezierCurve(this.currentPoint.clone(), new Vector2$1(aCP1x, aCP1y), new Vector2$1(aCP2x, aCP2y), new Vector2$1(aX, aY));
+			const curve = new CubicBezierCurve(this.currentPoint.clone(), new Vector2(aCP1x, aCP1y), new Vector2(aCP2x, aCP2y), new Vector2(aX, aY));
 			this.curves.push(curve);
 			this.currentPoint.set(aX, aY);
 			return this;
@@ -27657,14 +27657,14 @@
 			this.bias = 0;
 			this.normalBias = 0;
 			this.radius = 1;
-			this.mapSize = new Vector2$1(512, 512);
+			this.mapSize = new Vector2(512, 512);
 			this.map = null;
 			this.mapPass = null;
 			this.matrix = new Matrix4();
 			this.autoUpdate = true;
 			this.needsUpdate = false;
 			this._frustum = new Frustum();
-			this._frameExtents = new Vector2$1(1, 1);
+			this._frameExtents = new Vector2(1, 1);
 			this._viewportCount = 1;
 			this._viewports = [new Vector4(0, 0, 1, 1)];
 		}
@@ -27829,7 +27829,7 @@
 	class PointLightShadow extends LightShadow {
 		constructor() {
 			super(new PerspectiveCamera(90, 1, 0.5, 500));
-			this._frameExtents = new Vector2$1(4, 2);
+			this._frameExtents = new Vector2(4, 2);
 			this._viewportCount = 6;
 			this._viewports = [// These viewports map a cube-map onto a 2D texture with the
 			// following orientation:
@@ -28423,7 +28423,7 @@
 							break;
 
 						case 'v2':
-							material.uniforms[name].value = new Vector2$1().fromArray(uniform.value);
+							material.uniforms[name].value = new Vector2().fromArray(uniform.value);
 							break;
 
 						case 'v3':
@@ -28481,7 +28481,7 @@
 					normalScale = [normalScale, normalScale];
 				}
 
-				material.normalScale = new Vector2$1().fromArray(normalScale);
+				material.normalScale = new Vector2().fromArray(normalScale);
 			}
 
 			if (json.displacementMap !== undefined) material.displacementMap = getTexture(json.displacementMap);
@@ -28504,7 +28504,7 @@
 			if (json.clearcoatMap !== undefined) material.clearcoatMap = getTexture(json.clearcoatMap);
 			if (json.clearcoatRoughnessMap !== undefined) material.clearcoatRoughnessMap = getTexture(json.clearcoatRoughnessMap);
 			if (json.clearcoatNormalMap !== undefined) material.clearcoatNormalMap = getTexture(json.clearcoatNormalMap);
-			if (json.clearcoatNormalScale !== undefined) material.clearcoatNormalScale = new Vector2$1().fromArray(json.clearcoatNormalScale);
+			if (json.clearcoatNormalScale !== undefined) material.clearcoatNormalScale = new Vector2().fromArray(json.clearcoatNormalScale);
 			if (json.transmissionMap !== undefined) material.transmissionMap = getTexture(json.transmissionMap);
 			if (json.thicknessMap !== undefined) material.thicknessMap = getTexture(json.thicknessMap);
 			return material;
@@ -32944,10 +32944,10 @@
 		}
 	});
 
-	const _vector$4 = /*@__PURE__*/new Vector2$1();
+	const _vector$4 = /*@__PURE__*/new Vector2();
 
 	class Box2 {
-		constructor(min = new Vector2$1(+Infinity, +Infinity), max = new Vector2$1(-Infinity, -Infinity)) {
+		constructor(min = new Vector2(+Infinity, +Infinity), max = new Vector2(-Infinity, -Infinity)) {
 			this.min = min;
 			this.max = max;
 		}
@@ -34668,7 +34668,7 @@
 	}
 
 	function _getEquirectShader() {
-		const texelSize = new Vector2$1(1, 1);
+		const texelSize = new Vector2(1, 1);
 		const shaderMaterial = new RawShaderMaterial({
 			name: 'EquirectangularToCubeUV',
 			uniforms: {
@@ -35364,17 +35364,17 @@
 	}; //
 
 
-	Vector2$1.prototype.fromAttribute = function (attribute, index, offset) {
+	Vector2.prototype.fromAttribute = function (attribute, index, offset) {
 		console.warn('THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().');
 		return this.fromBufferAttribute(attribute, index, offset);
 	};
 
-	Vector2$1.prototype.distanceToManhattan = function (v) {
+	Vector2.prototype.distanceToManhattan = function (v) {
 		console.warn('THREE.Vector2: .distanceToManhattan() has been renamed to .manhattanDistanceTo().');
 		return this.manhattanDistanceTo(v);
 	};
 
-	Vector2$1.prototype.lengthManhattan = function () {
+	Vector2.prototype.lengthManhattan = function () {
 		console.warn('THREE.Vector2: .lengthManhattan() has been renamed to .manhattanLength().');
 		return this.manhattanLength();
 	}; //
@@ -36649,7 +36649,7 @@
 	exports.UnsignedShort565Type = UnsignedShort565Type;
 	exports.UnsignedShortType = UnsignedShortType;
 	exports.VSMShadowMap = VSMShadowMap;
-	exports.Vector2 = Vector2$1;
+	exports.Vector2 = Vector2;
 	exports.Vector3 = Vector3;
 	exports.Vector4 = Vector4;
 	exports.VectorKeyframeTrack = VectorKeyframeTrack;
