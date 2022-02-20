@@ -390,7 +390,8 @@
 			"Exporters": {
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
-				"ColladaExporter": "examples/en/exporters/ColladaExporter"
+				"ColladaExporter": "examples/en/exporters/ColladaExporter",
+				"EXRExporter": "examples/en/exporters/EXRExporter"
 			},
 
 			"Math": {
