@@ -1,70 +1,77 @@
-/**
- * @author Maxime Quiblier / http://github.com/maximeq
- *
- */
-THREE.MeshWorldPositionMaterial = function ( parameters ) {
+( function () {
 
-	parameters = parameters || {};
+	/**
+	 * @author Maxime Quiblier / http://github.com/maximeq
+	 *
+	 */
+	class MeshWorldPositionMaterial extends THREE.ShaderMaterial {
 
-	parameters.uniforms = THREE.UniformsUtils.merge( [
-		THREE.ShaderLib.depth.uniforms
-	] );
-	parameters.vertexShader = [
+		constructor( parameters ) {
 
-		"#include <common>",
-		"#include <displacementmap_pars_vertex>",
-		"#include <fog_pars_vertex>",
-		"#include <morphtarget_pars_vertex>",
-		"#include <skinning_pars_vertex>",
-		"#include <shadowmap_pars_vertex>",
-		"#include <logdepthbuf_pars_vertex>",
-		"#include <clipping_planes_pars_vertex>",
+			parameters = parameters || {};
 
-		"varying vec4 vWorldPosition;",
+			parameters.uniforms = THREE.UniformsUtils.merge( [
+				THREE.ShaderLib.depth.uniforms
+			] );
+			parameters.vertexShader = [
 
-		"void main() {",
+				'#include <common>',
+				'#include <displacementmap_pars_vertex>',
+				'#include <fog_pars_vertex>',
+				'#include <morphtarget_pars_vertex>',
+				'#include <skinning_pars_vertex>',
+				'#include <shadowmap_pars_vertex>',
+				'#include <logdepthbuf_pars_vertex>',
+				'#include <clipping_planes_pars_vertex>',
 
-		"#include <skinbase_vertex>",
+				'varying vec4 vWorldPosition;',
 
-		"#include <begin_vertex>",
-		"#include <morphtarget_vertex>",
-		"#include <skinning_vertex>",
-		"#include <displacementmap_vertex>",
-		"#include <project_vertex>",
-		"#include <logdepthbuf_vertex>",
-		"#include <clipping_planes_vertex>",
+				'void main() {',
 
-		"vWorldPosition = modelMatrix * vec4( transformed, 1.0 );",
+				'#include <skinbase_vertex>',
 
-		"}"
-	].join( "\n" );
+				'#include <begin_vertex>',
+				'#include <morphtarget_vertex>',
+				'#include <skinning_vertex>',
+				'#include <displacementmap_vertex>',
+				'#include <project_vertex>',
+				'#include <logdepthbuf_vertex>',
+				'#include <clipping_planes_vertex>',
 
-	parameters.fragmentShader = [
-		"varying vec4 vWorldPosition;",
-		"void main() {",
-		"gl_FragColor = vWorldPosition;",
-		"}",
-	].join( "\n" );
+				'vWorldPosition = modelMatrix * vec4( transformed, 1.0 );',
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+				'}'
+			].join( '\n' );
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
+			parameters.fragmentShader = [
+				'varying vec4 vWorldPosition;',
+				'void main() {',
+				'gl_FragColor = vWorldPosition;',
+				'}',
+			].join( '\n' );
 
-	this.fog = false;
-	this.lights = false;
+			super( parameters );
 
-	this.skinning = false;
-	this.morphTargets = false;
+			this.displacementMap = null;
+			this.displacementScale = 1;
+			this.displacementBias = 0;
 
-	this.isMeshDepthMaterial = true;
-	this.isMeshWorldPositionMaterial = true;
+			this.wireframe = false;
+			this.wireframeLinewidth = 1;
 
-	THREE.ShaderMaterial.call( this, parameters );
+			this.fog = false;
+			this.lights = false;
 
-};
+			this.skinning = false;
+			this.morphTargets = false;
 
-THREE.MeshWorldPositionMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.MeshWorldPositionMaterial.prototype.constructor = THREE.MeshWorldPositionMaterial;
+			this.isMeshDepthMaterial = true;
+			this.isMeshWorldPositionMaterial = true;
+
+		}
+
+	}
+
+	THREE.MeshWorldPositionMaterial = MeshWorldPositionMaterial;
+
+} )();
