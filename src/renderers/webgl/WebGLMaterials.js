@@ -174,6 +174,14 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.ssaoMap ) {
+
+			uniforms.ssaoMap.value = material.ssaoMap;
+			uniforms.aoMapIntensity.value = material.aoMapIntensity;
+			uniforms.ssaoMapMatrix.value = material.ssaoMapMatrix;
+
+		}
+
 		// uv repeat and offset setting priorities
 		// 1. color map
 		// 2. specular map

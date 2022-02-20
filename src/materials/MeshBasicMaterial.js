@@ -49,6 +49,8 @@ class MeshBasicMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		this.aoMap = null;
+		this.ssaoMap = null;
+		this.ssaoMapMatrix = null;
 		this.aoMapIntensity = 1.0;
 
 		this.specularMap = null;

@@ -70,6 +70,8 @@ class MeshPhongMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		this.aoMap = null;
+		this.ssaoMap = null;
+		this.ssaoMapMatrix = null;
 		this.aoMapIntensity = 1.0;
 
 		this.emissive = new Color( 0x000000 );

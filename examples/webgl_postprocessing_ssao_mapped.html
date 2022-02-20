@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		body {
+			background-color: #aaa;
+		}
+	</style>
+</head>
+<body>
+<div id="info">
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
+</div>
+
+<script type="module">
+
+	import * as THREE from '../build/three.module.js';
+
+	import Stats from './jsm/libs/stats.module.js';
+	import { GUI } from './jsm/libs/dat.gui.module.js';
+
+	import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+	import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
+
+	import { OrbitControls } from "./jsm/controls/OrbitControls.js";
+
+	var container, stats;
+	var camera, scene, renderer;
+	var composer;
+	var group;
+	let ssaoPass, torusKnot;
+
+	init();
+	animate();
+
+	function init() {
+
+		container = document.createElement( 'div' );
+		document.body.appendChild( container );
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.shadowMap.enabled = true;
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 10, 300 );
+		camera.position.z = 100;
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+		controls.enableDamping = true;
+		controls.dampingFactor = 0.25;
+		controls.rotateSpeed = 0.35;
+		controls.minZoom = 5;
+
+		scene = new THREE.Scene();
+		scene.background = new THREE.Color( 0xaaaaaa );
+
+		const light = new THREE.DirectionalLight();
+		light.castShadow = true;
+		light.position.set( 0, 1000, 0 );
+		scene.add( light );
+
+		scene.add( new THREE.HemisphereLight() );
+
+		group = new THREE.Group();
+		scene.add( group );
+
+		torusKnot = new THREE.Mesh(
+			new THREE.TorusKnotBufferGeometry( 1.5, 0.5, 1000, 1000 ),
+			new THREE.MeshStandardMaterial( { color: 0xff8800 } ),
+		);
+		torusKnot.receiveShadow = true;
+		torusKnot.castShadow = true;
+		torusKnot.geometry.setAttribute( "uv2", new THREE.BufferAttribute( torusKnot.geometry.attributes.uv.array, 2, false ) );
+		torusKnot.scale.set( 20, 20, 20 );
+		torusKnot.position.set( 0, 0, 0 );
+		scene.add( torusKnot );
+
+		stats = new Stats();
+		container.appendChild( stats.dom );
+
+		var width = window.innerWidth;
+		var height = window.innerHeight;
+
+		composer = new EffectComposer( renderer );
+
+		ssaoPass = new SSAOPass( scene, camera, width, height );
+		ssaoPass.kernelRadius = 16;
+		ssaoPass.output = 0;
+		composer.addPass( ssaoPass );
+
+		torusKnot.material.ssaoMap = ssaoPass.blurRenderTarget.texture;
+		torusKnot.material.needsUpdate = true;
+
+		// Init gui
+		var gui = new GUI();
+		gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
+		gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
+		gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
+
+		window.addEventListener( 'resize', onWindowResize, false );
+
+	}
+
+	function onWindowResize() {
+
+		var width = window.innerWidth;
+		var height = window.innerHeight;
+
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( width, height );
+		composer.setSize( width, height );
+
+	}
+
+	function animate() {
+
+		requestAnimationFrame( animate );
+
+		stats.begin();
+		render();
+		stats.end();
+
+	}
+
+	function render() {
+
+		composer.render();
+
+		renderer.render( scene, camera );
+
+	}
+
+</script>
+</body>
+</html>

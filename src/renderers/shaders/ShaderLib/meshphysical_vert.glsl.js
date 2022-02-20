@@ -33,6 +33,7 @@ varying vec3 vViewPosition;
 #include <shadowmap_pars_vertex>
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
+#include <aomap_pars_vertex>
 
 void main() {
 
@@ -72,6 +73,7 @@ void main() {
 	#include <worldpos_vertex>
 	#include <shadowmap_vertex>
 	#include <fog_vertex>
+	#include <aomap_vertex>
 
 #ifdef USE_TRANSMISSION
 

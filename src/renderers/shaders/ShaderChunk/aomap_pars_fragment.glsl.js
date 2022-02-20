@@ -1,7 +1,22 @@
 export default /* glsl */`
-#ifdef USE_AOMAP
+#if defined( USE_AOMAP ) || defined( USE_SSAOMAP )
 
-	uniform sampler2D aoMap;
+	#ifndef USE_SSAOMAP
+
+		uniform sampler2D aoMap;
+
+	#else
+
+		uniform sampler2D ssaoMap;
+
+		#ifdef USE_SSAOMAPMATRIX
+
+			varying vec2 vAoCoords;
+
+		#endif
+
+	#endif
+
 	uniform float aoMapIntensity;
 
 #endif

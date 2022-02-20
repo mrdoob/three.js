@@ -69,6 +69,8 @@ function WebGLRenderer( parameters = {} ) {
 	let currentRenderList = null;
 	let currentRenderState = null;
 
+	var _resolution = new Vector2();
+
 	// render() can be called from within a callback triggered by another render.
 	// We track this so that the nested render call gets its list and state isolated from the parent render call.
 
@@ -171,6 +173,8 @@ function WebGLRenderer( parameters = {} ) {
 	// camera matrices cache
 
 	const _projScreenMatrix = new Matrix4();
+
+	const _tmpMatrix4 = new Matrix4();
 
 	const _vector3 = new Vector3();
 
@@ -1496,6 +1500,16 @@ function WebGLRenderer( parameters = {} ) {
 		const envMap = cubemaps.get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && object.geometry && object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4;
 
+		if ( material.isShaderMaterial ) {
+
+			if ( material.uniforms.projectionMatrixInverse )
+				material.uniforms.projectionMatrixInverse = { value: camera.projectionMatrixInverse };
+
+			if ( material.uniforms.viewMatrixInverse )
+				material.uniforms.viewMatrixInverse = { value: camera.matrixWorld };
+
+		}
+
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;
 
@@ -1764,6 +1778,12 @@ function WebGLRenderer( parameters = {} ) {
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
+		if ( _currentRenderTarget )
+			_resolution.set( _currentRenderTarget.width, _currentRenderTarget.height );
+		else
+			_resolution.set( _width, _height );
+		p_uniforms.setValue( _gl, 'renderSize', _resolution );
 
 		return program;
 
