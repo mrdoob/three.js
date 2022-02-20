@@ -193,7 +193,6 @@
 				gpuPanel = new GPUStatsPanel( renderer.getContext() );
 				stats.addPanel( gpuPanel );
 				stats.showPanel( 0 );
-				switchLine( 1 );
 				initGui();
 
 			}
@@ -335,7 +334,7 @@
 
 					switchLine( val );
 
-				} );
+				} ).setValue( 1 );
 
 				gui.add( param, 'world units' ).onChange( function ( val ) {
 

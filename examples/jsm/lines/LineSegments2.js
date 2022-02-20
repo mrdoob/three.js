@@ -49,7 +49,7 @@ function getWorldSpaceHalfWidth( camera, distance, resolution ) {
 
 }
 
-function raycastWorldUnits( intersects ) {
+function raycastWorldUnits( lineSegments, intersects ) {
 
 	for ( let i = 0, l = _instanceStart.count; i < l; i ++ ) {
 
@@ -68,7 +68,7 @@ function raycastWorldUnits( intersects ) {
 				point,
 				pointOnLine,
 				distance: _ray.origin.distanceTo( point ),
-				object: this,
+				object: lineSegments,
 				face: null,
 				faceIndex: i,
 				uv: null,
@@ -200,8 +200,7 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
 				point: point,
 				pointOnLine: pointOnLine,
 				distance: _ray.origin.distanceTo( point ),
-
-				object: this,
+				object: lineSegments,
 				face: null,
 				faceIndex: i,
 				uv: null,
@@ -339,7 +338,7 @@ class LineSegments2 extends Mesh {
 
 		if ( worldUnits ) {
 
-			raycastWorldUnits( intersects );
+			raycastWorldUnits( this, intersects );
 
 		} else {
 
