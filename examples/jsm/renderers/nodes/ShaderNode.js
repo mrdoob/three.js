@@ -5,6 +5,7 @@ import VarNode from './core/VarNode.js';
 // inputs
 import ColorNode from './inputs/ColorNode.js';
 import FloatNode from './inputs/FloatNode.js';
+import IntNode from './inputs/IntNode.js';
 import Vector2Node from './inputs/Vector2Node.js';
 import Vector3Node from './inputs/Vector3Node.js';
 import Vector4Node from './inputs/Vector4Node.js';
@@ -198,6 +199,12 @@ export const float = ( val ) => {
 
 };
 
+export const int = ( val ) => {
+
+	return nodeObject( new IntNode( val ).setConst( true ) );
+
+};
+
 export const color = ( ...params ) => {
 
 	return nodeObject( new ColorNode( new Color( ...params ) ).setConst( true ) );
@@ -296,9 +303,17 @@ export const mul = ShaderNodeProxy( OperatorNode, '*' );
 export const div = ShaderNodeProxy( OperatorNode, '/' );
 export const equal = ShaderNodeProxy( OperatorNode, '==' );
 export const assign = ShaderNodeProxy( OperatorNode, '=' );
+export const lessThan = ShaderNodeProxy( OperatorNode, '<' );
 export const greaterThan = ShaderNodeProxy( OperatorNode, '>' );
 export const lessThanEqual = ShaderNodeProxy( OperatorNode, '<=' );
+export const greaterThanEqual = ShaderNodeProxy( OperatorNode, '>=' );
 export const and = ShaderNodeProxy( OperatorNode, '&&' );
+export const or = ShaderNodeProxy( OperatorNode, '||' );
+export const xor = ShaderNodeProxy( OperatorNode, '^' );
+export const bitAnd = ShaderNodeProxy( OperatorNode, '&' );
+export const bitOr = ShaderNodeProxy( OperatorNode, '|' );
+export const shiftLeft = ShaderNodeProxy( OperatorNode, '<<' );
+export const shiftRight = ShaderNodeProxy( OperatorNode, '>>' );
 
 export const element = ShaderNodeProxy( ArrayElementNode );
 
