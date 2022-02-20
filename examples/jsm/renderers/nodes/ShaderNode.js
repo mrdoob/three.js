@@ -310,9 +310,10 @@ export const lessThanEqual = ShaderNodeProxy( OperatorNode, '<=' );
 export const greaterThanEqual = ShaderNodeProxy( OperatorNode, '>=' );
 export const and = ShaderNodeProxy( OperatorNode, '&&' );
 export const or = ShaderNodeProxy( OperatorNode, '||' );
-export const xor = ShaderNodeProxy( OperatorNode, '^' );
+export const xor = ShaderNodeProxy( OperatorNode, '^^' );
 export const bitAnd = ShaderNodeProxy( OperatorNode, '&' );
 export const bitOr = ShaderNodeProxy( OperatorNode, '|' );
+export const bitXor = ShaderNodeProxy( OperatorNode, '^' );
 export const shiftLeft = ShaderNodeProxy( OperatorNode, '<<' );
 export const shiftRight = ShaderNodeProxy( OperatorNode, '>>' );
 
