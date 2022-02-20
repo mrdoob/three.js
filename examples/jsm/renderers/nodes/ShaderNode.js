@@ -301,6 +301,7 @@ export const add = ShaderNodeProxy( OperatorNode, '+' );
 export const sub = ShaderNodeProxy( OperatorNode, '-' );
 export const mul = ShaderNodeProxy( OperatorNode, '*' );
 export const div = ShaderNodeProxy( OperatorNode, '/' );
+export const remainder = ShaderNodeProxy( OperatorNode, '%' );
 export const equal = ShaderNodeProxy( OperatorNode, '==' );
 export const assign = ShaderNodeProxy( OperatorNode, '=' );
 export const lessThan = ShaderNodeProxy( OperatorNode, '<' );
