@@ -41,11 +41,11 @@ class OperatorNode extends TempNode {
 
 			return 'void';
 
-		} else if ( op === '=' ) {
+		} else if ( op === '=' || op === '%' ) {
 
 			return typeA;
 
-		} else if ( op === '%' || op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
+		} else if ( op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 			
 			return 'int';
 			
