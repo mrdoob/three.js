@@ -172,7 +172,7 @@ class SVGLoader extends Loader {
 
 				const node = childNodes[ i ];
 
-				if (isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs') {
+				if ( isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs' ) {
 
 					// Ignore everything in defs except CSS style definitions
 					// and nested defs, because it is OK by the standard to have
