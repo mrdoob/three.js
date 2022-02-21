@@ -193,7 +193,7 @@ export const nodeObject = ( val ) => {
 
 };
 
-export const makeVar = ( node, name = null, nodeType === null ) => {
+export const makeVar = ( node, name = null, nodeType = null ) => {
 
 	if ( ( node.node?.isNode === true ) && ( ( node.name === name ) || ( name === null ) ) && ( ( node.nodeType === nodeType ) || ( nodeType === null ) ) ) {
 
