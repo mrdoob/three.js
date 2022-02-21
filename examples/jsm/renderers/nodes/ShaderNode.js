@@ -193,6 +193,20 @@ export const nodeObject = ( val ) => {
 
 };
 
+export const makeVar = ( node, name = null, nodeType === null ) => {
+
+	if ( ( node.node?.isNode === true ) && ( ( node.name === name ) || ( name === null ) ) && ( ( node.nodeType === nodeType ) || ( nodeType === null ) ) ) {
+
+		// node is already a VarNode with the same name and type
+
+		return nodeObject( node );
+
+	}
+
+	return nodeObject( new VarNode( nodeObject( node ), name, nodeType ) );
+
+};
+
 export const float = ( val ) => {
 
 	if ( val?.isNode === true ) {
@@ -221,7 +235,7 @@ export const color = ( ...params ) => {
 
 	if ( params[ 0 ]?.isNode === true ) {
 
-		return nodeObject( new ConvertNode( params[0], 'color' ) );
+		return nodeObject( new ConvertNode( params[ 0 ], 'color' ) );
 
 	}
 
