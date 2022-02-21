@@ -62,7 +62,7 @@ function supported( renderer, renderTarget ) {
 
 	}
 
-	if ( renderTarget.texture.format != RGBAFormat ) {
+	if ( renderTarget.texture.format !== RGBAFormat ) {
 
 		console.error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
 
@@ -115,7 +115,7 @@ function getPixelData( renderer, rtt, info ) {
 
 	let dataBuffer;
 
-	if ( info.type == FloatType ) {
+	if ( info.type === FloatType ) {
 
 		dataBuffer = new Float32Array( info.width * info.height * info.numInputChannels );
 
@@ -200,7 +200,7 @@ function compressData( inBuffer, info ) {
 
 	}
 
-	if ( info.compression != 0 ) {
+	if ( info.compression !== 0 ) {
 
 		tmpBuffer = new Uint8Array( size );
 
