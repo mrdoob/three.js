@@ -38,7 +38,7 @@ class EXRExporter {
 
 function supported( renderer, renderTarget ) {
 
-	if ( ! renderer || renderer.readRenderTargetPixels === undefined ) {
+	if ( ! renderer || ! renderer.isWebGLRenderer ) {
 
 		console.error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer.' );
 
@@ -54,7 +54,7 @@ function supported( renderer, renderTarget ) {
 
 	}
 
-	if ( renderTarget.texture.type != FloatType && renderTarget.texture.type != HalfFloatType ) {
+	if ( renderTarget.texture.type !== FloatType && renderTarget.texture.type !== HalfFloatType ) {
 
 		console.error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type.' );
 
@@ -75,9 +75,7 @@ function supported( renderer, renderTarget ) {
 
 }
 
-function buildInfo( renderTarget, options ) {
-
-	options = options || {};
+function buildInfo( renderTarget, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
@@ -160,12 +158,8 @@ function reorganizeDataBuffer( inBuffer, info ) {
 
 			decodeLinear( dec, r, g, b, a );
 
-			if ( info.numOutputChannels == 4 ) {
-
-				offset.value = line + x * info.dataSize;
-				setValue( dv, dec.a, offset );
-
-			}
+			offset.value = line + x * info.dataSize;
+			setValue( dv, dec.a, offset );
 
 			offset.value = line + ( cOffset ) * w * info.dataSize + x * info.dataSize;
 			setValue( dv, dec.b, offset );
