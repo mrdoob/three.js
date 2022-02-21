@@ -272,7 +272,7 @@ function compressZIP( data, tmpBuffer ) {
 
 	}
 
-	if ( typeof fflate === undefined ) {
+	if ( typeof fflate === 'undefined' ) {
 
 		console.error( 'THREE.EXRLoader: External \`fflate.module.js\` required' );
 
