@@ -195,17 +195,35 @@ export const nodeObject = ( val ) => {
 
 export const float = ( val ) => {
 
+	if ( val?.isNode === true ) {
+
+		return nodeObject( new ConvertNode( val, 'float' ) );
+
+	}
+
 	return nodeObject( new FloatNode( val ).setConst( true ) );
 
 };
 
 export const int = ( val ) => {
 
+	if ( val?.isNode === true ) {
+
+		return nodeObject( new ConvertNode( val, 'int' ) );
+
+	}
+
 	return nodeObject( new IntNode( val ).setConst( true ) );
 
 };
 
 export const color = ( ...params ) => {
+
+	if ( params[ 0 ]?.isNode === true ) {
+
+		return nodeObject( new ConvertNode( params[0], 'color' ) );
+
+	}
 
 	return nodeObject( new ColorNode( new Color( ...params ) ).setConst( true ) );
 
