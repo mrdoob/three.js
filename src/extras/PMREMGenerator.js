@@ -679,6 +679,8 @@ function _getBlurShader( lodMax, width, height ) {
 
 		fragmentShader: /* glsl */`
 
+			#extension GL_EXT_shader_texture_lod : enable
+
 			precision mediump float;
 			precision mediump int;
 
