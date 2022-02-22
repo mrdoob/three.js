@@ -1777,6 +1777,7 @@ function WebGLRenderer( parameters = {} ) {
 		uniforms.spotShadowMatrix.needsUpdate = value;
 		uniforms.pointShadowMap.needsUpdate = value;
 		uniforms.pointShadowMatrix.needsUpdate = value;
+
 	}
 
 	function materialNeedsLights( material ) {
