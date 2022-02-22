@@ -409,12 +409,6 @@ class PMREMGenerator {
 
 		uniforms[ 'envMap' ].value = texture;
 
-		if ( ! isCubeTexture ) {
-
-			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
-
-		}
-
 		const size = this._cubeSize;
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * size, 2 * size );
 
@@ -672,6 +666,10 @@ function _getBlurShader( lodMax, width, height ) {
 
 		name: 'SphericalGaussianBlur',
 
+		extensions: {
+			shaderTextureLOD: true
+		},
+
 		defines: {
 			'n': MAX_SAMPLES,
 			'CUBEUV_TEXEL_WIDTH': 1.0 / width,
@@ -765,14 +763,12 @@ function _getBlurShader( lodMax, width, height ) {
 
 function _getEquirectShader() {
 
-	const texelSize = new Vector2( 1, 1 );
 	const shaderMaterial = new RawShaderMaterial( {
 
 		name: 'EquirectangularToCubeUV',
 
 		uniforms: {
-			'envMap': { value: null },
-			'texelSize': { value: texelSize }
+			'envMap': { value: null }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -785,31 +781,16 @@ function _getEquirectShader() {
 			varying vec3 vOutputDirection;
 
 			uniform sampler2D envMap;
-			uniform vec2 texelSize;
 
 			#include <common>
 
 			void main() {
 
-				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
-
 				vec3 outputDirection = normalize( vOutputDirection );
 				vec2 uv = equirectUv( outputDirection );
 
-				vec2 f = fract( uv / texelSize - 0.5 );
-				uv -= f * texelSize;
-				vec3 tl = texture2D ( envMap, uv ).rgb;
-				uv.x += texelSize.x;
-				vec3 tr = texture2D ( envMap, uv ).rgb;
-				uv.y += texelSize.y;
-				vec3 br = texture2D ( envMap, uv ).rgb;
-				uv.x -= texelSize.x;
-				vec3 bl = texture2D ( envMap, uv ).rgb;
-
-				vec3 tm = mix( tl, tr, f.x );
-				vec3 bm = mix( bl, br, f.x );
-				gl_FragColor.rgb = mix( tm, bm, f.y );
-
+				gl_FragColor = vec4( texture2D ( envMap, uv ).rgb, 1.0 );
+				
 			}
 		`,
 

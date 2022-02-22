@@ -423,7 +423,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		prefixFragment = [
 
 			customExtensions,
-			customDefines
+			customDefines,
+			parameters.rendererExtensionShaderTextureLod ? '#define TEXTURE_LOD_EXT' : ''
 
 		].filter( filterEmptyLine ).join( '\n' );
 
@@ -700,7 +701,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
-	if ( parameters.isWebGL2 && parameters.isRawShaderMaterial !== true ) {
+	if ( parameters.isWebGL2 ) {
 
 		// GLSL 3.0 conversion for built-in materials and ShaderMaterial
 
