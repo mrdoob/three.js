@@ -71,7 +71,7 @@ class SVGLoader extends Loader {
 
 			const transform = getNodeTransform( node );
 
-			let traverseChildNodes = true;
+			let isDefsNode = false;
 
 			let path = null;
 
@@ -124,7 +124,7 @@ class SVGLoader extends Loader {
 					break;
 
 				case 'defs':
-					traverseChildNodes = false;
+					isDefsNode = true;
 					break;
 
 				case 'use':
@@ -166,17 +166,25 @@ class SVGLoader extends Loader {
 
 			}
 
-			if ( traverseChildNodes ) {
+			const childNodes = node.childNodes;
 
-				const nodes = node.childNodes;
+			for ( let i = 0; i < childNodes.length; i ++ ) {
 
-				for ( let i = 0; i < nodes.length; i ++ ) {
+				const node = childNodes[ i ];
 
-					parseNode( nodes[ i ], style );
+				if ( isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs' ) {
+
+					// Ignore everything in defs except CSS style definitions
+					// and nested defs, because it is OK by the standard to have
+					// <style/> there.
+					continue;
 
 				}
 
+				parseNode( node, style );
+
 			}
+
 
 			if ( transform ) {
 
