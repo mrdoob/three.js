@@ -4,7 +4,6 @@ import {
 	CubeUVReflectionMapping,
 	LinearEncoding,
 	LinearFilter,
-	NearestFilter,
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
@@ -17,7 +16,6 @@ import { Mesh } from '../objects/Mesh.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
@@ -448,9 +446,6 @@ class PMREMGenerator {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
-		cubeUVRenderTarget.texture.minFilter = NearestFilter;
-		pingPongRenderTarget.texture.minFilter = NearestFilter;
-
 		this._halfBlur(
 			cubeUVRenderTarget,
 			pingPongRenderTarget,
@@ -468,9 +463,6 @@ class PMREMGenerator {
 			sigma,
 			'longitudinal',
 			poleAxis );
-
-		cubeUVRenderTarget.texture.minFilter = LinearFilter;
-		pingPongRenderTarget.texture.minFilter = LinearFilter;
 
 	}
 
@@ -666,10 +658,6 @@ function _getBlurShader( lodMax, width, height ) {
 
 		name: 'SphericalGaussianBlur',
 
-		extensions: {
-			shaderTextureLOD: true
-		},
-
 		defines: {
 			'n': MAX_SAMPLES,
 			'CUBEUV_TEXEL_WIDTH': 1.0 / width,
@@ -790,7 +778,7 @@ function _getEquirectShader() {
 				vec2 uv = equirectUv( outputDirection );
 
 				gl_FragColor = vec4( texture2D ( envMap, uv ).rgb, 1.0 );
-				
+
 			}
 		`,
 
