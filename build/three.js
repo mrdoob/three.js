@@ -11639,8 +11639,8 @@
 			this._sizeLods = [];
 			this._sigmas = [];
 			this._blurMaterial = null;
-			this._equirectShader = null;
-			this._cubemapShader = null;
+			this._cubemapMaterial = null;
+			this._equirectMaterial = null;
 
 			this._compileMaterial(this._blurMaterial);
 		}
@@ -11701,10 +11701,10 @@
 
 
 		compileCubemapShader() {
-			if (this._cubemapShader === null) {
-				this._cubemapShader = _getCubemapShader();
+			if (this._cubemapMaterial === null) {
+				this._cubemapMaterial = _getCubemapMaterial();
 
-				this._compileMaterial(this._cubemapShader);
+				this._compileMaterial(this._cubemapMaterial);
 			}
 		}
 		/**
@@ -11714,10 +11714,10 @@
 
 
 		compileEquirectangularShader() {
-			if (this._equirectShader === null) {
-				this._equirectShader = _getEquirectMaterial();
+			if (this._equirectMaterial === null) {
+				this._equirectMaterial = _getEquirectMaterial();
 
-				this._compileMaterial(this._equirectShader);
+				this._compileMaterial(this._equirectMaterial);
 			}
 		}
 		/**
@@ -11730,8 +11730,8 @@
 		dispose() {
 			this._dispose();
 
-			if (this._cubemapShader !== null) this._cubemapShader.dispose();
-			if (this._equirectShader !== null) this._equirectShader.dispose();
+			if (this._cubemapMaterial !== null) this._cubemapMaterial.dispose();
+			if (this._equirectMaterial !== null) this._equirectMaterial.dispose();
 		} // private interface
 
 
@@ -11892,18 +11892,18 @@
 			const isCubeTexture = texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping;
 
 			if (isCubeTexture) {
-				if (this._cubemapShader === null) {
-					this._cubemapShader = _getCubemapShader();
+				if (this._cubemapMaterial === null) {
+					this._cubemapMaterial = _getCubemapMaterial();
 				}
 
-				this._cubemapShader.uniforms.flipEnvMap.value = texture.isRenderTargetTexture === false ? -1 : 1;
+				this._cubemapMaterial.uniforms.flipEnvMap.value = texture.isRenderTargetTexture === false ? -1 : 1;
 			} else {
-				if (this._equirectShader === null) {
-					this._equirectShader = _getEquirectMaterial();
+				if (this._equirectMaterial === null) {
+					this._equirectMaterial = _getEquirectMaterial();
 				}
 			}
 
-			const material = isCubeTexture ? this._cubemapShader : this._equirectShader;
+			const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
 			const mesh = new Mesh(this._lodPlanes[0], material);
 			const uniforms = material.uniforms;
 			uniforms['envMap'].value = texture;
@@ -12191,7 +12191,7 @@
 	}
 
 	function _getEquirectMaterial() {
-		const shaderMaterial = new ShaderMaterial({
+		return new ShaderMaterial({
 			name: 'EquirectangularToCubeUV',
 			uniforms: {
 				'envMap': {
@@ -12225,11 +12225,10 @@
 			depthTest: false,
 			depthWrite: false
 		});
-		return shaderMaterial;
 	}
 
-	function _getCubemapShader() {
-		const shaderMaterial = new ShaderMaterial({
+	function _getCubemapMaterial() {
+		return new ShaderMaterial({
 			name: 'CubemapToCubeUV',
 			uniforms: {
 				'envMap': {
@@ -12263,7 +12262,6 @@
 			depthTest: false,
 			depthWrite: false
 		});
-		return shaderMaterial;
 	}
 
 	function _getCommonVertexShader() {

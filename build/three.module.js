@@ -15216,8 +15216,8 @@ class PMREMGenerator {
 		this._sigmas = [];
 
 		this._blurMaterial = null;
-		this._equirectShader = null;
-		this._cubemapShader = null;
+		this._cubemapMaterial = null;
+		this._equirectMaterial = null;
 
 		this._compileMaterial( this._blurMaterial );
 
@@ -15235,10 +15235,12 @@ class PMREMGenerator {
 		_oldTarget = this._renderer.getRenderTarget();
 
 		this._setSize( 256 );
+
 		const cubeUVRenderTarget = this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+
 		if ( sigma > 0 ) {
 
 			this._blur( cubeUVRenderTarget, 0, 0, sigma );
@@ -15280,10 +15282,10 @@ class PMREMGenerator {
 	 */
 	compileCubemapShader() {
 
-		if ( this._cubemapShader === null ) {
+		if ( this._cubemapMaterial === null ) {
 
-			this._cubemapShader = _getCubemapShader();
-			this._compileMaterial( this._cubemapShader );
+			this._cubemapMaterial = _getCubemapMaterial();
+			this._compileMaterial( this._cubemapMaterial );
 
 		}
 
@@ -15295,10 +15297,10 @@ class PMREMGenerator {
 	 */
 	compileEquirectangularShader() {
 
-		if ( this._equirectShader === null ) {
+		if ( this._equirectMaterial === null ) {
 
-			this._equirectShader = _getEquirectMaterial();
-			this._compileMaterial( this._equirectShader );
+			this._equirectMaterial = _getEquirectMaterial();
+			this._compileMaterial( this._equirectMaterial );
 
 		}
 
@@ -15313,8 +15315,8 @@ class PMREMGenerator {
 
 		this._dispose();
 
-		if ( this._cubemapShader !== null ) this._cubemapShader.dispose();
-		if ( this._equirectShader !== null ) this._equirectShader.dispose();
+		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
+		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
 
 	}
 
@@ -15362,6 +15364,7 @@ class PMREMGenerator {
 		}
 
 		_oldTarget = this._renderer.getRenderTarget();
+
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
@@ -15464,6 +15467,7 @@ class PMREMGenerator {
 		for ( let i = 0; i < 6; i ++ ) {
 
 			const col = i % 3;
+
 			if ( col === 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
@@ -15482,7 +15486,9 @@ class PMREMGenerator {
 			}
 
 			const size = this._cubeSize;
+
 			_setViewport( cubeUVRenderTarget, col * size, i > 2 ? size : 0, size, size );
+
 			renderer.setRenderTarget( cubeUVRenderTarget );
 
 			if ( useSolidColor ) {
@@ -15512,25 +15518,25 @@ class PMREMGenerator {
 
 		if ( isCubeTexture ) {
 
-			if ( this._cubemapShader === null ) {
+			if ( this._cubemapMaterial === null ) {
 
-				this._cubemapShader = _getCubemapShader();
+				this._cubemapMaterial = _getCubemapMaterial();
 
 			}
 
-			this._cubemapShader.uniforms.flipEnvMap.value = ( texture.isRenderTargetTexture === false ) ? - 1 : 1;
+			this._cubemapMaterial.uniforms.flipEnvMap.value = ( texture.isRenderTargetTexture === false ) ? - 1 : 1;
 
 		} else {
 
-			if ( this._equirectShader === null ) {
+			if ( this._equirectMaterial === null ) {
 
-				this._equirectShader = _getEquirectMaterial();
+				this._equirectMaterial = _getEquirectMaterial();
 
 			}
 
 		}
 
-		const material = isCubeTexture ? this._cubemapShader : this._equirectShader;
+		const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
 		const mesh = new Mesh( this._lodPlanes[ 0 ], material );
 
 		const uniforms = material.uniforms;
@@ -15538,6 +15544,7 @@ class PMREMGenerator {
 		uniforms[ 'envMap' ].value = texture;
 
 		const size = this._cubeSize;
+
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * size, 2 * size );
 
 		renderer.setRenderTarget( cubeUVRenderTarget );
@@ -15881,7 +15888,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 function _getEquirectMaterial() {
 
-	const shaderMaterial = new ShaderMaterial( {
+	return new ShaderMaterial( {
 
 		name: 'EquirectangularToCubeUV',
 
@@ -15918,13 +15925,11 @@ function _getEquirectMaterial() {
 
 	} );
 
-	return shaderMaterial;
-
 }
 
-function _getCubemapShader() {
+function _getCubemapMaterial() {
 
-	const shaderMaterial = new ShaderMaterial( {
+	return new ShaderMaterial( {
 
 		name: 'CubemapToCubeUV',
 
@@ -15958,8 +15963,6 @@ function _getCubemapShader() {
 		depthWrite: false
 
 	} );
-
-	return shaderMaterial;
 
 }
 
