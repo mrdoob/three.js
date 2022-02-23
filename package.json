@@ -12,6 +12,7 @@
     },
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
+    "./examples/jsm/loaders/*": "./examples/jsm/loaders/*",
     "./src/*": "./src/*"
   },
   "repository": {
