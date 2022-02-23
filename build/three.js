@@ -11715,7 +11715,7 @@
 
 		compileEquirectangularShader() {
 			if (this._equirectShader === null) {
-				this._equirectShader = _getEquirectShader();
+				this._equirectShader = _getEquirectMaterial();
 
 				this._compileMaterial(this._equirectShader);
 			}
@@ -11899,7 +11899,7 @@
 				this._cubemapShader.uniforms.flipEnvMap.value = texture.isRenderTargetTexture === false ? -1 : 1;
 			} else {
 				if (this._equirectShader === null) {
-					this._equirectShader = _getEquirectShader();
+					this._equirectShader = _getEquirectMaterial();
 				}
 			}
 
@@ -12190,7 +12190,7 @@
 		return shaderMaterial;
 	}
 
-	function _getEquirectShader() {
+	function _getEquirectMaterial() {
 		const shaderMaterial = new ShaderMaterial({
 			name: 'EquirectangularToCubeUV',
 			uniforms: {
@@ -20346,6 +20346,12 @@
 			uniforms.spotLightShadows.needsUpdate = value;
 			uniforms.rectAreaLights.needsUpdate = value;
 			uniforms.hemisphereLights.needsUpdate = value;
+			uniforms.directionalShadowMap.needsUpdate = value;
+			uniforms.directionalShadowMatrix.needsUpdate = value;
+			uniforms.spotShadowMap.needsUpdate = value;
+			uniforms.spotShadowMatrix.needsUpdate = value;
+			uniforms.pointShadowMap.needsUpdate = value;
+			uniforms.pointShadowMatrix.needsUpdate = value;
 		}
 
 		function materialNeedsLights(material) {

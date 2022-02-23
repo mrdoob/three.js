@@ -15297,7 +15297,7 @@ class PMREMGenerator {
 
 		if ( this._equirectShader === null ) {
 
-			this._equirectShader = _getEquirectShader();
+			this._equirectShader = _getEquirectMaterial();
 			this._compileMaterial( this._equirectShader );
 
 		}
@@ -15524,7 +15524,7 @@ class PMREMGenerator {
 
 			if ( this._equirectShader === null ) {
 
-				this._equirectShader = _getEquirectShader();
+				this._equirectShader = _getEquirectMaterial();
 
 			}
 
@@ -15879,7 +15879,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 }
 
-function _getEquirectShader() {
+function _getEquirectMaterial() {
 
 	const shaderMaterial = new ShaderMaterial( {
 
@@ -27784,6 +27784,13 @@ function WebGLRenderer( parameters = {} ) {
 		uniforms.spotLightShadows.needsUpdate = value;
 		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
+
+		uniforms.directionalShadowMap.needsUpdate = value;
+		uniforms.directionalShadowMatrix.needsUpdate = value;
+		uniforms.spotShadowMap.needsUpdate = value;
+		uniforms.spotShadowMatrix.needsUpdate = value;
+		uniforms.pointShadowMap.needsUpdate = value;
+		uniforms.pointShadowMatrix.needsUpdate = value;
 
 	}
 
