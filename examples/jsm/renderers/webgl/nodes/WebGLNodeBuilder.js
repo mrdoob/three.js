@@ -1,6 +1,6 @@
-import NodeBuilder, { shaderStages } from '../../nodes/core/NodeBuilder.js';
+import NodeBuilder, { shaderStages } from 'three-nodes/core/NodeBuilder.js';
 import SlotNode from './SlotNode.js';
-import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
+import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
 import { ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,

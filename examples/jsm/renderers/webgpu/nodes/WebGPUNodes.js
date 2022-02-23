@@ -1,5 +1,5 @@
 import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
-import NodeFrame from '../../nodes/core/NodeFrame.js';
+import NodeFrame from 'three-nodes/core/NodeFrame.js';
 
 class WebGPUNodes {
 

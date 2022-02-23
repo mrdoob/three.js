@@ -1,6 +1,6 @@
 import { SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { NormalMapNode, FloatNode } from '../../renderers/nodes/Nodes.js';
+import { NormalMapNode, FloatNode } from 'three-nodes/Nodes.js';
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
 const nullValue = new FloatNode( 0 ).setConst( true );
