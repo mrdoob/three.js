@@ -1,5 +1,5 @@
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { ViewHelper } from 'three/addons/helpers/ViewHelper.js';
+import { OrbitControls } from 'three-addons/controls/OrbitControls.js';
+import { ViewHelper } from 'three-addons/helpers/ViewHelper.js';
 import { Element, LabelElement, SelectInput } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { MeshBasicNodeMaterial, FloatNode } from 'three-nodes/Nodes.js';
