@@ -15,7 +15,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Mesh } from '../objects/Mesh.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
-import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
+import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
@@ -654,7 +654,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 	const weights = new Float32Array( MAX_SAMPLES );
 	const poleAxis = new Vector3( 0, 1, 0 );
-	const shaderMaterial = new RawShaderMaterial( {
+	const shaderMaterial = new ShaderMaterial( {
 
 		name: 'SphericalGaussianBlur',
 
@@ -678,8 +678,6 @@ function _getBlurShader( lodMax, width, height ) {
 		vertexShader: _getCommonVertexShader(),
 
 		fragmentShader: /* glsl */`
-
-			#extension GL_EXT_shader_texture_lod : enable
 
 			precision mediump float;
 			precision mediump int;
@@ -753,7 +751,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 function _getEquirectShader() {
 
-	const shaderMaterial = new RawShaderMaterial( {
+	const shaderMaterial = new ShaderMaterial( {
 
 		name: 'EquirectangularToCubeUV',
 
@@ -796,7 +794,7 @@ function _getEquirectShader() {
 
 function _getCubemapShader() {
 
-	const shaderMaterial = new RawShaderMaterial( {
+	const shaderMaterial = new ShaderMaterial( {
 
 		name: 'CubemapToCubeUV',
 
@@ -842,8 +840,6 @@ function _getCommonVertexShader() {
 		precision mediump float;
 		precision mediump int;
 
-		attribute vec3 position;
-		attribute vec2 uv;
 		attribute float faceIndex;
 
 		varying vec3 vOutputDirection;
