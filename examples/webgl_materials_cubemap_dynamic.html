@@ -13,7 +13,7 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
@@ -31,6 +31,10 @@
 
 			import * as THREE from 'three';
 
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import Stats from './jsm/libs/stats.module.js';
 
 			let camera, scene, renderer, stats;
@@ -38,74 +42,75 @@
 
 			let count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
 
-			let onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
+			let controls;
 
-			let lon = 0, lat = 0;
-			let phi = 0, theta = 0;
+			init();
+			animate();
 
-			const textureLoader = new THREE.TextureLoader();
-
-			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
-
-				texture.encoding = THREE.sRGBEncoding;
-				texture.mapping = THREE.EquirectangularReflectionMapping;
-
-				init( texture );
-				animate();
-
-			} );
-
-			function init( texture ) {
+			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResized );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				scene = new THREE.Scene();
-				scene.background = texture;
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 75;
+
+				scene = new THREE.Scene();
+
+				new RGBELoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+						scene.background = texture;
+
+					} );
 
 				//
 
-				const envSize = 64; // minimum size for roughness >= 0.1
+				const envSize = 256;
 
 				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( envSize );
-
-				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
-
 				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( envSize );
 
+				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
 
 				//
 
 				material = new THREE.MeshStandardMaterial( {
 					envMap: cubeRenderTarget2.texture,
-					roughness: 0.1,
-					metalness: 1
+					roughness: 0.05,
+					metalness: 0
 				} );
 
-				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 20, 8 ), material );
+				const gui = new GUI();
+				gui.add( material, 'roughness', 0, 1 );
+				gui.add( material, 'metalness', 0, 1 );
+				gui.add( renderer, 'toneMappingExposure', 0, 2 ).name( 'exposure' );
+
+				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 15, 8 ), material );
 				scene.add( sphere );
 
-				cube = new THREE.Mesh( new THREE.BoxGeometry( 20, 20, 20 ), material );
+				cube = new THREE.Mesh( new THREE.BoxGeometry( 15, 15, 15 ), material );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 10, 5, 128, 16 ), material );
+				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 10, 3, 128, 16 ), material );
 				scene.add( torus );
 
 				//
 
-				document.addEventListener( 'pointerdown', onPointerDown );
-				document.addEventListener( 'wheel', onDocumentMouseWheel );
-
-				window.addEventListener( 'resize', onWindowResized );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
 
 			}
 
@@ -118,56 +123,11 @@
 
 			}
 
-			function onPointerDown( event ) {
-
-				event.preventDefault();
-
-				onPointerDownPointerX = event.clientX;
-				onPointerDownPointerY = event.clientY;
-
-				onPointerDownLon = lon;
-				onPointerDownLat = lat;
-
-				document.addEventListener( 'pointermove', onPointerMove );
-				document.addEventListener( 'pointerup', onPointerUp );
-
-			}
-
-			function onPointerMove( event ) {
-
-				lon = ( event.clientX - onPointerDownPointerX ) * 0.1 + onPointerDownLon;
-				lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
-
-			}
-
-			function onPointerUp() {
-
-				document.removeEventListener( 'pointermove', onPointerMove );
-				document.removeEventListener( 'pointerup', onPointerUp );
-
-			}
-
-			function onDocumentMouseWheel( event ) {
-
-				const fov = camera.fov + event.deltaY * 0.05;
-
-				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
-
-				camera.updateProjectionMatrix();
-
-			}
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
 				const time = Date.now();
-
-				lon += .15;
-
-				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.MathUtils.degToRad( 90 - lat );
-				theta = THREE.MathUtils.degToRad( lon );
 
 				cube.position.x = Math.cos( time * 0.001 ) * 30;
 				cube.position.y = Math.sin( time * 0.001 ) * 30;
@@ -182,12 +142,6 @@
 
 				torus.rotation.x += 0.02;
 				torus.rotation.y += 0.03;
-
-				camera.position.x = 100 * Math.sin( phi ) * Math.cos( theta );
-				camera.position.y = 100 * Math.cos( phi );
-				camera.position.z = 100 * Math.sin( phi ) * Math.sin( theta );
-
-				camera.lookAt( scene.position );
 
 				// pingpong
 
@@ -205,15 +159,11 @@
 
 				count ++;
 
-				render();
-
-				stats.update();
-
-			}
-
-			function render() {
+				controls.update();
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
