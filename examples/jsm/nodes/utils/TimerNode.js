@@ -3,11 +3,11 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class TimerNode extends FloatNode {
 
-	static LOCAL = 'local';
-	static GLOBAL = 'global';
-	static DELTA = 'delta';
+	static Local = 'local';
+	static Global = 'global';
+	static Delta = 'delta';
 
-	constructor( scope = TimerNode.LOCAL ) {
+	constructor( scope = TimerNode.Local ) {
 
 		super();
 
@@ -23,11 +23,11 @@ class TimerNode extends FloatNode {
 		const scope = this.scope;
 		const scale = this.scale;
 
-		if ( scope === TimerNode.LOCAL ) {
+		if ( scope === TimerNode.Local ) {
 
 			this.value += frame.deltaTime * scale;
 
-		} else if ( scope === TimerNode.DELTA ) {
+		} else if ( scope === TimerNode.Delta ) {
 
 			this.value = frame.deltaTime * scale;
 

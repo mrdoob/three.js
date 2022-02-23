@@ -5,8 +5,8 @@ import FloatNode from 'three-nodes/inputs/FloatNode.js';
 
 class WebGLPhysicalContextNode extends ContextNode {
 
-	static RADIANCE = 'radiance';
-	static IRRADIANCE = 'irradiance';
+	static Radiance = 'radiance';
+	static Irradiance = 'irradiance';
 
 	constructor( scope, node ) {
 
@@ -22,15 +22,15 @@ class WebGLPhysicalContextNode extends ContextNode {
 
 		let roughness = null;
 
-		if ( scope === WebGLPhysicalContextNode.RADIANCE ) {
+		if ( scope === WebGLPhysicalContextNode.Radiance ) {
 
 			roughness = new ExpressionNode( 'roughnessFactor', 'float' );
 
-		} else if ( scope === WebGLPhysicalContextNode.IRRADIANCE ) {
+		} else if ( scope === WebGLPhysicalContextNode.Irradiance ) {
 
 			roughness = new FloatNode( 1.0 ).setConst( true );
 
-			this.context.uv = new NormalNode( NormalNode.WORLD );
+			this.context.uv = new NormalNode( NormalNode.World );
 
 		}
 

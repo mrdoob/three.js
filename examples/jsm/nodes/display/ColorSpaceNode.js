@@ -35,8 +35,8 @@ const EncodingLib = {
 
 class ColorSpaceNode extends TempNode {
 
-	static LINEAR_TO_LINEAR = 'LinearToLinear';
-	static LINEAR_TO_SRGB = 'LinearTosRGB';
+	static LinearToLinear = 'LinearToLinear';
+	static LinearTosRGB = 'LinearTosRGB';
 
 	constructor( method, node ) {
 
@@ -75,7 +75,7 @@ class ColorSpaceNode extends TempNode {
 		const method = this.method;
 		const node = this.node;
 
-		if ( method !== ColorSpaceNode.LINEAR_TO_LINEAR ) {
+		if ( method !== ColorSpaceNode.LinearToLinear ) {
 
 			const encodingFunctionNode = EncodingLib[ method ];
 

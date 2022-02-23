@@ -9,21 +9,21 @@ export class LimiterEditor extends BaseNode {
 
 		const NULL_VALUE = new FloatNode();
 
-		const node = new MathNode( MathNode.MIN, NULL_VALUE, NULL_VALUE );
+		const node = new MathNode( MathNode.Min, NULL_VALUE, NULL_VALUE );
 
 		super( 'Limiter', 1, node, 175 );
 
 		const methodInput = new SelectInput( [
-			{ name: 'Min', value: MathNode.MIN },
-			{ name: 'Max', value: MathNode.MAX },
-			// { name: 'Clamp', value: MathNode.CLAMP }
-			{ name: 'Saturate', value: MathNode.SATURATE }
-		], MathNode.MIN );
+			{ name: 'Min', value: MathNode.Min },
+			{ name: 'Max', value: MathNode.Max },
+			// { name: 'Clamp', value: MathNode.Clamp }
+			{ name: 'Saturate', value: MathNode.Saturate }
+		], MathNode.Min );
 
 		methodInput.onChange( ( data ) => {
 
 			node.method = data.getValue();
-			bElement.setVisible( data.getValue() !== MathNode.SATURATE );
+			bElement.setVisible( data.getValue() !== MathNode.Saturate );
 
 			this.invalidate();
 

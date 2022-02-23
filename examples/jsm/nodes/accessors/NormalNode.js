@@ -8,12 +8,12 @@ import MathNode from '../math/MathNode.js';
 
 class NormalNode extends Node {
 
-	static GEOMETRY = 'geometry';
-	static LOCAL = 'local';
-	static WORLD = 'world';
-	static VIEW = 'view';
+	static Geometry = 'geometry';
+	static Local = 'local';
+	static World = 'world';
+	static View = 'view';
 
-	constructor( scope = NormalNode.LOCAL ) {
+	constructor( scope = NormalNode.Local ) {
 
 		super( 'vec3' );
 
@@ -33,24 +33,24 @@ class NormalNode extends Node {
 
 		let outputNode = null;
 
-		if ( scope === NormalNode.GEOMETRY ) {
+		if ( scope === NormalNode.Geometry ) {
 
 			outputNode = new AttributeNode( 'normal', 'vec3' );
 
-		} else if ( scope === NormalNode.LOCAL ) {
+		} else if ( scope === NormalNode.Local ) {
 
-			outputNode = new VaryNode( new NormalNode( NormalNode.GEOMETRY ) );
+			outputNode = new VaryNode( new NormalNode( NormalNode.Geometry ) );
 
-		} else if ( scope === NormalNode.VIEW ) {
+		} else if ( scope === NormalNode.View ) {
 
-			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), new NormalNode( NormalNode.LOCAL ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
+			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NormalMatrix ), new NormalNode( NormalNode.Local ) );
+			outputNode = new MathNode( MathNode.Normalize, new VaryNode( vertexNormalNode ) );
 
-		} else if ( scope === NormalNode.WORLD ) {
+		} else if ( scope === NormalNode.World ) {
 
 			// To use INVERSE_TRANSFORM_DIRECTION only inverse the param order like this: MathNode( ..., Vector, Matrix );
-			const vertexNormalNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new NormalNode( NormalNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
+			const vertexNormalNode = new MathNode( MathNode.TransformDirection, new NormalNode( NormalNode.View ), new CameraNode( CameraNode.ViewMatrix ) );
+			outputNode = new MathNode( MathNode.Normalize, new VaryNode( vertexNormalNode ) );
 
 		}
 

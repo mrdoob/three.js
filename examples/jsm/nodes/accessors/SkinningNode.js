@@ -75,8 +75,8 @@ class SkinningNode extends Node {
 	generate( builder ) {
 
 		// inout nodes
-		const position = new PositionNode( PositionNode.LOCAL );
-		const normal = new NormalNode( NormalNode.LOCAL );
+		const position = new PositionNode( PositionNode.Local );
+		const normal = new NormalNode( NormalNode.Local );
 
 		const index = this.skinIndexNode;
 		const weight = this.skinWeightNode;

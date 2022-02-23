@@ -128,8 +128,8 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		if ( material.envNode && material.envNode.isNode ) {
 
-			const envRadianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.RADIANCE, material.envNode );
-			const envIrradianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.IRRADIANCE, material.envNode );
+			const envRadianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.Radiance, material.envNode );
+			const envIrradianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.Irradiance, material.envNode );
 
 			this.addSlot( 'fragment', new SlotNode( envRadianceNode, 'RADIANCE', 'vec3' ) );
 			this.addSlot( 'fragment', new SlotNode( envIrradianceNode, 'IRRADIANCE', 'vec3' ) );

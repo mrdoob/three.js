@@ -8,7 +8,7 @@ export class PowerEditor extends BaseNode {
 	constructor() {
 
 		const NULL_VALUE = new FloatNode();
-		const node = new MathNode( MathNode.POW, NULL_VALUE, NULL_VALUE );
+		const node = new MathNode( MathNode.Pow, NULL_VALUE, NULL_VALUE );
 
 		super( 'Power', 1, node, 175 );
 

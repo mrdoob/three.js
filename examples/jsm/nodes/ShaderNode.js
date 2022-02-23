@@ -221,7 +221,7 @@ export const color = ( ...params ) => {
 
 	if ( params[ 0 ]?.isNode === true ) {
 
-		return nodeObject( new ConvertNode( params[0], 'color' ) );
+		return nodeObject( new ConvertNode( params[ 0 ], 'color' ) );
 
 	}
 
@@ -337,16 +337,16 @@ export const shiftRight = ShaderNodeProxy( OperatorNode, '>>' );
 
 export const element = ShaderNodeProxy( ArrayElementNode );
 
-export const normalGeometry = ShaderNodeObject( new NormalNode( NormalNode.GEOMETRY ) );
-export const normalLocal = ShaderNodeObject( new NormalNode( NormalNode.LOCAL ) );
-export const normalWorld = ShaderNodeObject( new NormalNode( NormalNode.WORLD ) );
-export const normalView = ShaderNodeObject( new NormalNode( NormalNode.VIEW ) );
-export const transformedNormalView = ShaderNodeObject( new VarNode( new NormalNode( NormalNode.VIEW ), 'TransformedNormalView', 'vec3' ) );
+export const normalGeometry = ShaderNodeObject( new NormalNode( NormalNode.Geometry ) );
+export const normalLocal = ShaderNodeObject( new NormalNode( NormalNode.Local ) );
+export const normalWorld = ShaderNodeObject( new NormalNode( NormalNode.World ) );
+export const normalView = ShaderNodeObject( new NormalNode( NormalNode.View ) );
+export const transformedNormalView = ShaderNodeObject( new VarNode( new NormalNode( NormalNode.View ), 'TransformedNormalView', 'vec3' ) );
 
-export const positionLocal = ShaderNodeObject( new PositionNode( PositionNode.LOCAL ) );
-export const positionWorld = ShaderNodeObject( new PositionNode( PositionNode.WORLD ) );
-export const positionView = ShaderNodeObject( new PositionNode( PositionNode.VIEW ) );
-export const positionViewDirection = ShaderNodeObject( new PositionNode( PositionNode.VIEW_DIRECTION ) );
+export const positionLocal = ShaderNodeObject( new PositionNode( PositionNode.Local ) );
+export const positionWorld = ShaderNodeObject( new PositionNode( PositionNode.World ) );
+export const positionView = ShaderNodeObject( new PositionNode( PositionNode.View ) );
+export const positionViewDirection = ShaderNodeObject( new PositionNode( PositionNode.ViewDirection ) );
 
 export const PI = float( 3.141592653589793 );
 export const PI2 = float( 6.283185307179586 );

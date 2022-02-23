@@ -8,7 +8,7 @@ export class DotEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new MathNode( MathNode.DOT, NULL_VALUE, NULL_VALUE );
+		const node = new MathNode( MathNode.Dot, NULL_VALUE, NULL_VALUE );
 
 		super( 'Dot Product', 1, node, 175 );
 

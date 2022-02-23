@@ -4,14 +4,14 @@ import MaterialReferenceNode from './MaterialReferenceNode.js';
 
 class MaterialNode extends Node {
 
-	static ALPHA_TEST = 'alphaTest';
-	static COLOR = 'color';
-	static OPACITY = 'opacity';
-	static SPECULAR = 'specular';
-	static ROUGHNESS = 'roughness';
-	static METALNESS = 'metalness';
+	static AlphaTest = 'alphaTest';
+	static Color = 'color';
+	static Opacity = 'opacity';
+	static Specular = 'specular';
+	static Roughness = 'roughness';
+	static Metalness = 'metalness';
 
-	constructor( scope = MaterialNode.COLOR ) {
+	constructor( scope = MaterialNode.Color ) {
 
 		super();
 
@@ -24,19 +24,19 @@ class MaterialNode extends Node {
 		const scope = this.scope;
 		const material = builder.context.material;
 
-		if ( scope === MaterialNode.COLOR ) {
+		if ( scope === MaterialNode.Color ) {
 
 			return material.map !== null ? 'vec4' : 'vec3';
 
-		} else if ( scope === MaterialNode.OPACITY ) {
+		} else if ( scope === MaterialNode.Opacity ) {
 
 			return 'float';
 
-		} else if ( scope === MaterialNode.SPECULAR ) {
+		} else if ( scope === MaterialNode.Specular ) {
 
 			return 'vec3';
 
-		} else if ( scope === MaterialNode.ROUGHNESS || scope === MaterialNode.METALNESS ) {
+		} else if ( scope === MaterialNode.Roughness || scope === MaterialNode.Metalness ) {
 
 			return 'float';
 
@@ -51,11 +51,11 @@ class MaterialNode extends Node {
 
 		let node = null;
 
-		if ( scope === MaterialNode.ALPHA_TEST ) {
+		if ( scope === MaterialNode.AlphaTest ) {
 
 			node = new MaterialReferenceNode( 'alphaTest', 'float' );
 
-		} else if ( scope === MaterialNode.COLOR ) {
+		} else if ( scope === MaterialNode.Color ) {
 
 			const colorNode = new MaterialReferenceNode( 'color', 'color' );
 
@@ -69,7 +69,7 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if ( scope === MaterialNode.OPACITY ) {
+		} else if ( scope === MaterialNode.Opacity ) {
 
 			const opacityNode = new MaterialReferenceNode( 'opacity', 'float' );
 
@@ -83,7 +83,7 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if ( scope === MaterialNode.SPECULAR ) {
+		} else if ( scope === MaterialNode.Specular ) {
 
 			const specularColorNode = new MaterialReferenceNode( 'specularColor', 'color' );
 

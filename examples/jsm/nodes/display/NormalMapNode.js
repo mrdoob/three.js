@@ -70,17 +70,17 @@ class NormalMapNode extends TempNode {
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), normalMap );
+			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NormalMatrix ), normalMap );
 
-			const normal = new MathNode( MathNode.NORMALIZE, vertexNormalNode );
+			const normal = new MathNode( MathNode.Normalize, vertexNormalNode );
 
 			return normal.build( builder, type );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
 			const perturbNormal2ArbCall = perturbNormal2ArbNode( {
-				eye_pos: new PositionNode( PositionNode.VIEW ),
-				surf_norm: new NormalNode( NormalNode.VIEW ),
+				eye_pos: new PositionNode( PositionNode.View ),
+				surf_norm: new NormalNode( NormalNode.View ),
 				mapN: normalMap,
 				faceDirection: new FloatNode( 1.0 ).setConst( true ),
 				uv: new UVNode()

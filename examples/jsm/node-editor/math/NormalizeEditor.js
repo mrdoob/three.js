@@ -8,7 +8,7 @@ export class NormalizeEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new MathNode( MathNode.NORMALIZE, DEFAULT_VALUE );
+		const node = new MathNode( MathNode.Normalize, DEFAULT_VALUE );
 
 		super( 'Normalize', 3, node, 175 );
 

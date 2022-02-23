@@ -103,10 +103,10 @@
 				const displaceAnimated = new Nodes.SplitNode( new Nodes.TextureNode( textureDisplace ), 'x' );
 				const displaceY = new Nodes.OperatorNode( '*', displaceAnimated, new Nodes.FloatNode( .25 ).setConst( true ) );
 
-				const displace = new Nodes.OperatorNode( '*', new Nodes.NormalNode( Nodes.NormalNode.LOCAL ), displaceY );
+				const displace = new Nodes.OperatorNode( '*', new Nodes.NormalNode( Nodes.NormalNode.Local ), displaceY );
 
 				materialSphere.colorNode = displaceY;
-				materialSphere.positionNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode( Nodes.PositionNode.LOCAL ), displace );
+				materialSphere.positionNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode( Nodes.PositionNode.Local ), displace );
 
 				const sphere = new THREE.Mesh( geometrySphere, materialSphere );
 				sphere.position.set( - 2, - 1, 0 );

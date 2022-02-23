@@ -18,7 +18,7 @@ class ModelViewProjectionNode extends Node {
 
 		const position = this.position;
 
-		const mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION_MATRIX ), new ModelNode( ModelNode.VIEW_MATRIX ) );
+		const mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.ProjectionMatrix ), new ModelNode( ModelNode.ViewMatrix ) );
 		const mvpNode = new OperatorNode( '*', mvpMatrix, position );
 
 		return mvpNode.build( builder );

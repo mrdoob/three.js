@@ -7,13 +7,13 @@ import OperatorNode from '../math/OperatorNode.js';
 
 class PositionNode extends Node {
 
-	static GEOMETRY = 'geometry';
-	static LOCAL = 'local';
-	static WORLD = 'world';
-	static VIEW = 'view';
-	static VIEW_DIRECTION = 'viewDirection';
+	static Geometry = 'geometry';
+	static Local = 'local';
+	static World = 'world';
+	static View = 'view';
+	static ViewDirection = 'viewDirection';
 
-	constructor( scope = PositionNode.LOCAL ) {
+	constructor( scope = PositionNode.Local ) {
 
 		super( 'vec3' );
 
@@ -33,28 +33,28 @@ class PositionNode extends Node {
 
 		let outputNode = null;
 
-		if ( scope === PositionNode.GEOMETRY ) {
+		if ( scope === PositionNode.Geometry ) {
 
 			outputNode = new AttributeNode( 'position', 'vec3' );
 
-		} else if ( scope === PositionNode.LOCAL ) {
+		} else if ( scope === PositionNode.Local ) {
 
-			outputNode = new VaryNode( new PositionNode( PositionNode.GEOMETRY ) );
+			outputNode = new VaryNode( new PositionNode( PositionNode.Geometry ) );
 
-		} else if ( scope === PositionNode.WORLD ) {
+		} else if ( scope === PositionNode.World ) {
 
-			const vertexPositionNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new ModelNode( ModelNode.WORLD_MATRIX ), new PositionNode( PositionNode.LOCAL ) );
+			const vertexPositionNode = new MathNode( MathNode.TransformDirection, new ModelNode( ModelNode.WorldMatrix ), new PositionNode( PositionNode.Local ) );
 			outputNode = new VaryNode( vertexPositionNode );
 
-		} else if ( scope === PositionNode.VIEW ) {
+		} else if ( scope === PositionNode.View ) {
 
-			const vertexPositionNode = new OperatorNode( '*', new ModelNode( ModelNode.VIEW_MATRIX ), new PositionNode( PositionNode.LOCAL ) );
+			const vertexPositionNode = new OperatorNode( '*', new ModelNode( ModelNode.ViewMatrix ), new PositionNode( PositionNode.Local ) );
 			outputNode = new VaryNode( vertexPositionNode );
 
-		} else if ( scope === PositionNode.VIEW_DIRECTION ) {
+		} else if ( scope === PositionNode.ViewDirection ) {
 
-			const vertexPositionNode = new MathNode( MathNode.NEGATE, new PositionNode( PositionNode.VIEW ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexPositionNode ) );
+			const vertexPositionNode = new MathNode( MathNode.Negate, new PositionNode( PositionNode.View ) );
+			outputNode = new MathNode( MathNode.Normalize, new VaryNode( vertexPositionNode ) );
 
 		}
 

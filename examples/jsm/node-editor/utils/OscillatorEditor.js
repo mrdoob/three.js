@@ -8,16 +8,16 @@ export class OscillatorEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new OscNode( OscNode.SINE, NULL_VALUE );
+		const node = new OscNode( OscNode.Sine, NULL_VALUE );
 
 		super( 'Oscillator', 1, node, 175 );
 
 		const methodInput = new SelectInput( [
-			{ name: 'Sine', value: OscNode.SINE },
-			{ name: 'Square', value: OscNode.SQUARE },
-			{ name: 'Triangle', value: OscNode.TRIANGLE },
-			{ name: 'Sawtooth', value: OscNode.SAWTOOTH }
-		], OscNode.SINE );
+			{ name: 'Sine', value: OscNode.Sine },
+			{ name: 'Square', value: OscNode.Square },
+			{ name: 'Triangle', value: OscNode.Triangle },
+			{ name: 'Sawtooth', value: OscNode.Sawtooth }
+		], OscNode.Sine );
 
 		methodInput.onChange( () => {
 

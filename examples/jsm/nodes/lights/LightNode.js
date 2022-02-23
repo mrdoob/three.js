@@ -37,14 +37,14 @@ class LightNode extends Node {
 
 	generate( builder ) {
 
-		const lightPositionView = new Object3DNode( Object3DNode.VIEW_POSITION );
-		const positionView = new PositionNode( PositionNode.VIEW );
+		const lightPositionView = new Object3DNode( Object3DNode.ViewPosition );
+		const positionView = new PositionNode( PositionNode.View );
 
 		const lVector = new OperatorNode( '-', lightPositionView, positionView );
 
-		const lightDirection = new MathNode( MathNode.NORMALIZE, lVector );
+		const lightDirection = new MathNode( MathNode.Normalize, lVector );
 
-		const lightDistance = new MathNode( MathNode.LENGTH, lVector );
+		const lightDistance = new MathNode( MathNode.Length, lVector );
 
 		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,

@@ -6,13 +6,13 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class Object3DNode extends Node {
 
-	static VIEW_MATRIX = 'viewMatrix';
-	static NORMAL_MATRIX = 'normalMatrix';
-	static WORLD_MATRIX = 'worldMatrix';
-	static POSITION = 'position';
-	static VIEW_POSITION = 'viewPosition';
+	static ViewMatrix = 'viewMatrix';
+	static NormalMatrix = 'normalMatrix';
+	static WorldMatrix = 'worldMatrix';
+	static Position = 'position';
+	static ViewPosition = 'viewPosition';
 
-	constructor( scope = Object3DNode.VIEW_MATRIX, object3d = null ) {
+	constructor( scope = Object3DNode.ViewMatrix, object3d = null ) {
 
 		super();
 
@@ -29,15 +29,15 @@ class Object3DNode extends Node {
 
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
+		if ( scope === Object3DNode.WorldMatrix || scope === Object3DNode.ViewMatrix ) {
 
 			return 'mat4';
 
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
+		} else if ( scope === Object3DNode.NormalMatrix ) {
 
 			return 'mat3';
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
+		} else if ( scope === Object3DNode.Position || scope === Object3DNode.ViewPosition ) {
 
 			return 'vec3';
 
@@ -52,23 +52,23 @@ class Object3DNode extends Node {
 		const camera = frame.camera;
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.VIEW_MATRIX ) {
+		if ( scope === Object3DNode.ViewMatrix ) {
 
 			inputNode.value = object.modelViewMatrix;
 
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
+		} else if ( scope === Object3DNode.NormalMatrix ) {
 
 			inputNode.value = object.normalMatrix;
 
-		} else if ( scope === Object3DNode.WORLD_MATRIX ) {
+		} else if ( scope === Object3DNode.WorldMatrix ) {
 
 			inputNode.value = object.matrixWorld;
 
-		} else if ( scope === Object3DNode.POSITION ) {
+		} else if ( scope === Object3DNode.Position ) {
 
 			inputNode.value.setFromMatrixPosition( object.matrixWorld );
 
-		} else if ( scope === Object3DNode.VIEW_POSITION ) {
+		} else if ( scope === Object3DNode.ViewPosition ) {
 
 			inputNode.value.setFromMatrixPosition( object.matrixWorld );
 
@@ -82,15 +82,15 @@ class Object3DNode extends Node {
 
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
+		if ( scope === Object3DNode.WorldMatrix || scope === Object3DNode.ViewMatrix ) {
 
 			this._inputNode = new Matrix4Node( /*null*/ );
 
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
+		} else if ( scope === Object3DNode.NormalMatrix ) {
 
 			this._inputNode = new Matrix3Node( /*null*/ );
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
+		} else if ( scope === Object3DNode.Position || scope === Object3DNode.ViewPosition ) {
 
 			this._inputNode = new Vector3Node();
 

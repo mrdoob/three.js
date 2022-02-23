@@ -31,12 +31,12 @@ class SpriteSheetUVNode extends Node {
 
 		const total = new OperatorNode( '*', width, height );
 
-		const roundFrame = new MathNode( MathNode.FLOOR, new MathNode( MathNode.MOD, frame, total ) );
+		const roundFrame = new MathNode( MathNode.Floor, new MathNode( MathNode.Mod, frame, total ) );
 
 		const frameNum = new OperatorNode( '+', roundFrame, one );
 
-		const cell = new MathNode( MathNode.MOD, roundFrame, width );
-		const row = new MathNode( MathNode.CEIL, new OperatorNode( '/', frameNum, width ) );
+		const cell = new MathNode( MathNode.Mod, roundFrame, width );
+		const row = new MathNode( MathNode.Ceil, new OperatorNode( '/', frameNum, width ) );
 		const rowInv = new OperatorNode( '-', height, row );
 
 		const scale = new OperatorNode( '/', one, count );

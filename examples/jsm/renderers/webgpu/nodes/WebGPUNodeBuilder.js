@@ -108,7 +108,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			// VERTEX STAGE
 
-			let vertex = new PositionNode( PositionNode.GEOMETRY );
+			let vertex = new PositionNode( PositionNode.Geometry );
 
 			if ( lightNode === null && this.lightNode && this.lightNode.hasLights === true ) {
 
@@ -118,7 +118,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( material.positionNode && material.positionNode.isNode ) {
 
-				const assignPositionNode = new OperatorNode( '=', new PositionNode( PositionNode.LOCAL ), material.positionNode );
+				const assignPositionNode = new OperatorNode( '=', new PositionNode( PositionNode.Local ), material.positionNode );
 
 				vertex = new BypassNode( vertex, assignPositionNode );
 
@@ -144,7 +144,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			} else {
 
-				colorNode = new MaterialNode( MaterialNode.COLOR );
+				colorNode = new MaterialNode( MaterialNode.Color );
 
 			}
 
@@ -162,7 +162,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			} else {
 
-				opacityNode = new VarNode( new MaterialNode( MaterialNode.OPACITY ) );
+				opacityNode = new VarNode( new MaterialNode( MaterialNode.Opacity ) );
 
 			}
 
@@ -180,7 +180,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			} else if ( material.alphaTest > 0 ) {
 
-				alphaTest = new MaterialNode( MaterialNode.ALPHA_TEST );
+				alphaTest = new MaterialNode( MaterialNode.AlphaTest );
 
 			}
 
@@ -204,7 +204,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				} else {
 
-					metalnessNode = new MaterialNode( MaterialNode.METALNESS );
+					metalnessNode = new MaterialNode( MaterialNode.Metalness );
 
 				}
 
@@ -222,7 +222,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				} else {
 
-					roughnessNode = new MaterialNode( MaterialNode.ROUGHNESS );
+					roughnessNode = new MaterialNode( MaterialNode.Roughness );
 
 				}
 
@@ -244,7 +244,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				} else {
 
-					normalNode = new NormalNode( NormalNode.VIEW );
+					normalNode = new NormalNode( NormalNode.View );
 
 				}
 
@@ -286,7 +286,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( outputEncoding !== LinearEncoding ) {
 
-				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, outputNode );
+				outputNode = new ColorSpaceNode( ColorSpaceNode.LinearToLinear, outputNode );
 				outputNode.fromEncoding( outputEncoding );
 
 			}

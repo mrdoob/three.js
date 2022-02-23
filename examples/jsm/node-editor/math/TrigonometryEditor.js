@@ -8,19 +8,19 @@ export class TrigonometryEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new MathNode( MathNode.SIN, DEFAULT_VALUE );
+		const node = new MathNode( MathNode.Sin, DEFAULT_VALUE );
 
 		super( 'Trigonometry', 1, node, 175 );
 
 		const optionsField = new SelectInput( [
-			{ name: 'Sin', value: MathNode.SIN },
-			{ name: 'Cos', value: MathNode.COS },
-			{ name: 'Tan', value: MathNode.TAN },
+			{ name: 'Sin', value: MathNode.Sin },
+			{ name: 'Cos', value: MathNode.Cos },
+			{ name: 'Tan', value: MathNode.Tan },
 
-			{ name: 'asin', value: MathNode.ASIN },
-			{ name: 'acos', value: MathNode.ACOS },
-			{ name: 'atan', value: MathNode.ATAN }
-		], MathNode.SIN ).onChange( () => {
+			{ name: 'asin', value: MathNode.Asin },
+			{ name: 'acos', value: MathNode.Acos },
+			{ name: 'atan', value: MathNode.Atan }
+		], MathNode.Sin ).onChange( () => {
 
 			node.method = optionsField.getValue();
 

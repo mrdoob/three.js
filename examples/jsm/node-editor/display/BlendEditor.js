@@ -9,7 +9,7 @@ export class BlendEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new MathNode( MathNode.MIX, NULL_VALUE, NULL_VALUE, ONE_VALUE );
+		const node = new MathNode( MathNode.Mix, NULL_VALUE, NULL_VALUE, ONE_VALUE );
 
 		super( 'Blend', 3, node, 200 );
 
