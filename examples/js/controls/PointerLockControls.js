@@ -38,7 +38,6 @@
 			this.maxPolarAngle = Math.PI; // radians
 
 			this.pointerSpeed = 1.0;
-
 			const scope = this;
 
 			function onMouseMove( event ) {
