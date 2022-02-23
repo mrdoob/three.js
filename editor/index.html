@@ -200,7 +200,7 @@
 				event.preventDefault();
 				event.dataTransfer.dropEffect = 'copy';
 
-			});
+			} );
 
 			document.addEventListener( 'drop', function ( event ) {
 
@@ -237,9 +237,9 @@
 			var isLoadingFromHash = false;
 			var hash = window.location.hash;
 
-			if ( hash.substr( 1, 5 ) === 'file=' ) {
+			if ( hash.slice( 1, 6 ) === 'file=' ) {
 
-				var file = hash.substr( 6 );
+				var file = hash.slice( 6 );
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 

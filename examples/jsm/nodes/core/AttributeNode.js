@@ -1,68 +1,54 @@
-import { Node } from './Node.js';
+import Node from './Node.js';
+import VaryNode from './VaryNode.js';
 
 class AttributeNode extends Node {
 
-	constructor( name, type ) {
+	constructor( attributeName, nodeType ) {
 
-		super( type );
+		super( nodeType );
 
-		this.name = name;
-
-	}
-
-	getAttributeType( builder ) {
-
-		return typeof this.type === 'number' ? builder.getConstructorFromLength( this.type ) : this.type;
+		this._attributeName = attributeName;
 
 	}
 
-	getType( builder ) {
+	getHash( builder ) {
 
-		const type = this.getAttributeType( builder );
-
-		return builder.getTypeByFormat( type );
+		return this.getAttributeName( builder );
 
 	}
 
-	generate( builder, output ) {
+	setAttributeName( attributeName ) {
 
-		const type = this.getAttributeType( builder );
-
-		const attribute = builder.getAttribute( this.name, type ),
-			name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
-
-		return builder.format( name, this.getType( builder ), output );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.type = source.type;
+		this._attributeName = attributeName;
 
 		return this;
 
 	}
 
-	toJSON( meta ) {
+	getAttributeName( /*builder*/ ) {
 
-		let data = this.getJSONNode( meta );
+		return this._attributeName;
 
-		if ( ! data ) {
+	}
 
-			data = this.createJSONNode( meta );
+	generate( builder ) {
 
-			data.type = this.type;
+		const attribute = builder.getAttribute( this.getAttributeName( builder ), this.getNodeType( builder ) );
+
+		if ( builder.isShaderStage( 'vertex' ) ) {
+
+			return attribute.name;
+
+		} else {
+
+			const nodeVary = new VaryNode( this );
+
+			return nodeVary.build( builder, attribute.type );
 
 		}
-
-		return data;
 
 	}
 
 }
 
-AttributeNode.prototype.nodeType = 'Attribute';
-
-export { AttributeNode };
+export default AttributeNode;

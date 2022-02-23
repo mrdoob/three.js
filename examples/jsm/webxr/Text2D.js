@@ -19,7 +19,7 @@ function createText( message, height ) {
 
 	const texture = new THREE.Texture( canvas );
 	texture.needsUpdate = true;
-	//var spriteAlignment = new THREE.Vector2(0,0) ;
+
 	const material = new THREE.MeshBasicMaterial( {
 		color: 0xffffff,
 		side: THREE.DoubleSide,

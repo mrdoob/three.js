@@ -96,9 +96,10 @@
 			Default is *true*.
 		</p>
 
-		<h3>[property:Boolean debug.checkShaderErrors]</h3>
+		<h3>[property:Object debug]</h3>
 		<p>
-			If [page:.checkShaderErrors checkShaderErrors] is true, defines whether material shader programs are checked
+		- [page:Boolean checkShaderErrors]: 
+		  If it is true, defines whether material shader programs are checked
 			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
 			It is strongly recommended to keep these checks enabled during development.
 			If the shader does not compile and link - it will not work and associated material will not render.
@@ -132,7 +133,7 @@
 		- [page:Integer maxVertexUniforms]: The value of *gl.MAX_VERTEX_UNIFORM_VECTORS*.
 		   The maximum number of uniforms that can be used in a vertex shader.<br />
 		- [page:String precision]: The shader precision currently being used by the renderer.<br />
-		- [page:Boolean vertexTextures]: *true* if [property:Integer maxVertexTextures] is greater than 0 (i.e. vertext textures can be used).<br />
+		- [page:Boolean vertexTextures]: *true* if [property:Integer maxVertexTextures] is greater than 0 (i.e. vertex textures can be used).<br />
 		</p>
 
 		<h3>[property:Array clippingPlanes]</h3>
@@ -154,8 +155,17 @@
 
 		<h3>[property:Object extensions]</h3>
 		<p>
-		A wrapper for the [page:WebGLRenderer.extensions.get .extensions.get] method, used to check whether
-		various WebGL extensions are supported.
+		- [page:Object get]( [param:String extensionName] ): 
+		Used to check whether various extensions are supported and returns an object with details of the extension if available.
+		This method can check for the following extensions:<br />
+
+		<ul>
+			<li>*WEBGL_depth_texture*</li>
+			<li>*EXT_texture_filter_anisotropic*</li>
+			<li>*WEBGL_compressed_texture_s3tc*</li>
+			<li>*WEBGL_compressed_texture_pvrtc*</li>
+			<li>*WEBGL_compressed_texture_etc1*</li>
+		</ul>
 		</p>
 
 		<h3>[property:number outputEncoding]</h3>
@@ -218,23 +228,26 @@
 
 		<h3>[property:WebGLShadowMap shadowMap]</h3>
 		<p>
-		This contains the reference to the shadow map, if used.
+		This contains the reference to the shadow map, if used.<br />
+		- [page:Boolean enabled]:
+			If set, use shadow maps in the scene. Default is *false*.<br />
+		- [page:Boolean autoUpdate]:
+			Enables automatic updates to the shadows in the scene. Default is *true*.<br />
+			If you do not require dynamic lighting / shadows, you may set this to *false* when the renderer is instantiated.<br />
+		- [page:Boolean needsUpdate]:
+			When set to *true*, shadow maps in the scene will be updated in the next *render* call. Default is *false*.<br />
+			If you have disabled automatic updates to shadow maps (*shadowMap.autoUpdate = false*), you will need to set this to *true* and then make a render call to update the shadows in your scene.<br />
+		- [page:Integer type]:
+			Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader).
+			Options are:
+			<ul>
+				<li>THREE.BasicShadowMap</li>
+				<li>THREE.PCFShadowMap (default)</li>
+				<li>THREE.PCFSoftShadowMap</li>
+				<li>THREE.VSMShadowMap</li>
+			</ul>
+			See [page:Renderer Renderer constants] for details.<br />
 		</p>
-
-		<h3>[property:Boolean shadowMap.enabled]</h3>
-		<p>If set, use shadow maps in the scene. Default is *false*.</p>
-
-		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
-		<p>Enables automatic updates to the shadows in the scene. Default is *true*.</p>
-		<p>If you do not require dynamic lighting / shadows, you may set this to *false* when the renderer is instantiated.</p>
-
-		<h3>[property:Boolean shadowMap.needsUpdate]</h3>
-		<p>When set to *true*, shadow maps in the scene will be updated in the next *render* call. Default is *false*. </p>
-		<p>If you have disabled automatic updates to shadow maps (*shadowMap.autoUpdate = false*), you will need to set this to *true* and then make a render call to update the shadows in your scene.</p>
-
-		<h3>[property:Integer shadowMap.type]</h3>
-		<p>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</p>
-		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap and THREE.VSMShadowMap. See [page:Renderer Renderer constants] for details.</p>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<p>
@@ -299,18 +312,6 @@
 		<h3>[method:undefined dispose]( )</h3>
 		<p>Dispose of the current rendering context.</p>
 
-		<h3>[method:Object extensions.get]( [param:String extensionName] )</h3>
-		<p>
-		Used to check whether various extensions are supported and returns an object with details of the extension if available.
-		This method can check for the following extensions:<br /><br />
-
-		- *WEBGL_depth_texture*<br />
-		- *EXT_texture_filter_anisotropic*<br />
-		- *WEBGL_compressed_texture_s3tc*<br />
-		- *WEBGL_compressed_texture_pvrtc*<br />
-		- *WEBGL_compressed_texture_etc1*
-		</p>
-
 		<h3>[method:undefined forceContextLoss]()</h3>
 		<p>
 		Simulate loss of the WebGL context. This requires support for the
@@ -329,7 +330,7 @@
 		<h3>[method:Color getClearColor]( [param:Color target] )</h3>
 		<p>Returns a [page:Color THREE.Color] instance with the current clear color.</p>
 
-		<h3>[method:WebGLRenderingContext getContext]()</h3>
+		<h3>[method:WebGL2RenderingContext getContext]()</h3>
 		<p>Return the current WebGL context.</p>
 
 		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
@@ -423,7 +424,7 @@
 		<p>Sets the clear color and opacity.</p>
 
 		<h3>[method:undefined setPixelRatio]( [param:number value] )</h3>
-		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>
+		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent blurring output canvas.</p>
 
 		<h3>[method:undefined setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>

@@ -1,89 +1,59 @@
-import { TempNode } from './TempNode.js';
+import Node from './Node.js';
 
-class InputNode extends TempNode {
+class InputNode extends Node {
 
-	constructor( type, params ) {
+	constructor( inputType ) {
 
-		params = params || {};
-		params.shared = params.shared !== undefined ? params.shared : false;
+		super( inputType );
 
-		super( type, params );
+		this.inputType = inputType;
 
-		this.readonly = false;
+		this.constant = false;
 
 	}
 
-	setReadonly( value ) {
+	setConst( value ) {
 
-		this.readonly = value;
-
-		this.hashProperties = this.readonly ? [ 'value' ] : undefined;
+		this.constant = value;
 
 		return this;
 
 	}
 
-	getReadonly( /* builder */ ) {
+	getConst() {
 
-		return this.readonly;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		if ( source.readonly !== undefined ) this.readonly = source.readonly;
-
-		return this;
+		return this.constant;
 
 	}
 
-	createJSONNode( meta ) {
+	getInputType( /* builder */ ) {
 
-		const data = super.createJSONNode( meta );
-
-		if ( this.readonly === true ) data.readonly = this.readonly;
-
-		return data;
+		return this.inputType;
 
 	}
 
-	generate( builder, output, uuid, type, ns, needsUpdate ) {
+	generateConst( builder ) {
 
-		uuid = builder.getUuid( uuid || this.getUuid() );
-		type = type || this.getType( builder );
+		return builder.getConst( this.getNodeType( builder ), this.value );
 
-		const data = builder.getNodeData( uuid ),
-			readonly = this.getReadonly( builder ) && this.generateReadonly !== undefined;
+	}
 
-		if ( readonly ) {
+	generate( builder, output ) {
 
-			return this.generateReadonly( builder, output, uuid, type, ns, needsUpdate );
+		const type = this.getNodeType( builder );
+
+		if ( this.constant === true ) {
+
+			return builder.format( this.generateConst( builder ), type, output );
 
 		} else {
 
-			if ( builder.isShader( 'vertex' ) ) {
+			const inputType = this.getInputType( builder );
 
-				if ( ! data.vertex ) {
+			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, inputType );
+			const propertyName = builder.getPropertyName( nodeUniform );
 
-					data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate, this.getLabel() );
-
-				}
-
-				return builder.format( data.vertex.name, type, output );
-
-			} else {
-
-				if ( ! data.fragment ) {
-
-					data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate, this.getLabel() );
-
-				}
-
-				return builder.format( data.fragment.name, type, output );
-
-			}
+			return builder.format( propertyName, type, output );
 
 		}
 
@@ -91,4 +61,6 @@ class InputNode extends TempNode {
 
 }
 
-export { InputNode };
+InputNode.prototype.isInputNode = true;
+
+export default InputNode;

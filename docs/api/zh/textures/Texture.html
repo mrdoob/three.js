@@ -33,6 +33,11 @@
 		只读 - 表示该纹理实例的唯一数字。
 		</p>
 
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Read-only flag to check whether a given object is of type [name].
+		</p>
+
 		<h3>[property:String uuid]</h3>
 		<p>
 		该对象实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
@@ -261,9 +266,15 @@
 		references to functions as these will not be cloned.
 		</p>
 
+		<h3>[property:Source source]</h3>
+		<p>
+		The data definition of a texture. A reference to the data source can be shared across textures.
+		This is often useful in context of spritesheets where multiple textures render the same data but with different texture transformations.
+		</p>
+
 		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</h3>
+		<p>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</p>
 
 		<h3>[method:undefined updateMatrix]()</h3>
 		<p>

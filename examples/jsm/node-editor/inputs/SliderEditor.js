@@ -1,6 +1,6 @@
 import { ButtonInput, SliderInput, NumberInput, LabelElement, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { FloatNode } from '../../renderers/nodes/Nodes.js';
+import { FloatNode } from 'three-nodes/Nodes.js';
 
 export class SliderEditor extends BaseNode {
 

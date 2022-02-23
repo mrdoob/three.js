@@ -1,18 +1,13 @@
-import { ColorInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
+import { ColorInput, ToggleInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { PointsNodeMaterial } from '../../renderers/nodes/Nodes.js';
+import { PointsNodeMaterial } from 'three-nodes/Nodes.js';
 import * as THREE from 'three';
 
 export class PointsMaterialEditor extends BaseNode {
 
 	constructor() {
 
-		const material = new PointsNodeMaterial( {
-			depthWrite: false,
-			transparent: true,
-			sizeAttenuation: true,
-			blending: THREE.AdditiveBlending
-		} );
+		const material = new PointsNodeMaterial();
 
 		super( 'Points Material', 1, material );
 
@@ -22,6 +17,7 @@ export class PointsMaterialEditor extends BaseNode {
 		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
 		const size = new LabelElement( 'size' ).setInput( 1 );
 		const position = new LabelElement( 'position' ).setInput( 3 );
+		const sizeAttenuation = new LabelElement( 'Size Attenuation' );
 
 		color.add( new ColorInput( material.color.getHex() ).onChange( ( input ) => {
 
@@ -37,20 +33,29 @@ export class PointsMaterialEditor extends BaseNode {
 
 		} ) );
 
+		sizeAttenuation.add( new ToggleInput( material.sizeAttenuation ).onClick( ( input ) => {
+
+			material.sizeAttenuation = input.getValue();
+			material.dispose();
+
+		} ) );
+
 		color.onConnect( () => this.update(), true );
 		opacity.onConnect( () => this.update(), true );
-		size.onConnect(() => this.update(), true );
-		position.onConnect(() => this.update(), true );
+		size.onConnect( () => this.update(), true );
+		position.onConnect( () => this.update(), true );
 
 		this.add( color )
 			.add( opacity )
 			.add( size )
-			.add( position );
+			.add( position )
+			.add( sizeAttenuation );
 
 		this.color = color;
 		this.opacity = opacity;
 		this.size = size;
 		this.position = position;
+		this.sizeAttenuation = sizeAttenuation;
 
 		this.material = material;
 

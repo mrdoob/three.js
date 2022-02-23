@@ -11,22 +11,22 @@ import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
 import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
-import VarNode from '../../nodes/core/VarNode.js';
-import CodeNode from '../../nodes/core/CodeNode.js';
-import BypassNode from '../../nodes/core/BypassNode.js';
-import ExpressionNode from '../../nodes/core/ExpressionNode.js';
-import NodeBuilder from '../../nodes/core/NodeBuilder.js';
-import MaterialNode from '../../nodes/accessors/MaterialNode.js';
-import PositionNode from '../../nodes/accessors/PositionNode.js';
-import NormalNode from '../../nodes/accessors/NormalNode.js';
-import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
-import SkinningNode from '../../nodes/accessors/SkinningNode.js';
-import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
-import LightContextNode from '../../nodes/lights/LightContextNode.js';
-import OperatorNode from '../../nodes/math/OperatorNode.js';
-import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
-import { vec4, join, nodeObject } from '../../nodes/ShaderNode.js';
-import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
+import VarNode from 'three-nodes/core/VarNode.js';
+import CodeNode from 'three-nodes/core/CodeNode.js';
+import BypassNode from 'three-nodes/core/BypassNode.js';
+import ExpressionNode from 'three-nodes/core/ExpressionNode.js';
+import NodeBuilder from 'three-nodes/core/NodeBuilder.js';
+import MaterialNode from 'three-nodes/accessors/MaterialNode.js';
+import PositionNode from 'three-nodes/accessors/PositionNode.js';
+import NormalNode from 'three-nodes/accessors/NormalNode.js';
+import ModelViewProjectionNode from 'three-nodes/accessors/ModelViewProjectionNode.js';
+import SkinningNode from 'three-nodes/accessors/SkinningNode.js';
+import ColorSpaceNode from 'three-nodes/display/ColorSpaceNode.js';
+import LightContextNode from 'three-nodes/lights/LightContextNode.js';
+import OperatorNode from 'three-nodes/math/OperatorNode.js';
+import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
+import { add, join, nodeObject } from 'three-nodes/ShaderNode.js';
+import { getRoughness } from 'three-nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
 	float: 'f32',
@@ -264,13 +264,23 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			// RESULT
+			// OUTGOING LIGHT
 
-			const outputNodeObj = nodeObject( outputNode );
+			let outgoingLightNode = nodeObject( outputNode ).xyz;
 
-			outputNode = join( outputNodeObj.x, outputNodeObj.y, outputNodeObj.z, nodeObject( diffuseColorNode ).w );
+			// EMISSIVE
 
-			//
+			const emissiveNode = material.emissiveNode;
+
+			if ( emissiveNode && emissiveNode.isNode ) {
+
+				outgoingLightNode = add( emissiveNode, outgoingLightNode );
+
+			}
+
+			outputNode = join( outgoingLightNode.xyz, nodeObject( diffuseColorNode ).w );
+
+			// OUTPUT
 
 			const outputEncoding = this.renderer.outputEncoding;
 
@@ -481,7 +491,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				const name = attribute.name;
 				const type = this.getType( attribute.type );
 
-				snippet += `\t[[ location( ${index} ) ]] ${ name } : ${ type }`;
+				snippet += `\t@location( ${index} ) ${ name } : ${ type }`;
 
 				if ( index + 1 < length ) {
 
@@ -526,7 +536,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'vertex' ) {
 
-			snippet += '\t[[ builtin( position ) ]] Vertex: vec4<f32>;\n';
+			snippet += '\t@builtin( position ) Vertex: vec4<f32>;\n';
 
 			const varys = this.varys;
 
@@ -534,7 +544,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const vary = varys[ index ];
 
-				snippet += `\t[[ location( ${index} ) ]] ${ vary.name } : ${ this.getType( vary.type ) };\n`;
+				snippet += `\t@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) };\n`;
 
 			}
 
@@ -550,7 +560,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const vary = varys[ index ];
 
-				snippet += `\t[[ location( ${index} ) ]] ${ vary.name } : ${ this.getType( vary.type ) }`;
+				snippet += `\t@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }`;
 
 				if ( index + 1 < varys.length ) {
 
@@ -583,11 +593,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' ) {
 
-					snippet += `[[ group( 0 ), binding( ${index ++} ) ]] var ${uniform.name}_sampler : sampler; `;
+					snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler; `;
 
 				}
 
-				snippet += `[[ group( 0 ), binding( ${index ++} ) ]] var ${uniform.name} : texture_2d<f32>; `;
+				snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>; `;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -744,7 +754,7 @@ ${shaderData.varys}
 // codes
 ${shaderData.codes}
 
-[[ stage( vertex ) ]]
+@stage( vertex )
 fn main( ${shaderData.attributes} ) -> NodeVarysStruct {
 
 	// system
@@ -773,8 +783,8 @@ ${shaderData.uniforms}
 // codes
 ${shaderData.codes}
 
-[[ stage( fragment ) ]]
-fn main( ${shaderData.varys} ) -> [[ location( 0 ) ]] vec4<f32> {
+@stage( fragment )
+fn main( ${shaderData.varys} ) -> @location( 0 ) vec4<f32> {
 
 	// vars
 	${shaderData.vars}
@@ -802,7 +812,7 @@ struct ${name} {
 		const structSnippet = this._getWGSLStruct( structName, vars );
 
 		return `${structSnippet}
-[[ binding( ${binding} ), group( ${group} ) ]]
+@binding( ${binding} ) @group( ${group} )
 var<uniform> ${name} : ${structName};`;
 
 	}

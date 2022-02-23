@@ -1,58 +1,43 @@
+import InputNode from '../core/InputNode.js';
 import { Color } from 'three';
-
-import { InputNode } from '../core/InputNode.js';
-import { NodeUtils } from '../core/NodeUtils.js';
 
 class ColorNode extends InputNode {
 
-	constructor( color, g, b ) {
+	constructor( value = new Color() ) {
 
-		super( 'c' );
+		super( 'color' );
 
-		this.value = color instanceof Color ? color : new Color( color || 0, g, b );
-
-	}
-
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate */ ) {
-
-		return builder.format( 'vec3( ' + this.r + ', ' + this.g + ', ' + this.b + ' )', type, output );
+		this.value = value;
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		this.value.copy( source );
+		const { r, g, b } = this.value;
 
-		return this;
+		data.r = r;
+		data.g = g;
+		data.b = b;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		var data = this.getJSONNode( meta );
+		super.serialize( data );
 
-		if ( ! data ) {
+		const { r, g, b } = data;
+		const value = this.value;
 
-			data = this.createJSONNode( meta );
-
-			data.r = this.r;
-			data.g = this.g;
-			data.b = this.b;
-
-			if ( this.readonly === true ) data.readonly = true;
-
-		}
-
-		return data;
+		value.r = r;
+		value.g = g;
+		value.b = b;
 
 	}
 
 }
 
-ColorNode.prototype.nodeType = 'Color';
+ColorNode.prototype.isColorNode = true;
 
-NodeUtils.addShortcuts( ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );
-
-export { ColorNode };
+export default ColorNode;

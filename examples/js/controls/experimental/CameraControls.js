@@ -138,7 +138,7 @@
 					if ( sphericalDelta.theta ) {
 
 						vec.set( 0, 1, 0 ).applyQuaternion( scope.object.quaternion );
-						var factor = scope.enableDamping ? scope.dampingFactor : 1;
+						const factor = scope.enableDamping ? scope.dampingFactor : 1;
 						q.setFromAxisAngle( vec, sphericalDelta.theta * factor );
 						scope.object.quaternion.premultiply( q );
 						offset.applyQuaternion( q );
@@ -149,7 +149,7 @@
 					if ( sphericalDelta.phi ) {
 
 						vec.set( 1, 0, 0 ).applyQuaternion( scope.object.quaternion );
-						var factor = scope.enableDamping ? scope.dampingFactor : 1;
+						const factor = scope.enableDamping ? scope.dampingFactor : 1;
 						q.setFromAxisAngle( vec, sphericalDelta.phi * factor );
 						scope.object.quaternion.premultiply( q );
 						offset.applyQuaternion( q );

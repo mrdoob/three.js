@@ -63,7 +63,7 @@ function main() {
     ]);
 
     return function(filter) {
-      const texture = new THREE.DataTexture(identityLUT, 4, 2, THREE.RGBAFormat);
+      const texture = new THREE.DataTexture(identityLUT, 4, 2);
       texture.minFilter = filter;
       texture.magFilter = filter;
       texture.needsUpdate = true;
@@ -171,8 +171,7 @@ function main() {
 
   const rtParameters = {
     minFilter: THREE.NearestFilter,
-    magFilter: THREE.NearestFilter,
-    format: THREE.RGBFormat,
+    magFilter: THREE.NearestFilter
   };
   const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
 
@@ -204,21 +203,20 @@ function main() {
 
   function ext(s) {
     const period = s.lastIndexOf('.');
-    return s.substr(period + 1);
+    return s.slice(period + 1);
   }
 
   function readLUTFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const type = ext(file.name);
-      const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+      const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
 
       effectLUT.uniforms.lutMapSize.value = lut.size;
 
       lutTexture.image.data = lut.data;
       lutTexture.image.width = lut.size * lut.size;
       lutTexture.image.height = lut.size;
-      lutTexture.format = THREE.RGBFormat;
       lutTexture.needsUpdate = true;
 
       render();

@@ -19,11 +19,12 @@ export const GPUCompareFunction = {
 
 export const GPUStoreOp = {
 	Store: 'store',
-	Clear: 'clear'
+	Discard: 'discard'
 };
 
 export const GPULoadOp = {
-	Load: 'load'
+	Load: 'load',
+	Clear: 'clear'
 };
 
 export const GPUFrontFace = {

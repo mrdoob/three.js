@@ -1,7 +1,7 @@
-import ContextNode from '../../nodes/core/ContextNode.js';
-import NormalNode from '../../nodes/accessors/NormalNode.js';
-import ExpressionNode from '../../nodes/core/ExpressionNode.js';
-import FloatNode from '../../nodes/inputs/FloatNode.js';
+import ContextNode from 'three-nodes/core/ContextNode.js';
+import NormalNode from 'three-nodes/accessors/NormalNode.js';
+import ExpressionNode from 'three-nodes/core/ExpressionNode.js';
+import FloatNode from 'three-nodes/inputs/FloatNode.js';
 
 class WebGLPhysicalContextNode extends ContextNode {
 

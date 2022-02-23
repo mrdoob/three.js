@@ -1,63 +1,18 @@
+import InputNode from '../core/InputNode.js';
 import { Matrix3 } from 'three';
-
-import { InputNode } from '../core/InputNode.js';
 
 class Matrix3Node extends InputNode {
 
-	constructor( matrix ) {
+	constructor( value = new Matrix3() ) {
 
-		super( 'm3' );
+		super( 'mat3' );
 
-		this.value = matrix || new Matrix3();
-
-	}
-
-	get elements() {
-
-		return this.value.elements;
-
-	}
-
-	set elements( val ) {
-
-		this.value.elements = val;
-
-	}
-
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate */ ) {
-
-		return builder.format( 'mat3( ' + this.value.elements.join( ', ' ) + ' )', type, output );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.value.fromArray( source.elements );
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		let data = this.getJSONNode( meta );
-
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.elements = this.value.elements.concat();
-
-		}
-
-		return data;
+		this.value = value;
 
 	}
 
 }
 
-Matrix3Node.prototype.nodeType = 'Matrix3';
+Matrix3Node.prototype.isMatrix3Node = true;
 
-export { Matrix3Node };
+export default Matrix3Node;

@@ -19,7 +19,7 @@
 		<h3>[name]( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding )</h3>
 		<p>
 			The data argument must be an [link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView].
-			Further parameters correspond to the properties inherited from [page:Texture], where both magFilter and minFilter default to THREE.NearestFilter. The properties flipY and generateMipmaps are initially set to false.
+			Further parameters correspond to the properties inherited from [page:Texture], where both magFilter and minFilter default to THREE.NearestFilter.
 		</p>
 		<p>
 			The interpretation of the data depends on type and format:
@@ -70,9 +70,33 @@
 		See the base [page:Texture Texture] class for common properties.
 		</p>
 
+		<h3>[property:Boolean flipY]</h3>
+		<p>
+		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+		Whether to generate mipmaps (if possible) for a texture. False by default.
+		</p>
+
 		<h3>[property:Image image]</h3>
 		<p>
 		Overridden with a record type holding data, width and height.
+		</p>
+
+		<h3>[property:Boolean isDataTexture]</h3>
+		<p>
+			Read-only flag to check whether a given object is of type [name].
+		</p>
+
+		<h3>[property:number unpackAlignment]</h3>
+		<p>
+		1 by default. Specifies the alignment requirements for the start of each pixel row in memory.
+		The allowable values are 1 (byte-alignment), 2 (rows aligned to even-numbered bytes),
+		4 (word-alignment), and 8 (rows start on double-word boundaries).
+		See [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]
+		for more information.
 		</p>
 
 		<h2>Methods</h2>

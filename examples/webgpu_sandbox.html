@@ -15,23 +15,23 @@
 		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js"
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
 			}
-		}
 		</script>
 
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 
 			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 
@@ -128,6 +128,8 @@
 
 				const materialCompressed = new Nodes.MeshBasicNodeMaterial();
 				materialCompressed.colorNode = new Nodes.TextureNode( dxt5Texture );
+				materialCompressed.emissiveNode = new Nodes.ColorNode( new THREE.Color( 0x663300 ) );
+				materialCompressed.alphaTestNode = new Nodes.OscNode();
 				materialCompressed.transparent = true;
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );

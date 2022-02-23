@@ -56,7 +56,7 @@ class KMZLoader extends Loader {
 
 			for ( const path in zip ) {
 
-				if ( path.substr( - url.length ) === url ) {
+				if ( path.slice( - url.length ) === url ) {
 
 					return zip[ path ];
 

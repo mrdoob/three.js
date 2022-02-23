@@ -1,51 +1,33 @@
-import { InputNode } from '../core/InputNode.js';
+import InputNode from '../core/InputNode.js';
 
 class FloatNode extends InputNode {
 
-	constructor( value ) {
+	constructor( value = 0 ) {
 
-		super( 'f' );
+		super( 'float' );
 
-		this.value = value || 0;
-
-	}
-
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate */ ) {
-
-		return builder.format( this.value + ( this.value % 1 ? '' : '.0' ), type, output );
+		this.value = value;
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		this.value = source.value;
-
-		return this;
+		data.value = this.value;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		let data = this.getJSONNode( meta );
+		super.serialize( data );
 
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.value = this.value;
-
-			if ( this.readonly === true ) data.readonly = true;
-
-		}
-
-		return data;
+		data.value = this.value;
 
 	}
 
 }
 
-FloatNode.prototype.nodeType = 'Float';
+FloatNode.prototype.isFloatNode = true;
 
-export { FloatNode };
+export default FloatNode;

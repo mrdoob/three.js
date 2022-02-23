@@ -127,7 +127,7 @@ function main() {
   const temp = new THREE.Vector3();
   function setPosition(e) {
     const pos = getCanvasRelativePosition(e);
-    const x = pos.x / canvas.width  *  2 - 1;
+    const x = pos.x / canvas.width * 2 - 1;
     const y = pos.y / canvas.height * -2 + 1;
     temp.set(x, y, 0).unproject(camera);
     state.x = temp.x;
@@ -144,4 +144,3 @@ function main() {
 main();
 </script>
 </html>
-

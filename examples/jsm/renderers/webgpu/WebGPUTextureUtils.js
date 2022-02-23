@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology } from './constants.js';
+import { GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology, GPULoadOp, GPUStoreOp } from './constants.js';
 
 // ported from https://github.com/toji/web-texture-tool/blob/master/src/webgpu-mipmap-generator.js
 
@@ -31,13 +31,13 @@ class WebGPUTextureUtils {
 		const mipmapVertexSource = `
 struct VarysStruct {
 
-	[[ builtin( position ) ]] Position: vec4<f32>;
-	[[ location( 0 ) ]] vTex : vec2<f32>;
+	@builtin( position ) Position: vec4<f32>;
+	@location( 0 ) vTex : vec2<f32>;
 
 };
 
-[[ stage( vertex ) ]]
-fn main( [[ builtin( vertex_index ) ]] vertexIndex : u32 ) -> VarysStruct {
+@stage( vertex )
+fn main( @builtin( vertex_index ) vertexIndex : u32 ) -> VarysStruct {
 
 	var Varys: VarysStruct;
 
@@ -64,14 +64,14 @@ fn main( [[ builtin( vertex_index ) ]] vertexIndex : u32 ) -> VarysStruct {
 `;
 
 		const mipmapFragmentSource = `
-[[ group( 0 ), binding( 0 ) ]] 
+@group( 0 ) @binding( 0 ) 
 var imgSampler : sampler;
 
-[[ group( 0 ), binding( 1 ) ]] 
+@group( 0 ) @binding( 1 )
 var img : texture_2d<f32>;
 
-[[ stage( fragment ) ]]
-fn main( [[ location( 0 ) ]] vTex : vec2<f32> ) -> [[ location( 0 ) ]] vec4<f32> {
+@stage( fragment )
+fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	return textureSample( img, imgSampler, vTex );
 
@@ -145,7 +145,9 @@ fn main( [[ location( 0 ) ]] vTex : vec2<f32> ) -> [[ location( 0 ) ]] vec4<f32>
 			const passEncoder = commandEncoder.beginRenderPass( {
 				colorAttachments: [ {
 					view: dstView,
-					loadValue: [ 0, 0, 0, 0 ]
+					loadOp: GPULoadOp.Clear,
+					storeOp: GPUStoreOp.Store,
+					clearValue: [ 0, 0, 0, 0 ]
 				} ]
 			} );
 
@@ -163,7 +165,7 @@ fn main( [[ location( 0 ) ]] vTex : vec2<f32> ) -> [[ location( 0 ) ]] vec4<f32>
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
 			passEncoder.draw( 4, 1, 0, 0 );
-			passEncoder.endPass();
+			passEncoder.end();
 
 			srcView = dstView;
 

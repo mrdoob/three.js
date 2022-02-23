@@ -1,6 +1,6 @@
 import { SelectInput, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { SplitNode, FloatNode } from '../../renderers/nodes/Nodes.js';
+import { SplitNode, FloatNode } from 'three-nodes/Nodes.js';
 
 const NULL_VALUE = new FloatNode();
 

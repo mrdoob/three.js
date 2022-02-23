@@ -165,12 +165,12 @@
 
 			// Activate content and title change on browser navigation
 
-			window.onpopstate = function() {
+			window.onpopstate = function () {
 
 				updateNavigation();
 				createNewIframe();
 
-			}
+			};
 
 			// Create the navigation panel and configure the iframe
 
@@ -324,7 +324,7 @@
 
 			const hash = location.hash;
 			if ( hash === '' ) return;
-			const docLink = hash.substr( hash.indexOf( '/' ) );
+			const docLink = hash.slice( hash.indexOf( '/' ) );
 			location.href = '#' + language + docLink;
 
 		}
@@ -337,7 +337,7 @@
 
 			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( search.substr( 3 ) );
+				return decodeURI( search.slice( 3 ) );
 
 			}
 
@@ -442,7 +442,7 @@
 
 			if ( url.origin === window.location.origin ) {
 
-				const hrefNoOrigin = url.href.substr( url.origin.length );
+				const hrefNoOrigin = url.href.slice( url.origin.length );
 				const m = re.exec( hrefNoOrigin );
 				const [ , base, path ] = m;
 				if ( base.includes( 'manual' ) ) {
@@ -509,8 +509,8 @@
 				const subHash = splitHash[0].indexOf('#');
 				let src;
 				if (subHash >= 0) {
-					const beforeSubHash = splitHash[0].substr(0, subHash);
-					const afterSubHash = splitHash[0].substr(subHash);
+					const beforeSubHash = splitHash[0].slice(0, subHash);
+					const afterSubHash = splitHash[0].slice(subHash);
 					src = `${beforeSubHash}.html${afterSubHash}${splitHash[ 1 ]}`;
 				} else {
 					src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];

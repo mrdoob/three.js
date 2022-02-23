@@ -11,7 +11,8 @@
 			const textureWidth = options.textureWidth || 512;
 			const textureHeight = options.textureHeight || 512;
 			const clipBias = options.clipBias || 0;
-			const shader = options.shader || Refractor.RefractorShader; //
+			const shader = options.shader || Refractor.RefractorShader;
+			const multisample = options.multisample !== undefined ? options.multisample : 4; //
 
 			const virtualCamera = new THREE.PerspectiveCamera();
 			virtualCamera.matrixAutoUpdate = false;
@@ -20,7 +21,9 @@
 			const refractorPlane = new THREE.Plane();
 			const textureMatrix = new THREE.Matrix4(); // render target
 
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight ); // material
+			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, {
+				samples: multisample
+			} ); // material
 
 			this.material = new THREE.ShaderMaterial( {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),

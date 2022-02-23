@@ -38,6 +38,7 @@ import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
 import {EffectComposer} from '../../examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from '../../examples/jsm/postprocessing/RenderPass.js';
 import {ShaderPass} from '../../examples/jsm/postprocessing/ShaderPass.js';
+import {GammaCorrectionShader} from '../../examples/jsm/shaders/GammaCorrectionShader.js';
 import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
 
 function main() {
@@ -68,7 +69,7 @@ function main() {
     ]);
 
     return function(filter) {
-      const texture = new THREE.DataTexture(identityLUT, 4, 2, THREE.RGBAFormat);
+      const texture = new THREE.DataTexture(identityLUT, 4, 2);
       texture.minFilter = filter;
       texture.magFilter = filter;
       texture.needsUpdate = true;
@@ -113,6 +114,7 @@ function main() {
   {
     const loader = new THREE.TextureLoader();
     bgTexture = loader.load('resources/images/beach.jpg');
+    bgTexture.encoding = THREE.sRGBEncoding;
     const planeGeo = new THREE.PlaneGeometry(2, 2);
     const planeMat = new THREE.MeshBasicMaterial({
       map: bgTexture,
@@ -241,27 +243,20 @@ function main() {
   };
 
   const effectLUT = new ShaderPass(lutShader);
-  effectLUT.renderToScreen = true;
   const effectLUTNearest = new ShaderPass(lutNearestShader);
-  effectLUTNearest.renderToScreen = true;
 
   const renderModel = new RenderPass(scene, camera);
   renderModel.clear = false;  // so we don't clear out the background
   const renderBG = new RenderPass(sceneBG, cameraBG);
+  const gammaPass = new ShaderPass(GammaCorrectionShader);
 
-  renderModel.clear = false;
-
-  const rtParameters = {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    format: THREE.RGBFormat,
-  };
-  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
+  const composer = new EffectComposer(renderer);
 
   composer.addPass(renderBG);
   composer.addPass(renderModel);
   composer.addPass(effectLUT);
   composer.addPass(effectLUTNearest);
+  composer.addPass(gammaPass);
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;

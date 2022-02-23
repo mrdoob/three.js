@@ -1,7 +1,7 @@
 import { ColorInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { MeshBasicNodeMaterial } from '../../renderers/nodes/Nodes.js';
-import * as THREE from 'three';
+import { MeshBasicNodeMaterial } from 'three-nodes/Nodes.js';
+import { MathUtils } from 'three';
 
 export class BasicMaterialEditor extends BaseNode {
 
@@ -68,7 +68,7 @@ export class BasicMaterialEditor extends BaseNode {
 		// TODO: Fix on NodeMaterial System
 		material.customProgramCacheKey = () => {
 
-			return THREE.MathUtils.generateUUID();
+			return MathUtils.generateUUID();
 
 		};
 

@@ -1,116 +1,89 @@
-import { InputNode } from '../core/InputNode.js';
-import { UVNode } from '../accessors/UVNode.js';
-import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
-import { ExpressionNode } from '../core/ExpressionNode.js';
+import InputNode from '../core/InputNode.js';
+import UVNode from '../accessors/UVNode.js';
 
 class TextureNode extends InputNode {
 
-	constructor( value, uv, bias, project ) {
+	constructor( value = null, uvNode = new UVNode(), biasNode = null ) {
 
-		super( 'v4', { shared: true } );
+		super( 'texture' );
 
 		this.value = value;
-		this.uv = uv || new UVNode();
-		this.bias = bias;
-		this.project = project !== undefined ? project : false;
-
-	}
-
-	getTexture( builder, output ) {
-
-		return super.generate( builder, output, this.value.uuid, 't' );
+		this.uvNode = uvNode;
+		this.biasNode = biasNode;
 
 	}
 
 	generate( builder, output ) {
 
-		if ( output === 'sampler2D' ) {
+		const texture = this.value;
 
-			return this.getTexture( builder, output );
+		if ( ! texture || texture.isTexture !== true ) {
 
-		}
-
-		const tex = this.getTexture( builder, output ),
-			uv = this.uv.build( builder, this.project ? 'v4' : 'v2' );
-
-		let bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
-
-		if ( bias === undefined && builder.context.bias ) {
-
-			bias = builder.context.bias.setTexture( this ).build( builder, 'f' );
+			throw new Error( 'TextureNode: Need a three.js texture.' );
 
 		}
 
-		let method, code;
+		const type = this.getNodeType( builder );
 
-		if ( this.project ) method = 'texture2DProj';
-		else method = bias ? 'tex2DBias' : 'tex2D';
+		const textureProperty = super.generate( builder, type );
 
-		if ( bias ) code = method + '( ' + tex + ', ' + uv + ', ' + bias + ' )';
-		else code = method + '( ' + tex + ', ' + uv + ' )';
+		if ( output === 'sampler2D' || output === 'texture2D' ) {
 
-		// add a custom context for fix incompatibility with the core
-		// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
-		// this should be removed in the future
-		// context.include is used to include or not functions if used FunctionNode
-		// context.ignoreCache =: not create temp variables nodeT0..9 to optimize the code
-		const context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
-		const outputType = this.getType( builder );
+			return textureProperty;
 
-		builder.addContext( context );
+		} else if ( output === 'sampler' ) {
 
-		this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
-		this.colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );
-		this.colorSpace.input.parse( code );
+			return textureProperty + '_sampler';
 
-		code = this.colorSpace.build( builder, outputType );
+		} else {
 
-		// end custom context
+			const nodeData = builder.getDataFromNode( this );
 
-		builder.removeContext();
+			let snippet = nodeData.snippet;
 
-		return builder.format( code, outputType, output );
+			if ( snippet === undefined ) {
+
+				const uvSnippet = this.uvNode.build( builder, 'vec2' );
+				const biasNode = this.biasNode;
+
+				let biasSnippet = null;
+
+				if ( biasNode !== null ) {
+
+					biasSnippet = biasNode.build( builder, 'float' );
+
+				}
+
+				snippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
+
+				nodeData.snippet = snippet;
+
+			}
+
+			return builder.format( snippet, 'vec4', output );
+
+		}
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		if ( source.value ) this.value = source.value;
-
-		this.uv = source.uv;
-
-		if ( source.bias ) this.bias = source.bias;
-		if ( source.project !== undefined ) this.project = source.project;
-
-		return this;
+		data.value = this.value.toJSON( data.meta ).uuid;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		let data = this.getJSONNode( meta );
+		super.serialize( data );
 
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			if ( this.value ) data.value = this.value.uuid;
-
-			data.uv = this.uv.toJSON( meta ).uuid;
-			data.project = this.project;
-
-			if ( this.bias ) data.bias = this.bias.toJSON( meta ).uuid;
-
-		}
-
-		return data;
+		this.value = data.meta.textures[ data.value ];
 
 	}
 
 }
 
-TextureNode.prototype.nodeType = 'Texture';
+TextureNode.prototype.isTextureNode = true;
 
-export { TextureNode };
+export default TextureNode;

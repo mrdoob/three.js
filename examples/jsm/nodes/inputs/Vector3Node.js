@@ -1,58 +1,43 @@
+import InputNode from '../core/InputNode.js';
 import { Vector3 } from 'three';
-
-import { InputNode } from '../core/InputNode.js';
-import { NodeUtils } from '../core/NodeUtils.js';
 
 class Vector3Node extends InputNode {
 
-	constructor( x, y, z ) {
+	constructor( value = new Vector3() ) {
 
-		super( 'v3' );
+		super( 'vec3' );
 
-		this.value = x instanceof Vector3 ? x : new Vector3( x, y, z );
-
-	}
-
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
-
-		return builder.format( 'vec3( ' + this.x + ', ' + this.y + ', ' + this.z + ' )', type, output );
+		this.value = value;
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		this.value.copy( source );
+		const { x, y, z } = this.value;
 
-		return this;
+		data.x = x;
+		data.y = y;
+		data.z = z;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		let data = this.getJSONNode( meta );
+		super.serialize( data );
 
-		if ( ! data ) {
+		const { x, y, z } = data;
+		const value = this.value;
 
-			data = this.createJSONNode( meta );
-
-			data.x = this.x;
-			data.y = this.y;
-			data.z = this.z;
-
-			if ( this.readonly === true ) data.readonly = true;
-
-		}
-
-		return data;
+		value.x = x;
+		value.y = y;
+		value.z = z;
 
 	}
 
 }
 
-Vector3Node.prototype.nodeType = 'Vector3';
+Vector3Node.prototype.isVector3Node = true;
 
-NodeUtils.addShortcuts( Vector3Node.prototype, 'value', [ 'x', 'y', 'z' ] );
-
-export { Vector3Node };
+export default Vector3Node;
