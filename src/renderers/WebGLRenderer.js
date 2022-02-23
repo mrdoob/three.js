@@ -385,11 +385,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		_width = width;
-		_height = height;
-
-		_canvas.width = Math.floor( width * _pixelRatio );
-		_canvas.height = Math.floor( height * _pixelRatio );
+		this.setDrawingBufferSize(width, height, _pixelRatio);
 
 		if ( updateStyle !== false ) {
 
@@ -397,8 +393,6 @@ function WebGLRenderer( parameters = {} ) {
 			_canvas.style.height = height + 'px';
 
 		}
-
-		this.setViewport( 0, 0, width, height );
 
 	};
 
