@@ -11591,16 +11591,6 @@ class OrthographicCamera extends Camera {
 
 OrthographicCamera.prototype.isOrthographicCamera = true;
 
-class RawShaderMaterial extends ShaderMaterial {
-	constructor(parameters) {
-		super(parameters);
-		this.type = 'RawShaderMaterial';
-	}
-
-}
-
-RawShaderMaterial.prototype.isRawShaderMaterial = true;
-
 const LOD_MIN = 4; // The standard deviations (radians) associated with the extra mips. These are
 // chosen to approximate a Trowbridge-Reitz distribution function times the
 // geometric shadowing function. These sigma values squared must match the
@@ -12096,7 +12086,7 @@ function _setViewport(target, x, y, width, height) {
 function _getBlurShader(lodMax, width, height) {
 	const weights = new Float32Array(MAX_SAMPLES);
 	const poleAxis = new Vector3(0, 1, 0);
-	const shaderMaterial = new RawShaderMaterial({
+	const shaderMaterial = new ShaderMaterial({
 		name: 'SphericalGaussianBlur',
 		defines: {
 			'n': MAX_SAMPLES,
@@ -12131,8 +12121,6 @@ function _getBlurShader(lodMax, width, height) {
 		fragmentShader:
 		/* glsl */
 		`
-
-			#extension GL_EXT_shader_texture_lod : enable
 
 			precision mediump float;
 			precision mediump int;
@@ -12201,7 +12189,7 @@ function _getBlurShader(lodMax, width, height) {
 }
 
 function _getEquirectShader() {
-	const shaderMaterial = new RawShaderMaterial({
+	const shaderMaterial = new ShaderMaterial({
 		name: 'EquirectangularToCubeUV',
 		uniforms: {
 			'envMap': {
@@ -12239,7 +12227,7 @@ function _getEquirectShader() {
 }
 
 function _getCubemapShader() {
-	const shaderMaterial = new RawShaderMaterial({
+	const shaderMaterial = new ShaderMaterial({
 		name: 'CubemapToCubeUV',
 		uniforms: {
 			'envMap': {
@@ -12284,8 +12272,6 @@ function _getCommonVertexShader() {
 		precision mediump float;
 		precision mediump int;
 
-		attribute vec3 position;
-		attribute vec2 uv;
 		attribute float faceIndex;
 
 		varying vec3 vOutputDirection;
@@ -26346,6 +26332,16 @@ class ShadowMaterial extends Material {
 
 ShadowMaterial.prototype.isShadowMaterial = true;
 
+class RawShaderMaterial extends ShaderMaterial {
+	constructor(parameters) {
+		super(parameters);
+		this.type = 'RawShaderMaterial';
+	}
+
+}
+
+RawShaderMaterial.prototype.isRawShaderMaterial = true;
+
 /**
  * parameters = {
  *	color: <hex>,
@@ -28618,9 +28614,10 @@ class FileLoader extends Loader {
 				// e.g. 'file://' or 'data://'. Handle as success.
 				if (response.status === 0) {
 					console.warn('THREE.FileLoader: HTTP Status 0 received.');
-				}
+				} // Workaround: Checking if response.body === undefined for Alipay browser #23548
 
-				if (typeof ReadableStream === 'undefined' || response.body.getReader === undefined) {
+
+				if (typeof ReadableStream === 'undefined' || response.body === undefined || response.body.getReader === undefined) {
 					return response;
 				}
 
