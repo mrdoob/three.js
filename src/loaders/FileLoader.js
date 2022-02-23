@@ -88,6 +88,8 @@ class FileLoader extends Loader {
 
 					}
 
+					// Workaround: Checking if response.body === undefined for Alipay browser #23548
+
 					if ( typeof ReadableStream === 'undefined' || response.body === undefined || response.body.getReader === undefined ) {
 
 						return response;
