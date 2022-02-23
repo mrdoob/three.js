@@ -167,7 +167,7 @@ class PMREMGenerator {
 
 		if ( this._equirectShader === null ) {
 
-			this._equirectShader = _getEquirectShader();
+			this._equirectShader = _getEquirectMaterial();
 			this._compileMaterial( this._equirectShader );
 
 		}
@@ -394,7 +394,7 @@ class PMREMGenerator {
 
 			if ( this._equirectShader === null ) {
 
-				this._equirectShader = _getEquirectShader();
+				this._equirectShader = _getEquirectMaterial();
 
 			}
 
@@ -749,7 +749,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 }
 
-function _getEquirectShader() {
+function _getEquirectMaterial() {
 
 	const shaderMaterial = new ShaderMaterial( {
 
