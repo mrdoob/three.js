@@ -195,7 +195,7 @@ export const nodeObject = ( val ) => {
 
 export const makeVar = ( node, name = null, nodeType = null ) => {
 
-	if ( ( node.node?.isNode === true ) && ( ( node.name === name ) || ( name === null ) ) && ( ( node.nodeType === nodeType ) || ( nodeType === null ) ) ) {
+	if ( ( node.isVarNode === true ) && ( ( node.name === name ) || ( name === null ) ) && ( ( node.nodeType === nodeType ) || ( nodeType === null ) ) ) {
 
 		// node is already a VarNode with the same name and type
 
