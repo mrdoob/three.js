@@ -11,22 +11,22 @@ import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
 import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
-import VarNode from '../../nodes/core/VarNode.js';
-import CodeNode from '../../nodes/core/CodeNode.js';
-import BypassNode from '../../nodes/core/BypassNode.js';
-import ExpressionNode from '../../nodes/core/ExpressionNode.js';
-import NodeBuilder from '../../nodes/core/NodeBuilder.js';
-import MaterialNode from '../../nodes/accessors/MaterialNode.js';
-import PositionNode from '../../nodes/accessors/PositionNode.js';
-import NormalNode from '../../nodes/accessors/NormalNode.js';
-import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js';
-import SkinningNode from '../../nodes/accessors/SkinningNode.js';
-import ColorSpaceNode from '../../nodes/display/ColorSpaceNode.js';
-import LightContextNode from '../../nodes/lights/LightContextNode.js';
-import OperatorNode from '../../nodes/math/OperatorNode.js';
-import WGSLNodeParser from '../../nodes/parsers/WGSLNodeParser.js';
-import { add, join, nodeObject } from '../../nodes/ShaderNode.js';
-import { getRoughness } from '../../nodes/functions/PhysicalMaterialFunctions.js';
+import VarNode from 'three-nodes/core/VarNode.js';
+import CodeNode from 'three-nodes/core/CodeNode.js';
+import BypassNode from 'three-nodes/core/BypassNode.js';
+import ExpressionNode from 'three-nodes/core/ExpressionNode.js';
+import NodeBuilder from 'three-nodes/core/NodeBuilder.js';
+import MaterialNode from 'three-nodes/accessors/MaterialNode.js';
+import PositionNode from 'three-nodes/accessors/PositionNode.js';
+import NormalNode from 'three-nodes/accessors/NormalNode.js';
+import ModelViewProjectionNode from 'three-nodes/accessors/ModelViewProjectionNode.js';
+import SkinningNode from 'three-nodes/accessors/SkinningNode.js';
+import ColorSpaceNode from 'three-nodes/display/ColorSpaceNode.js';
+import LightContextNode from 'three-nodes/lights/LightContextNode.js';
+import OperatorNode from 'three-nodes/math/OperatorNode.js';
+import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
+import { add, join, nodeObject } from 'three-nodes/ShaderNode.js';
+import { getRoughness } from 'three-nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
 	float: 'f32',

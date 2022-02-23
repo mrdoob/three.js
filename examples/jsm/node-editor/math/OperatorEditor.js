@@ -1,5 +1,5 @@
 import { Element, LabelElement, NumberInput, SelectInput } from '../../libs/flow.module.js';
-import { FloatNode, OperatorNode } from '../../renderers/nodes/Nodes.js';
+import { FloatNode, OperatorNode } from 'three-nodes/Nodes.js';
 import { BaseNode } from '../core/BaseNode.js';
 
 
