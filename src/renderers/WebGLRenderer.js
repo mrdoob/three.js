@@ -385,7 +385,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		this.setDrawingBufferSize(width, height, _pixelRatio);
+		this.setDrawingBufferSize( width, height, _pixelRatio );
 
 		if ( updateStyle !== false ) {
 
