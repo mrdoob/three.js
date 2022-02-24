@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '138';
+	const REVISION = '139dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -1456,7 +1456,7 @@
 		}
 
 		getHex() {
-			return this.r * 255 << 16 ^ this.g * 255 << 8 ^ this.b * 255 << 0;
+			return clamp(this.r * 255, 0, 255) << 16 ^ clamp(this.g * 255, 0, 255) << 8 ^ clamp(this.b * 255, 0, 255) << 0;
 		}
 
 		getHexString() {
@@ -9106,8 +9106,12 @@
 			if (this.parent === null) this.updateMatrixWorld();
 			const renderTarget = this.renderTarget;
 			const [cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ] = this.children;
-			const currentXrEnabled = renderer.xr.enabled;
 			const currentRenderTarget = renderer.getRenderTarget();
+			const currentOutputEncoding = renderer.outputEncoding;
+			const currentToneMapping = renderer.toneMapping;
+			const currentXrEnabled = renderer.xr.enabled;
+			renderer.outputEncoding = LinearEncoding;
+			renderer.toneMapping = NoToneMapping;
 			renderer.xr.enabled = false;
 			const generateMipmaps = renderTarget.texture.generateMipmaps;
 			renderTarget.texture.generateMipmaps = false;
@@ -9125,6 +9129,8 @@
 			renderer.setRenderTarget(renderTarget, 5);
 			renderer.render(scene, cameraNZ);
 			renderer.setRenderTarget(currentRenderTarget);
+			renderer.outputEncoding = currentOutputEncoding;
+			renderer.toneMapping = currentToneMapping;
 			renderer.xr.enabled = currentXrEnabled;
 			renderTarget.texture.needsPMREMUpdate = true;
 		}
