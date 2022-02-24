@@ -336,7 +336,7 @@ class Color {
 
 	getHex() {
 
-		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
+		return clamp( this.r * 255, 0, 255 ) << 16 ^ clamp( this.g * 255, 0, 255 ) << 8 ^ clamp( this.b * 255, 0, 255 ) << 0;
 
 	}
 
