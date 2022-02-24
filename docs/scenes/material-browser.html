@@ -343,7 +343,7 @@
 
 				const folder = gui.addFolder( 'THREE.Material' );
 
-				folder.add( material, 'transparent' );
+				folder.add( material, 'transparent' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'opacity', 0, 1 ).step( 0.01 );
 				// folder.add( material, 'blending', constants.blendingMode );
 				// folder.add( material, 'blendSrc', constants.destinationFactors );
