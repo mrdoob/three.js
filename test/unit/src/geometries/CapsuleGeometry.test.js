@@ -11,20 +11,18 @@ export default QUnit.module( 'Geometries', () => {
 		hooks.beforeEach( function () {
 
 			const parameters = {
-				radiusTop: 2,
-				radiusBottom: 2,
-				height: 2,
+				radius: 2,
+				length: 2,
 				capSegments: 20,
 				heightSegments: 20
 			};
 
 			geometries = [
 				new CapsuleGeometry(),
-				new CapsuleGeometry( parameters.radiusTop ),
-				new CapsuleGeometry( parameters.radiusTop, parameters.radiusBottom ),
-				new CapsuleGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height ),
-				new CapsuleGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.capSegments ),
-				new CapsuleGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.capSegments, parameters.heightSegments ),
+				new CapsuleGeometry( parameters.radius ),
+				new CapsuleGeometry( parameters.radius, parameters.length ),
+				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments ),
+				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments, parameters.heightSegments ),
 				new CapsuleBufferGeometry(),
 			];
 
