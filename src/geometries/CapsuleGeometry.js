@@ -1,5 +1,5 @@
-import { Path } from '../extras/core/Path';
-import { LatheGeometry } from './LatheGeometry';
+import { Path } from '../extras/core/Path.js';
+import { LatheGeometry } from './LatheGeometry.js';
 
 class CapsuleGeometry extends LatheGeometry {
 

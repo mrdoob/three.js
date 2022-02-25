@@ -22339,589 +22339,6 @@
 
 	CanvasTexture.prototype.isCanvasTexture = true;
 
-	class CircleGeometry extends BufferGeometry {
-		constructor(radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2) {
-			super();
-			this.type = 'CircleGeometry';
-			this.parameters = {
-				radius: radius,
-				segments: segments,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-			segments = Math.max(3, segments); // buffers
-
-			const indices = [];
-			const vertices = [];
-			const normals = [];
-			const uvs = []; // helper variables
-
-			const vertex = new Vector3();
-			const uv = new Vector2(); // center point
-
-			vertices.push(0, 0, 0);
-			normals.push(0, 0, 1);
-			uvs.push(0.5, 0.5);
-
-			for (let s = 0, i = 3; s <= segments; s++, i += 3) {
-				const segment = thetaStart + s / segments * thetaLength; // vertex
-
-				vertex.x = radius * Math.cos(segment);
-				vertex.y = radius * Math.sin(segment);
-				vertices.push(vertex.x, vertex.y, vertex.z); // normal
-
-				normals.push(0, 0, 1); // uvs
-
-				uv.x = (vertices[i] / radius + 1) / 2;
-				uv.y = (vertices[i + 1] / radius + 1) / 2;
-				uvs.push(uv.x, uv.y);
-			} // indices
-
-
-			for (let i = 1; i <= segments; i++) {
-				indices.push(i, i + 1, 0);
-			} // build geometry
-
-
-			this.setIndex(indices);
-			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-		}
-
-		static fromJSON(data) {
-			return new CircleGeometry(data.radius, data.segments, data.thetaStart, data.thetaLength);
-		}
-
-	}
-
-	class CylinderGeometry extends BufferGeometry {
-		constructor(radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
-			super();
-			this.type = 'CylinderGeometry';
-			this.parameters = {
-				radiusTop: radiusTop,
-				radiusBottom: radiusBottom,
-				height: height,
-				radialSegments: radialSegments,
-				heightSegments: heightSegments,
-				openEnded: openEnded,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-			const scope = this;
-			radialSegments = Math.floor(radialSegments);
-			heightSegments = Math.floor(heightSegments); // buffers
-
-			const indices = [];
-			const vertices = [];
-			const normals = [];
-			const uvs = []; // helper variables
-
-			let index = 0;
-			const indexArray = [];
-			const halfHeight = height / 2;
-			let groupStart = 0; // generate geometry
-
-			generateTorso();
-
-			if (openEnded === false) {
-				if (radiusTop > 0) generateCap(true);
-				if (radiusBottom > 0) generateCap(false);
-			} // build geometry
-
-
-			this.setIndex(indices);
-			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-
-			function generateTorso() {
-				const normal = new Vector3();
-				const vertex = new Vector3();
-				let groupCount = 0; // this will be used to calculate the normal
-
-				const slope = (radiusBottom - radiusTop) / height; // generate vertices, normals and uvs
-
-				for (let y = 0; y <= heightSegments; y++) {
-					const indexRow = [];
-					const v = y / heightSegments; // calculate the radius of the current row
-
-					const radius = v * (radiusBottom - radiusTop) + radiusTop;
-
-					for (let x = 0; x <= radialSegments; x++) {
-						const u = x / radialSegments;
-						const theta = u * thetaLength + thetaStart;
-						const sinTheta = Math.sin(theta);
-						const cosTheta = Math.cos(theta); // vertex
-
-						vertex.x = radius * sinTheta;
-						vertex.y = -v * height + halfHeight;
-						vertex.z = radius * cosTheta;
-						vertices.push(vertex.x, vertex.y, vertex.z); // normal
-
-						normal.set(sinTheta, slope, cosTheta).normalize();
-						normals.push(normal.x, normal.y, normal.z); // uv
-
-						uvs.push(u, 1 - v); // save index of vertex in respective row
-
-						indexRow.push(index++);
-					} // now save vertices of the row in our index array
-
-
-					indexArray.push(indexRow);
-				} // generate indices
-
-
-				for (let x = 0; x < radialSegments; x++) {
-					for (let y = 0; y < heightSegments; y++) {
-						// we use the index array to access the correct indices
-						const a = indexArray[y][x];
-						const b = indexArray[y + 1][x];
-						const c = indexArray[y + 1][x + 1];
-						const d = indexArray[y][x + 1]; // faces
-
-						indices.push(a, b, d);
-						indices.push(b, c, d); // update group counter
-
-						groupCount += 6;
-					}
-				} // add a group to the geometry. this will ensure multi material support
-
-
-				scope.addGroup(groupStart, groupCount, 0); // calculate new start value for groups
-
-				groupStart += groupCount;
-			}
-
-			function generateCap(top) {
-				// save the index of the first center vertex
-				const centerIndexStart = index;
-				const uv = new Vector2();
-				const vertex = new Vector3();
-				let groupCount = 0;
-				const radius = top === true ? radiusTop : radiusBottom;
-				const sign = top === true ? 1 : -1; // first we generate the center vertex data of the cap.
-				// because the geometry needs one set of uvs per face,
-				// we must generate a center vertex per face/segment
-
-				for (let x = 1; x <= radialSegments; x++) {
-					// vertex
-					vertices.push(0, halfHeight * sign, 0); // normal
-
-					normals.push(0, sign, 0); // uv
-
-					uvs.push(0.5, 0.5); // increase index
-
-					index++;
-				} // save the index of the last center vertex
-
-
-				const centerIndexEnd = index; // now we generate the surrounding vertices, normals and uvs
-
-				for (let x = 0; x <= radialSegments; x++) {
-					const u = x / radialSegments;
-					const theta = u * thetaLength + thetaStart;
-					const cosTheta = Math.cos(theta);
-					const sinTheta = Math.sin(theta); // vertex
-
-					vertex.x = radius * sinTheta;
-					vertex.y = halfHeight * sign;
-					vertex.z = radius * cosTheta;
-					vertices.push(vertex.x, vertex.y, vertex.z); // normal
-
-					normals.push(0, sign, 0); // uv
-
-					uv.x = cosTheta * 0.5 + 0.5;
-					uv.y = sinTheta * 0.5 * sign + 0.5;
-					uvs.push(uv.x, uv.y); // increase index
-
-					index++;
-				} // generate indices
-
-
-				for (let x = 0; x < radialSegments; x++) {
-					const c = centerIndexStart + x;
-					const i = centerIndexEnd + x;
-
-					if (top === true) {
-						// face top
-						indices.push(i, i + 1, c);
-					} else {
-						// face bottom
-						indices.push(i + 1, i, c);
-					}
-
-					groupCount += 3;
-				} // add a group to the geometry. this will ensure multi material support
-
-
-				scope.addGroup(groupStart, groupCount, top === true ? 1 : 2); // calculate new start value for groups
-
-				groupStart += groupCount;
-			}
-		}
-
-		static fromJSON(data) {
-			return new CylinderGeometry(data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength);
-		}
-
-	}
-
-	class ConeGeometry extends CylinderGeometry {
-		constructor(radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
-			super(0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
-			this.type = 'ConeGeometry';
-			this.parameters = {
-				radius: radius,
-				height: height,
-				radialSegments: radialSegments,
-				heightSegments: heightSegments,
-				openEnded: openEnded,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-		}
-
-		static fromJSON(data) {
-			return new ConeGeometry(data.radius, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength);
-		}
-
-	}
-
-	class PolyhedronGeometry extends BufferGeometry {
-		constructor(vertices = [], indices = [], radius = 1, detail = 0) {
-			super();
-			this.type = 'PolyhedronGeometry';
-			this.parameters = {
-				vertices: vertices,
-				indices: indices,
-				radius: radius,
-				detail: detail
-			}; // default buffer data
-
-			const vertexBuffer = [];
-			const uvBuffer = []; // the subdivision creates the vertex buffer data
-
-			subdivide(detail); // all vertices should lie on a conceptual sphere with a given radius
-
-			applyRadius(radius); // finally, create the uv data
-
-			generateUVs(); // build non-indexed geometry
-
-			this.setAttribute('position', new Float32BufferAttribute(vertexBuffer, 3));
-			this.setAttribute('normal', new Float32BufferAttribute(vertexBuffer.slice(), 3));
-			this.setAttribute('uv', new Float32BufferAttribute(uvBuffer, 2));
-
-			if (detail === 0) {
-				this.computeVertexNormals(); // flat normals
-			} else {
-				this.normalizeNormals(); // smooth normals
-			} // helper functions
-
-
-			function subdivide(detail) {
-				const a = new Vector3();
-				const b = new Vector3();
-				const c = new Vector3(); // iterate over all faces and apply a subdivison with the given detail value
-
-				for (let i = 0; i < indices.length; i += 3) {
-					// get the vertices of the face
-					getVertexByIndex(indices[i + 0], a);
-					getVertexByIndex(indices[i + 1], b);
-					getVertexByIndex(indices[i + 2], c); // perform subdivision
-
-					subdivideFace(a, b, c, detail);
-				}
-			}
-
-			function subdivideFace(a, b, c, detail) {
-				const cols = detail + 1; // we use this multidimensional array as a data structure for creating the subdivision
-
-				const v = []; // construct all of the vertices for this subdivision
-
-				for (let i = 0; i <= cols; i++) {
-					v[i] = [];
-					const aj = a.clone().lerp(c, i / cols);
-					const bj = b.clone().lerp(c, i / cols);
-					const rows = cols - i;
-
-					for (let j = 0; j <= rows; j++) {
-						if (j === 0 && i === cols) {
-							v[i][j] = aj;
-						} else {
-							v[i][j] = aj.clone().lerp(bj, j / rows);
-						}
-					}
-				} // construct all of the faces
-
-
-				for (let i = 0; i < cols; i++) {
-					for (let j = 0; j < 2 * (cols - i) - 1; j++) {
-						const k = Math.floor(j / 2);
-
-						if (j % 2 === 0) {
-							pushVertex(v[i][k + 1]);
-							pushVertex(v[i + 1][k]);
-							pushVertex(v[i][k]);
-						} else {
-							pushVertex(v[i][k + 1]);
-							pushVertex(v[i + 1][k + 1]);
-							pushVertex(v[i + 1][k]);
-						}
-					}
-				}
-			}
-
-			function applyRadius(radius) {
-				const vertex = new Vector3(); // iterate over the entire buffer and apply the radius to each vertex
-
-				for (let i = 0; i < vertexBuffer.length; i += 3) {
-					vertex.x = vertexBuffer[i + 0];
-					vertex.y = vertexBuffer[i + 1];
-					vertex.z = vertexBuffer[i + 2];
-					vertex.normalize().multiplyScalar(radius);
-					vertexBuffer[i + 0] = vertex.x;
-					vertexBuffer[i + 1] = vertex.y;
-					vertexBuffer[i + 2] = vertex.z;
-				}
-			}
-
-			function generateUVs() {
-				const vertex = new Vector3();
-
-				for (let i = 0; i < vertexBuffer.length; i += 3) {
-					vertex.x = vertexBuffer[i + 0];
-					vertex.y = vertexBuffer[i + 1];
-					vertex.z = vertexBuffer[i + 2];
-					const u = azimuth(vertex) / 2 / Math.PI + 0.5;
-					const v = inclination(vertex) / Math.PI + 0.5;
-					uvBuffer.push(u, 1 - v);
-				}
-
-				correctUVs();
-				correctSeam();
-			}
-
-			function correctSeam() {
-				// handle case when face straddles the seam, see #3269
-				for (let i = 0; i < uvBuffer.length; i += 6) {
-					// uv data of a single face
-					const x0 = uvBuffer[i + 0];
-					const x1 = uvBuffer[i + 2];
-					const x2 = uvBuffer[i + 4];
-					const max = Math.max(x0, x1, x2);
-					const min = Math.min(x0, x1, x2); // 0.9 is somewhat arbitrary
-
-					if (max > 0.9 && min < 0.1) {
-						if (x0 < 0.2) uvBuffer[i + 0] += 1;
-						if (x1 < 0.2) uvBuffer[i + 2] += 1;
-						if (x2 < 0.2) uvBuffer[i + 4] += 1;
-					}
-				}
-			}
-
-			function pushVertex(vertex) {
-				vertexBuffer.push(vertex.x, vertex.y, vertex.z);
-			}
-
-			function getVertexByIndex(index, vertex) {
-				const stride = index * 3;
-				vertex.x = vertices[stride + 0];
-				vertex.y = vertices[stride + 1];
-				vertex.z = vertices[stride + 2];
-			}
-
-			function correctUVs() {
-				const a = new Vector3();
-				const b = new Vector3();
-				const c = new Vector3();
-				const centroid = new Vector3();
-				const uvA = new Vector2();
-				const uvB = new Vector2();
-				const uvC = new Vector2();
-
-				for (let i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6) {
-					a.set(vertexBuffer[i + 0], vertexBuffer[i + 1], vertexBuffer[i + 2]);
-					b.set(vertexBuffer[i + 3], vertexBuffer[i + 4], vertexBuffer[i + 5]);
-					c.set(vertexBuffer[i + 6], vertexBuffer[i + 7], vertexBuffer[i + 8]);
-					uvA.set(uvBuffer[j + 0], uvBuffer[j + 1]);
-					uvB.set(uvBuffer[j + 2], uvBuffer[j + 3]);
-					uvC.set(uvBuffer[j + 4], uvBuffer[j + 5]);
-					centroid.copy(a).add(b).add(c).divideScalar(3);
-					const azi = azimuth(centroid);
-					correctUV(uvA, j + 0, a, azi);
-					correctUV(uvB, j + 2, b, azi);
-					correctUV(uvC, j + 4, c, azi);
-				}
-			}
-
-			function correctUV(uv, stride, vector, azimuth) {
-				if (azimuth < 0 && uv.x === 1) {
-					uvBuffer[stride] = uv.x - 1;
-				}
-
-				if (vector.x === 0 && vector.z === 0) {
-					uvBuffer[stride] = azimuth / 2 / Math.PI + 0.5;
-				}
-			} // Angle around the Y axis, counter-clockwise when looking from above.
-
-
-			function azimuth(vector) {
-				return Math.atan2(vector.z, -vector.x);
-			} // Angle above the XZ plane.
-
-
-			function inclination(vector) {
-				return Math.atan2(-vector.y, Math.sqrt(vector.x * vector.x + vector.z * vector.z));
-			}
-		}
-
-		static fromJSON(data) {
-			return new PolyhedronGeometry(data.vertices, data.indices, data.radius, data.details);
-		}
-
-	}
-
-	class DodecahedronGeometry extends PolyhedronGeometry {
-		constructor(radius = 1, detail = 0) {
-			const t = (1 + Math.sqrt(5)) / 2;
-			const r = 1 / t;
-			const vertices = [// (±1, ±1, ±1)
-			-1, -1, -1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, // (0, ±1/φ, ±φ)
-			0, -r, -t, 0, -r, t, 0, r, -t, 0, r, t, // (±1/φ, ±φ, 0)
-			-r, -t, 0, -r, t, 0, r, -t, 0, r, t, 0, // (±φ, 0, ±1/φ)
-			-t, 0, -r, t, 0, -r, -t, 0, r, t, 0, r];
-			const indices = [3, 11, 7, 3, 7, 15, 3, 15, 13, 7, 19, 17, 7, 17, 6, 7, 6, 15, 17, 4, 8, 17, 8, 10, 17, 10, 6, 8, 0, 16, 8, 16, 2, 8, 2, 10, 0, 12, 1, 0, 1, 18, 0, 18, 16, 6, 10, 2, 6, 2, 13, 6, 13, 15, 2, 16, 18, 2, 18, 3, 2, 3, 13, 18, 1, 9, 18, 9, 11, 18, 11, 3, 4, 14, 12, 4, 12, 0, 4, 0, 8, 11, 9, 5, 11, 5, 19, 11, 19, 7, 19, 5, 14, 19, 14, 4, 19, 4, 17, 1, 12, 14, 1, 14, 5, 1, 5, 9];
-			super(vertices, indices, radius, detail);
-			this.type = 'DodecahedronGeometry';
-			this.parameters = {
-				radius: radius,
-				detail: detail
-			};
-		}
-
-		static fromJSON(data) {
-			return new DodecahedronGeometry(data.radius, data.detail);
-		}
-
-	}
-
-	const _v0 = new Vector3();
-
-	const _v1$1 = new Vector3();
-
-	const _normal = new Vector3();
-
-	const _triangle = new Triangle();
-
-	class EdgesGeometry extends BufferGeometry {
-		constructor(geometry = null, thresholdAngle = 1) {
-			super();
-			this.type = 'EdgesGeometry';
-			this.parameters = {
-				geometry: geometry,
-				thresholdAngle: thresholdAngle
-			};
-
-			if (geometry !== null) {
-				const precisionPoints = 4;
-				const precision = Math.pow(10, precisionPoints);
-				const thresholdDot = Math.cos(DEG2RAD * thresholdAngle);
-				const indexAttr = geometry.getIndex();
-				const positionAttr = geometry.getAttribute('position');
-				const indexCount = indexAttr ? indexAttr.count : positionAttr.count;
-				const indexArr = [0, 0, 0];
-				const vertKeys = ['a', 'b', 'c'];
-				const hashes = new Array(3);
-				const edgeData = {};
-				const vertices = [];
-
-				for (let i = 0; i < indexCount; i += 3) {
-					if (indexAttr) {
-						indexArr[0] = indexAttr.getX(i);
-						indexArr[1] = indexAttr.getX(i + 1);
-						indexArr[2] = indexAttr.getX(i + 2);
-					} else {
-						indexArr[0] = i;
-						indexArr[1] = i + 1;
-						indexArr[2] = i + 2;
-					}
-
-					const {
-						a,
-						b,
-						c
-					} = _triangle;
-					a.fromBufferAttribute(positionAttr, indexArr[0]);
-					b.fromBufferAttribute(positionAttr, indexArr[1]);
-					c.fromBufferAttribute(positionAttr, indexArr[2]);
-
-					_triangle.getNormal(_normal); // create hashes for the edge from the vertices
-
-
-					hashes[0] = `${Math.round(a.x * precision)},${Math.round(a.y * precision)},${Math.round(a.z * precision)}`;
-					hashes[1] = `${Math.round(b.x * precision)},${Math.round(b.y * precision)},${Math.round(b.z * precision)}`;
-					hashes[2] = `${Math.round(c.x * precision)},${Math.round(c.y * precision)},${Math.round(c.z * precision)}`; // skip degenerate triangles
-
-					if (hashes[0] === hashes[1] || hashes[1] === hashes[2] || hashes[2] === hashes[0]) {
-						continue;
-					} // iterate over every edge
-
-
-					for (let j = 0; j < 3; j++) {
-						// get the first and next vertex making up the edge
-						const jNext = (j + 1) % 3;
-						const vecHash0 = hashes[j];
-						const vecHash1 = hashes[jNext];
-						const v0 = _triangle[vertKeys[j]];
-						const v1 = _triangle[vertKeys[jNext]];
-						const hash = `${vecHash0}_${vecHash1}`;
-						const reverseHash = `${vecHash1}_${vecHash0}`;
-
-						if (reverseHash in edgeData && edgeData[reverseHash]) {
-							// if we found a sibling edge add it into the vertex array if
-							// it meets the angle threshold and delete the edge from the map.
-							if (_normal.dot(edgeData[reverseHash].normal) <= thresholdDot) {
-								vertices.push(v0.x, v0.y, v0.z);
-								vertices.push(v1.x, v1.y, v1.z);
-							}
-
-							edgeData[reverseHash] = null;
-						} else if (!(hash in edgeData)) {
-							// if we've already got an edge here then skip adding a new one
-							edgeData[hash] = {
-								index0: indexArr[j],
-								index1: indexArr[jNext],
-								normal: _normal.clone()
-							};
-						}
-					}
-				} // iterate over all remaining, unmatched edges and add them to the vertex array
-
-
-				for (const key in edgeData) {
-					if (edgeData[key]) {
-						const {
-							index0,
-							index1
-						} = edgeData[key];
-
-						_v0.fromBufferAttribute(positionAttr, index0);
-
-						_v1$1.fromBufferAttribute(positionAttr, index1);
-
-						vertices.push(_v0.x, _v0.y, _v0.z);
-						vertices.push(_v1$1.x, _v1$1.y, _v1$1.z);
-					}
-				}
-
-				this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-			}
-		}
-
-	}
-
 	/**
 	 * Extensible curve object.
 	 *
@@ -24220,6 +23637,727 @@
 
 	}
 
+	class LatheGeometry extends BufferGeometry {
+		constructor(points = [new Vector2(0, 0.5), new Vector2(0.5, 0), new Vector2(0, -0.5)], segments = 12, phiStart = 0, phiLength = Math.PI * 2) {
+			super();
+			this.type = 'LatheGeometry';
+			this.parameters = {
+				points: points,
+				segments: segments,
+				phiStart: phiStart,
+				phiLength: phiLength
+			};
+			segments = Math.floor(segments); // clamp phiLength so it's in range of [ 0, 2PI ]
+
+			phiLength = clamp(phiLength, 0, Math.PI * 2); // buffers
+
+			const indices = [];
+			const vertices = [];
+			const uvs = [];
+			const initNormals = [];
+			const normals = []; // helper variables
+
+			const inverseSegments = 1.0 / segments;
+			const vertex = new Vector3();
+			const uv = new Vector2();
+			const normal = new Vector3();
+			const curNormal = new Vector3();
+			const prevNormal = new Vector3();
+			let dx = 0;
+			let dy = 0; // pre-compute normals for initial "meridian"
+
+			for (let j = 0; j <= points.length - 1; j++) {
+				switch (j) {
+					case 0:
+						// special handling for 1st vertex on path
+						dx = points[j + 1].x - points[j].x;
+						dy = points[j + 1].y - points[j].y;
+						normal.x = dy * 1.0;
+						normal.y = -dx;
+						normal.z = dy * 0.0;
+						prevNormal.copy(normal);
+						normal.normalize();
+						initNormals.push(normal.x, normal.y, normal.z);
+						break;
+
+					case points.length - 1:
+						// special handling for last Vertex on path
+						initNormals.push(prevNormal.x, prevNormal.y, prevNormal.z);
+						break;
+
+					default:
+						// default handling for all vertices in between
+						dx = points[j + 1].x - points[j].x;
+						dy = points[j + 1].y - points[j].y;
+						normal.x = dy * 1.0;
+						normal.y = -dx;
+						normal.z = dy * 0.0;
+						curNormal.copy(normal);
+						normal.x += prevNormal.x;
+						normal.y += prevNormal.y;
+						normal.z += prevNormal.z;
+						normal.normalize();
+						initNormals.push(normal.x, normal.y, normal.z);
+						prevNormal.copy(curNormal);
+				}
+			} // generate vertices, uvs and normals
+
+
+			for (let i = 0; i <= segments; i++) {
+				const phi = phiStart + i * inverseSegments * phiLength;
+				const sin = Math.sin(phi);
+				const cos = Math.cos(phi);
+
+				for (let j = 0; j <= points.length - 1; j++) {
+					// vertex
+					vertex.x = points[j].x * sin;
+					vertex.y = points[j].y;
+					vertex.z = points[j].x * cos;
+					vertices.push(vertex.x, vertex.y, vertex.z); // uv
+
+					uv.x = i / segments;
+					uv.y = j / (points.length - 1);
+					uvs.push(uv.x, uv.y); // normal
+
+					const x = initNormals[3 * j + 0] * sin;
+					const y = initNormals[3 * j + 1];
+					const z = initNormals[3 * j + 0] * cos;
+					normals.push(x, y, z);
+				}
+			} // indices
+
+
+			for (let i = 0; i < segments; i++) {
+				for (let j = 0; j < points.length - 1; j++) {
+					const base = j + i * points.length;
+					const a = base;
+					const b = base + points.length;
+					const c = base + points.length + 1;
+					const d = base + 1; // faces
+
+					indices.push(a, b, d);
+					indices.push(c, d, b);
+				}
+			} // build geometry
+
+
+			this.setIndex(indices);
+			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+		}
+
+		static fromJSON(data) {
+			return new LatheGeometry(data.points, data.segments, data.phiStart, data.phiLength);
+		}
+
+	}
+
+	class CapsuleGeometry extends LatheGeometry {
+		constructor(radius = 1, length = 1, capSegments = 4, radialSegments = 8) {
+			const path = new Path();
+			path.absarc(0, 0, radius, Math.PI * 1.5, 0);
+			path.absarc(0, length, radius, 0, Math.PI * 0.5);
+			super(path.getPoints(capSegments), radialSegments);
+			this.translate(0, -length / 2, 0);
+			this.type = 'CapsuleGeometry';
+			this.parameters = {
+				radius: radius,
+				height: length,
+				capSegments: capSegments,
+				radialSegments: radialSegments
+			};
+		}
+
+		static fromJSON(data) {
+			return new CapsuleGeometry(data.radius, data.length, data.capSegments, data.radialSegments);
+		}
+
+	}
+
+	class CircleGeometry extends BufferGeometry {
+		constructor(radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2) {
+			super();
+			this.type = 'CircleGeometry';
+			this.parameters = {
+				radius: radius,
+				segments: segments,
+				thetaStart: thetaStart,
+				thetaLength: thetaLength
+			};
+			segments = Math.max(3, segments); // buffers
+
+			const indices = [];
+			const vertices = [];
+			const normals = [];
+			const uvs = []; // helper variables
+
+			const vertex = new Vector3();
+			const uv = new Vector2(); // center point
+
+			vertices.push(0, 0, 0);
+			normals.push(0, 0, 1);
+			uvs.push(0.5, 0.5);
+
+			for (let s = 0, i = 3; s <= segments; s++, i += 3) {
+				const segment = thetaStart + s / segments * thetaLength; // vertex
+
+				vertex.x = radius * Math.cos(segment);
+				vertex.y = radius * Math.sin(segment);
+				vertices.push(vertex.x, vertex.y, vertex.z); // normal
+
+				normals.push(0, 0, 1); // uvs
+
+				uv.x = (vertices[i] / radius + 1) / 2;
+				uv.y = (vertices[i + 1] / radius + 1) / 2;
+				uvs.push(uv.x, uv.y);
+			} // indices
+
+
+			for (let i = 1; i <= segments; i++) {
+				indices.push(i, i + 1, 0);
+			} // build geometry
+
+
+			this.setIndex(indices);
+			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+		}
+
+		static fromJSON(data) {
+			return new CircleGeometry(data.radius, data.segments, data.thetaStart, data.thetaLength);
+		}
+
+	}
+
+	class CylinderGeometry extends BufferGeometry {
+		constructor(radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
+			super();
+			this.type = 'CylinderGeometry';
+			this.parameters = {
+				radiusTop: radiusTop,
+				radiusBottom: radiusBottom,
+				height: height,
+				radialSegments: radialSegments,
+				heightSegments: heightSegments,
+				openEnded: openEnded,
+				thetaStart: thetaStart,
+				thetaLength: thetaLength
+			};
+			const scope = this;
+			radialSegments = Math.floor(radialSegments);
+			heightSegments = Math.floor(heightSegments); // buffers
+
+			const indices = [];
+			const vertices = [];
+			const normals = [];
+			const uvs = []; // helper variables
+
+			let index = 0;
+			const indexArray = [];
+			const halfHeight = height / 2;
+			let groupStart = 0; // generate geometry
+
+			generateTorso();
+
+			if (openEnded === false) {
+				if (radiusTop > 0) generateCap(true);
+				if (radiusBottom > 0) generateCap(false);
+			} // build geometry
+
+
+			this.setIndex(indices);
+			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+
+			function generateTorso() {
+				const normal = new Vector3();
+				const vertex = new Vector3();
+				let groupCount = 0; // this will be used to calculate the normal
+
+				const slope = (radiusBottom - radiusTop) / height; // generate vertices, normals and uvs
+
+				for (let y = 0; y <= heightSegments; y++) {
+					const indexRow = [];
+					const v = y / heightSegments; // calculate the radius of the current row
+
+					const radius = v * (radiusBottom - radiusTop) + radiusTop;
+
+					for (let x = 0; x <= radialSegments; x++) {
+						const u = x / radialSegments;
+						const theta = u * thetaLength + thetaStart;
+						const sinTheta = Math.sin(theta);
+						const cosTheta = Math.cos(theta); // vertex
+
+						vertex.x = radius * sinTheta;
+						vertex.y = -v * height + halfHeight;
+						vertex.z = radius * cosTheta;
+						vertices.push(vertex.x, vertex.y, vertex.z); // normal
+
+						normal.set(sinTheta, slope, cosTheta).normalize();
+						normals.push(normal.x, normal.y, normal.z); // uv
+
+						uvs.push(u, 1 - v); // save index of vertex in respective row
+
+						indexRow.push(index++);
+					} // now save vertices of the row in our index array
+
+
+					indexArray.push(indexRow);
+				} // generate indices
+
+
+				for (let x = 0; x < radialSegments; x++) {
+					for (let y = 0; y < heightSegments; y++) {
+						// we use the index array to access the correct indices
+						const a = indexArray[y][x];
+						const b = indexArray[y + 1][x];
+						const c = indexArray[y + 1][x + 1];
+						const d = indexArray[y][x + 1]; // faces
+
+						indices.push(a, b, d);
+						indices.push(b, c, d); // update group counter
+
+						groupCount += 6;
+					}
+				} // add a group to the geometry. this will ensure multi material support
+
+
+				scope.addGroup(groupStart, groupCount, 0); // calculate new start value for groups
+
+				groupStart += groupCount;
+			}
+
+			function generateCap(top) {
+				// save the index of the first center vertex
+				const centerIndexStart = index;
+				const uv = new Vector2();
+				const vertex = new Vector3();
+				let groupCount = 0;
+				const radius = top === true ? radiusTop : radiusBottom;
+				const sign = top === true ? 1 : -1; // first we generate the center vertex data of the cap.
+				// because the geometry needs one set of uvs per face,
+				// we must generate a center vertex per face/segment
+
+				for (let x = 1; x <= radialSegments; x++) {
+					// vertex
+					vertices.push(0, halfHeight * sign, 0); // normal
+
+					normals.push(0, sign, 0); // uv
+
+					uvs.push(0.5, 0.5); // increase index
+
+					index++;
+				} // save the index of the last center vertex
+
+
+				const centerIndexEnd = index; // now we generate the surrounding vertices, normals and uvs
+
+				for (let x = 0; x <= radialSegments; x++) {
+					const u = x / radialSegments;
+					const theta = u * thetaLength + thetaStart;
+					const cosTheta = Math.cos(theta);
+					const sinTheta = Math.sin(theta); // vertex
+
+					vertex.x = radius * sinTheta;
+					vertex.y = halfHeight * sign;
+					vertex.z = radius * cosTheta;
+					vertices.push(vertex.x, vertex.y, vertex.z); // normal
+
+					normals.push(0, sign, 0); // uv
+
+					uv.x = cosTheta * 0.5 + 0.5;
+					uv.y = sinTheta * 0.5 * sign + 0.5;
+					uvs.push(uv.x, uv.y); // increase index
+
+					index++;
+				} // generate indices
+
+
+				for (let x = 0; x < radialSegments; x++) {
+					const c = centerIndexStart + x;
+					const i = centerIndexEnd + x;
+
+					if (top === true) {
+						// face top
+						indices.push(i, i + 1, c);
+					} else {
+						// face bottom
+						indices.push(i + 1, i, c);
+					}
+
+					groupCount += 3;
+				} // add a group to the geometry. this will ensure multi material support
+
+
+				scope.addGroup(groupStart, groupCount, top === true ? 1 : 2); // calculate new start value for groups
+
+				groupStart += groupCount;
+			}
+		}
+
+		static fromJSON(data) {
+			return new CylinderGeometry(data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength);
+		}
+
+	}
+
+	class ConeGeometry extends CylinderGeometry {
+		constructor(radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
+			super(0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
+			this.type = 'ConeGeometry';
+			this.parameters = {
+				radius: radius,
+				height: height,
+				radialSegments: radialSegments,
+				heightSegments: heightSegments,
+				openEnded: openEnded,
+				thetaStart: thetaStart,
+				thetaLength: thetaLength
+			};
+		}
+
+		static fromJSON(data) {
+			return new ConeGeometry(data.radius, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength);
+		}
+
+	}
+
+	class PolyhedronGeometry extends BufferGeometry {
+		constructor(vertices = [], indices = [], radius = 1, detail = 0) {
+			super();
+			this.type = 'PolyhedronGeometry';
+			this.parameters = {
+				vertices: vertices,
+				indices: indices,
+				radius: radius,
+				detail: detail
+			}; // default buffer data
+
+			const vertexBuffer = [];
+			const uvBuffer = []; // the subdivision creates the vertex buffer data
+
+			subdivide(detail); // all vertices should lie on a conceptual sphere with a given radius
+
+			applyRadius(radius); // finally, create the uv data
+
+			generateUVs(); // build non-indexed geometry
+
+			this.setAttribute('position', new Float32BufferAttribute(vertexBuffer, 3));
+			this.setAttribute('normal', new Float32BufferAttribute(vertexBuffer.slice(), 3));
+			this.setAttribute('uv', new Float32BufferAttribute(uvBuffer, 2));
+
+			if (detail === 0) {
+				this.computeVertexNormals(); // flat normals
+			} else {
+				this.normalizeNormals(); // smooth normals
+			} // helper functions
+
+
+			function subdivide(detail) {
+				const a = new Vector3();
+				const b = new Vector3();
+				const c = new Vector3(); // iterate over all faces and apply a subdivison with the given detail value
+
+				for (let i = 0; i < indices.length; i += 3) {
+					// get the vertices of the face
+					getVertexByIndex(indices[i + 0], a);
+					getVertexByIndex(indices[i + 1], b);
+					getVertexByIndex(indices[i + 2], c); // perform subdivision
+
+					subdivideFace(a, b, c, detail);
+				}
+			}
+
+			function subdivideFace(a, b, c, detail) {
+				const cols = detail + 1; // we use this multidimensional array as a data structure for creating the subdivision
+
+				const v = []; // construct all of the vertices for this subdivision
+
+				for (let i = 0; i <= cols; i++) {
+					v[i] = [];
+					const aj = a.clone().lerp(c, i / cols);
+					const bj = b.clone().lerp(c, i / cols);
+					const rows = cols - i;
+
+					for (let j = 0; j <= rows; j++) {
+						if (j === 0 && i === cols) {
+							v[i][j] = aj;
+						} else {
+							v[i][j] = aj.clone().lerp(bj, j / rows);
+						}
+					}
+				} // construct all of the faces
+
+
+				for (let i = 0; i < cols; i++) {
+					for (let j = 0; j < 2 * (cols - i) - 1; j++) {
+						const k = Math.floor(j / 2);
+
+						if (j % 2 === 0) {
+							pushVertex(v[i][k + 1]);
+							pushVertex(v[i + 1][k]);
+							pushVertex(v[i][k]);
+						} else {
+							pushVertex(v[i][k + 1]);
+							pushVertex(v[i + 1][k + 1]);
+							pushVertex(v[i + 1][k]);
+						}
+					}
+				}
+			}
+
+			function applyRadius(radius) {
+				const vertex = new Vector3(); // iterate over the entire buffer and apply the radius to each vertex
+
+				for (let i = 0; i < vertexBuffer.length; i += 3) {
+					vertex.x = vertexBuffer[i + 0];
+					vertex.y = vertexBuffer[i + 1];
+					vertex.z = vertexBuffer[i + 2];
+					vertex.normalize().multiplyScalar(radius);
+					vertexBuffer[i + 0] = vertex.x;
+					vertexBuffer[i + 1] = vertex.y;
+					vertexBuffer[i + 2] = vertex.z;
+				}
+			}
+
+			function generateUVs() {
+				const vertex = new Vector3();
+
+				for (let i = 0; i < vertexBuffer.length; i += 3) {
+					vertex.x = vertexBuffer[i + 0];
+					vertex.y = vertexBuffer[i + 1];
+					vertex.z = vertexBuffer[i + 2];
+					const u = azimuth(vertex) / 2 / Math.PI + 0.5;
+					const v = inclination(vertex) / Math.PI + 0.5;
+					uvBuffer.push(u, 1 - v);
+				}
+
+				correctUVs();
+				correctSeam();
+			}
+
+			function correctSeam() {
+				// handle case when face straddles the seam, see #3269
+				for (let i = 0; i < uvBuffer.length; i += 6) {
+					// uv data of a single face
+					const x0 = uvBuffer[i + 0];
+					const x1 = uvBuffer[i + 2];
+					const x2 = uvBuffer[i + 4];
+					const max = Math.max(x0, x1, x2);
+					const min = Math.min(x0, x1, x2); // 0.9 is somewhat arbitrary
+
+					if (max > 0.9 && min < 0.1) {
+						if (x0 < 0.2) uvBuffer[i + 0] += 1;
+						if (x1 < 0.2) uvBuffer[i + 2] += 1;
+						if (x2 < 0.2) uvBuffer[i + 4] += 1;
+					}
+				}
+			}
+
+			function pushVertex(vertex) {
+				vertexBuffer.push(vertex.x, vertex.y, vertex.z);
+			}
+
+			function getVertexByIndex(index, vertex) {
+				const stride = index * 3;
+				vertex.x = vertices[stride + 0];
+				vertex.y = vertices[stride + 1];
+				vertex.z = vertices[stride + 2];
+			}
+
+			function correctUVs() {
+				const a = new Vector3();
+				const b = new Vector3();
+				const c = new Vector3();
+				const centroid = new Vector3();
+				const uvA = new Vector2();
+				const uvB = new Vector2();
+				const uvC = new Vector2();
+
+				for (let i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6) {
+					a.set(vertexBuffer[i + 0], vertexBuffer[i + 1], vertexBuffer[i + 2]);
+					b.set(vertexBuffer[i + 3], vertexBuffer[i + 4], vertexBuffer[i + 5]);
+					c.set(vertexBuffer[i + 6], vertexBuffer[i + 7], vertexBuffer[i + 8]);
+					uvA.set(uvBuffer[j + 0], uvBuffer[j + 1]);
+					uvB.set(uvBuffer[j + 2], uvBuffer[j + 3]);
+					uvC.set(uvBuffer[j + 4], uvBuffer[j + 5]);
+					centroid.copy(a).add(b).add(c).divideScalar(3);
+					const azi = azimuth(centroid);
+					correctUV(uvA, j + 0, a, azi);
+					correctUV(uvB, j + 2, b, azi);
+					correctUV(uvC, j + 4, c, azi);
+				}
+			}
+
+			function correctUV(uv, stride, vector, azimuth) {
+				if (azimuth < 0 && uv.x === 1) {
+					uvBuffer[stride] = uv.x - 1;
+				}
+
+				if (vector.x === 0 && vector.z === 0) {
+					uvBuffer[stride] = azimuth / 2 / Math.PI + 0.5;
+				}
+			} // Angle around the Y axis, counter-clockwise when looking from above.
+
+
+			function azimuth(vector) {
+				return Math.atan2(vector.z, -vector.x);
+			} // Angle above the XZ plane.
+
+
+			function inclination(vector) {
+				return Math.atan2(-vector.y, Math.sqrt(vector.x * vector.x + vector.z * vector.z));
+			}
+		}
+
+		static fromJSON(data) {
+			return new PolyhedronGeometry(data.vertices, data.indices, data.radius, data.details);
+		}
+
+	}
+
+	class DodecahedronGeometry extends PolyhedronGeometry {
+		constructor(radius = 1, detail = 0) {
+			const t = (1 + Math.sqrt(5)) / 2;
+			const r = 1 / t;
+			const vertices = [// (±1, ±1, ±1)
+			-1, -1, -1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, // (0, ±1/φ, ±φ)
+			0, -r, -t, 0, -r, t, 0, r, -t, 0, r, t, // (±1/φ, ±φ, 0)
+			-r, -t, 0, -r, t, 0, r, -t, 0, r, t, 0, // (±φ, 0, ±1/φ)
+			-t, 0, -r, t, 0, -r, -t, 0, r, t, 0, r];
+			const indices = [3, 11, 7, 3, 7, 15, 3, 15, 13, 7, 19, 17, 7, 17, 6, 7, 6, 15, 17, 4, 8, 17, 8, 10, 17, 10, 6, 8, 0, 16, 8, 16, 2, 8, 2, 10, 0, 12, 1, 0, 1, 18, 0, 18, 16, 6, 10, 2, 6, 2, 13, 6, 13, 15, 2, 16, 18, 2, 18, 3, 2, 3, 13, 18, 1, 9, 18, 9, 11, 18, 11, 3, 4, 14, 12, 4, 12, 0, 4, 0, 8, 11, 9, 5, 11, 5, 19, 11, 19, 7, 19, 5, 14, 19, 14, 4, 19, 4, 17, 1, 12, 14, 1, 14, 5, 1, 5, 9];
+			super(vertices, indices, radius, detail);
+			this.type = 'DodecahedronGeometry';
+			this.parameters = {
+				radius: radius,
+				detail: detail
+			};
+		}
+
+		static fromJSON(data) {
+			return new DodecahedronGeometry(data.radius, data.detail);
+		}
+
+	}
+
+	const _v0 = new Vector3();
+
+	const _v1$1 = new Vector3();
+
+	const _normal = new Vector3();
+
+	const _triangle = new Triangle();
+
+	class EdgesGeometry extends BufferGeometry {
+		constructor(geometry = null, thresholdAngle = 1) {
+			super();
+			this.type = 'EdgesGeometry';
+			this.parameters = {
+				geometry: geometry,
+				thresholdAngle: thresholdAngle
+			};
+
+			if (geometry !== null) {
+				const precisionPoints = 4;
+				const precision = Math.pow(10, precisionPoints);
+				const thresholdDot = Math.cos(DEG2RAD * thresholdAngle);
+				const indexAttr = geometry.getIndex();
+				const positionAttr = geometry.getAttribute('position');
+				const indexCount = indexAttr ? indexAttr.count : positionAttr.count;
+				const indexArr = [0, 0, 0];
+				const vertKeys = ['a', 'b', 'c'];
+				const hashes = new Array(3);
+				const edgeData = {};
+				const vertices = [];
+
+				for (let i = 0; i < indexCount; i += 3) {
+					if (indexAttr) {
+						indexArr[0] = indexAttr.getX(i);
+						indexArr[1] = indexAttr.getX(i + 1);
+						indexArr[2] = indexAttr.getX(i + 2);
+					} else {
+						indexArr[0] = i;
+						indexArr[1] = i + 1;
+						indexArr[2] = i + 2;
+					}
+
+					const {
+						a,
+						b,
+						c
+					} = _triangle;
+					a.fromBufferAttribute(positionAttr, indexArr[0]);
+					b.fromBufferAttribute(positionAttr, indexArr[1]);
+					c.fromBufferAttribute(positionAttr, indexArr[2]);
+
+					_triangle.getNormal(_normal); // create hashes for the edge from the vertices
+
+
+					hashes[0] = `${Math.round(a.x * precision)},${Math.round(a.y * precision)},${Math.round(a.z * precision)}`;
+					hashes[1] = `${Math.round(b.x * precision)},${Math.round(b.y * precision)},${Math.round(b.z * precision)}`;
+					hashes[2] = `${Math.round(c.x * precision)},${Math.round(c.y * precision)},${Math.round(c.z * precision)}`; // skip degenerate triangles
+
+					if (hashes[0] === hashes[1] || hashes[1] === hashes[2] || hashes[2] === hashes[0]) {
+						continue;
+					} // iterate over every edge
+
+
+					for (let j = 0; j < 3; j++) {
+						// get the first and next vertex making up the edge
+						const jNext = (j + 1) % 3;
+						const vecHash0 = hashes[j];
+						const vecHash1 = hashes[jNext];
+						const v0 = _triangle[vertKeys[j]];
+						const v1 = _triangle[vertKeys[jNext]];
+						const hash = `${vecHash0}_${vecHash1}`;
+						const reverseHash = `${vecHash1}_${vecHash0}`;
+
+						if (reverseHash in edgeData && edgeData[reverseHash]) {
+							// if we found a sibling edge add it into the vertex array if
+							// it meets the angle threshold and delete the edge from the map.
+							if (_normal.dot(edgeData[reverseHash].normal) <= thresholdDot) {
+								vertices.push(v0.x, v0.y, v0.z);
+								vertices.push(v1.x, v1.y, v1.z);
+							}
+
+							edgeData[reverseHash] = null;
+						} else if (!(hash in edgeData)) {
+							// if we've already got an edge here then skip adding a new one
+							edgeData[hash] = {
+								index0: indexArr[j],
+								index1: indexArr[jNext],
+								normal: _normal.clone()
+							};
+						}
+					}
+				} // iterate over all remaining, unmatched edges and add them to the vertex array
+
+
+				for (const key in edgeData) {
+					if (edgeData[key]) {
+						const {
+							index0,
+							index1
+						} = edgeData[key];
+
+						_v0.fromBufferAttribute(positionAttr, index0);
+
+						_v1$1.fromBufferAttribute(positionAttr, index1);
+
+						vertices.push(_v0.x, _v0.y, _v0.z);
+						vertices.push(_v1$1.x, _v1$1.y, _v1$1.z);
+					}
+				}
+
+				this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+			}
+		}
+
+	}
+
 	class Shape extends Path {
 		constructor(points) {
 			super(points);
@@ -25478,122 +25616,6 @@
 
 	}
 
-	class LatheGeometry extends BufferGeometry {
-		constructor(points = [new Vector2(0, 0.5), new Vector2(0.5, 0), new Vector2(0, -0.5)], segments = 12, phiStart = 0, phiLength = Math.PI * 2) {
-			super();
-			this.type = 'LatheGeometry';
-			this.parameters = {
-				points: points,
-				segments: segments,
-				phiStart: phiStart,
-				phiLength: phiLength
-			};
-			segments = Math.floor(segments); // clamp phiLength so it's in range of [ 0, 2PI ]
-
-			phiLength = clamp(phiLength, 0, Math.PI * 2); // buffers
-
-			const indices = [];
-			const vertices = [];
-			const uvs = [];
-			const initNormals = [];
-			const normals = []; // helper variables
-
-			const inverseSegments = 1.0 / segments;
-			const vertex = new Vector3();
-			const uv = new Vector2();
-			const normal = new Vector3();
-			const curNormal = new Vector3();
-			const prevNormal = new Vector3();
-			let dx = 0;
-			let dy = 0; // pre-compute normals for initial "meridian"
-
-			for (let j = 0; j <= points.length - 1; j++) {
-				switch (j) {
-					case 0:
-						// special handling for 1st vertex on path
-						dx = points[j + 1].x - points[j].x;
-						dy = points[j + 1].y - points[j].y;
-						normal.x = dy * 1.0;
-						normal.y = -dx;
-						normal.z = dy * 0.0;
-						prevNormal.copy(normal);
-						normal.normalize();
-						initNormals.push(normal.x, normal.y, normal.z);
-						break;
-
-					case points.length - 1:
-						// special handling for last Vertex on path
-						initNormals.push(prevNormal.x, prevNormal.y, prevNormal.z);
-						break;
-
-					default:
-						// default handling for all vertices in between
-						dx = points[j + 1].x - points[j].x;
-						dy = points[j + 1].y - points[j].y;
-						normal.x = dy * 1.0;
-						normal.y = -dx;
-						normal.z = dy * 0.0;
-						curNormal.copy(normal);
-						normal.x += prevNormal.x;
-						normal.y += prevNormal.y;
-						normal.z += prevNormal.z;
-						normal.normalize();
-						initNormals.push(normal.x, normal.y, normal.z);
-						prevNormal.copy(curNormal);
-				}
-			} // generate vertices, uvs and normals
-
-
-			for (let i = 0; i <= segments; i++) {
-				const phi = phiStart + i * inverseSegments * phiLength;
-				const sin = Math.sin(phi);
-				const cos = Math.cos(phi);
-
-				for (let j = 0; j <= points.length - 1; j++) {
-					// vertex
-					vertex.x = points[j].x * sin;
-					vertex.y = points[j].y;
-					vertex.z = points[j].x * cos;
-					vertices.push(vertex.x, vertex.y, vertex.z); // uv
-
-					uv.x = i / segments;
-					uv.y = j / (points.length - 1);
-					uvs.push(uv.x, uv.y); // normal
-
-					const x = initNormals[3 * j + 0] * sin;
-					const y = initNormals[3 * j + 1];
-					const z = initNormals[3 * j + 0] * cos;
-					normals.push(x, y, z);
-				}
-			} // indices
-
-
-			for (let i = 0; i < segments; i++) {
-				for (let j = 0; j < points.length - 1; j++) {
-					const base = j + i * points.length;
-					const a = base;
-					const b = base + points.length;
-					const c = base + points.length + 1;
-					const d = base + 1; // faces
-
-					indices.push(a, b, d);
-					indices.push(c, d, b);
-				}
-			} // build geometry
-
-
-			this.setIndex(indices);
-			this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-			this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-			this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-		}
-
-		static fromJSON(data) {
-			return new LatheGeometry(data.points, data.segments, data.phiStart, data.phiLength);
-		}
-
-	}
-
 	class OctahedronGeometry extends PolyhedronGeometry {
 		constructor(radius = 1, detail = 0) {
 			const vertices = [1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1];
@@ -26281,6 +26303,8 @@
 		__proto__: null,
 		BoxGeometry: BoxGeometry,
 		BoxBufferGeometry: BoxGeometry,
+		CapsuleGeometry: CapsuleGeometry,
+		CapsuleBufferGeometry: CapsuleGeometry,
 		CircleGeometry: CircleGeometry,
 		CircleBufferGeometry: CircleGeometry,
 		ConeGeometry: ConeGeometry,
@@ -36560,6 +36584,8 @@
 	exports.CameraHelper = CameraHelper;
 	exports.CanvasRenderer = CanvasRenderer;
 	exports.CanvasTexture = CanvasTexture;
+	exports.CapsuleBufferGeometry = CapsuleGeometry;
+	exports.CapsuleGeometry = CapsuleGeometry;
 	exports.CatmullRomCurve3 = CatmullRomCurve3;
 	exports.CineonToneMapping = CineonToneMapping;
 	exports.CircleBufferGeometry = CircleGeometry;
@@ -36958,3 +36984,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiIn0=
