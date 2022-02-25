@@ -83,7 +83,7 @@ import './src/extras/curves/SplineCurve.tests.js';
 
 //src/geometries
 import './src/geometries/BoxGeometry.tests.js';
-import './src/geometries/CapsuleGeometry.test';
+import './src/geometries/CapsuleGeometry.tests.js';
 import './src/geometries/CircleGeometry.tests.js';
 import './src/geometries/ConeGeometry.tests.js';
 import './src/geometries/CylinderGeometry.tests.js';
