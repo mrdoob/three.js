@@ -133,13 +133,17 @@ function randFloatSpread( range ) {
 // Deterministic pseudo-random float in the interval [ 0, 1 ]
 function seededRandom( s ) {
 
-	if ( s !== undefined ) _seed = s % 2147483647;
+	if ( s !== undefined ) _seed = s;
 
-	// Park-Miller algorithm
+	// Mulberry32 generator
 
-	_seed = _seed * 16807 % 2147483647;
+	let t = _seed += 0x6D2B79F5;
 
-	return ( _seed - 1 ) / 2147483646;
+	t = Math.imul( t ^ t >>> 15, t | 1 );
+
+	t ^= t + Math.imul( t ^ t >>> 7, t | 61 );
+
+	return ( ( t ^ t >>> 14 ) >>> 0 ) / 4294967296;
 
 }
 
