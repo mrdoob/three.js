@@ -41,6 +41,7 @@
 			import {
 				BoxGeometry,
 				BufferGeometry,
+				CapsuleGeometry,
 				CircleGeometry,
 				Color,
 				ConeGeometry,
@@ -160,6 +161,34 @@
 					folder.add( data, 'widthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'heightSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
 					folder.add( data, 'depthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
+
+					generateGeometry();
+
+				},
+
+				CapsuleGeometry: function ( mesh ) {
+
+					const data = {
+						radius: 5,
+						length: 5,
+						capSegments: 10,
+						heightSegments: 20
+					};
+
+					function generateGeometry() {
+
+						updateGroupGeometry( mesh,
+							new CapsuleGeometry( data.radius, data.length, data.capSegments, data.heightSegments ),
+						);
+
+					}
+
+					const folder = gui.addFolder( 'THREE.CapsuleGeometry' );
+
+					folder.add( data, 'radius', 1, 30 ).onChange( generateGeometry );
+					folder.add( data, 'length', 1, 30 ).onChange( generateGeometry );
+					folder.add( data, 'capSegments', 1, 32 ).step( 1 ).onChange( generateGeometry );
+					folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 
 					generateGeometry();
 

@@ -134,6 +134,7 @@
 
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/en/geometries/CapsuleGeometry",
 				"CircleGeometry": "api/en/geometries/CircleGeometry",
 				"ConeGeometry": "api/en/geometries/ConeGeometry",
 				"CylinderGeometry": "api/en/geometries/CylinderGeometry",
