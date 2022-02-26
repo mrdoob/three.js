@@ -25,7 +25,7 @@ import ColorSpaceNode from 'three-nodes/display/ColorSpaceNode.js';
 import LightContextNode from 'three-nodes/lights/LightContextNode.js';
 import OperatorNode from 'three-nodes/math/OperatorNode.js';
 import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
-import { add, join, nodeObject } from 'three-nodes/ShaderNode.js';
+import { vec3, add, join, nodeObject } from 'three-nodes/ShaderNode.js';
 import { getRoughness } from 'three-nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
@@ -266,7 +266,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			// OUTGOING LIGHT
 
-			let outgoingLightNode = nodeObject( outputNode ).xyz;
+			let outgoingLightNode = vec3( outputNode );
 
 			// EMISSIVE
 
@@ -278,7 +278,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			outputNode = join( outgoingLightNode.xyz, nodeObject( diffuseColorNode ).w );
+			outputNode = join( vec3( outgoingLightNode ), nodeObject( diffuseColorNode ).w );
 
 			// OUTPUT
 
