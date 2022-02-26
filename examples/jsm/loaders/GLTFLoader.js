@@ -2968,10 +2968,10 @@ class GLTFParser {
 
 			texture.userData.mimeType = sourceDef.mimeType;
 
-			if ( !sourceDef.mimeType ) {
+			if ( ! sourceDef.mimeType ) {
 
-				const ext = sourceDef.uri.split('.').pop().toLowerCase();
-				texture.userData.mimeType = ext.includes('jp') ? 'image/jpeg' : ext === 'webp' ? 'image/webp' : 'image/png';
+				const ext = sourceDef.uri.split( '.' ).pop().toLowerCase();
+				texture.userData.mimeType = ext.includes( 'jp' ) ? 'image/jpeg' : ext === 'webp' ? 'image/webp' : 'image/png';
 
 			}
 
