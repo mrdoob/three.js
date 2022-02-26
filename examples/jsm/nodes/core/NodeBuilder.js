@@ -76,6 +76,12 @@ class NodeBuilder {
 
 	}
 
+	setHashNode( node, hash ) {
+
+		this.hashNodes[ hash ] = node;
+
+	}
+
 	addNode( node ) {
 
 		if ( this.nodes.indexOf( node ) === - 1 ) {
@@ -90,7 +96,7 @@ class NodeBuilder {
 
 			this.nodes.push( node );
 
-			this.hashNodes[ node.getHash( this ) ] = node;
+			this.setHashNode( node, node.getHash( this ) );
 
 		}
 
