@@ -67,6 +67,9 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
+			// Use PreviewEditor in WebGL for now
+			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+
 			let stats;
 			let camera, scene, renderer;
 			let model;
@@ -146,7 +149,7 @@
 
 					const node = e.node;
 
-					if ( node.value !== null && node.value.isMaterial === true ) {
+					if ( node.value !== null && node.value.isMeshStandardNodeMaterial === true ) {
 
 						const material = node.value;
 
@@ -214,6 +217,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				nodeFrame.update();
 
 				render();
 

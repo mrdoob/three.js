@@ -9,6 +9,8 @@ class PointsNodeMaterial extends NodeMaterial {
 
 		super();
 
+		this.transparent = true;
+
 		this.colorNode = null;
 		this.opacityNode = null;
 
@@ -45,6 +47,6 @@ class PointsNodeMaterial extends NodeMaterial {
 
 }
 
-PointsNodeMaterial.prototype.isNodeMaterial = true;
+PointsNodeMaterial.prototype.isPointsNodeMaterial = true;
 
 export default PointsNodeMaterial;

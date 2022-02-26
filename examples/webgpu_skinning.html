@@ -28,6 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
@@ -80,7 +81,7 @@
 
 						if ( child.isMesh ) {
 
-							child.material = new THREE.MeshStandardMaterial();
+							child.material = new Nodes.MeshStandardNodeMaterial();
 							child.material.lightNode = lightNode;
 
 						}

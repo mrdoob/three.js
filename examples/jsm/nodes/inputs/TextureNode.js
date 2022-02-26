@@ -13,6 +13,12 @@ class TextureNode extends InputNode {
 
 	}
 
+	getInputHash( /*builder*/ ) {
+
+		return this.value.uuid;
+
+	}
+
 	generate( builder, output ) {
 
 		const texture = this.value;
