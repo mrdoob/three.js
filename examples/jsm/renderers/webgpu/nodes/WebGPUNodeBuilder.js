@@ -60,6 +60,16 @@ fn mod( x : f32, y : f32 ) -> f32 {
 
 }
 ` ),
+
+	smoothstep: new CodeNode( `
+fn smoothstep( low : f32, high : f32, x : f32 ) -> f32 {
+
+	let t = clamp( ( x - low ) / ( high - low ), 0.0, 1.0 );
+
+	return t * t * ( 3.0 - 2.0 * t );
+
+}
+` ),
 	repeatWrapping: new CodeNode( `
 fn repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
 
