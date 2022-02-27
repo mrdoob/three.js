@@ -1,6 +1,7 @@
 // core
 import PropertyNode from './core/PropertyNode.js';
 import VarNode from './core/VarNode.js';
+import AttributeNode from './core/AttributeNode.js';
 
 // inputs
 import ColorNode from './inputs/ColorNode.js';
@@ -9,10 +10,14 @@ import IntNode from './inputs/IntNode.js';
 import Vector2Node from './inputs/Vector2Node.js';
 import Vector3Node from './inputs/Vector3Node.js';
 import Vector4Node from './inputs/Vector4Node.js';
+import Matrix3Node from './inputs/Matrix3Node.js';
+import Matrix4Node from './inputs/Matrix4Node.js';
+import TextureNode from './inputs/TextureNode.js';
 
 // accessors
 import PositionNode from './accessors/PositionNode.js';
 import NormalNode from './accessors/NormalNode.js';
+import UVNode from './accessors/UVNode.js';
 
 // math
 import OperatorNode from './math/OperatorNode.js';
@@ -115,7 +120,7 @@ const ShaderNodeObjects = function( objects ) {
 
 };
 
-const ShaderNodeArray = function( array ) {
+const getShaderNodeArray = ( array ) => {
 
 	const len = array.length;
 
@@ -135,7 +140,7 @@ const ShaderNodeProxy = function( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return new ShaderNodeObject( new NodeClass( ...ShaderNodeArray( params ) ) );
+			return new ShaderNodeObject( new NodeClass( ...getShaderNodeArray( params ) ) );
 
 		};
 
@@ -143,7 +148,7 @@ const ShaderNodeProxy = function( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return new ShaderNodeObject( new NodeClass( scope, ...ShaderNodeArray( params ) ) );
+			return new ShaderNodeObject( new NodeClass( scope, ...getShaderNodeArray( params ) ) );
 
 		};
 
@@ -153,7 +158,7 @@ const ShaderNodeProxy = function( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return new ShaderNodeObject( new NodeClass( scope, ...ShaderNodeArray( params ), factor ) );
+			return new ShaderNodeObject( new NodeClass( scope, ...getShaderNodeArray( params ), factor ) );
 
 		};
 
@@ -231,13 +236,13 @@ export const color = ( ...params ) => {
 
 export const join = ( ...params ) => {
 
-	return nodeObject( new JoinNode( ShaderNodeArray( params ) ) );
+	return nodeObject( new JoinNode( getShaderNodeArray( params ) ) );
 
 };
 
 export const cond = ( ...params ) => {
 
-	return nodeObject( new CondNode( ...ShaderNodeArray( params ) ) );
+	return nodeObject( new CondNode( ...getShaderNodeArray( params ) ) );
 
 };
 
@@ -307,13 +312,30 @@ export const vec4 = ( ...params ) => {
 
 };
 
+export const mat3 = ( val ) => {
+
+	return nodeObject( new Matrix3Node( val ).setConst( true ) );
+
+};
+
+export const mat4 = ( val ) => {
+
+	return nodeObject( new Matrix4Node( val ).setConst( true ) );
+
+};
+
 export const addTo = ( varNode, ...params ) => {
 
-	varNode.node = add( varNode.node, ...ShaderNodeArray( params ) );
+	varNode.node = add( varNode.node, ...getShaderNodeArray( params ) );
 
 	return nodeObject( varNode );
 
 };
+
+export const uv = new ShaderNodeProxy( UVNode );
+export const attribute = new ShaderNodeProxy( AttributeNode );
+
+export const texture = new ShaderNodeProxy( TextureNode );
 
 export const add = new ShaderNodeProxy( OperatorNode, '+' );
 export const sub = new ShaderNodeProxy( OperatorNode, '-' );
