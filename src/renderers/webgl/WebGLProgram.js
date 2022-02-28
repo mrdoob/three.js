@@ -95,7 +95,7 @@ function getToneMappingFunction( functionName, toneMapping ) {
 function generateExtensions( parameters ) {
 
 	const chunks = [
-		( parameters.extensionDerivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.tangentSpaceNormalMap || parameters.clearcoatNormalMap || parameters.flatShading || parameters.shaderID === 'physical' ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+		( parameters.extensionDerivatives || !! parameters.envMapCubeUVHeight || parameters.bumpMap || parameters.tangentSpaceNormalMap || parameters.clearcoatNormalMap || parameters.flatShading || parameters.shaderID === 'physical' ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 		( parameters.extensionFragDepth || parameters.logarithmicDepthBuffer ) && parameters.rendererExtensionFragDepth ? '#extension GL_EXT_frag_depth : enable' : '',
 		( parameters.extensionDrawBuffers && parameters.rendererExtensionDrawBuffers ) ? '#extension GL_EXT_draw_buffers : require' : '',
 		( parameters.extensionShaderTextureLOD || parameters.envMap || parameters.transmission ) && parameters.rendererExtensionShaderTextureLod ? '#extension GL_EXT_shader_texture_lod : enable' : ''
@@ -363,6 +363,22 @@ function generateEnvMapBlendingDefine( parameters ) {
 
 }
 
+function generateCubeUVSize( parameters ) {
+
+	const imageHeight = parameters.envMapCubeUVHeight;
+
+	if ( imageHeight === null ) return null;
+
+	const maxMip = Math.log2( imageHeight / 32 + 1 ) + 3;
+
+	const texelHeight = 1.0 / imageHeight;
+
+	const texelWidth = 1.0 / ( 3 * Math.max( Math.pow( 2, maxMip ), 7 * 16 ) );
+
+	return { texelWidth, texelHeight, maxMip };
+
+}
+
 function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	// TODO Send this event to Three.js DevTools
@@ -379,6 +395,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const envMapTypeDefine = generateEnvMapTypeDefine( parameters );
 	const envMapModeDefine = generateEnvMapModeDefine( parameters );
 	const envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
+	const envMapCubeUVSize = generateCubeUVSize( parameters );
 
 	const customExtensions = parameters.isWebGL2 ? '' : generateExtensions( parameters );
 
@@ -480,8 +497,10 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
 			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
-			( parameters.morphTargets && parameters.isWebGL2 ) ? '#define MORPHTARGETS_TEXTURE' : '',
-			( parameters.morphTargets && parameters.isWebGL2 ) ? '#define MORPHTARGETS_COUNT ' + parameters.morphTargetsCount : '',
+			( parameters.morphColors && parameters.isWebGL2 ) ? '#define USE_MORPHCOLORS' : '',
+			( parameters.morphTargetsCount > 0 && parameters.isWebGL2 ) ? '#define MORPHTARGETS_TEXTURE' : '',
+			( parameters.morphTargetsCount > 0 && parameters.isWebGL2 ) ? '#define MORPHTARGETS_TEXTURE_STRIDE ' + parameters.morphTextureStride : '',
+			( parameters.morphTargetsCount > 0 && parameters.isWebGL2 ) ? '#define MORPHTARGETS_COUNT ' + parameters.morphTargetsCount : '',
 			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 			parameters.flipSided ? '#define FLIP_SIDED' : '',
 
@@ -588,6 +607,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.envMap ? '#define ' + envMapTypeDefine : '',
 			parameters.envMap ? '#define ' + envMapModeDefine : '',
 			parameters.envMap ? '#define ' + envMapBlendingDefine : '',
+			envMapCubeUVSize ? '#define CUBEUV_TEXEL_WIDTH ' + envMapCubeUVSize.texelWidth : '',
+			envMapCubeUVSize ? '#define CUBEUV_TEXEL_HEIGHT ' + envMapCubeUVSize.texelHeight : '',
+			envMapCubeUVSize ? '#define CUBEUV_MAX_MIP ' + envMapCubeUVSize.maxMip + '.0' : '',
 			parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 			parameters.aoMap ? '#define USE_AOMAP' : '',
 			parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
@@ -643,8 +665,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			( parameters.logarithmicDepthBuffer && parameters.rendererExtensionFragDepth ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-			( ( parameters.extensionShaderTextureLOD || parameters.envMap ) && parameters.rendererExtensionShaderTextureLod ) ? '#define TEXTURE_LOD_EXT' : '',
-
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
 			'uniform bool isOrthographic;',
@@ -654,7 +674,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
-			parameters.alphaWrite ? '' : '#define OPAQUE',
+			parameters.opaque ? '#define OPAQUE' : '',
 
 			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ),

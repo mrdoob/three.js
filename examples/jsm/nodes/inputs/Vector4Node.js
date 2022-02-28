@@ -1,59 +1,45 @@
+import InputNode from '../core/InputNode.js';
 import { Vector4 } from 'three';
-
-import { InputNode } from '../core/InputNode.js';
-import { NodeUtils } from '../core/NodeUtils.js';
 
 class Vector4Node extends InputNode {
 
-	constructor( x, y, z, w ) {
+	constructor( value = new Vector4() ) {
 
-		super( 'v4' );
+		super( 'vec4' );
 
-		this.value = x instanceof Vector4 ? x : new Vector4( x, y, z, w );
-
-	}
-
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
-
-		return builder.format( 'vec4( ' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ' )', type, output );
+		this.value = value;
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		this.value.copy( source );
+		const { x, y, z, w } = this.value;
 
-		return this;
+		data.x = x;
+		data.y = y;
+		data.z = z;
+		data.w = w;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		let data = this.getJSONNode( meta );
+		super.serialize( data );
 
-		if ( ! data ) {
+		const { x, y, z, w } = data;
+		const value = this.value;
 
-			data = this.createJSONNode( meta );
-
-			data.x = this.x;
-			data.y = this.y;
-			data.z = this.z;
-			data.w = this.w;
-
-			if ( this.readonly === true ) data.readonly = true;
-
-		}
-
-		return data;
+		value.x = x;
+		value.y = y;
+		value.z = z;
+		value.w = w;
 
 	}
 
 }
 
-Vector4Node.prototype.nodeType = 'Vector4';
+Vector4Node.prototype.isVector4Node = true;
 
-NodeUtils.addShortcuts( Vector4Node.prototype, 'value', [ 'x', 'y', 'z', 'w' ] );
-
-export { Vector4Node };
+export default Vector4Node;

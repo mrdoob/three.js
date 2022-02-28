@@ -27,7 +27,7 @@ scene.add( object1 ); //object1과 object2는 자동으로 자신들의 행렬�
 		<p>하지만 오브젝트가 고정되어야 한다면, 이 설정을 풀고 수동으로 행렬구조를 갱신할 수 있습니다.</p>
 
 		<code>
-object.matrixAutoUpdate  = false;
+object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
@@ -70,7 +70,7 @@ geometry.setDrawRange( 0, drawCount );
 const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-const line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry, material );
 scene.add( line );
 			</code>
 		 	<p>
@@ -146,6 +146,7 @@ line.geometry.computeBoundingSphere();
 						<li>morphing</li>
 						<li>shadow map</li>
 						<li>alpha test</li>
+						<li>transparent</li>
 					</ul>
 				</li>
 			</ul>

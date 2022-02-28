@@ -43,12 +43,12 @@
 
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { Texture } from '../../textures/Texture.js';
-import { DataTexture2DArray } from '../../textures/DataTexture2DArray.js';
-import { DataTexture3D } from '../../textures/DataTexture3D.js';
+import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
+import { Data3DTexture } from '../../textures/Data3DTexture.js';
 
 const emptyTexture = new Texture();
-const emptyTexture2dArray = new DataTexture2DArray();
-const emptyTexture3d = new DataTexture3D();
+const emptyArrayTexture = new DataArrayTexture();
+const empty3dTexture = new Data3DTexture();
 const emptyCubeTexture = new CubeTexture();
 
 // --- Utilities ---
@@ -467,7 +467,7 @@ function setValueT1( gl, v, textures ) {
 
 	}
 
-	textures.safeSetTexture2D( v || emptyTexture, unit );
+	textures.setTexture2D( v || emptyTexture, unit );
 
 }
 
@@ -483,7 +483,7 @@ function setValueT3D1( gl, v, textures ) {
 
 	}
 
-	textures.setTexture3D( v || emptyTexture3d, unit );
+	textures.setTexture3D( v || empty3dTexture, unit );
 
 }
 
@@ -499,7 +499,7 @@ function setValueT6( gl, v, textures ) {
 
 	}
 
-	textures.safeSetTextureCube( v || emptyCubeTexture, unit );
+	textures.setTextureCube( v || emptyCubeTexture, unit );
 
 }
 
@@ -515,7 +515,7 @@ function setValueT2DArray1( gl, v, textures ) {
 
 	}
 
-	textures.setTexture2DArray( v || emptyTexture2dArray, unit );
+	textures.setTexture2DArray( v || emptyArrayTexture, unit );
 
 }
 
@@ -702,7 +702,7 @@ function setValueT1Array( gl, v, textures ) {
 
 	for ( let i = 0; i !== n; ++ i ) {
 
-		textures.safeSetTexture2D( v[ i ] || emptyTexture, units[ i ] );
+		textures.setTexture2D( v[ i ] || emptyTexture, units[ i ] );
 
 	}
 
@@ -718,7 +718,7 @@ function setValueT3DArray( gl, v, textures ) {
 
 	for ( let i = 0; i !== n; ++ i ) {
 
-		textures.setTexture3D( v[ i ] || emptyTexture3d, units[ i ] );
+		textures.setTexture3D( v[ i ] || empty3dTexture, units[ i ] );
 
 	}
 
@@ -734,7 +734,7 @@ function setValueT6Array( gl, v, textures ) {
 
 	for ( let i = 0; i !== n; ++ i ) {
 
-		textures.safeSetTextureCube( v[ i ] || emptyCubeTexture, units[ i ] );
+		textures.setTextureCube( v[ i ] || emptyCubeTexture, units[ i ] );
 
 	}
 
@@ -750,7 +750,7 @@ function setValueT2DArrayArray( gl, v, textures ) {
 
 	for ( let i = 0; i !== n; ++ i ) {
 
-		textures.setTexture2DArray( v[ i ] || emptyTexture2dArray, units[ i ] );
+		textures.setTexture2DArray( v[ i ] || emptyArrayTexture, units[ i ] );
 
 	}
 

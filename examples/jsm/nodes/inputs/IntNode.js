@@ -1,51 +1,33 @@
-import { InputNode } from '../core/InputNode.js';
+import InputNode from '../core/InputNode.js';
 
 class IntNode extends InputNode {
 
-	constructor( value ) {
+	constructor( value = 0 ) {
 
-		super( 'i' );
+		super( 'int' );
 
-		this.value = Math.floor( value || 0 );
-
-	}
-
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate */ ) {
-
-		return builder.format( this.value, type, output );
+		this.value = value;
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		this.value = source.value;
-
-		return this;
+		data.value = this.value;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		let data = this.getJSONNode( meta );
+		super.serialize( data );
 
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.value = this.value;
-
-			if ( this.readonly === true ) data.readonly = true;
-
-		}
-
-		return data;
+		this.value = data.value;
 
 	}
 
 }
 
-IntNode.prototype.nodeType = 'Int';
+IntNode.prototype.isIntNode = true;
 
-export { IntNode };
+export default IntNode;

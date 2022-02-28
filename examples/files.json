@@ -120,7 +120,6 @@
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
 		"webgl_loader_vox",
-		"webgl_loader_vrm",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
 		"webgl_loader_xyz",
@@ -225,20 +224,10 @@
 		"webgl_water_flowmap"
 	],
 	"webgl / nodes": [
-		"webgl_loader_nodes",
-		"webgl_materials_compile",
-		"webgl_materials_envmaps_hdr_nodes",
-		"webgl_materials_envmaps_pmrem_nodes",
 		"webgl_materials_instance_uniform_nodes",
-		"webgl_materials_nodes",
 		"webgl_materials_standard_nodes",
 		"webgl_nodes_playground",
-		"webgl_mirror_nodes",
-		"webgl_performance_nodes",
-		"webgl_points_nodes",
-		"webgl_postprocessing_nodes",
-		"webgl_postprocessing_nodes_pass",
-		"webgl_sprites_nodes"
+		"webgl_points_nodes"
 	],
 	"webgl / postprocessing": [
 		"webgl_postprocessing",
@@ -263,7 +252,6 @@
 		"webgl_postprocessing_sobel",
 		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_ssr",
-		"webgl_postprocessing_ssrr",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_postprocessing_unreal_bloom_selective"

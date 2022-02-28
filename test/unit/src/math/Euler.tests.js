@@ -200,25 +200,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set/setFromVector3/toVector3', ( assert ) => {
-
-			var a = new Euler();
-
-			a.set( 0, 1, 0, 'ZYX' );
-			assert.ok( a.equals( eulerAzyx ), 'Passed!' );
-			assert.ok( ! a.equals( eulerAxyz ), 'Passed!' );
-			assert.ok( ! a.equals( eulerZero ), 'Passed!' );
-
-			var vec = new Vector3( 0, 1, 0 );
-
-			var b = new Euler().setFromVector3( vec, 'ZYX' );
-			assert.ok( a.equals( b ), 'Passed!' );
-
-			var c = b.toVector3();
-			assert.ok( c.equals( vec ), 'Passed!' );
-
-		} );
-
 		QUnit.test( 'clone/copy/equals', ( assert ) => {
 
 			var a = eulerAxyz.clone();

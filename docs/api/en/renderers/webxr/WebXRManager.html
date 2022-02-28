@@ -69,6 +69,11 @@
 		in two different coordinate spaces for the same WebXR controller.
 		</p>
 
+		<h3>[method:Float getFoveation]()</h3>
+		<p>
+		Returns the amount of foveation used by the XR compositor for the projection layer.
+		</p>
+
 		<h3>[method:Group getHand]( [param:Integer index] )</h3>
 		<p>
 		[page:Integer index] — The index of the controller. <br /><br />
@@ -85,6 +90,13 @@
 		<h3>[method:XRSession getSession]()</h3>
 		<p>
 		Returns the *XRSession* object which allows a more fine-grained management of active WebXR sessions on application level.
+		</p>
+
+		<h3>[method:undefined setFoveation]( [param:Float foveation] )</h3>
+		<p>
+		[page:Float foveation] — The foveation to set.<br /><br />
+
+		Specifies the amount of foveation used by the XR compositor for the layer. Must be a value between *0* and *1*.
 		</p>
 
 		<h3>[method:undefined setFramebufferScaleFactor]( [param:Float framebufferScaleFactor] )</h3>

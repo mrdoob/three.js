@@ -251,7 +251,7 @@ class OBJExporter {
 
 					if ( colors !== undefined ) {
 
-						color.fromBufferAttribute( colors, i );
+						color.fromBufferAttribute( colors, i ).convertLinearToSRGB();
 
 						output += ' ' + color.r + ' ' + color.g + ' ' + color.b;
 
@@ -261,17 +261,17 @@ class OBJExporter {
 
 				}
 
+				output += 'p ';
+
+				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+
+					output += ( indexVertex + j ) + ' ';
+
+				}
+
+				output += '\n';
+
 			}
-
-			output += 'p ';
-
-			for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
-
-				output += ( indexVertex + j ) + ' ';
-
-			}
-
-			output += '\n';
 
 			// update index
 			indexVertex += nbVertex;

@@ -1,6 +1,6 @@
 import { LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { JoinNode, FloatNode } from '../../renderers/nodes/Nodes.js';
+import { JoinNode, FloatNode } from 'three-nodes/Nodes.js';
 
 const NULL_VALUE = new FloatNode();
 

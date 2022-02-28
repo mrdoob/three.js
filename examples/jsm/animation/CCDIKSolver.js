@@ -186,19 +186,13 @@ class CCDIKSolver {
 
 				if ( rotationMin !== undefined ) {
 
-					link.rotation.setFromVector3(
-						link.rotation
-							.toVector3( _vector )
-							.max( rotationMin ) );
+					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).max( rotationMin ) );
 
 				}
 
 				if ( rotationMax !== undefined ) {
 
-					link.rotation.setFromVector3(
-						link.rotation
-							.toVector3( _vector )
-							.min( rotationMax ) );
+					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).min( rotationMax ) );
 
 				}
 
@@ -461,4 +455,4 @@ class CCDIKHelper extends Object3D {
 
 }
 
-export { CCDIKSolver };
+export { CCDIKSolver, CCDIKHelper };

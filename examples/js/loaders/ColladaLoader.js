@@ -1333,11 +1333,11 @@
 
 			function parseEffectExtraTechniqueBump( xml ) {
 
-				var data = {};
+				const data = {};
 
-				for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
-					var child = xml.childNodes[ i ];
+					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
 
 					switch ( child.nodeName ) {
@@ -1443,7 +1443,7 @@
 
 				material.name = data.name || '';
 
-				function getTexture( textureObject ) {
+				function getTexture( textureObject, encoding = null ) {
 
 					const sampler = effect.profile.samplers[ textureObject.id ];
 					let image = null; // get image
@@ -1485,6 +1485,12 @@
 
 							}
 
+							if ( encoding !== null ) {
+
+								texture.encoding = encoding;
+
+							}
+
 							return texture;
 
 						} else {
@@ -1513,7 +1519,7 @@
 
 						case 'diffuse':
 							if ( parameter.color ) material.color.fromArray( parameter.color );
-							if ( parameter.texture ) material.map = getTexture( parameter.texture );
+							if ( parameter.texture ) material.map = getTexture( parameter.texture, THREE.sRGBEncoding );
 							break;
 
 						case 'specular':
@@ -1526,7 +1532,7 @@
 							break;
 
 						case 'ambient':
-							if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
+							if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, THREE.sRGBEncoding );
 							break;
 
 						case 'shininess':
@@ -1535,13 +1541,16 @@
 
 						case 'emission':
 							if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
-							if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
+							if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, THREE.sRGBEncoding );
 							break;
 
 					}
 
-				} //
+				}
 
+				material.color.convertSRGBToLinear();
+				if ( material.specular ) material.specular.convertSRGBToLinear();
+				if ( material.emissive ) material.emissive.convertSRGBToLinear(); //
 
 				let transparent = parameters[ 'transparent' ];
 				let transparency = parameters[ 'transparency' ]; // <transparency> does not exist but <transparent>
@@ -1851,7 +1860,7 @@
 
 						case 'color':
 							const array = parseFloats( child.textContent );
-							data.color = new THREE.Color().fromArray( array );
+							data.color = new THREE.Color().fromArray( array ).convertSRGBToLinear();
 							break;
 
 						case 'falloff_angle':
@@ -2310,7 +2319,7 @@
 								break;
 
 							case 'COLOR':
-								buildGeometryData( primitive, sources[ input.id ], input.offset, color.array );
+								buildGeometryData( primitive, sources[ input.id ], input.offset, color.array, true );
 								color.stride = sources[ input.id ].stride;
 								break;
 
@@ -2345,7 +2354,7 @@
 
 			}
 
-			function buildGeometryData( primitive, source, offset, array ) {
+			function buildGeometryData( primitive, source, offset, array, isColor = false ) {
 
 				const indices = primitive.p;
 				const stride = primitive.stride;
@@ -2359,6 +2368,17 @@
 					for ( ; index < length; index ++ ) {
 
 						array.push( sourceArray[ index ] );
+
+					}
+
+					if ( isColor ) {
+
+						// convert the vertex colors from srgb to linear if present
+						const startIndex = array.length - sourceStride - 1;
+						tempColor.setRGB( array[ startIndex + 0 ], array[ startIndex + 1 ], array[ startIndex + 2 ] ).convertSRGBToLinear();
+						array[ startIndex + 0 ] = tempColor.r;
+						array[ startIndex + 1 ] = tempColor.g;
+						array[ startIndex + 2 ] = tempColor.b;
 
 					}
 
@@ -2785,7 +2805,7 @@
 							const param = child.getElementsByTagName( 'param' )[ 0 ];
 							data.axis = param.textContent;
 							const tmpJointIndex = data.axis.split( 'inst_' ).pop().split( 'axis' )[ 0 ];
-							data.jointIndex = tmpJointIndex.substr( 0, tmpJointIndex.length - 1 );
+							data.jointIndex = tmpJointIndex.substring( 0, tmpJointIndex.length - 1 );
 							break;
 
 					}
@@ -3721,6 +3741,7 @@
 			} //
 
 
+			const tempColor = new THREE.Color();
 			const animations = [];
 			let kinematics = {};
 			let count = 0; //

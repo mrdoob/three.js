@@ -1,57 +1,41 @@
+import InputNode from '../core/InputNode.js';
 import { Vector2 } from 'three';
-
-import { InputNode } from '../core/InputNode.js';
-import { NodeUtils } from '../core/NodeUtils.js';
 
 class Vector2Node extends InputNode {
 
-	constructor( x, y ) {
+	constructor( value = new Vector2() ) {
 
-		super( 'v2' );
+		super( 'vec2' );
 
-		this.value = x instanceof Vector2 ? x : new Vector2( x, y );
-
-	}
-
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
-
-		return builder.format( 'vec2( ' + this.x + ', ' + this.y + ' )', type, output );
+		this.value = value;
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		this.value.copy( source );
+		const { x, y } = this.value;
 
-		return this;
+		data.x = x;
+		data.y = y;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		let data = this.getJSONNode( meta );
+		super.serialize( data );
 
-		if ( ! data ) {
+		const { x, y } = data;
+		const value = this.value;
 
-			data = this.createJSONNode( meta );
-
-			data.x = this.x;
-			data.y = this.y;
-
-			if ( this.readonly === true ) data.readonly = true;
-
-		}
-
-		return data;
+		value.x = x;
+		value.y = y;
 
 	}
 
 }
 
-Vector2Node.prototype.nodeType = 'Vector2';
+Vector2Node.prototype.isVector2Node = true;
 
-NodeUtils.addShortcuts( Vector2Node.prototype, 'value', [ 'x', 'y' ] );
-
-export { Vector2Node };
+export default Vector2Node;

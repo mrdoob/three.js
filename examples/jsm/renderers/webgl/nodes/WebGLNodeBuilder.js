@@ -1,11 +1,17 @@
-import NodeBuilder from '../../nodes/core/NodeBuilder.js';
+import NodeBuilder, { shaderStages } from 'three-nodes/core/NodeBuilder.js';
 import SlotNode from './SlotNode.js';
-import GLSLNodeParser from '../../nodes/parsers/GLSLNodeParser.js';
+import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { ShaderChunk, LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
+import { ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
+	LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
 
-const shaderStages = [ 'vertex', 'fragment' ];
+const nodeShaderLib = {
+	LineBasicNodeMaterial: ShaderLib.basic,
+	MeshBasicNodeMaterial: ShaderLib.basic,
+	PointsNodeMaterial: ShaderLib.points,
+	MeshStandardNodeMaterial: ShaderLib.standard
+};
 
 function getIncludeSnippet( name ) {
 
@@ -55,6 +61,20 @@ class WebGLNodeBuilder extends NodeBuilder {
 	_parseObject() {
 
 		const material = this.material;
+		const type = material.type;
+
+		// shader lib
+
+		if ( nodeShaderLib[ type ] !== undefined ) {
+
+			const shaderLib = nodeShaderLib[ type ];
+			const shader = this.shader;
+
+			shader.vertexShader = shaderLib.vertexShader;
+			shader.fragmentShader = shaderLib.fragmentShader;
+			shader.uniforms = UniformsUtils.merge( [ shaderLib.uniforms, UniformsLib.lights ] );
+
+		}
 
 		// parse inputs
 

@@ -54,7 +54,6 @@
 		bin.readUshort( data, offset );
 		offset += 2;
 		var ifdo = bin.readUint( data, offset );
-		offset += 4;
 		var ifds = [];
 
 		while ( true ) {
@@ -430,7 +429,7 @@
 			if ( prm.debug ) console.log( '   '.repeat( depth ), tag, type, UTIF.tags[ tag ], arr );
 			ifd[ 't' + tag ] = arr;
 
-			if ( tag == 330 && ifd[ 't272' ] && ifd[ 't272' ][ 0 ] == 'DSLR-A100' ) {} else if ( tag == 330 || tag == 34665 || tag == 34853 || tag == 50740 && bin.readUshort( data, bin.readUint( arr, 0 ) ) < 300 || tag == 61440 ) {
+			if ( tag == 330 || tag == 34665 || tag == 34853 || tag == 50740 && bin.readUshort( data, bin.readUint( arr, 0 ) ) < 300 || tag == 61440 ) {
 
 				var oarr = tag == 50740 ? [ bin.readUint( arr, 0 ) ] : arr;
 				var subfd = [];

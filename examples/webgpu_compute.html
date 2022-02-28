@@ -15,16 +15,18 @@
 		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js"
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
 			}
-		}
 		</script>
 
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
@@ -36,8 +38,6 @@
 			import * as WebGPUBufferUtils from './jsm/renderers/webgpu/WebGPUBufferUtils.js';
 			import WebGPUUniformsGroup from './jsm/renderers/webgpu/WebGPUUniformsGroup.js';
 			import { Vector2Uniform } from './jsm/renderers/webgpu/WebGPUUniform.js';
-
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 			let pointer;
@@ -110,13 +110,13 @@
 					struct Particle {
 						value : array< vec4<f32> >;
 					};
-					[[ binding( 0 ), group( 0 ) ]]
+					@binding( 0 ) @group( 0 )
 					var<storage,read_write> particle : Particle;
 
 					struct Velocity {
 						value : array< vec4<f32> >;
 					};
-					[[ binding( 1 ), group( 0 ) ]]
+					@binding( 1 ) @group( 0 )
 					var<storage,read_write> velocity : Velocity;
 
 					//
@@ -126,17 +126,17 @@
 					struct Scale {
 						value : array< vec3<f32>, 2 >;
 					};
-					[[ binding( 2 ), group( 0 ) ]]
+					@binding( 2 ) @group( 0 )
 					var<uniform> scaleUniform : Scale;
 
 					struct MouseUniforms {
 						pointer : vec2<f32>;
 					};
-					[[ binding( 3 ), group( 0 ) ]]
+					@binding( 3 ) @group( 0 )
 					var<uniform> mouseUniforms : MouseUniforms;
 
-					[[ stage( compute ), workgroup_size( 64 ) ]]
-					fn main( [[builtin(global_invocation_id)]] id : vec3<u32> ) {
+					@stage( compute ) @workgroup_size( 64 )
+					fn main( @builtin(global_invocation_id) id : vec3<u32> ) {
 
 						// get particle index
 

@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding } from '../../constants.js';
+import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding, NormalBlending } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -75,9 +75,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	function getParameters( material, lights, shadows, scene, object ) {
 
 		const fog = scene.fog;
+		const geometry = object.geometry;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
+		const envMapCubeUVHeight = ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ) ? envMap.image.height : null;
 
 		const shaderID = shaderIDs[ material.type ];
 
@@ -97,6 +99,19 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			}
 
 		}
+
+		//
+
+		const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
+		const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
+
+		let morphTextureStride = 0;
+
+		if ( geometry.morphAttributes.position !== undefined ) morphTextureStride = 1;
+		if ( geometry.morphAttributes.normal !== undefined ) morphTextureStride = 2;
+		if ( geometry.morphAttributes.color !== undefined ) morphTextureStride = 3;
+
+		//
 
 		let vertexShader, fragmentShader;
 		let customVertexShaderID, customFragmentShaderID;
@@ -153,7 +168,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			matcap: !! material.matcap,
 			envMap: !! envMap,
 			envMapMode: envMap && envMap.mapping,
-			envMapCubeUV: ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ),
+			envMapCubeUVHeight: envMapCubeUVHeight,
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
@@ -176,9 +191,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
 
+			opaque: material.transparent === false && material.blending === NormalBlending,
+
 			alphaMap: !! material.alphaMap,
 			alphaTest: useAlphaTest,
-			alphaWrite: material.alphaWrite || material.transparent,
 
 			gradientMap: !! material.gradientMap,
 
@@ -192,9 +208,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			combine: material.combine,
 
-			vertexTangents: ( !! material.normalMap && !! object.geometry && !! object.geometry.attributes.tangent ),
+			vertexTangents: ( !! material.normalMap && !! geometry.attributes.tangent ),
 			vertexColors: material.vertexColors,
-			vertexAlphas: material.vertexColors === true && !! object.geometry && !! object.geometry.attributes.color && object.geometry.attributes.color.itemSize === 4,
+			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
 			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || !! material.sheenRoughnessMap,
 			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || material.sheen > 0 || !! material.sheenColorMap || !! material.sheenRoughnessMap ) && !! material.displacementMap,
 
@@ -211,9 +227,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			maxBones: maxBones,
 			useVertexTexture: floatVertexTextures,
 
-			morphTargets: !! object.geometry && !! object.geometry.morphAttributes.position,
-			morphNormals: !! object.geometry && !! object.geometry.morphAttributes.normal,
-			morphTargetsCount: ( !! object.geometry && !! object.geometry.morphAttributes.position ) ? object.geometry.morphAttributes.position.length : 0,
+			morphTargets: geometry.morphAttributes.position !== undefined,
+			morphNormals: geometry.morphAttributes.normal !== undefined,
+			morphColors: geometry.morphAttributes.color !== undefined,
+			morphTargetsCount: morphTargetsCount,
+			morphTextureStride: morphTextureStride,
 
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
@@ -307,12 +325,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.precision );
 		array.push( parameters.outputEncoding );
 		array.push( parameters.envMapMode );
+		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.combine );
 		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
 		array.push( parameters.sizeAttenuation );
 		array.push( parameters.maxBones );
 		array.push( parameters.morphTargetsCount );
+		array.push( parameters.morphAttributeCount );
 		array.push( parameters.numDirLights );
 		array.push( parameters.numPointLights );
 		array.push( parameters.numSpotLights );
@@ -325,7 +345,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.toneMapping );
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
-		array.push( parameters.alphaWrite );
 
 	}
 
@@ -347,56 +366,54 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 5 );
 		if ( parameters.envMap )
 			_programLayers.enable( 6 );
-		if ( parameters.envMapCubeUV )
-			_programLayers.enable( 7 );
 		if ( parameters.lightMap )
-			_programLayers.enable( 8 );
+			_programLayers.enable( 7 );
 		if ( parameters.aoMap )
-			_programLayers.enable( 9 );
+			_programLayers.enable( 8 );
 		if ( parameters.emissiveMap )
-			_programLayers.enable( 10 );
+			_programLayers.enable( 9 );
 		if ( parameters.bumpMap )
-			_programLayers.enable( 11 );
+			_programLayers.enable( 10 );
 		if ( parameters.normalMap )
-			_programLayers.enable( 12 );
+			_programLayers.enable( 11 );
 		if ( parameters.objectSpaceNormalMap )
-			_programLayers.enable( 13 );
+			_programLayers.enable( 12 );
 		if ( parameters.tangentSpaceNormalMap )
-			_programLayers.enable( 14 );
+			_programLayers.enable( 13 );
 		if ( parameters.clearcoat )
-			_programLayers.enable( 15 );
+			_programLayers.enable( 14 );
 		if ( parameters.clearcoatMap )
-			_programLayers.enable( 16 );
+			_programLayers.enable( 15 );
 		if ( parameters.clearcoatRoughnessMap )
-			_programLayers.enable( 17 );
+			_programLayers.enable( 16 );
 		if ( parameters.clearcoatNormalMap )
-			_programLayers.enable( 18 );
+			_programLayers.enable( 17 );
 		if ( parameters.displacementMap )
-			_programLayers.enable( 19 );
+			_programLayers.enable( 18 );
 		if ( parameters.specularMap )
-			_programLayers.enable( 20 );
+			_programLayers.enable( 19 );
 		if ( parameters.roughnessMap )
-			_programLayers.enable( 21 );
+			_programLayers.enable( 20 );
 		if ( parameters.metalnessMap )
-			_programLayers.enable( 22 );
+			_programLayers.enable( 21 );
 		if ( parameters.gradientMap )
-			_programLayers.enable( 23 );
+			_programLayers.enable( 22 );
 		if ( parameters.alphaMap )
-			_programLayers.enable( 24 );
+			_programLayers.enable( 23 );
 		if ( parameters.alphaTest )
-			_programLayers.enable( 25 );
+			_programLayers.enable( 24 );
 		if ( parameters.vertexColors )
-			_programLayers.enable( 26 );
+			_programLayers.enable( 25 );
 		if ( parameters.vertexAlphas )
-			_programLayers.enable( 27 );
+			_programLayers.enable( 26 );
 		if ( parameters.vertexUvs )
-			_programLayers.enable( 28 );
+			_programLayers.enable( 27 );
 		if ( parameters.vertexTangents )
-			_programLayers.enable( 29 );
+			_programLayers.enable( 28 );
 		if ( parameters.uvsVertexOnly )
-			_programLayers.enable( 30 );
+			_programLayers.enable( 29 );
 		if ( parameters.fog )
-			_programLayers.enable( 31 );
+			_programLayers.enable( 30 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -415,38 +432,42 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 5 );
 		if ( parameters.morphNormals )
 			_programLayers.enable( 6 );
-		if ( parameters.premultipliedAlpha )
+		if ( parameters.morphColors )
 			_programLayers.enable( 7 );
-		if ( parameters.shadowMapEnabled )
+		if ( parameters.premultipliedAlpha )
 			_programLayers.enable( 8 );
-		if ( parameters.physicallyCorrectLights )
+		if ( parameters.shadowMapEnabled )
 			_programLayers.enable( 9 );
-		if ( parameters.doubleSided )
+		if ( parameters.physicallyCorrectLights )
 			_programLayers.enable( 10 );
-		if ( parameters.flipSided )
+		if ( parameters.doubleSided )
 			_programLayers.enable( 11 );
-		if ( parameters.depthPacking )
+		if ( parameters.flipSided )
 			_programLayers.enable( 12 );
-		if ( parameters.dithering )
+		if ( parameters.depthPacking )
 			_programLayers.enable( 13 );
-		if ( parameters.specularIntensityMap )
+		if ( parameters.dithering )
 			_programLayers.enable( 14 );
-		if ( parameters.specularColorMap )
+		if ( parameters.specularIntensityMap )
 			_programLayers.enable( 15 );
-		if ( parameters.transmission )
+		if ( parameters.specularColorMap )
 			_programLayers.enable( 16 );
-		if ( parameters.transmissionMap )
+		if ( parameters.transmission )
 			_programLayers.enable( 17 );
-		if ( parameters.thicknessMap )
+		if ( parameters.transmissionMap )
 			_programLayers.enable( 18 );
-		if ( parameters.sheen )
+		if ( parameters.thicknessMap )
 			_programLayers.enable( 19 );
-		if ( parameters.sheenColorMap )
+		if ( parameters.sheen )
 			_programLayers.enable( 20 );
-		if ( parameters.sheenRoughnessMap )
+		if ( parameters.sheenColorMap )
 			_programLayers.enable( 21 );
-		if ( parameters.decodeVideoTexture )
+		if ( parameters.sheenRoughnessMap )
 			_programLayers.enable( 22 );
+		if ( parameters.decodeVideoTexture )
+			_programLayers.enable( 23 );
+		if ( parameters.opaque )
+			_programLayers.enable( 24 );
 
 		array.push( _programLayers.mask );
 

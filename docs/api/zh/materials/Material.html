@@ -107,6 +107,11 @@ Default is *false*.
 	在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
 </p>
 
+		<h3>[property:Boolean isMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 <h3>[property:Boolean stencilWrite]</h3>
 <p>
 Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.
@@ -268,7 +273,7 @@ This starts at *0* and counts how many times [property:Boolean needsUpdate] is s
 
 <h2>方法(Methods)</h2>
 
-<h3>[page:EventDispatcher EventDispatcher] 方法在此类中可用。</h3>
+<p>[page:EventDispatcher EventDispatcher] 方法在此类中可用。</p>
 
 <h3>[method:Material clone]( )</h3>
 <p> 返回与此材质具有相同参数的新材质。</p>

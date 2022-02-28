@@ -53,7 +53,7 @@
 
 				if ( node.nodeType !== 1 ) return;
 				const transform = getNodeTransform( node );
-				let traverseChildNodes = true;
+				let isDefsNode = false;
 				let path = null;
 
 				switch ( node.nodeName ) {
@@ -105,7 +105,7 @@
 						break;
 
 					case 'defs':
-						traverseChildNodes = false;
+						isDefsNode = true;
 						break;
 
 					case 'use':
@@ -147,15 +147,22 @@
 
 				}
 
-				if ( traverseChildNodes ) {
+				const childNodes = node.childNodes;
 
-					const nodes = node.childNodes;
+				for ( let i = 0; i < childNodes.length; i ++ ) {
 
-					for ( let i = 0; i < nodes.length; i ++ ) {
+					const node = childNodes[ i ];
 
-						parseNode( nodes[ i ], style );
+					if ( isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs' ) {
+
+						// Ignore everything in defs except CSS style definitions
+						// and nested defs, because it is OK by the standard to have
+						// <style/> there.
+						continue;
 
 					}
+
+					parseNode( node, style );
 
 				}
 
@@ -193,7 +200,7 @@
 
 					const command = commands[ i ];
 					const type = command.charAt( 0 );
-					const data = command.substr( 1 ).trim();
+					const data = command.slice( 1 ).trim();
 
 					if ( isFirstPoint === true ) {
 
@@ -1261,8 +1268,8 @@
 
 						if ( openParPos > 0 && openParPos < closeParPos ) {
 
-							const transformType = transformText.substr( 0, openParPos );
-							const array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
+							const transformType = transformText.slice( 0, openParPos );
+							const array = parseFloats( transformText.slice( openParPos + 1 ) );
 							currentTransform.identity();
 
 							switch ( transformType ) {

@@ -1,31 +1,68 @@
-import { MeshStandardNode } from './nodes/MeshStandardNode.js';
-import { NodeMaterial } from './NodeMaterial.js';
-import { NodeUtils } from '../core/NodeUtils.js';
+import NodeMaterial from './NodeMaterial.js';
+import { MeshStandardMaterial } from 'three';
 
-class MeshStandardNodeMaterial extends NodeMaterial {
+const defaultValues = new MeshStandardMaterial();
 
-	constructor() {
+export default class MeshStandardNodeMaterial extends NodeMaterial {
 
-		const node = new MeshStandardNode();
+	constructor( parameters ) {
 
-		super( node, node );
+		super();
 
-		this.type = 'MeshStandardNodeMaterial';
+		this.colorNode = null;
+		this.opacityNode = null;
+
+		this.alphaTestNode = null;
+
+		this.normalNode = null;
+
+		this.emissiveNode = null;
+
+		this.metalnessNode = null;
+		this.roughnessNode = null;
+
+		this.clearcoatNode = null;
+		this.clearcoatRoughnessNode = null;
+
+		this.envNode = null;
+
+		this.lightNode = null;
+
+		this.positionNode = null;
+
+		this.setDefaultValues( defaultValues );
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		this.colorNode = source.colorNode;
+		this.opacityNode = source.opacityNode;
+
+		this.alphaTestNode = source.alphaTestNode;
+
+		this.normalNode = source.normalNode;
+
+		this.emissiveNode = source.emissiveNode;
+
+		this.metalnessNode = source.metalnessNode;
+		this.roughnessNode = source.roughnessNode;
+
+		this.clearcoatNode = source.clearcoatNode;
+		this.clearcoatRoughnessNode = source.clearcoatRoughnessNode;
+
+		this.envNode = source.envNode;
+
+		this.lightNode = source.lightNode;
+
+		this.positionNode = source.positionNode;
+
+		return super.copy( source );
 
 	}
 
 }
 
-NodeUtils.addShortcuts( MeshStandardNodeMaterial.prototype, 'properties', [
-	'color',
-	'roughness',
-	'metalness',
-	'map',
-	'normalMap',
-	'normalScale',
-	'metalnessMap',
-	'roughnessMap',
-	'envMap'
-] );
-
-export { MeshStandardNodeMaterial };
+MeshStandardNodeMaterial.prototype.isMeshStandardNodeMaterial = true;

@@ -27,15 +27,26 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([param:Number width], [param:Number height], [param:Number count])</h3>
+		<h3>[name]([param:Number width], [param:Number height], [param:Number count], [param:Object options])</h3>
 
 		<p>
 		[page:Number width] - The width of the render target. <br />
 		[page:Number height] - The height of the render target.<br />
-		[page:Number count] - The number of render targets.
+		[page:Number count] - The number of render targets.<br />
+
+		options - (optional object that holds texture parameters for an auto-generated target
+		texture and depthBuffer/stencilBuffer booleans.
+
+		For an explanation of the texture parameters see [page:Texture Texture]. 
+		For a list of valid options, see [page:WebGLRenderTarget WebGLRenderTarget].<br /><br />
 		</p>
 
 		<h2>Properties</h2>
+
+		<h3>[property:Boolean isWebGLMultipleRenderTargets]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Array texture]</h3>
 		<p>

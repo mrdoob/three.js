@@ -7,7 +7,7 @@
  * aspect: vec2 of (1/width, 1/height)
  */
 
-	var FreiChenShader = {
+	const FreiChenShader = {
 		uniforms: {
 			'tDiffuse': {
 				value: null

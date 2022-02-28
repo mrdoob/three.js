@@ -90,13 +90,9 @@ class XRHandMeshModel {
 
 					const position = XRJoint.position;
 
-					if ( bone ) {
-
-						bone.position.copy( position );
-						bone.quaternion.copy( XRJoint.quaternion );
-						// bone.scale.setScalar( XRJoint.jointRadius || defaultRadius );
-
-					}
+					bone.position.copy( position );
+					bone.quaternion.copy( XRJoint.quaternion );
+					// bone.scale.setScalar( XRJoint.jointRadius || defaultRadius );
 
 				}
 

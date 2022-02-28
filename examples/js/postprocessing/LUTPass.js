@@ -124,7 +124,7 @@
 
 				if ( v ) {
 
-					const is3dTextureDefine = v.isDataTexture3D ? 1 : 0;
+					const is3dTextureDefine = v.isData3DTexture ? 1 : 0;
 
 					if ( is3dTextureDefine !== material.defines.USE_3DTEXTURE ) {
 
@@ -135,7 +135,7 @@
 
 					material.uniforms.lutSize.value = v.image.width;
 
-					if ( v.isDataTexture3D ) {
+					if ( v.isData3DTexture ) {
 
 						material.uniforms.lut3d.value = v;
 

@@ -3,7 +3,7 @@
 	/**
  * Full-screen textured quad shader
  */
-	var CopyShader = {
+	const CopyShader = {
 		uniforms: {
 			'tDiffuse': {
 				value: null

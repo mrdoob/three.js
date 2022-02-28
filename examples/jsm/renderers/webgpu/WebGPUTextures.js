@@ -349,7 +349,7 @@ class WebGPUTextures {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isDataTexture2DArray || texture.isDataTexture3D ) {
+		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 			this._copyBufferToTexture( image, format, textureGPU );
 
@@ -365,7 +365,7 @@ class WebGPUTextures {
 
 		} else {
 
-			if ( image !== undefined ) {
+			if ( image !== null ) {
 
 				// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
 
@@ -528,7 +528,7 @@ class WebGPUTextures {
 
 		let dimension;
 
-		if ( texture.isDataTexture3D ) {
+		if ( texture.isData3DTexture ) {
 
 			dimension = GPUTextureDimension.ThreeD;
 
@@ -701,7 +701,7 @@ class WebGPUTextures {
 			height = ( image.length > 0 ) ? image[ 0 ].height : 1;
 			depth = 6; // one image for each side of the cube map
 
-		} else if ( image !== undefined ) {
+		} else if ( image !== null ) {
 
 			width = image.width;
 			height = image.height;

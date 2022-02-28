@@ -67,7 +67,7 @@
 			The light's view of the world. This is used to generate a depth map of the scene; objects behind
 			other objects from the light's perspective will be in shadow.<br /><br />
 
-			The default is a  [page:PerspectiveCamera] with [page:PerspectiveCamera.near near] clipping plane at 0.5.
+			The default is a [page:PerspectiveCamera] with [page:PerspectiveCamera.near near] clipping plane at 0.5.
 			The [page:PerspectiveCamera.fov fov] will track the [page:SpotLight.angle angle] property of the owning
 			[page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the
 			[page:PerspectiveCamera.aspect aspect] property will track the aspect of the
@@ -79,6 +79,11 @@
 		<h3>[property:Number focus]</h3>
 		<p>
 			Used to focus the shadow camera. The camera's field of view is set as a percentage of the spotlight's field-of-view. Range is [0, 1]. Default is 1.0.<br/>
+		</p>
+
+		<h3>[property:Boolean isSpotLightShadow]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h2>Methods</h2>

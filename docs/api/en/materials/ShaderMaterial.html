@@ -30,7 +30,7 @@
 			</li>
 			<li>
 				As of THREE r72, directly assigning attributes in a ShaderMaterial is no longer supported.
-				A [page:BufferGeometry] instance  must be used instead, using [page:BufferAttribute] instances to define custom attributes.
+				A [page:BufferGeometry] instance must be used instead, using [page:BufferAttribute] instances to define custom attributes.
 			</li>
 			<li>
 				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLCubeRenderTarget] instances
@@ -349,6 +349,11 @@ this.extensions = {
 			to bind a generic vertex index to an attribute variable.
 			Default is undefined.
 
+		</p>
+
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Boolean lights]</h3>

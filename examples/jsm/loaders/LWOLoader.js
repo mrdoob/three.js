@@ -1060,7 +1060,7 @@ function extractParentUrl( url, dir ) {
 
 	if ( index === - 1 ) return './';
 
-	return url.substr( 0, index );
+	return url.slice( 0, index );
 
 }
 

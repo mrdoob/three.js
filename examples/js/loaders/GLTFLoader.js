@@ -928,7 +928,6 @@
 			}
 
 			const extension = textureDef.extensions[ this.name ];
-			const source = json.images[ extension.source ];
 			const loader = parser.options.ktx2Loader;
 
 			if ( ! loader ) {
@@ -946,7 +945,7 @@
 
 			}
 
-			return parser.loadTextureImage( textureIndex, source, loader );
+			return parser.loadTextureImage( textureIndex, extension.source, loader );
 
 		}
 
@@ -1822,19 +1821,22 @@
 
 		let hasMorphPosition = false;
 		let hasMorphNormal = false;
+		let hasMorphColor = false;
 
 		for ( let i = 0, il = targets.length; i < il; i ++ ) {
 
 			const target = targets[ i ];
 			if ( target.POSITION !== undefined ) hasMorphPosition = true;
 			if ( target.NORMAL !== undefined ) hasMorphNormal = true;
-			if ( hasMorphPosition && hasMorphNormal ) break;
+			if ( target.COLOR_0 !== undefined ) hasMorphColor = true;
+			if ( hasMorphPosition && hasMorphNormal && hasMorphColor ) break;
 
 		}
 
-		if ( ! hasMorphPosition && ! hasMorphNormal ) return Promise.resolve( geometry );
+		if ( ! hasMorphPosition && ! hasMorphNormal && ! hasMorphColor ) return Promise.resolve( geometry );
 		const pendingPositionAccessors = [];
 		const pendingNormalAccessors = [];
+		const pendingColorAccessors = [];
 
 		for ( let i = 0, il = targets.length; i < il; i ++ ) {
 
@@ -1854,14 +1856,23 @@
 
 			}
 
+			if ( hasMorphColor ) {
+
+				const pendingAccessor = target.COLOR_0 !== undefined ? parser.getDependency( 'accessor', target.COLOR_0 ) : geometry.attributes.color;
+				pendingColorAccessors.push( pendingAccessor );
+
+			}
+
 		}
 
-		return Promise.all( [ Promise.all( pendingPositionAccessors ), Promise.all( pendingNormalAccessors ) ] ).then( function ( accessors ) {
+		return Promise.all( [ Promise.all( pendingPositionAccessors ), Promise.all( pendingNormalAccessors ), Promise.all( pendingColorAccessors ) ] ).then( function ( accessors ) {
 
 			const morphPositions = accessors[ 0 ];
 			const morphNormals = accessors[ 1 ];
+			const morphColors = accessors[ 2 ];
 			if ( hasMorphPosition ) geometry.morphAttributes.position = morphPositions;
 			if ( hasMorphNormal ) geometry.morphAttributes.normal = morphNormals;
+			if ( hasMorphColor ) geometry.morphAttributes.color = morphColors;
 			geometry.morphTargetsRelative = true;
 			return geometry;
 
@@ -2001,6 +2012,7 @@
 				refs: {},
 				uses: {}
 			};
+			this.sourceCache = {};
 			this.textureCache = {}; // Track node names, to ensure no duplicates
 
 			this.nodeNamesUsed = {}; // Use an THREE.ImageBitmapLoader if imageBitmaps are supported. Moves much of the
@@ -2540,27 +2552,28 @@
 			const json = this.json;
 			const options = this.options;
 			const textureDef = json.textures[ textureIndex ];
-			const source = json.images[ textureDef.source ];
+			const sourceIndex = textureDef.source;
+			const sourceDef = json.images[ sourceIndex ];
 			let loader = this.textureLoader;
 
-			if ( source.uri ) {
+			if ( sourceDef.uri ) {
 
-				const handler = options.manager.getHandler( source.uri );
+				const handler = options.manager.getHandler( sourceDef.uri );
 				if ( handler !== null ) loader = handler;
 
 			}
 
-			return this.loadTextureImage( textureIndex, source, loader );
+			return this.loadTextureImage( textureIndex, sourceIndex, loader );
 
 		}
 
-		loadTextureImage( textureIndex, source, loader ) {
+		loadTextureImage( textureIndex, sourceIndex, loader ) {
 
 			const parser = this;
 			const json = this.json;
-			const options = this.options;
 			const textureDef = json.textures[ textureIndex ];
-			const cacheKey = ( source.uri || source.bufferView ) + ':' + textureDef.sampler;
+			const sourceDef = json.images[ sourceIndex ];
+			const cacheKey = ( sourceDef.uri || sourceDef.bufferView ) + ':' + textureDef.sampler;
 
 			if ( this.textureCache[ cacheKey ] ) {
 
@@ -2569,27 +2582,73 @@
 
 			}
 
+			const promise = this.loadImageSource( sourceIndex, loader ).then( function ( texture ) {
+
+				texture.flipY = false;
+				if ( textureDef.name ) texture.name = textureDef.name;
+				const samplers = json.samplers || {};
+				const sampler = samplers[ textureDef.sampler ] || {};
+				texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
+				texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.LinearMipmapLinearFilter;
+				texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
+				texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
+				parser.associations.set( texture, {
+					textures: textureIndex
+				} );
+				return texture;
+
+			} ).catch( function () {
+
+				return null;
+
+			} );
+			this.textureCache[ cacheKey ] = promise;
+			return promise;
+
+		}
+
+		loadImageSource( sourceIndex, loader ) {
+
+			const parser = this;
+			const json = this.json;
+			const options = this.options;
+
+			if ( this.sourceCache[ sourceIndex ] !== undefined ) {
+
+				return this.sourceCache[ sourceIndex ].then( function ( texture ) {
+
+					return texture.clone();
+
+				} ).catch( function ( error ) {
+
+					throw error;
+
+				} );
+
+			}
+
+			const sourceDef = json.images[ sourceIndex ];
 			const URL = self.URL || self.webkitURL;
-			let sourceURI = source.uri || '';
+			let sourceURI = sourceDef.uri || '';
 			let isObjectURL = false;
 
-			if ( source.bufferView !== undefined ) {
+			if ( sourceDef.bufferView !== undefined ) {
 
 				// Load binary image data from bufferView, if provided.
-				sourceURI = parser.getDependency( 'bufferView', source.bufferView ).then( function ( bufferView ) {
+				sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
 
 					isObjectURL = true;
 					const blob = new Blob( [ bufferView ], {
-						type: source.mimeType
+						type: sourceDef.mimeType
 					} );
 					sourceURI = URL.createObjectURL( blob );
 					return sourceURI;
 
 				} );
 
-			} else if ( source.uri === undefined ) {
+			} else if ( sourceDef.uri === undefined ) {
 
-				throw new Error( 'THREE.GLTFLoader: Image ' + textureIndex + ' is missing URI and bufferView' );
+				throw new Error( 'THREE.GLTFLoader: Image ' + sourceIndex + ' is missing URI and bufferView' );
 
 			}
 
@@ -2624,26 +2683,15 @@
 
 				}
 
-				texture.flipY = false;
-				if ( textureDef.name ) texture.name = textureDef.name;
-				const samplers = json.samplers || {};
-				const sampler = samplers[ textureDef.sampler ] || {};
-				texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
-				texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.LinearMipmapLinearFilter;
-				texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
-				texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
-				parser.associations.set( texture, {
-					textures: textureIndex
-				} );
 				return texture;
 
-			} ).catch( function () {
+			} ).catch( function ( error ) {
 
 				console.error( 'THREE.GLTFLoader: Couldn\'t load texture', sourceURI );
-				return null;
+				throw error;
 
 			} );
-			this.textureCache[ cacheKey ] = promise;
+			this.sourceCache[ sourceIndex ] = promise;
 			return promise;
 
 		}
@@ -2885,7 +2933,6 @@
 			} else {
 
 				materialParams.transparent = false;
-				materialParams.alphaWrite = false;
 
 				if ( alphaMode === ALPHA_MODES.MASK ) {
 

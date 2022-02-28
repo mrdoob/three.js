@@ -10,15 +10,7 @@ export default /* glsl */`
 
 		for ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {
 
-			#ifndef USE_MORPHNORMALS
-
-				if ( morphTargetInfluences[ i ] != 0.0 ) transformed += getMorph( gl_VertexID, i, 0, 1 ) * morphTargetInfluences[ i ];
-
-			#else
-
-				if ( morphTargetInfluences[ i ] != 0.0 ) transformed += getMorph( gl_VertexID, i, 0, 2 ) * morphTargetInfluences[ i ];
-
-			#endif
+			if ( morphTargetInfluences[ i ] != 0.0 ) transformed += getMorph( gl_VertexID, i, 0 ).xyz * morphTargetInfluences[ i ];
 
 		}
 

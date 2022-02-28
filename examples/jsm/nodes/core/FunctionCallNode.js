@@ -1,108 +1,67 @@
-import { TempNode } from './TempNode.js';
+import TempNode from './TempNode.js';
 
 class FunctionCallNode extends TempNode {
 
-	constructor( func, inputs ) {
+	constructor( functionNode = null, parameters = {} ) {
 
 		super();
 
-		this.setFunction( func, inputs );
+		this.functionNode = functionNode;
+		this.parameters = parameters;
 
 	}
 
-	setFunction( func, inputs = [] ) {
+	setParameters( parameters ) {
 
-		this.value = func;
-		this.inputs = inputs;
-
-	}
-
-	getFunction() {
-
-		return this.value;
-
-	}
-
-	getType( builder ) {
-
-		return this.value.getType( builder );
-
-	}
-
-	generate( builder, output ) {
-
-		const type = this.getType( builder ),
-			func = this.value;
-
-		let code = func.build( builder, output ) + '( ';
-		const params = [];
-
-		for ( let i = 0; i < func.inputs.length; i ++ ) {
-
-			const inpt = func.inputs[ i ],
-				param = this.inputs[ i ] || this.inputs[ inpt.name ];
-
-			params.push( param.build( builder, builder.getTypeByFormat( inpt.type ) ) );
-
-		}
-
-		code += params.join( ', ' ) + ' )';
-
-		return builder.format( code, type, output );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		for ( const prop in source.inputs ) {
-
-			this.inputs[ prop ] = source.inputs[ prop ];
-
-		}
-
-		this.value = source.value;
+		this.parameters = parameters;
 
 		return this;
 
 	}
 
-	toJSON( meta ) {
+	getParameters() {
 
-		let data = this.getJSONNode( meta );
+		return this.parameters;
 
-		if ( ! data ) {
+	}
 
-			const func = this.value;
+	getNodeType( builder ) {
 
-			data = this.createJSONNode( meta );
+		return this.functionNode.getNodeType( builder );
 
-			data.value = this.value.toJSON( meta ).uuid;
+	}
 
-			if ( func.inputs.length ) {
+	generate( builder ) {
 
-				data.inputs = {};
+		const params = [];
 
-				for ( let i = 0; i < func.inputs.length; i ++ ) {
+		const functionNode = this.functionNode;
 
-					const inpt = func.inputs[ i ],
-						node = this.inputs[ i ] || this.inputs[ inpt.name ];
+		const inputs = functionNode.getInputs( builder );
+		const parameters = this.parameters;
 
-					data.inputs[ inpt.name ] = node.toJSON( meta ).uuid;
+		for ( const inputNode of inputs ) {
 
-				}
+			const node = parameters[ inputNode.name ];
+
+			if ( node !== undefined ) {
+
+				params.push( node.build( builder, inputNode.type ) );
+
+			} else {
+
+				throw new Error( `FunctionCallNode: Input '${inputNode.name}' not found in FunctionNode.` );
 
 			}
 
 		}
 
-		return data;
+		const functionName = functionNode.build( builder, 'property' );
+
+		return `${functionName}( ${params.join( ', ' )} )`;
 
 	}
 
 }
 
-FunctionCallNode.prototype.nodeType = 'FunctionCall';
-
-export { FunctionCallNode };
+export default FunctionCallNode;

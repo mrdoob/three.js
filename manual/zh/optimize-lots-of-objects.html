@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
     <link rel="stylesheet" href="/manual/zh/lang.css">
   </head>
   <body>
@@ -162,7 +173,7 @@ function hsl(h, s, l) {
   const boxWidth = 1;
   const boxHeight = 1;
   const boxDepth = 1;
-  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
   // 沿着z轴缩放
   geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
@@ -263,7 +274,7 @@ function hsl(h, s, l) {
 -  const boxWidth = 1;
 -  const boxHeight = 1;
 -  const boxDepth = 1;
--  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 -  // 沿着Z轴缩放
 -  geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
@@ -304,7 +315,7 @@ function hsl(h, s, l) {
 +      const boxWidth = 1;
 +      const boxHeight = 1;
 +      const boxDepth = 1;
-+      const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
++      const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
       // 调整位置辅助器的指向
       lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
@@ -361,7 +372,7 @@ data.forEach((row, latNdx) =&gt; {
     const boxWidth = 1;
     const boxHeight = 1;
     const boxDepth = 1;
-    const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
     latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
