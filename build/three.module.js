@@ -23875,7 +23875,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			}
 
 			const renderTargetProperties = properties.get( renderTarget );
-			const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : true;
+			const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : false;
 
 			if ( ignoreDepthValues === false ) {
 
