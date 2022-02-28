@@ -193,7 +193,7 @@ export const nodeObject = ( val ) => {
 
 };
 
-const ConvertType = function ( nodeClass, type, vectorClass = null, vectorComponents = 1 ) {
+const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1 ) {
 
 	return ( ...params ) => {
 
@@ -203,11 +203,11 @@ const ConvertType = function ( nodeClass, type, vectorClass = null, vectorCompon
 
 		}
 
-		if ( ( params.length === 1 ) && ( vectorComponents !== 1 ) ) {
+		if ( ( params.length === 1 ) && ( valueComponents !== 1 ) ) {
 
 			// Providing one scalar value: This value is used for all components
 
-			for ( let i = 1; i < vectorComponents; i ++ ) {
+			for ( let i = 1; i < valueComponents; i ++ ) {
 
 				params[ i ] = params [ 0 ];
 
@@ -215,7 +215,7 @@ const ConvertType = function ( nodeClass, type, vectorClass = null, vectorCompon
 
 		}
 
-		const val = ( vectorClass === null ) ? params[ 0 ] : new vectorClass( ...params );
+		const val = ( valueClass === null ) ? params[ 0 ] : new valueClass().set( ...params );
 
 		return nodeObject( new nodeClass( val ).setConst( true ) );
 
