@@ -758,21 +758,7 @@ class GLTFWriter {
 
 			const texture = new Texture( canvas );
 
-			let mimeType = material.roughnessMap.userData.mimeType;
-
-			if ( ! mimeType ) {
-
-				mimeType = material.metalnessMap.userData.mimeType;
-
-			} 
-			
-			if ( ! mimeType ) {
-
-				mimeType = material.aoMap.userData.mimeType;
-
-			}
-			
-			texture.userData.mimeType = mimeType;
+			texture.userData.mimeType = material.roughnessMap.userData.mimeType || material.metalnessMap.userData.mimeType || material.aoMap.userData.mimeType;
 
 			return texture;
 
