@@ -215,7 +215,7 @@ const ConvertType = function ( nodeClass, type, valueClass = null, valueComponen
 
 		}
 
-		const val = ( valueClass === null ) ? params[ 0 ] : new valueClass().set( ...params );
+		const val = ( ( valueClass === null ) || ( params[ 0 ] instanceof valueClass ) ) ? params[ 0 ] : new valueClass().set( ...params );
 
 		return nodeObject( new nodeClass( val ).setConst( true ) );
 
