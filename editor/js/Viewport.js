@@ -367,7 +367,7 @@ function Viewport( editor ) {
 		if ( window.matchMedia ) {
 
 			const mediaQuery = window.matchMedia( '(prefers-color-scheme: dark)' );
-			mediaQuery.addListener( function ( event ) {
+			mediaQuery.addEventListener( 'change', function ( event ) {
 
 				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
 				updateGridColors( grid1, grid2, event.matches ? [ 0x222222, 0x888888 ] : [ 0x888888, 0x282828 ] );
