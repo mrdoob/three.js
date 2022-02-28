@@ -19,30 +19,30 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget ) {
+	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget, physicallyCorrectLights ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 
 		} else if ( material.isMeshLambertMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 			refreshUniformsLambert( uniforms, material );
 
 		} else if ( material.isMeshToonMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 			refreshUniformsToon( uniforms, material );
 
 		} else if ( material.isMeshPhongMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 			refreshUniformsPhong( uniforms, material );
 
 		} else if ( material.isMeshStandardMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 
 			if ( material.isMeshPhysicalMaterial ) {
 
@@ -56,22 +56,22 @@ function WebGLMaterials( properties ) {
 
 		} else if ( material.isMeshMatcapMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 			refreshUniformsMatcap( uniforms, material );
 
 		} else if ( material.isMeshDepthMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 			refreshUniformsDepth( uniforms, material );
 
 		} else if ( material.isMeshDistanceMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 			refreshUniformsDistance( uniforms, material );
 
 		} else if ( material.isMeshNormalMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
 			refreshUniformsNormal( uniforms, material );
 
 		} else if ( material.isLineBasicMaterial ) {
@@ -105,7 +105,7 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsCommon( uniforms, material ) {
+	function refreshUniformsCommon( uniforms, material, physicallyCorrectLights ) {
 
 		uniforms.opacity.value = material.opacity;
 
@@ -162,7 +162,11 @@ function WebGLMaterials( properties ) {
 		if ( material.lightMap ) {
 
 			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+			// artist-friendly light intensity scaling factor
+			const scaleFactor = ( physicallyCorrectLights !== true ) ? Math.PI : 1;
+
+			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
 		}
 

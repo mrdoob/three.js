@@ -87,8 +87,8 @@ void main() {
 	// accumulation (baked indirect lighting only)
 	#ifdef USE_LIGHTMAP
 
-		vec4 lightMapTexel= texture2D( lightMap, vUv2 );
-		reflectedLight.indirectDiffuse += lightMapTexel.rgb * lightMapIntensity;
+		vec4 lightMapTexel = texture2D( lightMap, vUv2 );
+		reflectedLight.indirectDiffuse += lightMapTexel.rgb * lightMapIntensity * RECIPROCAL_PI;
 
 	#else
 
