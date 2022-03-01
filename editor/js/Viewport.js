@@ -38,8 +38,6 @@ function Viewport( editor ) {
 	const sceneHelpers = editor.sceneHelpers;
 	let showSceneHelpers = true;
 
-	const objects = [];
-
 	// helpers
 
 	const grid = new THREE.Group();
@@ -169,14 +167,27 @@ function Viewport( editor ) {
 
 	}
 
-	function getIntersects( point, objects ) {
+	function getIntersects( point ) {
 
 		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
 
 		raycaster.setFromCamera( mouse, camera );
 
-		return raycaster.intersectObjects( objects )
-			.filter( intersect => intersect.object.visible === true );
+		const objects = [];
+
+		scene.traverseVisible( function ( child ) {
+
+			objects.push( child );
+
+		} );
+
+		sceneHelpers.traverseVisible( function ( child ) {
+
+			if ( child.name === 'picker' ) objects.push( child );
+
+		} );
+
+		return raycaster.intersectObjects( objects, false );
 
 	}
 
@@ -195,7 +206,7 @@ function Viewport( editor ) {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
-			const intersects = getIntersects( onUpPosition, objects );
+			const intersects = getIntersects( onUpPosition );
 
 			if ( intersects.length > 0 ) {
 
@@ -276,7 +287,7 @@ function Viewport( editor ) {
 		const array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDoubleClickPosition.fromArray( array );
 
-		const intersects = getIntersects( onDoubleClickPosition, objects );
+		const intersects = getIntersects( onDoubleClickPosition );
 
 		if ( intersects.length > 0 ) {
 
@@ -446,16 +457,6 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.objectAdded.add( function ( object ) {
-
-		object.traverse( function ( child ) {
-
-			objects.push( child );
-
-		} );
-
-	} );
-
 	signals.objectChanged.add( function ( object ) {
 
 		if ( editor.selected === object ) {
@@ -486,36 +487,6 @@ function Viewport( editor ) {
 		if ( object === transformControls.object ) {
 
 			transformControls.detach();
-
-		}
-
-		object.traverse( function ( child ) {
-
-			objects.splice( objects.indexOf( child ), 1 );
-
-		} );
-
-	} );
-
-	signals.helperAdded.add( function ( object ) {
-
-		const picker = object.getObjectByName( 'picker' );
-
-		if ( picker !== undefined ) {
-
-			objects.push( picker );
-
-		}
-
-	} );
-
-	signals.helperRemoved.add( function ( object ) {
-
-		const picker = object.getObjectByName( 'picker' );
-
-		if ( picker !== undefined ) {
-
-			objects.splice( objects.indexOf( picker ), 1 );
 
 		}
 
