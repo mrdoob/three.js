@@ -1,6 +1,6 @@
 import { BackSide } from '../../constants.js';
 
-function WebGLMaterials( properties ) {
+function WebGLMaterials( renderer, properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
@@ -19,30 +19,30 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget, physicallyCorrectLights ) {
+	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 
 		} else if ( material.isMeshLambertMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 			refreshUniformsLambert( uniforms, material );
 
 		} else if ( material.isMeshToonMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 			refreshUniformsToon( uniforms, material );
 
 		} else if ( material.isMeshPhongMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 			refreshUniformsPhong( uniforms, material );
 
 		} else if ( material.isMeshStandardMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 
 			if ( material.isMeshPhysicalMaterial ) {
 
@@ -56,22 +56,22 @@ function WebGLMaterials( properties ) {
 
 		} else if ( material.isMeshMatcapMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 			refreshUniformsMatcap( uniforms, material );
 
 		} else if ( material.isMeshDepthMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 			refreshUniformsDepth( uniforms, material );
 
 		} else if ( material.isMeshDistanceMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 			refreshUniformsDistance( uniforms, material );
 
 		} else if ( material.isMeshNormalMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, physicallyCorrectLights );
+			refreshUniformsCommon( uniforms, material );
 			refreshUniformsNormal( uniforms, material );
 
 		} else if ( material.isLineBasicMaterial ) {
@@ -105,7 +105,7 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsCommon( uniforms, material, physicallyCorrectLights ) {
+	function refreshUniformsCommon( uniforms, material ) {
 
 		uniforms.opacity.value = material.opacity;
 
@@ -164,7 +164,7 @@ function WebGLMaterials( properties ) {
 			uniforms.lightMap.value = material.lightMap;
 
 			// artist-friendly light intensity scaling factor
-			const scaleFactor = ( physicallyCorrectLights !== true ) ? Math.PI : 1;
+			const scaleFactor = ( renderer.physicallyCorrectLights !== true ) ? Math.PI : 1;
 
 			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
