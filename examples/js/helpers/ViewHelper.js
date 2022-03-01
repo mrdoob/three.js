@@ -127,8 +127,8 @@
 
 				if ( this.animating === true ) return false;
 				const rect = dom.getBoundingClientRect();
-				const offsetX = rect.left + ( container.dom.offsetWidth - dim );
-				const offsetY = rect.top + ( container.dom.offsetHeight - dim );
+				const offsetX = rect.left + ( dom.offsetWidth - dim );
+				const offsetY = rect.top + ( dom.offsetHeight - dim );
 				mouse.x = ( event.clientX - offsetX ) / ( rect.width - offsetX ) * 2 - 1;
 				mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
 				raycaster.setFromCamera( mouse, camera );
