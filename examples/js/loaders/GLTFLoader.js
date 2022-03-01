@@ -1821,19 +1821,22 @@
 
 		let hasMorphPosition = false;
 		let hasMorphNormal = false;
+		let hasMorphColor = false;
 
 		for ( let i = 0, il = targets.length; i < il; i ++ ) {
 
 			const target = targets[ i ];
 			if ( target.POSITION !== undefined ) hasMorphPosition = true;
 			if ( target.NORMAL !== undefined ) hasMorphNormal = true;
-			if ( hasMorphPosition && hasMorphNormal ) break;
+			if ( target.COLOR_0 !== undefined ) hasMorphColor = true;
+			if ( hasMorphPosition && hasMorphNormal && hasMorphColor ) break;
 
 		}
 
-		if ( ! hasMorphPosition && ! hasMorphNormal ) return Promise.resolve( geometry );
+		if ( ! hasMorphPosition && ! hasMorphNormal && ! hasMorphColor ) return Promise.resolve( geometry );
 		const pendingPositionAccessors = [];
 		const pendingNormalAccessors = [];
+		const pendingColorAccessors = [];
 
 		for ( let i = 0, il = targets.length; i < il; i ++ ) {
 
@@ -1853,14 +1856,23 @@
 
 			}
 
+			if ( hasMorphColor ) {
+
+				const pendingAccessor = target.COLOR_0 !== undefined ? parser.getDependency( 'accessor', target.COLOR_0 ) : geometry.attributes.color;
+				pendingColorAccessors.push( pendingAccessor );
+
+			}
+
 		}
 
-		return Promise.all( [ Promise.all( pendingPositionAccessors ), Promise.all( pendingNormalAccessors ) ] ).then( function ( accessors ) {
+		return Promise.all( [ Promise.all( pendingPositionAccessors ), Promise.all( pendingNormalAccessors ), Promise.all( pendingColorAccessors ) ] ).then( function ( accessors ) {
 
 			const morphPositions = accessors[ 0 ];
 			const morphNormals = accessors[ 1 ];
+			const morphColors = accessors[ 2 ];
 			if ( hasMorphPosition ) geometry.morphAttributes.position = morphPositions;
 			if ( hasMorphNormal ) geometry.morphAttributes.normal = morphNormals;
+			if ( hasMorphColor ) geometry.morphAttributes.color = morphColors;
 			geometry.morphTargetsRelative = true;
 			return geometry;
 
@@ -1968,6 +1980,14 @@
 				throw new Error( 'THREE.GLTFLoader: Unsupported normalized accessor component type.' );
 
 		}
+
+	}
+
+	function getImageURIMimeType( uri ) {
+
+		if ( uri.search( /\.jpe?g($|\?)/i ) > 0 || uri.search( /^data\:image\/jpeg/ ) === 0 ) return 'image/jpeg';
+		if ( uri.search( /\.webp($|\?)/i ) > 0 || uri.search( /^data\:image\/webp/ ) === 0 ) return 'image/webp';
+		return 'image/png';
 
 	}
 	/* GLTF PARSER */
@@ -2671,6 +2691,7 @@
 
 				}
 
+				texture.userData.mimeType = sourceDef.mimeType || getImageURIMimeType( sourceDef.uri );
 				return texture;
 
 			} ).catch( function ( error ) {

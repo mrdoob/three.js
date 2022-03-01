@@ -113,15 +113,15 @@ class CSS2DRenderer {
 
 			if ( object.isCSS2DObject ) {
 
-				const visible = object.visible && _vector.z >= - 1 && _vector.z <= 1 && object.layers.test( camera.layers );
-				object.element.style.display = visible ? '' : 'none';
+				_vector.setFromMatrixPosition( object.matrixWorld );
+				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				if ( visible ) {
+				const visible = ( object.visible === true ) && ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
+				object.element.style.display = ( visible === true ) ? '' : 'none';
+
+				if ( visible === true ) {
 
 					object.onBeforeRender( _this, scene, camera );
-
-					_vector.setFromMatrixPosition( object.matrixWorld );
-					_vector.applyMatrix4( _viewProjectionMatrix );
 
 					const element = object.element;
 
