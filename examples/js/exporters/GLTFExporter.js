@@ -671,9 +671,8 @@
 			context.putImageData( composite, 0, 0 ); //
 
 			const reference = metalnessMap || roughnessMap;
-			const texture = reference.clone(); // TODO Use new Source() instead?
-
-			texture.source = new THREE.Texture( canvas ).source;
+			const texture = reference.clone();
+			texture.source = new THREE.Source( canvas );
 			return texture;
 
 		}
@@ -1024,7 +1023,7 @@
 		}
 		/**
    * Process sampler
-   * @param  {Texture} map THREE.Texture to process
+   * @param  {Texture} map Texture to process
    * @return {Integer}     Index of the processed texture in the "samplers" array
    */
 
