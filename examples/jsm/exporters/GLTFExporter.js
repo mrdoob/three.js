@@ -756,7 +756,11 @@ class GLTFWriter {
 
 			context.putImageData( composite, 0, 0 );
 
-			return new Texture( canvas );
+			const texture = new Texture( canvas );
+
+			texture.userData.mimeType = material.roughnessMap.userData.mimeType || material.metalnessMap.userData.mimeType || material.aoMap.userData.mimeType;
+
+			return texture;
 
 		}
 
@@ -1037,9 +1041,10 @@ class GLTFWriter {
 	 * @param  {Image} image to process
 	 * @param  {Integer} format of the image (RGBAFormat)
 	 * @param  {Boolean} flipY before writing out the image
+	 * @param  {String} mimeType export format
 	 * @return {Integer}     Index of the processed texture in the "images" array
 	 */
-	processImage( image, format, flipY ) {
+	processImage( image, format, flipY, mimeType = 'image/png' ) {
 
 		const writer = this;
 		const cache = writer.cache;
@@ -1050,7 +1055,7 @@ class GLTFWriter {
 		if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
 
 		const cachedImages = cache.images.get( image );
-		const mimeType = 'image/png';
+
 		const key = mimeType + ':flipY/' + flipY.toString();
 
 		if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
@@ -1182,9 +1187,13 @@ class GLTFWriter {
 
 		if ( ! json.textures ) json.textures = [];
 
+		let mimeType = map.userData.mimeType;
+
+		if ( mimeType === 'image/webp' ) mimeType = 'image/png';
+
 		const textureDef = {
 			sampler: this.processSampler( map ),
-			source: this.processImage( map.image, map.format, map.flipY )
+			source: this.processImage( map.image, map.format, map.flipY, mimeType )
 		};
 
 		if ( map.name ) textureDef.name = map.name;
