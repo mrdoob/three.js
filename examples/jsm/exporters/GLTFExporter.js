@@ -1187,7 +1187,9 @@ class GLTFWriter {
 
 		if ( ! json.textures ) json.textures = [];
 
-		const mimeType = map.userData.mimeType === 'image/webp' ? 'image/png' : map.userData.mimeType;
+		let mimeType = map.userData.mimeType;
+
+		if ( mimeType === 'image/webp' ) mimeType = 'image/png';
 
 		const textureDef = {
 			sampler: this.processSampler( map ),
