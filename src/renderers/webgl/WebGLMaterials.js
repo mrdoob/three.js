@@ -1,6 +1,6 @@
 import { BackSide } from '../../constants.js';
 
-function WebGLMaterials( properties ) {
+function WebGLMaterials( renderer, properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
@@ -162,7 +162,11 @@ function WebGLMaterials( properties ) {
 		if ( material.lightMap ) {
 
 			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+			// artist-friendly light intensity scaling factor
+			const scaleFactor = ( renderer.physicallyCorrectLights !== true ) ? Math.PI : 1;
+
+			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
 		}
 
