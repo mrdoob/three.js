@@ -435,7 +435,7 @@ Editor.prototype = {
 
 				}
 
-				var picker = new THREE.Mesh( geometry, material );
+				const picker = new THREE.Mesh( geometry, material );
 				picker.name = 'picker';
 				picker.userData.object = object;
 				helper.add( picker );
