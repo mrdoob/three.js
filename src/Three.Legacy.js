@@ -110,124 +110,193 @@ export function MultiMaterial( materials = [] ) {
 
 }
 
-export function PointCloud( geometry, material ) {
+export class PointCloud extends Points {
 
-	console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
-	return new Points( geometry, material );
+	constructor( geometry, material ) {
 
-}
+		console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
+		super( geometry, material );
 
-export function Particle( material ) {
-
-	console.warn( 'THREE.Particle has been renamed to THREE.Sprite.' );
-	return new Sprite( material );
+	}
 
 }
 
-export function ParticleSystem( geometry, material ) {
+export class Particle extends Sprite {
 
-	console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
-	return new Points( geometry, material );
+	constructor( material ) {
 
-}
+		console.warn( 'THREE.Particle has been renamed to THREE.Sprite.' );
+		super( material );
 
-export function PointCloudMaterial( parameters ) {
-
-	console.warn( 'THREE.PointCloudMaterial has been renamed to THREE.PointsMaterial.' );
-	return new PointsMaterial( parameters );
+	}
 
 }
 
-export function ParticleBasicMaterial( parameters ) {
+export class ParticleSystem extends Points {
 
-	console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointsMaterial.' );
-	return new PointsMaterial( parameters );
+	constructor( geometry, material ) {
 
-}
+		console.warn( 'THREE.ParticleSystem has been renamed to THREE.Points.' );
+		super( geometry, material );
 
-export function ParticleSystemMaterial( parameters ) {
-
-	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
-	return new PointsMaterial( parameters );
+	}
 
 }
 
-export function Vertex( x, y, z ) {
+export class PointCloudMaterial extends PointsMaterial {
 
-	console.warn( 'THREE.Vertex has been removed. Use THREE.Vector3 instead.' );
-	return new Vector3( x, y, z );
+	constructor( parameters ) {
+
+		console.warn( 'THREE.PointCloudMaterial has been renamed to THREE.PointsMaterial.' );
+		super( parameters );
+
+	}
+
+}
+
+export class ParticleBasicMaterial extends PointsMaterial {
+
+	constructor( parameters ) {
+
+		console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointsMaterial.' );
+		super( parameters );
+
+	}
+
+}
+
+export class ParticleSystemMaterial extends PointsMaterial {
+
+	constructor( parameters ) {
+
+		console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
+		super( parameters );
+
+	}
+
+}
+
+export class Vertex extends Vector3 {
+
+	constructor( x, y, z ) {
+
+		console.warn( 'THREE.Vertex has been removed. Use THREE.Vector3 instead.' );
+		super( x, y, z );
+
+	}
 
 }
 
 //
 
-export function DynamicBufferAttribute( array, itemSize ) {
+export class DynamicBufferAttribute extends BufferAttribute {
 
-	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setUsage( THREE.DynamicDrawUsage ) instead.' );
-	return new BufferAttribute( array, itemSize ).setUsage( DynamicDrawUsage );
+	constructor( array, itemSize ) {
 
-}
+		console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setUsage( THREE.DynamicDrawUsage ) instead.' );
+		super( array, itemSize );
+		this.setUsage( DynamicDrawUsage );
 
-export function Int8Attribute( array, itemSize ) {
-
-	console.warn( 'THREE.Int8Attribute has been removed. Use new THREE.Int8BufferAttribute() instead.' );
-	return new Int8BufferAttribute( array, itemSize );
+	}
 
 }
 
-export function Uint8Attribute( array, itemSize ) {
+export class Int8Attribute extends Int8BufferAttribute {
 
-	console.warn( 'THREE.Uint8Attribute has been removed. Use new THREE.Uint8BufferAttribute() instead.' );
-	return new Uint8BufferAttribute( array, itemSize );
+	constructor( array, itemSize ) {
 
-}
+		console.warn( 'THREE.Int8Attribute has been removed. Use new THREE.Int8BufferAttribute() instead.' );
+		super( array, itemSize );
 
-export function Uint8ClampedAttribute( array, itemSize ) {
-
-	console.warn( 'THREE.Uint8ClampedAttribute has been removed. Use new THREE.Uint8ClampedBufferAttribute() instead.' );
-	return new Uint8ClampedBufferAttribute( array, itemSize );
+	}
 
 }
 
-export function Int16Attribute( array, itemSize ) {
+export class Uint8Attribute extends Uint8BufferAttribute {
 
-	console.warn( 'THREE.Int16Attribute has been removed. Use new THREE.Int16BufferAttribute() instead.' );
-	return new Int16BufferAttribute( array, itemSize );
+	constructor( array, itemSize ) {
 
-}
+		console.warn( 'THREE.Uint8Attribute has been removed. Use new THREE.Uint8BufferAttribute() instead.' );
+		super( array, itemSize );
 
-export function Uint16Attribute( array, itemSize ) {
-
-	console.warn( 'THREE.Uint16Attribute has been removed. Use new THREE.Uint16BufferAttribute() instead.' );
-	return new Uint16BufferAttribute( array, itemSize );
+	}
 
 }
 
-export function Int32Attribute( array, itemSize ) {
+export class Uint8ClampedAttribute extends Uint8ClampedBufferAttribute {
 
-	console.warn( 'THREE.Int32Attribute has been removed. Use new THREE.Int32BufferAttribute() instead.' );
-	return new Int32BufferAttribute( array, itemSize );
+	constructor( array, itemSize ) {
 
-}
+		console.warn( 'THREE.Uint8ClampedAttribute has been removed. Use new THREE.Uint8ClampedBufferAttribute() instead.' );
+		super( array, itemSize );
 
-export function Uint32Attribute( array, itemSize ) {
-
-	console.warn( 'THREE.Uint32Attribute has been removed. Use new THREE.Uint32BufferAttribute() instead.' );
-	return new Uint32BufferAttribute( array, itemSize );
+	}
 
 }
 
-export function Float32Attribute( array, itemSize ) {
+export class Int16Attribute extends Int16BufferAttribute {
 
-	console.warn( 'THREE.Float32Attribute has been removed. Use new THREE.Float32BufferAttribute() instead.' );
-	return new Float32BufferAttribute( array, itemSize );
+	constructor( array, itemSize ) {
+
+		console.warn( 'THREE.Int16Attribute has been removed. Use new THREE.Int16BufferAttribute() instead.' );
+		super( array, itemSize );
+
+	}
 
 }
 
-export function Float64Attribute( array, itemSize ) {
+export class Uint16Attribute extends Uint16BufferAttribute {
 
-	console.warn( 'THREE.Float64Attribute has been removed. Use new THREE.Float64BufferAttribute() instead.' );
-	return new Float64BufferAttribute( array, itemSize );
+	constructor( array, itemSize ) {
+
+		console.warn( 'THREE.Uint16Attribute has been removed. Use new THREE.Uint16BufferAttribute() instead.' );
+		super( array, itemSize );
+
+	}
+
+}
+
+export class Int32Attribute extends Int32BufferAttribute {
+
+	constructor( array, itemSize ) {
+
+		console.warn( 'THREE.Int32Attribute has been removed. Use new THREE.Int32BufferAttribute() instead.' );
+		super( array, itemSize );
+
+	}
+
+}
+
+export class Uint32Attribute extends Uint32BufferAttribute {
+
+	constructor( array, itemSize ) {
+
+		console.warn( 'THREE.Uint32Attribute has been removed. Use new THREE.Uint32BufferAttribute() instead.' );
+		super( array, itemSize );
+
+	}
+
+}
+
+export class Float32Attribute extends Float32BufferAttribute {
+
+	constructor( array, itemSize ) {
+
+		console.warn( 'THREE.Float32Attribute has been removed. Use new THREE.Float32BufferAttribute() instead.' );
+		super( array, itemSize );
+
+	}
+
+}
+
+export class Float64Attribute extends Float64BufferAttribute {
+
+	constructor( array, itemSize ) {
+
+		console.warn( 'THREE.Float64Attribute has been removed. Use new THREE.Float64BufferAttribute() instead.' );
+		super( array, itemSize );
+
+	}
 
 }
 
@@ -256,24 +325,36 @@ Path.prototype.fromPoints = function ( points ) {
 
 //
 
-export function AxisHelper( size ) {
+export class AxisHelper extends AxesHelper {
 
-	console.warn( 'THREE.AxisHelper has been renamed to THREE.AxesHelper.' );
-	return new AxesHelper( size );
+	constructor( size ) {
 
-}
+		console.warn( 'THREE.AxisHelper has been renamed to THREE.AxesHelper.' );
+		super( size );
 
-export function BoundingBoxHelper( object, color ) {
-
-	console.warn( 'THREE.BoundingBoxHelper has been deprecated. Creating a THREE.BoxHelper instead.' );
-	return new BoxHelper( object, color );
+	}
 
 }
 
-export function EdgesHelper( object, hex ) {
+export class BoundingBoxHelper extends BoxHelper {
 
-	console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
-	return new LineSegments( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+	constructor( object, color ) {
+
+		console.warn( 'THREE.BoundingBoxHelper has been deprecated. Creating a THREE.BoxHelper instead.' );
+		super( object, color );
+
+	}
+
+}
+
+export class EdgesHelper extends LineSegments {
+
+	constructor( object, hex ) {
+
+		console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
+		super( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+
+	}
 
 }
 
@@ -289,10 +370,14 @@ SkeletonHelper.prototype.update = function () {
 
 };
 
-export function WireframeHelper( object, hex ) {
+export class WireframeHelper extends LineSegments {
 
-	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
-	return new LineSegments( new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+	constructor( object, hex ) {
+
+		console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
+		super( new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+
+	}
 
 }
 
@@ -321,17 +406,25 @@ Loader.Handlers = {
 
 };
 
-export function XHRLoader( manager ) {
+export class XHRLoader extends FileLoader {
 
-	console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
-	return new FileLoader( manager );
+	constructor( manager ) {
+
+		console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
+		super( manager );
+
+	}
 
 }
 
-export function BinaryTextureLoader( manager ) {
+export class BinaryTextureLoader extends DataTextureLoader {
 
-	console.warn( 'THREE.BinaryTextureLoader has been renamed to THREE.DataTextureLoader.' );
-	return new DataTextureLoader( manager );
+	constructor( manager ) {
+
+		console.warn( 'THREE.BinaryTextureLoader has been renamed to THREE.DataTextureLoader.' );
+		super( manager );
+
+	}
 
 }
 
@@ -1668,10 +1761,14 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 
 } );
 
-export function WebGLRenderTargetCube( width, height, options ) {
+export class WebGLRenderTargetCube extends WebGLCubeRenderTarget {
 
-	console.warn( 'THREE.WebGLRenderTargetCube( width, height, options ) is now WebGLCubeRenderTarget( size, options ).' );
-	return new WebGLCubeRenderTarget( width, options );
+	constructor( width, height, options ) {
+
+		console.warn( 'THREE.WebGLRenderTargetCube( width, height, options ) is now WebGLCubeRenderTarget( size, options ).' );
+		super( width, options );
+
+	}
 
 }
 
@@ -1956,17 +2053,25 @@ export function LensFlare() {
 
 //
 
-export function ParametricGeometry() {
+export class ParametricGeometry extends BufferGeometry {
 
-	console.error( 'THREE.ParametricGeometry has been moved to /examples/jsm/geometries/ParametricGeometry.js' );
-	return new BufferGeometry();
+	constructor() {
+
+		console.error( 'THREE.ParametricGeometry has been moved to /examples/jsm/geometries/ParametricGeometry.js' );
+		super();
+
+	}
 
 }
 
-export function TextGeometry() {
+export class TextGeometry extends BufferGeometry {
 
-	console.error( 'THREE.TextGeometry has been moved to /examples/jsm/geometries/TextGeometry.js' );
-	return new BufferGeometry();
+	constructor() {
+
+		console.error( 'THREE.TextGeometry has been moved to /examples/jsm/geometries/TextGeometry.js' );
+		super();
+
+	}
 
 }
 
@@ -1988,25 +2093,36 @@ export function ImmediateRenderObject() {
 
 }
 
-export function WebGLMultisampleRenderTarget( width, height, options ) {
+export class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
-	console.error( 'THREE.WebGLMultisampleRenderTarget has been removed. Use a normal render target and set the "samples" property to greater 0 to enable multisampling.' );
-	const renderTarget = new WebGLRenderTarget( width, height, options );
-	renderTarget.samples = 4;
-	return renderTarget;
+	constructor( width, height, options ) {
 
-}
+		console.error( 'THREE.WebGLMultisampleRenderTarget has been removed. Use a normal render target and set the "samples" property to greater 0 to enable multisampling.' );
+		super( width, height, options );
+		this.samples = 4;
 
-export function DataTexture2DArray( data, width, height, depth ) {
-
-	console.warn( 'THREE.DataTexture2DArray has been renamed to DataArrayTexture.' );
-	return new DataArrayTexture( data, width, height, depth );
+	}
 
 }
 
-export function DataTexture3D( data, width, height, depth ) {
+export class DataTexture2DArray extends DataArrayTexture {
 
-	console.warn( 'THREE.DataTexture3D has been renamed to Data3DTexture.' );
-	return new Data3DTexture( data, width, height, depth );
+	constructor( data, width, height, depth ) {
+
+		console.warn( 'THREE.DataTexture2DArray has been renamed to DataArrayTexture.' );
+		super( data, width, height, depth );
+
+	}
+
+}
+
+export class DataTexture3D extends Data3DTexture {
+
+	constructor( data, width, height, depth ) {
+
+		console.warn( 'THREE.DataTexture3D has been renamed to Data3DTexture.' );
+		super( data, width, height, depth );
+
+	}
 
 }
