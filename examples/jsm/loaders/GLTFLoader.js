@@ -2234,6 +2234,15 @@ function getNormalizedComponentScale( constructor ) {
 
 }
 
+function getImageURIMimeType( uri ) {
+
+	if ( uri.search( /\.jpe?g($|\?)/i ) > 0 || uri.search( /^data\:image\/jpeg/ ) === 0 ) return 'image/jpeg';
+	if ( uri.search( /\.webp($|\?)/i ) > 0 || uri.search( /^data\:image\/webp/ ) === 0 ) return 'image/webp';
+
+	return 'image/png';
+
+}
+
 /* GLTF PARSER */
 
 class GLTFParser {
@@ -2966,14 +2975,7 @@ class GLTFParser {
 
 			}
 
-			texture.userData.mimeType = sourceDef.mimeType;
-
-			if ( ! sourceDef.mimeType ) {
-
-				const ext = sourceDef.uri.split( '.' ).pop().toLowerCase();
-				texture.userData.mimeType = ( ext.includes( 'jp' ) ) ? 'image/jpeg' : ext === 'webp' ? 'image/webp' : 'image/png';
-
-			}
+			texture.userData.mimeType = sourceDef.mimeType || getImageURIMimeType( sourceDef.uri );
 
 			return texture;
 
