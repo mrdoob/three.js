@@ -181,10 +181,10 @@
 
 				if ( object.isCSS3DObject ) {
 
-					const visible = object.visible && object.layers.test( camera.layers );
-					object.element.style.display = visible ? '' : 'none'; // only getObjectCSSMatrix when object.visible
+					const visible = object.visible === true && object.layers.test( camera.layers ) === true;
+					object.element.style.display = visible === true ? '' : 'none';
 
-					if ( visible ) {
+					if ( visible === true ) {
 
 						object.onBeforeRender( _this, scene, camera );
 						let style;
