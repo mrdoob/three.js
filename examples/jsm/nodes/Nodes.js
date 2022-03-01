@@ -79,6 +79,10 @@ import NodeMaterialLoader from './loaders/NodeMaterialLoader.js';
 // procedural
 import CheckerNode from './procedural/CheckerNode.js';
 
+// fog
+import FogNode from './fog/FogNode.js';
+import FogRangeNode from './fog/FogRangeNode.js';
+
 // core
 export * from './core/constants.js';
 
@@ -167,6 +171,10 @@ const nodeLib = {
 
 	// procedural
 	CheckerNode,
+
+	// fog
+	FogNode,
+	FogRangeNode,
 
 	// loaders
 	NodeLoader,
@@ -257,6 +265,10 @@ export {
 
 	// procedural
 	CheckerNode,
+
+	// fog
+	FogNode,
+	FogRangeNode,
 
 	// loaders
 	NodeLoader,

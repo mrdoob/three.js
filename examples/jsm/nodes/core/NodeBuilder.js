@@ -11,6 +11,12 @@ import { REVISION, LinearEncoding } from 'three';
 export const shaderStages = [ 'fragment', 'vertex' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
+const toFloat = ( value ) => {
+
+	return value + ( value % 1 ? '' : '.0' );
+
+};
+
 class NodeBuilder {
 
 	constructor( object, renderer, parser ) {
@@ -150,10 +156,10 @@ class NodeBuilder {
 	getConst( type, value ) {
 
 		if ( type === 'float' ) return value + ( value % 1 ? '' : '.0' );
-		if ( type === 'vec2' ) return `${ this.getType( 'vec2' ) }( ${value.x}, ${value.y} )`;
-		if ( type === 'vec3' ) return `${ this.getType( 'vec3' ) }( ${value.x}, ${value.y}, ${value.z} )`;
-		if ( type === 'vec4' ) return `${ this.getType( 'vec4' ) }( ${value.x}, ${value.y}, ${value.z}, ${value.w} )`;
-		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${value.r}, ${value.g}, ${value.b} )`;
+		if ( type === 'vec2' ) return `${ this.getType( 'vec2' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) } )`;
+		if ( type === 'vec3' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) }, ${ toFloat( value.z ) } )`;
+		if ( type === 'vec4' ) return `${ this.getType( 'vec4' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) }, ${ toFloat( value.z ) }, ${ toFloat( value.w ) } )`;
+		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
 
 		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
 

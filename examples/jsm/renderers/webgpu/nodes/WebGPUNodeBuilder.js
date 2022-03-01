@@ -25,7 +25,7 @@ import ColorSpaceNode from 'three-nodes/display/ColorSpaceNode.js';
 import LightContextNode from 'three-nodes/lights/LightContextNode.js';
 import OperatorNode from 'three-nodes/math/OperatorNode.js';
 import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
-import { vec3, add, join, nodeObject } from 'three-nodes/ShaderNode.js';
+import { vec3, add, join, mix, nodeObject } from 'three-nodes/ShaderNode.js';
 import { getRoughness } from 'three-nodes/functions/PhysicalMaterialFunctions.js';
 
 const wgslTypeLib = {
@@ -60,6 +60,16 @@ fn mod( x : f32, y : f32 ) -> f32 {
 
 }
 ` ),
+
+	smoothstep: new CodeNode( `
+fn smoothstep( low : f32, high : f32, x : f32 ) -> f32 {
+
+	let t = clamp( ( x - low ) / ( high - low ), 0.0, 1.0 );
+
+	return t * t * ( 3.0 - 2.0 * t );
+
+}
+` ),
 	repeatWrapping: new CodeNode( `
 fn repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
 
@@ -80,18 +90,25 @@ fn inversesqrt( x : f32 ) -> f32 {
 
 class WebGPUNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, lightNode = null ) {
+	constructor( object, renderer ) {
 
 		super( object, renderer, new WGSLNodeParser() );
 
-		this.lightNode = lightNode;
+		this.lightNode = null;
+		this.fogNode = null;
 
 		this.bindings = { vertex: [], fragment: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0 };
 
 		this.uniformsGroup = {};
 
+	}
+
+	build() {
+
 		this._parseObject();
+
+		return super.build();
 
 	}
 
@@ -278,9 +295,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
+			// OUTPUT
+
 			outputNode = join( vec3( outgoingLightNode ), nodeObject( diffuseColorNode ).w );
 
-			// OUTPUT
+			// ENCODING
 
 			const outputEncoding = this.renderer.outputEncoding;
 
@@ -290,6 +309,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				outputNode.fromEncoding( outputEncoding );
 
 			}
+
+			// FOG
+
+			const fogNode = this.fogNode;
+
+			if ( fogNode && fogNode.isFogNode ) {
+
+				outputNode = mix( outputNode, fogNode.colorNode, fogNode );
+
+			}
+
+			// RESULT
 
 			this.addFlow( 'fragment', new VarNode( outputNode, 'Output', 'vec4' ) );
 
