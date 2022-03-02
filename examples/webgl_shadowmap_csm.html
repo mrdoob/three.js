@@ -98,7 +98,7 @@
 				scene.add( ambientLight );
 
 				const additionalDirectionalLight = new THREE.DirectionalLight( 0x000020, 0.5 );
-		    additionalDirectionalLight.position.set( params.lightX, params.lightY, params.lightZ ).normalize().multiplyScalar( - 200 );
+				additionalDirectionalLight.position.set( params.lightX, params.lightY, params.lightZ ).normalize().multiplyScalar( - 200 );
 				scene.add( additionalDirectionalLight );
 
 				csm = new CSM( {
