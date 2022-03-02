@@ -1,9 +1,9 @@
-// core
+// core nodes
 import PropertyNode from './core/PropertyNode.js';
 import VarNode from './core/VarNode.js';
 import AttributeNode from './core/AttributeNode.js';
 
-// inputs
+// input nodes
 import ColorNode from './inputs/ColorNode.js';
 import FloatNode from './inputs/FloatNode.js';
 import IntNode from './inputs/IntNode.js';
@@ -14,24 +14,24 @@ import Matrix3Node from './inputs/Matrix3Node.js';
 import Matrix4Node from './inputs/Matrix4Node.js';
 import TextureNode from './inputs/TextureNode.js';
 
-// accessors
+// accessor nodes
 import PositionNode from './accessors/PositionNode.js';
 import NormalNode from './accessors/NormalNode.js';
 import UVNode from './accessors/UVNode.js';
 
-// math
+// math nodes
 import OperatorNode from './math/OperatorNode.js';
 import CondNode from './math/CondNode.js';
 import MathNode from './math/MathNode.js';
 
-// utils
+// util nodes
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
 // core
-import { Vector2, Vector3, Vector4, Color } from 'three';
+import { Vector2, Vector3, Vector4, Matrix3, Matrix4, Color } from 'three';
 
 const NodeHandler = {
 
@@ -226,41 +226,46 @@ export const label = ( node, name = null, nodeType = null ) => {
 
 export const temp = ( node, nodeType = null ) => label( node, null, nodeType );
 
-export const float = ( val ) => {
+const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1 ) {
 
-	if ( val?.isNode === true ) {
+	return ( ...params ) => {
 
-		return nodeObject( new ConvertNode( val, 'float' ) );
+		if ( params[ 0 ]?.isNode === true ) {
 
-	}
+			return nodeObject( new ConvertNode( params[ 0 ], type ) );
 
-	return nodeObject( new FloatNode( val ).setConst( true ) );
+		}
 
-};
+		if ( ( params.length === 1 ) && ( valueComponents !== 1 ) ) {
 
-export const int = ( val ) => {
+			// Providing one scalar value: This value is used for all components
 
-	if ( val?.isNode === true ) {
+			for ( let i = 1; i < valueComponents; i ++ ) {
 
-		return nodeObject( new ConvertNode( val, 'int' ) );
+				params[ i ] = params [ 0 ];
 
-	}
+			}
 
-	return nodeObject( new IntNode( val ).setConst( true ) );
+		}
 
-};
+		const val = ( ( valueClass === null ) || ( params[ 0 ] instanceof valueClass ) ) ? params[ 0 ] : new valueClass().set( ...params );
 
-export const color = ( ...params ) => {
+		return nodeObject( new nodeClass( val ).setConst( true ) );
 
-	if ( params[ 0 ]?.isNode === true ) {
-
-		return nodeObject( new ConvertNode( params[ 0 ], 'color' ) );
-
-	}
-
-	return nodeObject( new ColorNode( new Color( ...params ) ).setConst( true ) );
+	};
 
 };
+
+export const float = new ConvertType( FloatNode, 'float' );
+export const int = new ConvertType( IntNode, 'int' );
+export const color = new ConvertType( ColorNode, 'color', Color );
+
+export const vec2 = new ConvertType( Vector2Node, 'vec2', Vector2, 2 );
+export const vec3 = new ConvertType( Vector3Node, 'vec3', Vector3, 3 );
+export const vec4 = new ConvertType( Vector4Node, 'vec4', Vector4, 4 );
+
+export const mat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3 );
+export const mat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4 );
 
 export const join = ( ...params ) => {
 
@@ -271,84 +276,6 @@ export const join = ( ...params ) => {
 export const cond = ( ...params ) => {
 
 	return nodeObject( new CondNode( ...getShaderNodeArray( params ) ) );
-
-};
-
-export const vec2 = ( ...params ) => {
-
-	if ( params[ 0 ]?.isNode === true ) {
-
-		return nodeObject( new ConvertNode( params[ 0 ], 'vec2' ) );
-
-	} else {
-
-		// Providing one scalar value: This value is used for all components
-
-		if ( params.length === 1 ) {
-
-			params[ 1 ] = params[ 0 ];
-
-		}
-
-		return nodeObject( new Vector2Node( new Vector2( ...params ) ).setConst( true ) );
-
-	}
-
-};
-
-export const vec3 = ( ...params ) => {
-
-	if ( params[ 0 ]?.isNode === true ) {
-
-		return nodeObject( new ConvertNode( params[ 0 ], 'vec3' ) );
-
-	} else {
-
-		// Providing one scalar value: This value is used for all components
-
-		if ( params.length === 1 ) {
-
-			params[ 1 ] = params[ 2 ] = params[ 0 ];
-
-		}
-
-		return nodeObject( new Vector3Node( new Vector3( ...params ) ).setConst( true ) );
-
-	}
-
-};
-
-export const vec4 = ( ...params ) => {
-
-	if ( params[ 0 ]?.isNode === true ) {
-
-		return nodeObject( new ConvertNode( params[ 0 ], 'vec4' ) );
-
-	} else {
-
-		// Providing one scalar value: This value is used for all components
-
-		if ( params.length === 1 ) {
-
-			params[ 1 ] = params[ 2 ] = params[ 3 ] = params[ 0 ];
-
-		}
-
-		return nodeObject( new Vector4Node( new Vector4( ...params ) ).setConst( true ) );
-
-	}
-
-};
-
-export const mat3 = ( val ) => {
-
-	return nodeObject( new Matrix3Node( val ).setConst( true ) );
-
-};
-
-export const mat4 = ( val ) => {
-
-	return nodeObject( new Matrix4Node( val ).setConst( true ) );
 
 };
 
