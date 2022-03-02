@@ -3308,9 +3308,11 @@ class GLTFParser {
 
 			if ( materialDef.name ) material.name = materialDef.name;
 
-			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
+			// baseColorTexture, emissiveTexture, specularColorMap, sheenColorMap and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = sRGBEncoding;
 			if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding;
+			if ( material.sheenColorMap ) material.sheenColorMap.encoding = sRGBEncoding;
+			if ( material.specularColorMap ) material.specularColorMap.encoding = sRGBEncoding;
 			if ( material.specularMap ) material.specularMap.encoding = sRGBEncoding;
 
 			assignExtrasToUserData( material, materialDef );
