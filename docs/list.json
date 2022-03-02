@@ -134,6 +134,7 @@
 
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/en/geometries/CapsuleGeometry",
 				"CircleGeometry": "api/en/geometries/CircleGeometry",
 				"ConeGeometry": "api/en/geometries/ConeGeometry",
 				"CylinderGeometry": "api/en/geometries/CylinderGeometry",
@@ -390,7 +391,8 @@
 			"Exporters": {
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
-				"ColladaExporter": "examples/en/exporters/ColladaExporter"
+				"ColladaExporter": "examples/en/exporters/ColladaExporter",
+				"EXRExporter": "examples/en/exporters/EXRExporter"
 			},
 
 			"Math": {

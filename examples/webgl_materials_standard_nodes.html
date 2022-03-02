@@ -20,7 +20,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
 				}
 			}
 		</script>
@@ -28,6 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -37,8 +39,6 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
-
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let container, stats;
 

@@ -32,6 +32,12 @@ class InputNode extends Node {
 
 	}
 
+	getInputHash( builder ) {
+
+		return this.getHash( builder );
+
+	}
+
 	generateConst( builder ) {
 
 		return builder.getConst( this.getNodeType( builder ), this.value );
@@ -48,9 +54,21 @@ class InputNode extends Node {
 
 		} else {
 
-			const inputType = this.getInputType( builder );
+			const inputHash = this.getInputHash( builder );
 
-			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, inputType );
+			let sharedNode = builder.getNodeFromHash( inputHash );
+
+			if ( sharedNode === undefined ) {
+
+				builder.setHashNode( this, inputHash );
+
+				sharedNode = this;
+
+			}
+
+			const inputType = sharedNode.getInputType( builder );
+
+			const nodeUniform = builder.getUniformFromNode( sharedNode, builder.shaderStage, inputType );
 			const propertyName = builder.getPropertyName( nodeUniform );
 
 			return builder.format( propertyName, type, output );

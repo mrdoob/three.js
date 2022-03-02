@@ -53,7 +53,7 @@
 
 				if ( node.nodeType !== 1 ) return;
 				const transform = getNodeTransform( node );
-				let traverseChildNodes = true;
+				let isDefsNode = false;
 				let path = null;
 
 				switch ( node.nodeName ) {
@@ -105,7 +105,7 @@
 						break;
 
 					case 'defs':
-						traverseChildNodes = false;
+						isDefsNode = true;
 						break;
 
 					case 'use':
@@ -147,15 +147,22 @@
 
 				}
 
-				if ( traverseChildNodes ) {
+				const childNodes = node.childNodes;
 
-					const nodes = node.childNodes;
+				for ( let i = 0; i < childNodes.length; i ++ ) {
 
-					for ( let i = 0; i < nodes.length; i ++ ) {
+					const node = childNodes[ i ];
 
-						parseNode( nodes[ i ], style );
+					if ( isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs' ) {
+
+						// Ignore everything in defs except CSS style definitions
+						// and nested defs, because it is OK by the standard to have
+						// <style/> there.
+						continue;
 
 					}
+
+					parseNode( node, style );
 
 				}
 

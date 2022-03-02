@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.137.5",
+  "version": "0.138.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.js",
@@ -47,7 +47,8 @@
       }
     },
     "plugins": [
-      "html"
+      "html",
+      "import"
     ],
     "globals": {
       "__THREE_DEVTOOLS__": "readonly",
@@ -67,6 +68,10 @@
     "rules": {
       "no-throw-literal": [
         "error"
+      ],
+      "import/extensions": [
+        "error",
+        "always"
       ],
       "quotes": [
         "error",
@@ -132,6 +137,7 @@
     "eslint": "^7.32.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.2.0",
+    "eslint-plugin-import": "^2.25.4",
     "rollup": "^2.57.0",
     "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-terser": "^7.0.2",

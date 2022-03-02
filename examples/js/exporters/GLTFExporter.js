@@ -626,68 +626,54 @@
 
 		}
 
-		buildORMTexture( material ) {
+		buildMetalRoughTexture( metalnessMap, roughnessMap ) {
 
-			const occlusion = material.aoMap?.image;
-			const roughness = material.roughnessMap?.image;
-			const metalness = material.metalnessMap?.image;
-			if ( occlusion === roughness && roughness === metalness ) return material.aoMap;
+			if ( metalnessMap === roughnessMap ) return metalnessMap;
+			console.warn( 'THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.' );
+			const metalness = metalnessMap?.image;
+			const roughness = roughnessMap?.image;
+			const width = Math.max( metalness?.width || 0, roughness?.width || 0 );
+			const height = Math.max( metalness?.height || 0, roughness?.height || 0 );
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = width;
+			canvas.height = height;
+			const context = canvas.getContext( '2d' );
+			context.fillStyle = '#00ffff';
+			context.fillRect( 0, 0, width, height );
+			const composite = context.getImageData( 0, 0, width, height );
 
-			if ( occlusion || roughness || metalness ) {
+			if ( metalness ) {
 
-				const width = Math.max( occlusion?.width || 0, roughness?.width || 0, metalness?.width || 0 );
-				const height = Math.max( occlusion?.height || 0, roughness?.height || 0, metalness?.height || 0 );
-				const canvas = document.createElement( 'canvas' );
-				canvas.width = width;
-				canvas.height = height;
-				const context = canvas.getContext( '2d' );
-				context.fillStyle = '#ffffff';
-				context.fillRect( 0, 0, width, height );
-				const composite = context.getImageData( 0, 0, width, height );
+				context.drawImage( metalness, 0, 0, width, height );
+				const data = context.getImageData( 0, 0, width, height ).data;
 
-				if ( occlusion ) {
+				for ( let i = 2; i < data.length; i += 4 ) {
 
-					context.drawImage( occlusion, 0, 0, width, height );
-					const data = context.getImageData( 0, 0, width, height ).data;
-
-					for ( let i = 0; i < data.length; i += 4 ) {
-
-						composite.data[ i ] = data[ i ];
-
-					}
+					composite.data[ i ] = data[ i ];
 
 				}
-
-				if ( roughness ) {
-
-					context.drawImage( roughness, 0, 0, width, height );
-					const data = context.getImageData( 0, 0, width, height ).data;
-
-					for ( let i = 1; i < data.length; i += 4 ) {
-
-						composite.data[ i ] = data[ i ];
-
-					}
-
-				}
-
-				if ( metalness ) {
-
-					context.drawImage( metalness, 0, 0, width, height );
-					const data = context.getImageData( 0, 0, width, height ).data;
-
-					for ( let i = 2; i < data.length; i += 4 ) {
-
-						composite.data[ i ] = data[ i ];
-
-					}
-
-				}
-
-				context.putImageData( composite, 0, 0 );
-				return new THREE.Texture( canvas );
 
 			}
+
+			if ( roughness ) {
+
+				context.drawImage( roughness, 0, 0, width, height );
+				const data = context.getImageData( 0, 0, width, height ).data;
+
+				for ( let i = 1; i < data.length; i += 4 ) {
+
+					composite.data[ i ] = data[ i ];
+
+				}
+
+			}
+
+			context.putImageData( composite, 0, 0 ); //
+
+			const reference = metalnessMap || roughnessMap;
+			const texture = reference.clone();
+			texture.source = new THREE.Source( canvas );
+			return texture;
 
 		}
 		/**
@@ -933,11 +919,12 @@
    * @param  {Image} image to process
    * @param  {Integer} format of the image (THREE.RGBAFormat)
    * @param  {Boolean} flipY before writing out the image
+   * @param  {String} mimeType export format
    * @return {Integer}     Index of the processed texture in the "images" array
    */
 
 
-		processImage( image, format, flipY ) {
+		processImage( image, format, flipY, mimeType = 'image/png' ) {
 
 			const writer = this;
 			const cache = writer.cache;
@@ -946,7 +933,6 @@
 			const pending = writer.pending;
 			if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
 			const cachedImages = cache.images.get( image );
-			const mimeType = 'image/png';
 			const key = mimeType + ':flipY/' + flipY.toString();
 			if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
 			if ( ! json.images ) json.images = [];
@@ -1037,7 +1023,7 @@
 		}
 		/**
    * Process sampler
-   * @param  {Texture} map THREE.Texture to process
+   * @param  {Texture} map Texture to process
    * @return {Integer}     Index of the processed texture in the "samplers" array
    */
 
@@ -1068,9 +1054,11 @@
 			const json = this.json;
 			if ( cache.textures.has( map ) ) return cache.textures.get( map );
 			if ( ! json.textures ) json.textures = [];
+			let mimeType = map.userData.mimeType;
+			if ( mimeType === 'image/webp' ) mimeType = 'image/png';
 			const textureDef = {
 				sampler: this.processSampler( map ),
-				source: this.processImage( map.image, map.format, map.flipY )
+				source: this.processImage( map.image, map.format, map.flipY, mimeType )
 			};
 			if ( map.name ) textureDef.name = map.name;
 
@@ -1136,16 +1124,16 @@
 				materialDef.pbrMetallicRoughness.metallicFactor = 0.5;
 				materialDef.pbrMetallicRoughness.roughnessFactor = 0.5;
 
-			}
+			} // pbrMetallicRoughness.metallicRoughnessTexture
 
-			const ormTexture = this.buildORMTexture( material ); // pbrMetallicRoughness.metallicRoughnessTexture
 
 			if ( material.metalnessMap || material.roughnessMap ) {
 
+				const metalRoughTexture = this.buildMetalRoughTexture( material.metalnessMap, material.roughnessMap );
 				const metalRoughMapDef = {
-					index: this.processTexture( ormTexture )
+					index: this.processTexture( metalRoughTexture )
 				};
-				this.applyTextureTransform( metalRoughMapDef, material.metalnessMap || material.roughnessMap );
+				this.applyTextureTransform( metalRoughMapDef, metalRoughTexture );
 				materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 			} // pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
@@ -1217,7 +1205,7 @@
 			if ( material.aoMap ) {
 
 				const occlusionMapDef = {
-					index: this.processTexture( ormTexture ),
+					index: this.processTexture( material.aoMap ),
 					texCoord: 1
 				};
 

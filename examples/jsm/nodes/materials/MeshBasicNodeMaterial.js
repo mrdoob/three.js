@@ -1,13 +1,15 @@
 import NodeMaterial from './NodeMaterial.js';
-import { LineBasicMaterial } from 'three';
+import { MeshBasicMaterial } from 'three';
 
-const defaultValues = new LineBasicMaterial();
+const defaultValues = new MeshBasicMaterial();
 
-class LineBasicNodeMaterial extends NodeMaterial {
+class MeshBasicNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.lights = true;
 
 		this.colorNode = null;
 		this.opacityNode = null;
@@ -41,6 +43,6 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 }
 
-LineBasicNodeMaterial.prototype.isNodeMaterial = true;
+MeshBasicNodeMaterial.prototype.isMeshBasicNodeMaterial = true;
 
-export default LineBasicNodeMaterial;
+export default MeshBasicNodeMaterial;

@@ -65,4 +65,4 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 }
 
-MeshStandardNodeMaterial.prototype.isNodeMaterial = true;
+MeshStandardNodeMaterial.prototype.isMeshStandardNodeMaterial = true;

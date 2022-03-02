@@ -665,8 +665,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			( parameters.logarithmicDepthBuffer && parameters.rendererExtensionFragDepth ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-			( ( parameters.extensionShaderTextureLOD || parameters.envMap ) && parameters.rendererExtensionShaderTextureLod ) ? '#define TEXTURE_LOD_EXT' : '',
-
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
 			'uniform bool isOrthographic;',

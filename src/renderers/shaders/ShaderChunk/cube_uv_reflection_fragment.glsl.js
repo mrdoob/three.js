@@ -104,7 +104,15 @@ export default /* glsl */`
 		uv.x *= CUBEUV_TEXEL_WIDTH;
 		uv.y *= CUBEUV_TEXEL_HEIGHT;
 
-		return texture2D( envMap, uv ).rgb;
+		#ifdef texture2DGradEXT
+
+			return texture2DGradEXT( envMap, uv, vec2( 0.0 ), vec2( 0.0 ) ).rgb; // disable anisotropic filtering
+
+		#else
+
+			return texture2D( envMap, uv ).rgb;
+
+		#endif
 
 	}
 

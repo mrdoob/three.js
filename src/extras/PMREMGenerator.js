@@ -4,7 +4,6 @@ import {
 	CubeUVReflectionMapping,
 	LinearEncoding,
 	LinearFilter,
-	NearestFilter,
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
@@ -16,8 +15,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Mesh } from '../objects/Mesh.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
-import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
-import { Vector2 } from '../math/Vector2.js';
+import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
@@ -88,8 +86,8 @@ class PMREMGenerator {
 		this._sigmas = [];
 
 		this._blurMaterial = null;
-		this._equirectShader = null;
-		this._cubemapShader = null;
+		this._cubemapMaterial = null;
+		this._equirectMaterial = null;
 
 		this._compileMaterial( this._blurMaterial );
 
@@ -107,10 +105,12 @@ class PMREMGenerator {
 		_oldTarget = this._renderer.getRenderTarget();
 
 		this._setSize( 256 );
+
 		const cubeUVRenderTarget = this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+
 		if ( sigma > 0 ) {
 
 			this._blur( cubeUVRenderTarget, 0, 0, sigma );
@@ -152,10 +152,10 @@ class PMREMGenerator {
 	 */
 	compileCubemapShader() {
 
-		if ( this._cubemapShader === null ) {
+		if ( this._cubemapMaterial === null ) {
 
-			this._cubemapShader = _getCubemapShader();
-			this._compileMaterial( this._cubemapShader );
+			this._cubemapMaterial = _getCubemapMaterial();
+			this._compileMaterial( this._cubemapMaterial );
 
 		}
 
@@ -167,10 +167,10 @@ class PMREMGenerator {
 	 */
 	compileEquirectangularShader() {
 
-		if ( this._equirectShader === null ) {
+		if ( this._equirectMaterial === null ) {
 
-			this._equirectShader = _getEquirectShader();
-			this._compileMaterial( this._equirectShader );
+			this._equirectMaterial = _getEquirectMaterial();
+			this._compileMaterial( this._equirectMaterial );
 
 		}
 
@@ -185,8 +185,8 @@ class PMREMGenerator {
 
 		this._dispose();
 
-		if ( this._cubemapShader !== null ) this._cubemapShader.dispose();
-		if ( this._equirectShader !== null ) this._equirectShader.dispose();
+		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
+		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
 
 	}
 
@@ -234,6 +234,7 @@ class PMREMGenerator {
 		}
 
 		_oldTarget = this._renderer.getRenderTarget();
+
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
@@ -336,6 +337,7 @@ class PMREMGenerator {
 		for ( let i = 0; i < 6; i ++ ) {
 
 			const col = i % 3;
+
 			if ( col === 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
@@ -354,7 +356,9 @@ class PMREMGenerator {
 			}
 
 			const size = this._cubeSize;
+
 			_setViewport( cubeUVRenderTarget, col * size, i > 2 ? size : 0, size, size );
+
 			renderer.setRenderTarget( cubeUVRenderTarget );
 
 			if ( useSolidColor ) {
@@ -384,38 +388,33 @@ class PMREMGenerator {
 
 		if ( isCubeTexture ) {
 
-			if ( this._cubemapShader === null ) {
+			if ( this._cubemapMaterial === null ) {
 
-				this._cubemapShader = _getCubemapShader();
+				this._cubemapMaterial = _getCubemapMaterial();
 
 			}
 
-			this._cubemapShader.uniforms.flipEnvMap.value = ( texture.isRenderTargetTexture === false ) ? - 1 : 1;
+			this._cubemapMaterial.uniforms.flipEnvMap.value = ( texture.isRenderTargetTexture === false ) ? - 1 : 1;
 
 		} else {
 
-			if ( this._equirectShader === null ) {
+			if ( this._equirectMaterial === null ) {
 
-				this._equirectShader = _getEquirectShader();
+				this._equirectMaterial = _getEquirectMaterial();
 
 			}
 
 		}
 
-		const material = isCubeTexture ? this._cubemapShader : this._equirectShader;
+		const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
 		const mesh = new Mesh( this._lodPlanes[ 0 ], material );
 
 		const uniforms = material.uniforms;
 
 		uniforms[ 'envMap' ].value = texture;
 
-		if ( ! isCubeTexture ) {
-
-			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
-
-		}
-
 		const size = this._cubeSize;
+
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * size, 2 * size );
 
 		renderer.setRenderTarget( cubeUVRenderTarget );
@@ -454,9 +453,6 @@ class PMREMGenerator {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
-		cubeUVRenderTarget.texture.minFilter = NearestFilter;
-		pingPongRenderTarget.texture.minFilter = NearestFilter;
-
 		this._halfBlur(
 			cubeUVRenderTarget,
 			pingPongRenderTarget,
@@ -474,9 +470,6 @@ class PMREMGenerator {
 			sigma,
 			'longitudinal',
 			poleAxis );
-
-		cubeUVRenderTarget.texture.minFilter = LinearFilter;
-		pingPongRenderTarget.texture.minFilter = LinearFilter;
 
 	}
 
@@ -668,7 +661,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 	const weights = new Float32Array( MAX_SAMPLES );
 	const poleAxis = new Vector3( 0, 1, 0 );
-	const shaderMaterial = new RawShaderMaterial( {
+	const shaderMaterial = new ShaderMaterial( {
 
 		name: 'SphericalGaussianBlur',
 
@@ -763,16 +756,14 @@ function _getBlurShader( lodMax, width, height ) {
 
 }
 
-function _getEquirectShader() {
+function _getEquirectMaterial() {
 
-	const texelSize = new Vector2( 1, 1 );
-	const shaderMaterial = new RawShaderMaterial( {
+	return new ShaderMaterial( {
 
 		name: 'EquirectangularToCubeUV',
 
 		uniforms: {
-			'envMap': { value: null },
-			'texelSize': { value: texelSize }
+			'envMap': { value: null }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -785,30 +776,15 @@ function _getEquirectShader() {
 			varying vec3 vOutputDirection;
 
 			uniform sampler2D envMap;
-			uniform vec2 texelSize;
 
 			#include <common>
 
 			void main() {
 
-				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
-
 				vec3 outputDirection = normalize( vOutputDirection );
 				vec2 uv = equirectUv( outputDirection );
 
-				vec2 f = fract( uv / texelSize - 0.5 );
-				uv -= f * texelSize;
-				vec3 tl = texture2D ( envMap, uv ).rgb;
-				uv.x += texelSize.x;
-				vec3 tr = texture2D ( envMap, uv ).rgb;
-				uv.y += texelSize.y;
-				vec3 br = texture2D ( envMap, uv ).rgb;
-				uv.x -= texelSize.x;
-				vec3 bl = texture2D ( envMap, uv ).rgb;
-
-				vec3 tm = mix( tl, tr, f.x );
-				vec3 bm = mix( bl, br, f.x );
-				gl_FragColor.rgb = mix( tm, bm, f.y );
+				gl_FragColor = vec4( texture2D ( envMap, uv ).rgb, 1.0 );
 
 			}
 		`,
@@ -819,13 +795,11 @@ function _getEquirectShader() {
 
 	} );
 
-	return shaderMaterial;
-
 }
 
-function _getCubemapShader() {
+function _getCubemapMaterial() {
 
-	const shaderMaterial = new RawShaderMaterial( {
+	return new ShaderMaterial( {
 
 		name: 'CubemapToCubeUV',
 
@@ -860,8 +834,6 @@ function _getCubemapShader() {
 
 	} );
 
-	return shaderMaterial;
-
 }
 
 function _getCommonVertexShader() {
@@ -871,8 +843,6 @@ function _getCommonVertexShader() {
 		precision mediump float;
 		precision mediump int;
 
-		attribute vec3 position;
-		attribute vec2 uv;
 		attribute float faceIndex;
 
 		varying vec3 vOutputDirection;

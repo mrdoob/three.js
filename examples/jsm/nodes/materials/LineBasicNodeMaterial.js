@@ -1,9 +1,9 @@
 import NodeMaterial from './NodeMaterial.js';
-import { MeshBasicMaterial } from 'three';
+import { LineBasicMaterial } from 'three';
 
-const defaultValues = new MeshBasicMaterial();
+const defaultValues = new LineBasicMaterial();
 
-class MeshBasicNodeMaterial extends NodeMaterial {
+class LineBasicNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
@@ -41,6 +41,6 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 }
 
-MeshBasicNodeMaterial.prototype.isNodeMaterial = true;
+LineBasicNodeMaterial.prototype.isLineBasicNodeMaterial = true;
 
-export default MeshBasicNodeMaterial;
+export default LineBasicNodeMaterial;
