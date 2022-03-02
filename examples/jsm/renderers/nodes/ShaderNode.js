@@ -193,7 +193,7 @@ export const nodeObject = ( val ) => {
 
 };
 
-export const makeVar = ( node, name = null, nodeType = null ) => {
+export const label = ( node, name = null, nodeType = null ) => {
 
 	if ( ( node.isVarNode === true ) && ( ( node.name === name ) || ( name === null ) ) && ( ( node.nodeType === nodeType ) || ( nodeType === null ) ) ) {
 
@@ -206,6 +206,8 @@ export const makeVar = ( node, name = null, nodeType = null ) => {
 	return nodeObject( new VarNode( nodeObject( node ), name, nodeType ) );
 
 };
+
+export const temp = ( node, nodeType = null ) => label( node, null, nodeType );
 
 export const float = ( val ) => {
 
