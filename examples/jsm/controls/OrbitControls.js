@@ -227,12 +227,12 @@ class OrbitControls extends EventDispatcher {
 				if ( scope.enableDamping === true ) {
 					if ( scale != 1 ){
 						from_radius = spherical.radius;
-						dst_radius = spherical.radius*scale;
-						delta_radius = (dst_radius - from_radius)*3; // x3 because slow
+						dst_radius = spherical.radius * scale;
+						delta_radius = (dst_radius - from_radius) * 3; // x3 to dolly in/out faster
 					}
 					spherical.radius += delta_radius * scope.dampingFactor 
 					delta_radius = delta_radius - delta_radius * scope.dampingFactor
-					if ( Math.abs( delta_radius )< EPS*10 ){
+					if ( Math.abs( delta_radius ) < EPS*10 ){
 						delta_radius = 0
 					}
 				}else{
