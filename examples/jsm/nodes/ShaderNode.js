@@ -95,6 +95,7 @@ const ShaderNodeObject = function( obj ) {
 
 				nodeObject = new Proxy( obj, NodeHandler );
 				nodeObjects.set( obj, nodeObject );
+				nodeObjects.set( nodeObject, nodeObject );
 
 			}
 
