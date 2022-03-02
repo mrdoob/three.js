@@ -17,7 +17,7 @@ import {
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
-	Texture,
+	Source,
 	Vector3
 } from 'three';
 
@@ -689,76 +689,67 @@ class GLTFWriter {
 
 	}
 
-	buildORMTexture( material ) {
+	buildMetalRoughTexture( metalnessMap, roughnessMap ) {
 
-		const occlusion = material.aoMap?.image;
-		const roughness = material.roughnessMap?.image;
-		const metalness = material.metalnessMap?.image;
+		if ( metalnessMap === roughnessMap ) return metalnessMap;
 
-		if ( occlusion === roughness && roughness === metalness ) return material.aoMap;
+		console.warn( 'THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.' );
 
-		if ( occlusion || roughness || metalness ) {
+		const metalness = metalnessMap?.image;
+		const roughness = roughnessMap?.image;
 
-			const width = Math.max( occlusion?.width || 0, roughness?.width || 0, metalness?.width || 0 );
-			const height = Math.max( occlusion?.height || 0, roughness?.height || 0, metalness?.height || 0 );
+		const width = Math.max( metalness?.width || 0, roughness?.width || 0 );
+		const height = Math.max( metalness?.height || 0, roughness?.height || 0 );
 
-			const canvas = document.createElement( 'canvas' );
-			canvas.width = width;
-			canvas.height = height;
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = width;
+		canvas.height = height;
 
-			const context = canvas.getContext( '2d' );
-			context.fillStyle = '#ffffff';
-			context.fillRect( 0, 0, width, height );
+		const context = canvas.getContext( '2d' );
+		context.fillStyle = '#00ffff';
+		context.fillRect( 0, 0, width, height );
 
-			const composite = context.getImageData( 0, 0, width, height );
+		const composite = context.getImageData( 0, 0, width, height );
 
-			if ( occlusion ) {
+		if ( metalness ) {
 
-				context.drawImage( occlusion, 0, 0, width, height );
+			context.drawImage( metalness, 0, 0, width, height );
 
-				const data = context.getImageData( 0, 0, width, height ).data;
+			const data = context.getImageData( 0, 0, width, height ).data;
 
-				for ( let i = 0; i < data.length; i += 4 ) {
+			for ( let i = 2; i < data.length; i += 4 ) {
 
-					composite.data[ i ] = data[ i ];
-
-				}
+				composite.data[ i ] = data[ i ];
 
 			}
-
-			if ( roughness ) {
-
-				context.drawImage( roughness, 0, 0, width, height );
-
-				const data = context.getImageData( 0, 0, width, height ).data;
-
-				for ( let i = 1; i < data.length; i += 4 ) {
-
-					composite.data[ i ] = data[ i ];
-
-				}
-
-			}
-
-			if ( metalness ) {
-
-				context.drawImage( metalness, 0, 0, width, height );
-
-				const data = context.getImageData( 0, 0, width, height ).data;
-
-				for ( let i = 2; i < data.length; i += 4 ) {
-
-					composite.data[ i ] = data[ i ];
-
-				}
-
-			}
-
-			context.putImageData( composite, 0, 0 );
-
-			return new Texture( canvas );
 
 		}
+
+		if ( roughness ) {
+
+			context.drawImage( roughness, 0, 0, width, height );
+
+			const data = context.getImageData( 0, 0, width, height ).data;
+
+			for ( let i = 1; i < data.length; i += 4 ) {
+
+				composite.data[ i ] = data[ i ];
+
+			}
+
+		}
+
+		context.putImageData( composite, 0, 0 );
+
+		//
+
+		const reference = metalnessMap || roughnessMap;
+
+		const texture = reference.clone();
+
+		texture.source = new Source( canvas );
+
+		return texture;
 
 	}
 
@@ -1037,9 +1028,10 @@ class GLTFWriter {
 	 * @param  {Image} image to process
 	 * @param  {Integer} format of the image (RGBAFormat)
 	 * @param  {Boolean} flipY before writing out the image
+	 * @param  {String} mimeType export format
 	 * @return {Integer}     Index of the processed texture in the "images" array
 	 */
-	processImage( image, format, flipY ) {
+	processImage( image, format, flipY, mimeType = 'image/png' ) {
 
 		const writer = this;
 		const cache = writer.cache;
@@ -1050,7 +1042,7 @@ class GLTFWriter {
 		if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
 
 		const cachedImages = cache.images.get( image );
-		const mimeType = 'image/png';
+
 		const key = mimeType + ':flipY/' + flipY.toString();
 
 		if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
@@ -1182,9 +1174,13 @@ class GLTFWriter {
 
 		if ( ! json.textures ) json.textures = [];
 
+		let mimeType = map.userData.mimeType;
+
+		if ( mimeType === 'image/webp' ) mimeType = 'image/png';
+
 		const textureDef = {
 			sampler: this.processSampler( map ),
-			source: this.processImage( map.image, map.format, map.flipY )
+			source: this.processImage( map.image, map.format, map.flipY, mimeType )
 		};
 
 		if ( map.name ) textureDef.name = map.name;
@@ -1252,13 +1248,13 @@ class GLTFWriter {
 
 		}
 
-		const ormTexture = this.buildORMTexture( material );
-
 		// pbrMetallicRoughness.metallicRoughnessTexture
 		if ( material.metalnessMap || material.roughnessMap ) {
 
-			const metalRoughMapDef = { index: this.processTexture( ormTexture ) };
-			this.applyTextureTransform( metalRoughMapDef, material.metalnessMap || material.roughnessMap );
+			const metalRoughTexture = this.buildMetalRoughTexture( material.metalnessMap, material.roughnessMap );
+
+			const metalRoughMapDef = { index: this.processTexture( metalRoughTexture ) };
+			this.applyTextureTransform( metalRoughMapDef, metalRoughTexture );
 			materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
 		}
@@ -1325,7 +1321,7 @@ class GLTFWriter {
 		if ( material.aoMap ) {
 
 			const occlusionMapDef = {
-				index: this.processTexture( ormTexture ),
+				index: this.processTexture( material.aoMap ),
 				texCoord: 1
 			};
 

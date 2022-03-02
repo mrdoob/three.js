@@ -45,7 +45,7 @@ class WebGLShaderCache {
 
 			shaderStage.usedTimes --;
 
-			if ( shaderStage.usedTimes === 0 ) this.shaderCache.delete( shaderStage );
+			if ( shaderStage.usedTimes === 0 ) this.shaderCache.delete( shaderStage.code );
 
 		}
 
@@ -94,7 +94,7 @@ class WebGLShaderCache {
 
 		if ( cache.has( code ) === false ) {
 
-			const stage = new WebGLShaderStage();
+			const stage = new WebGLShaderStage( code );
 			cache.set( code, stage );
 
 		}
@@ -107,10 +107,11 @@ class WebGLShaderCache {
 
 class WebGLShaderStage {
 
-	constructor() {
+	constructor( code ) {
 
 		this.id = _id ++;
 
+		this.code = code;
 		this.usedTimes = 0;
 
 	}
