@@ -195,9 +195,21 @@ export const nodeObject = ( val ) => {
 
 export const label = ( node, name = null, nodeType = null ) => {
 
-	if ( ( node.isVarNode === true ) && ( ( node.name === name ) || ( name === null ) ) && ( ( node.nodeType === nodeType ) || ( nodeType === null ) ) ) {
+	if ( node.isVarNode === true ) {
 
-		// node is already a VarNode with the same name and type
+		// node is already a VarNode
+
+		if ( ( node.name !== name ) && ( name !== null ) ) {
+
+			node.name = name;
+
+		}
+
+		if ( ( node.nodeType !== nodeType ) && ( nodeType !== null ) ) {
+
+			node.nodeType = nodeType;
+
+		}
 
 		return nodeObject( node );
 
