@@ -201,33 +201,23 @@ export const nodeObject = ( val ) => {
 
 };
 
-export const label = ( node, name = null, nodeType = null ) => {
+export const label = ( node, name ) => {
+
+	node = nodeObject( node );
 
 	if ( node.isVarNode === true ) {
 
-		// node is already a VarNode
+		node.name = name;
 
-		if ( ( node.name !== name ) && ( name !== null ) ) {
-
-			node.name = name;
-
-		}
-
-		if ( ( node.nodeType !== nodeType ) && ( nodeType !== null ) ) {
-
-			node.nodeType = nodeType;
-
-		}
-
-		return nodeObject( node );
+		return node;
 
 	}
 
-	return nodeObject( new VarNode( nodeObject( node ), name, nodeType ) );
+	return nodeObject( new VarNode( node, name ) );
 
 };
 
-export const temp = ( node, nodeType = null ) => label( node, null, nodeType );
+export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ), name ) );
 
 const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1 ) {
 
