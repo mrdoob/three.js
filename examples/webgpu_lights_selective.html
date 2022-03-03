@@ -41,6 +41,8 @@
 			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 
+			import { color, float } from 'three-nodes/ShaderNode.js';
+
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
 				stats, controls;
@@ -61,6 +63,7 @@
 				camera.position.z = 70;
 
 				scene = new THREE.Scene();
+				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 )  );
 
 				const sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
 
@@ -137,7 +140,7 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 30;
-				controls.maxDistance = 150;
+				controls.maxDistance = 250;
 
 				//stats
 

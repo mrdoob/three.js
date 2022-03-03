@@ -17,7 +17,7 @@ import {
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
-	Texture,
+	Source,
 	Vector3
 } from 'three';
 
@@ -747,8 +747,7 @@ class GLTFWriter {
 
 		const texture = reference.clone();
 
-		// TODO Use new Source() instead?
-		texture.source = new Texture( canvas ).source;
+		texture.source = new Source( canvas );
 
 		return texture;
 

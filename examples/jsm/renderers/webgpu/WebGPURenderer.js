@@ -180,7 +180,7 @@ class WebGPURenderer {
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
-		this._nodes = new WebGPUNodes( this );
+		this._nodes = new WebGPUNodes( this, this._properties );
 		this._computePipelines = new WebGPUComputePipelines( device );
 		this._renderPipelines = new WebGPURenderPipelines( this, device, parameters.sampleCount, this._nodes );
 		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
@@ -308,8 +308,8 @@ class WebGPURenderer {
 		const opaqueObjects = this._currentRenderList.opaque;
 		const transparentObjects = this._currentRenderList.transparent;
 
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, passEncoder );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, passEncoder );
+		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, scene, passEncoder );
+		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, scene, passEncoder );
 
 		// finish render pass
 
@@ -736,7 +736,7 @@ class WebGPURenderer {
 
 	}
 
-	_renderObjects( renderList, camera, passEncoder ) {
+	_renderObjects( renderList, camera, scene, passEncoder ) {
 
 		// process renderable objects
 
@@ -753,6 +753,12 @@ class WebGPURenderer {
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			this._objects.update( object );
+
+			// send scene properties to object
+
+			const objectProperties = this._properties.get( object );
+
+			objectProperties.fogNode = scene.fogNode;
 
 			if ( camera.isArrayCamera ) {
 
