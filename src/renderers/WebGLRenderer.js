@@ -1783,7 +1783,7 @@ function WebGLRenderer( parameters = {} ) {
 		if ( _currentRenderTarget )
 			_resolution.set( _currentRenderTarget.width, _currentRenderTarget.height );
 		else
-			_resolution.set( _width * _pixelRatio, _height * _pixelRatio );
+			_resolution.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
 		p_uniforms.setValue( _gl, 'renderSize', _resolution );
 
 		return program;
