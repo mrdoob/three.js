@@ -152,12 +152,12 @@ class NodeBuilder {
 
 	}
 
-	// rename to generate
+	// @TODO: rename to .generateConst()
 	getConst( type, value ) {
 
 		if ( type === 'float' ) return toFloat( value );
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
-		if ( type === 'uint' ) return ( value >= 0 ) ? `${ Math.round( value ) }` : '0';
+		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }` : '0';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
 		if ( type === 'vec2' ) return `${ this.getType( 'vec2' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) } )`;
 		if ( type === 'vec3' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) }, ${ toFloat( value.z ) } )`;
@@ -598,7 +598,7 @@ class NodeBuilder {
 		fromType = this.getVectorType( fromType );
 		toType = this.getVectorType( toType );
 
-		if ( ( fromType === toType ) || ( toType === null ) ) {
+		if ( fromType === toType || toType === 'void' || toType === null ) {
 
 			return snippet;
 
@@ -617,7 +617,10 @@ class NodeBuilder {
 
 		if ( toTypeLength === 0 ) { // toType is matrix-like
 
-			return `${ this.getType( toType ) }( ${ snippet } )`;
+			// ignore for now
+			//return `${ this.getType( toType ) }( ${ snippet } )`;
+
+			return snippet;
 
 		}
 
