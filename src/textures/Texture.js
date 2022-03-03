@@ -136,6 +136,8 @@ class Texture extends EventDispatcher {
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
+		this.needsUpdate = true;
+
 		return this;
 
 	}
