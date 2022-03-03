@@ -14,8 +14,8 @@ class Vector3 {
 	set( x, y, z ) {
 
 		if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
-		
-		if ( y === undefined) {
+
+		if ( y === undefined ) {
 
 			y = z = x;
 
