@@ -18746,7 +18746,7 @@
 			p_uniforms.setValue(_gl, 'modelViewMatrix', object.modelViewMatrix);
 			p_uniforms.setValue(_gl, 'normalMatrix', object.normalMatrix);
 			p_uniforms.setValue(_gl, 'modelMatrix', object.matrixWorld);
-			if (_currentRenderTarget) _resolution.set(_currentRenderTarget.width, _currentRenderTarget.height);else _resolution.set(_width, _height);
+			if (_currentRenderTarget) _resolution.set(_currentRenderTarget.width, _currentRenderTarget.height);else _resolution.set(_width * _pixelRatio, _height * _pixelRatio).floor();
 			p_uniforms.setValue(_gl, 'renderSize', _resolution);
 			return program;
 		} // If uniforms are marked as clean, they don't need to be loaded to the GPU.
