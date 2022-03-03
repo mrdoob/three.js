@@ -1871,6 +1871,7 @@
 			this.unpackAlignment = source.unpackAlignment;
 			this.encoding = source.encoding;
 			this.userData = JSON.parse(JSON.stringify(source.userData));
+			this.needsUpdate = true;
 			return this;
 		}
 
@@ -2637,6 +2638,7 @@
 
 			for (let i = 0; i < count; i++) {
 				this.texture[i] = texture.clone();
+				this.texture[i].isRenderTargetTexture = true;
 			}
 		}
 
@@ -16803,7 +16805,7 @@
 			const textureProperties = properties.get(texture);
 			if (texture.isVideoTexture) updateVideoTexture(texture);
 
-			if (texture.version > 0 && textureProperties.__version !== texture.version) {
+			if (texture.isRenderTargetTexture === false && texture.version > 0 && textureProperties.__version !== texture.version) {
 				const image = texture.image;
 
 				if (image === null) {
@@ -20344,12 +20346,6 @@
 			uniforms.spotLightShadows.needsUpdate = value;
 			uniforms.rectAreaLights.needsUpdate = value;
 			uniforms.hemisphereLights.needsUpdate = value;
-			uniforms.directionalShadowMap.needsUpdate = value;
-			uniforms.directionalShadowMatrix.needsUpdate = value;
-			uniforms.spotShadowMap.needsUpdate = value;
-			uniforms.spotShadowMatrix.needsUpdate = value;
-			uniforms.pointShadowMap.needsUpdate = value;
-			uniforms.pointShadowMatrix.needsUpdate = value;
 		}
 
 		function materialNeedsLights(material) {
@@ -20382,8 +20378,7 @@
 					// are midframe flushes and an external depth buffer. Disable use of the extension.
 					if (extensions.has('WEBGL_multisampled_render_to_texture') === true) {
 						console.warn('THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided');
-						renderTarget.useRenderToTexture = false;
-						renderTarget.useRenderbuffer = true;
+						renderTargetProperties.__useRenderToTexture = false;
 					}
 				}
 			}
