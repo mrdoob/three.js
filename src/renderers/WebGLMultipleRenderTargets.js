@@ -13,6 +13,7 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 		for ( let i = 0; i < count; i ++ ) {
 
 			this.texture[ i ] = texture.clone();
+			this.texture[ i ].isRenderTargetTexture = true;
 
 		}
 
