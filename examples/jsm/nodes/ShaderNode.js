@@ -4,9 +4,11 @@ import VarNode from './core/VarNode.js';
 import AttributeNode from './core/AttributeNode.js';
 
 // input nodes
+import BoolNode from './inputs/BoolNode.js';
 import ColorNode from './inputs/ColorNode.js';
 import FloatNode from './inputs/FloatNode.js';
 import IntNode from './inputs/IntNode.js';
+import UintNode from './inputs/UintNode.js';
 import Vector2Node from './inputs/Vector2Node.js';
 import Vector3Node from './inputs/Vector3Node.js';
 import Vector4Node from './inputs/Vector4Node.js';
@@ -259,6 +261,8 @@ const ConvertType = function ( nodeClass, type, valueClass = null, valueComponen
 
 export const float = new ConvertType( FloatNode, 'float' );
 export const int = new ConvertType( IntNode, 'int' );
+export const uint = new ConvertType( UintNode, 'uint' );
+export const bool = new ConvertType( BoolNode, 'bool' );
 export const color = new ConvertType( ColorNode, 'color', Color );
 
 export const vec2 = new ConvertType( Vector2Node, 'vec2', Vector2, 2 );
