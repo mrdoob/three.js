@@ -231,7 +231,7 @@ const flatArray = obj => {
 
 	let arr = [];
 
-	for (let el of obj) {
+	for ( let el of obj ) {
 
 		if ( Array.isArray( el ) ) {
 
