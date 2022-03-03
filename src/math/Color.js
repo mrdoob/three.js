@@ -431,7 +431,7 @@ class Color {
 
 		}
 
-		return `rgb(${( _rgb.r * 255 ) | 0}, ${( _rgb.g * 255 ) | 0}, ${( _rgb.b * 255 ) | 0})`;
+		return `rgb(${( _rgb.r * 255 ) | 0},${( _rgb.g * 255 ) | 0},${( _rgb.b * 255 ) | 0})`;
 
 	}
 
