@@ -595,7 +595,7 @@ class NodeBuilder {
 		fromType = this.getVectorType( fromType );
 		toType = this.getVectorType( toType );
 
-		if ( fromType === toType ) {
+		if ( ( fromType === toType ) || ( toType === null ) ) {
 
 			return snippet;
 
