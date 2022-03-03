@@ -217,7 +217,7 @@ export const label = ( node, name ) => {
 
 };
 
-export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ), name ) );
+export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
 const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1 ) {
 
