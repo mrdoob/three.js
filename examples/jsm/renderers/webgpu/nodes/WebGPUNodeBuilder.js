@@ -129,7 +129,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			let vertex = new PositionNode( PositionNode.GEOMETRY );
 
-			if ( lightNode === null && this.lightNode && this.lightNode.hasLights === true ) {
+			if ( lightNode === null && this.lightNode ) {
 
 				lightNode = this.lightNode;
 
@@ -275,7 +275,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			let outputNode = diffuseColorNode;
 
-			if ( lightNode && lightNode.isNode ) {
+			if ( lightNode && lightNode.isNode && lightNode.hasLight !== false ) {
 
 				const lightContextNode = new LightContextNode( lightNode );
 
