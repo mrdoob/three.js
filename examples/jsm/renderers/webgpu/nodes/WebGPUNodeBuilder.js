@@ -31,6 +31,8 @@ import { getRoughness } from 'three-nodes/functions/PhysicalMaterialFunctions.js
 const wgslTypeLib = {
 	float: 'f32',
 	int: 'i32',
+	uint: 'u32',
+	bool: 'bool',
 	vec2: 'vec2<f32>',
 	vec3: 'vec3<f32>',
 	vec4: 'vec4<f32>',
