@@ -227,6 +227,33 @@ export const label = ( node, name = null, nodeType = null ) => {
 
 export const temp = ( node, nodeType = null ) => label( node, null, nodeType );
 
+const flatArray = obj => {
+
+	let arr = [];
+
+	for (let el of obj) {
+
+		if ( Array.isArray( el ) ) {
+
+			arr = arr.concat( flatArray( el ) );
+
+		} else if ( typeof el === 'object' ) {
+
+			// We should not flat number and strings, but should flat vectors, matrices, and colors
+
+			arr = arr.concat( flatArray( el.toArray() ) );
+
+		} else {
+
+			arr.push( el );
+
+		}
+
+	}
+
+	return arr;
+};
+
 const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1 ) {
 
 	return ( ...params ) => {
@@ -243,13 +270,19 @@ const ConvertType = function ( nodeClass, type, valueClass = null, valueComponen
 
 			for ( let i = 1; i < valueComponents; i ++ ) {
 
-				params[ i ] = params [ 0 ];
+				params[ i ] = params[ 0 ];
 
 			}
 
 		}
 
-		const val = ( ( valueClass === null ) || ( params[ 0 ] instanceof valueClass ) ) ? params[ 0 ] : new valueClass().set( ...params );
+		let val = params[ 0 ];
+
+		if ( ( valueClass !== null ) && ! ( params[ 0 ] instanceof valueClass ) ) {
+
+			val = new valueClass().set( ...flatArray( params ) );
+
+		}
 
 		return nodeObject( new nodeClass( val ).setConst( true ) );
 
