@@ -252,9 +252,10 @@ const flatArray = obj => {
 	}
 
 	return arr;
+
 };
 
-const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1 ) {
+const ConvertType = function ( nodeClass, type, valueClass = null ) {
 
 	return ( ...params ) => {
 
@@ -264,21 +265,9 @@ const ConvertType = function ( nodeClass, type, valueClass = null, valueComponen
 
 		}
 
-		if ( ( params.length === 1 ) && ( valueComponents !== 1 ) ) {
-
-			// Providing one scalar value: This value is used for all components
-
-			for ( let i = 1; i < valueComponents; i ++ ) {
-
-				params[ i ] = params[ 0 ];
-
-			}
-
-		}
-
 		let val = params[ 0 ];
 
-		if ( ( valueClass !== null ) && ! ( params[ 0 ] instanceof valueClass ) ) {
+		if ( ( valueClass !== null ) && ! ( val instanceof valueClass ) ) {
 
 			val = new valueClass().set( ...flatArray( params ) );
 
@@ -294,9 +283,9 @@ export const float = new ConvertType( FloatNode, 'float' );
 export const int = new ConvertType( IntNode, 'int' );
 export const color = new ConvertType( ColorNode, 'color', Color );
 
-export const vec2 = new ConvertType( Vector2Node, 'vec2', Vector2, 2 );
-export const vec3 = new ConvertType( Vector3Node, 'vec3', Vector3, 3 );
-export const vec4 = new ConvertType( Vector4Node, 'vec4', Vector4, 4 );
+export const vec2 = new ConvertType( Vector2Node, 'vec2', Vector2 );
+export const vec3 = new ConvertType( Vector3Node, 'vec3', Vector3 );
+export const vec4 = new ConvertType( Vector4Node, 'vec4', Vector4 );
 
 export const mat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3 );
 export const mat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4 );
