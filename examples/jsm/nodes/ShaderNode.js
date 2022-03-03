@@ -285,10 +285,10 @@ export const imat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3, 'i' );
 export const umat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3, 'u' );
 export const bmat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3, 'b' );
 
-export const mat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4 );
-export const imat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4, 'i' );
-export const umat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4, 'u' );
-export const bmat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4, 'b' );
+export const mat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4 );
+export const imat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4, 'i' );
+export const umat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4, 'u' );
+export const bmat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4, 'b' );
 
 export const join = ( ...params ) => {
 
