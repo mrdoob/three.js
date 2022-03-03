@@ -3,9 +3,9 @@ import { Vector4 } from 'three';
 
 class Vector4Node extends InputNode {
 
-	constructor( value = new Vector4() ) {
+	constructor( value = new Vector4(), type = '' ) {
 
-		super( 'vec4' );
+		super( type + 'vec4' );
 
 		this.value = value;
 

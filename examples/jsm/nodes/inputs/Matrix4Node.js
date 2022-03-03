@@ -3,9 +3,9 @@ import { Matrix4 } from 'three';
 
 class Matrix4Node extends InputNode {
 
-	constructor( value = new Matrix4() ) {
+	constructor( value = new Matrix4(), type = '' ) {
 
-		super( 'mat4' );
+		super( type + 'mat4' );
 
 		this.value = value;
 

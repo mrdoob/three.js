@@ -229,7 +229,7 @@ export const label = ( node, name = null, nodeType = null ) => {
 
 export const temp = ( node, nodeType = null ) => label( node, null, nodeType );
 
-const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1 ) {
+const ConvertType = function ( nodeClass, type, valueClass = null, valueComponents = 1, ...nodeParams ) {
 
 	return ( ...params ) => {
 
@@ -253,7 +253,7 @@ const ConvertType = function ( nodeClass, type, valueClass = null, valueComponen
 
 		const val = ( ( valueClass === null ) || ( params[ 0 ] instanceof valueClass ) ) ? params[ 0 ] : new valueClass().set( ...params );
 
-		return nodeObject( new nodeClass( val ).setConst( true ) );
+		return nodeObject( new nodeClass( val, ...nodeParams ).setConst( true ) );
 
 	};
 
@@ -266,11 +266,29 @@ export const bool = new ConvertType( BoolNode, 'bool' );
 export const color = new ConvertType( ColorNode, 'color', Color );
 
 export const vec2 = new ConvertType( Vector2Node, 'vec2', Vector2, 2 );
+export const ivec2 = new ConvertType( Vector2Node, 'ivec2', Vector2, 2, 'i' );
+export const uvec2 = new ConvertType( Vector2Node, 'uvec2', Vector2, 2, 'u' );
+export const bvec2 = new ConvertType( Vector2Node, 'bvec2', Vector2, 2, 'b' );
+
 export const vec3 = new ConvertType( Vector3Node, 'vec3', Vector3, 3 );
+export const ivec3 = new ConvertType( Vector3Node, 'ivec3', Vector3, 3, 'i' );
+export const uvec3 = new ConvertType( Vector3Node, 'uvec3', Vector3, 3, 'u' );
+export const bvec3 = new ConvertType( Vector3Node, 'bvec3', Vector3, 3, 'b' );
+
 export const vec4 = new ConvertType( Vector4Node, 'vec4', Vector4, 4 );
+export const ivec4 = new ConvertType( Vector4Node, 'ivec4', Vector4, 4, 'i' );
+export const uvec4 = new ConvertType( Vector4Node, 'uvec4', Vector4, 4, 'u' );
+export const bvec4 = new ConvertType( Vector4Node, 'bvec4', Vector4, 4, 'b' );
 
 export const mat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3 );
-export const mat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4 );
+export const imat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3, 'i' );
+export const umat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3, 'u' );
+export const bmat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3, 'b' );
+
+export const mat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4 );
+export const imat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4, 'i' );
+export const umat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4, 'u' );
+export const bmat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4, 'b' );
 
 export const join = ( ...params ) => {
 
