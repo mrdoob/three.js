@@ -287,10 +287,10 @@ export const imat3 = new ConvertType( Matrix3Node, 'imat3', Matrix3, 1, true );
 export const umat3 = new ConvertType( Matrix3Node, 'umat3', Matrix3, 1, true );
 export const bmat3 = new ConvertType( Matrix3Node, 'bmat3', Matrix3, 1, true );
 
-export const mat4 = new ConvertType( Matrix3Node, 'mat4', Matrix4 );
-export const imat4 = new ConvertType( Matrix3Node, 'imat4', Matrix4, 1, true );
-export const umat4 = new ConvertType( Matrix3Node, 'umat4', Matrix4, 1, true );
-export const bmat4 = new ConvertType( Matrix3Node, 'bmat4', Matrix4, 1, true );
+export const mat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4 );
+export const imat4 = new ConvertType( Matrix4Node, 'imat4', Matrix4, 1, true );
+export const umat4 = new ConvertType( Matrix4Node, 'umat4', Matrix4, 1, true );
+export const bmat4 = new ConvertType( Matrix4Node, 'bmat4', Matrix4, 1, true );
 
 export const join = ( ...params ) => {
 
