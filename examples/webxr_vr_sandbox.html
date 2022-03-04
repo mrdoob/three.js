@@ -7,6 +7,15 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="basic-html-mesh" style="position: absolute; left: 100px">
+			Items:
+			<!-- this is a comment! -->
+			<ul>
+				<li>one</li>
+				<li>two</li>
+			</ul>
+		</div>
+
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
 		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
@@ -38,6 +47,7 @@
 			let camera, scene, renderer;
 			let reflector;
 			let stats, statsMesh;
+			let basicHtmlMesh;
 
 			const parameters = {
 				radius: 0.6,
@@ -209,6 +219,16 @@
 				statsMesh.rotation.y = Math.PI / 4;
 				statsMesh.scale.setScalar( 2.5 );
 				group.add( statsMesh );
+
+				// add basic htmlmesh
+				basicHtmlMesh = new HTMLMesh(document.querySelector('#basic-html-mesh'));
+				basicHtmlMesh.position.x = - 0.55;
+				basicHtmlMesh.position.y = 2;
+				basicHtmlMesh.position.z = - 0.6;
+				basicHtmlMesh.rotation.y = Math.PI / 4;
+				basicHtmlMesh.scale.setScalar( 2.5 );
+				group.add( basicHtmlMesh );
+
 
 			}
 
