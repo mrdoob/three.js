@@ -12,6 +12,8 @@ export const shaderStages = [ 'fragment', 'vertex' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
 const toFloat = ( value ) => {
+	
+	value = Number( value );
 
 	return value + ( value % 1 ? '' : '.0' );
 
