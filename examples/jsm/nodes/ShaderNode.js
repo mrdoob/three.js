@@ -5,6 +5,7 @@ import AttributeNode from './core/AttributeNode.js';
 
 // input nodes
 import BoolNode from './inputs/BoolNode.js';
+import BufferNode from './inputs/BufferNode.js';
 import ColorNode from './inputs/ColorNode.js';
 import FloatNode from './inputs/FloatNode.js';
 import IntNode from './inputs/IntNode.js';
@@ -285,6 +286,7 @@ export const addTo = ( varNode, ...params ) => {
 export const uv = new ShaderNodeProxy( UVNode );
 export const attribute = new ShaderNodeProxy( AttributeNode );
 
+export const buffer = new ShaderNodeProxy( BufferNode );
 export const texture = new ShaderNodeProxy( TextureNode );
 
 export const add = new ShaderNodeProxy( OperatorNode, '+' );
