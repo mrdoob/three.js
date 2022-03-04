@@ -225,18 +225,26 @@ class OrbitControls extends EventDispatcher {
 				spherical.makeSafe();
 
 				if ( scope.enableDamping === true ) {
-					if ( scale != 1 ){
-						from_radius = spherical.radius;
-						dst_radius = spherical.radius*scale;
-						delta_radius = (dst_radius - from_radius)*3; // x3 because slow
+
+					if ( scale !== 1 ) {
+
+						zoomFrom = spherical.radius;
+						zoomTo = spherical.radius * scale;
+						zoomDelta = ( zoomTo - zoomFrom ) * 3; // x3 because slow
 					}
-					spherical.radius += delta_radius * scope.dampingFactor 
-					delta_radius = delta_radius - delta_radius * scope.dampingFactor
-					if ( Math.abs( delta_radius )< EPS*10 ){
-						delta_radius = 0
+
+					spherical.radius += zoomDelta * scope.dampingFactor;
+					zoomDelta = zoomDelta - zoomDelta * scope.dampingFactor;
+
+					if ( Math.abs( zoomDelta ) < EPS * 10 ) {
+
+						zoomDelta = 0;
 					}
-				}else{
+
+				} else {
+
 					spherical.radius *= scale;
+
 				}
 
 				// restrict radius to be between desired limits
@@ -352,9 +360,9 @@ class OrbitControls extends EventDispatcher {
 		const sphericalDelta = new Spherical();
 
 		let scale = 1;
-		let dst_radius = 1
-		let from_radius = 1
-		let delta_radius = 1
+		let zoomTo = 1;
+		let zoomFrom = 1;
+		let zoomDelta = 1;
 		const panOffset = new Vector3();
 		let zoomChanged = false;
 
