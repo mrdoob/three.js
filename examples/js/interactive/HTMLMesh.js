@@ -210,7 +210,7 @@
 				width = 0,
 				height = 0;
 
-			if ( element.nodeType === 3 ) {
+			if ( element.nodeType === Node.TEXT_NODE ) {
 
 				// text
 				range.selectNode( element );
@@ -220,6 +220,10 @@
 				width = rect.width;
 				height = rect.height;
 				drawText( style, x, y, element.nodeValue.trim() );
+
+			} else if ( element.nodeType === Node.COMMENT_NODE ) {
+
+				return;
 
 			} else if ( element instanceof HTMLCanvasElement ) {
 
@@ -333,7 +337,7 @@
 
 		function traverse( element ) {
 
-			if ( element.nodeType !== 3 ) {
+			if ( element.nodeType !== Node.TEXT_NODE && element.nodeType !== Node.COMMENT_NODE ) {
 
 				const rect = element.getBoundingClientRect();
 
