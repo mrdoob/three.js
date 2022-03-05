@@ -4,9 +4,12 @@ import VarNode from './core/VarNode.js';
 import AttributeNode from './core/AttributeNode.js';
 
 // input nodes
+import BoolNode from './inputs/BoolNode.js';
+import BufferNode from './inputs/BufferNode.js';
 import ColorNode from './inputs/ColorNode.js';
 import FloatNode from './inputs/FloatNode.js';
 import IntNode from './inputs/IntNode.js';
+import UintNode from './inputs/UintNode.js';
 import Vector2Node from './inputs/Vector2Node.js';
 import Vector3Node from './inputs/Vector3Node.js';
 import Vector4Node from './inputs/Vector4Node.js';
@@ -199,33 +202,23 @@ export const nodeObject = ( val ) => {
 
 };
 
-export const label = ( node, name = null, nodeType = null ) => {
+export const label = ( node, name ) => {
+
+	node = nodeObject( node );
 
 	if ( node.isVarNode === true ) {
 
-		// node is already a VarNode
+		node.name = name;
 
-		if ( ( node.name !== name ) && ( name !== null ) ) {
-
-			node.name = name;
-
-		}
-
-		if ( ( node.nodeType !== nodeType ) && ( nodeType !== null ) ) {
-
-			node.nodeType = nodeType;
-
-		}
-
-		return nodeObject( node );
+		return node;
 
 	}
 
-	return nodeObject( new VarNode( nodeObject( node ), name, nodeType ) );
+	return nodeObject( new VarNode( node, name ) );
 
 };
 
-export const temp = ( node, nodeType = null ) => label( node, null, nodeType );
+export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
 const flatArray = obj => {
 
@@ -255,7 +248,7 @@ const flatArray = obj => {
 
 };
 
-const ConvertType = function ( nodeClass, type, valueClass = null ) {
+const ConvertType = function ( nodeClass, type, valueClass = null, convertAfter = false ) {
 
 	return ( ...params ) => {
 
@@ -273,7 +266,9 @@ const ConvertType = function ( nodeClass, type, valueClass = null ) {
 
 		}
 
-		return nodeObject( new nodeClass( val ).setConst( true ) );
+		const node = nodeObject( new nodeClass( val ).setConst( true ) );
+
+		return convertAfter === true ? nodeObject( new ConvertNode( node, type ) ) : node;
 
 	};
 
@@ -281,14 +276,34 @@ const ConvertType = function ( nodeClass, type, valueClass = null ) {
 
 export const float = new ConvertType( FloatNode, 'float' );
 export const int = new ConvertType( IntNode, 'int' );
+export const uint = new ConvertType( UintNode, 'uint' );
+export const bool = new ConvertType( BoolNode, 'bool' );
 export const color = new ConvertType( ColorNode, 'color', Color );
 
 export const vec2 = new ConvertType( Vector2Node, 'vec2', Vector2 );
+export const ivec2 = new ConvertType( Vector2Node, 'ivec2', Vector2, true );
+export const uvec2 = new ConvertType( Vector2Node, 'uvec2', Vector2, true );
+export const bvec2 = new ConvertType( Vector2Node, 'bvec2', Vector2, true );
+
 export const vec3 = new ConvertType( Vector3Node, 'vec3', Vector3 );
+export const ivec3 = new ConvertType( Vector3Node, 'ivec3', Vector3, true );
+export const uvec3 = new ConvertType( Vector3Node, 'uvec3', Vector3, true );
+export const bvec3 = new ConvertType( Vector3Node, 'bvec3', Vector3, true );
+
 export const vec4 = new ConvertType( Vector4Node, 'vec4', Vector4 );
+export const ivec4 = new ConvertType( Vector4Node, 'ivec4', Vector4, true );
+export const uvec4 = new ConvertType( Vector4Node, 'uvec4', Vector4, true );
+export const bvec4 = new ConvertType( Vector4Node, 'bvec4', Vector4, true );
 
 export const mat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3 );
+export const imat3 = new ConvertType( Matrix3Node, 'imat3', Matrix3, true );
+export const umat3 = new ConvertType( Matrix3Node, 'umat3', Matrix3, true );
+export const bmat3 = new ConvertType( Matrix3Node, 'bmat3', Matrix3, true );
+
 export const mat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4 );
+export const imat4 = new ConvertType( Matrix4Node, 'imat4', Matrix4, true );
+export const umat4 = new ConvertType( Matrix4Node, 'umat4', Matrix4, true );
+export const bmat4 = new ConvertType( Matrix4Node, 'bmat4', Matrix4, true );
 
 export const join = ( ...params ) => {
 
@@ -313,6 +328,7 @@ export const addTo = ( varNode, ...params ) => {
 export const uv = new ShaderNodeProxy( UVNode );
 export const attribute = new ShaderNodeProxy( AttributeNode );
 
+export const buffer = new ShaderNodeProxy( BufferNode );
 export const texture = new ShaderNodeProxy( TextureNode );
 
 export const add = new ShaderNodeProxy( OperatorNode, '+' );
