@@ -1,12 +1,6 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-/**
- * parameters = {
- *  color: <THREE.Color>
- * }
- */
-
 class ShadowMaterial extends Material {
 
 	constructor( parameters ) {
