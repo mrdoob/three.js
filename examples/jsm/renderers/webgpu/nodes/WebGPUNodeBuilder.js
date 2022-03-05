@@ -483,13 +483,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( node.isArrayInputNode === true ) {
+				if ( node.isArrayUniformNode === true ) {
 
 					uniformGPU = [];
 
-					for ( const inputNode of node.nodes ) {
+					for ( const uniformNode of node.nodes ) {
 
-						const uniformNodeGPU = this._getNodeUniform( inputNode, type );
+						const uniformNodeGPU = this._getNodeUniform( uniformNode, type );
 
 						// fit bounds to buffer
 						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );
