@@ -2,6 +2,7 @@
 import PropertyNode from './core/PropertyNode.js';
 import VarNode from './core/VarNode.js';
 import AttributeNode from './core/AttributeNode.js';
+import InputNode from './core/InputNode.js';
 
 // input nodes
 import BoolNode from './inputs/BoolNode.js';
@@ -252,6 +253,37 @@ const ConvertType = function ( nodeClass, type, valueClass = null, valueComponen
 
 };
 
+const ConstNode = function ( type, valueClass, vectorLength = 1 ) {
+
+	return ( ...params ) => {
+
+		if ( params[ 0 ]?.isNode === true ) {
+
+			return nodeObject( new ConvertNode( params[ 0 ], type ) );
+
+		}
+
+		if ( params.length === 1 && vectorLength > 1 ) {
+
+			// Providing one scalar value: This value is used for all components
+
+			for ( let i = 1; i < vectorLength; i ++ ) {
+
+				params[ i ] = params[ 0 ];
+
+			}
+
+		}
+
+		const value = new valueClass().fromArray( params );
+		const node = nodeObject( new InputNode( type, value, true ) );
+
+		return node;
+
+	};
+
+};
+
 export const float = new ConvertType( FloatNode, 'float' );
 export const int = new ConvertType( IntNode, 'int' );
 export const uint = new ConvertType( UintNode, 'uint' );
@@ -264,7 +296,7 @@ export const uvec2 = new ConvertType( Vector2Node, 'uvec2', Vector2, 2, true );
 export const bvec2 = new ConvertType( Vector2Node, 'bvec2', Vector2, 2, true );
 
 export const vec3 = new ConvertType( Vector3Node, 'vec3', Vector3, 3 );
-export const ivec3 = new ConvertType( Vector3Node, 'ivec3', Vector3, 3, true );
+export const ivec3 = new ConstNode( 'ivec3', Vector3, 3 );
 export const uvec3 = new ConvertType( Vector3Node, 'uvec3', Vector3, 3, true );
 export const bvec3 = new ConvertType( Vector3Node, 'bvec3', Vector3, 3, true );
 

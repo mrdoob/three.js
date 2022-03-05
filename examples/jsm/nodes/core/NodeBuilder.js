@@ -163,6 +163,7 @@ class NodeBuilder {
 		if ( type === 'bool' ) return value ? 'true' : 'false';
 		if ( type === 'vec2' ) return `${ this.getType( 'vec2' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) } )`;
 		if ( type === 'vec3' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) }, ${ toFloat( value.z ) } )`;
+		if ( type === 'ivec3' ) return `${ this.getType( 'ivec3' ) }( ${ parseInt( value.x ) }, ${ parseInt( value.y ) }, ${ parseInt( value.z ) } )`;
 		if ( type === 'vec4' ) return `${ this.getType( 'vec4' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) }, ${ toFloat( value.z ) }, ${ toFloat( value.w ) } )`;
 		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
 

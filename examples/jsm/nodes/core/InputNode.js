@@ -2,13 +2,14 @@ import Node from './Node.js';
 
 class InputNode extends Node {
 
-	constructor( inputType ) {
+	constructor( inputType, value = null, constant = false ) {
 
 		super( inputType );
 
 		this.inputType = inputType;
 
-		this.constant = false;
+		this.value = value;
+		this.constant = constant;
 
 	}
 
