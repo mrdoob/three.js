@@ -2,78 +2,33 @@ import Node from './Node.js';
 
 class InputNode extends Node {
 
-	constructor( inputType ) {
+	constructor( nodeType, value = null ) {
 
-		super( inputType );
+		super( nodeType );
 
-		this.inputType = inputType;
-
-		this.constant = false;
+		this.value = value;
 
 	}
 
-	setConst( value ) {
+	serialize( data ) {
 
-		this.constant = value;
+		super.serialize( data );
 
-		return this;
-
-	}
-
-	getConst() {
-
-		return this.constant;
+		data.value = this.value?.toArray?.() || this.value;
 
 	}
 
-	getInputType( /* builder */ ) {
+	deserialize( data ) {
 
-		return this.inputType;
+		super.deserialize( data );
 
-	}
-
-	getInputHash( builder ) {
-
-		return this.getHash( builder );
+		this.value = this.value?.fromArray?.( data.value ) || data.value;
 
 	}
 
-	generateConst( builder ) {
+	generate( /*builder, output*/ ) {
 
-		return builder.getConst( this.getNodeType( builder ), this.value );
-
-	}
-
-	generate( builder, output ) {
-
-		const type = this.getNodeType( builder );
-
-		if ( this.constant === true ) {
-
-			return builder.format( this.generateConst( builder ), type, output );
-
-		} else {
-
-			const inputHash = this.getInputHash( builder );
-
-			let sharedNode = builder.getNodeFromHash( inputHash );
-
-			if ( sharedNode === undefined ) {
-
-				builder.setHashNode( this, inputHash );
-
-				sharedNode = this;
-
-			}
-
-			const inputType = sharedNode.getInputType( builder );
-
-			const nodeUniform = builder.getUniformFromNode( sharedNode, builder.shaderStage, inputType );
-			const propertyName = builder.getPropertyName( nodeUniform );
-
-			return builder.format( propertyName, type, output );
-
-		}
+		console.warn('Abstract function.');
 
 	}
 
