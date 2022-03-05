@@ -60,6 +60,7 @@ class OrbitControls extends EventDispatcher {
 		// If damping is enabled, you must call controls.update() in your animation loop
 		this.enableDamping = false;
 		this.dampingFactor = 0.05;
+		this.zoomDampingFactor = this.dampingFactor * 3
 
 		// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 		// Set to false to disable zooming
@@ -230,13 +231,13 @@ class OrbitControls extends EventDispatcher {
 
 						zoomFrom = spherical.radius;
 						zoomTo = spherical.radius * scale;
-						zoomDelta = ( zoomTo - zoomFrom ) * 3; // x3 because slow
+						zoomDelta = ( zoomTo - zoomFrom );
 					}
 
-					spherical.radius += zoomDelta * scope.dampingFactor;
-					zoomDelta = zoomDelta - zoomDelta * scope.dampingFactor;
+					spherical.radius += zoomDelta * scope.zoomDampingFactor;
+					zoomDelta = zoomDelta - zoomDelta * scope.zoomDampingFactor;
 
-					if ( Math.abs( zoomDelta ) < EPS * 10 ) {
+					if ( Math.abs( zoomDelta ) < EPS ) {
 
 						zoomDelta = 0;
 					}
@@ -362,7 +363,7 @@ class OrbitControls extends EventDispatcher {
 		let scale = 1;
 		let zoomTo = 1;
 		let zoomFrom = 1;
-		let zoomDelta = 1;
+		let zoomDelta = 0;
 		const panOffset = new Vector3();
 		let zoomChanged = false;
 
