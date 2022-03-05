@@ -41,7 +41,7 @@
 
 					this.updateType = Nodes.NodeUpdateType.Object;
 
-					this.inputNode = new Nodes.ColorNode();
+					this.uniformNode = new Nodes.UniformNode( 'color', new THREE.Color() );
 
 				}
 
@@ -52,7 +52,7 @@
 
 					const meshColor = mesh.color;
 
-					this.inputNode.value.copy( meshColor );
+					this.uniformNode.value.copy( meshColor );
 
 					// force refresh material uniforms
 					rendererState.useProgram( null );
@@ -61,7 +61,7 @@
 
 				generate( builder, output ) {
 
-					return this.inputNode.build( builder, output );
+					return this.uniformNode.build( builder, output );
 
 				}
 

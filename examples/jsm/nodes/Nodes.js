@@ -3,11 +3,11 @@ import ArrayInputNode from './core/ArrayInputNode.js';
 import AttributeNode from './core/AttributeNode.js';
 import BypassNode from './core/BypassNode.js';
 import CodeNode from './core/CodeNode.js';
+import ConstNode from './core/ConstNode.js';
 import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
 import FunctionNode from './core/FunctionNode.js';
-import InputNode from './core/InputNode.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
@@ -20,10 +20,12 @@ import NodeVar from './core/NodeVar.js';
 import NodeVary from './core/NodeVary.js';
 import PropertyNode from './core/PropertyNode.js';
 import TempNode from './core/TempNode.js';
+import UniformNode from './core/UniformNode.js';
 import VarNode from './core/VarNode.js';
 import VaryNode from './core/VaryNode.js';
 
 // accessors
+import BufferNode from './inputs/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import MaterialNode from './accessors/MaterialNode.js';
 import MaterialReferenceNode from './accessors/MaterialReferenceNode.js';
@@ -35,18 +37,8 @@ import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
-import UVNode from './accessors/UVNode.js';
-
-// inputs
-import ColorNode from './inputs/ColorNode.js';
-import FloatNode from './inputs/FloatNode.js';
-import IntNode from './inputs/IntNode.js';
-import Matrix3Node from './inputs/Matrix3Node.js';
-import Matrix4Node from './inputs/Matrix3Node.js';
 import TextureNode from './inputs/TextureNode.js';
-import Vector2Node from './inputs/Vector2Node.js';
-import Vector3Node from './inputs/Vector3Node.js';
-import Vector4Node from './inputs/Vector4Node.js';
+import UVNode from './accessors/UVNode.js';
 
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
@@ -102,10 +94,10 @@ const nodeLib = {
 	BypassNode,
 	CodeNode,
 	ContextNode,
+	ConstNode,
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
-	InputNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -118,10 +110,12 @@ const nodeLib = {
 	NodeVary,
 	PropertyNode,
 	TempNode,
+	UniformNode,
 	VarNode,
 	VaryNode,
 
 	// accessors
+	BufferNode,
 	CameraNode,
 	MaterialNode,
 	MaterialReferenceNode,
@@ -133,18 +127,8 @@ const nodeLib = {
 	PositionNode,
 	ReferenceNode,
 	SkinningNode,
-	UVNode,
-
-	// inputs
-	ColorNode,
-	FloatNode,
-	IntNode,
-	Matrix3Node,
-	Matrix4Node,
 	TextureNode,
-	Vector2Node,
-	Vector3Node,
-	Vector4Node,
+	UVNode,
 
 	// display
 	ColorSpaceNode,
@@ -196,10 +180,10 @@ export {
 	BypassNode,
 	CodeNode,
 	ContextNode,
+	ConstNode,
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
-	InputNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -212,10 +196,12 @@ export {
 	NodeVary,
 	PropertyNode,
 	TempNode,
+	UniformNode,
 	VarNode,
 	VaryNode,
 
 	// accessors
+	BufferNode,
 	CameraNode,
 	MaterialNode,
 	MaterialReferenceNode,
@@ -227,18 +213,8 @@ export {
 	PositionNode,
 	ReferenceNode,
 	SkinningNode,
-	UVNode,
-
-	// inputs
-	ColorNode,
-	FloatNode,
-	IntNode,
-	Matrix3Node,
-	Matrix4Node,
 	TextureNode,
-	Vector2Node,
-	Vector3Node,
-	Vector4Node,
+	UVNode,
 
 	// display
 	ColorSpaceNode,
