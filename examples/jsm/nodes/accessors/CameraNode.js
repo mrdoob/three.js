@@ -1,5 +1,5 @@
 import Object3DNode from './Object3DNode.js';
-import Matrix4Node from '../inputs/Matrix4Node.js';
+import UniformNode from '../core/UniformNode.js';
 
 class CameraNode extends Object3DNode {
 
@@ -9,7 +9,7 @@ class CameraNode extends Object3DNode {
 
 		super( scope );
 
-		this._inputNode = null;
+		this._uniformNode = null;
 
 	}
 
@@ -30,16 +30,16 @@ class CameraNode extends Object3DNode {
 	update( frame ) {
 
 		const camera = frame.camera;
-		const inputNode = this._inputNode;
+		const uniformNode = this._uniformNode;
 		const scope = this.scope;
 
 		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-			inputNode.value = camera.projectionMatrix;
+			uniformNode.value = camera.projectionMatrix;
 
 		} else if ( scope === CameraNode.VIEW_MATRIX ) {
 
-			inputNode.value = camera.matrixWorldInverse;
+			uniformNode.value = camera.matrixWorldInverse;
 
 		} else {
 
@@ -55,7 +55,7 @@ class CameraNode extends Object3DNode {
 
 		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-			this._inputNode = new Matrix4Node( null );
+			this._uniformNode = new UniformNode( 'mat4' );
 
 		}
 

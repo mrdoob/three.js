@@ -1,14 +1,6 @@
-import PositionNode from '../accessors/PositionNode.js';
-import NormalNode from '../accessors/NormalNode.js';
-import UVNode from '../accessors/UVNode.js';
-import MathNode from '../math/MathNode.js';
-import OperatorNode from '../math/OperatorNode.js';
-import FloatNode from '../inputs/FloatNode.js';
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
-import SplitNode from '../utils/SplitNode.js';
-import JoinNode from '../utils/JoinNode.js';
-import { ShaderNode, cond, add, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../ShaderNode.js';
+import { ShaderNode, positionView, normalView, uv, join, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../ShaderNode.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -58,32 +50,32 @@ class NormalMapNode extends TempNode {
 
 		const { normalMapType, scaleNode } = this;
 
-		const normalOP = new OperatorNode( '*', this.node, new FloatNode( 2.0 ).setConst( true ) );
-		let normalMap = new OperatorNode( '-', normalOP, new FloatNode( 1.0 ).setConst( true ) );
+		const normalOP = mul( this.node, 2.0 );
+		let normalMap = sub( normalOP, 1.0 );
 
 		if ( scaleNode !== null ) {
 
-			const normalMapScale = new OperatorNode( '*', new SplitNode( normalMap, 'xy'), scaleNode );
-			normalMap = new JoinNode( [ normalMapScale, new SplitNode( normalMap, 'z' ) ] );
+			const normalMapScale = mul( normalMap.xy, scaleNode );
+			normalMap = join( normalMapScale, normalMap.z );
 
 		}
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), normalMap );
+			const vertexNormalNode = mul( new ModelNode( ModelNode.NORMAL_MATRIX ), normalMap );
 
-			const normal = new MathNode( MathNode.NORMALIZE, vertexNormalNode );
+			const normal = normalize( vertexNormalNode );
 
 			return normal.build( builder, type );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
 			const perturbNormal2ArbCall = perturbNormal2ArbNode( {
-				eye_pos: new PositionNode( PositionNode.VIEW ),
-				surf_norm: new NormalNode( NormalNode.VIEW ),
+				eye_pos: positionView,
+				surf_norm: normalView,
 				mapN: normalMap,
-				faceDirection: new FloatNode( 1.0 ).setConst( true ),
-				uv: new UVNode()
+				faceDirection: 1.0,
+				uv: uv()
 			} );
 
 			return perturbNormal2ArbCall.build( builder, type );

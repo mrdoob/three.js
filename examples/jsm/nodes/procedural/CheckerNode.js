@@ -1,7 +1,6 @@
 import Node from '../core/Node.js';
-import UVNode from '../accessors/UVNode.js';
 
-import { ShaderNode, add, mul, floor, mod, sign } from '../ShaderNode.js';
+import { ShaderNode, uv, add, mul, floor, mod, sign } from '../ShaderNode.js';
 
 const checkerShaderNode = new ShaderNode( ( inputs ) => {
 
@@ -17,7 +16,7 @@ const checkerShaderNode = new ShaderNode( ( inputs ) => {
 
 class CheckerNode extends Node {
 
-	constructor( uvNode = new UVNode() ) {
+	constructor( uvNode = uv() ) {
 
 		super( 'float' );
 

@@ -1,6 +1,6 @@
 import ContextNode from '../core/ContextNode.js';
 import VarNode from '../core/VarNode.js';
-import Vector3Node from '../inputs/Vector3Node.js';
+import UniformNode from '../core/UniformNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import { PhysicalLightingModel } from '../functions/BSDFs.js';
 
@@ -30,8 +30,8 @@ class LightContextNode extends ContextNode {
 
 		}
 
-		const directDiffuse = new VarNode( new Vector3Node(), 'DirectDiffuse', 'vec3' );
-		const directSpecular = new VarNode( new Vector3Node(), 'DirectSpecular', 'vec3' );
+		const directDiffuse = new VarNode( new UniformNode( 'vec3' ), 'DirectDiffuse', 'vec3' );
+		const directSpecular = new VarNode( new UniformNode( 'vec3' ), 'DirectSpecular', 'vec3' );
 
 		this.context.directDiffuse = directDiffuse;
 		this.context.directSpecular = directSpecular;
