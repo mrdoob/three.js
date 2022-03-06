@@ -1,4 +1,4 @@
-import UniformNode from './UniformNode.js';
+import UniformNode from '../core/UniformNode.js';
 
 class BufferNode extends UniformNode {
 

@@ -1,4 +1,4 @@
-import UniformNode from '../inputs/UniformNode.js';
+import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 class TimerNode extends UniformNode {

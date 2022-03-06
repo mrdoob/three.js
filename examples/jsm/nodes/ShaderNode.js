@@ -6,10 +6,10 @@ import ConstNode from './core/ConstNode.js';
 import UniformNode from './core/UniformNode.js';
 
 // accessor nodes
-import BufferNode from './inputs/BufferNode.js';
+import BufferNode from './accessors/BufferNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import NormalNode from './accessors/NormalNode.js';
-import TextureNode from './inputs/TextureNode.js';
+import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 
 // math nodes

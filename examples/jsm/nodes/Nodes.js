@@ -1,5 +1,5 @@
 // core
-import ArrayInputNode from './core/ArrayInputNode.js';
+import ArrayUniformNode from './core/ArrayUniformNode.js';
 import AttributeNode from './core/AttributeNode.js';
 import BypassNode from './core/BypassNode.js';
 import CodeNode from './core/CodeNode.js';
@@ -25,7 +25,7 @@ import VarNode from './core/VarNode.js';
 import VaryNode from './core/VaryNode.js';
 
 // accessors
-import BufferNode from './inputs/BufferNode.js';
+import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import MaterialNode from './accessors/MaterialNode.js';
 import MaterialReferenceNode from './accessors/MaterialReferenceNode.js';
@@ -37,7 +37,7 @@ import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
-import TextureNode from './inputs/TextureNode.js';
+import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 
 // display
@@ -89,7 +89,7 @@ export * from './ShaderNode.js';
 
 const nodeLib = {
 	// core
-	ArrayInputNode,
+	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
 	CodeNode,
@@ -175,7 +175,7 @@ export const fromType = ( type ) => {
 
 export {
 	// core
-	ArrayInputNode,
+	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
 	CodeNode,
