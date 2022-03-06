@@ -161,10 +161,27 @@ class NodeBuilder {
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
 		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }` : '0';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
-		if ( type === 'vec2' ) return `${ this.getType( 'vec2' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) } )`;
-		if ( type === 'vec3' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) }, ${ toFloat( value.z ) } )`;
-		if ( type === 'vec4' ) return `${ this.getType( 'vec4' ) }( ${ toFloat( value.x ) }, ${ toFloat( value.y ) }, ${ toFloat( value.z ) }, ${ toFloat( value.w ) } )`;
 		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
+
+		const typeLength = this.getTypeLength( type );
+
+		const componentType = this.getComponentType( type );
+
+		const getConst = value => this.getConst( componentType, value );
+
+		if ( typeLength === 2 ) {
+
+			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) } )`;
+
+		} else if ( typeLength === 3 ) {
+
+			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) } )`;
+
+		} else if ( typeLength === 4 ) {
+
+			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
+
+		}
 
 		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
 
@@ -251,6 +268,18 @@ class NodeBuilder {
 		}
 
 		return encoding;
+
+	}
+
+	getComponentType( type ) {
+
+		type = this.getVectorType( type );
+
+		if ( type[ 0 ] === 'b' ) return 'bool';
+		if ( type[ 0 ] === 'i' ) return 'int';
+		if ( type[ 0 ] === 'u' ) return 'uint';
+
+		return 'float';
 
 	}
 
@@ -650,7 +679,7 @@ class NodeBuilder {
 
 		}
 
-		return `${ this.getType( toType ) }( ${ snippet } )`;
+		return `${ this.getType( toType ) }( ${ snippet } )`; // fromType is float-like
 
 	}
 
