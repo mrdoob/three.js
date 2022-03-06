@@ -275,9 +275,13 @@ class NodeBuilder {
 
 		type = this.getVectorType( type );
 
-		if ( type[ 0 ] === 'b' ) return 'bool';
-		if ( type[ 0 ] === 'i' ) return 'int';
-		if ( type[ 0 ] === 'u' ) return 'uint';
+		const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
+
+		if ( componentType === null ) return null;
+
+		if ( componentType[ 1 ] === 'b' ) return 'bool';
+		if ( componentType[ 1 ] === 'i' ) return 'int';
+		if ( componentType[ 1 ] === 'u' ) return 'uint';
 
 		return 'float';
 
