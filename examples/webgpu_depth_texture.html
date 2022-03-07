@@ -32,7 +32,7 @@
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
 
-			import { smoothstep, negate, positionView, sub } from 'three-nodes/ShaderNode.js';
+			import { smoothstep, negate, positionView, invert } from 'three-nodes/ShaderNode.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -63,7 +63,7 @@
 				// depth material
 
 				const material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = sub( 1.0, smoothstep( camera.near, camera.far, negate( positionView.z ) ) );
+				material.colorNode = invert( smoothstep( camera.near, camera.far, negate( positionView.z ) ) );
 
 				//
 
