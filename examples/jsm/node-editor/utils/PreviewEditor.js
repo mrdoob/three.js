@@ -5,7 +5,7 @@ import { BaseNode } from '../core/BaseNode.js';
 import { MeshBasicNodeMaterial, ConstNode } from 'three-nodes/Nodes.js';
 import { WebGLRenderer, PerspectiveCamera, Scene, Mesh, DoubleSide, SphereGeometry, BoxGeometry, PlaneGeometry, TorusKnotGeometry } from 'three';
 
-const nullValue = new ConstNode( 'float', 0 );
+const nullValue = new ConstNode( 0 );
 
 const sceneDict = {};
 

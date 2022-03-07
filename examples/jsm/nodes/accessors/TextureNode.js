@@ -5,7 +5,7 @@ class TextureNode extends UniformNode {
 
 	constructor( value, uvNode = new UVNode(), biasNode = null ) {
 
-		super( 'texture', value );
+		super( value, 'texture' );
 
 		this.uvNode = uvNode;
 		this.biasNode = biasNode;

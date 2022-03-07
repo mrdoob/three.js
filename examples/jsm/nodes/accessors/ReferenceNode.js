@@ -24,7 +24,7 @@ class ReferenceNode extends Node {
 
 	setNodeType( uniformType ) {
 
-		this.node = new UniformNode( uniformType );
+		this.node = new UniformNode( null, uniformType );
 		this.nodeType = uniformType;
 
 		if ( uniformType === 'color' ) {

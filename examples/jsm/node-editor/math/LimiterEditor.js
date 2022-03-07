@@ -6,7 +6,7 @@ export class LimiterEditor extends BaseNode {
 
 	constructor() {
 
-		const NULL_VALUE = new UniformNode( 'float', 0 );
+		const NULL_VALUE = new UniformNode( 0 );
 
 		const node = new MathNode( MathNode.MIN, NULL_VALUE, NULL_VALUE );
 

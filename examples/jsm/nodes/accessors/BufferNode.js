@@ -4,7 +4,7 @@ class BufferNode extends UniformNode {
 
 	constructor( value, bufferType, bufferCount = 0 ) {
 
-		super( 'buffer', value );
+		super( value, 'buffer' );
 
 		this.bufferType = bufferType;
 		this.bufferCount = bufferCount;

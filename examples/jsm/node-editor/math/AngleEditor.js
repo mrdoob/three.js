@@ -3,7 +3,7 @@ import { BaseNode } from '../core/BaseNode.js';
 import { Vector3 } from 'three';
 import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
 
-const DEFAULT_VALUE = new UniformNode( 'vec3', new Vector3() );
+const DEFAULT_VALUE = new UniformNode( new Vector3() );
 
 export class AngleEditor extends BaseNode {
 

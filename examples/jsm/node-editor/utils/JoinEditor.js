@@ -2,7 +2,7 @@ import { LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { JoinNode, UniformNode } from 'three-nodes/Nodes.js';
 
-const NULL_VALUE = new UniformNode( 'float', 0 );
+const NULL_VALUE = new UniformNode( 0 );
 
 export class JoinEditor extends BaseNode {
 

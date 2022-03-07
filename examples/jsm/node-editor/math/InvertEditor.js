@@ -2,7 +2,7 @@ import { SelectInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
 
-const DEFAULT_VALUE = new UniformNode( 'float', 0 );
+const DEFAULT_VALUE = new UniformNode( 0 );
 
 export class InvertEditor extends BaseNode {
 

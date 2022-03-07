@@ -6,7 +6,7 @@ export class SliderEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new UniformNode( 'float' );
+		const node = new UniformNode( 0 );
 
 		super( 'Slider', 1, node );
 

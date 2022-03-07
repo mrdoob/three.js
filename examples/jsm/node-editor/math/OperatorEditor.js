@@ -6,7 +6,7 @@ export class OperatorEditor extends BaseNode {
 
 	constructor() {
 
-		const NULL_VALUE = new UniformNode( 'float', 0 );
+		const NULL_VALUE = new UniformNode( 0 );
 
 		const node = new OperatorNode( '+', NULL_VALUE, NULL_VALUE );
 

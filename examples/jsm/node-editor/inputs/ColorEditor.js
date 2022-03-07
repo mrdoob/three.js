@@ -7,7 +7,7 @@ export class ColorEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new UniformNode( 'color', new Color() );
+		const node = new UniformNode( new Color() );
 
 		super( 'Color', 3, node );
 

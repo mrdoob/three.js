@@ -83,15 +83,15 @@ class Object3DNode extends Node {
 
 		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
 
-			this._uniformNode = new UniformNode( 'mat4' );
+			this._uniformNode = new UniformNode( null, 'mat4' );
 
 		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
 
-			this._uniformNode = new UniformNode( 'mat3' );
+			this._uniformNode = new UniformNode( null, 'mat3' );
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
 
-			this._uniformNode = new UniformNode( 'vec3', new Vector3() );
+			this._uniformNode = new UniformNode( new Vector3(), 'vec3' );
 
 		}
 

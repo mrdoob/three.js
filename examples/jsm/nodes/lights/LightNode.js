@@ -19,10 +19,10 @@ class LightNode extends Node {
 
 		this.light = light;
 
-		this.colorNode = new UniformNode( 'color', new Color() );
+		this.colorNode = new UniformNode( new Color() );
 
-		this.lightCutoffDistanceNode = new UniformNode( 'float' );
-		this.lightDecayExponentNode = new UniformNode( 'float' );
+		this.lightCutoffDistanceNode = new UniformNode( 0 );
+		this.lightDecayExponentNode = new UniformNode( 0 );
 
 	}
 

@@ -8,7 +8,7 @@ import JoinNode from '../utils/JoinNode.js';
 
 class SpriteSheetUVNode extends Node {
 
-	constructor( countNode, uvNode = new UVNode(), frameNode = new ConstNode( 'float', 0 ) ) {
+	constructor( countNode, uvNode = new UVNode(), frameNode = new ConstNode( 0 ) ) {
 
 		super( 'vec2' );
 
@@ -24,7 +24,7 @@ class SpriteSheetUVNode extends Node {
 		const uv = this.uvNode;
 		const frame = this.frameNode;
 
-		const one = new ConstNode( 'float', 1 );
+		const one = new ConstNode( 1 );
 
 		const width = new SplitNode( count, 'x' );
 		const height = new SplitNode( count, 'y' );

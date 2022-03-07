@@ -7,7 +7,7 @@ export class Vector3Editor extends BaseNode {
 
 	constructor() {
 
-		const node = new UniformNode( 'vec3', new Vector3() );
+		const node = new UniformNode( new Vector3() );
 
 		super( 'Vector 3', 3, node, 325 );
 

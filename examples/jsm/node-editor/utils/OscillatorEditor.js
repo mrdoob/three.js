@@ -2,7 +2,7 @@ import { SelectInput, LabelElement, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { OscNode, UniformNode } from 'three-nodes/Nodes.js';
 
-const NULL_VALUE = new UniformNode( 'float', 0 );
+const NULL_VALUE = new UniformNode( 0 );
 
 export class OscillatorEditor extends BaseNode {
 

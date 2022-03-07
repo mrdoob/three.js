@@ -56,7 +56,7 @@ const NodeHandler = {
 
 				// accessing array
 
-				return new ShaderNodeObject( new ArrayElementNode( node, new ConstNode( 'uint', Number( prop ) ) ) );
+				return new ShaderNodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
 
 			}
 
@@ -74,13 +74,9 @@ const ShaderNodeObject = function( obj ) {
 
 	const type = typeof obj;
 
-	if ( type === 'number' ) {
+	if ( ( type === 'number' ) || ( type === 'boolean' ) ) {
 
-		return new ShaderNodeObject( new ConstNode( 'float', obj ) );
-
-	} else if ( type === 'boolean' ) {
-
-		return new ShaderNodeObject( new ConstNode( 'bool', obj ) );
+		return new ShaderNodeObject( new ConstNode( obj ) );
 
 	} else if ( type === 'object' ) {
 
@@ -190,7 +186,7 @@ export const nodeObject = ( val ) => {
 
 export const uniform = ( constNode ) => {
 
-	return nodeObject( new UniformNode( constNode.nodeType, constNode.value ) );
+	return nodeObject( new UniformNode( constNode.value, constNode.nodeType ) );
 
 };
 
@@ -236,7 +232,7 @@ const ConvertType = function ( type, valueClass = null, valueComponents = 1 ) {
 
 		const val = ( ( valueClass === null ) || ( params[ 0 ] instanceof valueClass ) ) ? params[ 0 ] : new valueClass().set( ...params );
 
-		return nodeObject( new ConstNode( type, val ) );
+		return nodeObject( new ConstNode( val, type ) );
 
 	};
 

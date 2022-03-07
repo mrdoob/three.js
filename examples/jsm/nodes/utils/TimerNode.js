@@ -9,7 +9,7 @@ class TimerNode extends UniformNode {
 
 	constructor( scope = TimerNode.LOCAL ) {
 
-		super( 'float' );
+		super( 0 );
 
 		this.scope = scope;
 		this.scale = 1;

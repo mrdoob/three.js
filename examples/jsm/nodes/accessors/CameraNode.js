@@ -55,7 +55,7 @@ class CameraNode extends Object3DNode {
 
 		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-			this._uniformNode = new UniformNode( 'mat4' );
+			this._uniformNode = new UniformNode( null, 'mat4' );
 
 		}
 

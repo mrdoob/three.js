@@ -3,7 +3,7 @@ import { BaseNode } from '../core/BaseNode.js';
 import { NormalMapNode, ConstNode } from 'three-nodes/Nodes.js';
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
-const nullValue = new ConstNode( 'float', 0 );
+const nullValue = new ConstNode( 0 );
 
 export class NormalMapEditor extends BaseNode {
 

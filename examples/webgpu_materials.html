@@ -116,7 +116,7 @@
 
 				// Opacity
 				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.UniformNode( 'color', new THREE.Color( 0x0099FF ) );
+				material.colorNode = new Nodes.UniformNode( new THREE.Color( 0x0099FF ) );
 				material.opacityNode = new Nodes.TextureNode( texture );
 				material.transparent = true;
 				materials.push( material );
@@ -125,7 +125,7 @@
 				material = new Nodes.MeshBasicNodeMaterial();
 				material.colorNode = new Nodes.TextureNode( texture );
 				material.opacityNode = new Nodes.TextureNode( opacityTexture );
-				material.alphaTestNode = new Nodes.UniformNode( 'float', 0.5 );
+				material.alphaTestNode = new Nodes.UniformNode( 0.5 );
 				materials.push( material );
 
 				//

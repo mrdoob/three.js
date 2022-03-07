@@ -6,7 +6,7 @@ export class FloatEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new UniformNode( 'float' );
+		const node = new UniformNode( 0 );
 
 		super( 'Float', 1, node, 150 );
 

@@ -28,7 +28,7 @@ class WebGLPhysicalContextNode extends ContextNode {
 
 		} else if ( scope === WebGLPhysicalContextNode.IRRADIANCE ) {
 
-			roughness = new ConstNode( 'float', 1.0 );
+			roughness = new ConstNode( 1 );
 
 			this.context.uv = new NormalNode( NormalNode.WORLD );
 
