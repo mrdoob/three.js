@@ -6,7 +6,6 @@ import {
 	WebGLRenderTarget
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { CopyShader } from '../shaders/CopyShader.js';
 import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
 
 class BloomPass extends Pass {
@@ -22,21 +21,17 @@ class BloomPass extends Pass {
 		this.renderTargetY = new WebGLRenderTarget( resolution, resolution );
 		this.renderTargetY.texture.name = 'BloomPass.y';
 
-		// copy material
+		// combine material
 
-		if ( CopyShader === undefined ) console.error( 'THREE.BloomPass relies on CopyShader' );
+		this.combineUniforms = UniformsUtils.clone( CombineShader.uniforms );
 
-		const copyShader = CopyShader;
+		this.combineUniforms[ 'strength' ].value = strength;
 
-		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
+		this.materialCombine = new ShaderMaterial( {
 
-		this.copyUniforms[ 'opacity' ].value = strength;
-
-		this.materialCopy = new ShaderMaterial( {
-
-			uniforms: this.copyUniforms,
-			vertexShader: copyShader.vertexShader,
-			fragmentShader: copyShader.fragmentShader,
+			uniforms: this.combineUniforms,
+			vertexShader: CombineShader.vertexShader,
+			fragmentShader: CombineShader.fragmentShader,
 			blending: AdditiveBlending,
 			transparent: true
 
@@ -98,9 +93,9 @@ class BloomPass extends Pass {
 
 		// Render original scene with superimposed blur to texture
 
-		this.fsQuad.material = this.materialCopy;
+		this.fsQuad.material = this.materialCombine;
 
-		this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
+		this.combineUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
 
 		if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
 
@@ -111,6 +106,43 @@ class BloomPass extends Pass {
 	}
 
 }
+
+const CombineShader = {
+
+	uniforms: {
+
+		'tDiffuse': { value: null },
+		'strength': { value: 1.0 }
+
+	},
+
+	vertexShader: /* glsl */`
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}`,
+
+	fragmentShader: /* glsl */`
+
+		uniform float strength;
+
+		uniform sampler2D tDiffuse;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vec4 texel = texture2D( tDiffuse, vUv );
+			gl_FragColor = strength * texel;
+
+		}`
+
+};
 
 BloomPass.blurX = new Vector2( 0.001953125, 0.0 );
 BloomPass.blurY = new Vector2( 0.0, 0.001953125 );
