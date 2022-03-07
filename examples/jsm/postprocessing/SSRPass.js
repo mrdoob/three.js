@@ -9,7 +9,6 @@ import {
 	MeshBasicMaterial,
 	NearestFilter,
 	NoBlending,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedShortType,
@@ -163,7 +162,6 @@ class SSRPass extends Pass {
 		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
-			format: RGBAFormat,
 			depthTexture: depthTexture,
 			depthBuffer: true
 		} );
@@ -171,8 +169,7 @@ class SSRPass extends Pass {
 		//for bouncing
 		this.prevRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat,
+			magFilter: NearestFilter
 		} );
 
 		// normal render target
@@ -180,7 +177,6 @@ class SSRPass extends Pass {
 		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
-			format: RGBAFormat,
 			type: HalfFloatType,
 		} );
 
@@ -188,8 +184,7 @@ class SSRPass extends Pass {
 
 		this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat
+			magFilter: NearestFilter
 		} );
 
 
@@ -198,8 +193,7 @@ class SSRPass extends Pass {
 
 		this.ssrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat
+			magFilter: NearestFilter
 		} );
 
 		this.blurRenderTarget = this.ssrRenderTarget.clone();
