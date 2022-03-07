@@ -1,8 +1,6 @@
 import {
-	LinearFilter,
 	MeshBasicMaterial,
 	NearestFilter,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
@@ -25,19 +23,11 @@ class AfterimagePass extends Pass {
 		this.uniforms[ 'damp' ].value = damp;
 
 		this.textureComp = new WebGLRenderTarget( window.innerWidth, window.innerHeight, {
-
-			minFilter: LinearFilter,
 			magFilter: NearestFilter,
-			format: RGBAFormat
-
 		} );
 
 		this.textureOld = new WebGLRenderTarget( window.innerWidth, window.innerHeight, {
-
-			minFilter: LinearFilter,
 			magFilter: NearestFilter,
-			format: RGBAFormat
-
 		} );
 
 		this.shaderMaterial = new ShaderMaterial( {

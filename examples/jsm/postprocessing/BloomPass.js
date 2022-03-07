@@ -1,7 +1,5 @@
 import {
 	AdditiveBlending,
-	LinearFilter,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
@@ -19,11 +17,9 @@ class BloomPass extends Pass {
 
 		// render targets
 
-		const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
-
-		this.renderTargetX = new WebGLRenderTarget( resolution, resolution, pars );
+		this.renderTargetX = new WebGLRenderTarget( resolution, resolution );
 		this.renderTargetX.texture.name = 'BloomPass.x';
-		this.renderTargetY = new WebGLRenderTarget( resolution, resolution, pars );
+		this.renderTargetY = new WebGLRenderTarget( resolution, resolution );
 		this.renderTargetY.texture.name = 'BloomPass.y';
 
 		// copy material
