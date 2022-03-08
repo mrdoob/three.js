@@ -85,21 +85,21 @@ class InputNode extends Node {
 
 	}
 
-	get value() {
-
-		return this._value;
-
-	}
-
-	set value( val ) {
-
-		this._value = val;
+	_getNodeType() {
 
 		if ( this.nodeType === null ) {
 
-			this.nodeType = getValueType( val );
+			return getValueType( this.value );
 
 		}
+
+		return this.nodeType;
+
+	}
+
+	getNodeType( /*builder*/ ) {
+
+		return this._getNodeType();
 
 	}
 
@@ -108,7 +108,7 @@ class InputNode extends Node {
 		super.serialize( data );
 
 		data.value = this.value?.toArray?.() || this.value;
-		data.nodeType = this.nodeType;
+		data.nodeType = this._getNodeType();
 
 	}
 
