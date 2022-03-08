@@ -37,51 +37,69 @@ function getValueType( value ) {
 
 	}
 
+	return null;
+
 }
 
 function getValueFromType( type ) {
+
+	const last4 = type?.slice( -4 );
 
 	if ( type === 'color' ) {
 
 		return new Color();
 
-	} else if ( type.includes( 'vec2' ) ) {
+	} else if ( last4 === 'vec2' ) {
 
 		return new Vector2();
 
-	} else if ( type.includes( 'vec3' ) ) {
+	} else if ( last4 === 'vec3' ) {
 
 		return new Vector3();
 
-	} else if ( type.includes( 'vec4' ) ) {
+	} else if ( last4 === 'vec4' ) {
 
 		return new Vector4();
 
-	} else if ( type.includes( 'mat3' ) ) {
+	} else if ( last4 === 'mat3' ) {
 
 		return new Matrix3();
 
-	} else if ( type.includes( 'mat4' ) ) {
+	} else if ( last4 === 'mat4' ) {
 
 		return new Matrix4();
 
 	}
 
+	return null;
+
 }
 
 class InputNode extends Node {
 
-	constructor( value, nodeType ) {
-
-		if ( nodeType === undefined ) {
-
-			nodeType = getValueType( value );
-
-		}
+	constructor( value, nodeType = null ) {
 
 		super( nodeType );
 
 		this.value = value;
+
+	}
+
+	get value() {
+
+		return this._value;
+
+	}
+
+	set value( val ) {
+
+		this._value = val;
+
+		if ( this.nodeType === null ) {
+
+			this.nodeType = getValueType( val );
+
+		}
 
 	}
 

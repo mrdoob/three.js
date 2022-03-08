@@ -91,7 +91,7 @@ class Object3DNode extends Node {
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
 
-			this._uniformNode = new UniformNode( new Vector3(), 'vec3' );
+			this._uniformNode = new UniformNode( new Vector3() );
 
 		}
 
