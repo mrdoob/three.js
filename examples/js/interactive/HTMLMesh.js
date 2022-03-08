@@ -306,6 +306,16 @@
 
 			}
 
+			if ( element.shadowRoot ) {
+
+				for ( let i = 0; i < element.shadowRoot.childNodes.length; i ++ ) {
+
+					drawElement( element.shadowRoot.childNodes[ i ], style );
+
+				}
+
+			}
+
 			if ( isClipping ) clipper.remove();
 
 		}
@@ -363,6 +373,16 @@
 				for ( let i = 0; i < element.childNodes.length; i ++ ) {
 
 					traverse( element.childNodes[ i ] );
+
+				}
+
+				if ( element.shadowRoot ) {
+
+					for ( let i = 0; i < element.shadowRoot.childNodes.length; i ++ ) {
+
+						traverse( element.shadowRoot.childNodes[ i ] );
+
+					}
 
 				}
 
