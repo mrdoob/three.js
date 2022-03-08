@@ -102,6 +102,7 @@ class InputNode extends Node {
 		super.serialize( data );
 
 		data.value = this.value?.toArray?.() || this.value;
+		data.valueType = getValueType( this.value );
 		data.nodeType = this.nodeType;
 
 	}
@@ -111,7 +112,7 @@ class InputNode extends Node {
 		super.deserialize( data );
 
 		this.nodeType = data.nodeType;
-		this.value = getValueFromType( this.nodeType );
+		this.value = getValueFromType( data.valueType );
 		this.value = this.value?.fromArray?.( data.value ) || data.value;
 
 	}
