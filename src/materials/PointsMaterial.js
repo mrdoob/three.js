@@ -1,19 +1,6 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *  map: new THREE.Texture( <Image> ),
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  size: <float>,
- *  sizeAttenuation: <bool>
- *
- * }
- */
-
 class PointsMaterial extends Material {
 
 	constructor( parameters ) {
