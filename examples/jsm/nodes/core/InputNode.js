@@ -85,7 +85,7 @@ class InputNode extends Node {
 
 	}
 
-	_getNodeType() {
+	getNodeType( /*builder*/ ) {
 
 		if ( this.nodeType === null ) {
 
@@ -97,18 +97,12 @@ class InputNode extends Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
-
-		return this._getNodeType();
-
-	}
-
 	serialize( data ) {
 
 		super.serialize( data );
 
 		data.value = this.value?.toArray?.() || this.value;
-		data.nodeType = this._getNodeType();
+		data.nodeType = this.nodeType;
 
 	}
 
