@@ -43,29 +43,27 @@ function getValueType( value ) {
 
 function getValueFromType( type ) {
 
-	const last4 = type?.slice( -4 );
-
 	if ( type === 'color' ) {
 
 		return new Color();
 
-	} else if ( last4 === 'vec2' ) {
+	} else if ( type === 'vec2' ) {
 
 		return new Vector2();
 
-	} else if ( last4 === 'vec3' ) {
+	} else if ( type === 'vec3' ) {
 
 		return new Vector3();
 
-	} else if ( last4 === 'vec4' ) {
+	} else if ( type === 'vec4' ) {
 
 		return new Vector4();
 
-	} else if ( last4 === 'mat3' ) {
+	} else if ( type === 'mat3' ) {
 
 		return new Matrix3();
 
-	} else if ( last4 === 'mat4' ) {
+	} else if ( type === 'mat4' ) {
 
 		return new Matrix4();
 
