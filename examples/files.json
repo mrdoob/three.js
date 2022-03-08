@@ -307,6 +307,7 @@
 	],
 	"webgpu": [
 		"webgpu_compute",
+		"webgpu_depth_texture",
 		"webgpu_instance_uniform",
 		"webgpu_lights_custom",
 		"webgpu_lights_selective",
