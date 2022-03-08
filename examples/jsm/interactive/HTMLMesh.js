@@ -316,6 +316,14 @@ function html2canvas( element ) {
 
 		}
 
+		if(element.shadowRoot) {
+			for ( let i = 0; i < element.shadowRoot.childNodes.length; i ++ ) {
+
+				drawElement( element.shadowRoot.childNodes[ i ], style );
+
+			}
+		}
+
 		if ( isClipping ) clipper.remove();
 
 	}
@@ -381,6 +389,15 @@ function htmlevent( element, event, x, y ) {
 
 				traverse( element.childNodes[ i ] );
 
+			}
+
+			if(element.shadowRoot) {
+
+				for ( let i = 0; i < element.shadowRoot.childNodes.length; i ++ ) {
+
+					traverse( element.shadowRoot.childNodes[ i ] );
+
+				}
 			}
 
 		}

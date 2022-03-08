@@ -32,6 +32,33 @@
 		<script type="module">
 			import { LitElement, html, css } from "https://cdn.skypack.dev/lit?min";
 
+			class MyElementChild extends LitElement {
+
+				static properties = {
+					counter: {}
+				};
+
+				constructor() {
+					super();
+				}
+
+				render() {
+					return html`
+                    <p>
+                    	LitChild
+						<button @click = "${this.inc}">+1</button>
+						${this.counter}
+                    </p>
+                `;
+				}
+
+				inc() {
+					this.counter++;
+					this.dispatchEvent(new CustomEvent('select', {detail: this.counter}))
+				}
+			}
+			customElements.define('lit-exple-child-el', MyElementChild);
+
 			class MyElement extends LitElement {
 				static get styles() {
 					// language=CSS
@@ -43,27 +70,40 @@
 						button {
 							color: blue
 						}
-					`
+			`
 
 				}
 
 				static properties = {
-					_counter: { state: true }
+					_counter: { state: true },
+					subcounter: {state: true}
 				};
 
 				constructor() {
 					super();
 
-					this._counter = 0;
+					this._counter = 9;
+					this.subcounter = 2;
 				}
 
 				render() {
 					return html`
-                    <p>LitElement</p>
-                    <p>Counter: ${this._counter}</p>
-                    <button @click = "${this.inc}">+</button>
-                    <button @click = "${this.dec}">-</button>
+                    <p>LitElement:
+						<button @click = "${this.inc}">+</button>
+						<button @click = "${this.dec}">-</button>
+						${this._counter}
+					</p>
+					SubCounter ${this.subcounter}
+					<lit-exple-child-el @select=${this.onselectSubcounter} .counter=${this.subcounter}></lit-exple-child-el>
                 `;
+				}
+
+				updated(changedProperties) {
+					this.dispatchEvent(new CustomEvent('lit-updated')) //this is needed, because HTMLMesh, uses MutationObserver which ignores shadow
+				}
+
+				onselectSubcounter(e) {
+					this.subcounter = e.detail
 				}
 
 				dec() {
@@ -71,14 +111,6 @@
 				}
 				inc() {
 					this._counter++;
-				}
-				//because dom inside shadowRoot is not observable (MutationObserver), a workaround is to disable shadowRoot with Lit
-				//it is easy to attach clicks event. But waiting for shadowRoot to be attached and observe its children add a lot of code
-				//dirty alternative is to call myhtmlmesh.texture.update() at every frame
-				// a better alternative is to have method `updated(changedProperties) {this.setAttribute('observeme', new Date().getTime())}`
-				// but because I don't want to surcharge HTMLMesh with shadow related code, I prefer to avoid shadowRoot with lit
-				createRenderRoot() {
-					return this;
 				}
 			}
 			customElements.define('lit-exple-el', MyElement);
@@ -110,7 +142,7 @@
 					return React.createElement(
 						'button',
 						{ onClick: () => this.countClick() },
-						this.state.count ? this.state.count : 'Count'
+						this.state.count ? this.state.count : 'React Count'
 					);
 				}
 			}
@@ -326,13 +358,19 @@
 				group.add( basicHtmlMesh );
 
 				// add lit htmlmesh
-				litHtmlMesh = new HTMLMesh(document.querySelector('#lit-html-mesh'));
+				let elLit = document.querySelector('#lit-html-mesh')
+				litHtmlMesh = new HTMLMesh(elLit);
 				litHtmlMesh.position.x = - 0.30;
 				litHtmlMesh.position.y = 2;
 				litHtmlMesh.position.z = - 0.6;
 				litHtmlMesh.rotation.y = Math.PI / 8;
 				litHtmlMesh.scale.setScalar( 2.5 );
 				group.add( litHtmlMesh );
+				elLit.addEventListener('lit-updated', () => {
+					if ( ! litHtmlMesh.material.map.scheduleUpdate ) {
+						litHtmlMesh.material.map.scheduleUpdate = setTimeout( () => litHtmlMesh.material.map.update(), 16 );
+					}
+				})
 
 				//add react htmlmesh
 				reactHtmlMesh = new HTMLMesh(document.querySelector('.react-count-btn'));
@@ -369,11 +407,6 @@
 
 				renderer.render( scene, camera );
 				stats.update();
-
-				// workaround
-				// litHtmlMesh.texture.update()
-
-				// reactHtmlMesh.texture.update()
 
 				// Canvas elements doesn't trigger DOM updates, so we have to update the texture
 				statsMesh.material.map.update();
