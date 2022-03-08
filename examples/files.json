@@ -338,6 +338,7 @@
 		"webxr_vr_handinput_pointerdrag",
 		"webxr_vr_handinput_pressbutton",
 		"webxr_vr_haptics",
+		"webxr_vr_htmlmesh",
 		"webxr_vr_layers",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",

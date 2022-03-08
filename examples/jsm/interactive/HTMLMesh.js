@@ -14,7 +14,7 @@ class HTMLMesh extends Mesh {
 		const texture = new HTMLTexture( dom );
 
 		const geometry = new PlaneGeometry( texture.image.width * 0.001, texture.image.height * 0.001 );
-		const material = new MeshBasicMaterial( { map: texture, toneMapped: false } );
+		const material = new MeshBasicMaterial( { map: texture, toneMapped: false, transparent: true } );
 
 		super( geometry, material );
 
@@ -92,6 +92,14 @@ class HTMLTexture extends CanvasTexture {
 	update() {
 
 		this.image = html2canvas( this.dom );
+
+		//when canvas size changed, this is needed; but I don't understand why! Do we lose time to call it at every update?
+		if ( !this.prevCanvasSize || this.image.width !== this.prevCanvasSize.width || this.image.height !== this.prevCanvasSize.height) {
+			this.prevCanvasSize = { width: this.image.width, height: this.image.height };
+			super.dispose();
+			console.log("canvas size changed, dispose"); //I'll remove that later
+		}
+
 		this.needsUpdate = true;
 
 		this.scheduleUpdate = null;
