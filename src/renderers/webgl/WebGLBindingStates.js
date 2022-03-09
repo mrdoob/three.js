@@ -60,9 +60,11 @@
 
 		}
 
-		if (mustUpdateBuffers) {
+		if ( mustUpdateBuffers ) {
+
 			updateBuffers = true;
 			mustUpdateBuffers = false;
+
 		}
 
 		if ( updateBuffers ) {
@@ -560,6 +562,7 @@
 	}
 
 	function reset() {
+
 		resetDefaultState();
 		mustUpdateBuffers = true;
 
@@ -567,6 +570,7 @@
 
 		currentState = defaultState;
 		bindVertexArrayObject( currentState.object );
+
 	}
 
 	// for backward-compatilibity
