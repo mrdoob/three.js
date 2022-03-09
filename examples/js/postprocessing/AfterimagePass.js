@@ -10,14 +10,10 @@
 			this.uniforms = THREE.UniformsUtils.clone( this.shader.uniforms );
 			this.uniforms[ 'damp' ].value = damp;
 			this.textureComp = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} );
 			this.textureOld = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} );
 			this.shaderMaterial = new THREE.ShaderMaterial( {
 				uniforms: this.uniforms,

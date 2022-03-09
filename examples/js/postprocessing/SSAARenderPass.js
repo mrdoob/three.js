@@ -31,7 +31,6 @@
 				uniforms: this.copyUniforms,
 				vertexShader: copyShader.vertexShader,
 				fragmentShader: copyShader.fragmentShader,
-				premultipliedAlpha: true,
 				transparent: true,
 				blending: THREE.AdditiveBlending,
 				depthTest: false,
@@ -62,11 +61,7 @@
 
 			if ( ! this.sampleRenderTarget ) {
 
-				this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBAFormat
-				} );
+				this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height );
 				this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 			}
