@@ -737,11 +737,7 @@ class VTKLoader extends Loader {
 					// computed by summing the compressed block sizes from preceding blocks according to the header.
 
 					const textNode = ele[ '#text' ];
-					const rawData = (
-						( textNode instanceof Array )
-							? textNode[ 0 ]
-							: textNode
-					);
+					const rawData = Array.isArray( textNode ) ? textNode[ 0 ] : textNode;
 
 					const byteData = Base64toByteArray( rawData );
 
