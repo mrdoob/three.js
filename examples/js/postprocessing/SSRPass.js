@@ -146,34 +146,29 @@
 			this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 				minFilter: THREE.NearestFilter,
 				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat,
 				depthTexture: depthTexture,
 				depthBuffer: true
 			} ); //for bouncing
 
 			this.prevRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 				minFilter: THREE.NearestFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} ); // normal render target
 
 			this.normalRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 				minFilter: THREE.NearestFilter,
 				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat,
 				type: THREE.HalfFloatType
 			} ); // metalness render target
 
 			this.metalnessRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 				minFilter: THREE.NearestFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} ); // ssr render target
 
 			this.ssrRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 				minFilter: THREE.NearestFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} );
 			this.blurRenderTarget = this.ssrRenderTarget.clone();
 			this.blurRenderTarget2 = this.ssrRenderTarget.clone(); // this.blurRenderTarget3 = this.ssrRenderTarget.clone();

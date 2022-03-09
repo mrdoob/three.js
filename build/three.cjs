@@ -162,7 +162,11 @@ const sRGBEncoding = 3001;
 const BasicDepthPacking = 3200;
 const RGBADepthPacking = 3201;
 const TangentSpaceNormalMap = 0;
-const ObjectSpaceNormalMap = 1;
+const ObjectSpaceNormalMap = 1; // Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
+
+const NoColorSpace = '';
+const SRGBColorSpace = 'srgb';
+const LinearSRGBColorSpace = 'srgb-linear';
 const ZeroStencilOp = 0;
 const KeepStencilOp = 7680;
 const ReplaceStencilOp = 7681;
@@ -1084,6 +1088,56 @@ function createElementNS(name) {
 	return document.createElementNS('http://www.w3.org/1999/xhtml', name);
 }
 
+function SRGBToLinear(c) {
+	return c < 0.04045 ? c * 0.0773993808 : Math.pow(c * 0.9478672986 + 0.0521327014, 2.4);
+}
+function LinearToSRGB(c) {
+	return c < 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 0.41666) - 0.055;
+} // JavaScript RGB-to-RGB transforms, defined as
+// FN[InputColorSpace][OutputColorSpace] callback functions.
+
+const FN = {
+	[SRGBColorSpace]: {
+		[LinearSRGBColorSpace]: SRGBToLinear
+	},
+	[LinearSRGBColorSpace]: {
+		[SRGBColorSpace]: LinearToSRGB
+	}
+};
+const ColorManagement = {
+	legacyMode: true,
+
+	get workingColorSpace() {
+		return LinearSRGBColorSpace;
+	},
+
+	set workingColorSpace(colorSpace) {
+		console.warn('THREE.ColorManagement: .workingColorSpace is readonly.');
+	},
+
+	convert: function (color, sourceColorSpace, targetColorSpace) {
+		if (this.legacyMode || sourceColorSpace === targetColorSpace || !sourceColorSpace || !targetColorSpace) {
+			return color;
+		}
+
+		if (FN[sourceColorSpace] && FN[sourceColorSpace][targetColorSpace] !== undefined) {
+			const fn = FN[sourceColorSpace][targetColorSpace];
+			color.r = fn(color.r);
+			color.g = fn(color.g);
+			color.b = fn(color.b);
+			return color;
+		}
+
+		throw new Error('Unsupported color space conversion.');
+	},
+	fromWorkingColorSpace: function (color, targetColorSpace) {
+		return this.convert(color, this.workingColorSpace, targetColorSpace);
+	},
+	toWorkingColorSpace: function (color, sourceColorSpace) {
+		return this.convert(color, sourceColorSpace, this.workingColorSpace);
+	}
+};
+
 const _colorKeywords = {
 	'aliceblue': 0xF0F8FF,
 	'antiquewhite': 0xFAEBD7,
@@ -1234,6 +1288,11 @@ const _colorKeywords = {
 	'yellow': 0xFFFF00,
 	'yellowgreen': 0x9ACD32
 };
+const _rgb = {
+	r: 0,
+	g: 0,
+	b: 0
+};
 const _hslA = {
 	h: 0,
 	s: 0,
@@ -1254,12 +1313,11 @@ function hue2rgb(p, q, t) {
 	return p;
 }
 
-function SRGBToLinear(c) {
-	return c < 0.04045 ? c * 0.0773993808 : Math.pow(c * 0.9478672986 + 0.0521327014, 2.4);
-}
-
-function LinearToSRGB(c) {
-	return c < 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 0.41666) - 0.055;
+function toComponents(source, target) {
+	target.r = source.r;
+	target.g = source.g;
+	target.b = source.b;
+	return target;
 }
 
 class Color {
@@ -1291,22 +1349,24 @@ class Color {
 		return this;
 	}
 
-	setHex(hex) {
+	setHex(hex, colorSpace = SRGBColorSpace) {
 		hex = Math.floor(hex);
 		this.r = (hex >> 16 & 255) / 255;
 		this.g = (hex >> 8 & 255) / 255;
 		this.b = (hex & 255) / 255;
+		ColorManagement.toWorkingColorSpace(this, colorSpace);
 		return this;
 	}
 
-	setRGB(r, g, b) {
+	setRGB(r, g, b, colorSpace = LinearSRGBColorSpace) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
+		ColorManagement.toWorkingColorSpace(this, colorSpace);
 		return this;
 	}
 
-	setHSL(h, s, l) {
+	setHSL(h, s, l, colorSpace = LinearSRGBColorSpace) {
 		// h,s,l ranges are in 0.0 - 1.0
 		h = euclideanModulo(h, 1);
 		s = clamp(s, 0, 1);
@@ -1322,10 +1382,11 @@ class Color {
 			this.b = hue2rgb(q, p, h - 1 / 3);
 		}
 
+		ColorManagement.toWorkingColorSpace(this, colorSpace);
 		return this;
 	}
 
-	setStyle(style) {
+	setStyle(style, colorSpace = SRGBColorSpace) {
 		function handleAlpha(string) {
 			if (string === undefined) return;
 
@@ -1350,6 +1411,7 @@ class Color {
 						this.r = Math.min(255, parseInt(color[1], 10)) / 255;
 						this.g = Math.min(255, parseInt(color[2], 10)) / 255;
 						this.b = Math.min(255, parseInt(color[3], 10)) / 255;
+						ColorManagement.toWorkingColorSpace(this, colorSpace);
 						handleAlpha(color[4]);
 						return this;
 					}
@@ -1359,6 +1421,7 @@ class Color {
 						this.r = Math.min(100, parseInt(color[1], 10)) / 100;
 						this.g = Math.min(100, parseInt(color[2], 10)) / 100;
 						this.b = Math.min(100, parseInt(color[3], 10)) / 100;
+						ColorManagement.toWorkingColorSpace(this, colorSpace);
 						handleAlpha(color[4]);
 						return this;
 					}
@@ -1373,7 +1436,7 @@ class Color {
 						const s = parseInt(color[2], 10) / 100;
 						const l = parseInt(color[3], 10) / 100;
 						handleAlpha(color[4]);
-						return this.setHSL(h, s, l);
+						return this.setHSL(h, s, l, colorSpace);
 					}
 
 					break;
@@ -1388,30 +1451,32 @@ class Color {
 				this.r = parseInt(hex.charAt(0) + hex.charAt(0), 16) / 255;
 				this.g = parseInt(hex.charAt(1) + hex.charAt(1), 16) / 255;
 				this.b = parseInt(hex.charAt(2) + hex.charAt(2), 16) / 255;
+				ColorManagement.toWorkingColorSpace(this, colorSpace);
 				return this;
 			} else if (size === 6) {
 				// #ff0000
 				this.r = parseInt(hex.charAt(0) + hex.charAt(1), 16) / 255;
 				this.g = parseInt(hex.charAt(2) + hex.charAt(3), 16) / 255;
 				this.b = parseInt(hex.charAt(4) + hex.charAt(5), 16) / 255;
+				ColorManagement.toWorkingColorSpace(this, colorSpace);
 				return this;
 			}
 		}
 
 		if (style && style.length > 0) {
-			return this.setColorName(style);
+			return this.setColorName(style, colorSpace);
 		}
 
 		return this;
 	}
 
-	setColorName(style) {
+	setColorName(style, colorSpace = SRGBColorSpace) {
 		// color keywords
 		const hex = _colorKeywords[style.toLowerCase()];
 
 		if (hex !== undefined) {
 			// red
-			this.setHex(hex);
+			this.setHex(hex, colorSpace);
 		} else {
 			// unknown color
 			console.warn('THREE.Color: Unknown color ' + style);
@@ -1455,19 +1520,21 @@ class Color {
 		return this;
 	}
 
-	getHex() {
-		return clamp(this.r * 255, 0, 255) << 16 ^ clamp(this.g * 255, 0, 255) << 8 ^ clamp(this.b * 255, 0, 255) << 0;
+	getHex(colorSpace = SRGBColorSpace) {
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+		return clamp(_rgb.r * 255, 0, 255) << 16 ^ clamp(_rgb.g * 255, 0, 255) << 8 ^ clamp(_rgb.b * 255, 0, 255) << 0;
 	}
 
-	getHexString() {
-		return ('000000' + this.getHex().toString(16)).slice(-6);
+	getHexString(colorSpace = SRGBColorSpace) {
+		return ('000000' + this.getHex(colorSpace).toString(16)).slice(-6);
 	}
 
-	getHSL(target) {
+	getHSL(target, colorSpace = LinearSRGBColorSpace) {
 		// h,s,l ranges are in 0.0 - 1.0
-		const r = this.r,
-					g = this.g,
-					b = this.b;
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+		const r = _rgb.r,
+					g = _rgb.g,
+					b = _rgb.b;
 		const max = Math.max(r, g, b);
 		const min = Math.min(r, g, b);
 		let hue, saturation;
@@ -1503,8 +1570,23 @@ class Color {
 		return target;
 	}
 
-	getStyle() {
-		return 'rgb(' + (this.r * 255 | 0) + ',' + (this.g * 255 | 0) + ',' + (this.b * 255 | 0) + ')';
+	getRGB(target, colorSpace = LinearSRGBColorSpace) {
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+		target.r = _rgb.r;
+		target.g = _rgb.g;
+		target.b = _rgb.b;
+		return target;
+	}
+
+	getStyle(colorSpace = SRGBColorSpace) {
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+
+		if (colorSpace !== SRGBColorSpace) {
+			// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
+			return `color(${colorSpace} ${_rgb.r} ${_rgb.g} ${_rgb.b})`;
+		}
+
+		return `rgb(${_rgb.r * 255 | 0},${_rgb.g * 255 | 0},${_rgb.b * 255 | 0})`;
 	}
 
 	offsetHSL(h, s, l) {
@@ -6966,35 +7048,6 @@ Material.fromType = function
 	return null;
 };
 
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	specularMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	combine: THREE.Multiply,
- *	reflectivity: <float>,
- *	refractionRatio: <float>,
- *
- *	depthTest: <bool>,
- *	depthWrite: <bool>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- * }
- */
-
 class MeshBasicMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -8691,21 +8744,6 @@ const UniformsUtils = {
 var default_vertex = "void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}";
 
 var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
-
-/**
- * parameters = {
- *	defines: { "label" : "value" },
- *	uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
- *
- *	fragmentShader: <string>,
- *	vertexShader: <string>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- *	lights: <bool>
- * }
- */
 
 class ShaderMaterial extends Material {
 	constructor(parameters) {
@@ -12811,7 +12849,7 @@ function WebGLMorphtargets(gl, capabilities, textures) {
 
 						if (hasMorphColors === true) {
 							morph.fromBufferAttribute(morphColor, j);
-							if (morphColor.normalized === true) denormalize(morph, morphNormal);
+							if (morphColor.normalized === true) denormalize(morph, morphColor);
 							buffer[offset + stride + 8] = morph.x;
 							buffer[offset + stride + 9] = morph.y;
 							buffer[offset + stride + 10] = morph.z;
@@ -15337,24 +15375,6 @@ function WebGLRenderStates(extensions, capabilities) {
 	};
 }
 
-/**
- * parameters = {
- *
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>
- * }
- */
-
 class MeshDepthMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -15387,24 +15407,6 @@ class MeshDepthMaterial extends Material {
 }
 
 MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
-
-/**
- * parameters = {
- *
- *	referencePosition: <float>,
- *	nearDistance: <float>,
- *	farDistance: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>
- *
- * }
- */
 
 class MeshDistanceMaterial extends Material {
 	constructor(parameters) {
@@ -21062,16 +21064,6 @@ class InterleavedBufferAttribute {
 
 InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	map: new THREE.Texture( <Image> ),
- *	alphaMap: new THREE.Texture( <Image> ),
- *	rotation: <float>,
- *	sizeAttenuation: <bool>
- * }
- */
-
 class SpriteMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -21815,17 +21807,6 @@ class InstancedMesh extends Mesh {
 
 InstancedMesh.prototype.isInstancedMesh = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	linewidth: <float>,
- *	linecap: "round",
- *	linejoin: "round"
- * }
- */
-
 class LineBasicMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -22083,19 +22064,6 @@ class LineLoop extends Line {
 }
 
 LineLoop.prototype.isLineLoop = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *	map: new THREE.Texture( <Image> ),
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	size: <float>,
- *	sizeAttenuation: <bool>
- *
- * }
- */
 
 class PointsMaterial extends Material {
 	constructor(parameters) {
@@ -26341,12 +26309,6 @@ var Geometries = /*#__PURE__*/Object.freeze({
 	WireframeGeometry: WireframeGeometry
 });
 
-/**
- * parameters = {
- *	color: <THREE.Color>
- * }
- */
-
 class ShadowMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26375,54 +26337,6 @@ class RawShaderMaterial extends ShaderMaterial {
 }
 
 RawShaderMaterial.prototype.isRawShaderMaterial = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	roughness: <float>,
- *	metalness: <float>,
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	roughnessMap: new THREE.Texture( <Image> ),
- *
- *	metalnessMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	envMapIntensity: <float>
- *
- *	refractionRatio: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- *	flatShading: <bool>
- * }
- */
 
 class MeshStandardMaterial extends Material {
 	constructor(parameters) {
@@ -26506,39 +26420,6 @@ class MeshStandardMaterial extends Material {
 }
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
-
-/**
- * parameters = {
- *	clearcoat: <float>,
- *	clearcoatMap: new THREE.Texture( <Image> ),
- *	clearcoatRoughness: <float>,
- *	clearcoatRoughnessMap: new THREE.Texture( <Image> ),
- *	clearcoatNormalScale: <Vector2>,
- *	clearcoatNormalMap: new THREE.Texture( <Image> ),
- *
- *	ior: <float>,
- *	reflectivity: <float>,
- *
- *	sheen: <float>,
- *	sheenColor: <Color>,
- *	sheenColorMap: new THREE.Texture( <Image> ),
- *	sheenRoughness: <float>,
- *	sheenRoughnessMap: new THREE.Texture( <Image> ),
- *
- *	transmission: <float>,
- *	transmissionMap: new THREE.Texture( <Image> ),
- *
- *	thickness: <float>,
- *	thicknessMap: new THREE.Texture( <Image> ),
- *	attenuationDistance: <float>,
- *	attenuationColor: <Color>,
- *
- *	specularIntensity: <float>,
- *	specularIntensityMap: new THREE.Texture( <Image> ),
- *	specularColor: <Color>,
- *	specularColorMap: new THREE.Texture( <Image> )
- * }
- */
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 	constructor(parameters) {
@@ -26652,52 +26533,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	specular: <hex>,
- *	shininess: <float>,
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	specularMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	combine: THREE.MultiplyOperation,
- *	reflectivity: <float>,
- *	refractionRatio: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- *	flatShading: <bool>
- * }
- */
-
 class MeshPhongMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26775,42 +26610,6 @@ class MeshPhongMaterial extends Material {
 
 MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *
- *	map: new THREE.Texture( <Image> ),
- *	gradientMap: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- * }
- */
-
 class MeshToonMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26876,28 +26675,6 @@ class MeshToonMaterial extends Material {
 
 MeshToonMaterial.prototype.isMeshToonMaterial = true;
 
-/**
- * parameters = {
- *	opacity: <float>,
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>
- *
- *	flatShading: <bool>
- * }
- */
-
 class MeshNormalMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26936,38 +26713,6 @@ class MeshNormalMaterial extends Material {
 }
 
 MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	specularMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	combine: THREE.Multiply,
- *	reflectivity: <float>,
- *	refractionRatio: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- * }
- */
 
 class MeshLambertMaterial extends Material {
 	constructor(parameters) {
@@ -27024,32 +26769,6 @@ class MeshLambertMaterial extends Material {
 
 MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	matcap: new THREE.Texture( <Image> ),
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	flatShading: <bool>
- * }
- */
-
 class MeshMatcapMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -27098,19 +26817,6 @@ class MeshMatcapMaterial extends Material {
 }
 
 MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	linewidth: <float>,
- *
- *	scale: <float>,
- *	dashSize: <float>,
- *	gapSize: <float>
- * }
- */
 
 class LineDashedMaterial extends LineBasicMaterial {
 	constructor(parameters) {
@@ -36725,6 +36431,7 @@ exports.ClampToEdgeWrapping = ClampToEdgeWrapping;
 exports.Clock = Clock;
 exports.Color = Color;
 exports.ColorKeyframeTrack = ColorKeyframeTrack;
+exports.ColorManagement = ColorManagement;
 exports.CompressedTexture = CompressedTexture;
 exports.CompressedTextureLoader = CompressedTextureLoader;
 exports.ConeBufferGeometry = ConeGeometry;
@@ -36872,6 +36579,7 @@ exports.LinearMipMapLinearFilter = LinearMipMapLinearFilter;
 exports.LinearMipMapNearestFilter = LinearMipMapNearestFilter;
 exports.LinearMipmapLinearFilter = LinearMipmapLinearFilter;
 exports.LinearMipmapNearestFilter = LinearMipmapNearestFilter;
+exports.LinearSRGBColorSpace = LinearSRGBColorSpace;
 exports.LinearToneMapping = LinearToneMapping;
 exports.Loader = Loader;
 exports.LoaderUtils = LoaderUtils;
@@ -36915,6 +36623,7 @@ exports.NearestMipmapNearestFilter = NearestMipmapNearestFilter;
 exports.NeverDepth = NeverDepth;
 exports.NeverStencilFunc = NeverStencilFunc;
 exports.NoBlending = NoBlending;
+exports.NoColorSpace = NoColorSpace;
 exports.NoColors = NoColors;
 exports.NoToneMapping = NoToneMapping;
 exports.NormalAnimationBlendMode = NormalAnimationBlendMode;
@@ -37009,6 +36718,7 @@ exports.ReplaceStencilOp = ReplaceStencilOp;
 exports.ReverseSubtractEquation = ReverseSubtractEquation;
 exports.RingBufferGeometry = RingGeometry;
 exports.RingGeometry = RingGeometry;
+exports.SRGBColorSpace = SRGBColorSpace;
 exports.Scene = Scene;
 exports.SceneUtils = SceneUtils;
 exports.ShaderChunk = ShaderChunk;

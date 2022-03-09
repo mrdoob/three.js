@@ -19,18 +19,24 @@ class LightNode extends Node {
 
 		this.light = light;
 
-		this.colorNode = new UniformNode( new Color() );
+		this._colorNode = new UniformNode( new Color() );
 
-		this.lightCutoffDistanceNode = new UniformNode( 0 );
-		this.lightDecayExponentNode = new UniformNode( 0 );
+		this._lightCutoffDistanceNode = new UniformNode( 0 );
+		this._lightDecayExponentNode = new UniformNode( 0 );
+
+	}
+
+	getHash( /*builder*/ ) {
+
+		return this.light.uuid;
 
 	}
 
 	update( /* frame */ ) {
 
-		this.colorNode.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
-		this.lightCutoffDistanceNode.value = this.light.distance;
-		this.lightDecayExponentNode.value = this.light.decay;
+		this._colorNode.value.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		this._lightCutoffDistanceNode.value = this.light.distance;
+		this._lightDecayExponentNode.value = this.light.decay;
 
 	}
 
@@ -47,11 +53,11 @@ class LightNode extends Node {
 
 		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,
-			cutoffDistance: this.lightCutoffDistanceNode,
-			decayExponent: this.lightDecayExponentNode
+			cutoffDistance: this._lightCutoffDistanceNode,
+			decayExponent: this._lightDecayExponentNode
 		} );
 
-		const lightColor = new OperatorNode( '*', this.colorNode, lightAttenuation );
+		const lightColor = new OperatorNode( '*', this._colorNode, lightAttenuation );
 
 		lightPositionView.object3d = this.light;
 

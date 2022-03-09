@@ -8,16 +8,11 @@
 
 			if ( renderTarget === undefined ) {
 
-				const parameters = {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBAFormat
-				};
 				const size = renderer.getSize( new THREE.Vector2() );
 				this._pixelRatio = renderer.getPixelRatio();
 				this._width = size.width;
 				this._height = size.height;
-				renderTarget = new THREE.WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, parameters );
+				renderTarget = new THREE.WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio );
 				renderTarget.texture.name = 'EffectComposer.rt1';
 
 			} else {
