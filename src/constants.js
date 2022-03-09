@@ -60,7 +60,6 @@ export const CubeRefractionMapping = 302;
 export const EquirectangularReflectionMapping = 303;
 export const EquirectangularRefractionMapping = 304;
 export const CubeUVReflectionMapping = 306;
-export const CubeUVRefractionMapping = 307;
 export const RepeatWrapping = 1000;
 export const ClampToEdgeWrapping = 1001;
 export const MirroredRepeatWrapping = 1002;

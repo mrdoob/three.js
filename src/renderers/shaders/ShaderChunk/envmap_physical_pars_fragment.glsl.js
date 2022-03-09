@@ -1,12 +1,6 @@
 export default /* glsl */`
 #if defined( USE_ENVMAP )
 
-	#ifdef ENVMAP_MODE_REFRACTION
-
-		uniform float refractionRatio;
-
-	#endif
-
 	vec3 getIBLIrradiance( const in vec3 normal ) {
 
 		#if defined( ENVMAP_TYPE_CUBE_UV )
@@ -29,20 +23,10 @@ export default /* glsl */`
 
 		#if defined( ENVMAP_TYPE_CUBE_UV )
 
-			vec3 reflectVec;
+			vec3 reflectVec = reflect( - viewDir, normal );
 
-			#ifdef ENVMAP_MODE_REFLECTION
-
-				reflectVec = reflect( - viewDir, normal );
-
-				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-				reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
-
-			#else
-
-				reflectVec = refract( - viewDir, normal, refractionRatio );
-
-			#endif
+			// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+			reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
 
 			reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
 
