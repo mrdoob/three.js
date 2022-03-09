@@ -688,8 +688,9 @@
 						// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is
 						// computed by summing the compressed block sizes from preceding blocks according to the header.
 
+						const textNode = ele[ '#text' ];
+						const rawData = Array.isArray( textNode ) ? textNode[ 0 ] : textNode;
 
-						const rawData = ele[ '#text' ];
 						const byteData = Base64toByteArray( rawData );
 						let blocks = byteData[ 0 ];
 
