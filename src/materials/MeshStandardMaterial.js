@@ -49,8 +49,6 @@ class MeshStandardMaterial extends Material {
 		this.envMap = null;
 		this.envMapIntensity = 1.0;
 
-		this.refractionRatio = 0.98;
-
 		this.wireframe = false;
 		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
@@ -103,8 +101,6 @@ class MeshStandardMaterial extends Material {
 
 		this.envMap = source.envMap;
 		this.envMapIntensity = source.envMapIntensity;
-
-		this.refractionRatio = source.refractionRatio;
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
