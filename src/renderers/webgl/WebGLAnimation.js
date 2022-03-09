@@ -9,7 +9,15 @@ function WebGLAnimation() {
 
 		animationLoop( time, frame );
 
-		requestId = context.requestAnimationFrame( onAnimationFrame );
+		requestId = _requestAnimationFrame();
+
+	}
+
+	function _requestAnimationFrame() {
+
+		return context
+			? context.requestAnimationFrame( onAnimationFrame )
+			: requestAnimationFrame( onAnimationFrame );
 
 	}
 
@@ -20,7 +28,7 @@ function WebGLAnimation() {
 			if ( isAnimating === true ) return;
 			if ( animationLoop === null ) return;
 
-			requestId = context.requestAnimationFrame( onAnimationFrame );
+			requestId = _requestAnimationFrame();
 
 			isAnimating = true;
 
@@ -28,7 +36,9 @@ function WebGLAnimation() {
 
 		stop: function () {
 
-			context.cancelAnimationFrame( requestId );
+			context
+				? context.cancelAnimationFrame( requestId )
+				: cancelAnimationFrame( requestId );
 
 			isAnimating = false;
 
