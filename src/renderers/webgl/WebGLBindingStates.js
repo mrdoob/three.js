@@ -18,14 +18,14 @@
 
 			const state = getBindingState( geometry, program, material );
 
+			updateBuffers = needsUpdate( geometry, index );
+
 			if ( currentState !== state ) {
 
 				currentState = state;
 				bindVertexArrayObject( currentState.object );
 
 			}
-
-			updateBuffers = needsUpdate( geometry, index );
 
 			if ( updateBuffers ) saveCache( geometry, index );
 
