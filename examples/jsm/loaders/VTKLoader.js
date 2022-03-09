@@ -736,10 +736,10 @@ class VTKLoader extends Loader {
 					// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is
 					// computed by summing the compressed block sizes from preceding blocks according to the header.
 
-					const textNode = ele['#text'];
+					const textNode = ele[ '#text' ];
 					const rawData = (
 						( textNode instanceof Array )
-							? textNode[0]
+							? textNode[ 0 ]
 							: textNode
 					);
 
