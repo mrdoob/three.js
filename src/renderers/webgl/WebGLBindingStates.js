@@ -9,6 +9,7 @@
 
 	const defaultState = createBindingState( null );
 	let currentState = defaultState;
+	let mustUpdateBuffers = false;
 
 	function setup( object, material, program, geometry, index ) {
 
@@ -57,6 +58,11 @@
 
 			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
 
+		}
+
+		if (mustUpdateBuffers) {
+			updateBuffers = true;
+			mustUpdateBuffers = false;
 		}
 
 		if ( updateBuffers ) {
@@ -554,14 +560,13 @@
 	}
 
 	function reset() {
-
 		resetDefaultState();
+		mustUpdateBuffers = true;
 
 		if ( currentState === defaultState ) return;
 
 		currentState = defaultState;
 		bindVertexArrayObject( currentState.object );
-
 	}
 
 	// for backward-compatilibity
