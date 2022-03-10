@@ -14089,6 +14089,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	const defaultState = createBindingState( null );
 	let currentState = defaultState;
+	let forceUpdate = false;
 
 	function setup( object, material, program, geometry, index ) {
 
@@ -14139,7 +14140,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		}
 
-		if ( updateBuffers ) {
+		if ( updateBuffers || forceUpdate ) {
+
+			forceUpdate = false;
 
 			setupVertexAttributes( object, material, program, geometry );
 
@@ -14636,6 +14639,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	function reset() {
 
 		resetDefaultState();
+		forceUpdate = true;
 
 		if ( currentState === defaultState ) return;
 
@@ -15417,7 +15421,7 @@ class PMREMGenerator {
 
 	_dispose() {
 
-		this._blurMaterial.dispose();
+		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
 
 		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
 
@@ -43422,6 +43426,14 @@ class PositionalAudio extends Audio {
 		this.panner = this.context.createPanner();
 		this.panner.panningModel = 'HRTF';
 		this.panner.connect( this.gain );
+
+	}
+
+	disconnect() {
+
+		super.disconnect();
+
+		this.panner.disconnect( this.gain );
 
 	}
 
