@@ -9,7 +9,7 @@
 
 	const defaultState = createBindingState( null );
 	let currentState = defaultState;
-	let mustUpdateBuffers = false;
+	let forceUpdate = false;
 
 	function setup( object, material, program, geometry, index ) {
 
@@ -60,14 +60,9 @@
 
 		}
 
-		if ( mustUpdateBuffers ) {
+		if ( updateBuffers || forceUpdate ) {
 
-			updateBuffers = true;
-			mustUpdateBuffers = false;
-
-		}
-
-		if ( updateBuffers ) {
+			forceUpdate = false;
 
 			setupVertexAttributes( object, material, program, geometry );
 
@@ -564,7 +559,7 @@
 	function reset() {
 
 		resetDefaultState();
-		mustUpdateBuffers = true;
+		forceUpdate = true;
 
 		if ( currentState === defaultState ) return;
 
