@@ -1,60 +1,60 @@
 class Clock {
 
-    constructor( autoStart = true ) {
+	constructor( autoStart = true ) {
 
-        this.autoStart = autoStart;
-        this.running = this.autoStart;
+		this.autoStart = autoStart;
+		this.running = this.autoStart;
 
-        this.startTime = 0;
-        this.oldTime = 0;
-        this.elapsedTime = 0;
+		this.startTime = 0;
+		this.oldTime = 0;
+		this.elapsedTime = 0;
 
-        this.running && this.start();
+		this.running && this.start();
 
-    }
+	}
 
-    start() {
+	start() {
 
-        this.startTime = now();
-        this.oldTime = this.startTime;
-        this.elapsedTime = 0;
-        this.running = true;
+		this.startTime = now();
+		this.oldTime = this.startTime;
+		this.elapsedTime = 0;
+		this.running = true;
 
-    }
+	}
 
-    stop() {
+	stop() {
 
-        this.getElapsedTime();
-        this.running = false;
+		this.getElapsedTime();
+		this.running = false;
 
-    }
+	}
 
-    getElapsedTime() {
+	getElapsedTime() {
 
-        this.getDelta();
+		this.getDelta();
 
-        return this.elapsedTime;
+		return this.elapsedTime;
 
-    }
+	}
 
-    getDelta() {
+	getDelta() {
 
-        let diff = 0;
+		let diff = 0;
 
-        if ( this.running ) {
+		if ( this.running ) {
 
-            const newTime = now();
+			const newTime = now();
 
-            diff = ( newTime - this.oldTime ) / 1000;
+			diff = ( newTime - this.oldTime ) / 1000;
 
-            this.oldTime = newTime;
-            this.elapsedTime += diff;
+			this.oldTime = newTime;
+			this.elapsedTime += diff;
 
-        }
+		}
 
-        return diff;
+		return diff;
 
-    }
+	}
 
 }
 
