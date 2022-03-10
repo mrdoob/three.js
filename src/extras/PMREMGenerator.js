@@ -201,7 +201,7 @@ class PMREMGenerator {
 
 	_dispose() {
 
-		this._blurMaterial.dispose();
+		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
 
 		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
 
