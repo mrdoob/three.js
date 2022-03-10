@@ -672,7 +672,7 @@
 
 							txt = new Float32Array();
 
-						} else if ( ele.attributes.type === 'Int64' ) {
+						} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 							txt = new Int32Array();
 
@@ -737,7 +737,7 @@
 								content = new Float32Array( content );
 								txt = Float32Concat( txt, content );
 
-							} else if ( ele.attributes.type === 'Int64' ) {
+							} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 								content = new Int32Array( content );
 								txt = Int32Concat( txt, content );
