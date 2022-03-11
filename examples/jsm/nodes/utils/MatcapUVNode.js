@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { join, negate, cross, dot, mul, add, normalize, transformedNormalView, positionViewDirection } from '../ShaderNode.js';
+import { join, negate, cross, dot, mul, add, transformedNormalView, positionViewDirection } from '../ShaderNode.js';
 
 class MatcapUVNode extends TempNode {
 
