@@ -143,15 +143,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			let lightNode = material.lightNode;
 
-			// VERTEX STAGE
+			if ( material.isMeshStandardMaterial && lightNode === null && this.lightNode ) {
 
-			let vertex = new PositionNode( PositionNode.GEOMETRY );
-
-			if ( lightNode === null && this.lightNode ) {
+				// use scene lights
 
 				lightNode = this.lightNode;
 
 			}
+
+			// VERTEX STAGE
+
+			let vertex = new PositionNode( PositionNode.GEOMETRY );
 
 			if ( material.positionNode && material.positionNode.isNode ) {
 
