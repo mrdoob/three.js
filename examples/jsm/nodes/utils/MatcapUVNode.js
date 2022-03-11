@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { join, negate, cross, dot, mul, add, transformedNormalView, positionViewDirection } from '../ShaderNode.js';
+import { join, negate, normalize, cross, dot, mul, add, transformedNormalView, positionViewDirection } from '../ShaderNode.js';
 
 class MatcapUVNode extends TempNode {
 
@@ -11,7 +11,7 @@ class MatcapUVNode extends TempNode {
 
 	generate( builder ) {
 
-		const x = join( positionViewDirection.z, 0, negate( positionViewDirection.x ) );
+		const x = normalize( join( positionViewDirection.z, 0, negate( positionViewDirection.x ) ) );
 		const y = cross( positionViewDirection, x );
 
 		const uv = add( mul( join( dot( x, transformedNormalView ), dot( y, transformedNormalView ) ), 0.495 ), 0.5 );
