@@ -21,8 +21,6 @@ const getTexture = ( file ) => {
 
 			texture.dispose();
 
-			fileURL.delete( file );
-
 		}
 
 		texture = textureLoader.load( url );
