@@ -124,7 +124,7 @@ export class TextureEditor extends BaseNode {
 
 		} );
 
-		this.flipYInput = new ToggleInput( false ).onClick( () => {
+		this.flipYInput = new ToggleInput( false ).onChange( () => {
 
 			this.update();
 
