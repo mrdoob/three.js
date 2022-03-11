@@ -4,19 +4,29 @@ import { TextureNode, UVNode } from 'three-nodes/Nodes.js';
 import { Texture, TextureLoader, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from 'three';
 
 const fileTexture = new WeakMap();
+const fileURL = new WeakMap();
 const textureLoader = new TextureLoader();
 const defaultTexture = new Texture();
 const defaultUV = new UVNode();
 
-const getTextureFromFile = ( file ) => {
+const getTexture = ( file ) => {
 
 	let texture = fileTexture.get( file );
 
-	if ( texture === undefined ) {
+	if ( texture === undefined || file.getURL() !== fileURL.get( file ) ) {
 
-		texture = textureLoader.load( URL.createObjectURL( file ) );
+		const url = file.getURL();
+
+		if ( texture !== undefined ) {
+
+			texture.dispose();
+
+		}
+
+		texture = textureLoader.load( url );
 
 		fileTexture.set( file, texture );
+		fileURL.set( file, url );
 
 	}
 
@@ -49,7 +59,7 @@ export class TextureEditor extends BaseNode {
 
 			const object = target.getObject();
 
-			if ( object && ( object instanceof File ) === false ) {
+			if ( object && object.isDataFile !== true ) {
 
 				if ( stage === 'dragged' ) {
 
@@ -68,13 +78,13 @@ export class TextureEditor extends BaseNode {
 			const file = fileElement.getLinkedObject();
 			const node = this.value;
 
-			this.texture = file ? getTextureFromFile( file ) : null;
+			this.texture = file ? getTexture( file ) : null;
 
 			node.value = this.texture || defaultTexture;
 
 			this.update();
 
-		} );
+		}, true );
 
 		this.add( fileElement );
 
@@ -112,7 +122,7 @@ export class TextureEditor extends BaseNode {
 
 		} );
 
-		this.flipYInput = new ToggleInput( false ).onClick( () => {
+		this.flipYInput = new ToggleInput( false ).onChange( () => {
 
 			this.update();
 

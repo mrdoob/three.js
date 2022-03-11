@@ -68,6 +68,7 @@ import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
+import MatcapUVNode from './utils/MatcapUVNode.js';
 import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
@@ -166,6 +167,7 @@ const nodeLib = {
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,
+	MatcapUVNode,
 	OscNode,
 	TimerNode,
 
@@ -260,6 +262,7 @@ export {
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,
+	MatcapUVNode,
 	OscNode,
 	TimerNode,
 
