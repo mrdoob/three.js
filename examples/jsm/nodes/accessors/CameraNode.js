@@ -9,8 +9,6 @@ class CameraNode extends Object3DNode {
 
 		super( scope );
 
-		this._uniformNode = null;
-
 	}
 
 	getNodeType( builder ) {
@@ -55,7 +53,7 @@ class CameraNode extends Object3DNode {
 
 		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-			this._uniformNode = new UniformNode( null, 'mat4' );
+			this._uniformNode.nodeType = 'mat4';
 
 		}
 

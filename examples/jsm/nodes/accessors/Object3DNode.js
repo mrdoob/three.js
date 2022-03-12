@@ -20,7 +20,7 @@ class Object3DNode extends Node {
 
 		this.updateType = NodeUpdateType.Object;
 
-		this._uniformNode = null;
+		this._uniformNode = new UniformNode( null );
 
 	}
 
@@ -83,15 +83,16 @@ class Object3DNode extends Node {
 
 		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
 
-			this._uniformNode = new UniformNode( null, 'mat4' );
+			this._uniformNode.nodeType = 'mat4';
 
 		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
 
-			this._uniformNode = new UniformNode( null, 'mat3' );
+			this._uniformNode.nodeType = 'mat3';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
 
-			this._uniformNode = new UniformNode( new Vector3() );
+			this._uniformNode.nodeType = 'vec3';
+			this._uniformNode.value = new Vector3();
 
 		}
 
