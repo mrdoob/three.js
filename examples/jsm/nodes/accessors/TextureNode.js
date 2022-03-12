@@ -1,21 +1,26 @@
-import InputNode from '../core/InputNode.js';
-import UVNode from '../accessors/UVNode.js';
+import UniformNode from '../core/UniformNode.js';
+import UVNode from './UVNode.js';
 
-class TextureNode extends InputNode {
+class TextureNode extends UniformNode {
 
-	constructor( value = null, uvNode = new UVNode(), biasNode = null ) {
+	constructor( value, uvNode = new UVNode(), biasNode = null ) {
 
-		super( 'texture' );
+		super( value, 'vec4' );
 
-		this.value = value;
 		this.uvNode = uvNode;
 		this.biasNode = biasNode;
 
 	}
 
-	getInputHash( /*builder*/ ) {
+	getUniformHash( /*builder*/ ) {
 
 		return this.value.uuid;
+
+	}
+
+	getInputType( /*builder*/ ) {
+
+		return 'texture';
 
 	}
 
@@ -29,9 +34,7 @@ class TextureNode extends InputNode {
 
 		}
 
-		const type = this.getNodeType( builder );
-
-		const textureProperty = super.generate( builder, type );
+		const textureProperty = super.generate( builder, 'texture' );
 
 		if ( output === 'sampler2D' || output === 'texture2D' ) {
 
@@ -66,7 +69,7 @@ class TextureNode extends InputNode {
 
 			}
 
-			return builder.format( snippet, 'vec4', output );
+			return builder.format( snippet, 'texture', output );
 
 		}
 
@@ -82,7 +85,7 @@ class TextureNode extends InputNode {
 
 	deserialize( data ) {
 
-		super.serialize( data );
+		super.deserialize( data );
 
 		this.value = data.meta.textures[ data.value ];
 

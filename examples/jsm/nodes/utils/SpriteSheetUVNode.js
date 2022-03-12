@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import FloatNode from '../inputs/FloatNode.js';
+import ConstNode from '../core/ConstNode.js';
 import UVNode from '../accessors/UVNode.js';
 import MathNode from '../math/MathNode.js';
 import OperatorNode from '../math/OperatorNode.js';
@@ -8,7 +8,7 @@ import JoinNode from '../utils/JoinNode.js';
 
 class SpriteSheetUVNode extends Node {
 
-	constructor( countNode, uvNode = new UVNode(), frameNode = new FloatNode( 0 ).setConst( true ) ) {
+	constructor( countNode, uvNode = new UVNode(), frameNode = new ConstNode( 0 ) ) {
 
 		super( 'vec2' );
 
@@ -24,7 +24,7 @@ class SpriteSheetUVNode extends Node {
 		const uv = this.uvNode;
 		const frame = this.frameNode;
 
-		const one = new FloatNode( 1 ).setConst( true );
+		const one = new ConstNode( 1 );
 
 		const width = new SplitNode( count, 'x' );
 		const height = new SplitNode( count, 'y' );

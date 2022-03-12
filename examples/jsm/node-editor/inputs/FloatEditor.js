@@ -1,12 +1,12 @@
 import { NumberInput, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { FloatNode } from 'three-nodes/Nodes.js';
+import { UniformNode } from 'three-nodes/Nodes.js';
 
 export class FloatEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new FloatNode();
+		const node = new UniformNode( 0 );
 
 		super( 'Float', 1, node, 150 );
 

@@ -95,7 +95,7 @@
 
 				// modulate the final color based on the mouse position
 
-				const screenFXNode = new Nodes.OperatorNode( '+', new Nodes.Vector2Node( mouse ), new Nodes.Vector2Node( new THREE.Vector2( 0.5, 0.5 ) ).setConst( true ) );
+				const screenFXNode = new Nodes.OperatorNode( '+', new Nodes.UniformNode( mouse ), new Nodes.ConstNode( new THREE.Vector2( 0.5, 0.5 ) ) );
 
 				const materialFX = new Nodes.MeshBasicNodeMaterial();
 				materialFX.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( textureRenderer.getTexture() ), screenFXNode );

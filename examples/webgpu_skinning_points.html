@@ -74,7 +74,7 @@
 							child.visible = false;
 
 							const materialPoints = new Nodes.PointsNodeMaterial();
-							materialPoints.colorNode = new Nodes.ColorNode();
+							materialPoints.colorNode = new Nodes.UniformNode( new THREE.Color() );
 							materialPoints.positionNode = new Nodes.SkinningNode( child );
 
 							const pointCloud = new THREE.Points( child.geometry, materialPoints );

@@ -99,7 +99,7 @@
 
 						const mpMapNode = new Nodes.TextureNode( rmMap );
 
-						material.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( diffuseMap ), new Nodes.ColorNode( material.color ) );
+						material.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( diffuseMap ), new Nodes.UniformNode( material.color ) );
 
 						// roughness is in G channel, metalness is in B channel
 						material.roughnessNode = new Nodes.SplitNode( mpMapNode, 'g' );

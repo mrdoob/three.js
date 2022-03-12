@@ -1,7 +1,7 @@
-import FloatNode from '../inputs/FloatNode.js';
+import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
-class TimerNode extends FloatNode {
+class TimerNode extends UniformNode {
 
 	static LOCAL = 'local';
 	static GLOBAL = 'global';
@@ -9,7 +9,7 @@ class TimerNode extends FloatNode {
 
 	constructor( scope = TimerNode.LOCAL ) {
 
-		super();
+		super( 0 );
 
 		this.scope = scope;
 		this.scale = 1;

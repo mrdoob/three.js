@@ -1,8 +1,7 @@
 import Node from '../core/Node.js';
 import Object3DNode from '../accessors/Object3DNode.js';
 import PositionNode from '../accessors/PositionNode.js';
-import ColorNode from '../inputs/ColorNode.js';
-import FloatNode from '../inputs/FloatNode.js';
+import UniformNode from '../core/UniformNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import MathNode from '../math/MathNode.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -20,10 +19,10 @@ class LightNode extends Node {
 
 		this.light = light;
 
-		this._colorNode = new ColorNode( new Color() );
+		this._colorNode = new UniformNode( new Color() );
 
-		this._lightCutoffDistanceNode = new FloatNode( 0 );
-		this._lightDecayExponentNode = new FloatNode( 0 );
+		this._lightCutoffDistanceNode = new UniformNode( 0 );
+		this._lightDecayExponentNode = new UniformNode( 0 );
 
 	}
 
