@@ -275,6 +275,11 @@ export const join = ( ...params ) => {
 
 };
 
+export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
+export const attribute = ( ...params ) => nodeObject( new AttributeNode( ...params ) );
+export const buffer = ( ...params ) => nodeObject( new BufferNode( ...params ) );
+export const texture = ( ...params ) => nodeObject( new TextureNode( ...params ) );
+
 export const cond = ( ...params ) => {
 
 	return nodeObject( new CondNode( ...getShaderNodeArray( params ) ) );
@@ -288,12 +293,6 @@ export const addTo = ( varNode, ...params ) => {
 	return nodeObject( varNode );
 
 };
-
-export const uv = new ShaderNodeProxy( UVNode );
-export const attribute = new ShaderNodeProxy( AttributeNode );
-
-export const buffer = new ShaderNodeProxy( BufferNode );
-export const texture = new ShaderNodeProxy( TextureNode );
 
 export const add = new ShaderNodeProxy( OperatorNode, '+' );
 export const sub = new ShaderNodeProxy( OperatorNode, '-' );
