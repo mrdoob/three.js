@@ -1,5 +1,4 @@
 import Object3DNode from './Object3DNode.js';
-import UniformNode from '../core/UniformNode.js';
 
 class CameraNode extends Object3DNode {
 
