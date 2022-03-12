@@ -1,10 +1,14 @@
 import NodeBuilder, { shaderStages } from 'three-nodes/core/NodeBuilder.js';
+import NodeFrame from 'three-nodes/core/NodeFrame.js';
 import SlotNode from './SlotNode.js';
 import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
 import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
+import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
 	LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
+
+const nodeFrame = new NodeFrame();
+nodeFrame.camera = new PerspectiveCamera();
 
 const nodeShaderLib = {
 	LineBasicNodeMaterial: ShaderLib.basic,
@@ -368,6 +372,8 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 		this._addSnippets();
 		this._addUniforms();
 
+		this._updateUniforms();
+
 		this.shader.vertexShader = this.vertexShader;
 		this.shader.fragmentShader = this.fragmentShader;
 
@@ -530,6 +536,19 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 				this.shader.uniforms[ uniform.name ] = uniform;
 
 			}
+
+		}
+
+	}
+
+	_updateUniforms() {
+
+		nodeFrame.object = this.object;
+		nodeFrame.renderer = this.renderer;
+
+		for ( const node of this.updateNodes ) {
+
+			nodeFrame.updateNode( node );
 
 		}
 
