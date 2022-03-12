@@ -95,6 +95,12 @@ class InputNode extends Node {
 
 	}
 
+	getInputType( builder ) {
+
+		return this.getNodeType( builder );
+
+	}
+
 	serialize( data ) {
 
 		super.serialize( data );

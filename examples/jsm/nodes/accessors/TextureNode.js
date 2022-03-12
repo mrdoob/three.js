@@ -5,7 +5,7 @@ class TextureNode extends UniformNode {
 
 	constructor( value, uvNode = new UVNode(), biasNode = null ) {
 
-		super( value, 'texture' );
+		super( value, 'vec4' );
 
 		this.uvNode = uvNode;
 		this.biasNode = biasNode;
@@ -15,6 +15,12 @@ class TextureNode extends UniformNode {
 	getUniformHash( /*builder*/ ) {
 
 		return this.value.uuid;
+
+	}
+
+	getInputType( /*builder*/ ) {
+
+		return 'texture';
 
 	}
 
