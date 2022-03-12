@@ -5,6 +5,7 @@ import {
 	attribute,
 	buffer,
 	mat4,
+	uniform,
 	positionLocal,
 	normalLocal,
 	assign,
@@ -73,8 +74,8 @@ class SkinningNode extends Node {
 		this.skinIndexNode = attribute( 'skinIndex', 'uvec4' );
 		this.skinWeightNode = attribute( 'skinWeight', 'vec4' );
 
-		this.bindMatrixNode = mat4( skinnedMesh.bindMatrix );
-		this.bindMatrixInverseNode = mat4( skinnedMesh.bindMatrixInverse );
+		this.bindMatrixNode = uniform( mat4( skinnedMesh.bindMatrix ) );
+		this.bindMatrixInverseNode = uniform( mat4( skinnedMesh.bindMatrixInverse ) );
 		this.boneMatricesNode = buffer( skinnedMesh.skeleton.boneMatrices, 'mat4', skinnedMesh.skeleton.bones.length );
 
 	}
