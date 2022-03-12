@@ -1,12 +1,13 @@
 import { ColorInput, StringInput, NumberInput, LabelElement, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { ColorNode } from 'three-nodes/Nodes.js';
+import { Color } from 'three';
+import { UniformNode } from 'three-nodes/Nodes.js';
 
 export class ColorEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new ColorNode();
+		const node = new UniformNode( new Color() );
 
 		super( 'Color', 3, node );
 

@@ -60,7 +60,6 @@ export const CubeRefractionMapping = 302;
 export const EquirectangularReflectionMapping = 303;
 export const EquirectangularRefractionMapping = 304;
 export const CubeUVReflectionMapping = 306;
-export const CubeUVRefractionMapping = 307;
 export const RepeatWrapping = 1000;
 export const ClampToEdgeWrapping = 1001;
 export const MirroredRepeatWrapping = 1002;
@@ -144,6 +143,11 @@ export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
+
+// Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
+export const NoColorSpace = '';
+export const SRGBColorSpace = 'srgb';
+export const LinearSRGBColorSpace = 'srgb-linear';
 
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;

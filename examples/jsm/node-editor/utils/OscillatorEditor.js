@@ -1,8 +1,8 @@
 import { SelectInput, LabelElement, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { OscNode, FloatNode } from 'three-nodes/Nodes.js';
+import { OscNode, UniformNode } from 'three-nodes/Nodes.js';
 
-const NULL_VALUE = new FloatNode();
+const NULL_VALUE = new UniformNode( 0 );
 
 export class OscillatorEditor extends BaseNode {
 

@@ -1,13 +1,12 @@
 import { Element, LabelElement, NumberInput, SelectInput } from '../../libs/flow.module.js';
-import { FloatNode, OperatorNode } from 'three-nodes/Nodes.js';
+import { UniformNode, OperatorNode } from 'three-nodes/Nodes.js';
 import { BaseNode } from '../core/BaseNode.js';
-
 
 export class OperatorEditor extends BaseNode {
 
 	constructor() {
 
-		const NULL_VALUE = new FloatNode();
+		const NULL_VALUE = new UniformNode( 0 );
 
 		const node = new OperatorNode( '+', NULL_VALUE, NULL_VALUE );
 

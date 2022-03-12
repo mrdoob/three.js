@@ -80,12 +80,12 @@
 				const timerNode = new Nodes.TimerNode();
 
 				// birection speed
-				const timerScaleNode = new Nodes.OperatorNode( '*', timerNode, new Nodes.Vector2Node( new THREE.Vector2( - 0.5, 0.1 ) ).setConst( true ) );
+				const timerScaleNode = new Nodes.OperatorNode( '*', timerNode, new Nodes.ConstNode( new THREE.Vector2( - 0.5, 0.1 ) ) );
 				const animateUV = new Nodes.OperatorNode( '+', new Nodes.UVNode(), timerScaleNode );
 
 				const textureNode = new Nodes.TextureNode( texture, animateUV );
 
-				materialBox.colorNode = new Nodes.MathNode( 'mix', textureNode, new Nodes.CheckerNode( animateUV ), new Nodes.FloatNode( .5 ) );
+				materialBox.colorNode = new Nodes.MathNode( 'mix', textureNode, new Nodes.CheckerNode( animateUV ), new Nodes.UniformNode( .5 ) );
 
 				// test uv 2
 				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
@@ -101,7 +101,7 @@
 				const materialSphere = new Nodes.MeshBasicNodeMaterial();
 
 				const displaceAnimated = new Nodes.SplitNode( new Nodes.TextureNode( textureDisplace ), 'x' );
-				const displaceY = new Nodes.OperatorNode( '*', displaceAnimated, new Nodes.FloatNode( .25 ).setConst( true ) );
+				const displaceY = new Nodes.OperatorNode( '*', displaceAnimated, new Nodes.ConstNode( .25 ) );
 
 				const displace = new Nodes.OperatorNode( '*', new Nodes.NormalNode( Nodes.NormalNode.LOCAL ), displaceY );
 
@@ -116,7 +116,7 @@
 
 				const geometryPlane = new THREE.PlaneGeometry();
 				const materialPlane = new Nodes.MeshBasicNodeMaterial();
-				materialPlane.colorNode = new Nodes.OperatorNode( '+', new Nodes.TextureNode( createDataTexture() ), new Nodes.ColorNode( new THREE.Color( 0x0000FF ) ) );
+				materialPlane.colorNode = new Nodes.OperatorNode( '+', new Nodes.TextureNode( createDataTexture() ), new Nodes.UniformNode( new THREE.Color( 0x0000FF ) ) );
 				materialPlane.opacityNode = new Nodes.SplitNode( new Nodes.TextureNode( dxt5Texture ), 'a' );
 				materialPlane.transparent = true;
 
@@ -128,7 +128,7 @@
 
 				const materialCompressed = new Nodes.MeshBasicNodeMaterial();
 				materialCompressed.colorNode = new Nodes.TextureNode( dxt5Texture );
-				materialCompressed.emissiveNode = new Nodes.ColorNode( new THREE.Color( 0x663300 ) );
+				materialCompressed.emissiveNode = new Nodes.UniformNode( new THREE.Color( 0x663300 ) );
 				materialCompressed.alphaTestNode = new Nodes.OscNode();
 				materialCompressed.transparent = true;
 
@@ -150,7 +150,7 @@
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 				const materialPoints = new Nodes.PointsNodeMaterial();
 
-				materialPoints.colorNode = new Nodes.OperatorNode( '*', new Nodes.PositionNode(), new Nodes.FloatNode( 3 ).setConst( true ) );
+				materialPoints.colorNode = new Nodes.OperatorNode( '*', new Nodes.PositionNode(), new Nodes.ConstNode( 3 ) );
 
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );

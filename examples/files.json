@@ -67,6 +67,7 @@
 		"webgl_lines_colors",
 		"webgl_lines_dashed",
 		"webgl_lines_fat",
+		"webgl_lines_fat_raycasting",
 		"webgl_lines_fat_wireframe",
 		"webgl_lines_sphere",
 		"webgl_loader_3dm",
@@ -307,6 +308,7 @@
 	],
 	"webgpu": [
 		"webgpu_compute",
+		"webgpu_depth_texture",
 		"webgpu_instance_uniform",
 		"webgpu_lights_custom",
 		"webgpu_lights_selective",

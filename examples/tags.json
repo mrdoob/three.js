@@ -29,6 +29,7 @@
 	"webgl_lights_hemisphere": [ "directional" ],
 	"webgl_lights_pointlights": [ "multiple" ],
 	"webgl_lines_fat": [ "gpu", "stats", "panel" ],
+	"webgl_lines_fat_raycasting": [ "gpu", "stats", "panel", "raycast" ],
 	"webgl_loader_ttf": [ "text", "font" ],
 	"webgl_loader_pdb": [ "molecules", "css2d" ],
 	"webgl_loader_ldraw": [ "lego" ],

@@ -1,13 +1,12 @@
 import { SelectInput, LabelElement, Element, NumberInput } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { MathNode, FloatNode } from 'three-nodes/Nodes.js';
-
+import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
 
 export class LimiterEditor extends BaseNode {
 
 	constructor() {
 
-		const NULL_VALUE = new FloatNode();
+		const NULL_VALUE = new UniformNode( 0 );
 
 		const node = new MathNode( MathNode.MIN, NULL_VALUE, NULL_VALUE );
 

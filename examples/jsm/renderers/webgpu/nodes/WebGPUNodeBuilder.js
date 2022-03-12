@@ -143,15 +143,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			let lightNode = material.lightNode;
 
-			// VERTEX STAGE
+			if ( material.isMeshStandardMaterial && lightNode === null && this.lightNode ) {
 
-			let vertex = new PositionNode( PositionNode.GEOMETRY );
-
-			if ( lightNode === null && this.lightNode && this.lightNode.hasLights === true ) {
+				// use scene lights
 
 				lightNode = this.lightNode;
 
 			}
+
+			// VERTEX STAGE
+
+			let vertex = new PositionNode( PositionNode.GEOMETRY );
 
 			if ( material.positionNode && material.positionNode.isNode ) {
 
@@ -293,7 +295,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			let outputNode = diffuseColorNode;
 
-			if ( lightNode && lightNode.isNode ) {
+			if ( lightNode && lightNode.isNode && lightNode.hasLight !== false ) {
 
 				const lightContextNode = new LightContextNode( lightNode );
 
@@ -483,13 +485,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( node.isArrayInputNode === true ) {
+				if ( node.isArrayUniformNode === true ) {
 
 					uniformGPU = [];
 
-					for ( const inputNode of node.nodes ) {
+					for ( const uniformNode of node.nodes ) {
 
-						const uniformNodeGPU = this._getNodeUniform( inputNode, type );
+						const uniformNodeGPU = this._getNodeUniform( uniformNode, type );
 
 						// fit bounds to buffer
 						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );

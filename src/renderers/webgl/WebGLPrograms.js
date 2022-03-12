@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding, NormalBlending } from '../../constants.js';
+import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding, NormalBlending } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -79,7 +79,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
-		const envMapCubeUVHeight = ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ) ? envMap.image.height : null;
+		const envMapCubeUVHeight = ( !! envMap ) && ( envMap.mapping === CubeUVReflectionMapping ) ? envMap.image.height : null;
 
 		const shaderID = shaderIDs[ material.type ];
 

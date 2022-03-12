@@ -2,6 +2,8 @@ import { NodeUpdateType } from './constants.js';
 import { getNodesKeys } from './NodeUtils.js';
 import { MathUtils } from 'three';
 
+let _nodeId = 0;
+
 class Node {
 
 	constructor( nodeType = null ) {
@@ -11,6 +13,8 @@ class Node {
 		this.updateType = NodeUpdateType.None;
 
 		this.uuid = MathUtils.generateUUID();
+
+		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
 
 	}
 

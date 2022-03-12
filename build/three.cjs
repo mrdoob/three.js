@@ -80,7 +80,6 @@ const CubeRefractionMapping = 302;
 const EquirectangularReflectionMapping = 303;
 const EquirectangularRefractionMapping = 304;
 const CubeUVReflectionMapping = 306;
-const CubeUVRefractionMapping = 307;
 const RepeatWrapping = 1000;
 const ClampToEdgeWrapping = 1001;
 const MirroredRepeatWrapping = 1002;
@@ -162,7 +161,11 @@ const sRGBEncoding = 3001;
 const BasicDepthPacking = 3200;
 const RGBADepthPacking = 3201;
 const TangentSpaceNormalMap = 0;
-const ObjectSpaceNormalMap = 1;
+const ObjectSpaceNormalMap = 1; // Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
+
+const NoColorSpace = '';
+const SRGBColorSpace = 'srgb';
+const LinearSRGBColorSpace = 'srgb-linear';
 const ZeroStencilOp = 0;
 const KeepStencilOp = 7680;
 const ReplaceStencilOp = 7681;
@@ -264,9 +267,9 @@ function generateUUID() {
 	const d1 = Math.random() * 0xffffffff | 0;
 	const d2 = Math.random() * 0xffffffff | 0;
 	const d3 = Math.random() * 0xffffffff | 0;
-	const uuid = _lut[d0 & 0xff] + _lut[d0 >> 8 & 0xff] + _lut[d0 >> 16 & 0xff] + _lut[d0 >> 24 & 0xff] + '-' + _lut[d1 & 0xff] + _lut[d1 >> 8 & 0xff] + '-' + _lut[d1 >> 16 & 0x0f | 0x40] + _lut[d1 >> 24 & 0xff] + '-' + _lut[d2 & 0x3f | 0x80] + _lut[d2 >> 8 & 0xff] + '-' + _lut[d2 >> 16 & 0xff] + _lut[d2 >> 24 & 0xff] + _lut[d3 & 0xff] + _lut[d3 >> 8 & 0xff] + _lut[d3 >> 16 & 0xff] + _lut[d3 >> 24 & 0xff]; // .toUpperCase() here flattens concatenated strings to save heap memory space.
+	const uuid = _lut[d0 & 0xff] + _lut[d0 >> 8 & 0xff] + _lut[d0 >> 16 & 0xff] + _lut[d0 >> 24 & 0xff] + '-' + _lut[d1 & 0xff] + _lut[d1 >> 8 & 0xff] + '-' + _lut[d1 >> 16 & 0x0f | 0x40] + _lut[d1 >> 24 & 0xff] + '-' + _lut[d2 & 0x3f | 0x80] + _lut[d2 >> 8 & 0xff] + '-' + _lut[d2 >> 16 & 0xff] + _lut[d2 >> 24 & 0xff] + _lut[d3 & 0xff] + _lut[d3 >> 8 & 0xff] + _lut[d3 >> 16 & 0xff] + _lut[d3 >> 24 & 0xff]; // .toLowerCase() here flattens concatenated strings to save heap memory space.
 
-	return uuid.toUpperCase();
+	return uuid.toLowerCase();
 }
 
 function clamp(value, min, max) {
@@ -1084,6 +1087,56 @@ function createElementNS(name) {
 	return document.createElementNS('http://www.w3.org/1999/xhtml', name);
 }
 
+function SRGBToLinear(c) {
+	return c < 0.04045 ? c * 0.0773993808 : Math.pow(c * 0.9478672986 + 0.0521327014, 2.4);
+}
+function LinearToSRGB(c) {
+	return c < 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 0.41666) - 0.055;
+} // JavaScript RGB-to-RGB transforms, defined as
+// FN[InputColorSpace][OutputColorSpace] callback functions.
+
+const FN = {
+	[SRGBColorSpace]: {
+		[LinearSRGBColorSpace]: SRGBToLinear
+	},
+	[LinearSRGBColorSpace]: {
+		[SRGBColorSpace]: LinearToSRGB
+	}
+};
+const ColorManagement = {
+	legacyMode: true,
+
+	get workingColorSpace() {
+		return LinearSRGBColorSpace;
+	},
+
+	set workingColorSpace(colorSpace) {
+		console.warn('THREE.ColorManagement: .workingColorSpace is readonly.');
+	},
+
+	convert: function (color, sourceColorSpace, targetColorSpace) {
+		if (this.legacyMode || sourceColorSpace === targetColorSpace || !sourceColorSpace || !targetColorSpace) {
+			return color;
+		}
+
+		if (FN[sourceColorSpace] && FN[sourceColorSpace][targetColorSpace] !== undefined) {
+			const fn = FN[sourceColorSpace][targetColorSpace];
+			color.r = fn(color.r);
+			color.g = fn(color.g);
+			color.b = fn(color.b);
+			return color;
+		}
+
+		throw new Error('Unsupported color space conversion.');
+	},
+	fromWorkingColorSpace: function (color, targetColorSpace) {
+		return this.convert(color, this.workingColorSpace, targetColorSpace);
+	},
+	toWorkingColorSpace: function (color, sourceColorSpace) {
+		return this.convert(color, sourceColorSpace, this.workingColorSpace);
+	}
+};
+
 const _colorKeywords = {
 	'aliceblue': 0xF0F8FF,
 	'antiquewhite': 0xFAEBD7,
@@ -1234,6 +1287,11 @@ const _colorKeywords = {
 	'yellow': 0xFFFF00,
 	'yellowgreen': 0x9ACD32
 };
+const _rgb = {
+	r: 0,
+	g: 0,
+	b: 0
+};
 const _hslA = {
 	h: 0,
 	s: 0,
@@ -1254,12 +1312,11 @@ function hue2rgb(p, q, t) {
 	return p;
 }
 
-function SRGBToLinear(c) {
-	return c < 0.04045 ? c * 0.0773993808 : Math.pow(c * 0.9478672986 + 0.0521327014, 2.4);
-}
-
-function LinearToSRGB(c) {
-	return c < 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 0.41666) - 0.055;
+function toComponents(source, target) {
+	target.r = source.r;
+	target.g = source.g;
+	target.b = source.b;
+	return target;
 }
 
 class Color {
@@ -1291,22 +1348,24 @@ class Color {
 		return this;
 	}
 
-	setHex(hex) {
+	setHex(hex, colorSpace = SRGBColorSpace) {
 		hex = Math.floor(hex);
 		this.r = (hex >> 16 & 255) / 255;
 		this.g = (hex >> 8 & 255) / 255;
 		this.b = (hex & 255) / 255;
+		ColorManagement.toWorkingColorSpace(this, colorSpace);
 		return this;
 	}
 
-	setRGB(r, g, b) {
+	setRGB(r, g, b, colorSpace = LinearSRGBColorSpace) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
+		ColorManagement.toWorkingColorSpace(this, colorSpace);
 		return this;
 	}
 
-	setHSL(h, s, l) {
+	setHSL(h, s, l, colorSpace = LinearSRGBColorSpace) {
 		// h,s,l ranges are in 0.0 - 1.0
 		h = euclideanModulo(h, 1);
 		s = clamp(s, 0, 1);
@@ -1322,10 +1381,11 @@ class Color {
 			this.b = hue2rgb(q, p, h - 1 / 3);
 		}
 
+		ColorManagement.toWorkingColorSpace(this, colorSpace);
 		return this;
 	}
 
-	setStyle(style) {
+	setStyle(style, colorSpace = SRGBColorSpace) {
 		function handleAlpha(string) {
 			if (string === undefined) return;
 
@@ -1350,6 +1410,7 @@ class Color {
 						this.r = Math.min(255, parseInt(color[1], 10)) / 255;
 						this.g = Math.min(255, parseInt(color[2], 10)) / 255;
 						this.b = Math.min(255, parseInt(color[3], 10)) / 255;
+						ColorManagement.toWorkingColorSpace(this, colorSpace);
 						handleAlpha(color[4]);
 						return this;
 					}
@@ -1359,6 +1420,7 @@ class Color {
 						this.r = Math.min(100, parseInt(color[1], 10)) / 100;
 						this.g = Math.min(100, parseInt(color[2], 10)) / 100;
 						this.b = Math.min(100, parseInt(color[3], 10)) / 100;
+						ColorManagement.toWorkingColorSpace(this, colorSpace);
 						handleAlpha(color[4]);
 						return this;
 					}
@@ -1373,7 +1435,7 @@ class Color {
 						const s = parseInt(color[2], 10) / 100;
 						const l = parseInt(color[3], 10) / 100;
 						handleAlpha(color[4]);
-						return this.setHSL(h, s, l);
+						return this.setHSL(h, s, l, colorSpace);
 					}
 
 					break;
@@ -1388,30 +1450,32 @@ class Color {
 				this.r = parseInt(hex.charAt(0) + hex.charAt(0), 16) / 255;
 				this.g = parseInt(hex.charAt(1) + hex.charAt(1), 16) / 255;
 				this.b = parseInt(hex.charAt(2) + hex.charAt(2), 16) / 255;
+				ColorManagement.toWorkingColorSpace(this, colorSpace);
 				return this;
 			} else if (size === 6) {
 				// #ff0000
 				this.r = parseInt(hex.charAt(0) + hex.charAt(1), 16) / 255;
 				this.g = parseInt(hex.charAt(2) + hex.charAt(3), 16) / 255;
 				this.b = parseInt(hex.charAt(4) + hex.charAt(5), 16) / 255;
+				ColorManagement.toWorkingColorSpace(this, colorSpace);
 				return this;
 			}
 		}
 
 		if (style && style.length > 0) {
-			return this.setColorName(style);
+			return this.setColorName(style, colorSpace);
 		}
 
 		return this;
 	}
 
-	setColorName(style) {
+	setColorName(style, colorSpace = SRGBColorSpace) {
 		// color keywords
 		const hex = _colorKeywords[style.toLowerCase()];
 
 		if (hex !== undefined) {
 			// red
-			this.setHex(hex);
+			this.setHex(hex, colorSpace);
 		} else {
 			// unknown color
 			console.warn('THREE.Color: Unknown color ' + style);
@@ -1455,19 +1519,21 @@ class Color {
 		return this;
 	}
 
-	getHex() {
-		return clamp(this.r * 255, 0, 255) << 16 ^ clamp(this.g * 255, 0, 255) << 8 ^ clamp(this.b * 255, 0, 255) << 0;
+	getHex(colorSpace = SRGBColorSpace) {
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+		return clamp(_rgb.r * 255, 0, 255) << 16 ^ clamp(_rgb.g * 255, 0, 255) << 8 ^ clamp(_rgb.b * 255, 0, 255) << 0;
 	}
 
-	getHexString() {
-		return ('000000' + this.getHex().toString(16)).slice(-6);
+	getHexString(colorSpace = SRGBColorSpace) {
+		return ('000000' + this.getHex(colorSpace).toString(16)).slice(-6);
 	}
 
-	getHSL(target) {
+	getHSL(target, colorSpace = LinearSRGBColorSpace) {
 		// h,s,l ranges are in 0.0 - 1.0
-		const r = this.r,
-					g = this.g,
-					b = this.b;
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+		const r = _rgb.r,
+					g = _rgb.g,
+					b = _rgb.b;
 		const max = Math.max(r, g, b);
 		const min = Math.min(r, g, b);
 		let hue, saturation;
@@ -1503,8 +1569,23 @@ class Color {
 		return target;
 	}
 
-	getStyle() {
-		return 'rgb(' + (this.r * 255 | 0) + ',' + (this.g * 255 | 0) + ',' + (this.b * 255 | 0) + ')';
+	getRGB(target, colorSpace = LinearSRGBColorSpace) {
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+		target.r = _rgb.r;
+		target.g = _rgb.g;
+		target.b = _rgb.b;
+		return target;
+	}
+
+	getStyle(colorSpace = SRGBColorSpace) {
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+
+		if (colorSpace !== SRGBColorSpace) {
+			// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
+			return `color(${colorSpace} ${_rgb.r} ${_rgb.g} ${_rgb.b})`;
+		}
+
+		return `rgb(${_rgb.r * 255 | 0},${_rgb.g * 255 | 0},${_rgb.b * 255 | 0})`;
 	}
 
 	offsetHSL(h, s, l) {
@@ -6689,7 +6770,7 @@ class Material extends EventDispatcher {
 			if (newValue === undefined) {
 				console.warn('THREE.Material: \'' + key + '\' parameter is undefined.');
 				continue;
-			} // for backward compatability if shading is set in the constructor
+			} // for backward compatibility if shading is set in the constructor
 
 
 			if (key === 'shading') {
@@ -6965,35 +7046,6 @@ Material.fromType = function
 	// TODO: Behavior added in Materials.js
 	return null;
 };
-
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	specularMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	combine: THREE.Multiply,
- *	reflectivity: <float>,
- *	refractionRatio: <float>,
- *
- *	depthTest: <bool>,
- *	depthWrite: <bool>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- * }
- */
 
 class MeshBasicMaterial extends Material {
 	constructor(parameters) {
@@ -8692,21 +8744,6 @@ var default_vertex = "void main() {\n\tgl_Position = projectionMatrix * modelVie
 
 var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
 
-/**
- * parameters = {
- *	defines: { "label" : "value" },
- *	uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
- *
- *	fragmentShader: <string>,
- *	vertexShader: <string>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- *	lights: <bool>
- * }
- */
-
 class ShaderMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -9832,7 +9869,7 @@ var lights_lambert_vertex = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geome
 
 var lights_pars_begin = "uniform bool receiveShadow;\nuniform vec3 ambientLightColor;\nuniform vec3 lightProbe[ 9 ];\nvec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {\n\tfloat x = normal.x, y = normal.y, z = normal.z;\n\tvec3 result = shCoefficients[ 0 ] * 0.886227;\n\tresult += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;\n\tresult += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;\n\tresult += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;\n\tresult += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;\n\tresult += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;\n\tresult += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );\n\tresult += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;\n\tresult += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );\n\treturn result;\n}\nvec3 getLightProbeIrradiance( const in vec3 lightProbe[ 9 ], const in vec3 normal ) {\n\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\tvec3 irradiance = shGetIrradianceAt( worldNormal, lightProbe );\n\treturn irradiance;\n}\nvec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {\n\tvec3 irradiance = ambientLightColor;\n\treturn irradiance;\n}\nfloat getDistanceAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n\t#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n\t\tfloat distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n\t\tif ( cutoffDistance > 0.0 ) {\n\t\t\tdistanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n\t\t}\n\t\treturn distanceFalloff;\n\t#else\n\t\tif ( cutoffDistance > 0.0 && decayExponent > 0.0 ) {\n\t\t\treturn pow( saturate( - lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\t\t}\n\t\treturn 1.0;\n\t#endif\n}\nfloat getSpotAttenuation( const in float coneCosine, const in float penumbraCosine, const in float angleCosine ) {\n\treturn smoothstep( coneCosine, penumbraCosine, angleCosine );\n}\n#if NUM_DIR_LIGHTS > 0\n\tstruct DirectionalLight {\n\t\tvec3 direction;\n\t\tvec3 color;\n\t};\n\tuniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\n\tvoid getDirectionalLightInfo( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight light ) {\n\t\tlight.color = directionalLight.color;\n\t\tlight.direction = directionalLight.direction;\n\t\tlight.visible = true;\n\t}\n#endif\n#if NUM_POINT_LIGHTS > 0\n\tstruct PointLight {\n\t\tvec3 position;\n\t\tvec3 color;\n\t\tfloat distance;\n\t\tfloat decay;\n\t};\n\tuniform PointLight pointLights[ NUM_POINT_LIGHTS ];\n\tvoid getPointLightInfo( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight light ) {\n\t\tvec3 lVector = pointLight.position - geometry.position;\n\t\tlight.direction = normalize( lVector );\n\t\tfloat lightDistance = length( lVector );\n\t\tlight.color = pointLight.color;\n\t\tlight.color *= getDistanceAttenuation( lightDistance, pointLight.distance, pointLight.decay );\n\t\tlight.visible = ( light.color != vec3( 0.0 ) );\n\t}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n\tstruct SpotLight {\n\t\tvec3 position;\n\t\tvec3 direction;\n\t\tvec3 color;\n\t\tfloat distance;\n\t\tfloat decay;\n\t\tfloat coneCos;\n\t\tfloat penumbraCos;\n\t};\n\tuniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];\n\tvoid getSpotLightInfo( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight light ) {\n\t\tvec3 lVector = spotLight.position - geometry.position;\n\t\tlight.direction = normalize( lVector );\n\t\tfloat angleCos = dot( light.direction, spotLight.direction );\n\t\tfloat spotAttenuation = getSpotAttenuation( spotLight.coneCos, spotLight.penumbraCos, angleCos );\n\t\tif ( spotAttenuation > 0.0 ) {\n\t\t\tfloat lightDistance = length( lVector );\n\t\t\tlight.color = spotLight.color * spotAttenuation;\n\t\t\tlight.color *= getDistanceAttenuation( lightDistance, spotLight.distance, spotLight.decay );\n\t\t\tlight.visible = ( light.color != vec3( 0.0 ) );\n\t\t} else {\n\t\t\tlight.color = vec3( 0.0 );\n\t\t\tlight.visible = false;\n\t\t}\n\t}\n#endif\n#if NUM_RECT_AREA_LIGHTS > 0\n\tstruct RectAreaLight {\n\t\tvec3 color;\n\t\tvec3 position;\n\t\tvec3 halfWidth;\n\t\tvec3 halfHeight;\n\t};\n\tuniform sampler2D ltc_1;\tuniform sampler2D ltc_2;\n\tuniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];\n#endif\n#if NUM_HEMI_LIGHTS > 0\n\tstruct HemisphereLight {\n\t\tvec3 direction;\n\t\tvec3 skyColor;\n\t\tvec3 groundColor;\n\t};\n\tuniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];\n\tvec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in vec3 normal ) {\n\t\tfloat dotNL = dot( normal, hemiLight.direction );\n\t\tfloat hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n\t\tvec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n\t\treturn irradiance;\n\t}\n#endif";
 
-var envmap_physical_pars_fragment = "#if defined( USE_ENVMAP )\n\t#ifdef ENVMAP_MODE_REFRACTION\n\t\tuniform float refractionRatio;\n\t#endif\n\tvec3 getIBLIrradiance( const in vec3 normal ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );\n\t\t\treturn PI * envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n\tvec3 getIBLRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 reflectVec;\n\t\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\t\treflectVec = reflect( - viewDir, normal );\n\t\t\t\treflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );\n\t\t\t#else\n\t\t\t\treflectVec = refract( - viewDir, normal, refractionRatio );\n\t\t\t#endif\n\t\t\treflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );\n\t\t\treturn envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n#endif";
+var envmap_physical_pars_fragment = "#if defined( USE_ENVMAP )\n\tvec3 getIBLIrradiance( const in vec3 normal ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );\n\t\t\treturn PI * envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n\tvec3 getIBLRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 reflectVec = reflect( - viewDir, normal );\n\t\t\treflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );\n\t\t\treflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );\n\t\t\treturn envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n#endif";
 
 var lights_toon_fragment = "ToonMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb;";
 
@@ -10189,10 +10226,11 @@ const UniformsLib = {
 		ior: {
 			value: 1.5
 		},
-		// standard, physical
+		// physical
 		refractionRatio: {
 			value: 0.98
-		}
+		} // basic, lambert, phong
+
 	},
 	aomap: {
 		aoMap: {
@@ -10826,6 +10864,7 @@ function WebGLBindingStates(gl, extensions, attributes, capabilities) {
 	const bindingStates = {};
 	const defaultState = createBindingState(null);
 	let currentState = defaultState;
+	let forceUpdate = false;
 
 	function setup(object, material, program, geometry, index) {
 		let updateBuffers = false;
@@ -10859,7 +10898,8 @@ function WebGLBindingStates(gl, extensions, attributes, capabilities) {
 			attributes.update(index, gl.ELEMENT_ARRAY_BUFFER);
 		}
 
-		if (updateBuffers) {
+		if (updateBuffers || forceUpdate) {
+			forceUpdate = false;
 			setupVertexAttributes(object, material, program, geometry);
 
 			if (index !== null) {
@@ -11186,6 +11226,7 @@ function WebGLBindingStates(gl, extensions, attributes, capabilities) {
 
 	function reset() {
 		resetDefaultState();
+		forceUpdate = true;
 		if (currentState === defaultState) return;
 		currentState = defaultState;
 		bindVertexArrayObject(currentState.object);
@@ -11750,8 +11791,7 @@ class PMREMGenerator {
 	}
 
 	_dispose() {
-		this._blurMaterial.dispose();
-
+		if (this._blurMaterial !== null) this._blurMaterial.dispose();
 		if (this._pingPongRenderTarget !== null) this._pingPongRenderTarget.dispose();
 
 		for (let i = 0; i < this._lodPlanes.length; i++) {
@@ -12811,7 +12851,7 @@ function WebGLMorphtargets(gl, capabilities, textures) {
 
 						if (hasMorphColors === true) {
 							morph.fromBufferAttribute(morphColor, j);
-							if (morphColor.normalized === true) denormalize(morph, morphNormal);
+							if (morphColor.normalized === true) denormalize(morph, morphColor);
 							buffer[offset + stride + 8] = morph.x;
 							buffer[offset + stride + 9] = morph.y;
 							buffer[offset + stride + 10] = morph.z;
@@ -13996,7 +14036,6 @@ function generateEnvMapTypeDefine(parameters) {
 				break;
 
 			case CubeUVReflectionMapping:
-			case CubeUVRefractionMapping:
 				envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
 				break;
 		}
@@ -14011,7 +14050,6 @@ function generateEnvMapModeDefine(parameters) {
 	if (parameters.envMap) {
 		switch (parameters.envMapMode) {
 			case CubeRefractionMapping:
-			case CubeUVRefractionMapping:
 				envMapModeDefine = 'ENVMAP_MODE_REFRACTION';
 				break;
 		}
@@ -14355,7 +14393,7 @@ function WebGLPrograms(renderer, cubemaps, cubeuvmaps, extensions, capabilities,
 		const geometry = object.geometry;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const envMap = (material.isMeshStandardMaterial ? cubeuvmaps : cubemaps).get(material.envMap || environment);
-		const envMapCubeUVHeight = !!envMap && (envMap.mapping === CubeUVReflectionMapping || envMap.mapping === CubeUVRefractionMapping) ? envMap.image.height : null;
+		const envMapCubeUVHeight = !!envMap && envMap.mapping === CubeUVReflectionMapping ? envMap.image.height : null;
 		const shaderID = shaderIDs[material.type]; // heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
@@ -15337,24 +15375,6 @@ function WebGLRenderStates(extensions, capabilities) {
 	};
 }
 
-/**
- * parameters = {
- *
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>
- * }
- */
-
 class MeshDepthMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -15387,24 +15407,6 @@ class MeshDepthMaterial extends Material {
 }
 
 MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
-
-/**
- * parameters = {
- *
- *	referencePosition: <float>,
- *	nearDistance: <float>,
- *	farDistance: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>
- *
- * }
- */
 
 class MeshDistanceMaterial extends Material {
 	constructor(parameters) {
@@ -16533,6 +16535,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 	const maxTextureSize = capabilities.maxTextureSize;
 	const maxSamples = capabilities.maxSamples;
 	const multisampledRTTExt = extensions.has('WEBGL_multisampled_render_to_texture') ? extensions.get('WEBGL_multisampled_render_to_texture') : null;
+	const supportsInvalidateFramebuffer = /OculusBrowser/g.test(navigator.userAgent);
 
 	const _videoTextures = new WeakMap();
 
@@ -17679,7 +17682,9 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 
 			_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST);
 
-			_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, invalidationArray);
+			if (supportsInvalidateFramebuffer) {
+				_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, invalidationArray);
+			}
 
 			state.bindFramebuffer(_gl.READ_FRAMEBUFFER, null);
 			state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
@@ -19778,7 +19783,7 @@ function WebGLRenderer(parameters = {}) {
 
 	const animation = new WebGLAnimation();
 	animation.setAnimationLoop(onAnimationFrame);
-	if (typeof window !== 'undefined') animation.setContext(window);
+	if (typeof self !== 'undefined') animation.setContext(self);
 
 	this.setAnimationLoop = function (callback) {
 		onAnimationFrameCallback = callback;
@@ -21062,16 +21067,6 @@ class InterleavedBufferAttribute {
 
 InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	map: new THREE.Texture( <Image> ),
- *	alphaMap: new THREE.Texture( <Image> ),
- *	rotation: <float>,
- *	sizeAttenuation: <bool>
- * }
- */
-
 class SpriteMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -21815,17 +21810,6 @@ class InstancedMesh extends Mesh {
 
 InstancedMesh.prototype.isInstancedMesh = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	linewidth: <float>,
- *	linecap: "round",
- *	linejoin: "round"
- * }
- */
-
 class LineBasicMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -22083,19 +22067,6 @@ class LineLoop extends Line {
 }
 
 LineLoop.prototype.isLineLoop = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *	map: new THREE.Texture( <Image> ),
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	size: <float>,
- *	sizeAttenuation: <bool>
- *
- * }
- */
 
 class PointsMaterial extends Material {
 	constructor(parameters) {
@@ -26341,12 +26312,6 @@ var Geometries = /*#__PURE__*/Object.freeze({
 	WireframeGeometry: WireframeGeometry
 });
 
-/**
- * parameters = {
- *	color: <THREE.Color>
- * }
- */
-
 class ShadowMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26375,54 +26340,6 @@ class RawShaderMaterial extends ShaderMaterial {
 }
 
 RawShaderMaterial.prototype.isRawShaderMaterial = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	roughness: <float>,
- *	metalness: <float>,
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	roughnessMap: new THREE.Texture( <Image> ),
- *
- *	metalnessMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	envMapIntensity: <float>
- *
- *	refractionRatio: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- *	flatShading: <bool>
- * }
- */
 
 class MeshStandardMaterial extends Material {
 	constructor(parameters) {
@@ -26456,7 +26373,6 @@ class MeshStandardMaterial extends Material {
 		this.alphaMap = null;
 		this.envMap = null;
 		this.envMapIntensity = 1.0;
-		this.refractionRatio = 0.98;
 		this.wireframe = false;
 		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
@@ -26494,7 +26410,6 @@ class MeshStandardMaterial extends Material {
 		this.alphaMap = source.alphaMap;
 		this.envMap = source.envMap;
 		this.envMapIntensity = source.envMapIntensity;
-		this.refractionRatio = source.refractionRatio;
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
 		this.wireframeLinecap = source.wireframeLinecap;
@@ -26506,39 +26421,6 @@ class MeshStandardMaterial extends Material {
 }
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
-
-/**
- * parameters = {
- *	clearcoat: <float>,
- *	clearcoatMap: new THREE.Texture( <Image> ),
- *	clearcoatRoughness: <float>,
- *	clearcoatRoughnessMap: new THREE.Texture( <Image> ),
- *	clearcoatNormalScale: <Vector2>,
- *	clearcoatNormalMap: new THREE.Texture( <Image> ),
- *
- *	ior: <float>,
- *	reflectivity: <float>,
- *
- *	sheen: <float>,
- *	sheenColor: <Color>,
- *	sheenColorMap: new THREE.Texture( <Image> ),
- *	sheenRoughness: <float>,
- *	sheenRoughnessMap: new THREE.Texture( <Image> ),
- *
- *	transmission: <float>,
- *	transmissionMap: new THREE.Texture( <Image> ),
- *
- *	thickness: <float>,
- *	thicknessMap: new THREE.Texture( <Image> ),
- *	attenuationDistance: <float>,
- *	attenuationColor: <Color>,
- *
- *	specularIntensity: <float>,
- *	specularIntensityMap: new THREE.Texture( <Image> ),
- *	specularColor: <Color>,
- *	specularColorMap: new THREE.Texture( <Image> )
- * }
- */
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 	constructor(parameters) {
@@ -26652,52 +26534,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	specular: <hex>,
- *	shininess: <float>,
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	specularMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	combine: THREE.MultiplyOperation,
- *	reflectivity: <float>,
- *	refractionRatio: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- *	flatShading: <bool>
- * }
- */
-
 class MeshPhongMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26775,42 +26611,6 @@ class MeshPhongMaterial extends Material {
 
 MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *
- *	map: new THREE.Texture( <Image> ),
- *	gradientMap: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- * }
- */
-
 class MeshToonMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26876,28 +26676,6 @@ class MeshToonMaterial extends Material {
 
 MeshToonMaterial.prototype.isMeshToonMaterial = true;
 
-/**
- * parameters = {
- *	opacity: <float>,
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>
- *
- *	flatShading: <bool>
- * }
- */
-
 class MeshNormalMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26936,38 +26714,6 @@ class MeshNormalMaterial extends Material {
 }
 
 MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	lightMap: new THREE.Texture( <Image> ),
- *	lightMapIntensity: <float>
- *
- *	aoMap: new THREE.Texture( <Image> ),
- *	aoMapIntensity: <float>
- *
- *	emissive: <hex>,
- *	emissiveIntensity: <float>
- *	emissiveMap: new THREE.Texture( <Image> ),
- *
- *	specularMap: new THREE.Texture( <Image> ),
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *	combine: THREE.Multiply,
- *	reflectivity: <float>,
- *	refractionRatio: <float>,
- *
- *	wireframe: <boolean>,
- *	wireframeLinewidth: <float>,
- *
- * }
- */
 
 class MeshLambertMaterial extends Material {
 	constructor(parameters) {
@@ -27024,32 +26770,6 @@ class MeshLambertMaterial extends Material {
 
 MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	matcap: new THREE.Texture( <Image> ),
- *
- *	map: new THREE.Texture( <Image> ),
- *
- *	bumpMap: new THREE.Texture( <Image> ),
- *	bumpScale: <float>,
- *
- *	normalMap: new THREE.Texture( <Image> ),
- *	normalMapType: THREE.TangentSpaceNormalMap,
- *	normalScale: <Vector2>,
- *
- *	displacementMap: new THREE.Texture( <Image> ),
- *	displacementScale: <float>,
- *	displacementBias: <float>,
- *
- *	alphaMap: new THREE.Texture( <Image> ),
- *
- *	flatShading: <bool>
- * }
- */
-
 class MeshMatcapMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -27098,19 +26818,6 @@ class MeshMatcapMaterial extends Material {
 }
 
 MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
-
-/**
- * parameters = {
- *	color: <hex>,
- *	opacity: <float>,
- *
- *	linewidth: <float>,
- *
- *	scale: <float>,
- *	dashSize: <float>,
- *	gapSize: <float>
- * }
- */
 
 class LineDashedMaterial extends LineBasicMaterial {
 	constructor(parameters) {
@@ -30850,8 +30557,7 @@ const TEXTURE_MAPPING = {
 	CubeRefractionMapping: CubeRefractionMapping,
 	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	CubeUVReflectionMapping: CubeUVReflectionMapping,
-	CubeUVRefractionMapping: CubeUVRefractionMapping
+	CubeUVReflectionMapping: CubeUVReflectionMapping
 };
 const TEXTURE_WRAPPING = {
 	RepeatWrapping: RepeatWrapping,
@@ -31505,6 +31211,11 @@ class PositionalAudio extends Audio {
 		this.panner = this.context.createPanner();
 		this.panner.panningModel = 'HRTF';
 		this.panner.connect(this.gain);
+	}
+
+	disconnect() {
+		super.disconnect();
+		this.panner.disconnect(this.gain);
 	}
 
 	getOutput() {
@@ -36725,6 +36436,7 @@ exports.ClampToEdgeWrapping = ClampToEdgeWrapping;
 exports.Clock = Clock;
 exports.Color = Color;
 exports.ColorKeyframeTrack = ColorKeyframeTrack;
+exports.ColorManagement = ColorManagement;
 exports.CompressedTexture = CompressedTexture;
 exports.CompressedTextureLoader = CompressedTextureLoader;
 exports.ConeBufferGeometry = ConeGeometry;
@@ -36735,7 +36447,6 @@ exports.CubeRefractionMapping = CubeRefractionMapping;
 exports.CubeTexture = CubeTexture;
 exports.CubeTextureLoader = CubeTextureLoader;
 exports.CubeUVReflectionMapping = CubeUVReflectionMapping;
-exports.CubeUVRefractionMapping = CubeUVRefractionMapping;
 exports.CubicBezierCurve = CubicBezierCurve;
 exports.CubicBezierCurve3 = CubicBezierCurve3;
 exports.CubicInterpolant = CubicInterpolant;
@@ -36872,6 +36583,7 @@ exports.LinearMipMapLinearFilter = LinearMipMapLinearFilter;
 exports.LinearMipMapNearestFilter = LinearMipMapNearestFilter;
 exports.LinearMipmapLinearFilter = LinearMipmapLinearFilter;
 exports.LinearMipmapNearestFilter = LinearMipmapNearestFilter;
+exports.LinearSRGBColorSpace = LinearSRGBColorSpace;
 exports.LinearToneMapping = LinearToneMapping;
 exports.Loader = Loader;
 exports.LoaderUtils = LoaderUtils;
@@ -36915,6 +36627,7 @@ exports.NearestMipmapNearestFilter = NearestMipmapNearestFilter;
 exports.NeverDepth = NeverDepth;
 exports.NeverStencilFunc = NeverStencilFunc;
 exports.NoBlending = NoBlending;
+exports.NoColorSpace = NoColorSpace;
 exports.NoColors = NoColors;
 exports.NoToneMapping = NoToneMapping;
 exports.NormalAnimationBlendMode = NormalAnimationBlendMode;
@@ -37009,6 +36722,7 @@ exports.ReplaceStencilOp = ReplaceStencilOp;
 exports.ReverseSubtractEquation = ReverseSubtractEquation;
 exports.RingBufferGeometry = RingGeometry;
 exports.RingGeometry = RingGeometry;
+exports.SRGBColorSpace = SRGBColorSpace;
 exports.Scene = Scene;
 exports.SceneUtils = SceneUtils;
 exports.ShaderChunk = ShaderChunk;

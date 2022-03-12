@@ -718,7 +718,7 @@ class VTKLoader extends Loader {
 
 						txt = new Float32Array( );
 
-					} else if ( ele.attributes.type === 'Int64' ) {
+					} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 						txt = new Int32Array( );
 
@@ -736,7 +736,8 @@ class VTKLoader extends Loader {
 					// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is
 					// computed by summing the compressed block sizes from preceding blocks according to the header.
 
-					const rawData = ele[ '#text' ];
+					const textNode = ele[ '#text' ];
+					const rawData = Array.isArray( textNode ) ? textNode[ 0 ] : textNode;
 
 					const byteData = Base64toByteArray( rawData );
 
@@ -785,7 +786,7 @@ class VTKLoader extends Loader {
 							content = new Float32Array( content );
 							txt = Float32Concat( txt, content );
 
-						} else if ( ele.attributes.type === 'Int64' ) {
+						} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 							content = new Int32Array( content );
 							txt = Int32Concat( txt, content );

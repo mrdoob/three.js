@@ -1,8 +1,8 @@
 import { SelectInput, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { SplitNode, FloatNode } from 'three-nodes/Nodes.js';
+import { SplitNode, UniformNode } from 'three-nodes/Nodes.js';
 
-const NULL_VALUE = new FloatNode();
+const NULL_VALUE = new UniformNode( 0 );
 
 export class SplitEditor extends BaseNode {
 

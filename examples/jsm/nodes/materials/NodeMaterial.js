@@ -18,11 +18,23 @@ class NodeMaterial extends ShaderMaterial {
 		// This approach is to reuse the native refreshUniforms*
 		// and turn available the use of features like transmission and environment in core
 
+		let value;
+
 		for ( const property in values ) {
+
+			value = values[ property ];
 
 			if ( this[ property ] === undefined ) {
 
-				this[ property ] = values[ property ];
+				if ( value && typeof value.clone === 'function' ) {
+
+					this[ property ] = value.clone();
+
+				} else {
+
+					this[ property ] = value;
+
+				}
 
 			}
 

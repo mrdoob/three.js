@@ -2,24 +2,14 @@
 import PropertyNode from './core/PropertyNode.js';
 import VarNode from './core/VarNode.js';
 import AttributeNode from './core/AttributeNode.js';
-
-// input nodes
-import BoolNode from './inputs/BoolNode.js';
-import BufferNode from './inputs/BufferNode.js';
-import ColorNode from './inputs/ColorNode.js';
-import FloatNode from './inputs/FloatNode.js';
-import IntNode from './inputs/IntNode.js';
-import UintNode from './inputs/UintNode.js';
-import Vector2Node from './inputs/Vector2Node.js';
-import Vector3Node from './inputs/Vector3Node.js';
-import Vector4Node from './inputs/Vector4Node.js';
-import Matrix3Node from './inputs/Matrix3Node.js';
-import Matrix4Node from './inputs/Matrix4Node.js';
-import TextureNode from './inputs/TextureNode.js';
+import ConstNode from './core/ConstNode.js';
+import UniformNode from './core/UniformNode.js';
 
 // accessor nodes
+import BufferNode from './accessors/BufferNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import NormalNode from './accessors/NormalNode.js';
+import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 
 // math nodes
@@ -66,7 +56,7 @@ const NodeHandler = {
 
 				// accessing array
 
-				return new ShaderNodeObject( new ArrayElementNode( node, new FloatNode( Number( prop ) ).setConst( true ) ) );
+				return new ShaderNodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
 
 			}
 
@@ -84,9 +74,9 @@ const ShaderNodeObject = function( obj ) {
 
 	const type = typeof obj;
 
-	if ( type === 'number' ) {
+	if ( ( type === 'number' ) || ( type === 'boolean' ) ) {
 
-		return new ShaderNodeObject( new FloatNode( obj ).setConst( true ) );
+		return new ShaderNodeObject( new ConstNode( obj ) );
 
 	} else if ( type === 'object' ) {
 
@@ -188,17 +178,15 @@ export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
 // Node Material Shader Syntax
 //
 
-export const uniform = new ShaderNode( ( inputNode ) => {
-
-	inputNode.setConst( false );
-
-	return inputNode;
-
-} );
-
 export const nodeObject = ( val ) => {
 
 	return new ShaderNodeObject( val );
+
+};
+
+export const uniform = ( constNode ) => {
+
+	return nodeObject( new UniformNode( constNode.value, constNode.nodeType ) );
 
 };
 
@@ -248,7 +236,7 @@ const flatArray = obj => {
 
 };
 
-const ConvertType = function ( nodeClass, type, valueClass = null, convertAfter = false ) {
+const ConvertType = function ( type, valueClass = null ) {
 
 	return ( ...params ) => {
 
@@ -266,50 +254,53 @@ const ConvertType = function ( nodeClass, type, valueClass = null, convertAfter 
 
 		}
 
-		const node = nodeObject( new nodeClass( val ).setConst( true ) );
-
-		return convertAfter === true ? nodeObject( new ConvertNode( node, type ) ) : node;
+		return nodeObject( new ConstNode( val, type ) );
 
 	};
 
 };
 
-export const float = new ConvertType( FloatNode, 'float' );
-export const int = new ConvertType( IntNode, 'int' );
-export const uint = new ConvertType( UintNode, 'uint' );
-export const bool = new ConvertType( BoolNode, 'bool' );
-export const color = new ConvertType( ColorNode, 'color', Color );
+export const float = new ConvertType( 'float' );
+export const int = new ConvertType( 'int' );
+export const uint = new ConvertType( 'uint' );
+export const bool = new ConvertType( 'bool' );
+export const color = new ConvertType( 'color', Color );
 
-export const vec2 = new ConvertType( Vector2Node, 'vec2', Vector2 );
-export const ivec2 = new ConvertType( Vector2Node, 'ivec2', Vector2, true );
-export const uvec2 = new ConvertType( Vector2Node, 'uvec2', Vector2, true );
-export const bvec2 = new ConvertType( Vector2Node, 'bvec2', Vector2, true );
+export const vec2 = new ConvertType( 'vec2', Vector2 );
+export const ivec2 = new ConvertType( 'ivec2', Vector2 );
+export const uvec2 = new ConvertType( 'uvec2', Vector2 );
+export const bvec2 = new ConvertType( 'bvec2', Vector2 );
 
-export const vec3 = new ConvertType( Vector3Node, 'vec3', Vector3 );
-export const ivec3 = new ConvertType( Vector3Node, 'ivec3', Vector3, true );
-export const uvec3 = new ConvertType( Vector3Node, 'uvec3', Vector3, true );
-export const bvec3 = new ConvertType( Vector3Node, 'bvec3', Vector3, true );
+export const vec3 = new ConvertType( 'vec3', Vector3 );
+export const ivec3 = new ConvertType( 'ivec3', Vector3 );
+export const uvec3 = new ConvertType( 'uvec3', Vector3 );
+export const bvec3 = new ConvertType( 'bvec3', Vector3 );
 
-export const vec4 = new ConvertType( Vector4Node, 'vec4', Vector4 );
-export const ivec4 = new ConvertType( Vector4Node, 'ivec4', Vector4, true );
-export const uvec4 = new ConvertType( Vector4Node, 'uvec4', Vector4, true );
-export const bvec4 = new ConvertType( Vector4Node, 'bvec4', Vector4, true );
+export const vec4 = new ConvertType( 'vec4', Vector4 );
+export const ivec4 = new ConvertType( 'ivec4', Vector4 );
+export const uvec4 = new ConvertType( 'uvec4', Vector4 );
+export const bvec4 = new ConvertType( 'bvec4', Vector4 );
 
-export const mat3 = new ConvertType( Matrix3Node, 'mat3', Matrix3 );
-export const imat3 = new ConvertType( Matrix3Node, 'imat3', Matrix3, true );
-export const umat3 = new ConvertType( Matrix3Node, 'umat3', Matrix3, true );
-export const bmat3 = new ConvertType( Matrix3Node, 'bmat3', Matrix3, true );
+export const mat3 = new ConvertType( 'mat3', Matrix3 );
+export const imat3 = new ConvertType( 'imat3', Matrix3 );
+export const umat3 = new ConvertType( 'umat3', Matrix3 );
+export const bmat3 = new ConvertType( 'bmat3', Matrix3 );
 
-export const mat4 = new ConvertType( Matrix4Node, 'mat4', Matrix4 );
-export const imat4 = new ConvertType( Matrix4Node, 'imat4', Matrix4, true );
-export const umat4 = new ConvertType( Matrix4Node, 'umat4', Matrix4, true );
-export const bmat4 = new ConvertType( Matrix4Node, 'bmat4', Matrix4, true );
+export const mat4 = new ConvertType( 'mat4', Matrix4 );
+export const imat4 = new ConvertType( 'imat4', Matrix4 );
+export const umat4 = new ConvertType( 'umat4', Matrix4 );
+export const bmat4 = new ConvertType( 'bmat4', Matrix4 );
 
 export const join = ( ...params ) => {
 
 	return nodeObject( new JoinNode( getShaderNodeArray( params ) ) );
 
 };
+
+export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
+export const attribute = ( ...params ) => nodeObject( new AttributeNode( ...params ) );
+export const buffer = ( ...params ) => nodeObject( new BufferNode( ...params ) );
+export const texture = ( ...params ) => nodeObject( new TextureNode( ...params ) );
 
 export const cond = ( ...params ) => {
 
@@ -324,12 +315,6 @@ export const addTo = ( varNode, ...params ) => {
 	return nodeObject( varNode );
 
 };
-
-export const uv = new ShaderNodeProxy( UVNode );
-export const attribute = new ShaderNodeProxy( AttributeNode );
-
-export const buffer = new ShaderNodeProxy( BufferNode );
-export const texture = new ShaderNodeProxy( TextureNode );
 
 export const add = new ShaderNodeProxy( OperatorNode, '+' );
 export const sub = new ShaderNodeProxy( OperatorNode, '-' );

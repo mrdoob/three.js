@@ -1,24 +1,6 @@
 import { Material } from './Material.js';
 import { BasicDepthPacking } from '../constants.js';
 
-/**
- * parameters = {
- *
- *  opacity: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>
- * }
- */
-
 class MeshDepthMaterial extends Material {
 
 	constructor( parameters ) {

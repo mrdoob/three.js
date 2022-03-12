@@ -122,7 +122,7 @@ class Material extends EventDispatcher {
 
 			}
 
-			// for backward compatability if shading is set in the constructor
+			// for backward compatibility if shading is set in the constructor
 			if ( key === 'shading' ) {
 
 				console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );

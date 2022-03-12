@@ -65,7 +65,6 @@ const CubeRefractionMapping = 302;
 const EquirectangularReflectionMapping = 303;
 const EquirectangularRefractionMapping = 304;
 const CubeUVReflectionMapping = 306;
-const CubeUVRefractionMapping = 307;
 const RepeatWrapping = 1000;
 const ClampToEdgeWrapping = 1001;
 const MirroredRepeatWrapping = 1002;
@@ -149,6 +148,11 @@ const BasicDepthPacking = 3200;
 const RGBADepthPacking = 3201;
 const TangentSpaceNormalMap = 0;
 const ObjectSpaceNormalMap = 1;
+
+// Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
+const NoColorSpace = '';
+const SRGBColorSpace = 'srgb';
+const LinearSRGBColorSpace = 'srgb-linear';
 
 const ZeroStencilOp = 0;
 const KeepStencilOp = 7680;
@@ -294,8 +298,8 @@ function generateUUID() {
 			_lut[ d2 & 0x3f | 0x80 ] + _lut[ d2 >> 8 & 0xff ] + '-' + _lut[ d2 >> 16 & 0xff ] + _lut[ d2 >> 24 & 0xff ] +
 			_lut[ d3 & 0xff ] + _lut[ d3 >> 8 & 0xff ] + _lut[ d3 >> 16 & 0xff ] + _lut[ d3 >> 24 & 0xff ];
 
-	// .toUpperCase() here flattens concatenated strings to save heap memory space.
-	return uuid.toUpperCase();
+	// .toLowerCase() here flattens concatenated strings to save heap memory space.
+	return uuid.toLowerCase();
 
 }
 
@@ -1388,6 +1392,79 @@ function createElementNS( name ) {
 
 }
 
+function SRGBToLinear( c ) {
+
+	return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+}
+
+function LinearToSRGB( c ) {
+
+	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+}
+
+// JavaScript RGB-to-RGB transforms, defined as
+// FN[InputColorSpace][OutputColorSpace] callback functions.
+const FN = {
+	[ SRGBColorSpace ]: { [ LinearSRGBColorSpace ]: SRGBToLinear },
+	[ LinearSRGBColorSpace ]: { [ SRGBColorSpace ]: LinearToSRGB },
+};
+
+const ColorManagement = {
+
+	legacyMode: true,
+
+	get workingColorSpace() {
+
+		return LinearSRGBColorSpace;
+
+	},
+
+	set workingColorSpace( colorSpace ) {
+
+		console.warn( 'THREE.ColorManagement: .workingColorSpace is readonly.' );
+
+	},
+
+	convert: function ( color, sourceColorSpace, targetColorSpace ) {
+
+		if ( this.legacyMode || sourceColorSpace === targetColorSpace || ! sourceColorSpace || ! targetColorSpace ) {
+
+			return color;
+
+		}
+
+		if ( FN[ sourceColorSpace ] && FN[ sourceColorSpace ][ targetColorSpace ] !== undefined ) {
+
+			const fn = FN[ sourceColorSpace ][ targetColorSpace ];
+
+			color.r = fn( color.r );
+			color.g = fn( color.g );
+			color.b = fn( color.b );
+
+			return color;
+
+		}
+
+		throw new Error( 'Unsupported color space conversion.' );
+
+	},
+
+	fromWorkingColorSpace: function ( color, targetColorSpace ) {
+
+		return this.convert( color, this.workingColorSpace, targetColorSpace );
+
+	},
+
+	toWorkingColorSpace: function ( color, sourceColorSpace ) {
+
+		return this.convert( color, sourceColorSpace, this.workingColorSpace );
+
+	},
+
+};
+
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
 	'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
@@ -1413,6 +1490,7 @@ const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua'
 	'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
 	'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
 
+const _rgb = { r: 0, g: 0, b: 0 };
 const _hslA = { h: 0, s: 0, l: 0 };
 const _hslB = { h: 0, s: 0, l: 0 };
 
@@ -1427,15 +1505,13 @@ function hue2rgb( p, q, t ) {
 
 }
 
-function SRGBToLinear( c ) {
+function toComponents( source, target ) {
 
-	return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+	target.r = source.r;
+	target.g = source.g;
+	target.b = source.b;
 
-}
-
-function LinearToSRGB( c ) {
-
-	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+	return target;
 
 }
 
@@ -1484,7 +1560,7 @@ class Color {
 
 	}
 
-	setHex( hex ) {
+	setHex( hex, colorSpace = SRGBColorSpace ) {
 
 		hex = Math.floor( hex );
 
@@ -1492,21 +1568,25 @@ class Color {
 		this.g = ( hex >> 8 & 255 ) / 255;
 		this.b = ( hex & 255 ) / 255;
 
+		ColorManagement.toWorkingColorSpace( this, colorSpace );
+
 		return this;
 
 	}
 
-	setRGB( r, g, b ) {
+	setRGB( r, g, b, colorSpace = LinearSRGBColorSpace ) {
 
 		this.r = r;
 		this.g = g;
 		this.b = b;
 
+		ColorManagement.toWorkingColorSpace( this, colorSpace );
+
 		return this;
 
 	}
 
-	setHSL( h, s, l ) {
+	setHSL( h, s, l, colorSpace = LinearSRGBColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 		h = euclideanModulo( h, 1 );
@@ -1528,11 +1608,13 @@ class Color {
 
 		}
 
+		ColorManagement.toWorkingColorSpace( this, colorSpace );
+
 		return this;
 
 	}
 
-	setStyle( style ) {
+	setStyle( style, colorSpace = SRGBColorSpace ) {
 
 		function handleAlpha( string ) {
 
@@ -1569,6 +1651,8 @@ class Color {
 						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
 						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
 
+						ColorManagement.toWorkingColorSpace( this, colorSpace );
+
 						handleAlpha( color[ 4 ] );
 
 						return this;
@@ -1581,6 +1665,8 @@ class Color {
 						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
 						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
 						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+
+						ColorManagement.toWorkingColorSpace( this, colorSpace );
 
 						handleAlpha( color[ 4 ] );
 
@@ -1602,7 +1688,7 @@ class Color {
 
 						handleAlpha( color[ 4 ] );
 
-						return this.setHSL( h, s, l );
+						return this.setHSL( h, s, l, colorSpace );
 
 					}
 
@@ -1624,6 +1710,8 @@ class Color {
 				this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
 				this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
 
+				ColorManagement.toWorkingColorSpace( this, colorSpace );
+
 				return this;
 
 			} else if ( size === 6 ) {
@@ -1633,6 +1721,8 @@ class Color {
 				this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
 				this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
 
+				ColorManagement.toWorkingColorSpace( this, colorSpace );
+
 				return this;
 
 			}
@@ -1641,7 +1731,7 @@ class Color {
 
 		if ( style && style.length > 0 ) {
 
-			return this.setColorName( style );
+			return this.setColorName( style, colorSpace );
 
 		}
 
@@ -1649,7 +1739,7 @@ class Color {
 
 	}
 
-	setColorName( style ) {
+	setColorName( style, colorSpace = SRGBColorSpace ) {
 
 		// color keywords
 		const hex = _colorKeywords[ style.toLowerCase() ];
@@ -1657,7 +1747,7 @@ class Color {
 		if ( hex !== undefined ) {
 
 			// red
-			this.setHex( hex );
+			this.setHex( hex, colorSpace );
 
 		} else {
 
@@ -1722,23 +1812,27 @@ class Color {
 
 	}
 
-	getHex() {
+	getHex( colorSpace = SRGBColorSpace ) {
 
-		return clamp( this.r * 255, 0, 255 ) << 16 ^ clamp( this.g * 255, 0, 255 ) << 8 ^ clamp( this.b * 255, 0, 255 ) << 0;
+		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
 
-	}
-
-	getHexString() {
-
-		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
+		return clamp( _rgb.r * 255, 0, 255 ) << 16 ^ clamp( _rgb.g * 255, 0, 255 ) << 8 ^ clamp( _rgb.b * 255, 0, 255 ) << 0;
 
 	}
 
-	getHSL( target ) {
+	getHexString( colorSpace = SRGBColorSpace ) {
+
+		return ( '000000' + this.getHex( colorSpace ).toString( 16 ) ).slice( - 6 );
+
+	}
+
+	getHSL( target, colorSpace = LinearSRGBColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		const r = this.r, g = this.g, b = this.b;
+		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
+
+		const r = _rgb.r, g = _rgb.g, b = _rgb.b;
 
 		const max = Math.max( r, g, b );
 		const min = Math.min( r, g, b );
@@ -1777,9 +1871,30 @@ class Color {
 
 	}
 
-	getStyle() {
+	getRGB( target, colorSpace = LinearSRGBColorSpace ) {
 
-		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
+
+		target.r = _rgb.r;
+		target.g = _rgb.g;
+		target.b = _rgb.b;
+
+		return target;
+
+	}
+
+	getStyle( colorSpace = SRGBColorSpace ) {
+
+		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
+
+		if ( colorSpace !== SRGBColorSpace ) {
+
+			// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
+			return `color(${ colorSpace } ${ _rgb.r } ${ _rgb.g } ${ _rgb.b })`;
+
+		}
+
+		return `rgb(${( _rgb.r * 255 ) | 0},${( _rgb.g * 255 ) | 0},${( _rgb.b * 255 ) | 0})`;
 
 	}
 
@@ -8674,7 +8789,7 @@ class Material extends EventDispatcher {
 
 			}
 
-			// for backward compatability if shading is set in the constructor
+			// for backward compatibility if shading is set in the constructor
 			if ( key === 'shading' ) {
 
 				console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
@@ -9044,35 +9159,6 @@ Material.fromType = function ( /*type*/ ) {
 	return null;
 
 };
-
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *  map: new THREE.Texture( <Image> ),
- *
- *  lightMap: new THREE.Texture( <Image> ),
- *  lightMapIntensity: <float>
- *
- *  aoMap: new THREE.Texture( <Image> ),
- *  aoMapIntensity: <float>
- *
- *  specularMap: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *  combine: THREE.Multiply,
- *  reflectivity: <float>,
- *  refractionRatio: <float>,
- *
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- * }
- */
 
 class MeshBasicMaterial extends Material {
 
@@ -11411,21 +11497,6 @@ var default_vertex = "void main() {\n\tgl_Position = projectionMatrix * modelVie
 
 var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
 
-/**
- * parameters = {
- *  defines: { "label" : "value" },
- *  uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
- *
- *  fragmentShader: <string>,
- *  vertexShader: <string>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- *
- *  lights: <bool>
- * }
- */
-
 class ShaderMaterial extends Material {
 
 	constructor( parameters ) {
@@ -12939,7 +13010,7 @@ var lights_lambert_vertex = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geome
 
 var lights_pars_begin = "uniform bool receiveShadow;\nuniform vec3 ambientLightColor;\nuniform vec3 lightProbe[ 9 ];\nvec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {\n\tfloat x = normal.x, y = normal.y, z = normal.z;\n\tvec3 result = shCoefficients[ 0 ] * 0.886227;\n\tresult += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;\n\tresult += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;\n\tresult += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;\n\tresult += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;\n\tresult += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;\n\tresult += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );\n\tresult += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;\n\tresult += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );\n\treturn result;\n}\nvec3 getLightProbeIrradiance( const in vec3 lightProbe[ 9 ], const in vec3 normal ) {\n\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\tvec3 irradiance = shGetIrradianceAt( worldNormal, lightProbe );\n\treturn irradiance;\n}\nvec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {\n\tvec3 irradiance = ambientLightColor;\n\treturn irradiance;\n}\nfloat getDistanceAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n\t#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n\t\tfloat distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n\t\tif ( cutoffDistance > 0.0 ) {\n\t\t\tdistanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n\t\t}\n\t\treturn distanceFalloff;\n\t#else\n\t\tif ( cutoffDistance > 0.0 && decayExponent > 0.0 ) {\n\t\t\treturn pow( saturate( - lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\t\t}\n\t\treturn 1.0;\n\t#endif\n}\nfloat getSpotAttenuation( const in float coneCosine, const in float penumbraCosine, const in float angleCosine ) {\n\treturn smoothstep( coneCosine, penumbraCosine, angleCosine );\n}\n#if NUM_DIR_LIGHTS > 0\n\tstruct DirectionalLight {\n\t\tvec3 direction;\n\t\tvec3 color;\n\t};\n\tuniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\n\tvoid getDirectionalLightInfo( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight light ) {\n\t\tlight.color = directionalLight.color;\n\t\tlight.direction = directionalLight.direction;\n\t\tlight.visible = true;\n\t}\n#endif\n#if NUM_POINT_LIGHTS > 0\n\tstruct PointLight {\n\t\tvec3 position;\n\t\tvec3 color;\n\t\tfloat distance;\n\t\tfloat decay;\n\t};\n\tuniform PointLight pointLights[ NUM_POINT_LIGHTS ];\n\tvoid getPointLightInfo( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight light ) {\n\t\tvec3 lVector = pointLight.position - geometry.position;\n\t\tlight.direction = normalize( lVector );\n\t\tfloat lightDistance = length( lVector );\n\t\tlight.color = pointLight.color;\n\t\tlight.color *= getDistanceAttenuation( lightDistance, pointLight.distance, pointLight.decay );\n\t\tlight.visible = ( light.color != vec3( 0.0 ) );\n\t}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n\tstruct SpotLight {\n\t\tvec3 position;\n\t\tvec3 direction;\n\t\tvec3 color;\n\t\tfloat distance;\n\t\tfloat decay;\n\t\tfloat coneCos;\n\t\tfloat penumbraCos;\n\t};\n\tuniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];\n\tvoid getSpotLightInfo( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight light ) {\n\t\tvec3 lVector = spotLight.position - geometry.position;\n\t\tlight.direction = normalize( lVector );\n\t\tfloat angleCos = dot( light.direction, spotLight.direction );\n\t\tfloat spotAttenuation = getSpotAttenuation( spotLight.coneCos, spotLight.penumbraCos, angleCos );\n\t\tif ( spotAttenuation > 0.0 ) {\n\t\t\tfloat lightDistance = length( lVector );\n\t\t\tlight.color = spotLight.color * spotAttenuation;\n\t\t\tlight.color *= getDistanceAttenuation( lightDistance, spotLight.distance, spotLight.decay );\n\t\t\tlight.visible = ( light.color != vec3( 0.0 ) );\n\t\t} else {\n\t\t\tlight.color = vec3( 0.0 );\n\t\t\tlight.visible = false;\n\t\t}\n\t}\n#endif\n#if NUM_RECT_AREA_LIGHTS > 0\n\tstruct RectAreaLight {\n\t\tvec3 color;\n\t\tvec3 position;\n\t\tvec3 halfWidth;\n\t\tvec3 halfHeight;\n\t};\n\tuniform sampler2D ltc_1;\tuniform sampler2D ltc_2;\n\tuniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];\n#endif\n#if NUM_HEMI_LIGHTS > 0\n\tstruct HemisphereLight {\n\t\tvec3 direction;\n\t\tvec3 skyColor;\n\t\tvec3 groundColor;\n\t};\n\tuniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];\n\tvec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in vec3 normal ) {\n\t\tfloat dotNL = dot( normal, hemiLight.direction );\n\t\tfloat hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n\t\tvec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n\t\treturn irradiance;\n\t}\n#endif";
 
-var envmap_physical_pars_fragment = "#if defined( USE_ENVMAP )\n\t#ifdef ENVMAP_MODE_REFRACTION\n\t\tuniform float refractionRatio;\n\t#endif\n\tvec3 getIBLIrradiance( const in vec3 normal ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );\n\t\t\treturn PI * envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n\tvec3 getIBLRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 reflectVec;\n\t\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\t\treflectVec = reflect( - viewDir, normal );\n\t\t\t\treflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );\n\t\t\t#else\n\t\t\t\treflectVec = refract( - viewDir, normal, refractionRatio );\n\t\t\t#endif\n\t\t\treflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );\n\t\t\treturn envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n#endif";
+var envmap_physical_pars_fragment = "#if defined( USE_ENVMAP )\n\tvec3 getIBLIrradiance( const in vec3 normal ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );\n\t\t\treturn PI * envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n\tvec3 getIBLRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {\n\t\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\t\tvec3 reflectVec = reflect( - viewDir, normal );\n\t\t\treflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );\n\t\t\treflectVec = inverseTransformDirection( reflectVec, viewMatrix );\n\t\t\tvec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );\n\t\t\treturn envMapColor.rgb * envMapIntensity;\n\t\t#else\n\t\t\treturn vec3( 0.0 );\n\t\t#endif\n\t}\n#endif";
 
 var lights_toon_fragment = "ToonMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb;";
 
@@ -13297,8 +13368,8 @@ const UniformsLib = {
 		envMap: { value: null },
 		flipEnvMap: { value: - 1 },
 		reflectivity: { value: 1.0 }, // basic, lambert, phong
-		ior: { value: 1.5 }, // standard, physical
-		refractionRatio: { value: 0.98 }
+		ior: { value: 1.5 }, // physical
+		refractionRatio: { value: 0.98 } // basic, lambert, phong
 
 	},
 
@@ -14018,6 +14089,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	const defaultState = createBindingState( null );
 	let currentState = defaultState;
+	let forceUpdate = false;
 
 	function setup( object, material, program, geometry, index ) {
 
@@ -14068,7 +14140,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		}
 
-		if ( updateBuffers ) {
+		if ( updateBuffers || forceUpdate ) {
+
+			forceUpdate = false;
 
 			setupVertexAttributes( object, material, program, geometry );
 
@@ -14565,6 +14639,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	function reset() {
 
 		resetDefaultState();
+		forceUpdate = true;
 
 		if ( currentState === defaultState ) return;
 
@@ -15346,7 +15421,7 @@ class PMREMGenerator {
 
 	_dispose() {
 
-		this._blurMaterial.dispose();
+		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
 
 		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
 
@@ -16727,7 +16802,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 							morph.fromBufferAttribute( morphColor, j );
 
-							if ( morphColor.normalized === true ) denormalize( morph, morphNormal );
+							if ( morphColor.normalized === true ) denormalize( morph, morphColor );
 
 							buffer[ offset + stride + 8 ] = morph.x;
 							buffer[ offset + stride + 9 ] = morph.y;
@@ -18297,7 +18372,6 @@ function generateEnvMapTypeDefine( parameters ) {
 				break;
 
 			case CubeUVReflectionMapping:
-			case CubeUVRefractionMapping:
 				envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
 				break;
 
@@ -18318,7 +18392,6 @@ function generateEnvMapModeDefine( parameters ) {
 		switch ( parameters.envMapMode ) {
 
 			case CubeRefractionMapping:
-			case CubeUVRefractionMapping:
 
 				envMapModeDefine = 'ENVMAP_MODE_REFRACTION';
 				break;
@@ -19075,7 +19148,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
-		const envMapCubeUVHeight = ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ) ? envMap.image.height : null;
+		const envMapCubeUVHeight = ( !! envMap ) && ( envMap.mapping === CubeUVReflectionMapping ) ? envMap.image.height : null;
 
 		const shaderID = shaderIDs[ material.type ];
 
@@ -20488,24 +20561,6 @@ function WebGLRenderStates( extensions, capabilities ) {
 
 }
 
-/**
- * parameters = {
- *
- *  opacity: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>
- * }
- */
-
 class MeshDepthMaterial extends Material {
 
 	constructor( parameters ) {
@@ -20557,24 +20612,6 @@ class MeshDepthMaterial extends Material {
 }
 
 MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
-
-/**
- * parameters = {
- *
- *  referencePosition: <float>,
- *  nearDistance: <float>,
- *  farDistance: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>
- *
- * }
- */
 
 class MeshDistanceMaterial extends Material {
 
@@ -22208,6 +22245,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	const maxTextureSize = capabilities.maxTextureSize;
 	const maxSamples = capabilities.maxSamples;
 	const multisampledRTTExt = extensions.has( 'WEBGL_multisampled_render_to_texture' ) ? extensions.get( 'WEBGL_multisampled_render_to_texture' ) : null;
+	const supportsInvalidateFramebuffer = /OculusBrowser/g.test( navigator.userAgent );
 
 	const _videoTextures = new WeakMap();
 	let _canvas;
@@ -23911,7 +23949,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			}
 
 			_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, 9728 );
-			_gl.invalidateFramebuffer( 36008, invalidationArray );
+
+			if ( supportsInvalidateFramebuffer ) {
+
+				_gl.invalidateFramebuffer( 36008, invalidationArray );
+
+			}
 
 			state.bindFramebuffer( 36008, null );
 			state.bindFramebuffer( 36009, renderTargetProperties.__webglMultisampledFramebuffer );
@@ -26928,7 +26971,7 @@ function WebGLRenderer( parameters = {} ) {
 	const animation = new WebGLAnimation();
 	animation.setAnimationLoop( onAnimationFrame );
 
-	if ( typeof window !== 'undefined' ) animation.setContext( window );
+	if ( typeof self !== 'undefined' ) animation.setContext( self );
 
 	this.setAnimationLoop = function ( callback ) {
 
@@ -28771,16 +28814,6 @@ class InterleavedBufferAttribute {
 
 InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
 
-/**
- * parameters = {
- *  color: <hex>,
- *  map: new THREE.Texture( <Image> ),
- *  alphaMap: new THREE.Texture( <Image> ),
- *  rotation: <float>,
- *  sizeAttenuation: <bool>
- * }
- */
-
 class SpriteMaterial extends Material {
 
 	constructor( parameters ) {
@@ -29805,17 +29838,6 @@ class InstancedMesh extends Mesh {
 
 InstancedMesh.prototype.isInstancedMesh = true;
 
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *
- *  linewidth: <float>,
- *  linecap: "round",
- *  linejoin: "round"
- * }
- */
-
 class LineBasicMaterial extends Material {
 
 	constructor( parameters ) {
@@ -30166,19 +30188,6 @@ class LineLoop extends Line {
 }
 
 LineLoop.prototype.isLineLoop = true;
-
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *  map: new THREE.Texture( <Image> ),
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  size: <float>,
- *  sizeAttenuation: <bool>
- *
- * }
- */
 
 class PointsMaterial extends Material {
 
@@ -36373,12 +36382,6 @@ var Geometries = /*#__PURE__*/Object.freeze({
 	WireframeGeometry: WireframeGeometry
 });
 
-/**
- * parameters = {
- *  color: <THREE.Color>
- * }
- */
-
 class ShadowMaterial extends Material {
 
 	constructor( parameters ) {
@@ -36421,54 +36424,6 @@ class RawShaderMaterial extends ShaderMaterial {
 }
 
 RawShaderMaterial.prototype.isRawShaderMaterial = true;
-
-/**
- * parameters = {
- *  color: <hex>,
- *  roughness: <float>,
- *  metalness: <float>,
- *  opacity: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  lightMap: new THREE.Texture( <Image> ),
- *  lightMapIntensity: <float>
- *
- *  aoMap: new THREE.Texture( <Image> ),
- *  aoMapIntensity: <float>
- *
- *  emissive: <hex>,
- *  emissiveIntensity: <float>
- *  emissiveMap: new THREE.Texture( <Image> ),
- *
- *  bumpMap: new THREE.Texture( <Image> ),
- *  bumpScale: <float>,
- *
- *  normalMap: new THREE.Texture( <Image> ),
- *  normalMapType: THREE.TangentSpaceNormalMap,
- *  normalScale: <Vector2>,
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  roughnessMap: new THREE.Texture( <Image> ),
- *
- *  metalnessMap: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *  envMapIntensity: <float>
- *
- *  refractionRatio: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- *
- *  flatShading: <bool>
- * }
- */
 
 class MeshStandardMaterial extends Material {
 
@@ -36515,8 +36470,6 @@ class MeshStandardMaterial extends Material {
 
 		this.envMap = null;
 		this.envMapIntensity = 1.0;
-
-		this.refractionRatio = 0.98;
 
 		this.wireframe = false;
 		this.wireframeLinewidth = 1;
@@ -36571,8 +36524,6 @@ class MeshStandardMaterial extends Material {
 		this.envMap = source.envMap;
 		this.envMapIntensity = source.envMapIntensity;
 
-		this.refractionRatio = source.refractionRatio;
-
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
 		this.wireframeLinecap = source.wireframeLinecap;
@@ -36587,39 +36538,6 @@ class MeshStandardMaterial extends Material {
 }
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
-
-/**
- * parameters = {
- *  clearcoat: <float>,
- *  clearcoatMap: new THREE.Texture( <Image> ),
- *  clearcoatRoughness: <float>,
- *  clearcoatRoughnessMap: new THREE.Texture( <Image> ),
- *  clearcoatNormalScale: <Vector2>,
- *  clearcoatNormalMap: new THREE.Texture( <Image> ),
- *
- *  ior: <float>,
- *  reflectivity: <float>,
- *
- *  sheen: <float>,
- *  sheenColor: <Color>,
- *  sheenColorMap: new THREE.Texture( <Image> ),
- *  sheenRoughness: <float>,
- *  sheenRoughnessMap: new THREE.Texture( <Image> ),
- *
- *  transmission: <float>,
- *  transmissionMap: new THREE.Texture( <Image> ),
- *
- *  thickness: <float>,
- *  thicknessMap: new THREE.Texture( <Image> ),
- *  attenuationDistance: <float>,
- *  attenuationColor: <Color>,
- *
- *  specularIntensity: <float>,
- *  specularIntensityMap: new THREE.Texture( <Image> ),
- *  specularColor: <Color>,
- *  specularColorMap: new THREE.Texture( <Image> )
- * }
- */
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
@@ -36783,52 +36701,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
-/**
- * parameters = {
- *  color: <hex>,
- *  specular: <hex>,
- *  shininess: <float>,
- *  opacity: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  lightMap: new THREE.Texture( <Image> ),
- *  lightMapIntensity: <float>
- *
- *  aoMap: new THREE.Texture( <Image> ),
- *  aoMapIntensity: <float>
- *
- *  emissive: <hex>,
- *  emissiveIntensity: <float>
- *  emissiveMap: new THREE.Texture( <Image> ),
- *
- *  bumpMap: new THREE.Texture( <Image> ),
- *  bumpScale: <float>,
- *
- *  normalMap: new THREE.Texture( <Image> ),
- *  normalMapType: THREE.TangentSpaceNormalMap,
- *  normalScale: <Vector2>,
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  specularMap: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *  combine: THREE.MultiplyOperation,
- *  reflectivity: <float>,
- *  refractionRatio: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- *
- *  flatShading: <bool>
- * }
- */
-
 class MeshPhongMaterial extends Material {
 
 	constructor( parameters ) {
@@ -36939,42 +36811,6 @@ class MeshPhongMaterial extends Material {
 
 MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
-/**
- * parameters = {
- *  color: <hex>,
- *
- *  map: new THREE.Texture( <Image> ),
- *  gradientMap: new THREE.Texture( <Image> ),
- *
- *  lightMap: new THREE.Texture( <Image> ),
- *  lightMapIntensity: <float>
- *
- *  aoMap: new THREE.Texture( <Image> ),
- *  aoMapIntensity: <float>
- *
- *  emissive: <hex>,
- *  emissiveIntensity: <float>
- *  emissiveMap: new THREE.Texture( <Image> ),
- *
- *  bumpMap: new THREE.Texture( <Image> ),
- *  bumpScale: <float>,
- *
- *  normalMap: new THREE.Texture( <Image> ),
- *  normalMapType: THREE.TangentSpaceNormalMap,
- *  normalScale: <Vector2>,
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- *
- * }
- */
-
 class MeshToonMaterial extends Material {
 
 	constructor( parameters ) {
@@ -37067,28 +36903,6 @@ class MeshToonMaterial extends Material {
 
 MeshToonMaterial.prototype.isMeshToonMaterial = true;
 
-/**
- * parameters = {
- *  opacity: <float>,
- *
- *  bumpMap: new THREE.Texture( <Image> ),
- *  bumpScale: <float>,
- *
- *  normalMap: new THREE.Texture( <Image> ),
- *  normalMapType: THREE.TangentSpaceNormalMap,
- *  normalScale: <Vector2>,
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>
- *
- *  flatShading: <bool>
- * }
- */
-
 class MeshNormalMaterial extends Material {
 
 	constructor( parameters ) {
@@ -37146,38 +36960,6 @@ class MeshNormalMaterial extends Material {
 }
 
 MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
-
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  lightMap: new THREE.Texture( <Image> ),
- *  lightMapIntensity: <float>
- *
- *  aoMap: new THREE.Texture( <Image> ),
- *  aoMapIntensity: <float>
- *
- *  emissive: <hex>,
- *  emissiveIntensity: <float>
- *  emissiveMap: new THREE.Texture( <Image> ),
- *
- *  specularMap: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
- *  combine: THREE.Multiply,
- *  reflectivity: <float>,
- *  refractionRatio: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- *
- * }
- */
 
 class MeshLambertMaterial extends Material {
 
@@ -37259,32 +37041,6 @@ class MeshLambertMaterial extends Material {
 
 MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *
- *  matcap: new THREE.Texture( <Image> ),
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  bumpMap: new THREE.Texture( <Image> ),
- *  bumpScale: <float>,
- *
- *  normalMap: new THREE.Texture( <Image> ),
- *  normalMapType: THREE.TangentSpaceNormalMap,
- *  normalScale: <Vector2>,
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  flatShading: <bool>
- * }
- */
-
 class MeshMatcapMaterial extends Material {
 
 	constructor( parameters ) {
@@ -37355,19 +37111,6 @@ class MeshMatcapMaterial extends Material {
 }
 
 MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
-
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *
- *  linewidth: <float>,
- *
- *  scale: <float>,
- *  dashSize: <float>,
- *  gapSize: <float>
- * }
- */
 
 class LineDashedMaterial extends LineBasicMaterial {
 
@@ -42750,8 +42493,7 @@ const TEXTURE_MAPPING = {
 	CubeRefractionMapping: CubeRefractionMapping,
 	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	CubeUVReflectionMapping: CubeUVReflectionMapping,
-	CubeUVRefractionMapping: CubeUVRefractionMapping
+	CubeUVReflectionMapping: CubeUVReflectionMapping
 };
 
 const TEXTURE_WRAPPING = {
@@ -43684,6 +43426,14 @@ class PositionalAudio extends Audio {
 		this.panner = this.context.createPanner();
 		this.panner.panningModel = 'HRTF';
 		this.panner.connect( this.gain );
+
+	}
+
+	disconnect() {
+
+		super.disconnect();
+
+		this.panner.disconnect( this.gain );
 
 	}
 
@@ -50966,4 +50716,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CapsuleGeometry as CapsuleBufferGeometry, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, FaceColors, FileLoader, FlatShading, Float16BufferAttribute, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Source, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CapsuleGeometry as CapsuleBufferGeometry, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, FaceColors, FileLoader, FlatShading, Float16BufferAttribute, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, SRGBColorSpace, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Source, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };

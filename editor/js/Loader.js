@@ -668,6 +668,7 @@ function Loader( editor ) {
 			}
 
 			case 'vtk':
+			case 'vtp':
 
 			{
 

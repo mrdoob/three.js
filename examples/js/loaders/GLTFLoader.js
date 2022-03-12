@@ -518,7 +518,7 @@
 
 				if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture ) );
+					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, THREE.sRGBEncoding ) );
 
 				}
 
@@ -666,7 +666,7 @@
 
 			if ( extension.sheenColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture ) );
+				pending.push( parser.assignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -886,11 +886,7 @@
 
 			if ( extension.specularColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'specularColorMap', extension.specularColorTexture ).then( function ( texture ) {
-
-					texture.encoding = THREE.sRGBEncoding;
-
-				} ) );
+				pending.push( parser.assignTexture( materialParams, 'specularColorMap', extension.specularColorTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -1488,7 +1484,7 @@
 
 			if ( pbrSpecularGlossiness.diffuseTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'map', pbrSpecularGlossiness.diffuseTexture ) );
+				pending.push( parser.assignTexture( materialParams, 'map', pbrSpecularGlossiness.diffuseTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -1506,7 +1502,7 @@
 
 				const specGlossMapDef = pbrSpecularGlossiness.specularGlossinessTexture;
 				pending.push( parser.assignTexture( materialParams, 'glossinessMap', specGlossMapDef ) );
-				pending.push( parser.assignTexture( materialParams, 'specularMap', specGlossMapDef ) );
+				pending.push( parser.assignTexture( materialParams, 'specularMap', specGlossMapDef, THREE.sRGBEncoding ) );
 
 			}
 
@@ -2623,15 +2619,7 @@
 
 			if ( this.sourceCache[ sourceIndex ] !== undefined ) {
 
-				return this.sourceCache[ sourceIndex ].then( function ( texture ) {
-
-					return texture.clone();
-
-				} ).catch( function ( error ) {
-
-					throw error;
-
-				} );
+				return this.sourceCache[ sourceIndex ].then( texture => texture.clone() );
 
 			}
 
@@ -2713,7 +2701,7 @@
    */
 
 
-		assignTexture( materialParams, mapName, mapDef ) {
+		assignTexture( materialParams, mapName, mapDef, encoding ) {
 
 			const parser = this;
 			return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
@@ -2737,6 +2725,12 @@
 						parser.associations.set( texture, gltfReference );
 
 					}
+
+				}
+
+				if ( encoding !== undefined ) {
+
+					texture.encoding = encoding;
 
 				}
 
@@ -2898,7 +2892,7 @@
 
 				if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture ) );
+					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, THREE.sRGBEncoding ) );
 
 				}
 
@@ -2985,7 +2979,7 @@
 
 			if ( materialDef.emissiveTexture !== undefined && materialType !== THREE.MeshBasicMaterial ) {
 
-				pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture ) );
+				pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -3003,10 +2997,7 @@
 
 				}
 
-				if ( materialDef.name ) material.name = materialDef.name; // baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
-
-				if ( material.map ) material.map.encoding = THREE.sRGBEncoding;
-				if ( material.emissiveMap ) material.emissiveMap.encoding = THREE.sRGBEncoding;
+				if ( materialDef.name ) material.name = materialDef.name;
 				assignExtrasToUserData( material, materialDef );
 				parser.associations.set( material, {
 					materials: materialIndex

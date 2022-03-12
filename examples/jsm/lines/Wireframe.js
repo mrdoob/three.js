@@ -20,7 +20,7 @@ class Wireframe extends Mesh {
 
 	}
 
-	// for backwards-compatability, but could be a method of LineSegmentsGeometry...
+	// for backwards-compatibility, but could be a method of LineSegmentsGeometry...
 
 	computeLineDistances() {
 
