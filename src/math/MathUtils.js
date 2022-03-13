@@ -251,11 +251,11 @@ function denormalize( value, array ) {
 
 		case Int16Array:
 
-			return Math.max( value / 32767.0, -1.0 );
+			return Math.max( value / 32767.0, - 1.0 );
 
 		case Int8Array:
 
-			return Math.max( value / 127.0, -1.0 );
+			return Math.max( value / 127.0, - 1.0 );
 
 		default:
 
