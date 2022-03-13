@@ -26,9 +26,6 @@ import SplitNode from './utils/SplitNode.js';
 // utils
 import { getValueFromType } from './core/NodeUtils.js';
 
-// core
-import { Vector2, Vector3, Vector4, Matrix3, Matrix4, Color } from 'three';
-
 const NodeHandler = {
 
 	construct( NodeClosure, params ) {
