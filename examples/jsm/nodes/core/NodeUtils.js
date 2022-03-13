@@ -93,3 +93,205 @@ export const getValueFromType = ( type ) => {
 	return null;
 
 };
+
+export class ArrayMap {
+
+	constructor( iterable ) {
+
+		this.map = new Map();
+
+		if ( iterable ) {
+
+			for ( let el of iterable ) {
+
+				this.set( el.slice( 0, -1 ), el[ el.length - 1 ] );
+
+			}
+
+		}
+
+	}
+
+	get size() {
+
+		let total = 0;
+
+		for ( let el of this.map.entries() ) {
+
+			total += ( el.size !== undefined ) ? el.size : 1;
+
+		}
+
+	}
+
+	clear() {
+
+		this.map.clear();
+
+	}
+
+	delete( key ) {
+
+		if ( key.length === 1 ) {
+
+			return this.map.delete( key[ 0 ] );
+
+		}
+
+		return this.map.has( key[ 0 ] ) ? this.map.get( key[ 0 ] ).delete( key.slice( 1 ) ) : false;
+
+	}
+
+	get( key ) {
+
+		if ( key.length === 1 ) {
+
+			return this.map.get( key[ 0 ] );
+
+		}
+
+		return this.map.get( key[ 0 ] ).get( key.slice( 1 ) );
+
+	}
+
+	has( key ) {
+
+		if ( key.length === 1 ) {
+
+			return this.map.has( key[ 0 ] );
+
+		}
+
+		return this.map.has( key[ 0 ] ) && this.map.get( key[ 0 ] ).has( key.slice( 1 ) );
+
+	}
+
+	set( key, value ) {
+
+		if ( key.length === 1 ) {
+
+			return this.map.set( key[ 0 ], value );
+
+		}
+
+		if ( ! this.map.has( key[ 0 ] ) ) {
+
+			this.map.set( key[ 0 ], new ArrayMap() );
+
+		}
+
+		this.map.get( key[ 0 ] ).set( key.slice( 1 ), value );
+
+		return this;
+
+	}
+
+	[ Symbol.iterator ]() {
+
+		return this.entries();
+
+	}
+
+	* keys() {
+
+		for ( let [ key, value ] of this.map ) {
+
+			if ( value.keys === undefined ) {
+
+				yield [ key ];
+
+			}
+
+			for ( let key2 of value.keys() ) {
+
+				key2.unshift( key );
+
+				yield key2;
+
+			}
+
+		}
+
+	}
+
+	* values() {
+
+		for ( let value of this.map.values() ) {
+
+			if ( value.values === undefined ) {
+
+				yield value;
+
+			}
+
+			for ( let value2 of value.values() ) {
+
+				yield value2;
+
+			}
+
+		}
+
+	}
+
+	* entries() {
+
+		for ( let [ key, value ] of this.map ) {
+
+			if ( value.entries === undefined ) {
+
+				yield [ [ key ], value ];
+
+			}
+
+			for ( let [ key2, value2 ] of value.entries() ) {
+
+				key2.unshift( key );
+
+				yield [ key2, value ];
+
+			}
+
+		}
+
+	}
+
+	forEach( callbackFn, thisArg ) {
+
+		for ( let [ key, value ] of this ) {
+
+			callbackFn.call( thisArg, value, key, this );
+
+		}
+
+	}
+
+}
+
+export const flatArray = obj => {
+
+	let arr = [];
+
+	for ( let el of obj ) {
+
+		if ( Array.isArray( el ) ) {
+
+			arr = arr.concat( flatArray( el ) );
+
+		} else if ( typeof el === 'object' ) {
+
+			// We should not flat number and strings, but should flat vectors, matrices, and colors
+
+			arr = arr.concat( flatArray( el.toArray() ) );
+
+		} else {
+
+			arr.push( el );
+
+		}
+
+	}
+
+	return arr;
+
+};
