@@ -35,7 +35,7 @@
 
 		figure.float {
 			float: right;
-			max-width: 25%;
+			max-width: 30%;
 			margin: 1em;
 		}
 
@@ -66,24 +66,23 @@
 	<figure class="float">
 		<img src="resources/srgb_gamut.png" alt="">
 		<figcaption>
-			<b>FIGURE:</b> A 2D projection of the sRGB color gamut within the visible spectrum.
-			Source: <a href="https://en.wikipedia.org/wiki/SRGB" target="_blank" rel="noopener">Wikipedia</a>
+			sRGB colors and white point (D65) displayed in the reference CIE 1931 chromaticity
+			diagram. Colored region represents a 2D projection of the sRGB gamut, which is a 3D
+			volume. Source: <a href="https://en.wikipedia.org/wiki/SRGB" target="_blank" rel="noopener">Wikipedia</a>
 		</figcaption>
-		<!-- TODO: "Gamut" is not the right word in this case. -->
 	</figure>
 
 	<ul>
 		<li>
 			<b>Color primaries:</b> Primary colors (e.g. red, green, blue) are not absolutes; they are
-			selected from the visible spectrum based on constraints of limited precision, and often
-			optimized for prevailing display devices. Colors are expressed as a weighted sum of
-			the primary colors.
+			selected from the visible spectrum based on constraints of limited precision and
+			capabilities of available display devices. Colors are expressed as a ratio of the primary colors.
 		</li>
 		<li>
 			<b>White point:</b> Most color spaces are engineed such that an equally weighted sum of
 			primaries <i>R = G = B</i> will appear to be without color, or "achromatic". The appearance
 			of achromatic values (like white or grey) depend on human perception, which in turn depends
-			heavily on the context of the observer. A color space chooses its "white point" to balance
+			heavily on the context of the observer. A color space specifies its "white point" to balance
 			these needs. The white point defined by the sRGB color space is
 			<a href="https://en.wikipedia.org/wiki/Illuminant_D65" target="_blank">D65</a>.
 		</li>
@@ -99,8 +98,8 @@
 		</li>
 	</ul>
 
-	Each color space is triplet — color primaries, white point, and transfer functions — with each
-	parameter chosen for particular goals. Having defined these parameters, a few additional terms
+	These three parameters — color primaries, white point, and transfer functions — define a color
+	space, with each chosen for particular goals. Having defined the parameters, a few additional terms
 	are helpful:
 
 	<ul>
@@ -109,14 +108,13 @@
 			a coordinate system for colors. In three.js we're mainly concerned with the RGB color
 			model, having three coordinates <i>r, g, b ∈ [0,1]</i> ("closed domain") or
 			<i>r, g, b ∈ [0,∞]</i> ("open domain") each representing a fraction of a primary
-			color. Other color models (HSL, Lab, LCH) are commonly used for artistic control, and
-			may be used to initialize [page:Color] objects.
+			color. Other color models (HSL, Lab, LCH) are commonly used for artistic control.
 		</li>
 		<li>
 			<b>Color gamut:</b> Once color primaries and a white point have been chosen, these represent
 			a volume within the visible spectrum (a "gamut"). Colors not within this volume ("out of gamut")
-			cannot be expressed by any RGB values in the closed domain, [0,1]. In the open domain,
-			[0,∞], the gamut is technically infinite.
+			cannot be expressed by closed domain [0,1] RGB values. In the open domain [0,∞], the gamut is
+			technically infinite.
 		</li>
 	</ul>
 
@@ -150,7 +148,7 @@
 	<p>
 		Linear workflows — required for modern rendering methods — generally involve more than
 		one color space, each assigned to a particular role. Linear and nonlinear color spaces are
-		appropriate for different roles, as explained below.
+		appropriate for different roles, explained below.
 	</p>
 
 	<h3>Input Color Space</h3>
@@ -158,7 +156,7 @@
 	<p>
 		Colors supplied to three.js — from color pickers, textures, 3D models, and other sources —
 		each have an associated color space. Those not already in the Linear-sRGB working color
-		space must be converted, and textures be given the correct <i>.encoding</i> assignment.
+		space must be converted, and textures be given the correct <i>texture.encoding</i> assignment.
 		Certain conversions (for hexadecimal and CSS colors in sRGB) can be made automatically if
 		the legacy color management mode is disabled before initializing colors:
 	</p>
@@ -178,10 +176,10 @@ THREE.ColorManagement.legacyMode = false;
 		</li>
 		<li>
 			<b>Color textures:</b> PNG or JPEG [page:Texture Textures] containing color information
-			(like .map or .emissive) use the closed domain sRGB color space, and must be annotated with
-			<i>texture.encoding = sRGBEncoding</i> to be handled correctly. Formats like EXR
-			(common for environment maps and light maps) use the open domain Linear-sRGB
-			color space instead, indicated with <i>texture.encoding = LinearEncoding</i>.
+			(like .map or .emissiveMap) use the closed domain sRGB color space, and must be annotated with
+			<i>texture.encoding = sRGBEncoding</i>. Formats like OpenEXR (sometimes used for .envMap or
+			.lightMap) use the Linear-sRGB color space indicated with <i>texture.encoding = LinearEncoding</i>,
+			and may contain values in the open domain [0,∞].
 		</li>
 		<li>
 			<b>Non-color textures:</b> Textures that do not store color information (like .normalMap
@@ -193,9 +191,9 @@ THREE.ColorManagement.legacyMode = false;
 
 	<blockquote>
 		<p>
-			⚠️ <i><b>WARNING:</b> [page:Scene.fog] and [page:Scene.background] are exceptions to
-			the rule. Both are unaffected by [page:WebGLRenderer.outputEncoding] and so must
-			store RGB components in the renderer's <u>output</u> color space.</i>
+			⚠️ <i><b>WARNING:</b> [page:Scene.fog], [page:Scene.background], and [page:WebGLRenderer.setClearColor]
+			are exceptions to the rule. These properties are unaffected by [page:WebGLRenderer.outputEncoding]
+			and so must store RGB components in the renderer's <u>output</u> color space.</i>
 		</p>
 	</blockquote>
 
@@ -211,9 +209,9 @@ THREE.ColorManagement.legacyMode = false;
 	<h3>Working Color Space</h3>
 
 	<p>
-		Rendering (and most other operations) must be done using an open domain linear working
-		color space, in which RGB components are proportional to physical illumination. In
-		three.js, the working color space is Linear-sRGB.
+		Rendering, interpolation, and many other operations must be performed in an open domain
+		linear working color space, in which RGB components are proportional to physical
+		illumination. In three.js, the working color space is Linear-sRGB.
 	</p>
 
 	<h3>Output Color Space</h3>
@@ -238,46 +236,49 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 			the format and usage. Fully-rendered images written to PNG or JPEG textures generally
 			use the sRGB color space. Images containing emission, light maps, or other data not
 			confined to the [0,1] range will generally use the open domain Linear-sRGB color space,
-			and a compatible image format like EXR.
+			and a compatible image format like OpenEXR.
 		</li>
 	</ul>
 
 	<blockquote>
 		<p>
 			⚠️ <i><b>WARNING:</b> Render targets may use either sRGB or Linear-sRGB. sRGB makes
-			better use of limited precision — 8 bits suffice for LDR output to sRGB, whereas ≥12 bits
-			(half float textures) are often required for LDR output to Linear-sRGB. However, the
-			next pipeline stage using the render target may require input in the working color
-			space, Linear-sRGB, incurring modest overhead to perform an additional sRGB → Linear-sRGB
-			conversion.</i>
+			better use of limited precision. In the closed domain, 8 bits often suffice for sRGB
+			whereas ≥12 bits (half float) may be required for Linear-sRGB. If later pipeline
+			stages require Linear-sRGB input, the additional conversions may have a small
+			performance cost.</i>
 		</p>
 	</blockquote>
 
 	<h2>Working with THREE.Color Instances</h2>
 
 	<p>
-		Methods reading or modifying [page:Color] instances assume the color data is already in the
-		three.js working color space, Linear-sRGB, as required for most rendering work. RGB and HSL
-		components are direct representations of data stored by the Color instance, and are never
-		converted implicitly. Color data may be explicitly converted with <i>.convertLinearToSRGB()</i>
+		Methods reading or modifying [page:Color] instances assume data is already in the
+		three.js working color space, Linear-sRGB. RGB and HSL components are direct
+		representations of data stored by the Color instance, and are never converted
+		implicitly. Color data may be explicitly converted with <i>.convertLinearToSRGB()</i>
 		or <i>.convertSRGBToLinear()</i>.
 	</p>
 
-	<p>
-		Because hexadecimal and CSS colors are generally sRGB, not Linear-sRGB, [page:Color] methods
-		will automatically convert these inputs from sRGB to Linear-sRGB, or convert from Linear-sRGB
-		to sRGB when returning hexadecimal or CSS output. For these conversions to occur,
-		<i>ColorManagement.legacyMode</i> must be disabled.
-	</p>
-
 	<code>
-		// RGB components use the Linear-sRGB working color space.
+		// RGB components (no change).
 		color.r = color.g = color.b = 0.5;
 		console.log( color.r ); // → 0.5
 
-		// Assignment of hexadecimal or CSS values will convert from sRGB to Linear-sRGB.
-		// Reading from a getter will reverse the conversion.
+		// Manual conversion.
+		color.r = 0.5;
+		color.convertSRGBToLinear();
+		console.log( color.r ); // → 0.214041140
+	</code>
 
+	<p>
+		With <i>ColorManagement.legacyMode = false</i> set (recommended), certain conversions
+		are made automatically. Because hexadecimal and CSS colors are generally sRGB, [page:Color]
+		methods will automatically convert these inputs from sRGB to Linear-sRGB in setters, or
+		convert from Linear-sRGB to sRGB when returning hexadecimal or CSS output from getters.
+	</p>
+
+	<code>
 		// Hexadecimal conversion.
 		color.setHex( 0x808080 );
 		console.log( color.r ); // → 0.214041140
@@ -287,8 +288,8 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		color.setStyle( 'rgb( 0.5, 0.5, 0.5 )' );
 		console.log( color.r ); // → 0.214041140
 
-		// Conversion in getters and setters may be overridden with a 'colorSpace' argument.
-		color.setHex( 0x808080, LinearSRGBColorSpace ); // Linear-sRGB hex color.
+		// Override conversion with 'colorSpace' argument.
+		color.setHex( 0x808080, LinearSRGBColorSpace );
 		console.log( color.r ); // → 0.5
 		console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
 		console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
@@ -308,8 +309,8 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		A more subtle issue appears when <i>both</i> the input color spaces and the output color
 		spaces are incorrect — the overall brightness levels may be fine, but colors may change
 		unexpectedly under different lighting, or shading may appear more blown-out and less soft
-		than intended. In other words, two wrongs do not make a right, and it's important that the
-		working color space be linear ("scene referred") and the display color space be nonlinear
+		than intended. These two wrongs do not make a right, and it's important that the working
+		color space be linear ("scene referred") and the output color space be nonlinear
 		("display referred").
 	</p>
 
@@ -317,16 +318,16 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 
 	<ul>
 		<li>
-			<a href="https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-24-importance-being-linear" target="_blank" rel="noopener">GPU Gems 3: The Importance of Being Linear</a>
+			<a href="https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-24-importance-being-linear" target="_blank" rel="noopener">GPU Gems 3: The Importance of Being Linear</a>, by Larry Gritz and Eugene d'Eon
 		</li>
 		<li>
-			<a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/" target="_blank" rel="noopener">What every coder should know about gamma</a>
+			<a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/" target="_blank" rel="noopener">What every coder should know about gamma</a>, by John Novak
 		</li>
 		<li>
-			<a href="https://hg2dc.com/" target="_blank" rel="noopener">The Hitchhiker's Guide to Digital Color</a>
+			<a href="https://hg2dc.com/" target="_blank" rel="noopener">The Hitchhiker's Guide to Digital Color</a>, by Troy Sobotka
 		</li>
 		<li>
-			<a href="https://docs.blender.org/manual/en/latest/render/color_management.html" target="_blank" rel="noopener">Blender: Color Management</a>
+			<a href="https://docs.blender.org/manual/en/latest/render/color_management.html" target="_blank" rel="noopener">Color Management</a>, Blender
 		</li>
 	</ul>
 
