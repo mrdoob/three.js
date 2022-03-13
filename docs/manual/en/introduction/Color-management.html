@@ -53,7 +53,7 @@
 <body>
 	<h1>[name]</h1>
 
-	<h2>What is a Color Space?</h2>
+	<h2>What is a color space?</h2>
 
 	<p>
 		Every color space is a collection of several design decisions, chosen together to support a
@@ -143,7 +143,7 @@
 		</p>
 	</blockquote>
 
-	<h2>Roles of Color Spaces</h2>
+	<h2>Roles of color spaces</h2>
 
 	<p>
 		Linear workflows — required for modern rendering methods — generally involve more than
@@ -151,7 +151,7 @@
 		appropriate for different roles, explained below.
 	</p>
 
-	<h3>Input Color Space</h3>
+	<h3>Input color space</h3>
 
 	<p>
 		Colors supplied to three.js — from color pickers, textures, 3D models, and other sources —
@@ -206,7 +206,7 @@ THREE.ColorManagement.legacyMode = false;
 		</p>
 	</blockquote>
 
-	<h3>Working Color Space</h3>
+	<h3>Working color space</h3>
 
 	<p>
 		Rendering, interpolation, and many other operations must be performed in an open domain
@@ -214,7 +214,7 @@ THREE.ColorManagement.legacyMode = false;
 		illumination. In three.js, the working color space is Linear-sRGB.
 	</p>
 
-	<h3>Output Color Space</h3>
+	<h3>Output color space</h3>
 
 	<p>
 		Output to a display device, image, or video may involve conversion from the open domain
@@ -250,7 +250,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		</p>
 	</blockquote>
 
-	<h2>Working with THREE.Color Instances</h2>
+	<h2>Working with THREE.Color instances</h2>
 
 	<p>
 		Methods reading or modifying [page:Color] instances assume data is already in the
@@ -295,7 +295,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
 	</code>
 
-	<h2>Common Mistakes</h2>
+	<h2>Common mistakes</h2>
 
 	<p>
 		When an individual color or texture is misconfigured, it will appear darker or lighter than
@@ -314,7 +314,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		("display referred").
 	</p>
 
-	<h2>Further Reading</h2>
+	<h2>Further reading</h2>
 
 	<ul>
 		<li>
