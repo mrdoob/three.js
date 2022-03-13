@@ -13,7 +13,7 @@
 			super( geometry, material );
 			this.type = 'Wireframe';
 
-		} // for backwards-compatability, but could be a method of THREE.LineSegmentsGeometry...
+		} // for backwards-compatibility, but could be a method of THREE.LineSegmentsGeometry...
 
 
 		computeLineDistances() {
