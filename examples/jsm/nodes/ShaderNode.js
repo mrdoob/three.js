@@ -23,6 +23,9 @@ import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
+// utils
+import { getValueFromType } from './core/NodeUtils.js';
+
 // core
 import { Vector2, Vector3, Vector4, Matrix3, Matrix4, Color } from 'three';
 
@@ -236,7 +239,7 @@ const flatArray = obj => {
 
 };
 
-const ConvertType = function ( type, valueClass = null ) {
+const ConvertType = function ( type ) {
 
 	return ( ...params ) => {
 
@@ -246,15 +249,11 @@ const ConvertType = function ( type, valueClass = null ) {
 
 		}
 
-		let val = params[ 0 ];
+		const classValue = getValueFromType( type );
 
-		if ( ( valueClass !== null ) && ! ( val instanceof valueClass ) ) {
+		const value = ( classValue !== null ) ? classValue.set( ...flatArray( params ) ) : params[ 0 ];
 
-			val = new valueClass().set( ...flatArray( params ) );
-
-		}
-
-		return nodeObject( new ConstNode( val, type ) );
+		return nodeObject( new ConstNode( value, type ) );
 
 	};
 
@@ -264,32 +263,32 @@ export const float = new ConvertType( 'float' );
 export const int = new ConvertType( 'int' );
 export const uint = new ConvertType( 'uint' );
 export const bool = new ConvertType( 'bool' );
-export const color = new ConvertType( 'color', Color );
+export const color = new ConvertType( 'color' );
 
-export const vec2 = new ConvertType( 'vec2', Vector2 );
-export const ivec2 = new ConvertType( 'ivec2', Vector2 );
-export const uvec2 = new ConvertType( 'uvec2', Vector2 );
-export const bvec2 = new ConvertType( 'bvec2', Vector2 );
+export const vec2 = new ConvertType( 'vec2' );
+export const ivec2 = new ConvertType( 'ivec2' );
+export const uvec2 = new ConvertType( 'uvec2' );
+export const bvec2 = new ConvertType( 'bvec2' );
 
-export const vec3 = new ConvertType( 'vec3', Vector3 );
-export const ivec3 = new ConvertType( 'ivec3', Vector3 );
-export const uvec3 = new ConvertType( 'uvec3', Vector3 );
-export const bvec3 = new ConvertType( 'bvec3', Vector3 );
+export const vec3 = new ConvertType( 'vec3' );
+export const ivec3 = new ConvertType( 'ivec3' );
+export const uvec3 = new ConvertType( 'uvec3' );
+export const bvec3 = new ConvertType( 'bvec3' );
 
-export const vec4 = new ConvertType( 'vec4', Vector4 );
-export const ivec4 = new ConvertType( 'ivec4', Vector4 );
-export const uvec4 = new ConvertType( 'uvec4', Vector4 );
-export const bvec4 = new ConvertType( 'bvec4', Vector4 );
+export const vec4 = new ConvertType( 'vec4' );
+export const ivec4 = new ConvertType( 'ivec4' );
+export const uvec4 = new ConvertType( 'uvec4' );
+export const bvec4 = new ConvertType( 'bvec4' );
 
-export const mat3 = new ConvertType( 'mat3', Matrix3 );
-export const imat3 = new ConvertType( 'imat3', Matrix3 );
-export const umat3 = new ConvertType( 'umat3', Matrix3 );
-export const bmat3 = new ConvertType( 'bmat3', Matrix3 );
+export const mat3 = new ConvertType( 'mat3' );
+export const imat3 = new ConvertType( 'imat3' );
+export const umat3 = new ConvertType( 'umat3' );
+export const bmat3 = new ConvertType( 'bmat3' );
 
-export const mat4 = new ConvertType( 'mat4', Matrix4 );
-export const imat4 = new ConvertType( 'imat4', Matrix4 );
-export const umat4 = new ConvertType( 'umat4', Matrix4 );
-export const bmat4 = new ConvertType( 'bmat4', Matrix4 );
+export const mat4 = new ConvertType( 'mat4' );
+export const imat4 = new ConvertType( 'imat4' );
+export const umat4 = new ConvertType( 'umat4' );
+export const bmat4 = new ConvertType( 'bmat4' );
 
 export const join = ( ...params ) => {
 
