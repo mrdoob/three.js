@@ -35,12 +35,6 @@ class Vector4 {
 
 	set( x, y, z, w ) {
 
-		if ( y === undefined ) {
-
-			y = z = w = x;
-
-		}
-
 		this.x = x;
 		this.y = y;
 		this.z = z;

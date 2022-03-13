@@ -20,13 +20,6 @@ class Matrix3 {
 
 	set( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
-		if ( n12 === undefined ) {
-
-			n22 = n33 = n11;
-			n12 = n13 = n21 = n23 = n31 = n32 = 0;
-
-		}
-
 		const te = this.elements;
 
 		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;

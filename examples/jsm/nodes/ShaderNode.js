@@ -208,15 +208,21 @@ export const label = ( node, name ) => {
 
 export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
-const ConvertType = function ( type ) {
+const ConvertType = function ( type, valueComponents = 1 ) {
 
 	const map = new ArrayMap();
 
 	return ( ...params ) => {
 
 		if ( map.has( params ) ) {
+			
+			const value = map.get( params );
 
-			return map.get( params );
+			if ( value.isNode === true ) { // otherwise it can be another ArrayMap
+
+				return value;
+
+			}
 
 		}
 
@@ -227,6 +233,18 @@ const ConvertType = function ( type ) {
 			map.set( params, node );
 
 			return node;
+
+		}
+
+		if ( ( params.length === 1 ) && ( valueComponents !== 1 ) ) {
+
+			// Providing one scalar value: This value is used for all components
+
+			for ( let i = 1; i < valueComponents; i ++ ) {
+
+				params[ i ] = params[ 0 ];
+
+			}
 
 		}
 
@@ -244,32 +262,39 @@ const ConvertType = function ( type ) {
 
 		map.set( params, node );
 
+		if ( params.every( val => val == params[ 0 ] ) ) {
+
+			map.set( [ params[ 0 ] ], node );
+
+		}
+
 		return node;
 
 	};
 
 };
 
+export const color = new ConvertType( 'color' );
+
 export const float = new ConvertType( 'float' );
 export const int = new ConvertType( 'int' );
 export const uint = new ConvertType( 'uint' );
 export const bool = new ConvertType( 'bool' );
-export const color = new ConvertType( 'color' );
 
-export const vec2 = new ConvertType( 'vec2' );
-export const ivec2 = new ConvertType( 'ivec2' );
-export const uvec2 = new ConvertType( 'uvec2' );
-export const bvec2 = new ConvertType( 'bvec2' );
+export const vec2 = new ConvertType( 'vec2', 2 );
+export const ivec2 = new ConvertType( 'ivec2', 2 );
+export const uvec2 = new ConvertType( 'uvec2', 2 );
+export const bvec2 = new ConvertType( 'bvec2', 2 );
 
-export const vec3 = new ConvertType( 'vec3' );
-export const ivec3 = new ConvertType( 'ivec3' );
-export const uvec3 = new ConvertType( 'uvec3' );
-export const bvec3 = new ConvertType( 'bvec3' );
+export const vec3 = new ConvertType( 'vec3', 3 );
+export const ivec3 = new ConvertType( 'ivec3', 3 );
+export const uvec3 = new ConvertType( 'uvec3', 3 );
+export const bvec3 = new ConvertType( 'bvec3', 3 );
 
-export const vec4 = new ConvertType( 'vec4' );
-export const ivec4 = new ConvertType( 'ivec4' );
-export const uvec4 = new ConvertType( 'uvec4' );
-export const bvec4 = new ConvertType( 'bvec4' );
+export const vec4 = new ConvertType( 'vec4', 4 );
+export const ivec4 = new ConvertType( 'ivec4', 4 );
+export const uvec4 = new ConvertType( 'uvec4', 4 );
+export const bvec4 = new ConvertType( 'bvec4', 4 );
 
 export const mat3 = new ConvertType( 'mat3' );
 export const imat3 = new ConvertType( 'imat3' );
