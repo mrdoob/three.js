@@ -84,9 +84,7 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal(),
-
-		animationStopped: new Signal()
+		viewportCameraChanged: new Signal()
 
 	};
 

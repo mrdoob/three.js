@@ -498,12 +498,6 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.animationStopped.add( function () {
-
-		render();
-
-	} );
-
 	// background
 
 	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture ) {
@@ -685,6 +679,8 @@ function Viewport( editor ) {
 
 	// animations
 
+	let prevActionsInUse = 0;
+
 	const clock = new THREE.Clock(); // only used for animations
 
 	function animate() {
@@ -694,12 +690,20 @@ function Viewport( editor ) {
 
 		let needsUpdate = false;
 
-		if ( mixer.stats.actions.inUse > 0 ) {
+		// Animations
+
+		const actions = mixer.stats.actions;
+
+		if ( actions.inUse > 0 || prevActionsInUse > 0 ) {
+
+			prevActionsInUse = actions.inUse;
 
 			mixer.update( delta );
 			needsUpdate = true;
 
 		}
+
+		// View Helper
 
 		if ( viewHelper.animating === true ) {
 
