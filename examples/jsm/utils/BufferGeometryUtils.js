@@ -24,12 +24,12 @@ function computeTangents( geometry, negateSign = true ) {
 
 			for ( let i = 0, j = 0; i < attribute.getCount(); i ++ ) {
 
-				dstArray[ j ++ ] = denormalize( attribute.getX( i ), srcArray );
-				dstArray[ j ++ ] = denormalize( attribute.getY( i ), srcArray );
+				dstArray[ j ++ ] = MathUtils.denormalize( attribute.getX( i ), srcArray );
+				dstArray[ j ++ ] = MathUtils.denormalize( attribute.getY( i ), srcArray );
 
 				if ( attribute.itemSize > 2 ) {
 
-					dstArray[ j ++ ] = denormalize( attribute.getZ( i ), srcArray );
+					dstArray[ j ++ ] = MathUtils.denormalize( attribute.getZ( i ), srcArray );
 
 				}
 
