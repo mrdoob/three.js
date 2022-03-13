@@ -251,7 +251,13 @@ const ConvertType = function ( type ) {
 
 		const classValue = getValueFromType( type );
 
-		const value = ( classValue !== null ) ? classValue.set( ...flatArray( params ) ) : params[ 0 ];
+		let value = params[ 0 ];
+
+		if ( ( classValue !== null ) && ! ( value instanceof classValue.constructor ) ) {
+
+			value = classValue.set( ...flatArray( params ) );
+
+		}
 
 		return nodeObject( new ConstNode( value, type ) );
 
