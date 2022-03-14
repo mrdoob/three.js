@@ -167,7 +167,7 @@ export class ArrayMap {
 
 		const firstKey = key.shift();
 
-		return this.map.get( firstKey ).get( key );
+		return this.map.has( firstKey ) ? this.map.get( firstKey ).get( key ) : undefined;
 
 	}
 
