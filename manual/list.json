@@ -346,7 +346,7 @@
 			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
 			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
 			"Billboards and Facades": "zh/billboards",
-			"Freeing Resources": "zh/cleanup",
+			"释放资源": "zh/cleanup",
 			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
 			"Start making a Game": "zh/game"
 		},
