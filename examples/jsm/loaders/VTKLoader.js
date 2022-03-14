@@ -741,10 +741,13 @@ class VTKLoader extends Loader {
 
 					const byteData = Base64toByteArray( rawData );
 
+					// Each data point consists of 8 bits regardless of the header type
+					const dataPointSize = 8;
+
 					let blocks = byteData[ 0 ];
 					for ( let i = 1; i < numBytes - 1; i ++ ) {
 
-						blocks = blocks | ( byteData[ i ] << ( i * numBytes ) );
+						blocks = blocks | ( byteData[ i ] << ( i * dataPointSize ) );
 
 					}
 
@@ -766,8 +769,7 @@ class VTKLoader extends Loader {
 
 						for ( let j = 1; j < numBytes - 1; j ++ ) {
 
-							// Each data point consists of 8 bytes regardless of the header type
-							currentBlockSize = currentBlockSize | ( byteData[ i * numBytes + cSizeStart + j ] << ( j * 8 ) );
+							currentBlockSize = currentBlockSize | ( byteData[ i * numBytes + cSizeStart + j ] << ( j * dataPointSize ) );
 
 						}
 
