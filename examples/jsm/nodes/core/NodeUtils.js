@@ -100,11 +100,14 @@ export class ArrayMap {
 
 		this.map = new Map();
 
+		this.value = undefined;
+		this.hasValue = false;
+
 		if ( iterable ) {
 
 			for ( let el of iterable ) {
 
-				this.set( el.slice( 0, -1 ), el[ el.length - 1 ] );
+				this.set( el[ 0 ], el[ 1 ] );
 
 			}
 
@@ -114,13 +117,15 @@ export class ArrayMap {
 
 	get size() {
 
-		let total = 0;
+		let total = this.hasValue ? 1 : 0;
 
 		for ( let el of this.map.entries() ) {
 
-			total += ( el.size !== undefined ) ? el.size : 1;
+			total += el.size;
 
 		}
+
+		return total;
 
 	}
 
@@ -128,59 +133,78 @@ export class ArrayMap {
 
 		this.map.clear();
 
+		this.value = undefined;
+		this.hasValue = false;
+
 	}
 
 	delete( key ) {
 
-		if ( key.length === 1 ) {
+		if ( key.length === 0 ) {
 
-			return this.map.delete( key[ 0 ] );
+			const hadValue = this.hasValue;
+
+			this.value = undefined;
+			this.hasValue = false;
+
+			return hadValue;
 
 		}
 
-		return this.map.has( key[ 0 ] ) ? this.map.get( key[ 0 ] ).delete( key.slice( 1 ) ) : false;
+		const firstKey = key.shift();
+
+		return this.map.has( firstKey ) ? this.map.get( firstKey ).delete( key ) : false;
 
 	}
 
 	get( key ) {
 
-		if ( key.length === 1 ) {
+		if ( key.length === 0 ) {
 
-			return this.map.get( key[ 0 ] );
+			return this.hasValue ? this.value : undefined;
 
 		}
 
-		return this.map.get( key[ 0 ] ).get( key.slice( 1 ) );
+		const firstKey = key.shift();
+
+		return this.map.get( firstKey ).get( key );
 
 	}
 
 	has( key ) {
 
-		if ( key.length === 1 ) {
+		if ( key.length === 0 ) {
 
-			return this.map.has( key[ 0 ] );
+			return this.hasValue;
 
 		}
 
-		return this.map.has( key[ 0 ] ) && this.map.get( key[ 0 ] ).has( key.slice( 1 ) );
+		const firstKey = key.shift();
+
+		return this.map.has( firstKey ) && this.map.get( firstKey ).has( key );
 
 	}
 
 	set( key, value ) {
 
-		if ( key.length === 1 ) {
+		if ( key.length === 0 ) {
 
-			return this.map.set( key[ 0 ], value );
+			this.value = value;
+			this.hasValue = true;
 
-		}
-
-		if ( ! this.map.has( key[ 0 ] ) ) {
-
-			this.map.set( key[ 0 ], new ArrayMap() );
+			return this;
 
 		}
 
-		this.map.get( key[ 0 ] ).set( key.slice( 1 ), value );
+		const firstKey = key.shift();
+
+		if ( ! this.map.has( firstKey ) ) {
+
+			this.map.set( firstKey, new ArrayMap() );
+
+		}
+
+		this.map.get( firstKey ).set( key, value );
 
 		return this;
 
@@ -194,13 +218,13 @@ export class ArrayMap {
 
 	* keys() {
 
+		if ( this.hasValue ) {
+
+			yield [];
+
+		}
+
 		for ( let [ key, value ] of this.map ) {
-
-			if ( value.keys === undefined ) {
-
-				yield [ key ];
-
-			}
 
 			for ( let key2 of value.keys() ) {
 
@@ -216,13 +240,13 @@ export class ArrayMap {
 
 	* values() {
 
+		if ( this.hasValue ) {
+
+			yield this.value;
+
+		}
+
 		for ( let value of this.map.values() ) {
-
-			if ( value.values === undefined ) {
-
-				yield value;
-
-			}
 
 			for ( let value2 of value.values() ) {
 
@@ -236,13 +260,13 @@ export class ArrayMap {
 
 	* entries() {
 
+		if ( this.hasValue ) {
+
+			yield [ [], this.value ];
+
+		}
+
 		for ( let [ key, value ] of this.map ) {
-
-			if ( value.entries === undefined ) {
-
-				yield [ [ key ], value ];
-
-			}
 
 			for ( let [ key2, value2 ] of value.entries() ) {
 

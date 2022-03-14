@@ -216,13 +216,7 @@ const ConvertType = function ( type, valueComponents = 1 ) {
 
 		if ( map.has( params ) ) {
 			
-			const value = map.get( params );
-
-			if ( value.isNode === true ) { // otherwise it can be another ArrayMap
-
-				return value;
-
-			}
+			return map.get( params );
 
 		}
 
@@ -262,7 +256,7 @@ const ConvertType = function ( type, valueComponents = 1 ) {
 
 		map.set( params, node );
 
-		if ( params.every( val => val == params[ 0 ] ) ) {
+		if ( params.every( val => val == params[ 0 ] ) ) { // all components are the same
 
 			map.set( [ params[ 0 ] ], node );
 
