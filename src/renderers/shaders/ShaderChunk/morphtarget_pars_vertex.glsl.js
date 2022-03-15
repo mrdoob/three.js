@@ -15,8 +15,8 @@ export default /* glsl */`
 			float y = floor( texelIndex / morphTargetsTextureSize.x );
 			float x = texelIndex - y * morphTargetsTextureSize.x;
 
-			vec3 morphUV = vec3( ( x + 0.5 ) / morphTargetsTextureSize.x, y / morphTargetsTextureSize.y, morphTargetIndex );
-			return texture( morphTargetsTexture, morphUV );
+			ivec3 morphUV = ivec3( x, y, morphTargetIndex );
+			return texelFetch( morphTargetsTexture, morphUV, 0 );
 
 		}
 
