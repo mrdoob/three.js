@@ -246,7 +246,11 @@ const ConvertType = function ( type, valueComponents = 1 ) {
 
 		let value = params[ 0 ];
 
-		if ( ( classValue !== null ) && ! ( value instanceof classValue.constructor ) ) {
+		if ( params.length === 0 ) { // no arguments are given
+
+			value = classValue;
+
+		} else if ( ( typeof classValue === 'object' ) && ! ( value instanceof classValue.constructor ) ) {
 
 			value = classValue.set( ...flatArray( params ) );
 

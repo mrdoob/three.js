@@ -88,6 +88,14 @@ export const getValueFromType = ( type ) => {
 
 		return new Matrix4();
 
+	} else if ( type === 'bool' ) {
+
+		return false;
+
+	} else if ( ( type === 'float' ) || ( type === 'int' ) || ( type === 'uint' ) ) {
+
+		return 0;
+
 	}
 
 	return null;
