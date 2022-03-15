@@ -174,7 +174,7 @@ window.addEventListener('touchmove', (event) =&gt; {
 
 window.addEventListener('touchend', clearPickPosition);
 </pre>
-<p>And finally in our <code class="notranslate" translate="no">render</code> function we call call the <code class="notranslate" translate="no">PickHelper</code>'s <code class="notranslate" translate="no">pick</code> function.</p>
+<p>And finally in our <code class="notranslate" translate="no">render</code> function we call the <code class="notranslate" translate="no">PickHelper</code>'s <code class="notranslate" translate="no">pick</code> function.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
 
 function render(time) {

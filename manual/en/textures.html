@@ -64,7 +64,7 @@ put this image on cube.</p>
 
 <p>We'll modify one of our first samples. All we need to do is create a <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>. Call its
 <a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> method with the URL of an
-image and and set the material's <code class="notranslate" translate="no">map</code> property to the result instead of setting its <code class="notranslate" translate="no">color</code>.</p>
+image and set the material's <code class="notranslate" translate="no">map</code> property to the result instead of setting its <code class="notranslate" translate="no">color</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 
 const material = new THREE.MeshBasicMaterial({
