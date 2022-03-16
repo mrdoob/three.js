@@ -68,7 +68,19 @@ class Frustum {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+		_sphere.copy( geometry.boundingSphere );
+
+		if ( object.skeleton && object.skeleton.rootMotionBone ) {
+
+			const rootMotion = object.skeleton.rootMotionBone.matrixWorld.clone();
+			rootMotion.multiply( object.skeleton.rootMotionBoneInitialMatrixInverse );
+			_sphere.applyMatrix4( rootMotion );
+
+		} else {
+
+			_sphere.applyMatrix4( object.matrixWorld );
+
+		}
 
 		return this.intersectsSphere( _sphere );
 

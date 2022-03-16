@@ -140,6 +140,7 @@ export { Box3Helper } from './helpers/Box3Helper.js';
 export { PlaneHelper } from './helpers/PlaneHelper.js';
 export { ArrowHelper } from './helpers/ArrowHelper.js';
 export { AxesHelper } from './helpers/AxesHelper.js';
+export { SkinnedMeshBoxHelper } from './helpers/SkinnedMeshBoxHelper.js';
 export * from './extras/curves/Curves.js';
 export { Shape } from './extras/core/Shape.js';
 export { Path } from './extras/core/Path.js';

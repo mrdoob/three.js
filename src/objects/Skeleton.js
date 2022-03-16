@@ -19,6 +19,7 @@ class Skeleton {
 		this.bones = bones.slice( 0 );
 		this.boneInverses = boneInverses;
 		this.boneMatrices = null;
+		this.rootMotionBone = null;
 
 		this.boneTexture = null;
 		this.boneTextureSize = 0;
@@ -242,6 +243,40 @@ class Skeleton {
 		this.init();
 
 		return this;
+
+	}
+
+	setRootMotionBone( bone ) {
+
+		if ( typeof bone == 'object' ) {
+
+			if ( bone.type == 'Bone' ) {
+
+				this.rootMotionBone = bone;
+
+			}
+
+		} else if ( typeof bone == 'string' ) {
+
+			for ( let i = 0; i < this.bones.length; i ++ ) {
+
+				if ( this.bones[ i ].name.indexOf( bone ) >= 0 ) {
+
+					this.rootMotionBone = this.bones[ i ];
+					break;
+
+				}
+
+			}
+
+		}
+
+		if ( this.rootMotionBone ) {
+
+			this.rootMotionBoneInitialMatrixInverse = this.rootMotionBone.matrixWorld.clone();
+			this.rootMotionBoneInitialMatrixInverse.invert();
+
+		}
 
 	}
 
