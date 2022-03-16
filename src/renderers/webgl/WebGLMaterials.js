@@ -569,6 +569,7 @@ function WebGLMaterials( properties ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
+			if ( material.lowerNormalMap ) uniforms.lowerNormalMap.value = material.lowerNormalMap;
 			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}

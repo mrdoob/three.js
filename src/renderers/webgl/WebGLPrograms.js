@@ -199,6 +199,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
+			lowerNormalMap: !! material.lowerNormalMap,
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
 
@@ -494,6 +495,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 21 );
 		if ( parameters.transparent )
 			_programLayers.enable( 22 );
+		if ( parameters.lowerNormalMap )
+			_programLayers.enable( 23 );
 
 		array.push( _programLayers.mask );
 

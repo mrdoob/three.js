@@ -4,6 +4,12 @@ export default /* glsl */`
 	uniform sampler2D normalMap;
 	uniform vec2 normalScale;
 
+	#ifdef USE_LOWER_8_BIT_NORMALMAP
+
+	uniform sampler2D lowerNormalMap;
+
+	#endif
+
 #endif
 
 #ifdef OBJECTSPACE_NORMALMAP

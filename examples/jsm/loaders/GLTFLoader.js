@@ -364,6 +364,10 @@ class GLTFLoader extends Loader {
 						extensions[ extensionName ] = new GLTFMeshQuantizationExtension();
 						break;
 
+					case EXTENSIONS.OFT_TEXTURE_HIGHPRECISION_NORMAL:
+						extensions[ extensionName ] = new GLTFHighPrecisionNormalExtension();
+						break;
+
 					default:
 
 						if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
@@ -454,7 +458,8 @@ const EXTENSIONS = {
 	KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 	KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 	EXT_TEXTURE_WEBP: 'EXT_texture_webp',
-	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression'
+	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
+	OFT_TEXTURE_HIGHPRECISION_NORMAL: 'OFT_texture_highPrecisionNormal'
 };
 
 /**
@@ -1656,6 +1661,7 @@ class GLTFMaterialsPbrSpecularGlossinessExtension {
 			'bumpMap',
 			'bumpScale',
 			'normalMap',
+			'lowerNormalMap',
 			'normalMapType',
 			'displacementMap',
 			'displacementScale',
@@ -1747,6 +1753,7 @@ class GLTFMaterialsPbrSpecularGlossinessExtension {
 		material.bumpScale = 1;
 
 		material.normalMap = materialParams.normalMap === undefined ? null : materialParams.normalMap;
+		material.lowerNormalMap = materialParams.lowerNormalMap === undefined ? null : materialParams.lowerNormalMap;
 		material.normalMapType = TangentSpaceNormalMap;
 
 		if ( materialParams.normalScale ) material.normalScale = materialParams.normalScale;
@@ -1784,6 +1791,21 @@ class GLTFMeshQuantizationExtension {
 	constructor() {
 
 		this.name = EXTENSIONS.KHR_MESH_QUANTIZATION;
+
+	}
+
+}
+
+/**
+ * OppenFuture Tech texture high precision normal Extension
+ *
+ * Specification: https://github.com/oppenfuture/glTF/blob/hpnormal/extensions/2.0/Vendor/OFT_texture_highPrecisionNormal
+ */
+class GLTFHighPrecisionNormalExtension {
+
+	constructor() {
+
+		this.name = EXTENSIONS.OFT_TEXTURE_HIGHPRECISION_NORMAL;
 
 	}
 
@@ -3199,6 +3221,30 @@ class GLTFParser {
 				const scale = materialDef.normalTexture.scale;
 
 				materialParams.normalScale.set( scale, scale );
+
+			}
+
+			if ( materialDef.normalTexture.extensions !== undefined ) {
+
+				if ( extensions[ EXTENSIONS.OFT_TEXTURE_HIGHPRECISION_NORMAL ]
+					&& materialDef.normalTexture.extensions[ EXTENSIONS.OFT_TEXTURE_HIGHPRECISION_NORMAL ] ) {
+
+					var highPrecisionNormalExt = materialDef.normalTexture.extensions[ EXTENSIONS.OFT_TEXTURE_HIGHPRECISION_NORMAL ];
+					var lowerTexture = highPrecisionNormalExt.lower8BitTexture;
+					var texCoord = materialDef.normalTexture.texCoord || 0;
+					var lowerTexCoord = lowerTexture.texCoord || 0;
+					// The texCoord property of lower8BitTexture must be the same as the texCoord of normalTexture
+					if ( texCoord !== lowerTexCoord ) {
+
+						console.warn( 'The texCoord property of lower8BitTexture' + texCoord + 'are not same as the texCoord of normalTexture' + lowerTexCoord );
+
+					} else {
+
+						pending.push( parser.assignTexture( materialParams, 'lowerNormalMap', lowerTexture ) );
+
+					}
+
+				}
 
 			}
 
