@@ -350,6 +350,12 @@
 
 		}
 
+		function escapeRegExp( string ) {
+
+			return string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // https://stackoverflow.com/a/6969486/5250847
+
+		}
+
 		function updateFilter() {
 
 			let v = filterInput.value.trim();
@@ -367,7 +373,7 @@
 
 			//
 
-			const regExp = new RegExp( filterInput.value, 'gi' );
+			const regExp = new RegExp( escapeRegExp( v ), 'gi' );
 
 			for ( let pageName in pageProperties ) {
 
