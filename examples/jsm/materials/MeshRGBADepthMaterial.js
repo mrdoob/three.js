@@ -1,14 +1,14 @@
-import { MeshDepthMaterial, RGBADepthPacking } from "../../../build/three.module";
+import { MeshDepthMaterial, RGBADepthPacking } from '../../../build/three.module.js';
 
 /**
  * @author Maxime Quiblier / http://github.com/maximeq
  */
 export function MeshRGBADepthMaterial( parameters ) {
 
-	parameters = parameters || {};
-	parameters.depthPacking = RGBADepthPacking;
+    parameters = parameters || {};
+    parameters.depthPacking = RGBADepthPacking;
 
-	MeshDepthMaterial.call( this, parameters );
+    MeshDepthMaterial.call( this, parameters );
 
 }
 

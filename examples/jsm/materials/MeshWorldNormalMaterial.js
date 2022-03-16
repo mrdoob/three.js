@@ -1,11 +1,11 @@
 import {
-	Matrix4,
-	ShaderLib,
-	ShaderMaterial,
-	TangentSpaceNormalMap,
-	UniformsUtils,
-	Vector2
-} from "../../../build/three.module";
+    Matrix4,
+    ShaderLib,
+    ShaderMaterial,
+    TangentSpaceNormalMap,
+    UniformsUtils,
+    Vector2
+} from '../../../build/three.module.js';
 
 /**
  * @author Maxime Quiblier / http://github.com/maximeq
@@ -19,47 +19,47 @@ import {
  */
 export function MeshWorldNormalMaterial( parameters ) {
 
-	parameters = parameters || {};
+    parameters = parameters || {};
 
-	parameters.uniforms = UniformsUtils.merge( [
-		ShaderLib.normal.uniforms,
-		{ viewMatrixInverse: { value: new Matrix4() } }
-	] );
-	parameters.vertexShader = ShaderLib.normal.vertexShader;
-	parameters.fragmentShader =
-		"uniform mat4 viewMatrixInverse;" + "\n" +
-		ShaderLib.normal.fragmentShader.replace(
-			"gl_FragColor = ",
+    parameters.uniforms = UniformsUtils.merge( [
+        ShaderLib.normal.uniforms,
+        { viewMatrixInverse: { value: new Matrix4() } }
+    ] );
+    parameters.vertexShader = ShaderLib.normal.vertexShader;
+    parameters.fragmentShader =
+        "uniform mat4 viewMatrixInverse;" + "\n" +
+        ShaderLib.normal.fragmentShader.replace(
+            "gl_FragColor = ",
 
-			"normal = normalize(mat3(viewMatrixInverse) * normal);" + "\n" +
-			"gl_FragColor = "
-		);
+            "normal = normalize(mat3(viewMatrixInverse) * normal);" + "\n" +
+            "gl_FragColor = "
+        );
 
-	this.bumpMap = null;
-	this.bumpScale = 1;
+    this.bumpMap = null;
+    this.bumpScale = 1;
 
-	this.normalMap = null;
-	this.normalMapType = TangentSpaceNormalMap;
-	this.normalScale = new Vector2( 1, 1 );
+    this.normalMap = null;
+    this.normalMapType = TangentSpaceNormalMap;
+    this.normalScale = new Vector2( 1, 1 );
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+    this.displacementMap = null;
+    this.displacementScale = 1;
+    this.displacementBias = 0;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
+    this.wireframe = false;
+    this.wireframeLinewidth = 1;
 
-	this.fog = false;
-	this.lights = false;
+    this.fog = false;
+    this.lights = false;
 
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
+    this.skinning = false;
+    this.morphTargets = false;
+    this.morphNormals = false;
 
-	this.isMeshNormalMaterial = true;
-	this.isMeshWorldNormalMaterial = true;
+    this.isMeshNormalMaterial = true;
+    this.isMeshWorldNormalMaterial = true;
 
-	ShaderMaterial.call( this, parameters );
+    ShaderMaterial.call( this, parameters );
 
 }
 
@@ -73,14 +73,14 @@ MeshWorldNormalMaterial.prototype.constructor = MeshWorldNormalMaterial;
  */
 MeshWorldNormalMaterial.updateMeshOnBeforeRender = function ( mesh ) {
 
-	const oldOnBeforeRender = mesh.onBeforeRender;
-	mesh.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
+    const oldOnBeforeRender = mesh.onBeforeRender;
+    mesh.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
 
-		oldOnBeforeRender.call( this, renderer, scene, camera, geometry, material, group );
+        oldOnBeforeRender.call( this, renderer, scene, camera, geometry, material, group );
 
-		if ( this.material.isMeshWorldNormalMaterial )
-			this.material.uniforms.viewMatrixInverse.value.copy( camera.matrixWorld );
+        if ( this.material.isMeshWorldNormalMaterial )
+            this.material.uniforms.viewMatrixInverse.value.copy( camera.matrixWorld );
 
-	};
+    };
 
 };
