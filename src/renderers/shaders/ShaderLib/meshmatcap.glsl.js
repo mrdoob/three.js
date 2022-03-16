@@ -86,6 +86,7 @@ void main() {
 	#ifdef USE_MATCAP
 
 		vec4 matcapColor = texture2D( matcap, uv );
+		matcapColor = matcapTexelToLinear( matcapColor );
 
 	#else
 

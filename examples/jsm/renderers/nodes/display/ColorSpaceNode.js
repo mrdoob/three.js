@@ -1,7 +1,7 @@
 import TempNode from '../core/Node.js';
 import { ShaderNode,
 	vec3,
-	pow, mul, sub, mix, join,
+	pow, mul, add, sub, mix, join,
 	lessThanEqual } from '../ShaderNode.js';
 
 import { LinearEncoding, sRGBEncoding } from 'three';
@@ -9,6 +9,22 @@ import { LinearEncoding, sRGBEncoding } from 'three';
 export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
 	return inputs.value;
+
+} );
+
+export const sRGBToLinear = new ShaderNode( ( inputs ) => {
+
+	const { value } = inputs;
+
+	const rgb = value.rgb;
+
+	const a = pow( add( mul( rgb, 0.9478672986 ), vec3( 0.0521327014 ) ), vec3( 2.4 ) );
+	const b = mul( rgb, 0.0773993808 );
+	const factor = vec3( lessThanEqual( rgb, vec3( 0.04045 ) ) );
+
+	const rgbResult = mix( a, b, factor );
+
+	return join( rgbResult.r, rgbResult.g, rgbResult.b, value.a );
 
 } );
 
@@ -30,12 +46,15 @@ export const LinearTosRGB = new ShaderNode( ( inputs ) => {
 
 const EncodingLib = {
 	LinearToLinear,
+	sRGBToLinear,
 	LinearTosRGB
 };
 
 class ColorSpaceNode extends TempNode {
 
 	static LINEAR_TO_LINEAR = 'LinearToLinear';
+
+	static SRGB_TO_LINEAR = 'sRGBToLinear';
 	static LINEAR_TO_SRGB = 'LinearTosRGB';
 
 	constructor( method, node ) {
