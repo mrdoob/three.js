@@ -19,12 +19,36 @@
 			three.js의 현재 리비전 번호([link:https://github.com/mrdoob/three.js/releases revision number]).
 		</div>
 
-    <h2>마우스 버튼</h2>
-    <code>
-		THREE.MOUSE.LEFT
-		THREE.MOUSE.MIDDLE
-		THREE.MOUSE.RIGHT
-    </code>
+		<h2>Color Spaces</h2>
+		<code>
+THREE.SRGBColorSpace
+THREE.LinearSRGBColorSpace
+		</code>
+
+		<p>
+			[page:SRGBColorSpace] (“sRGB”) refers to the color space defined by the Rec. 709 primaries, D65
+			white point, and nonlinear sRGB transfer functions. sRGB is the default color space in
+			CSS, and is often found in color palettes and color pickers. Colors expressed in
+			hexadecimal or CSS notation are typically in the sRGB color space.
+		</p>
+
+		<p>
+			[page:LinearSRGBColorSpace] (“Linear-sRGB”) refers to the sRGB color space (above) with
+			linear transfer functions. Linear-sRGB is the working color space in three.js, used
+			throughout most of the rendering process. RGB components found in three.js materials
+			and shaders are in the Linear-sRGB color space.
+		D</p>
+
+		<p>
+			For further background and usage, see <i>Color management</i>.
+		</p>
+
+		<h2>마우스 버튼</h2>
+		<code>
+			THREE.MOUSE.LEFT
+			THREE.MOUSE.MIDDLE
+			THREE.MOUSE.RIGHT
+		</code>
 
 		<h2>소스 코드</h2>
 
