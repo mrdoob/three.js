@@ -145,6 +145,7 @@
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
 		THREE.LuminanceAlphaFormat
+		THREE.RGBEFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
@@ -184,6 +185,8 @@
 		[page:constant LuminanceAlphaFormat]은 각 요소(element)를 휘도/알파 소수로 읽어들입니다.
 		The same process occurs as for the [page:constant LuminanceFormat]와 같은 절차가 이루어지며, 알파 채널에 *1.0* 이외의 값이 들어갈 수 있다는 점만 다릅니다.
 		<br /><br />
+
+		[page:constant RGBEFormat]은 [page:constant RGBAFormat]과 동일합니다..<br /><br />
 
 		[page:constant DepthFormat]은 각 요소를 단일 깊이 값으로 일거들이며 부동 소수점으로 변환하고, [0,1]범위에 고정합니다.
 		[page:DepthTexture DepthTexture]의 기본값이기도 합니다.<br /><br />
@@ -527,6 +530,7 @@
 		<code>
 		THREE.LinearEncoding
 		THREE.sRGBEncoding
+		THREE.RGBEEncoding
 		THREE.BasicDepthPacking
 		THREE.RGBADepthPacking
 		</code>

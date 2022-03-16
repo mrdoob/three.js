@@ -56,7 +56,7 @@ class UITexture extends UISpan {
 
 					// assuming RGBE/Radiance HDR iamge format
 
-					const loader = new RGBELoader();
+					const loader = new RGBELoader().setDataType( THREE.FloatType );
 					loader.load( event.target.result, function ( hdrTexture ) {
 
 						hdrTexture.sourceFile = file.name;

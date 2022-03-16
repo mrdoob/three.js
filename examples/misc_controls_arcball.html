@@ -155,6 +155,7 @@
 						render();
 
 						new RGBELoader()
+							.setDataType( THREE.UnsignedByteType )
 							.setPath( 'textures/equirectangular/' )
 							.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 

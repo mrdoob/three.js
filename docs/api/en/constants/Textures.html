@@ -148,6 +148,7 @@
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
 		THREE.LuminanceAlphaFormat
+		THREE.RGBEFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
@@ -188,6 +189,8 @@
 		[page:constant LuminanceAlphaFormat] reads each element as a luminance/alpha double.
 		The same process occurs as for the [page:constant LuminanceFormat], except that the
 		alpha channel may have values other than *1.0*.<br /><br />
+
+		[page:constant RGBEFormat] is identical to [page:constant RGBAFormat].<br /><br />
 
 		[page:constant DepthFormat] reads each element as a single depth value, converts it to floating point, and clamps to the range [0,1].
 		This is the default for [page:DepthTexture DepthTexture].<br /><br />
@@ -533,6 +536,7 @@
 		<code>
 		THREE.LinearEncoding
 		THREE.sRGBEncoding
+		THREE.RGBEEncoding
 		THREE.BasicDepthPacking
 		THREE.RGBADepthPacking
 		</code>

@@ -4,7 +4,12 @@ import {
 	FloatType,
 	HalfFloatType,
 	LinearEncoding,
-	LinearFilter
+	LinearFilter,
+	NearestFilter,
+	RGBEEncoding,
+	RGBEFormat,
+	RGBFormat,
+	UnsignedByteType
 } from 'three';
 
 // https://github.com/mrdoob/three.js/issues/5552
@@ -375,6 +380,13 @@ class RGBELoader extends DataTextureLoader {
 
 				switch ( this.type ) {
 
+					case UnsignedByteType:
+
+						data = image_rgba_data;
+						format = RGBEFormat; // handled as THREE.RGBAFormat in shaders
+						type = UnsignedByteType;
+						break;
+
 					case FloatType:
 
 						numElements = image_rgba_data.length / 4;
@@ -442,6 +454,15 @@ class RGBELoader extends DataTextureLoader {
 		function onLoadCallback( texture, texData ) {
 
 			switch ( texture.type ) {
+
+				case UnsignedByteType:
+
+					texture.encoding = RGBEEncoding;
+					texture.minFilter = NearestFilter;
+					texture.magFilter = NearestFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = true;
+					break;
 
 				case FloatType:
 
