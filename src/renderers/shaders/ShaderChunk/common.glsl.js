@@ -53,11 +53,7 @@ struct ReflectedLight {
 
 struct GeometricContext {
 	vec3 position;
-	vec3 normal;
 	vec3 viewDir;
-#ifdef USE_CLEARCOAT
-	vec3 clearcoatNormal;
-#endif
 };
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {

@@ -72,7 +72,7 @@
 				'  		pointlight.color = lightColor.rgb;',
 				'  		pointlight.decay = lightColor.a;',
 				'  		getPointLightInfo( pointlight, geometry, directLight );',
-				'		RE_Direct( directLight, geometry, material, reflectedLight );',
+				'		RE_Direct( directLight, splitGeoNormal, geometry, material, reflectedLight );',
 				'	}',
 				'}',
 				'#endif'

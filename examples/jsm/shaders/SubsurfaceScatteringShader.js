@@ -57,9 +57,9 @@ const SubsurfaceScatteringShader = {
 		'uniform float thicknessAttenuation;',
 		'uniform vec3 thicknessColor;',
 
-		'void RE_Direct_Scattering(const in IncidentLight directLight, const in vec2 uv, const in GeometricContext geometry, inout ReflectedLight reflectedLight) {',
+		'void RE_Direct_Scattering(const in IncidentLight directLight, const in vec2 uv, const in vec3 normal, const in GeometricContext geometry, inout ReflectedLight reflectedLight) {',
 		'	vec3 thickness = thicknessColor * texture2D(thicknessMap, uv).r;',
-		'	vec3 scatteringHalf = normalize(directLight.direction + (geometry.normal * thicknessDistortion));',
+		'	vec3 scatteringHalf = normalize(directLight.direction + (normal * thicknessDistortion));',
 		'	float scatteringDot = pow(saturate(dot(geometry.viewDir, -scatteringHalf)), thicknessPower) * thicknessScale;',
 		'	vec3 scatteringIllu = (scatteringDot + thicknessAmbient) * thickness;',
 		'	reflectedLight.directDiffuse += scatteringIllu * thicknessAttenuation * directLight.color;',
@@ -69,14 +69,32 @@ const SubsurfaceScatteringShader = {
 
 			replaceAll(
 				ShaderChunk[ 'lights_fragment_begin' ],
-				'RE_Direct( directLight, geometry, material, reflectedLight );',
-				[
-					'RE_Direct( directLight, geometry, material, reflectedLight );',
+				`RE_Direct(
+			directLight,
+			splitGeoNormal,
+#ifdef USE_CLEARCOAT
+			splitGeoClearcoatNormal,
+#endif
+			geometry,
+			material,
+			reflectedLight
+		);`,
+				`
+		RE_Direct(
+			directLight,
+			splitGeoNormal,
+#ifdef USE_CLEARCOAT
+			splitGeoClearcoatNormal,
+#endif
+			geometry,
+			material,
+			reflectedLight
+		);
 
-					'#if defined( SUBSURFACE ) && defined( USE_UV )',
-					' RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);',
-					'#endif',
-				].join( '\n' )
+		#if defined( SUBSURFACE ) && defined( USE_UV )
+			RE_Direct_Scattering(directLight, vUv, splitGeoNormal, geometry, reflectedLight);
+		#endif
+				`
 			),
 
 		),

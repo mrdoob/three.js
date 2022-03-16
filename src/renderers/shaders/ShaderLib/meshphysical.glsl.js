@@ -187,7 +187,7 @@ void main() {
 
 	#ifdef USE_CLEARCOAT
 
-		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
+		float dotNVcc = saturate( dot( splitGeoClearcoatNormal, geometry.viewDir ) );
 
 		vec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );
 

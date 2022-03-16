@@ -130,7 +130,7 @@ class StandardNode extends Node {
 				roughness: roughnessNode,
 				bias: new SpecularMIPLevelNode( roughnessNode ),
 				viewNormal: new ExpressionNode( 'normal', 'v3' ),
-				worldNormal: new ExpressionNode( 'inverseTransformDirection( geometry.normal, viewMatrix )', 'v3' ),
+				worldNormal: new ExpressionNode( 'inverseTransformDirection( splitGeoNormal, viewMatrix )', 'v3' ),
 				gamma: true
 			};
 
@@ -142,7 +142,7 @@ class StandardNode extends Node {
 				roughness: clearcoatRoughnessNode,
 				bias: new SpecularMIPLevelNode( clearcoatRoughnessNode ),
 				viewNormal: new ExpressionNode( 'clearcoatNormal', 'v3' ),
-				worldNormal: new ExpressionNode( 'inverseTransformDirection( geometry.clearcoatNormal, viewMatrix )', 'v3' ),
+				worldNormal: new ExpressionNode( 'inverseTransformDirection( splitGeoClearcoatNormal, viewMatrix )', 'v3' ),
 				gamma: true
 			};
 
@@ -417,7 +417,7 @@ class StandardNode extends Node {
 				output.push(
 					ao.code,
 					'reflectedLight.indirectDiffuse *= ' + ao.result + ';',
-					'float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );',
+					'float dotNV = saturate( dot( splitGeoNormal, geometry.viewDir ) );',
 					'reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ' + ao.result + ', material.roughness );'
 				);
 

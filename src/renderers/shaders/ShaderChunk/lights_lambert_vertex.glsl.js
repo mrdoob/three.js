@@ -3,13 +3,13 @@ vec3 diffuse = vec3( 1.0 );
 
 GeometricContext geometry;
 geometry.position = mvPosition.xyz;
-geometry.normal = normalize( transformedNormal );
 geometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( -mvPosition.xyz );
+vec3 normal = normalize( transformedNormal );
 
 GeometricContext backGeometry;
 backGeometry.position = geometry.position;
-backGeometry.normal = -geometry.normal;
 backGeometry.viewDir = geometry.viewDir;
+vec3 backNormal = -normal;
 
 vLightFront = vec3( 0.0 );
 vIndirectFront = vec3( 0.0 );
@@ -24,13 +24,13 @@ vec3 directLightColor_Diffuse;
 
 vIndirectFront += getAmbientLightIrradiance( ambientLightColor );
 
-vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
+vIndirectFront += getLightProbeIrradiance( lightProbe, normal );
 
 #ifdef DOUBLE_SIDED
 
 	vIndirectBack += getAmbientLightIrradiance( ambientLightColor );
 
-	vIndirectBack += getLightProbeIrradiance( lightProbe, backGeometry.normal );
+	vIndirectBack += getLightProbeIrradiance( lightProbe, backNormal );
 
 #endif
 
@@ -41,7 +41,7 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
 
 		getPointLightInfo( pointLights[ i ], geometry, directLight );
 
-		dotNL = dot( geometry.normal, directLight.direction );
+		dotNL = dot( normal, directLight.direction );
 		directLightColor_Diffuse = directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
@@ -64,7 +64,7 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
 
 		getSpotLightInfo( spotLights[ i ], geometry, directLight );
 
-		dotNL = dot( geometry.normal, directLight.direction );
+		dotNL = dot( normal, directLight.direction );
 		directLightColor_Diffuse = directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
@@ -86,7 +86,7 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
 
 		getDirectionalLightInfo( directionalLights[ i ], geometry, directLight );
 
-		dotNL = dot( geometry.normal, directLight.direction );
+		dotNL = dot( normal, directLight.direction );
 		directLightColor_Diffuse = directLight.color;
 
 		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
@@ -107,11 +107,11 @@ vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-		vIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry.normal );
+		vIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], normal );
 
 		#ifdef DOUBLE_SIDED
 
-			vIndirectBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry.normal );
+			vIndirectBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backNormal );
 
 		#endif
 

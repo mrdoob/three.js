@@ -18,7 +18,7 @@ export default /* glsl */`
 
 	#if defined( USE_ENVMAP ) && defined( STANDARD ) && defined( ENVMAP_TYPE_CUBE_UV )
 
-		iblIrradiance += getIBLIrradiance( geometry.normal );
+		iblIrradiance += getIBLIrradiance( splitGeoNormal );
 
 	#endif
 
@@ -26,11 +26,11 @@ export default /* glsl */`
 
 #if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
-	radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+	radiance += getIBLRadiance( geometry.viewDir, splitGeoNormal, material.roughness );
 
 	#ifdef USE_CLEARCOAT
 
-		clearcoatRadiance += getIBLRadiance( geometry.viewDir, geometry.clearcoatNormal, material.clearcoatRoughness );
+		clearcoatRadiance += getIBLRadiance( geometry.viewDir, splitGeoClearcoatNormal, material.clearcoatRoughness );
 
 	#endif
 
