@@ -1,86 +1,43 @@
-three.js
+three.js (fork)
 ========
 
-[![NPM Package][npm]][npm-url]
-[![Build Size][build-size]][build-size-url]
-[![NPM Downloads][npm-downloads]][npmtrends-url]
-[![Language Grade][lgtm]][lgtm-url]
-
-#### JavaScript 3D library ####
-
-The aim of the project is to create an easy to use, lightweight, cross-browser, general purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available in the examples.
-
-[Examples](https://threejs.org/examples/) &mdash;
-[Documentation](https://threejs.org/docs/) &mdash;
-[Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
-[Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
-[Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
-[Forum](https://discourse.threejs.org/) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw) &mdash;
-[Discord](https://discordapp.com/invite/HF4UdyF)
-
-### Usage ###
-
-This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the `document.body` element. Finally, it animates the cube within the scene for the camera.
-
-```javascript
-import * as THREE from './js/three.module.js';
-
-let camera, scene, renderer;
-let geometry, material, mesh;
-
-init();
-
-function init() {
-
-	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-	camera.position.z = 1;
-
-	scene = new THREE.Scene();
-
-	geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
-	material = new THREE.MeshNormalMaterial();
-
-	mesh = new THREE.Mesh( geometry, material );
-	scene.add( mesh );
-
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setAnimationLoop( animation );
-	document.body.appendChild( renderer.domElement );
-
-}
-
-function animation( time ) {
-
-	mesh.rotation.x = time / 2000;
-	mesh.rotation.y = time / 1000;
-
-	renderer.render( scene, camera );
-
-}
-```
-
-If everything went well, you should see [this](https://jsfiddle.net/vy29n6aj/).
-
-### Cloning this repository ###
-
-Cloning the repo with all its history results in a ~2 GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
-
-```sh
-git clone --depth=1 https://github.com/mrdoob/three.js.git
-```
-
-### Change log ###
-
-[Releases](https://github.com/mrdoob/three.js/releases)
+## Changes from the original three js repo
+- **[r101]** Changed `depth_vert.glsl.js` and `depth_frag.glsl.js` to fix issues 
+with depth on iOS. Achieved by passing down `varying vec2 vHighPrecisionZW;`
+- Implemented a `Cone` math object, declared in `math/Cone.js` and `math/Cone.d.ts`,
+and added to `Three.js` and `Three.d.ts`
+- Implemented a `Cylinder` math object, declared in `math/Cylinder.js` and 
+`math/Cylinder.d.ts`, and added to `Three.js` and `Three.d.ts`
+- Added functions `intersectCone` and `intersectCylinder` to `Ray`
+- Added extra base uniforms (`viewMatrixInverse` and `projectionMatrixInverse`), that will automatically be attributed by 
+`WebGLRenderer`
+- Added `renderSize` uniform to fragment shaders, declared in `WebGLProgram.js`
+and updated by `WebGLRenderer`
+- Updated `FXAAShader` to support alpha input
+- ssaoMap material suport:
+    - Edited `aomap_fragment.glsl.js` and `aomap_pars_fragment.glsl.js` shaders 
+    to support the use of ssaoMap.
+    - recorded ssaoMap to `UniformsLib`
+    - added ssaoMap uniforms in `Shader lib to :
+        - basic
+        - lambert
+        - phong
+        - standard
+        - **[r121+]** toon
+    - added `ssaoMap` parameter declaration and detection to `WebGLPrograms`
+    - added support for parameter `ssaoMap` to `WebGLProgram`'s auto define
+    declarations
+    - added material detection of an `ssaoMap` parameter to pass down the 
+    render pipeline in `WebGLRenderer` **[r101]** / `WebGLMaterials` **[r121+]**
+    - added `ssaoMap` parameter to:
+        - `MeshBasicMaterial`
+        - `MeshLambertMaterial`
+        - `MeshPhongMaterial`
+        - `MeshStandardMaterial`
+        - **[r121+]** `MeshToonMaterial`
+    - if `aoMap` is also defined, `ssaoMap` takes precedance over it 
+    - added the `ssaoMapMatrix` parameter, which can be used to manually compute the SSAO 
+      texture coordinates.
 
 
-[npm]: https://img.shields.io/npm/v/three
-[npm-url]: https://www.npmjs.com/package/three
-[build-size]: https://badgen.net/bundlephobia/minzip/three
-[build-size-url]: https://bundlephobia.com/result?p=three
-[npm-downloads]: https://img.shields.io/npm/dw/three
-[npmtrends-url]: https://www.npmtrends.com/three
-[lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
-[lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/
+**TODO: add changes from 122 to 130**
