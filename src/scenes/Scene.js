@@ -8,6 +8,7 @@ class Scene extends Object3D {
 
 		this.type = 'Scene';
 
+		this.bgToneMapped = true;
 		this.background = null;
 		this.environment = null;
 		this.fog = null;
@@ -28,6 +29,7 @@ class Scene extends Object3D {
 
 		super.copy( source, recursive );
 
+		this.bgToneMapped = source.bgToneMapped;
 		if ( source.background !== null ) this.background = source.background.clone();
 		if ( source.environment !== null ) this.environment = source.environment.clone();
 		if ( source.fog !== null ) this.fog = source.fog.clone();
@@ -46,6 +48,7 @@ class Scene extends Object3D {
 		const data = super.toJSON( meta );
 
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+		data.object.bgToneMapped = this.bgToneMapped.toJSON();
 
 		return data;
 

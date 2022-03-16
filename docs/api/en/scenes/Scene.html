@@ -36,6 +36,13 @@
 		Can be set to a [page:Color] which sets the clear color, a [page:Texture] covering the canvas, a cubemap as a [page:CubeTexture] or an equirectangular as a [page:Texture] . Default is null.
 		</p>
 
+		<h3>[property:Boolean bgToneMapped]</h3>
+		<p>
+		Default is true. Controls if the background respects the renderer's tonemapping setting.
+		If true, the background will be tonemapped as set in the renderer.
+		If false, the background won't be tonemapped no matter what the renderer's tonemapping setting is.
+		</p>
+
 		<h3>[property:Texture environment]</h3>
 		<p>
 		If not null, this texture is set as the environment map for all physical materials in the scene.

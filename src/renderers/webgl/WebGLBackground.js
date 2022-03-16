@@ -18,11 +18,13 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 	let currentBackground = null;
 	let currentBackgroundVersion = 0;
 	let currentTonemapping = null;
+	let currentBgToneMapped = null;
 
 	function render( renderList, scene ) {
 
 		let forceClear = false;
 		let background = scene.isScene === true ? scene.background : null;
+		const bgToneMapped = scene.isScene === true ? scene.bgToneMapped : false;
 
 		if ( background && background.isTexture ) {
 
@@ -101,18 +103,21 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			}
 
+			boxMesh.material.toneMapped = bgToneMapped;
 			boxMesh.material.uniforms.envMap.value = background;
 			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background.isRenderTargetTexture === false ) ? - 1 : 1;
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
-				currentTonemapping !== renderer.toneMapping ) {
+				currentTonemapping !== renderer.toneMapping ||
+				currentBgToneMapped !== bgToneMapped ) {
 
 				boxMesh.material.needsUpdate = true;
 
 				currentBackground = background;
 				currentBackgroundVersion = background.version;
 				currentTonemapping = renderer.toneMapping;
+				currentBgToneMapped = bgToneMapped;
 
 			}
 
@@ -154,6 +159,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			}
 
+			planeMesh.material.toneMapped = bgToneMapped;
 			planeMesh.material.uniforms.t2D.value = background;
 
 			if ( background.matrixAutoUpdate === true ) {
@@ -166,13 +172,15 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
-				currentTonemapping !== renderer.toneMapping ) {
+				currentTonemapping !== renderer.toneMapping ||
+				currentBgToneMapped !== bgToneMapped ) {
 
 				planeMesh.material.needsUpdate = true;
 
 				currentBackground = background;
 				currentBackgroundVersion = background.version;
 				currentTonemapping = renderer.toneMapping;
+				currentBgToneMapped = bgToneMapped;
 
 			}
 
