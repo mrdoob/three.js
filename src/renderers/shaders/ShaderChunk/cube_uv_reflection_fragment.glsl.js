@@ -89,7 +89,11 @@ export default /* glsl */`
 
 		float texelSize = 1.0 / ( 3.0 * cubeUV_maxTileSize );
 
-		vec2 uv = getUV( direction, face ) * ( faceSize - 1.0 ) + 0.5;
+		vec2 uv = getUV( direction, face ) * ( faceSize - 1.0 );
+
+		vec2 f = fract( uv );
+
+		uv += 0.5 - f;
 
 		if ( face > 2.0 ) {
 
@@ -113,7 +117,25 @@ export default /* glsl */`
 
 		uv *= texelSize;
 
-		return texture2D( envMap, uv ).rgb;
+		vec3 tl = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;
+
+		uv.x += texelSize;
+
+		vec3 tr = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;
+
+		uv.y += texelSize;
+
+		vec3 br = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;
+
+		uv.x -= texelSize;
+
+		vec3 bl = envMapTexelToLinear( texture2D( envMap, uv ) ).rgb;
+
+		vec3 tm = mix( tl, tr, f.x );
+
+		vec3 bm = mix( bl, br, f.x );
+
+		return mix( tm, bm, f.y );
 
 	}
 
