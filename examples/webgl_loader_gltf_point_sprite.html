@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - GLTFloader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/oppenfuture/glTF/tree/pointSprite/extensions/2.0/Vendor/OFT_materials_pointSprite" target="_blank" rel="noopener">OFT_materials_pointSprite</a><br />
+			Test model by <a href="https://oppentech.com/" target="_blank" rel="noopener">OppenFuture Technologies</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
+			let camera, scene, renderer, depthRT, depthMat;
+
+			init();
+			render();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4 );
+				camera.position.set( - 1.38, 1.119, 2.18 );
+
+				scene = new THREE.Scene();
+
+				new RGBELoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						scene.background = texture;
+						scene.environment = texture;
+
+						render();
+
+						// model
+
+						const loader = new GLTFLoader().setPath( 'models/gltf/' );
+						loader.load( 'glitter.glb', function ( gltf ) {
+
+							gltf.scene.traverse( function ( child ) {
+
+								if (
+									child.isPoints && 
+									child.material.type === 'OFTPointSpriteMaterial' 
+								) {
+
+									child.material.uniforms.depthBias.value = 0.05;
+									child.material.uniforms.pointSize.value = 500;
+									child.material.uniforms.depthTexture.value = depthRT.texture;
+
+								}
+
+							} );
+
+							scene.add( gltf.scene );
+
+							render();
+
+						} );
+
+					} );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				container.appendChild( renderer.domElement );
+
+				initDepthRT();
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function initDepthRT() {
+
+				if ( depthRT ) return;
+
+				var parameters = {
+					minFilter: THREE.LinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBAFormat,
+					stencilBuffer: false,
+				};
+
+				var size = new THREE.Vector2();
+				renderer.getSize(size);
+				depthRT = new THREE.WebGLRenderTarget(
+					size.x,
+					size.y,
+					parameters,
+				);
+
+				depthMat = new THREE.MeshDepthMaterial({
+					depthPacking: THREE.RGBADepthPacking,
+				});
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			//
+
+			function render() {
+
+				//render depth pass
+				scene.overrideMaterial = depthMat;
+				renderer.setRenderTarget(depthRT);
+				renderer.render(scene, camera);
+				scene.overrideMaterial = null;
+				renderer.setRenderTarget(null);
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
