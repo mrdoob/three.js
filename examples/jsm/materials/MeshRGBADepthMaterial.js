@@ -2,15 +2,19 @@ import { MeshDepthMaterial, RGBADepthPacking } from '../../../build/three.module
 
 /**
  * @author Maxime Quiblier / http://github.com/maximeq
+ * Material packing depth as rgba values.
+ * It is basically just MeshDepthMaterial with depthPacking at THREE.RGBADepthPacking
  */
-export function MeshRGBADepthMaterial( parameters ) {
+class MeshRGBADepthMaterial extends MeshDepthMaterial {
 
-    parameters = parameters || {};
-    parameters.depthPacking = RGBADepthPacking;
+    constructor(parameters) {
 
-    MeshDepthMaterial.call( this, parameters );
+        parameters = parameters || {};
+        parameters.depthPacking = RGBADepthPacking;
+        super(parameters);
+
+    }
 
 }
 
-MeshRGBADepthMaterial.prototype = Object.create( MeshDepthMaterial.prototype );
-MeshRGBADepthMaterial.prototype.constructor = MeshRGBADepthMaterial;
+export { MeshRGBADepthMaterial };
