@@ -95,6 +95,7 @@ class PMREMGenerator {
 		this._pingPongRenderTarget = null;
 
 		this._blurMaterial = _getBlurShader( MAX_SAMPLES );
+		this._flipCubeUVMaxLevelTileShader = null;
 		this._equirectShader = null;
 		this._cubemapShader = null;
 
@@ -114,7 +115,8 @@ class PMREMGenerator {
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets();
 
-		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+		this._sceneToCubeUV( scene, near, far, this._pingPongRenderTarget );
+		this._flipCubeUVMaxLevelTile( this._pingPongRenderTarget, cubeUVRenderTarget );
 		if ( sigma > 0 ) {
 
 			this._blur( cubeUVRenderTarget, 0, 0, sigma );
@@ -191,6 +193,7 @@ class PMREMGenerator {
 
 		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
 
+		if ( this._flipCubeUVMaxLevelTileShader !== null ) this._flipCubeUVMaxLevelTileShader.dispose();
 		if ( this._cubemapShader !== null ) this._cubemapShader.dispose();
 		if ( this._equirectShader !== null ) this._equirectShader.dispose();
 
@@ -546,6 +549,32 @@ class PMREMGenerator {
 
 	}
 
+	_flipCubeUVMaxLevelTile( targetIn, targetOut ) {
+
+		const renderer = this._renderer;
+
+		if ( this._flipCubeUVMaxLevelTileShader === null ) {
+
+			this._flipCubeUVMaxLevelTileShader = _getFlipCubeUVMaxLevelTileShader();
+
+		}
+
+		const flipMaterial = this._flipCubeUVMaxLevelTileShader;
+
+		const flipMesh = new Mesh( _lodPlanes[ 0 ], flipMaterial );
+		const flipUniforms = flipMaterial.uniforms;
+
+		flipUniforms[ 'envMap' ].value = targetIn.texture;
+
+		this._setEncoding( flipUniforms[ 'inputEncoding' ], targetIn.texture );
+		this._setEncoding( flipUniforms[ 'outputEncoding' ], targetIn.texture );
+
+		_setViewport( targetOut, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+		renderer.setRenderTarget( targetOut );
+		renderer.render( flipMesh, _flatCamera );
+
+	}
+
 }
 
 function _isLDR( texture ) {
@@ -751,6 +780,64 @@ function _getBlurShader( maxSamples ) {
 
 }
 
+function _getFlipCubeUVMaxLevelTileShader() {
+
+	const shaderMaterial = new RawShaderMaterial( {
+
+		name: 'FlipCubeUVMaxLevelTile',
+
+		uniforms: {
+			'envMap': { value: null },
+			'inputEncoding': { value: ENCODINGS[ LinearEncoding ] },
+			'outputEncoding': { value: ENCODINGS[ LinearEncoding ] }
+		},
+
+		vertexShader: _getCommonVertexShader(),
+
+		fragmentShader: /* glsl */`
+			precision mediump float;
+			precision mediump int;
+
+			varying vec3 vOutputDirection;
+
+			uniform sampler2D envMap;
+
+			${ _getEncodings() }
+
+			#define ENVMAP_TYPE_CUBE_UV
+			#include <cube_uv_reflection_fragment>
+
+			void main() {
+
+				vec3 direction = normalize( vOutputDirection );
+				float face = getFace( direction );
+
+				if ( face == 0.0 || face == 3.0 ) {
+
+					direction.z = - direction.z;
+
+				} else {
+
+					direction.x = - direction.x;
+
+				}
+
+				gl_FragColor = vec4( bilinearCubeUV( envMap, direction, cubeUV_maxMipLevel ), 1.0 );
+				gl_FragColor = linearToOutputTexel( gl_FragColor );
+
+			}
+		`,
+
+		blending: NoBlending,
+		depthTest: false,
+		depthWrite: false
+
+	} );
+
+	return shaderMaterial;
+
+}
+
 function _getEquirectShader() {
 
 	const texelSize = new Vector2( 1, 1 );
@@ -877,7 +964,6 @@ function _getCommonVertexShader() {
 
 		varying vec3 vOutputDirection;
 
-		// RH coordinate system; PMREM face-indexing convention
 		vec3 getDirection( vec2 uv, float face ) {
 
 			uv = 2.0 * uv - 1.0;
@@ -886,30 +972,27 @@ function _getCommonVertexShader() {
 
 			if ( face == 0.0 ) {
 
-				direction = direction.zyx; // ( 1, v, u ) pos x
+				direction = direction.zyx;
+				direction.z *= -1.0;
 
 			} else if ( face == 1.0 ) {
 
 				direction = direction.xzy;
-				direction.xz *= -1.0; // ( -u, 1, -v ) pos y
-
-			} else if ( face == 2.0 ) {
-
-				direction.x *= -1.0; // ( -u, v, 1 ) pos z
+				direction.z *= -1.0;
 
 			} else if ( face == 3.0 ) {
 
 				direction = direction.zyx;
-				direction.xz *= -1.0; // ( -1, v, -u ) neg x
+				direction.x *= -1.0;
 
 			} else if ( face == 4.0 ) {
 
 				direction = direction.xzy;
-				direction.xy *= -1.0; // ( -u, -1, v ) neg y
+				direction.y *= -1.0;
 
 			} else if ( face == 5.0 ) {
 
-				direction.z *= -1.0; // ( u, v, -1 ) neg z
+				direction.xz *= -1.0;
 
 			}
 

@@ -42,34 +42,33 @@ export default /* glsl */`
 
 	}
 
-	// RH coordinate system; PMREM face-indexing convention
 	vec2 getUV( vec3 direction, float face ) {
 
 		vec2 uv;
 
 		if ( face == 0.0 ) {
 
-			uv = vec2( direction.z, direction.y ) / abs( direction.x ); // pos x
+			uv = vec2(-direction.z, direction.y) / abs(direction.x);
 
 		} else if ( face == 1.0 ) {
 
-			uv = vec2( - direction.x, - direction.z ) / abs( direction.y ); // pos y
+			uv = vec2(direction.x, -direction.z) / abs(direction.y);
 
 		} else if ( face == 2.0 ) {
 
-			uv = vec2( - direction.x, direction.y ) / abs( direction.z ); // pos z
+			uv = direction.xy / abs(direction.z);
 
 		} else if ( face == 3.0 ) {
 
-			uv = vec2( - direction.z, direction.y ) / abs( direction.x ); // neg x
+			uv = vec2(direction.z, direction.y) / abs(direction.x);
 
 		} else if ( face == 4.0 ) {
 
-			uv = vec2( - direction.x, direction.z ) / abs( direction.y ); // neg y
+			uv = direction.xz / abs(direction.y);
 
 		} else {
 
-			uv = vec2( direction.x, direction.y ) / abs( direction.z ); // neg z
+			uv = vec2(-direction.x, direction.y) / abs(direction.z);
 
 		}
 
