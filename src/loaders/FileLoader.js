@@ -1,5 +1,6 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
+import { platform } from '../platform.js';
 
 const loading = {};
 
@@ -63,8 +64,8 @@ class FileLoader extends Loader {
 		} );
 
 		// create request
-		const req = new Request( url, {
-			headers: new Headers( this.requestHeader ),
+		const req = new platform.Request( url, {
+			headers: new platform.Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
 			// An abort controller could be added within a future PR
 		} );
@@ -74,7 +75,7 @@ class FileLoader extends Loader {
 		const responseType = this.responseType;
 
 		// start the fetch
-		fetch( req )
+		platform.fetch( req )
 			.then( response => {
 
 				if ( response.status === 200 || response.status === 0 ) {

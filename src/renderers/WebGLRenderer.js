@@ -13,6 +13,7 @@ import {
 	NearestFilter,
 	ClampToEdgeWrapping
 } from '../constants.js';
+import { platform } from '../platform.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector3 } from '../math/Vector3.js';
@@ -880,7 +881,7 @@ function WebGLRenderer( parameters = {} ) {
 	const animation = new WebGLAnimation();
 	animation.setAnimationLoop( onAnimationFrame );
 
-	if ( typeof window !== 'undefined' ) animation.setContext( window );
+	animation.setContext( platform.animationContext );
 
 	this.setAnimationLoop = function ( callback ) {
 

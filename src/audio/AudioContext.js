@@ -1,12 +1,14 @@
 let _context;
 
+import { platform } from '../platform.js';
+
 const AudioContext = {
 
 	getContext: function () {
 
 		if ( _context === undefined ) {
 
-			_context = new ( window.AudioContext || window.webkitAudioContext )();
+			_context = new platform.AudioContext();
 
 		}
 

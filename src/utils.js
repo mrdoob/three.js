@@ -1,3 +1,5 @@
+import { platform } from './platform.js';
+
 function arrayMin( array ) {
 
 	if ( array.length === 0 ) return Infinity;
@@ -64,7 +66,7 @@ function getTypedArray( type, buffer ) {
 
 function createElementNS( name ) {
 
-	return document.createElementNS( 'http://www.w3.org/1999/xhtml', name );
+	return platform.createElementNS( 'http://www.w3.org/1999/xhtml', name );
 
 }
 
