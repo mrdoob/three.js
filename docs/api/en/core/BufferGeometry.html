@@ -92,7 +92,7 @@
 		<h3>[property:Array groups]</h3>
 		<p>
 			Split the geometry into groups, each of which will be rendered in a separate WebGL draw call.
-			This allows an array of materials to be used with the bufferGeometry.<br /><br />
+			This allows an array of materials to be used with the geometry.<br /><br />
 
 			Each group is an object of the form:
 			<code>{ start: Integer, count: Integer, materialIndex: Integer }</code>
@@ -100,7 +100,9 @@
 			otherwise the first triangle index. Count specifies how many vertices (or indices) are included, and
 			materialIndex specifies the material array index to use.<br /><br />
 
-			Use [page:.addGroup] to add groups, rather than modifying this array directly.
+			Use [page:.addGroup] to add groups, rather than modifying this array directly.<br /><br />
+
+			The geometry is considered as invalid when parts of the vertex data or indices are in groups but others are not.
 		</p>
 
 
