@@ -16,8 +16,11 @@ void main() {
 `;
 
 export const fragment = /* glsl */`
+#define USE_BACKGROUND_BLURRINESS
+
 #include <envmap_common_pars_fragment>
 uniform float opacity;
+uniform float blurriness;
 
 varying vec3 vWorldDirection;
 

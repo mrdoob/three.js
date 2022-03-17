@@ -230,7 +230,8 @@ const ShaderLib = {
 		uniforms: mergeUniforms( [
 			UniformsLib.envmap,
 			{
-				opacity: { value: 1.0 }
+				opacity: { value: 1.0 },
+				blurriness: { value: 0 }
 			}
 		] ),
 

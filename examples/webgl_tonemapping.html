@@ -41,7 +41,8 @@
 
 			const params = {
 				exposure: 1.0,
-				toneMapping: 'ACESFilmic'
+				toneMapping: 'ACESFilmic',
+				blurriness: 1
 			};
 
 			const toneMappingOptions = {
@@ -85,6 +86,7 @@
 				);
 
 				scene = new THREE.Scene();
+				scene.backgroundBlurriness = 1;
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.6, 2.7 );
@@ -109,6 +111,8 @@
 				// environment
 
 				texture.mapping = THREE.EquirectangularReflectionMapping;
+				texture.generateMipmaps = true;
+				texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				scene.background = texture;
 				scene.environment = texture;
@@ -139,6 +143,15 @@
 						updateGUI();
 
 						renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
+						render();
+
+					} );
+
+				gui.add( params, 'blurriness', 0, 1 )
+
+					.onChange( function ( value ) {
+
+						scene.backgroundBlurriness = value;
 						render();
 
 					} );

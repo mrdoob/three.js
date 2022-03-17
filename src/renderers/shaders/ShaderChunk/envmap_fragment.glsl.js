@@ -36,7 +36,15 @@ export default /* glsl */`
 
 	#ifdef ENVMAP_TYPE_CUBE
 
-		vec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+		#ifdef USE_BACKGROUND_BLURRINESS
+
+			vec4 envColor = textureCubeLodEXT( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), blurriness * 8.0 );
+
+		#else
+
+			vec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+
+		#endif
 
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 
