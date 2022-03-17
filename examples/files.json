@@ -84,6 +84,7 @@
 		"webgl_loader_gcode",
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_compressed",
+		"webgl_loader_gltf_hp_normal",
 		"webgl_loader_gltf_sheen",
 		"webgl_loader_gltf_point_sprite",
 		"webgl_loader_gltf_transmission",
