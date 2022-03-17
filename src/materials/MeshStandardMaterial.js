@@ -43,6 +43,7 @@ import { Color } from '../math/Color.js';
  *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
  *  envMapIntensity: <float>
  *
+ *  refraction: <float>,
  *  refractionRatio: <float>,
  *
  *  wireframe: <boolean>,
@@ -99,6 +100,7 @@ class MeshStandardMaterial extends Material {
 		this.envMap = null;
 		this.envMapIntensity = 1.0;
 
+		this._refraction = 0.0;
 		this.refractionRatio = 0.98;
 
 		this.wireframe = false;
@@ -109,6 +111,24 @@ class MeshStandardMaterial extends Material {
 		this.flatShading = false;
 
 		this.setValues( parameters );
+
+	}
+
+	get refraction() {
+
+		return this._refraction;
+
+	}
+
+	set refraction( value ) {
+
+		if ( this._refraction > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._refraction = value;
 
 	}
 
@@ -155,6 +175,7 @@ class MeshStandardMaterial extends Material {
 		this.envMap = source.envMap;
 		this.envMapIntensity = source.envMapIntensity;
 
+		this.refraction = source.refraction;
 		this.refractionRatio = source.refractionRatio;
 
 		this.wireframe = source.wireframe;

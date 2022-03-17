@@ -9,6 +9,9 @@ export default /* glsl */`
 
 	RE_IndirectSpecular(
 		radiance,
+#ifdef USE_REFRACTION
+		radianceRefraction,
+#endif
 		iblIrradiance,
 		clearcoatRadiance,
 		splitGeoNormal,

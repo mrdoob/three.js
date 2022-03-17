@@ -92,4 +92,10 @@ material.roughness = min( material.roughness, 1.0 );
 	#endif
 
 #endif
+
+#ifdef USE_REFRACTION
+
+	material.refraction = refraction;
+
+#endif
 `;

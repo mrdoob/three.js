@@ -106,6 +106,10 @@ uniform float opacity;
 	#endif
 #endif
 
+#ifdef USE_REFRACTION
+	uniform float refraction;
+#endif
+
 varying vec3 vViewPosition;
 
 #include <common>

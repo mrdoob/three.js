@@ -18,6 +18,10 @@ struct PhysicalMaterial {
 		float sheenRoughness;
 	#endif
 
+	#ifdef USE_REFRACTION
+		float refraction;
+	#endif
+
 };
 
 // temporary
@@ -179,6 +183,9 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricCo
 
 void RE_IndirectSpecular_Physical(
 	const in vec3 radiance,
+#ifdef USE_REFRACTION
+	const in vec3 radianceRefraction,
+#endif
 	const in vec3 irradiance,
 	const in vec3 clearcoatRadiance,
 	const in vec3 normal,
@@ -216,6 +223,12 @@ void RE_IndirectSpecular_Physical(
 	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
 
 	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+
+	#ifdef USE_REFRACTION
+
+		reflectedLight.indirectDiffuse = mix(reflectedLight.indirectDiffuse, radianceRefraction * material.diffuseColor, material.refraction);
+
+	#endif
 
 }
 
