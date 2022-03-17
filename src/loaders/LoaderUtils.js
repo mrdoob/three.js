@@ -59,6 +59,9 @@ class LoaderUtils {
 		// Absolute URL http://,https://,//
 		if ( /^(https?:)?\/\//i.test( url ) ) return url;
 
+		// wxfile URL wxfile://
+		if ( /^wxfile:\/\//i.test( url ) ) return url;
+
 		// Data URI
 		if ( /^data:.*,.*$/i.test( url ) ) return url;
 
