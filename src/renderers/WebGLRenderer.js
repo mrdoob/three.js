@@ -174,7 +174,9 @@ function WebGLRenderer( parameters = {} ) {
 
 	const _vector3 = new Vector3();
 
-	const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
+	const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, layers: { test: () => false }, children: [], isScene: true, onBeforeRender: function () {}, onAfterRender: function () {} };
+
+	const _camera = { isCamera: true, projectionMatrix: new Matrix4(), matrixWorldInverse: new Matrix4() };
 
 	function getTargetPixelRatio() {
 
@@ -533,6 +535,26 @@ function WebGLRenderer( parameters = {} ) {
 		if ( stencil === undefined || stencil ) bits |= _gl.STENCIL_BUFFER_BIT;
 
 		_gl.clear( bits );
+
+	};
+
+	this.clearEncodingAware = function ( color, depth, stencil ) {
+
+		const savedAutoClear = this.autoClear;
+		const savedAutoClearColor = this.autoClearColor;
+		const savedAutoClearDepth = this.autoClearDepth;
+		const savedAutoClearStencil = this.autoClearStencil;
+
+		this.autoClear = true;
+		this.autoClearColor = color;
+		this.autoClearDepth = depth;
+		this.autoClearStencil = stencil;
+		this.render( _emptyScene, _camera );
+
+		this.autoClear = savedAutoClear;
+		this.autoClearColor = savedAutoClearColor;
+		this.autoClearDepth = savedAutoClearDepth;
+		this.autoClearStencil = savedAutoClearStencil;
 
 	};
 
