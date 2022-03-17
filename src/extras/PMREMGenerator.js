@@ -235,7 +235,7 @@ class PMREMGenerator {
 			generateMipmaps: false,
 			type: UnsignedByteType,
 			format: RGBEFormat,
-			encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
+			encoding: RGBEEncoding,
 			depthBuffer: false
 		};
 
@@ -574,14 +574,6 @@ class PMREMGenerator {
 		renderer.render( flipMesh, _flatCamera );
 
 	}
-
-}
-
-function _isLDR( texture ) {
-
-	if ( texture === undefined || texture.type !== UnsignedByteType ) return false;
-
-	return texture.encoding === LinearEncoding || texture.encoding === sRGBEncoding;
 
 }
 
