@@ -223,7 +223,7 @@
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x263238 );
+				renderer.setClearColor( new THREE.Color( 0x263238 ).convertLinearToSRGB() );
 				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( renderer.domElement );
 

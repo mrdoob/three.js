@@ -42,7 +42,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x999999 );
+				scene.background = new THREE.Color( 0x999999 ).convertLinearToSRGB();
 
 				scene.add( new THREE.AmbientLight( 0x999999 ) );
 

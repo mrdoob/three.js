@@ -60,7 +60,7 @@
 
 				// scene
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x949494 );
+				scene.background = new THREE.Color( 0x949494 ).convertLinearToSRGB();
 				scene.fog = new THREE.Fog( 0x949494, 1000, 3000 );
 
 				// progressive lightmap

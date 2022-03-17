@@ -78,7 +78,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( '#454e61' );
+				scene.background = new THREE.Color( '#454e61' ).convertLinearToSRGB();
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 5000 );
 				orthoCamera = new THREE.OrthographicCamera();
 

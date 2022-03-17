@@ -55,7 +55,7 @@
 				clock = new THREE.Clock();
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xaaccff );
+				scene.background = new THREE.Color( 0xaaccff ).convertLinearToSRGB();
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
 				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );

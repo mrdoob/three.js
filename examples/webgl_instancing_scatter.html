@@ -129,7 +129,7 @@
 				//
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( api.backgroundColor );
+				scene.background = new THREE.Color( api.backgroundColor ).convertLinearToSRGB();
 
 				const pointLight = new THREE.PointLight( 0xAA8899, 0.75 );
 				pointLight.position.set( 50, - 25, 75 );

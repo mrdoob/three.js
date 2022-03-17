@@ -59,7 +59,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xaaaaaa );
+				scene.background = new THREE.Color( 0xaaaaaa ).convertLinearToSRGB();
 
 				scene.add( new THREE.DirectionalLight() );
 				scene.add( new THREE.HemisphereLight() );

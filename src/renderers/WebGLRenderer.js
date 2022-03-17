@@ -8,6 +8,7 @@ import {
 	FloatType,
 	UnsignedByteType,
 	LinearEncoding,
+	sRGBEncoding,
 	NoToneMapping,
 	LinearMipmapLinearFilter,
 	NearestFilter,
@@ -553,6 +554,44 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
+	// Returns the actual encoding that should be used to read from or write to the map in shaders.
+	// It can be different from map.encoding because usage of SRGB8_ALPHA8 textures.
+	// This function's implementation should be kept in sync with WebGLTextures.getInternalFormat.
+	this.getTextureEncodingFromMap = function ( map ) {
+
+		let encoding;
+
+		if ( map && map.isTexture ) {
+
+			encoding = map.encoding;
+
+		} else if ( map && map.isWebGLRenderTarget ) {
+
+			console.warn( 'THREE.WebGLRenderer.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
+			encoding = map.texture.encoding;
+
+		} else {
+
+			encoding = LinearEncoding;
+
+		}
+
+		if ( capabilities.isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
+
+			encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
+
+		}
+
+		if ( map && map.isCompressedTexture ) {
+
+			encoding = LinearEncoding; // disable inline decode for sRGB compressed textures
+
+		}
+
+		return encoding;
+
+	};
+
 	//
 
 	this.dispose = function () {
@@ -969,7 +1008,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		//
 
-		background.render( currentRenderList, scene );
+		background.render( currentRenderList, scene, _currentRenderTarget );
 
 		// render scene
 
@@ -1415,7 +1454,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
-		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
+		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _this.getTextureEncodingFromMap( _currentRenderTarget.texture );
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 		const vertexTangents = !! material.normalMap && !! geometry.attributes.tangent;

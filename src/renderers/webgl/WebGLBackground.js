@@ -1,4 +1,4 @@
-import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
+import { BackSide, FrontSide, CubeUVReflectionMapping, LinearEncoding, RGBEEncoding } from '../../constants.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
@@ -20,7 +20,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 	let currentTonemapping = null;
 	let currentBgToneMapped = null;
 
-	function render( renderList, scene ) {
+	function render( renderList, scene, renderTarget ) {
 
 		let forceClear = false;
 		let background = scene.isScene === true ? scene.background : null;
@@ -44,14 +44,33 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 		}
 
-		if ( background === null ) {
+		const color = clearColor.clone();
+		let alpha = clearAlpha;
+		if ( background && background.isColor ) {
 
-			setClear( clearColor, clearAlpha );
-
-		} else if ( background && background.isColor ) {
-
-			setClear( background, 1 );
+			color.set( background );
+			alpha = 1.0;
 			forceClear = true;
+
+		}
+
+		if ( background === null || background.isColor ) {
+
+			const outputEncoding = ( renderTarget !== null ) ? renderer.getTextureEncodingFromMap( renderTarget.texture ) : renderer.outputEncoding;
+
+			// Assume background color is in sRGB color space.
+			if ( outputEncoding === LinearEncoding ) {
+
+				color.convertSRGBToLinear();
+
+			} else if ( outputEncoding === RGBEEncoding ) {
+
+				color.convertSRGBToLinear();
+				alpha = 128.0 / 255.0; // Exponent will be 0.
+
+			}
+
+			setClear( color, alpha );
 
 		}
 

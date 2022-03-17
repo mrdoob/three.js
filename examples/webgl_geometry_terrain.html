@@ -58,7 +58,7 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xefd1b5 );
+				scene.background = new THREE.Color( 0xefd1b5 ).convertLinearToSRGB();
 				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
 				const data = generateHeight( worldWidth, worldDepth );

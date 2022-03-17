@@ -54,7 +54,7 @@
 				scene2.add( torus );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xe0e0e0 );
+				renderer.setClearColor( new THREE.Color( 0xe0e0e0 ).convertLinearToSRGB() );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;

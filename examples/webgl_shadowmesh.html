@@ -68,7 +68,7 @@
 
 			function init() {
 
-				scene.background = new THREE.Color( 0x0096ff );
+				scene.background = new THREE.Color( 0x0096ff ).convertLinearToSRGB();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );

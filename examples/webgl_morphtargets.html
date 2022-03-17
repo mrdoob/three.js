@@ -42,7 +42,7 @@
 				container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x8FBCD4 );
+				scene.background = new THREE.Color( 0x8FBCD4 ).convertLinearToSRGB();
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
 				camera.position.z = 10;

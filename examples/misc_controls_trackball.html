@@ -67,7 +67,7 @@
 				// world
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xcccccc );
+				scene.background = new THREE.Color( 0xcccccc ).convertLinearToSRGB();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
 				const geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );

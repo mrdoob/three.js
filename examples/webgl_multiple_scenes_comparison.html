@@ -68,10 +68,10 @@
 				container = document.querySelector( '.container' );
 
 				sceneL = new THREE.Scene();
-				sceneL.background = new THREE.Color( 0xBCD48F );
+				sceneL.background = new THREE.Color( 0xBCD48F ).convertLinearToSRGB();
 
 				sceneR = new THREE.Scene();
-				sceneR.background = new THREE.Color( 0x8FBCD4 );
+				sceneR.background = new THREE.Color( 0x8FBCD4 ).convertLinearToSRGB();
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 6;

@@ -42,7 +42,7 @@
 				camera.position.set( 200, 100, 200 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.background = new THREE.Color( 0xa0a0a0 ).convertLinearToSRGB();
 				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
 				exporter = new STLExporter();

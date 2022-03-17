@@ -47,7 +47,7 @@
 				camera.position.set( 18, 6, 18 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.background = new THREE.Color( 0xa0a0a0 ).convertLinearToSRGB();
 				scene.fog = new THREE.Fog( 0xa0a0a0, 70, 100 );
 
 				clock = new THREE.Clock();

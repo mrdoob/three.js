@@ -62,7 +62,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x333333 );
+				scene.background = new THREE.Color( 0x333333 ).convertLinearToSRGB();
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 

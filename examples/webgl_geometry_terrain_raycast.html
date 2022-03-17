@@ -69,7 +69,7 @@
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+				scene.background = new THREE.Color( 0xbfd1e5 ).convertLinearToSRGB();
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 20000 );
 

@@ -373,7 +373,7 @@
 				camera.position.z = 350;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( colors[ selectModel ] );
+				scene.background = new THREE.Color( colors[ selectModel ] ).convertLinearToSRGB();
 				scene.fog = new THREE.Fog( colors[ selectModel ], 100, 1000 );
 
 				// LIGHTS
