@@ -47,7 +47,7 @@ var APP = {
 				update: []
 			};
 
-			var scriptWrapParams = 'player,renderer,scene,camera';
+			var scriptWrapParams = 'player,renderer,scene,camera,THREE';
 			var scriptWrapResultObj = {};
 
 			for ( var eventKey in events ) {
@@ -72,11 +72,17 @@ var APP = {
 
 				var scripts = json.scripts[ uuid ];
 
+				var iframe = document.createElement( 'iframe' );
+
+				document.body.appendChild( iframe );
+
+				var F = iframe.contentWindow.Function;
+
 				for ( var i = 0; i < scripts.length; i ++ ) {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
+					var functions = ( new F( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera, THREE );
 
 					for ( var name in functions ) {
 
@@ -94,6 +100,8 @@ var APP = {
 					}
 
 				}
+
+				document.body.removeChild( iframe );
 
 			}
 
