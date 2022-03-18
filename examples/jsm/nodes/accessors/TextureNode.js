@@ -55,21 +55,23 @@ class TextureNode extends UniformNode {
 				const uvSnippet = this.uvNode.build( builder, 'vec2' );
 				const biasNode = this.biasNode;
 
-				let biasSnippet = null;
-
 				if ( biasNode !== null ) {
 
-					biasSnippet = biasNode.build( builder, 'float' );
+					const biasSnippet = biasNode.build( builder, 'float' );
+
+					snippet = builder.getTextureBias( textureProperty, uvSnippet, biasSnippet );
+
+				} else {
+
+					snippet = builder.getTexture( textureProperty, uvSnippet );
 
 				}
-
-				snippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
 
 				nodeData.snippet = snippet;
 
 			}
 
-			return builder.format( snippet, 'texture', output );
+			return builder.format( snippet, 'vec4', output );
 
 		}
 
