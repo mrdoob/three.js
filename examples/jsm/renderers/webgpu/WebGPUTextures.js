@@ -361,11 +361,7 @@ class WebGPUTextures {
 
 		} else if ( texture.isCubeTexture ) {
 
-			if ( image.length === 6 ) {
-
-				this._copyCubeMapToTexture( image, texture, textureGPU, textureGPUDescriptor, needsMipmaps );
-
-			}
+			this._copyCubeMapToTexture( image, texture, textureGPU );
 
 		} else {
 
@@ -419,17 +415,15 @@ class WebGPUTextures {
 
 	}
 
-	_copyCubeMapToTexture( images, texture, textureGPU, textureGPUDescriptor, needsMipmaps ) {
+	_copyCubeMapToTexture( images, texture, textureGPU ) {
 
-		for ( let i = 5; i >= 0; i -- ) {
+		for ( let i = 0; i < images.length; i ++ ) {
 
 			const image = images[ i ];
 
 			this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-				this._copyExternalImageToTexture( imageBitmap, textureGPU );
-
-				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i, i > 0 ? 0 : 1 );
+				this._copyExternalImageToTexture( imageBitmap, textureGPU, { x: 0, y: 0, z: i } );
 
 			} );
 
@@ -445,7 +439,7 @@ class WebGPUTextures {
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
-				origin
+				origin: origin
 			}, {
 				width: image.width,
 				height: image.height,
@@ -483,14 +477,14 @@ class WebGPUTextures {
 				{
 					width: Math.ceil( width / blockData.width ) * blockData.width,
 					height: Math.ceil( height / blockData.width ) * blockData.width,
-					depthOrArrayLayers: 1
+					depthOrArrayLayers: 1,
 				} );
 
 		}
 
 	}
 
-	_generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer, mipLevelOffset ) {
+	_generateMipmaps( textureGPU, textureGPUDescriptor ) {
 
 		if ( this.utils === null ) {
 
@@ -498,7 +492,7 @@ class WebGPUTextures {
 
 		}
 
-		this.utils.generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer, mipLevelOffset );
+		this.utils.generateMipmaps( textureGPU, textureGPUDescriptor );
 
 	}
 
