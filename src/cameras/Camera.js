@@ -61,6 +61,17 @@ class Camera extends Object3D {
 
 	}
 
+    clearViewOffset() {
+
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
+		this.updateProjectionMatrix();
+
+	}
 }
 
 Camera.prototype.isCamera = true;

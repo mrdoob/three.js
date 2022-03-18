@@ -162,18 +162,6 @@ class PerspectiveCamera extends Camera {
 
 	}
 
-	clearViewOffset() {
-
-		if ( this.view !== null ) {
-
-			this.view.enabled = false;
-
-		}
-
-		this.updateProjectionMatrix();
-
-	}
-
 	updateProjectionMatrix() {
 
 		const near = this.near;
