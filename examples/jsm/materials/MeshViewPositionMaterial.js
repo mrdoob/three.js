@@ -1,4 +1,4 @@
-import { ShaderLib, ShaderMaterial, UniformsUtils } from '../../../build/three.module.js';
+import { ShaderLib, ShaderMaterial, UniformsUtils } from '@dualbox/three';
 
 /**
      * @author Maxime Quiblier / http://github.com/maximeq
