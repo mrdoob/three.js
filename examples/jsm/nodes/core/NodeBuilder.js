@@ -142,13 +142,25 @@ class NodeBuilder {
 
 	}
 
-	getTexture( /* textureProperty, uvSnippet, biasSnippet = null */ ) {
+	getTexture( /* textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	getCubeTexture( /* textureProperty, uvSnippet, biasSnippet = null */ ) {
+	getTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getCubeTexture( /* textureProperty, uvSnippet */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getCubeTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
