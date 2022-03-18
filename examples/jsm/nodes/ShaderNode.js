@@ -9,6 +9,8 @@ import UniformNode from './core/UniformNode.js';
 import BufferNode from './accessors/BufferNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import NormalNode from './accessors/NormalNode.js';
+import CameraNode from './accessors/CameraNode.js';
+import ModelNode from './accessors/ModelNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 
@@ -269,22 +271,14 @@ export const imat4 = new ConvertType( 'imat4', Matrix4 );
 export const umat4 = new ConvertType( 'umat4', Matrix4 );
 export const bmat4 = new ConvertType( 'bmat4', Matrix4 );
 
-export const join = ( ...params ) => {
-
-	return nodeObject( new JoinNode( getShaderNodeArray( params ) ) );
-
-};
+export const join = ( ...params ) => nodeObject( new JoinNode( getShaderNodeArray( params ) ) );
 
 export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
 export const attribute = ( ...params ) => nodeObject( new AttributeNode( ...params ) );
 export const buffer = ( ...params ) => nodeObject( new BufferNode( ...params ) );
 export const texture = ( ...params ) => nodeObject( new TextureNode( ...params ) );
 
-export const cond = ( ...params ) => {
-
-	return nodeObject( new CondNode( ...getShaderNodeArray( params ) ) );
-
-};
+export const cond = ( ...params ) => nodeObject( new CondNode( ...getShaderNodeArray( params ) ) );
 
 export const addTo = ( varNode, ...params ) => {
 
@@ -326,6 +320,10 @@ export const positionLocal = new ShaderNodeObject( new PositionNode( PositionNod
 export const positionWorld = new ShaderNodeObject( new PositionNode( PositionNode.WORLD ) );
 export const positionView = new ShaderNodeObject( new PositionNode( PositionNode.VIEW ) );
 export const positionViewDirection = new ShaderNodeObject( new PositionNode( PositionNode.VIEW_DIRECTION ) );
+
+export const viewMatrix = new ShaderNodeObject( new ModelNode( ModelNode.VIEW_MATRIX ) );
+
+export const cameraPosition = new ShaderNodeObject( new CameraNode( CameraNode.POSITION ) );
 
 export const PI = float( 3.141592653589793 );
 export const PI2 = float( 6.283185307179586 );
