@@ -61,7 +61,7 @@ class Camera extends Object3D {
 
 	}
 
-    clearViewOffset() {
+	clearViewOffset() {
 
 		if ( this.view !== null ) {
 
@@ -72,6 +72,7 @@ class Camera extends Object3D {
 		this.updateProjectionMatrix();
 
 	}
+
 }
 
 Camera.prototype.isCamera = true;
