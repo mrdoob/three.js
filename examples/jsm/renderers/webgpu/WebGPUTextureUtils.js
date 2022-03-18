@@ -123,7 +123,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
-	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 1, mipLevelOffset = 1 ) {
+	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0, mipLevelOffset = 1 ) {
 
 		const pipeline = this.getMipmapPipeline( textureGPUDescriptor.format );
 
