@@ -6,7 +6,7 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from './WebGPUNodeUniform.js';
 import WebGPUNodeSampler from './WebGPUNodeSampler.js';
-import { WebGPUNodeSampledTexture } from './WebGPUNodeSampledTexture.js';
+import { WebGPUNodeSampledTexture, WebGPUNodeSampledCubeTexture } from './WebGPUNodeSampledTexture.js';
 
 import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
@@ -33,27 +33,27 @@ const wgslTypeLib = {
 	int: 'i32',
 	uint: 'u32',
 	bool: 'bool',
-	
+
 	vec2: 'vec2<f32>',
 	ivec2: 'vec2<i32>',
 	uvec2: 'vec2<u32>',
 	bvec2: 'vec2<bool>',
-	
+
 	vec3: 'vec3<f32>',
 	ivec3: 'vec3<i32>',
 	uvec3: 'vec3<u32>',
 	bvec3: 'vec3<bool>',
-	
+
 	vec4: 'vec4<f32>',
 	ivec4: 'vec4<i32>',
 	uvec4: 'vec4<u32>',
 	bvec4: 'vec4<bool>',
-	
+
 	mat3: 'mat3x3<f32>',
 	imat3: 'mat3x3<i32>',
 	umat3: 'mat3x3<u32>',
 	bmat3: 'mat3x3<bool>',
-	
+
 	mat4: 'mat4x4<f32>',
 	imat4: 'mat4x4<i32>',
 	umat4: 'mat4x4<u32>',
@@ -362,7 +362,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
@@ -377,6 +377,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			return `textureLoad( ${textureProperty}, repeatWrapping( ${uvSnippet}, ${dimension} ), 0 )`;
 
 		}
+
+	}
+
+	getTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+
+		return this.getSampler( textureProperty, uvSnippet, shaderStage );
+
+	}
+
+	getCubeTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+
+		return this.getSampler( textureProperty, uvSnippet, shaderStage );
 
 	}
 
@@ -395,7 +407,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			const name = node.name;
 			const type = node.type;
 
-			if ( type === 'texture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' ) {
 
 				return name;
 
@@ -434,10 +446,21 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const bindings = this.bindings[ shaderStage ];
 
-			if ( type === 'texture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' ) {
 
 				const sampler = new WebGPUNodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
-				const texture = new WebGPUNodeSampledTexture( uniformNode.name, uniformNode.node );
+
+				let texture = null;
+
+				if ( type === 'texture' ) {
+
+					texture = new WebGPUNodeSampledTexture( uniformNode.name, uniformNode.node );
+
+				} else if ( type === 'cubeTexture' ) {
+
+					texture = new WebGPUNodeSampledCubeTexture( uniformNode.name, uniformNode.node );
+
+				}
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
@@ -454,7 +477,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 					bindings.splice( index, 0, texture );
 
 					uniformGPU = [ texture ];
-
 
 				}
 
@@ -651,6 +673,16 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				}
 
 				snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>; `;
+
+			} else if ( uniform.type === 'cubeTexture' ) {
+
+				if ( shaderStage === 'fragment' ) {
+
+					snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler; `;
+
+				}
+
+				snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_cube<f32>; `;
 
 			} else if ( uniform.type === 'buffer' ) {
 
