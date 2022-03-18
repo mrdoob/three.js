@@ -568,7 +568,7 @@
 
 	}
 
-	// for backward-compatilibity
+	// for backward-compatibility
 
 	function resetDefaultState() {
 

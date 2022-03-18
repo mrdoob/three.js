@@ -65,9 +65,14 @@ class WebGLNodeBuilder extends NodeBuilder {
 	_parseObject() {
 
 		const material = this.material;
-		const type = material.type;
+		let type = material.type;
 
 		// shader lib
+
+		if ( material.isMeshStandardNodeMaterial ) type = 'MeshStandardNodeMaterial';
+		else if ( material.isMeshBasicNodeMaterial ) type = 'MeshBasicNodeMaterial';
+		else if ( material.isPointsNodeMaterial ) type = 'PointsNodeMaterial';
+		else if ( material.isLineBasicNodeMaterial ) type = 'LineBasicNodeMaterial';
 
 		if ( nodeShaderLib[ type ] !== undefined ) {
 

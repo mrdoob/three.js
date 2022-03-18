@@ -35,7 +35,7 @@ function clamp( value, min, max ) {
 
 }
 
-// compute euclidian modulo of m % n
+// compute euclidean modulo of m % n
 // https://en.wikipedia.org/wiki/Modulo_operation
 function euclideanModulo( n, m ) {
 

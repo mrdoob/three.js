@@ -254,7 +254,22 @@ class PCDLoader extends Loader {
 
 				if ( offset.rgb !== undefined ) {
 
-					const rgb = parseFloat( line[ offset.rgb ] );
+					const rgb_field_index = PCDheader.fields.findIndex( ( field ) => field === 'rgb' );
+					const rgb_type = PCDheader.type[ rgb_field_index ];
+
+					const float = parseFloat( line[ offset.rgb ] );
+					let rgb = float;
+
+					if ( rgb_type === 'F' ) {
+
+						// treat float values as int
+						// https://github.com/daavoo/pyntcloud/pull/204/commits/7b4205e64d5ed09abe708b2e91b615690c24d518
+						const farr = new Float32Array( 1 );
+						farr[ 0 ] = float;
+						rgb = new Int32Array( farr.buffer )[ 0 ];
+
+					}
+
 					const r = ( rgb >> 16 ) & 0x0000ff;
 					const g = ( rgb >> 8 ) & 0x0000ff;
 					const b = ( rgb >> 0 ) & 0x0000ff;
