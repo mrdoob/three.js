@@ -40,6 +40,8 @@ class CameraNode extends Object3DNode {
 
 		} else {
 
+			this.object3d = camera;
+
 			super.update( frame );
 
 		}
