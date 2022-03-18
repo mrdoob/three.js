@@ -1,20 +1,12 @@
+import TextureNode from './TextureNode.js';
 import UniformNode from '../core/UniformNode.js';
 import ReflectNode from './ReflectNode.js';
 
-class CubeTextureNode extends UniformNode {
+class CubeTextureNode extends TextureNode {
 
 	constructor( value, uvNode = new ReflectNode(), biasNode = null ) {
 
-		super( value, 'vec4' );
-
-		this.uvNode = uvNode;
-		this.biasNode = biasNode;
-
-	}
-
-	getUniformHash( /*builder*/ ) {
-
-		return this.value.uuid;
+		super( value, uvNode, biasNode );
 
 	}
 
@@ -34,7 +26,7 @@ class CubeTextureNode extends UniformNode {
 
 		}
 
-		const textureProperty = super.generate( builder, 'cubeTexture' );
+		const textureProperty = UniformNode.prototype.generate.call( this, builder, 'cubeTexture' );
 
 		if ( output === 'samplerCube' || output === 'textureCube' ) {
 
@@ -74,22 +66,6 @@ class CubeTextureNode extends UniformNode {
 			return builder.format( snippet, 'vec4', output );
 
 		}
-
-	}
-
-	serialize( data ) {
-
-		super.serialize( data );
-
-		data.value = this.value.toJSON( data.meta ).uuid;
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		this.value = data.meta.textures[ data.value ];
 
 	}
 
