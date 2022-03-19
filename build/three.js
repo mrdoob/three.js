@@ -939,17 +939,10 @@
 		}
 
 		transpose() {
-			let tmp;
 			const m = this.elements;
-			tmp = m[1];
-			m[1] = m[3];
-			m[3] = tmp;
-			tmp = m[2];
-			m[2] = m[6];
-			m[6] = tmp;
-			tmp = m[5];
-			m[5] = m[7];
-			m[7] = tmp;
+			m[1], m[3] = m[3], m[1];
+			m[2], m[6] = m[6], m[2];
+			m[5], m[7] = m[7], m[5];
 			return this;
 		}
 
