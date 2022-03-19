@@ -146,7 +146,7 @@ export class ArrayMap {
 
 	}
 
-	delete( key ) {
+	delete( key, preserveKey = true ) {
 
 		if ( key.length === 0 ) {
 
@@ -159,13 +159,19 @@ export class ArrayMap {
 
 		}
 
+		if ( preserveKey ) {
+
+			key = Array.from( key );
+
+		}
+
 		const firstKey = key.shift();
 
-		return this.map.has( firstKey ) ? this.map.get( firstKey ).delete( key ) : false;
+		return this.map.has( firstKey ) ? this.map.get( firstKey ).delete( key, false ) : false;
 
 	}
 
-	get( key ) {
+	get( key, preserveKey = true ) {
 
 		if ( key.length === 0 ) {
 
@@ -173,13 +179,19 @@ export class ArrayMap {
 
 		}
 
+		if ( preserveKey ) {
+
+			key = Array.from( key );
+
+		}
+
 		const firstKey = key.shift();
 
-		return this.map.has( firstKey ) ? this.map.get( firstKey ).get( key ) : undefined;
+		return this.map.has( firstKey ) ? this.map.get( firstKey ).get( key, false ) : undefined;
 
 	}
 
-	has( key ) {
+	has( key, preserveKey = true ) {
 
 		if ( key.length === 0 ) {
 
@@ -187,13 +199,19 @@ export class ArrayMap {
 
 		}
 
+		if ( preserveKey ) {
+
+			key = Array.from( key );
+
+		}
+
 		const firstKey = key.shift();
 
-		return this.map.has( firstKey ) && this.map.get( firstKey ).has( key );
+		return this.map.has( firstKey ) && this.map.get( firstKey ).has( key, false );
 
 	}
 
-	set( key, value ) {
+	set( key, value, preserveKey = true ) {
 
 		if ( key.length === 0 ) {
 
@@ -201,6 +219,12 @@ export class ArrayMap {
 			this.hasValue = true;
 
 			return this;
+
+		}
+
+		if ( preserveKey ) {
+
+			key = Array.from( key );
 
 		}
 
@@ -212,7 +236,7 @@ export class ArrayMap {
 
 		}
 
-		this.map.get( firstKey ).set( key, value );
+		this.map.get( firstKey ).set( key, value, false );
 
 		return this;
 
