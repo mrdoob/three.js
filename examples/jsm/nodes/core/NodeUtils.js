@@ -102,14 +102,21 @@ export const getValueFromType = ( type ) => {
 
 };
 
+let lastAccessed = 0;
+
 export class ArrayMap {
 
-	constructor( iterable ) {
+	constructor( iterable, maxSize = 100, chunkSize = 10 ) {
 
 		this.map = new Map();
 
 		this.value = undefined;
 		this.hasValue = false;
+
+		this.maxSize = maxSize;
+		this.chunkSize = chunkSize;
+
+		this.lastAccessed = 0;
 
 		if ( iterable ) {
 
@@ -146,6 +153,62 @@ export class ArrayMap {
 
 	}
 
+	_removeEmptyMaps() {
+
+		for ( let [ key, map ] of this.map.entries() ) {
+
+			map._removeEmptyMaps();
+
+			if ( map.size === 0 ) {
+
+				this.map.delete( key );
+
+			}
+
+		}
+
+	}
+
+	_cap() {
+
+		let valuesToRemove = this.size - this.maxSize;
+
+		const keys = [];
+
+		for ( let [ key, map ] of this._mapEntries() ) {
+
+			if ( map.hasValue ) {
+
+				keys[ map.lastAccessed ] = key;
+
+			}
+
+		}
+
+		for ( let key of keys ) {
+
+			if ( key === undefined ) {
+
+				continue;
+
+			}
+
+			if ( valuesToRemove -- ) {
+
+				this.delete( key );
+
+			} else {
+
+				break;
+
+			}
+
+		}
+
+		this._removeEmptyMaps();
+
+	}
+
 	delete( key, preserveKey = true ) {
 
 		if ( key.length === 0 ) {
@@ -154,6 +217,8 @@ export class ArrayMap {
 
 			this.value = undefined;
 			this.hasValue = false;
+
+			this.lastAccessed = 0;
 
 			return hadValue;
 
@@ -175,7 +240,17 @@ export class ArrayMap {
 
 		if ( key.length === 0 ) {
 
-			return this.hasValue ? this.value : undefined;
+			if ( this.hasValue ) {
+
+				this.lastAccessed = ++lastAccessed;
+
+				return this.value;
+
+			} else {
+
+				return undefined;
+
+			}
 
 		}
 
@@ -211,12 +286,14 @@ export class ArrayMap {
 
 	}
 
-	set( key, value, preserveKey = true ) {
+	set( key, value, preserveKey = true, checkOverflow = preserveKey ) {
 
 		if ( key.length === 0 ) {
 
 			this.value = value;
 			this.hasValue = true;
+
+			this.lastAccessed = ++lastAccessed;
 
 			return this;
 
@@ -237,6 +314,12 @@ export class ArrayMap {
 		}
 
 		this.map.get( firstKey ).set( key, value, false );
+
+		if ( checkOverflow && ( this.size > this.maxSize + this.chunkSize ) ) {
+
+			this._cap();
+
+		}
 
 		return this;
 
@@ -305,6 +388,24 @@ export class ArrayMap {
 				key2.unshift( key );
 
 				yield [ key2, value ];
+
+			}
+
+		}
+
+	}
+
+	* _mapEntries() {
+
+		yield [ [], this ];
+
+		for ( let [ key, value ] of this.map ) {
+
+			for ( let [ key2, map ] of value._mapEntries() ) {
+
+				key2.unshift( key );
+
+				yield [ key2, map ];
 
 			}
 
