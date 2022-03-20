@@ -42,6 +42,15 @@
 		Default is *false*.
 		</p>
 
+		<h3>[property:Color blendColor]</h3>
+		<p>
+		Constant blend color used by [page:CustomBlendingEquation ConstantColor], [page:CustomBlendingEquation OneMinusConstantColor], [page:CustomBlendingEquation ConstantAlpha] and [page:CustomBlendingEquation OneMinusConstantAlpha].
+		See the destination factors [page:CustomBlendingEquation constants] for all possible values.<br />
+		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] and one of the blending factors listed above must be in use for this to have any effect.<br />
+		Note that if a constant color and a constant alpha value are used together as source and destination factors, an error will occur.
+	
+		</p>
+
 		<h3>[property:Integer blendDst]</h3>
 		<p>
 		Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor].

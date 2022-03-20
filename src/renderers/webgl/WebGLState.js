@@ -1,4 +1,4 @@
-import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor } from '../../constants.js';
+import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, ConstantColor, OneMinusConstantColor, ConstantAlpha, OneMinusConstantAlpha } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
 
 function WebGLState( gl, extensions, capabilities ) {
@@ -590,10 +590,14 @@ function WebGLState( gl, extensions, capabilities ) {
 		[ OneMinusSrcColorFactor ]: gl.ONE_MINUS_SRC_COLOR,
 		[ OneMinusSrcAlphaFactor ]: gl.ONE_MINUS_SRC_ALPHA,
 		[ OneMinusDstColorFactor ]: gl.ONE_MINUS_DST_COLOR,
-		[ OneMinusDstAlphaFactor ]: gl.ONE_MINUS_DST_ALPHA
+		[ OneMinusDstAlphaFactor ]: gl.ONE_MINUS_DST_ALPHA,
+		[ ConstantColor ]: gl.CONSTANT_COLOR,
+		[ OneMinusConstantColor ]: gl.ONE_MINUS_CONSTANT_COLOR,
+		[ ConstantAlpha ]: gl.CONSTANT_ALPHA,
+		[ OneMinusConstantAlpha ]: gl.ONE_MINUS_CONSTANT_ALPHA
 	};
 
-	function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
+	function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha, blendColor ) {
 
 		if ( blending === NoBlending ) {
 
@@ -722,6 +726,12 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		}
 
+		if ( blendColor !== null ) {
+
+			gl.blendColor( blendColor.r, blendColor.g, blendColor.b, blendColor.a );
+
+		}
+
 		currentBlending = blending;
 		currentPremultipledAlpha = null;
 
@@ -740,7 +750,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		( material.blending === NormalBlending && material.transparent === false )
 			? setBlending( NoBlending )
-			: setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
+			: setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha, material.blendColor );
 
 		depthBuffer.setFunc( material.depthFunc );
 		depthBuffer.setTest( material.depthTest );

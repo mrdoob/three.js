@@ -32,6 +32,7 @@ class Material extends EventDispatcher {
 		this.blendSrcAlpha = null;
 		this.blendDstAlpha = null;
 		this.blendEquationAlpha = null;
+		this.blendColor = null;
 
 		this.depthFunc = LessEqualDepth;
 		this.depthTest = true;
@@ -409,6 +410,7 @@ class Material extends EventDispatcher {
 		this.blendSrcAlpha = source.blendSrcAlpha;
 		this.blendDstAlpha = source.blendDstAlpha;
 		this.blendEquationAlpha = source.blendEquationAlpha;
+		this.blendColor = source.blendColor;
 
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;

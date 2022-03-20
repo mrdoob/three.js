@@ -44,7 +44,7 @@ class LightsNode extends Node {
 		if ( this._hash === null ) {
 
 			let hash = '';
-			
+
 			const lightNodes = this.lightNodes;
 
 			for ( const lightNode of lightNodes ) {
@@ -52,9 +52,9 @@ class LightsNode extends Node {
 				hash += lightNode.light.uuid + ' ';
 
 			}
-			
+
 			this._hash = hash;
-			
+
 		}
 
 		return this._hash;

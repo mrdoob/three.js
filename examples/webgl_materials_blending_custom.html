@@ -32,7 +32,9 @@
 			const materials = [];
 
 			const params = {
-				blendEquation: THREE.AddEquation
+				blendEquation: THREE.AddEquation,
+				blendColor: 0xff0000,
+				alpha: 1
 			};
 
 			const equations = { Add: THREE.AddEquation, Subtract: THREE.SubtractEquation, ReverseSubtract: THREE.ReverseSubtractEquation, Min: THREE.MinEquation, Max: THREE.MaxEquation };
@@ -99,10 +101,14 @@
 					{ name: 'DstAlpha', constant: THREE.DstAlphaFactor },
 					{ name: 'OneMinusDstAlpha', constant: THREE.OneMinusDstAlphaFactor },
 					{ name: 'DstColor', constant: THREE.DstColorFactor },
-					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor }
+					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor },
+					{ name: 'ConstantColor', constant: THREE.ConstantColor },
+					{ name: 'OneMinusConstantColor', constant: THREE.OneMinusConstantColor },
+					{ name: 'ConstantAlpha', constant: THREE.ConstantAlpha},
+					{ name: 'OneMinusConstantAlpha', constant: THREE.OneMinusConstantAlpha }
 				];
 
-				const geo1 = new THREE.PlaneGeometry( 100, 100 );
+				const geo1 = new THREE.PlaneGeometry( 70, 70 );
 				const geo2 = new THREE.PlaneGeometry( 100, 25 );
 
 				const texture = new THREE.TextureLoader().load( 'textures/lensflare/lensflare0_alpha.png' );
@@ -122,10 +128,12 @@
 						material.blendSrc = blendSrc.constant;
 						material.blendDst = blendDst.constant;
 						material.blendEquation = THREE.AddEquation;
+						material.blendColor = new THREE.Color( params.blendColor );
+						material.blendColor.a = params.alpha;
 
-						const x = ( j - src.length / 2 ) * 110;
+						const x = ( j - src.length / 2 ) * 80;
 						const z = 0;
-						const y = ( i - dst.length / 2 ) * 110 + 50;
+						const y = ( i - dst.length / 2 ) * 80 + 50;
 
 						const mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, - y, z );
@@ -143,9 +151,9 @@
 
 					const blendSrc = src[ j ];
 
-					const x = ( j - src.length / 2 ) * 110;
+					const x = ( j - src.length / 2 ) * 80;
 					const z = 0;
-					const y = ( 0 - dst.length / 2 ) * 110 + 50;
+					const y = ( 0 - dst.length / 2 ) * 80 + 50;
 
 					const mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.name, 'rgba( 0, 150, 0, 1 )' ) );
 					mesh.position.set( x, - ( y - 70 ), z );
@@ -159,9 +167,9 @@
 
 					const blendDst = dst[ i ];
 
-					const x = ( 0 - src.length / 2 ) * 110 - 125;
+					const x = ( 0 - src.length / 2 ) * 80 - 125;
 					const z = 0;
-					const y = ( i - dst.length / 2 ) * 110 + 165;
+					const y = ( i - dst.length / 2 ) * 80 + 165;
 
 					const mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.name, 'rgba( 150, 0, 0, 1 )' ) );
 					mesh.position.set( x, - ( y - 120 ), z );
@@ -185,9 +193,11 @@
 				// GUI
 
 				//
-				const gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 200 } );
 
 				gui.add( params, 'blendEquation', equations ).onChange( updateBlendEquation );
+				gui.addColor(params, 'blendColor').onChange( updateBlendColor );
+				gui.add(params, 'alpha', 0, 1).onChange( updateAlpha );
 				gui.open();
 
 			}
@@ -231,6 +241,27 @@
 				for ( const material of materials ) {
 
 					material.blendEquation = value;
+
+				}
+
+			}
+
+			function updateBlendColor( value ) {
+
+				for ( const material of materials ) {
+
+					material.blendColor = new THREE.Color( value );
+					material.blendColor.a = params.alpha;
+
+				}
+
+			}
+
+			function updateAlpha( value ) {
+
+				for ( const material of materials ) {
+
+					material.blendColor.a = value;
 
 				}
 
