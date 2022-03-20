@@ -134,7 +134,7 @@ export class ArrayMap {
 
 		let total = this.hasValue ? 1 : 0;
 
-		for ( let el of this.map.entries() ) {
+		for ( let el of this.map.values() ) {
 
 			total += el.size;
 
