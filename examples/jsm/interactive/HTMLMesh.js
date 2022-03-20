@@ -249,8 +249,8 @@ function html2canvas( element ) {
 
 			context.save();
 			const dpr = window.devicePixelRatio;
-			context.scale( 1 / dpr, 1 / dpr );
-			context.drawImage( element, 0, 0 );
+			context.scale(1/dpr, 1/dpr);
+			context.drawImage(element, 0, 0 );
 			context.restore();
 
 		} else {

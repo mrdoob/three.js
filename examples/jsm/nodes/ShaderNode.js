@@ -70,7 +70,7 @@ const NodeHandler = {
 
 const nodeObjects = new WeakMap();
 
-const ShaderNodeObject = function ( obj ) {
+const ShaderNodeObject = function( obj ) {
 
 	const type = typeof obj;
 
@@ -102,7 +102,7 @@ const ShaderNodeObject = function ( obj ) {
 
 };
 
-const ShaderNodeObjects = function ( objects ) {
+const ShaderNodeObjects = function( objects ) {
 
 	for ( const name in objects ) {
 
@@ -128,7 +128,7 @@ const getShaderNodeArray = ( array ) => {
 
 };
 
-const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
+const ShaderNodeProxy = function( NodeClass, scope = null, factor = null ) {
 
 	if ( scope === null ) {
 
@@ -224,7 +224,7 @@ const ConvertType = function ( type, valueClass = null, valueComponents = 1 ) {
 
 			for ( let i = 1; i < valueComponents; i ++ ) {
 
-				params[ i ] = params[ 0 ];
+				params[ i ] = params [ 0 ];
 
 			}
 
