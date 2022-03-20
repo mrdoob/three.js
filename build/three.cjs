@@ -57,10 +57,6 @@ const OneMinusDstAlphaFactor = 207;
 const DstColorFactor = 208;
 const OneMinusDstColorFactor = 209;
 const SrcAlphaSaturateFactor = 210;
-const ConstantColor = 211;
-const OneMinusConstantColor = 212;
-const ConstantAlpha = 213;
-const OneMinusConstantAlpha = 214;
 const NeverDepth = 0;
 const AlwaysDepth = 1;
 const LessDepth = 2;
@@ -278,7 +274,7 @@ function generateUUID() {
 
 function clamp(value, min, max) {
 	return Math.max(min, Math.min(max, value));
-} // compute euclidean modulo of m % n
+} // compute euclidian modulo of m % n
 // https://en.wikipedia.org/wiki/Modulo_operation
 
 
@@ -2623,8 +2619,7 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.height = source.height;
 		this.depth = source.depth;
 		this.viewport.copy(source.viewport);
-		this.texture = source.texture.clone();
-		this.texture.isRenderTargetTexture = true; // ensure image object is not shared, see #20328
+		this.texture = source.texture.clone(); // ensure image object is not shared, see #20328
 
 		this.texture.image = Object.assign({}, source.texture.image);
 		this.depthBuffer = source.depthBuffer;
@@ -4234,10 +4229,10 @@ const _testAxis = /*@__PURE__*/new Vector3();
 
 function satForAxes(axes, v0, v1, v2, extents) {
 	for (let i = 0, j = axes.length - 3; i <= j; i += 3) {
-		_testAxis.fromArray(axes, i); // project the aabb onto the separating axis
+		_testAxis.fromArray(axes, i); // project the aabb onto the seperating axis
 
 
-		const r = extents.x * Math.abs(_testAxis.x) + extents.y * Math.abs(_testAxis.y) + extents.z * Math.abs(_testAxis.z); // project all 3 vertices of the triangle onto the separating axis
+		const r = extents.x * Math.abs(_testAxis.x) + extents.y * Math.abs(_testAxis.y) + extents.z * Math.abs(_testAxis.z); // project all 3 vertices of the triangle onto the seperating axis
 
 		const p0 = v0.dot(_testAxis);
 		const p1 = v1.dot(_testAxis);
@@ -4245,7 +4240,7 @@ function satForAxes(axes, v0, v1, v2, extents) {
 
 		if (Math.max(-Math.max(p0, p1, p2), Math.min(p0, p1, p2)) > r) {
 			// points of the projected triangle are outside the projected half-length of the aabb
-			// the axis is separating and we can exit
+			// the axis is seperating and we can exit
 			return false;
 		}
 	}
@@ -6713,7 +6708,6 @@ class Material extends EventDispatcher {
 		this.blendSrcAlpha = null;
 		this.blendDstAlpha = null;
 		this.blendEquationAlpha = null;
-		this.blendColor = null;
 		this.depthFunc = LessEqualDepth;
 		this.depthTest = true;
 		this.depthWrite = true;
@@ -6990,7 +6984,6 @@ class Material extends EventDispatcher {
 		this.blendSrcAlpha = source.blendSrcAlpha;
 		this.blendDstAlpha = source.blendDstAlpha;
 		this.blendEquationAlpha = source.blendEquationAlpha;
-		this.blendColor = source.blendColor;
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
@@ -9227,6 +9220,8 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	fromEquirectangularTexture(renderer, texture) {
 		this.texture.type = texture.type;
+		this.texture.format = RGBAFormat; // see #18859
+
 		this.texture.encoding = texture.encoding;
 		this.texture.generateMipmaps = texture.generateMipmaps;
 		this.texture.minFilter = texture.minFilter;
@@ -9918,7 +9913,7 @@ var morphcolor_vertex = "#if defined( USE_MORPHCOLORS ) && defined( MORPHTARGETS
 
 var morphnormal_vertex = "#ifdef USE_MORPHNORMALS\n\tobjectNormal *= morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) objectNormal += getMorph( gl_VertexID, i, 1 ).xyz * morphTargetInfluences[ i ];\n\t\t}\n\t#else\n\t\tobjectNormal += morphNormal0 * morphTargetInfluences[ 0 ];\n\t\tobjectNormal += morphNormal1 * morphTargetInfluences[ 1 ];\n\t\tobjectNormal += morphNormal2 * morphTargetInfluences[ 2 ];\n\t\tobjectNormal += morphNormal3 * morphTargetInfluences[ 3 ];\n\t#endif\n#endif";
 
-var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\tuniform float morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tuniform float morphTargetInfluences[ MORPHTARGETS_COUNT ];\n\t\tuniform sampler2DArray morphTargetsTexture;\n\t\tuniform ivec2 morphTargetsTextureSize;\n\t\tvec4 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset ) {\n\t\t\tint texelIndex = vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + offset;\n\t\t\tint y = texelIndex / morphTargetsTextureSize.x;\n\t\t\tint x = texelIndex - y * morphTargetsTextureSize.x;\n\t\t\tivec3 morphUV = ivec3( x, y, morphTargetIndex );\n\t\t\treturn texelFetch( morphTargetsTexture, morphUV, 0 );\n\t\t}\n\t#else\n\t\t#ifndef USE_MORPHNORMALS\n\t\t\tuniform float morphTargetInfluences[ 8 ];\n\t\t#else\n\t\t\tuniform float morphTargetInfluences[ 4 ];\n\t\t#endif\n\t#endif\n#endif";
+var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\tuniform float morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tuniform float morphTargetInfluences[ MORPHTARGETS_COUNT ];\n\t\tuniform sampler2DArray morphTargetsTexture;\n\t\tuniform vec2 morphTargetsTextureSize;\n\t\tvec4 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset ) {\n\t\t\tfloat texelIndex = float( vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + offset );\n\t\t\tfloat y = floor( texelIndex / morphTargetsTextureSize.x );\n\t\t\tfloat x = texelIndex - y * morphTargetsTextureSize.x;\n\t\t\tvec3 morphUV = vec3( ( x + 0.5 ) / morphTargetsTextureSize.x, y / morphTargetsTextureSize.y, morphTargetIndex );\n\t\t\treturn texture( morphTargetsTexture, morphUV );\n\t\t}\n\t#else\n\t\t#ifndef USE_MORPHNORMALS\n\t\t\tuniform float morphTargetInfluences[ 8 ];\n\t\t#else\n\t\t\tuniform float morphTargetInfluences[ 4 ];\n\t\t#endif\n\t#endif\n#endif";
 
 var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) transformed += getMorph( gl_VertexID, i, 0 ).xyz * morphTargetInfluences[ i ];\n\t\t}\n\t#else\n\t\ttransformed += morphTarget0 * morphTargetInfluences[ 0 ];\n\t\ttransformed += morphTarget1 * morphTargetInfluences[ 1 ];\n\t\ttransformed += morphTarget2 * morphTargetInfluences[ 2 ];\n\t\ttransformed += morphTarget3 * morphTargetInfluences[ 3 ];\n\t\t#ifndef USE_MORPHNORMALS\n\t\t\ttransformed += morphTarget4 * morphTargetInfluences[ 4 ];\n\t\t\ttransformed += morphTarget5 * morphTargetInfluences[ 5 ];\n\t\t\ttransformed += morphTarget6 * morphTargetInfluences[ 6 ];\n\t\t\ttransformed += morphTarget7 * morphTargetInfluences[ 7 ];\n\t\t#endif\n\t#endif\n#endif";
 
@@ -11235,7 +11230,7 @@ function WebGLBindingStates(gl, extensions, attributes, capabilities) {
 		if (currentState === defaultState) return;
 		currentState = defaultState;
 		bindVertexArrayObject(currentState.object);
-	} // for backward-compatibility
+	} // for backward-compatilibity
 
 
 	function resetDefaultState() {
@@ -12820,6 +12815,8 @@ function WebGLMorphtargets(gl, capabilities, textures) {
 
 				const buffer = new Float32Array(width * height * 4 * morphTargetsCount);
 				const texture = new DataArrayTexture(buffer, width, height, morphTargetsCount);
+				texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
+
 				texture.type = FloatType;
 				texture.needsUpdate = true; // fill buffer
 
@@ -15554,9 +15551,14 @@ function WebGLShadowMap(_renderer, _objects, _capabilities) {
 			}
 
 			if (shadow.map === null && !shadow.isPointLightShadow && this.type === VSMShadowMap) {
-				shadow.map = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y);
+				const pars = {
+					minFilter: LinearFilter,
+					magFilter: LinearFilter,
+					format: RGBAFormat
+				};
+				shadow.map = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y, pars);
 				shadow.map.texture.name = light.name + '.shadowMap';
-				shadow.mapPass = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y);
+				shadow.mapPass = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y, pars);
 				shadow.camera.updateProjectionMatrix();
 			}
 
@@ -16117,14 +16119,10 @@ function WebGLState(gl, extensions, capabilities) {
 		[OneMinusSrcColorFactor]: gl.ONE_MINUS_SRC_COLOR,
 		[OneMinusSrcAlphaFactor]: gl.ONE_MINUS_SRC_ALPHA,
 		[OneMinusDstColorFactor]: gl.ONE_MINUS_DST_COLOR,
-		[OneMinusDstAlphaFactor]: gl.ONE_MINUS_DST_ALPHA,
-		[ConstantColor]: gl.CONSTANT_COLOR,
-		[OneMinusConstantColor]: gl.ONE_MINUS_CONSTANT_COLOR,
-		[ConstantAlpha]: gl.CONSTANT_ALPHA,
-		[OneMinusConstantAlpha]: gl.ONE_MINUS_CONSTANT_ALPHA
+		[OneMinusDstAlphaFactor]: gl.ONE_MINUS_DST_ALPHA
 	};
 
-	function setBlending(blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha, blendColor) {
+	function setBlending(blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha) {
 		if (blending === NoBlending) {
 			if (currentBlendingEnabled === true) {
 				disable(gl.BLEND);
@@ -16223,10 +16221,6 @@ function WebGLState(gl, extensions, capabilities) {
 			currentBlendDstAlpha = blendDstAlpha;
 		}
 
-		if (blendColor !== null) {
-			gl.blendColor(blendColor.r, blendColor.g, blendColor.b, blendColor.a);
-		}
-
 		currentBlending = blending;
 		currentPremultipledAlpha = null;
 	}
@@ -16236,7 +16230,7 @@ function WebGLState(gl, extensions, capabilities) {
 		let flipSided = material.side === BackSide;
 		if (frontFaceCW) flipSided = !flipSided;
 		setFlipSided(flipSided);
-		material.blending === NormalBlending && material.transparent === false ? setBlending(NoBlending) : setBlending(material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha, material.blendColor);
+		material.blending === NormalBlending && material.transparent === false ? setBlending(NoBlending) : setBlending(material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha);
 		depthBuffer.setFunc(material.depthFunc);
 		depthBuffer.setTest(material.depthTest);
 		depthBuffer.setMask(material.depthWrite);
@@ -24549,7 +24543,7 @@ function eliminateHoles(data, holeIndices, outerNode, dim) {
 
 function compareX(a, b) {
 	return a.x - b.x;
-} // find a bridge between vertices that connects hole with an outer ring and link it
+} // find a bridge between vertices that connects hole with an outer ring and and link it
 
 
 function eliminateHole(hole, outerNode) {
@@ -24735,7 +24729,7 @@ function pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {
 
 
 function isValidDiagonal(a, b) {
-	return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // doesn't intersect other edges
+	return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // dones't intersect other edges
 	locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && ( // locally visible
 	area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
 	equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
@@ -25892,7 +25886,7 @@ class TorusKnotGeometry extends BufferGeometry {
 		const N = new Vector3(); // generate vertices, normals and uvs
 
 		for (let i = 0; i <= tubularSegments; ++i) {
-			// the radian "u" is used to calculate the position on the torus curve of the current tubular segment
+			// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
 			const u = i / tubularSegments * p * Math.PI * 2; // now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
 			// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
 
@@ -25913,7 +25907,7 @@ class TorusKnotGeometry extends BufferGeometry {
 				const v = j / radialSegments * Math.PI * 2;
 				const cx = -tube * Math.cos(v);
 				const cy = tube * Math.sin(v); // now calculate the final vertex position.
-				// first we orient the extrusion with our basis vectors, then we add it to the current position on the curve
+				// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
 
 				vertex.x = P1.x + (cx * N.x + cy * B.x);
 				vertex.y = P1.y + (cx * N.y + cy * B.y);
@@ -26108,7 +26102,7 @@ class WireframeGeometry extends BufferGeometry {
 						count: indices.count,
 						materialIndex: 0
 					}];
-				} // create a data structure that contains all edges without duplicates
+				} // create a data structure that contains all eges without duplicates
 
 
 				for (let o = 0, ol = groups.length; o < ol; ++o) {
@@ -27314,7 +27308,7 @@ class LinearInterpolant extends Interpolant {
 
 /**
  *
- * Interpolant that evaluates to the sample value at the position preceding
+ * Interpolant that evaluates to the sample value at the position preceeding
  * the parameter.
  */
 
@@ -33427,7 +33421,7 @@ class Spherical {
 		this.phi = other.phi;
 		this.theta = other.theta;
 		return this;
-	} // restrict phi to be between EPS and PI-EPS
+	} // restrict phi to be betwee EPS and PI-EPS
 
 
 	makeSafe() {
@@ -33883,15 +33877,15 @@ class PointLightHelper extends Mesh {
 		// TODO: delete this comment?
 		const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 		const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
-			this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+		this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 		this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
-			const d = light.distance;
-			if ( d === 0.0 ) {
-				this.lightDistance.visible = false;
-			} else {
-				this.lightDistance.scale.set( d, d, d );
-			}
-			this.add( this.lightDistance );
+		const d = light.distance;
+		if ( d === 0.0 ) {
+			this.lightDistance.visible = false;
+		} else {
+			this.lightDistance.scale.set( d, d, d );
+		}
+		this.add( this.lightDistance );
 		*/
 	}
 
@@ -33908,12 +33902,12 @@ class PointLightHelper extends Mesh {
 		}
 		/*
 		const d = this.light.distance;
-				if ( d === 0.0 ) {
-					this.lightDistance.visible = false;
-				} else {
-					this.lightDistance.visible = true;
+			if ( d === 0.0 ) {
+				this.lightDistance.visible = false;
+			} else {
+				this.lightDistance.visible = true;
 			this.lightDistance.scale.set( d, d, d );
-				}
+			}
 		*/
 
 	}
@@ -34312,7 +34306,7 @@ class BoxHelper extends LineSegments {
 		1/___0/|
 		| 6__|_7
 		2/___3/
-				0: max.x, max.y, max.z
+			0: max.x, max.y, max.z
 		1: min.x, max.y, max.z
 		2: min.x, min.y, max.z
 		3: max.x, min.y, max.z
@@ -36344,8 +36338,6 @@ exports.CompressedTexture = CompressedTexture;
 exports.CompressedTextureLoader = CompressedTextureLoader;
 exports.ConeBufferGeometry = ConeGeometry;
 exports.ConeGeometry = ConeGeometry;
-exports.ConstantAlpha = ConstantAlpha;
-exports.ConstantColor = ConstantColor;
 exports.CubeCamera = CubeCamera;
 exports.CubeReflectionMapping = CubeReflectionMapping;
 exports.CubeRefractionMapping = CubeRefractionMapping;
@@ -36546,8 +36538,6 @@ exports.ObjectSpaceNormalMap = ObjectSpaceNormalMap;
 exports.OctahedronBufferGeometry = OctahedronGeometry;
 exports.OctahedronGeometry = OctahedronGeometry;
 exports.OneFactor = OneFactor;
-exports.OneMinusConstantAlpha = OneMinusConstantAlpha;
-exports.OneMinusConstantColor = OneMinusConstantColor;
 exports.OneMinusDstAlphaFactor = OneMinusDstAlphaFactor;
 exports.OneMinusDstColorFactor = OneMinusDstColorFactor;
 exports.OneMinusSrcAlphaFactor = OneMinusSrcAlphaFactor;
