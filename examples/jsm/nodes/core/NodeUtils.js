@@ -424,31 +424,3 @@ export class ArrayMap {
 	}
 
 }
-
-export const flatArray = obj => {
-
-	let arr = [];
-
-	for ( let el of obj ) {
-
-		if ( Array.isArray( el ) ) {
-
-			arr = arr.concat( flatArray( el ) );
-
-		} else if ( typeof el === 'object' ) {
-
-			// We should not flat number and strings, but should flat vectors, matrices, and colors
-
-			arr = arr.concat( flatArray( el.toArray() ) );
-
-		} else {
-
-			arr.push( el );
-
-		}
-
-	}
-
-	return arr;
-
-};

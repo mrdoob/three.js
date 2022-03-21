@@ -24,7 +24,7 @@ import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
 // utils
-import { getValueFromType, ArrayMap, flatArray } from './core/NodeUtils.js';
+import { getValueFromType, ArrayMap } from './core/NodeUtils.js';
 
 const NodeHandler = {
 
@@ -220,51 +220,20 @@ const ConvertType = function ( type, valueComponents = 1 ) {
 
 		}
 
-		if ( params[ 0 ]?.isNode === true ) {
+		let node;
 
-			const node = nodeObject( new ConvertNode( params[ 0 ], type ) );
+		if ( params.length === 0 ) {
 
-			map.set( params, node );
+			node = nodeObject( new ConstNode( getValueFromType( type ), type ) );
 
-			return node;
+		} else {
 
-		}
-
-		if ( ( params.length === 1 ) && ( valueComponents !== 1 ) ) {
-
-			// Providing one scalar value: This value is used for all components
-
-			for ( let i = 1; i < valueComponents; i ++ ) {
-
-				params[ i ] = params[ 0 ];
-
-			}
+			const nodes = params.map( param => param.isNode === true ? param : new ConstNode( param ) );
+			node = nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
 
 		}
-
-		const classValue = getValueFromType( type );
-
-		let value = params[ 0 ];
-
-		if ( params.length === 0 ) { // no arguments are given
-
-			value = classValue;
-
-		} else if ( ( typeof classValue === 'object' ) && ! ( value instanceof classValue.constructor ) ) {
-
-			value = classValue.set( ...flatArray( params ) );
-
-		}
-
-		const node = nodeObject( new ConstNode( value, type ) );
 
 		map.set( params, node );
-
-		if ( params.every( val => val == params[ 0 ] ) ) { // all components are the same
-
-			map.set( [ params[ 0 ] ], node );
-
-		}
 
 		return node;
 
