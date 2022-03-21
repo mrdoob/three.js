@@ -211,9 +211,11 @@ export const label = ( node, name ) => {
 
 export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
-const cacheMap = new Map();
+const paramsCacheMap = new Map();
 
 const ConvertType = function ( type ) {
+
+	const nodesCacheMap = new Map();
 
 	return ( ...params ) => {
 
@@ -231,23 +233,43 @@ const ConvertType = function ( type ) {
 
 			}
 
+			if ( params.length === 1 && nodesCacheMap.has( params[ 0 ] ) ) {
+
+				return nodesCacheMap.get( params[ 0 ] );
+
+			}
+
 			const nodes = params.map( ( param ) => {
 
-				if ( cacheMap.has( param ) ) {
+				if ( paramsCacheMap.has( param ) ) {
 
-					return cacheMap.get( param );
+					return paramsCacheMap.get( param );
 
 				} else if ( param.isNode === true ) {
 
 					return param;
 
-				}
+				} else {
 
-				return new ConstNode( param );
+					const node = new ConstNode( param );
+
+					if ( typeof param !== 'object' ) {
+
+						paramsCacheMap.set( param, node );
+
+					}
+
+					return node;
 
 			} );
 
 			node = nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
+
+		}
+
+		if ( params.length === 1 && typeof params[ 0 ] !== 'object' ) {
+
+			nodesCacheMap.set( params[ 0 ], node );
 
 		}
 
@@ -405,15 +427,3 @@ export const PI_HALF = float( Math.PI / 2 );
 export const RECIPROCAL_PI = float( 1 / Math.PI );
 export const RECIPROCAL_PI2 = float( 1 / ( 2 * Math.PI ) );
 export const EPSILON = float( 1e-6 );
-
-cacheMap.set( - 1, float( - 1 ) );
-cacheMap.set( - .5, float( - .5 ) );
-cacheMap.set( 0, float( 1 ) );
-cacheMap.set( .5, float( .5 ) );
-cacheMap.set( 1, float( 1 ) );
-cacheMap.set( PI.value, PI );
-cacheMap.set( PI2.value, PI2 );
-cacheMap.set( PI_HALF.value, PI_HALF );
-cacheMap.set( RECIPROCAL_PI.value, RECIPROCAL_PI );
-cacheMap.set( RECIPROCAL_PI2.value, RECIPROCAL_PI2 );
-cacheMap.set( EPSILON.value, EPSILON );
