@@ -24,7 +24,7 @@ import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
 // utils
-import { getValueFromType, ArrayMap } from './core/NodeUtils.js';
+import { getValueFromType } from './core/NodeUtils.js';
 
 const NodeHandler = {
 
@@ -213,13 +213,13 @@ export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
 const ConvertType = function ( type ) {
 
-	const map = new ArrayMap();
+	const map = new Map();
 
 	return ( ...params ) => {
 
-		if ( map.has( params ) ) {
+		if ( ( params.length === 1 ) && map.has( params[ 0 ] ) ) {
 			
-			return map.get( params );
+			return map.get( params[ 0 ] );
 
 		}
 
@@ -242,7 +242,11 @@ const ConvertType = function ( type ) {
 
 		}
 
-		map.set( params, node );
+		if ( ( params.length === 1 ) && ( params[ 0 ].isNode !== true ) ) {
+
+			map.set( params[ 0 ], node );
+
+		}
 
 		return node;
 
@@ -340,11 +344,11 @@ export const positionWorld = new ShaderNodeObject( new PositionNode( PositionNod
 export const positionView = new ShaderNodeObject( new PositionNode( PositionNode.VIEW ) );
 export const positionViewDirection = new ShaderNodeObject( new PositionNode( PositionNode.VIEW_DIRECTION ) );
 
-export const PI = float( 3.141592653589793 );
-export const PI2 = float( 6.283185307179586 );
-export const PI_HALF = float( 1.5707963267948966 );
-export const RECIPROCAL_PI = float( 0.3183098861837907 );
-export const RECIPROCAL_PI2 = float( 0.15915494309189535 );
+export const PI = float( Math.PI );
+export const PI2 = float( Math.PI * 2 );
+export const PI_HALF = float( Math.PI / 2 );
+export const RECIPROCAL_PI = float( 1 / Math.PI );
+export const RECIPROCAL_PI2 = float( 1 / ( 2 * Math.PI ) );
 export const EPSILON = float( 1e-6 );
 
 export const diffuseColor = new ShaderNodeObject( new PropertyNode( 'DiffuseColor', 'vec4' ) );
