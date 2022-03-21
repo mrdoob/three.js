@@ -30,9 +30,9 @@ WebGPUSampledTexture.prototype.isSampledTexture = true;
 
 class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
 
 		this.dimension = GPUTextureViewDimension.TwoDArray;
 
@@ -44,9 +44,9 @@ WebGPUSampledArrayTexture.prototype.isSampledArrayTexture = true;
 
 class WebGPUSampled3DTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
 
 		this.dimension = GPUTextureViewDimension.ThreeD;
 
@@ -58,9 +58,9 @@ WebGPUSampled3DTexture.prototype.isSampled3DTexture = true;
 
 class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
 
 		this.dimension = GPUTextureViewDimension.Cube;
 
