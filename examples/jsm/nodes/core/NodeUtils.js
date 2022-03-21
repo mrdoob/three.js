@@ -60,33 +60,33 @@ export const getValueType = ( value ) => {
 
 };
 
-export const getValueFromType = ( type ) => {
+export const getValueFromType = ( type, ...params ) => {
 
 	const last4 = type?.slice( -4 );
 
 	if ( type === 'color' ) {
 
-		return new Color();
+		return new Color( ...params );
 
 	} else if ( last4 === 'vec2' ) {
 
-		return new Vector2();
+		return new Vector2( ...params );
 
 	} else if ( last4 === 'vec3' ) {
 
-		return new Vector3();
+		return new Vector3( ...params );
 
 	} else if ( last4 === 'vec4' ) {
 
-		return new Vector4();
+		return new Vector4( ...params );
 
 	} else if ( last4 === 'mat3' ) {
 
-		return new Matrix3();
+		return new Matrix3( ...params );
 
 	} else if ( last4 === 'mat4' ) {
 
-		return new Matrix4();
+		return new Matrix4( ...params );
 
 	} else if ( type === 'bool' ) {
 
