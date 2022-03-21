@@ -187,7 +187,7 @@ export const nodeObject = ( val ) => {
 export const uniform = ( constNode ) => {
 
 	// TODO: get constNode from .traverse() in the future
-	const value = constNode.value === undefined ? constNode?.node.value : constNode.value;
+	const value = constNode.value === undefined ? constNode.node?.value : constNode.value;
 
 	return nodeObject( new UniformNode( value, constNode.nodeType ) );
 
