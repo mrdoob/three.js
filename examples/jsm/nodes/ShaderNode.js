@@ -253,9 +253,9 @@ const ConvertType = function ( type ) {
 
 		} else {
 
-			if ( type === 'color' && params.length === 1 ) {
+			if ( type === 'color' && params[ 0 ].isNode !== true ) {
 
-				params[ 0 ] = getValueFromType( type, params[ 0 ] );
+				params = [ getValueFromType( type, ...params ) ];
 
 			}
 
