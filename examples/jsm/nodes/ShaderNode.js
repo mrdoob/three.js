@@ -228,6 +228,12 @@ const ConvertType = function ( type ) {
 
 		} else {
 
+			if ( type === 'color' && params.length === 1 ) {
+
+				params[ 0 ] = getValueFromType( type, params[ 0 ] );
+
+			}
+
 			const nodes = params.map( param => param.isNode === true ? param : new ConstNode( param ) );
 			node = nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
 

@@ -24,7 +24,7 @@ class ConvertNode extends Node {
 		const convertToSnippet = builder.getType( convertTo );
 		const nodeSnippet = this.node.build( builder, convertTo );
 
-		return `${ convertToSnippet }( ${ nodeSnippet } )`;
+		return `${ builder.getVectorType( convertToSnippet ) }( ${ nodeSnippet } )`;
 
 	}
 
