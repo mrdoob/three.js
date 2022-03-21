@@ -1,0 +1,285 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.6.9",
+        "version" : "2.0"
+    },
+    "extensionsUsed" : [
+        "OFT_texture_precomputed_mipmap"
+    ],
+    "extensionsRequired" : [
+        "OFT_texture_precomputed_mipmap"
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "extras" : {},
+            "name" : "Scene",
+            "nodes" : [
+                2
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "PreviewSphere.001"
+        },
+        {
+            "children" : [
+                0
+            ],
+            "name" : "PreviewSphere"
+        },
+        {
+            "children" : [
+                1
+            ],
+            "name" : "root"
+        }
+    ],
+    "materials" : [
+        {
+            "name" : "Sphere",
+            "normalTexture" : {
+                "index" : 0
+            },
+            "occlusionTexture" : {
+                "index" : 1
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 2
+                },
+                "metallicRoughnessTexture" : {
+                    "index" : 1
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "PreviewSphere",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        },
+        {
+            "extensions" : {
+                "OFT_texture_precomputed_mipmap" : {
+                    "sources" : [
+                        {
+                            "level" : 0,
+                            "source" : 2
+                        },
+                        {
+                            "level" : 1,
+                            "source" : 3
+                        },
+                        {
+                            "level" : 2,
+                            "source" : 4
+                        },
+                        {
+                            "level" : 3,
+                            "source" : 5
+                        },
+                        {
+                            "level" : 4,
+                            "source" : 6
+                        },
+                        {
+                            "level" : 5,
+                            "source" : 7
+                        },
+                        {
+                            "level" : 6,
+                            "source" : 8
+                        },
+                        {
+                            "level" : 7,
+                            "source" : 9
+                        },
+                        {
+                            "level" : 8,
+                            "source" : 10
+                        },
+                        {
+                            "level" : 9,
+                            "source" : 11
+                        },
+                        {
+                            "level" : 10,
+                            "source" : 12
+                        },
+                        {
+                            "level" : 11,
+                            "source" : 13
+                        }
+                    ]
+                }
+            },
+            "sampler" : 0,
+            "source" : 2
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_2",
+            "uri" : "Image_2.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_1",
+            "uri" : "Image_1.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0",
+            "uri" : "Image_0.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv1",
+            "uri" : "Image_0_lv1.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv2",
+            "uri" : "Image_0_lv2.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv3",
+            "uri" : "Image_0_lv3.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv4",
+            "uri" : "Image_0_lv4.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv5",
+            "uri" : "Image_0_lv5.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv6",
+            "uri" : "Image_0_lv6.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv7",
+            "uri" : "Image_0_lv7.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv8",
+            "uri" : "Image_0_lv8.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv9",
+            "uri" : "Image_0_lv9.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv10",
+            "uri" : "Image_0_lv10.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Image_0_lv11",
+            "uri" : "Image_0_lv11.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 25741,
+            "max" : [
+                0.988581657409668,
+                1.0000001192092896,
+                0.9642330408096313
+            ],
+            "min" : [
+                -0.9885817170143127,
+                -1,
+                -0.9642329812049866
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 25741,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 25741,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 121110,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 308892,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 308892,
+            "byteOffset" : 308892
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 205928,
+            "byteOffset" : 617784
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 242220,
+            "byteOffset" : 823712
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 1065932,
+            "uri" : "mipmap.bin"
+        }
+    ]
+}

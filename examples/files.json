@@ -87,6 +87,7 @@
 		"webgl_loader_gltf_hp_normal",
 		"webgl_loader_gltf_matcap",
 		"webgl_loader_gltf_sheen",
+		"webgl_loader_gltf_precomputed_mipmap",
 		"webgl_loader_gltf_point_sprite",
 		"webgl_loader_gltf_transmission",
 		"webgl_loader_gltf_variants",
