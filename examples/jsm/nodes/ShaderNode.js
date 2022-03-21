@@ -208,7 +208,7 @@ export const label = ( node, name ) => {
 
 export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
-const ConvertType = function ( type, valueComponents = 1 ) {
+const ConvertType = function ( type ) {
 
 	const map = new ArrayMap();
 
