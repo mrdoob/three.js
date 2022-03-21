@@ -261,6 +261,8 @@ const ConvertType = function ( type ) {
 
 					return node;
 
+				}
+
 			} );
 
 			node = nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
