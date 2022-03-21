@@ -248,20 +248,20 @@ export const int = new ConvertType( 'int' );
 export const uint = new ConvertType( 'uint' );
 export const bool = new ConvertType( 'bool' );
 
-export const vec2 = new ConvertType( 'vec2', 2 );
-export const ivec2 = new ConvertType( 'ivec2', 2 );
-export const uvec2 = new ConvertType( 'uvec2', 2 );
-export const bvec2 = new ConvertType( 'bvec2', 2 );
+export const vec2 = new ConvertType( 'vec2' );
+export const ivec2 = new ConvertType( 'ivec2' );
+export const uvec2 = new ConvertType( 'uvec2' );
+export const bvec2 = new ConvertType( 'bvec2' );
 
-export const vec3 = new ConvertType( 'vec3', 3 );
-export const ivec3 = new ConvertType( 'ivec3', 3 );
-export const uvec3 = new ConvertType( 'uvec3', 3 );
-export const bvec3 = new ConvertType( 'bvec3', 3 );
+export const vec3 = new ConvertType( 'vec3' );
+export const ivec3 = new ConvertType( 'ivec3' );
+export const uvec3 = new ConvertType( 'uvec3' );
+export const bvec3 = new ConvertType( 'bvec3' );
 
-export const vec4 = new ConvertType( 'vec4', 4 );
-export const ivec4 = new ConvertType( 'ivec4', 4 );
-export const uvec4 = new ConvertType( 'uvec4', 4 );
-export const bvec4 = new ConvertType( 'bvec4', 4 );
+export const vec4 = new ConvertType( 'vec4' );
+export const ivec4 = new ConvertType( 'ivec4' );
+export const uvec4 = new ConvertType( 'uvec4' );
+export const bvec4 = new ConvertType( 'bvec4' );
 
 export const mat3 = new ConvertType( 'mat3' );
 export const imat3 = new ConvertType( 'imat3' );
