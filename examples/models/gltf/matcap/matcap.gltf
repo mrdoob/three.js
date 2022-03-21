@@ -1,0 +1,167 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.6.9",
+        "version" : "2.0"
+    },
+    "extensionsUsed" : [
+        "OFT_materials_matcap"
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "extras" : {},
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "LeePerrySmith"
+        }
+    ],
+    "materials" : [
+        {
+            "emissiveFactor" : [
+                1,
+                1,
+                1
+            ],
+            "emissiveTexture" : {
+                "index" : 0
+            },
+            "extensions" : {
+                "OFT_materials_matcap" : {
+                    "matcapTexture" : {
+                        "index" : 0
+                    }
+                }
+            },
+            "extras" : {},
+            "name" : "Material.002",
+            "normalTexture" : {
+                "index" : 1
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    1,
+                    1,
+                    1,
+                    1
+                ],
+                "metallicFactor" : 0
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "extras" : {},
+            "name" : "LeePerrySmith",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/jpeg",
+            "name" : "matcap-porcelain-white",
+            "uri" : "matcap-porcelain-white.jpg"
+        },
+        {
+            "mimeType" : "image/jpeg",
+            "name" : "Infinite-Level_02_Tangent_SmoothUV",
+            "uri" : "Infinite-Level_02_Tangent_SmoothUV.jpg"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 9279,
+            "max" : [
+                4.276320934295654,
+                3.9725468158721924,
+                2.5903584957122803
+            ],
+            "min" : [
+                -4.276320934295654,
+                -3.9725465774536133,
+                -2.5903775691986084
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 9279,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 9279,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 53052,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 111348,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 111348,
+            "byteOffset" : 111348
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 74232,
+            "byteOffset" : 222696
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 106104,
+            "byteOffset" : 296928
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 403032,
+            "uri" : "matcap.bin"
+        }
+    ]
+}

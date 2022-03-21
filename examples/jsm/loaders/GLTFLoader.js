@@ -32,6 +32,7 @@ import {
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
+	OFTMatcapMaterial,
 	MeshPhysicalMaterial,
 	MeshStandardMaterial,
 	MirroredRepeatWrapping,
@@ -374,6 +375,10 @@ class GLTFLoader extends Loader {
 						extensions[ extensionName ] = new GLTFMaterialsPointSpriteExtension();
 						break;
 
+					case EXTENSIONS.OFT_MATERIALS_MATCAP:
+						extensions[ extensionName ] = new GLTFMaterialsMatcapExtension();
+						break;
+
 					default:
 
 						if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
@@ -466,7 +471,8 @@ const EXTENSIONS = {
 	EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
 	OFT_TEXTURE_HIGHPRECISION_NORMAL: 'OFT_texture_highPrecisionNormal',
-	OFT_MATERIALS_POINT_SPRITE: 'OFT_materials_pointSprite'
+	OFT_MATERIALS_POINT_SPRITE: 'OFT_materials_pointSprite',
+	OFT_MATERIALS_MATCAP: 'OFT_materials_matcap',
 };
 
 /**
@@ -2007,6 +2013,71 @@ class GLTFMaterialsPointSpriteExtension {
 
 }
 
+/**
+ * matcap Materials Extension
+ *
+ * Specification: https://github.com/oppenfuture/glTF/tree/matcap/extensions/2.0/Vendor/OFT_materials_matcap
+ */
+class GLTFMaterialsMatcapExtension {
+
+	constructor() {
+
+		this.name = EXTENSIONS.KHR_MATERIALS_MATCAP;
+
+	}
+
+	getMaterialType() {
+
+		return OFTMatcapMaterial;
+
+	}
+
+	extendParams( materialParams, materialDef, parser ) {
+
+		const pending = [];
+
+		materialParams.color = new Color( 1.0, 1.0, 1.0 );
+		materialParams.opacity = 1.0;
+
+		const metallicRoughness = materialDef.pbrMetallicRoughness;
+
+		if ( metallicRoughness ) {
+
+			if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
+
+				const array = metallicRoughness.baseColorFactor;
+
+				materialParams.color.fromArray( array );
+				materialParams.opacity = array[ 3 ];
+
+			}
+
+			if ( metallicRoughness.baseColorTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture ) );
+
+			}
+
+		}
+
+		const matcap = materialDef.extensions?.OFT_materials_matcap;
+
+		if ( matcap ) {
+
+			if ( matcap.matcapTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'matcap', matcap.matcapTexture ) );
+
+			}
+
+		}
+
+		return Promise.all( pending );
+
+	}
+
+}
+
 /*********************************/
 /********** INTERPOLATION ********/
 /*********************************/
@@ -3341,6 +3412,12 @@ class GLTFParser {
 			materialType = kmuExtension.getMaterialType();
 			pending.push( kmuExtension.extendParams( materialParams, materialDef, parser ) );
 
+		} else if ( materialExtensions[ EXTENSIONS.OFT_MATERIALS_MATCAP ] ) {
+
+			const matcapExtension = extensions[ EXTENSIONS.OFT_MATERIALS_MATCAP ];
+			materialType = matcapExtension.getMaterialType();
+			pending.push( matcapExtension.extendParams( materialParams, materialDef, parser ) );
+
 		} else {
 
 			// Specification:
@@ -3457,7 +3534,7 @@ class GLTFParser {
 
 		}
 
-		if ( materialDef.occlusionTexture !== undefined && materialType !== MeshBasicMaterial ) {
+		if ( materialDef.occlusionTexture !== undefined && materialType !== MeshBasicMaterial && materialType !== OFTMatcapMaterial ) {
 
 			pending.push( parser.assignTexture( materialParams, 'aoMap', materialDef.occlusionTexture ) );
 
@@ -3469,13 +3546,13 @@ class GLTFParser {
 
 		}
 
-		if ( materialDef.emissiveFactor !== undefined && materialType !== MeshBasicMaterial ) {
+		if ( materialDef.emissiveFactor !== undefined && materialType !== MeshBasicMaterial && materialType !== OFTMatcapMaterial ) {
 
 			materialParams.emissive = new Color().fromArray( materialDef.emissiveFactor );
 
 		}
 
-		if ( materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial ) {
+		if ( materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial && materialType !== OFTMatcapMaterial ) {
 
 			pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture ) );
 
@@ -3501,9 +3578,14 @@ class GLTFParser {
 
 			if ( materialDef.name ) material.name = materialDef.name;
 
-			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
+			// baseColorTexture, emissiveTexture, matcap and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = sRGBEncoding;
 			if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding;
+			if ( material.matcap ) {
+
+				material.matcap.encoding = sRGBEncoding;
+
+			}
 
 			assignExtrasToUserData( material, materialDef );
 

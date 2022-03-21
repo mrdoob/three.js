@@ -83,6 +83,15 @@ void main() {
 	vec3 y = cross( viewDir, x );
 	vec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5; // 0.495 to remove artifacts caused by undersized matcap disks
 
+	// gltf的标准定义了texture 坐标系的(0,0)点是在左上角，
+	// 但是这里matcap的uv是以左下角为(0,0)点计算的, 所以需要flip Y。
+	// 之前的flip Y是在gltfloader中做的, 但是r137以后, gltfloader
+	// 使用了ImageBitmapLoader, 这种方式不支持flip Y, 所以
+	// 把flip Y的操作放到了这里。
+	#ifdef OFT_MATCAP
+	uv.y = 1.0 - uv.y;
+	#endif
+
 	#ifdef USE_MATCAP
 
 		vec4 matcapColor = texture2D( matcap, uv );

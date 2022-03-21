@@ -13,6 +13,7 @@ export { MeshDepthMaterial } from './MeshDepthMaterial.js';
 export { MeshDistanceMaterial } from './MeshDistanceMaterial.js';
 export { MeshBasicMaterial } from './MeshBasicMaterial.js';
 export { MeshMatcapMaterial } from './MeshMatcapMaterial.js';
+export { OFTMatcapMaterial } from './OFTMatcapMaterial.js';
 export { LineDashedMaterial } from './LineDashedMaterial.js';
 export { LineBasicMaterial } from './LineBasicMaterial.js';
 export { Material } from './Material.js';
