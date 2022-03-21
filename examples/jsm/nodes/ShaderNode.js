@@ -56,7 +56,7 @@ const NodeHandler = {
 
 				// accessing array
 
-				return new ShaderNodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+				return new ShaderNodeObject( new ArrayElementNode( node, uint( Number( prop ) ) ) );
 
 			}
 
@@ -76,7 +76,7 @@ const ShaderNodeObject = function ( obj ) {
 
 	if ( ( type === 'number' ) || ( type === 'boolean' ) ) {
 
-		return new ShaderNodeObject( new ConstNode( obj ) );
+		return new ShaderNodeObject( getAutoTypedConstNode( obj ) );
 
 	} else if ( type === 'object' ) {
 
@@ -211,7 +211,33 @@ export const label = ( node, name ) => {
 
 export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
-const paramsCacheMap = new Map();
+const constNodesCacheMap = new Map();
+
+const getAutoTypedConstNode = ( value ) => {
+
+	if ( constNodesCacheMap.has( value ) ) {
+
+		return constNodesCacheMap.get( value );
+
+	} else if ( value.isNode === true ) {
+
+		return value;
+
+	} else {
+
+		const node = new ConstNode( value );
+
+		if ( typeof value !== 'object' ) {
+
+			constNodesCacheMap.set( value, node );
+
+		}
+
+		return node;
+
+	}
+
+};
 
 const ConvertType = function ( type ) {
 
@@ -223,7 +249,7 @@ const ConvertType = function ( type ) {
 
 		if ( params.length === 0 ) {
 
-			node = nodeObject( new ConstNode( getValueFromType( type ), type ) );
+			node = new ShaderNodeObject( new ConstNode( getValueFromType( type ), type ) );
 
 		} else {
 
@@ -239,33 +265,9 @@ const ConvertType = function ( type ) {
 
 			}
 
-			const nodes = params.map( ( param ) => {
+			const nodes = params.map( getAutoTypedConstNode );
 
-				if ( paramsCacheMap.has( param ) ) {
-
-					return paramsCacheMap.get( param );
-
-				} else if ( param.isNode === true ) {
-
-					return param;
-
-				} else {
-
-					const node = new ConstNode( param );
-
-					if ( typeof param !== 'object' ) {
-
-						paramsCacheMap.set( param, node );
-
-					}
-
-					return node;
-
-				}
-
-			} );
-
-			node = nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
+			node = new ShaderNodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
 
 		}
 
