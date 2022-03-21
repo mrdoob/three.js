@@ -70,7 +70,7 @@ const NodeHandler = {
 
 const nodeObjects = new WeakMap();
 
-const ShaderNodeObject = function( obj ) {
+const ShaderNodeObject = function ( obj ) {
 
 	const type = typeof obj;
 
@@ -102,7 +102,7 @@ const ShaderNodeObject = function( obj ) {
 
 };
 
-const ShaderNodeObjects = function( objects ) {
+const ShaderNodeObjects = function ( objects ) {
 
 	for ( const name in objects ) {
 
@@ -128,7 +128,7 @@ const getShaderNodeArray = ( array ) => {
 
 };
 
-const ShaderNodeProxy = function( NodeClass, scope = null, factor = null ) {
+const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 	if ( scope === null ) {
 
@@ -211,17 +211,11 @@ export const label = ( node, name ) => {
 
 export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
+const cacheMap = new Map();
+
 const ConvertType = function ( type ) {
 
-	const map = new Map();
-
 	return ( ...params ) => {
-
-		if ( ( params.length === 1 ) && map.has( params[ 0 ] ) ) {
-			
-			return map.get( params[ 0 ] );
-
-		}
 
 		let node;
 
@@ -237,14 +231,23 @@ const ConvertType = function ( type ) {
 
 			}
 
-			const nodes = params.map( param => param.isNode === true ? param : new ConstNode( param ) );
+			const nodes = params.map( ( param ) => {
+
+				if ( cacheMap.has( param ) ) {
+
+					return cacheMap.get( param );
+
+				} else if ( param.isNode === true ) {
+
+					return param;
+
+				}
+
+				return new ConstNode( param );
+
+			} );
+
 			node = nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
-
-		}
-
-		if ( ( params.length === 1 ) && ( params[ 0 ].isNode !== true ) ) {
-
-			map.set( params[ 0 ], node );
 
 		}
 
@@ -344,13 +347,6 @@ export const positionWorld = new ShaderNodeObject( new PositionNode( PositionNod
 export const positionView = new ShaderNodeObject( new PositionNode( PositionNode.VIEW ) );
 export const positionViewDirection = new ShaderNodeObject( new PositionNode( PositionNode.VIEW_DIRECTION ) );
 
-export const PI = float( Math.PI );
-export const PI2 = float( Math.PI * 2 );
-export const PI_HALF = float( Math.PI / 2 );
-export const RECIPROCAL_PI = float( 1 / Math.PI );
-export const RECIPROCAL_PI2 = float( 1 / ( 2 * Math.PI ) );
-export const EPSILON = float( 1e-6 );
-
 export const diffuseColor = new ShaderNodeObject( new PropertyNode( 'DiffuseColor', 'vec4' ) );
 export const roughness = new ShaderNodeObject( new PropertyNode( 'Roughness', 'float' ) );
 export const metalness = new ShaderNodeObject( new PropertyNode( 'Metalness', 'float' ) );
@@ -402,3 +398,22 @@ export const sqrt = new ShaderNodeProxy( MathNode, 'sqrt' );
 export const step = new ShaderNodeProxy( MathNode, 'step' );
 export const tan = new ShaderNodeProxy( MathNode, 'tan' );
 export const transformDirection = new ShaderNodeProxy( MathNode, 'transformDirection' );
+
+export const PI = float( Math.PI );
+export const PI2 = float( Math.PI * 2 );
+export const PI_HALF = float( Math.PI / 2 );
+export const RECIPROCAL_PI = float( 1 / Math.PI );
+export const RECIPROCAL_PI2 = float( 1 / ( 2 * Math.PI ) );
+export const EPSILON = float( 1e-6 );
+
+cacheMap.set( - 1, float( - 1 ) );
+cacheMap.set( - .5, float( - .5 ) );
+cacheMap.set( 0, float( 1 ) );
+cacheMap.set( .5, float( .5 ) );
+cacheMap.set( 1, float( 1 ) );
+cacheMap.set( PI.value, PI );
+cacheMap.set( PI2.value, PI2 );
+cacheMap.set( PI_HALF.value, PI_HALF );
+cacheMap.set( RECIPROCAL_PI.value, RECIPROCAL_PI );
+cacheMap.set( RECIPROCAL_PI2.value, RECIPROCAL_PI2 );
+cacheMap.set( EPSILON.value, EPSILON );
