@@ -53,6 +53,11 @@
       "html",
       "import"
     ],
+    "settings": {
+      "polyfills": [
+        "WebGL2RenderingContext"
+      ]
+    },
     "globals": {
       "__THREE_DEVTOOLS__": "readonly",
       "WebGL2ComputeRenderingContext": "readonly",
