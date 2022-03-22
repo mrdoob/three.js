@@ -34,7 +34,7 @@
 
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
-			import { ShaderNode, vec3, dot } from 'three-nodes/ShaderNode.js';
+			import { ShaderNode, vec3, dot, sampler } from 'three-nodes/ShaderNode.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -158,6 +158,23 @@
 
 				material = new Nodes.MeshBasicNodeMaterial();
 				material.colorNode = desaturateWGSLNode.call( { color: new Nodes.TextureNode( texture ) } );
+				materials.push( material );
+
+				// Custom WGSL ( get texture from keywords )
+
+				const getWGSLTextureSample = new Nodes.FunctionNode( `
+					fn getWGSLTextureSample( uv:vec2<f32> ) -> vec4<f32> {
+
+						return textureSample( tex, tex_sampler, uv );
+
+					}
+				` );
+
+				const nodeTexture = new Nodes.TextureNode( texture );
+				getWGSLTextureSample.keywords = { tex: nodeTexture, tex_sampler: sampler( nodeTexture ) };
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = getWGSLTextureSample.call( { uv: new Nodes.UVNode() } );
 				materials.push( material );
 
 				//
