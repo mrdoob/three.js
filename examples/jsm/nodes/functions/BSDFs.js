@@ -3,7 +3,7 @@ import { ShaderNode,
 	cond, greaterThan, and,
 	transformedNormalView, positionViewDirection,
 	diffuseColor, specularColor, roughness,
-	PI, RECIPROCAL_PI, EPSILON
+	EPSILON
 } from '../ShaderNode.js';
 
 export const F_Schlick = new ShaderNode( ( inputs ) => {
@@ -23,7 +23,7 @@ export const F_Schlick = new ShaderNode( ( inputs ) => {
 
 export const BRDF_Lambert = new ShaderNode( ( inputs ) => {
 
-	return mul( RECIPROCAL_PI, inputs.diffuseColor ); // punctual light
+	return mul( 1 / Math.PI, inputs.diffuseColor ); // punctual light
 
 } ); // validated
 
@@ -69,7 +69,7 @@ export const D_GGX = new ShaderNode( ( inputs ) => {
 
 	const denom = add( mul( pow2( dotNH ), sub( a2, 1.0 ) ), 1.0 ); // avoid alpha = 0 with dotNH = 1
 
-	return mul( RECIPROCAL_PI, div( a2, pow2( denom ) ) );
+	return mul( 1 / Math.PI, div( a2, pow2( denom ) ) );
 
 } ); // validated
 
@@ -105,7 +105,7 @@ export const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 	const dotNL = saturate( dot( transformedNormalView, lightDirection ) );
 	let irradiance = mul( dotNL, lightColor );
 
-	irradiance = mul( irradiance, PI ); // punctual light
+	irradiance = mul( irradiance, Math.PI ); // punctual light
 
 	addTo( directDiffuse, mul( irradiance, BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
