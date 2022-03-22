@@ -20,6 +20,7 @@ class WebGL {
 		try {
 
 			const canvas = document.createElement( 'canvas' );
+			// eslint-disable-next-line compat/compat
 			return !! ( window.WebGL2RenderingContext && canvas.getContext( 'webgl2' ) );
 
 		} catch ( e ) {
@@ -51,7 +52,7 @@ class WebGL {
 
 		const contexts = {
 			1: window.WebGLRenderingContext,
-			2: window.WebGL2RenderingContext
+			2: window.WebGL2RenderingContext // eslint-disable-line compat/compat
 		};
 
 		let message = 'Your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">$1</a>';
