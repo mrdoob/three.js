@@ -276,7 +276,7 @@
 
 	function clamp(value, min, max) {
 		return Math.max(min, Math.min(max, value));
-	} // compute euclidian modulo of m % n
+	} // compute euclidean modulo of m % n
 	// https://en.wikipedia.org/wiki/Modulo_operation
 
 
@@ -419,6 +419,50 @@
 		}
 	}
 
+	function denormalize$1(value, array) {
+		switch (array.constructor) {
+			case Float32Array:
+				return value;
+
+			case Uint16Array:
+				return value / 65535.0;
+
+			case Uint8Array:
+				return value / 255.0;
+
+			case Int16Array:
+				return Math.max(value / 32767.0, -1.0);
+
+			case Int8Array:
+				return Math.max(value / 127.0, -1.0);
+
+			default:
+				throw new Error('Invalid component type.');
+		}
+	}
+
+	function normalize(value, array) {
+		switch (array.constructor) {
+			case Float32Array:
+				return value;
+
+			case Uint16Array:
+				return Math.round(value * 65535.0);
+
+			case Uint8Array:
+				return Math.round(value * 255.0);
+
+			case Int16Array:
+				return Math.round(value * 32767.0);
+
+			case Int8Array:
+				return Math.round(value * 127.0);
+
+			default:
+				throw new Error('Invalid component type.');
+		}
+	}
+
 	var MathUtils = /*#__PURE__*/Object.freeze({
 		__proto__: null,
 		DEG2RAD: DEG2RAD,
@@ -442,7 +486,9 @@
 		isPowerOfTwo: isPowerOfTwo,
 		ceilPowerOfTwo: ceilPowerOfTwo,
 		floorPowerOfTwo: floorPowerOfTwo,
-		setQuaternionFromProperEuler: setQuaternionFromProperEuler
+		setQuaternionFromProperEuler: setQuaternionFromProperEuler,
+		normalize: normalize,
+		denormalize: denormalize$1
 	});
 
 	class Vector2 {
@@ -2621,7 +2667,8 @@
 			this.height = source.height;
 			this.depth = source.depth;
 			this.viewport.copy(source.viewport);
-			this.texture = source.texture.clone(); // ensure image object is not shared, see #20328
+			this.texture = source.texture.clone();
+			this.texture.isRenderTargetTexture = true; // ensure image object is not shared, see #20328
 
 			this.texture.image = Object.assign({}, source.texture.image);
 			this.depthBuffer = source.depthBuffer;
@@ -4231,10 +4278,10 @@
 
 	function satForAxes(axes, v0, v1, v2, extents) {
 		for (let i = 0, j = axes.length - 3; i <= j; i += 3) {
-			_testAxis.fromArray(axes, i); // project the aabb onto the seperating axis
+			_testAxis.fromArray(axes, i); // project the aabb onto the separating axis
 
 
-			const r = extents.x * Math.abs(_testAxis.x) + extents.y * Math.abs(_testAxis.y) + extents.z * Math.abs(_testAxis.z); // project all 3 vertices of the triangle onto the seperating axis
+			const r = extents.x * Math.abs(_testAxis.x) + extents.y * Math.abs(_testAxis.y) + extents.z * Math.abs(_testAxis.z); // project all 3 vertices of the triangle onto the separating axis
 
 			const p0 = v0.dot(_testAxis);
 			const p1 = v1.dot(_testAxis);
@@ -4242,7 +4289,7 @@
 
 			if (Math.max(-Math.max(p0, p1, p2), Math.min(p0, p1, p2)) > r) {
 				// points of the projected triangle are outside the projected half-length of the aabb
-				// the axis is seperating and we can exit
+				// the axis is separating and we can exit
 				return false;
 			}
 		}
@@ -9222,8 +9269,6 @@
 
 		fromEquirectangularTexture(renderer, texture) {
 			this.texture.type = texture.type;
-			this.texture.format = RGBAFormat; // see #18859
-
 			this.texture.encoding = texture.encoding;
 			this.texture.generateMipmaps = texture.generateMipmaps;
 			this.texture.minFilter = texture.minFilter;
@@ -9911,11 +9956,11 @@
 
 	var metalnessmap_pars_fragment = "#ifdef USE_METALNESSMAP\n\tuniform sampler2D metalnessMap;\n#endif";
 
-	var morphcolor_vertex = "#if defined( USE_MORPHCOLORS ) && defined( MORPHTARGETS_TEXTURE )\n\tvColor *= morphTargetBaseInfluence;\n\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t#if defined( USE_COLOR_ALPHA )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor += getMorph( gl_VertexID, i, 2 ) * morphTargetInfluences[ i ];\n\t\t#elif defined( USE_COLOR )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor += getMorph( gl_VertexID, i, 2 ).rgb * morphTargetInfluences[ i ]\n\t\t#endif\n\t}\n#endif";
+	var morphcolor_vertex = "#if defined( USE_MORPHCOLORS ) && defined( MORPHTARGETS_TEXTURE )\n\tvColor *= morphTargetBaseInfluence;\n\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t#if defined( USE_COLOR_ALPHA )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor += getMorph( gl_VertexID, i, 2 ) * morphTargetInfluences[ i ];\n\t\t#elif defined( USE_COLOR )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor += getMorph( gl_VertexID, i, 2 ).rgb * morphTargetInfluences[ i ];\n\t\t#endif\n\t}\n#endif";
 
 	var morphnormal_vertex = "#ifdef USE_MORPHNORMALS\n\tobjectNormal *= morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) objectNormal += getMorph( gl_VertexID, i, 1 ).xyz * morphTargetInfluences[ i ];\n\t\t}\n\t#else\n\t\tobjectNormal += morphNormal0 * morphTargetInfluences[ 0 ];\n\t\tobjectNormal += morphNormal1 * morphTargetInfluences[ 1 ];\n\t\tobjectNormal += morphNormal2 * morphTargetInfluences[ 2 ];\n\t\tobjectNormal += morphNormal3 * morphTargetInfluences[ 3 ];\n\t#endif\n#endif";
 
-	var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\tuniform float morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tuniform float morphTargetInfluences[ MORPHTARGETS_COUNT ];\n\t\tuniform sampler2DArray morphTargetsTexture;\n\t\tuniform vec2 morphTargetsTextureSize;\n\t\tvec4 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset ) {\n\t\t\tfloat texelIndex = float( vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + offset );\n\t\t\tfloat y = floor( texelIndex / morphTargetsTextureSize.x );\n\t\t\tfloat x = texelIndex - y * morphTargetsTextureSize.x;\n\t\t\tvec3 morphUV = vec3( ( x + 0.5 ) / morphTargetsTextureSize.x, y / morphTargetsTextureSize.y, morphTargetIndex );\n\t\t\treturn texture( morphTargetsTexture, morphUV );\n\t\t}\n\t#else\n\t\t#ifndef USE_MORPHNORMALS\n\t\t\tuniform float morphTargetInfluences[ 8 ];\n\t\t#else\n\t\t\tuniform float morphTargetInfluences[ 4 ];\n\t\t#endif\n\t#endif\n#endif";
+	var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\tuniform float morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tuniform float morphTargetInfluences[ MORPHTARGETS_COUNT ];\n\t\tuniform sampler2DArray morphTargetsTexture;\n\t\tuniform ivec2 morphTargetsTextureSize;\n\t\tvec4 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset ) {\n\t\t\tint texelIndex = vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + offset;\n\t\t\tint y = texelIndex / morphTargetsTextureSize.x;\n\t\t\tint x = texelIndex - y * morphTargetsTextureSize.x;\n\t\t\tivec3 morphUV = ivec3( x, y, morphTargetIndex );\n\t\t\treturn texelFetch( morphTargetsTexture, morphUV, 0 );\n\t\t}\n\t#else\n\t\t#ifndef USE_MORPHNORMALS\n\t\t\tuniform float morphTargetInfluences[ 8 ];\n\t\t#else\n\t\t\tuniform float morphTargetInfluences[ 4 ];\n\t\t#endif\n\t#endif\n#endif";
 
 	var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) transformed += getMorph( gl_VertexID, i, 0 ).xyz * morphTargetInfluences[ i ];\n\t\t}\n\t#else\n\t\ttransformed += morphTarget0 * morphTargetInfluences[ 0 ];\n\t\ttransformed += morphTarget1 * morphTargetInfluences[ 1 ];\n\t\ttransformed += morphTarget2 * morphTargetInfluences[ 2 ];\n\t\ttransformed += morphTarget3 * morphTargetInfluences[ 3 ];\n\t\t#ifndef USE_MORPHNORMALS\n\t\t\ttransformed += morphTarget4 * morphTargetInfluences[ 4 ];\n\t\t\ttransformed += morphTarget5 * morphTargetInfluences[ 5 ];\n\t\t\ttransformed += morphTarget6 * morphTargetInfluences[ 6 ];\n\t\t\ttransformed += morphTarget7 * morphTargetInfluences[ 7 ];\n\t\t#endif\n\t#endif\n#endif";
 
@@ -11232,7 +11277,7 @@
 			if (currentState === defaultState) return;
 			currentState = defaultState;
 			bindVertexArrayObject(currentState.object);
-		} // for backward-compatilibity
+		} // for backward-compatibility
 
 
 		function resetDefaultState() {
@@ -12817,8 +12862,6 @@
 
 					const buffer = new Float32Array(width * height * 4 * morphTargetsCount);
 					const texture = new DataArrayTexture(buffer, width, height, morphTargetsCount);
-					texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
-
 					texture.type = FloatType;
 					texture.needsUpdate = true; // fill buffer
 
@@ -15553,14 +15596,9 @@
 				}
 
 				if (shadow.map === null && !shadow.isPointLightShadow && this.type === VSMShadowMap) {
-					const pars = {
-						minFilter: LinearFilter,
-						magFilter: LinearFilter,
-						format: RGBAFormat
-					};
-					shadow.map = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y, pars);
+					shadow.map = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y);
 					shadow.map.texture.name = light.name + '.shadowMap';
-					shadow.mapPass = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y, pars);
+					shadow.mapPass = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y);
 					shadow.camera.updateProjectionMatrix();
 				}
 
@@ -24545,7 +24583,7 @@
 
 	function compareX(a, b) {
 		return a.x - b.x;
-	} // find a bridge between vertices that connects hole with an outer ring and and link it
+	} // find a bridge between vertices that connects hole with an outer ring and link it
 
 
 	function eliminateHole(hole, outerNode) {
@@ -24731,7 +24769,7 @@
 
 
 	function isValidDiagonal(a, b) {
-		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // dones't intersect other edges
+		return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && ( // doesn't intersect other edges
 		locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && ( // locally visible
 		area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
 		equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
@@ -25888,7 +25926,7 @@
 			const N = new Vector3(); // generate vertices, normals and uvs
 
 			for (let i = 0; i <= tubularSegments; ++i) {
-				// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
+				// the radian "u" is used to calculate the position on the torus curve of the current tubular segment
 				const u = i / tubularSegments * p * Math.PI * 2; // now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
 				// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
 
@@ -25909,7 +25947,7 @@
 					const v = j / radialSegments * Math.PI * 2;
 					const cx = -tube * Math.cos(v);
 					const cy = tube * Math.sin(v); // now calculate the final vertex position.
-					// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
+					// first we orient the extrusion with our basis vectors, then we add it to the current position on the curve
 
 					vertex.x = P1.x + (cx * N.x + cy * B.x);
 					vertex.y = P1.y + (cx * N.y + cy * B.y);
@@ -26104,7 +26142,7 @@
 							count: indices.count,
 							materialIndex: 0
 						}];
-					} // create a data structure that contains all eges without duplicates
+					} // create a data structure that contains all edges without duplicates
 
 
 					for (let o = 0, ol = groups.length; o < ol; ++o) {
@@ -27310,7 +27348,7 @@
 
 	/**
 	 *
-	 * Interpolant that evaluates to the sample value at the position preceeding
+	 * Interpolant that evaluates to the sample value at the position preceding
 	 * the parameter.
 	 */
 
@@ -33423,7 +33461,7 @@
 			this.phi = other.phi;
 			this.theta = other.theta;
 			return this;
-		} // restrict phi to be betwee EPS and PI-EPS
+		} // restrict phi to be between EPS and PI-EPS
 
 
 		makeSafe() {
