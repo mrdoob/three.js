@@ -691,16 +691,14 @@
 
 						const textNode = ele[ '#text' ];
 						const rawData = Array.isArray( textNode ) ? textNode[ 0 ] : textNode;
-						const byteData = Base64toByteArray( rawData );
+						const byteData = Base64toByteArray( rawData ); // Each data point consists of 8 bits regardless of the header type
 
-						// Each data point consists of 8 bits regardless of the header type
 						const dataPointSize = 8;
-
 						let blocks = byteData[ 0 ];
 
 						for ( let i = 1; i < numBytes - 1; i ++ ) {
 
-							blocks = blocks | byteData[ i ] << ( i * dataPointSize );
+							blocks = blocks | byteData[ i ] << i * dataPointSize;
 
 						}
 
@@ -720,7 +718,7 @@
 
 							for ( let j = 1; j < numBytes - 1; j ++ ) {
 
-								currentBlockSize = currentBlockSize | byteData[ i * numBytes + cSizeStart + j ] << ( j * dataPointSize );
+								currentBlockSize = currentBlockSize | byteData[ i * numBytes + cSizeStart + j ] << j * dataPointSize;
 
 							}
 
