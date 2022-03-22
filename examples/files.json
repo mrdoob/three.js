@@ -216,6 +216,7 @@
 		"webgl_tonemapping",
 		"webgl_video_kinect",
 		"webgl_video_panorama_equirectangular",
+		"webgl_loader_multiple",
 		"webgl_water",
 		"webgl_water_flowmap"
 	],
