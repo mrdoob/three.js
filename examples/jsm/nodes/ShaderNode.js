@@ -229,7 +229,7 @@ for ( let int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
 
 const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
 for ( let float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
-for ( let float of floats ) floatsCacheMap.set( float, new ConstNode( - float ) );
+for ( let float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
 
 const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
 
