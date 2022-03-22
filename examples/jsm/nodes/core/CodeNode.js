@@ -8,8 +8,6 @@ class CodeNode extends Node {
 
 		this.code = code;
 
-		this.useKeywords = false;
-
 		this._includes = [];
 
 	}
@@ -29,32 +27,6 @@ class CodeNode extends Node {
 	}
 
 	generate( builder ) {
-
-		if ( this.useKeywords === true ) {
-
-			const contextKeywords = builder.context.keywords;
-
-			if ( contextKeywords !== undefined ) {
-
-				const nodeData = builder.getDataFromNode( this, builder.shaderStage );
-
-				if ( nodeData.keywords === undefined ) {
-
-					nodeData.keywords = [];
-
-				}
-
-				if ( nodeData.keywords.indexOf( contextKeywords ) === - 1 ) {
-
-					contextKeywords.include( builder, this.code );
-
-					nodeData.keywords.push( contextKeywords );
-
-				}
-
-			}
-
-		}
 
 		const includes = this.getIncludes( builder );
 

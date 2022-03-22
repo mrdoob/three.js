@@ -36,13 +36,13 @@ class TextureNode extends UniformNode {
 
 		const textureProperty = super.generate( builder, 'texture' );
 
-		if ( output === 'sampler2D' || output === 'texture2D' ) {
-
-			return textureProperty;
-
-		} else if ( output === 'sampler' ) {
+		if ( output === 'sampler' ) {
 
 			return textureProperty + '_sampler';
+
+		} else if ( builder.isReference( output ) ) {
+
+			return textureProperty;
 
 		} else {
 

@@ -28,13 +28,13 @@ class CubeTextureNode extends TextureNode {
 
 		const textureProperty = UniformNode.prototype.generate.call( this, builder, 'cubeTexture' );
 
-		if ( output === 'samplerCube' || output === 'textureCube' ) {
-
-			return textureProperty;
-
-		} else if ( output === 'sampler' ) {
+		if ( output === 'sampler' ) {
 
 			return textureProperty + '_sampler';
+
+		} else if ( builder.isReference( output ) ) {
+
+			return textureProperty;
 
 		} else {
 

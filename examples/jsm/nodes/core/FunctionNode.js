@@ -7,7 +7,7 @@ class FunctionNode extends CodeNode {
 
 		super( code );
 
-		this.useKeywords = true;
+		this.keywords = {};
 
 	}
 
@@ -68,7 +68,25 @@ class FunctionNode extends CodeNode {
 
 		const propertyName = builder.getPropertyName( nodeCode );
 
-		nodeCode.code = this.getNodeFunction( builder ).getCode( propertyName );
+		let code = this.getNodeFunction( builder ).getCode( propertyName );
+
+		const keywords = this.keywords;
+		const keywordsProperties = Object.keys( keywords );
+
+		if ( keywordsProperties.length > 0 ) {
+
+			for ( const property of keywordsProperties ) {
+
+				const propertyRegExp = new RegExp( `\\b${property}\\b`, 'g' );
+				const nodeProperty = keywords[ property ].build( builder, 'property' );
+
+				code = code.replace( propertyRegExp, nodeProperty );
+
+			}
+
+		}
+
+		nodeCode.code = code;
 
 		if ( output === 'property' ) {
 

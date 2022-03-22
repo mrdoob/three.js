@@ -33,10 +33,17 @@ const parse = ( source ) => {
 
 		while ( i < propsMatches.length ) {
 
+			// default
+
 			const name = propsMatches[ i ++ ][ 0 ];
 			const type = propsMatches[ i ++ ][ 0 ];
 
-			propsMatches[ i ++ ][ 0 ]; // precision
+			// precision
+
+			if ( i < propsMatches.length && /^[fui]\d{2}$/.test( propsMatches[ i ][ 0 ] ) === true )
+				i ++;
+
+			// add input
 
 			inputs.push( new NodeFunctionInput( type, name ) );
 
