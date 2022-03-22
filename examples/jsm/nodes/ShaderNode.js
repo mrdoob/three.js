@@ -269,7 +269,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-				return сacheMap.get( params[ 0 ] );
+				return cacheMap.get( params[ 0 ] );
 
 			}
 
