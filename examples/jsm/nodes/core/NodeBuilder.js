@@ -255,6 +255,12 @@ class NodeBuilder {
 
 	}
 
+	isReference( type ) {
+
+		return type === 'void' || type === 'property' || type === 'sampler';
+
+	}
+
 	isShaderStage( shaderStage ) {
 
 		return this.shaderStage === shaderStage;
@@ -645,7 +651,7 @@ class NodeBuilder {
 		fromType = this.getVectorType( fromType );
 		toType = this.getVectorType( toType );
 
-		if ( fromType === toType || toType === 'void' || toType === null ) {
+		if ( fromType === toType || toType === null || this.isReference( toType ) ) {
 
 			return snippet;
 

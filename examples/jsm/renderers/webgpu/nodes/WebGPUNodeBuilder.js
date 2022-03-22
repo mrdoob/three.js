@@ -549,6 +549,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	isReference( type ) {
+
+		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube';
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		let snippet = '';

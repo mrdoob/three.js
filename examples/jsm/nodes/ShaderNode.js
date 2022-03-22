@@ -321,6 +321,7 @@ export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
 export const attribute = ( ...params ) => nodeObject( new AttributeNode( ...params ) );
 export const buffer = ( ...params ) => nodeObject( new BufferNode( ...params ) );
 export const texture = ( ...params ) => nodeObject( new TextureNode( ...params ) );
+export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), 'sampler' ) );
 
 export const cond = ( ...params ) => nodeObject( new CondNode( ...getShaderNodeArray( params ) ) );
 
