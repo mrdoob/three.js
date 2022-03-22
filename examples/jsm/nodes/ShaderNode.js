@@ -25,8 +25,8 @@ import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
-// core
-import { Vector2, Vector3, Vector4, Matrix3, Matrix4, Color } from 'three';
+// utils
+import { getValueFromType } from './core/NodeUtils.js';
 
 const NodeHandler = {
 
@@ -58,7 +58,7 @@ const NodeHandler = {
 
 				// accessing array
 
-				return new ShaderNodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+				return new ShaderNodeObject( new ArrayElementNode( node, uint( Number( prop ) ) ) );
 
 			}
 
@@ -72,13 +72,13 @@ const NodeHandler = {
 
 const nodeObjects = new WeakMap();
 
-const ShaderNodeObject = function( obj ) {
+const ShaderNodeObject = function ( obj ) {
 
 	const type = typeof obj;
 
 	if ( ( type === 'number' ) || ( type === 'boolean' ) ) {
 
-		return new ShaderNodeObject( new ConstNode( obj ) );
+		return new ShaderNodeObject( getAutoTypedConstNode( obj ) );
 
 	} else if ( type === 'object' ) {
 
@@ -104,7 +104,7 @@ const ShaderNodeObject = function( obj ) {
 
 };
 
-const ShaderNodeObjects = function( objects ) {
+const ShaderNodeObjects = function ( objects ) {
 
 	for ( const name in objects ) {
 
@@ -130,7 +130,7 @@ const getShaderNodeArray = ( array ) => {
 
 };
 
-const ShaderNodeProxy = function( NodeClass, scope = null, factor = null ) {
+const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 	if ( scope === null ) {
 
@@ -174,11 +174,81 @@ const ShaderNodeScript = function ( jsFunc ) {
 
 };
 
-export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
+const bools = [ false, true ];
+const uints = [ 0, 1, 2, 3 ];
+const ints = [ -1, -2 ];
+const floats = [ 0.5, 1.5, 1 / 3, 1e-6, 1e6, Math.PI, Math.PI * 2, 1 / Math.PI, 2 / Math.PI, 1 / ( Math.PI * 2), Math.PI / 2 ];
+
+const boolsCacheMap = new Map();
+for ( let bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
+
+const uintsCacheMap = new Map();
+for ( let uint of uints ) uintsCacheMap.set( uint, new ConstNode( uint, 'uint' ) );
+
+const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
+for ( let int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
+
+const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
+for ( let float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
+for ( let float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
+
+const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
+
+const getAutoTypedConstNode = ( value ) => {
+
+	if ( constNodesCacheMap.has( value ) ) {
+
+		return constNodesCacheMap.get( value );
+
+	} else if ( value.isNode === true ) {
+
+		return value;
+
+	} else {
+
+		return new ConstNode( value );
+
+	}
+
+};
+
+const ConvertType = function ( type, cacheMap = null ) {
+
+	return ( ...params ) => {
+
+		if ( params.length === 0 ) {
+
+			return nodeObject( new ConstNode( getValueFromType( type ), type ) );
+
+		} else {
+
+			if ( type === 'color' && params[ 0 ].isNode !== true ) {
+
+				params = [ getValueFromType( type, ...params ) ];
+
+			}
+
+			if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
+
+				return cacheMap.get( params[ 0 ] );
+
+			}
+
+			const nodes = params.map( getAutoTypedConstNode );
+
+			return nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
+
+		}
+
+	};
+
+};
 
 //
 // Node Material Shader Syntax
 //
+
+export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
 
 export const nodeObject = ( val ) => {
 
@@ -186,9 +256,12 @@ export const nodeObject = ( val ) => {
 
 };
 
-export const uniform = ( constNode ) => {
+export const uniform = ( value ) => {
 
-	return nodeObject( new UniformNode( constNode.value, constNode.nodeType ) );
+	// TODO: get ConstNode from .traverse() in the future
+	value = value.isNode === true ? value.node?.value || value.value : value;
+
+	return nodeObject( new UniformNode( value, value.nodeType ) );
 
 };
 
@@ -210,66 +283,37 @@ export const label = ( node, name ) => {
 
 export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
-const ConvertType = function ( type, valueClass = null, valueComponents = 1 ) {
+export const color = new ConvertType( 'color' );
 
-	return ( ...params ) => {
+export const float = new ConvertType( 'float', floatsCacheMap );
+export const int = new ConvertType( 'int', intsCacheMap );
+export const uint = new ConvertType( 'uint', uintsCacheMap );
+export const bool = new ConvertType( 'bool', boolsCacheMap );
 
-		if ( params[ 0 ]?.isNode === true ) {
+export const vec2 = new ConvertType( 'vec2' );
+export const ivec2 = new ConvertType( 'ivec2' );
+export const uvec2 = new ConvertType( 'uvec2' );
+export const bvec2 = new ConvertType( 'bvec2' );
 
-			return nodeObject( new ConvertNode( params[ 0 ], type ) );
+export const vec3 = new ConvertType( 'vec3' );
+export const ivec3 = new ConvertType( 'ivec3' );
+export const uvec3 = new ConvertType( 'uvec3' );
+export const bvec3 = new ConvertType( 'bvec3' );
 
-		}
+export const vec4 = new ConvertType( 'vec4' );
+export const ivec4 = new ConvertType( 'ivec4' );
+export const uvec4 = new ConvertType( 'uvec4' );
+export const bvec4 = new ConvertType( 'bvec4' );
 
-		if ( ( params.length === 1 ) && ( valueComponents !== 1 ) ) {
+export const mat3 = new ConvertType( 'mat3' );
+export const imat3 = new ConvertType( 'imat3' );
+export const umat3 = new ConvertType( 'umat3' );
+export const bmat3 = new ConvertType( 'bmat3' );
 
-			// Providing one scalar value: This value is used for all components
-
-			for ( let i = 1; i < valueComponents; i ++ ) {
-
-				params[ i ] = params [ 0 ];
-
-			}
-
-		}
-
-		const val = ( ( valueClass === null ) || ( params[ 0 ] instanceof valueClass ) ) ? params[ 0 ] : new valueClass().set( ...params );
-
-		return nodeObject( new ConstNode( val, type ) );
-
-	};
-
-};
-
-export const float = new ConvertType( 'float' );
-export const int = new ConvertType( 'int' );
-export const uint = new ConvertType( 'uint' );
-export const bool = new ConvertType( 'bool' );
-export const color = new ConvertType( 'color', Color );
-
-export const vec2 = new ConvertType( 'vec2', Vector2, 2 );
-export const ivec2 = new ConvertType( 'ivec2', Vector2, 2 );
-export const uvec2 = new ConvertType( 'uvec2', Vector2, 2 );
-export const bvec2 = new ConvertType( 'bvec2', Vector2, 2 );
-
-export const vec3 = new ConvertType( 'vec3', Vector3, 3 );
-export const ivec3 = new ConvertType( 'ivec3', Vector3, 3 );
-export const uvec3 = new ConvertType( 'uvec3', Vector3, 3 );
-export const bvec3 = new ConvertType( 'bvec3', Vector3, 3 );
-
-export const vec4 = new ConvertType( 'vec4', Vector4, 4 );
-export const ivec4 = new ConvertType( 'ivec4', Vector4, 4 );
-export const uvec4 = new ConvertType( 'uvec4', Vector4, 4 );
-export const bvec4 = new ConvertType( 'bvec4', Vector4, 4 );
-
-export const mat3 = new ConvertType( 'mat3', Matrix3 );
-export const imat3 = new ConvertType( 'imat3', Matrix3 );
-export const umat3 = new ConvertType( 'umat3', Matrix3 );
-export const bmat3 = new ConvertType( 'bmat3', Matrix3 );
-
-export const mat4 = new ConvertType( 'mat4', Matrix4 );
-export const imat4 = new ConvertType( 'imat4', Matrix4 );
-export const umat4 = new ConvertType( 'umat4', Matrix4 );
-export const bmat4 = new ConvertType( 'bmat4', Matrix4 );
+export const mat4 = new ConvertType( 'mat4' );
+export const imat4 = new ConvertType( 'imat4' );
+export const umat4 = new ConvertType( 'umat4' );
+export const bmat4 = new ConvertType( 'bmat4' );
 
 export const join = ( ...params ) => nodeObject( new JoinNode( getShaderNodeArray( params ) ) );
 
@@ -325,13 +369,6 @@ export const viewMatrix = new ShaderNodeObject( new ModelNode( ModelNode.VIEW_MA
 
 export const cameraPosition = new ShaderNodeObject( new CameraNode( CameraNode.POSITION ) );
 
-export const PI = float( 3.141592653589793 );
-export const PI2 = float( 6.283185307179586 );
-export const PI_HALF = float( 1.5707963267948966 );
-export const RECIPROCAL_PI = float( 0.3183098861837907 );
-export const RECIPROCAL_PI2 = float( 0.15915494309189535 );
-export const EPSILON = float( 1e-6 );
-
 export const diffuseColor = new ShaderNodeObject( new PropertyNode( 'DiffuseColor', 'vec4' ) );
 export const roughness = new ShaderNodeObject( new PropertyNode( 'Roughness', 'float' ) );
 export const metalness = new ShaderNodeObject( new PropertyNode( 'Metalness', 'float' ) );
@@ -383,3 +420,11 @@ export const sqrt = new ShaderNodeProxy( MathNode, 'sqrt' );
 export const step = new ShaderNodeProxy( MathNode, 'step' );
 export const tan = new ShaderNodeProxy( MathNode, 'tan' );
 export const transformDirection = new ShaderNodeProxy( MathNode, 'transformDirection' );
+
+export const PI = float( Math.PI );
+export const PI2 = float( Math.PI * 2 );
+export const PI_HALF = float( Math.PI / 2 );
+export const RECIPROCAL_PI = float( 1 / Math.PI );
+export const RECIPROCAL_PI2 = float( 1 / ( 2 * Math.PI ) );
+export const EPSILON = float( 1e-6 );
+export const INFINITY = float( 1e6 );
