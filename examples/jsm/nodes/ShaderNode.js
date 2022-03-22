@@ -421,10 +421,5 @@ export const step = new ShaderNodeProxy( MathNode, 'step' );
 export const tan = new ShaderNodeProxy( MathNode, 'tan' );
 export const transformDirection = new ShaderNodeProxy( MathNode, 'transformDirection' );
 
-export const PI = float( Math.PI );
-export const PI2 = float( Math.PI * 2 );
-export const PI_HALF = float( Math.PI / 2 );
-export const RECIPROCAL_PI = float( 1 / Math.PI );
-export const RECIPROCAL_PI2 = float( 1 / ( 2 * Math.PI ) );
 export const EPSILON = float( 1e-6 );
 export const INFINITY = float( 1e6 );
