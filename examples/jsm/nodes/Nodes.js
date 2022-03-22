@@ -27,6 +27,7 @@ import VaryNode from './core/VaryNode.js';
 // accessors
 import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
+import CubeTextureNode from './accessors/CubeTextureNode.js';
 import MaterialNode from './accessors/MaterialNode.js';
 import MaterialReferenceNode from './accessors/MaterialReferenceNode.js';
 import ModelNode from './accessors/ModelNode.js';
@@ -36,6 +37,7 @@ import Object3DNode from './accessors/Object3DNode.js';
 import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
+import ReflectNode from './accessors/ReflectNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
@@ -118,6 +120,7 @@ const nodeLib = {
 	// accessors
 	BufferNode,
 	CameraNode,
+	CubeTextureNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -127,6 +130,7 @@ const nodeLib = {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
+	ReflectNode,
 	SkinningNode,
 	TextureNode,
 	UVNode,
@@ -205,6 +209,7 @@ export {
 	// accessors
 	BufferNode,
 	CameraNode,
+	CubeTextureNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -214,6 +219,7 @@ export {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
+	ReflectNode,
 	SkinningNode,
 	TextureNode,
 	UVNode,

@@ -13837,14 +13837,17 @@
 
 	let programIdCount = 0;
 
-	function addLineNumbers(string) {
+	function handleSource(string, errorLine) {
 		const lines = string.split('\n');
+		const lines2 = [];
+		const from = Math.max(errorLine - 6, 0);
+		const to = Math.min(errorLine + 6, lines.length);
 
-		for (let i = 0; i < lines.length; i++) {
-			lines[i] = i + 1 + ': ' + lines[i];
+		for (let i = from; i < to; i++) {
+			lines2.push(i + 1 + ': ' + lines[i]);
 		}
 
-		return lines.join('\n');
+		return lines2.join('\n');
 	}
 
 	function getEncodingComponents(encoding) {
@@ -13864,10 +13867,11 @@
 	function getShaderErrors(gl, shader, type) {
 		const status = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
 		const errors = gl.getShaderInfoLog(shader).trim();
-		if (status && errors === '') return ''; // --enable-privileged-webgl-extension
+		if (status && errors === '') return '';
+		const errorLine = parseInt(/ERROR: 0:(\d+)/.exec(errors)[1]); // --enable-privileged-webgl-extension
 		// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
 
-		return type.toUpperCase() + '\n\n' + errors + '\n\n' + addLineNumbers(gl.getShaderSource(shader));
+		return type.toUpperCase() + '\n\n' + errors + '\n\n' + handleSource(gl.getShaderSource(shader), errorLine);
 	}
 
 	function getTexelEncodingFunction(functionName, encoding) {
@@ -18680,7 +18684,6 @@
 				refreshUniformsCommon(uniforms, material);
 			} else if (material.isMeshLambertMaterial) {
 				refreshUniformsCommon(uniforms, material);
-				refreshUniformsLambert(uniforms, material);
 			} else if (material.isMeshToonMaterial) {
 				refreshUniformsCommon(uniforms, material);
 				refreshUniformsToon(uniforms, material);
@@ -18689,24 +18692,21 @@
 				refreshUniformsPhong(uniforms, material);
 			} else if (material.isMeshStandardMaterial) {
 				refreshUniformsCommon(uniforms, material);
+				refreshUniformsStandard(uniforms, material);
 
 				if (material.isMeshPhysicalMaterial) {
 					refreshUniformsPhysical(uniforms, material, transmissionRenderTarget);
-				} else {
-					refreshUniformsStandard(uniforms, material);
 				}
 			} else if (material.isMeshMatcapMaterial) {
 				refreshUniformsCommon(uniforms, material);
 				refreshUniformsMatcap(uniforms, material);
 			} else if (material.isMeshDepthMaterial) {
 				refreshUniformsCommon(uniforms, material);
-				refreshUniformsDepth(uniforms, material);
 			} else if (material.isMeshDistanceMaterial) {
 				refreshUniformsCommon(uniforms, material);
 				refreshUniformsDistance(uniforms, material);
 			} else if (material.isMeshNormalMaterial) {
 				refreshUniformsCommon(uniforms, material);
-				refreshUniformsNormal(uniforms, material);
 			} else if (material.isLineBasicMaterial) {
 				refreshUniformsLine(uniforms, material);
 
@@ -18742,6 +18742,28 @@
 
 			if (material.alphaMap) {
 				uniforms.alphaMap.value = material.alphaMap;
+			}
+
+			if (material.bumpMap) {
+				uniforms.bumpMap.value = material.bumpMap;
+				uniforms.bumpScale.value = material.bumpScale;
+				if (material.side === BackSide) uniforms.bumpScale.value *= -1;
+			}
+
+			if (material.displacementMap) {
+				uniforms.displacementMap.value = material.displacementMap;
+				uniforms.displacementScale.value = material.displacementScale;
+				uniforms.displacementBias.value = material.displacementBias;
+			}
+
+			if (material.emissiveMap) {
+				uniforms.emissiveMap.value = material.emissiveMap;
+			}
+
+			if (material.normalMap) {
+				uniforms.normalMap.value = material.normalMap;
+				uniforms.normalScale.value.copy(material.normalScale);
+				if (material.side === BackSide) uniforms.normalScale.value.negate();
 			}
 
 			if (material.specularMap) {
@@ -18955,64 +18977,14 @@
 			}
 		}
 
-		function refreshUniformsLambert(uniforms, material) {
-			if (material.emissiveMap) {
-				uniforms.emissiveMap.value = material.emissiveMap;
-			}
-		}
-
 		function refreshUniformsPhong(uniforms, material) {
 			uniforms.specular.value.copy(material.specular);
 			uniforms.shininess.value = Math.max(material.shininess, 1e-4); // to prevent pow( 0.0, 0.0 )
-
-			if (material.emissiveMap) {
-				uniforms.emissiveMap.value = material.emissiveMap;
-			}
-
-			if (material.bumpMap) {
-				uniforms.bumpMap.value = material.bumpMap;
-				uniforms.bumpScale.value = material.bumpScale;
-				if (material.side === BackSide) uniforms.bumpScale.value *= -1;
-			}
-
-			if (material.normalMap) {
-				uniforms.normalMap.value = material.normalMap;
-				uniforms.normalScale.value.copy(material.normalScale);
-				if (material.side === BackSide) uniforms.normalScale.value.negate();
-			}
-
-			if (material.displacementMap) {
-				uniforms.displacementMap.value = material.displacementMap;
-				uniforms.displacementScale.value = material.displacementScale;
-				uniforms.displacementBias.value = material.displacementBias;
-			}
 		}
 
 		function refreshUniformsToon(uniforms, material) {
 			if (material.gradientMap) {
 				uniforms.gradientMap.value = material.gradientMap;
-			}
-
-			if (material.emissiveMap) {
-				uniforms.emissiveMap.value = material.emissiveMap;
-			}
-
-			if (material.bumpMap) {
-				uniforms.bumpMap.value = material.bumpMap;
-				uniforms.bumpScale.value = material.bumpScale;
-				if (material.side === BackSide) uniforms.bumpScale.value *= -1;
-			}
-
-			if (material.normalMap) {
-				uniforms.normalMap.value = material.normalMap;
-				uniforms.normalScale.value.copy(material.normalScale);
-				if (material.side === BackSide) uniforms.normalScale.value.negate();
-			}
-
-			if (material.displacementMap) {
-				uniforms.displacementMap.value = material.displacementMap;
-				uniforms.displacementScale.value = material.displacementScale;
-				uniforms.displacementBias.value = material.displacementBias;
 			}
 		}
 
@@ -19028,28 +19000,6 @@
 				uniforms.metalnessMap.value = material.metalnessMap;
 			}
 
-			if (material.emissiveMap) {
-				uniforms.emissiveMap.value = material.emissiveMap;
-			}
-
-			if (material.bumpMap) {
-				uniforms.bumpMap.value = material.bumpMap;
-				uniforms.bumpScale.value = material.bumpScale;
-				if (material.side === BackSide) uniforms.bumpScale.value *= -1;
-			}
-
-			if (material.normalMap) {
-				uniforms.normalMap.value = material.normalMap;
-				uniforms.normalScale.value.copy(material.normalScale);
-				if (material.side === BackSide) uniforms.normalScale.value.negate();
-			}
-
-			if (material.displacementMap) {
-				uniforms.displacementMap.value = material.displacementMap;
-				uniforms.displacementScale.value = material.displacementScale;
-				uniforms.displacementBias.value = material.displacementBias;
-			}
-
 			const envMap = properties.get(material).envMap;
 
 			if (envMap) {
@@ -19059,7 +19009,6 @@
 		}
 
 		function refreshUniformsPhysical(uniforms, material, transmissionRenderTarget) {
-			refreshUniformsStandard(uniforms, material);
 			uniforms.ior.value = material.ior; // also part of uniforms common
 
 			if (material.sheen > 0) {
@@ -19132,64 +19081,12 @@
 			if (material.matcap) {
 				uniforms.matcap.value = material.matcap;
 			}
-
-			if (material.bumpMap) {
-				uniforms.bumpMap.value = material.bumpMap;
-				uniforms.bumpScale.value = material.bumpScale;
-				if (material.side === BackSide) uniforms.bumpScale.value *= -1;
-			}
-
-			if (material.normalMap) {
-				uniforms.normalMap.value = material.normalMap;
-				uniforms.normalScale.value.copy(material.normalScale);
-				if (material.side === BackSide) uniforms.normalScale.value.negate();
-			}
-
-			if (material.displacementMap) {
-				uniforms.displacementMap.value = material.displacementMap;
-				uniforms.displacementScale.value = material.displacementScale;
-				uniforms.displacementBias.value = material.displacementBias;
-			}
-		}
-
-		function refreshUniformsDepth(uniforms, material) {
-			if (material.displacementMap) {
-				uniforms.displacementMap.value = material.displacementMap;
-				uniforms.displacementScale.value = material.displacementScale;
-				uniforms.displacementBias.value = material.displacementBias;
-			}
 		}
 
 		function refreshUniformsDistance(uniforms, material) {
-			if (material.displacementMap) {
-				uniforms.displacementMap.value = material.displacementMap;
-				uniforms.displacementScale.value = material.displacementScale;
-				uniforms.displacementBias.value = material.displacementBias;
-			}
-
 			uniforms.referencePosition.value.copy(material.referencePosition);
 			uniforms.nearDistance.value = material.nearDistance;
 			uniforms.farDistance.value = material.farDistance;
-		}
-
-		function refreshUniformsNormal(uniforms, material) {
-			if (material.bumpMap) {
-				uniforms.bumpMap.value = material.bumpMap;
-				uniforms.bumpScale.value = material.bumpScale;
-				if (material.side === BackSide) uniforms.bumpScale.value *= -1;
-			}
-
-			if (material.normalMap) {
-				uniforms.normalMap.value = material.normalMap;
-				uniforms.normalScale.value.copy(material.normalScale);
-				if (material.side === BackSide) uniforms.normalScale.value.negate();
-			}
-
-			if (material.displacementMap) {
-				uniforms.displacementMap.value = material.displacementMap;
-				uniforms.displacementScale.value = material.displacementScale;
-				uniforms.displacementBias.value = material.displacementBias;
-			}
 		}
 
 		return {

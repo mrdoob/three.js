@@ -123,7 +123,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
-	generateMipmaps( textureGPU, textureGPUDescriptor ) {
+	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0, mipLevelOffset = 1 ) {
 
 		const pipeline = this.getMipmapPipeline( textureGPUDescriptor.format );
 
@@ -135,11 +135,12 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 			mipLevelCount: 1
 		} );
 
-		for ( let i = 1; i < textureGPUDescriptor.mipLevelCount; i ++ ) {
+		for ( let i = mipLevelOffset; i < textureGPUDescriptor.mipLevelCount; i ++ ) {
 
 			const dstView = textureGPU.createView( {
 				baseMipLevel: i,
-				mipLevelCount: 1
+				mipLevelCount: 1,
+				baseArrayLayer
 			} );
 
 			const passEncoder = commandEncoder.beginRenderPass( {

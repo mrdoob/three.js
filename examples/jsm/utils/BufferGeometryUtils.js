@@ -4,25 +4,91 @@ import {
 	Float32BufferAttribute,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
+	MathUtils,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
-	Vector3
+	Vector3,
 } from 'three';
+import { generateTangents } from '../libs/mikktspace.module.js';
 
 
-function computeTangents( geometry ) {
+function computeTangents( geometry, negateSign = true ) {
 
-	geometry.computeTangents();
-	console.warn( 'THREE.BufferGeometryUtils: .computeTangents() has been removed. Use BufferGeometry.computeTangents() instead.' );
+	function getAttributeArray( attribute ) {
+
+		if ( attribute.normalized || attribute.isInterleavedBufferAttribute ) {
+
+			const srcArray = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
+			const dstArray = new Float32Array( attribute.getCount() * attribute.itemSize );
+
+			for ( let i = 0, j = 0; i < attribute.getCount(); i ++ ) {
+
+				dstArray[ j ++ ] = MathUtils.denormalize( attribute.getX( i ), srcArray );
+				dstArray[ j ++ ] = MathUtils.denormalize( attribute.getY( i ), srcArray );
+
+				if ( attribute.itemSize > 2 ) {
+
+					dstArray[ j ++ ] = MathUtils.denormalize( attribute.getZ( i ), srcArray );
+
+				}
+
+			}
+
+			return dstArray;
+
+		}
+
+		if ( attribute.array instanceof Float32Array ) {
+
+			return attribute.array;
+
+		}
+
+		return new Float32Array( attribute.array );
+
+	}
+
+	// MikkTSpace algorithm requires non-indexed input.
+
+	const _geometry = geometry.index ? geometry.toNonIndexed() : geometry;
+
+	// Compute vertex tangents.
+
+	const tangents = generateTangents(
+
+		getAttributeArray( _geometry.attributes.position ),
+		getAttributeArray( _geometry.attributes.normal ),
+		getAttributeArray( _geometry.attributes.uv )
+
+	);
+
+	// Texture coordinate convention of glTF differs from the apparent
+	// default of the MikkTSpace library; .w component must be flipped.
+
+	if ( negateSign ) {
+
+		for ( let i = 3; i < tangents.length; i += 4 ) {
+
+			tangents[ i ] *= -1;
+
+		}
+
+	}
+
+	//
+
+	_geometry.setAttribute( 'tangent', new BufferAttribute( tangents, 4 ) );
+
+	return geometry.copy( _geometry );
 
 }
 
 /**
-	 * @param  {Array<BufferGeometry>} geometries
-	 * @param  {Boolean} useGroups
-	 * @return {BufferGeometry}
-	 */
+ * @param  {Array<BufferGeometry>} geometries
+ * @param  {Boolean} useGroups
+ * @return {BufferGeometry}
+ */
 function mergeBufferGeometries( geometries, useGroups = false ) {
 
 	const isIndexed = geometries[ 0 ].index !== null;
@@ -929,7 +995,107 @@ function computeMorphedAttributes( object ) {
 
 }
 
+function mergeGroups( geometry ) {
 
+	if ( geometry.groups.length === 0 ) {
+
+		console.warn( 'THREE.BufferGeometryUtils.mergeGroups(): No groups are defined. Nothing to merge.' );
+		return geometry;
+
+	}
+
+	let groups = geometry.groups;
+
+	// sort groups by material index
+
+	groups = groups.sort( ( a, b ) => {
+
+		if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
+
+		return a.start - b.start;
+
+	} );
+
+	// create index for non-indexed geometries
+
+	if ( geometry.getIndex() === null ) {
+
+		const positionAttribute = geometry.getAttribute( 'position' );
+		const indices = [];
+
+		for ( let i = 0; i < positionAttribute.count; i += 3 ) {
+
+			indices.push( i, i + 1, i + 2 );
+
+		}
+
+		geometry.setIndex( indices );
+
+	}
+
+	// sort index
+
+	const index = geometry.getIndex();
+
+	const newIndices = [];
+
+	for ( let i = 0; i < groups.length; i ++ ) {
+
+		const group = groups[ i ];
+
+		const groupStart = group.start;
+		const groupLength = groupStart + group.count;
+
+		for ( let j = groupStart; j < groupLength; j ++ ) {
+
+			newIndices.push( index.getX( j ) );
+
+		}
+
+	}
+
+	geometry.dispose(); // Required to force buffer recreation
+	geometry.setIndex( newIndices );
+
+	// update groups indices
+
+	let start = 0;
+
+	for ( let i = 0; i < groups.length; i ++ ) {
+
+		const group = groups[ i ];
+
+		group.start = start;
+		start += group.count;
+
+	}
+
+	// merge groups
+
+	let currentGroup = groups[ 0 ];
+
+	geometry.groups = [ currentGroup ];
+
+	for ( let i = 1; i < groups.length; i ++ ) {
+
+		const group = groups[ i ];
+
+		if ( currentGroup.materialIndex === group.materialIndex ) {
+
+			currentGroup.count += group.count;
+
+		} else {
+
+			currentGroup = group;
+			geometry.groups.push( currentGroup );
+
+		}
+
+	}
+
+	return geometry;
+
+}
 
 export {
 	computeTangents,
@@ -940,4 +1106,5 @@ export {
 	mergeVertices,
 	toTrianglesDrawMode,
 	computeMorphedAttributes,
+	mergeGroups
 };

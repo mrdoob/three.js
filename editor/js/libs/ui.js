@@ -142,9 +142,12 @@ class UIElement {
 
 // properties
 
-const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'verticalAlign', 'color',
-	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
+const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height',
+	'display', 'verticalAlign', 'overflow', 'color', 'background', 'backgroundColor', 'opacity',
+	'border', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor',
+	'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom',
+	'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
+	'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
