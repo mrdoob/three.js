@@ -165,13 +165,13 @@
 				const getWGSLTextureSample = new Nodes.FunctionNode( `
 					fn getWGSLTextureSample( uv:vec2<f32> ) -> vec4<f32> {
 
-						return textureSample( tex, tex_sampler, uv );
+						return textureSample( tex, tex_sampler, uv ) * vec4<f32>( 0.0, 1.0, 0.0, 1.0 );
 
 					}
 				` );
 
-				const nodeTexture = new Nodes.TextureNode( texture );
-				getWGSLTextureSample.keywords = { tex: nodeTexture, tex_sampler: sampler( nodeTexture ) };
+				const textureNode = new Nodes.TextureNode( texture );
+				getWGSLTextureSample.keywords = { tex: textureNode, tex_sampler: sampler( textureNode ) };
 
 				material = new Nodes.MeshBasicNodeMaterial();
 				material.colorNode = getWGSLTextureSample.call( { uv: new Nodes.UVNode() } );
