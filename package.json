@@ -39,7 +39,10 @@
   },
   "eslintConfig": {
     "root": true,
-    "extends": "mdcs",
+    "extends": [
+      "mdcs",
+      "plugin:compat/recommended"
+    ],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
       "babelOptions": {
@@ -86,6 +89,9 @@
       ]
     }
   },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
   "scripts": {
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
@@ -136,6 +142,7 @@
     "concurrently": "^6.2.2",
     "eslint": "^7.32.0",
     "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-compat": "^4.0.2",
     "eslint-plugin-html": "^6.2.0",
     "eslint-plugin-import": "^2.25.4",
     "rollup": "^2.57.0",
