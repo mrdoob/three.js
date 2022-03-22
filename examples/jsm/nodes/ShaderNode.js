@@ -213,7 +213,25 @@ export const label = ( node, name ) => {
 
 export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
-const constNodesCacheMap = new Map();
+const bools = [ false, true ];
+const uints = [ 0, 1, 2, 3 ];
+const ints = [ -1, -2 ];
+const floats = [ 0.5, 1.5, 1 / 3, 1e-6, 1e6, Math.PI, Math.PI * 2, 1 / Math.PI, 2 / Math.PI, 1 / ( Math.PI * 2), Math.PI / 2 ];
+
+const boolsCacheMap = new Map();
+for ( let bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
+
+const uintsCacheMap = new Map();
+for ( let uint of uints ) uintsCacheMap.set( uint, new ConstNode( uint, 'uint' ) );
+
+const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
+for ( let int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
+
+const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
+for ( let float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
+for ( let float of floats ) floatsCacheMap.set( float, new ConstNode( - float ) );
+
+const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
 
 const getAutoTypedConstNode = ( value ) => {
 
@@ -227,31 +245,19 @@ const getAutoTypedConstNode = ( value ) => {
 
 	} else {
 
-		const node = new ConstNode( value );
-
-		if ( typeof value !== 'object' ) {
-
-			constNodesCacheMap.set( value, node );
-
-		}
-
-		return node;
+		return new ConstNode( value );
 
 	}
 
 };
 
-const ConvertType = function ( type ) {
-
-	const nodesCacheMap = new Map();
+const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		let node;
-
 		if ( params.length === 0 ) {
 
-			node = new ShaderNodeObject( new ConstNode( getValueFromType( type ), type ) );
+			return nodeObject( new ConstNode( getValueFromType( type ), type ) );
 
 		} else {
 
@@ -261,7 +267,7 @@ const ConvertType = function ( type ) {
 
 			}
 
-			if ( params.length === 1 && nodesCacheMap.has( params[ 0 ] ) ) {
+			if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
 				return nodesCacheMap.get( params[ 0 ] );
 
@@ -269,17 +275,9 @@ const ConvertType = function ( type ) {
 
 			const nodes = params.map( getAutoTypedConstNode );
 
-			node = new ShaderNodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
+			return nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
 
 		}
-
-		if ( params.length === 1 && typeof params[ 0 ] !== 'object' ) {
-
-			nodesCacheMap.set( params[ 0 ], node );
-
-		}
-
-		return node;
 
 	};
 
@@ -287,10 +285,10 @@ const ConvertType = function ( type ) {
 
 export const color = new ConvertType( 'color' );
 
-export const float = new ConvertType( 'float' );
-export const int = new ConvertType( 'int' );
-export const uint = new ConvertType( 'uint' );
-export const bool = new ConvertType( 'bool' );
+export const float = new ConvertType( 'float', floatsCacheMap );
+export const int = new ConvertType( 'int', intsCacheMap );
+export const uint = new ConvertType( 'uint', uintsCacheMap );
+export const bool = new ConvertType( 'bool', boolsCacheMap );
 
 export const vec2 = new ConvertType( 'vec2' );
 export const ivec2 = new ConvertType( 'ivec2' );
@@ -429,3 +427,4 @@ export const PI_HALF = float( Math.PI / 2 );
 export const RECIPROCAL_PI = float( 1 / Math.PI );
 export const RECIPROCAL_PI2 = float( 1 / ( 2 * Math.PI ) );
 export const EPSILON = float( 1e-6 );
+export const INFINITY = float( 1e6 );
