@@ -174,45 +174,6 @@ const ShaderNodeScript = function ( jsFunc ) {
 
 };
 
-export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
-
-//
-// Node Material Shader Syntax
-//
-
-export const nodeObject = ( val ) => {
-
-	return new ShaderNodeObject( val );
-
-};
-
-export const uniform = ( constNode ) => {
-
-	// TODO: get constNode from .traverse() in the future
-	const value = constNode.value === undefined ? constNode.node?.value : constNode.value;
-
-	return nodeObject( new UniformNode( value, constNode.nodeType ) );
-
-};
-
-export const label = ( node, name ) => {
-
-	node = nodeObject( node );
-
-	if ( node.isVarNode === true ) {
-
-		node.name = name;
-
-		return node;
-
-	}
-
-	return nodeObject( new VarNode( node, name ) );
-
-};
-
-export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
-
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
 const ints = [ -1, -2 ];
@@ -282,6 +243,45 @@ const ConvertType = function ( type, cacheMap = null ) {
 	};
 
 };
+
+//
+// Node Material Shader Syntax
+//
+
+export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
+
+export const nodeObject = ( val ) => {
+
+	return new ShaderNodeObject( val );
+
+};
+
+export const uniform = ( value ) => {
+
+	// TODO: get ConstNode from .traverse() in the future
+	value = value.isNode === true ? value.node?.value || value.value : value;
+
+	return nodeObject( new UniformNode( value, value.nodeType ) );
+
+};
+
+export const label = ( node, name ) => {
+
+	node = nodeObject( node );
+
+	if ( node.isVarNode === true ) {
+
+		node.name = name;
+
+		return node;
+
+	}
+
+	return nodeObject( new VarNode( node, name ) );
+
+};
+
+export const temp = ( node ) => nodeObject( new VarNode( nodeObject( node ) ) );
 
 export const color = new ConvertType( 'color' );
 
