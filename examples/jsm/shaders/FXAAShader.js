@@ -7,6 +7,7 @@ import {
  * https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
  * - WebGL port by @supereggbert
  * http://www.glge.org/demos/fxaa/
+ * Further improved by Daniel Sturk
  */
 
 const FXAAShader = {
