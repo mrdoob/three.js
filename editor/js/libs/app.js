@@ -58,7 +58,13 @@ var APP = {
 			}
 
 			var scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+			
+			var iframe = document.createElement( 'iframe' );
 
+			document.body.appendChild( iframe );
+			
+			var F = iframe.contentWindow.Function;
+			
 			for ( var uuid in json.scripts ) {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
@@ -71,12 +77,6 @@ var APP = {
 				}
 
 				var scripts = json.scripts[ uuid ];
-
-				var iframe = document.createElement( 'iframe' );
-
-				document.body.appendChild( iframe );
-
-				var F = iframe.contentWindow.Function;
 
 				for ( var i = 0; i < scripts.length; i ++ ) {
 
@@ -101,9 +101,9 @@ var APP = {
 
 				}
 
-				document.body.removeChild( iframe );
-
 			}
+			
+			document.body.removeChild( iframe );
 
 			dispatch( events.init, arguments );
 
