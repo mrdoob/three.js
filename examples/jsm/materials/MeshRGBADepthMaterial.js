@@ -1,4 +1,4 @@
-import { MeshDepthMaterial, RGBADepthPacking } from '@dualbox/three';
+import { MeshDepthMaterial, RGBADepthPacking } from '../../../build/three.module.js'
 
 /**
  * @author Maxime Quiblier / http://github.com/maximeq

@@ -5,7 +5,7 @@ import {
     TangentSpaceNormalMap,
     UniformsUtils,
     Vector2
-} from '@dualbox/three';
+} from '../../../build/three.module.js';
 
 
 /**
