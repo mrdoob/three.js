@@ -198,6 +198,22 @@ const ShaderLib = {
 
 	},
 
+	velocity: {
+
+		uniforms: mergeUniforms( [
+			UniformsLib.common,
+			UniformsLib.displacementmap,
+			{
+				currentProjectionViewMatrix: { value: null },
+				previousProjectionViewMatrix: { value: null }
+			}
+		] ),
+
+		vertexShader: ShaderChunk.meshvelocity_vert,
+		fragmentShader: ShaderChunk.meshvelocity_frag
+
+	},
+
 	sprite: {
 
 		uniforms: mergeUniforms( [
