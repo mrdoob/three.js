@@ -171,7 +171,8 @@ class WebGPURenderer {
 
 		context.configure( {
 			device: device,
-			format: GPUTextureFormat.BGRA8Unorm // this is the only valid context format right now (r121)
+			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
+			compositingAlphaMode: 'opaque'
 		} );
 
 		this._adapter = adapter;
