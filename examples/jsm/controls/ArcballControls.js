@@ -2875,7 +2875,7 @@ class ArcballControls extends EventDispatcher {
 			this._v3_1.set( this._v2_1.x, this._v2_1.y, - 1 );
 			this._v3_1.applyMatrix4( camera.projectionMatrixInverse );
 
-			const rayDir = this._v3_2.copy( _v3_1 ).normalize(); //unprojected ray direction
+			const rayDir = this._v3_2.copy( this._v3_1 ).normalize(); //unprojected ray direction
 			const cameraGizmoDistance = camera.position.distanceTo( this._gizmos.position );
 			const radius2 = Math.pow( tbRadius, 2 );
 
@@ -2989,7 +2989,7 @@ class ArcballControls extends EventDispatcher {
 			this._v3_1.set( this._v2_1.x, this._v2_1.y, - 1 );
 			this._v3_1.applyMatrix4( camera.projectionMatrixInverse );
 
-			const rayDir = this._v3_2.copy( _v3_1 ).normalize(); //unprojected ray direction
+			const rayDir = this._v3_2.copy( this._v3_1 ).normalize(); //unprojected ray direction
 
 			//	  camera
 			//		|\
