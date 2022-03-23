@@ -15,6 +15,12 @@
 
 			在 BufferAttribute 中，数据被存储为任意长度的矢量（通过[page:BufferAttribute.itemSize itemSize]进行定义），下列函数如无特别说明，
 			函数参数中的index会自动乘以矢量长度进行计算。
+
+			When working with vector-like data, the <i>.fromBufferAttribute( attribute, index )</i>
+			helper methods on [page:Vector2.fromBufferAttribute Vector2],
+			[page:Vector3.fromBufferAttribute Vector3],
+			[page:Vector4.fromBufferAttribute Vector4], and
+			[page:Color.fromBufferAttribute Color] classes may be helpful.
 		</p>
 
 		<h2>构造函数</h2>
