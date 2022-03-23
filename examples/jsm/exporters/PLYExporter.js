@@ -227,9 +227,7 @@ class PLYExporter {
 
 				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					vertex.applyMatrix4( mesh.matrixWorld );
 
@@ -249,9 +247,7 @@ class PLYExporter {
 
 						if ( normals != null ) {
 
-							vertex.x = normals.getX( i );
-							vertex.y = normals.getY( i );
-							vertex.z = normals.getZ( i );
+							vertex.fromBufferAttribute( normals, i );
 
 							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
@@ -411,9 +407,7 @@ class PLYExporter {
 				// form each line
 				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					vertex.applyMatrix4( mesh.matrixWorld );
 
@@ -429,9 +423,7 @@ class PLYExporter {
 
 						if ( normals != null ) {
 
-							vertex.x = normals.getX( i );
-							vertex.y = normals.getY( i );
-							vertex.z = normals.getZ( i );
+							vertex.fromBufferAttribute( normals, i );
 
 							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
