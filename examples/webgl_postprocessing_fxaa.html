@@ -70,9 +70,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
-
+			
 				clock = new THREE.Clock();
 
 				//
@@ -123,10 +121,13 @@
 				//
 
 				const renderPass = new RenderPass( scene, camera );
+				renderPass.clearColor = new THREE.Color( 0, 0, 0 );
+				renderPass.clearAlpha = 0;
 
 				//
 
 				fxaaPass = new ShaderPass( FXAAShader );
+
 				const copyPass = new ShaderPass( CopyShader );
 
 				composer1 = new EffectComposer( renderer );
