@@ -66,6 +66,7 @@ const _endEvent = { type: 'end' };
 
 const _raycaster = new Raycaster();
 const _offset = new Vector3();
+const _movement = new Vector3();
 
 const _gizmoMatrixStateTemp = new Matrix4();
 const _cameraMatrixStateTemp = new Matrix4();
@@ -108,8 +109,6 @@ class ArcballControls extends EventDispatcher {
 		this._scaleMatrix = new Matrix4(); //matrix for scaling operation
 
 		this._rotationAxis = new Vector3(); //axis for rotate operation
-
-		this._movement = new Vector3();
 
 
 		//camera state
@@ -2443,7 +2442,7 @@ class ArcballControls extends EventDispatcher {
 	 */
 	pan = ( p0, p1, adjust = false ) => {
 
-		const movement = this._movement.copy( p0 ).sub( p1 );
+		const movement = _movement.copy( p0 ).sub( p1 );
 
 		if ( this.camera.isOrthographicCamera ) {
 
