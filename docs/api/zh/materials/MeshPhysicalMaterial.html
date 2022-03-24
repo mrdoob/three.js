@@ -17,25 +17,18 @@
 
 		<ul>
 			<li>
-				<b>Clearcoat:</b> Some materials — like car paints, carbon fiber, and wet surfaces — require a
-				clear, reflective layer on top of another layer that may be irregular or rough. Clearcoat
-				approximates this effect, without the need for a separate transparent surface.
+				<b>Clearcoat:</b> 有些类似于车漆，碳纤，被水打湿的表面的材质需要在面上再增加一个透明的，具有一定反光特性的面。而且这个面说不定有一定的起伏与粗糙度。Clearcoat可以在不需要重新创建一个透明的面的情况下做到类似的效果。
 			</li>
 			<li>
-				<b>Physically-based transparency:</b> One limitation of [page:Material.opacity .opacity] is
-				that highly transparent materials are less reflective. Physically-based [page:.transmission]
-				provides a more realistic option for thin, transparent surfaces like glass.
+				<b>基于物理的透明度</b>:[page:Material.opacity .opacity]属性有一些限制:在透明度比较高的时候，反射也随之减少。使用基于物理的透光性[page:.transmission]属性可以让一些很薄的透明表面，例如玻璃，变得更真实一些。
 			</li>
 			<li>
-				<b>Advanced reflectivity:</b> More flexible reflectivity for non-metallic materials.
+				<b>高级光线反射:</b> 为非金属材质提供了更多更灵活的光线反射。
 			</li>
 		</ul>
 
 		<p>
-			As a result of these complex shading features, MeshPhysicalMaterial has a higher performance
-			cost, per pixel, than other three.js materials. Most effects are disabled by default, and add
-			cost as they are enabled. For best results, always specify an [page:.envMap environment map]
-			when using this material.
+			物理网格材质使用了更复杂的着色器功能，所以在每个像素的渲染都要比three.js中的其他材质更费性能，大部分的特性是默认关闭的，需要手动开启，每开启一项功能在开启的时候才会更耗性能。请注意，为获得最佳效果，您在使用此材质时应始终指定[page:.envMap environment map]。
 		</p>
 
 		<iframe id="scene" src="scenes/material-browser.html#MeshPhysicalMaterial"></iframe>
@@ -79,29 +72,26 @@
 
 		<h3>[property:Float clearcoat]</h3>
 		<p>
-		Represents the intensity of the clear coat layer, from *0.0* to *1.0*. Use clear coat related properties to enable multilayer
-		materials that have a thin translucent layer over the base layer. Default is *0.0*.
+		表示clear coat层的强度，范围从*0.0*到*1.0*m，当需要在表面加一层薄薄的半透明材质的时候，可以使用与clear coat相关的属性，默认为*0.0*;
 		</p>
 
 		<h3>[property:Texture clearcoatMap]</h3>
 		<p>
-		The red channel of this texture is multiplied against [page:.clearcoat], for per-pixel control
-		over a coating's intensity. Default is *null*.
+		这个贴图的红色通道值会与[page:.clearcoat]相乘作为整个clear coat的强度值层，默认为*null*。
 		</p>
 
 		<h3>[property:Texture clearcoatNormalMap]</h3>
-		<p>Can be used to enable independent normals for the clear coat layer. Default is *null*.</p>
+		<p>用于为clear coat层设置的独立的法线贴图，默认为*null*。</p>
 
 		<h3>[property:Vector2 clearcoatNormalScale]</h3>
-		<p>How much [page:.clearcoatNormalMap] affects the clear coat layer, from *(0,0)* to *(1,1)*. Default is *(1,1)*.</p>
+		<p>衡量[page:.clearcoatNormalMap]影响clear coat层多少的值，由*(0,0)*到*(1,1)*，默认为*(1,1)*。</p>
 
 		<h3>[property:Float clearcoatRoughness]</h3>
-		<p>Roughness of the clear coat layer, from *0.0* to *1.0*. Default is *0.0*.</p>
+		<p>clear coat层的粗糙度，由*0.0*到*1.0*。 默认为*0.0*</p>
 
 		<h3>[property:Texture clearcoatRoughnessMap]</h3>
 		<p>
-		The green channel of this texture is multiplied against [page:.clearcoatRoughness], for per-pixel control
-		over a coating's roughness. Default is *null*.
+			此纹理的绿色通道值会与[page:.clearcoatRoughness]相乘，用于改变clear coat的粗糙度，默认为*null*
 		</p>
 
 		<h3>[property:Object defines]</h3>
@@ -119,41 +109,40 @@
 
 		<h3>[property:Float ior]</h3>
 		<p>
-			Index-of-refraction for non-metallic materials, from *1.0* to *2.333*. Default is *1.5*.<br />
+			为非金属材质所设置的折射率，范围由*1.0*到*2.333*。默认为*1.5*。
+			<br />
 		</p>
 
 		<h3>[property:Float reflectivity]</h3>
 		<p>
-			Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*, which corresponds to an index-of-refraction of 1.5.<br />
-
-			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial]为*1.0*时，此属性无效。
+			反射率，由*0.0*到*1.0*。默认为*0.5*, 相当于折射率1.5。
+			<br />
+			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial metalness]为*1.0*时，此属性无效。
 		</p>
 
 		<h3>[property:Float sheen]</h3>
 		<p>
-			The intensity of the sheen layer, from *0.0* to *1.0*. Default is *0.0*.
+			光泽层的强度,范围是*0.0*到*1.0*。默认为*0.0*。
 		</p>
 
 		<h3>[property:Float sheenRoughness]</h3>
 		<p>
-			Roughness of the sheen layer, from *0.0* to *1.0*. Default is *1.0*.
+			光泽层的粗糙度，由*0.0*到*1.0*。默认值是*1.0*。
 		</p>
 
 		<h3>[property:Texture sheenRoughnessMap]</h3>
 		<p>
-			The alpha channel of this texture is multiplied against [page:.sheenRoughness], for per-pixel control
-			over sheen roughness. Default is *null*.
+			此纹理的透明通道会与[page:.sheenRoughness]相乘，用于改变光泽层的粗糙度，默认为*null*;
 		</p>
 
 		<h3>[property:Color sheenColor]</h3>
 		<p>
-			The sheen tint. Default is *0xffffff*, white.
+			光泽颜色，默认为*0xffffff*白色。
 		</p>
 
 		<h3>[property:Texture sheenColorMap]</h3>
 		<p>
-			The RGB channels of this texture are multiplied against [page:.sheenColor], for per-pixel control
-			over sheen tint. Default is *null*.
+			此纹理的RGB通道会与[page:.sheenColor]光泽颜色相乘，最终作为光泽颜色结果，默认为*null*。
 		</p>
 
 		<h3>[property:Float specularIntensity]</h3>
@@ -178,19 +167,16 @@
 
 		<h3>[property:Float transmission]</h3>
 		<p>
-		Degree of transmission (or optical transparency), from *0.0* to *1.0*. Default is *0.0*.<br />
+		透光率（或者说透光性），范围从*0.0*到*1.0*。默认值是*0.0*。<br />
 
-		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are fully transmissive.
+		很薄的透明或者半透明的塑料、玻璃材质即便在几乎完全透明的情况下仍旧会保留反射的光线，透光性属性用于这种类型的材质。<br />
 
-		The transmission property can be used to model these materials.<br />
-
-		When transmission is non-zero, [page:Material.opacity opacity] should be set to *1*.
+		当透光率不为0的时候, [page:Material.opacity opacity]透明度应设置为*1*.
 		</p>
 
 		<h3>[property:Texture transmissionMap]</h3>
 		<p>
-			The red channel of this texture is multiplied against [page:.transmission], for per-pixel control
-			over optical transparency. Default is *null*.
+			此纹理的红色通道会与透光性[page:.transmission]相乘最为最终的透光性结果。默认为*null*。
 		</p>
 
 		<h2>方法(Methods)</h2>

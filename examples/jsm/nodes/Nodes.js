@@ -1,13 +1,13 @@
 // core
-import ArrayInputNode from './core/ArrayInputNode.js';
+import ArrayUniformNode from './core/ArrayUniformNode.js';
 import AttributeNode from './core/AttributeNode.js';
 import BypassNode from './core/BypassNode.js';
 import CodeNode from './core/CodeNode.js';
+import ConstNode from './core/ConstNode.js';
 import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
 import FunctionNode from './core/FunctionNode.js';
-import InputNode from './core/InputNode.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
@@ -20,11 +20,14 @@ import NodeVar from './core/NodeVar.js';
 import NodeVary from './core/NodeVary.js';
 import PropertyNode from './core/PropertyNode.js';
 import TempNode from './core/TempNode.js';
+import UniformNode from './core/UniformNode.js';
 import VarNode from './core/VarNode.js';
 import VaryNode from './core/VaryNode.js';
 
 // accessors
+import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
+import CubeTextureNode from './accessors/CubeTextureNode.js';
 import MaterialNode from './accessors/MaterialNode.js';
 import MaterialReferenceNode from './accessors/MaterialReferenceNode.js';
 import ModelNode from './accessors/ModelNode.js';
@@ -34,19 +37,10 @@ import Object3DNode from './accessors/Object3DNode.js';
 import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
+import ReflectNode from './accessors/ReflectNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
+import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
-
-// inputs
-import ColorNode from './inputs/ColorNode.js';
-import FloatNode from './inputs/FloatNode.js';
-import IntNode from './inputs/IntNode.js';
-import Matrix3Node from './inputs/Matrix3Node.js';
-import Matrix4Node from './inputs/Matrix3Node.js';
-import TextureNode from './inputs/TextureNode.js';
-import Vector2Node from './inputs/Vector2Node.js';
-import Vector3Node from './inputs/Vector3Node.js';
-import Vector4Node from './inputs/Vector4Node.js';
 
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
@@ -68,6 +62,7 @@ import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
+import MatcapUVNode from './utils/MatcapUVNode.js';
 import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
@@ -78,6 +73,10 @@ import NodeMaterialLoader from './loaders/NodeMaterialLoader.js';
 
 // procedural
 import CheckerNode from './procedural/CheckerNode.js';
+
+// fog
+import FogNode from './fog/FogNode.js';
+import FogRangeNode from './fog/FogRangeNode.js';
 
 // core
 export * from './core/constants.js';
@@ -93,15 +92,15 @@ export * from './ShaderNode.js';
 
 const nodeLib = {
 	// core
-	ArrayInputNode,
+	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
 	CodeNode,
 	ContextNode,
+	ConstNode,
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
-	InputNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -114,11 +113,14 @@ const nodeLib = {
 	NodeVary,
 	PropertyNode,
 	TempNode,
+	UniformNode,
 	VarNode,
 	VaryNode,
 
 	// accessors
+	BufferNode,
 	CameraNode,
+	CubeTextureNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -128,19 +130,10 @@ const nodeLib = {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
+	ReflectNode,
 	SkinningNode,
-	UVNode,
-
-	// inputs
-	ColorNode,
-	FloatNode,
-	IntNode,
-	Matrix3Node,
-	Matrix4Node,
 	TextureNode,
-	Vector2Node,
-	Vector3Node,
-	Vector4Node,
+	UVNode,
 
 	// display
 	ColorSpaceNode,
@@ -162,11 +155,16 @@ const nodeLib = {
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,
+	MatcapUVNode,
 	OscNode,
 	TimerNode,
 
 	// procedural
 	CheckerNode,
+
+	// fog
+	FogNode,
+	FogRangeNode,
 
 	// loaders
 	NodeLoader,
@@ -183,15 +181,15 @@ export const fromType = ( type ) => {
 
 export {
 	// core
-	ArrayInputNode,
+	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
 	CodeNode,
 	ContextNode,
+	ConstNode,
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
-	InputNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -204,11 +202,14 @@ export {
 	NodeVary,
 	PropertyNode,
 	TempNode,
+	UniformNode,
 	VarNode,
 	VaryNode,
 
 	// accessors
+	BufferNode,
 	CameraNode,
+	CubeTextureNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -218,19 +219,10 @@ export {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
+	ReflectNode,
 	SkinningNode,
-	UVNode,
-
-	// inputs
-	ColorNode,
-	FloatNode,
-	IntNode,
-	Matrix3Node,
-	Matrix4Node,
 	TextureNode,
-	Vector2Node,
-	Vector3Node,
-	Vector4Node,
+	UVNode,
 
 	// display
 	ColorSpaceNode,
@@ -252,11 +244,16 @@ export {
 	JoinNode,
 	SplitNode,
 	SpriteSheetUVNode,
+	MatcapUVNode,
 	OscNode,
 	TimerNode,
 
 	// procedural
 	CheckerNode,
+
+	// fog
+	FogNode,
+	FogRangeNode,
 
 	// loaders
 	NodeLoader,

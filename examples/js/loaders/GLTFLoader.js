@@ -518,7 +518,7 @@
 
 				if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture ) );
+					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, THREE.sRGBEncoding ) );
 
 				}
 
@@ -666,7 +666,7 @@
 
 			if ( extension.sheenColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture ) );
+				pending.push( parser.assignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -886,11 +886,7 @@
 
 			if ( extension.specularColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'specularColorMap', extension.specularColorTexture ).then( function ( texture ) {
-
-					texture.encoding = THREE.sRGBEncoding;
-
-				} ) );
+				pending.push( parser.assignTexture( materialParams, 'specularColorMap', extension.specularColorTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -1461,7 +1457,7 @@
 		constructor() {
 
 			this.name = EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS;
-			this.specularGlossinessParams = [ 'color', 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveIntensity', 'emissiveMap', 'bumpMap', 'bumpScale', 'normalMap', 'normalMapType', 'displacementMap', 'displacementScale', 'displacementBias', 'specularMap', 'specular', 'glossinessMap', 'glossiness', 'alphaMap', 'envMap', 'envMapIntensity', 'refractionRatio' ];
+			this.specularGlossinessParams = [ 'color', 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveIntensity', 'emissiveMap', 'bumpMap', 'bumpScale', 'normalMap', 'normalMapType', 'displacementMap', 'displacementScale', 'displacementBias', 'specularMap', 'specular', 'glossinessMap', 'glossiness', 'alphaMap', 'envMap', 'envMapIntensity' ];
 
 		}
 
@@ -1488,7 +1484,7 @@
 
 			if ( pbrSpecularGlossiness.diffuseTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'map', pbrSpecularGlossiness.diffuseTexture ) );
+				pending.push( parser.assignTexture( materialParams, 'map', pbrSpecularGlossiness.diffuseTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -1506,7 +1502,7 @@
 
 				const specGlossMapDef = pbrSpecularGlossiness.specularGlossinessTexture;
 				pending.push( parser.assignTexture( materialParams, 'glossinessMap', specGlossMapDef ) );
-				pending.push( parser.assignTexture( materialParams, 'specularMap', specGlossMapDef ) );
+				pending.push( parser.assignTexture( materialParams, 'specularMap', specGlossMapDef, THREE.sRGBEncoding ) );
 
 			}
 
@@ -1542,7 +1538,6 @@
 			material.alphaMap = null;
 			material.envMap = materialParams.envMap === undefined ? null : materialParams.envMap;
 			material.envMapIntensity = 1.0;
-			material.refractionRatio = 0.98;
 			return material;
 
 		}
@@ -2026,7 +2021,7 @@
 			this.nodeNamesUsed = {}; // Use an THREE.ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 			// expensive work of uploading a texture to the GPU off the main thread.
 
-			if ( typeof createImageBitmap !== 'undefined' && /Firefox|^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === false ) {
+			if ( typeof createImageBitmap !== 'undefined' && /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === false ) {
 
 				this.textureLoader = new THREE.ImageBitmapLoader( this.options.manager );
 
@@ -2623,15 +2618,7 @@
 
 			if ( this.sourceCache[ sourceIndex ] !== undefined ) {
 
-				return this.sourceCache[ sourceIndex ].then( function ( texture ) {
-
-					return texture.clone();
-
-				} ).catch( function ( error ) {
-
-					throw error;
-
-				} );
+				return this.sourceCache[ sourceIndex ].then( texture => texture.clone() );
 
 			}
 
@@ -2713,7 +2700,7 @@
    */
 
 
-		assignTexture( materialParams, mapName, mapDef ) {
+		assignTexture( materialParams, mapName, mapDef, encoding ) {
 
 			const parser = this;
 			return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
@@ -2737,6 +2724,12 @@
 						parser.associations.set( texture, gltfReference );
 
 					}
+
+				}
+
+				if ( encoding !== undefined ) {
+
+					texture.encoding = encoding;
 
 				}
 
@@ -2898,7 +2891,7 @@
 
 				if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture ) );
+					pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, THREE.sRGBEncoding ) );
 
 				}
 
@@ -2985,7 +2978,7 @@
 
 			if ( materialDef.emissiveTexture !== undefined && materialType !== THREE.MeshBasicMaterial ) {
 
-				pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture ) );
+				pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture, THREE.sRGBEncoding ) );
 
 			}
 
@@ -3003,10 +2996,7 @@
 
 				}
 
-				if ( materialDef.name ) material.name = materialDef.name; // baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
-
-				if ( material.map ) material.map.encoding = THREE.sRGBEncoding;
-				if ( material.emissiveMap ) material.emissiveMap.encoding = THREE.sRGBEncoding;
+				if ( materialDef.name ) material.name = materialDef.name;
 				assignExtrasToUserData( material, materialDef );
 				parser.associations.set( material, {
 					materials: materialIndex

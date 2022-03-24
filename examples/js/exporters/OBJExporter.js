@@ -47,9 +47,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i ); // transform the vertex to world space
+						vertex.fromBufferAttribute( vertices, i ); // transform the vertex to world space
 
 						vertex.applyMatrix4( mesh.matrixWorld ); // transform the vertex to export format
 
@@ -64,8 +62,7 @@
 
 					for ( let i = 0, l = uvs.count; i < l; i ++, nbVertexUvs ++ ) {
 
-						uv.x = uvs.getX( i );
-						uv.y = uvs.getY( i ); // transform the uv to export format
+						uv.fromBufferAttribute( uvs, i ); // transform the uv to export format
 
 						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
@@ -80,9 +77,7 @@
 
 					for ( let i = 0, l = normals.count; i < l; i ++, nbNormals ++ ) {
 
-						normal.x = normals.getX( i );
-						normal.y = normals.getY( i );
-						normal.z = normals.getZ( i ); // transform the normal to world space
+						normal.fromBufferAttribute( normals, i ); // transform the normal to world space
 
 						normal.applyMatrix3( normalMatrixWorld ).normalize(); // transform the normal to export format
 
@@ -155,9 +150,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i ); // transform the vertex to world space
+						vertex.fromBufferAttribute( vertices, i ); // transform the vertex to world space
 
 						vertex.applyMatrix4( line.matrixWorld ); // transform the vertex to export format
 

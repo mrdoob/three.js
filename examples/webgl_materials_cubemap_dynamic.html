@@ -40,18 +40,18 @@
 			let camera, scene, renderer, stats;
 			let cube, sphere, torus, material;
 
-			let count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
+			let cubeCamera, cubeRenderTarget;
 
 			let controls;
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animation );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
@@ -65,32 +65,32 @@
 				camera.position.z = 75;
 
 				scene = new THREE.Scene();
+				scene.rotation.y = 0.5; // avoid flying objects occluding the sun
 
 				new RGBELoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
+
 						scene.background = texture;
+						scene.environment = texture;
 
 					} );
 
 				//
 
-				const envSize = 256;
+				cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256 );
+				cubeRenderTarget.texture.type = THREE.HalfFloatType;
 
-				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( envSize );
-				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( envSize );
-
-				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
-				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
+				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
 
 				//
 
 				material = new THREE.MeshStandardMaterial( {
-					envMap: cubeRenderTarget2.texture,
+					envMap: cubeRenderTarget.texture,
 					roughness: 0.05,
-					metalness: 0
+					metalness: 1
 				} );
 
 				const gui = new GUI();
@@ -101,10 +101,15 @@
 				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 15, 8 ), material );
 				scene.add( sphere );
 
-				cube = new THREE.Mesh( new THREE.BoxGeometry( 15, 15, 15 ), material );
+				const material2 = new THREE.MeshStandardMaterial( {
+					roughness: 0.1,
+					metalness: 0
+				} );
+
+				cube = new THREE.Mesh( new THREE.BoxGeometry( 15, 15, 15 ), material2 );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 10, 3, 128, 16 ), material );
+				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 8, 3, 128, 16 ), material2 );
 				scene.add( torus );
 
 				//
@@ -123,41 +128,25 @@
 
 			}
 
-			function animate() {
+			function animation( msTime ) {
 
-				requestAnimationFrame( animate );
+				const time = msTime / 1000;
 
-				const time = Date.now();
-
-				cube.position.x = Math.cos( time * 0.001 ) * 30;
-				cube.position.y = Math.sin( time * 0.001 ) * 30;
-				cube.position.z = Math.sin( time * 0.001 ) * 30;
+				cube.position.x = Math.cos( time ) * 30;
+				cube.position.y = Math.sin( time ) * 30;
+				cube.position.z = Math.sin( time ) * 30;
 
 				cube.rotation.x += 0.02;
 				cube.rotation.y += 0.03;
 
-				torus.position.x = Math.cos( time * 0.001 + 10 ) * 30;
-				torus.position.y = Math.sin( time * 0.001 + 10 ) * 30;
-				torus.position.z = Math.sin( time * 0.001 + 10 ) * 30;
+				torus.position.x = Math.cos( time + 10 ) * 30;
+				torus.position.y = Math.sin( time + 10 ) * 30;
+				torus.position.z = Math.sin( time + 10 ) * 30;
 
 				torus.rotation.x += 0.02;
 				torus.rotation.y += 0.03;
 
-				// pingpong
-
-				if ( count % 2 === 0 ) {
-
-					cubeCamera1.update( renderer, scene );
-					material.envMap = cubeRenderTarget1.texture;
-
-				} else {
-
-					cubeCamera2.update( renderer, scene );
-					material.envMap = cubeRenderTarget2.texture;
-
-				}
-
-				count ++;
+				cubeCamera.update( renderer, scene );
 
 				controls.update();
 

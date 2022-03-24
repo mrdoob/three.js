@@ -1,5 +1,4 @@
 import Object3DNode from './Object3DNode.js';
-import Matrix4Node from '../inputs/Matrix4Node.js';
 
 class CameraNode extends Object3DNode {
 
@@ -8,8 +7,6 @@ class CameraNode extends Object3DNode {
 	constructor( scope = CameraNode.POSITION ) {
 
 		super( scope );
-
-		this._inputNode = null;
 
 	}
 
@@ -30,18 +27,20 @@ class CameraNode extends Object3DNode {
 	update( frame ) {
 
 		const camera = frame.camera;
-		const inputNode = this._inputNode;
+		const uniformNode = this._uniformNode;
 		const scope = this.scope;
 
 		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-			inputNode.value = camera.projectionMatrix;
+			uniformNode.value = camera.projectionMatrix;
 
 		} else if ( scope === CameraNode.VIEW_MATRIX ) {
 
-			inputNode.value = camera.matrixWorldInverse;
+			uniformNode.value = camera.matrixWorldInverse;
 
 		} else {
+
+			this.object3d = camera;
 
 			super.update( frame );
 
@@ -55,7 +54,7 @@ class CameraNode extends Object3DNode {
 
 		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-			this._inputNode = new Matrix4Node( null );
+			this._uniformNode.nodeType = 'mat4';
 
 		}
 

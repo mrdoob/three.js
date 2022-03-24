@@ -223,7 +223,7 @@ function html2canvas( element ) {
 
 		let x = 0, y = 0, width = 0, height = 0;
 
-		if ( element.nodeType === 3 ) {
+		if ( element.nodeType === Node.TEXT_NODE ) {
 
 			// text
 
@@ -237,6 +237,10 @@ function html2canvas( element ) {
 			height = rect.height;
 
 			drawText( style, x, y, element.nodeValue.trim() );
+
+		} else if ( element.nodeType === Node.COMMENT_NODE ) {
+
+			return;
 
 		} else if ( element instanceof HTMLCanvasElement ) {
 
@@ -355,7 +359,7 @@ function htmlevent( element, event, x, y ) {
 
 	function traverse( element ) {
 
-		if ( element.nodeType !== 3 ) {
+		if ( element.nodeType !== Node.TEXT_NODE && element.nodeType !== Node.COMMENT_NODE ) {
 
 			const rect = element.getBoundingClientRect();
 

@@ -20,11 +20,20 @@ class ConvertNode extends Node {
 	generate( builder ) {
 
 		const convertTo = this.convertTo;
+		const node = this.node;
 
-		const convertToSnippet = builder.getType( convertTo );
-		const nodeSnippet = this.node.build( builder, convertTo );
+		if ( builder.isReference( convertTo ) === false ) {
 
-		return `${ convertToSnippet }( ${ nodeSnippet } )`;
+			const convertToSnippet = builder.getType( convertTo );
+			const nodeSnippet = node.build( builder, convertTo );
+
+			return `${ builder.getVectorType( convertToSnippet ) }( ${ nodeSnippet } )`;
+
+		} else {
+
+			return node.build( builder, convertTo );
+
+		}
 
 	}
 

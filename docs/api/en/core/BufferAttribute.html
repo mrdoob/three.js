@@ -12,11 +12,12 @@
 		<p class="desc">
 		This class stores data for an attribute (such as vertex positions, face indices, normals,
 		colors, UVs, and any custom attributes ) associated with a [page:BufferGeometry], which allows
-		for more efficient passing of data to the GPU. See that page for details and a usage example.<br /><br />
-
-		Data is stored as vectors of any length (defined by [page:BufferAttribute.itemSize itemSize]),
-		and in general in the methods outlined below if passing in an index, this is automatically
-		multiplied by the vector length.
+		for more efficient passing of data to the GPU. See that page for details and a usage example.
+		When working with vector-like data, the <i>.fromBufferAttribute( attribute, index )</i>
+		helper methods on [page:Vector2.fromBufferAttribute Vector2],
+		[page:Vector3.fromBufferAttribute Vector3],
+		[page:Vector4.fromBufferAttribute Vector4], and
+		[page:Color.fromBufferAttribute Color] classes may be helpful.
 		</p>
 
 		<h2>Constructor</h2>
@@ -59,7 +60,7 @@
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
 		<p>
-			Read-only flag to check whether a given object is of type [name].
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Integer itemSize]</h3>

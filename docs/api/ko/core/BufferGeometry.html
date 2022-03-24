@@ -129,7 +129,7 @@
 
 		<h3>[property:Boolean isBufferGeometry]</h3>
 		<p>
-			Read-only flag to check whether a given object is of type [name].
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Object morphAttributes]</h3>
@@ -208,6 +208,8 @@
 		<p>
 		기하학에 탄젠트 속성을 계산하고 추가합니다.<br />
 		이 계산은 인덱스가 있는 기하학에만 지원되며 위치, 법선, uv 속성이 정의되어야 합니다.
+		When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+		[page:BufferGeometryUtils.computeTangents] instead.
 		</p>
 
 		<h3>[method:undefined computeVertexNormals]()</h3>

@@ -1,20 +1,19 @@
-import InputNode from '../core/InputNode.js';
+import UniformNode from '../core/UniformNode.js';
 
-class BufferNode extends InputNode {
+class BufferNode extends UniformNode {
 
 	constructor( value, bufferType, bufferCount = 0 ) {
 
-		super( 'buffer' );
+		super( value, bufferType );
 
-		this.value = value;
 		this.bufferType = bufferType;
 		this.bufferCount = bufferCount;
 
 	}
 
-	getNodeType( /* builder */ ) {
+	getInputType( /*builder*/ ) {
 
-		return this.bufferType;
+		return 'buffer';
 
 	}
 

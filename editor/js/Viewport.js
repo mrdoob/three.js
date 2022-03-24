@@ -378,7 +378,7 @@ function Viewport( editor ) {
 		if ( window.matchMedia ) {
 
 			const mediaQuery = window.matchMedia( '(prefers-color-scheme: dark)' );
-			mediaQuery.addListener( function ( event ) {
+			mediaQuery.addEventListener( 'change', function ( event ) {
 
 				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
 				updateGridColors( grid1, grid2, event.matches ? [ 0x222222, 0x888888 ] : [ 0x888888, 0x282828 ] );
@@ -493,12 +493,6 @@ function Viewport( editor ) {
 	} );
 
 	signals.materialChanged.add( function () {
-
-		render();
-
-	} );
-
-	signals.animationStopped.add( function () {
 
 		render();
 
@@ -685,6 +679,8 @@ function Viewport( editor ) {
 
 	// animations
 
+	let prevActionsInUse = 0;
+
 	const clock = new THREE.Clock(); // only used for animations
 
 	function animate() {
@@ -694,12 +690,20 @@ function Viewport( editor ) {
 
 		let needsUpdate = false;
 
-		if ( mixer.stats.actions.inUse > 0 ) {
+		// Animations
+
+		const actions = mixer.stats.actions;
+
+		if ( actions.inUse > 0 || prevActionsInUse > 0 ) {
+
+			prevActionsInUse = actions.inUse;
 
 			mixer.update( delta );
 			needsUpdate = true;
 
 		}
+
+		// View Helper
 
 		if ( viewHelper.animating === true ) {
 

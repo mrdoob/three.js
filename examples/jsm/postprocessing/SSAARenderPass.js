@@ -1,8 +1,6 @@
 import {
 	AdditiveBlending,
 	Color,
-	LinearFilter,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
@@ -46,7 +44,6 @@ class SSAARenderPass extends Pass {
 			uniforms: this.copyUniforms,
 			vertexShader: copyShader.vertexShader,
 			fragmentShader: copyShader.fragmentShader,
-			premultipliedAlpha: true,
 			transparent: true,
 			blending: AdditiveBlending,
 			depthTest: false,
@@ -78,7 +75,7 @@ class SSAARenderPass extends Pass {
 
 		if ( ! this.sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat } );
+			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height );
 			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}

@@ -31,17 +31,12 @@
 				saoBlurDepthCutoff: 0.01
 			};
 			this.resolution = new THREE.Vector2( resolution.x, resolution.y );
-			this.saoRenderTarget = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBAFormat
-			} );
+			this.saoRenderTarget = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y );
 			this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
 			this.beautyRenderTarget = this.saoRenderTarget.clone();
 			this.normalRenderTarget = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, {
 				minFilter: THREE.NearestFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} );
 			this.depthRenderTarget = this.normalRenderTarget.clone();
 			let depthTexture;

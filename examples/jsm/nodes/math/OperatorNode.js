@@ -46,18 +46,18 @@ class OperatorNode extends TempNode {
 			return typeA;
 
 		} else if ( op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
-			
+
 			return 'int';
-			
+
 		} else if ( op === '==' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
 
-		} else if ( op === '<=' || op === '>=' || op === '<' || op === '>' ) {
+		} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
-			const length = builder.getTypeLength( output );
+			const typeLength = builder.getTypeLength( output );
 
-			return length > 1 ? `bvec${ length }` : 'bool';
+			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
 		} else {
 
@@ -111,6 +111,18 @@ class OperatorNode extends TempNode {
 			if ( op === '=' ) {
 
 				typeB = typeA;
+
+			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+
+				if ( builder.isVector( typeA ) ) {
+
+					typeB = typeA;
+
+				} else {
+
+					typeA = typeB = 'float';
+
+				}
 
 			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 

@@ -1,8 +1,9 @@
 import { SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { MathNode, Vector3Node } from 'three-nodes/Nodes.js';
+import { Vector3 } from 'three';
+import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
 
-const DEFAULT_VALUE = new Vector3Node();
+const DEFAULT_VALUE = new UniformNode( new Vector3() );
 
 export class TrigonometryEditor extends BaseNode {
 

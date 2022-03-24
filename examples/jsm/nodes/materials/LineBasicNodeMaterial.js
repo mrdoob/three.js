@@ -41,6 +41,6 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 }
 
-LineBasicNodeMaterial.prototype.isNodeMaterial = true;
+LineBasicNodeMaterial.prototype.isLineBasicNodeMaterial = true;
 
 export default LineBasicNodeMaterial;

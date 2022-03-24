@@ -54,6 +54,13 @@
 
 		</p>
 
+		<h3>[method:BufferGeometry mergeGroups]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the groups of.<br /><br />
+
+		Merges the [page:BufferGeometry.groups groups] for the given geometry.
+		</p>
+
 		<h3>[method:BufferGeometry mergeVertices]( [param:BufferGeometry geometry], [param:Number tolerance] )</h3>
 		<p>
 		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the vertices of.<br />
@@ -87,6 +94,31 @@
 		generating an incorrect result.
 		Using this function to create a shadow Object3D the DecalGeometry can be correctly generated).
 
+		</p>
+
+		<h3>[method:Object computeTangents]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry].
+		</p>
+
+		<p>
+		Computes vertex tangents using the [link:http://www.mikktspace.com/ MikkTSpace] algorithm.
+		MikkTSpace generates the same tangents consistently, and is used in most modelling tools and
+		normal map bakers. Use MikkTSpace for materials with normal maps, because inconsistent
+		tangents may lead to subtle visual issues in the normal map, particularly around mirrored
+		UV seams.
+		</p>
+
+		<p>
+		In comparison to [page:BufferGeometryUtils.computeTangents], [page:BufferGeometry.computeTangents]
+		(a custom algorithm) generates tangents that probably will not match the tangents
+		in other software. The custom algorithm is sufficient for general use with a
+		[page:ShaderMaterial], and may be faster than MikkTSpace.
+		</p>
+
+		<p>
+		Returns the original [page:BufferGeometry]. Indexed geometries will be de-indexed.
+		Requires position, normal, and uv attributes.
 		</p>
 
 		<h2>Source</h2>

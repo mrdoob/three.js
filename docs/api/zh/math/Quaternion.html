@@ -41,7 +41,7 @@
 
 		<h3>[property:Boolean isQuaternion]</h3>
 		<p>
-			Read-only flag to check whether a given object is of type [name].
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Float x]</h3>
@@ -218,9 +218,20 @@
 		[page:Array src1] - 目标四元数的源数组<br />
 		[page:Integer srcOffset1] - 数组 *src1* 的偏移量<br />
 		[page:Float t] - 归一化插值因子(介于 0 和 1 之间)<br /><br />
+
+		This SLERP implementation assumes the quaternion data are managed in flat arrays.
 		</p>
+
+		<h3>[method:Array multiplyQuaternionsFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1] )</h3>
 		<p>
-		类似于上面的 *slerp* 方法，但直接对平面数组进行操作。
+		[page:Array dst] - The output array.<br />
+		[page:Integer dstOffset] - An offset into the output array.<br />
+		[page:Array src0] - The source array of the starting quaternion.<br />
+		[page:Integer srcOffset0] - An offset into the array *src0*.<br />
+		[page:Array src1] - The source array of the target quaternion.<br />
+		[page:Integer srcOffset1] - An offset into the array *src1*.<br /><br />
+
+		This multiplication implementation assumes the quaternion data are managed in flat arrays.
 		</p>
 
 		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->

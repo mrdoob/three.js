@@ -67,6 +67,7 @@
 		"webgl_lines_colors",
 		"webgl_lines_dashed",
 		"webgl_lines_fat",
+		"webgl_lines_fat_raycasting",
 		"webgl_lines_fat_wireframe",
 		"webgl_lines_sphere",
 		"webgl_loader_3dm",
@@ -252,7 +253,6 @@
 		"webgl_postprocessing_sobel",
 		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_ssr",
-		"webgl_postprocessing_ssrr",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_postprocessing_unreal_bloom_selective"
@@ -308,6 +308,7 @@
 	],
 	"webgpu": [
 		"webgpu_compute",
+		"webgpu_depth_texture",
 		"webgpu_instance_uniform",
 		"webgpu_lights_custom",
 		"webgpu_lights_selective",

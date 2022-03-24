@@ -51,6 +51,13 @@
 
 		</p>
 
+		<h3>[method:BufferGeometry mergeGroups]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the groups of.<br /><br />
+
+		Merges the [page:BufferGeometry.groups groups] for the given geometry.
+		</p>
+
 		<h3>[method:BufferGeometry mergeVertices]( [param:BufferGeometry geometry], [param:Number tolerance] )</h3>
 		<p>
 		geometry -- 用于合并顶点的 [page:BufferGeometry BufferGeometry] 实例。<br />
@@ -67,6 +74,46 @@
 
 		基于 [page:DrawModes THREE.TrianglesDrawMode] 绘制模式，返回一个新的有索引值的 [page:BufferGeometry BufferGeometry]。 此模式对应于 WebGL 的原始术语 *gl.TRIANGLES* 。
 
+		</p>
+
+		<h3>[method:Object computeMorphedAttributes]( [param:Mesh | Line | Points object] )</h3>
+		<p>
+		object -- Instance of [page:Mesh Mesh] | [page:Line Line] | [page:Points Points].<br /><br />
+
+		Returns the current attributes (Position and Normal) of a morphed/skinned [page:Object3D Object3D] whose geometry is a
+		[page:BufferGeometry BufferGeometry], together with the original ones: An Object with 4 properties:
+		`positionAttribute`, `normalAttribute`, `morphedPositionAttribute` and `morphedNormalAttribute`.
+
+		Helpful for Raytracing or Decals (i.e. a [page:DecalGeometry DecalGeometry] applied to a morphed Object
+		with a [page:BufferGeometry BufferGeometry] will use the original BufferGeometry, not the morphed/skinned one,
+		generating an incorrect result.
+		Using this function to create a shadow Object3D the DecalGeometry can be correctly generated).
+
+		</p>
+
+		<h3>[method:Object computeTangents]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry].
+		</p>
+
+		<p>
+		Computes vertex tangents using the [link:http://www.mikktspace.com/ MikkTSpace] algorithm.
+		MikkTSpace generates the same tangents consistently, and is used in most modelling tools and
+		normal map bakers. Use MikkTSpace for materials with normal maps, because inconsistent
+		tangents may lead to subtle visual issues in the normal map, particularly around mirrored
+		UV seams.
+		</p>
+
+		<p>
+		In comparison to [page:BufferGeometryUtils.computeTangents], [page:BufferGeometry.computeTangents]
+		(a custom algorithm) generates tangents that probably will not match the tangents
+		in other software. The custom algorithm is sufficient for general use with a
+		[page:ShaderMaterial], and may be faster than MikkTSpace.
+		</p>
+
+		<p>
+		Returns the original [page:BufferGeometry]. Indexed geometries will be de-indexed.
+		Requires position, normal, and uv attributes.
 		</p>
 
 		<h2></h2>

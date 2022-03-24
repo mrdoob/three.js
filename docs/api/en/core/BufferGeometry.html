@@ -92,7 +92,7 @@
 		<h3>[property:Array groups]</h3>
 		<p>
 			Split the geometry into groups, each of which will be rendered in a separate WebGL draw call.
-			This allows an array of materials to be used with the bufferGeometry.<br /><br />
+			This allows an array of materials to be used with the geometry.<br /><br />
 
 			Each group is an object of the form:
 			<code>{ start: Integer, count: Integer, materialIndex: Integer }</code>
@@ -100,7 +100,9 @@
 			otherwise the first triangle index. Count specifies how many vertices (or indices) are included, and
 			materialIndex specifies the material array index to use.<br /><br />
 
-			Use [page:.addGroup] to add groups, rather than modifying this array directly.
+			Use [page:.addGroup] to add groups, rather than modifying this array directly.<br /><br />
+
+			Every vertex and index must belong to exactly one group — groups must not share vertices or indices, and must not leave vertices or indices unused.
 		</p>
 
 
@@ -131,7 +133,7 @@
 
 		<h3>[property:Boolean isBufferGeometry]</h3>
 		<p>
-			Read-only flag to check whether a given object is of type [name].
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Object morphAttributes]</h3>
@@ -214,7 +216,8 @@
 		<h3>[method:undefined computeTangents]()</h3>
 		<p>
 		Calculates and adds a tangent attribute to this geometry.<br />
-		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined.
+		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+		[page:BufferGeometryUtils.computeTangents] instead.
 		</p>
 
 		<h3>[method:undefined computeVertexNormals]()</h3>

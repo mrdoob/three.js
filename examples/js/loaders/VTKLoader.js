@@ -672,7 +672,7 @@
 
 							txt = new Float32Array();
 
-						} else if ( ele.attributes.type === 'Int64' ) {
+						} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 							txt = new Int32Array();
 
@@ -689,13 +689,16 @@
 						// computed by summing the compressed block sizes from preceding blocks according to the header.
 
 
-						const rawData = ele[ '#text' ];
-						const byteData = Base64toByteArray( rawData );
+						const textNode = ele[ '#text' ];
+						const rawData = Array.isArray( textNode ) ? textNode[ 0 ] : textNode;
+						const byteData = Base64toByteArray( rawData ); // Each data point consists of 8 bits regardless of the header type
+
+						const dataPointSize = 8;
 						let blocks = byteData[ 0 ];
 
 						for ( let i = 1; i < numBytes - 1; i ++ ) {
 
-							blocks = blocks | byteData[ i ] << i * numBytes;
+							blocks = blocks | byteData[ i ] << i * dataPointSize;
 
 						}
 
@@ -715,8 +718,7 @@
 
 							for ( let j = 1; j < numBytes - 1; j ++ ) {
 
-								// Each data point consists of 8 bytes regardless of the header type
-								currentBlockSize = currentBlockSize | byteData[ i * numBytes + cSizeStart + j ] << j * 8;
+								currentBlockSize = currentBlockSize | byteData[ i * numBytes + cSizeStart + j ] << j * dataPointSize;
 
 							}
 
@@ -736,7 +738,7 @@
 								content = new Float32Array( content );
 								txt = Float32Concat( txt, content );
 
-							} else if ( ele.attributes.type === 'Int64' ) {
+							} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 								content = new Int32Array( content );
 								txt = Int32Concat( txt, content );

@@ -219,7 +219,7 @@
 				);
 
 				const pointsMaterial = new Nodes.PointsNodeMaterial();
-				pointsMaterial.colorNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode(), new Nodes.ColorNode( new THREE.Color( 0xFFFFFF ) ) );
+				pointsMaterial.colorNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode(), new Nodes.UniformNode( new THREE.Color( 0xFFFFFF ) ) );
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
 				scene.add( mesh );

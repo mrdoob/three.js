@@ -336,7 +336,7 @@
 			"加载 .OBJ 文件": "zh/load-obj",
 			"Load a .GLTF file": "zh/load-gltf",
 			"Add a Background or Skybox": "zh/backgrounds",
-			"How to Draw Transparent Objects": "zh/transparency",
+			"如何绘制透明的物体": "zh/transparency",
 			"多个画布, 多个场景": "zh/multiple-scenes",
 			"鼠标选取对象": "zh/picking",
 			"后期处理": "zh/post-processing",
@@ -346,7 +346,7 @@
 			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
 			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
 			"Billboards and Facades": "zh/billboards",
-			"Freeing Resources": "zh/cleanup",
+			"释放资源": "zh/cleanup",
 			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
 			"Start making a Game": "zh/game"
 		},

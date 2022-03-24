@@ -67,9 +67,9 @@ class VertexNormalsHelper extends LineSegments {
 
 			for ( let j = 0, jl = objPos.count; j < jl; j ++ ) {
 
-				_v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
+				_v1.fromBufferAttribute( objPos, j ).applyMatrix4( matrixWorld );
 
-				_v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
+				_v2.fromBufferAttribute( objNorm, j );
 
 				_v2.applyMatrix3( _normalMatrix ).normalize().multiplyScalar( this.size ).add( _v1 );
 

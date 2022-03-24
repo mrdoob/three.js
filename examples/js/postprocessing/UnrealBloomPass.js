@@ -22,27 +22,22 @@
 
 			this.clearColor = new THREE.Color( 0, 0, 0 ); // render targets
 
-			const pars = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBAFormat
-			};
 			this.renderTargetsHorizontal = [];
 			this.renderTargetsVertical = [];
 			this.nMips = 5;
 			let resx = Math.round( this.resolution.x / 2 );
 			let resy = Math.round( this.resolution.y / 2 );
-			this.renderTargetBright = new THREE.WebGLRenderTarget( resx, resy, pars );
+			this.renderTargetBright = new THREE.WebGLRenderTarget( resx, resy );
 			this.renderTargetBright.texture.name = 'UnrealBloomPass.bright';
 			this.renderTargetBright.texture.generateMipmaps = false;
 
 			for ( let i = 0; i < this.nMips; i ++ ) {
 
-				const renderTargetHorizonal = new THREE.WebGLRenderTarget( resx, resy, pars );
+				const renderTargetHorizonal = new THREE.WebGLRenderTarget( resx, resy );
 				renderTargetHorizonal.texture.name = 'UnrealBloomPass.h' + i;
 				renderTargetHorizonal.texture.generateMipmaps = false;
 				this.renderTargetsHorizontal.push( renderTargetHorizonal );
-				const renderTargetVertical = new THREE.WebGLRenderTarget( resx, resy, pars );
+				const renderTargetVertical = new THREE.WebGLRenderTarget( resx, resy );
 				renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
 				renderTargetVertical.texture.generateMipmaps = false;
 				this.renderTargetsVertical.push( renderTargetVertical );

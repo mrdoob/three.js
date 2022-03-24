@@ -5,13 +5,11 @@ import {
 	DepthTexture,
 	DstAlphaFactor,
 	DstColorFactor,
-	LinearFilter,
 	MeshDepthMaterial,
 	MeshNormalMaterial,
 	NearestFilter,
 	NoBlending,
 	RGBADepthPacking,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedShortType,
@@ -64,18 +62,13 @@ class SAOPass extends Pass {
 
 		this.resolution = new Vector2( resolution.x, resolution.y );
 
-		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBAFormat
-		} );
+		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
 		this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
 		this.beautyRenderTarget = this.saoRenderTarget.clone();
 
 		this.normalRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat
+			magFilter: NearestFilter
 		} );
 		this.depthRenderTarget = this.normalRenderTarget.clone();
 

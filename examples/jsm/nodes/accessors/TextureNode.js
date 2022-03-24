@@ -1,15 +1,26 @@
-import InputNode from '../core/InputNode.js';
-import UVNode from '../accessors/UVNode.js';
+import UniformNode from '../core/UniformNode.js';
+import UVNode from './UVNode.js';
 
-class TextureNode extends InputNode {
+class TextureNode extends UniformNode {
 
-	constructor( value = null, uvNode = new UVNode(), biasNode = null ) {
+	constructor( value, uvNode = new UVNode(), biasNode = null ) {
 
-		super( 'texture' );
+		super( value, 'vec4' );
 
-		this.value = value;
 		this.uvNode = uvNode;
 		this.biasNode = biasNode;
+
+	}
+
+	getUniformHash( /*builder*/ ) {
+
+		return this.value.uuid;
+
+	}
+
+	getInputType( /*builder*/ ) {
+
+		return 'texture';
 
 	}
 
@@ -23,17 +34,15 @@ class TextureNode extends InputNode {
 
 		}
 
-		const type = this.getNodeType( builder );
+		const textureProperty = super.generate( builder, 'texture' );
 
-		const textureProperty = super.generate( builder, type );
-
-		if ( output === 'sampler2D' || output === 'texture2D' ) {
-
-			return textureProperty;
-
-		} else if ( output === 'sampler' ) {
+		if ( output === 'sampler' ) {
 
 			return textureProperty + '_sampler';
+
+		} else if ( builder.isReference( output ) ) {
+
+			return textureProperty;
 
 		} else {
 
@@ -46,15 +55,17 @@ class TextureNode extends InputNode {
 				const uvSnippet = this.uvNode.build( builder, 'vec2' );
 				const biasNode = this.biasNode;
 
-				let biasSnippet = null;
-
 				if ( biasNode !== null ) {
 
-					biasSnippet = biasNode.build( builder, 'float' );
+					const biasSnippet = biasNode.build( builder, 'float' );
+
+					snippet = builder.getTextureBias( textureProperty, uvSnippet, biasSnippet );
+
+				} else {
+
+					snippet = builder.getTexture( textureProperty, uvSnippet );
 
 				}
-
-				snippet = builder.getTexture( textureProperty, uvSnippet, biasSnippet );
 
 				nodeData.snippet = snippet;
 
@@ -76,7 +87,7 @@ class TextureNode extends InputNode {
 
 	deserialize( data ) {
 
-		super.serialize( data );
+		super.deserialize( data );
 
 		this.value = data.meta.textures[ data.value ];
 

@@ -8,6 +8,7 @@ import WebGPURenderPipelines from './WebGPURenderPipelines.js';
 import WebGPUComputePipelines from './WebGPUComputePipelines.js';
 import WebGPUBindings from './WebGPUBindings.js';
 import WebGPURenderLists from './WebGPURenderLists.js';
+import WebGPURenderStates from './WebGPURenderStates.js';
 import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
@@ -105,10 +106,13 @@ class WebGPURenderer {
 		this._renderPipelines = null;
 		this._computePipelines = null;
 		this._renderLists = null;
+		this._renderStates = null;
 		this._textures = null;
 		this._background = null;
 
 		this._renderPassDescriptor = null;
+
+		this._currentRenderState = null;
 
 		this._currentRenderList = null;
 		this._opaqueSort = null;
@@ -167,7 +171,8 @@ class WebGPURenderer {
 
 		context.configure( {
 			device: device,
-			format: GPUTextureFormat.BGRA8Unorm // this is the only valid context format right now (r121)
+			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
+			compositingAlphaMode: 'opaque'
 		} );
 
 		this._adapter = adapter;
@@ -180,11 +185,12 @@ class WebGPURenderer {
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
-		this._nodes = new WebGPUNodes( this );
+		this._nodes = new WebGPUNodes( this, this._properties );
 		this._computePipelines = new WebGPUComputePipelines( device );
 		this._renderPipelines = new WebGPURenderPipelines( this, device, parameters.sampleCount, this._nodes );
 		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
+		this._renderStates = new WebGPURenderStates();
 		this._background = new WebGPUBackground( this );
 
 		//
@@ -224,6 +230,9 @@ class WebGPURenderer {
 
 		this._currentRenderList = this._renderLists.get( scene, camera );
 		this._currentRenderList.init();
+
+		this._currentRenderState = this._renderStates.get( scene );
+		this._currentRenderState.init();
 
 		this._projectObject( scene, camera, 0 );
 
@@ -303,13 +312,17 @@ class WebGPURenderer {
 
 		}
 
+		// light node
+
+		const lightNode = this._currentRenderState.getLightNode();
+
 		// process render lists
 
 		const opaqueObjects = this._currentRenderList.opaque;
 		const transparentObjects = this._currentRenderList.transparent;
 
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, passEncoder );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, passEncoder );
+		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, scene, lightNode, passEncoder );
+		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, scene, lightNode, passEncoder );
 
 		// finish render pass
 
@@ -581,6 +594,7 @@ class WebGPURenderer {
 		this._bindings.dispose();
 		this._info.dispose();
 		this._renderLists.dispose();
+		this._renderStates.dispose();
 		this._textures.dispose();
 
 	}
@@ -634,6 +648,7 @@ class WebGPURenderer {
 	_projectObject( object, camera, groupOrder ) {
 
 		const currentRenderList = this._currentRenderList;
+		const currentRenderState = this._currentRenderState;
 
 		if ( object.visible === false ) return;
 
@@ -651,7 +666,7 @@ class WebGPURenderer {
 
 			} else if ( object.isLight ) {
 
-				//currentRenderState.pushLight( object );
+				currentRenderState.pushLight( object );
 
 				if ( object.castShadow ) {
 
@@ -736,7 +751,7 @@ class WebGPURenderer {
 
 	}
 
-	_renderObjects( renderList, camera, passEncoder ) {
+	_renderObjects( renderList, camera, scene, lightNode, passEncoder ) {
 
 		// process renderable objects
 
@@ -753,6 +768,13 @@ class WebGPURenderer {
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			this._objects.update( object );
+
+			// send scene properties to object
+
+			const objectProperties = this._properties.get( object );
+
+			objectProperties.lightNode = lightNode;
+			objectProperties.fogNode = scene.fogNode;
 
 			if ( camera.isArrayCamera ) {
 
