@@ -70,7 +70,7 @@ function computeTangents( geometry, negateSign = true ) {
 
 		for ( let i = 3; i < tangents.length; i += 4 ) {
 
-			tangents[ i ] *= -1;
+			tangents[ i ] *= - 1;
 
 		}
 
