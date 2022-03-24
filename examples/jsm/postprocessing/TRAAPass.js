@@ -4,8 +4,11 @@ import {
 	Object3D,
 	Matrix4,
 	Mesh,
+	MeshVelocityMaterial,
+	OrthographicCamera,
 	PlaneGeometry,
 	RGBAFormat,
+	Scene,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget,
@@ -18,14 +21,13 @@ import { TRAASuperSampleShader } from '../shaders/TRAASuperSampleShader.js';
 
 class TexturePass extends Pass {
 	constructor(scene, camera, resolution) {
-		THREE.Pass.call(this);
 
 		this.scene = scene;
 		this.camera = camera;
 
 
-		this.orthoScene = new THREE.Scene();
-		this.orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, -0.01, 1000);
+		this.orthoScene = new Scene();
+		this.orthoCamera = new OrthographicCamera(-1, 1, 1, -1, -0.01, 1000);
 
 		this.superSampleTRAAMaterial = new TRAASuperSampleShader();
 		this.velocityMaterial = new MeshVelocityMaterial();
@@ -35,17 +37,16 @@ class TexturePass extends Pass {
 		var quad = new PlaneGeometry(2, 2);
 		var quadMesh = new Mesh(quad, this.currentMaterial);
 		this.orthoScene.add(quadMesh);
-		this.oldClearColor = new THREE.Color();
+		this.oldClearColor = new Color();
 		this.oldClearAlpha = 1;
 		this.needsSwap = false;
 
-		var copyShader = CopyShader;
-		this.copyUniforms = UniformsUtils.clone(copyShader.uniforms);
+		this.copyUniforms = UniformsUtils.clone(CopyShader.uniforms);
 
 		this.copyMaterial = new ShaderMaterial({
 			uniforms: this.copyUniforms,
-			vertexShader: copyShader.vertexShader,
-			fragmentShader: copyShader.fragmentShader,
+			vertexShader: CopyShader.vertexShader,
+			fragmentShader: CopyShader.fragmentShader,
 			transparent: true,
 			depthWrite: false,
 		});
