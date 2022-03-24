@@ -10,6 +10,7 @@ import { MeshToonMaterial } from './MeshToonMaterial.js';
 import { MeshNormalMaterial } from './MeshNormalMaterial.js';
 import { MeshLambertMaterial } from './MeshLambertMaterial.js';
 import { MeshDepthMaterial } from './MeshDepthMaterial.js';
+import { MeshVelocityMaterial } from './MeshVelocityMaterial.js';
 import { MeshDistanceMaterial } from './MeshDistanceMaterial.js';
 import { MeshBasicMaterial } from './MeshBasicMaterial.js';
 import { MeshMatcapMaterial } from './MeshMatcapMaterial.js';
@@ -30,6 +31,7 @@ export {
 	MeshNormalMaterial,
 	MeshLambertMaterial,
 	MeshDepthMaterial,
+	MeshVelocityMaterial,
 	MeshDistanceMaterial,
 	MeshBasicMaterial,
 	MeshMatcapMaterial,
@@ -51,6 +53,7 @@ const materialLib = {
 	MeshNormalMaterial,
 	MeshLambertMaterial,
 	MeshDepthMaterial,
+	MeshVelocityMaterial,
 	MeshDistanceMaterial,
 	MeshBasicMaterial,
 	MeshMatcapMaterial,

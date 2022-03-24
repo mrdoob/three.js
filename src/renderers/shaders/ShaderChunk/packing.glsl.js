@@ -26,25 +26,11 @@ float unpackRGBAToDepth( const in vec4 v ) {
 }
 
 vec2 packDepthToRG( in highp float v ) {
-	v = v * (1. - EDGE_DISTANCE * 2.) + EDGE_DISTANCE;
-	v += 0.5 / ( 255.0 );
-
-	const highp vec4 packFactor = vec4( 1.0, 255.0, 65025.0, 16581375.0 );
-	highp vec4 res = fract( v * packFactor );
-	res.xy -= res.yz * (1.0/255.0);
-
-	res.zw = vec2( 0.0 );
-
-	return res.yx;
+	return packDepthToRGBA( v ).yx;
 }
 
-
 float unpackRGToDepth( const in highp vec2 v ) {
-	const highp vec2 unpackFactor = 1.0 / vec2( 1.0, 255.0 );
-	   highp float depth = dot( v.yx, unpackFactor );
-	depth -= 0.5 / ( 255.0 );
-	depth = (depth - EDGE_DISTANCE) * (1. / (1. - EDGE_DISTANCE * 2.));
-	return depth;
+	return unpackRGBAToDepth( vec4( v.xy, 0.0, 0.0 ) );
 }
 
 vec4 pack2HalfToRGBA( vec2 v ) {

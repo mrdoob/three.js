@@ -2,12 +2,13 @@ import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Color } from '../math/Color.js';
+import { BasicDepthPacking } from '../constants.js';
 
 class MeshVelocityMaterial extends Material {
 
 	constructor( parameters ) {
 
-		Material.call( this );
+		super();
 
 		this.type = 'MeshVelocityMaterial';
 
@@ -20,6 +21,8 @@ class MeshVelocityMaterial extends Material {
 		this.map = null;
 
 		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
 
 		this.alphaMap = null;
 
@@ -38,7 +41,6 @@ class MeshVelocityMaterial extends Material {
 		this.clearColor = new Color( 1.0, 1.0, 1.0 );
 		this.clearAlpha = 1.0;
 
-		this.blending = NoBlending;
 		this.flatShading = false;
 
 		this.setValues( parameters );
@@ -50,15 +52,17 @@ class MeshVelocityMaterial extends Material {
 
 		super.copy( source );
 
-		this.currentProjectionViewMatrix.copy( this.currentProjectionViewMatrix );
-		this.previousProjectionViewMatrix.copy( this.previousProjectionViewMatrix );
+		this.currentProjectionViewMatrix.copy( source.currentProjectionViewMatrix );
+		this.previousProjectionViewMatrix.copy( source.previousProjectionViewMatrix );
 
 		this.opacity = source.opacity;
-		this.mapSlot.copy( source.mapSlot );
+		this.map.copy( source.map );
 
-		this.displacementMapSlot.copy( source.displacementMapSlot );
+		this.displacementMap.copy( source.displacementMap );
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
 
-		this.alphaMapSlot.copy( source.alphaMapSlot );
+		this.alphaMap.copy( source.alphaMap );
 
 		this.depthPacking = source.depthPacking;
 

@@ -40,7 +40,7 @@
 			let camera, scene, renderer;
 
 			const params = {
-				material: 'normal',
+				material: 'velocity',
 				camera: 'perspective',
 				side: 'double'
 			};
@@ -54,7 +54,7 @@
 			let cameraOrtho, cameraPerspective;
 			let controlsOrtho, controlsPerspective;
 
-			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
+			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal, materialVelocity;
 
 			const SCALE = 2.436143; // from original model
 			const BIAS = - 0.428408; // from original model
@@ -67,7 +67,7 @@
 			function initGui() {
 
 				const gui = new GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
+				gui.add( params, 'material', [ 'standard', 'normal', 'velocity', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 
@@ -190,6 +190,16 @@
 					side: THREE.DoubleSide
 				} );
 
+				materialVelocity = new THREE.MeshVelocityMaterial( {
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					//flatShading: true,
+
+					side: THREE.DoubleSide
+				} );
+
 				//
 
 				const loader = new OBJLoader();
@@ -260,6 +270,7 @@
 						case 'depthBasic': material = materialDepthBasic; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'normal': material = materialNormal; break;
+						case 'velocity': material = materialVelocity; break;
 
 					}
 
@@ -295,8 +306,16 @@
 				controlsPerspective.update();
 				controlsOrtho.update(); // must update both controls for damping to complete
 
+				materialVelocity.previousProjectionViewMatrix.copy(materialVelocity.currentProjectionViewMatrix);
+ 				materialVelocity.currentProjectionViewMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
 				renderer.render( scene, camera );
 
+				scene.traverse( obj => {
+					if (obj.isObject3D) {
+						obj.matrixWorldPrevious.copy(obj.matrixWorld);
+					}
+				});
 			}
 
 		</script>

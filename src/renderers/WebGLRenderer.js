@@ -1752,8 +1752,8 @@ function WebGLRenderer( parameters = {} ) {
 
 			// nothing yet
 
-			m_uniforms.currentProjectionViewMatrix.value = material.currentProjectionViewMatrix;
-			m_uniforms.previousProjectionViewMatrix.value = material.previousProjectionViewMatrix;
+			m_uniforms.currentProjectionViewMatrix.value.copy( material.currentProjectionViewMatrix );
+			m_uniforms.previousProjectionViewMatrix.value.copy( material.previousProjectionViewMatrix );
 
 		}
 
@@ -1761,7 +1761,9 @@ function WebGLRenderer( parameters = {} ) {
 
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
+		p_uniforms.setValue( _gl, 'modelMatrixPrev', object.matrixWorldPrevious );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
 
 		return program;
 

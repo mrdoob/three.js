@@ -94,6 +94,7 @@ class Object3D extends EventDispatcher {
 
 		this.matrix = new Matrix4();
 		this.matrixWorld = new Matrix4();
+		this.matrixWorldPrevious = new Matrix4();
 
 		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
 		this.matrixWorldNeedsUpdate = false;
