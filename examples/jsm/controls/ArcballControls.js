@@ -1941,9 +1941,9 @@ class ArcballControls extends EventDispatcher {
 	calculateRotationAxis = ( vec1, vec2 ) => {
 
 		this._rotationMatrix.extractRotation( this._cameraMatrixState );
-		this._quat.setFromRotationMatrix( this._rotationMatrix );
+		_quat.setFromRotationMatrix( this._rotationMatrix );
 
-		this._rotationAxis.crossVectors( vec1, vec2 ).applyQuaternion( this._quat );
+		this._rotationAxis.crossVectors( vec1, vec2 ).applyQuaternion( _quat );
 		return this._rotationAxis.normalize();
 
 	};
