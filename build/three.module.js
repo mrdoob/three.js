@@ -9517,9 +9517,7 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$9.x = this.getX( i );
-			_vector$9.y = this.getY( i );
-			_vector$9.z = this.getZ( i );
+			_vector$9.fromBufferAttribute( this, i );
 
 			_vector$9.applyMatrix4( m );
 
@@ -9535,9 +9533,7 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$9.x = this.getX( i );
-			_vector$9.y = this.getY( i );
-			_vector$9.z = this.getZ( i );
+			_vector$9.fromBufferAttribute( this, i );
 
 			_vector$9.applyNormalMatrix( m );
 
@@ -9553,9 +9549,7 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$9.x = this.getX( i );
-			_vector$9.y = this.getY( i );
-			_vector$9.z = this.getZ( i );
+			_vector$9.fromBufferAttribute( this, i );
 
 			_vector$9.transformDirection( m );
 
@@ -13202,7 +13196,7 @@ var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defin
 
 const vertex$g = "varying vec2 vUv;\nuniform mat3 uvTransform;\nvoid main() {\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n\tgl_Position = vec4( position.xy, 1.0, 1.0 );\n}";
 
-const fragment$g = "uniform sampler2D t2D;\nvarying vec2 vUv;\nvoid main() {\n\tgl_FragColor = texture2D( t2D, vUv );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
+const fragment$g = "uniform sampler2D t2D;\nvarying vec2 vUv;\nvoid main() {\n\tgl_FragColor = texture2D( t2D, vUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\tgl_FragColor = vec4( mix( pow( gl_FragColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), gl_FragColor.rgb * 0.0773993808, vec3( lessThanEqual( gl_FragColor.rgb, vec3( 0.04045 ) ) ) ), gl_FragColor.w );\n\t#endif\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
 
 const vertex$f = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
 
@@ -22330,6 +22324,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	try {
 
 		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
+			// eslint-disable-next-line compat/compat
 			&& ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
 
 	} catch ( err ) {
@@ -22343,6 +22338,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		// Use OffscreenCanvas when available. Specially needed in web workers
 
 		return useOffscreenCanvas ?
+			// eslint-disable-next-line compat/compat
 			new OffscreenCanvas( width, height ) : createElementNS( 'canvas' );
 
 	}
@@ -27983,19 +27979,11 @@ function WebGLRenderer( parameters = {} ) {
 
 				}
 
-				if ( _gl.checkFramebufferStatus( 36160 ) === 36053 ) {
+				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 
-					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
-
-						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), buffer );
-
-					}
-
-				} else {
-
-					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
+					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), buffer );
 
 				}
 
@@ -28488,9 +28476,7 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
 
-			_vector$6.x = this.getX( i );
-			_vector$6.y = this.getY( i );
-			_vector$6.z = this.getZ( i );
+			_vector$6.fromBufferAttribute( this, i );
 
 			_vector$6.applyMatrix4( m );
 
@@ -28506,9 +28492,7 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$6.x = this.getX( i );
-			_vector$6.y = this.getY( i );
-			_vector$6.z = this.getZ( i );
+			_vector$6.fromBufferAttribute( this, i );
 
 			_vector$6.applyNormalMatrix( m );
 
@@ -28524,9 +28508,7 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$6.x = this.getX( i );
-			_vector$6.y = this.getY( i );
-			_vector$6.z = this.getZ( i );
+			_vector$6.fromBufferAttribute( this, i );
 
 			_vector$6.transformDirection( m );
 
@@ -29208,10 +29190,7 @@ class SkinnedMesh extends Mesh {
 
 		for ( let i = 0, l = skinWeight.count; i < l; i ++ ) {
 
-			vector.x = skinWeight.getX( i );
-			vector.y = skinWeight.getY( i );
-			vector.z = skinWeight.getZ( i );
-			vector.w = skinWeight.getW( i );
+			vector.fromBufferAttribute( skinWeight, i );
 
 			const scale = 1.0 / vector.manhattanLength();
 
