@@ -59,13 +59,15 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-		this.depthTexture = source.depthTexture;
+
+		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
 		this.texture.length = 0;
 
 		for ( let i = 0, il = source.texture.length; i < il; i ++ ) {
 
 			this.texture[ i ] = source.texture[ i ].clone();
+			this.texture[ i ].isRenderTargetTexture = true;
 
 		}
 
