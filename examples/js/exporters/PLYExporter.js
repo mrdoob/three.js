@@ -185,9 +185,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
+						vertex.fromBufferAttribute( vertices, i );
 						vertex.applyMatrix4( mesh.matrixWorld ); // Position information
 
 						output.setFloat32( vOffset, vertex.x, options.littleEndian );
@@ -201,9 +199,7 @@
 
 							if ( normals != null ) {
 
-								vertex.x = normals.getX( i );
-								vertex.y = normals.getY( i );
-								vertex.z = normals.getZ( i );
+								vertex.fromBufferAttribute( normals, i );
 								vertex.applyMatrix3( normalMatrixWorld ).normalize();
 								output.setFloat32( vOffset, vertex.x, options.littleEndian );
 								vOffset += 4;
@@ -336,9 +332,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
+						vertex.fromBufferAttribute( vertices, i );
 						vertex.applyMatrix4( mesh.matrixWorld ); // Position information
 
 						let line = vertex.x + ' ' + vertex.y + ' ' + vertex.z; // Normal information
@@ -347,9 +341,7 @@
 
 							if ( normals != null ) {
 
-								vertex.x = normals.getX( i );
-								vertex.y = normals.getY( i );
-								vertex.z = normals.getZ( i );
+								vertex.fromBufferAttribute( normals, i );
 								vertex.applyMatrix3( normalMatrixWorld ).normalize();
 								line += ' ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
 
