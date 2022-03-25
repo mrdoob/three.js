@@ -92,7 +92,7 @@ class LOD extends Object3D {
 
 			for ( i = 1, l = levels.length; i < l; i ++ ) {
 
-				const levelDistance = levels[ i ].distance;
+				let levelDistance = levels[ i ].distance;
 
 				if ( levels[ i ].object.visible ) {
 
@@ -149,7 +149,7 @@ class LOD extends Object3D {
 
 			for ( i = 1, l = levels.length; i < l; i ++ ) {
 
-				const levelDistance = levels[ i ].distance;
+				let levelDistance = levels[ i ].distance;
 
 				if ( levels[ i ].object.visible ) {
 
