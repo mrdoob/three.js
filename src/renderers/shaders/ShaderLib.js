@@ -206,7 +206,7 @@ const ShaderLib = {
 			UniformsLib.displacementmap,
 			{
 				currentProjectionViewMatrix: { value: new Matrix4() },
-				previousProjectionViewMatrix: { value:  new Matrix4() }
+				previousProjectionViewMatrix: { value: new Matrix4() }
 			}
 		] ),
 

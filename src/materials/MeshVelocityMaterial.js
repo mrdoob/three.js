@@ -1,5 +1,4 @@
 import { Material } from './Material.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Color } from '../math/Color.js';
 import { BasicDepthPacking } from '../constants.js';
