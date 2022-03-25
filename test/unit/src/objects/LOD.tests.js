@@ -78,9 +78,9 @@ export default QUnit.module( 'Objects', () => {
 			lod.addLevel( low, 50 );
 
 			assert.strictEqual( lod.levels.length, 3, 'LOD.levels has the correct length.' );
-			assert.deepEqual( lod.levels[ 0 ], { distance: 5, object: high }, 'First entry correct.' );
-			assert.deepEqual( lod.levels[ 1 ], { distance: 25, object: mid }, 'Second entry correct.' );
-			assert.deepEqual( lod.levels[ 2 ], { distance: 50, object: low }, 'Third entry correct.' );
+			assert.deepEqual( lod.levels[ 0 ], { distance: 5, object: high, hysteresis: 0.05 }, 'First entry correct.' );
+			assert.deepEqual( lod.levels[ 1 ], { distance: 25, object: mid, hysteresis: 0.05 }, 'Second entry correct.' );
+			assert.deepEqual( lod.levels[ 2 ], { distance: 50, object: low, hysteresis: 0.05 }, 'Third entry correct.' );
 
 		} );
 		QUnit.test( 'getObjectForDistance', ( assert ) => {
