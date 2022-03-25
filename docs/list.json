@@ -12,7 +12,6 @@
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
-				"Color management": "manual/en/introduction/Color-management",
 				"Libraries and Plugins": "manual/en/introduction/Libraries-and-Plugins",
 				"FAQ": "manual/en/introduction/FAQ",
 				"Useful links": "manual/en/introduction/Useful-links"
@@ -24,7 +23,8 @@
 				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
 				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
-				"Animation system": "manual/en/introduction/Animation-system"
+				"Animation system": "manual/en/introduction/Animation-system",
+				"Color management": "manual/en/introduction/Color-management"
 			},
 
 			"Build Tools": {
