@@ -1,7 +1,5 @@
 import { Material } from './Material.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { Color } from '../math/Color.js';
-import { BasicDepthPacking } from '../constants.js';
 
 class MeshVelocityMaterial extends Material {
 
