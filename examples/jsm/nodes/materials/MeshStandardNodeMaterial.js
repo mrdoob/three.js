@@ -73,13 +73,13 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// SPECULAR COLOR
 
-		let specularColorNode = mix( vec3( 0.04 ), colorNode.rgb, metalnessNode );
+		const specularColorNode = mix( vec3( 0.04 ), colorNode.rgb, metalnessNode );
 
 		builder.addFlow( 'fragment', label( specularColorNode, 'SpecularColor' ) );
 
 		// NORMAL VIEW
 
-		let normalNode = this.normalNode ? vec3( this.normalNode ) : normalView;
+		const normalNode = this.normalNode ? vec3( this.normalNode ) : normalView;
 
 		builder.addFlow( 'fragment', label( normalNode, 'TransformedNormalView' ) );
 

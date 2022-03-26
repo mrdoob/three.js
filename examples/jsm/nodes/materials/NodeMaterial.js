@@ -56,7 +56,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( this.alphaTestNode || this.alphaTest > 0 ) {
 
-			let alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
+			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
 			builder.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
