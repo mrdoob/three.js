@@ -31,3 +31,29 @@ Material.fromType = function ( type ) {
 	return fromTypeFunction.call( this, type );
 
 };
+
+export function toNodeMaterial( material ) {
+
+	const type = material.type.replace( 'Material', 'NodeMaterial' );
+
+	if ( materialLib[ type ] === undefined ) {
+
+		return material; // is already a node material or cannot be converted
+
+	}
+
+	const nodeMaterial = new materialLib[ type ]( material );
+
+	for ( let key in material ) {
+
+		if ( nodeMaterial[ key ] === undefined ) {
+
+			nodeMaterial[ key ] = material[ key ]; // currently this is needed only for material.alphaTest
+
+		}
+
+	}
+
+	return nodeMaterial;
+
+}

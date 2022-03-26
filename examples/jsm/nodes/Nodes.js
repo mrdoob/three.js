@@ -1,7 +1,6 @@
 // core
 import ArrayUniformNode from './core/ArrayUniformNode.js';
 import AttributeNode from './core/AttributeNode.js';
-import BypassNode from './core/BypassNode.js';
 import CodeNode from './core/CodeNode.js';
 import ConstNode from './core/ConstNode.js';
 import ContextNode from './core/ContextNode.js';
@@ -94,7 +93,6 @@ const nodeLib = {
 	// core
 	ArrayUniformNode,
 	AttributeNode,
-	BypassNode,
 	CodeNode,
 	ContextNode,
 	ConstNode,
@@ -183,7 +181,6 @@ export {
 	// core
 	ArrayUniformNode,
 	AttributeNode,
-	BypassNode,
 	CodeNode,
 	ContextNode,
 	ConstNode,

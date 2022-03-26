@@ -7,10 +7,13 @@ import UniformNode from './core/UniformNode.js';
 
 // accessor nodes
 import BufferNode from './accessors/BufferNode.js';
-import PositionNode from './accessors/PositionNode.js';
-import NormalNode from './accessors/NormalNode.js';
 import CameraNode from './accessors/CameraNode.js';
+import MaterialNode from './accessors/MaterialNode.js';
 import ModelNode from './accessors/ModelNode.js';
+import ModelViewProjectionNode from './accessors/ModelViewProjectionNode.js';
+import NormalNode from './accessors/NormalNode.js';
+import PositionNode from './accessors/PositionNode.js';
+import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 
@@ -24,6 +27,10 @@ import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
+
+// other nodes
+import ColorSpaceNode from './display/ColorSpaceNode.js';
+import LightContextNode from './lights/LightContextNode.js';
 
 // utils
 import { getValueFromType } from './core/NodeUtils.js';
@@ -269,9 +276,7 @@ export const label = ( node, name ) => {
 
 	node = nodeObject( node );
 
-	if ( node.isVarNode === true ) {
-
-		node.name = name;
+	if ( ( node.isVarNode === true ) && ( node.name === name ) ) {
 
 		return node;
 
@@ -355,12 +360,15 @@ export const shiftRight = new ShaderNodeProxy( OperatorNode, '>>' );
 
 export const element = new ShaderNodeProxy( ArrayElementNode );
 
+export const modelViewProjection = new ShaderNodeProxy( ModelViewProjectionNode );
+
 export const normalGeometry = new ShaderNodeObject( new NormalNode( NormalNode.GEOMETRY ) );
 export const normalLocal = new ShaderNodeObject( new NormalNode( NormalNode.LOCAL ) );
 export const normalWorld = new ShaderNodeObject( new NormalNode( NormalNode.WORLD ) );
 export const normalView = new ShaderNodeObject( new NormalNode( NormalNode.VIEW ) );
 export const transformedNormalView = new ShaderNodeObject( new VarNode( new NormalNode( NormalNode.VIEW ), 'TransformedNormalView', 'vec3' ) );
 
+export const positionGeometry = new ShaderNodeObject( new PositionNode( PositionNode.GEOMETRY ) );
 export const positionLocal = new ShaderNodeObject( new PositionNode( PositionNode.LOCAL ) );
 export const positionWorld = new ShaderNodeObject( new PositionNode( PositionNode.WORLD ) );
 export const positionView = new ShaderNodeObject( new PositionNode( PositionNode.VIEW ) );
@@ -375,6 +383,19 @@ export const roughness = new ShaderNodeObject( new PropertyNode( 'Roughness', 'f
 export const metalness = new ShaderNodeObject( new PropertyNode( 'Metalness', 'float' ) );
 export const alphaTest = new ShaderNodeObject( new PropertyNode( 'AlphaTest', 'float' ) );
 export const specularColor = new ShaderNodeObject( new PropertyNode( 'SpecularColor', 'color' ) );
+
+export const materialAlphaTest = new ShaderNodeObject( new MaterialNode( MaterialNode.ALPHA_TEST ) );
+export const materialColor = new ShaderNodeObject( new MaterialNode( MaterialNode.COLOR ) );
+export const materialOpacity = new ShaderNodeObject( new MaterialNode( MaterialNode.OPACITY ) );
+export const materialSpecular = new ShaderNodeObject( new MaterialNode( MaterialNode.SPECULAR ) );
+export const materialRoughness = new ShaderNodeObject( new MaterialNode( MaterialNode.ROUGHNESS ) );
+export const materialMetalness = new ShaderNodeObject( new MaterialNode( MaterialNode.METALNESS ) );
+
+export const skinning = new ShaderNodeProxy( SkinningNode );
+
+export const lightContext = new ShaderNodeProxy( LightContextNode );
+
+export const toColorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 
 export const abs = new ShaderNodeProxy( MathNode, 'abs' );
 export const acos = new ShaderNodeProxy( MathNode, 'acos' );

@@ -1,5 +1,12 @@
 import { Material, ShaderMaterial } from 'three';
 import { getNodesKeys } from '../core/NodeUtils.js';
+import {
+	float, vec3, vec4,
+	assign, label, mul, add, mix,
+	positionLocal, skinning, modelViewProjection, lightContext, toColorSpace,
+	materialAlphaTest, materialColor, materialOpacity
+} from '../ShaderNode.js';
+import ExpressionNode from '../core/ExpressionNode.js';
 
 class NodeMaterial extends ShaderMaterial {
 
@@ -10,6 +17,83 @@ class NodeMaterial extends ShaderMaterial {
 		this.type = this.constructor.name;
 
 		this.lights = true;
+
+	}
+
+	build( builder ) {
+
+		const { diffuseColorNode } = this.generateMain( builder );
+
+		this.generateLight( builder, diffuseColorNode, this.lightNode );
+
+	}
+
+	generateMain( builder ) {
+
+		// VERTEX STAGE
+
+		if ( this.positionNode ) builder.addFlow( 'vertex', assign( positionLocal, this.positionNode ) );
+		if ( builder.object.isSkinnedMesh ) builder.addFlow( 'vertex', skinning( builder.object ) );
+
+		builder.addFlow( 'vertex', modelViewProjection() );
+
+		// FRAGMENT STAGE
+
+		let colorNode = vec4( this.colorNode || materialColor );
+		let opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+
+		// COLOR
+
+		colorNode = builder.addFlow( 'fragment', label( colorNode, 'Color' ) );
+		const diffuseColorNode = builder.addFlow( 'fragment', label( colorNode, 'DiffuseColor' ) );
+
+		// OPACITY
+
+		opacityNode = builder.addFlow( 'fragment', label( opacityNode, 'OPACITY' ) );
+		builder.addFlow( 'fragment', assign( diffuseColorNode.a, mul( diffuseColorNode.a, opacityNode ) ) );
+
+		// ALPHA TEST
+
+		if ( this.alphaTestNode || this.alphaTest > 0 ) {
+
+			let alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
+
+			alphaTestNode = builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
+			builder.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
+																	// TODO: remove ExpressionNode here and then possibly remove it completely
+
+		}
+
+		return { colorNode, diffuseColorNode };
+
+	}
+
+	generateLight( builder, diffuseColorNode, lightNode ) {
+
+		// OUTGOING LIGHT
+
+		let outgoingLightNode = diffuseColorNode.xyz;
+		if ( lightNode && lightNode.hasLight !== false ) outgoingLightNode = builder.addFlow( 'fragment', label( lightContext( lightNode ), 'Light' ) );
+
+		// EMISSIVE
+
+		if ( this.emissiveNode ) outgoingLightNode = add( vec3( this.emissiveNode ), outgoingLightNode );
+
+		// OUTPUT
+
+		let outputNode = vec4( outgoingLightNode, diffuseColorNode.a );
+
+		// ENCODING
+
+		outputNode = toColorSpace( outputNode, builder.renderer.outputEncoding );
+
+		// FOG
+
+		if ( builder.fogNode ) outputNode = mix( outputNode, builder.fogNode.colorNode, builder.fogNode );
+
+		// RESULT
+
+		builder.addFlow( 'fragment', label( outputNode, 'Output' ) );
 
 	}
 
@@ -26,15 +110,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			if ( this[ property ] === undefined ) {
 
-				if ( value && typeof value.clone === 'function' ) {
-
-					this[ property ] = value.clone();
-
-				} else {
-
-					this[ property ] = value;
-
-				}
+				this[ property ] = value?.clone?.() || value;
 
 			}
 

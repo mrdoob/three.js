@@ -1,10 +1,22 @@
-import { ShaderNode,
+import { nodeObject,
 	add, addTo, sub, mul, div, saturate, dot, pow, pow2, exp2, normalize, max, sqrt, negate,
 	cond, greaterThan, and,
 	transformedNormalView, positionViewDirection,
 	diffuseColor, specularColor, roughness,
 	EPSILON
 } from '../ShaderNode.js';
+
+function ShaderNode( func ) { // a workaround for circular inclusion
+	
+	return ( inputs ) => {
+
+		Object.keys( inputs ).forEach( key => inputs[ key ] = nodeObject( inputs[ key ] ) );
+
+		return func( inputs );
+
+	};
+
+}
 
 export const F_Schlick = new ShaderNode( ( inputs ) => {
 
