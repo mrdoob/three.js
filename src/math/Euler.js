@@ -302,6 +302,7 @@ class Euler {
 		yield this._x;
 		yield this._y;
 		yield this._z;
+		yield this._order;
 
 	}
 
