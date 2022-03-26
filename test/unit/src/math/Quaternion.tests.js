@@ -850,6 +850,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'iterable', ( assert ) => {
+
+			var q = new Quaternion( 0, 0.5, 0.7, 1 );
+			var array = [ ...q ];
+			assert.strictEqual( array[ 0 ], 0, 'Quaternion is iterable.' );
+			assert.strictEqual( array[ 1 ], 0.5, 'Quaternion is iterable.' );
+			assert.strictEqual( array[ 2 ], 0.7, 'Quaternion is iterable.' );
+			assert.strictEqual( array[ 3 ], 1, 'Quaternion is iterable.' );
+
+		} );
+
 	} );
 
 } );

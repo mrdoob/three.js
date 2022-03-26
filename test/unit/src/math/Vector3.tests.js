@@ -1006,6 +1006,16 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'iterable', ( assert ) => {
+
+			var v = new Vector3( 0, 0.5, 1 );
+			var array = [ ...v ];
+			assert.strictEqual( array[ 0 ], 0, 'Vector3 is iterable.' );
+			assert.strictEqual( array[ 1 ], 0.5, 'Vector3 is iterable.' );
+			assert.strictEqual( array[ 2 ], 1, 'Vector3 is iterable.' );
+
+		} );
+
 	} );
 
 } );
