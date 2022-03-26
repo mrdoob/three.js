@@ -65,9 +65,11 @@ class Clock {
 
 }
 
+const provider = typeof performance === 'undefined' ? Date : performance; // see #10732
+
 function now() {
 
-	return ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
+	return provider.now();
 
 }
 
