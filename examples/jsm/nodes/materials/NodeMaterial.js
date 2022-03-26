@@ -58,7 +58,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			let alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			alphaTestNode = builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
+			builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
 			builder.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
 																	// TODO: remove ExpressionNode here and then possibly remove it completely
 

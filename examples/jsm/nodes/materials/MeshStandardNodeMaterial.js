@@ -69,19 +69,19 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
 		roughnessNode = getRoughness( { roughness: roughnessNode } );
 
-		roughnessNode = builder.addFlow( 'fragment', label( roughnessNode, 'Roughness' ) );
+		builder.addFlow( 'fragment', label( roughnessNode, 'Roughness' ) );
 
 		// SPECULAR COLOR
 
 		let specularColorNode = mix( vec3( 0.04 ), colorNode.rgb, metalnessNode );
 
-		specularColorNode = builder.addFlow( 'fragment', label( specularColorNode, 'SpecularColor' ) );
+		builder.addFlow( 'fragment', label( specularColorNode, 'SpecularColor' ) );
 
 		// NORMAL VIEW
 
 		let normalNode = this.normalNode ? vec3( this.normalNode ) : normalView;
 
-		normalNode = builder.addFlow( 'fragment', label( normalNode, 'TransformedNormalView' ) );
+		builder.addFlow( 'fragment', label( normalNode, 'TransformedNormalView' ) );
 
 		return diffuseColorNode;
 
