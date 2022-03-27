@@ -19,7 +19,7 @@ class VarNode extends Node {
 
 	getNodeType( builder ) {
 
-		return super.getNodeType( builder ) || this.node.getNodeType( builder );
+		return this.node.getNodeType( builder );
 
 	}
 
