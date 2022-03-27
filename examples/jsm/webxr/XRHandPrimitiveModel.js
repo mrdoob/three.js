@@ -2,6 +2,7 @@ import {
 	DynamicDrawUsage,
 	SphereGeometry,
 	BoxGeometry,
+	CylinderGeometry,
 	MeshStandardMaterial,
 	InstancedMesh,
 	Matrix4,
@@ -28,6 +29,10 @@ class XRHandPrimitiveModel {
 		} else if ( options.primitive === 'box' ) {
 
 			geometry = new BoxGeometry( 1, 1, 1 );
+
+		} else if ( options.primitive === 'bone' ) {
+
+			geometry = new CylinderGeometry( 0.5, 0.75, 2.25, 10, 1 ).rotateX( - Math.PI / 2 );
 
 		}
 

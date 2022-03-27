@@ -75,6 +75,10 @@ class XRHandModelFactory {
 
 					handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'box' } );
 
+				} else if ( profile === 'bones' ) {
+
+					handModel.motionController = new XRHandPrimitiveModel( handModel, controller, this.path, xrInputSource.handedness, { primitive: 'bone' } );
+
 				} else if ( profile === 'mesh' ) {
 
 					handModel.motionController = new XRHandMeshModel( handModel, controller, this.path, xrInputSource.handedness );
