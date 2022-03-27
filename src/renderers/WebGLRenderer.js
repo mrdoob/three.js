@@ -174,7 +174,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	// transmission
 
-	let _transmissionRenderTarget = null;
+	let _transmissionRenderTarget = [];
 
 	// camera matrices cache
 
@@ -584,10 +584,10 @@ function WebGLRenderer( parameters = {} ) {
 		xr.removeEventListener( 'sessionstart', onXRSessionStart );
 		xr.removeEventListener( 'sessionend', onXRSessionEnd );
 
-		if ( _transmissionRenderTarget ) {
+		if ( _transmissionRenderTarget.length > 0 ) {
 
-			_transmissionRenderTarget.dispose();
-			_transmissionRenderTarget = null;
+			_transmissionRenderTarget.forEach( ( target ) => target.dispose() );
+			_transmissionRenderTarget = [];
 
 		}
 
@@ -988,18 +988,34 @@ function WebGLRenderer( parameters = {} ) {
 		if ( camera.isArrayCamera ) {
 
 			const cameras = camera.cameras;
+			const opaqueObjects = currentRenderList.opaque;
+			const transmissiveObjects = currentRenderList.transmissive;
+
+			if ( transmissiveObjects.length > 0 ) {
+
+				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+
+					const camera2 = cameras[ i ];
+
+					currentRenderState.setupLightsView( camera2 );
+
+					renderTransmissionPass( opaqueObjects, scene, camera2 );
+
+				}
+
+			}
 
 			for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
 				const camera2 = cameras[ i ];
 
-				renderScene( currentRenderList, scene, camera2, camera2.viewport );
+				renderScene( currentRenderList, scene, camera2, camera2.viewport, false );
 
 			}
 
 		} else {
 
-			renderScene( currentRenderList, scene, camera );
+			renderScene( currentRenderList, scene, camera, undefined, true );
 
 		}
 
@@ -1167,7 +1183,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	}
 
-	function renderScene( currentRenderList, scene, camera, viewport ) {
+	function renderScene( currentRenderList, scene, camera, viewport, renderTransmissiveObjects ) {
 
 		const opaqueObjects = currentRenderList.opaque;
 		const transmissiveObjects = currentRenderList.transmissive;
@@ -1175,7 +1191,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		currentRenderState.setupLightsView( camera );
 
-		if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, scene, camera );
+		if ( transmissiveObjects.length > 0 && renderTransmissiveObjects ) renderTransmissionPass( opaqueObjects, scene, camera );
 
 		if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
 
@@ -1197,9 +1213,9 @@ function WebGLRenderer( parameters = {} ) {
 
 		const isWebGL2 = capabilities.isWebGL2;
 
-		if ( _transmissionRenderTarget === null ) {
+		if ( _transmissionRenderTarget[ camera ] === undefined ) {
 
-			_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
+			_transmissionRenderTarget[ camera ] = new WebGLRenderTarget( 1, 1, {
 				generateMipmaps: true,
 				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
 				minFilter: LinearMipmapLinearFilter,
@@ -1223,7 +1239,7 @@ function WebGLRenderer( parameters = {} ) {
 		//
 
 		const currentRenderTarget = _this.getRenderTarget();
-		_this.setRenderTarget( _transmissionRenderTarget );
+		_this.setRenderTarget( _transmissionRenderTarget[ camera ] );
 		_this.clear();
 
 		// Turn off the features which can affect the frag color for opaque objects pass.
@@ -1235,8 +1251,8 @@ function WebGLRenderer( parameters = {} ) {
 
 		_this.toneMapping = currentToneMapping;
 
-		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
-		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+		textures.updateMultisampleRenderTarget( _transmissionRenderTarget[ camera ] );
+		textures.updateRenderTargetMipmap( _transmissionRenderTarget[ camera ] );
 
 		_this.setRenderTarget( currentRenderTarget );
 
@@ -1726,7 +1742,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			}
 
-			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget );
+			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget[ camera ] );
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 
