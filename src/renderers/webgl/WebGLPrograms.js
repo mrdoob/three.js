@@ -259,7 +259,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 
-			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
+			useDepthPacking: material.depthPacking !== undefined,
+			depthPacking: material.depthPacking || 0,
 
 			index0AttributeName: material.index0AttributeName,
 
@@ -345,6 +346,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.toneMapping );
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
+		array.push( parameters.depthPacking );
 
 	}
 
@@ -444,7 +446,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 11 );
 		if ( parameters.flipSided )
 			_programLayers.enable( 12 );
-		if ( parameters.depthPacking )
+		if ( parameters.useDepthPacking )
 			_programLayers.enable( 13 );
 		if ( parameters.dithering )
 			_programLayers.enable( 14 );
