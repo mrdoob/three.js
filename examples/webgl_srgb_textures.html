@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>three.js webgl - srgb textures</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
+    <style>
+      body {
+        background-color: #fff;
+        color: #444;
+      }
+      a {
+        color: #08f;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="info"><a href="https://github.com/oppenfuture/three.js" target="_blank" rel="noopener">three.js</a> webgl - srgb textures</div>
+
+    <!-- Import maps polyfill -->
+    <!-- Remove this when import maps will be widely supported -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../build/three.module.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+
+      import * as THREE from 'three';
+
+      let camera, scene, renderer1, renderer2;
+
+      init();
+
+      function init() {
+
+        camera = new THREE.OrthographicCamera();
+        camera.position.z = 1.0;
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0xffffff );
+
+        const geometry = new THREE.PlaneGeometry();
+        const material = new THREE.MeshBasicMaterial();
+        const mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+
+        new THREE.TextureLoader().load('textures/checkboard.png', ( texture ) => {
+
+          texture.encoding = THREE.sRGBEncoding;
+          material.map = texture;
+          animate();
+
+        });
+
+        //
+
+        renderer1 = new THREE.WebGLRenderer( {} );
+        renderer1.outputEncoding = THREE.sRGBEncoding;
+        renderer1.setPixelRatio( window.devicePixelRatio );
+        renderer1.setSize( window.innerWidth, window.innerHeight / 2 );
+        document.body.appendChild( renderer1.domElement );
+
+        renderer2 = new THREE.WebGLRenderer( { srgbTextures: false } );
+        renderer2.outputEncoding = THREE.sRGBEncoding;
+        renderer2.setPixelRatio( window.devicePixelRatio );
+        renderer2.setSize( window.innerWidth, window.innerHeight / 2 );
+        document.body.appendChild( renderer2.domElement );
+
+      }
+
+      function animate() {
+
+        requestAnimationFrame( animate );
+
+        renderer1.render( scene, camera );
+        renderer2.render( scene, camera );
+
+      }
+
+    </script>
+
+  </body>
+</html>

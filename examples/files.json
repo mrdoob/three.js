@@ -219,6 +219,7 @@
 		"webgl_shadowmesh",
 		"webgl_skinning_simple",
 		"webgl_sprites",
+		"webgl_srgb_textures",
 		"webgl_test_memory",
 		"webgl_test_memory2",
 		"webgl_tonemapping",
