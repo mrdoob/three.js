@@ -2026,6 +2026,14 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
+	this.copyFrameBufferToRenderTarget = function ( renderTarget ) {
+
+		const texture = renderTarget.texture;
+		textures.setTexture2D( texture, 0 );
+		_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, utils.convert( texture.format ), 0, 0, texture.image.width, texture.image.height, 0 );
+
+	};
+
 	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0 ) {
 
 		const width = srcTexture.image.width;
