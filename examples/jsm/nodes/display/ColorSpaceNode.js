@@ -1,20 +1,18 @@
 import TempNode from '../core/Node.js';
-import { nodeObject,
-	vec3,
-	pow, mul, sub, mix, join,
-	lessThanEqual } from '../ShaderNode.js';
+import { ShaderNode } from '../utils/ShaderNodeUtils.js';
+import { vec3, pow, mul, sub, mix, join, lessThanEqual } from '../ShaderNode.js';
 
 import { LinearEncoding, sRGBEncoding } from 'three';
 
-export const LinearToLinear = ( { value } ) => {
+export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
-	return nodeObject( value );
+	return inputs.value;
 
-};
+} );
 
-export const LinearTosRGB = ( { value } ) => {
+export const LinearTosRGB = new ShaderNode( ( inputs ) => {
 
-	value = nodeObject( value );
+	const { value } = inputs;
 
 	const rgb = value.rgb;
 
@@ -26,7 +24,7 @@ export const LinearTosRGB = ( { value } ) => {
 
 	return join( rgbResult.r, rgbResult.g, rgbResult.b, value.a );
 
-};
+} );
 
 const EncodingLib = {
 	LinearToLinear,
