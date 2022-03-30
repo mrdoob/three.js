@@ -31,7 +31,6 @@ import ColorSpaceNode from './display/ColorSpaceNode.js';
 import LightContextNode from './lights/LightContextNode.js';
 
 // utils
-import { getValueFromType } from './core/NodeUtils.js';
 import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, float, int, uint, bool } from './utils/ShaderNodeUtils.js';
 
 //

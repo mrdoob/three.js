@@ -4,6 +4,7 @@ import JoinNode from './JoinNode.js';
 import SplitNode from './SplitNode.js';
 
 import ConstNode from '../core/ConstNode.js';
+import { getValueFromType } from './core/NodeUtils.js';
 
 const NodeHandler = {
 
@@ -93,7 +94,7 @@ const ShaderNodeObjects = function ( objects ) {
 
 };
 
-const ShaderNodeArray = function ( array ) => {
+const ShaderNodeArray = function ( array ) {
 
 	const len = array.length;
 
