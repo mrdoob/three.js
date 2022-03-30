@@ -1,3 +1,4 @@
+import NodeMaterial from './NodeMaterial.js';
 import LineBasicNodeMaterial from './LineBasicNodeMaterial.js';
 import MeshBasicNodeMaterial from './MeshBasicNodeMaterial.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
@@ -5,6 +6,7 @@ import PointsNodeMaterial from './PointsNodeMaterial.js';
 import { Material } from 'three';
 
 export {
+	NodeMaterial,
 	LineBasicNodeMaterial,
 	MeshBasicNodeMaterial,
 	MeshStandardNodeMaterial,
@@ -12,6 +14,7 @@ export {
 };
 
 const materialLib = {
+	NodeMaterial,
 	LineBasicNodeMaterial,
 	MeshBasicNodeMaterial,
 	MeshStandardNodeMaterial,
@@ -32,7 +35,7 @@ Material.fromType = function ( type ) {
 
 };
 
-export function toNodeMaterial( material ) {
+NodeMaterial.fromMaterial = function ( material ) {
 
 	const type = material.type.replace( 'Material', 'NodeMaterial' );
 
@@ -56,4 +59,4 @@ export function toNodeMaterial( material ) {
 
 	return nodeMaterial;
 
-}
+};
