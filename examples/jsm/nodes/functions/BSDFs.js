@@ -1,4 +1,4 @@
-import { ShaderNode } from '../utils/ShaderNodeUtils.js';
+import { ShaderNode } from '../core/ShaderNodeUtils.js';
 import {
 	add, addTo, sub, mul, div, saturate, dot, pow, pow2, exp2, normalize, max, sqrt, negate,
 	cond, greaterThan, and,

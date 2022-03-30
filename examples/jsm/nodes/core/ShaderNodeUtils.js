@@ -1,10 +1,10 @@
-import ArrayElementNode from './ArrayElementNode.js';
-import ConvertNode from './ConvertNode.js';
-import JoinNode from './JoinNode.js';
-import SplitNode from './SplitNode.js';
+import ArrayElementNode from '../utils/ArrayElementNode.js';
+import ConvertNode from '../utils/ConvertNode.js';
+import JoinNode from '../utils/JoinNode.js';
+import SplitNode from '../utils/SplitNode.js';
 
-import ConstNode from '../core/ConstNode.js';
-import { getValueFromType } from '../core/NodeUtils.js';
+import ConstNode from './ConstNode.js';
+import { getValueFromType } from './NodeUtils.js';
 
 const NodeHandler = {
 

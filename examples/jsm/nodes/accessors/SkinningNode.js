@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { ShaderNode } from '../utils/ShaderNodeUtils.js';
+import { ShaderNode } from '../core/ShaderNodeUtils.js';
 import {
 	attribute,
 	buffer,
