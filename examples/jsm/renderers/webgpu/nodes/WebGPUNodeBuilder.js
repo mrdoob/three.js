@@ -1,5 +1,3 @@
-import { LinearEncoding } from 'three';
-
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -11,22 +9,12 @@ import { WebGPUNodeSampledTexture, WebGPUNodeSampledCubeTexture } from './WebGPU
 import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
-import VarNode from 'three-nodes/core/VarNode.js';
-import CodeNode from 'three-nodes/core/CodeNode.js';
-import BypassNode from 'three-nodes/core/BypassNode.js';
-import ExpressionNode from 'three-nodes/core/ExpressionNode.js';
 import NodeBuilder from 'three-nodes/core/NodeBuilder.js';
-import MaterialNode from 'three-nodes/accessors/MaterialNode.js';
-import PositionNode from 'three-nodes/accessors/PositionNode.js';
-import NormalNode from 'three-nodes/accessors/NormalNode.js';
-import ModelViewProjectionNode from 'three-nodes/accessors/ModelViewProjectionNode.js';
-import SkinningNode from 'three-nodes/accessors/SkinningNode.js';
-import ColorSpaceNode from 'three-nodes/display/ColorSpaceNode.js';
-import LightContextNode from 'three-nodes/lights/LightContextNode.js';
-import OperatorNode from 'three-nodes/math/OperatorNode.js';
 import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
-import { vec3, add, join, mix, nodeObject } from 'three-nodes/ShaderNode.js';
-import { getRoughness } from 'three-nodes/functions/PhysicalMaterialFunctions.js';
+
+import CodeNode from 'three-nodes/core/CodeNode.js';
+
+import { NodeMaterial } from 'three-nodes/materials/Materials.js';
 
 const wgslTypeLib = {
 	float: 'f32',
@@ -126,227 +114,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	build() {
 
-		this._parseObject();
+		NodeMaterial.fromMaterial( this.material ).build( this );
 
 		return super.build();
-
-	}
-
-	_parseObject() {
-
-		const object = this.object;
-		const material = this.material;
-
-		// parse inputs
-
-		if ( material.isMeshStandardMaterial || material.isMeshBasicMaterial || material.isPointsMaterial || material.isLineBasicMaterial ) {
-
-			let lightNode = material.lightNode;
-
-			if ( material.isMeshStandardMaterial && lightNode === null && this.lightNode ) {
-
-				// use scene lights
-
-				lightNode = this.lightNode;
-
-			}
-
-			// VERTEX STAGE
-
-			let vertex = new PositionNode( PositionNode.GEOMETRY );
-
-			if ( material.positionNode && material.positionNode.isNode ) {
-
-				const assignPositionNode = new OperatorNode( '=', new PositionNode( PositionNode.LOCAL ), material.positionNode );
-
-				vertex = new BypassNode( vertex, assignPositionNode );
-
-			}
-
-			if ( object.isSkinnedMesh === true ) {
-
-				vertex = new BypassNode( vertex, new SkinningNode( object ) );
-
-			}
-
-			this.context.vertex = vertex;
-
-			this.addFlow( 'vertex', new VarNode( new ModelViewProjectionNode(), 'MVP', 'vec4' ) );
-
-			// COLOR
-
-			let colorNode = null;
-
-			if ( material.colorNode && material.colorNode.isNode ) {
-
-				colorNode = material.colorNode;
-
-			} else {
-
-				colorNode = new MaterialNode( MaterialNode.COLOR );
-
-			}
-
-			colorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'Color', 'vec4' ) );
-
-			const diffuseColorNode = this.addFlow( 'fragment', new VarNode( colorNode, 'DiffuseColor', 'vec4' ) );
-
-			// OPACITY
-
-			let opacityNode = null;
-
-			if ( material.opacityNode && material.opacityNode.isNode ) {
-
-				opacityNode = material.opacityNode;
-
-			} else {
-
-				opacityNode = new VarNode( new MaterialNode( MaterialNode.OPACITY ) );
-
-			}
-
-			this.addFlow( 'fragment', new VarNode( opacityNode, 'OPACITY', 'float' ) );
-
-			this.addFlow( 'fragment', new ExpressionNode( 'DiffuseColor.a = DiffuseColor.a * OPACITY;' ) );
-
-			// ALPHA TEST
-
-			let alphaTest = null;
-
-			if ( material.alphaTestNode && material.alphaTestNode.isNode ) {
-
-				alphaTest = material.alphaTestNode;
-
-			} else if ( material.alphaTest > 0 ) {
-
-				alphaTest = new MaterialNode( MaterialNode.ALPHA_TEST );
-
-			}
-
-			if ( alphaTest !== null ) {
-
-				this.addFlow( 'fragment', new VarNode( alphaTest, 'AlphaTest', 'float' ) );
-
-				this.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
-
-			}
-
-			if ( material.isMeshStandardMaterial ) {
-
-				// METALNESS
-
-				let metalnessNode = null;
-
-				if ( material.metalnessNode && material.metalnessNode.isNode ) {
-
-					metalnessNode = material.metalnessNode;
-
-				} else {
-
-					metalnessNode = new MaterialNode( MaterialNode.METALNESS );
-
-				}
-
-				this.addFlow( 'fragment', new VarNode( metalnessNode, 'Metalness', 'float' ) );
-
-				this.addFlow( 'fragment', new ExpressionNode( 'DiffuseColor = vec4<f32>( DiffuseColor.rgb * ( 1.0 - Metalness ), DiffuseColor.a );' ) );
-
-				// ROUGHNESS
-
-				let roughnessNode = null;
-
-				if ( material.roughnessNode && material.roughnessNode.isNode ) {
-
-					roughnessNode = material.roughnessNode;
-
-				} else {
-
-					roughnessNode = new MaterialNode( MaterialNode.ROUGHNESS );
-
-				}
-
-				roughnessNode = getRoughness( { roughness: roughnessNode } );
-
-				this.addFlow( 'fragment', new VarNode( roughnessNode, 'Roughness', 'float' ) );
-
-				// SPECULAR_TINT
-
-				this.addFlow( 'fragment', new VarNode( new ExpressionNode( 'mix( vec3<f32>( 0.04 ), Color.rgb, Metalness )', 'vec3' ), 'SpecularColor', 'color' ) );
-
-				// NORMAL_VIEW
-
-				let normalNode = null;
-
-				if ( material.normalNode && material.normalNode.isNode ) {
-
-					normalNode = material.normalNode;
-
-				} else {
-
-					normalNode = new NormalNode( NormalNode.VIEW );
-
-				}
-
-				this.addFlow( 'fragment', new VarNode( normalNode, 'TransformedNormalView', 'vec3' ) );
-
-			}
-
-			// LIGHT
-
-			let outputNode = diffuseColorNode;
-
-			if ( lightNode && lightNode.isNode && lightNode.hasLight !== false ) {
-
-				const lightContextNode = new LightContextNode( lightNode );
-
-				outputNode = this.addFlow( 'fragment', new VarNode( lightContextNode, 'Light', 'vec3' ) );
-
-			}
-
-			// OUTGOING LIGHT
-
-			let outgoingLightNode = vec3( outputNode );
-
-			// EMISSIVE
-
-			const emissiveNode = material.emissiveNode;
-
-			if ( emissiveNode && emissiveNode.isNode ) {
-
-				outgoingLightNode = add( emissiveNode, outgoingLightNode );
-
-			}
-
-			// OUTPUT
-
-			outputNode = join( vec3( outgoingLightNode ), nodeObject( diffuseColorNode ).w );
-
-			// ENCODING
-
-			const outputEncoding = this.renderer.outputEncoding;
-
-			if ( outputEncoding !== LinearEncoding ) {
-
-				outputNode = new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, outputNode );
-				outputNode.fromEncoding( outputEncoding );
-
-			}
-
-			// FOG
-
-			const fogNode = this.fogNode;
-
-			if ( fogNode && fogNode.isFogNode ) {
-
-				outputNode = mix( outputNode, fogNode.colorNode, fogNode );
-
-			}
-
-			// RESULT
-
-			this.addFlow( 'fragment', new VarNode( outputNode, 'Output', 'vec4' ) );
-
-		}
 
 	}
 

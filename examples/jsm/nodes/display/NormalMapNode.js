@@ -1,6 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
-import { ShaderNode, positionView, normalView, uv, join, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../ShaderNode.js';
+import ShaderNode from '../shadernode/ShaderNode.js';
+import { positionView, normalView, uv, join, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../shadernode/ShaderNodeElements.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 

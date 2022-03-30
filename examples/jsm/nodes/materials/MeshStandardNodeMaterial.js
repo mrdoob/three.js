@@ -1,4 +1,11 @@
 import NodeMaterial from './NodeMaterial.js';
+import {
+	float, vec3, vec4,
+	assign, label, mul, invert, mix,
+	normalView,
+	materialRoughness, materialMetalness
+} from '../shadernode/ShaderNodeElements.js';
+import { getRoughness } from '../functions/PhysicalMaterialFunctions.js';
 import { MeshStandardMaterial } from 'three';
 
 const defaultValues = new MeshStandardMaterial();
@@ -33,6 +40,50 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
+
+	}
+
+	build( builder ) {
+
+		const lightNode = this.lightNode || builder.lightNode; // use scene lights
+
+		let { colorNode, diffuseColorNode } = this.generateMain( builder );
+
+		diffuseColorNode = this.generateStandardMaterial( builder, { colorNode, diffuseColorNode } );
+
+		this.generateLight( builder, diffuseColorNode, lightNode );
+
+	}
+
+	generateStandardMaterial( builder, { colorNode, diffuseColorNode } ) {
+
+		// METALNESS
+
+		let metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
+
+		metalnessNode = builder.addFlow( 'fragment', label( metalnessNode, 'Metalness' ) );
+		builder.addFlow( 'fragment', assign( diffuseColorNode, vec4( mul( diffuseColorNode.rgb, invert( metalnessNode ) ), diffuseColorNode.a ) ) );
+
+		// ROUGHNESS
+
+		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
+		roughnessNode = getRoughness( { roughness: roughnessNode } );
+
+		builder.addFlow( 'fragment', label( roughnessNode, 'Roughness' ) );
+
+		// SPECULAR COLOR
+
+		const specularColorNode = mix( vec3( 0.04 ), colorNode.rgb, metalnessNode );
+
+		builder.addFlow( 'fragment', label( specularColorNode, 'SpecularColor' ) );
+
+		// NORMAL VIEW
+
+		const normalNode = this.normalNode ? vec3( this.normalNode ) : normalView;
+
+		builder.addFlow( 'fragment', label( normalNode, 'TransformedNormalView' ) );
+
+		return diffuseColorNode;
 
 	}
 

@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { nodeObject, normalWorld, positionWorld, cameraPosition, sub, normalize, join, negate, reflect } from '../ShaderNode.js';
+import { nodeObject, normalWorld, positionWorld, cameraPosition, sub, normalize, join, negate, reflect } from '../shadernode/ShaderNodeElements.js';
 
 class ReflectNode extends Node {
 

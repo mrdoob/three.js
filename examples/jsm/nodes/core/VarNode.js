@@ -2,9 +2,9 @@ import Node from './Node.js';
 
 class VarNode extends Node {
 
-	constructor( node, name = null, nodeType = null ) {
+	constructor( node, name = null ) {
 
-		super( nodeType );
+		super();
 
 		this.node = node;
 		this.name = name;
@@ -19,7 +19,7 @@ class VarNode extends Node {
 
 	getNodeType( builder ) {
 
-		return super.getNodeType( builder ) || this.node.getNodeType( builder );
+		return this.node.getNodeType( builder );
 
 	}
 

@@ -1,5 +1,5 @@
 import FogNode from './FogNode.js';
-import { smoothstep, negate, positionView } from '../ShaderNode.js';
+import { smoothstep, negate, positionView } from '../shadernode/ShaderNodeElements.js';
 
 class FogRangeNode extends FogNode {
 

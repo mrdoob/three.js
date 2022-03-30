@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import TimerNode from './TimerNode.js';
-import { abs, fract, round, sin, add, sub, mul } from '../ShaderNode.js';
+import { abs, fract, round, sin, add, sub, mul } from '../shadernode/ShaderNodeElements.js';
 
 class OscNode extends Node {
 

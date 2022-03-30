@@ -1,10 +1,11 @@
-import { ShaderNode,
+import ShaderNode from '../shadernode/ShaderNode.js';
+import {
 	add, addTo, sub, mul, div, saturate, dot, pow, pow2, exp2, normalize, max, sqrt, negate,
 	cond, greaterThan, and,
 	transformedNormalView, positionViewDirection,
 	diffuseColor, specularColor, roughness,
 	EPSILON
-} from '../ShaderNode.js';
+} from '../shadernode/ShaderNodeElements.js';
 
 export const F_Schlick = new ShaderNode( ( inputs ) => {
 
