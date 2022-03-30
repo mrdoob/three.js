@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from './core/Node.js';
 
 import {
 	nodeObject,
@@ -61,7 +61,7 @@ const Skinning = ( inputs, builder ) => {
 
 };
 
-class SkinningNode extends TempNode {
+class SkinningNode extends Node {
 
 	constructor( skinnedMesh ) {
 

@@ -4,6 +4,7 @@ import VarNode from './core/VarNode.js';
 import AttributeNode from './core/AttributeNode.js';
 import ConstNode from './core/ConstNode.js';
 import UniformNode from './core/UniformNode.js';
+import BypassNode from './core/BypassNode.js';
 
 // accessor nodes
 import BufferNode from './accessors/BufferNode.js';
@@ -396,6 +397,8 @@ export const skinning = new ShaderNodeProxy( SkinningNode );
 export const lightContext = new ShaderNodeProxy( LightContextNode );
 
 export const toColorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
+
+export const bypass = new ShaderNodeProxy( BypassNode );
 
 export const abs = new ShaderNodeProxy( MathNode, 'abs' );
 export const acos = new ShaderNodeProxy( MathNode, 'acos' );

@@ -3,7 +3,7 @@ import { getNodesKeys } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
-	assign, label, mul, add, mix,
+	assign, label, mul, add, mix, bypass,
 	positionLocal, skinning, modelViewProjection, lightContext, toColorSpace,
 	materialAlphaTest, materialColor, materialOpacity
 } from '../ShaderNode.js';
@@ -34,8 +34,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		let vertex = positionLocal;
 
-		if ( this.positionNode ) vertex = builder.addFlow( 'vertex', assign( positionLocal, this.positionNode ) );
-		if ( builder.object.isSkinnedMesh ) vertex = builder.addFlow( 'vertex', skinning( builder.object ) );
+		if ( this.positionNode ) vertex = bypass( vertex, assign( positionLocal, this.positionNode ) );
+		if ( builder.object.isSkinnedMesh ) vertex = bypass( vertex, skinning( builder.object ) );
 
 		builder.context.vertex = vertex;
 
