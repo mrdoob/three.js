@@ -32,8 +32,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		// VERTEX STAGE
 
-		if ( this.positionNode ) builder.addFlow( 'vertex', assign( positionLocal, this.positionNode ) );
-		if ( builder.object.isSkinnedMesh ) builder.addFlow( 'vertex', skinning( builder.object ) );
+		let vertex = positionLocal;
+
+		if ( this.positionNode ) vertex = builder.addFlow( 'vertex', assign( positionLocal, this.positionNode ) );
+		if ( builder.object.isSkinnedMesh ) vertex = builder.addFlow( 'vertex', skinning( builder.object ) );
+
+		builder.context.vertex = vertex;
 
 		builder.addFlow( 'vertex', modelViewProjection() );
 
