@@ -220,7 +220,13 @@ export const ConvertType = function ( type, cacheMap = null ) {
 
 			const nodes = params.map( getAutoTypedConstNode );
 
-			return nodeObject( new ConvertNode( nodes.length === 1 ? nodes[ 0 ] : new JoinNode( nodes ), type ) );
+			if ( nodes.length === 1 ) {
+
+				return nodeObject( nodes[ 0 ].nodeType === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
+
+			}
+
+			return nodeObject( new ConvertNode( new JoinNode( nodes ), type ) );
 
 		}
 

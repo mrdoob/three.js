@@ -1,7 +1,6 @@
 import Node from '../core/Node.js';
-
+import { ShaderNode } from '../utils/ShaderNodeUtils.js';
 import {
-	nodeObject,
 	attribute,
 	buffer,
 	mat4,
@@ -17,9 +16,7 @@ import {
 
 import { NodeUpdateType } from '../core/constants.js';
 
-const Skinning = ( inputs, builder ) => {
-	
-	Object.keys( inputs ).forEach( key => inputs[ key ] = nodeObject( inputs[ key ] ) );
+const Skinning = new ShaderNode( ( inputs, builder ) => {
 
 	const { index, weight, bindMatrix, bindMatrixInverse, boneMatrices } = inputs;
 
@@ -59,7 +56,7 @@ const Skinning = ( inputs, builder ) => {
 	assign( positionLocal, skinPosition ).build( builder );
 	assign( normalLocal, skinNormal ).build( builder );
 
-};
+} );
 
 class SkinningNode extends Node {
 
