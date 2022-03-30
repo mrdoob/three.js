@@ -48,7 +48,7 @@ const NodeHandler = {
 
 };
 
-const nodeObjects = new WeakMap();
+const nodeObjectsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj ) {
 
@@ -62,13 +62,13 @@ const ShaderNodeObject = function ( obj ) {
 
 		if ( obj.isNode === true ) {
 
-			let nodeObject = nodeObjects.get( obj );
+			let nodeObject = nodeObjectsCacheMap.get( obj );
 
 			if ( nodeObject === undefined ) {
 
 				nodeObject = new Proxy( obj, NodeHandler );
-				nodeObjects.set( obj, nodeObject );
-				nodeObjects.set( nodeObject, nodeObject );
+				nodeObjectsCacheMap.set( obj, nodeObject );
+				nodeObjectsCacheMap.set( nodeObject, nodeObject );
 
 			}
 
