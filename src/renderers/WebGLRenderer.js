@@ -835,6 +835,12 @@ function WebGLRenderer( parameters = {} ) {
 
 			renderer.setMode( _gl.POINTS );
 
+			if ( material.isOFTPointSpriteMaterial ) {
+
+				material.uniforms.pointSize.value = material.pointSize * getTargetPixelRatio();
+
+			}
+
 		} else if ( object.isSprite ) {
 
 			renderer.setMode( _gl.TRIANGLES );

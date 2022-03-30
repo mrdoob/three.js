@@ -68,13 +68,13 @@
 							gltf.scene.traverse( function ( child ) {
 
 								if (
-									child.isPoints && 
-									child.material.type === 'OFTPointSpriteMaterial' 
+									child.isPoints &&
+									child.material.type === 'OFTPointSpriteMaterial'
 								) {
 
-									child.material.uniforms.depthBias.value = 0.05;
-									child.material.uniforms.pointSize.value = 500;
-									child.material.uniforms.depthTexture.value = depthRT.texture;
+									child.material.depthBias = 0.05;
+									child.material.pointSize = 500;
+									child.material.depthTexture = depthRT.texture;
 
 								}
 
@@ -121,16 +121,16 @@
 				};
 
 				var size = new THREE.Vector2();
-				renderer.getSize(size);
+				renderer.getSize( size );
 				depthRT = new THREE.WebGLRenderTarget(
 					size.x,
 					size.y,
 					parameters,
 				);
 
-				depthMat = new THREE.MeshDepthMaterial({
+				depthMat = new THREE.MeshDepthMaterial( {
 					depthPacking: THREE.RGBADepthPacking,
-				});
+				} );
 
 			}
 
@@ -151,10 +151,10 @@
 
 				//render depth pass
 				scene.overrideMaterial = depthMat;
-				renderer.setRenderTarget(depthRT);
-				renderer.render(scene, camera);
+				renderer.setRenderTarget( depthRT );
+				renderer.render( scene, camera );
 				scene.overrideMaterial = null;
-				renderer.setRenderTarget(null);
+				renderer.setRenderTarget( null );
 
 				renderer.render( scene, camera );
 
