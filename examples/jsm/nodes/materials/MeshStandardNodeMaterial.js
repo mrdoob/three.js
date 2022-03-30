@@ -1,5 +1,4 @@
 import NodeMaterial from './NodeMaterial.js';
-import ShaderNode from '../shadernode/ShaderNode.js';
 import {
 	float, vec3, vec4,
 	assign, label, mul, invert, mix,
