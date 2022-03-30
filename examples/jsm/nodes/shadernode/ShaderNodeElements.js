@@ -1,38 +1,39 @@
 // core nodes
-import PropertyNode from './core/PropertyNode.js';
-import VarNode from './core/VarNode.js';
-import AttributeNode from './core/AttributeNode.js';
-import UniformNode from './core/UniformNode.js';
-import BypassNode from './core/BypassNode.js';
+import PropertyNode from '../core/PropertyNode.js';
+import VarNode from '../core/VarNode.js';
+import AttributeNode from '../core/AttributeNode.js';
+import UniformNode from '../core/UniformNode.js';
+import BypassNode from '../core/BypassNode.js';
 
 // accessor nodes
-import BufferNode from './accessors/BufferNode.js';
-import CameraNode from './accessors/CameraNode.js';
-import MaterialNode from './accessors/MaterialNode.js';
-import ModelNode from './accessors/ModelNode.js';
-import ModelViewProjectionNode from './accessors/ModelViewProjectionNode.js';
-import NormalNode from './accessors/NormalNode.js';
-import PositionNode from './accessors/PositionNode.js';
-import SkinningNode from './accessors/SkinningNode.js';
-import TextureNode from './accessors/TextureNode.js';
-import UVNode from './accessors/UVNode.js';
+import BufferNode from '../accessors/BufferNode.js';
+import CameraNode from '../accessors/CameraNode.js';
+import MaterialNode from '../accessors/MaterialNode.js';
+import ModelNode from '../accessors/ModelNode.js';
+import ModelViewProjectionNode from '../accessors/ModelViewProjectionNode.js';
+import NormalNode from '../accessors/NormalNode.js';
+import PositionNode from '../accessors/PositionNode.js';
+import SkinningNode from '../accessors/SkinningNode.js';
+import TextureNode from '../accessors/TextureNode.js';
+import UVNode from '../accessors/UVNode.js';
 
 // math nodes
-import OperatorNode from './math/OperatorNode.js';
-import CondNode from './math/CondNode.js';
-import MathNode from './math/MathNode.js';
+import OperatorNode from '../math/OperatorNode.js';
+import CondNode from '../math/CondNode.js';
+import MathNode from '../math/MathNode.js';
 
 // util nodes
-import ArrayElementNode from './utils/ArrayElementNode.js';
-import ConvertNode from './utils/ConvertNode.js';
-import JoinNode from './utils/JoinNode.js';
+import ArrayElementNode from '../utils/ArrayElementNode.js';
+import ConvertNode from '../utils/ConvertNode.js';
+import JoinNode from '../utils/JoinNode.js';
 
 // other nodes
-import ColorSpaceNode from './display/ColorSpaceNode.js';
-import LightContextNode from './lights/LightContextNode.js';
+import ColorSpaceNode from '../display/ColorSpaceNode.js';
+import LightContextNode from '../lights/LightContextNode.js';
 
 // utils
-import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, float, int, uint, bool } from './core/ShaderNodeUtils.js';
+import { nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, floatsCacheMap, intsCacheMap, uintsCacheMap, boolsCacheMap } from './ShaderNodeUtils.js';
+import ShaderNode from './ShaderNode.js';
 
 //
 // Node Material Shader Syntax
@@ -40,7 +41,10 @@ import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType,
 
 export { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy };
 
-export { float, int, uint, bool };
+export const float = new ConvertType( 'float', floatsCacheMap );
+export const int = new ConvertType( 'int', intsCacheMap );
+export const uint = new ConvertType( 'uint', uintsCacheMap );
+export const bool = new ConvertType( 'bool', boolsCacheMap );
 
 export const color = new ConvertType( 'color' );
 
@@ -96,10 +100,10 @@ export const temp = nodeProxy( VarNode );
 
 export const join = ( ...params ) => nodeObject( new JoinNode( nodeArray( params ) ) );
 
-export const uv = nodeProxy( UVNode );
-export const attribute = nodeProxy( AttributeNode );
-export const buffer = nodeProxy( BufferNode );
-export const texture = nodeProxy( TextureNode );
+export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
+export const attribute = ( ...params ) => nodeObject( new AttributeNode( ...params ) );
+export const buffer = ( ...params ) => nodeObject( new BufferNode( ...params ) );
+export const texture = ( ...params ) => nodeObject( new TextureNode( ...params ) );
 export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), 'sampler' ) );
 
 export const cond = nodeProxy( CondNode );

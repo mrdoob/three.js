@@ -1,12 +1,13 @@
 import { Material, ShaderMaterial } from 'three';
 import { getNodesKeys } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
+import ShaderNode from '../shadernode/ShaderNode.js';
 import {
 	float, vec3, vec4,
 	assign, label, mul, add, mix, bypass,
 	positionLocal, skinning, modelViewProjection, lightContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
-} from '../ShaderNode.js';
+} from '../shadernode/ShaderNodeElements.js';
 
 class NodeMaterial extends ShaderMaterial {
 

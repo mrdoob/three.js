@@ -1,10 +1,11 @@
 import NodeMaterial from './NodeMaterial.js';
+import ShaderNode from '../shadernode/ShaderNode.js';
 import {
 	float, vec3, vec4,
 	assign, label, mul, invert, mix,
 	normalView,
 	materialRoughness, materialMetalness
-} from '../ShaderNode.js';
+} from '../shadernode/ShaderNodeElements.js';
 import { getRoughness } from '../functions/PhysicalMaterialFunctions.js';
 import { MeshStandardMaterial } from 'three';
 

@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
-import { ShaderNode } from '../core/ShaderNodeUtils.js';
-import { uv, add, mul, floor, mod, sign } from '../ShaderNode.js';
+import ShaderNode from '../shadernode/ShaderNode.js';
+import { uv, add, mul, floor, mod, sign } from '../shadernode/ShaderNodeElements.js';
 
 const checkerShaderNode = new ShaderNode( ( inputs ) => {
 

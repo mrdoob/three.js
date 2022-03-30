@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { ShaderNode } from '../core/ShaderNodeUtils.js';
+import ShaderNode from '../shadernode/ShaderNode.js';
 import {
 	attribute,
 	buffer,
@@ -12,7 +12,7 @@ import {
 	add,
 	mul,
 	transformDirection
-} from '../ShaderNode.js';
+} from '../shadernode/ShaderNodeElements.js';
 
 import { NodeUpdateType } from '../core/constants.js';
 

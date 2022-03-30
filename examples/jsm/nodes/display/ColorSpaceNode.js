@@ -1,6 +1,6 @@
 import TempNode from '../core/Node.js';
-import { ShaderNode } from '../core/ShaderNodeUtils.js';
-import { vec3, pow, mul, sub, mix, join, lessThanEqual } from '../ShaderNode.js';
+import ShaderNode from '../shadernode/ShaderNode.js';
+import { vec3, pow, mul, sub, mix, join, lessThanEqual } from '../shadernode/ShaderNodeElements.js';
 
 import { LinearEncoding, sRGBEncoding } from 'three';
 
