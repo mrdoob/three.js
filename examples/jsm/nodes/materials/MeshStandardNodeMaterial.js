@@ -49,13 +49,13 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		let { colorNode, diffuseColorNode } = this.generateMain( builder );
 
-		diffuseColorNode = this.applyStandardMaterialProperties( builder, { colorNode, diffuseColorNode } );
+		diffuseColorNode = this.generateStandardMaterial( builder, { colorNode, diffuseColorNode } );
 
 		this.generateLight( builder, diffuseColorNode, lightNode );
 
 	}
 
-	applyStandardMaterialProperties( builder, { colorNode, diffuseColorNode } ) {
+	generateStandardMaterial( builder, { colorNode, diffuseColorNode } ) {
 
 		// METALNESS
 

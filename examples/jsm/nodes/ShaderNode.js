@@ -168,7 +168,7 @@ export const skinning = nodeProxy( SkinningNode );
 
 export const lightContext = nodeProxy( LightContextNode );
 
-export const toColorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
+export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 
 export const bypass = nodeProxy( BypassNode );
 

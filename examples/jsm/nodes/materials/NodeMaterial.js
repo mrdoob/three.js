@@ -4,7 +4,7 @@ import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
 	assign, label, mul, add, mix, bypass,
-	positionLocal, skinning, modelViewProjection, lightContext, toColorSpace,
+	positionLocal, skinning, modelViewProjection, lightContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
 } from '../ShaderNode.js';
 
@@ -89,7 +89,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// ENCODING
 
-		outputNode = toColorSpace( outputNode, builder.renderer.outputEncoding );
+		outputNode = colorSpace( outputNode, builder.renderer.outputEncoding );
 
 		// FOG
 
