@@ -4,7 +4,7 @@ import JoinNode from './JoinNode.js';
 import SplitNode from './SplitNode.js';
 
 import ConstNode from '../core/ConstNode.js';
-import { getValueFromType } from './core/NodeUtils.js';
+import { getValueFromType } from '../core/NodeUtils.js';
 
 const NodeHandler = {
 

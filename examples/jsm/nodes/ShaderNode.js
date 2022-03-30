@@ -23,6 +23,7 @@ import CondNode from './math/CondNode.js';
 import MathNode from './math/MathNode.js';
 
 // util nodes
+import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
 
