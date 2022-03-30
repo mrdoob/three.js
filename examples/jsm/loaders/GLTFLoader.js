@@ -1948,7 +1948,6 @@ class GLTFMaterialsPointSpriteExtension {
 
 			uniform sampler2D pointTexture;
 			uniform sampler2D depthTexture;
-			uniform sampler2D colorTexture;
 			uniform float depthBias;
 
 			varying vec4 vColor;
@@ -1990,7 +1989,7 @@ class GLTFMaterialsPointSpriteExtension {
 			void main() {
 				vec3 projCoords = vMvpPosition.xyz / vMvpPosition.w;
 				projCoords = projCoords * 0.5 + 0.5;
-				float depth = unpackRGBAToDepth(texture2D(colorTexture, projCoords.xy));
+				float depth = unpackRGBAToDepth(texture2D(depthTexture, projCoords.xy));
 				if (projCoords.z - depth >= depthBias) discard;
 
 				if (vIntensity <= 0.0) discard;
