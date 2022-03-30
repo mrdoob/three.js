@@ -157,7 +157,7 @@ export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
 export const nodeObject = ( val ) => new ShaderNodeObject( val );
 export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
 export const nodeArray = ( val ) => new ShaderNodeArray( val );
-export const nodeProxy = ( val ) => new ShaderNodeProxy( val );
+export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
