@@ -10826,8 +10826,9 @@ function WebGLBackground(renderer, cubemaps, state, objects, alpha, premultiplie
 				currentBackground = background;
 				currentBackgroundVersion = background.version;
 				currentTonemapping = renderer.toneMapping;
-			} // push to the pre-sorted opaque render list
+			}
 
+			boxMesh.layers.enableAll(); // push to the pre-sorted opaque render list
 
 			renderList.unshift(boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null);
 		} else if (background && background.isTexture) {
@@ -10865,8 +10866,9 @@ function WebGLBackground(renderer, cubemaps, state, objects, alpha, premultiplie
 				currentBackground = background;
 				currentBackgroundVersion = background.version;
 				currentTonemapping = renderer.toneMapping;
-			} // push to the pre-sorted opaque render list
+			}
 
+			planeMesh.layers.enableAll(); // push to the pre-sorted opaque render list
 
 			renderList.unshift(planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null);
 		}
@@ -17964,7 +17966,10 @@ function WebGLUtils(gl, extensions, capabilities) {
 			} else {
 				return null;
 			}
-		}
+		} // if "p" can't be resolved, assume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
+
+
+		return gl[p] !== undefined ? gl[p] : null;
 	}
 
 	return {

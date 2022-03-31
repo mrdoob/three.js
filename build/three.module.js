@@ -14033,6 +14033,8 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			}
 
+			boxMesh.layers.enableAll();
+
 			// push to the pre-sorted opaque render list
 			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
 
@@ -14093,6 +14095,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			}
 
+			planeMesh.layers.enableAll();
 
 			// push to the pre-sorted opaque render list
 			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null );
@@ -24386,6 +24389,10 @@ function WebGLUtils( gl, extensions, capabilities ) {
 			}
 
 		}
+
+		// if "p" can't be resolved, assume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
+
+		return ( gl[ p ] !== undefined ) ? gl[ p ] : null;
 
 	}
 
