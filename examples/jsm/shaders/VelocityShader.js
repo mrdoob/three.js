@@ -1,18 +1,18 @@
 import {
 	UniformsLib,
-	mergeUniforms,
+	UniformsUtils,
 	Matrix4
 } from 'three';
 
 /**
- * Mesh Velocity Shader
+ * Mesh Velocity Shader @bhouston
  */
 
 const VelocityShader = {
 
-	uniforms: mergeUniforms( [
+	uniforms: UniformsUtils.merge( [
 		UniformsLib.common,
-		UniformsLib.displacementMap,
+		UniformsLib.displacementmap,
 		{
 			currentProjectionViewMatrix: { value: new Matrix4() },
 			previousProjectionViewMatrix: { value: new Matrix4() }
@@ -122,4 +122,4 @@ void main() {
 `
 };
 
-export { NormalMapShader };
+export { VelocityShader };
