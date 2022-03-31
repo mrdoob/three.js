@@ -11,12 +11,23 @@ import {
 	Vector3,
 } from 'three';
 
+function computeTangents() {
 
-function computeTangents( geometry, MikkTSpace, negateSign = true ) {
+	throw new Error( 'BufferGeometryUtils: computeTangents renamed to computeMikkTSpaceTangents.' );
+
+}
+
+function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	if ( ! MikkTSpace || ! MikkTSpace.isReady ) {
 
 		throw new Error( 'BufferGeometryUtils: Initialized MikkTSpace library required.' );
+
+	}
+
+	if ( ! geometry.hasAttribute( 'position' ) || ! geometry.hasAttribute( 'normal' ) || ! geometry.hasAttribute( 'uv' ) ) {
+
+		throw new Error( 'BufferGeometryUtils: Tangents require "position", "normal", and "uv" attributes.' );
 
 	}
 
@@ -1110,6 +1121,7 @@ function mergeGroups( geometry ) {
 
 export {
 	computeTangents,
+	computeMikkTSpaceTangents,
 	mergeBufferGeometries,
 	mergeBufferAttributes,
 	interleaveAttributes,
