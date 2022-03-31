@@ -399,7 +399,7 @@ class TeapotGeometry extends BufferGeometry {
 		segments = Math.max( 2, Math.floor( segments ) );
 
 		// Jim Blinn scaled the teapot down in size by about 1.3 for
-		// some rendering tests. He liked the new proportions that he kept
+		// some rendering tests. They liked the new proportions that they kept
 		// the data in this form. The model was distributed with these new
 		// proportions and became the norm. Trivia: comparing images of the
 		// real teapot and the computer model, the ratio for the bowl of the

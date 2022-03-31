@@ -161,7 +161,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
     const u = ndx / sphereShadowBases.length;
 
     // calculer une position pour la base. Cela va bouger
-    // à la fois la sphère et son ombre
+    // à la fois la sphère et child ombre
     const speed = time * .2;
     const angle = speed + u * Math.PI * 2 * (ndx % 1 ? 1 : -1);
     const radius = Math.sin(speed - ndx) * 10;
