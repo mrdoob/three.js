@@ -342,7 +342,7 @@
 			"后期处理": "zh/post-processing",
 			"Applying a LUT File for effects": "zh/post-processing-3dlut",
 			"Using Shadertoy shaders": "zh/shadertoy",
-			"Aligning HTML Elements to 3D": "zh/align-html-elements-to-3d",
+			"对齐HTML元素和3D对象": "zh/align-html-elements-to-3d",
 			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
 			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
 			"Billboards and Facades": "zh/billboards",
