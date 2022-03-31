@@ -5,7 +5,7 @@ import SplitNode from '../utils/SplitNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType } from '../core/NodeUtils.js';
 
-export const NodeHandler = {
+export const shaderNodeHandler = {
 
 	construct( NodeClosure, params ) {
 
@@ -65,7 +65,7 @@ const ShaderNodeObject = function ( obj ) {
 
 			if ( nodeObject === undefined ) {
 
-				nodeObject = new Proxy( obj, NodeHandler );
+				nodeObject = new Proxy( obj, shaderNodeHandler );
 				nodeObjectsCacheMap.set( obj, nodeObject );
 				nodeObjectsCacheMap.set( nodeObject, nodeObject );
 
@@ -161,18 +161,20 @@ const uints = [ 0, 1, 2, 3 ];
 const ints = [ -1, -2 ];
 const floats = [ 0.5, 1.5, 1 / 3, 1e-6, 1e6, Math.PI, Math.PI * 2, 1 / Math.PI, 2 / Math.PI, 1 / ( Math.PI * 2 ), Math.PI / 2 ];
 
-export const boolsCacheMap = new Map();
+const boolsCacheMap = new Map();
 for ( let bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
 
-export const uintsCacheMap = new Map();
+const uintsCacheMap = new Map();
 for ( let uint of uints ) uintsCacheMap.set( uint, new ConstNode( uint, 'uint' ) );
 
-export const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
+const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
 for ( let int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
 
-export const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
+const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
 for ( let float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
 for ( let float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
+
+export const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
 const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
 

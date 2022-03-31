@@ -1,5 +1,5 @@
-import { ShaderNodeScript, NodeHandler } from './ShaderNodeUtils.js';
+import { ShaderNodeScript, shaderNodeHandler } from './ShaderNodeUtils.js';
 
-const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
+const ShaderNode = new Proxy( ShaderNodeScript, shaderNodeHandler );
 
 export default ShaderNode;
