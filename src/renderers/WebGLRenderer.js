@@ -1751,7 +1751,6 @@ function WebGLRenderer( parameters = {} ) {
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
-
 		return program;
 
 	}

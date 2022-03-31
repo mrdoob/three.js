@@ -335,7 +335,7 @@
 
 				scene.traverse( function( object ) {
 				    if ( object.isMesh ) {
-				        if ( object.matrixWorldPrevious === undefined ) object.matrixWorldPrevious = new Matrix4();
+				        if ( object.matrixWorldPrevious === undefined ) object.matrixWorldPrevious = new THREE.Matrix4();
 				        object.matrixWorldPrevious.copy( object.matrixWorld );
 				    }
 				} );

@@ -42,6 +42,8 @@ const VelocityShader = {
 uniform mat4 previousProjectionViewMatrix;
 uniform mat4 currentProjectionViewMatrix;
 
+uniform mat4 modelMatrixPrev;
+
 varying vec4 clipPositionCurrent;
 varying vec4 clipPositionPrevious;
 
