@@ -32,8 +32,7 @@ import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import LightContextNode from '../lights/LightContextNode.js';
 
 // utils
-import { nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, floatsCacheMap, intsCacheMap, uintsCacheMap, boolsCacheMap } from './ShaderNodeUtils.js';
-import ShaderNode from './ShaderNode.js';
+import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, cacheMaps } from './ShaderNodeUtils.js';
 
 //
 // Node Material Shader Syntax
@@ -41,12 +40,12 @@ import ShaderNode from './ShaderNode.js';
 
 export { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy };
 
-export const float = new ConvertType( 'float', floatsCacheMap );
-export const int = new ConvertType( 'int', intsCacheMap );
-export const uint = new ConvertType( 'uint', uintsCacheMap );
-export const bool = new ConvertType( 'bool', boolsCacheMap );
-
 export const color = new ConvertType( 'color' );
+
+export const float = new ConvertType( 'float', cacheMaps.float );
+export const int = new ConvertType( 'int', cacheMaps.int );
+export const uint = new ConvertType( 'uint', cacheMaps.uint );
+export const bool = new ConvertType( 'bool', cacheMaps.bool );
 
 export const vec2 = new ConvertType( 'vec2' );
 export const ivec2 = new ConvertType( 'ivec2' );
