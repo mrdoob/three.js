@@ -10,10 +10,15 @@ import {
 	TrianglesDrawMode,
 	Vector3,
 } from 'three';
-import { generateTangents } from '../libs/mikktspace.module.js';
 
 
-function computeTangents( geometry, negateSign = true ) {
+function computeTangents( geometry, MikkTSpace, negateSign = true ) {
+
+	if ( ! MikkTSpace || ! MikkTSpace.isReady ) {
+
+		throw new Error( 'BufferGeometryUtils: Initialized MikkTSpace library required.' );
+
+	}
 
 	function getAttributeArray( attribute ) {
 
@@ -55,7 +60,7 @@ function computeTangents( geometry, negateSign = true ) {
 
 	// Compute vertex tangents.
 
-	const tangents = generateTangents(
+	const tangents = MikkTSpace.generateTangents(
 
 		getAttributeArray( _geometry.attributes.position ),
 		getAttributeArray( _geometry.attributes.normal ),
@@ -80,7 +85,13 @@ function computeTangents( geometry, negateSign = true ) {
 
 	_geometry.setAttribute( 'tangent', new BufferAttribute( tangents, 4 ) );
 
-	return geometry.copy( _geometry );
+	if ( geometry !== _geometry ) {
+
+		geometry.copy( _geometry )
+
+	}
+
+	return geometry;
 
 }
 
