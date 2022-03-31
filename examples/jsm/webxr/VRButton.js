@@ -186,10 +186,9 @@ class VRButton {
 
 		if ( 'xr' in navigator ) {
 
-			// WebXRViewer (based on Firefox) has a bug where addEventListener 
+			// WebXRViewer (based on Firefox) has a bug where addEventListener
 			// throws a silent exception and aborts execution entirely.
-			const isWebXRViewer = /WebXRViewer\//i.test( navigator.userAgent );
-			if( isWebXRViewer ) return;
+			if ( /WebXRViewer\//i.test( navigator.userAgent ) ) return;
 
 			navigator.xr.addEventListener( 'sessiongranted', () => {
 
