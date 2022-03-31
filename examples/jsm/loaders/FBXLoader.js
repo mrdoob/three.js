@@ -2606,6 +2606,10 @@ class AnimationParser {
 			tracks = tracks.concat( scope.generateTracks( rawTracks ) );
 
 		} );
+		
+		tracks.forEach(function (track) {
+			track.times = track.times.map(time => time - track.times[0]);
+		});
 
 		return new AnimationClip( rawClip.name, - 1, tracks );
 
