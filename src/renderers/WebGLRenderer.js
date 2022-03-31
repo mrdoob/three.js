@@ -1749,7 +1749,6 @@ function WebGLRenderer( parameters = {} ) {
 
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
-		p_uniforms.setValue( _gl, 'modelMatrixPrev', object.matrixWorldPrevious );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 

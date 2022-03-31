@@ -14,6 +14,7 @@ const VelocityShader = {
 		UniformsLib.common,
 		UniformsLib.displacementmap,
 		{
+			modelMatrixPrev: { value: new Matrix4() },
 			currentProjectionViewMatrix: { value: new Matrix4() },
 			previousProjectionViewMatrix: { value: new Matrix4() }
 		}
