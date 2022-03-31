@@ -5,7 +5,7 @@ import SplitNode from '../utils/SplitNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType } from '../core/NodeUtils.js';
 
-const NodeHandler = {
+export const shaderNodeHandler = {
 
 	construct( NodeClosure, params ) {
 
@@ -65,7 +65,7 @@ const ShaderNodeObject = function ( obj ) {
 
 			if ( nodeObject === undefined ) {
 
-				nodeObject = new Proxy( obj, NodeHandler );
+				nodeObject = new Proxy( obj, shaderNodeHandler );
 				nodeObjectsCacheMap.set( obj, nodeObject );
 				nodeObjectsCacheMap.set( nodeObject, nodeObject );
 
@@ -139,7 +139,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 };
 
-const ShaderNodeScript = function ( jsFunc ) {
+export const ShaderNodeScript = function ( jsFunc ) {
 
 	return ( inputs, builder ) => {
 
@@ -150,8 +150,6 @@ const ShaderNodeScript = function ( jsFunc ) {
 	};
 
 };
-
-export const ShaderNode = new Proxy( ShaderNodeScript, NodeHandler );
 
 export const nodeObject = ( val ) => new ShaderNodeObject( val );
 export const nodeObjects = ( val ) => new ShaderNodeObjects( val );

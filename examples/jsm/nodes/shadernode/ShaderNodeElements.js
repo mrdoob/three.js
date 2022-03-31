@@ -32,7 +32,8 @@ import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import LightContextNode from '../lights/LightContextNode.js';
 
 // utils
-import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, cacheMaps } from './ShaderNodeUtils.js';
+import ShaderNode from './ShaderNode.js';
+import { nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, cacheMaps } from './ShaderNodeUtils.js';
 
 //
 // Node Material Shader Syntax
