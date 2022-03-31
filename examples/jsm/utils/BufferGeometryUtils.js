@@ -468,11 +468,20 @@ export function deinterleaveGeometry( geometry ) {
 
 	const attributes = geometry.attributes;
 	const morphTargets = geometry.morphTargets;
+	const attrMap = new Map();
+
 	for ( const key in attributes ) {
 
-		if ( attributes[ key ].isInterleavedBufferAttribute ) {
+		const attr = attributes[ key ];
+		if ( attr.isInterleavedBufferAttribute ) {
 
-			attributes[ key ] = deinterleaveAttribute( attributes[ key ] );
+			if ( ! attrMap.has( attr ) ) {
+
+				attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+			}
+
+			attributes[ key ] = attrMap.get( attr );
 
 		}
 
@@ -480,9 +489,16 @@ export function deinterleaveGeometry( geometry ) {
 
 	for ( const key in morphTargets ) {
 
-		if ( morphTargets[ key ].isInstancedInterleavedBufferAttribute ) {
+		const attr = morphTargets[ key ];
+		if ( attr.isInterleavedBufferAttribute ) {
 
-			morphTargets[ key ] = deinterleaveAttribute( morphTargets[ key ] );
+			if ( ! attrMap.has( attr ) ) {
+
+				attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+			}
+
+			morphTargets[ key ] = attrMap.get( attr );
 
 		}
 
