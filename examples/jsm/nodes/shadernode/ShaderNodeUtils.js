@@ -2,7 +2,6 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
-
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType } from '../core/NodeUtils.js';
 
@@ -36,7 +35,7 @@ export const NodeHandler = {
 
 				// accessing array
 
-				return new ShaderNodeObject( new ArrayElementNode( node, uint( Number( prop ) ) ) );
+				return new ShaderNodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
 
 			}
 
@@ -160,7 +159,7 @@ export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
 const ints = [ -1, -2 ];
-const floats = [ 0.5, 1.5, 1 / 3, 1e-6, 1e6, Math.PI, Math.PI * 2, 1 / Math.PI, 2 / Math.PI, 1 / ( Math.PI * 2), Math.PI / 2 ];
+const floats = [ 0.5, 1.5, 1 / 3, 1e-6, 1e6, Math.PI, Math.PI * 2, 1 / Math.PI, 2 / Math.PI, 1 / ( Math.PI * 2 ), Math.PI / 2 ];
 
 export const boolsCacheMap = new Map();
 for ( let bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
