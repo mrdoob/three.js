@@ -1120,6 +1120,7 @@ function mergeGroups( geometry ) {
 }
 
 export {
+	computeTangents,
 	computeMikkTSpaceTangents,
 	mergeBufferGeometries,
 	mergeBufferAttributes,
