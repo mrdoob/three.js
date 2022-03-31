@@ -2580,7 +2580,11 @@ class GLTFParser {
 					break;
 
 				case 'animation':
-					dependency = this.loadAnimation( index );
+					dependency = this._invokeOne( function ( ext ) {
+		
+						return ext.loadAnimation && ext.loadAnimation( index );
+		
+					} );
 					break;
 
 				case 'camera':
