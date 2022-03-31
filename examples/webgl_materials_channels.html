@@ -34,6 +34,7 @@
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { MeshVelocityShader } from './jsm/shaders/MeshVelocityShader.js';
 
 			let stats;
 
@@ -190,15 +191,16 @@
 					side: THREE.DoubleSide
 				} );
 
-				materialVelocity = new THREE.MeshVelocityMaterial( {
-					displacementMap: displacementMap,
-					displacementScale: SCALE,
-					displacementBias: BIAS,
-
-					//flatShading: true,
-
+				materialVelocity = new THREE.ShaderMaterial( {
+					uniforms: THREE.UniformsUtils.clone( MeshVelocityShader.uniforms ),
+					vertexShader: MeshVelocityShader.vertexShader,
+					fragmentShader: MeshVelocityShader.fragmentShader,
 					side: THREE.DoubleSide
 				} );
+				materialVelocity.uniforms[displacementMap].value = displacementMap;
+				materialVelocity.uniforms[displacementScale].value = SCALE;
+				materialVelocity.uniforms[displacementBias].value = BIAS;
+				materialVelocity.extensions.derivatives = true;
 
 				//
 
