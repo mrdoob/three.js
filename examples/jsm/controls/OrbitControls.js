@@ -376,7 +376,7 @@ class OrbitControls extends EventDispatcher {
 			if ( obj.parent )
 				obj.parent.worldToLocal( val );
 
-			obj.position.set( val.x, val.y, val.z );
+			obj.position.copy( val );
 
 		}
 
