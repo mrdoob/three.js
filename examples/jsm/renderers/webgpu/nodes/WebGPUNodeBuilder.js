@@ -118,7 +118,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		}
 
-		super.addFlowCode( '\t' + code + '\n' );
+		super.addFlowCode( code + '\n\t' );
 
 	}
 
@@ -481,7 +481,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			let flow = '// code\n';
 			flow += `\t${ this.flowCode[ shaderStage ] }`;
-			flow += '\n';
+			flow += '\n\t';
 
 			const flowNodes = this.flowNodes[ shaderStage ];
 			const mainNode = flowNodes[ flowNodes.length - 1 ];
