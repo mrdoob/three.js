@@ -30,10 +30,8 @@ class WebGPUTextureUtils {
 
 		const mipmapVertexSource = `
 struct VarysStruct {
-
-	@builtin( position ) Position: vec4<f32>;
-	@location( 0 ) vTex : vec2<f32>;
-
+	@builtin( position ) Position: vec4<f32>,
+	@location( 0 ) vTex : vec2<f32>
 };
 
 @stage( vertex )

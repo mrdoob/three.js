@@ -68,16 +68,6 @@ fn mod( x : f32, y : f32 ) -> f32 {
 
 }
 ` ),
-
-	smoothstep: new CodeNode( `
-fn smoothstep( low : f32, high : f32, x : f32 ) -> f32 {
-
-	let t = clamp( ( x - low ) / ( high - low ), 0.0, 1.0 );
-
-	return t * t * ( 3.0 - 2.0 * t );
-
-}
-` ),
 	repeatWrapping: new CodeNode( `
 fn repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
 
@@ -327,14 +317,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	getAttributes( shaderStage ) {
 
-		let snippet = '';
+		const snippets = [];
 
 		if ( shaderStage === 'vertex' ) {
 
 			const attributes = this.attributes;
 			const length = attributes.length;
-
-			snippet += '\n';
 
 			for ( let index = 0; index < length; index ++ ) {
 
@@ -342,28 +330,19 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				const name = attribute.name;
 				const type = this.getType( attribute.type );
 
-				snippet += `\t@location( ${index} ) ${ name } : ${ type }`;
-
-				if ( index + 1 < length ) {
-
-					snippet += ',\n';
-
-				}
+				snippets.push( `@location( ${index} ) ${ name } : ${ type }` );
 
 			}
 
-			snippet += '\n';
-
 		}
 
-		return snippet;
+		return snippets.join( ',\n\t' );
 
 	}
 
 	getVars( shaderStage ) {
 
-		let snippet = '';
-
+		const snippets = [];
 		const vars = this.vars[ shaderStage ];
 
 		for ( let index = 0; index < vars.length; index ++ ) {
@@ -373,21 +352,21 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			const name = variable.name;
 			const type = this.getType( variable.type );
 
-			snippet += `var ${name} : ${type}; `;
+			snippets.push( `\tvar ${name} : ${type};` );
 
 		}
 
-		return snippet;
+		return `\n${ snippets.join( '\n' ) }\n`;
 
 	}
 
 	getVarys( shaderStage ) {
 
-		let snippet = '';
+		const snippets = [];
 
 		if ( shaderStage === 'vertex' ) {
 
-			snippet += '\t@builtin( position ) Vertex: vec4<f32>;\n';
+			snippets.push( '@builtin( position ) Vertex: vec4<f32>' );
 
 			const varys = this.varys;
 
@@ -395,37 +374,27 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const vary = varys[ index ];
 
-				snippet += `\t@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) };\n`;
+				snippets.push( `@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }` );
 
 			}
-
-			snippet = this._getWGSLStruct( 'NodeVarysStruct', snippet );
 
 		} else if ( shaderStage === 'fragment' ) {
 
 			const varys = this.varys;
 
-			snippet += '\n';
-
 			for ( let index = 0; index < varys.length; index ++ ) {
 
 				const vary = varys[ index ];
 
-				snippet += `\t@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }`;
-
-				if ( index + 1 < varys.length ) {
-
-					snippet += ',\n';
-
-				}
+				snippets.push( `@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }` );
 
 			}
 
-			snippet += '\n';
-
 		}
 
-		return snippet;
+		const code = snippets.join( ',\n\t' );
+
+		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVarysStruct', code ) : code;
 
 	}
 
@@ -433,8 +402,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
-		let snippet = '';
-		let groupSnippet = '';
+		const bindingSnippets = [];
+		const bufferSnippets = [];
+		const groupSnippets = [];
 
 		let index = this.bindingsOffset[ shaderStage ];
 
@@ -444,21 +414,21 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' ) {
 
-					snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler; `;
+					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler;` );
 
 				}
 
-				snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>; `;
+				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>;` );
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
 				if ( shaderStage === 'fragment' ) {
 
-					snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler; `;
+					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler;` );
 
 				}
 
-				snippet += `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_cube<f32>; `;
+				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_cube<f32>;` );
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -466,9 +436,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				const bufferType = this.getType( bufferNode.bufferType );
 				const bufferCount = bufferNode.bufferCount;
 
-				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}, ${bufferCount} >;\n`;
+				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}, ${bufferCount} >\n`;
 
-				snippet += this._getWGSLUniforms( 'NodeBuffer', bufferSnippet, index ++ ) + '\n\n';
+				bufferSnippets.push( this._getWGSLUniforms( 'NodeBuffer', bufferSnippet, index ++ ) );
 
 			} else {
 
@@ -478,11 +448,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					const length = uniform.value.length;
 
-					groupSnippet += `uniform ${vectorType}[ ${length} ] ${uniform.name}; `;
+					groupSnippets.push( `uniform ${vectorType}[ ${length} ] ${uniform.name}` );
 
 				} else {
 
-					groupSnippet += `\t${uniform.name} : ${ vectorType};\n`;
+					groupSnippets.push( `\t${uniform.name} : ${ vectorType}` );
 
 				}
 
@@ -490,13 +460,16 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		}
 
-		if ( groupSnippet ) {
+		let code = bindingSnippets.join( '\n' );
+		code += bufferSnippets.join( ',\n' );
 
-			snippet += this._getWGSLUniforms( 'NodeUniforms', groupSnippet, index ++ );
+		if ( groupSnippets.length > 0 ) {
+
+			code += this._getWGSLUniforms( 'NodeUniforms', groupSnippets.join( ',\n' ), index ++ );
 
 		}
 
-		return snippet;
+		return code;
 
 	}
 
@@ -662,7 +635,7 @@ fn main( ${shaderData.varys} ) -> @location( 0 ) vec4<f32> {
 
 		return `
 struct ${name} {
-\n${vars}
+${vars}
 };`;
 
 	}
