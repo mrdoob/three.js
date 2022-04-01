@@ -18,7 +18,7 @@ const _camera = /*@__PURE__*/ new Camera();
 
 class CameraHelper extends LineSegments {
 
-	constructor( camera ) {
+	constructor( camera, colorFrustum = 0xffaa00, colorCone = 0xff0000, colorUp = 0x00aaff, colorTarget = 0xffffff, colorCross = 0x333333 ) {
 
 		const geometry = new BufferGeometry();
 		const material = new LineBasicMaterial( { color: 0xffffff, vertexColors: true, toneMapped: false } );
@@ -30,58 +30,58 @@ class CameraHelper extends LineSegments {
 
 		// colors
 
-		const colorFrustum = new Color( 0xffaa00 );
-		const colorCone = new Color( 0xff0000 );
-		const colorUp = new Color( 0x00aaff );
-		const colorTarget = new Color( 0xffffff );
-		const colorCross = new Color( 0x333333 );
+		const _colorFrustum = new Color( colorFrustum );
+		const _colorCone = new Color( colorCone );
+		const _colorUp = new Color( colorUp );
+		const _colorTarget = new Color( colorTarget );
+		const _colorCross = new Color( colorCross );
 
 		// near
 
-		addLine( 'n1', 'n2', colorFrustum );
-		addLine( 'n2', 'n4', colorFrustum );
-		addLine( 'n4', 'n3', colorFrustum );
-		addLine( 'n3', 'n1', colorFrustum );
+		addLine( 'n1', 'n2', _colorFrustum );
+		addLine( 'n2', 'n4', _colorFrustum );
+		addLine( 'n4', 'n3', _colorFrustum );
+		addLine( 'n3', 'n1', _colorFrustum );
 
 		// far
 
-		addLine( 'f1', 'f2', colorFrustum );
-		addLine( 'f2', 'f4', colorFrustum );
-		addLine( 'f4', 'f3', colorFrustum );
-		addLine( 'f3', 'f1', colorFrustum );
+		addLine( 'f1', 'f2', _colorFrustum );
+		addLine( 'f2', 'f4', _colorFrustum );
+		addLine( 'f4', 'f3', _colorFrustum );
+		addLine( 'f3', 'f1', _colorFrustum );
 
 		// sides
 
-		addLine( 'n1', 'f1', colorFrustum );
-		addLine( 'n2', 'f2', colorFrustum );
-		addLine( 'n3', 'f3', colorFrustum );
-		addLine( 'n4', 'f4', colorFrustum );
+		addLine( 'n1', 'f1', _colorFrustum );
+		addLine( 'n2', 'f2', _colorFrustum );
+		addLine( 'n3', 'f3', _colorFrustum );
+		addLine( 'n4', 'f4', _colorFrustum );
 
 		// cone
 
-		addLine( 'p', 'n1', colorCone );
-		addLine( 'p', 'n2', colorCone );
-		addLine( 'p', 'n3', colorCone );
-		addLine( 'p', 'n4', colorCone );
+		addLine( 'p', 'n1', _colorCone );
+		addLine( 'p', 'n2', _colorCone );
+		addLine( 'p', 'n3', _colorCone );
+		addLine( 'p', 'n4', _colorCone );
 
 		// up
 
-		addLine( 'u1', 'u2', colorUp );
-		addLine( 'u2', 'u3', colorUp );
-		addLine( 'u3', 'u1', colorUp );
+		addLine( 'u1', 'u2', _colorUp );
+		addLine( 'u2', 'u3', _colorUp );
+		addLine( 'u3', 'u1', _colorUp );
 
 		// target
 
-		addLine( 'c', 't', colorTarget );
-		addLine( 'p', 'c', colorCross );
+		addLine( 'c', 't', _colorTarget );
+		addLine( 'p', 'c', _colorCross );
 
 		// cross
 
-		addLine( 'cn1', 'cn2', colorCross );
-		addLine( 'cn3', 'cn4', colorCross );
+		addLine( 'cn1', 'cn2', _colorCross );
+		addLine( 'cn3', 'cn4', _colorCross );
 
-		addLine( 'cf1', 'cf2', colorCross );
-		addLine( 'cf3', 'cf4', colorCross );
+		addLine( 'cf1', 'cf2', _colorCross );
+		addLine( 'cf3', 'cf4', _colorCross );
 
 		function addLine( a, b, color ) {
 
