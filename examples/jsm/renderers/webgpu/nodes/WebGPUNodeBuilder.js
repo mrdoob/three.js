@@ -118,7 +118,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		}
 
-		super.addFlowCode( code + '\n\t' );
+		super.addFlowCode( '\t' + code + '\n' );
 
 	}
 
