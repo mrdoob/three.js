@@ -172,7 +172,7 @@ class WebGPURenderer {
 		context.configure( {
 			device: device,
 			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
-			compositingAlphaMode: 'opaque'
+			compositingAlphaMode: 'premultiplied'
 		} );
 
 		this._adapter = adapter;
@@ -957,6 +957,7 @@ class WebGPURenderer {
 				device: device,
 				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT,
+				compositingAlphaMode: 'premultiplied',
 				size: {
 					width: Math.floor( this._width * this._pixelRatio ),
 					height: Math.floor( this._height * this._pixelRatio ),
