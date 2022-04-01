@@ -25,9 +25,16 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const type = builder.getVectorType( this.getNodeType( builder ) );
 		const node = this.node;
+
+		if ( node.isTempNode === true ) {
+
+			return node.build( builder );
+
+		}
+
 		const name = this.name;
+		const type = builder.getVectorType( this.getNodeType( builder ) );
 
 		const snippet = node.build( builder, type );
 		const nodeVar = builder.getVarFromNode( this, type );
