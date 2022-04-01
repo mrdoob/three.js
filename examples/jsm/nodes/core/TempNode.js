@@ -39,4 +39,6 @@ class TempNode extends Node {
 
 }
 
+TempNode.prototype.isTempNode = true;
+
 export default TempNode;
