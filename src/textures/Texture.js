@@ -339,6 +339,8 @@ class Texture extends EventDispatcher {
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
 
+Texture.useSrgbTextures = true;
+
 Texture.prototype.isTexture = true;
 
 function serializeImage( image ) {

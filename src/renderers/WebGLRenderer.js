@@ -48,6 +48,7 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { createElementNS } from '../utils.js';
+import { Texture } from '../textures/Texture.js';
 
 function createCanvasElement() {
 
@@ -598,7 +599,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		if ( capabilities.srgbTextures && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
+		if ( capabilities.isWebGL2 && Texture.useSrgbTextures && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding ) {
 
 			encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
 

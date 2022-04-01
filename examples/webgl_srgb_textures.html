@@ -62,13 +62,13 @@
 
         //
 
-        renderer1 = new THREE.WebGLRenderer( {} );
+        renderer1 = new THREE.WebGLRenderer();
         renderer1.outputEncoding = THREE.sRGBEncoding;
         renderer1.setPixelRatio( window.devicePixelRatio );
         renderer1.setSize( window.innerWidth, window.innerHeight / 2 );
         document.body.appendChild( renderer1.domElement );
 
-        renderer2 = new THREE.WebGLRenderer( { srgbTextures: false } );
+        renderer2 = new THREE.WebGLRenderer();
         renderer2.outputEncoding = THREE.sRGBEncoding;
         renderer2.setPixelRatio( window.devicePixelRatio );
         renderer2.setSize( window.innerWidth, window.innerHeight / 2 );
@@ -80,7 +80,10 @@
 
         requestAnimationFrame( animate );
 
+        THREE.Texture.useSrgbTextures = true;
         renderer1.render( scene, camera );
+
+        THREE.Texture.useSrgbTextures = false;
         renderer2.render( scene, camera );
 
       }
