@@ -21,16 +21,11 @@ const _endEvent = { type: 'end' };
 
 class OrbitControls extends EventDispatcher {
 
-	constructor( object, domElement ) {
+	constructor( object, _domElement ) {
 
 		super();
 
-		if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
-		if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
-
 		this.object = object;
-		this.domElement = domElement;
-		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
 		// Set to false to disable this control
 		this.enabled = true;
@@ -291,6 +286,24 @@ class OrbitControls extends EventDispatcher {
 			};
 
 		}();
+
+		this.connect = function (domElement) {
+
+			if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
+
+			scope.domElement = domElement;
+			scope.domElement.style.touchAction = 'none'; // disable touch scroll
+
+			scope.domElement.addEventListener( 'contextmenu', onContextMenu );
+
+			scope.domElement.addEventListener( 'pointerdown', onPointerDown );
+			scope.domElement.addEventListener( 'pointercancel', onPointerCancel );
+			scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+
+			// force an update at start
+
+			scope.update();
+		};
 
 		this.dispose = function () {
 
@@ -1206,17 +1219,13 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		//
+		if (_domElement) {
 
-		scope.domElement.addEventListener( 'contextmenu', onContextMenu );
+			console.warn( 'THREE.OrbitControls: The domElement constructor param has been deprecated. Use .connect() instead.' );
 
-		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
-		scope.domElement.addEventListener( 'pointercancel', onPointerCancel );
-		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+			this.connect(_domElement);
 
-		// force an update at start
-
-		this.update();
+		}
 
 	}
 
