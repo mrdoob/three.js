@@ -77,7 +77,7 @@
 
 		<h3>[property:Float attenuationDistance]</h3>
 		<p>
-		Density of the medium given as the average distance (in world space) that light travels in the medium before interacting with a particle. Default is *0*.
+		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space. Default is *0*.
 		</p>
 
 		<h3>[property:Float clearcoat]</h3>
@@ -177,7 +177,7 @@
 
 		<h3>[property:Float thickness]</h3>
 		<p>
-		The thickness of the volume beneath the surface. Default is *0*.
+		The thickness of the volume beneath the surface. The value is given in the coordinate space of the mesh. If the value is 0 the material is thin-walled. Otherwise the material is a volume boundary. Default is *0*.
 		</p>
 
 		<h3>[property:Texture thicknessMap]</h3>
