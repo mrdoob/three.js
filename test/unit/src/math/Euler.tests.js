@@ -413,6 +413,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'iterable', ( assert ) => {
+
+			var e = new Euler( 0.5, 0.75, 1, 'YZX' );
+			var array = [ ...e ];
+			assert.strictEqual( array[ 0 ], 0.5, 'Euler is iterable.' );
+			assert.strictEqual( array[ 1 ], 0.75, 'Euler is iterable.' );
+			assert.strictEqual( array[ 2 ], 1, 'Euler is iterable.' );
+			assert.strictEqual( array[ 3 ], 'YZX', 'Euler is iterable.' );
+
+		} );
+
 	} );
 
 } );

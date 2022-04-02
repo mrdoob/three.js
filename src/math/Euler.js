@@ -297,6 +297,15 @@ class Euler {
 
 	_onChangeCallback() {}
 
+	*[ Symbol.iterator ]() {
+
+		yield this._x;
+		yield this._y;
+		yield this._z;
+		yield this._order;
+
+	}
+
 }
 
 Euler.prototype.isEuler = true;
