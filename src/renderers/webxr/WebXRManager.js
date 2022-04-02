@@ -331,8 +331,8 @@ class WebXRManager extends EventDispatcher {
 
 			for ( let i = 0; i < inputSources.length; i ++ ) {
 
-				const offset = inputSources[ i ].handedness === 'right' ? 1 : 0;
-				inputSourcesMap.set( inputSources[ i ], controllers[ offset ] );
+				const index = inputSources[ i ].handedness === 'right' ? 1 : 0;
+				inputSourcesMap.set( inputSources[ i ], controllers[ index ] );
 
 			}
 
