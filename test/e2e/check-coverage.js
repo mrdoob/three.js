@@ -1,4 +1,4 @@
-const fs = require( 'fs' );
+import fs from 'fs';
 
 // examples
 const E = fs.readdirSync( './examples' )
@@ -37,14 +37,14 @@ console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 
 if ( subES.length + subSE.length + subEF.length + subFE.length === 0 ) {
 
-	console.green( 'TEST PASSED! All examples is covered with screenshots and descriptions in files.js!' );
+	console.green( 'TEST PASSED! All examples is covered with screenshots and descriptions in files.json!' );
 
 } else {
 
 	if ( subES.length > 0 ) console.red( 'Make screenshot for example(s): ' + subES.join( ' ' ) );
 	if ( subSE.length > 0 ) console.red( 'Remove unnecessary screenshot(s): ' + subSE.join( ' ' ) );
-	if ( subEF.length > 0 ) console.red( 'Add description in file.js for example(s): ' + subEF.join( ' ' ) );
-	if ( subFE.length > 0 ) console.red( 'Remove description in file.js for example(s): ' + subFE.join( ' ' ) );
+	if ( subEF.length > 0 ) console.red( 'Add description in files.json for example(s): ' + subEF.join( ' ' ) );
+	if ( subFE.length > 0 ) console.red( 'Remove description in files.json for example(s): ' + subFE.join( ' ' ) );
 
 	console.red( 'TEST FAILED!' );
 

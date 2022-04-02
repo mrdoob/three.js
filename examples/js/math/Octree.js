@@ -411,19 +411,18 @@
 
 		fromGraphNode( group ) {
 
+			group.updateWorldMatrix( true, true );
 			group.traverse( obj => {
 
-				if ( obj.type === 'Mesh' ) {
+				if ( obj.isMesh === true ) {
 
-					obj.updateMatrix();
-					obj.updateWorldMatrix();
 					let geometry,
 						isTemp = false;
 
-					if ( obj.geometry.index ) {
+					if ( obj.geometry.index !== null ) {
 
 						isTemp = true;
-						geometry = obj.geometry.clone().toNonIndexed();
+						geometry = obj.geometry.toNonIndexed();
 
 					} else {
 
@@ -431,17 +430,16 @@
 
 					}
 
-					const positions = geometry.attributes.position.array;
-					const transform = obj.matrixWorld;
+					const positionAttribute = geometry.getAttribute( 'position' );
 
-					for ( let i = 0; i < positions.length; i += 9 ) {
+					for ( let i = 0; i < positionAttribute.count; i += 3 ) {
 
-						const v1 = new THREE.Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-						const v2 = new THREE.Vector3( positions[ i + 3 ], positions[ i + 4 ], positions[ i + 5 ] );
-						const v3 = new THREE.Vector3( positions[ i + 6 ], positions[ i + 7 ], positions[ i + 8 ] );
-						v1.applyMatrix4( transform );
-						v2.applyMatrix4( transform );
-						v3.applyMatrix4( transform );
+						const v1 = new THREE.Vector3().fromBufferAttribute( positionAttribute, i );
+						const v2 = new THREE.Vector3().fromBufferAttribute( positionAttribute, i + 1 );
+						const v3 = new THREE.Vector3().fromBufferAttribute( positionAttribute, i + 2 );
+						v1.applyMatrix4( obj.matrixWorld );
+						v2.applyMatrix4( obj.matrixWorld );
+						v3.applyMatrix4( obj.matrixWorld );
 						this.addTriangle( new THREE.Triangle( v1, v2, v3 ) );
 
 					}

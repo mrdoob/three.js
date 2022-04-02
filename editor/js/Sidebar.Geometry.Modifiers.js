@@ -2,15 +2,15 @@ import { UIRow, UIButton } from './libs/ui.js';
 
 function SidebarGeometryModifiers( editor, object ) {
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
-	var container = new UIRow().setPaddingLeft( '90px' );
+	const container = new UIDiv().setPaddingLeft( '90px' );
 
-	var geometry = object.geometry;
+	const geometry = object.geometry;
 
 	// Compute Vertex Normals
 
-	var button = new UIButton( 'Compute Vertex Normals' );
+	const button = new UIButton( 'Compute Vertex Normals' );
 	button.onClick( function () {
 
 		geometry.computeVertexNormals();

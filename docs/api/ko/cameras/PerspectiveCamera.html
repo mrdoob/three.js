@@ -50,7 +50,7 @@
 		<h2>프로퍼티</h2>
 		<p>
 			일반 프로퍼티는 기본 [page:Camera] 클래스를 참고하세요.<br>
-			대부분의 이 프로퍼티들은 수정한 후에 반드시 변경된 효과 적용을 위해 
+			대부분의 이 프로퍼티들은 수정한 후에 반드시 변경된 효과 적용을 위해
 			[page:PerspectiveCamera.updateProjectionMatrix .updateProjectionMatrix]를 호출해야 하는 점을 주의하세요.
 		</p>
 
@@ -80,6 +80,11 @@
 		<h3>[property:Float fov]</h3>
 		<p>카메라 아래부터 위까지, 도 단위로 표시되는 수직 시야입니다. 기본값은 *50*입니다.</p>
 
+		<h3>[property:Boolean isPerspectiveCamera]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 
 		<h3>[property:Float near]</h3>
 		<p>
@@ -102,7 +107,7 @@
 		<h2>메서드</h2>
 		<p>일반 메서드는 기본 [page:Camera] 클래스를 참고하세요.</p>
 
-		<h3>[method:null clearViewOffset]()</h3>
+		<h3>[method:undefined clearViewOffset]()</h3>
 		<p>[page:PerspectiveCamera.setViewOffset .setViewOffset] 메서드로 설정된 오프셋을 모두 제거합니다.</p>
 
 		<h3>[method:Float getEffectiveFOV]()</h3>
@@ -110,27 +115,27 @@
 
 		<h3>[method:Float getFilmHeight]()</h3>
 		<p>
-		필름에 있는 이미지의 높이를 리턴합니다. 
+		필름에 있는 이미지의 높이를 리턴합니다.
 		.aspect가 1보다 작거나 같으면(portraot 포맷) 결과는 .filmGauge와 동일합니다.
 		</p>
 
 		<h3>[method:Float getFilmWidth]()</h3>
 		<p>
-		필름에 있는 이미지의 너비를 리턴합니다. 
+		필름에 있는 이미지의 너비를 리턴합니다.
 		.aspect가 1보다 크거나 같으면(landscape 포맷) 결과는 .filmGauge와 동일합니다.
 		</p>
 
 		<h3>[method:Float getFocalLength]()</h3>
 		<p>.filmGauge에 대해 현재 .fov의 초점 길이를 리턴합니다.</p>
 
-		<h3>[method:null setFocalLength]( [param:Float focalLength] )</h3>
+		<h3>[method:undefined setFocalLength]( [param:Float focalLength] )</h3>
 		<p>
 		현재 [page:PerspectiveCamera.filmGauge .filmGauge]에 대해 초점 길이로 FOV를 설정합니다.<br /><br />
 
 		기본적으로 초점 길이는 35mm(전체 프레임) 카메라로 지정됩니다.
 		</p>
 
-		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
 		fullWidth — 멀티뷰 설정의 최대너비<br />
 		fullHeight — 멀티뷰 설정의 최대높이<br />
@@ -179,7 +184,7 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 		모니터들이 반드시 같은 크기나 구조여야 할 필요가 없다는 점을 참고하세요.
 		</p>
 
-		<h3>[method:null updateProjectionMatrix]()</h3>
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
 		<p>
 		카메라 투영 매트릭스를 업데이트합니다. 파라미터 변경 후에 반드시 호출해야합니다.
 		</p>

@@ -53,7 +53,7 @@
 
 				if ( node.nodeType !== 1 ) return;
 				const transform = getNodeTransform( node );
-				let traverseChildNodes = true;
+				let isDefsNode = false;
 				let path = null;
 
 				switch ( node.nodeName ) {
@@ -105,12 +105,13 @@
 						break;
 
 					case 'defs':
-						traverseChildNodes = false;
+						isDefsNode = true;
 						break;
 
 					case 'use':
 						style = parseStyle( node, style );
-						const usedNodeId = node.href.baseVal.substring( 1 );
+						const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
+						const usedNodeId = href.substring( 1 );
 						const usedNode = node.viewportElement.getElementById( usedNodeId );
 
 						if ( usedNode ) {
@@ -146,15 +147,22 @@
 
 				}
 
-				if ( traverseChildNodes ) {
+				const childNodes = node.childNodes;
 
-					const nodes = node.childNodes;
+				for ( let i = 0; i < childNodes.length; i ++ ) {
 
-					for ( let i = 0; i < nodes.length; i ++ ) {
+					const node = childNodes[ i ];
 
-						parseNode( nodes[ i ], style );
+					if ( isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs' ) {
+
+						// Ignore everything in defs except CSS style definitions
+						// and nested defs, because it is OK by the standard to have
+						// <style/> there.
+						continue;
 
 					}
+
+					parseNode( node, style );
 
 				}
 
@@ -192,7 +200,7 @@
 
 					const command = commands[ i ];
 					const type = command.charAt( 0 );
-					const data = command.substr( 1 ).trim();
+					const data = command.slice( 1 ).trim();
 
 					if ( isFirstPoint === true ) {
 
@@ -225,7 +233,7 @@
 
 								}
 
-								if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+								if ( j === 0 ) firstPoint.copy( point );
 
 							}
 
@@ -382,7 +390,7 @@
 
 								}
 
-								if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+								if ( j === 0 ) firstPoint.copy( point );
 
 							}
 
@@ -560,7 +568,9 @@
 
 					for ( let j = 0; j < selectorList.length; j ++ ) {
 
-						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, stylesheet.style );
+						// Remove empty rules
+						const definitions = Object.fromEntries( Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' ) );
+						stylesheets[ selectorList[ j ] ] = Object.assign( stylesheets[ selectorList[ j ] ] || {}, definitions );
 
 					}
 
@@ -651,29 +661,49 @@
 
 				const x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
 				const y = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
-				const rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || 0 );
-				const ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || 0 );
+				const rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || node.getAttribute( 'ry' ) || 0 );
+				const ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || node.getAttribute( 'rx' ) || 0 );
 				const w = parseFloatWithUnits( node.getAttribute( 'width' ) );
-				const h = parseFloatWithUnits( node.getAttribute( 'height' ) );
-				const path = new THREE.ShapePath();
-				path.moveTo( x + 2 * rx, y );
-				path.lineTo( x + w - 2 * rx, y );
-				if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
-				path.lineTo( x + w, y + h - 2 * ry );
-				if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y + h, x + w, y + h, x + w - 2 * rx, y + h );
-				path.lineTo( x + 2 * rx, y + h );
+				const h = parseFloatWithUnits( node.getAttribute( 'height' ) ); // Ellipse arc to Bezier approximation Coefficient (Inversed). See:
+				// https://spencermortensen.com/articles/bezier-circle/
+
+				const bci = 1 - 0.551915024494;
+				const path = new THREE.ShapePath(); // top left
+
+				path.moveTo( x + rx, y ); // top right
+
+				path.lineTo( x + w - rx, y );
 
 				if ( rx !== 0 || ry !== 0 ) {
 
-					path.bezierCurveTo( x, y + h, x, y + h, x, y + h - 2 * ry );
+					path.bezierCurveTo( x + w - rx * bci, y, x + w, y + ry * bci, x + w, y + ry );
 
-				}
+				} // bottom right
 
-				path.lineTo( x, y + 2 * ry );
+
+				path.lineTo( x + w, y + h - ry );
 
 				if ( rx !== 0 || ry !== 0 ) {
 
-					path.bezierCurveTo( x, y, x, y, x + 2 * rx, y );
+					path.bezierCurveTo( x + w, y + h - ry * bci, x + w - rx * bci, y + h, x + w - rx, y + h );
+
+				} // bottom left
+
+
+				path.lineTo( x + rx, y + h );
+
+				if ( rx !== 0 || ry !== 0 ) {
+
+					path.bezierCurveTo( x + rx * bci, y + h, x, y + h - ry * bci, x, y + h - ry );
+
+				} // back to top left
+
+
+				path.lineTo( x, y + ry );
+
+				if ( rx !== 0 || ry !== 0 ) {
+
+					path.bezierCurveTo( x, y + ry * bci, x + rx * bci, y, x + rx, y );
 
 				}
 
@@ -836,6 +866,7 @@
 
 				addStyle( 'fill', 'fill' );
 				addStyle( 'fill-opacity', 'fillOpacity', clamp );
+				addStyle( 'fill-rule', 'fillRule' );
 				addStyle( 'opacity', 'opacity', clamp );
 				addStyle( 'stroke', 'stroke' );
 				addStyle( 'stroke-opacity', 'strokeOpacity', clamp );
@@ -1237,8 +1268,8 @@
 
 						if ( openParPos > 0 && openParPos < closeParPos ) {
 
-							const transformType = transformText.substr( 0, openParPos );
-							const array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
+							const transformType = transformText.slice( 0, openParPos );
+							const array = parseFloats( transformText.slice( openParPos + 1 ) );
 							currentTransform.identity();
 
 							switch ( transformType ) {
@@ -1866,6 +1897,7 @@
 				}
 
 				return {
+					curves: p.curves,
 					points: points,
 					isCW: THREE.ShapeUtils.isClockWise( points ),
 					identifier: identifier ++,
@@ -1873,7 +1905,7 @@
 				};
 
 			} );
-			simplePaths = simplePaths.filter( sp => sp.points.length > 0 ); // check if path is solid or a hole
+			simplePaths = simplePaths.filter( sp => sp.points.length > 1 ); // check if path is solid or a hole
 
 			const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
 			const shapesToReturn = [];
@@ -1883,12 +1915,15 @@
 
 				if ( ! amIAHole.isHole ) {
 
-					const shape = new THREE.Shape( p.points );
+					const shape = new THREE.Shape();
+					shape.curves = p.curves;
 					const holes = isAHole.filter( h => h.isHole && h.for === p.identifier );
 					holes.forEach( h => {
 
-						const path = simplePaths[ h.identifier ];
-						shape.holes.push( new THREE.Path( path.points ) );
+						const hole = simplePaths[ h.identifier ];
+						const path = new THREE.Path();
+						path.curves = hole.curves;
+						shape.holes.push( path );
 
 					} );
 					shapesToReturn.push( shape );

@@ -16,12 +16,24 @@
 		based on greggman's <a href="https://webglsamples.org/blob/blob.html">blob</a>, original code by Henrik Rydgård
 	</div>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import Stats from './jsm/libs/stats.module.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { GUI } from './jsm/libs/lil-gui.module.min.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
 		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from './jsm/shaders/ToonShader.js';
@@ -39,6 +51,7 @@
 		let effectController;
 
 		let time = 0;
+
 		const clock = new THREE.Clock();
 
 		init();
@@ -74,13 +87,13 @@
 			// MATERIALS
 
 			materials = generateMaterials();
-			current_material = "shiny";
+			current_material = 'shiny';
 
 			// MARCHING CUBES
 
 			resolution = 28;
 
-			effect = new MarchingCubes( resolution, materials[ current_material ].m, true, true );
+			effect = new MarchingCubes( resolution, materials[ current_material ], true, true, 100000 );
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
 
@@ -133,7 +146,7 @@
 
 			// environment map
 
-			const path = "textures/cube/SwedishRoyalCastle/";
+			const path = 'textures/cube/SwedishRoyalCastle/';
 			const format = '.jpg';
 			const urls = [
 				path + 'px' + format, path + 'nx' + format,
@@ -154,77 +167,24 @@
 			const hatchingMaterial = createShaderMaterial( ToonShaderHatching, light, ambientLight );
 			const dottedMaterial = createShaderMaterial( ToonShaderDotted, light, ambientLight );
 
-			const texture = new THREE.TextureLoader().load( "textures/uv_grid_opengl.jpg" );
+			const texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
 
 			const materials = {
-
-				"chrome": {
-					m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
-					h: 0, s: 0, l: 1
-				},
-
-				"liquid": {
-					m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
-					h: 0, s: 0, l: 1
-				},
-
-				"shiny": {
-					m: new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
-					h: 0, s: 0.8, l: 0.2
-				},
-
-				"matte": {
-					m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1 } ),
-					h: 0, s: 0, l: 1
-				},
-
-				"flat": {
-					m: new THREE.MeshLambertMaterial( { color: 0x000000 } ),
-					h: 0, s: 0, l: 1
-				},
-
-				"textured": {
-					m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
-					h: 0, s: 0, l: 1
-				},
-
-				"colors": {
-					m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: true } ),
-					h: 0, s: 0, l: 1
-				},
-
-				"multiColors": {
-					m: new THREE.MeshPhongMaterial( { shininess: 2, vertexColors: true } ),
-					h: 0, s: 0, l: 1
-				},
-
-				"plastic": {
-					m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, shininess: 250 } ),
-					h: 0.6, s: 0.8, l: 0.1
-				},
-
-				"toon1": {
-					m: toonMaterial1,
-					h: 0.2, s: 1, l: 0.75
-				},
-
-				"toon2": {
-					m: toonMaterial2,
-					h: 0.4, s: 1, l: 0.75
-				},
-
-				"hatching": {
-					m: hatchingMaterial,
-					h: 0.2, s: 1, l: 0.9
-				},
-
-				"dotted": {
-					m: dottedMaterial,
-					h: 0.2, s: 1, l: 0.9
-				}
-
+				'shiny': new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
+				'chrome': new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
+				'liquid': new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
+				'matte': new THREE.MeshPhongMaterial( { specular: 0x111111, shininess: 1 } ),
+				'flat': new THREE.MeshLambertMaterial( { /*TODO flatShading: true */ } ),
+				'textured': new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
+				'colors': new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: true } ),
+				'multiColors': new THREE.MeshPhongMaterial( { shininess: 2, vertexColors: true } ),
+				'plastic': new THREE.MeshPhongMaterial( { specular: 0x888888, shininess: 250 } ),
+				'toon1': toonMaterial1,
+				'toon2': toonMaterial2,
+				'hatching': hatchingMaterial,
+				'dotted': dottedMaterial
 			};
 
 			return materials;
@@ -240,10 +200,10 @@
 
 			const material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
 
-			material.uniforms[ "uDirLightPos" ].value = light.position;
-			material.uniforms[ "uDirLightColor" ].value = light.color;
+			material.uniforms[ 'uDirLightPos' ].value = light.position;
+			material.uniforms[ 'uDirLightColor' ].value = light.color;
 
-			material.uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
+			material.uniforms[ 'uAmbientLightColor' ].value = ambientLight.color;
 
 			return material;
 
@@ -257,22 +217,11 @@
 
 				return function () {
 
-					const mat_old = materials[ current_material ];
-					mat_old.h = m_h.getValue();
-					mat_old.s = m_s.getValue();
-					mat_old.l = m_l.getValue();
-
 					current_material = id;
 
-					const mat = materials[ id ];
-					effect.material = mat.m;
-
-					m_h.setValue( mat.h );
-					m_s.setValue( mat.s );
-					m_l.setValue( mat.l );
-
-					effect.enableUvs = ( current_material === "textured" ) ? true : false;
-					effect.enableColors = ( current_material === "colors" || current_material === "multiColors" ) ? true : false;
+					effect.material = materials[ id ];
+					effect.enableUvs = ( current_material === 'textured' ) ? true : false;
+					effect.enableColors = ( current_material === 'colors' || current_material === 'multiColors' ) ? true : false;
 
 				};
 
@@ -280,7 +229,7 @@
 
 			effectController = {
 
-				material: "shiny",
+				material: 'shiny',
 
 				speed: 1.0,
 				numBlobs: 10,
@@ -290,18 +239,6 @@
 				floor: true,
 				wallx: false,
 				wallz: false,
-
-				hue: 0.0,
-				saturation: 0.8,
-				lightness: 0.1,
-
-				lhue: 0.04,
-				lsaturation: 1.0,
-				llightness: 0.5,
-
-				lx: 0.5,
-				ly: 0.5,
-				lz: 1.0,
 
 				dummy: function () {}
 
@@ -313,7 +250,7 @@
 
 			// material (type)
 
-			h = gui.addFolder( "Materials" );
+			h = gui.addFolder( 'Materials' );
 
 			for ( const m in materials ) {
 
@@ -322,42 +259,18 @@
 
 			}
 
-			// material (color)
-
-			h = gui.addFolder( "Material color" );
-
-			const m_h = h.add( effectController, "hue", 0.0, 1.0, 0.025 );
-			const m_s = h.add( effectController, "saturation", 0.0, 1.0, 0.025 );
-			const m_l = h.add( effectController, "lightness", 0.0, 1.0, 0.025 );
-
-			// light (point)
-
-			h = gui.addFolder( "Point light color" );
-
-			h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name( "hue" );
-			h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name( "saturation" );
-			h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name( "lightness" );
-
-			// light (directional)
-
-			h = gui.addFolder( "Directional light orientation" );
-
-			h.add( effectController, "lx", - 1.0, 1.0, 0.025 ).name( "x" );
-			h.add( effectController, "ly", - 1.0, 1.0, 0.025 ).name( "y" );
-			h.add( effectController, "lz", - 1.0, 1.0, 0.025 ).name( "z" );
-
 			// simulation
 
-			h = gui.addFolder( "Simulation" );
+			h = gui.addFolder( 'Simulation' );
 
-			h.add( effectController, "speed", 0.1, 8.0, 0.05 );
-			h.add( effectController, "numBlobs", 1, 50, 1 );
-			h.add( effectController, "resolution", 14, 100, 1 );
-			h.add( effectController, "isolation", 10, 300, 1 );
+			h.add( effectController, 'speed', 0.1, 8.0, 0.05 );
+			h.add( effectController, 'numBlobs', 1, 50, 1 );
+			h.add( effectController, 'resolution', 14, 100, 1 );
+			h.add( effectController, 'isolation', 10, 300, 1 );
 
-			h.add( effectController, "floor" );
-			h.add( effectController, "wallx" );
-			h.add( effectController, "wallz" );
+			h.add( effectController, 'floor' );
+			h.add( effectController, 'wallx' );
+			h.add( effectController, 'wallz' );
 
 		}
 
@@ -438,25 +351,6 @@
 			}
 
 			updateCubes( effect, time, effectController.numBlobs, effectController.floor, effectController.wallx, effectController.wallz );
-
-			// materials
-
-			if ( effect.material instanceof THREE.ShaderMaterial ) {
-
-				effect.material.uniforms[ "uBaseColor" ].value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
-
-			} else {
-
-				effect.material.color.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
-
-			}
-
-			// lights
-
-			light.position.set( effectController.lx, effectController.ly, effectController.lz );
-			light.position.normalize();
-
-			pointLight.color.setHSL( effectController.lhue, effectController.lsaturation, effectController.llightness );
 
 			// render
 

@@ -4,38 +4,38 @@ import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
 
 function SidebarProjectMaterials( editor ) {
 
-	var signals = editor.signals;
-	var strings = editor.strings;
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 
-	var headerRow = new UIRow();
+	const headerRow = new UIRow();
 	headerRow.add( new UIText( strings.getKey( 'sidebar/project/materials' ).toUpperCase() ) );
 
 	container.add( headerRow );
 
-	var listbox = new UIListbox();
+	const listbox = new UIListbox();
 	container.add( listbox );
 
 	container.add( new UIBreak() );
 
-	var buttonsRow = new UIRow();
+	const buttonsRow = new UIRow();
 	container.add( buttonsRow );
 
-	var assignMaterial = new UIButton( strings.getKey( 'sidebar/project/Assign' ) );
+	const assignMaterial = new UIButton( strings.getKey( 'sidebar/project/Assign' ) );
 	assignMaterial.onClick( function () {
 
-		var selectedObject = editor.selected;
+		const selectedObject = editor.selected;
 
 		if ( selectedObject !== null ) {
 
-			var oldMaterial = selectedObject.material;
+			const oldMaterial = selectedObject.material;
 
 			// only assing materials to objects with a material property (e.g. avoid assigning material to THREE.Group)
 
 			if ( oldMaterial !== undefined ) {
 
-				var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+				const material = editor.getMaterialById( parseInt( listbox.getValue() ) );
 
 				if ( material !== undefined ) {
 
@@ -64,7 +64,7 @@ function SidebarProjectMaterials( editor ) {
 
 		if ( object !== null ) {
 
-			var index = Object.values( editor.materials ).indexOf( object.material );
+			const index = Object.values( editor.materials ).indexOf( object.material );
 			listbox.selectIndex( index );
 
 		}

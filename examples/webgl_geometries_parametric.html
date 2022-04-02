@@ -11,13 +11,26 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - parametric geometries</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { Curves } from './jsm/curves/CurveExtras.js';
+			import * as Curves from './jsm/curves/CurveExtras.js';
+			import { ParametricGeometry } from './jsm/geometries/ParametricGeometry.js';
 			import { ParametricGeometries } from './jsm/geometries/ParametricGeometries.js';
 
 			let camera, scene, renderer, stats;
@@ -55,19 +68,19 @@
 
 				let geometry, object;
 
-				geometry = new THREE.ParametricBufferGeometry( ParametricGeometries.plane( 100, 100 ), 10, 10 );
+				geometry = new ParametricGeometry( ParametricGeometries.plane( 100, 100 ), 10, 10 );
 				geometry.center();
 				object = new THREE.Mesh( geometry, material );
 				object.position.set( - 200, 0, 200 );
 				scene.add( object );
 
-				geometry = new THREE.ParametricBufferGeometry( ParametricGeometries.klein, 20, 20 );
+				geometry = new ParametricGeometry( ParametricGeometries.klein, 20, 20 );
 				object = new THREE.Mesh( geometry, material );
 				object.position.set( 0, 0, 200 );
 				object.scale.multiplyScalar( 5 );
 				scene.add( object );
 
-				geometry = new THREE.ParametricBufferGeometry( ParametricGeometries.mobius, 20, 20 );
+				geometry = new ParametricGeometry( ParametricGeometries.mobius, 20, 20 );
 				object = new THREE.Mesh( geometry, material );
 				object.position.set( 200, 0, 200 );
 				object.scale.multiplyScalar( 30 );

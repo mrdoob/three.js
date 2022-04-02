@@ -1,22 +1,22 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
-import { UIRow, UIText, UINumber, UIInteger } from './libs/ui.js';
+import { UIDiv, UIRow, UIText, UINumber, UIInteger } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
 function GeometryParametersPanel( editor, object ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var container = new UIRow();
+	const container = new UIDiv();
 
-	var geometry = object.geometry;
-	var parameters = geometry.parameters;
+	const geometry = object.geometry;
+	const parameters = geometry.parameters;
 
 	// width
 
-	var widthRow = new UIRow();
-	var width = new UINumber( parameters.width ).onChange( update );
+	const widthRow = new UIRow();
+	const width = new UINumber( parameters.width ).onChange( update );
 
 	widthRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/width' ) ).setWidth( '90px' ) );
 	widthRow.add( width );
@@ -25,8 +25,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// height
 
-	var heightRow = new UIRow();
-	var height = new UINumber( parameters.height ).onChange( update );
+	const heightRow = new UIRow();
+	const height = new UINumber( parameters.height ).onChange( update );
 
 	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/height' ) ).setWidth( '90px' ) );
 	heightRow.add( height );
@@ -35,8 +35,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// depth
 
-	var depthRow = new UIRow();
-	var depth = new UINumber( parameters.depth ).onChange( update );
+	const depthRow = new UIRow();
+	const depth = new UINumber( parameters.depth ).onChange( update );
 
 	depthRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/depth' ) ).setWidth( '90px' ) );
 	depthRow.add( depth );
@@ -45,8 +45,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// widthSegments
 
-	var widthSegmentsRow = new UIRow();
-	var widthSegments = new UIInteger( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
+	const widthSegmentsRow = new UIRow();
+	const widthSegments = new UIInteger( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
 	widthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/widthseg' ) ).setWidth( '90px' ) );
 	widthSegmentsRow.add( widthSegments );
@@ -55,8 +55,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// heightSegments
 
-	var heightSegmentsRow = new UIRow();
-	var heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+	const heightSegmentsRow = new UIRow();
+	const heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/heightseg' ) ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
@@ -65,8 +65,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// depthSegments
 
-	var depthSegmentsRow = new UIRow();
-	var depthSegments = new UIInteger( parameters.depthSegments ).setRange( 1, Infinity ).onChange( update );
+	const depthSegmentsRow = new UIRow();
+	const depthSegments = new UIInteger( parameters.depthSegments ).setRange( 1, Infinity ).onChange( update );
 
 	depthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/depthseg' ) ).setWidth( '90px' ) );
 	depthSegmentsRow.add( depthSegments );

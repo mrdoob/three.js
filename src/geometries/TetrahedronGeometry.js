@@ -23,6 +23,12 @@ class TetrahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new TetrahedronGeometry( data.radius, data.detail );
+
+	}
+
 }
 
 export { TetrahedronGeometry, TetrahedronGeometry as TetrahedronBufferGeometry };

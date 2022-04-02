@@ -2,7 +2,7 @@ import {
 	EventDispatcher,
 	Quaternion,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _changeEvent = { type: 'change' };
 
@@ -56,8 +56,6 @@ class FlyControls extends EventDispatcher {
 				return;
 
 			}
-
-			//event.preventDefault();
 
 			switch ( event.code ) {
 
@@ -123,14 +121,6 @@ class FlyControls extends EventDispatcher {
 
 		this.mousedown = function ( event ) {
 
-			if ( this.domElement !== document ) {
-
-				this.domElement.focus();
-
-			}
-
-			event.preventDefault();
-
 			if ( this.dragToLook ) {
 
 				this.mouseStatus ++;
@@ -168,8 +158,6 @@ class FlyControls extends EventDispatcher {
 		};
 
 		this.mouseup = function ( event ) {
-
-			event.preventDefault();
 
 			if ( this.dragToLook ) {
 

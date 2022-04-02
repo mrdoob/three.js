@@ -34,6 +34,12 @@
 
 	const _vectemp3 = new THREE.Vector3();
 
+	const _matrix = new THREE.Matrix4();
+
+	const _quaternion = new THREE.Quaternion();
+
+	const _scale = new THREE.Vector3();
+
 	class SelectionBox {
 
 		constructor( camera, scene, deep = Number.MAX_VALUE ) {
@@ -43,6 +49,7 @@
 			this.startPoint = new THREE.Vector3();
 			this.endPoint = new THREE.Vector3();
 			this.collection = [];
+			this.instances = {};
 			this.deep = deep;
 
 		}
@@ -198,7 +205,27 @@
 
 			if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				if ( object.material !== undefined ) {
+				if ( object.isInstancedMesh ) {
+
+					this.instances[ object.uuid ] = [];
+
+					for ( let instanceId = 0; instanceId < object.count; instanceId ++ ) {
+
+						object.getMatrixAt( instanceId, _matrix );
+
+						_matrix.decompose( _center, _quaternion, _scale );
+
+						_center.applyMatrix4( object.matrixWorld );
+
+						if ( frustum.containsPoint( _center ) ) {
+
+							this.instances[ object.uuid ].push( instanceId );
+
+						}
+
+					}
+
+				} else {
 
 					if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
 

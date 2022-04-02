@@ -1,66 +1,54 @@
-import { Node } from './Node.js';
+import Node from './Node.js';
+import VaryNode from './VaryNode.js';
 
-function AttributeNode( name, type ) {
+class AttributeNode extends Node {
 
-	Node.call( this, type );
+	constructor( attributeName, nodeType ) {
 
-	this.name = name;
+		super( nodeType );
 
-}
-
-AttributeNode.prototype = Object.create( Node.prototype );
-AttributeNode.prototype.constructor = AttributeNode;
-AttributeNode.prototype.nodeType = 'Attribute';
-
-AttributeNode.prototype.getAttributeType = function ( builder ) {
-
-	return typeof this.type === 'number' ? builder.getConstructorFromLength( this.type ) : this.type;
-
-};
-
-AttributeNode.prototype.getType = function ( builder ) {
-
-	var type = this.getAttributeType( builder );
-
-	return builder.getTypeByFormat( type );
-
-};
-
-AttributeNode.prototype.generate = function ( builder, output ) {
-
-	var type = this.getAttributeType( builder );
-
-	var attribute = builder.getAttribute( this.name, type ),
-		name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
-
-	return builder.format( name, this.getType( builder ), output );
-
-};
-
-AttributeNode.prototype.copy = function ( source ) {
-
-	Node.prototype.copy.call( this, source );
-
-	this.type = source.type;
-
-	return this;
-
-};
-
-AttributeNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.type = this.type;
+		this._attributeName = attributeName;
 
 	}
 
-	return data;
+	getHash( builder ) {
 
-};
+		return this.getAttributeName( builder );
 
-export { AttributeNode };
+	}
+
+	setAttributeName( attributeName ) {
+
+		this._attributeName = attributeName;
+
+		return this;
+
+	}
+
+	getAttributeName( /*builder*/ ) {
+
+		return this._attributeName;
+
+	}
+
+	generate( builder ) {
+
+		const attribute = builder.getAttribute( this.getAttributeName( builder ), this.getNodeType( builder ) );
+
+		if ( builder.isShaderStage( 'vertex' ) ) {
+
+			return attribute.name;
+
+		} else {
+
+			const nodeVary = new VaryNode( this );
+
+			return nodeVary.build( builder, attribute.type );
+
+		}
+
+	}
+
+}
+
+export default AttributeNode;

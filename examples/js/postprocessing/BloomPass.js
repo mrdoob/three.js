@@ -6,24 +6,17 @@
 
 			super(); // render targets
 
-			const pars = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBAFormat
-			};
-			this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+			this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution );
 			this.renderTargetX.texture.name = 'BloomPass.x';
-			this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
-			this.renderTargetY.texture.name = 'BloomPass.y'; // copy material
+			this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution );
+			this.renderTargetY.texture.name = 'BloomPass.y'; // combine material
 
-			if ( THREE.CopyShader === undefined ) console.error( 'THREE.BloomPass relies on THREE.CopyShader' );
-			const copyShader = THREE.CopyShader;
-			this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
-			this.copyUniforms[ 'opacity' ].value = strength;
-			this.materialCopy = new THREE.ShaderMaterial( {
-				uniforms: this.copyUniforms,
-				vertexShader: copyShader.vertexShader,
-				fragmentShader: copyShader.fragmentShader,
+			this.combineUniforms = THREE.UniformsUtils.clone( CombineShader.uniforms );
+			this.combineUniforms[ 'strength' ].value = strength;
+			this.materialCombine = new THREE.ShaderMaterial( {
+				uniforms: this.combineUniforms,
+				vertexShader: CombineShader.vertexShader,
+				fragmentShader: CombineShader.fragmentShader,
 				blending: THREE.AdditiveBlending,
 				transparent: true
 			} ); // convolution material
@@ -64,8 +57,8 @@
 			renderer.clear();
 			this.fsQuad.render( renderer ); // Render original scene with superimposed blur to texture
 
-			this.fsQuad.material = this.materialCopy;
-			this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
+			this.fsQuad.material = this.materialCombine;
+			this.combineUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
 			if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
 			renderer.setRenderTarget( readBuffer );
 			if ( this.clear ) renderer.clear();
@@ -75,6 +68,44 @@
 
 	}
 
+	const CombineShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'strength': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
+
+		uniform float strength;
+
+		uniform sampler2D tDiffuse;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vec4 texel = texture2D( tDiffuse, vUv );
+			gl_FragColor = strength * texel;
+
+		}`
+	};
 	BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
 	BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
 

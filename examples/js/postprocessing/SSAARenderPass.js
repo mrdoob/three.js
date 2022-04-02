@@ -31,7 +31,6 @@
 				uniforms: this.copyUniforms,
 				vertexShader: copyShader.vertexShader,
 				fragmentShader: copyShader.fragmentShader,
-				premultipliedAlpha: true,
 				transparent: true,
 				blending: THREE.AdditiveBlending,
 				depthTest: false,
@@ -62,11 +61,7 @@
 
 			if ( ! this.sampleRenderTarget ) {
 
-				this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBAFormat
-				} );
+				this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height );
 				this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 			}
@@ -80,8 +75,16 @@
 			const baseSampleWeight = 1.0 / jitterOffsets.length;
 			const roundingRange = 1 / 32;
 			this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
-			const width = readBuffer.width,
-				height = readBuffer.height; // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
+			const viewOffset = {
+				fullWidth: readBuffer.width,
+				fullHeight: readBuffer.height,
+				offsetX: 0,
+				offsetY: 0,
+				width: readBuffer.width,
+				height: readBuffer.height
+			};
+			const originalViewOffset = Object.assign( {}, this.camera.view );
+			if ( originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset ); // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 
 			for ( let i = 0; i < jitterOffsets.length; i ++ ) {
 
@@ -89,8 +92,8 @@
 
 				if ( this.camera.setViewOffset ) {
 
-					this.camera.setViewOffset( width, height, jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
-						width, height );
+					this.camera.setViewOffset( viewOffset.fullWidth, viewOffset.fullHeight, viewOffset.offsetX + jitterOffset[ 0 ] * 0.0625, viewOffset.offsetY + jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+						viewOffset.width, viewOffset.height );
 
 				}
 
@@ -124,7 +127,16 @@
 
 			}
 
-			if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
+			if ( this.camera.setViewOffset && originalViewOffset.enabled ) {
+
+				this.camera.setViewOffset( originalViewOffset.fullWidth, originalViewOffset.fullHeight, originalViewOffset.offsetX, originalViewOffset.offsetY, originalViewOffset.width, originalViewOffset.height );
+
+			} else if ( this.camera.clearViewOffset ) {
+
+				this.camera.clearViewOffset();
+
+			}
+
 			renderer.autoClear = autoClear;
 			renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 

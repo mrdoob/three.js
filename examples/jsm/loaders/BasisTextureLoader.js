@@ -15,7 +15,7 @@ import {
 	RGB_PVRTC_4BPPV1_Format,
 	RGB_S3TC_DXT1_Format,
 	UnsignedByteType
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Loader for Basis Universal GPU Texture Codec.
@@ -47,6 +47,13 @@ class BasisTextureLoader extends Loader {
 		this.workerNextTaskID = 1;
 		this.workerSourceURL = '';
 		this.workerConfig = null;
+
+		console.warn(
+
+			'THREE.BasisTextureLoader: This loader is deprecated, and will be removed in a future release. '
+			+ 'Instead, use Basis Universal compression in KTX2 (.ktx2) files with THREE.KTX2Loader.'
+
+		);
 
 	}
 

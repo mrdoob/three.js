@@ -1,8 +1,7 @@
 ( function () {
 
 	/**
- * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/
- * Maybe more about this later with a blog post at http://lab4games.net/zz85/blog
+ * Ascii generation is based on https://github.com/hassadee/jsascii/blob/master/jsascii.js
  *
  * 16 April 2012 - @blurspline
  */
@@ -46,17 +45,11 @@
 			this.render = function ( scene, camera ) {
 
 				renderer.render( scene, camera );
-				asciifyImage( renderer, oAscii );
+				asciifyImage( oAscii );
 
 			};
 
-			this.domElement = domElement; // Throw in ascii library from http://www.nihilogic.dk/labs/jsascii/jsascii.js
-
-			/*
-    * jsAscii 0.1
-    * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
-    * MIT License [http://www.nihilogic.dk/licenses/mit-license.txt]
-    */
+			this.domElement = domElement; // Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
 
 			function initAsciiSize() {
 
@@ -212,7 +205,7 @@
 			// convert img element to ascii
 
 
-			function asciifyImage( canvasRenderer, oAscii ) {
+			function asciifyImage( oAscii ) {
 
 				oCtx.clearRect( 0, 0, iWidth, iHeight );
 				oCtx.drawImage( oCanvasImg, 0, 0, iWidth, iHeight );

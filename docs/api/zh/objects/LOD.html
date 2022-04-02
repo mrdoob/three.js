@@ -59,6 +59,11 @@
 		Default is true.
 		</p>
 
+		<h3>[property:Boolean isLOD]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Array levels]</h3>
 		<p>
 			一个包含有[page:Object level] objects（各层次物体）的数组。<br /><br />
@@ -107,7 +112,7 @@
 			使用这个方法，为LOD对象中的每个细节层次创建一个JSON结构。
 		</p>
 
-		<h3>[method:null update]( [param:Camera camera] )</h3>
+		<h3>[method:undefined update]( [param:Camera camera] )</h3>
 		<p>
 			基于每个[page:levels level]中的[page:Object3D object]和[page:Camera camera]（摄像机）之间的距离，来设置其可见性。
 		</p>

@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>でのGLSLデバッグ</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – でのGLSLデバッグ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>でのGLSLデバッグ</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>このサイトではJavaScriptについては教えてないと同様にGLSLについても教えていません。
+それは本当に大きなトピックです。GLSLを学びたいのであれば<a href="https://webglfundamentals.org">これらの記事</a>から始めてみて下さい。</p>
+<p>すでにGLSLを知っている場合はデバッグのヒントをいくつか紹介します。</p>
+<p>新しくGLSLシェーダーを作成し何も表示されない場合、一般的に最初にするのはフラグメントシェーダーでソリッドカラーに変更する事です。例えばシェーダーの一番下を以下のようにします。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">void main() {
+
+  ...
+
+  gl_FragColor = vec4(1, 0, 0, 1);  // red
+}
+</pre>
+<p>描画しようとしたオブジェクトが表示されれば、その問題がフラグメントシェーダーに関係している事がわかります。良くないテクスチャ、初期化がないuniform変数、間違った値を持つuniform変数の可能性がありますが、私には見るべきポイントがあります。</p>
+<p>いくつかをテストするために入力値を描画してみようと思います。
+例えばフラグメントシェーダーで法線を使用している場合は次のように追加します。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(vNormal * 0.5 + 0.5, 1);
+</pre>
+<p>法線は-1から+1までなので、0.5を掛けて0.5を足すと0.0から1.0までの値が得られて色で判別できて便利です。</p>
+<p>動作すると知ってるコード変更をいくつか試してみて下さい。正常な<em>通常</em>の描画がどのように見えるか目に見えてわかるようになります。
+通常に見えない箇所があれば、どこを見て直せば良いかのヒントがあります。
+フラグメントシェーダーで法線を操作している場合、その操作の結果を描画するために同じテクニックが使えます。</p>
+<div class="threejs_center"><img src="../resources/images/standard-primitive-normals.jpg" style="width: 650px;"></div>
+
+<p>テクスチャを使用している場合も同様に、テクスチャ座標で以下のように描画できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(fract(vUv), 0, 1);
+</pre>
+<p><code class="notranslate" translate="no">fract</code> は0から1の範囲外のテクスチャ座標を使用している場合に使用します。
+これは <code class="notranslate" translate="no">texture.repeat</code> が1よりも大きい値に設定されている場合によく見られます。</p>
+<div class="threejs_center"><img src="../resources/images/standard-primitive-uvs.jpg" style="width: 650px;"></div>
+
+<p>フラグメントシェーダーの全ての値に対して同様の事ができます。
+その範囲を把握し、0.0から1.0にスケーリングし <code class="notranslate" translate="no">gl_FragColor</code> に設定するコードを追加します。</p>
+<p>テクスチャを確認するには <a href="/docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> や <a href="/docs/#api/ja/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> が動作するもので試してみて下さい。</p>
+<p>逆に言えば <code class="notranslate" translate="no">gl_FragColor</code> を赤に設定しても何も表示されない場合、問題は頂点シェーダーに関連したものにあるかもしれません。
+一部の行列が間違っていたり、attributesが間違ったデータを持っていたり、設定が間違っていたりする事があります。</p>
+<p>私ならまず行列を見ます。<code class="notranslate" translate="no">renderer.renderer.render(scene, camera)</code> の呼出直後にブレークポイントを設定し、インスペクタで展開を始めるかもしれません。
+カメラのワールド座標とプロジェクション座標は <code class="notranslate" translate="no">NaN</code> でいっぱいではないのか？
+シーンを展開し <code class="notranslate" translate="no">children</code> を見てみるとワールド座標が妥当に見えるか（ <code class="notranslate" translate="no">NaN</code> がない）、各行列の最後の4つの値がシーンにとって妥当に見えるかを確認します。
+シーンが50 x 50 x 50 x 50の単位であるはずが、いくつかの行列が552352623.123の場合は明らかに何かが間違っている事がわかります。</p>
+<div class="threejs_center"><img src="../resources/images/inspect-matrices.gif"></div>
+
+<p>フラグメントシェーダーの時と同様に、頂点シェーダーの値をフラグメントシェーダーに渡すと頂点シェーダーから値を描画する事もできます。
+両方のシェーダーでvaryingを宣言し、正しい値なのかわからない値を渡します。
+実際にシェーダーが法線を使っている場合、値が0.0から1.0になるように <code class="notranslate" translate="no">vNormal</code> を値に設定し法線を表示するようにします。
+描画結果を見て予想通りか確認します。</p>
+<p>もう一つの良い点はよりシンプルなシェーダーを使う事です。
+<a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> でデータを描画できますか？
+可能であれば試してみて期待通りに表示される事を確認して下さい。</p>
+<p>期待通りでない場合、ジオメトリをビジュアライズできる最もシンプルな頂点シェーダーは何でしょうか？
+通常は次のようなシンプルなものです。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_Position = projection * modelView * vec4(position.xyz, 1);
+</pre>
+<p>それが動作する場合は一度に少しずつ変更を追加していきます。</p>
+<p>もう一つの方法は<a href="https://chrome.google.com/webstore/detail/shader-editor/ggeaidddejpbakgafapihjbgdlbbbpob?hl=en">Shader Editor extension for Chrome</a>を使うか、他のブラウザでは同様なものを使う事です。
+他のシェーダーがどのように動作してるか見る良い方法です。また、上記で記載してきたフラグメントシェーダーの変更を行うとライブで結果確認できるので良いです。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

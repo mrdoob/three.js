@@ -8,18 +8,36 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - ply<br/><br/>
-			<button id="exportASCII">export ASCII</button> <button id="exportBinaryBigEndian">export binary (Big Endian)</button> <button id="exportBinaryLittleEndian">export binary (Little Endian)</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - ply
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { PLYExporter } from './jsm/exporters/PLYExporter.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh;
+
+			const params = {
+				exportASCII: exportASCII,
+				exportBinaryBigEndian: exportBinaryBigEndian,
+				exportBinaryLittleEndian: exportBinaryLittleEndian
+			};
 
 			init();
 			animate();
@@ -65,7 +83,18 @@
 				// export mesh
 
 				const geometry = new THREE.BoxGeometry( 50, 50, 50 );
-				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				const material = new THREE.MeshPhongMaterial( { vertexColors: true } );
+
+				// color vertices based on vertex positions
+				const colors = geometry.getAttribute( 'position' ).array.slice();
+				for ( let i = 0, l = colors.length; i < l; i ++ ) {
+
+					if ( colors[ i ] > 0 ) colors[ i ] = 0.5;
+					else colors[ i ] = 0;
+
+				}
+
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3, false ) );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
@@ -75,6 +104,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -90,14 +120,12 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const buttonExportASCII = document.getElementById( 'exportASCII' );
-				buttonExportASCII.addEventListener( 'click', exportASCII );
+				const gui = new GUI();
 
-				const buttonExportBinaryBE = document.getElementById( 'exportBinaryBigEndian' );
-				buttonExportBinaryBE.addEventListener( 'click', exportBinaryBigEndian );
-
-				const buttonExportBinaryLE = document.getElementById( 'exportBinaryLittleEndian' );
-				buttonExportBinaryLE.addEventListener( 'click', exportBinaryLittleEndian );
+				gui.add( params, 'exportASCII' ).name( 'Export PLY (ASCII)' );
+				gui.add( params, 'exportBinaryBigEndian' ).name( 'Export PLY (Binary BE)' );
+				gui.add( params, 'exportBinaryLittleEndian' ).name( 'Export PLY (Binary LE)' );
+				gui.open();
 
 			}
 

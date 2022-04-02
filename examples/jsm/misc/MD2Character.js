@@ -7,7 +7,7 @@ import {
 	TextureLoader,
 	UVMapping,
 	sRGBEncoding
-} from '../../../build/three.module.js';
+} from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 
 class MD2Character {
@@ -43,8 +43,8 @@ class MD2Character {
 
 		function createPart( geometry, skinMap ) {
 
-			const materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true, morphTargets: true, morphNormals: true } );
-			const materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap, morphTargets: true, morphNormals: true } );
+			const materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true } );
+			const materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap } );
 
 			//
 

@@ -1,9 +1,19 @@
 {
   "name": "three",
-  "version": "0.127.0",
+  "version": "0.139.1",
   "description": "JavaScript 3D library",
-  "main": "build/three.js",
-  "module": "build/three.module.js",
+  "type": "module",
+  "main": "./build/three.js",
+  "module": "./build/three.module.js",
+  "exports": {
+    ".": {
+      "import": "./build/three.module.js",
+      "require": "./build/three.cjs"
+    },
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./src/*": "./src/*"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
@@ -11,6 +21,7 @@
   "sideEffects": false,
   "files": [
     "build/three.js",
+    "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
     "examples/js",
@@ -28,7 +39,10 @@
   },
   "eslintConfig": {
     "root": true,
-    "extends": "mdcs",
+    "extends": [
+      "mdcs",
+      "plugin:compat/recommended"
+    ],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
       "babelOptions": {
@@ -36,15 +50,37 @@
       }
     },
     "plugins": [
-      "html"
+      "html",
+      "import"
     ],
+    "settings": {
+      "polyfills": [
+        "WebGL2RenderingContext"
+      ]
+    },
     "globals": {
-      "potpack": true,
-      "fflate": true,
-      "ZSTDDecoder": true,
-      "bodymovin": true
+      "__THREE_DEVTOOLS__": "readonly",
+      "WebGL2ComputeRenderingContext": "readonly",
+      "potpack": "readonly",
+      "fflate": "readonly",
+      "bodymovin": "readonly",
+      "OIMO": "readonly",
+      "Stats": "readonly",
+      "XRWebGLBinding": "readonly",
+      "XRWebGLLayer": "readonly",
+      "GPUShaderStage": "readonly",
+      "GPUBufferUsage": "readonly",
+      "GPUTextureUsage": "readonly",
+      "QUnit": "readonly"
     },
     "rules": {
+      "no-throw-literal": [
+        "error"
+      ],
+      "import/extensions": [
+        "error",
+        "always"
+      ],
       "quotes": [
         "error",
         "single"
@@ -58,10 +94,14 @@
       ]
     }
   },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
   "scripts": {
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
+    "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
     "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint": "eslint src --ext js",
@@ -69,12 +109,10 @@
     "lint-fix": "npm run lint -- --fix && npm run lint-examples -- --fix",
     "lint-docs": "eslint docs --ext html",
     "test-unit": "npm run unit --prefix test",
-    "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
-    "make-screenshot": "node test/e2e/puppeteer.js --make",
-    "prepublishOnly": "node utils/prepublish.js"
+    "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
     "three",
@@ -86,6 +124,7 @@
     "webgl",
     "webgl2",
     "webaudio",
+    "webgpu",
     "webxr",
     "canvas",
     "svg",
@@ -98,23 +137,24 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@babel/core": "^7.13.15",
-    "@babel/eslint-parser": "^7.13.14",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/preset-env": "^7.13.15",
+    "@babel/core": "^7.15.5",
+    "@babel/eslint-parser": "^7.15.7",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/preset-env": "^7.15.6",
     "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^11.2.1",
-    "chalk": "^4.1.0",
-    "concurrently": "^6.0.2",
-    "eslint": "^7.24.0",
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "chalk": "^4.1.2",
+    "concurrently": "^6.2.2",
+    "eslint": "^7.32.0",
     "eslint-config-mdcs": "^5.0.0",
-    "eslint-plugin-html": "^6.1.2",
-    "glob": "^7.1.6",
-    "rollup": "^2.45.2",
+    "eslint-plugin-compat": "^4.0.2",
+    "eslint-plugin-html": "^6.2.0",
+    "eslint-plugin-import": "^2.25.4",
+    "rollup": "^2.57.0",
     "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-visualizer": "^5.3.6",
-    "servez": "^1.11.0"
+    "rollup-plugin-visualizer": "^5.5.2",
+    "servez": "^1.12.0"
   },
   "jspm": {
     "files": [

@@ -2,14 +2,13 @@
 
 	/**
  * Two pass Gaussian blur filter (horizontal and vertical blur shaders)
- * - described in http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
- *   and used in http://www.cake23.de/traveling-wavefronts-lit-up.html
+ * - see http://www.cake23.de/traveling-wavefronts-lit-up.html
  *
  * - 9 samples per pass
  * - standard deviation 2.7
  * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
  */
-	var HorizontalBlurShader = {
+	const HorizontalBlurShader = {
 		uniforms: {
 			'tDiffuse': {
 				value: null

@@ -1,0 +1,13 @@
+path_classifiers:
+  library:
+    - "editor/js/libs/**/*.*"
+    - "examples/jsm/libs/**/*.*"
+    - "examples/js/libs/**/*.*"
+    - "examples/jsm/loaders/ifc/**/*.*"
+    - "examples/js/loaders/ifc/**/*.*"
+  test:
+    - exclude: /
+  docs:
+    - exclude: /
+  generated: 
+    - "build/*.*"

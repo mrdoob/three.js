@@ -2,17 +2,20 @@ import {
 	Matrix4,
 	Object3D,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class CSS2DObject extends Object3D {
 
- 	constructor( element ) {
+	constructor( element = document.createElement( 'div' ) ) {
 
 		super();
 
-		this.element = element || document.createElement( 'div' );
+		this.element = element;
 
 		this.element.style.position = 'absolute';
+		this.element.style.userSelect = 'none';
+
+		this.element.setAttribute( 'draggable', false );
 
 		this.addEventListener( 'removed', function () {
 
@@ -54,7 +57,7 @@ const _b = new Vector3();
 
 class CSS2DRenderer {
 
-	constructor() {
+	constructor( parameters = {} ) {
 
 		const _this = this;
 
@@ -65,7 +68,8 @@ class CSS2DRenderer {
 			objects: new WeakMap()
 		};
 
-		const domElement = document.createElement( 'div' );
+		const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
+
 		domElement.style.overflow = 'hidden';
 
 		this.domElement = domElement;
@@ -109,39 +113,44 @@ class CSS2DRenderer {
 
 			if ( object.isCSS2DObject ) {
 
-				object.onBeforeRender( _this, scene, camera );
-
 				_vector.setFromMatrixPosition( object.matrixWorld );
 				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				const element = object.element;
+				const visible = ( object.visible === true ) && ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
+				object.element.style.display = ( visible === true ) ? '' : 'none';
 
-				if ( /apple/i.test( navigator.vendor ) ) {
+				if ( visible === true ) {
 
-					// https://github.com/mrdoob/three.js/issues/21415
-					element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+					object.onBeforeRender( _this, scene, camera );
 
-				} else {
+					const element = object.element;
 
-					element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+					if ( /apple/i.test( navigator.vendor ) ) {
+
+						// https://github.com/mrdoob/three.js/issues/21415
+						element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+
+					} else {
+
+						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+
+					}
+
+					if ( element.parentNode !== domElement ) {
+
+						domElement.appendChild( element );
+
+					}
+
+					object.onAfterRender( _this, scene, camera );
 
 				}
-
-				element.style.display = ( object.visible && _vector.z >= - 1 && _vector.z <= 1 ) ? '' : 'none';
 
 				const objectData = {
 					distanceToCameraSquared: getDistanceToSquared( camera, object )
 				};
 
 				cache.objects.set( object, objectData );
-
-				if ( element.parentNode !== domElement ) {
-
-					domElement.appendChild( element );
-
-				}
-
-				object.onAfterRender( _this, scene, camera );
 
 			}
 
@@ -179,6 +188,12 @@ class CSS2DRenderer {
 		function zOrder( scene ) {
 
 			const sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
+
+				if ( a.renderOrder !== b.renderOrder ) {
+
+					return b.renderOrder - a.renderOrder;
+
+				}
 
 				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
 				const distanceB = cache.objects.get( b ).distanceToCameraSquared;

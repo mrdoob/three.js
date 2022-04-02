@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[name]는 장면 안의 모든 지정 및 비지정 오디오 효과의 가상 [link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener]입니다.<br />
+			[name]는 장면 안의 모든 지정 및 비지정 오디오 효과의 가상 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioListener listener]입니다.<br />
 			three.js 앱은 일반적으로 단일 [name] 인스턴스를 생성합니다. 이는 [page:Audio Audio]와 [page:PositionalAudio PositionalAudio] 같은 오디오 개체의 필수 생성자 파라미터입니다.<br />
 			대부분의 경우, 리스너 오브젝트는 카메라의 자식입니다. 그래서 카메라의 3D 변환은 곧 리스너의 3D 변환이 됩니다.
 		</p>
@@ -77,7 +77,7 @@
 		[page:AudioListener.gain gainNode]를 리턴합니다.
 		</p>
 
-		<h3>[method:AudioListener removeFilter]()</h3>
+		<h3>[method:this removeFilter]()</h3>
 		<p>
 		[page:AudioListener.filter filter] 프로퍼티를 *null*로 설정합니다.
 		</p>
@@ -87,7 +87,7 @@
 		[page:AudioListener.filter filter] 프로퍼티의 값을 리턴합니다.
 		</p>
 
-		<h3>[method:AudioListener setFilter]( [param:AudioNode value] )</h3>
+		<h3>[method:this setFilter]( [param:AudioNode value] )</h3>
 		<p>
 		[page:AudioListener.filter filter] 프로퍼티를 *value*로 설정합니다.
 		</p>
@@ -97,7 +97,7 @@
 		볼륨을 리턴합니다.
 		</p>
 
-		<h3>[method:AudioListener setMasterVolume]( [param:Number value] )</h3>
+		<h3>[method:this setMasterVolume]( [param:Number value] )</h3>
 		<p>
 		볼륨을 설정합니다.
 		</p>

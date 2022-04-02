@@ -16,6 +16,12 @@ class WebGPUSampler extends WebGPUBinding {
 
 	}
 
+	getTexture() {
+
+		return this.texture;
+
+	}
+
 }
 
 WebGPUSampler.prototype.isSampler = true;

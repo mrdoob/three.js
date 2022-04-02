@@ -51,18 +51,30 @@
 			<a href="https://www.codeproject.com/info/cpol10.aspx" target="_blank" rel="noopener">CPOL</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { unzipSync } from './jsm/libs/fflate.module.js';
 
-			import { WEBGL } from './jsm/WebGL.js';
+			import WebGL from './jsm/capabilities/WebGL.js';
 
-			if ( WEBGL.isWebGL2Available() === false ) {
+			if ( WebGL.isWebGL2Available() === false ) {
 
-				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
 
 			}
 
@@ -95,9 +107,9 @@
 						const zip = unzipSync( new Uint8Array( data ) );
 						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
-						const texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
+						const texture = new THREE.DataArrayTexture( array, 256, 256, 109 );
 						texture.format = THREE.RedFormat;
-						texture.type = THREE.UnsignedByteType;
+						texture.needsUpdate = true;
 
 						const material = new THREE.ShaderMaterial( {
 							uniforms: {

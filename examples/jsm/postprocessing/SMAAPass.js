@@ -1,14 +1,12 @@
 import {
 	LinearFilter,
 	NearestFilter,
-	RGBAFormat,
-	RGBFormat,
 	ShaderMaterial,
 	Texture,
 	UniformsUtils,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { SMAAEdgesShader } from '../shaders/SMAAShader.js';
 import { SMAAWeightsShader } from '../shaders/SMAAShader.js';
 import { SMAABlendShader } from '../shaders/SMAAShader.js';
@@ -22,18 +20,12 @@ class SMAAPass extends Pass {
 		// render targets
 
 		this.edgesRT = new WebGLRenderTarget( width, height, {
-			depthBuffer: false,
-			generateMipmaps: false,
-			minFilter: LinearFilter,
-			format: RGBFormat
+			depthBuffer: false
 		} );
 		this.edgesRT.texture.name = 'SMAAPass.edges';
 
 		this.weightsRT = new WebGLRenderTarget( width, height, {
-			depthBuffer: false,
-			generateMipmaps: false,
-			minFilter: LinearFilter,
-			format: RGBAFormat
+			depthBuffer: false
 		} );
 		this.weightsRT.texture.name = 'SMAAPass.weights';
 
@@ -52,7 +44,6 @@ class SMAAPass extends Pass {
 		this.areaTexture = new Texture();
 		this.areaTexture.name = 'SMAAPass.area';
 		this.areaTexture.image = areaTextureImage;
-		this.areaTexture.format = RGBFormat;
 		this.areaTexture.minFilter = LinearFilter;
 		this.areaTexture.generateMipmaps = false;
 		this.areaTexture.flipY = false;

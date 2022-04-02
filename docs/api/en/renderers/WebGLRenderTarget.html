@@ -48,6 +48,11 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean isWebGLRenderTarget]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:number width]</h3>
 		<p>
 		The width of the render target.
@@ -93,10 +98,14 @@
 		If set, the scene depth will be rendered to this texture. Default is null.
 		</p>
 
+		<h3>[property:Number samples]</h3>
+		<p>
+		Defines the count of MSAA samples. Can only be used with WebGL 2. Default is *0*.
+		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setSize]( [param:Number width], [param:Number height] )</h3>
+		<h3>[method:undefined setSize]( [param:Number width], [param:Number height] )</h3>
 		<p>
 		Sets the size of the render target.
 		</p>
@@ -106,12 +115,12 @@
 		Creates a copy of this render target.
 		</p>
 
-		<h3>[method:WebGLRenderTarget copy]( [param:WebGLRenderTarget source] )</h3>
+		<h3>[method:this copy]( [param:WebGLRenderTarget source] )</h3>
 		<p>
 		Adopts the settings of the given render target.
 		</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 		Dispatches a dispose event.
 		</p>
@@ -120,7 +129,7 @@
 
 
 
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		<p>[page:EventDispatcher EventDispatcher] methods are available on this class.</p>
 
 		<h2>Source</h2>
 

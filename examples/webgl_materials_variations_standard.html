@@ -12,21 +12,35 @@
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Standard Material Variations by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.<br/><br/>
 		Note: Every second sphere has an IBL environment map on it.</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 
 			let container, stats;
 
 			let camera, scene, renderer;
 			let particleLight;
 
-			const loader = new THREE.FontLoader();
+			const loader = new FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -44,23 +58,18 @@
 
 				scene = new THREE.Scene();
 
-				let hdrCubeRenderTarget = null;
-
 				// Materials
 
-				let imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
+				let imgTexture = new THREE.TextureLoader().load( 'textures/planets/moon_1024.jpg' );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						hdrEquirect.dispose();
-						pmremGenerator.dispose();
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						const bumpScale = 1;
 						const cubeWidth = 400;
@@ -88,7 +97,7 @@
 										color: diffuseColor,
 										metalness: beta,
 										roughness: 1.0 - alpha,
-										envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture
+										envMap: index % 2 === 0 ? null : texture
 									} );
 
 									index ++;
@@ -109,13 +118,13 @@
 
 						}
 
-						scene.background = hdrCubeRenderTarget.texture;
+						scene.background = texture;
 
 					} );
 
 				function addLabel( name, location ) {
 
-					const textGeo = new THREE.TextGeometry( name, {
+					const textGeo = new TextGeometry( name, {
 
 						font: font,
 
@@ -132,14 +141,14 @@
 
 				}
 
-				addLabel( "+roughness", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "-roughness", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( '+roughness', new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( '-roughness', new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-metalness", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "+metalness", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( '-metalness', new THREE.Vector3( 0, - 300, 0 ) );
+				addLabel( '+metalness', new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
-				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( '-diffuse', new THREE.Vector3( 0, 0, - 300 ) );
+				addLabel( '+diffuse', new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -165,11 +174,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.75;
-
-				//
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				//
 

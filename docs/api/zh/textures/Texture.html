@@ -33,6 +33,11 @@
 		只读 - 表示该纹理实例的唯一数字。
 		</p>
 
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:String uuid]</h3>
 		<p>
 		该对象实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
@@ -110,8 +115,7 @@
 
 		<h3>[property:number format]</h3>
 		<p>
-		默认值为[page:Textures THREE.RGBAFormat]，
-		但[page:TextureLoader TextureLoader]将会在载入JPG图片时自动将这个值设置为[page:Textures THREE.RGBFormat]。<br /><br />
+		默认值为[page:Textures THREE.RGBAFormat]。<br /><br />
 
 		请参阅[page:Textures texture constants]页面来了解其它格式。
 		</p>
@@ -256,12 +260,23 @@
 			这对于设置包裹模式尤其重要。
 		</p>
 
+		<h3>[property:Object userData]</h3>
+		<p>
+		An object that can be used to store custom data about the texture. It should not hold
+		references to functions as these will not be cloned.
+		</p>
+
+		<h3>[property:Source source]</h3>
+		<p>
+		The data definition of a texture. A reference to the data source can be shared across textures.
+		This is often useful in context of spritesheets where multiple textures render the same data but with different texture transformations.
+		</p>
 
 		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</h3>
+		<p>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</p>
 
-		<h3>[method:null updateMatrix]()</h3>
+		<h3>[method:undefined updateMatrix]()</h3>
 		<p>
 			从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
 			[page:Texture.rotation .rotation]和[page:Texture.center .center]属性来更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
@@ -270,6 +285,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			拷贝纹理。请注意。这不是“深拷贝”，图像是共用的。
+			Besides, cloning a texture does not automatically mark it for a texture upload. You have to set [page:Texture.needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -278,7 +294,7 @@
 		将Texture对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 		</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 			使用“废置”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
 		</p>

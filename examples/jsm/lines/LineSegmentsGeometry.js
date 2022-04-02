@@ -7,7 +7,7 @@ import {
 	Sphere,
 	Vector3,
 	WireframeGeometry
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _box = new Box3();
 const _vector = new Vector3();
@@ -138,7 +138,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
-	romLineSegments( lineSegments ) {
+	fromLineSegments( lineSegments ) {
 
 		const geometry = lineSegments.geometry;
 

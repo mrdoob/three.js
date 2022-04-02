@@ -44,6 +44,11 @@
 
 		<h2>属性</h2>
 
+		<h3>[property:Boolean isWebGLRenderTarget]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:number width]</h3>
 		<p>
 		渲染目标宽度
@@ -89,6 +94,10 @@
 		如果设置，那么场景的深度将会被渲染到此纹理上。默认为null
 		</p>
 
+		<h3>[property:Number samples]</h3>
+		<p>
+		Defines the count of MSAA samples. Can only be used with WebGL 2. Default is *0*.
+		</p>
 
 		<h2>方法</h2>
 
@@ -102,7 +111,7 @@
 		创建一个渲染目标副本
 		</p>
 
-		<h3>[method:WebGLRenderTarget copy]( [param:WebGLRenderTarget source] )</h3>
+		<h3>[method:this copy]( [param:WebGLRenderTarget source] )</h3>
 		<p>
 		采用传入的渲染目标的设置
 		</p>

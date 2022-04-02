@@ -26,6 +26,12 @@ class OctahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new OctahedronGeometry( data.radius, data.detail );
+
+	}
+
 }
 
 export { OctahedronGeometry, OctahedronGeometry as OctahedronBufferGeometry };

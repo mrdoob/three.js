@@ -79,19 +79,9 @@
 			}
 
 			const parameters = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBFormat,
 				depthTexture: useDepthTexture ? depthTexture : null
 			};
 			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-				renderTarget.texture.generateMipmaps = false;
-
-			}
-
 			const material = new THREE.ShaderMaterial( {
 				transparent: useDepthTexture,
 				defines: Object.assign( {}, ReflectorForSSRPass.ReflectorShader.defines, {

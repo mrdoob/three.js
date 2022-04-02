@@ -19,8 +19,32 @@
 			options = Object.assign( {
 				version: '1.4.1',
 				author: null,
-				textureDirectory: ''
+				textureDirectory: '',
+				upAxis: 'Y_UP',
+				unitName: null,
+				unitMeter: null
 			}, options );
+
+			if ( options.upAxis.match( /^[XYZ]_UP$/ ) === null ) {
+
+				console.error( 'ColladaExporter: Invalid upAxis: valid values are X_UP, Y_UP or Z_UP.' );
+				return null;
+
+			}
+
+			if ( options.unitName !== null && options.unitMeter === null ) {
+
+				console.error( 'ColladaExporter: unitMeter needs to be specified if unitName is specified.' );
+				return null;
+
+			}
+
+			if ( options.unitMeter !== null && options.unitName === null ) {
+
+				console.error( 'ColladaExporter: unitName needs to be specified if unitMeter is specified.' );
+				return null;
+
+			}
 
 			if ( options.textureDirectory !== '' ) {
 
@@ -103,10 +127,28 @@
 
 
 			const getFuncs = [ 'getX', 'getY', 'getZ', 'getW' ];
+			const tempColor = new THREE.Color();
 
-			function attrBufferToArray( attr ) {
+			function attrBufferToArray( attr, isColor = false ) {
 
-				if ( attr.isInterleavedBufferAttribute ) {
+				if ( isColor ) {
+
+					// convert the colors to srgb before export
+					// colors are always written as floats
+					const arr = new Float32Array( attr.count * 3 );
+
+					for ( let i = 0, l = attr.count; i < l; i ++ ) {
+
+						tempColor.fromBufferAttribute( attr, i ).convertLinearToSRGB();
+						arr[ 3 * i + 0 ] = tempColor.r;
+						arr[ 3 * i + 1 ] = tempColor.g;
+						arr[ 3 * i + 2 ] = tempColor.b;
+
+					}
+
+					return arr;
+
+				} else if ( attr.isInterleavedBufferAttribute ) {
 
 					// use the typed array constructor to save on memory
 					const arr = new attr.array.constructor( attr.count * attr.itemSize );
@@ -141,9 +183,9 @@
 			} // Returns the string for a geometry's attribute
 
 
-			function getAttribute( attr, name, params, type ) {
+			function getAttribute( attr, name, params, type, isColor = false ) {
 
-				const array = attrBufferToArray( attr );
+				const array = attrBufferToArray( attr, isColor );
 				const res = `<source id="${name}">` + `<float_array id="${name}-array" count="${array.length}">` + array.join( ' ' ) + '</float_array>' + '<technique_common>' + `<accessor source="#${name}-array" count="${Math.floor( array.length / attr.itemSize )}" stride="${attr.itemSize}">` + params.map( n => `<param name="${n}" type="${type}" />` ).join( '' ) + '</accessor>' + '</technique_common>' + '</source>';
 				return res;
 
@@ -231,8 +273,9 @@
 
 					if ( 'color' in bufferGeometry.attributes ) {
 
+						// colors are always written as floats
 						const colName = `${meshid}-color`;
-						gnode += getAttribute( bufferGeometry.attributes.color, colName, [ 'X', 'Y', 'Z' ], 'uint8' );
+						gnode += getAttribute( bufferGeometry.attributes.color, colName, [ 'R', 'G', 'B' ], 'float', true );
 						triangleInputs += `<input semantic="COLOR" source="#${colName}" offset="0" />`;
 
 					}
@@ -352,7 +395,10 @@
 					const diffuse = m.color ? m.color : new THREE.Color( 0, 0, 0 );
 					const specular = m.specular ? m.specular : new THREE.Color( 1, 1, 1 );
 					const shininess = m.shininess || 0;
-					const reflectivity = m.reflectivity || 0; // Do not export and alpha map for the reasons mentioned in issue (#13792)
+					const reflectivity = m.reflectivity || 0;
+					emissive.convertLinearToSRGB();
+					specular.convertLinearToSRGB();
+					diffuse.convertLinearToSRGB(); // Do not export and alpha map for the reasons mentioned in issue (#13792)
 					// in three.js alpha maps are black and white, but collada expects the alpha
 					// channel to specify the transparency
 
@@ -417,7 +463,7 @@
 					}
 
 					matids = matidsArray.fill().map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
-					node += `<instance_geometry url="#${meshid}">` + ( matids != null ? '<bind_material><technique_common>' + matids.map( ( id, i ) => `<instance_material symbol="MESH_MATERIAL_${i}" target="#${id}" >` + '<bind_vertex_input semantic="TEXCOORD" input_semantic="TEXCOORD" input_set="0" />' + '</instance_material>' ).join( '' ) + '</technique_common></bind_material>' : '' ) + '</instance_geometry>';
+					node += `<instance_geometry url="#${meshid}">` + ( matids.length > 0 ? '<bind_material><technique_common>' + matids.map( ( id, i ) => `<instance_material symbol="MESH_MATERIAL_${i}" target="#${id}" >` + '<bind_vertex_input semantic="TEXCOORD" input_semantic="TEXCOORD" input_set="0" />' + '</instance_material>' ).join( '' ) + '</technique_common></bind_material>' : '' ) + '</instance_geometry>';
 
 				}
 
@@ -437,7 +483,7 @@
 			const libraryMaterials = [];
 			const libraryVisualScenes = processObject( object );
 			const specLink = version === '1.4.1' ? 'http://www.collada.org/2005/11/COLLADASchema' : 'https://www.khronos.org/collada/';
-			let dae = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' + `<COLLADA xmlns="${specLink}" version="${version}">` + '<asset>' + ( '<contributor>' + '<authoring_tool>three.js Collada Exporter</authoring_tool>' + ( options.author !== null ? `<author>${options.author}</author>` : '' ) + '</contributor>' + `<created>${new Date().toISOString()}</created>` + `<modified>${new Date().toISOString()}</modified>` + '<up_axis>Y_UP</up_axis>' ) + '</asset>';
+			let dae = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' + `<COLLADA xmlns="${specLink}" version="${version}">` + '<asset>' + ( '<contributor>' + '<authoring_tool>three.js Collada Exporter</authoring_tool>' + ( options.author !== null ? `<author>${options.author}</author>` : '' ) + '</contributor>' + `<created>${new Date().toISOString()}</created>` + `<modified>${new Date().toISOString()}</modified>` + ( options.unitName !== null ? `<unit name="${options.unitName}" meter="${options.unitMeter}" />` : '' ) + `<up_axis>${options.upAxis}</up_axis>` ) + '</asset>';
 			dae += `<library_images>${libraryImages.join( '' )}</library_images>`;
 			dae += `<library_effects>${libraryEffects.join( '' )}</library_effects>`;
 			dae += `<library_materials>${libraryMaterials.join( '' )}</library_materials>`;

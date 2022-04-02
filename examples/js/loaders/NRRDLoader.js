@@ -207,7 +207,10 @@
 				if ( ! headerObject.vectors ) {
 
 					//if no space direction is set, let's use the identity
-					headerObject.vectors = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ]; //apply spacing if defined
+					headerObject.vectors = [];
+					headerObject.vectors.push( [ 1, 0, 0 ] );
+					headerObject.vectors.push( [ 0, 1, 0 ] );
+					headerObject.vectors.push( [ 0, 0, 1 ] ); //apply spacing if defined
 
 					if ( headerObject.spacings ) {
 
@@ -215,7 +218,11 @@
 
 							if ( ! isNaN( headerObject.spacings[ i ] ) ) {
 
-								headerObject.vectors[ i ].multiplyScalar( headerObject.spacings[ i ] );
+								for ( let j = 0; j <= 2; j ++ ) {
+
+									headerObject.vectors[ i ][ j ] *= headerObject.spacings[ i ];
+
+								}
 
 							}
 
@@ -362,37 +369,54 @@
 			volume.dimensions = [ headerObject.sizes[ 0 ], headerObject.sizes[ 1 ], headerObject.sizes[ 2 ] ];
 			volume.xLength = volume.dimensions[ 0 ];
 			volume.yLength = volume.dimensions[ 1 ];
-			volume.zLength = volume.dimensions[ 2 ]; // spacing
+			volume.zLength = volume.dimensions[ 2 ]; // Identify axis order in the space-directions matrix from the header if possible.
 
-			const spacingX = new THREE.Vector3( headerObject.vectors[ 0 ][ 0 ], headerObject.vectors[ 0 ][ 1 ], headerObject.vectors[ 0 ][ 2 ] ).length();
-			const spacingY = new THREE.Vector3( headerObject.vectors[ 1 ][ 0 ], headerObject.vectors[ 1 ][ 1 ], headerObject.vectors[ 1 ][ 2 ] ).length();
-			const spacingZ = new THREE.Vector3( headerObject.vectors[ 2 ][ 0 ], headerObject.vectors[ 2 ][ 1 ], headerObject.vectors[ 2 ][ 2 ] ).length();
+			if ( headerObject.vectors ) {
+
+				const xIndex = headerObject.vectors.findIndex( vector => vector[ 0 ] !== 0 );
+				const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
+				const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
+				const axisOrder = [];
+				axisOrder[ xIndex ] = 'x';
+				axisOrder[ yIndex ] = 'y';
+				axisOrder[ zIndex ] = 'z';
+				volume.axisOrder = axisOrder;
+
+			} else {
+
+				volume.axisOrder = [ 'x', 'y', 'z' ];
+
+			} // spacing
+
+
+			const spacingX = new THREE.Vector3().fromArray( headerObject.vectors[ 0 ] ).length();
+			const spacingY = new THREE.Vector3().fromArray( headerObject.vectors[ 1 ] ).length();
+			const spacingZ = new THREE.Vector3().fromArray( headerObject.vectors[ 2 ] ).length();
 			volume.spacing = [ spacingX, spacingY, spacingZ ]; // Create IJKtoRAS matrix
 
 			volume.matrix = new THREE.Matrix4();
-			let _spaceX = 1;
-			let _spaceY = 1;
-			const _spaceZ = 1;
+			const transitionMatrix = new THREE.Matrix4();
 
-			if ( headerObject.space == 'left-posterior-superior' ) {
+			if ( headerObject.space === 'left-posterior-superior' ) {
 
-				_spaceX = - 1;
-				_spaceY = - 1;
+				transitionMatrix.set( - 1, 0, 0, 0, 0, - 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
 
 			} else if ( headerObject.space === 'left-anterior-superior' ) {
 
-				_spaceX = - 1;
+				transitionMatrix.set( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, - 1, 0, 0, 0, 0, 1 );
 
 			}
 
 			if ( ! headerObject.vectors ) {
 
-				volume.matrix.set( _spaceX, 0, 0, 0, 0, _spaceY, 0, 0, 0, 0, _spaceZ, 0, 0, 0, 0, 1 );
+				volume.matrix.set( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
 
 			} else {
 
 				const v = headerObject.vectors;
-				volume.matrix.set( _spaceX * v[ 0 ][ 0 ], _spaceX * v[ 1 ][ 0 ], _spaceX * v[ 2 ][ 0 ], 0, _spaceY * v[ 0 ][ 1 ], _spaceY * v[ 1 ][ 1 ], _spaceY * v[ 2 ][ 1 ], 0, _spaceZ * v[ 0 ][ 2 ], _spaceZ * v[ 1 ][ 2 ], _spaceZ * v[ 2 ][ 2 ], 0, 0, 0, 0, 1 );
+				const ijk_to_transition = new THREE.Matrix4().set( v[ 0 ][ 0 ], v[ 1 ][ 0 ], v[ 2 ][ 0 ], 0, v[ 0 ][ 1 ], v[ 1 ][ 1 ], v[ 2 ][ 1 ], 0, v[ 0 ][ 2 ], v[ 1 ][ 2 ], v[ 2 ][ 2 ], 0, 0, 0, 0, 1 );
+				const transition_to_ras = new THREE.Matrix4().multiplyMatrices( ijk_to_transition, transitionMatrix );
+				volume.matrix = transition_to_ras;
 
 			}
 

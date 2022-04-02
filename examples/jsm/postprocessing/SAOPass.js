@@ -5,21 +5,19 @@ import {
 	DepthTexture,
 	DstAlphaFactor,
 	DstColorFactor,
-	LinearFilter,
 	MeshDepthMaterial,
 	MeshNormalMaterial,
 	NearestFilter,
 	NoBlending,
 	RGBADepthPacking,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedShortType,
 	Vector2,
 	WebGLRenderTarget,
 	ZeroFactor
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { SAOShader } from '../shaders/SAOShader.js';
 import { DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader.js';
 import { BlurShaderUtils } from '../shaders/DepthLimitedBlurShader.js';
@@ -32,7 +30,7 @@ import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
 
 class SAOPass extends Pass {
 
-	constructor( scene, camera, depthTexture, useNormals, resolution ) {
+	constructor( scene, camera, useDepthTexture = false, useNormals = false, resolution = new Vector2( 256, 256 ) ) {
 
 		super();
 
@@ -42,8 +40,8 @@ class SAOPass extends Pass {
 		this.clear = true;
 		this.needsSwap = false;
 
-		this.supportsDepthTextureExtension = ( depthTexture !== undefined ) ? depthTexture : false;
-		this.supportsNormalTexture = ( useNormals !== undefined ) ? useNormals : false;
+		this.supportsDepthTextureExtension = useDepthTexture;
+		this.supportsNormalTexture = useNormals;
 
 		this.originalClearColor = new Color();
 		this._oldClearColor = new Color();
@@ -62,26 +60,23 @@ class SAOPass extends Pass {
 			saoBlurDepthCutoff: 0.01
 		};
 
-		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
+		this.resolution = new Vector2( resolution.x, resolution.y );
 
-		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBAFormat
-		} );
+		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
 		this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
 		this.beautyRenderTarget = this.saoRenderTarget.clone();
 
 		this.normalRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat
+			magFilter: NearestFilter
 		} );
 		this.depthRenderTarget = this.normalRenderTarget.clone();
 
+		let depthTexture;
+
 		if ( this.supportsDepthTextureExtension ) {
 
-			const depthTexture = new DepthTexture();
+			depthTexture = new DepthTexture();
 			depthTexture.type = UnsignedShortType;
 
 			this.beautyRenderTarget.depthTexture = depthTexture;

@@ -62,7 +62,7 @@
 						// more precision than can be captured with Uint8Array.
 						const sizeToken = split[ 1 ];
 						size = parseFloat( sizeToken );
-						data = new Uint8Array( size * size * size * 3 );
+						data = new Uint8Array( size * size * size * 4 );
 						break;
 
 					case 'DOMAIN_MIN':
@@ -91,7 +91,8 @@
 						data[ currIndex + 0 ] = r * 255;
 						data[ currIndex + 1 ] = g * 255;
 						data[ currIndex + 2 ] = b * 255;
-						currIndex += 3;
+						data[ currIndex + 3 ] = 255;
+						currIndex += 4;
 
 				}
 
@@ -101,19 +102,18 @@
 			texture.image.data = data;
 			texture.image.width = size;
 			texture.image.height = size * size;
-			texture.format = THREE.RGBFormat;
 			texture.type = THREE.UnsignedByteType;
 			texture.magFilter = THREE.LinearFilter;
 			texture.minFilter = THREE.LinearFilter;
 			texture.wrapS = THREE.ClampToEdgeWrapping;
 			texture.wrapT = THREE.ClampToEdgeWrapping;
 			texture.generateMipmaps = false;
-			const texture3D = new THREE.DataTexture3D();
+			texture.needsUpdate = true;
+			const texture3D = new THREE.Data3DTexture();
 			texture3D.image.data = data;
 			texture3D.image.width = size;
 			texture3D.image.height = size;
 			texture3D.image.depth = size;
-			texture3D.format = THREE.RGBFormat;
 			texture3D.type = THREE.UnsignedByteType;
 			texture3D.magFilter = THREE.LinearFilter;
 			texture3D.minFilter = THREE.LinearFilter;
@@ -121,6 +121,7 @@
 			texture3D.wrapT = THREE.ClampToEdgeWrapping;
 			texture3D.wrapR = THREE.ClampToEdgeWrapping;
 			texture3D.generateMipmaps = false;
+			texture3D.needsUpdate = true;
 			return {
 				title,
 				size,

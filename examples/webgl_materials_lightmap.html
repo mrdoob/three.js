@@ -42,9 +42,21 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -56,10 +68,10 @@
 			let container, stats;
 			let camera, scene, renderer;
 
-			init();
+			await init();
 			animate();
 
-			function init() {
+			async function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -126,11 +138,8 @@
 				// MODEL
 
 				const loader = new THREE.ObjectLoader();
-				loader.load( "models/json/lightmap/lightmap.json", function ( object ) {
-
-					scene.add( object );
-
-				} );
+				const object = await loader.loadAsync( 'models/json/lightmap/lightmap.json' );
+				scene.add( object );
 
 				//
 

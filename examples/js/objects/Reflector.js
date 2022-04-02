@@ -11,7 +11,8 @@
 			const textureWidth = options.textureWidth || 512;
 			const textureHeight = options.textureHeight || 512;
 			const clipBias = options.clipBias || 0;
-			const shader = options.shader || Reflector.ReflectorShader; //
+			const shader = options.shader || Reflector.ReflectorShader;
+			const multisample = options.multisample !== undefined ? options.multisample : 4; //
 
 			const reflectorPlane = new THREE.Plane();
 			const normal = new THREE.Vector3();
@@ -25,19 +26,9 @@
 			const q = new THREE.Vector4();
 			const textureMatrix = new THREE.Matrix4();
 			const virtualCamera = new THREE.PerspectiveCamera();
-			const parameters = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBFormat
-			};
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-				renderTarget.texture.generateMipmaps = false;
-
-			}
-
+			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, {
+				samples: multisample
+			} );
 			const material = new THREE.ShaderMaterial( {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				fragmentShader: shader.fragmentShader,
@@ -135,6 +126,13 @@
 
 			};
 
+			this.dispose = function () {
+
+				renderTarget.dispose();
+				scope.material.dispose();
+
+			};
+
 		}
 
 	}
@@ -158,11 +156,16 @@
 		uniform mat4 textureMatrix;
 		varying vec4 vUv;
 
+		#include <common>
+		#include <logdepthbuf_pars_vertex>
+
 		void main() {
 
 			vUv = textureMatrix * vec4( position, 1.0 );
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			#include <logdepthbuf_vertex>
 
 		}`,
 		fragmentShader:
@@ -171,6 +174,8 @@
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 		varying vec4 vUv;
+
+		#include <logdepthbuf_pars_fragment>
 
 		float blendOverlay( float base, float blend ) {
 
@@ -185,6 +190,8 @@
 		}
 
 		void main() {
+
+			#include <logdepthbuf_fragment>
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );

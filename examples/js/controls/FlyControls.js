@@ -55,8 +55,7 @@
 
 					return;
 
-				} //event.preventDefault();
-
+				}
 
 				switch ( event.code ) {
 
@@ -186,14 +185,6 @@
 
 			this.mousedown = function ( event ) {
 
-				if ( this.domElement !== document ) {
-
-					this.domElement.focus();
-
-				}
-
-				event.preventDefault();
-
 				if ( this.dragToLook ) {
 
 					this.mouseStatus ++;
@@ -234,8 +225,6 @@
 			};
 
 			this.mouseup = function ( event ) {
-
-				event.preventDefault();
 
 				if ( this.dragToLook ) {
 

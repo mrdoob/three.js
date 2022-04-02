@@ -165,7 +165,7 @@ function SmartComparer() {
 
 			var key = keys1[ i ];
 
-			if ( key === "uuid" || key === "id" ) {
+			if ( key === 'uuid' || key === 'id' ) {
 
 				continue;
 
@@ -196,7 +196,7 @@ function SmartComparer() {
 	function makeFail( msg, val1, val2 ) {
 
 		message = msg;
-		if ( arguments.length > 1 ) message += " (" + val1 + " vs " + val2 + ")";
+		if ( arguments.length > 1 ) message += ' (' + val1 + ' vs ' + val2 + ')';
 
 		return false;
 
@@ -205,8 +205,8 @@ function SmartComparer() {
 	function addContext( msg ) {
 
 		// There should already be a validation message. Add more context to it.
-		message = message || "Error";
-		message += ", at " + msg;
+		message = message || 'Error';
+		message += ', at ' + msg;
 
 		return false;
 

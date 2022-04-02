@@ -6,7 +6,7 @@ import {
 	LoaderUtils,
 	Points,
 	PointsMaterial
-} from '../../../build/three.module.js';
+} from 'three';
 
 class PCDLoader extends Loader {
 
@@ -114,11 +114,11 @@ class PCDLoader extends Loader {
 
 			const PCDheader = {};
 			const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
-			const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
+			const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.slice( result1 - 1 ) );
 
 			PCDheader.data = result2[ 1 ];
 			PCDheader.headerLen = result2[ 0 ].length + result1;
-			PCDheader.str = data.substr( 0, PCDheader.headerLen );
+			PCDheader.str = data.slice( 0, PCDheader.headerLen );
 
 			// remove comments
 
@@ -141,8 +141,7 @@ class PCDLoader extends Loader {
 			if ( PCDheader.version !== null )
 				PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
 
-			if ( PCDheader.fields !== null )
-				PCDheader.fields = PCDheader.fields[ 1 ].split( ' ' );
+			PCDheader.fields = ( PCDheader.fields !== null ) ? PCDheader.fields[ 1 ].split( ' ' ) : [];
 
 			if ( PCDheader.type !== null )
 				PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
@@ -236,7 +235,7 @@ class PCDLoader extends Loader {
 		if ( PCDheader.data === 'ascii' ) {
 
 			const offset = PCDheader.offset;
-			const pcdData = textData.substr( PCDheader.headerLen );
+			const pcdData = textData.slice( PCDheader.headerLen );
 			const lines = pcdData.split( '\n' );
 
 			for ( let i = 0, l = lines.length; i < l; i ++ ) {
@@ -255,7 +254,22 @@ class PCDLoader extends Loader {
 
 				if ( offset.rgb !== undefined ) {
 
-					const rgb = parseFloat( line[ offset.rgb ] );
+					const rgb_field_index = PCDheader.fields.findIndex( ( field ) => field === 'rgb' );
+					const rgb_type = PCDheader.type[ rgb_field_index ];
+
+					const float = parseFloat( line[ offset.rgb ] );
+					let rgb = float;
+
+					if ( rgb_type === 'F' ) {
+
+						// treat float values as int
+						// https://github.com/daavoo/pyntcloud/pull/204/commits/7b4205e64d5ed09abe708b2e91b615690c24d518
+						const farr = new Float32Array( 1 );
+						farr[ 0 ] = float;
+						rgb = new Int32Array( farr.buffer )[ 0 ];
+
+					}
+
 					const r = ( rgb >> 16 ) & 0x0000ff;
 					const g = ( rgb >> 8 ) & 0x0000ff;
 					const b = ( rgb >> 0 ) & 0x0000ff;
@@ -303,9 +317,9 @@ class PCDLoader extends Loader {
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
 					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
 
 				}
 

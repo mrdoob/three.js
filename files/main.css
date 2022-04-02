@@ -316,6 +316,11 @@ h1 a {
 			padding-top: 12px;
 		}
 
+	        #panel #content h3 {
+			color: var(--text-color);
+			font-weight: 900;
+		}
+
 		#panel #content a {
 			position: relative;
 			color: var(--text-color);
@@ -383,6 +388,10 @@ iframe {
 	width: 100%;
 	height: 100%;
 	overflow: auto;
+}
+
+iframe#viewer {
+	display: none; /* Workaround: The iframe has white background in Chrome for some reason */
 }
 
 #viewer {

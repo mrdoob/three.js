@@ -5,11 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			#warning {
-				color: #ff0000;
-			}
-		</style>
 	</head>
 	<body>
 
@@ -233,21 +228,30 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 
-			const isIE = /Trident/i.test( navigator.userAgent );
-			const isEdge = /Edge/i.test( navigator.userAgent );
-
 			// Texture width for simulation (each texel is a debris particle)
-			const WIDTH = ( isIE || isEdge ) ? 4 : 64;
+			const WIDTH = 64;
 
 			let container, stats;
 			let camera, scene, renderer, geometry;
@@ -318,7 +322,7 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
-				if ( isSafari() ) {
+				if ( renderer.capabilities.isWebGL2 === false ) {
 
 					gpuCompute.setDataType( THREE.HalfFloatType );
 
@@ -329,16 +333,16 @@
 
 				fillTextures( dtPosition, dtVelocity );
 
-				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
-				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
+				velocityVariable = gpuCompute.addVariable( 'textureVelocity', document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
+				positionVariable = gpuCompute.addVariable( 'texturePosition', document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
 
 				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
 				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
 
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				velocityUniforms[ "gravityConstant" ] = { value: 0.0 };
-				velocityUniforms[ "density" ] = { value: 0.0 };
+				velocityUniforms[ 'gravityConstant' ] = { value: 0.0 };
+				velocityUniforms[ 'density' ] = { value: 0.0 };
 
 				const error = gpuCompute.init();
 
@@ -347,12 +351,6 @@
 					console.error( error );
 
 				}
-
-			}
-
-			function isSafari() {
-
-				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 
@@ -403,10 +401,10 @@
 				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
-					"texturePosition": { value: null },
-					"textureVelocity": { value: null },
-					"cameraConstant": { value: getCameraConstant( camera ) },
-					"density": { value: 0.0 }
+					'texturePosition': { value: null },
+					'textureVelocity': { value: null },
+					'cameraConstant': { value: getCameraConstant( camera ) },
+					'density': { value: 0.0 }
 				};
 
 				// THREE.ShaderMaterial
@@ -491,36 +489,36 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				particleUniforms[ "cameraConstant" ].value = getCameraConstant( camera );
+				particleUniforms[ 'cameraConstant' ].value = getCameraConstant( camera );
 
 			}
 
 			function dynamicValuesChanger() {
 
-				velocityUniforms[ "gravityConstant" ].value = effectController.gravityConstant;
-				velocityUniforms[ "density" ].value = effectController.density;
-				particleUniforms[ "density" ].value = effectController.density;
+				velocityUniforms[ 'gravityConstant' ].value = effectController.gravityConstant;
+				velocityUniforms[ 'density' ].value = effectController.density;
+				particleUniforms[ 'density' ].value = effectController.density;
 
 			}
 
 			function initGUI() {
 
-				const gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 280 } );
 
 				const folder1 = gui.addFolder( 'Dynamic parameters' );
 
-				folder1.add( effectController, "gravityConstant", 0.0, 1000.0, 0.05 ).onChange( dynamicValuesChanger );
-				folder1.add( effectController, "density", 0.0, 10.0, 0.001 ).onChange( dynamicValuesChanger );
+				folder1.add( effectController, 'gravityConstant', 0.0, 1000.0, 0.05 ).onChange( dynamicValuesChanger );
+				folder1.add( effectController, 'density', 0.0, 10.0, 0.001 ).onChange( dynamicValuesChanger );
 
 				const folder2 = gui.addFolder( 'Static parameters' );
 
-				folder2.add( effectController, "radius", 10.0, 1000.0, 1.0 );
-				folder2.add( effectController, "height", 0.0, 50.0, 0.01 );
-				folder2.add( effectController, "exponent", 0.0, 2.0, 0.001 );
-				folder2.add( effectController, "maxMass", 1.0, 50.0, 0.1 );
-				folder2.add( effectController, "velocity", 0.0, 150.0, 0.1 );
-				folder2.add( effectController, "velocityExponent", 0.0, 1.0, 0.01 );
-				folder2.add( effectController, "randVelocity", 0.0, 50.0, 0.1 );
+				folder2.add( effectController, 'radius', 10.0, 1000.0, 1.0 );
+				folder2.add( effectController, 'height', 0.0, 50.0, 0.01 );
+				folder2.add( effectController, 'exponent', 0.0, 2.0, 0.001 );
+				folder2.add( effectController, 'maxMass', 1.0, 50.0, 0.1 );
+				folder2.add( effectController, 'velocity', 0.0, 150.0, 0.1 );
+				folder2.add( effectController, 'velocityExponent', 0.0, 1.0, 0.01 );
+				folder2.add( effectController, 'randVelocity', 0.0, 50.0, 0.1 );
 
 				const buttonRestart = {
 					restartSimulation: function () {
@@ -557,8 +555,8 @@
 
 				gpuCompute.compute();
 
-				particleUniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				particleUniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				particleUniforms[ 'texturePosition' ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				particleUniforms[ 'textureVelocity' ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

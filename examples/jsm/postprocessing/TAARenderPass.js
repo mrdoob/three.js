@@ -1,7 +1,7 @@
 import {
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { SSAARenderPass } from '../postprocessing/SSAARenderPass.js';
+} from 'three';
+import { SSAARenderPass } from './SSAARenderPass.js';
 
 /**
  *
@@ -28,7 +28,7 @@ class TAARenderPass extends SSAARenderPass {
 
 	render( renderer, writeBuffer, readBuffer, deltaTime ) {
 
-		if ( ! this.accumulate ) {
+		if ( this.accumulate === false ) {
 
 			super.render( renderer, writeBuffer, readBuffer, deltaTime );
 
@@ -39,21 +39,21 @@ class TAARenderPass extends SSAARenderPass {
 
 		const jitterOffsets = _JitterVectors[ 5 ];
 
-		if ( ! this.sampleRenderTarget ) {
+		if ( this.sampleRenderTarget === undefined ) {
 
 			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
 			this.sampleRenderTarget.texture.name = 'TAARenderPass.sample';
 
 		}
 
-		if ( ! this.holdRenderTarget ) {
+		if ( this.holdRenderTarget === undefined ) {
 
 			this.holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
 			this.holdRenderTarget.texture.name = 'TAARenderPass.hold';
 
 		}
 
-		if ( this.accumulate && this.accumulateIndex === - 1 ) {
+		if ( this.accumulateIndex === - 1 ) {
 
 			super.render( renderer, this.holdRenderTarget, readBuffer, deltaTime );
 

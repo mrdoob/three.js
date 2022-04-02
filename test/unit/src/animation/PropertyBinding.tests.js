@@ -1,31 +1,31 @@
 /* global QUnit */
 
-import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { Mesh } from '../../../../src/objects/Mesh';
-import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
+import { PropertyBinding } from '../../../../src/animation/PropertyBinding.js';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
 
 export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'PropertyBinding', () => {
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.todo( "Composite", ( assert ) => {
+		QUnit.todo( 'Composite', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "create", ( assert ) => {
+		QUnit.todo( 'create', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -282,40 +282,40 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "findNode", ( assert ) => {
+		QUnit.todo( 'findNode', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "BindingType", ( assert ) => {
+		QUnit.todo( 'BindingType', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "Versioning", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "GetterByBindingType", ( assert ) => {
+		QUnit.todo( 'Versioning', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "SetterByBindingTypeAndVersioning", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "getValue", ( assert ) => {
+		QUnit.todo( 'GetterByBindingType', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'SetterByBindingTypeAndVersioning', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getValue', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -356,15 +356,15 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "bind", ( assert ) => {
+		QUnit.todo( 'bind', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "unbind", ( assert ) => {
+		QUnit.todo( 'unbind', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

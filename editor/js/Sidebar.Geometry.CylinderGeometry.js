@@ -1,22 +1,22 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
-import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
+import { UIDiv, UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
 function GeometryParametersPanel( editor, object ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var container = new UIRow();
+	const container = new UIDiv();
 
-	var geometry = object.geometry;
-	var parameters = geometry.parameters;
+	const geometry = object.geometry;
+	const parameters = geometry.parameters;
 
 	// radiusTop
 
-	var radiusTopRow = new UIRow();
-	var radiusTop = new UINumber( parameters.radiusTop ).onChange( update );
+	const radiusTopRow = new UIRow();
+	const radiusTop = new UINumber( parameters.radiusTop ).onChange( update );
 
 	radiusTopRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radiustop' ) ).setWidth( '90px' ) );
 	radiusTopRow.add( radiusTop );
@@ -25,8 +25,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// radiusBottom
 
-	var radiusBottomRow = new UIRow();
-	var radiusBottom = new UINumber( parameters.radiusBottom ).onChange( update );
+	const radiusBottomRow = new UIRow();
+	const radiusBottom = new UINumber( parameters.radiusBottom ).onChange( update );
 
 	radiusBottomRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radiusbottom' ) ).setWidth( '90px' ) );
 	radiusBottomRow.add( radiusBottom );
@@ -35,8 +35,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// height
 
-	var heightRow = new UIRow();
-	var height = new UINumber( parameters.height ).onChange( update );
+	const heightRow = new UIRow();
+	const height = new UINumber( parameters.height ).onChange( update );
 
 	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/height' ) ).setWidth( '90px' ) );
 	heightRow.add( height );
@@ -45,8 +45,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new UIRow();
-	var radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+	const radialSegmentsRow = new UIRow();
+	const radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radialsegments' ) ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -55,8 +55,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// heightSegments
 
-	var heightSegmentsRow = new UIRow();
-	var heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+	const heightSegmentsRow = new UIRow();
+	const heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/heightsegments' ) ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
@@ -65,8 +65,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// openEnded
 
-	var openEndedRow = new UIRow();
-	var openEnded = new UICheckbox( parameters.openEnded ).onChange( update );
+	const openEndedRow = new UIRow();
+	const openEnded = new UICheckbox( parameters.openEnded ).onChange( update );
 
 	openEndedRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/openended' ) ).setWidth( '90px' ) );
 	openEndedRow.add( openEnded );

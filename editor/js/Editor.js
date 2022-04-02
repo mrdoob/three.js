@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
@@ -84,9 +84,7 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal(),
-
-		animationStopped: new Signal()
+		viewportCameraChanged: new Signal()
 
 	};
 
@@ -131,9 +129,9 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
-		this.scene.background = ( scene.background !== null ) ? scene.background.clone() : null;
-
-		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+		this.scene.background = scene.background;
+		this.scene.environment = scene.environment;
+		this.scene.fog = scene.fog;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -424,6 +422,10 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
+				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+
+					helper = new THREE.SkeletonHelper( object );
+
 				} else {
 
 					// no helper for this object type
@@ -431,7 +433,7 @@ Editor.prototype = {
 
 				}
 
-				var picker = new THREE.Mesh( geometry, material );
+				const picker = new THREE.Mesh( geometry, material );
 				picker.name = 'picker';
 				picker.userData.object = object;
 				helper.add( picker );
@@ -641,12 +643,10 @@ Editor.prototype = {
 
 	//
 
-	fromJSON: function ( json ) {
-
-		var scope = this;
+	fromJSON: async function ( json ) {
 
 		var loader = new THREE.ObjectLoader();
-		var camera = loader.parse( json.camera );
+		var camera = await loader.parseAsync( json.camera );
 
 		this.camera.copy( camera );
 		this.signals.cameraResetted.dispatch();
@@ -654,11 +654,7 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		loader.parse( json.scene, function ( scene ) {
-
-			scope.setScene( scene );
-
-		} );
+		this.setScene( await loader.parseAsync( json.scene ) );
 
 	},
 

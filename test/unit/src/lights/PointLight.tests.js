@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils';
-import { PointLight } from '../../../../src/lights/PointLight';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { PointLight } from '../../../../src/lights/PointLight.js';
 
 export default QUnit.module( 'Lights', () => {
 
@@ -28,45 +28,45 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( "power", ( assert ) => {
+		QUnit.test( 'power', ( assert ) => {
 
 			var a = new PointLight( 0xaaaaaa );
 
 			a.intensity = 100;
-			assert.numEqual( a.power, 100 * Math.PI * 4, "Correct power for an intensity of 100" );
+			assert.numEqual( a.power, 100 * Math.PI * 4, 'Correct power for an intensity of 100' );
 
 			a.intensity = 40;
-			assert.numEqual( a.power, 40 * Math.PI * 4, "Correct power for an intensity of 40" );
+			assert.numEqual( a.power, 40 * Math.PI * 4, 'Correct power for an intensity of 40' );
 
 			a.power = 100;
-			assert.numEqual( a.intensity, 100 / ( 4 * Math.PI ), "Correct intensity for a power of 100" );
+			assert.numEqual( a.intensity, 100 / ( 4 * Math.PI ), 'Correct intensity for a power of 100' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isPointLight", ( assert ) => {
+		QUnit.todo( 'isPointLight', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "copy", ( assert ) => {
+		QUnit.todo( 'copy', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

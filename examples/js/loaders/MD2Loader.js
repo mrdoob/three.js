@@ -102,7 +102,6 @@
 
 			const translation = new THREE.Vector3();
 			const scale = new THREE.Vector3();
-			const string = [];
 			const frames = [];
 			offset = header.offset_frames;
 
@@ -111,10 +110,11 @@
 				scale.set( data.getFloat32( offset + 0, true ), data.getFloat32( offset + 4, true ), data.getFloat32( offset + 8, true ) );
 				translation.set( data.getFloat32( offset + 12, true ), data.getFloat32( offset + 16, true ), data.getFloat32( offset + 20, true ) );
 				offset += 24;
+				const string = [];
 
 				for ( let j = 0; j < 16; j ++ ) {
 
-					const character = data.getUint8( offset + j, true );
+					const character = data.getUint8( offset + j );
 					if ( character === 0 ) break;
 					string[ j ] = character;
 
@@ -129,11 +129,11 @@
 
 				for ( let j = 0; j < header.num_vertices; j ++ ) {
 
-					let x = data.getUint8( offset ++, true );
-					let y = data.getUint8( offset ++, true );
-					let z = data.getUint8( offset ++, true );
+					let x = data.getUint8( offset ++ );
+					let y = data.getUint8( offset ++ );
+					let z = data.getUint8( offset ++ );
 
-					const n = _normalData[ data.getUint8( offset ++, true ) ];
+					const n = _normalData[ data.getUint8( offset ++ ) ];
 
 					x = x * scale.x + translation.x;
 					y = y * scale.y + translation.y;

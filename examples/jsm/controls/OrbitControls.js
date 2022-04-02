@@ -6,7 +6,7 @@ import {
 	TOUCH,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -30,6 +30,7 @@ class OrbitControls extends EventDispatcher {
 
 		this.object = object;
 		this.domElement = domElement;
+		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
 		// Set to false to disable this control
 		this.enabled = true;
@@ -110,6 +111,12 @@ class OrbitControls extends EventDispatcher {
 		this.getAzimuthalAngle = function () {
 
 			return spherical.theta;
+
+		};
+
+		this.getDistance = function () {
+
+			return this.object.position.distanceTo( this.target );
 
 		};
 
@@ -290,14 +297,11 @@ class OrbitControls extends EventDispatcher {
 			scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
 
 			scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
+			scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
 			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
 
-			scope.domElement.removeEventListener( 'touchstart', onTouchStart );
-			scope.domElement.removeEventListener( 'touchend', onTouchEnd );
-			scope.domElement.removeEventListener( 'touchmove', onTouchMove );
-
-			scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-			scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
 
 			if ( scope._domElementKeyEvents !== null ) {
@@ -350,6 +354,9 @@ class OrbitControls extends EventDispatcher {
 		const dollyStart = new Vector2();
 		const dollyEnd = new Vector2();
 		const dollyDelta = new Vector2();
+
+		const pointers = [];
+		const pointerPositions = {};
 
 		function getAutoRotationAngle() {
 
@@ -574,12 +581,6 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function handleMouseUp( /*event*/ ) {
-
-			// no-op
-
-		}
-
 		function handleMouseWheel( event ) {
 
 			if ( event.deltaY < 0 ) {
@@ -636,16 +637,16 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function handleTouchStartRotate( event ) {
+		function handleTouchStartRotate() {
 
-			if ( event.touches.length == 1 ) {
+			if ( pointers.length === 1 ) {
 
-				rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+				rotateStart.set( pointers[ 0 ].pageX, pointers[ 0 ].pageY );
 
 			} else {
 
-				const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
-				const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+				const x = 0.5 * ( pointers[ 0 ].pageX + pointers[ 1 ].pageX );
+				const y = 0.5 * ( pointers[ 0 ].pageY + pointers[ 1 ].pageY );
 
 				rotateStart.set( x, y );
 
@@ -653,16 +654,16 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function handleTouchStartPan( event ) {
+		function handleTouchStartPan() {
 
-			if ( event.touches.length == 1 ) {
+			if ( pointers.length === 1 ) {
 
-				panStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+				panStart.set( pointers[ 0 ].pageX, pointers[ 0 ].pageY );
 
 			} else {
 
-				const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
-				const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+				const x = 0.5 * ( pointers[ 0 ].pageX + pointers[ 1 ].pageX );
+				const y = 0.5 * ( pointers[ 0 ].pageY + pointers[ 1 ].pageY );
 
 				panStart.set( x, y );
 
@@ -670,10 +671,10 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function handleTouchStartDolly( event ) {
+		function handleTouchStartDolly() {
 
-			const dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-			const dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+			const dx = pointers[ 0 ].pageX - pointers[ 1 ].pageX;
+			const dy = pointers[ 0 ].pageY - pointers[ 1 ].pageY;
 
 			const distance = Math.sqrt( dx * dx + dy * dy );
 
@@ -681,32 +682,34 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function handleTouchStartDollyPan( event ) {
+		function handleTouchStartDollyPan() {
 
-			if ( scope.enableZoom ) handleTouchStartDolly( event );
+			if ( scope.enableZoom ) handleTouchStartDolly();
 
-			if ( scope.enablePan ) handleTouchStartPan( event );
+			if ( scope.enablePan ) handleTouchStartPan();
 
 		}
 
-		function handleTouchStartDollyRotate( event ) {
+		function handleTouchStartDollyRotate() {
 
-			if ( scope.enableZoom ) handleTouchStartDolly( event );
+			if ( scope.enableZoom ) handleTouchStartDolly();
 
-			if ( scope.enableRotate ) handleTouchStartRotate( event );
+			if ( scope.enableRotate ) handleTouchStartRotate();
 
 		}
 
 		function handleTouchMoveRotate( event ) {
 
-			if ( event.touches.length == 1 ) {
+			if ( pointers.length == 1 ) {
 
-				rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+				rotateEnd.set( event.pageX, event.pageY );
 
 			} else {
 
-				const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
-				const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+				const position = getSecondPointerPosition( event );
+
+				const x = 0.5 * ( event.pageX + position.x );
+				const y = 0.5 * ( event.pageY + position.y );
 
 				rotateEnd.set( x, y );
 
@@ -726,14 +729,16 @@ class OrbitControls extends EventDispatcher {
 
 		function handleTouchMovePan( event ) {
 
-			if ( event.touches.length == 1 ) {
+			if ( pointers.length === 1 ) {
 
-				panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+				panEnd.set( event.pageX, event.pageY );
 
 			} else {
 
-				const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
-				const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+				const position = getSecondPointerPosition( event );
+
+				const x = 0.5 * ( event.pageX + position.x );
+				const y = 0.5 * ( event.pageY + position.y );
 
 				panEnd.set( x, y );
 
@@ -749,8 +754,10 @@ class OrbitControls extends EventDispatcher {
 
 		function handleTouchMoveDolly( event ) {
 
-			const dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-			const dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+			const position = getSecondPointerPosition( event );
+
+			const dx = event.pageX - position.x;
+			const dy = event.pageY - position.y;
 
 			const distance = Math.sqrt( dx * dx + dy * dy );
 
@@ -780,12 +787,6 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function handleTouchEnd( /*event*/ ) {
-
-			// no-op
-
-		}
-
 		//
 		// event handlers - FSM: listen for events and reset state
 		//
@@ -794,14 +795,26 @@ class OrbitControls extends EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			switch ( event.pointerType ) {
+			if ( pointers.length === 0 ) {
 
-				case 'mouse':
-				case 'pen':
-					onMouseDown( event );
-					break;
+				scope.domElement.setPointerCapture( event.pointerId );
 
-				// TODO touch
+				scope.domElement.addEventListener( 'pointermove', onPointerMove );
+				scope.domElement.addEventListener( 'pointerup', onPointerUp );
+
+			}
+
+			//
+
+			addPointer( event );
+
+			if ( event.pointerType === 'touch' ) {
+
+				onTouchStart( event );
+
+			} else {
+
+				onMouseDown( event );
 
 			}
 
@@ -811,14 +824,13 @@ class OrbitControls extends EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			switch ( event.pointerType ) {
+			if ( event.pointerType === 'touch' ) {
 
-				case 'mouse':
-				case 'pen':
-					onMouseMove( event );
-					break;
+				onTouchMove( event );
 
-				// TODO touch
+			} else {
+
+				onMouseMove( event );
 
 			}
 
@@ -826,28 +838,30 @@ class OrbitControls extends EventDispatcher {
 
 		function onPointerUp( event ) {
 
-			switch ( event.pointerType ) {
+		    removePointer( event );
 
-				case 'mouse':
-				case 'pen':
-					onMouseUp( event );
-					break;
+		    if ( pointers.length === 0 ) {
 
-				// TODO touch
+		        scope.domElement.releasePointerCapture( event.pointerId );
 
-			}
+		        scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+		        scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+
+		    }
+
+		    scope.dispatchEvent( _endEvent );
+
+		    state = STATE.NONE;
+
+		}
+
+		function onPointerCancel( event ) {
+
+			removePointer( event );
 
 		}
 
 		function onMouseDown( event ) {
-
-			// Prevent the browser from scrolling.
-			event.preventDefault();
-
-			// Manually set the focus since calling preventDefault above
-			// prevents the browser from setting it automatically.
-
-			scope.domElement.focus ? scope.domElement.focus() : window.focus();
 
 			let mouseAction;
 
@@ -938,9 +952,6 @@ class OrbitControls extends EventDispatcher {
 
 			if ( state !== STATE.NONE ) {
 
-				scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
-				scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
-
 				scope.dispatchEvent( _startEvent );
 
 			}
@@ -950,8 +961,6 @@ class OrbitControls extends EventDispatcher {
 		function onMouseMove( event ) {
 
 			if ( scope.enabled === false ) return;
-
-			event.preventDefault();
 
 			switch ( state ) {
 
@@ -983,24 +992,9 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function onMouseUp( event ) {
-
-			scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-			scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
-
-			if ( scope.enabled === false ) return;
-
-			handleMouseUp( event );
-
-			scope.dispatchEvent( _endEvent );
-
-			state = STATE.NONE;
-
-		}
-
 		function onMouseWheel( event ) {
 
-			if ( scope.enabled === false || scope.enableZoom === false || ( state !== STATE.NONE && state !== STATE.ROTATE ) ) return;
+			if ( scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE ) return;
 
 			event.preventDefault();
 
@@ -1022,11 +1016,9 @@ class OrbitControls extends EventDispatcher {
 
 		function onTouchStart( event ) {
 
-			if ( scope.enabled === false ) return;
+			trackPointer( event );
 
-			event.preventDefault(); // prevent scrolling
-
-			switch ( event.touches.length ) {
+			switch ( pointers.length ) {
 
 				case 1:
 
@@ -1036,7 +1028,7 @@ class OrbitControls extends EventDispatcher {
 
 							if ( scope.enableRotate === false ) return;
 
-							handleTouchStartRotate( event );
+							handleTouchStartRotate();
 
 							state = STATE.TOUCH_ROTATE;
 
@@ -1046,7 +1038,7 @@ class OrbitControls extends EventDispatcher {
 
 							if ( scope.enablePan === false ) return;
 
-							handleTouchStartPan( event );
+							handleTouchStartPan();
 
 							state = STATE.TOUCH_PAN;
 
@@ -1068,7 +1060,7 @@ class OrbitControls extends EventDispatcher {
 
 							if ( scope.enableZoom === false && scope.enablePan === false ) return;
 
-							handleTouchStartDollyPan( event );
+							handleTouchStartDollyPan();
 
 							state = STATE.TOUCH_DOLLY_PAN;
 
@@ -1078,7 +1070,7 @@ class OrbitControls extends EventDispatcher {
 
 							if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 
-							handleTouchStartDollyRotate( event );
+							handleTouchStartDollyRotate();
 
 							state = STATE.TOUCH_DOLLY_ROTATE;
 
@@ -1108,9 +1100,7 @@ class OrbitControls extends EventDispatcher {
 
 		function onTouchMove( event ) {
 
-			if ( scope.enabled === false ) return;
-
-			event.preventDefault(); // prevent scrolling
+			trackPointer( event );
 
 			switch ( state ) {
 
@@ -1162,18 +1152,6 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function onTouchEnd( event ) {
-
-			if ( scope.enabled === false ) return;
-
-			handleTouchEnd( event );
-
-			scope.dispatchEvent( _endEvent );
-
-			state = STATE.NONE;
-
-		}
-
 		function onContextMenu( event ) {
 
 			if ( scope.enabled === false ) return;
@@ -1182,16 +1160,59 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
+		function addPointer( event ) {
+
+			pointers.push( event );
+
+		}
+
+		function removePointer( event ) {
+
+			delete pointerPositions[ event.pointerId ];
+
+			for ( let i = 0; i < pointers.length; i ++ ) {
+
+				if ( pointers[ i ].pointerId == event.pointerId ) {
+
+					pointers.splice( i, 1 );
+					return;
+
+				}
+
+			}
+
+		}
+
+		function trackPointer( event ) {
+
+			let position = pointerPositions[ event.pointerId ];
+
+			if ( position === undefined ) {
+
+				position = new Vector2();
+				pointerPositions[ event.pointerId ] = position;
+
+			}
+
+			position.set( event.pageX, event.pageY );
+
+		}
+
+		function getSecondPointerPosition( event ) {
+
+			const pointer = ( event.pointerId === pointers[ 0 ].pointerId ) ? pointers[ 1 ] : pointers[ 0 ];
+
+			return pointerPositions[ pointer.pointerId ];
+
+		}
+
 		//
 
 		scope.domElement.addEventListener( 'contextmenu', onContextMenu );
 
 		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
+		scope.domElement.addEventListener( 'pointercancel', onPointerCancel );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
-
-		scope.domElement.addEventListener( 'touchstart', onTouchStart, { passive: false } );
-		scope.domElement.addEventListener( 'touchend', onTouchEnd );
-		scope.domElement.addEventListener( 'touchmove', onTouchMove, { passive: false } );
 
 		// force an update at start
 

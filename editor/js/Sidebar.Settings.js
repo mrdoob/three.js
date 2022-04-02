@@ -1,4 +1,4 @@
-import { UIPanel, UIRow, UISelect, UISpan, UIText, UIInteger } from './libs/ui.js';
+import { UIPanel, UIRow, UISelect, UISpan, UIText } from './libs/ui.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
@@ -6,26 +6,26 @@ import { SidebarSettingsHistory } from './Sidebar.Settings.History.js';
 
 function SidebarSettings( editor ) {
 
-	var config = editor.config;
-	var strings = editor.strings;
+	const config = editor.config;
+	const strings = editor.strings;
 
-	var container = new UISpan();
+	const container = new UISpan();
 
-	var settings = new UIPanel();
+	const settings = new UIPanel();
 	settings.setBorderTop( '0' );
 	settings.setPaddingTop( '20px' );
 	container.add( settings );
 
 	// language
 
-	var options = {
+	const options = {
 		en: 'English',
 		fr: 'Français',
 		zh: '中文'
 	};
 
-	var languageRow = new UIRow();
-	var language = new UISelect().setWidth( '150px' );
+	const languageRow = new UIRow();
+	const language = new UISelect().setWidth( '150px' );
 	language.setOptions( options );
 
 	if ( config.getKey( 'language' ) !== undefined ) {
@@ -36,7 +36,7 @@ function SidebarSettings( editor ) {
 
 	language.onChange( function () {
 
-		var value = this.getValue();
+		const value = this.getValue();
 
 		editor.config.setKey( 'language', value );
 
@@ -46,24 +46,6 @@ function SidebarSettings( editor ) {
 	languageRow.add( language );
 
 	settings.add( languageRow );
-
-	// export precision
-
-	var exportPrecisionRow = new UIRow();
-	var exportPrecision = new UIInteger( config.getKey( 'exportPrecision' ) ).setRange( 2, Infinity );
-
-	exportPrecision.onChange( function () {
-
-		var value = this.getValue();
-
-		editor.config.setKey( 'exportPrecision', value );
-
-	} );
-
-	exportPrecisionRow.add( new UIText( strings.getKey( 'sidebar/settings/exportPrecision' ) ).setWidth( '90px' ) );
-	exportPrecisionRow.add( exportPrecision );
-
-	settings.add( exportPrecisionRow );
 
 	//
 
