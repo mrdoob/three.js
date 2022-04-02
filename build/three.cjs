@@ -1746,6 +1746,12 @@ class Color {
 		return this.getHex();
 	}
 
+	*[Symbol.iterator]() {
+		yield this.r;
+		yield this.g;
+		yield this.b;
+	}
+
 }
 
 Color.NAMES = _colorKeywords;
@@ -2800,11 +2806,12 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 		this.scissor.set(0, 0, this.width, this.height);
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-		this.depthTexture = source.depthTexture;
+		if (source.depthTexture !== null) this.depthTexture = source.depthTexture.clone();
 		this.texture.length = 0;
 
 		for (let i = 0, il = source.texture.length; i < il; i++) {
 			this.texture[i] = source.texture[i].clone();
+			this.texture[i].isRenderTargetTexture = true;
 		}
 
 		return this;
@@ -3340,6 +3347,13 @@ class Quaternion {
 	}
 
 	_onChangeCallback() {}
+
+	*[Symbol.iterator]() {
+		yield this._x;
+		yield this._y;
+		yield this._z;
+		yield this._w;
+	}
 
 }
 
@@ -5781,6 +5795,13 @@ class Euler {
 	}
 
 	_onChangeCallback() {}
+
+	*[Symbol.iterator]() {
+		yield this._x;
+		yield this._y;
+		yield this._z;
+		yield this._order;
+	}
 
 }
 
