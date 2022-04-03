@@ -26,6 +26,7 @@ class OrbitControls extends EventDispatcher {
 		super();
 
 		this.object = object;
+		this.domElement = null;
 
 		// Set to false to disable this control
 		this.enabled = true;
@@ -300,22 +301,22 @@ class OrbitControls extends EventDispatcher {
 			scope.domElement.addEventListener( 'pointercancel', onPointerCancel );
 			scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
 
-			// force an update at start
-
-			scope.update();
 		};
 
 		this.dispose = function () {
 
-			scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
+			if (scope.domElement !== null) {
 
-			scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
-			scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
-			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
+				scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
 
-			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
-			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+				scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
+				scope.domElement.removeEventListener( 'pointercancel', onPointerCancel );
+				scope.domElement.removeEventListener( 'wheel', onMouseWheel );
 
+				scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+				scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+
+			}
 
 			if ( scope._domElementKeyEvents !== null ) {
 
@@ -1226,6 +1227,10 @@ class OrbitControls extends EventDispatcher {
 			this.connect(_domElement);
 
 		}
+
+		// force an update at start
+
+		this.update();
 
 	}
 
