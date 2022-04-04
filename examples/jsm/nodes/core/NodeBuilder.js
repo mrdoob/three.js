@@ -55,6 +55,9 @@ class NodeBuilder {
 		this.shaderStage = null;
 		this.node = null;
 
+		this.lightNode = null;
+		this.fogNode = null;
+
 	}
 
 	addStack( node ) {

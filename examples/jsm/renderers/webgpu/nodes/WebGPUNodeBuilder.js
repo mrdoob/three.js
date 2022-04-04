@@ -90,9 +90,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		super( object, renderer, new WGSLNodeParser() );
 
-		this.lightNode = null;
-		this.fogNode = null;
-
 		this.bindings = { vertex: [], fragment: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0 };
 

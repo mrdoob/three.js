@@ -16,9 +16,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		this.shader = shader;
 
-		this.lightNode = null;
-		this.fogNode = null;
-
 	}
 
 	addFlowCode( code ) {
