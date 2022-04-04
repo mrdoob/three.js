@@ -247,7 +247,7 @@ class PMREMGenerator {
 	_allocateTargets() {
 
 		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
-		const height = 4 * this._cubeSize - 32;
+		const height = 4 * this._cubeSize;
 
 		const params = {
 			magFilter: LinearFilter,
@@ -588,9 +588,9 @@ function _createPlanes( lodMax ) {
 
 		sigmas.push( sigma );
 
-		const texelSize = 1.0 / ( sizeLod - 1 );
-		const min = - texelSize / 2;
-		const max = 1 + texelSize / 2;
+		const texelSize = 1.0 / ( sizeLod - 2 );
+		const min = - texelSize;
+		const max = 1 + texelSize;
 		const uv1 = [ min, min, max, min, max, max, min, min, max, max, min, max ];
 
 		const cubeFaces = 6;

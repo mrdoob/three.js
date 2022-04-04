@@ -373,7 +373,7 @@ function generateCubeUVSize( parameters ) {
 
 	if ( imageHeight === null ) return null;
 
-	const maxMip = Math.log2( imageHeight / 32 + 1 ) + 3;
+	const maxMip = Math.log2( imageHeight / 32 ) + 3;
 
 	const texelHeight = 1.0 / imageHeight;
 
