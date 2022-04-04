@@ -14,8 +14,6 @@ import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
 
 import CodeNode from 'three-nodes/core/CodeNode.js';
 
-import { NodeMaterial } from 'three-nodes/materials/Materials.js';
-
 const wgslTypeLib = {
 	float: 'f32',
 	int: 'i32',
@@ -100,13 +98,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.uniformsGroup = {};
 
-	}
-
-	build() {
-
-		NodeMaterial.fromMaterial( this.material ).build( this );
-
-		return super.build();
+		this.vertexShader = null;
+		this.fragmentShader = null;
 
 	}
 

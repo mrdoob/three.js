@@ -1,33 +1,12 @@
 import NodeBuilder, { shaderStages } from 'three-nodes/core/NodeBuilder.js';
 import NodeFrame from 'three-nodes/core/NodeFrame.js';
-import SlotNode from './SlotNode.js';
 import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
-import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
+//import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
-import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
-	LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
+import { PerspectiveCamera, LinearEncoding, sRGBEncoding, RGBAFormat, UnsignedByteType } from 'three';
 
 const nodeFrame = new NodeFrame();
 nodeFrame.camera = new PerspectiveCamera();
-
-const nodeShaderLib = {
-	LineBasicNodeMaterial: ShaderLib.basic,
-	MeshBasicNodeMaterial: ShaderLib.basic,
-	PointsNodeMaterial: ShaderLib.points,
-	MeshStandardNodeMaterial: ShaderLib.standard
-};
-
-function getIncludeSnippet( name ) {
-
-	return `#include <${name}>`;
-
-}
-
-function getShaderStageProperty( shaderStage ) {
-
-	return `${shaderStage}Shader`;
-
-}
 
 class WebGLNodeBuilder extends NodeBuilder {
 
@@ -36,17 +15,9 @@ class WebGLNodeBuilder extends NodeBuilder {
 		super( object, renderer, new GLSLNodeParser() );
 
 		this.shader = shader;
-		this.slots = { vertex: [], fragment: [] };
 
-		this._parseObject();
-
-	}
-
-	addSlot( shaderStage, slotNode ) {
-
-		this.slots[ shaderStage ].push( slotNode );
-
-		return this.addFlow( shaderStage, slotNode );
+		this.lightNode = null;
+		this.fogNode = null;
 
 	}
 
@@ -59,103 +30,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 		}
 
 		super.addFlowCode( code + '\n\t' );
-
-	}
-
-	_parseObject() {
-
-		const material = this.material;
-		let type = material.type;
-
-		// shader lib
-
-		if ( material.isMeshStandardNodeMaterial ) type = 'MeshStandardNodeMaterial';
-		else if ( material.isMeshBasicNodeMaterial ) type = 'MeshBasicNodeMaterial';
-		else if ( material.isPointsNodeMaterial ) type = 'PointsNodeMaterial';
-		else if ( material.isLineBasicNodeMaterial ) type = 'LineBasicNodeMaterial';
-
-		if ( nodeShaderLib[ type ] !== undefined ) {
-
-			const shaderLib = nodeShaderLib[ type ];
-			const shader = this.shader;
-
-			shader.vertexShader = shaderLib.vertexShader;
-			shader.fragmentShader = shaderLib.fragmentShader;
-			shader.uniforms = UniformsUtils.merge( [ shaderLib.uniforms, UniformsLib.lights ] );
-
-		}
-
-		// parse inputs
-
-		if ( material.colorNode && material.colorNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.colorNode, 'COLOR', 'vec4' ) );
-
-		}
-
-		if ( material.opacityNode && material.opacityNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.opacityNode, 'OPACITY', 'float' ) );
-
-		}
-
-		if ( material.normalNode && material.normalNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.normalNode, 'NORMAL', 'vec3' ) );
-
-		}
-
-		if ( material.emissiveNode && material.emissiveNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.emissiveNode, 'EMISSIVE', 'vec3' ) );
-
-		}
-
-		if ( material.metalnessNode && material.metalnessNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.metalnessNode, 'METALNESS', 'float' ) );
-
-		}
-
-		if ( material.roughnessNode && material.roughnessNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.roughnessNode, 'ROUGHNESS', 'float' ) );
-
-		}
-
-		if ( material.clearcoatNode && material.clearcoatNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.clearcoatNode, 'CLEARCOAT', 'float' ) );
-
-		}
-
-		if ( material.clearcoatRoughnessNode && material.clearcoatRoughnessNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.clearcoatRoughnessNode, 'CLEARCOAT_ROUGHNESS', 'float' ) );
-
-		}
-
-		if ( material.envNode && material.envNode.isNode ) {
-
-			const envRadianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.RADIANCE, material.envNode );
-			const envIrradianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.IRRADIANCE, material.envNode );
-
-			this.addSlot( 'fragment', new SlotNode( envRadianceNode, 'RADIANCE', 'vec3' ) );
-			this.addSlot( 'fragment', new SlotNode( envIrradianceNode, 'IRRADIANCE', 'vec3' ) );
-
-		}
-
-		if ( material.positionNode && material.positionNode.isNode ) {
-
-			this.addSlot( 'vertex', new SlotNode( material.positionNode, 'POSITION', 'vec3' ) );
-
-		}
-
-		if ( material.sizeNode && material.sizeNode.isNode ) {
-
-			this.addSlot( 'vertex', new SlotNode( material.sizeNode, 'SIZE', 'float' ) );
-
-		}
 
 	}
 
@@ -230,8 +104,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 				const attribute = attributes[ index ];
 
 				// ignore common attributes to prevent redefinitions
-				if ( attribute.name === 'uv' || attribute.name === 'position' || attribute.name === 'normal' )
-					continue;
+				if ( attribute.name === 'uv' || attribute.name === 'position' || attribute.name === 'normal' ) continue;
 
 				snippet += `attribute ${attribute.type} ${attribute.name}; `;
 
@@ -263,9 +136,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	addCodeAfterSnippet( shaderStage, snippet, code ) {
 
-		const shaderProperty = getShaderStageProperty( shaderStage );
-
-		let source = this[ shaderProperty ];
+		let source = this.shader[ shaderStage + 'Shader' ];
 
 		const index = source.indexOf( snippet );
 
@@ -278,36 +149,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
-		this[ shaderProperty ] = source;
-
-	}
-
-	addCodeAfterInclude( shaderStage, includeName, code ) {
-
-		const includeSnippet = getIncludeSnippet( includeName );
-
-		this.addCodeAfterSnippet( shaderStage, includeSnippet, code );
-
-	}
-
-	replaceCode( shaderStage, source, target ) {
-
-		const shaderProperty = getShaderStageProperty( shaderStage );
-
-		this.shader[ shaderProperty ] = this.shader[ shaderProperty ].replaceAll( source, target );
-
-	}
-
-	parseInclude( shaderStage, ...includes ) {
-
-		for ( const name of includes ) {
-
-			const includeSnippet = getIncludeSnippet( name );
-			const code = ShaderChunk[ name ];
-
-			this.replaceCode( shaderStage, includeSnippet, code );
-
-		}
+		this.shader[ shaderStage + 'Shader' ] = source;
 
 	}
 
@@ -327,8 +169,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	buildCode() {
 
-		const shaderData = {};
-
 		for ( const shaderStage of shaderStages ) {
 
 			const uniforms = this.getUniforms( shaderStage );
@@ -337,8 +177,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 			const vars = this.getVars( shaderStage );
 			const codes = this.getCodes( shaderStage );
 
-			shaderData[ shaderStage ] = `${this.getSignature()}
-// <node_builder>
+			this.shader[ shaderStage + 'Shader' ] = `${this.getSignature()}
 
 // uniforms
 ${uniforms}
@@ -355,165 +194,19 @@ ${vars}
 // codes
 ${codes}
 
-// </node_builder>
-
-${this.shader[ getShaderStageProperty( shaderStage ) ]}
+${this.shader[ shaderStage + 'Shader' ]}
 `;
 
 		}
 
-		this.vertexShader = shaderData.vertex;
-		this.fragmentShader = shaderData.fragment;
-
-	}
-
-	build() {
-
-		super.build();
-
-		this._addSnippets();
-		this._addUniforms();
+		this._buildFlowCode();
+		this._buildUniforms();
 
 		this._updateUniforms();
 
-		this.shader.vertexShader = this.vertexShader;
-		this.shader.fragmentShader = this.fragmentShader;
-
-		return this;
-
 	}
 
-	getSlot( shaderStage, name ) {
-
-		const slots = this.slots[ shaderStage ];
-
-		for ( const node of slots ) {
-
-			if ( node.name === name ) {
-
-				return this.getFlowData( shaderStage, node );
-
-			}
-
-		}
-
-	}
-
-	_addSnippets() {
-
-		this.parseInclude( 'fragment', 'lights_physical_fragment' );
-
-		const colorSlot = this.getSlot( 'fragment', 'COLOR' );
-		const opacityNode = this.getSlot( 'fragment', 'OPACITY' );
-		const normalSlot = this.getSlot( 'fragment', 'NORMAL' );
-		const emissiveNode = this.getSlot( 'fragment', 'EMISSIVE' );
-		const roughnessNode = this.getSlot( 'fragment', 'ROUGHNESS' );
-		const metalnessNode = this.getSlot( 'fragment', 'METALNESS' );
-		const clearcoatNode = this.getSlot( 'fragment', 'CLEARCOAT' );
-		const clearcoatRoughnessNode = this.getSlot( 'fragment', 'CLEARCOAT_ROUGHNESS' );
-
-		const positionNode = this.getSlot( 'vertex', 'POSITION' );
-		const sizeNode = this.getSlot( 'vertex', 'SIZE' );
-
-		if ( colorSlot !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'color_fragment',
-				`${colorSlot.code}\n\tdiffuseColor = ${colorSlot.result};`
-			);
-
-		}
-
-		if ( opacityNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'alphatest_fragment',
-				`${opacityNode.code}\n\tdiffuseColor.a = ${opacityNode.result};`
-			);
-
-		}
-
-		if ( normalSlot !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'normal_fragment_begin',
-				`${normalSlot.code}\n\tnormal = ${normalSlot.result};`
-			);
-
-		}
-
-		if ( emissiveNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'emissivemap_fragment',
-				`${emissiveNode.code}\n\ttotalEmissiveRadiance = ${emissiveNode.result};`
-			);
-
-		}
-
-		if ( roughnessNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'roughnessmap_fragment',
-				`${roughnessNode.code}\n\troughnessFactor = ${roughnessNode.result};`
-			);
-
-		}
-
-		if ( metalnessNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'metalnessmap_fragment',
-				`${metalnessNode.code}\n\tmetalnessFactor = ${metalnessNode.result};`
-			);
-
-		}
-
-		if ( clearcoatNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'fragment',
-				'material.clearcoatRoughness = clearcoatRoughness;',
-				`${clearcoatNode.code}\n\tmaterial.clearcoat = ${clearcoatNode.result};`
-			);
-
-		}
-
-		if ( clearcoatRoughnessNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'fragment',
-				'material.clearcoatRoughness = clearcoatRoughness;',
-				`${clearcoatRoughnessNode.code}\n\tmaterial.clearcoatRoughness = ${clearcoatRoughnessNode.result};`
-			);
-
-		}
-
-		if ( positionNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'vertex',
-				'begin_vertex',
-				`${positionNode.code}\n\ttransformed = ${positionNode.result};`
-			);
-
-		}
-
-		if ( sizeNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'vertex',
-				'gl_PointSize = size;',
-				`${sizeNode.code}\n\tgl_PointSize = ${sizeNode.result};`
-			);
-
-		}
+	_buildFlowCode() {
 
 		for ( const shaderStage of shaderStages ) {
 
@@ -527,7 +220,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	}
 
-	_addUniforms() {
+	_buildUniforms() {
 
 		for ( const shaderStage of shaderStages ) {
 

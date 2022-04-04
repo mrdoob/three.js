@@ -6,6 +6,8 @@ import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
+import { NodeMaterial } from '../materials/Materials.js';
+
 import { REVISION, LinearEncoding } from 'three';
 
 export const shaderStages = [ 'fragment', 'vertex' ];
@@ -31,9 +33,6 @@ class NodeBuilder {
 		this.nodes = [];
 		this.updateNodes = [];
 		this.hashNodes = {};
-
-		this.vertexShader = null;
-		this.fragmentShader = null;
 
 		this.flowNodes = { vertex: [], fragment: [] };
 		this.flowCode = { vertex: '', fragment: '' };
@@ -595,6 +594,10 @@ class NodeBuilder {
 	}
 
 	build() {
+
+		// stage 0: build material
+
+		NodeMaterial.fromMaterial( this.material ).build( this );
 
 		// stage 1: analyze nodes to possible optimization and validation
 
