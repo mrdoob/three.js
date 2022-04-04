@@ -847,7 +847,9 @@ class WebGPURenderer {
 
 		const drawRange = geometry.drawRange;
 		const firstVertex = drawRange.start;
-		const instanceCount = ( geometry.isInstancedBufferGeometry ) ? geometry.instanceCount : 1;
+
+		let instanceCount = object.isInstancedMesh ? object.count : 1;
+		instanceCount = geometry.isInstancedBufferGeometry ? geometry.instanceCount : instanceCount;
 
 		if ( hasIndex === true ) {
 

@@ -4,7 +4,7 @@ import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
 	assign, label, mul, add, mix, bypass,
-	positionLocal, skinning, modelViewProjection, lightContext, colorSpace,
+	positionLocal, skinning, instance, modelViewProjection, lightContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
 } from '../shadernode/ShaderNodeElements.js';
 
@@ -30,18 +30,35 @@ class NodeMaterial extends ShaderMaterial {
 
 	generateMain( builder ) {
 
-		// VERTEX STAGE
+		const rendererObject = builder.object;
+
+		// < VERTEX STAGE >
 
 		let vertex = positionLocal;
 
-		if ( this.positionNode ) vertex = bypass( vertex, assign( positionLocal, this.positionNode ) );
-		if ( builder.object.isSkinnedMesh ) vertex = bypass( vertex, skinning( builder.object ) );
+		if ( this.positionNode !== null ) {
+
+			vertex = bypass( vertex, assign( vertex, this.positionNode ) );
+
+		}
+
+		if ( rendererObject.isInstancedMesh === true && builder.isAvailable( 'instance' ) === true ) {
+
+			vertex = bypass( vertex, instance( rendererObject ) );
+
+		}
+
+		if ( rendererObject.isSkinnedMesh === true ) {
+
+			vertex = bypass( vertex, skinning( rendererObject ) );
+
+		}
 
 		builder.context.vertex = vertex;
 
 		builder.addFlow( 'vertex', modelViewProjection() );
 
-		// FRAGMENT STAGE
+		// < FRAGMENT STAGE >
 
 		let colorNode = vec4( this.colorNode || materialColor );
 		let opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
@@ -63,8 +80,9 @@ class NodeMaterial extends ShaderMaterial {
 			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
+
+			// @TODO: remove ExpressionNode here and then possibly remove it completely
 			builder.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
-																	// TODO: remove ExpressionNode here and then possibly remove it completely
 
 		}
 
@@ -106,11 +124,9 @@ class NodeMaterial extends ShaderMaterial {
 		// This approach is to reuse the native refreshUniforms*
 		// and turn available the use of features like transmission and environment in core
 
-		let value;
-
 		for ( const property in values ) {
 
-			value = values[ property ];
+			const value = values[ property ];
 
 			if ( this[ property ] === undefined ) {
 

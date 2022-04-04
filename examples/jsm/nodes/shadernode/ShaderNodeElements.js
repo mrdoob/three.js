@@ -4,6 +4,7 @@ import VarNode from '../core/VarNode.js';
 import AttributeNode from '../core/AttributeNode.js';
 import UniformNode from '../core/UniformNode.js';
 import BypassNode from '../core/BypassNode.js';
+import InstanceIndexNode from '../core/InstanceIndexNode.js';
 
 // accessor nodes
 import BufferNode from '../accessors/BufferNode.js';
@@ -16,6 +17,7 @@ import PositionNode from '../accessors/PositionNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
 import TextureNode from '../accessors/TextureNode.js';
 import UVNode from '../accessors/UVNode.js';
+import InstanceNode from '../accessors/InstanceNode.js';
 
 // math nodes
 import OperatorNode from '../math/OperatorNode.js';
@@ -137,6 +139,7 @@ export const shiftLeft = nodeProxy( OperatorNode, '<<' );
 export const shiftRight = nodeProxy( OperatorNode, '>>' );
 
 export const element = nodeProxy( ArrayElementNode );
+export const instanceIndex = nodeObject( new InstanceIndexNode() );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
@@ -170,6 +173,7 @@ export const materialRoughness = nodeObject( new MaterialNode( MaterialNode.ROUG
 export const materialMetalness = nodeObject( new MaterialNode( MaterialNode.METALNESS ) );
 
 export const skinning = nodeProxy( SkinningNode );
+export const instance = nodeProxy( InstanceNode );
 
 export const lightContext = nodeProxy( LightContextNode );
 

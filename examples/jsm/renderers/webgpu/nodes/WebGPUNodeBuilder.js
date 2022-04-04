@@ -16,6 +16,10 @@ import CodeNode from 'three-nodes/core/CodeNode.js';
 
 import { NodeMaterial } from 'three-nodes/materials/Materials.js';
 
+const supports = {
+	instance: true
+};
+
 const wgslTypeLib = {
 	float: 'f32',
 	int: 'i32',
@@ -100,6 +104,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.uniformsGroup = {};
 
+		this.requires = {
+			instanceIndex: false
+		};
+
 	}
 
 	build() {
@@ -173,7 +181,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' ) {
 
-				return `NodeBuffer.${name}`;
+				return `NodeBuffer_${node.node.id}.${name}`;
 
 			} else {
 
@@ -240,10 +248,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-
 			} else if ( type === 'buffer' ) {
 
-				const buffer = new WebGPUUniformBuffer( 'NodeBuffer', node.value );
+				const buffer = new WebGPUUniformBuffer( 'NodeBuffer_' + node.id, node.value );
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
@@ -315,11 +322,29 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getInstanceIndex( shaderStage = this.shaderStage ) {
+
+		this.requires.instanceIndex = true;
+
+		if ( shaderStage === 'vertex' ) {
+
+			return 'instanceIndex';
+
+		}
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		const snippets = [];
 
 		if ( shaderStage === 'vertex' ) {
+
+			if ( this.requires.instanceIndex === true ) {
+
+				snippets.push( `@builtin( instance_index ) instanceIndex : u32` );
+
+			}
 
 			const attributes = this.attributes;
 			const length = attributes.length;
@@ -394,7 +419,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const code = snippets.join( ',\n\t' );
 
-		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVarysStruct', code ) : code;
+		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVarysStruct', '\t' + code ) : code;
 
 	}
 
@@ -438,7 +463,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}, ${bufferCount} >\n`;
 
-				bufferSnippets.push( this._getWGSLUniforms( 'NodeBuffer', bufferSnippet, index ++ ) );
+				bufferSnippets.push( this._getWGSLUniforms( 'NodeBuffer_' + bufferNode.id, bufferSnippet, index ++ ) );
 
 			} else {
 
@@ -461,7 +486,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		}
 
 		let code = bindingSnippets.join( '\n' );
-		code += bufferSnippets.join( ',\n' );
+		code += bufferSnippets.join( '\n' );
 
 		if ( groupSnippets.length > 0 ) {
 
@@ -552,6 +577,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 	getType( type ) {
 
 		return wgslTypeLib[ type ] || type;
+
+	}
+
+	isAvailable( name ) {
+
+		return supports[ name ] === true;
 
 	}
 

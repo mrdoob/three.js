@@ -75,9 +75,9 @@ class MathNode extends TempNode {
 		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
 		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
 
-		const aLen = builder.getTypeLength( aType );
-		const bLen = builder.getTypeLength( bType );
-		const cLen = builder.getTypeLength( cType );
+		const aLen = builder.isVector( aType ) ? builder.getTypeLength( aType ) : 0;
+		const bLen = builder.isVector( bType ) ? builder.getTypeLength( bType ) : 0;
+		const cLen = builder.isVector( cType ) ? builder.getTypeLength( cType ) : 0;
 
 		if ( aLen > bLen && aLen > cLen ) {
 
