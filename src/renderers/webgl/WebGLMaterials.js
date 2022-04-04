@@ -194,10 +194,12 @@ function WebGLMaterials( properties ) {
 		// 10. clearcoat map
 		// 11. clearcoat normal map
 		// 12. clearcoat roughnessMap map
-		// 13. specular intensity map
-		// 14. specular tint map
-		// 15. transmission map
-		// 16. thickness map
+		// 13. iridescence map
+		// 14. iridescence thickness map
+		// 15. specular intensity map
+		// 16. specular tint map
+		// 17. transmission map
+		// 18. thickness map
 
 		let uvScaleMap;
 
@@ -248,6 +250,14 @@ function WebGLMaterials( properties ) {
 		} else if ( material.clearcoatRoughnessMap ) {
 
 			uvScaleMap = material.clearcoatRoughnessMap;
+
+		} else if ( material.iridescenceMap ) {
+
+			uvScaleMap = material.iridescenceMap;
+
+		} else if ( material.iridescenceThicknessMap ) {
+
+			uvScaleMap = material.iridescenceThicknessMap;
 
 		} else if ( material.specularIntensityMap ) {
 
@@ -633,6 +643,27 @@ function WebGLMaterials( properties ) {
 					uniforms.clearcoatNormalScale.value.negate();
 
 				}
+
+			}
+
+		}
+
+		if ( material.iridescence > 0 ) {
+
+			uniforms.iridescence.value = material.iridescence;
+			uniforms.iridescenceIOR.value = material.iridescenceIOR;
+			uniforms.iridescenceThicknessMinimum.value = material.iridescenceThicknessMinimum;
+			uniforms.iridescenceThicknessMaximum.value = material.iridescenceThicknessMaximum;
+
+			if ( material.iridescenceMap ) {
+
+				uniforms.iridescenceMap.value = material.iridescenceMap;
+
+			}
+
+			if ( material.iridescenceThicknessMap ) {
+
+				uniforms.iridescenceThicknessMap.value = material.iridescenceThicknessMap;
 
 			}
 

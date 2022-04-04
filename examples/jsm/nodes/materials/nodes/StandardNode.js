@@ -35,6 +35,14 @@ class StandardNode extends Node {
 
 		}
 
+		const useIridescence = this.iridescence;
+
+		if ( useIridescence ) {
+
+			builder.define( 'IRIDESCENCE' );
+
+		}
+
 		builder.requires.lights = true;
 
 		builder.extensions.derivatives = true;
@@ -161,6 +169,10 @@ class StandardNode extends Node {
 			if ( this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
 			if ( this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
 
+			if ( this.iridescence ) this.iridescence.analyze( builder );
+			if ( this.iridescenceIOR ) this.iridescenceIOR.analyze( builder );
+			if ( this.iridescenceThickness ) this.iridescenceThickness.analyze( builder );
+
 			if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
 			if ( this.light ) this.light.analyze( builder, { cache: 'light' } );
@@ -202,6 +214,10 @@ class StandardNode extends Node {
 			const clearcoat = this.clearcoat ? this.clearcoat.flow( builder, 'f' ) : undefined;
 			const clearcoatRoughness = this.clearcoatRoughness ? this.clearcoatRoughness.flow( builder, 'f' ) : undefined;
 			const clearcoatNormal = this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
+
+			const iridescence = this.iridescence ? this.iridescence.flow( builder, 'f' ) : undefined;
+			const iridescenceIOR = this.iridescenceIOR ? this.iridescenceIOR.flow( builder, 'f' ) : undefined;
+			const iridescenceThickness = this.iridescenceThickness ? this.iridescenceThickness.flow( builder, 'f' ) : undefined;
 
 			const reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
@@ -249,6 +265,7 @@ class StandardNode extends Node {
 				#include <dithering_pars_fragment>
 				#include <fog_pars_fragment>
 				#include <bsdfs>
+				#include <iridescence_fragment>
 				#include <lights_pars_begin>
 				#include <lights_physical_pars_fragment>
 				#include <shadowmap_pars_fragment>
@@ -365,6 +382,50 @@ class StandardNode extends Node {
 			} else if ( useClearcoat ) {
 
 				output.push( 'material.clearcoatRoughness = 0.0;' );
+
+			}
+
+			if ( iridescence ) {
+
+				output.push(
+					iridescence.code,
+					'material.iridescence = saturate( ' + iridescence.result + ' );'
+				);
+
+			}
+
+			if ( iridescenceIOR ) {
+
+				output.push(
+					iridescenceIOR.code,
+					'material.iridescenceIOR = ' + iridescenceIOR.result + ';'
+				);
+
+			} else if ( useIridescence ) {
+
+				output.push( 'material.iridescenceIOR = 1.3;' );
+
+			}
+
+			if ( iridescenceThickness ) {
+
+				output.push(
+					iridescenceThickness.code,
+					'material.iridescenceThickness = ' + iridescenceThickness.result + ';'
+				);
+
+			} else if ( useIridescence ) {
+
+				output.push( 'material.iridescenceThickness = 400;' );
+
+			}
+
+			if ( useIridescence ) {
+
+				output.push( 'material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNV, material.iridescenceThickness, material.specularColor );' );
+
+				// Iridescence F0 approximation
+				output.push( 'material.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNV );' );
 
 			}
 
@@ -535,6 +596,10 @@ class StandardNode extends Node {
 		if ( source.clearcoatRoughness ) this.clearcoatRoughness = source.clearcoatRoughness;
 		if ( source.clearcoatNormal ) this.clearcoatNormal = source.clearcoatNormal;
 
+		if ( source.iridescence ) this.iridescence = source.iridescence;
+		if ( source.iridescenceIOR ) this.iridescenceIOR = source.iridescenceIOR;
+		if ( source.iridescenceThickness ) this.iridescenceThickness = source.iridescenceThickness;
+
 		if ( source.reflectivity ) this.reflectivity = source.reflectivity;
 
 		if ( source.light ) this.light = source.light;
@@ -580,6 +645,10 @@ class StandardNode extends Node {
 			if ( this.clearcoat ) data.clearcoat = this.clearcoat.toJSON( meta ).uuid;
 			if ( this.clearcoatRoughness ) data.clearcoatRoughness = this.clearcoatRoughness.toJSON( meta ).uuid;
 			if ( this.clearcoatNormal ) data.clearcoatNormal = this.clearcoatNormal.toJSON( meta ).uuid;
+
+			if ( this.iridescence ) data.iridescence = this.iridescence.toJSON( meta ).uuid;
+			if ( this.iridescenceIOR ) data.iridescenceIOR = this.iridescenceIOR.toJSON( meta ).uuid;
+			if ( this.iridescenceThickness ) data.iridescenceThickness = this.iridescenceThickness.toJSON( meta ).uuid;
 
 			if ( this.reflectivity ) data.reflectivity = this.reflectivity.toJSON( meta ).uuid;
 

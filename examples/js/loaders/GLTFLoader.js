@@ -51,6 +51,11 @@
 			} );
 			this.register( function ( parser ) {
 
+				return new GLTFMaterialsIridescenceExtension( parser );
+
+			} );
+			this.register( function ( parser ) {
+
 				return new GLTFLightsExtension( parser );
 
 			} );
@@ -343,6 +348,7 @@
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_SHEEN: 'KHR_materials_sheen',
 		KHR_MATERIALS_SPECULAR: 'KHR_materials_specular',
+		KHR_MATERIALS_IRIDESCENCE: 'KHR_materials_iridescence',
 		KHR_MATERIALS_TRANSMISSION: 'KHR_materials_transmission',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		KHR_MATERIALS_VOLUME: 'KHR_materials_volume',
@@ -591,6 +597,86 @@
 					materialParams.clearcoatNormalScale = new THREE.Vector2( scale, scale );
 
 				}
+
+			}
+
+			return Promise.all( pending );
+
+		}
+
+	}
+	/**
+ * Iridescence Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence
+ */
+
+
+	class GLTFMaterialsIridescenceExtension {
+
+		constructor( parser ) {
+
+			this.parser = parser;
+			this.name = EXTENSIONS.KHR_MATERIALS_IRIDESCENCE;
+
+		}
+
+		getMaterialType( materialIndex ) {
+
+			const parser = this.parser;
+			const materialDef = parser.json.materials[ materialIndex ];
+			if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
+			return THREE.MeshPhysicalMaterial;
+
+		}
+
+		extendMaterialParams( materialIndex, materialParams ) {
+
+			const parser = this.parser;
+			const materialDef = parser.json.materials[ materialIndex ];
+
+			if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+				return Promise.resolve();
+
+			}
+
+			const pending = [];
+			const extension = materialDef.extensions[ this.name ];
+
+			if ( extension.iridescenceFactor !== undefined ) {
+
+				materialParams.iridescence = extension.iridescenceFactor;
+
+			}
+
+			if ( extension.iridescenceTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'iridescenceMap', extension.iridescenceTexture ) );
+
+			}
+
+			if ( extension.iridescenceIOR !== undefined ) {
+
+				materialParams.iridescenceIOR = extension.iridescenceIOR;
+
+			}
+
+			if ( extension.iridescenceThicknessMinimum !== undefined ) {
+
+				materialParams.iridescenceThicknessMinimum = extension.iridescenceThicknessMinimum;
+
+			}
+
+			if ( extension.iridescenceThicknessMaximum !== undefined ) {
+
+				materialParams.iridescenceThicknessMaximum = extension.iridescenceThicknessMaximum;
+
+			}
+
+			if ( extension.iridescenceThicknessTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'iridescenceThicknessMap', extension.iridescenceThicknessTexture ) );
 
 			}
 

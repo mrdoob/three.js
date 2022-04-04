@@ -21,6 +21,10 @@ class MeshStandardNodeMaterial extends MeshStandardMaterial {
 		this.clearcoatNode = null;
 		this.clearcoatRoughnessNode = null;
 
+		this.iridescenceNode = null;
+		this.iridescenceIORNode = null;
+		this.iridescenceThicknessNode = null;
+
 		this.envNode = null;
 
 		this.lightNode = null;
@@ -45,6 +49,10 @@ class MeshStandardNodeMaterial extends MeshStandardMaterial {
 
 		this.clearcoatNode = source.clearcoatNode;
 		this.clearcoatRoughnessNode = source.clearcoatRoughnessNode;
+
+		this.iridescenceNode = source.iridescenceNode;
+		this.iridescenceIORNode = source.iridescenceIORNode;
+		this.iridescenceThicknessNode = source.iridescenceThicknessNode;
 
 		this.envNode = source.envNode;
 
