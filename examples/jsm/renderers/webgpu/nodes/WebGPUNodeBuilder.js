@@ -104,8 +104,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.uniformsGroup = {};
 
-		this.requires = {
-			instanceIndex: false
+		this.builtins = {
+			instance_index: false
 		};
 
 	}
@@ -324,7 +324,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	getInstanceIndex( shaderStage = this.shaderStage ) {
 
-		this.requires.instanceIndex = true;
+		this.builtins.instance_index = true;
 
 		if ( shaderStage === 'vertex' ) {
 
@@ -340,7 +340,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'vertex' ) {
 
-			if ( this.requires.instanceIndex === true ) {
+			if ( this.builtins.instance_index === true ) {
 
 				snippets.push( `@builtin( instance_index ) instanceIndex : u32` );
 

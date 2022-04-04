@@ -350,8 +350,8 @@ class NodeBuilder {
 
 		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
 		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) return 1;
-		if ( /mat3/.exec( type ) ) return 9;
-		if ( /mat4/.exec( type ) ) return 16;
+		if ( /mat3/.test( type ) === true ) return 9;
+		if ( /mat4/.test( type ) === true ) return 16;
 
 		return 0;
 

@@ -30,7 +30,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	generateMain( builder ) {
 
-		const rendererObject = builder.object;
+		const object = builder.object;
 
 		// < VERTEX STAGE >
 
@@ -42,15 +42,15 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( rendererObject.isInstancedMesh === true && builder.isAvailable( 'instance' ) === true ) {
+		if ( object.isInstancedMesh === true && builder.isAvailable( 'instance' ) === true ) {
 
-			vertex = bypass( vertex, instance( rendererObject ) );
+			vertex = bypass( vertex, instance( object ) );
 
 		}
 
-		if ( rendererObject.isSkinnedMesh === true ) {
+		if ( object.isSkinnedMesh === true ) {
 
-			vertex = bypass( vertex, skinning( rendererObject ) );
+			vertex = bypass( vertex, skinning( object ) );
 
 		}
 
