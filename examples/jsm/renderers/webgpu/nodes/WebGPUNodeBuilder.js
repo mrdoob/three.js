@@ -54,7 +54,8 @@ const wgslTypeLib = {
 
 const wgslMethods = {
 	dFdx: 'dpdx',
-	dFdy: 'dpdy'
+	dFdy: 'dpdy',
+	inversesqrt: 'inverseSqrt'
 };
 
 const wgslPolyfill = {
@@ -78,13 +79,6 @@ fn repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
 	let uvScaled = vec2<i32>( uv * vec2<f32>( dimension ) );
 
 	return ( ( uvScaled % dimension ) + dimension ) % dimension;
-
-}
-` ),
-	inversesqrt: new CodeNode( `
-fn inversesqrt( x : f32 ) -> f32 {
-
-	return 1.0 / sqrt( x );
 
 }
 ` )
