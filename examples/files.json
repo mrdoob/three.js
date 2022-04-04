@@ -309,6 +309,7 @@
 	"webgpu": [
 		"webgpu_compute",
 		"webgpu_depth_texture",
+		"webgpu_instance_mesh",
 		"webgpu_instance_uniform",
 		"webgpu_lights_custom",
 		"webgpu_lights_selective",
@@ -317,6 +318,7 @@
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_skinning",
+		"webgpu_skinning_instancing",
 		"webgpu_skinning_points"
 	],
 	"webaudio": [
