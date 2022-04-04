@@ -130,6 +130,26 @@ function SidebarMaterial( editor ) {
 	const materialClearcoatRoughness = new SidebarMaterialNumberProperty( editor, 'clearcoatRoughness', strings.getKey( 'sidebar/material/clearcoatroughness' ), [ 0, 1 ] );
 	container.add( materialClearcoatRoughness );
 
+	// iridescence
+
+	const materialIridescence = new SidebarMaterialNumberProperty( editor, 'iridescence', strings.getKey( 'sidebar/material/iridescence' ), [ 0, 1 ] );
+	container.add( materialIridescence );
+
+	// iridescenceIOR
+
+	const materialIridescenceIOR = new SidebarMaterialNumberProperty( editor, 'iridescenceIOR', strings.getKey( 'sidebar/material/iridescenceIOR' ), [ 1, 4 ] );
+	container.add( materialIridescenceIOR );
+
+	// iridescenceThicknessMinimum
+
+	const materialIridescenceThicknessMinimum = new SidebarMaterialNumberProperty( editor, 'iridescenceThicknessMinimum', strings.getKey( 'sidebar/material/iridescenceThicknessMinimum' ) );
+	container.add( materialIridescenceThicknessMinimum );
+
+	// iridescenceThicknessMaximum
+
+	const materialIridescenceThicknessMaximum = new SidebarMaterialNumberProperty( editor, 'iridescenceThicknessMaximum', strings.getKey( 'sidebar/material/iridescenceThicknessMaximum' ) );
+	container.add( materialIridescenceThicknessMaximum );
+
 	// transmission
 
 	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
@@ -219,6 +239,16 @@ function SidebarMaterial( editor ) {
 
 	const materialMetalnessMap = new SidebarMaterialMapProperty( editor, 'metalnessMap', strings.getKey( 'sidebar/material/metalnessmap' ) );
 	container.add( materialMetalnessMap );
+
+	// iridescence map
+
+	const materialIridescenceMap = new SidebarMaterialMapProperty( editor, 'iridescenceMap', strings.getKey( 'sidebar/material/iridescencemap' ) );
+	container.add( materialIridescenceMap );
+
+	// iridescence thickness map
+
+	const materialIridescenceThicknessMap = new SidebarMaterialMapProperty( editor, 'iridescenceThicknessMap', strings.getKey( 'sidebar/material/iridescencethicknessmap' ) );
+	container.add( materialIridescenceThicknessMap );
 
 	// env map
 
