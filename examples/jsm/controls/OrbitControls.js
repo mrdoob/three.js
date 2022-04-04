@@ -303,7 +303,7 @@ class OrbitControls extends EventDispatcher {
 
 		};
 
-		this.dispose = function () {
+		this.disconnect = function () {
 
 			if (scope.domElement !== null) {
 
@@ -325,6 +325,14 @@ class OrbitControls extends EventDispatcher {
 			}
 
 			//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
+
+		};
+
+		this.dispose = function () {
+
+			console.warn( 'THREE.OrbitControls: dispose() has been deprecated. Use disconnect() instead.' );
+
+			scope.disconnect();
 
 		};
 
