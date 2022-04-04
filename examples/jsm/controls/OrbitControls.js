@@ -1222,8 +1222,6 @@ class OrbitControls extends EventDispatcher {
 
 		if (_domElement) {
 
-			console.warn( 'THREE.OrbitControls: The domElement constructor param has been deprecated. Use .connect() instead.' );
-
 			this.connect(_domElement);
 
 		}
