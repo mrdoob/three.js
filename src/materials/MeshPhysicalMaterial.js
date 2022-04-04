@@ -15,6 +15,13 @@ import * as MathUtils from '../math/MathUtils.js';
  *  ior: <float>,
  *  reflectivity: <float>,
  *
+ *  iridescence: <float>,
+ *  iridescenceMap: new THREE.Texture( <Image> ),
+ *  iridescenceIOR: <float>,
+ *  iridescenceThicknessMinimum: <float>,
+ *  iridescenceThicknessMaximum: <float>,
+ *  iridescenceThicknessMap: new THREE.Texture( <Image> ),
+ *
  *  sheen: <float>,
  *  sheenTint: <Color>,
  *  sheenRoughness: <float>,
@@ -70,6 +77,12 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			}
 		} );
 
+		this.iridescenceMap = null;
+		this.iridescenceIOR = 1.8;
+		this.iridescenceThicknessMinimum = 200;
+		this.iridescenceThicknessMaximum = 800;
+		this.iridescenceThicknessMap = null;
+
 		this.sheenTint = new Color( 0x000000 );
 		this.sheenRoughness = 1.0;
 
@@ -87,6 +100,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this._sheen = 0.0;
 		this._clearcoat = 0;
+		this._iridescence = 0;
 		this._transmission = 0;
 
 		this.setValues( parameters );
@@ -129,6 +143,24 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	}
 
+	get iridescence() {
+
+		return this._iridescence;
+
+	}
+
+	set iridescence( value ) {
+
+		if ( this._iridescence > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._iridescence = value;
+
+	}
+
 	get transmission() {
 
 		return this._transmission;
@@ -166,6 +198,13 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
 
 		this.ior = source.ior;
+
+		this.iridescence = source.iridescence;
+		this.iridescenceMap = source.iridescenceMap;
+		this.iridescenceIOR = source.iridescenceIOR;
+		this.iridescenceThicknessMinimum = source.iridescenceThicknessMinimum;
+		this.iridescenceThicknessMaximum = source.iridescenceThicknessMaximum;
+		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
 
 		this.sheen = source.sheen;
 		this.sheenTint.copy( source.sheenTint );
