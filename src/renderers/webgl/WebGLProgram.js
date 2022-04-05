@@ -46,12 +46,20 @@ function getShaderErrors( gl, shader, type ) {
 
 	if ( status && errors === '' ) return '';
 
-	const errorLine = parseInt( /ERROR: 0:(\d+)/.exec( errors )[ 1 ] );
+	const errorMatches = /ERROR: 0:(\d+)/.exec( errors );
+	if ( errorMatches ) {
 
-	// --enable-privileged-webgl-extension
-	// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
+		// --enable-privileged-webgl-extension
+		// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
 
-	return type.toUpperCase() + '\n\n' + errors + '\n\n' + handleSource( gl.getShaderSource( shader ), errorLine );
+		const errorLine = parseInt( errorMatches[ 0 ] );
+		return type.toUpperCase() + '\n\n' + errors + '\n\n' + handleSource( gl.getShaderSource( shader ), errorLine );
+
+	} else {
+
+		return errors;
+
+	}
 
 }
 
