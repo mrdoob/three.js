@@ -330,8 +330,6 @@ class OrbitControls extends EventDispatcher {
 
 		this.dispose = function () {
 
-			console.warn( 'THREE.OrbitControls: dispose() has been deprecated. Use disconnect() instead.' );
-
 			scope.disconnect();
 
 		};
