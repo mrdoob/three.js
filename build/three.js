@@ -10941,8 +10941,8 @@
 					bindVertexArrayObject(currentState.object);
 				}
 
-				updateBuffers = needsUpdate(geometry, index);
-				if (updateBuffers) saveCache(geometry, index);
+				updateBuffers = needsUpdate(object, geometry, program, index);
+				if (updateBuffers) saveCache(object, geometry, program, index);
 			} else {
 				const wireframe = material.wireframe === true;
 
@@ -10952,10 +10952,6 @@
 					currentState.wireframe = wireframe;
 					updateBuffers = true;
 				}
-			}
-
-			if (object.isInstancedMesh === true) {
-				updateBuffers = true;
 			}
 
 			if (index !== null) {
@@ -11038,18 +11034,29 @@
 			};
 		}
 
-		function needsUpdate(geometry, index) {
+		function needsUpdate(object, geometry, program, index) {
 			const cachedAttributes = currentState.attributes;
 			const geometryAttributes = geometry.attributes;
 			let attributesNum = 0;
+			const programAttributes = program.getAttributes();
 
-			for (const key in geometryAttributes) {
-				const cachedAttribute = cachedAttributes[key];
-				const geometryAttribute = geometryAttributes[key];
-				if (cachedAttribute === undefined) return true;
-				if (cachedAttribute.attribute !== geometryAttribute) return true;
-				if (cachedAttribute.data !== geometryAttribute.data) return true;
-				attributesNum++;
+			for (const name in programAttributes) {
+				const programAttribute = programAttributes[name];
+
+				if (programAttribute.location >= 0) {
+					const cachedAttribute = cachedAttributes[name];
+					let geometryAttribute = geometryAttributes[name];
+
+					if (geometryAttribute === undefined) {
+						if (name === 'instanceMatrix' && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
+						if (name === 'instanceColor' && object.instanceColor) geometryAttribute = object.instanceColor;
+					}
+
+					if (cachedAttribute === undefined) return true;
+					if (cachedAttribute.attribute !== geometryAttribute) return true;
+					if (geometryAttribute && cachedAttribute.data !== geometryAttribute.data) return true;
+					attributesNum++;
+				}
 			}
 
 			if (currentState.attributesNum !== attributesNum) return true;
@@ -11057,22 +11064,33 @@
 			return false;
 		}
 
-		function saveCache(geometry, index) {
+		function saveCache(object, geometry, program, index) {
 			const cache = {};
 			const attributes = geometry.attributes;
 			let attributesNum = 0;
+			const programAttributes = program.getAttributes();
 
-			for (const key in attributes) {
-				const attribute = attributes[key];
-				const data = {};
-				data.attribute = attribute;
+			for (const name in programAttributes) {
+				const programAttribute = programAttributes[name];
 
-				if (attribute.data) {
-					data.data = attribute.data;
+				if (programAttribute.location >= 0) {
+					let attribute = attributes[name];
+
+					if (attribute === undefined) {
+						if (name === 'instanceMatrix' && object.instanceMatrix) attribute = object.instanceMatrix;
+						if (name === 'instanceColor' && object.instanceColor) attribute = object.instanceColor;
+					}
+
+					const data = {};
+					data.attribute = attribute;
+
+					if (attribute && attribute.data) {
+						data.data = attribute.data;
+					}
+
+					cache[name] = data;
+					attributesNum++;
 				}
-
-				cache[key] = data;
-				attributesNum++;
 			}
 
 			currentState.attributes = cache;
