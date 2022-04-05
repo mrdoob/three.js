@@ -8,6 +8,7 @@ import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
 import FunctionNode from './core/FunctionNode.js';
+import InstanceIndexNode from './core/InstanceIndexNode.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
@@ -81,9 +82,6 @@ import FogRangeNode from './fog/FogRangeNode.js';
 // core
 export * from './core/constants.js';
 
-// functions
-export * from './functions/BSDFs.js';
-
 // materials
 export * from './materials/Materials.js';
 
@@ -101,6 +99,7 @@ const nodeLib = {
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
+	InstanceIndexNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -190,6 +189,7 @@ export {
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
+	InstanceIndexNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
