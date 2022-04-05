@@ -305,7 +305,7 @@ class OrbitControls extends EventDispatcher {
 
 		this.disconnect = function () {
 
-			if (scope.domElement !== null) {
+			if ( scope.domElement !== null ) {
 
 				scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
 
@@ -1228,9 +1228,9 @@ class OrbitControls extends EventDispatcher {
 
 		//
 
-		if (_domElement) {
+		if ( _domElement ) {
 
-			this.connect(_domElement);
+			this.connect( _domElement );
 
 		}
 
