@@ -1226,6 +1226,8 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
+		//
+
 		if (_domElement) {
 
 			this.connect(_domElement);
