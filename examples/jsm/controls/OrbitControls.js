@@ -164,9 +164,11 @@ class OrbitControls extends EventDispatcher {
 
 			const twoPI = 2 * Math.PI;
 
+			const _position = object.position;
+
 			return function update() {
 
-				const position = getPosition( scope.object, scope.object.position );
+				const position = scope.object.getWorldPosition( _position );
 
 				offset.copy( position ).sub( scope.target );
 
@@ -248,7 +250,7 @@ class OrbitControls extends EventDispatcher {
 				offset.applyQuaternion( quatInverse );
 
 				position.copy( scope.target ).add( offset );
-				setPosition( scope.object, position );
+				scope.object.parent.worldToLocal( position );
 
 				scope.object.lookAt( scope.target );
 
@@ -359,27 +361,6 @@ class OrbitControls extends EventDispatcher {
 		const pointers = [];
 		const pointerPositions = {};
 
-
-		function getPosition( obj, vec ) {
-
-			if ( ! obj.parent || obj.parent.type === 'Scene' )
-				return vec.copy( obj.position );
-
-			obj.getWorldPosition( vec );
-
-			return vec;
-
-		}
-
-		function setPosition( obj, val ) {
-
-			if ( obj.parent )
-				obj.parent.worldToLocal( val );
-
-			obj.position.copy( val );
-
-		}
-
 		function getAutoRotationAngle() {
 
 			return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
@@ -457,7 +438,7 @@ class OrbitControls extends EventDispatcher {
 				if ( scope.object.isPerspectiveCamera ) {
 
 					// perspective
-					getPosition( scope.object, position );
+					scope.object.getWorldPosition( position );
 					offset.copy( position ).sub( scope.target );
 					let targetDistance = offset.length();
 
