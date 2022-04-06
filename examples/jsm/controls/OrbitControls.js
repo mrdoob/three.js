@@ -250,7 +250,7 @@ class OrbitControls extends EventDispatcher {
 				offset.applyQuaternion( quatInverse );
 
 				position.copy( scope.target ).add( offset );
-				scope.object.parent.worldToLocal( position );
+				scope.object.parent ? scope.object.parent.worldToLocal( position ) : scope.object.position.copy( position )
 
 				scope.object.lookAt( scope.target );
 
