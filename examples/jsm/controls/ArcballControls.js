@@ -1037,9 +1037,9 @@ class ArcballControls extends EventDispatcher {
 
 							}
 
-							this._v3_1.setFromMatrixPosition(this._gizmoMatrixState);
+							_v3_1.setFromMatrixPosition( this._gizmoMatrixState );
 
-							this.applyTransformMatrix( this.scale( size, this._v3_1 ) );
+							this.applyTransformMatrix( this.scale( size, _v3_1 ) );
 
 						}
 
