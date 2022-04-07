@@ -347,25 +347,17 @@ function getCanvas() {
 
 	}
 
-	try {
+	if ( typeof OffscreenCanvas !== 'undefined' ) {
 
-		if ( typeof OffscreenCanvas !== 'undefined' ) {
-
-			const canvas = new OffscreenCanvas( 1, 1 );
-			cachedCanvas = canvas;
-			return canvas;
-
-		}
-
-	} catch ( err ) {
-
-		console.error( err );
-
-		const canvas = document.createElement( 'canvas' );
+		const canvas = new OffscreenCanvas( 1, 1 );
 		cachedCanvas = canvas;
 		return canvas;
 
 	}
+
+	const canvas = document.createElement( 'canvas' );
+	cachedCanvas = canvas;
+	return canvas;
 
 }
 
