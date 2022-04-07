@@ -1119,15 +1119,15 @@ class GLTFWriter {
 
 				}
 
-				pending.push( toBlobPromise.then( blob => {
+				pending.push( toBlobPromise.then( blob =>
 
 					writer.processBufferViewImage( blob ).then( bufferViewIndex => {
 
 						imageDef.bufferView = bufferViewIndex;
 
-					} );
+					} )
 
-				} ) );
+				) );
 
 			} else {
 
