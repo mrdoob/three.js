@@ -351,13 +351,15 @@ function getCanvas() {
 
 		if ( typeof OffscreenCanvas !== 'undefined' ) {
 
-			const canvas = new OffscreenCanvas();
+			const canvas = new OffscreenCanvas( 1, 1 );
 			cachedCanvas = canvas;
 			return canvas;
 
 		}
 
 	} catch ( err ) {
+
+		console.error( err );
 
 		const canvas = document.createElement( 'canvas' );
 		cachedCanvas = canvas;
@@ -1113,18 +1115,25 @@ class GLTFWriter {
 
 			if ( options.binary === true ) {
 
-				pending.push( new Promise( function ( resolve ) {
+				let toBlobPromise;
 
-					canvas.toBlob( function ( blob ) {
+				if ( canvas.toBlob !== undefined ) {
 
-						writer.processBufferViewImage( blob ).then( function ( bufferViewIndex ) {
+					toBlobPromise = new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
 
-							imageDef.bufferView = bufferViewIndex;
-							resolve();
+				} else {
 
-						} );
+					toBlobPromise = canvas.convertToBlob( { type: mimeType } );
 
-					}, mimeType );
+				}
+
+				pending.push( toBlobPromise.then( blob => {
+
+					writer.processBufferViewImage( blob ).then( bufferViewIndex => {
+
+						imageDef.bufferView = bufferViewIndex;
+
+					} );
 
 				} ) );
 
