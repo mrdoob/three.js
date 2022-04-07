@@ -57,6 +57,8 @@ class WebGPUBackground {
 
 			if ( renderer.autoClearColor === true ) {
 
+				_clearColor.multiplyScalar( _clearAlpha );
+
 				colorAttachment.clearValue = { r: _clearColor.r, g: _clearColor.g, b: _clearColor.b, a: _clearAlpha };
 				colorAttachment.loadOp = GPULoadOp.Clear;
 				colorAttachment.storeOp = GPUStoreOp.Store;
