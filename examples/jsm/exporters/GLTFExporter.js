@@ -349,7 +349,7 @@ function getCanvas() {
 
 	try {
 
-		if ( typeof OffscreenCanvas !== "undefined" ) {
+		if ( typeof OffscreenCanvas !== 'undefined' ) {
 
 			const canvas = new OffscreenCanvas();
 			cachedCanvas = canvas;
@@ -359,7 +359,7 @@ function getCanvas() {
 
 	} catch ( err ) {
 
-		const canvas = document.createElement( "canvas" );
+		const canvas = document.createElement( 'canvas' );
 		cachedCanvas = canvas;
 		return canvas;
 
