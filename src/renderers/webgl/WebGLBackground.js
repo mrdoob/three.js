@@ -70,7 +70,8 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			}
 
-			setClear( color, alpha );
+			const premultiplyAlpha = ( renderTarget != null ) ? renderTarget.texture.premultiplyAlpha : premultipliedAlpha;
+			setClear( color, alpha, premultiplyAlpha );
 
 		}
 
@@ -211,9 +212,9 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 	}
 
-	function setClear( color, alpha ) {
+	function setClear( color, alpha, premultiplyAlpha ) {
 
-		state.buffers.color.setClear( color.r, color.g, color.b, alpha, premultipliedAlpha );
+		state.buffers.color.setClear( color.r, color.g, color.b, alpha, premultiplyAlpha );
 
 	}
 
@@ -228,7 +229,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			clearColor.set( color );
 			clearAlpha = alpha;
-			setClear( clearColor, clearAlpha );
+			setClear( clearColor, clearAlpha, premultipliedAlpha );
 
 		},
 		getClearAlpha: function () {
@@ -239,7 +240,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 		setClearAlpha: function ( alpha ) {
 
 			clearAlpha = alpha;
-			setClear( clearColor, clearAlpha );
+			setClear( clearColor, clearAlpha, premultipliedAlpha );
 
 		},
 		render: render
