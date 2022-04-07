@@ -164,11 +164,9 @@ class OrbitControls extends EventDispatcher {
 
 			const twoPI = 2 * Math.PI;
 
-			const _position = object.position;
-
 			return function update() {
 
-				const position = scope.object.getWorldPosition( _position );
+				const position = scope.object.getWorldPosition( object.position );
 
 				offset.copy( position ).sub( scope.target );
 
