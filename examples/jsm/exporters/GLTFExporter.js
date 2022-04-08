@@ -1072,7 +1072,7 @@ class GLTFWriter {
 
 			}
 
-			if ( image.data !== undefined ) {
+			if ( image.data !== undefined ) { // THREE.DataTexture
 
 				if ( format !== RGBAFormat ) {
 
