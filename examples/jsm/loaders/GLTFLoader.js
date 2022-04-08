@@ -670,7 +670,14 @@ class GLTFMaterialsUnlitExtension {
 
 		}
 
-		materialParams.emissiveIntensity = materialDef.extensions[this.name].emissiveStrength;
+		const emissiveStrength = materialDef.extensions[this.name].emissiveStrength;
+		
+		if ( emissiveStrength !== undefined ) {
+
+			materialParams.emissiveIntensity = emissiveStrength;
+
+		}
+
 		return Promise.resolve();
 
 	}
