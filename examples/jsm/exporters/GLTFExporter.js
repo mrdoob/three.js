@@ -349,15 +349,15 @@ function getCanvas() {
 
 	if ( typeof OffscreenCanvas !== 'undefined' ) {
 
-		const canvas = new OffscreenCanvas( 1, 1 );
-		cachedCanvas = canvas;
-		return canvas;
+		cachedCanvas = new OffscreenCanvas( 1, 1 );
+
+	} else {
+
+		cachedCanvas = document.createElement( 'canvas' );
 
 	}
 
-	const canvas = document.createElement( 'canvas' );
-	cachedCanvas = canvas;
-	return canvas;
+	return cachedCanvas;
 
 }
 
