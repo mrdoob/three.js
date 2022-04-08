@@ -14,70 +14,64 @@
 		if it is available, otherwise it reverts to the less accurate [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now Date.now].
 		</p>
 
-
 		<h2>Constructor</h2>
-
 
 		<h3>[name]( [param:Boolean autoStart] )</h3>
 		<p>
-		autoStart — (optional) whether to automatically start the clock. Default is true.
+		autoStart — (optional) whether to automatically start the clock when [page:.getDelta]() is called for the first time. Default is *true*.
 		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Boolean autoStart]</h3>
 		<p>
-		If set, starts the clock automatically when the first update is called. Default is true.
+		If set, starts the clock automatically when [page:.getDelta]() is called for the first time. Default is *true*.
 		</p>
 
 		<h3>[property:Float startTime]</h3>
 		<p>
-		Holds the time at which the clock's [page:Clock.start start] method was last called.
+		Holds the time at which the clock's [page:Clock.start start] method was last called. Default is *0*.
  		</p>
-
 
 		<h3>[property:Float oldTime]</h3>
 		<p>
-		Holds the time at which the clock's [page:Clock.start start], [page:Clock.getElapsedTime getElapsedTime] or [page:Clock.getDelta getDelta]
-		methods were last called.
+		Holds the time at which the clock's [page:Clock.start start], [page:.getElapsedTime]() or [page:.getDelta]()
+		methods were last called. Default is *0*.
  		</p>
 
 		<h3>[property:Float elapsedTime]</h3>
 		<p>
-		Keeps track of the total time that the clock has been running.
+		Keeps track of the total time that the clock has been running. Default is *0*.
  		</p>
 
 		<h3>[property:Boolean running]</h3>
 		<p>
-		Whether the clock is running or not.
+		Whether the clock is running or not. Default is *false*.
  		</p>
-
 
 		<h2>Methods</h2>
 
-		<h3>[method:null start]()</h3>
+		<h3>[method:undefined start]()</h3>
 		<p>
-		Starts clock. Also sets the [page:Clock.startTime startTime] and [page:Clock.oldTime oldTime]
-		to the current time, sets [page:Clock.elapsedTime elapsedTime] to *0* and [page:Clock.running running] to *true*.
+		Starts clock. Also sets the [page:.startTime] and [page:.oldTime] to the current time, sets [page:.elapsedTime] to *0* and [page:.running] to *true*.
 		</p>
 
-		<h3>[method:null stop]()</h3>
+		<h3>[method:undefined stop]()</h3>
 		<p>
 		Stops clock and sets [page:Clock.oldTime oldTime] to the current time.
 		</p>
 
 		<h3>[method:Float getElapsedTime]()</h3>
 		<p>
-		Get the seconds passed since the clock started and sets [page:Clock.oldTime oldTime] to the current time.<br />
-		If [page:Clock.autoStart autoStart] is *true* and the clock is not running, also starts the clock.
+		Get the seconds passed since the clock started and sets [page:.oldTime] to the current time.<br />
+		If [page:.autoStart] is *true* and the clock is not running, also starts the clock.
 		</p>
 
 		<h3>[method:Float getDelta]()</h3>
 		<p>
-		Get the seconds passed since the time [page:Clock.oldTime oldTime] was set and sets [page:Clock.oldTime oldTime] to the current time.<br />
-		If [page:Clock.autoStart autoStart] is *true* and the clock is not running, also starts the clock.
+		Get the seconds passed since the time [page:.oldTime] was set and sets [page:.oldTime] to the current time.<br />
+		If [page:.autoStart] is *true* and the clock is not running, also starts the clock.
 		</p>
-
 
 		<h2>Source</h2>
 

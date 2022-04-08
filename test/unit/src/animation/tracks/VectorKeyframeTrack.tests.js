@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { VectorKeyframeTrack } from '../../../../../src/animation/tracks/VectorKeyframeTrack';
+//import { VectorKeyframeTrack } from '../../../../../src/animation/tracks/VectorKeyframeTrack.js';
 
 export default QUnit.module( 'Animation', () => {
 
@@ -10,7 +10,7 @@ export default QUnit.module( 'Animation', () => {
 
 			QUnit.todo( 'write me !', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

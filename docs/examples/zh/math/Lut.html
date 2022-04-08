@@ -25,7 +25,7 @@
 
 		<h3>[name]( [param:String colormap], [param:Number count] )</h3>
 		<p>
-		colormap - Sets a colormap from predefined colormaps. Available colormaps are : *rainbow*, *cooltowarm*, *blackbody*, *grayscale*. Default is *rainbow*.<br />
+		colormap - Sets a colormap from predefined colormaps. Available colormaps are: *rainbow*, *cooltowarm*, *blackbody*, *grayscale*. Default is *rainbow*.<br />
 		count - Sets the number of colors used to represent the data array. Default is *32*.
 		</p>
 
@@ -58,7 +58,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null copy]( [param:Lut lut] ) [param:Lut this]</h3>
+		<h3>[method:this copy]( [param:Lut lut] ) [param:Lut this]</h3>
 		<p>
 		color — Lut to copy.
 		</p>
@@ -66,7 +66,7 @@
 		Copies the given lut.
 		</p>
 
-		<h3>[method:Lut addColorMap]( [param:String name], [param:Array arrayOfColors] )</h3>
+		<h3>[method:this addColorMap]( [param:String name], [param:Array arrayOfColors] )</h3>
 		<p>
 		name — The name of the color map.<br />
 		arrayOfColors — An array of color values. Each value is an array holding a threshold and the actual color value as a hexadecimal number.
@@ -88,7 +88,7 @@
 		Returns an instance of [page:Color] for the given data value.
 		</p>
 
-		<h3>[method:Lut setColorMap]( [param:String colormap], [param:Number count] )</h3>
+		<h3>[method:this setColorMap]( [param:String colormap], [param:Number count] )</h3>
 		<p>
 		colormap — The name of the color map.<br />
 		count — The number of colors. Default is *32*.
@@ -97,7 +97,7 @@
 		Configure the lookup table for the given color map and number of colors.
 		</p>
 
-		<h3>[method:Lut setMin]( [param:Number minV] )</h3>
+		<h3>[method:this setMin]( [param:Number minV] )</h3>
 		<p>
 		minV — The minimum value to be represented with the lookup table
 		</p>
@@ -105,7 +105,7 @@
 		Sets this Lut with the minimum value to be represented.
 		</p>
 
-		<h3>[method:Lut setMax]( [param:Number maxV] )</h3>
+		<h3>[method:this setMax]( [param:Number maxV] )</h3>
 		<p>
 		maxV — The maximum value to be represented with the lookup table.
 		</p>

@@ -2,7 +2,7 @@ import {
 	MathUtils,
 	Spherical,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _lookDirection = new Vector3();
 const _spherical = new Spherical();

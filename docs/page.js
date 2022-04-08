@@ -2,11 +2,11 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
 	// redirect to the index page (using the current URL without extension as the new fragment).
-	// If this URL itself has a fragment, append it with a dot (since '#' in an URL fragment is not allowed).
+	// If this URL itself has a fragment, append it with a dot (since '#' in a URL fragment is not allowed).
 
 	let href = window.location.href;
 	const splitIndex = href.lastIndexOf( '/docs/' ) + 6;
-	const docsBaseURL = href.substr( 0, splitIndex );
+	const docsBaseURL = href.slice( 0, splitIndex );
 
 	let hash = window.location.hash;
 
@@ -31,27 +31,27 @@ function onDocumentLoad() {
 	let path, localizedPath;
 	const pathname = window.location.pathname;
 	const section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
-	let name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
+	let name = /[\-A-Za-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
 
 	switch ( section ) {
 
 		case 'api':
-			localizedPath = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			localizedPath = /\/api\/[A-Za-z0-9\/]+/.exec( pathname ).toString().slice( 5 );
 
 			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
-			path = localizedPath.replace( /^[A-z0-9-]+\//, '' );
+			path = localizedPath.replace( /^[A-Za-z0-9-]+\//, '' );
 
 			break;
 
 		case 'examples':
-			path = localizedPath = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+			path = localizedPath = /\/examples\/[A-Za-z0-9\/]+/.exec( pathname ).toString().slice( 10 );
 			break;
 
 		case 'manual':
 			name = name.replace( /\-/g, ' ' );
 
 			path = pathname.replace( /\ /g, '-' );
-			path = localizedPath = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
+			path = localizedPath = /\/manual\/[-A-Za-z0-9\/]+/.exec( path ).toString().slice( 8 );
 			break;
 
 	}
@@ -69,12 +69,12 @@ function onDocumentLoad() {
 	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, '<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" target="_parent" title="' + name + '.$2" class="permalink">#</a> .<a onclick="window.parent.setUrlFragment(\'' + name + '.$2\')" id="$2">$2</a> $3 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' );
 	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class="param" onclick="window.parent.setUrlFragment(\'$1\')">$1</a>' ); // [param:name title]
 
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+)\]/gi, '<a href="$1"  target="_blank">$1</a>' ); // [link:url]
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=|\!|\~]+) ([\w|\:|\/|\.|\-|\_|\'|\s]+)\]/gi, '<a href="$1"  target="_blank">$2</a>' ); // [link:url title]
-	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, '<strong>$1</strong>' ); // *
+	text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
+	text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+) ([\w\:\/\.\-\_\'\s]+)\]/gi, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
+	text = text.replace( /\*([\w\d\"\-\(][\w\d\ \/\+\-\(\)\=\,\."]*[\w\d\"\)]|\w)\*/gi, '<strong>$1</strong>' ); // *text*
 
 	text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
-	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../examples/#$1"  target="_blank">$2</a>' ); // [example:name title]
+	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../examples/#$1" target="_blank">$2</a>' ); // [example:name title]
 
 	text = text.replace( /<a class="param" onclick="window.parent.setUrlFragment\('\w+'\)">(null|this|Boolean|Object|Array|Number|String|Integer|Float|TypedArray|ArrayBuffer)<\/a>/gi, '<span class="param">$1</span>' ); // remove links to primitive types
 

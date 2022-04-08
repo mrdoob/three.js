@@ -28,7 +28,7 @@
 
   CodeMirror.defineExtension("showHint", function(options) {
     options = parseOptions(this, this.getCursor("start"), options);
-    var selections = this.listSelections()
+    var selections = this.listSelections();
     if (selections.length > 1) return;
     // By default, don't allow completion when something is selected.
     // A hint function can have a `supportsSelection` property to
@@ -50,7 +50,7 @@
 
   CodeMirror.defineExtension("closeHint", function() {
     if (this.state.completionActive) this.state.completionActive.close()
-  })
+  });
 
   function Completion(cm, options) {
     this.cm = cm;

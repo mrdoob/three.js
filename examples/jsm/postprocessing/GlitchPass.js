@@ -2,11 +2,12 @@ import {
 	DataTexture,
 	FloatType,
 	MathUtils,
-	RGBFormat,
+	RedFormat,
+	LuminanceFormat,
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
 
 class GlitchPass extends Pass {
@@ -38,6 +39,8 @@ class GlitchPass extends Pass {
 	}
 
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+
+		if ( renderer.capabilities.isWebGL2 === false ) this.uniforms[ 'tDisp' ].value.format = LuminanceFormat;
 
 		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 		this.uniforms[ 'seed' ].value = Math.random();//default seeding
@@ -94,19 +97,19 @@ class GlitchPass extends Pass {
 
 	generateHeightmap( dt_size ) {
 
-		const data_arr = new Float32Array( dt_size * dt_size * 3 );
+		const data_arr = new Float32Array( dt_size * dt_size );
 		const length = dt_size * dt_size;
 
 		for ( let i = 0; i < length; i ++ ) {
 
 			const val = MathUtils.randFloat( 0, 1 );
-			data_arr[ i * 3 + 0 ] = val;
-			data_arr[ i * 3 + 1 ] = val;
-			data_arr[ i * 3 + 2 ] = val;
+			data_arr[ i ] = val;
 
 		}
 
-		return new DataTexture( data_arr, dt_size, dt_size, RGBFormat, FloatType );
+		const texture = new DataTexture( data_arr, dt_size, dt_size, RedFormat, FloatType );
+		texture.needsUpdate = true;
+		return texture;
 
 	}
 

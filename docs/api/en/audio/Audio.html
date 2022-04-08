@@ -104,16 +104,21 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Audio connect]()</h3>
+		<h3>[method:this connect]()</h3>
 		<p>
 		Connect to the [page:Audio.source]. This is used internally on initialisation and when
 		setting / removing filters.
 		</p>
 
-		<h3>[method:Audio disconnect]()</h3>
+		<h3>[method:this disconnect]()</h3>
 		<p>
 		Disconnect from the [page:Audio.source]. This is used internally when
 		setting / removing filters.
+		</p>
+
+		<h3>[method:Float getDetune]()</h3>
+		<p>
+		Returns the detuning of oscillation in cents.
 		</p>
 
 		<h3>[method:BiquadFilterNode getFilter]()</h3>
@@ -147,84 +152,89 @@
 		Return the current volume.
 		</p>
 
-		<h3>[method:Audio play]( delay )</h3>
+		<h3>[method:this play]( delay )</h3>
 		<p>
 		If [page:Audio.hasPlaybackControl hasPlaybackControl] is true, starts playback.
 		</p>
 
-		<h3>[method:Audio pause]()</h3>
+		<h3>[method:this pause]()</h3>
 		<p>
 		If [page:Audio.hasPlaybackControl hasPlaybackControl] is true, pauses playback.
 		</p>
 
-		<h3>[method:null onEnded]()</h3>
+		<h3>[method:undefined onEnded]()</h3>
 		<p>
 		Called automatically when playback finished.
 		</p>
 
-		<h3>[method:Audio setBuffer]( audioBuffer )</h3>
+		<h3>[method:this setBuffer]( audioBuffer )</h3>
 		<p>
 		Setup the [page:Audio.source source] to the audioBuffer, and sets [page:Audio.sourceType sourceType] to 'buffer'.<br />
 		If [page:Audio.autoplay autoplay], also starts playback.
 		</p>
 
-		<h3>[method:Audio setFilter]( filter )</h3>
+		<h3>[method:this setDetune]( [param:Float value] )</h3>
+		<p>
+		Defines the detuning of oscillation in cents.
+		</p>
+
+		<h3>[method:this setFilter]( filter )</h3>
 		<p>
 		Applies a single filter node to the audio.
 		</p>
 
-		<h3>[method:Audio setFilters]( [param:Array value] )</h3>
+		<h3>[method:this setFilters]( [param:Array value] )</h3>
 		<p>
 		value - arrays of filters.<br />
 		Applies an array of filter nodes to the audio.
 		</p>
 
-		<h3>[method:Audio setLoop]( [param:Boolean value] )</h3>
+		<h3>[method:this setLoop]( [param:Boolean value] )</h3>
 		<p>
 		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop] to *value*
 		(whether playback should loop).
 		</p>
 
-		<h3>[method:Audio setLoopStart]( [param:Float value] )</h3>
+		<h3>[method:this setLoopStart]( [param:Float value] )</h3>
 		<p>
 		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart] to *value*.
 		</p>
 
-		<h3>[method:Audio setLoopEnd]( [param:Float value] )</h3>
+		<h3>[method:this setLoopEnd]( [param:Float value] )</h3>
 		<p>
 		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd] to *value*.
 		</p>
 
-		<h3>[method:Audio setMediaElementSource]( mediaElement )</h3>
+		<h3>[method:this setMediaElementSource]( mediaElement )</h3>
 		<p>
 		Applies the given object of type [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement HTMLMediaElement] as the source of this audio.<br />
 		Also sets [page:Audio.hasPlaybackControl hasPlaybackControl] to false.
 		</p>
 
-		<h3>[method:Audio setMediaStreamSource]( mediaStream )</h3>
+		<h3>[method:this setMediaStreamSource]( mediaStream )</h3>
 		<p>
 		Applies the given object of type [link:https://developer.mozilla.org/en-US/docs/Web/API/MediaStream MediaStream] as the source of this audio.<br />
 		Also sets [page:Audio.hasPlaybackControl hasPlaybackControl] to false.
 		</p>
 
-		<h3>[method:Audio setNodeSource]( audioNode )</h3>
+		<h3>[method:this setNodeSource]( audioNode )</h3>
 		<p>
 		Setup the [page:Audio.source source] to the audioBuffer, and sets [page:Audio.sourceType sourceType] to 'audioNode'.<br />
 		Also sets [page:Audio.hasPlaybackControl hasPlaybackControl] to false.
 
 		</p>
 
-		<h3>[method:Audio setPlaybackRate]( [param:Float value] )</h3>
+		<h3>[method:this setPlaybackRate]( [param:Float value] )</h3>
 		<p>
 		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, set the [page:Audio.playbackRate playbackRate] to *value*.
 		</p>
 
-		<h3>[method:Audio setVolume]( [param:Float value] )</h3>
+		<h3>[method:this setVolume]( [param:Float value] )</h3>
 		<p>
 		Set the volume.
 		</p>
 
-		<h3>[method:Audio stop]()</h3>
+		<h3>[method:this stop]()</h3>
 		<p>
 		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, stops playback.
 		</p>

@@ -4,7 +4,7 @@ import {
 	Color,
 	DynamicDrawUsage,
 	Mesh
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Port of http://webglsamples.org/blob/blob.html

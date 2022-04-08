@@ -17,7 +17,7 @@
 
 		<code>
 		// Create cube render target
-		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 
 		// Create cube camera
 		const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
@@ -25,7 +25,7 @@
 
 		// Create car
 		const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
-		const car = new Mesh( carGeometry, chromeMaterial );
+		const car = new THREE.Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
 		// Update the render target cube
@@ -72,7 +72,7 @@
 		<p>共有方法请参见其基类[page:Object3D]。</p>
 
 
-		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
+		<h3>[method:undefined update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
 		<p>
 		renderer -- 当前的WebGL渲染器<br />
 		scene -- 当前的场景

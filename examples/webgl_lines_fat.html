@@ -13,14 +13,26 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GPUStatsPanel } from './jsm/utils/GPUStatsPanel.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Line2 } from './jsm/lines/Line2.js';
 			import { LineMaterial } from './jsm/lines/LineMaterial.js';
@@ -97,7 +109,7 @@
 					color: 0xffffff,
 					linewidth: 5, // in world units with size attenuation, pixels otherwise
 					vertexColors: true,
-					
+
 					//resolution:  // to be set by renderer, eventually
 					dashed: false,
 					alphaToCoverage: true,
@@ -218,14 +230,14 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							line.visible = true;
 
 							line1.visible = false;
 
 							break;
 
-						case '1':
+						case 1:
 							line.visible = false;
 
 							line1.visible = true;
@@ -249,7 +261,7 @@
 
 				} );
 
-				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) { 
+				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) {
 
 					matLine.alphaToCoverage = val;
 
@@ -273,7 +285,7 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							matLine.dashSize = 2;
 							matLine.gapSize = 1;
 
@@ -282,7 +294,7 @@
 
 							break;
 
-						case '1':
+						case 1:
 							matLine.dashSize = 1;
 							matLine.gapSize = 1;
 
@@ -291,7 +303,7 @@
 
 							break;
 
-						case '2':
+						case 2:
 							matLine.dashSize = 1;
 							matLine.gapSize = 2;
 

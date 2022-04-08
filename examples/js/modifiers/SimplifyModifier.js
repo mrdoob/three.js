@@ -13,16 +13,6 @@
 
 	class SimplifyModifier {
 
-		constructor() {
-
-			if ( THREE.BufferGeometryUtils === undefined ) {
-
-				throw 'THREE.SimplifyModifier relies on THREE.BufferGeometryUtils';
-
-			}
-
-		}
-
 		modify( geometry, count ) {
 
 			if ( geometry.isGeometry === true ) {
@@ -151,7 +141,7 @@
 
 	function removeFromArray( array, object ) {
 
-		var k = array.indexOf( object );
+		const k = array.indexOf( object );
 		if ( k > - 1 ) array.splice( k, 1 );
 
 	}

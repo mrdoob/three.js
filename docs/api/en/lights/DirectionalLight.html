@@ -74,6 +74,11 @@
 			The default is *false*.
 		</p>
 
+		<h3>[property:Boolean isDirectionalLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 position]</h3>
 		<p>
 			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
@@ -123,7 +128,7 @@
 		Disposes of this light's [page:DirectionalLightShadow shadow].
 		</p>
 
-		<h3>[method:DirectionalLight copy]( [param:DirectionalLight source] )</h3>
+		<h3>[method:this copy]( [param:DirectionalLight source] )</h3>
 		<p>
 		Copies value of all the properties from the [page:DirectionalLight source] to this
 		DirectionalLight.

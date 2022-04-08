@@ -117,7 +117,8 @@
 				const vector = new THREE.Vector2();
 				return function getMouseOnCircle( pageX, pageY ) {
 
-					vector.set( ( pageX - scope.screen.width * 0.5 - scope.screen.left ) / ( scope.screen.width * 0.5 ), ( scope.screen.height + 2 * ( scope.screen.top - pageY ) ) / scope.screen.width );
+					vector.set( ( pageX - scope.screen.width * 0.5 - scope.screen.left ) / ( scope.screen.width * 0.5 ), ( scope.screen.height + 2 * ( scope.screen.top - pageY ) ) / scope.screen.width // screen.width intentional
+					);
 					return vector;
 
 				};
@@ -194,7 +195,7 @@
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom *= factor;
+						scope.object.zoom /= factor;
 						scope.object.updateProjectionMatrix();
 
 					} else {
@@ -509,9 +510,6 @@
 							_state = STATE.PAN;
 							break;
 
-						default:
-							_state = STATE.NONE;
-
 					}
 
 				}
@@ -687,7 +685,7 @@
 					case 2:
 						_state = STATE.TOUCH_ZOOM_PAN;
 
-						_moveCurr.copy( getMouseOnCircle( event.pageX - _movePrev.pageX, event.pageY - _movePrev.pageY ) );
+						_moveCurr.copy( getMouseOnCircle( event.pageX - _movePrev.x, event.pageY - _movePrev.y ) );
 
 						_movePrev.copy( _moveCurr );
 

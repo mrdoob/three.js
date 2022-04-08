@@ -49,9 +49,8 @@
 		[page:Constant minFilter] -- How the texture is sampled when a texel covers less than one pixel.
 		The default is [page:Textures THREE.LinearMipmapLinearFilter]. See [page:Textures minification filter constants] for other choices.<br />
 
-		[page:Constant format] -- The default is [page:Textures THREE.RGBFormat].
-		See [page:Textures format constants] for other choices.
-		Note that a bug has been reported with Firefox's WebGL implementation where use of [page:Textures THREE.RGBFormat] on a VideoTexture can result in a significant performance penalty, if you encounter this issue it is recommended to pass in [page:Textures THREE.RGBAFormat] instead.<br />
+		[page:Constant format] -- The default is [page:Textures THREE.RGBAFormat].
+		See [page:Textures format constants] for other choices.<br />
 
 		[page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
 		See [page:Textures type constants] for other choices.<br />
@@ -68,6 +67,16 @@
 		See the base [page:Texture Texture] class for common properties.
 		</p>
 
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+		Whether to generate mipmaps. False by default.
+		</p>
+
+		<h3>[property:Boolean isVideoTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
 		You will not need to set this manually here as it is handled by the [page:VideoTexture.update update] method.
@@ -79,7 +88,7 @@
 		See the base [page:Texture Texture] class for common methods.
 		</p>
 
-		<h3>[method:null update]()</h3>
+		<h3>[method:undefined update]()</h3>
 		<p>
 		This is called automatically and sets [property:Boolean needsUpdate] to *true* every time
 		a new frame is available.

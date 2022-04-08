@@ -23,7 +23,8 @@
 				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
 				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
-				"Animation system": "manual/en/introduction/Animation-system"
+				"Animation system": "manual/en/introduction/Animation-system",
+				"Color management": "manual/en/introduction/Color-management"
 			},
 
 			"Build Tools": {
@@ -134,6 +135,7 @@
 
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/en/geometries/CapsuleGeometry",
 				"CircleGeometry": "api/en/geometries/CircleGeometry",
 				"ConeGeometry": "api/en/geometries/ConeGeometry",
 				"CylinderGeometry": "api/en/geometries/CylinderGeometry",
@@ -283,10 +285,11 @@
 
 			"Renderers": {
 				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
-				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
+				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
+				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
 
@@ -311,10 +314,12 @@
 				"CanvasTexture": "api/en/textures/CanvasTexture",
 				"CompressedTexture": "api/en/textures/CompressedTexture",
 				"CubeTexture": "api/en/textures/CubeTexture",
+				"Data3DTexture": "api/en/textures/Data3DTexture",
+				"DataArrayTexture": "api/en/textures/DataArrayTexture",
 				"DataTexture": "api/en/textures/DataTexture",
-				"DataTexture2DArray": "api/en/textures/DataTexture2DArray",
-				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
+				"FramebufferTexture": "api/en/textures/FramebufferTexture",
+				"Source": "api/en/textures/Source",
 				"Texture": "api/en/textures/Texture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
@@ -361,11 +366,11 @@
 
 			"Loaders": {
 				"3DMLoader": "examples/en/loaders/3DMLoader",
-				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"FontLoader": "examples/en/loaders/FontLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
+				"LDrawLoader": "examples/en/loaders/LDrawLoader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
@@ -385,9 +390,11 @@
 			},
 
 			"Exporters": {
+				"ColladaExporter": "examples/en/exporters/ColladaExporter",
+				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
-				"PLYExporter": "examples/en/exporters/PLYExporter",
-				"ColladaExporter": "examples/en/exporters/ColladaExporter"
+				"OBJExporter": "examples/en/exporters/OBJExporter",
+				"PLYExporter": "examples/en/exporters/PLYExporter"
 			},
 
 			"Math": {
@@ -422,14 +429,8 @@
 
 		"Developer Reference": {
 
-			"Polyfills": {
-				"Polyfills": "api/en/Polyfills"
-			},
-
 			"WebGLRenderer": {
-				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram",
-				"WebGLShader": "api/en/renderers/webgl/WebGLShader",
-				"WebGLState": "api/en/renderers/webgl/WebGLState"
+				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
 			}
 
 		}
@@ -787,7 +788,6 @@
 
 			"渲染器": {
 				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
-				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
@@ -815,10 +815,12 @@
 				"CanvasTexture": "api/zh/textures/CanvasTexture",
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
+				"DataArrayTexture": "api/zh/textures/DataArrayTexture",
+				"Data3DTexture": "api/zh/textures/Data3DTexture",
 				"DataTexture": "api/zh/textures/DataTexture",
-				"DataTexture2DArray": "api/zh/textures/DataTexture2DArray",
-				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
+				"FramebufferTexture": "api/zh/textures/FramebufferTexture",
+				"Source": "api/zh/textures/Source",
 				"Texture": "api/zh/textures/Texture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
 			}
@@ -863,7 +865,6 @@
 			},
 
 			"加载器": {
-				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"FontLoader": "examples/zh/loaders/FontLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
@@ -886,9 +887,9 @@
 			},
 
 			"导出器": {
+				"ColladaExporter": "examples/zh/exporters/ColladaExporter",
 				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
-				"PLYExporter": "examples/zh/exporters/PLYExporter",
-				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
+				"PLYExporter": "examples/zh/exporters/PLYExporter"
 			},
 
 			"数学库": {
@@ -921,14 +922,8 @@
 
 		"开发者参考": {
 
-			"差异化支持": {
-				"Polyfills": "api/zh/Polyfills"
-			},
-
 			"WebGL渲染器": {
-				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram",
-				"WebGLShader": "api/zh/renderers/webgl/WebGLShader",
-				"WebGLState": "api/zh/renderers/webgl/WebGLState"
+				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram"
 			}
 
 		}
@@ -1013,7 +1008,59 @@
 				"Materials": "api/ko/constants/Materials",
 				"Renderer": "api/ko/constants/Renderer",
 				"Textures": "api/ko/constants/Textures"
+			},
+
+			"Core": {
+				"BufferAttribute": "api/ko/core/BufferAttribute",
+				"BufferGeometry": "api/ko/core/BufferGeometry",
+				"Clock": "api/ko/core/Clock",
+				"EventDispatcher": "api/ko/core/EventDispatcher",
+				"GLBufferAttribute": "api/ko/core/GLBufferAttribute",
+				"InstancedBufferAttribute": "api/ko/core/InstancedBufferAttribute",
+				"InstancedBufferGeometry": "api/ko/core/InstancedBufferGeometry",
+				"InstancedInterleavedBuffer": "api/ko/core/InstancedInterleavedBuffer",
+				"InterleavedBuffer": "api/ko/core/InterleavedBuffer",
+				"InterleavedBufferAttribute": "api/ko/core/InterleavedBufferAttribute",
+				"Layers": "api/ko/core/Layers",
+				"Object3D": "api/ko/core/Object3D",
+				"Raycaster": "api/ko/core/Raycaster",
+				"Uniform": "api/ko/core/Uniform"
+			},
+
+			"Core / BufferAttributes": {
+				"BufferAttribute Types": "api/ko/core/bufferAttributeTypes/BufferAttributeTypes"
+			},
+
+			"Extras": {
+				"DataUtils": "api/ko/extras/DataUtils",
+				"Earcut": "api/ko/extras/Earcut",
+				"ImageUtils": "api/ko/extras/ImageUtils",
+				"PMREMGenerator": "api/ko/extras/PMREMGenerator",
+				"ShapeUtils": "api/ko/extras/ShapeUtils"
+			},
+
+			"Extras / Core": {
+				"Curve": "api/ko/extras/core/Curve",
+				"CurvePath": "api/ko/extras/core/CurvePath",
+				"Interpolations": "api/ko/extras/core/Interpolations",
+				"Path": "api/ko/extras/core/Path",
+				"Shape": "api/ko/extras/core/Shape",
+				"ShapePath": "api/ko/extras/core/ShapePath"
+			},
+
+			"Extras / Curves": {
+				"ArcCurve": "api/ko/extras/curves/ArcCurve",
+				"CatmullRomCurve3": "api/ko/extras/curves/CatmullRomCurve3",
+				"CubicBezierCurve": "api/ko/extras/curves/CubicBezierCurve",
+				"CubicBezierCurve3": "api/ko/extras/curves/CubicBezierCurve3",
+				"EllipseCurve": "api/ko/extras/curves/EllipseCurve",
+				"LineCurve": "api/ko/extras/curves/LineCurve",
+				"LineCurve3": "api/ko/extras/curves/LineCurve3",
+				"QuadraticBezierCurve": "api/ko/extras/curves/QuadraticBezierCurve",
+				"QuadraticBezierCurve3": "api/ko/extras/curves/QuadraticBezierCurve3",
+				"SplineCurve": "api/ko/extras/curves/SplineCurve"
 			}
+
 		},
 
 		"예제": {

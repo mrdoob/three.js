@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { zipSync, strToU8 } from '../../examples/jsm/libs/fflate.module.js';
 
@@ -6,24 +6,24 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 function MenubarFile( editor ) {
 
-	var config = editor.config;
-	var strings = editor.strings;
+	const config = editor.config;
+	const strings = editor.strings;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new UIPanel();
+	const title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/file' ) );
 	container.add( title );
 
-	var options = new UIPanel();
+	const options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// New
 
-	var option = new UIRow();
+	let option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
 	option.onClick( function () {
@@ -43,11 +43,11 @@ function MenubarFile( editor ) {
 
 	// Import
 
-	var form = document.createElement( 'form' );
+	const form = document.createElement( 'form' );
 	form.style.display = 'none';
 	document.body.appendChild( form );
 
-	var fileInput = document.createElement( 'input' );
+	const fileInput = document.createElement( 'input' );
 	fileInput.multiple = true;
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function () {
@@ -58,7 +58,7 @@ function MenubarFile( editor ) {
 	} );
 	form.appendChild( fileInput );
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
@@ -74,12 +74,12 @@ function MenubarFile( editor ) {
 
 	// Export Geometry
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/geometry' ) );
 	option.onClick( function () {
 
-		var object = editor.selected;
+		const object = editor.selected;
 
 		if ( object === null ) {
 
@@ -88,7 +88,7 @@ function MenubarFile( editor ) {
 
 		}
 
-		var geometry = object.geometry;
+		const geometry = object.geometry;
 
 		if ( geometry === undefined ) {
 
@@ -97,7 +97,7 @@ function MenubarFile( editor ) {
 
 		}
 
-		var output = geometry.toJSON();
+		let output = geometry.toJSON();
 
 		try {
 
@@ -117,12 +117,12 @@ function MenubarFile( editor ) {
 
 	// Export Object
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/object' ) );
 	option.onClick( function () {
 
-		var object = editor.selected;
+		const object = editor.selected;
 
 		if ( object === null ) {
 
@@ -131,7 +131,7 @@ function MenubarFile( editor ) {
 
 		}
 
-		var output = object.toJSON();
+		let output = object.toJSON();
 
 		try {
 
@@ -151,12 +151,12 @@ function MenubarFile( editor ) {
 
 	// Export Scene
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/scene' ) );
 	option.onClick( function () {
 
-		var output = editor.scene.toJSON();
+		let output = editor.scene.toJSON();
 
 		try {
 
@@ -180,14 +180,14 @@ function MenubarFile( editor ) {
 
 	// Export DAE
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
 	option.onClick( async function () {
 
-		var { ColladaExporter } = await import( '../../examples/jsm/exporters/ColladaExporter.js' );
+		const { ColladaExporter } = await import( '../../examples/jsm/exporters/ColladaExporter.js' );
 
-		var exporter = new ColladaExporter();
+		const exporter = new ColladaExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -200,12 +200,12 @@ function MenubarFile( editor ) {
 
 	// Export DRC
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
 	option.onClick( async function () {
 
-		var object = editor.selected;
+		const object = editor.selected;
 
 		if ( object === null || object.isMesh === undefined ) {
 
@@ -214,9 +214,9 @@ function MenubarFile( editor ) {
 
 		}
 
-		var { DRACOExporter } = await import( '../../examples/jsm/exporters/DRACOExporter.js' );
+		const { DRACOExporter } = await import( '../../examples/jsm/exporters/DRACOExporter.js' );
 
-		var exporter = new DRACOExporter();
+		const exporter = new DRACOExporter();
 
 		const options = {
 			decodeSpeed: 5,
@@ -229,7 +229,7 @@ function MenubarFile( editor ) {
 		};
 
 		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
-		var result = exporter.parse( object, options );
+		const result = exporter.parse( object, options );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
@@ -237,46 +237,46 @@ function MenubarFile( editor ) {
 
 	// Export GLB
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( async function () {
 
-		var scene = editor.scene;
-		var animations = getAnimations( scene );
+		const scene = editor.scene;
+		const animations = getAnimations( scene );
 
-		var { GLTFExporter } = await import( '../../examples/jsm/exporters/GLTFExporter.js' );
+		const { GLTFExporter } = await import( '../../examples/jsm/exporters/GLTFExporter.js' );
 
-		var exporter = new GLTFExporter();
+		const exporter = new GLTFExporter();
 
 		exporter.parse( scene, function ( result ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-		}, { binary: true, animations: animations } );
+		}, undefined, { binary: true, animations: animations } );
 
 	} );
 	options.add( option );
 
 	// Export GLTF
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( async function () {
 
-		var scene = editor.scene;
-		var animations = getAnimations( scene );
+		const scene = editor.scene;
+		const animations = getAnimations( scene );
 
-		var { GLTFExporter } = await import( '../../examples/jsm/exporters/GLTFExporter.js' );
+		const { GLTFExporter } = await import( '../../examples/jsm/exporters/GLTFExporter.js' );
 
-		var exporter = new GLTFExporter();
+		const exporter = new GLTFExporter();
 
 		exporter.parse( scene, function ( result ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
-		}, { animations: animations } );
+		}, undefined, { animations: animations } );
 
 
 	} );
@@ -284,12 +284,12 @@ function MenubarFile( editor ) {
 
 	// Export OBJ
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
 	option.onClick( async function () {
 
-		var object = editor.selected;
+		const object = editor.selected;
 
 		if ( object === null ) {
 
@@ -298,9 +298,9 @@ function MenubarFile( editor ) {
 
 		}
 
-		var { OBJExporter } = await import( '../../examples/jsm/exporters/OBJExporter.js' );
+		const { OBJExporter } = await import( '../../examples/jsm/exporters/OBJExporter.js' );
 
-		var exporter = new OBJExporter();
+		const exporter = new OBJExporter();
 
 		saveString( exporter.parse( object ), 'model.obj' );
 
@@ -309,14 +309,14 @@ function MenubarFile( editor ) {
 
 	// Export PLY (ASCII)
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/ply' ) );
 	option.onClick( async function () {
 
-		var { PLYExporter } = await import( '../../examples/jsm/exporters/PLYExporter.js' );
+		const { PLYExporter } = await import( '../../examples/jsm/exporters/PLYExporter.js' );
 
-		var exporter = new PLYExporter();
+		const exporter = new PLYExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -329,14 +329,14 @@ function MenubarFile( editor ) {
 
 	// Export PLY (Binary)
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/ply_binary' ) );
 	option.onClick( async function () {
 
-		var { PLYExporter } = await import( '../../examples/jsm/exporters/PLYExporter.js' );
+		const { PLYExporter } = await import( '../../examples/jsm/exporters/PLYExporter.js' );
 
-		var exporter = new PLYExporter();
+		const exporter = new PLYExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -349,14 +349,14 @@ function MenubarFile( editor ) {
 
 	// Export STL (ASCII)
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
 	option.onClick( async function () {
 
-		var { STLExporter } = await import( '../../examples/jsm/exporters/STLExporter.js' );
+		const { STLExporter } = await import( '../../examples/jsm/exporters/STLExporter.js' );
 
-		var exporter = new STLExporter();
+		const exporter = new STLExporter();
 
 		saveString( exporter.parse( editor.scene ), 'model.stl' );
 
@@ -365,14 +365,14 @@ function MenubarFile( editor ) {
 
 	// Export STL (Binary)
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
 	option.onClick( async function () {
 
-		var { STLExporter } = await import( '../../examples/jsm/exporters/STLExporter.js' );
+		const { STLExporter } = await import( '../../examples/jsm/exporters/STLExporter.js' );
 
-		var exporter = new STLExporter();
+		const exporter = new STLExporter();
 
 		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model-binary.stl' );
 
@@ -381,14 +381,14 @@ function MenubarFile( editor ) {
 
 	// Export USDZ
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/usdz' ) );
 	option.onClick( async function () {
 
-		var { USDZExporter } = await import( '../../examples/jsm/exporters/USDZExporter.js' );
+		const { USDZExporter } = await import( '../../examples/jsm/exporters/USDZExporter.js' );
 
-		var exporter = new USDZExporter();
+		const exporter = new USDZExporter();
 
 		saveArrayBuffer( await exporter.parse( editor.scene, { binary: true } ), 'model.usdz' );
 
@@ -401,16 +401,16 @@ function MenubarFile( editor ) {
 
 	// Publish
 
-	var option = new UIRow();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {
 
-		var toZip = {};
+		const toZip = {};
 
 		//
 
-		var output = editor.toJSON();
+		let output = editor.toJSON();
 		output.metadata.type = 'App';
 		delete output.history;
 
@@ -421,33 +421,33 @@ function MenubarFile( editor ) {
 
 		//
 
-		var title = config.getKey( 'project/title' );
+		const title = config.getKey( 'project/title' );
 
-		var manager = new THREE.LoadingManager( function () {
+		const manager = new THREE.LoadingManager( function () {
 
-			var zipped = zipSync( toZip, { level: 9 } );
+			const zipped = zipSync( toZip, { level: 9 } );
 
-			var blob = new Blob( [ zipped.buffer ], { type: 'application/zip' } );
+			const blob = new Blob( [ zipped.buffer ], { type: 'application/zip' } );
 
 			save( blob, ( title !== '' ? title : 'untitled' ) + '.zip' );
 
 		} );
 
-		var loader = new THREE.FileLoader( manager );
+		const loader = new THREE.FileLoader( manager );
 		loader.load( 'js/libs/app/index.html', function ( content ) {
 
 			content = content.replace( '<!-- title -->', title );
 
-			var includes = [];
+			const includes = [];
 
 			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
 
-			var editButton = '';
+			let editButton = '';
 
 			if ( config.getKey( 'project/editable' ) ) {
 
 				editButton = [
-					'			var button = document.createElement( \'a\' );',
+					'			let button = document.createElement( \'a\' );',
 					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
 					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
 					'			button.target = \'_blank\';',
@@ -483,7 +483,7 @@ function MenubarFile( editor ) {
 
 	//
 
-	var link = document.createElement( 'a' );
+	const link = document.createElement( 'a' );
 	function save( blob, filename ) {
 
 		if ( link.href ) {
@@ -512,7 +512,7 @@ function MenubarFile( editor ) {
 
 	function getAnimations( scene ) {
 
-		var animations = [];
+		const animations = [];
 
 		scene.traverse( function ( object ) {
 

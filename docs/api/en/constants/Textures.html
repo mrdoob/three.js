@@ -17,7 +17,6 @@
 		THREE.EquirectangularReflectionMapping
 		THREE.EquirectangularRefractionMapping
 		THREE.CubeUVReflectionMapping
-		THREE.CubeUVRefractionMapping
 		</code>
 
 		<p>
@@ -129,7 +128,6 @@
 		THREE.HalfFloatType
 		THREE.UnsignedShort4444Type
 		THREE.UnsignedShort5551Type
-		THREE.UnsignedShort565Type
 		THREE.UnsignedInt248Type
 		</code>
 		<p>
@@ -145,13 +143,10 @@
 		THREE.RedIntegerFormat
 		THREE.RGFormat
 		THREE.RGIntegerFormat
-		THREE.RGBFormat
-		THREE.RGBIntegerFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
 		THREE.LuminanceAlphaFormat
-		THREE.RGBEFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
@@ -177,12 +172,6 @@
 		(can only be used with a WebGL 2 rendering context).
 		<br /><br />
 
-		[page:constant RGBFormat] discards the alpha components and reads the red, green and blue components.<br /><br />
-
-		[page:constant RGBIntegerFormat] discards the alpha components and reads the red, green and blue components.
-		(can only be used with a WebGL 2 rendering context).
-		<br /><br />
-
 		[page:constant RGBAFormat] is the default and reads the red, green, blue and alpha components.<br /><br />
 
 		[page:constant RGBAIntegerFormat] is the default and reads the red, green, blue and alpha components.
@@ -198,8 +187,6 @@
 		[page:constant LuminanceAlphaFormat] reads each element as a luminance/alpha double.
 		The same process occurs as for the [page:constant LuminanceFormat], except that the
 		alpha channel may have values other than *1.0*.<br /><br />
-
-		[page:constant RGBEFormat] is identical to [page:constant RGBAFormat].<br /><br />
 
 		[page:constant DepthFormat] reads each element as a single depth value, converts it to floating point, and clamps to the range [0,1].
 		This is the default for [page:DepthTexture DepthTexture].<br /><br />
@@ -282,20 +269,6 @@
 		THREE.RGBA_ASTC_10x10_Format
 		THREE.RGBA_ASTC_12x10_Format
 		THREE.RGBA_ASTC_12x12_Format
-		THREE.SRGB8_ALPHA8_ASTC_4x4_Format
-		THREE.SRGB8_ALPHA8_ASTC_5x4_Format
-		THREE.SRGB8_ALPHA8_ASTC_5x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_6x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_6x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x8_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x8_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x10_Format
-		THREE.SRGB8_ALPHA8_ASTC_12x10_Format
-		THREE.SRGB8_ALPHA8_ASTC_12x12_Format
 		</code>
 		<p>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
@@ -559,12 +532,6 @@
 		<code>
 		THREE.LinearEncoding
 		THREE.sRGBEncoding
-		THREE.GammaEncoding
-		THREE.RGBEEncoding
-		THREE.LogLuvEncoding
-		THREE.RGBM7Encoding
-		THREE.RGBM16Encoding
-		THREE.RGBDEncoding
 		THREE.BasicDepthPacking
 		THREE.RGBADepthPacking
 		</code>

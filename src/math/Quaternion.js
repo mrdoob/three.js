@@ -604,7 +604,7 @@ class Quaternion {
 
 	slerpQuaternions( qa, qb, t ) {
 
-		this.copy( qa ).slerp( qb, t );
+		return this.copy( qa ).slerp( qb, t );
 
 	}
 
@@ -681,6 +681,15 @@ class Quaternion {
 	}
 
 	_onChangeCallback() {}
+
+	*[ Symbol.iterator ]() {
+
+		yield this._x;
+		yield this._y;
+		yield this._z;
+		yield this._w;
+
+	}
 
 }
 

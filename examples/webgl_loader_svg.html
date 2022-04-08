@@ -19,20 +19,28 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - SVGLoader
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
-
-			import Stats from './jsm/libs/stats.module.js';
-
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import * as THREE from 'three';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
-			let renderer, stats, scene, camera, gui, guiData;
+			let renderer, scene, camera, gui, guiData;
 
 			init();
-			animate();
 
 			//
 
@@ -50,17 +58,14 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				//
 
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
 				controls.screenSpacePanning = true;
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				//
 
@@ -84,7 +89,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new GUI( { width: 350 } );
+				gui = new GUI();
 
 				gui.add( guiData, 'currentURL', {
 
@@ -103,11 +108,14 @@
 					"Test 8": 'models/svg/tests/8.svg',
 					"Test 9": 'models/svg/tests/9.svg',
 					"Units": 'models/svg/tests/units.svg',
+					"Ordering": 'models/svg/tests/ordering.svg',
 					"Defs": 'models/svg/tests/testDefs/Svg-defs.svg',
 					"Defs2": 'models/svg/tests/testDefs/Svg-defs2.svg',
 					"Defs3": 'models/svg/tests/testDefs/Wave-defs.svg',
 					"Defs4": 'models/svg/tests/testDefs/defs4.svg',
 					"Defs5": 'models/svg/tests/testDefs/defs5.svg',
+					"Style CSS inside defs": 'models/svg/style-css-inside-defs.svg',
+					"Multiple CSS classes": 'models/svg/multiple-css-classes.svg',
 					"Zero Radius": 'models/svg/zero-radius.svg'
 
 				} ).name( 'SVG File' ).onChange( update );
@@ -163,9 +171,9 @@
 						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
 							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( fillColor ),
+								color: new THREE.Color().setStyle( fillColor ).convertSRGBToLinear(),
 								opacity: path.userData.style.fillOpacity,
-								transparent: path.userData.style.fillOpacity < 1,
+								transparent: true,
 								side: THREE.DoubleSide,
 								depthWrite: false,
 								wireframe: guiData.fillShapesWireframe
@@ -191,9 +199,9 @@
 						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
 
 							const material = new THREE.MeshBasicMaterial( {
-								color: new THREE.Color().setStyle( strokeColor ),
+								color: new THREE.Color().setStyle( strokeColor ).convertSRGBToLinear(),
 								opacity: path.userData.style.strokeOpacity,
-								transparent: path.userData.style.strokeOpacity < 1,
+								transparent: true,
 								side: THREE.DoubleSide,
 								depthWrite: false,
 								wireframe: guiData.strokesWireframe
@@ -221,6 +229,8 @@
 
 					scene.add( group );
 
+					render();
+
 				} );
 
 			}
@@ -231,15 +241,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
 
 			}
 

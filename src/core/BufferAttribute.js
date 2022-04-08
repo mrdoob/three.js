@@ -222,9 +222,7 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.x = this.getX( i );
-			_vector.y = this.getY( i );
-			_vector.z = this.getZ( i );
+			_vector.fromBufferAttribute( this, i );
 
 			_vector.applyMatrix4( m );
 
@@ -240,9 +238,7 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.x = this.getX( i );
-			_vector.y = this.getY( i );
-			_vector.z = this.getZ( i );
+			_vector.fromBufferAttribute( this, i );
 
 			_vector.applyNormalMatrix( m );
 
@@ -258,9 +254,7 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.x = this.getX( i );
-			_vector.y = this.getY( i );
-			_vector.z = this.getZ( i );
+			_vector.fromBufferAttribute( this, i );
 
 			_vector.transformDirection( m );
 

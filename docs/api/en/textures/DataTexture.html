@@ -19,14 +19,14 @@
 		<h3>[name]( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding )</h3>
 		<p>
 			The data argument must be an [link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView].
-			Further parameters correspond to the properties inherited from [page:Texture], where both magFilter and minFilter default to THREE.NearestFilter. The properties flipY and generateMipmaps are initially set to false.
+			Further parameters correspond to the properties inherited from [page:Texture], where both magFilter and minFilter default to THREE.NearestFilter.
 		</p>
 		<p>
 			The interpretation of the data depends on type and format:
 			If the type is THREE.UnsignedByteType, a Uint8Array will be useful for addressing the texel data.
-			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity). Similarly, THREE.RGBFormat specifies a format where only three values are used for each texel.<br />
+			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity).<br />
 
-			For the packed types, THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type or THREE.UnsignedShort565Type, all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
+			For the packed types, THREE.UnsignedShort4444Type and THREE.UnsignedShort5551Type all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
 
 			In order to use the types THREE.FloatType and THREE.HalfFloatType, the WebGL implementation must support the respective extensions OES_texture_float and OES_texture_half_float. In order to use THREE.LinearFilter for component-wise, bilinear interpolation of the texels based on these types, the WebGL extensions OES_texture_float_linear or OES_texture_half_float_linear must also be present.
 		</p>
@@ -40,7 +40,7 @@
 		const height = 512;
 
 		const size = width * height;
-		const data = new Uint8Array( 3 * size );
+		const data = new Uint8Array( 4 * size );
 		const color = new THREE.Color( 0xffffff );
 
 		const r = Math.floor( color.r * 255 );
@@ -49,17 +49,19 @@
 
 		for ( let i = 0; i < size; i ++ ) {
 
-			const stride = i * 3;
+			const stride = i * 4;
 
 			data[ stride ] = r;
 			data[ stride + 1 ] = g;
 			data[ stride + 2 ] = b;
+			data[ stride + 3 ] = 255;
 
 		}
 
 		// used the buffer to create a [name]
 
-		const texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+		const texture = new THREE.DataTexture( data, width, height );
+		texture.needsUpdate = true;
 		</code>
 
 		<h2>Properties</h2>
@@ -68,9 +70,33 @@
 		See the base [page:Texture Texture] class for common properties.
 		</p>
 
+		<h3>[property:Boolean flipY]</h3>
+		<p>
+		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+		Whether to generate mipmaps (if possible) for a texture. False by default.
+		</p>
+
 		<h3>[property:Image image]</h3>
 		<p>
 		Overridden with a record type holding data, width and height.
+		</p>
+
+		<h3>[property:Boolean isDataTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h3>[property:number unpackAlignment]</h3>
+		<p>
+		1 by default. Specifies the alignment requirements for the start of each pixel row in memory.
+		The allowable values are 1 (byte-alignment), 2 (rows aligned to even-numbered bytes),
+		4 (word-alignment), and 8 (rows start on double-word boundaries).
+		See [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]
+		for more information.
 		</p>
 
 		<h2>Methods</h2>

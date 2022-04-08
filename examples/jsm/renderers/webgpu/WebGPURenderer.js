@@ -8,6 +8,7 @@ import WebGPURenderPipelines from './WebGPURenderPipelines.js';
 import WebGPUComputePipelines from './WebGPUComputePipelines.js';
 import WebGPUBindings from './WebGPUBindings.js';
 import WebGPURenderLists from './WebGPURenderLists.js';
+import WebGPURenderStates from './WebGPURenderStates.js';
 import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
@@ -92,7 +93,6 @@ class WebGPURenderer {
 		this._adapter = null;
 		this._device = null;
 		this._context = null;
-		this._swapChain = null;
 		this._colorBuffer = null;
 		this._depthBuffer = null;
 
@@ -106,10 +106,13 @@ class WebGPURenderer {
 		this._renderPipelines = null;
 		this._computePipelines = null;
 		this._renderLists = null;
+		this._renderStates = null;
 		this._textures = null;
 		this._background = null;
 
 		this._renderPassDescriptor = null;
+
+		this._currentRenderState = null;
 
 		this._currentRenderList = null;
 		this._opaqueSort = null;
@@ -166,15 +169,15 @@ class WebGPURenderer {
 
 		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
 
-		const swapChain = context.configure( {
+		context.configure( {
 			device: device,
-			format: GPUTextureFormat.BRGA8Unorm // this is the only valid swap chain format right now (r121)
+			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
+			compositingAlphaMode: 'premultiplied'
 		} );
 
 		this._adapter = adapter;
 		this._device = device;
 		this._context = context;
-		this._swapChain = swapChain;
 
 		this._info = new WebGPUInfo();
 		this._properties = new WebGPUProperties();
@@ -182,11 +185,12 @@ class WebGPURenderer {
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
-		this._nodes = new WebGPUNodes( this );
-		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, parameters.sampleCount, this._nodes );
+		this._nodes = new WebGPUNodes( this, this._properties );
 		this._computePipelines = new WebGPUComputePipelines( device );
-		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
+		this._renderPipelines = new WebGPURenderPipelines( this, device, parameters.sampleCount, this._nodes );
+		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
+		this._renderStates = new WebGPURenderStates();
 		this._background = new WebGPUBackground( this );
 
 		//
@@ -195,7 +199,7 @@ class WebGPURenderer {
 			colorAttachments: [ {
 				view: null
 			} ],
-			 depthStencilAttachment: {
+			depthStencilAttachment: {
 				view: null,
 				depthStoreOp: GPUStoreOp.Store,
 				stencilStoreOp: GPUStoreOp.Store
@@ -226,6 +230,9 @@ class WebGPURenderer {
 
 		this._currentRenderList = this._renderLists.get( scene, camera );
 		this._currentRenderList.init();
+
+		this._currentRenderState = this._renderStates.get( scene );
+		this._currentRenderState.init();
 
 		this._projectObject( scene, camera, 0 );
 
@@ -305,17 +312,21 @@ class WebGPURenderer {
 
 		}
 
+		// light node
+
+		const lightNode = this._currentRenderState.getLightNode();
+
 		// process render lists
 
 		const opaqueObjects = this._currentRenderList.opaque;
 		const transparentObjects = this._currentRenderList.transparent;
 
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, passEncoder );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, passEncoder );
+		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, scene, lightNode, passEncoder );
+		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, scene, lightNode, passEncoder );
 
 		// finish render pass
 
-		passEncoder.endPass();
+		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
 
 	}
@@ -489,7 +500,7 @@ class WebGPURenderer {
 
 		} else {
 
-			format = GPUTextureFormat.BRGA8Unorm; // default swap chain format
+			format = GPUTextureFormat.BGRA8Unorm; // default context format
 
 		}
 
@@ -583,6 +594,7 @@ class WebGPURenderer {
 		this._bindings.dispose();
 		this._info.dispose();
 		this._renderLists.dispose();
+		this._renderStates.dispose();
 		this._textures.dispose();
 
 	}
@@ -622,7 +634,7 @@ class WebGPURenderer {
 
 		}
 
-		passEncoder.endPass();
+		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
 
 	}
@@ -635,8 +647,8 @@ class WebGPURenderer {
 
 	_projectObject( object, camera, groupOrder ) {
 
-		const info = this._info;
 		const currentRenderList = this._currentRenderList;
+		const currentRenderState = this._currentRenderState;
 
 		if ( object.visible === false ) return;
 
@@ -654,7 +666,7 @@ class WebGPURenderer {
 
 			} else if ( object.isLight ) {
 
-				//currentRenderState.pushLight( object );
+				currentRenderState.pushLight( object );
 
 				if ( object.castShadow ) {
 
@@ -739,7 +751,7 @@ class WebGPURenderer {
 
 	}
 
-	_renderObjects( renderList, camera, passEncoder ) {
+	_renderObjects( renderList, camera, scene, lightNode, passEncoder ) {
 
 		// process renderable objects
 
@@ -756,6 +768,13 @@ class WebGPURenderer {
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			this._objects.update( object );
+
+			// send scene properties to object
+
+			const objectProperties = this._properties.get( object );
+
+			objectProperties.lightNode = lightNode;
+			objectProperties.fogNode = scene.fogNode;
 
 			if ( camera.isArrayCamera ) {
 
@@ -774,7 +793,7 @@ class WebGPURenderer {
 						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
 						this._nodes.update( object, camera2 );
-						this._bindings.update( object, camera2 );
+						this._bindings.update( object );
 						this._renderObject( object, passEncoder );
 
 					}
@@ -784,7 +803,7 @@ class WebGPURenderer {
 			} else {
 
 				this._nodes.update( object, camera );
-				this._bindings.update( object, camera );
+				this._bindings.update( object );
 				this._renderObject( object, passEncoder );
 
 			}
@@ -828,7 +847,8 @@ class WebGPURenderer {
 
 		const drawRange = geometry.drawRange;
 		const firstVertex = drawRange.start;
-		const instanceCount = ( geometry.isInstancedBufferGeometry ) ? geometry.instanceCount : 1;
+
+		const instanceCount = geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.isInstancedMesh ? object.count : 1 );
 
 		if ( hasIndex === true ) {
 
@@ -897,7 +917,7 @@ class WebGPURenderer {
 					depthOrArrayLayers: 1
 				},
 				sampleCount: this._parameters.sampleCount,
-				format: GPUTextureFormat.BRGA8Unorm,
+				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT
 			} );
 
@@ -936,8 +956,9 @@ class WebGPURenderer {
 
 			this._context.configure( {
 				device: device,
-				format: GPUTextureFormat.BRGA8Unorm,
+				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT,
+				compositingAlphaMode: 'premultiplied',
 				size: {
 					width: Math.floor( this._width * this._pixelRatio ),
 					height: Math.floor( this._height * this._pixelRatio ),

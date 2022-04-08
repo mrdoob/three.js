@@ -2,17 +2,15 @@ import {
 	BufferGeometry,
 	Clock,
 	Float32BufferAttribute,
-	LinearFilter,
 	Mesh,
 	OrthographicCamera,
-	RGBAFormat,
 	Vector2,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 import { CopyShader } from '../shaders/CopyShader.js';
-import { ShaderPass } from '../postprocessing/ShaderPass.js';
-import { MaskPass } from '../postprocessing/MaskPass.js';
-import { ClearMaskPass } from '../postprocessing/MaskPass.js';
+import { ShaderPass } from './ShaderPass.js';
+import { MaskPass } from './MaskPass.js';
+import { ClearMaskPass } from './MaskPass.js';
 
 class EffectComposer {
 
@@ -22,18 +20,12 @@ class EffectComposer {
 
 		if ( renderTarget === undefined ) {
 
-			const parameters = {
-				minFilter: LinearFilter,
-				magFilter: LinearFilter,
-				format: RGBAFormat
-			};
-
 			const size = renderer.getSize( new Vector2() );
 			this._pixelRatio = renderer.getPixelRatio();
 			this._width = size.width;
 			this._height = size.height;
 
-			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, parameters );
+			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio );
 			renderTarget.texture.name = 'EffectComposer.rt1';
 
 		} else {

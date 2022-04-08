@@ -1,27 +1,34 @@
 import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
-import NodeFrame from '../../nodes/core/NodeFrame.js';
+import NodeFrame from 'three-nodes/core/NodeFrame.js';
 
 class WebGPUNodes {
 
-	constructor( renderer ) {
+	constructor( renderer, properties ) {
 
 		this.renderer = renderer;
+		this.properties = properties;
 
 		this.nodeFrame = new NodeFrame();
 
-		this.builders = new WeakMap();
-
 	}
 
-	get( object, lightNode ) {
+	get( object ) {
 
-		let nodeBuilder = this.builders.get( object );
+		const objectProperties = this.properties.get( object );
+
+		let nodeBuilder = objectProperties.nodeBuilder;
 
 		if ( nodeBuilder === undefined ) {
 
-			nodeBuilder = new WebGPUNodeBuilder( object, this.renderer, lightNode ).build();
+			const fogNode = objectProperties.fogNode;
+			const lightNode = objectProperties.lightNode;
 
-			this.builders.set( object, nodeBuilder );
+			nodeBuilder = new WebGPUNodeBuilder( object, this.renderer );
+			nodeBuilder.lightNode = lightNode;
+			nodeBuilder.fogNode = fogNode;
+			nodeBuilder.build();
+
+			objectProperties.nodeBuilder = nodeBuilder;
 
 		}
 
@@ -31,7 +38,9 @@ class WebGPUNodes {
 
 	remove( object ) {
 
-		this.builders.delete( object );
+		const objectProperties = this.properties.get( object );
+
+		delete objectProperties.nodeBuilder;
 
 	}
 
@@ -41,18 +50,18 @@ class WebGPUNodes {
 
 	}
 
-	update( object, camera, lightNode ) {
+	update( object, camera ) {
 
 		const renderer = this.renderer;
 		const material = object.material;
 
-		const nodeBuilder = this.get( object, lightNode );
+		const nodeBuilder = this.get( object );
 		const nodeFrame = this.nodeFrame;
 
-		nodeFrame.material = material;
-		nodeFrame.camera = camera;
 		nodeFrame.object = object;
+		nodeFrame.camera = camera;
 		nodeFrame.renderer = renderer;
+		nodeFrame.material = material;
 
 		for ( const node of nodeBuilder.updateNodes ) {
 
@@ -64,7 +73,7 @@ class WebGPUNodes {
 
 	dispose() {
 
-		this.builders = new WeakMap();
+		this.nodeFrame = new NodeFrame();
 
 	}
 

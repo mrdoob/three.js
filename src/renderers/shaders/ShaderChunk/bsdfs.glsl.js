@@ -285,7 +285,7 @@ float V_Neubelt( float dotNV, float dotNL ) {
 
 }
 
-vec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenTint, const in float sheenRoughness ) {
+vec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenColor, const in float sheenRoughness ) {
 
 	vec3 halfDir = normalize( lightDir + viewDir );
 
@@ -296,7 +296,7 @@ vec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 no
 	float D = D_Charlie( sheenRoughness, dotNH );
 	float V = V_Neubelt( dotNV, dotNL );
 
-	return sheenTint * ( D * V );
+	return sheenColor * ( D * V );
 
 }
 

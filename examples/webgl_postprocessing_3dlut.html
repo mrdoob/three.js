@@ -13,11 +13,23 @@
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
 			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a><br />
-			LUTs from <a href="https://www.rocketstock.com/free-after-effects-templates/35-free-luts-for-color-grading-videos/">RocketStock</a>
+			LUTs from <a href="https://www.rocketstock.com/free-after-effects-templates/35-free-luts-for-color-grading-videos/">RocketStock</a>, <a href="https://www.freepresets.com/product/free-luts-cinematic/">FreePresets.com</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
@@ -27,8 +39,9 @@
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 			import { LUTPass } from './jsm/postprocessing/LUTPass.js';
 			import { LUTCubeLoader } from './jsm/loaders/LUTCubeLoader.js';
+			import { LUT3dlLoader } from './jsm/loaders/LUT3dlLoader.js';
 			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			const params = {
 				enabled: true,
@@ -43,6 +56,7 @@
 				'Clayton 33.CUBE': null,
 				'Cubicle 99.CUBE': null,
 				'Remy 24.CUBE': null,
+				'Presetpro-Cinematic.3dl': null
 			};
 
 			let gui;
@@ -84,12 +98,25 @@
 
 				Object.keys( lutMap ).forEach( name => {
 
-					new LUTCubeLoader()
-						.load( 'luts/' + name, function ( result ) {
+					if ( /\.CUBE$/i.test( name ) ) {
 
-							lutMap[ name ] = result;
+						new LUTCubeLoader()
+							.load( 'luts/' + name, function ( result ) {
 
-						} );
+								lutMap[ name ] = result;
+
+							} );
+
+					} else {
+
+						new LUT3dlLoader()
+							.load( 'luts/' + name, function ( result ) {
+
+								lutMap[ name ] = result;
+
+							} );
+
+					}
 
 				} );
 

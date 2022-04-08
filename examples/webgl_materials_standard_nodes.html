@@ -13,27 +13,32 @@
 			<a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
 		<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js"
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
 			}
-		}
 		</script>
+
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
-
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let container, stats;
 
@@ -77,7 +82,9 @@
 					.setPath( 'models/obj/cerberus/' )
 					.load( 'Cerberus.obj', function ( group ) {
 
-						const loader = new THREE.TextureLoader()
+						const loaderManager = new THREE.LoadingManager();
+
+						const loader = new THREE.TextureLoader( loaderManager )
 							.setPath( 'models/obj/cerberus/' );
 
 						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
@@ -92,7 +99,7 @@
 
 						const mpMapNode = new Nodes.TextureNode( rmMap );
 
-						material.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( diffuseMap ), new Nodes.Vector3Node( material.color ) );
+						material.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( diffuseMap ), new Nodes.UniformNode( material.color ) );
 
 						// roughness is in G channel, metalness is in B channel
 						material.roughnessNode = new Nodes.SplitNode( mpMapNode, 'g' );
@@ -112,7 +119,29 @@
 
 						group.position.x = - 0.45;
 						group.rotation.y = - Math.PI / 2;
-						scene.add( group );
+						//scene.add( group );
+
+						// TODO: Serialization test
+
+						loaderManager.onLoad = () => {
+
+							const groupJSON = JSON.stringify( group.toJSON() );
+
+							const objectLoader = new Nodes.NodeObjectLoader();
+							objectLoader.parse( JSON.parse( groupJSON ), ( newGroup ) => {
+
+								//scene.remove( group );
+
+								newGroup.position.copy( group.position );
+								newGroup.rotation.copy( group.rotation );
+
+								scene.add( newGroup );
+
+								console.log( 'Serialized!' );
+
+							} );
+
+						};
 
 					} );
 
@@ -135,7 +164,6 @@
 
 					const filename = environments[ name ].filename;
 					new RGBELoader()
-						.setDataType( THREE.UnsignedByteType )
 						.setPath( 'textures/equirectangular/' )
 						.load( filename, function ( hdrEquirect ) {
 

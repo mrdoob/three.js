@@ -45,9 +45,21 @@
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { Editor } from './js/Editor.js';
 			import { Viewport } from './js/Viewport.js';
@@ -70,31 +82,31 @@
 
 			//
 
-			var editor = new Editor();
+			const editor = new Editor();
 
 			window.editor = editor; // Expose editor to Console
 			window.THREE = THREE; // Expose THREE to APP Scripts and Console
 			window.VRButton = VRButton; // Expose VRButton to APP Scripts
 
-			var viewport = new Viewport( editor );
+			const viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var toolbar = new Toolbar( editor );
+			const toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
 
-			var script = new Script( editor );
+			const script = new Script( editor );
 			document.body.appendChild( script.dom );
 
-			var player = new Player( editor );
+			const player = new Player( editor );
 			document.body.appendChild( player.dom );
 
-			var sidebar = new Sidebar( editor );
+			const sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
-			var menubar = new Menubar( editor );
+			const menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
 
-			var resizer = new Resizer( editor );
+			const resizer = new Resizer( editor );
 			document.body.appendChild( resizer.dom );
 
 			//
@@ -111,7 +123,7 @@
 
 					}
 
-					var selected = editor.config.getKey( 'selected' );
+					const selected = editor.config.getKey( 'selected' );
 
 					if ( selected !== undefined ) {
 
@@ -123,7 +135,7 @@
 
 				//
 
-				var timeout;
+				let timeout;
 
 				function saveState() {
 
@@ -151,7 +163,7 @@
 
 				}
 
-				var signals = editor.signals;
+				const signals = editor.signals;
 
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
@@ -174,7 +186,7 @@
 				event.preventDefault();
 				event.dataTransfer.dropEffect = 'copy';
 
-			}, false );
+			} );
 
 			document.addEventListener( 'drop', function ( event ) {
 
@@ -194,7 +206,7 @@
 
 				}
 
-			}, false );
+			} );
 
 			function onWindowResize() {
 
@@ -202,22 +214,22 @@
 
 			}
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			onWindowResize();
 
 			//
 
-			var isLoadingFromHash = false;
-			var hash = window.location.hash;
+			let isLoadingFromHash = false;
+			const hash = window.location.hash;
 
-			if ( hash.substr( 1, 5 ) === 'file=' ) {
+			if ( hash.slice( 1, 6 ) === 'file=' ) {
 
-				var file = hash.substr( 6 );
+				const file = hash.slice( 6 );
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-					var loader = new THREE.FileLoader();
+					const loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 

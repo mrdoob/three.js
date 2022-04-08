@@ -4,30 +4,33 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-97), expires 10/11/2021 -->
-		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
+		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
+		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT
 		</div>
 
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
 		<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js"
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
 			}
-		}
 		</script>
+
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
 
+			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
-			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
-
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
@@ -46,7 +49,7 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 
@@ -92,7 +95,7 @@
 
 				// modulate the final color based on the mouse position
 
-				const screenFXNode = new Nodes.OperatorNode( '+', new Nodes.Vector2Node( mouse ), new Nodes.Vector2Node( new THREE.Vector2( 0.5, 0.5 ) ).setConst( true ) );
+				const screenFXNode = new Nodes.OperatorNode( '+', new Nodes.UniformNode( mouse ), new Nodes.ConstNode( new THREE.Vector2( 0.5, 0.5 ) ) );
 
 				const materialFX = new Nodes.MeshBasicNodeMaterial();
 				materialFX.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( textureRenderer.getTexture() ), screenFXNode );

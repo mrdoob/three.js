@@ -103,6 +103,7 @@
 				}
 
 			} );
+			const tempColor = new THREE.Color();
 			const includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
 			includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 			includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
@@ -184,9 +185,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
+						vertex.fromBufferAttribute( vertices, i );
 						vertex.applyMatrix4( mesh.matrixWorld ); // Position information
 
 						output.setFloat32( vOffset, vertex.x, options.littleEndian );
@@ -200,9 +199,7 @@
 
 							if ( normals != null ) {
 
-								vertex.x = normals.getX( i );
-								vertex.y = normals.getY( i );
-								vertex.z = normals.getZ( i );
+								vertex.fromBufferAttribute( normals, i );
 								vertex.applyMatrix3( normalMatrixWorld ).normalize();
 								output.setFloat32( vOffset, vertex.x, options.littleEndian );
 								vOffset += 4;
@@ -234,7 +231,7 @@
 								output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 								vOffset += 4;
 
-							} else if ( includeUVs !== false ) {
+							} else {
 
 								output.setFloat32( vOffset, 0, options.littleEndian );
 								vOffset += 4;
@@ -243,18 +240,19 @@
 
 							}
 
-						} // Color information
+						} // THREE.Color information
 
 
 						if ( includeColors === true ) {
 
 							if ( colors != null ) {
 
-								output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
+								tempColor.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+								output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 								vOffset += 1;
-								output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
+								output.setUint8( vOffset, Math.floor( tempColor.g * 255 ) );
 								vOffset += 1;
-								output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
+								output.setUint8( vOffset, Math.floor( tempColor.b * 255 ) );
 								vOffset += 1;
 
 							} else {
@@ -334,9 +332,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
+						vertex.fromBufferAttribute( vertices, i );
 						vertex.applyMatrix4( mesh.matrixWorld ); // Position information
 
 						let line = vertex.x + ' ' + vertex.y + ' ' + vertex.z; // Normal information
@@ -345,9 +341,7 @@
 
 							if ( normals != null ) {
 
-								vertex.x = normals.getX( i );
-								vertex.y = normals.getY( i );
-								vertex.z = normals.getZ( i );
+								vertex.fromBufferAttribute( normals, i );
 								vertex.applyMatrix3( normalMatrixWorld ).normalize();
 								line += ' ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
 
@@ -366,20 +360,21 @@
 
 								line += ' ' + uvs.getX( i ) + ' ' + uvs.getY( i );
 
-							} else if ( includeUVs !== false ) {
+							} else {
 
 								line += ' 0 0';
 
 							}
 
-						} // Color information
+						} // THREE.Color information
 
 
 						if ( includeColors === true ) {
 
 							if ( colors != null ) {
 
-								line += ' ' + Math.floor( colors.getX( i ) * 255 ) + ' ' + Math.floor( colors.getY( i ) * 255 ) + ' ' + Math.floor( colors.getZ( i ) * 255 );
+								tempColor.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+								line += ' ' + Math.floor( tempColor.r * 255 ) + ' ' + Math.floor( tempColor.g * 255 ) + ' ' + Math.floor( tempColor.b * 255 );
 
 							} else {
 

@@ -35,7 +35,7 @@
 		<h3>[property:Boolean castShadow]</h3>
 		<p>Whether the object gets rendered into shadow map. Default is *false*.</p>
 
-		<h3>[property:Object3D children]</h3>
+		<h3>[property:Array children]</h3>
 		<p>Array with object's children. See [page:Group] for info on manually grouping objects.</p>
 
 		<h3>[property:Material customDepthMaterial]</h3>
@@ -56,6 +56,11 @@
 
 		<h3>[property:Integer id]</h3>
 		<p>readonly – Unique number for this object instance.</p>
+
+		<h3>[property:Boolean isObject3D]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Layers layers]</h3>
 		<p>
@@ -204,7 +209,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		<p>[page:EventDispatcher EventDispatcher] methods are available on this class.</p>
 
 		<h3>[method:this add]( [param:Object3D object], ... )</h3>
 		<p>
@@ -214,14 +219,16 @@
 		See [page:Group] for info on manually grouping objects.
 		</p>
 
-		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:undefined applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>Applies the matrix transform to the object and updates the object's position, rotation and scale.</p>
 
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 
 		<h3>[method:this attach]( [param:Object3D object] )</h3>
-		<p>Adds *object* as a child of this, while maintaining the object's world transform.</p>
+		<p>Adds *object* as a child of this, while maintaining the object's world transform.<br/><br/>
+		Note: This method does not support scene graphs having non-uniformly-scaled nodes(s).
+		</p>
 
 		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
 		<p>
@@ -300,8 +307,8 @@
 		Converts the vector from this object's local space to world space.
 		</p>
 
-		<h3>[method:null lookAt]( [param:Vector3 vector] )<br />
-		[method:null lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:undefined lookAt]( [param:Vector3 vector] )<br />
+		[method:undefined lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		vector - A vector representing a position in world space.<br /><br />
 		Optionally, the [page:.x x], [page:.y y] and [page:.z z] components of the world space position.<br /><br />
@@ -371,7 +378,7 @@
 		Rotates the object around z axis in local space.
 		</p>
 
-		<h3>[method:null setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<h3>[method:undefined setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
 			axis -- A normalized vector in object space. <br />
 			angle -- angle in radians<br /><br />
@@ -380,7 +387,7 @@
 			on the [page:.quaternion].
 		</p>
 
-		<h3>[method:null setRotationFromEuler]( [param:Euler euler] )</h3>
+		<h3>[method:undefined setRotationFromEuler]( [param:Euler euler] )</h3>
 		<p>
 			euler -- Euler angle specifying rotation amount.<br />
 
@@ -388,7 +395,7 @@
 			on the [page:.quaternion].
 		</p>
 
-		<h3>[method:null setRotationFromMatrix]( [param:Matrix4 m] )</h3>
+		<h3>[method:undefined setRotationFromMatrix]( [param:Matrix4 m] )</h3>
 		<p>
 			m -- rotate the quaternion by the rotation component of the matrix.<br />
 
@@ -398,7 +405,7 @@
 			Note that this assumes that the upper 3x3 of m is a pure rotation matrix (i.e, unscaled).
 		</p>
 
-		<h3>[method:null setRotationFromQuaternion]( [param:Quaternion q] )</h3>
+		<h3>[method:undefined setRotationFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
 			q -- normalized Quaternion.<br /><br />
 
@@ -428,7 +435,7 @@
 		<h3>[method:this translateZ]( [param:Float distance] )</h3>
 		<p>Translates object along z axis in object space by *distance* units.</p>
 
-		<h3>[method:null traverse]( [param:Function callback] )</h3>
+		<h3>[method:undefined traverse]( [param:Function callback] )</h3>
 		<p>
 		callback - A function with as first argument an object3D object.<br /><br />
 
@@ -436,7 +443,7 @@
 		Note: Modifying the scene graph inside the callback is discouraged.
 		</p>
 
-		<h3>[method:null traverseVisible]( [param:Function callback] )</h3>
+		<h3>[method:undefined traverseVisible]( [param:Function callback] )</h3>
 		<p>
 		callback - A function with as first argument an object3D object.<br /><br />
 
@@ -445,7 +452,7 @@
 		Note: Modifying the scene graph inside the callback is discouraged.
 		</p>
 
-		<h3>[method:null traverseAncestors]( [param:Function callback] )</h3>
+		<h3>[method:undefined traverseAncestors]( [param:Function callback] )</h3>
 		<p>
 		callback - A function with as first argument an object3D object.<br /><br />
 
@@ -453,13 +460,13 @@
 		Note: Modifying the scene graph inside the callback is discouraged.
 		</p>
 
-		<h3>[method:null updateMatrix]()</h3>
+		<h3>[method:undefined updateMatrix]()</h3>
 		<p>Updates the local transform.</p>
 
-		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>Updates the global transform of the object and its descendants.</p>
 
-		<h3>[method:null updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
+		<h3>[method:undefined updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
 		<p>
 		updateParents - recursively updates global transform of ancestors.<br />
 		updateChildren - recursively updates global transform of descendants.<br /><br />

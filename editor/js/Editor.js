@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
@@ -84,9 +84,7 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal(),
-
-		animationStopped: new Signal()
+		viewportCameraChanged: new Signal()
 
 	};
 
@@ -424,6 +422,10 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
+				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+
+					helper = new THREE.SkeletonHelper( object );
+
 				} else {
 
 					// no helper for this object type
@@ -431,7 +433,7 @@ Editor.prototype = {
 
 				}
 
-				var picker = new THREE.Mesh( geometry, material );
+				const picker = new THREE.Mesh( geometry, material );
 				picker.name = 'picker';
 				picker.userData.object = object;
 				helper.add( picker );

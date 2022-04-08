@@ -17,14 +17,26 @@
 		SSRPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 	</div>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import Stats from './jsm/libs/stats.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { GUI } from './jsm/libs/lil-gui.module.min.js';
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
 		import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
@@ -106,7 +118,7 @@
 
 			let geometry, material, mesh;
 
-			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
+			geometry = new THREE.BoxGeometry( .05, .05, .05 );
 			material = new THREE.MeshStandardMaterial( { color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, .025, .015 );
@@ -114,7 +126,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
+			geometry = new THREE.IcosahedronGeometry( .025, 4 );
 			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, .08 );
@@ -122,7 +134,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
+			geometry = new THREE.ConeGeometry( .025, .05, 64 );
 			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, - .055 );
@@ -130,7 +142,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+			geometry = new THREE.PlaneGeometry( 1, 1 );
 			groundReflector = new ReflectorForSSRPass( geometry, {
 				clipBias: 0.0003,
 				textureWidth: window.innerWidth,

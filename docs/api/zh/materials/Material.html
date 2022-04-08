@@ -30,8 +30,8 @@
 
 <h3>[property:Float alphaToCoverage]</h3>
 <p>
-Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with *antialias* parameter set to *true*).
-Default is *false*.
+启用alpha to coverage. 只能在开启了MSAA的渲染环境中使用 (当渲染器创建的时候*antialias* 属性要*true*才能使用).
+默认为 *false*.
 </p>
 
 <h3>[property:Integer blendDst]</h3>
@@ -107,49 +107,49 @@ Default is *false*.
 	在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
 </p>
 
-<h3>[property:Number format]</h3>
-<p>
-When this property is set to [page:Textures THREE.RGBFormat], the material is considered to be opaque and alpha values are ignored. Default is [page:Textures THREE.RGBAFormat].
-</p>
+		<h3>[property:Boolean isMaterial]</h3>
+		<p>
+			检查这个对象是否为材质[name]的只读标记.
+		</p>
 
 <h3>[property:Boolean stencilWrite]</h3>
 <p>
-Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.
+是否对模板缓冲执行模板操作，如果执行写入或者与模板缓冲进行比较，这个值需要设置为*true*。默认为*false*。
 </p>
 
 <h3>[property:Integer stencilWriteMask]</h3>
 <p>
-The bit mask to use when writing to the stencil buffer. Default is *0xFF*.
+写入模板缓冲区时所用的位元遮罩，默认为*0xFF*。
 </p>
 
 <h3>[property:Integer stencilFunc]</h3>
 <p>
-The stencil comparison function to use. Default is [page:Materials AlwaysStencilFunc]. See stencil function [page:Materials constants] for all possible values.
+使用模板比较时所用的方法，默认为[page:Materials AlwaysStencilFunc]。在模板函数 [page:Materials constants] 中查看可用的值
 </p>
 
 <h3>[property:Integer stencilRef]</h3>
 <p>
-The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+在进行模板比较或者模板操作的时候所用的基准值，默认为*0*。
 </p>
 
 <h3>[property:Integer stencilFuncMask]</h3>
 <p>
-The bit mask to use when comparing against the stencil buffer. Default is *0xFF*.
+与模板缓冲进行比较时所使用的位元遮罩，默认为*0xFF*
 </p>
 
 <h3>[property:Integer stencilFail]</h3>
 <p>
-Which stencil operation to perform when the comparison function returns false. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+当比较函数没有通过的时候要执行的模板操作，默认为[page:Materials KeepStencilOp]，在模板操作 [page:Materials constants] 查看可用值。
 </p>
 
 <h3>[property:Integer stencilZFail]</h3>
 <p>
-Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+当比较函数通过了但是深度检测没有通过的时候要执行的模板操作， 默认为[page:Materials KeepStencilOp]，在模板操作 [page:Materials constants] 查看可用值。
 </p>
 
 <h3>[property:Integer stencilZPass]</h3>
 <p>
-Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+当比较函数和深度检测都通过时要执行的模板操作，默认为[page:Materials KeepStencilOp]，在模板操作[page:Materials constants] 中查看可用值。
 </p>
 
 <h3>[property:Boolean fog]</h3>
@@ -234,7 +234,7 @@ Which stencil operation to perform when the comparison function returns true and
 
 <h3>[property:Boolean toneMapped]</h3>
 <p>
-Defines whether this material is tone mapped according to the renderer's [page:WebGLRenderer.toneMapping toneMapping] setting. Default is *true*.
+	定义这个材质是否会被渲染器的[page:WebGLRenderer.toneMapping toneMapping]设置所影响，默认为 *true* 。
 </p>
 
 <h3>[property:Boolean transparent]</h3>
@@ -255,7 +255,7 @@ Defines whether this material is tone mapped according to the renderer's [page:W
 
 <h3>[property:Integer version]</h3>
 <p>
-This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
+开始为0，会记录[property:Boolean needsUpdate]设置为*true*的次数。
 </p>
 
 <h3>[property:Boolean vertexColors]</h3>
@@ -273,32 +273,32 @@ This starts at *0* and counts how many times [property:Boolean needsUpdate] is s
 
 <h2>方法(Methods)</h2>
 
-<h3>[page:EventDispatcher EventDispatcher] 方法在此类中可用。</h3>
+<p>[page:EventDispatcher EventDispatcher] 方法在此类中可用。</p>
 
 <h3>[method:Material clone]( )</h3>
 <p> 返回与此材质具有相同参数的新材质。</p>
 
-<h3>[method:Material copy]( [param:material material] )</h3>
+<h3>[method:this copy]( [param:material material] )</h3>
 <p> 将被传入材质中的参数复制到此材质中。</p>
 
-<h3>[method:null dispose]()</h3>
+<h3>[method:undefined dispose]()</h3>
 <p> 处理材质。材质的纹理不会被处理。需要通过[page:Texture Texture]处理。
 </p>
 
-<h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
+<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 <p> 在编译shader程序之前立即执行的可选回调。此函数使用shader源码作为参数。用于修改内置材质。
 </p>
 <p>
-Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+和其他属性不一样的是，这个回调在[page:Material.clone .clone]()，[page:Material.copy .copy]() 和 [page:Material.toJSON .toJSON]() 中不支持。
 </p>
 
 <h3>[method:String customProgramCacheKey]()</h3>
 <p>
-In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader for this material as needed.
+当用到onBeforeCompile回调的时候，这个回调函数可以用来定义在onBeforeCompile中使用的配置项，这样three.js就可以根据这个回调返回的字符串来判定使用一个缓存的编译好的着色器代码还是根据需求重新编译一个新的着色器代码。
 </p>
 
 <p>
-For example, if onBeforeCompile contains a conditional statement like:<br />
+例如一个onBeforeCompile回调函数包含了下面的条件语句:<br />
 
 <code>if ( black ) {
 
@@ -307,7 +307,7 @@ For example, if onBeforeCompile contains a conditional statement like:<br />
 }
 </code>
 
-then customProgramCacheKey should be set like this:<br />
+那么 customProgramCacheKey 就可以设置为:<br />
 
 <code>material.customProgramCacheKey = function() {
 
@@ -319,10 +319,10 @@ then customProgramCacheKey should be set like this:<br />
 </p>
 
 <p>
-Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+	和其他属性不一样的是，这个回调在[page:Material.clone .clone]()，[page:Material.copy .copy]() 和 [page:Material.toJSON .toJSON]() 中不支持。
 </p>
 
-<h3>[method:null setValues]( [param:Object values] )</h3>
+<h3>[method:undefined setValues]( [param:Object values] )</h3>
 <p> values -- 具有参数的容器。
 	根据*values*设置属性。<br/>
 </p>

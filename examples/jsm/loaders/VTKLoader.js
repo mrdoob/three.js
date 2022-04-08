@@ -5,7 +5,7 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils
-} from '../../../build/three.module.js';
+} from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
 class VTKLoader extends Loader {
@@ -56,67 +56,67 @@ class VTKLoader extends Loader {
 		function parseASCII( data ) {
 
 			// connectivity of the triangles
-			var indices = [];
+			const indices = [];
 
 			// triangles vertices
-			var positions = [];
+			const positions = [];
 
 			// red, green, blue colors in the range 0 to 1
-			var colors = [];
+			const colors = [];
 
 			// normal vector, one per vertex
-			var normals = [];
+			const normals = [];
 
-			var result;
+			let result;
 
 			// pattern for detecting the end of a number sequence
-			var patWord = /^[^\d.\s-]+/;
+			const patWord = /^[^\d.\s-]+/;
 
 			// pattern for reading vertices, 3 floats or integers
-			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
+			const pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
 
 			// pattern for connectivity, an integer followed by any number of ints
 			// the first integer is the number of polygon nodes
-			var patConnectivity = /^(\d+)\s+([\s\d]*)/;
+			const patConnectivity = /^(\d+)\s+([\s\d]*)/;
 
 			// indicates start of vertex data section
-			var patPOINTS = /^POINTS /;
+			const patPOINTS = /^POINTS /;
 
 			// indicates start of polygon connectivity section
-			var patPOLYGONS = /^POLYGONS /;
+			const patPOLYGONS = /^POLYGONS /;
 
 			// indicates start of triangle strips section
-			var patTRIANGLE_STRIPS = /^TRIANGLE_STRIPS /;
+			const patTRIANGLE_STRIPS = /^TRIANGLE_STRIPS /;
 
 			// POINT_DATA number_of_values
-			var patPOINT_DATA = /^POINT_DATA[ ]+(\d+)/;
+			const patPOINT_DATA = /^POINT_DATA[ ]+(\d+)/;
 
 			// CELL_DATA number_of_polys
-			var patCELL_DATA = /^CELL_DATA[ ]+(\d+)/;
+			const patCELL_DATA = /^CELL_DATA[ ]+(\d+)/;
 
 			// Start of color section
-			var patCOLOR_SCALARS = /^COLOR_SCALARS[ ]+(\w+)[ ]+3/;
+			const patCOLOR_SCALARS = /^COLOR_SCALARS[ ]+(\w+)[ ]+3/;
 
 			// NORMALS Normals float
-			var patNORMALS = /^NORMALS[ ]+(\w+)[ ]+(\w+)/;
+			const patNORMALS = /^NORMALS[ ]+(\w+)[ ]+(\w+)/;
 
-			var inPointsSection = false;
-			var inPolygonsSection = false;
-			var inTriangleStripSection = false;
-			var inPointDataSection = false;
-			var inCellDataSection = false;
-			var inColorSection = false;
-			var inNormalsSection = false;
+			let inPointsSection = false;
+			let inPolygonsSection = false;
+			let inTriangleStripSection = false;
+			let inPointDataSection = false;
+			let inCellDataSection = false;
+			let inColorSection = false;
+			let inNormalsSection = false;
 
-			var lines = data.split( '\n' );
+			const lines = data.split( '\n' );
 
-			for ( var i in lines ) {
+			for ( const i in lines ) {
 
-				var line = lines[ i ].trim();
+				const line = lines[ i ].trim();
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
-					var dataset = line.split( ' ' )[ 1 ];
+					const dataset = line.split( ' ' )[ 1 ];
 
 					if ( dataset !== 'POLYDATA' ) throw new Error( 'Unsupported DATASET type: ' + dataset );
 
@@ -127,9 +127,9 @@ class VTKLoader extends Loader {
 
 						if ( patWord.exec( line ) !== null ) break;
 
-						var x = parseFloat( result[ 1 ] );
-						var y = parseFloat( result[ 2 ] );
-						var z = parseFloat( result[ 3 ] );
+						const x = parseFloat( result[ 1 ] );
+						const y = parseFloat( result[ 2 ] );
+						const z = parseFloat( result[ 3 ] );
 						positions.push( x, y, z );
 
 					}
@@ -139,19 +139,18 @@ class VTKLoader extends Loader {
 					if ( ( result = patConnectivity.exec( line ) ) !== null ) {
 
 						// numVertices i0 i1 i2 ...
-						var numVertices = parseInt( result[ 1 ] );
-						var inds = result[ 2 ].split( /\s+/ );
+						const numVertices = parseInt( result[ 1 ] );
+						const inds = result[ 2 ].split( /\s+/ );
 
 						if ( numVertices >= 3 ) {
 
-							var i0 = parseInt( inds[ 0 ] );
-							var i1, i2;
-							var k = 1;
+							const i0 = parseInt( inds[ 0 ] );
+							let k = 1;
 							// split the polygon in numVertices - 2 triangles
-							for ( var j = 0; j < numVertices - 2; ++ j ) {
+							for ( let j = 0; j < numVertices - 2; ++ j ) {
 
-								i1 = parseInt( inds[ k ] );
-								i2 = parseInt( inds[ k + 1 ] );
+								const i1 = parseInt( inds[ k ] );
+								const i2 = parseInt( inds[ k + 1 ] );
 								indices.push( i0, i1, i2 );
 								k ++;
 
@@ -166,27 +165,26 @@ class VTKLoader extends Loader {
 					if ( ( result = patConnectivity.exec( line ) ) !== null ) {
 
 						// numVertices i0 i1 i2 ...
-						var numVertices = parseInt( result[ 1 ] );
-						var inds = result[ 2 ].split( /\s+/ );
+						const numVertices = parseInt( result[ 1 ] );
+						const inds = result[ 2 ].split( /\s+/ );
 
 						if ( numVertices >= 3 ) {
 
-							var i0, i1, i2;
 							// split the polygon in numVertices - 2 triangles
-							for ( var j = 0; j < numVertices - 2; j ++ ) {
+							for ( let j = 0; j < numVertices - 2; j ++ ) {
 
 								if ( j % 2 === 1 ) {
 
-									i0 = parseInt( inds[ j ] );
-									i1 = parseInt( inds[ j + 2 ] );
-									i2 = parseInt( inds[ j + 1 ] );
+									const i0 = parseInt( inds[ j ] );
+									const i1 = parseInt( inds[ j + 2 ] );
+									const i2 = parseInt( inds[ j + 1 ] );
 									indices.push( i0, i1, i2 );
 
 								} else {
 
-									i0 = parseInt( inds[ j ] );
-									i1 = parseInt( inds[ j + 1 ] );
-									i2 = parseInt( inds[ j + 2 ] );
+									const i0 = parseInt( inds[ j ] );
+									const i1 = parseInt( inds[ j + 1 ] );
+									const i2 = parseInt( inds[ j + 2 ] );
 									indices.push( i0, i1, i2 );
 
 								}
@@ -207,9 +205,9 @@ class VTKLoader extends Loader {
 
 							if ( patWord.exec( line ) !== null ) break;
 
-							var r = parseFloat( result[ 1 ] );
-							var g = parseFloat( result[ 2 ] );
-							var b = parseFloat( result[ 3 ] );
+							const r = parseFloat( result[ 1 ] );
+							const g = parseFloat( result[ 2 ] );
+							const b = parseFloat( result[ 3 ] );
 							colors.push( r, g, b );
 
 						}
@@ -222,9 +220,9 @@ class VTKLoader extends Loader {
 
 							if ( patWord.exec( line ) !== null ) break;
 
-							var nx = parseFloat( result[ 1 ] );
-							var ny = parseFloat( result[ 2 ] );
-							var nz = parseFloat( result[ 3 ] );
+							const nx = parseFloat( result[ 1 ] );
+							const ny = parseFloat( result[ 2 ] );
+							const nz = parseFloat( result[ 3 ] );
 							normals.push( nx, ny, nz );
 
 						}
@@ -285,7 +283,7 @@ class VTKLoader extends Loader {
 
 			}
 
-			var geometry = new BufferGeometry();
+			let geometry = new BufferGeometry();
 			geometry.setIndex( indices );
 			geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
@@ -310,17 +308,17 @@ class VTKLoader extends Loader {
 				// cell
 
 				geometry = geometry.toNonIndexed();
-				var numTriangles = geometry.attributes.position.count / 3;
+				const numTriangles = geometry.attributes.position.count / 3;
 
 				if ( colors.length === ( numTriangles * 3 ) ) {
 
-					var newColors = [];
+					const newColors = [];
 
-					for ( var i = 0; i < numTriangles; i ++ ) {
+					for ( let i = 0; i < numTriangles; i ++ ) {
 
-						var r = colors[ 3 * i + 0 ];
-						var g = colors[ 3 * i + 1 ];
-						var b = colors[ 3 * i + 2 ];
+						const r = colors[ 3 * i + 0 ];
+						const g = colors[ 3 * i + 1 ];
+						const b = colors[ 3 * i + 2 ];
 
 						newColors.push( r, g, b );
 						newColors.push( r, g, b );
@@ -340,24 +338,21 @@ class VTKLoader extends Loader {
 
 		function parseBinary( data ) {
 
-			var count, pointIndex, i, numberOfPoints, s;
-			var buffer = new Uint8Array( data );
-			var dataView = new DataView( data );
+			const buffer = new Uint8Array( data );
+			const dataView = new DataView( data );
 
 			// Points and normals, by default, are empty
-			var points = [];
-			var normals = [];
-			var indices = [];
+			let points = [];
+			let normals = [];
+			let indices = [];
 
-			// Going to make a big array of strings
-			var vtk = [];
-			var index = 0;
+			let index = 0;
 
 			function findString( buffer, start ) {
 
-				var index = start;
-				var c = buffer[ index ];
-				var s = [];
+				let index = start;
+				let c = buffer[ index ];
+				const s = [];
 				while ( c !== 10 ) {
 
 					s.push( String.fromCharCode( c ) );
@@ -373,7 +368,7 @@ class VTKLoader extends Loader {
 
 			}
 
-			var state, line;
+			let state, line;
 
 			while ( true ) {
 
@@ -383,23 +378,22 @@ class VTKLoader extends Loader {
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
-					var dataset = line.split( ' ' )[ 1 ];
+					const dataset = line.split( ' ' )[ 1 ];
 
 					if ( dataset !== 'POLYDATA' ) throw new Error( 'Unsupported DATASET type: ' + dataset );
 
 				} else if ( line.indexOf( 'POINTS' ) === 0 ) {
 
-					vtk.push( line );
 					// Add the points
-					numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
+					const numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
 
 					// Each point is 3 4-byte floats
-					count = numberOfPoints * 4 * 3;
+					const count = numberOfPoints * 4 * 3;
 
 					points = new Float32Array( numberOfPoints * 3 );
 
-					pointIndex = state.next;
-					for ( i = 0; i < numberOfPoints; i ++ ) {
+					let pointIndex = state.next;
+					for ( let i = 0; i < numberOfPoints; i ++ ) {
 
 						points[ 3 * i ] = dataView.getFloat32( pointIndex, false );
 						points[ 3 * i + 1 ] = dataView.getFloat32( pointIndex + 4, false );
@@ -413,22 +407,22 @@ class VTKLoader extends Loader {
 
 				} else if ( line.indexOf( 'TRIANGLE_STRIPS' ) === 0 ) {
 
-					var numberOfStrips = parseInt( line.split( ' ' )[ 1 ], 10 );
-					var size = parseInt( line.split( ' ' )[ 2 ], 10 );
+					const numberOfStrips = parseInt( line.split( ' ' )[ 1 ], 10 );
+					const size = parseInt( line.split( ' ' )[ 2 ], 10 );
 					// 4 byte integers
-					count = size * 4;
+					const count = size * 4;
 
 					indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
-					var indicesIndex = 0;
+					let indicesIndex = 0;
 
-					pointIndex = state.next;
-					for ( i = 0; i < numberOfStrips; i ++ ) {
+					let pointIndex = state.next;
+					for ( let i = 0; i < numberOfStrips; i ++ ) {
 
 						// For each strip, read the first value, then record that many more points
-						var indexCount = dataView.getInt32( pointIndex, false );
-						var strip = [];
+						const indexCount = dataView.getInt32( pointIndex, false );
+						const strip = [];
 						pointIndex += 4;
-						for ( s = 0; s < indexCount; s ++ ) {
+						for ( let s = 0; s < indexCount; s ++ ) {
 
 							strip.push( dataView.getInt32( pointIndex, false ) );
 							pointIndex += 4;
@@ -436,7 +430,7 @@ class VTKLoader extends Loader {
 						}
 
 						// retrieves the n-2 triangles from the triangle strip
-						for ( var j = 0; j < indexCount - 2; j ++ ) {
+						for ( let j = 0; j < indexCount - 2; j ++ ) {
 
 							if ( j % 2 ) {
 
@@ -462,22 +456,22 @@ class VTKLoader extends Loader {
 
 				} else if ( line.indexOf( 'POLYGONS' ) === 0 ) {
 
-					var numberOfStrips = parseInt( line.split( ' ' )[ 1 ], 10 );
-					var size = parseInt( line.split( ' ' )[ 2 ], 10 );
+					const numberOfStrips = parseInt( line.split( ' ' )[ 1 ], 10 );
+					const size = parseInt( line.split( ' ' )[ 2 ], 10 );
 					// 4 byte integers
-					count = size * 4;
+					const count = size * 4;
 
 					indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
-					var indicesIndex = 0;
+					let indicesIndex = 0;
 
-					pointIndex = state.next;
-					for ( i = 0; i < numberOfStrips; i ++ ) {
+					let pointIndex = state.next;
+					for ( let i = 0; i < numberOfStrips; i ++ ) {
 
 						// For each strip, read the first value, then record that many more points
-						var indexCount = dataView.getInt32( pointIndex, false );
-						var strip = [];
+						const indexCount = dataView.getInt32( pointIndex, false );
+						const strip = [];
 						pointIndex += 4;
-						for ( s = 0; s < indexCount; s ++ ) {
+						for ( let s = 0; s < indexCount; s ++ ) {
 
 							strip.push( dataView.getInt32( pointIndex, false ) );
 							pointIndex += 4;
@@ -485,7 +479,7 @@ class VTKLoader extends Loader {
 						}
 
 						// divide the polygon in n-2 triangle
-						for ( var j = 1; j < indexCount - 1; j ++ ) {
+						for ( let j = 1; j < indexCount - 1; j ++ ) {
 
 							indices[ indicesIndex ++ ] = strip[ 0 ];
 							indices[ indicesIndex ++ ] = strip[ j ];
@@ -500,17 +494,17 @@ class VTKLoader extends Loader {
 
 				} else if ( line.indexOf( 'POINT_DATA' ) === 0 ) {
 
-					numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
+					const numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
 
 					// Grab the next line
 					state = findString( buffer, state.next );
 
 					// Now grab the binary data
-					count = numberOfPoints * 4 * 3;
+					const count = numberOfPoints * 4 * 3;
 
 					normals = new Float32Array( numberOfPoints * 3 );
-					pointIndex = state.next;
-					for ( i = 0; i < numberOfPoints; i ++ ) {
+					let pointIndex = state.next;
+					for ( let i = 0; i < numberOfPoints; i ++ ) {
 
 						normals[ 3 * i ] = dataView.getFloat32( pointIndex, false );
 						normals[ 3 * i + 1 ] = dataView.getFloat32( pointIndex + 4, false );
@@ -535,7 +529,7 @@ class VTKLoader extends Loader {
 
 			}
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setIndex( new BufferAttribute( indices, 1 ) );
 			geometry.setAttribute( 'position', new BufferAttribute( points, 3 ) );
 
@@ -562,7 +556,7 @@ class VTKLoader extends Loader {
 
 		function Int32Concat( first, second ) {
 
-			var firstLength = first.length, result = new Int32Array( firstLength + second.length );
+			const firstLength = first.length, result = new Int32Array( firstLength + second.length );
 
 			result.set( first );
 			result.set( second, firstLength );
@@ -578,7 +572,7 @@ class VTKLoader extends Loader {
 			function xmlToJson( xml ) {
 
 				// Create the return object
-				var obj = {};
+				let obj = {};
 
 				if ( xml.nodeType === 1 ) { // element
 
@@ -590,9 +584,9 @@ class VTKLoader extends Loader {
 
 							obj[ 'attributes' ] = {};
 
-							for ( var j = 0; j < xml.attributes.length; j ++ ) {
+							for ( let j = 0; j < xml.attributes.length; j ++ ) {
 
-								var attribute = xml.attributes.item( j );
+								const attribute = xml.attributes.item( j );
 								obj[ 'attributes' ][ attribute.nodeName ] = attribute.nodeValue.trim();
 
 							}
@@ -610,14 +604,14 @@ class VTKLoader extends Loader {
 				// do children
 				if ( xml.hasChildNodes() ) {
 
-					for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+					for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
-						var item = xml.childNodes.item( i );
-						var nodeName = item.nodeName;
+						const item = xml.childNodes.item( i );
+						const nodeName = item.nodeName;
 
 						if ( typeof obj[ nodeName ] === 'undefined' ) {
 
-							var tmp = xmlToJson( item );
+							const tmp = xmlToJson( item );
 
 							if ( tmp !== '' ) obj[ nodeName ] = tmp;
 
@@ -625,12 +619,12 @@ class VTKLoader extends Loader {
 
 							if ( typeof obj[ nodeName ].push === 'undefined' ) {
 
-								var old = obj[ nodeName ];
+								const old = obj[ nodeName ];
 								obj[ nodeName ] = [ old ];
 
 							}
 
-							var tmp = xmlToJson( item );
+							const tmp = xmlToJson( item );
 
 							if ( tmp !== '' ) obj[ nodeName ].push( tmp );
 
@@ -647,20 +641,11 @@ class VTKLoader extends Loader {
 			// Taken from Base64-js
 			function Base64toByteArray( b64 ) {
 
-				var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
-				var i;
-				var lookup = [];
-				var revLookup = [];
-				var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-				var len = code.length;
+				const Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
+				const revLookup = [];
+				const code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-				for ( i = 0; i < len; i ++ ) {
-
-					lookup[ i ] = code[ i ];
-
-				}
-
-				for ( i = 0; i < len; ++ i ) {
+				for ( let i = 0, l = code.length; i < l; ++ i ) {
 
 					revLookup[ code.charCodeAt( i ) ] = i;
 
@@ -669,8 +654,7 @@ class VTKLoader extends Loader {
 				revLookup[ '-'.charCodeAt( 0 ) ] = 62;
 				revLookup[ '_'.charCodeAt( 0 ) ] = 63;
 
-				var j, l, tmp, placeHolders, arr;
-				var len = b64.length;
+				const len = b64.length;
 
 				if ( len % 4 > 0 ) {
 
@@ -678,15 +662,16 @@ class VTKLoader extends Loader {
 
 				}
 
-				placeHolders = b64[ len - 2 ] === '=' ? 2 : b64[ len - 1 ] === '=' ? 1 : 0;
-				arr = new Arr( len * 3 / 4 - placeHolders );
-				l = placeHolders > 0 ? len - 4 : len;
+				const placeHolders = b64[ len - 2 ] === '=' ? 2 : b64[ len - 1 ] === '=' ? 1 : 0;
+				const arr = new Arr( len * 3 / 4 - placeHolders );
+				const l = placeHolders > 0 ? len - 4 : len;
 
-				var L = 0;
+				let L = 0;
+				let i, j;
 
 				for ( i = 0, j = 0; i < l; i += 4, j += 3 ) {
 
-					tmp = ( revLookup[ b64.charCodeAt( i ) ] << 18 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] << 12 ) | ( revLookup[ b64.charCodeAt( i + 2 ) ] << 6 ) | revLookup[ b64.charCodeAt( i + 3 ) ];
+					const tmp = ( revLookup[ b64.charCodeAt( i ) ] << 18 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] << 12 ) | ( revLookup[ b64.charCodeAt( i + 2 ) ] << 6 ) | revLookup[ b64.charCodeAt( i + 3 ) ];
 					arr[ L ++ ] = ( tmp & 0xFF0000 ) >> 16;
 					arr[ L ++ ] = ( tmp & 0xFF00 ) >> 8;
 					arr[ L ++ ] = tmp & 0xFF;
@@ -695,12 +680,12 @@ class VTKLoader extends Loader {
 
 				if ( placeHolders === 2 ) {
 
-					tmp = ( revLookup[ b64.charCodeAt( i ) ] << 2 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] >> 4 );
+					const tmp = ( revLookup[ b64.charCodeAt( i ) ] << 2 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] >> 4 );
 					arr[ L ++ ] = tmp & 0xFF;
 
 				} else if ( placeHolders === 1 ) {
 
-					tmp = ( revLookup[ b64.charCodeAt( i ) ] << 10 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] << 4 ) | ( revLookup[ b64.charCodeAt( i + 2 ) ] >> 2 );
+					const tmp = ( revLookup[ b64.charCodeAt( i ) ] << 10 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] << 4 ) | ( revLookup[ b64.charCodeAt( i + 2 ) ] >> 2 );
 					arr[ L ++ ] = ( tmp >> 8 ) & 0xFF;
 					arr[ L ++ ] = tmp & 0xFF;
 
@@ -712,7 +697,7 @@ class VTKLoader extends Loader {
 
 			function parseDataArray( ele, compressed ) {
 
-				var numBytes = 0;
+				let numBytes = 0;
 
 				if ( json.attributes.header_type === 'UInt64' ) {
 
@@ -724,19 +709,18 @@ class VTKLoader extends Loader {
 
 				}
 
+				let txt, content;
 
 				// Check the format
 				if ( ele.attributes.format === 'binary' && compressed ) {
 
-					var rawData, content, byteData, blocks, cSizeStart, headerSize, padding, dataOffsets, currentOffset;
-
 					if ( ele.attributes.type === 'Float32' ) {
 
-						var txt = new Float32Array( );
+						txt = new Float32Array( );
 
-					} else if ( ele.attributes.type === 'Int64' ) {
+					} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
-						var txt = new Int32Array( );
+						txt = new Int32Array( );
 
 					}
 
@@ -752,37 +736,40 @@ class VTKLoader extends Loader {
 					// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is
 					// computed by summing the compressed block sizes from preceding blocks according to the header.
 
-					rawData = ele[ '#text' ];
+					const textNode = ele[ '#text' ];
+					const rawData = Array.isArray( textNode ) ? textNode[ 0 ] : textNode;
 
-					byteData = Base64toByteArray( rawData );
+					const byteData = Base64toByteArray( rawData );
 
-					blocks = byteData[ 0 ];
-					for ( var i = 1; i < numBytes - 1; i ++ ) {
+					// Each data point consists of 8 bits regardless of the header type
+					const dataPointSize = 8;
 
-						blocks = blocks | ( byteData[ i ] << ( i * numBytes ) );
+					let blocks = byteData[ 0 ];
+					for ( let i = 1; i < numBytes - 1; i ++ ) {
+
+						blocks = blocks | ( byteData[ i ] << ( i * dataPointSize ) );
 
 					}
 
-					headerSize = ( blocks + 3 ) * numBytes;
-					padding = ( ( headerSize % 3 ) > 0 ) ? 3 - ( headerSize % 3 ) : 0;
+					let headerSize = ( blocks + 3 ) * numBytes;
+					const padding = ( ( headerSize % 3 ) > 0 ) ? 3 - ( headerSize % 3 ) : 0;
 					headerSize = headerSize + padding;
 
-					dataOffsets = [];
-					currentOffset = headerSize;
+					const dataOffsets = [];
+					let currentOffset = headerSize;
 					dataOffsets.push( currentOffset );
 
 					// Get the blocks sizes after the compression.
 					// There are three blocks before c-size-i, so we skip 3*numBytes
-					cSizeStart = 3 * numBytes;
+					const cSizeStart = 3 * numBytes;
 
-					for ( var i = 0; i < blocks; i ++ ) {
+					for ( let i = 0; i < blocks; i ++ ) {
 
-						var currentBlockSize = byteData[ i * numBytes + cSizeStart ];
+						let currentBlockSize = byteData[ i * numBytes + cSizeStart ];
 
-						for ( var j = 1; j < numBytes - 1; j ++ ) {
+						for ( let j = 1; j < numBytes - 1; j ++ ) {
 
-							// Each data point consists of 8 bytes regardless of the header type
-							currentBlockSize = currentBlockSize | ( byteData[ i * numBytes + cSizeStart + j ] << ( j * 8 ) );
+							currentBlockSize = currentBlockSize | ( byteData[ i * numBytes + cSizeStart + j ] << ( j * dataPointSize ) );
 
 						}
 
@@ -791,9 +778,9 @@ class VTKLoader extends Loader {
 
 					}
 
-					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
+					for ( let i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						var data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) ); // eslint-disable-line no-undef
+						const data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) ); // eslint-disable-line no-undef
 						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {
@@ -801,7 +788,7 @@ class VTKLoader extends Loader {
 							content = new Float32Array( content );
 							txt = Float32Concat( txt, content );
 
-						} else if ( ele.attributes.type === 'Int64' ) {
+						} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 							content = new Int32Array( content );
 							txt = Int32Concat( txt, content );
@@ -830,7 +817,7 @@ class VTKLoader extends Loader {
 
 					if ( ele.attributes.format === 'binary' && ! compressed ) {
 
-						var content = Base64toByteArray( ele[ '#text' ] );
+						content = Base64toByteArray( ele[ '#text' ] );
 
 						//  VTP data for the uncompressed case has the following structure:
 						// [#bytes][DATA]
@@ -841,7 +828,7 @@ class VTKLoader extends Loader {
 
 						if ( ele[ '#text' ] ) {
 
-							var content = ele[ '#text' ].split( /\s+/ ).filter( function ( el ) {
+							content = ele[ '#text' ].split( /\s+/ ).filter( function ( el ) {
 
 								if ( el !== '' ) return el;
 
@@ -849,7 +836,7 @@ class VTKLoader extends Loader {
 
 						} else {
 
-							var content = new Int32Array( 0 ).buffer;
+							content = new Int32Array( 0 ).buffer;
 
 						}
 
@@ -860,15 +847,15 @@ class VTKLoader extends Loader {
 					// Get the content and optimize it
 					if ( ele.attributes.type === 'Float32' ) {
 
-						var txt = new Float32Array( content );
+						txt = new Float32Array( content );
 
 					} else if ( ele.attributes.type === 'Int32' ) {
 
-						var txt = new Int32Array( content );
+						txt = new Int32Array( content );
 
 					} else if ( ele.attributes.type === 'Int64' ) {
 
-						var txt = new Int32Array( content );
+						txt = new Int32Array( content );
 
 						if ( ele.attributes.format === 'binary' ) {
 
@@ -890,66 +877,30 @@ class VTKLoader extends Loader {
 
 			// Main part
 			// Get Dom
-			var dom = null;
-
-			if ( window.DOMParser ) {
-
-				try {
-
-					dom = ( new DOMParser() ).parseFromString( stringFile, 'text/xml' );
-
-				} catch ( e ) {
-
-					dom = null;
-
-				}
-
-			} else if ( window.ActiveXObject ) {
-
-				try {
-
-					dom = new ActiveXObject( 'Microsoft.XMLDOM' ); // eslint-disable-line no-undef
-					dom.async = false;
-
-					if ( ! dom.loadXML( /* xml */ ) ) {
-
-						throw new Error( dom.parseError.reason + dom.parseError.srcText );
-
-					}
-
-				} catch ( e ) {
-
-					dom = null;
-
-				}
-
-			} else {
-
-				throw new Error( 'Cannot parse xml string!' );
-
-			}
+			const dom = new DOMParser().parseFromString( stringFile, 'application/xml' );
 
 			// Get the doc
-			var doc = dom.documentElement;
+			const doc = dom.documentElement;
 			// Convert to json
-			var json = xmlToJson( doc );
-			var points = [];
-			var normals = [];
-			var indices = [];
+			const json = xmlToJson( doc );
+			let points = [];
+			let normals = [];
+			let indices = [];
 
 			if ( json.PolyData ) {
 
-				var piece = json.PolyData.Piece;
-				var compressed = json.attributes.hasOwnProperty( 'compressor' );
+				const piece = json.PolyData.Piece;
+				const compressed = json.attributes.hasOwnProperty( 'compressor' );
 
 				// Can be optimized
 				// Loop through the sections
-				var sections = [ 'PointData', 'Points', 'Strips', 'Polys' ];// +['CellData', 'Verts', 'Lines'];
-				var sectionIndex = 0, numberOfSections = sections.length;
+				const sections = [ 'PointData', 'Points', 'Strips', 'Polys' ];// +['CellData', 'Verts', 'Lines'];
+				let sectionIndex = 0;
+				const numberOfSections = sections.length;
 
 				while ( sectionIndex < numberOfSections ) {
 
-					var section = piece[ sections[ sectionIndex ] ];
+					const section = piece[ sections[ sectionIndex ] ];
 
 					// If it has a DataArray in it
 
@@ -957,17 +908,20 @@ class VTKLoader extends Loader {
 
 						// Depending on the number of DataArrays
 
+						let arr;
+
 						if ( Object.prototype.toString.call( section.DataArray ) === '[object Array]' ) {
 
-							var arr = section.DataArray;
+							arr = section.DataArray;
 
 						} else {
 
-							var arr = [ section.DataArray ];
+							arr = [ section.DataArray ];
 
 						}
 
-						var dataArrayIndex = 0, numberOfDataArrays = arr.length;
+						let dataArrayIndex = 0;
+						const numberOfDataArrays = arr.length;
 
 						while ( dataArrayIndex < numberOfDataArrays ) {
 
@@ -987,18 +941,22 @@ class VTKLoader extends Loader {
 							// if iti is point data
 							case 'PointData':
 
-								var numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
-								var normalsName = section.attributes.Normals;
+								{
 
-								if ( numberOfPoints > 0 ) {
+									const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+									const normalsName = section.attributes.Normals;
 
-									for ( var i = 0, len = arr.length; i < len; i ++ ) {
+									if ( numberOfPoints > 0 ) {
 
-										if ( normalsName === arr[ i ].attributes.Name ) {
+										for ( let i = 0, len = arr.length; i < len; i ++ ) {
 
-											var components = arr[ i ].attributes.NumberOfComponents;
-											normals = new Float32Array( numberOfPoints * components );
-											normals.set( arr[ i ].text, 0 );
+											if ( normalsName === arr[ i ].attributes.Name ) {
+
+												const components = arr[ i ].attributes.NumberOfComponents;
+												normals = new Float32Array( numberOfPoints * components );
+												normals.set( arr[ i ].text, 0 );
+
+											}
 
 										}
 
@@ -1011,13 +969,17 @@ class VTKLoader extends Loader {
 							// if it is points
 							case 'Points':
 
-								var numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+								{
 
-								if ( numberOfPoints > 0 ) {
+									const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
 
-									var components = section.DataArray.attributes.NumberOfComponents;
-									points = new Float32Array( numberOfPoints * components );
-									points.set( section.DataArray.text, 0 );
+									if ( numberOfPoints > 0 ) {
+
+										const components = section.DataArray.attributes.NumberOfComponents;
+										points = new Float32Array( numberOfPoints * components );
+										points.set( section.DataArray.text, 0 );
+
+									}
 
 								}
 
@@ -1026,49 +988,53 @@ class VTKLoader extends Loader {
 							// if it is strips
 							case 'Strips':
 
-								var numberOfStrips = parseInt( piece.attributes.NumberOfStrips );
+								{
 
-								if ( numberOfStrips > 0 ) {
+									const numberOfStrips = parseInt( piece.attributes.NumberOfStrips );
 
-									var connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
-									var offset = new Int32Array( section.DataArray[ 1 ].text.length );
-									connectivity.set( section.DataArray[ 0 ].text, 0 );
-									offset.set( section.DataArray[ 1 ].text, 0 );
+									if ( numberOfStrips > 0 ) {
 
-									var size = numberOfStrips + connectivity.length;
-									indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
+										const connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
+										const offset = new Int32Array( section.DataArray[ 1 ].text.length );
+										connectivity.set( section.DataArray[ 0 ].text, 0 );
+										offset.set( section.DataArray[ 1 ].text, 0 );
 
-									var indicesIndex = 0;
+										const size = numberOfStrips + connectivity.length;
+										indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
 
-									for ( var i = 0, len = numberOfStrips; i < len; i ++ ) {
+										let indicesIndex = 0;
 
-										var strip = [];
+										for ( let i = 0, len = numberOfStrips; i < len; i ++ ) {
 
-										for ( var s = 0, len1 = offset[ i ], len0 = 0; s < len1 - len0; s ++ ) {
+											const strip = [];
 
-											strip.push( connectivity[ s ] );
+											for ( let s = 0, len1 = offset[ i ], len0 = 0; s < len1 - len0; s ++ ) {
 
-											if ( i > 0 ) len0 = offset[ i - 1 ];
+												strip.push( connectivity[ s ] );
 
-										}
-
-										for ( var j = 0, len1 = offset[ i ], len0 = 0; j < len1 - len0 - 2; j ++ ) {
-
-											if ( j % 2 ) {
-
-												indices[ indicesIndex ++ ] = strip[ j ];
-												indices[ indicesIndex ++ ] = strip[ j + 2 ];
-												indices[ indicesIndex ++ ] = strip[ j + 1 ];
-
-											} else {
-
-												indices[ indicesIndex ++ ] = strip[ j ];
-												indices[ indicesIndex ++ ] = strip[ j + 1 ];
-												indices[ indicesIndex ++ ] = strip[ j + 2 ];
+												if ( i > 0 ) len0 = offset[ i - 1 ];
 
 											}
 
-											if ( i > 0 ) len0 = offset[ i - 1 ];
+											for ( let j = 0, len1 = offset[ i ], len0 = 0; j < len1 - len0 - 2; j ++ ) {
+
+												if ( j % 2 ) {
+
+													indices[ indicesIndex ++ ] = strip[ j ];
+													indices[ indicesIndex ++ ] = strip[ j + 2 ];
+													indices[ indicesIndex ++ ] = strip[ j + 1 ];
+
+												} else {
+
+													indices[ indicesIndex ++ ] = strip[ j ];
+													indices[ indicesIndex ++ ] = strip[ j + 1 ];
+													indices[ indicesIndex ++ ] = strip[ j + 2 ];
+
+												}
+
+												if ( i > 0 ) len0 = offset[ i - 1 ];
+
+											}
 
 										}
 
@@ -1081,45 +1047,51 @@ class VTKLoader extends Loader {
 							// if it is polys
 							case 'Polys':
 
-								var numberOfPolys = parseInt( piece.attributes.NumberOfPolys );
+								{
 
-								if ( numberOfPolys > 0 ) {
+									const numberOfPolys = parseInt( piece.attributes.NumberOfPolys );
 
-									var connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
-									var offset = new Int32Array( section.DataArray[ 1 ].text.length );
-									connectivity.set( section.DataArray[ 0 ].text, 0 );
-									offset.set( section.DataArray[ 1 ].text, 0 );
+									if ( numberOfPolys > 0 ) {
 
-									var size = numberOfPolys + connectivity.length;
-									indices = new Uint32Array( 3 * size - 9 * numberOfPolys );
-									var indicesIndex = 0, connectivityIndex = 0;
-									var i = 0, len = numberOfPolys, len0 = 0;
+										const connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
+										const offset = new Int32Array( section.DataArray[ 1 ].text.length );
+										connectivity.set( section.DataArray[ 0 ].text, 0 );
+										offset.set( section.DataArray[ 1 ].text, 0 );
 
-									while ( i < len ) {
+										const size = numberOfPolys + connectivity.length;
+										indices = new Uint32Array( 3 * size - 9 * numberOfPolys );
+										let indicesIndex = 0, connectivityIndex = 0;
+										let i = 0, len0 = 0;
+										const len = numberOfPolys;
 
-										var poly = [];
-										var s = 0, len1 = offset[ i ];
+										while ( i < len ) {
 
-										while ( s < len1 - len0 ) {
+											const poly = [];
+											let s = 0;
+											const len1 = offset[ i ];
 
-											poly.push( connectivity[ connectivityIndex ++ ] );
-											s ++;
+											while ( s < len1 - len0 ) {
+
+												poly.push( connectivity[ connectivityIndex ++ ] );
+												s ++;
+
+											}
+
+											let j = 1;
+
+											while ( j < len1 - len0 - 1 ) {
+
+												indices[ indicesIndex ++ ] = poly[ 0 ];
+												indices[ indicesIndex ++ ] = poly[ j ];
+												indices[ indicesIndex ++ ] = poly[ j + 1 ];
+												j ++;
+
+											}
+
+											i ++;
+											len0 = offset[ i - 1 ];
 
 										}
-
-										var j = 1;
-
-										while ( j < len1 - len0 - 1 ) {
-
-											indices[ indicesIndex ++ ] = poly[ 0 ];
-											indices[ indicesIndex ++ ] = poly[ j ];
-											indices[ indicesIndex ++ ] = poly[ j + 1 ];
-											j ++;
-
-										}
-
-										i ++;
-										len0 = offset[ i - 1 ];
 
 									}
 
@@ -1138,7 +1110,7 @@ class VTKLoader extends Loader {
 
 				}
 
-				var geometry = new BufferGeometry();
+				const geometry = new BufferGeometry();
 				geometry.setIndex( new BufferAttribute( indices, 1 ) );
 				geometry.setAttribute( 'position', new BufferAttribute( points, 3 ) );
 
@@ -1159,7 +1131,7 @@ class VTKLoader extends Loader {
 		}
 
 		// get the 5 first lines of the files to check if there is the key word binary
-		var meta = LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
+		const meta = LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 

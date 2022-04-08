@@ -9,14 +9,9 @@ class DataTexture extends Texture {
 
 		this.image = { data: data, width: width, height: height };
 
-		this.magFilter = magFilter;
-		this.minFilter = minFilter;
-
 		this.generateMipmaps = false;
 		this.flipY = false;
 		this.unpackAlignment = 1;
-
-		this.needsUpdate = true;
 
 	}
 

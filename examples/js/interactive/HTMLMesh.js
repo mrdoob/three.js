@@ -14,7 +14,7 @@
 
 			function onEvent( event ) {
 
-				material.map.dispatchEvent( event );
+				material.map.dispatchDOMEvent( event );
 
 			}
 
@@ -22,6 +22,18 @@
 			this.addEventListener( 'mousemove', onEvent );
 			this.addEventListener( 'mouseup', onEvent );
 			this.addEventListener( 'click', onEvent );
+
+			this.dispose = function () {
+
+				geometry.dispose();
+				material.dispose();
+				material.map.dispose();
+				this.removeEventListener( 'mousedown', onEvent );
+				this.removeEventListener( 'mousemove', onEvent );
+				this.removeEventListener( 'mouseup', onEvent );
+				this.removeEventListener( 'click', onEvent );
+
+			};
 
 		}
 
@@ -36,14 +48,36 @@
 			this.anisotropy = 16;
 			this.encoding = THREE.sRGBEncoding;
 			this.minFilter = THREE.LinearFilter;
-			this.magFilter = THREE.LinearFilter;
+			this.magFilter = THREE.LinearFilter; // Create an observer on the DOM, and run html2canvas update in the next loop
+
+			const observer = new MutationObserver( () => {
+
+				if ( ! this.scheduleUpdate ) {
+
+					// ideally should use xr.requestAnimationFrame, here setTimeout to avoid passing the renderer
+					this.scheduleUpdate = setTimeout( () => this.update(), 16 );
+
+				}
+
+			} );
+			const config = {
+				attributes: true,
+				childList: true,
+				subtree: true,
+				characterData: true
+			};
+			observer.observe( dom, config );
+			this.observer = observer;
 
 		}
 
-		dispatchEvent( event ) {
+		dispatchDOMEvent( event ) {
 
-			htmlevent( this.dom, event.type, event.data.x, event.data.y );
-			this.update();
+			if ( event.data ) {
+
+				htmlevent( this.dom, event.type, event.data.x, event.data.y );
+
+			}
 
 		}
 
@@ -51,6 +85,20 @@
 
 			this.image = html2canvas( this.dom );
 			this.needsUpdate = true;
+			this.scheduleUpdate = null;
+
+		}
+
+		dispose() {
+
+			if ( this.observer ) {
+
+				this.observer.disconnect();
+
+			}
+
+			this.scheduleUpdate = clearTimeout( this.scheduleUpdate );
+			super.dispose();
 
 		}
 
@@ -61,12 +109,12 @@
 
 	function html2canvas( element ) {
 
-		var range = document.createRange();
+		const range = document.createRange();
 
 		function Clipper( context ) {
 
-			var clips = [];
-			var isClipping = false;
+			const clips = [];
+			let isClipping = false;
 
 			function doClip() {
 
@@ -78,14 +126,14 @@
 				}
 
 				if ( clips.length === 0 ) return;
-				var minX = - Infinity,
+				let minX = - Infinity,
 					minY = - Infinity;
-				var maxX = Infinity,
+				let maxX = Infinity,
 					maxY = Infinity;
 
-				for ( var i = 0; i < clips.length; i ++ ) {
+				for ( let i = 0; i < clips.length; i ++ ) {
 
-					var clip = clips[ i ];
+					const clip = clips[ i ];
 					minX = Math.max( minX, clip.x );
 					minY = Math.max( minY, clip.y );
 					maxX = Math.min( maxX, clip.x + clip.width );
@@ -139,9 +187,9 @@
 
 		function drawBorder( style, which, x, y, width, height ) {
 
-			var borderWidth = style[ which + 'Width' ];
-			var borderStyle = style[ which + 'Style' ];
-			var borderColor = style[ which + 'Color' ];
+			const borderWidth = style[ which + 'Width' ];
+			const borderStyle = style[ which + 'Style' ];
+			const borderColor = style[ which + 'Color' ];
 
 			if ( borderWidth !== '0px' && borderStyle !== 'none' && borderColor !== 'transparent' && borderColor !== 'rgba(0, 0, 0, 0)' ) {
 
@@ -157,32 +205,46 @@
 
 		function drawElement( element, style ) {
 
-			var x = 0,
+			let x = 0,
 				y = 0,
 				width = 0,
 				height = 0;
 
-			if ( element.nodeType === 3 ) {
+			if ( element.nodeType === Node.TEXT_NODE ) {
 
 				// text
 				range.selectNode( element );
-				var rect = range.getBoundingClientRect();
+				const rect = range.getBoundingClientRect();
 				x = rect.left - offset.left - 0.5;
 				y = rect.top - offset.top - 0.5;
 				width = rect.width;
 				height = rect.height;
 				drawText( style, x, y, element.nodeValue.trim() );
 
+			} else if ( element.nodeType === Node.COMMENT_NODE ) {
+
+				return;
+
+			} else if ( element instanceof HTMLCanvasElement ) {
+
+				// Canvas element
+				if ( element.style.display === 'none' ) return;
+				context.save();
+				const dpr = window.devicePixelRatio;
+				context.scale( 1 / dpr, 1 / dpr );
+				context.drawImage( element, 0, 0 );
+				context.restore();
+
 			} else {
 
 				if ( element.style.display === 'none' ) return;
-				var rect = element.getBoundingClientRect();
+				const rect = element.getBoundingClientRect();
 				x = rect.left - offset.left - 0.5;
 				y = rect.top - offset.top - 0.5;
 				width = rect.width;
 				height = rect.height;
 				style = window.getComputedStyle( element );
-				var backgroundColor = style.backgroundColor;
+				const backgroundColor = style.backgroundColor;
 
 				if ( backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
 
@@ -196,7 +258,7 @@
 				drawBorder( style, 'borderBottom', x, y + height, width, 0 );
 				drawBorder( style, 'borderRight', x + width, y, 0, height );
 
-				if ( element.type === 'color' || element.type === 'text' ) {
+				if ( element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
 
 					clipper.add( {
 						x: x,
@@ -217,7 +279,7 @@
     */
 
 
-			var isClipping = style.overflow === 'auto' || style.overflow === 'hidden';
+			const isClipping = style.overflow === 'auto' || style.overflow === 'hidden';
 			if ( isClipping ) clipper.add( {
 				x: x,
 				y: y,
@@ -225,7 +287,7 @@
 				height: height
 			} );
 
-			for ( var i = 0; i < element.childNodes.length; i ++ ) {
+			for ( let i = 0; i < element.childNodes.length; i ++ ) {
 
 				drawElement( element.childNodes[ i ], style );
 
@@ -275,7 +337,7 @@
 
 		function traverse( element ) {
 
-			if ( element.nodeType !== 3 ) {
+			if ( element.nodeType !== Node.TEXT_NODE && element.nodeType !== Node.COMMENT_NODE ) {
 
 				const rect = element.getBoundingClientRect();
 
@@ -285,7 +347,7 @@
 
 				}
 
-				for ( var i = 0; i < element.childNodes.length; i ++ ) {
+				for ( let i = 0; i < element.childNodes.length; i ++ ) {
 
 					traverse( element.childNodes[ i ] );
 

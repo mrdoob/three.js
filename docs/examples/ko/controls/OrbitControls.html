@@ -144,7 +144,7 @@ controls.keys = {
 	BOTTOM: 'ArrowDown' // 아래쪽 화살표
 }
 			 </code>
-			 전체 키코드 목록은 [link:https://developer.mozilla.org/ko/docs/Web/API/KeyboardEvent/code KeyboardEvent.code] 를 참조하세요.
+			 전체 키코드 목록은 [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code KeyboardEvent.code] 를 참조하세요.
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
@@ -262,7 +262,7 @@ controls.touches = {
 
 		<h2>메서드</h2>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			모든 이벤트 리스너를 삭제합니다.
 			Remove all the event listeners.
@@ -283,17 +283,17 @@ controls.touches = {
 			Returns the distance from the camera to the target.
 		</p>
 
-		<h3>[method:void listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
+		<h3>[method:undefined listenToKeyEvents] ( [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			Adds key event listeners to the given DOM element. *window* is a recommended argument for using this method.
 		</p>
 
-		<h3>[method:null reset] ()</h3>
+		<h3>[method:undefined reset] ()</h3>
 		<p>
 			컨트롤이 마지막으로 호출된 [page:.saveState] 시점으로 돌리거나, 초기상태로 재설정합니다.
 		</p>
 
-		<h3>[method:null saveState] ()</h3>
+		<h3>[method:undefined saveState] ()</h3>
 		<p>
 			컨트롤의 현재 상태를 저장합니다. 나중에 [page:.reset]을 이용하여 현재 상태로 복구할 수 있습니다.
 		</p>

@@ -113,6 +113,11 @@
 
 		</p>
 
+		<h3>[property:Boolean isSpotLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Float penumbra]</h3>
 		<p>
 			Percent of the spotlight cone that is attenuated due to penumbra. Takes values between
@@ -176,7 +181,7 @@ light.target = targetObject;
 		Disposes of this light's [page:SpotLightShadow shadow].
 		</p>
 
-		<h3>[method:SpotLight copy]( [param:SpotLight source] )</h3>
+		<h3>[method:this copy]( [param:SpotLight source] )</h3>
 		<p>
 		Copies value of all the properties from the [page:SpotLight source] to this
 		SpotLight.

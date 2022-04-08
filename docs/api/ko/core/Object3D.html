@@ -33,7 +33,7 @@
 		<h3>[property:Boolean castShadow]</h3>
 		<p>객체가 섀도우 맵으로 렌더링 되는지의 여부입니다. 기본값은 *false*입니다.</p>
 
-		<h3>[property:Object3D children]</h3>
+		<h3>[property:Array children]</h3>
 		<p>객체의 자식 배열입니다. 수동으로 객체를 그룹핑하는 내용은 [page:Group]을 참고하세요.</p>
 
 		<h3>[property:Material customDepthMaterial]</h3>
@@ -57,6 +57,11 @@
 
 		<h3>[property:Integer id]</h3>
 		<p>읽기전용 – 이 객체 인스턴스의 고유 번호입니다.</p>
+
+		<h3>[property:Boolean isObject3D]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Layers layers]</h3>
 		<p>
@@ -196,7 +201,7 @@
 
 		<h2>메서드</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] 메서드들은 이 클래스에서 사용 가능합니다.</h3>
+		<p>[page:EventDispatcher EventDispatcher] 메서드들은 이 클래스에서 사용 가능합니다.</p>
 
 		<h3>[method:this add]( [param:Object3D object], ... )</h3>
 		<p>
@@ -206,7 +211,7 @@
 		수동으로 객체 그룹핑을 하는 내용은 [page:Group]를 참고하세요.
 		</p>
 
-		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:undefined applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>매트릭스 변환을 객체에 적용하고 객체의 위치, 회전 및 스케일을 업데이트합니다.</p>
 
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
@@ -291,8 +296,8 @@
 		이 객체의 로컬 스페이스를 월드 스페이스로 전환합니다.
 		</p>
 
-		<h3>[method:null lookAt]( [param:Vector3 vector] )<br />
-		[method:null lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:undefined lookAt]( [param:Vector3 vector] )<br />
+		[method:undefined lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		vector - 로컬 스페이스에서의 위치를 나타내는 벡터입니다.<br /><br />
 		부가적으로, 월드 스페이스의 [page:.x x], [page:.y y] 및 [page:.z z] 위치 컴포넌트를 설정할 수 있습니다.<br /><br />
@@ -361,7 +366,7 @@
 		로컬 스페이스에서 z 축을 기준으로 회전시킵니다.
 		</p>
 
-		<h3>[method:null setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<h3>[method:undefined setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
 			axis -- 오브젝트 스페이스의 정규화 벡터입니다. <br />
 			angle -- 라디안 각도입니다<br /><br />
@@ -369,14 +374,14 @@
 			[page:.quaternion]에서 [page:Quaternion.setFromAxisAngle setFromAxisAngle]( [page:Float axis], [page:Float angle] )를 호출합니다.
 		</p>
 
-		<h3>[method:null setRotationFromEuler]( [param:Euler euler] )</h3>
+		<h3>[method:undefined setRotationFromEuler]( [param:Euler euler] )</h3>
 		<p>
 			euler -- 회전 정도를 나타내는 오일러 각입니다.<br />
 
 			 [page:Quaternion.setRotationFromEuler setRotationFromEuler]( [page:Euler euler])를 호출합니다.
 		</p>
 
-		<h3>[method:null setRotationFromMatrix]( [param:Matrix4 m] )</h3>
+		<h3>[method:undefined setRotationFromMatrix]( [param:Matrix4 m] )</h3>
 		<p>
 			m -- 매트릭스의 회전 컴포넌트만큼 쿼터니언을 회전시킵니다.<br />
 
@@ -385,7 +390,7 @@
 			m의 상위 3x3은 순수 회전 매트릭스(예를 들어 스케일이 없는 매트릭스)로 가정합니다.
 		</p>
 
-		<h3>[method:null setRotationFromQuaternion]( [param:Quaternion q] )</h3>
+		<h3>[method:undefined setRotationFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
 			q -- 정규화 쿼터니언입니다.<br /><br />
 
@@ -415,7 +420,7 @@
 		<h3>[method:this translateZ]( [param:Float distance] )</h3>
 		<p>객체 스페이스에서 *distance*만큼 객체를 z축으로 이동시킵니다.</p>
 
-		<h3>[method:null traverse]( [param:Function callback] )</h3>
+		<h3>[method:undefined traverse]( [param:Function callback] )</h3>
 		<p>
 		callback - object3D 객체의 첫 번째 인자 함수입니다.<br /><br />
 
@@ -423,7 +428,7 @@
 		주의: 콜백에서 씬 그래프를 수정하는 것은 허용되지 않습니다.
 		</p>
 
-		<h3>[method:null traverseVisible]( [param:Function callback] )</h3>
+		<h3>[method:undefined traverseVisible]( [param:Function callback] )</h3>
 		<p>
 		callback - object3D 객체의 첫 번째 인자 함수입니다.<br /><br />
 
@@ -432,7 +437,7 @@
 		주의: 콜백에서 씬 그래프를 수정하는 것은 허용되지 않습니다.
 		</p>
 
-		<h3>[method:null traverseAncestors]( [param:Function callback] )</h3>
+		<h3>[method:undefined traverseAncestors]( [param:Function callback] )</h3>
 		<p>
 		callback - object3D 객체의 첫 번째 인자 함수입니다.<br /><br />
 
@@ -440,13 +445,13 @@
 		주의: 콜백에서 씬 그래프를 수정하는 것은 허용되지 않습니다.
 		</p>
 
-		<h3>[method:null updateMatrix]()</h3>
+		<h3>[method:undefined updateMatrix]()</h3>
 		<p>로컬 변형을 업데이트합니다.</p>
 
-		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>객체와 자식들의 글로벌 변형을 업데이트합니다.</p>
 
-		<h3>[method:null updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
+		<h3>[method:undefined updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
 		<p>
 		updateParents - 재귀적으로 부모의 글로벌 변형을 업데이트합니다.<br />
 		updateChildren - 재귀적으로 자식의 글로벌 변형을 업데이트합니다.<br /><br />

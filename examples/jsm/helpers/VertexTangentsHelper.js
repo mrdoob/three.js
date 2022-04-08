@@ -4,7 +4,7 @@ import {
 	LineSegments,
 	LineBasicMaterial,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _v1 = new Vector3();
 const _v2 = new Vector3();
@@ -13,21 +13,9 @@ class VertexTangentsHelper extends LineSegments {
 
 	constructor( object, size = 1, color = 0x00ffff ) {
 
-		const objGeometry = object.geometry;
-
-		if ( ! ( objGeometry && objGeometry.isBufferGeometry ) ) {
-
-			console.error( 'THREE.VertexTangentsHelper: geometry not an instance of THREE.BufferGeometry.', objGeometry );
-			return;
-
-		}
-
-		const nTangents = objGeometry.attributes.tangent.count;
-
-		//
-
 		const geometry = new BufferGeometry();
 
+		const nTangents = object.geometry.attributes.tangent.count;
 		const positions = new Float32BufferAttribute( nTangents * 2 * 3, 3 );
 
 		geometry.setAttribute( 'position', positions );
@@ -68,9 +56,9 @@ class VertexTangentsHelper extends LineSegments {
 
 		for ( let j = 0, jl = objPos.count; j < jl; j ++ ) {
 
-			_v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
+			_v1.fromBufferAttribute( objPos, j ).applyMatrix4( matrixWorld );
 
-			_v2.set( objTan.getX( j ), objTan.getY( j ), objTan.getZ( j ) );
+			_v2.fromBufferAttribute( objTan, j );
 
 			_v2.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( _v1 );
 

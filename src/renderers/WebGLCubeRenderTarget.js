@@ -1,4 +1,4 @@
-import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, RGBAFormat } from '../constants.js';
+import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
@@ -9,19 +9,14 @@ import { CubeTexture } from '../textures/CubeTexture.js';
 
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
-	constructor( size, options, dummy ) {
-
-		if ( Number.isInteger( options ) ) {
-
-			console.warn( 'THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )' );
-
-			options = dummy;
-
-		}
+	constructor( size, options = {} ) {
 
 		super( size, size, options );
 
-		options = options || {};
+		const image = { width: size, height: size, depth: 1 };
+		const images = [ image, image, image, image, image, image ];
+
+		this.texture = new CubeTexture( images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
 		// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
 		// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
@@ -31,20 +26,16 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		// and the flag isRenderTargetTexture controls this conversion. The flip is not required when using WebGLCubeRenderTarget.texture
 		// as a cube texture (this is detected when isRenderTargetTexture is set to true for cube textures).
 
-		this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 		this.texture.isRenderTargetTexture = true;
 
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
-
-		this.texture._needsFlipEnvMap = false;
 
 	}
 
 	fromEquirectangularTexture( renderer, texture ) {
 
 		this.texture.type = texture.type;
-		this.texture.format = RGBAFormat; // see #18859
 		this.texture.encoding = texture.encoding;
 
 		this.texture.generateMipmaps = texture.generateMipmaps;

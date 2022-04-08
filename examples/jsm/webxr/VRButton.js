@@ -104,6 +104,16 @@ class VRButton {
 
 		}
 
+		function showVRNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'VR NOT ALLOWED';
+
+		}
+
 		function stylizeElement( element ) {
 
 			element.style.position = 'absolute';
@@ -132,7 +142,13 @@ class VRButton {
 
 				supported ? showEnterVR() : showWebXRNotFound();
 
-			} );
+				if ( supported && VRButton.xrSessionIsGranted ) {
+
+					button.click();
+
+				}
+
+			} ).catch( showVRNotAllowed );
 
 			return button;
 
@@ -164,6 +180,28 @@ class VRButton {
 
 	}
 
+	static xrSessionIsGranted = false;
+
+	static registerSessionGrantedListener() {
+
+		if ( 'xr' in navigator ) {
+
+			// WebXRViewer (based on Firefox) has a bug where addEventListener
+			// throws a silent exception and aborts execution entirely.
+			if ( /WebXRViewer\//i.test( navigator.userAgent ) ) return;
+
+			navigator.xr.addEventListener( 'sessiongranted', () => {
+
+				VRButton.xrSessionIsGranted = true;
+
+			} );
+
+		}
+
+	}
+
 }
+
+VRButton.registerSessionGrantedListener();
 
 export { VRButton };

@@ -16,15 +16,11 @@ function WebGLAttributes( gl, capabilities ) {
 
 		attribute.onUploadCallback();
 
-		let type = gl.FLOAT;
+		let type;
 
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
-
-		} else if ( array instanceof Float64Array ) {
-
-			console.warn( 'THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.' );
 
 		} else if ( array instanceof Uint16Array ) {
 
@@ -36,7 +32,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 				} else {
 
-					console.warn( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.' );
+					throw new Error( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.' );
 
 				}
 
@@ -69,6 +65,10 @@ function WebGLAttributes( gl, capabilities ) {
 		} else if ( array instanceof Uint8ClampedArray ) {
 
 			type = gl.UNSIGNED_BYTE;
+
+		} else {
+
+			throw new Error( 'THREE.WebGLAttributes: Unsupported buffer data format: ' + array );
 
 		}
 

@@ -39,6 +39,11 @@
 
 		<h2>属性</h2>
 
+		<h3>[property:Boolean isQuaternion]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Float x]</h3>
 
 		<h3>[property:Float y]</h3>
@@ -61,13 +66,13 @@
 			属性的四元数。
 		</p>
 
-		<h3>[method:Quaternion conjugate]()</h3>
+		<h3>[method:this conjugate]()</h3>
 		<p>
 			返回该四元数的旋转共轭。
 			四元数的共轭表示的是，围绕旋转轴在相反方向上的相同旋转。
 		</p>
 
-		<h3>[method:Quaternion copy]( [param:Quaternion q] )</h3>
+		<h3>[method:this copy]( [param:Quaternion q] )</h3>
 		<p>
 			复制四元数 [page:Quaternion q] 的 [page:.x x]、[page:.y y]、[page:.z z] 和 [page:.w w]
 			属性到该四元数中。
@@ -86,7 +91,7 @@
 			计算四元数 [page:Quaternion v] 与当前四元数的[link:https://en.wikipedia.org/wiki/Dot_product dot product]（点积）。
 		</p>
 
-		<h3>[method:Quaternion fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
 		[page:Array array] - 用于构造四元数的形如(x, y, z, w)的数组。<br />
 		[page:Integer offset] - （可选）数组的偏移量。（译者注：使用数组中从第offset元素算起的四个元素）<br /><br />
@@ -94,12 +99,12 @@
 		从一个数组来设置四元数的 [page:.x x]、 [page:.y y]、[page:.z z] 和 [page:.w w] 的属性。
 		</p>
 
-		<h3>[method:Quaternion identity]()</h3>
+		<h3>[method:this identity]()</h3>
 		<p>
 			设置该四元数为 identity 四元数，即表示“不旋转”的四元数。
 		</p>
 
-		<h3>[method:Quaternion invert]()</h3>
+		<h3>[method:this invert]()</h3>
 		<p>
 			翻转该四元数 —— 计算 [page:.conjugate conjugate] 。假定该四元数具有单位长度。
 		</p>
@@ -116,25 +121,25 @@
 			因为这比 [page:.length length]() 的效率稍高一些。
 		</p>
 
-		<h3>[method:Quaternion normalize]()</h3>
+		<h3>[method:this normalize]()</h3>
 		<p>
 			[link:https://en.wikipedia.org/wiki/Normalized_vector Normalizes]（归一化）四元数 ——
 			即计算与该四元数具有相同旋转、但长度为*1*的四元数。
 		</p>
 
-		<h3>[method:Quaternion multiply]( [param:Quaternion q] )</h3>
+		<h3>[method:this multiply]( [param:Quaternion q] )</h3>
 		<p>将该四元数与[page:Quaternion q]相乘。</p>
 
-		<h3>[method:Quaternion multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
+		<h3>[method:this multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
 		<p>
 		将该四元数设为 [page:Quaternion a] x [page:Quaternion b] 。<br />
 		改编自 [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here] 所概述的方法。
 		</p>
 
-		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
+		<h3>[method:this premultiply]( [param:Quaternion q] )</h3>
 		<p>使用 [page:Quaternion q] 乘以该四元数。</p>
 
-		<h3>[method:Quaternion rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
+		<h3>[method:this rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
 		<p>
 			[page:Quaternion q] - 目标四元数<br />
 			[page:Float step] - 以弧度为单位的角度步长<br /><br />
@@ -142,7 +147,7 @@
 			将该四元数按照步长 step 向目标 *q* 进行旋转。该方法确保最终的四元数不会超过 *q*。
 		</p>
 
-		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:Float t] )</h3>
+		<h3>[method:this slerp]( [param:Quaternion qb], [param:Float t] )</h3>
 		<p>
 			[page:Quaternion qb] - 另一个四元数旋转<br />
 			[page:Float t] - 闭区间 [0, 1] 中的插值因子<br /><br />
@@ -159,26 +164,26 @@
 		<h3>[method:this slerpQuaternions]( [param:Quaternion qa], [param:Quaternion qb], [param:Float t] )</h3>
 		<p>在给定的四元数之间执行球面线性插值，并将结果存储在这个四元数中</p>
 
-		<h3>[method:Quaternion set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>设置该四元数的 [page:.x x]、[page:.y y]、[page:.z z]和[page:.w w]属性。</p>
 
-		<h3>[method:Quaternion setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<h3>[method:this setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
 		从由 [page:Vector3 axis]（轴） 和 [page:Float angle]（角度）所给定的旋转来设置该四元数。<br />
 		改编自 [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here] 所述的方法。<br />
 		假定*Axis*已被归一化，*angle*以弧度来表示。
 		</p>
 
-		<h3>[method:Quaternion setFromEuler]( [param:Euler euler] )</h3>
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
 		<p>从由 [page:Euler] 角所给定的旋转来设置该四元数。</p>
 
-		<h3>[method:Quaternion setFromRotationMatrix]( [param:Matrix4 m] )</h3>
+		<h3>[method:this setFromRotationMatrix]( [param:Matrix4 m] )</h3>
 		<p>
 		从[page:Matrix4 m]的旋转分量中来设置该四元数。<br />
 		改编自 [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here] 所概述的方法。
 		</p>
 
-		<h3>[method:Quaternion setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>
+		<h3>[method:this setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>
 		<p>
 		将该四元数设置为从方向向量 [page:Vector3 vFrom] 旋转到方向向量 [page:Vector3 vTo] 所需的旋转。<br />
 		改编自方法 [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors here]。<br />
@@ -204,7 +209,7 @@
 
 		<h2>静态方法</h2>
 
-		<h3>[method:null slerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float t] )</h3>
+		<h3>[method:undefined slerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float t] )</h3>
 		<p>
 		[page:Array dst] - 输出数组<br />
 		[page:Integer dstOffset] - 输出数组的偏移量<br />
@@ -213,9 +218,20 @@
 		[page:Array src1] - 目标四元数的源数组<br />
 		[page:Integer srcOffset1] - 数组 *src1* 的偏移量<br />
 		[page:Float t] - 归一化插值因子(介于 0 和 1 之间)<br /><br />
+
+		This SLERP implementation assumes the quaternion data are managed in flat arrays.
 		</p>
+
+		<h3>[method:Array multiplyQuaternionsFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1] )</h3>
 		<p>
-		类似于上面的 *slerp* 方法，但直接对平面数组进行操作。
+		[page:Array dst] - The output array.<br />
+		[page:Integer dstOffset] - An offset into the output array.<br />
+		[page:Array src0] - The source array of the starting quaternion.<br />
+		[page:Integer srcOffset0] - An offset into the array *src0*.<br />
+		[page:Array src1] - The source array of the target quaternion.<br />
+		[page:Integer srcOffset1] - An offset into the array *src1*.<br /><br />
+
+		This multiplication implementation assumes the quaternion data are managed in flat arrays.
 		</p>
 
 		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->

@@ -20,9 +20,21 @@
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - portal
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import * as CameraUtils from './jsm/utils/CameraUtils.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -88,22 +100,14 @@
 				topLeftCorner = new THREE.Vector3();
 				reflectedPosition = new THREE.Vector3();
 
-				leftPortalTexture = new THREE.WebGLRenderTarget( 256, 256, {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBFormat
-				} );
+				leftPortalTexture = new THREE.WebGLRenderTarget( 256, 256 );
 				leftPortal = new THREE.Mesh( planeGeo, new THREE.MeshBasicMaterial( { map: leftPortalTexture.texture } ) );
 				leftPortal.position.x = - 30;
 				leftPortal.position.y = 20;
 				leftPortal.scale.set( 0.35, 0.35, 0.35 );
 				scene.add( leftPortal );
 
-				rightPortalTexture = new THREE.WebGLRenderTarget( 256, 256, {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBFormat
-				} );
+				rightPortalTexture = new THREE.WebGLRenderTarget( 256, 256 );
 				rightPortal = new THREE.Mesh( planeGeo, new THREE.MeshBasicMaterial( { map: rightPortalTexture.texture } ) );
 				rightPortal.position.x = 30;
 				rightPortal.position.y = 20;

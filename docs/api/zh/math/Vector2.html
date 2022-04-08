@@ -34,9 +34,9 @@
 		</p>
 
 		<p>
-			Iterating through a Vector2 instance will yield its components (x, y) in the corresponding order.
+			对Vector2实例进行遍历将按相应的顺序生成它的分量(x, y)。
 		</p>
-		
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -64,6 +64,11 @@
 
 		<h3>[property:Float height]</h3>
 		<p>[page:.y y]的别名。</p>
+
+		<h3>[property:Boolean isVector2]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float width]</h3>
 		<p>[page:.x x]的别名。</p>
@@ -162,8 +167,7 @@
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-			将该向量除以标量[page:Float s]。<br />
-			如果传入的[page:Float s] = 0，则向量将被设置为*( 0, 0 )*。
+			将该向量除以标量[page:Float s]。
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector2 v] )</h3>
@@ -294,7 +298,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y] )</h3>
 		<p>设置该向量的[page:.x x]和[page:.y y]分量。</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0 或 1<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -338,7 +342,7 @@
 
 		<h3>[method:this random]()</h3>
 		<p>
-			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+			将该向量的每个分量(x、y)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
 		<h2>源代码</h2>

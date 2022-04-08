@@ -316,6 +316,11 @@ h1 a {
 			padding-top: 12px;
 		}
 
+	        #panel #content h3 {
+			color: var(--text-color);
+			font-weight: 900;
+		}
+
 		#panel #content a {
 			position: relative;
 			color: var(--text-color);

@@ -62,6 +62,11 @@
 			Default is a new [page:Color] set to white (0xffffff).
 		</p>
 
+		<h3>[property:Boolean isHemisphereLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 position]</h3>
 		<p>
 			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
@@ -73,7 +78,7 @@
 
 		<p>See the base [page:Light Light] class for common methods.</p>
 
-		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
+		<h3>[method:this copy]( [param:HemisphereLight source] )</h3>
 		<p>
 			Copies the value of [page:.color color], [page:.intensity intensity] and
 			[page:.groundColor groundColor] from the [page:Light source] light into this one.

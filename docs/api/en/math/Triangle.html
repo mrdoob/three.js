@@ -49,7 +49,7 @@
 
 		<h3>[method:Triangle clone]()</h3>
 		<p>
-			Returns a new triangle with the same [page:.a a], [page:.b b] and  [page:.c c] properties as this one.
+			Returns a new triangle with the same [page:.a a], [page:.b b] and [page:.c c] properties as this one.
 		</p>
 
 		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
@@ -67,7 +67,7 @@
 		Returns true if the passed point, when projected onto the plane of the triangle, lies within the triangle.
 		</p>
 
-		<h3>[method:Triangle copy]( [param:Triangle triangle] )</h3>
+		<h3>[method:this copy]( [param:Triangle triangle] )</h3>
 		<p>
 			Copies the values of the passed triangles's [page:.a a], [page:.b b] and [page:.c c]
 			properties to this triangle.
@@ -113,6 +113,17 @@
 		Calculate a [page:Plane plane] based on the triangle. .
 		</p>
 
+		<h3>[method:Vector2 getUV]( [param:Vector3 point], [param:Vector2 uv1], [param:Vector2 uv2], [param:Vector2 uv3], [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector3 point] - The point on the triangle.<br />
+		[page:Vector2 uv1] - The uv coordinate of the triangle's first vertex.<br />
+		[page:Vector2 uv2] - The uv coordinate of the triangle's second vertex.<br />
+		[page:Vector2 uv2] - The uv coordinate of the triangle's third vertex.<br />
+		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+
+		Returns the uv coordinates for the given point on the triangle.
+		</p>
+
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
 		[page:Box3 box] - Box to check for intersection against.<br /><br />
@@ -120,13 +131,20 @@
 		Determines whether or not this triangle intersects [page:Box3 box].
 		</p>
 
-		<h3>[method:Triangle set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
+		<h3>[method:Boolean isFrontFacing]( [param:Vector3 direction] )</h3>
+		<p>
+		[page:Vector3 direction] - The direction to test.<br /><br />
+
+		Whether the triangle is oriented towards the given direction or not.
+		</p>
+
+		<h3>[method:this set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
 		<p>
 		Sets the triangle's [page:.a a], [page:.b b] and [page:.c c] properties to the passed [page:Vector3 vector3s].<br>
 		Please note that this method only copies the values from the given objects.
 		</p>
 
-		<h3>[method:Triangle setFromAttributeAndIndices]( [param:BufferAttribute attribute], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<h3>[method:this setFromAttributeAndIndices]( [param:BufferAttribute attribute], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
 		<p>
 		attribute - [page:BufferAttribute] of vertex data <br />
 		i0 - [page:Integer] index <br />
@@ -136,7 +154,7 @@
 		Sets the triangle's vertices from the buffer attribute vertex data.
 		</p>
 
-		<h3>[method:Triangle setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<h3>[method:this setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
 		<p>
 		points - [page:Array] of [page:Vector3]s <br />
 		i0 - [page:Integer] index <br />

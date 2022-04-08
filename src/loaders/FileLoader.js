@@ -69,6 +69,10 @@ class FileLoader extends Loader {
 			// An abort controller could be added within a future PR
 		} );
 
+		// record states ( avoid data race )
+		const mimeType = this.mimeType;
+		const responseType = this.responseType;
+
 		// start the fetch
 		fetch( req )
 			.then( response => {
@@ -84,6 +88,14 @@ class FileLoader extends Loader {
 
 					}
 
+					// Workaround: Checking if response.body === undefined for Alipay browser #23548
+
+					if ( typeof ReadableStream === 'undefined' || response.body === undefined || response.body.getReader === undefined ) {
+
+						return response;
+
+					}
+
 					const callbacks = loading[ url ];
 					const reader = response.body.getReader();
 					const contentLength = response.headers.get( 'Content-Length' );
@@ -92,7 +104,7 @@ class FileLoader extends Loader {
 					let loaded = 0;
 
 					// periodically read data into the new stream tracking while download progress
-					return new ReadableStream( {
+					const stream = new ReadableStream( {
 						start( controller ) {
 
 							readData();
@@ -130,6 +142,8 @@ class FileLoader extends Loader {
 
 					} );
 
+					return new Response( stream );
+
 				} else {
 
 					throw Error( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}` );
@@ -137,11 +151,9 @@ class FileLoader extends Loader {
 				}
 
 			} )
-			.then( stream => {
+			.then( response => {
 
-				const response = new Response( stream );
-
-				switch ( this.responseType ) {
+				switch ( responseType ) {
 
 					case 'arraybuffer':
 
@@ -157,7 +169,7 @@ class FileLoader extends Loader {
 							.then( text => {
 
 								const parser = new DOMParser();
-								return parser.parseFromString( text, this.mimeType );
+								return parser.parseFromString( text, mimeType );
 
 							} );
 
@@ -167,7 +179,20 @@ class FileLoader extends Loader {
 
 					default:
 
-						return response.text();
+						if ( mimeType === undefined ) {
+
+							return response.text();
+
+						} else {
+
+							// sniff encoding
+							const re = /charset="?([^;"\s]*)"?/i;
+							const exec = re.exec( mimeType );
+							const label = exec && exec[ 1 ] ? exec[ 1 ].toLowerCase() : undefined;
+							const decoder = new TextDecoder( label );
+							return response.arrayBuffer().then( ab => decoder.decode( ab ) );
+
+						}
 
 				}
 
@@ -188,14 +213,21 @@ class FileLoader extends Loader {
 
 				}
 
-				this.manager.itemEnd( url );
-
 			} )
 			.catch( err => {
 
 				// Abort errors and other errors are handled the same
 
 				const callbacks = loading[ url ];
+
+				if ( callbacks === undefined ) {
+
+					// When onLoad was called and url was deleted in `loading`
+					this.manager.itemError( url );
+					throw err;
+
+				}
+
 				delete loading[ url ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
@@ -206,6 +238,10 @@ class FileLoader extends Loader {
 				}
 
 				this.manager.itemError( url );
+
+			} )
+			.finally( () => {
+
 				this.manager.itemEnd( url );
 
 			} );

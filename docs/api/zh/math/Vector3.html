@@ -35,6 +35,10 @@
 		但以上这些是它在three.js中的常用用途。
 		</p>
 
+		<p>
+			对Vector3实例进行遍历将按相应的顺序生成它的分量(x, y, z)。
+		</p>
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -45,10 +49,6 @@
 
 		const d = a.distanceTo( b );
 		</code>
-
-		<p>
-			Iterating through a Vector3 instance will yield its components (x, y, z) in the corresponding order.
-		</p>
 
 		<h2>构造函数</h2>
 
@@ -63,6 +63,11 @@
 
 
 		<h2>属性</h2>
+
+		<h3>[property:Boolean isVector3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -193,8 +198,7 @@
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-		将该向量除以标量[page:Float s]。<br />
-		如果传入的[page:Float s] = 0，则向量将被设置为*( 0, 0, 0 )*。
+		将该向量除以标量[page:Float s]。
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector3 v] )</h3>
@@ -336,7 +340,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>设置该向量的[page:.x x]、[page:.y y] 和 [page:.z z] 分量。</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0、1 或 2。<br />
 		[page:Float value] - [page:Float]<br /><br />

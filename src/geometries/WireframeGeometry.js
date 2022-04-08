@@ -39,7 +39,7 @@ class WireframeGeometry extends BufferGeometry {
 
 				}
 
-				// create a data structure that contains all eges without duplicates
+				// create a data structure that contains all edges without duplicates
 
 				for ( let o = 0, ol = groups.length; o < ol; ++ o ) {
 
@@ -124,7 +124,8 @@ function isUniqueEdge( start, end, edges ) {
 
 	} else {
 
-		edges.add( hash1, hash2 );
+		edges.add( hash1 );
+		edges.add( hash2 );
 		return true;
 
 	}

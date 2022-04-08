@@ -49,6 +49,11 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean isBox3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 min]</h3>
 		<p>
 			[page:Vector3] representing the lower (x, y, z) boundary of the box.<br />
@@ -121,13 +126,14 @@
 		Returns true if this box and [page:Box3 box] share the same lower and upper bounds.
 		</p>
 
-		<h3>[method:this expandByObject]( [param:Object3D object] )</h3>
+		<h3>[method:this expandByObject]( [param:Object3D object], [param:Boolean precise] )</h3>
 		<p>
-		[page:Object3D object] - [page:Object3D] to expand the box by.<br /><br />
+		[page:Object3D object] - [page:Object3D] to expand the box by.<br />
+		precise - (optional) expand the bounding box as little as necessary at the expense of more computation. Default is false.<br /><br />
 
 		Expands the boundaries of this box to include [page:Object3D object] and its children,
 		accounting for the object's, and children's, world transforms.
-		The function may result in a larger box than strictly necessary.
+		The function may result in a larger box than strictly necessary (unless the precise parameter is set to true).
 
 		</p>
 
@@ -235,7 +241,7 @@
 		<h3>[method:this set]( [param:Vector3 min], [param:Vector3 max] )</h3>
 		<p>
 		[page:Vector3 min] - [page:Vector3] representing the lower (x, y, z) boundary of the box.<br />
-		[page:Vector3 max] - [page:Vector3] representing the lower upper (x, y, z) boundary of the box.<br /><br />
+		[page:Vector3 max] - [page:Vector3] representing the upper (x, y, z) boundary of the box.<br /><br />
 
 		Sets the lower and upper (x, y, z) boundaries of this box.<br>
 		Please note that this method only copies the values from the given objects.
@@ -264,9 +270,10 @@
 		in [page:Vector3 size]
 		</p>
 
-		<h3>[method:this setFromObject]( [param:Object3D object] )</h3>
+		<h3>[method:this setFromObject]( [param:Object3D object], [param:Boolean precise] )</h3>
 		<p>
-		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br /><br />
+		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br />
+		precise - (optional) compute the smallest world-axis-aligned bounding box at the expense of more computation. Default is false.<br /><br />
 
 		Computes the world-axis-aligned bounding box of an [page:Object3D] (including its children),
 		accounting for the object's, and children's, world transforms.

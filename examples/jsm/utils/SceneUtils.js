@@ -1,9 +1,11 @@
 import {
 	Group,
-	Mesh
-} from '../../../build/three.module.js';
+	Mesh,
+	BufferAttribute,
+	BufferGeometry
+} from 'three';
 
-
+import { mergeGroups } from './BufferGeometryUtils.js';
 
 function createMeshesFromInstancedMesh( instancedMesh ) {
 
@@ -28,6 +30,77 @@ function createMeshesFromInstancedMesh( instancedMesh ) {
 	group.updateMatrixWorld(); // ensure correct world matrices of meshes
 
 	return group;
+
+}
+
+function createMeshesFromMultiMaterialMesh( mesh ) {
+
+	if ( Array.isArray( mesh.material ) === false ) {
+
+		console.warn( 'THREE.SceneUtils.createMeshesFromMultiMaterialMesh(): The given mesh has no multiple materials.' );
+		return mesh;
+
+	}
+
+	const object = new Group();
+	object.copy( mesh );
+
+	// merge groups (which automatically sorts them)
+
+	const geometry = mergeGroups( mesh.geometry );
+
+	const index = geometry.index;
+	const groups = geometry.groups;
+	const attributeNames = Object.keys( geometry.attributes );
+
+	// create a mesh for each group by extracting the buffer data into a new geometry
+
+	for ( let i = 0; i < groups.length; i ++ ) {
+
+		const group = groups[ i ];
+
+		const start = group.start;
+		const end = start + group.count;
+
+		const newGeometry = new BufferGeometry();
+		const newMaterial = mesh.material[ group.materialIndex ];
+
+		// process all buffer attributes
+
+		for ( let j = 0; j < attributeNames.length; j ++ ) {
+
+			const name = attributeNames[ j ];
+			const attribute = geometry.attributes[ name ];
+			const itemSize = attribute.itemSize;
+
+			const newLength = group.count * itemSize;
+			const type = attribute.array.constructor;
+
+			const newArray = new type( newLength );
+			const newAttribute = new BufferAttribute( newArray, itemSize );
+
+			for ( let k = start, n = 0; k < end; k ++, n ++ ) {
+
+				const ind = index.getX( k );
+
+				if ( itemSize >= 1 ) newAttribute.setX( n, attribute.getX( ind ) );
+				if ( itemSize >= 2 ) newAttribute.setY( n, attribute.getY( ind ) );
+				if ( itemSize >= 3 ) newAttribute.setZ( n, attribute.getZ( ind ) );
+				if ( itemSize >= 4 ) newAttribute.setW( n, attribute.getW( ind ) );
+
+			}
+
+
+			newGeometry.setAttribute( name, newAttribute );
+
+		}
+
+		const newMesh = new Mesh( newGeometry, newMaterial );
+		object.add( newMesh );
+
+	}
+
+	return object;
 
 }
 
@@ -65,6 +138,7 @@ function attach( child, scene, parent ) {
 
 export {
 	createMeshesFromInstancedMesh,
+	createMeshesFromMultiMaterialMesh,
 	createMultiMaterialObject,
 	detach,
 	attach,

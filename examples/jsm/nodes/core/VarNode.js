@@ -1,66 +1,60 @@
-import { Node } from './Node.js';
+import Node from './Node.js';
 
 class VarNode extends Node {
 
-	constructor( type, value ) {
+	constructor( node, name = null ) {
 
-		super( type );
+		super();
 
-		this.value = value;
-
-	}
-
-	getType( builder ) {
-
-		return builder.getTypeByFormat( this.type );
+		this.node = node;
+		this.name = name;
 
 	}
 
-	generate( builder, output ) {
+	getHash( builder ) {
 
-		const varying = builder.getVar( this.uuid, this.type );
+		return this.name || super.getHash( builder );
 
-		if ( this.value && builder.isShader( 'vertex' ) ) {
+	}
 
-			builder.addNodeCode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
+	getNodeType( builder ) {
+
+		return this.node.getNodeType( builder );
+
+	}
+
+	generate( builder ) {
+
+		const node = this.node;
+
+		if ( node.isTempNode === true ) {
+
+			return node.build( builder );
 
 		}
 
-		return builder.format( varying.name, this.getType( builder ), output );
+		const name = this.name;
+		const type = builder.getVectorType( this.getNodeType( builder ) );
 
-	}
+		const snippet = node.build( builder, type );
+		const nodeVar = builder.getVarFromNode( this, type );
 
-	copy( source ) {
+		if ( name !== null ) {
 
-		super.copy( source );
-
-		this.type = source.type;
-		this.value = source.value;
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		let data = this.getJSONNode( meta );
-
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.type = this.type;
-
-			if ( this.value ) data.value = this.value.toJSON( meta ).uuid;
+			nodeVar.name = name;
 
 		}
 
-		return data;
+		const propertyName = builder.getPropertyName( nodeVar );
+
+		builder.addFlowCode( `${propertyName} = ${snippet}` );
+
+		return propertyName;
 
 	}
 
 }
 
-VarNode.prototype.nodeType = 'Var';
+VarNode.prototype.isVarNode = true;
 
-export { VarNode };
+export default VarNode;

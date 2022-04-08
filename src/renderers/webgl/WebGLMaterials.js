@@ -1,6 +1,6 @@
 import { BackSide } from '../../constants.js';
 
-function WebGLMaterials( properties ) {
+function WebGLMaterials( renderer, properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
@@ -28,7 +28,6 @@ function WebGLMaterials( properties ) {
 		} else if ( material.isMeshLambertMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );
-			refreshUniformsLambert( uniforms, material );
 
 		} else if ( material.isMeshToonMaterial ) {
 
@@ -43,14 +42,11 @@ function WebGLMaterials( properties ) {
 		} else if ( material.isMeshStandardMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );
+			refreshUniformsStandard( uniforms, material );
 
 			if ( material.isMeshPhysicalMaterial ) {
 
 				refreshUniformsPhysical( uniforms, material, transmissionRenderTarget );
-
-			} else {
-
-				refreshUniformsStandard( uniforms, material );
 
 			}
 
@@ -62,7 +58,6 @@ function WebGLMaterials( properties ) {
 		} else if ( material.isMeshDepthMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );
-			refreshUniformsDepth( uniforms, material );
 
 		} else if ( material.isMeshDistanceMaterial ) {
 
@@ -72,7 +67,6 @@ function WebGLMaterials( properties ) {
 		} else if ( material.isMeshNormalMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );
-			refreshUniformsNormal( uniforms, material );
 
 		} else if ( material.isLineBasicMaterial ) {
 
@@ -133,6 +127,36 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.bumpMap ) {
+
+			uniforms.bumpMap.value = material.bumpMap;
+			uniforms.bumpScale.value = material.bumpScale;
+			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
+
+		}
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+		if ( material.emissiveMap ) {
+
+			uniforms.emissiveMap.value = material.emissiveMap;
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
+			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+
+		}
+
 		if ( material.specularMap ) {
 
 			uniforms.specularMap.value = material.specularMap;
@@ -157,20 +181,16 @@ function WebGLMaterials( properties ) {
 			uniforms.ior.value = material.ior;
 			uniforms.refractionRatio.value = material.refractionRatio;
 
-			const maxMipLevel = properties.get( envMap ).__maxMipLevel;
-
-			if ( maxMipLevel !== undefined ) {
-
-				uniforms.maxMipLevel.value = maxMipLevel;
-
-			}
-
 		}
 
 		if ( material.lightMap ) {
 
 			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+			// artist-friendly light intensity scaling factor
+			const scaleFactor = ( renderer.physicallyCorrectLights !== true ) ? Math.PI : 1;
+
+			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
 		}
 
@@ -263,9 +283,9 @@ function WebGLMaterials( properties ) {
 
 			uvScaleMap = material.specularIntensityMap;
 
-		} else if ( material.specularTintMap ) {
+		} else if ( material.specularColorMap ) {
 
-			uvScaleMap = material.specularTintMap;
+			uvScaleMap = material.specularColorMap;
 
 		} else if ( material.transmissionMap ) {
 
@@ -274,6 +294,14 @@ function WebGLMaterials( properties ) {
 		} else if ( material.thicknessMap ) {
 
 			uvScaleMap = material.thicknessMap;
+
+		} else if ( material.sheenColorMap ) {
+
+			uvScaleMap = material.sheenColorMap;
+
+		} else if ( material.sheenRoughnessMap ) {
+
+			uvScaleMap = material.sheenRoughnessMap;
 
 		}
 
@@ -457,50 +485,10 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsLambert( uniforms, material ) {
-
-		if ( material.emissiveMap ) {
-
-			uniforms.emissiveMap.value = material.emissiveMap;
-
-		}
-
-	}
-
 	function refreshUniformsPhong( uniforms, material ) {
 
 		uniforms.specular.value.copy( material.specular );
 		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
-
-		if ( material.emissiveMap ) {
-
-			uniforms.emissiveMap.value = material.emissiveMap;
-
-		}
-
-		if ( material.bumpMap ) {
-
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
-
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
-
-		}
-
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
-
-		}
 
 	}
 
@@ -509,36 +497,6 @@ function WebGLMaterials( properties ) {
 		if ( material.gradientMap ) {
 
 			uniforms.gradientMap.value = material.gradientMap;
-
-		}
-
-		if ( material.emissiveMap ) {
-
-			uniforms.emissiveMap.value = material.emissiveMap;
-
-		}
-
-		if ( material.bumpMap ) {
-
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
-
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
-
-		}
-
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
 
 		}
 
@@ -561,36 +519,6 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( material.emissiveMap ) {
-
-			uniforms.emissiveMap.value = material.emissiveMap;
-
-		}
-
-		if ( material.bumpMap ) {
-
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
-
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
-
-		}
-
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
-
-		}
-
 		const envMap = properties.get( material ).envMap;
 
 		if ( envMap ) {
@@ -604,15 +532,25 @@ function WebGLMaterials( properties ) {
 
 	function refreshUniformsPhysical( uniforms, material, transmissionRenderTarget ) {
 
-		refreshUniformsStandard( uniforms, material );
-
 		uniforms.ior.value = material.ior; // also part of uniforms common
 
 		if ( material.sheen > 0 ) {
 
-			uniforms.sheenTint.value.copy( material.sheenTint ).multiplyScalar( material.sheen );
+			uniforms.sheenColor.value.copy( material.sheenColor ).multiplyScalar( material.sheen );
 
 			uniforms.sheenRoughness.value = material.sheenRoughness;
+
+			if ( material.sheenColorMap ) {
+
+				uniforms.sheenColorMap.value = material.sheenColorMap;
+
+			}
+
+			if ( material.sheenRoughnessMap ) {
+
+				uniforms.sheenRoughnessMap.value = material.sheenRoughnessMap;
+
+			}
 
 		}
 
@@ -690,12 +628,12 @@ function WebGLMaterials( properties ) {
 			}
 
 			uniforms.attenuationDistance.value = material.attenuationDistance;
-			uniforms.attenuationTint.value.copy( material.attenuationTint );
+			uniforms.attenuationColor.value.copy( material.attenuationColor );
 
 		}
 
 		uniforms.specularIntensity.value = material.specularIntensity;
-		uniforms.specularTint.value.copy( material.specularTint );
+		uniforms.specularColor.value.copy( material.specularColor );
 
 		if ( material.specularIntensityMap ) {
 
@@ -703,9 +641,9 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( material.specularTintMap ) {
+		if ( material.specularColorMap ) {
 
-			uniforms.specularTintMap.value = material.specularTintMap;
+			uniforms.specularColorMap.value = material.specularColorMap;
 
 		}
 
@@ -719,85 +657,13 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( material.bumpMap ) {
-
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
-
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
-
-		}
-
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
-
-		}
-
-	}
-
-	function refreshUniformsDepth( uniforms, material ) {
-
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
-
-		}
-
 	}
 
 	function refreshUniformsDistance( uniforms, material ) {
 
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
-
-		}
-
 		uniforms.referencePosition.value.copy( material.referencePosition );
 		uniforms.nearDistance.value = material.nearDistance;
 		uniforms.farDistance.value = material.farDistance;
-
-	}
-
-	function refreshUniformsNormal( uniforms, material ) {
-
-		if ( material.bumpMap ) {
-
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
-
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
-
-		}
-
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
-
-		}
 
 	}
 

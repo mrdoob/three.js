@@ -117,6 +117,11 @@
 			该基础矩阵用于重置绑定骨骼的变换。
 		</p>
 
+		<h3>[property:Boolean isSkinnedMesh]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Skeleton skeleton]</h3>
 		<p>
 			用于表示蒙皮网格中骨骼的层次结构的[page:Skeleton]（骨架）。
@@ -127,7 +132,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Mesh]。</p>
 
-		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<h3>[method:undefined bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
 		<p>
 		[page:Skeleton skeleton] —— 由一棵[page:Bone Bones]树创建的[page:Skeleton]。<br/>
 		[page:Matrix4 bindMatrix] —— 表示骨架基本变换的[page:Matrix4]（4x4矩阵）。<br /><br />
@@ -136,22 +141,17 @@
 
 		<h3>[method:SkinnedMesh clone]()</h3>
 		<p>
-		返回当前SkinnedMesh对象的一个克隆及其任何后代。
+		This method does currently not clone an instance of [name] correctly. Please use [page:SkeletonUtils.clone]() in the meanwhile.
 		</p>
 
-		<h3>[method:null normalizeSkinWeights]()</h3>
+		<h3>[method:undefined normalizeSkinWeights]()</h3>
 		<p>
 		标准化蒙皮的权重。
 		</p>
 
-		<h3>[method:null pose]()</h3>
+		<h3>[method:undefined pose]()</h3>
 		<p>
 		这个方法设置了在“休息”状态下蒙皮网格的姿势（重置姿势）。
-		</p>
-
-		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
-		<p>
-		更新[page:Matrix4 MatrixWorld]矩阵。
 		</p>
 
 		<h2>源代码</h2>

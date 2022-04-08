@@ -13,7 +13,7 @@
 
 	<p>
         애플리케이션에서 성능을 개선하고 메모리 누수를 방지하기 위한 중요한 한 가지는 사용되지 않는 라이브러리 개체를 폐기하는 것입니다.
-        *three.js* 유형의 인스턴스는 생성될 때마다 일정량의 메모리를 할당하게 됩니다. 하지만 *three.js*는 특정 개체에 대해 기하학적 구조나 WebGL 관련 재질(예: 버퍼 또는 쉐이더 프로그램) 개체의 렌더링에 필요한 것입니다. 
+        *three.js* 유형의 인스턴스는 생성될 때마다 일정량의 메모리를 할당하게 됩니다. 하지만 *three.js*는 특정 개체에 대해 기하학적 구조나 WebGL 관련 재질(예: 버퍼 또는 쉐이더 프로그램) 개체의 렌더링에 필요한 것입니다.
         이러한 오브젝트들은 자동으로 폐기되지 않는다는 점을 주의하세요. 대신, 애플리케이션에서는 메모리 자원을 확보하기 위해 특별한 API를 사용해야 합니다.
         이 가이드에서는 이 API의 사용 방법과 이와 관련해서 어떤 오브젝트가 있는지에 대한 간략한 설명을 제공해 드립니다.
 	</p>
@@ -46,7 +46,7 @@
 
 	<p>
         [page:WebGLRenderTarget] 타입의 오브젝트는 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]의 인스턴스가 할당되어 있을 뿐만 아니라,
-        [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer WebGLFramebuffer]와 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderbuffer WebGLRenderbuffer] 도 할당되어, 
+        [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLFramebuffer WebGLFramebuffer]와 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderbuffer WebGLRenderbuffer] 도 할당되어,
         커스텀 렌더링 목표를 실체화합니다. 이러한 오브젝트는 [page:WebGLRenderTarget.dispose]()를 실행해야만 폐기할 수 있습니다.
 	</p>
 
@@ -76,7 +76,7 @@
 	<h3>*three.js*에서 캐시화된 오브젝트의 수를 알 수 있나요?</h3>
 
 	<p>
-        네, 렌더러의 그래빅 보드와 렌더링 프로세스의 통계 정보를 담고 있는 특수 속성인 [page: WebGLRenderer.info]를 통해 확인할 수 있습니다. 
+        네, 렌더러의 그래빅 보드와 렌더링 프로세스의 통계 정보를 담고 있는 특수 속성인 [page:WebGLRenderer.info]를 통해 확인할 수 있습니다.
         다른 것 보다도, 이를 통해 내부적으로 많은 텍스쳐와 기하학, 셰이더 프로그램이 저장되어 있다는 것을 알 수 있습니다.
         만약 애플리케이션에서 성능 문제를 발견했다면, 바로 이 속성을 조절하여 쉽게 메모리 누출을 확인할 수 있습니다.
 	</p>
@@ -91,7 +91,7 @@
 	<h3>*dispose()*를 하고 나서 나중에 다시 각각의 오브젝트를 사용하면 어떻게 되나요?</h3>
 
 	<p>
-        삭제된 내부 자원이 엔진에서 다시 생성될 것입니다. 런타임 에러는 발생하지 않겠지만 프레임에 부정적인 영향을 미치는 것을 확인할 수 있을 것이고 
+        삭제된 내부 자원이 엔진에서 다시 생성될 것입니다. 런타임 에러는 발생하지 않겠지만 프레임에 부정적인 영향을 미치는 것을 확인할 수 있을 것이고
         특히 셰이더 프로그램을 컴파일할 때 더 두드러질 것입니다.
 	</p>
 

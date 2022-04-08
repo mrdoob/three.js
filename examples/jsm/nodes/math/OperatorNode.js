@@ -1,86 +1,206 @@
-import { TempNode } from '../core/TempNode.js';
+import TempNode from '../core/TempNode.js';
 
 class OperatorNode extends TempNode {
 
-	constructor( a, b, op ) {
+	constructor( op, aNode, bNode, ...params ) {
 
 		super();
 
-		this.a = a;
-		this.b = b;
 		this.op = op;
 
-	}
+		if ( params.length > 0 ) {
 
-	getType( builder ) {
+			let finalBNode = bNode;
 
-		const a = this.a.getType( builder ),
-			b = this.b.getType( builder );
+			for ( let i = 0; i < params.length; i ++ ) {
 
-		if ( builder.isTypeMatrix( a ) ) {
+				finalBNode = new OperatorNode( op, finalBNode, params[ i ] );
 
-			return 'v4';
+			}
 
-		} else if ( builder.getTypeLength( b ) > builder.getTypeLength( a ) ) {
-
-			// use the greater length vector
-
-			return b;
+			bNode = finalBNode;
 
 		}
 
-		return a;
+		this.aNode = aNode;
+		this.bNode = bNode;
+
+	}
+
+	getNodeType( builder, output ) {
+
+		const op = this.op;
+
+		const aNode = this.aNode;
+		const bNode = this.bNode;
+
+		const typeA = aNode.getNodeType( builder );
+		const typeB = bNode.getNodeType( builder );
+
+		if ( typeA === 'void' || typeB === 'void' ) {
+
+			return 'void';
+
+		} else if ( op === '=' || op === '%' ) {
+
+			return typeA;
+
+		} else if ( op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
+
+			return 'int';
+
+		} else if ( op === '==' || op === '&&' || op === '||' || op === '^^' ) {
+
+			return 'bool';
+
+		} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+
+			const typeLength = builder.getTypeLength( output );
+
+			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
+
+		} else {
+
+			if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
+
+				return typeB;
+
+			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+
+				// matrix x vector
+
+				return builder.getVectorFromMatrix( typeA );
+
+			} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+
+				// vector x matrix
+
+				return builder.getVectorFromMatrix( typeB );
+
+			} else if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+
+				// anytype x anytype: use the greater length vector
+
+				return typeB;
+
+			}
+
+			return typeA;
+
+		}
 
 	}
 
 	generate( builder, output ) {
 
-		const type = this.getType( builder );
+		const op = this.op;
 
-		const a = this.a.build( builder, type ),
-			b = this.b.build( builder, type );
+		const aNode = this.aNode;
+		const bNode = this.bNode;
 
-		return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
+		const type = this.getNodeType( builder, output );
 
-	}
+		let typeA = null;
+		let typeB = null;
 
-	copy( source ) {
+		if ( type !== 'void' ) {
 
-		super.copy( source );
+			typeA = aNode.getNodeType( builder );
+			typeB = bNode.getNodeType( builder );
 
-		this.a = source.a;
-		this.b = source.b;
-		this.op = source.op;
+			if ( op === '=' ) {
 
-		return this;
+				typeB = typeA;
 
-	}
+			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
-	toJSON( meta ) {
+				if ( builder.isVector( typeA ) ) {
 
-		let data = this.getJSONNode( meta );
+					typeB = typeA;
 
-		if ( ! data ) {
+				} else {
 
-			data = this.createJSONNode( meta );
+					typeA = typeB = 'float';
 
-			data.a = this.a.toJSON( meta ).uuid;
-			data.b = this.b.toJSON( meta ).uuid;
-			data.op = this.op;
+				}
+
+			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
+
+				// matrix x vector
+
+				typeB = builder.getVectorFromMatrix( typeA );
+
+			} else if ( builder.isVector( typeA ) && builder.isMatrix( typeB ) ) {
+
+				// vector x matrix
+
+				typeA = builder.getVectorFromMatrix( typeB );
+
+			} else {
+
+				// anytype x anytype
+
+				typeA = typeB = type;
+
+			}
+
+		} else {
+
+			typeA = typeB = type;
 
 		}
 
-		return data;
+		const a = aNode.build( builder, typeA );
+		const b = bNode.build( builder, typeB );
+
+		const outputLength = builder.getTypeLength( output );
+
+		if ( output !== 'void' ) {
+
+			if ( op === '=' ) {
+
+				builder.addFlowCode( `${a} ${this.op} ${b}` );
+
+				return a;
+
+			} else if ( op === '>' && outputLength > 1 ) {
+
+				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`, type, output );
+
+			} else if ( op === '<=' && outputLength > 1 ) {
+
+				return builder.format( `${ builder.getMethod( 'lessThanEqual' ) }( ${a}, ${b} )`, type, output );
+
+			} else {
+
+				return builder.format( `( ${a} ${this.op} ${b} )`, type, output );
+
+			}
+
+		} else if ( typeA !== 'void' ) {
+
+			return builder.format( `${a} ${this.op} ${b}`, type, output );
+
+		}
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.op = this.op;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.op = data.op;
 
 	}
 
 }
 
-OperatorNode.ADD = '+';
-OperatorNode.SUB = '-';
-OperatorNode.MUL = '*';
-OperatorNode.DIV = '/';
-
-OperatorNode.prototype.nodeType = 'Operator';
-
-export { OperatorNode };
+export default OperatorNode;

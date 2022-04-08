@@ -12,11 +12,12 @@
 		<p class="desc">
 		This class stores data for an attribute (such as vertex positions, face indices, normals,
 		colors, UVs, and any custom attributes ) associated with a [page:BufferGeometry], which allows
-		for more efficient passing of data to the GPU. See that page for details and a usage example.<br /><br />
-
-		Data is stored as vectors of any length (defined by [page:BufferAttribute.itemSize itemSize]),
-		and in general in the methods outlined below if passing in an index, this is automatically
-		multiplied by the vector length.
+		for more efficient passing of data to the GPU. See that page for details and a usage example.
+		When working with vector-like data, the <i>.fromBufferAttribute( attribute, index )</i>
+		helper methods on [page:Vector2.fromBufferAttribute Vector2],
+		[page:Vector3.fromBufferAttribute Vector3],
+		[page:Vector4.fromBufferAttribute Vector4], and
+		[page:Color.fromBufferAttribute Color] classes may be helpful.
 		</p>
 
 		<h2>Constructor</h2>
@@ -38,7 +39,7 @@
 		in the buffer maps to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance
 		of UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
 		 data will be mapped to 0.0f - +1.0f in the GLSL attribute. An Int16Array (signed) would map
-		 from -32767 - +32767  to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values
+		 from -32768 - +32767 to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values
 		 will be converted to floats unmodified, i.e. 32767 becomes 32767.0f.
 		</p>
 
@@ -55,6 +56,11 @@
 
 		If the buffer is storing a 3-component vector (such as a position, normal, or color),
 		then this will count the number of such vectors stored.
+		</p>
+
+		<h3>[property:Boolean isBufferAttribute]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Integer itemSize]</h3>
@@ -120,10 +126,10 @@
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>Return a copy of this bufferAttribute.</p>
 
-		<h3>[method:BufferAttribute copy]( [param:BufferAttribute bufferAttribute] )</h3>
+		<h3>[method:this copy]( [param:BufferAttribute bufferAttribute] )</h3>
 		<p>Copies another BufferAttribute to this BufferAttribute.</p>
 
-		<h3>[method:BufferAttribute copyArray]( array ) </h3>
+		<h3>[method:this copyArray]( array ) </h3>
 		<p>Copy the array given here (which can be a normal array or TypedArray) into
 			[page:BufferAttribute.array array].<br /><br />
 
@@ -131,19 +137,19 @@
 			for notes on requirements if copying a TypedArray.
 		</p>
 
-		<h3>[method:null copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
+		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>Copy a vector from bufferAttribute[index2] to [page:BufferAttribute.array array][index1].</p>
 
-		<h3>[method:BufferAttribute copyColorsArray]( [param:Array colors] ) </h3>
+		<h3>[method:this copyColorsArray]( [param:Array colors] ) </h3>
 		<p>Copy an array representing RGB color values into [page:BufferAttribute.array array].</p>
 
-		<h3>[method:BufferAttribute copyVector2sArray]( [param:Array vectors] ) </h3>
+		<h3>[method:this copyVector2sArray]( [param:Array vectors] ) </h3>
 		<p>Copy an array representing [page:Vector2]s into [page:BufferAttribute.array array].</p>
 
-		<h3>[method:BufferAttribute copyVector3sArray]( [param:Array vectors] ) </h3>
+		<h3>[method:this copyVector3sArray]( [param:Array vectors] ) </h3>
 		<p>Copy an array representing [page:Vector3]s into [page:BufferAttribute.array array].</p>
 
-		<h3>[method:BufferAttribute copyVector4sArray]( [param:Array vectors] ) </h3>
+		<h3>[method:this copyVector4sArray]( [param:Array vectors] ) </h3>
 		<p>Copy an array representing [page:Vector4]s into [page:BufferAttribute.array array].</p>
 
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
@@ -166,7 +172,7 @@
 		after the buffer has been	transferred to the GPU.
 		</p>
 
-		<h3>[method:BufferAttribute set] ( [param:Array value], [param:Integer offset] ) </h3>
+		<h3>[method:this set] ( [param:Array value], [param:Integer offset] ) </h3>
 		<p>
 		value -- an [page:Array] or [page:TypedArray] from which to copy values. <br />
 		offset -- (optional) index of the [page:BufferAttribute.array array] at which to start copying.<br /><br />
@@ -178,28 +184,28 @@
 		being a [page:TypedArray].
 		</p>
 
-		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
 		<p>Set [page:BufferAttribute.usage usage] to value. See usage [page:BufferAttributeUsage constants] for all possible input values.</p>
 
-		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
+		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>Sets the x component of the vector at the given index.</p>
 
-		<h3>[method:BufferAttribute setY]( [param:Integer index], [param:Float y] ) </h3>
+		<h3>[method:this setY]( [param:Integer index], [param:Float y] ) </h3>
 		<p>Sets the y component of the vector at the given index.</p>
 
-		<h3>[method:BufferAttribute setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<h3>[method:this setZ]( [param:Integer index], [param:Float z] ) </h3>
 		<p>Sets the z component of the vector at the given index.</p>
 
-		<h3>[method:BufferAttribute setW]( [param:Integer index], [param:Float w] ) </h3>
+		<h3>[method:this setW]( [param:Integer index], [param:Float w] ) </h3>
 		<p>Sets the w component of the vector at the given index.</p>
 
-		<h3>[method:BufferAttribute setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<h3>[method:this setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
 		<p>Sets the x and y components of the vector at the given index.</p>
 
-		<h3>[method:BufferAttribute setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<h3>[method:this setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
 		<p>Sets the x, y and z components of the vector at the given index.</p>
 
-		<h3>[method:BufferAttribute setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<h3>[method:this setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
 		<p>Sets the x, y, z and w components of the vector at the given index.</p>
 
 

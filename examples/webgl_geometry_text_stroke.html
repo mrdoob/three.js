@@ -20,9 +20,21 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple text from json fonts
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
@@ -31,7 +43,6 @@
 			let camera, scene, renderer;
 
 			init();
-			animate();
 
 			function init( ) {
 
@@ -58,7 +69,7 @@
 						side: THREE.DoubleSide
 					} );
 
-					const message = "   Three.js\nStroke text.";
+					const message = '   Three.js\nStroke text.';
 
 					const shapes = font.generateShapes( message, 100 );
 
@@ -120,6 +131,8 @@
 
 					scene.add( strokeText );
 
+					render();
+
 				} ); //end load function
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -131,6 +144,8 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
+				controls.addEventListener( 'change', render );
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			} // end init
@@ -141,12 +156,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 

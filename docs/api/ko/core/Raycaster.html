@@ -17,22 +17,22 @@
 		<h2>코드 예제</h2>
 		<code>
 		const raycaster = new THREE.Raycaster();
-		const mouse = new THREE.Vector2();
+		const pointer = new THREE.Vector2();
 
-		function onMouseMove( event ) {
+		function onPointerMove( event ) {
 
-			// calculate mouse position in normalized device coordinates
+			// calculate pointer position in normalized device coordinates
 			// (-1 to +1) for both components
 
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 		}
 
 		function render() {
 
-			// update the picking ray with the camera and mouse position
-			raycaster.setFromCamera( mouse, camera );
+			// update the picking ray with the camera and pointer position
+			raycaster.setFromCamera( pointer, camera );
 
 			// calculate objects intersecting the picking ray
 			const intersects = raycaster.intersectObjects( scene.children );
@@ -47,7 +47,7 @@
 
 		}
 
-		window.addEventListener( 'mousemove', onMouseMove, false );
+		window.addEventListener( 'pointermove', onPointerMove );
 
 		window.requestAnimationFrame(render);
 
@@ -69,7 +69,7 @@
 
 		<h2>생성자</h2>
 
-		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] ) {</h3>
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] )</h3>
 		<p>
 		[page:Vector3 origin] — 레이캐스팅이 활용되는 시점 벡터입니다.<br />
 		[page:Vector3 direction] — 레이 방향을 가지고 있는 방향 벡터입니다. 정규화되어야 합니다.<br />
@@ -97,7 +97,7 @@
 
 		<h3>[property:Camera camera]</h3>
 		<p>
-		[page:Sprites]같은 빌보드객체처럼 뷰에 의존하는 객체에 대항 레이캐스팅 시에 사용되는 카메라입니다. 
+		[page:Sprites]같은 빌보드객체처럼 뷰에 의존하는 객체에 대항 레이캐스팅 시에 사용되는 카메라입니다.
 		이 값은 수동으로 설정하거나 "setFromCamera"를 호출해야 합니다.
 
 		기본값은 null입니다.
@@ -137,7 +137,7 @@
 
 		<h2>메서드</h2>
 
-		<h3>[method:null set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<h3>[method:undefined set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
 		[page:Vector3 origin] — 레이캐스팅이 활용되는 시점 벡터입니다.<br />
 		[page:Vector3 direction] — 레이 방향을 정하는 정규화된 방향 벡터입니다.
@@ -146,7 +146,7 @@
 		새 시점과 방향으로 레이를 업데이트합니다. 이 메서드는 인자의 값만을 복사한다는 점에 주의하세요.
 		</p>
 
-		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
+		<h3>[method:undefined setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
 		<p>
 		[page:Vector2 coords] — 마우스의 2D 좌표이며 정규화 디바이스 좌표입니다(NDC)---X 및 Y 컴포넌트는 -1 과 1 사이입니다.<br />
 		[page:Camera camera] — 레이의 시점이 되는 카메라입니다.
@@ -158,7 +158,7 @@
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] — 레이와의 교차 체크를 하는 객체입니다.<br />
-		[page:Boolean recursive] — true라면, 모든 자식들도 함게 체크합니다. false라면 해당 객체와의 교차만 체크합니다. 기본값은 false입니다.<br />
+		[page:Boolean recursive] — true라면, 모든 자식들도 함게 체크합니다. false라면 해당 객체와의 교차만 체크합니다. 기본값은 true입니다.<br />
 		[page:Array optionalTarget] — (생략가능) 결과값을 설정할 타겟입니다. 아니면 [page:Array]가 인스턴스화됩니다. 이 값을 설정하면, 모든 요청 전에 배열을 제거해야합니다 (예를 들어 array.length = 0;).
 		</p>
 		<p>
@@ -181,15 +181,15 @@
 		*Raycaster*는 레이가 객체에 교차하는지 아닌지 판단할 때의 전달받은 객체의 [page:Object3D.raycast raycast] 메서드를 대신합니다. 이는 [page:Line lines]과 [page:Points pointclouds]와 달리 [page:Mesh meshes]가 레이캐스팅에 다르게 반응할 수 있게 합니다.
 		</p>
 		<p>
-		메쉬의 면은 [page:.ray ray]의 시점에서 탐지 가능할 수 있도록 마주보고 있어야 하는 것에 주의하세요; 
-		면의 뒤쪽을 통과하는 레이 교차는 탐지디지 않을 것입니다. 
+		메쉬의 면은 [page:.ray ray]의 시점에서 탐지 가능할 수 있도록 마주보고 있어야 하는 것에 주의하세요;
+		면의 뒤쪽을 통과하는 레이 교차는 탐지디지 않을 것입니다.
 		객체의 양 면을 레이캐스팅하고 싶다면, [page:Mesh.material material]의 [page:Material.side side] 프로퍼티를 *THREE.DoubleSide*로 설정해야합니다.
 		</p>
 
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Array objects] — 레이의 교차를 체크하기 위한 객체입니다.<br />
-		[page:Boolean recursive] — true면 객체의 모든 자식들도 체크합니다. 아니면 객체만의 교차를 체크합니다. 기본값은 false입니다.<br />
+		[page:Boolean recursive] — true면 객체의 모든 자식들도 체크합니다. 아니면 객체만의 교차를 체크합니다. 기본값은 true입니다.<br />
 		[page:Array optionalTarget] — (생략가능) 결과값을 설정할 타겟입니다. 아니면 [page:Array]가 인스턴스화됩니다. 이 값을 설정하면, 모든 요청 전에 배열을 제거해야합니다 (예를 들어 array.length = 0;).
 		</p>
 		<p>

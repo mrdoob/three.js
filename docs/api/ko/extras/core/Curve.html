@@ -25,7 +25,7 @@
 		<h2>프로퍼티</h2>
 
 		<h3>[property:Integer arcLengthDivisions]</h3>
-		<p>이 값은 곡선의 누적 세그먼트 길이를 계산할 때 [page:.getLengths]를 통해 분할할 양을 결정합니다. 
+		<p>이 값은 곡선의 누적 세그먼트 길이를 계산할 때 [page:.getLengths]를 통해 분할할 양을 결정합니다.
 			[page:.getSpacedPoints]같은 메서드를 사용할 때 정확도를 위해, 곡선이 아주 크다면 [page:.arcLengthDivisions]를 올리는 것을 추천합니다. 기본값은 200입니다.</p>
 
 		<h2>메서드</h2>
@@ -66,7 +66,7 @@
 		<h3>[method:Array getLengths]( [param:Integer divisions] )</h3>
 		<p>누적 세그먼트 길이 목록을 가져옵니다.</p>
 
-		<h3>[method:null updateArcLengths]()</h3>
+		<h3>[method:undefined updateArcLengths]()</h3>
 		<p>누적 세그먼트 거리 캐시를 업데이트합니다.</p>
 
 		<h3>[method:Float getUtoTmapping]( [param:Float u], [param:Float distance] )</h3>
@@ -80,7 +80,7 @@
 			[page:Float t] - 곡선의 위치입니다 [ 0, 1 ] 범위여야합니다. <br>
 			[page:Vector optionalTarget] — (생략가능) 값이 지정되면, 결과값이 이 벡터에 복제될 것이고 생략되면 새 Vector가 생성됩니다. <br /><br />
 
-			t에서 접선하는 단위 벡터를 반환합니다. 
+			t에서 접선하는 단위 벡터를 반환합니다.
 			파생 곡선이 접선 유도법을 구현하지 않는 경우, 작은 델타 간격의 두 점이 합리적인 근사치의 기울기를 찾는 데 사용됩니다.
 		</p>
 
@@ -100,13 +100,13 @@
 		<h3>[method:Curve clone]()</h3>
 		<p>이 인스턴스의 사본을 만듭니다.</p>
 
-		<h3>[method:Curve copy]( [param:Curve source] )</h3>
+		<h3>[method:this copy]( [param:Curve source] )</h3>
 		<p>다른 [name] 객체를 이 인스턴스에 복사합니다.</p>
 
 		<h3>[method:Object toJSON]()</h3>
 		<p>이 인스턴스의 JSON 객체 표현을 리턴합니다.</p>
 
-		<h3>[method:Curve fromJSON]( [param:Object json] )</h3>
+		<h3>[method:this fromJSON]( [param:Object json] )</h3>
 		<p>JSON 객체에서 이 인스턴스로 데이터를 복사합니다.</p>
 
 		<h2>소스코드</h2>

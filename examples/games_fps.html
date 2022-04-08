@@ -7,41 +7,54 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<div id="info">Octree threejs demo - basic collisions with static triangle mesh<br />WASD to move, space to jump, use mouse to throw balls and move the camera.</div>
+		<div id="info">
+			Octree threejs demo - basic collisions with static triangle mesh<br />
+			MOUSE to look around and to throw balls<br/>
+			WASD to move and SPACE to jump
+		</div>
 		<div id="container"></div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			import { Octree } from './jsm/math/Octree.js';
+			import { OctreeHelper } from './jsm/helpers/OctreeHelper.js';
+
 			import { Capsule } from './jsm/math/Capsule.js';
 
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			const clock = new THREE.Clock();
 
 			const scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x88ccff );
+			scene.background = new THREE.Color( 0x88ccee );
+			scene.fog = new THREE.Fog( 0x88ccee, 0, 50 );
 
-			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.rotation.order = 'YXZ';
 
-			const ambientlight = new THREE.AmbientLight( 0x6688cc );
-			scene.add( ambientlight );
-
-			const fillLight1 = new THREE.DirectionalLight( 0xff9999, 0.5 );
-			fillLight1.position.set( - 1, 1, 2 );
+			const fillLight1 = new THREE.HemisphereLight( 0x4488bb, 0x002244, 0.5 );
+			fillLight1.position.set( 2, 1, 1 );
 			scene.add( fillLight1 );
 
-			const fillLight2 = new THREE.DirectionalLight( 0x8888ff, 0.2 );
-			fillLight2.position.set( 0, - 1, 0 );
-			scene.add( fillLight2 );
-
-			const directionalLight = new THREE.DirectionalLight( 0xffffaa, 1.2 );
+			const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
 			directionalLight.position.set( - 5, 25, - 1 );
 			directionalLight.castShadow = true;
 			directionalLight.shadow.camera.near = 0.01;
@@ -56,20 +69,20 @@
 			directionalLight.shadow.bias = - 0.00006;
 			scene.add( directionalLight );
 
+			const container = document.getElementById( 'container' );
+
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.VSMShadowMap;
-
-			const container = document.getElementById( 'container' );
-
+			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			container.appendChild( renderer.domElement );
 
 			const stats = new Stats();
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
-
 			container.appendChild( stats.domElement );
 
 			const GRAVITY = 30;
@@ -79,8 +92,8 @@
 
 			const STEPS_PER_FRAME = 5;
 
-			const sphereGeometry = new THREE.SphereGeometry( SPHERE_RADIUS, 32, 32 );
-			const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0x888855, roughness: 0.8, metalness: 0.5 } );
+			const sphereGeometry = new THREE.IcosahedronGeometry( SPHERE_RADIUS, 5 );
+			const sphereMaterial = new THREE.MeshLambertMaterial( { color: 0xbbbb44 } );
 
 			const spheres = [];
 			let sphereIdx = 0;
@@ -93,7 +106,11 @@
 
 				scene.add( sphere );
 
-				spheres.push( { mesh: sphere, collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ), velocity: new THREE.Vector3() } );
+				spheres.push( {
+					mesh: sphere,
+					collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
+					velocity: new THREE.Vector3()
+				} );
 
 			}
 
@@ -125,7 +142,7 @@
 
 			} );
 
-			document.addEventListener( 'mousedown', () => {
+			container.addEventListener( 'mousedown', () => {
 
 				document.body.requestPointerLock();
 
@@ -135,7 +152,7 @@
 
 			document.addEventListener( 'mouseup', () => {
 
-				throwBall();
+				if ( document.pointerLockElement !== null ) throwBall();
 
 			} );
 
@@ -410,7 +427,7 @@
 
 						if ( child.material.map ) {
 
-							child.material.map.anisotropy = 8;
+							child.material.map.anisotropy = 4;
 
 						}
 
@@ -418,9 +435,36 @@
 
 				} );
 
+				const helper = new OctreeHelper( worldOctree );
+				helper.visible = false;
+				scene.add( helper );
+
+				const gui = new GUI( { width: 200 } );
+				gui.add( { debug: false }, 'debug' )
+					.onChange( function ( value ) {
+
+						helper.visible = value;
+
+					} );
+
 				animate();
 
 			} );
+
+			function teleportPlayerIfOob() {
+
+				if ( camera.position.y <= - 25 ) {
+
+					playerCollider.start.set( 0, 0.35, 0 );
+					playerCollider.end.set( 0, 1, 0 );
+					playerCollider.radius = 0.35;
+					camera.position.copy( playerCollider.end );
+					camera.rotation.set( 0, 0, 0 );
+
+				}
+
+			}
+
 
 			function animate() {
 
@@ -436,6 +480,8 @@
 					updatePlayer( deltaTime );
 
 					updateSpheres( deltaTime );
+
+					teleportPlayerIfOob();
 
 				}
 

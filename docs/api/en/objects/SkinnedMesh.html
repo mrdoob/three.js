@@ -38,7 +38,8 @@
 		<code>
 		const geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
 
-		// create the skin indices and skin weights
+		// create the skin indices and skin weights manually
+		// (typically a loader would read this data from a 3D model for you)
 
 		const position = geometry.attributes.position;
 
@@ -113,6 +114,11 @@
 		The base matrix that is used for resetting the bound bone transforms.
 		</p>
 
+		<h3>[property:Boolean isSkinnedMesh]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Skeleton skeleton]</h3>
 		<p>
 		[page:Skeleton] representing the bone hierarchy of the skinned mesh.
@@ -123,7 +129,7 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Mesh] class for common methods.</p>
 
-		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<h3>[method:undefined bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
 		<p>
 		[page:Skeleton skeleton] - [page:Skeleton] created from a [page:Bone Bones] tree.<br/>
 		[page:Matrix4 bindMatrix] - [page:Matrix4] that represents the base transform of the skeleton.<br /><br />
@@ -134,27 +140,28 @@
 
 		<h3>[method:SkinnedMesh clone]()</h3>
 		<p>
-		Returns a clone of this SkinnedMesh object and any descendants.
+		This method does currently not clone an instance of [name] correctly. Please use [page:SkeletonUtils.clone]() in the meanwhile.
 		</p>
 
-		<h3>[method:null normalizeSkinWeights]()</h3>
+		<h3>[method:undefined normalizeSkinWeights]()</h3>
 		<p>
 		Normalizes the skin weights.
 		</p>
 
-		<h3>[method:null pose]()</h3>
+		<h3>[method:undefined pose]()</h3>
 		<p>
 		This method sets the skinned mesh in the rest pose (resets the pose).
 		</p>
 
-		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
-		<p>
-		Updates the [page:Matrix4 MatrixWorld].
-		</p>
-
-		<h3>[method:Vector3 boneTransform]( [index:Integer], [target:Vector3] )</h3>
+		<h3>[method:Vector3 boneTransform]( [param:Integer index], [param:Vector3 target] )</h3>
 		<p>
 		Calculates the position of the vertex at the given index relative to the current bone transformations.
+		Target vector must be initialized with the vetrex coordinates prior to the transformation:
+		<code>
+const target = new THREE.Vector3();
+target.fromBufferAttribute( mesh.geometry.attributes.position, index );
+mesh.boneTransform( index, target );
+		</code>
 		</p>
 
 		<h2>Source</h2>

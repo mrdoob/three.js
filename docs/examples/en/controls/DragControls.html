@@ -101,17 +101,17 @@
 
 		<p>See the base [page:EventDispatcher] class for common methods.</p>
 
-		<h3>[method:null activate] ()</h3>
+		<h3>[method:undefined activate] ()</h3>
 		<p>
 			Adds the event listeners of the controls.
 		</p>
 
-		<h3>[method:null deactivate] ()</h3>
+		<h3>[method:undefined deactivate] ()</h3>
 		<p>
 			Removes the event listeners of the controls.
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Should be called if the controls is no longer required.
 		</p>
@@ -119,6 +119,11 @@
 		<h3>[method:Array getObjects] ()</h3>
 		<p>
 			Returns the array of draggable objects.
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the internal [page:Raycaster] instance that is used for intersection tests.
 		</p>
 
 		<h2>Source</h2>

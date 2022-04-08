@@ -7,7 +7,7 @@ export default /* glsl */`
 	uniform float transmission;
 	uniform float thickness;
 	uniform float attenuationDistance;
-	uniform vec3 attenuationTint;
+	uniform vec3 attenuationColor;
 
 	#ifdef USE_TRANSMISSIONMAP
 
@@ -29,7 +29,7 @@ export default /* glsl */`
 
 	varying vec3 vWorldPosition;
 
-	vec3 getVolumeTransmissionRay( vec3 n, vec3 v, float thickness, float ior, mat4 modelMatrix ) {
+	vec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {
 
 		// Direction of refracted light.
 		vec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );
@@ -45,7 +45,7 @@ export default /* glsl */`
 
 	}
 
-	float applyIorToRoughness( float roughness, float ior ) {
+	float applyIorToRoughness( const in float roughness, const in float ior ) {
 
 		// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
 		// an IOR of 1.5 results in the default amount of microfacet refraction.
@@ -53,11 +53,11 @@ export default /* glsl */`
 
 	}
 
-	vec4 getTransmissionSample( vec2 fragCoord, float roughness, float ior ) {
+	vec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {
 
 		float framebufferLod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );
 
-		#ifdef TEXTURE_LOD_EXT
+		#ifdef texture2DLodEXT
 
 			return texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod );
 
@@ -69,7 +69,7 @@ export default /* glsl */`
 
 	}
 
-	vec3 applyVolumeAttenuation( vec3 radiance, float transmissionDistance, vec3 attenuationColor, float attenuationDistance ) {
+	vec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {
 
 		if ( attenuationDistance == 0.0 ) {
 
@@ -87,9 +87,10 @@ export default /* glsl */`
 
 	}
 
-	vec4 getIBLVolumeRefraction( vec3 n, vec3 v, float roughness, vec3 diffuseColor, vec3 specularColor, float specularF90,
-		vec3 position, mat4 modelMatrix, mat4 viewMatrix, mat4 projMatrix, float ior, float thickness,
-		vec3 attenuationColor, float attenuationDistance ) {
+	vec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,
+		const in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,
+		const in mat4 viewMatrix, const in mat4 projMatrix, const in float ior, const in float thickness,
+		const in vec3 attenuationColor, const in float attenuationDistance ) {
 
 		vec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
 		vec3 refractedRayExit = position + transmissionRay;

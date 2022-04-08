@@ -139,13 +139,13 @@
 		<h3>[method:KeyframeTrack clone]()</h3>
 		<p></p>
 
-		<h3>[method:null createInterpolant]()</h3>
+		<h3>[method:Interpolant createInterpolant]()</h3>
 		<p>
 			根据传入构造器中的插值类型参数，创建线性插值([page:LinearInterpolant LinearInterpolant])，立方插值([page:CubicInterpolant CubicInterpolant])或离散插值
 			([page:DiscreteInterpolant DiscreteInterpolant])
 		</p>
 
-		<h3>[method:null getInterpolation]()</h3>
+		<h3>[method:Interpolant getInterpolation]()</h3>
 		<p>
 			返回插值类型
 		</p>
@@ -162,13 +162,13 @@
 			可传入一个Float32Array类型的变量来接收结果， 否则会自动创建一个长度适宜的新数组。
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:LinearInterpolant InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			根据时间([page:KeyframeTrack.times times])和值([page:KeyframeTrack.times values])创建一个新的线性插值([page:LinearInterpolant LinearInterpolant])。
 			可传入一个Float32Array类型的变量来接收结果， 否则会自动创建一个长度适宜的新数组。
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:CubicInterpolant InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			根据时间([page:KeyframeTrack.times times])和值([page:KeyframeTrack.times values])创建一个新的立方插值([page:CubicInterpolant CubicInterpolant])。
 			可传入一个Float32Array类型的变量来接收结果， 否则会自动创建一个长度适宜的新数组。

@@ -36,7 +36,7 @@
 		</p>
 
 		<p>
-		Iterating through a Vector3 instance will yield its components (x, y, z) in the corresponding order.
+		Iterating through a [name] instance will yield its components (x, y, z) in the corresponding order.
 		</p>
 
 
@@ -65,6 +65,11 @@
 
 
 		<h2>Properties</h2>
+
+		<h3>[property:Boolean isVector3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -195,8 +200,7 @@
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-		Divides this vector by scalar [page:Float s].<br />
-		Sets vector to *( 0, 0, 0 )* if *[page:Float s] = 0*.
+		Divides this vector by scalar [page:Float s].
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector3 v] )</h3>
@@ -340,7 +344,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector.</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0, 1 or 2.<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -357,6 +361,11 @@
 
 		<h3>[method:this setFromCylindricalCoords]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
 		<p>Sets this vector from the cylindrical coordinates [page:Cylindrical radius], [page:Cylindrical theta] and [page:Cylindrical y].</p>
+
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
+		<p>
+		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from the x, y, and z components of the specified [page:Euler Euler Angle].
+		</p>
 
 		<h3>[method:this setFromMatrixColumn]( [param:Matrix4 matrix], [param:Integer index] )</h3>
 		<p>
@@ -412,7 +421,7 @@
 		<p>Subtracts [page:Vector3 v] from this vector.</p>
 
 		<h3>[method:this subScalar]( [param:Float s] )</h3>
-		<p>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y] and [page:.z z] compnents.</p>
+		<p>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y] and [page:.z z] components.</p>
 
 		<h3>[method:this subVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
 		<p>Sets this vector to [page:Vector3 a] - [page:Vector3 b].</p>

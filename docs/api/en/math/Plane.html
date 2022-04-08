@@ -27,13 +27,18 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean isPlane]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 normal]</h3>
 
 		<h3>[property:Float constant]</h3>
 
 		<h2>Methods</h2>
 
-		<h3>[method:Plane applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )</h3>
 		<p>
 		[page:Matrix4 matrix] - the [Page:Matrix4] to apply.<br />
 		[page:Matrix3 optionalNormalMatrix] - (optional) pre-computed normal [Page:Matrix3] of the Matrix4 being applied.<br /><br />
@@ -56,7 +61,7 @@
 		normal vector at the origin onto the plane.
 		</p>
 
-		<h3>[method:Plane copy]( [param:Plane plane] )</h3>
+		<h3>[method:this copy]( [param:Plane plane] )</h3>
 		<p>
 		Copies the values of the passed plane's [page:.normal normal] and [page:.constant constant]
 		properties to this plane.
@@ -105,12 +110,12 @@
 		Determines whether or not this plane intersects [page:Sphere sphere].
 		</p>
 
-		<h3>[method:Plane negate]()</h3>
+		<h3>[method:this negate]()</h3>
 		<p>
 		Negates both the normal vector and the constant.
 		</p>
 
-		<h3>[method:Plane normalize]()</h3>
+		<h3>[method:this normalize]()</h3>
 		<p>
 			Normalizes the [page:.normal normal] vector, and adjusts the [page:.constant constant]
 			value accordingly.
@@ -124,7 +129,7 @@
 		Projects a [page:Vector3 point] onto the plane.
 		</p>
 
-		<h3>[method:Plane set]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<h3>[method:this set]( [param:Vector3 normal], [param:Float constant] )</h3>
 		<p>
 			[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
 			[page:Float constant] - the signed distance from the origin to the plane. Default is *0*.<br /><br />
@@ -132,7 +137,7 @@
 			Sets this plane's [page:.normal normal] and [page:.constant constant] properties by copying the values from the given normal.
 		</p>
 
-		<h3>[method:Plane setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<h3>[method:this setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>
 		[page:Float x] - x value of the unit length normal vector.<br />
 		[page:Float y] - y value of the unit length normal vector.<br />
@@ -142,7 +147,7 @@
 		Set the individual components that define the plane.
 		</p>
 
-		<h3>[method:Plane setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
+		<h3>[method:this setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
 		<p>
 		 [page:Vector3 a] - first point on the plane.<br />
 		 [page:Vector3 b] - second point on the plane.<br />
@@ -152,7 +157,7 @@
 		and determines the direction of the [page:.normal normal].
 		</p>
 
-		<h3>[method:Plane setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] )</h3>
+		<h3>[method:this setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] )</h3>
 		<p>
 		[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
 		[page:Vector3 point] - [page:Vector3]<br /><br />
@@ -160,7 +165,7 @@
 		Sets the plane's properties as defined by a [page:Vector3 normal] and an arbitrary coplanar [page:Vector3 point].
 		</p>
 
-		<h3>[method:Plane translate]( [param:Vector3 offset] )</h3>
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
 		<p>
 		[page:Vector3 offset] - the amount to move the plane by.<br /><br />
 

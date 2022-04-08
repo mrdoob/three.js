@@ -54,6 +54,13 @@
 
 		</p>
 
+		<h3>[method:BufferGeometry mergeGroups]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the groups of.<br /><br />
+
+		Merges the [page:BufferGeometry.groups groups] for the given geometry.
+		</p>
+
 		<h3>[method:BufferGeometry mergeVertices]( [param:BufferGeometry geometry], [param:Number tolerance] )</h3>
 		<p>
 		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the vertices of.<br />
@@ -78,15 +85,42 @@
 		<p>
 		object -- Instance of [page:Mesh Mesh] | [page:Line Line] | [page:Points Points].<br /><br />
 
-		Returns the current attributes (Position and Normal) of a morphed/skinned [page:Object3D Object3D] whose geometry is a 
-		[page:BufferGeometry BufferGeometry], together with the original ones: An Object with 4 properties: 
+		Returns the current attributes (Position and Normal) of a morphed/skinned [page:Object3D Object3D] whose geometry is a
+		[page:BufferGeometry BufferGeometry], together with the original ones: An Object with 4 properties:
 		`positionAttribute`, `normalAttribute`, `morphedPositionAttribute` and `morphedNormalAttribute`.
 
-		Helpful for Raytracing or Decals (i.e. a [page:DecalGeometry DecalGeometry] applied to a morphed Object 
-		with a [page:BufferGeometry BufferGeometry] will use the original BufferGeometry, not the morphed/skinned one, 
-		generating an incorrect result. 
+		Helpful for Raytracing or Decals (i.e. a [page:DecalGeometry DecalGeometry] applied to a morphed Object
+		with a [page:BufferGeometry BufferGeometry] will use the original BufferGeometry, not the morphed/skinned one,
+		generating an incorrect result.
 		Using this function to create a shadow Object3D the DecalGeometry can be correctly generated).
 
+		</p>
+
+		<h3>[method:Object computeMikkTSpaceTangents]( [param:BufferGeometry geometry], [param:Object MikkTSpace], [param:Boolean negateSign] = true )</h3>
+		<ul>
+			<li>geometry -- Instance of [page:BufferGeometry].</li>
+			<li>MikkTSpace -- Instance of <i>examples/jsm/libs/mikktspace.module.js</i>, or <i>mikktspace</i> npm package. Await <i>MikkTSpace.ready</i> before use.
+			<li>negateSign -- Whether to negate the sign component (.w) of each tangent. Required for normal map conventions in some formats, including glTF.</li>
+		</ul>
+
+		<p>
+		Computes vertex tangents using the [link:http://www.mikktspace.com/ MikkTSpace] algorithm.
+		MikkTSpace generates the same tangents consistently, and is used in most modelling tools and
+		normal map bakers. Use MikkTSpace for materials with normal maps, because inconsistent
+		tangents may lead to subtle visual issues in the normal map, particularly around mirrored
+		UV seams.
+		</p>
+
+		<p>
+		In comparison to this method, [page:BufferGeometry.computeTangents] (a
+		custom algorithm) generates tangents that probably will not match the tangents
+		in other software. The custom algorithm is sufficient for general use with a
+		[page:ShaderMaterial], and may be faster than MikkTSpace.
+		</p>
+
+		<p>
+		Returns the original [page:BufferGeometry]. Indexed geometries will be de-indexed.
+		Requires position, normal, and uv attributes.
 		</p>
 
 		<h2>Source</h2>

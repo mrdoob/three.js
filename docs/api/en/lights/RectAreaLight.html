@@ -34,7 +34,7 @@ rectLight.position.set( 5, 5, 0 );
 rectLight.lookAt( 0, 0, 0 );
 scene.add( rectLight )
 
-const rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+const rectLightHelper = new RectAreaLightHelper( rectLight );
 rectLight.add( rectLightHelper );
 		</code>
 
@@ -62,6 +62,11 @@ rectLight.add( rectLightHelper );
 			See the base [page:Light Light] class for common properties.
 		</p>
 
+		<h3>[property:Float height]</h3>
+		<p>
+			The height of the light.
+		</p>
+
 		<h3>[property:Float intensity]</h3>
 		<p>
 			The light's intensity. Default is *1*. <br />
@@ -70,6 +75,11 @@ rectLight.add( rectLightHelper );
 
 			Changing the intensity will also change the light's power.
 
+		</p>
+
+		<h3>[property:Boolean isRectAreaLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Float power]</h3>
@@ -81,13 +91,18 @@ rectLight.add( rectLightHelper );
 			Changing the power will also change the light's intensity.
 		</p>
 
+		<h3>[property:Float width]</h3>
+		<p>
+			The width of the light.
+		</p>
+
 		<h2>Methods</h2>
 		<p>
 			See the base [page:Light Light] class for common methods.
 		</p>
 
 
-		<h3>[method:RectAreaLight copy]( [param:RectAreaLight source] )</h3>
+		<h3>[method:this copy]( [param:RectAreaLight source] )</h3>
 		<p>
 		Copies value of all the properties from the [page:RectAreaLight source] to this
 		RectAreaLight.

@@ -1,18 +1,15 @@
 import {
 	Color,
-	LinearFilter,
-	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
 	Plane,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector3,
 	Vector4,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 
 class Reflector extends Mesh {
 
@@ -29,6 +26,7 @@ class Reflector extends Mesh {
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Reflector.ReflectorShader;
+		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
 
 		//
 
@@ -47,19 +45,7 @@ class Reflector extends Mesh {
 		const textureMatrix = new Matrix4();
 		const virtualCamera = new PerspectiveCamera();
 
-		const parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBFormat
-		};
-
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-			renderTarget.texture.generateMipmaps = false;
-
-		}
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample } );
 
 		const material = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( shader.uniforms ),
@@ -193,6 +179,13 @@ class Reflector extends Mesh {
 
 		};
 
+		this.dispose = function () {
+
+			renderTarget.dispose();
+			scope.material.dispose();
+
+		};
+
 	}
 
 }
@@ -259,6 +252,8 @@ Reflector.ReflectorShader = {
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <encodings_fragment>
 
 		}`
 };

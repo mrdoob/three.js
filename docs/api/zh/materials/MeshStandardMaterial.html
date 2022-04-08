@@ -133,8 +133,8 @@
 		<p>放射光强度。调节发光颜色。默认为1。</p>
 
 		<h3>[property:Texture envMap]</h3>
-		<p>The environment map. To ensure a physically correct rendering, you should only add
-			environment maps which were preprocessed by [page:PMREMGenerator]. Default is null.
+		<p>
+			环境贴图，为了能够保证物理渲染准确，您应该添加由[page:PMREMGenerator]预处理过的环境贴图，默认为null。
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>
@@ -142,6 +142,11 @@
 
 		<h3>[property:Boolean flatShading]</h3>
 		<p> 定义材质是否使用平面着色进行渲染。默认值为false。
+		</p>
+
+		<h3>[property:Boolean isMeshStandardMaterial]</h3>
+		<p>
+			检查当前对象是否为标准网格材质的标记。
 		</p>
 
 		<h3>[property:Texture lightMap]</h3>

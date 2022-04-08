@@ -1,0 +1,392 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のカスタムバッファジオメトリ</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のカスタムバッファジオメトリ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のカスタムバッファジオメトリ</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>は全てのジオメトリを表現する方法です。
+BufferGeometryは<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を使います。１つの<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>はジオメトリを作るための１種類のデータに対応しています。vertexの位置情報を格納するための<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>、color情報を格納するための<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>、normal情報を格納するための<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>がそれぞれあります。</p>
+<div class="threejs_center"><img src="../resources/threejs-attributes.svg" style="width: 700px"></div>
+
+<p>上の図では<code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">color</code>, <code class="notranslate" translate="no">uv</code>それぞれのattribute情報を格納した<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を表しています。これらは<em>並列な配列</em>です。<em>並列な配列</em>というのはN番目にあるデータはN番目のvertexに対応しており、それがattributeの数だけあるという意味です。図ではindex=4のattributeがハイライトされています。</p>
+<div class="threejs_center"><img src="../resources/cube-faces-vertex.svg" style="width: 500px"></div>
+
+<p>上の図のハイライトされたvertexには、このvertexに接する全ての面に異なるnormalが必要です。normalとはどの方向を向いているかの情報です。
+この図ではnormalは角の頂点の周りの矢印で示されており、その頂点に接する全ての面には異なる方向を指すnormalが必要です。</p>
+<p>同様に面ごとに違うUVも必要です。
+UVはテクスチャのどの部分に頂点位置が対応しているか指定するテクスチャ座標です。
+緑の面はFテクスチャの右上に対応するUV、青い面は左上に対応するUV、赤の面は左下に対応したUVが必要な事が分かります。</p>
+<p>単一のvertexはこれらの情報の合成として表現されます。
+頂点が異なる部分を必要とする場合、それは異なる頂点でなければなりません。</p>
+<p>簡単な例として<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を使って立方体を作ってみましょう。立方体を例にするのはvertexがfaceによって共有されているように見えて実は共有されていないからです。この例ではまずすべてのvertexの情報をリストアップして並列の配列に変換して<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を作り、最後に<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を作ります。</p>
+<p>立方体に必要な情報をすべてリストアップします。<code class="notranslate" translate="no">Geometry</code>では１つのvertexを複数のfaceで共有できましたが今回は共有できないことに注意してください。つまり１つの立方体を作るために３６個のvertexが必要になります。１つの面につき２つの三角形、１つの三角形につき３つのvertex、これが６面あるので３６個のvertexが必要になる計算です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertices = [
+  // front
+  { pos: [-1, -1,  1], norm: [ 0,  0,  1], uv: [0, 0], },
+  { pos: [ 1, -1,  1], norm: [ 0,  0,  1], uv: [1, 0], },
+  { pos: [-1,  1,  1], norm: [ 0,  0,  1], uv: [0, 1], },
+
+  { pos: [-1,  1,  1], norm: [ 0,  0,  1], uv: [0, 1], },
+  { pos: [ 1, -1,  1], norm: [ 0,  0,  1], uv: [1, 0], },
+  { pos: [ 1,  1,  1], norm: [ 0,  0,  1], uv: [1, 1], },
+  // right
+  { pos: [ 1, -1,  1], norm: [ 1,  0,  0], uv: [0, 0], },
+  { pos: [ 1, -1, -1], norm: [ 1,  0,  0], uv: [1, 0], },
+  { pos: [ 1,  1,  1], norm: [ 1,  0,  0], uv: [0, 1], },
+
+  { pos: [ 1,  1,  1], norm: [ 1,  0,  0], uv: [0, 1], },
+  { pos: [ 1, -1, -1], norm: [ 1,  0,  0], uv: [1, 0], },
+  { pos: [ 1,  1, -1], norm: [ 1,  0,  0], uv: [1, 1], },
+  // back
+  { pos: [ 1, -1, -1], norm: [ 0,  0, -1], uv: [0, 0], },
+  { pos: [-1, -1, -1], norm: [ 0,  0, -1], uv: [1, 0], },
+  { pos: [ 1,  1, -1], norm: [ 0,  0, -1], uv: [0, 1], },
+
+  { pos: [ 1,  1, -1], norm: [ 0,  0, -1], uv: [0, 1], },
+  { pos: [-1, -1, -1], norm: [ 0,  0, -1], uv: [1, 0], },
+  { pos: [-1,  1, -1], norm: [ 0,  0, -1], uv: [1, 1], },
+  // left
+  { pos: [-1, -1, -1], norm: [-1,  0,  0], uv: [0, 0], },
+  { pos: [-1, -1,  1], norm: [-1,  0,  0], uv: [1, 0], },
+  { pos: [-1,  1, -1], norm: [-1,  0,  0], uv: [0, 1], },
+
+  { pos: [-1,  1, -1], norm: [-1,  0,  0], uv: [0, 1], },
+  { pos: [-1, -1,  1], norm: [-1,  0,  0], uv: [1, 0], },
+  { pos: [-1,  1,  1], norm: [-1,  0,  0], uv: [1, 1], },
+  // top
+  { pos: [ 1,  1, -1], norm: [ 0,  1,  0], uv: [0, 0], },
+  { pos: [-1,  1, -1], norm: [ 0,  1,  0], uv: [1, 0], },
+  { pos: [ 1,  1,  1], norm: [ 0,  1,  0], uv: [0, 1], },
+
+  { pos: [ 1,  1,  1], norm: [ 0,  1,  0], uv: [0, 1], },
+  { pos: [-1,  1, -1], norm: [ 0,  1,  0], uv: [1, 0], },
+  { pos: [-1,  1,  1], norm: [ 0,  1,  0], uv: [1, 1], },
+  // bottom
+  { pos: [ 1, -1,  1], norm: [ 0, -1,  0], uv: [0, 0], },
+  { pos: [-1, -1,  1], norm: [ 0, -1,  0], uv: [1, 0], },
+  { pos: [ 1, -1, -1], norm: [ 0, -1,  0], uv: [0, 1], },
+
+  { pos: [ 1, -1, -1], norm: [ 0, -1,  0], uv: [0, 1], },
+  { pos: [-1, -1,  1], norm: [ 0, -1,  0], uv: [1, 0], },
+  { pos: [-1, -1, -1], norm: [ 0, -1,  0], uv: [1, 1], },
+];
+</pre>
+<p>次にこれを３つの並列な配列に変換します。
+（訳註：並列な配列<em>parallel arrays</em>とは例えば頂点を指定する配列と色を指定する配列があり１つの頂点をレンダリングするために２つの配列の同じインデックスの要素を指定するような使われ方をする配列のことです。次の例ではpositions, normals, uvsの３つの配列が並列の配列として使われています）</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const positions = [];
+const normals = [];
+const uvs = [];
+for (const vertex of vertices) {
+  positions.push(...vertex.pos);
+  normals.push(...vertex.norm);
+  uvs.push(...vertex.uv);
+}
+</pre>
+<p>最後にそれぞれの配列に対して<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>を作り<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>に指定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const geometry = new THREE.BufferGeometry();
+  const positionNumComponents = 3;
+  const normalNumComponents = 3;
+  const uvNumComponents = 2;
+  geometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
+  geometry.setAttribute(
+      'normal',
+      new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
+  geometry.setAttribute(
+      'uv',
+      new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
+</pre>
+<p>名前の付け方に注意してください。three.jsで決められている名前以外を指定することはできません（カスタムシェーダーを使用する場合は別です）。<code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">uv</code>はthree.jsで決められている名前です。ここでは指定していませんが<code class="notranslate" translate="no">color</code>も指定可能です。</p>
+<p>上の例では<code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code>, <code class="notranslate" translate="no">uvs</code>の３つのJavaScriptのネイティブ配列を作りました。次に<code class="notranslate" translate="no">Float32Array</code>型の<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>に変換します。<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>はネイティブ配列ではなくTypedArrayである必要があります。さらにそれぞれの<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>に対して「１つのvertexに対していくつの要素が必要か」を指定する必要があります。例えばpositionやnormalsは３次元なので１つのvertexつき３つの要素を必要とします。UVはテクスチャ上の２次元の点なので２つの要素を必要とします。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-cube.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>かなり大量のデータです。この配列からvertexを選ぶときにはインデックスを使います。１つの三角形は３つのvertexで構成されていて２つの三角形が１つのfaceを作っています。これが６枚で１つの立方体を構成しています。１つのfaceを構成する２つの三角形を作っているvertexは２つが同じデータを持っています。position, normal, UVすべて同じです。そこで重複しているデータを１つ消して１つにして、そのデータを別のインデックスで指定します。</p>
+<p>ではまず重複したデータを１つにします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertices = [
+  // front
+  { pos: [-1, -1,  1], norm: [ 0,  0,  1], uv: [0, 0], }, // 0
+  { pos: [ 1, -1,  1], norm: [ 0,  0,  1], uv: [1, 0], }, // 1
+  { pos: [-1,  1,  1], norm: [ 0,  0,  1], uv: [0, 1], }, // 2
+-
+-  { pos: [-1,  1,  1], norm: [ 0,  0,  1], uv: [0, 1], },
+-  { pos: [ 1, -1,  1], norm: [ 0,  0,  1], uv: [1, 0], },
+  { pos: [ 1,  1,  1], norm: [ 0,  0,  1], uv: [1, 1], }, // 3
+  // right
+  { pos: [ 1, -1,  1], norm: [ 1,  0,  0], uv: [0, 0], }, // 4
+  { pos: [ 1, -1, -1], norm: [ 1,  0,  0], uv: [1, 0], }, // 5
+-
+-  { pos: [ 1,  1,  1], norm: [ 1,  0,  0], uv: [0, 1], },
+-  { pos: [ 1, -1, -1], norm: [ 1,  0,  0], uv: [1, 0], },
+  { pos: [ 1,  1,  1], norm: [ 1,  0,  0], uv: [0, 1], }, // 6
+  { pos: [ 1,  1, -1], norm: [ 1,  0,  0], uv: [1, 1], }, // 7
+  // back
+  { pos: [ 1, -1, -1], norm: [ 0,  0, -1], uv: [0, 0], }, // 8
+  { pos: [-1, -1, -1], norm: [ 0,  0, -1], uv: [1, 0], }, // 9
+-
+-  { pos: [ 1,  1, -1], norm: [ 0,  0, -1], uv: [0, 1], },
+-  { pos: [-1, -1, -1], norm: [ 0,  0, -1], uv: [1, 0], },
+  { pos: [ 1,  1, -1], norm: [ 0,  0, -1], uv: [0, 1], }, // 10
+  { pos: [-1,  1, -1], norm: [ 0,  0, -1], uv: [1, 1], }, // 11
+  // left
+  { pos: [-1, -1, -1], norm: [-1,  0,  0], uv: [0, 0], }, // 12
+  { pos: [-1, -1,  1], norm: [-1,  0,  0], uv: [1, 0], }, // 13
+-
+-  { pos: [-1,  1, -1], norm: [-1,  0,  0], uv: [0, 1], },
+-  { pos: [-1, -1,  1], norm: [-1,  0,  0], uv: [1, 0], },
+  { pos: [-1,  1, -1], norm: [-1,  0,  0], uv: [0, 1], }, // 14
+  { pos: [-1,  1,  1], norm: [-1,  0,  0], uv: [1, 1], }, // 15
+  // top
+  { pos: [ 1,  1, -1], norm: [ 0,  1,  0], uv: [0, 0], }, // 16
+  { pos: [-1,  1, -1], norm: [ 0,  1,  0], uv: [1, 0], }, // 17
+-
+-  { pos: [ 1,  1,  1], norm: [ 0,  1,  0], uv: [0, 1], },
+-  { pos: [-1,  1, -1], norm: [ 0,  1,  0], uv: [1, 0], },
+  { pos: [ 1,  1,  1], norm: [ 0,  1,  0], uv: [0, 1], }, // 18
+  { pos: [-1,  1,  1], norm: [ 0,  1,  0], uv: [1, 1], }, // 19
+  // bottom
+  { pos: [ 1, -1,  1], norm: [ 0, -1,  0], uv: [0, 0], }, // 20
+  { pos: [-1, -1,  1], norm: [ 0, -1,  0], uv: [1, 0], }, // 21
+-
+-  { pos: [ 1, -1, -1], norm: [ 0, -1,  0], uv: [0, 1], },
+-  { pos: [-1, -1,  1], norm: [ 0, -1,  0], uv: [1, 0], },
+  { pos: [ 1, -1, -1], norm: [ 0, -1,  0], uv: [0, 1], }, // 22
+  { pos: [-1, -1, -1], norm: [ 0, -1,  0], uv: [1, 1], }, // 23
+];
+</pre>
+<p>はい、24個になりました。これに対して36個のインデックスを指定して36個のvertexを作ります。<a href="/docs/#api/ja/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a>により36個のインデックスを使って12個の三角形を作ります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(positions, positionNumComponents));
+geometry.setAttribute(
+    'normal',
+    new THREE.BufferAttribute(normals, normalNumComponents));
+geometry.setAttribute(
+    'uv',
+    new THREE.BufferAttribute(uvs, uvNumComponents));
+
++geometry.setIndex([
++   0,  1,  2,   2,  1,  3,  // front
++   4,  5,  6,   6,  5,  7,  // right
++   8,  9, 10,  10,  9, 11,  // back
++  12, 13, 14,  14, 13, 15,  // left
++  16, 17, 18,  18, 17, 19,  // top
++  20, 21, 22,  22, 21, 23,  // bottom
++]);
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube-indexed.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-cube-indexed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p><code class="notranslate" translate="no">Geometry</code>と同じように<a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>も<a href="/docs/#api/ja/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a>メソッドを持っています。これは特に指定がない場合に自動的にnormalを計算するメソッドです。ただし<code class="notranslate" translate="no">Geometry</code>の場合と違いvertexがfaceによって共有されていないために<code class="notranslate" translate="no">computeVertexNormals</code>の結果も少し違います。</p>
+<div class="spread">
+  <div>
+    <div data-diagram="bufferGeometryCylinder"></div>
+  </div>
+</div>
+
+<p>シリンダーで<code class="notranslate" translate="no">computeVertexNormals</code>の違いを比較してみましょう。よく見ると左のシリンダーには縫い目が見えると思います。これはvertexを共有することができないためにUVも異なるためです。ちょっとしたことですが、気になるときは自分でnormalを指定すれば良いだけです。</p>
+<p>ネイティブの配列を使う代わりに<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>を使うこともできます。TypedArrayは最初に配列の大きさを指定する必要があるため少し面倒です。ネイティブの配列は<code class="notranslate" translate="no">push</code>で追加して<code class="notranslate" translate="no">length</code>で配列の長さを確認することができます。TypedArrayには<code class="notranslate" translate="no">push</code>メソッドがないのであらかじめ用意した配列に注意しながら要素を入れていく必要があります。</p>
+<p>この例では最初に大きなデータを使っているので配列の長さを意識することはそれほど大変ではありません。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const positions = [];
+-const normals = [];
+-const uvs = [];
++const numVertices = vertices.length;
++const positionNumComponents = 3;
++const normalNumComponents = 3;
++const uvNumComponents = 2;
++const positions = new Float32Array(numVertices * positionNumComponents);
++const normals = new Float32Array(numVertices * normalNumComponents);
++const uvs = new Float32Array(numVertices * uvNumComponents);
++let posNdx = 0;
++let nrmNdx = 0;
++let uvNdx = 0;
+for (const vertex of vertices) {
+-  positions.push(...vertex.pos);
+-  normals.push(...vertex.norm);
+-  uvs.push(...vertex.uv);
++  positions.set(vertex.pos, posNdx);
++  normals.set(vertex.norm, nrmNdx);
++  uvs.set(vertex.uv, uvNdx);
++  posNdx += positionNumComponents;
++  nrmNdx += normalNumComponents;
++  uvNdx += uvNumComponents;
+}
+
+geometry.setAttribute(
+    'position',
+-    new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
++    new THREE.BufferAttribute(positions, positionNumComponents));
+geometry.setAttribute(
+    'normal',
+-    new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
++    new THREE.BufferAttribute(normals, normalNumComponents));
+geometry.setAttribute(
+    'uv',
+-    new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
++    new THREE.BufferAttribute(uvs, uvNumComponents));
+
+geometry.setIndex([
+   0,  1,  2,   2,  1,  3,  // front
+   4,  5,  6,   6,  5,  7,  // right
+   8,  9, 10,  10,  9, 11,  // back
+  12, 13, 14,  14, 13, 15,  // left
+  16, 17, 18,  18, 17, 19,  // top
+  20, 21, 22,  22, 21, 23,  // bottom
+]);
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-cube-typedarrays.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-cube-typedarrays.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>TypedArrayはプログラムが走っている状態でvertexの編集をしたいときに便利です。</p>
+<p>良い例が思いつかないのでとりあえずメッシュの四角形が出たり入ったりする球体を作ってみます。</p>
+<p>球体の位置とindexを生成するコードです。四角形の中でvertexを共有していますが四角形と四角形でvertexを共有することはありません。共有してしまうと１つの四角形が出たり入ったりするたびに隣の四角形が移動してしまいます。今回は別々に移動させたいのでそうしています。</p>
+<p>面倒なので３つの<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>階層を用意して球体のvertexを計算します。くわしくは<a href="optimize-lots-of-objects.html">たくさんのオブジェクトを最適化するこの記事</a>をご覧ください。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeSpherePositions(segmentsAround, segmentsDown) {
+  const numVertices = segmentsAround * segmentsDown * 6;
+  const numComponents = 3;
+  const positions = new Float32Array(numVertices * numComponents);
+  const indices = [];
+
+  const longHelper = new THREE.Object3D();
+  const latHelper = new THREE.Object3D();
+  const pointHelper = new THREE.Object3D();
+  longHelper.add(latHelper);
+  latHelper.add(pointHelper);
+  pointHelper.position.z = 1;
+  const temp = new THREE.Vector3();
+
+  function getPoint(lat, long) {
+    latHelper.rotation.x = lat;
+    longHelper.rotation.y = long;
+    longHelper.updateMatrixWorld(true);
+    return pointHelper.getWorldPosition(temp).toArray();
+  }
+
+  let posNdx = 0;
+  let ndx = 0;
+  for (let down = 0; down &lt; segmentsDown; ++down) {
+    const v0 = down / segmentsDown;
+    const v1 = (down + 1) / segmentsDown;
+    const lat0 = (v0 - 0.5) * Math.PI;
+    const lat1 = (v1 - 0.5) * Math.PI;
+
+    for (let across = 0; across &lt; segmentsAround; ++across) {
+      const u0 = across / segmentsAround;
+      const u1 = (across + 1) / segmentsAround;
+      const long0 = u0 * Math.PI * 2;
+      const long1 = u1 * Math.PI * 2;
+
+      positions.set(getPoint(lat0, long0), posNdx);  posNdx += numComponents;
+      positions.set(getPoint(lat1, long0), posNdx);  posNdx += numComponents;
+      positions.set(getPoint(lat0, long1), posNdx);  posNdx += numComponents;
+      positions.set(getPoint(lat1, long1), posNdx);  posNdx += numComponents;
+
+      indices.push(
+        ndx, ndx + 1, ndx + 2,
+        ndx + 2, ndx + 1, ndx + 3,
+      );
+      ndx += 4;
+    }
+  }
+  return {positions, indices};
+}
+</pre>
+<p>こんな感じです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const segmentsAround = 24;
+const segmentsDown = 16;
+const {positions, indices} = makeSpherePositions(segmentsAround, segmentsDown);
+</pre>
+<p>returnされているpositionは単位球（半径が１の球体）なのでそのままこのデータをnormalに使えます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const normals = positions.slice();
+</pre>
+<p>attributeも設定しましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.BufferGeometry();
+const positionNumComponents = 3;
+const normalNumComponents = 3;
+
++const positionAttribute = new THREE.BufferAttribute(positions, positionNumComponents);
++positionAttribute.setUsage(THREE.DynamicDrawUsage);
+geometry.setAttribute(
+    'position',
++    positionAttribute);
+geometry.setAttribute(
+    'normal',
+    new THREE.BufferAttribute(normals, normalNumComponents));
+geometry.setIndex(indices);
+</pre>
+<p>position attributeに対する参照を保存しています。dynamicに指定しているところも注意が必要です。これはTHREE.jsに「これからこのattributeは変更が加えられる」ことを教えます。renderループではpositionを毎度アップデートします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const temp = new THREE.Vector3();
+
+...
+
+for (let i = 0; i &lt; positions.length; i += 3) {
+  const quad = (i / 12 | 0);
+  const ringId = quad / segmentsAround | 0;
+  const ringQuadId = quad % segmentsAround;
+  const ringU = ringQuadId / segmentsAround;
+  const angle = ringU * Math.PI * 2;
+  temp.fromArray(normals, i);
+  temp.multiplyScalar(THREE.MathUtils.lerp(1, 1.4, Math.sin(time + ringId + angle) * .5 + .5));
+  temp.toArray(positions, i);
+}
+positionAttribute.needsUpdate = true;
+</pre>
+<p>最後に<code class="notranslate" translate="no">positionAttribute.needsUpdate</code>を設定してTHREE.jsに変更が必要であることを伝えます。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/custom-buffergeometry-dynamic.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/custom-buffergeometry-dynamic.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p><a href="/docs/#api/ja/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>を作って<a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>をアップデートする方法を紹介しました。</p>
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-custom-buffergeometry.js"></script>
+
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

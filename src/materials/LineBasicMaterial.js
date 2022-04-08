@@ -1,17 +1,6 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *
- *  linewidth: <float>,
- *  linecap: "round",
- *  linejoin: "round"
- * }
- */
-
 class LineBasicMaterial extends Material {
 
 	constructor( parameters ) {

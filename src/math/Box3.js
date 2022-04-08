@@ -109,11 +109,11 @@ class Box3 {
 
 	}
 
-	setFromObject( object ) {
+	setFromObject( object, precise = false ) {
 
 		this.makeEmpty();
 
-		return this.expandByObject( object );
+		return this.expandByObject( object, precise );
 
 	}
 
@@ -188,7 +188,7 @@ class Box3 {
 
 	}
 
-	expandByObject( object ) {
+	expandByObject( object, precise = false ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
@@ -199,16 +199,30 @@ class Box3 {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.boundingBox === null ) {
+			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
 
-				geometry.computeBoundingBox();
+				const position = geometry.attributes.position;
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector );
+
+				}
+
+			} else {
+
+				if ( geometry.boundingBox === null ) {
+
+					geometry.computeBoundingBox();
+
+				}
+
+				_box.copy( geometry.boundingBox );
+				_box.applyMatrix4( object.matrixWorld );
+
+				this.union( _box );
 
 			}
-
-			_box.copy( geometry.boundingBox );
-			_box.applyMatrix4( object.matrixWorld );
-
-			this.union( _box );
 
 		}
 
@@ -216,7 +230,7 @@ class Box3 {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this.expandByObject( children[ i ] );
+			this.expandByObject( children[ i ], precise );
 
 		}
 
@@ -494,9 +508,9 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
 
 		_testAxis.fromArray( axes, i );
-		// project the aabb onto the seperating axis
+		// project the aabb onto the separating axis
 		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
-		// project all 3 vertices of the triangle onto the seperating axis
+		// project all 3 vertices of the triangle onto the separating axis
 		const p0 = v0.dot( _testAxis );
 		const p1 = v1.dot( _testAxis );
 		const p2 = v2.dot( _testAxis );
@@ -504,7 +518,7 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
 
 			// points of the projected triangle are outside the projected half-length of the aabb
-			// the axis is seperating and we can exit
+			// the axis is separating and we can exit
 			return false;
 
 		}

@@ -7,8 +7,8 @@ import {
 	ShaderLib,
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass } from './Pass.js';
 
 class CubeTexturePass extends Pass {
 

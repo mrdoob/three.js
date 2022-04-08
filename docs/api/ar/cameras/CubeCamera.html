@@ -17,7 +17,7 @@
 
 		<code>
 		// Create cube render target
-		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 
 		// Create cube camera
 		const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
@@ -25,7 +25,7 @@
 
 		// Create car
 		const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
-		const car = new Mesh( carGeometry, chromeMaterial );
+		const car = new THREE.Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
 		// Update the render target cube
@@ -60,7 +60,7 @@
 		</p>
 
 		<h2>الخصائص (Properties)</h2>
-		<p>راجع فئة [page: Object3D] الأساسية للخصائص العامة.</p>
+		<p>راجع فئة [page:Object3D] الأساسية للخصائص العامة.</p>
 
 		<h3>[property:WebGLCubeRenderTarget renderTarget]</h3>
 		<p>
@@ -68,21 +68,15 @@
 		</p>
 
 		<h2>الوظائف (Methods)</h2>
-		<p>راجع فئة [page: Object3D] الأساسية للخصائص العامة.</p>
+		<p>راجع فئة [page:Object3D] الأساسية للخصائص العامة.</p>
 
-		<h3>[method:null update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
+		<h3>[method:undefined update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
 		<p>
 		renderer -- عارض WebGL الحالي <br />
 		scene -- المشهد الحالي
 		</p>
 		<p>
 		استدعاء هذا لتحديث [page:CubeCamera.renderTarget renderTarget].
-		</p>
-
-		<h3>[method:null clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
-		<p>
-		قم باستدعاء هذا لمسح لون وعمق و / أو مخازن الاستنسل *stencil buffers* المؤقتة الخاصة بالهدف.
-		يتم تعيين مخزن الألوان على اللون الواضح الحالي لجهاز العرض. القيم الافتراضية هي *true*.
 		</p>
 
 		<h2>المصدر (Source)</h2>

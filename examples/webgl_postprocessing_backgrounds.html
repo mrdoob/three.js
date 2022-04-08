@@ -14,13 +14,25 @@
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
@@ -61,17 +73,17 @@
 
 				gui = new GUI();
 
-				gui.add( params, "clearPass" );
-				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );
-				gui.add( params, "clearAlpha", 0, 1 );
+				gui.add( params, 'clearPass' );
+				gui.add( params, 'clearColor', [ 'black', 'white', 'blue', 'green', 'red' ] );
+				gui.add( params, 'clearAlpha', 0, 1 );
 
-				gui.add( params, "texturePass" );
-				gui.add( params, "texturePassOpacity", 0, 1 );
+				gui.add( params, 'texturePass' );
+				gui.add( params, 'texturePassOpacity', 0, 1 );
 
-				gui.add( params, "cubeTexturePass" );
-				gui.add( params, "cubeTexturePassOpacity", 0, 1 );
+				gui.add( params, 'cubeTexturePass' );
+				gui.add( params, 'cubeTexturePassOpacity', 0, 1 );
 
-				gui.add( params, "renderPass" );
+				gui.add( params, 'renderPass' );
 
 				gui.open();
 
@@ -79,7 +91,7 @@
 
 			function init() {
 
-				const container = document.getElementById( "container" );
+				const container = document.getElementById( 'container' );
 
 				const width = window.innerWidth || 1;
 				const height = window.innerHeight || 1;
@@ -153,7 +165,7 @@
 				composer.addPass( texturePass );
 
 				const textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
+				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
 
 					texturePass.map = map;
 
@@ -161,7 +173,7 @@
 
 				cubeTexturePassP = null;
 
-				const ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
+				const ldrUrls = genCubeUrls( 'textures/cube/pisa/', '.png' );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
 					cubeTexturePassP = new CubeTexturePass( cameraP, ldrCubeMap );

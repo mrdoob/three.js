@@ -11,11 +11,41 @@
 
 		<p class="desc">
 			This class generates a Prefiltered, Mipmapped Radiance Environment Map (PMREM) from a cubeMap environment texture.
-			This allows different levels of blur to be quickly accessed based on material roughness. It is packed into a special
-			CubeUV format that allows us to perform custom interpolation so that we can support nonlinear formats such as RGBE.
+			This allows different levels of blur to be quickly accessed based on material roughness.
 			Unlike a traditional mipmap chain, it only goes down to the LOD_MIN level (above), and then creates extra even more
 			filtered 'mips' at the same LOD_MIN resolution, associated with higher roughness levels. In this way we maintain
-			resolution to smoothly interpolate diffuse lighting while limiting sampling computation.
+			resolution to smoothly interpolate diffuse lighting while limiting sampling computation.<br/><br/>
+
+			Note: The minimum [page:MeshStandardMaterial]'s roughness depends on the size of the provided texture.
+			If your render has small dimensions or the shiny parts have a lot of curvature, you may still be able to get away with
+			a smaller texture size.
+
+			<table>
+				<tr>
+					<th>texture size</td><th>minimum roughness</td>
+				</tr>
+				<tr>
+					<td>16</td><td>0.21</td>
+				</tr>
+				<tr>
+					<td>32</td><td>0.15</td>
+				</tr>
+				<tr>
+					<td>64</td><td>0.11</td>
+				</tr>
+				<tr>
+					<td>128</td><td>0.076</td>
+				</tr>
+				<tr>
+					<td>256</td><td>0.054</td>
+				</tr>
+				<tr>
+					<td>512</td><td>0.038</td>
+				</tr>
+				<tr>
+					<td>1024</td><td>0.027</td>
+				</tr>
+			</table>
 		</p>
 
 		<h2>Constructor</h2>
@@ -42,32 +72,29 @@
 		<p>
 			[page:Texture equirectangular] - The equirectangular texture.<br /><br />
 
-			Generates a PMREM from an equirectangular texture, which can be either LDR (RGBFormat) or HDR (RGBEFormat).
-			The ideal input image size is 1k (1024 x 512), as this matches best with the 256 x 256 cubemap output.
+			Generates a PMREM from an equirectangular texture.
 		</p>
 
 		<h3>[method:WebGLRenderTarget fromCubemap]( [param:CubeTexture cubemap] )</h3>
 		<p>
 			[page:CubeTexture cubemap] - The cubemap texture.<br /><br />
 
-			Generates a PMREM from an cubemap texture, which can be either LDR (RGBFormat) or HDR (RGBEFormat).
-			The ideal input cube size is 256 x 256, as this matches best with the 256 x 256 cubemap output.
+			Generates a PMREM from an cubemap texture.
 		</p>
 
-		<h3>[method:void compileCubemapShader]()</h3>
+		<h3>[method:undefined compileCubemapShader]()</h3>
 		<p>
 			Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during your texture's network fetch for increased concurrency.
 		</p>
 
-		<h3>[method:void compileEquirectangularShader]()</h3>
+		<h3>[method:undefined compileEquirectangularShader]()</h3>
 		<p>
 			Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during your texture's network fetch for increased concurrency.
 		</p>
 
-		<h3>[method:void dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
-			Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class, so you should not need more than one
-			PMREMGenerator object. If you do, calling dispose() on one of them will cause any others to also become unusable.
+			Disposes of the PMREMGenerator's internal memory.
 		</p>
 
 		<h2>Source</h2>

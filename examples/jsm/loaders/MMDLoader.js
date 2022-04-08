@@ -36,7 +36,7 @@ import {
 	RGB_PVRTC_2BPPV1_Format,
 	RGB_ETC1_Format,
 	RGB_ETC2_Format
-} from '../../../build/three.module.js';
+} from 'three';
 import { MMDToonShader } from '../shaders/MMDToonShader.js';
 import { TGALoader } from '../loaders/TGALoader.js';
 import { MMDParser } from '../libs/mmdparser.module.js';
@@ -357,7 +357,6 @@ class MMDLoader extends Loader {
 /*
 	 * base64 encoded defalut toon textures toon00.bmp - toon10.bmp.
 	 * We don't need to request external toon image files.
-	 * This idea is from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
 	 */
 const DEFAULT_TOON_TEXTURES = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',

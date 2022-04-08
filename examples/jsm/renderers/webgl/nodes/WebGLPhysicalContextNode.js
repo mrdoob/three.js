@@ -1,7 +1,7 @@
-import ContextNode from '../../nodes/core/ContextNode.js';
-import NormalNode from '../../nodes/accessors/NormalNode.js';
-import ExpressionNode from '../../nodes/core/ExpressionNode.js';
-import FloatNode from '../../nodes/inputs/FloatNode.js';
+import ContextNode from 'three-nodes/core/ContextNode.js';
+import NormalNode from 'three-nodes/accessors/NormalNode.js';
+import ExpressionNode from 'three-nodes/core/ExpressionNode.js';
+import ConstNode from 'three-nodes/core/ConstNode.js';
 
 class WebGLPhysicalContextNode extends ContextNode {
 
@@ -28,7 +28,7 @@ class WebGLPhysicalContextNode extends ContextNode {
 
 		} else if ( scope === WebGLPhysicalContextNode.IRRADIANCE ) {
 
-			roughness = new FloatNode( 1.0 ).setConst( true );
+			roughness = new ConstNode( 1 );
 
 			this.context.uv = new NormalNode( NormalNode.WORLD );
 

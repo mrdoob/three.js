@@ -27,7 +27,7 @@ scene.add( object1 ); //object1 和 object2 会自动更新它们的矩阵
 		<p>但是，如果你知道对象将是静态的，则可以禁用此选项并在需要时手动更新转换矩阵。</p>
 
 		<code>
-object.matrixAutoUpdate  = false;
+object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
@@ -69,7 +69,7 @@ geometry.setDrawRange( 0, drawCount );
 const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-const line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry, material );
 scene.add( line );
 			</code>
 		 	<p>
@@ -135,6 +135,7 @@ line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次�
 						<li>morphing</li>
 						<li>shadow map</li>
 						<li>alpha test</li>
+						<li>transparent</li>
 					</ul>
 				</li>
 			</ul>

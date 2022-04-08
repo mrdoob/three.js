@@ -45,6 +45,11 @@
 			Default - *1.0*.
 		</p>
 
+		<h3>[property:Boolean isLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 
 		<h2>Methods</h2>
 		<p>
@@ -56,7 +61,7 @@
 		Abstract dispose method for lights; implemented by subclasses that have disposable resources.
 		</p>
 
-		<h3>[method:Light copy]( [param:Light source] )</h3>
+		<h3>[method:this copy]( [param:Light source] )</h3>
 		<p>
 		Copies the value of [page:.color color] and [page:.intensity intensity] from the
 		[page:Light source] light into this one.

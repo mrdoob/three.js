@@ -7,7 +7,7 @@ import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class ParametricGeometry extends BufferGeometry {
 

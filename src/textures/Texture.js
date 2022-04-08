@@ -13,7 +13,7 @@ import {
 import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { ImageUtils } from '../extras/ImageUtils.js';
+import { Source } from './Source.js';
 
 let textureId = 0;
 
@@ -29,7 +29,7 @@ class Texture extends EventDispatcher {
 
 		this.name = '';
 
-		this.image = image;
+		this.source = new Source( image );
 		this.mipmaps = [];
 
 		this.mapping = mapping;
@@ -70,7 +70,20 @@ class Texture extends EventDispatcher {
 		this.version = 0;
 		this.onUpdate = null;
 
-		this.isRenderTargetTexture = false;
+		this.isRenderTargetTexture = false; // indicates whether a texture belongs to a render target or not
+		this.needsPMREMUpdate = false; // indicates whether this texture should be processed by PMREMGenerator or not (only relevant for render target textures)
+
+	}
+
+	get image() {
+
+		return this.source.data;
+
+	}
+
+	set image( value ) {
+
+		this.source.data = value;
 
 	}
 
@@ -90,7 +103,7 @@ class Texture extends EventDispatcher {
 
 		this.name = source.name;
 
-		this.image = source.image;
+		this.source = source.source;
 		this.mipmaps = source.mipmaps.slice( 0 );
 
 		this.mapping = source.mapping;
@@ -123,6 +136,8 @@ class Texture extends EventDispatcher {
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
+		this.needsUpdate = true;
+
 		return this;
 
 	}
@@ -148,6 +163,8 @@ class Texture extends EventDispatcher {
 			uuid: this.uuid,
 			name: this.name,
 
+			image: this.source.toJSON( meta ).uuid,
+
 			mapping: this.mapping,
 
 			repeat: [ this.repeat.x, this.repeat.y ],
@@ -171,63 +188,6 @@ class Texture extends EventDispatcher {
 			unpackAlignment: this.unpackAlignment
 
 		};
-
-		if ( this.image !== undefined ) {
-
-			// TODO: Move to THREE.Image
-
-			const image = this.image;
-
-			if ( image.uuid === undefined ) {
-
-				image.uuid = MathUtils.generateUUID(); // UGH
-
-			}
-
-			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
-
-				let url;
-
-				if ( Array.isArray( image ) ) {
-
-					// process array of images e.g. CubeTexture
-
-					url = [];
-
-					for ( let i = 0, l = image.length; i < l; i ++ ) {
-
-						// check cube texture with data textures
-
-						if ( image[ i ].isDataTexture ) {
-
-							url.push( serializeImage( image[ i ].image ) );
-
-						} else {
-
-							url.push( serializeImage( image[ i ] ) );
-
-						}
-
-					}
-
-				} else {
-
-					// process single image
-
-					url = serializeImage( image );
-
-				}
-
-				meta.images[ image.uuid ] = {
-					uuid: image.uuid,
-					url: url
-				};
-
-			}
-
-			output.image = image.uuid;
-
-		}
 
 		if ( JSON.stringify( this.userData ) !== '{}' ) output.userData = this.userData;
 
@@ -329,49 +289,20 @@ class Texture extends EventDispatcher {
 
 	set needsUpdate( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) {
 
-	}
-
-}
-
-Texture.DEFAULT_IMAGE = undefined;
-Texture.DEFAULT_MAPPING = UVMapping;
-
-Texture.prototype.isTexture = true;
-
-function serializeImage( image ) {
-
-	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
-		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
-		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
-
-		// default images
-
-		return ImageUtils.getDataURL( image );
-
-	} else {
-
-		if ( image.data ) {
-
-			// images of DataTexture
-
-			return {
-				data: Array.prototype.slice.call( image.data ),
-				width: image.width,
-				height: image.height,
-				type: image.data.constructor.name
-			};
-
-		} else {
-
-			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
-			return {};
+			this.version ++;
+			this.source.needsUpdate = true;
 
 		}
 
 	}
 
 }
+
+Texture.DEFAULT_IMAGE = null;
+Texture.DEFAULT_MAPPING = UVMapping;
+
+Texture.prototype.isTexture = true;
 
 export { Texture };

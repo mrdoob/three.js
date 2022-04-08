@@ -60,7 +60,12 @@
 		</p>
 
 		<h3>[property:Color color]</h3>
-		<p>[page:Color] of the material, by default set to white (0xffffff). The [page:.map] is mutiplied by the color.</p>
+		<p>[page:Color] of the material, by default set to white (0xffffff). The [page:.map] is multiplied by the color.</p>
+
+		<h3>[property:Boolean isSpriteMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Texture map]</h3>
 		<p>The texture map. Default is null.</p>
@@ -70,6 +75,9 @@
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p>Whether the size of the sprite is attenuated by the camera depth. (Perspective camera only.) Default is *true*.</p>
+
+		<h3>[property:Boolean transparent]</h3>
+		<p>Defines whether this material is transparent. Default is *true*.</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Material] class for common methods.</p>

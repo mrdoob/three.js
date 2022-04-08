@@ -75,7 +75,7 @@
 		Returns true if the specified [page:Vector2 point] lies within or on the boundaries of this box.
 		</p>
 
-		<h3>[method:Box2 copy]( [param:Box2 box] )</h3>
+		<h3>[method:this copy]( [param:Box2 box] )</h3>
 		<p>
 		Copies the [page:.min min] and [page:.max max] from [page:Box2 box] to this box.
 		</p>
@@ -95,14 +95,14 @@
 		Returns true if this box and [page:Box2 box] share the same lower and upper bounds.
 		</p>
 
-		<h3>[method:Box2 expandByPoint]( [param:Vector2 point] )</h3>
+		<h3>[method:this expandByPoint]( [param:Vector2 point] )</h3>
 		<p>
 		[page:Vector2 point] - [page:Vector2] that should be included in the box.<br /><br />
 
 		Expands the boundaries of this box to include [page:Vector2 point].
 		</p>
 
-		<h3>[method:Box2 expandByScalar]( [param:Float scalar] )</h3>
+		<h3>[method:this expandByScalar]( [param:Float scalar] )</h3>
 		<p>
 		[page:Float scalar] - Distance to expand the box by.<br /><br />
 
@@ -110,7 +110,7 @@
 		will be contracted.
 		</p>
 
-		<h3>[method:Box2 expandByVector]( [param:Vector2 vector] )</h3>
+		<h3>[method:this expandByVector]( [param:Vector2 vector] )</h3>
 		<p>
 		[page:Vector2 vector] - [page:Vector2] to expand the box by.<br /><br />
 
@@ -141,7 +141,7 @@
 		Returns the width and height of this box.
 		</p>
 
-		<h3>[method:Box2 intersect]( [param:Box2 box] )</h3>
+		<h3>[method:this intersect]( [param:Box2 box] )</h3>
 		<p>
 		[page:Box2 box] - Box to intersect with.<br /><br />
 
@@ -164,11 +164,11 @@
 		one both bounds share.
 		</p>
 
-		<h3>[method:Box2 makeEmpty]()</h3>
+		<h3>[method:this makeEmpty]()</h3>
 		<p>Makes this box empty.</p>
 
 
-		<h3>[method:Box2 set]( [param:Vector2 min], [param:Vector2 max] )</h3>
+		<h3>[method:this set]( [param:Vector2 min], [param:Vector2 max] )</h3>
 		<p>
 			[page:Vector2 min] - (required ) [page:Vector2] representing the lower (x, y) boundary of the box. <br>
 			[page:Vector2 max]  - (required) [page:Vector2] representing the upper (x, y) boundary of the box. <br /><br />
@@ -177,7 +177,7 @@
 			Please note that this method only copies the values from the given objects.
 		</p>
 
-		<h3>[method:Box2 setFromCenterAndSize]( [param:Vector2 center], [param:Vector2 size] )</h3>
+		<h3>[method:this setFromCenterAndSize]( [param:Vector2 center], [param:Vector2 size] )</h3>
 		<p>
 		[page:Vector2 center] - Desired center position of the box ([page:Vector2]). <br>
 		[page:Vector2 size] - Desired x and y dimensions of the box ([page:Vector2]).<br /><br />
@@ -186,14 +186,14 @@
 		in [page:Vector2 size].
 		</p>
 
-		<h3>[method:Box2 setFromPoints]( [param:Array points] )</h3>
+		<h3>[method:this setFromPoints]( [param:Array points] )</h3>
 		<p>
 		[page:Array points] - Array of [page:Vector2 Vector2s] that the resulting box will contain.<br /><br />
 
 		Sets the upper and lower bounds of this box to include all of the points in [page:Array points].
 		</p>
 
-		<h3>[method:Box2 translate]( [param:Vector2 offset] )</h3>
+		<h3>[method:this translate]( [param:Vector2 offset] )</h3>
 		<p>
 		[page:Vector2 offset] - Direction and distance of offset.<br /><br />
 
@@ -201,7 +201,7 @@
 		[page:Vector2 offset] units in 2D space.
 		</p>
 
-		<h3>[method:Box2 union]( [param:Box2 box] )</h3>
+		<h3>[method:this union]( [param:Box2 box] )</h3>
 		<p>
 		[page:Box2 box] - Box that will be unioned with this box.<br /><br />
 

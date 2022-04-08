@@ -99,7 +99,6 @@
 		<h2>Examples</h2>
 
 		<p>
-			[example:webgl_loader_fbx WebGL / loader / fbx]<br />
 			[example:webgl_loader_obj WebGL / loader / obj]<br />
 			[example:webgl_materials_physical_reflectivity WebGL / materials / physical / reflectivity]<br />
 			[example:webgl_postprocessing_outline WebGL / postprocesing / outline]
@@ -124,8 +123,8 @@
 			This function will be called when loading starts.
 			The arguments are:<br />
 			[page:String url] — The url of the item just loaded.<br />
-			[page:Integer itemsLoaded] — the number  of items already loaded so far.<br />
-			[page:Iteger itemsTotal] — the total amount of items to be loaded.<br /><br />
+			[page:Integer itemsLoaded] — the number of items already loaded so far.<br />
+			[page:Integer itemsTotal] — the total amount of items to be loaded.<br /><br />
 
 			By default this is undefined.
 		</p>
@@ -141,8 +140,8 @@
 		This function will be called when an item is complete.
 		The arguments are:<br />
 		[page:String url] — The url of the item just loaded.<br />
-		[page:Integer itemsLoaded] — the number  of items already loaded so far.<br />
-		[page:Iteger itemsTotal] — the total amount of items to be loaded.<br /><br />
+		[page:Integer itemsLoaded] — the number of items already loaded so far.<br />
+		[page:Integer itemsTotal] — the total amount of items to be loaded.<br /><br />
 
 		By default this is undefined, unless passed in the constructor.
 		</p>
@@ -158,7 +157,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:LoadingManager addHandler]( [param:Object regex], [param:Loader loader] )</h3>
+		<h3>[method:this addHandler]( [param:Object regex], [param:Loader loader] )</h3>
 		<p>
 		[page:Object regex] — A regular expression.<br />
 		[page:Loader loader] — The loader.
@@ -171,14 +170,14 @@
 manager.addHandler( /\.tga$/i, new TGALoader() );
 		</code>
 
-		<h3>[method:null getHandler]( [param:String file] )</h3>
+		<h3>[method:Loader getHandler]( [param:String file] )</h3>
 		<p>
 		[page:String file] — The file path.
 		<p>
 		Can be used to retrieve the registered loader for the given file path.
 		</p>
 
-		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<h3>[method:this removeHandler]( [param:Object regex] )</h3>
 		<p>
 		[page:Object regex] — A regular expression.
 		<p>
@@ -193,7 +192,7 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 		URL modifier is set, returns the original URL.
 		</p>
 
-		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
+		<h3>[method:this setURLModifier]( [param:Function callback] )</h3>
 		<p>
 		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
 		must return [page:String resolvedURL].<br /><br />
@@ -210,21 +209,21 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 			them directly.</em>
 		</p>
 
-		<h3>[method:null itemStart]( [param:String url] )</h3>
+		<h3>[method:undefined itemStart]( [param:String url] )</h3>
 		<p>
 		[page:String url] — the url to load<br /><br />
 
 		This should be called by any loader using the manager when the loader starts loading an url.
 		</p>
 
-		<h3>[method:null itemEnd]( [param:String url] )</h3>
+		<h3>[method:undefined itemEnd]( [param:String url] )</h3>
 		<p>
 		[page:String url] — the loaded url<br /><br />
 
 		This should be called by any loader using the manager when the loader ended loading an url.
 		</p>
 
-		<h3>[method:null itemError]( [param:String url] )</h3>
+		<h3>[method:undefined itemError]( [param:String url] )</h3>
 		<p>
 		[page:String url] — the loaded url<br /><br />
 

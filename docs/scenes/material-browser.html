@@ -23,12 +23,24 @@
 	</head>
 	<body>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js"
+				}
+			}
+		</script>
+
 		<a id='newWindow' href='./material-browser.html' target='_blank'>Open in New Window</a>
 
 		<script type="module">
 
-			import * as THREE from '../../build/three.module.js';
-			import * as DAT from '../../examples/jsm/libs/dat.gui.module.js';
+			import * as THREE from 'three';
+			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
 			import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
 
 			const constants = {
@@ -123,11 +135,9 @@
 				];
 
 				const reflectionCube = cubeTextureLoader.load( urls );
-				reflectionCube.format = THREE.RGBFormat;
 
 				const refractionCube = cubeTextureLoader.load( urls );
 				refractionCube.mapping = THREE.CubeRefractionMapping;
-				refractionCube.format = THREE.RGBFormat;
 
 				return {
 					none: null,
@@ -207,6 +217,7 @@
 			} )();
 
 			const envMapKeys = getObjectsKeys( envMaps );
+			const envMapKeysPBR = envMapKeys.slice( 0, 2 );
 			const diffuseMapKeys = getObjectsKeys( diffuseMaps );
 			const roughnessMapKeys = getObjectsKeys( roughnessMaps );
 			const matcapKeys = getObjectsKeys( matcaps );
@@ -251,7 +262,6 @@
 
 				return function () {
 
-					material.vertexColors = material.vertexColors;
 					material.side = parseInt( material.side ); //Ensure number
 					material.needsUpdate = true;
 					geometry.attributes.position.needsUpdate = true;
@@ -334,7 +344,7 @@
 
 				const folder = gui.addFolder( 'THREE.Material' );
 
-				folder.add( material, 'transparent' );
+				folder.add( material, 'transparent' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'opacity', 0, 1 ).step( 0.01 );
 				// folder.add( material, 'blending', constants.blendingMode );
 				// folder.add( material, 'blendSrc', constants.destinationFactors );
@@ -444,7 +454,7 @@
 
 			}
 
-			function guiMeshMatcapMaterial( gui, mesh, material ) {
+			function guiMeshMatcapMaterial( gui, mesh, material, geometry ) {
 
 				const data = {
 					color: material.color.getHex(),
@@ -516,7 +526,7 @@
 				const data = {
 					color: material.color.getHex(),
 					emissive: material.emissive.getHex(),
-					envMaps: envMapKeys[ 0 ],
+					envMaps: envMapKeysPBR[ 0 ],
 					map: diffuseMapKeys[ 0 ],
 					roughnessMap: roughnessMapKeys[ 0 ],
 					alphaMap: alphaMapKeys[ 0 ]
@@ -533,7 +543,7 @@
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
-				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
+				folder.add( data, 'envMaps', envMapKeysPBR ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
@@ -567,7 +577,7 @@
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
-				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
+				folder.add( data, 'envMaps', envMapKeysPBR ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
@@ -634,7 +644,7 @@
 
 						material = new THREE.MeshToonMaterial( { color: 0x049EF4, gradientMap: gradientMaps.threeTone } );
 						guiMaterial( gui, mesh, material, geometry );
-						guiMeshToonMaterial( gui, mesh, material, geometry );
+						guiMeshToonMaterial( gui, mesh, material );
 
 						// only use a single point light
 
@@ -681,7 +691,7 @@
 
 						material = new THREE.MeshDepthMaterial();
 						guiMaterial( gui, mesh, material, geometry );
-						guiMeshDepthMaterial( gui, mesh, material, geometry );
+						guiMeshDepthMaterial( gui, mesh, material );
 
 						return material;
 
@@ -713,9 +723,15 @@
 
 			//
 
-			document.getElementById( 'newWindow' ).href += window.location.hash;
+			const selectedMaterial = window.location.hash.substring( 1 );
 
-			const gui = new DAT.GUI();
+			if ( THREE[ selectedMaterial ] !== undefined ) {
+
+				document.getElementById( 'newWindow' ).href += '#' + selectedMaterial;
+
+			}
+
+			const gui = new GUI();
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -747,7 +763,7 @@
 			light3.position.set( - 100, - 200, - 100 );
 			scene.add( light3 );
 
-			guiScene( gui, scene, camera );
+			guiScene( gui, scene );
 
 			const geometry = new THREE.TorusKnotGeometry( 10, 3, 200, 32 ).toNonIndexed();
 

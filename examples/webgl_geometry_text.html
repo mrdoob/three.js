@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text<br/>
 			type to enter new text, drag to spin the text<br/>
 			<button id="color">change color</button>
 			<button id="font">change font</button>
@@ -18,9 +18,21 @@
 			<a id="permalink" href="#">permalink</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { FontLoader } from './jsm/loaders/FontLoader.js';
 			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
@@ -37,14 +49,14 @@
 
 			let firstLetter = true;
 
-			let text = "three.js",
+			let text = 'three.js',
 
 				bevelEnabled = true,
 
 				font = undefined,
 
-				fontName = "optimer", // helvetiker, optimer, gentilis, droid sans, droid serif
-				fontWeight = "bold"; // normal bold
+				fontName = 'optimer', // helvetiker, optimer, gentilis, droid sans, droid serif
+				fontWeight = 'bold'; // normal bold
 
 			const height = 20,
 				size = 70,
@@ -59,18 +71,18 @@
 
 			const fontMap = {
 
-				"helvetiker": 0,
-				"optimer": 1,
-				"gentilis": 2,
-				"droid/droid_sans": 3,
-				"droid/droid_serif": 4
+				'helvetiker': 0,
+				'optimer': 1,
+				'gentilis': 2,
+				'droid/droid_sans': 3,
+				'droid/droid_serif': 4
 
 			};
 
 			const weightMap = {
 
-				"regular": 0,
-				"bold": 1
+				'regular': 0,
+				'bold': 1
 
 			};
 
@@ -96,7 +108,7 @@
 			function decimalToHex( d ) {
 
 				let hex = Number( d ).toString( 16 );
-				hex = "000000".substr( 0, 6 - hex.length ) + hex;
+				hex = '000000'.substring( 0, 6 - hex.length ) + hex;
 				return hex.toUpperCase();
 
 			}
@@ -106,7 +118,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				permalink = document.getElementById( "permalink" );
+				permalink = document.getElementById( 'permalink' );
 
 				// CAMERA
 
@@ -133,7 +145,7 @@
 
 				// Get text from hash
 
-				const hash = document.location.hash.substr( 1 );
+				const hash = document.location.hash.slice( 1 );
 
 				if ( hash.length !== 0 ) {
 
@@ -202,7 +214,7 @@
 				document.addEventListener( 'keypress', onDocumentKeyPress );
 				document.addEventListener( 'keydown', onDocumentKeyDown );
 
-				document.getElementById( "color" ).addEventListener( 'click', function () {
+				document.getElementById( 'color' ).addEventListener( 'click', function () {
 
 					pointLight.color.setHSL( Math.random(), 1, 0.5 );
 					hex = decimalToHex( pointLight.color.getHex() );
@@ -211,7 +223,7 @@
 
 				} );
 
-				document.getElementById( "font" ).addEventListener( 'click', function () {
+				document.getElementById( 'font' ).addEventListener( 'click', function () {
 
 					fontIndex ++;
 
@@ -222,15 +234,15 @@
 				} );
 
 
-				document.getElementById( "weight" ).addEventListener( 'click', function () {
+				document.getElementById( 'weight' ).addEventListener( 'click', function () {
 
-					if ( fontWeight === "bold" ) {
+					if ( fontWeight === 'bold' ) {
 
-						fontWeight = "regular";
+						fontWeight = 'regular';
 
 					} else {
 
-						fontWeight = "bold";
+						fontWeight = 'bold';
 
 					}
 
@@ -238,7 +250,7 @@
 
 				} );
 
-				document.getElementById( "bevel" ).addEventListener( 'click', function () {
+				document.getElementById( 'bevel' ).addEventListener( 'click', function () {
 
 					bevelEnabled = ! bevelEnabled;
 
@@ -273,9 +285,9 @@
 
 			function updatePermalink() {
 
-				const link = hex + fontMap[ fontName ] + weightMap[ fontWeight ] + boolToNum( bevelEnabled ) + "#" + encodeURI( text );
+				const link = hex + fontMap[ fontName ] + weightMap[ fontWeight ] + boolToNum( bevelEnabled ) + '#' + encodeURI( text );
 
-				permalink.href = "#" + link;
+				permalink.href = '#' + link;
 				window.location.hash = link;
 
 			}
@@ -285,7 +297,7 @@
 				if ( firstLetter ) {
 
 					firstLetter = false;
-					text = "";
+					text = '';
 
 				}
 

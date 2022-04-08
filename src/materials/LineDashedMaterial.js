@@ -1,18 +1,5 @@
 import { LineBasicMaterial } from './LineBasicMaterial.js';
 
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *
- *  linewidth: <float>,
- *
- *  scale: <float>,
- *  dashSize: <float>,
- *  gapSize: <float>
- * }
- */
-
 class LineDashedMaterial extends LineBasicMaterial {
 
 	constructor( parameters ) {
