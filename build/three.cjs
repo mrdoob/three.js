@@ -1378,6 +1378,7 @@ class Texture extends EventDispatcher {
 
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
+Texture.useSrgbTextures = true;
 Texture.prototype.isTexture = true;
 
 function serializeImage(image) {
@@ -10650,7 +10651,8 @@ function WebGLBackground(renderer, cubemaps, state, objects, alpha, premultiplie
 				alpha = 128.0 / 255.0; // Exponent will be 0.
 			}
 
-			setClear(color, alpha);
+			const premultiplyAlpha = renderTarget != null ? renderTarget.texture.premultiplyAlpha : premultipliedAlpha;
+			setClear(color, alpha, premultiplyAlpha);
 		}
 
 		if (renderer.autoClear || forceClear) {
@@ -10743,8 +10745,8 @@ function WebGLBackground(renderer, cubemaps, state, objects, alpha, premultiplie
 		}
 	}
 
-	function setClear(color, alpha) {
-		state.buffers.color.setClear(color.r, color.g, color.b, alpha, premultipliedAlpha);
+	function setClear(color, alpha, premultiplyAlpha) {
+		state.buffers.color.setClear(color.r, color.g, color.b, alpha, premultiplyAlpha);
 	}
 
 	return {
@@ -10754,14 +10756,14 @@ function WebGLBackground(renderer, cubemaps, state, objects, alpha, premultiplie
 		setClearColor: function (color, alpha = 1) {
 			clearColor.set(color);
 			clearAlpha = alpha;
-			setClear(clearColor, clearAlpha);
+			setClear(clearColor, clearAlpha, premultipliedAlpha);
 		},
 		getClearAlpha: function () {
 			return clearAlpha;
 		},
 		setClearAlpha: function (alpha) {
 			clearAlpha = alpha;
-			setClear(clearColor, clearAlpha);
+			setClear(clearColor, clearAlpha, premultipliedAlpha);
 		},
 		render: render
 	};
@@ -16793,7 +16795,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		if (glFormat === _gl.RGBA) {
 			if (glType === _gl.FLOAT) internalFormat = _gl.RGBA32F;
 			if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F;
-			if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+			if (glType === _gl.UNSIGNED_BYTE) internalFormat = isWebGL2 && Texture.useSrgbTextures && encoding === sRGBEncoding ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 			if (glType === _gl.UNSIGNED_SHORT_4_4_4_4) internalFormat = _gl.RGBA4;
 			if (glType === _gl.UNSIGNED_SHORT_5_5_5_1) internalFormat = _gl.RGB5_A1;
 		}
@@ -17132,7 +17134,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 
 			if (useTexStorage && allocateMemory) {
 				state.texStorage2D(_gl.TEXTURE_2D, 1, glInternalFormat, image.width, image.height);
-			} else {
+			} else if (allocateMemory) {
 				state.texImage2D(_gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null);
 			}
 		} else if (texture.isDataTexture) {
@@ -17215,8 +17217,15 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		} else if (texture.isFramebufferTexture) {
 			if (useTexStorage && allocateMemory) {
 				state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height);
-			} else {
-				state.texImage2D(_gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null);
+			} else if (allocateMemory) {
+				let width = image.width,
+						height = image.height;
+
+				for (let i = 0; i < levels; i++) {
+					state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, width, height, 0, glFormat, glType, null);
+					width >>= 1;
+					height >>= 1;
+				}
 			}
 		} else {
 			// regular Texture (image, video, canvas)
@@ -19657,7 +19666,7 @@ function WebGLRenderer(parameters = {}) {
 			encoding = LinearEncoding;
 		}
 
-		if (capabilities.isWebGL2 && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding) {
+		if (capabilities.isWebGL2 && Texture.useSrgbTextures && map && map.isTexture && map.format === RGBAFormat && map.type === UnsignedByteType && map.encoding === sRGBEncoding) {
 			encoding = LinearEncoding; // disable inline decode for sRGB textures in WebGL 2
 		}
 
@@ -19702,7 +19711,9 @@ function WebGLRenderer(parameters = {}) {
 		_isContextLost = true;
 	}
 
-	function onContextRestore() {
+	function
+		/* event */
+	onContextRestore() {
 		console.log('THREE.WebGLRenderer: Context Restored.');
 		_isContextLost = false;
 		const infoAutoReset = info.autoReset;
@@ -19812,6 +19823,10 @@ function WebGLRenderer(parameters = {}) {
 			}
 		} else if (object.isPoints) {
 			renderer.setMode(_gl.POINTS);
+
+			if (material.isOFTPointSpriteMaterial) {
+				material.uniforms.pointSize.value = material.pointSize * getTargetPixelRatio();
+			}
 		} else if (object.isSprite) {
 			renderer.setMode(_gl.TRIANGLES);
 		}
@@ -27213,6 +27228,198 @@ class OFTMatcapMaterial extends MeshMatcapMaterial {
 OFTMatcapMaterial.prototype.isOFTMatcapMaterial = true;
 
 /**
+ * Point Sprite Materials Extension
+ *
+ * Specification: https://github.com/oppenfuture/glTF/tree/pointSprite/extensions/2.0/Vendor/OFT_materials_pointSprite
+ */
+
+class OFTPointSpriteMaterial extends ShaderMaterial {
+	constructor(params) {
+		const localParams = {
+			vertexShader:
+			/* glsl */
+			`
+			attribute float size;
+
+			uniform float pointSize;
+
+			varying vec4 vColor;
+			varying float vIntensity;
+			varying float vRandom;
+			varying vec4 vMvpPosition;
+
+			#define PI 3.14159265359
+			#define PI2 6.28318530718
+
+			const float Threshold = 0.65;
+
+			highp float rand( const in vec2 uv ) {
+				const highp float a = 12.9898, b = 78.233, c = 43758.5453;
+				highp float dt = dot( uv.xy, vec2( a, b ) ), sn = mod( dt, PI );
+				return fract(sin(sn) * c);
+			}
+
+			void main() {
+
+				vColor.rgb = color.rgb;
+
+				vRandom = rand(position.xy);
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				vec3 ViewPosition = - mvPosition.xyz;
+				vec3 viewDir = normalize(ViewPosition);
+
+				vec3 n = normalize(normalMatrix * normal);
+				float dotNV = dot(viewDir, n);
+				// cos func to liner func
+				vIntensity = 1.0 - acos(dotNV);
+				// map Threshold ~ 1.0 to 0 ~ 1.0
+				vIntensity = vIntensity < Threshold ? 0.0 : (vIntensity - Threshold) / (1.0 - Threshold);
+				// sharp the curve
+				vIntensity = pow(vIntensity, 1.1);
+
+				vColor.a = 0.2 + vIntensity * 0.8;
+
+				gl_Position = projectionMatrix * mvPosition;
+
+				vMvpPosition = gl_Position;
+				gl_PointSize = ((vRandom * 0.2 + 1.8) * pointSize) * vIntensity * (0.5/-mvPosition.z);
+
+			}
+			`,
+			fragmentShader:
+			/* glsl */
+			`
+			precision highp float;
+			#include <packing>
+
+			#define PI 3.14159265359
+			#define PI2 6.28318530718
+
+			uniform sampler2D pointTexture;
+			uniform sampler2D depthTexture;
+			uniform float depthBias;
+
+			varying vec4 vColor;
+			varying float vRandom;
+			varying float vDotNV;
+			varying float vIntensity;
+			varying vec4 vMvpPosition;
+
+			vec2 rotateUV(vec2 uv, float rotation) {
+				float mid = 0.5;
+				return vec2(
+					cos(rotation) * (uv.x - mid) + sin(rotation) * (uv.y - mid) + mid,
+					cos(rotation) * (uv.y - mid) - sin(rotation) * (uv.x - mid) + mid
+				);
+			}
+
+			vec3 rgb2hsv(vec3 c) {
+				vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+				vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+				vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+				float d = q.x - min(q.w, q.y);
+				float e = 1.0e-10;
+				return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+			}
+
+			vec3 hsv2rgb(vec3 c) {
+				vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+				vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+				return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+			}
+
+			float readDepth( sampler2D depthSampler, vec2 coord ) {
+				float fragCoordZ = texture2D( depthSampler, coord ).x;
+				float viewZ = perspectiveDepthToViewZ( fragCoordZ, 0.1, 2.0 );
+				return viewZToOrthographicDepth( viewZ, 0.1, 2.0 );
+			}
+
+			void main() {
+				vec3 projCoords = vMvpPosition.xyz / vMvpPosition.w;
+				projCoords = projCoords * 0.5 + 0.5;
+				float depth = unpackRGBAToDepth(texture2D(depthTexture, projCoords.xy));
+				if (projCoords.z - depth >= depthBias) discard;
+
+				if (vIntensity <= 0.0) discard;
+				gl_FragColor = vColor;
+				vec2 rotateUv = rotateUV(gl_PointCoord, vRandom * vIntensity * PI * 0.6);
+				rotateUv = clamp(rotateUv, 0.0, 1.0);
+				gl_FragColor = gl_FragColor * texture2D( pointTexture, rotateUv );
+			}
+			`,
+			blending: AdditiveBlending,
+			depthTest: false,
+			transparent: true,
+			vertexColors: true
+		};
+		super(localParams);
+
+		if (params != undefined) {
+			this._pointSize = params.pointSize || 50;
+			this._depthBias = params.depthBias || 0.001;
+			this._pointTexture = params.pointTexture || null;
+			this._depthTexture = params.depthTexture || null;
+		}
+
+		this.uniforms = {
+			pointSize: {
+				value: this.pointSize
+			},
+			pointTexture: {
+				value: this.pointTexture
+			},
+			depthTexture: {
+				value: this.depthTexture
+			},
+			depthBias: {
+				value: this.depthBias
+			}
+		};
+		this.type = 'OFTPointSpriteMaterial';
+	}
+
+	get pointSize() {
+		return this._pointSize;
+	}
+
+	set pointSize(value) {
+		this._pointSize = value;
+		this.uniforms.pointSize.value = value;
+	}
+
+	get depthBias() {
+		return this._depthBias;
+	}
+
+	set depthBias(value) {
+		this._depthBias = value;
+		this.uniforms.depthBias.value = value;
+	}
+
+	get pointTexture() {
+		return this._pointTexture;
+	}
+
+	set pointTexture(value) {
+		this._pointTexture = value;
+		this.uniforms.pointTexture.value = value;
+	}
+
+	get depthTexture() {
+		return this._depthTexture;
+	}
+
+	set depthTexture(value) {
+		this._depthTexture = value;
+		this.uniforms.depthTexture.value = value;
+	}
+
+}
+
+OFTPointSpriteMaterial.prototype.isOFTPointSpriteMaterial = true;
+
+/**
  * parameters = {
  *	color: <hex>,
  *	opacity: <float>,
@@ -27265,6 +27472,7 @@ var Materials = /*#__PURE__*/Object.freeze({
 	MeshBasicMaterial: MeshBasicMaterial,
 	MeshMatcapMaterial: MeshMatcapMaterial,
 	OFTMatcapMaterial: OFTMatcapMaterial,
+	OFTPointSpriteMaterial: OFTPointSpriteMaterial,
 	LineDashedMaterial: LineDashedMaterial,
 	LineBasicMaterial: LineBasicMaterial,
 	Material: Material
@@ -35561,10 +35769,14 @@ Loader.prototype.extractUrlBase = function (url) {
 };
 
 Loader.Handlers = {
-	add: function () {
+	add: function
+		/* regex, loader */
+	() {
 		console.error('THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.');
 	},
-	get: function () {
+	get: function
+		/* file */
+	() {
 		console.error('THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.');
 	}
 };
@@ -35652,7 +35864,9 @@ Matrix3.prototype.multiplyVector3 = function (vector) {
 	return vector.applyMatrix3(this);
 };
 
-Matrix3.prototype.multiplyVector3Array = function () {
+Matrix3.prototype.multiplyVector3Array = function
+	/* a */
+() {
 	console.error('THREE.Matrix3: .multiplyVector3Array() has been removed.');
 };
 
@@ -35661,7 +35875,9 @@ Matrix3.prototype.applyToBufferAttribute = function (attribute) {
 	return attribute.applyMatrix3(this);
 };
 
-Matrix3.prototype.applyToVector3Array = function () {
+Matrix3.prototype.applyToVector3Array = function
+	/* array, offset, length */
+() {
 	console.error('THREE.Matrix3: .applyToVector3Array() has been removed.');
 };
 
@@ -35705,7 +35921,9 @@ Matrix4.prototype.multiplyVector4 = function (vector) {
 	return vector.applyMatrix4(this);
 };
 
-Matrix4.prototype.multiplyVector3Array = function () {
+Matrix4.prototype.multiplyVector3Array = function
+	/* a */
+() {
 	console.error('THREE.Matrix4: .multiplyVector3Array() has been removed.');
 };
 
@@ -35744,7 +35962,9 @@ Matrix4.prototype.applyToBufferAttribute = function (attribute) {
 	return attribute.applyMatrix4(this);
 };
 
-Matrix4.prototype.applyToVector3Array = function () {
+Matrix4.prototype.applyToVector3Array = function
+	/* array, offset, length */
+() {
 	console.error('THREE.Matrix4: .applyToVector3Array() has been removed.');
 };
 
@@ -36077,7 +36297,9 @@ Object.defineProperties(BufferAttribute.prototype, {
 			console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 			return this.usage === DynamicDrawUsage;
 		},
-		set: function () {
+		set: function
+			/* value */
+		() {
 			console.warn('THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.');
 			this.setUsage(DynamicDrawUsage);
 		}
@@ -36090,9 +36312,13 @@ BufferAttribute.prototype.setDynamic = function (value) {
 	return this;
 };
 
-BufferAttribute.prototype.copyIndicesArray = function () {
+BufferAttribute.prototype.copyIndicesArray = function
+	/* indices */
+() {
 	console.error('THREE.BufferAttribute: .copyIndicesArray() has been removed.');
-}, BufferAttribute.prototype.setArray = function () {
+}, BufferAttribute.prototype.setArray = function
+	/* array */
+() {
 	console.error('THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 }; //
 
@@ -36167,7 +36393,9 @@ InterleavedBuffer.prototype.setDynamic = function (value) {
 	return this;
 };
 
-InterleavedBuffer.prototype.setArray = function () {
+InterleavedBuffer.prototype.setArray = function
+	/* array */
+() {
 	console.error('THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers');
 }; //
 
@@ -36401,7 +36629,9 @@ Object.defineProperties(WebGLRenderer.prototype, {
 			console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 			return undefined;
 		},
-		set: function () {
+		set: function
+			/* value */
+		() {
 			console.warn('THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.');
 		}
 	},
@@ -36461,7 +36691,9 @@ Object.defineProperties(WebGLShadowMap.prototype, {
 			console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 			return undefined;
 		},
-		set: function () {
+		set: function
+			/* cullFace */
+		() {
 			console.warn('THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.');
 		}
 	},
@@ -36656,13 +36888,19 @@ function JSONLoader() {
 } //
 
 const SceneUtils = {
-	createMultiMaterialObject: function () {
+	createMultiMaterialObject: function
+		/* geometry, materials */
+	() {
 		console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 	},
-	detach: function () {
+	detach: function
+		/* child, parent, scene */
+	() {
 		console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 	},
-	attach: function () {
+	attach: function
+		/* child, scene, parent */
+	() {
 		console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');
 	}
 }; //
@@ -36956,6 +37194,7 @@ exports.NotEqualDepth = NotEqualDepth;
 exports.NotEqualStencilFunc = NotEqualStencilFunc;
 exports.NumberKeyframeTrack = NumberKeyframeTrack;
 exports.OFTMatcapMaterial = OFTMatcapMaterial;
+exports.OFTPointSpriteMaterial = OFTPointSpriteMaterial;
 exports.Object3D = Object3D;
 exports.ObjectLoader = ObjectLoader;
 exports.ObjectSpaceNormalMap = ObjectSpaceNormalMap;
@@ -37146,4 +37385,3 @@ exports.ZeroSlopeEnding = ZeroSlopeEnding;
 exports.ZeroStencilOp = ZeroStencilOp;
 exports.platform = platform;
 exports.sRGBEncoding = sRGBEncoding;
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuY2pzIiwic291cmNlcyI6W10sInNvdXJjZXNDb250ZW50IjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9
