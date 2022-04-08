@@ -780,7 +780,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					state.texStorage2D( _gl.TEXTURE_2D, 1, glInternalFormat, image.width, image.height );
 
-				} else {
+				} else if ( allocateMemory ) {
 
 					state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
 
