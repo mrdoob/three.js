@@ -71,7 +71,7 @@ class NormalMapNode extends TempNode {
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
-			const perturbNormal2ArbCall = perturbNormal2ArbNode( {
+			const perturbNormal2ArbCall = perturbNormal2ArbNode.call( {
 				eye_pos: positionView,
 				surf_norm: normalView,
 				mapN: normalMap,
