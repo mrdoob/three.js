@@ -52,7 +52,8 @@ Sky.SkyShader = {
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
 		'sunPosition': { value: new Vector3() },
-		'up': { value: new Vector3( 0, 1, 0 ) }
+		'up': { value: new Vector3( 0, 1, 0 ) },
+		'cameraPos': { value: new Vector3( 0, 0, 0)}
 	},
 
 	vertexShader: /* glsl */`
@@ -138,7 +139,7 @@ Sky.SkyShader = {
 		uniform float mieDirectionalG;
 		uniform vec3 up;
 
-		const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
+		uniform vec3 cameraPos;
 
 		// constants for atmospheric scattering
 		const float pi = 3.141592653589793238462643383279502884197169;
