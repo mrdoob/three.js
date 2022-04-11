@@ -3,8 +3,8 @@ import { getNodesKeys } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
-	assign, label, mul, add, mix, bypass,
-	positionLocal, skinning, instance, modelViewProjection, lightContext, colorSpace,
+	assign, label, mul, add, bypass,
+	positionLocal, skinning, instance, modelViewProjection, context, lightContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
 } from '../shadernode/ShaderNodeElements.js';
 
@@ -22,9 +22,12 @@ class NodeMaterial extends ShaderMaterial {
 
 	build( builder ) {
 
+		const { lightNode } = this;
 		const { diffuseColorNode } = this.generateMain( builder );
 
-		this.generateLight( builder, diffuseColorNode, this.lightNode );
+		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightNode } );
+
+		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
 
 	}
 
@@ -90,20 +93,34 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	generateLight( builder, diffuseColorNode, lightNode ) {
+	generateLight( builder, { diffuseColorNode, lightNode, lightingModelNode } ) {
+
+		// < ANALYTIC LIGHTS >
 
 		// OUTGOING LIGHT
 
 		let outgoingLightNode = diffuseColorNode.xyz;
-		if ( lightNode && lightNode.hasLight !== false ) outgoingLightNode = builder.addFlow( 'fragment', label( lightContext( lightNode ), 'Light' ) );
+		if ( lightNode && lightNode.hasLight !== false ) outgoingLightNode = builder.addFlow( 'fragment', label( lightContext( lightNode, lightingModelNode ), 'Light' ) );
 
 		// EMISSIVE
 
 		if ( this.emissiveNode ) outgoingLightNode = add( vec3( this.emissiveNode ), outgoingLightNode );
 
+		return outgoingLightNode;
+
+	}
+
+	generateOutput( builder, { diffuseColorNode, outgoingLightNode } ) {
+
+		const { renderer } = builder;
+
 		// OUTPUT
 
 		let outputNode = vec4( outgoingLightNode, diffuseColorNode.a );
+
+		// TONE MAPPING
+
+		if ( renderer.toneMappingNode ) outputNode = context( renderer.toneMappingNode, { color: outputNode } );
 
 		// ENCODING
 
@@ -111,11 +128,13 @@ class NodeMaterial extends ShaderMaterial {
 
 		// FOG
 
-		if ( builder.fogNode ) outputNode = mix( outputNode, builder.fogNode.colorNode, builder.fogNode );
+		if ( builder.fogNode ) outputNode = builder.fogNode.mix( outputNode );
 
 		// RESULT
 
 		builder.addFlow( 'fragment', label( outputNode, 'Output' ) );
+
+		return outputNode;
 
 	}
 
@@ -199,7 +218,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	static fromMaterial( material ) { }
+	static fromMaterial( /*material*/ ) { }
 
 }
 

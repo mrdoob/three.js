@@ -81,19 +81,19 @@
 
 				//lights
 
-				light1 = new THREE.PointLight( 0xff0040, 2, 100 );
+				light1 = new THREE.PointLight( 0xff0040, 2, 1000 );
 				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
 				scene.add( light1 );
 
-				light2 = new THREE.PointLight( 0x0040ff, 2, 100 );
+				light2 = new THREE.PointLight( 0x0040ff, 2, 1000 );
 				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) ) );
 				scene.add( light2 );
 
-				light3 = new THREE.PointLight( 0x80ff80, 2, 100 );
+				light3 = new THREE.PointLight( 0x80ff80, 2, 1000 );
 				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) ) );
 				scene.add( light3 );
 
-				light4 = new THREE.PointLight( 0xffaa00, 2, 100 );
+				light4 = new THREE.PointLight( 0xffaa00, 2, 1000 );
 				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
 				scene.add( light4 );
 
@@ -115,6 +115,7 @@
 
 				const centerObject = new THREE.Mesh( geometryTeapot, new Nodes.MeshStandardNodeMaterial( { color: 0x555555 } ) );
 				centerObject.material.normalNode = new Nodes.NormalMapNode( new Nodes.TextureNode( normalMapTexture ) );
+				centerObject.material.metalness = .5;
 				centerObject.material.roughness = .5;
 				scene.add( centerObject );
 
@@ -133,6 +134,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 100 );
 
 				//controls
 

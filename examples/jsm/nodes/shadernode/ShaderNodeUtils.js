@@ -141,13 +141,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 export const ShaderNodeScript = function ( jsFunc ) {
 
-	return ( inputs, builder ) => {
+	return { call: ( inputs, builder ) => {
 
-		new ShaderNodeObjects( inputs );
+		inputs = new ShaderNodeObjects( inputs );
 
 		return new ShaderNodeObject( jsFunc( inputs, builder ) );
 
-	};
+	} };
 
 };
 
@@ -158,7 +158,7 @@ export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
-const ints = [ -1, -2 ];
+const ints = [ - 1, - 2 ];
 const floats = [ 0.5, 1.5, 1 / 3, 1e-6, 1e6, Math.PI, Math.PI * 2, 1 / Math.PI, 2 / Math.PI, 1 / ( Math.PI * 2 ), Math.PI / 2 ];
 
 const boolsCacheMap = new Map();

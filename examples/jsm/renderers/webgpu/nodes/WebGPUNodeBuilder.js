@@ -140,15 +140,45 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleBias( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
+
+		} else {
+
+			this._include( 'repeatWrapping' );
+
+			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
+
+			return `textureLoad( ${textureProperty}, repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
+
+		}
+
+	}
+
 	getTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		return this.getSampler( textureProperty, uvSnippet, shaderStage );
 
 	}
 
+	getTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+
+		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+
+	}
+
 	getCubeTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		return this.getSampler( textureProperty, uvSnippet, shaderStage );
+
+	}
+
+	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+
+		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 

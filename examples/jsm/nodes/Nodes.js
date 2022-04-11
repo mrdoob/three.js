@@ -46,6 +46,7 @@ import UVNode from './accessors/UVNode.js';
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
+import ToneMappingNode from './display/ToneMappingNode.js';
 
 // math
 import MathNode from './math/MathNode.js';
@@ -137,6 +138,7 @@ const nodeLib = {
 	// display
 	ColorSpaceNode,
 	NormalMapNode,
+	ToneMappingNode,
 
 	// math
 	MathNode,
@@ -227,6 +229,7 @@ export {
 	// display
 	ColorSpaceNode,
 	NormalMapNode,
+	ToneMappingNode,
 
 	// math
 	MathNode,

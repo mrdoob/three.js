@@ -61,7 +61,7 @@
 
 				//lights
 
-				const centerLight = new THREE.PointLight( 0xffffff, .8, 7000 );
+				const centerLight = new THREE.PointLight( 0xff9900, .8, 7000 );
 				centerLight.position.y = 450;
 				centerLight.position.z = - 200;
 				scene.add( centerLight );
@@ -86,6 +86,7 @@
 						if ( child.isMesh ) {
 
 							child.material = new Nodes.MeshStandardNodeMaterial();
+							child.material.roughness = .1;
 
 							child.isInstancedMesh = true;
 							child.instanceMatrix = new THREE.InstancedBufferAttribute( new Float32Array( instanceCount * 16 ), 16 );
@@ -115,6 +116,8 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 800 );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

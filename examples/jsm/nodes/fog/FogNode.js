@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import MathNode from '../math/MathNode.js';
 
 class FogNode extends Node {
 
@@ -8,6 +9,12 @@ class FogNode extends Node {
 
 		this.colorNode = colorNode;
 		this.factorNode = factorNode;
+
+	}
+
+	mix( outputNode ) {
+
+		return new MathNode( MathNode.MIX, outputNode, this.colorNode, this );
 
 	}
 

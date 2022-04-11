@@ -1,4 +1,5 @@
 import Node from './Node.js';
+import OperatorNode from '../math/OperatorNode.js';
 
 class VarNode extends Node {
 
@@ -8,6 +9,44 @@ class VarNode extends Node {
 
 		this.node = node;
 		this.name = name;
+
+	}
+
+	op( op, ...params ) {
+
+		this.node = new OperatorNode( op, this.node, ...params );
+
+		return this;
+
+	}
+
+	assign( ...params ) {
+
+		return this.op( '=', ...params );
+
+	}
+
+	add( ...params ) {
+
+		return this.op( '+', ...params );
+
+	}
+
+	sub( ...params ) {
+
+		return this.op( '-', ...params );
+
+	}
+
+	mul( ...params ) {
+
+		return this.op( '*', ...params );
+
+	}
+
+	div( ...params ) {
+
+		return this.op( '/', ...params );
 
 	}
 

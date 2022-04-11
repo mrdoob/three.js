@@ -5,6 +5,7 @@ import AttributeNode from '../core/AttributeNode.js';
 import UniformNode from '../core/UniformNode.js';
 import BypassNode from '../core/BypassNode.js';
 import InstanceIndexNode from '../core/InstanceIndexNode.js';
+import ContextNode from '../core/ContextNode.js';
 
 // accessor nodes
 import BufferNode from '../accessors/BufferNode.js';
@@ -32,6 +33,7 @@ import JoinNode from '../utils/JoinNode.js';
 // other nodes
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import LightContextNode from '../lights/LightContextNode.js';
+import ReflectedLightNode from '../lights/ReflectedLightNode.js';
 
 // utils
 import ShaderNode from './ShaderNode.js';
@@ -110,14 +112,6 @@ export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNod
 
 export const cond = nodeProxy( CondNode );
 
-export const addTo = ( varNode, ...params ) => {
-
-	varNode.node = add( varNode.node, ...nodeArray( params ) );
-
-	return nodeObject( varNode );
-
-};
-
 export const add = nodeProxy( OperatorNode, '+' );
 export const sub = nodeProxy( OperatorNode, '-' );
 export const mul = nodeProxy( OperatorNode, '*' );
@@ -175,7 +169,10 @@ export const materialMetalness = nodeObject( new MaterialNode( MaterialNode.META
 export const skinning = nodeProxy( SkinningNode );
 export const instance = nodeProxy( InstanceNode );
 
+export const context = nodeProxy( ContextNode );
 export const lightContext = nodeProxy( LightContextNode );
+
+export const reflectedLight = nodeProxy( ReflectedLightNode );
 
 export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 
@@ -229,3 +226,5 @@ export const transformDirection = nodeProxy( MathNode, 'transformDirection' );
 
 export const EPSILON = float( 1e-6 );
 export const INFINITY = float( 1e6 );
+
+export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
