@@ -29,6 +29,7 @@ import VaryNode from './core/VaryNode.js';
 import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import CubeTextureNode from './accessors/CubeTextureNode.js';
+import InstanceNode from './accessors/InstanceNode.js';
 import MaterialNode from './accessors/MaterialNode.js';
 import MaterialReferenceNode from './accessors/MaterialReferenceNode.js';
 import ModelNode from './accessors/ModelNode.js';
@@ -121,6 +122,7 @@ const nodeLib = {
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
+	InstanceNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -212,6 +214,7 @@ export {
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
+	InstanceNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
