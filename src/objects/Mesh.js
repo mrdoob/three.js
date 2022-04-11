@@ -270,13 +270,13 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 	let intersect;
 
-	if ( material.side === BackSide ) {
+	if ( material && ( material.side === BackSide ) ) {
 
 		intersect = ray.intersectTriangle( pC, pB, pA, true, point );
 
 	} else {
 
-		intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
+		intersect = ray.intersectTriangle( pA, pB, pC, material ? material.side !== DoubleSide : false, point );
 
 	}
 
