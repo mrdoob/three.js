@@ -31,7 +31,7 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'Instancing', ( assert ) => {
 
 				const gl = new WebglContextMock();
-				const extensions = new WebGLExtensions( gl );
+				const extensions = new WebGLExtensions( gl, {} );
 				assert.ok( extensions !== undefined );
 
 			} );
@@ -39,7 +39,7 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'has', ( assert ) => {
 
 				const gl = new WebglContextMock( [ 'Extension1', 'Extension2' ] );
-				const extensions = new WebGLExtensions( gl );
+				const extensions = new WebGLExtensions( gl, {} );
 				assert.ok( extensions.has( 'Extension1' ) );
 				assert.ok( extensions.has( 'Extension2' ) );
 				assert.ok( extensions.has( 'Extension1' ) );
@@ -50,7 +50,7 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'has (with aliasses)', ( assert ) => {
 
 				const gl = new WebglContextMock( [ 'WEBKIT_WEBGL_depth_texture' ] );
-				const extensions = new WebGLExtensions( gl );
+				const extensions = new WebGLExtensions( gl, {} );
 				assert.ok( extensions.has( 'WEBGL_depth_texture' ) );
 				assert.ok( extensions.has( 'WEBKIT_WEBGL_depth_texture' ) );
 				assert.notOk( extensions.has( 'EXT_texture_filter_anisotropic' ) );
@@ -61,7 +61,7 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'get', ( assert ) => {
 
 				const gl = new WebglContextMock( [ 'Extension1', 'Extension2' ] );
-				const extensions = new WebGLExtensions( gl );
+				const extensions = new WebGLExtensions( gl, {} );
 				assert.ok( extensions.get( 'Extension1' ) );
 				assert.ok( extensions.get( 'Extension2' ) );
 				assert.ok( extensions.get( 'Extension1' ) );
@@ -72,7 +72,7 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'get (with aliasses)', ( assert ) => {
 
 				const gl = new WebglContextMock( [ 'WEBKIT_WEBGL_depth_texture' ] );
-				const extensions = new WebGLExtensions( gl );
+				const extensions = new WebGLExtensions( gl, {} );
 				assert.ok( extensions.get( 'WEBGL_depth_texture' ) );
 				assert.ok( extensions.get( 'WEBKIT_WEBGL_depth_texture' ) );
 				assert.notOk( extensions.get( 'EXT_texture_filter_anisotropic' ) );
@@ -83,13 +83,22 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'init', ( assert ) => {
 
 				const gl = new WebglContextMock();
-				const extensions = new WebGLExtensions( gl );
+				const extensions = new WebGLExtensions( gl, {} );
 				extensions.init( { isWebGL2: false } );
 				assert.ok( extensions );
 				const gl2 = new WebglContextMock();
-				const extensions2 = new WebGLExtensions( gl2 );
+				const extensions2 = new WebGLExtensions( gl2, {} );
 				extensions2.init( { isWebGL2: true } );
 				assert.ok( extensions2 );
+
+			} );
+
+			QUnit.test( 'allowed', ( assert ) => {
+
+				const gl = new WebglContextMock( [ 'AllowedExtension', 'NotAllowedExtension' ] );
+				const extensions = new WebGLExtensions( gl, { allowedExtensions: [ 'AllowedExtension' ] } );
+				assert.ok( extensions.get( 'AllowedExtension' ) );
+				assert.notOk( extensions.get( 'NotAllowedExtension' ) );
 
 			} );
 

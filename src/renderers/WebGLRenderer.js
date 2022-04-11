@@ -280,7 +280,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	function initGLContext() {
 
-		extensions = new WebGLExtensions( _gl );
+		extensions = new WebGLExtensions( _gl, parameters );
 
 		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 

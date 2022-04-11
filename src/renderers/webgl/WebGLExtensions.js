@@ -1,6 +1,8 @@
-function WebGLExtensions( gl ) {
+function WebGLExtensions( gl, parameters ) {
 
 	const extensions = {};
+
+	const _allowedExtensions = parameters.allowedExtensions;
 
 	function getExtension( name ) {
 
@@ -12,26 +14,35 @@ function WebGLExtensions( gl ) {
 
 		let extension;
 
-		switch ( name ) {
+		if ( _allowedExtensions !== undefined && _allowedExtensions.indexOf( name ) === - 1 ) {
 
-			case 'WEBGL_depth_texture':
-				extension = gl.getExtension( 'WEBGL_depth_texture' ) || gl.getExtension( 'MOZ_WEBGL_depth_texture' ) || gl.getExtension( 'WEBKIT_WEBGL_depth_texture' );
-				break;
+			console.warn( 'THREE.WebGLRenderer: Attempt to use extension ' + name + ' which is not allowed.' );
+			extension = null;
 
-			case 'EXT_texture_filter_anisotropic':
-				extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
-				break;
+		} else {
 
-			case 'WEBGL_compressed_texture_s3tc':
-				extension = gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
-				break;
+			switch ( name ) {
 
-			case 'WEBGL_compressed_texture_pvrtc':
-				extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
-				break;
+				case 'WEBGL_depth_texture':
+					extension = gl.getExtension( 'WEBGL_depth_texture' ) || gl.getExtension( 'MOZ_WEBGL_depth_texture' ) || gl.getExtension( 'WEBKIT_WEBGL_depth_texture' );
+					break;
 
-			default:
-				extension = gl.getExtension( name );
+				case 'EXT_texture_filter_anisotropic':
+					extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+					break;
+
+				case 'WEBGL_compressed_texture_s3tc':
+					extension = gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
+					break;
+
+				case 'WEBGL_compressed_texture_pvrtc':
+					extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+					break;
+
+				default:
+					extension = gl.getExtension( name );
+
+			}
 
 		}
 
