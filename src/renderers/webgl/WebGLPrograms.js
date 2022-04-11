@@ -395,32 +395,38 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 16 );
 		if ( parameters.clearcoatNormalMap )
 			_programLayers.enable( 17 );
-		if ( parameters.displacementMap )
+		if ( parameters.iridescence )
 			_programLayers.enable( 18 );
-		if ( parameters.specularMap )
+		if ( parameters.iridescenceMap )
 			_programLayers.enable( 19 );
-		if ( parameters.roughnessMap )
+		if ( parameters.iridescenceThicknessMap )
 			_programLayers.enable( 20 );
-		if ( parameters.metalnessMap )
+		if ( parameters.displacementMap )
 			_programLayers.enable( 21 );
-		if ( parameters.gradientMap )
+		if ( parameters.specularMap )
 			_programLayers.enable( 22 );
-		if ( parameters.alphaMap )
+		if ( parameters.roughnessMap )
 			_programLayers.enable( 23 );
-		if ( parameters.alphaTest )
+		if ( parameters.metalnessMap )
 			_programLayers.enable( 24 );
-		if ( parameters.vertexColors )
+		if ( parameters.gradientMap )
 			_programLayers.enable( 25 );
-		if ( parameters.vertexAlphas )
+		if ( parameters.alphaMap )
 			_programLayers.enable( 26 );
-		if ( parameters.vertexUvs )
+		if ( parameters.alphaTest )
 			_programLayers.enable( 27 );
-		if ( parameters.vertexTangents )
+		if ( parameters.vertexColors )
 			_programLayers.enable( 28 );
-		if ( parameters.uvsVertexOnly )
+		if ( parameters.vertexAlphas )
 			_programLayers.enable( 29 );
-		if ( parameters.fog )
+		if ( parameters.vertexUvs )
 			_programLayers.enable( 30 );
+		if ( parameters.vertexTangents )
+			_programLayers.enable( 31 );
+		if ( parameters.uvsVertexOnly )
+			_programLayers.enable( 32 );
+		if ( parameters.fog )
+			_programLayers.enable( 33 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
