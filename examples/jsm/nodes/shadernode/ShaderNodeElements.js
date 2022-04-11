@@ -79,10 +79,12 @@ export const bmat4 = new ConvertType( 'bmat4' );
 
 export const uniform = ( value ) => {
 
+	const nodeType = value.nodeType || value.convertTo;
+
 	// TODO: get ConstNode from .traverse() in the future
 	value = value.isNode === true ? value.node?.value || value.value : value;
 
-	return nodeObject( new UniformNode( value, value.nodeType ) );
+	return nodeObject( new UniformNode( value, nodeType ) );
 
 };
 
