@@ -224,9 +224,13 @@ void RE_IndirectSpecular_Physical(
 
 	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
 
-	#ifdef USE_REFRACTION
+	#ifdef ENVMAP_MODE_REFLECTION
 
-		reflectedLight.indirectDiffuse = mix(reflectedLight.indirectDiffuse, radianceRefraction * material.diffuseColor, material.refraction);
+		#ifdef USE_REFRACTION
+
+			reflectedLight.indirectDiffuse = mix(reflectedLight.indirectDiffuse, radianceRefraction * material.diffuseColor, material.refraction);
+
+		#endif
 
 	#endif
 
