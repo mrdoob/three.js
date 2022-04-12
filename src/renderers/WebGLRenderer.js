@@ -1257,10 +1257,11 @@ function WebGLRenderer( parameters = {} ) {
 
 			const needsAntialias = _antialias === true && capabilities.isWebGL2 === true;
 			const renderTargetType = needsAntialias ? WebGLMultisampleRenderTarget : WebGLRenderTarget;
+			const hasColorBufferHalfFloat = extensions.has( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.has( 'EXT_color_buffer_float' ) );
 
 			_transmissionRenderTarget = new renderTargetType( 1024, 1024, {
 				generateMipmaps: true,
-				type: utils.convert( HalfFloatType ) !== null ? HalfFloatType : UnsignedByteType,
+				type: hasColorBufferHalfFloat ? HalfFloatType : UnsignedByteType,
 				minFilter: LinearMipmapLinearFilter,
 				magFilter: NearestFilter,
 				wrapS: ClampToEdgeWrapping,
