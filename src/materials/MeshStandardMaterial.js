@@ -66,6 +66,7 @@ class MeshStandardMaterial extends Material {
 		this.color = new Color( 0xffffff ); // diffuse
 		this.roughness = 1.0;
 		this.metalness = 0.0;
+		this.f90 = 1.0;
 
 		this.map = null;
 
@@ -141,6 +142,7 @@ class MeshStandardMaterial extends Material {
 		this.color.copy( source.color );
 		this.roughness = source.roughness;
 		this.metalness = source.metalness;
+		this.f90 = source.f90;
 
 		this.map = source.map;
 

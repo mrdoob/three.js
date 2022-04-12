@@ -538,6 +538,7 @@ function WebGLMaterials( properties ) {
 
 		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
+		uniforms.f90_r115_compatability.value = material.f90;
 
 		if ( material.refraction > 0 ) {
 

@@ -91,7 +91,8 @@ const ShaderLib = {
 				roughness: { value: 1.0 },
 				metalness: { value: 0.0 },
 				refraction: { value: 0 },
-				envMapIntensity: { value: 1 } // temporary
+				envMapIntensity: { value: 1 }, // temporary
+				f90_r115_compatability: { value: 1.0 },
 			}
 		] ),
 

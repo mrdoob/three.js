@@ -69,6 +69,7 @@ uniform vec3 diffuse;
 uniform vec3 emissive;
 uniform float roughness;
 uniform float metalness;
+uniform float f90_r115_compatability;
 uniform float opacity;
 
 #ifdef IOR
