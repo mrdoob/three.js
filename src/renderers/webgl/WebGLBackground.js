@@ -98,6 +98,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 						fog: false
 					} )
 				);
+				boxMesh.layers.enableAll();
 
 				boxMesh.geometry.deleteAttribute( 'normal' );
 				boxMesh.geometry.deleteAttribute( 'uv' );
@@ -161,6 +162,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 						fog: false
 					} )
 				);
+				planeMesh.layers.enableAll();
 
 				planeMesh.geometry.deleteAttribute( 'normal' );
 
