@@ -675,13 +675,13 @@
 
 			if ( extension.iridescenceThicknessMinimum !== undefined ) {
 
-				materialParams.iridescenceThicknessRange[0] = extension.iridescenceThicknessMinimum;
+				materialParams.iridescenceThicknessRange[ 0 ] = extension.iridescenceThicknessMinimum;
 
 			}
 
 			if ( extension.iridescenceThicknessMaximum !== undefined ) {
 
-				materialParams.iridescenceThicknessRange[1] = extension.iridescenceThicknessMaximum;
+				materialParams.iridescenceThicknessRange[ 1 ] = extension.iridescenceThicknessMaximum;
 
 			}
 
