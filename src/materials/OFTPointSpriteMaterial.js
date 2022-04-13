@@ -117,7 +117,9 @@ class OFTPointSpriteMaterial extends ShaderMaterial {
 				gl_FragColor = vColor;
 				vec2 rotateUv = rotateUV(gl_PointCoord, vRandom * vIntensity * PI * 0.6);
 				rotateUv = clamp(rotateUv, 0.0, 1.0);
-				gl_FragColor = gl_FragColor * texture2D( pointTexture, rotateUv );
+				gl_FragColor = gl_FragColor * mapTexelToLinear(texture2D( pointTexture, rotateUv ));
+
+				#include <encodings_fragment>
 			}
 			`,
 
@@ -175,6 +177,13 @@ class OFTPointSpriteMaterial extends ShaderMaterial {
 
 		this._depthBias = value;
 		this.uniforms.depthBias.value = value;
+
+	}
+
+	// enable code injection: mapTexelToLinear
+	get map() {
+
+		return this._pointTexture;
 
 	}
 
