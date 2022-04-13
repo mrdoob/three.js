@@ -75,12 +75,10 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 		rangeMax = new UINumber().setWidth( '40px' ).onChange( onRangeChange );
 		rangeMaxRow.add( rangeMax );
 
-		if ( property === 'iridescenceThicknessMap' ) {
-
-			rangeMin.setPrecision( 0 ).setRange( 0, Infinity ).setNudge( 1 ).setStep( 10 ).setUnit( 'nm' );
-			rangeMax.setPrecision( 0 ).setRange( 0, Infinity ).setNudge( 1 ).setStep( 10 ).setUnit( 'nm' );
-
-		}
+		// Additional settings for iridescenceThicknessMap
+		// Please add conditional if more maps are having a range property
+		rangeMin.setPrecision( 0 ).setRange( 0, Infinity ).setNudge( 1 ).setStep( 10 ).setUnit( 'nm' );
+		rangeMax.setPrecision( 0 ).setRange( 0, Infinity ).setNudge( 1 ).setStep( 10 ).setUnit( 'nm' );
 
 	}
 
