@@ -121,7 +121,7 @@ class FileLoader extends Loader {
 
 										loaded += value.byteLength;
 
-										const event = new ProgressEvent( 'progress', { lengthComputable, loaded, total } );
+										const event = { lengthComputable, loaded, total, response };
 										for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
 											const callback = callbacks[ i ];
