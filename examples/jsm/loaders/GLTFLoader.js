@@ -787,6 +787,12 @@ class GLTFMaterialsIridescenceExtension {
 
 		}
 
+		if ( materialParams.iridescenceThicknessRange === undefined ) {
+
+			materialParams.iridescenceThicknessRange = [ 100, 400 ];
+
+		}
+
 		if ( extension.iridescenceThicknessMinimum !== undefined ) {
 
 			materialParams.iridescenceThicknessRange[ 0 ] = extension.iridescenceThicknessMinimum;
