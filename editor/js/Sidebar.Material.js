@@ -10,6 +10,7 @@ import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.j
 import { SidebarMaterialConstantProperty } from './Sidebar.Material.ConstantProperty.js';
 import { SidebarMaterialMapProperty } from './Sidebar.Material.MapProperty.js';
 import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty.js';
+import { SidebarMaterialRangeValueProperty } from './Sidebar.Material.RangeValueProperty.js';
 import { SidebarMaterialProgram } from './Sidebar.Material.Program.js';
 
 function SidebarMaterial( editor ) {
@@ -137,18 +138,13 @@ function SidebarMaterial( editor ) {
 
 	// iridescenceIOR
 
-	const materialIridescenceIOR = new SidebarMaterialNumberProperty( editor, 'iridescenceIOR', strings.getKey( 'sidebar/material/iridescenceIOR' ), [ 1, 4 ] );
+	const materialIridescenceIOR = new SidebarMaterialNumberProperty( editor, 'iridescenceIOR', strings.getKey( 'sidebar/material/iridescenceIOR' ), [ 1, 5 ] );
 	container.add( materialIridescenceIOR );
 
-	// iridescenceThicknessMinimum
+	// iridescenceThicknessMax
 
-	const materialIridescenceThicknessMinimum = new SidebarMaterialNumberProperty( editor, 'iridescenceThicknessMinimum', strings.getKey( 'sidebar/material/iridescenceThicknessMinimum' ) );
-	container.add( materialIridescenceThicknessMinimum );
-
-	// iridescenceThicknessMaximum
-
-	const materialIridescenceThicknessMaximum = new SidebarMaterialNumberProperty( editor, 'iridescenceThicknessMaximum', strings.getKey( 'sidebar/material/iridescenceThicknessMaximum' ) );
-	container.add( materialIridescenceThicknessMaximum );
+	const materialIridescenceThicknessMax = new SidebarMaterialRangeValueProperty( editor, 'iridescenceThicknessRange', strings.getKey( 'sidebar/material/iridescenceThicknessMax' ), false, [ 0, Infinity ], 0, 10, 1, 'nm' );
+	container.add( materialIridescenceThicknessMax );
 
 	// transmission
 

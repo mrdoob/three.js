@@ -41,8 +41,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.iridescenceMap = null;
 		this.iridescenceIOR = 1.3;
-		this.iridescenceThicknessMinimum = 100;
-		this.iridescenceThicknessMaximum = 400;
+		this.iridescenceThicknessRange = [ 100, 400 ];
 		this.iridescenceThicknessMap = null;
 
 		this.sheenColor = new Color( 0x000000 );
@@ -166,8 +165,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescence = source.iridescence;
 		this.iridescenceMap = source.iridescenceMap;
 		this.iridescenceIOR = source.iridescenceIOR;
-		this.iridescenceThicknessMinimum = source.iridescenceThicknessMinimum;
-		this.iridescenceThicknessMaximum = source.iridescenceThicknessMaximum;
+		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
 		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
 
 		this.sheen = source.sheen;

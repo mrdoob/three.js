@@ -86,8 +86,7 @@ class MaterialLoader extends Loader {
 		if ( json.clearcoatRoughness !== undefined ) material.clearcoatRoughness = json.clearcoatRoughness;
 		if ( json.iridescence !== undefined ) material.iridescence = json.iridescence;
 		if ( json.iridescenceIOR !== undefined ) material.iridescenceIOR = json.iridescenceIOR;
-		if ( json.iridescenceThicknessMinimum !== undefined ) material.iridescenceThicknessMinimum = json.iridescenceThicknessMinimum;
-		if ( json.iridescenceThicknessMaximum !== undefined ) material.iridescenceThicknessMaximum = json.iridescenceThicknessMaximum;
+		if ( json.iridescenceThicknessRange !== undefined ) material.iridescenceThicknessRange = json.iridescenceThicknessRange;
 		if ( json.transmission !== undefined ) material.transmission = json.transmission;
 		if ( json.thickness !== undefined ) material.thickness = json.thickness;
 		if ( json.attenuationDistance !== undefined ) material.attenuationDistance = json.attenuationDistance;

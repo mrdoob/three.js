@@ -224,8 +224,7 @@ class Material extends EventDispatcher {
 
 		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
 		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
-		if ( this.iridescenceThicknessMinimum !== undefined ) data.iridescenceThicknessMinimum = this.iridescenceThicknessMinimum;
-		if ( this.iridescenceThicknessMaximum !== undefined ) data.iridescenceThicknessMaximum = this.iridescenceThicknessMaximum;
+		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
 
 		if ( this.iridescenceMap && this.iridescenceMap.isTexture ) {
 
