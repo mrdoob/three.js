@@ -15382,7 +15382,6 @@
 					const uniforms = state.hemi[hemiLength];
 					uniforms.direction.setFromMatrixPosition(light.matrixWorld);
 					uniforms.direction.transformDirection(viewMatrix);
-					uniforms.direction.normalize();
 					hemiLength++;
 				}
 			}
@@ -19980,7 +19979,7 @@
 			if (_transmissionRenderTarget === null) {
 				_transmissionRenderTarget = new WebGLRenderTarget(1, 1, {
 					generateMipmaps: true,
-					type: utils.convert(HalfFloatType) !== null ? HalfFloatType : UnsignedByteType,
+					type: extensions.has('EXT_color_buffer_half_float') ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: isWebGL2 && _antialias === true ? 4 : 0
 				});
