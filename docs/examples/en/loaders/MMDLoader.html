@@ -75,7 +75,7 @@
 		<p>
 		[page:String url] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
+		[page:Function onProgress] — (optional) Will be called while load progresses. The argument will contain [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/lengthComputable lengthComputable], [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/total total], [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/loaded loaded] and the [link:https://developer.mozilla.org/en-US/docs/Web/API/Response response]. If the server does not set the Content-Length header; [page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
@@ -87,7 +87,7 @@
 		[page:String url] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).If two or more files are specified, they'll be merged.<br />
 		[page:Object3D object] — [page:SkinnedMesh] or [page:Camera]. Clip and its tracks will be fitting to this object.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — (optional) Will be called while load progresses. The argument will contain [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/lengthComputable lengthComputable], [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/total total], [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/loaded loaded] and the [link:https://developer.mozilla.org/en-US/docs/Web/API/Response response]. If the server does not set the Content-Length header; [page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
@@ -99,7 +99,7 @@
 		[page:String modelUrl] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
 		[page:String vmdUrl] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — (optional) Will be called while load progresses. The argument will contain [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/lengthComputable lengthComputable], [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/total total], [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent/loaded loaded] and the [link:https://developer.mozilla.org/en-US/docs/Web/API/Response response]. If the server does not set the Content-Length header; [page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
