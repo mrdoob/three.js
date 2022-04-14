@@ -18,6 +18,7 @@ class Reflector extends Mesh {
 		super( geometry );
 
 		this.type = 'Reflector';
+		this.camera = new PerspectiveCamera();
 
 		const scope = this;
 
@@ -43,7 +44,7 @@ class Reflector extends Mesh {
 		const q = new Vector4();
 
 		const textureMatrix = new Matrix4();
-		const virtualCamera = new PerspectiveCamera();
+		const virtualCamera = this.camera;
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample } );
 
