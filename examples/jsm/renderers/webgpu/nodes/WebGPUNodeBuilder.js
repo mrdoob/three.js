@@ -93,7 +93,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		this.uniformsGroup = {};
 
-    this.builtins = new Set();
+		this.builtins = new Set();
 
 		this.vertexShader = null;
 		this.fragmentShader = null;
