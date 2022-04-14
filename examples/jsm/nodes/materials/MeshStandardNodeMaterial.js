@@ -5,7 +5,9 @@ import {
 	normalView,
 	materialRoughness, materialMetalness
 } from '../shadernode/ShaderNodeElements.js';
-import { getRoughness } from '../functions/PhysicalMaterialFunctions.js';
+import getRoughness from '../functions/material/getRoughness.js';
+import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
+
 import { MeshStandardMaterial } from 'three';
 
 const defaultValues = new MeshStandardMaterial();
@@ -51,7 +53,19 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		diffuseColorNode = this.generateStandardMaterial( builder, { colorNode, diffuseColorNode } );
 
-		this.generateLight( builder, diffuseColorNode, lightNode );
+		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightNode } );
+
+		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
+
+	}
+
+	generateLight( builder, { diffuseColorNode, lightNode } ) {
+
+		const outgoingLightNode = super.generateLight( builder, { diffuseColorNode, lightNode, lightingModelNode: PhysicalLightingModel } );
+
+		// @TODO: add IBL code here
+
+		return outgoingLightNode;
 
 	}
 
@@ -67,7 +81,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 		// ROUGHNESS
 
 		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
-		roughnessNode = getRoughness( { roughness: roughnessNode } );
+		roughnessNode = getRoughness.call( { roughness: roughnessNode } );
 
 		builder.addFlow( 'fragment', label( roughnessNode, 'Roughness' ) );
 

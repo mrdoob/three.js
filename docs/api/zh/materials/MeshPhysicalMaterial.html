@@ -70,6 +70,16 @@
 		<h2>属性(Properties)</h2>
 		<p>共有属性请参见其基类[page:Material]和[page:MeshStandardMaterial]。</p>
 
+		<h3>[property:Color attenuationColor]</h3>
+		<p>
+		The color that white light turns into due to absorption when reaching the attenuation distance. Default is *white* (0xffffff).
+		</p>
+
+		<h3>[property:Float attenuationDistance]</h3>
+		<p>
+		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space. Default is *0*.
+		</p>
+
 		<h3>[property:Float clearcoat]</h3>
 		<p>
 		表示clear coat层的强度，范围从*0.0*到*1.0*m，当需要在表面加一层薄薄的半透明材质的时候，可以使用与clear coat相关的属性，默认为*0.0*;
@@ -164,6 +174,17 @@
 		<p>
 			此纹理的alpha通道将与[page:.specularColor]相乘，用于逐像素地控制高光颜色。默认值为*null*。
 		</p>
+
+		<h3>[property:Float thickness]</h3>
+		<p>
+		The thickness of the volume beneath the surface. The value is given in the coordinate space of the mesh. If the value is 0 the material is thin-walled. Otherwise the material is a volume boundary. Default is *0*.
+		</p>
+
+		<h3>[property:Texture thicknessMap]</h3>
+		<p>
+		A texture that defines the thickness, stored in the G channel. This will be multiplied by [page:.thickness]. Default is *null*.
+		</p>
+
 
 		<h3>[property:Float transmission]</h3>
 		<p>

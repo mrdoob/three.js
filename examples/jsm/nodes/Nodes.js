@@ -8,6 +8,7 @@ import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
 import FunctionNode from './core/FunctionNode.js';
+import InstanceIndexNode from './core/InstanceIndexNode.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
@@ -28,6 +29,7 @@ import VaryNode from './core/VaryNode.js';
 import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import CubeTextureNode from './accessors/CubeTextureNode.js';
+import InstanceNode from './accessors/InstanceNode.js';
 import MaterialNode from './accessors/MaterialNode.js';
 import MaterialReferenceNode from './accessors/MaterialReferenceNode.js';
 import ModelNode from './accessors/ModelNode.js';
@@ -45,6 +47,7 @@ import UVNode from './accessors/UVNode.js';
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
+import ToneMappingNode from './display/ToneMappingNode.js';
 
 // math
 import MathNode from './math/MathNode.js';
@@ -81,9 +84,6 @@ import FogRangeNode from './fog/FogRangeNode.js';
 // core
 export * from './core/constants.js';
 
-// functions
-export * from './functions/BSDFs.js';
-
 // materials
 export * from './materials/Materials.js';
 
@@ -101,6 +101,7 @@ const nodeLib = {
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
+	InstanceIndexNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -121,6 +122,7 @@ const nodeLib = {
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
+	InstanceNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -138,6 +140,7 @@ const nodeLib = {
 	// display
 	ColorSpaceNode,
 	NormalMapNode,
+	ToneMappingNode,
 
 	// math
 	MathNode,
@@ -190,6 +193,7 @@ export {
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
+	InstanceIndexNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -210,6 +214,7 @@ export {
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
+	InstanceNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -227,6 +232,7 @@ export {
 	// display
 	ColorSpaceNode,
 	NormalMapNode,
+	ToneMappingNode,
 
 	// math
 	MathNode,

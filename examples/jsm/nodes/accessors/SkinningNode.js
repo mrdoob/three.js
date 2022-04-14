@@ -81,7 +81,7 @@ class SkinningNode extends Node {
 
 	generate( builder ) {
 
-		Skinning( {
+		Skinning.call( {
 			index: this.skinIndexNode,
 			weight: this.skinWeightNode,
 			bindMatrix: this.bindMatrixNode,

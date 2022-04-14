@@ -67,8 +67,6 @@
 				camera.add( light );
 				scene.add( camera );
 
-				const lightNode = new LightsNode().fromLights( [ light ] );
-
 				const loader = new FBXLoader();
 				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
 
@@ -82,7 +80,7 @@
 						if ( child.isMesh ) {
 
 							child.material = new Nodes.MeshStandardNodeMaterial();
-							child.material.lightNode = lightNode;
+							child.material.roughness = .1;
 
 						}
 
@@ -97,6 +95,8 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 800 );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

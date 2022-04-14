@@ -26,7 +26,7 @@ class CheckerNode extends Node {
 
 	generate( builder ) {
 
-		return checkerShaderNode( { uv: this.uvNode } ).build( builder );
+		return checkerShaderNode.call( { uv: this.uvNode } ).build( builder );
 
 	}
 

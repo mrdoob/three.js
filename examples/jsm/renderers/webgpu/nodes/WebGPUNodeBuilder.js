@@ -14,6 +14,10 @@ import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
 
 import CodeNode from 'three-nodes/core/CodeNode.js';
 
+const supports = {
+	instance: true
+};
+
 const wgslTypeLib = {
 	float: 'f32',
 	int: 'i32',
@@ -48,7 +52,8 @@ const wgslTypeLib = {
 
 const wgslMethods = {
 	dFdx: 'dpdx',
-	dFdy: 'dpdy'
+	dFdy: 'dpdy',
+	inversesqrt: 'inverseSqrt'
 };
 
 const wgslPolyfill = {
@@ -74,13 +79,6 @@ fn repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
 	return ( ( uvScaled % dimension ) + dimension ) % dimension;
 
 }
-` ),
-	inversesqrt: new CodeNode( `
-fn inversesqrt( x : f32 ) -> f32 {
-
-	return 1.0 / sqrt( x );
-
-}
 ` )
 };
 
@@ -94,6 +92,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		this.bindingsOffset = { vertex: 0, fragment: 0 };
 
 		this.uniformsGroup = {};
+
+    this.builtins = new Set();
 
 		this.vertexShader = null;
 		this.fragmentShader = null;
@@ -130,15 +130,45 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleBias( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
+
+		} else {
+
+			this._include( 'repeatWrapping' );
+
+			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
+
+			return `textureLoad( ${textureProperty}, repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
+
+		}
+
+	}
+
 	getTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		return this.getSampler( textureProperty, uvSnippet, shaderStage );
 
 	}
 
+	getTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+
+		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+
+	}
+
 	getCubeTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		return this.getSampler( textureProperty, uvSnippet, shaderStage );
+
+	}
+
+	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+
+		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
@@ -163,7 +193,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' ) {
 
-				return `NodeBuffer.${name}`;
+				return `NodeBuffer_${node.node.id}.${name}`;
 
 			} else {
 
@@ -230,10 +260,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-
 			} else if ( type === 'buffer' ) {
 
-				const buffer = new WebGPUUniformBuffer( 'NodeBuffer', node.value );
+				const buffer = new WebGPUUniformBuffer( 'NodeBuffer_' + node.id, node.value );
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
@@ -305,11 +334,29 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getInstanceIndex( shaderStage = this.shaderStage ) {
+
+		this.builtins.add( 'instance_index' );
+
+		if ( shaderStage === 'vertex' ) {
+
+			return 'instanceIndex';
+
+		}
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		const snippets = [];
 
 		if ( shaderStage === 'vertex' ) {
+
+			if ( this.builtins.has( 'instance_index' ) ) {
+
+				snippets.push( `@builtin( instance_index ) instanceIndex : u32` );
+
+			}
 
 			const attributes = this.attributes;
 			const length = attributes.length;
@@ -384,7 +431,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const code = snippets.join( ',\n\t' );
 
-		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVarysStruct', code ) : code;
+		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVarysStruct', '\t' + code ) : code;
 
 	}
 
@@ -428,7 +475,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}, ${bufferCount} >\n`;
 
-				bufferSnippets.push( this._getWGSLUniforms( 'NodeBuffer', bufferSnippet, index ++ ) );
+				bufferSnippets.push( this._getWGSLUniforms( 'NodeBuffer_' + bufferNode.id, bufferSnippet, index ++ ) );
 
 			} else {
 
@@ -451,7 +498,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		}
 
 		let code = bindingSnippets.join( '\n' );
-		code += bufferSnippets.join( ',\n' );
+		code += bufferSnippets.join( '\n' );
 
 		if ( groupSnippets.length > 0 ) {
 
@@ -542,6 +589,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 	getType( type ) {
 
 		return wgslTypeLib[ type ] || type;
+
+	}
+
+	isAvailable( name ) {
+
+		return supports[ name ] === true;
 
 	}
 

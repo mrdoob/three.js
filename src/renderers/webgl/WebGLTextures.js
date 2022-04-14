@@ -776,13 +776,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				//
 
-				if ( useTexStorage && allocateMemory ) {
+				if ( allocateMemory ) {
 
-					state.texStorage2D( _gl.TEXTURE_2D, 1, glInternalFormat, image.width, image.height );
+					if ( useTexStorage ) {
 
-				} else {
+						state.texStorage2D( _gl.TEXTURE_2D, 1, glInternalFormat, image.width, image.height );
 
-					state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+					} else {
+
+						state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+
+					}
 
 				}
 
@@ -924,13 +928,26 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.isFramebufferTexture ) {
 
-				if ( useTexStorage && allocateMemory ) {
+				if ( allocateMemory ) {
 
-					state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+					if ( useTexStorage ) {
 
-				} else {
+						state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
 
-					state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+					} else {
+
+						let width = image.width, height = image.height;
+
+						for ( let i = 0; i < levels; i ++ ) {
+
+							state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, width, height, 0, glFormat, glType, null );
+
+							width >>= 1;
+							height >>= 1;
+
+						}
+
+					}
 
 				}
 

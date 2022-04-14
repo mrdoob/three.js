@@ -4,6 +4,8 @@ import VarNode from '../core/VarNode.js';
 import AttributeNode from '../core/AttributeNode.js';
 import UniformNode from '../core/UniformNode.js';
 import BypassNode from '../core/BypassNode.js';
+import InstanceIndexNode from '../core/InstanceIndexNode.js';
+import ContextNode from '../core/ContextNode.js';
 
 // accessor nodes
 import BufferNode from '../accessors/BufferNode.js';
@@ -16,6 +18,7 @@ import PositionNode from '../accessors/PositionNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
 import TextureNode from '../accessors/TextureNode.js';
 import UVNode from '../accessors/UVNode.js';
+import InstanceNode from '../accessors/InstanceNode.js';
 
 // math nodes
 import OperatorNode from '../math/OperatorNode.js';
@@ -30,6 +33,7 @@ import JoinNode from '../utils/JoinNode.js';
 // other nodes
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import LightContextNode from '../lights/LightContextNode.js';
+import ReflectedLightNode from '../lights/ReflectedLightNode.js';
 
 // utils
 import ShaderNode from './ShaderNode.js';
@@ -75,10 +79,12 @@ export const bmat4 = new ConvertType( 'bmat4' );
 
 export const uniform = ( value ) => {
 
+	const nodeType = value.nodeType || value.convertTo;
+
 	// TODO: get ConstNode from .traverse() in the future
 	value = value.isNode === true ? value.node?.value || value.value : value;
 
-	return nodeObject( new UniformNode( value, value.nodeType ) );
+	return nodeObject( new UniformNode( value, nodeType ) );
 
 };
 
@@ -108,14 +114,6 @@ export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNod
 
 export const cond = nodeProxy( CondNode );
 
-export const addTo = ( varNode, ...params ) => {
-
-	varNode.node = add( varNode.node, ...nodeArray( params ) );
-
-	return nodeObject( varNode );
-
-};
-
 export const add = nodeProxy( OperatorNode, '+' );
 export const sub = nodeProxy( OperatorNode, '-' );
 export const mul = nodeProxy( OperatorNode, '*' );
@@ -137,6 +135,7 @@ export const shiftLeft = nodeProxy( OperatorNode, '<<' );
 export const shiftRight = nodeProxy( OperatorNode, '>>' );
 
 export const element = nodeProxy( ArrayElementNode );
+export const instanceIndex = nodeObject( new InstanceIndexNode() );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
@@ -170,8 +169,12 @@ export const materialRoughness = nodeObject( new MaterialNode( MaterialNode.ROUG
 export const materialMetalness = nodeObject( new MaterialNode( MaterialNode.METALNESS ) );
 
 export const skinning = nodeProxy( SkinningNode );
+export const instance = nodeProxy( InstanceNode );
 
+export const context = nodeProxy( ContextNode );
 export const lightContext = nodeProxy( LightContextNode );
+
+export const reflectedLight = nodeProxy( ReflectedLightNode );
 
 export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 
@@ -225,3 +228,5 @@ export const transformDirection = nodeProxy( MathNode, 'transformDirection' );
 
 export const EPSILON = float( 1e-6 );
 export const INFINITY = float( 1e6 );
+
+export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
