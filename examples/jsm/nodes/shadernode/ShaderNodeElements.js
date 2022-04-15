@@ -147,8 +147,8 @@ export const uniform = ( nodeOrType ) => {
 
 };
 
-export const attribute = ( name, nodeOrType ) => nodeObject( new AttributeNode( name, getConstNodeType( nodeOrType ) );
-export const property = ( name, nodeOrType ) => nodeObject( new PropertyNode( name, getConstNodeType( nodeOrType ) );
+export const attribute = ( name, nodeOrType ) => nodeObject( new AttributeNode( name, getConstNodeType( nodeOrType ) ) );
+export const property = ( name, nodeOrType ) => nodeObject( new PropertyNode( name, getConstNodeType( nodeOrType ) ) );
 
 export const bypass = nodeProxy( BypassNode );
 export const code = nodeProxy( CodeNode );
@@ -190,8 +190,8 @@ export const metalness = nodeObject( new PropertyNode( 'Metalness', 'float' ) );
 export const alphaTest = nodeObject( new PropertyNode( 'AlphaTest', 'float' ) );
 export const specularColor = nodeObject( new PropertyNode( 'SpecularColor', 'color' ) );
 
-export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object );
-export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material );
+export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
+export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material ) );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
