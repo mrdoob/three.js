@@ -64,7 +64,7 @@ import FogRangeNode from '../fog/FogRangeNode.js';
 
 // shader node utils
 import ShaderNode from './ShaderNode.js';
-import { nodeObject, nodeObjects, nodeArray, nodeProxy, ConvertType, getConstNodeType, cacheMaps } from './ShaderNodeUtils.js';
+import { nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNodeUtils.js';
 
 //
 // Node Material Shader Syntax
@@ -87,7 +87,7 @@ export { default as PhysicalLightingModel } from '../functions/PhysicalLightingM
 
 // shader node utils
 
-export { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy };
+export { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable };
 
 export const color = new ConvertType( 'color' );
 
@@ -155,7 +155,7 @@ export const code = nodeProxy( CodeNode );
 export const context = nodeProxy( ContextNode );
 export const expression = nodeProxy( ExpressionNode );
 export const functionCall = nodeProxy( FunctionCallNode );
-export const instanceIndex = nodeObject( new InstanceIndexNode() );
+export const instanceIndex = nodeImmutable( InstanceIndexNode );
 export const label = nodeProxy( VarNode );
 export const vary = nodeProxy( VaryNode );
 
@@ -163,43 +163,43 @@ export const vary = nodeProxy( VaryNode );
 
 export const buffer = ( value, nodeOrType, count ) => nodeObject( new BufferNode( value, getConstNodeType( nodeOrType ), count ) );
 
-export const cameraProjectionMatrix = nodeObject( new CameraNode( CameraNode.PROJECTION_MATRIX ) );
-export const cameraViewMatrix = nodeObject( new CameraNode( CameraNode.VIEW_MATRIX ) );
-export const cameraNormalMatrix = nodeObject( new CameraNode( CameraNode.NORMAL_MATRIX ) );
-export const cameraWorldMatrix = nodeObject( new CameraNode( CameraNode.WORLD_MATRIX ) );
-export const cameraPosition = nodeObject( new CameraNode( CameraNode.POSITION ) );
+export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX );
+export const cameraViewMatrix = nodeImmutable( CameraNode, CameraNode.VIEW_MATRIX );
+export const cameraNormalMatrix = nodeImmutable( CameraNode, CameraNode.NORMAL_MATRIX );
+export const cameraWorldMatrix = nodeImmutable( CameraNode, CameraNode.WORLD_MATRIX );
+export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
 
 export const cubeTexture = nodeProxy( CubeTextureNode );
 export const texture = nodeProxy( TextureNode );
 export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), sampler ) );
 export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
-export const pointUV = nodeObject( new PointUVNode() );
+export const pointUV = nodeImmutable( PointUVNode );
 
 export const instance = nodeProxy( InstanceNode );
 
-export const materialAlphaTest = nodeObject( new MaterialNode( MaterialNode.ALPHA_TEST ) );
-export const materialColor = nodeObject( new MaterialNode( MaterialNode.COLOR ) );
-export const materialOpacity = nodeObject( new MaterialNode( MaterialNode.OPACITY ) );
-export const materialSpecular = nodeObject( new MaterialNode( MaterialNode.SPECULAR ) );
-export const materialRoughness = nodeObject( new MaterialNode( MaterialNode.ROUGHNESS ) );
-export const materialMetalness = nodeObject( new MaterialNode( MaterialNode.METALNESS ) );
+export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
+export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
+export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
+export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
+export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
+export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
 
-export const diffuseColor = nodeObject( new PropertyNode( 'DiffuseColor', 'vec4' ) );
-export const roughness = nodeObject( new PropertyNode( 'Roughness', 'float' ) );
-export const metalness = nodeObject( new PropertyNode( 'Metalness', 'float' ) );
-export const alphaTest = nodeObject( new PropertyNode( 'AlphaTest', 'float' ) );
-export const specularColor = nodeObject( new PropertyNode( 'SpecularColor', 'color' ) );
+export const diffuseColor = nodeImmutable( PropertyNode, 'DiffuseColor', 'vec4' );
+export const roughness = nodeImmutable( PropertyNode, 'Roughness', 'float' );
+export const metalness = nodeImmutable( PropertyNode, 'Metalness', 'float' );
+export const alphaTest = nodeImmutable( PropertyNode, 'AlphaTest', 'float' );
+export const specularColor = nodeImmutable( PropertyNode, 'SpecularColor', 'color' );
 
 export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
 export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material ) );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
-export const normalGeometry = nodeObject( new NormalNode( NormalNode.GEOMETRY ) );
-export const normalLocal = nodeObject( new NormalNode( NormalNode.LOCAL ) );
-export const normalWorld = nodeObject( new NormalNode( NormalNode.WORLD ) );
-export const normalView = nodeObject( new NormalNode( NormalNode.VIEW ) );
-export const transformedNormalView = nodeObject( new VarNode( normalView, 'TransformedNormalView' ) );
+export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
+export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
+export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
+export const transformedNormalView = nodeImmutable( VarNode, normalView, 'TransformedNormalView' );
 
 export const viewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
 export const normalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
@@ -207,14 +207,14 @@ export const worldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
 export const position = nodeProxy( Object3DNode, Object3DNode.POSITION );
 export const viewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
 
-export const positionGeometry = nodeObject( new PositionNode( PositionNode.GEOMETRY ) );
-export const positionLocal = nodeObject( new PositionNode( PositionNode.LOCAL ) );
-export const positionWorld = nodeObject( new PositionNode( PositionNode.WORLD ) );
-export const positionView = nodeObject( new PositionNode( PositionNode.VIEW ) );
-export const positionViewDirection = nodeObject( new PositionNode( PositionNode.VIEW_DIRECTION ) );
+export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
+export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );
+export const positionWorld = nodeImmutable( PositionNode, PositionNode.WORLD );
+export const positionView = nodeImmutable( PositionNode, PositionNode.VIEW );
+export const positionViewDirection = nodeImmutable( PositionNode, PositionNode.VIEW_DIRECTION );
 
-export const reflectVector = nodeObject( new ReflectNode( ReflectNode.VECTOR ) );
-export const reflectCube = nodeObject( new ReflectNode( ReflectNode.CUBE ) );
+export const reflectVector = nodeImmutable( ReflectNode, ReflectNode.VECTOR );
+export const reflectCube = nodeImmutable( ReflectNode, ReflectNode.CUBE );
 
 export const skinning = nodeProxy( SkinningNode );
 
@@ -304,14 +304,14 @@ export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 export const lightContext = nodeProxy( LightContextNode );
 export const light = nodeProxy( LightNode );
 export const fromLights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
-export const reflectedLight = nodeObject( new ReflectedLightNode() );
+export const reflectedLight = nodeImmutable( ReflectedLightNode );
 
 // utils
 
 export const element = nodeProxy( ArrayElementNode );
 export const arrayElement = element;
 
-export const matcapUV = nodeObject( new MatcapUVNode() );
+export const matcapUV = nodeImmutable( MatcapUVNode );
 export const maxMipLevel = nodeProxy( MaxMipLevelNode );
 
 export const oscSine = nodeProxy( OscNode, OscNode.SINE );
@@ -321,9 +321,9 @@ export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
 
 export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
 
-export const timerLocal = nodeObject( new TimerNode( TimerNode.LOCAL ) );
-export const timerGlobal = nodeObject( new TimerNode( TimerNode.GLOBAL ) );
-export const timerDelta = nodeObject( new TimerNode( TimerNode.DELTA ) );
+export const timerLocal = nodeImmutable( TimerNode, TimerNode.LOCAL );
+export const timerGlobal = nodeImmutable( TimerNode, TimerNode.GLOBAL );
+export const timerDelta = nodeImmutable( TimerNode, TimerNode.DELTA );
 
 // procedural
 

@@ -139,6 +139,12 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 };
 
+const ShaderNodeImmutable = function ( NodeClass, ...params ) {
+
+	return new ShaderNodeObject( new NodeClass( ...( new ShaderNodeArray( params ) ) ) );
+
+};
+
 export const ShaderNodeScript = function ( jsFunc ) {
 
 	return { call: ( inputs, builder ) => {
@@ -155,6 +161,7 @@ export const nodeObject = ( val ) => new ShaderNodeObject( val );
 export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
 export const nodeArray = ( val ) => new ShaderNodeArray( val );
 export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
+export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
 
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
