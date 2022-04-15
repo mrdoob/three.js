@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
 import ShaderNode from '../shadernode/ShaderNode.js';
-import { positionView, normalView, uv, join, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../shadernode/ShaderNodeElements.js';
+import { positionView, normalView, uv, vec3, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, invSqrt, equal } from '../shadernode/ShaderNodeElements.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -26,7 +26,7 @@ const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
 	const B = add( mul( q1perp, st0.y ), mul( q0perp, st1.y ) );
 
 	const det = max( dot( T, T ), dot( B, B ) );
-	const scale = cond( equal( det, 0 ), 0, mul( faceDirection, inversesqrt( det ) ) );
+	const scale = cond( equal( det, 0 ), 0, mul( faceDirection, invSqrt( det ) ) );
 
 	return normalize( add( mul( T, mul( mapN.x, scale ) ), mul( B, mul( mapN.y, scale ) ), mul( N, mapN.z ) ) );
 
@@ -57,7 +57,7 @@ class NormalMapNode extends TempNode {
 		if ( scaleNode !== null ) {
 
 			const normalMapScale = mul( normalMap.xy, scaleNode );
-			normalMap = join( normalMapScale, normalMap.z );
+			normalMap = vec3( normalMapScale, normalMap.z );
 
 		}
 

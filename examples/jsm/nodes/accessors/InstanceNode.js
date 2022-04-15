@@ -8,7 +8,6 @@ import {
 	element,
 	dot,
 	div,
-	temp,
 	instanceIndex,
 	positionLocal,
 	normalLocal
@@ -26,7 +25,7 @@ class InstanceNode extends Node {
 
 		const instanceBufferNode = buffer( instanceMesh.instanceMatrix.array, 'mat4', instanceMesh.count );
 
-		this.instanceMatrixNode = temp( element( instanceBufferNode, instanceIndex ) );
+		this.instanceMatrixNode = element( instanceBufferNode, instanceIndex );
 
 	}
 

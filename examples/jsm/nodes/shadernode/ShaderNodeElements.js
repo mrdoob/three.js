@@ -213,8 +213,6 @@ export const positionWorld = nodeObject( new PositionNode( PositionNode.WORLD ) 
 export const positionView = nodeObject( new PositionNode( PositionNode.VIEW ) );
 export const positionViewDirection = nodeObject( new PositionNode( PositionNode.VIEW_DIRECTION ) );
 
-export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
-
 export const reflectVector = nodeObject( new ReflectNode( ReflectNode.VECTOR ) );
 export const reflectCube = nodeObject( new ReflectNode( ReflectNode.CUBE ) );
 
@@ -335,3 +333,7 @@ export const checker = nodeProxy( CheckerNode );
 
 export const fog = nodeProxy( FogNode );
 export const rangeFog = nodeProxy( FogRangeNode );
+
+// miscellaneous
+
+export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
