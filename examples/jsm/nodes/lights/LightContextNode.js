@@ -21,7 +21,7 @@ class LightContextNode extends ContextNode {
 
 		const { lightingModelNode } = this;
 
-		this.context.reflectedLight = reflectedLight();
+		this.context.reflectedLight = reflectedLight;
 
 		if ( lightingModelNode !== null ) {
 

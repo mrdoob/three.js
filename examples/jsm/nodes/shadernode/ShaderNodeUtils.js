@@ -59,7 +59,7 @@ const ShaderNodeObject = function ( obj ) {
 
 	} else if ( type === 'object' ) {
 
-		if ( obj.isNode === true ) {
+		if ( obj?.isNode === true ) {
 
 			let nodeObject = nodeObjectsCacheMap.get( obj );
 
@@ -233,3 +233,5 @@ export const ConvertType = function ( type, cacheMap = null ) {
 	};
 
 };
+
+export const getConstNodeType = ( value ) => value.nodeType || value.convertTo || value;
