@@ -13,7 +13,7 @@ _DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
 function Editor() {
 
-	var Signal = signals.Signal;
+	var Signal = signals.Signal; // eslint-disable-line no-undef
 
 	this.signals = {
 
@@ -84,7 +84,9 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal()
+		viewportCameraChanged: new Signal(),
+
+		intersects: new Signal(),
 
 	};
 
@@ -107,6 +109,7 @@ function Editor() {
 	this.materials = {};
 	this.textures = {};
 	this.scripts = {};
+	this.plugins = {};
 
 	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
 
@@ -535,20 +538,7 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		if ( this.selected === object ) return;
-
-		var uuid = null;
-
-		if ( object !== null ) {
-
-			uuid = object.uuid;
-
-		}
-
-		this.selected = object;
-
-		this.config.setKey( 'selected', uuid );
-		this.signals.objectSelected.dispatch( object );
+		this.plugins[ 'select' ].select( object );
 
 	},
 
