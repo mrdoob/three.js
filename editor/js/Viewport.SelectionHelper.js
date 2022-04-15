@@ -1,19 +1,18 @@
-class SelectPlugin {
+class SelectionHelper {
 
 	constructor( editor ) {
 
+		const signals = editor.signals;
+
 		this.editor = editor;
 		this.config = editor.config;
-		this.signals = editor.signals;
+		this.signals = signals;
 		this.selected = null;
 		this.disabled = false;
 
 		// signals
 
-		const signals = editor.signals;
 		signals.intersects.add( ( intersects ) => {
-
-			console.log( 'SelectPlugin intersects: ', intersects );
 
 			if ( intersects.length > 0 ) {
 
@@ -37,7 +36,7 @@ class SelectPlugin {
 
 			}
 
-		} );
+		}, null, Number.MIN_VALUE );
 
 	}
 
@@ -70,4 +69,4 @@ class SelectPlugin {
 
 }
 
-export { SelectPlugin };
+export { SelectionHelper };

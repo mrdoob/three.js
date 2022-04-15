@@ -69,7 +69,6 @@
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
 			import { Resizer } from './js/Resizer.js';
-			import { SelectPlugin } from './js/plugins/SelectPlugin.js';
 			import { VRButton } from '../examples/jsm/webxr/VRButton.js';
 
 			window.URL = window.URL || window.webkitURL;
@@ -88,9 +87,6 @@
 			window.editor = editor; // Expose editor to Console
 			window.THREE = THREE; // Expose THREE to APP Scripts and Console
 			window.VRButton = VRButton; // Expose VRButton to APP Scripts
-
-			const select = new SelectPlugin( editor );
-			editor.plugins[ 'select' ] = select;
 
 			const viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );

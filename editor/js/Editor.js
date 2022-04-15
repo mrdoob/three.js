@@ -5,6 +5,7 @@ import { Loader } from './Loader.js';
 import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
+import { SelectionHelper } from './Viewport.SelectionHelper.js';
 
 var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
@@ -94,6 +95,7 @@ function Editor() {
 	this.history = new _History( this );
 	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
+	this.selectionHelper = new SelectionHelper( this );
 
 	this.loader = new Loader( this );
 
@@ -109,7 +111,7 @@ function Editor() {
 	this.materials = {};
 	this.textures = {};
 	this.scripts = {};
-	this.plugins = {};
+
 
 	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
 
@@ -538,7 +540,7 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		this.plugins[ 'select' ].select( object );
+		this.selectionHelper.select( object );
 
 	},
 
