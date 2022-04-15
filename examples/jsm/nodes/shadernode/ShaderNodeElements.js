@@ -171,7 +171,7 @@ export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
 
 export const cubeTexture = nodeProxy( CubeTextureNode );
 export const texture = nodeProxy( TextureNode );
-export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), sampler ) );
+export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), 'sampler' ) );
 export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
 export const pointUV = nodeImmutable( PointUVNode );
 
