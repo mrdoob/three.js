@@ -35,7 +35,7 @@ class SelectionHelper {
 
 			}
 
-		}, null, Number.MIN_VALUE );
+		} );
 
 	}
 
