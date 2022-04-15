@@ -8,7 +8,6 @@ class SelectionHelper {
 		this.config = editor.config;
 		this.signals = signals;
 		this.selected = null;
-		this.disabled = false;
 
 		// signals
 
@@ -41,8 +40,6 @@ class SelectionHelper {
 	}
 
 	select( object ) {
-
-		if ( this.disabled === true ) return;
 
 		if ( this.selected === object ) return;
 
