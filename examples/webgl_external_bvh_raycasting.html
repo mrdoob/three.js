@@ -5,13 +5,22 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #333;
+			}
+
+			a {
+				color: #E91E63;
+				text-decoration: underline;
+			}
+		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org">Three.js</a> cube map refraction demo<br/>
-			Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository<br/>
-			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
+			<a href="https://github.com/gkjohnson/three-mesh-bvh">three-mesh-bvh</a> accelerated raycasting demo<br/>
+			See <a href="https://github.com/gkjohnson/three-mesh-bvh">main project repository</a> for more information and examples.
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -21,7 +30,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.5.10/build/index.module.js"
 				}
 			}
 		</script>
@@ -29,22 +39,30 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHVisualizer } from 'three-mesh-bvh';
 			import Stats from './jsm/libs/stats.module.js';
 			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
+			// Add the extension functions
+			THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+			THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
+			THREE.Mesh.prototype.raycast = acceleratedRaycast;
+
 			let container, stats;
 			let camera, scene, renderer;
-			let mesh;
+			let mesh, helper, bvh;
 			let sphereInstance, lineSegments;
 
-			const MAX_RAYS = 1000;
-			const RAY_COLOR = 0x333333;
+			const MAX_RAYS = 3000;
+			const RAY_COLOR = 0x444444;
 
 			const params = {
 
-				count: 10,
+				count: 150,
+				firstHitOnly: true,
+				useBVH: true,
 
 				displayHelper: false,
 				helperDepth: 10,
@@ -65,7 +83,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0xaaaaaa );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999 );
 				scene.add( ambient );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true });
@@ -87,7 +105,7 @@
 
 				sphereInstance = new THREE.InstancedMesh(
 					new THREE.SphereBufferGeometry(),
-					new THREE.MeshStandardMaterial( { color: RAY_COLOR } ),
+					new THREE.MeshBasicMaterial( { color: RAY_COLOR } ),
 					2 * MAX_RAYS
 				);
 				sphereInstance.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
@@ -99,20 +117,47 @@
 				loader.load( 'models/ply/binary/Lucy100k.ply', geometry => {
 
 					geometry.computeVertexNormals();
+					geometry.computeBoundsTree();
+					bvh = geometry.boundsTree;
+
+					if ( ! params.useBVH ) {
+
+						geometry.boundsTree = null;
+
+					}
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 					mesh.scale.setScalar( 0.003 );
 					mesh.rotation.y = Math.PI;
 					scene.add( mesh );
 
-					mesh.updateMatrixWorld();
+					helper = new MeshBVHVisualizer( mesh );
+					helper.color.set( 0xE91E63 );
+					// helper.opacity = 0.5;
+					scene.add( helper );
 					
 				} );
 
 				new OrbitControls( camera, renderer.domElement 	)
 
 				const gui = new GUI();
-				gui.add( params, 'count', 1, MAX_RAYS, 1 );
+				const rayFolder = gui.addFolder( 'Raycasting' );
+				rayFolder.add( params, 'count', 1, MAX_RAYS, 1 );
+				rayFolder.add( params, 'firstHitOnly' );
+				rayFolder.add( params, 'useBVH' ).onChange( v => {
+
+					mesh.geometry.boundsTree = v ? bvh : null;
+
+				} );
+				
+				const helperFolder = gui.addFolder( 'BVH Helper' );
+				helperFolder.add( params, 'displayHelper' );
+				helperFolder.add( params, 'helperDepth', 1, 20, 1 ).onChange( v => {
+
+					helper.depth = v;
+					helper.update();
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
@@ -130,7 +175,7 @@
 
 				for ( let i = 0; i < MAX_RAYS * 2; i ++ ) {
 
-					position.randomDirection().multiplyScalar( 4 );
+					position.randomDirection().multiplyScalar( 3.75 );
 					matrix.compose( position, quaternion, scale );
 					sphereInstance.setMatrixAt( i, matrix );
 
@@ -143,6 +188,7 @@
 				if ( ! mesh ) return;
 
 				const raycaster = new THREE.Raycaster();
+				raycaster.firstHitOnly = params.firstHitOnly;
 				const position = new THREE.Vector3();
 				const quaternion = new THREE.Quaternion();
 				const scale = new THREE.Vector3( 1, 1, 1 );
@@ -160,7 +206,7 @@
 					axis.set(
 						Math.sin( i * 100 + offset ),
 						Math.cos( - i * 10 + offset ),
-						Math.tan( i * 1 + offset ),
+						Math.sin( i * 1 + offset ),
 					).normalize();
 
 					position.applyAxisAngle( axis, 0.01 );
@@ -226,6 +272,12 @@
 			function render() {
 
 				updateRays();
+				if ( helper ) {
+
+					helper.visible = params.displayHelper;
+
+				}
+
 				renderer.render( scene, camera );
 
 			}
