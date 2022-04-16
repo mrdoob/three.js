@@ -43,7 +43,7 @@ class SelectionHelper {
 
 		if ( this.selected === object ) return;
 
-		var uuid = null;
+		let uuid = null;
 
 		if ( object !== null ) {
 
