@@ -50,11 +50,18 @@
 			THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 			THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
-			let container, stats;
-			let camera, scene, renderer;
+			let stats;
+			let camera, scene, renderer, controls;
 			let mesh, helper, bvh;
 			let sphereInstance, lineSegments;
 
+			// reusable variables
+			const _raycaster = new THREE.Raycaster();
+			const _position = new THREE.Vector3();
+			const _quaternion = new THREE.Quaternion();
+			const _scale = new THREE.Vector3( 1, 1, 1 );
+			const _matrix = new THREE.Matrix4();
+			const _axis = new THREE.Vector3();
 			const MAX_RAYS = 3000;
 			const RAY_COLOR = 0x444444;
 
@@ -74,9 +81,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
+				// environment
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.z = 10;
 
@@ -86,14 +91,16 @@
 				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999 );
 				scene.add( ambient );
 
+				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true });
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
+				// raycast visualizations
 				const lineGeometry = new THREE.BufferGeometry();
 				lineGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( MAX_RAYS * 2 * 3 ), 3 ) );
 				lineSegments = new THREE.LineSegments( lineGeometry, new THREE.LineBasicMaterial( {
@@ -113,6 +120,7 @@
 
 				scene.add( sphereInstance, lineSegments );
 
+				// load the bunny
 				const loader = new FBXLoader();
 				loader.load( 'models/fbx/stanford-bunny.fbx', object => {
 
@@ -138,8 +146,9 @@
 					
 				} );
 
-				new OrbitControls( camera, renderer.domElement 	)
+				controls = new OrbitControls( camera, renderer.domElement );
 
+				// set up gui
 				const gui = new GUI();
 				const rayFolder = gui.addFolder( 'Raycasting' );
 				rayFolder.add( params, 'count', 1, MAX_RAYS, 1 );
@@ -187,56 +196,52 @@
 
 				if ( ! mesh ) return;
 
-				const raycaster = new THREE.Raycaster();
-				raycaster.firstHitOnly = params.firstHitOnly;
-				const position = new THREE.Vector3();
-				const quaternion = new THREE.Quaternion();
-				const scale = new THREE.Vector3( 1, 1, 1 );
-				const matrix = new THREE.Matrix4();
+				_raycaster.firstHitOnly = params.firstHitOnly;
 				const rayCount = params.count;
-				const axis = new THREE.Vector3();
-				const target = new THREE.Vector3();
 
 				let lineNum = 0;
 				for ( let i = 0; i < rayCount; i ++ ) {
 
-					sphereInstance.getMatrixAt( i * 2, matrix );
-					matrix.decompose( position, quaternion, scale );
+					// get the current ray origin
+					sphereInstance.getMatrixAt( i * 2, _matrix );
+					_matrix.decompose( _position, _quaternion, _scale );
 
+					// rotate it about the origin
 					const offset = 1e-4 * window.performance.now();
-					axis.set(
+					_axis.set(
 						Math.sin( i * 100 + offset ),
 						Math.cos( - i * 10 + offset ),
 						Math.sin( i * 1 + offset ),
 					).normalize();
+					_position.applyAxisAngle( _axis, 0.01 );
+					
+					// update the position
+					_scale.setScalar( 0.02 );
+					_matrix.compose( _position, _quaternion, _scale );
+					sphereInstance.setMatrixAt( i * 2, _matrix );
 
-					position.applyAxisAngle( axis, 0.01 );
-					scale.setScalar( 0.02 );
-					matrix.compose( position, quaternion, scale );
+					// raycast
+					_raycaster.ray.origin.copy( _position );
+					_raycaster.ray.direction.copy( _position ).multiplyScalar( - 1).normalize();
 
-					sphereInstance.setMatrixAt( i * 2, matrix );
-
-					target.set( 0, 0, 0 );
-					raycaster.ray.origin.copy( position );
-					raycaster.ray.direction.subVectors( target, position ).normalize();
-
-					const hits = raycaster.intersectObject( mesh );
+					// update hits points and lines
+					const hits = _raycaster.intersectObject( mesh );
 					if ( hits.length !== 0 ) {
 
 						const hit = hits[ 0 ];
 						const point = hit.point;
-						scale.setScalar( 0.01 );
-						matrix.compose( point, quaternion, scale );
-						sphereInstance.setMatrixAt( i * 2 + 1, matrix );
+						_scale.setScalar( 0.01 );
+						_matrix.compose( point, _quaternion, _scale );
+						sphereInstance.setMatrixAt( i * 2 + 1, _matrix );
 
-						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, position.x, position.y, position.z );
+						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, _position.x, _position.y, _position.z );
 						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, point.x, point.y, point.z );
 
 					} else {
 
-						sphereInstance.setMatrixAt( i * 2 + 1, matrix );
-						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, position.x, position.y, position.z );
-						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, target.x, target.y, target.z );
+						sphereInstance.setMatrixAt( i * 2 + 1, _matrix );
+						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, _position.x, _position.y, _position.z );
+						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, 0, 0, 0 );
 
 					}
 					
@@ -281,7 +286,7 @@
 
 				if ( mesh ) {
 
-					mesh.rotation.y += 0.004;
+					mesh.rotation.y += 0.002;
 					mesh.updateMatrixWorld();
 
 				}
