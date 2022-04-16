@@ -574,7 +574,7 @@ Editor.prototype = {
 
 	deselect: function () {
 
-		this.select( null );
+		this.deselect();
 
 	},
 
