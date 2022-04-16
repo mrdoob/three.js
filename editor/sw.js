@@ -188,6 +188,7 @@ const assets = [
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
+	'./js/Viewport.SelectionHelper.js',
 	'./js/Viewport.ViewHelper.js',
 	'./js/Viewport.VR.js',
 
