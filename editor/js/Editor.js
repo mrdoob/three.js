@@ -574,7 +574,7 @@ Editor.prototype = {
 
 	deselect: function () {
 
-		this.deselect();
+		this.selectionHelper.deselect();
 
 	},
 
