@@ -73,8 +73,7 @@ class CubeCamera extends Object3D {
 		const currentOutputEncoding = renderer.outputEncoding;
 		const currentToneMapping = renderer.toneMapping;
 		const currentXrEnabled = renderer.xr.enabled;
-
-		renderer.outputEncoding = LinearEncoding;
+		
 		renderer.toneMapping = NoToneMapping;
 		renderer.xr.enabled = false;
 
