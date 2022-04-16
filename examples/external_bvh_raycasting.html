@@ -41,7 +41,6 @@
 			import * as THREE from 'three';
 			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHVisualizer } from 'three-mesh-bvh';
 			import Stats from './jsm/libs/stats.module.js';
-			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
@@ -132,7 +131,6 @@
 
 					scene.add( mesh );
 					mesh.scale.setScalar( 0.0075 );
-					// mesh.position.y = 0.5;
 
 					helper = new MeshBVHVisualizer( mesh );
 					helper.color.set( 0xE91E63 );
@@ -220,7 +218,7 @@
 
 					target.set( 0, 0, 0 );
 					raycaster.ray.origin.copy( position );
-					raycaster.ray.direction.subVectors( target, position );
+					raycaster.ray.direction.subVectors( target, position ).normalize();
 
 					const hits = raycaster.intersectObject( mesh );
 					if ( hits.length !== 0 ) {
@@ -275,7 +273,6 @@
 
 			function render() {
 
-				updateRays();
 				if ( helper ) {
 
 					helper.visible = params.displayHelper;
@@ -284,9 +281,11 @@
 
 				if ( mesh ) {
 
-					mesh.rotation.y += 0.006;
+					mesh.rotation.y += 0.004;
+					mesh.updateMatrixWorld();
 
 				}
+				updateRays();
 
 				renderer.render( scene, camera );
 
