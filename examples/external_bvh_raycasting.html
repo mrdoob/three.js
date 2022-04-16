@@ -31,7 +31,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.5.10/build/index.module.js"
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh/build/index.module.js"
 				}
 			}
 		</script>
@@ -213,7 +213,7 @@
 						Math.cos( - i * 10 + offset ),
 						Math.sin( i * 1 + offset ),
 					).normalize();
-					_position.applyAxisAngle( _axis, 0.01 );
+					_position.applyAxisAngle( _axis, 0.0025 );
 					
 					// update the position
 					_scale.setScalar( 0.02 );
