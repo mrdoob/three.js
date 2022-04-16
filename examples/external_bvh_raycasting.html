@@ -42,6 +42,7 @@
 			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHVisualizer } from 'three-mesh-bvh';
 			import Stats from './jsm/libs/stats.module.js';
 			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
+			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
@@ -113,10 +114,13 @@
 
 				scene.add( sphereInstance, lineSegments );
 
-				const loader = new PLYLoader();
-				loader.load( 'models/ply/binary/Lucy100k.ply', geometry => {
+				const loader = new FBXLoader();
+				loader.load( 'models/fbx/stanford-bunny.fbx', object => {
 
-					geometry.computeVertexNormals();
+					mesh = object.children[ 0 ];
+
+					const geometry = mesh.geometry;
+					geometry.translate( 0, 0.5 / 0.0075, 0 );
 					geometry.computeBoundsTree();
 					bvh = geometry.boundsTree;
 
@@ -126,14 +130,12 @@
 
 					}
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-					mesh.scale.setScalar( 0.003 );
-					mesh.rotation.y = Math.PI;
 					scene.add( mesh );
+					mesh.scale.setScalar( 0.0075 );
+					// mesh.position.y = 0.5;
 
 					helper = new MeshBVHVisualizer( mesh );
 					helper.color.set( 0xE91E63 );
-					// helper.opacity = 0.5;
 					scene.add( helper );
 					
 				} );
@@ -195,6 +197,7 @@
 				const matrix = new THREE.Matrix4();
 				const rayCount = params.count;
 				const axis = new THREE.Vector3();
+				const target = new THREE.Vector3();
 
 				let lineNum = 0;
 				for ( let i = 0; i < rayCount; i ++ ) {
@@ -215,8 +218,9 @@
 
 					sphereInstance.setMatrixAt( i * 2, matrix );
 
+					target.set( 0, 0, 0 );
 					raycaster.ray.origin.copy( position );
-					raycaster.ray.direction.copy( position ).multiplyScalar( - 1 ).normalize();
+					raycaster.ray.direction.subVectors( target, position );
 
 					const hits = raycaster.intersectObject( mesh );
 					if ( hits.length !== 0 ) {
@@ -234,7 +238,7 @@
 
 						sphereInstance.setMatrixAt( i * 2 + 1, matrix );
 						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, position.x, position.y, position.z );
-						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, 0, 0, 0 );
+						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, target.x, target.y, target.z );
 
 					}
 					
@@ -275,6 +279,12 @@
 				if ( helper ) {
 
 					helper.visible = params.displayHelper;
+
+				}
+
+				if ( mesh ) {
+
+					mesh.rotation.y += 0.006;
 
 				}
 
