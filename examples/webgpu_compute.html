@@ -90,7 +90,7 @@
 
 				// create wgsl function
 
-				const WGSLFnNode = func( `( pointer:vec2<f32>, limit:vec2<f32> ) -> vec3<f32> {
+				const WGSLFnNode = func( `( particle:vec3<f32>, pointer:vec2<f32>, limit:vec2<f32> ) -> vec3<f32> {
 
 						var position = particle + velocity;
 
@@ -146,13 +146,14 @@
 				` );
 
 				// define particle and velocity keywords in wgsl function
+				// it's used in case of needed change a global variable like this storageBuffer
 
-				WGSLFnNode.keywords[ 'particle' ] = element( particleBufferNode, instanceIndex );
 				WGSLFnNode.keywords[ 'velocity' ] = element( velocityBufferNode, instanceIndex );
 
 				// create a call function node
 
 				const WGSLFnCallNode = WGSLFnNode.call( {
+					particle: element( particleBufferNode, instanceIndex ),
 					pointer: uniform( pointer ),
 					limit: uniform( scaleVector )
 				} );
