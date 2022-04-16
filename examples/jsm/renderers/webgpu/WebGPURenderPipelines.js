@@ -24,13 +24,14 @@ class WebGPURenderPipelines {
 	get( object ) {
 
 		const device = this.device;
-		const material = object.material;
 
 		const cache = this._getCache( object );
 
 		let currentPipeline;
 
 		if ( this._needsUpdate( object, cache ) ) {
+
+			const material = object.material;
 
 			// release previous cache
 

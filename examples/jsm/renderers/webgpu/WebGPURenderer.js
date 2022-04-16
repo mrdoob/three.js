@@ -186,7 +186,7 @@ class WebGPURenderer {
 		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
 		this._nodes = new WebGPUNodes( this, this._properties );
-		this._computePipelines = new WebGPUComputePipelines( device );
+		this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
 		this._renderPipelines = new WebGPURenderPipelines( this, device, parameters.sampleCount, this._nodes );
 		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
@@ -611,26 +611,30 @@ class WebGPURenderer {
 
 	}
 
-	compute( computeParams ) {
+	compute( ...computeNodes ) {
 
 		const device = this._device;
 		const cmdEncoder = device.createCommandEncoder( {} );
 		const passEncoder = cmdEncoder.beginComputePass();
 
-		for ( const param of computeParams ) {
+		for ( const computeNode of computeNodes ) {
 
 			// pipeline
 
-			const pipeline = this._computePipelines.get( param );
+			const pipeline = this._computePipelines.get( computeNode );
 			passEncoder.setPipeline( pipeline );
+
+			// node
+
+			//this._nodes.update( computeNode );
 
 			// bind group
 
-			const bindGroup = this._bindings.getForCompute( param ).group;
-			this._bindings.update( param );
+			const bindGroup = this._bindings.get( computeNode ).group;
+			this._bindings.update( computeNode );
 			passEncoder.setBindGroup( 0, bindGroup );
 
-			passEncoder.dispatch( param.num );
+			passEncoder.dispatch( computeNode.dispatchCount );
 
 		}
 
