@@ -101,5 +101,5 @@
 	"misc_controls_orbit": [ "rotation" ],
 	"misc_controls_trackball": [ "rotation" ],
 	"misc_controls_transform": [ "scale", "rotate", "translate" ],
-	"external_bvh_raycasting": [ "three-mesh-bvh", "query", "bounds", "tree", "raycasting", "acceleration", "performance" ]
+	"external_bvh_raycasting": [ "three-mesh-bvh", "query", "bounds", "tree", "raycasting", "accelerate", "performance" ]
 }
