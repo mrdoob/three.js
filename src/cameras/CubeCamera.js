@@ -1,4 +1,4 @@
-import { LinearEncoding, NoToneMapping } from '../constants.js';
+import { NoToneMapping } from '../constants.js';
 import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
@@ -73,7 +73,7 @@ class CubeCamera extends Object3D {
 		const currentOutputEncoding = renderer.outputEncoding;
 		const currentToneMapping = renderer.toneMapping;
 		const currentXrEnabled = renderer.xr.enabled;
-		
+
 		renderer.toneMapping = NoToneMapping;
 		renderer.xr.enabled = false;
 
