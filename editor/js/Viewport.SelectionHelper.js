@@ -11,7 +11,7 @@ class SelectionHelper {
 
 		// signals
 
-		signals.intersects.add( ( intersects ) => {
+		signals.intersectionsDetected.add( ( intersects ) => {
 
 			if ( intersects.length > 0 ) {
 

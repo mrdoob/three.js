@@ -87,7 +87,7 @@ function Editor() {
 
 		viewportCameraChanged: new Signal(),
 
-		intersects: new Signal(),
+		intersectionsDetected: new Signal(),
 
 	};
 

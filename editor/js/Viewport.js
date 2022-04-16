@@ -207,7 +207,7 @@ function Viewport( editor ) {
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			const intersects = getIntersects( onUpPosition );
-			signals.intersects.dispatch( intersects );
+			signals.intersectionsDetected.dispatch( intersects );
 
 			render();
 
