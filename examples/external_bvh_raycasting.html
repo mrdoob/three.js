@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube refraction [Lucy]</title>
+		<title>three-mesh-bvh external - bvh - raycasting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -31,7 +31,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh/build/index.module.js"
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.10/build/index.module.js"
 				}
 			}
 		</script>
@@ -92,7 +92,7 @@
 				scene.add( ambient );
 
 				// renderer
-				renderer = new THREE.WebGLRenderer( { antialias: true });
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
