@@ -650,7 +650,7 @@ class GLTFMaterialsUnlitExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/blob/5768b3ce0ef32bc39cdf1bef10b948586635ead3/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md
  */
- class GLTFMaterialsEmissiveStrengthExtension {
+class GLTFMaterialsEmissiveStrengthExtension {
 
 	constructor( parser ) {
 
@@ -670,8 +670,8 @@ class GLTFMaterialsUnlitExtension {
 
 		}
 
-		const emissiveStrength = materialDef.extensions[this.name].emissiveStrength;
-		
+		const emissiveStrength = materialDef.extensions[ this.name ].emissiveStrength;
+
 		if ( emissiveStrength !== undefined ) {
 
 			materialParams.emissiveIntensity = emissiveStrength;
@@ -2315,7 +2315,7 @@ class GLTFParser {
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		if ( typeof createImageBitmap !== 'undefined' && /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === false ) {
+		if ( typeof createImageBitmap !== 'undefined' && /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === false && navigator.userAgent.match( /Firefox\/([0-9]+)\./ )?.[ 1 ] < 98 === false ) {
 
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
 
@@ -2627,9 +2627,9 @@ class GLTFParser {
 
 				case 'animation':
 					dependency = this._invokeOne( function ( ext ) {
-		
+
 						return ext.loadAnimation && ext.loadAnimation( index );
-		
+
 					} );
 					break;
 
