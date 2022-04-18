@@ -483,6 +483,8 @@ class Material extends EventDispatcher {
 
 }
 
+Material.r115Compatible = false;
+
 Material.prototype.isMaterial = true;
 
 export { Material };

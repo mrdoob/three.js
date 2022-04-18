@@ -61,6 +61,12 @@ class MeshStandardMaterial extends Material {
 
 		this.defines = { 'STANDARD': '' };
 
+		if ( Material.r115Compatible ) {
+
+			this.defines[ 'MULTISCATTERRING_R115_COMPATABILITY' ] = '';
+
+		}
+
 		this.type = 'MeshStandardMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
@@ -137,7 +143,7 @@ class MeshStandardMaterial extends Material {
 
 		super.copy( source );
 
-		this.defines = { 'STANDARD': '' };
+		this.defines = source.defines;
 
 		this.color.copy( source.color );
 		this.roughness = source.roughness;

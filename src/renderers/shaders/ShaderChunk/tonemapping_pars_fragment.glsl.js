@@ -73,5 +73,10 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
 
 }
 
-vec3 CustomToneMapping( vec3 color ) { return color; }
+// This is the ACESFilmicToneMapping in three.js r115.
+// It's modified in https://github.com/mrdoob/three.js/pull/19621 and https://github.com/mrdoob/three.js/pull/19696.
+vec3 CustomToneMapping( vec3 color ) {
+	color *= toneMappingExposure;
+	return saturate( ( color * ( 2.51 * color + 0.03 ) ) / ( color * ( 2.43 * color + 0.59 ) + 0.14 ) );
+}
 `;

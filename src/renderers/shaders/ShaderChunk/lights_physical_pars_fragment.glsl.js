@@ -84,7 +84,21 @@ void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const 
 
 	vec2 fab = DFGApprox( normal, viewDir, roughness );
 
+#ifdef MULTISCATTERRING_R115_COMPATABILITY
+
+	// This is a PBR shader snippet in three.js r115. It's fixed in https://github.com/mrdoob/three.js/pull/22308.
+	// We keep it here for backward compatability.
+	float dotNV = saturate( dot( normal, viewDir ) );
+	float fresnel = exp2( ( -5.55473 * dotNV - 6.98316 ) * dotNV );
+	vec3 Fr = max( vec3( 1.0 - roughness ), specularColor ) - specularColor;
+	vec3 F = f90_r115_compatability * Fr * fresnel + specularColor;
+	vec3 FssEss = F * fab.x + specularF90 * fab.y;
+
+#else
+
 	vec3 FssEss = specularColor * fab.x + specularF90 * fab.y;
+
+#endif
 
 	float Ess = fab.x + fab.y;
 	float Ems = 1.0 - Ess;

@@ -42,12 +42,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		super();
 
-		this.defines = {
-
-			'STANDARD': '',
-			'PHYSICAL': ''
-
-		};
+		this.defines[ 'PHYSICAL' ] = '';
 
 		this.type = 'MeshPhysicalMaterial';
 
@@ -155,12 +150,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		super.copy( source );
 
-		this.defines = {
-
-			'STANDARD': '',
-			'PHYSICAL': ''
-
-		};
+		this.defines = source.defines;
 
 		this.clearcoat = source.clearcoat;
 		this.clearcoatMap = source.clearcoatMap;
