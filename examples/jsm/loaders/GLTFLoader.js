@@ -2317,7 +2317,7 @@ class GLTFParser {
 		// expensive work of uploading a texture to the GPU off the main thread.
 
 		const isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === true;
-		const isFirefox = navigator.userAgent.toLowerCase().indexOf( 'firefox' ) > - 1;
+		const isFirefox = navigator.userAgent.indexOf( 'Firefox' ) > - 1;
 		const firefoxVersion = isFirefox ? navigator.userAgent.match( /Firefox\/([0-9]+)\./ )[ 1 ] : - 1;
 
 		if ( typeof createImageBitmap === 'undefined' || isSafari || ( isFirefox && firefoxVersion < 98 ) ) {
