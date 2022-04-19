@@ -2315,13 +2315,19 @@ class GLTFParser {
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		if ( typeof createImageBitmap !== 'undefined' && /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === false && navigator.userAgent.match( /Firefox\/([0-9]+)\./ )?.[ 1 ] < 98 === false ) {
 
-			this.textureLoader = new ImageBitmapLoader( this.options.manager );
+		const isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === true;
+		const isFirefox = navigator.userAgent.toLowerCase().indexOf( 'firefox' ) > - 1;
+		const firefoxVersion = isFirefox ? navigator.userAgent.match( /Firefox\/([0-9]+)\./ )[ 1 ] : - 1;
+
+		if ( typeof createImageBitmap === 'undefined' || isSafari || ( isFirefox && firefoxVersion < 98 ) ) {
+
+			this.textureLoader = new TextureLoader( this.options.manager );
 
 		} else {
 
-			this.textureLoader = new TextureLoader( this.options.manager );
+			console.log( true );
+			this.textureLoader = new ImageBitmapLoader( this.options.manager );
 
 		}
 
