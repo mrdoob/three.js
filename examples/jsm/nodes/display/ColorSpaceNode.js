@@ -77,7 +77,7 @@ class ColorSpaceNode extends TempNode {
 
 			const encodingFunctionNode = EncodingLib[ method ];
 
-			return encodingFunctionNode( {
+			return encodingFunctionNode.call( {
 				value: node
 			} ).build( builder, type );
 

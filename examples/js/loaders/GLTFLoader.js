@@ -46,6 +46,11 @@
 			} );
 			this.register( function ( parser ) {
 
+				return new GLTFMaterialsEmissiveStrengthExtension( parser );
+
+			} );
+			this.register( function ( parser ) {
+
 				return new GLTFMaterialsSpecularExtension( parser );
 
 			} );
@@ -360,6 +365,7 @@
 		KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
+		KHR_MATERIALS_EMISSIVE_STRENGTH: 'KHR_materials_emissive_strength',
 		EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 		EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression'
 	};
@@ -525,6 +531,46 @@
 			}
 
 			return Promise.all( pending );
+
+		}
+
+	}
+	/**
+ * Materials Emissive Strength Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/blob/5768b3ce0ef32bc39cdf1bef10b948586635ead3/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md
+ */
+
+
+	class GLTFMaterialsEmissiveStrengthExtension {
+
+		constructor( parser ) {
+
+			this.parser = parser;
+			this.name = EXTENSIONS.KHR_MATERIALS_EMISSIVE_STRENGTH;
+
+		}
+
+		extendMaterialParams( materialIndex, materialParams ) {
+
+			const parser = this.parser;
+			const materialDef = parser.json.materials[ materialIndex ];
+
+			if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+				return Promise.resolve();
+
+			}
+
+			const emissiveStrength = materialDef.extensions[ this.name ].emissiveStrength;
+
+			if ( emissiveStrength !== undefined ) {
+
+				materialParams.emissiveIntensity = emissiveStrength;
+
+			}
+
+			return Promise.resolve();
 
 		}
 
@@ -989,7 +1035,7 @@
 
 			return this.detectSupport().then( function ( isSupported ) {
 
-				if ( isSupported ) return parser.loadTextureImage( textureIndex, source, loader );
+				if ( isSupported ) return parser.loadTextureImage( textureIndex, extension.source, loader );
 
 				if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
 
@@ -1521,7 +1567,7 @@
 			material.aoMap = materialParams.aoMap === undefined ? null : materialParams.aoMap;
 			material.aoMapIntensity = 1.0;
 			material.emissive = materialParams.emissive;
-			material.emissiveIntensity = 1.0;
+			material.emissiveIntensity = materialParams.emissiveIntensity === undefined ? 1.0 : materialParams.emissiveIntensity;
 			material.emissiveMap = materialParams.emissiveMap === undefined ? null : materialParams.emissiveMap;
 			material.bumpMap = materialParams.bumpMap === undefined ? null : materialParams.bumpMap;
 			material.bumpScale = 1;
@@ -2317,7 +2363,11 @@
 						break;
 
 					case 'animation':
-						dependency = this.loadAnimation( index );
+						dependency = this._invokeOne( function ( ext ) {
+
+							return ext.loadAnimation && ext.loadAnimation( index );
+
+						} );
 						break;
 
 					case 'camera':

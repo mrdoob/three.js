@@ -82,16 +82,19 @@
 			// Lights
 
 			const topLight = new THREE.PointLight( 0xF4F6F0, 1 );
-			topLight.position.set( 0, 100000, 100000 );
+			topLight.position.set( 0, 1000, 1000 );
 			scene.add( topLight );
 
-			const backLight = new THREE.PointLight( 0x0c1445, 1.4 );
+			const backLight = new THREE.PointLight( 0x0c1445, 1 );
 			backLight.position.set( - 100, 20, - 260 );
 			scene.add( backLight );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			document.body.appendChild( renderer.domElement );
 			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.toneMapping = THREE.LinearToneMapping;
+			renderer.toneMappingExposure = 4000;
+			renderer.physicallyCorrectLights = true;
 
 			renderer.domElement.className = 'renderer';
 

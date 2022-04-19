@@ -12,7 +12,7 @@ export const shaderStages = [ 'fragment', 'vertex' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
 const toFloat = ( value ) => {
-	
+
 	value = Number( value );
 
 	return value + ( value % 1 ? '' : '.0' );
@@ -142,6 +142,18 @@ class NodeBuilder {
 
 	}
 
+	isAvailable( /*name*/ ) {
+
+		return false;
+
+	}
+
+	getInstanceIndex( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	getTexture( /* textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
@@ -192,6 +204,10 @@ class NodeBuilder {
 		} else if ( typeLength === 4 ) {
 
 			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
+
+		} else if ( typeLength > 4 ) {
+
+			return `${ this.getType( type ) }()`;
 
 		}
 
@@ -257,7 +273,7 @@ class NodeBuilder {
 
 	isReference( type ) {
 
-		return type === 'void' || type === 'property' || type === 'sampler';
+		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture';
 
 	}
 
@@ -320,6 +336,8 @@ class NodeBuilder {
 		if ( type === 2 ) return 'vec2';
 		if ( type === 3 ) return 'vec3';
 		if ( type === 4 ) return 'vec4';
+		if ( type === 9 ) return 'mat3';
+		if ( type === 16 ) return 'mat4';
 
 		return 0;
 
@@ -332,6 +350,8 @@ class NodeBuilder {
 
 		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
 		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) return 1;
+		if ( /mat3/.test( type ) === true ) return 9;
+		if ( /mat4/.test( type ) === true ) return 16;
 
 		return 0;
 
@@ -660,18 +680,17 @@ class NodeBuilder {
 		const fromTypeLength = this.getTypeLength( fromType );
 		const toTypeLength = this.getTypeLength( toType );
 
-		if ( fromTypeLength === 0 ) { // fromType is matrix-like
+		if ( fromTypeLength > 4 ) { // fromType is matrix-like
 
-			const vectorType = this.getVectorFromMatrix( fromType );
+			// @TODO: ignore for now
 
-			return this.format( `( ${ snippet } * ${ this.getType( vectorType ) }( 1.0 ) )`, vectorType, toType );
+			return snippet;
 
 		}
 
-		if ( toTypeLength === 0 ) { // toType is matrix-like
+		if ( toTypeLength > 4 ) { // toType is matrix-like
 
-			// ignore for now
-			//return `${ this.getType( toType ) }( ${ snippet } )`;
+			// @TODO: ignore for now
 
 			return snippet;
 

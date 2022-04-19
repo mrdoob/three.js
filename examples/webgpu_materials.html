@@ -141,7 +141,7 @@
 				} );
 
 				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = desaturateShaderNode( { color: new Nodes.TextureNode( texture ) } );
+				material.colorNode = desaturateShaderNode.call( { color: new Nodes.TextureNode( texture ) } );
 				materials.push( material );
 
 				// Custom WGSL ( desaturate filter )

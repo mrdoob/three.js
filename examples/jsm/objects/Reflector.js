@@ -18,6 +18,7 @@ class Reflector extends Mesh {
 		super( geometry );
 
 		this.type = 'Reflector';
+		this.camera = new PerspectiveCamera();
 
 		const scope = this;
 
@@ -43,7 +44,7 @@ class Reflector extends Mesh {
 		const q = new Vector4();
 
 		const textureMatrix = new Matrix4();
-		const virtualCamera = new PerspectiveCamera();
+		const virtualCamera = this.camera;
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample } );
 
@@ -252,6 +253,8 @@ Reflector.ReflectorShader = {
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <encodings_fragment>
 
 		}`
 };

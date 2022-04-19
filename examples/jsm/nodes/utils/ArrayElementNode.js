@@ -1,6 +1,6 @@
-import Node from '../core/Node.js';
+import TempNode from '../core/Node.js';
 
-class ArrayElementNode extends Node {
+class ArrayElementNode extends TempNode {
 
 	constructor( node, indexNode ) {
 
@@ -20,7 +20,7 @@ class ArrayElementNode extends Node {
 	generate( builder ) {
 
 		const nodeSnippet = this.node.build( builder );
-		const indexSnippet = this.indexNode.build( builder, 'int' );
+		const indexSnippet = this.indexNode.build( builder, 'uint' );
 
 		return `${nodeSnippet}[ ${indexSnippet} ]`;
 

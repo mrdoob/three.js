@@ -389,6 +389,15 @@ class FBXTreeParser {
 
 		}
 
+		if ( 'Translation' in textureNode ) {
+
+			const values = textureNode.Translation.value;
+
+			texture.offset.x = values[ 0 ];
+			texture.offset.y = values[ 1 ];
+
+		}
+
 		return texture;
 
 	}
