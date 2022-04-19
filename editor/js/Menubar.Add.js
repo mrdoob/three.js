@@ -55,6 +55,23 @@ function MenubarAdd( editor ) {
 	} );
 	options.add( option );
 
+	// Capsule
+
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/capsule' ) );
+	option.onClick( function () {
+
+		const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 );
+		const material = new THREE.MeshStandardMaterial();
+		const mesh = new THREE.Mesh( geometry, material );
+		mesh.name = 'Capsule';
+
+		editor.execute( new AddObjectCommand( editor, mesh ) );
+
+	} );
+	options.add( option );
+
 	// Circle
 
 	option = new UIRow();
