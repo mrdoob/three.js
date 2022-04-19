@@ -2326,7 +2326,6 @@ class GLTFParser {
 
 		} else {
 
-			console.log( true );
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
 
 		}
