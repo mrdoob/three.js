@@ -835,20 +835,6 @@ function PureArrayUniform( id, activeInfo, addr ) {
 
 }
 
-PureArrayUniform.prototype.updateCache = function ( data ) {
-
-	const cache = this.cache;
-
-	if ( data instanceof Float32Array && cache.length !== data.length ) {
-
-		this.cache = new Float32Array( data.length );
-
-	}
-
-	copyArray( cache, data );
-
-};
-
 function StructuredUniform( id ) {
 
 	this.id = id;
