@@ -9214,7 +9214,6 @@
 			const currentOutputEncoding = renderer.outputEncoding;
 			const currentToneMapping = renderer.toneMapping;
 			const currentXrEnabled = renderer.xr.enabled;
-			renderer.outputEncoding = LinearEncoding;
 			renderer.toneMapping = NoToneMapping;
 			renderer.xr.enabled = false;
 			const generateMipmaps = renderTarget.texture.generateMipmaps;
@@ -13785,16 +13784,6 @@
 		this.setValue = getPureArraySetter(activeInfo.type); // this.path = activeInfo.name; // DEBUG
 	}
 
-	PureArrayUniform.prototype.updateCache = function (data) {
-		const cache = this.cache;
-
-		if (data instanceof Float32Array && cache.length !== data.length) {
-			this.cache = new Float32Array(data.length);
-		}
-
-		copyArray(cache, data);
-	};
-
 	function StructuredUniform(id) {
 		this.id = id;
 		this.seq = [];
@@ -18305,6 +18294,7 @@
 			let framebufferScaleFactor = 1.0;
 			let referenceSpace = null;
 			let referenceSpaceType = 'local-floor';
+			let customReferenceSpace = null;
 			let pose = null;
 			let glBinding = null;
 			let glProjLayer = null;
@@ -18417,7 +18407,11 @@
 			};
 
 			this.getReferenceSpace = function () {
-				return referenceSpace;
+				return customReferenceSpace || referenceSpace;
+			};
+
+			this.setReferenceSpace = function (space) {
+				customReferenceSpace = space;
 			};
 
 			this.getBaseLayer = function () {
@@ -18690,7 +18684,7 @@
 			let onAnimationFrameCallback = null;
 
 			function onAnimationFrame(time, frame) {
-				pose = frame.getViewerPose(referenceSpace);
+				pose = frame.getViewerPose(customReferenceSpace || referenceSpace);
 				xrFrame = frame;
 
 				if (pose !== null) {
@@ -18747,7 +18741,7 @@
 					const controller = inputSourcesMap.get(inputSource);
 
 					if (controller !== undefined) {
-						controller.update(inputSource, frame, referenceSpace);
+						controller.update(inputSource, frame, customReferenceSpace || referenceSpace);
 					}
 				}
 

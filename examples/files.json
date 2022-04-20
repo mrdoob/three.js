@@ -349,6 +349,7 @@
 		"webxr_vr_rollercoaster",
 		"webxr_vr_sandbox",
 		"webxr_vr_sculpt",
+		"webxr_vr_teleport",
 		"webxr_vr_video"
 	],
 	"games": [
