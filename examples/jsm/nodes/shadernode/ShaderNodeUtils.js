@@ -11,7 +11,7 @@ const shaderNodeHandler = {
 
 		const inputs = params.shift();
 
-		return NodeClosure( new ShaderNodeObjects( inputs ), ...params );
+		return NodeClosure( nodeObjects( inputs ), ...params );
 
 	},
 
@@ -29,13 +29,13 @@ const shaderNodeHandler = {
 					.replace( /b|p/g, 'z' )
 					.replace( /a|q/g, 'w' );
 
-				return new ShaderNodeObject( new SplitNode( node, prop ) );
+				return nodeObject( new SplitNode( node, prop ) );
 
 			} else if ( /^\d+$/.test( prop ) === true ) {
 
 				// accessing array
 
-				return new ShaderNodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+				return nodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
 
 			}
 
@@ -55,7 +55,7 @@ const ShaderNodeObject = function ( obj ) {
 
 	if ( ( type === 'number' ) || ( type === 'boolean' ) ) {
 
-		return new ShaderNodeObject( getAutoTypedConstNode( obj ) );
+		return nodeObject( getAutoTypedConstNode( obj ) );
 
 	} else if ( type === 'object' ) {
 
@@ -85,7 +85,7 @@ const ShaderNodeObjects = function ( objects ) {
 
 	for ( const name in objects ) {
 
-		objects[ name ] = new ShaderNodeObject( objects[ name ] );
+		objects[ name ] = nodeObject( objects[ name ] );
 
 	}
 
@@ -99,7 +99,7 @@ const ShaderNodeArray = function ( array ) {
 
 	for ( let i = 0; i < len; i ++ ) {
 
-		array[ i ] = new ShaderNodeObject( array[ i ] );
+		array[ i ] = nodeObject( array[ i ] );
 
 	}
 
@@ -113,7 +113,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return new ShaderNodeObject( new NodeClass( ...( new ShaderNodeArray( params ) ) ) );
+			return nodeObject( new NodeClass( ...( nodeArray( params ) ) ) );
 
 		};
 
@@ -121,17 +121,17 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return new ShaderNodeObject( new NodeClass( scope, ...( new ShaderNodeArray( params ) ) ) );
+			return nodeObject( new NodeClass( scope, ...( nodeArray( params ) ) ) );
 
 		};
 
 	} else {
 
-		factor = new ShaderNodeObject( factor );
+		factor = nodeObject( factor );
 
 		return ( ...params ) => {
 
-			return new ShaderNodeObject( new NodeClass( scope, ...( new ShaderNodeArray( params ) ), factor ) );
+			return nodeObject( new NodeClass( scope, ...( nodeArray( params ) ), factor ) );
 
 		};
 
@@ -141,7 +141,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
-	return new ShaderNodeObject( new NodeClass( ...( new ShaderNodeArray( params ) ) ) );
+	return nodeObject( new NodeClass( ...( nodeArray( params ) ) ) );
 
 };
 
@@ -149,9 +149,9 @@ const ShaderNodeScript = function ( jsFunc ) {
 
 	return { call: ( inputs, builder ) => {
 
-		inputs = new ShaderNodeObjects( inputs );
+		inputs = nodeObjects( inputs );
 
-		return new ShaderNodeObject( jsFunc( inputs, builder ) );
+		return nodeObject( jsFunc( inputs, builder ) );
 
 	} };
 
@@ -159,7 +159,7 @@ const ShaderNodeScript = function ( jsFunc ) {
 
 export const ShaderNode = new Proxy( ShaderNodeScript, shaderNodeHandler );
 
-export const nodeObject = ( val ) => new ShaderNodeObject( val );
+export const nodeObject = ( val ) => /* new */ ShaderNodeObject( val );
 export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
 export const nodeArray = ( val ) => new ShaderNodeArray( val );
 export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
