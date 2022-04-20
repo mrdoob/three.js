@@ -11,9 +11,6 @@ import ToneMappingNode from '../display/ToneMappingNode.js';
 
 // lights
 import LightContextNode from '../lights/LightContextNode.js';
-import LightNode from '../lights/LightNode.js';
-import LightsNode from '../lights/LightsNode.js';
-import ReflectedLightNode from '../lights/ReflectedLightNode.js';
 
 // utils
 import MatcapUVNode from '../utils/MatcapUVNode.js';
@@ -75,9 +72,8 @@ export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneM
 // lights
 
 export const lightContext = nodeProxy( LightContextNode );
-export const light = nodeProxy( LightNode );
-export const fromLights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
-export const reflectedLight = nodeProxy( ReflectedLightNode );
+
+// utils
 
 export const matcapUV = nodeImmutable( MatcapUVNode );
 export const maxMipLevel = nodeProxy( MaxMipLevelNode );
