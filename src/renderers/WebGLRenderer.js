@@ -1496,7 +1496,7 @@ function WebGLRenderer( parameters = {} ) {
 
 				needsProgramChange = true;
 
-			} else if ( object.isSkinnedMesh && materialProperties.maxBones < programCache.getMaxBones(object)) {
+			} else if ( object.isSkinnedMesh && materialProperties.maxBones < programCache.getMaxBones( object ) ) {
 
 				needsProgramChange = true;
 
