@@ -113,7 +113,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return nodeObject( new NodeClass( ...( nodeArray( params ) ) ) );
+			return nodeObject( new NodeClass( ...nodeArray( params ) ) );
 
 		};
 
@@ -121,7 +121,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return nodeObject( new NodeClass( scope, ...( nodeArray( params ) ) ) );
+			return nodeObject( new NodeClass( scope, ...nodeArray( params ) ) );
 
 		};
 
@@ -131,7 +131,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 		return ( ...params ) => {
 
-			return nodeObject( new NodeClass( scope, ...( nodeArray( params ) ), factor ) );
+			return nodeObject( new NodeClass( scope, ...nodeArray( params ), factor ) );
 
 		};
 
@@ -141,7 +141,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
-	return nodeObject( new NodeClass( ...( nodeArray( params ) ) ) );
+	return nodeObject( new NodeClass( ...nodeArray( params ) ) );
 
 };
 
