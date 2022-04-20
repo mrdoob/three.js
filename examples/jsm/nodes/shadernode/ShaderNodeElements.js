@@ -1,4 +1,5 @@
 // accessors
+import CubeTextureNode from '../accessors/CubeTextureNode.js';
 import InstanceNode from '../accessors/InstanceNode.js';
 import ReflectNode from '../accessors/ReflectNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
@@ -55,6 +56,8 @@ export { default as getRoughness } from '../functions/material/getRoughness.js';
 export { default as PhysicalLightingModel } from '../functions/PhysicalLightingModel.js';
 
 // accessors
+
+export const cubeTexture = nodeProxy( CubeTextureNode );
 
 export const instance = nodeProxy( InstanceNode );
 

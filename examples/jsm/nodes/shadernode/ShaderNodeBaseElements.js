@@ -16,7 +16,6 @@ import VaryNode from '../core/VaryNode.js';
 // accessors
 import BufferNode from '../accessors/BufferNode.js';
 import CameraNode from '../accessors/CameraNode.js';
-import CubeTextureNode from '../accessors/CubeTextureNode.js';
 import MaterialNode from '../accessors/MaterialNode.js';
 import MaterialReferenceNode from '../accessors/MaterialReferenceNode.js';
 import ModelViewProjectionNode from '../accessors/ModelViewProjectionNode.js';
@@ -125,12 +124,6 @@ export const cameraNormalMatrix = nodeImmutable( CameraNode, CameraNode.NORMAL_M
 export const cameraWorldMatrix = nodeImmutable( CameraNode, CameraNode.WORLD_MATRIX );
 export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
 
-export const cubeTexture = nodeProxy( CubeTextureNode );
-export const texture = nodeProxy( TextureNode );
-export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), 'sampler' ) );
-export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
-export const pointUV = nodeImmutable( PointUVNode );
-
 export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
 export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
@@ -166,6 +159,11 @@ export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );
 export const positionWorld = nodeImmutable( PositionNode, PositionNode.WORLD );
 export const positionView = nodeImmutable( PositionNode, PositionNode.VIEW );
 export const positionViewDirection = nodeImmutable( PositionNode, PositionNode.VIEW_DIRECTION );
+
+export const texture = nodeProxy( TextureNode );
+export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), 'sampler' ) );
+export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
+export const pointUV = nodeImmutable( PointUVNode );
 
 // math
 
