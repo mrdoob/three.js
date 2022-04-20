@@ -1,6 +1,5 @@
 import TempNode from '../core/Node.js';
-import ShaderNode from '../shadernode/ShaderNode.js';
-import { mul, float } from '../shadernode/ShaderNodeElements.js';
+import { ShaderNode, mul, float } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { LinearToneMapping } from 'three';
 

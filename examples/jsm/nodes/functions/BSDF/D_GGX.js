@@ -1,5 +1,4 @@
-import ShaderNode from '../../shadernode/ShaderNode.js';
-import { add, sub, mul, div, pow2 } from '../../shadernode/ShaderNodeElements.js';
+import { ShaderNode, add, sub, mul, div, pow2 } from '../../shadernode/ShaderNodeBaseElements.js';
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html

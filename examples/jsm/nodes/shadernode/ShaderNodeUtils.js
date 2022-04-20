@@ -5,7 +5,7 @@ import SplitNode from '../utils/SplitNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType } from '../core/NodeUtils.js';
 
-export const shaderNodeHandler = {
+const shaderNodeHandler = {
 
 	construct( NodeClosure, params ) {
 
@@ -145,7 +145,7 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
-export const ShaderNodeScript = function ( jsFunc ) {
+const ShaderNodeScript = function ( jsFunc ) {
 
 	return { call: ( inputs, builder ) => {
 
@@ -156,6 +156,8 @@ export const ShaderNodeScript = function ( jsFunc ) {
 	} };
 
 };
+
+export const ShaderNode = new Proxy( ShaderNodeScript, shaderNodeHandler );
 
 export const nodeObject = ( val ) => new ShaderNodeObject( val );
 export const nodeObjects = ( val ) => new ShaderNodeObjects( val );

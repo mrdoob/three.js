@@ -8,10 +8,11 @@ import {
 	element,
 	dot,
 	div,
+	temp,
 	instanceIndex,
 	positionLocal,
 	normalLocal
-} from '../shadernode/ShaderNodeElements.js';
+} from '../shadernode/ShaderNodeBaseElements.js';
 
 class InstanceNode extends Node {
 
@@ -25,7 +26,7 @@ class InstanceNode extends Node {
 
 		const instanceBufferNode = buffer( instanceMesh.instanceMatrix.array, 'mat4', instanceMesh.count );
 
-		this.instanceMatrixNode = element( instanceBufferNode, instanceIndex );
+		this.instanceMatrixNode = temp( element( instanceBufferNode, instanceIndex ) ); // @TODO: a possible caching issue here?
 
 	}
 
