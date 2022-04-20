@@ -561,6 +561,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		acquireProgram: acquireProgram,
 		releaseProgram: releaseProgram,
 		releaseShaderCache: releaseShaderCache,
+		// Exposed for maxBone calculation during determing `needsProgramChange` in renderer
+		getMaxBones: getMaxBones,
 		// Exposed for resource monitoring & error feedback via renderer.info:
 		programs: programs,
 		dispose: dispose
