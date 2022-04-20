@@ -98,7 +98,3 @@ export const checker = nodeProxy( CheckerNode );
 
 export const fog = nodeProxy( FogNode );
 export const rangeFog = nodeProxy( FogRangeNode );
-
-// miscellaneous
-
-export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );

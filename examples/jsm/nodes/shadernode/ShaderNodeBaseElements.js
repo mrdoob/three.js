@@ -246,3 +246,7 @@ export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
 export const element = nodeProxy( ArrayElementNode );
 export const arrayElement = element;
+
+// miscellaneous
+
+export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
