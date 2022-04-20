@@ -1,5 +1,5 @@
 import ContextNode from '../core/ContextNode.js';
-import { reflectedLight } from '../shadernode/ShaderNodeElements.js';
+import { reflectedLight } from '../shadernode/ShaderNodeBaseElements.js';
 
 class LightContextNode extends ContextNode {
 

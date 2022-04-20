@@ -10,6 +10,8 @@ import NormalMapNode from '../display/NormalMapNode.js';
 import ToneMappingNode from '../display/ToneMappingNode.js';
 
 // lights
+import LightNode from '../lights/LightNode.js';
+import LightsNode from '../lights/LightsNode.js';
 import LightContextNode from '../lights/LightContextNode.js';
 
 // utils
@@ -71,6 +73,8 @@ export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneM
 
 // lights
 
+export const light = nodeProxy( LightNode );
+export const fromLights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
 export const lightContext = nodeProxy( LightContextNode );
 
 // utils

@@ -33,8 +33,6 @@ import OperatorNode from '../math/OperatorNode.js';
 import CondNode from '../math/CondNode.js';
 
 // lights
-import LightNode from '../lights/LightNode.js';
-import LightsNode from '../lights/LightsNode.js';
 import ReflectedLightNode from '../lights/ReflectedLightNode.js';
 
 // utils
@@ -247,8 +245,6 @@ export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
 // lights
 
-export const light = nodeProxy( LightNode );
-export const fromLights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
 export const reflectedLight = nodeProxy( ReflectedLightNode );
 
 // utils
