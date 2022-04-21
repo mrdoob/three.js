@@ -82,9 +82,9 @@ export const bmat4 = new ConvertType( 'bmat4' );
 
 // @TODO: ArrayUniformNode
 
-export const func = ( nodeOrCode ) => {
+export const func = ( code ) => {
 
-	const node = nodeObject( new FunctionNode( nodeOrCode.code || nodeOrCode ) );
+	const node = nodeObject( new FunctionNode( code ) );
 
 	const call = node.call.bind( node );
 	node.call = ( params ) => nodeObject( call( params ) );
