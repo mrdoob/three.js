@@ -63,7 +63,9 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		const outgoingLightNode = super.generateLight( builder, { diffuseColorNode, lightNode, lightingModelNode: PhysicalLightingModel } );
 
-		// @TODO: add IBL code here
+		// TONE MAPPING
+
+		if ( renderer.toneMappingNode ) outgoingLightNode = context( renderer.toneMappingNode, { color: outgoingLightNode } );
 
 		return outgoingLightNode;
 
