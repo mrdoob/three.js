@@ -30,6 +30,7 @@ class WebXRManager extends EventDispatcher {
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
+		let customReferenceSpace = null;
 
 		let pose = null;
 		let glBinding = null;
@@ -187,7 +188,13 @@ class WebXRManager extends EventDispatcher {
 
 		this.getReferenceSpace = function () {
 
-			return referenceSpace;
+			return customReferenceSpace || referenceSpace;
+
+		};
+
+		this.setReferenceSpace = function ( space ) {
+
+			customReferenceSpace = space;
 
 		};
 
@@ -560,7 +567,7 @@ class WebXRManager extends EventDispatcher {
 
 		function onAnimationFrame( time, frame ) {
 
-			pose = frame.getViewerPose( referenceSpace );
+			pose = frame.getViewerPose( customReferenceSpace || referenceSpace );
 			xrFrame = frame;
 
 			if ( pose !== null ) {
@@ -647,7 +654,7 @@ class WebXRManager extends EventDispatcher {
 
 				if ( controller !== undefined ) {
 
-					controller.update( inputSource, frame, referenceSpace );
+					controller.update( inputSource, frame, customReferenceSpace || referenceSpace );
 
 				}
 
