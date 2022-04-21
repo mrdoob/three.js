@@ -1,5 +1,4 @@
 import Node from '../core/Node.js';
-import { assign, element, instanceIndex } from '../shadernode/ShaderNodeElements.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 class ComputeNode extends Node {
@@ -13,23 +12,7 @@ class ComputeNode extends Node {
 		this.dispatchCount = dispatchCount;
 		this.workgroupSize = workgroupSize;
 
-		this.assigns = [];
-
-	}
-
-	getMainStorageBufferNode() {
-
-		const assigns = this.assigns;
-
-		return assigns[ assigns.length - 1 ].storageBufferNode;
-
-	}
-
-	assign( storageBufferNode, sourceNode ) {
-
-		this.assigns.push( { storageBufferNode, sourceNode } );
-
-		return this;
+		this.computeNode = null;
 
 	}
 
@@ -41,13 +24,15 @@ class ComputeNode extends Node {
 
 	generate( builder ) {
 
-		const { renderer, shaderStage } = builder;
+		const { shaderStage } = builder;
 
 		if ( shaderStage === 'compute' ) {
 
-			for ( const { storageBufferNode, sourceNode } of this.assigns ) {
+			const snippet = this.computeNode.build( builder, 'void' );
 
-				assign( element( storageBufferNode, instanceIndex ), sourceNode ).build( builder );
+			if ( snippet !== '' ) {
+
+				builder.addFlowCode( snippet );
 
 			}
 

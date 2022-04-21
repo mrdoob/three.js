@@ -141,13 +141,28 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
 
 export const ShaderNodeScript = function ( jsFunc ) {
 
-	return { call: ( inputs, builder ) => {
+	//@TODO: Move this to Node extended class
 
-		inputs = new ShaderNodeObjects( inputs );
+	const self =
+	{
+		build: ( builder ) => {
 
-		return new ShaderNodeObject( jsFunc( inputs, builder ) );
+			self.call( {}, builder );
 
-	} };
+			return '';
+
+		},
+
+		call: ( inputs, builder ) => {
+
+			inputs = new ShaderNodeObjects( inputs );
+
+			return new ShaderNodeObject( jsFunc( inputs, builder ) );
+
+		}
+	};
+
+	return self;
 
 };
 

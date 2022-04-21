@@ -8,8 +8,16 @@ import { NodeUpdateType } from './constants.js';
 
 import { REVISION, LinearEncoding } from 'three';
 
-export const shaderStages = [ 'fragment', 'vertex' ];
+export const shaderStages = [ 'fragment', 'vertex', 'compute' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
+
+const typeFromLength = new Map();
+typeFromLength.set( 1, 'float' );
+typeFromLength.set( 2, 'vec2' );
+typeFromLength.set( 3, 'vec3' );
+typeFromLength.set( 4, 'vec4' );
+typeFromLength.set( 9, 'mat3' );
+typeFromLength.set( 16, 'mat4' );
 
 const toFloat = ( value ) => {
 
@@ -331,16 +339,9 @@ class NodeBuilder {
 
 	}
 
-	getTypeFromLength( type ) {
+	getTypeFromLength( length ) {
 
-		if ( type === 1 ) return 'float';
-		if ( type === 2 ) return 'vec2';
-		if ( type === 3 ) return 'vec3';
-		if ( type === 4 ) return 'vec4';
-		if ( type === 9 ) return 'mat3';
-		if ( type === 16 ) return 'mat4';
-
-		return 0;
+		return typeFromLength.get( length );
 
 	}
 
@@ -617,51 +618,9 @@ class NodeBuilder {
 
 	build() {
 
-		if ( this.material !== null ) {
+		// stage 1: analyze nodes to possible optimization and validation
 
-			// stage 1: analyze nodes to possible optimization and validation
-
-			for ( const shaderStage of shaderStages ) {
-
-				this.setShaderStage( shaderStage );
-
-				const flowNodes = this.flowNodes[ shaderStage ];
-
-				for ( const node of flowNodes ) {
-
-					node.analyze( this );
-
-				}
-
-			}
-
-			// stage 2: pre-build vertex code used in fragment shader
-
-			if ( this.context.vertex && this.context.vertex.isNode ) {
-
-				this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
-
-			}
-
-			// stage 3: generate shader
-
-			for ( const shaderStage of shaderStages ) {
-
-				this.setShaderStage( shaderStage );
-
-				const flowNodes = this.flowNodes[ shaderStage ];
-
-				for ( const node of flowNodes ) {
-
-					this.flowNode( node, shaderStage );
-
-				}
-
-			}
-
-		} else {
-
-			const shaderStage = 'compute';
+		for ( const shaderStage of shaderStages ) {
 
 			this.setShaderStage( shaderStage );
 
@@ -670,6 +629,28 @@ class NodeBuilder {
 			for ( const node of flowNodes ) {
 
 				node.analyze( this );
+
+			}
+
+		}
+
+		// stage 2: pre-build vertex code used in fragment shader
+
+		if ( this.context.vertex && this.context.vertex.isNode ) {
+
+			this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
+
+		}
+
+		// stage 3: generate shader
+
+		for ( const shaderStage of shaderStages ) {
+
+			this.setShaderStage( shaderStage );
+
+			const flowNodes = this.flowNodes[ shaderStage ];
+
+			for ( const node of flowNodes ) {
 
 				this.flowNode( node, shaderStage );
 

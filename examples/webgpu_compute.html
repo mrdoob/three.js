@@ -31,6 +31,7 @@
 			import {
 				compute,
 				color, add, uniform, element, storage, func,
+				assign, float, mul,
 				positionLocal, instanceIndex
 			} from 'three-nodes/Nodes.js';
 
@@ -90,7 +91,7 @@
 
 				// create wgsl function
 
-				const WGSLFnNode = func( `( particle:vec3<f32>, pointer:vec2<f32>, limit:vec2<f32> ) -> vec3<f32> {
+				const WGSLFnNode = func( `( pointer:vec2<f32>, limit:vec2<f32> ) {
 
 						var position = particle + velocity;
 
@@ -140,7 +141,7 @@
 
 						}
 
-						return position;
+						particle = position;
 
 					}
 				` );
@@ -148,22 +149,35 @@
 				// define particle and velocity keywords in wgsl function
 				// it's used in case of needed change a global variable like this storageBuffer
 
-				WGSLFnNode.keywords[ 'velocity' ] = element( velocityBufferNode, instanceIndex );
+				const particleNode = element( particleBufferNode, instanceIndex );
+				const velocityNode = element( velocityBufferNode, instanceIndex );
 
-				// create a call function node
-
-				const WGSLFnCallNode = WGSLFnNode.call( {
-					particle: element( particleBufferNode, instanceIndex ),
-					pointer: uniform( pointer ),
-					limit: uniform( scaleVector )
-				} );
+				WGSLFnNode.keywords[ 'particle' ] = particleNode;
+				WGSLFnNode.keywords[ 'velocity' ] = velocityNode;
 
 				// compute
 
 				computeNode = compute( particleNum );
 
-				// WGSLFnCallNode can be other kind of node, like a ShaderNode for example
-				computeNode.assign( particleBufferNode, WGSLFnCallNode );
+				// Example 1: Calling a WGSL function
+
+				computeNode.computeNode = WGSLFnNode.call( {
+					pointer: uniform( pointer ),
+					limit: uniform( scaleVector )
+				} );
+
+				// Example 2: Creating single storage assign
+
+				//computeNode.computeNode = assign( particleNode, add( particleNode, velocityNode ) );
+
+				// Example 3: Creating multiples storage assign
+
+				/*computeNode.computeNode = new Nodes.ShaderNode( ( {}, builder ) => {
+
+					assign( particleNode, add( particleNode, velocityNode ) ).build( builder );
+					assign( velocityNode, mul( velocityNode, float( 0.99 ) ) ).build( builder );
+
+				} );/**/
 
 				// use a compute shader to animate the point cloud's vertex data.
 
