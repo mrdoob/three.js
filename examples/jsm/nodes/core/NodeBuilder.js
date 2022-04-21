@@ -8,7 +8,8 @@ import { NodeUpdateType } from './constants.js';
 
 import { REVISION, LinearEncoding } from 'three';
 
-export const shaderStages = [ 'fragment', 'vertex', 'compute' ];
+export const defaultShaderStages = [ 'fragment', 'vertex' ];
+export const shaderStages = [ ...defaultShaderStages, 'compute' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
 const typeFromLength = new Map();
