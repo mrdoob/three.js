@@ -6,9 +6,11 @@ import UniformNode from '../core/UniformNode.js';
 import BypassNode from '../core/BypassNode.js';
 import InstanceIndexNode from '../core/InstanceIndexNode.js';
 import ContextNode from '../core/ContextNode.js';
+import FunctionNode from '../core/FunctionNode.js';
 
 // accessor nodes
 import BufferNode from '../accessors/BufferNode.js';
+import StorageBufferNode from '../accessors/StorageBufferNode.js';
 import CameraNode from '../accessors/CameraNode.js';
 import MaterialNode from '../accessors/MaterialNode.js';
 import ModelNode from '../accessors/ModelNode.js';
@@ -20,6 +22,9 @@ import TextureNode from '../accessors/TextureNode.js';
 import UVNode from '../accessors/UVNode.js';
 import InstanceNode from '../accessors/InstanceNode.js';
 
+// gpgpu
+import ComputeNode from '../gpgpu/ComputeNode.js';
+
 // math nodes
 import OperatorNode from '../math/OperatorNode.js';
 import CondNode from '../math/CondNode.js';
@@ -29,6 +34,7 @@ import MathNode from '../math/MathNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
+import TimerNode from '../utils/TimerNode.js';
 
 // other nodes
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
@@ -109,8 +115,14 @@ export const join = ( ...params ) => nodeObject( new JoinNode( nodeArray( params
 export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
 export const attribute = ( ...params ) => nodeObject( new AttributeNode( ...params ) );
 export const buffer = ( ...params ) => nodeObject( new BufferNode( ...params ) );
+export const storage = ( ...params ) => nodeObject( new StorageBufferNode( ...params ) );
 export const texture = ( ...params ) => nodeObject( new TextureNode( ...params ) );
 export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), 'sampler' ) );
+
+export const timer = ( ...params ) => nodeObject( new TimerNode( ...params ) );
+
+export const compute = ( ...params ) => nodeObject( new ComputeNode( ...params ) );
+export const func = ( ...params ) => nodeObject( new FunctionNode( ...params ) );
 
 export const cond = nodeProxy( CondNode );
 

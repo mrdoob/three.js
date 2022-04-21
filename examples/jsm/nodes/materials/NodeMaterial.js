@@ -4,7 +4,7 @@ import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
 	assign, label, mul, add, bypass,
-	positionLocal, skinning, instance, modelViewProjection, context, lightContext, colorSpace,
+	positionLocal, skinning, instance, modelViewProjection, lightContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
 } from '../shadernode/ShaderNodeElements.js';
 
@@ -112,15 +112,9 @@ class NodeMaterial extends ShaderMaterial {
 
 	generateOutput( builder, { diffuseColorNode, outgoingLightNode } ) {
 
-		const { renderer } = builder;
-
 		// OUTPUT
 
 		let outputNode = vec4( outgoingLightNode, diffuseColorNode.a );
-
-		// TONE MAPPING
-
-		if ( renderer.toneMappingNode ) outputNode = context( renderer.toneMappingNode, { color: outputNode } );
 
 		// ENCODING
 
