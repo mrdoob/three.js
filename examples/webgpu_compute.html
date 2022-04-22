@@ -29,10 +29,10 @@
 			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import {
-				compute,
-				color, add, uniform, element, storage, func,
-				assign, float, mul,
-				positionLocal, instanceIndex
+				ShaderNode, compute,
+				uniform, element, storage, temp,
+				assign, add, sub, cond, abs, negate, max, min, length, vec3,
+				greaterThanEqual, lessThanEqual, positionLocal, instanceIndex
 			} from 'three-nodes/Nodes.js';
 
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
@@ -89,95 +89,39 @@
 				const particleBufferNode = storage( particleBuffer, 'vec3' );
 				const velocityBufferNode = storage( velocityBuffer, 'vec3' );
 
-				// create wgsl function
+				// create function
 
-				const WGSLFnNode = func( `( pointer:vec2<f32>, limit:vec2<f32> ) {
+				const FnNode = new ShaderNode( ( inputs, builder ) => {
 
-						var position = particle + velocity;
+					const { particleBuffer, velocityBuffer, pointer, limit } = inputs;
 
-						if ( abs( position.x ) >= limit.x ) {
+					const particle = element( particleBuffer, instanceIndex );
+					const velocity = element( velocityBuffer, instanceIndex );
 
-							if ( position.x > 0.0 ) {
+					const position = temp( add( particle, velocity ) );
 
-								position.x = limit.x;
+					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ).build( builder );
+					assign( velocity.y, cond( greaterThanEqual( abs( position.y ), limit.y ), negate( velocity.y ), velocity.y ).build( builder );
 
-							} else {
+					assign( position, max( negate( limit ), min( limit, position ) ) ).build( builder );
 
-								position.x = -limit.x;
+					const pointerSize = 0.1;
+					const distanceFromPointer = length( sub( pointer, position ) );
 
-							}
+					assign( particle, cond( lessThanEqual( distanceFromPointer, pointerSize ), vec3(), position ) ).build( builder );
 
-							velocity.x = - velocity.x;
-
-						}
-
-						if ( abs( position.y ) >= limit.y ) {
-
-							if ( position.y > 0.0 ) {
-
-								position.y = limit.y;
-
-							} else {
-
-								position.y = -limit.y;
-
-							}
-
-							velocity.y = - velocity.y ;
-
-						}
-
-						let POINTER_SIZE = .1;
-
-						let dx = pointer.x - position.x;
-						let dy = pointer.y - position.y;
-						let distanceFromPointer = sqrt( dx * dx + dy * dy );
-
-						if ( distanceFromPointer <= POINTER_SIZE ) {
-
-							position.x = 0.0;
-							position.y = 0.0;
-							position.z = 0.0;
-
-						}
-
-						particle = position;
-
-					}
-				` );
-
-				// define particle and velocity keywords in wgsl function
-				// it's used in case of needed change a global variable like this storageBuffer
-
-				const particleNode = element( particleBufferNode, instanceIndex );
-				const velocityNode = element( velocityBufferNode, instanceIndex );
-
-				WGSLFnNode.keywords[ 'particle' ] = particleNode;
-				WGSLFnNode.keywords[ 'velocity' ] = velocityNode;
+				} );
 
 				// compute
 
 				computeNode = compute( particleNum );
 
-				// Example 1: Calling a WGSL function
-
-				computeNode.computeNode = WGSLFnNode.call( {
+				computeNode.computeNode = FnNode.call( {
+					particleBuffer: particleBufferNode,
+					velocityBuffer: velocityBufferNode,
 					pointer: uniform( pointer ),
 					limit: uniform( scaleVector )
 				} );
-
-				// Example 2: Creating single storage assign
-
-				//computeNode.computeNode = assign( particleNode, add( particleNode, velocityNode ) );
-
-				// Example 3: Creating multiples storage assign
-
-				/*computeNode.computeNode = new Nodes.ShaderNode( ( {}, builder ) => {
-
-					assign( particleNode, add( particleNode, velocityNode ) ).build( builder );
-					assign( velocityNode, mul( velocityNode, float( 0.99 ) ) ).build( builder );
-
-				} );/**/
 
 				// use a compute shader to animate the point cloud's vertex data.
 
