@@ -31,7 +31,7 @@
 			import {
 				ShaderNode, compute,
 				uniform, element, storage, temp,
-				assign, add, sub, cond, abs, negate, max, min, length, vec3,
+				assign, add, sub, cond, abs, negate, max, min, length, vec3, color,
 				greaterThanEqual, lessThanEqual, positionLocal, instanceIndex
 			} from 'three-nodes/Nodes.js';
 
@@ -43,7 +43,7 @@
 			let camera, scene, renderer;
 			let computeNode;
 
-			const pointer = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
+			const pointerVector = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
 			const scaleVector = new THREE.Vector2( 1, 1 );
 
 			init().then( animate ).catch( error );
@@ -93,15 +93,17 @@
 
 				const FnNode = new ShaderNode( ( inputs, builder ) => {
 
-					const { particleBuffer, velocityBuffer, pointer, limit } = inputs;
+					const particle = element( particleBufferNode, instanceIndex );
+					const velocity = element( velocityBufferNode, instanceIndex );
 
-					const particle = element( particleBuffer, instanceIndex );
-					const velocity = element( velocityBuffer, instanceIndex );
+					const pointer = uniform( pointerVector );
+					const limit = uniform( scaleVector );
 
-					const position = temp( add( particle, velocity ) );
+					const position = temp( vec3() );
+					assign( position, add( particle, velocity ) ).build( builder ); // workaround
 
-					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ).build( builder );
-					assign( velocity.y, cond( greaterThanEqual( abs( position.y ), limit.y ), negate( velocity.y ), velocity.y ).build( builder );
+					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ) ).build( builder );
+					assign( velocity.y, cond( greaterThanEqual( abs( position.y ), limit.y ), negate( velocity.y ), velocity.y ) ).build( builder );
 
 					assign( position, max( negate( limit ), min( limit, position ) ) ).build( builder );
 
@@ -116,12 +118,7 @@
 
 				computeNode = compute( particleNum );
 
-				computeNode.computeNode = FnNode.call( {
-					particleBuffer: particleBufferNode,
-					velocityBuffer: velocityBufferNode,
-					pointer: uniform( pointer ),
-					limit: uniform( scaleVector )
-				} );
+				computeNode.computeNode = FnNode;
 
 				// use a compute shader to animate the point cloud's vertex data.
 
@@ -169,7 +166,7 @@
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
-				pointer.set(
+				pointerVector.set(
 					( x / width - 0.5 ) * 2.0,
 					( - y / height + 0.5 ) * 2.0
 				);
