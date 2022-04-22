@@ -9212,7 +9212,6 @@ class CubeCamera extends Object3D {
 		const currentOutputEncoding = renderer.outputEncoding;
 		const currentToneMapping = renderer.toneMapping;
 		const currentXrEnabled = renderer.xr.enabled;
-		renderer.outputEncoding = LinearEncoding;
 		renderer.toneMapping = NoToneMapping;
 		renderer.xr.enabled = false;
 		const generateMipmaps = renderTarget.texture.generateMipmaps;
@@ -13783,16 +13782,6 @@ function PureArrayUniform(id, activeInfo, addr) {
 	this.setValue = getPureArraySetter(activeInfo.type); // this.path = activeInfo.name; // DEBUG
 }
 
-PureArrayUniform.prototype.updateCache = function (data) {
-	const cache = this.cache;
-
-	if (data instanceof Float32Array && cache.length !== data.length) {
-		this.cache = new Float32Array(data.length);
-	}
-
-	copyArray(cache, data);
-};
-
 function StructuredUniform(id) {
 	this.id = id;
 	this.seq = [];
@@ -15380,7 +15369,6 @@ function WebGLLights(extensions, capabilities) {
 				const uniforms = state.hemi[hemiLength];
 				uniforms.direction.setFromMatrixPosition(light.matrixWorld);
 				uniforms.direction.transformDirection(viewMatrix);
-				uniforms.direction.normalize();
 				hemiLength++;
 			}
 		}
@@ -18304,6 +18292,7 @@ class WebXRManager extends EventDispatcher {
 		let framebufferScaleFactor = 1.0;
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
+		let customReferenceSpace = null;
 		let pose = null;
 		let glBinding = null;
 		let glProjLayer = null;
@@ -18416,7 +18405,11 @@ class WebXRManager extends EventDispatcher {
 		};
 
 		this.getReferenceSpace = function () {
-			return referenceSpace;
+			return customReferenceSpace || referenceSpace;
+		};
+
+		this.setReferenceSpace = function (space) {
+			customReferenceSpace = space;
 		};
 
 		this.getBaseLayer = function () {
@@ -18689,7 +18682,7 @@ class WebXRManager extends EventDispatcher {
 		let onAnimationFrameCallback = null;
 
 		function onAnimationFrame(time, frame) {
-			pose = frame.getViewerPose(referenceSpace);
+			pose = frame.getViewerPose(customReferenceSpace || referenceSpace);
 			xrFrame = frame;
 
 			if (pose !== null) {
@@ -18746,7 +18739,7 @@ class WebXRManager extends EventDispatcher {
 				const controller = inputSourcesMap.get(inputSource);
 
 				if (controller !== undefined) {
-					controller.update(inputSource, frame, referenceSpace);
+					controller.update(inputSource, frame, customReferenceSpace || referenceSpace);
 				}
 			}
 
@@ -19978,7 +19971,7 @@ function WebGLRenderer(parameters = {}) {
 		if (_transmissionRenderTarget === null) {
 			_transmissionRenderTarget = new WebGLRenderTarget(1, 1, {
 				generateMipmaps: true,
-				type: utils.convert(HalfFloatType) !== null ? HalfFloatType : UnsignedByteType,
+				type: extensions.has('EXT_color_buffer_half_float') ? HalfFloatType : UnsignedByteType,
 				minFilter: LinearMipmapLinearFilter,
 				samples: isWebGL2 && _antialias === true ? 4 : 0
 			});

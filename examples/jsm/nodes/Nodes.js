@@ -44,6 +44,9 @@ import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 
+// gpgpu
+import ComputeNode from './gpgpu/ComputeNode.js';
+
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
@@ -119,6 +122,9 @@ const nodeLib = {
 	UniformNode,
 	VarNode,
 	VaryNode,
+
+	// compute
+	ComputeNode,
 
 	// accessors
 	BufferNode,
@@ -214,6 +220,9 @@ export {
 	VarNode,
 	VaryNode,
 
+	// compute
+	ComputeNode,
+
 	// accessors
 	BufferNode,
 	CameraNode,
@@ -271,5 +280,4 @@ export {
 	NodeLoader,
 	NodeObjectLoader,
 	NodeMaterialLoader
-
 };

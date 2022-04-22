@@ -147,13 +147,28 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 const ShaderNodeScript = function ( jsFunc ) {
 
-	return { call: ( inputs, builder ) => {
+	// @TODO: Move this to Node extended class
 
-		inputs = nodeObjects( inputs );
+	const self =
+	{
+		build: ( builder ) => {
 
-		return nodeObject( jsFunc( inputs, builder ) );
+			self.call( {}, builder );
 
-	} };
+			return '';
+
+		},
+
+		call: ( inputs, builder ) => {
+
+			inputs = nodeObjects( inputs );
+
+			return nodeObject( jsFunc( inputs, builder ) );
+
+		}
+	};
+
+	return self;
 
 };
 
