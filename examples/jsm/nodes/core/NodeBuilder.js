@@ -10,8 +10,17 @@ import { NodeMaterial } from '../materials/Materials.js';
 
 import { REVISION, LinearEncoding } from 'three';
 
-export const shaderStages = [ 'fragment', 'vertex' ];
+export const defaultShaderStages = [ 'fragment', 'vertex' ];
+export const shaderStages = [ ...defaultShaderStages, 'compute' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
+
+const typeFromLength = new Map();
+typeFromLength.set( 1, 'float' );
+typeFromLength.set( 2, 'vec2' );
+typeFromLength.set( 3, 'vec3' );
+typeFromLength.set( 4, 'vec4' );
+typeFromLength.set( 9, 'mat3' );
+typeFromLength.set( 16, 'mat4' );
 
 const toFloat = ( value ) => {
 
@@ -26,7 +35,7 @@ class NodeBuilder {
 	constructor( object, renderer, parser ) {
 
 		this.object = object;
-		this.material = object.material;
+		this.material = object.material || null;
 		this.renderer = renderer;
 		this.parser = parser;
 
@@ -34,13 +43,14 @@ class NodeBuilder {
 		this.updateNodes = [];
 		this.hashNodes = {};
 
-		this.flowNodes = { vertex: [], fragment: [] };
-		this.flowCode = { vertex: '', fragment: '' };
-		this.uniforms = { vertex: [], fragment: [], index: 0 };
-		this.codes = { vertex: [], fragment: [] };
+		this.flowNodes = { vertex: [], fragment: [], compute: [] };
+		this.flowCode = { vertex: '', fragment: '', compute: [] };
+		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
+		this.codes = { vertex: [], fragment: [], compute: [] };
+
 		this.attributes = [];
 		this.varys = [];
-		this.vars = { vertex: [], fragment: [] };
+		this.vars = { vertex: [], fragment: [], compute: [] };
 		this.flow = { code: '' };
 		this.stack = [];
 
@@ -332,16 +342,9 @@ class NodeBuilder {
 
 	}
 
-	getTypeFromLength( type ) {
+	getTypeFromLength( length ) {
 
-		if ( type === 1 ) return 'float';
-		if ( type === 2 ) return 'vec2';
-		if ( type === 3 ) return 'vec3';
-		if ( type === 4 ) return 'vec4';
-		if ( type === 9 ) return 'mat3';
-		if ( type === 16 ) return 'mat4';
-
-		return 0;
+		return typeFromLength.get( length );
 
 	}
 
@@ -371,7 +374,7 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = { vertex: {}, fragment: {} };
+			nodeData = { vertex: {}, fragment: {}, compute: {} };
 
 			this.nodesData.set( node, nodeData );
 
@@ -594,7 +597,7 @@ class NodeBuilder {
 
 	getHash() {
 
-		return this.vertexShader + this.fragmentShader;
+		return this.vertexShader + this.fragmentShader + this.computeShader;
 
 	}
 
@@ -620,7 +623,11 @@ class NodeBuilder {
 
 		// stage 0: build material
 
-		NodeMaterial.fromMaterial( this.material ).build( this );
+    if ( this.material !== null ) {
+
+		    NodeMaterial.fromMaterial( this.material ).build( this );
+
+    }
 
 		// stage 1: analyze nodes to possible optimization and validation
 

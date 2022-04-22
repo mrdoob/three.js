@@ -28,23 +28,23 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three-nodes/Nodes.js';
 
+			import {
+				compute,
+				color, add, uniform, element, storage, func,
+				assign, float, mul,
+				positionLocal, instanceIndex
+			} from 'three-nodes/Nodes.js';
+
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 
-			import WebGPUStorageBuffer from './jsm/renderers/webgpu/WebGPUStorageBuffer.js';
-			import WebGPUUniformBuffer from './jsm/renderers/webgpu/WebGPUUniformBuffer.js';
-			import * as WebGPUBufferUtils from './jsm/renderers/webgpu/WebGPUBufferUtils.js';
-			import WebGPUUniformsGroup from './jsm/renderers/webgpu/WebGPUUniformsGroup.js';
-			import { Vector2Uniform } from './jsm/renderers/webgpu/WebGPUUniform.js';
-
 			let camera, scene, renderer;
-			let pointer;
-			let scaleUniformBuffer;
-			const scaleVector = new THREE.Vector3( 1, 1, 1 );
+			let computeNode;
 
-			const computeParams = [];
+			const pointer = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
+			const scaleVector = new THREE.Vector2( 1, 1 );
 
 			init().then( animate ).catch( error );
 
@@ -62,10 +62,11 @@
 				camera.position.z = 1;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
+
+				// initialize particles
 
 				const particleNum = 65000; // 16-bit limit
-				const particleSize = 4; // 16-byte stride align
+				const particleSize = 3; // vec3
 
 				const particleArray = new Float32Array( particleNum * particleSize );
 				const velocityArray = new Float32Array( particleNum * particleSize );
@@ -74,81 +75,25 @@
 
 					const r = Math.random() * 0.01 + 0.0005;
 					const degree = Math.random() * 360;
+
 					velocityArray[ i + 0 ] = r * Math.sin( degree * Math.PI / 180 );
 					velocityArray[ i + 1 ] = r * Math.cos( degree * Math.PI / 180 );
 
 				}
 
-				const particleBuffer = new WebGPUStorageBuffer( 'particle', new THREE.BufferAttribute( particleArray, particleSize ) );
-				const velocityBuffer = new WebGPUStorageBuffer( 'velocity', new THREE.BufferAttribute( velocityArray, particleSize ) );
+				// create buffers
 
-				const scaleUniformLength = WebGPUBufferUtils.getVectorLength( 2, 3 ); // two vector3 for array
+				const particleBuffer = new THREE.BufferAttribute( particleArray, particleSize );
+				const velocityBuffer = new THREE.BufferAttribute( velocityArray, particleSize );
 
-				scaleUniformBuffer = new WebGPUUniformBuffer( 'scaleUniform', new Float32Array( scaleUniformLength ) );
+				const particleBufferNode = storage( particleBuffer, 'vec3' );
+				const velocityBufferNode = storage( velocityBuffer, 'vec3' );
 
-				pointer = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
+				// create wgsl function
 
-				const pointerGroup = new WebGPUUniformsGroup( 'mouseUniforms' ).addUniform(
-					new Vector2Uniform( 'pointer', pointer )
-				);
+				const WGSLFnNode = func( `( pointer:vec2<f32>, limit:vec2<f32> ) {
 
-				// Object keys need follow the binding shader sequence
-
-				const computeBindings = [
-					particleBuffer,
-					velocityBuffer,
-					scaleUniformBuffer,
-					pointerGroup
-				];
-
-				const computeShader = `
-
-					//
-					// Buffer
-					//
-
-					struct Particle {
-						value : array< vec4<f32> >
-					};
-					@binding( 0 ) @group( 0 )
-					var<storage,read_write> particle : Particle;
-
-					struct Velocity {
-						value : array< vec4<f32> >
-					};
-					@binding( 1 ) @group( 0 )
-					var<storage,read_write> velocity : Velocity;
-
-					//
-					// Uniforms
-					//
-
-					struct Scale {
-						value : array< vec3<f32>, 2 >
-					};
-					@binding( 2 ) @group( 0 )
-					var<uniform> scaleUniform : Scale;
-
-					struct MouseUniforms {
-						pointer : vec2<f32>
-					};
-					@binding( 3 ) @group( 0 )
-					var<uniform> mouseUniforms : MouseUniforms;
-
-					@stage( compute ) @workgroup_size( 64 )
-					fn main( @builtin(global_invocation_id) id : vec3<u32> ) {
-
-						// get particle index
-
-						let index : u32 = id.x * 3u;
-
-						// update speed
-
-						var position : vec4<f32> = particle.value[ index ] + velocity.value[ index ];
-
-						// update limit
-
-						let limit : vec2<f32> = scaleUniform.value[ 0 ].xy;
+						var position = particle + velocity;
 
 						if ( abs( position.x ) >= limit.x ) {
 
@@ -162,7 +107,7 @@
 
 							}
 
-							velocity.value[ index ].x = - velocity.value[ index ].x;
+							velocity.x = - velocity.x;
 
 						}
 
@@ -178,17 +123,15 @@
 
 							}
 
-							velocity.value[ index ].y = - velocity.value[ index ].y;
+							velocity.y = - velocity.y ;
 
 						}
 
-						// update mouse
+						let POINTER_SIZE = .1;
 
-						let POINTER_SIZE : f32 = .1;
-
-						let dx : f32 = mouseUniforms.pointer.x - position.x;
-						let dy : f32 = mouseUniforms.pointer.y - position.y;
-						let distanceFromPointer : f32 = sqrt( dx * dx + dy * dy );
+						let dx = pointer.x - position.x;
+						let dy = pointer.y - position.y;
+						let distanceFromPointer = sqrt( dx * dx + dy * dy );
 
 						if ( distanceFromPointer <= POINTER_SIZE ) {
 
@@ -198,28 +141,51 @@
 
 						}
 
-						// update buffer
-
-						particle.value[ index ] = position;
+						particle = position;
 
 					}
+				` );
 
-				`;
+				// define particle and velocity keywords in wgsl function
+				// it's used in case of needed change a global variable like this storageBuffer
 
-				computeParams.push( {
-					num: particleNum,
-					shader: computeShader,
-					bindings: computeBindings
+				const particleNode = element( particleBufferNode, instanceIndex );
+				const velocityNode = element( velocityBufferNode, instanceIndex );
+
+				WGSLFnNode.keywords[ 'particle' ] = particleNode;
+				WGSLFnNode.keywords[ 'velocity' ] = velocityNode;
+
+				// compute
+
+				computeNode = compute( particleNum );
+
+				// Example 1: Calling a WGSL function
+
+				computeNode.computeNode = WGSLFnNode.call( {
+					pointer: uniform( pointer ),
+					limit: uniform( scaleVector )
 				} );
 
-				// Use a compute shader to animate the point cloud's vertex data.
+				// Example 2: Creating single storage assign
 
-				const pointsGeometry = new THREE.BufferGeometry().setAttribute(
-					'position', particleBuffer.attribute
-				);
+				//computeNode.computeNode = assign( particleNode, add( particleNode, velocityNode ) );
+
+				// Example 3: Creating multiples storage assign
+
+				/*computeNode.computeNode = new Nodes.ShaderNode( ( {}, builder ) => {
+
+					assign( particleNode, add( particleNode, velocityNode ) ).build( builder );
+					assign( velocityNode, mul( velocityNode, float( 0.99 ) ) ).build( builder );
+
+				} );/**/
+
+				// use a compute shader to animate the point cloud's vertex data.
+
+				const pointsGeometry = new THREE.BufferGeometry();
+				pointsGeometry.setAttribute( 'position', particleBuffer );
 
 				const pointsMaterial = new Nodes.PointsNodeMaterial();
-				pointsMaterial.colorNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode(), new Nodes.UniformNode( new THREE.Color( 0xFFFFFF ) ) );
+				pointsMaterial.colorNode = add( positionLocal, color( 0xFFFFFF ) );
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
 				scene.add( mesh );
@@ -270,10 +236,8 @@
 
 				requestAnimationFrame( animate );
 
-				renderer.compute( computeParams );
+				renderer.compute( computeNode );
 				renderer.render( scene, camera );
-
-				scaleVector.toArray( scaleUniformBuffer.buffer, 0 );
 
 			}
 

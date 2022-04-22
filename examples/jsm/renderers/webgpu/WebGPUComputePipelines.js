@@ -2,9 +2,10 @@ import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
 
 class WebGPUComputePipelines {
 
-	constructor( device ) {
+	constructor( device, nodes ) {
 
 		this.device = device;
+		this.nodes = nodes;
 
 		this.pipelines = new WeakMap();
 		this.stages = {
@@ -13,9 +14,9 @@ class WebGPUComputePipelines {
 
 	}
 
-	get( param ) {
+	get( computeNode ) {
 
-		let pipeline = this.pipelines.get( param );
+		let pipeline = this.pipelines.get( computeNode );
 
 		// @TODO: Reuse compute pipeline if possible, introduce WebGPUComputePipeline
 
@@ -23,8 +24,13 @@ class WebGPUComputePipelines {
 
 			const device = this.device;
 
+			// get shader
+
+			const nodeBuilder = this.nodes.get( computeNode );
+			const computeShader = nodeBuilder.computeShader;
+
 			const shader = {
-				computeShader: param.shader
+				computeShader
 			};
 
 			// programmable stage
@@ -33,7 +39,7 @@ class WebGPUComputePipelines {
 
 			if ( stageCompute === undefined ) {
 
- 				stageCompute = new WebGPUProgrammableStage( device, shader.computeShader, 'compute' );
+ 				stageCompute = new WebGPUProgrammableStage( device, computeShader, 'compute' );
 
 				this.stages.compute.set( shader, stageCompute );
 
@@ -43,7 +49,7 @@ class WebGPUComputePipelines {
 				compute: stageCompute.stage
 			} );
 
-			this.pipelines.set( param, pipeline );
+			this.pipelines.set( computeNode, pipeline );
 
 		}
 

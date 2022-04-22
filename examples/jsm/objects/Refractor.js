@@ -19,6 +19,7 @@ class Refractor extends Mesh {
 		super( geometry );
 
 		this.type = 'Refractor';
+		this.camera = new PerspectiveCamera();
 
 		const scope = this;
 
@@ -31,7 +32,7 @@ class Refractor extends Mesh {
 
 		//
 
-		const virtualCamera = new PerspectiveCamera();
+		const virtualCamera = this.camera;
 		virtualCamera.matrixAutoUpdate = false;
 		virtualCamera.userData.refractor = true;
 

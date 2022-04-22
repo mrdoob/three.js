@@ -1,4 +1,4 @@
-import NodeBuilder, { shaderStages } from 'three-nodes/core/NodeBuilder.js';
+import NodeBuilder, { defaultShaderStages } from 'three-nodes/core/NodeBuilder.js';
 import NodeFrame from 'three-nodes/core/NodeFrame.js';
 import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
 //import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
@@ -166,7 +166,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	buildCode() {
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			const uniforms = this.getUniforms( shaderStage );
 			const attributes = this.getAttributes( shaderStage );
@@ -205,7 +205,7 @@ ${this.shader[ shaderStage + 'Shader' ]}
 
 	_buildFlowCode() {
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			this.addCodeAfterSnippet(
 				shaderStage,
@@ -219,7 +219,7 @@ ${this.shader[ shaderStage + 'Shader' ]}
 
 	_buildUniforms() {
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			// uniforms
 

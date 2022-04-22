@@ -1,7 +1,7 @@
 import NodeMaterial from './NodeMaterial.js';
 import {
 	float, vec3, vec4,
-	assign, label, mul, invert, mix,
+	context, assign, label, mul, invert, mix,
 	normalView,
 	materialRoughness, materialMetalness
 } from '../shadernode/ShaderNodeElements.js';
@@ -61,9 +61,13 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	generateLight( builder, { diffuseColorNode, lightNode } ) {
 
-		const outgoingLightNode = super.generateLight( builder, { diffuseColorNode, lightNode, lightingModelNode: PhysicalLightingModel } );
+		let outgoingLightNode = super.generateLight( builder, { diffuseColorNode, lightNode, lightingModelNode: PhysicalLightingModel } );
 
-		// @TODO: add IBL code here
+		// TONE MAPPING
+
+		const renderer = builder.renderer;
+
+		if ( renderer.toneMappingNode ) outgoingLightNode = context( renderer.toneMappingNode, { color: outgoingLightNode } );
 
 		return outgoingLightNode;
 
