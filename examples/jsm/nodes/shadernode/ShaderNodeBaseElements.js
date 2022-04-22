@@ -24,8 +24,12 @@ import Object3DNode from '../accessors/Object3DNode.js';
 import PointUVNode from '../accessors/PointUVNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
+import StorageBufferNode from '../accessors/StorageBufferNode.js';
 import TextureNode from '../accessors/TextureNode.js';
 import UVNode from '../accessors/UVNode.js';
+
+// gpgpu
+import ComputeNode from '../gpgpu/ComputeNode.js';
 
 // math
 import MathNode from '../math/MathNode.js';
@@ -120,6 +124,7 @@ export const vary = nodeProxy( VaryNode );
 // accesors
 
 export const buffer = ( value, nodeOrType, count ) => nodeObject( new BufferNode( value, getConstNodeType( nodeOrType ), count ) );
+export const storage = ( value, nodeOrType, count ) => nodeObject( new StorageBufferNode( value, getConstNodeType( nodeOrType ), count ) );
 
 export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX );
 export const cameraViewMatrix = nodeImmutable( CameraNode, CameraNode.VIEW_MATRIX );
@@ -167,6 +172,10 @@ export const texture = nodeProxy( TextureNode );
 export const sampler = ( texture ) => nodeObject( new ConvertNode( texture.isNode === true ? texture : new TextureNode( texture ), 'sampler' ) );
 export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
 export const pointUV = nodeImmutable( PointUVNode );
+
+// gpgpu
+
+export const compute = ( dispatchCount, workgroupSize ) => nodeObject( new ComputeNode( dispatchCount, workgroupSize ) );
 
 // math
 
