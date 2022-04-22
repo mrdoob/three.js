@@ -44,7 +44,7 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 
 // shader node utils
-import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNodeUtils.js';
+import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNode.js';
 
 // shader node utils
 
@@ -211,7 +211,7 @@ export const exp2 = nodeProxy( MathNode, MathNode.EXP2 );
 export const log = nodeProxy( MathNode, MathNode.LOG );
 export const log2 = nodeProxy( MathNode, MathNode.LOG2 );
 export const sqrt = nodeProxy( MathNode, MathNode.SQRT );
-export const invSqrt = nodeProxy( MathNode, MathNode.INV_SQRT );
+export const inverseSqrt = nodeProxy( MathNode, MathNode.INVERSE_SQRT );
 export const floor = nodeProxy( MathNode, MathNode.FLOOR );
 export const ceil = nodeProxy( MathNode, MathNode.CEIL );
 export const normalize = nodeProxy( MathNode, MathNode.NORMALIZE );

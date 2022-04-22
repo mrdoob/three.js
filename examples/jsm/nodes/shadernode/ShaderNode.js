@@ -149,8 +149,8 @@ const ShaderNodeScript = function ( jsFunc ) {
 
 	// @TODO: Move this to Node extended class
 
-	const self =
-	{
+	const self = {
+
 		build: ( builder ) => {
 
 			self.call( {}, builder );
@@ -166,6 +166,7 @@ const ShaderNodeScript = function ( jsFunc ) {
 			return nodeObject( jsFunc( inputs, builder ) );
 
 		}
+
 	};
 
 	return self;

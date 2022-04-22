@@ -15,7 +15,7 @@ class MathNode extends TempNode {
 	static LOG = 'log';
 	static LOG2 = 'log2';
 	static SQRT = 'sqrt';
-	static INV_SQRT = 'inversesqrt';
+	static INVERSE_SQRT = 'inversesqrt';
 	static FLOOR = 'floor';
 	static CEIL = 'ceil';
 	static NORMALIZE = 'normalize';
