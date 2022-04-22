@@ -28,6 +28,7 @@ class MarchingCubes extends Mesh {
 
 		this.enableUvs = enableUvs;
 		this.enableColors = enableColors;
+		this.autoUpdate = true;
 
 		// functions have to be object properties
 		// prototype functions kill performance
@@ -812,7 +813,7 @@ class MarchingCubes extends Mesh {
 
 		};
 
-		this.onBeforeRender = function () {
+		this.update = function () {
 
 			this.count = 0;
 
@@ -862,6 +863,16 @@ class MarchingCubes extends Mesh {
 			// safety check
 
 			if ( this.count / 3 > maxPolyCount ) console.warn( 'THREE.MarchingCubes: Geometry buffers too small for rendering. Please create an instance with a higher poly count.' );
+
+		};
+
+		this.onBeforeRender = function () {
+
+			if ( this.autoUpdate ) {
+
+				this.update();
+
+			}
 
 		};
 
