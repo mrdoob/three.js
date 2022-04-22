@@ -259,7 +259,6 @@ export const reflectedLight = nodeProxy( ReflectedLightNode );
 // utils
 
 export const element = nodeProxy( ArrayElementNode );
-export const arrayElement = element;
 
 // miscellaneous
 
