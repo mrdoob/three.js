@@ -29,7 +29,7 @@ import FogNode from '../fog/FogNode.js';
 import FogRangeNode from '../fog/FogRangeNode.js';
 
 // shader node utils
-import { nodeObject, nodeProxy, nodeImmutable } from './ShaderNodeUtils.js';
+import { nodeObject, nodeProxy, nodeImmutable } from './ShaderNode.js';
 
 //
 // Node Material Shader Syntax
