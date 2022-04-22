@@ -321,6 +321,8 @@ function WebGLRenderer( parameters = {} ) {
 
 		_this.capabilities = capabilities;
 		_this.extensions = extensions;
+		_this.cubemaps = cubemaps;
+		_this.cubeuvmaps = cubeuvmaps;
 		_this.properties = properties;
 		_this.renderLists = renderLists;
 		_this.shadowMap = shadowMap;
