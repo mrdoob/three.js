@@ -9209,7 +9209,6 @@ class CubeCamera extends Object3D {
 		const renderTarget = this.renderTarget;
 		const [cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ] = this.children;
 		const currentRenderTarget = renderer.getRenderTarget();
-		const currentOutputEncoding = renderer.outputEncoding;
 		const currentToneMapping = renderer.toneMapping;
 		const currentXrEnabled = renderer.xr.enabled;
 		renderer.toneMapping = NoToneMapping;
@@ -9230,7 +9229,6 @@ class CubeCamera extends Object3D {
 		renderer.setRenderTarget(renderTarget, 5);
 		renderer.render(scene, cameraNZ);
 		renderer.setRenderTarget(currentRenderTarget);
-		renderer.outputEncoding = currentOutputEncoding;
 		renderer.toneMapping = currentToneMapping;
 		renderer.xr.enabled = currentXrEnabled;
 		renderTarget.texture.needsPMREMUpdate = true;
