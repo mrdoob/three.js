@@ -91,10 +91,10 @@
 			{
 				target: 5, // "target"
 				effector: 4, // "bone3"
-				links: [{ index: 3 }, { index: 2 }, { index: 1 }] // "bone2", "bone1", "bone0"
+				links: [ { index: 3 }, { index: 2 }, { index: 1 } ] // "bone2", "bone1", "bone0"
 			}
 		];
-		ikSolver = new CCDIKSolver(mesh, iks);
+		ikSolver = new CCDIKSolver( mesh, iks );
 
 		function render() {
 			ikSolver?.update();
