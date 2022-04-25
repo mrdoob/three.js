@@ -125,7 +125,7 @@
 				const pointsGeometry = new THREE.BufferGeometry();
 				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ) ) ); // single vertex ( not triangle )
 				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
-				pointsGeometry.drawRange.count = 1; // force render a points as instances ( not triangle )
+				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 
 				const pointsMaterial = new Nodes.PointsNodeMaterial();
 				pointsMaterial.colorNode = add( particleNode, color( 0xFFFFFF ) );
