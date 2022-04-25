@@ -730,7 +730,7 @@ ${shaderData.codes}
 fn main( ${shaderData.attributes} ) {
 
 	// system
-	instanceIndex = id.x * 3u;
+	instanceIndex = id.x;
 
 	// vars
 	${shaderData.vars}
