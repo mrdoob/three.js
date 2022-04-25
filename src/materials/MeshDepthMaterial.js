@@ -22,8 +22,6 @@ class MeshDepthMaterial extends Material {
 		this.wireframe = false;
 		this.wireframeLinewidth = 1;
 
-		this.fog = false;
-
 		this.setValues( parameters );
 
 	}

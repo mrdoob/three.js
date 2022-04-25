@@ -46,6 +46,8 @@ class MeshToonMaterial extends Material {
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
+		this.fog = true;
+
 		this.setValues( parameters );
 
 	}
@@ -86,6 +88,8 @@ class MeshToonMaterial extends Material {
 		this.wireframeLinewidth = source.wireframeLinewidth;
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
+
+		this.fog = source.fog;
 
 		return this;
 

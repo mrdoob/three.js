@@ -18,6 +18,8 @@ class PointsMaterial extends Material {
 		this.size = 1;
 		this.sizeAttenuation = true;
 
+		this.fog = true;
+
 		this.setValues( parameters );
 
 	}
@@ -34,6 +36,8 @@ class PointsMaterial extends Material {
 
 		this.size = source.size;
 		this.sizeAttenuation = source.sizeAttenuation;
+
+		this.fog = source.fog;
 
 		return this;
 
