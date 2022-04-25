@@ -23,7 +23,7 @@ class ComputeNode extends Node {
 
 		const { count, workgroupSize } = this;
 
-		const size = workgroupSize[ 0 ];
+		let size = workgroupSize[ 0 ];
 
 		for ( let i = 1; i < workgroupSize.length; i ++ )
 			size *= workgroupSize[ i ];
