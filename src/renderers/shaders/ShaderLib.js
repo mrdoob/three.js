@@ -298,7 +298,7 @@ ShaderLib.physical = {
 			clearcoatNormalMap: { value: null },
 			iridescence: { value: 0 },
 			iridescenceMap: { value: null },
-			iridescenceIOR: { value: 1.3 },
+			iridescenceIor: { value: 1.3 },
 			iridescenceThicknessMinimum: { value: 100 },
 			iridescenceThicknessMaximum: { value: 400 },
 			iridescenceThicknessMap: { value: null },

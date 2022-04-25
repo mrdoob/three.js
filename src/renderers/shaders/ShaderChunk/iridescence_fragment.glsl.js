@@ -43,13 +43,13 @@ vec3 evalSensitivity( float OPD, vec3 shift ) {
    return srgb;
 }
 
-vec3 evalIridescence( float outsideIOR, float eta2, float cosTheta1, float thinFilmThickness, vec3 baseF0 ) {
+vec3 evalIridescence( float outsideIor, float eta2, float cosTheta1, float thinFilmThickness, vec3 baseF0 ) {
    vec3 I;
 
-   // Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
-   float iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
+   // Force iridescenceIor -> outsideIor when thinFilmThickness -> 0.0
+   float iridescenceIor = mix( outsideIor, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
    // Evaluate the cosTheta on the base layer (Snell law)
-   float sinTheta2Sq = pow2( outsideIOR / iridescenceIOR ) * ( 1.0 - pow2( cosTheta1 ) );
+   float sinTheta2Sq = pow2( outsideIor / iridescenceIor ) * ( 1.0 - pow2( cosTheta1 ) );
 
    // Handle TIR:
    float cosTheta2Sq = 1.0 - sinTheta2Sq;
@@ -60,25 +60,25 @@ vec3 evalIridescence( float outsideIOR, float eta2, float cosTheta1, float thinF
    float cosTheta2 = sqrt( cosTheta2Sq );
 
    // First interface
-   float R0 = IorToFresnel0( iridescenceIOR, outsideIOR );
+   float R0 = IorToFresnel0( iridescenceIor, outsideIor );
    float R12 = F_Schlick( R0, 1.0, cosTheta1 );
    float R21 = R12;
    float T121 = 1.0 - R12;
    float phi12 = 0.0;
-   if ( iridescenceIOR < outsideIOR ) phi12 = PI;
+   if ( iridescenceIor < outsideIor ) phi12 = PI;
    float phi21 = PI - phi12;
 
    // Second interface
-   vec3 baseIOR = Fresnel0ToIor( clamp( baseF0, 0.0, 0.9999 ) ); // guard against 1.0
-   vec3 R1 = IorToFresnel0( baseIOR, iridescenceIOR );
+   vec3 baseIor = Fresnel0ToIor( clamp( baseF0, 0.0, 0.9999 ) ); // guard against 1.0
+   vec3 R1 = IorToFresnel0( baseIor, iridescenceIor );
    vec3 R23 = F_Schlick( R1, 1.0, cosTheta2 );
    vec3 phi23 = vec3( 0.0 );
-   if ( baseIOR[0] < iridescenceIOR ) phi23[0] = PI;
-   if ( baseIOR[1] < iridescenceIOR ) phi23[1] = PI;
-   if ( baseIOR[2] < iridescenceIOR ) phi23[2] = PI;
+   if ( baseIor[0] < iridescenceIor ) phi23[0] = PI;
+   if ( baseIor[1] < iridescenceIor ) phi23[1] = PI;
+   if ( baseIor[2] < iridescenceIor ) phi23[2] = PI;
 
    // Phase shift
-   float OPD = 2.0 * iridescenceIOR * thinFilmThickness * cosTheta2;
+   float OPD = 2.0 * iridescenceIor * thinFilmThickness * cosTheta2;
    vec3 phi = vec3( phi21 ) + phi23;
 
    // Compound terms

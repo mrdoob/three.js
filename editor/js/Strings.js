@@ -250,7 +250,7 @@ function Strings( config ) {
 			'sidebar/material/clearcoat': 'Clearcoat',
 			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/iridescence': 'Iridescence',
-			'sidebar/material/iridescenceIOR': 'Thin-Film IOR',
+			'sidebar/material/iridescenceIor': 'Thin-Film IOR',
 			'sidebar/material/iridescenceThicknessMax': 'Thin-Film Thickness',
 			'sidebar/material/transmission': 'Transmission',
 			'sidebar/material/attenuationDistance': 'Attenuation Distance',

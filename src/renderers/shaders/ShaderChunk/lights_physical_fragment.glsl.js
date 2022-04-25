@@ -76,7 +76,7 @@ material.roughness = min( material.roughness, 1.0 );
 #ifdef USE_IRIDESCENCE
 
 	material.iridescence = iridescence;
-	material.iridescenceIOR = iridescenceIOR;
+	material.iridescenceIor = iridescenceIor;
 
 	#ifdef USE_IRIDESCENCEMAP
 

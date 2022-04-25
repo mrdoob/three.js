@@ -141,9 +141,9 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
-		if ( material.iridescenceIORNode && material.iridescenceIORNode.isNode ) {
+		if ( material.iridescenceIorNode && material.iridescenceIorNode.isNode ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.iridescenceIORNode, 'IRIDESCENCE_IOR', 'float' ) );
+			this.addSlot( 'fragment', new SlotNode( material.iridescenceIorNode, 'IRIDESCENCE_IOR', 'float' ) );
 
 		}
 
@@ -430,7 +430,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 		const clearcoatNode = this.getSlot( 'fragment', 'CLEARCOAT' );
 		const clearcoatRoughnessNode = this.getSlot( 'fragment', 'CLEARCOAT_ROUGHNESS' );
 		const iridescenceNode = this.getSlot( 'fragment', 'IRIDESCENCE' );
-		const iridescenceIORNode = this.getSlot( 'fragment', 'IRIDESCENCE_IOR' );
+		const iridescenceIorNode = this.getSlot( 'fragment', 'IRIDESCENCE_IOR' );
 		const iridescenceThicknessNode = this.getSlot( 'fragment', 'IRIDESCENCE_THICKNESS' );
 
 		const positionNode = this.getSlot( 'vertex', 'POSITION' );
@@ -526,12 +526,12 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		}
 
-		if ( iridescenceIORNode !== undefined ) {
+		if ( iridescenceIorNode !== undefined ) {
 
 			this.addCodeAfterSnippet(
 				'fragment',
 				'iridescence_fragment',
-				`${iridescenceIORNode.code}\n\tmaterial.iridescenceIOR = ${iridescenceIORNode.result};`
+				`${iridescenceIorNode.code}\n\tmaterial.iridescenceIor = ${iridescenceIorNode.result};`
 			);
 
 		}

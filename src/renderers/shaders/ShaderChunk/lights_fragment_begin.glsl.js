@@ -42,7 +42,7 @@ if ( material.iridescenceThickness == 0.0 ) {
 
 if ( material.iridescence > 0.0 ) {
 
-	material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNV, material.iridescenceThickness, material.specularColor );
+	material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIor, dotNV, material.iridescenceThickness, material.specularColor );
 
 	// Iridescence F0 approximation
 	material.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNV );
