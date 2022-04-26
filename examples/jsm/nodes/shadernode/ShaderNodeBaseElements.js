@@ -175,7 +175,7 @@ export const pointUV = nodeImmutable( PointUVNode );
 
 // gpgpu
 
-export const compute = ( dispatchCount, workgroupSize ) => nodeObject( new ComputeNode( dispatchCount, workgroupSize ) );
+export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 
 // math
 
