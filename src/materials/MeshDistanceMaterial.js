@@ -21,8 +21,6 @@ class MeshDistanceMaterial extends Material {
 		this.displacementScale = 1;
 		this.displacementBias = 0;
 
-		this.fog = false;
-
 		this.setValues( parameters );
 
 	}

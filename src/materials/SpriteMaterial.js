@@ -21,6 +21,8 @@ class SpriteMaterial extends Material {
 
 		this.transparent = true;
 
+		this.fog = true;
+
 		this.setValues( parameters );
 
 	}
@@ -38,6 +40,8 @@ class SpriteMaterial extends Material {
 		this.rotation = source.rotation;
 
 		this.sizeAttenuation = source.sizeAttenuation;
+
+		this.fog = source.fog;
 
 		return this;
 

@@ -56,6 +56,8 @@ class MeshStandardMaterial extends Material {
 
 		this.flatShading = false;
 
+		this.fog = true;
+
 		this.setValues( parameters );
 
 	}
@@ -108,6 +110,8 @@ class MeshStandardMaterial extends Material {
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
 		this.flatShading = source.flatShading;
+
+		this.fog = source.fog;
 
 		return this;
 

@@ -24,8 +24,6 @@ class MeshNormalMaterial extends Material {
 		this.wireframe = false;
 		this.wireframeLinewidth = 1;
 
-		this.fog = false;
-
 		this.flatShading = false;
 
 		this.setValues( parameters );

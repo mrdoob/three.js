@@ -12,6 +12,8 @@ class ShadowMaterial extends Material {
 		this.color = new Color( 0x000000 );
 		this.transparent = true;
 
+		this.fog = true;
+
 		this.setValues( parameters );
 
 	}
@@ -21,6 +23,8 @@ class ShadowMaterial extends Material {
 		super.copy( source );
 
 		this.color.copy( source.color );
+
+		this.fog = source.fog;
 
 		return this;
 
