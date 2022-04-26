@@ -105,9 +105,6 @@ class OrbitControls extends EventDispatcher {
 		//
 		// public methods
 		//
-		this.addHtmlButton = function (domElement, action){
-
-		}
 		this.getPolarAngle = function () {
 
 			return spherical.phi;
@@ -128,17 +125,20 @@ class OrbitControls extends EventDispatcher {
 
 		this.listenToHtmlButtonEvents = function ( domElement , attachAction, speed = 7.0) {
 			const id = domElement.id
-            this.htmlButton[id]={action:null,active:null, speed: speed}
+			this.htmlButton[id] = {action:null, active:null, speed: speed}
 			this.htmlButton[id]['action'] = attachAction
 			domElement.addEventListener( 'mousedown', (event) => {
 				this.htmlButton[id]['active'] = true
-			}, false)
+				}, false)
+			
 			domElement.addEventListener( 'mouseup', (event) => {
 				this.htmlButton[id]['active'] = false
-			}, false)
+				}, false)
+			
 			domElement.addEventListener( 'mouseleave', (event) => {
 				this.htmlButton[id]['active'] = false
-			}, false)
+				}, false)
+			
 			this.htmlButtonList.push(domElement)
 		};
 
@@ -187,7 +187,15 @@ class OrbitControls extends EventDispatcher {
 			const twoPI = 2 * Math.PI;
 
 			return function update() {
-				if(this.htmlButtonList.length>0)handleHtmlButton(this.htmlButton, this.htmlButtonList)
+				
+				//Check if there is HtmlButton to handle
+				if(this.htmlButtonList.length>0){
+					
+					if ( scope.enabled === false || scope.enablePan === false ) return;
+					
+					handleHtmlButton(this.htmlButton, this.htmlButtonList);
+				
+				}
 				
 				const position = scope.object.position;
 
@@ -334,12 +342,15 @@ class OrbitControls extends EventDispatcher {
 			}
 
 			if (scope.htmlButtonList.length>0) {
-                scope.htmlButtonList.forEach((elem)=>{
-                    scope.htmlButton[elem.id].removeEventListener( 'mousedown', null );
-                    scope.htmlButton[elem.id].removeEventListener( 'mouseup', null );
-                    scope.htmlButton[elem.id].removeEventListener( 'mouseleave', null );
-                    })
-                }
+				
+				scope.htmlButtonList.forEach((elem)=>{
+					
+				scope.htmlButton[elem.id].removeEventListener( 'mousedown', null );
+				scope.htmlButton[elem.id].removeEventListener( 'mouseup', null );
+				scope.htmlButton[elem.id].removeEventListener( 'mouseleave', null );
+					
+				})
+			}
 		 
 			//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
@@ -629,20 +640,50 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function handleHtmlButton(button, buttonList) {
+			
 			const element = scope.domElement;
+			
 			buttonList.forEach((elem)=>{
+				
 				if(button[elem.id].active === true){
+					
 					switch (button[elem.id].action){
-						case 'up': pan( 0, button[elem.id].speed ); break;
-						case 'down': pan( 0, - button[elem.id].speed ); break;
-						case 'left': pan( button[elem.id].speed, 0 ); break;
-						case 'right': pan( - button[elem.id].speed, 0 ); break;
-						case 'rotateUp':  rotateUp( 2 * Math.PI * button[elem.id].speed / element.clientHeight ); break;
-						case 'rotateDown': rotateUp( -2 * Math.PI * button[elem.id].speed / element.clientHeight );break;
-						case 'rotateLeft': rotateLeft( 2 * Math.PI * button[elem.id].speed / element.clientHeight );break;
-						case 'rotateRight': rotateLeft( -2 * Math.PI * button[elem.id].speed / element.clientHeight );break;
+						case 'up':
+							pan( 0, button[elem.id].speed );
+							break;
+							
+						case 'down':
+							pan( 0, - button[elem.id].speed );
+							break;
+							
+						case 'left':
+							pan( button[elem.id].speed, 0 );
+							break;
+							
+						case 'right':
+							pan( - button[elem.id].speed, 0 );
+							break;
+							
+						case 'rotateUp':
+							rotateUp( 2 * Math.PI * button[elem.id].speed / element.clientHeight );
+							break;
+							
+						case 'rotateDown':
+							rotateUp( -2 * Math.PI * button[elem.id].speed / element.clientHeight );
+							break;
+							
+						case 'rotateLeft':
+							rotateLeft( 2 * Math.PI * button[elem.id].speed / element.clientHeight );
+							break;
+							
+						case 'rotateRight':
+							rotateLeft( -2 * Math.PI * button[elem.id].speed / element.clientHeight );
+							break;
+							
 					}
+					
 				}
+				
 			})
 		}
 
@@ -1055,11 +1096,6 @@ class OrbitControls extends EventDispatcher {
 
 			scope.dispatchEvent( _endEvent );
 
-		}
-
-		function onHtmlButtonDown (event) {
-			// if ( scope.enabled === false || scope.enablePan === false ) return;
-			handleHtmlClickDown = (event)
 		}
 
 		function onKeyDown( event ) {
