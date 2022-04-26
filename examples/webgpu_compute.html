@@ -29,10 +29,10 @@
 			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import {
-				compute,
-				color, add, uniform, element, storage, func,
-				assign, float, mul,
-				positionLocal, instanceIndex
+				ShaderNode, compute,
+				uniform, element, storage, attribute,
+				temp, assign, add, sub, cond, abs, negate, max, min, length, vec3, color,
+				greaterThanEqual, lessThanEqual, instanceIndex
 			} from 'three-nodes/Nodes.js';
 
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
@@ -43,7 +43,7 @@
 			let camera, scene, renderer;
 			let computeNode;
 
-			const pointer = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
+			const pointerVector = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
 			const scaleVector = new THREE.Vector2( 1, 1 );
 
 			init().then( animate ).catch( error );
@@ -65,129 +65,75 @@
 
 				// initialize particles
 
-				const particleNum = 65000; // 16-bit limit
-				const particleSize = 3; // vec3
+				const particleNum = 300000;
+				const particleSize = 2; // vec2
 
 				const particleArray = new Float32Array( particleNum * particleSize );
 				const velocityArray = new Float32Array( particleNum * particleSize );
 
-				for ( let i = 0; i < particleArray.length; i += particleSize ) {
+				for ( let i = 0; i < particleNum; i ++ ) {
 
-					const r = Math.random() * 0.01 + 0.0005;
+					const r = Math.random() * 0.01 + 0.005;
 					const degree = Math.random() * 360;
 
-					velocityArray[ i + 0 ] = r * Math.sin( degree * Math.PI / 180 );
-					velocityArray[ i + 1 ] = r * Math.cos( degree * Math.PI / 180 );
+					velocityArray[ i * particleSize + 0 ] = r * Math.sin( degree * Math.PI / 180 ); // x
+					velocityArray[ i * particleSize + 1 ] = r * Math.cos( degree * Math.PI / 180 ); // y
 
 				}
 
 				// create buffers
 
-				const particleBuffer = new THREE.BufferAttribute( particleArray, particleSize );
-				const velocityBuffer = new THREE.BufferAttribute( velocityArray, particleSize );
+				const particleBuffer = new THREE.InstancedBufferAttribute( particleArray );
+				const velocityBuffer = new THREE.InstancedBufferAttribute( velocityArray );
 
-				const particleBufferNode = storage( particleBuffer, 'vec3' );
-				const velocityBufferNode = storage( velocityBuffer, 'vec3' );
+				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
+				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
 
-				// create wgsl function
+				// create function
 
-				const WGSLFnNode = func( `( pointer:vec2<f32>, limit:vec2<f32> ) {
+				const FnNode = new ShaderNode( ( inputs, builder ) => {
 
-						var position = particle + velocity;
+					const particle = element( particleBufferNode, instanceIndex );
+					const velocity = element( velocityBufferNode, instanceIndex );
 
-						if ( abs( position.x ) >= limit.x ) {
+					const pointer = uniform( pointerVector );
+					const limit = uniform( scaleVector );
 
-							if ( position.x > 0.0 ) {
+					const position = temp( vec3() );
+					assign( position, add( particle, velocity ) ).build( builder ); // workaround
 
-								position.x = limit.x;
+					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ) ).build( builder );
+					assign( velocity.y, cond( greaterThanEqual( abs( position.y ), limit.y ), negate( velocity.y ), velocity.y ) ).build( builder );
 
-							} else {
+					assign( position, max( negate( limit ), min( limit, position ) ) ).build( builder );
 
-								position.x = -limit.x;
+					const pointerSize = 0.1;
+					const distanceFromPointer = length( sub( pointer, position ) );
 
-							}
+					assign( particle, cond( lessThanEqual( distanceFromPointer, pointerSize ), vec3(), position ) ).build( builder );
 
-							velocity.x = - velocity.x;
-
-						}
-
-						if ( abs( position.y ) >= limit.y ) {
-
-							if ( position.y > 0.0 ) {
-
-								position.y = limit.y;
-
-							} else {
-
-								position.y = -limit.y;
-
-							}
-
-							velocity.y = - velocity.y ;
-
-						}
-
-						let POINTER_SIZE = .1;
-
-						let dx = pointer.x - position.x;
-						let dy = pointer.y - position.y;
-						let distanceFromPointer = sqrt( dx * dx + dy * dy );
-
-						if ( distanceFromPointer <= POINTER_SIZE ) {
-
-							position.x = 0.0;
-							position.y = 0.0;
-							position.z = 0.0;
-
-						}
-
-						particle = position;
-
-					}
-				` );
-
-				// define particle and velocity keywords in wgsl function
-				// it's used in case of needed change a global variable like this storageBuffer
-
-				const particleNode = element( particleBufferNode, instanceIndex );
-				const velocityNode = element( velocityBufferNode, instanceIndex );
-
-				WGSLFnNode.keywords[ 'particle' ] = particleNode;
-				WGSLFnNode.keywords[ 'velocity' ] = velocityNode;
+				} );
 
 				// compute
 
-				computeNode = compute( particleNum );
-
-				// Example 1: Calling a WGSL function
-
-				computeNode.computeNode = WGSLFnNode.call( {
-					pointer: uniform( pointer ),
-					limit: uniform( scaleVector )
-				} );
-
-				// Example 2: Creating single storage assign
-
-				//computeNode.computeNode = assign( particleNode, add( particleNode, velocityNode ) );
-
-				// Example 3: Creating multiples storage assign
-
-				/*computeNode.computeNode = new Nodes.ShaderNode( ( {}, builder ) => {
-
-					assign( particleNode, add( particleNode, velocityNode ) ).build( builder );
-					assign( velocityNode, mul( velocityNode, float( 0.99 ) ) ).build( builder );
-
-				} );/**/
+				computeNode = compute( FnNode, particleNum );
 
 				// use a compute shader to animate the point cloud's vertex data.
 
+				const particleNode = attribute( 'particle', 'vec2' );
+
 				const pointsGeometry = new THREE.BufferGeometry();
-				pointsGeometry.setAttribute( 'position', particleBuffer );
+				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ) ) ); // single vertex ( not triangle )
+				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
+				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 
 				const pointsMaterial = new Nodes.PointsNodeMaterial();
-				pointsMaterial.colorNode = add( positionLocal, color( 0xFFFFFF ) );
+				pointsMaterial.colorNode = add( particleNode, color( 0xFFFFFF ) );
+				pointsMaterial.positionNode = particleNode;
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
+				mesh.isInstancedMesh = true;
+				mesh.count = particleNum;
 				scene.add( mesh );
 
 				renderer = new WebGPURenderer();
@@ -225,7 +171,7 @@
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
-				pointer.set(
+				pointerVector.set(
 					( x / width - 0.5 ) * 2.0,
 					( - y / height + 0.5 ) * 2.0
 				);

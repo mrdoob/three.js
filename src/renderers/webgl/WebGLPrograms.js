@@ -13,8 +13,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	const isWebGL2 = capabilities.isWebGL2;
 	const logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
-	const floatVertexTextures = capabilities.floatVertexTextures;
-	const maxVertexUniforms = capabilities.maxVertexUniforms;
 	const vertexTextures = capabilities.vertexTextures;
 	let precision = capabilities.precision;
 
@@ -36,42 +34,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		SpriteMaterial: 'sprite'
 	};
 
-	function getMaxBones( object ) {
-
-		const skeleton = object.skeleton;
-		const bones = skeleton.bones;
-
-		if ( floatVertexTextures ) {
-
-			return 1024;
-
-		} else {
-
-			// default for when object is not specified
-			// ( for example when prebuilding shader to be used with multiple objects )
-			//
-			//  - leave some extra space for other uniforms
-			//  - limit here is ANGLE's 254 max uniform vectors
-			//    (up to 54 should be safe)
-
-			const nVertexUniforms = maxVertexUniforms;
-			const nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
-
-			const maxBones = Math.min( nVertexMatrices, bones.length );
-
-			if ( maxBones < bones.length ) {
-
-				console.warn( 'THREE.WebGLRenderer: Skeleton has ' + bones.length + ' bones. This GPU supports ' + maxBones + '.' );
-				return 0;
-
-			}
-
-			return maxBones;
-
-		}
-
-	}
-
 	function getParameters( material, lights, shadows, scene, object ) {
 
 		const fog = scene.fog;
@@ -85,8 +47,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
-
-		const maxBones = object.isSkinnedMesh ? getMaxBones( object ) : 0;
 
 		if ( material.precision !== null ) {
 
@@ -223,9 +183,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
-			skinning: object.isSkinnedMesh === true && maxBones > 0,
-			maxBones: maxBones,
-			useVertexTexture: floatVertexTextures,
+			skinning: object.isSkinnedMesh === true,
 
 			morphTargets: geometry.morphAttributes.position !== undefined,
 			morphNormals: geometry.morphAttributes.normal !== undefined,
@@ -331,7 +289,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
 		array.push( parameters.sizeAttenuation );
-		array.push( parameters.maxBones );
 		array.push( parameters.morphTargetsCount );
 		array.push( parameters.morphAttributeCount );
 		array.push( parameters.numDirLights );
@@ -428,48 +385,46 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.skinning )
 			_programLayers.enable( 3 );
-		if ( parameters.useVertexTexture )
-			_programLayers.enable( 4 );
 		if ( parameters.morphTargets )
-			_programLayers.enable( 5 );
+			_programLayers.enable( 4 );
 		if ( parameters.morphNormals )
-			_programLayers.enable( 6 );
+			_programLayers.enable( 5 );
 		if ( parameters.morphColors )
-			_programLayers.enable( 7 );
+			_programLayers.enable( 6 );
 		if ( parameters.premultipliedAlpha )
-			_programLayers.enable( 8 );
+			_programLayers.enable( 7 );
 		if ( parameters.shadowMapEnabled )
-			_programLayers.enable( 9 );
+			_programLayers.enable( 8 );
 		if ( parameters.physicallyCorrectLights )
-			_programLayers.enable( 10 );
+			_programLayers.enable( 9 );
 		if ( parameters.doubleSided )
-			_programLayers.enable( 11 );
+			_programLayers.enable( 10 );
 		if ( parameters.flipSided )
-			_programLayers.enable( 12 );
+			_programLayers.enable( 11 );
 		if ( parameters.useDepthPacking )
-			_programLayers.enable( 13 );
+			_programLayers.enable( 12 );
 		if ( parameters.dithering )
-			_programLayers.enable( 14 );
+			_programLayers.enable( 13 );
 		if ( parameters.specularIntensityMap )
-			_programLayers.enable( 15 );
+			_programLayers.enable( 14 );
 		if ( parameters.specularColorMap )
-			_programLayers.enable( 16 );
+			_programLayers.enable( 15 );
 		if ( parameters.transmission )
-			_programLayers.enable( 17 );
+			_programLayers.enable( 16 );
 		if ( parameters.transmissionMap )
-			_programLayers.enable( 18 );
+			_programLayers.enable( 17 );
 		if ( parameters.thicknessMap )
-			_programLayers.enable( 19 );
+			_programLayers.enable( 18 );
 		if ( parameters.sheen )
-			_programLayers.enable( 20 );
+			_programLayers.enable( 19 );
 		if ( parameters.sheenColorMap )
-			_programLayers.enable( 21 );
+			_programLayers.enable( 20 );
 		if ( parameters.sheenRoughnessMap )
-			_programLayers.enable( 22 );
+			_programLayers.enable( 21 );
 		if ( parameters.decodeVideoTexture )
-			_programLayers.enable( 23 );
+			_programLayers.enable( 22 );
 		if ( parameters.opaque )
-			_programLayers.enable( 24 );
+			_programLayers.enable( 23 );
 
 		array.push( _programLayers.mask );
 
