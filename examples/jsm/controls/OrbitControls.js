@@ -90,6 +90,10 @@ class OrbitControls extends EventDispatcher {
 		// Touch fingers
 		this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
 
+		//Html Button Element
+		this.htmlButton = {}
+		this.htmlButtonList = []
+
 		// for reset
 		this.target0 = this.target.clone();
 		this.position0 = this.object.position.clone();
@@ -101,7 +105,9 @@ class OrbitControls extends EventDispatcher {
 		//
 		// public methods
 		//
+		this.addHtmlButton = function (domElement, action){
 
+		}
 		this.getPolarAngle = function () {
 
 			return spherical.phi;
@@ -118,6 +124,22 @@ class OrbitControls extends EventDispatcher {
 
 			return this.object.position.distanceTo( this.target );
 
+		};
+
+		this.listenToHtmlButtonEvents = function ( domElement , attachAction, speed = 7.0) {
+			const id = domElement.id
+            this.htmlButton[id]={action:null,active:null, speed: speed}
+			this.htmlButton[id]['action'] = attachAction
+			domElement.addEventListener( 'mousedown', (event) => {
+				this.htmlButton[id]['active'] = true
+			}, false)
+			domElement.addEventListener( 'mouseup', (event) => {
+				this.htmlButton[id]['active'] = false
+			}, false)
+			domElement.addEventListener( 'mouseleave', (event) => {
+				this.htmlButton[id]['active'] = false
+			}, false)
+			this.htmlButtonList.push(domElement)
 		};
 
 		this.listenToKeyEvents = function ( domElement ) {
@@ -165,7 +187,8 @@ class OrbitControls extends EventDispatcher {
 			const twoPI = 2 * Math.PI;
 
 			return function update() {
-
+				if(this.htmlButtonList.length>0)handleHtmlButton(this.htmlButton, this.htmlButtonList)
+				
 				const position = scope.object.position;
 
 				offset.copy( position ).sub( scope.target );
@@ -310,6 +333,14 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
+			if (scope.htmlButtonList.length>0) {
+                scope.htmlButtonList.forEach((elem)=>{
+                    scope.htmlButton[elem.id].removeEventListener( 'mousedown', null );
+                    scope.htmlButton[elem.id].removeEventListener( 'mouseup', null );
+                    scope.htmlButton[elem.id].removeEventListener( 'mouseleave', null );
+                    })
+                }
+		 
 			//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
 		};
@@ -597,6 +628,24 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
+		function handleHtmlButton(button, buttonList) {
+			const element = scope.domElement;
+			buttonList.forEach((elem)=>{
+				if(button[elem.id].active === true){
+					switch (button[elem.id].action){
+						case 'up': pan( 0, button[elem.id].speed ); break;
+						case 'down': pan( 0, - button[elem.id].speed ); break;
+						case 'left': pan( button[elem.id].speed, 0 ); break;
+						case 'right': pan( - button[elem.id].speed, 0 ); break;
+						case 'rotateUp':  rotateUp( 2 * Math.PI * button[elem.id].speed / element.clientHeight ); break;
+						case 'rotateDown': rotateUp( -2 * Math.PI * button[elem.id].speed / element.clientHeight );break;
+						case 'rotateLeft': rotateLeft( 2 * Math.PI * button[elem.id].speed / element.clientHeight );break;
+						case 'rotateRight': rotateLeft( -2 * Math.PI * button[elem.id].speed / element.clientHeight );break;
+					}
+				}
+			})
+		}
+
 		function handleKeyDown( event ) {
 
 			let needsUpdate = false;
@@ -836,6 +885,8 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
+		
+
 		function onPointerUp( event ) {
 
 		    removePointer( event );
@@ -1004,6 +1055,11 @@ class OrbitControls extends EventDispatcher {
 
 			scope.dispatchEvent( _endEvent );
 
+		}
+
+		function onHtmlButtonDown (event) {
+			// if ( scope.enabled === false || scope.enablePan === false ) return;
+			handleHtmlClickDown = (event)
 		}
 
 		function onKeyDown( event ) {
@@ -1205,7 +1261,7 @@ class OrbitControls extends EventDispatcher {
 			return pointerPositions[ pointer.pointerId ];
 
 		}
-
+		
 		//
 
 		scope.domElement.addEventListener( 'contextmenu', onContextMenu );
@@ -1219,6 +1275,7 @@ class OrbitControls extends EventDispatcher {
 		this.update();
 
 	}
+	
 
 }
 
