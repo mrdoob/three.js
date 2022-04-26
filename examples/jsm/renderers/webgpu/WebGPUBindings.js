@@ -189,7 +189,7 @@ class WebGPUBindings {
 
 					binding.bufferGPU = this.device.createBuffer( {
 						size: byteLength,
-						usage: binding.usage,
+						usage: binding.usage
 					} );
 
 				}

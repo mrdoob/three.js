@@ -41,11 +41,11 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( this.positionNode !== null ) {
 
-			vertex = bypass( vertex, assign( vertex, this.positionNode ) );
+			vertex = bypass( vertex, assign( positionLocal, this.positionNode ) );
 
 		}
 
-		if ( object.isInstancedMesh === true && builder.isAvailable( 'instance' ) === true ) {
+		if ( object.instanceMatrix?.isInstancedBufferAttribute === true && builder.isAvailable( 'instance' ) === true ) {
 
 			vertex = bypass( vertex, instance( object ) );
 
