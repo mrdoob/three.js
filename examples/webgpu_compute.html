@@ -100,6 +100,7 @@
 					const limit = uniform( scaleVector );
 
 					const position = temp( add( particle, velocity ) );
+					position.node.isTempNode = false; // workaround
 					position.build( builder );
 
 					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ) ).build( builder );
