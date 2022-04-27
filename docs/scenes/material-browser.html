@@ -305,7 +305,7 @@
 					'ambient light': ambientLight.color.getHex()
 				};
 
-				folder.addColor( data, 'ambient light' ).onChange( handleColorChange( ambientLight.color ) );
+				folder.addColor( data, 'ambient light' ).onChange( handleColorChange( ambientLight.color, true ) );
 
 				guiSceneFog( folder, scene );
 
