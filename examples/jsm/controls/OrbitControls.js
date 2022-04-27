@@ -288,7 +288,7 @@ class OrbitControls extends EventDispatcher {
 
 		}();
 
-		this.connect = function (domElement) {
+		this.connect = function ( domElement ) {
 
 			if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
