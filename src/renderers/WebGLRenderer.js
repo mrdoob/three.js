@@ -319,7 +319,6 @@ function WebGLRenderer( parameters = {} ) {
 		_this.renderLists = renderLists;
 		_this.shadowMap = shadowMap;
 		_this.state = state;
-		_this.bindingStates = bindingStates;
 		_this.info = info;
 
 	}
