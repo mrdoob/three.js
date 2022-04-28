@@ -366,6 +366,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textureProperties = properties.get( texture );
 
+		if ( texture.isExternalTexture2D ) textureProperties.__webglTexture = texture.webglTexture;
+
 		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
 		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
