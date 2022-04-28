@@ -204,14 +204,15 @@ export const bitXor = nodeProxy( OperatorNode, '^' );
 export const shiftLeft = nodeProxy( OperatorNode, '<<' );
 export const shiftRight = nodeProxy( OperatorNode, '>>' );
 
-export const rad = nodeProxy( MathNode, MathNode.RAD );
-export const deg = nodeProxy( MathNode, MathNode.DEG );
+export const radians = nodeProxy( MathNode, MathNode.RADIANS );
+export const degrees = nodeProxy( MathNode, MathNode.DEGREES );
 export const exp = nodeProxy( MathNode, MathNode.EXP );
 export const exp2 = nodeProxy( MathNode, MathNode.EXP2 );
 export const log = nodeProxy( MathNode, MathNode.LOG );
 export const log2 = nodeProxy( MathNode, MathNode.LOG2 );
 export const sqrt = nodeProxy( MathNode, MathNode.SQRT );
 export const inverseSqrt = nodeProxy( MathNode, MathNode.INVERSE_SQRT );
+export const inversesqrt = inverseSqrt;
 export const floor = nodeProxy( MathNode, MathNode.FLOOR );
 export const ceil = nodeProxy( MathNode, MathNode.CEIL );
 export const normalize = nodeProxy( MathNode, MathNode.NORMALIZE );

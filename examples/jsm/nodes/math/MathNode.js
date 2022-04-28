@@ -8,8 +8,8 @@ class MathNode extends TempNode {
 
 	// 1 input
 
-	static RAD = 'radians';
-	static DEG = 'degrees';
+	static RADIANS = 'radians';
+	static DEGREES = 'degrees';
 	static EXP = 'exp';
 	static EXP2 = 'exp2';
 	static LOG = 'log';
