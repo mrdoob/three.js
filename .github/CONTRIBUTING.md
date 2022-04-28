@@ -30,11 +30,11 @@ This script will start a local server similar to [threejs.org](https://threejs.o
 
 The next most important script runs all the appropriate testing. The E-2-E testing is intended to be run by github actions.
 
-First, run this command from the root folder to install test dependencies:
+Run this command from the root folder to install test dependencies.
 
     npm install --prefix test
 
-Next, run the tests.
+And run tests.
 
     npm test
 
