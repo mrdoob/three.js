@@ -1,0 +1,33 @@
+name: CD
+
+on:
+  push:
+    branches: [ r137-dev ]
+  
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: "Continous Deployment"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+
+      - name: Install deployment packages
+        run: npm ci
+        working-directory: deployment
+
+      - name: Deploy
+        run: node index.js ${{ secrets.ALIYUN_SECRET_ID }} ${{ secrets.ALIYUN_SECRET_KEY }} oss-cn-beijing oppentech-test ../build/three.js /holodeck/js/cd/three-$(git rev-parse HEAD).js
+        working-directory: deployment
