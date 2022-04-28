@@ -18,6 +18,11 @@ jobs:
         with:
           node-version: 16
           cache: 'npm'
+
+      - name: Modify version
+        run: |
+          sed -i 's/"version" *: *"\(.*\)"/"version": "\1-'$(git rev-parse HEAD)'"/g' package.json
+
       - name: Install packages
         run: npm ci
       
@@ -28,6 +33,14 @@ jobs:
         run: npm ci
         working-directory: deployment
 
-      - name: Deploy
+      - name: Deploy to OSS
         run: node index.js ${{ secrets.ALIYUN_SECRET_ID }} ${{ secrets.ALIYUN_SECRET_KEY }} oss-cn-beijing oppentech-test ../build/three.js /holodeck/js/cd/three-$(git rev-parse HEAD).js
         working-directory: deployment
+
+      - name: Modify npm repository
+        run: |
+          echo "@oppentech:registry=http://npm.internal.oppenlab.com/repository/npm_private/" >> ~/.npmrc
+          echo "//npm.internal.oppenlab.com/repository/npm_private/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> ~/.npmrc
+
+      - name: Publish to npm
+        run: npm publish
