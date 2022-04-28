@@ -95,7 +95,7 @@ function WebGLAttributes( gl, capabilities ) {
 			attribute.cachedUsage = attribute.usage;
 			gl.bufferData( bufferType, array, attribute.usage );
 			updateRange.count = - 1; // reset range
-			return
+			return;
 
 		}
 
