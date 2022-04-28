@@ -105,8 +105,7 @@
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
 			Default is [page:BufferAttributeUsage StaticDrawUsage]. See usage [page:BufferAttributeUsage constants] for all possible values.
 			
-			Note: After the initial use of a buffer, its usage cannot be changed. Instead,instantiate a new one and set the desired usage before the next render.
-
+			Note: After the initial use of a buffer, its usage cannot be changed. Instead, instantiate a new one and set the desired usage before the next render.
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -188,7 +187,11 @@
 		</p>
 
 		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:BufferAttribute.usage usage] to value. See usage [page:BufferAttributeUsage constants] for all possible input values.</p>
+		<p>
+			Set [page:BufferAttribute.usage usage] to value. See usage [page:BufferAttributeUsage constants] for all possible input values.
+
+			Note: After the initial use of a buffer, its usage cannot be changed. Instead, instantiate a new one and set the desired usage before the next render.
+		</p>
 
 		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>Sets the x component of the vector at the given index.</p>
