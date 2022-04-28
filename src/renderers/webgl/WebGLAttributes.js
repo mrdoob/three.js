@@ -9,11 +9,7 @@ function WebGLAttributes( gl, capabilities ) {
 		const array = attribute.array;
 		const usage = attribute.usage;
 
-		if ( attribute.cachedUsage !== usage ) {
-
-			attribute.cachedUsage = usage;
-
-		}
+		attribute.cachedUsage = usage;
 
 		const buffer = gl.createBuffer();
 
