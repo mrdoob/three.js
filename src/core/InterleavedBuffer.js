@@ -10,6 +10,7 @@ class InterleavedBuffer {
 		this.count = array !== undefined ? array.length / stride : 0;
 
 		this.usage = StaticDrawUsage;
+		this.cachedUsage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
 
 		this.version = 0;
@@ -27,6 +28,12 @@ class InterleavedBuffer {
 	}
 
 	setUsage( value ) {
+
+		if ( this.usage !== value ) {
+
+			this.version ++;
+
+		}
 
 		this.usage = value;
 

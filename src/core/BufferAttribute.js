@@ -25,6 +25,8 @@ class BufferAttribute {
 		this.normalized = normalized === true;
 
 		this.usage = StaticDrawUsage;
+		this.cachedUsage = StaticDrawUsage;
+
 		this.updateRange = { offset: 0, count: - 1 };
 
 		this.version = 0;
@@ -40,6 +42,12 @@ class BufferAttribute {
 	}
 
 	setUsage( value ) {
+
+		if ( this.usage !== value ) {
+
+			this.version ++;
+
+		}
 
 		this.usage = value;
 
