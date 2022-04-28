@@ -15,7 +15,7 @@ struct PhysicalMaterial {
 
 	#ifdef USE_IRIDESCENCE
 		float iridescence;
-		float iridescenceIor;
+		float iridescenceIOR;
 		float iridescenceThickness;
 		vec3 iridescenceFresnel;
 		vec3 iridescenceF0;

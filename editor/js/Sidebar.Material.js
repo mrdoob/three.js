@@ -136,10 +136,10 @@ function SidebarMaterial( editor ) {
 	const materialIridescence = new SidebarMaterialNumberProperty( editor, 'iridescence', strings.getKey( 'sidebar/material/iridescence' ), [ 0, 1 ] );
 	container.add( materialIridescence );
 
-	// iridescenceIor
+	// iridescenceIOR
 
-	const materialIridescenceIor = new SidebarMaterialNumberProperty( editor, 'iridescenceIor', strings.getKey( 'sidebar/material/iridescenceIor' ), [ 1, 5 ] );
-	container.add( materialIridescenceIor );
+	const materialIridescenceIOR = new SidebarMaterialNumberProperty( editor, 'iridescenceIOR', strings.getKey( 'sidebar/material/iridescenceIOR' ), [ 1, 5 ] );
+	container.add( materialIridescenceIOR );
 
 	// iridescenceThicknessMax
 

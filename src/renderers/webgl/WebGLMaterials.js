@@ -589,7 +589,7 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.iridescence > 0 ) {
 
 			uniforms.iridescence.value = material.iridescence;
-			uniforms.iridescenceIor.value = material.iridescenceIor;
+			uniforms.iridescenceIOR.value = material.iridescenceIOR;
 			uniforms.iridescenceThicknessMinimum.value = material.iridescenceThicknessRange[ 0 ];
 			uniforms.iridescenceThicknessMaximum.value = material.iridescenceThicknessRange[ 1 ];
 

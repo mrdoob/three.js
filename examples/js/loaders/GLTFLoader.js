@@ -669,7 +669,7 @@
 
 			if ( extension.iridescenceIor !== undefined ) {
 
-				materialParams.iridescenceIor = extension.iridescenceIor;
+				materialParams.iridescenceIOR = extension.iridescenceIor;
 
 			}
 

@@ -96,7 +96,7 @@ uniform float opacity;
 
 #ifdef USE_IRIDESCENCE
 	uniform float iridescence;
-	uniform float iridescenceIor;
+	uniform float iridescenceIOR;
 	uniform float iridescenceThicknessMinimum;
 	uniform float iridescenceThicknessMaximum;
 #endif

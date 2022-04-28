@@ -2400,7 +2400,7 @@ class GLTFMaterialsIridescenceExtension {
 
 		}
 
-		extensionDef.iridescenceIor = material.iridescenceIor;
+		extensionDef.iridescenceIor = material.iridescenceIOR;
 		extensionDef.iridescenceThicknessMinimum = material.iridescenceThicknessRange[ 0 ];
 		extensionDef.iridescenceThicknessMaximum = material.iridescenceThicknessRange[ 1 ];
 
