@@ -190,8 +190,8 @@
 			"개발 환경": "ko/setup"
 		},
 		"기본 구조": {
-			"원시 모델": "ko/primitives",
-			"씬 그래프": "ko/scenegraph",
+			"원시 모델(Primitives)": "ko/primitives",
+			"씬 그래프(Scenegraph)": "ko/scenegraph",
 			"재질(Materials)": "ko/materials",
 			"텍스처(Textures)": "ko/textures",
 			"조명(Lights)": "ko/lights",
