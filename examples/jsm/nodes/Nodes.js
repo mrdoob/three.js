@@ -148,6 +148,7 @@ const nodeLib = {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 
@@ -245,6 +246,7 @@ export {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 
