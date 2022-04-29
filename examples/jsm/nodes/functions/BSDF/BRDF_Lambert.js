@@ -1,5 +1,4 @@
-import ShaderNode from '../../shadernode/ShaderNode.js';
-import { mul } from '../../shadernode/ShaderNodeElements.js';
+import { ShaderNode, mul } from '../../shadernode/ShaderNodeBaseElements.js';
 
 const BRDF_Lambert = new ShaderNode( ( inputs ) => {
 

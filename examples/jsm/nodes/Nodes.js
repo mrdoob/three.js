@@ -61,15 +61,17 @@ import CondNode from './math/CondNode.js';
 import LightContextNode from './lights/LightContextNode.js';
 import LightNode from './lights/LightNode.js';
 import LightsNode from './lights/LightsNode.js';
+import ReflectedLightNode from './lights/ReflectedLightNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
+import MatcapUVNode from './utils/MatcapUVNode.js';
+import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
+import OscNode from './utils/OscNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
-import MatcapUVNode from './utils/MatcapUVNode.js';
-import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
 // loaders
@@ -157,15 +159,17 @@ const nodeLib = {
 	LightContextNode,
 	LightNode,
 	LightsNode,
+	ReflectedLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural
@@ -252,15 +256,17 @@ export {
 	LightContextNode,
 	LightNode,
 	LightsNode,
+	ReflectedLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural

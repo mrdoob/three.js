@@ -1,7 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
-import ShaderNode from '../shadernode/ShaderNode.js';
-import { positionView, normalView, uv, join, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../shadernode/ShaderNodeElements.js';
+import { ShaderNode, positionView, normalView, uv, vec3, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -57,7 +56,7 @@ class NormalMapNode extends TempNode {
 		if ( scaleNode !== null ) {
 
 			const normalMapScale = mul( normalMap.xy, scaleNode );
-			normalMap = join( normalMapScale, normalMap.z );
+			normalMap = vec3( normalMapScale, normalMap.z );
 
 		}
 

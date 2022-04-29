@@ -94,6 +94,4 @@ class VarNode extends Node {
 
 }
 
-VarNode.prototype.isVarNode = true;
-
 export default VarNode;

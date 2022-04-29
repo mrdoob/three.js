@@ -1,7 +1,6 @@
-import ShaderNode from '../../shadernode/ShaderNode.js';
 import {
-	div, max, sub, mul, saturate, pow, pow2, pow4, cond, greaterThan
-} from '../../shadernode/ShaderNodeElements.js';
+	ShaderNode, div, max, sub, mul, saturate, pow, pow2, pow4, cond, greaterThan
+} from '../../shadernode/ShaderNodeBaseElements.js';
 
 const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 

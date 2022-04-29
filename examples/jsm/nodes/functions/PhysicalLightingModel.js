@@ -1,10 +1,9 @@
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import BRDF_GGX from './BSDF/BRDF_GGX.js';
-import ShaderNode from '../shadernode/ShaderNode.js';
 import {
-	mul, saturate, dot, transformedNormalView,
+	ShaderNode, mul, saturate, dot, transformedNormalView,
 	diffuseColor, specularColor, roughness
-} from '../shadernode/ShaderNodeElements.js';
+} from '../shadernode/ShaderNodeBaseElements.js';
 
 const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 
