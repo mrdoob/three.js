@@ -257,7 +257,7 @@ export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
 // display
 
-export const frontFacing = nodeObject( new FrontFacingNode() );
+export const frontFacing = nodeImmutable( FrontFacingNode );
 export const faceDirection = sub( mul( float( frontFacing ), 2 ), 1 );
 
 // lights
