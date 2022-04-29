@@ -11,7 +11,7 @@ class Vector3 {
 
 	}
 
-	static lerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+	static lerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, alpha ) {
 
 		let x0 = src0[ srcOffset0 + 0 ],
 			y0 = src0[ srcOffset0 + 1 ],
