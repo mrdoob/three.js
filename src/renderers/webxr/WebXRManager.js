@@ -561,6 +561,15 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		function addCamera( i ) {
+
+			const camera = new PerspectiveCamera();
+			camera.layers.enable( i );
+			camera.viewport = new Vector4();
+			cameras.push( camera );
+
+		}
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -620,6 +629,8 @@ class WebXRManager extends EventDispatcher {
 						}
 
 					}
+
+					if ( ! cameras[ i ] ) addCamera( i );
 
 					const camera = cameras[ i ];
 
