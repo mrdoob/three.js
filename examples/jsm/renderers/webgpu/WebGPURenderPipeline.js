@@ -134,10 +134,8 @@ class WebGPURenderPipeline {
 
 	_getAlphaBlend( material ) {
 
-		const blending = material.blending;
 		const premultipliedAlpha = material.premultipliedAlpha;
-
-		let alphaBlend = undefined;
+		const blending = material.blending;
 
 		switch ( blending ) {
 
@@ -145,7 +143,7 @@ class WebGPURenderPipeline {
 
 				if ( premultipliedAlpha === false ) {
 
-					alphaBlend = {
+					return {
 						srcFactor: GPUBlendFactor.One,
 						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
 						operation: GPUBlendOperation.Add
@@ -163,7 +161,7 @@ class WebGPURenderPipeline {
 
 				if ( premultipliedAlpha === true ) {
 
-					alphaBlend = {
+					return {
 						srcFactor: GPUBlendFactor.OneMinusSrcColor,
 						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
 						operation: GPUBlendOperation.Add
@@ -176,7 +174,7 @@ class WebGPURenderPipeline {
 			case MultiplyBlending:
 				if ( premultipliedAlpha === true ) {
 
-					alphaBlend = {
+					return {
 						srcFactor: GPUBlendFactor.Zero,
 						dstFactor: GPUBlendFactor.SrcAlpha,
 						operation: GPUBlendOperation.Add
@@ -194,7 +192,7 @@ class WebGPURenderPipeline {
 
 				if ( blendSrcAlpha !== null && blendDstAlpha !== null && blendEquationAlpha !== null ) {
 
-					alphaBlend = {
+					return {
 						srcFactor: this._getBlendFactor( blendSrcAlpha ),
 						dstFactor: this._getBlendFactor( blendDstAlpha ),
 						operation: this._getBlendOperation( blendEquationAlpha )
@@ -209,110 +207,81 @@ class WebGPURenderPipeline {
 
 		}
 
-		return alphaBlend;
-
 	}
 
 	_getBlendFactor( blend ) {
 
-		let blendFactor;
-
 		switch ( blend ) {
 
 			case ZeroFactor:
-				blendFactor = GPUBlendFactor.Zero;
-				break;
+				return GPUBlendFactor.Zero;
 
 			case OneFactor:
-				blendFactor = GPUBlendFactor.One;
-				break;
+				return GPUBlendFactor.One;
 
 			case SrcColorFactor:
-				blendFactor = GPUBlendFactor.SrcColor;
-				break;
+				return GPUBlendFactor.SrcColor;
 
 			case OneMinusSrcColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusSrcColor;
-				break;
+				return GPUBlendFactor.OneMinusSrcColor;
 
 			case SrcAlphaFactor:
-				blendFactor = GPUBlendFactor.SrcAlpha;
-				break;
+				return GPUBlendFactor.SrcAlpha;
 
 			case OneMinusSrcAlphaFactor:
-				blendFactor = GPUBlendFactor.OneMinusSrcAlpha;
-				break;
+				return GPUBlendFactor.OneMinusSrcAlpha;
 
 			case DstColorFactor:
-				blendFactor = GPUBlendFactor.DstColor;
-				break;
+				return GPUBlendFactor.DstColor;
 
 			case OneMinusDstColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusDstColor;
-				break;
+				return GPUBlendFactor.OneMinusDstColor;
 
 			case DstAlphaFactor:
-				blendFactor = GPUBlendFactor.DstAlpha;
-				break;
+				return GPUBlendFactor.DstAlpha;
 
 			case OneMinusDstAlphaFactor:
-				blendFactor = GPUBlendFactor.OneMinusDstAlpha;
-				break;
+				return GPUBlendFactor.OneMinusDstAlpha;
 
 			case SrcAlphaSaturateFactor:
-				blendFactor = GPUBlendFactor.SrcAlphaSaturated;
-				break;
+				return GPUBlendFactor.SrcAlphaSaturated;
 
 			case BlendColorFactor:
-				blendFactor = GPUBlendFactor.BlendColor;
-				break;
+				return GPUBlendFactor.BlendColor;
 
 			case OneMinusBlendColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusBlendColor;
-				break;
-
+				return GPUBlendFactor.OneMinusBlendColor;
 
 			default:
 				console.error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
 
 		}
 
-		return blendFactor;
-
 	}
 
 	_getBlendOperation( blendEquation ) {
 
-		let blendOperation;
-
 		switch ( blendEquation ) {
 
 			case AddEquation:
-				blendOperation = GPUBlendOperation.Add;
-				break;
+				return GPUBlendOperation.Add;
 
 			case SubtractEquation:
-				blendOperation = GPUBlendOperation.Subtract;
-				break;
+				return GPUBlendOperation.Subtract;
 
 			case ReverseSubtractEquation:
-				blendOperation = GPUBlendOperation.ReverseSubtract;
-				break;
+				return GPUBlendOperation.ReverseSubtract;
 
 			case MinEquation:
-				blendOperation = GPUBlendOperation.Min;
-				break;
+				return GPUBlendOperation.Min;
 
 			case MaxEquation:
-				blendOperation = GPUBlendOperation.Max;
-				break;
+				return GPUBlendOperation.Max;
 
 			default:
 				console.error( 'THREE.WebGPURenderer: Blend equation not supported.', blendEquation );
 
 		}
-
-		return blendOperation;
 
 	}
 
@@ -321,50 +290,52 @@ class WebGPURenderPipeline {
 		const blending = material.blending;
 		const premultipliedAlpha = material.premultipliedAlpha;
 
-		const colorBlend = {
-			srcFactor: null,
-			dstFactor: null,
-			operation: null
-		};
-
 		switch ( blending ) {
 
 			case NormalBlending:
-
-				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
-				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
+				return {
+					srcFactor: ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha,
+					dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
+					operation: GPUBlendOperation.Add
+				};
 
 			case AdditiveBlending:
-				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
+				return {
+					srcFactor: ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha,
+					dstFactor: null,
+					operation: GPUBlendOperation.Add
+				};
 
 			case SubtractiveBlending:
-				colorBlend.srcFactor = GPUBlendFactor.Zero;
-				colorBlend.dstFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.Zero : GPUBlendFactor.OneMinusSrcColor;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
+				return {
+					srcFactor: GPUBlendFactor.Zero,
+					dstFactor: ( premultipliedAlpha === true ) ? GPUBlendFactor.Zero : GPUBlendFactor.OneMinusSrcColor,
+					operation: GPUBlendOperation.Add
+				};
 
 			case MultiplyBlending:
-				colorBlend.srcFactor = GPUBlendFactor.Zero;
-				colorBlend.dstFactor = GPUBlendFactor.SrcColor;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
+				return {
+					srcFactor: GPUBlendFactor.Zero,
+					dstFactor: GPUBlendFactor.SrcColor,
+					operation: GPUBlendOperation.Add
+				};
 
 			case CustomBlending:
-				colorBlend.srcFactor = this._getBlendFactor( material.blendSrc );
-				colorBlend.dstFactor = this._getBlendFactor( material.blendDst );
-				colorBlend.operation = this._getBlendOperation( material.blendEquation );
-				break;
+				return {
+					srcFactor: this._getBlendFactor( material.blendSrc ),
+					dstFactor: this._getBlendFactor( material.blendDst ),
+					operation: this._getBlendOperation( material.blendEquation )
+				};
 
 			default:
 				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
+				return {
+					srcFactor: null,
+					dstFactor: null,
+					operation: null
+				};
 
 		}
-
-		return colorBlend;
 
 	}
 
@@ -376,58 +347,44 @@ class WebGPURenderPipeline {
 
 	_getDepthCompare( material ) {
 
-		let depthCompare;
-
 		if ( material.depthTest === false ) {
 
-			depthCompare = GPUCompareFunction.Always;
-
-		} else {
-
-			const depthFunc = material.depthFunc;
-
-			switch ( depthFunc ) {
-
-				case NeverDepth:
-					depthCompare = GPUCompareFunction.Never;
-					break;
-
-				case AlwaysDepth:
-					depthCompare = GPUCompareFunction.Always;
-					break;
-
-				case LessDepth:
-					depthCompare = GPUCompareFunction.Less;
-					break;
-
-				case LessEqualDepth:
-					depthCompare = GPUCompareFunction.LessEqual;
-					break;
-
-				case EqualDepth:
-					depthCompare = GPUCompareFunction.Equal;
-					break;
-
-				case GreaterEqualDepth:
-					depthCompare = GPUCompareFunction.GreaterEqual;
-					break;
-
-				case GreaterDepth:
-					depthCompare = GPUCompareFunction.Greater;
-					break;
-
-				case NotEqualDepth:
-					depthCompare = GPUCompareFunction.NotEqual;
-					break;
-
-				default:
-					console.error( 'THREE.WebGPURenderer: Invalid depth function.', depthFunc );
-
-			}
+			return GPUCompareFunction.Always;
 
 		}
 
-		return depthCompare;
+		const depthFunc = material.depthFunc;
+
+		switch ( depthFunc ) {
+
+			case NeverDepth:
+				return GPUCompareFunction.Never;
+
+			case AlwaysDepth:
+				return GPUCompareFunction.Always;
+
+			case LessDepth:
+				return GPUCompareFunction.Less;
+
+			case LessEqualDepth:
+				return GPUCompareFunction.LessEqual;
+
+			case EqualDepth:
+				return GPUCompareFunction.Equal;
+
+			case GreaterEqualDepth:
+				return GPUCompareFunction.GreaterEqual;
+
+			case GreaterDepth:
+				return GPUCompareFunction.Greater;
+
+			case NotEqualDepth:
+				return GPUCompareFunction.NotEqual;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Invalid depth function.', depthFunc );
+
+		}
 
 	}
 
@@ -483,97 +440,73 @@ class WebGPURenderPipeline {
 
 	_getStencilCompare( material ) {
 
-		let stencilCompare;
-
 		const stencilFunc = material.stencilFunc;
 
 		switch ( stencilFunc ) {
 
 			case NeverStencilFunc:
-				stencilCompare = GPUCompareFunction.Never;
-				break;
+				return GPUCompareFunction.Never;
 
 			case AlwaysStencilFunc:
-				stencilCompare = GPUCompareFunction.Always;
-				break;
+				return GPUCompareFunction.Always;
 
 			case LessStencilFunc:
-				stencilCompare = GPUCompareFunction.Less;
-				break;
+				return GPUCompareFunction.Less;
 
 			case LessEqualStencilFunc:
-				stencilCompare = GPUCompareFunction.LessEqual;
-				break;
+				return GPUCompareFunction.LessEqual;
 
 			case EqualStencilFunc:
-				stencilCompare = GPUCompareFunction.Equal;
-				break;
+				return GPUCompareFunction.Equal;
 
 			case GreaterEqualStencilFunc:
-				stencilCompare = GPUCompareFunction.GreaterEqual;
-				break;
+				return GPUCompareFunction.GreaterEqual;
 
 			case GreaterStencilFunc:
-				stencilCompare = GPUCompareFunction.Greater;
-				break;
+				return GPUCompareFunction.Greater;
 
 			case NotEqualStencilFunc:
-				stencilCompare = GPUCompareFunction.NotEqual;
-				break;
+				return GPUCompareFunction.NotEqual;
 
 			default:
 				console.error( 'THREE.WebGPURenderer: Invalid stencil function.', stencilFunc );
 
 		}
 
-		return stencilCompare;
-
 	}
 
 	_getStencilOperation( op ) {
 
-		let stencilOperation;
-
 		switch ( op ) {
 
 			case KeepStencilOp:
-				stencilOperation = GPUStencilOperation.Keep;
-				break;
+				return GPUStencilOperation.Keep;
 
 			case ZeroStencilOp:
-				stencilOperation = GPUStencilOperation.Zero;
-				break;
+				return GPUStencilOperation.Zero;
 
 			case ReplaceStencilOp:
-				stencilOperation = GPUStencilOperation.Replace;
-				break;
+				return GPUStencilOperation.Replace;
 
 			case InvertStencilOp:
-				stencilOperation = GPUStencilOperation.Invert;
-				break;
+				return GPUStencilOperation.Invert;
 
 			case IncrementStencilOp:
-				stencilOperation = GPUStencilOperation.IncrementClamp;
-				break;
+				return GPUStencilOperation.IncrementClamp;
 
 			case DecrementStencilOp:
-				stencilOperation = GPUStencilOperation.DecrementClamp;
-				break;
+				return GPUStencilOperation.DecrementClamp;
 
 			case IncrementWrapStencilOp:
-				stencilOperation = GPUStencilOperation.IncrementWrap;
-				break;
+				return GPUStencilOperation.IncrementWrap;
 
 			case DecrementWrapStencilOp:
-				stencilOperation = GPUStencilOperation.DecrementWrap;
-				break;
+				return GPUStencilOperation.DecrementWrap;
 
 			default:
 				console.error( 'THREE.WebGPURenderer: Invalid stencil operation.', stencilOperation );
 
 		}
-
-		return stencilOperation;
 
 	}
 
