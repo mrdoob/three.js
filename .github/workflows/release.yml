@@ -4,6 +4,37 @@ on:
   workflow_dispatch:
 
 jobs:
+  push:
+    name: Push to repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets._GITHUB_PUSH_PAT }}
+
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Output version number
+        id: version
+        run: |
+          export version=$(cat package.json | grep '"version"'| awk -F '"' '{print $4}')
+          echo ::set-output name=version::"$version"
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Release ${{ steps.version.outputs.version }}
+
   deploy:
     name: Deploy to OSS
     runs-on: ubuntu-latest
