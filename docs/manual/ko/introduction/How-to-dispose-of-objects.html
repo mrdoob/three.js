@@ -42,6 +42,11 @@
         buffer와 비슷하게, 이 오브젝트는 [page:Texture.dispose]() 호출로만 삭제가 가능합니다.
 	</p>
 
+	<p>
+        If you use an *ImageBitmap* as the texture's data source, you have to call [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]() at the application level to dispose of all CPU-side resources.
+        An automated call of *ImageBitmap.close()* in [page:Texture.dispose]() is not possible, since the image bitmap becomes unusable, and the engine has no way of knowing if the image bitmap is used elsewhere.
+	</p>
+
 	<h2>렌더링 대상</h2>
 
 	<p>
