@@ -1,6 +1,8 @@
 export default /* glsl */`
+#ifndef ALPHA_R115_COMPATABILITY
 #ifdef OPAQUE
 diffuseColor.a = 1.0;
+#endif
 #endif
 
 // https://github.com/mrdoob/three.js/pull/22425
