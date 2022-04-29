@@ -11,6 +11,22 @@ class Vector3 {
 
 	}
 
+	static lerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+
+		let x0 = src0[ srcOffset0 + 0 ],
+			y0 = src0[ srcOffset0 + 1 ],
+			z0 = src0[ srcOffset0 + 2 ];
+
+		const x1 = src1[ srcOffset1 + 0 ],
+			y1 = src1[ srcOffset1 + 1 ],
+			z1 = src1[ srcOffset1 + 2 ];
+
+		dst[ dstOffset + 0 ] = x0 + ( x1 - x0 ) * alpha;
+		dst[ dstOffset + 1 ] = y0 + ( y1 - y0 ) * alpha;
+		dst[ dstOffset + 2 ] = z0 + ( z1 - z0 ) * alpha;
+
+	}
+
 	set( x, y, z ) {
 
 		if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
