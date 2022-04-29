@@ -32,6 +32,22 @@ export default /* glsl */`
 		vec2 st0 = dFdx( vUv.st );
 		vec2 st1 = dFdy( vUv.st );
 
+	#ifdef PERTURB_NORMAL_R115_COMPATABILITY
+
+		float scale = sign( st1.t * st0.s - st0.t * st1.s ); // we do not care about the magnitude
+
+		vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );
+		vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );
+		vec3 N = normalize( surf_norm );
+
+		mat3 tsn = mat3( S, T, N );
+
+		mapN.xy *= ( faceDirection * 2.0 - 1.0 );
+
+		return normalize( tsn * mapN );
+
+	#else
+
 		vec3 N = surf_norm; // normalized
 
 		vec3 q1perp = cross( q1, N );
@@ -44,6 +60,8 @@ export default /* glsl */`
 		float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
 
 		return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
+
+	#endif
 
 	}
 

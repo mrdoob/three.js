@@ -37,6 +37,12 @@ class MeshMatcapMaterial extends Material {
 
 		this.defines = { 'MATCAP': '' };
 
+		if ( Material.r115Compatible === true ) {
+
+			this.defines[ 'PERTURB_NORMAL_R115_COMPATABILITY' ] = '';
+
+		}
+
 		this.type = 'MeshMatcapMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
@@ -69,7 +75,7 @@ class MeshMatcapMaterial extends Material {
 
 		super.copy( source );
 
-		this.defines = { 'MATCAP': '' };
+		this.defines = source.defines;
 
 		this.color.copy( source.color );
 
