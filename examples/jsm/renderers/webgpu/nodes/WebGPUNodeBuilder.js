@@ -106,10 +106,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		this.uniformsGroup = {};
 
 		this.builtins = {
-			vertex: new Set(),
-			fragment: new Set(),
-			compute: new Set(),
-			attribute: new Set()
+			vertex: new Map(),
+			fragment: new Map(),
+			compute: new Map(),
+			attribute: new Map()
 		};
 
 	}
@@ -371,11 +371,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	getBuiltin( name, property, type, shaderStage = this.shaderStage ) {
 
-		this.builtins[ shaderStage ].add( {
-			name,
-			property,
-			type
-		} );
+		const map = this.builtins[ shaderStage ];
+
+		if ( map.has( name ) === false ) {
+
+			map.set( name, {
+				name,
+				property,
+				type
+			} );
+
+		}
 
 		return property;
 
@@ -411,7 +417,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			for ( const { name, property, type } of this.builtins[ 'attribute' ] ) {
+			for ( const { name, property, type } of this.builtins.attribute.values() ) {
 
 				snippets.push( `@builtin( ${name} ) ${property} : ${type}` );
 
@@ -488,7 +494,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		}
 
-		for ( const { name, property, type } of this.builtins[ shaderStage ] ) {
+		for ( const { name, property, type } of this.builtins[ shaderStage ].values() ) {
 
 			snippets.push( `@builtin( ${name} ) ${property} : ${type}` );
 
