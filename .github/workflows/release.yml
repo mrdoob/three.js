@@ -17,7 +17,7 @@ jobs:
           cache: 'npm'
       - name: Install packages
         run: npm ci
-      
+
       - name: Build
         run: npm run build
 
@@ -27,7 +27,7 @@ jobs:
 
       - name: Deploy to OSS
         run: |
-          export version=$(cat package.json | grep '"version"'| awk -F '"' '{print $4}')
+          export version=$(cat ../package.json | grep '"version"'| awk -F '"' '{print $4}')
           node index.js ${{ secrets.ALIYUN_SECRET_ID }} ${{ secrets.ALIYUN_SECRET_KEY }} oss-cn-beijing oppentech-static ../build/three.min.js /holodeck/js/three-$version.js
           node index.js ${{ secrets.ALIYUN_SECRET_ID }} ${{ secrets.ALIYUN_SECRET_KEY }} oss-cn-beijing oppentech-test ../build/three.min.js /holodeck/js/three-$version.js
         working-directory: deployment
