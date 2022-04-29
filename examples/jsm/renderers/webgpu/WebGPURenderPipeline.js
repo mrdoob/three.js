@@ -448,8 +448,8 @@ class WebGPURenderPipeline {
 		switch ( material.side ) {
 
 			case FrontSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.Back;
+				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.cullMode = GPUCullMode.Front;
 				break;
 
 			case BackSide:
@@ -458,7 +458,7 @@ class WebGPURenderPipeline {
 				break;
 
 			case DoubleSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.frontFace = GPUFrontFace.CW;
 				descriptor.cullMode = GPUCullMode.None;
 				break;
 
