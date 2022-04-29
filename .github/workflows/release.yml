@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to OSS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+
+      - name: Install deployment packages
+        run: npm ci
+        working-directory: deployment
+
+      - name: Deploy to OSS
+        run: |
+          export version=$(cat package.json | grep '"version"'| awk -F '"' '{print $4}')
+          node index.js ${{ secrets.ALIYUN_SECRET_ID }} ${{ secrets.ALIYUN_SECRET_KEY }} oss-cn-beijing oppentech-static ../build/three.min.js /holodeck/js/three-$version.js
+          node index.js ${{ secrets.ALIYUN_SECRET_ID }} ${{ secrets.ALIYUN_SECRET_KEY }} oss-cn-beijing oppentech-test ../build/three.min.js /holodeck/js/three-$version.js
+        working-directory: deployment
+
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Modify npm repository
+        run: |
+          echo "@oppentech:registry=http://npm.internal.oppenlab.com/repository/npm_private/" >> ~/.npmrc
+          echo "//npm.internal.oppenlab.com/repository/npm_private/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> ~/.npmrc
+
+      - name: Publish to npm
+        run: npm publish
