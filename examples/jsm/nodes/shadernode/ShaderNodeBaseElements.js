@@ -28,6 +28,9 @@ import StorageBufferNode from '../accessors/StorageBufferNode.js';
 import TextureNode from '../accessors/TextureNode.js';
 import UVNode from '../accessors/UVNode.js';
 
+// display
+import FrontFacingNode from '../display/FrontFacingNode.js';
+
 // gpgpu
 import ComputeNode from '../gpgpu/ComputeNode.js';
 
@@ -251,6 +254,11 @@ export const clamp = nodeProxy( MathNode, MathNode.CLAMP );
 export const refract = nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
 export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
+
+// display
+
+export const frontFacing = nodeImmutable( FrontFacingNode );
+export const faceDirection = sub( mul( float( frontFacing ), 2 ), 1 );
 
 // lights
 

@@ -49,6 +49,7 @@ import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
+import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
 import ToneMappingNode from './display/ToneMappingNode.js';
 
@@ -147,6 +148,7 @@ const nodeLib = {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 
@@ -244,6 +246,7 @@ export {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 

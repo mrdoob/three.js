@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
-import { ShaderNode, positionView, normalView, uv, vec3, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal } from '../shadernode/ShaderNodeBaseElements.js';
+import { ShaderNode, positionView, normalView, uv, vec3, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal, faceDirection } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -9,7 +9,7 @@ import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
 const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
 
-	const { eye_pos, surf_norm, mapN, faceDirection, uv } = inputs;
+	const { eye_pos, surf_norm, mapN, uv } = inputs;
 
 	const q0 = dFdx( eye_pos.xyz );
 	const q1 = dFdy( eye_pos.xyz );
@@ -74,7 +74,6 @@ class NormalMapNode extends TempNode {
 				eye_pos: positionView,
 				surf_norm: normalView,
 				mapN: normalMap,
-				faceDirection: 1.0,
 				uv: uv()
 			} );
 
