@@ -49,6 +49,7 @@ import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
+import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
 import ToneMappingNode from './display/ToneMappingNode.js';
 
