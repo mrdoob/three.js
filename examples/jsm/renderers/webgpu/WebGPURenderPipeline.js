@@ -134,8 +134,8 @@ class WebGPURenderPipeline {
 
 	_getAlphaBlend( material ) {
 
-		const premultipliedAlpha = material.premultipliedAlpha;
 		const blending = material.blending;
+		const premultipliedAlpha = material.premultipliedAlpha;
 
 		switch ( blending ) {
 
