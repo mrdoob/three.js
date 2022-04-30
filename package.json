@@ -10,16 +10,9 @@
   },
   "sideEffects": false,
   "files": [
-    "build/three.js",
-    "build/three.min.js",
     "build/three.module.js",
-    "examples/js",
     "examples/jsm",
-    "examples/fonts",
-    "LICENSE",
-    "package.json",
-    "README.md",
-    "src"
+    "package.json"
   ],
   "directories": {
     "doc": "docs",
