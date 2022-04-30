@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    paths-ignore:
+      - 'build/**'
+      - 'docs/**'
+      - 'files/**'
+
+jobs:
+
+  Create_Build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install packages
+        run: npm ci
+
+      - name: === building three ===
+        run: npm run build && npm run build-module && npm run build-examples
+
+      - name: === Giving permission to build script ===
+        run: chmod +x ./utils/three-production.sh
+
+      - name: === Running build script ===
+        run: sh ./utils/three-production.sh
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          add-paths: |
+            build/three.module.js
+            examples/jsm/*
+            package.json
