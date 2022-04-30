@@ -1,6 +1,6 @@
 mkdir output
 git clone https://github.com/webaverse/three output
-npm pack --pack-destination output
+npm pack . --pack-destination output
 cd output
 tar -xvzf $(find . -type f -name "*.tgz")
 cp -r package/* .
