@@ -3,6 +3,7 @@ git clone https://github.com/webaverse/three output
 npm pack . --pack-destination output
 cd output
 rm -rf $(find . -type f -name "output*.tgz")
+ls -l
 tar -xvzf $(find . -type f -name "*.tgz")
 cp -r package/* .
 rm -rf package 
