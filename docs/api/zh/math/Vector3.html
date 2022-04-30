@@ -443,6 +443,21 @@
 		将该向量的每个分量(x、y、z)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
+		<h2>静态方法</h2>
+
+		<h3>[method:undefined lerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float t] )</h3>
+		<p>
+		[page:Array dst] - 输出数组<br />
+		[page:Integer dstOffset] - 输出数组的偏移量<br />
+		[page:Array src0] - 起始三维向量的源数组<br />
+		[page:Integer srcOffset0] - 数组 *src0* 的偏移量<br />
+		[page:Array src1] - 目标三维向量的源数组<br />
+		[page:Integer srcOffset1] - 数组 *src1* 的偏移量<br />
+		[page:Float t] - 归一化插值因子(介于 0 和 1 之间)<br /><br />
+
+		此 LERP 实现假定三维向量数据在扁平数组中进行管理。
+		</p>
+
 		<h2>源代码</h2>
 
 		<p>

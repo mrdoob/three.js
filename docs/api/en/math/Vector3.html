@@ -458,6 +458,21 @@
 		Sets this vector to a uniformly random point on a unit sphere.
 		</p>
 
+		<h2>Static Methods</h2>
+
+		<h3>[method:undefined lerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float alpha] )</h3>
+		<p>
+		[page:Array dst] - The output array.<br />
+		[page:Integer dstOffset] - An offset into the output array.<br />
+		[page:Array src0] - The source array of the starting vector3.<br />
+		[page:Integer srcOffset0] - An offset into the array *src0*.<br />
+		[page:Array src1] - The source array of the target vector3.<br />
+		[page:Integer srcOffset1] - An offset into the array *src1*.<br />
+		[page:Float alpha] - Normalized interpolation factor (between 0 and 1).<br /><br />
+
+		This LERP implementation assumes the vector3 data are managed in flat arrays.
+		</p>
+
 		<h2>Source</h2>
 
 		<p>
