@@ -22,6 +22,7 @@ export default QUnit.module( 'Loaders', () => {
 			assert.equal( '/path/to/', LoaderUtils.extractUrlBase( '/path/to/model.glb' ) );
 			assert.equal( './', LoaderUtils.extractUrlBase( 'model.glb' ) );
 			assert.equal( '/', LoaderUtils.extractUrlBase( '/model.glb' ) );
+			assert.equal( '/host/to\\folder\\', LoaderUtils.extractUrlBase( '/host/to\\folder\\model.glb' ) );
 
 		} );
 

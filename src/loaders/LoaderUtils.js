@@ -36,7 +36,7 @@ class LoaderUtils {
 
 	static extractUrlBase( url ) {
 
-		const index = url.lastIndexOf( '/' );
+		const index = Math.max( url.lastIndexOf( '/' ), url.lastIndexOf( '\\' ) );
 
 		if ( index === - 1 ) return './';
 
