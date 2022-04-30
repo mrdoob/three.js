@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '140dev';
+	const REVISION = '140';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
