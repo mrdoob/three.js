@@ -8,14 +8,14 @@ class MathNode extends TempNode {
 
 	// 1 input
 
-	static RAD = 'radians';
-	static DEG = 'degrees';
+	static RADIANS = 'radians';
+	static DEGREES = 'degrees';
 	static EXP = 'exp';
 	static EXP2 = 'exp2';
 	static LOG = 'log';
 	static LOG2 = 'log2';
 	static SQRT = 'sqrt';
-	static INV_SQRT = 'inversesqrt';
+	static INVERSE_SQRT = 'inversesqrt';
 	static FLOOR = 'floor';
 	static CEIL = 'ceil';
 	static NORMALIZE = 'normalize';
@@ -75,9 +75,9 @@ class MathNode extends TempNode {
 		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
 		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
 
-		const aLen = builder.getTypeLength( aType );
-		const bLen = builder.getTypeLength( bType );
-		const cLen = builder.getTypeLength( cType );
+		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
+		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
+		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
 		if ( aLen > bLen && aLen > cLen ) {
 

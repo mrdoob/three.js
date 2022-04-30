@@ -24,10 +24,9 @@ class ConvertNode extends Node {
 
 		if ( builder.isReference( convertTo ) === false ) {
 
-			const convertToSnippet = builder.getType( convertTo );
 			const nodeSnippet = node.build( builder, convertTo );
 
-			return `${ builder.getVectorType( convertToSnippet ) }( ${ nodeSnippet } )`;
+			return builder.format( nodeSnippet, this.getNodeType( builder ), convertTo );
 
 		} else {
 

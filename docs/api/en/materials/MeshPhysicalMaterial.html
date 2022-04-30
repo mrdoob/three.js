@@ -79,6 +79,16 @@
 		<h2>Properties</h2>
 		<p>See the base [page:Material] and [page:MeshStandardMaterial] classes for common properties.</p>
 
+		<h3>[property:Color attenuationColor]</h3>
+		<p>
+		The color that white light turns into due to absorption when reaching the attenuation distance. Default is *white* (0xffffff).
+		</p>
+
+		<h3>[property:Float attenuationDistance]</h3>
+		<p>
+		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space. Default is *0*.
+		</p>
+
 		<h3>[property:Float clearcoat]</h3>
 		<p>
 		Represents the intensity of the clear coat layer, from *0.0* to *1.0*. Use clear coat related properties to enable multilayer
@@ -178,6 +188,16 @@
 		<h3>[property:Texture specularColorMap]</h3>
 		<p>
 			The RGB channels of this texture are multiplied against [page:.specularColor], for per-pixel control over specular color. Default is *null*.
+		</p>
+
+		<h3>[property:Float thickness]</h3>
+		<p>
+		The thickness of the volume beneath the surface. The value is given in the coordinate space of the mesh. If the value is 0 the material is thin-walled. Otherwise the material is a volume boundary. Default is *0*.
+		</p>
+
+		<h3>[property:Texture thicknessMap]</h3>
+		<p>
+		A texture that defines the thickness, stored in the G channel. This will be multiplied by [page:.thickness]. Default is *null*.
 		</p>
 
 		<h3>[property:Float transmission]</h3>

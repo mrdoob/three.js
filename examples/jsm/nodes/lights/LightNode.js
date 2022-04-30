@@ -5,7 +5,7 @@ import UniformNode from '../core/UniformNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import MathNode from '../math/MathNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { getDistanceAttenuation } from '../functions/BSDFs.js';
+import getDistanceAttenuation from '../functions/light/getDistanceAttenuation.js';
 
 import { Color } from 'three';
 
@@ -51,7 +51,7 @@ class LightNode extends Node {
 
 		const lightDistance = new MathNode( MathNode.LENGTH, lVector );
 
-		const lightAttenuation = getDistanceAttenuation( {
+		const lightAttenuation = getDistanceAttenuation.call( {
 			lightDistance,
 			cutoffDistance: this._lightCutoffDistanceNode,
 			decayExponent: this._lightDecayExponentNode
@@ -61,18 +61,16 @@ class LightNode extends Node {
 
 		lightPositionView.object3d = this.light;
 
-		const lightingModelFunction = builder.context.lightingModel;
+		const lightingModelFunctionNode = builder.context.lightingModelNode;
 
-		if ( lightingModelFunction !== undefined ) {
+		if ( lightingModelFunctionNode !== undefined ) {
 
-			const directDiffuse = builder.context.directDiffuse;
-			const directSpecular = builder.context.directSpecular;
+			const reflectedLight = builder.context.reflectedLight;
 
-			lightingModelFunction( {
+			lightingModelFunctionNode.call( {
 				lightDirection,
 				lightColor,
-				directDiffuse,
-				directSpecular
+				reflectedLight
 			}, builder );
 
 		}

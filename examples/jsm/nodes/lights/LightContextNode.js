@@ -1,15 +1,13 @@
 import ContextNode from '../core/ContextNode.js';
-import VarNode from '../core/VarNode.js';
-import UniformNode from '../core/UniformNode.js';
-import OperatorNode from '../math/OperatorNode.js';
-import { PhysicalLightingModel } from '../functions/BSDFs.js';
-import { Vector3 } from 'three';
+import { reflectedLight } from '../shadernode/ShaderNodeBaseElements.js';
 
 class LightContextNode extends ContextNode {
 
-	constructor( node ) {
+	constructor( node, lightingModelNode = null ) {
 
 		super( node );
+
+		this.lightingModelNode = lightingModelNode;
 
 	}
 
@@ -21,37 +19,21 @@ class LightContextNode extends ContextNode {
 
 	generate( builder ) {
 
-		const material = builder.material;
+		const { lightingModelNode } = this;
 
-		let lightingModel = null;
+		this.context.reflectedLight = reflectedLight();
 
-		if ( material.isMeshStandardMaterial === true ) {
+		if ( lightingModelNode !== null ) {
 
-			lightingModel = PhysicalLightingModel;
-
-		}
-
-		const directDiffuse = new VarNode( new UniformNode( new Vector3() ), 'DirectDiffuse', 'vec3' );
-		const directSpecular = new VarNode( new UniformNode( new Vector3() ), 'DirectSpecular', 'vec3' );
-
-		this.context.directDiffuse = directDiffuse;
-		this.context.directSpecular = directSpecular;
-
-		if ( lightingModel !== null ) {
-
-			this.context.lightingModel = lightingModel;
+			this.context.lightingModelNode = lightingModelNode;
 
 		}
-
-		// add code
 
 		const type = this.getNodeType( builder );
 
 		super.generate( builder, type );
 
-		const totalLight = new OperatorNode( '+', directDiffuse, directSpecular );
-
-		return totalLight.build( builder, type );
+		return this.context.reflectedLight.build( builder, type );
 
 	}
 

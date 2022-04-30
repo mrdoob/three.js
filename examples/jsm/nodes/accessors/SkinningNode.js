@@ -1,5 +1,4 @@
 import Node from '../core/Node.js';
-
 import {
 	ShaderNode,
 	attribute,
@@ -13,7 +12,7 @@ import {
 	add,
 	mul,
 	transformDirection
-} from '../ShaderNode.js';
+} from '../shadernode/ShaderNodeBaseElements.js';
 
 import { NodeUpdateType } from '../core/constants.js';
 
@@ -82,7 +81,7 @@ class SkinningNode extends Node {
 
 	generate( builder ) {
 
-		Skinning( {
+		Skinning.call( {
 			index: this.skinIndexNode,
 			weight: this.skinWeightNode,
 			bindMatrix: this.bindMatrixNode,

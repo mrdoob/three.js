@@ -37,6 +37,7 @@ function Strings( config ) {
 			'menubar/add/group': 'Group',
 			'menubar/add/plane': 'Plane',
 			'menubar/add/box': 'Box',
+			'menubar/add/capsule': 'Capsule',
 			'menubar/add/circle': 'Circle',
 			'menubar/add/cylinder': 'Cylinder',
 			'menubar/add/ring': 'Ring',
@@ -143,6 +144,11 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributes',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+
+			'sidebar/geometry/capsule_geometry/radius': 'Radius',
+			'sidebar/geometry/capsule_geometry/length': 'Length',
+			'sidebar/geometry/capsule_geometry/capseg': 'Cap Seg',
+			'sidebar/geometry/capsule_geometry/radialseg': 'Radial Seg',
 
 			'sidebar/geometry/circle_geometry/radius': 'Radius',
 			'sidebar/geometry/circle_geometry/segments': 'Segments',
@@ -280,6 +286,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': 'Depth Test',
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
+			'sidebar/material/userdata': 'User data',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
@@ -365,6 +372,7 @@ function Strings( config ) {
 			'menubar/add/group': 'Groupe',
 			'menubar/add/plane': 'Plan',
 			'menubar/add/box': 'Cube',
+			'menubar/add/capsule': 'Capsule',
 			'menubar/add/circle': 'Cercle',
 			'menubar/add/cylinder': 'Cylindre',
 			'menubar/add/ring': 'Bague',
@@ -471,6 +479,11 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributs',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+
+			'sidebar/geometry/capsule_geometry/radius': 'Radius',
+			'sidebar/geometry/capsule_geometry/length': 'Length',
+			'sidebar/geometry/capsule_geometry/capseg': 'Cap Seg',
+			'sidebar/geometry/capsule_geometry/radialseg': 'Radial Seg',
 
 			'sidebar/geometry/circle_geometry/radius': 'Rayon',
 			'sidebar/geometry/circle_geometry/segments': 'Segments',
@@ -608,6 +621,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': 'Depth Test',
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
+			'sidebar/material/userdata': 'Données utilisateur',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
@@ -693,6 +707,7 @@ function Strings( config ) {
 			'menubar/add/group': '组',
 			'menubar/add/plane': '平面',
 			'menubar/add/box': '正方体',
+			'menubar/add/capsule': '胶囊',
 			'menubar/add/circle': '圆',
 			'menubar/add/cylinder': '圆柱体',
 			'menubar/add/ring': '环',
@@ -799,6 +814,11 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': '属性',
 			'sidebar/geometry/buffer_geometry/index': '索引',
+
+			'sidebar/geometry/capsule_geometry/radius': '半径',
+			'sidebar/geometry/capsule_geometry/length': '长度',
+			'sidebar/geometry/capsule_geometry/capseg': '胶囊分段',
+			'sidebar/geometry/capsule_geometry/radialseg': '半径分段',
 
 			'sidebar/geometry/circle_geometry/radius': '半径',
 			'sidebar/geometry/circle_geometry/segments': '分段',
@@ -936,6 +956,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': '深度测试',
 			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
+			'sidebar/material/userdata': '自定义数据',
 
 			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',

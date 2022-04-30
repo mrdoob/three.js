@@ -1,4 +1,4 @@
-import NodeBuilder, { shaderStages } from 'three-nodes/core/NodeBuilder.js';
+import NodeBuilder, { defaultShaderStages } from 'three-nodes/core/NodeBuilder.js';
 import NodeFrame from 'three-nodes/core/NodeFrame.js';
 import SlotNode from './SlotNode.js';
 import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
@@ -82,6 +82,12 @@ class WebGLNodeBuilder extends NodeBuilder {
 			shader.vertexShader = shaderLib.vertexShader;
 			shader.fragmentShader = shaderLib.fragmentShader;
 			shader.uniforms = UniformsUtils.merge( [ shaderLib.uniforms, UniformsLib.lights ] );
+
+		}
+
+		if ( material.isMeshStandardNodeMaterial !== true ) {
+
+			this.replaceCode( 'fragment', getIncludeSnippet( 'tonemapping_fragment' ), '' );
 
 		}
 
@@ -329,7 +335,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		const shaderData = {};
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			const uniforms = this.getUniforms( shaderStage );
 			const attributes = this.getAttributes( shaderStage );
@@ -515,7 +521,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		}
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			this.addCodeAfterSnippet(
 				shaderStage,
@@ -529,7 +535,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	_addUniforms() {
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			// uniforms
 

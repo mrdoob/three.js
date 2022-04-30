@@ -6,6 +6,7 @@
 
 			super( geometry );
 			this.type = 'Reflector';
+			this.camera = new THREE.PerspectiveCamera();
 			const scope = this;
 			const color = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 			const textureWidth = options.textureWidth || 512;
@@ -25,7 +26,7 @@
 			const target = new THREE.Vector3();
 			const q = new THREE.Vector4();
 			const textureMatrix = new THREE.Matrix4();
-			const virtualCamera = new THREE.PerspectiveCamera();
+			const virtualCamera = this.camera;
 			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, {
 				samples: multisample
 			} );
@@ -195,6 +196,8 @@
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <encodings_fragment>
 
 		}`
 	};

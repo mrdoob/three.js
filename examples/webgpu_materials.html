@@ -34,7 +34,7 @@
 
 			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
 
-			import { ShaderNode, vec3, dot, sampler } from 'three-nodes/ShaderNode.js';
+			import { ShaderNode, vec3, dot, sampler } from 'three-nodes/Nodes.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -141,7 +141,7 @@
 				} );
 
 				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = desaturateShaderNode( { color: new Nodes.TextureNode( texture ) } );
+				material.colorNode = desaturateShaderNode.call( { color: new Nodes.TextureNode( texture ) } );
 				materials.push( material );
 
 				// Custom WGSL ( desaturate filter )

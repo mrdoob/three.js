@@ -96,10 +96,12 @@
 
 		</p>
 
-		<h3>[method:Object computeTangents]( [param:BufferGeometry geometry] )</h3>
-		<p>
-		geometry -- Instance of [page:BufferGeometry].
-		</p>
+		<h3>[method:Object computeMikkTSpaceTangents]( [param:BufferGeometry geometry], [param:Object MikkTSpace], [param:Boolean negateSign] = true )</h3>
+		<ul>
+			<li>geometry -- Instance of [page:BufferGeometry].</li>
+			<li>MikkTSpace -- Instance of <i>examples/jsm/libs/mikktspace.module.js</i>, or <i>mikktspace</i> npm package. Await <i>MikkTSpace.ready</i> before use.
+			<li>negateSign -- Whether to negate the sign component (.w) of each tangent. Required for normal map conventions in some formats, including glTF.</li>
+		</ul>
 
 		<p>
 		Computes vertex tangents using the [link:http://www.mikktspace.com/ MikkTSpace] algorithm.
@@ -110,8 +112,8 @@
 		</p>
 
 		<p>
-		In comparison to [page:BufferGeometryUtils.computeTangents], [page:BufferGeometry.computeTangents]
-		(a custom algorithm) generates tangents that probably will not match the tangents
+		In comparison to this method, [page:BufferGeometry.computeTangents] (a
+		custom algorithm) generates tangents that probably will not match the tangents
 		in other software. The custom algorithm is sufficient for general use with a
 		[page:ShaderMaterial], and may be faster than MikkTSpace.
 		</p>

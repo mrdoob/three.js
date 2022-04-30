@@ -1,4 +1,4 @@
-// r139
+// r140
 
 const cacheName = 'threejs-editor';
 
@@ -158,6 +158,7 @@ const assets = [
 	'./js/Sidebar.Geometry.BufferGeometry.js',
 	'./js/Sidebar.Geometry.Modifiers.js',
 	'./js/Sidebar.Geometry.BoxGeometry.js',
+	'./js/Sidebar.Geometry.CapsuleGeometry.js',
 	'./js/Sidebar.Geometry.CircleGeometry.js',
 	'./js/Sidebar.Geometry.CylinderGeometry.js',
 	'./js/Sidebar.Geometry.DodecahedronGeometry.js',

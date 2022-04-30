@@ -1,13 +1,52 @@
 import Node from './Node.js';
+import OperatorNode from '../math/OperatorNode.js';
 
 class VarNode extends Node {
 
-	constructor( node, name = null, nodeType = null ) {
+	constructor( node, name = null ) {
 
-		super( nodeType );
+		super();
 
 		this.node = node;
 		this.name = name;
+
+	}
+
+	op( op, ...params ) {
+
+		this.node = new OperatorNode( op, this.node, ...params );
+
+		return this;
+
+	}
+
+	assign( ...params ) {
+
+		return this.op( '=', ...params );
+
+	}
+
+	add( ...params ) {
+
+		return this.op( '+', ...params );
+
+	}
+
+	sub( ...params ) {
+
+		return this.op( '-', ...params );
+
+	}
+
+	mul( ...params ) {
+
+		return this.op( '*', ...params );
+
+	}
+
+	div( ...params ) {
+
+		return this.op( '/', ...params );
 
 	}
 
@@ -19,15 +58,22 @@ class VarNode extends Node {
 
 	getNodeType( builder ) {
 
-		return super.getNodeType( builder ) || this.node.getNodeType( builder );
+		return this.node.getNodeType( builder );
 
 	}
 
 	generate( builder ) {
 
-		const type = builder.getVectorType( this.getNodeType( builder ) );
 		const node = this.node;
+
+		if ( node.isTempNode === true ) {
+
+			return node.build( builder );
+
+		}
+
 		const name = this.name;
+		const type = builder.getVectorType( this.getNodeType( builder ) );
 
 		const snippet = node.build( builder, type );
 		const nodeVar = builder.getVarFromNode( this, type );
@@ -47,7 +93,5 @@ class VarNode extends Node {
 	}
 
 }
-
-VarNode.prototype.isVarNode = true;
 
 export default VarNode;

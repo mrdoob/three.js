@@ -73,7 +73,6 @@
 			let stats;
 			let camera, scene, renderer;
 			let model;
-			let nodeLights;
 
 			init().then( animate ).catch( error => console.error( error ) );
 
@@ -96,20 +95,19 @@
 				// Lights
 
 				const topLight = new THREE.PointLight( 0xF4F6F0, 1 );
-				topLight.position.set( 0, 100000, 100000 );
+				topLight.position.set( 0, 1000, 1000 );
 				scene.add( topLight );
 
-				const backLight = new THREE.PointLight( 0x0c1445, 1.4 );
+				const backLight = new THREE.PointLight( 0x0c1445, 1 );
 				backLight.position.set( - 100, 20, - 260 );
 				scene.add( backLight );
-
-				nodeLights = new Nodes.LightsNode().fromLights( [ topLight, backLight ] );
 
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 4000 );
 
 				renderer.domElement.className = 'renderer';
 
@@ -142,20 +140,6 @@
 
 					nodeEditor.add( materialEditor );
 					nodeEditor.centralizeNode( materialEditor );
-
-				} );
-
-				nodeEditor.addEventListener( 'add', ( e ) => {
-
-					const node = e.node;
-
-					if ( node.value !== null && node.value.isMeshStandardNodeMaterial === true ) {
-
-						const material = node.value;
-
-						material.lightNode = nodeLights;
-
-					}
 
 				} );
 

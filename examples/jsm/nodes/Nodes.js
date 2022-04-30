@@ -8,6 +8,7 @@ import ContextNode from './core/ContextNode.js';
 import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
 import FunctionNode from './core/FunctionNode.js';
+import InstanceIndexNode from './core/InstanceIndexNode.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
@@ -28,6 +29,7 @@ import VaryNode from './core/VaryNode.js';
 import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import CubeTextureNode from './accessors/CubeTextureNode.js';
+import InstanceNode from './accessors/InstanceNode.js';
 import MaterialNode from './accessors/MaterialNode.js';
 import MaterialReferenceNode from './accessors/MaterialReferenceNode.js';
 import ModelNode from './accessors/ModelNode.js';
@@ -42,9 +44,14 @@ import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 
+// gpgpu
+import ComputeNode from './gpgpu/ComputeNode.js';
+
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
+import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
+import ToneMappingNode from './display/ToneMappingNode.js';
 
 // math
 import MathNode from './math/MathNode.js';
@@ -55,15 +62,17 @@ import CondNode from './math/CondNode.js';
 import LightContextNode from './lights/LightContextNode.js';
 import LightNode from './lights/LightNode.js';
 import LightsNode from './lights/LightsNode.js';
+import ReflectedLightNode from './lights/ReflectedLightNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
+import MatcapUVNode from './utils/MatcapUVNode.js';
+import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
+import OscNode from './utils/OscNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
-import MatcapUVNode from './utils/MatcapUVNode.js';
-import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
 // loaders
@@ -81,14 +90,11 @@ import FogRangeNode from './fog/FogRangeNode.js';
 // core
 export * from './core/constants.js';
 
-// functions
-export * from './functions/BSDFs.js';
-
 // materials
 export * from './materials/Materials.js';
 
 // shader node
-export * from './ShaderNode.js';
+export * from './shadernode/ShaderNodeElements.js';
 
 const nodeLib = {
 	// core
@@ -101,6 +107,7 @@ const nodeLib = {
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
+	InstanceIndexNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -117,10 +124,14 @@ const nodeLib = {
 	VarNode,
 	VaryNode,
 
+	// compute
+	ComputeNode,
+
 	// accessors
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
+	InstanceNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -137,7 +148,9 @@ const nodeLib = {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
+	ToneMappingNode,
 
 	// math
 	MathNode,
@@ -148,15 +161,17 @@ const nodeLib = {
 	LightContextNode,
 	LightNode,
 	LightsNode,
+	ReflectedLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural
@@ -190,6 +205,7 @@ export {
 	ExpressionNode,
 	FunctionCallNode,
 	FunctionNode,
+	InstanceIndexNode,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -206,10 +222,14 @@ export {
 	VarNode,
 	VaryNode,
 
+	// compute
+	ComputeNode,
+
 	// accessors
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
+	InstanceNode,
 	MaterialNode,
 	MaterialReferenceNode,
 	ModelNode,
@@ -226,7 +246,9 @@ export {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
+	ToneMappingNode,
 
 	// math
 	MathNode,
@@ -237,15 +259,17 @@ export {
 	LightContextNode,
 	LightNode,
 	LightsNode,
+	ReflectedLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural
@@ -259,5 +283,4 @@ export {
 	NodeLoader,
 	NodeObjectLoader,
 	NodeMaterialLoader
-
 };

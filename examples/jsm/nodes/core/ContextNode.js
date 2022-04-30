@@ -21,7 +21,7 @@ class ContextNode extends Node {
 
 		const previousContext = builder.getContext();
 
-		builder.setContext( Object.assign( {}, builder.context, this.context ) );
+		builder.setContext( { ...builder.context, ...this.context } );
 
 		const snippet = this.node.build( builder, output );
 

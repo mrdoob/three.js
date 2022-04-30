@@ -6,6 +6,7 @@
 
 			super( geometry );
 			this.type = 'Refractor';
+			this.camera = new THREE.PerspectiveCamera();
 			const scope = this;
 			const color = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 			const textureWidth = options.textureWidth || 512;
@@ -14,7 +15,7 @@
 			const shader = options.shader || Refractor.RefractorShader;
 			const multisample = options.multisample !== undefined ? options.multisample : 4; //
 
-			const virtualCamera = new THREE.PerspectiveCamera();
+			const virtualCamera = this.camera;
 			virtualCamera.matrixAutoUpdate = false;
 			virtualCamera.userData.refractor = true; //
 
@@ -243,6 +244,8 @@
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <encodings_fragment>
 
 		}`
 	};

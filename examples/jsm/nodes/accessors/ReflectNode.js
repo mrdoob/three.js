@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { nodeObject, normalWorld, positionWorld, cameraPosition, sub, normalize, join, negate, reflect } from '../ShaderNode.js';
+import { nodeObject, normalWorld, positionWorld, cameraPosition, sub, normalize, vec3, negate, reflect } from '../shadernode/ShaderNodeBaseElements.js';
 
 class ReflectNode extends Node {
 
@@ -34,7 +34,7 @@ class ReflectNode extends Node {
 		} else if ( scope === ReflectNode.CUBE ) {
 
 			const reflectVec = nodeObject( new ReflectNode( ReflectNode.VECTOR ) );
-			const cubeUV = join( negate( reflectVec.x ), reflectVec.yz );
+			const cubeUV = vec3( negate( reflectVec.x ), reflectVec.yz );
 
 			return cubeUV.build( builder );
 

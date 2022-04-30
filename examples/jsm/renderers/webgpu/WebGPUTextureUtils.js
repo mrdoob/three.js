@@ -30,16 +30,14 @@ class WebGPUTextureUtils {
 
 		const mipmapVertexSource = `
 struct VarysStruct {
-
-	@builtin( position ) Position: vec4<f32>;
-	@location( 0 ) vTex : vec2<f32>;
-
+	@builtin( position ) Position: vec4<f32>,
+	@location( 0 ) vTex : vec2<f32>
 };
 
 @stage( vertex )
 fn main( @builtin( vertex_index ) vertexIndex : u32 ) -> VarysStruct {
 
-	var Varys: VarysStruct;
+	var Varys : VarysStruct;
 
 	var pos = array< vec2<f32>, 4 >(
 		vec2<f32>( -1.0,  1.0 ),
@@ -64,7 +62,7 @@ fn main( @builtin( vertex_index ) vertexIndex : u32 ) -> VarysStruct {
 `;
 
 		const mipmapFragmentSource = `
-@group( 0 ) @binding( 0 ) 
+@group( 0 ) @binding( 0 )
 var imgSampler : sampler;
 
 @group( 0 ) @binding( 1 )
@@ -102,12 +100,12 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 			pipeline = this.device.createRenderPipeline( {
 				vertex: {
 					module: this.mipmapVertexShaderModule,
-					entryPoint: 'main',
+					entryPoint: 'main'
 				},
 				fragment: {
 					module: this.mipmapFragmentShaderModule,
 					entryPoint: 'main',
-					targets: [ { format } ],
+					targets: [ { format } ]
 				},
 				primitive: {
 					topology: GPUPrimitiveTopology.TriangleStrip,

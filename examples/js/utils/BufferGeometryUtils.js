@@ -1,6 +1,24 @@
 ( function () {
 
-	function computeTangents( geometry, negateSign = true ) {
+	function computeTangents() {
+
+		throw new Error( 'BufferGeometryUtils: computeTangents renamed to computeMikkTSpaceTangents.' );
+
+	}
+
+	function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
+
+		if ( ! MikkTSpace || ! MikkTSpace.isReady ) {
+
+			throw new Error( 'BufferGeometryUtils: Initialized MikkTSpace library required.' );
+
+		}
+
+		if ( ! geometry.hasAttribute( 'position' ) || ! geometry.hasAttribute( 'normal' ) || ! geometry.hasAttribute( 'uv' ) ) {
+
+			throw new Error( 'BufferGeometryUtils: Tangents require "position", "normal", and "uv" attributes.' );
+
+		}
 
 		function getAttributeArray( attribute ) {
 
@@ -40,7 +58,7 @@
 		const _geometry = geometry.index ? geometry.toNonIndexed() : geometry; // Compute vertex tangents.
 
 
-		const tangents = generateTangents( getAttributeArray( _geometry.attributes.position ), getAttributeArray( _geometry.attributes.normal ), getAttributeArray( _geometry.attributes.uv ) ); // Texture coordinate convention of glTF differs from the apparent
+		const tangents = MikkTSpace.generateTangents( getAttributeArray( _geometry.attributes.position ), getAttributeArray( _geometry.attributes.normal ), getAttributeArray( _geometry.attributes.uv ) ); // Texture coordinate convention of glTF differs from the apparent
 		// default of the MikkTSpace library; .w component must be flipped.
 
 		if ( negateSign ) {
@@ -56,7 +74,13 @@
 
 		_geometry.setAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ) );
 
-		return geometry.copy( _geometry );
+		if ( geometry !== _geometry ) {
+
+			geometry.copy( _geometry );
+
+		}
+
+		return geometry;
 
 	}
 	/**
@@ -371,12 +395,103 @@
 
 		return res;
 
+	} // returns a new, non-interleaved version of the provided attribute
+
+
+	function deinterleaveAttribute( attribute ) {
+
+		const cons = attribute.data.array.constructor;
+		const count = attribute.count;
+		const itemSize = attribute.itemSize;
+		const normalized = attribute.normalized;
+		const array = new cons( count * itemSize );
+		let newAttribute;
+
+		if ( attribute.isInstancedInterleavedBufferAttribute ) {
+
+			newAttribute = new InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
+
+		} else {
+
+			newAttribute = new THREE.BufferAttribute( array, itemSize, normalized );
+
+		}
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			newAttribute.setX( i, attribute.getX( i ) );
+
+			if ( itemSize >= 2 ) {
+
+				newAttribute.setY( i, attribute.getY( i ) );
+
+			}
+
+			if ( itemSize >= 3 ) {
+
+				newAttribute.setZ( i, attribute.getZ( i ) );
+
+			}
+
+			if ( itemSize >= 4 ) {
+
+				newAttribute.setW( i, attribute.getW( i ) );
+
+			}
+
+		}
+
+		return newAttribute;
+
+	} // deinterleaves all attributes on the geometry
+
+	function deinterleaveGeometry( geometry ) {
+
+		const attributes = geometry.attributes;
+		const morphTargets = geometry.morphTargets;
+		const attrMap = new Map();
+
+		for ( const key in attributes ) {
+
+			const attr = attributes[ key ];
+
+			if ( attr.isInterleavedBufferAttribute ) {
+
+				if ( ! attrMap.has( attr ) ) {
+
+					attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+				}
+
+				attributes[ key ] = attrMap.get( attr );
+
+			}
+
+		}
+
+		for ( const key in morphTargets ) {
+
+			const attr = morphTargets[ key ];
+
+			if ( attr.isInterleavedBufferAttribute ) {
+
+				if ( ! attrMap.has( attr ) ) {
+
+					attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+				}
+
+				morphTargets[ key ] = attrMap.get( attr );
+
+			}
+
+		}
+
 	}
 	/**
  * @param {Array<BufferGeometry>} geometry
  * @return {number}
  */
-
 
 	function estimateBytesUsed( geometry ) {
 
@@ -676,7 +791,7 @@
 
 		const _morphC = new THREE.Vector3();
 
-		function _calculateMorphedAttributeData( object, material, attribute, morphAttribute, morphTargetsRelative, a, b, c, modifiedAttributeArray ) {
+		function _calculateMorphedAttributeData( object, attribute, morphAttribute, morphTargetsRelative, a, b, c, modifiedAttributeArray ) {
 
 			_vA.fromBufferAttribute( attribute, a );
 
@@ -686,7 +801,7 @@
 
 			const morphInfluences = object.morphTargetInfluences;
 
-			if ( material.morphTargets && morphAttribute && morphInfluences ) {
+			if ( morphAttribute && morphInfluences ) {
 
 				_morphA.set( 0, 0, 0 );
 
@@ -766,7 +881,7 @@
 		const groups = geometry.groups;
 		const drawRange = geometry.drawRange;
 		let i, j, il, jl;
-		let group, groupMaterial;
+		let group;
 		let start, end;
 		const modifiedPosition = new Float32Array( positionAttribute.count * positionAttribute.itemSize );
 		const modifiedNormal = new Float32Array( normalAttribute.count * normalAttribute.itemSize );
@@ -779,7 +894,6 @@
 				for ( i = 0, il = groups.length; i < il; i ++ ) {
 
 					group = groups[ i ];
-					groupMaterial = material[ group.materialIndex ];
 					start = Math.max( group.start, drawRange.start );
 					end = Math.min( group.start + group.count, drawRange.start + drawRange.count );
 
@@ -789,9 +903,9 @@
 						b = index.getX( j + 1 );
 						c = index.getX( j + 2 );
 
-						_calculateMorphedAttributeData( object, groupMaterial, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+						_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-						_calculateMorphedAttributeData( object, groupMaterial, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+						_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 					}
 
@@ -808,9 +922,9 @@
 					b = index.getX( i + 1 );
 					c = index.getX( i + 2 );
 
-					_calculateMorphedAttributeData( object, material, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+					_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-					_calculateMorphedAttributeData( object, material, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+					_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 				}
 
@@ -824,7 +938,6 @@
 				for ( i = 0, il = groups.length; i < il; i ++ ) {
 
 					group = groups[ i ];
-					groupMaterial = material[ group.materialIndex ];
 					start = Math.max( group.start, drawRange.start );
 					end = Math.min( group.start + group.count, drawRange.start + drawRange.count );
 
@@ -834,9 +947,9 @@
 						b = j + 1;
 						c = j + 2;
 
-						_calculateMorphedAttributeData( object, groupMaterial, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+						_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-						_calculateMorphedAttributeData( object, groupMaterial, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+						_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 					}
 
@@ -853,9 +966,9 @@
 					b = i + 1;
 					c = i + 2;
 
-					_calculateMorphedAttributeData( object, material, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+					_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-					_calculateMorphedAttributeData( object, material, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+					_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 				}
 
@@ -965,8 +1078,11 @@
 	}
 
 	THREE.BufferGeometryUtils = {};
+	THREE.BufferGeometryUtils.computeMikkTSpaceTangents = computeMikkTSpaceTangents;
 	THREE.BufferGeometryUtils.computeMorphedAttributes = computeMorphedAttributes;
 	THREE.BufferGeometryUtils.computeTangents = computeTangents;
+	THREE.BufferGeometryUtils.deinterleaveAttribute = deinterleaveAttribute;
+	THREE.BufferGeometryUtils.deinterleaveGeometry = deinterleaveGeometry;
 	THREE.BufferGeometryUtils.estimateBytesUsed = estimateBytesUsed;
 	THREE.BufferGeometryUtils.interleaveAttributes = interleaveAttributes;
 	THREE.BufferGeometryUtils.mergeBufferAttributes = mergeBufferAttributes;

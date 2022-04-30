@@ -1,6 +1,5 @@
 import Node from '../core/Node.js';
-
-import { ShaderNode, uv, add, mul, floor, mod, sign } from '../ShaderNode.js';
+import { ShaderNode, uv, add, mul, floor, mod, sign } from '../shadernode/ShaderNodeBaseElements.js';
 
 const checkerShaderNode = new ShaderNode( ( inputs ) => {
 
@@ -26,7 +25,7 @@ class CheckerNode extends Node {
 
 	generate( builder ) {
 
-		return checkerShaderNode( { uv: this.uvNode } ).build( builder );
+		return checkerShaderNode.call( { uv: this.uvNode } ).build( builder );
 
 	}
 

@@ -845,7 +845,9 @@
 
 									}
 
-									this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+									this._v3_1.setFromMatrixPosition( this._gizmoMatrixState );
+
+									this.applyTransformMatrix( this.scale( size, this._v3_1 ) );
 
 								}
 

@@ -335,7 +335,8 @@
 
 		<script>
 
-			const parent = document.scripts[ document.scripts.length - 1 ].parentNode;
+			/* eslint-disable prefer-const*/
+			let parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
 			parent.displacement = function ( x, y, z, t, target ) {
 
