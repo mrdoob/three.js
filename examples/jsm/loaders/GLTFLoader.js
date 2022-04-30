@@ -3044,6 +3044,9 @@ class GLTFParser {
 
 		return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
 
+			// TODO(mrdoob) Clean up
+			texture.userData._gltfTexCoord = mapDef.texCoord;
+
 			// Materials sample aoMap from UV set 1 and other maps from UV set 0 - this can't be configured
 			// However, we will copy UV set 0 to UV set 1 on demand for aoMap
 			if ( mapDef.texCoord !== undefined && mapDef.texCoord != 0 && ! ( mapName === 'aoMap' && mapDef.texCoord == 1 ) ) {
@@ -3174,11 +3177,28 @@ class GLTFParser {
 
 		}
 
-		// workarounds for mesh and geometry
+		// TODO(mrdoob) Clean up
 
-		if ( material.aoMap && geometry.attributes.uv2 === undefined && geometry.attributes.uv !== undefined ) {
+		if ( material.aoMap ) {
 
-			geometry.setAttribute( 'uv2', geometry.attributes.uv );
+			if ( geometry.attributes.uv2 === undefined ) {
+
+				if ( material.aoMap.userData._gltfTexCoord !== 0 && geometry.attributes.uv !== undefined ) {
+
+					geometry.setAttribute( 'uv2', geometry.attributes.uv );
+
+				}
+
+			} else {
+
+				if ( material.aoMap.userData._gltfTexCoord === 0 ) {
+
+					console.warn( 'THREE.GLTFLoader: Removed uv2 attribute as it\'s not being used.' );
+					geometry.deleteAttribute( 'uv2' );
+
+				}
+
+			}
 
 		}
 
