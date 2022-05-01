@@ -15,8 +15,8 @@ if [ "${#output}" -ge 5 ]; then
     git checkout -b threejs-bump
     git add .
     git commit -m "Bump webaverse/three.js@latest into three" -a
-    # echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
-    echo "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" | gh auth login --with-token
+    echo ${{ secrets.WEBA_BOT_PAT }} | gh auth login --with-token
+    # echo "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" | gh auth login --with-token
     git push --set-upstream origin threejs-bump -f
     gh pr create --fill
 fi
