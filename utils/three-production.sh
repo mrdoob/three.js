@@ -9,15 +9,15 @@ cp -r package/* .
 rm -rf package 
 rm -rf $(find . -type f -name "*.tgz")
 output=$(git status --porcelain)
-if [ "${#output}" -ge 5 ]; then 
-    git config --global user.email "hello@webaverse.com"
-    git config --global user.name "Webaverse"
-    echo $secrets.WEBA_BOT_SSH_KEY
-    git checkout -b threejs-bump
-    git add .
-    git commit -m "Bump webaverse/three.js@latest into three" -a
-    ssh git@github.com
-    git push --set-upstream origin threejs-bump -f
-    gh pr create --fill
-fi
+# if [ "${#output}" -ge 5 ]; then 
+#     git config --global user.email "hello@webaverse.com"
+#     git config --global user.name "Webaverse"
+#     echo $secrets.WEBA_BOT_SSH_KEY
+#     git checkout -b threejs-bump
+#     git add .
+#     git commit -m "Bump webaverse/three.js@latest into three" -a
+#     ssh git@github.com
+#     git push --set-upstream origin threejs-bump -f
+#     #gh pr create --fill
+# fi
 cd ..
