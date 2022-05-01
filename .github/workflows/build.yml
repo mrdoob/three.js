@@ -30,9 +30,9 @@ jobs:
 
       - name: === Running build script ===
         run: sh ./utils/three-production.sh
-      # - uses: webfactory/ssh-agent@v0.5.4
-      #   with:
-      #       ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+            ssh-private-key: ${{ secrets.WEBA_BOT_PAT }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
