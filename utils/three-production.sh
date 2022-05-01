@@ -1,5 +1,5 @@
 mkdir output
-git clone "https://$API_TOKEN_GITHUB@github.com/three.git" output
+git clone "https://$API_TOKEN_GITHUB@github.com/webaverse/three.git" output
 npm pack . --pack-destination output
 cd output
 rm -rf $(find . -type f -name "output*.tgz")
@@ -20,7 +20,7 @@ if [ "${#output}" -ge 5 ]; then
     then
         git commit --message "Update from https://github.com/three/commit/$GITHUB_SHA" --allow-empty
         echo "Pushing git commit"
-        git push -u origin HEAD:$INPUT_DESTINATION_HEAD_BRANCH
+        git push -f -u origin HEAD:$INPUT_DESTINATION_HEAD_BRANCH
         echo "Creating a pull request"
         gh pr create -t $INPUT_DESTINATION_HEAD_BRANCH \
                     -b $INPUT_DESTINATION_HEAD_BRANCH \
