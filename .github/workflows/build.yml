@@ -34,7 +34,7 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.WEBA_BOT_PAT }}
           INPUT_DESTINATION_BASE_BRANCH: 'main'
           INPUT_DESTINATION_HEAD_BRANCH: 'threejs-bump'
-          PULL_REQUEST_REVIEWERS: 'abeersaqib'   
+          # PULL_REQUEST_REVIEWERS: '"abeersaqib"'   
 
       - name: Create Pull Request in weba/three.js
         uses: peter-evans/create-pull-request@v4
