@@ -18,7 +18,7 @@ if [ "${#output}" -ge 5 ]; then
     git commit -m "Bump webaverse/three.js@latest into three" -a
     if git status | grep -q "Changes to be committed"
     then
-        git commit --message "Update from https://github.com/three/commit/$GITHUB_SHA"
+        git commit --message "Update from https://github.com/three/commit/$GITHUB_SHA" --allow-empty
         echo "Pushing git commit"
         git push -u origin HEAD:$INPUT_DESTINATION_HEAD_BRANCH
         echo "Creating a pull request"

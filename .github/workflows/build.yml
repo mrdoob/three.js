@@ -32,15 +32,9 @@ jobs:
         run: sh ./utils/three-production.sh
         env:
           API_TOKEN_GITHUB: ${{ secrets.WEBA_BOT_PAT }}
-        with:
-          source_folder: 'output'
-          destination_repo: 'webaverse/three'
-          destination_folder: ''
-          destination_base_branch: 'main'
-          destination_head_branch: 'threejs-bump'
-          user_email: 'bot@webaverse.com'
-          user_name: 'Weba Bot'
-          pull_request_reviewers: 'abeersaqib'   
+          INPUT_DESTINATION_BASE_BRANCH: 'main'
+          INPUT_DESTINATION_HEAD_BRANCH: 'threejs-bump'
+          PULL_REQUEST_REVIEWERS: 'abeersaqib'   
 
       - name: Create Pull Request in weba/three.js
         uses: peter-evans/create-pull-request@v4
