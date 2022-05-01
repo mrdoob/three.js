@@ -421,15 +421,15 @@ class WebGPUTextures {
 
 	_copyCubeMapToTexture( images, texture, textureGPU, textureGPUDescriptor, needsMipmaps ) {
 
-		for ( let i = 5; i >= 0; i -- ) {
+		for ( let i = 0; i < 6; i ++ ) {
 
 			const image = images[ i ];
 
 			this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-				this._copyExternalImageToTexture( imageBitmap, textureGPU );
+				this._copyExternalImageToTexture( imageBitmap, textureGPU, { z : i } );
 
-				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i, i > 0 ? 0 : 1 );
+				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i );
 
 			} );
 
@@ -490,7 +490,7 @@ class WebGPUTextures {
 
 	}
 
-	_generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer, mipLevelOffset ) {
+	_generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer ) {
 
 		if ( this.utils === null ) {
 
@@ -498,7 +498,7 @@ class WebGPUTextures {
 
 		}
 
-		this.utils.generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer, mipLevelOffset );
+		this.utils.generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer );
 
 	}
 
