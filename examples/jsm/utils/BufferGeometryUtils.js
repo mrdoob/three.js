@@ -1202,7 +1202,7 @@ function mergeGroups( geometry ) {
 
 // Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at
 // an angle greater than the crease angle.
-export function generateSmoothNormalsWithCrease( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ ) {
+function generateSmoothNormalsWithCrease( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ ) {
 
 	const creaseDot = Math.cos( creaseAngle );
 	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
