@@ -1,3 +1,4 @@
+export GITHUB_TOKEN=$API_TOKEN_GITHUB
 mkdir output
 git clone "https://$API_TOKEN_GITHUB@github.com/webaverse/three.git" output
 npm pack . --pack-destination output
