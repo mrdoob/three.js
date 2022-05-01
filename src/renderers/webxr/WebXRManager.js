@@ -133,7 +133,11 @@ class WebXRManager extends EventDispatcher {
 
 			inputSourcesMap.forEach( function ( controller, inputSource ) {
 
-				controller.disconnect( inputSource );
+				if( controller ) {
+
+					controller.disconnect( inputSource );
+
+				}
 
 			} );
 
