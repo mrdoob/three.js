@@ -30,11 +30,6 @@ jobs:
 
       - name: === Running build script ===
         run: sh ./utils/three-production.sh
-      # - uses: webfactory/ssh-agent@v0.5.4
-      #   with:
-      #       ssh-private-key: ${{ secrets.WEBA_BOT_SSH_KEY }}
-      - name: Create pull request in weba/three
-        uses: paygoc6/action-pull-request-another-repo@v1.0.1
         env:
           API_TOKEN_GITHUB: ${{ secrets.WEBA_BOT_PAT }}
         with:
@@ -45,7 +40,7 @@ jobs:
           destination_head_branch: 'threejs-bump'
           user_email: 'bot@webaverse.com'
           user_name: 'Weba Bot'
-          pull_request_reviewers: 'abeersaqib'
+          pull_request_reviewers: 'abeersaqib'   
 
       - name: Create Pull Request in weba/three.js
         uses: peter-evans/create-pull-request@v4
