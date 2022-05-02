@@ -17,7 +17,6 @@ class PerspectiveCamera extends Camera {
 		this.focus = 10;
 
 		this.aspect = aspect;
-		this.view = null;
 
 		this.filmGauge = 35;	// width of the film (default in millimeters)
 		this.filmOffset = 0;	// horizontal film offset (same unit as gauge)
@@ -97,66 +96,14 @@ class PerspectiveCamera extends Camera {
 
 	}
 
-	/**
-	 * Sets an offset in a larger frustum. This is useful for multi-window or
-	 * multi-monitor/multi-machine setups.
-	 *
-	 * For example, if you have 3x2 monitors and each monitor is 1920x1080 and
-	 * the monitors are in grid like this
-	 *
-	 *   +---+---+---+
-	 *   | A | B | C |
-	 *   +---+---+---+
-	 *   | D | E | F |
-	 *   +---+---+---+
-	 *
-	 * then for each monitor you would call it like this
-	 *
-	 *   const w = 1920;
-	 *   const h = 1080;
-	 *   const fullWidth = w * 3;
-	 *   const fullHeight = h * 2;
-	 *
-	 *   --A--
-	 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
-	 *   --B--
-	 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
-	 *   --C--
-	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
-	 *   --D--
-	 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
-	 *   --E--
-	 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
-	 *   --F--
-	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
-	 *
-	 *   Note there is no reason monitors have to be the same size or in a grid.
-	 */
-	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
+	setViewOffset( right, left, top, bottom ) {
 
-		this.aspect = fullWidth / fullHeight;
-
-		if ( this.view === null ) {
-
-			this.view = {
-				enabled: true,
-				fullWidth: 1,
-				fullHeight: 1,
-				offsetX: 0,
-				offsetY: 0,
-				width: 1,
-				height: 1
-			};
-
-		}
-
-		this.view.enabled = true;
-		this.view.fullWidth = fullWidth;
-		this.view.fullHeight = fullHeight;
-		this.view.offsetX = x;
-		this.view.offsetY = y;
-		this.view.width = width;
-		this.view.height = height;
+		this.viewOffset = {
+			left,
+			right,
+			top,
+			bottom,
+		};
 
 		this.updateProjectionMatrix();
 
@@ -164,11 +111,12 @@ class PerspectiveCamera extends Camera {
 
 	clearViewOffset() {
 
-		if ( this.view !== null ) {
-
-			this.view.enabled = false;
-
-		}
+		this.viewOffset = {
+			left: 0,
+			right: 0,
+			top: 0,
+			bottom: 0,
+		};
 
 		this.updateProjectionMatrix();
 
@@ -178,27 +126,28 @@ class PerspectiveCamera extends Camera {
 
 		const near = this.near;
 		let top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
-		let height = 2 * top;
-		let width = this.aspect * height;
+		const height = 2 * top;
+		const width = this.aspect * height;
 		let left = - 0.5 * width;
-		const view = this.view;
-
-		if ( this.view !== null && this.view.enabled ) {
-
-			const fullWidth = view.fullWidth,
-				fullHeight = view.fullHeight;
-
-			left += view.offsetX * width / fullWidth;
-			top -= view.offsetY * height / fullHeight;
-			width *= view.width / fullWidth;
-			height *= view.height / fullHeight;
-
-		}
 
 		const skew = this.filmOffset;
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
+		let right = left + width;
+		let bottom = top - height;
+
+		const viewOffset = this.viewOffset;
+		top += viewOffset.top;
+		bottom += viewOffset.bottom;
+		left += viewOffset.left;
+		right += viewOffset.right;
+
+		this.projectionMatrix.makePerspective( left, right, top, bottom, near, this.far );
+
+		this.view.left = left;
+		this.view.right = right;
+		this.view.top = top;
+		this.view.bottom = bottom;
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
