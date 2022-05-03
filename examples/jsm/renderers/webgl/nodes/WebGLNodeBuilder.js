@@ -331,6 +331,12 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getFrontFacing() {
+
+		return 'gl_FrontFacing';
+
+	}
+
 	buildCode() {
 
 		const shaderData = {};

@@ -286,6 +286,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': 'Depth Test',
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
+			'sidebar/material/userdata': 'User data',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
@@ -620,6 +621,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': 'Depth Test',
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
+			'sidebar/material/userdata': 'Données utilisateur',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
@@ -954,6 +956,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': '深度测试',
 			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
+			'sidebar/material/userdata': '自定义数据',
 
 			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',

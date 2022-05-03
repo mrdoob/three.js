@@ -41,6 +41,10 @@ class NodeBuilder {
 		this.updateNodes = [];
 		this.hashNodes = {};
 
+		this.scene = null;
+		this.lightsNode = null;
+		this.fogNode = null;
+
 		this.vertexShader = null;
 		this.fragmentShader = null;
 		this.computeShader = null;
@@ -158,7 +162,13 @@ class NodeBuilder {
 
 	}
 
-	getInstanceIndex( /*shaderStage*/ ) {
+	getInstanceIndex() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getFrontFacing() {
 
 		console.warn( 'Abstract function.' );
 
