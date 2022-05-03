@@ -9,8 +9,6 @@ function WebGLAttributes( gl, capabilities ) {
 		const array = attribute.array;
 		const usage = attribute.usage;
 
-		attribute.cachedUsage = usage;
-
 		const buffer = gl.createBuffer();
 
 		gl.bindBuffer( bufferType, buffer );
@@ -89,15 +87,6 @@ function WebGLAttributes( gl, capabilities ) {
 		const updateRange = attribute.updateRange;
 
 		gl.bindBuffer( bufferType, buffer );
-
-		if ( attribute.cachedUsage !== attribute.usage ) {
-
-			attribute.cachedUsage = attribute.usage;
-			gl.bufferData( bufferType, array, attribute.usage );
-			updateRange.count = - 1; // reset range
-			return;
-
-		}
 
 		if ( updateRange.count === - 1 ) {
 
