@@ -1784,24 +1784,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-
-			for ( let i = 0; i < textures.length; i ++ ) {
-
-			  	const webglTexture = properties.get( textures[ i ] ).__webglTexture;
-
-				_gl.framebufferTexture2D(
-					_gl.DRAW_FRAMEBUFFER,
-					_gl.COLOR_ATTACHMENT0 + i,
-					_gl.TEXTURE_2D,
-					webglTexture,
-					0,
-				);
-
-			}
-
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
-
 		}
 
 	}
