@@ -347,7 +347,7 @@ function getCanvas() {
 
 	}
 
-	if ( typeof OffscreenCanvas !== 'undefined' ) {
+	if ( typeof document === 'undefined' && typeof OffscreenCanvas !== 'undefined' ) {
 
 		cachedCanvas = new OffscreenCanvas( 1, 1 );
 
