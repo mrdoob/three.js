@@ -139,12 +139,12 @@
 			};
 
 			init();
-			gui.add( effectController, 'msaa', true ).onChange(() => {
+			gui.add( effectController, 'msaa', true ).onChange( () => {
 
 				renderTarget.samples = effectController.msaa ? 4 : 0;
 				render();
 
-			})
+			} );
 
 			function init() {
 
@@ -176,6 +176,8 @@
 						samples: effectController.msaa ? 4 : 0
 					}
 				);
+				renderTarget.depthTexture = new THREE.DepthTexture( 512, 512 );
+				renderTarget.depthTexture.type = THREE.FloatType;
 
 				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
 
@@ -193,11 +195,31 @@
 				// Scene setup
 
 				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0xa0a0a0, 500, 2000 );
+
+				const groundMat = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+				groundMat.onBeforeCompile = function ( shader ) {
+
+					shader.fragmentShader = `
+						layout(location = 1) out vec4 gOther;
+						${shader.fragmentShader}
+					`;
+					shader.fragmentShader = shader.fragmentShader.replace(
+						'#include <fog_fragment>',
+						`
+						#include <fog_fragment>
+						gOther = gl_FragColor;
+						`
+					);
+
+				};
+
+				const ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 10000, 10000 ), groundMat );
+				ground.position.y = - 100;
+				ground.rotation.x = - Math.PI / 2;
+				scene.add( ground );
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemiLight.position.set( 0, 20, 0 );
-				scene.add( hemiLight );
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
@@ -205,14 +227,7 @@
 
 				const diffuse = new THREE.TextureLoader().load(
 
-					'textures/brick_diffuse.jpg',
-
-					function () {
-
-						// ready to render
-						render();
-
-					}
+					'textures/brick_diffuse.jpg'
 
 				);
 
@@ -220,7 +235,7 @@
 
 				group = new THREE.Group();
 
-				const geometry = new THREE.SphereGeometry( 10, 64, 40 );
+				const geometry = new THREE.TorusKnotGeometry( 10, 3.3, 12, 32 );
 			
 				for ( let i = 0; i < 10; i ++ ) {
 
@@ -233,11 +248,11 @@
 						},
 						wireframe: i % 2 === 0,
 						glslVersion: THREE.GLSL3
-					} )
+					} );
 
 					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 600 - 300;
-					mesh.position.y = Math.random() * 600 - 300;
+					mesh.position.x = ( i / 10 ) * 600 - 300;
+					mesh.position.y = ( i / 10 ) * 200 - 100;
 					mesh.position.z = Math.random() * 600 - 300;
 					mesh.rotation.x = Math.random();
 					mesh.rotation.z = Math.random();
@@ -246,6 +261,7 @@
 
 
 				}
+
 				scene.add( group );
 				// PostProcessing setup
 
@@ -275,7 +291,8 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				animate()
+				animate();
+
 			}
 
 			function onWindowResize() {
