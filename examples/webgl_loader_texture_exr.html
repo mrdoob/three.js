@@ -33,8 +33,17 @@
 
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
+			const ToneMapping = {
+				Linear: THREE.LinearToneMapping,
+				Rienhard: THREE.ReinhardToneMapping,
+				RienhardLuma: THREE.ReinhardLumaToneMapping,
+				Cineon: THREE.CineonToneMapping,
+				ACES: THREE.ACESFilmicToneMapping,
+			};
+
 			const params = {
-				exposure: 2.0
+				logExposure: 0.0,
+				toneMapping: ToneMapping.Linear
 			};
 
 			let renderer, scene, camera;
@@ -49,7 +58,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ReinhardToneMapping;
-				renderer.toneMappingExposure = params.exposure;
+				renderer.toneMappingExposure = Math.pow( 10, params.logExposure );
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -74,7 +83,7 @@
 
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-						const quad = new THREE.PlaneGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+						const quad = new THREE.PlaneGeometry( 2 * textureData.width / textureData.height, 2 );
 
 						const mesh = new THREE.Mesh( quad, material );
 
@@ -88,7 +97,8 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
+				gui.add( params, 'logExposure', -2, 2, 0.01 ).onChange( render );
+				gui.add( params, 'toneMapping', ToneMapping ).onChange( render );
 				gui.open();
 
 				//
@@ -118,7 +128,8 @@
 
 			function render() {
 
-				renderer.toneMappingExposure = params.exposure;
+				renderer.toneMappingExposure = Math.pow( 10, params.logExposure );
+				renderer.toneMapping = params.toneMapping;
 
 				renderer.render( scene, camera );
 

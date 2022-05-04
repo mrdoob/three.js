@@ -36,11 +36,12 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			let mesh, renderer, scene, camera, controls;
+			let texture, helmet, cube, renderer, scene, camera, controls;
 			let gui, guiExposure = null;
 
 			const params = {
-				exposure: 1.0,
+				model: 'helmet',
+				logExposure: 0.0,
 				toneMapping: 'ACESFilmic'
 			};
 
@@ -48,6 +49,7 @@
 				None: THREE.NoToneMapping,
 				Linear: THREE.LinearToneMapping,
 				Reinhard: THREE.ReinhardToneMapping,
+				ReinhardLuma: THREE.ReinhardLumaToneMapping,
 				Cineon: THREE.CineonToneMapping,
 				ACESFilmic: THREE.ACESFilmicToneMapping,
 				Custom: THREE.CustomToneMapping
@@ -67,7 +69,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-				renderer.toneMappingExposure = params.exposure;
+				renderer.toneMappingExposure = Math.pow( 10, params.logExposure );
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -98,13 +100,34 @@
 
 				const rgbeLoader = new RGBELoader()
 					.setPath( 'textures/equirectangular/' );
+				
+				async function loadGltf( path, file ) {
 
-				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+					const gltf = await new GLTFLoader().setPath( path ).loadAsync( file );
+					let result;
+					gltf.scene.traverse( function ( child ) {
 
-				const [ texture, gltf ] = await Promise.all( [
+						if ( child.isMesh ) {
+
+							result = child;
+
+						}
+
+					} );
+
+					return result;
+
+				}
+
+				[ texture, helmet, cube ] = await Promise.all( [
 					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
-					gltfLoader.loadAsync( 'DamagedHelmet.gltf' ),
+					loadGltf( 'models/gltf/DamagedHelmet/glTF/', 'DamagedHelmet.gltf' ),
+					loadGltf( 'models/gltf/', 'Emissive HSL cube.glb' ),
 				] );
+
+				scene.add( helmet );
+				scene.add( cube );
+				cube.visible = false;
 
 				// environment
 
@@ -113,24 +136,21 @@
 				scene.background = texture;
 				scene.environment = texture;
 
-				// model
-
-				gltf.scene.traverse( function ( child ) {
-
-					if ( child.isMesh ) {
-
-						mesh = child;
-						scene.add( mesh );
-
-					}
-
-				} );
-
 				render();
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				gui = new GUI();
+
+				gui.add( params, 'model', [ 'helmet', 'cube' ] )
+
+					.onChange( function () {
+
+						helmet.visible = params.model === 'helmet';
+						cube.visible = params.model === 'cube';
+						render();
+
+					} );
 
 				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) )
 
@@ -160,11 +180,11 @@
 
 				if ( params.toneMapping !== 'None' ) {
 
-					guiExposure = gui.add( params, 'exposure', 0, 2 )
+					guiExposure = gui.add( params, 'logExposure', -2, 2 )
 
 						.onChange( function () {
 
-							renderer.toneMappingExposure = params.exposure;
+							renderer.toneMappingExposure = Math.pow( 10, params.logExposure );
 							render();
 
 						} );

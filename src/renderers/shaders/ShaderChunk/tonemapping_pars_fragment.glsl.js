@@ -21,6 +21,16 @@ vec3 ReinhardToneMapping( vec3 color ) {
 
 }
 
+// source: https://64.github.io/tonemapping/
+vec3 ReinhardLumaToneMapping( vec3 color ) {
+
+	const vec3 luma = vec3( 0.2126, 0.7152, 0.0722 );
+	color *= toneMappingExposure;
+	float l = dot( color, luma );
+	return saturate( color / ( 1. + l ) );
+
+}
+
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
 vec3 OptimizedCineonToneMapping( vec3 color ) {
 
