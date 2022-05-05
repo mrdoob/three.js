@@ -784,6 +784,7 @@ const WorldUVGenerator = {
 function toJSON( shapes, options, data ) {
 
 	data.shapes = [];
+	data.options = Object.assign( {}, options );
 
 	if ( Array.isArray( shapes ) ) {
 
