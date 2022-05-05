@@ -214,7 +214,7 @@
 
 				};
 
-				const ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 10000, 10000 ), groundMat );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), groundMat );
 				ground.position.y = - 100;
 				ground.rotation.x = - Math.PI / 2;
 				scene.add( ground );
