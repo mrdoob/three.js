@@ -98,7 +98,7 @@
 
 		<h3>[property:Object debug]</h3>
 		<p>
-		- [page:Boolean checkShaderErrors]: 
+		- [page:Boolean checkShaderErrors]:
 		  If it is true, defines whether material shader programs are checked
 			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
 			It is strongly recommended to keep these checks enabled during development.
@@ -122,6 +122,8 @@
 		Maximum height * width of cube map textures that a shader can use.<br />
 		- [page:Integer maxFragmentUniforms]: The value of *gl.MAX_FRAGMENT_UNIFORM_VECTORS*.
 		  The number of uniforms that can be used by a fragment shader.<br />
+		- [page:Integer maxSamples]: The value of *gl.MAX_SAMPLES*.
+		Maximum number of samples in context of Multisample anti-aliasing (MSAA).<br />
 		- [page:Integer maxTextureSize]: The value of *gl.MAX_TEXTURE_SIZE*.
 		Maximum height * width of a texture that a shader use.<br />
 		- [page:Integer maxTextures]: The value of *gl.MAX_TEXTURE_IMAGE_UNITS*.
@@ -155,7 +157,7 @@
 
 		<h3>[property:Object extensions]</h3>
 		<p>
-		- [page:Object get]( [param:String extensionName] ): 
+		- [page:Object get]( [param:String extensionName] ):
 		Used to check whether various extensions are supported and returns an object with details of the extension if available.
 		This method can check for the following extensions:<br />
 
