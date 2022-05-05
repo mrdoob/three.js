@@ -24028,7 +24028,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const textures = renderTarget.isWebGLMultipleRenderTargets ? renderTarget.texture : [ renderTarget.texture ];
 			const width = renderTarget.width;
 			const height = renderTarget.height;
-			let mask = 16384;
 			const invalidationArray = [ 36064 ];
 			const depthStyle = renderTarget.stencilBuffer ? 33306 : 36096;
 			const renderTargetProperties = properties.get( renderTarget );
@@ -24045,8 +24044,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( ignoreDepthValues === false ) {
 
-					if ( renderTarget.depthBuffer ) mask |= 256;
-					if ( renderTarget.stencilBuffer ) mask |= 1024;
+					if ( renderTarget.depthBuffer ) ;
+					if ( renderTarget.stencilBuffer ) ;
 
 				}
 
@@ -24066,8 +24065,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.framebufferTexture2D( 36009, 36064, 3553, webglTexture, 0 );
 
-				// _gl.clearBufferfv( _gl.COLOR, 0, [0, 0, 0, 1] );
-				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, 9728 );
+				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, 16384, 9728 );
 
 				if ( supportsInvalidateFramebuffer ) {
 
@@ -24080,6 +24078,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
+			state.bindFramebuffer( 36009, renderTargetProperties.__webglMultisampledFramebuffer );
 		}
 
 	}

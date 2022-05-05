@@ -17753,10 +17753,9 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 
 				const webglTexture = properties.get(textures[i]).__webglTexture;
 
-				_gl.framebufferTexture2D(_gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0); // _gl.clearBufferfv( _gl.COLOR, 0, [0, 0, 0, 1] );
+				_gl.framebufferTexture2D(_gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0);
 
-
-				_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST);
+				_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST);
 
 				if (supportsInvalidateFramebuffer) {
 					_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, invalidationArray);
@@ -17765,6 +17764,8 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 				state.bindFramebuffer(_gl.READ_FRAMEBUFFER, null);
 				state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, null);
 			}
+
+			state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
 		}
 	}
 
