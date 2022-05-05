@@ -1,0 +1,157 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Depth Texture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
+		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Depth Texture
+		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
+
+			import WebGPU from './jsm/capabilities/WebGPU.js';
+			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
+
+			import { smoothstep, negate, positionView, invert } from 'three-nodes/Nodes.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			let camera, scene, controls, renderer;
+
+			let cameraFX, sceneFX, textureRenderer;
+
+			const dpr = window.devicePixelRatio;
+
+			init().then( animate ).catch( error );
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 30 );
+				camera.position.z = 4;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// depth material
+
+				const material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = invert( smoothstep( camera.near, camera.far, negate( positionView.z ) ) );
+
+				//
+
+				const geometry = new THREE.TorusKnotGeometry( 1, 0.3, 128, 64 );
+
+				const count = 50;
+				const scale = 5;
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const r = Math.random() * 2.0 * Math.PI;
+					const z = ( Math.random() * 2.0 ) - 1.0;
+					const zScale = Math.sqrt( 1.0 - z * z ) * scale;
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set(
+						Math.cos( r ) * zScale,
+						Math.sin( r ) * zScale,
+						z * scale
+					);
+					mesh.rotation.set( Math.random(), Math.random(), Math.random() );
+					scene.add( mesh );
+
+				}
+
+				//
+
+				renderer = new WebGPURenderer();
+				renderer.setPixelRatio( dpr );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				textureRenderer = new WebGPUTextureRenderer( renderer );
+				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// FX
+
+				cameraFX = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				sceneFX = new THREE.Scene();
+
+				const geometryFX = new THREE.PlaneGeometry( 2, 2 );
+
+				//
+
+				const materialFX = new Nodes.MeshBasicNodeMaterial();
+				materialFX.colorNode = new Nodes.TextureNode( textureRenderer.getTexture() );
+
+				const quad = new THREE.Mesh( geometryFX, materialFX );
+				sceneFX.add( quad );
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				//
+
+				return renderer.init();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				textureRenderer.render( scene, camera );
+				renderer.render( sceneFX, cameraFX );
+
+			}
+
+			function error( error ) {
+
+				console.error( error );
+
+			}
+
+		</script>
+	</body>
+</html>

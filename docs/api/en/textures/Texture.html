@@ -9,7 +9,13 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Create a texture to apply to a surface or as a reflection or refraction map.</p>
+		<p class="desc">
+			Create a texture to apply to a surface or as a reflection or refraction map.
+		</p>
+
+		<p>
+			Note: After the initial use of a texture, its dimensions, format, and type cannot be changed. Instead, call [page:.dispose]() on the texture and instantiate a new one.
+		</p>
 
 		<h2>Code Example</h2>
 
@@ -30,6 +36,11 @@
 		<h3>[property:Integer id]</h3>
 		<p>
 		Readonly - unique number for this texture instance.
+		</p>
+
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:String uuid]</h3>
@@ -111,8 +122,7 @@
 
 		<h3>[property:number format]</h3>
 		<p>
-		The default is [page:Textures THREE.RGBAFormat], although the [page:TextureLoader TextureLoader] will automatically
-		set this to [page:Textures THREE.RGBFormat] for JPG images. <br /><br />
+		The default is [page:Textures THREE.RGBAFormat].<br /><br />
 
 		See the [page:Textures texture constants] page for details of other formats.
 		</p>
@@ -139,10 +149,33 @@
 		<h3>[property:Vector2 offset]</h3>
 		<p>
 		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
-		Typical range is *0.0* to *1.0*.  _Note:_ The offset property is a convenience modifier and only affects
-		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
-		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
-		assigned to achieve the desired offset.
+		Typical range is *0.0* to *1.0*.
+		</p>
+		<p>
+			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>color map</li>
+				<li>specular map</li>
+				<li>displacement map</li>
+				<li>normal map</li>
+				<li>bump map</li>
+				<li>roughness map</li>
+				<li>metalness map</li>
+				<li>alpha map</li>
+				<li>emissive map</li>
+				<li>clearcoat map</li>
+				<li>clearcoat normal map</li>
+				<li>clearcoat roughnessMap map</li>
+			</ol>
+		</p>
+		<p>
+			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>ao map</li>
+				<li>light map</li>
+			</ol>
 		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
@@ -150,10 +183,7 @@
 		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
 		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
 		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
-		tiling effect.  _Note:_ The repeat property is a convenience modifier and only affects
-		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
-		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
-		assigned to achieve the desired repetiton.
+		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -237,12 +267,23 @@
 		Set this to *true* to trigger an update next time the texture is used. Particularly important for setting the wrap mode.
 		</p>
 
+		<h3>[property:Object userData]</h3>
+		<p>
+		An object that can be used to store custom data about the texture. It should not hold
+		references to functions as these will not be cloned.
+		</p>
+
+		<h3>[property:Source source]</h3>
+		<p>
+		The data definition of a texture. A reference to the data source can be shared across textures.
+		This is often useful in context of spritesheets where multiple textures render the same data but with different texture transformations.
+		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		<p>[page:EventDispatcher EventDispatcher] methods are available on this class.</p>
 
-		<h3>[method:null updateMatrix]()</h3>
+		<h3>[method:undefined updateMatrix]()</h3>
 		<p>
 		Update the texture's uv-transform [page:Texture.matrix .matrix] from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
 		[page:Texture.rotation .rotation], and [page:Texture.center .center].
@@ -251,6 +292,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
+		Besides, cloning a texture does not automatically mark it for a texture upload. You have to set [page:Texture.needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -259,9 +301,9 @@
 		Convert the texture to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
 		</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Call [page:EventDispatcher EventDispatcher].dispatchEvent with a 'dispose' event type.
+		Frees the GPU related resources allocated by a texture. Call this method whenever a texture is no longer used in your app.
 		</p>
 
 		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>

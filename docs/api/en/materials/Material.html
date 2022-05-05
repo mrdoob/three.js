@@ -32,8 +32,14 @@
 		<h3>[property:Float alphaTest]</h3>
 		<p>
 		Sets the alpha value to be used when running an alpha test.
-		The material will not be renderered if the opacity is lower than this value.
+		The material will not be rendered if the opacity is lower than this value.
 		Default is *0*.
+		</p>
+
+		<h3>[property:Float alphaToCoverage]</h3>
+		<p>
+		Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with *antialias* parameter set to *true*).
+		Default is *false*.
 		</p>
 
 		<h3>[property:Integer blendDst]</h3>
@@ -122,6 +128,11 @@
 		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
 		</p>
 
+		<h3>[property:Boolean isMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Boolean stencilWrite]</h3>
 		<p>
 		Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.
@@ -161,9 +172,6 @@
 		<p>
 		Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
 		</p>
-
-		<h3>[property:Boolean fog]</h3>
-		<p>Whether the material is affected by fog. Default is *true*.</p>
 
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this material instance.</p>
@@ -305,21 +313,21 @@
 
 		<h2>Methods</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		<p>[page:EventDispatcher EventDispatcher] methods are available on this class.</p>
 
 		<h3>[method:Material clone]( )</h3>
 		<p>Return a new material with the same parameters as this material.</p>
 
-		<h3>[method:Material copy]( [param:material material] )</h3>
+		<h3>[method:this copy]( [param:material material] )</h3>
 		<p>Copy the parameters from the passed material into this material.</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 		This disposes the material. Textures of a material don't get disposed.
 		These needs to be disposed by [page:Texture Texture].
 		</p>
 
-		<h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
+		<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 		<p>
 		An optional callback that is executed immediately before the shader program is compiled.
 		This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
@@ -358,7 +366,7 @@
 		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 		</p>
 
-		<h3>[method:null setValues]( [param:Object values] )</h3>
+		<h3>[method:undefined setValues]( [param:Object values] )</h3>
 		<p>
 		values -- a container with parameters.<br />
 		Sets the properties based on the *values*.

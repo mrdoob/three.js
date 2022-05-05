@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			The [name] represents a virtual [link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener] of the all positional and non-positional audio effects in the scene.<br />
+			The [name] represents a virtual [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioListener listener] of the all positional and non-positional audio effects in the scene.<br />
 			A three.js application usually creates a single instance of [name]. It is a mandatory construtor parameter for audios entities like [page:Audio Audio] and [page:PositionalAudio PositionalAudio].<br />
 			In most cases, the listener object is a child of the camera. So the 3D transformation of the camera represents the 3D transformation of the listener.
 		</p>
@@ -77,7 +77,7 @@
 		Return the [page:AudioListener.gain gainNode].
 		</p>
 
-		<h3>[method:AudioListener removeFilter]()</h3>
+		<h3>[method:this removeFilter]()</h3>
 		<p>
 		Set the [page:AudioListener.filter filter] property to *null*.
 		</p>
@@ -87,7 +87,7 @@
 		Returns the value of the [page:AudioListener.filter filter] property.
 		</p>
 
-		<h3>[method:AudioListener setFilter]( [param:AudioNode value] )</h3>
+		<h3>[method:this setFilter]( [param:AudioNode value] )</h3>
 		<p>
 		Set the [page:AudioListener.filter filter] property to *value*.
 		</p>
@@ -97,7 +97,7 @@
 		Return the volume.
 		</p>
 
-		<h3>[method:AudioListener setMasterVolume]( [param:Number value] )</h3>
+		<h3>[method:this setMasterVolume]( [param:Number value] )</h3>
 		<p>
 		Set the volume.
 		</p>

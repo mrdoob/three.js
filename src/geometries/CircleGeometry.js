@@ -79,6 +79,12 @@ class CircleGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new CircleGeometry( data.radius, data.segments, data.thetaStart, data.thetaLength );
+
+	}
+
 }
 
 

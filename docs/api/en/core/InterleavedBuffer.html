@@ -45,17 +45,9 @@
 
 		<h3>[property:Object updateRange]</h3>
 		<p>
-		Object containing offset and count.
-		</p>
-
-		<h3>[property:Number updateRange.offset]</h3>
-		<p>
-		Default is *0*.
-		</p>
-
-		<h3>[property:Number updateRange.count]</h3>
-		<p>
-		Default is *-1*.
+		Object containing offset and count.<br />
+		- [page:Number offset]: Default is *0*.<br />
+		- [page:Number count]: Default is *-1*.<br />
 		</p>
 
 		<h3>[property:String uuid]</h3>
@@ -81,15 +73,15 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:InterleavedBuffer copy]( [param:InterleavedBuffer source] ) </h3>
+		<h3>[method:this copy]( [param:InterleavedBuffer source] ) </h3>
 		<p>
 		 Copies another [name] to this [name].
 		</p>
 
-		<h3>[method:InterleavedBuffer copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
+		<h3>[method:this copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
 		<p>Copies data from attribute[index2] to [page:InterleavedBuffer.array array][index1].</p>
 
-		<h3>[method:InterleavedBuffer set]( [param:TypedArray value], [param:Integer offset] ) </h3>
+		<h3>[method:this set]( [param:TypedArray value], [param:Integer offset] ) </h3>
 		<p>
 			value - The source (typed) array.<br/>
 			offset - The offset into the target array at which to begin writing values from the source array. Default is *0*.<br/><br />
@@ -104,10 +96,10 @@
 			Creates a clone of this [name].
 		</p>
 
-		<h3>[method:InterleavedBuffer setUsage] ( [param:Usage value] ) </h3>
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
 		<p>Set [page:InterleavedBuffer.usage usage] to value.</p>
 
-		<h3>[method:InterleavedBuffer toJSON]( [param:Object data] ) </h3>
+		<h3>[method:Object toJSON]( [param:Object data] ) </h3>
 		<p>
 			data - This object holds shared array buffers required for properly serializing geometries with interleaved attributes.<br/><br />
 

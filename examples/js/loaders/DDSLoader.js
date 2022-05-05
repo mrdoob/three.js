@@ -1,270 +1,252 @@
-THREE.DDSLoader = function ( manager ) {
+( function () {
 
-	THREE.CompressedTextureLoader.call( this, manager );
+	class DDSLoader extends THREE.CompressedTextureLoader {
 
-};
+		constructor( manager ) {
 
-THREE.DDSLoader.prototype = Object.assign( Object.create( THREE.CompressedTextureLoader.prototype ), {
-
-	constructor: THREE.DDSLoader,
-
-	parse: function ( buffer, loadMipmaps ) {
-
-		var dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
-
-		// Adapted from @toji's DDS utils
-		// https://github.com/toji/webgl-texture-utils/blob/master/texture-util/dds.js
-
-		// All values and structures referenced from:
-		// http://msdn.microsoft.com/en-us/library/bb943991.aspx/
-
-		var DDS_MAGIC = 0x20534444;
-
-		// var DDSD_CAPS = 0x1;
-		// var DDSD_HEIGHT = 0x2;
-		// var DDSD_WIDTH = 0x4;
-		// var DDSD_PITCH = 0x8;
-		// var DDSD_PIXELFORMAT = 0x1000;
-		var DDSD_MIPMAPCOUNT = 0x20000;
-		// var DDSD_LINEARSIZE = 0x80000;
-		// var DDSD_DEPTH = 0x800000;
-
-		// var DDSCAPS_COMPLEX = 0x8;
-		// var DDSCAPS_MIPMAP = 0x400000;
-		// var DDSCAPS_TEXTURE = 0x1000;
-
-		var DDSCAPS2_CUBEMAP = 0x200;
-		var DDSCAPS2_CUBEMAP_POSITIVEX = 0x400;
-		var DDSCAPS2_CUBEMAP_NEGATIVEX = 0x800;
-		var DDSCAPS2_CUBEMAP_POSITIVEY = 0x1000;
-		var DDSCAPS2_CUBEMAP_NEGATIVEY = 0x2000;
-		var DDSCAPS2_CUBEMAP_POSITIVEZ = 0x4000;
-		var DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000;
-		// var DDSCAPS2_VOLUME = 0x200000;
-
-		// var DDPF_ALPHAPIXELS = 0x1;
-		// var DDPF_ALPHA = 0x2;
-		var DDPF_FOURCC = 0x4;
-		// var DDPF_RGB = 0x40;
-		// var DDPF_YUV = 0x200;
-		// var DDPF_LUMINANCE = 0x20000;
-
-		function fourCCToInt32( value ) {
-
-			return value.charCodeAt( 0 ) +
-				( value.charCodeAt( 1 ) << 8 ) +
-				( value.charCodeAt( 2 ) << 16 ) +
-				( value.charCodeAt( 3 ) << 24 );
+			super( manager );
 
 		}
 
-		function int32ToFourCC( value ) {
+		parse( buffer, loadMipmaps ) {
 
-			return String.fromCharCode(
-				value & 0xff,
-				( value >> 8 ) & 0xff,
-				( value >> 16 ) & 0xff,
-				( value >> 24 ) & 0xff
-			);
+			const dds = {
+				mipmaps: [],
+				width: 0,
+				height: 0,
+				format: null,
+				mipmapCount: 1
+			}; // Adapted from @toji's DDS utils
+			// https://github.com/toji/webgl-texture-utils/blob/master/texture-util/dds.js
+			// All values and structures referenced from:
+			// http://msdn.microsoft.com/en-us/library/bb943991.aspx/
 
-		}
+			const DDS_MAGIC = 0x20534444; // let DDSD_CAPS = 0x1;
+			// let DDSD_HEIGHT = 0x2;
+			// let DDSD_WIDTH = 0x4;
+			// let DDSD_PITCH = 0x8;
+			// let DDSD_PIXELFORMAT = 0x1000;
 
-		function loadARGBMip( buffer, dataOffset, width, height ) {
+			const DDSD_MIPMAPCOUNT = 0x20000; // let DDSD_LINEARSIZE = 0x80000;
+			// let DDSD_DEPTH = 0x800000;
+			// let DDSCAPS_COMPLEX = 0x8;
+			// let DDSCAPS_MIPMAP = 0x400000;
+			// let DDSCAPS_TEXTURE = 0x1000;
 
-			var dataLength = width * height * 4;
-			var srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
-			var byteArray = new Uint8Array( dataLength );
-			var dst = 0;
-			var src = 0;
-			for ( var y = 0; y < height; y ++ ) {
+			const DDSCAPS2_CUBEMAP = 0x200;
+			const DDSCAPS2_CUBEMAP_POSITIVEX = 0x400;
+			const DDSCAPS2_CUBEMAP_NEGATIVEX = 0x800;
+			const DDSCAPS2_CUBEMAP_POSITIVEY = 0x1000;
+			const DDSCAPS2_CUBEMAP_NEGATIVEY = 0x2000;
+			const DDSCAPS2_CUBEMAP_POSITIVEZ = 0x4000;
+			const DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000; // let DDSCAPS2_VOLUME = 0x200000;
+			// let DDPF_ALPHAPIXELS = 0x1;
+			// let DDPF_ALPHA = 0x2;
 
-				for ( var x = 0; x < width; x ++ ) {
+			const DDPF_FOURCC = 0x4; // let DDPF_RGB = 0x40;
+			// let DDPF_YUV = 0x200;
+			// let DDPF_LUMINANCE = 0x20000;
 
-					var b = srcBuffer[ src ]; src ++;
-					var g = srcBuffer[ src ]; src ++;
-					var r = srcBuffer[ src ]; src ++;
-					var a = srcBuffer[ src ]; src ++;
-					byteArray[ dst ] = r; dst ++;	//r
-					byteArray[ dst ] = g; dst ++;	//g
-					byteArray[ dst ] = b; dst ++;	//b
-					byteArray[ dst ] = a; dst ++;	//a
+			function fourCCToInt32( value ) {
+
+				return value.charCodeAt( 0 ) + ( value.charCodeAt( 1 ) << 8 ) + ( value.charCodeAt( 2 ) << 16 ) + ( value.charCodeAt( 3 ) << 24 );
+
+			}
+
+			function int32ToFourCC( value ) {
+
+				return String.fromCharCode( value & 0xff, value >> 8 & 0xff, value >> 16 & 0xff, value >> 24 & 0xff );
+
+			}
+
+			function loadARGBMip( buffer, dataOffset, width, height ) {
+
+				const dataLength = width * height * 4;
+				const srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
+				const byteArray = new Uint8Array( dataLength );
+				let dst = 0;
+				let src = 0;
+
+				for ( let y = 0; y < height; y ++ ) {
+
+					for ( let x = 0; x < width; x ++ ) {
+
+						const b = srcBuffer[ src ];
+						src ++;
+						const g = srcBuffer[ src ];
+						src ++;
+						const r = srcBuffer[ src ];
+						src ++;
+						const a = srcBuffer[ src ];
+						src ++;
+						byteArray[ dst ] = r;
+						dst ++; //r
+
+						byteArray[ dst ] = g;
+						dst ++; //g
+
+						byteArray[ dst ] = b;
+						dst ++; //b
+
+						byteArray[ dst ] = a;
+						dst ++; //a
+
+					}
+
+				}
+
+				return byteArray;
+
+			}
+
+			const FOURCC_DXT1 = fourCCToInt32( 'DXT1' );
+			const FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
+			const FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
+			const FOURCC_ETC1 = fourCCToInt32( 'ETC1' );
+			const headerLengthInt = 31; // The header length in 32 bit ints
+			// Offsets into the header array
+
+			const off_magic = 0;
+			const off_size = 1;
+			const off_flags = 2;
+			const off_height = 3;
+			const off_width = 4;
+			const off_mipmapCount = 7;
+			const off_pfFlags = 20;
+			const off_pfFourCC = 21;
+			const off_RGBBitCount = 22;
+			const off_RBitMask = 23;
+			const off_GBitMask = 24;
+			const off_BBitMask = 25;
+			const off_ABitMask = 26; // let off_caps = 27;
+
+			const off_caps2 = 28; // let off_caps3 = 29;
+			// let off_caps4 = 30;
+			// Parse header
+
+			const header = new Int32Array( buffer, 0, headerLengthInt );
+
+			if ( header[ off_magic ] !== DDS_MAGIC ) {
+
+				console.error( 'THREE.DDSLoader.parse: Invalid magic number in DDS header.' );
+				return dds;
+
+			}
+
+			if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
+
+				console.error( 'THREE.DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
+				return dds;
+
+			}
+
+			let blockBytes;
+			const fourCC = header[ off_pfFourCC ];
+			let isRGBAUncompressed = false;
+
+			switch ( fourCC ) {
+
+				case FOURCC_DXT1:
+					blockBytes = 8;
+					dds.format = THREE.RGB_S3TC_DXT1_Format;
+					break;
+
+				case FOURCC_DXT3:
+					blockBytes = 16;
+					dds.format = THREE.RGBA_S3TC_DXT3_Format;
+					break;
+
+				case FOURCC_DXT5:
+					blockBytes = 16;
+					dds.format = THREE.RGBA_S3TC_DXT5_Format;
+					break;
+
+				case FOURCC_ETC1:
+					blockBytes = 8;
+					dds.format = THREE.RGB_ETC1_Format;
+					break;
+
+				default:
+					if ( header[ off_RGBBitCount ] === 32 && header[ off_RBitMask ] & 0xff0000 && header[ off_GBitMask ] & 0xff00 && header[ off_BBitMask ] & 0xff && header[ off_ABitMask ] & 0xff000000 ) {
+
+						isRGBAUncompressed = true;
+						blockBytes = 64;
+						dds.format = THREE.RGBAFormat;
+
+					} else {
+
+						console.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
+						return dds;
+
+					}
+
+			}
+
+			dds.mipmapCount = 1;
+
+			if ( header[ off_flags ] & DDSD_MIPMAPCOUNT && loadMipmaps !== false ) {
+
+				dds.mipmapCount = Math.max( 1, header[ off_mipmapCount ] );
+
+			}
+
+			const caps2 = header[ off_caps2 ];
+			dds.isCubemap = caps2 & DDSCAPS2_CUBEMAP ? true : false;
+
+			if ( dds.isCubemap && ( ! ( caps2 & DDSCAPS2_CUBEMAP_POSITIVEX ) || ! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEX ) || ! ( caps2 & DDSCAPS2_CUBEMAP_POSITIVEY ) || ! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEY ) || ! ( caps2 & DDSCAPS2_CUBEMAP_POSITIVEZ ) || ! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEZ ) ) ) {
+
+				console.error( 'THREE.DDSLoader.parse: Incomplete cubemap faces' );
+				return dds;
+
+			}
+
+			dds.width = header[ off_width ];
+			dds.height = header[ off_height ];
+			let dataOffset = header[ off_size ] + 4; // Extract mipmaps buffers
+
+			const faces = dds.isCubemap ? 6 : 1;
+
+			for ( let face = 0; face < faces; face ++ ) {
+
+				let width = dds.width;
+				let height = dds.height;
+
+				for ( let i = 0; i < dds.mipmapCount; i ++ ) {
+
+					let byteArray, dataLength;
+
+					if ( isRGBAUncompressed ) {
+
+						byteArray = loadARGBMip( buffer, dataOffset, width, height );
+						dataLength = byteArray.length;
+
+					} else {
+
+						dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
+						byteArray = new Uint8Array( buffer, dataOffset, dataLength );
+
+					}
+
+					const mipmap = {
+						'data': byteArray,
+						'width': width,
+						'height': height
+					};
+					dds.mipmaps.push( mipmap );
+					dataOffset += dataLength;
+					width = Math.max( width >> 1, 1 );
+					height = Math.max( height >> 1, 1 );
 
 				}
 
 			}
 
-			return byteArray;
-
-		}
-
-		var FOURCC_DXT1 = fourCCToInt32( 'DXT1' );
-		var FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
-		var FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
-		var FOURCC_ETC1 = fourCCToInt32( 'ETC1' );
-
-		var headerLengthInt = 31; // The header length in 32 bit ints
-
-		// Offsets into the header array
-
-		var off_magic = 0;
-
-		var off_size = 1;
-		var off_flags = 2;
-		var off_height = 3;
-		var off_width = 4;
-
-		var off_mipmapCount = 7;
-
-		var off_pfFlags = 20;
-		var off_pfFourCC = 21;
-		var off_RGBBitCount = 22;
-		var off_RBitMask = 23;
-		var off_GBitMask = 24;
-		var off_BBitMask = 25;
-		var off_ABitMask = 26;
-
-		// var off_caps = 27;
-		var off_caps2 = 28;
-		// var off_caps3 = 29;
-		// var off_caps4 = 30;
-
-		// Parse header
-
-		var header = new Int32Array( buffer, 0, headerLengthInt );
-
-		if ( header[ off_magic ] !== DDS_MAGIC ) {
-
-			console.error( 'THREE.DDSLoader.parse: Invalid magic number in DDS header.' );
 			return dds;
 
 		}
-
-		if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
-
-			console.error( 'THREE.DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
-			return dds;
-
-		}
-
-		var blockBytes;
-
-		var fourCC = header[ off_pfFourCC ];
-
-		var isRGBAUncompressed = false;
-
-		switch ( fourCC ) {
-
-			case FOURCC_DXT1:
-
-				blockBytes = 8;
-				dds.format = THREE.RGB_S3TC_DXT1_Format;
-				break;
-
-			case FOURCC_DXT3:
-
-				blockBytes = 16;
-				dds.format = THREE.RGBA_S3TC_DXT3_Format;
-				break;
-
-			case FOURCC_DXT5:
-
-				blockBytes = 16;
-				dds.format = THREE.RGBA_S3TC_DXT5_Format;
-				break;
-
-			case FOURCC_ETC1:
-
-				blockBytes = 8;
-				dds.format = THREE.RGB_ETC1_Format;
-				break;
-
-			default:
-
-				if ( header[ off_RGBBitCount ] === 32
-					&& header[ off_RBitMask ] & 0xff0000
-					&& header[ off_GBitMask ] & 0xff00
-					&& header[ off_BBitMask ] & 0xff
-					&& header[ off_ABitMask ] & 0xff000000 ) {
-
-					isRGBAUncompressed = true;
-					blockBytes = 64;
-					dds.format = THREE.RGBAFormat;
-
-				} else {
-
-					console.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
-					return dds;
-
-				}
-
-		}
-
-		dds.mipmapCount = 1;
-
-		if ( header[ off_flags ] & DDSD_MIPMAPCOUNT && loadMipmaps !== false ) {
-
-			dds.mipmapCount = Math.max( 1, header[ off_mipmapCount ] );
-
-		}
-
-		var caps2 = header[ off_caps2 ];
-		dds.isCubemap = caps2 & DDSCAPS2_CUBEMAP ? true : false;
-		if ( dds.isCubemap && (
-			! ( caps2 & DDSCAPS2_CUBEMAP_POSITIVEX ) ||
-			! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEX ) ||
-			! ( caps2 & DDSCAPS2_CUBEMAP_POSITIVEY ) ||
-			! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEY ) ||
-			! ( caps2 & DDSCAPS2_CUBEMAP_POSITIVEZ ) ||
-			! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEZ )
-		) ) {
-
-			console.error( 'THREE.DDSLoader.parse: Incomplete cubemap faces' );
-			return dds;
-
-		}
-
-		dds.width = header[ off_width ];
-		dds.height = header[ off_height ];
-
-		var dataOffset = header[ off_size ] + 4;
-
-		// Extract mipmaps buffers
-
-		var faces = dds.isCubemap ? 6 : 1;
-
-		for ( var face = 0; face < faces; face ++ ) {
-
-			var width = dds.width;
-			var height = dds.height;
-
-			for ( var i = 0; i < dds.mipmapCount; i ++ ) {
-
-				if ( isRGBAUncompressed ) {
-
-					var byteArray = loadARGBMip( buffer, dataOffset, width, height );
-					var dataLength = byteArray.length;
-
-				} else {
-
-					var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
-					var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
-
-				}
-
-				var mipmap = { 'data': byteArray, 'width': width, 'height': height };
-				dds.mipmaps.push( mipmap );
-
-				dataOffset += dataLength;
-
-				width = Math.max( width >> 1, 1 );
-				height = Math.max( height >> 1, 1 );
-
-			}
-
-		}
-
-		return dds;
 
 	}
 
-} );
+	THREE.DDSLoader = DDSLoader;
+
+} )();

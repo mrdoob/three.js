@@ -1,8 +1,8 @@
 class Clock {
 
-	constructor( autoStart ) {
+	constructor( autoStart = true ) {
 
-		this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+		this.autoStart = autoStart;
 
 		this.startTime = 0;
 		this.oldTime = 0;

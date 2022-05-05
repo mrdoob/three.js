@@ -1,9 +1,23 @@
 {
   "name": "three",
+<<<<<<< HEAD
   "version": "0.126.1",
+=======
+  "version": "0.140.0",
+>>>>>>> 1238a324e081752d9f66219252361f05f73594df
   "description": "JavaScript 3D library",
-  "main": "build/three.js",
-  "module": "build/three.module.js",
+  "type": "module",
+  "main": "./build/three.js",
+  "module": "./build/three.module.js",
+  "exports": {
+    ".": {
+      "import": "./build/three.module.js",
+      "require": "./build/three.cjs"
+    },
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./src/*": "./src/*"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
@@ -11,6 +25,7 @@
   "sideEffects": false,
   "files": [
     "build/three.js",
+    "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
     "examples/js",
@@ -28,11 +43,48 @@
   },
   "eslintConfig": {
     "root": true,
-    "extends": "mdcs",
-    "plugins": [
-      "html"
+    "extends": [
+      "mdcs",
+      "plugin:compat/recommended"
     ],
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+      "babelOptions": {
+        "configFile": "./utils/build/.babelrc.json"
+      }
+    },
+    "plugins": [
+      "html",
+      "import"
+    ],
+    "settings": {
+      "polyfills": [
+        "WebGL2RenderingContext"
+      ]
+    },
+    "globals": {
+      "__THREE_DEVTOOLS__": "readonly",
+      "WebGL2ComputeRenderingContext": "readonly",
+      "potpack": "readonly",
+      "fflate": "readonly",
+      "bodymovin": "readonly",
+      "OIMO": "readonly",
+      "Stats": "readonly",
+      "XRWebGLBinding": "readonly",
+      "XRWebGLLayer": "readonly",
+      "GPUShaderStage": "readonly",
+      "GPUBufferUsage": "readonly",
+      "GPUTextureUsage": "readonly",
+      "QUnit": "readonly"
+    },
     "rules": {
+      "no-throw-literal": [
+        "error"
+      ],
+      "import/extensions": [
+        "error",
+        "always"
+      ],
       "quotes": [
         "error",
         "single"
@@ -46,19 +98,24 @@
       ]
     }
   },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
   "scripts": {
     "start": "npm run dev",
-    "test": "npm run test-lint && npm run test-unit",
+    "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
+    "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
+    "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "lint-fix": "eslint src --ext js --fix && eslint examples/js examples/jsm --ext js --ignore-pattern libs --fix",
+    "lint": "eslint src --ext js",
+    "lint-examples": "eslint examples/js examples/jsm --ext js --ignore-pattern libs --ignore-pattern ifc",
+    "lint-fix": "npm run lint -- --fix && npm run lint-examples -- --fix",
     "lint-docs": "eslint docs --ext html",
-    "lint-examples": "eslint examples/js examples/jsm --ext js --ignore-pattern libs",
-    "test-lint": "eslint src --ext js",
     "test-unit": "npm run unit --prefix test",
-    "test-unit-examples": "npm run unit-examples --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
+    "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
@@ -71,6 +128,7 @@
     "webgl",
     "webgl2",
     "webaudio",
+    "webgpu",
     "webxr",
     "canvas",
     "svg",
@@ -83,19 +141,24 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/plugin-proposal-class-properties": "^7.12.13",
-    "@babel/preset-env": "^7.12.16",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^11.2.0",
-    "concurrently": "^5.3.0",
-    "eslint": "^7.20.0",
+    "@babel/core": "^7.17.9",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/preset-env": "^7.16.11",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-node-resolve": "^13.2.0",
+    "chalk": "^5.0.1",
+    "concurrently": "^7.1.0",
+    "eslint": "^8.13.0",
     "eslint-config-mdcs": "^5.0.0",
-    "eslint-plugin-html": "^6.1.1",
-    "regenerator-runtime": "^0.13.7",
-    "rollup": "^2.39.0",
+    "eslint-plugin-compat": "^4.0.2",
+    "eslint-plugin-html": "^6.2.0",
+    "eslint-plugin-import": "^2.26.0",
+    "rollup": "^2.70.2",
+    "rollup-plugin-filesize": "^9.1.2",
     "rollup-plugin-terser": "^7.0.2",
-    "servez": "^1.11.0"
+    "rollup-plugin-visualizer": "^5.6.0",
+    "servez": "^1.14.1"
   },
   "jspm": {
     "files": [

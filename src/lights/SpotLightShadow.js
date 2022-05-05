@@ -1,5 +1,5 @@
 import { LightShadow } from './LightShadow.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
 class SpotLightShadow extends LightShadow {
@@ -30,6 +30,16 @@ class SpotLightShadow extends LightShadow {
 		}
 
 		super.updateMatrices( light );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.focus = source.focus;
+
+		return this;
 
 	}
 

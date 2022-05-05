@@ -2,24 +2,20 @@ import { Line } from './Line.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-const _start = new Vector3();
-const _end = new Vector3();
+const _start = /*@__PURE__*/ new Vector3();
+const _end = /*@__PURE__*/ new Vector3();
 
-function LineSegments( geometry, material ) {
+class LineSegments extends Line {
 
-	Line.call( this, geometry, material );
+	constructor( geometry, material ) {
 
-	this.type = 'LineSegments';
+		super( geometry, material );
 
-}
+		this.type = 'LineSegments';
 
-LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
+	}
 
-	constructor: LineSegments,
-
-	isLineSegments: true,
-
-	computeLineDistances: function () {
+	computeLineDistances() {
 
 		const geometry = this.geometry;
 
@@ -60,7 +56,8 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 	}
 
-} );
+}
 
+LineSegments.prototype.isLineSegments = true;
 
 export { LineSegments };

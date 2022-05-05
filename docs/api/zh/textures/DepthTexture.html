@@ -29,7 +29,7 @@
 
 		[page:Number height] -- 纹理的高度。<br />
 
-		[page:Constant type] -- Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using  [page:Textures DepthStencilFormat].
+		[page:Constant type] -- Default is [page:Textures THREE.UnsignedShortType] when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
 		请参阅[page:Textures type constants]（类型常量）来了解其他选项。<br />
 
 		[page:Constant mapping] --
@@ -63,40 +63,45 @@
 		—— 以下属性也是texture类中的一部分，但在这里默认值不同。
 		</p>
 
-		<h3>[page:Texture.format .format]</h3>
+		<h3>[page:Texture.format format]</h3>
 		<p>
 		[page:Textures DepthFormat]（默认值）或者[page:Textures DepthStencilFormat]中的一个。
 		请参阅[page:Textures format constants]来了解详细信息。<br />
 		</p>
 
-		<h3>[page:Texture.type .type]</h3>
+		<h3>[page:Texture.type type]</h3>
 		<p>
-		Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
+		Default is [page:Textures THREE.UnsignedShortType] when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
 		请参阅[page:Textures format constants]来了解详细信息。<br />
 		</p>
 
-		<h3>[page:Texture.magFilter .magFilter]</h3>
+		<h3>[page:Texture.magFilter magFilter]</h3>
 		<p>
 		当一个纹素覆盖大于一个像素时，贴图将如何采样。
 		其默认值为[page:Textures THREE.NearestFilter]。
 		请参阅[page:Textures magnification filter constants]（放大滤镜常量）来了解其他选项。
 		</p>
 
-		<h3>[page:Texture.minFilter .minFilter]</h3>
+		<h3>[page:Texture.minFilter minFilter]</h3>
 		<p>
 		当一个纹素覆盖小于一个像素时，贴图将如何采样。
 		其默认值为[page:Textures THREE.NearestFilter]。
 		请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其他选项。
 		</p>
 
-		<h3>[page:Texture.flipY .flipY]</h3>
+		<h3>[page:Texture.flipY flipY]</h3>
 		<p>
 		深度贴图不需要被翻转，因此其默认值为*false*。
 		</p>
 
-		<h3>[page:Texture.generateMipmaps .generateMipmaps]</h3>
+		<h3>[page:Texture.generateMipmaps generateMipmaps]</h3>
 		<p>
 		深度贴图不使用mipmap。
+		</p>
+
+		<h3>[property:Boolean isDepthTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h2>方法</h2>

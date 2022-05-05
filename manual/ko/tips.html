@@ -1,0 +1,336 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="utf-8">
+    <title>팁</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 팁">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+    <link rel="stylesheet" href="/manual/ko/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>팁</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>이 글은 Three.js의 팁에 관한 글들 중 너무 짧아 별도의 글로 분리하기 애매한 글들을 묶은 것입니다.</p>
+<hr>
+<p><a id="screenshot" data-toc="스크린샷 찍기"></a></p>
+<h1 id="-">캔버스의 스크린샷 찍기</h1>
+<p>브라우저에서 스크린샷을 찍을 수 있는 방법은 2가지 정도가 있습니다. 예전부터 사용하던 <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL"><code class="notranslate" translate="no">canvas.toDataURL</code></a>과, 새로 등장한 <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob"><code class="notranslate" translate="no">canvas.toBlob</code></a>이 있죠.</p>
+<p>그냥 메서드만 호출하면 되는 거라니, 얼핏 쉬워 보입니다. 아래 정도의 코드면 손쉽게 스크린샷을 찍을 수 있을 것 같네요.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
++&lt;button id="screenshot" type="button"&gt;Save...&lt;/button&gt;
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${ canvas.width }x${ canvas.height }.png`);
+  });
+});
+
+const saveBlob = (function() {
+  const a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style.display = 'none';
+  return function saveData(blob, fileName) {
+     const url = window.URL.createObjectURL(blob);
+     a.href = url;
+     a.download = fileName;
+     a.click();
+  };
+}());
+</pre>
+<p>아래는 <a href="responsive.html">반응형 디자인</a>의 예제에 버튼과 버튼을 꾸밀 CSS를 추가한 예제입니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-bad.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-bad.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>하지만 막상 스크린샷을 찍어보니 아래와 같은 결과가 나옵니다.</p>
+<div class="threejs_center"><img src="../resources/images/screencapture-413x313.png"></div>
+
+<p>그냥 텅 빈 이미지네요.</p>
+<p>물론 브라우저나/OS에 따라 잘 나오는 경우도 있을 수 있지만 대게의 경우 텅 빈 이미지가 나올 겁니다.</p>
+<p>이건 성능 관련 문제입니다. 기본적으로 브라우저는 화면을 렌더링한 후 WebGL 캔버스의 드로잉 버퍼를 바로 비웁니다.</p>
+<p>이 문제를 해결하려면 화면을 캡쳐하기 직전에 화면을 렌더링하는 함수를 호출해야 합니다.</p>
+<p>예제에서 몇 가지를 수정해야 합니다. 먼저 렌더링 함수를 분리합시다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const state = {
++  time: 0,
++};
+
+-function render(time) {
+-  time *= 0.001;
++function render() {
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
++    const rot = state.time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
++function animate(time) {
++  state.time = time * 0.001;
++
++  render();
++
++  requestAnimationFrame(animate);
++}
++requestAnimationFrame(animate);
+</pre>
+<p>이제 <code class="notranslate" translate="no">render</code> 함수는 오직 화면을 렌더링하는 역할만 하기에, 화면을 캡쳐하기 직전에 <code class="notranslate" translate="no">render</code> 함수를 호출하면 됩니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
++  render();
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${ canvas.width }x${ canvas.height }.png`);
+  });
+});
+</pre>
+<p>이제 문제 없이 잘 작동할 겁니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-good.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-good.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>다른 방법에 대해서는 다음 글을 보기 바랍니다.</p>
+<hr>
+<p><a id="preservedrawingbuffer" data-toc="캔버스 초기화 방지하기"></a></p>
+<h1 id="-">캔버스 초기화 방지하기</h1>
+<p>움직이는 물체로 사용자가 그림을 그리게 한다고 해봅시다. 이걸 구현하려면 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <code class="notranslate" translate="no">preserveDrawingBuffer: true</code>를 설정해야 합니다. 또한 Three.js가 캔버스를 초기화하지 않도록 해주어야 하죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({ canvas });
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  preserveDrawingBuffer: true,
++  alpha: true,
++});
++renderer.autoClearColor = false;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-preservedrawingbuffer.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-preservedrawingbuffer.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>만약 진짜 드로잉 프로그램을 만들 계획이라면 이 방법은 쓰지 않는 게 좋습니다. 해상도가 변경될 때마다 브라우저가 캔버스를 초기화할 테니까요. 현재 예제에서는 해상도를 캔버스 크기에 맞춰 변경합니다. 그리고 캔버스 크기는 화면 크기에 맞춰 조정되죠. 파일을 다운받거나, 탭을 바꾸거나, 상태표시줄이 추가되는 등 화면 크기가 바뀌는 경우는 다양합니다. 모바일 환경이라면 화면을 회전시키는 경우도 포함되겠죠.</p>
+<p>드로잉 프로그램을 만들려면 <a href="rendertargets.html">렌더 타겟을 이용해 텍스처로 화면을 렌더링</a>하는 게 좋을 겁니다.</p>
+<hr>
+<p><a id="tabindex" data-toc="캔버스에서 키 입력 받기"></a></p>
+<h1 id="-">키 입력 받기</h1>
+<p>이 시리즈에서는 대부분의 이벤트 리스너를 <code class="notranslate" translate="no">canvas</code>에 추가했습니다. 다른 이벤트는 문제 없이 작동했지만, 딱 하나, 키보드 이벤트는 기본적으로 그냥 동작하지 않았습니다.</p>
+<p>키보드 이벤트를 받으려면 해당 요소의 <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex"><code class="notranslate" translate="no">tabindex</code></a>를 0 이상의 값으로 설정해야 합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas tabindex="0"&gt;&lt;/canvas&gt;
+</pre>
+<p>하지만 이 속성을 적용하면 새로운 문제가 생깁니다. <code class="notranslate" translate="no">tabindex</code>가 있는 요소는 focus 상태일 때 강조 표시가 적용되거든요. 이 문제를 해결하려면 CSS의 <code class="notranslate" translate="no">outline</code> 속성을 <code class="notranslate" translate="no">none</code>으로 설정해야 합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">canvas:focus {
+  outline: none;
+}
+</pre>
+<p>간단한 테스트를 위해 캔버스 3개를 만들겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c1"&gt;&lt;/canvas&gt;
+&lt;canvas id="c2" tabindex="0"&gt;&lt;/canvas&gt;
+&lt;canvas id="c3" tabindex="1"&gt;&lt;/canvas&gt;
+</pre>
+<p>마지막 캔버스에만 CSS를 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c3:focus {
+    outline: none;
+}
+</pre>
+<p>그리고 모든 캔버스에 이벤트 리스너를 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">document.querySelectorAll('canvas').forEach((canvas) =&gt; {
+  const ctx = canvas.getContext('2d');
+
+  function draw(str) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(str, canvas.width / 2, canvas.height / 2);
+  }
+  draw(canvas.id);
+
+  canvas.addEventListener('focus', () =&gt; {
+    draw('has focus press a key');
+  });
+
+  canvas.addEventListener('blur', () =&gt; {
+    draw('lost focus');
+  });
+
+  canvas.addEventListener('keydown', (e) =&gt; {
+    draw(`keyCode: ${e.keyCode}`);
+  });
+});
+</pre>
+<p>첫 번째 캔버스에는 아무리 해도 키보드 이벤트가 발생하지 않을 겁니다. 두 번째 캔버스는 키보드 이벤트를 받긴 하지만 강조 표시가 생기죠. 대신 세 번째 캔버스에서는 두 문제가 발생하지 않습니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-tabindex.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-tabindex.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="transparent-canvas" data-toc="캔버스를 투명하게 만들기"></a></p>
+<h1 id="-">캔버스를 투명하게 만들기</h1>
+<p>아무런 설정을 하지 않는다면 Three.js는 기본적으로 캔버스를 불투명하게 렌더링합니다. 캔버스를 투명하게 만들려면 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <a href="/docs/#api/ko/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha: true</code></a>를 넘겨줘야 하죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({ canvas });
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  alpha: true,
++});
+</pre>
+<p>또한 캔버스가 premultiplied 알파(미리 계산된 alpha 값, straight alpha 또는 associated alpha라고도 불림)를 사용하지 <strong>않도록</strong> 하게끔 하려면 아래처럼 값을 설정해줘야 합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  alpha: true,
++  premultipliedAlpha: false,
+});
+</pre>
+<p>Three.js는 기본적으로 캔버스에는 <a href="/docs/#api/ko/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a>를 사용하지만 재질(material)에는 <a href="/docs/#api/ko/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>를 사용합니다.</p>
+<p>premultiplied alpha를 어떻게 사용해야 하는지 알고 싶다면 <a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre">여기 이 글</a>*을 참고하기 바랍니다.</p>
+<p>※ 영어이니 읽기가 어렵다면 그냥 구글에 premultiplied alpha를 검색하는 것을 추천합니다. 역주.</p>
+<p>어쨌든 이제 한 번 투명 캔버스 예제를 만들어보죠.</p>
+<p><a href="responsive.html">반응형 디자인</a>에서 가져온 예제에 저 설정을 적용했습니다. 추가로 재질도 똑같이 투명하게 만들어보죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+-  const material = new THREE.MeshPhongMaterial({ color });
++  const material = new THREE.MeshPhongMaterial({
++    color,
++    opacity: 0.5,
++  });
+
+...
+</pre>
+<p>여기에 HTML로 텍스트를 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="content"&gt;
++    &lt;div&gt;
++      &lt;h1&gt;Cubes-R-Us!&lt;/h1&gt;
++      &lt;p&gt;We make the best cubes!&lt;/p&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>캔버스를 앞에 둬야 하니 CSS도 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    position: fixed;
++    left: 0;
++    top: 0;
++    z-index: 2;
++    pointer-events: none;
+}
++#content {
++  font-size: 7vw;
++  font-family: sans-serif;
++  text-align: center;
++  width: 100%;
++  height: 100%;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++}
+</pre>
+<p><code class="notranslate" translate="no">pointer-events: none</code>은 캔버스가 마우스나 터치 이벤트의 영향을 받지 않도록 해줍니다. 아래에 있는 텍스트를 바로 선택할 수 있도록 설정한 것이죠.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-transparent-canvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-transparent-canvas.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="html-background" data-toc="Three.js를 HTML 요소의 배경으로 사용하기"></a></p>
+<h1 id="-three-js-">배경에 Three.js 애니메이션 넣기</h1>
+<p>많이 받은 질문 중에 하나가 Three.js 애니메이션을 웹 페이지의 배경으로 사용하는 방법이었습니다.</p>
+<p>가능한 방법은 2가지 정도겠네요.</p>
+<ul>
+<li>캔버스 요소의 CSS <code class="notranslate" translate="no">position</code>을 <code class="notranslate" translate="no">fixed</code>로 설정한다.</li>
+</ul>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+ position: fixed;
+ left: 0;
+ top: 0;
+ ...
+}
+</pre>
+<p>이전 예제에서 썼던 방법과 똑같은 방법을 적용할 수 있습니다. <code class="notranslate" translate="no">z-index</code>를 -1 로 설정하면 정육면체들이 텍스트 뒤로 사라질 겁니다.</p>
+<p>이 방법의 단점은 자바스크립트 코드가 반드시 페이지와 통합되야 한다는 겁니다. 특히 복잡한 페이지라면 Three.js를 렌더링하는 코드가 다른 코드와 충돌하지 않도록 특별히 신경을 써야 하겠죠.</p>
+<ul>
+<li><code class="notranslate" translate="no">iframe</code>을 쓴다.</li>
+</ul>
+<p>이 방법은 이 사이트의 <a href="/threejs/lessons/kr/">메인 페이지</a>에서 사용한 방법입니다.</p>
+<p>해당 웹 페이지에 iframe만 추가하면 되죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;iframe id="background" src="responsive.html"&gt;
+&lt;div&gt;
+  내용 내용 내용 내용
+&lt;/div&gt;
+</pre>
+<p>그런 다음 캔버스 요소를 활용했을 때와 마찬가지로 iframe이 창 전체를 채우도록 한 뒤, <code class="notranslate" translate="no">z-index</code>를 이용해 배경으로 지정합니다. iframe에는 기본적으로 윤곽선이 있으니 추가로 <code class="notranslate" translate="no">border</code>만 <code class="notranslate" translate="no">none</code>으로 설정해주면 됩니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    border: none;
+    pointer-events: none;
+}
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-html-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-html-background.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

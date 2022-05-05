@@ -4,19 +4,25 @@
 		<title>three.js webgl - materials - blending</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			let camera, scene, renderer;
 			let mapBg;
@@ -55,19 +61,9 @@
 
 				mapBg = new THREE.CanvasTexture( canvas );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
-				mapBg.repeat.set( 128, 64 );
+				mapBg.repeat.set( 64, 32 );
 
-				/*
-				let mapBg = textureLoader.load( 'textures/disturb.jpg' );
-				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
-				mapBg.repeat.set( 8, 4 );
-				*/
-
-				const materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
-
-				const meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
-				meshBg.position.set( 0, 0, - 1 );
-				scene.add( meshBg );
+				scene.background = mapBg;
 
 				// OBJECTS
 
@@ -110,7 +106,6 @@
 						let mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, y, z );
 						scene.add( mesh );
-
 
 						mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.name ) );
 						mesh.position.set( x, y - 75, z );
@@ -159,7 +154,7 @@
 				ctx.fillRect( 0, 0, 128, 32 );
 
 				ctx.fillStyle = 'white';
-				ctx.font = '12pt arial bold';
+				ctx.font = 'bold 12pt arial';
 				ctx.fillText( text, 10, 22 );
 
 				const map = new THREE.CanvasTexture( canvas );

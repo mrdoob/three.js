@@ -1,5 +1,4 @@
 import { Camera } from './Camera.js';
-import { Object3D } from '../core/Object3D.js';
 
 class OrthographicCamera extends Camera {
 
@@ -114,7 +113,7 @@ class OrthographicCamera extends Camera {
 
 	toJSON( meta ) {
 
-		const data = Object3D.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		data.object.zoom = this.zoom;
 		data.object.left = this.left;

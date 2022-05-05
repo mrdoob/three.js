@@ -1,29 +1,29 @@
 /* global QUnit */
 
-import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper';
+// import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper.js';
 
 export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module( 'SkeletonHelper', () => {
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "updateMatrixWorld", ( assert ) => {
+		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

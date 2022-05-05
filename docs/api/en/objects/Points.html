@@ -35,6 +35,11 @@
 			An instance of [page:BufferGeometry] (or derived classes), defining the object's structure.
 		</p>
 
+		<h3>[property:Boolean isPoints]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Material material]</h3>
 		<p>
 			An instance of [page:Material], defining the object's appearance.
@@ -56,7 +61,7 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		Get intersections between a casted ray and this Points.
 		[page:Raycaster.intersectObject] will call this method.
@@ -67,7 +72,7 @@
 		Returns a clone of this Points object and its descendants.
 		</p>
 
-		<h3>[method:null updateMorphTargets]()</h3>
+		<h3>[method:undefined updateMorphTargets]()</h3>
 		<p>
 		Updates the morphTargets to have no influence on the object. Resets the
 		[page:Points.morphTargetInfluences morphTargetInfluences] and

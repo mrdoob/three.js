@@ -19,61 +19,61 @@
 
 		<h3>[name]( [param:Boolean autoStart] )</h3>
 		<p>
-		autoStart — (可选) 是否要自动开启时钟。默认值是 true。
+		autoStart — (可选) 是否要在第一次调用 [page:.getDelta]() 时自动开启时钟。默认值是 *true*。
 		</p>
 
 		<h2>属性</h2>
 
 		<h3>[property:Boolean autoStart]</h3>
 		<p>
-			如果设置为 true，则在第一次 update 时开启时钟。默认值是 true。
+			如果设置为 true，则在第一次调用 [page:.getDelta]() 时开启时钟。默认值是 *true*。
 		</p>
 
 		<h3>[property:Float startTime]</h3>
 		<p>
-			存储时钟最后一次调用 [page:Clock.start start] 方法的时间。
+			存储时钟最后一次调用 [page:Clock.start start] 方法的时间。默认值是 *0*。
  		</p>
 
 
 		<h3>[property:Float oldTime]</h3>
 		<p>
-			存储时钟最后一次调用  [page:Clock.start start], [page:Clock.getElapsedTime getElapsedTime] 或 [page:Clock.getDelta getDelta] 方法的时间。
+			存储时钟最后一次调用 [page:Clock.start start], [page:.getElapsedTime]() 或 [page:.getDelta]() 方法的时间。默认值是 *0*。
  		</p>
 
 		<h3>[property:Float elapsedTime]</h3>
 		<p>
-			保存时钟运行的总时长。
+			保存时钟运行的总时长。默认值是 *0*。
  		</p>
 
 		<h3>[property:Boolean running]</h3>
 		<p>
-			判断时钟是否在运行。
+			判断时钟是否在运行。默认值是 *false*。
  		</p>
 
 
 		<h2>方法</h2>
 
-		<h3>[method:null start]()</h3>
+		<h3>[method:undefined start]()</h3>
 		<p>
 			启动时钟。同时将 [page:Clock.startTime startTime] 和 [page:Clock.oldTime oldTime] 设置为当前时间。
 			设置 [page:Clock.elapsedTime elapsedTime] 为 *0*，并且设置 [page:Clock.running running] 为 *true*.
 		</p>
 
-		<h3>[method:null stop]()</h3>
+		<h3>[method:undefined stop]()</h3>
 		<p>
 			停止时钟。同时将 [page:Clock.oldTime oldTime] 设置为当前时间。
 		</p>
 
 		<h3>[method:Float getElapsedTime]()</h3>
 		<p>
-			获取自时钟启动后的秒数，同时将 [page:Clock.oldTime oldTime] 设置为当前时间。<br />
-			如果 [page:Clock.autoStart autoStart] 设置为 *true* 且时钟并未运行，则该方法同时启动时钟。
+			获取自时钟启动后的秒数，同时将 [page:.oldTime] 设置为当前时间。<br />
+			如果 [page:.autoStart] 设置为 *true* 且时钟并未运行，则该方法同时启动时钟。
 		</p>
 
 		<h3>[method:Float getDelta]()</h3>
 		<p>
-			获取自 [page:Clock.oldTime oldTime] 设置后到当前的秒数。 同时将 [page:Clock.oldTime oldTime] 设置为当前时间。<br/>
-			如果 [page:Clock.autoStart autoStart] 设置为 *true* 且时钟并未运行，则该方法同时启动时钟。
+			获取自 [page:.oldTime] 设置后到当前的秒数。 同时将 [page:.oldTime] 设置为当前时间。<br/>
+			如果 [page:.autoStart] 设置为 *true* 且时钟并未运行，则该方法同时启动时钟。
 		</p>
 
 

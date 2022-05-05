@@ -5,7 +5,7 @@ import { Vector2 } from '../math/Vector2.js';
 
 class PolyhedronGeometry extends BufferGeometry {
 
-	constructor( vertices, indices, radius = 1, detail = 0 ) {
+	constructor( vertices = [], indices = [], radius = 1, detail = 0 ) {
 
 		super();
 
@@ -295,6 +295,12 @@ class PolyhedronGeometry extends BufferGeometry {
 			return Math.atan2( - vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
 
 		}
+
+	}
+
+	static fromJSON( data ) {
+
+		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );
 
 	}
 

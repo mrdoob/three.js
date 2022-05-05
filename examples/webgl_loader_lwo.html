@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - LWO loader</title>
+		<title>three.js webgl - LWOLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -15,9 +15,21 @@
 			Models by <a href="https://onthez.com/" target="_blank" rel="noopener">on the z</a> - Environment images by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { LWOLoader } from './jsm/loaders/LWOLoader.js';
@@ -37,29 +49,12 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				const ambientLight = new THREE.AmbientLight( 0xaaaaaa, 1.75 );
+				const ambientLight = new THREE.AmbientLight( 0x222222 );
 				scene.add( ambientLight );
 
-				const light1 = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light1 = new THREE.DirectionalLight( 0x888888 );
 				light1.position.set( 0, 200, 100 );
-				light1.castShadow = true;
-				light1.shadow.camera.top = 180;
-				light1.shadow.camera.bottom = - 100;
-				light1.shadow.camera.left = - 120;
-				light1.shadow.camera.right = 120;
 				scene.add( light1 );
-
-				const light2 = new THREE.DirectionalLight( 0xffffff, 0.7 );
-				light2.position.set( - 100, 200, - 100 );
-				scene.add( light2 );
-
-				const light3 = new THREE.DirectionalLight( 0xffffff, 0.4 );
-				light3.position.set( 100, - 200, 100 );
-				scene.add( light3 );
-
-				const light4 = new THREE.DirectionalLight( 0xffffff, 1 );
-				light4.position.set( - 100, - 100, 100 );
-				scene.add( light4 );
 
 				const grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.3;
@@ -85,21 +80,14 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
-				renderer.physicallyCorrectLights = true;
-				renderer.gammaFactor = 1.18;
+				renderer.setAnimationLoop( animation );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 1.33, 10, - 6.7 );
 				controls.update();
-
-				renderer.setAnimationLoop( function () {
-
-					renderer.render( scene, camera );
-
-				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -111,6 +99,12 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animation() {
+
+				renderer.render( scene, camera );
 
 			}
 

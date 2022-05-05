@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils';
+// import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils.js';
 
 export default QUnit.module( 'Renderers', () => {
 
@@ -10,7 +10,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.todo( 'write me !', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

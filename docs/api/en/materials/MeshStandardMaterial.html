@@ -49,7 +49,7 @@
 		</p>
 		<p>
 			Technical details of the approach used in three.js (and most other PBR systems) can be found is this
-			[link:https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf paper from Disney] (pdf),
+			[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf paper from Disney] (pdf),
 			by Brent Burley.
 		</p>
 
@@ -156,7 +156,7 @@
 
 		<h3>[property:Texture emissiveMap]</h3>
 		<p>
-		Set emisssive (glow) map. Default is null. The emissive map color is modulated by
+		Set emissive (glow) map. Default is null. The emissive map color is modulated by
 		the emissive color and the emissive intensity. If you have an emissive map, be sure to
 		set the emissive color to something other than black.
 		</p>
@@ -177,6 +177,14 @@
 		Define whether the material is rendered with flat shading. Default is false.
 		</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>Whether the material is affected by fog. Default is *true*.</p>
+
+		<h3>[property:Boolean isMeshStandardMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Texture lightMap]</h3>
 		<p>The light map. Default is null. The lightMap requires a second set of UVs.</p>
 
@@ -195,15 +203,6 @@
 
 		<h3>[property:Texture metalnessMap]</h3>
 		<p>The blue channel of this texture is used to alter the metalness of the material.</p>
-
-		<h3>[property:Boolean morphNormals]</h3>
-		<p>
-			Defines whether the material uses morphNormals. Set as true to pass morphNormal
-			attributes from the geometry to the shader. Default is *false*.
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>Define whether the material uses morphTargets. Default is false.</p>
 
 		<h3>[property:Texture normalMap]</h3>
 		<p>
@@ -226,13 +225,6 @@
 			Default is a [page:Vector2] set to (1,1).
 		</p>
 
-		<h3>[property:Float refractionRatio]</h3>
-		<p>
-			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
-			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
-			The refraction ratio should not exceed 1. Default is *0.98*.
-		</p>
-
 		<h3>[property:Float roughness]</h3>
 		<p>
 			How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse. Default is 1.0.
@@ -241,16 +233,6 @@
 
 		<h3>[property:Texture roughnessMap]</h3>
 		<p>The green channel of this texture is used to alter the roughness of the material.</p>
-
-		<h3>[property:Boolean skinning]</h3>
-		<p>Define whether the material uses skinning. Default is false.</p>
-
-		<h3>[property:Boolean vertexTangents]</h3>
-		<p>
-		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
-		</p>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>Render geometry as wireframe. Default is *false* (i.e. render as flat polygons).</p>

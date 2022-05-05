@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This class can only be used in combination with [page:WebGLRenderer.copyFramebufferToTexture]().
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:Number width], [param:Number height], [param:Constant format] )</h3>
+		<p>
+		[page:Number width] -- The width of the texture.<br />
+
+		[page:Number height] -- The height of the texture.<br />
+
+		[page:Constant format] -- The format used in the texture.
+		See [page:Textures format constants] for other choices.<br />
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<p>See the base [page:Texture Texture] class for common properties.</p>
+
+		<h3>[property:Boolean isFramebufferTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+
+		<p>
+			True by default. This is required so that the canvas data is loaded.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:Texture Texture] class for common methods.</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

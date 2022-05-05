@@ -4,7 +4,8 @@
 		<meta charset="utf-8">
 		<title>three.js examples</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="shortcut icon" href="../files/favicon.ico" />
+		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 	</head>
 	<body>
@@ -38,7 +39,7 @@
 
 		</div>
 
-		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allow="fullscreen; xr-spatial-tracking;"></iframe>
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
@@ -52,8 +53,10 @@
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
-
 		const previewsToggler = document.getElementById( 'previewsToggler' );
+
+		const sectionLink = document.querySelector( '#sections > a' );
+		const sectionDefaultHref = sectionLink.href;
 
 		const links = {};
 		const validRedirects = new Map();
@@ -105,8 +108,16 @@
 
 					selectFile( file );
 					viewer.src = validRedirects.get( file );
+					viewer.style.display = 'unset';
 
 				}
+
+			}
+
+			if ( viewer.src === '' ) {
+
+				viewer.srcdoc = document.getElementById( 'PlaceholderHTML' ).innerHTML;
+				viewer.style.display = 'unset';
 
 			}
 
@@ -116,9 +127,13 @@
 
 				panel.classList.add( 'searchFocused' );
 
-			}
+				updateFilter( files, tags );
 
-			updateFilter( files, tags );
+			} else {
+
+				updateLink( '' );
+
+			}
 
 			// Events
 
@@ -221,6 +236,7 @@
 
 			window.location.hash = file;
 			viewer.focus();
+			viewer.style.display = 'unset';
 
 			panel.classList.remove( 'open' );
 
@@ -230,6 +246,12 @@
 			viewSrcButton.style.display = '';
 			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
 			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
+
+		}
+
+		function escapeRegExp( string ) {
+
+			return string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // https://stackoverflow.com/a/6969486/5250847
 
 		}
 
@@ -248,7 +270,7 @@
 
 			}
 
-			const exp = new RegExp( v, 'gi' );
+			const exp = new RegExp( escapeRegExp( v ), 'gi' );
 
 			for ( const key in files ) {
 
@@ -263,6 +285,25 @@
 			}
 
 			layoutList( files );
+
+			updateLink( v );
+
+		}
+
+		function updateLink( search ) {
+
+			// update docs link
+
+			if ( search ) {
+
+				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				sectionLink.href = `${link}?q=${search}`;
+
+			} else {
+
+				sectionLink.href = sectionDefaultHref;
+
+			}
 
 		}
 
@@ -342,18 +383,17 @@
 
 		function extractQuery() {
 
-			const p = window.location.search.indexOf( '?q=' );
+			const search = window.location.search;
 
-			if ( p !== - 1 ) {
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( window.location.search.substr( 3 ) );
+				return decodeURI( search.slice( 3 ) );
 
 			}
 
 			return '';
 
 		}
-
 
 		function createElementFromHTML( htmlString ) {
 
@@ -364,6 +404,31 @@
 		}
 
 		</script>
-
+		<template id="PlaceholderHTML">
+			<!DOCTYPE html>
+				<html lang="en">
+					<head>
+						<meta charset="utf-8">
+						<title>three.js examples</title>
+						<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+						<link rel="stylesheet" type="text/css" href="../files/main.css">
+						<style>
+						html, body {
+							height: 100%;
+						}
+						body {
+							height: 100%;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							user-select: none;
+						}
+						</style>
+					</head>
+					<body>
+						Select an example from the sidebar
+					</body>
+				</html>
+		</template>
 	</body>
 </html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr; [page:CurvePath] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		2D path 표현입니다. 이 클래스는 2D Canvas API와 유사한 2D 도형의 path 및 윤곽선을 만드는 방법을 제공합니다.
+		</p>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		const path = new THREE.Path();
+
+		path.lineTo( 0, 0.8 );
+		path.quadraticCurveTo( 0, 1, 0.2, 1 );
+		path.lineTo( 1, 1 );
+
+		const points = path.getPoints();
+
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+
+		const line = new THREE.Line( geometry, material );
+		scene.add( line );
+		</code>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:Array points] )</h3>
+		<p>
+		points -- (생략가능) [page:Vector2 Vector2s] 배열.<br /><br />
+
+		점들로 path를 만듭니다. 첫 점은 오프셋을 정의하고 이어지는 점들은 [page:LineCurve LineCurves]로 
+		[page:CurvePath.curves curves] 배열에 추가됩니다.<br /><br />
+
+		점이 지정되지 않으면, 빈 path가 만들어지며 [page:.currentPoint]가 기본값으로 설정됩니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:CurvePath] 클래스를 참고하세요.</p>
+
+		<h3>[property:Array currentPoint]</h3>
+		<p>path의 현재 오프셋입니다. 새 [page:Curve]들은 여기서부터 시작될 것입니다.</p>
+
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:CurvePath] 클래스를 참고하세요.</p>
+
+		<h3>[method:this absarc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise] )</h3>
+		<p>
+			x, y -- 호의 절대중심입니다.<br />
+			radius -- 호의 반지름입니다.<br />
+			startAngle -- 라디안 시작 각도입니다.<br />
+			endAngle -- 라디안 끝 각도입니다.<br />
+			clockwise -- 호를 시계방향으로 회전합니다. 기본값은 *false*입니다.<br /><br />
+
+			절대 위치를 가진 [page:EllipseCurve EllipseCurve]를 path에 추가합니다.
+		</p>
+
+		<h3>[method:this absellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise], [param:Float rotation] )</h3>
+		<p>
+			x, y -- 타원의 절대중심입니다.<br />
+			xRadius -- 타원의 x 축 반지름입니다.<br />
+			yRadius -- 타원의 y 축 반지름입니다..<br />
+			startAngle -- 라디안 시작 각도입니다.<br />
+			endAngle -- 라디안 끝 각도입니다.<br />
+			clockwise -- 타원을 시계방향으로 회전합니다. 기본값은 *false*입니다.<br />
+			rotation -- 타원의 라디안 회전각도이며 양수 x축의 반시계방향입니다. 생략 가능하며 기본값은 0입니다.<br /><br />
+
+			path에 절대 위치를 가진 [page:EllipseCurve EllipseCurve]를 추가합니다.
+		</p>
+
+		<h3>[method:this arc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise] )</h3>
+		<p>
+		x, y -- 마지막 호출의 호의 오프셋의 중심입니다.<br />
+		radius -- 호의 반지름입니다.<br />
+		startAngle -- 라디안 시작 각도입니다.<br />
+		endAngle -- 라디안 끝 각도입니다.<br />
+		clockwise -- 호를 시계방향으로 회전합니다. 기본값은 *false*입니다.<br /><br />
+
+		[page:.currentPoint]에 대한 상대위치를 가지는 [page:EllipseCurve EllipseCurve]를 path에 추가합니다.
+		</p>
+
+
+		<h3>[method:this bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
+		<p>This creates a bezier curve from [page:.currentPoint] with (cp1X, cp1Y) and (cp2X, cp2Y) as control points and updates [page:.currentPoint] to x and y.</p>
+
+		<h3>[method:this ellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise], [param:Float rotation] )</h3>
+		<p>
+			x, y -- 마지막 호출의 타원의 오프셋의 중심입니다.<br />
+			xRadius -- 타원의 x 축 반지름입니다.<br />
+			yRadius -- 타원의 y 축 반지름입니다..<br />
+			startAngle -- 라디안 시작 각도입니다.<br />
+			endAngle -- 라디안 끝 각도입니다.<br />
+			clockwise -- 타원을 시계방향으로 회전합니다. 기본값은 *false*입니다.<br />
+			rotation -- 타원의 라디안 회전각도이며 양수 x축의 반시계방향입니다. 생략 가능하며 기본값은 0입니다.<br /><br />
+
+			[page:.currentPoint]에 대한 상대위치를 가지는 [page:EllipseCurve EllipseCurve]를 path에 추가합니다.
+		</p>
+
+		<h3>[method:this lineTo]( [param:Float x], [param:Float y] )</h3>
+		<p>path 위에 [page:.currentPoint]에서 x, y로 [page:LineCurve]를 연결합니다.</p>
+
+
+		<h3>[method:this moveTo]( [param:Float x], [param:Float y] )</h3>
+		<p>[page:.currentPoint]를 x, y로 이동시킵니다.</p>
+
+
+		<h3>[method:this quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
+		<p>조절점 cpX 와 cpY의 [page:.currentPoint]로부터 이차곡선을 만들고 [page:.currentPoint]를 x 와 y로 업데이트합니다.</p>
+
+		<h3>[method:this setFromPoints]( [param:Array vector2s] )</h3>
+		<p>
+			points --  [page:Vector2 Vector2s] 배열.<br /><br />
+
+			점들은 [page:CurvePath.curves curves] 배열에 [page:LineCurve LineCurves]로 추가됩니다.
+		</p>
+
+		<h3>[method:this splineThru] ( [param:Array points] ) </h3>
+		<p>
+			points - [page:Vector2 Vector2s] 배열.<br /><br />
+
+			path에 새 [page:SplineCurve]를 추가합니다.
+		</p>
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

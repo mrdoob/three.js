@@ -1,5 +1,5 @@
 import { Path } from './Path.js';
-import { MathUtils } from '../../math/MathUtils.js';
+import * as MathUtils from '../../math/MathUtils.js';
 
 class Shape extends Path {
 

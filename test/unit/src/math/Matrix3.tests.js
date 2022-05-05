@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { Matrix3 } from '../../../../src/math/Matrix3';
-import { Matrix4 } from '../../../../src/math/Matrix4';
+import { Matrix3 } from '../../../../src/math/Matrix3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 
 function matrixEquals3( a, b, tolerance ) {
 
@@ -51,10 +51,10 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'Matrix3', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
 			var a = new Matrix3();
-			assert.ok( a.determinant() == 1, "Passed!" );
+			assert.ok( a.determinant() == 1, 'Passed!' );
 
 			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -67,25 +67,25 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.elements[ 7 ] == 5 );
 			assert.ok( b.elements[ 8 ] == 8 );
 
-			assert.ok( ! matrixEquals3( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMatrix3", ( assert ) => {
+		QUnit.test( 'isMatrix3', ( assert ) => {
 
 			var a = new Matrix3();
-			assert.ok( a.isMatrix3 === true, "Passed!" );
+			assert.ok( a.isMatrix3 === true, 'Passed!' );
 
 			var b = new Matrix4();
-			assert.ok( ! b.isMatrix3, "Passed!" );
+			assert.ok( ! b.isMatrix3, 'Passed!' );
 
 		} );
 
-		QUnit.test( "set", ( assert ) => {
+		QUnit.test( 'set', ( assert ) => {
 
 			var b = new Matrix3();
-			assert.ok( b.determinant() == 1, "Passed!" );
+			assert.ok( b.determinant() == 1, 'Passed!' );
 
 			b.set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -100,7 +100,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "identity", ( assert ) => {
+		QUnit.test( 'identity', ( assert ) => {
 
 			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -114,40 +114,40 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.elements[ 8 ] == 8 );
 
 			var a = new Matrix3();
-			assert.ok( ! matrixEquals3( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
 
 			b.identity();
-			assert.ok( matrixEquals3( a, b ), "Passed!" );
+			assert.ok( matrixEquals3( a, b ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.test( 'clone', ( assert ) => {
 
 			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var b = a.clone();
 
-			assert.ok( matrixEquals3( a, b ), "Passed!" );
+			assert.ok( matrixEquals3( a, b ), 'Passed!' );
 
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
-			assert.ok( ! matrixEquals3( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.test( 'copy', ( assert ) => {
 
 			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var b = new Matrix3().copy( a );
 
-			assert.ok( matrixEquals3( a, b ), "Passed!" );
+			assert.ok( matrixEquals3( a, b ), 'Passed!' );
 
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
-			assert.ok( ! matrixEquals3( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "setFromMatrix4", ( assert ) => {
+		QUnit.test( 'setFromMatrix4', ( assert ) => {
 
 
 			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
@@ -158,7 +158,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiply/premultiply", ( assert ) => {
+		QUnit.test( 'multiply/premultiply', ( assert ) => {
 
 			// both simply just wrap multiplyMatrices
 			var a = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
@@ -167,15 +167,15 @@ export default QUnit.module( 'Maths', () => {
 			var expectedPremultiply = [ 904, 1182, 1556, 1131, 1489, 1967, 1399, 1845, 2435 ];
 
 			a.multiply( b );
-			assert.deepEqual( a.elements, expectedMultiply, "multiply: check result" );
+			assert.deepEqual( a.elements, expectedMultiply, 'multiply: check result' );
 
 			a.set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
 			a.premultiply( b );
-			assert.deepEqual( a.elements, expectedPremultiply, "premultiply: check result" );
+			assert.deepEqual( a.elements, expectedPremultiply, 'premultiply: check result' );
 
 		} );
 
-		QUnit.test( "multiplyMatrices", ( assert ) => {
+		QUnit.test( 'multiplyMatrices', ( assert ) => {
 
 			// Reference:
 			//
@@ -210,7 +210,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyScalar", ( assert ) => {
+		QUnit.test( 'multiplyScalar', ( assert ) => {
 
 			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -236,24 +236,24 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "determinant", ( assert ) => {
+		QUnit.test( 'determinant', ( assert ) => {
 
 			var a = new Matrix3();
-			assert.ok( a.determinant() == 1, "Passed!" );
+			assert.ok( a.determinant() == 1, 'Passed!' );
 
 			a.elements[ 0 ] = 2;
-			assert.ok( a.determinant() == 2, "Passed!" );
+			assert.ok( a.determinant() == 2, 'Passed!' );
 
 			a.elements[ 0 ] = 0;
-			assert.ok( a.determinant() == 0, "Passed!" );
+			assert.ok( a.determinant() == 0, 'Passed!' );
 
 			// calculated via http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/threeD/index.htm
 			a.set( 2, 3, 4, 5, 13, 7, 8, 9, 11 );
-			assert.ok( a.determinant() == - 73, "Passed!" );
+			assert.ok( a.determinant() == - 73, 'Passed!' );
 
 		} );
 
-		QUnit.test( "invert", ( assert ) => {
+		QUnit.test( 'invert', ( assert ) => {
 
 			var zero = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity4 = new Matrix4();
@@ -261,7 +261,7 @@ export default QUnit.module( 'Maths', () => {
 			var b = new Matrix3();
 
 			b.copy( a ).invert();
-			assert.ok( matrixEquals3( b, zero ), "Matrix a is zero matrix" );
+			assert.ok( matrixEquals3( b, zero ), 'Matrix a is zero matrix' );
 
 			var testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -284,32 +284,32 @@ export default QUnit.module( 'Maths', () => {
 				var mInverse = toMatrix4( mInverse3 );
 
 				// the determinant of the inverse should be the reciprocal
-				assert.ok( Math.abs( a.determinant() * mInverse3.determinant() - 1 ) < 0.0001, "Passed!" );
-				assert.ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, "Passed!" );
+				assert.ok( Math.abs( a.determinant() * mInverse3.determinant() - 1 ) < 0.0001, 'Passed!' );
+				assert.ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, 'Passed!' );
 
 				var mProduct = new Matrix4().multiplyMatrices( m, mInverse );
-				assert.ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, "Passed!" );
-				assert.ok( matrixEquals3( mProduct, identity4 ), "Passed!" );
+				assert.ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, 'Passed!' );
+				assert.ok( matrixEquals3( mProduct, identity4 ), 'Passed!' );
 
 			}
 
 		} );
 
-		QUnit.test( "transpose", ( assert ) => {
+		QUnit.test( 'transpose', ( assert ) => {
 
 			var a = new Matrix3();
 			var b = a.clone().transpose();
-			assert.ok( matrixEquals3( a, b ), "Passed!" );
+			assert.ok( matrixEquals3( a, b ), 'Passed!' );
 
 			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var c = b.clone().transpose();
-			assert.ok( ! matrixEquals3( b, c ), "Passed!" );
+			assert.ok( ! matrixEquals3( b, c ), 'Passed!' );
 			c.transpose();
-			assert.ok( matrixEquals3( b, c ), "Passed!" );
+			assert.ok( matrixEquals3( b, c ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "getNormalMatrix", ( assert ) => {
+		QUnit.test( 'getNormalMatrix', ( assert ) => {
 
 			var a = new Matrix3();
 			var b = new Matrix4().set(
@@ -325,11 +325,11 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 			a.getNormalMatrix( b );
-			assert.ok( matrixEquals3( a, expected ), "Check resulting Matrix3" );
+			assert.ok( matrixEquals3( a, expected ), 'Check resulting Matrix3' );
 
 		} );
 
-		QUnit.test( "transposeIntoArray", ( assert ) => {
+		QUnit.test( 'transposeIntoArray', ( assert ) => {
 
 			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var b = [];
@@ -348,7 +348,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setUvTransform", ( assert ) => {
+		QUnit.test( 'setUvTransform', ( assert ) => {
 
 			var a = new Matrix3().set(
 				0.1767766952966369, 0.17677669529663687, 0.32322330470336313,
@@ -385,12 +385,12 @@ export default QUnit.module( 'Maths', () => {
 			 .translate( params.centerX, params.centerY )
 			 .translate( params.offsetX, params.offsetY );
 
-			assert.ok( matrixEquals3( a, expected ), "Check direct method" );
-			assert.ok( matrixEquals3( b, expected ), "Check indirect method" );
+			assert.ok( matrixEquals3( a, expected ), 'Check direct method' );
+			assert.ok( matrixEquals3( b, expected ), 'Check indirect method' );
 
 		} );
 
-		QUnit.test( "scale", ( assert ) => {
+		QUnit.test( 'scale', ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var expected = new Matrix3().set(
@@ -400,11 +400,11 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 			a.scale( 0.25, 0.25 );
-			assert.ok( matrixEquals3( a, expected ), "Check scaling result" );
+			assert.ok( matrixEquals3( a, expected ), 'Check scaling result' );
 
 		} );
 
-		QUnit.test( "rotate", ( assert ) => {
+		QUnit.test( 'rotate', ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var expected = new Matrix3().set(
@@ -414,35 +414,35 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 			a.rotate( Math.PI / 4 );
-			assert.ok( matrixEquals3( a, expected ), "Check rotated result" );
+			assert.ok( matrixEquals3( a, expected ), 'Check rotated result' );
 
 		} );
 
-		QUnit.test( "translate", ( assert ) => {
+		QUnit.test( 'translate', ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var expected = new Matrix3().set( 22, 26, 30, 53, 61, 69, 7, 8, 9 );
 
 			a.translate( 3, 7 );
-			assert.ok( matrixEquals3( a, expected ), "Check translation result" );
+			assert.ok( matrixEquals3( a, expected ), 'Check translation result' );
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {
+		QUnit.test( 'equals', ( assert ) => {
 
 			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var b = new Matrix3().set( 0, - 1, 2, 3, 4, 5, 6, 7, 8 );
 
-			assert.notOk( a.equals( b ), "Check that a does not equal b" );
-			assert.notOk( b.equals( a ), "Check that b does not equal a" );
+			assert.notOk( a.equals( b ), 'Check that a does not equal b' );
+			assert.notOk( b.equals( a ), 'Check that b does not equal a' );
 
 			a.copy( b );
-			assert.ok( a.equals( b ), "Check that a equals b after copy()" );
-			assert.ok( b.equals( a ), "Check that b equals a after copy()" );
+			assert.ok( a.equals( b ), 'Check that a equals b after copy()' );
+			assert.ok( b.equals( a ), 'Check that b equals a after copy()' );
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {
+		QUnit.test( 'fromArray', ( assert ) => {
 
 			var b = new Matrix3();
 			b.fromArray( [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] );
@@ -472,22 +472,22 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "toArray", ( assert ) => {
+		QUnit.test( 'toArray', ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var noOffset = [ 1, 4, 7, 2, 5, 8, 3, 6, 9 ];
 			var withOffset = [ undefined, 1, 4, 7, 2, 5, 8, 3, 6, 9 ];
 
 			var array = a.toArray();
-			assert.deepEqual( array, noOffset, "No array, no offset" );
+			assert.deepEqual( array, noOffset, 'No array, no offset' );
 
 			var array = [];
 			a.toArray( array );
-			assert.deepEqual( array, noOffset, "With array, no offset" );
+			assert.deepEqual( array, noOffset, 'With array, no offset' );
 
 			var array = [];
 			a.toArray( array, 1 );
-			assert.deepEqual( array, withOffset, "With array, with offset" );
+			assert.deepEqual( array, withOffset, 'With array, with offset' );
 
 		} );
 

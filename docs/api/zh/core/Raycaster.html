@@ -17,21 +17,21 @@
 		<h2>代码示例</h2>
 		<code>
 		const raycaster = new THREE.Raycaster();
-		const mouse = new THREE.Vector2();
+		const pointer = new THREE.Vector2();
 
-		function onMouseMove( event ) {
+		function onPointerMove( event ) {
 
 			// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
 
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 		}
 
 		function render() {
 
 			// 通过摄像机和鼠标位置更新射线
-			raycaster.setFromCamera( mouse, camera );
+			raycaster.setFromCamera( pointer, camera );
 
 			// 计算物体和射线的焦点
 			const intersects = raycaster.intersectObjects( scene.children );
@@ -46,7 +46,7 @@
 
 		}
 
-		window.addEventListener( 'mousemove', onMouseMove, false );
+		window.addEventListener( 'pointermove', onPointerMove );
 
 		window.requestAnimationFrame(render);
 
@@ -72,7 +72,7 @@
 
 		<h2>构造器</h2>
 
-		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] ) {</h3>
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] )</h3>
 		<p>
 		[page:Vector3 origin] —— 光线投射的原点向量。<br />
 		[page:Vector3 direction] —— 向射线提供方向的方向向量，应当被标准化。<br />
@@ -140,7 +140,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<h3>[method:undefined set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
 		[page:Vector3 origin] —— 光线投射的原点向量。<br />
 		[page:Vector3 direction] —— 为光线提供方向的标准化方向向量。
@@ -149,7 +149,7 @@
 			使用一个新的原点和方向来更新射线。
 		</p>
 
-		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
+		<h3>[method:undefined setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
 		<p>
 		[page:Vector2 coords] —— 在标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间。<br />
 
@@ -162,7 +162,7 @@
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] —— 检查与射线相交的物体。<br />
-		[page:Boolean recursive] —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为false。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为true。<br />
 		[page:Array optionalTarget] — （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
@@ -195,7 +195,7 @@
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Array objects] —— 检测和射线相交的一组物体。<br />
-		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为false。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为true。<br />
 		[page:Array optionalTarget] —— （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>

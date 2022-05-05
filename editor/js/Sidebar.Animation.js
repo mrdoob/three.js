@@ -1,36 +1,59 @@
-import { UIPanel, UIBreak, UISelect, UIButton, UIText, UINumber, UIRow } from './libs/ui.js';
+import { UIPanel, UIBreak, UIButton, UIDiv, UIText, UINumber, UIRow } from './libs/ui.js';
 
 function SidebarAnimation( editor ) {
 
-	var strings = editor.strings;
-	var signals = editor.signals;
-	var mixer = editor.mixer;
+	const strings = editor.strings;
+	const signals = editor.signals;
+	const mixer = editor.mixer;
 
-	var actions = {};
+	function getButtonText( action ) {
+
+		return action.isRunning()
+			? strings.getKey( 'sidebar/animations/stop' )
+			: strings.getKey( 'sidebar/animations/play' );
+
+	}
+
+	function Animation( animation, object ) {
+
+		const action = mixer.clipAction( animation, object );
+
+		const container = new UIRow();
+
+		const name = new UIText( animation.name ).setWidth( '200px' );
+		container.add( name );
+
+		const button = new UIButton( getButtonText( action  ) );
+		button.onClick( function () {
+
+			console.log( action );
+
+			action.isRunning() ? action.stop() : action.play();
+			button.setTextContent( getButtonText( action  ) );
+
+		} );
+
+		container.add( button );
+
+		return container;
+
+	}
 
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object !== null && object.animations.length > 0 ) {
 
-			var animations = object.animations;
+			animationsList.clear();
 
-			container.setDisplay( '' );
+			const animations = object.animations;
 
-			var options = {};
-			var firstAnimation;
+			for ( const animation of animations ) {
 
-			for ( var animation of animations ) {
-
-				if ( firstAnimation === undefined ) firstAnimation = animation.name;
-
-				actions[ animation.name ] = mixer.clipAction( animation, object );
-				options[ animation.name ] = animation.name;
+				animationsList.add( new Animation( animation, object ) );
 
 			}
 
-			animationsSelect.setOptions( options );
-			animationsSelect.setValue( firstAnimation );
-			mixerTimeScaleNumber.setValue( mixer.timeScale );
+			container.setDisplay( '' );
 
 		} else {
 
@@ -50,48 +73,23 @@ function SidebarAnimation( editor ) {
 
 	} );
 
-	function playAction() {
-
-		actions[ animationsSelect.getValue() ].play();
-
-	}
-
-	function stopAction() {
-
-		actions[ animationsSelect.getValue() ].stop();
-
-		signals.animationStopped.dispatch();
-
-	}
-
-	function changeTimeScale() {
-
-		mixer.timeScale = mixerTimeScaleNumber.getValue();
-
-	}
-
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setDisplay( 'none' );
 
 	container.add( new UIText( strings.getKey( 'sidebar/animations' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UIBreak() );
 	container.add( new UIBreak() );
 
-	//
+	const animationsList = new UIDiv();
+	container.add( animationsList );
 
-	var animationsRow = new UIRow();
+	const mixerTimeScaleRow = new UIRow();
+	const mixerTimeScaleNumber = new UINumber( 0.5 ).setWidth( '60px' ).setRange( - 10, 10 );
+	mixerTimeScaleNumber.onChange( function () {
 
-	var animationsSelect = new UISelect().setFontSize( '12px' );
-	animationsRow.add( animationsSelect );
-	animationsRow.add( new UIButton( strings.getKey( 'sidebar/animations/play' ) ).setMarginLeft( '4px' ).onClick( playAction ) );
-	animationsRow.add( new UIButton( strings.getKey( 'sidebar/animations/stop' ) ).setMarginLeft( '4px' ).onClick( stopAction ) );
+		mixer.timeScale = mixerTimeScaleNumber.getValue();
 
-	container.add( animationsRow );
-
-	//
-
-	var mixerTimeScaleRow = new UIRow();
-	var mixerTimeScaleNumber = new UINumber( 0.5 ).setWidth( '60px' ).setRange( - 10, 10 ).onChange( changeTimeScale );
+	} );
 
 	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setWidth( '90px' ) );
 	mixerTimeScaleRow.add( mixerTimeScaleNumber );

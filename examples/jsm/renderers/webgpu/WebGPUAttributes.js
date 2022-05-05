@@ -9,11 +9,15 @@ class WebGPUAttributes {
 
 	get( attribute ) {
 
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
 		return this.buffers.get( attribute );
 
 	}
 
 	remove( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
 		const data = this.buffers.get( attribute );
 
@@ -28,6 +32,8 @@ class WebGPUAttributes {
 	}
 
 	update( attribute, isIndex = false, usage = null ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
 		let data = this.buffers.get( attribute );
 
@@ -67,9 +73,9 @@ class WebGPUAttributes {
 		const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 		const buffer = this.device.createBuffer( {
-			size: size,
+			size,
 			usage: usage | GPUBufferUsage.COPY_DST,
-			mappedAtCreation: true,
+			mappedAtCreation: true
 		} );
 
 		new array.constructor( buffer.getMappedRange() ).set( array );
@@ -80,8 +86,8 @@ class WebGPUAttributes {
 
 		return {
 			version: attribute.version,
-			buffer: buffer,
-			usage: usage
+			buffer,
+			usage
 		};
 
 	}

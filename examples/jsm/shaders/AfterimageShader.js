@@ -4,7 +4,7 @@
  * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
  */
 
-var AfterimageShader = {
+const AfterimageShader = {
 
 	uniforms: {
 
@@ -14,46 +14,42 @@ var AfterimageShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = uv;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+		}`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		uniform float damp;
 
-		'uniform float damp;',
+		uniform sampler2D tOld;
+		uniform sampler2D tNew;
 
-		'uniform sampler2D tOld;',
-		'uniform sampler2D tNew;',
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		vec4 when_gt( vec4 x, float y ) {
 
-		'vec4 when_gt( vec4 x, float y ) {',
+			return max( sign( x - y ), 0.0 );
 
-		'	return max( sign( x - y ), 0.0 );',
+		}
 
-		'}',
+		void main() {
 
-		'void main() {',
+			vec4 texelOld = texture2D( tOld, vUv );
+			vec4 texelNew = texture2D( tNew, vUv );
 
-		'	vec4 texelOld = texture2D( tOld, vUv );',
-		'	vec4 texelNew = texture2D( tNew, vUv );',
+			texelOld *= damp * when_gt( texelOld, 0.1 );
 
-		'	texelOld *= damp * when_gt( texelOld, 0.1 );',
+			gl_FragColor = max(texelNew, texelOld);
 
-		'	gl_FragColor = max(texelNew, texelOld);',
-
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 

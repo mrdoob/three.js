@@ -1,34 +1,50 @@
 <html lang="en">
 	<head>
-		<title>WebGPU Compute</title>
+		<title>three.js - WebGPU - Compute</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
+		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute
 		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
 
+			import {
+				ShaderNode, compute, context,
+				uniform, element, storage, attribute,
+				temp, assign, add, sub, cond, abs, negate, max, min, length, vec3, color,
+				greaterThanEqual, lessThanEqual, instanceIndex
+			} from 'three-nodes/Nodes.js';
+
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
-
-			import WebGPUStorageBuffer from './jsm/renderers/webgpu/WebGPUStorageBuffer.js';
-			import WebGPUUniformsGroup from './jsm/renderers/webgpu/WebGPUUniformsGroup.js';
-			import { Vector2Uniform } from './jsm/renderers/webgpu/WebGPUUniform.js';
-
-			import PositionNode from './jsm/renderers/nodes/accessors/PositionNode.js';
-			import ColorNode from './jsm/renderers/nodes/inputs/ColorNode.js';
-			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 
 			let camera, scene, renderer;
-			let pointer;
+			let computeNode;
 
-			const computeParams = [];
+			const pointerVector = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
+			const scaleVector = new THREE.Vector2( 1, 1 );
 
 			init().then( animate ).catch( error );
 
@@ -38,7 +54,7 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 
@@ -46,120 +62,78 @@
 				camera.position.z = 1;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
 
-				const particleNum = 100000;
-				const particleSize = 3;
+				// initialize particles
+
+				const particleNum = 300000;
+				const particleSize = 2; // vec2
 
 				const particleArray = new Float32Array( particleNum * particleSize );
 				const velocityArray = new Float32Array( particleNum * particleSize );
 
-				for ( let i = 0; i < particleArray.length; i += 3 ) {
+				for ( let i = 0; i < particleNum; i ++ ) {
 
-					const r = Math.random() * 0.01 + 0.0005;
+					const r = Math.random() * 0.01 + 0.005;
 					const degree = Math.random() * 360;
-					velocityArray[ i + 0 ] = r * Math.sin( degree * Math.PI / 180 );
-					velocityArray[ i + 1 ] = r * Math.cos( degree * Math.PI / 180 );
+
+					velocityArray[ i * particleSize + 0 ] = r * Math.sin( degree * Math.PI / 180 ); // x
+					velocityArray[ i * particleSize + 1 ] = r * Math.cos( degree * Math.PI / 180 ); // y
 
 				}
 
-				const particleBuffer = new WebGPUStorageBuffer( 'particle', new THREE.BufferAttribute( particleArray, 3 ) );
-				const velocityBuffer = new WebGPUStorageBuffer( 'velocity', new THREE.BufferAttribute( velocityArray, 3 ) );
+				// create buffers
 
-				pointer = new THREE.Vector2( - 10.0, - 10.0 ); // Out of bounds first
+				const particleBuffer = new THREE.InstancedBufferAttribute( particleArray );
+				const velocityBuffer = new THREE.InstancedBufferAttribute( velocityArray );
 
-				const pointerGroup = new WebGPUUniformsGroup( 'mouseUniforms' ).addUniform(
-					new Vector2Uniform( 'pointer', pointer )
-				);
+				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
+				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
 
-				const computeBindings = [
-					particleBuffer,
-					velocityBuffer,
-					pointerGroup
-				];
+				// create function
 
-				const computeShader = /* glsl */`#version 450
-					#define PARTICLE_NUM ${particleNum}
-					#define PARTICLE_SIZE ${particleSize}
-					#define ROOM_SIZE 1.0
-					#define POINTER_SIZE 0.1
+				const FnNode = new ShaderNode( ( inputs, builder ) => {
 
-					// Limitation for now: the order should be the same as bindings order
+					const particle = element( particleBufferNode, instanceIndex );
+					const velocity = element( velocityBufferNode, instanceIndex );
 
-					layout(set = 0, binding = 0) buffer Particle {
-						float particle[ PARTICLE_NUM * PARTICLE_SIZE ];
-					} particle;
+					const pointer = uniform( pointerVector );
+					const limit = uniform( scaleVector );
 
-					layout(set = 0, binding = 1) buffer Velocity {
-						float velocity[ PARTICLE_NUM * PARTICLE_SIZE ];
-					} velocity;
+					const position = temp( context( add( particle, velocity ), { temp: false } ) );
+					position.build( builder );
 
-					layout(set = 0, binding = 2) uniform MouseUniforms {
-						vec2 pointer;
-					} mouseUniforms;
+					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ) ).build( builder );
+					assign( velocity.y, cond( greaterThanEqual( abs( position.y ), limit.y ), negate( velocity.y ), velocity.y ) ).build( builder );
 
-					void main() {
-						uint index = gl_GlobalInvocationID.x;
-						if ( index >= PARTICLE_NUM ) { return; }
+					assign( position, max( negate( limit ), min( limit, position ) ) ).build( builder );
 
-						vec3 position = vec3(
-							particle.particle[ index * 3 + 0 ] + velocity.velocity[ index * 3 + 0 ],
-							particle.particle[ index * 3 + 1 ] + velocity.velocity[ index * 3 + 1 ],
-							particle.particle[ index * 3 + 2 ] + velocity.velocity[ index * 3 + 2 ]
-						);
+					const pointerSize = 0.1;
+					const distanceFromPointer = length( sub( pointer, position ) );
 
-						if ( abs( position.x ) >= ROOM_SIZE ) {
+					assign( particle, cond( lessThanEqual( distanceFromPointer, pointerSize ), vec3(), position ) ).build( builder );
 
-							velocity.velocity[ index * 3 + 0 ] = - velocity.velocity[ index * 3 + 0 ];
-
-						}
-
-						if ( abs( position.y ) >= ROOM_SIZE ) {
-
-							velocity.velocity[ index * 3 + 1 ] = - velocity.velocity[ index * 3 + 1 ];
-
-						}
-
-						if ( abs( position.z ) >= ROOM_SIZE ) {
-
-							velocity.velocity[ index * 3 + 2 ] = - velocity.velocity[ index * 3 + 2 ];
-
-						}
-
-						float dx = mouseUniforms.pointer.x - position.x;
-						float dy = mouseUniforms.pointer.y - position.y;
-						float distanceFromPointer = sqrt( dx * dx + dy * dy );
-
-						if ( distanceFromPointer <= POINTER_SIZE ) {
-
-							position.x = 0.0;
-							position.y = 0.0;
-							position.z = 0.0;
-
-						}
-
-						particle.particle[ index * 3 + 0 ] = position.x;
-						particle.particle[ index * 3 + 1 ] = position.y;
-						particle.particle[ index * 3 + 2 ] = position.z;
-					}
-				`;
-
-				computeParams.push( {
-					num: particleNum,
-					shader: computeShader,
-					bindings: computeBindings
 				} );
 
-				// Use a compute shader to animate the point cloud's vertex data.
+				// compute
 
-				const pointsGeometry = new THREE.BufferGeometry().setAttribute(
-					'position', particleBuffer.attribute
-				);
+				computeNode = compute( FnNode, particleNum );
 
-				const pointsMaterial = new THREE.PointsMaterial();
-				pointsMaterial.colorNode = new OperatorNode( '+', new PositionNode(), new ColorNode( new THREE.Color( 0x0000FF ) ) );
+				// use a compute shader to animate the point cloud's vertex data.
+
+				const particleNode = attribute( 'particle', 'vec2' );
+
+				const pointsGeometry = new THREE.BufferGeometry();
+				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ) ) ); // single vertex ( not triangle )
+				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
+				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
+
+				const pointsMaterial = new Nodes.PointsNodeMaterial();
+				pointsMaterial.colorNode = add( particleNode, color( 0xFFFFFF ) );
+				pointsMaterial.positionNode = particleNode;
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
+				mesh.isInstancedMesh = true;
+				mesh.count = particleNum;
 				scene.add( mesh );
 
 				renderer = new WebGPURenderer();
@@ -169,6 +143,13 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'mousemove', onMouseMove );
+
+				// gui
+
+				const gui = new GUI();
+
+				gui.add( scaleVector, 'x', 0, 1, 0.01 );
+				gui.add( scaleVector, 'y', 0, 1, 0.01 );
 
 				return renderer.init();
 
@@ -190,7 +171,7 @@
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
-				pointer.set(
+				pointerVector.set(
 					( x / width - 0.5 ) * 2.0,
 					( - y / height + 0.5 ) * 2.0
 				);
@@ -201,7 +182,7 @@
 
 				requestAnimationFrame( animate );
 
-				renderer.compute( computeParams );
+				renderer.compute( computeNode );
 				renderer.render( scene, camera );
 
 			}

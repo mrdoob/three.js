@@ -13,13 +13,25 @@
 			by <a href="https://Clara.io">Ben Houston</a>. ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -119,9 +131,9 @@
 				// textures
 
 				const textureLoader = new THREE.TextureLoader();
-				const normalMap = textureLoader.load( "models/obj/ninja/normal.png" );
-				const aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
-				const displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
+				const normalMap = textureLoader.load( 'models/obj/ninja/normal.png' );
+				const aoMap = textureLoader.load( 'models/obj/ninja/ao.jpg' );
+				const displacementMap = textureLoader.load( 'models/obj/ninja/displacement.jpg' );
 
 				// material
 
@@ -181,7 +193,7 @@
 				//
 
 				const loader = new OBJLoader();
-				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
+				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( group ) {
 
 					const geometry = group.children[ 0 ].geometry;
 					geometry.attributes.uv2 = geometry.attributes.uv;

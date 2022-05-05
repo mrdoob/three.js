@@ -136,12 +136,12 @@
 			ترجع نسخة من هذا المسار.
 		</p>
 
-		<h3>[method:null createInterpolant]()</h3>
+		<h3>[method:Interpolant createInterpolant]()</h3>
 		<p>
 			ينشئ [page:LinearInterpolant LinearInterpolant] أو [page:CubicInterpolant CubicInterpolant] أو [page:DiscreteInterpolant DiscreteInterpolant] ، اعتمادًا على قيمة معلمة الاستيفاء التي تم تمريرها في الباني.
 		</p>
 
-		<h3>[method:null getInterpolation]()</h3>
+		<h3>[method:Interpolant getInterpolation]()</h3>
 		<p>
 			إرجاع نوع الاستيفاء (interpolation).
 		</p>
@@ -156,12 +156,12 @@
 			ينشئ [page:DiscreteInterpolant DiscreteInterpolant] جديدًا من [page:KeyframeTrack.times times] و [page:KeyframeTrack.times values]. يمكن تمرير Float32Array الذي سيحصل على النتائج. وإلا فسيتم إنشاء مصفوفة جديدة بالحجم المناسب تلقائيًا.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:LinearInterpolant InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			ينشئ [page:LinearInterpolant LinearInterpolant] جديدًا من page:KeyframeTrack.times times] و [page:KeyframeTrack.times values]. يمكن تمرير Float32Array الذي سيتلقى النتائج. وإلا فسيتم إنشاء مصفوفة جديدة بالحجم المناسب تلقائيًا.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:CubicInterpolant InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			قم بإنشاء [page:CubicInterpolant CubicInterpolant] جديد من [page:KeyframeTrack.times times] و [page:KeyframeTrack.times values]. يمكن تمرير Float32Array الذي سيحصل على النتائج. وإلا فسيتم إنشاء مصفوفة جديدة بالحجم المناسب تلقائيًا.
 		</p>
@@ -191,7 +191,7 @@
 
 		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
 		<p>
-			يزيل الإطارات الرئيسية قبل *startTime* وبعد *endTime* ، بدون تغيير أي قيم في النطاق  [*startTime*, *endTime*].
+			يزيل الإطارات الرئيسية قبل *startTime* وبعد *endTime* ، بدون تغيير أي قيم في النطاق [*startTime*, *endTime*].
 		</p>
 
 		<h3>[method:Boolean validate]()</h3>

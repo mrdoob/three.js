@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ArcCurve } from '../../../../../src/extras/curves/ArcCurve';
+// import { ArcCurve } from '../../../../../src/extras/curves/ArcCurve.js';
 
 export default QUnit.module( 'Extras', () => {
 
@@ -9,23 +9,23 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'ArcCurve', () => {
 
 			// INHERITANCE
-			QUnit.todo( "Extending", ( assert ) => {
+			QUnit.todo( 'Extending', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// INSTANCING
-			QUnit.todo( "Instancing", ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.todo( "isArcCurve", ( assert ) => {
+			QUnit.todo( 'isArcCurve', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

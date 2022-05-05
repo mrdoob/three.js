@@ -12,8 +12,8 @@
 		<p class="desc">
 		An exporter for *glTF* 2.0.
 		<br /><br />
-		<a href="https://www.khronos.org/gltf">glTF</a> (GL Transmission Format) is an
-		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
+		<a href="https://www.khronos.org/gltf" target="_blank">glTF</a> (GL Transmission Format) is an
+		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0" target="_blank">open format specification</a>
 		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
 		or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
 		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
@@ -48,10 +48,23 @@
 		const exporter = new GLTFExporter();
 
 		// Parse the input and generate the glTF output
-		exporter.parse( scene, function ( gltf ) {
-			console.log( gltf );
-			downloadJSON( gltf );
-		}, options );
+		exporter.parse(
+			scene,
+			// called when the gltf has been generated
+			function ( gltf ) {
+
+				console.log( gltf );
+				downloadJSON( gltf );
+
+			},
+			// called when there is an error in the generation
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			},
+			options
+		);
 		</code>
 
 		<h2>例子</h2>
@@ -71,7 +84,8 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null parse]( [param:Object3D input], [param:Function onCompleted], [param:Object options] )</h3>
+		<h3>[method:undefined parse]( [param:Object3D input], [param:Function onCompleted], [param:Function onError], [param:Object options] )</h3>
+
 		<p>
 		[page:Object input] — Scenes or objects to export. Valid options:<br />
 		<ul>
@@ -98,6 +112,7 @@
 		</ul>
 
 		[page:Function onCompleted] — Will be called when the export completes. The argument will be the generated glTF JSON or binary ArrayBuffer.<br />
+		[page:Function onError] — Will be called if there are any errors during the gltf generation.<br />
 		[page:Options options] — Export options<br />
 		<ul>
 			<li>trs - bool. Export position, rotation and scale instead of matrix per node. Default is false</li>

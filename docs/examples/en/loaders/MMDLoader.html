@@ -71,18 +71,18 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
 		Begin loading PMD/PMX model file from url and fire the callback function with the parsed [page:SkinnedMesh] containing [page:BufferGeometry] and an array of [page:MeshToonMaterial].
 		</p>
 
-		<h3>[method:null loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).If two or more files are specified, they'll be merged.<br />
 		[page:Object3D object] — [page:SkinnedMesh] or [page:Camera]. Clip and its tracks will be fitting to this object.<br />
@@ -94,7 +94,7 @@
 		Begin loading VMD motion file(s) from url(s) and fire the callback function with the parsed [page:AnimationClip].
 		</p>
 
-		<h3>[method:null loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String modelUrl] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
 		[page:String vmdUrl] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).<br />
@@ -106,7 +106,7 @@
 		Begin loading PMD/PMX model file and VMD motion file(s) from urls and fire the callback function with an [page:Object] containing parsed [page:SkinnedMesh] and [page:AnimationClip] fitting to the [page:SkinnedMesh].
 		</p>
 
-		<h3>[method:MMDLoader setAnimationPath]( [param:String animationPath] )</h3>
+		<h3>[method:this setAnimationPath]( [param:String animationPath] )</h3>
 		<p>
 		[page:String animationPath] — Base path for loading animation data (VMD/VPD files).
 		</p>

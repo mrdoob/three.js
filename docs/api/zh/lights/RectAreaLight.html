@@ -33,7 +33,7 @@
 		rectLight.lookAt( 0, 0, 0 );
 		scene.add( rectLight )
 
-		rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+		rectLightHelper = new RectAreaLightHelper( rectLight );
 		scene.add( rectLightHelper );
 		</code>
 
@@ -53,12 +53,17 @@
 			[page:Float width] - (可选参数) 光源宽度。缺省值为 10。<br />
 			[page:Float height] - (可选参数) 光源高度。缺省值为 10。<br /><br />
 
-			创建一个新的平行光。
+			创建一个新的平面光。
 		</p>
 
 		<h2>属性（Properties）</h2>
 		<p>
 			公共属性请查看基类[page:Light Light]。
+		</p>
+
+		<h3>[property:Boolean isRectAreaLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h2>方法（Methods）</h2>
@@ -67,7 +72,7 @@
 		</p>
 
 
-		<h3>[method:RectAreaLight copy]( [param:RectAreaLight source] )</h3>
+		<h3>[method:this copy]( [param:RectAreaLight source] )</h3>
 		<p>
 			将所有属性的值从源 [page:RectAreaLight source] 复制到此平面光光源对象。
 		</p>

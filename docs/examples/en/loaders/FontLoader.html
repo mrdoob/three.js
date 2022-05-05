@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Class for loading a font in JSON format. Returns a font, which is an
+		array of [page:Shape Shapes] representing the font.
+		This uses the [page:FileLoader] internally for loading files. <br /><br />
+
+		You can convert fonts online using [link:https://gero3.github.io/facetype.js/ facetype.js]
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const loader = new FontLoader();
+		const font = loader.load(
+			// resource URL
+			'fonts/helvetiker_bold.typeface.json',
+
+			// onLoad callback
+			function ( font ) {
+				// do something with the font
+				console.log( font );
+			},
+
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError callback
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+		[example:webgl_geometry_text_shapes geometry / text / shapes ]<br/>
+		[example:webgl_geometry_text geometry / text ]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — the path or URL to the file. This can also be a
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded font.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
+		[page:Function onError] — Will be called when load errors.<br /><br />
+
+		Begin loading from url and pass the loaded font to onLoad.
+		</p>
+
+		<h3>[method:Font parse]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
+		Parse a <em>JSON</em> structure and return a font.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/FontLoader.js examples/jsm/loaders/FontLoader.js]
+		</p>
+	</body>
+</html>

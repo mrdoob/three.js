@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { LinearInterpolant } from '../../../../../src/math/interpolants/LinearInterpolant';
+// import { LinearInterpolant } from '../../../../../src/math/interpolants/LinearInterpolant.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -9,16 +9,16 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.module( 'LinearInterpolant', () => {
 
 			// INHERITANCE
-			QUnit.todo( "Extending", ( assert ) => {
+			QUnit.todo( 'Extending', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// INSTANCING
-			QUnit.todo( "Instancing", ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

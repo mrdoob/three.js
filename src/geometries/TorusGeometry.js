@@ -98,6 +98,12 @@ class TorusGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
+
+	}
+
 }
 
 export { TorusGeometry, TorusGeometry as TorusBufferGeometry };

@@ -1,0 +1,174 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Custom Lighting Model</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
+		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Custom Lighting Model
+		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
+
+			import WebGPU from './jsm/capabilities/WebGPU.js';
+			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			let camera, scene, renderer;
+
+			let light1, light2, light3;
+
+			init().then( animate ).catch( error );
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.z = 2;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// lights
+
+				const sphere = new THREE.SphereGeometry( 0.02, 16, 8 );
+
+				light1 = new THREE.PointLight( 0xffaa00, 2, 1 );
+				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
+				scene.add( light1 );
+
+				light2 = new THREE.PointLight( 0x0040ff, 2, 1 );
+				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) ) );
+				scene.add( light2 );
+
+				light3 = new THREE.PointLight( 0x80ff80, 2, 1 );
+				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) ) );
+				scene.add( light3 );
+
+				//light nodes ( selective lights )
+
+				const allLightsNode = new Nodes.LightsNode().fromLights( [ light1, light2, light3 ] );
+
+				// points
+
+				const points = [];
+
+				for ( let i = 0; i < 3000; i ++ ) {
+
+					const point = new THREE.Vector3().random().subScalar( 0.5 ).multiplyScalar( 2 );
+					points.push( point );
+
+				}
+
+				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
+				const materialPoints = new Nodes.PointsNodeMaterial();
+
+				// custom lighting model
+
+				const customLightingModel = new Nodes.ShaderNode( ( inputs ) => {
+
+					const { lightColor, reflectedLight } = inputs;
+
+					reflectedLight.directDiffuse.add( lightColor );
+
+				} );
+
+				const lightingModelContext = new Nodes.LightContextNode( allLightsNode, customLightingModel );
+
+				materialPoints.lightNode = lightingModelContext;
+
+				//
+
+				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
+				scene.add( pointCloud );
+
+				//
+
+				renderer = new WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// controls
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 0;
+				controls.maxDistance = 4;
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				//
+
+				return renderer.init();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const time = Date.now() * 0.0005;
+				const scale = .5;
+
+				light1.position.x = Math.sin( time * 0.7 ) * scale;
+				light1.position.y = Math.cos( time * 0.5 ) * scale;
+				light1.position.z = Math.cos( time * 0.3 ) * scale;
+
+				light2.position.x = Math.cos( time * 0.3 ) * scale;
+				light2.position.y = Math.sin( time * 0.5 ) * scale;
+				light2.position.z = Math.sin( time * 0.7 ) * scale;
+
+				light3.position.x = Math.sin( time * 0.7 ) * scale;
+				light3.position.y = Math.cos( time * 0.3 ) * scale;
+				light3.position.z = Math.sin( time * 0.5 ) * scale;
+
+				renderer.render( scene, camera );
+
+			}
+
+			function error( error ) {
+
+				console.error( error );
+
+			}
+
+		</script>
+	</body>
+</html>

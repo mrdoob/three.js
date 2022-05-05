@@ -12,14 +12,30 @@
 			<div id="info">
 				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a>
+				<br>Roughness increases left to right
+				<br>Metalness increases top to bottom
 			</div>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			let scene, camera, renderer, radianceMap;
+
+			const COLOR = 0xcccccc;
 
 			function init() {
 
@@ -34,15 +50,19 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
 
+				//renderer.outputEncoding = THREE.sRGBEncoding; // optional
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				document.body.addEventListener( 'mouseover', function () {
 
 					scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) child.material.color.setHex( 0xaaaaff );
+						if ( child.isMesh ) child.material.color.setHex( 0xffffff );
 
 					} );
+
+					render();
 
 				} );
 
@@ -50,9 +70,11 @@
 
 					scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) child.material.color.setHex( 0xffffff );
+						if ( child.isMesh ) child.material.color.setHex( 0xccccff ); // tinted for visibility
 
 					} );
+
+					render();
 
 				} );
 
@@ -61,7 +83,6 @@
 				scene = new THREE.Scene();
 
 				// camera
-
 				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
 				camera.position.set( 0, 0, 18 );
 
@@ -69,7 +90,7 @@
 
 			function createObjects() {
 
-				const geometry = new THREE.SphereGeometry( 0.4, 32, 32 );
+				const geometry = new THREE.SphereGeometry( 0.4, 32, 16 );
 
 				for ( let x = 0; x <= 10; x ++ ) {
 
@@ -81,7 +102,8 @@
 							color: 0xffffff,
 							envMap: radianceMap,
 							envMapIntensity: 1,
-							reflectivity: 1
+							transmission: 0,
+							ior: 1.5
 						} );
 
 						const mesh = new THREE.Mesh( geometry, material );
@@ -97,20 +119,15 @@
 
 			function createEnvironment() {
 
-				return new Promise( function ( resolve ) {
+				const envScene = new THREE.Scene();
+				envScene.background = new THREE.Color( COLOR );
+				if ( renderer.outputEncoding === THREE.sRGBEncoding ) envScene.background.convertSRGBToLinear();
 
-					const envScene = new THREE.Scene();
-					envScene.background = new THREE.Color( 0xcccccc );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				radianceMap = pmremGenerator.fromScene( envScene ).texture;
+				pmremGenerator.dispose();
 
-					const pmremGenerator = new THREE.PMREMGenerator( renderer );
-					radianceMap = pmremGenerator.fromScene( envScene ).texture;
-					pmremGenerator.dispose();
-
-					scene.background = radianceMap;
-
-					resolve();
-
-				} );
+				scene.background = radianceMap;
 
 			}
 
@@ -124,11 +141,7 @@
 
 				renderer.setSize( width, height );
 
-			}
-
-			function animate() {
-
-				renderer.setAnimationLoop( render );
+				render();
 
 			}
 
@@ -142,7 +155,7 @@
 				.then( init )
 				.then( createEnvironment )
 				.then( createObjects )
-				.then( animate );
+				.then( render );
 
 		</script>
 	</body>
