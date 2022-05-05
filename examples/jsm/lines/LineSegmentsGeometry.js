@@ -142,16 +142,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		const geometry = lineSegments.geometry;
 
-		if ( geometry.isGeometry ) {
-
-			console.error( 'THREE.LineSegmentsGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-			return;
-
-		} else if ( geometry.isBufferGeometry ) {
-
-			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
-
-		}
+		this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 
 		// set colors, maybe
 
