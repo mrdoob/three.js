@@ -8,6 +8,7 @@
  * http://en.wikipedia.org/wiki/Viviani%27s_curve
  * http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
  * https://prideout.net/blog/old/blog/index.html@p=44.html
+ * https://gamedev.stackexchange.com/questions/43691/how-can-i-move-an-object-in-an-infinity-or-figure-8-trajectory
  */
 	// GrannyKnot
 
@@ -330,6 +331,26 @@
 
 	}
 
+	// LemniscateKnot 
+	class LemniscateKnot extends THREE.Curve {
+
+		constructor( scale = 40 ) {
+
+			super();
+			this.scale = scale;
+
+		}
+		getPoint( t, optionalTarget = new THREE.Vector3() ) {
+			const point = optionalTarget;
+			const fi = t * Math.PI * 2;
+			const scale = 2.0 / (3.0 - Math.cos(2.0*fi));
+			const x = scale * Math.cos(fi);
+			const y = 0.1 * Math.sin(fi);
+			const z = scale * Math.sin(2*fi) / 2;
+			return point.set(x,y,z).multiplyScalar( this.scale);
+		}
+	}
+
 	THREE.CinquefoilKnot = CinquefoilKnot;
 	THREE.DecoratedTorusKnot4a = DecoratedTorusKnot4a;
 	THREE.DecoratedTorusKnot4b = DecoratedTorusKnot4b;
@@ -344,5 +365,6 @@
 	THREE.TrefoilKnot = TrefoilKnot;
 	THREE.TrefoilPolynomialKnot = TrefoilPolynomialKnot;
 	THREE.VivianiCurve = VivianiCurve;
+	THREE.LemniscateKnot = LemniscateKnot;
 
 } )();
