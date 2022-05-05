@@ -33,8 +33,8 @@
 
 		<h2>Code Example</h2>
 
-		<code>const geometry = new THREE.SphereGeometry( 5, 32, 32 );
-		const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		<code>const geometry = new THREE.SphereGeometry( 15, 32, 16 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 		const sphere = new THREE.Mesh( geometry, material );
 		scene.add( sphere );
 		</code>
@@ -45,8 +45,8 @@
 
 		<p>
 		radius — sphere radius. Default is 1.<br />
-		widthSegments — number of horizontal segments. Minimum value is 3, and the default is 8.<br />
-		heightSegments — number of vertical segments. Minimum value is 2, and the default is 6.<br />
+		widthSegments — number of horizontal segments. Minimum value is 3, and the default is 32.<br />
+		heightSegments — number of vertical segments. Minimum value is 2, and the default is 16.<br />
 		phiStart — specify horizontal starting angle. Default is 0.<br />
 		phiLength — specify horizontal sweep angle size. Default is Math.PI * 2.<br />
 		thetaStart — specify vertical starting angle. Default is 0.<br />

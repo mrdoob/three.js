@@ -23,14 +23,26 @@
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
 
 			let container, stats;
 			let camera, controls, scene, renderer;
@@ -39,7 +51,7 @@
 
 			const pickingData = [];
 
-			const mouse = new THREE.Vector2();
+			const pointer = new THREE.Vector2();
 			const offset = new THREE.Vector3( 10, 10, 10 );
 
 			init();
@@ -47,7 +59,7 @@
 
 			function init() {
 
-				container = document.getElementById( "container" );
+				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
@@ -165,16 +177,16 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+				renderer.domElement.addEventListener( 'pointermove', onPointerMove );
 
 			}
 
 			//
 
-			function onMouseMove( e ) {
+			function onPointerMove( e ) {
 
-				mouse.x = e.clientX;
-				mouse.y = e.clientY;
+				pointer.x = e.clientX;
+				pointer.y = e.clientY;
 
 			}
 
@@ -193,7 +205,7 @@
 
 				// set the view offset to represent just a single pixel under the mouse
 
-				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, mouse.x * window.devicePixelRatio | 0, mouse.y * window.devicePixelRatio | 0, 1, 1 );
+				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, pointer.x * window.devicePixelRatio | 0, pointer.y * window.devicePixelRatio | 0, 1, 1 );
 
 				// render the scene
 

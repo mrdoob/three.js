@@ -1,0 +1,346 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のTips</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のTips">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のTips</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>この記事では個別の記事を持つには小さすぎるため、three.jsで遭遇するかもしれないいくつかの小さな問題をまとめています。</p>
+<hr>
+<p><a id="screenshot" data-toc="スクリーンショットを撮る"></a></p>
+<h1 id="-">キャンバスのスクリーンショットを撮る</h1>
+<p>ブラウザではスクリーンショットを撮れる機能が2つあります。
+古いやり方は <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL"><code class="notranslate" translate="no">canvas.toDataURL</code></a>、新しいやり方は <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob"><code class="notranslate" translate="no">canvas.toBlob</code></a> です。</p>
+<p>以下のようなコードを追加するだけで簡単にスクリーンショットを撮れると思うはずです。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
++&lt;button id="screenshot" type="button"&gt;Save...&lt;/button&gt;
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+  });
+});
+
+const saveBlob = (function() {
+  const a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style.display = 'none';
+  return function saveData(blob, fileName) {
+     const url = window.URL.createObjectURL(blob);
+     a.href = url;
+     a.download = fileName;
+     a.click();
+  };
+}());
+</pre>
+<p>以下は<a href="responsive.html">レスポンシブデザインの記事</a>の例で、上記のコードにボタンを配置するためのCSSを追加したものです。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-bad.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-bad.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>試してみるとこのようなスクリーンショットが出てきました。</p>
+<div class="threejs_center"><img src="../resources/images/screencapture-413x313.png"></div>
+
+<p>はい、ただの黒い画像です。</p>
+<p>お使いのブラウザやOSによっては上手く撮れる事もありますが、一般的には上手く撮れない可能性が高いです。</p>
+<p>この問題はパフォーマンスと互換性の理由から、デフォルトではブラウザがWebGLキャンバスに描画後に描画バッファをクリアしてしまいます。</p>
+<p>解決策としてはキャプチャの直前にレンダリングのコードを呼び出す事です。</p>
+<p>このコードはいくつか調整する必要があります。最初にレンダリングのコードを分離してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const state = {
++  time: 0,
++};
+
+-function render(time) {
+-  time *= 0.001;
++function render() {
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
++    const rot = state.time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
++function animate(time) {
++  state.time = time * 0.001;
++
++  render();
++
++  requestAnimationFrame(animate);
++}
++requestAnimationFrame(animate);
+</pre>
+<p><code class="notranslate" translate="no">render</code> は実際にレンダリングする事だけに関係しており、キャンバスをキャプチャする直前に呼び出す事ができます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
++  render();
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+  });
+});
+</pre>
+<p>そして上手く機能するはずです。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-good.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-good.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>別の解決策については次の項目を参照して下さい。</p>
+<hr>
+<p><a id="preservedrawingbuffer" data-toc="キャンバスがクリアされるのを防ぐ"></a></p>
+<h1 id="-">キャンバスのクリアを防ぐ</h1>
+<p>アニメーションオブジェクトを使って、ユーザーにお絵かきさせたいとしましょう。
+<a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 作成時に <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> を渡す必要があります。
+これによりブラウザがキャンバスをクリアできなくなります。また、three.jsでもキャンバスをクリアしないようにする必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  preserveDrawingBuffer: true,
++  alpha: true,
++});
++renderer.autoClearColor = false;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-preservedrawingbuffer.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-preservedrawingbuffer.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>もしお絵かきプログラムを作ろうとしているのであれば、解像度を変更するとブラウザはキャンバスをクリアしてしまうのでこれは解決策にはなりません。
+ディスプレイのサイズに応じて解像度を変えています。ウィンドウのサイズが変わると表示サイズも変わります。
+これにはユーザーが別のタブでファイルをダウンロードし、ブラウザがステータスバーを追加した場合も含まれます。
+また、ユーザーがスマートフォンを回転しブラウザが縦から横に切り替わった時も含まれます。</p>
+<p>お絵かきプログラムを作りたいのであれば、<a href="rendertargets.html">レンダーターゲットを使用してテクスチャにレンダリング</a>して下さい。</p>
+<hr>
+<p><a id="tabindex" data-toc="キャンバスからキーボード入力を取得する"></a></p>
+<h1 id="-">キーボード入力を取得する</h1>
+<p>このチュートリアルではイベントリスナーを <code class="notranslate" translate="no">canvas</code> にアタッチする事がよくあります。
+多くのイベントが動作しますが、デフォルトでは動作しないキーボードイベントもあります。</p>
+<p>例えばキーボードイベントを取得するには、キャンバスの<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex"><code class="notranslate" translate="no">tabindex</code></a>を0以上にします。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas tabindex="0"&gt;&lt;/canvas&gt;
+</pre>
+<p>しかし、これは新たな問題を引き起こします。<code class="notranslate" translate="no">tabindex</code> が設定されているものはフォーカスがある時にハイライトされます。
+これを修正するにはCSSの擬似クラスであるfocusでoutlineをnoneにします。</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">canvas:focus {
+  outline:none;
+}
+</pre>
+<p>ここに3つのキャンバスがあります。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c1"&gt;&lt;/canvas&gt;
+&lt;canvas id="c2" tabindex="0"&gt;&lt;/canvas&gt;
+&lt;canvas id="c3" tabindex="1"&gt;&lt;/canvas&gt;
+</pre>
+<p>最後のキャンバスだけCSSを追加します。</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c3:focus {
+    outline: none;
+}
+</pre>
+<p>全てのイベントリスナーに同じイベントリスナーをアタッチしてみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">document.querySelectorAll('canvas').forEach((canvas) =&gt; {
+  const ctx = canvas.getContext('2d');
+
+  function draw(str) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(str, canvas.width / 2, canvas.height / 2);
+  }
+  draw(canvas.id);
+
+  canvas.addEventListener('focus', () =&gt; {
+    draw('has focus press a key');
+  });
+
+  canvas.addEventListener('blur', () =&gt; {
+    draw('lost focus');
+  });
+
+  canvas.addEventListener('keydown', (e) =&gt; {
+    draw(`keyCode: ${e.keyCode}`);
+  });
+});
+</pre>
+<p>1つ目のキャンバスがキーボード入力を受け付けない事に注意して下さい。
+2つ目はキーボード入力をうけつけますがハイライトされます。
+3つ目は両方の問題を解決しています。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-tabindex.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-tabindex.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="transparent-canvas" data-toc="キャンバスを透明にする"></a></p>
+<h1 id="-">キャンバスを透明にする</h1>
+<p>デフォルトではthree.jsはキャンバスを不透明にします。
+キャンバスを透明にしたい場合は <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 作成時に<a href="/docs/#api/ja/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a>を指定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  alpha: true,
++});
+</pre>
+<p>また、プリマルチプライドアルファを<strong>使用しない</strong>事を指定したいでしょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  alpha: true,
++  premultipliedAlpha: false,
+});
+</pre>
+<p>Three.jsのデフォルトではキャンバスは<a href="/docs/#api/ja/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a>で出力されますが、マテリアルは<a href="/docs/#api/ja/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>で出力されます。</p>
+<p>プリマルチプライドアルファを利用するタイミングの理解を深めたいのであれば、この<a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre">良い記事</a>を参照して下さい。</p>
+<p>いずれにしても透明なキャンバスを使った簡単な例で設定してみましょう。</p>
+<p><a href="responsive.html">レスポンシブデザインの記事</a>の例に上記の設定を適用してみました。
+マテリアルも透明感のあるものにしてみました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+-  const material = new THREE.MeshPhongMaterial({color});
++  const material = new THREE.MeshPhongMaterial({
++    color,
++    opacity: 0.5,
++  });
+
+...
+</pre>
+<p>次にHTMLを追加してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="content"&gt;
++    &lt;div&gt;
++      &lt;h1&gt;Cubes-R-Us!&lt;/h1&gt;
++      &lt;p&gt;We make the best cubes!&lt;/p&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>CSSで文字テキストをキャンバスの前に配置します。</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    position: fixed;
++    left: 0;
++    top: 0;
++    z-index: 2;
++    pointer-events: none;
+}
++#content {
++  font-size: 7vw;
++  font-family: sans-serif;
++  text-align: center;
++  width: 100%;
++  height: 100%;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++}
+</pre>
+<p><code class="notranslate" translate="no">pointer-events: none</code> はマウスやタッチイベントをキャンバスから見えなくするので、その下のテキストを選択できる事に注意して下さい。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-transparent-canvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-transparent-canvas.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="html-background" data-toc="HTMLの背景にthree.jsを使う"></a></p>
+<h1 id="-three-js-">背景をthree.jsでアニメーションする</h1>
+<p>よくある質問として、three.jsのアニメーションをWebページの背景にするにはどうしたら良いかという事です。</p>
+<p>明確な2つの方法があります。</p>
+<ul>
+<li>以下のようにCSSでキャンバスの <code class="notranslate" translate="no">position</code> を <code class="notranslate" translate="no">fixed</code> にします。</li>
+</ul>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+ position: fixed;
+ left: 0;
+ top: 0;
+ ...
+}
+</pre>
+<p>先ほどの例でこの正解コードを見る事ができます。<code class="notranslate" translate="no">z-index</code> を-1にするだけでキューブがテキストの後ろに表示されます。</p>
+<p>この解決策の小さな欠点はJavaScriptをウェブページと統合する必要があります。
+複雑なウェブページの場合、three.jsの描画部分がページの他の要素と競合しないようにする必要があります。</p>
+<ul>
+<li><code class="notranslate" translate="no">iframe</code> を使用する</li>
+</ul>
+<p>この解決策は<a href="/">このサイトのトップページ</a>で使用してます。</p>
+<p>ウェブページへiframeを挿入したとします。例えば</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;iframe id="background" src="responsive.html"&gt;
+&lt;div&gt;
+  Your content goes here.
+&lt;/div&gt;
+</pre>
+<p>これは基本的には上記でキャンバスに使用したのと同じコードですが、iframeにはデフォルトでborderがあるので <code class="notranslate" translate="no">border</code> を <code class="notranslate" translate="no">none</code> にする必要があります。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">#background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    border: none;
+    pointer-events: none;
+}
+</pre><p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-html-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-html-background.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

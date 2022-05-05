@@ -1,4 +1,4 @@
-import { MathUtils } from './MathUtils.js';
+import * as MathUtils from './MathUtils.js';
 
 class Quaternion {
 
@@ -13,7 +13,8 @@ class Quaternion {
 
 	static slerp( qa, qb, qm, t ) {
 
-		return qm.copy( qa ).slerp( qb, t );
+		console.warn( 'THREE.Quaternion: Static .slerp() has been deprecated. Use qm.slerpQuaternions( qa, qb, t ) instead.' );
+		return qm.slerpQuaternions( qa, qb, t );
 
 	}
 
@@ -363,11 +364,11 @@ class Quaternion {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		const EPS = 0.000001;
-
 		let r = vFrom.dot( vTo ) + 1;
 
-		if ( r < EPS ) {
+		if ( r < Number.EPSILON ) {
+
+			// vFrom and vTo point in opposite directions
 
 			r = 0;
 
@@ -601,6 +602,35 @@ class Quaternion {
 
 	}
 
+	slerpQuaternions( qa, qb, t ) {
+
+		return this.copy( qa ).slerp( qb, t );
+
+	}
+
+	random() {
+
+		// Derived from http://planning.cs.uiuc.edu/node198.html
+		// Note, this source uses w, x, y, z ordering,
+		// so we swap the order below.
+
+		const u1 = Math.random();
+		const sqrt1u1 = Math.sqrt( 1 - u1 );
+		const sqrtu1 = Math.sqrt( u1 );
+
+		const u2 = 2 * Math.PI * Math.random();
+
+		const u3 = 2 * Math.PI * Math.random();
+
+		return this.set(
+			sqrt1u1 * Math.cos( u2 ),
+			sqrtu1 * Math.sin( u3 ),
+			sqrtu1 * Math.cos( u3 ),
+			sqrt1u1 * Math.sin( u2 ),
+		);
+
+	}
+
 	equals( quaternion ) {
 
 		return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
@@ -651,6 +681,15 @@ class Quaternion {
 	}
 
 	_onChangeCallback() {}
+
+	*[ Symbol.iterator ]() {
+
+		yield this._x;
+		yield this._y;
+		yield this._z;
+		yield this._w;
+
+	}
 
 }
 

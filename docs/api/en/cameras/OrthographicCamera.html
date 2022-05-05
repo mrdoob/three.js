@@ -74,6 +74,11 @@
 		Must be greater than the current value of [page:.near near] plane.
 		</p>
 
+		<h3>[property:Boolean isOrthographicCamera]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Float left]</h3>
 		<p>Camera frustum left plane.</p>
 
@@ -101,7 +106,7 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Camera] class for common methods.</p>
 
-		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
 		fullWidth — full width of multiview setup<br />
 		fullHeight — full height of multiview setup<br />
@@ -115,12 +120,12 @@
 			For an example on how to use it see [page:PerspectiveCamera.setViewOffset PerspectiveCamera].
 		</p>
 
-		<h3>[method:null clearViewOffset]()</h3>
+		<h3>[method:undefined clearViewOffset]()</h3>
 		<p>
 		Removes any offset set by the .setViewOffset method.
 		</p>
 
-		<h3>[method:null updateProjectionMatrix]()</h3>
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
 		<p>
 		Updates the camera projection matrix. Must be called after any change of parameters.
 		</p>

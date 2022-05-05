@@ -1,18 +1,19 @@
+import { Vector3 } from '../../math/Vector3.js';
 import { Group } from '../../objects/Group.js';
 
-function WebXRController() {
+const _moveEvent = { type: 'move' };
 
-	this._targetRay = null;
-	this._grip = null;
-	this._hand = null;
+class WebXRController {
 
-}
+	constructor() {
 
-Object.assign( WebXRController.prototype, {
+		this._targetRay = null;
+		this._grip = null;
+		this._hand = null;
 
-	constructor: WebXRController,
+	}
 
-	getHandSpace: function () {
+	getHandSpace() {
 
 		if ( this._hand === null ) {
 
@@ -27,37 +28,45 @@ Object.assign( WebXRController.prototype, {
 
 		return this._hand;
 
-	},
+	}
 
-	getTargetRaySpace: function () {
+	getTargetRaySpace() {
 
 		if ( this._targetRay === null ) {
 
 			this._targetRay = new Group();
 			this._targetRay.matrixAutoUpdate = false;
 			this._targetRay.visible = false;
+			this._targetRay.hasLinearVelocity = false;
+			this._targetRay.linearVelocity = new Vector3();
+			this._targetRay.hasAngularVelocity = false;
+			this._targetRay.angularVelocity = new Vector3();
 
 		}
 
 		return this._targetRay;
 
-	},
+	}
 
-	getGripSpace: function () {
+	getGripSpace() {
 
 		if ( this._grip === null ) {
 
 			this._grip = new Group();
 			this._grip.matrixAutoUpdate = false;
 			this._grip.visible = false;
+			this._grip.hasLinearVelocity = false;
+			this._grip.linearVelocity = new Vector3();
+			this._grip.hasAngularVelocity = false;
+			this._grip.angularVelocity = new Vector3();
 
 		}
 
 		return this._grip;
 
-	},
+	}
 
-	dispatchEvent: function ( event ) {
+	dispatchEvent( event ) {
 
 		if ( this._targetRay !== null ) {
 
@@ -79,9 +88,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this;
 
-	},
+	}
 
-	disconnect: function ( inputSource ) {
+	disconnect( inputSource ) {
 
 		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
 
@@ -105,9 +114,9 @@ Object.assign( WebXRController.prototype, {
 
 		return this;
 
-	},
+	}
 
-	update: function ( inputSource, frame, referenceSpace ) {
+	update( inputSource, frame, referenceSpace ) {
 
 		let inputPose = null;
 		let gripPose = null;
@@ -118,6 +127,43 @@ Object.assign( WebXRController.prototype, {
 		const hand = this._hand;
 
 		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
+
+			if ( targetRay !== null ) {
+
+				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+				if ( inputPose !== null ) {
+
+					targetRay.matrix.fromArray( inputPose.transform.matrix );
+					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+					if ( inputPose.linearVelocity ) {
+
+						targetRay.hasLinearVelocity = true;
+						targetRay.linearVelocity.copy( inputPose.linearVelocity );
+
+					} else {
+
+						targetRay.hasLinearVelocity = false;
+
+					}
+
+					if ( inputPose.angularVelocity ) {
+
+						targetRay.hasAngularVelocity = true;
+						targetRay.angularVelocity.copy( inputPose.angularVelocity );
+
+					} else {
+
+						targetRay.hasAngularVelocity = false;
+
+					}
+
+					this.dispatchEvent( _moveEvent );
+
+				}
+
+			}
 
 			if ( hand && inputSource.hand ) {
 
@@ -186,19 +232,6 @@ Object.assign( WebXRController.prototype, {
 
 			} else {
 
-				if ( targetRay !== null ) {
-
-					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-					if ( inputPose !== null ) {
-
-						targetRay.matrix.fromArray( inputPose.transform.matrix );
-						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
-
-					}
-
-				}
-
 				if ( grip !== null && inputSource.gripSpace ) {
 
 					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
@@ -207,6 +240,28 @@ Object.assign( WebXRController.prototype, {
 
 						grip.matrix.fromArray( gripPose.transform.matrix );
 						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+
+						if ( gripPose.linearVelocity ) {
+
+							grip.hasLinearVelocity = true;
+							grip.linearVelocity.copy( gripPose.linearVelocity );
+
+						} else {
+
+							grip.hasLinearVelocity = false;
+
+						}
+
+						if ( gripPose.angularVelocity ) {
+
+							grip.hasAngularVelocity = true;
+							grip.angularVelocity.copy( gripPose.angularVelocity );
+
+						} else {
+
+							grip.hasAngularVelocity = false;
+
+						}
 
 					}
 
@@ -238,7 +293,7 @@ Object.assign( WebXRController.prototype, {
 
 	}
 
-} );
+}
 
 
 export { WebXRController };

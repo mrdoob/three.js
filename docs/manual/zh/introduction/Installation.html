@@ -28,7 +28,7 @@
 		</p>
 
 		<code>
-		npm install --save three
+		npm install three
 		</code>
 
 		<p>
@@ -69,9 +69,9 @@
 		<code>
 		&lt;script type="module">
 
-		  // 通过访问 https://unpkg.com/three 来查找最新版本。
+		  // 通过访问 https://cdn.skypack.dev/three 来查找最新版本。
 
-		  import * as THREE from 'https://unpkg.com/three@&lt;version&gt;/build/three.module.js';
+		  import * as THREE from 'https://cdn.skypack.dev/three@&lt;version&gt;';
 
 		  const scene = new THREE.Scene();
 
@@ -97,7 +97,7 @@
 		<code>
 		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
 		<p>
@@ -107,11 +107,11 @@
 		<code>
 		&lt;script type="module">
 
-		  // 通过访问 https://unpkg.com/three 来查找最新版本。
+		  // 通过访问 https://cdn.skypack.dev/three 来查找最新版本。
 
-		  import { OrbitControls } from 'https://unpkg.com/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
+		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
 
-		  const controls = new OrbitControls();
+		  const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>

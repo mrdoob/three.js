@@ -10,14 +10,26 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example<br/>
-			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
+			<a href="https://casual-effects.com/data/" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -83,7 +95,7 @@
 				sceneModel.add( directionalLight );
 
 				const loader = new GLTFLoader();
-				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
 
@@ -91,7 +103,7 @@
 
 				//
 
-				const diffuseMap = new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" );
+				const diffuseMap = new THREE.TextureLoader().load( 'textures/cube/SwedishRoyalCastle/pz.jpg' );
 				diffuseMap.encoding = THREE.sRGBEncoding;
 
 				const materialColor = new THREE.MeshBasicMaterial( {
@@ -140,12 +152,12 @@
 				const effectVignette = new ShaderPass( shaderVignette );
 				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
 
-				effectBleach.uniforms[ "opacity" ].value = 0.95;
+				effectBleach.uniforms[ 'opacity' ].value = 0.95;
 
-				effectSepia.uniforms[ "amount" ].value = 0.9;
+				effectSepia.uniforms[ 'amount' ].value = 0.9;
 
-				effectVignette.uniforms[ "offset" ].value = 0.95;
-				effectVignette.uniforms[ "darkness" ].value = 1.6;
+				effectVignette.uniforms[ 'offset' ].value = 0.95;
+				effectVignette.uniforms[ 'darkness' ].value = 1.6;
 
 				const effectBloom = new BloomPass( 0.5 );
 				const effectFilm = new FilmPass( 0.35, 0.025, 648, false );
@@ -171,9 +183,6 @@
 				//
 
 				const rtParameters = {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBFormat,
 					stencilBuffer: true
 				};
 
@@ -245,7 +254,7 @@
 				composer4.addPass( effectBleach );
 				composer4.addPass( effectVignette );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
+				renderScene.uniforms[ 'tDiffuse' ].value = composerScene.renderTarget2.texture;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -275,7 +284,7 @@
 				composer3.setSize( halfWidth, halfHeight );
 				composer4.setSize( halfWidth, halfHeight );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
+				renderScene.uniforms[ 'tDiffuse' ].value = composerScene.renderTarget2.texture;
 
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
@@ -284,7 +293,7 @@
 
 			function createMesh( geometry, scene, scale ) {
 
-				const diffuseMap = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				const diffuseMap = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
 				diffuseMap.encoding = THREE.sRGBEncoding;
 
 				const mat2 = new THREE.MeshPhongMaterial( {
@@ -293,7 +302,7 @@
 					specular: 0x080808,
 					shininess: 20,
 					map: diffuseMap,
-					normalMap: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalMap: new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
 				} );

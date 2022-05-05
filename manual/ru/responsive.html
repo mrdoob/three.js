@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Oтзывчивый Дизайн</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Oтзывчивый Дизайн">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Oтзывчивый Дизайн</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Это вторая статья в серии статей о three.js.
+Первая была <a href="fundamentals.html">об основах</a>.
+Если вы её еще не читали, советую вам сделать это.</p>
+<p>Эта статья о том, как заставить ваше приложение three.js 
+реагировать на любую ситуацию. Создание адаптивной веб-страницы 
+обычно означает, что страница хорошо отображается на экранах 
+разных размеров - от настольных компьютеров до планшетов и телефонов.</p>
+<p>Для three.js нужно рассмотреть еще больше ситуаций. Например, 
+3D-редактор с элементами управления слева, справа, сверху или 
+снизу - это то, что мы можем захотеть обработать. Динамическая диаграмма 
+в середине документа является еще одним примером.</p>
+<p>В последнем примере мы использовали простой холст без указания CSS и размера</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
+</pre><p>Этот холст по умолчанию имеет размер 300x150 CSS пикселей.</p>
+<p>В вебе рекомендуемый способ установить размер чего-либо - использовать CSS.</p>
+<p>Прим. переводчика: Далее идет слишком подробное описание банальностей.</p>
+<p>Давайте растянем холст на всю страницу:</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;style&gt;
+html, body {
+   margin: 0;
+   height: 100%;
+}
+#c {
+   width: 100%;
+   height: 100%;
+   display: block;
+}
+&lt;/style&gt;
+</pre><p>HTML body по умолчанию имеет margin в 5 пикселей, поэтому установка в 0 удаляет margin. 
+Установка высоты html и body на 100% заставляет их заполнить окно. В противном случае 
+они будут такими же большими, как контент, который их наполняет.</p>
+<p>Далее мы говорим, что <code class="notranslate" translate="no">id=c</code> элемент будет занимать 100% его контейнера, 
+который в данном случае является телом документа.</p>
+<p>Наконец, мы установили его <code class="notranslate" translate="no">display</code> режим на <code class="notranslate" translate="no">block</code>. Режим отображения canvas 
+по умолчанию <code class="notranslate" translate="no">inline</code>. Inline элементы могут в конечном итоге добавить пробел к тому, 
+что отображается. Устанавливая canvas'у <code class="notranslate" translate="no">display: block</code> эта проблема исчезает.</p>
+<p>Вот результат</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-no-resize.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-no-resize.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Вы можете видеть, что холст сейчас заполняет страницу, но есть 2 проблемы. </p>
+<ol>
+<li>Кубы растягиваются. Они не кубики, они больше похожи на прямоугольные параллелепипеды.
+Слишком высокие или слишком широкие. Откройте пример в его отдельном окне и измените 
+его размер. Вы увидите, как кубы растягиваются то вширь, то ввысь.</li>
+</ol>
+<p><img src="../resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center nobg"></p>
+<ol>
+<li>Они выглядят пиксельно и размыто. 
+Растяните окно больше, и вы действительно увидите проблему.</li>
+</ol>
+<p><img src="../resources/images/resize-low-res.png" class="threejs_center nobg"></p>
+<p>Давайте сначала исправим проблему растяжения. Для этого нам нужно установить соотношение 
+сторон (aspect) камеры в соответствии с размером холста.
+Мы можем сделать это, задав холсту свойства
+<code class="notranslate" translate="no">clientWidth</code> и <code class="notranslate" translate="no">clientHeight</code>.</p>
+<p>Мы обновим наш цикл отрисовки следующим образом</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;
+
++  const canvas = renderer.domElement;
++  camera.aspect = canvas.clientWidth / canvas.clientHeight;
++  camera.updateProjectionMatrix();
+
+  ...
+</pre><p>Теперь кубики должны перестать быть искаженными.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-update-camera.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-update-camera.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Откройте пример в отдельном окне и измените размер окна, и вы увидите, что кубы больше 
+не растянуты по высоте или ширине. Они остаются правильными, независимо от размера окна.</p>
+<p><img src="../resources/images/resize-correct-aspect.png" width="407" class="threejs_center nobg"></p>
+<p>Теперь давайте исправим пиксильность.</p>
+<p>Canvas элемент имеет 2 размера. Один размер - это размер холста, 
+отображаемый на странице. Это то, что мы устанавливаем с помощью CSS. 
+Другой размер - это количество пикселей на холсте. 
+Это ничем не отличается от изображения. Например, у нас может быть 
+изображение размером 128x64 пикселей, а с помощью css мы можем отобразить 
+как 400x200 пикселей.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;img src="some128x64image.jpg" style="width:400px; height:200px"&gt;
+</pre><p>Внутренний размер холста, его разрешение часто называют размером рисованного 
+буфера (drawingbuffer size). В three.js мы можем установить размер буфера 
+рисования холста, вызывая <code class="notranslate" translate="no">renderer.setSize</code>. Какой размер мы должны выбрать? 
+Самый очевидный ответ - "тот же размер, что отображается на холсте".
+Опять же, чтобы сделать это, мы можем посмотреть на <code class="notranslate" translate="no">clientWidth</code> и <code class="notranslate" translate="no">clientHeight</code>
+свойства.</p>
+<p>Давайте напишем функцию, которая проверяет, совпадает ли размер рисованного буфера 
+с размером, на котором он отображается, и, если это так, зададим холсту этот размер.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre><p>Обратите внимание, что мы проверяем, нужно ли изменять размер холста. 
+Изменение размера холста - интересная часть спецификации холста, 
+и лучше не устанавливать тот же размер, если он уже соответствует желаемому.</p>
+<p>Как только мы узнаем, нужно ли нам изменить размер или нет, мы вызываем 
+<code class="notranslate" translate="no">renderer.setSize</code> и передаем новую ширину и высоту. Важно передать <code class="notranslate" translate="no">false</code> в конце.
+<code class="notranslate" translate="no">render.setSize</code> по умолчанию устанавливает размер CSS холста, но это не то, 
+что нам нужно. Мы хотим, чтобы браузер продолжал работать так же, как и 
+для всех других элементов, то есть использовать CSS для определения размера 
+отображения элемента. Мы не хотим, чтобы холсты, используемые three.js, 
+отличались от других элементов.</p>
+<p>Обратите внимание, что наша функция возвращает true, если размер холста был изменен. 
+Мы можем использовать это, чтобы проверить, есть ли другие вещи, которые мы 
+должны обновить. Давайте изменим наш цикл отрисовки, чтобы использовать 
+новую функцию.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;
+
++  if (resizeRendererToDisplaySize(renderer)) {
++    const canvas = renderer.domElement;
++    camera.aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.updateProjectionMatrix();
++  }
+
+  ...
+</pre><p>Поскольку apsect будет меняться только в случае изменения размера холста, мы 
+устанавливаем соотношение сторон камеры, только если <code class="notranslate" translate="no">resizeRendererToDisplaySize</code> 
+вернёт <code class="notranslate" translate="no">true</code>.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Теперь он должен отображаться с разрешением, 
+соответствующим размеру изображения на холсте.</p>
+<p>Чтобы сделать так, чтобы CSS позволял обрабатывать изменение размера, 
+давайте возьмем наш код и поместим его в <a href="../examples/threejs-responsive.js">отдельный <code class="notranslate" translate="no">.js</code> файл</a>.
+Вот еще несколько примеров, где мы позволяем CSS выбирать размер, без написания кода.</p>
+<p>Давайте поместим наши кубики в середине абзаца текста.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-paragraph.html&amp;startPane=html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-paragraph.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>и вот наш тот же код, используемый в макете стиля редактора, 
+где область управления справа может менять размер.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-editor.html&amp;startPane=html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-editor.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Важная часть, на которую следует обратить внимание - отсутствие изменений прежнего кода.
+Только HTML и CSS изменились.</p>
+<h2 id="-hd-dpi">Обработка дисплеев HD-DPI</h2>
+<p>HD-DPI - дисплеи с высокой плотностью точек на дюйм. Сейчас они у большинства 
+компьютеров Mac, многих компьютеров с Windows, а также почти всех смартфонов.</p>
+<p>То, как это работает в браузере, заключается в том, что они используют 
+пиксели CSS для установки размеров, которые должны быть одинаковыми, 
+независимо от того, насколько высоким является разрешение дисплея. 
+Браузер будет просто отображать текст с большей детализацией, но с 
+таким же физическим размером.</p>
+<p>Существуют различные способы обработки HD-DPI с помощью three.js.</p>
+<p>Первый - просто не делать ничего особенного. Это, пожалуй, 
+самый распространенный. Рендеринг 3D-графики занимает много 
+вычислительной мощности графического процессора. Мобильные 
+графические процессоры имеют меньшую мощность, чем настольные 
+компьютеры, по крайней мере на 2018 год, и все же мобильные 
+телефоны часто имеют дисплеи с очень высоким разрешением. 
+Нынешние топовые телефоны имеют соотношение HD-DPI 3x, означающее, 
+что для каждого пикселя с дисплея без HD-DPI эти телефоны имеют 9 
+пикселей. Это означает, что они должны сделать 9-кратный рендеринг.</p>
+<p>Вычисление 9x пикселей - большая работа, поэтому, если мы просто 
+оставим код таким, какой он есть, мы вычислим 1x пикселей, 
+а браузер просто нарисует его в 3x размере (3x на 3x = 9x пикселей).</p>
+<p>Для любого тяжелого приложения three.js это, вероятно, то, что вам 
+нужно, иначе вы, вероятно, получите медленную частоту кадров (FPS).</p>
+<p>Тем не менее, если вы действительно хотите рендерить с разрешением 
+устройства, есть три способа сделать это в three.js.</p>
+<p>Один из них заключается в том, чтобы сообщить Three.js множитель 
+разрешения, используя <code class="notranslate" translate="no">renderer.setPixelRatio</code>.
+Вы спрашиваете браузер, каков множитель пикселей CSS 
+для пикселей устройства, и передаете его в three.js.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> renderer.setPixelRatio(window.devicePixelRatio);
+</pre><p>После этого любые вызовы <code class="notranslate" translate="no">renderer.setSize</code> будут магически 
+использовать размер, который вы запрашиваете, 
+умноженный на любое количество пикселей, которое вы передали.</p>
+<p>Другой способ - сделать это самостоятельно, когда вы измените размер холста.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">    function resizeRendererToDisplaySize(renderer) {
+      const canvas = renderer.domElement;
+      const pixelRatio = window.devicePixelRatio;
+      const width = canvas.clientWidth * pixelRatio | 0;
+      const height = canvas.clientHeight * pixelRatio | 0;
+      const needResize = canvas.width !== width || canvas.height !== height;
+      if (needResize) {
+        renderer.setSize(width, height, false);
+      }
+      return needResize;
+    }
+</pre><p>Я предпочитаю этот второй способ. Зачем? Потому что это означает, что я 
+получаю то, что я прошу. При использовании three.js существует много случаев, 
+когда нам нужно знать фактический размер canvas's drawingBuffer. Например, 
+при создании фильтра пост-обработки, или если мы создаем шейдер, 
+который получает доступ <code class="notranslate" translate="no">gl_FragCoord</code> и прочее... Делая это самостоятельно, 
+мы всегда знаем, что используемый размер - это размер, 
+который мы запрашивали. Не существует особого случая, 
+когда магия происходит за кулисами.</p>
+<p>Вот пример использования кода выше.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-hd-dpi.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/responsive-hd-dpi.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Может быть трудно увидеть разницу, но если у вас есть дисплей HD-DPI 
+и вы сравниваете этот образец с приведенными выше, 
+вы должны заметить, что края более четкие.</p>
+<p>Эта статья охватывает очень основную, но фундаментальную тему. Далее давайте быстро 
+<a href="primitives.html">пройдемся по основным примитивам, которые предоставляет three.js</a>.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

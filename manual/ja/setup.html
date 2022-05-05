@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のセットアップ</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のセットアップ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のセットアップ</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>これはthree.jsの連載記事の1つです。
+最初の記事は<a href="fundamentals.html">Three.jsの基礎知識</a>でした。
+まだ読んでない人はそこから読んでみるといいかもしれません。</p>
+<p>先に進む前に開発環境のセットアップの話をする必要があります。特にセキュリティ上の理由から、WebGLはハードディスクから直接画像を扱う事ができません。開発をするためにはWebサーバーを利用する必要があります。幸運な事に開発用のWebサーバーをセットアップし利用する事は非常に簡単です。</p>
+<p>まず最初にこのサイト全体を<a href="https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip">このリンク</a>からダウンロードする事ができます。
+ダウンロードしたらzipファイルをダブルクリックで解凍して下さい。</p>
+<p>次にシンプルなWebサーバーの1つをダウンロードします。
+ユーザーインターフェースのあるWebサーバーをお望みなら<a href="https://greggman.github.io/servez">Servez</a>があります。</p>
+<p></p><div class="threejs_image border">
+  <img class="" src="../resources/servez.gif">
+</div>
+
+<p></p>
+<p>ファイルを解凍してフォルダを指定し、"Start"をクリックしてからブラウザで<a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>を表示するか、またはサンプルを閲覧したい場合は<a href="http://localhost:8080/threejs"><code class="notranslate" translate="no">http://localhost:8080/threejs</code></a>にアクセスして下さい。</p>
+<p>Servezのサービスを停止するにはstopを選ぶか、Servezを終了します。</p>
+<p>コマンドラインが好きな方は（私はそうしてる）、別の方法として<a href="https://nodejs.org">node.js</a>を使う事もできます。</p>
+<p>ダウンロードしてインストールし、コマンドプロンプト / コンソール / ターミナルウィンドウを開きます。WindowsのNode.jsインストーラーで追加した場合、"Node Command Prompt"を選択する必要があります。</p>
+<p><a href="https://github.com/greggman/servez-cli"><code class="notranslate" translate="no">servez</code></a>をインストールするには、次のように入力します。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">npm -g install servez
+</pre><p>もしMacを使ってる場合は以下を入力します。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">sudo npm -g install servez
+</pre><p>次に以下を入力します。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">servez path/to/folder/where/you/unzipped/files
+</pre><p>または、私と同じであれば以下を入力します。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">cd path/to/folder/where/you/unzipped/files
+servez
+</pre><p>そして、以下のように表示されるはずです。</p>
+<p></p><div class="threejs_image ">
+  <img class="" src="../resources/servez-response.png">
+</div>
+
+<p></p>
+<p>ブラウザで<a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>にアクセスして下さい。</p>
+<p>もしパスを指定しなかった場合、servezは現在のフォルダをserveします。</p>
+<p>これらのオプションが好きでない場合、<a href="https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver">他にもたくさんのシンプルなサーバーがあります</a>。</p>
+<p>これでサーバーのセットアップが完了したので<a href="textures.html">テクスチャ</a>のページに移動しましょう。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

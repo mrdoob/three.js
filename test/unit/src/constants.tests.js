@@ -1,10 +1,10 @@
 /* global QUnit */
 
-import * as Constants from '../../../src/constants';
+import * as Constants from '../../../src/constants.js';
 
 export default QUnit.module( 'Constants', () => {
 
-	QUnit.test( "default values", ( assert ) => {
+	QUnit.test( 'default values', ( assert ) => {
 
 		assert.propEqual( Constants.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }, 'MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }' );
 		assert.propEqual( Constants.TOUCH, { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }, 'TOUCH equal { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }' );
@@ -64,7 +64,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.EquirectangularReflectionMapping, 303, 'EquirectangularReflectionMapping is equal to 303' );
 		assert.equal( Constants.EquirectangularRefractionMapping, 304, 'EquirectangularRefractionMapping is equal to 304' );
 		assert.equal( Constants.CubeUVReflectionMapping, 306, 'CubeUVReflectionMapping is equal to 306' );
-		assert.equal( Constants.CubeUVRefractionMapping, 307, 'CubeUVRefractionMapping is equal to 307' );
 		assert.equal( Constants.RepeatWrapping, 1000, 'RepeatWrapping is equal to 1000' );
 		assert.equal( Constants.ClampToEdgeWrapping, 1001, 'ClampToEdgeWrapping is equal to 1001' );
 		assert.equal( Constants.MirroredRepeatWrapping, 1002, 'MirroredRepeatWrapping is equal to 1002' );
@@ -84,14 +83,11 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.HalfFloatType, 1016, 'HalfFloatType is equal to 1016' );
 		assert.equal( Constants.UnsignedShort4444Type, 1017, 'UnsignedShort4444Type is equal to 1017' );
 		assert.equal( Constants.UnsignedShort5551Type, 1018, 'UnsignedShort5551Type is equal to 1018' );
-		assert.equal( Constants.UnsignedShort565Type, 1019, 'UnsignedShort565Type is equal to 1019' );
 		assert.equal( Constants.UnsignedInt248Type, 1020, 'UnsignedInt248Type is equal to 1020' );
 		assert.equal( Constants.AlphaFormat, 1021, 'AlphaFormat is equal to 1021' );
-		assert.equal( Constants.RGBFormat, 1022, 'RGBFormat is equal to 1022' );
 		assert.equal( Constants.RGBAFormat, 1023, 'RGBAFormat is equal to 1023' );
 		assert.equal( Constants.LuminanceFormat, 1024, 'LuminanceFormat is equal to 1024' );
 		assert.equal( Constants.LuminanceAlphaFormat, 1025, 'LuminanceAlphaFormat is equal to 1025' );
-		assert.equal( Constants.RGBEFormat, Constants.RGBAFormat, 'RGBEFormat is equal to RGBAFormat' );
 		assert.equal( Constants.DepthFormat, 1026, 'DepthFormat is equal to 1026' );
 		assert.equal( Constants.DepthStencilFormat, 1027, 'DepthStencilFormat is equal to 1027' );
 		assert.equal( Constants.RGB_S3TC_DXT1_Format, 33776, 'RGB_S3TC_DXT1_Format is equal to 33776' );
@@ -103,20 +99,20 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.RGBA_PVRTC_4BPPV1_Format, 35842, 'RGBA_PVRTC_4BPPV1_Format is equal to 35842' );
 		assert.equal( Constants.RGBA_PVRTC_2BPPV1_Format, 35843, 'RGBA_PVRTC_2BPPV1_Format is equal to 35843' );
 		assert.equal( Constants.RGB_ETC1_Format, 36196, 'RGB_ETC1_Format is equal to 36196' );
-		assert.equal( Constants.RGBA_ASTC_4x4_Format, 37808, "Constants.RGBA_ASTC_4x4_Format is equal to 37808" );
-		assert.equal( Constants.RGBA_ASTC_5x4_Format, 37809, "Constants.RGBA_ASTC_5x4_Format is equal to 37809" );
-		assert.equal( Constants.RGBA_ASTC_5x5_Format, 37810, "Constants.RGBA_ASTC_5x5_Format is equal to 37810" );
-		assert.equal( Constants.RGBA_ASTC_6x5_Format, 37811, "Constants.RGBA_ASTC_6x5_Format is equal to 37811" );
-		assert.equal( Constants.RGBA_ASTC_6x6_Format, 37812, "Constants.RGBA_ASTC_6x6_Format is equal to 37812" );
-		assert.equal( Constants.RGBA_ASTC_8x5_Format, 37813, "Constants.RGBA_ASTC_8x5_Format is equal to 37813" );
-		assert.equal( Constants.RGBA_ASTC_8x6_Format, 37814, "Constants.RGBA_ASTC_8x6_Format is equal to 37814" );
-		assert.equal( Constants.RGBA_ASTC_8x8_Format, 37815, "Constants.RGBA_ASTC_8x8_Format is equal to 37815" );
-		assert.equal( Constants.RGBA_ASTC_10x5_Format, 37816, "Constants.RGBA_ASTC_10x5_Format is equal to 37816" );
-		assert.equal( Constants.RGBA_ASTC_10x6_Format, 37817, "Constants.RGBA_ASTC_10x6_Format is equal to 37817" );
-		assert.equal( Constants.RGBA_ASTC_10x8_Format, 37818, "Constants.RGBA_ASTC_10x8_Format is equal to 37818" );
-		assert.equal( Constants.RGBA_ASTC_10x10_Format, 37819, "Constants.RGBA_ASTC_10x10_Format is equal to 37819" );
-		assert.equal( Constants.RGBA_ASTC_12x10_Format, 37820, "Constants.RGBA_ASTC_12x10_Format is equal to 37820" );
-		assert.equal( Constants.RGBA_ASTC_12x12_Format, 37821, "Constants.RGBA_ASTC_12x12_Format is equal to 37821" );
+		assert.equal( Constants.RGBA_ASTC_4x4_Format, 37808, 'Constants.RGBA_ASTC_4x4_Format is equal to 37808' );
+		assert.equal( Constants.RGBA_ASTC_5x4_Format, 37809, 'Constants.RGBA_ASTC_5x4_Format is equal to 37809' );
+		assert.equal( Constants.RGBA_ASTC_5x5_Format, 37810, 'Constants.RGBA_ASTC_5x5_Format is equal to 37810' );
+		assert.equal( Constants.RGBA_ASTC_6x5_Format, 37811, 'Constants.RGBA_ASTC_6x5_Format is equal to 37811' );
+		assert.equal( Constants.RGBA_ASTC_6x6_Format, 37812, 'Constants.RGBA_ASTC_6x6_Format is equal to 37812' );
+		assert.equal( Constants.RGBA_ASTC_8x5_Format, 37813, 'Constants.RGBA_ASTC_8x5_Format is equal to 37813' );
+		assert.equal( Constants.RGBA_ASTC_8x6_Format, 37814, 'Constants.RGBA_ASTC_8x6_Format is equal to 37814' );
+		assert.equal( Constants.RGBA_ASTC_8x8_Format, 37815, 'Constants.RGBA_ASTC_8x8_Format is equal to 37815' );
+		assert.equal( Constants.RGBA_ASTC_10x5_Format, 37816, 'Constants.RGBA_ASTC_10x5_Format is equal to 37816' );
+		assert.equal( Constants.RGBA_ASTC_10x6_Format, 37817, 'Constants.RGBA_ASTC_10x6_Format is equal to 37817' );
+		assert.equal( Constants.RGBA_ASTC_10x8_Format, 37818, 'Constants.RGBA_ASTC_10x8_Format is equal to 37818' );
+		assert.equal( Constants.RGBA_ASTC_10x10_Format, 37819, 'Constants.RGBA_ASTC_10x10_Format is equal to 37819' );
+		assert.equal( Constants.RGBA_ASTC_12x10_Format, 37820, 'Constants.RGBA_ASTC_12x10_Format is equal to 37820' );
+		assert.equal( Constants.RGBA_ASTC_12x12_Format, 37821, 'Constants.RGBA_ASTC_12x12_Format is equal to 37821' );
 		assert.equal( Constants.LoopOnce, 2200, 'LoopOnce is equal to 2200' );
 		assert.equal( Constants.LoopRepeat, 2201, 'LoopRepeat is equal to 2201' );
 		assert.equal( Constants.LoopPingPong, 2202, 'LoopPingPong is equal to 2202' );
@@ -131,12 +127,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.TriangleFanDrawMode, 2, 'TriangleFanDrawMode is equal to 2' );
 		assert.equal( Constants.LinearEncoding, 3000, 'LinearEncoding is equal to 3000' );
 		assert.equal( Constants.sRGBEncoding, 3001, 'sRGBEncoding is equal to 3001' );
-		assert.equal( Constants.GammaEncoding, 3007, 'GammaEncoding is equal to 3007' );
-		assert.equal( Constants.RGBEEncoding, 3002, 'RGBEEncoding is equal to 3002' );
-		assert.equal( Constants.LogLuvEncoding, 3003, 'LogLuvEncoding is equal to 3003' );
-		assert.equal( Constants.RGBM7Encoding, 3004, 'RGBM7Encoding is equal to 3004' );
-		assert.equal( Constants.RGBM16Encoding, 3005, 'RGBM16Encoding is equal to 3005' );
-		assert.equal( Constants.RGBDEncoding, 3006, 'RGBDEncoding is equal to 3006' );
 		assert.equal( Constants.BasicDepthPacking, 3200, 'BasicDepthPacking is equal to 3200' );
 		assert.equal( Constants.RGBADepthPacking, 3201, 'RGBADepthPacking is equal to 3201' );
 

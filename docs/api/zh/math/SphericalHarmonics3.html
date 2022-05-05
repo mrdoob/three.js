@@ -22,6 +22,11 @@
 		<h3>[property:Array coefficients]</h3>
 		<p>An array holding the (9) SH coefficients. A single coefficient is represented as an instance of [page:Vector3].</p>
 
+		<h3>[property:Boolean isSphericalHarmonics3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h2>Methods</h2>
 
 		<h3>[method:SphericalHarmonics3 add]( [param:SphericalHarmonics3 sh] )</h3>
@@ -120,7 +125,7 @@
 
 		<h2>Static Methods</h2>
 
-		<h3>[method:void getBasisAt]( [param:Vector3 normal], [param:Array shBasis] )</h3>
+		<h3>[method:undefined getBasisAt]( [param:Vector3 normal], [param:Array shBasis] )</h3>
 		<p>
 			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
 			[page:Array shBasis] - The resulting SH basis.<br /><br />

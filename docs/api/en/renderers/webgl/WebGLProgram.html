@@ -55,7 +55,10 @@
 		<h3>Vertex shader (conditional):</h3>
 		<div>
 		<code>
-		#ifdef USE_COLOR
+		#if defined( USE_COLOR_ALPHA )
+			// vertex color attribute with alpha
+			attribute vec4 color;
+		#elif defined( USE_COLOR )
 			// vertex color attribute
 			attribute vec3 color;
 		#endif
@@ -135,10 +138,10 @@
 		<p>The actual shader program.</p>
 
 		<h3>[property:WebGLShader vertexShader]</h3>
-		<p>An instance of [page:WebGLShader] representing the vertex shader.</p>
+		<p>The vertex shader.</p>
 
 		<h3>[property:WebGLShader fragmentShader]</h3>
-		<p>An instance of [page:WebGLShader] representing the frament shader.</p>
+		<p>The fragment shader.</p>
 
 		<h2>Methods</h2>
 
@@ -152,7 +155,7 @@
 		Returns a name-value mapping of all active vertex attribute locations.
 		</p>
 
-		<h3>[method:null destroy]()</h3>
+		<h3>[method:undefined destroy]()</h3>
 		<p>
 		Destroys an instance of [name].
 		</p>

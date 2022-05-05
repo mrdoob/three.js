@@ -11,7 +11,7 @@
 
 		<p class="desc">[name] can be used to apply hierarchical 3D transformations to DOM elements
 			via the CSS3 [link:https://www.w3schools.com/cssref/css3_pr_transform.asp transform] property.
-			This renderer is particular interesting if you want to apply 3D effects to a website without
+			This renderer is particularly interesting if you want to apply 3D effects to a website without
 			canvas based rendering. It can also be used in order to combine DOM elements with WebGL
 			content.<br /><br />
 			There are, however, some important limitations:
@@ -33,7 +33,21 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:DOMElement element] - A [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement HTMLElement]
+			where the renderer appends its child-elements.
+			This corresponds to the [page:CSS3DRenderer.domElement domElement] property below.
+			If not passed in here, a new div element will be created.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:DOMElement domElement]</h3>
+		<p>
+			A [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement HTMLElement] where the renderer appends its child-elements.<br />
+			This is automatically created by the renderer in the constructor (if not provided already).
+		</p>
 
 		<h2>Methods</h2>
 
@@ -42,12 +56,12 @@
 			Returns an object containing the width and height of the renderer.
 		</p>
 
-		<h3>[method:null render]( [param:Scene scene], [param:PerspectiveCamera camera] )</h3>
+		<h3>[method:undefined render]( [param:Scene scene], [param:PerspectiveCamera camera] )</h3>
 		<p>
 			Renders a [page:Scene scene] using a [page:PerspectiveCamera perspective camera].<br />
 		</p>
 
-		<h3>[method:null setSize]([param:Number width], [param:Number height])</h3>
+		<h3>[method:undefined setSize]([param:Number width], [param:Number height])</h3>
 		<p>
 			Resizes the renderer to (width, height).
 		</p>

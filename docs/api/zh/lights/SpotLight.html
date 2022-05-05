@@ -88,6 +88,11 @@
 			缺省值为 *0.0*。
 		</p>
 
+		<h3>[property:Boolean isSpotLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Float penumbra]</h3>
 		<p>
 				聚光锥的半影衰减百分比。在0和1之间的值。
@@ -120,7 +125,7 @@
 
 		<h3>[property:Object3D target]</h3>
 		<p>
-				平行光的方向是从它的位置到目标位置.默认的目标位置为原点 *(0,0,0)*。<br />
+				聚光灯的方向是从它的位置到目标位置.默认的目标位置为原点 *(0,0,0)*。<br />
 				注意: 对于目标的位置，要将其更改为除缺省值之外的任何位置，它必须被添加到 [page:Scene scene]
 				场景中去。
 			<code>
@@ -144,7 +149,7 @@ light.target = targetObject;
 
 		<p>公共方法请查看基类 [page:Light Light]。</p>
 
-		<h3>[method:SpotLight copy]( [param:SpotLight source] )</h3>
+		<h3>[method:this copy]( [param:SpotLight source] )</h3>
 		<p>
 			将所有属性的值从源 [page:SpotLight source] 复制到此聚光灯光源对象。
 		</p>

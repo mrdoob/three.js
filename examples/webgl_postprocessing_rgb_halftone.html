@@ -12,12 +12,24 @@
 			<a href="https://github.com/meatbags" target="_blank">Xavier Burrow</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
@@ -72,29 +84,29 @@
 					uniforms: {},
 
 					vertexShader: [
-						"varying vec2 vUV;",
-						"varying vec3 vNormal;",
+						'varying vec2 vUV;',
+						'varying vec3 vNormal;',
 
-						"void main() {",
+						'void main() {',
 
-						"vUV = uv;",
-						"vNormal = vec3( normal );",
-						"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+						'vUV = uv;',
+						'vNormal = vec3( normal );',
+						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-						"}"
-					].join( "\n" ),
+						'}'
+					].join( '\n' ),
 
 					fragmentShader: [
-						"varying vec2 vUV;",
-						"varying vec3 vNormal;",
+						'varying vec2 vUV;',
+						'varying vec3 vNormal;',
 
-						"void main() {",
+						'void main() {',
 
-						"vec4 c = vec4( abs( vNormal ) + vec3( vUV, 0.0 ), 0.0 );",
-						"gl_FragColor = c;",
+						'vec4 c = vec4( abs( vNormal ) + vec3( vUV, 0.0 ), 0.0 );',
+						'gl_FragColor = c;',
 
-						"}"
-					].join( "\n" )
+						'}'
+					].join( '\n' )
 				} );
 
 				for ( let i = 0; i < 50; ++ i ) {
@@ -140,31 +152,31 @@
 				// GUI
 
 				const controller = {
-					radius: halftonePass.uniforms[ "radius" ].value,
-					rotateR: halftonePass.uniforms[ "rotateR" ].value / ( Math.PI / 180 ),
-					rotateG: halftonePass.uniforms[ "rotateG" ].value / ( Math.PI / 180 ),
-					rotateB: halftonePass.uniforms[ "rotateB" ].value / ( Math.PI / 180 ),
-					scatter: halftonePass.uniforms[ "scatter" ].value,
-					shape: halftonePass.uniforms[ "shape" ].value,
-					greyscale: halftonePass.uniforms[ "greyscale" ].value,
-					blending: halftonePass.uniforms[ "blending" ].value,
-					blendingMode: halftonePass.uniforms[ "blendingMode" ].value,
-					disable: halftonePass.uniforms[ "disable" ].value
+					radius: halftonePass.uniforms[ 'radius' ].value,
+					rotateR: halftonePass.uniforms[ 'rotateR' ].value / ( Math.PI / 180 ),
+					rotateG: halftonePass.uniforms[ 'rotateG' ].value / ( Math.PI / 180 ),
+					rotateB: halftonePass.uniforms[ 'rotateB' ].value / ( Math.PI / 180 ),
+					scatter: halftonePass.uniforms[ 'scatter' ].value,
+					shape: halftonePass.uniforms[ 'shape' ].value,
+					greyscale: halftonePass.uniforms[ 'greyscale' ].value,
+					blending: halftonePass.uniforms[ 'blending' ].value,
+					blendingMode: halftonePass.uniforms[ 'blendingMode' ].value,
+					disable: halftonePass.uniforms[ 'disable' ].value
 				};
 
 				function onGUIChange() {
 
 					// update uniforms
-					halftonePass.uniforms[ "radius" ].value = controller.radius;
-					halftonePass.uniforms[ "rotateR" ].value = controller.rotateR * ( Math.PI / 180 );
-					halftonePass.uniforms[ "rotateG" ].value = controller.rotateG * ( Math.PI / 180 );
-					halftonePass.uniforms[ "rotateB" ].value = controller.rotateB * ( Math.PI / 180 );
-					halftonePass.uniforms[ "scatter" ].value = controller.scatter;
-					halftonePass.uniforms[ "shape" ].value = controller.shape;
-					halftonePass.uniforms[ "greyscale" ].value = controller.greyscale;
-					halftonePass.uniforms[ "blending" ].value = controller.blending;
-					halftonePass.uniforms[ "blendingMode" ].value = controller.blendingMode;
-					halftonePass.uniforms[ "disable" ].value = controller.disable;
+					halftonePass.uniforms[ 'radius' ].value = controller.radius;
+					halftonePass.uniforms[ 'rotateR' ].value = controller.rotateR * ( Math.PI / 180 );
+					halftonePass.uniforms[ 'rotateG' ].value = controller.rotateG * ( Math.PI / 180 );
+					halftonePass.uniforms[ 'rotateB' ].value = controller.rotateB * ( Math.PI / 180 );
+					halftonePass.uniforms[ 'scatter' ].value = controller.scatter;
+					halftonePass.uniforms[ 'shape' ].value = controller.shape;
+					halftonePass.uniforms[ 'greyscale' ].value = controller.greyscale;
+					halftonePass.uniforms[ 'blending' ].value = controller.blending;
+					halftonePass.uniforms[ 'blendingMode' ].value = controller.blendingMode;
+					halftonePass.uniforms[ 'disable' ].value = controller.disable;
 
 				}
 

@@ -1,54 +1,59 @@
-function NodeFrame( time ) {
+import { NodeUpdateType } from './constants.js';
 
-	this.time = time !== undefined ? time : 0;
+class NodeFrame {
 
-	this.id = 0;
+	constructor() {
 
-}
+		this.time = 0;
+		this.deltaTime = 0;
 
-NodeFrame.prototype = {
+		this.frameId = 0;
 
-	constructor: NodeFrame,
+		this.startTime = null;
 
-	update: function ( delta ) {
+		this.updateMap = new WeakMap();
 
-		++ this.id;
-
-		this.time += delta;
-		this.delta = delta;
-
-		return this;
-
-	},
-
-	setRenderer: function ( renderer ) {
-
-		this.renderer = renderer;
-
-		return this;
-
-	},
-
-	setRenderTexture: function ( renderTexture ) {
-
-		this.renderTexture = renderTexture;
-
-		return this;
-
-	},
-
-	updateNode: function ( node ) {
-
-		if ( node.frameId === this.id ) return this;
-
-		node.updateFrame( this );
-
-		node.frameId = this.id;
-
-		return this;
+		this.renderer = null;
+		this.material = null;
+		this.camera = null;
+		this.object = null;
 
 	}
 
-};
+	updateNode( node ) {
 
-export { NodeFrame };
+		if ( node.updateType === NodeUpdateType.Frame ) {
+
+			if ( this.updateMap.get( node ) !== this.frameId ) {
+
+				this.updateMap.set( node, this.frameId );
+
+				node.update( this );
+
+			}
+
+		} else if ( node.updateType === NodeUpdateType.Object ) {
+
+			node.update( this );
+
+		}
+
+	}
+
+	update() {
+
+		this.frameId ++;
+
+		if ( this.lastTime === undefined ) this.lastTime = performance.now();
+
+		this.deltaTime = ( performance.now() - this.lastTime ) / 1000;
+
+		this.lastTime = performance.now();
+
+		this.time += this.deltaTime;
+
+	}
+
+}
+
+export default NodeFrame;

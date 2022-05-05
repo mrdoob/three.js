@@ -38,6 +38,11 @@
 
 		<h2>属性（Properties）</h2>
 
+		<h3>[property:Boolean isEuler]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:String order]</h3>
 		<p>
 			order值应用于旋转顺序。默认值为 'XYZ'，这意味着对象将首先是
@@ -65,7 +70,7 @@
 
 		<h2>方法（Methods）</h2>
 
-		<h3>[method:Euler copy]( [param:Euler euler] )</h3>
+		<h3>[method:this copy]( [param:Euler euler] )</h3>
 		<p>将 [page:Euler euler] 的属性拷贝到当前对象。</p>
 
 		<h3>[method:Euler clone]()</h3>
@@ -74,7 +79,7 @@
 		<h3>[method:Boolean equals]( [param:Euler euler] )</h3>
 		<p>检查 [page:Euler euler] 是否与当前对象相同。</p>
 
-		<h3>[method:Euler fromArray]( [param:Array array] )</h3>
+		<h3>[method:this fromArray]( [param:Array array] )</h3>
 		<p>
 		长度为3或4的一个 [page:Array array] 。array[3] 是一个可选的 [page:.order order] 参数。<br /><br />
 
@@ -84,14 +89,14 @@
 		将array[3]设置给欧拉角的 [page:.order order] 。可选。
 		</p>
 
-		<h3>[method:Euler reorder]( [param:String newOrder] )</h3>
+		<h3>[method:this reorder]( [param:String newOrder] )</h3>
 		<p>
 		通过这个欧拉角创建一个四元数，然后用这个四元数和新顺序设置这个欧拉角。 <br /><br />
 
 		<em>警告</em>: 这将弃用旋转信息。
 		</p>
 
-		<h3>[method:Euler set]( [param:Float x], [param:Float y], [param:Float z], [param:String order] )</h3>
+		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:String order] )</h3>
 		<p>
 			[page:.x x] - 用弧度表示x轴旋转量。<br />
 			[page:.y y] - 用弧度表示y轴旋转量。<br />
@@ -101,7 +106,7 @@
 			设置该欧拉变换的角度和旋转顺序 [page:.order order]。
 		</p>
 
-		<h3>[method:Euler setFromRotationMatrix]( [param:Matrix4 m], [param:String order])</h3>
+		<h3>[method:this setFromRotationMatrix]( [param:Matrix4 m], [param:String order])</h3>
 		<p>
 		[page:Matrix4 m] - [page:Matrix4] 矩阵上面的3x3部分是一个纯旋转矩阵[link:https://en.wikipedia.org/wiki/Rotation_matrix rotation matrix]
 		（也就是不发生缩放）<br />
@@ -110,7 +115,7 @@
 		使用基于 [page:.order order] 顺序的纯旋转矩阵来设置当前欧拉角。
 		</p>
 
-		<h3>[method:Euler setFromQuaternion]( [param:Quaternion q], [param:String order] )</h3>
+		<h3>[method:this setFromQuaternion]( [param:Quaternion q], [param:String order] )</h3>
 		<p>
 		[page:Quaternion q] - 归一化的四元数。<br />
 		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br />
@@ -119,7 +124,7 @@
 		</p>
 
 
-		<h3>[method:Euler setFromVector3]( [param:Vector3 vector], [param:String order] )</h3>
+		<h3>[method:this setFromVector3]( [param:Vector3 vector], [param:String order] )</h3>
 		<p>
 		[page:Vector3 vector] - [page:Vector3].<br />
 		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br /><br />

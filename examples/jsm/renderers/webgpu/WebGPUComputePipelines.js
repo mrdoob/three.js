@@ -1,56 +1,55 @@
+import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
+
 class WebGPUComputePipelines {
 
-	constructor( device, glslang ) {
+	constructor( device, nodes ) {
 
 		this.device = device;
-		this.glslang = glslang;
+		this.nodes = nodes;
 
 		this.pipelines = new WeakMap();
-		this.shaderModules = {
+		this.stages = {
 			compute: new WeakMap()
 		};
 
 	}
 
-	get( param ) {
+	get( computeNode ) {
 
-		let pipeline = this.pipelines.get( param );
+		let pipeline = this.pipelines.get( computeNode );
+
+		// @TODO: Reuse compute pipeline if possible, introduce WebGPUComputePipeline
 
 		if ( pipeline === undefined ) {
 
 			const device = this.device;
+
+			// get shader
+
+			const nodeBuilder = this.nodes.get( computeNode );
+			const computeShader = nodeBuilder.computeShader;
+
 			const shader = {
-				computeShader: param.shader
+				computeShader
 			};
 
-			// shader modules
+			// programmable stage
 
-			const glslang = this.glslang;
+			let stageCompute = this.stages.compute.get( shader );
 
-			let moduleCompute = this.shaderModules.compute.get( shader );
+			if ( stageCompute === undefined ) {
 
-			if ( moduleCompute === undefined ) {
+ 				stageCompute = new WebGPUProgrammableStage( device, computeShader, 'compute' );
 
-				const byteCodeCompute = glslang.compileGLSL( shader.computeShader, 'compute' );
-
-				moduleCompute = device.createShaderModule( { code: byteCodeCompute } );
-
-				this.shaderModules.compute.set( shader, moduleCompute );
+				this.stages.compute.set( shader, stageCompute );
 
 			}
 
-			//
-
-			const computeStage = {
-				module: moduleCompute,
-				entryPoint: 'main'
-			};
-
 			pipeline = device.createComputePipeline( {
-				computeStage: computeStage
+				compute: stageCompute.stage
 			} );
 
-			this.pipelines.set( param, pipeline );
+			this.pipelines.set( computeNode, pipeline );
 
 		}
 
@@ -61,7 +60,7 @@ class WebGPUComputePipelines {
 	dispose() {
 
 		this.pipelines = new WeakMap();
-		this.shaderModules = {
+		this.stages = {
 			compute: new WeakMap()
 		};
 

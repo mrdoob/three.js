@@ -1,29 +1,20 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
-import {
-	FrontSide, BackSide, DoubleSide,
-	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
-	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc,
-	KeepStencilOp, ZeroStencilOp, ReplaceStencilOp, InvertStencilOp, IncrementStencilOp, DecrementStencilOp, IncrementWrapStencilOp, DecrementWrapStencilOp,
-	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
-	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
-	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
-} from '../../../../build/three.module.js';
+import WebGPURenderPipeline from './WebGPURenderPipeline.js';
+import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
 
 class WebGPURenderPipelines {
 
-	constructor( renderer, properties, device, glslang, sampleCount, nodes ) {
+	constructor( renderer, device, sampleCount, nodes, bindings = null ) {
 
 		this.renderer = renderer;
-		this.properties = properties;
 		this.device = device;
-		this.glslang = glslang;
 		this.sampleCount = sampleCount;
 		this.nodes = nodes;
+		this.bindings = bindings;
 
-		this.pipelines = new WeakMap();
-		this.shaderAttributes = new WeakMap();
+		this.pipelines = [];
+		this.objectCache = new WeakMap();
 
-		this.shaderModules = {
+		this.stages = {
 			vertex: new Map(),
 			fragment: new Map()
 		};
@@ -32,197 +23,77 @@ class WebGPURenderPipelines {
 
 	get( object ) {
 
-		// @TODO: Avoid a 1:1 relationship between pipelines and objects. It's necessary
-		// to check various conditions in order to request an appropriate pipeline.
-		//
-		// - material's version and node configuration
-		// - environment map (material)
-		// - fog and environment (scene)
-		// - output encoding (renderer)
-		// - light state
-		// - clipping planes
-		//
-		// The renderer needs to manage multiple pipelines per object so
-		// GPUDevice.createRenderPipeline() is only called when no pipeline exists for the
-		// current configuration.
+		const device = this.device;
 
-		let pipeline = this.pipelines.get( object );
+		const cache = this._getCache( object );
 
-		if ( pipeline === undefined ) {
+		let currentPipeline;
 
-			const device = this.device;
-			const properties = this.properties;
+		if ( this._needsUpdate( object, cache ) ) {
 
 			const material = object.material;
+
+			// release previous cache
+
+			if ( cache.currentPipeline !== undefined ) {
+
+				this._releaseObject( object );
+
+			}
 
 			// get shader
 
 			const nodeBuilder = this.nodes.get( object );
 
-			// shader modules
+			// programmable stages
 
-			const glslang = this.glslang;
+			let stageVertex = this.stages.vertex.get( nodeBuilder.vertexShader );
 
-			let moduleVertex = this.shaderModules.vertex.get( nodeBuilder.vertexShader );
+			if ( stageVertex === undefined ) {
 
-			if ( moduleVertex === undefined ) {
-
-				const byteCodeVertex = glslang.compileGLSL( nodeBuilder.vertexShader, 'vertex' );
-
-				moduleVertex = {
-					module: device.createShaderModule( { code: byteCodeVertex } ),
-					entryPoint: 'main'
-				};
-
-				this.shaderModules.vertex.set( nodeBuilder.vertexShader, moduleVertex );
+				stageVertex = new WebGPUProgrammableStage( device, nodeBuilder.vertexShader, 'vertex' );
+				this.stages.vertex.set( nodeBuilder.vertexShader, stageVertex );
 
 			}
 
-			let moduleFragment = this.shaderModules.fragment.get( nodeBuilder.fragmentShader );
+			let stageFragment = this.stages.fragment.get( nodeBuilder.fragmentShader );
 
-			if ( moduleFragment === undefined ) {
+			if ( stageFragment === undefined ) {
 
-				const byteCodeFragment = glslang.compileGLSL( nodeBuilder.fragmentShader, 'fragment' );
-
-				moduleFragment = {
-					module: device.createShaderModule( { code: byteCodeFragment } ),
-					entryPoint: 'main'
-				};
-
-				this.shaderModules.fragment.set( nodeBuilder.fragmentShader, moduleFragment );
+				stageFragment = new WebGPUProgrammableStage( device, nodeBuilder.fragmentShader, 'fragment' );
+				this.stages.fragment.set( nodeBuilder.fragmentShader, stageFragment );
 
 			}
 
-			// dispose material
+			// determine render pipeline
 
-			const materialProperties = properties.get( material );
+			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, object, nodeBuilder );
+			cache.currentPipeline = currentPipeline;
 
-			if ( materialProperties.disposeCallback === undefined ) {
+			// keep track of all used times
 
-				const disposeCallback = onMaterialDispose.bind( this );
-				materialProperties.disposeCallback = disposeCallback;
+			currentPipeline.usedTimes ++;
+			stageVertex.usedTimes ++;
+			stageFragment.usedTimes ++;
 
-				material.addEventListener( 'dispose', disposeCallback );
+			// events
 
-			}
+			material.addEventListener( 'dispose', cache.dispose );
 
-			// determine shader attributes
+		} else {
 
-			const shaderAttributes = this._parseShaderAttributes( nodeBuilder.vertexShader );
-
-			// vertex buffers
-
-			const vertexBuffers = [];
-			const geometry = object.geometry;
-
-			for ( const attribute of shaderAttributes ) {
-
-				const name = attribute.name;
-				const geometryAttribute = geometry.getAttribute( name );
-				const stepMode = ( geometryAttribute !== undefined && geometryAttribute.isInstancedBufferAttribute ) ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
-
-				vertexBuffers.push( {
-					arrayStride: attribute.arrayStride,
-					attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ],
-					stepMode: stepMode
-				} );
-
-			}
-
-			//
-
-			let indexFormat;
-
-			if ( object.isLine ) {
-
-				const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
-
-				indexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
-
-			}
-
-			//
-
-			let alphaBlend = {};
-			let colorBlend = {};
-
-			if ( material.transparent === true && material.blending !== NoBlending ) {
-
-				alphaBlend = this._getAlphaBlend( material );
-				colorBlend = this._getColorBlend( material );
-
-			}
-
-			//
-
-			let stencilFront = {};
-
-			if ( material.stencilWrite === true ) {
-
-				stencilFront = {
-					compare: this._getStencilCompare( material ),
-					failOp: this._getStencilOperation( material.stencilFail ),
-					depthFailOp: this._getStencilOperation( material.stencilZFail ),
-					passOp: this._getStencilOperation( material.stencilZPass )
-				};
-
-			}
-
-			// pipeline
-
-			const primitiveTopology = this._getPrimitiveTopology( object );
-			const rasterizationState = this._getRasterizationStateDescriptor( material );
-			const colorWriteMask = this._getColorWriteMask( material );
-			const depthCompare = this._getDepthCompare( material );
-			const colorFormat = this._getColorFormat( this.renderer );
-			const depthStencilFormat = this._getDepthStencilFormat( this.renderer );
-
-			pipeline = device.createRenderPipeline( {
-				vertexStage: moduleVertex,
-				fragmentStage: moduleFragment,
-				primitiveTopology: primitiveTopology,
-				rasterizationState: rasterizationState,
-				colorStates: [ {
-					format: colorFormat,
-					alphaBlend: alphaBlend,
-					colorBlend: colorBlend,
-					writeMask: colorWriteMask
-				} ],
-				depthStencilState: {
-					format: depthStencilFormat,
-					depthWriteEnabled: material.depthWrite,
-					depthCompare: depthCompare,
-					stencilFront: stencilFront,
-					stencilBack: {}, // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
-					stencilReadMask: material.stencilFuncMask,
-					stencilWriteMask: material.stencilWriteMask
-				},
-				vertexState: {
-					indexFormat: indexFormat,
-					vertexBuffers: vertexBuffers
-				},
-				sampleCount: this.sampleCount
-			} );
-
-			this.pipelines.set( object, pipeline );
-			this.shaderAttributes.set( pipeline, shaderAttributes );
+			currentPipeline = cache.currentPipeline;
 
 		}
 
-		return pipeline;
-
-	}
-
-	getShaderAttributes( pipeline ) {
-
-		return this.shaderAttributes.get( pipeline );
+		return currentPipeline;
 
 	}
 
 	dispose() {
 
-		this.pipelines = new WeakMap();
-		this.shaderAttributes = new WeakMap();
+		this.pipelines = [];
+		this.objectCache = new WeakMap();
 		this.shaderModules = {
 			vertex: new Map(),
 			fragment: new Map()
@@ -230,577 +101,193 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getArrayStride( type ) {
+	_acquirePipeline( stageVertex, stageFragment, object, nodeBuilder ) {
 
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
+		let pipeline;
+		const pipelines = this.pipelines;
 
-		if ( type === 'float' ) return 4;
-		if ( type === 'vec2' ) return 8;
-		if ( type === 'vec3' ) return 12;
-		if ( type === 'vec4' ) return 16;
+		// check for existing pipeline
 
-		if ( type === 'int' ) return 4;
-		if ( type === 'ivec2' ) return 8;
-		if ( type === 'ivec3' ) return 12;
-		if ( type === 'ivec4' ) return 16;
+		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object );
 
-		if ( type === 'uint' ) return 4;
-		if ( type === 'uvec2' ) return 8;
-		if ( type === 'uvec3' ) return 12;
-		if ( type === 'uvec4' ) return 16;
+		for ( let i = 0, il = pipelines.length; i < il; i ++ ) {
 
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
+			const preexistingPipeline = pipelines[ i ];
 
-	}
+			if ( preexistingPipeline.cacheKey === cacheKey ) {
 
-	_getAlphaBlend( material ) {
-
-		const blending = material.blending;
-		const premultipliedAlpha = material.premultipliedAlpha;
-
-		let alphaBlend = undefined;
-
-		switch ( blending ) {
-
-			case NormalBlending:
-
-				if ( premultipliedAlpha === false ) {
-
-					alphaBlend = {
-						srcFactor: GPUBlendFactor.One,
-						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
-						operation: GPUBlendOperation.Add
-					};
-
-				}
-
+				pipeline = preexistingPipeline;
 				break;
-
-			case AdditiveBlending:
-				// no alphaBlend settings
-				break;
-
-			case SubtractiveBlending:
-
-				if ( premultipliedAlpha === true ) {
-
-					alphaBlend = {
-						srcFactor: GPUBlendFactor.OneMinusSrcColor,
-						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
-						operation: GPUBlendOperation.Add
-					};
-
-				}
-
-				break;
-
-			case MultiplyBlending:
-				if ( premultipliedAlpha === true ) {
-
-					alphaBlend = {
-						srcFactor: GPUBlendFactor.Zero,
-						dstFactor: GPUBlendFactor.SrcAlpha,
-						operation: GPUBlendOperation.Add
-					};
-
-				}
-
-				break;
-
-			case CustomBlending:
-
-				const blendSrcAlpha = material.blendSrcAlpha;
-				const blendDstAlpha = material.blendDstAlpha;
-				const blendEquationAlpha = material.blendEquationAlpha;
-
-				if ( blendSrcAlpha !== null && blendDstAlpha !== null && blendEquationAlpha !== null ) {
-
-					alphaBlend = {
-						srcFactor: this._getBlendFactor( blendSrcAlpha ),
-						dstFactor: this._getBlendFactor( blendDstAlpha ),
-						operation: this._getBlendOperation( blendEquationAlpha )
-					};
-
-				}
-
-				break;
-
-			default:
-				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
-
-		}
-
-		return alphaBlend;
-
-	}
-
-	_getBlendFactor( blend ) {
-
-		let blendFactor;
-
-		switch ( blend ) {
-
-			case ZeroFactor:
-				blendFactor = GPUBlendFactor.Zero;
-				break;
-
-			case OneFactor:
-				blendFactor = GPUBlendFactor.One;
-				break;
-
-			case SrcColorFactor:
-				blendFactor = GPUBlendFactor.SrcColor;
-				break;
-
-			case OneMinusSrcColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusSrcColor;
-				break;
-
-			case SrcAlphaFactor:
-				blendFactor = GPUBlendFactor.SrcAlpha;
-				break;
-
-			case OneMinusSrcAlphaFactor:
-				blendFactor = GPUBlendFactor.OneMinusSrcAlpha;
-				break;
-
-			case DstColorFactor:
-				blendFactor = GPUBlendFactor.DstColor;
-				break;
-
-			case OneMinusDstColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusDstColor;
-				break;
-
-			case DstAlphaFactor:
-				blendFactor = GPUBlendFactor.DstAlpha;
-				break;
-
-			case OneMinusDstAlphaFactor:
-				blendFactor = GPUBlendFactor.OneMinusDstAlpha;
-				break;
-
-			case SrcAlphaSaturateFactor:
-				blendFactor = GPUBlendFactor.SrcAlphaSaturated;
-				break;
-
-			case BlendColorFactor:
-				blendFactor = GPUBlendFactor.BlendColor;
-				break;
-
-			case OneMinusBlendColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusBlendColor;
-				break;
-
-
-			default:
-				console.error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
-
-		}
-
-		return blendFactor;
-
-	}
-
-	_getBlendOperation( blendEquation ) {
-
-		let blendOperation;
-
-		switch ( blendEquation ) {
-
-			case AddEquation:
-				blendOperation = GPUBlendOperation.Add;
-				break;
-
-			case SubtractEquation:
-				blendOperation = GPUBlendOperation.Subtract;
-				break;
-
-			case ReverseSubtractEquation:
-				blendOperation = GPUBlendOperation.ReverseSubtract;
-				break;
-
-			case MinEquation:
-				blendOperation = GPUBlendOperation.Min;
-				break;
-
-			case MaxEquation:
-				blendOperation = GPUBlendOperation.Max;
-				break;
-
-			default:
-				console.error( 'THREE.WebGPURenderer: Blend equation not supported.', blendEquation );
-
-		}
-
-		return blendOperation;
-
-	}
-
-	_getColorBlend( material ) {
-
-		const blending = material.blending;
-		const premultipliedAlpha = material.premultipliedAlpha;
-
-		const colorBlend = {
-			srcFactor: null,
-			dstFactor: null,
-			operation: null
-		};
-
-		switch ( blending ) {
-
-			case NormalBlending:
-
-				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
-				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case AdditiveBlending:
-				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case SubtractiveBlending:
-				colorBlend.srcFactor = GPUBlendFactor.Zero;
-				colorBlend.dstFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.Zero : GPUBlendFactor.OneMinusSrcColor;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case MultiplyBlending:
-				colorBlend.srcFactor = GPUBlendFactor.Zero;
-				colorBlend.dstFactor = GPUBlendFactor.SrcColor;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case CustomBlending:
-				colorBlend.srcFactor = this._getBlendFactor( material.blendSrc );
-				colorBlend.dstFactor = this._getBlendFactor( material.blendDst );
-				colorBlend.operation = this._getBlendOperation( material.blendEquation );
-				break;
-
-			default:
-				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
-
-		}
-
-		return colorBlend;
-
-	}
-
-	_getColorFormat( renderer ) {
-
-		let format;
-
-		const renderTarget = renderer.getRenderTarget();
-
-		if ( renderTarget !== null ) {
-
-			const renderTargetProperties = this.properties.get( renderTarget );
-			format = renderTargetProperties.colorTextureFormat;
-
-		} else {
-
-			format = GPUTextureFormat.BRGA8Unorm; // default swap chain format
-
-		}
-
-		return format;
-
-	}
-
-	_getColorWriteMask( material ) {
-
-		return ( material.colorWrite === true ) ? GPUColorWriteFlags.All : GPUColorWriteFlags.None;
-
-	}
-
-	_getDepthCompare( material ) {
-
-		let depthCompare;
-
-		if ( material.depthTest === false ) {
-
-			depthCompare = GPUCompareFunction.Always;
-
-		} else {
-
-			const depthFunc = material.depthFunc;
-
-			switch ( depthFunc ) {
-
-				case NeverDepth:
-					depthCompare = GPUCompareFunction.Never;
-					break;
-
-				case AlwaysDepth:
-					depthCompare = GPUCompareFunction.Always;
-					break;
-
-				case LessDepth:
-					depthCompare = GPUCompareFunction.Less;
-					break;
-
-				case LessEqualDepth:
-					depthCompare = GPUCompareFunction.LessEqual;
-					break;
-
-				case EqualDepth:
-					depthCompare = GPUCompareFunction.Equal;
-					break;
-
-				case GreaterEqualDepth:
-					depthCompare = GPUCompareFunction.GreaterEqual;
-					break;
-
-				case GreaterDepth:
-					depthCompare = GPUCompareFunction.Greater;
-					break;
-
-				case NotEqualDepth:
-					depthCompare = GPUCompareFunction.NotEqual;
-					break;
-
-				default:
-					console.error( 'THREE.WebGPURenderer: Invalid depth function.', depthFunc );
 
 			}
 
 		}
 
-		return depthCompare;
+		if ( pipeline === undefined ) {
 
-	}
+			pipeline = new WebGPURenderPipeline( this.device, this.renderer, this.sampleCount );
+			pipeline.init( cacheKey, stageVertex, stageFragment, object, nodeBuilder );
 
-	_getDepthStencilFormat( renderer ) {
-
-		let format;
-
-		const renderTarget = renderer.getRenderTarget();
-
-		if ( renderTarget !== null ) {
-
-			const renderTargetProperties = this.properties.get( renderTarget );
-			format = renderTargetProperties.depthTextureFormat;
-
-		} else {
-
-			format = GPUTextureFormat.Depth24PlusStencil8;
+			pipelines.push( pipeline );
 
 		}
 
-		return format;
+		return pipeline;
 
 	}
 
-	_getPrimitiveTopology( object ) {
+	_computeCacheKey( stageVertex, stageFragment, object ) {
 
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
+		const material = object.material;
+		const renderer = this.renderer;
+
+		const parameters = [
+			stageVertex.id, stageFragment.id,
+			material.transparent, material.blending, material.premultipliedAlpha,
+			material.blendSrc, material.blendDst, material.blendEquation,
+			material.blendSrcAlpha, material.blendDstAlpha, material.blendEquationAlpha,
+			material.colorWrite,
+			material.depthWrite, material.depthTest, material.depthFunc,
+			material.stencilWrite, material.stencilFunc,
+			material.stencilFail, material.stencilZFail, material.stencilZPass,
+			material.stencilFuncMask, material.stencilWriteMask,
+			material.side,
+			this.sampleCount,
+			renderer.getCurrentEncoding(), renderer.getCurrentColorFormat(), renderer.getCurrentDepthStencilFormat()
+		];
+
+		return parameters.join();
 
 	}
 
-	_getRasterizationStateDescriptor( material ) {
+	_getCache( object ) {
 
-		const descriptor = {};
+		let cache = this.objectCache.get( object );
 
-		switch ( material.side ) {
+		if ( cache === undefined ) {
 
-			case FrontSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.Back;
-				break;
+			cache = {
 
-			case BackSide:
-				descriptor.frontFace = GPUFrontFace.CW;
-				descriptor.cullMode = GPUCullMode.Back;
-				break;
+				dispose: () => {
 
-			case DoubleSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.None;
-				break;
+					this._releaseObject( object );
 
-			default:
-				console.error( 'THREE.WebGPURenderer: Unknown Material.side value.', material.side );
-				break;
+					this.objectCache.delete( object );
+
+					object.material.removeEventListener( 'dispose', cache.dispose );
+
+				}
+
+			};
+
+			this.objectCache.set( object, cache );
 
 		}
 
-		return descriptor;
+		return cache;
 
 	}
 
-	_getStencilCompare( material ) {
+	_releaseObject( object ) {
 
-		let stencilCompare;
+		const cache = this.objectCache.get( object );
 
-		const stencilFunc = material.stencilFunc;
+		this._releasePipeline( cache.currentPipeline );
+		delete cache.currentPipeline;
 
-		switch ( stencilFunc ) {
+		this.nodes.remove( object );
+		this.bindings.remove( object );
 
-			case NeverStencilFunc:
-				stencilCompare = GPUCompareFunction.Never;
-				break;
+	}
 
-			case AlwaysStencilFunc:
-				stencilCompare = GPUCompareFunction.Always;
-				break;
+	_releasePipeline( pipeline ) {
 
-			case LessStencilFunc:
-				stencilCompare = GPUCompareFunction.Less;
-				break;
+		if ( -- pipeline.usedTimes === 0 ) {
 
-			case LessEqualStencilFunc:
-				stencilCompare = GPUCompareFunction.LessEqual;
-				break;
+			const pipelines = this.pipelines;
 
-			case EqualStencilFunc:
-				stencilCompare = GPUCompareFunction.Equal;
-				break;
+			const i = pipelines.indexOf( pipeline );
+			pipelines[ i ] = pipelines[ pipelines.length - 1 ];
+			pipelines.pop();
 
-			case GreaterEqualStencilFunc:
-				stencilCompare = GPUCompareFunction.GreaterEqual;
-				break;
-
-			case GreaterStencilFunc:
-				stencilCompare = GPUCompareFunction.Greater;
-				break;
-
-			case NotEqualStencilFunc:
-				stencilCompare = GPUCompareFunction.NotEqual;
-				break;
-
-			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil function.', stencilFunc );
+			this._releaseStage( pipeline.stageVertex );
+			this._releaseStage( pipeline.stageFragment );
 
 		}
 
-		return stencilCompare;
-
 	}
 
-	_getStencilOperation( op ) {
+	_releaseStage( stage ) {
 
-		let stencilOperation;
+		if ( -- stage.usedTimes === 0 ) {
 
-		switch ( op ) {
+			const code = stage.code;
+			const type = stage.type;
 
-			case KeepStencilOp:
-				stencilOperation = GPUStencilOperation.Keep;
-				break;
-
-			case ZeroStencilOp:
-				stencilOperation = GPUStencilOperation.Zero;
-				break;
-
-			case ReplaceStencilOp:
-				stencilOperation = GPUStencilOperation.Replace;
-				break;
-
-			case InvertStencilOp:
-				stencilOperation = GPUStencilOperation.Invert;
-				break;
-
-			case IncrementStencilOp:
-				stencilOperation = GPUStencilOperation.IncrementClamp;
-				break;
-
-			case DecrementStencilOp:
-				stencilOperation = GPUStencilOperation.DecrementClamp;
-				break;
-
-			case IncrementWrapStencilOp:
-				stencilOperation = GPUStencilOperation.IncrementWrap;
-				break;
-
-			case DecrementWrapStencilOp:
-				stencilOperation = GPUStencilOperation.DecrementWrap;
-				break;
-
-			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil operation.', stencilOperation );
+			this.stages[ type ].delete( code );
 
 		}
 
-		return stencilOperation;
-
 	}
 
-	_getVertexFormat( type ) {
+	_needsUpdate( object, cache ) {
 
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
+		const material = object.material;
 
-		if ( type === 'float' ) return GPUVertexFormat.Float;
-		if ( type === 'vec2' ) return GPUVertexFormat.Float2;
-		if ( type === 'vec3' ) return GPUVertexFormat.Float3;
-		if ( type === 'vec4' ) return GPUVertexFormat.Float4;
+		let needsUpdate = false;
 
-		if ( type === 'int' ) return GPUVertexFormat.Int;
-		if ( type === 'ivec2' ) return GPUVertexFormat.Int2;
-		if ( type === 'ivec3' ) return GPUVertexFormat.Int3;
-		if ( type === 'ivec4' ) return GPUVertexFormat.Int4;
+		// check material state
 
-		if ( type === 'uint' ) return GPUVertexFormat.UInt;
-		if ( type === 'uvec2' ) return GPUVertexFormat.UInt2;
-		if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
-		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
+		if ( cache.material !== material || cache.materialVersion !== material.version ||
+			cache.transparent !== material.transparent || cache.blending !== material.blending || cache.premultipliedAlpha !== material.premultipliedAlpha ||
+			cache.blendSrc !== material.blendSrc || cache.blendDst !== material.blendDst || cache.blendEquation !== material.blendEquation ||
+			cache.blendSrcAlpha !== material.blendSrcAlpha || cache.blendDstAlpha !== material.blendDstAlpha || cache.blendEquationAlpha !== material.blendEquationAlpha ||
+			cache.colorWrite !== material.colorWrite ||
+			cache.depthWrite !== material.depthWrite || cache.depthTest !== material.depthTest || cache.depthFunc !== material.depthFunc ||
+			cache.stencilWrite !== material.stencilWrite || cache.stencilFunc !== material.stencilFunc ||
+			cache.stencilFail !== material.stencilFail || cache.stencilZFail !== material.stencilZFail || cache.stencilZPass !== material.stencilZPass ||
+			cache.stencilFuncMask !== material.stencilFuncMask || cache.stencilWriteMask !== material.stencilWriteMask ||
+			cache.side !== material.side
+		) {
 
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
+			cache.material = material; cache.materialVersion = material.version;
+			cache.transparent = material.transparent; cache.blending = material.blending; cache.premultipliedAlpha = material.premultipliedAlpha;
+			cache.blendSrc = material.blendSrc; cache.blendDst = material.blendDst; cache.blendEquation = material.blendEquation;
+			cache.blendSrcAlpha = material.blendSrcAlpha; cache.blendDstAlpha = material.blendDstAlpha; cache.blendEquationAlpha = material.blendEquationAlpha;
+			cache.colorWrite = material.colorWrite;
+			cache.depthWrite = material.depthWrite; cache.depthTest = material.depthTest; cache.depthFunc = material.depthFunc;
+			cache.stencilWrite = material.stencilWrite; cache.stencilFunc = material.stencilFunc;
+			cache.stencilFail = material.stencilFail; cache.stencilZFail = material.stencilZFail; cache.stencilZPass = material.stencilZPass;
+			cache.stencilFuncMask = material.stencilFuncMask; cache.stencilWriteMask = material.stencilWriteMask;
+			cache.side = material.side;
 
-	}
-
-	_parseShaderAttributes( shader ) {
-
-		// find "layout (location = num) in type name" in vertex shader
-
-		const regex = /\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
-		let shaderAttribute = null;
-
-		const attributes = [];
-
-		while ( shaderAttribute = regex.exec( shader ) ) {
-
-			const shaderLocation = parseInt( shaderAttribute.groups.location );
-			const arrayStride = this._getArrayStride( shaderAttribute.groups.type );
-			const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type );
-
-			attributes.push( {
-				name: shaderAttribute.groups.name,
-				arrayStride: arrayStride,
-				slot: shaderLocation,
-				format: vertexFormat
-			} );
+			needsUpdate = true;
 
 		}
 
-		// the sort ensures to setup vertex buffers in the correct order
+		// check renderer state
 
-		return attributes.sort( function ( a, b ) {
+		const renderer = this.renderer;
 
-			return a.slot - b.slot;
+		const encoding = renderer.getCurrentEncoding();
+		const colorFormat = renderer.getCurrentColorFormat();
+		const depthStencilFormat = renderer.getCurrentDepthStencilFormat();
 
-		} );
+		if ( cache.sampleCount !== this.sampleCount || cache.encoding !== encoding ||
+			cache.colorFormat !== colorFormat || cache.depthStencilFormat !== depthStencilFormat ) {
+
+			cache.sampleCount = this.sampleCount;
+			cache.encoding = encoding;
+			cache.colorFormat = colorFormat;
+			cache.depthStencilFormat = depthStencilFormat;
+
+			needsUpdate = true;
+
+		}
+
+		return needsUpdate;
 
 	}
-
-}
-
-function onMaterialDispose( event ) {
-
-	const properties = this.properties;
-
-	const material = event.target;
-	const materialProperties = properties.get( material );
-
-	material.removeEventListener( 'dispose', materialProperties.disposeCallback );
-
-	properties.remove( material );
-
-	// @TODO: still needed remove nodes, bindings and pipeline
 
 }
 

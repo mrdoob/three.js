@@ -11,12 +11,24 @@
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - VSM Shadows example by <a href="https://github.com/supereggbert">Paul Brunt</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -36,21 +48,39 @@
 				const gui = new GUI();
 
 				const config = {
-					'Spotlight Radius': 4,
-					'Directional light Radius': 4,
+					spotlightRadius: 4,
+					spotlightSamples: 8,
+					dirlightRadius: 4,
+					dirlightSamples: 8
 				};
 
-				gui.add( config, 'Spotlight Radius' ).min( 2 ).max( 8 ).onChange( function ( value ) {
+				const spotlightFolder = gui.addFolder( 'Spotlight' );
+				spotlightFolder.add( config, 'spotlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
 
 					spotLight.shadow.radius = value;
 
 				} );
 
-				gui.add( config, 'Directional light Radius' ).min( 2 ).max( 8 ).onChange( function ( value ) {
+				spotlightFolder.add( config, 'spotlightSamples', 1, 25, 1 ).name( 'samples' ).onChange( function ( value ) {
+
+					spotLight.shadow.blurSamples = value;
+
+				} );
+				spotlightFolder.open();
+
+				const dirlightFolder = gui.addFolder( 'Directional Light' );
+				dirlightFolder.add( config, 'dirlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
 
 					dirLight.shadow.radius = value;
 
 				} );
+
+				dirlightFolder.add( config, 'dirlightSamples', 1, 25, 1 ).name( 'samples' ).onChange( function ( value ) {
+
+					dirLight.shadow.blurSamples = value;
+
+				} );
+				dirlightFolder.open();
 
 				document.body.appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize );
@@ -63,14 +93,14 @@
 				camera.position.set( 0, 10, 30 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xCCCCCC, 50, 100 );
+				scene.background = new THREE.Color( 0x222244 );
+				scene.fog = new THREE.Fog( 0x222244, 50, 100 );
 
 				// Lights
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				spotLight = new THREE.SpotLight( 0x888888 );
-				spotLight.name = 'Spot Light';
+				spotLight = new THREE.SpotLight( 0xff8888 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
 				spotLight.position.set( 8, 10, 5 );
@@ -84,8 +114,7 @@
 				scene.add( spotLight );
 
 
-				dirLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
-				dirLight.name = 'Dir. Light';
+				dirLight = new THREE.DirectionalLight( 0x8888ff );
 				dirLight.position.set( 3, 12, 17 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 0.1;
@@ -98,7 +127,6 @@
 				dirLight.shadow.mapSize.height = 512;
 				dirLight.shadow.radius = 4;
 				dirLight.shadow.bias = - 0.0005;
-				scene.add( dirLight );
 
 				dirGroup = new THREE.Group();
 				dirGroup.add( dirLight );
@@ -123,16 +151,16 @@
 				const cylinderGeometry = new THREE.CylinderGeometry( 0.75, 0.75, 7, 32 );
 
 				const pillar1 = new THREE.Mesh( cylinderGeometry, material );
-				pillar1.position.set( 10, 3.5, 10 );
+				pillar1.position.set( 8, 3.5, 8 );
 				pillar1.castShadow = true;
 				pillar1.receiveShadow = true;
 
 				const pillar2 = pillar1.clone();
-				pillar2.position.set( 10, 3.5, - 10 );
+				pillar2.position.set( 8, 3.5, - 8 );
 				const pillar3 = pillar1.clone();
-				pillar3.position.set( - 10, 3.5, 10 );
+				pillar3.position.set( - 8, 3.5, 8 );
 				const pillar4 = pillar1.clone();
-				pillar4.position.set( - 10, 3.5, - 10 );
+				pillar4.position.set( - 8, 3.5, - 8 );
 
 				scene.add( pillar1 );
 				scene.add( pillar2 );
@@ -163,8 +191,6 @@
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.VSMShadowMap;
 
-				renderer.setClearColor( 0xCCCCCC, 1 );
-
 				// Mouse control
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
@@ -186,34 +212,22 @@
 
 			}
 
-			function animate() {
+			function animate( time ) {
 
 				requestAnimationFrame( animate );
-				render();
-
-				stats.update();
-
-			}
-
-			function renderScene() {
-
-				renderer.render( scene, camera );
-
-			}
-
-			function render() {
 
 				const delta = clock.getDelta();
-				const time = clock.elapsedTime;
-
-				renderScene();
 
 				torusKnot.rotation.x += 0.25 * delta;
-				torusKnot.rotation.y += 2 * delta;
+				torusKnot.rotation.y += 0.5 * delta;
 				torusKnot.rotation.z += 1 * delta;
 
 				dirGroup.rotation.y += 0.7 * delta;
 				dirLight.position.z = 17 + Math.sin( time * 0.001 ) * 5;
+
+				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

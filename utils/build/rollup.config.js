@@ -1,8 +1,8 @@
 import babel from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
+import babelrc from './.babelrc.json';
 
-function glconstants() {
+export function glconstants() {
 
 	var constants = {
 		POINTS: 0, ZERO: 0, NONE: 0,
@@ -39,7 +39,9 @@ function glconstants() {
 		CULL_FACE: 2884,
 		DEPTH_TEST: 2929,
 		STENCIL_TEST: 2960,
+		VIEWPORT: 2978,
 		BLEND: 3042,
+		SCISSOR_BOX: 3088,
 		SCISSOR_TEST: 3089,
 		UNPACK_ALIGNMENT: 3317,
 		MAX_TEXTURE_SIZE: 3379,
@@ -90,6 +92,7 @@ function glconstants() {
 		POLYGON_OFFSET_FILL: 32823,
 		RGB8: 32849,
 		RGBA4: 32854,
+		RGB5_A1: 32855,
 		RGBA8: 32856,
 		TEXTURE_3D: 32879,
 		CLAMP_TO_EDGE: 33071,
@@ -98,8 +101,11 @@ function glconstants() {
 		DEPTH_COMPONENT32F: 36012,
 		DEPTH_STENCIL_ATTACHMENT: 33306,
 		R8: 33321,
+		RG8: 33323,
 		R16F: 33325,
 		R32F: 33326,
+		RG16F: 33327,
+		RG32F: 33328,
 		UNSIGNED_SHORT_5_6_5: 33635,
 		MIRRORED_REPEAT: 33648,
 		TEXTURE0: 33984,
@@ -123,6 +129,9 @@ function glconstants() {
 		FRAGMENT_SHADER: 35632,
 		MAX_VERTEX_TEXTURE_IMAGE_UNITS: 35660,
 		MAX_COMBINED_TEXTURE_IMAGE_UNITS: 35661,
+		FLOAT_MAT2: 35674,
+		FLOAT_MAT3: 35675,
+		FLOAT_MAT4: 35676,
 		COMPILE_STATUS: 35713,
 		LINK_STATUS: 35714,
 		VALIDATE_STATUS: 35715,
@@ -152,7 +161,10 @@ function glconstants() {
 		UNPACK_SKIP_IMAGES: 32877,
 		MAX_SAMPLES: 36183,
 		READ_FRAMEBUFFER: 36008,
-		DRAW_FRAMEBUFFER: 36009
+		DRAW_FRAMEBUFFER: 36009,
+		SAMPLE_ALPHA_TO_COVERAGE: 32926,
+		SRGB8: 35905,
+		SRGB8_ALPHA8: 35907
 	};
 
 	return {
@@ -199,7 +211,7 @@ function addons() {
 
 }
 
-function glsl() {
+export function glsl() {
 
 	return {
 
@@ -207,7 +219,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.|\r|\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -258,7 +270,12 @@ function header() {
 
 		renderChunk( code ) {
 
-			return '// threejs.org/license\n' + code;
+			return `/**
+ * @license
+ * Copyright 2010-2022 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+${ code }`;
 
 		}
 
@@ -266,53 +283,26 @@ function header() {
 
 }
 
-function polyfills() {
-
-	return {
-
-		transform( code, filePath ) {
-
-			if ( filePath.endsWith( 'src/Three.js' ) || filePath.endsWith( 'src\\Three.js' ) ) {
-
-				code = 'import \'regenerator-runtime\';\n' + code;
-
-			}
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
-const babelrc = {
-	presets: [
-		[
-			'@babel/preset-env',
-			{
-				modules: false,
-				// the supported browsers of the three.js browser bundle
-				// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
-				targets: '>0.3%, not dead',
-				loose: true,
-				bugfixes: true,
-			}
-		]
-	]
-};
-
-export default [
+let builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
 			addons(),
 			glconstants(),
+			glsl(),
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
 			glsl(),
 			babel( {
 				babelHelpers: 'bundled',
@@ -329,14 +319,18 @@ export default [
 				name: 'THREE',
 				file: 'build/three.js',
 				indent: '\t'
+			},
+			{
+				format: 'cjs',
+				name: 'THREE',
+				file: 'build/three.cjs',
+				indent: '\t'
 			}
 		]
 	},
 	{
 		input: 'src/Three.js',
 		plugins: [
-			polyfills(),
-			nodeResolve(),
 			addons(),
 			glconstants(),
 			glsl(),
@@ -356,20 +350,14 @@ export default [
 				file: 'build/three.min.js'
 			}
 		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glconstants(),
-			glsl(),
-			header()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.module.js'
-			}
-		]
 	}
 ];
+
+
+if ( process.env.ONLY_MODULE === 'true' ) {
+
+	builds = builds[ 0 ];
+
+}
+
+export default builds;

@@ -2,7 +2,7 @@ import {
 	Matrix3,
 	Matrix4,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import { VolumeSlice } from '../misc/VolumeSlice.js';
 
 /**
@@ -17,7 +17,7 @@ import { VolumeSlice } from '../misc/VolumeSlice.js';
  * @param   {string}        type            The type of data (uint8, uint16, ...)
  * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
  */
-var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
+function Volume( xLength, yLength, zLength, type, arrayBuffer ) {
 
 	if ( arguments.length > 0 ) {
 
@@ -33,7 +33,10 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 		 * @member {number} zLength Depth of the volume in the IJK coordinate system
 		 */
 		this.zLength = Number( zLength ) || 1;
-
+		/**
+		 * @member {Array<string>} The order of the Axis dictated by the NRRD header
+		 */
+		this.axisOrder = [ 'x', 'y', 'z' ];
 		/**
 		 * @member {TypedArray} data Data of the volume
 		 */
@@ -96,7 +99,7 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 			case 'unsigned long long int' :
 			case 'uint64' :
 			case 'uint64_t' :
-				throw 'Error in Volume constructor : this type is not supported in JavaScript';
+				throw new Error( 'Error in Volume constructor : this type is not supported in JavaScript' );
 				break;
 			case 'Float32' :
 			case 'float32' :
@@ -115,7 +118,7 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 
 		if ( this.data.length !== this.xLength * this.yLength * this.zLength ) {
 
-			throw 'Error in Volume constructor, lengths are not matching arrayBuffer size';
+			throw new Error( 'Error in Volume constructor, lengths are not matching arrayBuffer size' );
 
 		}
 
@@ -141,7 +144,7 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 	 * @member {number} lowerThreshold The voxels with values under this threshold won't appear in the slices.
 	 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
 	 */
-	var lowerThreshold = - Infinity;
+	let lowerThreshold = - Infinity;
 	Object.defineProperty( this, 'lowerThreshold', {
 		get: function () {
 
@@ -163,7 +166,7 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 	 * @member {number} upperThreshold The voxels with values over this threshold won't appear in the slices.
 	 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
 	 */
-	var upperThreshold = Infinity;
+	let upperThreshold = Infinity;
 	Object.defineProperty( this, 'upperThreshold', {
 		get: function () {
 
@@ -193,7 +196,7 @@ var Volume = function ( xLength, yLength, zLength, type, arrayBuffer ) {
 	 * @member {Array} RASDimensions This array holds the dimensions of the volume in the RAS space
 	 */
 
-};
+}
 
 Volume.prototype = {
 
@@ -235,9 +238,9 @@ Volume.prototype = {
 	 */
 	reverseAccess: function ( index ) {
 
-		var z = Math.floor( index / ( this.yLength * this.xLength ) );
-		var y = Math.floor( ( index - z * this.yLength * this.xLength ) / this.xLength );
-		var x = index - z * this.yLength * this.xLength - y * this.xLength;
+		const z = Math.floor( index / ( this.yLength * this.xLength ) );
+		const y = Math.floor( ( index - z * this.yLength * this.xLength ) / this.xLength );
+		const x = index - z * this.yLength * this.xLength - y * this.xLength;
 		return [ x, y, z ];
 
 	},
@@ -254,10 +257,10 @@ Volume.prototype = {
 	 */
 	map: function ( functionToMap, context ) {
 
-		var length = this.data.length;
+		const length = this.data.length;
 		context = context || this;
 
-		for ( var i = 0; i < length; i ++ ) {
+		for ( let i = 0; i < length; i ++ ) {
 
 			this.data[ i ] = functionToMap.call( context, this.data[ i ], i, this.data );
 
@@ -276,23 +279,18 @@ Volume.prototype = {
 	 */
 	extractPerpendicularPlane: function ( axis, RASIndex ) {
 
-		var iLength,
-			jLength,
-			sliceAccess,
-			planeMatrix = ( new Matrix4() ).identity(),
-			volume = this,
-			planeWidth,
-			planeHeight,
-			firstSpacing,
+		let firstSpacing,
 			secondSpacing,
 			positionOffset,
 			IJKIndex;
 
-		var axisInIJK = new Vector3(),
+		const axisInIJK = new Vector3(),
 			firstDirection = new Vector3(),
-			secondDirection = new Vector3();
+			secondDirection = new Vector3(),
+			planeMatrix = ( new Matrix4() ).identity(),
+			volume = this;
 
-		var dimensions = new Vector3( this.xLength, this.yLength, this.zLength );
+		const dimensions = new Vector3( this.xLength, this.yLength, this.zLength );
 
 
 		switch ( axis ) {
@@ -301,8 +299,8 @@ Volume.prototype = {
 				axisInIJK.set( 1, 0, 0 );
 				firstDirection.set( 0, 0, - 1 );
 				secondDirection.set( 0, - 1, 0 );
-				firstSpacing = this.spacing[ 2 ];
-				secondSpacing = this.spacing[ 1 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
 				IJKIndex = new Vector3( RASIndex, 0, 0 );
 
 				planeMatrix.multiply( ( new Matrix4() ).makeRotationY( Math.PI / 2 ) );
@@ -313,8 +311,8 @@ Volume.prototype = {
 				axisInIJK.set( 0, 1, 0 );
 				firstDirection.set( 1, 0, 0 );
 				secondDirection.set( 0, 0, 1 );
-				firstSpacing = this.spacing[ 0 ];
-				secondSpacing = this.spacing[ 2 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
 				IJKIndex = new Vector3( 0, RASIndex, 0 );
 
 				planeMatrix.multiply( ( new Matrix4() ).makeRotationX( - Math.PI / 2 ) );
@@ -326,8 +324,8 @@ Volume.prototype = {
 				axisInIJK.set( 0, 0, 1 );
 				firstDirection.set( 1, 0, 0 );
 				secondDirection.set( 0, - 1, 0 );
-				firstSpacing = this.spacing[ 0 ];
-				secondSpacing = this.spacing[ 1 ];
+				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
+				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
 				IJKIndex = new Vector3( 0, 0, RASIndex );
 
 				positionOffset = ( volume.RASDimensions[ 2 ] - 1 ) / 2;
@@ -337,50 +335,48 @@ Volume.prototype = {
 		}
 
 		firstDirection.applyMatrix4( volume.inverseMatrix ).normalize();
-		firstDirection.argVar = 'i';
+		firstDirection.arglet = 'i';
 		secondDirection.applyMatrix4( volume.inverseMatrix ).normalize();
-		secondDirection.argVar = 'j';
+		secondDirection.arglet = 'j';
 		axisInIJK.applyMatrix4( volume.inverseMatrix ).normalize();
-		iLength = Math.floor( Math.abs( firstDirection.dot( dimensions ) ) );
-		jLength = Math.floor( Math.abs( secondDirection.dot( dimensions ) ) );
-		planeWidth = Math.abs( iLength * firstSpacing );
-		planeHeight = Math.abs( jLength * secondSpacing );
+		const iLength = Math.floor( Math.abs( firstDirection.dot( dimensions ) ) );
+		const jLength = Math.floor( Math.abs( secondDirection.dot( dimensions ) ) );
+		const planeWidth = Math.abs( iLength * firstSpacing );
+		const planeHeight = Math.abs( jLength * secondSpacing );
 
 		IJKIndex = Math.abs( Math.round( IJKIndex.applyMatrix4( volume.inverseMatrix ).dot( axisInIJK ) ) );
-		var base = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
-		var iDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
+		const base = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
+		const iDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
 
 			return Math.abs( x.dot( base[ 0 ] ) ) > 0.9;
 
 		} );
-		var jDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
+		const jDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
 
 			return Math.abs( x.dot( base[ 1 ] ) ) > 0.9;
 
 		} );
-		var kDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
+		const kDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
 
 			return Math.abs( x.dot( base[ 2 ] ) ) > 0.9;
 
 		} );
 
-		sliceAccess = function ( i, j ) {
+		function sliceAccess( i, j ) {
 
-			var accessI, accessJ, accessK;
-
-			var si = ( iDirection === axisInIJK ) ? IJKIndex : ( iDirection.argVar === 'i' ? i : j );
-			var sj = ( jDirection === axisInIJK ) ? IJKIndex : ( jDirection.argVar === 'i' ? i : j );
-			var sk = ( kDirection === axisInIJK ) ? IJKIndex : ( kDirection.argVar === 'i' ? i : j );
+			const si = ( iDirection === axisInIJK ) ? IJKIndex : ( iDirection.arglet === 'i' ? i : j );
+			const sj = ( jDirection === axisInIJK ) ? IJKIndex : ( jDirection.arglet === 'i' ? i : j );
+			const sk = ( kDirection === axisInIJK ) ? IJKIndex : ( kDirection.arglet === 'i' ? i : j );
 
 			// invert indices if necessary
 
-			var accessI = ( iDirection.dot( base[ 0 ] ) > 0 ) ? si : ( volume.xLength - 1 ) - si;
-			var accessJ = ( jDirection.dot( base[ 1 ] ) > 0 ) ? sj : ( volume.yLength - 1 ) - sj;
-			var accessK = ( kDirection.dot( base[ 2 ] ) > 0 ) ? sk : ( volume.zLength - 1 ) - sk;
+			const accessI = ( iDirection.dot( base[ 0 ] ) > 0 ) ? si : ( volume.xLength - 1 ) - si;
+			const accessJ = ( jDirection.dot( base[ 1 ] ) > 0 ) ? sj : ( volume.yLength - 1 ) - sj;
+			const accessK = ( kDirection.dot( base[ 2 ] ) > 0 ) ? sk : ( volume.zLength - 1 ) - sk;
 
 			return volume.access( accessI, accessJ, accessK );
 
-		};
+		}
 
 		return {
 			iLength: iLength,
@@ -403,7 +399,7 @@ Volume.prototype = {
 	 */
 	extractSlice: function ( axis, index ) {
 
-		var slice = new VolumeSlice( this, index, axis );
+		const slice = new VolumeSlice( this, index, axis );
 		this.sliceList.push( slice );
 		return slice;
 
@@ -434,19 +430,19 @@ Volume.prototype = {
 	 */
 	computeMinMax: function () {
 
-		var min = Infinity;
-		var max = - Infinity;
+		let min = Infinity;
+		let max = - Infinity;
 
 		// buffer the length
-		var datasize = this.data.length;
+		const datasize = this.data.length;
 
-		var i = 0;
+		let i = 0;
 
 		for ( i = 0; i < datasize; i ++ ) {
 
 			if ( ! isNaN( this.data[ i ] ) ) {
 
-				var value = this.data[ i ];
+				const value = this.data[ i ];
 				min = Math.min( min, value );
 				max = Math.max( max, value );
 

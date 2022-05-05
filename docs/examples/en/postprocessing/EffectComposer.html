@@ -29,7 +29,6 @@
 			[example:webgl_postprocessing_glitch postprocessing glitch]<br />
 			[example:webgl_postprocessing_godrays postprocessing godrays]<br />
 			[example:webgl_postprocessing_masking postprocessing masking]<br />
-			[example:webgl_postprocessing_nodes postprocessing node material]<br />
 			[example:webgl_postprocessing_outline postprocessing outline]<br />
 			[example:webgl_postprocessing_pixel postprocessing pixelate]<br />
 			[example:webgl_postprocessing_procedural postprocessing procedural]<br />
@@ -82,7 +81,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:void addPass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined addPass]( [param:Pass pass] )</h3>
 
 		<p>
 			pass -- The pass to add to the pass chain.<br /><br />
@@ -90,7 +89,7 @@
 			Adds the given pass to the pass chain.
 		</p>
 
-		<h3>[method:void insertPass]( [param:Pass pass], [param:Integer index] )</h3>
+		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>
 
 		<p>
 			pass -- The pass to insert into the pass chain.<br />
@@ -108,7 +107,7 @@
 			Used by [name] to determine when a pass should be rendered to screen.
 		</p>
 
-		<h3>[method:void removePass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined removePass]( [param:Pass pass] )</h3>
 
 		<p>
 			pass -- The pass to remove from the pass chain.<br /><br />
@@ -116,7 +115,7 @@
 			Removes the given pass from the pass chain.
 		</p>
 
-		<h3>[method:void render]( [param:Float deltaTime] )</h3>
+		<h3>[method:undefined render]( [param:Float deltaTime] )</h3>
 
 		<p>
 			deltaTime -- The delta time value.<br /><br />
@@ -124,7 +123,7 @@
 			Executes all enabled post-processing passes in order to produce the final frame.
 		</p>
 
-		<h3>[method:void reset]( [param:WebGLRenderTarget renderTarget] )</h3>
+		<h3>[method:undefined reset]( [param:WebGLRenderTarget renderTarget] )</h3>
 
 		<p>
 			[page:WebGLRenderTarget renderTarget] -- (optional) A preconfigured render target internally used by [name]..<br /><br />
@@ -132,7 +131,7 @@
 			Resets the internal state of the [name].
 		</p>
 
-		<h3>[method:void setPixelRatio]( [param:Float pixelRatio] )</h3>
+		<h3>[method:undefined setPixelRatio]( [param:Float pixelRatio] )</h3>
 
 		<p>
 			pixelRatio -- The device pixel ratio.<br /><br />
@@ -141,7 +140,7 @@
 				Thus, the semantic of the method is similar to [page:WebGLRenderer.setPixelRatio]().
 		</p>
 
-		<h3>[method:void setSize]( [param:Integer width], [param:Integer height] )</h3>
+		<h3>[method:undefined setSize]( [param:Integer width], [param:Integer height] )</h3>
 
 		<p>
 			width -- The width of the [name].<br />
@@ -151,7 +150,7 @@
 				Thus, the semantic of the method is similar to [page:WebGLRenderer.setSize]().
 		</p>
 
-		<h3>[method:void swapBuffers]()</h3>
+		<h3>[method:undefined swapBuffers]()</h3>
 
 		<p>Swaps the internal read/write buffers.</p>
 

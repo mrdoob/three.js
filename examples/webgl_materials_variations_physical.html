@@ -12,21 +12,35 @@
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Physical Material Variations by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.<br/><br/>
 		Note: Every second sphere has an IBL environment map on it.</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 
 			let container, stats;
 
 			let camera, scene, renderer;
 			let particleLight;
 
-			const loader = new THREE.FontLoader();
+			const loader = new FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -46,16 +60,11 @@
 
 				scene = new THREE.Scene();
 
-				let hdrCubeRenderTarget = null;
-
 				new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
-						hdrEquirect.dispose();
-						pmremGenerator.dispose();
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						// Materials
 
@@ -83,7 +92,7 @@
 										clearcoat: 1.0 - alpha,
 										clearcoatRoughness: 1.0 - beta,
 										reflectivity: 1.0 - gamma,
-										envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
+										envMap: ( index % 2 ) == 1 ? texture : null
 									} );
 
 									index ++;
@@ -106,13 +115,13 @@
 
 						}
 
-						scene.background = hdrCubeRenderTarget.texture;
+						scene.background = texture;
 
 					} );
 
 				function addLabel( name, location ) {
 
-					const textGeo = new THREE.TextGeometry( name, {
+					const textGeo = new TextGeometry( name, {
 
 						font: font,
 
@@ -129,14 +138,14 @@
 
 				}
 
-				addLabel( "+clearcoat", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "-clearcoat", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( '+clearcoat', new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( '-clearcoat', new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "+clearcoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "-clearcoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( '+clearcoatRoughness', new THREE.Vector3( 0, - 300, 0 ) );
+				addLabel( '-clearcoatRoughness', new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, - 300 ) );
-				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( '+reflectivity', new THREE.Vector3( 0, 0, - 300 ) );
+				addLabel( '-reflectivity', new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -162,11 +171,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.75;
-
-				//
-
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				//
 

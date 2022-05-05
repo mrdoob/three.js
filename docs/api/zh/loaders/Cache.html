@@ -40,7 +40,7 @@ THREE.Cache.enabled = true.
 
 		<h2>方法</h2>
 
-		<h3>[method:null add]( [param:String key], file )</h3>
+		<h3>[method:undefined add]( [param:String key], file )</h3>
 		<p>
 		[page:String key] — 通过引用缓存文件的[page:String key]。<br />
 		[page:Object file] — 所被缓存的文件<br /><br />
@@ -48,21 +48,21 @@ THREE.Cache.enabled = true.
 			使用key为引用文件增加一个缓存入口。如果该key已持有一个文件，则会被覆盖。
 		</p>
 
-		<h3>[method:null get]( [param:String key] )</h3>
+		<h3>[method:Any get]( [param:String key] )</h3>
 		<p>
 		[page:String key] — 一个字符串key <br /><br />
 
 		获得该[page:String key]的值。 如果该key不存在，则以*undefined*被返回。
 		</p>
 
-		<h3>[method:null remove]( [param:String key] )</h3>
+		<h3>[method:undefined remove]( [param:String key] )</h3>
 		<p>
 		[page:String key] — 引用缓存文件的一个字符串key<br /><br />
 
 		使用key来删除相应的缓存文件。
 		</p>
 
-		<h3>[method:null clear]()</h3>
+		<h3>[method:undefined clear]()</h3>
 		<p>清除所有缓存中的值。</p>
 
 

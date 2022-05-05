@@ -48,12 +48,6 @@ export default /* glsl */`
 
 	#endif
 
-	#ifndef ENVMAP_TYPE_CUBE_UV
-
-		envColor = envMapTexelToLinear( envColor );
-
-	#endif
-
 	#ifdef ENVMAP_BLENDING_MULTIPLY
 
 		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );

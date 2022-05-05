@@ -1,0 +1,142 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - WebXR - Look to Select (selection cursor)</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas});
+
+  const left = -2;    // Use values for left
+  const right = 2;    // right, top and bottom
+  const top = 1;      // that match the default
+  const bottom = -1;  // canvas size.
+  const near = -1;
+  const far = 1;
+  const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+
+  function makeDataTexture(data, width, height) {
+    const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
+    texture.minFilter = THREE.NearestFilter;
+    texture.magFilter = THREE.NearestFilter;
+    texture.needsUpdate = true;
+    return texture;
+  }
+
+  const backgroundColors = new Uint8Array([
+      0,   0,   0, 255,  // black
+     90,  38,  38, 255,  // dark red
+    100, 175, 103, 255,  // medium green
+    255, 239, 151, 255,  // light yellow
+  ]);
+  const backgroundTexture = makeDataTexture(backgroundColors, 2, 2);
+  backgroundTexture.wrapS = THREE.RepeatWrapping;
+  backgroundTexture.wrapT = THREE.RepeatWrapping;
+  backgroundTexture.repeat.set(4, 4);
+
+  const scene = new THREE.Scene();
+  scene.background = backgroundTexture;
+
+  //const innerRadius = 0.4;
+  //const outerRadius = 0.5;
+  //const segments = 64;
+  //const cursorGeometry = new THREE.RingGeometry(
+  //    innerRadius, outerRadius, segments);
+
+  const ringRadius = 0.4;
+  const tubeRadius = 0.1;
+  const tubeSegments = 4;
+  const ringSegments = 64;
+  const cursorGeometry = new THREE.TorusGeometry(
+      ringRadius, tubeRadius, tubeSegments, ringSegments);
+
+  const cursorColors = new Uint8Array([
+    64, 64, 64, 64,       // dark gray
+    255, 255, 255, 255,   // white
+  ]);
+  const cursorTexture = makeDataTexture(cursorColors, 2, 1);
+
+  const cursorMaterial = new THREE.MeshBasicMaterial({
+    color: 'white',
+    map: cursorTexture,
+    transparent: true,
+    blending: THREE.CustomBlending,
+    blendSrc: THREE.OneMinusDstColorFactor,
+    blendDst: THREE.OneMinusSrcColorFactor,
+  });
+  const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
+  scene.add(cursor);
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  function render(time) {
+    time *= 0.001;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      const aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.left = -aspect;
+      camera.right = aspect;
+      camera.updateProjectionMatrix();
+    }
+
+    const fromStart = 0;
+    const fromEnd = 2;
+    const toStart = -0.5;
+    const toEnd = 0.5;
+    cursorTexture.offset.x = THREE.MathUtils.mapLinear(
+        time % 2,
+        fromStart, fromEnd,
+        toStart, toEnd);
+
+    renderer.render(scene, camera);
+  }
+
+  renderer.setAnimationLoop(render);
+}
+
+main();
+</script>
+</html>
+

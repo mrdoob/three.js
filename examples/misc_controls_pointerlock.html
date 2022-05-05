@@ -17,48 +17,46 @@
 				width: 100%;
 				height: 100%;
 
-				display: -webkit-box;
-				display: -moz-box;
-				display: box;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
 
-				-webkit-box-orient: horizontal;
-				-moz-box-orient: horizontal;
-				box-orient: horizontal;
-
-				-webkit-box-pack: center;
-				-moz-box-pack: center;
-				box-pack: center;
-
-				-webkit-box-align: center;
-				-moz-box-align: center;
-				box-align: center;
-
-				color: #ffffff;
 				text-align: center;
-				font-family: Arial;
 				font-size: 14px;
-				line-height: 24px;
-
 				cursor: pointer;
 			}
 		</style>
 	</head>
 	<body>
 		<div id="blocker">
-
 			<div id="instructions">
-				<span style="font-size:36px">Click to play</span>
-				<br /><br />
-				Move: WASD<br/>
-				Jump: SPACE<br/>
-				Look: MOUSE
+				<p style="font-size:36px">
+					Click to play
+				</p>
+				<p>
+					Move: WASD<br/>
+					Jump: SPACE<br/>
+					Look: MOUSE
+				</p>
 			</div>
-
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
 
@@ -293,7 +291,7 @@
 					raycaster.ray.origin.copy( controls.getObject().position );
 					raycaster.ray.origin.y -= 10;
 
-					const intersections = raycaster.intersectObjects( objects );
+					const intersections = raycaster.intersectObjects( objects, false );
 
 					const onObject = intersections.length > 0;
 

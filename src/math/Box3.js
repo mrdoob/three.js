@@ -109,11 +109,11 @@ class Box3 {
 
 	}
 
-	setFromObject( object ) {
+	setFromObject( object, precise = false ) {
 
 		this.makeEmpty();
 
-		return this.expandByObject( object );
+		return this.expandByObject( object, precise );
 
 	}
 
@@ -151,25 +151,11 @@ class Box3 {
 
 	getCenter( target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getCenter() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	}
 
 	getSize( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getSize() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
 
@@ -202,7 +188,7 @@ class Box3 {
 
 	}
 
-	expandByObject( object ) {
+	expandByObject( object, precise = false ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
@@ -213,16 +199,30 @@ class Box3 {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.boundingBox === null ) {
+			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
 
-				geometry.computeBoundingBox();
+				const position = geometry.attributes.position;
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector );
+
+				}
+
+			} else {
+
+				if ( geometry.boundingBox === null ) {
+
+					geometry.computeBoundingBox();
+
+				}
+
+				_box.copy( geometry.boundingBox );
+				_box.applyMatrix4( object.matrixWorld );
+
+				this.union( _box );
 
 			}
-
-			_box.copy( geometry.boundingBox );
-			_box.applyMatrix4( object.matrixWorld );
-
-			this.union( _box );
 
 		}
 
@@ -230,7 +230,7 @@ class Box3 {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this.expandByObject( children[ i ] );
+			this.expandByObject( children[ i ], precise );
 
 		}
 
@@ -258,13 +258,6 @@ class Box3 {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getParameter() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -395,13 +388,6 @@ class Box3 {
 
 	clampPoint( point, target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .clampPoint() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return target.copy( point ).clamp( this.min, this.max );
 
 	}
@@ -415,13 +401,6 @@ class Box3 {
 	}
 
 	getBoundingSphere( target ) {
-
-		if ( target === undefined ) {
-
-			console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
-			//target = new Sphere(); // removed to avoid cyclic dependency
-
-		}
 
 		this.getCenter( target.center );
 
@@ -529,9 +508,9 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
 
 		_testAxis.fromArray( axes, i );
-		// project the aabb onto the seperating axis
+		// project the aabb onto the separating axis
 		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
-		// project all 3 vertices of the triangle onto the seperating axis
+		// project all 3 vertices of the triangle onto the separating axis
 		const p0 = v0.dot( _testAxis );
 		const p1 = v1.dot( _testAxis );
 		const p2 = v2.dot( _testAxis );
@@ -539,7 +518,7 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
 
 			// points of the projected triangle are outside the projected half-length of the aabb
-			// the axis is seperating and we can exit
+			// the axis is separating and we can exit
 			return false;
 
 		}

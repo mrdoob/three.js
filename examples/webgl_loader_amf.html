@@ -13,15 +13,24 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<a href="http://amf.wikispaces.com" target="_blank" rel="noopener">AMF File format</a>
-			<div>AMF loader test by <a href="https://github.com/tamarintech" target="_blank" rel="noopener">tamarintech</a></div>
-			<div>Rook manufacturing file from <a href="http://amf.wikispaces.com/AMF+test+files" target="_blank" rel="noopener">AMF test files</a></div>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - AMF loader
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { AMFLoader } from './jsm/loaders/AMFLoader.js';

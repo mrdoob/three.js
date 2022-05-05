@@ -2,10 +2,10 @@ import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 
 function ViewportInfo( editor ) {
 
-	var signals = editor.signals;
-	var strings = editor.strings;
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setId( 'info' );
 	container.setPosition( 'absolute' );
 	container.setLeft( '10px' );
@@ -13,10 +13,10 @@ function ViewportInfo( editor ) {
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
 
-	var objectsText = new UIText( '0' ).setMarginLeft( '6px' );
-	var verticesText = new UIText( '0' ).setMarginLeft( '6px' );
-	var trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
-	var frametimeText = new UIText( '0' ).setMarginLeft( '6px' );
+	const objectsText = new UIText( '0' ).setMarginLeft( '6px' );
+	const verticesText = new UIText( '0' ).setMarginLeft( '6px' );
+	const trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
+	const frametimeText = new UIText( '0' ).setMarginLeft( '6px' );
 
 	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
 	container.add( objectsText, new UIBreak() );
@@ -35,13 +35,13 @@ function ViewportInfo( editor ) {
 
 	function update() {
 
-		var scene = editor.scene;
+		const scene = editor.scene;
 
-		var objects = 0, vertices = 0, triangles = 0;
+		let objects = 0, vertices = 0, triangles = 0;
 
-		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+		for ( let i = 0, l = scene.children.length; i < l; i ++ ) {
 
-			var object = scene.children[ i ];
+			const object = scene.children[ i ];
 
 			object.traverseVisible( function ( object ) {
 
@@ -49,26 +49,17 @@ function ViewportInfo( editor ) {
 
 				if ( object.isMesh ) {
 
-					var geometry = object.geometry;
+					const geometry = object.geometry;
 
-					if ( geometry.isGeometry ) {
+					vertices += geometry.attributes.position.count;
 
-						vertices += geometry.vertices.length;
-						triangles += geometry.faces.length;
+					if ( geometry.index !== null ) {
 
-					} else if ( geometry.isBufferGeometry ) {
+						triangles += geometry.index.count / 3;
 
-						vertices += geometry.attributes.position.count;
+					} else {
 
-						if ( geometry.index !== null ) {
-
-							triangles += geometry.index.count / 3;
-
-						} else {
-
-							triangles += geometry.attributes.position.count / 3;
-
-						}
+						triangles += geometry.attributes.position.count / 3;
 
 					}
 

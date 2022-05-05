@@ -23,14 +23,14 @@
 		</p>
 
 		<h2>Constructor</h2>
-		<h3>[name]( [param:Number width], [param:Number height], [param:Constant type], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant format] )</h3>
+		<h3>[name]( [param:Number width], [param:Number height], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant format] )</h3>
 
 		<p>
 		[page:Number width] -- width of the texture.<br />
 
 		[page:Number height] -- height of the texture.<br />
 
-		[page:Constant type] -- Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using  [page:Textures DepthStencilFormat].
+		[page:Constant type] -- Default is [page:Textures THREE.UnsignedShortType] when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
 		See [page:Textures type constants] for other choices.<br />
 
 		[page:Constant mapping] --
@@ -64,33 +64,33 @@
 		- the following are also part of the texture class, but have different defaults here.
 		</p>
 
-		<h3>[page:Texture.format .format]</h3>
+		<h3>[page:Texture.format format]</h3>
 		<p>
 		Either [page:Textures DepthFormat] (default) or [page:Textures DepthStencilFormat].
 		See [page:Textures format constants] for details.<br />
 		</p>
 
-		<h3>[page:Texture.type .type]</h3>
+		<h3>[page:Texture.type type]</h3>
 		<p>
-		Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
+		Default is [page:Textures THREE.UnsignedShortType] when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
 		See [page:Textures format constants] for details.<br />
 		</p>
 
-		<h3>[page:Texture.magFilter .magFilter]</h3>
+		<h3>[page:Texture.magFilter magFilter]</h3>
 		<p>
 		  How the texture is sampled when a texel covers more than one pixel.
 			The default is [page:Textures THREE.NearestFilter].
 		  See [page:Textures magnification filter constants] for other choices.
 		</p>
 
-		<h3>[page:Texture.minFilter .minFilter]</h3>
+		<h3>[page:Texture.minFilter minFilter]</h3>
 		<p>
 		How the texture is sampled when a texel covers less than one pixel.
 		The default is [page:Textures THREE.NearestFilter].
 		See [page:Textures magnification filter constants] for other choices.
 		</p>
 
-		<h3>[page:Texture.flipY .flipY]</h3>
+		<h3>[page:Texture.flipY flipY]</h3>
 		<p>
 		Depth textures do not need to be flipped so this is *false* by default.
 		</p>
@@ -98,6 +98,11 @@
 		<h3>[page:Texture.generateMipmaps .generateMipmaps]</h3>
 		<p>
 		Depth textures do not use mipmaps.
+		</p>
+
+		<h3>[property:Boolean isDepthTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h2>Methods</h2>

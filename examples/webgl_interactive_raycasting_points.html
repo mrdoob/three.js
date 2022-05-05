@@ -11,9 +11,21 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - raycasting - points </div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -25,7 +37,7 @@
 			let clock;
 			let toggle = 0;
 
-			const mouse = new THREE.Vector2();
+			const pointer = new THREE.Vector2();
 			const spheres = [];
 
 			const threshold = 0.1;
@@ -209,16 +221,14 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				document.addEventListener( 'pointermove', onPointerMove );
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -245,9 +255,9 @@
 				camera.applyMatrix4( rotateY );
 				camera.updateMatrixWorld();
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( pointer, camera );
 
-				const intersections = raycaster.intersectObjects( pointclouds );
+				const intersections = raycaster.intersectObjects( pointclouds, false );
 				intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
 
 				if ( toggle > 0.02 && intersection !== null ) {

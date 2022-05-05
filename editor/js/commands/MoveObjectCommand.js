@@ -49,6 +49,7 @@ class MoveObjectCommand extends Command {
 		children.splice( this.newIndex, 0, this.object );
 		this.object.parent = this.newParent;
 
+		this.object.dispatchEvent( { type: 'added' } );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
 	}
@@ -61,6 +62,7 @@ class MoveObjectCommand extends Command {
 		children.splice( this.oldIndex, 0, this.object );
 		this.object.parent = this.oldParent;
 
+		this.object.dispatchEvent( { type: 'added' } );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
 	}

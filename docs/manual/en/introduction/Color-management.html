@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+	<style>
+		blockquote {
+			font-size: 0.8em;
+			line-height: 1.5em;
+			margin-left: 0;
+			border-left: 4px solid #cccccc;
+			padding: 1em 2em 1em 2em;
+		}
+
+		blockquote p:first-child {
+			margin-top: 0;
+		}
+
+		blockquote p:last-child {
+			margin-bottom: 0;
+		}
+
+		figure {
+			width: 100%;
+			margin: 1em 0;
+			font-style: italic;
+		}
+
+		figure img {
+			width: 100%;
+		}
+
+		figure.float {
+			float: right;
+			max-width: 30%;
+			margin: 1em;
+		}
+
+		@media all and ( max-width: 640px ) {
+
+			figure.float {
+				float: none;
+				max-width: 100%;
+			}
+
+		}
+	</style>
+</head>
+
+<body>
+	<h1>[name]</h1>
+
+	<h2>What is a color space?</h2>
+
+	<p>
+		Every color space is a collection of several design decisions, chosen together to support a
+		large range of colors while satisfying technical constraints related to precision and display
+		technologies. When creating a 3D asset, or assembling 3D assets together into a scene, it is
+		important to know what these properties are, and how the properties of one color space relate
+		to other color spaces in the scene.
+	</p>
+
+	<figure class="float">
+		<img src="resources/srgb_gamut.png" alt="">
+		<figcaption>
+			sRGB colors and white point (D65) displayed in the reference CIE 1931 chromaticity
+			diagram. Colored region represents a 2D projection of the sRGB gamut, which is a 3D
+			volume. Source: <a href="https://en.wikipedia.org/wiki/SRGB" target="_blank" rel="noopener">Wikipedia</a>
+		</figcaption>
+	</figure>
+
+	<ul>
+		<li>
+			<b>Color primaries:</b> Primary colors (e.g. red, green, blue) are not absolutes; they are
+			selected from the visible spectrum based on constraints of limited precision and
+			capabilities of available display devices. Colors are expressed as a ratio of the primary colors.
+		</li>
+		<li>
+			<b>White point:</b> Most color spaces are engineered such that an equally weighted sum of
+			primaries <i>R = G = B</i> will appear to be without color, or "achromatic". The appearance
+			of achromatic values (like white or grey) depend on human perception, which in turn depends
+			heavily on the context of the observer. A color space specifies its "white point" to balance
+			these needs. The white point defined by the sRGB color space is
+			<a href="https://en.wikipedia.org/wiki/Illuminant_D65" target="_blank">D65</a>.
+		</li>
+		<li>
+			<b>Transfer functions:</b> After choosing the color gamut and a color model, we still need to
+			define mappings ("transfer functions") of numerical values to/from the color space. Does <i>r = 0.5</i>
+			represent 50% less physical illumination than <i>r = 1.0</i>? Or 50% less bright, as perceived
+			by an average human eye? These are different things, and that difference can be represented as
+			a mathematical function. Transfer functions may be <i>linear</i> or <i>nonlinear</i>, depending
+			on the objectives of the color space. sRGB defines nonlinear transfer functions. Those
+			functions are sometimes approximated as <i>gamma functions</i>, but the term "gamma" is
+			ambiguous and should be avoided in this context.
+		</li>
+	</ul>
+
+	These three parameters — color primaries, white point, and transfer functions — define a color
+	space, with each chosen for particular goals. Having defined the parameters, a few additional terms
+	are helpful:
+
+	<ul>
+		<li>
+			<b>Color model:</b> Syntax for numerically identifying colors within chosen the color gamut —
+			a coordinate system for colors. In three.js we're mainly concerned with the RGB color
+			model, having three coordinates <i>r, g, b ∈ [0,1]</i> ("closed domain") or
+			<i>r, g, b ∈ [0,∞]</i> ("open domain") each representing a fraction of a primary
+			color. Other color models (HSL, Lab, LCH) are commonly used for artistic control.
+		</li>
+		<li>
+			<b>Color gamut:</b> Once color primaries and a white point have been chosen, these represent
+			a volume within the visible spectrum (a "gamut"). Colors not within this volume ("out of gamut")
+			cannot be expressed by closed domain [0,1] RGB values. In the open domain [0,∞], the gamut is
+			technically infinite.
+		</li>
+	</ul>
+
+	<p>
+		Consider two very common color spaces: [page:SRGBColorSpace] ("sRGB") and
+		[page:LinearSRGBColorSpace] ("Linear-sRGB"). Both use the same primaries and white point,
+		and therefore have the same color gamut. Both use the RGB color model. They differ only in
+		the transfer functions — Linear-sRGB is linear with respect to physical light intensity.
+		sRGB uses the nonlinear sRGB transfer functions, and more closely resembles the way that
+		the human eye perceives light and the responsiveness of common display devices.
+	</p>
+
+	<p>
+		That difference is important. Lighting calculations and other rendering operations must
+		generally occur in a linear color space. However, a linear colors are less efficient to
+		store in an image or framebuffer, and do not look correct when viewed by a human observer.
+		As a result, input textures and the final rendered image will generally use the nonlinear
+		sRGB color space.
+	</p>
+
+	<blockquote>
+		<p>
+			ℹ️ <i><b>NOTICE:</b> While some modern displays support wider gamuts like Display-P3,
+				the web platform's graphics APIs largely rely on sRGB. Applications using three.js
+				today will typically use only the sRGB and Linear-sRGB color spaces.</i>
+		</p>
+	</blockquote>
+
+	<h2>Roles of color spaces</h2>
+
+	<p>
+		Linear workflows — required for modern rendering methods — generally involve more than
+		one color space, each assigned to a particular role. Linear and nonlinear color spaces are
+		appropriate for different roles, explained below.
+	</p>
+
+	<h3>Input color space</h3>
+
+	<p>
+		Colors supplied to three.js — from color pickers, textures, 3D models, and other sources —
+		each have an associated color space. Those not already in the Linear-sRGB working color
+		space must be converted, and textures be given the correct <i>texture.encoding</i> assignment.
+		Certain conversions (for hexadecimal and CSS colors in sRGB) can be made automatically if
+		the legacy color management mode is disabled before initializing colors:
+	</p>
+
+	<code>
+THREE.ColorManagement.legacyMode = false;
+	</code>
+
+	<ul>
+		<li>
+			<b>Materials, lights, and shaders:</b> Colors in materials, lights, and shaders store
+			RGB components in the Linear-sRGB working color space.
+		</li>
+		<li>
+			<b>Vertex colors:</b> [page:BufferAttribute BufferAttributes] store RGB components in the
+			Linear-sRGB working color space.
+		</li>
+		<li>
+			<b>Color textures:</b> PNG or JPEG [page:Texture Textures] containing color information
+			(like .map or .emissiveMap) use the closed domain sRGB color space, and must be annotated with
+			<i>texture.encoding = sRGBEncoding</i>. Formats like OpenEXR (sometimes used for .envMap or
+			.lightMap) use the Linear-sRGB color space indicated with <i>texture.encoding = LinearEncoding</i>,
+			and may contain values in the open domain [0,∞].
+		</li>
+		<li>
+			<b>Non-color textures:</b> Textures that do not store color information (like .normalMap
+			or .roughnessMap) do not have an associated color space, and generally use the (default) texture
+			annotation of <i>texture.encoding = LinearEncoding</i>. In rare cases, non-color data
+			may be represented with other nonlinear encodings for technical reasons.
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b>WARNING:</b> [page:Scene.fog], [page:Scene.background], and [page:WebGLRenderer.setClearColor]
+			are exceptions to the rule. These properties are unaffected by [page:WebGLRenderer.outputEncoding]
+			and so must store RGB components in the renderer's <u>output</u> color space.</i>
+		</p>
+	</blockquote>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b>WARNING:</b> Many formats for 3D models do not correctly or consistently
+			define color space information. While three.js attempts to handle most cases, problems
+			are common with older file formats. For best results, use glTF 2.0 ([page:GLTFLoader])
+			and test 3D models in online viewers early to confirm the asset itself is correct.</i>
+		</p>
+	</blockquote>
+
+	<h3>Working color space</h3>
+
+	<p>
+		Rendering, interpolation, and many other operations must be performed in an open domain
+		linear working color space, in which RGB components are proportional to physical
+		illumination. In three.js, the working color space is Linear-sRGB.
+	</p>
+
+	<h3>Output color space</h3>
+
+	<p>
+		Output to a display device, image, or video may involve conversion from the open domain
+		Linear-sRGB working color space to another color space. This conversion may be performed in
+		the main render pass ([page:WebGLRenderer.outputEncoding]), or during post-processing.
+	</p>
+
+	<code>
+renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
+	</code>
+
+	<ul>
+		<li>
+			<b>Display:</b> Colors written to a WebGL canvas for display should be in the sRGB
+			color space.
+		</li>
+		<li>
+			<b>Image:</b> Colors written to an image should use the color space appropriate for
+			the format and usage. Fully-rendered images written to PNG or JPEG textures generally
+			use the sRGB color space. Images containing emission, light maps, or other data not
+			confined to the [0,1] range will generally use the open domain Linear-sRGB color space,
+			and a compatible image format like OpenEXR.
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b>WARNING:</b> Render targets may use either sRGB or Linear-sRGB. sRGB makes
+			better use of limited precision. In the closed domain, 8 bits often suffice for sRGB
+			whereas ≥12 bits (half float) may be required for Linear-sRGB. If later pipeline
+			stages require Linear-sRGB input, the additional conversions may have a small
+			performance cost.</i>
+		</p>
+	</blockquote>
+
+	<h2>Working with THREE.Color instances</h2>
+
+	<p>
+		Methods reading or modifying [page:Color] instances assume data is already in the
+		three.js working color space, Linear-sRGB. RGB and HSL components are direct
+		representations of data stored by the Color instance, and are never converted
+		implicitly. Color data may be explicitly converted with <i>.convertLinearToSRGB()</i>
+		or <i>.convertSRGBToLinear()</i>.
+	</p>
+
+	<code>
+		// RGB components (no change).
+		color.r = color.g = color.b = 0.5;
+		console.log( color.r ); // → 0.5
+
+		// Manual conversion.
+		color.r = 0.5;
+		color.convertSRGBToLinear();
+		console.log( color.r ); // → 0.214041140
+	</code>
+
+	<p>
+		With <i>ColorManagement.legacyMode = false</i> set (recommended), certain conversions
+		are made automatically. Because hexadecimal and CSS colors are generally sRGB, [page:Color]
+		methods will automatically convert these inputs from sRGB to Linear-sRGB in setters, or
+		convert from Linear-sRGB to sRGB when returning hexadecimal or CSS output from getters.
+	</p>
+
+	<code>
+		// Hexadecimal conversion.
+		color.setHex( 0x808080 );
+		console.log( color.r ); // → 0.214041140
+		console.log( color.getHex() ); // → 0x808080
+
+		// CSS conversion.
+		color.setStyle( 'rgb( 0.5, 0.5, 0.5 )' );
+		console.log( color.r ); // → 0.214041140
+
+		// Override conversion with 'colorSpace' argument.
+		color.setHex( 0x808080, LinearSRGBColorSpace );
+		console.log( color.r ); // → 0.5
+		console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
+		console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
+	</code>
+
+	<h2>Common mistakes</h2>
+
+	<p>
+		When an individual color or texture is misconfigured, it will appear darker or lighter than
+		expected. When the renderer's output color space is misconfigured, the entire scene may appear
+		darker (e.g. missing conversion to sRGB) or lighter (e.g. a double conversion to sRGB with
+		post-processing). In each case the problem may not be uniform, and simply increasing/decreasing
+		lighting does not solve it.
+	</p>
+
+	<p>
+		A more subtle issue appears when <i>both</i> the input color spaces and the output color
+		spaces are incorrect — the overall brightness levels may be fine, but colors may change
+		unexpectedly under different lighting, or shading may appear more blown-out and less soft
+		than intended. These two wrongs do not make a right, and it's important that the working
+		color space be linear ("scene referred") and the output color space be nonlinear
+		("display referred").
+	</p>
+
+	<h2>Further reading</h2>
+
+	<ul>
+		<li>
+			<a href="https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-24-importance-being-linear" target="_blank" rel="noopener">GPU Gems 3: The Importance of Being Linear</a>, by Larry Gritz and Eugene d'Eon
+		</li>
+		<li>
+			<a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/" target="_blank" rel="noopener">What every coder should know about gamma</a>, by John Novak
+		</li>
+		<li>
+			<a href="https://hg2dc.com/" target="_blank" rel="noopener">The Hitchhiker's Guide to Digital Color</a>, by Troy Sobotka
+		</li>
+		<li>
+			<a href="https://docs.blender.org/manual/en/latest/render/color_management.html" target="_blank" rel="noopener">Color Management</a>, Blender
+		</li>
+	</ul>
+
+</body>
+
+</html>

@@ -3,7 +3,7 @@ import {
 	Loader,
 	CanvasTexture,
 	NearestFilter
-} from '../../../build/three.module.js';
+} from 'three';
 
 class LottieLoader extends Loader {
 
@@ -36,7 +36,6 @@ class LottieLoader extends Loader {
 			container.style.height = data.h + 'px';
 			document.body.appendChild( container );
 
-			// eslint-disable-next-line no-undef
 			const animation = bodymovin.loadAnimation( {
 				container: container,
 				animType: 'canvas',

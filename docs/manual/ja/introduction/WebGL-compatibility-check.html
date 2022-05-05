@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+		<p>
+			問題が少なくなってきたとはいえ、端末やブラウザによってはWebGLに対応していない場合があります。以下の方法で、ブラウザがWebGLをサポートしているかどうかを確認し、サポートされていない場合はユーザーにメッセージを表示することができます。
+		</p>
+
+		<p>
+			javascriptのコードに[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js]を付け加えて、何かを描画する前に以下のコードを実行してください。
+		</p>
+
+		<code>
+		if ( WebGL.isWebGLAvailable() ) {
+
+			// Initiate function or other initializations here
+			animate();
+
+		} else {
+
+			const warning = WebGL.getWebGLErrorMessage();
+			document.getElementById( 'container' ).appendChild( warning );
+
+		}
+		</code>
+	</body>
+</html>

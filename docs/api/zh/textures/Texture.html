@@ -33,6 +33,11 @@
 		只读 - 表示该纹理实例的唯一数字。
 		</p>
 
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:String uuid]</h3>
 		<p>
 		该对象实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
@@ -110,8 +115,7 @@
 
 		<h3>[property:number format]</h3>
 		<p>
-		默认值为[page:Textures THREE.RGBAFormat]，
-		但[page:TextureLoader TextureLoader]将会在载入JPG图片时自动将这个值设置为[page:Textures THREE.RGBFormat]。<br /><br />
+		默认值为[page:Textures THREE.RGBAFormat]。<br /><br />
 
 		请参阅[page:Textures texture constants]页面来了解其它格式。
 		</p>
@@ -137,21 +141,42 @@
 
 		<h3>[property:Vector2 offset]</h3>
 		<p>
-		纹理在单次重复时，从一开始将分别在U、V方向上偏移多少。
-		这个值的范围通常在*0.0*之间*1.0*。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的偏移。
+		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
+		Typical range is *0.0* to *1.0*.
+		</p>
+		<p>
+			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>color map</li>
+				<li>specular map</li>
+				<li>displacement map</li>
+				<li>normal map</li>
+				<li>bump map</li>
+				<li>roughness map</li>
+				<li>metalness map</li>
+				<li>alpha map</li>
+				<li>emissive map</li>
+				<li>clearcoat map</li>
+				<li>clearcoat normal map</li>
+				<li>clearcoat roughnessMap map</li>
+			</ol>
+		</p>
+		<p>
+			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			the following priorities and then shared by those textures:
+			<ol>
+				<li>ao map</li>
+				<li>light map</li>
+			</ol>
 		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
-		纹理将在表面上，分别在U、V方向重复多少次。如果这个值在任意方向上设置为大于1，
-		则对应的Wrap参数应当也被设为[page:Textures THREE.RepeatWrapping]或[page:Textures THREE.MirroredRepeatWrapping]，
-		以实现所期望的平铺效果。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的重复。
+		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
+		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
+		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
+		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -235,12 +260,23 @@
 			这对于设置包裹模式尤其重要。
 		</p>
 
+		<h3>[property:Object userData]</h3>
+		<p>
+		An object that can be used to store custom data about the texture. It should not hold
+		references to functions as these will not be cloned.
+		</p>
+
+		<h3>[property:Source source]</h3>
+		<p>
+		The data definition of a texture. A reference to the data source can be shared across textures.
+		This is often useful in context of spritesheets where multiple textures render the same data but with different texture transformations.
+		</p>
 
 		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</h3>
+		<p>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</p>
 
-		<h3>[method:null updateMatrix]()</h3>
+		<h3>[method:undefined updateMatrix]()</h3>
 		<p>
 			从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
 			[page:Texture.rotation .rotation]和[page:Texture.center .center]属性来更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
@@ -249,6 +285,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			拷贝纹理。请注意。这不是“深拷贝”，图像是共用的。
+			Besides, cloning a texture does not automatically mark it for a texture upload. You have to set [page:Texture.needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -257,7 +294,7 @@
 		将Texture对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 		</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 			使用“废置”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
 		</p>

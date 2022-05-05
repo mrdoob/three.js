@@ -38,13 +38,6 @@ class Ray {
 
 	at( t, target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Ray: .at() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
 	}
@@ -66,13 +59,6 @@ class Ray {
 	}
 
 	closestPointToPoint( point, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Ray: .closestPointToPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		target.subVectors( point, this.origin );
 
@@ -114,7 +100,7 @@ class Ray {
 
 	distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
+		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteDistRaySegment.h
 		// It returns the min distance between the ray and the segment
 		// defined by v0 and v1
 		// It can also set two optional targets :
@@ -413,7 +399,7 @@ class Ray {
 
 		// Compute the offset origin, edges, and normal.
 
-		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
 		_edge1.subVectors( b, a );
 		_edge2.subVectors( c, a );

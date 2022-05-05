@@ -49,7 +49,7 @@ const texture = new THREE.VideoTexture( video );
 		[page:Constant minFilter] -- 当一个纹素覆盖小于一个像素时，贴图将如何采样。
 		其默认值为[page:Textures THREE.LinearMipmapLinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
 
-		[page:Constant format] -- 在纹理贴图中使用的格式。
+		[page:Constant format] -- The default is [page:Textures THREE.RGBAFormat].
 	 	请参阅[page:Textures format constants]（格式常量）来了解各个选项。<br />
 
 		[page:Constant type] -- 默认值是[page:Textures THREE.UnsignedByteType].
@@ -67,6 +67,16 @@ const texture = new THREE.VideoTexture( video );
 		共有属性请参见其基类[page:Texture Texture]。
 	</p>
 
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+		Whether to generate mipmaps. False by default.
+		</p>
+
+		<h3>[property:Boolean isVideoTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
 		在这里，你不必手动设置这个值，因为它是由[page:VideoTexture.update update]方法来进行控制的。
@@ -78,7 +88,7 @@ const texture = new THREE.VideoTexture( video );
 		共有方法请参见其基类[page:Texture Texture]。
 	</p>
 
-	<h3>[method:null update]()</h3>
+	<h3>[method:undefined update]()</h3>
 		<p>
 		在每一次新的一帧可用时，这个方法将被自动调用，
 		并将[property:Boolean needsUpdate]设置为*true*。

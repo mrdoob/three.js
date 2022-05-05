@@ -71,7 +71,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 一个包含有<em>.pmd</em>或<em>.pmx</em>文件的路径或URL的字符串。<br />
 		[page:Function onLoad] — 当加载过程成功完成以后将被调用的函数。<br />
@@ -82,7 +82,7 @@
 		开始从URL中加载PMD/PMX模型文件，并使用包含有已被解析的[page:SkinnedMesh]和[page:MeshToonMaterial]数组的[page:BufferGeometry]对象来触发回调函数。
 		</p>
 
-		<h3>[method:null loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 一个包含有<em>.vmd</em>文件的路径或URL的字符串或字符串数组。如果两个及以上文件被指定，它们将会合并。<br />
 		[page:Object3D object] — [page:SkinnedMesh] 或 [page:Camera]。 剪辑及其轨道将会适应到该对象。<br />
@@ -94,7 +94,7 @@
 		开始从url(s)加载VMD动画文件（可能有多个文件），并使用已解析的[page:AnimatioinClip]触发回调函数。
 		</p>
 
-		<h3>[method:null loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String modelUrl] — 一个包含有<em>.pmd</em>或<em>.pmx</em>文件的路径或URL的字符串。<br />
 		[page:String vmdUrl] — 一个包含有<em>.vmd</em>文件的路径或URL的字符串或字符串数组。<br />
@@ -106,7 +106,7 @@
 		开始从URL中加载PMD/PMX模型文件和VMD动画文件（可能有多个文件），并使用一个[page:Object] —— 包含有已解析的[page:SkinnedMesh]和适应[page:SkinnedMesh]的[page:AnimationClip]，来触发回调函数。
 		</p>
 
-		<h3>[method:MMDLoader setAnimationPath]( [param:String animationPath] )</h3>
+		<h3>[method:this setAnimationPath]( [param:String animationPath] )</h3>
 		<p>
 		[page:String animationPath] — 用于加载动画数据（VMD/VPD 文件）的基础路径。 Base path for loading animation data (VMD/VPD files).
 		</p>

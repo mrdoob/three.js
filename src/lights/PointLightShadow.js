@@ -64,6 +64,15 @@ class PointLightShadow extends LightShadow {
 		const camera = this.camera;
 		const shadowMatrix = this.matrix;
 
+		const far = light.distance || camera.far;
+
+		if ( far !== camera.far ) {
+
+			camera.far = far;
+			camera.updateProjectionMatrix();
+
+		}
+
 		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 		camera.position.copy( _lightPositionWorld );
 

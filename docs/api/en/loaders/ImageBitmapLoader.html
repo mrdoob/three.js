@@ -72,25 +72,30 @@
 		<h2>Properties</h2>
 		<p>See the base [page:Loader] class for common properties.</p>
 
+		<h3>[property:Boolean isImageBitmapLoader]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:String options]</h3>
 		<p>An optional object that sets options for the internally used [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap] factory method. Default is *undefined*.</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Image image].<br />
-		[page:Function onProgress] — This callback function is currently not supported.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:Function onProgress] (optional) — This callback function is currently not supported.<br />
+		[page:Function onError] (optional) — Will be called when load errors.<br />
 		</p>
 		<p>
 		Begin loading from url and return the [page:ImageBitmap image] object that will contain the data.
 		</p>
 
-		<h3>[method:ImageBitmapLoader setOptions]( [param:Object options] )</h3>
+		<h3>[method:this setOptions]( [param:Object options] )</h3>
 		<p>
 			Sets the options object for [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap].
 		</p>

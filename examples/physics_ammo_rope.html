@@ -16,8 +16,20 @@
 
 	<script src="js/libs/ammo.wasm.js"></script>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -148,7 +160,7 @@
 			const ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 			ground.castShadow = true;
 			ground.receiveShadow = true;
-			textureLoader.load( "textures/grid.png", function ( texture ) {
+			textureLoader.load( 'textures/grid.png', function ( texture ) {
 
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
