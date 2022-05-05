@@ -106,6 +106,7 @@
 		- [page:Integer maxAttributes]: *gl.MAX_VERTEX_ATTRIBS*的值<br />
 		- [page:Integer maxCubemapSize]: *gl.MAX_CUBE_MAP_TEXTURE_SIZE* 的值，着色器可使用的立方体贴图纹理的最大宽度*高度<br />
 		- [page:Integer maxFragmentUniforms]: *gl.MAX_FRAGMENT_UNIFORM_VECTORS*的值，片元着色器可使用的全局变量(uniforms)数量<br />
+		- [page:Integer maxSamples]: The value of *gl.MAX_SAMPLES*. Maximum number of samples in context of Multisample anti-aliasing (MSAA).<br />
 		- [page:Integer maxTextureSize]: *gl.MAX_TEXTURE_SIZE*的值，着色器可使用纹理的最大宽度*高度<br />
 		- [page:Integer maxTextures]: *gl.MAX_TEXTURE_IMAGE_UNITS的值，着色器可使用的纹理数量<br />
 		- [page:Integer maxVaryings]: *gl.MAX_VARYING_VECTORS*的值，着色器可使用矢量的数量<br />
@@ -133,7 +134,7 @@
 
 		<h3>[property:Object extensions]</h3>
 		<p>
-		- [page:Object get]( [param:String extensionName] ): 
+		- [page:Object get]( [param:String extensionName] ):
 			用于检查是否支持各种扩展，并返回一个对象，其中包含扩展的详细信息。
 			该方法检查以下扩展：<br />
 
