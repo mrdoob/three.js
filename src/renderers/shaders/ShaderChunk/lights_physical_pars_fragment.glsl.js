@@ -24,9 +24,11 @@ struct PhysicalMaterial {
 
 };
 
+#ifndef CLEARCOAT_R115_COMPATABILITY
 // temporary
 vec3 clearcoatSpecular = vec3( 0.0 );
 vec3 sheenSpecular = vec3( 0.0 );
+#endif
 
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from 
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
@@ -152,6 +154,13 @@ void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const 
 
 #endif
 
+#define DEFAULT_SPECULAR_COEFFICIENT 0.04
+
+// Clear coat directional hemishperical reflectance (this approximation should be improved)
+float clearcoatDHRApprox( const in float roughness, const in float dotNL ) {
+	return DEFAULT_SPECULAR_COEFFICIENT + ( 1.0 - DEFAULT_SPECULAR_COEFFICIENT ) * ( pow( 1.0 - dotNL, 5.0 ) * pow( 1.0 - roughness, 2.0 ) );
+}
+
 void RE_Direct_Physical(
 	const in IncidentLight directLight,
 	const in vec3 normal,
@@ -173,20 +182,60 @@ void RE_Direct_Physical(
 
 		vec3 ccIrradiance = dotNLcc * directLight.color;
 
-		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight.direction, geometry.viewDir, ccNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+		vec3 ccSpecular = ccIrradiance * BRDF_GGX( directLight.direction, geometry.viewDir, ccNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+
+	#ifdef CLEARCOAT_R115_COMPATABILITY
+
+		float clearcoatDHR = material.clearcoat * clearcoatDHRApprox( material.clearcoatRoughness, dotNLcc );
+
+		reflectedLight.directSpecular += material.clearcoat * ccSpecular;
+	
+	#else
+
+		clearcoatSpecular += ccSpecular;
+
+	#endif
+
+	#else
+
+	#ifdef CLEARCOAT_R115_COMPATABILITY
+
+		float clearcoatDHR = 0.0;
+
+	#endif
+
+	#endif
+
+	#ifdef CLEARCOAT_R115_COMPATABILITY
+
+	float clearcoatInv = 1.0 - clearcoatDHR;
+
+	#else
+
+	float clearcoatInv = 1.0;
 
 	#endif
 
 	#ifdef USE_SHEEN
 
-		sheenSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, normal, material.sheenColor, material.sheenRoughness );
+		vec3 snSpecular = irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, normal, material.sheenColor, material.sheenRoughness );
+
+	#ifdef CLEARCOAT_R115_COMPATABILITY
+
+		reflectedLight.directSpecular += clearcoatInv * snSpecular;
+
+	#else
+
+		sheenSpecular += snSpecular;
 
 	#endif
 
-	reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, normal, material.specularColor, material.specularF90, material.roughness );
+	#endif
+
+	reflectedLight.directSpecular += clearcoatInv * irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, normal, material.specularColor, material.specularF90, material.roughness );
 
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	reflectedLight.directDiffuse += clearcoatInv * irradiance * BRDF_Lambert( material.diffuseColor );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
@@ -213,13 +262,49 @@ void RE_IndirectSpecular_Physical(
 
 	#ifdef USE_CLEARCOAT
 
-		clearcoatSpecular += clearcoatRadiance * EnvironmentBRDF( ccNormal, geometry.viewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+		vec3 ccSpecular = clearcoatRadiance * EnvironmentBRDF( ccNormal, geometry.viewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+
+	#ifdef CLEARCOAT_R115_COMPATABILITY
+
+		float dotNLcc = saturate( dot( ccNormal, geometry.viewDir ) );
+
+		float clearcoatDHR = material.clearcoat * clearcoatDHRApprox( material.clearcoatRoughness, dotNLcc );
+
+		reflectedLight.indirectSpecular += material.clearcoat * ccSpecular;
+	
+	#else
+
+		clearcoatSpecular += ccSpecular;
+
+	#endif
+
+	#else
+
+	#ifdef CLEARCOAT_R115_COMPATABILITY
+
+		float clearcoatDHR = 0.0;
+
+	#endif
 
 	#endif
 
 	#ifdef USE_SHEEN
 
+	#ifndef CLEARCOAT_R115_COMPATABILITY
+
 		sheenSpecular += irradiance * material.sheenColor * IBLSheenBRDF( normal, geometry.viewDir, material.sheenRoughness );
+
+	#endif
+
+	#endif
+
+	#ifdef CLEARCOAT_R115_COMPATABILITY
+
+	float clearcoatInv = 1.0 - clearcoatDHR;
+
+	#else
+
+	float clearcoatInv = 1.0;
 
 	#endif
 
@@ -233,7 +318,7 @@ void RE_IndirectSpecular_Physical(
 
 	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
 
-	reflectedLight.indirectSpecular += radiance * singleScattering;
+	reflectedLight.indirectSpecular += clearcoatInv * radiance * singleScattering;
 	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
 
 	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
