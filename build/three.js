@@ -17757,7 +17757,7 @@
 
 					_gl.framebufferTexture2D(_gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0);
 
-					_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST);
+					_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST);
 
 					if (supportsInvalidateFramebuffer) {
 						_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, invalidationArray);
