@@ -173,20 +173,21 @@
 					window.innerHeight,
 					2,
 					{
+						depthBuffer: true,
+						stencilBuffer: true,
 						samples: effectController.msaa ? 4 : 0
 					}
 				);
-				renderTarget.depthTexture = new THREE.DepthTexture( 512, 512 );
-				renderTarget.depthTexture.type = THREE.FloatType;
+				// renderTarget.depthTexture = new THREE.DepthTexture( 512, 512 );
+				// renderTarget.depthTexture.type = THREE.FloatType;
 
 				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
 
 					renderTarget.texture[ i ].minFilter = THREE.NearestFilter;
 					renderTarget.texture[ i ].magFilter = THREE.NearestFilter;
-					renderTarget.texture[ i ].type = THREE.FloatType;
+					// renderTarget.texture[ i ].type = THREE.FloatType;
 
 				}
-
 				// Name our G-Buffer attachments for debugging
 
 				renderTarget.texture[ 0 ].name = 'diffuse';
