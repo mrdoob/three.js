@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - shadow map</title>
+		<title>three.js webgl - shadow map manual update</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -10,7 +10,7 @@
 	<body>
 
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">rome</a><br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap manual update<br />
 		move camera with WASD / RF + mouse<br />
 		t: toggle HUD
 		</div>
@@ -34,12 +34,11 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { FontLoader } from './jsm/loaders/FontLoader.js';
 			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
 			import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
-			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
+			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 2048;
 
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
@@ -50,12 +49,12 @@
 
 			const NEAR = 10, FAR = 3000;
 
-			let mixer;
-
-			const morphs = [];
-
 			let light;
 			let lightShadowMapViewer;
+
+			const textMeshes = [];
+
+			let needToRenderShadows = true;
 
 			const clock = new THREE.Clock();
 
@@ -86,13 +85,13 @@
 				const ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 5, 0.3 );
-				light.position.set( 0, 1500, 1000 );
+				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 10, 0.3 );
+				light.position.set( 200, 1200, - 3000 );
 				light.target.position.set( 0, 0, 0 );
 
 				light.castShadow = true;
 				light.shadow.camera.near = 1200;
-				light.shadow.camera.far = 2500;
+				light.shadow.camera.far = 5000;
 				light.shadow.bias = 0.0001;
 
 				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
@@ -116,7 +115,7 @@
 				//
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFShadowMap;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.shadowMap.autoUpdate = false;
 
 				// CONTROLS
@@ -199,14 +198,15 @@
 
 				// TEXT
 
-				const loader = new FontLoader();
-				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
+				function addTextMesh( font, text, y, visible ) {
 
-					const textGeo = new TextGeometry( 'THREE.JS', {
+					const textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
+
+					const textGeo = new TextGeometry( text, {
 
 						font: font,
 
-						size: 200,
+						size: 100,
 						height: 50,
 						curveSegments: 12,
 
@@ -219,16 +219,29 @@
 					textGeo.computeBoundingBox();
 					const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-					const textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
-
 					const mesh = new THREE.Mesh( textGeo, textMaterial );
 					mesh.position.x = centerOffset;
-					mesh.position.y = FLOOR + 67;
+					mesh.position.y = y;
+
+					mesh.visible = visible;
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
 
+					textMeshes.push( mesh );
+
 					scene.add( mesh );
+
+				}
+
+				const loader = new FontLoader();
+				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
+
+					addTextMesh( font, 'MYSTERIOUS', FLOOR + 220, false );
+
+					addTextMesh( font, 'THREE.JS', FLOOR + 67, true );
+
+					needToRenderShadows = true;
 
 				} );
 
@@ -254,86 +267,6 @@
 
 				scene.add( cubes2 );
 
-				// MORPHS
-
-				mixer = new THREE.AnimationMixer( scene );
-
-				function addMorph( mesh, clip, speed, duration, x, y, z, fudgeColor ) {
-
-					mesh = mesh.clone();
-					mesh.material = mesh.material.clone();
-
-					if ( fudgeColor ) {
-
-						mesh.material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.5 - 0.25 );
-
-					}
-
-					mesh.speed = speed;
-
-					mixer.clipAction( clip, mesh ).
-						setDuration( duration ).
-					// to shift the playback out of phase:
-						startAt( - duration * Math.random() ).
-						play();
-
-					mesh.position.set( x, y, z );
-					mesh.rotation.y = Math.PI / 2;
-
-					mesh.castShadow = true;
-					mesh.receiveShadow = true;
-
-					scene.add( mesh );
-
-					morphs.push( mesh );
-
-				}
-
-				const gltfloader = new GLTFLoader();
-
-				gltfloader.load( 'models/gltf/Horse.glb', function ( gltf ) {
-
-					const mesh = gltf.scene.children[ 0 ];
-
-					const clip = gltf.animations[ 0 ];
-
-					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, 300, true );
-					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, 450, true );
-					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, 600, true );
-
-					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, - 300, true );
-					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, - 450, true );
-					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, - 600, true );
-
-				} );
-
-				gltfloader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
-
-					const mesh = gltf.scene.children[ 0 ];
-					const clip = gltf.animations[ 0 ];
-
-					addMorph( mesh, clip, 500, 1, 500 - Math.random() * 500, FLOOR + 350, 40 );
-
-				} );
-
-				gltfloader.load( 'models/gltf/Stork.glb', function ( gltf ) {
-
-					const mesh = gltf.scene.children[ 0 ];
-					const clip = gltf.animations[ 0 ];
-
-					addMorph( mesh, clip, 350, 1, 500 - Math.random() * 500, FLOOR + 350, 340 );
-
-				} );
-
-				gltfloader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
-
-					const mesh = gltf.scene.children[ 0 ];
-					const clip = gltf.animations[ 0 ];
-
-					addMorph( mesh, clip, 450, 0.5, 500 - Math.random() * 500, FLOOR + 300, 700 );
-
-				} );
-
 			}
 
 			function animate() {
@@ -349,25 +282,25 @@
 
 				const delta = clock.getDelta();
 
-				if ( clock.elapsedTime % 3 < 2 ) {
+				if ( needToRenderShadows ) {
 
-					mixer.update( delta );
+					// The scene can be setup for a different way when rendering shadow maps since we're manually updating shadow maps.
 
-					for ( let i = 0; i < morphs.length; i ++ ) {
+					if ( textMeshes.length > 0 ) {
 
-						const morph = morphs[ i ];
-
-						morph.position.x += morph.speed * delta;
-
-						if ( morph.position.x > 2000 ) {
-
-							morph.position.x = - 1000 - Math.random() * 500;
-
-						}
+						textMeshes[ 0 ].visible = true;
 
 					}
 
 					renderer.renderShadowMap( [ light ], scene, camera );
+
+					needToRenderShadows = false;
+
+					if ( textMeshes.length > 0 ) {
+
+						textMeshes[ 0 ].visible = false;
+
+					}
 
 				}
 
