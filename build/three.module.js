@@ -23646,7 +23646,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : [ renderTarget.texture ];
 
-			for (let i = 0; i < textures.length; i++) {
+			for ( let i = 0; i < textures.length; i ++ ) {
 
 				const texture = textures[ i ];
 
