@@ -176,14 +176,20 @@
 						samples: effectController.msaa ? 4 : 0
 					}
 				);
-				renderTarget.depthTexture = new THREE.DepthTexture( 512, 512 );
-				renderTarget.depthTexture.type = THREE.FloatType;
+
+				// delay the switch of depth to make happy puppeeteer
+				setTimeout( () => {
+
+					// force depth in float to prevent aliasing
+					renderTarget.depthTexture = new THREE.DepthTexture( 0, 0 );
+					renderTarget.depthTexture.type = THREE.FloatType;
+
+				} );
 
 				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
 
 					renderTarget.texture[ i ].minFilter = THREE.NearestFilter;
 					renderTarget.texture[ i ].magFilter = THREE.NearestFilter;
-					// renderTarget.texture[ i ].type = THREE.FloatType;
 
 				}
 				// Name our G-Buffer attachments for debugging
