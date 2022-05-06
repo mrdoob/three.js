@@ -181,7 +181,7 @@
 				setTimeout( () => {
 
 					// force depth in float to prevent aliasing
-					renderTarget.depthTexture = new THREE.DepthTexture( 0, 0 );
+					renderTarget.depthTexture = new THREE.DepthTexture();
 					renderTarget.depthTexture.type = THREE.FloatType;
 
 				} );
