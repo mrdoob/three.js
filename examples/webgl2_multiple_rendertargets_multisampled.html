@@ -173,13 +173,11 @@
 					window.innerHeight,
 					2,
 					{
-						depthBuffer: true,
-						stencilBuffer: true,
 						samples: effectController.msaa ? 4 : 0
 					}
 				);
-				// renderTarget.depthTexture = new THREE.DepthTexture( 512, 512 );
-				// renderTarget.depthTexture.type = THREE.FloatType;
+				renderTarget.depthTexture = new THREE.DepthTexture( 512, 512 );
+				renderTarget.depthTexture.type = THREE.FloatType;
 
 				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
 
@@ -198,7 +196,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xa0a0a0, 500, 2000 );
 
-				const groundMat = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+				const groundMat = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true } );
 				groundMat.onBeforeCompile = function ( shader ) {
 
 					shader.fragmentShader = `

@@ -344,9 +344,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
 			if ( renderTargetProperties.__webglMultisampledFramebuffer ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledFramebuffer );
 
-			if ( renderTargetProperties.__webglMultisampledTempWrite ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledTempWrite );
-			if ( renderTargetProperties.__webglMultisampledTempRead ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledTempRead );
-
 			if ( renderTargetProperties.__webglColorRenderbuffer ) {
 
 				for ( let i = 0; i < renderTargetProperties.__webglColorRenderbuffer.length; i ++ ) {
@@ -1581,8 +1578,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const textures = isMultipleRenderTargets ? texture : [ texture ];
 
 				renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
-				renderTargetProperties.__webglMultisampledTempRead = _gl.createFramebuffer();
-				renderTargetProperties.__webglMultisampledTempWrite = _gl.createFramebuffer();
 				renderTargetProperties.__webglColorRenderbuffer = [];
 
 				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
@@ -1734,15 +1729,33 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false ) {
 
+
 			const textures = renderTarget.isWebGLMultipleRenderTargets ? renderTarget.texture : [ renderTarget.texture ];
 			const width = renderTarget.width;
 			const height = renderTarget.height;
 			let mask = _gl.COLOR_BUFFER_BIT;
-			const invalidationArray = [ _gl.COLOR_ATTACHMENT0 ];
+			const invalidationArray = [];
 			const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
 			const renderTargetProperties = properties.get( renderTarget );
 
+
+			// Remove FBO attachments
 			for ( let i = 0; i < textures.length; i ++ ) {
+
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, null );
+
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, null, 0 );
+
+			}
+
+			state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+			state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				invalidationArray.push( _gl.COLOR_ATTACHMENT0 + i );
 
 				if ( renderTarget.depthBuffer ) {
 
@@ -1758,9 +1771,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					if ( renderTarget.stencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
 
 				}
-
-				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledTempRead );
-				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledTempWrite );
 
 				_gl.framebufferRenderbuffer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
 
@@ -1783,8 +1793,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
-				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
+
+			}
+
+			state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
+			state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
+
+    		// Reconstruct FBO attachments
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
+
+				const webglTexture = properties.get( textures[ i ] ).__webglTexture;
+
+				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+				_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, webglTexture, 0 );
 
 			}
 

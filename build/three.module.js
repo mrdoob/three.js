@@ -22640,9 +22640,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
 			if ( renderTargetProperties.__webglMultisampledFramebuffer ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledFramebuffer );
 
-			if ( renderTargetProperties.__webglMultisampledTempWrite ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledTempWrite );
-			if ( renderTargetProperties.__webglMultisampledTempRead ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledTempRead );
-
 			if ( renderTargetProperties.__webglColorRenderbuffer ) {
 
 				for ( let i = 0; i < renderTargetProperties.__webglColorRenderbuffer.length; i ++ ) {
@@ -23877,8 +23874,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const textures = isMultipleRenderTargets ? texture : [ texture ];
 
 				renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
-				renderTargetProperties.__webglMultisampledTempRead = _gl.createFramebuffer();
-				renderTargetProperties.__webglMultisampledTempWrite = _gl.createFramebuffer();
 				renderTargetProperties.__webglColorRenderbuffer = [];
 
 				state.bindFramebuffer( 36160, renderTargetProperties.__webglMultisampledFramebuffer );
@@ -24030,15 +24025,33 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false ) {
 
+
 			const textures = renderTarget.isWebGLMultipleRenderTargets ? renderTarget.texture : [ renderTarget.texture ];
 			const width = renderTarget.width;
 			const height = renderTarget.height;
 			let mask = 16384;
-			const invalidationArray = [ 36064 ];
+			const invalidationArray = [];
 			const depthStyle = renderTarget.stencilBuffer ? 33306 : 36096;
 			const renderTargetProperties = properties.get( renderTarget );
 
+
+			// Remove FBO attachments
 			for ( let i = 0; i < textures.length; i ++ ) {
+
+				state.bindFramebuffer( 36160, renderTargetProperties.__webglMultisampledFramebuffer );
+				_gl.framebufferRenderbuffer( 36160, 36064 + i, 36161, null );
+
+				state.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer );
+				_gl.framebufferTexture2D( 36009, 36064 + i, 3553, null, 0 );
+
+			}
+
+			state.bindFramebuffer( 36008, renderTargetProperties.__webglMultisampledFramebuffer );
+			state.bindFramebuffer( 36009, renderTargetProperties.__webglFramebuffer );
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				invalidationArray.push( 36064 + i );
 
 				if ( renderTarget.depthBuffer ) {
 
@@ -24054,9 +24067,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					if ( renderTarget.stencilBuffer ) mask |= 1024;
 
 				}
-
-				state.bindFramebuffer( 36008, renderTargetProperties.__webglMultisampledTempRead );
-				state.bindFramebuffer( 36009, renderTargetProperties.__webglMultisampledTempWrite );
 
 				_gl.framebufferRenderbuffer( 36008, 36064, 36161, renderTargetProperties.__webglColorRenderbuffer[ i ] );
 
@@ -24079,8 +24089,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				state.bindFramebuffer( 36008, null );
-				state.bindFramebuffer( 36009, null );
+
+			}
+
+			state.bindFramebuffer( 36008, null );
+			state.bindFramebuffer( 36009, null );
+
+    		// Reconstruct FBO attachments
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				state.bindFramebuffer( 36160, renderTargetProperties.__webglMultisampledFramebuffer );
+				_gl.framebufferRenderbuffer( 36160, 36064 + i, 36161, renderTargetProperties.__webglColorRenderbuffer[ i ] );
+
+				const webglTexture = properties.get( textures[ i ] ).__webglTexture;
+
+				state.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer );
+				_gl.framebufferTexture2D( 36009, 36064 + i, 3553, webglTexture, 0 );
 
 			}
 
