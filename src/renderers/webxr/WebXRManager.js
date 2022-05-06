@@ -121,7 +121,7 @@ class WebXRManager extends EventDispatcher {
 
 			const controller = inputSourcesMap.get( event.inputSource );
 
-			if ( controller ) {
+			if ( controller !== undefined ) {
 
 				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
@@ -133,7 +133,7 @@ class WebXRManager extends EventDispatcher {
 
 			inputSourcesMap.forEach( function ( controller, inputSource ) {
 
-				if ( controller ) {
+				if ( controller !== undefined ) {
 
 					controller.disconnect( inputSource );
 
