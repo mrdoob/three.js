@@ -802,7 +802,7 @@ function toJSON( shapes, options, data ) {
 	}
 
 	data.options = Object.assign( {}, options );
-	
+
 	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
 
 	return data;
