@@ -396,12 +396,13 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		if ( !Number.isInteger(height) && !Number.isInteger(width) ) {
+		if ( ! Number.isInteger( height ) && ! Number.isInteger( width ) ) {
 
 			console.warn( 'THREE.WebGLRenderer: Can\'t change size while width or height is not Number.' );
 			return;
 
 		}
+
 		
 		_width = width;
 		_height = height;
