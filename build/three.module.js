@@ -22639,17 +22639,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer );
 			if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
 			if ( renderTargetProperties.__webglMultisampledFramebuffer ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledFramebuffer );
-
-			if ( renderTargetProperties.__webglColorRenderbuffer ) {
-
-				for ( let i = 0; i < renderTargetProperties.__webglColorRenderbuffer.length; i ++ ) {
-
-					if ( renderTargetProperties.__webglColorRenderbuffer[ i ] ) _gl.deleteRenderbuffer( renderTargetProperties.__webglColorRenderbuffer[ i ] );
-
-				}
-
-			}
-
+			if ( renderTargetProperties.__webglColorRenderbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglColorRenderbuffer );
 			if ( renderTargetProperties.__webglDepthRenderbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthRenderbuffer );
 
 		}
@@ -23644,30 +23634,25 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : [ renderTarget.texture ];
+			// Use the first texture for MRT so far
+			const texture = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture[ 0 ] : renderTarget.texture;
 
-			for ( let i = 0; i < textures.length; i ++ ) {
+			const glFormat = utils.convert( texture.format, texture.encoding );
+			const glType = utils.convert( texture.type );
+			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+			const samples = getRenderTargetSamples( renderTarget );
 
-				const texture = textures[ i ];
+			if ( isMultisample && useMultisampledRTT( renderTarget ) === false ) {
 
-				const glFormat = utils.convert( texture.format, texture.encoding );
-				const glType = utils.convert( texture.type );
-				const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
-				const samples = getRenderTargetSamples( renderTarget );
+				_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
-				if ( isMultisample && useMultisampledRTT( renderTarget ) === false ) {
+			} else if ( useMultisampledRTT( renderTarget ) ) {
 
-					_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+				multisampledRTTExt.renderbufferStorageMultisampleEXT( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
-				} else if ( useMultisampledRTT( renderTarget ) ) {
+			} else {
 
-					multisampledRTTExt.renderbufferStorageMultisampleEXT( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
-
-				} else {
-
-					_gl.renderbufferStorage( 36161, glInternalFormat, renderTarget.width, renderTarget.height );
-
-				}
+				_gl.renderbufferStorage( 36161, glInternalFormat, renderTarget.width, renderTarget.height );
 
 			}
 
@@ -23867,34 +23852,21 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-			}
-
-			if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false ) {
-
-				const textures = isMultipleRenderTargets ? texture : [ texture ];
+			} else if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false ) {
 
 				renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
-				renderTargetProperties.__webglColorRenderbuffer = [];
+				renderTargetProperties.__webglColorRenderbuffer = _gl.createRenderbuffer();
+
+				_gl.bindRenderbuffer( 36161, renderTargetProperties.__webglColorRenderbuffer );
+
+				const glFormat = utils.convert( texture.format, texture.encoding );
+				const glType = utils.convert( texture.type );
+				const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+				const samples = getRenderTargetSamples( renderTarget );
+				_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
 				state.bindFramebuffer( 36160, renderTargetProperties.__webglMultisampledFramebuffer );
-
-				for ( let i = 0; i < textures.length; i ++ ) {
-
-					const texture = textures[ i ];
-					renderTargetProperties.__webglColorRenderbuffer[ i ] = _gl.createRenderbuffer();
-
-					_gl.bindRenderbuffer( 36161, renderTargetProperties.__webglColorRenderbuffer[ i ] );
-
-					const glFormat = utils.convert( texture.format, texture.encoding );
-					const glType = utils.convert( texture.type );
-					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
-					const samples = getRenderTargetSamples( renderTarget );
-					_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
-
-					_gl.framebufferRenderbuffer( 36160, 36064 + i, 36161, renderTargetProperties.__webglColorRenderbuffer[ i ] );
-
-				}
-
+				_gl.framebufferRenderbuffer( 36160, 36064, 36161, renderTargetProperties.__webglColorRenderbuffer );
 				_gl.bindRenderbuffer( 36161, null );
 
 				if ( renderTarget.depthBuffer ) {
@@ -24025,97 +23997,48 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false ) {
 
-			const textures = renderTarget.isWebGLMultipleRenderTargets ? renderTarget.texture : [ renderTarget.texture ];
 			const width = renderTarget.width;
 			const height = renderTarget.height;
 			let mask = 16384;
-			const invalidationArray = [];
+			const invalidationArray = [ 36064 ];
 			const depthStyle = renderTarget.stencilBuffer ? 33306 : 36096;
+
+			if ( renderTarget.depthBuffer ) {
+
+				invalidationArray.push( depthStyle );
+
+			}
+
 			const renderTargetProperties = properties.get( renderTarget );
-			const isMultipleRenderTargets = ( renderTarget.isWebGLMultipleRenderTargets === true );
+			const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : false;
 
-			// If MRT we need to remove FBO attachments
-			if ( isMultipleRenderTargets ) {
+			if ( ignoreDepthValues === false ) {
 
-				for ( let i = 0; i < textures.length; i ++ ) {
-
-					state.bindFramebuffer( 36160, renderTargetProperties.__webglMultisampledFramebuffer );
-					_gl.framebufferRenderbuffer( 36160, 36064 + i, 36161, null );
-
-					state.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer );
-					_gl.framebufferTexture2D( 36009, 36064 + i, 3553, null, 0 );
-
-				}
+				if ( renderTarget.depthBuffer ) mask |= 256;
+				if ( renderTarget.stencilBuffer ) mask |= 1024;
 
 			}
 
 			state.bindFramebuffer( 36008, renderTargetProperties.__webglMultisampledFramebuffer );
 			state.bindFramebuffer( 36009, renderTargetProperties.__webglFramebuffer );
 
-			for ( let i = 0; i < textures.length; i ++ ) {
+			if ( ignoreDepthValues === true ) {
 
-				invalidationArray.push( 36064 + i );
+				_gl.invalidateFramebuffer( 36008, [ depthStyle ] );
+				_gl.invalidateFramebuffer( 36009, [ depthStyle ] );
 
-				if ( renderTarget.depthBuffer ) {
+			}
 
-					invalidationArray.push( depthStyle );
+			_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, 9728 );
 
-				}
+			if ( supportsInvalidateFramebuffer ) {
 
-				const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : false;
-
-				if ( ignoreDepthValues === false ) {
-
-					if ( renderTarget.depthBuffer ) mask |= 256;
-					if ( renderTarget.stencilBuffer ) mask |= 1024;
-
-				}
-
-				_gl.framebufferRenderbuffer( 36008, 36064, 36161, renderTargetProperties.__webglColorRenderbuffer[ i ] );
-
-				if ( ignoreDepthValues === true ) {
-
-					_gl.invalidateFramebuffer( 36008, [ depthStyle ] );
-					_gl.invalidateFramebuffer( 36009, [ depthStyle ] );
-
-				}
-
-				const webglTexture = properties.get( textures[ i ] ).__webglTexture;
-
-				_gl.framebufferTexture2D( 36009, 36064, 3553, webglTexture, 0 );
-
-				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, 9728 );
-
-				if ( supportsInvalidateFramebuffer ) {
-
-					_gl.invalidateFramebuffer( 36008, invalidationArray );
-
-				}
-
+				_gl.invalidateFramebuffer( 36008, invalidationArray );
 
 			}
 
 			state.bindFramebuffer( 36008, null );
-			state.bindFramebuffer( 36009, null );
-
-			// If MRT since pre-blit we removed the FBO we need to reconstruct the attachments
-			if ( isMultipleRenderTargets ) {
-
-				for ( let i = 0; i < textures.length; i ++ ) {
-
-					state.bindFramebuffer( 36160, renderTargetProperties.__webglMultisampledFramebuffer );
-					_gl.framebufferRenderbuffer( 36160, 36064 + i, 36161, renderTargetProperties.__webglColorRenderbuffer[ i ] );
-
-					const webglTexture = properties.get( textures[ i ] ).__webglTexture;
-
-					state.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer );
-					_gl.framebufferTexture2D( 36009, 36064 + i, 3553, webglTexture, 0 );
-
-				}
-
-				state.bindFramebuffer( 36009, renderTargetProperties.__webglMultisampledFramebuffer );
-
-			}
+			state.bindFramebuffer( 36009, renderTargetProperties.__webglMultisampledFramebuffer );
 
 		}
 
@@ -50758,4 +50681,3 @@ if ( typeof window !== 'undefined' ) {
 }
 
 export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CapsuleGeometry as CapsuleBufferGeometry, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, FaceColors, FileLoader, FlatShading, Float16BufferAttribute, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, SRGBColorSpace, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Source, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUubW9kdWxlLmpzIiwic291cmNlcyI6W10sInNvdXJjZXNDb250ZW50IjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9
