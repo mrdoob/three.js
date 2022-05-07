@@ -110,7 +110,8 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				primitive: {
 					topology: GPUPrimitiveTopology.TriangleStrip,
 					stripIndexFormat: GPUIndexFormat.Uint32
-				}
+				},
+				layout: 'auto'
 			} );
 
 			this.pipelines[ format ] = pipeline;
