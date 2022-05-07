@@ -634,7 +634,7 @@ class WebGPURenderer {
 			this._bindings.update( computeNode );
 			passEncoder.setBindGroup( 0, bindGroup );
 
-			passEncoder.dispatch( computeNode.dispatchCount );
+			passEncoder.dispatchWorkgroups( computeNode.dispatchCount );
 
 		}
 
