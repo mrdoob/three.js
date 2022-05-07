@@ -246,7 +246,7 @@ There are many cases when using three.js where we need to know the actual
 size of the canvas's drawingBuffer. For example when making a post processing filter,
 or if we are making a shader that accesses <code class="notranslate" translate="no">gl_FragCoord</code>, if we are making
 a screenshot, or reading pixels for GPU picking, for drawing into a 2D canvas,
-etc... There many many cases where if we use <code class="notranslate" translate="no">setPixelRatio</code> then our actual size will be different
+etc... There are many cases where if we use <code class="notranslate" translate="no">setPixelRatio</code> then our actual size will be different
 than the size we requested and we'll have to guess when to use the size
 we asked for and when to use the size three.js is actually using.
 By doing it ourselves we always know the size being used is the size we requested.
