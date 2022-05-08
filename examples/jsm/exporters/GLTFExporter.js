@@ -1102,9 +1102,9 @@ class GLTFWriter {
 
 		}
 
-		if ( options.binary === true ) {
+		let toBlobPromise;
 
-			let toBlobPromise;
+		if ( ( options.binary === true ) || ( canvas.toDataURL === undefined ) ) {
 
 			if ( canvas.toBlob !== undefined ) {
 
@@ -1116,19 +1116,43 @@ class GLTFWriter {
 
 			}
 
-			pending.push( toBlobPromise.then( blob =>
+		}
 
-				writer.processBufferViewImage( blob ).then( bufferViewIndex => {
+		if ( options.binary === true ) {
 
-					imageDef.bufferView = bufferViewIndex;
+			pending.push(
 
-				} )
+				toBlobPromise
+					.then( blob => writer.processBufferViewImage( blob ) )
+				     	.then( bufferViewIndex => {
 
-			) );
+						imageDef.bufferView = bufferViewIndex;
+
+					} )
+
+			);
 
 		} else {
 
-			imageDef.uri = canvas.toDataURL( mimeType );
+			if ( canvas.toDataURL !== undefined ) {
+
+				imageDef.uri = canvas.toDataURL( mimeType );
+
+			} else {
+
+				pending.push(
+
+					toBlobPromise
+						.then( blob => new FileReader().readAsDataURL( blob ) )
+						.then( dataURL => {
+
+							imageDef.uri = dataURL;
+
+						} )
+
+				);
+
+			}
 
 		}
 
