@@ -297,7 +297,10 @@ function html2canvas( element ) {
 			let prevBorder = null;
 			for (const border of borders) {
 				if (prevBorder) {
-					match = match && style[ border + 'Width' ] && style[ border + 'Color' ] && style[ border + 'Style'];
+					match = match &&
+					(style[ border + 'Width' ] === style[ prevBorder + 'Width' ]) &&
+					(style[ border + 'Color' ] === style[ prevBorder + 'Color' ]) &&
+					(style[ border + 'Style' ] === style[ prevBorder + 'Style' ]);
 				}
 				if (!match) break;
 				prevBorder = border;
