@@ -4,7 +4,8 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PlaneGeometry,
-	sRGBEncoding
+	sRGBEncoding,
+	Color
 } from 'three';
 
 class HTMLMesh extends Mesh {
@@ -14,7 +15,7 @@ class HTMLMesh extends Mesh {
 		const texture = new HTMLTexture( dom );
 
 		const geometry = new PlaneGeometry( texture.image.width * 0.001, texture.image.height * 0.001 );
-		const material = new MeshBasicMaterial( { map: texture, toneMapped: false } );
+		const material = new MeshBasicMaterial( { map: texture, toneMapped: false, transparent: true } );
 
 		super( geometry, material );
 
@@ -122,6 +123,7 @@ const canvases = new WeakMap();
 function html2canvas( element ) {
 
 	const range = document.createRange();
+	const color = new Color();
 
 	function Clipper( context ) {
 
@@ -192,13 +194,25 @@ function html2canvas( element ) {
 
 			}
 
-			context.font = style.fontSize + ' ' + style.fontFamily;
+			context.font = style.fontWeight + ' ' + style.fontSize + ' ' + style.fontFamily;
 			context.textBaseline = 'top';
 			context.fillStyle = style.color;
-			context.fillText( string, x, y );
+			context.fillText( string, x, y + parseFloat(style.fontSize)*0.1 );
 
 		}
 
+	}
+
+	function roundRectPath(x, y, w, h, r) {
+		if (w < 2 * r) r = w / 2;
+		if (h < 2 * r) r = h / 2;
+		context.beginPath();
+		context.moveTo(x+r, y);
+		context.arcTo(x+w, y,   x+w, y+h, r);
+		context.arcTo(x+w, y+h, x,   y+h, r);
+		context.arcTo(x,   y+h, x,   y,   r);
+		context.arcTo(x,   y,   x+w, y,   r);
+		context.closePath();
 	}
 
 	function drawBorder( style, which, x, y, width, height ) {
@@ -210,6 +224,7 @@ function html2canvas( element ) {
 		if ( borderWidth !== '0px' && borderStyle !== 'none' && borderColor !== 'transparent' && borderColor !== 'rgba(0, 0, 0, 0)' ) {
 
 			context.strokeStyle = borderColor;
+			context.lineWidth = parseFloat(borderWidth);
 			context.beginPath();
 			context.moveTo( x, y );
 			context.lineTo( x + width, y + height );
@@ -268,25 +283,120 @@ function html2canvas( element ) {
 
 			const backgroundColor = style.backgroundColor;
 
+			// Get the border of the element used for fill and border
+			roundRectPath(x, y, width, height, parseFloat(style.borderRadius) );
 			if ( backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
 
 				context.fillStyle = backgroundColor;
-				context.fillRect( x, y, width, height );
-
+				context.fill();
 			}
 
-			drawBorder( style, 'borderTop', x, y, width, 0 );
-			drawBorder( style, 'borderLeft', x, y, 0, height );
-			drawBorder( style, 'borderBottom', x, y + height, width, 0 );
-			drawBorder( style, 'borderRight', x + width, y, 0, height );
+			// If all the borders match then stroke the round rectangle
+			const borders = ['borderTop', 'borderLeft', 'borderBottom', 'borderRight'];
+			let match = true;
+			let prevBorder = null;
+			for (const border of borders) {
+				if (prevBorder) {
+					match = match && style[ border + 'Width' ] && style[ border + 'Color' ] && style[ border + 'Style'];
+				}
+				if (!match) break;
+				prevBorder = border;
+			}
 
-			if ( element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
+			// they all match so stroke the rectangle from before
+			if (match) {
+				const width = parseFloat(style.borderTopWidth);
+				if ( style.borderTopWidth !== '0px' && style.borderTopStyle !== 'none' && style.borderTopColor !== 'transparent' && style.borderTopColor !== 'rgba(0, 0, 0, 0)' ) {
+					context.strokeStyle = style.borderTopColor;
+					context.lineWidth = width;
+					context.stroke();
+				}
+			} else {
 
-				clipper.add( { x: x, y: y, width: width, height: height } );
+				// Otherwise draw individual borders
+				drawBorder( style, 'borderTop', x, y, width, 0 );
+				drawBorder( style, 'borderLeft', x, y, 0, height );
+				drawBorder( style, 'borderBottom', x, y + height, width, 0 );
+				drawBorder( style, 'borderRight', x + width, y, 0, height );
+			}
 
-				drawText( style, x + parseInt( style.paddingLeft ), y + parseInt( style.paddingTop ), element.value );
+			if ( element instanceof HTMLInputElement) {
 
-				clipper.remove();
+				let accentColor = style.accentColor;
+				if (accentColor === undefined || accentColor === 'auto') accentColor = style.color;
+				color.set(accentColor);
+				const luminance = Math.sqrt( 0.299*color.r**2 + 0.587*color.g**2 + 0.114*color.b**2 );
+				const accentTextColor = luminance < 0.5 ? 'white' : '#111111';
+
+				if (element.type  === 'radio') {
+					roundRectPath(x,y,width,height,height);
+					context.fillStyle = 'white';
+					context.strokeStyle = accentColor;
+					context.lineWidth = 1;
+					context.fill();
+					context.stroke();
+
+					if (element.checked) {
+						const border = 2;
+						roundRectPath(x+border,y+border,width-border*2,height-border*2, height);
+						context.fillStyle = accentColor;
+						context.strokeStyle = accentTextColor;
+						context.lineWidth = border;
+						context.fill();
+						context.stroke();
+					}
+				}
+
+				if (element.type  === 'checkbox') {
+					roundRectPath(x,y,width,height,2);
+					context.fillStyle = element.checked ? accentColor : 'white';
+					context.strokeStyle = element.checked ? accentTextColor : accentColor;
+					context.lineWidth = 1;
+					context.stroke();
+					context.fill();
+
+					if (element.checked) {
+						const oldTextAlign = context.textAlign;
+						context.textAlign = 'center';
+						drawText( {
+							color: accentTextColor,
+							fontFamily: style.fontFamily,
+							fontSize: height + 'px',
+							fontWeight: 'bold'
+						}, x + width/2, y, '✔' );
+						context.textAlign = oldTextAlign;
+					}
+				}
+
+				if (element.type  === 'range') {
+					const [min,max,value] = ['min','max','value'].map(property => parseFloat(element[property]));
+					const position = ((value-min)/(max-min)) * (width - height);
+
+					roundRectPath(x,y + height*0.25,width, height*0.5, height*0.25);
+					context.fillStyle = accentTextColor;
+					context.strokeStyle = accentColor;
+					context.lineWidth = 1;
+					context.fill();
+					context.stroke();
+
+					roundRectPath(x,y + height*0.25,position+height*0.5, height*0.5, height*0.25);
+					context.fillStyle = accentColor;
+					context.fill();
+
+					roundRectPath(x + position,y,height, height, height*0.5);
+					context.fillStyle = accentColor;
+					context.fill();
+				}
+
+				if (element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
+
+					clipper.add( { x: x, y: y, width: width, height: height } );
+
+					drawText( style, x + parseInt( style.paddingLeft ), y + parseInt( style.paddingTop ), element.value );
+
+					clipper.remove();
+
+				}
 
 			}
 
