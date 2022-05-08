@@ -221,7 +221,7 @@ class WebGPURenderer {
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.autoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( this._info.autoReset === true ) this._info.reset();
 

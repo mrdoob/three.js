@@ -924,7 +924,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		// update camera matrices and frustum
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.autoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( xr.enabled === true && xr.isPresenting === true ) {
 
