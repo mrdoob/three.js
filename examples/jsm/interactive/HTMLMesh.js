@@ -297,8 +297,7 @@ function html2canvas( element ) {
 			let prevBorder = null;
 			for (const border of borders) {
 				if (prevBorder) {
-					match = match &&
-					(style[ border + 'Width' ] === style[ prevBorder + 'Width' ]) &&
+					match = (style[ border + 'Width' ] === style[ prevBorder + 'Width' ]) &&
 					(style[ border + 'Color' ] === style[ prevBorder + 'Color' ]) &&
 					(style[ border + 'Style' ] === style[ prevBorder + 'Style' ]);
 				}
@@ -306,7 +305,7 @@ function html2canvas( element ) {
 				prevBorder = border;
 			}
 
-			// they all match so stroke the rectangle from before
+			// they all match so stroke the rectangle from before allows for border-radius
 			if (match) {
 				const width = parseFloat(style.borderTopWidth);
 				if ( style.borderTopWidth !== '0px' && style.borderTopStyle !== 'none' && style.borderTopColor !== 'transparent' && style.borderTopColor !== 'rgba(0, 0, 0, 0)' ) {
