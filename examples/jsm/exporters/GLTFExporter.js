@@ -347,15 +347,7 @@ function getCanvas() {
 
 	}
 
-	if ( typeof OffscreenCanvas !== 'undefined' ) {
-
-		cachedCanvas = new OffscreenCanvas( 1, 1 );
-
-	} else {
-
-		cachedCanvas = document.createElement( 'canvas' );
-
-	}
+	cachedCanvas = document.createElement( 'canvas' );
 
 	return cachedCanvas;
 
