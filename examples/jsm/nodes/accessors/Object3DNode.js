@@ -46,9 +46,8 @@ class Object3DNode extends Node {
 
 	update( frame ) {
 
-		const object = this.object3d !== null ? this.object3d : frame.object;
+		const object = this.object3d;
 		const uniformNode = this._uniformNode;
-		const camera = frame.camera;
 		const scope = this.scope;
 
 		if ( scope === Object3DNode.VIEW_MATRIX ) {
@@ -69,9 +68,13 @@ class Object3DNode extends Node {
 
 		} else if ( scope === Object3DNode.VIEW_POSITION ) {
 
+			const camera = frame.camera;
+
 			uniformNode.value.setFromMatrixPosition( object.matrixWorld );
 
 			uniformNode.value.applyMatrix4( camera.matrixWorldInverse );
+
+			//uniformNode.value.setFromMatrixPosition( object.modelViewMatrix );
 
 		}
 
