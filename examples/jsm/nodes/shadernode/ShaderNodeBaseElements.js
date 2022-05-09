@@ -39,9 +39,6 @@ import MathNode from '../math/MathNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import CondNode from '../math/CondNode.js';
 
-// lights
-import ReflectedLightNode from '../lights/ReflectedLightNode.js';
-
 // utils
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
@@ -262,7 +259,6 @@ export const faceDirection = sub( mul( float( frontFacing ), 2 ), 1 );
 
 // lights
 
-export const reflectedLight = nodeProxy( ReflectedLightNode );
 
 // utils
 
