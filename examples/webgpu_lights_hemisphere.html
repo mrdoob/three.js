@@ -1,0 +1,303 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Hemisphere Light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
+		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Hemisphere Light
+		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
+
+			import WebGPU from './jsm/capabilities/WebGPU.js';
+			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			let camera, scene, renderer;
+			let controls;
+			const mixers = [];
+			let stats;
+
+			const clock = new THREE.Clock();
+
+			init().then( animate ).catch( error );
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				const container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.set( 0, 0, 250 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+				//scene.fog = new THREE.Fog( scene.background, 1, 5000 );
+
+				// LIGHTS
+
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+				hemiLight.color.setHSL( 0.6, 1, 0.6 );
+				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+				hemiLight.position.set( 0, 1, 0 );
+				//scene.add( hemiLight );
+
+				const hemiLightHelper = new THREE.HemisphereLightHelper( hemiLight, 10 );
+				//scene.add( hemiLightHelper );
+
+				//
+
+				const pointLight = new THREE.PointLight( 0xffffff, 1 );
+				pointLight.position.set( - 1, 1.75, 1 );
+				pointLight.position.multiplyScalar( 30 );
+				//scene.add( pointLight );
+
+				//
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				dirLight.color.setHSL( 0.1, 1, 0.95 );
+				dirLight.position.set( - 1, 1.75, 1 );
+				dirLight.position.multiplyScalar( 30 );
+				//scene.add( dirLight );
+
+				dirLight.castShadow = true;
+
+				dirLight.shadow.mapSize.width = 2048;
+				dirLight.shadow.mapSize.height = 2048;
+
+				const d = 50;
+
+				dirLight.shadow.camera.left = - d;
+				dirLight.shadow.camera.right = d;
+				dirLight.shadow.camera.top = d;
+				dirLight.shadow.camera.bottom = - d;
+
+				dirLight.shadow.camera.far = 3500;
+				dirLight.shadow.bias = - 0.0001;
+
+				const dirLightHelper = new THREE.DirectionalLightHelper( dirLight, 10 );
+				//scene.add( dirLightHelper );
+
+				// GROUND
+
+				const groundGeo = new THREE.PlaneGeometry( 10000, 10000 );
+				const groundMat = new THREE.MeshStandardMaterial( { color: 0xffffff } );
+				groundMat.color.setHSL( 0.095, 1, 0.75 );
+
+				const ground = new THREE.Mesh( groundGeo, groundMat );
+				ground.position.y = - 33;
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				//scene.add( ground );
+
+				// SKYDOME
+/*
+				const vertexShader = document.getElementById( 'vertexShader' ).textContent;
+				const fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+				const uniforms = {
+					'topColor': { value: new THREE.Color( 0x0077ff ) },
+					'bottomColor': { value: new THREE.Color( 0xffffff ) },
+					'offset': { value: 33 },
+					'exponent': { value: 0.6 }
+				};
+				uniforms[ 'topColor' ].value.copy( hemiLight.color );
+
+				scene.fog.color.copy( uniforms[ 'bottomColor' ].value );
+*/
+				THREE.ShaderChunk['lights_fragment_maps'] = `
+				
+	#if defined( RE_IndirectDiffuse )
+		#ifdef USE_LIGHTMAP
+			vec4 lightMapTexel = texture2D( lightMap, vUv2 );
+			vec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;
+			//irradiance += lightMapIrradiance;
+		#endif
+		#if defined( USE_ENVMAP ) && defined( STANDARD ) && defined( ENVMAP_TYPE_CUBE_UV )
+			iblIrradiance += getIBLIrradiance( geometry.normal );
+		#endif
+	#endif
+	#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
+		radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+		#ifdef USE_CLEARCOAT
+			//clearcoatRadiance += getIBLRadiance( geometry.viewDir, geometry.clearcoatNormal, material.clearcoatRoughness );
+		#endif
+	#endif
+			`;	
+
+				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+				const skyMat = new THREE.MeshStandardMaterial( {
+					side: THREE.BackSide,
+					color: 0x00
+				} );
+
+				const sky = new THREE.Mesh( skyGeo, skyMat );
+				scene.add( sky );
+
+				//
+				
+				const path = 'textures/cube/SwedishRoyalCastle/';
+				const format = '.jpg';
+				const urls = [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
+
+				const cubeTexture = new THREE.CubeTextureLoader().load( urls );
+
+				// MODEL
+
+				const loader = new GLTFLoader();
+
+				loader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
+
+					const mesh = gltf.scene.children[ 0 ];
+					mesh.material = new THREE.MeshStandardMaterial( { color: 0 } );
+					//mesh.material.colorNode = Nodes.normalView;
+
+					const sphere = new THREE.Mesh( new THREE.SphereGeometry( 30, 32, 16 ), new THREE.MeshStandardMaterial( { color: 0xFFFFFF } ) );
+					sphere.material.roughness = 1;
+					sphere.material.roughness = .5;
+					sphere.material.roughness = 0;
+					sphere.material.metalness = 0;
+					sphere.material.envMap = cubeTexture;
+					sphere.material.envNode = new Nodes.CubeTextureNode( cubeTexture );
+					scene.add( sphere );
+
+					const s = 0.35;
+					mesh.scale.set( s, s, s );
+					mesh.position.y = 15;
+					mesh.rotation.y = - 1;
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					scene.add( mesh );
+
+					//const mixer = new THREE.AnimationMixer( mesh );
+					//mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
+					//mixers.push( mixer );
+
+				} );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
+				renderer.toneMappingExposure = 1;
+				renderer.physicallyCorrectLights = true;
+				//renderer.shadowMap.enabled = true;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+/*
+				const hemisphereButton = document.getElementById( 'hemisphereButton' );
+				hemisphereButton.addEventListener( 'click', function () {
+
+					hemiLight.visible = ! hemiLight.visible;
+					hemiLightHelper.visible = ! hemiLightHelper.visible;
+
+				} );
+
+				const directionalButton = document.getElementById( 'directionalButton' );
+				directionalButton.addEventListener( 'click', function () {
+
+					dirLight.visible = ! dirLight.visible;
+					dirLightHelper.visible = ! dirLightHelper.visible;
+
+				} );
+*/
+				if ( renderer.init) return renderer.init();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				const delta = clock.getDelta();
+
+				for ( let i = 0; i < mixers.length; i ++ ) {
+
+					mixers[ i ].update( delta );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			function error( error ) {
+
+				console.error( error );
+
+			}
+
+		</script>
+	</body>
+</html>
