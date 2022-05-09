@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '140';
+	const REVISION = '141dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -2676,7 +2676,8 @@
 			this.texture = source.texture.clone();
 			this.texture.isRenderTargetTexture = true; // ensure image object is not shared, see #20328
 
-			this.texture.image = Object.assign({}, source.texture.image);
+			const image = Object.assign({}, source.texture.image);
+			this.texture.source = new Source(image);
 			this.depthBuffer = source.depthBuffer;
 			this.stencilBuffer = source.stencilBuffer;
 			if (source.depthTexture !== null) this.depthTexture = source.depthTexture.clone();
@@ -18324,7 +18325,7 @@
 			function onSessionEvent(event) {
 				const controller = inputSourcesMap.get(event.inputSource);
 
-				if (controller) {
+				if (controller !== undefined) {
 					controller.dispatchEvent({
 						type: event.type,
 						data: event.inputSource
@@ -18334,7 +18335,9 @@
 
 			function onSessionEnd() {
 				inputSourcesMap.forEach(function (controller, inputSource) {
-					controller.disconnect(inputSource);
+					if (controller !== undefined) {
+						controller.disconnect(inputSource);
+					}
 				});
 				inputSourcesMap.clear();
 				_currentDepthNear = null;
@@ -20489,11 +20492,6 @@
 		};
 
 		this.copyFramebufferToTexture = function (position, texture, level = 0) {
-			if (texture.isFramebufferTexture !== true) {
-				console.error('THREE.WebGLRenderer: copyFramebufferToTexture() can only be used with FramebufferTexture.');
-				return;
-			}
-
 			const levelScale = Math.pow(2, -level);
 			const width = Math.floor(texture.image.width * levelScale);
 			const height = Math.floor(texture.image.height * levelScale);
@@ -25512,6 +25510,7 @@
 			data.shapes.push(shapes.uuid);
 		}
 
+		data.options = Object.assign({}, options);
 		if (options.extrudePath !== undefined) data.options.extrudePath = options.extrudePath.toJSON();
 		return data;
 	}

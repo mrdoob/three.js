@@ -3,7 +3,7 @@
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '140';
+const REVISION = '141dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -3416,7 +3416,8 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		// ensure image object is not shared, see #20328
 
-		this.texture.image = Object.assign( {}, source.texture.image );
+		const image = Object.assign( {}, source.texture.image );
+		this.texture.source = new Source( image );
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
@@ -24869,7 +24870,7 @@ class WebXRManager extends EventDispatcher {
 
 			const controller = inputSourcesMap.get( event.inputSource );
 
-			if ( controller ) {
+			if ( controller !== undefined ) {
 
 				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
@@ -24881,7 +24882,11 @@ class WebXRManager extends EventDispatcher {
 
 			inputSourcesMap.forEach( function ( controller, inputSource ) {
 
-				controller.disconnect( inputSource );
+				if ( controller !== undefined ) {
+
+					controller.disconnect( inputSource );
+
+				}
 
 			} );
 
@@ -28033,13 +28038,6 @@ function WebGLRenderer( parameters = {} ) {
 	};
 
 	this.copyFramebufferToTexture = function ( position, texture, level = 0 ) {
-
-		if ( texture.isFramebufferTexture !== true ) {
-
-			console.error( 'THREE.WebGLRenderer: copyFramebufferToTexture() can only be used with FramebufferTexture.' );
-			return;
-
-		}
 
 		const levelScale = Math.pow( 2, - level );
 		const width = Math.floor( texture.image.width * levelScale );
@@ -35192,6 +35190,8 @@ function toJSON$1( shapes, options, data ) {
 		data.shapes.push( shapes.uuid );
 
 	}
+
+	data.options = Object.assign( {}, options );
 
 	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
 
