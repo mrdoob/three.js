@@ -203,7 +203,7 @@ function html2canvas( element ) {
 
 	}
 
-	function roundRectPath(x, y, w, h, r) {
+	function buildRectPath(x, y, w, h, r) {
 		if (w < 2 * r) r = w / 2;
 		if (h < 2 * r) r = h / 2;
 		context.beginPath();
@@ -284,7 +284,7 @@ function html2canvas( element ) {
 			const backgroundColor = style.backgroundColor;
 
 			// Get the border of the element used for fill and border
-			roundRectPath(x, y, width, height, parseFloat(style.borderRadius) );
+			buildRectPath(x, y, width, height, parseFloat(style.borderRadius) );
 			if ( backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
 
 				context.fillStyle = backgroundColor;
@@ -331,7 +331,7 @@ function html2canvas( element ) {
 				const accentTextColor = luminance < 0.5 ? 'white' : '#111111';
 
 				if (element.type  === 'radio') {
-					roundRectPath(x,y,width,height,height);
+					buildRectPath(x,y,width,height,height);
 					context.fillStyle = 'white';
 					context.strokeStyle = accentColor;
 					context.lineWidth = 1;
@@ -340,7 +340,7 @@ function html2canvas( element ) {
 
 					if (element.checked) {
 						const border = 2;
-						roundRectPath(x+border,y+border,width-border*2,height-border*2, height);
+						buildRectPath(x+border,y+border,width-border*2,height-border*2, height);
 						context.fillStyle = accentColor;
 						context.strokeStyle = accentTextColor;
 						context.lineWidth = border;
@@ -350,7 +350,7 @@ function html2canvas( element ) {
 				}
 
 				if (element.type  === 'checkbox') {
-					roundRectPath(x,y,width,height,2);
+					buildRectPath(x,y,width,height,2);
 					context.fillStyle = element.checked ? accentColor : 'white';
 					context.strokeStyle = element.checked ? accentTextColor : accentColor;
 					context.lineWidth = 1;
@@ -374,18 +374,18 @@ function html2canvas( element ) {
 					const [min,max,value] = ['min','max','value'].map(property => parseFloat(element[property]));
 					const position = ((value-min)/(max-min)) * (width - height);
 
-					roundRectPath(x,y + height*0.25,width, height*0.5, height*0.25);
+					buildRectPath(x,y + height*0.25,width, height*0.5, height*0.25);
 					context.fillStyle = accentTextColor;
 					context.strokeStyle = accentColor;
 					context.lineWidth = 1;
 					context.fill();
 					context.stroke();
 
-					roundRectPath(x,y + height*0.25,position+height*0.5, height*0.5, height*0.25);
+					buildRectPath(x,y + height*0.25,position+height*0.5, height*0.5, height*0.25);
 					context.fillStyle = accentColor;
 					context.fill();
 
-					roundRectPath(x + position,y,height, height, height*0.5);
+					buildRectPath(x + position,y,height, height, height*0.5);
 					context.fillStyle = accentColor;
 					context.fill();
 				}
