@@ -50,7 +50,7 @@ class CubeTextureNode extends TextureNode {
 
 				if ( levelNode?.isNode === true ) {
 
-					const levelOutNode = builder.context.levelShaderNode ? builder.context.levelShaderNode?.call( { texture, levelNode }, builder ) : levelNode;
+					const levelOutNode = builder.context.levelShaderNode ? builder.context.levelShaderNode.call( { texture, levelNode }, builder ) : levelNode;
 
 					const levelSnippet = levelOutNode.build( builder, 'float' );
 
