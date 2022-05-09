@@ -440,11 +440,20 @@ class RGBELoader extends DataTextureLoader {
 
 		function onLoadCallback( texture, texData ) {
 
-			texture.encoding = LinearEncoding;
-			texture.minFilter = LinearFilter;
-			texture.magFilter = LinearFilter;
-			texture.generateMipmaps = false;
-			texture.flipY = true;
+			switch ( texture.type ) {
+
+				case FloatType:
+				case HalfFloatType:
+
+					texture.encoding = LinearEncoding;
+					texture.minFilter = LinearFilter;
+					texture.magFilter = LinearFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = true;
+			
+					break;
+
+			}
 
 			if ( onLoad ) onLoad( texture, texData );
 
