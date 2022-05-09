@@ -162,11 +162,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
-			return `textureSampleBias( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
+			return `textureSampleLevel( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
 
 		} else {
 
@@ -186,9 +186,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
@@ -198,9 +198,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getCubeTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
