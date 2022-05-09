@@ -9,10 +9,10 @@ import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
 import ToneMappingNode from '../display/ToneMappingNode.js';
 
-// lights
-import LightNode from '../lights/LightNode.js';
-import LightsNode from '../lights/LightsNode.js';
-import LightContextNode from '../lights/LightContextNode.js';
+// lighting
+//import LightingNode from '../lighting/LightingNode.js';
+import LightingContextNode from '../lighting/LightingContextNode.js';
+import LightsNode from '../lighting/LightsNode.js';
 
 // utils
 import MatcapUVNode from '../utils/MatcapUVNode.js';
@@ -71,11 +71,11 @@ export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( 
 export const normalMap = nodeProxy( NormalMapNode );
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
 
-// lights
+// lighting
 
-export const light = nodeProxy( LightNode );
-export const fromLights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
-export const lightContext = nodeProxy( LightContextNode );
+//export const light = nodeProxy( LightingNode );
+export const lights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
+export const lightingContext = nodeProxy( LightingContextNode );
 
 // utils
 
