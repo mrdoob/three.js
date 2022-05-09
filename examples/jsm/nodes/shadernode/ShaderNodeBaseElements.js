@@ -20,7 +20,7 @@ import MaterialNode from '../accessors/MaterialNode.js';
 import MaterialReferenceNode from '../accessors/MaterialReferenceNode.js';
 import ModelViewProjectionNode from '../accessors/ModelViewProjectionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
-import Object3DNode from '../accessors/Object3DNode.js';
+import ModelNode from '../accessors/ModelNode.js';
 import PointUVNode from '../accessors/PointUVNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
@@ -134,8 +134,9 @@ export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
 
 export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
+export const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
 export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
-export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
+//export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
 
@@ -156,11 +157,11 @@ export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const transformedNormalView = nodeImmutable( VarNode, normalView, 'TransformedNormalView' );
 
-export const viewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
-export const normalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
-export const worldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
-export const position = nodeProxy( Object3DNode, Object3DNode.POSITION );
-export const viewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+export const modelViewMatrix = nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX );
+export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
+export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
+export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
+export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 
 export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
 export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );
@@ -257,7 +258,7 @@ export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 export const frontFacing = nodeImmutable( FrontFacingNode );
 export const faceDirection = sub( mul( float( frontFacing ), 2 ), 1 );
 
-// lights
+// lighting
 
 
 // utils
@@ -267,3 +268,4 @@ export const element = nodeProxy( ArrayElementNode );
 // miscellaneous
 
 export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
+export const transformedNormalWorld = normalize( transformDirection( transformedNormalView, cameraViewMatrix ) );
