@@ -14,16 +14,16 @@ class Camera extends Object3D {
 		this.projectionMatrix = new Matrix4();
 		this.projectionMatrixInverse = new Matrix4();
 
-		this.view = {
-			left: 0,
+		this.projectionOffset = {
 			right: 0,
+			left: 0,
 			top: 0,
 			bottom: 0,
 		};
 
-		this.viewOffset = {
-			left: 0,
+		this.projectionParams = {
 			right: 0,
+			left: 0,
 			top: 0,
 			bottom: 0,
 		};

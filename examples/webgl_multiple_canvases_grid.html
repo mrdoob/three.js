@@ -80,7 +80,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as CameraUtils from './jsm/utils/CameraUtils.js';
 
 			const views = [];
 
@@ -105,7 +104,7 @@
 
 				const camera = new THREE.PerspectiveCamera( 20, viewWidth / viewHeight, 1, 10000 );
 
-				CameraUtils.setMultWindowOffset( camera, fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight );
+				camera.setViewOffset( fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight );
 
 				camera.position.z = 1800;
 
