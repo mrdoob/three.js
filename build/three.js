@@ -32754,6 +32754,8 @@
 
 	}
 
+	const _controlInterpolantsResultBuffer = /*@__PURE__*/new Float32Array(1);
+
 	class AnimationMixer extends EventDispatcher {
 		constructor(root) {
 			super();
@@ -33084,7 +33086,7 @@
 			let interpolant = interpolants[lastActiveIndex];
 
 			if (interpolant === undefined) {
-				interpolant = new LinearInterpolant(new Float32Array(2), new Float32Array(2), 1, this._controlInterpolantsResultBuffer);
+				interpolant = new LinearInterpolant(new Float32Array(2), new Float32Array(2), 1, _controlInterpolantsResultBuffer);
 				interpolant.__cacheIndex = lastActiveIndex;
 				interpolants[lastActiveIndex] = interpolant;
 			}
@@ -33292,8 +33294,6 @@
 		}
 
 	}
-
-	AnimationMixer.prototype._controlInterpolantsResultBuffer = new Float32Array(1);
 
 	class Uniform {
 		constructor(value) {
