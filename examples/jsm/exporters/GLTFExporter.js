@@ -361,7 +361,7 @@ function getCanvas() {
 
 }
 
-function getToBlobPromise( canvas ) {
+function getToBlobPromise( canvas, mimeType ) {
 
 	if ( canvas.toBlob !== undefined ) {
 
@@ -1137,7 +1137,7 @@ class GLTFWriter {
 
 			pending.push(
 
-				getToBlobPromise( canvas )
+				getToBlobPromise( canvas, mimeType )
 				.then( blob => writer.processBufferViewImage( blob ) )
 				.then( bufferViewIndex => {
 
@@ -1157,7 +1157,7 @@ class GLTFWriter {
 
 				pending.push(
 
-					getToBlobPromise( canvas )
+					getToBlobPromise( canvas, mimeType )
 					.then( blob => new FileReader().readAsDataURL( blob ) )
 					.then( dataURL => {
 
