@@ -1775,7 +1775,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				_gl.framebufferRenderbuffer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
+				if ( isMultipleRenderTargets ) {
+
+					_gl.framebufferRenderbuffer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
+
+				}
 
 				if ( ignoreDepthValues === true ) {
 
@@ -1784,9 +1788,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				const webglTexture = properties.get( textures[ i ] ).__webglTexture;
+				if ( isMultipleRenderTargets ) {
 
-				_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0 );
+					const webglTexture = properties.get( textures[ i ] ).__webglTexture;
+					_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0 );
+
+				}
 
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 
