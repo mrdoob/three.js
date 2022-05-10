@@ -305,7 +305,7 @@
 
 		}
 
-		if ( typeof OffscreenCanvas !== 'undefined' ) {
+		if ( typeof document === 'undefined' && typeof OffscreenCanvas !== 'undefined' ) {
 
 			cachedCanvas = new OffscreenCanvas( 1, 1 );
 
@@ -1005,8 +1005,22 @@
 
 					} else {
 
+						let quality; // Blink's implementation of convertToBlob seems to default to a quality level of 100%
+						// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
+
+						if ( mimeType === 'image/jpeg' ) {
+
+							quality = 0.92;
+
+						} else if ( mimeType === 'image/webp' ) {
+
+							quality = 0.8;
+
+						}
+
 						toBlobPromise = canvas.convertToBlob( {
-							type: mimeType
+							type: mimeType,
+							quality: quality
 						} );
 
 					}
