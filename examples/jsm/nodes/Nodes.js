@@ -59,11 +59,14 @@ import OperatorNode from './math/OperatorNode.js';
 import CondNode from './math/CondNode.js';
 
 // lighting
-import LightingContextNode from './lighting/LightingContextNode.js';
-import LightingNode from './lighting/LightingNode.js';
-import LightsNode from './lighting/LightsNode.js';
 import PunctualLightNode from './lighting/PunctualLightNode.js';
+import LightsNode from './lighting/LightsNode.js';
+import LightingNode from './lighting/LightingNode.js';
+import LightingContextNode from './lighting/LightingContextNode.js';
 import HemisphereLightNode from './lighting/HemisphereLightNode.js';
+import EnvironmentLightNode from './lighting/EnvironmentLightNode.js';
+import AONode from './lighting/AONode.js';
+import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
@@ -159,11 +162,14 @@ const nodeLib = {
 	CondNode,
 
 	// lighting
-	LightingContextNode,
-	LightingNode,
-	LightsNode,
 	PunctualLightNode,
+	LightsNode,
+	LightingNode,
+	LightingContextNode,
 	HemisphereLightNode,
+	EnvironmentLightNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,
@@ -258,11 +264,14 @@ export {
 	CondNode,
 
 	// lighting
-	LightingContextNode,
-	LightingNode,
-	LightsNode,
 	PunctualLightNode,
+	LightsNode,
+	LightingNode,
+	LightingContextNode,
 	HemisphereLightNode,
+	EnvironmentLightNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,

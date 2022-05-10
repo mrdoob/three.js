@@ -46,7 +46,7 @@ import ConvertNode from '../utils/ConvertNode.js';
 // shader node utils
 import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNode.js';
 
-// shader node utils
+// shader node base
 
 export { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable };
 
@@ -101,7 +101,7 @@ export const uniform = ( nodeOrType ) => {
 
 	const nodeType = getConstNodeType( nodeOrType );
 
-	// TODO: get ConstNode from .traverse() in the future
+	// @TODO: get ConstNode from .traverse() in the future
 	const value = nodeOrType.isNode === true ? nodeOrType.node?.value || nodeOrType.value : nodeOrType;
 
 	return nodeObject( new UniformNode( value, nodeType ) );
