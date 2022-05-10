@@ -197,7 +197,7 @@ function html2canvas( element ) {
 			context.font = style.fontWeight + ' ' + style.fontSize + ' ' + style.fontFamily;
 			context.textBaseline = 'top';
 			context.fillStyle = style.color;
-			context.fillText( string, x, y + parseFloat(style.fontSize)*0.1 );
+			context.fillText( string, x, y + parseFloat( style.fontSize ) * 0.1 );
 
 		}
 
@@ -522,16 +522,16 @@ function htmlevent( element, event, x, y ) {
 
 				element.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
 
-				if (
-					element instanceof HTMLInputElement && element.type  === 'range' &&
-					(event === 'mousedown' || event === 'click')
-				) {
-					const [min,max] = ['min','max'].map(property => parseFloat(element[property]));
+				if ( element instanceof HTMLInputElement && element.type  === 'range' && ( event === 'mousedown' || event === 'click' ) ) {
+
+					const [ min, max ] = [ 'min', 'max' ].map( property => parseFloat( element[ property ] ) );
+
 					const width = rect.width;
 					const offsetX = x - rect.x;
-					const proportion = offsetX/width;
-					element.value = min + (max-min)*proportion;
-					element.dispatchEvent(new InputEvent('input', {bubbles: true}));
+					const proportion = offsetX / width;
+					element.value = min + ( max - min ) * proportion;
+					element.dispatchEvent( new InputEvent( 'input', { bubbles: true } ) );
+
 				}
 
 			}
