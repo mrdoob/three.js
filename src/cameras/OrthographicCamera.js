@@ -45,7 +45,38 @@ class OrthographicCamera extends Camera {
 
 		if ( this.view === null ) {
 
-			this.view = {
+			const scope = this;
+
+			const viewHandler = {
+				set: function ( target, property, value ) {
+
+					scope.clearProjectionOffset();
+
+					target[ property ] = value;
+
+					if ( target.enabled ) {
+
+						// calculate projection offset
+						const { fullWidth, fullHeight, offsetX, offsetY, width, height } = target;
+						const { right, left, top, bottom } = scope.projectionParams;
+						const projectionHeight = top - bottom;
+						const projectionwidth = right - left;
+
+						const leftOffset = offsetX * projectionwidth / fullWidth;
+						const rightOffset = left + leftOffset + projectionwidth * width / fullWidth - right;
+						const topOffset = - offsetY * projectionHeight / fullHeight;
+						const bottomOffset = top + topOffset - projectionHeight * height / fullHeight - bottom;
+
+						scope.setProjectionOffset( rightOffset, leftOffset, topOffset, bottomOffset );
+
+					}
+
+					return true;
+
+				},
+			};
+
+			this.view = new Proxy( {
 				enabled: true,
 				fullWidth: 1,
 				fullHeight: 1,
@@ -53,7 +84,7 @@ class OrthographicCamera extends Camera {
 				offsetY: 0,
 				width: 1,
 				height: 1
-			};
+			}, viewHandler );
 
 		}
 
@@ -65,8 +96,6 @@ class OrthographicCamera extends Camera {
 		this.view.width = width;
 		this.view.height = height;
 
-		this.updateProjectionMatrix();
-
 	}
 
 	clearViewOffset() {
@@ -76,6 +105,30 @@ class OrthographicCamera extends Camera {
 			this.view.enabled = false;
 
 		}
+
+	}
+
+	setProjectionOffset( right, left, top, bottom ) {
+
+		this.projectionOffset = {
+			right,
+			left,
+			top,
+			bottom,
+		};
+
+		this.updateProjectionMatrix();
+
+	}
+
+	clearProjectionOffset() {
+
+		this.projectionOffset = {
+			right: 0,
+			left: 0,
+			top: 0,
+			bottom: 0,
+		};
 
 		this.updateProjectionMatrix();
 
@@ -93,21 +146,20 @@ class OrthographicCamera extends Camera {
 		let top = cy + dy;
 		let bottom = cy - dy;
 
-		if ( this.view !== null && this.view.enabled ) {
-
-			const scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
-			const scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
-
-			left += scaleW * this.view.offsetX;
-			right = left + scaleW * this.view.width;
-			top -= scaleH * this.view.offsetY;
-			bottom = top - scaleH * this.view.height;
-
-		}
+		const projectionOffset = this.projectionOffset;
+		top += projectionOffset.top;
+		bottom += projectionOffset.bottom;
+		left += projectionOffset.left;
+		right += projectionOffset.right;
 
 		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+
+		this.projectionParams.right = right;
+		this.projectionParams.left = left;
+		this.projectionParams.top = top;
+		this.projectionParams.bottom = bottom;
 
 	}
 
