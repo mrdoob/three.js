@@ -35,7 +35,10 @@ class OrthographicCamera extends Camera {
 		this.far = source.far;
 
 		this.zoom = source.zoom;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
+
+		this.projectionOffset = { ...source.projectionOffset };
+
+		this.view = source.view === null ? null : { ...source.view };
 
 		return this;
 
@@ -175,7 +178,9 @@ class OrthographicCamera extends Camera {
 		data.object.near = this.near;
 		data.object.far = this.far;
 
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+		data.object.projectionOffset = { ...this.projectionOffset };
+
+		if ( this.view !== null ) data.object.view = { ...this.view };
 
 		return data;
 
