@@ -1,59 +1,7 @@
 import { BufferGeometry } from './core/BufferGeometry.js';
-import { Material } from './materials/Material.js';
-import { Euler } from './math/Euler.js';
-import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { DataArrayTexture } from './textures/DataArrayTexture.js';
 import { Data3DTexture } from './textures/Data3DTexture.js';
-
-// r138, 02cf0df1cb4575d5842fef9c85bb5a89fe020d53
-
-Euler.prototype.toVector3 = function () {
-
-	console.error( 'THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead' );
-
-};
-
-//
-
-Object.defineProperties( Material.prototype, {
-
-	// r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
-
-	vertexTangents: {
-		get: function () {
-
-			console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-
-		},
-		set: function () {
-
-			console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-
-		}
-	},
-
-} );
-
-Object.defineProperties( WebGLRenderer.prototype, {
-
-	// r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
-
-	gammaFactor: {
-		get: function () {
-
-			console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
-			return 2;
-
-		},
-		set: function () {
-
-			console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
-
-		}
-	}
-
-} );
 
 // r133, c5bb5434555a3c3ddd784944a0a124f996fc721b
 
