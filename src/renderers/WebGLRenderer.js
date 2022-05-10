@@ -138,6 +138,7 @@ function WebGLRenderer( parameters = {} ) {
 		// @deprecated since r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
 
 		gammaFactor: {
+			configurable: true,
 			get: function () {
 
 				console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
