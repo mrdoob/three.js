@@ -361,6 +361,37 @@ function getCanvas() {
 
 }
 
+function getToBlobPromise( canvas ) {
+
+	if ( canvas.toBlob !== undefined ) {
+
+		return new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
+
+	}
+
+	let quality;
+
+	// Blink's implementation of convertToBlob seems to default to a quality level of 100%
+	// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
+	if ( mimeType === 'image/jpeg' ) {
+
+		quality = 0.92;
+
+	} else if ( mimeType === 'image/webp' ) {
+
+		quality = 0.8;
+
+	}
+
+	return canvas.convertToBlob( {
+
+		type: mimeType,
+		quality: quality
+
+	} );
+
+}
+
 /**
  * Writer
  */
@@ -1099,37 +1130,6 @@ class GLTFWriter {
 		} else {
 
 			ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
-
-		}
-
-		function getToBlobPromise( canvas ) {
-
-			if ( canvas.toBlob !== undefined ) {
-
-				return new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
-
-			}
-
-			let quality;
-
-			// Blink's implementation of convertToBlob seems to default to a quality level of 100%
-			// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
-			if ( mimeType === 'image/jpeg' ) {
-
-				quality = 0.92;
-
-			} else if ( mimeType === 'image/webp' ) {
-
-				quality = 0.8;
-
-			}
-
-			return canvas.convertToBlob( {
-
-				type: mimeType,
-				quality: quality
-
-			} );
 
 		}
 
