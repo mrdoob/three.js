@@ -204,15 +204,18 @@ function html2canvas( element ) {
 	}
 
 	function buildRectPath(x, y, w, h, r) {
-		if (w < 2 * r) r = w / 2;
-		if (h < 2 * r) r = h / 2;
+
+		if ( w < 2 * r ) r = w / 2;
+		if ( h < 2 * r ) r = h / 2;
+
 		context.beginPath();
-		context.moveTo(x+r, y);
-		context.arcTo(x+w, y,   x+w, y+h, r);
-		context.arcTo(x+w, y+h, x,   y+h, r);
-		context.arcTo(x,   y+h, x,   y,   r);
-		context.arcTo(x,   y,   x+w, y,   r);
+		context.moveTo( x + r, y );
+		context.arcTo( x + w, y, x + w, y + h, r );
+		context.arcTo( x + w, y + h, x, y + h, r );
+		context.arcTo( x, y + h, x, y, r );
+		context.arcTo( x, y, x + w, y, r );
 		context.closePath();
+
 	}
 
 	function drawBorder( style, which, x, y, width, height ) {
@@ -224,7 +227,7 @@ function html2canvas( element ) {
 		if ( borderWidth !== '0px' && borderStyle !== 'none' && borderColor !== 'transparent' && borderColor !== 'rgba(0, 0, 0, 0)' ) {
 
 			context.strokeStyle = borderColor;
-			context.lineWidth = parseFloat(borderWidth);
+			context.lineWidth = parseFloat( borderWidth );
 			context.beginPath();
 			context.moveTo( x, y );
 			context.lineTo( x + width, y + height );
@@ -264,8 +267,8 @@ function html2canvas( element ) {
 
 			context.save();
 			const dpr = window.devicePixelRatio;
-			context.scale(1/dpr, 1/dpr);
-			context.drawImage(element, 0, 0 );
+			context.scale( 1 / dpr, 1 / dpr );
+			context.drawImage( element, 0, 0 );
 			context.restore();
 
 		} else {
@@ -281,116 +284,156 @@ function html2canvas( element ) {
 
 			style = window.getComputedStyle( element );
 
+			// Get the border of the element used for fill and border
+
+			buildRectPath( x, y, width, height, parseFloat( style.borderRadius ) );
+
 			const backgroundColor = style.backgroundColor;
 
-			// Get the border of the element used for fill and border
-			buildRectPath(x, y, width, height, parseFloat(style.borderRadius) );
 			if ( backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
 
 				context.fillStyle = backgroundColor;
 				context.fill();
+
 			}
 
 			// If all the borders match then stroke the round rectangle
-			const borders = ['borderTop', 'borderLeft', 'borderBottom', 'borderRight'];
+
+			const borders = [ 'borderTop', 'borderLeft', 'borderBottom', 'borderRight' ];
+
 			let match = true;
 			let prevBorder = null;
-			for (const border of borders) {
-				if (prevBorder) {
-					match = (style[ border + 'Width' ] === style[ prevBorder + 'Width' ]) &&
-					(style[ border + 'Color' ] === style[ prevBorder + 'Color' ]) &&
-					(style[ border + 'Style' ] === style[ prevBorder + 'Style' ]);
+
+			for ( const border of borders ) {
+
+				if ( prevBorder !== null ) {
+
+					match = ( style[ border + 'Width' ] === style[ prevBorder + 'Width' ] ) &&
+					( style[ border + 'Color' ] === style[ prevBorder + 'Color' ] ) &&
+					( style[ border + 'Style' ] === style[ prevBorder + 'Style' ] );
+
 				}
-				if (!match) break;
+
+				if ( match === false ) break;
+
 				prevBorder = border;
+
 			}
 
-			// they all match so stroke the rectangle from before allows for border-radius
-			if (match) {
-				const width = parseFloat(style.borderTopWidth);
+			if ( match === true ) {
+
+				// They all match so stroke the rectangle from before allows for border-radius
+
+				const width = parseFloat( style.borderTopWidth );
+
 				if ( style.borderTopWidth !== '0px' && style.borderTopStyle !== 'none' && style.borderTopColor !== 'transparent' && style.borderTopColor !== 'rgba(0, 0, 0, 0)' ) {
+
 					context.strokeStyle = style.borderTopColor;
 					context.lineWidth = width;
 					context.stroke();
+
 				}
+
 			} else {
 
 				// Otherwise draw individual borders
+
 				drawBorder( style, 'borderTop', x, y, width, 0 );
 				drawBorder( style, 'borderLeft', x, y, 0, height );
 				drawBorder( style, 'borderBottom', x, y + height, width, 0 );
 				drawBorder( style, 'borderRight', x + width, y, 0, height );
+
 			}
 
-			if ( element instanceof HTMLInputElement) {
+			if ( element instanceof HTMLInputElement ) {
 
 				let accentColor = style.accentColor;
-				if (accentColor === undefined || accentColor === 'auto') accentColor = style.color;
-				color.set(accentColor);
-				const luminance = Math.sqrt( 0.299*color.r**2 + 0.587*color.g**2 + 0.114*color.b**2 );
+
+				if ( accentColor === undefined || accentColor === 'auto' ) accentColor = style.color;
+
+				color.set( accentColor );
+
+				const luminance = Math.sqrt( 0.299 * ( color.r ** 2 ) + 0.587 * ( color.g ** 2 ) + 0.114 * ( color.b ** 2 ) );
 				const accentTextColor = luminance < 0.5 ? 'white' : '#111111';
 
-				if (element.type  === 'radio') {
-					buildRectPath(x,y,width,height,height);
+				if ( element.type  === 'radio' ) {
+
+					buildRectPath( x, y, width, height, height );
+
 					context.fillStyle = 'white';
 					context.strokeStyle = accentColor;
 					context.lineWidth = 1;
 					context.fill();
 					context.stroke();
 
-					if (element.checked) {
-						const border = 2;
-						buildRectPath(x+border,y+border,width-border*2,height-border*2, height);
+					if ( element.checked ) {
+
+						buildRectPath( x + 2, y + 2, width - 4, height - 4, height );
+
 						context.fillStyle = accentColor;
 						context.strokeStyle = accentTextColor;
-						context.lineWidth = border;
+						context.lineWidth = 2;
 						context.fill();
 						context.stroke();
+
 					}
+
 				}
 
-				if (element.type  === 'checkbox') {
-					buildRectPath(x,y,width,height,2);
+				if ( element.type  === 'checkbox' ) {
+
+					buildRectPath( x, y, width, height, 2 );
+
 					context.fillStyle = element.checked ? accentColor : 'white';
 					context.strokeStyle = element.checked ? accentTextColor : accentColor;
 					context.lineWidth = 1;
 					context.stroke();
 					context.fill();
 
-					if (element.checked) {
-						const oldTextAlign = context.textAlign;
+					if ( element.checked ) {
+
+						const currentTextAlign = context.textAlign;
+
 						context.textAlign = 'center';
-						drawText( {
+						
+						const properties = {
 							color: accentTextColor,
 							fontFamily: style.fontFamily,
 							fontSize: height + 'px',
 							fontWeight: 'bold'
-						}, x + width/2, y, '✔' );
-						context.textAlign = oldTextAlign;
+						};
+
+						drawText( properties, x + ( width / 2 ), y, '✔' );
+
+						context.textAlign = currentTextAlign;
+
 					}
+
 				}
 
-				if (element.type  === 'range') {
+				if ( element.type  === 'range' ) {
+
 					const [min,max,value] = ['min','max','value'].map(property => parseFloat(element[property]));
 					const position = ((value-min)/(max-min)) * (width - height);
 
-					buildRectPath(x,y + height*0.25,width, height*0.5, height*0.25);
+					buildRectPath( x, y + ( height / 4 ), width, height / 2, height / 4 );
 					context.fillStyle = accentTextColor;
 					context.strokeStyle = accentColor;
 					context.lineWidth = 1;
 					context.fill();
 					context.stroke();
 
-					buildRectPath(x,y + height*0.25,position+height*0.5, height*0.5, height*0.25);
+					buildRectPath( x, y + ( height / 4 ),position + ( height / 2 ), height / 2, height / 4 );
 					context.fillStyle = accentColor;
 					context.fill();
 
-					buildRectPath(x + position,y,height, height, height*0.5);
+					buildRectPath( x + position, y, height, height, height / 2 );
 					context.fillStyle = accentColor;
 					context.fill();
+
 				}
 
-				if (element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
+				if ( element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
 
 					clipper.add( { x: x, y: y, width: width, height: height } );
 
