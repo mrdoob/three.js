@@ -34,6 +34,10 @@ class Camera extends Object3D {
 
 		super.copy( source, recursive );
 
+		this.projectionOffset = { ...source.projectionOffset };
+
+		this.projectionParams = { ...source.projectionParams };
+
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
 
 		this.projectionMatrix.copy( source.projectionMatrix );

@@ -38,8 +38,6 @@ class PerspectiveCamera extends Camera {
 		this.far = source.far;
 		this.focus = source.focus;
 
-		this.projectionOffset = { ...this.projectionOffset };
-
 		this.aspect = source.aspect;
 		this.view = source.view === null ? null : Object.assign( {}, source.view );
 

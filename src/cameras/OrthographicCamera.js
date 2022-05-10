@@ -36,8 +36,6 @@ class OrthographicCamera extends Camera {
 
 		this.zoom = source.zoom;
 
-		this.projectionOffset = { ...source.projectionOffset };
-
 		this.view = source.view === null ? null : { ...source.view };
 
 		return this;
