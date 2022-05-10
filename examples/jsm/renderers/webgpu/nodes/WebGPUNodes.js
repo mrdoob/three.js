@@ -20,12 +20,13 @@ class WebGPUNodes {
 
 		if ( nodeBuilder === undefined ) {
 
-			const fogNode = objectProperties.fogNode;
-			const lightNode = objectProperties.lightNode;
+			const scene = objectProperties.scene;
+			const lightsNode = objectProperties.lightsNode;
 
 			nodeBuilder = new WebGPUNodeBuilder( object, this.renderer );
-			nodeBuilder.lightNode = lightNode;
-			nodeBuilder.fogNode = fogNode;
+			nodeBuilder.lightsNode = lightsNode;
+			nodeBuilder.fogNode = scene?.fogNode;
+			nodeBuilder.scene = scene;
 			nodeBuilder.build();
 
 			objectProperties.nodeBuilder = nodeBuilder;

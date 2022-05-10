@@ -8,6 +8,14 @@ class ModelNode extends Object3DNode {
 
 	}
 
+	update( frame ) {
+
+		this.object3d = frame.object;
+
+		super.update( frame );
+
+	}
+
 }
 
 export default ModelNode;

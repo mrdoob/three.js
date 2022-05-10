@@ -1,5 +1,8 @@
 import Node from '../core/Node.js';
-import { nodeObject, normalWorld, positionWorld, cameraPosition, sub, normalize, vec3, negate, reflect } from '../shadernode/ShaderNodeBaseElements.js';
+import {
+	nodeObject, transformedNormalView, positionViewDirection,
+	transformDirection, negate, reflect, vec3, cameraViewMatrix
+} from '../shadernode/ShaderNodeBaseElements.js';
 
 class ReflectNode extends Node {
 
@@ -26,8 +29,8 @@ class ReflectNode extends Node {
 
 		if ( scope === ReflectNode.VECTOR ) {
 
-			const cameraToFrag = normalize( sub( positionWorld, cameraPosition ) );
-			const reflectVec = reflect( cameraToFrag, normalWorld );
+			const reflectView = reflect( negate( positionViewDirection ), transformedNormalView );
+			const reflectVec = transformDirection( reflectView, cameraViewMatrix );
 
 			return reflectVec.build( builder );
 

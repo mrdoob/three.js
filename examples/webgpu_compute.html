@@ -29,7 +29,7 @@
 			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import {
-				ShaderNode, compute, context,
+				ShaderNode, compute,
 				uniform, element, storage, attribute,
 				temp, assign, add, sub, cond, abs, negate, max, min, length, vec3, color,
 				greaterThanEqual, lessThanEqual, instanceIndex
@@ -99,7 +99,7 @@
 					const pointer = uniform( pointerVector );
 					const limit = uniform( scaleVector );
 
-					const position = temp( context( add( particle, velocity ), { temp: false } ) );
+					const position = temp( add( particle, velocity ), 'tempPos' ); // @TODO: this should work without 'tempPos' property name
 					position.build( builder );
 
 					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ) ).build( builder );

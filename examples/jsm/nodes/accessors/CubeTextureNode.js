@@ -4,9 +4,9 @@ import ReflectNode from './ReflectNode.js';
 
 class CubeTextureNode extends TextureNode {
 
-	constructor( value, uvNode = new ReflectNode(), biasNode = null ) {
+	constructor( value, uvNode = null, levelNode = null ) {
 
-		super( value, uvNode, biasNode );
+		super( value, uvNode, levelNode );
 
 	}
 
@@ -19,6 +19,7 @@ class CubeTextureNode extends TextureNode {
 	generate( builder, output ) {
 
 		const texture = this.value;
+		const uvNode = this.uvNode || builder.context.uvNode || new ReflectNode();
 
 		if ( ! texture || texture.isCubeTexture !== true ) {
 
@@ -42,16 +43,18 @@ class CubeTextureNode extends TextureNode {
 
 			let snippet = nodeData.snippet;
 
-			if ( snippet === undefined ) {
+			if ( builder.context.tempRead === false || snippet === undefined ) {
 
-				const uvSnippet = this.uvNode.build( builder, 'vec3' );
-				const biasNode = this.biasNode;
+				const uvSnippet = uvNode.build( builder, 'vec3' );
+				const levelNode = this.levelNode || builder.context.levelNode;
 
-				if ( biasNode !== null ) {
+				if ( levelNode?.isNode === true ) {
 
-					const biasSnippet = biasNode.build( builder, 'float' );
+					const levelOutNode = builder.context.levelShaderNode ? builder.context.levelShaderNode.call( { texture, levelNode }, builder ) : levelNode;
 
-					snippet = builder.getCubeTextureBias( textureProperty, uvSnippet, biasSnippet );
+					const levelSnippet = levelOutNode.build( builder, 'float' );
+
+					snippet = builder.getCubeTextureLevel( textureProperty, uvSnippet, levelSnippet );
 
 				} else {
 

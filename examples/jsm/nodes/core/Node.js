@@ -42,6 +42,15 @@ class Node {
 
 	}
 
+	getReference( builder ) {
+
+		const hash = this.getHash( builder );
+		const nodeFromHash = builder.getNodeFromHash( hash );
+
+		return nodeFromHash || this;
+
+	}
+
 	update( /*frame*/ ) {
 
 		console.warn( 'Abstract function.' );
@@ -56,12 +65,11 @@ class Node {
 
 	analyze( builder ) {
 
-		const hash = this.getHash( builder );
-		const sharedNode = builder.getNodeFromHash( hash );
+		const refNode = this.getReference( builder );
 
-		if ( sharedNode !== undefined && this !== sharedNode ) {
+		if ( this !== refNode ) {
 
-			return sharedNode.analyze( builder );
+			return refNode.analyze( builder );
 
 		}
 
@@ -80,12 +88,11 @@ class Node {
 
 	build( builder, output = null ) {
 
-		const hash = this.getHash( builder );
-		const sharedNode = builder.getNodeFromHash( hash );
+		const refNode = this.getReference( builder );
 
-		if ( sharedNode !== undefined && this !== sharedNode ) {
+		if ( this !== refNode ) {
 
-			return sharedNode.build( builder, output );
+			return refNode.build( builder, output );
 
 		}
 
