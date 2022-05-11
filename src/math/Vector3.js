@@ -1,9 +1,5 @@
 import * as MathUtils from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
-
-const _vector = /*@__PURE__*/ new Vector3();
-const _quaternion = /*@__PURE__*/ new Quaternion();
-
 class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
@@ -751,5 +747,8 @@ class Vector3 {
 	}
 
 }
+
+const _vector = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
 
 export { Vector3 };
