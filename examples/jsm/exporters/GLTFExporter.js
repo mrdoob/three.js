@@ -1138,12 +1138,12 @@ class GLTFWriter {
 			pending.push(
 
 				getToBlobPromise( canvas, mimeType )
-				.then( blob => writer.processBufferViewImage( blob ) )
-				.then( bufferViewIndex => {
+					.then( blob => writer.processBufferViewImage( blob ) )
+					.then( bufferViewIndex => {
 
-					imageDef.bufferView = bufferViewIndex;
+						imageDef.bufferView = bufferViewIndex;
 
-				} )
+					} )
 
 			);
 
@@ -1158,12 +1158,12 @@ class GLTFWriter {
 				pending.push(
 
 					getToBlobPromise( canvas, mimeType )
-					.then( blob => new FileReader().readAsDataURL( blob ) )
-					.then( dataURL => {
+						.then( blob => new FileReader().readAsDataURL( blob ) )
+						.then( dataURL => {
 
-						imageDef.uri = dataURL;
+							imageDef.uri = dataURL;
 
-					} )
+						} )
 
 				);
 
