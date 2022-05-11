@@ -361,6 +361,37 @@ function getCanvas() {
 
 }
 
+function getToBlobPromise( canvas, mimeType ) {
+
+	if ( canvas.toBlob !== undefined ) {
+
+		return new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
+
+	}
+
+	let quality;
+
+	// Blink's implementation of convertToBlob seems to default to a quality level of 100%
+	// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
+	if ( mimeType === 'image/jpeg' ) {
+
+		quality = 0.92;
+
+	} else if ( mimeType === 'image/webp' ) {
+
+		quality = 0.8;
+
+	}
+
+	return canvas.convertToBlob( {
+
+		type: mimeType,
+		quality: quality
+
+	} );
+
+}
+
 /**
  * Writer
  */
@@ -1104,50 +1135,39 @@ class GLTFWriter {
 
 		if ( options.binary === true ) {
 
-			let toBlobPromise;
+			pending.push(
 
-			if ( canvas.toBlob !== undefined ) {
+				getToBlobPromise( canvas, mimeType )
+					.then( blob => writer.processBufferViewImage( blob ) )
+					.then( bufferViewIndex => {
 
-				toBlobPromise = new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
+						imageDef.bufferView = bufferViewIndex;
 
-			} else {
+					} )
 
-				let quality;
-
-				// Blink's implementation of convertToBlob seems to default to a quality level of 100%
-				// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
-				if ( mimeType === 'image/jpeg' ) {
-
-					quality = 0.92;
-
-				} else if ( mimeType === 'image/webp' ) {
-
-					quality = 0.8;
-
-				}
-
-				toBlobPromise = canvas.convertToBlob( {
-
-					type: mimeType,
-					quality: quality
-
-				} );
-
-			}
-
-			pending.push( toBlobPromise.then( blob =>
-
-				writer.processBufferViewImage( blob ).then( bufferViewIndex => {
-
-					imageDef.bufferView = bufferViewIndex;
-
-				} )
-
-			) );
+			);
 
 		} else {
 
-			imageDef.uri = canvas.toDataURL( mimeType );
+			if ( canvas.toDataURL !== undefined ) {
+
+				imageDef.uri = canvas.toDataURL( mimeType );
+
+			} else {
+
+				pending.push(
+
+					getToBlobPromise( canvas, mimeType )
+						.then( blob => new FileReader().readAsDataURL( blob ) )
+						.then( dataURL => {
+
+							imageDef.uri = dataURL;
+
+						} )
+
+				);
+
+			}
 
 		}
 
