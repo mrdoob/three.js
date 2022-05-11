@@ -7,6 +7,8 @@ class Light extends Object3D {
 
 		super();
 
+		this.isLight = true;
+
 		this.type = 'Light';
 
 		this.color = new Color( color );
@@ -52,7 +54,5 @@ class Light extends Object3D {
 	}
 
 }
-
-Light.prototype.isLight = true;
 
 export { Light };

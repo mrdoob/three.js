@@ -56,6 +56,8 @@ function createCanvasElement() {
 
 function WebGLRenderer( parameters = {} ) {
 
+	this.isWebGLRenderer = true;
+
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
@@ -2190,7 +2192,5 @@ function WebGLRenderer( parameters = {} ) {
 	}
 
 }
-
-WebGLRenderer.prototype.isWebGLRenderer = true;
 
 export { WebGLRenderer };

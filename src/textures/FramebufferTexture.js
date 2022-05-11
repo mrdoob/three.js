@@ -7,6 +7,8 @@ class FramebufferTexture extends Texture {
 
 		super( { width, height } );
 
+		this.isFramebufferTexture = true;
+
 		this.format = format;
 
 		this.magFilter = NearestFilter;
@@ -19,7 +21,5 @@ class FramebufferTexture extends Texture {
 	}
 
 }
-
-FramebufferTexture.prototype.isFramebufferTexture = true;
 
 export { FramebufferTexture };

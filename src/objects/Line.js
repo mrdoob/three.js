@@ -19,6 +19,8 @@ class Line extends Object3D {
 
 		super();
 
+		this.isLine = true;
+
 		this.type = 'Line';
 
 		this.geometry = geometry;
@@ -246,8 +248,5 @@ class Line extends Object3D {
 	}
 
 }
-
-Line.prototype.isLine = true;
-
 
 export { Line };

@@ -87,6 +87,8 @@ class CatmullRomCurve3 extends Curve {
 
 		super();
 
+		this.isCatmullRomCurve3 = true;
+
 		this.type = 'CatmullRomCurve3';
 
 		this.points = points;
@@ -247,7 +249,5 @@ class CatmullRomCurve3 extends Curve {
 	}
 
 }
-
-CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
 export { CatmullRomCurve3 };

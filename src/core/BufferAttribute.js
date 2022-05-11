@@ -17,6 +17,8 @@ class BufferAttribute {
 
 		}
 
+		this.isBufferAttribute = true;
+
 		this.name = '';
 
 		this.array = array;
@@ -399,8 +401,6 @@ class BufferAttribute {
 
 }
 
-BufferAttribute.prototype.isBufferAttribute = true;
-
 //
 
 class Int8BufferAttribute extends BufferAttribute {
@@ -479,11 +479,12 @@ class Float16BufferAttribute extends BufferAttribute {
 
 		super( new Uint16Array( array ), itemSize, normalized );
 
+		this.isFloat16BufferAttribute = true;
+
 	}
 
 }
 
-Float16BufferAttribute.prototype.isFloat16BufferAttribute = true;
 
 class Float32BufferAttribute extends BufferAttribute {
 

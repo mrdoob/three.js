@@ -52,6 +52,4 @@ class PointLight extends Light {
 
 }
 
-PointLight.prototype.isPointLight = true;
-
 export { PointLight };

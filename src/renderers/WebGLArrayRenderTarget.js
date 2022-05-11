@@ -7,6 +7,8 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
 		super( width, height );
 
+		this.isWebGLArrayRenderTarget = true;
+
 		this.depth = depth;
 
 		this.texture = new DataArrayTexture( null, width, height, depth );
@@ -16,7 +18,5 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 	}
 
 }
-
-WebGLArrayRenderTarget.prototype.isWebGLArrayRenderTarget = true;
 
 export { WebGLArrayRenderTarget };
