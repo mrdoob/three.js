@@ -5802,6 +5802,11 @@ class Euler {
 		yield this._y;
 		yield this._z;
 		yield this._order;
+	} // @deprecated since r138, 02cf0df1cb4575d5842fef9c85bb5a89fe020d53
+
+
+	toVector3() {
+		console.error('THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead');
 	}
 
 }
@@ -7102,6 +7107,16 @@ class Material extends EventDispatcher {
 
 	set needsUpdate(value) {
 		if (value === true) this.version++;
+	} // @deprecated since r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
+
+
+	get vertexTangents() {
+		console.warn('THREE.' + this.type + ': .vertexTangents has been removed.');
+		return false;
+	}
+
+	set vertexTangents(value) {
+		console.warn('THREE.' + this.type + ': .vertexTangents has been removed.');
 	}
 
 }
@@ -19211,7 +19226,21 @@ function WebGLRenderer(parameters = {}) {
 	this.physicallyCorrectLights = false; // tone mapping
 
 	this.toneMapping = NoToneMapping;
-	this.toneMappingExposure = 1.0; // internal properties
+	this.toneMappingExposure = 1.0; //
+
+	Object.defineProperties(WebGLRenderer.prototype, {
+		// @deprecated since r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
+		gammaFactor: {
+			configurable: true,
+			get: function () {
+				console.warn('THREE.WebGLRenderer: .gammaFactor has been removed.');
+				return 2;
+			},
+			set: function () {
+				console.warn('THREE.WebGLRenderer: .gammaFactor has been removed.');
+			}
+		}
+	}); // internal properties
 
 	const _this = this;
 
@@ -34915,35 +34944,6 @@ for (let i = 1; i < 64; ++i) {
 		_offsetTable[i] = 1024;
 	}
 }
-
-Euler.prototype.toVector3 = function () {
-	console.error('THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead');
-}; //
-
-
-Object.defineProperties(Material.prototype, {
-	// r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
-	vertexTangents: {
-		get: function () {
-			console.warn('THREE.' + this.type + ': .vertexTangents has been removed.');
-		},
-		set: function () {
-			console.warn('THREE.' + this.type + ': .vertexTangents has been removed.');
-		}
-	}
-});
-Object.defineProperties(WebGLRenderer.prototype, {
-	// r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
-	gammaFactor: {
-		get: function () {
-			console.warn('THREE.WebGLRenderer: .gammaFactor has been removed.');
-			return 2;
-		},
-		set: function () {
-			console.warn('THREE.WebGLRenderer: .gammaFactor has been removed.');
-		}
-	}
-}); // r133, c5bb5434555a3c3ddd784944a0a124f996fc721b
 
 class ParametricGeometry extends BufferGeometry {
 	constructor() {
