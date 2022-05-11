@@ -449,6 +449,7 @@ function html2canvas( element ) {
 
 				const drawImage = () => {
 
+					element.removeEventListener( 'load', drawImage );
 					buildRectPath( x, y, width, height, 2 );
 					context.drawImage( element, x, y, element.width, element.height );
 
