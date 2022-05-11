@@ -630,9 +630,16 @@ class WebXRManager extends EventDispatcher {
 
 					}
 
-					if ( ! cameras[ i ] ) addCamera( i );
+					let camera = cameras[ i ];
 
-					const camera = cameras[ i ];
+					if ( camera === undefined ) {
+
+						camera = new PerspectiveCamera();
+						camera.layers.enable( i );
+						camera.viewport = new Vector4();
+						cameras[ i ] = camera;
+
+					}
 
 					camera.matrix.fromArray( view.transform.matrix );
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
