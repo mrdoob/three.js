@@ -34,6 +34,7 @@ class NodeBuilder {
 
 		this.object = object;
 		this.material = object.material || null;
+		this.geometry = object.geometry || null;
 		this.renderer = renderer;
 		this.parser = parser;
 
