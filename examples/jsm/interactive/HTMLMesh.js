@@ -237,6 +237,14 @@ function html2canvas( element ) {
 
 	}
 
+	function drawImage() {
+
+		element.removeEventListener( 'load', drawImage );
+		buildRectPath( x, y, width, height, 2 );
+		context.drawImage( element, x, y, element.width, element.height );
+
+	}
+
 	function drawElement( element, style ) {
 
 		let x = 0, y = 0, width = 0, height = 0;
@@ -446,14 +454,6 @@ function html2canvas( element ) {
 			}
 
 			if ( element instanceof HTMLImageElement ) {
-
-				const drawImage = () => {
-
-					element.removeEventListener( 'load', drawImage );
-					buildRectPath( x, y, width, height, 2 );
-					context.drawImage( element, x, y, element.width, element.height );
-
-				}
 				
 				if ( element.complete ) {
 
