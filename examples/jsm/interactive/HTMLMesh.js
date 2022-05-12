@@ -461,7 +461,7 @@ function html2canvas( element ) {
 
 				} else {
 					
-					element.addEventListener( 'load', drawImage( element, x, y, width, height ) );
+					element.addEventListener( 'load', () => drawImage( element, x, y, width, height ) );
 
 				}
 
