@@ -1,5 +1,5 @@
 {
-  "name": "three",
+  "name": "@exabyte-io/three",
   "version": "0.140.0",
   "description": "JavaScript 3D library",
   "type": "module",
@@ -10,6 +10,8 @@
       "import": "./build/three.module.js",
       "require": "./build/three.cjs"
     },
+    "./editor/css/*": "./editor/css/*",
+    "./editor/js/*": "./editor/js/*",
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
     "./src/*": "./src/*"
@@ -24,6 +26,9 @@
     "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
+    "editor/js",
+    "editor/css",
+    "editor/images",
     "examples/js",
     "examples/jsm",
     "examples/fonts",
