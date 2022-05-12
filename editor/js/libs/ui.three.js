@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
-import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
+import { UIElement, UISpan, UIDiv, UIUl, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
 class UITexture extends UISpan {
@@ -388,6 +388,8 @@ class UIOutliner extends UIDiv {
 
 		this.editor = editor;
 
+        this.contextMenu = new UIContextMenu();
+
 		this.options = [];
 		this.selectedIndex = - 1;
 		this.selectedValue = null;
@@ -425,6 +427,19 @@ class UIOutliner extends UIDiv {
 			const changeEvent = document.createEvent( 'HTMLEvents' );
 			changeEvent.initEvent( 'change', true, true );
 			scope.dom.dispatchEvent( changeEvent );
+
+		}
+
+        function onContextMenu( e ) {
+
+			e.preventDefault();
+
+			scope.contextMenu.setLeft( e.clientX + "px" );
+	        scope.contextMenu.setTop( e.clientY + "px" );
+
+			scope.add( scope.contextMenu );
+
+			onClick.bind( this )();
 
 		}
 
@@ -564,6 +579,7 @@ class UIOutliner extends UIDiv {
 				div.addEventListener( 'dragover', onDragOver );
 				div.addEventListener( 'dragleave', onDragLeave );
 				div.addEventListener( 'drop', onDrop );
+                div.addEventListener( 'contextmenu', onContextMenu, false );
 
 			}
 
@@ -573,6 +589,22 @@ class UIOutliner extends UIDiv {
 		return scope;
 
 	}
+
+   	setContextMenuOptions = function ( options ) {
+
+		this.contextMenu.setOptions( options );
+
+		return this;
+
+	};
+
+	onContextMenuChange = function ( callback ) {
+
+		this.contextMenu.onChange( callback );
+
+		return this;
+
+	};
 
 	getValue() {
 
@@ -917,6 +949,56 @@ class UIBoolean extends UISpan {
 
 	}
 
+}
+
+class UIContextMenu extends UIUl {
+	constructor() {
+		super();
+
+		this.dom.className = 'ContextMenu';
+
+		const scope = this;
+
+		function clickOutside(e) {
+			if (scope.dom.parentElement && scope.dom.contains(e.target) === false) {
+				scope.dom.parentElement.removeChild(scope.dom);
+			}
+		}
+		document.addEventListener('click', clickOutside, false);
+	}
+
+	setOptions(options) {
+		const scope = this;
+
+		while (scope.dom.children.length > 0) {
+			scope.dom.removeChild(scope.dom.firstChild);
+		}
+
+		function onClick(e) {
+			if (scope.onChangeCallback) {
+				scope.onChangeCallback(e.srcElement.innerHTML);
+				if (scope.dom.parentElement) {
+					scope.dom.parentElement.removeChild(scope.dom);
+				}
+			}
+		}
+
+		scope.options = [];
+
+		for (let i = 0; i < options.length; i++) {
+			const div = document.createElement('li');
+			div.innerHTML = options[i];
+			div.className = 'option';
+			scope.dom.appendChild(div);
+			scope.options.push(div);
+			div.addEventListener('click', onClick, false);
+		}
+
+	}
+
+	onChange(callback) {
+		this.onChangeCallback = callback;
+	}
 }
 
 let renderer;

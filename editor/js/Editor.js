@@ -6,12 +6,16 @@ import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
 
+import '../css/main.css';
+
 var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
 _DEFAULT_CAMERA.position.set( 0, 5, 10 );
 _DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
-function Editor() {
+function Editor( providedDefaultCamera ) {
+
+	this.DEFAULT_CAMERA = providedDefaultCamera || _DEFAULT_CAMERA;
 
 	var Signal = signals.Signal;
 
@@ -95,7 +99,7 @@ function Editor() {
 
 	this.loader = new Loader( this );
 
-	this.camera = _DEFAULT_CAMERA.clone();
+	this.camera = this.DEFAULT_CAMERA.clone();
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
@@ -398,11 +402,12 @@ Editor.prototype = {
 
 			if ( helper === undefined ) {
 
-				if ( object.isCamera ) {
+				// if ( object.isCamera ) {
 
-					helper = new THREE.CameraHelper( object );
+				// 	helper = new THREE.CameraHelper( object );
 
-				} else if ( object.isPointLight ) {
+				// } else
+				if ( object.isPointLight ) {
 
 					helper = new THREE.PointLightHelper( object, 1 );
 
@@ -608,7 +613,7 @@ Editor.prototype = {
 		this.history.clear();
 		this.storage.clear();
 
-		this.camera.copy( _DEFAULT_CAMERA );
+		this.camera.copy( this.DEFAULT_CAMERA );
 		this.signals.cameraResetted.dispatch();
 
 		this.scene.name = 'Scene';

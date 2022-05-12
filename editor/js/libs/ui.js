@@ -201,6 +201,16 @@ class UIDiv extends UIElement {
 
 }
 
+class UIUl extends UIElement {
+
+	constructor() {
+
+		super( document.createElement( 'ul' ) );
+
+	}
+
+}
+
 class UIRow extends UIDiv {
 
 	constructor() {
@@ -1282,4 +1292,4 @@ class ListboxItem extends UIDiv {
 
 }
 
-export { UIElement, UISpan, UIDiv, UIRow, UIPanel, UIText, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UIProgress, UITabbedPanel, UIListbox, ListboxItem };
+export { UIElement, UISpan, UIDiv, UIUl, UIRow, UIPanel, UIText, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UIProgress, UITabbedPanel, UIListbox, ListboxItem };

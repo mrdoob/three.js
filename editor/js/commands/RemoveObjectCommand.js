@@ -28,6 +28,8 @@ class RemoveObjectCommand extends Command {
 
 	execute() {
 
+		// avoid modifying camera and light objects
+		if ( [ 'PerspectiveCamera', 'AmbientLight', 'DirectionalLight' ].includes( this.object.type ) ) return;
 		this.editor.removeObject( this.object );
 		this.editor.deselect();
 
