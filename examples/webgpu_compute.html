@@ -83,8 +83,8 @@
 
 				// create buffers
 
-				const particleBuffer = new THREE.InstancedBufferAttribute( particleArray );
-				const velocityBuffer = new THREE.InstancedBufferAttribute( velocityArray );
+				const particleBuffer = new THREE.InstancedBufferAttribute( particleArray, 2 );
+				const velocityBuffer = new THREE.InstancedBufferAttribute( velocityArray, 2 );
 
 				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
 				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
@@ -123,7 +123,7 @@
 				const particleNode = attribute( 'particle', 'vec2' );
 
 				const pointsGeometry = new THREE.BufferGeometry();
-				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ) ) ); // single vertex ( not triangle )
+				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ), 3 ) ); // single vertex ( not triangle )
 				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
 				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 
