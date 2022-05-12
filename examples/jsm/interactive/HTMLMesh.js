@@ -237,7 +237,7 @@ function html2canvas( element ) {
 
 	}
 
-	function drawImage() {
+	function drawImage( element, x, y, width, height ) {
 
 		element.removeEventListener( 'load', drawImage );
 		buildRectPath( x, y, width, height, 2 );
@@ -457,11 +457,11 @@ function html2canvas( element ) {
 				
 				if ( element.complete ) {
 
-					drawImage();
+					drawImage( element, x, y, width, height );
 
 				} else {
 					
-					element.addEventListener( 'load', drawImage );
+					element.addEventListener( 'load', drawImage( element, x, y, width, height ) );
 
 				}
 
