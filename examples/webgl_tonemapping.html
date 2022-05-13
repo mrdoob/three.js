@@ -41,7 +41,7 @@
 
 			const params = {
 				model: 'helmet',
-				logExposure: 0.0,
+				exposure: 1.0,
 				toneMapping: 'ACESFilmic'
 			};
 
@@ -69,7 +69,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-				renderer.toneMappingExposure = Math.pow( 10, params.logExposure );
+				renderer.toneMappingExposure = params.exposure;
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -180,11 +180,11 @@
 
 				if ( params.toneMapping !== 'None' ) {
 
-					guiExposure = gui.add( params, 'logExposure', -2, 2 )
+					guiExposure = gui.add( params, 'exposure', 0, 2 )
 
 						.onChange( function () {
 
-							renderer.toneMappingExposure = Math.pow( 10, params.logExposure );
+							renderer.toneMappingExposure = params.exposure;
 							render();
 
 						} );
