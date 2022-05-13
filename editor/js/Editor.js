@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Signal } from "signals";
 
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
@@ -6,7 +7,7 @@ import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
 
-// import '../css/main.css';
+import '../css/main.css';
 
 var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
@@ -17,7 +18,7 @@ function Editor( providedDefaultCamera ) {
 
 	this.DEFAULT_CAMERA = providedDefaultCamera || _DEFAULT_CAMERA;
 
-	var Signal = signals.Signal;
+	var signal = new Signal();
 
 	this.signals = {
 
