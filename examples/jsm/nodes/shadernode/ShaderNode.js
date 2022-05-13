@@ -259,4 +259,26 @@ export const ConvertType = function ( type, cacheMap = null ) {
 
 };
 
-export const getConstNodeType = ( value ) => value?.nodeType || value?.convertTo || value?.name || ( typeof value === 'string' ? value : null );
+export const getConstNodeType = ( value ) => {
+
+	if ( typeof value === 'function' ) {
+
+		value = value();
+
+	}
+
+	if ( typeof value === 'string' ) {
+
+		return value;
+
+	}
+
+	if ( ( value === null ) || ( value === undefined ) ) {
+
+		return null;
+
+	}
+
+	return value.nodeType || value.convertTo || null;
+
+};
