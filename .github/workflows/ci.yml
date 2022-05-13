@@ -1,16 +1,15 @@
 name: CI
 
 on:
-  pull_request:
-    paths-ignore:
-      - 'build/**'
-      - 'docs/**'
-      - 'files/**'
   push:
     paths-ignore:
       - 'build/**'
       - 'docs/**'
       - 'files/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
 
