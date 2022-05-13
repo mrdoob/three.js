@@ -326,16 +326,16 @@ function SidebarScene( editor ) {
 	fogPropertiesRow.add( fogDensity );
 
 	//
-
+	var copiedObject;
 	function refreshUI() {
 
-		const camera = editor.camera;
+		// const camera = editor.camera;
 		const scene = editor.scene;
 
 		const options = [];
 
-		options.push( buildOption( camera, false ) );
-		options.push( buildOption( scene, false ) );
+		// options.push( buildOption( camera, false ) );
+		// options.push( buildOption( scene, false ) );
 
 		( function addObjects( objects, pad ) {
 
@@ -349,9 +349,22 @@ function SidebarScene( editor ) {
 
 				}
 
-				const option = buildOption( object, true );
-				option.style.paddingLeft = ( pad * 18 ) + 'px';
-				options.push( option );
+                // Hide utility scene objects and labels from materials editor
+            	if (
+					! [
+						'OrthographicCamera',
+						'PerspectiveCamera',
+						'AmbientLight',
+						'DirectionalLight',
+					].includes( object.type ) &&
+                    ! object.name.includes( 'label-for-' )
+				) {
+
+					const option = buildOption( object, true );
+					option.style.paddingLeft = pad * 18 + 'px';
+					options.push( option );
+
+				}
 
 				if ( nodeStates.get( object ) === true ) {
 
@@ -364,6 +377,45 @@ function SidebarScene( editor ) {
 		} )( scene.children, 0 );
 
 		outliner.setOptions( options );
+
+       	outliner.setContextMenuOptions( [ 'Copy', 'Cut', 'Paste', 'Clone', 'Delete' ] );
+
+		outliner.onContextMenuChange( function ( value ) {
+
+			if ( editor.selected !== undefined ) {
+
+				if ( value === 'Copy' ) {
+
+					copiedObject = editor.selected.clone();
+
+				} else if ( value === 'Cut' ) {
+
+					copiedObject = editor.selected;
+				   editor.execute( new RemoveObjectCommand( editor.selected ) );
+
+				} else if ( value === 'Delete' ) {
+
+					editor.execute( new RemoveObjectCommand( editor.selected ) );
+
+				} else if ( value === 'Clone' ) {
+
+					editor.execute( new AddObjectCommand( editor.selected.clone() ) );
+
+				} else if ( value === 'Paste' && copiedObject !== undefined ) {
+
+					if ( copiedObject.parent !== null ) {
+
+						copiedObject = copiedObject.clone();
+
+					}
+
+				   editor.execute( new AddObjectCommand( copiedObject, editor.selected ) );
+
+				}
+
+			}
+
+		} );
 
 		if ( editor.selected !== null ) {
 

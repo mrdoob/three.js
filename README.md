@@ -82,3 +82,10 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [discord]: https://img.shields.io/discord/685241246557667386
 [discord-url]: https://discord.gg/56GBJwAnUS
 
+### Notes
+
+This fork is introducing adjustments to the Editor to (1) make it reusable and (2) focus on 3D design of materials/chemicals.
+
+Known Issues:
+
+- Codemirror Dependency on Tern.JS https://github.com/Exabyte-io/three.js/pull/6/files#diff-164db2a22a4c894e29fdccb6def3bfcf77c385084b8a0f6bdbce66146d2f5a88R3

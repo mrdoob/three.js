@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+import { VRButton } from '../../../examples/jsm/webxr/VRButton.js';
 var APP = {
 
 	Player: function () {

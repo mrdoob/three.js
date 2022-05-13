@@ -1,16 +1,15 @@
 name: CI
 
 on:
-  pull_request:
-    paths-ignore:
-      - 'build/**'
-      - 'docs/**'
-      - 'files/**'
   push:
     paths-ignore:
       - 'build/**'
       - 'docs/**'
       - 'files/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
 
@@ -96,3 +95,27 @@ jobs:
 
       - name: === Ready for release ===
         run: npm run test-e2e-cov
+
+  publish:
+    name: "Publish package"
+    needs: [lint, unit, e2e, e2e-cov] 
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'dev'
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Checkout actions repository
+        uses: actions/checkout@v2
+        with:
+          repository: Exabyte-io/actions
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          path: actions
+
+      - name: Publish release
+        uses: ./actions/js/publish
+        with:
+          npm-token: ${{ secrets.NPM_TOKEN }}
+          github-token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          verify-tests: false

@@ -1,4 +1,9 @@
 import { UIElement, UIPanel, UIText } from './libs/ui.js';
+import CodeMirror from "codemirror";
+// TODO : resolve global tern reference in CodeMirror.TernServer
+import tern from "ternjs";
+import "codemirror/addon/tern/tern";
+import "codemirror/addon/tern/tern.css";
 
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
