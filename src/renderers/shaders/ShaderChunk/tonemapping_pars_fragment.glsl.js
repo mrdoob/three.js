@@ -4,6 +4,19 @@ export default /* glsl */`
 #define saturate( a ) clamp( a, 0.0, 1.0 )
 #endif
 
+#ifndef linearToRelativeLuminance
+// <common> may have defined linearToRelativeLuminance() already
+#define linearToRelativeLuminance linearToRelativeLuminance
+// https://en.wikipedia.org/wiki/Relative_luminance
+float linearToRelativeLuminance( const in vec3 color ) {
+
+	vec3 weights = vec3( 0.2126, 0.7152, 0.0722 );
+
+	return dot( weights, color.rgb );
+
+}
+#endif
+
 uniform float toneMappingExposure;
 
 // exposure only
@@ -24,10 +37,8 @@ vec3 ReinhardToneMapping( vec3 color ) {
 // source: https://64.github.io/tonemapping/
 vec3 ReinhardLumaToneMapping( vec3 color ) {
 
-	const vec3 luma = vec3( 0.2126, 0.7152, 0.0722 );
 	color *= toneMappingExposure;
-	float l = dot( color, luma );
-	return saturate( color / ( 1. + l ) );
+	return saturate( color / ( 1. + linearToRelativeLuminance( color ) ) );
 
 }
 

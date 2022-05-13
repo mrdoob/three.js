@@ -87,6 +87,9 @@ mat3 transposeMat3( const in mat3 m ) {
 
 }
 
+#ifndef linearToRelativeLuminance
+// <tonemapping_pars_fragment> may have defined linearToRelativeLuminance() already
+#define linearToRelativeLuminance linearToRelativeLuminance
 // https://en.wikipedia.org/wiki/Relative_luminance
 float linearToRelativeLuminance( const in vec3 color ) {
 
@@ -95,6 +98,7 @@ float linearToRelativeLuminance( const in vec3 color ) {
 	return dot( weights, color.rgb );
 
 }
+#endif
 
 bool isPerspectiveMatrix( mat4 m ) {
 
